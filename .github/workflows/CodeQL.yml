@@ -2,19 +2,22 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "Stable", "main" ]
+    branches: [ "Stable" ]
   pull_request:
-    branches: [ "Stable", "main" ]
-  workflow_dispatch:
+    branches: [ "Stable" ]
+  schedule:
+    - cron: '0 5 * * 1'
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
 
 jobs:
   analyze:
-    name: Analyze
+    name: Analyze C#
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
+    timeout-minutes: 60
 
     strategy:
       fail-fast: false
@@ -24,24 +27,27 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          global-json-file: global.json
 
-      - name: Restore dependencies
+      - name: Restore
         run: dotnet restore TenshoAssistant.sln
-
-      - name: Build project
-        run: dotnet build TenshoAssistant.sln --configuration Release --no-restore
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: csharp
+          languages: ${{ matrix.language }}
           build-mode: manual
-          config-file: ./.github/codeql/codeql-config.yml
+
+      - name: Build
+        run: dotnet build src/TenshoAssistant/TenshoAssistant.csproj -c Release --no-restore
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
