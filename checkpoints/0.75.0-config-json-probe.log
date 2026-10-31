@@ -1,0 +1,3 @@
+PASS Newtonsoft.Json 13.0.0.0, mode None: configuration v1, recipe ids, immutable actions and UTC date roundtrip
+PASS Newtonsoft.Json 13.0.0.0, mode Auto: configuration v1, recipe ids, immutable actions and UTC date roundtrip
+PASS Newtonsoft.Json 13.0.0.0, mode Objects: configuration v1, recipe ids, immutable actions and UTC date roundtrip

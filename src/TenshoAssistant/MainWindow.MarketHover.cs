@@ -1,0 +1,203 @@
+using System.Numerics;
+using Dalamud.Bindings.ImGui;
+using TenshoAssistant.Inventory;
+using TenshoAssistant.Items;
+using TenshoAssistant.Market;
+
+namespace TenshoAssistant;
+
+internal sealed partial class MainWindow
+{
+    private Vector2 hoverPanelSize=new(380,300);
+    private (uint Item,object? Live,object? Bank,ulong Character) hoverHoldingsKey;
+    private ItemHoldingsSummary? hoverHoldings;
+    private Monsters.MonsterHoverSources? monsterHover;
+    internal void ConfigureMonsterHover(Monsters.MonsterHoverSources service)=>monsterHover=service;
+    public void DrawItemHover()
+    {
+        var observed=itemHover.State;var now=DateTimeOffset.UtcNow;
+        if(windowDisposed || !observed.Fresh(now) || observed.Item is not { } hovered)return;
+        var priced=MarketHoverTracker.Eligible(hovered,itemCatalog.State.Catalog);
+        var prices=configuration.MarketPricesOnHover && market.State.WorldId!=0 && priced is not null;
+        var usages=configuration.ItemUsagesOnHover && observed.Stable(now);
+        if(!prices && !usages)return;
+        using var theme=TenshoAssistant.UI.FfxivTheme.Apply();
+        var viewport=ImGui.GetMainViewport();
+        var (position,width)=HoverPlacement(observed.Anchor,viewport);
+        ImGui.SetNextWindowPos(position,ImGuiCond.Always);
+        if(width is { } fixedWidth)ImGui.SetNextWindowSizeConstraints(new Vector2(fixedWidth,0),new Vector2(fixedWidth,viewport.WorkSize.Y));
+        else ImGui.SetNextWindowSizeConstraints(Vector2.Zero,viewport.WorkSize);
+        ImGui.SetNextWindowBgAlpha(0.94f);
+        var visible=ImGui.Begin(localization.Get("HoverUi.Title")+"###TenshoItemHover",ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize
+            | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav);
+        try
+        {
+            if(!visible)return;
+            var item=itemCatalog.State.Catalog?.Find(hovered.ItemId);
+            ImGui.PushTextWrapPos(width is { } wrap ? wrap-ImGui.GetStyle().WindowPadding.X:Math.Min(350,Math.Max(120,viewport.WorkSize.X-32)));
+            try
+            {
+                // Under the game tooltip the name and icon are already visible: only the mouse fallback repeats them.
+                if(width is null)
+                {
+                    DrawItemIcon(item,new Vector2(28));ImGui.SameLine();
+                    ImGui.TextColored(Accent,item?.Name ?? localization.Format("HoverUi.Item",hovered.ItemId));
+                }
+                if(usages)
+                {
+                    DrawHoveredStock(hovered.ItemId);
+                    DrawHoveredSources(hovered.ItemId,observed.StableSince is { } since ? now-since:TimeSpan.Zero);
+                    DrawHoveredUsages(hovered.ItemId);
+                }
+                if(prices)
+                {
+                    if(usages)ImGui.Separator();
+                    DrawHoveredPrices(priced!,item?.CanBeHq ?? true);
+                }
+            }
+            finally{ImGui.PopTextWrapPos();}
+            hoverPanelSize=ImGui.GetWindowSize();
+        }
+        finally{ImGui.End();}
+    }
+
+    // Below the game tooltip, else above it, else beside it; the mouse position is only a fallback when no tooltip is visible.
+    private (Vector2 Position,float? Width) HoverPlacement(ItemHoverAnchor? anchor,ImGuiViewportPtr viewport)
+    {
+        var min=viewport.WorkPos;var max=viewport.WorkPos+viewport.WorkSize;const float gap=2;
+        if(anchor is not { } tooltip)
+        {
+            var mouse=ImGui.GetMousePos()+new Vector2(24);
+            return (new(Math.Clamp(mouse.X,min.X,Math.Max(min.X,max.X-hoverPanelSize.X)),Math.Clamp(mouse.Y,min.Y,Math.Max(min.Y,max.Y-hoverPanelSize.Y))),null);
+        }
+        var width=Math.Max(260,tooltip.Width);var height=hoverPanelSize.Y;
+        Vector2 position;
+        if(tooltip.Y+tooltip.Height+gap+height<=max.Y)position=new(tooltip.X,tooltip.Y+tooltip.Height+gap);
+        else if(tooltip.Y-gap-height>=min.Y)position=new(tooltip.X,tooltip.Y-gap-height);
+        else if(tooltip.X+tooltip.Width+gap+width<=max.X)position=new(tooltip.X+tooltip.Width+gap,tooltip.Y);
+        else position=new(tooltip.X-gap-width,tooltip.Y);
+        position.X=Math.Clamp(position.X,min.X,Math.Max(min.X,max.X-width));
+        position.Y=Math.Clamp(position.Y,min.Y,Math.Max(min.Y,max.Y-height));
+        return (position,width);
+    }
+
+    private void DrawHoveredStock(uint id)
+    {
+        var live=inventory.Current;var bankState=bank.State;var character=bankBridge.State.CharacterId;
+        if(hoverHoldings is null || hoverHoldingsKey!=(id,live,bankState,character))
+        {
+            hoverHoldings=ItemHoldings.Build(id,character,live,bankState.Entries,StorageFilter.All,includeCrystals:true);
+            hoverHoldingsKey=(id,live,bankState,character);
+        }
+        var summary=hoverHoldings;
+        ImGui.TextColored(Accent,localization.Get("HoverUi.Stock"));
+        if(!summary.HasObservation){ImGui.TextDisabled(localization.Get("HoverUi.OwnedUnknown"));return;}
+        ImGui.TextUnformatted(localization.Format(summary.HasUnknown ? "HoverUi.OwnedPartial":"HoverUi.Owned",summary.Total.ToString("N0"),summary.Nq.ToString("N0"),summary.Hq.ToString("N0")));
+        var rows=summary.Rows.Where(row=>row.Nq+row.Hq>0).OrderByDescending(row=>row.Nq+row.Hq).ToArray();
+        if(rows.Length>0)
+            ImGui.TextDisabled(string.Join(" · ",rows.Take(4).Select(row=>localization.Format("HoverUi.StorageRow",row.Name,(row.Nq+row.Hq).ToString("N0"))))
+                +(rows.Length>4 ? localization.Format("HoverUi.More",rows.Length-4):""));
+    }
+
+    private void DrawHoveredSources(uint id,TimeSpan hoveredFor)
+    {
+        var lines=new List<string>();
+        string? monsterStatus=null;
+        var crafted=recipeCatalog.State.Catalog?.ForResult(id) ?? [];
+        var gathered=gatheringCatalog.State.Catalog?.ForItem(id) ?? [];
+        if(crafted.Count>0)
+            lines.Add(localization.Format("HoverUi.Craftable",crafted.Count,string.Join(", ",crafted.Select(recipe=>recipe.CraftType).Where(name=>name.Length>0).Distinct().Take(3))));
+        if(gathered.Count>0)
+        {
+            var first=gathered[0];
+            lines.Add(localization.Format("HoverUi.Gathered",first.TypeName,first.Level,first.Zone)+(gathered.Count>1 ? localization.Format("HoverUi.More",gathered.Count-1):""));
+        }
+        // Only materials that can be monster drops are looked up; equipment, crafted and gathered items never trigger a request.
+        if(Monsters.MonsterDropCandidates.Eligible(itemCatalog.State.Catalog?.Find(id),crafted.Count>0,gathered.Count>0)
+            && monsterHover?.Observe(id,hoveredFor,configuration.MonsterSourcesOnHover) is { } monsters)
+        {
+            if(monsters.Document is { Monsters.Count:>0 } document)
+            {
+                var first=document.Monsters[0];
+                var head=first.Level.Length>0 ? localization.Format("HoverUi.MonsterLevel",first.Name,first.Level):first.Name;
+                if(first.Location.Length>0)head+=" · "+first.Location;
+                lines.Add(localization.Format("HoverUi.Monsters",head)+(document.Monsters.Count>1 ? localization.Format("HoverUi.More",document.Monsters.Count-1):""));
+            }
+            monsterStatus=monsters.Status switch
+            {
+                Monsters.MonsterHoverStatus.Loading=>localization.Get("HoverUi.MonstersLoading"),
+                Monsters.MonsterHoverStatus.Unavailable=>localization.Get("HoverUi.MonstersUnavailable"),
+                _=>monsters.Stale && monsters.Document is { Monsters.Count:>0 } ? localization.Get("HoverUi.MonstersOld"):null,
+            };
+        }
+        if(quests.State.RewardIndex?.ForItem(id) is { Count:>0 } rewards)lines.Add(localization.Format("HoverUi.QuestRewards",rewards.Count));
+        if(lines.Count==0 && monsterStatus is null && HoveredNpcCount(id)==0)return;
+        ImGui.TextColored(Accent,localization.Get("HoverUi.Obtain"));
+        DrawHoveredNpcs(id);
+        foreach(var line in lines)ImGui.TextWrapped(line);
+        if(monsterStatus is not null)ImGui.TextDisabled(monsterStatus);
+    }
+
+    private void DrawHoveredUsages(uint id)
+    {
+        var lines=new List<string>();
+        if(recipeCatalog.State.Catalog is { } recipes && recipes.ForIngredient(id).Count is > 0 and var count)lines.Add(localization.Format("HoverUi.RecipeCount",count));
+        if(itemUses.State.Catalog is { } uses)
+        {
+            if(uses.LevesFor(id).Count is > 0 and var leves)lines.Add(localization.Format("HoverUi.Leves",leves));
+            if(uses.IsSupplyCandidate(id))lines.Add(localization.Get("HoverUi.Supply"));
+            if(uses.IsAquariumFish(id))lines.Add(localization.Get("HoverUi.Aquarium"));
+        }
+        if(lines.Count==0)return;
+        ImGui.TextColored(Accent,localization.Get("HoverUi.Usages"));
+        foreach(var line in lines)ImGui.TextWrapped(line);
+    }
+
+    private void DrawHoveredPrices(MarketHoverItem hovered,bool canBeHq)
+    {
+        var state=market.State;var quote=market.GetCached(state.WorldId,hovered.ItemId);var background=market.BackgroundState;var now=DateTimeOffset.UtcNow;
+        ImGui.TextColored(Accent,localization.Format("HoverUi.Prices",state.WorldName));
+        if(quote is { } prices)
+        {
+            DrawPriceLine("NQ",prices.Nq.Minimum);
+            if(canBeHq)DrawPriceLine("HQ",prices.Hq.Minimum);
+            ImGui.TextDisabled(prices.UploadedAt is { } date ? localization.Format("HoverUi.Uploaded",date.ToLocalTime().ToString("g")):localization.Get("HoverUi.UnknownDate"));
+            if(!prices.HasRecentUpload(now))ImGui.TextColored(Accent,localization.Get("HoverUi.Old"));
+            if(prices.NqCheapest is not null || canBeHq && prices.HqCheapest is not null)
+            {
+                ImGui.TextColored(Accent,localization.Format("HoverUi.Cheapest",state.DataCenterName.Length>0 ? state.DataCenterName:localization.Get("HoverUi.DataCenter")));
+                DrawCheapest("NQ",prices.NqCheapest,state,now);
+                if(canBeHq)DrawCheapest("HQ",prices.HqCheapest,state,now);
+            }
+            ImGui.TextDisabled(localization.Format("HoverUi.Fetched",prices.FetchedAt.ToLocalTime().ToString("T")));
+            if(!market.IsFresh(prices,now))ImGui.TextDisabled(localization.Get("HoverUi.Expired"));
+        }
+        else ImGui.TextWrapped(background?.ItemId==hovered.ItemId && background.WorldId==state.WorldId
+            ? background.Loading ? localization.Get("HoverUi.Loading"):background.Error is not null ? localization.Get("HoverUi.Error") : localization.Get("HoverUi.NoPrices")
+            :localization.Get("HoverUi.Pending"));
+        ImGui.TextDisabled(localization.Get("HoverUi.Source"));
+    }
+
+    // Amounts end with the game's Gil icon instead of a currency word.
+    private void DrawPriceLine(string quality,decimal? price)
+    {
+        if(price is not { } value){ImGui.TextUnformatted(localization.Format("HoverUi.NoListing",quality));return;}
+        ImGui.TextUnformatted(localization.Format("HoverUi.PriceLine",quality,value.ToString("N0")));
+        DrawGilIcon();
+    }
+    private void DrawGilIcon()
+    {
+        if(itemCatalog.State.Catalog?.Find(1) is not { } gil)return;
+        ImGui.SameLine(0,3);DrawItemIcon(gil,new Vector2(ImGui.GetTextLineHeight()));
+    }
+
+    private void DrawCheapest(string quality,MarketListing? listing,MarketState state,DateTimeOffset now)
+    {
+        if(listing is not { } cheapest){ImGui.TextDisabled(localization.Format("HoverUi.NoListing",quality));return;}
+        var world=cheapest.WorldId==state.WorldId ? localization.Get("HoverUi.ThisWorld"):state.NameOf(cheapest.WorldId) ?? localization.Format("HoverUi.WorldId",cheapest.WorldId);
+        ImGui.TextUnformatted(localization.Format("HoverUi.PriceLine",quality,cheapest.Price.ToString("N0")));
+        DrawGilIcon();ImGui.SameLine(0,6);ImGui.TextUnformatted(localization.Format("HoverUi.CheapestWorld",world));
+        if(!MarketQuote.Recent(cheapest.UploadedAt,now))
+            ImGui.TextDisabled(cheapest.UploadedAt is { } date ? localization.Format("HoverUi.CheapestOld",date.ToLocalTime().ToString("g")):localization.Get("HoverUi.UnknownDate"));
+    }
+}

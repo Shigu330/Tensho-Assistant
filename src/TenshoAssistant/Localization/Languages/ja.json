@@ -1,0 +1,7 @@
+{
+  "_meta": { "code": "ja", "name": "Japanese", "nativeName": "日本語", "author": "Community", "version": 1 },
+  "Plugin": { "Title": "Tensho Assistant", "Subtitle": "アイテム、アクティビティ、ツールをひとつの場所にまとめます。", "AllTools": "すべてのツール", "AllToolsDescription": "ツールを選択して現在の対応状況を確認してください。", "ToolFilterHint": "カテゴリ、ツール、参照プラグインで絞り込む…", "NoToolMatch": "一致するツールがありません。", "Available": "利用可能", "ComingSoon": "準備中", "FoundationAvailable": "基盤利用可能" },
+  "Navigation": { "Workspace": "ワークスペース", "Home": "ホームとツール", "Items": "アイテムと収納", "Modules": "モジュール", "Crafting": "製作", "Gathering": "採集", "Collection": "コレクション", "Quests": "クエスト", "Map": "マップ / ワールド", "Market": "マーケット", "Automation": "自動化", "Combat": "戦闘", "Preferences": "設定", "Settings": "設定", "Diagnostics": "診断", "ContextItem": "コンテキストアイテム", "ViewQuantities": "数量を表示", "SelectItem": "ツール間で使用するアイテムを選択してください。" },
+  "Settings": { "Title": "設定", "Description": "共通オプションとツール設定を分野ごとに整理します。", "Window": "ウィンドウ · 保存済み設定", "OpenOnLoad": "プラグイン読み込み時に開く", "OpenOnLogin": "キャラクターのログイン時に開く", "Interface": "インターフェース", "Language": "言語" },
+  "Common": { "SaveError": "保存に失敗しました。詳細はDalamudのログを確認してください。" }
+}

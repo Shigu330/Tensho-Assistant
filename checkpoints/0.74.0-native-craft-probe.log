@@ -1,0 +1,147 @@
+STATUS 251 Calme intérieur icon=217321 stacks=10
+STATUS 252 Parcimonie icon=211701 stacks=0
+STATUS 2226 Vénération icon=216126 stacks=0
+STATUS 254 Grands progrès icon=216105 stacks=0
+STATUS 2189 Innovation icon=211652 stacks=0
+STATUS 257 Parcimonie pérenne icon=211702 stacks=0
+STATUS 2191 Mémoire musculaire icon=216125 stacks=0
+STATUS 1164 Manipulation icon=211651 stacks=0
+STATUS 3813 Main suprême icon=216129 stacks=0
+STATUS 2190 Dernières vérifications icon=216124 stacks=0
+STATUS 2665 Attention totale icon=216127 stacks=0
+STATUS 3812 Opportunité experte icon=216128 stacks=0
+PASS 12 native effect ids, names, descriptions and icons
+PASS 208 native job actions, levels, CP, descriptions and icons
+ACTION Byregot native=100346 name=Bénédiction de Byregot icon=1975 description=Augmente la qualité au détriment de la solidité.
+L'efficacité est augmentée de 20 pour chaque degré de Calme intérieur.
+Efficacité : 100 (maximum 300).
+Taux de réussite : 100%
+Met fin à l'effet Calme intérieur.
+Ne peut être utilisé que sous l'effet Calme intérieur.
+ACTION GreatStrides native=260 name=Grands progrès icon=1955 description=Double l'efficacité de la prochaine action qui augmente la qualité.
+Cet effet dure 3 tours.
+COLLECTABLE recipe=35829 item=44232 level=100 HQ=True collectable=True progress=6600 quality=12000 durability=80 requiredQuality=0 unsupported=none
+COLLECTABLE_SEARCH completed=Completed quality=7308 target=False transitions=61176
+COLLECTABLE_MACRO actions=16 blocks=2 quality=7308
+COLLECTABLE_ACTIONS Mémoire musculaire → Vénération → Travail préparatoire → Travail préparatoire → Travail minutieux → Travail minutieux → Réparation totale → Ouvrage préparatoire → Ouvrage préparatoire → Ouvrage préparatoire → Réparation totale → Main suprême → Ouvrage préparatoire → Grands progrès → Bénédiction de Byregot → Travail de base
+HQ_COMPARE start=6000 width=128 nodes=100000 target=True quality=12000 actions=13 waits=37 pruned=True budgetReached=False
+HQ_ACTIONS Mémoire musculaire → Vénération → Travail préparatoire → Travail préparatoire → Travail minutieux → Travail minutieux → Réparation totale → Innovation → Ouvrage préparatoire → Ouvrage préparatoire → Ouvrage préparatoire → Bénédiction de Byregot → Travail de base
+LOCAL_COMPARE actions=13 waits=37 quality=12000
+LOCAL_ACTIONS Mémoire musculaire → Vénération → Travail préparatoire → Travail préparatoire → Travail minutieux → Travail minutieux → Réparation totale → Innovation → Ouvrage préparatoire → Ouvrage préparatoire → Ouvrage préparatoire → Bénédiction de Byregot → Travail de base
+FINISHER_COMPARE actions=13 waits=37 quality=12000
+FINISHER_ACTIONS Mémoire musculaire → Vénération → Travail préparatoire → Travail préparatoire → Travail minutieux → Travail minutieux → Réparation totale → Innovation → Ouvrage préparatoire → Ouvrage préparatoire → Ouvrage préparatoire → Bénédiction de Byregot → Travail de base
+HQ_COMPARE start=6000 width=512 nodes=500000 target=True quality=12000 actions=13 waits=37 pruned=True budgetReached=False
+HQ_ACTIONS Mémoire musculaire → Vénération → Travail préparatoire → Travail préparatoire → Travail minutieux → Travail minutieux → Réparation totale → Innovation → Ouvrage préparatoire → Ouvrage préparatoire → Ouvrage préparatoire → Bénédiction de Byregot → Travail de base
+PASS native recipe factors: 12521 supported, 1371 explicitly excluded
+PASS simulated stats (not player): recipe 2819, durability 35, progress 270, quality 2104, initial cap 0, bases 726/1055, final Completed
+PASS native localized macro export for eight jobs, ordered simulated prefix and fifteen-line limit
+PASS native recipe search at fictitious stats: 2 actions, quality 2104, 447 transitions, replay verified
+INFO native level100 recipe 5618 item 44104: target 12000, reached False, actions 21, quality 9975, transitions 76618, elapsed 87ms; fictitious stats only
+Action 19297 Vénération, level=15, cost=8:18, secondary=0:0
+Augmente de 50% l'efficacité des actions d'avancée de progression pendant 4 tours.
+Action 19004 Innovation, level=26, cost=8:18, secondary=0:0
+Augmente de 50% l'efficacité des actions de gain de qualité pendant 4 tours.
+Action 260 Grands progrès, level=21, cost=8:32, secondary=0:0
+Double l'efficacité de la prochaine action qui augmente la qualité.
+ Cet effet dure 3 tours.
+Action 4631 Parcimonie, level=15, cost=8:56, secondary=0:0
+Réduit de moitié la baisse de solidité pendant 4 tours.
+Action 4639 Parcimonie pérenne, level=47, cost=8:98, secondary=0:0
+Réduit de moitié la baisse de solidité pendant 8 tours.
+Action 4574 Manipulation, level=65, cost=8:96, secondary=0:0
+Restaure 5 points de solidité après chaque tour, pendant 8 tours.
+CraftAction 100001 Travail de base, job=8, level=1, CP=0, CUL=100105
+Fait progresser la synthèse au détriment de la solidité.
+ Efficacité : 
+ Taux de réussite : 100%
+CraftAction 100203 Travail prudent, job=8, level=62, CP=7, CUL=100210
+Fait progresser la synthèse au détriment de la solidité.
+ Efficacité : 
+ Taux de réussite : 100%
+CraftAction 100403 Travail préparatoire, job=8, level=72, CP=18, CUL=100410
+Fait progresser la synthèse au grand détriment de la solidité.
+ L'efficacité est réduite de moitié si la solidité est inférieure à la perte de solidité.
+ Efficacité : 
+ Taux de réussite : 100%
+ Perte de solidité : 20
+CraftAction 100002 Ouvrage de base, job=8, level=5, CP=18, CUL=100106
+Augmente la qualité au détriment de la solidité.
+ Efficacité : 100
+ Taux de réussite : 100%
+CraftAction 100004 Ouvrage standard, job=8, level=18, CP=32, CUL=100109
+Augmente la qualité au détriment de la solidité.
+ Efficacité : 125
+ Taux de réussite : 100%
+ Combo : Ouvrage de base
+ Bonus du combo : coût réduit à 18 PS.
+CraftAction 100411 Ouvrage avancé, job=8, level=68, CP=46, CUL=100418
+Augmente la qualité au détriment de la solidité.
+ Efficacité : 150
+ Taux de réussite : 100%
+ Combo : Ouvrage standard ou Observation
+ Bonus du combo : coût réduit à 18 PS.
+CraftAction 100339 Bénédiction de Byregot, job=8, level=50, CP=24, CUL=100346
+Augmente la qualité au détriment de la solidité.
+ L'efficacité est augmentée de 20 pour chaque degré de Calme intérieur.
+ Efficacité : 100 (maximum 300).
+ Taux de réussite : 100%
+ Met fin à l'effet Calme intérieur.
+ Ne peut être utilisé que sous l'effet Calme intérieur.
+CraftAction 100003 Réparation de maître, job=8, level=7, CP=88, CUL=100107
+Restaure 30 points de solidité.
+CraftAction 100010 Observation, job=8, level=13, CP=7, CUL=100113
+Observe sans rien faire pendant un tour.
+CraftAction 100387 Véritable valeur, job=8, level=69, CP=6, CUL=100394
+Augmente la qualité au détriment de la solidité.
+ Ajoute un degré supplémentaire à Calme intérieur (maximum 10).
+ Efficacité : 300
+ Taux de réussite : 100%
+ Ne peut être utilisé qu'au premier tour.
+CraftAction 100379 Mémoire musculaire, job=8, level=54, CP=6, CUL=100386
+Fait progresser la synthèse au détriment de la solidité.
+ Efficacité : 300
+ Taux de réussite : 100%
+ Double l'efficacité de la prochaine action qui fait progresser la synthèse.
+ Cet effet dure 5 tours.
+ Ne peut être utilisé qu'au premier tour.
+CraftAction 100323 Travail minutieux, job=8, level=76, CP=32, CUL=100330
+Fait progresser la synthèse et augmente la qualité au détriment de la solidité.
+ 
+ Taux de réussite : 100%
+CraftAction 100299 Ouvrage préparatoire, job=8, level=71, CP=40, CUL=100306
+Augmente la qualité au grand détriment de la solidité.
+ Ajoute un degré supplémentaire à Calme intérieur (maximum 10).
+ Efficacité : 200
+ Taux de réussite : 100%
+ Perte de solidité : 20
+CraftAction 100427 Travail économe, job=8, level=88, CP=18, CUL=100434
+Fait progresser la synthèse tout en réduisant de moitié le coût en solidité.
+ Efficacité : 180
+ Taux de réussite : 100%
+ Ne peut pas être utilisé sous les effets Parcimonie et Parcimonie pérenne.
+CraftAction 100227 Ouvrage parcimonieux, job=8, level=66, CP=25, CUL=100234
+Augmente la qualité tout en réduisant de moitié le coût en solidité.
+ Efficacité : 100
+ Taux de réussite : 100%
+ Ne peut pas être utilisé sous les effets Parcimonie et Parcimonie pérenne.
+CraftAction 100443 Ouvrage raffiné, job=8, level=92, CP=24, CUL=100450
+Augmente la qualité au détriment de la solidité.
+ Efficacité : 100
+ Taux de réussite : 100%
+ Combo : Ouvrage de base
+ Bonus du combo : ajoute un degré supplémentaire à Calme intérieur (maximum 10).
+CraftAction 100283 Main preste, job=8, level=80, CP=250, CUL=100290
+Augmente la qualité de 100% de sa valeur maximale.
+ Taux de réussite : 100%
+ Ne peut être utilisé qu'au premier tour et seulement si le niveau de la recette est inférieur de 10 ou plus par rapport au vôtre.
+ Ne peut être utilisé avec les recettes avancées.
+CraftAction 100435 Main divine, job=8, level=90, CP=32, CUL=100442
+Augmente la qualité sans réduire la solidité.
+ Efficacité : 100
+ Taux de réussite : 100%
+ Ne peut être utilisé qu'avec 10 degrés de Calme intérieur.
+CraftAction 100467 Réparation totale, job=8, level=98, CP=112, CUL=100474
+Restaure intégralement la solidité.
+CraftAction 100475 Main suprême, job=8, level=100, CP=0, CUL=100482
+Le prochain coût en solidité dû à une action est réduit à 0.
+ Utilisable une seule fois par synthèse.

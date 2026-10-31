@@ -1,0 +1,91 @@
+using System.Collections.Frozen;
+using System.Globalization;
+
+namespace TenshoAssistant.Maps;
+
+public sealed record MapDefinition(uint MapId, uint TerritoryId, string Region, string Zone, string Subzone,
+    int MapIndex, int SizeFactor, uint PlaceNameId = 0, string TexturePath = "", int OffsetX = 0, int OffsetY = 0, uint MarkerRange = 0, uint RegionPlaceId = 0,
+    int MenuCategory = 0, int MenuPriority = 0);
+
+/// <summary>
+/// Zone menu of the game map (probe checkpoints/0.105.0-zones-probe.log): maps sharing the region map's PriorityCategoryUI,
+/// ordered by PriorityUI, one entry per priority; maps of one priority are the floors of that entry, ordered by MapIndex.
+/// </summary>
+public static class MapMenus
+{
+    public static IReadOnlyList<IReadOnlyList<MapDefinition>> Zones(IEnumerable<MapDefinition> maps,MapDefinition? region)
+        =>region is not { MenuCategory:>0 } ? []:maps.Where(map=>map.MenuCategory==region.MenuCategory && map.MenuPriority>region.MenuPriority && map.TerritoryId!=0)
+            .GroupBy(map=>map.MenuPriority).OrderBy(group=>group.Key)
+            .Select(group=>(IReadOnlyList<MapDefinition>)group.OrderBy(map=>map.MapIndex).ThenBy(map=>map.MapId).ToArray()).ToArray();
+}
+
+public sealed class MapCatalog
+{
+    private readonly FrozenDictionary<uint, MapDefinition> byId;
+    private readonly FrozenDictionary<uint, IReadOnlyList<MapDefinition>> byPlace;
+    public IReadOnlyList<MapDefinition> Entries { get; }
+    public MapCatalog(IEnumerable<MapDefinition> source, CancellationToken cancellation = default)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        var copied = new Dictionary<uint, MapDefinition>();
+        cancellation.ThrowIfCancellationRequested();
+        foreach (var map in source)
+        {
+            cancellation.ThrowIfCancellationRequested();
+            if (map.MapId == 0 || map.TerritoryId == 0 || map.SizeFactor <= 0 || string.IsNullOrWhiteSpace(map.Zone)) continue;
+            if (!copied.TryAdd(map.MapId, map)) throw new ArgumentException("Duplicate map ID.", nameof(source));
+        }
+        byId = copied.ToFrozenDictionary();
+        Entries = Array.AsReadOnly(copied.Values.OrderBy(map => map.Region, StringComparer.CurrentCultureIgnoreCase)
+            .ThenBy(map => map.Zone, StringComparer.CurrentCultureIgnoreCase).ThenBy(map => map.MapIndex).ThenBy(map => map.MapId).ToArray());
+        byPlace = Entries.Where(map => map.PlaceNameId != 0).GroupBy(map => map.PlaceNameId)
+            .ToFrozenDictionary(group => group.Key,group => (IReadOnlyList<MapDefinition>)Array.AsReadOnly(group.ToArray()));
+        cancellation.ThrowIfCancellationRequested();
+    }
+    public MapDefinition? Find(uint id) => byId.GetValueOrDefault(id);
+    public IReadOnlyList<MapDefinition> ForPlace(uint placeNameId) => byPlace.GetValueOrDefault(placeNameId) ?? Array.Empty<MapDefinition>();
+    public IReadOnlyList<MapDefinition> Search(string query)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        var tokens = query.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (tokens.Length == 0) return Entries;
+        return Array.AsReadOnly(Entries.Where(map => tokens.All(token =>
+            CultureInfo.CurrentCulture.CompareInfo.IndexOf($"{map.Region} {map.Zone} {map.Subzone} {map.MapId}", token,
+                CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) >= 0)).ToArray());
+    }
+    // A generous input bound protects the native coordinate encoder; this is not a map availability check.
+    public static bool CoordinatesValid(float x, float y) => float.IsFinite(x) && float.IsFinite(y)
+        && x is >= -10000 and <= 10000 && y is >= -10000 and <= 10000;
+}
+
+public sealed record MapCatalogState(MapCatalog? Catalog, int Copied, int Total, string? Error);
+
+/// <summary>
+/// What the game asked when its map opened: the selected map, the open request (quest, flag, link) and its territory,
+/// and the player's current map. All copied on the framework thread.
+/// </summary>
+public sealed record GameMapRequest(uint Selected, uint Requested, uint Territory, uint Current)
+{
+    /// <summary>
+    /// Map to show in the Tensho window, 0 = follow the player (M on the current zone, which toggles the window).
+    /// A zone selection wins; when the selection is not a zone (world or region map, as seen in 0.111 for a quest), the
+    /// request is used, then the first map of the requested territory, then the selection itself.
+    /// </summary>
+    public uint Resolve(MapCatalog catalog)
+    {
+        ArgumentNullException.ThrowIfNull(catalog);
+        if (catalog.Find(Selected) is not null) return Selected == Current ? 0 : Selected;
+        if (catalog.Find(Requested) is not null) return Requested;
+        if (Territory != 0 && catalog.Entries.Where(map => map.TerritoryId == Territory).OrderBy(map => map.MapIndex).FirstOrDefault() is { } zone) return zone.MapId;
+        return Selected;
+    }
+}
+public sealed class MapCatalogService
+{
+    private MapCatalogState state = new(null, 0, 0, null);
+    public MapCatalogState State => Volatile.Read(ref state);
+    internal void Progress(int copied, int total) => Interlocked.Exchange(ref state, new(null, copied, total, null));
+    internal void Publish(MapCatalog catalog) => Interlocked.Exchange(ref state, new(catalog, 0, 0, null));
+    internal void Fail(Exception error) => Interlocked.Exchange(ref state, new(null, 0, 0, error.Message));
+    internal void Clear() => Interlocked.Exchange(ref state, new(null, 0, 0, null));
+}

@@ -1,0 +1,114 @@
+Named quests=5373
+MODE 1: 5202 quests; fixed row types=Item
+SAMPLE 65537 Savoir tendre la main; gil=0; currency=0x0; tome=0x0; shape=7/7/5/5/5
+ FIXED Item:4551x2;Item:0x0;Item:0x0;Item:0x0;Item:0x0;Item:0x0;Item:0x0
+ CHOICE 0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False
+SAMPLE 65539 La voie de la botanique; gil=0; currency=0x0; tome=0x0; shape=7/7/5/5/5
+ FIXED Item:2545x1;Item:0x0;Item:0x0;Item:0x0;Item:0x0;Item:0x0;Item:0x0
+ CHOICE 0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False
+MODE 5: 6 quests; fixed row types=Item
+SAMPLE 65783 Un présent pour la fête des étoiles (Lavandière); gil=200; currency=0x0; tome=0x0; shape=7/7/5/5/5
+ FIXED Item:9276x1;Item:9277x1;Item:9278x1;Item:9279x1;Item:0x0;Item:0x0;Item:0x0
+ CHOICE 0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False
+SAMPLE 65784 Un présent pour la fête des étoiles (Brumée); gil=200; currency=0x0; tome=0x0; shape=7/7/5/5/5
+ FIXED Item:9276x1;Item:9277x1;Item:9278x1;Item:9279x1;Item:0x0;Item:0x0;Item:0x0
+ CHOICE 0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False
+MODE 3: 20 quests; fixed row types=Item
+SAMPLE 66689 Une fracassante guerrière; gil=0; currency=0x0; tome=0x0; shape=7/7/5/5/5
+ FIXED Item:6046x1;Item:6042x1;Item:0x0;Item:0x0;Item:0x0;Item:0x0;Item:0x0
+ CHOICE 0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False
+SAMPLE 66690 Une intrigante guerrière; gil=0; currency=0x0; tome=0x0; shape=7/7/5/5/5
+ FIXED Item:6047x1;Item:6043x1;Item:0x0;Item:0x0;Item:0x0;Item:0x0;Item:0x0
+ CHOICE 0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False
+MODE 6: 115 quests; fixed row types=QuestClassJobReward
+SAMPLE 67748  Les cristaux d'Ardashir; gil=1447; currency=0x0; tome=0x0; shape=7/7/5/5/5
+ FIXED QuestClassJobReward:3x0;QuestClassJobReward:0x0;QuestClassJobReward:0x0;QuestClassJobReward:0x0;QuestClassJobReward:0x0;QuestClassJobReward:0x0;QuestClassJobReward:0x0
+ CHOICE 0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False
+SAMPLE 67749  Les marches de l'éveil; gil=848; currency=0x0; tome=0x0; shape=7/7/5/5/5
+ FIXED QuestClassJobReward:4x0;QuestClassJobReward:0x0;QuestClassJobReward:0x0;QuestClassJobReward:0x0;QuestClassJobReward:0x0;QuestClassJobReward:0x0;QuestClassJobReward:0x0
+ CHOICE 0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False
+MODE 7: 30 quests; fixed row types=BeastRankBonus
+SAMPLE 67826  Avec un peu d'entraînement; gil=517; currency=0x0; tome=0x0; shape=7/7/5/5/5
+ FIXED BeastRankBonus:2x1;BeastRankBonus:0x0;BeastRankBonus:0x0;BeastRankBonus:0x0;BeastRankBonus:0x0;BeastRankBonus:0x0;BeastRankBonus:0x0
+ CHOICE 0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False
+SAMPLE 67827  Un trésor à la maison; gil=600; currency=0x0; tome=0x0; shape=7/7/5/5/5
+ FIXED BeastRankBonus:2x1;BeastRankBonus:0x0;BeastRankBonus:0x0;BeastRankBonus:0x0;BeastRankBonus:0x0;BeastRankBonus:0x0;BeastRankBonus:0x0
+ CHOICE 0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False;0x0 HQ=False
+Currencies=40, tomestones=306, catalysts=211
+MISSING CURRENCY quest=66584 Quand la flamme se ravive, GCTypeReward=0, requirementGC=0, amount=719, mode=1
+MISSING CURRENCY quest=66640 L'Antre des loups (Maelstrom), GCTypeReward=0, requirementGC=1, amount=1438, mode=1
+MISSING CURRENCY quest=66641 L'Antre des loups (Deux Vipères), GCTypeReward=0, requirementGC=2, amount=1438, mode=1
+MISSING CURRENCY quest=66642 L'Antre des loups (Immortels), GCTypeReward=0, requirementGC=3, amount=1438, mode=1
+MISSING CURRENCY quest=66664 Opération Dzemael (Maelstrom), GCTypeReward=0, requirementGC=1, amount=1265, mode=1
+MISSING CURRENCY quest=66665 Opération Dzemael (Deux Vipères), GCTypeReward=0, requirementGC=2, amount=1265, mode=1
+MISSING CURRENCY quest=66666 Opération Dzemael (Immortels), GCTypeReward=0, requirementGC=3, amount=1265, mode=1
+MISSING CURRENCY quest=66667 Opération Val d'Aurum (Maelstrom), GCTypeReward=0, requirementGC=1, amount=1366, mode=1
+MISSING CURRENCY quest=66668 Opération Val d'Aurum (Deux Vipères), GCTypeReward=0, requirementGC=2, amount=1366, mode=1
+MISSING CURRENCY quest=66669 Opération Val d'Aurum (Immortels), GCTypeReward=0, requirementGC=3, amount=1366, mode=1
+MISSING CURRENCY quest=66693 Un vent de panique, GCTypeReward=0, requirementGC=0, amount=719, mode=1
+MISSING CURRENCY quest=66694 Un retour fracassant, GCTypeReward=0, requirementGC=0, amount=719, mode=1
+MISSING CURRENCY quest=66731 La furie de la Souffleuse de rafales, GCTypeReward=0, requirementGC=0, amount=1798, mode=1
+MISSING CURRENCY quest=66732 La rage de l'Ébranleur des terres, GCTypeReward=0, requirementGC=0, amount=2157, mode=1
+MISSING CURRENCY quest=66733 Le brasier du Seigneur des flammes, GCTypeReward=0, requirementGC=0, amount=2517, mode=1
+KNOWN CURRENCY quest=66219 Que la Sylve vous protège, GCTypeReward=0, Item=21, amount=300
+KNOWN CURRENCY quest=66220 Jusqu'à ce que la mer nous engloutisse tous, GCTypeReward=0, Item=20, amount=300
+KNOWN CURRENCY quest=66221 Pour la prospérité d'Ul'dah, GCTypeReward=0, Item=22, amount=300
+KNOWN CURRENCY quest=69479 Des affrontements cruciaux, GCTypeReward=0, Item=30363, amount=300
+CURRENCY ITEM 21 Sceau de compagnie gridanien, itemGC=0, UI=63 Autre
+CURRENCY ITEM 20 Sceau de compagnie limséen, itemGC=0, UI=63 Autre
+CURRENCY ITEM 22 Sceau de compagnie uldien, itemGC=0, UI=63 Autre
+CURRENCY ITEM 30363 Point de faits d'armes, itemGC=0, UI=63 Autre
+CURRENCY ITEM 45041 Savoir, itemGC=0, UI=63 Autre
+Quests with nonzero fixed reference and zero direct quantity=116
+PASS production projection: 5373 snapshots, 9313 reward/condition alternatives, 4 unknown quantities, 15 unresolved references; all Item IDs resolve
+PROJECTED Fixed: 2704 lines
+PROJECTED Choice: 3993 lines
+PROJECTED ConditionalChoice: 18 lines
+PROJECTED Currency: 331 lines
+PROJECTED Masculine: 20 lines
+PROJECTED Feminine: 20 lines
+PROJECTED ClassJob: 1987 lines
+PROJECTED TribeRankVariant: 240 lines
+UNRESOLVED currency: 15 references, quantity retained
+PASS inverse production index: 3496 Items, 8288 quest/Item associations, every variant agrees with forward projection; 25 Potion quests, versions=1; offline progression remains unconfirmed
+JOB tables=37, subrows=538, maximum subrows=21
+JOB 3/0, category=20 PLD; rewards=13611x1;13624x1;0x0;0x0
+JOB 3/1, category=21 MOI; rewards=13612x1;0x0;0x0;0x0
+TRIBE 1: Item=0, quantities=0,0,0,0,0,0,0,0, neutral=180, recognized=180
+TRIBE 2: Item=21080, quantities=1,1,1,2,2,2,3,3, neutral=240, recognized=240
+TRIBE 3: Item=0, quantities=0,0,0,0,0,0,0,0, neutral=100, recognized=100
+RANK 0: Aucun
+RANK 1: Neutre
+RANK 2: Reconnu
+RANK 3: Ami
+RANK 4: Estimé
+RANK 5: Respecté
+RANK 6: Émérite
+RANK 7: Assermenté
+RANK 8: Allié
+TOME quest keys=1,3
+TOME ItemRow=0, type=0, Item=23 Mémoquartz allagois philosophal
+TOME ItemRow=1, type=0, Item=24 Mémoquartz allagois mythologique
+TOME ItemRow=2, type=0, Item=26 Mémoquartz allagois martial
+TOME ItemRow=3, type=1, Item=28 Mémoquartz allagois poétique
+TOME ItemRow=4, type=0, Item=30 Mémoquartz allagois juridique
+TOME ItemRow=5, type=0, Item=31 Mémoquartz allagois ésotérique
+TOME ItemRow=6, type=0, Item=32 Mémoquartz allagois traditionnel
+TOME ItemRow=7, type=0, Item=33 Mémoquartz allagois théologique
+TOME ItemRow=8, type=0, Item=34 Mémoquartz allagois véridique
+TOME ItemRow=9, type=0, Item=35 Mémoquartz allagois cosmogonique
+TOME ItemRow=10, type=0, Item=36 Mémoquartz allagois mensonger
+TOME ItemRow=11, type=0, Item=37 Mémoquartz allagois génésiaque
+TOME ItemRow=12, type=0, Item=38 Mémoquartz allagois goétique
+TOME ItemRow=13, type=0, Item=39 Mémoquartz allagois fantasmagorique
+TOME ItemRow=14, type=0, Item=40 Mémoquartz allagois fabuleux
+TOME ItemRow=15, type=0, Item=41 Mémoquartz allagois révélateur
+TOME ItemRow=16, type=0, Item=42 Mémoquartz allagois aphoristique
+TOME ItemRow=17, type=0, Item=43 Mémoquartz allagois astronomique
+TOME ItemRow=18, type=0, Item=44 Mémoquartz allagois déterministe
+TOME ItemRow=19, type=0, Item=45 Mémoquartz allagois dantesque
+TOME ItemRow=20, type=0, Item=46 Mémoquartz allagois esthétique
+TOME ItemRow=21, type=4, Item=47 Mémoquartz allagois héliologique
+TOME ItemRow=22, type=2, Item=48 Mémoquartz allagois mathématique
+TOME ItemRow=23, type=3, Item=49 Mémoquartz allagois mnémonique
+ZERO QUANTITY 70493 À la découverte de l'inconnu, mode=1

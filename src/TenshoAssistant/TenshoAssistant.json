@@ -1,0 +1,11 @@
+{
+  "Author": "Tensho",
+  "Name": "Tensho--Assistant",
+  "InternalName": "TenshoAssistant",
+  "AssemblyVersion": "0.117.0.0",
+  "Punchline": "Une interface commune pour les outils du quotidien.",
+  "Description": "Banque et stocks, recettes et sous-recettes, récolte, cartes, collections, quêtes, grimoire bleu, prix au survol optionnels, statistiques, Mini Cactpot, Triple Triade manuel et séquences de macros à marqueur final. Commande : /tensho. Couverture et limites dans les fiches des outils.",
+  "ApplicableVersion": "any",
+  "DalamudApiLevel": 15,
+  "Tags": ["utility"]
+}

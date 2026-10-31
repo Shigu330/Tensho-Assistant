@@ -1,0 +1,59 @@
+TYPE FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentRecipeNote
+ATTRIBUTE System.Reflection.TypeLoading.Ecma.EcmaCustomAttributeData
+ATTRIBUTE System.Reflection.TypeLoading.Ecma.EcmaCustomAttributeData
+ATTRIBUTE System.Reflection.TypeLoading.Ecma.EcmaCustomAttributeData
+  System.Void OpenRecipeByRecipeId(System.UInt32)
+  System.Void SearchRecipeByItemId(System.UInt32, System.UInt32)
+  System.Void OpenRecipeByRecipeIdInternal(System.UInt32)
+  System.Void SearchRecipe(FFXIVClientStructs.FFXIV.Client.System.String.Utf8String*, System.Byte, System.Boolean)
+  System.Boolean IsNoteBookDivisionUnlocked(System.UInt32, System.Int32)
+  FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentRecipeNote* Instance()
+  FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentInterface* GetAgentByInternalId(FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentId)
+  System.Boolean IsAddonReady()
+  System.Void ShowAddon()
+  System.Void HideAddon()
+  System.Boolean IsAddonShown()
+  System.Boolean IsAddonHidden()
+  FFXIVClientStructs.FFXIV.Component.GUI.AddonStatus GetAddonStatus()
+  System.Boolean FocusAddon()
+  FFXIVClientStructs.FFXIV.Component.GUI.AtkValue* ReceiveEvent(FFXIVClientStructs.FFXIV.Component.GUI.AtkValue*, FFXIVClientStructs.FFXIV.Component.GUI.AtkValue*, System.UInt32, System.UInt64)
+  FFXIVClientStructs.FFXIV.Component.GUI.AtkValue* ReceiveEventWithResult(FFXIVClientStructs.FFXIV.Component.GUI.AtkValue*, FFXIVClientStructs.FFXIV.Component.GUI.AtkValue*, System.UInt32, System.UInt64)
+  FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentInterface* Dtor(System.Byte)
+  System.Void Show()
+  System.Void ShowFromLua(System.Int32, System.Int32*, System.Int64)
+  System.Void Hide()
+  System.Boolean IsAgentActive()
+  System.Void Update(System.UInt32)
+  System.Boolean IsActivatable()
+  System.UInt32 GetAddonId()
+  System.Void OnGameEvent(FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentGameEvent)
+  System.Void OnLevelChange(System.Byte, System.UInt16)
+  System.Void OnClassJobChange(System.Byte)
+  System.UInt32 ContextMenuResultItemId
+  System.Int32 SelectedCraftType
+  System.Int32 SelectedRecipeCategoryPage
+  System.Int32 SelectedRecipeCategory
+  System.Int32 SelectedRecipeIndex
+  System.UInt32 ActiveCraftRecipeId
+  System.Boolean RecipeSearchOpen
+  System.Boolean RecipeSearchProcessing
+  FFXIVClientStructs.FFXIV.Client.System.String.Utf8String RecipeSearch
+  FFXIVClientStructs.FFXIV.Client.UI.Agent.RecipeSearchContext* SearchContext
+  FFXIVClientStructs.STD.StdVector`1[System.UInt32] SearchResults
+  System.Byte RecipeSearchHistorySelected
+  FFXIVClientStructs.STD.StdDeque`1[FFXIVClientStructs.FFXIV.Client.System.String.Utf8String] RecipeSearchHistory
+  System.Int32 StructSize
+    = 1392
+  FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentInterface AgentInterface
+  FFXIVClientStructs.FFXIV.Client.UI.UIModuleInterface* UIModuleInterface
+  FFXIVClientStructs.FFXIV.Component.GUI.AtkModuleInterface+AtkEventInterface* OpenerEventInterface
+  System.UInt32 AddonId
+  FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentRecipeNote+AgentRecipeNoteVirtualTable* VirtualTable
+  FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentRecipeNote+Addresses
+  FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentRecipeNote+Delegates
+  FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentRecipeNote+MemberFunctionPointers
+  FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentRecipeNote+AgentRecipeNoteVirtualTable
+Unhandled exception. System.TypeLoadException: Could not find type 'FFXIVClientStructs.FFXIV.Client.UI.Agent.RecipeNoteData' in assembly 'C:\Users\PC\AppData\Roaming\XIVLauncher\addon\Hooks\dev\FFXIVClientStructs.dll'.
+   at System.Reflection.TypeLoading.Helpers.LoadTypeFromAssemblyQualifiedName(String name, RoAssembly defaultAssembly, Boolean ignoreCase, Boolean throwOnError)
+   at System.Reflection.TypeLoading.RoAssembly.GetType(String name, Boolean throwOnError, Boolean ignoreCase)
+   at Program.<Main>$(String[] args) in C:\Plugins-ff14\tools\ApiProbe\Program.cs:line 48

@@ -1,0 +1,80 @@
+SHOP 1770039 'Espoille de pirate des cieux en acier' UseCurrencyType=2 costs=1x[13631 'Espoille de pirate des cieux en acier' type0]
+SHOP 1770193 'Appât et autres' UseCurrencyType=16 costs=20x[4 'Éclat de vent' type3]
+SHOP 1770275 'Appât et autres' UseCurrencyType=16 costs=20x[4 'Éclat de vent' type3]
+SHOP 1770430 'Appât et autres' UseCurrencyType=16 costs=20x[4 'Éclat de vent' type3]
+SHOP 1770508 'Assignats mauves : orchestrion, logement et autres' UseCurrencyType=16 costs=20x[4 'Éclat de vent' type3]
+SHOP 1770602 '' UseCurrencyType=4 costs=150x[37550 'Assignat insulaire émeraude' type0]
+SHOP 1770660 '' UseCurrencyType=4 costs=60x[37549 'Assignat insulaire azur' type0]
+SHOP 1770879 'Appât et autres' UseCurrencyType=16 costs=20x[4 'Éclat de vent' type3]
+SHOP 1770977 'Échange de crédits cosmiques (matériaux, matérias et consommables)' UseCurrencyType=4 costs=40x[45690 'Crédit cosmique' type0]
+ENPC 1016261 direct -> 1770039
+ENPC 1016496 direct -> 1770039
+ENPC 1016498 direct -> 1770039
+ENPC 1016500 direct -> 1770039
+ENPC 1019106 direct -> 1770039
+ENPC 1052588 direct -> 1770977
+ENPC 1052600 direct -> 1770977
+ENPC 1052607 direct -> 1770977
+ENPC 1052608 direct -> 1770977
+ENPC 1052640 direct -> 1770977
+ENPC 1052650 direct -> 1770977
+ENPC 1056824 direct -> 1770977
+SERIES 24.0 -> 1770193
+SERIES 36.0 -> 1770275
+SERIES 48.0 -> 1770430
+SERIES 52.0 -> 1770508
+SERIES 58.0 -> 1770508
+SERIES 62.0 -> 1770508
+SERIES 73.0 -> 1770508
+SERIES 85.0 -> 1770879
+CATEGORY 24 'Matériel de récolte' series 24
+CATEGORY 36 'Matériel de récolte' series 36
+CATEGORY 48 'Matériel de récolte' series 48
+CATEGORY 52 'Assignats de récolteur (légendes locales, matériaux, divers)' series 52
+CATEGORY 58 'Assignats de récolteur (légendes locales, matériaux, divers)' series 58
+CATEGORY 62 'Assignats de récolteur (légendes locales, matériaux, divers)' series 62
+CATEGORY 73 'Assignats de récolteur (légendes locales, matériaux, divers)' series 73
+CATEGORY 85 'Matériel de récolte' series 85
+INCLUSION 3801091 '' via category 24
+INCLUSION 3801092 '' via category 36
+INCLUSION 3801093 '' via category 48
+INCLUSION 3801094 'Échange d'assignats' via category 52
+INCLUSION 3801095 'Échange d'assignats de récolteur' via category 52
+INCLUSION 3801096 'Échange d'assignats' via category 58
+INCLUSION 3801097 'Échange d'assignats' via category 62
+INCLUSION 3801099 '' via category 62
+INCLUSION 3801101 '' via category 62
+INCLUSION 3801102 '' via category 85
+INCLUSION 3801103 'Échange d'assignats' via category 73
+NPC 1001617 'comptable des assignats' data=2032117,3539066
+NPC 1003077 'comptable des assignats' data=2032115,3539066
+NPC 1003633 'comptable des assignats' data=2032116,3539066
+NPC 1005423 'comptable des assignats' data=2032706,3801095
+NPC 1012301 'comptable des assignats' data=2031861,3539114
+NPC 1013397 'comptable des assignats' data=2031860,3539066,721286
+NPC 1019458 'comptable des assignats' data=2032113,3539064
+NPC 1027541 'comptable des assignats' data=2032361,3539063
+NPC 1031501 'comptable des assignats' data=2032361,3539063
+NPC 1037262 'comptable des assignats' data=2032812,3539062
+NPC 1037307 'comptable des assignats' data=2032804,3539062
+NPC 1048386 'comptable des assignats' data=2033183,3539073
+NPC 1049085 'comptable des assignats' data=2033182,3539072
+CODE t2:1 count=1271 samples=Chefs-d'œuvre de Gerolt (guerre) → Diadème noct ×100 | Chefs-d'œuvre de Gerolt (guerre) → Coiffe crepusculum ×100 | Chefs-d'œuvre de Gerolt (guerre) → Heaume astrum ×100
+CODE t2:2 count=61 samples=Mémoquartz allagois astronomiques (armes) → Épée bâtarde radieuse ×350 | Mémoquartz allagois astronomiques (armes) → Baghnakhs radieux ×500 | Mémoquartz allagois astronomiques (armes) → Hache de combat radieuse ×500
+CODE t2:3 count=21 samples=Mémoquartz allagois mnémoniques (armes - NvObj 780) → Épée en laiton royal ×500 | Mémoquartz allagois mnémoniques (armes - NvObj 780) → Saintis en laiton royal ×500 | Mémoquartz allagois mnémoniques (armes - NvObj 780) → Hache de combat en laiton royal ×500
+CODE t3:2 count=10 samples=Objets en développement → Méga potion ×1 | Objets en développement → Potion X ×1
+CODE t4:1 count=831 samples=Mémoquartz allagois poétiques (guerre) → Casque de protecteur des Forges amélioré ×345 | Mémoquartz allagois poétiques (guerre) → Visière d'agresseur des Forges améliorée ×345 | Mémoquartz allagois poétiques (guerre) → Visière d'abatteur des Forges améliorée ×345
+CODE t4:2 count=404 samples=Assignats blancs d'artisan III (équipements/Nv 80) → Potion ×999 | Mémoquartz allagois aphoristiques (guerre) → Épée longue des lunautes ×350 | Mémoquartz allagois aphoristiques (guerre) → Tonfas des lunautes ×500
+CODE t4:3 count=55 samples=Mémoquartz allagois mnémoniques (guerre - NvObj 780) → Casquette de protecteur en laiton royal ×495 | Mémoquartz allagois mnémoniques (guerre - NvObj 780) → Manteau de protecteur en laiton royal ×825 | Mémoquartz allagois mnémoniques (guerre - NvObj 780) → Gants de protecteur en laiton royal ×495
+CODE t4:4 count=5 samples=Assignats blancs de récolteur III (équipements/Nv 80) → Potion ×999 | Assignats de récolteur → Pioche des merveilles ×750 | Assignats de récolteur → Hachette des merveilles ×750
+CODE t4:25 count=119 samples=
+CODE t4:27 count=221 samples=Insignes alliés (Maelstrom) → Sallet d'élite du Maelstrom ×600 | Insignes alliés (Maelstrom) → Bicorne d'élite du Maelstrom ×600 | Insignes alliés (Maelstrom) → Chapeau d'élite du Maelstrom ×600
+CODE t4:29 count=1341 samples=Lots (armes) → Épée sanguine ×10000 | Lots (armes) → Ai Apaec ×10000 | Lots (armes) → Harpon du démon marin ×10000
+CODE t5:29 count=14 samples=Test des devises → Potion ×1 | Test des devises → Super potion ×2 | Test des devises → Méga potion ×3
+CODE t16:1 count=862 samples=[NvObj 110] Chefs-d'œuvre de Gerolt → Épée Burtgang ×600 | [NvObj 110] Chefs-d'œuvre de Gerolt → Hache Conquérante ×600 | [NvObj 110] Chefs-d'œuvre de Gerolt → Arondie ×600
+CODE t16:2 count=1489 samples=Matérias → Potion ×999 | [NvObj 55] Équipement pour vétérans → Faluche de menuisier ×30 | [NvObj 55] Équipement pour vétérans → Lunettes de forgeron ×30
+CODE t16:4 count=713 samples=[NvObj 55] Équipement pour vétérans → Casque de mineur des hameaux ×50 | [NvObj 55] Équipement pour vétérans → Chapeau d'horticulteur des hameaux ×50 | [NvObj 55] Équipement pour vétérans → Chapeau de pêcheur des hameaux ×50
+CODE t16:6 count=116 samples=Assignats orange : matérias → Matéria de l'art physique XII ×500 | Assignats orange : matérias → Matéria de l'art magique XII ×500 | Assignats orange : matérias → Matéria du contrôle XII ×500
+CODE t16:7 count=56 samples=Assignats orange : matérias → Matéria de la collecte XII ×500 | Assignats orange : matérias → Matéria du discernement XII ×500 | Assignats orange : matérias → Matéria du rendement XII ×500
+CODE t16:25 count=719 samples=Équipement de loup → Espafut de loup ×350 | Équipement de loup → Griffes de loup ×500 | Équipement de loup → Labrys de loup ×500
+ENCODED t2:1 t2:2 t2:3 t3:2 t4:1 t4:2 t4:3 t4:4 t4:25 t4:27 t4:29 t5:29 t16:1 t16:2 t16:4 t16:6 t16:7 t16:25

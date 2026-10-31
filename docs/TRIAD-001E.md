@@ -1,0 +1,19 @@
+# TRIAD-001E — Ordre et Bonus/Malus
+
+État IMPLEMENTED / TESTED, version 0.25.0, 2026-10-28. Moteur et UI compilés ; rendu/match natif non observés. Triple Triade reste PARTIAL.
+
+Ordre limite chaque main à sa première carte restante dans l'ordre de saisie, pour le joueur bleu comme le rouge. Coups, reconstruction et recherche appliquent la même contrainte ; restaurer une position qui a sauté une carte initiale est refusé. Les flèches < et > réordonnent les mains dans la préparation. Il s'agit de l'ordre explicitement saisi des deux mains connues ; aucun ordre adverse caché n'est deviné.
+
+Bonus ou Malus modifie les valeurs des cartes d'une famille selon le nombre de cartes de cette famille déjà posées, toutes couleurs confondues. Les cartes sans famille restent inchangées. Valeurs bornées entre 1 et A, dans les deux mains et sur le plateau. Un retournement ne change pas ce compte. Des masques immuables par instance conservent la jointure native TypeId sans tableau indexé par cet identifiant.
+
+Point de timing : les captures initiales et tous leurs combos utilisent le compte précédent, sans inclure la carte nouvellement posée. Après leur résolution, la nouvelle position inclut cette carte et ses valeurs affichées sont mises à jour. Ce même calcul couvre comparaison ordinaire, Identique, sommes de Plus, Inversion et Tueur d'as. Bonus et Malus simultanés sont refusés ; la liste UI rend le choix exclusif. Modifier règles, mains ou ordre réinitialise plateau/historique et annule les résultats précédents. Les infobulles montrent valeurs de base, actuelles et modificateur, même pour une carte non jouable à ce tour.
+
+Sources primaires CURRENT_VERIFIED le 2026-10-28 : [guide français officiel](https://fr.finalfantasyxiv.com/lodestone/playguide/contentsguide/goldsaucer/tripletriad/) pour Ordre, familles, limites et incompatibilité Bonus/Malus ; [TriadGameModifier, OnCardPlaced/OnPostCaptures](https://github.com/MgAl2O4/FFTriadBuddy/blob/425f72ecb3ba1580943e62b83097a0bf5a4e69e7/sources/gamelogic/TriadGameModifier.cs) pour le moment d'application ; [TriadCard.GetNumber](https://github.com/MgAl2O4/FFTriadBuddy/blob/425f72ecb3ba1580943e62b83097a0bf5a4e69e7/sources/gamelogic/TriadCard.cs) pour les bornes. Le filtre Ordre du solveur NPC de référence est limité au bleu ; notre simulateur à deux mains ordonnées explicitement suit les deux duellistes du guide, sans extrapoler un ordre de PNJ inconnu. Aucune implémentation copiée.
+
+COMPILED / TESTED : Verify.ps1 Release sans avertissement/erreur, 150/150 tests et package cohérent. Six groupes ajoutés : Ordre/prefixes/deux premiers joueurs, compte famille/couleurs/mains, timing pose, timing combo, incompatibilités/identités immuables, 384 fins de partie sur 96 combinaisons. Chaque étape de reconstruction, les quatre rangs effectifs des dix cartes et chaque score minimax final sont comparés à un moteur de référence par tableaux et comptage de familles par dictionnaire. Les tests antérieurs restent passants.
+
+LOCAL_VERIFIED : GatheringProbe sélectionne dix cartes natives d'une famille commune (TypeId 3 sur cette installation) et contrôle les 96 combinaisons : fin exacte à trois coups, six candidats ou trois avec Ordre, modificateur attendu 0/+6/−6 et rang effectif borné. Catalogue des 475 cartes, icônes et objets liés toujours vérifié. Aucun de ces contrôles statiques ne prouve le comportement du match en jeu.
+
+Essai ultérieur : Simulateur & conseil, choisir Ordre et Bonus ou Malus, ordonner les mains puis reconstruire les coups. Vérifier les cartes autorisées, les valeurs actuelles au survol, les seuils 1/A et l'annulation d'un coup. Tester aussi Bonus/Malus avec Identique/Plus. Pas de redemande du test Macro Chain reporté.
+
+Suite : étude d'une lecture passive du match et de ses règles natives, avec inconnus explicites et séparation du simulateur manuel. Chaos, Mort subite, informations cachées et exécution dans le jeu ne sont pas couverts à ce stade.

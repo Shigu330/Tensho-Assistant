@@ -1,0 +1,44 @@
+# MACRO-001A — séquences explicites de macros
+
+État courant au 2026-10-28 : IMPLEMENTED / TESTED en 0.18.0, validation native EN ATTENTE. Page, catalogue personnel/partagé, plan sauvegardable de 1–32 macros, lancement explicite, arrêt des étapes suivantes, adaptateur framework et hook d'intervention externe ajoutés. 114 tests/package validés avant les essais demandés. La couverture reste PARTIAL, sans affirmation de réussite en jeu.
+
+Retour utilisateur du 2026-10-28 : « Je testerai plus tard ». Le test natif reste différé, sans acceptation ni échec constaté. Poursuite sur MAP-002 sans modifier le protocole des macros ni répéter la demande d'essai.
+
+Protocole choisi après relecture de tous les Markdown : chaque macro sélectionnée doit finir par une ligne /tenshonext, ajoutée manuellement dans le menu du jeu. Le dernier marqueur est une demande explicite d'enchaîner ; il ne garantit pas la réussite des actions précédentes. Aucune modification automatique des macros enregistrées, aucune copie native temporaire et aucun pointeur conservé entre les frames. Une macro de 15 lignes occupées doit réserver sa dernière ligne au marqueur, comme les macros préparées avec /nextmacro dans la référence primaire. L'avancement par simple disparition d'un état busy reste exclu.
+
+Le hook ExecuteMacro est installé seulement au premier lancement explicite. L'appel du bridge est reconnu une seule fois grâce à une comparaison d'adresse limitée à la durée de l'appel synchrone et au thread courant ; tout appel extérieur annule les étapes futures. Le marqueur est accepté seulement sur le framework, pour le personnage et le nom natif attendus, avec un unique pied de macro concordant et une ligne courante correspondant au marqueur ou à sa consommation immédiate. Ce dernier détail est une hypothèse d'adaptateur encore à confirmer en jeu : un désaccord arrête la séquence et affiche les valeurs observées, sans annoncer une réussite.
+
+Les définitions sont copiées au lancement et comparées avant chaque exécution : une modification des commandes ou du nom arrête la séquence. La prochaine macro attend l'état idle et le déverrouillage natifs ; MacroLocked n'est jamais forcé. Arrêter l'enchaînement ne déclenche pas CancelMacro : la macro courante peut finir. Changement de personnage, interruption, absence de marqueur, erreur de lecture et Dispose empêchent les étapes suivantes. Le hook et les deux inscriptions commande/framework ont un propriétaire et un nettoyage sur échec.
+
+Tests 0.18.0 ajoutés : marqueurs absents/dupliqués/mal placés/avec arguments, limite 15 lignes, réception native à la bonne ligne/au bon nom/propriétaire, demandes copiées, annulation avant dispatch, changement propriétaire et persistance/migration de configuration. Les tests ne simulent pas la fonction native du jeu.
+
+Essai demandé après compilation :
+1. Recharger C:\Plugins-ff14\src\TenshoAssistant\bin\x64\Release\TenshoAssistant.dll et vérifier 0.18.0.
+2. Créer « Tensho Test 1 » dans le menu Macros du jeu : /echo TENSHO-1, /wait 1, /tenshonext, chacun sur sa ligne. Créer « Tensho Test 2 » : /echo TENSHO-2 puis /tenshonext.
+3. /tensho → Accueil & outils → Macro Chain → ouvrir les séquences. Actualiser, ajouter les deux tests dans l'ordre, lancer.
+4. Attendu : les deux messages dans l'ordre puis « Tous les marqueurs ont été reçus ». En cas d'arrêt, fournir le texte exact (ligne native, marqueur et noms si affichés). Aucun succès n'est déduit tant que ce retour n'est pas reçu.
+5. Après ce premier essai seulement, vérifier l'arrêt de l'enchaînement, l'intervention d'une autre macro et la sauvegarde/relecture. Ne pas considérer les cas non exercés comme validés.
+
+Les notes ci-dessous décrivent l'étude et le checkpoint antérieurs ; les exclusions d'exécuteur de 0.17.3 sont historiques.
+
+Observateur 0.17.3 : Diagnostics → Observation des macros · lecture seule → Observer les transitions natives. Option temporaire désactivée par défaut, aucune exécution/annulation native. Lecture framework possédée, garde de Dispose, copie du nom/ligne/verrou/attente, traces coalescées et limitées à 64 transitions, suppression au changement de personnage/désactivation/erreur. Les macros très courtes peuvent échapper à l'échantillonnage ; cet observateur ne prouve pas leur fin ou leur absence. Deux tests supplémentaires couvrent opt-in, coalescence, bornes, listes protégées, identité, erreurs et callbacks tardifs.
+
+Intervention utile à la reprise : charger la DLL 0.17.3 déjà compilée, activer l'observateur dans Diagnostics, puis lancer soi-même une macro de test sans effet externe, par exemple une seule ligne /wait 1. Utiliser Copier les transitions observées et conserver le résultat. Désactiver ensuite l'observateur. Ce protocole est proposé pour collecter des preuves natives ; il n'a pas été exécuté et ne suffit pas à lui seul à prouver les macros très courtes ou les takeovers.
+
+MacroSequence copie un plan de 1–32 emplacements (livres 0/1, indices 0–99), produit une demande à token unique et attend des reçus concordants de démarrage puis fin. Un shell occupé/verrouillé n'est jamais remplacé ; aucune fin n'est déduite d'un délai ou d'un simple état idle. Interruption, takeover externe, changement de personnage, arrêt et Dispose empêchent les demandes suivantes. Les reçus d'une ancienne séquence sont ignorés. Le modèle ne fait aucun appel natif et ne fournit jamais un ordre CancelMacro : arrêter les étapes futures ne signifie pas interrompre une macro native non possédée.
+
+Quatre groupes de tests ajoutés : ordre/stockage immuable/transitions, fin sans démarrage et reçus étrangers, interruption/identité/anciens reçus/arrêt, bornes/shell indisponible/Dispose. Ces tests prouvent le contrat managé, pas la possibilité pour l'adaptateur de produire les reçus natifs corrects.
+
+Prochaine action : prouver le démarrage/fin et les takeovers, y compris macro très courte et appel ExecuteMacro ignoré. Intercepter un appel à ExecuteMacro n'est pas à lui seul une preuve que le jeu a démarré la macro. Ne pas brancher ObserveStart/ObserveEnd sur de simples intentions ou un timeout. Après preuve suffisante, intégrer l'adaptateur framework et l'interface de lancement explicite, puis compiler et effectuer un essai natif ciblé.
+
+Objectif : permettre à l'utilisateur de préparer une séquence de macros personnelles/partagées, de la lancer explicitement et de l'interrompre. Ni pointeur natif conservé ni lancement implicite au chargement/à la connexion.
+
+LOCAL_VERIFIED / 2026-10-27 : ApiProbe confirme RaptureMacroModule.Instance, GetMacro(uint book,uint index), Individual/Shared et GetLineCount. RaptureShellModule.Instance, ExecuteMacro, CancelMacro, MacroLocked, MacroCurrentLine, WaitTimeMs sont présents dans les assemblies installées. Les appels natifs doivent rester sur le framework. Résoudre de nouveau le pointeur de la macro à chaque action, copier seulement IDs/noms/lignes utiles vers l'UI.
+
+CURRENT_VERIFIED / 2026-10-27 : source primaire https://raw.githubusercontent.com/Caraxi/MacroChain/master/MacroChain.cs (branche master, commit non épinglé) utilise MacroCurrentLine >= 0 comme état d'exécution et les livres 0/1, indices 0–99. https://raw.githubusercontent.com/aers/FFXIVClientStructs/main/FFXIVClientStructs/FFXIV/Client/UI/Shell/RaptureShellModule.cs confirme les champs/appels présents. Ces conventions sont une preuve de source, pas une observation du client local. Aucune licence de réutilisation du code MacroChain établie ; aucun code copié. Implémentation originale et tests requis.
+
+Tranche proposée : modèle managé de séquence, identité du personnage, états Idle/Starting/Running/Waiting/Complete/Cancelled/Failed, plan copié avant lancement, limites sur nombre d'étapes et indices. Ne jamais remplacer une macro externe déjà en cours ni forcer MacroLocked à false. Pour annuler, cesser les étapes futures ; annuler la macro native seulement si sa propriété par cette séquence est démontrée. Interruption, déconnexion, changement de personnage et Dispose doivent empêcher tout lancement supplémentaire. Une macro vide ou un démarrage non observé doit rester une erreur explicite.
+
+L'API ExecuteMacro est void et ne prouve pas seule un lancement réussi ; l'adaptateur doit traiter la fenêtre de démarrage, les macros très courtes et l'éventuelle exécution externe avant de promouvoir une séquence automatique. Étudier si un hook est nécessaire pour prouver la propriété ; ne pas conserver le pointeur de la macro ni reprendre automatiquement après une ambiguïté. Ne pas introduire un faux délai fixe qui prétend prouver la fin.
+
+Tests : bornes, ordre, démarrage/fin observés, interruption externe, annulation avant/pending/après démarrage, changement propriétaire et disposal. Validation native ciblée avec macros sans effet externe dans une session Dalamud, après compilation. Sans preuve d'ownership, laisser l'action bloquée plutôt que modifier l'état global des macros.

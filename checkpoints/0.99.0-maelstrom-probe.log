@@ -1,0 +1,37 @@
+SHOP 1770684 'コメンデーションクリスタルの取引' UseCurrencyType=2 costs=1x[20984 'Hache de combat de limier des enfers' type0] + 2x[40479 'Cristal-insigne' type0]
+NPC 1001617 'comptable des assignats' data=2032117,3539066
+NPC 1003077 'comptable des assignats' data=2032115,3539066
+NPC 1003633 'comptable des assignats' data=2032116,3539066
+NPC 1005423 'comptable des assignats' data=2032706,3801095
+NPC 1012301 'comptable des assignats' data=2031861,3539114
+NPC 1013397 'comptable des assignats' data=2031860,3539066,721286
+NPC 1019458 'comptable des assignats' data=2032113,3539064
+NPC 1027541 'comptable des assignats' data=2032361,3539063
+NPC 1031501 'comptable des assignats' data=2032361,3539063
+NPC 1037262 'comptable des assignats' data=2032812,3539062
+NPC 1037307 'comptable des assignats' data=2032804,3539062
+NPC 1048386 'comptable des assignats' data=2033183,3539073
+NPC 1049085 'comptable des assignats' data=2033182,3539072
+CODE t2:1 costType2 count=1271 shops=Chefs-d'œuvre de Gerolt (guerre) | Chefs-d'œuvre de Gerolt (magie) | Chefs-d'œuvre de Gerolt (armes) | Amélioration d'équipement des Forges (guerre)
+CODE t2:2 costType2 count=61 shops=Mémoquartz allagois astronomiques (armes) | Mémoquartz allagois héliologiques (armes - NvObj 720) | Mémoquartz allagois mathématiques (armes - NvObj 750)
+CODE t2:3 costType2 count=21 shops=Mémoquartz allagois mnémoniques (armes - NvObj 780)
+CODE t3:2 costType3 count=10 shops=Objets en développement
+CODE t4:1 costType2 count=831 shops=Mémoquartz allagois poétiques (guerre) | Mémoquartz allagois poétiques (magie) | Mémoquartz allagois poétiques (divers) | Mémoquartz allagois poétiques (guerre - NvObj 240)
+CODE t4:2 costType2 count=371 shops=Mémoquartz allagois aphoristiques (guerre) | Mémoquartz allagois aphoristiques (magie) | Mémoquartz allagois astronomiques (guerre) | Mémoquartz allagois astronomiques (magie)
+CODE t4:2 costType3 count=33 shops=Assignats blancs d'artisan III (équipements/Nv 80) | Assignats d'artisan
+CODE t4:3 costType2 count=55 shops=Mémoquartz allagois mnémoniques (guerre - NvObj 780) | Mémoquartz allagois mnémoniques (magie - NvObj 780)
+CODE t4:4 costType3 count=5 shops=Assignats blancs de récolteur III (équipements/Nv 80) | Assignats de récolteur
+CODE t4:25 costType0 count=119 shops=
+CODE t4:27 costType0 count=221 shops=Insignes alliés (Maelstrom) | Insignes alliés (Ordre) | Insignes alliés (Immortels) | Insignes alliés (guerre)
+CODE t4:29 costType0 count=1341 shops=Lots (armes) | Obtenir des cartes | Objets | Manuels de dressage (1)
+CODE t5:29 costType0 count=14 shops=Test des devises
+CODE t16:1 costType2 count=862 shops=[NvObj 110] Chefs-d'œuvre de Gerolt | [NvObj 130] Équipement des Forges | Matériaux pour armes spéciales | Divers
+CODE t16:2 costType3 count=1489 shops=Matérias | [NvObj 55] Équipement pour vétérans | Recettes expertes I | [NvObj 130] Équipement d'adepte
+CODE t16:4 costType3 count=713 shops=[NvObj 55] Équipement pour vétérans | [NvObj 130] Équipement de pionnier | [NvObj 200] Équipement pour récolteurs émérites (outils) | [NvObj 200] Équipement pour récolteurs émérites (armure)
+CODE t16:6 costType3 count=116 shops=Assignats orange : matérias | Assignats orange (Nv ≧ 100) [NvObj 700] | Assignats orange : matériaux et logement (Nv ≧ 100) | Assignats orange (Nv ≧ 100) [NvObj 720]
+CODE t16:7 costType3 count=56 shops=Assignats orange : matérias | Assignats orange (Nv ≧ 100) [NvObj 700] | Assignats orange : matériaux, appâts et avoirs (Nv ≧ 100) | Assignats orange (Nv ≧ 100) [NvObj 720]
+CODE t16:25 costType0 count=719 shops=Équipement de loup | Équipement de loup-garou | Équipement de loup sinistre | Équipement de créature
+ROYAL 1770911 'Mémoquartz allagois mathématiques (guerre - NvObj 750)' t4 495x2 costType2
+  TALK 721735 name='RegSeaPvpCommendationCrystalShop_00839' special=0 args=
+WOLFNPC 1043099 'officier de gestion du Maelstrom' 721735:CustomTalk
+ENCODED t2:1 t2:2 t2:3 t3:2 t4:1 t4:2 t4:3 t4:4 t4:25 t4:27 t4:29 t5:29 t16:1 t16:2 t16:4 t16:6 t16:7 t16:25

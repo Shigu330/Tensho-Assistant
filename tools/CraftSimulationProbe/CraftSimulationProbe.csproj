@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/TenshoAssistant/Craft/RecipeCatalog.cs" Link="RecipeCatalog.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftSimulation.cs" Link="CraftSimulation.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/RecipeSimulationCopy.Lumina.cs" Link="RecipeSimulationCopy.Lumina.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftSolver.cs" Link="CraftSolver.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftMacroExport.cs" Link="CraftMacroExport.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftActionCatalog.cs" Link="CraftActionCatalog.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftLiveObservation.cs" Link="CraftLiveObservation.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftLiveProjection.cs" Link="CraftLiveProjection.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftObservedEffects.cs" Link="CraftObservedEffects.cs" />
+    <Reference Include="Lumina"><HintPath>$(APPDATA)/XIVLauncher/addon/Hooks/dev/Lumina.dll</HintPath></Reference>
+    <Reference Include="Lumina.Excel"><HintPath>$(APPDATA)/XIVLauncher/addon/Hooks/dev/Lumina.Excel.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

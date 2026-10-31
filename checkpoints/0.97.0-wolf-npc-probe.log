@@ -1,0 +1,225 @@
+SHOP 1769743 '' UseCurrencyType=4 costs=2000x[25 'Marque de loup' type0]
+NPC 1001617 'comptable des assignats' data=2032117,3539066
+NPC 1003077 'comptable des assignats' data=2032115,3539066
+NPC 1003633 'comptable des assignats' data=2032116,3539066
+NPC 1005423 'comptable des assignats' data=2032706,3801095
+NPC 1012301 'comptable des assignats' data=2031861,3539114
+NPC 1013397 'comptable des assignats' data=2031860,3539066,721286
+NPC 1019458 'comptable des assignats' data=2032113,3539064
+NPC 1027541 'comptable des assignats' data=2032361,3539063
+NPC 1031501 'comptable des assignats' data=2032361,3539063
+NPC 1037262 'comptable des assignats' data=2032812,3539062
+NPC 1037307 'comptable des assignats' data=2032804,3539062
+NPC 1048386 'comptable des assignats' data=2033183,3539073
+NPC 1049085 'comptable des assignats' data=2033182,3539072
+CODE t2:1 costType2 count=1271 shops=Chefs-d'œuvre de Gerolt (guerre) | Chefs-d'œuvre de Gerolt (magie) | Chefs-d'œuvre de Gerolt (armes) | Amélioration d'équipement des Forges (guerre)
+CODE t2:2 costType2 count=61 shops=Mémoquartz allagois astronomiques (armes) | Mémoquartz allagois héliologiques (armes - NvObj 720) | Mémoquartz allagois mathématiques (armes - NvObj 750)
+CODE t2:3 costType2 count=21 shops=Mémoquartz allagois mnémoniques (armes - NvObj 780)
+CODE t3:2 costType3 count=10 shops=Objets en développement
+CODE t4:1 costType2 count=831 shops=Mémoquartz allagois poétiques (guerre) | Mémoquartz allagois poétiques (magie) | Mémoquartz allagois poétiques (divers) | Mémoquartz allagois poétiques (guerre - NvObj 240)
+CODE t4:2 costType2 count=371 shops=Mémoquartz allagois aphoristiques (guerre) | Mémoquartz allagois aphoristiques (magie) | Mémoquartz allagois astronomiques (guerre) | Mémoquartz allagois astronomiques (magie)
+CODE t4:2 costType3 count=33 shops=Assignats blancs d'artisan III (équipements/Nv 80) | Assignats d'artisan
+CODE t4:3 costType2 count=55 shops=Mémoquartz allagois mnémoniques (guerre - NvObj 780) | Mémoquartz allagois mnémoniques (magie - NvObj 780)
+CODE t4:4 costType3 count=5 shops=Assignats blancs de récolteur III (équipements/Nv 80) | Assignats de récolteur
+CODE t4:25 costType0 count=119 shops=
+CODE t4:27 costType0 count=221 shops=Insignes alliés (Maelstrom) | Insignes alliés (Ordre) | Insignes alliés (Immortels) | Insignes alliés (guerre)
+CODE t4:29 costType0 count=1341 shops=Lots (armes) | Obtenir des cartes | Objets | Manuels de dressage (1)
+CODE t5:29 costType0 count=14 shops=Test des devises
+CODE t16:1 costType2 count=862 shops=[NvObj 110] Chefs-d'œuvre de Gerolt | [NvObj 130] Équipement des Forges | Matériaux pour armes spéciales | Divers
+CODE t16:2 costType3 count=1489 shops=Matérias | [NvObj 55] Équipement pour vétérans | Recettes expertes I | [NvObj 130] Équipement d'adepte
+CODE t16:4 costType3 count=713 shops=[NvObj 55] Équipement pour vétérans | [NvObj 130] Équipement de pionnier | [NvObj 200] Équipement pour récolteurs émérites (outils) | [NvObj 200] Équipement pour récolteurs émérites (armure)
+CODE t16:6 costType3 count=116 shops=Assignats orange : matérias | Assignats orange (Nv ≧ 100) [NvObj 700] | Assignats orange : matériaux et logement (Nv ≧ 100) | Assignats orange (Nv ≧ 100) [NvObj 720]
+CODE t16:7 costType3 count=56 shops=Assignats orange : matérias | Assignats orange (Nv ≧ 100) [NvObj 700] | Assignats orange : matériaux, appâts et avoirs (Nv ≧ 100) | Assignats orange (Nv ≧ 100) [NvObj 720]
+CODE t16:25 costType0 count=719 shops=Équipement de loup | Équipement de loup-garou | Équipement de loup sinistre | Équipement de créature
+ROYAL 1770911 'Mémoquartz allagois mathématiques (guerre - NvObj 750)' t4 495x2 costType2
+  TALK 721280 name='RegSeaPvpGaro_00384' special=0 args=LOC_YUBI_01=4259,LOC_BGM_01=86,LOC_JOB_CHECK_DARK=32,LOC_JOB_CHECK_NIN=30,LOC_JOB_CHECK_DRG=22,LOC_JOB_CHECK_PLD=19,LOC_JOB_CHECK_WAR=21,LOC_JOB_CHECK_WHM=24,LOC_JOB_CHECK_SUM=27,LOC_JOB_CHECK_AST=33,LOC_JOB_CHECK_SCH=28
+  WOLFSHOP 1769743 t4 '' items=50 directNpc=False sample=Visage du Loup doré | Corps du Loup doré | Bras du Loup doré | Jambes du Loup doré
+  WOLFSHOP 1769744 t4 '' items=49 directNpc=False sample=Lunette du chasseur Makai | Tenue de bataille du chasseur Makai | Gants sans doigts du chasseur Makai | Trousses du chasseur Makai
+  WOLFSHOP 1770537 t4 '' items=20 directNpc=False sample=Monocle de l'avant-garde Makai | Tenue de bataille de l'avant-garde Makai | Gants sans doigts de l'avant-garde Makai | Jambières de l'avant-garde Makai
+  WOLFSHOP 1770551 t16 'Équipement de loup' items=9 directNpc=False sample=Espafut de loup | Griffes de loup | Labrys de loup | Guisarme de loup
+  WOLFSHOP 1770552 t16 'Équipement de loup-garou' items=9 directNpc=False sample=Lame de loup combattant | Écu mandorle de loup combattant | Patas de loup combattant | Hache de loup combattant
+  WOLFSHOP 1770553 t16 'Équipement de loup sinistre' items=9 directNpc=False sample=Épée longue de loup sinistre | Scutum de loup sinistre | Griffes de loup sinistre | Hache de combat de loup sinistre
+  WOLFSHOP 1770554 t16 'Équipement de créature' items=9 directNpc=False sample=Lame crinière-de-lion | Bouclier crinière-de-lion | Griffes aile-d'aigle | Hache gueule-d'ours
+  WOLFSHOP 1770555 t16 'Équipement de seigneur-des-créatures' items=9 directNpc=False sample=Lame seigneur-des-lions | Bouclier seigneur-des-lions | Griffes seigneur-des-aigles | Hache seigneur-des-ours
+  WOLFSHOP 1770556 t16 'Équipement bestial' items=10 directNpc=False sample=Lame du roi béhémoth | Bouclier du roi béhémoth | Crocs du dragon du firmament | Hache du roi béhémoth
+  WOLFSHOP 1770557 t16 'Équipement des Douze' items=10 directNpc=False sample=Épée de la Conquérante | Bouclier de la Conquérante | Poings du Contemplateur | Hache de la Conquérante
+  WOLFSHOP 1770558 t16 'Équipement occulte' items=12 directNpc=False sample=Cimeterre Aka-oni | Poings-de-fer Tengu | Grande hache Shôryû | Hallebarde Ao-oni
+  WOLFSHOP 1770559 t16 'Équipement de loup' items=5 directNpc=False sample=Canne de loup | Bâton de loup | Grimoire d'incantateur de loup | Grimoire de soigneur de loup
+  WOLFSHOP 1770560 t16 'Équipement de loup-garou' items=5 directNpc=False sample=Canne de loup combattant | Perche de loup combattant | Grimoire d'incantateur de loup combattant | Grimoire de soigneur de loup combattant
+  WOLFSHOP 1770561 t16 'Équipement de loup sinistre' items=5 directNpc=False sample=Canne de loup sinistre | Grand bâton de loup sinistre | Grimoire d'incantateur de loup sinistre | Grimoire de soigneur de loup sinistre
+  WOLFSHOP 1770562 t16 'Équipement de créature' items=5 directNpc=False sample=Canne grâce-de-cygne | Bâton œil-de-loup | Grimoire bois-d'élan | Grimoire queue-d'élan
+  WOLFSHOP 1770563 t16 'Équipement de seigneur-des-créatures' items=5 directNpc=False sample=Canne seigneur-des-cygnes | Bâton seigneur-des-loups | Grimoire seigneur-des-élans | Grimoire suzerain-des-élans
+  WOLFSHOP 1770564 t16 'Équipement bestial' items=6 directNpc=False sample=Canne du griffon blanc | Sceptre du griffon noir | Grimoire du griffon noir | Codex du griffon blanc
+  WOLFSHOP 1770565 t16 'Équipement des Douze' items=6 directNpc=False sample=Baguette de l'Érudit | Bâton de l'Érudit | Index de l'Érudit | Codex de l'Érudit
+  WOLFSHOP 1770566 t16 'Équipement occulte' items=6 directNpc=False sample=Canne Hakuko | Bâton Kokuko | Nouvelle-lune Kokuko | Pleine-lune Hakuko
+  WOLFSHOP 1770567 t16 'Équipement de loup' items=32 directNpc=False sample=Celata de loup | Elmo de loup | Sallet de loup | Chapeau de chasseur de loup
+  WOLFSHOP 1770568 t16 'Équipement de loup-garou' items=32 directNpc=False sample=Barbute de protecteur de loup combattant | Cache-œil d'agresseur de loup combattant | Sallet d'abatteur de loup combattant | Masque de pisteur de loup combattant
+  WOLFSHOP 1770569 t16 'Équipement de loup sinistre' items=32 directNpc=False sample=Casque de protecteur de loup sinistre | Bandana d'agresseur de loup sinistre | Masque d'abatteur de loup sinistre | Chapeau de pisteur de loup sinistre
+  WOLFSHOP 1770570 t16 'Équipement de créature' items=52 directNpc=False sample=Armet crinière-de-lion | Armet aile-d'aigle | Armet gueule-d'ours | Heaume langue-de-serpent
+  WOLFSHOP 1770571 t16 'Équipement de seigneur-des-créatures' items=52 directNpc=False sample=Armet seigneur-des-lions | Armet seigneur-des-aigles | Armet seigneur-des-ours | Heaume seigneur-des-serpents
+  WOLFSHOP 1770572 t16 'Équipement bestial' items=37 directNpc=False sample=Heaume du roi béhémoth | Heaume de la reine béhémoth | Heaume du dragon du firmament | Corne de la dernière licorne
+  WOLFSHOP 1770573 t16 'Équipement des Douze' items=37 directNpc=False sample=Casque de protecteur de la Conquérante | Casque d'abatteur de la Conquérante | Casque d'agresseur du Contemplateur | Casque de pisteur du Vagabond
+  WOLFSHOP 1770574 t16 'Équipement occulte' items=25 directNpc=False sample=Sômen Aka-oni | Hara-ate Aka-oni | Kote Aka-oni | Tsutsuhakama Aka-oni
+  WOLFSHOP 1770575 t16 'Équipement républicain' items=25 directNpc=False sample=Protège-tête d'hoplomachus républicain | Lorica d'hoplomachus républicain | Manicae d'hoplomachus républicain | Pagne d'hoplomachus républicain
+  WOLFSHOP 1770576 t16 'Équipement de précellence allagoise' items=25 directNpc=False sample=Masque de protecteur de précellence allagoise | Costume de protecteur de précellence allagoise | Gants de protecteur de précellence allagoise | Bas-de-corps de protecteur de précellence allagoise
+  WOLFSHOP 1770577 t16 'Équipement de loup' items=22 directNpc=False sample=Chapeau de cavalier de loup | Chapeau de loup | Bliaud de loup | Robe de loup
+  WOLFSHOP 1770578 t16 'Équipement de loup-garou' items=18 directNpc=False sample=Chapeau de soigneur de loup combattant | Chapeau d'incantateur de loup combattant | Bliaud de soigneur de loup combattant | Robe d'incantateur de loup combattant
+  WOLFSHOP 1770579 t16 'Équipement de loup sinistre' items=18 directNpc=False sample=Monocle de soigneur de loup sinistre | Chapeau d'incantateur de loup sinistre | Robe de soigneur de loup sinistre | Robe d'incantateur de loup sinistre
+  WOLFSHOP 1770580 t16 'Équipement de créature' items=33 directNpc=False sample=Capuche grâce-de-cygne | Chapeau œil-de-loup | Chapeau bois-d'élan | Chapeau queue-d'élan
+  WOLFSHOP 1770581 t16 'Équipement de seigneur-des-créatures' items=33 directNpc=False sample=Capuche seigneur-des-cygnes | Chapeau seigneur-des-loups | Chapeau seigneur-des-élans | Chapeau suzerain-des-élans
+  WOLFSHOP 1770582 t16 'Équipement bestial' items=18 directNpc=False sample=Capuche du griffon blanc | Capuche du griffon noir | Robe du griffon blanc | Robe du griffon noir
+  WOLFSHOP 1770583 t16 'Équipement des Douze' items=18 directNpc=False sample=Bandana de soigneur de l'Érudit | Bandana d'incantateur de l'Érudit | Cache-poitrine de soigneur de l'Érudit | Cache-poitrine d'incantateur de l'Érudit
+  WOLFSHOP 1770584 t16 'Équipement occulte' items=10 directNpc=False sample=Men Hakuko | Dôgi Hakuko | Tekkô Hakuko | Tsutsuhakama Hakuko
+  WOLFSHOP 1770585 t16 'Équipement républicain' items=10 directNpc=False sample=Couronne de laurier de medicus républicain | Chiton de medicus républicain | Torques de poignets de medicus républicain | Pagne de medicus républicain
+  WOLFSHOP 1770586 t16 'Équipement de précellence allagoise' items=10 directNpc=False sample=Masque de soigneur de précellence allagoise | Costume de soigneur de précellence allagoise | Gants de soigneur de précellence allagoise | Bas-de-corps de soigneur de précellence allagoise
+  WOLFSHOP 1770587 t16 'Autres' items=29 directNpc=False sample=Rouleau abîmé “Blood for Blood” | Rouleau abîmé “Starved” | Marionnette majorette | Rouleau “Birds of Prey”
+  WOLFSHOP 1770888 t16 'Logement' items=17 directNpc=False sample=Bannière des Faucons | Bannière des Corbeaux | Table ronde chocobo | Chaise chocobo
+  WOLFSHOP 1770889 t16 'Matérias' items=14 directNpc=False sample=Matéria de piété XI | Matéria du regard divin XI | Matéria de la barbarie maîtrisée XI | Matéria de la barbarie percutante XI
+  NEAR 1769735 'Amélioration d'équipements idylléens (guerre 2)' first=Arc long idylléen amélioré
+  NEAR 1769736 'Amélioration d'équipements idylléens (magie)' first=Crosse idylléenne améliorée
+  NEAR 1769737 'Mémoquartz allagois poétiques (armes - NvObj 270)' first=Épée idylléenne améliorée
+  NEAR 1769738 'Amélioration d'accessoire de maître artisan' first=Boucles d'oreilles de maître artisan améliorées
+  NEAR 1769739 'Amélioration d'accessoire de maître récolteur' first=Boucles d'oreilles de maître récolteur améliorées
+  NEAR 1769740 'Récompenses d'événements saisonniers' first=Œil du Cirque
+  NEAR 1769741 'Objets (attestations du sénéchal royal)' first=Chapeau des Églantines d'Ul'dah
+  NEAR 1769742 '' first=
+  NEAR 1769743 '' first=Visage du Loup doré
+  NEAR 1769744 '' first=Lunette du chasseur Makai
+  NEAR 1769745 'Armes de Primordiaux (4)' first=Lame de Zurvan
+  NEAR 1769746 '' first=Collier de protecteur de Proto-Ultima
+  NEAR 1769747 '' first=Señor Pampa en peluche
+  NEAR 1769748 'Espoilles d'expédition' first=Casquette d'expédition
+  NEAR 1769749 'Matérias pour artisan' first=Matéria de l'art physique IV
+  NEAR 1769750 'Matérias pour récolteur' first=Matéria de la collecte IV
+  NEAR 1769751 'Lots (1)' first=Loup doré terni
+  NEAR 1769752 'Lots (3)' first=Bâton Mado terni
+  NEAR 1769753 'Rêves de Priant' first=Veste des Zanarkand Abes
+  NEAR 1769754 '' first=
+WOLFNPC 1018655 'prêtresse à la robe noire' 721280:CustomTalk
+  WOLFSHOP 1769743 t4 '' items=50 directNpc=False sample=Visage du Loup doré | Corps du Loup doré | Bras du Loup doré | Jambes du Loup doré
+  WOLFSHOP 1769744 t4 '' items=49 directNpc=False sample=Lunette du chasseur Makai | Tenue de bataille du chasseur Makai | Gants sans doigts du chasseur Makai | Trousses du chasseur Makai
+  WOLFSHOP 1770537 t4 '' items=20 directNpc=False sample=Monocle de l'avant-garde Makai | Tenue de bataille de l'avant-garde Makai | Gants sans doigts de l'avant-garde Makai | Jambières de l'avant-garde Makai
+  WOLFSHOP 1770551 t16 'Équipement de loup' items=9 directNpc=False sample=Espafut de loup | Griffes de loup | Labrys de loup | Guisarme de loup
+  WOLFSHOP 1770552 t16 'Équipement de loup-garou' items=9 directNpc=False sample=Lame de loup combattant | Écu mandorle de loup combattant | Patas de loup combattant | Hache de loup combattant
+  WOLFSHOP 1770553 t16 'Équipement de loup sinistre' items=9 directNpc=False sample=Épée longue de loup sinistre | Scutum de loup sinistre | Griffes de loup sinistre | Hache de combat de loup sinistre
+  WOLFSHOP 1770554 t16 'Équipement de créature' items=9 directNpc=False sample=Lame crinière-de-lion | Bouclier crinière-de-lion | Griffes aile-d'aigle | Hache gueule-d'ours
+  WOLFSHOP 1770555 t16 'Équipement de seigneur-des-créatures' items=9 directNpc=False sample=Lame seigneur-des-lions | Bouclier seigneur-des-lions | Griffes seigneur-des-aigles | Hache seigneur-des-ours
+  WOLFSHOP 1770556 t16 'Équipement bestial' items=10 directNpc=False sample=Lame du roi béhémoth | Bouclier du roi béhémoth | Crocs du dragon du firmament | Hache du roi béhémoth
+  WOLFSHOP 1770557 t16 'Équipement des Douze' items=10 directNpc=False sample=Épée de la Conquérante | Bouclier de la Conquérante | Poings du Contemplateur | Hache de la Conquérante
+  WOLFSHOP 1770558 t16 'Équipement occulte' items=12 directNpc=False sample=Cimeterre Aka-oni | Poings-de-fer Tengu | Grande hache Shôryû | Hallebarde Ao-oni
+  WOLFSHOP 1770559 t16 'Équipement de loup' items=5 directNpc=False sample=Canne de loup | Bâton de loup | Grimoire d'incantateur de loup | Grimoire de soigneur de loup
+  WOLFSHOP 1770560 t16 'Équipement de loup-garou' items=5 directNpc=False sample=Canne de loup combattant | Perche de loup combattant | Grimoire d'incantateur de loup combattant | Grimoire de soigneur de loup combattant
+  WOLFSHOP 1770561 t16 'Équipement de loup sinistre' items=5 directNpc=False sample=Canne de loup sinistre | Grand bâton de loup sinistre | Grimoire d'incantateur de loup sinistre | Grimoire de soigneur de loup sinistre
+  WOLFSHOP 1770562 t16 'Équipement de créature' items=5 directNpc=False sample=Canne grâce-de-cygne | Bâton œil-de-loup | Grimoire bois-d'élan | Grimoire queue-d'élan
+  WOLFSHOP 1770563 t16 'Équipement de seigneur-des-créatures' items=5 directNpc=False sample=Canne seigneur-des-cygnes | Bâton seigneur-des-loups | Grimoire seigneur-des-élans | Grimoire suzerain-des-élans
+  WOLFSHOP 1770564 t16 'Équipement bestial' items=6 directNpc=False sample=Canne du griffon blanc | Sceptre du griffon noir | Grimoire du griffon noir | Codex du griffon blanc
+  WOLFSHOP 1770565 t16 'Équipement des Douze' items=6 directNpc=False sample=Baguette de l'Érudit | Bâton de l'Érudit | Index de l'Érudit | Codex de l'Érudit
+  WOLFSHOP 1770566 t16 'Équipement occulte' items=6 directNpc=False sample=Canne Hakuko | Bâton Kokuko | Nouvelle-lune Kokuko | Pleine-lune Hakuko
+  WOLFSHOP 1770567 t16 'Équipement de loup' items=32 directNpc=False sample=Celata de loup | Elmo de loup | Sallet de loup | Chapeau de chasseur de loup
+  WOLFSHOP 1770568 t16 'Équipement de loup-garou' items=32 directNpc=False sample=Barbute de protecteur de loup combattant | Cache-œil d'agresseur de loup combattant | Sallet d'abatteur de loup combattant | Masque de pisteur de loup combattant
+  WOLFSHOP 1770569 t16 'Équipement de loup sinistre' items=32 directNpc=False sample=Casque de protecteur de loup sinistre | Bandana d'agresseur de loup sinistre | Masque d'abatteur de loup sinistre | Chapeau de pisteur de loup sinistre
+  WOLFSHOP 1770570 t16 'Équipement de créature' items=52 directNpc=False sample=Armet crinière-de-lion | Armet aile-d'aigle | Armet gueule-d'ours | Heaume langue-de-serpent
+  WOLFSHOP 1770571 t16 'Équipement de seigneur-des-créatures' items=52 directNpc=False sample=Armet seigneur-des-lions | Armet seigneur-des-aigles | Armet seigneur-des-ours | Heaume seigneur-des-serpents
+  WOLFSHOP 1770572 t16 'Équipement bestial' items=37 directNpc=False sample=Heaume du roi béhémoth | Heaume de la reine béhémoth | Heaume du dragon du firmament | Corne de la dernière licorne
+  WOLFSHOP 1770573 t16 'Équipement des Douze' items=37 directNpc=False sample=Casque de protecteur de la Conquérante | Casque d'abatteur de la Conquérante | Casque d'agresseur du Contemplateur | Casque de pisteur du Vagabond
+  WOLFSHOP 1770574 t16 'Équipement occulte' items=25 directNpc=False sample=Sômen Aka-oni | Hara-ate Aka-oni | Kote Aka-oni | Tsutsuhakama Aka-oni
+  WOLFSHOP 1770575 t16 'Équipement républicain' items=25 directNpc=False sample=Protège-tête d'hoplomachus républicain | Lorica d'hoplomachus républicain | Manicae d'hoplomachus républicain | Pagne d'hoplomachus républicain
+  WOLFSHOP 1770576 t16 'Équipement de précellence allagoise' items=25 directNpc=False sample=Masque de protecteur de précellence allagoise | Costume de protecteur de précellence allagoise | Gants de protecteur de précellence allagoise | Bas-de-corps de protecteur de précellence allagoise
+  WOLFSHOP 1770577 t16 'Équipement de loup' items=22 directNpc=False sample=Chapeau de cavalier de loup | Chapeau de loup | Bliaud de loup | Robe de loup
+  WOLFSHOP 1770578 t16 'Équipement de loup-garou' items=18 directNpc=False sample=Chapeau de soigneur de loup combattant | Chapeau d'incantateur de loup combattant | Bliaud de soigneur de loup combattant | Robe d'incantateur de loup combattant
+  WOLFSHOP 1770579 t16 'Équipement de loup sinistre' items=18 directNpc=False sample=Monocle de soigneur de loup sinistre | Chapeau d'incantateur de loup sinistre | Robe de soigneur de loup sinistre | Robe d'incantateur de loup sinistre
+  WOLFSHOP 1770580 t16 'Équipement de créature' items=33 directNpc=False sample=Capuche grâce-de-cygne | Chapeau œil-de-loup | Chapeau bois-d'élan | Chapeau queue-d'élan
+  WOLFSHOP 1770581 t16 'Équipement de seigneur-des-créatures' items=33 directNpc=False sample=Capuche seigneur-des-cygnes | Chapeau seigneur-des-loups | Chapeau seigneur-des-élans | Chapeau suzerain-des-élans
+  WOLFSHOP 1770582 t16 'Équipement bestial' items=18 directNpc=False sample=Capuche du griffon blanc | Capuche du griffon noir | Robe du griffon blanc | Robe du griffon noir
+  WOLFSHOP 1770583 t16 'Équipement des Douze' items=18 directNpc=False sample=Bandana de soigneur de l'Érudit | Bandana d'incantateur de l'Érudit | Cache-poitrine de soigneur de l'Érudit | Cache-poitrine d'incantateur de l'Érudit
+  WOLFSHOP 1770584 t16 'Équipement occulte' items=10 directNpc=False sample=Men Hakuko | Dôgi Hakuko | Tekkô Hakuko | Tsutsuhakama Hakuko
+  WOLFSHOP 1770585 t16 'Équipement républicain' items=10 directNpc=False sample=Couronne de laurier de medicus républicain | Chiton de medicus républicain | Torques de poignets de medicus républicain | Pagne de medicus républicain
+  WOLFSHOP 1770586 t16 'Équipement de précellence allagoise' items=10 directNpc=False sample=Masque de soigneur de précellence allagoise | Costume de soigneur de précellence allagoise | Gants de soigneur de précellence allagoise | Bas-de-corps de soigneur de précellence allagoise
+  WOLFSHOP 1770587 t16 'Autres' items=29 directNpc=False sample=Rouleau abîmé “Blood for Blood” | Rouleau abîmé “Starved” | Marionnette majorette | Rouleau “Birds of Prey”
+  WOLFSHOP 1770888 t16 'Logement' items=17 directNpc=False sample=Bannière des Faucons | Bannière des Corbeaux | Table ronde chocobo | Chaise chocobo
+  WOLFSHOP 1770889 t16 'Matérias' items=14 directNpc=False sample=Matéria de piété XI | Matéria du regard divin XI | Matéria de la barbarie maîtrisée XI | Matéria de la barbarie percutante XI
+  NEAR 1769735 'Amélioration d'équipements idylléens (guerre 2)' first=Arc long idylléen amélioré
+  NEAR 1769736 'Amélioration d'équipements idylléens (magie)' first=Crosse idylléenne améliorée
+  NEAR 1769737 'Mémoquartz allagois poétiques (armes - NvObj 270)' first=Épée idylléenne améliorée
+  NEAR 1769738 'Amélioration d'accessoire de maître artisan' first=Boucles d'oreilles de maître artisan améliorées
+  NEAR 1769739 'Amélioration d'accessoire de maître récolteur' first=Boucles d'oreilles de maître récolteur améliorées
+  NEAR 1769740 'Récompenses d'événements saisonniers' first=Œil du Cirque
+  NEAR 1769741 'Objets (attestations du sénéchal royal)' first=Chapeau des Églantines d'Ul'dah
+  NEAR 1769742 '' first=
+  NEAR 1769743 '' first=Visage du Loup doré
+  NEAR 1769744 '' first=Lunette du chasseur Makai
+  NEAR 1769745 'Armes de Primordiaux (4)' first=Lame de Zurvan
+  NEAR 1769746 '' first=Collier de protecteur de Proto-Ultima
+  NEAR 1769747 '' first=Señor Pampa en peluche
+  NEAR 1769748 'Espoilles d'expédition' first=Casquette d'expédition
+  NEAR 1769749 'Matérias pour artisan' first=Matéria de l'art physique IV
+  NEAR 1769750 'Matérias pour récolteur' first=Matéria de la collecte IV
+  NEAR 1769751 'Lots (1)' first=Loup doré terni
+  NEAR 1769752 'Lots (3)' first=Bâton Mado terni
+  NEAR 1769753 'Rêves de Priant' first=Veste des Zanarkand Abes
+  NEAR 1769754 '' first=
+WOLFNPC 1029284 'homme à la robe noire' 
+  WOLFSHOP 1769743 t4 '' items=50 directNpc=False sample=Visage du Loup doré | Corps du Loup doré | Bras du Loup doré | Jambes du Loup doré
+  WOLFSHOP 1769744 t4 '' items=49 directNpc=False sample=Lunette du chasseur Makai | Tenue de bataille du chasseur Makai | Gants sans doigts du chasseur Makai | Trousses du chasseur Makai
+  WOLFSHOP 1770537 t4 '' items=20 directNpc=False sample=Monocle de l'avant-garde Makai | Tenue de bataille de l'avant-garde Makai | Gants sans doigts de l'avant-garde Makai | Jambières de l'avant-garde Makai
+  WOLFSHOP 1770551 t16 'Équipement de loup' items=9 directNpc=False sample=Espafut de loup | Griffes de loup | Labrys de loup | Guisarme de loup
+  WOLFSHOP 1770552 t16 'Équipement de loup-garou' items=9 directNpc=False sample=Lame de loup combattant | Écu mandorle de loup combattant | Patas de loup combattant | Hache de loup combattant
+  WOLFSHOP 1770553 t16 'Équipement de loup sinistre' items=9 directNpc=False sample=Épée longue de loup sinistre | Scutum de loup sinistre | Griffes de loup sinistre | Hache de combat de loup sinistre
+  WOLFSHOP 1770554 t16 'Équipement de créature' items=9 directNpc=False sample=Lame crinière-de-lion | Bouclier crinière-de-lion | Griffes aile-d'aigle | Hache gueule-d'ours
+  WOLFSHOP 1770555 t16 'Équipement de seigneur-des-créatures' items=9 directNpc=False sample=Lame seigneur-des-lions | Bouclier seigneur-des-lions | Griffes seigneur-des-aigles | Hache seigneur-des-ours
+  WOLFSHOP 1770556 t16 'Équipement bestial' items=10 directNpc=False sample=Lame du roi béhémoth | Bouclier du roi béhémoth | Crocs du dragon du firmament | Hache du roi béhémoth
+  WOLFSHOP 1770557 t16 'Équipement des Douze' items=10 directNpc=False sample=Épée de la Conquérante | Bouclier de la Conquérante | Poings du Contemplateur | Hache de la Conquérante
+  WOLFSHOP 1770558 t16 'Équipement occulte' items=12 directNpc=False sample=Cimeterre Aka-oni | Poings-de-fer Tengu | Grande hache Shôryû | Hallebarde Ao-oni
+  WOLFSHOP 1770559 t16 'Équipement de loup' items=5 directNpc=False sample=Canne de loup | Bâton de loup | Grimoire d'incantateur de loup | Grimoire de soigneur de loup
+  WOLFSHOP 1770560 t16 'Équipement de loup-garou' items=5 directNpc=False sample=Canne de loup combattant | Perche de loup combattant | Grimoire d'incantateur de loup combattant | Grimoire de soigneur de loup combattant
+  WOLFSHOP 1770561 t16 'Équipement de loup sinistre' items=5 directNpc=False sample=Canne de loup sinistre | Grand bâton de loup sinistre | Grimoire d'incantateur de loup sinistre | Grimoire de soigneur de loup sinistre
+  WOLFSHOP 1770562 t16 'Équipement de créature' items=5 directNpc=False sample=Canne grâce-de-cygne | Bâton œil-de-loup | Grimoire bois-d'élan | Grimoire queue-d'élan
+  WOLFSHOP 1770563 t16 'Équipement de seigneur-des-créatures' items=5 directNpc=False sample=Canne seigneur-des-cygnes | Bâton seigneur-des-loups | Grimoire seigneur-des-élans | Grimoire suzerain-des-élans
+  WOLFSHOP 1770564 t16 'Équipement bestial' items=6 directNpc=False sample=Canne du griffon blanc | Sceptre du griffon noir | Grimoire du griffon noir | Codex du griffon blanc
+  WOLFSHOP 1770565 t16 'Équipement des Douze' items=6 directNpc=False sample=Baguette de l'Érudit | Bâton de l'Érudit | Index de l'Érudit | Codex de l'Érudit
+  WOLFSHOP 1770566 t16 'Équipement occulte' items=6 directNpc=False sample=Canne Hakuko | Bâton Kokuko | Nouvelle-lune Kokuko | Pleine-lune Hakuko
+  WOLFSHOP 1770567 t16 'Équipement de loup' items=32 directNpc=False sample=Celata de loup | Elmo de loup | Sallet de loup | Chapeau de chasseur de loup
+  WOLFSHOP 1770568 t16 'Équipement de loup-garou' items=32 directNpc=False sample=Barbute de protecteur de loup combattant | Cache-œil d'agresseur de loup combattant | Sallet d'abatteur de loup combattant | Masque de pisteur de loup combattant
+  WOLFSHOP 1770569 t16 'Équipement de loup sinistre' items=32 directNpc=False sample=Casque de protecteur de loup sinistre | Bandana d'agresseur de loup sinistre | Masque d'abatteur de loup sinistre | Chapeau de pisteur de loup sinistre
+  WOLFSHOP 1770570 t16 'Équipement de créature' items=52 directNpc=False sample=Armet crinière-de-lion | Armet aile-d'aigle | Armet gueule-d'ours | Heaume langue-de-serpent
+  WOLFSHOP 1770571 t16 'Équipement de seigneur-des-créatures' items=52 directNpc=False sample=Armet seigneur-des-lions | Armet seigneur-des-aigles | Armet seigneur-des-ours | Heaume seigneur-des-serpents
+  WOLFSHOP 1770572 t16 'Équipement bestial' items=37 directNpc=False sample=Heaume du roi béhémoth | Heaume de la reine béhémoth | Heaume du dragon du firmament | Corne de la dernière licorne
+  WOLFSHOP 1770573 t16 'Équipement des Douze' items=37 directNpc=False sample=Casque de protecteur de la Conquérante | Casque d'abatteur de la Conquérante | Casque d'agresseur du Contemplateur | Casque de pisteur du Vagabond
+  WOLFSHOP 1770574 t16 'Équipement occulte' items=25 directNpc=False sample=Sômen Aka-oni | Hara-ate Aka-oni | Kote Aka-oni | Tsutsuhakama Aka-oni
+  WOLFSHOP 1770575 t16 'Équipement républicain' items=25 directNpc=False sample=Protège-tête d'hoplomachus républicain | Lorica d'hoplomachus républicain | Manicae d'hoplomachus républicain | Pagne d'hoplomachus républicain
+  WOLFSHOP 1770576 t16 'Équipement de précellence allagoise' items=25 directNpc=False sample=Masque de protecteur de précellence allagoise | Costume de protecteur de précellence allagoise | Gants de protecteur de précellence allagoise | Bas-de-corps de protecteur de précellence allagoise
+  WOLFSHOP 1770577 t16 'Équipement de loup' items=22 directNpc=False sample=Chapeau de cavalier de loup | Chapeau de loup | Bliaud de loup | Robe de loup
+  WOLFSHOP 1770578 t16 'Équipement de loup-garou' items=18 directNpc=False sample=Chapeau de soigneur de loup combattant | Chapeau d'incantateur de loup combattant | Bliaud de soigneur de loup combattant | Robe d'incantateur de loup combattant
+  WOLFSHOP 1770579 t16 'Équipement de loup sinistre' items=18 directNpc=False sample=Monocle de soigneur de loup sinistre | Chapeau d'incantateur de loup sinistre | Robe de soigneur de loup sinistre | Robe d'incantateur de loup sinistre
+  WOLFSHOP 1770580 t16 'Équipement de créature' items=33 directNpc=False sample=Capuche grâce-de-cygne | Chapeau œil-de-loup | Chapeau bois-d'élan | Chapeau queue-d'élan
+  WOLFSHOP 1770581 t16 'Équipement de seigneur-des-créatures' items=33 directNpc=False sample=Capuche seigneur-des-cygnes | Chapeau seigneur-des-loups | Chapeau seigneur-des-élans | Chapeau suzerain-des-élans
+  WOLFSHOP 1770582 t16 'Équipement bestial' items=18 directNpc=False sample=Capuche du griffon blanc | Capuche du griffon noir | Robe du griffon blanc | Robe du griffon noir
+  WOLFSHOP 1770583 t16 'Équipement des Douze' items=18 directNpc=False sample=Bandana de soigneur de l'Érudit | Bandana d'incantateur de l'Érudit | Cache-poitrine de soigneur de l'Érudit | Cache-poitrine d'incantateur de l'Érudit
+  WOLFSHOP 1770584 t16 'Équipement occulte' items=10 directNpc=False sample=Men Hakuko | Dôgi Hakuko | Tekkô Hakuko | Tsutsuhakama Hakuko
+  WOLFSHOP 1770585 t16 'Équipement républicain' items=10 directNpc=False sample=Couronne de laurier de medicus républicain | Chiton de medicus républicain | Torques de poignets de medicus républicain | Pagne de medicus républicain
+  WOLFSHOP 1770586 t16 'Équipement de précellence allagoise' items=10 directNpc=False sample=Masque de soigneur de précellence allagoise | Costume de soigneur de précellence allagoise | Gants de soigneur de précellence allagoise | Bas-de-corps de soigneur de précellence allagoise
+  WOLFSHOP 1770587 t16 'Autres' items=29 directNpc=False sample=Rouleau abîmé “Blood for Blood” | Rouleau abîmé “Starved” | Marionnette majorette | Rouleau “Birds of Prey”
+  WOLFSHOP 1770888 t16 'Logement' items=17 directNpc=False sample=Bannière des Faucons | Bannière des Corbeaux | Table ronde chocobo | Chaise chocobo
+  WOLFSHOP 1770889 t16 'Matérias' items=14 directNpc=False sample=Matéria de piété XI | Matéria du regard divin XI | Matéria de la barbarie maîtrisée XI | Matéria de la barbarie percutante XI
+  NEAR 1769735 'Amélioration d'équipements idylléens (guerre 2)' first=Arc long idylléen amélioré
+  NEAR 1769736 'Amélioration d'équipements idylléens (magie)' first=Crosse idylléenne améliorée
+  NEAR 1769737 'Mémoquartz allagois poétiques (armes - NvObj 270)' first=Épée idylléenne améliorée
+  NEAR 1769738 'Amélioration d'accessoire de maître artisan' first=Boucles d'oreilles de maître artisan améliorées
+  NEAR 1769739 'Amélioration d'accessoire de maître récolteur' first=Boucles d'oreilles de maître récolteur améliorées
+  NEAR 1769740 'Récompenses d'événements saisonniers' first=Œil du Cirque
+  NEAR 1769741 'Objets (attestations du sénéchal royal)' first=Chapeau des Églantines d'Ul'dah
+  NEAR 1769742 '' first=
+  NEAR 1769743 '' first=Visage du Loup doré
+  NEAR 1769744 '' first=Lunette du chasseur Makai
+  NEAR 1769745 'Armes de Primordiaux (4)' first=Lame de Zurvan
+  NEAR 1769746 '' first=Collier de protecteur de Proto-Ultima
+  NEAR 1769747 '' first=Señor Pampa en peluche
+  NEAR 1769748 'Espoilles d'expédition' first=Casquette d'expédition
+  NEAR 1769749 'Matérias pour artisan' first=Matéria de l'art physique IV
+  NEAR 1769750 'Matérias pour récolteur' first=Matéria de la collecte IV
+  NEAR 1769751 'Lots (1)' first=Loup doré terni
+  NEAR 1769752 'Lots (3)' first=Bâton Mado terni
+  NEAR 1769753 'Rêves de Priant' first=Veste des Zanarkand Abes
+  NEAR 1769754 '' first=
+WOLFNPC 1039378 'homme en robe noire' 69735:
+ENCODED t2:1 t2:2 t2:3 t3:2 t4:1 t4:2 t4:3 t4:4 t4:25 t4:27 t4:29 t5:29 t16:1 t16:2 t16:4 t16:6 t16:7 t16:25

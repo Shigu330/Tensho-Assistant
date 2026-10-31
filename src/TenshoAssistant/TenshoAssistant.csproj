@@ -1,0 +1,15 @@
+<Project Sdk="Dalamud.NET.Sdk">
+  <PropertyGroup>
+    <Version>0.117.0</Version>
+    <AssemblyName>TenshoAssistant</AssemblyName>
+    <RootNamespace>TenshoAssistant</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>$(MSBuildProjectDirectory)\bin\x64\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="Localization\Languages\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="Localization\Languages\*.json" />
+  </ItemGroup>
+</Project>

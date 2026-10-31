@@ -1,0 +1,13 @@
+  Identification des projets à restaurer...
+  Tous les projets sont à jour pour la restauration.
+  Dalamud.NET.Sdk: root at C:\Users\PC\AppData\Roaming\XIVLauncher\addon\Hooks\dev\
+  TenshoAssistant.Tests -> C:\Plugins-ff14\tests\TenshoAssistant.Tests\bin\Release\net10.0\TenshoAssistant.Tests.dll
+C:\Plugins-ff14\src\TenshoAssistant\Quests\QuestReader.Dalamud.cs(112,23): error CS0266: Impossible de convertir implicitement le type 'System.Threading.Tasks.Task<bool>' en 'Dalamud.Plugin.Services.IFramework'. Une conversion explicite existe (un cast est-il manquant ?) [C:\Plugins-ff14\src\TenshoAssistant\TenshoAssistant.csproj]
+
+ÉCHEC de la build.
+
+C:\Plugins-ff14\src\TenshoAssistant\Quests\QuestReader.Dalamud.cs(112,23): error CS0266: Impossible de convertir implicitement le type 'System.Threading.Tasks.Task<bool>' en 'Dalamud.Plugin.Services.IFramework'. Une conversion explicite existe (un cast est-il manquant ?) [C:\Plugins-ff14\src\TenshoAssistant\TenshoAssistant.csproj]
+    0 Avertissement(s)
+    1 Erreur(s)
+
+Temps écoulé 00:00:05.88

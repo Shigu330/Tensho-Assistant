@@ -1,0 +1,21 @@
+# TRIAD-001B — simulateur et conseil manuel
+
+État IMPLEMENTED / TESTED, version 0.22.0, 2026-10-28. Pas de validation en jeu observée. TriadBuddy reste PARTIAL : règles normales et deux mains entièrement connues uniquement.
+
+Le simulateur reprend TriadCardDefinition et le carnet natif. Charger son deck préparé dans la main bleue, choisir les cinq cartes rouges (ou compléter les deux mains depuis le carnet), puis démarrer le plateau. Choisir le premier joueur, sélectionner une carte en main et cliquer une case vide pour reproduire un coup. Les captures sont calculées, le score inclut les cartes encore en main et le dernier coup peut être annulé. Les conseils peuvent être appliqués uniquement à cette simulation. Mains initiales et plateau ont des vues distinctes ; plateau et mains restantes sont côte à côte sur une fenêtre assez large.
+
+Source primaire CURRENT_VERIFIED le 2026-10-28 : [guide officiel, règles de base](https://na.finalfantasyxiv.com/lodestone/playguide/contentsguide/goldsaucer/tripletriad/). Comparaison stricte des côtés opposés pour capturer, alternance sur neuf cases, dixième carte non jouée incluse au score. Aucune implémentation externe copiée.
+
+Moteur original : position immutable, dix instances de cartes distinguées même si un même identifiant existe dans les deux decks, neuf cases encodées et couleurs actuelles séparées de l'origine des cartes. Copie des decks à la création ; coups illégaux, doublons internes et restaurations incompatibles avec l'alternance rejetés. Les égalités ne capturent pas, les bords ne bouclent pas et les captures normales ne déclenchent pas de combo.
+
+Solveur minimax avec élagage alpha/bêta et approfondissement itératif. Chaque candidat d'une itération reçoit la même profondeur avant publication ; une itération interrompue est entièrement écartée. Limites UI : 1 000 000 positions et 3 secondes ; calcul manuel sur worker, annulation, ticket de génération et invalidation par révision/propriétaire/disposal. Aucun accès natif depuis le worker. Si toutes les cases restantes sont explorées, résultat exact sous les hypothèses saisies ; sinon estimation explicitement limitée, basée sur le contrôle des cartes à l'horizon, sans probabilité de victoire. L'adversaire est supposé choisir ses meilleurs coups.
+
+Les règles spéciales sont exclues et l'interface exige une confirmation des règles normales avant le conseil. Aucune carte cachée devinée, lecture automatique du plateau, interaction avec un match ou promesse de couverture des tournois. Les acquisitions du carnet ne deviennent pas une preuve que la main manuellement saisie est jouable par le personnage.
+
+COMPILED / TESTED : Verify.ps1 Release, zéro avertissement/erreur, 135/135 tests et package cohérent. Six groupes supplémentaires couvrent captures/égalités/bords, dixième carte et instances, validation/immutabilité, exactitude, budgets et cycle de vie. Pour 80 positions de fin de partie générées (deux premiers joueurs, deux à quatre cases restantes), chaque score de chaque coup est comparé à un moteur exhaustif indépendant utilisant tableaux et ensembles, sans réutiliser les transitions du moteur de production.
+
+LOCAL_VERIFIED : GatheringProbe réutilise les dix premières cartes natives. Ouverture : profondeur 5 complète obtenue sous la limite d'un million de positions, résultat correctement non exact et 45 coups évalués ; ce relevé ne garantit pas la profondeur sur d'autres decks ou machines. Après six coups reconstruits : conseil exact à trois coups, six candidats et score total dix. Probe des 475 cartes/icônes/objets toujours passant.
+
+Essai ultérieur : Accueil & outils → TriadBuddy → Simulateur & conseil. Renseigner les deux mains, confirmer les règles normales, démarrer et reproduire quelques coups. Vérifier couleurs, mains consommées, annulation, étiquettes exact/estimation et application locale d'un conseil. Changer les mains pendant/après calcul puis changer de personnage : aucun conseil précédent ne doit rester applicable. Protocole consigné sans redemander le test Macro Chain reporté.
+
+Suite : règles particulières à étudier et implémenter avec tests indépendants avant activation ; lecture native du plateau dans une tranche séparée. Ne pas supprimer les limites actuelles de la fiche avant couverture prouvée.

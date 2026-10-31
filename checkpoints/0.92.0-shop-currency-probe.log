@@ -1,0 +1,62 @@
+SHOP 1770039 'Espoille de pirate des cieux en acier' UseCurrencyType=2 costs=1x[13631 'Espoille de pirate des cieux en acier' type0]
+SHOP 1770193 'Appât et autres' UseCurrencyType=16 costs=20x[4 'Éclat de vent' type3]
+SHOP 1770275 'Appât et autres' UseCurrencyType=16 costs=20x[4 'Éclat de vent' type3]
+SHOP 1770430 'Appât et autres' UseCurrencyType=16 costs=20x[4 'Éclat de vent' type3]
+SHOP 1770508 'Assignats mauves : orchestrion, logement et autres' UseCurrencyType=16 costs=20x[4 'Éclat de vent' type3]
+SHOP 1770602 '' UseCurrencyType=4 costs=150x[37550 'Assignat insulaire émeraude' type0]
+SHOP 1770660 '' UseCurrencyType=4 costs=60x[37549 'Assignat insulaire azur' type0]
+SHOP 1770879 'Appât et autres' UseCurrencyType=16 costs=20x[4 'Éclat de vent' type3]
+SHOP 1770977 'Échange de crédits cosmiques (matériaux, matérias et consommables)' UseCurrencyType=4 costs=40x[45690 'Crédit cosmique' type0]
+ENPC 1016261 direct -> 1770039
+ENPC 1016496 direct -> 1770039
+ENPC 1016498 direct -> 1770039
+ENPC 1016500 direct -> 1770039
+ENPC 1019106 direct -> 1770039
+ENPC 1052588 direct -> 1770977
+ENPC 1052600 direct -> 1770977
+ENPC 1052607 direct -> 1770977
+ENPC 1052608 direct -> 1770977
+ENPC 1052640 direct -> 1770977
+ENPC 1052650 direct -> 1770977
+ENPC 1056824 direct -> 1770977
+SERIES 24.0 -> 1770193
+SERIES 36.0 -> 1770275
+SERIES 48.0 -> 1770430
+SERIES 52.0 -> 1770508
+SERIES 58.0 -> 1770508
+SERIES 62.0 -> 1770508
+SERIES 73.0 -> 1770508
+SERIES 85.0 -> 1770879
+CATEGORY 24 'Matériel de récolte' series 24
+CATEGORY 36 'Matériel de récolte' series 36
+CATEGORY 48 'Matériel de récolte' series 48
+CATEGORY 52 'Assignats de récolteur (légendes locales, matériaux, divers)' series 52
+CATEGORY 58 'Assignats de récolteur (légendes locales, matériaux, divers)' series 58
+CATEGORY 62 'Assignats de récolteur (légendes locales, matériaux, divers)' series 62
+CATEGORY 73 'Assignats de récolteur (légendes locales, matériaux, divers)' series 73
+CATEGORY 85 'Matériel de récolte' series 85
+INCLUSION 3801091 '' via category 24
+INCLUSION 3801092 '' via category 36
+INCLUSION 3801093 '' via category 48
+INCLUSION 3801094 'Échange d'assignats' via category 52
+INCLUSION 3801095 'Échange d'assignats de récolteur' via category 52
+INCLUSION 3801096 'Échange d'assignats' via category 58
+INCLUSION 3801097 'Échange d'assignats' via category 62
+INCLUSION 3801099 '' via category 62
+INCLUSION 3801101 '' via category 62
+INCLUSION 3801102 '' via category 85
+INCLUSION 3801103 'Échange d'assignats' via category 73
+NPC 1001617 'comptable des assignats' data=2032117,3539066
+NPC 1003077 'comptable des assignats' data=2032115,3539066
+NPC 1003633 'comptable des assignats' data=2032116,3539066
+NPC 1005423 'comptable des assignats' data=2032706,3801095
+NPC 1012301 'comptable des assignats' data=2031861,3539114
+NPC 1013397 'comptable des assignats' data=2031860,3539066,721286
+NPC 1019458 'comptable des assignats' data=2032113,3539064
+NPC 1027541 'comptable des assignats' data=2032361,3539063
+NPC 1031501 'comptable des assignats' data=2032361,3539063
+NPC 1037262 'comptable des assignats' data=2032812,3539062
+NPC 1037307 'comptable des assignats' data=2032804,3539062
+NPC 1048386 'comptable des assignats' data=2033183,3539073
+NPC 1049085 'comptable des assignats' data=2033182,3539072
+ENCODED t2:1 t2:2 t2:3 t3:2 t4:1 t4:2 t4:3 t4:4 t4:25 t4:27 t4:29 t5:29 t16:1 t16:2 t16:4 t16:6 t16:7 t16:25

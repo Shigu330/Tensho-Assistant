@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/TenshoAssistant/Localization/*.cs" Link="Localization/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../../src/TenshoAssistant/Localization/Languages/*.json" LogicalName="TenshoAssistant.Localization.Languages.%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Caching/*.cs" Exclude="../../src/TenshoAssistant/Caching/*.Dalamud.cs" Link="Caching/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Fashion/*.cs" Exclude="../../src/TenshoAssistant/Fashion/*.Dalamud.cs" Link="Fashion/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Community/*.cs" Link="Community/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Monsters/*.cs" Link="Monsters/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Npcs/*.cs" Exclude="../../src/TenshoAssistant/Npcs/*.Dalamud.cs" Link="Npcs/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Duties/*.cs" Exclude="../../src/TenshoAssistant/Duties/*.Dalamud.cs" Link="Duties/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Macros/MacroSequence.cs" Link="Macros/MacroSequence.cs" />
+    <Compile Include="../../src/TenshoAssistant/Macros/MacroChainService.cs" Link="Macros/MacroChainService.cs" />
+    <Compile Include="../../src/TenshoAssistant/Macros/MacroObservationService.cs" Link="Macros/MacroObservationService.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/MapCatalog.cs" Link="Maps/MapCatalog.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/MapBookmarks.cs" Link="Maps/MapBookmarks.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/MapProjection.cs" Link="Maps/MapProjection.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/MapLocalIndex.cs" Link="Maps/MapLocalIndex.cs" />
+    <Compile Include="../../src/TenshoAssistant/MiniGames/*.cs" Exclude="../../src/TenshoAssistant/MiniGames/*.Dalamud.cs" Link="MiniGames/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Character/CharacterStatsService.cs" Link="Character/CharacterStatsService.cs" />
+    <Compile Include="../../src/TenshoAssistant/Quests/QuestService.cs" Link="Quests/QuestService.cs" />
+    <Compile Include="../../src/TenshoAssistant/Quests/QuestRewards.cs" Link="Quests/QuestRewards.cs" />
+    <Compile Include="../../src/TenshoAssistant/Quests/QuestRewardIndex.cs" Link="Quests/QuestRewardIndex.cs" />
+    <Compile Include="../../src/TenshoAssistant/Quests/QuestItemProgress.cs" Link="Quests/QuestItemProgress.cs" />
+    <Compile Include="../../src/TenshoAssistant/Market/*.cs" Exclude="../../src/TenshoAssistant/Market/*.Dalamud.cs" Link="Market/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Collections/CollectionService.cs" Link="Collections/CollectionService.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/GatheringCatalog.cs" Link="Gathering/GatheringCatalog.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/GatheringCatalogCache.cs" Link="Gathering/GatheringCatalogCache.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/FishingNotebook.cs" Link="Gathering/FishingNotebook.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/WeatherForecast.cs" Link="Gathering/WeatherForecast.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/FishingForecast.cs" Link="Gathering/FishingForecast.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/GatheringSchedule.cs" Link="Gathering/GatheringSchedule.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/GatheringTimeline.cs" Link="Gathering/GatheringTimeline.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/GpActions.cs" Link="Gathering/GpActions.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/GpOptimizer.cs" Link="Gathering/GpOptimizer.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/GatheringObservation.cs" Link="Gathering/GatheringObservation.cs" />
+    <Compile Include="../../src/TenshoAssistant/Configuration.cs" Link="Configuration.cs" />
+    <Compile Include="../../src/TenshoAssistant/UI/ThemePalettes.cs" Link="UI/ThemePalettes.cs" />
+    <Compile Include="../../src/TenshoAssistant/RegistrationScope.cs" Link="RegistrationScope.cs" />
+    <Compile Include="../../src/TenshoAssistant/Inventory/*.cs" Exclude="../../src/TenshoAssistant/Inventory/*.Dalamud.cs" Link="Inventory/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Items/*.cs" Exclude="../../src/TenshoAssistant/Items/*.Dalamud.cs;../../src/TenshoAssistant/Items/*.Lumina.cs" Link="Items/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Craft/RecipeCatalog.cs" Link="Craft/RecipeCatalog.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/RecipeCatalogCache.cs" Link="Craft/RecipeCatalogCache.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftSimulation.cs" Link="Craft/CraftSimulation.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftConditionEnvelope.cs" Link="Craft/CraftConditionEnvelope.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftPresets.cs" Link="Craft/CraftPresets.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftLiveObservation.cs" Link="Craft/CraftLiveObservation.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftLiveProjection.cs" Link="Craft/CraftLiveProjection.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftObservedEffects.cs" Link="Craft/CraftObservedEffects.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftSolver.cs" Link="Craft/CraftSolver.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftSolveSession.cs" Link="Craft/CraftSolveSession.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftLogObservation.cs" Link="Craft/CraftLogObservation.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftLogSession.cs" Link="Craft/CraftLogSession.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftMacroExport.cs" Link="Craft/CraftMacroExport.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftActionCatalog.cs" Link="Craft/CraftActionCatalog.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftPlan.cs" Link="Craft/CraftPlan.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftChain.cs" Link="Craft/CraftChain.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftChainSession.cs" Link="Craft/CraftChainSession.cs" />
+  </ItemGroup>
+</Project>

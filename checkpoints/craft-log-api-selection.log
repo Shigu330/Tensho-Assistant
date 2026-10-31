@@ -1,0 +1,51 @@
+TYPE FFXIVClientStructs.FFXIV.Client.Game.UI.RecipeNote+RecipeData
+ATTRIBUTE System.Reflection.TypeLoading.Ecma.EcmaCustomAttributeData
+  System.Span`1[FFXIVClientStructs.FFXIV.Client.Game.UI.RecipeNote+RecipeEntry] RecipesSpan
+  FFXIVClientStructs.FFXIV.Client.Game.UI.RecipeNote+RecipeEntry* SelectedRecipe
+  System.Span`1[FFXIVClientStructs.FFXIV.Client.Game.UI.RecipeNote+NoteBookDivisionIdsArray] NoteBookDivisionIds
+  System.Span`1[System.Byte] NumAvailableNoteBookDivisions
+  System.Span`1[System.Byte] NumAvailableSecretNoteBookDivisions
+  FFXIVClientStructs.FFXIV.Client.Game.UI.RecipeNote+RecipeEntry* Recipes
+  System.Int32 RecipeCount
+  System.UInt16 SelectedIndex
+  System.Int32 StructSize
+    = 1152
+TYPE FFXIVClientStructs.FFXIV.Client.Game.UI.RecipeNote+RecipeEntry
+ATTRIBUTE System.Reflection.TypeLoading.Ecma.EcmaCustomAttributeData
+  System.Span`1[FFXIVClientStructs.FFXIV.Client.Game.UI.RecipeNote+RecipeIngredient] Ingredients
+  System.Span`1[FFXIVClientStructs.FFXIV.Client.Game.UI.RecipeNote+RecipeCrystal] Crystals
+  FFXIVClientStructs.FFXIV.Client.System.String.Utf8String ItemName
+  System.UInt32 IconId
+  System.UInt32 ItemId
+  System.UInt32 StatusRequired
+  System.UInt32 ItemRequired
+  System.Boolean RequiresMeisterSoulCrystal
+  System.UInt16 RecipeId
+  System.UInt16 Difficulty
+  System.UInt32 Quality
+  System.UInt16 Durability
+  System.Byte MaterialQualityFactor
+  System.UInt16 RequiredCraftsmanship
+  System.UInt16 RequiredControl
+  System.UInt16 QuickSynthCraftsmanship
+  System.UInt16 QuickSynthControl
+  System.UInt16 SecretRecipeBook
+  System.UInt32 RequiredQuality
+  System.UInt16 SuggestedCraftsmanship
+  System.UInt16 ConditionsFlag
+  System.Byte AmountResult
+  System.Byte CraftType
+  System.Byte ClassJobLevel
+  System.Byte Stars
+  System.Byte Flags
+  System.Byte Flags2
+  System.UInt32 Number
+  System.UInt16 RecipeLevelTableId
+  System.UInt16 PatchNumber
+  System.UInt16 DisplayPriority
+  System.UInt16 MaxAdjustableJobLevel
+  System.UInt16 DifficultyFactor
+  System.UInt16 QualityFactor
+  System.UInt16 DurabilityFactor
+  System.Int32 StructSize
+    = 1024

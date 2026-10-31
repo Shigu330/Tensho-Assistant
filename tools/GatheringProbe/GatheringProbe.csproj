@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/TenshoAssistant/Community/*.cs" Link="Community/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Monsters/*.cs" Link="Monsters/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Duties/*.cs" Exclude="../../src/TenshoAssistant/Duties/*.Dalamud.cs" Link="Duties/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Quests/QuestService.cs" Link="Quests/QuestService.cs" />
+    <Compile Include="../../src/TenshoAssistant/Quests/QuestRewards.cs" Link="Quests/QuestRewards.cs" />
+    <Compile Include="../../src/TenshoAssistant/Quests/QuestRewardIndex.cs" Link="Quests/QuestRewardIndex.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/MapCatalog.cs" Link="Maps/MapCatalog.cs" />
+    <Compile Include="../../src/TenshoAssistant/MiniGames/TripleTriad*.cs" Link="MiniGames/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Items/ItemCatalog.cs" Link="Items/ItemCatalog.cs" />
+    <Compile Include="../../src/TenshoAssistant/Items/ItemHover.cs" Link="Items/ItemHover.cs" />
+    <Compile Include="../../src/TenshoAssistant/Items/EquipmentSlots.cs" Link="Items/EquipmentSlots.cs" />
+    <Compile Include="../../src/TenshoAssistant/Market/MarketHover.cs" Link="Market/MarketHover.cs" />
+    <Compile Include="../../src/TenshoAssistant/Market/MarketQuote.cs" Link="Market/MarketQuote.cs" />
+    <Compile Include="../../src/TenshoAssistant/Market/PreparationCost.cs" Link="Market/PreparationCost.cs" />
+    <Reference Include="Lumina"><HintPath>$(APPDATA)/XIVLauncher/addon/Hooks/dev/Lumina.dll</HintPath></Reference>
+    <Reference Include="Lumina.Excel"><HintPath>$(APPDATA)/XIVLauncher/addon/Hooks/dev/Lumina.Excel.dll</HintPath></Reference>
+    <Compile Include="../../src/TenshoAssistant/Gathering/GatheringCatalog.cs" Link="GatheringCatalog.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/FishingNotebook.cs" Link="FishingNotebook.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/GatheringSchedule.cs" Link="GatheringSchedule.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/GatheringTimeline.cs" Link="GatheringTimeline.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/WeatherForecast.cs" Link="WeatherForecast.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/FishingForecast.cs" Link="FishingForecast.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/WeatherCopy.Lumina.cs" Link="WeatherCopy.Lumina.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/*.cs" Exclude="../../src/TenshoAssistant/Craft/*.Dalamud.cs;../../src/TenshoAssistant/Craft/CraftPresets.cs" Link="Craft/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Inventory/*.cs" Exclude="../../src/TenshoAssistant/Inventory/*.Dalamud.cs" Link="Inventory/%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>
