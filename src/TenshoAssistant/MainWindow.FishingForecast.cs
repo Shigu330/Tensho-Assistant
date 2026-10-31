@@ -47,7 +47,16 @@ internal sealed partial class MainWindow
             if(span.EndsAt<=now || span.ReportedConditionsMatch==false)continue;
             anyCandidate=true;
             var label=localization.Get(span.ReportedConditionsMatch==true ? "FishingWindows.Compatible":"FishingWindows.Unknown");
-            ImGui.TextColored(span.ReportedConditionsMatch==true ? Accent:Muted,$"{span.StartsAt.ToLocalTime():g}–{span.EndsAt.ToLocalTime():g} · {label}");
+            var spanStart=span.StartsAt>now ? span.StartsAt:now;
+            if(span.StartsAt>now)
+            {
+                var name=SelectedItem?.Name ?? itemId.ToString();
+                AlarmButton($"FishSpan{span.StartsAt.ToUnixTimeSeconds()}",localization.Format("Alarms.PeriodTooltip",name,span.StartsAt.ToLocalTime().ToString("g")),
+                    ()=>[new TenshoAssistant.Alarms.TenshoAlarm{Label=name,Repeat=TenshoAssistant.Alarms.AlarmRepeat.Once,At=span.StartsAt,
+                        LeadMinutes=TenshoAssistant.Alarms.AlarmSchedule.ClampLead(TenshoAssistant.Alarms.AlarmRepeat.Once,DefaultAlarmLead),TerritoryId=territory,ItemId=(uint)itemId}]);
+                ImGui.SameLine();
+            }
+            ImGui.TextColored(span.ReportedConditionsMatch==true ? Accent:Muted,$"{spanStart.ToLocalTime():g}–{span.EndsAt.ToLocalTime():g} · {label}");
         }
         if(!anyCandidate)ImGui.TextWrapped(localization.Get("FishingWindows.Empty"));
         ImGui.TextWrapped(localization.Get("FishingWindows.Disclaimer"));

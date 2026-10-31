@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
             {
                 DrawItemIcon(new ItemDefinition(0, type.TypeName, false, type.IconId), new Vector2(30));
                 if (ImGui.IsItemClicked()) gatheringTypeFilter = type.TypeId;
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip(type.TypeName);
+                if (ImGui.IsItemHovered()) WrappedTooltip(type.TypeName);
             }
             finally { ImGui.PopID(); }
         }
@@ -79,6 +79,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn(); ImGui.TextWrapped(source.Zone);
                     ImGui.TableNextColumn(); ImGui.TextWrapped(string.IsNullOrWhiteSpace(source.Place) ? localization.Get("GatheringDetails.UnknownPlace") : source.Place);
                     ImGui.TableNextColumn(); DrawGatheringTime(source.Timing);
+                    DrawGatheringAlarmButton($"Gather{source.IsFishing}/{source.PointId}/{source.ItemId}",source);
                     ImGui.TableNextColumn();
                     ImGui.PushID($"{source.IsFishing}/{source.PointId}/{source.ItemId}");
                     try
@@ -95,7 +96,7 @@ internal sealed partial class MainWindow
                             }
                         }
                         finally { ImGui.EndDisabled(); }
-                        if (ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Get("GatheringDetails.MapHelp"));
+                        if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("GatheringDetails.MapHelp"));
                         if(ImGui.SmallButton(localization.Get("GatheringDetails.ZoneWeather"))) OpenWeather(source.TerritoryId,source.Zone);
                     }
                     finally { ImGui.PopID(); }

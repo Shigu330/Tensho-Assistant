@@ -84,6 +84,30 @@ internal sealed class MapMarkerSource
         return regionMaps!.GetValueOrDefault(map.RegionPlaceId,worldMap);
     }
     public uint World{get{LoadOverviews();return worldMap;}}
+    private Dictionary<uint,(uint Row,bool Locked,int Variant)>? questIcons;
+    /// <summary>
+    /// Quest marker icons of the map (0.211): EventIconType rows, MapIconAvailable / MapIconInvalid + 1..IconRange (e.g. row 3 = 71001…
+    /// main scenario, row 8 = 71141… feature quests; docs/evidence/0.211-event-icons.md). Not in MapSymbol, so added to the icon settings.
+    /// </summary>
+    public IReadOnlyDictionary<uint,(uint Row,bool Locked,int Variant)> QuestIcons
+    {
+        get
+        {
+            if(questIcons is not null)return questIcons;
+            questIcons=[];
+            try
+            {
+                foreach(var row in data.GetExcelSheet<EventIconType>())
+                    for(var variant=1;variant<=Math.Clamp((int)row.IconRange,0,8);variant++)
+                    {
+                        if(row.MapIconAvailable>0)questIcons.TryAdd(row.MapIconAvailable+(uint)variant,(row.RowId,false,variant));
+                        if(row.MapIconInvalid>0)questIcons.TryAdd(row.MapIconInvalid+(uint)variant,(row.RowId,true,variant));
+                    }
+            }
+            catch(Exception error){log.Warning(error,"Quest marker icons unavailable.");}
+            return questIcons;
+        }
+    }
     private Dictionary<uint,string>? symbols;
     /// <summary>Every named map icon kind of the game (MapSymbol sheet), for the global icon settings.</summary>
     public IReadOnlyCollection<uint> SymbolIcons{get{SymbolName(0);return symbols!.Keys;}}

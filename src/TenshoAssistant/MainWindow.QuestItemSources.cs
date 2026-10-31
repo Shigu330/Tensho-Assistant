@@ -78,14 +78,14 @@ internal sealed partial class MainWindow
                         ImGui.TableNextRow();ImGui.TableNextColumn();
                         DrawItemIcon(new ItemDefinition(0,source.Name,false,source.Icon),new Vector2(28));var clicked=ImGui.IsItemClicked();ImGui.SameLine();
                         clicked|=ImGui.Selectable(source.Name);
-                        if(ImGui.IsItemHovered())ImGui.SetTooltip($"{source.Name}\n{source.Category}"+(developerMode ? $"\nID: {source.QuestId}":""));
+                        if(ImGui.IsItemHovered())WrappedTooltip($"{source.Name}\n{source.Category}"+(developerMode ? $"\nID: {source.QuestId}":""));
                         if(clicked){SelectQuest(source.QuestId);page=Page.Quests;}
                         ImGui.TableNextColumn();
                         ImGui.TextColored(row.Progress==QuestProgress.Complete ? Success:Muted,QuestProgressLabel(row.Progress,row.Sequence));
-                        if(row.IsRepeatable && row.Progress==QuestProgress.Complete && ImGui.IsItemHovered())ImGui.SetTooltip(localization.Get("QuestSources.Repeatable"));
+                        if(row.IsRepeatable && row.Progress==QuestProgress.Complete && ImGui.IsItemHovered())WrappedTooltip(localization.Get("QuestSources.Repeatable"));
                         ImGui.TableNextColumn();ImGui.TextUnformatted(source.Category);
                         ImGui.TableNextColumn();ImGui.TextDisabled(source.Variants.Count==1 ? localization.Get("QuestSourceCounts.VariantOne"):localization.Format("QuestSourceCounts.Variants",source.Variants.Count));
-                        if(ImGui.IsItemHovered())ImGui.SetTooltip(string.Join('\n',source.Variants.Take(12).Select(line=>
+                        if(ImGui.IsItemHovered())WrappedTooltip(string.Join('\n',source.Variants.Take(12).Select(line=>
                             $"{QuestRewardConditionLabel(line)} · {(line.Quantity is { } count ? "× "+count:localization.Get("QuestSources.Quantity"))}{(line.HighQuality==true ? " HQ":"")}"))
                             +(source.Variants.Count>12 ? localization.Get("QuestSources.More"):""));
                     }

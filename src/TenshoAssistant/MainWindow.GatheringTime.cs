@@ -10,8 +10,9 @@ internal sealed partial class MainWindow
     private void DrawGatheringClock()
     {
         var now=DateTimeOffset.UtcNow;var minute=GatheringTime.MinuteOfDay(now);
+        // Eorzea time only (0.206): the PC time is shown once, in the header next to the version.
         ImGui.TextColored(Accent,localization.Format("GatheringClock.Time",minute/60,minute%60));
-        ImGui.TextDisabled(localization.Format("LocalClock.Source",now.ToLocalTime().ToString("HH:mm:ss",System.Globalization.CultureInfo.CurrentCulture)));
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GatheringClock.Disclaimer"));
     }
     private void DrawGatheringTime(GatheringSchedule schedule)
     {
@@ -26,6 +27,6 @@ internal sealed partial class MainWindow
         ImGui.TextColored(current ? Success:Muted,localization.Format(current ? "LocalClock.Current":"LocalClock.Next",current ? first.EndsAt.ToLocalTime().ToString("HH:mm:ss"):first.StartsAt.ToLocalTime().ToString("g")));
         var remaining=(current ? first.EndsAt:first.StartsAt)-now;
         ImGui.TextDisabled(localization.Format(current ? "LocalClock.CountdownClose":"LocalClock.CountdownOpen",Math.Max(0,(int)remaining.TotalHours),remaining.Minutes,remaining.Seconds));
-        if(ImGui.IsItemHovered())ImGui.SetTooltip(string.Join('\n',timeline.Openings.Select(window=>$"{window.StartsAt.ToLocalTime():g}–{window.EndsAt.ToLocalTime():g}"))+"\n"+localization.Get("GatheringClock.Disclaimer"));
+        if(ImGui.IsItemHovered())WrappedTooltip(string.Join('\n',timeline.Openings.Select(window=>$"{window.StartsAt.ToLocalTime():g}–{window.EndsAt.ToLocalTime():g}"))+"\n"+localization.Get("GatheringClock.Disclaimer"));
     }
 }

@@ -58,13 +58,13 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Attempts"),ref gpAttempts,0);
                     ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("GpUi.Yield"),ref gpBaseYield,0);
-                    if(ImGui.IsItemHovered())ImGui.SetTooltip(localization.Get("GpUi.YieldHelp"));
+                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GpUi.YieldHelp"));
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Success"),ref gpSuccess,0);
                     ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("GpUi.Boon"),ref gpBoon,0);
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Bountiful"),ref gpBountiful,0);
-                    if(ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Get("GpUi.BountifulHelp"));
+                    if(ImGui.IsItemHovered()) WrappedTooltip(localization.Get("GpUi.BountifulHelp"));
                 }
                 finally { ImGui.EndTable(); }
             }
@@ -101,7 +101,7 @@ internal sealed partial class MainWindow
             DrawItemIcon(new ItemDefinition(0,use.Action.Name,false,use.Action.Icon),new Vector2(28)); ImGui.SameLine();
             var repeat=use.Action.Spec.Effect is GpEffect.Bountiful1 or GpEffect.Bountiful2;
             ImGui.TextWrapped(localization.Format("GpUi.Use",use.Action.Name,use.Count,use.Action.Spec.Cost*use.Count) + (repeat ? result.Scenario.Effects.FirstAttemptBonus>0 ? localization.Get("GpUi.AfterFirst"):localization.Get("GpUi.BeforeEach") : localization.Get("GpUi.BeforeAttempts")));
-            if(ImGui.IsItemHovered()) ImGui.SetTooltip(use.Action.Description);
+            if(ImGui.IsItemHovered()) WrappedTooltip(use.Action.Description);
         }
         if(result.NextUpgrade is { } next)
             ImGui.TextColored(Accent,localization.Format("GpUi.Next",next.Cost,next.Cost-result.Scenario.Budget,next.ExpectedYield.ToString("0.00")));
@@ -127,7 +127,7 @@ internal sealed partial class MainWindow
     {
         var metadata=catalog.Actions.First(action=>action.Spec.JobId==gpJob && action.Spec.Effect==effect);
         DrawItemIcon(new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(24));
-        if(ImGui.IsItemHovered())ImGui.SetTooltip(metadata.Description);
+        if(ImGui.IsItemHovered())WrappedTooltip(metadata.Description);
         ImGui.SameLine();return ImGui.Checkbox(label,ref active);
     }
 }

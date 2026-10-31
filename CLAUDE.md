@@ -14,7 +14,7 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
 
 ## Environnement
 
-- Dépôt Windows : `C:\Plugins-ff14` (GitHub : Shigu330/Plugins-ff14). Session desktop avec PowerShell : l'agent compile et teste.
+- Dépôt Windows : `C:\Plugins-ff14` (GitHub : Shigu330/Tensho-Assistant, branche Stable ; analyse CodeQL dans .github/workflows). Session desktop avec PowerShell : l'agent compile et teste.
 - SDK .NET 10.0.403 (global.json), Dalamud.NET.Sdk 15 ; build et tests : `.\scripts\Verify.ps1` (compile Release, tests managés,
   validation des langues, paquet). Sondes de données en lecture seule : `tools/ShopCurrencyProbe`, `tools/ApiProbe`.
 - **Les commits sont faits par l'application de bureau de l'utilisateur.** L'agent ne commit pas, ne pousse pas, ne réécrit pas l'historique

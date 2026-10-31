@@ -149,7 +149,7 @@ internal sealed partial class MainWindow
                                 {
                                     var min=ImGui.GetItemRectMin();
                                     ImGui.GetWindowDrawList().AddRect(min,min+new Vector2(slot),ImGui.GetColorU32(reserved.Preserve ? Success:Accent),4);
-                                    if(ImGui.IsItemHovered())ImGui.SetTooltip(previewStack is { } zoneItem
+                                    if(ImGui.IsItemHovered())WrappedTooltip(previewStack is { } zoneItem
                                         ? $"{catalog.Find(zoneItem.Stack.Item.Id.Value)?.Name ?? localization.Format("BankUi.Item",zoneItem.Stack.Item.Id.Value)}\n{(zoneItem.Stack.Item.IsHighQuality ? "HQ":"NQ")} : {zoneItem.Stack.Quantity:N0}\n"+localization.Format("SortUi.Slot",target+1,reserved.Name,reserved.Preserve ? localization.Get("SortUi.Protected"):"")
                                         : localization.Format("SortUi.EmptySlot",target+1,reserved.Name,reserved.Preserve ? localization.Get("SortUi.Protected"):""));
                                 }

@@ -8,7 +8,7 @@ sorting rules, recipes and a crafting simulator, gathering and fishing with Eorz
 game map, collections with how to obtain each item, quests and rewards, optional market prices on hover, duty and monster loot,
 Fashion Report hints, Mini Cactpot and Triple Triad helpers, character stats and macro chains.
 
-- Source: https://github.com/Shigu330/Plugins-ff14 (GPL-3.0)
+- Source: https://github.com/Shigu330/Tensho-Assistant (GPL-3.0)
 - Nothing runs on its own: teleport, applying a sort and macro chains only start on a click. No automation of crafting, dialogues or loot,
   no combat or PvP feature, no parser.
 - Network: Universalis (world + item id), Garland Tools, FFXIV Console Games Wiki and Fashion Report data, over HTTPS, only when the

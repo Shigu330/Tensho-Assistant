@@ -29,8 +29,11 @@ internal sealed partial class MainWindow
     private void DrawFashion()
     {
         Heading(localization.Get("FashionUi.Title"),localization.Get("FashionUi.Description"));
-        ImGui.TextWrapped(localization.Get("FashionUi.Help"));
         var native=fashionHints.State;
+        // 0.213: the week first (theme, 11 slots of the game window, gear per slot), then every category.
+        if(native.Catalog is not null && ImGui.CollapsingHeader(localization.Get("FashionWeek.Title")+"###FashionWeek",ImGuiTreeNodeFlags.DefaultOpen))DrawFashionWeek();
+        if(!ImGui.CollapsingHeader(localization.Get("FashionWeek.AllTitle")+"###FashionAll",fashionShowItems ? ImGuiTreeNodeFlags.DefaultOpen:ImGuiTreeNodeFlags.None))return;
+        ImGui.TextWrapped(localization.Get("FashionUi.Help"));
         if(native.Catalog is not { } catalog) { if(native.Error is { } hintError)DrawDataError(hintError,"ServiceErrors.Fashion");else ImGui.TextWrapped(localization.Get("FashionUi.LoadingHints")); return; }
         var state=fashionData.State; var dataset=state.Dataset;
         if(state.Loading) { if(ImGui.Button(localization.Get("FashionUi.Cancel"))) fashionData.Cancel(); ImGui.SameLine(); ImGui.TextDisabled(localization.Get("FashionUi.Loading")); }
@@ -85,7 +88,7 @@ internal sealed partial class MainWindow
                 {
                     var hint=fashionHintMatches[index]; ImGui.TableNextRow(); ImGui.TableNextColumn();
                     if(ImGui.Selectable($"{hint.Name}##FashionHint{hint.Id}",fashionHintId==hint.Id)) { fashionHintId=hint.Id; fashionShowItems=true; fashionItemQuery=""; }
-                    if(developerMode && ImGui.IsItemHovered()) ImGui.SetTooltip($"ID: {hint.Id}");
+                    if(developerMode && ImGui.IsItemHovered()) WrappedTooltip($"ID: {hint.Id}");
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(dataset is null ? localization.Get("FashionUi.NotFetched") : dataset.ForHint(hint.Id).Count.ToString(CultureInfo.InvariantCulture));
                 }
             }
@@ -142,12 +145,12 @@ internal sealed partial class MainWindow
                     ImGui.BeginDisabled(!selectable);
                     try { if((ImGui.Selectable($"{item?.Name ?? localization.Format("BankUi.Item",id)}##FashionItem{id}",itemId==id,ImGuiSelectableFlags.None,new Vector2(0,28)) || clicked) && selectable) SelectItem(id); }
                     finally { ImGui.EndDisabled(); }
-                    if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) ImGui.SetTooltip(localization.Format("UiFragments.Equipment",item?.Name ?? localization.Get("FashionUi.Unresolved"),item is null ? localization.Get("UiFragments.Unknown"):FashionSlotNames(item.Equipment))+(developerMode ? $"\nID {id}":""));
+                    if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(localization.Format("UiFragments.Equipment",item?.Name ?? localization.Get("FashionUi.Unresolved"),item is null ? localization.Get("UiFragments.Unknown"):FashionSlotNames(item.Equipment))+(developerMode ? $"\nID {id}":""));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Match.Reports.ToString("N0"));
                     ImGui.TableNextColumn();
                     var stock=GetRecipeHoldings(id);
                     ImGui.TextUnformatted(!stock.HasObservation ? localization.Get("FashionUi.Unknown") : $"{stock.Total:N0}{(stock.HasCached ? localization.Get("UiFragments.CacheSuffix"):"")}{(stock.HasUnknown ? localization.Get("UiFragments.PartialSuffix"):"")}");
-                    if(ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Get("FashionUi.StockHelp"));
+                    if(ImGui.IsItemHovered()) WrappedTooltip(localization.Get("FashionUi.StockHelp"));
                 }
             }
             finally { clipper.End(); clipper.Destroy(); }

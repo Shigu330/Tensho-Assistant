@@ -84,9 +84,11 @@ public sealed class WikiItemAcquisitionService:IDisposable
     private readonly CancellationTokenSource disposal=new();
     private Task? worker;private bool disposed;private DateTimeOffset lastRequest;
     public WikiItemAcquisitionService(Func<uint,string?> englishName,Func<TimeSpan> lifetime,DataCache? disk){this.englishName=englishName;this.lifetime=lifetime;this.disk=disk;}
+    // Settings › Advanced (0.206): when off, nothing is requested and the source is simply absent.
+    public Func<bool>? Enabled { get; set; }
     public WikiItemAcquisitionState Get(uint itemId)
     {
-        if(itemId==0)return new(null,false,null);
+        if(itemId==0 || Enabled?.Invoke()==false)return new(null,false,null);
         lock(gate)
         {
             if(states.TryGetValue(itemId,out var known))return known;

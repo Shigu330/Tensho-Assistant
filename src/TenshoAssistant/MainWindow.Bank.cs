@@ -391,7 +391,7 @@ internal sealed partial class MainWindow
             DrawItemIcon(item, new Vector2(slotSize - 6));
             if (ImGui.IsItemClicked()) SelectItem(row.ItemId);
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(localization.Format("BankUi.Tooltip",item?.Name ?? localization.Format("BankUi.Item",row.ItemId),row.Nq.ToString("N0"),row.Hq.ToString("N0")));
+                WrappedTooltip(localization.Format("BankUi.Tooltip",item?.Name ?? localization.Format("BankUi.Item",row.ItemId),row.Nq.ToString("N0"),row.Hq.ToString("N0")));
             var count = checked(row.Nq + row.Hq).ToString("N0");
             var countSize = ImGui.CalcTextSize(count);
             var countPosition = new Vector2(slotMax.X - countSize.X - 3, slotMax.Y - countSize.Y - 2);

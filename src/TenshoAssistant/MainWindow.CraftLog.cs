@@ -45,7 +45,7 @@ internal sealed partial class MainWindow
         var actions=craftActions.State.Catalog;
         var presets=(IReadOnlyList<CraftPreset>?)configuration.CraftPresets ?? Array.Empty<CraftPreset>();
         CraftLogInput? input=context is {Recipe:{ } recipe,Stats:{ } stats} && actions is not null
-            ? new(observed.Owner,recipe,stats,actions,presets,new(recipe.Simulation!.Quality,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality):null;
+            ? new(observed.Owner,recipe,stats,actions,presets,new(recipe.Simulation!.Quality,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true):null;
         if(input!=craftLogInput)
         {craftLogSession.Cancel();craftLogInput=input;craftLogStableSince=now;craftLogStarted=false;craftLogForceRefresh=false;}
         if(now<craftLogStableSince)craftLogStableSince=now;
@@ -105,10 +105,11 @@ internal sealed partial class MainWindow
                 if(index%10!=0)ImGui.SameLine(0,3);
                 var metadata=catalog.Find(job,steps[index].Action);
                 DrawItemIcon(metadata is null ? null:new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(25));
-                if(ImGui.IsItemHovered())ImGui.SetTooltip($"{index+1}. {metadata?.Name ?? steps[index].Action.ToString()}");
+                if(ImGui.IsItemHovered())WrappedTooltip($"{index+1}. {metadata?.Name ?? steps[index].Action.ToString()}");
             }
             if(steps.Count>30)ImGui.TextDisabled(localization.Format("CraftLogUi.More",steps.Count-30));
             foreach(var block in macro.Export.Pages)if(ImGui.SmallButton(localization.Format("CraftLogUi.Copy",block.Number,macro.Export.Pages.Count)))ImGui.SetClipboardText(block.Text);
+            DrawMacroToGame(macro.Export.Pages,true);
             if(ImGui.SmallButton(localization.Get("CraftLogUi.Edit")))
             {
                 var source=craftLogInput;

@@ -92,7 +92,7 @@ internal sealed partial class MainWindow
                             ImGui.TableNextRow(); ImGui.TableNextColumn();
                             if (ImGui.Selectable($"{(monster.Name.Length == 0 ? localization.Format("MonsterUi.UnnamedMonster",monster.Id) : monster.Name)}##Mob{monster.Id}",state.MonsterId == monster.Id))
                             { monsterLoot.SelectMonster(monster.Id); selectedMonsterMap=0; }
-                            if (developerMode && ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Format("Developer.SourceReference",monster.Id));
+                            if (developerMode && ImGui.IsItemHovered()) WrappedTooltip(localization.Format("Developer.SourceReference",monster.Id));
                             ImGui.TableNextColumn(); ImGui.TextUnformatted(monster.Level.Length == 0 ? localization.Get("MonsterUi.Missing") : monster.Level);
                             ImGui.TableNextColumn(); ImGui.TextUnformatted(MonsterZone(monster.PlaceNameId));
                         }

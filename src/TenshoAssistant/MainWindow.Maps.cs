@@ -49,7 +49,7 @@ internal sealed partial class MainWindow
                         var label = string.IsNullOrWhiteSpace(map.Subzone) ? map.Zone : $"{map.Zone} · {map.Subzone}";
                         if (ImGui.Selectable($"{label}##Map{map.MapId}", selectedMapId == map.MapId))
                         { selectedMapId = map.MapId; mapOpenError = null; selectedBookmark = Guid.Empty; bookmarkName = ""; bookmarkSaved = false; }
-                        if (ImGui.IsItemHovered()) ImGui.SetTooltip($"{map.Region}\n{label}"+(developerMode ? $"\nMap {map.MapId} · territory {map.TerritoryId}":""));
+                        if (ImGui.IsItemHovered()) WrappedTooltip($"{map.Region}\n{label}"+(developerMode ? $"\nMap {map.MapId} · territory {map.TerritoryId}":""));
                     }
                 }
                 finally { clipper.End(); clipper.Destroy(); }

@@ -146,6 +146,52 @@ if(Environment.GetEnvironmentVariable("PROBE_GROW") is { Length:>0 })
         Console.WriteLine($"JOB {job.RowId} '{job.Name.ExtractText()}' category {job.ClassJobCategory.RowId} role {job.Role} primary {job.PrimaryStat} limitBreak {job.LimitBreak1.RowId}");
     return;
 }
+// PROBE_EVENTICONS (0.211): EventIconType rows (NPC and map icons of quests, available / locked, icon range) — the quest marker icons.
+if(Environment.GetEnvironmentVariable("PROBE_EVENTICONS") is { Length:>0 })
+{
+    foreach(var row in data.Excel.GetSheet<EventIconType>())
+        Console.WriteLine($"EVENTICON {row.RowId} npcAvailable {row.NpcIconAvailable} mapAvailable {row.MapIconAvailable} npcInvalid {row.NpcIconInvalid} mapInvalid {row.MapIconInvalid} range {row.IconRange}");
+    return;
+}
+// PROBE_ALARMCMD (0.205): the TextCommand row of the alarm command in each client language (command, short form, alias, help text).
+if(Environment.GetEnvironmentVariable("PROBE_ALARMCMD") is { Length:>0 })
+{
+    var english=data.Excel.GetSheet<TextCommand>(Language.English)!;
+    foreach(var row in english.Where(row=>row.Command.ExtractText()=="/alarm"))
+        foreach(var language in new[]{Language.English,Language.French,Language.German,Language.Japanese})
+        {
+            var local=data.Excel.GetSheet<TextCommand>(language)!.GetRow(row.RowId);
+            Console.WriteLine($"ALARMCMD {row.RowId} {language} command '{local.Command.ExtractText()}' short '{local.ShortCommand.ExtractText()}' alias '{local.Alias.ExtractText()}' shortAlias '{local.ShortAlias.ExtractText()}'");
+            Console.WriteLine($"ALARMHELP {language} {local.Description.ExtractText().Replace((char)10,(char)124).Replace((char)13,(char)32)}");
+        }
+    return;
+}
+// PROBE_GTYPE (0.203): GatheringType rows (name, icons) and ClassJob 16–18 names — which gathering job each type belongs to.
+if(Environment.GetEnvironmentVariable("PROBE_GTYPE") is { Length:>0 })
+{
+    foreach(var type in data.Excel.GetSheet<GatheringType>())Console.WriteLine($"GTYPE {type.RowId} '{type.Name.ExtractText()}' iconMain {type.IconMain} iconOff {type.IconOff}");
+    foreach(var job in new uint[]{16,17,18})Console.WriteLine($"GJOB {job} '{data.Excel.GetSheet<ClassJob>().GetRow(job).Name.ExtractText()}' abbr '{data.Excel.GetSheet<ClassJob>().GetRow(job).Abbreviation.ExtractText()}'");
+    return;
+}
+// PROBE_SELLS=<item id> (0.199): SpecialShop rows that give the item, and the ENpcBase rows whose data values name each shop directly.
+if(Environment.GetEnvironmentVariable("PROBE_SELLS") is { Length:>0 } sellsQuery)
+{
+    var sold=uint.Parse(sellsQuery);
+    var sellingShops=data.Excel.GetSheet<SpecialShop>().Where(shop=>shop.Item.Any(entry=>entry.ReceiveItems.Any(receive=>receive.Item.RowId==sold))).Select(shop=>shop.RowId).ToHashSet();
+    Console.WriteLine($"SELLS {sold} shops={string.Join(",",sellingShops)}");
+    foreach(var npc in data.Excel.GetSheet<ENpcBase>())
+        foreach(var value in npc.ENpcData.Select(entry=>entry.RowId).Where(sellingShops.Contains))
+            Console.WriteLine($"SELLS npc {npc.RowId} '{data.Excel.GetSheet<ENpcResident>().GetRow(npc.RowId).Singular.ExtractText()}' shop {value}");
+    // Indirect links: PreHandler, TopicSelect and CustomTalk script arguments naming the shop, then the NPCs naming those rows.
+    var holders=new HashSet<uint>();
+    foreach(var row in data.Excel.GetSheet<PreHandler>().Where(row=>sellingShops.Contains(row.Target.RowId))){holders.Add(row.RowId);Console.WriteLine($"SELLS prehandler {row.RowId}");}
+    foreach(var row in data.Excel.GetSheet<TopicSelect>().Where(row=>row.Shop.Any(shop=>sellingShops.Contains(shop.RowId)||holders.Contains(shop.RowId)))){holders.Add(row.RowId);Console.WriteLine($"SELLS topicselect {row.RowId}");}
+    foreach(var row in data.Excel.GetSheet<CustomTalk>().Where(row=>row.Script.Any(script=>sellingShops.Contains(script.ScriptArg)||holders.Contains(script.ScriptArg)))){holders.Add(row.RowId);Console.WriteLine($"SELLS customtalk {row.RowId} '{row.Name.ExtractText()}'");}
+    foreach(var npc in data.Excel.GetSheet<ENpcBase>())
+        foreach(var value in npc.ENpcData.Select(entry=>entry.RowId).Where(holders.Contains))
+            Console.WriteLine($"SELLS npc {npc.RowId} '{data.Excel.GetSheet<ENpcResident>().GetRow(npc.RowId).Singular.ExtractText()}' via {value}");
+    return;
+}
 if(Environment.GetEnvironmentVariable("PROBE_ACH") is { Length:>0 } achQuery)
 {
     var achParts=achQuery.Split(',',2);

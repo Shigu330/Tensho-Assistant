@@ -3,6 +3,221 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.217.0
+- Retour (captures) : ne pas retirer les teintures des emplacements sans catégorie ; mettre les icônes (boutons) sur les cases d'équipement
+  de la fenêtre du jeu. Fait : un emplacement teignable (arme à pieds) sans catégorie s'ouvre et montre ses teintures de la semaine.
+- Non fait (quota 97 %) : boutons sur les icônes d'emplacement de la fenêtre « Revue de mode » du jeu.
+- Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.217.0.0. Non validé en jeu.
+## 0.216.0
+- Retour (captures) : interface mal agencée ; chaque emplacement doit être une ligne qui ouvre sa liste au clic, pas tout d'un coup.
+- Revue de mode (page et panneau) : un seul emplacement ouvert à la fois (clic sur la ligne : ▶/▼, catégorie, possédés / signalés, ✓) ;
+  la liste des pièces et des teintures s'ouvre dans un cadre défilant sous la ligne ; les emplacements sans catégorie cette semaine sont
+  seulement listés ; le nombre de signalements est abrégé « ×28 » (texte complet en infobulle) pour ne plus couper les lignes.
+- Non fait : boutons posés sur les cases de la fenêtre du jeu (autre option demandée) — à faire à la reprise si souhaité.
+- Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.216.0.0. Non validé en jeu.
+## 0.215.0
+- Demande : les teintures de la Revue de mode. FashionReport.json (FFXIVGachaSpreadsheet) contient « WeeklyDyes » : semaine (même
+  numéro que FashionWeek.Number, 442–457 lus le 2026-11-01) → 6 emplacements (Weapon, Head, Body, Hands, Legs, Feet) → teinture
+  (Count, Pct). Lu sans rejeter les données d'équipement si la section est mal formée (`FashionDataset.WeeklyDyes`, `DyesFor`).
+- Sous chaque emplacement teignable (arme à pieds) : « Teintures signalées cette semaine » avec pastille de couleur et nom (feuille Stain),
+  part en % et nombre de signalements, 10 au plus, triées par part.
+- Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.215.0.0. Non validé en jeu.
+## 0.214.0
+- Retour (capture) : l'infobulle d'une pièce non possédée était grisée aussi. Cause : l'opacité de la ligne restait active pendant le
+  dessin de l'infobulle et du menu. Correction : opacité retirée juste après la ligne, avant l'infobulle et le clic droit.
+- Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.214.0.0. Non validé en jeu.
+## 0.213.0
+- Retour : 0.212 « c'est ok ». Demande : examiner Avant-Garde et refaire la page Gold Saucer › Revue de mode dans le même esprit.
+- Avant-Garde (AGPL-3.0) lu sans copie (docs/project/REFERENCES.md, REF-FASHION-AVANTGARDE).
+- Page Revue de mode : section « Cette semaine » en tête — thème de la semaine (feuille FashionCheckWeeklyTheme), prochaine revue, les
+  11 emplacements avec la catégorie lue dans la fenêtre du jeu (`FashionCheckReader`, fenêtre « FashionCheck », AtkValue 2 + 11 × n),
+  le nombre de pièces possédées / signalées, et par emplacement la liste des pièces : possédées en premier, non possédées grisées,
+  tri par popularité (options enregistrées), infobulle complète et clic droit vers les autres outils. L'ancienne liste de toutes les
+  catégories reste dessous. Données d'équipement téléchargées automatiquement à l'ouverture de la fenêtre du jeu.
+- Panneau « Revue de mode · Tensho » à côté de la fenêtre du jeu quand elle est ouverte (désactivable). Mode développeur : journal des
+  11 catégories lues (preuve à relever).
+- Test ajouté (semaines, ligne de thème, ordre des emplacements). Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ;
+  DLL 0.213.0.0. Non validé en jeu.
+## 0.212.0
+- Demande : organiser les icônes (Réglages › Carte › Icônes) par catégorie ; retour (capture) : léger décalage des lignes Tensho.
+- Catégories repliables avec nombre d'icônes et boutons « Tout afficher / Tout masquer » : Couches Tensho, Quêtes, Objectifs et événements,
+  ALEA, Récolte, Boutiques, Drapeau et cible, Lieux et services du jeu, Autres ; dans chacune, tri par priorité ; le filtre ouvre tout.
+  Ligne d'icône extraite dans `DrawIconSizeRow`.
+- Décalage : le symbole des couches Tensho était plus étroit que les images du jeu ; il est dessiné dans le même carré (hauteur de ligne).
+- Verify.ps1 (agent) : 553/553, 0 avertissement, 0 erreur ; DLL 0.212.0.0. Non validé en jeu.
+## 0.211.0
+- Retour : « nos icônes c'est ok » (0.210) mais il manque des icônes : quêtes de l'épopée, bleues et autres, quêtes terminées.
+- Réglages › Carte › Icônes : toutes les icônes de marqueurs de quête du jeu (EventIconType : MapIconAvailable / MapIconInvalid + 1..IconRange,
+  sonde `PROBE_EVENTICONS`, docs/evidence/0.211-event-icons.md) quand les quêtes sont affichées, seulement celles dont l'image existe ;
+  nom « Quête de l'épopée / annexe / de déblocage (bleue) / Quête (type n) · disponible|non disponible · variante n ». Même visibilité,
+  taille et priorité que les autres icônes.
+- Verify.ps1 (agent) : 553/553, 0 avertissement, 0 erreur ; DLL 0.211.0.0. Non validé en jeu.
+## 0.210.0
+- Retour : 0.209 « c'est ok » (usages). L'icône « Coffre au trésor » existe déjà dans le jeu : l'utiliser pour les coffres de la carte
+  Tensho ; ajouter aux réglages les icônes créées par Tensho qui y manquent.
+- Coffres proches : icône du jeu MapSymbol 63852 « Coffre au trésor » (docs/evidence/0.139.0-symbols-probe.log) au lieu du symbole
+  BoxOpen (gardé seulement si la texture manque).
+- Réglages › Carte › Icônes : nouvelles lignes pour les couches de Tensho — coffre au trésor, repères d'exploration, courants éthérés,
+  points de récolte proches, membres du groupe — avec la même visibilité / taille / priorité (globale ou par carte) que les icônes du jeu
+  (clés hors de la plage des icônes du jeu) ; le dessin de chaque couche suit ces réglages. Infobulle « couche ajoutée par Tensho ».
+- Verify.ps1 (agent) : 553/553, 0 avertissement, 0 erreur ; DLL 0.210.0.0. Non validé en jeu.
+## 0.209.0
+- Retour : « usages ne prend pas en compte les outils adaptés pour trouver les références ». L'onglet Usages ajoute, avant les quêtes et
+  lèves : « Monnaie » (boutiques du jeu qui acceptent l'objet comme paiement, par PNJ : lien outil Vendeurs + drapeau, objets achetables
+  avec leur prix, clic = fiche ; index `NpcVendorCatalog.PaidWith`) ; « Ce qu'il donne » (LuminaSupplemental ItemSupplement lu dans
+  l'autre sens : désynthèse, réduction, contenu, coffres, lots de cartes, Eureka, Bozja… avec ✓/✗ de collection) ; « Quêtes qui le
+  demandent » (LuminaSupplemental QuestRequiredItem, noms de la feuille Quest, clic = outil Quêtes). Le menu de l'inventaire et le panneau
+  d'objet en contexte proposent Usages aussi pour ces cas.
+- Test ajouté (lectures LuminaSupplemental : ce qu'un objet donne, quêtes, PNJ des boutiques non reliées).
+- Verify.ps1 (agent) : 553/553, 0 avertissement, 0 erreur ; DLL 0.209.0.0. Non validé en jeu.
+## 0.208.0
+- Demande : le menu du clic droit de l'inventaire doit suivre la logique de l'objet en contexte et n'afficher que les outils utiles.
+- `RelevantRoutes(item)` (MainWindow.ItemContextMenu.cs) décide une seule fois, pour le menu « Tensho — objet » et le panneau « Objet en
+  contexte » (mêmes outils, même ordre) : usages (lèves, approvisionnement, aquarium, ingrédient), artisanat (recette qui le produit),
+  récolte, PNJ vendeurs (+ LuminaSupplemental), marché (objet vendable), butin des contenus, monstres, quête qui le donne, collection, puis
+  quantités, fiche et outils. Un catalogue pas encore chargé garde l'outil (inconnu ≠ aucun). Ouverture commune `OpenRoute`.
+- Verify.ps1 (agent) : 552/552, 0 avertissement, 0 erreur ; DLL 0.208.0.0. Non validé en jeu.
+## 0.207.0
+- Retours (captures) : infobulles qui dépassent l'écran ; outils manquants au clic droit dans l'inventaire ; icônes du carnet de craft qui se
+  décalent ; butin : ✓/✗ sur les objets de collection et filtres par type ; panneau de mission affiché en mission aléatoire.
+- Infobulles : les 80 infobulles des fenêtres passent par `WrappedTooltip` (retour à la ligne à ~32 caractères de police).
+- Menu « Tensho — objet » de l'inventaire : + Prix du marché, Butin des contenus (premier contenu qui lâche l'objet, filtré dessus), Monstres
+  qui le lâchent, Ouvrir la collection, Comment l'obtenir (fiche).
+- Carnet de craft · métier : cause = l'icône dessinée devenait le dernier élément, le bouton suivant se plaçait après elle (+3 px à chaque
+  fois) ; un élément invisible à la place du bouton rétablit l'alignement ; bouton « tous » à la même taille (38×38).
+- Butin (outil Butin des contenus et panneau de mission) : pastille ✓ verte (obtenu) / ✗ rouge (non obtenu) sur l'icône des objets de
+  collection ; filtre par type (montures, mascottes, cartes, rouleaux, équipement, autres) et « Non obtenus seulement ».
+- Panneau de mission : plus affiché pour une mission aléatoire ni sans mission choisie.
+- Verify.ps1 (agent) : 552/552, 0 avertissement, 0 erreur ; DLL 0.207.0.0. Non validé en jeu.
+## 0.206.0
+- Demandes : heure PC une seule fois (en-tête, à côté de la version) ; refaire l'accueil selon les outils actuels ; mode développeur avec un
+  maximum d'aide pour la communauté open source ; réglages cohérents et onglet « Avancé » ; un maximum de descriptions en infobulles.
+- Horloge : les outils (récolte, météo, alarmes) n'affichent plus que l'heure ET (avertissement en infobulle) ; l'en-tête montre l'heure PC
+  et l'heure ET, chacune désactivable (Paramètres › Général).
+- Accueil (`MainWindow.Home.cs`) : état des catalogues, travaux en cours, prochaine alarme (clic → module), erreurs ; une tuile par module
+  (Artisanat, Récolte, Collections, Quêtes, Carte, Marché, Alarmes, Automatisation, Combat, Gold Saucer) avec une ligne vivante ; objet en
+  contexte avec ses icônes d'outils ; annuaire des outils (désactivable).
+- Paramètres › Avancé (nouveau, `MainWindow.Advanced.cs`) : mode développeur (désormais enregistré), identifiants du jeu, sources
+  communautaires activables (LuminaSupplemental, Garland, wiki, prix Universalis — désactivées = aucune requête), délai entre commandes
+  /alarm, suppression de toutes les alarmes (deux clics), copie du rapport de diagnostic (sans données de personnage) et de l'adresse du dépôt.
+  Les prix au survol passent d'Interface à Avancé.
+- Mode développeur › Diagnostics : section « Contribuer au projet » (dépôt, commande de test, licence, documents, fichiers de la page affichée,
+  rôle de chaque dossier, sources de données actives, sondes et exemple de commande, traductions et clés).
+- Infobulles sur les réglages (Général, Interface, Données, Alarmes, Avancé, observations, Débogage) et sur les outils de développement.
+- Verify.ps1 (agent) : 552/552, 0 avertissement, 0 erreur ; DLL 0.206.0.0. Non validé en jeu.
+## 0.205.0
+- Retour : le jeu a une commande texte d'alarme (`/alerte "Alerte" et rp 2308 60 es00 silencieux`, `/alarm` en anglais). Sonde
+  `PROBE_ALARMCMD` : TextCommand 229, « /alarm » dans toutes les langues (alias FR « /alerte »), sous-commandes anglaises acceptées partout
+  (docs/evidence/0.205-alarm-command.md).
+- Réglage « Créer aussi les alarmes dans le jeu (commande /alarm) » (Alarmes › Réglages) : les alarmes « chaque jour ET » créées sont
+  ajoutées à la fenêtre « Alarmes » du jeu (`/alarm "nom" et rp HHmm rappel seNN [mute]`, nom ≤ 20 car. finissant par l'heure ET) ;
+  sous-option pour inclure celles avec condition météo (le jeu ne vérifie pas la météo). Bouton « Envoyer au jeu » par groupe.
+  Envoi par `UIModule.ProcessChatBoxEntry`, au clic seulement, une commande / 0,5 s, arrêt à 30 alarmes du jeu, commandes `/alarm`
+  construites par Tensho uniquement. Créneau : « dans le jeu » (vu dans la liste du jeu) ou « envoyée, absente du jeu ». Le jeu sonne
+  lui-même ces alarmes ; Tensho ne sonne plus pour elles. Suppression dans Tensho : rappel de la supprimer aussi dans le jeu (pas de
+  suppression automatique : `DeleteAlarm(index)` non prouvé).
+- Test ajouté (syntaxe, nom, garde de commande). Verify.ps1 (agent) : 552/552, 0 avertissement, 0 erreur ; DLL 0.205.0.0. Non validé en jeu.
+## 0.204.0
+- Retour : « ça ne sépare pas les alarmes par métier ». Le module Alarmes est maintenant découpé en sections repliables par métier
+  (Mineur, Botaniste, Pêcheur, avec icône et nombre d'alarmes), puis « Autres alarmes (météo, repères, personnelles) » ; dans chaque
+  section, les groupes par objet triés par prochaine sonnerie. Le métier n'est plus répété sur chaque groupe.
+- Verify.ps1 (agent) : 551/551, 0 avertissement, 0 erreur ; DLL 0.204.0.0. Non validé en jeu.
+## 0.203.0
+- Demande : les alarmes doivent afficher le métier avec lequel l'objet est récolté. Chaque groupe d'alarmes d'objet affiche l'icône et le
+  nom du métier (mineur, botaniste, pêcheur, noms de la feuille ClassJob) ; enregistré à la création (récolte : type du point ; pêche :
+  pêcheur), sinon déduit des sources de récolte de l'objet pour les alarmes déjà créées (un seul métier possible, sinon rien).
+- Preuve : docs/evidence/0.203-gathering-jobs.md (sonde `PROBE_GTYPE`). Test `JobOf` ajouté au cas des fenêtres d'alarmes.
+- Verify.ps1 (agent) : 551/551, 0 avertissement, 0 erreur ; DLL 0.203.0.0. Non validé en jeu.
+## 0.202.0
+- Demande : alarmes dans un module à part, réglage pour utiliser les alarmes du jeu, affichage regroupé par objet avec icône et infobulle.
+- Module « Alarmes (n) » dans la navigation (page dédiée) : réglages repliables, alarmes groupées par objet (icône + infobulle « Comment
+  l'obtenir »), ou par météo (icône de la météo) / repère / nom ; par groupe : prochaine sonnerie, actives, rappel, tout supprimer, ouvrir
+  l'objet ou la météo ; créneaux dépliables (activer, rappel, supprimer chacun). Groupes triés par prochaine sonnerie. La page Météo
+  renvoie au module.
+- Réglage « Créer aussi les alarmes dans le jeu » : visible mais désactivé, avec la raison (aucune fonction de création dans l'API ;
+  champs natifs Timestamp / sauvegarde non prouvés). Bouton « Copier le relevé des alarmes du jeu » (index, horloge, heure, rappel, son,
+  horodatage, drapeaux) pour prouver ces champs sur une vraie alarme avant d'écrire quoi que ce soit.
+- Verify.ps1 (agent) : 551/551, 0 avertissement, 0 erreur ; DLL 0.202.0.0. Non validé en jeu.
+## 0.201.0
+- Demande : terminer la météo, un système d'alarmes relié aux alarmes du jeu, appliqué partout où la météo compte ; alarmes répétables
+  chaque jour ET, délai du rappel au choix, tous les créneaux de l'objet sélectionné ; à jour dans la récolte et partout où il y a de la météo.
+- Météo : choix de la zone sur la page (toutes les zones avec table météo), 12 périodes, recherche « Quand aura lieu une météo ? »
+  (8 prochaines occurrences sur ~3 jours réels), cloche par période et « alarme à chaque <météo> » (périodes 00/08/16 ET avec condition).
+- Alarmes Tensho (`Alarms/TenshoAlarm.cs`, testé) : une fois ou chaque jour ET (70 min réelles), rappel N min avant (par alarme, modifiable),
+  conditions météo et météo précédente (prévision inconnue = pas de correspondance), 60 au plus, alarmes uniques passées retirées.
+  `AlarmService` (thread framework, 1 s) : message dans le chat + son des alarmes du jeu (`AgentAlarm.PlayAlarmSoundEffect`), muet en mission
+  au choix ; lit les alarmes du jeu (lecture) et ouvre leur fenêtre. Créer une alarme dans le jeu : aucune API (preuve :
+  docs/evidence/0.201-agent-alarm.md).
+- Cloche partout où l'heure ou la météo compte : récolte (tous les créneaux ET du point), pêche (tous les créneaux du poisson avec sa météo,
+  ou 00/08/16 ET si seule la météo compte ; chaque créneau calculé), repères d'exploration (clic droit sur la carte : créneau ET + météo du
+  wiki ; infobulle : prochaine fenêtre). Paramètres › Modules › Alarmes : rappel par défaut, son (+ écouter), chat, muet en mission.
+- Verify.ps1 (agent) : 551/551 (3 nouveaux tests d'alarmes), 0 avertissement, 0 erreur ; DLL 0.201.0.0. Non validé en jeu.
+## 0.200.0
+- Retour (capture « Objet en contexte » : 4 icônes) : ajouter les icônes manquantes des outils appropriés. Toujours : artisanat, récolte,
+  usages de l'objet (nouveau), marché, monstres. Selon l'objet, quand les données le relient : PNJ vendeurs (catalogue ou LuminaSupplemental
+  ENpcShop), butin des contenus (premier contenu LuminaSupplemental ou Garland, ouvert filtré sur l'objet), quête (récompense), collection
+  ou Triple Triad (carte sélectionnée). Les icônes passent à la ligne quand la colonne est étroite.
+- Verify.ps1 (agent) : 548/548, 0 avertissement, 0 erreur ; DLL 0.200.0.0. Non validé en jeu.
+## 0.199.0
+- Retour (captures adamankhélone, adenium insulaire) : dans le menu du clic droit, « Échange » renvoyait sur la monnaie (PGS) alors qu'un
+  vendeur est connu ; sans vendeur, rien n'indiquait que le PNJ manque. Correction : la ligne d'échange ouvre le PNJ qui vend l'objet contre
+  cette monnaie (outil Vendeurs, + drapeau), la monnaie devient un sous-lien ; sans PNJ connu : « PNJ inconnu ; ouvre la monnaie ».
+- LuminaSupplemental (demande « oublie pas LuminaSupplemental ») : ENpcShop (boutiques que les feuilles du jeu ne relient à aucun PNJ) et
+  ENpcPlace (position) — les ventes de ces boutiques donnent un lien PNJ avec drapeau. Nouvel index `NpcVendorCatalog.SalesOf`.
+- Preuve : docs/evidence/0.199-adenium-shop.md (sonde `PROBE_SELLS` : boutique 1770734 sans PNJ dans le jeu, Garland et LuminaSupplemental).
+- Verify.ps1 (agent) : 548/548, 0 avertissement, 0 erreur ; DLL 0.199.0.0. Non validé en jeu.
+## 0.198.0
+- Retour : l'infobulle (« Comment l'obtenir ») n'est pas appliquée sur toutes les icônes de carte. Cause : seules la liste des cartes manquantes
+  et les lots de cartes l'utilisaient ; ailleurs, simple nom ou rien. Correction : `TriadCardTooltip` (fiche de l'objet de la carte si elle
+  en a un, sinon nom) sur toutes les icônes : collection Triple Triad, liste et détail du Triple Triad, deck en cours, decks enregistrés,
+  deck généré, PNJ (cartes manquantes), lots de cartes.
+- Verify.ps1 (agent) : 548/548, 0 avertissement, 0 erreur ; DLL 0.198.0.0. Non validé en jeu.
+## 0.197.0
+- GOAL COLL-004 (suite) : dernière source LuminaSupplemental, `ItemSupplement.csv` (objet obtenu depuis un autre objet). « Comment l'obtenir »
+  (infobulle) affiche, avant Garland : désynthèse, réduction éthérée, contenu d'un objet, jardinage, bâtisseurs d'Ishgard, lots de cartes,
+  coffres, Palais des morts, Pilier des Cieux, Eureka Orthos/Anemos/Pagos/Pyros/Hydatos, Bozja, logogrammes, Traversée des pèlerins, Oizys,
+  Auxesia ; 3 objets sources nommés + « (+n autres) ». Clic droit : jusqu'à 4 objets sources par type, qui ouvrent la fiche de l'objet source.
+- Source : LuminaSupplemental (Critical-Impact, GPL-3.0), colonnes ItemId, SourceItemId, ItemSupplementSource ; types 1–19 de l'énumération
+  `ItemSupplementSource`. Fichier en cache comme les autres (limite 4 Mo, fichier ≈ 2,7 Mo).
+- Verify.ps1 (agent) : 548/548, 0 avertissement, 0 erreur ; DLL 0.197.0.0. Non validé en jeu.
+## 0.196.0
+- Retour : le système de macros ne prend pas en charge Macro Chain.
+- Option « Chaîner les pages » (Paramètres › Modules › Export, activée par défaut) : chaque page laisse une ligne et se termine par
+  « /tenshonext » (marqueur de la Macro Chain de Tensho, `MacroDefinition.Marker`) ; export du simulateur et du carnet d'artisan.
+- Après une copie dans les macros du jeu, les emplacements écrits deviennent le plan de la Macro Chain (outil Automatisation), et un bouton
+  « Lancer la chaîne de macros » apparaît sous le bouton de copie : les pages s'exécutent l'une après l'autre.
+- Verify.ps1 (agent) : 548/548, 0 avertissement, 0 erreur ; DLL 0.196.0.0. VALIDATED_IN_GAME : « macro chain fonctionne » (utilisateur, 2026-10-31).
+## 0.195.0
+- Retour (capture du panneau du carnet de synthèse) : bouton et prévision coupés à droite. Dans le panneau étroit : libellé court « Copier dans
+  les macros du jeu », plage (livre, premier–dernier) dans l'infobulle ; ligne de prévision qui revient à la ligne au lieu de déborder.
+- Verify.ps1 (agent) : 548/548, 0 avertissement, 0 erreur ; DLL 0.195.0.0. VALIDATED_IN_GAME (utilisateur, 2026-10-31).
+## 0.194.0
+- Retour (capture « Macros écrites dans les emplacements 50 à 51. ») : prédire les emplacements utilisés avant la copie, pas seulement le
+  signaler après.
+- Sous le bouton (export et carnet d'artisan) : « Utilisera les emplacements 50 à 51 (2 macro(s) : 50, 51). » ou « Pas assez d'emplacements
+  libres… : rien ne sera écrit », calculé avec la même règle que la copie (`MacroSlotPlan`) sur l'état des 100 emplacements de chaque livre,
+  copié une fois par seconde sur le thread framework (rien n'est lu pendant le dessin). Le message du chat reste la confirmation finale.
+- Verify.ps1 (agent) : 548/548, 0 avertissement, 0 erreur ; DLL 0.194.0.0. VALIDATED_IN_GAME (prévision affichée, capture utilisateur 2026-10-31).
+## 0.193.0
+- Demande : notification ou message dans le chat pour prévenir du statut de la copie des macros. Message « [Tensho] Macros écrites dans les
+  emplacements a à b » dans le chat du jeu, ou en erreur (pas assez de place, plage invalide, échec), après chaque copie (export et carnet).
+  Nouveau service injecté : `IChatGui`.
+- Verify.ps1 (agent) : 548/548, 0 avertissement, 0 erreur ; DLL 0.193.0.0. VALIDATED_IN_GAME : capture du message (utilisateur, 2026-10-31).
+## 0.192.0
+- Demande : même bouton dans le panneau lié au carnet d'artisan, à côté de « Copier bloc ». Bouton partagé (`DrawMacroToGame`) dans l'export
+  de macros et dans le panneau du carnet ; même plage et mêmes règles (Paramètres › Modules).
+- Verify.ps1 (agent) : 548/548, 0 avertissement, 0 erreur ; DLL 0.192.0.0. Non validé en jeu.
+## 0.191.0
+- Priorité utilisateur : copier les macros de l'outil de génération de macros dans les macros du jeu, avec des réglages pour indiquer où ça
+  commence et où est la limite, comme Craftimizer.
+- Bouton « Copier dans les macros du jeu (individuelles 80–89) » dans l'export de macros : pages écrites sur le thread framework au clic, via
+  FFXIVClientStructs (RaptureMacroModule.ReplaceMacroLines, nom, icône par défaut si aucune, SetSavePendingFlag, puis
+  RaptureHotbarModule.ReloadMacroSlots) — même suite d'appels que Craftimizer, référence fonctionnelle sans copie de code.
+- Sécurité (`MacroSlotPlan`, testé) : seulement entre le premier et le dernier emplacement réglés ; par défaut seulement dans les emplacements
+  vides ou déjà nommés par Tensho (« Tensho 1/3 »…) ; toutes les pages ou aucune ; écrasement des autres macros seulement si l'option est cochée.
+- Paramètres › Modules › Export : macros individuelles ou partagées, premier emplacement (0–99), dernier emplacement (limite), nom des macros,
+  autorisation d'écraser. Liens du dépôt mis à jour vers Shigu330/Tensho-Assistant (manifeste, CLAUDE.md, publication D17).
+- Test : 1 groupe `MacroSlotPlanTests`. Verify.ps1 (agent) : 548/548, 0 avertissement, 0 erreur ; DLL 0.191.0.0. VALIDATED_IN_GAME : « ça fonctionne » (utilisateur, 2026-10-31).
 ## 0.190.0
 - Retour (capture Butin des monstres, Épaule de rroneek : wiki puis Garland, LuminaSupplemental absent) : section « Source principale ·
   LuminaSupplemental » en tête de l'outil, monstres qui lâchent l'objet (MobDrop), lieux toujours par le wiki et Garland en dessous.

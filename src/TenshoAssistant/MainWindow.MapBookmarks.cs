@@ -59,7 +59,7 @@ internal sealed partial class MainWindow
                                     finally { ImGui.PopFont(); }
                                     if (open && point is not null && map is not null)
                                     { SelectBookmark(point); OpenMapPoint(map, point.X, point.Y); }
-                                    if (ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Get("MapsUi.BookmarkOpen"));
+                                    if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("MapsUi.BookmarkOpen"));
                                     ImGui.SameLine();
                                     if (ImGui.SmallButton(localization.Get("MapsUi.Load")) && point is not null) SelectBookmark(point);
                                 }
@@ -69,7 +69,7 @@ internal sealed partial class MainWindow
                                 ImGui.SameLine();
                                 ImGui.TextUnformatted(string.IsNullOrWhiteSpace(point?.Name) ? localization.Get("MapsUi.Unnamed") : point.Name);
                                 if (point is not null && ImGui.IsItemHovered())
-                                    ImGui.SetTooltip(valid ? $"{map!.Zone} · {map.Subzone}\nX {point.X:F1} · Y {point.Y:F1}"
+                                    WrappedTooltip(valid ? $"{map!.Zone} · {map.Subzone}\nX {point.X:F1} · Y {point.Y:F1}"
                                         : localization.Get("MapsUi.MissingBookmark"));
                             }
                             finally { ImGui.PopID(); }

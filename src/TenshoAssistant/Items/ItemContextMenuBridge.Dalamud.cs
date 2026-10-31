@@ -63,20 +63,34 @@ internal sealed class ItemContextMenuBridge : IDisposable
                 OnClicked=click=>
                 {
                     if(!Current(token))return;
-                    click.OpenSubmenu(new IMenuItem[]
-                    {
-                        Entry(localization.Get("ItemUsesUi.Title"),ItemContextRoute.Usages,token),
-                        Entry(localization.Get("ItemsUi.Stocks"),ItemContextRoute.Stocks,token),
-                        Entry(localization.Get("ItemsUi.Craft"),ItemContextRoute.Craft,token),
-                        Entry(localization.Get("GatheringDetails.Title"),ItemContextRoute.Gathering,token),
-                        Entry(localization.Get("NpcUi.Title"),ItemContextRoute.NpcVendors,token),
-                        Entry(localization.Get("ItemMenu.Tools"),ItemContextRoute.Tools,token),
-                    });
+                    // 0.208: the same tools as the context item panel, only those useful for this item (Relevant), in the same order.
+                    var routes=Relevant?.Invoke(token.Item.ItemId) ?? DefaultRoutes;
+                    click.OpenSubmenu(routes.Select(route=>(IMenuItem)Entry(RouteName(route),route,token)).ToArray());
                 },
             });
         }
         catch(Exception error){session.Clear();log.Warning(error,"Could not add Tensho inventory context menu.");}
     }
+
+    // Tools useful for an item (computed by the main window from the loaded catalogues); null = every tool.
+    public Func<uint,IReadOnlyList<ItemContextRoute>>? Relevant { get; set; }
+    private static readonly IReadOnlyList<ItemContextRoute> DefaultRoutes=[ItemContextRoute.Usages,ItemContextRoute.Stocks,ItemContextRoute.Craft,
+        ItemContextRoute.Gathering,ItemContextRoute.NpcVendors,ItemContextRoute.Market,ItemContextRoute.Sources,ItemContextRoute.Tools];
+    private string RouteName(ItemContextRoute route)=>route switch
+    {
+        ItemContextRoute.Usages=>localization.Get("ItemUsesUi.Title"),
+        ItemContextRoute.Stocks=>localization.Get("ItemsUi.Stocks"),
+        ItemContextRoute.Craft=>localization.Get("ItemsUi.Craft"),
+        ItemContextRoute.Gathering=>localization.Get("GatheringDetails.Title"),
+        ItemContextRoute.NpcVendors=>localization.Get("NpcUi.Title"),
+        ItemContextRoute.Market=>localization.Get("ItemLinks.Market"),
+        ItemContextRoute.DutyLoot=>localization.Get("ItemMenu.DutyLoot"),
+        ItemContextRoute.MonsterLoot=>localization.Get("ItemMenu.MonsterLoot"),
+        ItemContextRoute.Collection=>localization.Get("HoverUi.OpenCollection"),
+        ItemContextRoute.Quest=>localization.Get("ItemMenu.Quest"),
+        ItemContextRoute.Sources=>localization.Get("ItemMenu.Sources"),
+        _=>localization.Get("ItemMenu.Tools"),
+    };
 
     private MenuItem Entry(string name,ItemContextRoute route,ItemMenuToken token)=>new()
     {

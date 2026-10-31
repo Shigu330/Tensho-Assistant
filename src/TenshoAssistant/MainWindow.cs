@@ -23,7 +23,7 @@ namespace TenshoAssistant;
 
 internal sealed partial class MainWindow : Window, IDisposable
 {
-    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Character, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors }
+    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Character, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms }
     // Read from the active theme each time: the game theme can change while the plugin runs.
     private static Vector4 Accent => FfxivTheme.Gold;
     private static Vector4 Success => FfxivTheme.Success;
@@ -78,6 +78,7 @@ internal sealed partial class MainWindow : Window, IDisposable
     private Page page;
     private string? saveError;
     private bool developerMode;
+    private bool ShowIds=>developerMode || configuration.ShowIds;
     internal bool DeveloperMode => developerMode;
     private bool windowDisposed;
     private bool revealHomeTools;
@@ -115,6 +116,7 @@ internal sealed partial class MainWindow : Window, IDisposable
         this.inventory = inventory;
         this.visualSort=visualSort;
         this.itemCatalog = itemCatalog;
+        developerMode = configuration.DeveloperMode;
         this.recipeCatalog = recipeCatalog;
         this.craftActions = craftActions;
         this.craftLive = craftLive;
@@ -167,8 +169,12 @@ internal sealed partial class MainWindow : Window, IDisposable
         ImGui.TextColored(Accent, localization.Get("Plugin.Title").ToUpperInvariant());
         ImGui.SameLine();
         ImGui.TextDisabled($"v{BuildVersion}");
-        ImGui.SameLine();
-        ImGui.TextDisabled(localization.Format("LocalClock.Header",DateTimeOffset.Now.ToString("HH:mm:ss")));
+        if(configuration.ShowHeaderClock){ImGui.SameLine();ImGui.TextDisabled(localization.Format("LocalClock.Header",DateTimeOffset.Now.ToString("HH:mm:ss")));}
+        if(configuration.ShowHeaderEorzeaTime)
+        {
+            var eorzea=Gathering.GatheringTime.MinuteOfDay(DateTimeOffset.UtcNow);
+            ImGui.SameLine();ImGui.TextDisabled(localization.Format("LocalClock.HeaderEt",eorzea/60,eorzea%60));
+        }
         ImGui.TextDisabled(localization.Get("Plugin.Subtitle"));
         ImGui.Separator();
 
@@ -206,6 +212,7 @@ internal sealed partial class MainWindow : Window, IDisposable
                             case Page.CraftSimulation: DrawCraftSimulation(); break;
                             case Page.CraftLive: DrawCraftLive(); break;
                             case Page.Weather: DrawWeather(); break;
+                            case Page.Alarms: DrawAlarmsPage(); break;
                             case Page.CraftPresets: DrawCraftPresets(); break;
                             case Page.MacroChain: DrawMacroChain(); break;
                             case Page.SortPreview: DrawSortPreview(); break;
@@ -245,6 +252,7 @@ internal sealed partial class MainWindow : Window, IDisposable
         Navigation(localization.Get("Navigation.Map"), Page.Maps);
         Navigation(localization.Get("Navigation.Market"), Page.Market);
         Navigation(localization.Get("Navigation.Automation"), Page.MacroChain);
+        Navigation(localization.Format("Navigation.Alarms",configuration.Alarms?.Count ?? 0), Page.Alarms);
         Navigation(localization.Get("Navigation.Combat"), Page.Character);
         Navigation(localization.Get("Category.GoldSaucer"), Page.MiniCactpot);
         ImGui.Spacing();
@@ -259,7 +267,7 @@ internal sealed partial class MainWindow : Window, IDisposable
         {
             DrawItemIcon(selected, new Vector2(32));
             ImGui.TextWrapped(selected.Name);
-            if(developerMode)ImGui.TextDisabled($"ID {selected.Id}");
+            if(ShowIds)ImGui.TextDisabled($"ID {selected.Id}");
             if (ImGui.SmallButton(localization.Get("Navigation.ViewQuantities"))) { page = Page.Items; focusStocksTab = true; }
             DrawContextTools();
         }
@@ -288,46 +296,6 @@ internal sealed partial class MainWindow : Window, IDisposable
     private static void Heading(string title, string description)
     {
         UiComponents.SectionHeader(title, description);
-    }
-
-    private void DrawHome()
-    {
-        Heading(localization.Get("Home.Title"),localization.Get("Home.Description"));
-        var items = itemCatalog.State;
-        var recipes = recipeCatalog.State;
-        UiComponents.StatusBadge(localization.Get(items.Catalog is not null && recipes.Catalog is not null ? "Home.Ready":"Home.Loading"),
-            items.Catalog is not null && recipes.Catalog is not null ? Success:Accent);
-        ImGui.TextWrapped(localization.Format("Home.Catalogues",items.Catalog?.Count ?? 0,recipes.Catalog?.Count ?? 0));
-        ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("Home.Activity"));
-        var busy = false;
-        if(craftSolve.State.Loading) { ImGui.TextWrapped(localization.Get("CraftSearch.Loading")); busy=true; }
-        if(craftChain.State.Loading) { ImGui.TextWrapped(localization.Get("Home.CraftChain")); busy=true; }
-        if(cactpotSolve.State.Loading) { ImGui.TextWrapped(localization.Get("Home.Cactpot")); busy=true; }
-        if(!busy) ImGui.TextDisabled(localization.Get("Home.Idle"));
-        if(SelectedItem is { } contextItem)
-        {
-            ImGui.Separator();
-            ImGui.TextColored(Accent,contextItem.Name);
-            if(ImGui.SmallButton(localization.Get("Home.Stocks")+"###HomeStocks")) { page=Page.Items; focusStocksTab=true; }
-            ImGui.SameLine();
-            if(ImGui.SmallButton(localization.Get("Home.Recipes")+"###HomeRecipes")) { page=Page.Items; focusCraftTab=true; }
-            ImGui.SameLine();
-            if(ImGui.SmallButton(localization.Get("Navigation.Market")+"###HomeMarket"))page=Page.Market;
-        }
-        if(items.Error is not null || recipes.Error is not null || market.State.Error is not null || quests.State.Error is not null)
-        {
-            ImGui.Separator();
-            ImGui.TextWrapped(localization.Get("Home.Errors"));
-            if(items.Error is not null) ImGui.TextWrapped(localization.Get("Navigation.Items"));
-            if(recipes.Error is not null) ImGui.TextWrapped(localization.Get("Navigation.Crafting"));
-            if(market.State.Error is not null) ImGui.TextWrapped(localization.Get("Navigation.Market"));
-            if(quests.State.Error is not null) ImGui.TextWrapped(localization.Get("Navigation.Quests"));
-            if(developerMode && ImGui.SmallButton(localization.Get("Navigation.Diagnostics")))page=Page.Diagnostics;
-        }
-        ImGui.Separator();
-        if(revealHomeTools) { ImGui.SetNextItemOpen(true); revealHomeTools=false; }
-        if(ImGui.CollapsingHeader(localization.Get("Plugin.AllTools")+"###HomeTools")) DrawTools();
     }
 
     private void DrawCatalogStatus()

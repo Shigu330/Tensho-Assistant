@@ -30,7 +30,7 @@ La décision de soumettre appartient à l'auteur ; l'alternative est un dépôt 
 
 ```toml
 [plugin]
-repository = "https://github.com/Shigu330/Plugins-ff14.git"
+repository = "https://github.com/Shigu330/Tensho-Assistant.git"
 commit = "<hash du commit public à construire>"
 owners = ["Shigu330"]
 project_path = "src/TenshoAssistant"
