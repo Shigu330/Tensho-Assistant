@@ -110,13 +110,13 @@ internal sealed partial class MainWindow
             {
                 var world=new Vector3(position.X,0,position.Z);
                 if(ImGui.Selectable($"{label}##Gathering{point.BaseId}"))FlagAt(map,world);
-                ToolMenu($"GatheringTool{point.BaseId}","MapLocal.OpenGatheringTool",()=>{itemId=(int)point.Items[0];page=Page.Gathering;});
+                GatheringToolMenu($"GatheringTool{point.BaseId}",point.Items);
                 if(ImGui.IsItemHovered())DrawGatheringTooltip(point);
             }
             else
             {
                 ImGui.TextDisabled(label);
-                ToolMenu($"GatheringTool{point.BaseId}","MapLocal.OpenGatheringTool",()=>{itemId=(int)point.Items[0];page=Page.Gathering;});
+                GatheringToolMenu($"GatheringTool{point.BaseId}",point.Items);
                 if(ImGui.IsItemHovered())WrappedTooltip(names+"\n"+localization.Get("MapLocal.NoPosition"));
             }
         });
@@ -209,6 +209,23 @@ internal sealed partial class MainWindow
     }
 
     // Right click on a row (0.118, user request): open the matching tool on that entry instead of placing the flag.
+    // Right click on a gathering point (0.218): every resource with its icon; the chosen one opens in the gathering tool.
+    private void GatheringToolMenu(string id,IReadOnlyList<uint> resources)
+    {
+        if(!ImGui.BeginPopupContextItem(id))return;
+        try
+        {
+            ImGui.TextDisabled(localization.Get("MapLocal.OpenGatheringTool"));
+            foreach(var resource in resources)
+            {
+                var item=itemCatalog.State.Catalog?.Find(resource);
+                DrawSmallGameIcon(item?.IconId ?? 0);
+                if(ImGui.Selectable($"{item?.Name ?? $"#{resource}"}##{id}/{resource}")){itemId=(int)resource;page=Page.Gathering;IsOpen=true;mapLocalCloseMenu=true;}
+                if(ImGui.IsItemHovered())DrawItemInfoTooltip(resource);
+            }
+        }
+        finally{ImGui.EndPopup();}
+    }
     private void ToolMenu(string id,string labelKey,Action open)
     {
         if(!ImGui.BeginPopupContextItem(id))return;

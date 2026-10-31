@@ -3,6 +3,10 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.218.0
+- Retour (capture, clic droit sur la carte › Récolte) : le menu d'un point ouvrait toujours la première ressource. Le clic droit liste
+  maintenant chaque ressource du point avec son icône (infobulle complète) ; celle choisie s'ouvre dans l'outil Récolte.
+- Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.218.0.0. Non validé en jeu.
 ## 0.217.0
 - Retour (captures) : ne pas retirer les teintures des emplacements sans catégorie ; mettre les icônes (boutons) sur les cases d'équipement
   de la fenêtre du jeu. Fait : un emplacement teignable (arme à pieds) sans catégorie s'ouvre et montre ses teintures de la semaine.
