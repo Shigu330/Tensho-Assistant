@@ -1,76 +1,75 @@
-# Contribuer à Tensho Assistant / Contributing
+# Contributing to Tensho Assistant
 
 *English summary at the end.*
 
-## Prérequis
+## Prerequisites
 
-- Windows, Final Fantasy XIV avec XIVLauncher/Dalamud (plugins de développement activés).
-- SDK .NET **10.0.403** (fixé par `global.json`), Dalamud.NET.Sdk 15 (récupéré au build).
-- PowerShell 7 recommandé.
+- Windows, Final Fantasy XIV with XIVLauncher/Dalamud (development plugins enabled).
+- .NET SDK **10.0.403** (fixed by `global.json`), Dalamud.NET.Sdk 15 (restored during build).
+- PowerShell 7 recommended.
 
-## Compiler et tester
+## Build and test
 
 ```powershell
 .\scripts\Verify.ps1
-# SDK à un autre emplacement :
-.\scripts\Verify.ps1 -DotNet 'C:\chemin\dotnet.exe'
+# If the SDK is installed elsewhere:
+.\scripts\Verify.ps1 -DotNet 'C:\path\to\dotnet.exe'
 ```
 
-Le script compile en Release, exécute les tests managés (`tests/TenshoAssistant.Tests`), valide les fichiers de langue et le paquet.
-Une contribution doit le laisser **vert, sans avertissement**. DLL produite : `src/TenshoAssistant/bin/x64/Release/TenshoAssistant.dll`
-(à ajouter dans les plugins de développement de Dalamud, puis `/tensho`).
+The script builds in Release, runs the managed tests (`tests/TenshoAssistant.Tests`), validates the language files, and checks the package.
+A contribution must leave the project **green, with no warnings**. Output DLL: `src/TenshoAssistant/bin/x64/Release/TenshoAssistant.dll`
+(to be added to the Dalamud development plugin list, then run `/tensho`).
 
-## Organisation
+## Project organization
 
-- Code : `src/TenshoAssistant/` (un dossier par domaine ; les fichiers `*.Dalamud.cs` touchent au jeu, les autres sont du C# pur testé).
-- Tests : `tests/TenshoAssistant.Tests/` (programme de tests sans framework : `Check(condition,"message")`).
-- Documentation : voir [docs/README.md](docs/README.md). Historique : [CHANGELOG.md](CHANGELOG.md).
+- Code: `src/TenshoAssistant/` (one folder per domain; files ending in `*.Dalamud.cs` affect the game, while the others are pure C# and testable).
+- Tests: `tests/TenshoAssistant.Tests/` (no-framework test program using `Check(condition, "message")`).
+- Documentation: see [docs/README.md](docs/README.md). History: [CHANGELOG.md](CHANGELOG.md).
 
-## Règles du projet
+## Project rules
 
-- **Ne jamais inventer une donnée de jeu.** Un lien de données (feuille Excel, champ natif, format externe) se prouve : sonde en lecture seule
-  (`tools/ShopCurrencyProbe`, `tools/ApiProbe`) ou source citée ; la sortie va dans `docs/evidence/` et le code la cite.
-- Inconnu ≠ zéro : afficher « inconnu » plutôt qu'une valeur supposée ; citer la source des données communautaires (Garland Tools, wiki FFXIV, Universalis).
-- Mémoire du jeu : lue sur le thread framework puis copiée en données managées ; rien de lourd dans `Draw` ; lecture de chaînes natives bornée.
-- Chaque abonnement, tâche ou fenêtre a un propriétaire et un nettoyage (déchargement propre du plugin).
-- Interface : textes dans `src/TenshoAssistant/Localization/Languages/*.json` (anglais = référence, français complet) ; pas de texte en dur.
-- Style : suivre le code voisin (nommage, densité des commentaires, C# compact du projet).
-- Références sous licence AGPL ou autre (Mappy, SortaKinda…) : lues pour comprendre, **jamais copiées**. Le projet est sous **GPL v3**.
-- Hors périmètre : ACT/IINACT, parsers, tout avantage en combat ou en JcJ.
+- **Never invent game data.** Any data link (Excel sheet, native field, external format) must be proven: use a read-only probe
+  (`tools/ShopCurrencyProbe`, `tools/ApiProbe`) or a cited source; the output must be kept in `docs/evidence/` and referenced in the code.
+- Unknown ≠ zero: display "unknown" instead of a guessed value; cite the source of community data (Garland Tools, FFXIV wiki, Universalis).
+- Game memory: read on the framework thread and copied into managed data; nothing heavy in `Draw`; native string reads are bounded.
+- Every subscription, task, or window has an owner and cleanup (proper plugin shutdown/unsubscription).
+- Interface: text belongs in `src/TenshoAssistant/Localization/Languages/*.json` (English is the reference, French must be complete); no hardcoded text.
+- Style: follow the neighboring code (naming, comment density, compact C# style used by the project).
+- References under AGPL or other licenses (Mappy, SortaKinda…) are read to understand them, **never copied**. The project is under **GPL v3**.
+- Out of scope: ACT/IINACT, parsers, anything that provides an advantage in combat or PvP.
 
-## Proposer une modification
+## Proposing a change
 
-1. Une branche par sujet ; un sujet petit et vérifiable.
-2. `Verify.ps1` vert ; nouveaux tests pour la logique pure.
-3. Entrée dans [CHANGELOG.md](CHANGELOG.md) (quoi, pourquoi, preuves, « validé en jeu » ou non).
-4. Pull request décrivant le test en jeu effectué.
+1. One branch per subject; keep each subject small and verifiable.
+2. `Verify.ps1` must be green; add new tests for the pure logic.
+3. Add an entry in [CHANGELOG.md](CHANGELOG.md) (what, why, evidence, and whether it was "validated in-game" or not).
+4. Pull request describing the in-game test performed.
 
-## Publication Dalamud
+## Dalamud publication
 
-Le dépôt officiel ([DalamudPluginsD17](https://github.com/goatcorp/DalamudPluginsD17), [règles](https://dalamud.dev/plugin-publishing/submission))
-impose notamment (relevé 2026-10-31) :
+The official repository ([DalamudPluginsD17](https://github.com/goatcorp/DalamudPluginsD17), [rules](https://dalamud.dev/plugin-publishing/submission))
+requires, among other things (as of 2026-10-31):
 
-- dépôt Git public, build depuis un commit précis ; `manifest.toml` dans `testing/live/<plugin>/` (repository, commit, owners, project_path, changelog) ;
-- `images/icon.png` de 64×64 à 512×512 (images d'aperçu PNG ≤ 730×380, facultatives) ; DalamudPackager ; version et AssemblyVersion
-  déterministes (pas d'horodatage) ; fenêtres via le système de fenêtres Dalamud ; état détaillé du projet : [docs/project/PUBLISHING.md](docs/project/PUBLISHING.md) ;
-- [restrictions](https://dalamud.dev/plugin-publishing/restrictions) : pas de requête automatique au serveur du jeu sans action du joueur, pas
-  d'automatisation de jeu (artisanat, dialogues, butin…), pas d'avantage en combat/JcJ, pas de contournement de la Mog Station, pas de collecte
-  d'identifiants d'autres joueurs ;
-- [politique IA](https://dalamud.dev/plugin-publishing/ai-policy) : l'usage d'IA doit être **déclaré** dans la pull request (rédigée par un humain) ;
-  une soumission **entièrement générée par IA sans implication humaine réelle est refusée** ; l'auteur doit comprendre, tester et savoir expliquer le code.
+- a public Git repository built from a specific commit; `manifest.toml` in `testing/live/<plugin>/` (repository, commit, owners, project_path, changelog);
+- `images/icon.png` sized 64×64 to 512×512 (preview PNGs up to 730×380, optional); `DalamudPackager`; deterministic version and `AssemblyVersion`
+  (no timestamps); windows via the Dalamud window system; a detailed project status: [docs/project/PUBLISHING.md](docs/project/PUBLISHING.md);
+- [restrictions](https://dalamud.dev/plugin-publishing/restrictions): no automatic requests to the game server without player action, no
+  automated gameplay (crafting, dialogues, loot…), no advantage in combat/PvP, no bypassing the Mog Station, no collection of other players' credentials;
+- [AI policy](https://dalamud.dev/plugin-publishing/ai-policy): AI use must be **declared** in the pull request (written by a human);
+  a submission **entirely generated by AI without real human involvement is rejected**; the author must understand, test, and explain the code.
 
-**Situation de ce projet :** le code est écrit avec un agent IA (niveau « Auto ») sous la direction et les tests en jeu de son auteur.
-Avant toute soumission officielle, l'auteur doit pouvoir répondre de chaque choix ; à défaut, distribuer via un dépôt de plugins tiers (URL
-de dépôt personnalisé dans Dalamud). Points à vérifier avant soumission : requêtes externes (Universalis, Garland Tools, wiki) déclenchées
-uniquement par l'action ou les réglages du joueur, téléportation et tri seulement sur clic, carte du jeu masquée et non modifiée.
+**Current project status:** the code is written with an AI agent (level "Auto") under the direction and in-game testing of its author.
+Before any official submission, the author must be able to justify every choice; otherwise, distribute via a third-party plugin repository
+(custom repository URL in Dalamud). Things to verify before submission: external requests (Universalis, Garland Tools, wiki) are triggered only by
+player action or configured settings; teleportation and sorting only happen on click; the game map remains hidden and unmodified.
 
 ---
 
 ## English summary
 
-Build and test with `.\scripts\Verify.ps1` (.NET SDK 10.0.403); it must stay green with no warnings. Never invent game data: prove data links with a
+Build and test with `./scripts/Verify.ps1` (.NET SDK 10.0.403); it must stay green with no warnings. Never invent game data: prove data links with a
 read-only probe (`tools/`) and keep the output in `docs/evidence/`. Unknown is not zero. Native memory is read on the framework thread and copied;
 native strings are read with a bound. UI text lives in `Localization/Languages/*.json` (English is the reference). AGPL references (Mappy,
 SortaKinda) are read, never copied; this project is GPL-3.0. No ACT/parsers, no combat or PvP advantage. Add a [CHANGELOG.md](CHANGELOG.md) entry.
 Official Dalamud publishing follows D17 rules and the AI policy: AI use must be disclosed, fully AI-generated submissions are rejected, and the
-author must understand and test the code. See the French section « Publication Dalamud » above.
+author must understand and test the code. See the French “Publication Dalamud” section above.
