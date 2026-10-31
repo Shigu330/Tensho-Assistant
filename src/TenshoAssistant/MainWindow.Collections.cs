@@ -29,9 +29,9 @@ internal sealed partial class MainWindow
         {
             try
             {
-                if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Mounts")+"###CollectionMounts")) { collectionKind = CollectionKind.Mount; ImGui.EndTabItem(); }
-                if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Companions")+"###CollectionMinions")) { collectionKind = CollectionKind.Companion; ImGui.EndTabItem(); }
-                if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Emotes")+"###CollectionEmotes")) { collectionKind = CollectionKind.Emote; ImGui.EndTabItem(); }
+                if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Mounts")+"###CollectionMounts",focusCollectionKind==CollectionKind.Mount ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { collectionKind = CollectionKind.Mount; if(focusCollectionKind==CollectionKind.Mount)focusCollectionKind=null; ImGui.EndTabItem(); }
+                if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Companions")+"###CollectionMinions",focusCollectionKind==CollectionKind.Companion ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { collectionKind = CollectionKind.Companion; if(focusCollectionKind==CollectionKind.Companion)focusCollectionKind=null; ImGui.EndTabItem(); }
+                if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Emotes")+"###CollectionEmotes",focusCollectionKind==CollectionKind.Emote ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { collectionKind = CollectionKind.Emote; if(focusCollectionKind==CollectionKind.Emote)focusCollectionKind=null; ImGui.EndTabItem(); }
                 if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Orchestrion")+"###CollectionMusic",focusOrchestrionTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusOrchestrionTab=false;collectionKind = CollectionKind.Orchestrion; ImGui.EndTabItem(); }
                 if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Titles")+"###CollectionTitles",focusTitleTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusTitleTab=false;collectionKind=CollectionKind.Title;ImGui.EndTabItem(); }
                 if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Achievements")+"###CollectionAchievements",focusAchievementTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusAchievementTab=false;collectionKind=CollectionKind.Achievement;ImGui.EndTabItem(); }
@@ -44,6 +44,9 @@ internal sealed partial class MainWindow
         if(kind==CollectionKind.Achievement)DrawAchievementCategories(state);
         foreach(var issue in state.CategoryIssues ?? [])if(issue.Kind==kind)ImGui.TextWrapped(issue.Reason);
         ImGui.SetNextItemWidth(-1);
+        // 0.144: titles and achievements are only known once the game sent their list (its window opened once this session).
+        if(kind==CollectionKind.Title && collections.TitleListLoaded==false)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("CollectionsBrowser.TitlesNotLoaded"));
+        if(kind==CollectionKind.Achievement && collections.AchievementListLoaded==false)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("CollectionsBrowser.AchievementsNotLoaded"));
         ImGui.InputTextWithHint("##CollectionSearch", localization.Get("CollectionsBrowser.Search"), ref collectionQuery, 128);
         var completion=kind is CollectionKind.Title or CollectionKind.Achievement;
         if(!completion && collectionFilter==3)collectionFilter=0;
@@ -124,7 +127,12 @@ internal sealed partial class MainWindow
                     if(ImGui.Selectable($"{entry.Name}##Completion{kind}{entry.Id}")){selectedCompletionKind=kind;selectedCompletionId=entry.Id;openCompletionDetails=true;}
                 }
                 else ImGui.TextUnformatted(entry.Name);
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip(developerMode ? $"{entry.Name}\n{entry.Kind} : {entry.Id}":entry.Name);
+                // 0.142: how to obtain it (items, vendors, quests, recipes) for mounts, minions, emotes, cards and rolls.
+                if (ImGui.IsItemHovered())
+                {
+                    if(entry.Kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.Emote or CollectionKind.TripleTriad or CollectionKind.Orchestrion)DrawCollectionTooltip(entry);
+                    else ImGui.SetTooltip(developerMode ? $"{entry.Name}\n{entry.Kind} : {entry.Id}":entry.Name);
+                }
                 ImGui.TableNextColumn();
                 ImGui.TextColored(entry.ConfirmedUnlocked ? Success : Muted,CollectionAcquisitionLabel(entry));
             }

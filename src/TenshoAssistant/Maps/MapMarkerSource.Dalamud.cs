@@ -85,6 +85,8 @@ internal sealed class MapMarkerSource
     }
     public uint World{get{LoadOverviews();return worldMap;}}
     private Dictionary<uint,string>? symbols;
+    /// <summary>Every named map icon kind of the game (MapSymbol sheet), for the global icon settings.</summary>
+    public IReadOnlyCollection<uint> SymbolIcons{get{SymbolName(0);return symbols!.Keys;}}
     /// <summary>Game name of a map icon kind (MapSymbol sheet: aetheryte, merchant…), or "" when the game gives none.</summary>
     public string SymbolName(uint icon)
     {

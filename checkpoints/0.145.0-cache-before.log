@@ -1,0 +1,3 @@
+Mesures du dossier DataCache-v1 (2026-10-31) :
+- avant analyse (du -sh / ls) : 90 fichiers, 256 Mo — dont 2 × catalog-items (18,7 et 17,3 Mo), catalog-recipes 7,8 Mo, catalog-npc-vendors 7,2 Mo, et plusieurs « quests » de 4,8 Mo aux versions 0.120, 0.127, 0.141, 0.144 du plugin.
+- au point de contrôle (PowerShell, *.json) : 49 fichiers, 46 Mo — la rotation 0.144 (fichiers les plus anciens d'abord) avait entre-temps supprimé des fichiers, ce qui illustre la perte des catalogues et sources.

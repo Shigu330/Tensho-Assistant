@@ -1,6 +1,6 @@
 # Règles durables
 
-- Projet neuf Tensho--Assistant. Les 17 plugins du prompt maître et de ROADMAP.md déterminent le périmètre. ACT/Combat reste complémentaire.
+- Projet neuf Tensho--Assistant. Les 17 plugins du prompt maître et de ROADMAP.md déterminent le périmètre.
 - Un seul GOAL actif, petit et vérifiable. Pas de modules vides ni d'abstractions prématurées.
 - Source de vérité commune pour chaque domaine partagé. KEEP → EXTEND → REFACTOR → REPLACE → NEW.
 - Prompt maître > environnement local > source actuelle > références historiques > inférence. Aucune décision héritée d'Éorzéa ne fait autorité.

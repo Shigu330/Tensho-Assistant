@@ -25,7 +25,7 @@ internal sealed partial class MainWindow
         var current=first.StartsAt<=now && now<first.EndsAt;
         ImGui.TextColored(current ? Success:Muted,localization.Format(current ? "LocalClock.Current":"LocalClock.Next",current ? first.EndsAt.ToLocalTime().ToString("HH:mm:ss"):first.StartsAt.ToLocalTime().ToString("g")));
         var remaining=(current ? first.EndsAt:first.StartsAt)-now;
-        ImGui.TextDisabled(localization.Format("LocalClock.Countdown",Math.Max(0,(int)remaining.TotalHours),remaining.Minutes,remaining.Seconds));
+        ImGui.TextDisabled(localization.Format(current ? "LocalClock.CountdownClose":"LocalClock.CountdownOpen",Math.Max(0,(int)remaining.TotalHours),remaining.Minutes,remaining.Seconds));
         if(ImGui.IsItemHovered())ImGui.SetTooltip(string.Join('\n',timeline.Openings.Select(window=>$"{window.StartsAt.ToLocalTime():g}–{window.EndsAt.ToLocalTime():g}"))+"\n"+localization.Get("GatheringClock.Disclaimer"));
     }
 }

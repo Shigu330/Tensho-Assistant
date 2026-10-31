@@ -22,6 +22,7 @@
     <Compile Include="../../src/TenshoAssistant/Maps/MapBookmarks.cs" Link="Maps/MapBookmarks.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapProjection.cs" Link="Maps/MapProjection.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapLocalIndex.cs" Link="Maps/MapLocalIndex.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/WikiVistas.cs" Link="Maps/WikiVistas.cs" />
     <Compile Include="../../src/TenshoAssistant/MiniGames/*.cs" Exclude="../../src/TenshoAssistant/MiniGames/*.Dalamud.cs" Link="MiniGames/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Character/CharacterStatsService.cs" Link="Character/CharacterStatsService.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestService.cs" Link="Quests/QuestService.cs" />

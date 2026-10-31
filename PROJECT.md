@@ -4,7 +4,7 @@ Plugin Dalamud neuf réunissant les fonctions utiles de 17 plugins dans une inte
 
 Le périmètre autoritaire figure dans ROADMAP.md : Avant-Garde, Blue Mage Helper, Character Panel Refined, Collections, Craftimizer, Duty Loot Preview, ezMiniCactpot, GatherBuddy, Item Use, LazyGatherer, Macro Chain, Mappy, Monster Loot Hunter, Price Insight, QuestTracker, SortaKinda et TriadBuddy. Aucun ne peut être supprimé silencieusement.
 
-Domaines : objets/recettes/artisanat ; inventaire/règles ; récolte/pêche/cartes ; collections/quêtes/sources ; marché ; statistiques ; mini-jeux ; macros. ACT/IINACT reste une étude complémentaire séparée.
+Domaines : objets/recettes/artisanat ; inventaire/règles ; récolte/pêche/cartes ; collections/quêtes/sources ; marché ; statistiques ; mini-jeux ; macros.
 
 Priorités initiales : A Craftimizer/GatherBuddy/SortaKinda ; B Collections/QuestTracker/Monster Loot Hunter/Price Insight ; C Avant-Garde/Blue Mage Helper/Duty Loot Preview/Item Use/Mappy/TriadBuddy ; D Character Panel Refined/ezMiniCactpot/LazyGatherer/Macro Chain.
 

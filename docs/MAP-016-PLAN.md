@@ -62,3 +62,8 @@ Reste : groupe, courants éthérés, repères d'exploration, PNJ vendeurs, carte
 2. **Réglages globaux des icônes** : taille/visibilité/priorité par défaut pour toutes les cartes (IconSizes actuel = global) + surcharge par carte (nouvelle table MapId → réglages), bouton « revenir au global ».
 3. **Liens outils ↔ carte** : depuis les pages Quêtes et Récolte, bouton « voir sur la carte Tensho » (centre + drapeau, PlaceFlagFromMapView) ; depuis la carte, clic sur une quête/un point → ouvrir la fiche dans l'outil. **Nouvel outil ALEA** (page) : ALEA en cours de la zone (IFateTable, MapLiveReader.Fates), filtres niveau/état, lien carte. Rappel : aucune position fixe d'ALEA dans les données (0.114.0-local-probe.log).
 Cache : réutiliser « catalog-map-positions », « quests », « catalog-gathering » ; tout nouveau réglage dans Configuration (pas de relecture Lumina).
+
+- 2026-10-31 : reprise traitée en 0.118 (liens Quêtes/Récolte → carte Tensho, clic droit → outils, outil ALEA avec récompenses Garland) et 0.119 (réglages d'icônes globaux + par carte, priorité). Non validé en jeu.
+- 2026-10-31 : outil ALEA retiré en 0.123 à la demande de l'utilisateur (récompenses Garland sans expérience et peu utiles) ; couche ALEA et onglet ALEA du clic droit conservés. Quête du journal → carte validée en jeu (0.122).
+- 2026-10-31 : 0.127 groupe, repères d'exploration, courants éthérés (terrain + quête au donneur). Restent : PNJ vendeurs, cartes non découvertes masquées, confirmation des zones de mandats.
+- 2026-10-31 : 0.137 PNJ vendeurs (couche + onglet). Restent : cartes non découvertes masquées comme le jeu, zones de mandats ; exploration en pause.

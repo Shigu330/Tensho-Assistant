@@ -66,5 +66,5 @@ Les IDs métier désignent la capacité globale à découper en petits GOAL au m
 
 ## Domaine complémentaire
 
-Combat/ACT/IINACT : étude facultative, séparée des 17 lignes et sans priorité devant elles.
+Combat/ACT/IINACT : retiré du projet (décision utilisateur 2026-10-31).
 

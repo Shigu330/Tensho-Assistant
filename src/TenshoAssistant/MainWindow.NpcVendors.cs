@@ -23,10 +23,15 @@ internal sealed partial class MainWindow
             if(developerMode && state.Error is { } error)ImGui.TextWrapped(error);
             return;
         }
+        if(npcVendorFocus!=0 && catalog.Vendors.FirstOrDefault(vendor=>vendor.NpcId==npcVendorFocus) is { } focused){DrawNpcVendorSheet(catalog,focused);return;}
         if(itemId<=0){ImGui.TextWrapped(localization.Get("NpcUi.Help"));return;}
         var id=(uint)itemId;
-        DrawItemIcon(SelectedItem,new Vector2(40));ImGui.SameLine();
+        DrawItemIcon(SelectedItem,new Vector2(40));
+        if(ImGui.IsItemHovered())DrawItemInfoTooltip(id);
+        ItemCollectionMenu("SelectedItemCollection",SelectedItem);
+        ImGui.SameLine();
         ImGui.TextColored(Accent,SelectedItem?.Name ?? localization.Format("MonsterUi.Item",id));
+        DrawItemCollection(SelectedItem);
         var offers=catalog.ForItem(id);
         if(offers.Count==0){ImGui.TextWrapped(localization.Get("NpcUi.None"));return;}
         ImGui.TextDisabled(localization.Format("NpcUi.Count",offers.Count,offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));
@@ -60,6 +65,49 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndTable();}
         ImGui.TextDisabled(localization.Get("NpcUi.Source"));
+    }
+
+    // Vendor sheet (0.140, opened from the map's right-click « Vendors » tab): positions with a Tensho map link, then each shop's
+    // stock with item icon, name and price; a click on an item opens the item view of this tool.
+    private uint npcVendorFocus;
+    private void DrawNpcVendorSheet(NpcVendorCatalog catalog,NpcVendor vendor)
+    {
+        if(ImGui.SmallButton(localization.Get("NpcUi.BackToItem")))npcVendorFocus=0;
+        ImGui.TextColored(Accent,NpcName(vendor));
+        foreach(var location in vendor.Locations)
+        {
+            ImGui.TextUnformatted(NpcPlace(location));
+            if(maps.State.Catalog?.Find(location.MapId) is { } map)
+            {
+                ImGui.SameLine();
+                if(ImGui.SmallButton(localization.Get("MapView.ShowOnMap")+$"##VendorMap{location.MapId}/{location.X}/{location.Y}"))ShowOnTenshoMap(map,new Vector3(location.WorldX,0,location.WorldZ));
+            }
+        }
+        var sales=catalog.Sales.Where(sale=>vendor.ShopIds.Contains(sale.ShopId)).GroupBy(sale=>sale.ShopId).ToArray();
+        if(sales.Length==0){ImGui.TextDisabled(localization.Get("MapLocal.ShopsNone"));return;}
+        var items=itemCatalog.State.Catalog;
+        foreach(var shop in sales)
+        {
+            var first=shop.First();
+            var title=first.ShopName.Length>0 && !(localization.CurrentCode!="ja" && first.ShopName.Any(c=>c is >= '\u3040' and <= '\u30FF' or >= '\u4E00' and <= '\u9FFF'))
+                ? first.ShopName:localization.Get("MapLocal.ShopKind"+first.Kind);
+            if(!ImGui.CollapsingHeader($"{title} ({shop.Count()})##Shop{shop.Key}"))continue;
+            if(!ImGui.BeginTable($"VendorShop{shop.Key}",2,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))continue;
+            try
+            {
+                foreach(var sale in shop)
+                {
+                    ImGui.TableNextRow();ImGui.TableNextColumn();
+                    var item=items?.Find(sale.ItemId);
+                    DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();
+                    if(ImGui.Selectable($"{item?.Name ?? localization.Format("MonsterUi.Item",sale.ItemId)}##Sale{shop.Key}/{sale.ItemId}/{sale.Quantity}")){itemId=(int)sale.ItemId;npcVendorFocus=0;}
+                    if(ImGui.IsItemHovered())DrawItemInfoTooltip(sale.ItemId);
+                    ItemCollectionMenu($"SaleCollection{shop.Key}/{sale.ItemId}",item);
+                    ImGui.TableNextColumn();DrawNpcCosts(sale,16,true);
+                }
+            }
+            finally{ImGui.EndTable();}
+        }
     }
 
     // Right click on a vendor row: one entry per known position; the game map opens with its flag on that position.

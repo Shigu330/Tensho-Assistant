@@ -1,0 +1,21 @@
+﻿QUEST rows=5533 issuer=5292 issuerWithMap=5292
+  quest 65537 'Savoir tendre la main' level 1141124 map 2 x=49,8 z=51,8
+  quest 65539 'La voie de la botanique' level 1143529 map 3 x=-238,0 z=-142,9
+  quest 65540 'Dites-le avec des g├óteaux' level 1565640 map 3 x=-233,9 z=-171,0
+FATE named=1712 locationIsLevelWithMap=0 icons=60721:623,60722:436,60724:126,60723:90,60725:27,60726:2,0:9,60727:1,60852:76,60728:7,60858:252,63914:25,63915:27,63917:2,63916:4,60806:5
+GATHER bases=1426 exported=1078 basesWithExport=1077
+  point 30001 base 153 territory 1 x=-115,9 y=209,2 r=53 type 0
+  point 30002 base 154 territory 1 x=261,1 y=209,0 r=61 type 0
+  point 30003 base 155 territory 1 x=-64,9 y=54,2 r=50 type 0
+FISH 2 x=1094 z=1058 r=400 map 4 size 100 offset 0/0 asWorld=(43,40,42,68) asPixel=(22,90,22,18)
+FISH 35 x=668 z=1120 r=3000 map 12 size 200 offset 0/0 asWorld=(24,62,33,67) asPixel=(7,69,12,21)
+ADVENTURE named=340 firstRow=2162688 lastRow=2163027 withLevelMap=340
+  adv 2162688 'Quais du barracuda' place 'Limsa Lominsa' level 4876856 map 11 terr 128 x=-83,4 y=42,4 z=-171,2 coord=(9,6,7,8) type 49 object 5000000 time 800-1159 emote 22 'Scruter' level 0-0
+  adv 2162689 'Astalicia' place 'Limsa Lominsa' level 4876859 map 12 terr 129 x=-209,1 y=24,5 z=194,5 coord=(7,1,15,1) type 49 object 5000000 time 1800-459 emote 22 'Scruter' level 0-0
+  adv 2162690 'St├¿le du chant marin' place 'Noscea centrale' level 4876905 map 15 terr 134 x=-59,0 y=27,3 z=-118,4 coord=(20,3,19,1) type 49 object 5000000 time 500-759 emote 58 'Prier' level 0-0
+  adv 2162691 'Ascenciel' place 'Noscea centrale' level 4876907 map 15 terr 134 x=-269,6 y=29,4 z=-206,1 coord=(16,1,17,4) type 49 object 5000000 time 1200-1659 emote 22 'Scruter' level 0-0
+  adv 2162692 'Route orientale de la Thagran' place 'Noscea centrale' level 4876912 map 15 terr 134 x=194,5 y=73,8 z=302,7 coord=(25,4,27,6) type 49 object 5000000 time 800-1159 emote 22 'Scruter' level 0-0
+CURRENT rows=448 first=2818048 withQuest=151 eobjs=152 placedByLevel=152 distinctCurrents=152
+  current 2818053 eobj 2005536 map 211 x=402,0 z=561,4
+  current 2818055 eobj 2006187 map 211 x=425,0 z=-536,9
+  current 2818057 eobj 2006189 map 211 x=-332,9 z=-30,0

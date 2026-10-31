@@ -74,6 +74,16 @@ internal static class CacheTests
             var invalidated=reloaded.InvalidateAsync("prices","71:42","v1");
             Check(Wait(reloaded.ReadAsync<MarketQuote>("prices","71:42","v1")) is null && Wait(invalidated),"read waits for earlier forced invalidation rather than reviving the old snapshot");
         }),
+        ("Disk cache keeps only the newest version of a family and scope, other scopes untouched",()=>
+        {
+            // 0.145: one quest file per plugin version had filled the 256 MiB cache and evicted the catalogues.
+            using var folder=new Folder();var date=DateTimeOffset.UtcNow.AddHours(-1);
+            Check(Wait(folder.Cache.WriteAsync("quests","1","0.120",1,date)) && Wait(folder.Cache.WriteAsync("quests","2","0.120",2,date)),"two characters");
+            Check(Wait(folder.Cache.WriteAsync("quests","1","0.144",3,date.AddMinutes(1))),"new version for character 1");
+            Check(Directory.GetFiles(folder.Root,"*.json").Length==2,"old version of character 1 removed, character 2 kept");
+            Check(Wait(folder.Cache.ReadAsync<int>("quests","1","0.120")) is null && Wait(folder.Cache.ReadAsync<int>("quests","1","0.144"))?.Value==3
+                && Wait(folder.Cache.ReadAsync<int>("quests","2","0.120"))?.Value==2,"newest read back");
+        }),
         ("Disk cache ordered writes atomic files corruption cancellation and disposal are recoverable",()=>
         {
             using var folder=new Folder();var date=DateTimeOffset.UtcNow.AddHours(-1);

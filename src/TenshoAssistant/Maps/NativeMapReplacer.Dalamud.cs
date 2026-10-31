@@ -47,15 +47,21 @@ internal sealed class NativeMapReplacer : IDisposable
                     // A quest, flag or link asks for a map through CurrentOpenMapInfo; at that frame SelectedMapId can still be
                     // the world map (0.111 report: a quest opened the world). The window picks: a zone selection, else the request.
                     var agent=AgentMap.Instance();
-                    uint requested=0,territory=0,selected=0;var type="";
+                    uint requested=0,territory=0,selected=0,quest=0,aetheryte=0,fate=0;var type="";var questLog=false;System.Numerics.Vector2? target=null;uint targetIcon=0;
                     if(agent!=null)
                     {
                         requested=agent->CurrentOpenMapInfo.MapId;territory=agent->CurrentOpenMapInfo.TerritoryId;
-                        selected=agent->SelectedMapId;type=agent->CurrentOpenMapInfo.Type.ToString();
+                        selected=agent->SelectedMapId;type=agent->CurrentOpenMapInfo.Type.ToString();var kind=agent->CurrentOpenMapInfo.Type;questLog=kind is MapType.QuestLog or MapType.GatheringLog;
+                        if(questLog && agent->TempMapMarkerCount>0)
+                        {
+                            var marker=agent->TempMapMarkers[0].MapMarker;
+                            target=new System.Numerics.Vector2(marker.X/16f,marker.Y/16f);targetIcon=marker.IconId;
+                        }
+                        quest=agent->CurrentOpenMapInfo.QuestId;aetheryte=agent->CurrentOpenMapInfo.AetheryteId;fate=agent->CurrentOpenMapInfo.FateId;
                     }
                     ((AtkUnitBase*)addon.Address)->Close(true);
-                    log.Debug("Game map replaced: type {0}, map {1}, territory {2}, selected {3}.",type,requested,territory,selected);
-                    open(new(selected,requested,territory,client.MapId));
+                    log.Information("Game map replaced: type {0}, map {1}, territory {2}, selected {3}, quest {4}, aetheryte {5}, fate {6}, target {7}.",type,requested,territory,selected,quest,aetheryte,fate,target?.ToString() ?? "none");
+                    open(new(selected,requested,territory,client.MapId,quest,aetheryte,fate,questLog,target,targetIcon));
                     visible=false;
                 }
             }

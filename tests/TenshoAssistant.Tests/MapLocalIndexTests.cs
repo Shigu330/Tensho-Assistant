@@ -39,7 +39,25 @@ internal static class MapLocalIndexTests
             Check(groups.Count==2 && groups[0].Type=="Minage" && groups[1].Type=="Pêche","types of map 3");
             var point=groups[0].Points.Single();
             Check(point.Items.SequenceEqual(new uint[]{5,6}) && point.Hidden && point.Position is { Radius:53 },"items merged with position");
-            Check(groups[1].Points.Single().Position is null,"fishing has no position");
+            Check(groups[1].Points.Single().Position is null,"fishing spot without indexed position stays unknown");
+            var timed=new MapLocalGatheringPoint(1,"Minage",50,"",[],false,null,0,GatheringSchedule.FromEphemeral(2200,200));
+            Check(timed.Timed && timed.ActiveAt(23*60) && timed.ActiveAt(60) && !timed.ActiveAt(12*60) && !point.Timed,"timed window across midnight; ordinary point not timed");
+            var withSpot=new MapLocalIndex([new(MapLocalKind.FishingSpot,90,3,70f,-20f,0),new(MapLocalKind.GatheringPoint,90,0,1f,1f,0)]);
+            var spot=MapLocalLists.Gathering(sources,withSpot,3).Single(group=>group.Type=="Pêche").Points.Single();
+            Check(spot.Position is { Kind:MapLocalKind.FishingSpot,X:70f } && withSpot.Gathering(90) is { Kind:MapLocalKind.GatheringPoint },"fishing spot uses its own key space");
+        }),
+        ("Map local index lists vistas and aether currents per map once each",()=>
+        {
+            // Rows from checkpoints/0.127.0-sightseeing-probe.log (vista 2162688 on map 11, field current 2818053 on map 211).
+            var index=new MapLocalIndex([new(MapLocalKind.Sightseeing,2162688,11,-83.4f,-171.2f,0,81001,"Quais du barracuda"),
+                new(MapLocalKind.Sightseeing,2162688,12,1,1,0,81001,"double"),new(MapLocalKind.AetherCurrent,2818053,211,402f,561.4f,0),
+                new(MapLocalKind.AetherCurrent,2818054,211,1f,1f,0,66000),new(MapLocalKind.AetherCurrent,2818055,0,1f,1f,0)]);
+            Check(index.OnMap(MapLocalKind.Sightseeing,11).Single().Name=="Quais du barracuda" && index.OnMap(MapLocalKind.Sightseeing,12).Count==0,"first vista row wins");
+            Check(index.OnMap(MapLocalKind.AetherCurrent,211).Count==2 && index.OnMap(MapLocalKind.AetherCurrent,211)[1].Data==66000,"field and quest currents on their map");
+            Check(index.OnMap(MapLocalKind.AetherCurrent,0).Count==0 && index.Quest(2162688) is null,"no map dropped, kinds kept apart");
+            // Windows from the probe: #001 800–1159, #002 1800–459 (past midnight).
+            var day=new MapLocalPosition(MapLocalKind.Sightseeing,1,11,0,0,0,MinTime:800,MaxTime:1159);var night=day with{MinTime=1800,MaxTime=459};
+            Check(day.InWindow(9*60) && !day.InWindow(12*60) && night.InWindow(23*60) && night.InWindow(4*60+59) && !night.InWindow(5*60),"Eorzea windows, wrapping past midnight");
         }),
         ("Map local cache key follows the shape and rejects broken snapshots",()=>
         {

@@ -45,6 +45,7 @@ internal sealed partial class MainWindow
                 }
                 if(usages)
                 {
+                    DrawItemCollection(item);
                     DrawHoveredStock(hovered.ItemId);
                     DrawHoveredSources(hovered.ItemId,observed.StableSince is { } since ? now-since:TimeSpan.Zero);
                     DrawHoveredUsages(hovered.ItemId);
@@ -136,6 +137,195 @@ internal sealed partial class MainWindow
         DrawHoveredNpcs(id);
         foreach(var line in lines)ImGui.TextWrapped(line);
         if(monsterStatus is not null)ImGui.TextDisabled(monsterStatus);
+    }
+
+    // Collection state of what the item unlocks (mount, minion, Triple Triad card, orchestrion roll), from the collection
+    // observation of the character: obtained / not obtained / unknown when the observation does not prove it.
+    private void DrawItemCollection(Items.ItemDefinition? item)
+    {
+        if(item is null)return;
+        (Collections.CollectionKind Kind,uint Id)? link=item.MountId!=0 ? (Collections.CollectionKind.Mount,item.MountId)
+            :item.CompanionId!=0 ? (Collections.CollectionKind.Companion,item.CompanionId)
+            :item.TripleTriadCardId!=0 ? (Collections.CollectionKind.TripleTriad,item.TripleTriadCardId)
+            :item.OrchestrionId!=0 ? (Collections.CollectionKind.Orchestrion,item.OrchestrionId):null;
+        if(link is not { } target)return;
+        var entry=collections.State.Entries.FirstOrDefault(row=>row.Kind==target.Kind && row.Id==target.Id);
+        var acquisition=CollectionStateOf(entry);
+        var colour=acquisition switch{Collections.CollectionAcquisition.Acquired=>UI.FfxivTheme.Success,Collections.CollectionAcquisition.NotAcquired=>UI.FfxivTheme.Error,_=>UI.FfxivTheme.TextMuted};
+        ImGui.TextColored(colour,localization.Format("HoverUi.Collection",localization.Get("HoverUi.CollectionKind"+target.Kind),localization.Get("HoverUi.Collection"+acquisition)));
+    }
+    // Obtained when the game says so; mounts and minions are read live from the game's unlock state at login, so « not
+    // unlocked » there is a real « not obtained » once the collections are read (0.142: was shown as unknown); others need proof.
+    private Collections.CollectionAcquisition CollectionStateOf(Collections.CollectionEntry? entry)
+    {
+        if(entry is null)return Collections.CollectionAcquisition.Unknown;
+        if(entry.Acquisition!=Collections.CollectionAcquisition.Unknown)return entry.Acquisition;
+        var state=collections.State;
+        return entry.Kind is Collections.CollectionKind.Mount or Collections.CollectionKind.Companion && !state.Loading && state.CharacterId!=0
+            ? Collections.CollectionAcquisition.NotAcquired:Collections.CollectionAcquisition.Unknown;
+    }
+    // Collection entry an item unlocks, if any.
+    private Collections.CollectionEntry? CollectionOf(Items.ItemDefinition? item)
+    {
+        if(item is null)return null;
+        (Collections.CollectionKind Kind,uint Id)? link=item.MountId!=0 ? (Collections.CollectionKind.Mount,item.MountId)
+            :item.CompanionId!=0 ? (Collections.CollectionKind.Companion,item.CompanionId)
+            :item.TripleTriadCardId!=0 ? (Collections.CollectionKind.TripleTriad,item.TripleTriadCardId)
+            :item.OrchestrionId!=0 ? (Collections.CollectionKind.Orchestrion,item.OrchestrionId):null;
+        return link is { } target ? collections.State.Entries.FirstOrDefault(row=>row.Kind==target.Kind && row.Id==target.Id):null;
+    }
+    // Right click on an item row: open its collection entry (mount, minion, card, roll) in the Collections page.
+    private void ItemCollectionMenu(string id,Items.ItemDefinition? item)
+    {
+        if(CollectionOf(item) is not { } entry || !ImGui.BeginPopupContextItem(id))return;
+        try
+        {
+            if(ImGui.Selectable(localization.Get("HoverUi.OpenCollection")))
+            {
+                if(entry.Kind==Collections.CollectionKind.TripleTriad)page=Page.TripleTriad;
+                else{page=Page.Collections;collectionKind=entry.Kind;focusCollectionKind=entry.Kind;if(entry.Kind==Collections.CollectionKind.Orchestrion)focusOrchestrionTab=true;}
+                collectionQuery=entry.Name;IsOpen=true;
+            }
+        }
+        finally{ImGui.EndPopup();}
+    }
+    // How to obtain a collection entry: game description and source, unlocking items with their NPC vendors and prices,
+    // quests that reward them, recipes that make them.
+    private void DrawCollectionTooltip(Collections.CollectionEntry entry)
+    {
+        ImGui.BeginTooltip();
+        try
+        {
+            ImGui.PushTextWrapPos(ImGui.GetFontSize()*26);
+            ImGui.TextColored(Accent,entry.Name);
+            var acquisition=CollectionStateOf(entry);
+            ImGui.TextColored(acquisition switch{Collections.CollectionAcquisition.Acquired=>UI.FfxivTheme.Success,Collections.CollectionAcquisition.NotAcquired=>UI.FfxivTheme.Error,_=>UI.FfxivTheme.TextMuted},
+                localization.Format("HoverUi.Collection",localization.Get("HoverUi.CollectionKind"+entry.Kind),localization.Get("HoverUi.Collection"+acquisition)));
+            if(entry.Location.Length>0)ImGui.TextWrapped(localization.Format("HoverUi.CollectionWhere",entry.Location));
+            if(entry.Description.Length>0)ImGui.TextDisabled(entry.Description);
+            var catalog=itemCatalog.State.Catalog;
+            var items=catalog is null ? []:entry.Kind switch
+            {
+                Collections.CollectionKind.Mount=>catalog.ForMount(entry.Id),
+                Collections.CollectionKind.Companion=>catalog.ForCompanion(entry.Id),
+                Collections.CollectionKind.TripleTriad=>catalog.ForTriadCard(entry.Id),
+                Collections.CollectionKind.Orchestrion=>catalog.ForOrchestrion(entry.Id),
+                _=>[],
+            };
+            if(items.Count==0 && entry.Kind is Collections.CollectionKind.Mount or Collections.CollectionKind.Companion)ImGui.TextDisabled(localization.Get("HoverUi.CollectionNoItem"));
+            // Achievements rewarding the entry directly (title or item) are listed even without an unlocking item.
+            foreach(var achievement in AchievementsRewarding(items.Select(item=>item.Id)).Take(3))
+                ImGui.TextUnformatted(localization.Format("HoverUi.CollectionAchievement",achievement));
+            foreach(var item in items.Take(3))
+            {
+                ImGui.Separator();
+                DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();
+                ImGui.TextUnformatted(localization.Format("HoverUi.CollectionItem",item.Name));
+                var known=0;
+                if(npcVendors?.State.Catalog?.ForItem(item.Id) is { Count:>0 } offers)
+                    foreach(var offer in offers.Take(3).Select(offer=>{known++;return offer;}))
+                    {
+                        // 0.146: the price goes on its own indented line; on the same line the wrap squeezed it into a column.
+                        ImGui.TextWrapped(localization.Format("HoverUi.CollectionVendor",NpcName(offer.Vendor),offer.Vendor.Locations.FirstOrDefault() is { } place ? NpcPlace(place):localization.Get("NpcUi.NoLocation")));
+                        ImGui.Indent();DrawNpcCosts(offer.Sale,ImGui.GetTextLineHeight(),false);ImGui.Unindent();
+                    }
+                if(quests.State.RewardIndex?.ForItem(item.Id) is { Count:>0 } rewards)
+                {known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionQuests",string.Join(", ",rewards.Take(3).Select(reward=>reward.Name))));}
+                if(recipeCatalog.State.Catalog?.ForResult(item.Id) is { Count:>0 } recipes){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionCraft",recipes.Count));}
+                if(gatheringCatalog.State.Catalog?.ForItem(item.Id) is { Count:>0 } gathered){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionGathering",gathered[0].TypeName,gathered[0].Zone));}
+                if(AchievementsRewarding([item.Id]).Any())known++;
+                // 0.148: the market is a criterion, not a source: shown, but the real origin is still looked up.
+                if(item.IsMarketable)ImGui.TextDisabled(localization.Get("HoverUi.CollectionMarket"));
+                // Garland only when the plugin's own data knows nothing (0.146, user request).
+                if(known==0)DrawFallbackSources(item.Id);
+            }
+            ImGui.PopTextWrapPos();
+        }
+        finally{ImGui.EndTooltip();}
+    }
+
+    private Community.GarlandItemSourceService? itemSources;
+    private Community.WikiItemAcquisitionService? wikiItems;
+    internal void ConfigureWikiItems(Community.WikiItemAcquisitionService service)=>wikiItems=service;
+    // Last source (0.147): the wiki's « Acquisition » section, read only when the game data and Garland know nothing.
+    private int DrawWikiAcquisition(uint itemId)
+    {
+        if(wikiItems is null)return 0;
+        var state=wikiItems.Get(itemId);
+        if(state.Loading){ImGui.TextDisabled(localization.Get("HoverUi.WikiLoading"));return 0;}
+        if(state.Page is not { Lines.Count:>0 } page)return 0;
+        foreach(var line in page.Lines)ImGui.TextWrapped("· "+(line.Heading.Length>0 ? line.Heading+" : ":"")+line.Text);
+        ImGui.TextDisabled(localization.Get("HoverUi.WikiCredit"));
+        return page.Lines.Count;
+    }
+    // Garland, then the wiki, then « no known source » once both answered.
+    private void DrawFallbackSources(uint itemId)
+    {
+        var known=DrawGarlandSources(itemId);
+        if(known>0 || itemSources?.Get(itemId) is not { Loading:false })return;
+        known=DrawWikiAcquisition(itemId);
+        if(known==0 && wikiItems?.Get(itemId) is { Loading:false })ImGui.TextDisabled(localization.Get("HoverUi.CollectionNoSource"));
+    }
+    internal void ConfigureItemSources(Community.GarlandItemSourceService service)=>itemSources=service;
+    // Garland sources of an item (duties, monsters, FATEs, quests, achievements, leves), loaded on first display; count shown.
+    private int DrawGarlandSources(uint itemId)
+    {
+        if(itemSources is null)return 0;
+        var state=itemSources.Get(itemId);
+        if(state.Loading){ImGui.TextDisabled(localization.Get("HoverUi.GarlandLoading"));return 0;}
+        if(state.List is not { } list || list.Sources.Count==0 && list.Trades is not { Count:>0 })return 0;
+        var catalog=itemCatalog.State.Catalog;
+        foreach(var trade in list.Trades ?? [])
+        {
+            ImGui.TextUnformatted(localization.Format("HoverUi.GarlandTrade",trade.Amount.ToString("N0"),catalog?.Find(trade.CurrencyId)?.Name ?? $"#{trade.CurrencyId}"));
+            if(catalog?.Find(trade.CurrencyId) is { } currency){ImGui.SameLine(0,4);DrawItemIcon(currency,new Vector2(ImGui.GetTextLineHeight()));}
+        }
+        foreach(var group in list.Sources.GroupBy(source=>source.Type).Take(6))
+            ImGui.TextUnformatted(localization.Format("HoverUi.GarlandSource",localization.Get("HoverUi.GarlandType_"+group.Key),
+                string.Join(", ",group.Select(source=>source.Name).Distinct().Take(3))+(group.Count()>3 ? localization.Format("HoverUi.More",group.Count()-3):"")));
+        ImGui.TextDisabled(localization.Get("HoverUi.GarlandCredit"));
+        return list.Sources.Count+(list.Trades?.Count ?? 0);
+    }
+
+    // Achievements whose reward is one of these items (Achievement.Item, kept by the collection observation).
+    private IEnumerable<string> AchievementsRewarding(IEnumerable<uint> itemIds)
+    {
+        var wanted=itemIds.ToHashSet();
+        if(wanted.Count==0)return [];
+        return collections.State.Entries.Where(entry=>entry.Kind==Collections.CollectionKind.Achievement && entry.Achievement is { RewardItemId:not 0 } metadata && wanted.Contains(metadata.RewardItemId))
+            .Select(entry=>entry.Name).Distinct();
+    }
+
+    // Item tooltip for the tool lists (NPC vendors…): icon, name, category and levels, collection state, stock and uses.
+    private void DrawItemInfoTooltip(uint id)
+    {
+        var item=itemCatalog.State.Catalog?.Find(id);
+        ImGui.BeginTooltip();
+        try
+        {
+            ImGui.PushTextWrapPos(ImGui.GetFontSize()*24);
+            DrawItemIcon(item,new Vector2(32));ImGui.SameLine();
+            ImGui.BeginGroup();
+            ImGui.TextColored(Accent,item?.Name ?? localization.Format("HoverUi.Item",id));
+            if(item is { UiCategoryName.Length:>0 })ImGui.TextDisabled(item.UiCategoryName);
+            ImGui.EndGroup();
+            if(item is { ItemLevel:>1 })ImGui.TextDisabled(localization.Format("HoverUi.Levels",item.ItemLevel,item.EquipLevel));
+            DrawItemCollection(item);
+            DrawHoveredStock(id);
+            DrawHoveredUsages(id);
+            // How to obtain the item itself (0.144: the sources follow the unlocking item, not only the collection page).
+            ImGui.TextColored(Accent,localization.Get("HoverUi.HowToGet"));
+            var known=0;
+            if(npcVendors?.State.Catalog?.ForItem(id) is { Count:>0 } offers){known++;ImGui.TextUnformatted(localization.Format("HoverUi.VendorCount",offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));}
+            if(quests.State.RewardIndex?.ForItem(id) is { Count:>0 } rewards){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionQuests",string.Join(", ",rewards.Take(3).Select(reward=>reward.Name))));}
+            foreach(var achievement in AchievementsRewarding([id]).Take(3)){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionAchievement",achievement));}
+            if(recipeCatalog.State.Catalog?.ForResult(id) is { Count:>0 } recipes){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionCraft",recipes.Count));}
+            if(gatheringCatalog.State.Catalog?.ForItem(id) is { Count:>0 } gathered){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionGathering",gathered[0].TypeName,gathered[0].Zone));}
+            if(item is { IsMarketable:true })ImGui.TextDisabled(localization.Get("HoverUi.CollectionMarket"));
+            if(known==0)DrawFallbackSources(id);
+            ImGui.PopTextWrapPos();
+        }
+        finally{ImGui.EndTooltip();}
     }
 
     private void DrawHoveredUsages(uint id)

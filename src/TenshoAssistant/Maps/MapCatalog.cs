@@ -64,8 +64,15 @@ public sealed record MapCatalogState(MapCatalog? Catalog, int Copied, int Total,
 /// What the game asked when its map opened: the selected map, the open request (quest, flag, link) and its territory,
 /// and the player's current map. All copied on the framework thread.
 /// </summary>
-public sealed record GameMapRequest(uint Selected, uint Requested, uint Territory, uint Current)
+// QuestId/AetheryteId/FateId: what the request points at (CurrentOpenMapInfo), used to centre the Tensho map on it.
+// QuestLog: the journal or gathering log opened the map, even when it gives no id.
+// Target: world X/Z of the game's first temporary marker (AgentMap.TempMapMarkers[0], X/Y = world × 16), where the game itself
+// centres a quest or gathering link; read the way Mappy does (reference only, AGPL, not copied).
+public sealed record GameMapRequest(uint Selected, uint Requested, uint Territory, uint Current, uint QuestId = 0, uint AetheryteId = 0, uint FateId = 0, bool QuestLog = false,
+    System.Numerics.Vector2? Target = null, uint TargetIcon = 0)
 {
+    /// <summary>A quest, aetheryte or FATE was asked: never the M toggle.</summary>
+    public bool Pointed => QuestId != 0 || AetheryteId != 0 || FateId != 0 || QuestLog || Target is not null;
     /// <summary>
     /// Map to show in the Tensho window, 0 = follow the player (M on the current zone, which toggles the window).
     /// A zone selection wins; when the selection is not a zone (world or region map, as seen in 0.111 for a quest), the

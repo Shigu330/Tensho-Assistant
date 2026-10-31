@@ -138,7 +138,8 @@ internal sealed class ItemCatalogLoader : IDisposable
                             row.LevelItem.RowId,row.LevelEquip,row.Rarity,row.PriceLow,
                             (row.IsUnique ? ItemTraits.Unique:0)|(row.IsUntradable ? ItemTraits.Untradable:0)|(row.DyeCount>0 ? ItemTraits.Dyeable:0)
                             |(row.ItemRepair.RowId!=0 ? ItemTraits.Repairable:0)|(row.IsCollectable ? ItemTraits.Collectable:0),
-                            english?.Name.ExtractText() ?? ""));
+                            english?.Name.ExtractText() ?? "",
+                            ItemUnlockCopy.Mount(row),ItemUnlockCopy.Companion(row)));
                     }
                     if (Stopwatch.GetElapsedTime(started) >= TimeSpan.FromMilliseconds(2)) break;
                 }

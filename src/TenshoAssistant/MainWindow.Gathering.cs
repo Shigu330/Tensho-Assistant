@@ -86,8 +86,13 @@ internal sealed partial class MainWindow
                         ImGui.BeginDisabled(source.MapId == 0);
                         try
                         {
+                            // Tensho map (0.118): centred on the point with the flag when its position is known, else the whole map.
                             if (ImGui.SmallButton(localization.Get("GatheringDetails.ZoneMap")))
-                                gameGui.OpenMapWithMapLink(new MapLinkPayload(source.TerritoryId, source.MapId, 20.5f, 20.5f));
+                            {
+                                if (!source.IsFishing && mapLocal?.State.Index?.Gathering(source.BaseId) is { } spot && maps.State.Catalog?.Find(source.MapId) is { } spotMap)
+                                    ShowOnTenshoMap(spotMap, new Vector3(spot.X, 0, spot.Z));
+                                else ShowMapOnTenshoMap(source.MapId);
+                            }
                         }
                         finally { ImGui.EndDisabled(); }
                         if (ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Get("GatheringDetails.MapHelp"));

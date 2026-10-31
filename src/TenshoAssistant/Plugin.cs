@@ -65,7 +65,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public Plugin(IDalamudPluginInterface pluginInterface, ICommandManager commands, IPluginLog log,
         IGameInventory inventory, IPlayerState player, IClientState client, IFramework framework, IDataManager data, IGameGui gameGui,
-        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable)
+        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,IPartyList partyList)
     {
         this.log = log;
         localization = new LocalizationManager((error, message) => log.Warning(error, message), pluginInterface.AssemblyLocation.DirectoryName);
@@ -109,11 +109,20 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>{},monsterHover.Dispose);
             mainWindow.ConfigureMonsterHover(monsterHover);
             Maps.MapLiveReader? mapLive=null;
-            registrations.Register(()=>mapLive=new Maps.MapLiveReader(framework,client,objects,data,condition,fateTable,log),()=>mapLive?.Dispose());
+            registrations.Register(()=>mapLive=new Maps.MapLiveReader(framework,client,objects,data,condition,fateTable,partyList,log),()=>mapLive?.Dispose());
             var mapLocal=new Maps.MapLocalIndexService();
             Maps.MapLocalIndexLoader? mapLocalLoader=null;
             registrations.Register(()=>mapLocalLoader=new Maps.MapLocalIndexLoader(mapLocal,data,framework,log,dataCache),()=>mapLocalLoader?.Dispose());
             mainWindow.ConfigureMapView(mapLive!,new Maps.MapMarkerSource(data,log),mapLocal);
+            var itemSources=new Community.GarlandItemSourceService(garland);
+            registrations.Register(()=>{},itemSources.Dispose);
+            mainWindow.ConfigureItemSources(itemSources);
+            var wikiItems=new Community.WikiItemAcquisitionService(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache);
+            registrations.Register(()=>{},wikiItems.Dispose);
+            mainWindow.ConfigureWikiItems(wikiItems);
+            var wikiVistas=new Maps.WikiVistaSource(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache);
+            registrations.Register(()=>{},wikiVistas.Dispose);
+            mainWindow.ConfigureWikiVistas(wikiVistas);
             Maps.NativeMapReplacer? mapReplacer=null;
             registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,()=>configuration.MapView,mainWindow.ShowMapFromGame,log),()=>mapReplacer?.Dispose());
             mainWindow.ConfigureGameMapOpener(()=>mapReplacer?.OpenGameMap());

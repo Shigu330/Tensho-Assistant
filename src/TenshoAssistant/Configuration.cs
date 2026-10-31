@@ -25,9 +25,46 @@ public sealed class MapViewSettings
     public bool ReplaceGameMap { get; set; } = true;
     // 0.114: FATEs running in the zone (live), with their area.
     public bool ShowFates { get; set; } = true;
+    // 0.127: party members, sightseeing vistas, aether currents (collected ones greyed, or hidden on request).
+    public bool ShowParty { get; set; } = true;
+    public bool ShowSightseeing { get; set; } = true;
+    public bool ShowAetherCurrents { get; set; } = true;
+    public bool HideCollected { get; set; }
+    // 0.137: NPC vendors of the cached vendor catalogue (dense, off by default).
+    public bool ShowVendors { get; set; }
     // 0.111: size of each game icon (key = icon id) on top of IconScale; 0 hides that icon, absent keeps 100 %.
     public Dictionary<uint,float> IconSizes { get; set; } = [];
-    public float SizeOf(uint icon)=>IconSizes is not null && IconSizes.TryGetValue(icon,out var value) ? !float.IsFinite(value) ? 1f:value<=0 ? 0:ClampScale(value):1f;
+    public float SizeOf(uint icon)=>IconSizes is not null && IconSizes.TryGetValue(icon,out var value) ? CleanSize(value):1f;
+    // 0.119: per-map overrides (map id → icon id → size) on top of the global table, and draw priorities (-9..9, higher on top).
+    public Dictionary<uint,Dictionary<uint,float>> MapIconSizes { get; set; } = [];
+    public Dictionary<uint,int> IconPriorities { get; set; } = [];
+    public Dictionary<uint,Dictionary<uint,int>> MapIconPriorities { get; set; } = [];
+    public const int MinimumPriority=-9,MaximumPriority=9;
+    public float SizeOf(uint icon,uint mapId)=>MapIconSizes?.GetValueOrDefault(mapId)?.TryGetValue(icon,out var value)==true ? CleanSize(value):SizeOf(icon);
+    public int PriorityOf(uint icon,uint mapId)=>Math.Clamp(MapIconPriorities?.GetValueOrDefault(mapId)?.TryGetValue(icon,out var own)==true ? own
+        :IconPriorities?.TryGetValue(icon,out var global)==true ? global:0,MinimumPriority,MaximumPriority);
+    public bool HasMapOverrides(uint mapId)=>MapIconSizes?.ContainsKey(mapId)==true || MapIconPriorities?.ContainsKey(mapId)==true;
+    /// <summary>Writes a size to the global table (mapId 0) or to that map's overrides.</summary>
+    public void SetSize(uint icon,uint mapId,float size)
+    {
+        if(mapId==0){(IconSizes??=[])[icon]=size;return;}
+        MapIconSizes??=[];if(!MapIconSizes.TryGetValue(mapId,out var own))MapIconSizes[mapId]=own=[];
+        own[icon]=size;
+    }
+    public void SetPriority(uint icon,uint mapId,int priority)
+    {
+        priority=Math.Clamp(priority,MinimumPriority,MaximumPriority);
+        if(mapId==0){(IconPriorities??=[])[icon]=priority;return;}
+        MapIconPriorities??=[];if(!MapIconPriorities.TryGetValue(mapId,out var own))MapIconPriorities[mapId]=own=[];
+        own[icon]=priority;
+    }
+    /// <summary>Back to the global settings for one map (mapId) or resets the global table (mapId 0).</summary>
+    public void Reset(uint mapId)
+    {
+        if(mapId!=0){MapIconSizes?.Remove(mapId);MapIconPriorities?.Remove(mapId);return;}
+        IconSizes?.Clear();IconPriorities?.Clear();
+    }
+    private static float CleanSize(float value)=>!float.IsFinite(value) ? 1f:value<=0 ? 0:ClampScale(value);
     public static float ClampScale(float value)=>float.IsFinite(value) ? Math.Clamp(value,0.5f,2f):1f;
     public static float ClampOpacity(float value)=>float.IsFinite(value) ? Math.Clamp(value,0.2f,1f):1f;
 }

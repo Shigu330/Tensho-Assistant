@@ -1,0 +1,21 @@
+[08:19:55 CRASHHANDLER/DBG] [DAC] GetContext hr=0x0 Rip=0x7FFA13C90F5F Rsp=0xA78C37EEA0 Rbp=0xA78C37EF50
+[08:19:55 CRASHHANDLER/DBG] [DAC] GetFrameType hr=0x0 simpleType=2 detType=0
+[08:19:55 CRASHHANDLER/DBG] [DAC] managed frame: System.Text.Encoding.GetString(System.ReadOnlySpan`1<Byte>)
+[08:19:55 CRASHHANDLER/DBG] [DAC] ---> iteration limit=7 skipNext=false
+[08:19:55 CRASHHANDLER/DBG] [DAC] Next() hr=0x0
+[08:19:55 CRASHHANDLER/DBG] [DAC] GetContext hr=0x0 Rip=0x7FFA26AF7FEE Rsp=0xA78C37EF60 Rbp=0xA78C37F0D0
+[08:19:55 CRASHHANDLER/DBG] [DAC] GetFrameType hr=0x0 simpleType=2 detType=0
+[08:19:55 CRASHHANDLER/DBG] [DAC] managed frame: FFXIVClientStructs.FFXIV.Client.System.String.Utf8String.ToString()
+[08:19:55 CRASHHANDLER/DBG] [DAC] ---> iteration limit=8 skipNext=false
+[08:19:55 CRASHHANDLER/DBG] [DAC] Next() hr=0x0
+[08:19:55 CRASHHANDLER/DBG] [DAC] GetContext hr=0x0 Rip=0x2064F950E0E Rsp=0xA78C37EFA0 Rbp=0xA78C37F0D0
+[08:19:55 CRASHHANDLER/DBG] [DAC] GetFrameType hr=0x0 simpleType=2 detType=0
+[08:19:55 CRASHHANDLER/DBG] [DAC] managed frame: TenshoAssistant.Maps.MapLiveReader.ReadEvents()
+[08:19:55 CRASHHANDLER/DBG] [DAC] ---> iteration limit=9 skipNext=false
+[08:19:55 CRASHHANDLER/DBG] [DAC] Next() hr=0x0
+[08:19:55 CRASHHANDLER/DBG] [DAC] GetContext hr=0x0 Rip=0x2064F94DEFE Rsp=0xA78C37F0E0 Rbp=0xA78C37F230
+[08:19:55 CRASHHANDLER/DBG] [DAC] GetFrameType hr=0x0 simpleType=2 detType=0
+[08:19:55 CRASHHANDLER/DBG] [DAC] managed frame: TenshoAssistant.Maps.MapLiveReader.Update(Dalamud.Plugin.Services.IFramework)
+[08:19:55 CRASHHANDLER/DBG] [DAC] ---> iteration limit=10 skipNext=false
+[08:19:55 CRASHHANDLER/DBG] [DAC] Next() hr=0x0
+[08:19:55 CRASHHANDLER/DBG] [DAC] GetContext hr=0x0 Rip=0x7FF965D4E77D Rsp=0xA78C37F240 Rbp=0xA78C37F330

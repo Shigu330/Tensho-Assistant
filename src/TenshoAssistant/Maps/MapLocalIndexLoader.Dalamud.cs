@@ -109,19 +109,66 @@ internal sealed class MapLocalIndexLoader : IDisposable
     private IEnumerable<int> Copy()
     {
         var count=0;
+        var givers=new Dictionary<uint,MapLocalPosition>();
         foreach(var quest in data.GetExcelSheet<Quest>())
         {
             if(quest.IssuerLocation.RowId!=0 && quest.IssuerLocation.IsValid)
             {
                 var level=quest.IssuerLocation.Value;
-                if(level.Map.RowId!=0)rows.Add(new(MapLocalKind.QuestIssuer,quest.RowId,level.Map.RowId,level.X,level.Z,level.Radius));
+                if(level.Map.RowId!=0){var giver=new MapLocalPosition(MapLocalKind.QuestIssuer,quest.RowId,level.Map.RowId,level.X,level.Z,level.Radius);rows.Add(giver);givers[quest.RowId]=giver;}
             }
             yield return ++count;
+        }
+        // Sightseeing log vistas (Adventure → Level).
+        foreach(var vista in data.GetExcelSheet<Adventure>())
+        {
+            if(vista.Level.RowId!=0 && vista.Level.IsValid && vista.Level.Value.Map.RowId!=0 && vista.Name.ExtractText() is { Length:>0 } name)
+            {
+                var level=vista.Level.Value;
+                var emote=vista.Emote.RowId!=0 && vista.Emote.IsValid ? vista.Emote.Value.Name.ExtractText():"";
+                rows.Add(new(MapLocalKind.Sightseeing,vista.RowId,level.Map.RowId,level.X,level.Z,0,(uint)Math.Max(0,vista.IconDiscovered),name,vista.MinTime,vista.MaxTime,emote));
+            }
+            yield return ++count;
+        }
+        // Aether currents: quest ones at the quest giver; field ones where a Level places the EObj that carries them.
+        var currents=data.GetExcelSheet<AetherCurrent>();
+        foreach(var current in currents)
+        {
+            if(current.Quest.RowId!=0 && givers.TryGetValue(current.Quest.RowId,out var giver))
+                rows.Add(new(MapLocalKind.AetherCurrent,current.RowId,giver.MapId,giver.X,giver.Z,0,current.Quest.RowId));
+            yield return ++count;
+        }
+        var currentObjects=new Dictionary<uint,uint>();
+        foreach(var obj in data.GetExcelSheet<EObj>())
+        {
+            if(obj.Data.RowId!=0 && currents.HasRow(obj.Data.RowId))currentObjects.TryAdd(obj.RowId,obj.Data.RowId);
+            yield return ++count;
+        }
+        foreach(var level in data.GetExcelSheet<Level>())
+        {
+            if(level.Map.RowId!=0 && currentObjects.TryGetValue(level.Object.RowId,out var currentId))
+                rows.Add(new(MapLocalKind.AetherCurrent,currentId,level.Map.RowId,level.X,level.Z,0));
+            if((count & 63)==0)yield return count;
+            count++;
         }
         // ExportedGatheringPoint shares its row id with GatheringPointBase; X/Y are world X/Z.
         foreach(var point in data.GetExcelSheet<ExportedGatheringPoint>())
         {
             if(point.X!=0 || point.Y!=0)rows.Add(new(MapLocalKind.GatheringPoint,point.RowId,0,point.X,point.Y,point.Radius));
+            yield return ++count;
+        }
+        // FishingSpot X/Z are texture pixels of the territory's map: world = (pixel − 1024) / scale − offset.
+        foreach(var spot in data.GetExcelSheet<FishingSpot>())
+        {
+            if(spot.TerritoryType.RowId!=0 && spot.TerritoryType.IsValid && (spot.X!=0 || spot.Z!=0) && spot.TerritoryType.Value.Map.IsValid)
+            {
+                var map=spot.TerritoryType.Value.Map.Value;
+                if(map.SizeFactor>0)
+                {
+                    var scale=map.SizeFactor/100f;
+                    rows.Add(new(MapLocalKind.FishingSpot,spot.RowId,map.RowId,(spot.X-1024f)/scale-map.OffsetX,(spot.Z-1024f)/scale-map.OffsetY,0));
+                }
+            }
             yield return ++count;
         }
     }

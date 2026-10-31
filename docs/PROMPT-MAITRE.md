@@ -153,18 +153,9 @@ Ne la supprime pas silencieusement.
 
 ---
 
-# 5. ACT / COMBAT — DOMAINE COMPLÉMENTAIRE
+# 5. ACT / COMBAT — RETIRÉ
 
-ACT / IINACT ou une source équivalente peut être étudié comme référence technique complémentaire pour un éventuel domaine Combat.
-
-Cependant :
-
-- ACT n'est PAS le plugin #18 ;
-- il ne déplace aucun des 17 plugins ;
-- il ne devient pas prioritaire devant eux ;
-- son étude ne doit pas retarder les fonctionnalités principales.
-
-Le domaine Combat doit rester séparé de la matrice principale des 17 plugins tant qu'il n'est pas explicitement promu dans le périmètre principal.
+ACT / IINACT et le domaine Combat sont retirés du projet (décision utilisateur 2026-10-31). Aucune étude ni code.
 
 ---
 

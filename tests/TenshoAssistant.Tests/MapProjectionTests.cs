@@ -30,6 +30,24 @@ internal static class MapProjectionTests
             Check(new GameMapRequest(697,696,0,696).Resolve(catalog)==697,"a zone selection wins");
             Check(new GameMapRequest(697,0,0,696).Resolve(catalog)==697,"another zone selected");
             Check(new GameMapRequest(world,0,0,696).Resolve(catalog)==world,"nothing else known: the selection stays");
+            Check(!new GameMapRequest(696,0,0,696).Pointed && new GameMapRequest(696,0,0,696,QuestLog:true).Pointed && new GameMapRequest(696,0,0,696,QuestId:65539).Pointed,"journal or quest = pointed, never the M toggle");
+            Check(new GameMapRequest(696,0,0,696,Target:new System.Numerics.Vector2(10,20)).Pointed,"a game target is pointed");
+        }),
+        ("Per-map icon overrides win over the global table, priorities clamp and reset per scope",()=>
+        {
+            var settings=new TenshoAssistant.MapViewSettings();
+            settings.SetSize(60453,0,1.5f);settings.SetSize(60453,696,0);settings.SetPriority(60453,0,3);settings.SetPriority(60412,696,42);
+            Check(settings.SizeOf(60453,1)==1.5f && settings.SizeOf(60453,696)==0 && settings.SizeOf(1,696)==1,"map override, global fallback, default");
+            Check(settings.PriorityOf(60453,696)==3 && settings.PriorityOf(60412,696)==9 && settings.PriorityOf(60412,1)==0,"priority fallback and clamp");
+            Check(settings.HasMapOverrides(696) && !settings.HasMapOverrides(1),"overrides known");
+            var copy=System.Text.Json.JsonSerializer.Deserialize<TenshoAssistant.MapViewSettings>(System.Text.Json.JsonSerializer.Serialize(settings))!;
+            Check(copy.SizeOf(60453,696)==0 && copy.PriorityOf(60412,696)==9 && copy.SizeOf(60453,2)==1.5f,"JSON roundtrip");
+            settings.Reset(696);
+            Check(!settings.HasMapOverrides(696) && settings.SizeOf(60453,696)==1.5f,"back to global for one map");
+            settings.Reset(0);
+            Check(settings.SizeOf(60453,696)==1 && settings.PriorityOf(60453,696)==0,"global reset");
+            var old=System.Text.Json.JsonSerializer.Deserialize<TenshoAssistant.MapViewSettings>("{\"IconSizes\":{\"60453\":0}}")!;
+            Check(old.SizeOf(60453,696)==0 && old.PriorityOf(60453,696)==0,"0.111 configuration still applies");
         }),
         ("Per-icon sizes default to 100 %, hide at 0, clamp and survive JSON",()=>
         {

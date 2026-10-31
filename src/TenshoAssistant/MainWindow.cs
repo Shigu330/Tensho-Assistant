@@ -63,6 +63,8 @@ internal sealed partial class MainWindow : Window, IDisposable
     private string questCategory = string.Empty;
     private int questFilter = 1;
     private CollectionKind collectionKind;
+    // Tab to bring forward when another tool opens a collection entry (0.142).
+    private CollectionKind? focusCollectionKind;
     private string collectionQuery = string.Empty;
     private int collectionFilter;
     private uint selectedBlueSpell;

@@ -27,7 +27,7 @@ public sealed class DataCache : IDisposable
             JsonSerializer.Serialize(writer,new RewardData(value.Mode,value.Gil,value.Items.ToArray(),value.Unresolved.ToArray(),value.HasAdditionalRewards,value.DataVersion),options);
     }
     public const int MaximumEntryBytes=32*1024*1024;
-    private const int MaximumFiles=256;
+    private const int MaximumFiles=2048;
     private const long MaximumDiskBytes=256L*1024*1024;
     private static readonly JsonSerializerOptions JsonOptions=new(){MaxDepth=64,Converters={new RewardConverter()}};
     private readonly string root;
@@ -110,16 +110,41 @@ public sealed class DataCache : IDisposable
             writes=pending;return pending;
         }
     }
+    // 0.145: the cache had reached its 256 MiB limit (one 4.8 MB quest file per plugin version, old catalogue shapes) and the
+    // oldest-first rule then deleted the catalogues and the Garland sources, which were read again each time. Now: only the
+    // newest file of each family + scope is kept (a new version replaces the old one); « catalog-* » files are never removed
+    // by the file count; other entries (sources, wiki…) keep up to MaximumFiles; the byte limit removes small entries first.
     private void Trim()
     {
         var files=new DirectoryInfo(root).EnumerateFiles("*.json").Where(file=>file.Name.Length==69 && file.Name[..64].All(Uri.IsHexDigit))
-            .OrderByDescending(file=>file.LastWriteTimeUtc).ToArray();
-        long bytes=0;
-        for(var index=0;index<files.Length;index++)
+            .OrderByDescending(file=>file.LastWriteTimeUtc).Select(file=>(File:file,Identity:Identity(file))).ToArray();
+        var seen=new HashSet<(string,string)>();var kept=new List<(FileInfo File,bool Catalogue)>();
+        foreach(var (file,identity) in files)
         {
-            bytes+=files[index].Length;
-            if(index>=MaximumFiles || bytes>MaximumDiskBytes)files[index].Delete();
+            if(identity is { } key && !seen.Add(key)){Delete(file);continue;}
+            kept.Add((file,identity?.Family.StartsWith("catalog-",StringComparison.Ordinal)==true));
         }
+        var others=0;long bytes=kept.Where(entry=>entry.Catalogue).Sum(entry=>entry.File.Length);
+        foreach(var (file,catalogue) in kept)
+        {
+            if(catalogue)continue;
+            bytes+=file.Length;
+            if(++others>MaximumFiles || bytes>MaximumDiskBytes)Delete(file);
+        }
+    }
+    private static void Delete(FileInfo file){try{file.Delete();}catch(Exception error) when(error is IOException or UnauthorizedAccessException){}}
+    // Family and scope from the file header ({"Schema":1,"Family":"…","Scope":"…",…}); null when unreadable (then only the limits apply).
+    private static (string Family,string Scope)? Identity(FileInfo file)
+    {
+        try
+        {
+            using var stream=file.OpenRead();var buffer=new byte[4096];var read=stream.Read(buffer,0,buffer.Length);
+            var head=System.Text.Encoding.UTF8.GetString(buffer,0,read);
+            var family=System.Text.RegularExpressions.Regex.Match(head,@"""Family"":""((?:[^""\\]|\\.)*)""");
+            var scope=System.Text.RegularExpressions.Regex.Match(head,@"""Scope"":""((?:[^""\\]|\\.)*)""");
+            return family.Success && scope.Success ? (family.Groups[1].Value,scope.Groups[1].Value):null;
+        }
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){return null;}
     }
     public Task FlushAsync(){lock(gate)return writes;}
     public Task<bool> InvalidateAsync(string family,string scope,string version)=>WriteAsync<object?>(family,scope,version,null,DateTimeOffset.MinValue);

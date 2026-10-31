@@ -30,6 +30,15 @@ public sealed class CollectionService
     private int refresh;
     public CollectionState State => Volatile.Read(ref state);
     public void RequestRefresh() => Interlocked.Exchange(ref refresh, 1);
+    // Whether the game has sent the title / achievement lists (only after their window was opened); null = not read yet.
+    private int titlesLoaded=-1,achievementsLoaded=-1;
+    public bool? TitleListLoaded=>Volatile.Read(ref titlesLoaded) is var value && value<0 ? null:value==1;
+    public bool? AchievementListLoaded=>Volatile.Read(ref achievementsLoaded) is var value && value<0 ? null:value==1;
+    internal void SetListsLoaded(bool? titles,bool? achievements)
+    {
+        Volatile.Write(ref titlesLoaded,titles is null ? -1:titles.Value ? 1:0);
+        Volatile.Write(ref achievementsLoaded,achievements is null ? -1:achievements.Value ? 1:0);
+    }
     internal bool ConsumeRefresh() => Interlocked.Exchange(ref refresh, 0) == 1;
     internal void Publish(ulong characterId, IEnumerable<CollectionEntry> entries,IEnumerable<CollectionCategoryIssue>? issues=null,DateTimeOffset? observedAt=null,bool fromCache=false)
     {

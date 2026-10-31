@@ -22,6 +22,44 @@ if(Environment.GetEnvironmentVariable("PROBE_LOCAL") is { Length:>0 })
     Console.WriteLine($"GATHER bases={bases.Count} exported={exported.Count} basesWithExport={bases.Count(row=>exported.TryGetRow(row.RowId,out var e) && (e.X!=0 || e.Y!=0))}");
     foreach(var point in data.Excel.GetSheet<GatheringPoint>().Where(point=>point.GatheringPointBase.RowId!=0 && point.TerritoryType.RowId!=0).Take(3))
         if(exported.TryGetRow(point.GatheringPointBase.RowId,out var e))Console.WriteLine($"  point {point.RowId} base {point.GatheringPointBase.RowId} territory {point.TerritoryType.RowId} x={e.X:0.0} y={e.Y:0.0} r={e.Radius} type {e.GatheringType.RowId}");
+    // 0.126: FishingSpot X/Z coordinate system, checked against Garland (spot 2 The Vein 22.9/22.18, spot 35 Lower Decks 7.69/12.21).
+    foreach(var spot in data.Excel.GetSheet<FishingSpot>().Where(spot=>spot.RowId is 2 or 35))
+    {
+        var map=spot.TerritoryType.Value.Map.Value;double scale=map.SizeFactor/100.0;
+        double World(double world,int offset)=>41.0/scale*((world+offset)*scale+1024.0)/2048.0+1.0;
+        double Pixel(double pixel)=>41.0/scale*pixel/2048.0+1.0;
+        Console.WriteLine($"FISH {spot.RowId} x={spot.X} z={spot.Z} r={spot.Radius} map {map.RowId} size {map.SizeFactor} offset {map.OffsetX}/{map.OffsetY} "
+            +$"asWorld=({World(spot.X,map.OffsetX):0.00},{World(spot.Z,map.OffsetY):0.00}) asPixel=({Pixel(spot.X):0.00},{Pixel(spot.Z):0.00})");
+    }
+    // 0.146: which achievements reward these mount items (Achievement.Item).
+    foreach(var achievement in data.Excel.GetSheet<Achievement>().Where(row=>row.Item.RowId is 41498 or 40382 or 39486))
+        Console.WriteLine($"ACHIEVEMENT {achievement.RowId} '{achievement.Name.ExtractText()}' item {achievement.Item.RowId}");
+    Console.WriteLine("ACHIEVEMENT scan done");
+    // 0.141: ItemAction type → collection (mount / minion), checked by the Data[0] row name against the item name family.
+    var mountSheet=data.Excel.GetSheet<Mount>();var companionSheet=data.Excel.GetSheet<Companion>();
+    foreach(var group in data.Excel.GetSheet<Item>().Where(item=>item.ItemAction.RowId!=0 && item.ItemAction.IsValid).GroupBy(item=>item.ItemAction.Value.Action.RowId).OrderByDescending(group=>group.Count()).Take(25))
+    {
+        var sample=group.First();var key=sample.ItemAction.Value.Data[0];
+        var mount=mountSheet.TryGetRow(key,out var m) ? m.Singular.ExtractText():"";var companion=companionSheet.TryGetRow(key,out var c) ? c.Singular.ExtractText():"";
+        Console.WriteLine($"ACTION type {group.Key} items {group.Count()} sample '{sample.Name.ExtractText()}' data0 {key} mount '{mount}' companion '{companion}'");
+    }
+    // 0.139: map symbol icons and their names (shop icon for NPC vendors).
+    foreach(var symbol in data.Excel.GetSheet<MapSymbol>().Where(row=>row.Icon>0 && row.PlaceName.RowId!=0))
+        Console.WriteLine($"SYMBOL {symbol.Icon} '{symbol.PlaceName.Value.Name.ExtractText()}'");
+    // 0.127: sightseeing (Adventure → Level) and aether currents (EObj.Data = AetherCurrent, placed by a Level whose Object is the EObj).
+    var adventures=data.Excel.GetSheet<Adventure>().Where(row=>row.Name.ExtractText().Length>0).ToList();
+    Console.WriteLine($"ADVENTURE named={adventures.Count} firstRow={adventures.First().RowId} lastRow={adventures.Last().RowId} withLevelMap={adventures.Count(row=>row.Level.IsValid && row.Level.Value.Map.RowId!=0)}");
+    foreach(var row in adventures.Take(5))
+    {
+        var l=row.Level.Value;var m=l.Map.Value;double s=m.SizeFactor/100.0;
+        double C(double w,int o)=>41.0/s*((w+o)*s+1024.0)/2048.0+1.0;
+        Console.WriteLine($"  adv {row.RowId} '{row.Name.ExtractText()}' place '{row.PlaceName.Value.Name.ExtractText()}' level {l.RowId} map {l.Map.RowId} terr {l.Territory.RowId} x={l.X:0.0} y={l.Y:0.0} z={l.Z:0.0} coord=({C(l.X,m.OffsetX):0.0},{C(l.Z,m.OffsetY):0.0}) type {l.Type} object {l.Object.RowId} time {row.MinTime}-{row.MaxTime} emote {row.Emote.RowId} '{(row.Emote.IsValid ? row.Emote.Value.Name.ExtractText():"")}' level {row.MinLevel}-{row.MaxLevel}");
+    }
+    var currents=data.Excel.GetSheet<AetherCurrent>();
+    var currentObjects=data.Excel.GetSheet<EObj>().Where(obj=>obj.Data.RowId!=0 && currents.HasRow(obj.Data.RowId) && obj.Data.RowId>=0x2B0000).ToDictionary(obj=>obj.RowId,obj=>obj.Data.RowId);
+    var placed=levels.Where(level=>currentObjects.ContainsKey(level.Object.RowId) && level.Map.RowId!=0).ToList();
+    Console.WriteLine($"CURRENT rows={currents.Count} first={currents.First().RowId} withQuest={currents.Count(row=>row.Quest.RowId!=0)} eobjs={currentObjects.Count} placedByLevel={placed.Count} distinctCurrents={placed.Select(level=>currentObjects[level.Object.RowId]).Distinct().Count()}");
+    foreach(var level in placed.Take(3))Console.WriteLine($"  current {currentObjects[level.Object.RowId]} eobj {level.Object.RowId} map {level.Map.RowId} x={level.X:0.0} z={level.Z:0.0}");
     return;
 }
 var items=data.Excel.GetSheet<Item>();

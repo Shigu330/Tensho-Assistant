@@ -61,4 +61,4 @@ MISE À JOUR 2026-10-27 / 0.5.27 : les anciens états READY/TODO de CRAFT-001A c
 - CRAFT-001 TODO après ITEM-001 : catalogue Recipe + RecipeLevelTable + ingrédients ; chemin recette → besoins.
 - Runtime CORE-000 à effectuer : chargement, commande, préférence, rechargement/déchargement et logs dans un client FFXIV approprié.
 - Les phases suivantes de chaque plugin restent dans ROADMAP.md. Les dépôts non fournis doivent être identifiés et leurs licences vérifiées au moment de leur étude ciblée (NEEDS_STUDY).
-- Combat/ACT/IINACT : complément séparé, aucune priorité devant les 17 plugins.
+- Combat/ACT/IINACT : retiré du projet (décision utilisateur 2026-10-31).

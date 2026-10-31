@@ -70,6 +70,8 @@ internal sealed partial class CollectionReader : IDisposable
         var owner = client.IsLoggedIn && player.IsLoaded ? player.ContentId : 0;
         var now = Stopwatch.GetTimestamp();
         if(!scanning && owner!=0 && CompletionLoadingChanged())service.RequestRefresh();
+        try{service.SetListsLoaded(owner==0 ? null:unlocks.IsTitleListLoaded,owner==0 ? null:unlocks.IsAchievementListLoaded);}
+        catch{service.SetListsLoaded(null,null);}
         var force=service.ConsumeRefresh();
         if (owner != character || force || (!scanning && restore is null && owner!=0 && now >= nextRefresh && !CacheAge.Fresh(service.State.ObservedAt,DateTimeOffset.UtcNow,cacheLifetime())))
         {

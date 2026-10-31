@@ -79,3 +79,13 @@ Decision: Une destination Objets & rangements avec icônes du jeu, filtres et ru
 Reason: Réunit les emplacements autour de l'objet tout en conservant la fraîcheur et la portée explicites.
 Consequences: Pas de migration de banque ni nouvelle lecture native ; images empruntées au provider de l'hôte. Ancienne page Banque fusionnée, gestion des imports repliable ; nouveau contrôle visuel requis en 0.4.0.
 References: REF-ITEM-TEXTURES, TESTING.md UI-005, ARCHITECTURE.md vue unifiée
+
+DEC-ID: DEC-009
+Timestamp: 2026-10-31 Europe/Brussels
+Problem: ACT/IINACT et un domaine Combat figuraient comme étude complémentaire ; dépôt git ajouté avec les archives des points de contrôle suivies.
+Evidence: Demande utilisateur 2026-10-31 : « retire tout ce qui touche à ACT, on va pas le faire » ; « j'ai ajouté un repo git, pense à faire le nécessaire pour gitignore ».
+Options: Garder ACT en étude facultative ; le retirer du périmètre. Garder les zips dans git ; les ignorer.
+Decision: ACT/IINACT et Combat retirés du projet (docs mises à jour, aucun code concerné). Archives checkpoints/*.zip ignorées par git (gardées sur disque) ; logs et notes de vérification restent suivis.
+Reason: Décision de périmètre de l'utilisateur ; l'historique git conserve déjà chaque version du code.
+Consequences: Les zips restent créés à chaque version mais hors dépôt. Les commits sont faits automatiquement par l'application de bureau, pas par l'agent. Les zips déjà présents dans l'historique local ne sont pas réécrits.
+References: .gitignore, docs/PROMPT-MAITRE.md §5, CLAUDE.md

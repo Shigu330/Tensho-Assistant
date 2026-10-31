@@ -11,7 +11,7 @@ namespace TenshoAssistant;
 // (MapLocalIndexLoader, DataCache « catalog-map-positions »); quests and gathering reuse their already cached catalogues.
 internal sealed partial class MainWindow
 {
-    private bool mapLocalShowComplete;private bool mapTeleportRequested;
+    private bool mapLocalShowComplete;private bool mapTeleportRequested;private bool mapLocalCloseMenu;
     private string mapLocalQuestCategory="",mapLocalGatheringType="";
 
     private void DrawMapLocalLists(MapDefinition map,MapLiveState? live)
@@ -26,6 +26,9 @@ internal sealed partial class MainWindow
                 if(ImGui.BeginTabItem(localization.Get("MapLocal.Fates"))){try{DrawLocalFates(map,live);}finally{ImGui.EndTabItem();}}
                 if(ImGui.BeginTabItem(localization.Get("MapLocal.Gathering"))){try{DrawLocalGathering(map);}finally{ImGui.EndTabItem();}}
                 if(ImGui.BeginTabItem(localization.Get("MapLocal.Aetherytes"))){try{DrawLocalAetherytes(map);}finally{ImGui.EndTabItem();}}
+                if(ImGui.BeginTabItem(localization.Get("MapLocal.Vendors"))){try{DrawLocalVendors(map);}finally{ImGui.EndTabItem();}}
+                if(ImGui.BeginTabItem(localization.Get("MapLocal.Sightseeing"))){try{DrawLocalCollectibles(map,live,MapLocalKind.Sightseeing);}finally{ImGui.EndTabItem();}}
+                if(ImGui.BeginTabItem(localization.Get("MapLocal.Currents"))){try{DrawLocalCollectibles(map,live,MapLocalKind.AetherCurrent);}finally{ImGui.EndTabItem();}}
             }
             finally{ImGui.EndTabBar();}
         }
@@ -67,6 +70,7 @@ internal sealed partial class MainWindow
             var world=new Vector3(item.Position.X,0,item.Position.Z);
             var status=item.Quest.Progress switch{QuestProgress.Active=>localization.Get("MapLocal.Active"),QuestProgress.Complete=>localization.Get("MapLocal.Complete"),_=>""};
             if(ImGui.Selectable($"{localization.Format("MapLocal.Level",item.Quest.Level)}  {item.Quest.Name}  {status}##Quest{item.Quest.Id}"))FlagAt(map,world);
+            ToolMenu($"QuestTool{item.Quest.Id}","MapLocal.OpenQuestTool",()=>{SelectQuest(item.Quest.Id);questShowDetails=true;page=Page.Quests;});
             if(ImGui.IsItemHovered())ImGui.SetTooltip(CoordinateText(map,world)+"\n"+localization.Get("MapLocal.ClickFlag"));
         });
     }
@@ -104,11 +108,13 @@ internal sealed partial class MainWindow
             {
                 var world=new Vector3(position.X,0,position.Z);
                 if(ImGui.Selectable($"{label}##Gathering{point.BaseId}"))FlagAt(map,world);
-                if(ImGui.IsItemHovered())ImGui.SetTooltip(names+"\n"+CoordinateText(map,world)+"\n"+localization.Get("MapLocal.ClickFlag"));
+                ToolMenu($"GatheringTool{point.BaseId}","MapLocal.OpenGatheringTool",()=>{itemId=(int)point.Items[0];page=Page.Gathering;});
+                if(ImGui.IsItemHovered())DrawGatheringTooltip(point);
             }
             else
             {
                 ImGui.TextDisabled(label);
+                ToolMenu($"GatheringTool{point.BaseId}","MapLocal.OpenGatheringTool",()=>{itemId=(int)point.Items[0];page=Page.Gathering;});
                 if(ImGui.IsItemHovered())ImGui.SetTooltip(names+"\n"+localization.Get("MapLocal.NoPosition"));
             }
         });
@@ -137,6 +143,53 @@ internal sealed partial class MainWindow
         else ImGui.EndChild();
     }
 
+    // Sightseeing vistas and aether currents of the map with their state (read in game), number and coordinates, to compare
+    // with the game's logs; a click places the flag.
+    private void DrawLocalCollectibles(MapDefinition map,MapLiveState? live,MapLocalKind kind)
+    {
+        if(LocalIndexOrStatus() is not { } index)return;
+        var rows=index.OnMap(kind,map.MapId);
+        if(rows.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
+        var collected=kind==MapLocalKind.Sightseeing ? live?.Sightseen:live?.UnlockedCurrents;
+        var done=collected is null ? 0:rows.Count(row=>collected.Contains(row.Id));
+        ImGui.TextDisabled(collected is null ? localization.Get("MapView.CollectedUnknown"):localization.Format("MapLocal.CollectedCount",done,rows.Count));
+        // Vista numbers follow the sightseeing log order (row order from the first row of the sheet).
+        var first=kind==MapLocalKind.Sightseeing ? 2162688u:0u;
+        foreach(var row in rows.OrderBy(row=>row.Id))
+        {
+            var world=new Vector3(row.X,0,row.Z);
+            bool? state=collected is null ? null:collected.Contains(row.Id);
+            var mark=state switch{true=>"[x]",false=>"[ ]",_=>"[?]"};
+            var name=kind==MapLocalKind.Sightseeing
+                ? $"n° {row.Id-first+1:000}  {row.Name}"
+                : row.Data!=0 ? localization.Get("MapView.CurrentQuest")+(quests.State.Entries.FirstOrDefault(entry=>entry.Id==row.Data)?.Name is { Length:>0 } quest ? " · "+quest:""):localization.Get("MapView.CurrentField");
+            ImGui.PushStyleColor(ImGuiCol.Text,state==true ? UI.FfxivTheme.TextMuted:UI.FfxivTheme.Text);
+            try{if(ImGui.Selectable($"{mark}  {name}  ({CoordinateText(map,world)})##Collectible{kind}{row.Id}"))FlagAt(map,world);}
+            finally{ImGui.PopStyleColor();}
+            if(ImGui.IsItemHovered())
+            {
+                if(kind==MapLocalKind.Sightseeing)DrawSightseeingTooltip(row,state);
+                else ImGui.SetTooltip(localization.Get("MapLocal.ClickFlag"));
+            }
+        }
+    }
+
+    // NPC vendors of the map from the cached vendor catalogue, by name; click = flag, hover = shops.
+    private void DrawLocalVendors(MapDefinition map)
+    {
+        if(npcVendors?.State.Catalog is null){ImGui.TextDisabled(localization.Get("MapLocal.VendorsLoading"));return;}
+        var rows=MapVendors(map);
+        if(rows.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
+        ImGui.TextDisabled(localization.Format("MapLocal.VendorCount",rows.Count));
+        foreach(var (vendor,spot) in rows.OrderBy(row=>row.Vendor.Name,StringComparer.CurrentCultureIgnoreCase))
+        {
+            var name=vendor.Name.Length>0 ? vendor.Name:localization.Get("MapLocal.UnnamedVendor");
+            if(ImGui.Selectable($"{name}  (X {spot.X:0.0}  Y {spot.Y:0.0})##Vendor{vendor.NpcId}/{spot.X}/{spot.Y}")){PlaceFlagFromMapView(map,spot.X,spot.Y);ImGui.CloseCurrentPopup();}
+            ToolMenu($"VendorTool{vendor.NpcId}/{spot.X}/{spot.Y}","MapLocal.OpenVendorTool",()=>{npcVendorFocus=vendor.NpcId;page=Page.NpcVendors;});
+            if(ImGui.IsItemHovered())ImGui.SetTooltip(VendorLabel(vendor)+"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
+        }
+    }
+
     private void DrawLocalAetherytes(MapDefinition map)
     {
         var aetherytes=(mapMarkers?.For(map.MarkerRange) ?? []).Where(marker=>marker.AetheryteId!=0).ToArray();
@@ -150,6 +203,13 @@ internal sealed partial class MainWindow
         }
     }
 
+    // Right click on a row (0.118, user request): open the matching tool on that entry instead of placing the flag.
+    private void ToolMenu(string id,string labelKey,Action open)
+    {
+        if(!ImGui.BeginPopupContextItem(id))return;
+        try{if(ImGui.Selectable(localization.Get(labelKey))){open();IsOpen=true;mapLocalCloseMenu=true;}}
+        finally{ImGui.EndPopup();}
+    }
     private void DrawSmallGameIcon(uint icon)
     {
         var size=new Vector2(ImGui.GetTextLineHeight());

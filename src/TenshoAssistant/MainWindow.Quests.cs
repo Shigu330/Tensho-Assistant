@@ -157,11 +157,11 @@ internal sealed partial class MainWindow
             var issuerMap = maps.State.Catalog?.Find(entry.IssuerMapId);
             if (issuerMap is not null && issuerMap.TerritoryId == entry.IssuerTerritoryId)
             {
+                // Tensho map (0.118): centred on the quest giver with the flag (cached position index), else the whole map.
                 if (ImGui.SmallButton(localization.Get("QuestDetails.Map")+"###QuestMap"))
                 {
-                    selectedMapId = issuerMap.MapId; mapQuery = "";
-                    selectedBookmark = Guid.Empty; bookmarkName = ""; bookmarkSaved = false;
-                    mapX = 20.5f; mapY = 20.5f; mapOpenError = null; page = Page.Maps;
+                    if (mapLocal?.State.Index?.Quest(entry.Id) is { } giver && giver.MapId == issuerMap.MapId) ShowOnTenshoMap(issuerMap, new Vector3(giver.X, 0, giver.Z));
+                    else ShowMapOnTenshoMap(issuerMap.MapId);
                 }
                 if (ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Get("QuestDetails.MapHelp"));
             }

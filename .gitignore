@@ -1,5 +1,12 @@
 **/bin/
 **/obj/
 .vs/
+.vscode/
+.idea/
 *.user
+*.suo
 artifacts/
+TestResults/
+
+# Checkpoint source archives: git history now holds every version; the zips stay on disk only.
+checkpoints/*.zip

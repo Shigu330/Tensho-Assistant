@@ -1,0 +1,11 @@
+QUEST rows=5533 issuer=5292 issuerWithMap=5292
+  quest 65537 'Savoir tendre la main' level 1141124 map 2 x=49,8 z=51,8
+  quest 65539 'La voie de la botanique' level 1143529 map 3 x=-238,0 z=-142,9
+  quest 65540 'Dites-le avec des gâteaux' level 1565640 map 3 x=-233,9 z=-171,0
+FATE named=1712 locationIsLevelWithMap=0 icons=60721:623,60722:436,60724:126,60723:90,60725:27,60726:2,0:9,60727:1,60852:76,60728:7,60858:252,63914:25,63915:27,63917:2,63916:4,60806:5
+GATHER bases=1426 exported=1078 basesWithExport=1077
+  point 30001 base 153 territory 1 x=-115,9 y=209,2 r=53 type 0
+  point 30002 base 154 territory 1 x=261,1 y=209,0 r=61 type 0
+  point 30003 base 155 territory 1 x=-64,9 y=54,2 r=50 type 0
+FISH 2 x=1094 z=1058 r=400 map 4 size 100 offset 0/0 asWorld=(43,40,42,68) asPixel=(22,90,22,18)
+FISH 35 x=668 z=1120 r=3000 map 12 size 200 offset 0/0 asWorld=(24,62,33,67) asPixel=(7,69,12,21)

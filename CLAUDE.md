@@ -57,4 +57,4 @@ PROMPT-MAITRE > RULES.md > ce fichier.
   X.Y.Z-verification.md et TenshoAssistant-X.Y.Z-source.zip (dépôt sans bin/obj ni
   anciennes archives) avant de demander un essai en jeu. Écart 0.76→0.90 : voir
   checkpoints/0.91.0-verification.md.
-- Combat/ACT/IINACT : complément séparé, jamais prioritaire devant les 17 plugins.
+- Combat/ACT/IINACT : retiré du projet (décision utilisateur 2026-10-31), ne rien faire dessus.

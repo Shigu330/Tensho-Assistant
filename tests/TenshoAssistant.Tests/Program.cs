@@ -748,6 +748,10 @@ tests = tests.Concat(NpcVendorTests.Cases).ToArray();
 tests = tests.Concat(ThemePaletteTests.Cases).ToArray();
 tests = tests.Concat(MapProjectionTests.Cases).ToArray();
 tests = tests.Concat(MapLocalIndexTests.Cases).ToArray();
+tests = tests.Concat(WikiVistaTests.Cases).ToArray();
+tests = tests.Concat(GarlandItemSourceTests.Cases).ToArray();
+tests = tests.Concat(WikiItemAcquisitionTests.Cases).ToArray();
+
 tests = tests.Concat(FishingNotebookTests.Cases).ToArray();
 tests = tests.Concat(FishingSourcesTests.Cases).ToArray();
 tests = tests.Concat(FishingConditionsTests.Cases).ToArray();

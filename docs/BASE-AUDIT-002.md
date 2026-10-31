@@ -2,7 +2,7 @@
 
 2026-10-29. Audit ciblé de livraison et de périmètre ; aucune validation de jeu ajoutée.
 
-- Liste autoritaire comparée à la matrice ROADMAP et au répertoire du code : 17 noms distincts présents, aucun manquant. Le répertoire a 18 entrées car la banque commune s’ajoute aux 17 références prioritaires. Aucun plugin prioritaire supprimé ou remplacé par ACT/Combat.
+- Liste autoritaire comparée à la matrice ROADMAP et au répertoire du code : 17 noms distincts présents, aucun manquant. Le répertoire a 18 entrées car la banque commune s’ajoute aux 17 références prioritaires. Aucun plugin prioritaire supprimé.
 - Les 17 couvertures de la matrice restent PARTIAL. Cet audit ne prouve ni leur remplacement complet ni le fonctionnement runtime des nouveaux lecteurs.
 - 61 fichiers Markdown hors bin/obj/checkpoints inspectés automatiquement pour leurs liens locaux, exemples de code exclus : 71 liens résolus, aucun manquant. Ce contrôle de liens n’est pas une relecture sémantique de tous les anciens documents historiques.
 - DLL canonique : C:\Plugins-ff14\src\TenshoAssistant\bin\x64\Release\TenshoAssistant.dll, version 0.59.0.0. Paquet latest.zip dans le sous-dossier TenshoAssistant : deps.json, DLL et manifeste. Une seule DLL présente, aucune dépendance hôte redistribuée.

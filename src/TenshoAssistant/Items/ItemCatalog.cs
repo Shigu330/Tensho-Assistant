@@ -8,7 +8,9 @@ namespace TenshoAssistant.Items;
 public enum ItemTraits { None=0, Unique=1, Untradable=2, Dyeable=4, Repairable=8, Collectable=16, All=Unique|Untradable|Dyeable|Repairable|Collectable }
 public sealed record ItemDefinition(uint Id, string Name, bool CanBeHq, uint IconId = 0,
     uint UiCategoryId = 0, string UiCategoryName = "", bool IsMarketable = false, uint TripleTriadCardId = 0, EquipmentSlots Equipment = EquipmentSlots.None,CraftToolDefinition? CraftTool=null,uint OrchestrionId=0,
-    uint ItemLevel=0,int EquipLevel=0,int Rarity=0,uint SellPrice=0,ItemTraits Traits=ItemTraits.None,string EnglishName="");
+    uint ItemLevel=0,int EquipLevel=0,int Rarity=0,uint SellPrice=0,ItemTraits Traits=ItemTraits.None,string EnglishName="",
+    // 0.141: collection unlocked by the item (ItemAction 1322 = mount, 853 = minion; checkpoints/0.141.0-itemaction-probe.log).
+    uint MountId=0,uint CompanionId=0);
 public sealed record CraftToolDefinition(uint JobId,int? GoodQualityPercent);
 public sealed record ItemCategoryDefinition(uint Id,string Name);
 public static class CraftToolBonuses
@@ -29,6 +31,7 @@ public sealed class ItemCatalog
     private readonly FrozenDictionary<uint, ItemDefinition> byId;
     private readonly FrozenDictionary<uint, IReadOnlyList<ItemDefinition>> byTriadCard;
     private readonly FrozenDictionary<uint,IReadOnlyList<ItemDefinition>> byOrchestrion;
+    private readonly FrozenDictionary<uint,IReadOnlyList<ItemDefinition>> byMount,byCompanion;
     private readonly (ItemDefinition Item, string SearchName)[] searchable;
     public ItemCatalogMetadata Metadata { get; }
     public int Count => byId.Count;
@@ -46,6 +49,10 @@ public sealed class ItemCatalog
             .ToFrozenDictionary(group => group.Key, group => (IReadOnlyList<ItemDefinition>)Array.AsReadOnly(group.OrderBy(item => item.Id).ToArray()));
         this.searchable = searchable;
         byOrchestrion=items.Values.Where(item=>item.OrchestrionId!=0).GroupBy(item=>item.OrchestrionId)
+            .ToFrozenDictionary(group=>group.Key,group=>(IReadOnlyList<ItemDefinition>)Array.AsReadOnly(group.OrderBy(item=>item.Id).ToArray()));
+        byMount=items.Values.Where(item=>item.MountId!=0).GroupBy(item=>item.MountId)
+            .ToFrozenDictionary(group=>group.Key,group=>(IReadOnlyList<ItemDefinition>)Array.AsReadOnly(group.OrderBy(item=>item.Id).ToArray()));
+        byCompanion=items.Values.Where(item=>item.CompanionId!=0).GroupBy(item=>item.CompanionId)
             .ToFrozenDictionary(group=>group.Key,group=>(IReadOnlyList<ItemDefinition>)Array.AsReadOnly(group.OrderBy(item=>item.Id).ToArray()));
     }
 
@@ -73,6 +80,8 @@ public sealed class ItemCatalog
     public ItemDefinition? Find(uint id) => byId.GetValueOrDefault(id);
     public IReadOnlyList<ItemDefinition> ForTriadCard(uint cardId) => byTriadCard.GetValueOrDefault(cardId) ?? [];
     public IReadOnlyList<ItemDefinition> ForOrchestrion(uint musicId)=>byOrchestrion.GetValueOrDefault(musicId) ?? [];
+    public IReadOnlyList<ItemDefinition> ForMount(uint mountId)=>byMount.GetValueOrDefault(mountId) ?? [];
+    public IReadOnlyList<ItemDefinition> ForCompanion(uint companionId)=>byCompanion.GetValueOrDefault(companionId) ?? [];
 
     public IReadOnlyList<ItemDefinition> Search(string query, int limit = 30)
     {
