@@ -7,6 +7,7 @@
 | Universalis | `universalis.app/api/v2/aggregated/{monde}/{objet}` | `Market/MarketService.cs` | clic ou survol (option) | durée « Prix » |
 | Garland Tools | `garlandtools.org/db/doc/{route}/{id}.json` (objets, donjons, monstres) | `Community/GarlandClient.cs` | consultation d'un objet/donjon ; sources d'objet seulement si aucune source du jeu n'est connue | durée « Sources » |
 | Wiki FFXIV (consolegameswiki) | API `parse` et `index.php?action=raw` | `Monsters/WikiMonsterSources.cs`, `Community/WikiItemAcquisition.cs`, `Maps/WikiVistas.cs` | survol ou consultation ; carnet d'exploration au survol d'un repère | durée « Sources » |
+| LuminaSupplemental (Critical-Impact, GPL-3.0) | `raw.githubusercontent.com/Critical-Impact/LuminaSupplemental/main/.../Generated/*.csv` | `Community/LuminaSupplemental.cs` | premier usage du butin des contenus ou des sources d'objets | durée « Sources » |
 | FFXIVGachaSpreadsheet (Infiziert90) | `raw.githubusercontent.com/.../website/static/data/` | `Fashion/FashionDataService.cs` | onglet Revue de mode | durée « Revue de mode » |
 
 Toutes passent par `Community/BoundedHttp.cs` (taille et durée bornées) et le cache disque (`Caching/DataCache.cs`). Aucune ne contacte

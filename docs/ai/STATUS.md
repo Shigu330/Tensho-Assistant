@@ -1,8 +1,8 @@
 # État courant (mis à jour 2026-10-31)
 
-VERSION: 0.176.0.0 — Verify.ps1 (agent) 544/544, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
-GOAL: [TRIAD-003](GOAL.md) — Triple Triade comme TriadBuddy : conseil en match validé (0.160) ; % de victoire par deck et génération de deck (0.161) à valider.
-QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-10-31 ~17:20 : 5 h à 15 % (réinit. 22:10), semaine 56 %. Dernier relevé connu : 5 h remis à 0 vers 12:10, semaine 41 % (réinit. jeudi 23:00).
+VERSION: 0.190.0.0 — Verify.ps1 (agent) 547/547, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+GOAL: COLL-004 — réduire les sources « inconnues » des objets (choix utilisateur 2026-10-31) ; 0.177 lignes parasites du wiki retirées.
+QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-10-31 : 5 h à 93 % (réinit. 22:10), semaine 66 % — arrêt après 0.190 (5 h à 95 %). Dernier relevé connu : 5 h remis à 0 vers 12:10, semaine 41 % (réinit. jeudi 23:00).
 
 ## Validé en jeu (rapports utilisateur, 2026-10-30/31)
 - Carte Tensho : image, icônes fixes, menus Région/Zone, colonne d'outils, M remplace la carte du jeu, drapeau (pose, centrage, sans fermeture),
@@ -30,12 +30,9 @@ QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-10-31 ~17:20 : 5 
 - Antérieur non confirmé : caches recettes et récolte (0.82–0.83), critères de tri (0.84).
 
 ## Prochaine action
-1. FAIT (2026-10-31) : capture de l'éditeur de decks, 44 lignes, [preuve](../evidence/0.163.0-triad-editdeck-capture.log). Constat : chaque carte
-   de la liste du jeu est un nœud image (id 8, 40×40 px) dont la texture est `ui/icon/088000/088NNN_hr1.tex`, soit l'icône 88000 + id de
-   carte (= TriadCardDefinition.IconId) ; cadre 48×48 (id 6) autour ; rectangles écran lus.
-2. FAIT en 0.164 (à valider en jeu) : avec cette preuve, encadrer dans la liste du jeu les cartes du deck Tensho choisi (TRIAD-003) ; retirer ensuite la capture.
-3. À valider en jeu : 0.164 (surbrillance dans l'éditeur), 0.165–0.166 (% dans « Choix du jeu »), 0.166 titres/succès conservés (réglage Données), 0.167 servants et sacoches enregistrés à l'ouverture, 0.168 Triple Triade › PNJ et cartes (PNJ battus, lots prioritaires).
-4. Tests restants : 0.161–0.162 (panneau de défi, liste de decks), Mini Cactpot 0.158.
+1. Essai en jeu 0.188 (butin des contenus récents via LuminaSupplemental, sources d'objets).
+2. LuminaSupplemental, reste : ItemSupplement (désynthèse, coffres, réduction…) dans « Comment l'obtenir », (Butin des monstres : MobDrop en tête depuis 0.190). Fait en 0.189 : monstres, ALEA, entreprises, boutique dans l'infobulle.
+3. Commit (GitHub Desktop). Publication D17 côté auteur.
 
 ## Blocages connus
 - Bonus natif d'Abondance inconnu (sources divergentes) : ne pas inventer de formule.

@@ -6,7 +6,7 @@ public enum CollectionKind { Mount, Companion, Emote, BlueMagic, TripleTriad, Or
 public enum CollectionAcquisition { Unknown, Acquired, NotAcquired }
 public sealed record TitleMetadata(string Masculine,string Feminine,bool IsPrefix,int Order);
 public sealed record AchievementMetadata(uint CategoryId,string CategoryName,int? CategoryOrder,uint KindId,string KindName,int? KindOrder,
-    int Order,int Points,uint RewardItemId,uint RewardTitleId,uint HideConditionId);
+    int Order,int Points,uint RewardItemId,uint RewardTitleId,uint HideConditionId,string EnglishName="");
 public sealed record OrchestrionMetadata(uint CategoryId,string CategoryName,int? Order,int? CategoryOrder);
 public sealed record CollectionCategoryIssue(CollectionKind Kind,string Reason);
 public sealed record CollectionEntry(CollectionKind Kind, uint Id, string Name, uint IconId, bool ConfirmedUnlocked,

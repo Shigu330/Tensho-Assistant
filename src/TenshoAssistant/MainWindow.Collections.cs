@@ -132,6 +132,9 @@ internal sealed partial class MainWindow
                     if(entry.Kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.Emote or CollectionKind.TripleTriad or CollectionKind.Orchestrion)DrawCollectionTooltip(entry);
                     else ImGui.SetTooltip(developerMode ? $"{entry.Name}\n{entry.Kind} : {entry.Id}":entry.Name);
                 }
+                // 0.178: right click = links to the sources (NPC vendor, achievement, quest, recipe, gathering).
+                if(entry.Kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.TripleTriad or CollectionKind.Orchestrion)
+                    CollectionSourcesMenu($"CollectionSources{entry.Kind}{entry.Id}",entry);
                 ImGui.TableNextColumn();
                 ImGui.TextColored(entry.ConfirmedUnlocked ? Success : Muted,CollectionAcquisitionLabel(entry));
             }

@@ -108,7 +108,7 @@ internal sealed partial class MainWindow
         }
         if (state.Error is { } error) DrawDataError(error,"ServiceErrors.Duty");
         ImGui.TextWrapped(localization.Get("DutyUi.Source"));
-        if (state.Document is not { } document)
+        if (DutyDocument(state) is not { } document)
         { ImGui.TextDisabled(localization.Get("DutyUi.NeedFetch")); return; }
         ImGui.TextDisabled(localization.Format("DutyCounts.Fetched",document.FetchedAt.ToLocalTime().ToString("g")));
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,document.FetchedAt);
@@ -170,7 +170,9 @@ internal sealed partial class MainWindow
                             SelectItem(item.Id);
                     }
                     finally { ImGui.EndDisabled(); }
-                    if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) ImGui.SetTooltip((developerMode ? $"ID {item.Id}\n" : "") + (selectable ? item.Name : localization.Get("UiFragments.MissingItem")));
+                    // 0.186: full item tooltip and right click = links to the other tools.
+                    if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) { if (selectable) DrawItemInfoTooltip(item.Id); else ImGui.SetTooltip(localization.Get("UiFragments.MissingItem")); }
+                    ItemLinksMenu($"DutyLootLinks{item.Id}",local);
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted(item.Sources.Length == 1 ? DutySourceLabel(item.Sources[0]) : $"{item.Sources.Length} sources");
                     if (ImGui.IsItemHovered())

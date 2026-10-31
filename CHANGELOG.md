@@ -3,6 +3,113 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.190.0
+- Retour (capture Butin des monstres, Épaule de rroneek : wiki puis Garland, LuminaSupplemental absent) : section « Source principale ·
+  LuminaSupplemental » en tête de l'outil, monstres qui lâchent l'objet (MobDrop), lieux toujours par le wiki et Garland en dessous.
+- Verify.ps1 (agent) : 547/547, 0 avertissement, 0 erreur ; DLL 0.190.0.0. VALIDATED_IN_GAME : « 188-190 ok » (utilisateur, 2026-10-31). Arrêt quota (5 h à 95 %).
+## 0.189.0
+- Suite LuminaSupplemental (« continue dans la mesure du quota ») : « Comment l'obtenir » montre aussi, avant Garland et le wiki, les monstres
+  qui lâchent l'objet (MobDrop, noms de la feuille BNpcName), les ALEA (FateItem, noms de la feuille Fate), les entreprises de servant
+  (RetainerVentureItem) et la boutique en ligne avec son prix (StoreItem). Noms résolus à la construction des données, hors du dessin.
+  Reste : ItemSupplement (désynthèse, réduction, coffres, lots de cartes, donjons profonds, Eureka, Bozja) et l'outil Butin des monstres.
+- Verify.ps1 (agent) : 547/547, 0 avertissement, 0 erreur ; DLL 0.189.0.0. VALIDATED_IN_GAME : « 188-190 ok » (utilisateur, 2026-10-31).
+## 0.188.0
+- Demande : ajouter LuminaSupplemental et, si cette source offre plus que le wiki, Garland ou d'autres, l'utiliser en premier, pour les
+  autres outils aussi.
+- Source : LuminaSupplemental (Critical-Impact, GPL-3.0, CSV « Generated » sur GitHub, clés = identifiants du jeu) ; couverture relevée le
+  2026-10-31 : 283 contenus avec coffres de boss, 1 373 coffres de zone avec taux, butin direct des boss. Téléchargée une fois au premier
+  usage (4 Mo max par fichier), gardée dans le cache disque « lumina-supplemental » pour la durée « Sources ».
+- Butin des contenus (outil et panneau de l'outil de mission) : coffres de boss, butin direct et coffres de zone de LuminaSupplemental en
+  premier ; récompenses de Garland gardées ; coffres de Garland seulement pour les catégories absentes de LuminaSupplemental.
+- Sources d'objets : « Butin de contenu : … (LuminaSupplemental) » dans « Comment l'obtenir » avant Garland et le wiki, et lien du clic droit
+  vers ce contenu. Prochaine étape : monstres (MobDrop), ALEA (FateItem), entreprises (RetainerVentureItem), boutique en ligne (StoreItem),
+  désynthèse/coffres/réduction (ItemSupplement).
+- Test : 1 groupe `LuminaSupplementalTests` (premières lignes réelles, Sastasha). Verify.ps1 (agent) : 547/547, 0 avertissement, 0 erreur ;
+  DLL 0.188.0.0. VALIDATED_IN_GAME : « 188-190 ok » (utilisateur, 2026-10-31).
+## 0.187.0
+- Retour : coffres de combat et coffres de zone semblent vides.
+- Vérification : l'analyseur lit bien les coffres quand Garland les donne (test sur le document réel d'Alexander - Le Fardeau du Père sadique :
+  19 objets dans le coffre du boss ; Sastasha : 3 boss et des coffres de zone). Mais pour les contenus récents (Ihuykatumu, Cénote de
+  Skydeep, Everkeep…) Garland n'a ni coffre de boss ni coffre de zone, seulement les récompenses. Les feuilles du jeu ne contiennent pas ces
+  listes (Treasure = modèles de coffre, InstanceContentRewardItem sans objets) : le contenu des coffres est décidé par le serveur.
+- Correction : nombre d'objets dans chaque filtre du panneau, et message clair quand la source n'a aucun coffre pour ce contenu.
+  Piste : Duty Loot Preview utilise LuminaSupplemental (Critical-Impact) — boss, coffres de boss, butin direct, coffres de zone par contenu.
+- Test : document Garland réel (A4S). Verify.ps1 (agent) : 546/546, 0 avertissement, 0 erreur ; DLL 0.187.0.0. Non validé en jeu.
+## 0.186.0
+- Retour (capture, Alexander - Le Fardeau du Père sadique : contenu bien identifié depuis l'outil de mission) : interface mal découpée, aucun
+  lien avec les autres outils.
+- Panneau de l'outil de mission compact : en-tête sur deux lignes, date de récupération et bouton d'actualisation sur une ligne, texte de source
+  et limites dans l'infobulle (i), filtre en liste déroulante à côté de la recherche, objets regroupés par origine (récompenses, chaque boss
+  avec son nom, coffres) dans des sections repliables, « ✓ » quand la collection de l'objet est obtenue.
+- Liens : survol d'un objet = infobulle complète (collection, stock, comment l'obtenir) ; clic droit = fiche de l'objet, prix du marché,
+  recettes et usages, collection, puis ses sources (vendeur, succès, quête, contenu…). Même survol et même clic droit dans l'outil Butin des
+  contenus.
+- Verify.ps1 (agent) : 545/545, 0 avertissement, 0 erreur ; DLL 0.186.0.0. Non validé en jeu.
+## 0.185.0
+- Demande : butin des contenus lié à l'outil de mission du jeu — sélectionner un donjon, raid ou autre affiche une interface avec le butin
+  (équipement, récompenses, monnaies), en prenant Duty Loot Preview comme référence et en l'améliorant.
+- Lecture : `AgentContentsFinder.SelectedDuty` (FFXIVClientStructs : type Aucun/Mission aléatoire/Normal + identifiant) pendant que la fenêtre
+  « ContentsFinder » est visible, 5 fois par seconde ; l'identifiant normal est pris comme ContentFinderCondition (catalogue des contenus) ;
+  le panneau affiche le nom du contenu pour qu'un écart se voie ; en mode développeur, chaque sélection est notée dans dalamud.log (preuve).
+- Panneau « Tensho — butin du contenu » à droite de l'outil de mission : même vue que l'outil Butin des contenus (récompenses, boss, coffres,
+  recherche et filtres, données Garland Tools en cache), demande faite une fois par contenu sélectionné ; mission aléatoire signalée.
+  Réglage dans Paramètres › Données (activé par défaut).
+- Verify.ps1 (agent) : 545/545, 0 avertissement, 0 erreur ; DLL 0.185.0.0. VALIDATED_IN_GAME (sélection) : capture utilisateur 2026-10-31, contenu sélectionné correctement identifié.
+## 0.184.0
+- Retour (capture, Sage niv. 71) : confirme le niveau absent de la table ; Détermination et PM non calculés.
+- Correction : modificateur principal pour les niveaux 1 à 100, repris comme données de Character Panel Refined (Kouzukii, licence MIT,
+  LevelModifiers.cs, plugin de référence de la feuille de route) ; ses colonnes secondaire/diviseur concordent avec la feuille du jeu ParamGrow
+  aux niveaux 50/70/80/90/100, et ses valeurs principales avec les 6 déjà connues. Niveau 71 : 296.
+- Test : table niveaux 1 à 100. Verify.ps1 (agent) : 545/545, 0 avertissement, 0 erreur ; DLL 0.184.0.0. VALIDATED_IN_GAME : « c'est ok » (utilisateur, 2026-10-31, stats réelles 0.182–0.184).
+## 0.183.0
+- Retour : pas de PM pour un soigneur. Cause probable : niveau absent de la table communautaire du modificateur principal (connue seulement aux
+  niveaux 50, 60, 70, 80, 90, 100 ; absent des données du jeu), donc régénération de PM et Détermination non calculées, sans message dans le
+  panneau. Le panneau le signale maintenant. Table complète non récupérée (page AkhMorning sans tableau lisible) : pas de valeur inventée.
+- Verify.ps1 (agent) : 545/545, 0 avertissement, 0 erreur ; DLL 0.183.0.0. Non validé en jeu.
+## 0.182.0
+- Demandes : clic droit « Contenu » → outil Butin des contenus ; Combat : stats réelles en %, selon le métier équipé, seulement les stats
+  utiles, dans une fenêtre à côté des stats du jeu sans doublon, avec infobulles (formule et description) ; données du jeu d'abord.
+- Clic droit (sources) : un contenu cité par Garland (identifiant InstanceContent) ouvre ce contenu dans Butin des contenus (prévu en 0.181,
+  livré ici).
+- Stats réelles (`Character/StatFormulas.cs`) : modificateurs de niveau secondaire et diviseur lus dans la feuille du jeu ParamGrow (niv. 100 :
+  420 / 2780, [docs/evidence/0.182.0-paramgrow-probe.log](docs/evidence/0.182.0-paramgrow-probe.log)), catégorie/rôle du métier depuis
+  ClassJob ; modificateur principal (440 au niv. 100) et formules depuis la communauté (Allagan Studies), absents des données du jeu.
+  Combat : taux et dégâts critiques, coup direct, Détermination, temps de recharge global et bonus de vitesse (Vivacité ou Incantation selon
+  la catégorie), Ténacité (tanks), régénération de PM (soigneurs), réduction des dégâts. Récolte/artisanat : leurs trois stats seulement.
+- Panneau « Tensho — stats réelles » à droite de la fenêtre Personnage du jeu (seulement les valeurs réelles, pas les brutes déjà affichées),
+  survol = description, formule et modificateurs ; réglage dans Paramètres › Données (activé par défaut).
+- Test : 1 groupe `StatFormulaTests`. Verify.ps1 (agent) : 545/545, 0 avertissement, 0 erreur ; DLL 0.182.0.0. Non validé en jeu.
+## 0.180.0
+- Retour (captures) : les liens du clic droit marchent pour un PNJ vendeur (adamankhélone) ; Aeturna (succès connu par le wiki) et
+  adenium insulaire (échange Garland contre 200 Certificats végétaux) n'avaient aucune source cliquable.
+- Preuve ([docs/evidence/0.180.0-achievement-probe.log](docs/evidence/0.180.0-achievement-probe.log)) : le succès 3185 « Vintage Vogue »
+  (« Vêtements vertueux ») existe mais sa récompense (Achievement.Item) vaut 0 : le jeu donne la monture autrement ; seul le nom anglais le relie.
+- Correction : nom anglais de chaque succès copié avec le nom français ; une ligne wiki « Achievement » qui nomme un succès s'affiche en
+  français (« Succès : Vêtements vertueux ») et devient un lien du clic droit ; l'échange Garland devient un lien vers la monnaie (ses propres
+  sources). Copie des collections antérieure relue une fois (états des titres/succès gardés).
+- Verify.ps1 (agent) : 544/544, 0 avertissement, 0 erreur ; DLL 0.180.0.0. Non validé en jeu.
+## 0.179.0
+- Retour (captures Aeturna) : l'infobulle affichait « Succès : achievement table header » et « achievement table row Vintage Vogue » ; le menu
+  du clic droit disait « aucune source connue » alors que l'infobulle en montrait une.
+- Correction : modèles wiki « achievement table header » (ignoré) et « achievement table row » (nom du succès) → « Succès : Vintage Vogue » ;
+  cache « wiki-items » v5. Menu : « Aucune source cliquable dans les données du jeu » + rappel que les sources wiki/Garland sont dans
+  l'infobulle, sans lien.
+- Test : ligne de tableau de succès. Verify.ps1 (agent) : 544/544, 0 avertissement, 0 erreur ; DLL 0.179.0.0. Non validé en jeu.
+## 0.178.0
+- Demande : la collection n'est pas cliquable pour faire le lien avec le PNJ vendeur, le succès lié et le reste.
+- Clic droit sur une monture, une mascotte, une carte Triple Triade ou un morceau d'orchestrion (Collections), et sur un objet dans les
+  listes d'outils : menu de liens vers les sources de l'objet qui le débloque — succès (onglet Succès filtré), PNJ vendeur (outil PNJ
+  vendeurs centré sur lui) et « drapeau sur la carte », quête (fiche de la quête), artisanat (recette), récolte. Indication « Clic droit :
+  liens vers les sources » dans l'infobulle des collections. Mêmes données que l'infobulle « Comment l'obtenir ».
+- Verify.ps1 (agent) : 544/544, 0 avertissement, 0 erreur ; DLL 0.178.0.0. Non validé en jeu.
+## 0.177.0
+- COLL-004 (sources inconnues, reprise) : capture utilisateur d'Alsvid — la source wiki (campagne Twitch) était déjà affichée, suivie de
+  4 lignes parasites (« vendor list y », « contained in », « {{quest list||…}} », « deployed from Y »).
+- Cause : ces modèles du wiki génèrent des listes à l'affichage ; leur texte source ne contient aucune acquisition.
+- Correction : lignes de générateurs de listes ignorées (vendor/quest/item/recipe/drop… list, contained in, deployed from, fonctions {{#…}},
+  PAGENAME) ; cache « wiki-items » passé en v4 (pages relues).
+- Test : page brute d'Alsvid Whistle → seule la ligne de la campagne. Verify.ps1 (agent) : 544/544, 0 avertissement, 0 erreur ;
+  DLL 0.177.0.0. Non validé en jeu.
 ## 0.176.0
 - Retour (captures) : le second Échangeur d'Auxesia est Kaede « Fouilles archéologiques » — menu « Obtenir des batteries portatives » →
   « Échange de devises », Batterie portative (Auxesia) pour 200.
@@ -10,7 +117,7 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
   (CustomTalk 721862 « CtsWksTreasure_00966 ») sans aucun argument ; la boutique 1771038 (sans nom) est la seule à vendre cet objet.
 - Correction : lien observé en jeu ajouté (`NpcShopLinks.ObservedTalkShops` : 721862 → 1771038), règles de copie 11 (le cache des
   marchands est reconstruit). L'autre boutique de batteries (1771006) n'est pas reliée tant qu'elle n'est pas observée.
-- Verify.ps1 (agent) : 544/544, 0 avertissement, 0 erreur ; DLL 0.176.0.0. Non validé en jeu.
+- Verify.ps1 (agent) : 544/544, 0 avertissement, 0 erreur ; DLL 0.176.0.0. VALIDATED_IN_GAME : « ok » (utilisateur, 2026-10-31).
 ## 0.175.0
 - Retour (Auxesia) : toujours aucun marchand sur la carte malgré la 0.171.
 - Preuve ([docs/evidence/0.175.0-auxesia-maps-probe.log](docs/evidence/0.175.0-auxesia-maps-probe.log)) : le catalogue des marchands (cache disque) contient bien Mesouaidonque et Godgyth sur la carte 1246 ; mais Auxesia a 22 cartes (c1w4/01–22) pour le même territoire 1319, qui changent avec la progression de l'exploration cosmique, toutes à la même échelle et au même décalage. Le joueur voit une autre variante que la carte par défaut.

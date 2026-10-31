@@ -129,6 +129,15 @@ public sealed class Plugin : IDalamudPlugin
             Maps.NativeMapReplacer? mapReplacer=null;
             registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,()=>configuration.MapView,mainWindow.ShowMapFromGame,()=>mainWindow.MapViewOpen,mainWindow.CloseMapFromGame,log),()=>mapReplacer?.Dispose());
             mainWindow.ConfigureGameMapOpener(()=>mapReplacer?.OpenGameMap());
+            var lumina=new Community.LuminaSupplementalService(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,
+                id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().TryGetRow(id,out var monster) ? monster.Singular.ExtractText():null,
+                id=>data.GetExcelSheet<Lumina.Excel.Sheets.Fate>().TryGetRow(id,out var fate) ? fate.Name.ExtractText():null);
+            registrations.Register(()=>{},lumina.Dispose);
+            mainWindow.ConfigureLumina(lumina);
+            var dutyFinder=new Duties.DutyFinderService();
+            Duties.DutyFinderReader? dutyFinderReader=null;
+            registrations.Register(()=>dutyFinderReader=new Duties.DutyFinderReader(dutyFinder,framework,gameGui,log,()=>mainWindow.DeveloperMode),()=>dutyFinderReader?.Dispose());
+            mainWindow.ConfigureDutyFinder(dutyFinder);
             var triadNpcs=new TriadNpcService();
             TriadNpcLoader? triadNpcLoader=null;
             registrations.Register(()=>triadNpcLoader=new TriadNpcLoader(triadNpcs,data,framework,client,player,log),()=>triadNpcLoader?.Dispose());
@@ -153,7 +162,7 @@ public sealed class Plugin : IDalamudPlugin
             DutyCatalogLoader? dutyLoader = null;
             registrations.Register(() => dutyLoader = new DutyCatalogLoader(duties, data, framework, log), () => dutyLoader?.Dispose());
             CharacterStatsReader? statsReader = null;
-            registrations.Register(() => statsReader = new CharacterStatsReader(characterStats, framework, player, client, log,objects), () => statsReader?.Dispose());
+            registrations.Register(() => statsReader = new CharacterStatsReader(characterStats, framework, player, client, log,objects,data,gameGui), () => statsReader?.Dispose());
             GpCatalogLoader? gpLoader=null;
             WeatherCatalogLoader? weatherLoader=null;
             registrations.Register(()=>weatherLoader=new WeatherCatalogLoader(weather,data,framework,log),()=>weatherLoader?.Dispose());
@@ -246,6 +255,8 @@ public sealed class Plugin : IDalamudPlugin
         mainWindow.DrawTriadOverlay();
         mainWindow.DrawTriadRequestPanel();
         mainWindow.DrawTriadDeckReminder();
+        mainWindow.DrawCharacterPanel();
+        mainWindow.DrawDutyFinderPanel();
     }
 
     public void Dispose()

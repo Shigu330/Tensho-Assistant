@@ -61,6 +61,9 @@ internal sealed partial class CollectionReader
             try
             {
                 achievements ??= data.GetExcelSheet<Achievement>();
+                // English names (0.180): the wiki names achievements in English (Aeturna: « Vintage Vogue » = no. 3185 « Vêtements vertueux »,
+                // whose reward item is 0 in the game data: docs/evidence/0.180.0-achievement-probe.log).
+                try{achievementsEnglish ??= data.GetExcelSheet<Achievement>(Dalamud.Game.ClientLanguage.English);}catch{achievementsEnglish=null;}
                 achievementCategories ??= data.GetExcelSheet<AchievementCategory>();
                 achievementKinds ??= data.GetExcelSheet<AchievementKind>();
             }
@@ -106,7 +109,8 @@ internal sealed partial class CollectionReader
             var row=achievements!.GetRowAt(index);
             AchievementCategory? category=achievementCategories!.TryGetRow(row.AchievementCategory.RowId,out var group) ? group:null;
             AchievementKind? kind=category is { } nativeCategory && achievementKinds!.TryGetRow(nativeCategory.AchievementKind.RowId,out var nativeKind) ? nativeKind:null;
-            if(CompletionCopy.Achievement(row,category,kind) is not { } copied)return true;
+            var english=achievementsEnglish is { } englishSheet && englishSheet.TryGetRow(row.RowId,out var englishRow) ? englishRow.Name.ExtractText():"";
+            if(CompletionCopy.Achievement(row,category,kind,english) is not { } copied)return true;
             if(character!=0 && !achievementUnlockFailed)
             {
                 try
@@ -159,5 +163,6 @@ internal sealed partial class CollectionReader
         if(achievementsIssue is not null)yield return new(CollectionKind.Achievement,achievementsIssue);
     }
 
-    private void ReleaseCompletion(){titles=null;achievements=null;achievementCategories=null;achievementKinds=null;ResetCompletion();}
+    private Lumina.Excel.ExcelSheet<Achievement>? achievementsEnglish;
+    private void ReleaseCompletion(){titles=null;achievements=null;achievementsEnglish=null;achievementCategories=null;achievementKinds=null;ResetCompletion();}
 }

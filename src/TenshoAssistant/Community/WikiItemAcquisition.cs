@@ -15,6 +15,8 @@ public sealed record WikiItemAcquisition(uint ItemId,string Title,IReadOnlyList<
 public static class WikiItemAcquisitionParser
 {
     private static readonly TimeSpan Limit=TimeSpan.FromSeconds(1);
+    private static readonly Regex Generator=new(@"^[*#:\s]*\{\{\s*(vendor list|contained in|quest list|deployed from|desynthesis list|retrieval list|achievement list|item list|recipe list|gathering list|drop list)\s*(\||\}\})",
+        RegexOptions.IgnoreCase|RegexOptions.CultureInvariant,TimeSpan.FromSeconds(1));
     public static string Url(string title)=>"https://ffxiv.consolegameswiki.com/mediawiki/index.php?title="+Uri.EscapeDataString(title.Replace(' ','_'))+"&action=raw";
     public static WikiItemAcquisition Parse(string wikitext,uint itemId,string title,DateTimeOffset fetchedAt)
     {
@@ -31,6 +33,9 @@ public static class WikiItemAcquisitionParser
             if(Regex.Match(line,@"^===+\s*(.*?)\s*===+$",RegexOptions.None,Limit) is { Success:true } sub){heading=Clean(sub.Groups[1].Value);continue;}
             // Bullets, and plain lines such as « {{onlinestore|24}} » (0.148); tables, files and categories are skipped.
             if(line.Length==0 || line.StartsWith('{') && !line.StartsWith("{{",StringComparison.Ordinal) || line.StartsWith('|') || line.StartsWith('!') || line.StartsWith("[[File:",StringComparison.OrdinalIgnoreCase) || line.StartsWith("[[Category:",StringComparison.OrdinalIgnoreCase))continue;
+            // List generators filled by the wiki at display time (capture 2026-10-31, Alsvid Whistle: « vendor list y », « contained in »,
+            // « {{quest list||…{{#titleparts:{{PAGENAME}}}}…}} », « deployed from Y »): their source text holds no acquisition, skip them.
+            if(Generator.IsMatch(line) || line.Contains("{{#",StringComparison.Ordinal) || line.Contains("PAGENAME",StringComparison.Ordinal))continue;
             var text=Clean(line.TrimStart('*','#',':',' '));
             if(text.Length>0 && lines.Count<12 && !lines.Any(known=>known.Text==text))lines.Add(new(heading,text.Length>200 ? text[..200]+"…":text));
         }
@@ -41,6 +46,9 @@ public static class WikiItemAcquisitionParser
     {
         ["onlinestore"]=parts=>parts.Length>1 ? $"Online Store ({parts[1]} USD)":"Online Store",
         ["seriesmalmstonesreward"]=parts=>parts.Length>1 ? $"PvP series reward (rank {parts[1]})":"PvP series reward",
+        // Achievement tables (0.179, capture Aeturna: « achievement table header », « achievement table row Vintage Vogue »): the row names
+        // the achievement, the header is layout only; the section heading (Achievement) already says what it is.
+        ["achievement table header"]=_=>"",["achievement table row"]=parts=>parts.Length>1 ? parts[1]:"",
         // Layout-only templates (0.150: « clear » appeared as a source line).
         ["clear"]=_=>"",["-"]=_=>"",["clr"]=_=>"",["br"]=_=>"",
     };
@@ -67,7 +75,7 @@ public sealed record WikiItemAcquisitionState(WikiItemAcquisition? Page,bool Loa
 /// <summary>Reads item pages on demand, one at a time (3 s apart), kept in DataCache « wiki-items » for the sources lifetime.</summary>
 public sealed class WikiItemAcquisitionService:IDisposable
 {
-    private const string Family="wiki-items",Version="v3";
+    private const string Family="wiki-items",Version="v5"; // v4 (0.177): list generators dropped; v5 (0.179): achievement tables.
     private readonly HttpClient http=new(){Timeout=TimeSpan.FromSeconds(20)};
     private readonly Func<uint,string?> englishName;private readonly Func<TimeSpan> lifetime;private readonly DataCache? disk;
     private readonly object gate=new();

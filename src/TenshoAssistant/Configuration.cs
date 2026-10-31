@@ -98,6 +98,10 @@ public sealed partial class Configuration
     public bool OpenOnLoad { get; set; }
     // Retainers and saddlebags copied into the bank cache each time they are opened (0.167), instead of an import button.
     public bool AutoBankCapture { get; set; } = true;
+    // Real combat stats panel beside the game's Character window (0.182).
+    public bool ShowCharacterPanel { get; set; } = true;
+    // Duty loot panel beside the game's Duty Finder (0.185).
+    public bool ShowDutyFinderLoot { get; set; } = true;
     // 0 follows the game's interface theme; 1..6 force a PluginTheme (value - 1).
     public int ThemeMode { get; set; }
     public MapViewSettings MapView { get; set; } = new();

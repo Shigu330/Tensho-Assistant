@@ -133,6 +133,34 @@ foreach(var npc in data.Excel.GetSheet<ENpcBase>())foreach(var value in npc.ENpc
 // (sheet of each ENpcData value), and the map's shop-like markers — why the Tensho map shows no vendor there.
 // PROBE_TALK=<CustomTalk id>[,item name]: script instructions/arguments of a scripted dialogue, the sheets each argument belongs to, and the
 // special shops selling an item named like the second value — how a dialogue-only NPC reaches its shop.
+// PROBE_ACH=<item name>: achievements whose reward is that item, and achievements whose English name matches the wiki (en sheet).
+// PROBE_GROW: ParamGrow per level (BaseSpeed, LevelModifier, MpModifier) — the level modifiers of the stat formulas — and ClassJob categories.
+if(Environment.GetEnvironmentVariable("PROBE_GROW") is { Length:>0 })
+{
+    foreach(var level in new uint[]{50,70,80,90,100})
+    {
+        var row=data.Excel.GetSheet<ParamGrow>().GetRow(level);
+        Console.WriteLine($"GROW {level} BaseSpeed {row.BaseSpeed} LevelModifier {row.LevelModifier} MpModifier {row.MpModifier} HpModifier {row.HpModifier}");
+    }
+    foreach(var job in data.Excel.GetSheet<ClassJob>().Where(job=>job.RowId is 19 or 24 or 25 or 8 or 16 or 23))
+        Console.WriteLine($"JOB {job.RowId} '{job.Name.ExtractText()}' category {job.ClassJobCategory.RowId} role {job.Role} primary {job.PrimaryStat} limitBreak {job.LimitBreak1.RowId}");
+    return;
+}
+if(Environment.GetEnvironmentVariable("PROBE_ACH") is { Length:>0 } achQuery)
+{
+    var achParts=achQuery.Split(',',2);
+    var achItems=data.Excel.GetSheet<Item>().Where(item=>item.Name.ExtractText()==achParts[0]).Select(item=>item.RowId).ToHashSet();
+    Console.WriteLine($"ACHITEM '{achParts[0]}' ids={string.Join(",",achItems)}");
+    foreach(var row in data.Excel.GetSheet<Achievement>().Where(row=>achItems.Contains(row.Item.RowId)))
+        Console.WriteLine($"ACH reward {row.RowId} '{row.Name.ExtractText()}' item {row.Item.RowId} title {row.Title.RowId}");
+    if(achParts.Length>1)
+    {
+        var english=data.Excel.GetSheet<Achievement>(Language.English);
+        foreach(var row in english!.Where(row=>row.Name.ExtractText().Equals(achParts[1],StringComparison.OrdinalIgnoreCase)))
+            Console.WriteLine($"ACH english {row.RowId} '{row.Name.ExtractText()}' item {row.Item.RowId} -> fr '{data.Excel.GetSheet<Achievement>().GetRow(row.RowId).Name.ExtractText()}'");
+    }
+    return;
+}
 if(Environment.GetEnvironmentVariable("PROBE_TALK") is { Length:>0 } talkQuery)
 {
     var parts=talkQuery.Split(',',2);var talkId=uint.Parse(parts[0]);

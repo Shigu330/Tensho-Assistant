@@ -12,6 +12,13 @@ internal sealed partial class MainWindow
     internal void ConfigureWikiSources(WikiMonsterSources service)=>wikiMonsterSources=service;
     private void DrawWikiMonsterSources(uint id)
     {
+        // LuminaSupplemental first (0.190): monsters dropping the item, from MobDrop with names from the game sheet BNpcName.
+        lumina?.Request();
+        if(lumina?.State.Data?.MonstersOf(id) is { Count:>0 } mobs && ImGui.CollapsingHeader(localization.Get("MonsterUi.Lumina")+"###LuminaMonsters",ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            foreach(var mob in mobs)ImGui.BulletText(mob);
+            ImGui.TextDisabled(localization.Get("MonsterUi.LuminaHelp"));
+        }
         if(wikiMonsterSources is not { } wiki)return;
         wiki.Select(id);
         if(!ImGui.CollapsingHeader(localization.Get("WikiMonsters.Title")+"###WikiMonsters",ImGuiTreeNodeFlags.DefaultOpen))return;

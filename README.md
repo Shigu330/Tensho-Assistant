@@ -183,6 +183,8 @@ This project depends on and integrates with the following tools and ecosystems:
   [Garland Tools](https://www.garlandtools.org/) (item sources), the [FFXIV Console Games Wiki](https://ffxiv.consolegameswiki.com/)
   (monster drops, sightseeing log, acquisition), [Universalis](https://universalis.app/) (market prices)
 - reference plugins studied without copying code: Mappy, SortaKinda (AGPL) and the other reference plugins listed in `docs/project/ROADMAP.md`
+- level modifier table (main stat, levels 1–100) from Character Panel Refined by Kouzukii (MIT)
+- duty loot and item source data from [LuminaSupplemental](https://github.com/Critical-Impact/LuminaSupplemental) by Critical-Impact (GPL-3.0)
 - the localization and translation workflow used for UI strings and language files
 
 This project is an original plugin implementation, but it relies on these ecosystem components and references for its operation, testing, and validation.

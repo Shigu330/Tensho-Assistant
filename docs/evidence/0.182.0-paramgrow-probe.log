@@ -1,0 +1,12 @@
+# PROBE_GROW (2026-10-31) : ParamGrow BaseSpeed (= modificateur secondaire) et LevelModifier (= diviseur) ; ClassJob catégorie/rôle/stat principale
+GROW 50 BaseSpeed 341 LevelModifier 341 MpModifier 10000 HpModifier 927
+GROW 70 BaseSpeed 364 LevelModifier 900 MpModifier 10000 HpModifier 2275
+GROW 80 BaseSpeed 380 LevelModifier 1300 MpModifier 10000 HpModifier 3121
+GROW 90 BaseSpeed 400 LevelModifier 1900 MpModifier 10000 HpModifier 3661
+GROW 100 BaseSpeed 420 LevelModifier 2780 MpModifier 10000 HpModifier 4205
+JOB 8 'menuisier' category 33 role 0 primary 0 limitBreak 0
+JOB 16 'mineur' category 32 role 0 primary 0 limitBreak 0
+JOB 19 'paladin' category 30 role 1 primary 1 limitBreak 197
+JOB 23 'barde' category 30 role 3 primary 2 limitBreak 4238
+JOB 24 'mage blanc' category 31 role 4 primary 5 limitBreak 206
+JOB 25 'mage noir' category 31 role 3 primary 4 limitBreak 203

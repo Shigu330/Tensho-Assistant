@@ -763,7 +763,7 @@ tests = tests.Concat(QuestRewardsTests.Cases).ToArray();
 tests = tests.Concat(QuestRewardIndexTests.Cases).ToArray();
 tests = tests.Concat(QuestLinkTests.Cases).ToArray();
 tests = tests.Concat(QuestItemProgressTests.Cases).ToArray();
-var allTests = tests.Concat(ChainCostTests.Cases).Concat(PreparationCostTests.Cases).Concat(TriadObservationTests.Cases).Concat(TriadMatchAdvisorTests.Cases).Concat(TriadMatchSimulatorTests.Cases).Concat(CompletionMemoryTests.Cases).Concat(TriadNpcCatalogTests.Cases).Concat(TriadFamilyTests.Cases).Concat(TriadComboTests.Cases).Concat(TriadRulesTests.Cases).Concat(TriadSolverTests.Cases).Concat(TriadCardTests.Cases).Concat(GatheringScheduleTests.Cases).Concat(InventoryTests.Cases).Concat(InventoryCaptureTests.Cases)
+var allTests = tests.Concat(ChainCostTests.Cases).Concat(PreparationCostTests.Cases).Concat(TriadObservationTests.Cases).Concat(TriadMatchAdvisorTests.Cases).Concat(TriadMatchSimulatorTests.Cases).Concat(CompletionMemoryTests.Cases).Concat(TriadNpcCatalogTests.Cases).Concat(StatFormulaTests.Cases).Concat(LuminaSupplementalTests.Cases).Concat(TriadFamilyTests.Cases).Concat(TriadComboTests.Cases).Concat(TriadRulesTests.Cases).Concat(TriadSolverTests.Cases).Concat(TriadCardTests.Cases).Concat(GatheringScheduleTests.Cases).Concat(InventoryTests.Cases).Concat(InventoryCaptureTests.Cases)
     .Concat(InventoryReadEvidenceTests.Cases).Concat(ItemCatalogTests.Cases).Concat(InventoryBankTests.Cases)
     .Concat(ItemHoldingsTests.Cases).Concat(CraftChainTests.Cases).Concat(MapCatalogTests.Cases).Concat(MapBookmarkTests.Cases).Concat(MacroSequenceTests.Cases).Concat(MacroChainTests.Cases).ToArray();
 foreach (var test in allTests)

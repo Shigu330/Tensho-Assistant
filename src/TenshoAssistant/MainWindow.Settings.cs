@@ -200,6 +200,18 @@ internal sealed partial class MainWindow
     }
     private void DrawDataSettings()
     {
+        var finder=configuration.ShowDutyFinderLoot;
+        if(ImGui.Checkbox(localization.Get("DutyFinder.Setting"),ref finder))
+        {
+            configuration.ShowDutyFinderLoot=finder;
+            try{save();}catch(Exception error){configuration.ShowDutyFinderLoot=!finder;log.Warning(error,"Duty finder setting could not be saved.");}
+        }
+        var panel=configuration.ShowCharacterPanel;
+        if(ImGui.Checkbox(localization.Get("CharacterStats.Setting"),ref panel))
+        {
+            configuration.ShowCharacterPanel=panel;
+            try{save();}catch(Exception error){configuration.ShowCharacterPanel=!panel;log.Warning(error,"Character panel setting could not be saved.");}
+        }
         var auto=configuration.AutoBankCapture;
         if(ImGui.Checkbox(localization.Get("BankUi.AutoSetting"),ref auto))
         {

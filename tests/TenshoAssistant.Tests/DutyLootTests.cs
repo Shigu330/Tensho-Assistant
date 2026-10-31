@@ -37,6 +37,16 @@ internal static class DutyLootTests
             var parsed = DutyLootParser.Parse("""{"instance":{"id":4,"rewards":[1]}}""",4,DateTimeOffset.UtcNow);
             try { ((IList<DutyLootEntry>)parsed.Entries).Clear(); throw new Exception("Mutable loot"); } catch (NotSupportedException) { }
             try { DutyLootParser.Parse("{}",4,DateTimeOffset.UtcNow,new CancellationToken(true)); throw new Exception("Cancellation ignored"); } catch (OperationCanceledException) { }
-        })
+        }),
+        ("Duty loot keeps the boss coffer of a real Garland raid document (A4S, 2026-10-31)", () =>
+        {
+            // Garland instance/en/2/30028 « Alexander - The Burden of the Father (Savage) »: 34 rewards, one boss with a 19-item coffer, no zone coffer.
+            var json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "garland-instance-30028.json"));
+            var parsed = DutyLootParser.Parse(json, 30028, DateTimeOffset.UtcNow);
+            var fight = parsed.Entries.Count(entry => entry.Kind == DutyLootSourceKind.FightCoffer);
+            if (fight != 19) throw new Exception($"fight coffer entries {fight}, rewards {parsed.Entries.Count(entry => entry.Kind == DutyLootSourceKind.Reward)}");
+            // 34 reward ids with repeats: each item once.
+            Check(parsed.HasFights && parsed.Entries.Count(entry => entry.Kind == DutyLootSourceKind.Reward) is > 0 and <= 34);
+        }),
     ];
 }

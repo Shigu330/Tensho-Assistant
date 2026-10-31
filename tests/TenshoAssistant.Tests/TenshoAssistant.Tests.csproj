@@ -25,6 +25,7 @@
     <Compile Include="../../src/TenshoAssistant/Maps/WikiVistas.cs" Link="Maps/WikiVistas.cs" />
     <Compile Include="../../src/TenshoAssistant/MiniGames/*.cs" Exclude="../../src/TenshoAssistant/MiniGames/*.Dalamud.cs" Link="MiniGames/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Character/CharacterStatsService.cs" Link="Character/CharacterStatsService.cs" />
+    <Compile Include="../../src/TenshoAssistant/Character/StatFormulas.cs" Link="Character/StatFormulas.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestService.cs" Link="Quests/QuestService.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestRewards.cs" Link="Quests/QuestRewards.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestRewardIndex.cs" Link="Quests/QuestRewardIndex.cs" />
@@ -63,5 +64,8 @@
     <Compile Include="../../src/TenshoAssistant/Craft/CraftPlan.cs" Link="Craft/CraftPlan.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftChain.cs" Link="Craft/CraftChain.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftChainSession.cs" Link="Craft/CraftChainSession.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Fixtures\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

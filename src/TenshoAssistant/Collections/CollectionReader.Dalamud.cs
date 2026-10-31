@@ -95,8 +95,10 @@ internal sealed partial class CollectionReader : IDisposable
             // Even a stale copy keeps its title/achievement states for the next read (CompletionMemory).
             if(saved is not null && CacheSnapshots.Valid(saved.Value,owner))
                 RememberCompletion(owner,saved.Value.Entries,saved.Value.TitlesCheckedAt,saved.Value.AchievementsCheckedAt);
+            // A copy made before 0.180 lacks the achievements' English names: read again (its states stay remembered above).
             if(saved is not null && CacheSnapshots.Valid(saved.Value,owner)
-                && CacheAge.Fresh(saved.RecordedAt,DateTimeOffset.UtcNow,cacheLifetime()))
+                && CacheAge.Fresh(saved.RecordedAt,DateTimeOffset.UtcNow,cacheLifetime())
+                && (!saved.Value.Entries.Any(entry=>entry.Kind==CollectionKind.Achievement) || saved.Value.Entries.Any(entry=>entry.Achievement is { EnglishName.Length:>0 })))
             {
                 try
                 {

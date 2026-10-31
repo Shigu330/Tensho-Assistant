@@ -186,6 +186,7 @@ internal sealed partial class MainWindow
                 else{page=Page.Collections;collectionKind=entry.Kind;focusCollectionKind=entry.Kind;if(entry.Kind==Collections.CollectionKind.Orchestrion)focusOrchestrionTab=true;}
                 collectionQuery=entry.Name;IsOpen=true;
             }
+            if(item is not null){ImGui.Separator();DrawSourceLinks([item]);}
         }
         finally{ImGui.EndPopup();}
     }
@@ -239,6 +240,7 @@ internal sealed partial class MainWindow
                 // Garland only when the plugin's own data knows nothing (0.146, user request).
                 if(known==0)DrawFallbackSources(item.Id);
             }
+            ImGui.TextDisabled(localization.Get("SourceLinks.Hint"));
             ImGui.PopTextWrapPos();
         }
         finally{ImGui.EndTooltip();}
@@ -254,7 +256,8 @@ internal sealed partial class MainWindow
         var state=wikiItems.Get(itemId);
         if(state.Loading){ImGui.TextDisabled(localization.Get("HoverUi.WikiLoading"));return 0;}
         if(state.Page is not { Lines.Count:>0 } page)return 0;
-        foreach(var line in page.Lines)ImGui.TextWrapped("· "+(line.Heading.Length>0 ? WikiTerm(line.Heading)+" : ":"")+WikiTerm(line.Text));
+        foreach(var line in page.Lines)
+            ImGui.TextWrapped("· "+(line.Heading.Length>0 ? WikiTerm(line.Heading)+" : ":"")+(AchievementNamed(line) is { } achievement ? achievement.Name:WikiTerm(line.Text)));
         ImGui.TextDisabled(localization.Get("HoverUi.WikiCredit"));
         return page.Lines.Count;
     }
@@ -331,6 +334,15 @@ internal sealed partial class MainWindow
             if(npcVendors?.State.Catalog?.ForItem(id) is { Count:>0 } offers){known++;ImGui.TextUnformatted(localization.Format("HoverUi.VendorCount",offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));}
             if(quests.State.RewardIndex?.ForItem(id) is { Count:>0 } rewards){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionQuests",string.Join(", ",rewards.Take(3).Select(reward=>reward.Name))));}
             foreach(var achievement in AchievementsRewarding([id]).Take(3)){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionAchievement",achievement));}
+            foreach(var dutyId in LuminaDutiesOf(id).Take(3))
+                if(duties.State.Catalog?.Find(dutyId) is { } lootDuty){known++;ImGui.TextUnformatted(localization.Format("HoverUi.LuminaDuty",lootDuty.Name));}
+            if(lumina?.State.Data is { } supplement)
+            {
+                if(supplement.MonstersOf(id) is { Count:>0 } mobs){known++;ImGui.TextWrapped(localization.Format("HoverUi.LuminaMonsters",string.Join(", ",mobs.Take(4))));}
+                if(supplement.FatesOf(id) is { Count:>0 } fates){known++;ImGui.TextWrapped(localization.Format("HoverUi.LuminaFates",string.Join(", ",fates.Take(3))));}
+                if(supplement.FromVenture(id)){known++;ImGui.TextUnformatted(localization.Get("HoverUi.LuminaVenture"));}
+                if(supplement.StorePriceCents(id) is { } cents){known++;ImGui.TextUnformatted(localization.Format("HoverUi.LuminaStore",(cents/100m).ToString("0.00",System.Globalization.CultureInfo.InvariantCulture)));}
+            }
             if(recipeCatalog.State.Catalog?.ForResult(id) is { Count:>0 } recipes){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionCraft",recipes.Count));}
             if(gatheringCatalog.State.Catalog?.ForItem(id) is { Count:>0 } gathered){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionGathering",gathered[0].TypeName,gathered[0].Zone));}
             if(item is { IsMarketable:true })ImGui.TextDisabled(localization.Get("HoverUi.CollectionMarket"));
