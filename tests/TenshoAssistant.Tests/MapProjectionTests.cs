@@ -20,6 +20,14 @@ internal static class MapProjectionTests
             Check(!copy.ShowQuests && copy.IconScale==1.5f && copy.HideInDuty && copy.ShowFlag,"roundtrip");
             Check(System.Text.Json.JsonSerializer.Deserialize<TenshoAssistant.MapViewSettings>("{}")!.ShowFixedIcons,"older configuration keeps the defaults");
         }),
+        ("Map variants of one territory with the same scale and offset share positions",()=>
+        {
+            // Auxesia: territory 1319, maps 1246 (default) and 1255 (a later stage), same scale 100 and offset 0.
+            var catalog=new MapCatalog([new MapDefinition(1246,1319,"???","Auxesia","",2,100),new MapDefinition(1255,1319,"???","Auxesia","",11,100),
+                new MapDefinition(500,1319,"???","Auxesia","Sous-sol",3,200),new MapDefinition(12,128,"La Noscea","Limsa","",0,100)]);
+            var equivalent=catalog.Equivalent(catalog.Find(1255)!);
+            Check(equivalent.Contains(1246u) && equivalent.Contains(1255u) && !equivalent.Contains(500u) && !equivalent.Contains(12u),"same ground only");
+        }),
         ("Vendor joins the game icon it stands by: shops at 16 pixels, unlabelled services at 8",()=>
         {
             // Positions from docs/evidence/0.155.0-vendor-markers-probe.log (Limsa: class/job clerk 63919 at 5 px, market board 60570 at 37).
@@ -29,6 +37,10 @@ internal static class MapProjectionTests
             Check(MapVendorIcons.Nearest([(100,100,60412,false)],new(112,100))==0,"shop icon keeps its 16 pixel reach");
             Check(MapVendorIcons.Nearest([(100,100,60442,true),(100,104,60434,true)],new(100,101))==-1,"labelled or unknown icons never take a vendor");
             Check(MapVendorIcons.Nearest([(100,106,60412,false),(100,102,60434,false)],new(100,100))==1,"nearest qualifying icon wins");
+            // Auxesia (docs/evidence/0.171.0-cosmic-vendors-probe.log): Échoppe 2.3 px, Échangeur 3.7 px from the credit exchange.
+            var auxesia=new (float X,float Y,uint Icon,bool Labelled)[]{(1342,1403,60412,false),(1342,1397,60935,false)};
+            Check(MapVendorIcons.Nearest(auxesia,new(1342,1400.7f),60935)==1 && MapVendorIcons.Nearest(auxesia,new(1342,1400.7f),60412)==0,"vendor joins the icon of its kind");
+            Check(MapVendorIcons.Nearest([(1342,1403,60412,false)],new(1342,1400.7f),60935)==0,"no icon of its kind in reach: nearest");
         }),
         ("Game map request opens the asked zone, not the world map selected at that frame",()=>
         {

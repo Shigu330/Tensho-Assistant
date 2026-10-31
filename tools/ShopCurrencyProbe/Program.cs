@@ -129,6 +129,68 @@ foreach(var npc in data.Excel.GetSheet<ENpcBase>())foreach(var value in npc.ENpc
 // Overview maps (world, regions) and how their markers link to other maps.
 // PROBE_MARKERS (MAP-017): for NPCs named like the value, their data links, Level positions and the game's map markers around
 // them (icon, label, texture-pixel distance) — what the map should show for exchanges such as Rowena's.
+// PROBE_ZONE=<place name>: territories whose map is named like the value, the event NPCs of their layouts with their data links
+// (sheet of each ENpcData value), and the map's shop-like markers — why the Tensho map shows no vendor there.
+// PROBE_TALK=<CustomTalk id>[,item name]: script instructions/arguments of a scripted dialogue, the sheets each argument belongs to, and the
+// special shops selling an item named like the second value — how a dialogue-only NPC reaches its shop.
+if(Environment.GetEnvironmentVariable("PROBE_TALK") is { Length:>0 } talkQuery)
+{
+    var parts=talkQuery.Split(',',2);var talkId=uint.Parse(parts[0]);
+    var talk=data.Excel.GetSheet<CustomTalk>().GetRow(talkId);
+    Console.WriteLine($"TALK {talkId} name '{talk.Name.ExtractText()}' special {talk.SpecialLinks.RowId}");
+    var argumentSheets=new (string Name,Func<uint,bool> Has)[]
+    {
+        ("SpecialShop",id=>data.Excel.GetSheet<SpecialShop>().HasRow(id)),("GilShop",id=>data.Excel.GetSheet<GilShop>().HasRow(id)),
+        ("CustomTalk",id=>data.Excel.GetSheet<CustomTalk>().HasRow(id)),("PreHandler",id=>data.Excel.GetSheet<PreHandler>().HasRow(id)),
+        ("InclusionShop",id=>data.Excel.GetSheet<InclusionShop>().HasRow(id)),("TopicSelect",id=>data.Excel.GetSheet<TopicSelect>().HasRow(id)),
+        ("Item",id=>data.Excel.GetSheet<Item>().HasRow(id)),
+    };
+    foreach(var script in talk.Script.Where(script=>script.ScriptArg!=0 || script.ScriptInstruction.ExtractText().Length>0))
+        Console.WriteLine($"  {script.ScriptInstruction.ExtractText()} = {script.ScriptArg} [{string.Join("/",argumentSheets.Where(sheet=>sheet.Has(script.ScriptArg)).Select(sheet=>sheet.Name))}]");
+    if(parts.Length>1)
+        foreach(var shop in data.Excel.GetSheet<SpecialShop>())
+            if(shop.Item.Any(entry=>entry.ReceiveItems.Any(receive=>receive.Item.RowId!=0 && receive.Item.IsValid && receive.Item.Value.Name.ExtractText().Contains(parts[1],StringComparison.OrdinalIgnoreCase))))
+                Console.WriteLine($"  SHOP {shop.RowId} '{shop.Name.ExtractText()}' sells '{parts[1]}' (offset from talk {(long)shop.RowId-talkId})");
+    return;
+}
+if(Environment.GetEnvironmentVariable("PROBE_ZONE") is { Length:>0 } zoneName)
+{
+    foreach(var zoneMap in data.Excel.GetSheet<Map>().Where(row=>row.PlaceName.ValueNullable?.Name.ExtractText()==zoneName))
+        Console.WriteLine($"MAPROW {zoneMap.RowId} id '{zoneMap.Id.ExtractText()}' territory {zoneMap.TerritoryType.RowId} markers {zoneMap.MapMarkerRange} size {zoneMap.SizeFactor} offset {zoneMap.OffsetX},{zoneMap.OffsetY}");
+    foreach(var zoneTerritory in data.Excel.GetSheet<TerritoryType>().Where(row=>row.PlaceName.ValueNullable?.Name.ExtractText()==zoneName))
+        Console.WriteLine($"TERRITORY {zoneTerritory.RowId} map {zoneTerritory.Map.RowId} bg '{zoneTerritory.Bg.ExtractText()}'");
+    var zoneSheets=new (string Name,Func<uint,bool> Has)[]
+    {
+        ("GilShop",id=>data.Excel.GetSheet<GilShop>().HasRow(id)),("SpecialShop",id=>data.Excel.GetSheet<SpecialShop>().HasRow(id)),
+        ("CollectablesShop",id=>data.Excel.GetSheet<CollectablesShop>().HasRow(id)),("InclusionShop",id=>data.Excel.GetSheet<InclusionShop>().HasRow(id)),
+        ("PreHandler",id=>data.Excel.GetSheet<PreHandler>().HasRow(id)),("TopicSelect",id=>data.Excel.GetSheet<TopicSelect>().HasRow(id)),
+        ("CustomTalk",id=>data.Excel.GetSheet<CustomTalk>().HasRow(id)),("FateShop",id=>data.Excel.GetSheet<FateShop>().HasRow(id)),
+    };
+    var zoneResidents=data.Excel.GetSheet<ENpcResident>();var zoneBases=data.Excel.GetSheet<ENpcBase>();
+    foreach(var territory in data.Excel.GetSheet<TerritoryType>().Where(row=>row.Map.IsValid && row.Map.Value.PlaceName.ValueNullable?.Name.ExtractText()==zoneName))
+    {
+        var map=territory.Map.Value;
+        Console.WriteLine($"ZONE territory {territory.RowId} map {map.RowId} region '{map.PlaceNameRegion.ValueNullable?.Name.ExtractText()}' regionId {map.PlaceNameRegion.RowId} bg '{territory.Bg.ExtractText()}'");
+        var bg=territory.Bg.ExtractText();var cut=bg.IndexOf("/level/",StringComparison.Ordinal);if(cut<0)continue;
+        foreach(var kind in new[]{"planevent","planner"})
+        {
+            var path=$"bg/{bg[..(cut+1)]}level/{kind}.lgb";var zoneBytes=data.FileExists(path) ? data.GetFile(path)?.Data:null;
+            if(zoneBytes is null || zoneBytes.Length<16 || zoneBytes[0]!=0x4C || zoneBytes[1]!=0x47 || zoneBytes[2]!=0x42 || zoneBytes[3]!=0x31){Console.WriteLine($"  {kind}: absent or unreadable");continue;}
+            Console.WriteLine($"  {kind}: bytes {zoneBytes.Length} declared {BitConverter.ToInt32(zoneBytes,4)} chunk '{System.Text.Encoding.ASCII.GetString(zoneBytes,12,4)}'");
+            var file=data.GetFile<Lumina.Data.Files.LgbFile>(path);if(file is null)continue;
+            var seen=new HashSet<uint>();
+            foreach(var layer in file.Layers)foreach(var instance in layer.InstanceObjects)
+            {
+                if(instance.AssetType!=Lumina.Data.Parsing.Layer.LayerEntryType.EventNPC)continue;
+                var id=((Lumina.Data.Parsing.Layer.LayerCommon.ENPCInstanceObject)instance.Object).ParentData.ParentData.BaseId;
+                if(!seen.Add(id) || !zoneBases.TryGetRow(id,out var npc))continue;
+                var links=npc.ENpcData.Select(value=>value.RowId).Where(value=>value!=0).Select(value=>$"{value}:{string.Join("/",zoneSheets.Where(sheet=>sheet.Has(value)).Select(sheet=>sheet.Name))}");
+                Console.WriteLine($"  [{kind}] NPC {id} '{(zoneResidents.TryGetRow(id,out var who) ? who.Singular.ExtractText():"")}' title '{(zoneResidents.TryGetRow(id,out var w2) ? w2.Title.ExtractText():"")}' links={string.Join(",",links)}");
+            }
+        }
+    }
+    return;
+}
 if(Environment.GetEnvironmentVariable("PROBE_MARKERS") is { Length:>0 } markerNpc)
 {
     var npcBases=data.Excel.GetSheet<ENpcBase>();var levels=data.Excel.GetSheet<Level>();var markerRows=data.Excel.GetSubrowSheet<MapMarker>();
@@ -190,6 +252,67 @@ if(Environment.GetEnvironmentVariable("PROBE_MARKERS") is { Length:>0 } markerNp
             foreach(var row in rows.Select(row=>(row,distance:System.Numerics.Vector2.Distance(new(row.X,row.Y),pixel))).Where(pair=>pair.distance<=48).OrderBy(pair=>pair.distance))
                 Console.WriteLine($"    MARKER icon {row.row.Icon} type {row.row.DataType} key {row.row.DataKey.RowId} label '{row.row.PlaceNameSubtext.Value.Name.ExtractText()}' at {row.row.X},{row.row.Y} distance {row.distance:0.0}");
         }
+    }
+    return;
+}
+// PROBE_TRIAD (TRIAD-003): Triple Triad NPCs — ENpcBase data → TripleTriad row (rules, fixed and variable cards, rewards), rule list,
+// and where they stand (Level). The plugin relies on these links only after this probe.
+if(Environment.GetEnvironmentVariable("PROBE_TRIAD") is { Length:>0 })
+{
+    // PROBE_TRIAD=resident: TripleTriadResident ids/order next to TripleTriad rows; card items (ItemAction) and card sources.
+    if(Environment.GetEnvironmentVariable("PROBE_TRIAD")=="resident")
+    {
+        var residentsTt=data.Excel.GetSheet<TripleTriadResident>();
+        Console.WriteLine($"RESIDENT rows={residentsTt.Count} sample="+string.Join(",",residentsTt.Take(6).Select(row=>$"{row.RowId}:order{row.Order}")));
+        Console.WriteLine($"RESIDENT sameIdsAsTripleTriad={residentsTt.Count(row=>data.Excel.GetSheet<TripleTriad>().HasRow(row.RowId))}");
+        var cardItems=data.Excel.GetSheet<Item>().Where(item=>item.ItemAction.RowId!=0 && item.ItemAction.IsValid).ToList();
+        var cardActions=cardItems.Where(item=>item.Name.ExtractText().Contains("Carte",StringComparison.OrdinalIgnoreCase) && item.ItemUICategory.RowId==86)
+            .GroupBy(item=>item.ItemAction.Value.Action.RowId).Select(group=>$"{group.Key}x{group.Count()}");
+        Console.WriteLine("CARDITEM actions="+string.Join(",",cardActions));
+        foreach(var item in cardItems.Where(item=>item.ItemUICategory.RowId==86).Take(5))
+            Console.WriteLine($"CARDITEM {item.RowId} '{item.Name.ExtractText()}' action {item.ItemAction.Value.Action.RowId} data0 {item.ItemAction.Value.Data[0]}");
+        var cardResident=data.Excel.GetSheet<TripleTriadCardResident>();
+        foreach(var id in new uint[]{53,42,89,5,7})
+        {
+            var r=cardResident.GetRow(id);
+            Console.WriteLine($"CARDSRC {id} acqType {r.AcquisitionType.RowId} acquisition {r.Acquisition.RowId} location {r.Location.RowId} quest {r.Quest.RowId}");
+        }
+        var types=data.Excel.GetSheet<TripleTriadCardResident>().GroupBy(row=>row.AcquisitionType.RowId).Select(group=>$"{group.Key}x{group.Count()}");
+        Console.WriteLine("ACQTYPES "+string.Join(",",types));
+        return;
+    }
+    // PROBE_TRIAD=<npc id>: that NPC's deck with card faces (TripleTriadCardResident), to match cards observed in a match.
+    if(uint.TryParse(Environment.GetEnvironmentVariable("PROBE_TRIAD"),out var triadNpc) && triadNpc>1)
+    {
+        var npc=data.Excel.GetSheet<ENpcBase>().GetRow(triadNpc);var resident=data.Excel.GetSheet<TripleTriadCardResident>();
+        foreach(var id in npc.ENpcData.Select(value=>value.RowId).Where(id=>data.Excel.GetSheet<TripleTriad>().HasRow(id)))
+        {
+            var row=data.Excel.GetSheet<TripleTriad>().GetRow(id);
+            Console.WriteLine($"DECK npc {triadNpc} match {id} rules=[{string.Join(",",row.TripleTriadRule.Select(rule=>rule.RowId))}] regional={row.UsesRegionalRules}");
+            foreach(var (kind,cards) in new[]{("fixed",row.TripleTriadCardFixed),("variable",row.TripleTriadCardVariable)})
+                foreach(var card in cards.Where(card=>card.RowId!=0))
+                {
+                    var face=resident.GetRow(card.RowId);
+                    Console.WriteLine($"  {kind} {card.RowId} '{data.Excel.GetSheet<TripleTriadCard>().GetRow(card.RowId).Name.ExtractText()}' U{face.Top} R{face.Right} D{face.Bottom} L{face.Left} rarity {face.TripleTriadCardRarity.RowId} type {face.TripleTriadCardType.RowId}");
+                }
+        }
+        return;
+    }
+    var matches=data.Excel.GetSheet<TripleTriad>();var rules=data.Excel.GetSheet<TripleTriadRule>();var cardNames=data.Excel.GetSheet<TripleTriadCard>();
+    Console.WriteLine($"TRIAD rows={matches.Count} withRules={matches.Count(row=>row.TripleTriadRule.Any(rule=>rule.RowId!=0))} regional={matches.Count(row=>row.UsesRegionalRules)}");
+    foreach(var rule in rules)Console.WriteLine($"RULE {rule.RowId} '{rule.Name.ExtractText()}'");
+    var npcs=data.Excel.GetSheet<ENpcBase>().Select(npc=>(npc.RowId,Match:npc.ENpcData.Select(value=>value.RowId).FirstOrDefault(id=>matches.HasRow(id)))).Where(pair=>pair.Match!=0).ToList();
+    Console.WriteLine($"TRIAD npcsLinked={npcs.Count} distinctRows={npcs.Select(pair=>pair.Match).Distinct().Count()}");
+    var triadResidents=data.Excel.GetSheet<ENpcResident>();var levels=data.Excel.GetSheet<Level>().Where(level=>level.Type==8).GroupBy(level=>level.Object.RowId).ToDictionary(group=>group.Key,group=>group.First());
+    string Card(uint id)=>id==0 ? "-":cardNames.TryGetRow(id,out var card) ? $"{id}:{card.Name.ExtractText()}":$"{id}:?";
+    foreach(var (npcId,matchId) in npcs.Where(pair=>triadResidents.TryGetRow(pair.RowId,out var who) && who.Singular.ExtractText() is "Rowena" or "Triple Triad Master" or "maître de Triple Triade" || pair.RowId is 1001304).Concat(npcs.Take(4)))
+    {
+        var row=matches.GetRow(matchId);
+        var place=levels.TryGetValue(npcId,out var level) && level.Map.IsValid ? $"map {level.Map.RowId} '{level.Map.Value.PlaceName.Value.Name.ExtractText()}'":"no Level";
+        Console.WriteLine($"NPC {npcId} '{(triadResidents.TryGetRow(npcId,out var r) ? r.Singular.ExtractText():"")}' match {matchId} {place} regional={row.UsesRegionalRules} fee={row.Fee}"
+            +$" rules=[{string.Join(",",row.TripleTriadRule.Where(rule=>rule.RowId!=0).Select(rule=>$"{rule.RowId}:{rule.Value.Name.ExtractText()}"))}]"
+            +$" fixed=[{string.Join(",",row.TripleTriadCardFixed.Select(card=>Card(card.RowId)))}] variable=[{string.Join(",",row.TripleTriadCardVariable.Select(card=>Card(card.RowId)))}]"
+            +$" rewards=[{string.Join(",",row.ItemPossibleReward.Where(item=>item.RowId!=0).Select(item=>item.RowId))}]");
     }
     return;
 }

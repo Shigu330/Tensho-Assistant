@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace TenshoAssistant.MiniGames;
 
@@ -15,6 +16,31 @@ internal sealed class MiniCactpotObservationReader : IDisposable
     private static unsafe int[] Copy(AddonLotteryDaily* addon)
     {
         var values=new int[9];for(var index=0;index<9;index++)values[index]=addon->GameNumbers[index];return values;
+    }
+    // Screen rectangle of a component's owner node (also while the line buttons are greyed out); null when absent.
+    // Size uses the node and window scale.
+    private static unsafe MiniCactpotRect? Rect(AtkComponentBase* component,float scale)
+    {
+        if(component==null || component->OwnerNode==null)return null;
+        var node=&component->OwnerNode->AtkResNode;
+        var rect=new MiniCactpotRect(node->ScreenX,node->ScreenY,node->Width*node->ScaleX*scale,node->Height*node->ScaleY*scale);
+        return rect.Valid ? rect:null;
+    }
+    private static unsafe MiniCactpotRect[]? Tiles(AddonLotteryDaily* addon)
+    {
+        var rects=new MiniCactpotRect[9];
+        for(var index=0;index<9;index++){if(Rect((AtkComponentBase*)addon->GameBoard[index],addon->AtkUnitBase.Scale) is not { } rect)return null;rects[index]=rect;}
+        return rects;
+    }
+    private static unsafe MiniCactpotRect[]? Lanes(AddonLotteryDaily* addon)
+    {
+        var rects=new MiniCactpotRect[8];
+        for(var line=0;line<8;line++)
+        {
+            if(Rect((AtkComponentBase*)addon->LaneSelector[MiniCactpotObservedFrame.LaneOfLine[line]],addon->AtkUnitBase.Scale) is not { } rect)return null;
+            rects[line]=rect;
+        }
+        return rects;
     }
     private unsafe void Update(IFramework unused)
     {
@@ -34,7 +60,7 @@ internal sealed class MiniCactpotObservationReader : IDisposable
                 var after=gui.GetAddonByName("LotteryDaily");
                 if(after.IsNull || after.Address!=handle.Address || !after.IsReady || !after.IsVisible || gui.GameUiHidden || !board.SequenceEqual(Copy(addon)))
                 {service.Missing(ticket,current,MiniCactpotObservationStatus.NotReady);return;}
-                service.Publish(ticket,current,board);
+                service.Publish(ticket,current,board,Tiles(addon),Lanes(addon));
             }
             catch(Exception error){service.Fail(ticket,current,error);nextRead=now+Stopwatch.Frequency*5;log.Warning(error,"Mini Cactpot observation unavailable; retry in five seconds.");}
         }

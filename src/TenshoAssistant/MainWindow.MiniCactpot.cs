@@ -26,6 +26,28 @@ internal sealed partial class MainWindow
         for(var index=0;index<9;index++)cactpotBoard[index]=observation.Frame!.Board[index];
         _=cactpotSolve.StartAsync(cactpotBoard,cactpotObservedOwner,cactpotGeneration);
     }
+    // Overlay on the game's Mini Cactpot window (0.158), like ezMiniCactpot: drawn every frame while the observation is on, even
+    // with the Tensho window closed; the best cell(s) or line(s) get a green frame. Reading only: the player still clicks.
+    internal void DrawCactpotOverlay()
+    {
+        if(windowDisposed)return;
+        var observation=cactpotObservation.State;
+        if(!observation.Enabled)return;
+        SyncCactpot(observation);
+        cactpotSolve.ValidateContext(cactpotObservedOwner,cactpotGeneration);
+        if(!observation.CanSolve(DateTimeOffset.UtcNow) || observation.Frame is not { } frame)return;
+        var state=cactpotSolve.State;
+        if(state.Result is not { } result || state.Board is not { } solved || !solved.SequenceEqual(frame.Board))return;
+        if((result.ChooseLine ? frame.Lanes:frame.Tiles) is not { } rects)return;
+        var draw=ImGui.GetForegroundDrawList();
+        var fill=ImGui.GetColorU32(Success with { W=0.25f });var border=ImGui.GetColorU32(Success);
+        for(var index=0;index<result.Choices.Count && index<rects.Count;index++)
+        {
+            if(result.Choices[index] is not { } value || Math.Abs(value-result.ExpectedReward)>=0.000001)continue;
+            var rect=rects[index];var min=new Vector2(rect.X,rect.Y);var max=min+new Vector2(rect.Width,rect.Height);
+            draw.AddRectFilled(min,max,fill,6);draw.AddRect(min,max,border,6,ImDrawFlags.None,3);
+        }
+    }
     private void DrawMiniCactpot()
     {
         Heading(localization.Get("CactpotUi.Title"),localization.Get("CactpotUi.Description"));

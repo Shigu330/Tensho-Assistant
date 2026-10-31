@@ -179,7 +179,7 @@ internal sealed partial class MainWindow
     // Vertical tool column like the game map buttons.
     private void DrawMapTools(MapDefinition? map,ImGuiViewportPtr viewport,(Vector2 Size,Vector2 Position) window)
     {
-        if(!ImGui.BeginChild("MapTools",new Vector2(34,0),false,ImGuiWindowFlags.NoScrollbar))return;
+        if(!ImGui.BeginChild("MapTools",new Vector2(34,0),false,ImGuiWindowFlags.NoScrollbar)){ImGui.EndChild();return;}
         try
         {
             var parent=map is null || mapMarkers is null ? 0:mapMarkers.Parent(map);
@@ -511,7 +511,7 @@ internal sealed partial class MainWindow
             foreach(var (vendor,spot) in vendorsHere)
             {
                 var pixel=MapProjection.PixelFromWorld(new Vector3(spot.WorldX,0,spot.WorldZ),map);
-                var near=VendorMarker(shopMarkers,pixel);
+                var near=VendorMarker(shopMarkers,pixel,VendorIconOf(vendor));
                 if(near is null){lonelyVendors.Add((vendor,spot,pixel));continue;}
                 if(!mergedVendors.TryGetValue(near,out var list))mergedVendors[near]=list=[];
                 list.Add((VendorLabel(vendor),new Vector2(spot.X,spot.Y)));
@@ -705,9 +705,9 @@ internal sealed partial class MainWindow
     // Game shop icons (MapSymbol, docs/evidence/0.139.0-symbols-probe.log): 60412 Échoppe, 60935 Échangeur, 63851 Marchand.
     private static MapIconMarker[] VendorCandidates(IReadOnlyList<MapIconMarker> markers)=>
         markers.Where(marker=>MapVendorIcons.Shops.Contains(marker.Icon) || MapVendorIcons.Services.Contains(marker.Icon)).ToArray();
-    private static MapIconMarker? VendorMarker(MapIconMarker[] candidates,Vector2 pixel)
+    private static MapIconMarker? VendorMarker(MapIconMarker[] candidates,Vector2 pixel,uint preferred=0)
     {
-        var index=MapVendorIcons.Nearest(candidates.Select(marker=>(marker.X,marker.Y,marker.Icon,marker.Label.Length>0)).ToArray(),pixel);
+        var index=MapVendorIcons.Nearest(candidates.Select(marker=>(marker.X,marker.Y,marker.Icon,marker.Label.Length>0)).ToArray(),pixel,preferred);
         return index<0 ? null:candidates[index];
     }
     // Gil shop = Échoppe; only special exchanges = Échangeur.
@@ -911,7 +911,8 @@ internal sealed partial class MainWindow
         {
             var shops=ReferenceEquals(mapVendorCache.Catalog,catalog) ? mapVendorCache.Shops
 :catalog.Sales.GroupBy(sale=>sale.ShopId).ToDictionary(group=>group.Key,group=>(group.First().ShopName,group.First().Kind,group.Select(sale=>sale.ItemId).Distinct().Count()));
-            var rows=catalog.Vendors.SelectMany(vendor=>vendor.Locations.Where(spot=>spot.MapId==map.MapId).Select(spot=>(vendor,spot))).ToArray();
+            var same=(maps.State.Catalog?.Equivalent(map) ?? [map.MapId]).ToHashSet();
+            var rows=catalog.Vendors.SelectMany(vendor=>vendor.Locations.Where(spot=>same.Contains(spot.MapId)).Take(1).Select(spot=>(vendor,spot))).ToArray();
             mapVendorCache=(map.MapId,catalog,rows,shops);
         }
         return mapVendorCache.Rows;

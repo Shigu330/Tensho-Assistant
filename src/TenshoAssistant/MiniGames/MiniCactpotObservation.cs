@@ -1,20 +1,33 @@
 namespace TenshoAssistant.MiniGames;
 
 public enum MiniCactpotObservationStatus {Disabled,Waiting,Offline,AddonAbsent,NotReady,Observed,Error}
+/// <summary>Screen rectangle of a game button (pixels, same space as ImGui).</summary>
+public readonly record struct MiniCactpotRect(float X,float Y,float Width,float Height)
+{
+    public bool Valid=>float.IsFinite(X) && float.IsFinite(Y) && float.IsFinite(Width) && float.IsFinite(Height) && Width>0 && Height>0;
+}
 public sealed class MiniCactpotObservedFrame
 {
     public IReadOnlyList<int> Board {get;}
     public int Revealed {get;}
     public bool Playable=>Revealed is >=1 and <=4;
     public string Source=>"FFXIVClientStructs.AddonLotteryDaily.GameNumbers · ordre ligne/colonne";
-    public MiniCactpotObservedFrame(IReadOnlyList<int> board)
+    // Overlay (0.158): screen rectangles of the 9 cells (row by row) and of the 8 line buttons in the solver's line order
+    // (rows, columns, diagonal ↘, diagonal ↙); null when a button could not be read, so nothing is drawn.
+    public IReadOnlyList<MiniCactpotRect>? Tiles {get;}
+    public IReadOnlyList<MiniCactpotRect>? Lanes {get;}
+    public MiniCactpotObservedFrame(IReadOnlyList<int> board,IReadOnlyList<MiniCactpotRect>? tiles=null,IReadOnlyList<MiniCactpotRect>? lanes=null)
     {
         ArgumentNullException.ThrowIfNull(board);
         var values=board.ToArray();
         if(values.Length!=9 || values.Any(value=>value is <0 or >9) || values.Where(value=>value!=0).Distinct().Count()!=values.Count(value=>value!=0))
             throw new ArgumentException("Plateau observé incomplet, hors bornes ou chiffres répétés.",nameof(board));
         Board=Array.AsReadOnly(values);Revealed=values.Count(value=>value!=0);
+        Tiles=tiles is { Count:9 } && tiles.All(rect=>rect.Valid) ? Array.AsReadOnly(tiles.ToArray()):null;
+        Lanes=lanes is { Count:8 } && lanes.All(rect=>rect.Valid) ? Array.AsReadOnly(lanes.ToArray()):null;
     }
+    /// <summary>Game line button (LaneSelector: 0 diagonal ↘, 1–3 columns, 4 diagonal ↙, 5–7 rows) for each solver line.</summary>
+    public static readonly IReadOnlyList<int> LaneOfLine=Array.AsReadOnly(new[]{5,6,7,1,2,3,0,4});
 }
 public sealed record MiniCactpotObservationState(bool Enabled,ulong Owner,MiniCactpotObservationStatus Status,DateTimeOffset? ObservedAt,MiniCactpotObservedFrame? Frame,string? Error)
 {
@@ -47,12 +60,12 @@ public sealed class MiniCactpotObservationService : IDisposable
         }
     }
     private bool Accept(int ticket,ulong owner)=>!disposed && state.Enabled && owner!=0 && state.Owner==owner && generation==ticket;
-    internal void Publish(int ticket,ulong owner,IReadOnlyList<int> board)
+    internal void Publish(int ticket,ulong owner,IReadOnlyList<int> board,IReadOnlyList<MiniCactpotRect>? tiles=null,IReadOnlyList<MiniCactpotRect>? lanes=null)
     {
         lock(gate)
         {
             if(!Accept(ticket,owner))return;
-            try{state=new(true,owner,MiniCactpotObservationStatus.Observed,DateTimeOffset.UtcNow,new(board),null);}
+            try{state=new(true,owner,MiniCactpotObservationStatus.Observed,DateTimeOffset.UtcNow,new(board,tiles,lanes),null);}
             catch(ArgumentException error){generation++;state=new(true,owner,MiniCactpotObservationStatus.Error,null,null,error.Message);}
         }
     }

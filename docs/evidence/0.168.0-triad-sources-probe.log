@@ -1,0 +1,15 @@
+# TRIAD (2026-10-31) PROBE_TRIAD=resident : TripleTriadResident = mêmes ids que TripleTriad ; objets carte = ItemAction 3357, Data[0] = carte ; sources de carte (AcquisitionType 6 PNJ, 8 lot)
+RESIDENT rows=146 sample=2293760:order65535,2293761:order65535,2293762:order0,2293763:order1,2293764:order2,2293765:order3
+RESIDENT sameIdsAsTripleTriad=146
+CARDITEM actions=3357x475
+CARDITEM 9772 'Carte dodo' action 3357 data0 1
+CARDITEM 9773 'Carte tomberry' action 3357 data0 2
+CARDITEM 9774 'Carte pampa' action 3357 data0 3
+CARDITEM 9775 'Carte spriggan' action 3357 data0 4
+CARDITEM 9776 'Carte pudding' action 3357 data0 5
+CARDSRC 53 acqType 8 acquisition 10130 location 0 quest 65973
+CARDSRC 42 acqType 6 acquisition 1006261 location 4257902 quest 65973
+CARDSRC 89 acqType 6 acquisition 1000856 location 1673577 quest 65973
+CARDSRC 5 acqType 8 acquisition 10128 location 0 quest 65973
+CARDSRC 7 acqType 1 acquisition 0 location 0 quest 65973
+ACQTYPES 0x1,1x5,6x163,8x62,3x101,10x72,7x4,11x21,5x4,2x30,9x5,4x6,12x1,14x1

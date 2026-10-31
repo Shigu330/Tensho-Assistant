@@ -52,12 +52,17 @@ internal sealed partial class MainWindow
                 }
                 if (ImGui.BeginTabItem(localization.Get("TriadUi.Deck")))
                 {
-                    try { DrawTriadDeck(); }
+                    try { DrawTriadSavedDecks(); DrawTriadDeck(); }
                     finally { ImGui.EndTabItem(); }
                 }
                 if (ImGui.BeginTabItem(localization.Get("TriadUi.Simulation")))
                 {
                     try { DrawTriadSimulation(); }
+                    finally { ImGui.EndTabItem(); }
+                }
+                if (ImGui.BeginTabItem(localization.Get("TriadNpcs.Tab")))
+                {
+                    try { DrawTriadNpcs(); }
                     finally { ImGui.EndTabItem(); }
                 }
                 if (ImGui.BeginTabItem(localization.Get("TriadUi.Observation")))

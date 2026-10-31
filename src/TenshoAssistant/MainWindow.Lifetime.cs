@@ -11,6 +11,8 @@ internal sealed partial class MainWindow
         craftLogSession.Dispose();
         craftLog.Reset();
         triadSolve.Dispose();
+        CancelTriadAdvice();
+        CancelTriadRequest();
         preparationPrices.Dispose();
         cactpotSolve.Dispose();
         bankFrameRows.Clear();

@@ -150,7 +150,7 @@ internal sealed partial class MainWindow
     private void DrawLocalCollectibles(MapDefinition map,MapLiveState? live,MapLocalKind kind)
     {
         if(LocalIndexOrStatus() is not { } index)return;
-        var rows=index.OnMap(kind,map.MapId);
+        var rows=(maps.State.Catalog?.Equivalent(map) ?? [map.MapId]).SelectMany(id=>index.OnMap(kind,id)).ToList();
         if(rows.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
         var collected=kind==MapLocalKind.Sightseeing ? live?.Sightseen:live?.UnlockedCurrents;
         var done=collected is null ? 0:rows.Count(row=>collected.Contains(row.Id));
@@ -188,7 +188,7 @@ internal sealed partial class MainWindow
         {
             var name=vendor.Name.Length>0 ? vendor.Name:localization.Get("MapLocal.UnnamedVendor");
             // Same icon as on the map: the game's icon the vendor stands by (MAP-017), else the icon of its kind.
-            DrawSmallGameIcon(VendorMarker(vendorMarkers,MapProjection.PixelFromWorld(new Vector3(spot.WorldX,0,spot.WorldZ),map))?.Icon ?? VendorIconOf(vendor));
+            DrawSmallGameIcon(VendorMarker(vendorMarkers,MapProjection.PixelFromWorld(new Vector3(spot.WorldX,0,spot.WorldZ),map),VendorIconOf(vendor))?.Icon ?? VendorIconOf(vendor));
             if(ImGui.Selectable($"{name}  (X {spot.X:0.0}  Y {spot.Y:0.0})##Vendor{vendor.NpcId}/{spot.X}/{spot.Y}")){PlaceFlagFromMapView(map,spot.X,spot.Y);ImGui.CloseCurrentPopup();}
             ToolMenu($"VendorTool{vendor.NpcId}/{spot.X}/{spot.Y}","MapLocal.OpenVendorTool",()=>{npcVendorFocus=vendor.NpcId;page=Page.NpcVendors;});
             if(ImGui.IsItemHovered())ImGui.SetTooltip(VendorLabel(vendor)+"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));

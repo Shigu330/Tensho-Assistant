@@ -45,6 +45,10 @@ public static class NpcShopLinks
         // « Officier de gestion du Maelstrom », Wolves' Den « Échange de cristaux-insignes » (in-game capture 2026-10-31):
         // talk RegSeaPvpCommendationCrystalShop, the only shop costing commendation crystals (40479), the only NPC using it.
         [721735]=[1770684],
+        // Kaede « Fouilles archéologiques », Auxesia (in-game capture 2026-10-31: « Obtenir des batteries portatives » → « Échange de devises »,
+        // Batterie portative (Auxesia), 200): talk CtsWksTreasure_00966 has no script argument; 1771038 is the special shop selling that item
+        // (docs/evidence/0.176.0-kaede-talk-probe.log). The other battery shop, 1771006, is not linked until observed.
+        [721862]=[1771038],
     };
     public const byte TomestoneCost=2,ScripCost=3;
     public static NpcCost Currency(byte encoding,uint costId,uint amount,byte costType=0)
@@ -128,7 +132,7 @@ public static class NpcVendorCache
     public const int MaximumRows=500_000;
     // Bump when the sheet-to-record copy rules change without a change of record shape.
     // 2: FateShop links (gemstone traders). 3: InclusionShop links (scrip exchanges), encoded currencies no longer mapped (2026-10-30).
-    private const int CopyRules=10; // 8: observed talk links; 9: planevent.lgb; 10: planner.lgb + header check + crystal exchange. // 4: purple scrips; 5: (type, id) table; 6: currencies keyed by CostType (tomestones vs scrips).
+    private const int CopyRules=11; // 11: Kaede's archaeology talk (Auxesia). 8: observed talk links; 9: planevent.lgb; 10: planner.lgb + header check + crystal exchange. // 4: purple scrips; 5: (type, id) table; 6: currencies keyed by CostType (tomestones vs scrips).
     public static readonly string Shape=CatalogCacheKeys.Shape(typeof(NpcVendor),typeof(NpcLocation),typeof(NpcShopSale),typeof(NpcCost),typeof(NpcShopKind));
     public static string Version(string dataVersion)=>CatalogCacheKeys.Version(dataVersion,CopyRules,Shape);
     public static bool Valid(NpcVendorCacheData? data,string dataVersion)

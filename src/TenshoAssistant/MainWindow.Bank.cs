@@ -94,6 +94,7 @@ internal sealed partial class MainWindow
         }
         var entries = state.Entries.Where(entry => entry.Key.CharacterId == menus.CharacterId)
             .OrderBy(entry => entry.Key.Kind).ThenBy(entry => entry.Name, StringComparer.Ordinal).ToArray();
+        DrawFirstOpenNotices(entries,menus);
         ImGui.TextUnformatted(localization.Format("BankUi.Count",entries.Length));
         foreach (var entry in entries)
         {
@@ -398,6 +399,20 @@ internal sealed partial class MainWindow
             drawList.AddText(countPosition, ImGui.GetColorU32(ImGuiCol.Text), count);
         }
         finally { ImGui.PopID(); }
+    }
+
+    // What still needs one opening in the game before its contents are known (0.167).
+    private void DrawFirstOpenNotices(IReadOnlyList<BankEntry> entries,BankMenuState menus)
+    {
+        ImGui.TextWrapped(localization.Get(configuration.AutoBankCapture ? "BankUi.AutoOn":"BankUi.AutoOff"));
+        if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.Saddlebag))ImGui.TextColored(Accent,localization.Get("BankUi.OpenSaddlebag"));
+        if(menus.KnownRetainers is { } known)
+        {
+            foreach(var (id,name) in known)
+                if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.Retainer && entry.Key.StorageId==id))
+                    ImGui.TextColored(Accent,localization.Format("BankUi.OpenRetainer",name));
+        }
+        else if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.Retainer))ImGui.TextColored(Accent,localization.Get("BankUi.OpenBell"));
     }
 
     private void DrawMenuImport(BankMenuContext? context)

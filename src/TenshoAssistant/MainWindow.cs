@@ -78,6 +78,7 @@ internal sealed partial class MainWindow : Window, IDisposable
     private Page page;
     private string? saveError;
     private bool developerMode;
+    internal bool DeveloperMode => developerMode;
     private bool windowDisposed;
     private bool revealHomeTools;
     private int itemId;

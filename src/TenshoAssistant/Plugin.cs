@@ -59,6 +59,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly FashionHintService fashionHints=new();
     private readonly FashionDataService fashionData=new();
     private readonly BankImportOverlay bankOverlay;
+    private Func<bool> autoBankCapture = () => true;
     private readonly ItemContextMenuBridge? itemContextMenu;
     private readonly DataCache? dataCache;
     private CommandInfo? commandInfo;
@@ -66,7 +67,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public Plugin(IDalamudPluginInterface pluginInterface, ICommandManager commands, IPluginLog log,
         IGameInventory inventory, IPlayerState player, IClientState client, IFramework framework, IDataManager data, IGameGui gameGui,
-        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,IPartyList partyList)
+        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,ITargetManager targets,IPartyList partyList)
     {
         this.log = log;
         localization = new LocalizationManager((error, message) => log.Warning(error, message), pluginInterface.AssemblyLocation.DirectoryName);
@@ -81,6 +82,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(() => { }, monsterLoot.Dispose);
             registrations.Register(() => { }, fashionData.Dispose);
             var configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            autoBankCapture = () => configuration.AutoBankCapture;
             if (configuration.Version != 1)
                 throw new NotSupportedException($"Unsupported configuration version: {configuration.Version}");
             dataCache=new DataCache(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"DataCache-v1"));
@@ -92,7 +94,7 @@ public sealed class Plugin : IDalamudPlugin
             var bank = new InventoryBankService(new FileInventoryBankStore(
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(), "InventoryBank.json")));
             registrations.Register(() => { }, bank.Dispose);
-            var bankBridge = new BankInventoryBridge(bank, inventory, gameGui, player, client, framework, log);
+            var bankBridge = new BankInventoryBridge(bank, inventory, gameGui, player, client, framework, log, () => configuration.AutoBankCapture);
             registrations.Register(() => { }, bankBridge.Dispose);
             bankOverlay = new BankImportOverlay(bank, bankBridge, localization);
             localization.SelectInitialLanguage(configuration.LanguageCode,client.ClientLanguage.ToString());
@@ -127,6 +129,10 @@ public sealed class Plugin : IDalamudPlugin
             Maps.NativeMapReplacer? mapReplacer=null;
             registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,()=>configuration.MapView,mainWindow.ShowMapFromGame,()=>mainWindow.MapViewOpen,mainWindow.CloseMapFromGame,log),()=>mapReplacer?.Dispose());
             mainWindow.ConfigureGameMapOpener(()=>mapReplacer?.OpenGameMap());
+            var triadNpcs=new TriadNpcService();
+            TriadNpcLoader? triadNpcLoader=null;
+            registrations.Register(()=>triadNpcLoader=new TriadNpcLoader(triadNpcs,data,framework,client,player,log),()=>triadNpcLoader?.Dispose());
+            mainWindow.ConfigureTriadNpcs(triadNpcs);
             var npcVendors=new Npcs.NpcVendorService();
             Npcs.NpcVendorLoader? npcLoader=null;
             registrations.Register(()=>npcLoader=new Npcs.NpcVendorLoader(npcVendors,data,framework,log,dataCache),()=>npcLoader?.Dispose());
@@ -164,14 +170,14 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(() => questReader = new QuestReader(quests, data, framework, player, client, unlocks, log,()=>configuration.Cache.Duration(CacheArea.Quests),dataCache),
                 () => questReader?.Dispose());
             CollectionReader? collectionReader = null;
-            registrations.Register(() => collectionReader = new CollectionReader(collections, data, framework, player, client, unlocks, log,()=>configuration.Cache.Duration(CacheArea.Collections),dataCache),
+            registrations.Register(() => collectionReader = new CollectionReader(collections, data, framework, player, client, unlocks, log,()=>configuration.Cache.Duration(CacheArea.Collections),dataCache,()=>configuration.Cache.Duration(CacheArea.Completion)),
                 () => collectionReader?.Dispose());
             TriadObservationReader? triadReader = null;
             MiniCactpotObservationReader? cactpotReader=null;
             GatheringObservationReader? gatheringReader=null;
             registrations.Register(()=>gatheringReader=new GatheringObservationReader(gatheringObservation,framework,player,client,gameGui,objects,log),()=>gatheringReader?.Dispose());
             registrations.Register(()=>cactpotReader=new MiniCactpotObservationReader(cactpotObservation,framework,player,client,gameGui,log),()=>cactpotReader?.Dispose());
-            registrations.Register(() => triadReader = new TriadObservationReader(triadObservation, framework, player, client, gameGui, log),
+            registrations.Register(() => triadReader = new TriadObservationReader(triadObservation, framework, player, client, gameGui, log, () => targets.Target?.BaseId ?? 0, data, () => mainWindow.DeveloperMode),
                 () => triadReader?.Dispose());
             ItemCatalogLoader? catalogLoader = null;
             ItemUseCatalogLoader? usageLoader=null;
@@ -233,9 +239,13 @@ public sealed class Plugin : IDalamudPlugin
         // The map's open state lives in MainWindow (game map key M, journal); its window follows it.
         if(mapWindow is not null)mapWindow.IsOpen=mainWindow.MapViewOpen;
         windows.Draw();
-        bankOverlay.Draw();
+        if (!autoBankCapture()) bankOverlay.Draw();
         mainWindow.DrawCraftLogHelper();
         mainWindow.DrawItemHover();
+        mainWindow.DrawCactpotOverlay();
+        mainWindow.DrawTriadOverlay();
+        mainWindow.DrawTriadRequestPanel();
+        mainWindow.DrawTriadDeckReminder();
     }
 
     public void Dispose()

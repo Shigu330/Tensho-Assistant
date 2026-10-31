@@ -1,0 +1,25 @@
+# PROBE_ZONE=Auxesia (2026-10-31) : 22 cartes pour le territoire 1319 (mêmes échelle et décalage) ; carte par défaut 1246
+MAPROW 1245 id 'c1w4/01' territory 1319 markers 0 size 100 offset 0,0
+MAPROW 1246 id 'c1w4/02' territory 1319 markers 752 size 100 offset 0,0
+MAPROW 1247 id 'c1w4/03' territory 1319 markers 752 size 100 offset 0,0
+MAPROW 1248 id 'c1w4/04' territory 1319 markers 753 size 100 offset 0,0
+MAPROW 1249 id 'c1w4/05' territory 1319 markers 753 size 100 offset 0,0
+MAPROW 1250 id 'c1w4/06' territory 1319 markers 753 size 100 offset 0,0
+MAPROW 1251 id 'c1w4/07' territory 1319 markers 753 size 100 offset 0,0
+MAPROW 1252 id 'c1w4/08' territory 1319 markers 753 size 100 offset 0,0
+MAPROW 1253 id 'c1w4/09' territory 1319 markers 753 size 100 offset 0,0
+MAPROW 1254 id 'c1w4/10' territory 1319 markers 753 size 100 offset 0,0
+MAPROW 1255 id 'c1w4/11' territory 1319 markers 756 size 100 offset 0,0
+MAPROW 1256 id 'c1w4/12' territory 1319 markers 756 size 100 offset 0,0
+MAPROW 1257 id 'c1w4/13' territory 1319 markers 754 size 100 offset 0,0
+MAPROW 1258 id 'c1w4/14' territory 1319 markers 754 size 100 offset 0,0
+MAPROW 1259 id 'c1w4/15' territory 1319 markers 754 size 100 offset 0,0
+MAPROW 1260 id 'c1w4/16' territory 1319 markers 754 size 100 offset 0,0
+MAPROW 1261 id 'c1w4/17' territory 1319 markers 757 size 100 offset 0,0
+MAPROW 1262 id 'c1w4/18' territory 1319 markers 757 size 100 offset 0,0
+MAPROW 1263 id 'c1w4/19' territory 1319 markers 755 size 100 offset 0,0
+MAPROW 1264 id 'c1w4/20' territory 1319 markers 755 size 100 offset 0,0
+MAPROW 1265 id 'c1w4/21' territory 1319 markers 758 size 100 offset 0,0
+MAPROW 1266 id 'c1w4/22' territory 1319 markers 759 size 100 offset 0,0
+TERRITORY 1319 map 1246 bg 'ffxiv/cos_c1/hou/c1w4/level/c1w4'
+ZONE territory 1319 map 1246 region '???' regionId 2405 bg 'ffxiv/cos_c1/hou/c1w4/level/c1w4'

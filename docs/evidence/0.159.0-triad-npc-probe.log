@@ -1,0 +1,24 @@
+# TRIAD-003 (2026-10-31) PROBE_TRIAD : ENpcBase.ENpcData → TripleTriad (règles, cartes fixes/variables, récompenses), feuille TripleTriadRule
+TRIAD rows=146 withRules=134 regional=46
+RULE 0 ''
+RULE 1 'Roulette'
+RULE 2 'Toutes sur table'
+RULE 3 'Trois sur table'
+RULE 4 'Identique'
+RULE 5 'Mort subite'
+RULE 6 'Plus'
+RULE 7 'Aléatoire'
+RULE 8 'Ordre'
+RULE 9 'Chaos'
+RULE 10 'Inversion'
+RULE 11 'Tueur d'as'
+RULE 12 'Bonus'
+RULE 13 'Malus'
+RULE 14 'Échange'
+RULE 15 'Draft'
+TRIAD npcsLinked=144 distinctRows=142
+NPC 1001304 'Rowena' match 2293791 map 25 'Mor Dhona' regional=True fee=30 rules=[1:Roulette,1:Roulette] fixed=[34:Gerolt,61:Bahamut,-,-,-] variable=[29:Baderon,60:Louisoix,47:Nero,39:Gilgamesh & Enkidu,45:Godbert] rewards=[9831,9805]
+NPC 1000100 'Miounne' match 2293767 map 2 'Nouvelle Gridania' regional=False fee=15 rules=[3:Trois sur table] fixed=[30:Miounne,29:Baderon,15:Ixal,-,-] variable=[35:Frixio,28:Momodi,11:ahriman,12:goobbue,5:pudding] rewards=[9801,9783]
+NPC 1000168 'Vorsaile Heuloix' match 2293787 map 2 'Nouvelle Gridania' regional=True fee=30 rules=[12:Bonus] fixed=[66:Kan-E-Senna,56:Minfilia,53:Ramuh,-,-] variable=[63:Nanamo,58:Cid,48:Papalymo & Yda,43:Moggle Mog XII,-] rewards=[9837,9824,9819,9814]
+NPC 1000282 'Noes' match 2293795 map 3 'Vieille Gridania' regional=False fee=25 rules=[13:Malus,6:Plus] fixed=[52:Odin,42:Garuda,-,-,-] variable=[81:gaélichat,36:Mutamix,43:Moggle Mog XII,30:Miounne,35:Frixio] rewards=[12269,14201]
+NPC 1000590 'Buscarron' match 2293783 map 6 'Forêt du sud' regional=False fee=25 rules=[8:Ordre] fixed=[66:Kan-E-Senna,52:Odin,43:Moggle Mog XII,-,-] variable=[48:Papalymo & Yda,42:Garuda,39:Gilgamesh & Enkidu,44:Raya-O-Senna & A-Ruhn-Senna,-] rewards=[9819,9815,9794]

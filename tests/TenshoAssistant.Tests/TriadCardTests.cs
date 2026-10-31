@@ -75,5 +75,12 @@ internal static class TriadCardTests
             Check(loaded.TripleTriadDeck.SequenceEqual([1u,2u,3u,4u,5u]), "native identities persisted in exact selection order");
             Check(JsonSerializer.Deserialize<Configuration>("{\"Version\":1}")!.TripleTriadDeck.Count == 0, "legacy defaults empty without native modification");
         }),
+        ("Triad NPC decks persist with their NPC name and older configuration has none", () =>
+        {
+            var config = new Configuration { TripleTriadDecks = [new TriadSavedDeck { Name = "Munglig", NpcId = 1019323, Cards = [53,58,196,42,89] }] };
+            var loaded = JsonSerializer.Deserialize<Configuration>(JsonSerializer.Serialize(config))!;
+            Check(loaded.TripleTriadDecks is [{ Name: "Munglig", NpcId: 1019323 } deck] && deck.Cards.SequenceEqual([53u,58u,196u,42u,89u]), "name, NPC and card order kept");
+            Check(JsonSerializer.Deserialize<Configuration>("{\"Version\":1}")!.TripleTriadDecks.Count == 0, "no deck in an older configuration");
+        }),
     ];
 }

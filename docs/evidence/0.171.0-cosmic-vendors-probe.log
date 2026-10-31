@@ -1,0 +1,24 @@
+# PROBE_ZONE=Auxesia et PROBE_MARKERS=Mesouaidonque (2026-10-31) : PNJ de la zone d'exploration cosmique et marqueurs proches
+ZONE territory 1319 map 1246 region '???' regionId 2405 bg 'ffxiv/cos_c1/hou/c1w4/level/c1w4'
+  planevent: bytes 338176 declared 338176 chunk 'LGP1'
+  [planevent] NPC 1056820 'Phasingway' title '' links=1704317:,2033562:
+  [planevent] NPC 1056821 'Researchingway' title 'Chercheur' links=721816:CustomTalk
+  [planevent] NPC 1056822 'Scanningway' title 'Analyste' links=721823:CustomTalk
+  [planevent] NPC 1056823 'Alerot' title 'Interventions mécaniques' links=721828:CustomTalk
+  [planevent] NPC 1056824 'Mesouaidonque' title 'Échange de crédits' links=1770945:SpecialShop,1770977:SpecialShop,1771037:SpecialShop
+  [planevent] NPC 1056825 'Godgyth' title 'Équipements et réparations' links=3276947:TopicSelect,3276948:TopicSelect,3276949:TopicSelect,3276950:TopicSelect,3276951:TopicSelect,263239:GilShop,720915:CustomTalk
+  [planevent] NPC 1056826 'Orbitingway' title 'Roue de la fortune cosmique' links=721814:CustomTalk
+  [planevent] NPC 1056827 'Spina' title '' links=721879:CustomTalk
+  [planevent] NPC 1056828 'Kaede' title 'Fouilles archéologiques' links=721862:CustomTalk
+  planner: bytes 44 declared 44 chunk 'LGP1'
+MNPC 1056824 'Mesouaidonque' title='Échange de crédits' links=1770945:SpecialShop,1770977:SpecialShop,1771037:SpecialShop
+  SPOT map 1246 'Auxesia' pixel 1342,1401
+    MARKER icon 60412 type 0 key 0 label '' at 1342,1403 distance 2,3
+    MARKER icon 60935 type 0 key 0 label '' at 1342,1397 distance 3,7
+    MARKER icon 60425 type 0 key 0 label '' at 1337,1392 distance 9,9
+    MARKER icon 60935 type 0 key 0 label '' at 1326,1423 distance 27,3
+    MARKER icon 60442 type 0 key 0 label 'Havre forestier' at 1314,1400 distance 27,8
+    MARKER icon 63888 type 0 key 0 label '' at 1315,1427 distance 37,5
+    MARKER icon 63887 type 0 key 0 label '' at 1315,1373 distance 38,5
+    MARKER icon 63891 type 0 key 0 label '' at 1308,1423 distance 40,4
+    MARKER icon 63896 type 0 key 0 label '' at 1304,1377 distance 44,6

@@ -1,8 +1,8 @@
 # État courant (mis à jour 2026-10-31)
 
-VERSION: 0.157.0.0 — Verify.ps1 (agent) 533/533, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
-GOAL: [PUBLISH-018](GOAL.md) — préparer la publication Dalamud : code, icône, manifeste et dossier D17 prêts (0.157) ; soumission = action de l'auteur.
-QUOTA: réserve utilisateur 1 % (5 h et semaine). Dernier relevé connu : 5 h remis à 0 vers 12:10, semaine 41 % (réinit. jeudi 23:00).
+VERSION: 0.176.0.0 — Verify.ps1 (agent) 544/544, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+GOAL: [TRIAD-003](GOAL.md) — Triple Triade comme TriadBuddy : conseil en match validé (0.160) ; % de victoire par deck et génération de deck (0.161) à valider.
+QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-10-31 ~17:20 : 5 h à 15 % (réinit. 22:10), semaine 56 %. Dernier relevé connu : 5 h remis à 0 vers 12:10, semaine 41 % (réinit. jeudi 23:00).
 
 ## Validé en jeu (rapports utilisateur, 2026-10-30/31)
 - Carte Tensho : image, icônes fixes, menus Région/Zone, colonne d'outils, M remplace la carte du jeu, drapeau (pose, centrage, sans fermeture),
@@ -15,7 +15,14 @@ QUOTA: réserve utilisateur 1 % (5 h et semaine). Dernier relevé connu : 5 h re
 
 - Icône 0.157 dans la liste des plugins de Dalamud (rapport utilisateur 2026-10-31 ; visible après relance du jeu).
 
+- Triple Triade 0.160 : conseil en match (rapport utilisateur 2026-10-31, « test ok »).
+
+- Carte : marchands des variantes de carte d'une même zone (Auxesia, 0.171 + 0.175), capture utilisateur 2026-10-31.
+
 ## À valider en jeu
+- 0.158 Mini Cactpot : cadre vert sur les meilleures cases puis lignes, sur la fenêtre du jeu (sens des diagonales à confirmer).
+- 0.161 Triple Triade : panneau à côté de la fenêtre de défi du PNJ (% de victoire par deck, génération de deck).
+- 0.162 decks Tensho par PNJ (liste, suppression) et aide-mémoire des cartes à côté de l'éditeur de decks du jeu.
 - 0.150 traduction des lignes wiki (hors carte, non confirmée explicitement).
 - 0.156 carte Tensho dans le système de fenêtres Dalamud : ouverture (M, journal), fermeture (croix, M), agrandir/réduire, opacité,
   verrouillage, masquage en combat ; manifeste anglais dans l'installateur de plugins.
@@ -23,10 +30,12 @@ QUOTA: réserve utilisateur 1 % (5 h et semaine). Dernier relevé connu : 5 h re
 - Antérieur non confirmé : caches recettes et récolte (0.82–0.83), critères de tri (0.84).
 
 ## Prochaine action
-1. Essai en jeu 0.156–0.157 (carte dans le système de fenêtres, icône, nom).
-2. Commit et push (GitHub Desktop), puis soumission D17 par l'auteur : voir [PUBLISHING](../project/PUBLISHING.md) (hash du commit,
-   fork de DalamudPluginsD17, PR avec la déclaration IA relue et reformulée par l'auteur).
-3. GOAL suivant (backlog : [docs/project/BACKLOG.md](../project/BACKLOG.md)).
+1. FAIT (2026-10-31) : capture de l'éditeur de decks, 44 lignes, [preuve](../evidence/0.163.0-triad-editdeck-capture.log). Constat : chaque carte
+   de la liste du jeu est un nœud image (id 8, 40×40 px) dont la texture est `ui/icon/088000/088NNN_hr1.tex`, soit l'icône 88000 + id de
+   carte (= TriadCardDefinition.IconId) ; cadre 48×48 (id 6) autour ; rectangles écran lus.
+2. FAIT en 0.164 (à valider en jeu) : avec cette preuve, encadrer dans la liste du jeu les cartes du deck Tensho choisi (TRIAD-003) ; retirer ensuite la capture.
+3. À valider en jeu : 0.164 (surbrillance dans l'éditeur), 0.165–0.166 (% dans « Choix du jeu »), 0.166 titres/succès conservés (réglage Données), 0.167 servants et sacoches enregistrés à l'ouverture, 0.168 Triple Triade › PNJ et cartes (PNJ battus, lots prioritaires).
+4. Tests restants : 0.161–0.162 (panneau de défi, liste de decks), Mini Cactpot 0.158.
 
 ## Blocages connus
 - Bonus natif d'Abondance inconnu (sources divergentes) : ne pas inventer de formule.

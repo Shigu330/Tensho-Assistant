@@ -11,6 +11,33 @@ internal sealed partial class CollectionReader
     private ExcelSheet<AchievementKind>? achievementKinds;
     private bool titlesUnavailable,achievementsUnavailable,titleUnlockFailed,achievementUnlockFailed,titleRowFailed,achievementRowFailed;
     private bool titlesStable=true,achievementsStable=true;
+    private bool completeTitles,completeAchievements;
+    // Remembered title/achievement states of the current character (CompletionMemory) and when each list was last read completely.
+    private readonly Dictionary<(CollectionKind,uint),(bool Positive,bool Negative)> completionMemory=[];
+    private ulong completionOwner;
+    private DateTimeOffset? titlesCheckedAt,achievementsCheckedAt;
+    private void RememberCompletion(ulong owner,IEnumerable<CollectionEntry> source,DateTimeOffset? titles,DateTimeOffset? achievements)
+    {
+        if(completionOwner!=owner){completionMemory.Clear();completionOwner=owner;titlesCheckedAt=achievementsCheckedAt=null;}
+        if(titles is { } t && (titlesCheckedAt is null || t>titlesCheckedAt))titlesCheckedAt=t;
+        if(achievements is { } a && (achievementsCheckedAt is null || a>achievementsCheckedAt))achievementsCheckedAt=a;
+        foreach(var entry in source)
+            if(entry.Kind is CollectionKind.Title or CollectionKind.Achievement && (entry.ConfirmedUnlocked || entry.NegativeConfirmed))
+                completionMemory[(entry.Kind,entry.Id)]=(entry.ConfirmedUnlocked,entry.NegativeConfirmed);
+    }
+    private void ApplyCompletionMemory(ulong owner,List<CollectionEntry> source,TimeSpan keep)
+    {
+        var now=DateTimeOffset.UtcNow;
+        if(completionOwner!=owner){completionMemory.Clear();completionOwner=owner;titlesCheckedAt=achievementsCheckedAt=null;}
+        var keepTitles=titlesCheckedAt is { } t && now-t<=keep;var keepAchievements=achievementsCheckedAt is { } a && now-a<=keep;
+        for(var index=0;index<source.Count;index++)
+        {
+            var entry=source[index];
+            if(entry.Kind==CollectionKind.Title && !completeTitles)source[index]=CompletionMemory.Merge(entry,completionMemory.TryGetValue((entry.Kind,entry.Id),out var title) ? title:null,keepTitles);
+            if(entry.Kind==CollectionKind.Achievement && !completeAchievements)source[index]=CompletionMemory.Merge(entry,completionMemory.TryGetValue((entry.Kind,entry.Id),out var achievement) ? achievement:null,keepAchievements);
+        }
+        RememberCompletion(owner,source,completeTitles ? now:null,completeAchievements ? now:null);
+    }
     private bool? lastTitlesLoaded,lastAchievementsLoaded;
     private string? titlesIssue,achievementsIssue;
     private int TitleCount=>titlesUnavailable ? 0:titles!.Count;
@@ -110,7 +137,9 @@ internal sealed partial class CollectionReader
             catch(Exception error){achievementsIssue="Chargement des succès non vérifiable ; états négatifs inconnus.";achievementUnlockFailed=true;log.Warning(error,"Achievement list coverage unavailable.");}
         }
         var titleComplete=titlesStable && titleLoaded==true && !titleUnlockFailed && !titleRowFailed;
+        completeTitles=titleComplete;
         var achievementComplete=achievementsStable && achievementLoaded==true && !achievementUnlockFailed && !achievementRowFailed;
+        completeAchievements=achievementComplete;
         for(var index=0;index<entries.Count;index++)
         {
             var entry=entries[index];

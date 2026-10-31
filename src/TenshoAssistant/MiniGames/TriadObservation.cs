@@ -19,6 +19,29 @@ public sealed record TriadObservedCard(TriadObservedPresence Presence, TriadPlay
     }
 }
 
+/// <summary>Screen rectangle of a card slot or board square (pixels, same space as ImGui).</summary>
+public readonly record struct TriadRect(float X, float Y, float Width, float Height)
+{
+    public bool Valid => float.IsFinite(X) && float.IsFinite(Y) && float.IsFinite(Width) && float.IsFinite(Height) && Width > 0 && Height > 0;
+}
+/// <summary>
+/// What the match needs beyond the card faces (TRIAD-003, capture docs/evidence/0.160.0-triad-match-capture.log): rules shown in the
+/// match window (TripleTriadRule ids, matched by name), the card the game imposes on a constrained move (Chaos/Order), the NPC's deck
+/// from the TripleTriad sheet (docs/evidence/0.159.0-triad-npc-probe.log) and the slots' screen rectangles.
+/// </summary>
+public sealed record TriadMatchContext(IReadOnlyList<uint> RuleIds, int? ForcedSlot, uint NpcId, IReadOnlyList<uint> NpcFixed,
+    IReadOnlyList<uint> NpcVariable, IReadOnlyList<TriadRect>? BlueRects, IReadOnlyList<TriadRect>? BoardRects);
+
+/// <summary>A deck saved in the game (GoldSaucerModule.Decks): name and card ids (0 = empty slot).</summary>
+public sealed record TriadGameDeck(int Index, string Name, IReadOnlyList<uint> Cards);
+/// <summary>
+/// The NPC challenge window « TripleTriadRequest » (TRIAD-003, capture docs/evidence/0.160.0-triad-match-capture.log): values 102–105 hold
+/// the match rules as TripleTriadRule ids (10, 12, 4, 9 = the rules then shown in the match), the NPC is the target; plus the window's
+/// screen rectangle and the player's saved decks.
+/// </summary>
+public sealed record TriadRequestInfo(uint NpcId, IReadOnlyList<uint> RuleIds, IReadOnlyList<uint> NpcFixed, IReadOnlyList<uint> NpcVariable,
+    TriadRect Window, IReadOnlyList<TriadGameDeck> Decks, DateTimeOffset ObservedAt, string NpcName = "", IReadOnlyList<string>? RuleNames = null);
+
 public sealed class TriadObservedFrame
 {
     public byte NativePhase { get; }
@@ -26,8 +49,20 @@ public sealed class TriadObservedFrame
     public IReadOnlyList<TriadObservedCard> RedHand { get; }
     public IReadOnlyList<TriadObservedCard> Board { get; }
     public string Source => "FFXIVClientStructs.AddonTripleTriad / faces UI";
-    public TriadObservedFrame(byte phase, IReadOnlyList<TriadRawCard> blue, IReadOnlyList<TriadRawCard> red, IReadOnlyList<TriadRawCard> board)
+    public TriadMatchContext? Context { get; }
+    // TurnState (FFXIVClientStructs): 0 waiting, 1 normal move, 2 masked move (card imposed by Chaos/Order); the player moves on 1 and 2.
+    public bool BlueToMove => NativePhase is 1 or 2;
+    public TriadObservedFrame(byte phase, IReadOnlyList<TriadRawCard> blue, IReadOnlyList<TriadRawCard> red, IReadOnlyList<TriadRawCard> board,
+        TriadMatchContext? context = null)
     {
+        Context = context is null ? null : context with
+        {
+            RuleIds = Array.AsReadOnly(context.RuleIds.ToArray()), NpcFixed = Array.AsReadOnly(context.NpcFixed.ToArray()),
+            NpcVariable = Array.AsReadOnly(context.NpcVariable.ToArray()),
+            ForcedSlot = context.ForcedSlot is >= 0 and <= 4 ? context.ForcedSlot : null,
+            BlueRects = context.BlueRects is { Count: 5 } blueRects && blueRects.All(rect => rect.Valid) ? Array.AsReadOnly(blueRects.ToArray()) : null,
+            BoardRects = context.BoardRects is { Count: 9 } boardRects && boardRects.All(rect => rect.Valid) ? Array.AsReadOnly(boardRects.ToArray()) : null,
+        };
         ArgumentNullException.ThrowIfNull(blue); ArgumentNullException.ThrowIfNull(red); ArgumentNullException.ThrowIfNull(board);
         if (blue.Count != 5 || red.Count != 5 || board.Count != 9) throw new ArgumentException("Observation Triple Triade incomplète.");
         NativePhase = phase;
@@ -48,12 +83,30 @@ public sealed class TriadObservationService : IDisposable
     private bool disposed;
     private TriadObservationState state = new(false,0,TriadObservationStatus.Disabled,null,null,null);
     public TriadObservationState State => Volatile.Read(ref state);
+    private TriadRequestInfo? request;
+    public TriadRequestInfo? Request => Volatile.Read(ref request);
+    // Screen rectangle of the game's deck editor « GSInfoEditDeck » while it is open (0.162), for the deck reminder panel.
+    private TriadRect? editDeck;
+    public TriadRect? EditDeckWindow { get { lock (gate) return editDeck; } }
+    // Cards drawn in the editor's list (0.164, capture docs/evidence/0.163.0-triad-editdeck-capture.log): icon texture
+    // ui/icon/088000/088NNN = card NNN, with its screen rectangle.
+    private IReadOnlyList<(uint CardId, TriadRect Rect)> editDeckCards = [];
+    public IReadOnlyList<(uint CardId, TriadRect Rect)> EditDeckCards { get { lock (gate) return editDeckCards; } }
+    // Deck rows of the game's deck choice window « TripleTriadSelDeck » (0.165): the card ids of each row and its screen rectangle.
+    private IReadOnlyList<(IReadOnlyList<uint> Cards, TriadRect Row)> selDeck = [];
+    public IReadOnlyList<(IReadOnlyList<uint> Cards, TriadRect Row)> SelDeckRows { get { lock (gate) return selDeck; } }
+    internal void PublishSelDeck(int ticket, ulong character, IReadOnlyList<(IReadOnlyList<uint> Cards, TriadRect Row)> rows)
+    { lock (gate) if (Accept(ticket,character) || rows.Count == 0) selDeck = rows; }
+    internal void PublishEditDeck(int ticket, ulong character, TriadRect? rect, IReadOnlyList<(uint CardId, TriadRect Rect)>? cards = null)
+    { lock (gate) if (Accept(ticket,character) || rect is null) { editDeck = rect; editDeckCards = rect is null ? [] : cards ?? []; } }
+    internal void PublishRequest(int ticket, ulong character, TriadRequestInfo? info)
+    { lock (gate) if (Accept(ticket,character) || info is null) request = info; }
     public void SetEnabled(bool enabled)
     {
         lock (gate)
         {
             if (disposed || state.Enabled == enabled) return;
-            generation++;
+            generation++; request = null; editDeck = null;
             state = new(enabled,0,enabled ? TriadObservationStatus.Waiting : TriadObservationStatus.Disabled,null,null,null);
         }
     }
@@ -64,7 +117,7 @@ public sealed class TriadObservationService : IDisposable
             if (disposed || !state.Enabled) return null;
             if (state.CharacterId != character || (character == 0 && state.Status != TriadObservationStatus.Offline))
             {
-                generation++;
+                generation++; request = null; editDeck = null;
                 state = new(true,character,character == 0 ? TriadObservationStatus.Offline : TriadObservationStatus.Waiting,null,null,null);
             }
             return character == 0 ? null : generation;
@@ -72,13 +125,14 @@ public sealed class TriadObservationService : IDisposable
     }
     private bool Accept(int ticket, ulong character) => !disposed && state.Enabled && character != 0
         && state.CharacterId == character && ticket == generation;
-    internal void Publish(int ticket, ulong character, byte phase, IReadOnlyList<TriadRawCard> blue, IReadOnlyList<TriadRawCard> red, IReadOnlyList<TriadRawCard> board)
+    internal void Publish(int ticket, ulong character, byte phase, IReadOnlyList<TriadRawCard> blue, IReadOnlyList<TriadRawCard> red, IReadOnlyList<TriadRawCard> board,
+        TriadMatchContext? context = null)
     {
         lock (gate)
         {
             if (!Accept(ticket,character)) return;
             TriadObservedFrame copied;
-            try { copied = new TriadObservedFrame(phase,blue,red,board); }
+            try { copied = new TriadObservedFrame(phase,blue,red,board,context); }
             catch (ArgumentException error)
             {
                 state = new(true,character,TriadObservationStatus.Error,null,null,error.Message);
@@ -103,7 +157,7 @@ public sealed class TriadObservationService : IDisposable
         lock (gate)
         {
             if (disposed) return;
-            disposed = true; generation++;
+            disposed = true; generation++; request = null; editDeck = null;
             state = new(false,0,TriadObservationStatus.Disabled,null,null,null);
         }
     }

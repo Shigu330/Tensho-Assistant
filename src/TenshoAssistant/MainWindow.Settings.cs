@@ -200,6 +200,13 @@ internal sealed partial class MainWindow
     }
     private void DrawDataSettings()
     {
+        var auto=configuration.AutoBankCapture;
+        if(ImGui.Checkbox(localization.Get("BankUi.AutoSetting"),ref auto))
+        {
+            configuration.AutoBankCapture=auto;
+            try{save();}catch(Exception error){configuration.AutoBankCapture=!auto;log.Warning(error,"Bank capture setting could not be saved.");}
+        }
+        ImGui.TextDisabled(localization.Get("BankUi.AutoSettingHelp"));
         DrawCacheSettings();
         if(ImGui.CollapsingHeader(localization.Get("ModuleSettings.Profiles")))
         {

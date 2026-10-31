@@ -36,16 +36,18 @@ internal sealed partial class CollectionReader : IDisposable
     private bool disposed;
     private long nextRefresh;
     private readonly Func<TimeSpan> cacheLifetime;
+    private readonly Func<TimeSpan> completionLifetime;
     private readonly DataCache? disk;
     private string? cacheVersion;
     private Task<CachedValue<CollectionCacheData>?>? restore;
 
     public CollectionReader(CollectionService service, IDataManager data, IFramework framework,
-        IPlayerState player, IClientState client, IUnlockState unlocks, IPluginLog log,Func<TimeSpan>? cacheLifetime=null,DataCache? disk=null)
+        IPlayerState player, IClientState client, IUnlockState unlocks, IPluginLog log,Func<TimeSpan>? cacheLifetime=null,DataCache? disk=null,
+        Func<TimeSpan>? completionLifetime=null)
     {
         this.service = service; this.data = data; this.framework = framework;
         this.player = player; this.client = client; this.unlocks = unlocks; this.log = log;
-        this.cacheLifetime=cacheLifetime ?? (()=>TimeSpan.FromDays(1));this.disk=disk;
+        this.cacheLifetime=cacheLifetime ?? (()=>TimeSpan.FromDays(1));this.disk=disk;this.completionLifetime=completionLifetime ?? (()=>TimeSpan.FromDays(7));
         unlocks.Unlock+=OnCollectionUnlock;
         try{framework.Update += OnUpdate;try{client.Logout+=OnLogout;}catch{framework.Update-=OnUpdate;throw;}}
         catch{unlocks.Unlock-=OnCollectionUnlock;throw;}
@@ -90,6 +92,9 @@ internal sealed partial class CollectionReader : IDisposable
         {
             if(!loading.IsCompleted)return;
             var saved=loading.GetAwaiter().GetResult();restore=null;
+            // Even a stale copy keeps its title/achievement states for the next read (CompletionMemory).
+            if(saved is not null && CacheSnapshots.Valid(saved.Value,owner))
+                RememberCompletion(owner,saved.Value.Entries,saved.Value.TitlesCheckedAt,saved.Value.AchievementsCheckedAt);
             if(saved is not null && CacheSnapshots.Valid(saved.Value,owner)
                 && CacheAge.Fresh(saved.RecordedAt,DateTimeOffset.UtcNow,cacheLifetime()))
             {
@@ -249,9 +254,11 @@ internal sealed partial class CollectionReader : IDisposable
             var issues=new List<CollectionCategoryIssue>();
             if(orchestrionIssue is not null)issues.Add(new(CollectionKind.Orchestrion,orchestrionIssue));
             issues.AddRange(CompletionIssues());
+            if(character!=0)ApplyCompletionMemory(character,entries,completionLifetime());
             service.Publish(character,entries,issues);
             if(character!=0 && disk is not null && service.State.ObservedAt is { } date)
-                _=disk.WriteAsync("collections",character.ToString(),cacheVersion ??= GameCacheIdentity.For(data),new CollectionCacheData(character,service.State.Entries,service.State.CategoryIssues),date);
+                _=disk.WriteAsync("collections",character.ToString(),cacheVersion ??= GameCacheIdentity.For(data),
+                    new CollectionCacheData(character,service.State.Entries,service.State.CategoryIssues,titlesCheckedAt,achievementsCheckedAt),date);
             entries.Clear();
             scanning = false;
             nextRefresh = 0;

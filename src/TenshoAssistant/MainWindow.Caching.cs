@@ -13,7 +13,7 @@ internal sealed partial class MainWindow
         if(!ImGui.CollapsingHeader(localization.Get("CacheUi.Title"),ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextWrapped(localization.Get("CacheUi.Help"));
         foreach(var (area,label) in new[]{(CacheArea.Prices,localization.Get("CacheUi.Prices")),(CacheArea.Quests,localization.Get("CacheUi.Quests")),
-            (CacheArea.Collections,localization.Get("CacheUi.Collections")),(CacheArea.Sources,localization.Get("CacheUi.Sources")),
+            (CacheArea.Collections,localization.Get("CacheUi.Collections")),(CacheArea.Completion,localization.Get("CacheUi.Completion")),(CacheArea.Sources,localization.Get("CacheUi.Sources")),
             (CacheArea.Fashion,localization.Get("CacheUi.Fashion")),(CacheArea.ImportedStock,localization.Get("CacheUi.Stocks")),(CacheArea.CraftCalculations,localization.Get("CacheUi.Craft"))})
         {
             var selected=(int)configuration.Cache.Get(area);ImGui.SetNextItemWidth(155);

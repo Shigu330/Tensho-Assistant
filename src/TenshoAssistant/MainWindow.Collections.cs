@@ -35,7 +35,6 @@ internal sealed partial class MainWindow
                 if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Orchestrion")+"###CollectionMusic",focusOrchestrionTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusOrchestrionTab=false;collectionKind = CollectionKind.Orchestrion; ImGui.EndTabItem(); }
                 if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Titles")+"###CollectionTitles",focusTitleTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusTitleTab=false;collectionKind=CollectionKind.Title;ImGui.EndTabItem(); }
                 if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Achievements")+"###CollectionAchievements",focusAchievementTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusAchievementTab=false;collectionKind=CollectionKind.Achievement;ImGui.EndTabItem(); }
-                if (ImGui.TabItemButton(localization.Get("Category.Triad"))) page = Page.TripleTriad;
             }
             finally { ImGui.EndTabBar(); }
         }

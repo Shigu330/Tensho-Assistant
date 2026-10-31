@@ -1,0 +1,4 @@
+# PROBE_TALK (2026-10-31) : Kaede (PNJ 1056828, Auxesia) -> CustomTalk 721862 sans argument ; boutiques vendant « Batterie portative »
+TALK 721862 name 'CtsWksTreasure_00966' special 0
+  SHOP 1771006 '' sells 'Batterie portative' (offset from talk 1049144)
+  SHOP 1771038 '' sells 'Batterie portative' (offset from talk 1049176)

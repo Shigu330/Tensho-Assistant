@@ -3,6 +3,182 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.176.0
+- Retour (captures) : le second Échangeur d'Auxesia est Kaede « Fouilles archéologiques » — menu « Obtenir des batteries portatives » →
+  « Échange de devises », Batterie portative (Auxesia) pour 200.
+- Preuve ([docs/evidence/0.176.0-kaede-talk-probe.log](docs/evidence/0.176.0-kaede-talk-probe.log)) : Kaede n'a qu'un dialogue scripté
+  (CustomTalk 721862 « CtsWksTreasure_00966 ») sans aucun argument ; la boutique 1771038 (sans nom) est la seule à vendre cet objet.
+- Correction : lien observé en jeu ajouté (`NpcShopLinks.ObservedTalkShops` : 721862 → 1771038), règles de copie 11 (le cache des
+  marchands est reconstruit). L'autre boutique de batteries (1771006) n'est pas reliée tant qu'elle n'est pas observée.
+- Verify.ps1 (agent) : 544/544, 0 avertissement, 0 erreur ; DLL 0.176.0.0. Non validé en jeu.
+## 0.175.0
+- Retour (Auxesia) : toujours aucun marchand sur la carte malgré la 0.171.
+- Preuve ([docs/evidence/0.175.0-auxesia-maps-probe.log](docs/evidence/0.175.0-auxesia-maps-probe.log)) : le catalogue des marchands (cache disque) contient bien Mesouaidonque et Godgyth sur la carte 1246 ; mais Auxesia a 22 cartes (c1w4/01–22) pour le même territoire 1319, qui changent avec la progression de l'exploration cosmique, toutes à la même échelle et au même décalage. Le joueur voit une autre variante que la carte par défaut.
+- Correction : `MapCatalog.Equivalent` — une carte du même territoire, même échelle et même décalage montre le même terrain ; marchands et listes du clic droit (quêtes, exploration, courants…) des cartes équivalentes sont affichés.
+- Test : 1 groupe (variantes d'Auxesia, sous-sol et autre zone exclus). Verify.ps1 (agent) : 544/544, 0 avertissement, 0 erreur ; DLL 0.175.0.0. VALIDATED_IN_GAME : capture utilisateur 2026-10-31 — Mesouaidonque sous l'Échangeur, Godgyth sous l'Échoppe (Auxesia). Un second Échangeur reste sans marchand (PNJ dont la boutique passe par un script, non relié).
+## 0.174.0
+- Preuve ([docs/evidence/0.174.0-triad-seldeck-capture.log](docs/evidence/0.174.0-triad-seldeck-capture.log), Kikimo, 17:41) : dans « Choix
+  du jeu », les icônes 088NNN sont lues et les 3 rangées reconnues avec les bonnes cartes, mais « challenge kept: no » : entre la fermeture
+  de la fenêtre de défi et l'ouverture du choix du deck, aucune des deux n'est affichée pendant quelques images, et le PNJ était oublié.
+- Correction : le défi (PNJ, règles, decks) est gardé 30 s après la fermeture de sa fenêtre et rendu au choix du deck ; les % et le cadre du
+  meilleur deck peuvent s'afficher.
+- Verify.ps1 (agent) : 543/543, 0 avertissement, 0 erreur ; DLL 0.174.0.0. Non validé en jeu.
+## 0.173.0
+- Retour (capture « Choix du jeu ») : toujours pas de % dans cette fenêtre. dalamud.log ne contient aucune capture de `TripleTriadSelDeck`
+  (mode développeur désactivé) : pas de preuve, donc pas de nouvelle supposition.
+- Capture renforcée en mode développeur : toutes les textures visibles de la fenêtre (pas seulement les icônes de cartes), ses valeurs, et une
+  ligne « Triad deck choice » : rangées trouvées, cartes de chaque rangée, PNJ du défi gardé ou non. Correction suivante sur preuve.
+- Verify.ps1 (agent) : 543/543, 0 avertissement, 0 erreur ; DLL 0.173.0.0. Non validé en jeu.
+## 0.172.0
+- Retour (Kikimo, Chaos + Échange + Tueur d'as) : deck généré 30 % de victoires contre 35 % pour un deck existant.
+- Causes : le générateur partait de zéro sans les decks existants, comparait les decks sur 60 matchs (trop bruité avec Chaos) et donnait
+  son % final sur d'autres tirages que ceux des decks listés.
+- Correction : les decks existants (jeu + Tensho) sont des points de départ et un plancher ; essais sur 150 matchs ; % final calculé sur les
+  mêmes tirages que la liste ; le deck généré n'est jamais moins bon que le meilleur deck existant (sinon c'est lui qui est proposé). 8 s.
+  Limite : la règle Échange (une carte échangée avant le match) n'est pas simulée.
+- Test : plancher du deck existant (groupe du générateur). Verify.ps1 (agent) : 543/543, 0 avertissement, 0 erreur ; DLL 0.172.0.0.
+  Non validé en jeu.
+## 0.171.0
+- Retour (capture, Auxesia, exploration cosmique) : la carte ne semble pas voir les PNJ ; l'infobulle « Échangeur » ne listait personne.
+- Preuve ([docs/evidence/0.171.0-cosmic-vendors-probe.log](docs/evidence/0.171.0-cosmic-vendors-probe.log)) : Mesouaidonque (échange de
+  crédits, 3 SpecialShop) est bien placé sur la carte 1246 (Level), à 2,3 px d'une Échoppe et 3,7 px de l'Échangeur ; Godgyth (GilShop) est
+  dans la disposition de la zone. Le marchand était rattaché à l'icône la plus proche (Échoppe).
+- Correction : un marchand rejoint d'abord l'icône de son type à portée (Échangeur s'il n'a que des échanges, Échoppe sinon), puis la plus
+  proche ; même règle pour l'icône de l'onglet Vendeurs. La région « ??? » est le nom donné par le jeu lui-même (PlaceName 2405).
+- Test : cas Auxesia ajouté (groupe MapVendorIcons). Verify.ps1 (agent) : 543/543, 0 avertissement, 0 erreur ; DLL 0.171.0.0. Non validé en jeu.
+## 0.170.0
+- Retour 0.169 (capture) : PNJ de Triple Triade « lieu inconnu » (Aurifort l'As de trèfle, Jonas le Valet de pique, Nell la Boit-sans-soif…).
+- Cause : ces PNJ ne sont pas dans la feuille Level ; ils sont placés par les fichiers de disposition des zones. Le catalogue lit maintenant
+  aussi planevent/planner (en-tête LGB vérifié, comme les marchands PNJ : docs/evidence/0.98.0-lgb-probe.log) pour les PNJ sans position,
+  hors du thread framework, une fois au chargement.
+- Verify.ps1 (agent) : 543/543, 0 avertissement, 0 erreur ; DLL 0.170.0.0. Non validé en jeu.
+## 0.169.0
+- Retour 0.168 : « ImGui assertion failed : inner_window == g.CurrentWindow » (imgui_tables.cpp:1219), pile dalamud.log 17:27:37 :
+  `MainWindow.Draw` ligne 226 (fin de la table de mise en page).
+- Cause : la zone défilante des cartes manquantes (onglet PNJ et cartes) n'était fermée (`EndChild`) que si elle était visible ; ImGui
+  exige `EndChild` après chaque `BeginChild`. Même défaut latent dans la colonne d'outils de la carte Tensho. Les deux sont corrigés.
+- Verify.ps1 (agent) : 543/543, 0 avertissement, 0 erreur ; DLL 0.169.0.0. Non validé en jeu.
+## 0.168.0
+- Demandes : trouver les PNJ qui manquent à affronter et les cartes manquantes avec où les trouver ; Triple Triade seulement dans Gold
+  Saucer (pas de retour depuis Collections) ; quel lot de cartes acheter en priorité pour débloquer le plus de cartes.
+- Preuves ([docs/evidence/0.168.0-triad-sources-probe.log](docs/evidence/0.168.0-triad-sources-probe.log)) : TripleTriadResident = mêmes ids que
+  TripleTriad (146) ; objet carte = ItemAction 3357, Data[0] = n° de carte (« Carte dodo » → 1) ; source de carte : AcquisitionType 6 = PNJ
+  (+ position), 8 = lot de cartes (objet). PNJ battus : `UIState.IsTripleTriadNpcBeaten` (FFXIVClientStructs) avec l'id TripleTriad, lu
+  toutes les 5 s — à confirmer en jeu.
+- Triple Triade › onglet « PNJ et cartes » : PNJ à affronter (non battus ou avec des cartes qui manquent ; lieu, coordonnées, clic =
+  drapeau ; mise et cartes possibles au survol) ; lots de cartes classés par nombre de cartes manquantes (survol = où acheter) ; cartes
+  manquantes avec leurs PNJ et leur lot, survol de l'icône = « Comment l'obtenir » de l'objet carte. Catalogue construit hors du thread
+  framework depuis les feuilles.
+- Collections : le bouton qui sautait vers Triple Triade est retiré ; Triple Triade reste dans Gold Saucer.
+- Test : 1 groupe `TriadNpcCatalogTests`. Verify.ps1 (agent) : 543/543, 0 avertissement, 0 erreur ; DLL 0.168.0.0. Non validé en jeu.
+## 0.167.0
+- Demande : même principe que titres/succès pour les sacs — au lieu de l'interface d'import, remplir le cache à l'ouverture, signaler dans
+  l'outil si une première ouverture est requise, pareil pour tout ce qui en a besoin, réglage dans Paramètres.
+- Servants et sacoches de chocobo (normale et supplémentaire) : copiés automatiquement dans le cache à chaque ouverture dans le jeu, puis
+  toutes les 30 s tant que la fenêtre reste ouverte (mêmes contrôles qu'avant : inventaire chargé, bon propriétaire, lecture complète, sinon
+  l'ancien cache est gardé). Le panneau d'import à côté des fenêtres du jeu n'apparaît plus que si l'option est désactivée.
+- Outil Objets › rangements : messages « jamais ouvert » — sacoche, et chaque servant par son nom (liste `RetainerManager` connue après
+  l'ouverture de la sonnette), sinon « ouvre chaque servant une fois ».
+- Paramètres › Données : « Enregistrer automatiquement les servants et sacoches à leur ouverture » (activé par défaut). Titres et succès
+  (0.166) : relus automatiquement dès que le jeu a envoyé leur liste, réglage « Titres et succès » au même endroit.
+- Test : 1 groupe (option par défaut, ancienne configuration, choix gardé). Verify.ps1 (agent) : 542/542, 0 avertissement, 0 erreur ;
+  DLL 0.167.0.0. Non validé en jeu.
+## 0.166.0
+- Demandes : titres et succès sans cache ou pas assez longtemps, réglage à ajouter ; % du PNJ visibles mais pas dans « Choix du jeu ».
+- Titres et succès : le jeu n'envoie ces listes qu'après ouverture de leur fenêtre, donc une relecture remettait les états en « inconnu ».
+  `CompletionMemory` : obtenu reste obtenu ; « non obtenu » gardé tant que la dernière lecture complète a moins que le nouveau réglage
+  Paramètres › Données › « Titres et succès (états conservés) » (7 jours par défaut) ; mémoire gardée dans le cache disque (dates de lecture
+  complète), même quand la copie des collections est périmée.
+- Choix du jeu : la fenêtre de défi reste ouverte dessous, et la 0.165 effaçait alors les rangées lues à chaque passage ; elles sont lues dans
+  les deux cas. Icônes de carte petites (087NNN) acceptées en plus des grandes (088NNN). Capture de la fenêtre en mode développeur si besoin.
+- Test : 1 groupe `CompletionMemoryTests`. Verify.ps1 (agent) : 541/541, 0 avertissement, 0 erreur ; DLL 0.166.0.0. Non validé en jeu.
+## 0.165.0
+- Demande : % de victoire dans la fenêtre « Choix du jeu », comme TriadBuddy.
+- Fenêtre `TripleTriadSelDeck` (nom présent dans ffxiv_dx11.exe) : rangées de decks reconnues par les icônes de cartes (088NNN = carte NNN,
+  preuve 0.163), associées aux decks enregistrés par leurs cartes ; « xx % victoire · yy % nul » écrit à droite de chaque rangée, meilleur
+  deck encadré en vert. Le PNJ et les règles du défi sont gardés pendant le choix du deck. Lecture seule.
+- Verify.ps1 (agent) : 540/540, 0 avertissement, 0 erreur ; DLL 0.165.0.0. Non validé en jeu.
+## 0.164.0
+- Demande : faire comme TriadBuddy (surbrillance des bonnes cartes dans la liste du jeu) et améliorer si possible.
+- Preuve : capture de l'éditeur de decks ([docs/evidence/0.163.0-triad-editdeck-capture.log](docs/evidence/0.163.0-triad-editdeck-capture.log)) —
+  chaque carte de la liste est un nœud image 40×40 de texture `ui/icon/088000/088NNN_hr1.tex` = carte NNN (icône 88000 + id).
+- Les cartes du deck Tensho choisi (Triple Triade › Deck, par défaut le dernier enregistré) sont encadrées en vert dans la liste du jeu et le
+  cadre suit le défilement ; le nom du deck en surbrillance s'affiche au-dessus de l'éditeur. Sans mode développeur. Lecture seule.
+- Verify.ps1 (agent) : 540/540, 0 avertissement, 0 erreur ; DLL 0.164.0.0. Non validé en jeu.
+## 0.163.0
+- Retour 0.162 : l'aide-mémoire s'affiche bien à côté de l'éditeur de decks (nom `GSInfoEditDeck` confirmé en jeu, rapport utilisateur
+  avec capture) ; demande : pas une interface mais une surbrillance des bonnes cartes dans la liste du jeu, comme TriadBuddy.
+- Aide-mémoire retiré. Capture en mode développeur de l'éditeur de decks : nœuds image visibles (identifiant, rectangle écran, fichier
+  d'icône) et valeurs de la fenêtre, une ligne « Triad edit deck capture » dans dalamud.log par changement. Sert à prouver quelle carte est
+  dessinée où avant de l'encadrer.
+- Verify.ps1 (agent) : 540/540, 0 avertissement, 0 erreur ; DLL 0.163.0.0. Non validé en jeu.
+## 0.162.0
+- Demande : après génération, voir les cartes du deck plus facilement que les autres (comme TriadBuddy), pouvoir supprimer le deck,
+  les decks enregistrés dans une liste et nommés d'après le PNJ.
+- Liste des decks Tensho (`Configuration.TripleTriadDecks` : nom du PNJ, identifiant du PNJ, 5 cartes ; un deck par PNJ, remplacé à la
+  génération suivante). Triple Triade › Deck : chaque deck avec ses 5 icônes, « Afficher dans l'éditeur », « Supprimer ». Le panneau de la
+  fenêtre de défi donne aussi le % de chaque deck Tensho.
+- Aide-mémoire à droite de l'éditeur de decks du jeu (fenêtre `GSInfoEditDeck`, nom tiré du type FFXIVClientStructs `AddonGSInfoEditDeck`,
+  à confirmer en jeu) : les 5 cartes du deck choisi en grand — icône, numéro de carte (N°), nom, rareté, chiffres — pour les retrouver
+  dans la liste du jeu. Lecture seule ; rien n'est modifié dans le jeu.
+- Test : 1 groupe (decks persistés avec le nom du PNJ, configuration ancienne vide). Verify.ps1 (agent) : 540/540, 0 avertissement,
+  0 erreur ; DLL 0.162.0.0. Non validé en jeu.
+## 0.161.0
+- Retour utilisateur 0.160 : « test ok » (conseil en match) ; manquaient la génération de deck depuis la fenêtre de défi du PNJ et les %
+  de victoire estimés par deck, comme TriadBuddy.
+- Panneau « Tensho — Triple Triade » à droite de la fenêtre de défi `TripleTriadRequest` (observation Triple Triade active) : PNJ, règles,
+  % de victoires et de nuls estimés pour chaque deck enregistré dans le jeu et le deck Tensho, bouton « Générer un deck pour ce PNJ »
+  (cartes possédées), enregistrement comme deck Tensho. Rien n'est écrit dans le jeu : le joueur compose le deck dans l'éditeur du jeu.
+- Données : règles du défi = valeurs 102–105 de la fenêtre (identifiants TripleTriadRule 10, 12, 4, 9 dans la capture du match Munglig =
+  règles ensuite affichées en match) ; decks du joueur = `GoldSaucerModule.Decks` (FFXIVClientStructs : nom + 5 identifiants de carte),
+  lus seulement si le module appartient au personnage ; deck du PNJ = feuille TripleTriad.
+- Estimation (`TriadMatchSimulator`) : 400 matchs simulés par deck, main du PNJ tirée de son deck (fixes + variables au hasard), premier joueur
+  au hasard, chaque camp joue le coup qui maximise l'écart après une réponse ; Chaos impose une carte au hasard, Ordre la suivante. Les
+  règles Roulette (tirées au début du match) et Aléatoire sont signalées. Estimation : la logique des PNJ du jeu n'est pas connue.
+- Génération : cartes possédées classées par leurs chiffres pour les règles (Inversion : petits chiffres), deck de départ valide (≤ 2 cartes
+  4★ ou plus, ≤ 1 carte 5★), puis échanges d'une carte gardés s'ils améliorent le score simulé (mêmes tirages pour tous les decks), 6 s.
+- Capture de match : seulement en mode développeur (elle coûtait une image de 66 ms au début du match, dalamud.log 14:47:36).
+- Tests : 2 groupes `TriadMatchSimulatorTests` (reproductible, deck fort > faible, Inversion + Chaos, rareté, refus). Verify.ps1 (agent) :
+  539/539, 0 avertissement, 0 erreur ; DLL 0.161.0.0. Non validé en jeu.
+## 0.160.0
+- TRIAD-003 étape 1 : conseil pendant le match, superposé à la fenêtre du jeu (comme TriadBuddy) : cadre vert sur la meilleure carte de la
+  main et la meilleure case ; texte dans Triple Triade › Match observé. Lecture seule : le joueur pose la carte.
+- Preuves (match contre Munglig, PNJ 1019323, 14:39, [docs/evidence/0.160.0-triad-match-capture.log](docs/evidence/0.160.0-triad-match-capture.log)) :
+  `TurnState` 1 coup libre / 2 coup imposé / 0 attente (énumération FFXIVClientStructs, 2 observé à chacun des 4 coups du joueur en Chaos) ;
+  valeurs 5–9 de la fenêtre = noms des règles du match (Inversion, Bonus, Identique, Chaos — la feuille du PNJ n'en donne que 2, d'où la
+  lecture dans le match) ; valeur 25 = carte imposée (4/4 coups) ; PNJ = cible ; rectangles des 5 cartes de la main et des 9 cases.
+- Correction : **NumSideR et NumSideL sont inversés dans FFXIVClientStructs** — les 5 cartes jouées par Munglig ne correspondent à son
+  deck (TripleTriadCardResident) qu'en échangeant droite et gauche (Garuda U7 R6 D1 L7 lu U7 « R »7 D1 « L »6). L'observation corrige l'ordre ;
+  l'observation 0.26–0.159 affichait droite et gauche inversées.
+- Cartes cachées de l'adversaire : deck du PNJ (feuille TripleTriad liée par ENpcBase) — toutes les cartes fixes pas encore vues, puis
+  chaque combinaison des variables pas vues, équiprobables ; chaque main est résolue par le solveur existant et les coups sont classés par
+  écart moyen. Règles jouées par le solveur : Identique, Plus, Inversion, Tueur d'as, Bonus, Malus ; Chaos/Ordre via la carte imposée.
+  Refus explicites (pas de conseil inventé) : carte illisible, deck inconnu, cartes adverses hors du deck.
+- Tests : 3 groupes `TriadMatchAdvisorTests` sur la position réelle de 14:39:58 (cartes cachées = Cid et Sadu, révélées ensuite ; carte
+  imposée respectée ; refus). Verify.ps1 (agent) : 537/537, 0 avertissement, 0 erreur ; DLL 0.160.0.0. VALIDATED_IN_GAME : « test ok » (utilisateur, 2026-10-31).
+## 0.159.0
+- Demande : « commence Triad » (TRIAD-003, finir l'outil comme TriadBuddy ; plan : [docs/goals/TRIAD-003-PLAN.md](docs/goals/TRIAD-003-PLAN.md)).
+- Preuve hors jeu : sonde `PROBE_TRIAD` — 146 lignes TripleTriad, 144 PNJ liés par ENpcData, règles (Roulette, Toutes/Trois sur table,
+  Identique, Mort subite, Plus, Aléatoire, Ordre, Chaos, Inversion, Tueur d'as, Bonus, Malus, Échange, Draft), cartes fixes et variables,
+  récompenses, 46 PNJ aux règles régionales ([docs/evidence/0.159.0-triad-npc-probe.log](docs/evidence/0.159.0-triad-npc-probe.log)).
+  Conséquence : les règles réellement appliquées (Roulette, régionales) ne se lisent que dans le match.
+- Capture de match (avec l'observation Triple Triade active) : une ligne « Triad capture » dans dalamud.log à chaque changement de la fenêtre
+  `TripleTriad` (état du tour, PNJ ciblé, valeurs de la fenêtre, faces et rectangles des cartes et des cases) et « Triad request capture »
+  pour la fenêtre d'avant-match `TripleTriadRequest`. Chaînes lues bornées (240 octets, 60 caractères), 160 valeurs au plus. Sert à prouver
+  règles, tour et positions avant de lier l'observation au solveur. Nouveau service injecté : `ITargetManager` (PNJ ciblé).
+- Verify.ps1 (agent) : 534/534, 0 avertissement, 0 erreur ; DLL 0.159.0.0. Non validé en jeu.
+## 0.158.0
+- Demande : « régler d'abord le Mini Cactpot qui ne superpose aucune interface en jeu pour la solution, comme ezMiniCactpot »
+  (COLL-004 sources inconnues mis en pause ; Triple Triade ensuite).
+- Cause : la solution n'existait que dans la page Tensho, et n'était calculée que lorsque cette page était ouverte.
+- Correction : superposition sur la fenêtre du jeu `LotteryDaily`, dessinée à chaque image tant que l'observation Mini Cactpot est active
+  (Paramètres › Modules), même fenêtre Tensho fermée : cadre vert sur la ou les meilleures cases, puis sur la ou les meilleures lignes.
+  Positions lues au thread framework : `GameBoard` (9 cases) et `LaneSelector` (8 boutons de ligne) de FFXIVClientStructs
+  `AddonLotteryDaily` (réflexion sur l'assembly installée 7.57.0.9414) ; correspondance lignes du solveur → boutons du jeu
+  (lignes, colonnes, diagonale ↘, diagonale ↙ → 5,6,7,1,2,3,0,4 ; sens des diagonales à confirmer en jeu). Lecture seule : le joueur clique.
+  Libellé du réglage : « … et afficher la solution sur la fenêtre du jeu ».
+- Verify.ps1 (agent) : 534/534 (+1 test : rectangles complets, copies, correspondance des lignes), 0 avertissement, 0 erreur ; DLL 0.158.0.0.
+  Non validé en jeu.
 ## 0.157.0
 - Demande (PUBLISH-018) : « fais-le et déclare créé par IA » pour l'icône, la déclaration d'IA, le nom et le choix du dépôt officiel ;
   puis « l'icône doit montrer une boîte à outils en rapport avec FF14 ».

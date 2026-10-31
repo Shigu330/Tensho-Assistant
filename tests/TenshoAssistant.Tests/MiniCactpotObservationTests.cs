@@ -14,6 +14,17 @@ internal static class MiniCactpotObservationTests
             {var rejected=false;try{_=new MiniCactpotObservedFrame(invalid);}catch(ArgumentException){rejected=true;}Check(rejected,"invalid shape value or duplicate");}
             Check(!new MiniCactpotObservedFrame(new int[9]).Playable && !new MiniCactpotObservedFrame(Enumerable.Range(1,9).ToArray()).Playable,"initial and finished tickets never solved");
         }),
+        ("Cactpot overlay keeps button rectangles only when complete and maps solver lines to game buttons",()=>
+        {
+            var tiles=Enumerable.Range(0,9).Select(index=>new MiniCactpotRect(index*10,0,8,8)).ToArray();
+            var lanes=Enumerable.Range(0,8).Select(index=>new MiniCactpotRect(index*10,50,8,8)).ToArray();
+            var frame=new MiniCactpotObservedFrame(Board,tiles,lanes);tiles[0]=new(99,99,1,1);
+            Check(frame.Tiles is { Count:9 } && frame.Tiles[0].X==0 && frame.Lanes is { Count:8 },"owned copies of nine cells and eight lines");
+            Check(new MiniCactpotObservedFrame(Board,tiles[..8],lanes).Tiles is null,"missing cell: no cell overlay");
+            Check(new MiniCactpotObservedFrame(Board,tiles,lanes.Select((rect,index)=>index==3 ? rect with { Width=float.NaN }:rect).ToArray()).Lanes is null,"invalid line: no line overlay");
+            // Solver lines: rows, columns, ↘, ↙. Game LaneSelector: ↘, columns 1–3, ↙, rows 1–3.
+            Check(MiniCactpotObservedFrame.LaneOfLine.SequenceEqual(new[]{5,6,7,1,2,3,0,4}) && MiniCactpotObservedFrame.LaneOfLine.Distinct().Count()==8,"line to button mapping");
+        }),
         ("Cactpot observation is opt-in and old owner leases cannot publish",()=>
         {
             using var service=new MiniCactpotObservationService();Check(service.BeginRead(42) is null,"default disabled");service.SetEnabled(true);

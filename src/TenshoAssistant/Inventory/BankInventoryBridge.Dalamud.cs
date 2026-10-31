@@ -9,7 +9,7 @@ namespace TenshoAssistant.Inventory;
 
 internal sealed record BankMenuContext(BankKey Key, string Name, string AddonName, Vector2 Anchor, bool Loaded);
 internal sealed record BankMenuState(ulong CharacterId, BankMenuContext? Retainer, BankMenuContext? Saddlebag,
-    BankMenuContext? Premium, string? Message);
+    BankMenuContext? Premium, string? Message, IReadOnlyList<(ulong Id, string Name)>? KnownRetainers = null);
 
 /// <summary>Observes menu anchors on framework, and copies inventory only after an explicit import request.</summary>
 internal sealed class BankInventoryBridge : IDisposable
@@ -28,13 +28,18 @@ internal sealed class BankInventoryBridge : IDisposable
     private BankKey? lastRetainer;
     private BankKey? requested;
     private Task<BankImportResult>? importing;
+    // Automatic capture (0.167): each storage is copied once per opening, then again every 30 s while it stays open.
+    private readonly Func<bool> autoCapture;
+    private readonly Dictionary<BankKey, TimeSpan> autoCaptured = [];
+    private IReadOnlyList<(ulong Id, string Name)>? knownRetainers;
     private bool disposed;
     private BankMenuState state = new(0, null, null, null, null);
     public BankMenuState State => Volatile.Read(ref state);
 
     public BankInventoryBridge(InventoryBankService bank, IGameInventory inventory, IGameGui gui,
-        IPlayerState player, IClientState client, IFramework framework, IPluginLog log)
+        IPlayerState player, IClientState client, IFramework framework, IPluginLog log, Func<bool>? autoCapture = null)
     {
+        this.autoCapture = autoCapture ?? (() => false);
         this.bank = bank;
         this.inventory = inventory;
         this.gui = gui;
@@ -111,8 +116,15 @@ internal sealed class BankInventoryBridge : IDisposable
                     message = importing.GetAwaiter().GetResult().Message;
                     importing = null;
                 }
-                Volatile.Write(ref state, new(character, retainer, saddle, premium, message));
+                knownRetainers = ReadKnownRetainers(character) ?? (character == state.CharacterId ? knownRetainers : null);
+                Volatile.Write(ref state, new(character, retainer, saddle, premium, message, knownRetainers));
                 contextUpdated = true;
+                var open = new[] { retainer, saddle, premium }.Where(context => context is { Loaded: true }).Select(context => context!.Key).ToHashSet();
+                foreach (var gone in autoCaptured.Keys.Where(openKey => !open.Contains(openKey)).ToArray()) autoCaptured.Remove(gone);
+                if (requested is null && importing is null && autoCapture() && !bank.State.Loading && !bank.State.Importing && bank.State.Error is null)
+                    foreach (var openKey in open)
+                        if (!autoCaptured.TryGetValue(openKey, out var last) || now - last >= TimeSpan.FromSeconds(30))
+                        { autoCaptured[openKey] = now; requested = openKey; break; }
                 if (requested is not { } key) return;
                 requested = null;
                 var context = new[] { retainer, saddle, premium }.FirstOrDefault(c => c?.Key == key);
@@ -147,6 +159,18 @@ internal sealed class BankInventoryBridge : IDisposable
             if (!addon.IsNull && addon.IsReady && addon.IsVisible) return addon;
         }
         return default;
+    }
+
+    // The character's retainers (name, id), known once the summoning bell was opened in this session; null when not available.
+    private static unsafe IReadOnlyList<(ulong Id, string Name)>? ReadKnownRetainers(ulong character)
+    {
+        if (character == 0) return null;
+        var manager = RetainerManager.Instance();
+        if (manager == null || !manager->IsReady) return null;
+        var list = new List<(ulong, string)>();
+        foreach (ref var retainer in manager->Retainers)
+            if (retainer.RetainerId != 0 && retainer.NameString.Length > 0) list.Add((retainer.RetainerId, retainer.NameString));
+        return list.AsReadOnly();
     }
 
     private unsafe BankMenuContext? GetRetainer(ulong character)

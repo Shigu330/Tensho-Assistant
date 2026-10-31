@@ -15,6 +15,20 @@ public sealed record CollectionEntry(CollectionKind Kind, uint Id, string Name, 
 {
     public CollectionAcquisition Acquisition=>ConfirmedUnlocked ? CollectionAcquisition.Acquired:NegativeConfirmed ? CollectionAcquisition.NotAcquired:CollectionAcquisition.Unknown;
 }
+/// <summary>
+/// Title and achievement states kept between reads (0.166): the game sends these lists only after their window was opened, so a later read
+/// often confirms nothing. An obtained title or achievement stays obtained; "not obtained" is kept while its last complete read is
+/// younger than the "Titles and achievements" cache setting.
+/// </summary>
+public static class CompletionMemory
+{
+    public static CollectionEntry Merge(CollectionEntry fresh,(bool Positive,bool Negative)? remembered,bool keepNegative)
+    {
+        if(remembered is not { } memory || fresh.ConfirmedUnlocked)return fresh;
+        if(memory.Positive)return fresh with {ConfirmedUnlocked=true,NegativeConfirmed=false};
+        return memory.Negative && keepNegative && !fresh.NegativeConfirmed ? fresh with {NegativeConfirmed=true}:fresh;
+    }
+}
 public static class CollectionAcquisitionEvidence
 {
     public static CollectionEntry Observe(CollectionEntry entry,bool positive,bool loadedBefore,bool loadedAfter)=>entry with

@@ -43,6 +43,15 @@ public sealed class MapCatalog
         cancellation.ThrowIfCancellationRequested();
     }
     public MapDefinition? Find(uint id) => byId.GetValueOrDefault(id);
+    /// <summary>
+    /// Maps showing the same ground as <paramref name="map"/> (0.175): same territory, scale and offset, so world positions land on the same
+    /// pixel. Auxesia (territory 1319) has 22 such variants, c1w4/01–22, that change with cosmic exploration progress, while NPC positions
+    /// are recorded on the territory's default map (docs/evidence/0.175.0-auxesia-maps-probe.log).
+    /// </summary>
+    public IReadOnlyList<uint> Equivalent(MapDefinition map) => Entries
+        .Where(other => other.MapId == map.MapId || other.TerritoryId == map.TerritoryId && other.SizeFactor == map.SizeFactor
+            && other.OffsetX == map.OffsetX && other.OffsetY == map.OffsetY)
+        .Select(other => other.MapId).ToArray();
     public IReadOnlyList<MapDefinition> ForPlace(uint placeNameId) => byPlace.GetValueOrDefault(placeNameId) ?? Array.Empty<MapDefinition>();
     public IReadOnlyList<MapDefinition> Search(string query)
     {
@@ -111,17 +120,23 @@ public static class MapVendorIcons
     public static readonly FrozenSet<uint> Services = new uint[] { 60434, 60768, 60983, 63921, 63919, 60927, 63997 }.ToFrozenSet();
     public const float ShopRadius = 16, ServiceRadius = 8;
 
-    /// <summary>Index of the nearest marker the vendor at <paramref name="pixel"/> belongs to, or -1.</summary>
-    public static int Nearest(IReadOnlyList<(float X, float Y, uint Icon, bool Labelled)> markers, System.Numerics.Vector2 pixel)
+    /// <summary>
+    /// Index of the marker the vendor at <paramref name="pixel"/> belongs to, or -1: the nearest qualifying marker of the vendor's own
+    /// kind (<paramref name="preferred"/>: Échangeur for exchange-only vendors, Échoppe otherwise) when one is in reach, else the nearest
+    /// (0.171: in Auxesia the credit exchange stands 2.3 px from an Échoppe and 3.7 px from its Échangeur).
+    /// </summary>
+    public static int Nearest(IReadOnlyList<(float X, float Y, uint Icon, bool Labelled)> markers, System.Numerics.Vector2 pixel, uint preferred = 0)
     {
-        var best = -1; var bestDistance = float.MaxValue;
+        int best = -1, bestPreferred = -1; float bestDistance = float.MaxValue, bestPreferredDistance = float.MaxValue;
         for (var index = 0; index < markers.Count; index++)
         {
             var marker = markers[index];
             var radius = Shops.Contains(marker.Icon) ? ShopRadius : Services.Contains(marker.Icon) && !marker.Labelled ? ServiceRadius : 0;
             var distance = System.Numerics.Vector2.Distance(new(marker.X, marker.Y), pixel);
-            if (radius > 0 && distance <= radius && distance < bestDistance) { best = index; bestDistance = distance; }
+            if (radius <= 0 || distance > radius) continue;
+            if (distance < bestDistance) { best = index; bestDistance = distance; }
+            if (preferred != 0 && marker.Icon == preferred && distance < bestPreferredDistance) { bestPreferred = index; bestPreferredDistance = distance; }
         }
-        return best;
+        return bestPreferred >= 0 ? bestPreferred : best;
     }
 }

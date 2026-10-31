@@ -8,7 +8,8 @@ namespace TenshoAssistant.Caching;
 
 public sealed record CachedValue<T>(T Value,DateTimeOffset RecordedAt);
 public sealed record QuestCacheData(ulong Owner,IReadOnlyList<QuestEntry> Entries);
-public sealed record CollectionCacheData(ulong Owner,IReadOnlyList<Collections.CollectionEntry> Entries,IReadOnlyList<Collections.CollectionCategoryIssue>? Issues);
+public sealed record CollectionCacheData(ulong Owner,IReadOnlyList<Collections.CollectionEntry> Entries,IReadOnlyList<Collections.CollectionCategoryIssue>? Issues,
+    DateTimeOffset? TitlesCheckedAt=null,DateTimeOffset? AchievementsCheckedAt=null);
 public sealed record FashionCacheData(string Json,string? Metadata);
 
 /// <summary>Versioned, bounded local snapshots. All disk I/O and JSON work run off the framework thread.</summary>

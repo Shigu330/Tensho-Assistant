@@ -92,8 +92,12 @@ public sealed partial class Configuration
     public List<TenshoAssistant.Maps.MapBookmark> MapBookmarks { get; set; } = [];
     public List<TenshoAssistant.Craft.CraftPreset>? CraftPresets { get; set; } = [];
     public List<uint> TripleTriadDeck { get; set; } = [];
+    // Decks generated for an NPC (0.162), named after it; at most one per NPC.
+    public List<TriadSavedDeck> TripleTriadDecks { get; set; } = [];
     public List<uint> FollowedQuests { get; set; } = [];
     public bool OpenOnLoad { get; set; }
+    // Retainers and saddlebags copied into the bank cache each time they are opened (0.167), instead of an import button.
+    public bool AutoBankCapture { get; set; } = true;
     // 0 follows the game's interface theme; 1..6 force a PluginTheme (value - 1).
     public int ThemeMode { get; set; }
     public MapViewSettings MapView { get; set; } = new();
@@ -135,4 +139,11 @@ public sealed partial class Configuration
         get => Volatile.Read(ref marketPricesOnHover);
         set => Volatile.Write(ref marketPricesOnHover, value);
     }
+}
+
+public sealed class TriadSavedDeck
+{
+    public string Name { get; set; } = string.Empty;
+    public uint NpcId { get; set; }
+    public List<uint> Cards { get; set; } = [];
 }

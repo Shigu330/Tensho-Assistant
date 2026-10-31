@@ -29,6 +29,7 @@ internal sealed partial class MainWindow
         { ImGui.TextDisabled(localization.Get("TriadObserved.Changed")); return; }
         var phase = frame.NativePhase switch {0 => localization.Get("TriadObserved.WaitingPhase"),1 => localization.Get("TriadObserved.FreePhase"),2 => localization.Get("TriadObserved.ForcedPhase"),_ => localization.Get("TriadObserved.UnknownPhase")};
         ImGui.TextDisabled(localization.Format("TriadObservedCounts.Phase",phase,state.ObservedAt?.ToLocalTime().ToString("HH:mm:ss") ?? "—"));
+        DrawTriadAdviceText();
         if (ImGui.GetContentRegionAvail().X >= 620 && ImGui.BeginTable("ObservedTriadLayout",2,ImGuiTableFlags.SizingFixedFit))
         {
             try
