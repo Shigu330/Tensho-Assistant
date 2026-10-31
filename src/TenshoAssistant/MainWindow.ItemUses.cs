@@ -28,6 +28,7 @@ internal sealed partial class MainWindow
             if(ImGui.SmallButton(localization.Format("ItemUseCounts.Recipes",count)))focusCraftTab=true;
         }
         else ImGui.TextDisabled(localization.Get("ItemUsesUi.LoadingRecipes"));
+        DrawUseReferences(id);
         DrawQuestItemSources(id);
         var state=itemUses.State;
         if(state.Catalog is not { } catalog)
@@ -71,5 +72,63 @@ internal sealed partial class MainWindow
         }
         if(catalog.UnresolvedLeveRows>0)ImGui.TextWrapped(localization.Format("ItemUseCounts.Partial",catalog.UnresolvedLeveRows));
         ImGui.TextDisabled(localization.Format("ItemUseCounts.Source",catalog.Language));
+    }
+
+    // References found by the other tools (0.209): the item as a currency (game shops → vendor tool), what it gives (LuminaSupplemental
+    // ItemSupplement: desynthesis, coffer, card pack…), the quests that ask for it (LuminaSupplemental QuestRequiredItem → quest tool).
+    private void DrawUseReferences(uint id)
+    {
+        var items=itemCatalog.State.Catalog;
+        var paid=npcVendors?.State.Catalog?.PaidWith(id) ?? [];
+        if(paid.Count>0 && ImGui.CollapsingHeader(localization.Format("ItemUseRefs.Currency",paid.Select(offer=>offer.Sale.ItemId).Distinct().Count())+"###UseCurrency"))
+        {
+            ImGui.TextDisabled(localization.Get("ItemUseRefs.CurrencyHelp"));
+            foreach(var vendor in paid.GroupBy(offer=>offer.Vendor.NpcId).OrderByDescending(group=>group.Count()).Take(8))
+            {
+                var first=vendor.First().Vendor;
+                ImGui.PushID((int)first.NpcId);
+                try
+                {
+                    DrawVendorLink(id,first,localization.Format("SourceLinks.Vendor",NpcName(first),VendorPlace(first))+$" ({vendor.Select(offer=>offer.Sale.ItemId).Distinct().Count()})");
+                    ImGui.Indent();
+                    foreach(var offer in vendor.DistinctBy(offer=>offer.Sale.ItemId).Take(12))
+                    {
+                        var bought=items?.Find(offer.Sale.ItemId);
+                        DrawItemIcon(bought,new Vector2(20));var click=ImGui.IsItemClicked();ImGui.SameLine();
+                        var cost=offer.Sale.Costs.FirstOrDefault(entry=>entry.CurrencyItemId==id);
+                        click|=ImGui.Selectable($"{bought?.Name ?? offer.Sale.ItemId.ToString()} · {cost?.Amount.ToString("N0") ?? "?"}##Buy{offer.Sale.ShopId}/{offer.Sale.ItemId}");
+                        if(ImGui.IsItemHovered())DrawItemInfoTooltip(offer.Sale.ItemId);
+                        if(click){SelectItem(offer.Sale.ItemId);focusUsesTab=false;}
+                    }
+                    ImGui.Unindent();
+                }
+                finally{ImGui.PopID();}
+            }
+        }
+        if(lumina?.State.Data is { } data)
+        {
+            var given=data.GivesOf(id);
+            if(given.Count>0 && ImGui.CollapsingHeader(localization.Format("ItemUseRefs.Gives",given.Sum(kind=>kind.Count))+"###UseGives"))
+                foreach(var (kind,count,list) in given)
+                {
+                    ImGui.TextColored(Accent,localization.Get("ItemUseRefs.Kind"+(kind is >= 1 and <= 19 ? kind:0))+(count>list.Count ? " "+localization.Format("HoverUi.SupplementMore",count-list.Count):""));
+                    ImGui.Indent();
+                    foreach(var result in list)
+                    {
+                        var got=items?.Find(result);
+                        DrawItemIcon(got,new Vector2(20));DrawCollectionMark(got);var click=ImGui.IsItemClicked();ImGui.SameLine();
+                        click|=ImGui.Selectable($"{got?.Name ?? result.ToString()}##Gives{kind}/{result}");
+                        if(ImGui.IsItemHovered())DrawItemInfoTooltip(result);
+                        if(click){SelectItem(result);focusUsesTab=true;}
+                    }
+                    ImGui.Unindent();
+                }
+            var asked=data.QuestsRequiring(id);
+            if(asked.Count>0 && ImGui.CollapsingHeader(localization.Format("ItemUseRefs.Quests",asked.Count)+"###UseQuests"))
+                foreach(var (questId,name,quantity,hq) in asked)
+                    if(ImGui.Selectable(localization.Format("ItemUseRefs.Quest",name.Length>0 ? name:questId.ToString(),quantity)+(hq ? " HQ":"")+$"##AskQuest{questId}"))
+                    {page=Page.Quests;SelectQuest(questId);}
+        }
+        else if(configuration.CommunityLumina)lumina?.Request();
     }
 }

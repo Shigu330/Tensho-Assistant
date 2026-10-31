@@ -45,7 +45,7 @@ internal sealed partial class MainWindow
             {
                 DrawItemIcon(new ItemDefinition(0, type.TypeName, false, type.IconId), new Vector2(28));
                 if (ImGui.IsItemClicked()) sourceTypeFilter = type.TypeId;
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip(type.TypeName);
+                if (ImGui.IsItemHovered()) WrappedTooltip(type.TypeName);
             }
             finally { ImGui.PopID(); }
         }
@@ -93,7 +93,7 @@ internal sealed partial class MainWindow
                                 ImGui.SameLine();
                                 if (ImGui.Selectable(item.Name, itemId == item.Id, ImGuiSelectableFlags.None, new Vector2(0, 28)) || clicked)
                                 { SelectItem(item.Id); gatheringTypeFilter = sourceTypeFilter; }
-                                if (ImGui.IsItemHovered()) ImGui.SetTooltip(item.Name);
+                                if (ImGui.IsItemHovered()) WrappedTooltip(item.Name);
                             }
                             finally { ImGui.PopID(); }
                         }

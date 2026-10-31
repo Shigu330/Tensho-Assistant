@@ -4,7 +4,7 @@ using TenshoAssistant.Caching;
 namespace TenshoAssistant.Craft;
 
 public sealed record CraftLogInput(ulong Owner,RecipeDefinition Recipe,CraftStats Stats,CraftActionCatalog Catalog,
-    IReadOnlyList<CraftPreset> Presets,CraftSolveOptions Options,int ExtraWait,bool Echo,long ObservationRevision=0,int StartingQuality=0);
+    IReadOnlyList<CraftPreset> Presets,CraftSolveOptions Options,int ExtraWait,bool Echo,long ObservationRevision=0,int StartingQuality=0,bool Chain=false);
 public sealed record CraftLogMacro(string Name,CraftSimulationResult Simulation,CraftMacroExport Export);
 public sealed record CraftLogResult(CraftLogMacro? Saved,CraftLogMacro? Suggested,bool TargetReached,string? SearchIssue);
 public sealed record CraftLogState(CraftLogInput? Input,bool Loading,CraftLogResult? Result,string? Error,bool FromCache=false,DateTimeOffset? CalculatedAt=null);
@@ -74,7 +74,7 @@ public sealed class CraftLogSession : IDisposable
             {
                 if(macro is null)continue;
                 var simulation=CraftSimulation.Run(input.Recipe,input.Stats,input.StartingQuality,macro.Simulation.Steps.Select(step=>step.Action));
-                var export=CraftMacroExporter.Build(simulation,input.Recipe.CraftTypeId+8,input.Catalog,input.ExtraWait,input.Echo);
+                var export=CraftMacroExporter.Build(simulation,input.Recipe.CraftTypeId+8,input.Catalog,input.ExtraWait,input.Echo,input.Chain);
                 if(simulation.RecipeId!=macro.Simulation.RecipeId || simulation.Final!=macro.Simulation.Final || simulation.StartingQuality!=macro.Simulation.StartingQuality || simulation.Stats!=macro.Simulation.Stats
                     || export.Actions!=macro.Export.Actions || export.WaitSeconds!=macro.Export.WaitSeconds
                     || !export.Pages.Select(page=>page.Text).SequenceEqual(macro.Export.Pages.Select(page=>page.Text)))return false;
@@ -97,7 +97,7 @@ public sealed class CraftLogSession : IDisposable
             {
                 var simulation=CraftSimulation.Run(input.Recipe,input.Stats,input.StartingQuality,preset.Actions,token);
                 if(simulation.Final.Finish!=CraftFinish.Completed || simulation.Error is not null)continue;
-                var export=CraftMacroExporter.Build(simulation,job,input.Catalog,input.ExtraWait,input.Echo);
+                var export=CraftMacroExporter.Build(simulation,job,input.Catalog,input.ExtraWait,input.Echo,input.Chain);
                 if(CraftSolver.BetterCompletion(simulation.Final,export.WaitSeconds,saved?.Simulation.Final,saved?.Export.WaitSeconds ?? 0,input.Options.TargetQuality))
                     saved=new(preset.Name,simulation,export);
             }
@@ -105,7 +105,7 @@ public sealed class CraftLogSession : IDisposable
         }
         var result=CraftSolver.Solve(input.Recipe,input.Stats,input.StartingQuality,input.Options with {ExtraWait=input.ExtraWait},token);
         var suggested=result.Simulation is {Final.Finish:CraftFinish.Completed,Error:null} valid
-            ? new CraftLogMacro("Macro proposée",valid,CraftMacroExporter.Build(valid,job,input.Catalog,input.ExtraWait,input.Echo)):null;
+            ? new CraftLogMacro("Macro proposée",valid,CraftMacroExporter.Build(valid,job,input.Catalog,input.ExtraWait,input.Echo,input.Chain)):null;
         token.ThrowIfCancellationRequested();
         return new(saved,suggested,result.TargetReached,suggested is null ? "Aucune synthèse terminée trouvée dans les limites de recherche."
             :result.TargetReached ? null:"La séquence termine sous la qualité cible.");

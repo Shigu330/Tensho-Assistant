@@ -151,7 +151,7 @@ internal sealed partial class MainWindow
             else
             {
                 DrawItemIcon(currency,new Vector2(iconSize));
-                if(tooltips && ImGui.IsItemHovered())ImGui.SetTooltip(currency.Name);
+                if(tooltips && ImGui.IsItemHovered())WrappedTooltip(currency.Name);
             }
         }
         if(sale.Quantity>1 || sale.Hq){ImGui.SameLine(0,6);ImGui.TextDisabled(localization.Format("NpcUi.Receives",sale.Quantity,sale.Hq ? " HQ":""));}

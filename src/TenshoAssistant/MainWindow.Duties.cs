@@ -80,7 +80,7 @@ internal sealed partial class MainWindow
                     var clicked = ImGui.IsItemClicked(); ImGui.SameLine();
                     if (ImGui.Selectable($"{duty.Name}##Duty{duty.DutyId}",dutyLoot.State.Duty?.DutyId == duty.DutyId,ImGuiSelectableFlags.None,new Vector2(0,24)) || clicked)
                     { dutyLoot.Select(duty); showDutyDetails = true; dutyItemQuery = ""; }
-                    if (developerMode && ImGui.IsItemHovered()) ImGui.SetTooltip($"Duty {duty.DutyId} · instance {duty.InstanceId} · territory {duty.TerritoryId}");
+                    if (developerMode && ImGui.IsItemHovered()) WrappedTooltip($"Duty {duty.DutyId} · instance {duty.InstanceId} · territory {duty.TerritoryId}");
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(duty.Category);
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(duty.Level.ToString(CultureInfo.InvariantCulture));
                 }
@@ -131,13 +131,16 @@ internal sealed partial class MainWindow
             if (index > 0) ImGui.SameLine();
             if (ImGui.RadioButton(labels[index],dutySourceFilter == index)) dutySourceFilter = index;
         }
+        DrawLootKindFilter("DutyLoot");
         var items = itemCatalog.State.Catalog;
+        if (dutyViewLootKind != lootKind || dutyViewLootMissing != lootMissingOnly) { dutyViewDocument = null; dutyViewLootKind = lootKind; dutyViewLootMissing = lootMissingOnly; }
         if (!ReferenceEquals(dutyViewDocument,document) || !ReferenceEquals(dutyViewItems,items)
             || dutyViewItemQuery != dutyItemQuery || dutyViewSourceFilter != dutySourceFilter || dutyViewLanguageRevision!=localization.Revision)
         {
             var query = dutyItemQuery.Trim();
             dutyItemMatches = document.Entries.Where(entry => dutySourceFilter == 0 || (int)entry.Kind == dutySourceFilter-1)
                 .GroupBy(entry => entry.ItemId).Select(group => (Id:group.Key,Name:items?.Find(group.Key)?.Name ?? localization.Format("BankUi.Item",group.Key),Sources:group.ToArray()))
+                .Where(item => LootKindMatches(items?.Find(item.Id)))
                 .Where(item => query.Length == 0 || item.Name.Contains(query,StringComparison.CurrentCultureIgnoreCase)
                     || item.Id.ToString(CultureInfo.InvariantCulture) == query)
                 .OrderBy(item => item.Name,StringComparer.CurrentCultureIgnoreCase).ThenBy(item => item.Id).ToArray();
@@ -161,7 +164,7 @@ internal sealed partial class MainWindow
                     var item = dutyItemMatches[index];
                     var local = items?.Find(item.Id);
                     ImGui.TableNextRow(); ImGui.TableNextColumn();
-                    DrawItemIcon(local,new Vector2(28)); var clicked = ImGui.IsItemClicked(); ImGui.SameLine();
+                    DrawItemIcon(local,new Vector2(28)); var clicked = ImGui.IsItemClicked(); DrawCollectionMark(local); ImGui.SameLine();
                     var selectable = local is not null && item.Id <= int.MaxValue;
                     ImGui.BeginDisabled(!selectable);
                     try
@@ -171,12 +174,12 @@ internal sealed partial class MainWindow
                     }
                     finally { ImGui.EndDisabled(); }
                     // 0.186: full item tooltip and right click = links to the other tools.
-                    if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) { if (selectable) DrawItemInfoTooltip(item.Id); else ImGui.SetTooltip(localization.Get("UiFragments.MissingItem")); }
+                    if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) { if (selectable) DrawItemInfoTooltip(item.Id); else WrappedTooltip(localization.Get("UiFragments.MissingItem")); }
                     ItemLinksMenu($"DutyLootLinks{item.Id}",local);
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted(item.Sources.Length == 1 ? DutySourceLabel(item.Sources[0]) : $"{item.Sources.Length} sources");
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip(string.Join('\n',item.Sources.Select(DutySourceLabel)));
+                        WrappedTooltip(string.Join('\n',item.Sources.Select(DutySourceLabel)));
                 }
             }
             finally { clipper.End(); clipper.Destroy(); }

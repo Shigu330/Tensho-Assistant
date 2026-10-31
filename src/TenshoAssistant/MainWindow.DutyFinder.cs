@@ -22,6 +22,8 @@ internal sealed partial class MainWindow
     internal void DrawDutyFinderPanel()
     {
         if(windowDisposed || !configuration.ShowDutyFinderLoot || dutyFinder?.Selection is not { } selection)return;
+        // 0.207: no panel for a roulette (no fixed loot) or when no duty is selected.
+        if(selection.Kind!=2 || selection.Id==0)return;
         using var theme=UI.FfxivTheme.Apply();
         ImGui.SetNextWindowPos(new Vector2(selection.X+selection.Width+6,selection.Y),ImGuiCond.Always);
         ImGui.SetNextWindowSize(new Vector2(400,Math.Max(320,selection.Height)),ImGuiCond.Always);
@@ -64,7 +66,7 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.PopFont();}
         if(ImGui.IsItemHovered())
-            ImGui.SetTooltip(localization.Get("DutyUi.Source")+(state.Document is { HasRewards:true, HasFights:true, HasCoffers:true } ? "":"\n"+localization.Get("DutyUi.Partial")));
+            WrappedTooltip(localization.Get("DutyUi.Source")+(state.Document is { HasRewards:true, HasFights:true, HasCoffers:true } ? "":"\n"+localization.Get("DutyUi.Partial")));
         if(DutyDocument(state) is not { } document)return;
         if(lumina?.State.Data?.ForDuty(duty.DutyId) is { Count:>0 })ImGui.TextDisabled(localization.Get("DutyFinder.Lumina"));
         // Counts in the filter names; a kind the source leaves empty is said so (0.187: Garland has no coffer for recent duties).
@@ -81,7 +83,9 @@ internal sealed partial class MainWindow
         ImGui.SameLine();ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##DutyFinderQuery",localization.Get("DutyUi.ItemQuery"),ref dutyFinderQuery,64);
         var items=itemCatalog.State.Catalog;var query=dutyFinderQuery.Trim();
+        DrawLootKindFilter("DutyFinder");
         var groups=document.Entries.Where(entry=>dutyFinderFilter==0 || (int)entry.Kind==dutyFinderFilter-1)
+            .Where(entry=>LootKindMatches(items?.Find(entry.ItemId)))
             .Where(entry=>query.Length==0 || (items?.Find(entry.ItemId)?.Name ?? "").Contains(query,StringComparison.CurrentCultureIgnoreCase))
             .GroupBy(entry=>(entry.Kind,entry.SourceIndex)).OrderBy(group=>group.Key.Kind).ThenBy(group=>group.Key.SourceIndex).ToArray();
         if(groups.Length==0){ImGui.TextDisabled(localization.Get("DutyUi.Empty"));return;}
@@ -96,10 +100,9 @@ internal sealed partial class MainWindow
                 foreach(var id in group.Select(entry=>entry.ItemId).Distinct())
                 {
                     var item=items?.Find(id);
-                    DrawItemIcon(item,new Vector2(24));
+                    DrawItemIcon(item,new Vector2(24));DrawCollectionMark(item);
                     var hovered=ImGui.IsItemHovered();ImGui.SameLine();
-                    var owned=CollectionOf(item) is { ConfirmedUnlocked:true };
-                    ImGui.Selectable((owned ? "✓ ":"")+(item?.Name ?? localization.Format("BankUi.Item",id))+$"##DutyFinderItem{group.Key.Kind}{group.Key.SourceIndex}/{id}",false,ImGuiSelectableFlags.None,new Vector2(0,24));
+                    ImGui.Selectable((item?.Name ?? localization.Format("BankUi.Item",id))+$"##DutyFinderItem{group.Key.Kind}{group.Key.SourceIndex}/{id}",false,ImGuiSelectableFlags.None,new Vector2(0,24));
                     if(hovered || ImGui.IsItemHovered())DrawItemInfoTooltip(id);
                     ItemLinksMenu($"DutyFinderLinks{group.Key.Kind}{group.Key.SourceIndex}/{id}",item);
                 }

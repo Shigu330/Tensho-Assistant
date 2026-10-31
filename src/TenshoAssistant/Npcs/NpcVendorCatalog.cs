@@ -86,7 +86,13 @@ public sealed class NpcVendorCatalog
     public IReadOnlyList<NpcVendor> Vendors{get;}
     public IReadOnlyList<NpcShopSale> Sales{get;}
     private NpcVendorCatalog(string source,IReadOnlyList<NpcVendor> vendors,IReadOnlyList<NpcShopSale> sales,FrozenDictionary<uint,IReadOnlyList<NpcVendorOffer>> byItem)
-    {Source=source;Vendors=vendors;Sales=sales;this.byItem=byItem;VendorCount=vendors.Count;SaleCount=sales.Count;}
+    {
+        Source=source;Vendors=vendors;Sales=sales;this.byItem=byItem;VendorCount=vendors.Count;SaleCount=sales.Count;
+        salesByItem=sales.GroupBy(sale=>sale.ItemId).ToFrozenDictionary(group=>group.Key,group=>(IReadOnlyList<NpcShopSale>)group.ToArray());
+    }
+    // Every sale of an item, also in shops no NPC of the sheets opens (0.199: matched with LuminaSupplemental ENpcShop).
+    private readonly FrozenDictionary<uint,IReadOnlyList<NpcShopSale>> salesByItem;
+    public IReadOnlyList<NpcShopSale> SalesOf(uint itemId)=>salesByItem.GetValueOrDefault(itemId) ?? [];
 
     public static NpcVendorCatalog Build(IEnumerable<NpcVendor> vendors,IEnumerable<NpcShopSale> sales,string source,CancellationToken cancellation=default)
     {
@@ -113,6 +119,15 @@ public sealed class NpcVendorCatalog
         return new(source,Array.AsReadOnly(npcs),Array.AsReadOnly(rows),index);
     }
     public IReadOnlyList<NpcVendorOffer> ForItem(uint itemId)=>byItem.GetValueOrDefault(itemId) ?? [];
+    // Offers paid with an item (0.209: the item as a currency — scrips, certificates, MGP, seals…), built on first use.
+    private FrozenDictionary<uint,IReadOnlyList<NpcVendorOffer>>? byCurrency;
+    public IReadOnlyList<NpcVendorOffer> PaidWith(uint currencyItemId)
+    {
+        var index=byCurrency ??= byItem.Values.SelectMany(offers=>offers).SelectMany(offer=>offer.Sale.Costs.Select(cost=>(cost.CurrencyItemId,offer)))
+            .Where(pair=>pair.CurrencyItemId!=0).GroupBy(pair=>pair.CurrencyItemId)
+            .ToFrozenDictionary(group=>group.Key,group=>(IReadOnlyList<NpcVendorOffer>)group.Select(pair=>pair.offer).Distinct().ToArray());
+        return index.GetValueOrDefault(currencyItemId) ?? [];
+    }
 }
 
 public sealed record NpcVendorState(NpcVendorCatalog? Catalog,int Copied,int Total,string? Error);

@@ -49,7 +49,7 @@ internal sealed partial class MainWindow
                 foreach(var row in rows)
                 {
                     ImGui.TableNextRow();ImGui.TableNextColumn();DrawItemIcon(new ItemDefinition(0,row.Metadata.Name,false,row.Metadata.Icon),new Vector2(24));ImGui.SameLine();ImGui.TextWrapped(row.Metadata.Name);
-                    if(ImGui.IsItemHovered())ImGui.SetTooltip(localization.Format("LiveDetails.Alternatives",row.Metadata.Description,row.Alternatives));
+                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("LiveDetails.Alternatives",row.Metadata.Description,row.Alternatives));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(row.Progress.ToString());ImGui.TableNextColumn();ImGui.TextUnformatted(row.Quality?.ToString() ?? localization.Get("CraftProjectionUi.Unknown"));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(row.Durability.ToString());ImGui.TableNextColumn();ImGui.TextUnformatted(row.CpCost.ToString());
                     ImGui.TableNextColumn();ImGui.TextUnformatted(row.InnerQuiet.ToString());ImGui.TableNextColumn();

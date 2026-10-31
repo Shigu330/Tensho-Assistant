@@ -24,5 +24,21 @@ internal static class LuminaSupplementalTests
             Check(!sastasha.Any(entry=>entry.ItemId==38467),"item of an unknown chest ignored");
             Check(data.DutiesOf(2683).SequenceEqual([4u]) && data.DutiesOf(1).Count==0 && data.ForDuty(5).Count==0,"item to duties index");
         }),
+        ("LuminaSupplemental item uses: what an item gives, the quests asking for it, and the NPCs of unlinked shops",()=>
+        {
+            // QuestRequiredItem first row of the real file (read 2026-10-31); ItemSupplement and ENpcShop rows in the files' column order.
+            var csv=new Dictionary<string,string>
+            {
+                ["ItemSupplement"]="ItemId,SourceItemId,ItemSupplementSource,Min,Max,Probability\n2,5106,1,1,3,0\n41650,41667,7,1,1,0\n41650,41667,7,1,1,0\n",
+                ["QuestRequiredItem"]="ItemId,QuestId,Quantity,IsHq\n5352,65541,10,False\n",
+                ["ENpcShop"]="ENpcResidentId,ShopId\n1016289,1769635\n",
+                ["ENpcPlace"]="ENpcResidentId,TerritoryTypeId,MapId,PlaceNameId,Position\n1016289,132,2,52,11.7;13.4\n",
+            };
+            var data=new LuminaSupplementalData(csv,npcName:_=>"Vendor",questName:id=>id==65541 ? "Quest":null);
+            Check(data.GivesOf(5106) is [(1,1,[2u])],"desynthesis of 5106 gives 2");
+            Check(data.GivesOf(41667) is [(7,2,[41650u])] && data.SupplementsOf(41650) is [(7,2,[41667u])],"coffer read both ways, duplicates counted once in the list");
+            Check(data.QuestsRequiring(5352) is [(65541u,"Quest",10u,false)] && data.QuestsRequiring(1).Count==0,"quest asking for an item");
+            Check(data.NpcsOfShop(1769635) is [1016289u] && data.NpcName(1016289)=="Vendor" && data.PlaceOf(1016289) is { MapId:2, X:11.7f, Y:13.4f },"unlinked shop NPC and place");
+        }),
     ];
 }

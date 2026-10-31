@@ -18,7 +18,7 @@ public static class CraftMacroExporter
         _=>throw new ArgumentOutOfRangeException(nameof(action))
     };
 
-    public static CraftMacroExport Build(CraftSimulationResult simulation,uint job,CraftActionCatalog catalog,int extraWait=0,bool echo=true)
+    public static CraftMacroExport Build(CraftSimulationResult simulation,uint job,CraftActionCatalog catalog,int extraWait=0,bool echo=true,bool chain=false)
     {
         ArgumentNullException.ThrowIfNull(simulation); ArgumentNullException.ThrowIfNull(catalog);
         if(extraWait is <0 or >3 || job is <8 or >15) throw new ArgumentOutOfRangeException(nameof(extraWait));
@@ -34,11 +34,13 @@ public static class CraftMacroExporter
             var wait=BaseWait(step.Action)+extraWait;
             lines.Add($"/ac \"{name}\" <wait.{wait.ToString(CultureInfo.InvariantCulture)}>"); seconds+=wait;
         }
-        var size=echo ? 14:15; var chunks=lines.Chunk(size).ToArray(); var pages=new List<CraftMacroPage>();
+        // Tensho Macro Chain (0.196): the last line of every page is the marker « /tenshonext » (Macros/MacroChainService.cs).
+        var size=15-(echo ? 1:0)-(chain ? 1:0); var chunks=lines.Chunk(size).ToArray(); var pages=new List<CraftMacroPage>();
         for(var index=0;index<chunks.Length;index++)
         {
             var page=chunks[index].ToList();
             if(echo) page.Add($"/echo Tensho {index+1}/{chunks.Length} <se.1>");
+            if(chain) page.Add(TenshoAssistant.Macros.MacroDefinition.Marker);
             pages.Add(new(index+1,Array.AsReadOnly(page.ToArray())));
         }
         return new(Array.AsReadOnly(pages.ToArray()),lines.Count,seconds,Math.Max(0,simulation.PlannedActions-simulation.Steps.Count));

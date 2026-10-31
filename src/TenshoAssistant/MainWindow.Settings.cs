@@ -25,6 +25,7 @@ internal sealed partial class MainWindow
                     DrawMapSettingsBody(shown);
                 });
                 SettingsTab("Data",DrawDataSettings);
+                SettingsTab("Advanced",DrawAdvancedSettings);
                 if(developerMode)SettingsTab("Debug",DrawDeveloperSettings);
             }
             finally{ImGui.EndTabBar();}
@@ -47,9 +48,11 @@ internal sealed partial class MainWindow
         var openOnLoad = configuration.OpenOnLoad;
         var openOnLogin = configuration.OpenOnLogin;
         var loadChanged = ImGui.Checkbox(localization.Get("Settings.OpenOnLoad"), ref openOnLoad);
+        Tip("Settings.OpenOnLoadHelp");
         ImGui.TextDisabled(localization.Get("Settings.OpenOnLoadHelp"));
         ImGui.Spacing();
         var loginChanged = ImGui.Checkbox(localization.Get("Settings.OpenOnLogin"), ref openOnLogin);
+        Tip("Settings.OpenOnLoginHelp");
         ImGui.TextDisabled(localization.Get("Settings.OpenOnLoginHelp"));
         if (loadChanged || loginChanged)
         {
@@ -71,6 +74,7 @@ internal sealed partial class MainWindow
             }
         }
         ImGui.Spacing(); ImGui.Separator();
+        DrawHeaderSettings();
     }
     private void DrawInterfaceSettings()
     {
@@ -101,19 +105,8 @@ internal sealed partial class MainWindow
         }
         ImGui.TextDisabled(localization.Format("Localization.LoadedLanguages", localization.AvailableLanguages.Count));
         DrawThemeSetting();
-        ImGui.Checkbox(localization.Get("Developer.Enable") + "###DeveloperMode", ref developerMode);
-        if (!developerMode) localization.ShowKeys = false;
         ImGui.TextColored(Accent, localization.Get("Settings.ObjectsMarket"));
-        var hoverPrices = configuration.MarketPricesOnHover;
-        if (ImGui.Checkbox(localization.Get("Settings.MarketHover"), ref hoverPrices))
-        {
-            var previous = configuration.MarketPricesOnHover;
-            configuration.MarketPricesOnHover = hoverPrices;
-            try { save(); saveError = null; if (!hoverPrices) market.CancelBackground(); }
-            catch (Exception error)
-            { configuration.MarketPricesOnHover = previous; saveError = localization.Get("Common.SaveError"); log.Warning(error, "Could not save market hover preference."); }
-        }
-        ImGui.TextWrapped(localization.Get("InterfaceHelp.PriceHelp"));
+        ImGui.TextDisabled(localization.Get("Advanced.MarketMoved"));
         var hoverUsages=configuration.ItemUsagesOnHover;
         if(ImGui.Checkbox(localization.Get("Settings.UsageHover"),ref hoverUsages))
         {
@@ -121,7 +114,7 @@ internal sealed partial class MainWindow
             try{save();saveError=null;}
             catch(Exception error){configuration.ItemUsagesOnHover=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save item usage hover preference.");}
         }
-        ImGui.TextWrapped(localization.Get("InterfaceHelp.UsageHelp"));
+        Tip("InterfaceHelp.UsageHelp");
         ImGui.BeginDisabled(!configuration.ItemUsagesOnHover);
         try
         {
@@ -132,7 +125,7 @@ internal sealed partial class MainWindow
                 try{save();saveError=null;}
                 catch(Exception error){configuration.MonsterSourcesOnHover=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save monster hover preference.");}
             }
-            ImGui.TextWrapped(localization.Get("InterfaceHelp.MonsterHoverHelp"));
+            Tip("InterfaceHelp.MonsterHoverHelp");
         }
         finally{ImGui.EndDisabled();}
         var itemMenu=configuration.ItemContextMenuEnabled;
@@ -142,7 +135,7 @@ internal sealed partial class MainWindow
             try{save();saveError=null;}
             catch(Exception error){configuration.ItemContextMenuEnabled=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save item context menu preference.");}
         }
-        ImGui.TextWrapped(localization.Get("InterfaceHelp.MenuHelp"));
+        Tip("InterfaceHelp.MenuHelp");
         ImGui.Spacing(); ImGui.Separator();
     }
     private void DrawModuleSettings()
@@ -176,7 +169,35 @@ internal sealed partial class MainWindow
             exportChanged|=ImGui.Checkbox(localization.Get("ModuleSettings.Echo"),ref craftMacroEcho);
             if(exportChanged){craftMacroExport=null;craftMacroError=null;}
             ImGui.TextDisabled(localization.Get("ModuleSettings.ExportHelp"));
+            // Game macros used by « Copy into the game's macros » (0.191).
+            var copy=configuration.MacroCopy ??= new();
+            var book=copy.Book;var start=copy.Start;var end=copy.End;var prefix=copy.Prefix;var any=copy.OverwriteAny;var chain=copy.Chain;
+            var copyChanged=false;
+            ImGui.SetNextItemWidth(160);
+            if(ImGui.BeginCombo(localization.Get("ModuleSettings.MacroBook"),localization.Get(book==1 ? "CraftMacro.Shared":"CraftMacro.Individual")))
+            {
+                try
+                {
+                    if(ImGui.Selectable(localization.Get("CraftMacro.Individual"),book==0)){book=0;copyChanged=true;}
+                    if(ImGui.Selectable(localization.Get("CraftMacro.Shared"),book==1)){book=1;copyChanged=true;}
+                }
+                finally{ImGui.EndCombo();}
+            }
+            ImGui.SetNextItemWidth(100);copyChanged|=ImGui.InputInt(localization.Get("ModuleSettings.MacroStart"),ref start,0);
+            ImGui.SetNextItemWidth(100);copyChanged|=ImGui.InputInt(localization.Get("ModuleSettings.MacroEnd"),ref end,0);
+            ImGui.SetNextItemWidth(160);copyChanged|=ImGui.InputText(localization.Get("ModuleSettings.MacroPrefix"),ref prefix,12);
+            copyChanged|=ImGui.Checkbox(localization.Get("ModuleSettings.MacroOverwrite"),ref any);
+            if(ImGui.Checkbox(localization.Get("ModuleSettings.MacroChain"),ref chain)){copyChanged=true;craftMacroExport=null;}
+            if(copyChanged)
+            {
+                start=Math.Clamp(start,0,99);end=Math.Clamp(end,start,99);
+                var previous=configuration.MacroCopy;
+                configuration.MacroCopy=new(){Book=book,Start=start,End=end,Prefix=prefix.Trim(),OverwriteAny=any,Chain=chain};
+                try{save();}catch(Exception error){configuration.MacroCopy=previous;log.Warning(error,"Macro copy settings could not be saved.");}
+            }
+            ImGui.TextDisabled(localization.Get("ModuleSettings.MacroCopyHelp"));
         }
+        if(ImGui.CollapsingHeader(localization.Get("Alarms.SettingsTitle"),ImGuiTreeNodeFlags.DefaultOpen))DrawAlarmSettings();
         if(ImGui.CollapsingHeader(localization.Get("ModuleSettings.Gathering"),ImGuiTreeNodeFlags.DefaultOpen))
         {
             DrawObservationSetting("Gathering", localization.Get("ModuleSettings.ObserveGathering"),gatheringObservation.State.Enabled,gatheringObservation.SetEnabled);
@@ -201,19 +222,22 @@ internal sealed partial class MainWindow
     private void DrawDataSettings()
     {
         var finder=configuration.ShowDutyFinderLoot;
-        if(ImGui.Checkbox(localization.Get("DutyFinder.Setting"),ref finder))
+        var finderChanged=ImGui.Checkbox(localization.Get("DutyFinder.Setting"),ref finder);Tip("Advanced.DutyFinderTip");
+        if(finderChanged)
         {
             configuration.ShowDutyFinderLoot=finder;
             try{save();}catch(Exception error){configuration.ShowDutyFinderLoot=!finder;log.Warning(error,"Duty finder setting could not be saved.");}
         }
         var panel=configuration.ShowCharacterPanel;
-        if(ImGui.Checkbox(localization.Get("CharacterStats.Setting"),ref panel))
+        var panelChanged=ImGui.Checkbox(localization.Get("CharacterStats.Setting"),ref panel);Tip("Advanced.CharacterPanelTip");
+        if(panelChanged)
         {
             configuration.ShowCharacterPanel=panel;
             try{save();}catch(Exception error){configuration.ShowCharacterPanel=!panel;log.Warning(error,"Character panel setting could not be saved.");}
         }
         var auto=configuration.AutoBankCapture;
-        if(ImGui.Checkbox(localization.Get("BankUi.AutoSetting"),ref auto))
+        var autoChanged=ImGui.Checkbox(localization.Get("BankUi.AutoSetting"),ref auto);Tip("BankUi.AutoSettingHelp");
+        if(autoChanged)
         {
             configuration.AutoBankCapture=auto;
             try{save();}catch(Exception error){configuration.AutoBankCapture=!auto;log.Warning(error,"Bank capture setting could not be saved.");}
@@ -237,8 +261,10 @@ internal sealed partial class MainWindow
         {
             var showKeys = localization.ShowKeys;
             if (ImGui.Checkbox(localization.Get("Developer.ShowKeys") + "###ShowTranslationKeys", ref showKeys)) localization.ShowKeys = showKeys;
+            Tip("Contributor.ShowKeysTip");
             if (ImGui.SmallButton(localization.Get("Navigation.Diagnostics"))) page = Page.Diagnostics;
             if (ImGui.SmallButton(localization.Get("Settings.ReloadTranslations"))) localization.Reload();
+            Tip("Advanced.ReloadTip");
             var report = localization.Validate();
             ImGui.TextDisabled(localization.Format("Localization.ReferenceSummary", report.ReferenceKeyCount, report.LanguageCount));
             foreach (var language in report.Languages)
@@ -253,7 +279,9 @@ internal sealed partial class MainWindow
 
     private void DrawObservationSetting(string id,string label,bool enabled,Action<bool> apply)
     {
-        if(!ImGui.Checkbox(label+"###Observe"+id,ref enabled))return;
+        var clicked=ImGui.Checkbox(label+"###Observe"+id,ref enabled);
+        Tip("Advanced.ObservationTip");
+        if(!clicked)return;
         configuration.Observations ??= new();
         var hadPrevious=configuration.Observations.TryGetValue(id,out var previous);
         configuration.Observations[id]=enabled;

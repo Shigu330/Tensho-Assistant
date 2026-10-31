@@ -138,7 +138,7 @@ internal sealed partial class MainWindow
                             {
                                 DrawItemIcon(new ItemDefinition(0, entry.Name, false, entry.IconId), new Vector2(36));
                                 var clicked = ImGui.IsItemClicked();
-                                if (ImGui.IsItemHovered()) ImGui.SetTooltip(entry.Name);
+                                TriadCardTooltip(entry.Id);
                                 ImGui.SameLine();
                                 if (ImGui.Selectable($"{entry.Card!.Number} · {entry.Name}", selectedTriad == entry.Id, ImGuiSelectableFlags.None, new Vector2(0, 36)) || clicked)
                                     selectedTriad = entry.Id;
@@ -167,6 +167,7 @@ internal sealed partial class MainWindow
     {
         var card = entry.Card!;
         DrawItemIcon(new ItemDefinition(0, entry.Name, false, entry.IconId), new Vector2(80));
+        TriadCardTooltip(entry.Id);
         ImGui.SameLine(); ImGui.TextColored(Accent, $"{card.Number} · {entry.Name}");
         ImGui.TextUnformatted(new string('★', card.Stars));
         ImGui.TextUnformatted(string.IsNullOrWhiteSpace(card.TypeName) ? localization.Get("TriadUi.NoType") : card.TypeName);
@@ -230,6 +231,7 @@ internal sealed partial class MainWindow
             try
             {
                 DrawItemIcon(new ItemDefinition(0, entry?.Name ?? localization.Format("UiFragments.Card",id), false, entry?.IconId ?? 0), new Vector2(44));
+                TriadCardTooltip(id);
                 ImGui.SameLine();
                 ImGui.TextUnformatted(entry is null ? localization.Format("UiFragments.CardUnavailable",id) : $"{entry.Card!.Number} · {entry.Name} · {new string('★', entry.Card.Stars)}");
                 ImGui.SameLine();

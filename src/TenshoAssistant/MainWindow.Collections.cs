@@ -109,6 +109,7 @@ internal sealed partial class MainWindow
                     finally{ImGui.PopFont();}
                 }
                 else DrawItemIcon(musicItem ?? new ItemDefinition(0, entry.Name, false, entry.IconId), new Vector2(32));
+                if(kind==CollectionKind.TripleTriad)TriadCardTooltip(entry.Id);
                 if(kind==CollectionKind.Orchestrion && ImGui.IsItemClicked()){selectedOrchestrion=entry.Id;openMusicDetails=true;}
                 if(kind==CollectionKind.Achievement && ImGui.IsItemClicked()){selectedCompletionKind=kind;selectedCompletionId=entry.Id;openCompletionDetails=true;}
                 ImGui.SameLine();
@@ -130,7 +131,7 @@ internal sealed partial class MainWindow
                 if (ImGui.IsItemHovered())
                 {
                     if(entry.Kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.Emote or CollectionKind.TripleTriad or CollectionKind.Orchestrion)DrawCollectionTooltip(entry);
-                    else ImGui.SetTooltip(developerMode ? $"{entry.Name}\n{entry.Kind} : {entry.Id}":entry.Name);
+                    else WrappedTooltip(developerMode ? $"{entry.Name}\n{entry.Kind} : {entry.Id}":entry.Name);
                 }
                 // 0.178: right click = links to the sources (NPC vendor, achievement, quest, recipe, gathering).
                 if(entry.Kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.TripleTriad or CollectionKind.Orchestrion)

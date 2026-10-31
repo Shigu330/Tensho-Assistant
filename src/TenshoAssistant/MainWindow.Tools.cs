@@ -139,22 +139,45 @@ internal sealed partial class MainWindow
     private void DrawContextTools()
     {
         ImGui.Spacing();
-        foreach (var tool in PlannedTools.Where(tool => tool.Reference is "Craftimizer" or "GatherBuddy" or "Price Insight" or "Monster Loot Hunter"))
+        if (SelectedItem is not { } item) return;
+        var width = ImGui.GetContentRegionAvail().X; var used = 0f;
+        void Button(string id, FontAwesomeIcon icon, string tooltip, Action open)
         {
-            ImGui.PushID($"ContextTool{tool.Reference}");
+            // Wraps to a new row when the sidebar is too narrow for the next icon.
+            if (used > 0 && used + 34 <= width) ImGui.SameLine(); else used = 0;
+            ImGui.PushID($"ContextTool{id}");
             try
             {
                 ImGui.PushFont(UiBuilder.IconFont);
                 bool clicked;
-                try { clicked = ImGui.Button(tool.Icon.ToIconString(), new Vector2(34, 28)); }
+                try { clicked = ImGui.Button(icon.ToIconString(), new Vector2(34, 28)); }
                 finally { ImGui.PopFont(); }
-                if (clicked) OpenContextTool(tool.Reference);
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip($"{ToolText(tool.Name)} · {SelectedItem?.Name}");
-                ImGui.SameLine();
+                if (clicked) open();
+                if (ImGui.IsItemHovered()) WrappedTooltip($"{tooltip} · {item.Name}");
             }
             finally { ImGui.PopID(); }
+            used += 34 + ImGui.GetStyle().ItemSpacing.X;
         }
-        ImGui.NewLine();
+        // 0.208: the same useful tools as the inventory's « Tensho — objet » menu (RelevantRoutes), as icons.
+        foreach (var route in RelevantRoutes(item.Id))
+        {
+            if (route is Items.ItemContextRoute.Tools) continue;
+            var (icon, label) = route switch
+            {
+                Items.ItemContextRoute.Usages => (FontAwesomeIcon.Recycle, localization.Get("ItemUsesUi.Title")),
+                Items.ItemContextRoute.Craft => (FontAwesomeIcon.Hammer, localization.Get("ItemsUi.Craft")),
+                Items.ItemContextRoute.Gathering => (FontAwesomeIcon.Fish, localization.Get("GatheringDetails.Title")),
+                Items.ItemContextRoute.NpcVendors => (FontAwesomeIcon.Store, localization.Get("NpcUi.Title")),
+                Items.ItemContextRoute.Market => (FontAwesomeIcon.Coins, localization.Get("ItemLinks.Market")),
+                Items.ItemContextRoute.DutyLoot => (FontAwesomeIcon.Dungeon, localization.Get("ItemMenu.DutyLoot")),
+                Items.ItemContextRoute.MonsterLoot => (FontAwesomeIcon.Dragon, localization.Get("ItemMenu.MonsterLoot")),
+                Items.ItemContextRoute.Quest => (FontAwesomeIcon.Tasks, localization.Get("ItemMenu.Quest")),
+                Items.ItemContextRoute.Collection => (CollectionOf(item)?.Kind == Collections.CollectionKind.TripleTriad ? FontAwesomeIcon.Clone : FontAwesomeIcon.Trophy, localization.Get("HoverUi.OpenCollection")),
+                Items.ItemContextRoute.Stocks => (FontAwesomeIcon.Boxes, localization.Get("ItemsUi.Stocks")),
+                _ => (FontAwesomeIcon.InfoCircle, localization.Get("ItemMenu.Sources")),
+            };
+            Button(route.ToString(), icon, label, () => OpenRoute(route, item.Id));
+        }
     }
 
     private void DrawToolDetails()

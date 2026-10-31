@@ -67,7 +67,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public Plugin(IDalamudPluginInterface pluginInterface, ICommandManager commands, IPluginLog log,
         IGameInventory inventory, IPlayerState player, IClientState client, IFramework framework, IDataManager data, IGameGui gameGui,
-        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,ITargetManager targets,IPartyList partyList)
+        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,ITargetManager targets,IPartyList partyList,IChatGui chat)
     {
         this.log = log;
         localization = new LocalizationManager((error, message) => log.Warning(error, message), pluginInterface.AssemblyLocation.DirectoryName);
@@ -117,10 +117,10 @@ public sealed class Plugin : IDalamudPlugin
             Maps.MapLocalIndexLoader? mapLocalLoader=null;
             registrations.Register(()=>mapLocalLoader=new Maps.MapLocalIndexLoader(mapLocal,data,framework,log,dataCache),()=>mapLocalLoader?.Dispose());
             mainWindow.ConfigureMapView(mapLive!,new Maps.MapMarkerSource(data,log),mapLocal);
-            var itemSources=new Community.GarlandItemSourceService(garland);
+            var itemSources=new Community.GarlandItemSourceService(garland){Enabled=()=>configuration.CommunityGarland};
             registrations.Register(()=>{},itemSources.Dispose);
             mainWindow.ConfigureItemSources(itemSources);
-            var wikiItems=new Community.WikiItemAcquisitionService(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache);
+            var wikiItems=new Community.WikiItemAcquisitionService(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
             registrations.Register(()=>{},wikiItems.Dispose);
             mainWindow.ConfigureWikiItems(wikiItems);
             var wikiVistas=new Maps.WikiVistaSource(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache);
@@ -129,9 +129,29 @@ public sealed class Plugin : IDalamudPlugin
             Maps.NativeMapReplacer? mapReplacer=null;
             registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,()=>configuration.MapView,mainWindow.ShowMapFromGame,()=>mainWindow.MapViewOpen,mainWindow.CloseMapFromGame,log),()=>mapReplacer?.Dispose());
             mainWindow.ConfigureGameMapOpener(()=>mapReplacer?.OpenGameMap());
+            Macros.MacroWriter? macroWriter=null;
+            registrations.Register(()=>macroWriter=new Macros.MacroWriter(framework,log,outcome=>
+            {
+                var parts=outcome.Split(':');
+                var text=parts[0]=="Done" ? localization.Format("CraftMacro.Written",parts[1],parts[2]):localization.Get("CraftMacro.Write"+parts[0]);
+                if(parts[0]=="Done")chat.Print("[Tensho] "+text);else chat.PrintError("[Tensho] "+text);
+            }),()=>macroWriter?.Dispose());
+            mainWindow.ConfigureMacroWriter(macroWriter!);
+            Alarms.AlarmService? alarms=null;
+            registrations.Register(()=>alarms=new Alarms.AlarmService(framework,condition,log,configuration,()=>pluginInterface.SavePluginConfig(configuration),
+                ()=>weather.State.Catalog,line=>
+                {
+                    // « label|minutes|local time » from the service, localized here.
+                    var parts=line.Split('|');
+                    if(parts.Length>=3)chat.Print("[Tensho] "+localization.Format("Alarms.Ring",string.Join('|',parts[..^2]),parts[^2],parts[^1]));
+                }),()=>alarms?.Dispose());
+            mainWindow.ConfigureAlarms(alarms!);
+            mainWindow.ConfigureJobNames(job=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().TryGetRow(job,out var row) ? row.Name.ExtractText():null);
             var lumina=new Community.LuminaSupplementalService(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,
                 id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().TryGetRow(id,out var monster) ? monster.Singular.ExtractText():null,
-                id=>data.GetExcelSheet<Lumina.Excel.Sheets.Fate>().TryGetRow(id,out var fate) ? fate.Name.ExtractText():null);
+                id=>data.GetExcelSheet<Lumina.Excel.Sheets.Fate>().TryGetRow(id,out var fate) ? fate.Name.ExtractText():null,
+                id=>data.GetExcelSheet<Lumina.Excel.Sheets.ENpcResident>().TryGetRow(id,out var npc) ? npc.Singular.ExtractText():null,
+                id=>data.GetExcelSheet<Lumina.Excel.Sheets.Quest>().TryGetRow(id,out var quest) ? quest.Name.ExtractText():null){Enabled=()=>configuration.CommunityLumina};
             registrations.Register(()=>{},lumina.Dispose);
             mainWindow.ConfigureLumina(lumina);
             var dutyFinder=new Duties.DutyFinderService();
@@ -146,7 +166,7 @@ public sealed class Plugin : IDalamudPlugin
             Npcs.NpcVendorLoader? npcLoader=null;
             registrations.Register(()=>npcLoader=new Npcs.NpcVendorLoader(npcVendors,data,framework,log,dataCache),()=>npcLoader?.Dispose());
             mainWindow.ConfigureNpcVendors(npcVendors);
-            itemContextMenu=new ItemContextMenuBridge(configuration,contextMenus,player,client,itemCatalog,log,localization,gameGui);
+            itemContextMenu=new ItemContextMenuBridge(configuration,contextMenus,player,client,itemCatalog,log,localization,gameGui){Relevant=mainWindow.RelevantRoutes};
             registrations.Register(()=>{ },itemContextMenu.Dispose);
             InventoryVisualSortBridge? sortBridge=null;
             registrations.Register(()=>sortBridge=new InventoryVisualSortBridge(visualSort,inventory,player,client,framework,log,bankBridge),()=>sortBridge?.Dispose());
@@ -175,6 +195,11 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>craftLogReader=new CraftLogReader(mainWindow.CraftLog,recipeCatalog,configuration,framework,player,client,gameGui,log),()=>craftLogReader?.Dispose());
             FashionHintLoader? fashionLoader=null;
             registrations.Register(()=>fashionLoader=new FashionHintLoader(fashionHints,data,framework,log),()=>fashionLoader?.Dispose());
+            var fashionCheck=new Fashion.FashionCheckService();
+            Fashion.FashionCheckReader? fashionCheckReader=null;
+            registrations.Register(()=>fashionCheckReader=new Fashion.FashionCheckReader(fashionCheck,framework,gameGui,log,()=>mainWindow.DeveloperMode),()=>fashionCheckReader?.Dispose());
+            mainWindow.ConfigureFashionStains(id=>data.GetExcelSheet<Lumina.Excel.Sheets.Stain>().TryGetRow(id,out var stain) ? (stain.Name.ExtractText(),stain.Color):null);
+            mainWindow.ConfigureFashionCheck(fashionCheck,row=>data.GetExcelSheet<Lumina.Excel.Sheets.FashionCheckWeeklyTheme>().TryGetRow(row,out var theme) ? theme.Name.ExtractText():null);
             QuestReader? questReader = null;
             registrations.Register(() => questReader = new QuestReader(quests, data, framework, player, client, unlocks, log,()=>configuration.Cache.Duration(CacheArea.Quests),dataCache),
                 () => questReader?.Dispose());
@@ -257,6 +282,7 @@ public sealed class Plugin : IDalamudPlugin
         mainWindow.DrawTriadDeckReminder();
         mainWindow.DrawCharacterPanel();
         mainWindow.DrawDutyFinderPanel();
+        mainWindow.DrawFashionCheckPanel();
     }
 
     public void Dispose()

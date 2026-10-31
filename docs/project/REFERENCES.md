@@ -811,3 +811,12 @@ SOURCE: ApiProbe sur les assemblies Dalamud/Lumina locales, puis compilation de 
 TECHNICAL_FACTS: Recipe fournit ItemResult, Ingredient, AmountResult, AmountIngredient, CraftType et RecipeLevelTable. CraftType fournit Name ; RecipeLevelTable fournit ClassJobLevel. Les RowRef sont résolus par RowId via les feuilles correspondantes.
 LIMITS: Les valeurs et IDs sont copiés en données managées ; aucune validation de l'apparence ou de la complétude du catalogue n'est revendiquée avant l'essai en jeu.
 
+
+## REF-FASHION-AVANTGARDE (0.213)
+REPOSITORY: github.com/NeNeppie/AvantGarde — licence AGPL-3.0 : lu pour comprendre, aucun code copié (Tensho est GPL v3, code original).
+FILES_READ: AvantGarde.cs, UI/MainWindow.cs, UI/SlotWindow.cs, Managers/DataManager.cs, Utilities/EnumItemSlot.cs (2026-10-31).
+TECHNICAL_FACTS: fenêtre du jeu « FashionCheck » ; catégorie de l'emplacement n = AtkValue chaîne à l'indice 2 + 11 × n ; 11 emplacements
+(arme, tête, torse, mains, jambes, pieds, oreilles, cou, poignets, bague droite, bague gauche) ; semaines depuis le 30/01/2018 8 h UTC,
+FashionCheckWeeklyTheme = semaine + 9 ; données d'équipement FFXIVGachaSpreadsheet (FashionReport.json, déjà utilisé par Tensho).
+UX reprise (idée seulement) : liste par emplacement, possédés en premier, non possédés grisés, tri par popularité, panneau près de la fenêtre.
+LIMITS: lecture AtkValues à confirmer en jeu (journal du mode développeur) ; teintures non reprises ; coffre à apparence et armoire non lus.

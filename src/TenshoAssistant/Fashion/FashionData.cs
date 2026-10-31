@@ -27,6 +27,7 @@ public sealed class FashionHintService
     internal void Clear()=>Interlocked.Exchange(ref state,new(null,null));
 }
 public sealed record FashionMatch(uint ItemId,long Reports);
+public sealed record FashionDye(uint StainId,int Reports,double Share);
 public sealed record FashionCandidate(FashionMatch Match,ItemDefinition? Item);
 public enum FashionDateStatus { Missing, Parsed, Invalid, Future }
 public sealed class FashionDataset
@@ -43,6 +44,37 @@ public sealed class FashionDataset
         FetchedAt=fetchedAt.ToUniversalTime(); ProviderUpdatedAt=providerDate; DateStatus=dateStatus;
     }
     public IReadOnlyList<FashionMatch> ForHint(uint hintId)=>byHint.GetValueOrDefault(hintId) ?? Array.Empty<FashionMatch>();
+    // Dyes of the week (0.215): « WeeklyDyes » → week number → slot name (Weapon, Head, Body, Hands, Legs, Feet) → stain id, count, share.
+    // Read leniently: a malformed dye section leaves dyes unknown without rejecting the gear data.
+    public IReadOnlyDictionary<int,IReadOnlyDictionary<string,IReadOnlyList<FashionDye>>> WeeklyDyes { get; private set; }=new Dictionary<int,IReadOnlyDictionary<string,IReadOnlyList<FashionDye>>>();
+    public IReadOnlyList<FashionDye> DyesFor(int week,string slot)=>WeeklyDyes.GetValueOrDefault(week)?.GetValueOrDefault(slot) ?? [];
+    internal static IReadOnlyDictionary<int,IReadOnlyDictionary<string,IReadOnlyList<FashionDye>>> ParseDyes(JsonElement root)
+    {
+        var weeks=new Dictionary<int,IReadOnlyDictionary<string,IReadOnlyList<FashionDye>>>();
+        try
+        {
+            if(!root.TryGetProperty("WeeklyDyes",out var section) || section.ValueKind!=JsonValueKind.Object)return weeks;
+            foreach(var week in section.EnumerateObject().Take(256))
+            {
+                if(!int.TryParse(week.Name,NumberStyles.None,CultureInfo.InvariantCulture,out var number) || week.Value.ValueKind!=JsonValueKind.Array)continue;
+                var slots=new Dictionary<string,IReadOnlyList<FashionDye>>(StringComparer.OrdinalIgnoreCase);
+                foreach(var slot in week.Value.EnumerateArray().Take(16))
+                {
+                    if(!slot.TryGetProperty("Name",out var name) || name.ValueKind!=JsonValueKind.String || !slot.TryGetProperty("Dyes",out var dyes) || dyes.ValueKind!=JsonValueKind.Object)continue;
+                    var list=new List<FashionDye>();
+                    foreach(var dye in dyes.EnumerateObject().Take(128))
+                        if(uint.TryParse(dye.Name,NumberStyles.None,CultureInfo.InvariantCulture,out var stain) && dye.Value.ValueKind==JsonValueKind.Object
+                           && dye.Value.TryGetProperty("Count",out var count) && count.TryGetInt32(out var reports)
+                           && dye.Value.TryGetProperty("Pct",out var pct) && pct.TryGetDouble(out var share))
+                            list.Add(new(stain,reports,share));
+                    slots[name.GetString() ?? ""]=list.OrderByDescending(entry=>entry.Share).ThenByDescending(entry=>entry.Reports).ToArray();
+                }
+                weeks[number]=slots;
+            }
+        }
+        catch(InvalidOperationException){}
+        return weeks;
+    }
     public static FashionDataset Parse(string json,string? sourceDateJson,DateTimeOffset fetchedAt,CancellationToken cancellation=default)
     {
         ArgumentNullException.ThrowIfNull(json); cancellation.ThrowIfCancellationRequested();
@@ -82,7 +114,9 @@ public sealed class FashionDataset
             }
             catch(JsonException) { }
         }
-        return new(result,fetchedAt,sourceDate,status);
+        var dataset=new FashionDataset(result,fetchedAt,sourceDate,status);
+        dataset.WeeklyDyes=ParseDyes(document.RootElement);
+        return dataset;
     }
     public IReadOnlyList<FashionCandidate> Filter(uint hintId,EquipmentSlots slot,ItemCatalog? items,string query)
     {

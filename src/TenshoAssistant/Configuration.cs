@@ -102,6 +102,22 @@ public sealed partial class Configuration
     public bool ShowCharacterPanel { get; set; } = true;
     // Duty loot panel beside the game's Duty Finder (0.185).
     public bool ShowDutyFinderLoot { get; set; } = true;
+    // Where crafting macros are written in the game's macros (0.191).
+    public TenshoAssistant.Macros.MacroCopySettings MacroCopy { get; set; } = new();
+    // Tensho alarms (0.201): the list and the options (lead, game alarm sound, chat, silence in duties).
+    public List<TenshoAssistant.Alarms.TenshoAlarm> Alarms { get; set; } = [];
+    // Header and advanced settings (0.206).
+    public bool ShowHeaderClock { get; set; } = true;
+    // Fashion Report of the week (0.213): owned first, dim the others, by popularity, panel beside the game window.
+    public TenshoAssistant.Fashion.FashionOptions FashionOptions { get; set; } = new();
+    public bool ShowHeaderEorzeaTime { get; set; } = true;
+    public bool ShowIds { get; set; }
+    public bool DeveloperMode { get; set; }
+    public bool HomeShowTools { get; set; } = true;
+    public bool CommunityLumina { get; set; } = true;
+    public bool CommunityGarland { get; set; } = true;
+    public bool CommunityWiki { get; set; } = true;
+    public TenshoAssistant.Alarms.AlarmSettings AlarmOptions { get; set; } = new();
     // 0 follows the game's interface theme; 1..6 force a PluginTheme (value - 1).
     public int ThemeMode { get; set; }
     public MapViewSettings MapView { get; set; } = new();

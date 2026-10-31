@@ -341,6 +341,12 @@ internal sealed partial class MainWindow
                 if(supplement.MonstersOf(id) is { Count:>0 } mobs){known++;ImGui.TextWrapped(localization.Format("HoverUi.LuminaMonsters",string.Join(", ",mobs.Take(4))));}
                 if(supplement.FatesOf(id) is { Count:>0 } fates){known++;ImGui.TextWrapped(localization.Format("HoverUi.LuminaFates",string.Join(", ",fates.Take(3))));}
                 if(supplement.FromVenture(id)){known++;ImGui.TextUnformatted(localization.Get("HoverUi.LuminaVenture"));}
+                foreach(var (kind,count,sources) in supplement.SupplementsOf(id))
+                {
+                    known++;
+                    var names=string.Join(", ",sources.Take(3).Select(source=>itemCatalog.State.Catalog?.Find(source)?.Name ?? source.ToString()));
+                    ImGui.TextWrapped(localization.Format("HoverUi.Supplement"+(kind is >= 1 and <= 19 ? kind:0),names)+(count>3 ? localization.Format("HoverUi.SupplementMore",count-3):""));
+                }
                 if(supplement.StorePriceCents(id) is { } cents){known++;ImGui.TextUnformatted(localization.Format("HoverUi.LuminaStore",(cents/100m).ToString("0.00",System.Globalization.CultureInfo.InvariantCulture)));}
             }
             if(recipeCatalog.State.Catalog?.ForResult(id) is { Count:>0 } recipes){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionCraft",recipes.Count));}

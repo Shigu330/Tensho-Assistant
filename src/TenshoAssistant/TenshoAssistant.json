@@ -3,7 +3,7 @@
   "Name": "Tensho Assistant",
   "Punchline": "One window for everyday tools: items, crafting, gathering, map, collections and more.",
   "Description": "Tensho Assistant brings everyday tools together in one interface (/tensho): items and storage (bags, retainers, saddlebags), inventory sorting rules, recipes and a crafting simulator, gathering and fishing with Eorzea time windows and weather, a map that replaces the game map (quests, leves, FATEs, gathering points, vendors, aether currents, teleport costs), collections with how to obtain each item, quests and rewards, optional market prices on hover (Universalis), duty and monster loot, Fashion Report hints, Mini Cactpot and Triple Triad helpers, character stats and macro chains.\n\nCommunity data (Garland Tools, FFXIV Console Games Wiki, Universalis) is only requested when you open or hover the matching tool, and is cached on disk. Nothing runs on its own: actions that reach the game (teleport, applying a sort, a macro chain) only start when you click them.\n\nAI disclosure: the code and the icon were generated with an AI coding agent (Claude), directed and tested in game by the author.\n\nLanguages: English, French; German and Japanese partial.",
-  "RepoUrl": "https://github.com/Shigu330/Plugins-ff14",
+  "RepoUrl": "https://github.com/Shigu330/Tensho-Assistant",
   "ApplicableVersion": "any",
   "Tags": [
     "utility",

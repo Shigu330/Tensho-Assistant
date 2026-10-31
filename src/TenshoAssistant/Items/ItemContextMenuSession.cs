@@ -1,6 +1,6 @@
 namespace TenshoAssistant.Items;
 
-public enum ItemContextRoute { Usages, Stocks, Craft, Gathering, Tools, NpcVendors }
+public enum ItemContextRoute { Usages, Stocks, Craft, Gathering, Tools, NpcVendors, Market, DutyLoot, MonsterLoot, Collection, Sources, Quest }
 public sealed record ItemMenuToken(long Revision,ulong Owner,ItemHoverItem Item,DateTimeOffset CreatedAt);
 public sealed record ItemMenuRequest(ItemMenuToken Token,ItemContextRoute Route);
 

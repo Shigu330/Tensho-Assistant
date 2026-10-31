@@ -194,7 +194,7 @@ internal sealed partial class MainWindow
             ImGui.SetCursorPosX(left + Math.Max(0, (available - iconSize.X) / 2));
             DrawItemIcon(item, iconSize);
             if (ImGui.IsItemClicked()) SelectItem(crystal.ItemId);
-            if (ImGui.IsItemHovered()) ImGui.SetTooltip(item?.Name ?? localization.Format("BankUi.Item",crystal.ItemId));
+            if (ImGui.IsItemHovered()) WrappedTooltip(item?.Name ?? localization.Format("BankUi.Item",crystal.ItemId));
             var label = crystal.Hq > 0 ? $"{crystal.Nq:N0} / {crystal.Hq:N0}" : $"{crystal.Nq:N0}";
             var labelWidth = ImGui.CalcTextSize(label).X;
             ImGui.SetCursorPosX(left + Math.Max(0, (available - labelWidth) / 2));
@@ -420,11 +420,11 @@ internal sealed partial class MainWindow
         ImGui.PushFont(UiBuilder.IconFont);
         try
         {
-            if (ImGui.Button($"{FontAwesomeIcon.BookOpen.ToIconString()}##CraftBookAll", new Vector2(34, 30)))
+            if (ImGui.Button($"{FontAwesomeIcon.BookOpen.ToIconString()}##CraftBookAll", new Vector2(38, 38)))
                 craftBookFilter = string.Empty;
         }
         finally { ImGui.PopFont(); }
-        if (ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Get("RecipeUi.AllJobs"));
+        if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("RecipeUi.AllJobs"));
 
         foreach (var craftType in craftTypes)
         {
@@ -437,16 +437,18 @@ internal sealed partial class MainWindow
                 var clicked = ImGui.Button("##CraftBookJob", new Vector2(38, 38));
                 var buttonPosition = ImGui.GetItemRectMin();
                 var buttonHovered = ImGui.IsItemHovered();
-                var cursor = ImGui.GetCursorScreenPos();
                 var job = recipes.First(recipe => recipe.CraftType == craftType);
                 ImGui.SetCursorScreenPos(buttonPosition + new Vector2(3));
                 // Native framed class icons: 62100 + ClassJob ID, crafters 8..15.
                 if (job.CraftTypeId < 8)
                     DrawItemIcon(new ItemDefinition(0, craftType, false, 62108 + job.CraftTypeId), new Vector2(32));
-                ImGui.SetCursorScreenPos(cursor);
+                // 0.207: the icon was the last item, so the next SameLine started after it (3 px lower and further right each time);
+                // an invisible item over the button restores the button's place for the next one.
+                ImGui.SetCursorScreenPos(buttonPosition);
+                ImGui.Dummy(new Vector2(38, 38));
                 if (selected) ImGui.PopStyleColor();
                 if (clicked) craftBookFilter = craftType;
-                if (buttonHovered) ImGui.SetTooltip(craftType);
+                if (buttonHovered) WrappedTooltip(craftType);
             }
             finally { ImGui.PopID(); }
         }
@@ -494,7 +496,7 @@ internal sealed partial class MainWindow
                             if (ImGui.Selectable($"{result?.Name ?? recipe.ResultItemId.ToString()}##Recipe", craftBookRecipe == recipe.RecipeId,
                                     ImGuiSelectableFlags.None, new Vector2(0, 30)) || clickedIcon)
                                 craftBookRecipe = recipe.RecipeId;
-                            if (ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Format("RecipeUi.JobLevel",recipe.CraftType,recipe.Level));
+                            if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("RecipeUi.JobLevel",recipe.CraftType,recipe.Level));
                         }
                         finally { ImGui.PopID(); }
                     }
@@ -554,7 +556,7 @@ internal sealed partial class MainWindow
             var buttonWidth = Math.Max(90, ImGui.CalcTextSize(label).X + 20);
             if (ImGui.Selectable($"{label}##IngredientButton", false, ImGuiSelectableFlags.None, new Vector2(buttonWidth, 30)))
                 SelectItem(ingredient.ItemId);
-            if (ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Get("RecipeUi.IngredientHint"));
+            if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("RecipeUi.IngredientHint"));
             ImGui.SameLine();
             ImGui.TextDisabled($"× {ingredient.Amount}");
             ImGui.SameLine();
@@ -626,7 +628,7 @@ internal sealed partial class MainWindow
                 ImGui.PopFont();
                 ImGui.SameLine();
                 if (ImGui.SmallButton(ToolText(tool.Name))) OpenContextTool(tool.Reference);
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Format("ToolDirectory.OpenContext",ToolText(tool.Name)));
+                if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("ToolDirectory.OpenContext",ToolText(tool.Name)));
                 ImGui.SameLine();
             }
             finally { ImGui.PopID(); }
@@ -729,7 +731,7 @@ internal sealed partial class MainWindow
                         ImGui.SameLine();
                         if (ImGui.Selectable($"{item.Name}##Result", itemId == (int)item.Id,
                                 ImGuiSelectableFlags.None, new Vector2(0, 32))) itemId = (int)item.Id;
-                        if (ImGui.IsItemHovered()) ImGui.SetTooltip(developerMode ? $"{item.Name}\nID: {item.Id}":item.Name);
+                        if (ImGui.IsItemHovered()) WrappedTooltip(developerMode ? $"{item.Name}\nID: {item.Id}":item.Name);
                     }
                     finally { ImGui.PopID(); }
                 }

@@ -102,7 +102,7 @@ internal sealed partial class MainWindow
                 if (ImGui.IsItemClicked()) SelectQuest(entry.Id);
                 ImGui.SameLine();
                 if (ImGui.Selectable($"{entry.Name}##quest{entry.Id}", selectedQuestId == entry.Id)) SelectQuest(entry.Id);
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip(developerMode ? $"{entry.Name}\n{entry.Category}\nID: {entry.Id}":$"{entry.Name}\n{entry.Category}");
+                if (ImGui.IsItemHovered()) WrappedTooltip(developerMode ? $"{entry.Name}\n{entry.Category}\nID: {entry.Id}":$"{entry.Name}\n{entry.Category}");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Category);
                 ImGui.TableNextColumn();
                 ImGui.TextColored(entry.Progress == QuestProgress.Complete ? Success : Muted,
@@ -163,7 +163,7 @@ internal sealed partial class MainWindow
                     if (mapLocal?.State.Index?.Quest(entry.Id) is { } giver && giver.MapId == issuerMap.MapId) ShowOnTenshoMap(issuerMap, new Vector3(giver.X, 0, giver.Z));
                     else ShowMapOnTenshoMap(issuerMap.MapId);
                 }
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Get("QuestDetails.MapHelp"));
+                if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("QuestDetails.MapHelp"));
             }
             else ImGui.TextDisabled(localization.Get("QuestDetails.NoMap"));
         }

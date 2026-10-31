@@ -44,6 +44,7 @@ internal sealed partial class MainWindow
                         DrawGatheringTime(conditions.Timing);
                         DrawFishingWeatherNames(localization.Get("FishingWindows.Weather"),conditions.Weather,native?.TerritoryId);
                         DrawFishingWeatherNames(localization.Get("FishingWindows.Previous"),conditions.PreviousWeather,native?.TerritoryId);
+                        if(native is not null)DrawFishingAlarmButton($"Fish{index}",conditions,native.TerritoryId);
                         if(native is not null)DrawFishingForecast(conditions,native.TerritoryId);
                     }
                     if(native is not null && ImGui.SmallButton(localization.Get("FishingSources.Forecast")))OpenWeather(native.TerritoryId,native.Zone);
@@ -98,7 +99,7 @@ internal sealed partial class MainWindow
                 else
                 {
                     DrawItemIcon(new TenshoAssistant.Items.ItemDefinition(0,matched.Name,false,matched.Icon),new Vector2(24));
-                    if(ImGui.IsItemHovered())ImGui.SetTooltip(localization.Format("FishingWeather.Source",name));
+                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FishingWeather.Source",name));
                     ImGui.SameLine();ImGui.TextUnformatted(matched.Name);
                 }
             }

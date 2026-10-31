@@ -81,9 +81,11 @@ public sealed class GarlandItemSourceService:IDisposable
     private readonly CancellationTokenSource lifetime=new();
     private Task? worker;private bool disposed;
     public GarlandItemSourceService(GarlandClient garland){this.garland=garland;}
+    // Settings › Advanced (0.206): when off, nothing is requested and the source is simply absent.
+    public Func<bool>? Enabled { get; set; }
     public GarlandItemSourceState Get(uint itemId)
     {
-        if(itemId==0)return new(null,false,null);
+        if(itemId==0 || Enabled?.Invoke()==false)return new(null,false,null);
         lock(gate)
         {
             if(states.TryGetValue(itemId,out var known))return known;

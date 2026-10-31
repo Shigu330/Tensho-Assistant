@@ -88,7 +88,7 @@ internal sealed partial class MainWindow
                     Center(TriadCardDefinition.Value(card.Bottom),45);
                 }
                 else Center(card.Presence switch {TriadObservedPresence.Hidden=>"?",TriadObservedPresence.Empty=>"—",_=>"…"},25);
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Format("TriadObservedCounts.Slot",index+1,ObservedTriadDescription(card)));
+                if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("TriadObservedCounts.Slot",index+1,ObservedTriadDescription(card)));
             }
         }
         finally { ImGui.EndTable(); }

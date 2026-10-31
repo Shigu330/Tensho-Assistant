@@ -18,6 +18,54 @@ internal sealed partial class MainWindow
     private CraftSimulationResult? macroExportSimulation;
     private CraftMacroExport? craftMacroExport;
     private int craftMacroExtraWait;
+    private TenshoAssistant.Macros.MacroWriter? macroWriter;
+    internal void ConfigureMacroWriter(TenshoAssistant.Macros.MacroWriter writer)=>macroWriter=writer;
+    private string? macroChainApplied;
+    // After a chained copy (0.196): the written slots become the Macro Chain plan once, then a button starts the chain.
+    private void ApplyWrittenChain()
+    {
+        if(configuration.MacroCopy is not { Chain:true } || macroWriter?.Result is not { } written || written==macroChainApplied)return;
+        var parts=written.Split(':');
+        if(parts is not ["Done",_,_,var bookText,var list] || !uint.TryParse(bookText,out var book))return;
+        macroChainApplied=written;
+        var slots=list.Split(',').Select(uint.Parse).ToArray();
+        var plan=slots.Select((index,page)=>new TenshoAssistant.Macros.MacroSlot(book,index,TenshoAssistant.Macros.MacroSlotPlan.Name(configuration.MacroCopy.Prefix,page+1,slots.Length))).ToList();
+        var previous=configuration.MacroChainPlan;
+        configuration.MacroChainPlan=plan;
+        try{save();macroPlanLoaded=false;macroChain.RequestRefresh();}
+        catch(Exception error){configuration.MacroChainPlan=previous;log.Warning(error,"Macro chain plan could not be saved.");}
+    }
+    // 0.191: write the pages into the game's macros, inside the range set in Settings (as Craftimizer does); 0.192: also in the craft log panel.
+    private void DrawMacroToGame(IReadOnlyList<CraftMacroPage> pages,bool small)
+    {
+        var copy=configuration.MacroCopy ?? new();
+        var where=localization.Format("CraftMacro.Range",localization.Get(copy.Book==1 ? "CraftMacro.Shared":"CraftMacro.Individual"),copy.Start,copy.End);
+        // Narrow craft log panel (0.195): short label, the range in the tooltip; the prediction wraps.
+        var label=(small ? localization.Get("CraftMacro.ToGameShort"):localization.Get("CraftMacro.ToGame")+$" ({where})")+"##MacroToGame";
+        if((small ? ImGui.SmallButton(label):ImGui.Button(label)) && macroWriter is not null)
+            macroWriter.Request(pages.Select(page=>page.Lines).ToArray(),copy);
+        if(ImGui.IsItemHovered())WrappedTooltip(where+"\n"+localization.Get(copy.OverwriteAny ? "CraftMacro.ToGameAny":"CraftMacro.ToGameSafe"));
+        // 0.194: prediction before the click, same rule as the copy, from the slot states copied each second.
+        ApplyWrittenChain();
+        if(copy.Chain && macroChainApplied is not null && (configuration.MacroChainPlan?.Count ?? 0)>0)
+        {
+            if(ImGui.SmallButton(localization.Get("CraftMacro.StartChain")+"##MacroChainStart"))macroChain.RequestStart(configuration.MacroChainPlan!);
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftMacro.StartChainHelp"));
+        }
+        if(macroWriter?.SlotsOf(copy.Book) is { } states)
+        {
+            var plan=TenshoAssistant.Macros.MacroSlotPlan.Plan(pages.Count,copy,index=>states[index]);
+            ImGui.PushStyleColor(ImGuiCol.Text,plan.Problem is null ? Success:Accent);
+            try
+            {
+                ImGui.TextWrapped(plan.Problem is null
+                    ? localization.Format("CraftMacro.WillUse",plan.Slots[0],plan.Slots[^1],plan.Slots.Count,string.Join(", ",plan.Slots))
+                    :localization.Format("CraftMacro.Will"+plan.Problem,pages.Count));
+            }
+            finally{ImGui.PopStyleColor();}
+        }
+        else ImGui.TextDisabled(localization.Get("CraftMacro.WillUnknown"));
+    }
     private bool craftMacroEcho=true;
     private string? craftMacroError;
     private void OpenCraftSimulation(RecipeDefinition recipe)
@@ -98,9 +146,9 @@ internal sealed partial class MainWindow
                             try
                             {
                                 DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(26)); var click=ImGui.IsItemClicked();
-                                if(ImGui.IsItemHovered()) ImGui.SetTooltip(action.Description);
+                                if(ImGui.IsItemHovered()) WrappedTooltip(action.Description);
                                 ImGui.SameLine(); click|=ImGui.SmallButton(action.Name);
-                                if(ImGui.IsItemHovered()) ImGui.SetTooltip(localization.Format("SimulationHelp.Action",action.Description,spec.Level,spec.Cp));
+                                if(ImGui.IsItemHovered()) WrappedTooltip(localization.Format("SimulationHelp.Action",action.Description,spec.Level,spec.Cp));
                                 if(click && simulationActions.Count<100 && simulationLevel>=spec.Level && (spec.Kind!=CraftActionKind.Manipulation || simulationManipulation))
                                 { simulationActions.Add(spec.Kind); simulationResult=null; }
                             }
@@ -149,7 +197,7 @@ internal sealed partial class MainWindow
                     {
                         DrawItemIcon(metadata is null ? null:new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(24)); ImGui.SameLine();
                         ImGui.TextWrapped($"{i+1}. {metadata?.Name ?? kind.ToString()}");
-                        if(ImGui.IsItemHovered() && step is not null) ImGui.SetTooltip(localization.Format("SimulationHelp.Effects",step.After.Veneration,step.After.Innovation,step.After.GreatStrides,step.After.WasteNot,step.After.Manipulation,step.After.MuscleMemory,localization.Get(step.After.TrainedPerfection ? "SimulationHelp.Protected":step.After.UsedTrainedPerfection ? "SimulationHelp.Used":"SimulationHelp.Available")));
+                        if(ImGui.IsItemHovered() && step is not null) WrappedTooltip(localization.Format("SimulationHelp.Effects",step.After.Veneration,step.After.Innovation,step.After.GreatStrides,step.After.WasteNot,step.After.Manipulation,step.After.MuscleMemory,localization.Get(step.After.TrainedPerfection ? "SimulationHelp.Protected":step.After.UsedTrainedPerfection ? "SimulationHelp.Used":"SimulationHelp.Available")));
                         if(ImGui.SmallButton(localization.Get("CraftPresets.Remove"))) { simulationActions.RemoveAt(i); simulationResult=null; break; }
                         if(i>0) { ImGui.SameLine(); if(ImGui.SmallButton(localization.Get("CraftSequence.Up"))) { (simulationActions[i-1],simulationActions[i])=(simulationActions[i],simulationActions[i-1]); simulationResult=null; break; } }
                         if(i+1<simulationActions.Count) { ImGui.SameLine(); if(ImGui.SmallButton(localization.Get("CraftSequence.Down"))) { (simulationActions[i+1],simulationActions[i])=(simulationActions[i],simulationActions[i+1]); simulationResult=null; break; } }
@@ -178,7 +226,7 @@ internal sealed partial class MainWindow
         {
             if(ImGui.Button(localization.Get("CraftMacro.Prepare")))
             {
-                try { craftMacroExport=CraftMacroExporter.Build(result,job,catalog,craftMacroExtraWait,craftMacroEcho); craftMacroError=null; }
+                try { craftMacroExport=CraftMacroExporter.Build(result,job,catalog,craftMacroExtraWait,craftMacroEcho,configuration.MacroCopy?.Chain==true); craftMacroError=null; }
                 catch(ArgumentException error) { craftMacroExport=null; craftMacroError="CraftMacro.Failed"; log.Warning(error,"Could not export craft macros."); }
             }
         }
@@ -188,6 +236,7 @@ internal sealed partial class MainWindow
         if(craftMacroExport is not { } export) return;
         ImGui.TextDisabled(localization.Format("CraftMacro.Summary",export.Actions,export.Pages.Count,export.WaitSeconds));
         if(export.OmittedActions>0) ImGui.TextWrapped(localization.Format("CraftMacro.Omitted",export.OmittedActions));
+        DrawMacroToGame(export.Pages,false);
         foreach(var block in export.Pages)
         {
             ImGui.PushID(block.Number);

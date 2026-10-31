@@ -86,6 +86,7 @@ internal sealed partial class MainWindow
                 foreach(var card in generated.Deck)
                 {
                     DrawSmallGameIcon(card.IconId);
+                    TriadCardTooltip(card.Id);
                     var name=collections.State.Entries.FirstOrDefault(entry=>entry.Kind==CollectionKind.TripleTriad && entry.Id==card.Id)?.Name ?? card.Id.ToString();
                     ImGui.TextUnformatted($"{name}  {new string('★',card.Stars)}  {TriadCardDefinition.Value(card.Top)} {TriadCardDefinition.Value(card.Right)} {TriadCardDefinition.Value(card.Bottom)} {TriadCardDefinition.Value(card.Left)}");
                 }

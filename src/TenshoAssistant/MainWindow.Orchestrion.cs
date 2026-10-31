@@ -69,7 +69,7 @@ internal sealed partial class MainWindow
                     {
                         DrawItemIcon(item,new Vector2(32));var clicked=ImGui.IsItemClicked();ImGui.SameLine();
                         clicked|=ImGui.SmallButton($"{item.Name}##MusicItem{item.Id}");
-                        if(ImGui.IsItemHovered())ImGui.SetTooltip(localization.Get("OrchestrionDetails.ItemHelp"));
+                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("OrchestrionDetails.ItemHelp"));
                         if(clicked){SelectItem(item.Id);page=Page.Items;focusStocksTab=true;ImGui.CloseCurrentPopup();}
                     }
                 }

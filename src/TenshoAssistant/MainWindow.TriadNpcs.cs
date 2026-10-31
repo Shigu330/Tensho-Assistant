@@ -42,7 +42,7 @@ internal sealed partial class MainWindow
                         var place=npc.MapId!=0 ? $"{npc.Zone} (X {npc.X:0.0}, Y {npc.Y:0.0})":localization.Get("TriadNpcs.NoPlace");
                         if(ImGui.Selectable($"{npc.Name}##TriadNpc{npc.MatchId}",false,ImGuiSelectableFlags.SpanAllColumns) && npc.MapId!=0
                            && maps.State.Catalog?.Find(npc.MapId) is { } map)PlaceFlagFromMapView(map,npc.X,npc.Y);
-                        if(ImGui.IsItemHovered())ImGui.SetTooltip(localization.Format("TriadNpcs.Tooltip",npc.Fee,npc.RewardCards.Count==0 ? "—":string.Join(", ",npc.RewardCards.Select(Card)))
+                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("TriadNpcs.Tooltip",npc.Fee,npc.RewardCards.Count==0 ? "—":string.Join(", ",npc.RewardCards.Select(Card)))
                             +(npc.MapId!=0 ? "\n"+localization.Get("TriadNpcs.ClickFlag"):""));
                         ImGui.TableNextColumn();ImGui.TextUnformatted(place);
                         ImGui.TableNextColumn();
@@ -50,7 +50,7 @@ internal sealed partial class MainWindow
                         ImGui.TableNextColumn();
                         foreach(var card in missing)
                         {
-                            if(TriadCard(card) is { } definition){DrawSmallGameIcon(definition.IconId);if(ImGui.IsItemHovered())ImGui.SetTooltip(Card(card));ImGui.SameLine();}
+                            if(TriadCard(card) is { } definition){DrawSmallGameIcon(definition.IconId);TriadCardTooltip(card);ImGui.SameLine();}
                         }
                         if(missing.Count==0)ImGui.TextDisabled("—");else ImGui.NewLine();
                     }
@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
                 ImGui.TextColored(color,localization.Format("TriadNpcs.PackLine",rank,pack.PackName,lacking.Length,total,(100.0*lacking.Length/total).ToString("0")));
                 if(ImGui.IsItemHovered())DrawItemInfoTooltip(pack.PackItemId);
                 foreach(var card in lacking.Take(20))
-                    if(TriadCard(card) is { } definition){DrawSmallGameIcon(definition.IconId);if(ImGui.IsItemHovered())ImGui.SetTooltip(Card(card));ImGui.SameLine();}
+                    if(TriadCard(card) is { } definition){DrawSmallGameIcon(definition.IconId);TriadCardTooltip(card);ImGui.SameLine();}
                 if(lacking.Length>0)ImGui.NewLine();
             }
         }
@@ -95,7 +95,7 @@ internal sealed partial class MainWindow
                     {
                         if(entry.Card is { } definition)DrawSmallGameIcon(definition.IconId);
                         var source=catalog.Cards.GetValueOrDefault(entry.Id);
-                        if(ImGui.IsItemHovered() && source is { ItemId:>0 })DrawItemInfoTooltip(source.ItemId);
+                        TriadCardTooltip(entry.Id);
                         ImGui.SameLine();
                         ImGui.BeginGroup();
                         ImGui.TextUnformatted(localization.Format("TriadNpcs.CardLine",entry.Number,entry.Name,new string('★',entry.Card?.Stars ?? 0)));

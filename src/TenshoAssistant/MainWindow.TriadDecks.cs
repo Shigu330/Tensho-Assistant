@@ -32,6 +32,13 @@ internal sealed partial class MainWindow
             decks.Add(new TriadSavedDeck{Name=name,NpcId=request.NpcId,Cards=generated.Deck.Select(card=>card.Id).ToList()});
         }))triadShownDeck=name;
     }
+    // Tooltip of every card icon (0.198): the card item's full sheet (« Comment l'obtenir », links) when the card has an item, else its name.
+    private void TriadCardTooltip(uint id)
+    {
+        if(!ImGui.IsItemHovered())return;
+        if(triadNpcs?.State.Catalog?.Cards.GetValueOrDefault(id) is { ItemId:>0 } source)DrawItemInfoTooltip(source.ItemId);
+        else WrappedTooltip(TriadCardName(id));
+    }
     private string TriadCardName(uint id)=>collections.State.Entries.FirstOrDefault(entry=>entry.Kind==CollectionKind.TripleTriad && entry.Id==id)?.Name ?? id.ToString();
 
     // Triple Triad › Deck: the saved decks, each with its cards; « Show » picks the deck for the editor reminder, « Delete » removes it.
@@ -55,7 +62,7 @@ internal sealed partial class MainWindow
                 foreach(var id in deck.Cards)
                 {
                     if(TriadCard(id) is { } card)DrawSmallGameIcon(card.IconId);
-                    if(ImGui.IsItemHovered())ImGui.SetTooltip(TriadCardName(id));
+                    TriadCardTooltip(id);
                     ImGui.SameLine();
                 }
                 ImGui.NewLine();

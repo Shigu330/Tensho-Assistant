@@ -18,6 +18,9 @@
     <Compile Include="../../src/TenshoAssistant/Macros/MacroSequence.cs" Link="Macros/MacroSequence.cs" />
     <Compile Include="../../src/TenshoAssistant/Macros/MacroChainService.cs" Link="Macros/MacroChainService.cs" />
     <Compile Include="../../src/TenshoAssistant/Macros/MacroObservationService.cs" Link="Macros/MacroObservationService.cs" />
+    <Compile Include="../../src/TenshoAssistant/Macros/MacroSlotPlan.cs" Link="Macros/MacroSlotPlan.cs" />
+    <Compile Include="../../src/TenshoAssistant/Alarms/TenshoAlarm.cs" Link="Alarms/TenshoAlarm.cs" />
+    <Compile Include="../../src/TenshoAssistant/Alarms/GameAlarmCommand.cs" Link="Alarms/GameAlarmCommand.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapCatalog.cs" Link="Maps/MapCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapBookmarks.cs" Link="Maps/MapBookmarks.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapProjection.cs" Link="Maps/MapProjection.cs" />

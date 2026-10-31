@@ -19,6 +19,8 @@ internal sealed partial class MainWindow
     private float mapZoom=0.5f;
     private Vector2 mapPan;
     private Vector2 mapContextPixel;
+    // Vista under the mouse this frame and the one right-clicked (0.201: alarm for its ET window and weather).
+    private MapLocalPosition? mapHoveredVista,mapContextVista;
     private MapLocalIndexService? mapLocal;
     internal void ConfigureMapView(MapLiveReader live,MapMarkerSource markers,MapLocalIndexService local){mapLive=live;mapMarkers=markers;mapLocal=local;}
     private void OpenMapView(uint mapId){mapViewMapId=mapId;mapViewFollow=mapId==0;mapViewOpen=true;}
@@ -173,7 +175,7 @@ internal sealed partial class MainWindow
         ImGui.PushFont(UiBuilder.IconFont);
         try{ImGui.TextColored(flight.Complete ? Accent:Muted,FontAwesomeIcon.Feather.ToIconString());}
         finally{ImGui.PopFont();}
-        if(ImGui.IsItemHovered())ImGui.SetTooltip(flight.Complete ? localization.Get("MapView.FlightYes"):localization.Format("MapView.FlightPartial",flight.Unlocked,flight.Total));
+        if(ImGui.IsItemHovered())WrappedTooltip(flight.Complete ? localization.Get("MapView.FlightYes"):localization.Format("MapView.FlightPartial",flight.Unlocked,flight.Total));
     }
 
     // Vertical tool column like the game map buttons.
@@ -259,7 +261,7 @@ internal sealed partial class MainWindow
                 if(ImGui.SliderFloat(localization.Get("MapView.IconScale"),ref scale,50,200,"%.0f %%")){settings.IconScale=scale/100;changed=true;}
                 var follow=MapViewSettings.ClampFollow(settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.ZoomFollow"),ref follow,0,100,"%.0f %%")){settings.ZoomFollow=follow/100;changed=true;}
-                if(ImGui.IsItemHovered())ImGui.SetTooltip(localization.Get("MapView.ZoomFollowHelp"));
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.ZoomFollowHelp"));
                 var opacity=MapViewSettings.ClampOpacity(settings.Opacity)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.Opacity"),ref opacity,20,100,"%.0f %%")){settings.Opacity=opacity/100;changed=true;}
             }
@@ -289,19 +291,34 @@ internal sealed partial class MainWindow
     // One row per kind of game icon on the shown map (fixed icons, quest/event markers, FATEs, flag): visible box, size, priority.
     // Scope (0.119): « All maps » edits the global table; « This map » writes overrides kept for this map only, cleared by
     // « Back to global ». Rows show the effective value of the chosen scope; rows are listed by priority, highest first.
-    private bool mapIconScopeThisMap;private string mapIconFilter="";
+    private bool mapIconScopeThisMap;private string mapIconFilter="";private uint[]? questIconsWithImage;
     private bool DrawIconSizes(MapDefinition map,MapViewSettings settings)
     {
         var icons=new HashSet<uint>((mapMarkers?.For(map.MarkerRange) ?? []).Where(marker=>marker.Icon!=0).Select(marker=>marker.Icon));
+        // Where each icon comes from, for the categories (0.212).
+        var eventIcons=new HashSet<uint>();var fateIcons=new HashSet<uint>();var gatheringIcons=new HashSet<uint>();var targetIcons=new HashSet<uint>();
         if(mapLive?.State is { } live)
         {
-            foreach(var marker in live.Events ?? [])if(marker.MapId==map.MapId)icons.Add(marker.Icon);
-            if(live.MapId==map.MapId)foreach(var fate in live.Fates ?? [])if(fate.Icon!=0)icons.Add(fate.Icon);
+            foreach(var marker in live.Events ?? [])if(marker.MapId==map.MapId){icons.Add(marker.Icon);eventIcons.Add(marker.Icon);}
+            if(live.MapId==map.MapId)foreach(var fate in live.Fates ?? [])if(fate.Icon!=0){icons.Add(fate.Icon);fateIcons.Add(fate.Icon);}
         }
-        if(settings.ShowGathering)foreach(var point in MapGatheringPoints(map))if(point.Icon!=0)icons.Add(point.Icon);
-        if(mapGameTarget is { } target && target.MapId==map.MapId)icons.Add(target.Icon);
+        if(settings.ShowGathering)foreach(var point in MapGatheringPoints(map))if(point.Icon!=0){icons.Add(point.Icon);gatheringIcons.Add(point.Icon);}
+        if(mapGameTarget is { } target && target.MapId==map.MapId){icons.Add(target.Icon);targetIcons.Add(target.Icon);}
         if(settings.ShowVendors){icons.Add(VendorIcon);icons.Add(ExchangeIcon);}
         icons.Add(FlagIcon);
+        // Tensho's own layers (0.210): treasure coffers (game icon), vistas, aether currents, nearby gathering points, party members.
+        if(settings.ShowTreasure)icons.Add(TreasureIcon);
+        if(settings.ShowSightseeing)icons.Add(GlyphVista);
+        if(settings.ShowAetherCurrents)icons.Add(GlyphCurrent);
+        if(settings.ShowGathering)icons.Add(GlyphNearbyGathering);
+        if(settings.ShowParty)icons.Add(GlyphParty);
+        // Every quest marker icon of the game (main scenario, side, feature, repeatable… available or locked), when quests are shown;
+        // only icons whose image exists in the game files.
+        if(settings.ShowQuests && mapMarkers is not null)
+        {
+            questIconsWithImage??=mapMarkers.QuestIcons.Keys.Where(quest=>textures.TryGetIconPath(new GameIconLookup(quest),out _)).ToArray();
+            foreach(var quest in questIconsWithImage)icons.Add(quest);
+        }
         // « All maps »: every map icon kind the game names (MapSymbol), not only those of the shown map (0.128).
         if(!mapIconScopeThisMap && mapMarkers is not null)foreach(var symbol in mapMarkers.SymbolIcons)icons.Add(symbol);
         var changed=false;
@@ -318,17 +335,56 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Get("MapView.IconsPriorityHelp"));
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##IconFilter",localization.Get("MapView.IconsFilter"),ref mapIconFilter,64);
-        foreach(var icon in icons.OrderByDescending(icon=>settings.PriorityOf(icon,map.MapId)).ThenBy(icon=>icon))
+        // Categories (0.212): Tensho layers, quests, objectives and events, FATEs, gathering, shops, flag and target, places of the game, other.
+        int Category(uint icon)=>TenshoGlyph(icon) is not null || icon==TreasureIcon ? 0
+            :mapMarkers?.QuestIcons.ContainsKey(icon)==true ? 1
+            :eventIcons.Contains(icon) ? 2
+            :fateIcons.Contains(icon) ? 3
+            :gatheringIcons.Contains(icon) ? 4
+            :icon is VendorIcon or ExchangeIcon or 63851 ? 5
+            :icon==FlagIcon || targetIcons.Contains(icon) ? 6
+            :mapMarkers?.SymbolName(icon) is { Length:>0 } ? 7:8;
+        var rows=icons.Select(icon=>(Icon:icon,Name:IconRowName(icon)))
+            .Where(row=>mapIconFilter.Length==0 || row.Name.Contains(mapIconFilter,StringComparison.CurrentCultureIgnoreCase))
+            .GroupBy(row=>Category(row.Icon)).OrderBy(group=>group.Key);
+        foreach(var category in rows)
         {
-            var iconName=icon==FlagIcon ? localization.Get("MapView.ShowFlag"):mapMarkers?.SymbolName(icon) is { Length:>0 } known ? known:localization.Format("MapView.IconUnnamed",icon);
-            if(mapIconFilter.Length>0 && !iconName.Contains(mapIconFilter,StringComparison.CurrentCultureIgnoreCase))continue;
+            var open=ImGui.TreeNodeEx(localization.Format("MapView.IconCategory"+category.Key,category.Count())+$"###IconCategory{category.Key}",
+                mapIconFilter.Length>0 || category.Key is 0 or 6 ? ImGuiTreeNodeFlags.DefaultOpen:ImGuiTreeNodeFlags.None);
+            if(!open)continue;
+            try
+            {
+                if(ImGui.SmallButton(localization.Get("MapView.IconCategoryShow")+$"##Show{category.Key}")){foreach(var row in category)settings.SetSize(row.Icon,scope,1);changed=true;}
+                ImGui.SameLine();
+                if(ImGui.SmallButton(localization.Get("MapView.IconCategoryHide")+$"##Hide{category.Key}")){foreach(var row in category)settings.SetSize(row.Icon,scope,0);changed=true;}
+                foreach(var (icon,iconName) in category.OrderByDescending(row=>settings.PriorityOf(row.Icon,map.MapId)).ThenBy(row=>row.Icon))
+                    changed|=DrawIconSizeRow(icon,iconName,map,settings,scope);
+            }
+            finally{ImGui.TreePop();}
+        }
+        return changed;
+    }
+
+    // One icon row: visible box, image, size, priority, name.
+    private bool DrawIconSizeRow(uint icon,string iconName,MapDefinition map,MapViewSettings settings,uint scope)
+    {
+        var changed=false;
+        {
             ImGui.PushID((int)icon);
             try
             {
                 var own=scope==0 ? settings.SizeOf(icon):settings.SizeOf(icon,map.MapId);var visible=own>0;
                 if(ImGui.Checkbox("##Visible",ref visible)){settings.SetSize(icon,scope,visible ? 1:0);changed=true;}
                 ImGui.SameLine();
-                if(textures.TryGetFromGameIcon(new GameIconLookup(icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
+                if(TenshoGlyph(icon) is { } glyph)
+                {
+                    // Same square as the game icons (0.212: the narrower glyph shifted the slider of these rows).
+                    var square=ImGui.GetFrameHeight();
+                    ImGui.Dummy(new Vector2(square));
+                    var corner=ImGui.GetItemRectMin();var glyphSize=square*0.8f;
+                    ImGui.GetWindowDrawList().AddText(UiBuilder.IconFont,glyphSize,corner+new Vector2((square-glyphSize)/2),ImGui.GetColorU32(glyph.Colour),glyph.Symbol.ToIconString());
+                }
+                else if(textures.TryGetFromGameIcon(new GameIconLookup(icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
                     ImGui.Image(image.Handle,new Vector2(ImGui.GetFrameHeight()));
                 else ImGui.Dummy(new Vector2(ImGui.GetFrameHeight()));
                 ImGui.SameLine();
@@ -341,10 +397,10 @@ internal sealed partial class MainWindow
                 var priority=scope==0 ? settings.PriorityOf(icon,0):settings.PriorityOf(icon,map.MapId);
                 ImGui.SetNextItemWidth(70);
                 if(ImGui.InputInt("##Priority",ref priority,1)){settings.SetPriority(icon,scope,priority);changed=true;}
-                if(ImGui.IsItemHovered())ImGui.SetTooltip(localization.Get("MapView.IconsPriority"));
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.IconsPriority"));
                 ImGui.SameLine();
-                var name=icon==FlagIcon ? localization.Get("MapView.ShowFlag"):mapMarkers?.SymbolName(icon) is { Length:>0 } symbol ? symbol:localization.Format("MapView.IconUnnamed",icon);
-                ImGui.TextUnformatted(name);
+                ImGui.TextUnformatted(iconName);
+                if(TenshoGlyph(icon) is not null && ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.TenshoIconHelp"));
             }
             finally{ImGui.PopID();}
         }
@@ -372,7 +428,7 @@ internal sealed partial class MainWindow
         bool clicked;
         try{clicked=ImGui.Button($"{icon.ToIconString()}##{tooltipKey}",new Vector2(26));}
         finally{ImGui.PopFont();if(active)ImGui.PopStyleColor();ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))ImGui.SetTooltip(localization.Get(tooltipKey));
+        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(tooltipKey));
         return clicked && enabled;
     }
 
@@ -578,17 +634,29 @@ internal sealed partial class MainWindow
                     if(released){var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(new Vector3(spot.X,0,spot.Z),map),map);PlaceFlagFromMapView(map,coordinate.X,coordinate.Y);}
                 }
             }
-            // Nearby coffers (and gathering points the game streams for your current job), drawn with icon-font symbols.
+            // Nearby coffers with the game's « Coffre au trésor » map icon (0.210), and gathering points the game streams for your current job
+            // (icon-font symbol); both sized and hidden from the icon settings like the game's icons.
             if(live?.Objects is { } nearby && live.MapId==map.MapId)
                 foreach(var item in nearby)
                 {
                     if(item.Kind==MapObjectKind.Treasure ? !settings.ShowTreasure:!settings.ShowGathering)continue;
+                    var kindSize=settings.SizeOf(item.Kind==MapObjectKind.Treasure ? TreasureIcon:GlyphNearbyGathering,map.MapId);
+                    if(kindSize<=0)continue;
                     var at=origin+mapPan+MapProjection.PixelFromWorld(item.Position,map)*mapZoom;
-                    var symbol=(item.Kind==MapObjectKind.Treasure ? FontAwesomeIcon.BoxOpen:FontAwesomeIcon.Leaf).ToIconString();
-                    var colour=item.Kind==MapObjectKind.Treasure ? new Vector4(0.98f,0.82f,0.30f,1):new Vector4(0.55f,0.90f,0.55f,1);
-                    var glyph=Math.Max(4,baseIcon*0.6f);var corner=at-new Vector2(glyph/2);
-                    draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
-                    draw.AddText(UiBuilder.IconFont,glyph,corner,ImGui.GetColorU32(colour),symbol);
+                    var glyph=Math.Max(4,baseIcon*0.6f*kindSize);
+                    if(item.Kind==MapObjectKind.Treasure && textures.TryGetFromGameIcon(new GameIconLookup(TreasureIcon),out var chestShared) && chestShared.TryGetWrap(out var chest,out _) && chest is not null)
+                    {
+                        var half=Math.Max(4,baseIcon*kindSize)/2;
+                        draw.AddImage(chest.Handle,at-new Vector2(half),at+new Vector2(half));
+                        glyph=half*2;
+                    }
+                    else
+                    {
+                        var symbol=(item.Kind==MapObjectKind.Treasure ? FontAwesomeIcon.BoxOpen:FontAwesomeIcon.Leaf).ToIconString();
+                        var colour=item.Kind==MapObjectKind.Treasure ? new Vector4(0.98f,0.82f,0.30f,1):new Vector4(0.55f,0.90f,0.55f,1);
+                        draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
+                        draw.AddText(UiBuilder.IconFont,glyph,at-new Vector2(glyph/2),ImGui.GetColorU32(colour),symbol);
+                    }
                     var label=item.Kind==MapObjectKind.Gathering && item.Level>0 ? localization.Format("MapView.GatheringLabel",item.Name,item.Level):item.Name;
                     if(hovered && Vector2.Distance(io.MousePos,at)<=glyph){tooltip=label;tooltipPoint=null;}
                 }
@@ -608,7 +676,8 @@ internal sealed partial class MainWindow
                         var done=live?.Sightseen?.Contains(vista.Id);
                         if(done==true && settings.HideCollected)continue;
                         var at=origin+mapPan+MapProjection.PixelFromWorld(new Vector3(vista.X,0,vista.Z),map)*mapZoom;
-                        if(DrawGlyph(draw,at,FontAwesomeIcon.Binoculars,done==true ? new Vector4(0.62f,0.62f,0.62f,1):new Vector4(0.98f,0.82f,0.30f,1),baseIcon,hovered,io.MousePos))
+                        var vistaSize=settings.SizeOf(GlyphVista,map.MapId);if(vistaSize<=0)continue;
+                        if(DrawGlyph(draw,at,FontAwesomeIcon.Binoculars,done==true ? new Vector4(0.62f,0.62f,0.62f,1):new Vector4(0.98f,0.82f,0.30f,1),baseIcon*vistaSize,hovered,io.MousePos))
                             {sightseeingTip=(vista,done);tooltipPoint=null;tooltip=null;}
                     }
                 if(settings.ShowAetherCurrents)
@@ -617,7 +686,8 @@ internal sealed partial class MainWindow
                         var done=live?.UnlockedCurrents?.Contains(current.Id);
                         if(done==true && settings.HideCollected)continue;
                         var at=origin+mapPan+MapProjection.PixelFromWorld(new Vector3(current.X,0,current.Z),map)*mapZoom;
-                        if(DrawGlyph(draw,at,FontAwesomeIcon.Wind,done==true ? new Vector4(0.62f,0.62f,0.62f,1):new Vector4(0.45f,0.85f,0.95f,1),baseIcon,hovered,io.MousePos))
+                        var currentSize=settings.SizeOf(GlyphCurrent,map.MapId);if(currentSize<=0)continue;
+                        if(DrawGlyph(draw,at,FontAwesomeIcon.Wind,done==true ? new Vector4(0.62f,0.62f,0.62f,1):new Vector4(0.45f,0.85f,0.95f,1),baseIcon*currentSize,hovered,io.MousePos))
                         {
                             var state=localization.Get(done switch{true=>"MapView.CurrentUnlocked",false=>"MapView.CurrentLocked",_=>"MapView.CollectedUnknown"});
                             var quest=current.Data!=0 ? quests.State.Entries.FirstOrDefault(entry=>entry.Id==current.Data)?.Name:null;
@@ -626,10 +696,10 @@ internal sealed partial class MainWindow
                         }
                     }
             }
-            if(settings.ShowParty && live?.Party is { } members && live.MapId==map.MapId)
+            if(settings.ShowParty && live?.Party is { } members && live.MapId==map.MapId && settings.SizeOf(GlyphParty,map.MapId) is var partySize and >0)
                 foreach(var member in members)
                 {
-                    var at=origin+mapPan+MapProjection.PixelFromWorld(member.Position,map)*mapZoom;var badge=Math.Max(6,baseIcon*0.8f);
+                    var at=origin+mapPan+MapProjection.PixelFromWorld(member.Position,map)*mapZoom;var badge=Math.Max(6,baseIcon*0.8f*partySize);
                     draw.AddCircleFilled(at,badge*0.6f,ImGui.GetColorU32(new Vector4(0.15f,0.45f,0.95f,0.85f)),20);
                     if(member.Job!=0 && textures.TryGetFromGameIcon(new GameIconLookup(62100+member.Job),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
                         draw.AddImage(image.Handle,at-new Vector2(badge/2),at+new Vector2(badge/2));
@@ -646,15 +716,16 @@ internal sealed partial class MainWindow
             }
             // Gathering point: item icons and names, like the game's gathering tooltip (0.125, user request).
             // Glyph layers (vistas, currents, party, nearby objects) answer on their own; otherwise the list of game icons.
+            mapHoveredVista=sightseeingTip?.Vista;
             if(tooltipPoint is { } gatheringTip)DrawGatheringTooltip(gatheringTip);
             else if(sightseeingTip is { } vistaTip)DrawSightseeingTooltip(vistaTip.Vista,vistaTip.Done);
-            else if(tooltip is not null)ImGui.SetTooltip(tooltip);
+            else if(tooltip is not null)WrappedTooltip(tooltip);
             else if(hits.Count>0)DrawIconListTooltip(hits,top,settings);
             // Region and world maps: a click (not a drag) on a linked icon opens that map, like the game.
             if(linkUnderMouse is { } link && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)NavigateMap(link);
         }
         finally{draw.PopClipRect();}
-        if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right)){mapContextPixel=(io.MousePos-origin-mapPan)/mapZoom;ImGui.OpenPopup("MapViewContext");}
+        if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right)){mapContextPixel=(io.MousePos-origin-mapPan)/mapZoom;mapContextVista=mapHoveredVista;ImGui.OpenPopup("MapViewContext");}
         if(ImGui.BeginPopup("MapTeleport"))
         {
             try
@@ -689,6 +760,7 @@ internal sealed partial class MainWindow
                 ImGui.BeginDisabled(map.TerritoryId==0);
                 try{if(ImGui.Selectable(localization.Get("MapView.UseInTool"))){selectedMapId=map.MapId;mapX=coordinate.X;mapY=coordinate.Y;bookmarkSaved=false;page=Page.Maps;IsOpen=true;}}
                 finally{ImGui.EndDisabled();}
+                if(mapContextVista is { } contextVista && map.TerritoryId!=0){ImGui.Separator();DrawVistaAlarmEntry(contextVista,map.TerritoryId);}
                 if(map.TerritoryId!=0){ImGui.Separator();DrawMapLocalLists(map,live);}
                 if(mapLocalCloseMenu){mapLocalCloseMenu=false;ImGui.CloseCurrentPopup();}
             }
@@ -696,7 +768,7 @@ internal sealed partial class MainWindow
         }
         // Aetheryte chosen in the local lists: the teleport question opens once the context menu is closed.
         if(mapTeleportRequested){mapTeleportRequested=false;ImGui.OpenPopup("MapTeleport");}
-        if(mapOpenError is { } error)ImGui.SetTooltip(error);
+        if(mapOpenError is { } error)WrappedTooltip(error);
     }
 
     // One game icon to draw on the canvas, sorted by priority then layer then insertion.
@@ -789,6 +861,32 @@ internal sealed partial class MainWindow
             mapGatheringCache=(map.MapId,catalog,index,MapLocalLists.Gathering(catalog.Sources,index,map.MapId).SelectMany(group=>group.Points).ToArray());
         return mapGatheringCache.Points;
     }
+    // « Coffre au trésor » map icon of the game (MapSymbol 63852, docs/evidence/0.139.0-symbols-probe.log), used for nearby coffers (0.210).
+    private const uint TreasureIcon=63852;
+    // Keys of Tensho's own map layers in the icon size/priority tables (outside the game's icon id range).
+    private const uint GlyphVista=0xFFFF0001,GlyphCurrent=0xFFFF0002,GlyphNearbyGathering=0xFFFF0003,GlyphParty=0xFFFF0004;
+    private static (FontAwesomeIcon Symbol,Vector4 Colour)? TenshoGlyph(uint icon)=>icon switch
+    {
+        GlyphVista=>(FontAwesomeIcon.Binoculars,new Vector4(0.98f,0.82f,0.30f,1)),
+        GlyphCurrent=>(FontAwesomeIcon.Wind,new Vector4(0.45f,0.85f,0.95f,1)),
+        GlyphNearbyGathering=>(FontAwesomeIcon.Leaf,new Vector4(0.55f,0.90f,0.55f,1)),
+        GlyphParty=>(FontAwesomeIcon.Users,new Vector4(0.35f,0.6f,1f,1)),
+        _=>null,
+    };
+    private string IconRowName(uint icon)=>icon switch
+    {
+        FlagIcon=>localization.Get("MapView.ShowFlag"),
+        GlyphVista=>localization.Get("MapView.ShowSightseeing"),
+        GlyphCurrent=>localization.Get("MapView.ShowAetherCurrents"),
+        GlyphNearbyGathering=>localization.Get("MapView.IconNearbyGathering"),
+        GlyphParty=>localization.Get("MapView.ShowParty"),
+        _ when mapMarkers?.SymbolName(icon) is { Length:>0 } known=>known,
+        _ when mapMarkers?.QuestIcons.TryGetValue(icon,out var quest)==true=>localization.Format("MapView.QuestIcon",
+            localization.Get("MapView.QuestKind"+(quest.Row is 1 or 3 or 8 or 10 ? quest.Row:0u)),quest.Row,
+            localization.Get(quest.Locked ? "MapView.QuestLocked":"MapView.QuestAvailable"),quest.Variant),
+        _=>localization.Format("MapView.IconUnnamed",icon),
+    };
+
     // Icon-font marker with a dark disc, following the zoom; true when the cursor is on it.
     private static bool DrawGlyph(ImDrawListPtr draw,Vector2 at,FontAwesomeIcon symbol,Vector4 colour,float baseIcon,bool hovered,Vector2 mouse)
     {
@@ -852,6 +950,9 @@ internal sealed partial class MainWindow
                         +(weatherNow is null ? "":" "+localization.Get(matches ? "MapView.VistaWeatherOk":"MapView.VistaWeatherWait")));
                 }
                 else ImGui.TextDisabled(localization.Get("MapView.VistaNoWeather"));
+                if(NextVistaWindow(vista,territory) is { } nextWindow)
+                    ImGui.TextUnformatted(localization.Format("Alarms.VistaNext",nextWindow.ToLocalTime().ToString("g"),Math.Max(0,(int)(nextWindow-DateTimeOffset.UtcNow).TotalMinutes)));
+                ImGui.TextDisabled(localization.Get("Alarms.VistaRightClick"));
                 if(wiki.Comment.Length>0)
                 {
                     ImGui.PushTextWrapPos(ImGui.GetFontSize()*30);

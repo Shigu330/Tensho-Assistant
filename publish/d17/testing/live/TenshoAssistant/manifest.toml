@@ -1,5 +1,5 @@
 [plugin]
-repository = "https://github.com/Shigu330/Plugins-ff14.git"
+repository = "https://github.com/Shigu330/Tensho-Assistant.git"
 # Public commit to build: replace with the hash of the pushed commit before opening the pull request.
 commit = "REPLACE_WITH_PUSHED_COMMIT_HASH"
 owners = ["Shigu330"]

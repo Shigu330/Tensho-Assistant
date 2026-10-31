@@ -72,7 +72,7 @@ internal sealed partial class MainWindow
             DrawSmallGameIcon(item.Position.Data);
             if(ImGui.Selectable($"{localization.Format("MapLocal.Level",item.Quest.Level)}  {item.Quest.Name}  {status}##Quest{item.Quest.Id}"))FlagAt(map,world);
             ToolMenu($"QuestTool{item.Quest.Id}","MapLocal.OpenQuestTool",()=>{SelectQuest(item.Quest.Id);questShowDetails=true;page=Page.Quests;});
-            if(ImGui.IsItemHovered())ImGui.SetTooltip(CoordinateText(map,world)+"\n"+localization.Get("MapLocal.ClickFlag"));
+            if(ImGui.IsItemHovered())WrappedTooltip(CoordinateText(map,world)+"\n"+localization.Get("MapLocal.ClickFlag"));
         });
     }
 
@@ -85,7 +85,7 @@ internal sealed partial class MainWindow
         {
             DrawSmallGameIcon(fate.Icon);
             if(ImGui.Selectable($"{FateLabel(fate)}##Fate{fate.Id}"))FlagAt(map,fate.Position);
-            if(ImGui.IsItemHovered())ImGui.SetTooltip(CoordinateText(map,fate.Position)+"\n"+localization.Get("MapLocal.ClickFlag"));
+            if(ImGui.IsItemHovered())WrappedTooltip(CoordinateText(map,fate.Position)+"\n"+localization.Get("MapLocal.ClickFlag"));
         }
     }
     private string FateLabel(MapFateMarker fate)
@@ -117,7 +117,7 @@ internal sealed partial class MainWindow
             {
                 ImGui.TextDisabled(label);
                 ToolMenu($"GatheringTool{point.BaseId}","MapLocal.OpenGatheringTool",()=>{itemId=(int)point.Items[0];page=Page.Gathering;});
-                if(ImGui.IsItemHovered())ImGui.SetTooltip(names+"\n"+localization.Get("MapLocal.NoPosition"));
+                if(ImGui.IsItemHovered())WrappedTooltip(names+"\n"+localization.Get("MapLocal.NoPosition"));
             }
         });
     }
@@ -171,7 +171,7 @@ internal sealed partial class MainWindow
             if(ImGui.IsItemHovered())
             {
                 if(kind==MapLocalKind.Sightseeing)DrawSightseeingTooltip(row,state);
-                else ImGui.SetTooltip(localization.Get("MapLocal.ClickFlag"));
+                else WrappedTooltip(localization.Get("MapLocal.ClickFlag"));
             }
         }
     }
@@ -191,7 +191,7 @@ internal sealed partial class MainWindow
             DrawSmallGameIcon(VendorMarker(vendorMarkers,MapProjection.PixelFromWorld(new Vector3(spot.WorldX,0,spot.WorldZ),map),VendorIconOf(vendor))?.Icon ?? VendorIconOf(vendor));
             if(ImGui.Selectable($"{name}  (X {spot.X:0.0}  Y {spot.Y:0.0})##Vendor{vendor.NpcId}/{spot.X}/{spot.Y}")){PlaceFlagFromMapView(map,spot.X,spot.Y);ImGui.CloseCurrentPopup();}
             ToolMenu($"VendorTool{vendor.NpcId}/{spot.X}/{spot.Y}","MapLocal.OpenVendorTool",()=>{npcVendorFocus=vendor.NpcId;page=Page.NpcVendors;});
-            if(ImGui.IsItemHovered())ImGui.SetTooltip(VendorLabel(vendor)+"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
+            if(ImGui.IsItemHovered())WrappedTooltip(VendorLabel(vendor)+"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
         }
     }
 
@@ -204,7 +204,7 @@ internal sealed partial class MainWindow
             DrawSmallGameIcon(marker.Icon);
             if(ImGui.Selectable($"{marker.Label}##Aetheryte{marker.AetheryteId}"))
             {mapTeleportTarget=(marker.AetheryteId,marker.Label);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;ImGui.CloseCurrentPopup();}
-            if(ImGui.IsItemHovered())ImGui.SetTooltip(localization.Get("MapView.TeleportHint"));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.TeleportHint"));
         }
     }
 

@@ -143,10 +143,10 @@ internal sealed partial class MainWindow
                         ImGui.TableNextColumn(); ImGui.TextUnformatted(line.Quantity?.ToString("N0") ?? localization.Get("CostUi.Verify"));
                         ImGui.TableNextColumn(); ImGui.TextUnformatted(line.UnitPrice is { } unit ? $"{unit:N0} {(line.HighQuality==true ? "HQ" : "NQ")}" : "—");
                         if(ImGui.IsItemHovered() && line.Quote is { } quote)
-                            ImGui.SetTooltip(localization.Format("CostUi.Quote",quote.WorldId,quote.FetchedAt.ToLocalTime().ToString("G"),quote.UploadedAt?.ToLocalTime().ToString("G") ?? localization.Get("CostUi.Unknown")));
+                            WrappedTooltip(localization.Format("CostUi.Quote",quote.WorldId,quote.FetchedAt.ToLocalTime().ToString("G"),quote.UploadedAt?.ToLocalTime().ToString("G") ?? localization.Get("CostUi.Unknown")));
                         ImGui.TableNextColumn(); ImGui.TextUnformatted(line.Cost?.ToString("N0") ?? localization.Get("CostUi.Unknown"));
                         ImGui.TableNextColumn(); ImGui.TextUnformatted(PreparationPriceStatus(line));
-                        if(ImGui.IsItemHovered()) ImGui.SetTooltip(PreparationPriceStatus(line));
+                        if(ImGui.IsItemHovered()) WrappedTooltip(PreparationPriceStatus(line));
                     }
                     finally {ImGui.PopID();}
                     }
