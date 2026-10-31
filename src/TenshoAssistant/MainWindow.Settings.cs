@@ -16,6 +16,14 @@ internal sealed partial class MainWindow
                 SettingsTab("General",DrawGeneralSettings);
                 SettingsTab("Interface",DrawInterfaceSettings);
                 SettingsTab("Modules",DrawModuleSettings);
+                SettingsTab("Map",()=>
+                {
+                    // The per-map icon list needs a map: the one shown in the Tensho map, else the player's map.
+                    var catalog=maps.State.Catalog;
+                    var shown=catalog?.Find(mapViewMapId) ?? mapMarkers?.Overview(mapViewMapId) ?? (mapLive?.State is { MapId:>0 } live ? catalog?.Find(live.MapId):null);
+                    if(ImGui.Button(localization.Get("MapView.OpenMap")))OpenMapView(0);
+                    DrawMapSettingsBody(shown);
+                });
                 SettingsTab("Data",DrawDataSettings);
                 if(developerMode)SettingsTab("Debug",DrawDeveloperSettings);
             }

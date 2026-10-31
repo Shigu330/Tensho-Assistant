@@ -1,60 +1,51 @@
-# CLAUDE.md — Contexte agent (Claude, session cloud reliée au PC)
+# CLAUDE.md — point d'entrée de l'agent IA
 
-Ajouté le 2026-10-30. Complète RULES.md sans le remplacer ; en cas de conflit :
-PROMPT-MAITRE > RULES.md > ce fichier.
+Ce fichier est lu automatiquement par Claude Code. Il dit **où reprendre** et **comment travailler** sur Tensho Assistant.
+Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Ordre de lecture à chaque reprise
-1. RULES.md → STATUS.md → GOAL.md (obligatoire, court).
-2. Ensuite seulement le doc du GOAL (docs/<ID>.md) et le code ciblé.
-3. ROADMAP / ARCHITECTURE / REFERENCES / TESTING : recherche ciblée (grep par ID,
-   plugin ou symbole), jamais relus en entier sans raison.
+## Reprise : ordre de lecture
 
-## État de référence au 2026-10-30
-- Livraison canonique : Release 0.75.0.0 — Verify.ps1 471/471 (dernier passage
-  connu, refonte UI), zéro avertissement/erreur, paquet/SHA-256/langues verts.
-- Refonte UI + localisation (EN/FR 1763 clés ; DE/JA partiels avec fallback EN) :
-  CLOSE, validation en jeu rapportée par l'utilisateur.
-- CACHE-001 : IMPLEMENTED / TESTED, validation en jeu du cache encore à faire.
-- QUEST-ITEM-PROGRESS-007 : CLOSE (Verify.ps1 477/477, DLL 0.76.0.0, validation en
-  jeu rapportée par l'utilisateur, 2026-10-30).
-- Session desktop sur le PC (2026-10-30) : PowerShell disponible, Verify.ps1 exécutable
-  par l'agent ; la contrainte « sans shell » ci-dessous ne vaut que pour la session cloud.
-- Autres pistes du BACKLOG : SORT-NATIVE-002-STUDY. Les 17 plugins restent PARTIAL.
-- Blocage connu non résolu : bonus natif d'Abondance (ne pas inventer de formule).
+1. [docs/ai/RULES.md](docs/ai/RULES.md) — règles durables (courtes, obligatoires).
+2. [docs/ai/STATUS.md](docs/ai/STATUS.md) — état actuel, version, ce qui reste à valider, prochaine action.
+3. [docs/ai/GOAL.md](docs/ai/GOAL.md) — l'objectif actif.
+4. Puis seulement le document de l'objectif (`docs/goals/<ID>.md`) et le code ciblé.
+5. Le reste ([docs/README.md](docs/README.md) : feuille de route, architecture, tests, références, décisions) par recherche ciblée,
+   jamais relu en entier sans raison. Historique des versions : [CHANGELOG.md](CHANGELOG.md) et `git log`.
 
-## Contraintes propres à cet environnement d'agent
-- L'agent tourne dans un conteneur Linux cloud ; le dépôt est sur le PC Windows
-  de l'utilisateur (C:\Plugins-ff14), accessible par copie (stage/commit).
-- Sans shell sur le PC, l'agent NE PEUT PAS compiler (SDK .NET 10.0.403,
-  Dalamud.NET.Sdk 15.0.0, Hooks/dev Windows) ni lancer scripts/Verify.ps1.
-  → Tout changement de code livré dans ce mode est NON COMPILÉ / NON TESTÉ
-  tant que l'utilisateur n'a pas exécuté `.\scripts\Verify.ps1` et transmis
-  la sortie. Ne jamais écrire COMPILED/TESTED sans ce retour.
-- Avant toute demande d'essai en jeu : build + tests exécutés et version de DLL
-  effectivement produite indiquée (consigne utilisateur, RULES.md).
-- Écriture des fichiers : modifier seulement ce qui change (pas de réécriture
-  complète des gros MD), vérifier que la copie locale n'a pas changé avant de
-  renvoyer un fichier (mtime).
+## Environnement
 
-## Consigne de compte rendu (utilisateur, 2026-10-30)
-- À CHAQUE étape, donner : l'estimation du % restant du projet global (signalée
-  comme estimation subjective, non mesurée) et la commande exacte de test à lancer
-  quand un test est requis (par défaut `.\scripts\Verify.ps1` depuis C:\Plugins-ff14).
+- Dépôt Windows : `C:\Plugins-ff14` (GitHub : Shigu330/Plugins-ff14). Session desktop avec PowerShell : l'agent compile et teste.
+- SDK .NET 10.0.403 (global.json), Dalamud.NET.Sdk 15 ; build et tests : `.\scripts\Verify.ps1` (compile Release, tests managés,
+  validation des langues, paquet). Sondes de données en lecture seule : `tools/ShopCurrencyProbe`, `tools/ApiProbe`.
+- **Les commits sont faits par l'application de bureau de l'utilisateur.** L'agent ne commit pas, ne pousse pas, ne réécrit pas l'historique
+  sans demande explicite.
+
+## À chaque version livrée
+
+1. Incrémenter `<Version>` dans `src/TenshoAssistant/TenshoAssistant.csproj` (seule source de version ; `TenshoAssistant.json` ne contient
+   ni version ni InternalName ni DalamudApiLevel : DalamudPackager les remplit, `Verify.ps1` le contrôle).
+2. `.\scripts\Verify.ps1` vert (0 avertissement, 0 erreur) — ne jamais demander un essai en jeu avant, et donner la version de DLL produite.
+3. Ajouter l'entrée en tête de [CHANGELOG.md](CHANGELOG.md) (demande, cause, correction, preuves, résultat de Verify, « non validé en jeu »).
+4. Mettre à jour [docs/ai/STATUS.md](docs/ai/STATUS.md) (version, à valider, prochaine action).
+5. Toute preuve citée par le code (sonde, extrait de journal) va dans `docs/evidence/` et est référencée par ce chemin.
+   `checkpoints/` est un dossier local de travail, ignoré par git (les anciennes archives `.zip` n'y sont plus utiles).
+
+## Compte rendu (consignes utilisateur)
+
+- Répondre en français. À chaque étape : estimation du % restant du projet global, **signalée comme subjective, non mesurée**,
+  et la commande de test exacte : `.\scripts\Verify.ps1` depuis `C:\Plugins-ff14`.
+- Distinguer COMPILED / TESTED / VALIDATED_IN_GAME ; n'affirmer que ce qui a été exécuté ou rapporté par l'utilisateur.
 
 ## Quota
-- L'agent n'a pas accès au compteur : ne jamais estimer le quota restant.
-- Réserves utilisateur les plus récentes (2026-10-30 ~20:55) : arrêt à 1 % restant
-  sur 5 h OU 1 % restant sur la semaine (la réserve de 5 % sur 5 h est abandonnée). Aux jalons,
-  demander à l'utilisateur de relever le compteur.
 
-## Rappels de méthode
+- L'agent ne voit pas le compteur : ne jamais l'estimer. Réserve fixée par l'utilisateur : arrêt à **1 % restant** sur 5 h ou sur la semaine.
+  Quand l'utilisateur transmet un relevé proche de la limite : finir la version en cours (Verify + CHANGELOG + STATUS), noter la reprise, s'arrêter.
+
+## Méthode
+
 - Un seul GOAL actif, petit, vérifiable ; KEEP → EXTEND → REFACTOR → REPLACE → NEW.
-- Inconnu ≠ zéro ; absence de preuve ≠ preuve d'absence ; portée et date explicites.
-- Natif lu sur le thread framework puis copié ; rien de lourd dans Draw.
-- Rapport de fin d'étape au format §66 du prompt maître, concis.
-- Point de contrôle à CHAQUE version livrée (convention historique, rappel utilisateur
-  2026-10-30) : dans checkpoints/, déposer X.Y.Z-verify.log (sortie Verify.ps1),
-  X.Y.Z-verification.md et TenshoAssistant-X.Y.Z-source.zip (dépôt sans bin/obj ni
-  anciennes archives) avant de demander un essai en jeu. Écart 0.76→0.90 : voir
-  checkpoints/0.91.0-verification.md.
-- Combat/ACT/IINACT : retiré du projet (décision utilisateur 2026-10-31), ne rien faire dessus.
+- Inconnu ≠ zéro ; absence de preuve ≠ preuve d'absence ; ne jamais inventer une donnée (sonder les données du jeu, citer la source).
+- Natif lu sur le thread framework puis copié ; rien de lourd dans Draw ; chaque abonnement a un propriétaire et un nettoyage.
+- Références AGPL (Mappy, SortaKinda…) : lues pour comprendre, **jamais copiées** (le projet est sous GPL v3, code original).
+- Hors périmètre : ACT/IINACT et tout domaine Combat (décision DEC-009).
+- Publication éventuelle sur le dépôt officiel Dalamud : voir [CONTRIBUTING.md](CONTRIBUTING.md#publication-dalamud) (règles D17, politique IA).

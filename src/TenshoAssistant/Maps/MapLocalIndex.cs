@@ -10,13 +10,13 @@ public enum MapLocalKind { QuestIssuer, GatheringPoint, FishingSpot, Sightseeing
 /// <summary>
 /// World X/Z position of a quest giver (Quest.IssuerLocation → Level) or a gathering point (ExportedGatheringPoint, keyed by
 /// GatheringPointBase). MapId is 0 when the row gives no map: gathering points take the map of their catalogue source.
-/// Proof of the links: checkpoints/0.114.0-local-probe.log (Fate.Location is not a Level row, so FATEs have no static position).
-/// Fishing spots (0.126): FishingSpot.X/Z are map texture pixels (checkpoints/0.126.0-fishing-probe.log, equal to Garland's
+/// Proof of the links: docs/evidence/0.114.0-local-probe.log (Fate.Location is not a Level row, so FATEs have no static position).
+/// Fishing spots (0.126): FishingSpot.X/Z are map texture pixels (docs/evidence/0.126.0-fishing-probe.log, equal to Garland's
 /// coordinates for spots 2 and 35), converted to world X/Z; their radius unit is unproven, so Radius is 0.
 /// </summary>
 // Sightseeing (0.127): Id = Adventure row, Data = its discovered picture icon, Name = vista name (Adventure → Level).
 // AetherCurrent (0.127): Id = AetherCurrent row; field currents placed by the Level whose Object is the EObj carrying it
-// (152/152), quest currents at the quest giver with Data = quest id (checkpoints/0.127.0-sightseeing-probe.log).
+// (152/152), quest currents at the quest giver with Data = quest id (docs/evidence/0.127.0-sightseeing-probe.log).
 // Vistas (0.129): MinTime/MaxTime = Eorzea hhmm window (e.g. 800–1159, 1800–459 wraps past midnight), Extra = emote name;
 // weather is not in the Adventure sheet. Positions checked against the sightseeing log (#001 Barracuda Piers 9.5/7.8).
 public sealed record MapLocalPosition(MapLocalKind Kind,uint Id,uint MapId,float X,float Z,float Radius,uint Data=0,string Name="",int MinTime=0,int MaxTime=0,string Extra="")
@@ -85,7 +85,8 @@ public static class MapLocalIndexCache
     public const string Family="catalog-map-positions";
     public const int MaximumRows=200_000;
     // Bump when the Lumina → MapLocalPosition copy rules change without a change of record shape.
-    private const int CopyRules=1;
+    // 2: quest giver rows carry the quest kind's map icon in Data (0.151).
+    private const int CopyRules=2;
     public static readonly string Shape=CatalogCacheKeys.Shape(typeof(MapLocalPosition),typeof(MapLocalKind));
     public static string Version(string dataVersion)=>CatalogCacheKeys.Version(dataVersion,CopyRules,Shape);
     public static bool Valid(MapLocalIndexCacheData? data,string dataVersion)

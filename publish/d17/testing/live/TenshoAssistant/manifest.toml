@@ -1,0 +1,7 @@
+[plugin]
+repository = "https://github.com/Shigu330/Plugins-ff14.git"
+# Public commit to build: replace with the hash of the pushed commit before opening the pull request.
+commit = "REPLACE_WITH_PUSHED_COMMIT_HASH"
+owners = ["Shigu330"]
+project_path = "src/TenshoAssistant"
+changelog = "First submission: inventory and storage, sorting rules, crafting simulator, gathering and fishing windows, a map replacing the game map, collections with how to obtain items, quests, optional market prices, loot, Fashion Report, Mini Cactpot, Triple Triad, character stats and macro chains."

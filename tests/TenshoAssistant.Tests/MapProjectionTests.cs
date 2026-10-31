@@ -20,6 +20,16 @@ internal static class MapProjectionTests
             Check(!copy.ShowQuests && copy.IconScale==1.5f && copy.HideInDuty && copy.ShowFlag,"roundtrip");
             Check(System.Text.Json.JsonSerializer.Deserialize<TenshoAssistant.MapViewSettings>("{}")!.ShowFixedIcons,"older configuration keeps the defaults");
         }),
+        ("Vendor joins the game icon it stands by: shops at 16 pixels, unlabelled services at 8",()=>
+        {
+            // Positions from docs/evidence/0.155.0-vendor-markers-probe.log (Limsa: class/job clerk 63919 at 5 px, market board 60570 at 37).
+            var limsa=new (float X,float Y,uint Icon,bool Labelled)[]{(783,1045,60570,false),(809,1014,63919,false)};
+            Check(MapVendorIcons.Nearest(limsa,new(809,1019))==1,"Rowena's representative takes the class/job clerk icon");
+            Check(MapVendorIcons.Nearest(limsa,new(809,1030))==-1,"service icon farther than 8 pixels stays apart");
+            Check(MapVendorIcons.Nearest([(100,100,60412,false)],new(112,100))==0,"shop icon keeps its 16 pixel reach");
+            Check(MapVendorIcons.Nearest([(100,100,60442,true),(100,104,60434,true)],new(100,101))==-1,"labelled or unknown icons never take a vendor");
+            Check(MapVendorIcons.Nearest([(100,106,60412,false),(100,102,60434,false)],new(100,100))==1,"nearest qualifying icon wins");
+        }),
         ("Game map request opens the asked zone, not the world map selected at that frame",()=>
         {
             var catalog=new MapCatalog([Menu(696,"Radz-at-Han","",819,0,0),Menu(697,"Thavnair","",957,0,0),Menu(698,"Thavnair","Sous-sol",957,0,0,1)]);
@@ -32,6 +42,15 @@ internal static class MapProjectionTests
             Check(new GameMapRequest(world,0,0,696).Resolve(catalog)==world,"nothing else known: the selection stays");
             Check(!new GameMapRequest(696,0,0,696).Pointed && new GameMapRequest(696,0,0,696,QuestLog:true).Pointed && new GameMapRequest(696,0,0,696,QuestId:65539).Pointed,"journal or quest = pointed, never the M toggle");
             Check(new GameMapRequest(696,0,0,696,Target:new System.Numerics.Vector2(10,20)).Pointed,"a game target is pointed");
+            Check(new GameMapRequest(696,697,0,696,Target:new System.Numerics.Vector2(10,20)).Resolve(catalog)==697,"journal target on another map wins over the selected zone");
+        }),
+        ("Zoom follow keeps icons readable when zoomed out and is clamped",()=>
+        {
+            var settings=new TenshoAssistant.MapViewSettings();
+            Check(Near(settings.ZoomFactor(1),1) && Near(settings.ZoomFactor(0.4f),MathF.Sqrt(0.4f)),"default half follow: 40 % zoom keeps 63 % size");
+            settings.ZoomFollow=0;Check(Near(settings.ZoomFactor(0.4f),1),"fixed size");
+            settings.ZoomFollow=5;Check(Near(settings.ZoomFactor(0.4f),0.4f),"clamped to proportional");
+            settings.ZoomFollow=float.NaN;Check(Near(settings.ZoomFactor(0.25f),0.5f),"invalid = half");
         }),
         ("Per-map icon overrides win over the global table, priorities clamp and reset per scope",()=>
         {
@@ -61,7 +80,7 @@ internal static class MapProjectionTests
         }),
         ("Zone menu follows the game's category and priority with floors grouped",()=>
         {
-            // Rows from checkpoints/0.105.0-zones-probe.log (Ilsabard).
+            // Rows from docs/evidence/0.105.0-zones-probe.log (Ilsabard).
             var region=Menu(733,"Ilsabard","",0,17,1);
             var maps=new[]{region,Menu(697,"Garlemald","",958,17,4),Menu(694,"Radz-at-Han","",963,17,2),Menu(696,"Thavnair","",957,17,3),
                 Menu(703,"Tour de Zott","Niveau supérieur",952,17,5,3),Menu(701,"Tour de Zott","Niveau terrestre",952,17,5,1),Menu(702,"Tour de Zott","Niveau intermédiaire",952,17,5,2),

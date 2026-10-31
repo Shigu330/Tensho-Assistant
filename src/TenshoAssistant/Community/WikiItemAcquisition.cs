@@ -41,6 +41,8 @@ public static class WikiItemAcquisitionParser
     {
         ["onlinestore"]=parts=>parts.Length>1 ? $"Online Store ({parts[1]} USD)":"Online Store",
         ["seriesmalmstonesreward"]=parts=>parts.Length>1 ? $"PvP series reward (rank {parts[1]})":"PvP series reward",
+        // Layout-only templates (0.150: « clear » appeared as a source line).
+        ["clear"]=_=>"",["-"]=_=>"",["clr"]=_=>"",["br"]=_=>"",
     };
     // [[a|b]] → b, [https://… text] → text, {{template|x|y}} → known wording or « template x y », markup and HTML removed.
     private static string Clean(string text)
@@ -55,6 +57,7 @@ public static class WikiItemAcquisitionParser
                 :string.Join(" ",parts.Select(part=>part.Contains('=') ? part[(part.IndexOf('=')+1)..]:part).Where(part=>part.Length>0));
         },RegexOptions.None,Limit);
         text=Regex.Replace(text,@"<[^>]+>"," ",RegexOptions.None,Limit).Replace("'''","").Replace("''","");
+        text=Regex.Replace(text,@"^\s*(clear|-)\s*$","",RegexOptions.IgnoreCase,Limit);
         return Regex.Replace(text,@"\s+"," ",RegexOptions.None,Limit).Trim();
     }
 }
@@ -64,7 +67,7 @@ public sealed record WikiItemAcquisitionState(WikiItemAcquisition? Page,bool Loa
 /// <summary>Reads item pages on demand, one at a time (3 s apart), kept in DataCache « wiki-items » for the sources lifetime.</summary>
 public sealed class WikiItemAcquisitionService:IDisposable
 {
-    private const string Family="wiki-items",Version="v2";
+    private const string Family="wiki-items",Version="v3";
     private readonly HttpClient http=new(){Timeout=TimeSpan.FromSeconds(20)};
     private readonly Func<uint,string?> englishName;private readonly Func<TimeSpan> lifetime;private readonly DataCache? disk;
     private readonly object gate=new();

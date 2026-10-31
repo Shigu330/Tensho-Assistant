@@ -6,7 +6,7 @@ using TenshoAssistant.Maps;
 
 namespace TenshoAssistant;
 
-/// <summary>MAP-VIEW-016: the game map texture with fixed icons, the player and a flag on right click (docs/MAP-016-PLAN.md).</summary>
+/// <summary>MAP-VIEW-016: the game map texture with fixed icons, the player and a flag on right click (docs/goals/MAP-016-PLAN.md).</summary>
 internal sealed partial class MainWindow
 {
     // Game map icon of the red flag marker (to confirm in game; a drawn flag is the fallback).
@@ -23,6 +23,9 @@ internal sealed partial class MainWindow
     internal void ConfigureMapView(MapLiveReader live,MapMarkerSource markers,MapLocalIndexService local){mapLive=live;mapMarkers=markers;mapLocal=local;}
     private void OpenMapView(uint mapId){mapViewMapId=mapId;mapViewFollow=mapId==0;mapViewOpen=true;}
     // Called when the game map is replaced: the same key (M) that opens the game map toggles the Tensho map.
+    // Hosted game map (0.151): the replacer asks whether the Tensho map is still open, and closes it with the game map.
+    internal bool MapViewOpen=>Volatile.Read(ref mapViewOpen);
+    internal void CloseMapFromGame()=>Volatile.Write(ref mapViewOpen,false);
     internal void ShowMapFromGame(GameMapRequest request)
     {
         if(DateTimeOffset.UtcNow<mapOwnFlagUntil){mapOwnFlagUntil=default;mapViewOpen=true;return;}
@@ -60,14 +63,20 @@ internal sealed partial class MainWindow
     private Action? openGameMap;
     internal void ConfigureGameMapOpener(Action opener)=>openGameMap=opener;
 
-    public void DrawMapView()
+    // Drawn by MapViewWindow (WindowSystem, PUBLISH-018): visibility, then size/flags before Begin, then the content.
+    internal bool MapViewVisible()
     {
-        if(windowDisposed || !mapViewOpen || maps.State.Catalog is not { } catalog)return;
+        if(windowDisposed || maps.State.Catalog is null)return false;
         var settings=configuration.MapView;var live=mapLive?.State;
         // Hidden, not closed: the window comes back when combat or the duty ends.
-        if(live is not null && (settings.HideInCombat && live.InCombat || settings.HideInDuty && live.InDuty))return;
-        using var theme=UI.FfxivTheme.Apply();
-        var viewport=ImGui.GetMainViewport();
+        return !(live is not null && (settings.HideInCombat && live.InCombat || settings.HideInDuty && live.InDuty));
+    }
+    internal void PrepareMapView(Dalamud.Interface.Windowing.Window window)
+    {
+        UI.FfxivTheme.Push();
+        var settings=configuration.MapView;
+        window.WindowName=localization.Get("MapView.Title")+"###TenshoMapView";
+        // Sizes in screen pixels, set here rather than through Window.Size (which the window system scales).
         if(mapResize is { } resize)
         {
             // Enlarge: 90 % of the screen, centred; a second click restores the previous size.
@@ -76,23 +85,23 @@ internal sealed partial class MainWindow
         else ImGui.SetNextWindowSize(new Vector2(720,760),ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowSizeConstraints(new Vector2(320,280),new Vector2(float.MaxValue));
         ImGui.SetNextWindowBgAlpha(MapViewSettings.ClampOpacity(settings.Opacity));
-        var flags=ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | (settings.Locked ? ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize:0);
-        var visible=ImGui.Begin(localization.Get("MapView.Title")+"###TenshoMapView",ref mapViewOpen,flags);
-        try
-        {
-            if(!visible)return;
-            // Read here, outside the tool column: inside a child these calls return the child's size (the « Réduire » bug).
-            var window=(ImGui.GetWindowSize(),ImGui.GetWindowPos());
-            if(mapViewFollow && live is { MapId:>0 })mapViewMapId=live.MapId;
-            var map=catalog.Find(mapViewMapId) ?? mapMarkers?.Overview(mapViewMapId);
-            // Layout of the game map: region and zone menus on top, tool column on the left, the map on the right.
-            DrawMapMenus(catalog,map,live);
-            DrawMapTools(map,viewport,window);
-            ImGui.SameLine();
-            if(map is null || map.TexturePath.Length==0){ImGui.TextWrapped(localization.Get("MapView.Unavailable"));return;}
-            DrawMapCanvas(map,live);
-        }
-        finally{ImGui.End();}
+        window.Flags=ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | (settings.Locked ? ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize:0);
+    }
+    internal void FinishMapView()=>UI.FfxivTheme.Pop();
+    internal void DrawMapViewContents()
+    {
+        if(maps.State.Catalog is not { } catalog)return;
+        var live=mapLive?.State;var viewport=ImGui.GetMainViewport();
+        // Read here, outside the tool column: inside a child these calls return the child's size (the « Réduire » bug).
+        var window=(ImGui.GetWindowSize(),ImGui.GetWindowPos());
+        if(mapViewFollow && live is { MapId:>0 })mapViewMapId=live.MapId;
+        var map=catalog.Find(mapViewMapId) ?? mapMarkers?.Overview(mapViewMapId);
+        // Layout of the game map: region and zone menus on top, tool column on the left, the map on the right.
+        DrawMapMenus(catalog,map,live);
+        DrawMapTools(map,viewport,window);
+        ImGui.SameLine();
+        if(map is null || map.TexturePath.Length==0){ImGui.TextWrapped(localization.Get("MapView.Unavailable"));return;}
+        DrawMapCanvas(map,live);
     }
 
     private MapDefinition? ResolveMap(MapCatalog catalog,uint id)=>id==0 ? null:catalog.Find(id) ?? mapMarkers?.Overview(id);
@@ -204,7 +213,12 @@ internal sealed partial class MainWindow
     private void DrawMapSettings(MapDefinition? map)
     {
         if(!ImGui.BeginPopup("MapViewSettings"))return;
-        try
+        try{DrawMapSettingsBody(map);}
+        finally{ImGui.EndPopup();}
+    }
+    // Same body in the map's cog popup and in Settings › Map (0.153: every setting reachable from the Settings page).
+    private void DrawMapSettingsBody(MapDefinition? map)
+    {
         {
             var settings=configuration.MapView;var changed=false;
             if(ImGui.CollapsingHeader(localization.Get("MapView.SectionGame"),ImGuiTreeNodeFlags.DefaultOpen))
@@ -243,8 +257,18 @@ internal sealed partial class MainWindow
             {
                 var scale=MapViewSettings.ClampScale(settings.IconScale)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.IconScale"),ref scale,50,200,"%.0f %%")){settings.IconScale=scale/100;changed=true;}
+                var follow=MapViewSettings.ClampFollow(settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.ZoomFollow"),ref follow,0,100,"%.0f %%")){settings.ZoomFollow=follow/100;changed=true;}
+                if(ImGui.IsItemHovered())ImGui.SetTooltip(localization.Get("MapView.ZoomFollowHelp"));
                 var opacity=MapViewSettings.ClampOpacity(settings.Opacity)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.Opacity"),ref opacity,20,100,"%.0f %%")){settings.Opacity=opacity/100;changed=true;}
+            }
+            if(ImGui.CollapsingHeader(localization.Get("MapView.SectionAreas")))
+            {
+                changed|=AreaSetting("MapView.AreaQuests",settings.ShowQuestAreas,value=>settings.ShowQuestAreas=value,settings.QuestAreaColor,value=>settings.QuestAreaColor=value);
+                changed|=AreaSetting("MapView.AreaEvents",settings.ShowEventAreas,value=>settings.ShowEventAreas=value,settings.EventAreaColor,value=>settings.EventAreaColor=value);
+                changed|=AreaSetting("MapView.AreaFates",settings.ShowFateAreas,value=>settings.ShowFateAreas=value,settings.FateAreaColor,value=>settings.FateAreaColor=value);
+                changed|=AreaSetting("MapView.AreaGathering",settings.ShowGatheringAreas,value=>settings.ShowGatheringAreas=value,settings.GatheringAreaColor,value=>settings.GatheringAreaColor=value);
             }
             if(map is not null && ImGui.CollapsingHeader(localization.Get("MapView.SectionIcons")))changed|=DrawIconSizes(map,settings);
             if(ImGui.CollapsingHeader(localization.Get("MapView.Window")))
@@ -261,7 +285,6 @@ internal sealed partial class MainWindow
                 catch(Exception error){log.Warning(error,"Could not save map settings.");}
             }
         }
-        finally{ImGui.EndPopup();}
     }
     // One row per kind of game icon on the shown map (fixed icons, quest/event markers, FATEs, flag): visible box, size, priority.
     // Scope (0.119): « All maps » edits the global table; « This map » writes overrides kept for this map only, cleared by
@@ -325,6 +348,14 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.PopID();}
         }
+        return changed;
+    }
+    private bool AreaSetting(string key,bool shown,Action<bool> applyShown,Vector4 colour,Action<Vector4> applyColour)
+    {
+        var changed=false;
+        if(ImGui.Checkbox(localization.Get(key)+"##Area"+key,ref shown)){applyShown(shown);changed=true;}
+        ImGui.SameLine(ImGui.GetFontSize()*14);
+        if(ImGui.ColorEdit4("##Colour"+key,ref colour,ImGuiColorEditFlags.NoInputs | ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.AlphaPreviewHalf)){applyColour(colour);changed=true;}
         return changed;
     }
     private bool SettingBox(string key,bool value,Action<bool> apply)
@@ -425,11 +456,14 @@ internal sealed partial class MainWindow
             string? tooltip=null;MapLocalGatheringPoint? tooltipPoint=null;(MapLocalPosition Vista,bool? Done)? sightseeingTip=null;
             // Icons follow the map zoom exactly (32 px at 100 %, 0.113 at the user's request); 4 px floor only so they never vanish.
             // Each game icon can then be resized or hidden on its own (settings, « Icônes de cette carte »).
-            var baseIcon=Math.Max(4,32*mapZoom*MapViewSettings.ClampScale(settings.IconScale));
+            // 0.153: zoom^follow (setting « Suivi du zoom ») so icons set for a close zoom stay readable when zoomed out.
+            var zoomFactor=settings.ZoomFactor(mapZoom);
+            var baseIcon=Math.Max(4,32*zoomFactor*MapViewSettings.ClampScale(settings.IconScale));
             var markers=settings.ShowFixedIcons || settings.ShowPlaceNames ? mapMarkers?.For(map.MarkerRange) ?? []:[];
             // Place names first, under the icons, in large outlined text like the game map; they also follow the zoom.
             var font=ImGui.GetFont();var nameScale=Math.Clamp(float.IsFinite(settings.PlaceNameScale) ? settings.PlaceNameScale:1,0.5f,1.5f);
-            var nameSize=Math.Clamp(ImGui.GetFontSize()*2.4f*mapZoom*nameScale,ImGui.GetFontSize()*0.75f,ImGui.GetFontSize()*2.6f*nameScale);
+            // 0.152 (user choice « follow the zoom »): names scale with the map like the icons; only a 6 px floor keeps them drawable.
+            var nameSize=Math.Max(6,ImGui.GetFontSize()*2.4f*zoomFactor*nameScale);
             foreach(var marker in settings.ShowPlaceNames ? markers.Where(marker=>marker.Icon==0):[])
             {
                 var centre=origin+mapPan+new Vector2(marker.X,marker.Y)*mapZoom;
@@ -444,14 +478,20 @@ internal sealed partial class MainWindow
             var fates=settings.ShowFates && live?.Fates is { } running && live.MapId==map.MapId ? running:[];
             var events=settings.ShowQuests && live?.Events is { } liveEvents ? liveEvents.Where(marker=>marker.MapId==map.MapId).ToArray():[];
             var gathering=settings.ShowGathering ? MapGatheringPoints(map):[];
-            foreach(var fate in fates.Where(fate=>fate.Radius>0))
-                DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(fate.Position,map)*mapZoom,fate.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,new Vector4(0.75f,0.45f,0.95f,1));
-            if(settings.ShowQuestAreas)
-                foreach(var marker in events.Where(marker=>marker.Radius>0))
-                    DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(marker.Position,map)*mapZoom,marker.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,new Vector4(0.95f,0.70f,0.25f,1));
-            foreach(var point in gathering)
-                if(point.Position is { Radius:>0 } area)
-                    DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(area.X,0,area.Z),map)*mapZoom,area.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,new Vector4(0.55f,0.90f,0.55f,0.8f));
+            // Areas per kind (0.151): quests (marker type 3), leves and other events, FATEs, gathering points; own switch and colour.
+            if(settings.ShowFateAreas)
+                foreach(var fate in fates.Where(fate=>fate.Radius>0))
+                    DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(fate.Position,map)*mapZoom,fate.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,settings.FateAreaColor);
+            foreach(var marker in events.Where(marker=>marker.Radius>0))
+            {
+                var quest=marker.MarkerType==3;
+                if(quest ? !settings.ShowQuestAreas:!settings.ShowEventAreas)continue;
+                DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(marker.Position,map)*mapZoom,marker.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,quest ? settings.QuestAreaColor:settings.EventAreaColor);
+            }
+            if(settings.ShowGatheringAreas)
+                foreach(var point in gathering)
+                    if(point.Position is { Radius:>0 } area)
+                        DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(area.X,0,area.Z),map)*mapZoom,area.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,settings.GatheringAreaColor);
             // Every game icon in one list sorted by priority (0.124: quests used to be drawn above everything whatever the
             // setting). Equal priorities keep the game's layer order: fixed icons, gathering, FATEs, quests, game target.
             var icons=new List<MapIconDraw>();
@@ -462,16 +502,16 @@ internal sealed partial class MainWindow
                 icons.Add(new(settings.PriorityOf(icon,map.MapId),layer,icons.Count,icon,origin+mapPan+pixel*mapZoom,Math.Max(4,baseIcon*own),label,fixedMarker,point,
                     worldRadius*Math.Max(1,map.SizeFactor)/100f*mapZoom,flag));
             }
-            // NPC vendors (0.140): a vendor standing by one of the game's shop icons (Échoppe, Échangeur, Marchand: within 16 texture
-            // pixels) adds its shops to that icon's tooltip instead of a second icon; others get the game icon of their kind.
+            // NPC vendors (0.140): a vendor standing by the game's icon for it (shop or service icon, MapVendorIcons, MAP-017) adds its
+            // shops to that icon's tooltip instead of a second icon; others get the game icon of their kind.
             var vendorsHere=settings.ShowVendors ? MapVendors(map):[];
-            var shopMarkers=settings.ShowFixedIcons ? markers.Where(marker=>ShopIcons.Contains(marker.Icon)).ToArray():[];
+            var shopMarkers=settings.ShowFixedIcons ? VendorCandidates(markers):[];
             var mergedVendors=new Dictionary<MapIconMarker,List<(string Label,Vector2 Flag)>>(ReferenceEqualityComparer.Instance);
             var lonelyVendors=new List<(Npcs.NpcVendor Vendor,Npcs.NpcLocation Spot,Vector2 Pixel)>();
             foreach(var (vendor,spot) in vendorsHere)
             {
                 var pixel=MapProjection.PixelFromWorld(new Vector3(spot.WorldX,0,spot.WorldZ),map);
-                var near=shopMarkers.Select(marker=>(marker,distance:Vector2.Distance(new Vector2(marker.X,marker.Y),pixel))).Where(pair=>pair.distance<=16).OrderBy(pair=>pair.distance).Select(pair=>pair.marker).FirstOrDefault();
+                var near=VendorMarker(shopMarkers,pixel);
                 if(near is null){lonelyVendors.Add((vendor,spot,pixel));continue;}
                 if(!mergedVendors.TryGetValue(near,out var list))mergedVendors[near]=list=[];
                 list.Add((VendorLabel(vendor),new Vector2(spot.X,spot.Y)));
@@ -488,7 +528,7 @@ internal sealed partial class MainWindow
             }
             foreach(var point in gathering)
                 if(point.Position is { } spot && point.Icon!=0)Add(point.Icon,1,MapProjection.PixelFromWorld(new Vector3(spot.X,0,spot.Z),map),GatheringPointLabel(point),point:point,worldRadius:spot.Radius);
-            // NPC vendors (0.139): the game's « Échoppe » map icon (MapSymbol 60412, checkpoints/0.139.0-symbols-probe.log), in the
+            // NPC vendors (0.139): the game's « Échoppe » map icon (MapSymbol 60412, docs/evidence/0.139.0-symbols-probe.log), in the
             // same list, sizes and priorities as the game icons; click = flag.
             foreach(var (vendor,spot,pixel) in lonelyVendors)Add(VendorIconOf(vendor),1,pixel,VendorLabel(vendor),flag:new Vector2(spot.X,spot.Y));
             foreach(var fate in fates.Where(fate=>fate.Icon!=0))Add(fate.Icon,2,MapProjection.PixelFromWorld(fate.Position,map),FateLabel(fate),worldRadius:fate.Radius);
@@ -589,7 +629,7 @@ internal sealed partial class MainWindow
             if(settings.ShowParty && live?.Party is { } members && live.MapId==map.MapId)
                 foreach(var member in members)
                 {
-                    var at=origin+mapPan+MapProjection.PixelFromWorld(member.Position,map)*mapZoom;var badge=Math.Max(14,baseIcon*0.8f);
+                    var at=origin+mapPan+MapProjection.PixelFromWorld(member.Position,map)*mapZoom;var badge=Math.Max(6,baseIcon*0.8f);
                     draw.AddCircleFilled(at,badge*0.6f,ImGui.GetColorU32(new Vector4(0.15f,0.45f,0.95f,0.85f)),20);
                     if(member.Job!=0 && textures.TryGetFromGameIcon(new GameIconLookup(62100+member.Job),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
                         draw.AddImage(image.Handle,at-new Vector2(badge/2),at+new Vector2(badge/2));
@@ -662,8 +702,14 @@ internal sealed partial class MainWindow
     // One game icon to draw on the canvas, sorted by priority then layer then insertion.
     private readonly record struct MapIconDraw(int Priority,int Layer,int Order,uint Icon,Vector2 At,float Size,string? Label,MapIconMarker? Fixed,MapLocalGatheringPoint? Point,float Area=0,Vector2? Flag=null);
     private const uint VendorIcon=60412,ExchangeIcon=60935;
-    // Game shop icons (MapSymbol, checkpoints/0.139.0-symbols-probe.log): 60412 Échoppe, 60935 Échangeur, 63851 Marchand.
-    private static readonly HashSet<uint> ShopIcons=[60412,60935,63851];
+    // Game shop icons (MapSymbol, docs/evidence/0.139.0-symbols-probe.log): 60412 Échoppe, 60935 Échangeur, 63851 Marchand.
+    private static MapIconMarker[] VendorCandidates(IReadOnlyList<MapIconMarker> markers)=>
+        markers.Where(marker=>MapVendorIcons.Shops.Contains(marker.Icon) || MapVendorIcons.Services.Contains(marker.Icon)).ToArray();
+    private static MapIconMarker? VendorMarker(MapIconMarker[] candidates,Vector2 pixel)
+    {
+        var index=MapVendorIcons.Nearest(candidates.Select(marker=>(marker.X,marker.Y,marker.Icon,marker.Label.Length>0)).ToArray(),pixel);
+        return index<0 ? null:candidates[index];
+    }
     // Gil shop = Échoppe; only special exchanges = Échangeur.
     private uint VendorIconOf(Npcs.NpcVendor vendor)
     {
@@ -727,10 +773,11 @@ internal sealed partial class MainWindow
         var key=marker.ObjectiveId & 0xFFFF;
         return quests.State.Entries.FirstOrDefault(entry=>entry.Progress==Quests.QuestProgress.Active && (entry.Id & 0xFFFF)==key)?.Name;
     }
+    // Fill with the chosen colour and alpha; the outline is the same colour, stronger, so faint areas stay readable.
     private static void DrawArea(ImDrawListPtr draw,Vector2 at,float radius,Vector4 colour)
     {
-        draw.AddCircleFilled(at,radius,ImGui.GetColorU32(colour with{W=colour.W*0.17f}),48);
-        draw.AddCircle(at,radius,ImGui.GetColorU32(colour with{W=colour.W*0.6f}),48,1.5f);
+        draw.AddCircleFilled(at,radius,ImGui.GetColorU32(colour),48);
+        draw.AddCircle(at,radius,ImGui.GetColorU32(colour with{W=Math.Min(1,colour.W*2.5f+0.2f)}),48,2f);
     }
     // Gathering points of a map (cached catalogue + cached positions), rebuilt only when the map or a source changes.
     private (uint MapId,object? Catalog,object? Index,IReadOnlyList<MapLocalGatheringPoint> Points) mapGatheringCache=(0,null,null,[]);

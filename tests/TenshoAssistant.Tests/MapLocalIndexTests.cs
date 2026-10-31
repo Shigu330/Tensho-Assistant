@@ -6,7 +6,7 @@ internal static class MapLocalIndexTests
 {
     private static void Check(bool value,string message){if(!value)throw new Exception(message);}
     private static QuestEntry Quest(uint id,string name,string category,ushort level,QuestProgress progress)=>new(id,name,category,0,progress,null){Level=level};
-    // Rows from checkpoints/0.114.0-local-probe.log (quest 65539 on map 3, gathering base 153).
+    // Rows from docs/evidence/0.114.0-local-probe.log (quest 65539 on map 3, gathering base 153).
     private static MapLocalIndex Index()=>new([
         new(MapLocalKind.QuestIssuer,65539,3,-238f,-142.9f,0),new(MapLocalKind.QuestIssuer,65540,3,-233.9f,-171f,0),new(MapLocalKind.QuestIssuer,65537,2,49.8f,51.8f,0),
         new(MapLocalKind.QuestIssuer,65541,3,-1f,-1f,0),new(MapLocalKind.GatheringPoint,153,0,-115.9f,209.2f,53),
@@ -48,7 +48,7 @@ internal static class MapLocalIndexTests
         }),
         ("Map local index lists vistas and aether currents per map once each",()=>
         {
-            // Rows from checkpoints/0.127.0-sightseeing-probe.log (vista 2162688 on map 11, field current 2818053 on map 211).
+            // Rows from docs/evidence/0.127.0-sightseeing-probe.log (vista 2162688 on map 11, field current 2818053 on map 211).
             var index=new MapLocalIndex([new(MapLocalKind.Sightseeing,2162688,11,-83.4f,-171.2f,0,81001,"Quais du barracuda"),
                 new(MapLocalKind.Sightseeing,2162688,12,1,1,0,81001,"double"),new(MapLocalKind.AetherCurrent,2818053,211,402f,561.4f,0),
                 new(MapLocalKind.AetherCurrent,2818054,211,1f,1f,0,66000),new(MapLocalKind.AetherCurrent,2818055,0,1f,1f,0)]);

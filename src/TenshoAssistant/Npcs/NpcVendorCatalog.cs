@@ -31,13 +31,13 @@ public static class NpcShopLinks
     }
     /// <summary>
     /// Cost of a special shop entry: direct item ids are exact; encoded small ids stay raw. Probe 2026-10-30
-    /// (checkpoints/0.92.0-shop-currency-probe.log): scrip exchanges use type 16 id 4 for both crafter and gatherer scrips,
+    /// (docs/evidence/0.92.0-shop-currency-probe.log): scrip exchanges use type 16 id 4 for both crafter and gatherer scrips,
     /// so neither TomestonesItem nor any single table maps these ids; they are shown unresolved, never guessed.
     /// </summary>
     /// <summary>
     /// Talk scripts that open shops from compiled script code, never from a sheet. Each entry is backed by an in-game
     /// observation (2026-10-30: « Prêtresse à la robe noire », Wolves' Den, menu « Échanger des marques de loup » mêlée 1/2,
-    /// distance) and checkpoints/0.97.0-wolf-npc-probe.log: the only three wolf-mark shops (type 4) that no sheet references.
+    /// distance) and docs/evidence/0.97.0-wolf-npc-probe.log: the only three wolf-mark shops (type 4) that no sheet references.
     /// </summary>
     public static readonly IReadOnlyDictionary<uint,IReadOnlyList<uint>> ObservedTalkShops=new Dictionary<uint,IReadOnlyList<uint>>
     {
@@ -54,7 +54,7 @@ public static class NpcShopLinks
         return table is not null && table.TryGetValue(costId,out var coded) || DirectCodes.TryGetValue((encoding,costId),out coded)
             ? new(coded,amount):new(0,amount,costId);
     }
-    // Evidence (2026-10-30): in-game readings by the user and shop families of checkpoints/0.95.0-shop-currency-probe.log.
+    // Evidence (2026-10-30): in-game readings by the user and shop families of docs/evidence/0.95.0-shop-currency-probe.log.
     // CostType 2 = tomestones, CostType 3 = scrips, whatever UseCurrencyType. Tomestone codes follow the *current* patch
     // (old shops named astronomic/aphoristic now cost mathematics): revisit when the weekly tomestone changes.
     private static readonly IReadOnlyDictionary<uint,uint> Tomestones=new Dictionary<uint,uint>{[1]=28,[2]=48,[3]=49};          // poetics, mathematics, mnemonics

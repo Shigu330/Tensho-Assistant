@@ -216,7 +216,7 @@ internal sealed class NpcVendorLoader : IDisposable
             yield return ++count;
         }
         // Most vendors are placed by territory layouts, not the Level sheet: read planevent.lgb, one territory per step,
-        // only for vendors still without a position (probe: checkpoints/0.98.0-lgb-probe.log).
+        // only for vendors still without a position (probe: docs/evidence/0.98.0-lgb-probe.log).
         var missing=vendorShops.Keys.Where(id=>!locations.ContainsKey(id)).ToHashSet();
         if(missing.Count>0)
             foreach(var territory in data.GetExcelSheet<TerritoryType>())
@@ -247,7 +247,7 @@ internal sealed class NpcVendorLoader : IDisposable
         {names[id]=residents.TryGetRow(id,out var resident) ? resident.Singular.ExtractText():"";yield return ++count;}
     }
 
-    // Event NPCs are placed by these two layout kinds (probe: checkpoints/0.99.0-consigneur-probe.log).
+    // Event NPCs are placed by these two layout kinds (probe: docs/evidence/0.99.0-consigneur-probe.log).
     private static readonly string[] LayoutKinds=["planevent","planner"];
 
     // A missing, unexpected or unreadable layout only means no extra position for that territory.

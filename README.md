@@ -2,7 +2,7 @@
 
 TenshoAssistant is a Dalamud plugin for Final Fantasy XIV designed to centralize gameplay support tools into a single, coherent interface. The project currently exposes a multi-page assistant UI accessible through `/tensho`, bringing together inventory tracking, crafting workflows, gathering data, map navigation, quest context, market information, collections, macros, mini-games, and diagnostics.
 
-The repository shows a modular architecture with shared service layers, catalog stores, and a central window orchestrating multiple gameplay domains. The exact maturity and coverage of each feature area should be checked in the project documentation (`STATUS.md`, `GOAL.md`, `ROADMAP.md`, `PROJECT.md`, and `docs/`).
+The repository shows a modular architecture with shared service layers, catalog stores, and a central window orchestrating multiple gameplay domains. The exact maturity and coverage of each feature area are tracked in [docs/ai/STATUS.md](docs/ai/STATUS.md) and [CHANGELOG.md](CHANGELOG.md); the documentation map is [docs/README.md](docs/README.md).
 
 ## Overview
 
@@ -60,15 +60,16 @@ The implementation follows a service-driven structure:
 
 ### Gathering, maps, and weather
 
-- gathering catalog and point tracking
-- map and zone navigation
+- gathering catalog and point tracking, timed nodes with Eorzea windows
+- **Tensho map** replacing the game map (key M): game icons with per-map size and priority, quests and leves, FATEs, party,
+  gathering and fishing points, aether currents, sightseeing vistas, NPC vendors, flag, teleport with real gil cost, local lists by tab
 - weather and environmental context
 - gathering-related observation workflows
 
 ### Quests, collections, and progression
 
 - quest-related metadata and source tracking
-- collection tracking
+- collection tracking with « how to obtain » (vendors, exchanges, quests, achievements, crafting, Garland Tools and wiki as fallbacks)
 - duty and monster loot data
 - progression-oriented integration with game data
 
@@ -96,45 +97,18 @@ The implementation follows a service-driven structure:
 
 ```text
 .
-├── src/
-│   └── TenshoAssistant/
-│       ├── MainWindow.cs
-│       ├── Plugin.cs
-│       ├── Configuration.cs
-│       ├── Localization/
-│       ├── Inventory/
-│       ├── Items/
-│       ├── Craft/
-│       ├── Gathering/
-│       ├── Market/
-│       ├── Quests/
-│       ├── Collections/
-│       ├── Maps/
-│       ├── Macros/
-│       ├── MiniGames/
-│       ├── Duties/
-│       ├── Monsters/
-│       ├── Fashion/
-│       └── UI/
-├── tests/
-├── scripts/
-├── docs/
-├── Localization/
-├── README.md
-├── PROJECT.md
-├── ROADMAP.md
-├── STATUS.md
-├── GOAL.md
-├── RULES.md
-├── ARCHITECTURE.md
-├── REFERENCES.md
-├── TESTING.md
-├── global.json
-├── TenshoAssistant.sln
-├── LICENSE
-├── .gitignore
-├── .gitattributes
-└── ...
+├── src/TenshoAssistant/      plugin code (one folder per domain; *.Dalamud.cs = game access)
+├── tests/                    managed tests (pure logic)
+├── tools/                    read-only data probes (game sheets, APIs)
+├── scripts/Verify.ps1        build + tests + localization + package
+├── docs/                     documentation map: docs/README.md
+│   ├── ai/                   agent steering (rules, status, goal)
+│   ├── project/              scope, roadmap, architecture, testing, references, decisions
+│   ├── goals/                one document per delivered goal
+│   └── evidence/             probe outputs cited by the code
+├── Localization/README.md    translation guide
+├── README.md · CONTRIBUTING.md · CHANGELOG.md · CLAUDE.md · LICENSE
+└── global.json · TenshoAssistant.sln
 ```
 
 ## Build and verification
@@ -182,16 +156,19 @@ The project supports JSON-based localization. The rules are documented in `Local
 
 ## Documentation to consult
 
-For project status and feature maturity, use the following files as the source of truth:
+- [docs/README.md](docs/README.md) — map of all documents
+- [CONTRIBUTING.md](CONTRIBUTING.md) — build, tests, project rules, Dalamud publishing rules
+- [CHANGELOG.md](CHANGELOG.md) — what changed in each version
+- [docs/ai/STATUS.md](docs/ai/STATUS.md) — current status, what is validated in game, next action
+- [docs/project/ROADMAP.md](docs/project/ROADMAP.md) · [ARCHITECTURE.md](docs/project/ARCHITECTURE.md) · [TESTING.md](docs/project/TESTING.md)
+- [Localization/README.md](Localization/README.md) — localization workflow
 
-- `PROJECT.md` — project intent and scope
-- `ROADMAP.md` — roadmap and feature priorities
-- `STATUS.md` — current project status and known coverage
-- `GOAL.md` — current objective and validation target
-- `RULES.md` — development rules and constraints
-- `ARCHITECTURE.md` — architecture overview
-- `TESTING.md` — verification and testing guidance
-- `Localization/README.md` — localization workflow
+## AI usage disclosure
+
+This plugin is developed with an AI coding agent (Claude, « Auto » level) under the direction of its author, who defines the features and
+tests every version in game. Data links are proven with read-only probes ([docs/evidence/](docs/evidence/)). See
+[CONTRIBUTING.md](CONTRIBUTING.md#publication-dalamud) for the Dalamud AI policy. The plugin icon (`src/TenshoAssistant/images/icon.png`)
+was also generated by the AI agent.
 
 ## Credits
 
@@ -202,7 +179,10 @@ This project depends on and integrates with the following tools and ecosystems:
 - Dalamud.NET SDK and Dalamud API bindings used by the project
 - .NET SDK and runtime used to build and validate the plugin
 - PowerShell scripts used for project verification and build automation
-- community documentation, references, and game data sources used for feature implementation and validation
+- community documentation, references, and game data sources used for feature implementation and validation:
+  [Garland Tools](https://www.garlandtools.org/) (item sources), the [FFXIV Console Games Wiki](https://ffxiv.consolegameswiki.com/)
+  (monster drops, sightseeing log, acquisition), [Universalis](https://universalis.app/) (market prices)
+- reference plugins studied without copying code: Mappy, SortaKinda (AGPL) and the other reference plugins listed in `docs/project/ROADMAP.md`
 - the localization and translation workflow used for UI strings and language files
 
 This project is an original plugin implementation, but it relies on these ecosystem components and references for its operation, testing, and validation.
@@ -226,7 +206,7 @@ Version française / French version
 
 TenshoAssistant est un plugin Dalamud pour Final Fantasy XIV conçu pour regrouper dans une interface unique un ensemble d’outils d’assistance au gameplay : inventaire, artisanat, récolte, cartes, quêtes, collections, marché, macros, mini-jeux et diagnostics.
 
-Le dépôt montre une architecture modulaire orientée services, avec des catalogues partagés, un point d’entrée principal et une interface multi-pages qui coordonne plusieurs domaines fonctionnels. Le périmètre exact et le niveau de maturité des fonctionnalités doivent être vérifiés dans la documentation du projet (`STATUS.md`, `GOAL.md`, `ROADMAP.md`, `PROJECT.md` et `docs/`).
+Le dépôt montre une architecture modulaire orientée services, avec des catalogues partagés, un point d’entrée principal et une interface multi-pages qui coordonne plusieurs domaines fonctionnels. Le niveau de maturité de chaque fonction est suivi dans [docs/ai/STATUS.md](docs/ai/STATUS.md) et [CHANGELOG.md](CHANGELOG.md) ; carte des documents : [docs/README.md](docs/README.md).
 
 ## Vue d’ensemble
 
@@ -282,7 +262,9 @@ L’implémentation suit une logique orientée services :
 
 ### Récolte, cartes et météo
 
-- points de récolte et navigation de zone
+- points de récolte et navigation de zone, points à horaire
+- **carte Tensho** qui remplace la carte du jeu (touche M) : icônes du jeu (taille, priorité, par carte), quêtes et mandats, ALEA, groupe,
+  points de récolte et de pêche, courants éthérés, repères d'exploration, vendeurs, drapeau, téléportation au coût réel, listes par onglet
 - cartes et contexte géographique
 - données météo et conditions de récolte
 
@@ -314,48 +296,7 @@ L’implémentation suit une logique orientée services :
 
 ## Structure du dépôt
 
-```text
-.
-├── src/
-│   └── TenshoAssistant/
-│       ├── MainWindow.cs
-│       ├── Plugin.cs
-│       ├── Configuration.cs
-│       ├── Localization/
-│       ├── Inventory/
-│       ├── Items/
-│       ├── Craft/
-│       ├── Gathering/
-│       ├── Market/
-│       ├── Quests/
-│       ├── Collections/
-│       ├── Maps/
-│       ├── Macros/
-│       ├── MiniGames/
-│       ├── Duties/
-│       ├── Monsters/
-│       ├── Fashion/
-│       └── UI/
-├── tests/
-├── scripts/
-├── docs/
-├── Localization/
-├── README.md
-├── PROJECT.md
-├── ROADMAP.md
-├── STATUS.md
-├── GOAL.md
-├── RULES.md
-├── ARCHITECTURE.md
-├── REFERENCES.md
-├── TESTING.md
-├── global.json
-├── TenshoAssistant.sln
-├── LICENSE
-├── .gitignore
-├── .gitattributes
-└── ...
-```
+Voir la structure anglaise ci-dessus et la carte des documents [docs/README.md](docs/README.md).
 
 ## Build et validation
 
@@ -400,14 +341,16 @@ La localisation est gérée via des fichiers JSON et documentée dans `Localizat
 
 ## Documentation utile
 
-- `PROJECT.md` : périmètre et présentation du projet
-- `ROADMAP.md` : priorités et planification
-- `STATUS.md` : état courant du développement
-- `GOAL.md` : objectif actif et validation attendue
-- `RULES.md` : contraintes de travail et règles de conception
-- `ARCHITECTURE.md` : vue d’architecture
-- `TESTING.md` : vérifications et procédures
-- `Localization/README.md` : contribution à la localisation
+- [docs/README.md](docs/README.md) : carte de tous les documents
+- [CONTRIBUTING.md](CONTRIBUTING.md) : compiler, tester, règles du projet, publication Dalamud
+- [CHANGELOG.md](CHANGELOG.md) : changements par version
+- [docs/ai/STATUS.md](docs/ai/STATUS.md) : état, validé en jeu, prochaine action
+- [Localization/README.md](Localization/README.md) : contribution à la localisation
+
+## Usage de l'IA
+
+Ce plugin est développé avec un agent IA (Claude, niveau « Auto ») sous la direction de son auteur, qui définit les fonctions et teste chaque
+version en jeu. Les liens de données sont prouvés par des sondes en lecture seule ([docs/evidence/](docs/evidence/)). L'icône du plugin a aussi été générée par l'agent IA.
 
 ## Crédits
 
@@ -417,7 +360,8 @@ Ce projet dépend des outils et écosystèmes suivants :
 - Dalamud, le framework de plugin utilisé pour exécuter l’addon en jeu
 - SDK .NET et runtime .NET utilisés pour compiler et valider le plugin
 - PowerShell, utilisé dans les scripts de vérification et de build
-- données communautaires, références et documentation de jeu utilisées pour le développement et la validation des fonctionnalités
+- données communautaires : [Garland Tools](https://www.garlandtools.org/), le [wiki FFXIV](https://ffxiv.consolegameswiki.com/), [Universalis](https://universalis.app/)
+- plugins de référence étudiés sans copie de code : Mappy, SortaKinda (AGPL) et les autres références de `docs/project/ROADMAP.md`
 - le workflow de localisation et les fichiers de langue utilisés pour les libellés d’interface
 
 Ce projet est une implémentation originale, mais il s’appuie sur ces composants et références de l’écosystème pour son fonctionnement et sa validation.

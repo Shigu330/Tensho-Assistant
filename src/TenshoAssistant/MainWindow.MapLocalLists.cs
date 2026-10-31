@@ -69,6 +69,7 @@ internal sealed partial class MainWindow
         {
             var world=new Vector3(item.Position.X,0,item.Position.Z);
             var status=item.Quest.Progress switch{QuestProgress.Active=>localization.Get("MapLocal.Active"),QuestProgress.Complete=>localization.Get("MapLocal.Complete"),_=>""};
+            DrawSmallGameIcon(item.Position.Data);
             if(ImGui.Selectable($"{localization.Format("MapLocal.Level",item.Quest.Level)}  {item.Quest.Name}  {status}##Quest{item.Quest.Id}"))FlagAt(map,world);
             ToolMenu($"QuestTool{item.Quest.Id}","MapLocal.OpenQuestTool",()=>{SelectQuest(item.Quest.Id);questShowDetails=true;page=Page.Quests;});
             if(ImGui.IsItemHovered())ImGui.SetTooltip(CoordinateText(map,world)+"\n"+localization.Get("MapLocal.ClickFlag"));
@@ -104,6 +105,7 @@ internal sealed partial class MainWindow
         {
             var names=string.Join(", ",point.Items.Select(id=>items?.Find(id)?.Name ?? $"#{id}"));
             var label=$"{localization.Format("MapLocal.Level",point.Level)}  {point.Place}{(point.Hidden ? " "+localization.Get("MapLocal.Hidden"):"")}";
+            DrawSmallGameIcon(point.Icon);
             if(point.Position is { } position)
             {
                 var world=new Vector3(position.X,0,position.Z);
@@ -179,11 +181,14 @@ internal sealed partial class MainWindow
     {
         if(npcVendors?.State.Catalog is null){ImGui.TextDisabled(localization.Get("MapLocal.VendorsLoading"));return;}
         var rows=MapVendors(map);
+        var vendorMarkers=VendorCandidates(mapMarkers?.For(map.MarkerRange) ?? []);
         if(rows.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
         ImGui.TextDisabled(localization.Format("MapLocal.VendorCount",rows.Count));
         foreach(var (vendor,spot) in rows.OrderBy(row=>row.Vendor.Name,StringComparer.CurrentCultureIgnoreCase))
         {
             var name=vendor.Name.Length>0 ? vendor.Name:localization.Get("MapLocal.UnnamedVendor");
+            // Same icon as on the map: the game's icon the vendor stands by (MAP-017), else the icon of its kind.
+            DrawSmallGameIcon(VendorMarker(vendorMarkers,MapProjection.PixelFromWorld(new Vector3(spot.WorldX,0,spot.WorldZ),map))?.Icon ?? VendorIconOf(vendor));
             if(ImGui.Selectable($"{name}  (X {spot.X:0.0}  Y {spot.Y:0.0})##Vendor{vendor.NpcId}/{spot.X}/{spot.Y}")){PlaceFlagFromMapView(map,spot.X,spot.Y);ImGui.CloseCurrentPopup();}
             ToolMenu($"VendorTool{vendor.NpcId}/{spot.X}/{spot.Y}","MapLocal.OpenVendorTool",()=>{npcVendorFocus=vendor.NpcId;page=Page.NpcVendors;});
             if(ImGui.IsItemHovered())ImGui.SetTooltip(VendorLabel(vendor)+"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));

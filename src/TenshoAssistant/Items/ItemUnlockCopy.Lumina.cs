@@ -3,7 +3,7 @@ using Lumina.Excel.Sheets;
 namespace TenshoAssistant.Items;
 
 // Collection unlocked by an item, from its ItemAction: action 1322 teaches a mount, 853 a minion; Data[0] is the Mount or
-// Companion row (verified on « Sifflet chocobo » → mount 1 and « Bombino » → minion 1, checkpoints/0.141.0-itemaction-probe.log).
+// Companion row (verified on « Sifflet chocobo » → mount 1 and « Bombino » → minion 1, docs/evidence/0.141.0-itemaction-probe.log).
 public static class ItemUnlockCopy
 {
     private const uint MountAction=1322,CompanionAction=853;

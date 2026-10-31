@@ -31,6 +31,9 @@ if(Environment.GetEnvironmentVariable("PROBE_LOCAL") is { Length:>0 })
         Console.WriteLine($"FISH {spot.RowId} x={spot.X} z={spot.Z} r={spot.Radius} map {map.RowId} size {map.SizeFactor} offset {map.OffsetX}/{map.OffsetY} "
             +$"asWorld=({World(spot.X,map.OffsetX):0.00},{World(spot.Z,map.OffsetY):0.00}) asPixel=({Pixel(spot.X):0.00},{Pixel(spot.Z):0.00})");
     }
+    // 0.151: quest map icon kind (EventIconType) for quests seen in game (65560 → 71021, 65677 → 71151).
+    foreach(var quest in data.Excel.GetSheet<Quest>().Where(row=>row.RowId is 65560 or 65677 or 65539))
+        if(quest.EventIconType.IsValid){var e=quest.EventIconType.Value;Console.WriteLine($"ICONTYPE quest {quest.RowId} type {quest.EventIconType.RowId} mapAvail {e.MapIconAvailable} npcAvail {e.NpcIconAvailable} range {e.IconRange} genre {quest.JournalGenre.RowId} genreIcon {(quest.JournalGenre.IsValid ? quest.JournalGenre.Value.Icon:0)}");}
     // 0.146: which achievements reward these mount items (Achievement.Item).
     foreach(var achievement in data.Excel.GetSheet<Achievement>().Where(row=>row.Item.RowId is 41498 or 40382 or 39486))
         Console.WriteLine($"ACHIEVEMENT {achievement.RowId} '{achievement.Name.ExtractText()}' item {achievement.Item.RowId}");
@@ -124,6 +127,72 @@ foreach(var row in nested)foreach(var sub in row)if(referencing.Contains(sub.Nes
 foreach(var npc in data.Excel.GetSheet<ENpcBase>())foreach(var value in npc.ENpcData)if(nestTalks.Contains(value.RowId))
     Console.WriteLine($"NESTNPC {npc.RowId} '{(residents.TryGetRow(npc.RowId,out var who) ? who.Singular.ExtractText():"")}' via {value.RowId}");
 // Overview maps (world, regions) and how their markers link to other maps.
+// PROBE_MARKERS (MAP-017): for NPCs named like the value, their data links, Level positions and the game's map markers around
+// them (icon, label, texture-pixel distance) — what the map should show for exchanges such as Rowena's.
+if(Environment.GetEnvironmentVariable("PROBE_MARKERS") is { Length:>0 } markerNpc)
+{
+    var npcBases=data.Excel.GetSheet<ENpcBase>();var levels=data.Excel.GetSheet<Level>();var markerRows=data.Excel.GetSubrowSheet<MapMarker>();
+    var linkSheets=new (string Name,Func<uint,bool> Has)[]
+    {
+        ("GilShop",id=>data.Excel.GetSheet<GilShop>().HasRow(id)),("SpecialShop",id=>data.Excel.GetSheet<SpecialShop>().HasRow(id)),
+        ("CollectablesShop",id=>data.Excel.GetSheet<CollectablesShop>().HasRow(id)),("InclusionShop",id=>data.Excel.GetSheet<InclusionShop>().HasRow(id)),
+        ("PreHandler",id=>data.Excel.GetSheet<PreHandler>().HasRow(id)),("TopicSelect",id=>data.Excel.GetSheet<TopicSelect>().HasRow(id)),
+        ("CustomTalk",id=>data.Excel.GetSheet<CustomTalk>().HasRow(id)),("GuildleveAssignment",id=>data.Excel.GetSheet<GuildleveAssignment>().HasRow(id)),
+        ("SatisfactionNpc",id=>data.Excel.GetSheet<SatisfactionNpc>().HasRow(id)),
+    };
+    // Census: NPCs placed by the Level sheet with a direct shop-like link, and the icon of the game marker within 8 pixels.
+    if(markerNpc=="*")
+    {
+        var shopLike=linkSheets.Where(sheet=>sheet.Name is "GilShop" or "SpecialShop" or "InclusionShop" or "PreHandler" or "TopicSelect" or "CollectablesShop").ToArray();
+        var census=new Dictionary<uint,List<string>>();var lonely=0;
+        foreach(var level in levels.Where(level=>level.Type==8 && level.Map.RowId!=0 && level.Map.IsValid))
+        {
+            if(!npcBases.TryGetRow(level.Object.RowId,out var npc) || !npc.ENpcData.Any(value=>value.RowId!=0 && shopLike.Any(sheet=>sheet.Has(value.RowId))))continue;
+            var map=level.Map.Value;var scale=map.SizeFactor/100f;
+            var pixel=new System.Numerics.Vector2((level.X+map.OffsetX)*scale+1024f,(level.Z+map.OffsetY)*scale+1024f);
+            var near=markerRows.TryGetRow(map.MapMarkerRange,out var rows)
+                ? rows.Where(row=>row.Icon!=0).Select(row=>(row.Icon,distance:System.Numerics.Vector2.Distance(new(row.X,row.Y),pixel))).Where(pair=>pair.distance<=8).OrderBy(pair=>pair.distance).Select(pair=>pair.Icon).FirstOrDefault():0u;
+            if(near==0){lonely++;continue;}
+            if(!census.TryGetValue(near,out var names))census[near]=names=[];
+            names.Add(data.Excel.GetSheet<ENpcResident>().TryGetRow(level.Object.RowId,out var who) ? who.Singular.ExtractText():level.Object.RowId.ToString());
+        }
+        foreach(var (icon,names) in census.OrderByDescending(pair=>pair.Value.Count))
+            Console.WriteLine($"CENSUS icon {icon} count {names.Count} sample {string.Join(" | ",names.Distinct().Take(5))}");
+        Console.WriteLine($"CENSUS withoutMarker {lonely}");
+        return;
+    }
+    foreach(var resident in data.Excel.GetSheet<ENpcResident>().Where(row=>row.Singular.ExtractText().Contains(markerNpc,StringComparison.OrdinalIgnoreCase)
+        || row.Title.ExtractText().Contains(markerNpc,StringComparison.OrdinalIgnoreCase)))
+    {
+        if(!npcBases.TryGetRow(resident.RowId,out var npc))continue;
+        var links=npc.ENpcData.Select(value=>value.RowId).Where(id=>id!=0).Select(id=>$"{id}:{string.Join("/",linkSheets.Where(sheet=>sheet.Has(id)).Select(sheet=>sheet.Name))}");
+        Console.WriteLine($"MNPC {resident.RowId} '{resident.Singular.ExtractText()}' title='{resident.Title.ExtractText()}' links={string.Join(",",links)}");
+        foreach(var id in npc.ENpcData.Select(value=>value.RowId).Where(id=>data.Excel.GetSheet<PreHandler>().HasRow(id)))
+        {
+            var target=data.Excel.GetSheet<PreHandler>().GetRow(id).Target.RowId;
+            Console.WriteLine($"  PREHANDLER {id} target {target}:{string.Join("/",linkSheets.Where(sheet=>sheet.Has(target)).Select(sheet=>sheet.Name))}"
+                +(data.Excel.GetSheet<CollectablesShop>().TryGetRow(target,out var collectable) ? $" collectables '{collectable.Name.ExtractText()}'":""));
+        }
+        // Positions: Level rows; NPCs placed only by layouts take PROBE_MARKERS_AT « map:x,y;… » (map coordinates printed by PROBE_LGB).
+        var spots=levels.Where(level=>level.Type==8 && level.Object.RowId==resident.RowId && level.Map.RowId!=0)
+            .Select(level=>(Map:level.Map.Value,Pixel:new System.Numerics.Vector2((level.X+level.Map.Value.OffsetX)*level.Map.Value.SizeFactor/100f+1024f,(level.Z+level.Map.Value.OffsetY)*level.Map.Value.SizeFactor/100f+1024f))).ToList();
+        if(spots.Count==0)
+            foreach(var given in (Environment.GetEnvironmentVariable("PROBE_MARKERS_AT") ?? "").Split(';',StringSplitOptions.RemoveEmptyEntries))
+            {
+                var parts=given.Split(':',',');var map=data.Excel.GetSheet<Map>().GetRow(uint.Parse(parts[0]));var scale=map.SizeFactor/100f;
+                float Pixel(string coordinate)=>(float.Parse(coordinate,System.Globalization.CultureInfo.InvariantCulture)-1f)*2048f*scale/41f;
+                spots.Add((map,new System.Numerics.Vector2(Pixel(parts[1]),Pixel(parts[2]))));
+            }
+        foreach(var (map,pixel) in spots.Take(8))
+        {
+            Console.WriteLine($"  SPOT map {map.RowId} '{map.PlaceName.Value.Name.ExtractText()}' pixel {pixel.X:0},{pixel.Y:0}");
+            if(!markerRows.TryGetRow(map.MapMarkerRange,out var rows))continue;
+            foreach(var row in rows.Select(row=>(row,distance:System.Numerics.Vector2.Distance(new(row.X,row.Y),pixel))).Where(pair=>pair.distance<=48).OrderBy(pair=>pair.distance))
+                Console.WriteLine($"    MARKER icon {row.row.Icon} type {row.row.DataType} key {row.row.DataKey.RowId} label '{row.row.PlaceNameSubtext.Value.Name.ExtractText()}' at {row.row.X},{row.row.Y} distance {row.distance:0.0}");
+        }
+    }
+    return;
+}
 if(Environment.GetEnvironmentVariable("PROBE_MAPS") is { Length:>0 })
 {
     var mapSheet=data.Excel.GetSheet<Map>();var markers=data.Excel.GetSubrowSheet<MapMarker>();

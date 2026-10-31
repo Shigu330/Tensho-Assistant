@@ -1,0 +1,30 @@
+# MAP-017 (2026-10-31) PROBE_MARKERS='*' : icône du marqueur du jeu à moins de 8 px des PNJ marchands placés par la feuille Level
+CENSUS icon 60935 count 103 sample responsable de la Chasse | Auriana | vendeur sylphe | vendeur amalj'aa | marchand
+CENSUS icon 60412 count 99 sample Ilorie | Admiranda | O'rhoyod | Alaric | Albgast
+CENSUS icon 60434 count 15 sample quincaillier | quincaillière | bazardeur | pacotilleur mog | Jasfort
+CENSUS icon 60768 count 6 sample officier du logement | quincaillier
+CENSUS icon 60442 count 2 sample vendeuse des Feux de la Mort | vendeuse suspecte
+CENSUS icon 60983 count 1 sample Latool Ja
+CENSUS icon 63921 count 1 sample guide de la résistance
+CENSUS icon 63919 count 1 sample commise de l'Agora
+CENSUS icon 60927 count 1 sample Peyapewi
+CENSUS icon 63997 count 1 sample marchand du cornago
+CENSUS withoutMarker 132
+# PROBE_MARKERS='commise de Rowena' PROBE_MARKERS_AT (positions de planevent.lgb via PROBE_LGB, symbole 63919 = 'Commise aux objets de classe/job', docs/evidence/0.139.0-symbols-probe.log)
+MNPC 1033775 'commise de Rowena' title='Objets de classe/job' links=1704084:,3539041:PreHandler
+  PREHANDLER 3539041 target 3801090:InclusionShop
+  SPOT map 12 'Limsa Lominsa - L'Entrepont' pixel 809,1019
+    MARKER icon 63919 type 0 key 0 label '' at 809,1014 distance 5,0
+    MARKER icon 60570 type 0 key 0 label '' at 783,1045 distance 36,9
+  SPOT map 13 'Ul'dah - Faubourg de Nald' pixel 809,729
+    MARKER icon 63919 type 0 key 0 label '' at 813,732 distance 4,7
+  SPOT map 2 'Nouvelle Gridania' pixel 1099,1139
+    MARKER icon 63919 type 0 key 0 label '' at 1098,1135 distance 4,0
+    MARKER icon 60311 type 0 key 0 label 'Relais à chocobos' at 1085,1160 distance 25,3
+    MARKER icon 63922 type 0 key 0 label '' at 1140,1118 distance 46,1
+  SPOT map 218 'Ishgard - L'Assise' pixel 959,1079
+    MARKER icon 63919 type 0 key 0 label '' at 957,1080 distance 2,3
+  SPOT map 370 'Kugane' pixel 1129,979
+    MARKER icon 63919 type 0 key 0 label '' at 1126,983 distance 4,9
+    MARKER icon 60453 type 3 key 111 label 'Place de l'Éthérite' at 1118,950 distance 31,0
+MNPC 1033776 'commise de Rowena' title='Objets de classe/job' links=1704084:,3539041:PreHandler

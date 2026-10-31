@@ -29,6 +29,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly IPluginLog log;
     private readonly LocalizationManager localization;
     private readonly MainWindow mainWindow;
+    private MapViewWindow? mapWindow;
     private readonly WindowSystem windows = new("TenshoAssistant");
     private readonly InventoryService inventoryService = new();
     private readonly InventoryVisualSortService visualSort=new();
@@ -124,7 +125,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>{},wikiVistas.Dispose);
             mainWindow.ConfigureWikiVistas(wikiVistas);
             Maps.NativeMapReplacer? mapReplacer=null;
-            registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,()=>configuration.MapView,mainWindow.ShowMapFromGame,log),()=>mapReplacer?.Dispose());
+            registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,()=>configuration.MapView,mainWindow.ShowMapFromGame,()=>mainWindow.MapViewOpen,mainWindow.CloseMapFromGame,log),()=>mapReplacer?.Dispose());
             mainWindow.ConfigureGameMapOpener(()=>mapReplacer?.OpenGameMap());
             var npcVendors=new Npcs.NpcVendorService();
             Npcs.NpcVendorLoader? npcLoader=null;
@@ -192,6 +193,7 @@ public sealed class Plugin : IDalamudPlugin
             triadObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Triad") == true);
             macroObservations.SetEnabled(configuration.Observations?.GetValueOrDefault("Macros") == true);
             registrations.Register(() => windows.AddWindow(mainWindow), () => windows.RemoveWindow(mainWindow));
+            registrations.Register(() => windows.AddWindow(mapWindow = new MapViewWindow(mainWindow)), () => { if (mapWindow is not null) windows.RemoveWindow(mapWindow); });
             registrations.Register(() =>
             {
                 commandInfo=new CommandInfo(OnCommand){HelpMessage=localization.Get("Plugin.CommandHelp")};
@@ -228,11 +230,12 @@ public sealed class Plugin : IDalamudPlugin
         {commandInfo.HelpMessage=localization.Get("Plugin.CommandHelp");commandLocalizationRevision=localization.Revision;}
         if(itemContextMenu?.Take() is { } request)mainWindow.OpenItemContext(request);
         mainWindow.ApplyTheme();
+        // The map's open state lives in MainWindow (game map key M, journal); its window follows it.
+        if(mapWindow is not null)mapWindow.IsOpen=mainWindow.MapViewOpen;
         windows.Draw();
         bankOverlay.Draw();
         mainWindow.DrawCraftLogHelper();
         mainWindow.DrawItemHover();
-        mainWindow.DrawMapView();
     }
 
     public void Dispose()

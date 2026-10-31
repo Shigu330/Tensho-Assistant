@@ -4,8 +4,8 @@ using Lumina.Excel.Sheets;
 namespace TenshoAssistant.Maps;
 
 // Fixed map icon in texture pixels (MapMarker X/Y), with its game icon and optional label. Icon 0 = a place name drawn as text.
-// LinkMapId: on region and world maps, DataType 1 markers open that map (probe: checkpoints/0.103.0-maps-probe.log).
-// AetheryteId: DataType 3 markers are aetherytes (DataKey = Aetheryte row; probe checkpoints/0.107.0-aetheryte-probe.log).
+// LinkMapId: on region and world maps, DataType 1 markers open that map (probe: docs/evidence/0.103.0-maps-probe.log).
+// AetheryteId: DataType 3 markers are aetherytes (DataKey = Aetheryte row; probe docs/evidence/0.107.0-aetheryte-probe.log).
 public sealed record MapIconMarker(float X,float Y,uint Icon,string Label,uint LinkMapId=0,uint AetheryteId=0);
 
 /// <summary>

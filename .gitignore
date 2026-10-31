@@ -8,5 +8,5 @@
 artifacts/
 TestResults/
 
-# Checkpoint source archives: git history now holds every version; the zips stay on disk only.
-checkpoints/*.zip
+# Local working checkpoints (logs, notes, source zips): git history, CHANGELOG.md and docs/evidence/ replace them.
+checkpoints/

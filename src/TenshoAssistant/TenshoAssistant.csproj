@@ -1,6 +1,6 @@
 <Project Sdk="Dalamud.NET.Sdk">
   <PropertyGroup>
-    <Version>0.149.0</Version>
+    <Version>0.157.0</Version>
     <AssemblyName>TenshoAssistant</AssemblyName>
     <RootNamespace>TenshoAssistant</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,5 +11,7 @@
   <ItemGroup>
     <None Include="Localization\Languages\*.json" CopyToOutputDirectory="PreserveNewest" />
     <EmbeddedResource Include="Localization\Languages\*.json" />
+    <!-- Plugin icon shown by Dalamud (images/icon.png next to the DLL); generated with AI, declared in the manifest description. -->
+    <None Include="images\icon.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

@@ -8,7 +8,7 @@ public sealed record MapDefinition(uint MapId, uint TerritoryId, string Region, 
     int MenuCategory = 0, int MenuPriority = 0);
 
 /// <summary>
-/// Zone menu of the game map (probe checkpoints/0.105.0-zones-probe.log): maps sharing the region map's PriorityCategoryUI,
+/// Zone menu of the game map (probe docs/evidence/0.105.0-zones-probe.log): maps sharing the region map's PriorityCategoryUI,
 /// ordered by PriorityUI, one entry per priority; maps of one priority are the floors of that entry, ordered by MapIndex.
 /// </summary>
 public static class MapMenus
@@ -81,6 +81,9 @@ public sealed record GameMapRequest(uint Selected, uint Requested, uint Territor
     public uint Resolve(MapCatalog catalog)
     {
         ArgumentNullException.ThrowIfNull(catalog);
+        // 0.151: a game target (journal) lives on the requested map, which may differ from the selected zone when the quest
+        // is behind a zone-change NPC (Solution Nine → Nine Sentinel, user capture).
+        if (Target is not null && Requested != 0 && catalog.Find(Requested) is not null) return Requested;
         if (catalog.Find(Selected) is not null) return Selected == Current ? 0 : Selected;
         if (catalog.Find(Requested) is not null) return Requested;
         if (Territory != 0 && catalog.Entries.Where(map => map.TerritoryId == Territory).OrderBy(map => map.MapIndex).FirstOrDefault() is { } zone) return zone.MapId;
@@ -95,4 +98,30 @@ public sealed class MapCatalogService
     internal void Publish(MapCatalog catalog) => Interlocked.Exchange(ref state, new(catalog, 0, 0, null));
     internal void Fail(Exception error) => Interlocked.Exchange(ref state, new(null, 0, 0, error.Message));
     internal void Clear() => Interlocked.Exchange(ref state, new(null, 0, 0, null));
+}
+
+/// <summary>
+/// Game map icon a vendor NPC stands by (MAP-017, docs/evidence/0.155.0-vendor-markers-probe.log): shop icons (Échoppe, Échangeur,
+/// Marchand) within 16 texture pixels, as since 0.140; service icons seen beside vendors (Réparations, Officier du logement, Mage bleu,
+/// Guide, Commise aux objets de classe/job, Commandes spéciales, Dresseur) within 8 pixels and only when the marker has no place label.
+/// </summary>
+public static class MapVendorIcons
+{
+    public static readonly FrozenSet<uint> Shops = new uint[] { 60412, 60935, 63851 }.ToFrozenSet();
+    public static readonly FrozenSet<uint> Services = new uint[] { 60434, 60768, 60983, 63921, 63919, 60927, 63997 }.ToFrozenSet();
+    public const float ShopRadius = 16, ServiceRadius = 8;
+
+    /// <summary>Index of the nearest marker the vendor at <paramref name="pixel"/> belongs to, or -1.</summary>
+    public static int Nearest(IReadOnlyList<(float X, float Y, uint Icon, bool Labelled)> markers, System.Numerics.Vector2 pixel)
+    {
+        var best = -1; var bestDistance = float.MaxValue;
+        for (var index = 0; index < markers.Count; index++)
+        {
+            var marker = markers[index];
+            var radius = Shops.Contains(marker.Icon) ? ShopRadius : Services.Contains(marker.Icon) && !marker.Labelled ? ServiceRadius : 0;
+            var distance = System.Numerics.Vector2.Distance(new(marker.X, marker.Y), pixel);
+            if (radius > 0 && distance <= radius && distance < bestDistance) { best = index; bestDistance = distance; }
+        }
+        return best;
+    }
 }

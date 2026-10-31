@@ -7,7 +7,7 @@ namespace TenshoAssistant.Maps;
 /// <summary>
 /// Copies quest-giver and gathering-point positions in bounded framework batches (2 ms per tick), then indexes on a worker.
 /// The rows are kept in DataCache (family catalog-map-positions) until the client data, the language or the copy shape changes,
-/// like the item, recipe, gathering and NPC vendor catalogues (docs/CATALOG-CACHE-012.md).
+/// like the item, recipe, gathering and NPC vendor catalogues (docs/goals/CATALOG-CACHE-012.md).
 /// </summary>
 internal sealed class MapLocalIndexLoader : IDisposable
 {
@@ -115,7 +115,10 @@ internal sealed class MapLocalIndexLoader : IDisposable
             if(quest.IssuerLocation.RowId!=0 && quest.IssuerLocation.IsValid)
             {
                 var level=quest.IssuerLocation.Value;
-                if(level.Map.RowId!=0){var giver=new MapLocalPosition(MapLocalKind.QuestIssuer,quest.RowId,level.Map.RowId,level.X,level.Z,level.Radius);rows.Add(giver);givers[quest.RowId]=giver;}
+                // Data = map icon of the quest kind: EventIconType.MapIconAvailable + 1 (65560 → 71021 as seen in game;
+                // docs/evidence/0.151.0-questicon-probe.log — other states of the same kind use other offsets).
+                var kindIcon=quest.EventIconType.RowId!=0 && quest.EventIconType.IsValid && quest.EventIconType.Value.MapIconAvailable!=0 ? quest.EventIconType.Value.MapIconAvailable+1:0u;
+                if(level.Map.RowId!=0){var giver=new MapLocalPosition(MapLocalKind.QuestIssuer,quest.RowId,level.Map.RowId,level.X,level.Z,level.Radius,kindIcon);rows.Add(giver);givers[quest.RowId]=giver;}
             }
             yield return ++count;
         }

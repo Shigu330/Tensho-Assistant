@@ -32,6 +32,19 @@ public sealed class MapViewSettings
     public bool HideCollected { get; set; }
     // 0.137: NPC vendors of the cached vendor catalogue (dense, off by default).
     public bool ShowVendors { get; set; }
+    // 0.151: areas per kind — shown or not, and colour (RGBA, the fill uses the alpha, the outline is stronger).
+    // 0.153: how much icons and names follow the zoom — 0 = fixed size on screen (like the game), 1 = proportional to the map.
+    public float ZoomFollow { get; set; } = 0.5f;
+    public static float ClampFollow(float value)=>float.IsFinite(value) ? Math.Clamp(value,0f,1f):0.5f;
+    /// <summary>Zoom factor applied to icons and names: zoom^follow (1 at 100 % whatever the setting).</summary>
+    public float ZoomFactor(float zoom)=>MathF.Pow(Math.Max(0.01f,zoom),ClampFollow(ZoomFollow));
+    public bool ShowEventAreas { get; set; } = true;
+    public bool ShowFateAreas { get; set; } = true;
+    public bool ShowGatheringAreas { get; set; } = true;
+    public System.Numerics.Vector4 QuestAreaColor { get; set; } = new(0.95f,0.70f,0.25f,0.25f);
+    public System.Numerics.Vector4 EventAreaColor { get; set; } = new(0.30f,0.75f,1.00f,0.30f);
+    public System.Numerics.Vector4 FateAreaColor { get; set; } = new(0.75f,0.45f,0.95f,0.25f);
+    public System.Numerics.Vector4 GatheringAreaColor { get; set; } = new(0.55f,0.90f,0.55f,0.20f);
     // 0.111: size of each game icon (key = icon id) on top of IconScale; 0 hides that icon, absent keeps 100 %.
     public Dictionary<uint,float> IconSizes { get; set; } = [];
     public float SizeOf(uint icon)=>IconSizes is not null && IconSizes.TryGetValue(icon,out var value) ? CleanSize(value):1f;

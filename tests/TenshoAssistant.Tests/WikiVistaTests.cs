@@ -35,7 +35,7 @@ internal static class WikiVistaTests
         ("Wiki vistas match game vistas by coordinates and ARR number, never by guess",()=>
         {
             var rows=WikiVistaParser.Parse(Sample,DateTimeOffset.UnixEpoch).Rows;
-            // Game coordinates from checkpoints/0.129.0-sightseeing-probe.log (#001 9.6/7.8, #002 7.1/15.1, #003 20.3/19.1).
+            // Game coordinates from docs/evidence/0.129.0-sightseeing-probe.log (#001 9.6/7.8, #002 7.1/15.1, #003 20.3/19.1).
             var matched=WikiVistaParser.Match(rows,[(2162688u,0,9.6f,7.8f),(2162689u,1,7.1f,15.1f),(2162690u,2,20.3f,19.1f),(2162800u,112,32.1f,35.9f)]);
             Check(matched[2162688].Number==1 && matched[2162690].Weathers[0]=="Rain" && matched[2162800].Section==1,"ARR by number + coordinates, later by coordinates");
             var shifted=WikiVistaParser.Match(rows,[(2162688u,5,9.6f,7.8f),(2162689u,1,9f,9f)]);

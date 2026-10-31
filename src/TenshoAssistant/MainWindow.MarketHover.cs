@@ -254,9 +254,21 @@ internal sealed partial class MainWindow
         var state=wikiItems.Get(itemId);
         if(state.Loading){ImGui.TextDisabled(localization.Get("HoverUi.WikiLoading"));return 0;}
         if(state.Page is not { Lines.Count:>0 } page)return 0;
-        foreach(var line in page.Lines)ImGui.TextWrapped("· "+(line.Heading.Length>0 ? line.Heading+" : ":"")+line.Text);
+        foreach(var line in page.Lines)ImGui.TextWrapped("· "+(line.Heading.Length>0 ? WikiTerm(line.Heading)+" : ":"")+WikiTerm(line.Text));
         ImGui.TextDisabled(localization.Get("HoverUi.WikiCredit"));
         return page.Lines.Count;
+    }
+    // Wiki words in the plugin language (0.150): section headings and known terms through the language files (section
+    // « WikiTerms », key = the English term without spaces or punctuation), the two generated phrases with their numbers;
+    // free text (event names…) stays in English. A term missing from the language files is shown as written.
+    private string WikiTerm(string text)
+    {
+        if(localization.CurrentCode=="en" || text.Length==0)return text;
+        if(System.Text.RegularExpressions.Regex.Match(text,@"^Online Store \((.+) USD\)$") is { Success:true } store)return localization.Format("WikiTerms.OnlineStorePrice",store.Groups[1].Value);
+        if(System.Text.RegularExpressions.Regex.Match(text,@"^PvP series reward \(rank (\d+)\)$") is { Success:true } series)return localization.Format("WikiTerms.PvpSeriesRank",series.Groups[1].Value);
+        var key="WikiTerms."+System.Text.RegularExpressions.Regex.Replace(text,"[^A-Za-z]","");
+        var translated=key.Length>"WikiTerms.".Length ? localization.Get(key):text;
+        return translated.StartsWith('[') && translated.EndsWith(']') ? text:translated;
     }
     // Garland, then the wiki, then « no known source » once both answered.
     private void DrawFallbackSources(uint itemId)
