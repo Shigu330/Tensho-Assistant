@@ -1,45 +1,45 @@
-# Politique de sécurité
+# Security Policy
 
-Merci de contribuer à la sécurité de Tensho Assistant.
+Thank you for helping keep Tensho Assistant secure.
 
-## Signalement des vulnérabilités
+## Reporting a Vulnerability
 
-Si vous identifiez une vulnérabilité de sécurité dans ce projet, veuillez la signaler de manière privée et responsable.
+If you identify a security vulnerability in this project, please report it privately and responsibly.
 
-Utilisez le mécanisme GitHub Security Advisories de ce dépôt :
+Please use GitHub's private security reporting flow for this repository:
 
 https://github.com/Shigu330/Tensho-Assistant/security/advisories/new
 
-Veuillez ne pas ouvrir de ticket public contenant des détails sensibles sur la vulnérabilité avant qu'un correctif ne soit publié.
+Please do not open a public issue or disclose sensitive details about the vulnerability before a fix has been published.
 
-## Ce qu'il faut inclure dans votre signalement
+## Information to Include in Your Report
 
-- Description de la vulnérabilité
-- Étapes de reproduction
-- Impact potentiel
-- Version concernée
-- Captures d'écran, journaux ou extraits pertinents
-- Suggestions de correctif, si vous en avez
+- Description of the vulnerability
+- Steps to reproduce it
+- Potential impact and affected component
+- Affected version or build
+- Screenshots, logs, or relevant excerpts
+- Suggested remediation, if available
 
-## Ce que vous pouvez attendre
+## What You Can Expect
 
-- Accusé de réception dans les meilleurs délais
-- Évaluation de la gravité et du risque
-- Collaboration pour confirmer et corriger la vulnérabilité
-- Mises à jour sur l'état du correctif
-- Crédits publics ou privés selon les préférences du rapporteur, si cela est acceptable
+- Acknowledgement as quickly as possible
+- Assessment of the issue and severity
+- Collaboration to validate and remediate the issue
+- Updates on the remediation progress
+- Public or private credit, if appropriate and agreed upon
 
-## Ce qu'il ne faut pas faire
+## Prohibited Actions
 
-- Ne pas publier publiquement la vulnérabilité avant correction
-- Ne pas exploiter une faille dans un environnement réel ou une installation tierce
-- Ne pas demander ou collecter des données sensibles de tiers
-- Ne pas effectuer de tests de sécurité invasifs sur des systèmes non autorisés
+- Do not publicly disclose the vulnerability before a fix is available
+- Do not exploit a vulnerability in production or on third-party systems
+- Do not collect or request sensitive data from third parties
+- Do not perform intrusive or unauthorized security testing on systems you do not own or have explicit permission to test
 
-## Échéances de traitement
+## Response Expectations
 
-Les rapports sérieux sont traités avec la priorité la plus élevée, en fonction de leur impact et de leur criticité. Nous ferons de notre mieux pour y répondre rapidement et pour publier un correctif dès que possible.
+Critical issues will be prioritized based on impact and exploitability. We will do our best to investigate promptly and release a fix as soon as it is safe and feasible.
 
-## Remerciements
+## Thanks
 
-Merci de nous aider à maintenir Tensho Assistant sûr pour tous ses utilisateurs.
+Thank you for helping keep Tensho Assistant safe for all users.
