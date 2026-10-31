@@ -30,6 +30,10 @@ QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-10-31 : 5 h à 93
 - Antérieur non confirmé : caches recettes et récolte (0.82–0.83), critères de tri (0.84).
 
 ## Prochaine action
+0. PRIORITÉ utilisateur (2026-10-31 18:47) : copier les macros de l'outil de génération de macros (CRAFT-MACRO-001, `Craft/CraftMacroExport.cs`)
+   directement dans les macros du jeu, avec réglages : numéro de macro de départ, limite (dernier emplacement utilisable), individuel/partagé ;
+   référence fonctionnelle Craftimizer (lecture seule, pas de copie de code). Écriture dans RaptureMacroModule = action sur clic du joueur ;
+   à prouver par capture/sonde avant usage.
 1. Essai en jeu 0.188 (butin des contenus récents via LuminaSupplemental, sources d'objets).
 2. LuminaSupplemental, reste : ItemSupplement (désynthèse, coffres, réduction…) dans « Comment l'obtenir », (Butin des monstres : MobDrop en tête depuis 0.190). Fait en 0.189 : monstres, ALEA, entreprises, boutique dans l'infobulle.
 3. Commit (GitHub Desktop). Publication D17 côté auteur.
