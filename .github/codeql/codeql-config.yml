@@ -1,0 +1,6 @@
+name: "CodeQL config"
+
+paths-ignore:
+  - "**/bin/**"
+  - "**/obj/**"
+  - "**/Generated/**"
