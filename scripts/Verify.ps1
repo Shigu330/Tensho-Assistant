@@ -1,9 +1,11 @@
-param(
+﻿param(
     [string]$DotNet,
     # After a green run (0.219): -Commit commits and pushes Devloppement; -Release publishes Stable, the tag, the GitHub release and repo.json.
     [switch]$Commit,
     [switch]$Release,
-    [switch]$DryRun
+    [switch]$DryRun,
+    # Re-run everything even when this exact source state already passed (see the stamp below).
+    [switch]$Force
 )
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -16,6 +18,33 @@ if (-not $DotNet) {
     $DotNet = if (Test-Path -LiteralPath $taskLocalSdk) { $taskLocalSdk }
         elseif (Test-Path -LiteralPath $taskLegacySdk) { $taskLegacySdk } else { 'dotnet' }
 }
+# Stamp of the last green run (0.219): version + SHA-256 of every git-tracked or new file except *.md, docs/ and repo.json. When nothing
+# changed since that run (e.g. -Commit then -Release) and the DLL is still there, the build/tests/package checks are not run again.
+function Get-TaskFingerprint {
+    $files = & git -C $taskRoot ls-files -co --exclude-standard | Where-Object { $_ -notmatch '(\.md$|^docs/|^repo\.json$)' } | Sort-Object
+    $hasher = [Security.Cryptography.SHA256]::Create()
+    try {
+        foreach ($file in $files) {
+            $path = Join-Path $taskRoot $file
+            if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { continue }
+            $name = [Text.Encoding]::UTF8.GetBytes($file + "`n"); [void]$hasher.TransformBlock($name, 0, $name.Length, $null, 0)
+            $bytes = [IO.File]::ReadAllBytes($path); [void]$hasher.TransformBlock($bytes, 0, $bytes.Length, $null, 0)
+        }
+        [void]$hasher.TransformFinalBlock([byte[]]::new(0), 0, 0)
+        return [BitConverter]::ToString($hasher.Hash).Replace('-', '')
+    }
+    finally { $hasher.Dispose() }
+}
+$taskStampFile = Join-Path $taskRoot 'artifacts\verify-stamp.json'
+$taskVersionNow = ([xml](Get-Content -Raw -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\TenshoAssistant.csproj'))).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+$taskFingerprint = Get-TaskFingerprint
+$taskSkip = $false
+if (-not $Force -and (Test-Path -LiteralPath $taskStampFile) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip'))) {
+    $taskStamp = Get-Content -Raw -LiteralPath $taskStampFile | ConvertFrom-Json
+    $taskSkip = $taskStamp.Version -eq $taskVersionNow -and $taskStamp.Fingerprint -eq $taskFingerprint
+}
+if ($taskSkip) { Write-Output "SKIP checks: version $taskVersionNow already verified green on $($taskStamp.VerifiedAt) with the same sources (-Force to run again)." }
+else {
 Push-Location $taskRoot
 try {
     & $DotNet build TenshoAssistant.sln -c Release --nologo
@@ -70,8 +99,11 @@ try {
     finally { $taskZip.Dispose() }
     Write-Output 'PASS package identity, API, version, exact canonical ZIP hashes, language files and host assembly exclusion'
     Write-Output "VERSION $taskProjectVersion (DLL $taskAssemblyVersion)"
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $taskStampFile) | Out-Null
+    [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8
 }
 finally { Pop-Location }
+}
 # Git steps only after everything above passed (scripts/Release.ps1).
 if ($Commit) { & (Join-Path $PSScriptRoot 'Release.ps1') -Mode Commit -DryRun:$DryRun }
 if ($Release) { & (Join-Path $PSScriptRoot 'Release.ps1') -Mode Release -DryRun:$DryRun }

@@ -11,7 +11,7 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 - `scripts/Release.ps1` (appelé seulement après un Verify vert) : `Verify.ps1 -Commit` (sur Devloppement : commit « x.y.z » avec l'entrée
   du CHANGELOG, push) ; `Verify.ps1 -Release` (repo.json, main local remis sur origin/main, fusion Devloppement → main, push main, tag `Stable-x.y.z`,
   `gh release create` avec latest.zip et les notes, mise à jour de Devloppement) ; `-DryRun` affiche les commandes. Garde-fous : branche,
-  entrée du CHANGELOG, arbre propre, tag existant, gh absent. Verify affiche aussi « VERSION x.y.z (DLL …) ». Documentation : CONTRIBUTING
+  entrée du CHANGELOG, arbre propre, tag existant, gh absent. Verify affiche aussi « VERSION x.y.z (DLL …) » et ne relance pas les contrôles si la même version et les mêmes sources (hors .md, docs/, repo.json) sont déjà passées au vert (`artifacts/verify-stamp.json`, `-Force` pour relancer) ; recherche de gh dans son dossier d'installation ; compatible Windows PowerShell 5.1. Documentation : CONTRIBUTING
   « Versions and releases », README (URL du dépôt personnalisé), CLAUDE.md étape 5. Testé : syntaxe des deux scripts, garde-fou de branche
   (-DryRun). Non testé : un vrai -Commit / -Release (à lancer par l'utilisateur).
 - Revue de mode : un bouton Tensho (t-shirt) sur chaque ligne d'emplacement de la fenêtre du jeu (nœud 8 + n, position lue avec les
