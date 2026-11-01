@@ -41,6 +41,7 @@
     <Compile Include="../../src/TenshoAssistant/Gathering/WeatherForecast.cs" Link="Gathering/WeatherForecast.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/FishingForecast.cs" Link="Gathering/FishingForecast.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GatheringSchedule.cs" Link="Gathering/GatheringSchedule.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/BountifulEstimate.cs" Link="Gathering/BountifulEstimate.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GatheringTimeline.cs" Link="Gathering/GatheringTimeline.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GpActions.cs" Link="Gathering/GpActions.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GpOptimizer.cs" Link="Gathering/GpOptimizer.cs" />

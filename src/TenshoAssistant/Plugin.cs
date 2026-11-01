@@ -146,6 +146,55 @@ public sealed class Plugin : IDalamudPlugin
                     if(parts.Length>=3)chat.Print("[Tensho] "+localization.Format("Alarms.Ring",string.Join('|',parts[..^2]),parts[^2],parts[^1]));
                 }),()=>alarms?.Dispose());
             mainWindow.ConfigureAlarms(alarms!);
+            var gatherBuddyFish=new Community.GatherBuddyFishService(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityGatherBuddy};
+            registrations.Register(()=>{},gatherBuddyFish.Dispose);
+            mainWindow.ConfigureGatherBuddyFish(gatherBuddyFish);
+            var biteTimes=new Community.FishBiteTimeService(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityTeamcraftBites};
+            registrations.Register(()=>{},biteTimes.Dispose);
+            mainWindow.ConfigureBiteTimes(biteTimes);
+            // Fishing help (0.226): the FishingSpot of the player's territory nearest to the player. FishingSpot X/Z are map pixels
+            // (0–2048, probe PROBE_FISHSPOT: spot 35 X 668 Z 1120 at scale 200 = map 7.7, 12.2 as Garland): world = (pixel − 1024) / scale − offset.
+            Dictionary<uint,List<(uint Id,string Name,float X,float Z,uint[] Fish)>>? fishingSpots=null;
+            mainWindow.ConfigureFishingHelp(()=>
+            {
+                var local=objects.LocalPlayer;
+                return local is null ? null
+                    :(local.ClassJob.RowId,(uint)client.TerritoryType,local.Position.X,local.Position.Z,condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.Fishing]);
+            },(territory,x,z)=>
+            {
+                if(fishingSpots is null)
+                {
+                    var spots=new Dictionary<uint,List<(uint,string,float,float,uint[])>>();
+                    foreach(var spot in data.GetExcelSheet<Lumina.Excel.Sheets.FishingSpot>())
+                    {
+                        if(spot.TerritoryType.RowId==0 || !spot.TerritoryType.IsValid)continue;
+                        var map=spot.TerritoryType.Value.Map.Value;var scale=Math.Max(1,(int)map.SizeFactor)/100f;
+                        var fish=spot.Item.Where(item=>item.RowId!=0).Select(item=>item.RowId).ToArray();
+                        if(fish.Length==0)continue;
+                        if(!spots.TryGetValue(spot.TerritoryType.RowId,out var list))spots[spot.TerritoryType.RowId]=list=[];
+                        list.Add((spot.RowId,spot.PlaceName.IsValid ? spot.PlaceName.Value.Name.ExtractText():"",(spot.X-1024)/scale-map.OffsetX,(spot.Z-1024)/scale-map.OffsetY,fish));
+                    }
+                    fishingSpots=spots;
+                }
+                return fishingSpots.TryGetValue(territory,out var candidates) && candidates.Count>0
+                    ? candidates.OrderBy(spot=>(spot.X-x)*(spot.X-x)+(spot.Z-z)*(spot.Z-z)).First():null;
+            });
+            // Bountiful II base of a gathered item (0.224): ItemLevel.Gathering at its GatheringItemLevelConvertTable row, highest of its
+            // gathering rows; built once on first use (docs/evidence/0.224-bountiful-base.md).
+            Dictionary<uint,int>? bountifulBases=null;
+            mainWindow.ConfigureBountifulBase(item=>
+            {
+                if(bountifulBases is null)
+                {
+                    var bases=new Dictionary<uint,int>();
+                    var levels=data.GetExcelSheet<Lumina.Excel.Sheets.ItemLevel>();
+                    foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.GatheringItem>())
+                        if(row.Item.RowId!=0 && levels.TryGetRow(row.GatheringItemLevel.RowId,out var level) && level.Gathering>0)
+                            bases[row.Item.RowId]=Math.Max(bases.GetValueOrDefault(row.Item.RowId),(int)level.Gathering);
+                    bountifulBases=bases;
+                }
+                return bountifulBases.TryGetValue(item,out var value) ? value:null;
+            });
             mainWindow.ConfigureJobNames(job=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().TryGetRow(job,out var row) ? row.Name.ExtractText():null);
             var lumina=new Community.LuminaSupplementalService(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,
                 id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().TryGetRow(id,out var monster) ? monster.Singular.ExtractText():null,
@@ -228,7 +277,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(() => inventoryReader = new DalamudInventoryReader(inventoryService, inventory, player, client, framework, log),
                 () => inventoryReader?.Dispose());
             craftLive.SetEnabled(configuration.Observations?.GetValueOrDefault("Craft") == true);
-            gatheringObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Gathering") == true);
+            gatheringObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Gathering") == true || configuration.GatheringPanel);
             cactpotObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Cactpot") == true);
             triadObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Triad") == true);
             macroObservations.SetEnabled(configuration.Observations?.GetValueOrDefault("Macros") == true);
@@ -261,7 +310,12 @@ public sealed class Plugin : IDalamudPlugin
         }
     }
 
-    private void OnCommand(string command, string arguments) => Open();
+    // « /tensho » opens the window; « /tensho peche » (or fish) opens or closes the fishing help (0.228).
+    private void OnCommand(string command, string arguments)
+    {
+        if (arguments.Trim().ToLowerInvariant() is "peche" or "pêche" or "fish" or "fishing") { mainWindow?.ToggleFishingPanel(); return; }
+        Open();
+    }
     private void Open() => mainWindow.IsOpen = true;
     private void OpenConfig()=>mainWindow.OpenSettings();
     private void Draw()
@@ -283,6 +337,8 @@ public sealed class Plugin : IDalamudPlugin
         mainWindow.DrawCharacterPanel();
         mainWindow.DrawDutyFinderPanel();
         mainWindow.DrawFashionCheckPanel();
+        mainWindow.DrawGatheringPanel();
+        mainWindow.DrawFishingPanel();
     }
 
     public void Dispose()

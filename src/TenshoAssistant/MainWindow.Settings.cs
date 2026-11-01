@@ -201,6 +201,8 @@ internal sealed partial class MainWindow
         if(ImGui.CollapsingHeader(localization.Get("ModuleSettings.Gathering"),ImGuiTreeNodeFlags.DefaultOpen))
         {
             DrawObservationSetting("Gathering", localization.Get("ModuleSettings.ObserveGathering"),gatheringObservation.State.Enabled,gatheringObservation.SetEnabled);
+            BoolSetting("FishingPanel.Setting","FishingPanel.SettingTip",()=>configuration.FishingPanel,value=>configuration.FishingPanel=value);
+            BoolSetting("GatheringPanel.Setting","GatheringPanel.SettingTip",()=>configuration.GatheringPanel,value=>{configuration.GatheringPanel=value;if(value)gatheringObservation.SetEnabled(true);});
             ImGui.TextWrapped(localization.Get("ModuleSettings.GatheringHelp"));
         }
         if(ImGui.CollapsingHeader(localization.Get("ModuleSettings.Games"),ImGuiTreeNodeFlags.DefaultOpen))

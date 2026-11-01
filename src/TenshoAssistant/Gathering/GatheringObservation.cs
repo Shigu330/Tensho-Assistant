@@ -73,6 +73,10 @@ public sealed class GatheringObservationService : IDisposable
             catch(ArgumentException error){generation++;state=new(true,owner,GatheringObservationStatus.Error,null,null,error.Message);}
         }
     }
+    // Screen rectangle of the game's gathering window (0.225), for the in-game help panel; null when the window is not observed.
+    private (float X,float Y,float Width,float Height)? window;
+    public (float X,float Y,float Width,float Height)? Window{get{lock(gate)return State.Status==GatheringObservationStatus.Observed ? window:null;}}
+    internal void SetWindow((float X,float Y,float Width,float Height)? rect){lock(gate)window=rect;}
     internal void Missing(int ticket,ulong owner,GatheringObservationStatus reason)
     {
         if(reason is not (GatheringObservationStatus.AddonAbsent or GatheringObservationStatus.NotReady))throw new ArgumentOutOfRangeException(nameof(reason));

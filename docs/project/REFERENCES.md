@@ -820,3 +820,10 @@ TECHNICAL_FACTS: fenêtre du jeu « FashionCheck » ; catégorie de l'emplacemen
 FashionCheckWeeklyTheme = semaine + 9 ; données d'équipement FFXIVGachaSpreadsheet (FashionReport.json, déjà utilisé par Tensho).
 UX reprise (idée seulement) : liste par emplacement, possédés en premier, non possédés grisés, tri par popularité, panneau près de la fenêtre.
 LIMITS: lecture AtkValues à confirmer en jeu (journal du mode développeur) ; teintures non reprises ; coffre à apparence et armoire non lus.
+
+## REF-FISH-GATHERBUDDY (0.227)
+REPOSITORY: github.com/Ottermandias/GatherBuddy — licence Apache-2.0 (réutilisation permise avec mention).
+FILES_READ: GatherBuddy.GameData/Data/Fish/Data*.cs (36 fichiers, 1 183 instructions « data.Apply(…) », lus le 2026-11-01).
+USAGE: fichiers téléchargés à l'exécution et lus comme données (`Community/GatherBuddyFish.cs`, analyseur original, rien n'est compilé ni
+copié dans Tensho) : Bait, Mooch, Bite (HookSet, BiteType), Time (minutes ET), Weather / Transition (ids de la feuille Weather), Lure,
+Predators, Snag. Crédit dans README et dans l'aide à la pêche. Garland reste la source de secours.

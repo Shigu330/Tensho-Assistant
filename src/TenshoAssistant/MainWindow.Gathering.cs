@@ -18,16 +18,22 @@ internal sealed partial class MainWindow
     private void DrawGathering()
     {
         Heading(localization.Get("GatheringDetails.Title"),localization.Get("GatheringDetails.Description"));
-        DrawGatheringObservation();
-        DrawGatheringClock();
         if (itemId <= 0)
         {
+            DrawGatheringClock();
+            DrawFishingPanelButton();
             ImGui.TextWrapped(localization.Get("GatheringDetails.Select"));
+            DrawGatheringObservation();
             return;
         }
+        // 0.230: item, clock and the other modules for it (same useful tools as the context item panel) first.
         DrawItemIcon(SelectedItem, new Vector2(40));
         ImGui.SameLine();
+        ImGui.BeginGroup();
         ImGui.TextColored(Accent, SelectedItem?.Name ?? $"ID {itemId}");
+        DrawGatheringClock();
+        ImGui.EndGroup();
+        DrawContextTools();
         var state = gatheringCatalog.State;
         if (state.Catalog is not { } catalog)
         {
@@ -35,8 +41,9 @@ internal sealed partial class MainWindow
             if(developerMode && state.Error is { } error)ImGui.TextWrapped(error);
             return;
         }
-        DrawFishingNotebook(catalog);
-        DrawFishingSources(catalog);
+        // Fish: GatherBuddy first, then the places; the game's log and Garland stay below as other sources.
+        var gatherBuddyShown = DrawGatherBuddyFish(catalog);
+        if (!gatherBuddyShown) DrawFishingSources(catalog);
         var sources = catalog.ForItem((uint)itemId);
         if (sources.Count == 0)
         {
@@ -78,7 +85,15 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(source.Level.ToString());
                     ImGui.TableNextColumn(); ImGui.TextWrapped(source.Zone);
                     ImGui.TableNextColumn(); ImGui.TextWrapped(string.IsNullOrWhiteSpace(source.Place) ? localization.Get("GatheringDetails.UnknownPlace") : source.Place);
-                    ImGui.TableNextColumn(); DrawGatheringTime(source.Timing);
+                    ImGui.TableNextColumn();
+                    // Fishing rows: GatherBuddy's ET window (or « any time ») instead of the unknown schedule of the game data (0.230).
+                    if (source.IsFishing && source.Timing.Kind != Gathering.GatheringScheduleKind.Limited && gatherBuddyFish?.State.Data?.Find(source.ItemId) is { } gbFish)
+                    {
+                        if (gbFish.StartMinute is { } gbStart && gbFish.EndMinute is { } gbEnd)
+                            DrawGatheringTime(Gathering.GatheringSchedule.FromEphemeral((ushort)(gbStart/60*100+gbStart%60),(ushort)(gbEnd/60%24*100+gbEnd%60)));
+                        else ImGui.TextDisabled(localization.Get("GatheringFish.AnyTime"));
+                    }
+                    else DrawGatheringTime(source.Timing);
                     DrawGatheringAlarmButton($"Gather{source.IsFishing}/{source.PointId}/{source.ItemId}",source);
                     ImGui.TableNextColumn();
                     ImGui.PushID($"{source.IsFishing}/{source.PointId}/{source.ItemId}");
@@ -110,5 +125,8 @@ internal sealed partial class MainWindow
             ImGui.SetClipboardText(string.Join(Environment.NewLine,
                 sources.Where(source => gatheringTypeFilter is null || source.TypeId == gatheringTypeFilter)
                     .Select(source => $"{SelectedItem?.Name ?? itemId.ToString()} — {source.TypeName}, niv. {source.Level} — {source.Zone} / {source.Place} — {source.Timing.Label}")));
+        DrawFishingNotebook(catalog);
+        if (gatherBuddyShown) DrawFishingSources(catalog);
+        DrawGatheringObservation();
     }
 }

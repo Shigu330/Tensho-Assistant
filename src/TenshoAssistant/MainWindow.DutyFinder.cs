@@ -112,24 +112,33 @@ internal sealed partial class MainWindow
     }
 
     // Right click on an item: the other tools for it (0.186) — item sheet, market, recipes, collection, then its sources.
+    // 0.233: the same useful tools as the inventory menu and the context item panel (RelevantRoutes), then the item's sources.
     private void ItemLinksMenu(string id,ItemDefinition? item)
     {
         if(item is null || !ImGui.BeginPopupContextItem(id))return;
         try
         {
             ImGui.TextColored(Accent,item.Name);
-            if(ImGui.Selectable(localization.Get("ItemLinks.Sheet"))){SelectItem(item.Id);page=Page.Items;IsOpen=true;}
-            if(item.IsMarketable && ImGui.Selectable(localization.Get("ItemLinks.Market"))){SelectItem(item.Id);OpenContextTool("Price Insight");IsOpen=true;}
-            if(ImGui.Selectable(localization.Get("ItemLinks.Recipes"))){SelectItem(item.Id);OpenContextTool("Craftimizer");IsOpen=true;}
-            if(CollectionOf(item) is { } entry && ImGui.Selectable(localization.Get("HoverUi.OpenCollection")))
-            {
-                if(entry.Kind==Collections.CollectionKind.TripleTriad)page=Page.TripleTriad;
-                else{page=Page.Collections;collectionKind=entry.Kind;focusCollectionKind=entry.Kind;if(entry.Kind==Collections.CollectionKind.Orchestrion)focusOrchestrionTab=true;}
-                collectionQuery=entry.Name;IsOpen=true;
-            }
+            foreach(var route in RelevantRoutes(item.Id))
+                if(ImGui.Selectable(RouteLabel(route)+$"##Route{route}")){SelectItem(item.Id);OpenRoute(route,item.Id);IsOpen=true;}
             ImGui.Separator();
             if(!DrawSourceLinks([item]))ImGui.TextDisabled(localization.Get("SourceLinks.None"));
         }
         finally{ImGui.EndPopup();}
     }
+    private string RouteLabel(ItemContextRoute route)=>route switch
+    {
+        ItemContextRoute.Usages=>localization.Get("ItemUsesUi.Title"),
+        ItemContextRoute.Stocks=>localization.Get("ItemsUi.Stocks"),
+        ItemContextRoute.Craft=>localization.Get("ItemsUi.Craft"),
+        ItemContextRoute.Gathering=>localization.Get("GatheringDetails.Title"),
+        ItemContextRoute.NpcVendors=>localization.Get("NpcUi.Title"),
+        ItemContextRoute.Market=>localization.Get("ItemLinks.Market"),
+        ItemContextRoute.DutyLoot=>localization.Get("ItemMenu.DutyLoot"),
+        ItemContextRoute.MonsterLoot=>localization.Get("ItemMenu.MonsterLoot"),
+        ItemContextRoute.Collection=>localization.Get("HoverUi.OpenCollection"),
+        ItemContextRoute.Quest=>localization.Get("ItemMenu.Quest"),
+        ItemContextRoute.Sources=>localization.Get("ItemMenu.Sources"),
+        _=>localization.Get("ItemMenu.Tools"),
+    };
 }

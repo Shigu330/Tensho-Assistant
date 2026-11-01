@@ -23,6 +23,22 @@ D17 et la déclaration d'usage de l'IA (voir [CONTRIBUTING](../../CONTRIBUTING.m
 
 Les 17 lignes de la [ROADMAP](ROADMAP.md) restent PARTIAL.
 
+## Revue des points ouverts (2026-11-01, avant publication D17)
+Décision utilisateur : publier après résolution ; l'injection de texte dans l'infobulle native du jeu n'est **pas** faite.
+
+| Point | Constat | Décision |
+|---|---|---|
+| Bonus d'Abondance (Récolte abondante II, actions 272/273) | GatheringOptimizer (MIT) le demande à la main ; frozen_rabbit_tome (sans licence, fait relevé seulement) : +3 si récolte ≥ ⌊base × 1,1⌋, +2 si ≥ ⌊base × 0,9⌋, sinon +1, base = valeur « Gathering » de l'item level du point (table item-level de Teamcraft, issue de la feuille du jeu ItemLevel). Règle communautaire, non officielle. | **Faire** : préremplir le bonus avec cette règle (stat de récolte lue, item level du point par sonde), affiché « estimé », modifiable. |
+| Revue de mode : coffre à apparence et armoire | Lisibles dans le client (dresser d'apparence, armoire) ; donne un « possédé » plus juste. | **Faire** (sonde avant usage). |
+| Vendeurs : boutiques de compagnie libre | Feuille FccShop non lue (InclusionShop et monnaies codées déjà traitées, ligne du backlog périmée). | **Faire** (petit). |
+| Icônes de quête : nom des variantes, 71141 vs 71151 | Sens des variantes absent des données ; seule l'observation en jeu le donne. | **Faire seulement avec un relevé en jeu** de l'utilisateur ; sinon laisser « variante n ». |
+| Revue de mode : score | Aucune donnée de score par pièce dans les sources. | **Ne pas faire** (serait inventé). |
+| Suppression d'une alarme du jeu depuis Tensho | Pas de sous-commande /alarm par alarme (seulement « clear » = tout) ; DeleteAlarm(index) non prouvé. | **Ne pas faire** (risque d'effacer la mauvaise alarme) ; rappel manuel conservé. |
+| Sources inconnues restantes (Alsvid, PNJ du Certificat végétal) | Absentes du jeu, de Garland et de LuminaSupplemental. | **Ne pas faire** : inconnu documenté. |
+| Repères d'exploration (météo du wiki) | Météo du wiki déjà affichée et utilisée par les alarmes (0.201). | **Clos** (source wiki citée). |
+| Compléments des 17 outils (rotation adaptative, tri d'arsenal, règles Triad natives…) | Gros chantiers, non nécessaires pour publier. | **Après publication**, au cas par cas. |
+| Injection dans l'infobulle native | — | **Abandonné** (décision utilisateur). |
+
 ## Archive
 
 > Entrées historiques (2026-10-27 → 2026-10-30), de la plus récente à la plus ancienne ; leurs « NEXT » et compteurs sont ceux de leur date.
