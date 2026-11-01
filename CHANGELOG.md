@@ -3,6 +3,21 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.219.0
+- Demande : prévoir avec Verify.ps1 le commit et la release git ; vérifier l'existant et les .md ; puis reprendre la Revue de mode.
+- Existant vérifié : `Stable` locale publiée vers `origin/main`, tags `Stable-0.217.0` et `Stable-0.218.0` publiés, branche distante
+  `Devloppement` en retard (ancêtre de Stable), workflow CodeQL seul, GitHub CLI absent. Choix de l'utilisateur : commit + tag + push,
+  travail sur `Devloppement` puis `main` (retour : la branche de release sur GitHub est `main`, `Stable` n'est qu'un nom local), release via GitHub CLI, dépôt Dalamud personnalisé (repo.json).
+- `scripts/Release.ps1` (appelé seulement après un Verify vert) : `Verify.ps1 -Commit` (sur Devloppement : commit « x.y.z » avec l'entrée
+  du CHANGELOG, push) ; `Verify.ps1 -Release` (repo.json, main local remis sur origin/main, fusion Devloppement → main, push main, tag `Stable-x.y.z`,
+  `gh release create` avec latest.zip et les notes, mise à jour de Devloppement) ; `-DryRun` affiche les commandes. Garde-fous : branche,
+  entrée du CHANGELOG, arbre propre, tag existant, gh absent. Verify affiche aussi « VERSION x.y.z (DLL …) ». Documentation : CONTRIBUTING
+  « Versions and releases », README (URL du dépôt personnalisé), CLAUDE.md étape 5. Testé : syntaxe des deux scripts, garde-fou de branche
+  (-DryRun). Non testé : un vrai -Commit / -Release (à lancer par l'utilisateur).
+- Revue de mode : un bouton Tensho (t-shirt) sur chaque ligne d'emplacement de la fenêtre du jeu (nœud 8 + n, position lue avec les
+  catégories) ; clic = ouvre cet emplacement dans le panneau (pièces et teintures), nouveau clic = ferme. Petites fenêtres séparées pour
+  laisser le reste de la fenêtre du jeu cliquable.
+- Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.219.0.0. Non validé en jeu.
 ## 0.218.0
 - Retour (capture, clic droit sur la carte › Récolte) : le menu d'un point ouvrait toujours la première ressource. Le clic droit liste
   maintenant chaque ressource du point avec son icône (infobulle complète) ; celle choisie s'ouvre dans l'outil Récolte.

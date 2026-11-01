@@ -134,6 +134,9 @@ This script is the main validation path for build quality and project checks.
 
 ## Installation in-game
 
+Released versions: add `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json` to Dalamud › Settings ›
+Experimental › Custom Plugin Repositories, then install « Tensho Assistant » from the plugin installer. Development builds:
+
 1. Add the absolute DLL path to the Dalamud dev plugins list.
 2. Load the plugin.
 3. Open the window with:

@@ -45,6 +45,23 @@ A contribution must leave the project **green, with no warnings**. Output DLL: `
 3. Add an entry in [CHANGELOG.md](CHANGELOG.md) (what, why, evidence, and whether it was "validated in-game" or not).
 4. Pull request describing the in-game test performed.
 
+## Versions and releases (maintainer)
+
+Branches: work happens on **`Devloppement`**; **`main`** only receives releases. Tags: `Stable-x.y.z`.
+
+| Command (from the repository root) | What it does after a green build/test/package check |
+|---|---|
+| `.\scripts\Verify.ps1` | Checks only (Release build, tests, languages, package). |
+| `.\scripts\Verify.ps1 -Commit` | On `Devloppement`: commits every change as `x.y.z` with the CHANGELOG entry as description, pushes `Devloppement`. |
+| `.\scripts\Verify.ps1 -Release` | From a clean `Devloppement`: updates `repo.json`, sets the local `main` to `origin/main`, merges `Devloppement` into it, pushes `main`, tags `Stable-x.y.z`, creates the GitHub release with `latest.zip` and the CHANGELOG notes, brings `Devloppement` up to date. |
+| add `-DryRun` | Prints the git/gh commands without running them. |
+
+Requirements: `<Version>` raised in the csproj and a `## x.y.z` entry at the top of CHANGELOG.md (the script refuses otherwise); for
+`-Release`, GitHub CLI installed (`winget install GitHub.cli`) and logged in once (`gh auth login`). The logic is in `scripts/Release.ps1`.
+
+Custom Dalamud repository (install without the dev DLL): `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`
+(Dalamud › Settings › Experimental › Custom Plugin Repositories), refreshed by each `-Release`.
+
 ## Dalamud publication
 
 The official repository ([DalamudPluginsD17](https://github.com/goatcorp/DalamudPluginsD17), [rules](https://dalamud.dev/plugin-publishing/submission))

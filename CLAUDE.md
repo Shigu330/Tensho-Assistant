@@ -14,7 +14,7 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
 
 ## Environnement
 
-- Dépôt Windows : `C:\Plugins-ff14` (GitHub : Shigu330/Tensho-Assistant, branche Stable ; analyse CodeQL dans .github/workflows). Session desktop avec PowerShell : l'agent compile et teste.
+- Dépôt Windows : `C:\Plugins-ff14` (GitHub : Shigu330/Tensho-Assistant, branches Devloppement (travail) et main (releases) ; analyse CodeQL dans .github/workflows). Session desktop avec PowerShell : l'agent compile et teste.
 - SDK .NET 10.0.403 (global.json), Dalamud.NET.Sdk 15 ; build et tests : `.\scripts\Verify.ps1` (compile Release, tests managés,
   validation des langues, paquet). Sondes de données en lecture seule : `tools/ShopCurrencyProbe`, `tools/ApiProbe`.
 - **Les commits sont faits par l'application de bureau de l'utilisateur.** L'agent ne commit pas, ne pousse pas, ne réécrit pas l'historique
@@ -27,7 +27,10 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
 2. `.\scripts\Verify.ps1` vert (0 avertissement, 0 erreur) — ne jamais demander un essai en jeu avant, et donner la version de DLL produite.
 3. Ajouter l'entrée en tête de [CHANGELOG.md](CHANGELOG.md) (demande, cause, correction, preuves, résultat de Verify, « non validé en jeu »).
 4. Mettre à jour [docs/ai/STATUS.md](docs/ai/STATUS.md) (version, à valider, prochaine action).
-5. Toute preuve citée par le code (sonde, extrait de journal) va dans `docs/evidence/` et est référencée par ce chemin.
+5. Commit et release : faits par l'utilisateur avec `.\scripts\Verify.ps1 -Commit` (branche `Devloppement`, commit + push) puis
+   `.\scripts\Verify.ps1 -Release` (Devloppement fusionnée dans main, tag `Stable-x.y.z`, release GitHub avec `latest.zip`, `repo.json`) ; `-DryRun` pour voir
+   les commandes. L'agent ne lance pas ces options sans demande explicite (voir CONTRIBUTING.md « Versions and releases »).
+6. Toute preuve citée par le code (sonde, extrait de journal) va dans `docs/evidence/` et est référencée par ce chemin.
    `checkpoints/` est un dossier local de travail, ignoré par git (les anciennes archives `.zip` n'y sont plus utiles).
 
 ## Compte rendu (consignes utilisateur)

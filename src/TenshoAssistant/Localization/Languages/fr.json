@@ -269,6 +269,7 @@
     "Kind19": "Auxesia donne"
   },
   "FashionWeek": {
+    "SlotButton": "{0} · {1} — ouvrir dans le panneau Tensho (pièces et teintures)",
     "Dyes": "Teintures signalées cette semaine ({0})",
     "NoDyes": "Aucune teinture signalée pour cet emplacement cette semaine.",
     "Dye": "{0} · {1} % · {2} signalement(s)",

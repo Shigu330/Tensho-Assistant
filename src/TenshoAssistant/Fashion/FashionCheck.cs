@@ -6,7 +6,10 @@ namespace TenshoAssistant.Fashion;
 /// The game's Fashion Report window read live (0.213): the hint category of each of its 11 slots and the window rectangle.
 /// Slot order of the window: weapon, head, body, hands, legs, feet, ears, neck, wrists, right ring, left ring.
 /// </summary>
-public sealed record FashionCheckFrame(IReadOnlyList<string> Categories, float X, float Y, float Width, float Height, DateTimeOffset ObservedAt);
+public sealed record FashionCheckFrame(IReadOnlyList<string> Categories, float X, float Y, float Width, float Height, DateTimeOffset ObservedAt,
+    IReadOnlyList<FashionSlotRect>? Slots = null);
+/// <summary>Screen rectangle of one slot row of the game window (0.219), where Tensho puts its button.</summary>
+public readonly record struct FashionSlotRect(float X, float Y, float Width, float Height);
 
 public sealed class FashionOptions
 {
