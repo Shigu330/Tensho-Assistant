@@ -7,7 +7,7 @@
 | [../CHANGELOG.md](../CHANGELOG.md) | tout le monde | ce qui a changé à chaque version |
 | [../CLAUDE.md](../CLAUDE.md) | agent IA | point d'entrée de reprise, procédure par version, consignes |
 | [ai/](ai/) | agent IA | [RULES](ai/RULES.md) (règles durables), [STATUS](ai/STATUS.md) (état, à valider, prochaine action), [GOAL](ai/GOAL.md) (objectif actif), [PROMPT-MAITRE](ai/PROMPT-MAITRE.md) (cadre d'origine) |
-| [project/](project/) | contributeurs et agent | [PROJECT](project/PROJECT.md) (périmètre), [ROADMAP](project/ROADMAP.md) (17 plugins de référence), [BACKLOG](project/BACKLOG.md), [DECISIONS](project/DECISIONS.md), [ARCHITECTURE](project/ARCHITECTURE.md), [TESTING](project/TESTING.md) (protocoles), [REFERENCES](project/REFERENCES.md) (API et sources vérifiées), [PUBLISHING](project/PUBLISHING.md) (publication Dalamud) |
+| [project/](project/) | contributeurs et agent | [PROJECT](project/PROJECT.md) (périmètre), [ROADMAP](project/ROADMAP.md) (17 plugins de référence), [BACKLOG](project/BACKLOG.md), [USER-REQUESTS](project/USER-REQUESTS.md) (demandes utilisateur à planifier), [DECISIONS](project/DECISIONS.md), [ARCHITECTURE](project/ARCHITECTURE.md), [TESTING](project/TESTING.md) (protocoles), [REFERENCES](project/REFERENCES.md) (API et sources vérifiées), [PUBLISHING](project/PUBLISHING.md) (publication Dalamud) |
 | [goals/](goals/) | contributeurs et agent | un document par objectif livré ou en cours (`<ID>.md`) : demande, preuves, protocole de test en jeu |
 | [evidence/](evidence/) | contributeurs et agent | sorties de sondes et extraits de journaux cités par le code (preuves des liens de données) |
 | [../Localization/README.md](../Localization/README.md) | traducteurs | ajouter ou compléter une langue |

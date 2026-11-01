@@ -30,6 +30,10 @@ internal sealed class BankInventoryBridge : IDisposable
     private Task<BankImportResult>? importing;
     // Automatic capture (0.167): each storage is copied once per opening, then again every 30 s while it stays open.
     private readonly Func<bool> autoCapture;
+    // Armoire rows (Cabinet sheet: row → item), given by the plugin (0.236).
+    private readonly Func<IReadOnlyList<(uint Row, uint Item)>> cabinetRows;
+    // Pieces of an outfit stored as one item in the glamour dresser (MirageStoreSetItem: outfit item → pieces), 0.240.
+    private readonly Func<uint, IReadOnlyList<uint>> outfitPieces;
     private readonly Dictionary<BankKey, TimeSpan> autoCaptured = [];
     private IReadOnlyList<(ulong Id, string Name)>? knownRetainers;
     private bool disposed;
@@ -37,8 +41,11 @@ internal sealed class BankInventoryBridge : IDisposable
     public BankMenuState State => Volatile.Read(ref state);
 
     public BankInventoryBridge(InventoryBankService bank, IGameInventory inventory, IGameGui gui,
-        IPlayerState player, IClientState client, IFramework framework, IPluginLog log, Func<bool>? autoCapture = null)
+        IPlayerState player, IClientState client, IFramework framework, IPluginLog log, Func<bool>? autoCapture = null,
+        Func<IReadOnlyList<(uint Row, uint Item)>>? cabinetRows = null, Func<uint, IReadOnlyList<uint>>? outfitPieces = null)
     {
+        this.cabinetRows = cabinetRows ?? (() => []);
+        this.outfitPieces = outfitPieces ?? (_ => []);
         this.autoCapture = autoCapture ?? (() => false);
         this.bank = bank;
         this.inventory = inventory;
@@ -110,6 +117,14 @@ internal sealed class BankInventoryBridge : IDisposable
                     retainer = retainer with { Loaded = false };
                 var saddle = GetSaddle(character, BankStorageKind.Saddlebag);
                 var premium = GetSaddle(character, BankStorageKind.PremiumSaddlebag);
+                // Armoury chest (0.235): always in memory once logged in; read like a storage, kept in the Bank, refreshed every 30 s.
+                var armoury = character == 0 ? null : new BankMenuContext(new BankKey(character, BankStorageKind.Armoury, 0), "Arsenal", "",
+                    Vector2.Zero, IsLoaded(BankStorageKind.Armoury));
+                // Glamour dresser and armoire (0.236): known once opened in the game this session (PrismBoxLoaded, IsCabinetLoaded).
+                var dresser = character == 0 ? null : new BankMenuContext(new BankKey(character, BankStorageKind.GlamourDresser, 0), "Coffre à apparence", "",
+                    Vector2.Zero, DresserLoaded());
+                var armoire = character == 0 ? null : new BankMenuContext(new BankKey(character, BankStorageKind.Armoire, 0), "Armoire", "",
+                    Vector2.Zero, ArmoireLoaded());
                 var message = state.Message;
                 if (importing?.IsCompleted == true)
                 {
@@ -119,22 +134,30 @@ internal sealed class BankInventoryBridge : IDisposable
                 knownRetainers = ReadKnownRetainers(character) ?? (character == state.CharacterId ? knownRetainers : null);
                 Volatile.Write(ref state, new(character, retainer, saddle, premium, message, knownRetainers));
                 contextUpdated = true;
-                var open = new[] { retainer, saddle, premium }.Where(context => context is { Loaded: true }).Select(context => context!.Key).ToHashSet();
+                var open = new[] { retainer, saddle, premium, armoury, dresser, armoire }.Where(context => context is { Loaded: true }).Select(context => context!.Key).ToHashSet();
                 foreach (var gone in autoCaptured.Keys.Where(openKey => !open.Contains(openKey)).ToArray()) autoCaptured.Remove(gone);
                 if (requested is null && importing is null && autoCapture() && !bank.State.Loading && !bank.State.Importing && bank.State.Error is null)
                     foreach (var openKey in open)
-                        if (!autoCaptured.TryGetValue(openKey, out var last) || now - last >= TimeSpan.FromSeconds(30))
+                        if (!autoCaptured.TryGetValue(openKey, out var last)
+                            || now - last >= (openKey.Kind is BankStorageKind.Armoury or BankStorageKind.GlamourDresser or BankStorageKind.Armoire ? TimeSpan.FromMinutes(2) : TimeSpan.FromSeconds(30)))
                         { autoCaptured[openKey] = now; requested = openKey; break; }
                 if (requested is not { } key) return;
                 requested = null;
-                var context = new[] { retainer, saddle, premium }.FirstOrDefault(c => c?.Key == key);
+                var context = new[] { retainer, saddle, premium, armoury, dresser, armoire }.FirstOrDefault(c => c?.Key == key);
                 if (context is null || !context.Loaded || character != key.CharacterId)
                     throw new InvalidOperationException("Inventaire fermé, propriétaire changé ou conteneurs non chargés. Rouvrez le rangement et réessayez.");
 
                 var types = BankStorageScope.ContainerIds(key.Kind).Select(id => (GameInventoryType)id).ToArray();
                 var owner = new InventoryOwnerId(key.Kind == BankStorageKind.Retainer ? key.StorageId : key.CharacterId);
-                var snapshot = InventoryNativeReader.Capture(inventory, owner, types, $"Dalamud/manual-bank/{key.Kind}");
-                var after = key.Kind == BankStorageKind.Retainer ? GetRetainer(CharacterId) : GetSaddle(CharacterId, key.Kind);
+                var snapshot = key.Kind switch
+                {
+                    BankStorageKind.GlamourDresser => DresserSnapshot(owner),
+                    BankStorageKind.Armoire => ArmoireSnapshot(owner),
+                    _ => InventoryNativeReader.Capture(inventory, owner, types, $"Dalamud/manual-bank/{key.Kind}"),
+                };
+                var after = key.Kind == BankStorageKind.Retainer ? GetRetainer(CharacterId)
+                    : key.Kind == BankStorageKind.Armoury ? (IsLoaded(BankStorageKind.Armoury) ? context : null)
+                    : key.Kind is BankStorageKind.GlamourDresser or BankStorageKind.Armoire ? context : GetSaddle(CharacterId, key.Kind);
                 if (CharacterId != key.CharacterId || after?.Key != key || after?.Loaded != true
                     || snapshot.Containers.Values.Any(c => c.Coverage != InventoryCoverage.Complete))
                     throw new InvalidOperationException("Lecture incomplète ou identité modifiée. L'ancien cache est conservé ; réessayez une fois l'inventaire chargé.");
@@ -193,6 +216,42 @@ internal sealed class BankInventoryBridge : IDisposable
         if (addon.IsNull) return null;
         return new(new BankKey(character, kind, 0), kind == BankStorageKind.Saddlebag ? "Sacoche chocobo" : "Sacoche chocobo supplémentaire",
             addon.Name, addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(kind));
+    }
+
+    private static unsafe bool DresserLoaded() { var mirage = MirageManager.Instance(); return mirage != null && mirage->PrismBoxLoaded; }
+    private static unsafe bool ArmoireLoaded() { var ui = FFXIVClientStructs.FFXIV.Client.Game.UI.UIState.Instance(); return ui != null && ui->Cabinet.IsCabinetLoaded(); }
+
+    // Glamour dresser items (MirageManager.PrismBoxItemIds: 0 empty, +1 000 000 HQ, +500 000 collectable), one stack per stored piece.
+    private unsafe InventorySnapshot DresserSnapshot(InventoryOwnerId owner)
+    {
+        var mirage = MirageManager.Instance();
+        if (mirage == null || !mirage->PrismBoxLoaded) throw new InvalidOperationException("Coffre à apparence non chargé.");
+        var stacks = new List<InventoryStack>();
+        var ids = mirage->PrismBoxItemIds;
+        for (var slot = 0; slot < ids.Length; slot++)
+        {
+            var raw = ids[slot];
+            if (raw == 0) continue;
+            var hq = raw >= 1_000_000; var id = raw % 500_000;
+            if (id == 0) continue;
+            stacks.Add(new(new(new(id), hq), 1, slot));
+            // A whole outfit is stored as one item: its pieces count as owned too (numbered after the dresser's own slots).
+            foreach (var piece in outfitPieces(id))
+                if (piece != 0) stacks.Add(new(new(new(piece), false), 1, ids.Length + stacks.Count));
+        }
+        return new(DateTimeOffset.UtcNow, "Dalamud/MirageManager.PrismBox", [new InventoryContainerSnapshot(new(owner, new(25000)), InventoryCoverage.Complete, stacks)]);
+    }
+
+    // Armoire items: every Cabinet row whose item is stored (UIState.Cabinet.IsItemInCabinet).
+    private unsafe InventorySnapshot ArmoireSnapshot(InventoryOwnerId owner)
+    {
+        var ui = FFXIVClientStructs.FFXIV.Client.Game.UI.UIState.Instance();
+        if (ui == null || !ui->Cabinet.IsCabinetLoaded()) throw new InvalidOperationException("Armoire non chargée.");
+        var stacks = new List<InventoryStack>();
+        // Slots are numbered in order (0.238: Cabinet row ids exceed the stored slot bound of 1000).
+        foreach (var (row, item) in cabinetRows())
+            if (item != 0 && ui->Cabinet.IsItemInCabinet(row)) stacks.Add(new(new(new(item), false), 1, stacks.Count));
+        return new(DateTimeOffset.UtcNow, "Dalamud/UIState.Cabinet", [new InventoryContainerSnapshot(new(owner, new(25001)), InventoryCoverage.Complete, stacks)]);
     }
 
     private static unsafe bool IsLoaded(BankStorageKind kind)

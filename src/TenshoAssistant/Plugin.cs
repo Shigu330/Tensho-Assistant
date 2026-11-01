@@ -94,7 +94,13 @@ public sealed class Plugin : IDalamudPlugin
             var bank = new InventoryBankService(new FileInventoryBankStore(
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(), "InventoryBank.json")));
             registrations.Register(() => { }, bank.Dispose);
-            var bankBridge = new BankInventoryBridge(bank, inventory, gameGui, player, client, framework, log, () => configuration.AutoBankCapture);
+            IReadOnlyList<(uint,uint)>? cabinet = null;
+            var bankBridge = new BankInventoryBridge(bank, inventory, gameGui, player, client, framework, log, () => configuration.AutoBankCapture,
+                () => cabinet ??= data.GetExcelSheet<Lumina.Excel.Sheets.Cabinet>().Where(row => row.Item.RowId != 0).Select(row => (row.RowId, row.Item.RowId)).ToArray(),
+                set => data.GetExcelSheet<Lumina.Excel.Sheets.MirageStoreSetItem>().TryGetRow(set, out var outfit)
+                    ? new[] { outfit.MainHand.RowId, outfit.OffHand.RowId, outfit.Head.RowId, outfit.Body.RowId, outfit.Hands.RowId, outfit.Legs.RowId,
+                        outfit.Feet.RowId, outfit.Earrings.RowId, outfit.Necklace.RowId, outfit.Bracelets.RowId, outfit.Ring.RowId }.Where(piece => piece != 0).ToArray()
+                    : []);
             registrations.Register(() => { }, bankBridge.Dispose);
             bankOverlay = new BankImportOverlay(bank, bankBridge, localization);
             localization.SelectInitialLanguage(configuration.LanguageCode,client.ClientLanguage.ToString());

@@ -139,7 +139,8 @@ public sealed class FileInventoryBankStore : IInventoryBankStore
         var total = 0;
         foreach (var entry in dto.Entries)
         {
-            if (entry is null || entry.Containers is null || entry.Containers.Length > 7)
+            // 0.238: the armoury chest has 12 containers (retainers 7); the old limit of 7 rejected the whole file.
+            if (entry is null || entry.Containers is null || entry.Containers.Length > 16)
                 throw new InvalidDataException("Invalid bank containers.");
             foreach (var container in entry.Containers)
             {
@@ -191,9 +192,10 @@ public sealed class FileInventoryBankStore : IInventoryBankStore
             }).ToArray();
             var aggregate = new InventoryContainerSnapshot(new(new(owner), new(c.ContainerId)), InventoryCoverage.Complete, stacks);
             if (c.Slots is not { Length: > 0 }) return aggregate;
-            if (c.Slots.Length > 1000) throw new InvalidDataException("Too many stored slots.");
+            // 0.239: armoire records saved by 0.236 carry Cabinet row numbers as slots (up to a few thousand): read them as they are.
+            if (c.Slots.Length > 4096) throw new InvalidDataException("Too many stored slots.");
             var positioned = new InventoryContainerSnapshot(aggregate.Location, InventoryCoverage.Complete,
-                c.Slots.Select(slot => slot is null || slot.Slot is < 0 or >= 1000 || slot.DisplayIndex is < -1 or >= 175
+                c.Slots.Select(slot => slot is null || slot.Slot is < 0 or >= 100000 || slot.DisplayIndex is < -1 or >= 175
                     ? throw new InvalidDataException("Invalid stored slot.")
                     : new InventoryStack(new(new(slot.ItemId), slot.IsHighQuality), slot.Quantity, slot.Slot, slot.DisplayIndex)));
             if (aggregate.Quantities.Count != positioned.Quantities.Count

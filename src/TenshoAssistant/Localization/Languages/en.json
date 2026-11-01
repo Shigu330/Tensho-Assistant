@@ -1857,6 +1857,7 @@
     "WikiCredit": "(FFXIV wiki consolegameswiki, community data)"
   },
   "MapView": {
+    "RemoveGameTarget": "Remove the target shown by the game (journal)",
     "IconCategory0": "Tensho layers ({0})",
     "IconCategory1": "Quests ({0})",
     "IconCategory2": "Objectives and events ({0})",
@@ -2205,6 +2206,11 @@
     "TemplateDeleteError": "Could not delete the template."
   },
   "BankUi": {
+    "GlamourDresser": "Glamour dresser",
+    "Armoire": "Armoire",
+    "OpenDresser": "Open the glamour dresser once (inn) to read it.",
+    "OpenArmoire": "Open the armoire once (inn) to read it.",
+    "Armoury": "Armoury chest",
     "AutoSetting": "Save retainers and saddlebags automatically when they are opened",
     "AutoSettingHelp": "Off: an import button appears beside the game's storage windows.",
     "AutoOn": "Retainers and saddlebags are saved automatically each time you open them in the game.",

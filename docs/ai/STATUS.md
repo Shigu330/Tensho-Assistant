@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-01)
 
-VERSION: 0.234.0.0 (dernière release publiée : Stable-0.223.0) — Verify.ps1 (agent) 554/554, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.242.0.0 (dernière release : Stable-0.234.0) — Verify.ps1 (agent) 557/557, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: COLL-004 — réduire les sources « inconnues » des objets (choix utilisateur 2026-10-31) ; 0.177 lignes parasites du wiki retirées.
 QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-10-31 : 5 h à 93 % (réinit. 22:10), semaine 66 % — arrêt après 0.190 (5 h à 95 %). Dernier relevé connu : 5 h remis à 0 vers 12:10, semaine 41 % (réinit. jeudi 23:00).
 
@@ -39,6 +39,31 @@ QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-10-31 : 5 h à 93
 - 0.233 : clic droit (outils utiles) sur poissons et appâts ; menu « liens » commun aligné sur le menu de l'inventaire.
 
 ## Prochaine action
+REPRISE (quota semaine 97 % le 2026-11-01, arrêt après 0.237) : 1) boutiques de compagnie libre ; 2) flèches boussole sur la carte ;
+3) correctifs carte (cible de quête persistante = R-01) ; 4) demandes R-02 à R-10 de docs/project/USER-REQUESTS.md (ex-ISSUES.md, réorganisé),
+dans l'ordre que l'utilisateur choisira ; 5) publication D17.
+FAIT 0.237 (à valider en jeu) — retour en jeu 0.236 — onglet « Coffre à apparence » de la Banque affiche
+« ordre visuel indisponible. Réimportez le rangement ouvert » : la vue par onglet attend une grille (DisplayIndex) ; pour Arsenal, Coffre
+à apparence et Armoire, afficher une liste (objet, quantité) au lieu de la grille (MainWindow.Bank.cs, vue des onglets de rangement).
+La lecture elle-même a fonctionné (onglets créés, relevé 10:46).
+ÉTAPE AJOUTÉE (demande 2026-11-01, après le plan prévu : correctif Banque, boutiques de compagnie libre) : sur la carte Tensho, quand une
+quête active ou le drapeau est hors de la vue, une flèche de direction posée sur le bord de la carte, orientée vers la cible (style boussole
+de FF14 : icône de la quête ou du drapeau, distance éventuelle) ; clic = recentrer sur la cible.
+DERNIERS CORRECTIFS DE CARTE (demande 2026-11-01, avant D17) : une quête ciblée (« cible » de la carte, mapGameTarget) puis accomplie garde
+son icône de cible sur la carte et la minicarte : effacer la cible quand la quête n'est plus active ou que son étape change (relire l'état
+des quêtes / marqueurs à chaque relevé) ; relever les autres défauts de carte signalés à ce moment. Capture utilisateur : l'icône « Cible indiquée
+par le jeu (journal) » (quête « Kuiyki évolue ») reste à vie et ne peut pas être retirée : ajouter aussi un retrait manuel (clic droit sur
+l'icône ou bouton « Retirer la cible ») et la retirer quand le journal du jeu n'indique plus de cible. Puis publication D17.
+REPRISE — 0.235 arsenal et 0.236 coffre à apparence + armoire FAITS (lecture du jeu, sans autre plugin ; à valider en jeu). Suite du plan :
+point 3 boutiques de compagnie libre, puis D17. Point 2 élargi par l'utilisateur : coffre à apparence + armoire +
+arsenal, le tout relié au module Banque. API vérifiées (FFXIVClientStructs, lecture seule, réflexion 2026-11-01) :
+- arsenal : InventoryType ArmoryMainHand/OffHand/Head/Body/Hands/Waist/Legs/Feets/Ear/Neck/Wrist/Rings/SoulCrystal — non lus aujourd'hui
+  par Inventory/ (aucune occurrence « Armory ») ;
+- coffre à apparence : MirageManager.Instance() → PrismBoxLoaded, PrismBoxItemIds (rempli seulement après ouverture du coffre en jeu) ;
+- armoire : UIState.Cabinet → IsCabinetLoaded(), IsItemInCabinet(cabinetRowId) (lien objet → ligne de la feuille Cabinet à sonder).
+Plan : lecture sur le thread framework (copie), conteneurs « Arsenal », « Coffre à apparence », « Armoire » ajoutés aux entrées de la
+Banque (BankEntry/InventorySnapshot, Inventory/BankModels.cs) avec date de relevé ; « possédé » de la Revue de mode et stocks partout
+les incluent ; inconnu tant que le coffre / l'armoire n'ont pas été ouverts.
 PLAN AVANT PUBLICATION (décidé 2026-11-01, détail : docs/project/BACKLOG.md « Revue des points ouverts ») : 1) FAIT 0.224 (à valider en jeu) : bonus d'Abondance estimé
 (règle communautaire citée, modifiable) ; 2) Revue de mode : coffre à apparence + armoire dans « possédé » ; 3) boutiques de compagnie libre
 (FccShop) ; 4) icônes de quête seulement sur relevé en jeu ; puis publication D17. Non faits par décision : score de la revue, suppression

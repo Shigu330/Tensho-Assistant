@@ -1,7 +1,7 @@
 namespace TenshoAssistant.Inventory;
 
 public enum StorageFilter { All, PlayerBags, Chocobo, Retainers }
-public enum StorageCategory { PlayerBags, Chocobo, Retainer }
+public enum StorageCategory { PlayerBags, Chocobo, Retainer, Armoury, GlamourDresser, Armoire }
 
 public sealed record StorageHolding(StorageCategory Category, string Name, InventoryCoverage Coverage,
     bool IsCached, DateTimeOffset? ObservedAt, long Nq, long Hq);
@@ -33,6 +33,12 @@ public static class ItemHoldings
                 rows.Add(Observe(StorageCategory.PlayerBags, "Cristaux", false, live,
                     [new InventoryLocation(new(characterId), new(2001))]));
         }
+
+        // Armoury chest (0.235): counted with the character's own storage when it has been read.
+        if (filter is StorageFilter.All or StorageFilter.PlayerBags)
+            foreach (var entry in bankEntries)
+                if (characterId != 0 && entry.Key.CharacterId == characterId && entry.Key.Kind is BankStorageKind.Armoury or BankStorageKind.GlamourDresser or BankStorageKind.Armoire)
+                    rows.Add(ObserveBank(entry, entry.Key.Kind switch { BankStorageKind.GlamourDresser => StorageCategory.GlamourDresser, BankStorageKind.Armoire => StorageCategory.Armoire, _ => StorageCategory.Armoury }, entry.Name));
 
         if (filter is StorageFilter.All or StorageFilter.Chocobo)
         {
