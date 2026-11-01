@@ -25,7 +25,8 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
 1. Incrémenter `<Version>` dans `src/TenshoAssistant/TenshoAssistant.csproj` (seule source de version ; `TenshoAssistant.json` ne contient
    ni version ni InternalName ni DalamudApiLevel : DalamudPackager les remplit, `Verify.ps1` le contrôle).
 2. `.\scripts\Verify.ps1` vert (0 avertissement, 0 erreur) — ne jamais demander un essai en jeu avant, et donner la version de DLL produite.
-3. Ajouter l'entrée en tête de [CHANGELOG.md](CHANGELOG.md) (demande, cause, correction, preuves, résultat de Verify, « non validé en jeu »).
+3. Ajouter l'entrée en tête de [CHANGELOG.md](CHANGELOG.md) (demande, cause, correction, preuves, résultat de Verify, « non validé en jeu »),
+   en français, suivie d'une sous-section `### English` (résumé en anglais : c'est elle qui sert aux commits et aux releases GitHub).
 4. Mettre à jour [docs/ai/STATUS.md](docs/ai/STATUS.md) (version, à valider, prochaine action).
 5. Commit et release : faits par l'utilisateur avec `.\scripts\Verify.ps1 -Commit` (branche `Devloppement`, commit + push) puis
    `.\scripts\Verify.ps1 -Release` (Devloppement fusionnée dans main, tag `Stable-x.y.z`, release GitHub avec `latest.zip`, `repo.json`) ; `-DryRun` pour voir

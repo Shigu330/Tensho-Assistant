@@ -44,7 +44,13 @@ try {
     if ($start -lt 0) { throw "CHANGELOG.md has no '## $version' entry: add it before committing." }
     $end = $start + 1
     while ($end -lt $lines.Count -and -not $lines[$end].StartsWith('## ')) { $end++ }
-    $notes = ($lines[($start + 1)..($end - 1)] -join "`n").Trim()
+    # Git and GitHub are in English: the commit body and release notes come from the '### English' part of the entry (the French text
+    # above it stays in CHANGELOG.md for the maintainer).
+    $entry = $lines[($start + 1)..($end - 1)]
+    $english = [Array]::FindIndex($entry, [Predicate[string]] { param($line) $line.Trim() -eq '### English' })
+    if ($english -lt 0) { Write-Host "CHANGELOG.md entry '## $version' has no '### English' section: add the English notes (used for git and GitHub)." -ForegroundColor Yellow; exit 2 }
+    $notes = ($entry[($english + 1)..($entry.Count - 1)] -join "`n").Trim()
+    if (-not $notes) { Write-Host "The '### English' section of '## $version' is empty." -ForegroundColor Yellow; exit 2 }
 
     $branch = (Invoke-Git @('rev-parse', '--abbrev-ref', 'HEAD')).Trim()
     if ($branch -ne $developBranch) { throw "Current branch is '$branch': switch to '$developBranch' (git checkout $developBranch) first." }

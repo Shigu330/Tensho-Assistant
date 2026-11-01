@@ -3,6 +3,16 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.221.0
+- Retour : « le git ne se fait pas en anglais ». Les messages de commit et les notes de release GitHub viennent désormais de la sous-section
+  `### English` de l'entrée du CHANGELOG (le texte français au-dessus reste pour le suivi) ; `Release.ps1` s'arrête (en jaune) si elle
+  manque ou est vide. Sections anglaises ajoutées aux entrées 0.219.0 et 0.220.0. Règle ajoutée à CLAUDE.md et CONTRIBUTING.md.
+- Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.221.0.0. Aucun changement du plugin. Testé : -Commit -DryRun (section anglaise trouvée).
+### English
+- Git commit messages and GitHub release notes now come from the `### English` section of each CHANGELOG entry; the release script
+  stops if it is missing or empty.
+- No plugin change.
+
 ## 0.220.0
 - Demande : éviter qu'une version déjà envoyée soit commitée ou publiée deux fois.
 - `Verify.ps1 -Release` : arrêt immédiat, avant compilation, si le tag `Stable-x.y.z` existe (ici ou sur GitHub), message clair (code 2).
@@ -15,6 +25,14 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
   toute ligne de git sur stderr quand elle est redirigée. `Invoke-Git` capture stderr en texte et ne juge que le code de sortie.
   Arrêt survenu avant toute action (rien fusionné, tagué ni publié). Arrêts « fichiers non commités » et « tag existant » en jaune.
 - Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.220.0.0. Non validé en jeu (aucun changement du plugin).
+### English
+- Prevents committing or releasing the same version twice.
+- `Verify.ps1 -Release` stops before building when the `Stable-x.y.z` tag already exists (locally or on GitHub).
+- `Release.ps1`: `-Release` also stops when `Devloppement` has nothing new since `origin/main`; after a release, `-Commit` refuses code
+  changes under the released version (raise `<Version>` and the CHANGELOG entry) but accepts documentation only (« x.y.z · docs »);
+  « x.y.z · suite » for further commits before a release; no push when GitHub is already up to date. Expected stops are shown in yellow.
+- Fix: under Windows PowerShell 5.1, git messages on stderr (e.g. the « From https://… » line of a fetch) no longer abort the release.
+- No plugin change.
 ## 0.219.0
 - Demande : prévoir avec Verify.ps1 le commit et la release git ; vérifier l'existant et les .md ; puis reprendre la Revue de mode.
 - Existant vérifié : `Stable` locale publiée vers `origin/main`, tags `Stable-0.217.0` et `Stable-0.218.0` publiés, branche distante
@@ -30,6 +48,11 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
   catégories) ; clic = ouvre cet emplacement dans le panneau (pièces et teintures), nouveau clic = ferme. Petites fenêtres séparées pour
   laisser le reste de la fenêtre du jeu cliquable.
 - Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.219.0.0. Non validé en jeu.
+### English
+- Release tooling: `Verify.ps1 -Commit` (commit and push `Devloppement`) and `Verify.ps1 -Release` (merge into `main`, tag
+  `Stable-x.y.z`, GitHub release with `latest.zip`, `repo.json` custom Dalamud repository); `-DryRun` prints the commands; checks are
+  skipped when the same version and sources already passed (`-Force` runs them again).
+- Fashion Report: a Tensho button on each slot row of the game window opens that slot (gear and dyes) in the Tensho panel.
 ## 0.218.0
 - Retour (capture, clic droit sur la carte › Récolte) : le menu d'un point ouvrait toujours la première ressource. Le clic droit liste
   maintenant chaque ressource du point avec son icône (infobulle complète) ; celle choisie s'ouvre dans l'outil Récolte.
