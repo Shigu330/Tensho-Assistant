@@ -110,5 +110,7 @@ try {
 finally { Pop-Location }
 }
 # Git steps only after everything above passed (scripts/Release.ps1).
-if ($Commit) { & (Join-Path $PSScriptRoot 'Release.ps1') -Mode Commit -DryRun:$DryRun }
-if ($Release) { & (Join-Path $PSScriptRoot 'Release.ps1') -Mode Release -DryRun:$DryRun }
+# The git step's exit code is passed on (2 = expected stop such as 'already released'), so commit-release.bat can stop before releasing.
+if ($Commit) { & (Join-Path $PSScriptRoot 'Release.ps1') -Mode Commit -DryRun:$DryRun; if ($LASTEXITCODE) { exit $LASTEXITCODE } }
+if ($Release) { & (Join-Path $PSScriptRoot 'Release.ps1') -Mode Release -DryRun:$DryRun; if ($LASTEXITCODE) { exit $LASTEXITCODE } }
+exit 0

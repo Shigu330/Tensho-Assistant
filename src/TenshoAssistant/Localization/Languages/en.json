@@ -269,6 +269,7 @@
     "Kind19": "Auxesia gives"
   },
   "FashionWeek": {
+    "NoCategoryWeek": "No category for this slot this week.",
     "SlotButton": "{0} · {1} — open in the Tensho panel (gear and dyes)",
     "Dyes": "Dyes reported this week ({0})",
     "NoDyes": "No dye reported for this slot this week.",
@@ -288,8 +289,8 @@
     "DimTip": "Pieces observed at 0 in your stocks are dimmed; never observed ones stay normal (unknown ≠ absent).",
     "Popular": "By popularity",
     "PopularTip": "Sorts by the number of player reports (FFXIVGachaSpreadsheet data), else by item number.",
-    "Panel": "Panel beside the game's Fashion Report",
-    "PanelTip": "Shows the 11 slots and their pieces beside the game window when it is open.",
+    "Panel": "Buttons on the game's Fashion Report",
+    "PanelTip": "Makes the slot icons of the game window clickable: a click opens, beside the slot, a small window with its gear and dyes.",
     "Counts": "({0} owned / {1})",
     "NoCategory": "no category",
     "UnknownCategory": "Category not found in the game data.",

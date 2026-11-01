@@ -54,6 +54,7 @@ Branches: work happens on **`Devloppement`**; **`main`** only receives releases.
 | `.\scripts\Verify.ps1` | Checks only (Release build, tests, languages, package). |
 | `.\scripts\Verify.ps1 -Commit` | On `Devloppement`: commits every change as `x.y.z` with the CHANGELOG entry as description, pushes `Devloppement`. |
 | `.\scripts\Verify.ps1 -Release` | From a clean `Devloppement`: updates `repo.json`, sets the local `main` to `origin/main`, merges `Devloppement` into it, pushes `main`, tags `Stable-x.y.z`, creates the GitHub release with `latest.zip` and the CHANGELOG notes, brings `Devloppement` up to date. |
+| `commit-release.bat` (double-click) | `-Commit` then `-Release`, stopping before the release if the commit step fails or stops; `commit-release.bat dry` shows the commands only, `commit-release.bat commit` commits only. |
 | add `-DryRun` | Prints the git/gh commands without running them. |
 | add `-Force` | Runs every check again; otherwise checks are skipped when the same version and sources (all tracked files except `*.md`, `docs/`, `repo.json`) already passed (stamp in `artifacts/verify-stamp.json`). |
 
