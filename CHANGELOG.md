@@ -3,6 +3,37 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.223.0
+- Retour (capture) : le cadre ne tenait pas à l'icône (il couvrait toute la ligne avec la zone de texte) ; il faut une petite fenêtre à côté
+  de l'emplacement choisi plutôt qu'un panneau global sur le côté.
+- Bouton et cadre limités au carré de l'icône (bout de la ligne côté mannequin : droite pour la colonne de gauche, gauche pour celle de
+  droite). Le panneau latéral listant les 11 emplacements est remplacé par une petite fenêtre ouverte à côté de l'emplacement cliqué
+  (à gauche de la fenêtre du jeu pour la colonne de gauche, à droite pour celle de droite, alignée sur la case) : pièces et teintures,
+  croix pour fermer. La page Tensho garde la liste complète. Option renommée « Boutons sur la Revue de mode du jeu ».
+- Retour : le cadre bleu (couleur d'accent du thème) était peu visible sur le parchemin : cadre rouge.
+- `commit-release.bat` (fichier de l'utilisateur, revu) : lancement par PowerShell (cmd n'exécute pas un .ps1 directement), pwsh si présent
+  sinon Windows PowerShell 5.1, dossier du dépôt quel que soit le lecteur, release seulement si le commit a réussi, mode « dry » et
+  « commit », fenêtre gardée ouverte en double-clic, code de sortie transmis (Verify.ps1 renvoie celui de l'étape git) ; fins de ligne
+  CRLF (`.gitattributes`). Testé : `commit-release.bat dry` (Verify 554/554, commandes de commit affichées, release arrêtée en code 2).
+- Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.223.0.0. VALIDATED_IN_GAME : « c'est ok » (capture : cadre rouge sur l'icône Pieds, petite fenêtre « Pieds · Bibliophilie » avec pièces et teintures, utilisateur, 2026-11-01).
+### English
+- Fashion Report: the button and highlight now cover only the slot icon; the side panel listing every slot is replaced by a small
+  window opened beside the clicked slot (gear and dyes). The Tensho page keeps the full list. The highlight is now red.
+- `commit-release.bat`: verify, commit and release in one double-click (`dry` and `commit` modes), stopping before the release when the
+  commit step fails.
+
+## 0.222.0
+- Retour (capture) : même icône t-shirt sur chaque case au lieu d'une icône adaptée à l'emplacement ; cases de droite sans bouton.
+- Bouton invisible posé sur toute la case de l'emplacement (l'icône du jeu reste visible : chaque case garde la sienne), cadre doré au
+  survol et quand l'emplacement est ouvert ; bouton sur les 11 cases, aussi sans catégorie cette semaine (le panneau l'indique, et
+  montre les teintures d'arme à pieds). Cause des cases de droite : elles étaient ignorées sans catégorie. Mode développeur : le journal
+  donne aussi la position des 11 cases (si une case de droite manque encore, sa position n'est pas lue : envoyer cette ligne).
+- Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.222.0.0. Non validé en jeu.
+### English
+- Fashion Report: the Tensho button now covers each slot of the game window invisibly, so every slot keeps the game's own icon, with a
+  golden frame when hovered or open; buttons on all 11 slots, including slots without a category this week (their dyes still show).
+- Developer mode logs the 11 slot rectangles with the categories.
+
 ## 0.221.0
 - Retour : « le git ne se fait pas en anglais ». Les messages de commit et les notes de release GitHub viennent désormais de la sous-section
   `### English` de l'entrée du CHANGELOG (le texte français au-dessus reste pour le suivi) ; `Release.ps1` s'arrête (en jaune) si elle

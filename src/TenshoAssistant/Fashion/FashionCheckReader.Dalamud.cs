@@ -59,8 +59,8 @@ internal sealed class FashionCheckReader : IDisposable
             if (previous is null || !previous.Categories.SequenceEqual(categories) || previous.X != frame.X || previous.Y != frame.Y || previous.Width != frame.Width
                 || !(previous.Slots ?? []).SequenceEqual(rects))
                 service.Publish(frame);
-            var key = string.Join("|", categories);
-            if (capture() && key != lastLogged) { lastLogged = key; log.Information("Fashion Report categories: {Categories}", key); }
+            var key = string.Join("|", categories) + " / " + string.Join(" ", rects.Select((rect, slot) => $"{slot}:{rect.X:0},{rect.Y:0},{rect.Width:0}x{rect.Height:0}"));
+            if (capture() && key != lastLogged) { lastLogged = key; log.Information("Fashion Report categories and slot rectangles: {Categories}", key); }
         }
         catch (Exception error) { service.Publish(null); nextRead = now + Stopwatch.Frequency * 5; log.Warning(error, "Fashion Report window unavailable."); }
     }

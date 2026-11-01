@@ -269,6 +269,7 @@
     "Kind19": "Auxesia donne"
   },
   "FashionWeek": {
+    "NoCategoryWeek": "Aucune catégorie pour cet emplacement cette semaine.",
     "SlotButton": "{0} · {1} — ouvrir dans le panneau Tensho (pièces et teintures)",
     "Dyes": "Teintures signalées cette semaine ({0})",
     "NoDyes": "Aucune teinture signalée pour cet emplacement cette semaine.",
@@ -288,8 +289,8 @@
     "DimTip": "Les pièces observées à 0 dans vos stocks sont grisées ; celles jamais observées restent normales (inconnu ≠ absent).",
     "Popular": "Par popularité",
     "PopularTip": "Trie par nombre de signalements des joueurs (données FFXIVGachaSpreadsheet), sinon par numéro d'objet.",
-    "Panel": "Panneau à côté de la Revue de mode du jeu",
-    "PanelTip": "Affiche les 11 emplacements et leurs pièces à côté de la fenêtre du jeu quand elle est ouverte.",
+    "Panel": "Boutons sur la Revue de mode du jeu",
+    "PanelTip": "Rend les icônes d'emplacement de la fenêtre du jeu cliquables : un clic ouvre, à côté de l'emplacement, une petite fenêtre avec ses pièces et ses teintures.",
     "Counts": "({0} possédé(s) / {1})",
     "NoCategory": "aucune catégorie",
     "UnknownCategory": "Catégorie inconnue dans les données du jeu.",
