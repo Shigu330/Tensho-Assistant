@@ -18,8 +18,16 @@ function Step([string]$Text, [scriptblock]$Action) {
     & $Action
     if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "Failed: $Text" }
 }
+# Expected stop (already released, nothing new…): a clear message and exit code 2, not an error with a stack trace.
+function Stop-Release([string]$Text) { Write-Host $Text -ForegroundColor Yellow; exit 2 }
+# Changed paths that are only documentation (*.md, docs/, repo.json).
+function Test-DocsOnly([string[]]$Paths) { -not ($Paths | Where-Object { $_ -notmatch '(\.md$|^docs/|^repo\.json$)' }) }
 function Invoke-Git([string[]]$Arguments) {
-    $output = & git @Arguments 2>&1
+    # Windows PowerShell 5.1 turns any git line on stderr (e.g. 'From https://…' of a fetch) into a terminating error when redirected:
+    # stderr is captured as plain text and only the exit code decides.
+    $previous = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+    try { $output = & git @Arguments 2>&1 | ForEach-Object { "$_" } }
+    finally { $ErrorActionPreference = $previous }
     if ($LASTEXITCODE -ne 0) { throw "git $($Arguments -join ' ') : $output" }
     return $output
 }
@@ -41,32 +49,48 @@ try {
     $branch = (Invoke-Git @('rev-parse', '--abbrev-ref', 'HEAD')).Trim()
     if ($branch -ne $developBranch) { throw "Current branch is '$branch': switch to '$developBranch' (git checkout $developBranch) first." }
 
-    $message = Join-Path ([IO.Path]::GetTempPath()) "tensho-commit-$version.txt"
-    [IO.File]::WriteAllText($message, "$version`n`n$notes`n", [Text.UTF8Encoding]::new($false))
+    # Already released: the tag of this version exists here or on GitHub.
+    $released = [bool](Invoke-Git @('tag', '--list', $tag)) -or [bool](& git ls-remote --tags origin "refs/tags/$tag")
+    $releaseUrl = "https://github.com/$repository/releases/tag/$tag"
+    $changed = @(Invoke-Git @('status', '--porcelain') | ForEach-Object { ($_ -replace '^...', '').Trim('"') -replace '^.* -> ', '' })
+    $lastSubject = (Invoke-Git @('log', '-1', '--format=%s')).Trim()
 
     if ($Mode -eq 'Commit') {
-        $changes = Invoke-Git @('status', '--porcelain')
-        if (-not $changes) { Write-Output "Nothing to commit on $developBranch."; }
-        else {
+        if ($changed.Count -gt 0) {
+            # Subject: 'x.y.z' the first time, 'x.y.z · suite' for more work before the release, 'x.y.z · docs' after it (docs only).
+            if ($released -and -not (Test-DocsOnly $changed)) {
+                Stop-Release "Version $version is already released ($releaseUrl). Raise <Version> in src/TenshoAssistant/TenshoAssistant.csproj and add '## <new version>' at the top of CHANGELOG.md before committing code."
+            }
+            $subject = if ($released) { "$version · docs" } elseif ($lastSubject -like "$version*") { "$version · suite" } else { $version }
+            $message = Join-Path ([IO.Path]::GetTempPath()) "tensho-commit-$version.txt"
+            [IO.File]::WriteAllText($message, "$subject`n`n$notes`n", [Text.UTF8Encoding]::new($false))
             Step "git add -A" { git add -A }
-            Step "git commit -F <message $version>" { git commit -F $message }
+            Step "git commit -F <message '$subject'>" { git commit -F $message }
         }
+        else { Write-Output "Nothing to commit on $developBranch." }
+        # Push only when there is something GitHub does not have yet.
+        $ahead = if ($DryRun -and $changed.Count -gt 0) { 1 } else { [int](& git rev-list --count "origin/$developBranch..HEAD" 2>$null) }
+        if ($ahead -eq 0) { Write-Output "Nothing to push: origin/$developBranch is up to date."; return }
         Step "git push origin $developBranch" { git push origin $developBranch }
         Write-Output ($(if ($DryRun) { "DRY RUN: nothing was committed or pushed (version $version)." } else { "COMMIT $version pushed on $developBranch." }))
         return
     }
 
-    # Release
+    # Release: stop early when this version is out or nothing is new since the last release.
+    if ($released) { Stop-Release "Version $version is already released: $releaseUrl. Raise <Version> (and the CHANGELOG entry) for a new release." }
+    Invoke-Git @('fetch', 'origin', $releaseBranch) | Out-Null
+    $newCommits = @(Invoke-Git @('log', '--format=%s', "origin/$releaseBranch..HEAD") | Where-Object { $_ })
+    if ($newCommits.Count -eq 0) { Stop-Release "Nothing new on $developBranch since the last release (origin/$releaseBranch)." }
     # gh from PATH, else its usual install folders (a terminal opened before installing GitHub CLI does not see it yet).
     $command = Get-Command gh -ErrorAction SilentlyContinue; $gh = if ($command) { $command.Source } else { $null }
     foreach ($candidate in @("$env:ProgramFiles\GitHub CLI\gh.exe", "$env:LOCALAPPDATA\Programs\GitHub CLI\gh.exe")) { if (-not $gh -and (Test-Path -LiteralPath $candidate)) { $gh = $candidate } }
     if (-not $gh) {
         throw "GitHub CLI 'gh' not found: install it (winget install GitHub.cli), then run 'gh auth login' once."
     }
-    if (Invoke-Git @('status', '--porcelain')) { throw "Uncommitted changes: run '.\scripts\Verify.ps1 -Commit' first." }
-    if (Invoke-Git @('tag', '--list', $tag)) { throw "Tag $tag already exists: raise <Version> for a new release." }
+    if (Invoke-Git @('status', '--porcelain')) { Stop-Release "Uncommitted changes: run '.\scripts\Verify.ps1 -Commit' first, then -Release." }
+    if (Invoke-Git @('tag', '--list', $tag)) { Stop-Release "Tag $tag already exists: raise <Version> for a new release." }
     $remoteTag = & git ls-remote --tags origin "refs/tags/$tag"
-    if ($remoteTag) { throw "Tag $tag already exists on GitHub." }
+    if ($remoteTag) { Stop-Release "Tag $tag already exists on GitHub." }
 
     # repo.json: Dalamud custom repository entry built from the packaged manifest, pointing at this release's zip.
     $output = 'src\TenshoAssistant\bin\x64\Release'
