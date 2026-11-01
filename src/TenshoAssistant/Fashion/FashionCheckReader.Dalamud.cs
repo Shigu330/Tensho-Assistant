@@ -46,9 +46,18 @@ internal sealed class FashionCheckReader : IDisposable
                 categories[slot] = value.Type is AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString
                     ? value.GetValueAsString() ?? "" : "";
             }
-            var frame = new FashionCheckFrame(categories, unit->X, unit->Y, unit->RootNode->Width * unit->Scale, unit->RootNode->Height * unit->Scale, DateTimeOffset.UtcNow);
+            // Slot rows (0.219): node 8 + n of the window (layout learned from Avant-Garde, read only), screen position and size.
+            var rects = new FashionSlotRect[FashionWeek.SlotCount];
+            for (var slot = 0; slot < FashionWeek.SlotCount; slot++)
+            {
+                var node = unit->GetNodeById((uint)(8 + slot));
+                rects[slot] = node == null || !node->IsVisible() ? default
+                    : new(node->ScreenX, node->ScreenY, node->Width * unit->Scale, node->Height * unit->Scale);
+            }
+            var frame = new FashionCheckFrame(categories, unit->X, unit->Y, unit->RootNode->Width * unit->Scale, unit->RootNode->Height * unit->Scale, DateTimeOffset.UtcNow, rects);
             var previous = service.Live;
-            if (previous is null || !previous.Categories.SequenceEqual(categories) || previous.X != frame.X || previous.Y != frame.Y || previous.Width != frame.Width)
+            if (previous is null || !previous.Categories.SequenceEqual(categories) || previous.X != frame.X || previous.Y != frame.Y || previous.Width != frame.Width
+                || !(previous.Slots ?? []).SequenceEqual(rects))
                 service.Publish(frame);
             var key = string.Join("|", categories);
             if (capture() && key != lastLogged) { lastLogged = key; log.Information("Fashion Report categories: {Categories}", key); }

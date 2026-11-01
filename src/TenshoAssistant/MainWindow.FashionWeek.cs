@@ -1,4 +1,5 @@
 using System.Numerics;
+using Dalamud.Interface;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Fashion;
 using TenshoAssistant.Items;
@@ -150,11 +151,45 @@ internal sealed partial class MainWindow
         }
     }
 
+    // Buttons on the slot rows of the game window (0.219): one small Tensho button at the right end of each row with a category or dyes;
+    // a click opens that slot in the panel (again: closes it). Each is its own tiny window so the rest of the game window stays clickable.
+    private void DrawFashionSlotButtons(FashionCheckFrame frame)
+    {
+        if(frame.Slots is not { } rects)return;
+        for(var slot=0;slot<rects.Count && slot<frame.Categories.Count;slot++)
+        {
+            var rect=rects[slot];
+            if(rect.Width<=0 || rect.Height<=0 || frame.Categories[slot].Length==0 && slot>=6)continue;
+            var size=Math.Clamp(rect.Height*0.55f,16,30);
+            ImGui.SetNextWindowPos(new Vector2(rect.X+rect.Width-size-4,rect.Y+(rect.Height-size)/2),ImGuiCond.Always);
+            ImGui.SetNextWindowSize(new Vector2(size+2),ImGuiCond.Always);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding,new Vector2(1));
+            try
+            {
+                if(ImGui.Begin($"###TenshoFashionSlot{slot}",ImGuiWindowFlags.NoDecoration|ImGuiWindowFlags.NoBackground|ImGuiWindowFlags.NoSavedSettings
+                    |ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoScrollbar))
+                {
+                    var open=fashionOpenSlot==slot;
+                    if(open)ImGui.PushStyleColor(ImGuiCol.Button,Accent);
+                    ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
+                    bool clicked;
+                    try{clicked=ImGui.Button(Dalamud.Interface.FontAwesomeIcon.Tshirt.ToIconString()+"##Open",new Vector2(size));}
+                    finally{ImGui.PopFont();if(open)ImGui.PopStyleColor();}
+                    if(clicked)fashionOpenSlot=open ? -1:slot;
+                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FashionWeek.SlotButton",localization.Get("FashionWeek.Slot"+slot),
+                        frame.Categories[slot].Length>0 ? frame.Categories[slot]:localization.Get("FashionWeek.NoCategory")));
+                }
+            }
+            finally{ImGui.End();ImGui.PopStyleVar();}
+        }
+    }
+
     // Panel beside the game's Fashion Report window (like the Duty Finder panel).
     internal void DrawFashionCheckPanel()
     {
         if(windowDisposed || configuration.FashionOptions is { ShowPanel:false } || fashionCheck?.Live is not { } frame)return;
         using var theme=UI.FfxivTheme.Apply();
+        DrawFashionSlotButtons(frame);
         ImGui.SetNextWindowPos(new Vector2(frame.X+frame.Width+6,frame.Y),ImGuiCond.Always);
         ImGui.SetNextWindowSize(new Vector2(380,Math.Max(360,frame.Height)),ImGuiCond.Always);
         var visible=ImGui.Begin(localization.Get("FashionWeek.PanelTitle")+"###TenshoFashionCheck",ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove);

@@ -1,4 +1,10 @@
-param([string]$DotNet)
+param(
+    [string]$DotNet,
+    # After a green run (0.219): -Commit commits and pushes Devloppement; -Release publishes Stable, the tag, the GitHub release and repo.json.
+    [switch]$Commit,
+    [switch]$Release,
+    [switch]$DryRun
+)
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $taskRoot = Split-Path -Parent $PSScriptRoot
@@ -63,5 +69,9 @@ try {
     }
     finally { $taskZip.Dispose() }
     Write-Output 'PASS package identity, API, version, exact canonical ZIP hashes, language files and host assembly exclusion'
+    Write-Output "VERSION $taskProjectVersion (DLL $taskAssemblyVersion)"
 }
 finally { Pop-Location }
+# Git steps only after everything above passed (scripts/Release.ps1).
+if ($Commit) { & (Join-Path $PSScriptRoot 'Release.ps1') -Mode Commit -DryRun:$DryRun }
+if ($Release) { & (Join-Path $PSScriptRoot 'Release.ps1') -Mode Release -DryRun:$DryRun }

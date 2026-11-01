@@ -269,6 +269,7 @@
     "Kind19": "Auxesia gives"
   },
   "FashionWeek": {
+    "SlotButton": "{0} · {1} — open in the Tensho panel (gear and dyes)",
     "Dyes": "Dyes reported this week ({0})",
     "NoDyes": "No dye reported for this slot this week.",
     "Dye": "{0} · {1} % · {2} report(s)",
