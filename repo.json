@@ -1,0 +1,31 @@
+[
+    {
+        "Author":  "Tensho",
+        "Name":  "Tensho Assistant",
+        "InternalName":  "TenshoAssistant",
+        "AssemblyVersion":  "0.219.0.0",
+        "TestingAssemblyVersion":  "0.219.0.0",
+        "Description":  "Tensho Assistant brings everyday tools together in one interface (/tensho): items and storage (bags, retainers, saddlebags), inventory sorting rules, recipes and a crafting simulator, gathering and fishing with Eorzea time windows and weather, a map that replaces the game map (quests, leves, FATEs, gathering points, vendors, aether currents, teleport costs), collections with how to obtain each item, quests and rewards, optional market prices on hover (Universalis), duty and monster loot, Fashion Report hints, Mini Cactpot and Triple Triad helpers, character stats and macro chains.\n\nCommunity data (Garland Tools, FFXIV Console Games Wiki, Universalis) is only requested when you open or hover the matching tool, and is cached on disk. Nothing runs on its own: actions that reach the game (teleport, applying a sort, a macro chain) only start when you click them.\n\nAI disclosure: the code and the icon were generated with an AI coding agent (Claude), directed and tested in game by the author.\n\nLanguages: English, French; German and Japanese partial.",
+        "Punchline":  "One window for everyday tools: items, crafting, gathering, map, collections and more.",
+        "ApplicableVersion":  "any",
+        "RepoUrl":  "https://github.com/Shigu330/Tensho-Assistant",
+        "Tags":  [
+                     "utility",
+                     "map",
+                     "crafting",
+                     "gathering",
+                     "inventory",
+                     "collections"
+                 ],
+        "DalamudApiLevel":  15,
+        "IconUrl":  "https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/src/TenshoAssistant/images/icon.png",
+        "DownloadLinkInstall":  "https://github.com/Shigu330/Tensho-Assistant/releases/download/Stable-0.219.0/latest.zip",
+        "DownloadLinkUpdate":  "https://github.com/Shigu330/Tensho-Assistant/releases/download/Stable-0.219.0/latest.zip",
+        "DownloadLinkTesting":  "https://github.com/Shigu330/Tensho-Assistant/releases/download/Stable-0.219.0/latest.zip",
+        "IsHide":  false,
+        "IsTestingExclusive":  false,
+        "AcceptsFeedback":  true,
+        "LastUpdate":  1793519983,
+        "Changelog":  "- Demande : prévoir avec Verify.ps1 le commit et la release git ; vérifier l\u0027existant et les .md ; puis reprendre la Revue de mode.\n- Existant vérifié : `Stable` locale publiée vers `origin/main`, tags `Stable-0.217.0` et `Stable-0.218.0` publiés, branche distante\n  `Devloppement` en retard (ancêtre de Stable), workflow CodeQL seul, GitHub CLI absent. Choix de l\u0027utilisateur : commit + tag + push,\n  travail sur `Devloppement` puis `main` (retour : la branche de release sur GitHub est `main`, `Stable` n\u0027est qu\u0027un nom local), release via GitHub CLI, dépôt Dalamud personnalisé (repo.json).\n- `scripts/Release.ps1` (appelé seulement après un Verify vert) : `Verify.ps1 -Commit` (sur Devloppement : commit « x.y.z » avec l\u0027entrée\n  du CHANGELOG, push) ; `Verify.ps1 -Release` (repo.json, main local remis sur origin/main, fusion Devloppement → main, push main, tag `Stable-x.y.z`,\n  `gh release create` avec latest.zip et les notes, mise à jour de Devloppement) ; `-DryRun` affiche les commandes. Garde-fous : branche,\n  entrée du CHANGELOG, arbre propre, tag existant, gh absent. Verify affiche aussi « VERSION x.y.z (DLL …) ». Documentation : CONTRIBUTING\n  « Versions and releases », README (URL du dépôt personnalisé), CLAUDE.md étape 5. Testé : syntaxe des deux scripts, garde-fou de branche\n  (-DryRun). Non testé : un vrai -Commit / -Release (à lancer par l\u0027utilisateur).\n- Revue de mode : un bouton Tensho (t-shirt) sur chaque ligne d\u0027emplacement de la fenêtre du jeu (nœud 8 + n, position lue avec les\n  catégories) ; clic = ouvre cet emplacement dans le panneau (pièces et teintures), nouveau clic = ferme. Petites fenêtres séparées pour\n  laisser le reste de la fenêtre du jeu cliquable.\n- Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.219.0.0. Non validé en jeu."
+    }
+]
