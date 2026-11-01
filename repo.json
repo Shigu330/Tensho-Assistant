@@ -1,31 +1,31 @@
 [
-    {
-        "Author":  "Tensho",
-        "Name":  "Tensho Assistant",
-        "InternalName":  "TenshoAssistant",
-        "AssemblyVersion":  "0.221.0.0",
-        "TestingAssemblyVersion":  "0.221.0.0",
-        "Description":  "Tensho Assistant brings everyday tools together in one interface (/tensho): items and storage (bags, retainers, saddlebags), inventory sorting rules, recipes and a crafting simulator, gathering and fishing with Eorzea time windows and weather, a map that replaces the game map (quests, leves, FATEs, gathering points, vendors, aether currents, teleport costs), collections with how to obtain each item, quests and rewards, optional market prices on hover (Universalis), duty and monster loot, Fashion Report hints, Mini Cactpot and Triple Triad helpers, character stats and macro chains.\n\nCommunity data (Garland Tools, FFXIV Console Games Wiki, Universalis) is only requested when you open or hover the matching tool, and is cached on disk. Nothing runs on its own: actions that reach the game (teleport, applying a sort, a macro chain) only start when you click them.\n\nAI disclosure: the code and the icon were generated with an AI coding agent (Claude), directed and tested in game by the author.\n\nLanguages: English, French; German and Japanese partial.",
-        "Punchline":  "One window for everyday tools: items, crafting, gathering, map, collections and more.",
-        "ApplicableVersion":  "any",
-        "RepoUrl":  "https://github.com/Shigu330/Tensho-Assistant",
-        "Tags":  [
-                     "utility",
-                     "map",
-                     "crafting",
-                     "gathering",
-                     "inventory",
-                     "collections"
-                 ],
-        "DalamudApiLevel":  15,
-        "IconUrl":  "https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/src/TenshoAssistant/images/icon.png",
-        "DownloadLinkInstall":  "https://github.com/Shigu330/Tensho-Assistant/releases/download/Stable-0.221.0/latest.zip",
-        "DownloadLinkUpdate":  "https://github.com/Shigu330/Tensho-Assistant/releases/download/Stable-0.221.0/latest.zip",
-        "DownloadLinkTesting":  "https://github.com/Shigu330/Tensho-Assistant/releases/download/Stable-0.221.0/latest.zip",
-        "IsHide":  false,
-        "IsTestingExclusive":  false,
-        "AcceptsFeedback":  true,
-        "LastUpdate":  1793520678,
-        "Changelog":  "- Git commit messages and GitHub release notes now come from the `### English` section of each CHANGELOG entry; the release script\n  stops if it is missing or empty.\n- No plugin change."
-    }
+  {
+    "Author": "Tensho",
+    "Name": "Tensho Assistant",
+    "InternalName": "TenshoAssistant",
+    "AssemblyVersion": "0.223.0.0",
+    "TestingAssemblyVersion": "0.223.0.0",
+    "Description": "Tensho Assistant brings everyday tools together in one interface (/tensho): items and storage (bags, retainers, saddlebags), inventory sorting rules, recipes and a crafting simulator, gathering and fishing with Eorzea time windows and weather, a map that replaces the game map (quests, leves, FATEs, gathering points, vendors, aether currents, teleport costs), collections with how to obtain each item, quests and rewards, optional market prices on hover (Universalis), duty and monster loot, Fashion Report hints, Mini Cactpot and Triple Triad helpers, character stats and macro chains.\n\nCommunity data (Garland Tools, FFXIV Console Games Wiki, Universalis) is only requested when you open or hover the matching tool, and is cached on disk. Nothing runs on its own: actions that reach the game (teleport, applying a sort, a macro chain) only start when you click them.\n\nAI disclosure: the code and the icon were generated with an AI coding agent (Claude), directed and tested in game by the author.\n\nLanguages: English, French; German and Japanese partial.",
+    "Punchline": "One window for everyday tools: items, crafting, gathering, map, collections and more.",
+    "ApplicableVersion": "any",
+    "RepoUrl": "https://github.com/Shigu330/Tensho-Assistant",
+    "Tags": [
+      "utility",
+      "map",
+      "crafting",
+      "gathering",
+      "inventory",
+      "collections"
+    ],
+    "DalamudApiLevel": 15,
+    "IconUrl": "https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/src/TenshoAssistant/images/icon.png",
+    "DownloadLinkInstall": "https://github.com/Shigu330/Tensho-Assistant/releases/download/Stable-0.223.0/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/Shigu330/Tensho-Assistant/releases/download/Stable-0.223.0/latest.zip",
+    "DownloadLinkTesting": "https://github.com/Shigu330/Tensho-Assistant/releases/download/Stable-0.223.0/latest.zip",
+    "IsHide": false,
+    "IsTestingExclusive": false,
+    "AcceptsFeedback": true,
+    "LastUpdate": 1793521659,
+    "Changelog": "- Fashion Report: the button and highlight now cover only the slot icon; the side panel listing every slot is replaced by a small\n  window opened beside the clicked slot (gear and dyes). The Tensho page keeps the full list. The highlight is now red.\n- `commit-release.bat`: verify, commit and release in one double-click (`dry` and `commit` modes), stopping before the release when the\n  commit step fails."
+  }
 ]
