@@ -37,6 +37,11 @@ function Get-TaskFingerprint {
 }
 $taskStampFile = Join-Path $taskRoot 'artifacts\verify-stamp.json'
 $taskVersionNow = ([xml](Get-Content -Raw -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\TenshoAssistant.csproj'))).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+# -Release of a version already published: stop before building anything (scripts/Release.ps1 checks it again).
+if ($Release -and ((& git -C $taskRoot tag --list "Stable-$taskVersionNow") -or (& git -C $taskRoot ls-remote --tags origin "refs/tags/Stable-$taskVersionNow"))) {
+    Write-Host "Version $taskVersionNow is already released (tag Stable-$taskVersionNow): raise <Version> and the CHANGELOG entry for a new release." -ForegroundColor Yellow
+    exit 2
+}
 $taskFingerprint = Get-TaskFingerprint
 $taskSkip = $false
 if (-not $Force -and (Test-Path -LiteralPath $taskStampFile) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip'))) {

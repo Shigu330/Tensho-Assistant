@@ -3,6 +3,15 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.220.0
+- Demande : éviter qu'une version déjà envoyée soit commitée ou publiée deux fois.
+- `Verify.ps1 -Release` : arrêt immédiat, avant compilation, si le tag `Stable-x.y.z` existe (ici ou sur GitHub), message clair (code 2).
+- `Release.ps1` : `-Release` s'arrête aussi si rien n'est nouveau sur Devloppement depuis `origin/main` ; `-Commit` après la release
+  d'une version refuse de commiter du code (monter `<Version>` et ajouter l'entrée du CHANGELOG), accepte la documentation seule
+  (titre « x.y.z · docs ») ; titre « x.y.z · suite » pour un nouveau commit avant la release ; pas de push si GitHub est déjà à jour.
+  Arrêts attendus en jaune, sans pile d'erreur. Testé (-DryRun, Windows PowerShell 5.1) : release 0.219.0 refusée avant compilation,
+  commit de code sur 0.219.0 refusé.
+- Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.220.0.0. Non validé en jeu (aucun changement du plugin).
 ## 0.219.0
 - Demande : prévoir avec Verify.ps1 le commit et la release git ; vérifier l'existant et les .md ; puis reprendre la Revue de mode.
 - Existant vérifié : `Stable` locale publiée vers `origin/main`, tags `Stable-0.217.0` et `Stable-0.218.0` publiés, branche distante
@@ -13,7 +22,7 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
   `gh release create` avec latest.zip et les notes, mise à jour de Devloppement) ; `-DryRun` affiche les commandes. Garde-fous : branche,
   entrée du CHANGELOG, arbre propre, tag existant, gh absent. Verify affiche aussi « VERSION x.y.z (DLL …) » et ne relance pas les contrôles si la même version et les mêmes sources (hors .md, docs/, repo.json) sont déjà passées au vert (`artifacts/verify-stamp.json`, `-Force` pour relancer) ; recherche de gh dans son dossier d'installation ; compatible Windows PowerShell 5.1. Documentation : CONTRIBUTING
   « Versions and releases », README (URL du dépôt personnalisé), CLAUDE.md étape 5. Testé : syntaxe des deux scripts, garde-fou de branche
-  (-DryRun). Non testé : un vrai -Commit / -Release (à lancer par l'utilisateur).
+  (-DryRun). Lancé par l'utilisateur le 2026-11-01 : -Commit puis -Release réussis (release GitHub Stable-0.219.0 avec latest.zip, main, repo.json en ligne) ; un second -Release de la même version est refusé (tag existant).
 - Revue de mode : un bouton Tensho (t-shirt) sur chaque ligne d'emplacement de la fenêtre du jeu (nœud 8 + n, position lue avec les
   catégories) ; clic = ouvre cet emplacement dans le panneau (pièces et teintures), nouveau clic = ferme. Petites fenêtres séparées pour
   laisser le reste de la fenêtre du jeu cliquable.
