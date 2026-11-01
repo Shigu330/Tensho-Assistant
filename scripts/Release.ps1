@@ -23,7 +23,11 @@ function Stop-Release([string]$Text) { Write-Host $Text -ForegroundColor Yellow;
 # Changed paths that are only documentation (*.md, docs/, repo.json).
 function Test-DocsOnly([string[]]$Paths) { -not ($Paths | Where-Object { $_ -notmatch '(\.md$|^docs/|^repo\.json$)' }) }
 function Invoke-Git([string[]]$Arguments) {
-    $output = & git @Arguments 2>&1
+    # Windows PowerShell 5.1 turns any git line on stderr (e.g. 'From https://…' of a fetch) into a terminating error when redirected:
+    # stderr is captured as plain text and only the exit code decides.
+    $previous = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+    try { $output = & git @Arguments 2>&1 | ForEach-Object { "$_" } }
+    finally { $ErrorActionPreference = $previous }
     if ($LASTEXITCODE -ne 0) { throw "git $($Arguments -join ' ') : $output" }
     return $output
 }
@@ -83,10 +87,10 @@ try {
     if (-not $gh) {
         throw "GitHub CLI 'gh' not found: install it (winget install GitHub.cli), then run 'gh auth login' once."
     }
-    if (Invoke-Git @('status', '--porcelain')) { throw "Uncommitted changes: run '.\scripts\Verify.ps1 -Commit' first." }
-    if (Invoke-Git @('tag', '--list', $tag)) { throw "Tag $tag already exists: raise <Version> for a new release." }
+    if (Invoke-Git @('status', '--porcelain')) { Stop-Release "Uncommitted changes: run '.\scripts\Verify.ps1 -Commit' first, then -Release." }
+    if (Invoke-Git @('tag', '--list', $tag)) { Stop-Release "Tag $tag already exists: raise <Version> for a new release." }
     $remoteTag = & git ls-remote --tags origin "refs/tags/$tag"
-    if ($remoteTag) { throw "Tag $tag already exists on GitHub." }
+    if ($remoteTag) { Stop-Release "Tag $tag already exists on GitHub." }
 
     # repo.json: Dalamud custom repository entry built from the packaged manifest, pointing at this release's zip.
     $output = 'src\TenshoAssistant\bin\x64\Release'

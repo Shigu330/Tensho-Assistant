@@ -11,6 +11,9 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
   (titre « x.y.z · docs ») ; titre « x.y.z · suite » pour un nouveau commit avant la release ; pas de push si GitHub est déjà à jour.
   Arrêts attendus en jaune, sans pile d'erreur. Testé (-DryRun, Windows PowerShell 5.1) : release 0.219.0 refusée avant compilation,
   commit de code sur 0.219.0 refusé.
+- Retour (capture) : `-Release` s'arrêtait sur « git.exe : From https://github.com/… » : Windows PowerShell 5.1 change en erreur fatale
+  toute ligne de git sur stderr quand elle est redirigée. `Invoke-Git` capture stderr en texte et ne juge que le code de sortie.
+  Arrêt survenu avant toute action (rien fusionné, tagué ni publié). Arrêts « fichiers non commités » et « tag existant » en jaune.
 - Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.220.0.0. Non validé en jeu (aucun changement du plugin).
 ## 0.219.0
 - Demande : prévoir avec Verify.ps1 le commit et la release git ; vérifier l'existant et les .md ; puis reprendre la Revue de mode.
