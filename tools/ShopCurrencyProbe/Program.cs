@@ -146,6 +146,35 @@ if(Environment.GetEnvironmentVariable("PROBE_GROW") is { Length:>0 })
         Console.WriteLine($"JOB {job.RowId} '{job.Name.ExtractText()}' category {job.ClassJobCategory.RowId} role {job.Role} primary {job.PrimaryStat} limitBreak {job.LimitBreak1.RowId}");
     return;
 }
+// PROBE_FISHSPOT (0.226): FishingSpot rows (territory, X, Z, radius) to compare with known positions (world or map coordinates?).
+if(Environment.GetEnvironmentVariable("PROBE_FISHSPOT") is { Length:>0 } spotQuery)
+{
+    foreach(var id in spotQuery.Split(',').Select(uint.Parse))
+    {
+        var spot=data.Excel.GetSheet<FishingSpot>().GetRow(id);
+        var map=spot.TerritoryType.Value.Map.Value;
+        Console.WriteLine($"FISHSPOT {id} '{spot.PlaceName.Value.Name.ExtractText()}' territory {spot.TerritoryType.RowId} X {spot.X} Z {spot.Z} radius {spot.Radius} map size {map.SizeFactor} offset {map.OffsetX},{map.OffsetY}");
+    }
+    return;
+}
+// PROBE_GATHERLEVEL (0.224): for gathering items named like the value, GatheringItem → GatheringItemLevelConvertTable (level, stars)
+// → ItemLevel row of that level with its Gathering and Perception columns (base values of the Bountiful bonus rule).
+if(Environment.GetEnvironmentVariable("PROBE_GATHERLEVEL") is { Length:>0 } gatherName)
+{
+    var levels=data.Excel.GetSheet<ItemLevel>();
+    foreach(var gathering in data.Excel.GetSheet<GatheringItem>())
+    {
+        if(gathering.Item.RowId==0 || gathering.Item.RowType!=typeof(Item))continue;
+        var item=data.Excel.GetSheet<Item>().GetRow(gathering.Item.RowId);
+        if(!item.Name.ExtractText().Contains(gatherName,StringComparison.OrdinalIgnoreCase))continue;
+        var convert=gathering.GatheringItemLevel.Value;
+        var level=convert.GatheringItemLevel;
+        var row=levels.TryGetRow(level,out var found) ? found:default;
+        var byRow=levels.TryGetRow(gathering.GatheringItemLevel.RowId,out var rowFound) ? rowFound:default;
+        Console.WriteLine($"GATHERLEVEL item {item.RowId} '{item.Name.ExtractText()}' gatheringItem {gathering.RowId} convert {gathering.GatheringItemLevel.RowId} level {level} stars {convert.Stars} ItemLevel[level].Gathering {row.Gathering} ItemLevel[convert].Gathering {byRow.Gathering} Perception {byRow.Perception}");
+    }
+    return;
+}
 // PROBE_EVENTICONS (0.211): EventIconType rows (NPC and map icons of quests, available / locked, icon range) — the quest marker icons.
 if(Environment.GetEnvironmentVariable("PROBE_EVENTICONS") is { Length:>0 })
 {

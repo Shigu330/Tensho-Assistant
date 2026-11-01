@@ -11,7 +11,8 @@ public sealed record GarlandItemSource(string Type,ulong Id,string Name);
 // Trades: exchanges listed in « tradeShops » for this item (currency item id and amount), even without a known NPC
 // (e.g. 40382 Cor buffle insulaire ← 50 000 × 37549 Assignat insulaire azur, island sanctuary shop).
 public sealed record GarlandTrade(uint CurrencyId,uint Amount);
-public sealed record GarlandItemSourceList(uint ItemId,IReadOnlyList<GarlandItemSource> Sources,DateTimeOffset FetchedAt,IReadOnlyList<GarlandTrade>? Trades=null);
+public sealed record GarlandItemSourceList(uint ItemId,IReadOnlyList<GarlandItemSource> Sources,DateTimeOffset FetchedAt,IReadOnlyList<GarlandTrade>? Trades=null,
+    FishingSources? Fishing=null);
 
 public static class GarlandItemSourceParser
 {
@@ -56,7 +57,10 @@ public static class GarlandItemSourceParser
                             trades.Add(new(currencyId,amount));
                 }
             }
-        return new(expectedId,sources.AsReadOnly(),fetchedAt,trades.AsReadOnly());
+        // Fishing spots with their bait routes (0.226, same item document): used by the in-game fishing help.
+        FishingSources? fishing=null;
+        try{fishing=FishingSourceParser.Parse(item);}catch(InvalidDataException){}
+        return new(expectedId,sources.AsReadOnly(),fetchedAt,trades.AsReadOnly(),fishing);
     }
     private static bool Contains(JsonElement listing,string name,uint id)=>listing.TryGetProperty(name,out var list) && list.ValueKind==JsonValueKind.Array
         && list.EnumerateArray().Any(entry=>Number(entry,"id")==id);

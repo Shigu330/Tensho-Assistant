@@ -52,6 +52,23 @@ try {
     $notes = ($entry[($english + 1)..($entry.Count - 1)] -join "`n").Trim()
     if (-not $notes) { Write-Host "The '### English' section of '## $version' is empty." -ForegroundColor Yellow; exit 2 }
 
+    # English notes of every CHANGELOG version (0.234): a commit or a release covers all the versions since the last one, newest first.
+    $entries = [ordered]@{}
+    for ($index = 0; $index -lt $lines.Count; $index++) {
+        if ($lines[$index] -notmatch '^## (\d+\.\d+\.\d+)\s*$') { continue }
+        $number = $Matches[1]; $next = $index + 1
+        while ($next -lt $lines.Count -and -not $lines[$next].StartsWith('## ')) { $next++ }
+        $body = [string[]]@(if ($next -gt $index + 1) { $lines[($index + 1)..($next - 1)] })
+        $at = [Array]::FindIndex($body, [Predicate[string]] { param($line) $line.Trim() -eq '### English' })
+        $entries[$number] = if ($at -ge 0) { ($body[($at + 1)..($body.Count - 1)] -join "`n").Trim() } else { '' }
+    }
+    function Get-NotesSince([string]$Since) {
+        $from = if ($Since) { [version]$Since } else { [version]'0.0.0' }
+        $covered = @($entries.Keys | Where-Object { [version]$_ -gt $from -and [version]$_ -le [version]$version } | Sort-Object { [version]$_ } -Descending)
+        if ($covered.Count -le 1) { return $notes }
+        return ($covered | ForEach-Object { "## $_`n" + $(if ($entries[$_]) { $entries[$_] } else { '(no English notes)' }) }) -join "`n`n"
+    }
+
     $branch = (Invoke-Git @('rev-parse', '--abbrev-ref', 'HEAD')).Trim()
     if ($branch -ne $developBranch) { throw "Current branch is '$branch': switch to '$developBranch' (git checkout $developBranch) first." }
 
@@ -69,7 +86,13 @@ try {
             }
             $subject = if ($released) { "$version · docs" } elseif ($lastSubject -like "$version*") { "$version · suite" } else { $version }
             $message = Join-Path ([IO.Path]::GetTempPath()) "tensho-commit-$version.txt"
-            [IO.File]::WriteAllText($message, "$subject`n`n$notes`n", [Text.UTF8Encoding]::new($false))
+            # Body: every version since the last committed one (subject 'x.y.z…' of the latest commit carrying a version).
+            $lastCommitted = @(Invoke-Git @('log', '-200', '--format=%s') | ForEach-Object { if ($_ -match '^(\d+\.\d+\.\d+)') { $Matches[1] } } | Select-Object -First 1)
+            $since = if ($lastCommitted.Count -gt 0 -and [version]$lastCommitted[0] -lt [version]$version) { $lastCommitted[0] } else { $version }
+            $commitNotes = if ($since -eq $version) { $notes } else { Get-NotesSince $since }
+            [IO.File]::WriteAllText($message, "$subject`n`n$commitNotes`n", [Text.UTF8Encoding]::new($false))
+            if ($since -ne $version) { Write-Output "Commit message covers the versions after $since." }
+            if ($DryRun) { Write-Output "--- commit message ---`n$subject`n`n$commitNotes`n----------------------" }
             Step "git add -A" { git add -A }
             Step "git commit -F <message '$subject'>" { git commit -F $message }
         }
@@ -98,6 +121,11 @@ try {
     $remoteTag = & git ls-remote --tags origin "refs/tags/$tag"
     if ($remoteTag) { Stop-Release "Tag $tag already exists on GitHub." }
 
+    # Release notes: every version since the last published release (highest Stable-x.y.z tag here or on GitHub).
+    Invoke-Git @('fetch', 'origin', '--tags') | Out-Null
+    $lastReleased = @(Invoke-Git @('tag', '--list', 'Stable-*') | ForEach-Object { $_ -replace '^Stable-', '' } | Where-Object { $_ -match '^\d+\.\d+\.\d+$' -and [version]$_ -lt [version]$version } | Sort-Object { [version]$_ } -Descending | Select-Object -First 1)
+    if ($lastReleased.Count -gt 0) { $notes = Get-NotesSince $lastReleased[0]; Write-Output "Release notes cover the versions after $($lastReleased[0])." }
+    if ($DryRun) { Write-Output "--- release notes ---`n$notes`n---------------------" }
     # repo.json: Dalamud custom repository entry built from the packaged manifest, pointing at this release's zip.
     $output = 'src\TenshoAssistant\bin\x64\Release'
     $manifest = Get-Content -Raw -LiteralPath (Join-Path $output 'TenshoAssistant.json') | ConvertFrom-Json

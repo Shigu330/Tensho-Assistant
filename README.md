@@ -188,6 +188,8 @@ This project depends on and integrates with the following tools and ecosystems:
 - reference plugins studied without copying code: Mappy, SortaKinda (AGPL) and the other reference plugins listed in `docs/project/ROADMAP.md`
 - level modifier table (main stat, levels 1–100) from Character Panel Refined by Kouzukii (MIT)
 - duty loot and item source data from [LuminaSupplemental](https://github.com/Critical-Impact/LuminaSupplemental) by Critical-Impact (GPL-3.0)
+- fishing bait, mooch, bite and window data from [GatherBuddy](https://github.com/Ottermandias/GatherBuddy) by Ottermandias (Apache-2.0), downloaded at runtime as data
+- fishing bite times from [Teamcraft](https://github.com/ffxiv-teamcraft/ffxiv-teamcraft)'s public reports (MIT)
 - the localization and translation workflow used for UI strings and language files
 
 This project is an original plugin implementation, but it relies on these ecosystem components and references for its operation, testing, and validation.

@@ -65,6 +65,8 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Bountiful"),ref gpBountiful,0);
                     if(ImGui.IsItemHovered()) WrappedTooltip(localization.Get("GpUi.BountifulHelp"));
+                    ImGui.TableNextColumn();
+                    if(DrawBountifulEstimate() is { } estimate && estimate!=gpBountiful){gpBountiful=estimate;changed=true;}
                 }
                 finally { ImGui.EndTable(); }
             }
@@ -129,5 +131,28 @@ internal sealed partial class MainWindow
         DrawItemIcon(new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(24));
         if(ImGui.IsItemHovered())WrappedTooltip(metadata.Description);
         ImGui.SameLine();return ImGui.Checkbox(label,ref active);
+    }
+
+    // Bountiful II estimate (0.224): gathering rating of the current gathering job against the context item's base value; « Use » fills
+    // the field, which stays editable. Community rule (docs/evidence/0.224-bountiful-base.md).
+    private Func<uint,int?>? bountifulBase;
+    internal void ConfigureBountifulBase(Func<uint,int?> baseOf)=>bountifulBase=baseOf;
+    private int? DrawBountifulEstimate()
+    {
+        var stats=characterStats.State;
+        var baseValue=itemId>0 ? bountifulBase?.Invoke((uint)itemId):null;
+        var rating=stats.JobId is 16 or 17 && stats.Values.TryGetValue("Gathering",out var gathering) ? gathering:0;
+        if(baseValue is not { } valueBase || rating<=0 || BountifulEstimate.Bonus(rating,valueBase) is not { } bonus)
+        {
+            ImGui.TextDisabled(localization.Get("GpUi.BountifulEstimateNone"));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GpUi.BountifulEstimateNoneHelp"));
+            return null;
+        }
+        ImGui.TextColored(Accent,localization.Format("GpUi.BountifulEstimate",bonus));
+        var next=BountifulEstimate.NextStep(rating,valueBase);
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("GpUi.BountifulEstimateHelp",rating,valueBase,(int)Math.Floor(valueBase*0.9),(int)Math.Floor(valueBase*1.1))
+            +(next is { } step ? "\n"+localization.Format("GpUi.BountifulNext",step-rating):""));
+        ImGui.SameLine();
+        return ImGui.SmallButton(localization.Get("GpUi.BountifulUse")+"##BountifulUse") ? bonus:null;
     }
 }

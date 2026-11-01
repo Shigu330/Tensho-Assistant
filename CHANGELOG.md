@@ -3,6 +3,148 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.234.0
+- Demande : que le commit et la release ajoutent les textes de toutes les versions pas encore commitées ou publiées.
+- `Release.ps1` : le message de commit reprend la section anglaise de chaque version du CHANGELOG depuis la dernière version commitée
+  (dernier commit dont le titre commence par un numéro), et les notes de la release GitHub et de repo.json celles de chaque version depuis
+  la dernière release publiée (plus haut tag `Stable-x.y.z`, tags récupérés de GitHub), de la plus récente à la plus ancienne, chacune sous
+  « ## x.y.z » ; une seule version : ses notes seules comme avant. `-DryRun` affiche le message et les notes. Testé (-DryRun) : le commit
+  en attente couvre 0.224.0 à 0.233.0.
+- Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.234.0.0. Aucun changement du plugin.
+### English
+- Commit messages and release notes now gather the English notes of every version since the last commit or the last published release
+  (newest first, one « ## x.y.z » section each); `-DryRun` prints them.
+
+## 0.233.0
+- Retour : le clic droit ne donne pas accès à nos modules sur les poissons ni sur les appâts.
+- Clic droit sur un poisson ou un appât de l'aide à la pêche, et sur un appât de « Comment le pêcher » : menu des outils utiles pour cet
+  objet. Le menu « liens » commun (butin des contenus, mission, Revue de mode, pêche) liste maintenant les mêmes outils que le menu de
+  l'inventaire et l'objet en contexte (`RelevantRoutes` : usages, artisanat, récolte, vendeurs, marché, butin, monstres, quête,
+  collection, stocks, fiche, outils), puis les sources de l'objet.
+- Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.233.0.0. Non validé en jeu.
+### English
+- Right click on a fish or a bait (fishing help, Gathering page) opens the menu of useful tools; the shared item links menu now lists the
+  same tools as the inventory menu and the context item panel, then the item's sources.
+
+## 0.232.0
+- Retour (capture de l'aide à la pêche, temps de touche affichés) : plus compact sans perdre d'information, et adapté au texte.
+- Tableau d'une ligne par poisson : poisson (stock, ✓/✗), route d'appâts en icônes, touche « ! / !! / !!! » en couleur avec le ferrage
+  abrégé, temps de touche « 9–16 s (12) » (vert dans l'intervalle du chrono), et une colonne Conditions seulement si un poisson en a
+  (créneau, météo, météo précédente, leurre, accrochage, proies). Les textes complets passent en infobulle ; la note des sources devient
+  « Sources (i) » ; la fenêtre prend la largeur de son contenu.
+- Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.232.0.0. Non validé en jeu.
+### English
+- Fishing help as a compact table, one row per fish (fish, bait route, coloured bite and hookset, bite time, conditions only when any);
+  full texts in tooltips; the window fits its content.
+
+## 0.231.0
+- Retour : il manque le temps de pêche des poissons. GatherBuddy ne publie pas de temps de touche (il les mesure sur le jeu du joueur) ;
+  Teamcraft (MIT) les publie par son API publique (docs/evidence/0.231-teamcraft-bite-times.md).
+- « Touche après 13–26 s (souvent 13 s) » par poisson dans l'aide à la pêche et dans « Comment le pêcher » (par lieu), d'après les relevés
+  Teamcraft (secondes ayant au moins 3 relevés et 2 % du total ; `FishBiteTimeSummary` testé), une requête par lieu en cache.
+  Chrono dans l'aide à la pêche (depuis le début de la pêche, bouton « Relancer » à chaque lancer) ; le temps de touche passe en vert
+  quand le chrono est dans l'intervalle. Paramètres › Avancé : « Teamcraft (temps de touche) ».
+- Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.231.0.0. Non validé en jeu.
+### English
+- Fishing bite times (« bite after 13–26 s, usually 13 s ») per fish and spot from Teamcraft's public reports, in the fishing help and the
+  Gathering page; a stopwatch in the fishing help turns the bite time green while inside the range. New switch in Settings › Advanced.
+
+## 0.230.0
+- Retour : aide à la pêche 0.229 vue en jeu (touches et ferrages GatherBuddy affichés). Demande : revoir le module Récolte / pêche pour
+  utiliser GatherBuddy en priorité, interface plus pratique, garder les liens avec les autres modules et ajouter ceux qui manquent.
+- Page Récolte : en tête l'objet, l'heure ET et les icônes des autres modules utiles pour lui (mêmes que l'objet en contexte : usages,
+  artisanat, vendeurs, marché, butin, monstres, quête, collection, stocks). Pour un poisson, section « Comment le pêcher · GatherBuddy »
+  ouverte en premier : route d'appâts en icônes (clic = fiche de l'appât), touche et ferrage, leurre, accrochage, proies, créneau ET avec
+  les prochaines ouvertures, météo et météo précédente, puis alarme (chaque jour ET avec la condition météo), météo de zone, carte et aide
+  à la pêche. Tableau des lieux : créneau GatherBuddy au lieu de « Horaire ET inconnu » pour la pêche. Carnet du jeu, Garland (secours)
+  et lecture du point de récolte passent en bas.
+- Verify.ps1 (agent) : 556/556, 0 avertissement, 0 erreur ; DLL 0.230.0.0. Non validé en jeu.
+### English
+- Gathering page: the item's other modules first; for a fish, a « How to catch it · GatherBuddy » section first (bait route, bite and
+  hookset, lure, snagging, predators, ET window with next openings, weathers, alarm, zone weather, map, fishing help); fishing rows show
+  GatherBuddy's window; the game log, Garland and the live node reading move down.
+
+## 0.229.0
+- Retour (capture du panneau en pêche, « Pêche en cours » détecté) : appâts venus de Garland sans touche ni ferrage, lignes « Horaire ET
+  inconnu / non couvert » partout. Cause : les fichiers anciens de GatherBuddy alignent leurs appels (« data.Apply     (4869, … ) ») et
+  écrivent une mooch comme chaîne complète (« Mooch(data, 2585, 4869) ») ; le lecteur exigeait « Apply( » collé : tous ces poissons
+  étaient ignorés. Correction : espaces acceptés avant la parenthèse, route complétée depuis une chaîne entière ou un dernier poisson.
+  Vérifié sur les 36 vrais fichiers (lus le 2026-11-01) : 2 616 poissons lus (au lieu d'environ 1 180) ; test ajouté sur l'ancien format.
+  Les lignes d'horaire de Garland ne s'affichent plus que pour un vrai créneau ET.
+- Verify.ps1 (agent) : 556/556, 0 avertissement, 0 erreur ; DLL 0.229.0.0. Non validé en jeu.
+### English
+- Fishing help: GatherBuddy's older data files (aligned calls, whole mooch chains) are now read too — 2,616 fish instead of about
+  1,180 — so ARR fish show their bite and hookset; Garland's « unknown window » lines are no longer shown.
+
+## 0.228.0
+- Demande : un bouton pour ouvrir l'aide à la pêche (doute sur la détection de la pêche).
+- Ouverture manuelle : bouton « Ouvrir l'aide à la pêche » dans les pages Récolte, et commande `/tensho peche` (ou `fish`) ; la fenêtre
+  reste ouverte quel que soit le métier, même sans pêcher, et se ferme par sa croix ou le même bouton. Elle indique « pêche en cours »
+  ou « lieu le plus proche (pas en train de pêcher) », et « aucun lieu de pêche connu dans cette zone » le cas échéant. L'ouverture
+  automatique au lancer (condition Dalamud « Fishing ») reste en place.
+- Verify.ps1 (agent) : 556/556, 0 avertissement, 0 erreur ; DLL 0.228.0.0. Non validé en jeu.
+### English
+- Fishing help can be opened by hand: button on the Gathering pages and `/tensho fish`; it stays open on any job, even when not fishing,
+  until closed. The automatic opening when casting stays.
+
+## 0.227.0
+- Demande : utiliser GatherBuddy (Apache-2.0) pour les appâts plutôt que Garland ; question « Lumina au lieu de Garland ? » : les appâts
+  ne sont ni dans les données du jeu ni dans LuminaSupplemental (le jeu donne déjà lieux, poissons et positions).
+- `Community/GatherBuddyFish.cs` : téléchargement unique des fichiers de données de pêche de GatherBuddy (liste via l'API GitHub, cache
+  « gatherbuddy-fish ») et analyseur original des instructions « data.Apply(…) » : appât, poisson à réutiliser (route complète), touche
+  (« ! », « !! », « !!! ») et ferrage, créneau ET, météo et météo précédente, leurre, proies à attraper d'abord, accrochage. Testé sur un
+  extrait réel.
+- Aide à la pêche : GatherBuddy en premier (route d'appâts, touche/ferrage, créneau, leurre, météos nommées par la feuille Weather, proies),
+  Garland en secours. Paramètres › Avancé : interrupteur « GatherBuddy (pêche) ». Crédit dans README, références et pied du panneau.
+- Verify.ps1 (agent) : 556/556, 0 avertissement, 0 erreur ; DLL 0.227.0.0. Non validé en jeu.
+### English
+- Fishing help now uses GatherBuddy's fish data (Ottermandias, Apache-2.0, downloaded at runtime and parsed as data): bait route with
+  mooches, bite and hookset, ET window, weathers, lure, predators and snagging; Garland stays as a fallback. New switch in Settings ›
+  Advanced.
+
+## 0.226.0
+- Demande : une aide à la pêche, avec les appâts une fois la pêche lancée (et une aide du style Distant Seas).
+- Panneau « Aide à la pêche · <lieu> » pendant la pêche (pêcheur, condition « Fishing ») : lieu de pêche le plus proche du joueur dans
+  sa zone (feuille FishingSpot, coordonnées prouvées par `PROBE_FISHSPOT`, docs/evidence/0.226-fishing-spot-coordinates.md), ses
+  poissons (données du jeu) avec ✓/✗ de collection et stock, et pour chacun les appâts de ce lieu (appât → poisson à réutiliser), créneau
+  ET et météo d'après Garland (fiche de l'objet, une requête à la fois, cache ; la fiche Garland est maintenant lue aussi pour la pêche).
+  Fenêtre déplaçable ; réglage « Aide à la pêche en jeu » (Paramètres › Modules › Récolte, activé par défaut).
+- Distant Seas (AGPL, lu seulement) concerne la pêche en mer (croisière) et s'appuie sur un tableur communautaire (Fisherman's Horizon) :
+  non repris faute de source de données utilisable ; la pêche en mer n'est pas couverte par ce panneau.
+- Verify.ps1 (agent) : 555/555, 0 avertissement, 0 erreur ; DLL 0.226.0.0. Non validé en jeu.
+### English
+- In-game fishing help: while fishing, a panel lists the fish of the nearest fishing spot (game data) with their bait routes for that spot
+  (bait → mooch), ET window and weather (Garland community data). Setting « In-game fishing help » (on by default). Ocean fishing is not
+  covered.
+
+## 0.225.0
+- Retour (capture de la fenêtre « Extraction de minerai ») : aucune aide en jeu à la récolte ; bien séparer chaque métier.
+- Panneau « Aide à la récolte · Mineur / Botaniste » à droite de la fenêtre de récolte du jeu : en-tête du métier (icône de classe et
+  couleur propres), niveau, PR et essais ; chaque objet du point avec réussite, récolte supplémentaire, Abondance estimée (0.224) et
+  stock (clic = objet en contexte, infobulle complète) ; plan de PR conseillé pour l'objet choisi (objet en contexte, sinon le premier)
+  avec les actions du métier, calculé comme l'outil PR et seulement quand les valeurs lues changent. Position lue avec le point (thread
+  framework). Réglage « Aide à la récolte en jeu » (Paramètres › Modules › Récolte, activé par défaut) : active la lecture de la fenêtre.
+- Verify.ps1 (agent) : 555/555, 0 avertissement, 0 erreur ; DLL 0.225.0.0. Non validé en jeu.
+### English
+- In-game gathering help: a panel beside the game's gathering window, headed by the job (miner or botanist, own icon and colour), listing
+  each item of the node (success, gatherer's boon, estimated Bountiful bonus, stock) and the advised GP plan with that job's actions.
+  Setting « In-game gathering help » (on by default).
+
+## 0.224.0
+- Plan avant publication, point 1 : bonus de Récolte abondante II (« Abondance ») dans l'outil PR de récolte.
+- Recherche dans l'existant : GatheringOptimizer (MIT) le laisse manuel ; frozen_rabbit_tome (sans licence, règle relevée sans copie) :
+  +3 si récolte ≥ ⌊base × 1,1⌋, +2 si ≥ ⌊base × 0,9⌋, sinon +1. Base prouvée par sonde `PROBE_GATHERLEVEL` : colonne Gathering de la
+  feuille ItemLevel à la ligne GatheringItem.GatheringItemLevel (3420 pour un minerai de niveau 90 ; la ligne « niveau » donnait 600,
+  fausse) — docs/evidence/0.224-bountiful-base.md.
+- Outil PR : à côté du champ « bonus », « Estimé : +N » pour l'objet en contexte, avec la valeur de récolte du personnage en mineur ou
+  botaniste ; infobulle : récolte, base, paliers +2/+3, ce qui manque pour le palier suivant, règle communautaire ; bouton « Utiliser »
+  qui remplit le champ (toujours modifiable). `Gathering/BountifulEstimate.cs` testé.
+- Verify.ps1 (agent) : 555/555, 0 avertissement, 0 erreur ; DLL 0.224.0.0. Non validé en jeu.
+### English
+- Gathering GP tool: Bountiful Yield/Harvest II bonus estimated (+1/+2/+3) from the character's gathering rating against the item's base
+  value (game sheet ItemLevel, Gathering column, at the item's GatheringItemLevel row), using a community rule (+3 from 110 %, +2 from
+  90 %); shown as an estimate with a « Use » button, the field stays editable.
+
 ## 0.223.0
 - Retour (capture) : le cadre ne tenait pas à l'icône (il couvrait toute la ligne avec la zone de texte) ; il faut une petite fenêtre à côté
   de l'emplacement choisi plutôt qu'un panneau global sur le côté.

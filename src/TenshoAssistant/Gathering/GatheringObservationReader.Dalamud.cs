@@ -81,6 +81,8 @@ internal sealed class GatheringObservationReader : IDisposable
                     || objects.LocalPlayer?.Address!=local.Address || local.ClassJob.RowId!=job || local.Level!=level || local.CurrentGp!=gp || local.MaxGp!=maxGp
                     || addon->GatherStatus!=status || Text((AtkResNode*)addon->IntegrityLeftover)!=attempts || Text((AtkResNode*)addon->IntegrityTotal)!=total || !slots.SequenceEqual(Copy(addon)))
                 {service.Missing(ticket,current,GatheringObservationStatus.NotReady);return;}
+                var unit=(AtkUnitBase*)handle.Address;
+                service.SetWindow(unit->RootNode==null ? null:(unit->X,unit->Y,unit->RootNode->Width*unit->Scale,unit->RootNode->Height*unit->Scale));
                 service.Publish(ticket,current,job,level,gp,maxGp,status,attempts,total,slots);
             }
             catch(Exception error){service.Fail(ticket,current,error);nextRead=now+Stopwatch.Frequency*5;log.Warning(error,"Gathering observation unavailable; retry in five seconds.");}

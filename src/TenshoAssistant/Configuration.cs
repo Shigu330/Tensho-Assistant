@@ -108,6 +108,10 @@ public sealed partial class Configuration
     public List<TenshoAssistant.Alarms.TenshoAlarm> Alarms { get; set; } = [];
     // Header and advanced settings (0.206).
     public bool ShowHeaderClock { get; set; } = true;
+    // In-game gathering help beside the game's gathering window (0.225); turns the gathering window reading on.
+    public bool GatheringPanel { get; set; } = true;
+    // In-game fishing help while fishing (0.226): fish of the current spot with their bait routes.
+    public bool FishingPanel { get; set; } = true;
     // Fashion Report of the week (0.213): owned first, dim the others, by popularity, panel beside the game window.
     public TenshoAssistant.Fashion.FashionOptions FashionOptions { get; set; } = new();
     public bool ShowHeaderEorzeaTime { get; set; } = true;
@@ -117,6 +121,10 @@ public sealed partial class Configuration
     public bool CommunityLumina { get; set; } = true;
     public bool CommunityGarland { get; set; } = true;
     public bool CommunityWiki { get; set; } = true;
+    // GatherBuddy fish data (0.227, Apache-2.0): baits, mooches, bite, windows for the fishing help.
+    public bool CommunityGatherBuddy { get; set; } = true;
+    // Teamcraft bite times (0.231): seconds before the bite, per fish and spot.
+    public bool CommunityTeamcraftBites { get; set; } = true;
     public TenshoAssistant.Alarms.AlarmSettings AlarmOptions { get; set; } = new();
     // 0 follows the game's interface theme; 1..6 force a PluginTheme (value - 1).
     public int ThemeMode { get; set; }

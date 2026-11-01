@@ -75,6 +75,8 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.Lumina","Advanced.LuminaTip",()=>configuration.CommunityLumina,value=>configuration.CommunityLumina=value);
         BoolSetting("Advanced.Garland","Advanced.GarlandTip",()=>configuration.CommunityGarland,value=>configuration.CommunityGarland=value);
         BoolSetting("Advanced.Wiki","Advanced.WikiTip",()=>configuration.CommunityWiki,value=>configuration.CommunityWiki=value);
+        BoolSetting("Advanced.GatherBuddy","Advanced.GatherBuddyTip",()=>configuration.CommunityGatherBuddy,value=>configuration.CommunityGatherBuddy=value);
+        BoolSetting("Advanced.Teamcraft","Advanced.TeamcraftTip",()=>configuration.CommunityTeamcraftBites,value=>configuration.CommunityTeamcraftBites=value);
         BoolSetting("Settings.MarketHover","Advanced.MarketTip",()=>configuration.MarketPricesOnHover,value=>{configuration.MarketPricesOnHover=value;if(!value)market.CancelBackground();});
 
         ImGui.Separator();
@@ -177,6 +179,8 @@ internal sealed partial class MainWindow
                 SourceLine("Garland Tools","Contributor.SourceGarland",configuration.CommunityGarland);
                 SourceLine("consolegameswiki","Contributor.SourceWiki",configuration.CommunityWiki);
                 SourceLine("Universalis","Contributor.SourceUniversalis",configuration.MarketPricesOnHover);
+                SourceLine("GatherBuddy (Apache-2.0)","Contributor.SourceGatherBuddy",gatherBuddyFish?.State.Data is not null);
+                SourceLine("Teamcraft (MIT)","Contributor.SourceTeamcraft",configuration.CommunityTeamcraftBites);
                 SourceLine("Character Panel Refined (MIT)","Contributor.SourceCpr",true);
             }
             finally{ImGui.TreePop();}

@@ -59,7 +59,7 @@ Branches: work happens on **`Devloppement`**; **`main`** only receives releases.
 | add `-Force` | Runs every check again; otherwise checks are skipped when the same version and sources (all tracked files except `*.md`, `docs/`, `repo.json`) already passed (stamp in `artifacts/verify-stamp.json`). |
 
 Requirements: `<Version>` raised in the csproj and a `## x.y.z` entry at the top of CHANGELOG.md with a `### English` section (used for
-the commit message and the release notes; the script refuses otherwise); for
+the commit message and the release notes, which gather every version since the last commit or release; the script refuses otherwise); for
 `-Release`, GitHub CLI installed (`winget install GitHub.cli`) and logged in once (`gh auth login`). The logic is in `scripts/Release.ps1`.
 
 Custom Dalamud repository (install without the dev DLL): `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`

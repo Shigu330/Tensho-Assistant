@@ -1,6 +1,6 @@
-# État courant (mis à jour 2026-10-31)
+# État courant (mis à jour 2026-11-01)
 
-VERSION: 0.223.0.0 — Verify.ps1 (agent) 548/548, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.234.0.0 (dernière release publiée : Stable-0.223.0) — Verify.ps1 (agent) 554/554, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: COLL-004 — réduire les sources « inconnues » des objets (choix utilisateur 2026-10-31) ; 0.177 lignes parasites du wiki retirées.
 QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-10-31 : 5 h à 93 % (réinit. 22:10), semaine 66 % — arrêt après 0.190 (5 h à 95 %). Dernier relevé connu : 5 h remis à 0 vers 12:10, semaine 41 % (réinit. jeudi 23:00).
 
@@ -19,18 +19,31 @@ QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-10-31 : 5 h à 93
 
 - Carte : marchands des variantes de carte d'une même zone (Auxesia, 0.171 + 0.175), capture utilisateur 2026-10-31.
 
+## Validé en jeu (rapport utilisateur 2026-11-01 : « tous est ok »)
+- Tout ce qui était « à valider » : Mini Cactpot 0.158, Triple Triade 0.161–0.162, traduction wiki 0.150, carte Dalamud 0.156, caches et
+  tri anciens (0.82–0.84), sources d'objets et liens 0.197–0.199, objet en contexte 0.200, météo et alarmes 0.201–0.205 (dont `/alarm`
+  dans le jeu), accueil / horloge / Avancé / contributeurs 0.206, infobulles, menu inventaire, butin ✓/✗ et mission aléatoire 0.207–0.208,
+  icônes de quêtes 0.211, Revue de mode 0.213–0.223, choix de la ressource au clic droit d'un point de récolte 0.218.
+- Commit et release (`Verify.ps1 -Commit/-Release`, `commit-release.bat`) : releases Stable-0.219.0 à Stable-0.223.0 publiées.
+
 ## À valider en jeu
-- 0.158 Mini Cactpot : cadre vert sur les meilleures cases puis lignes, sur la fenêtre du jeu (sens des diagonales à confirmer).
-- 0.161 Triple Triade : panneau à côté de la fenêtre de défi du PNJ (% de victoire par deck, génération de deck).
-- 0.162 decks Tensho par PNJ (liste, suppression) et aide-mémoire des cartes à côté de l'éditeur de decks du jeu.
-- 0.150 traduction des lignes wiki (hors carte, non confirmée explicitement).
-- 0.156 carte Tensho dans le système de fenêtres Dalamud : ouverture (M, journal), fermeture (croix, M), agrandir/réduire, opacité,
-  verrouillage, masquage en combat ; manifeste anglais dans l'installateur de plugins.
-- Repères d'exploration : en pause (positions vérifiées contre le carnet publié ; météo via wiki).
-- Antérieur non confirmé : caches recettes et récolte (0.82–0.83), critères de tri (0.84).
+- 0.224 : estimation du bonus de Récolte abondante II dans l'outil PR (en mineur/botaniste, objet récolté en contexte).
+- 0.225 : panneau d'aide à la récolte en jeu (mineur / botaniste séparés).
+- 0.226 : panneau d'aide à la pêche (poissons du lieu, appâts, créneau, météo) ; pêche en mer non couverte (pas de source).
+- 0.227 : données de pêche de GatherBuddy (Apache-2.0) en premier, Garland en secours.
+- 0.228 : ouverture manuelle de l'aide à la pêche (bouton, /tensho peche) ; détection « pêche en cours » vue en jeu (capture 2026-11-01).
+- 0.229 : lecture des anciens fichiers GatherBuddy (2 616 poissons) — VALIDÉ en jeu (capture 2026-11-01).
+- 0.230 : page Récolte réorganisée (GatherBuddy d'abord, liens vers les modules).
+- 0.231 : temps de touche (Teamcraft) et chrono de pêche — VALIDÉ en jeu (capture 2026-11-01).
+- 0.232 : aide à la pêche en tableau compact.
+- 0.233 : clic droit (outils utiles) sur poissons et appâts ; menu « liens » commun aligné sur le menu de l'inventaire.
 
 ## Prochaine action
-0a. À VALIDER EN JEU (0.197–0.199 : infobulle sur toutes les icônes de carte ; clic droit « Échange » → vendeur, PNJ LuminaSupplemental ; 0.200 icônes d'outils de « Objet en contexte » ; 0.201 météo + alarmes : cloche récolte/pêche/météo/repères, son et message à l'heure, rappel modifiable ; 0.202 module Alarmes groupé par objet ; 0.203–0.204 alarmes séparées par métier ; 0.205 création dans le jeu par /alarm (réglage ou « Envoyer au jeu ») à valider ; 0.206 accueil, horloge unique, onglet Avancé, aide contributeurs ; 0.207 infobulles, menu inventaire, butin ✓/✗ et filtres, mission aléatoire ; 0.208 menu inventaire = outils utiles de l'objet en contexte ; 0.209 usages VALIDÉ (« c'est ok ») ; 0.210 couches Tensho VALIDÉ ; 0.211 icônes de quêtes (EventIconType) dans les réglages ; 0.212 VALIDÉ ; 0.213–0.214 Revue de mode façon Avant-Garde (catégories lues : affichées en jeu d'après la capture ; infobulle non grisée à valider). 0.215 teintures. REPRISE (quota 94 %+ le 2026-11-01) : valider 0.214–0.216 en jeu (infobulle, teintures, liste en accordéon) ; 0.219–0.223 Revue de mode (boutons sur les icônes du jeu, fenêtre par emplacement, cadre rouge) VALIDÉE en jeu le 2026-11-01 ; scripts de commit/release. PROCHAINE ACTION : valider 0.214–0.219 en jeu ; commit/release VALIDÉS (Stable-0.219.0 et Stable-0.220.0 publiées le 2026-11-01 par Verify.ps1 -Commit/-Release, protections anti-doublon comprises ; dépôt perso https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json)) : infobulle « Comment l'obtenir » d'un cristal, d'une carte de Triple Triad (lot de cartes), d'un objet de Bozja/Eureka ; clic droit → objet source.
+PLAN AVANT PUBLICATION (décidé 2026-11-01, détail : docs/project/BACKLOG.md « Revue des points ouverts ») : 1) FAIT 0.224 (à valider en jeu) : bonus d'Abondance estimé
+(règle communautaire citée, modifiable) ; 2) Revue de mode : coffre à apparence + armoire dans « possédé » ; 3) boutiques de compagnie libre
+(FccShop) ; 4) icônes de quête seulement sur relevé en jeu ; puis publication D17. Non faits par décision : score de la revue, suppression
+d'alarme du jeu, sources inconnues restantes, injection dans l'infobulle native.
+0a. FAIT et validé en jeu (2026-11-01) : 0.197–0.223. Dépôt perso : https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json
 0. FAIT et validé en jeu (0.191–0.196 : copie, carnet, prévision, Macro Chain) — PRIORITÉ utilisateur (2026-10-31 18:47) : copier les macros de l'outil de génération de macros (CRAFT-MACRO-001, `Craft/CraftMacroExport.cs`)
    directement dans les macros du jeu, avec réglages : numéro de macro de départ, limite (dernier emplacement utilisable), individuel/partagé ;
    référence fonctionnelle Craftimizer (lecture seule, pas de copie de code). Écriture dans RaptureMacroModule = action sur clic du joueur ;
@@ -40,8 +53,8 @@ QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-10-31 : 5 h à 93
 3. Commit (GitHub Desktop). Publication D17 côté auteur.
 
 ## Blocages connus
-- Bonus natif d'Abondance inconnu (sources divergentes) : ne pas inventer de formule.
-- Repères d'exploration : la météo exigée n'est pas dans les données du jeu (source wiki).
+- Bonus d'Abondance : règle communautaire trouvée (frozen_rabbit_tome), à appliquer comme estimation citée (plan avant publication).
+- Repères d'exploration : clos, météo du wiki citée (affichée et utilisée par les alarmes depuis 0.201).
 - Plantage 08:19 (2026-10-31) causé par la lecture d'une infobulle de marqueur : lecture bornée depuis 0.133 ; surveiller ([extrait](../evidence/0.133.0-crash-excerpt.log)).
 
 ## Couverture des 17 plugins de référence
