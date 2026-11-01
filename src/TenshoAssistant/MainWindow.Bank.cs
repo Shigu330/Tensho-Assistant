@@ -24,7 +24,7 @@ internal sealed partial class MainWindow
     private bool bankHasVisibleItems;
 
     private static readonly StorageCategory[] StorageGroups =
-        [StorageCategory.PlayerBags, StorageCategory.Chocobo, StorageCategory.Retainer];
+        [StorageCategory.PlayerBags, StorageCategory.Armoury, StorageCategory.GlamourDresser, StorageCategory.Armoire, StorageCategory.Chocobo, StorageCategory.Retainer];
 
     private void DrawStorageGroups(ItemHoldingsSummary summary)
     {
@@ -36,6 +36,9 @@ internal sealed partial class MainWindow
             {
                 StorageCategory.PlayerBags => localization.Get("BankUi.Character"),
                 StorageCategory.Chocobo => localization.Get("BankUi.Chocobo"),
+                StorageCategory.Armoury => localization.Get("BankUi.Armoury"),
+                StorageCategory.GlamourDresser => localization.Get("BankUi.GlamourDresser"),
+                StorageCategory.Armoire => localization.Get("BankUi.Armoire"),
                 _ => localization.Get("BankUi.Retainers"),
             };
             if (!ImGui.CollapsingHeader(label, ImGuiTreeNodeFlags.DefaultOpen)) continue;
@@ -269,6 +272,15 @@ internal sealed partial class MainWindow
                         ? InventoryCoverage.Complete : InventoryCoverage.Partial, positioned)));
             }
         }
+        catch (InvalidOperationException) when (copied.All(container => container.Location.Container.Value is >= 3200 and < 4000 or >= 25000))
+        {
+            // Armoury chest, glamour dresser and armoire (0.237) have no bag layout: their pieces in order, 35 per page (5 × 7).
+            var stacks = copied.SelectMany(container => container.Stacks.OrderBy(stack => stack.Slot)).ToArray();
+            var coverage = copied.All(c => c.Coverage == InventoryCoverage.Complete) ? InventoryCoverage.Complete : InventoryCoverage.Partial;
+            for (var page = 0; page * 35 < stacks.Length; page++)
+                frames.Add((localization.Format("BankUi.Bag", name, page + 1), new InventoryContainerSnapshot(copied[0].Location, coverage,
+                    stacks.Skip(page * 35).Take(35).Select((stack, index) => stack with { Slot = index, DisplayIndex = -1 }))));
+        }
         catch (InvalidOperationException)
         {
             errors.Add(localization.Format("BankUi.Reimport",name));
@@ -406,6 +418,8 @@ internal sealed partial class MainWindow
     {
         ImGui.TextWrapped(localization.Get(configuration.AutoBankCapture ? "BankUi.AutoOn":"BankUi.AutoOff"));
         if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.Saddlebag))ImGui.TextColored(Accent,localization.Get("BankUi.OpenSaddlebag"));
+        if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.GlamourDresser))ImGui.TextColored(Accent,localization.Get("BankUi.OpenDresser"));
+        if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.Armoire))ImGui.TextColored(Accent,localization.Get("BankUi.OpenArmoire"));
         if(menus.KnownRetainers is { } known)
         {
             foreach(var (id,name) in known)

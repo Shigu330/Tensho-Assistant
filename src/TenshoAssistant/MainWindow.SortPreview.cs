@@ -22,7 +22,7 @@ internal sealed partial class MainWindow
         var open=new[]{bankBridge.State.Retainer,bankBridge.State.Saddlebag,bankBridge.State.Premium}
             .Where(context=>context is not null && context.Key.CharacterId==character).Select(context=>context!).ToArray();
         var captured=visualSort.State.Capture;
-        var choices=entries.Select(entry=>(entry.Key,entry.Name)).Concat(open.Select(context=>(context.Key,context.Name))).ToList();
+        var choices=entries.Where(entry=>entry.Key.Kind is not (BankStorageKind.Armoury or BankStorageKind.GlamourDresser or BankStorageKind.Armoire)).Select(entry=>(entry.Key,entry.Name)).Concat(open.Select(context=>(context.Key,context.Name))).ToList();
         if(captured?.Scope.Storage is { } capturedKey && capturedKey.CharacterId==character)choices.Add((capturedKey,captured.Name));
         var origins=choices.DistinctBy(value=>value.Key).ToArray();
         if(sortPreviewOrigin is { } selected && !origins.Any(origin=>origin.Key==selected))sortPreviewOrigin=null;

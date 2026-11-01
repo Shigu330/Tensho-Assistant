@@ -161,7 +161,8 @@ internal sealed partial class MainWindow
         if(entry is null)return Collections.CollectionAcquisition.Unknown;
         if(entry.Acquisition!=Collections.CollectionAcquisition.Unknown)return entry.Acquisition;
         var state=collections.State;
-        return entry.Kind is Collections.CollectionKind.Mount or Collections.CollectionKind.Companion && !state.Loading && state.CharacterId!=0
+        // 0.241 (R-02): Triple Triad cards and orchestrion rolls are tracked like mounts and minions.
+        return entry.Kind is Collections.CollectionKind.Mount or Collections.CollectionKind.Companion or Collections.CollectionKind.TripleTriad or Collections.CollectionKind.Orchestrion && !state.Loading && state.CharacterId!=0
             ? Collections.CollectionAcquisition.NotAcquired:Collections.CollectionAcquisition.Unknown;
     }
     // Collection entry an item unlocks, if any.

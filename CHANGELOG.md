@@ -3,6 +3,80 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.242.0
+- R-01, première partie : l'icône « Cible indiquée par le jeu (journal) » restait sur la carte sans moyen de la retirer. Clic droit sur la
+  carte › « Retirer la cible indiquée par le jeu (journal) ». Le retrait automatique quand la quête est accomplie reste à faire (R-01).
+- Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.242.0.0. Non validé en jeu.
+### English
+- Map: right click › « Remove the target shown by the game (journal) » removes the journal target icon that stayed on the map.
+
+## 0.241.0
+- R-02 (docs/project/USER-REQUESTS.md) : cartes de Triple Triad et rouleaux d'orchestrion sans ✓/✗ et absents de « Non obtenus seulement »
+  dans le butin. Cause : un objet de collection non confirmé n'était tenu pour « non obtenu » (collection chargée) que pour les montures et
+  mascottes. Correction : même règle pour les cartes et les rouleaux.
+- Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.241.0.0. Non validé en jeu.
+### English
+- Triple Triad cards and orchestrion rolls now get the obtained / not obtained mark and the « not obtained only » filter, like mounts.
+
+## 0.240.0
+- Retour : les tenues complètes ne sont pas prises en compte pour le coffre à apparence. Cause : une tenue est rangée comme un seul objet
+  (la tenue) dans MirageManager.PrismBoxItemIds. Correction : pour chaque tenue rangée, ses pièces (feuille MirageStoreSetItem : arme,
+  bouclier, tête, torse, mains, jambes, pieds, oreilles, cou, poignets, bague) sont aussi comptées comme possédées (stocks, Revue de mode).
+- Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.240.0.0. Non validé en jeu.
+### English
+- Glamour dresser: the pieces of a stored outfit (MirageStoreSetItem) now count as owned, not only the outfit item.
+
+## 0.239.0
+- Retour (capture) : Banque toujours indisponible après 0.238. Fichier InventoryBank.json examiné (lecture seule) : l'entrée « Armoire »
+  enregistrée par 0.236 porte des numéros de case jusqu'à 3343 (numéros de ligne Cabinet), refusés au chargement (borne 1000) ; 0.238
+  évitait seulement d'en écrire de nouveaux. L'arsenal n'avait jamais été enregistré (capture bloquée tant que la Banque est en erreur).
+  La sacoche supplémentaire n'est pas en cause (entrée présente, vide).
+- Correction : au chargement, numéros de case acceptés jusqu'à 100 000 et 4 096 cases par conteneur ; le fichier actuel se relit sans perte.
+- Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.239.0.0. Non validé en jeu.
+### English
+- Fix: the Bank now loads armoire records saved by 0.236 (large slot numbers) instead of failing as a whole.
+
+## 0.238.0
+- Retour (capture) : Banque non fonctionnelle, « Les relevés de stocks ne sont pas disponibles », servants et sacoches disparus.
+  Cause (régression 0.235–0.236) : le fichier de la Banque refusait plus de 7 conteneurs par rangement, or l'arsenal en a 12 ; et les
+  cases de l'armoire portaient le numéro de ligne Cabinet, au-delà de la borne de 1000. Le chargement échouait en entier ; le fichier
+  n'a pas été écrasé (protection « échec de chargement »), les relevés sont intacts. Correction : 16 conteneurs au plus, cases de
+  l'armoire numérotées dans l'ordre.
+- Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.238.0.0. Non validé en jeu.
+### English
+- Fix: the Bank failed to load after the armoury chest was saved (12 containers over the old limit of 7; armoire slot numbers too large);
+  saved records were kept intact.
+
+## 0.237.0
+- Retour (capture de la Banque) : l'onglet « Coffre à apparence » affichait « ordre visuel indisponible. Réimportez le rangement
+  ouvert ». Cause : la vue par onglet range les objets selon la mise en page des sacs du jeu (InventoryDisplayLayout), qui n'existe pas
+  pour l'arsenal ni pour les conteneurs virtuels du coffre et de l'armoire. Correction : pour ces rangements, les pièces dans l'ordre,
+  35 par page (grille 5 × 7, même affichage et mêmes infobulles que les sacs). La lecture elle-même fonctionnait (relevé 10:46).
+- Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.237.0.0. Non validé en jeu.
+### English
+- Bank: the armoury chest, glamour dresser and armoire tabs now show their pieces in pages of 35 instead of « visual order unavailable ».
+
+## 0.236.0
+- Décision de l'utilisateur : ne pas dépendre d'un autre plugin (Allagan Tools écarté). Coffre à apparence et armoire lus dans le jeu.
+- Coffre à apparence : MirageManager.PrismBoxItemIds (HQ = +1 000 000, collectionnable = +500 000), connu après l'ouverture du coffre en
+  jeu (PrismBoxLoaded). Armoire : chaque ligne de la feuille Cabinet (ligne → objet) testée par UIState.Cabinet.IsItemInCabinet, connue après
+  l'ouverture de l'armoire (IsCabinetLoaded). Les deux sont enregistrés dans la Banque (conteneurs virtuels 25000 et 25001), affichés dans
+  leurs sections, comptés dans les stocks et le « possédé » de la Revue de mode ; rappel « ouvrez une fois… » tant qu'ils ne sont pas lus.
+  Arsenal, coffre et armoire relus toutes les 2 minutes (au lieu de 30 s) ; exclus de l'aperçu de tri.
+- Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.236.0.0. Non validé en jeu.
+### English
+- Glamour dresser and armoire read from the game (no other plugin needed), kept in the Bank and counted in stocks and the Fashion Report
+  « owned » state; known once each has been opened in the game.
+
+## 0.235.0
+- Plan avant publication, point 2 (élargi : coffre à apparence, armoire, arsenal, reliés à la Banque). Première étape : l'arsenal.
+- Arsenal lu comme un rangement (12 conteneurs InventoryType 3500, 3200–3203, 3205–3209, 3300, 3400 ; ids vérifiés par réflexion de
+  FFXIVClientStructs), enregistré dans la Banque (« Arsenal », relu toutes les 30 s quand la capture automatique est active), affiché dans
+  ses propres lignes et compté dans les stocks partout (« possédé » de la Revue de mode compris). Exclu de l'aperçu de tri.
+- Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.235.0.0. Non validé en jeu.
+### English
+- Armoury chest read as a storage, kept in the Bank and counted in stocks everywhere (Fashion Report « owned » included).
+
 ## 0.234.0
 - Demande : que le commit et la release ajoutent les textes de toutes les versions pas encore commitées ou publiées.
 - `Release.ps1` : le message de commit reprend la section anglaise de chaque version du CHANGELOG depuis la dernière version commitée

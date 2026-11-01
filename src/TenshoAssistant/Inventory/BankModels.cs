@@ -1,6 +1,6 @@
 namespace TenshoAssistant.Inventory;
 
-public enum BankStorageKind { Retainer, Saddlebag, PremiumSaddlebag }
+public enum BankStorageKind { Retainer, Saddlebag, PremiumSaddlebag, Armoury, GlamourDresser, Armoire }
 public readonly record struct BankKey(ulong CharacterId, BankStorageKind Kind, ulong StorageId);
 public sealed record BankEntry(BankKey Key, string Name, InventorySnapshot Snapshot);
 
@@ -9,12 +9,19 @@ public static class BankStorageScope
     private static readonly IReadOnlyList<int> Retainer = Array.AsReadOnly(Enumerable.Range(10000, 7).ToArray());
     private static readonly IReadOnlyList<int> Saddlebag = Array.AsReadOnly(new[] { 4000, 4001 });
     private static readonly IReadOnlyList<int> Premium = Array.AsReadOnly(new[] { 4100, 4101 });
+    // Armoury chest (0.235): main hand, off hand, head, body, hands, legs, feet, ears, neck, wrists, rings, soul crystals (InventoryType ids;
+    // the old waist container 3204 is left out).
+    private static readonly IReadOnlyList<int> Armoury = Array.AsReadOnly(new[] { 3500, 3200, 3201, 3202, 3203, 3205, 3206, 3207, 3208, 3209, 3300, 3400 });
 
     public static IReadOnlyList<int> ContainerIds(BankStorageKind kind) => kind switch
     {
         BankStorageKind.Retainer => Retainer,
         BankStorageKind.Saddlebag => Saddlebag,
         BankStorageKind.PremiumSaddlebag => Premium,
+        BankStorageKind.Armoury => Armoury,
+        // Glamour dresser and armoire (0.236): one virtual container each (not game InventoryType ids), filled from MirageManager and Cabinet.
+        BankStorageKind.GlamourDresser => [25000],
+        BankStorageKind.Armoire => [25001],
         _ => throw new ArgumentOutOfRangeException(nameof(kind)),
     };
 }

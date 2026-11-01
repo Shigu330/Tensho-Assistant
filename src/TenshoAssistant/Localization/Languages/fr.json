@@ -1857,6 +1857,7 @@
     "WikiCredit": "(wiki FFXIV consolegameswiki, en anglais, donnée communautaire)"
   },
   "MapView": {
+    "RemoveGameTarget": "Retirer la cible indiquée par le jeu (journal)",
     "IconCategory0": "Couches Tensho ({0})",
     "IconCategory1": "Quêtes ({0})",
     "IconCategory2": "Objectifs et événements ({0})",
@@ -2205,6 +2206,11 @@
     "TemplateDeleteError": "Échec de suppression du modèle."
   },
   "BankUi": {
+    "GlamourDresser": "Coffre à apparence",
+    "Armoire": "Armoire",
+    "OpenDresser": "Ouvrez une fois le coffre à apparence (auberge) pour le relever.",
+    "OpenArmoire": "Ouvrez une fois l'armoire (auberge) pour la relever.",
+    "Armoury": "Arsenal",
     "AutoSetting": "Enregistrer automatiquement les servants et sacoches à leur ouverture",
     "AutoSettingHelp": "Désactivé : un bouton d'import apparaît à côté des fenêtres de rangement du jeu.",
     "AutoOn": "Les servants et sacoches sont enregistrés automatiquement à chaque ouverture dans le jeu.",
