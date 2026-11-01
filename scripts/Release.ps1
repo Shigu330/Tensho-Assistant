@@ -57,7 +57,10 @@ try {
     }
 
     # Release
-    if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
+    # gh from PATH, else its usual install folders (a terminal opened before installing GitHub CLI does not see it yet).
+    $command = Get-Command gh -ErrorAction SilentlyContinue; $gh = if ($command) { $command.Source } else { $null }
+    foreach ($candidate in @("$env:ProgramFiles\GitHub CLI\gh.exe", "$env:LOCALAPPDATA\Programs\GitHub CLI\gh.exe")) { if (-not $gh -and (Test-Path -LiteralPath $candidate)) { $gh = $candidate } }
+    if (-not $gh) {
         throw "GitHub CLI 'gh' not found: install it (winget install GitHub.cli), then run 'gh auth login' once."
     }
     if (Invoke-Git @('status', '--porcelain')) { throw "Uncommitted changes: run '.\scripts\Verify.ps1 -Commit' first." }
@@ -94,7 +97,7 @@ try {
     Step "git push origin $releaseBranch" { git push origin $releaseBranch }
     Step "git tag -a $tag" { git tag -a $tag -m "Tensho Assistant $version" }
     Step "git push origin $tag" { git push origin $tag }
-    Step "gh release create $tag latest.zip" { gh release create $tag $zip --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --target $releaseBranch }
+    Step "gh release create $tag latest.zip" { & $gh release create $tag $zip --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --target $releaseBranch }
     Step "git checkout $developBranch" { git checkout $developBranch }
     Step "git merge --ff-only $releaseBranch" { git merge --ff-only $releaseBranch }
     Step "git push origin $developBranch" { git push origin $developBranch }
