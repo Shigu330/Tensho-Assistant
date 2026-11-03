@@ -3,6 +3,17 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.461.0
+- Demandes de l'utilisateur après l'essai au potager (détection validée : Shirogane 2-17, potager 1, emplacement 6, bonne graine) :
+  - Page Jardinage : chaque potager s'affiche en grille de 3 × 3, sans centre, comme le plan de plantation, avec le numéro, la graine (couleur selon l'état), les heures et
+    les boutons de chaque emplacement ; un emplacement libre dit « vide ». Les pots et les lieux tapés à la main restent en liste. La disposition suit le wiki (emplacement 1
+    en haut à gauche, puis sens horaire) : à comparer en jeu.
+  - Bouton « Replanter » retiré : une nouvelle plantation est détectée et remplace l'ancienne.
+- Tests : GardenGrid461Tests (2 cas) ; un test de Garden448 retiré avec le bouton. Verify.ps1 (agent) : 860/860, 0 avertissement, 0 erreur ; DLL 0.461.0.0. Non validé en jeu.
+### English
+- Garden page: each patch is drawn as a 3 × 3 grid (seed, state, times, buttons per bed), like the planting plan; pots and typed places stay a list. The « Replant » button
+  is gone: a new planting is detected and replaces the old one.
+
 ## 0.460.0
 - Demande de l'utilisateur pendant la campagne de tests : détecter le jardinage. Tensho lit les lignes du chat du jeu ; quand le jeu annonce une plantation (potager avec son
   numéro et son emplacement, ou pot), elle s'ajoute au journal avec :

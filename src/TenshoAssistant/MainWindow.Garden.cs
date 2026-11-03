@@ -65,36 +65,76 @@ internal sealed partial class MainWindow
         BoolSetting("Garden.Alerts","Garden.AlertsTip",()=>configuration.GardenAlerts,value=>configuration.GardenAlerts=value,c=>c.GardenAlerts);
         BoolSetting("Garden.Detect","Garden.DetectTip",()=>configuration.GardenDetect,value=>configuration.GardenDetect=value,c=>c.GardenDetect);
         var now=DateTimeOffset.UtcNow;GardenBed? removed=null;var changed=false;
-        foreach(var bed in beds)
+        // 0.461 (user request, in-game campaign): each patch as a grid; the rest (pots, places typed by hand) stays a list.
+        foreach(var (zone,patch,planted) in GardenJournal.Grids(beds))
+        {
+            ImGui.TextColored(Accent,localization.Format("Garden.GridTitle",zone,patch));
+            if(!ImGui.BeginTable($"GardenGrid{zone}{patch}",3,ImGuiTableFlags.Borders|ImGuiTableFlags.SizingStretchSame))continue;
+            try
+            {
+                for(var row=0;row<3;row++)
+                {
+                    ImGui.TableNextRow();
+                    for(var column=0;column<3;column++)
+                    {
+                        ImGui.TableNextColumn();
+                        if(GardenCrosses.BedAt(row,column) is not { } number){ImGui.TextDisabled("—");continue;}
+                        var (_,bed)=planted.FirstOrDefault(entry=>entry.Number==number);
+                        if(bed is null){ImGui.TextDisabled(localization.Format("Garden.GridEmpty",number));continue;}
+                        ImGui.PushID(bed.Id.ToString());
+                        try
+                        {
+                            ImGui.PushStyleColor(ImGuiCol.Text,GardenColor(GardenJournal.State(bed,now)));
+                            try{ImGui.TextWrapped($"{number}. {bed.Seed}");}
+                            finally{ImGui.PopStyleColor();}
+                            ImGui.TextDisabled(GardenTimes(bed,now));
+                            DrawBedButtons(bed,now,ref changed,ref removed);
+                        }
+                        finally{ImGui.PopID();}
+                    }
+                }
+            }
+            finally{ImGui.EndTable();}
+        }
+        foreach(var bed in beds.Where(bed=>GardenJournal.Slot(bed) is null))
         {
             ImGui.PushID(bed.Id.ToString());
             try
             {
-                var state=GardenJournal.State(bed,now);
-                ImGui.TextColored(state switch{GardenState.Ripe=>Success,GardenState.ToTend=>UI.FfxivTheme.Warning,_=>Accent},bed.Seed);
+                ImGui.TextColored(GardenColor(GardenJournal.State(bed,now)),bed.Seed);
                 ImGui.SameLine();
                 ImGui.TextUnformatted(bed.Place);
                 ImGui.SameLine();
-                var ripe=GardenJournal.RipeAt(bed).ToLocalTime().ToString("g");
-                var tend=GardenJournal.TendAt(bed) is { } due ? " · "+localization.Format(state==GardenState.ToTend ? "Garden.TendNow":"Garden.TendAt",due.ToLocalTime().ToString("g")):"";
-                ImGui.TextDisabled((state==GardenState.Ripe ? localization.Get("Garden.Ripe"):localization.Format("Garden.RipeAt",ripe))+tend);
+                ImGui.TextDisabled(GardenTimes(bed,now));
                 ImGui.SameLine();
-                ImGui.BeginDisabled(GardenJournal.TendAt(bed) is null);
-                try{if(ImGui.SmallButton(localization.Get("Garden.Tend"))){GardenJournal.Tend(bed,now);changed=true;}}
-                finally{ImGui.EndDisabled();}
-                if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Garden.TendTip"));
-                ImGui.SameLine();
-                if(ImGui.SmallButton(localization.Get("Garden.Replant"))){GardenJournal.Replant(bed,now);changed=true;}
-                Tip("Garden.ReplantTip");
-                ImGui.SameLine();
-                if(ImGui.SmallButton(localization.Get("Garden.Remove")))removed=bed;
-                Tip("Garden.RemoveTip");
+                DrawBedButtons(bed,now,ref changed,ref removed);
             }
             finally{ImGui.PopID();}
         }
         if(removed is not null){configuration.GardenBeds=beds.Where(bed=>bed!=removed).ToList();changed=true;}
         if(changed)SaveReminders();
         DrawNewBed(beds);
+    }
+
+    private static System.Numerics.Vector4 GardenColor(GardenState state)=>state switch{GardenState.Ripe=>Success,GardenState.ToTend=>UI.FfxivTheme.Warning,_=>Accent};
+
+    private string GardenTimes(GardenBed bed,DateTimeOffset now)
+    {
+        var state=GardenJournal.State(bed,now);
+        var ripe=GardenJournal.RipeAt(bed).ToLocalTime().ToString("g");
+        var tend=GardenJournal.TendAt(bed) is { } due ? " · "+localization.Format(state==GardenState.ToTend ? "Garden.TendNow":"Garden.TendAt",due.ToLocalTime().ToString("g")):"";
+        return (state==GardenState.Ripe ? localization.Get("Garden.Ripe"):localization.Format("Garden.RipeAt",ripe))+tend;
+    }
+
+    private void DrawBedButtons(GardenBed bed,DateTimeOffset now,ref bool changed,ref GardenBed? removed)
+    {
+        ImGui.BeginDisabled(GardenJournal.TendAt(bed) is null);
+        try{if(ImGui.SmallButton(localization.Get("Garden.Tend"))){GardenJournal.Tend(bed,now);changed=true;}}
+        finally{ImGui.EndDisabled();}
+        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Garden.TendTip"));
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get("Garden.Remove")))removed=bed;
+        Tip("Garden.RemoveTip");
     }
 
     private void DrawNewBed(List<GardenBed> beds)

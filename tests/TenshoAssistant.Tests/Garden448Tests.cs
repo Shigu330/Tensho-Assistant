@@ -21,8 +21,6 @@ internal static class Garden448Tests
             Check(GardenJournal.Due([bed],start.AddHours(31)) is [(_, GardenState.Ripe)] && GardenJournal.Due([bed],start.AddHours(40)).Count==0,"ripe said once");
             GardenJournal.Tend(bed,start.AddHours(24));
             Check(GardenJournal.TendAt(bed) is null,"no tending once the next one would come after the harvest");
-            GardenJournal.Replant(bed,start.AddHours(41));
-            Check(!bed.RipeSaid && bed.TendSaidFor is null && GardenJournal.RipeAt(bed)==start.AddHours(71),"replant starts over");
         }),
         ("Garden journal: no tending reminder at 0 h, typed values bounded, texts cleaned, future plantings silent",() =>
         {

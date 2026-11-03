@@ -61,6 +61,11 @@ public static class GardenCrosses
     // The 8 beds of a Deluxe Garden Patch around its empty centre, clockwise from the top left bed.
     private static readonly (int Row,int Column)[] Ring=[(0,0),(0,1),(0,2),(1,2),(2,2),(2,1),(2,0),(1,0)];
 
+    /// <summary>0.461: the grid cell of bed 1 to 8 (the same drawing as the plan); bed 1 at the top left, the rest clockwise, to compare in game.</summary>
+    public static (int Row,int Column) BedCell(int bed)=>Ring[Math.Clamp(bed,1,8)-1];
+    /// <summary>The bed drawn in a grid cell, or null for the empty centre.</summary>
+    public static int? BedAt(int row,int column){var index=Array.IndexOf(Ring,(row,column));return index<0 ? null:index+1;}
+
     /// <summary>
     /// 0.456 (user request, in-game campaign): the planting plan of a pair on a Deluxe Garden Patch, from the Gardening Guide of the Console Games Wiki
     /// (docs/evidence/0.456-garden-grid.md): the two seeds alternate around the ring, so each new seed sits next to the other one; four of each;
