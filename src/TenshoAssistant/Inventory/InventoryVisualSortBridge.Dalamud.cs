@@ -38,7 +38,7 @@ internal sealed class InventoryVisualSortBridge : IDisposable
                 var entry=bank.CaptureOpenForSort(capture.Scope.Storage!.Value);
                 service.CompleteCapture(capture,entry.Snapshot,entry.Name,DateTimeOffset.UtcNow);
             }
-            catch(Exception error){service.CompleteCapture(capture,null,string.Empty,DateTimeOffset.UtcNow,"Lecture impossible : "+error.Message);log.Warning(error,"Tensho live sort preview capture rejected.");}
+            catch(Exception error){service.CompleteCapture(capture,null,string.Empty,DateTimeOffset.UtcNow,"Reading failed: "+error.Message);log.Warning(error,"Tensho live sort preview capture rejected.");}
         }
         var request=service.Take(owner,DateTimeOffset.UtcNow);
         if(request is null)return;
@@ -46,10 +46,10 @@ internal sealed class InventoryVisualSortBridge : IDisposable
         {
             Apply(request.Plan,owner);
             service.Complete(request,request.Plan.Scope.Storage is null
-                ? "Tri visuel appliqué aux quatre sacs ; actualisation sous une seconde."
-                : "Tri visuel appliqué au rangement ouvert. Actualisez l’aperçu ; réimportez séparément pour mettre la banque à jour.");
+                ? "Visual sort applied to the four bags; refreshed within a second."
+                : "Visual sort applied to the open storage. Refresh the preview; import again separately to update the bank.");
         }
-        catch(Exception error){service.Complete(request,"Tri non appliqué : "+error.Message);log.Warning(error,"Tensho visual sort request rejected.");}
+        catch(Exception error){service.Complete(request,"Sort not applied: "+error.Message);log.Warning(error,"Tensho visual sort request rejected.");}
     }
 
     private unsafe void Apply(InventoryVisualSortPlan plan,ulong owner)
@@ -61,14 +61,14 @@ internal sealed class InventoryVisualSortBridge : IDisposable
         if(module==null || module->CharacterContentId!=owner || sorter==null || sorter->InventoryType!=(InventoryType)scope.FirstContainer
             || sorter->Items.First==null || sorter->Items.LongCount!=capacity || sorter->Items.LongCapacity<capacity || sorter->Items.LongCapacity>4096
             || sorter->ItemsPerPage!=scope.SlotsPerContainer || sorter->SortFunctionIndex!=-1)
-            throw new InvalidOperationException("Ordre visuel natif indisponible ou tri du jeu en cours.");
+            throw new InvalidOperationException("Native visual order unavailable or the game's sort running.");
         var vector=sorter->Items.First;
         var snapshot=scope.Storage is { } key ? bank.CaptureOpenForSort(key).Snapshot
             : InventoryNativeReader.Capture(inventory,new(scope.InventoryOwner),Enumerable.Range(scope.FirstContainer,scope.ContainerCount).Select(id=>(GameInventoryType)id).ToArray(),"Dalamud/visual-sort/verify");
         if(!plan.Matches(snapshot,owner,DateTimeOffset.UtcNow))
-            throw new InvalidOperationException("Les sacs ou leur ordre ont changé depuis l’aperçu. Actualisez puis réessayez.");
+            throw new InvalidOperationException("The bags or their order changed since the preview. Refresh, then try again.");
         if(sorter->Items.First!=vector || sorter->Items.LongCount!=capacity || sorter->SortFunctionIndex!=-1)
-            throw new InvalidOperationException("Table native modifiée pendant la capture.");
+            throw new InvalidOperationException("Native table changed during the capture.");
         var addresses=new HashSet<nint>();
         var entries=new Dictionary<InventoryPhysicalSlot,ItemOrderModuleSorterItemEntry>();
         var destinations=new nint[capacity];
@@ -78,7 +78,7 @@ internal sealed class InventoryVisualSortBridge : IDisposable
             var entry=sorter->Items[index].Value;
             if(entry==null || !addresses.Add((nint)entry) || entry->Page>=scope.ContainerCount || entry->Slot>=scope.SlotsPerContainer
                 || !entries.TryAdd(new(scope.FirstContainer+entry->Page,entry->Slot),*entry))
-                throw new InvalidOperationException("La table native n’est pas une permutation complète des sacs.");
+                throw new InvalidOperationException("The native table is not a complete permutation of the bags.");
             destinations[index]=(nint)entry;
             original[index]=*entry;
         }
@@ -88,20 +88,20 @@ internal sealed class InventoryVisualSortBridge : IDisposable
         {
             var entry=(ItemOrderModuleSorterItemEntry*)destinations[stack.DisplayIndex];
             if(scope.FirstContainer+entry->Page!=container.Location.Container.Value || entry->Slot!=stack.Slot)
-                throw new InvalidOperationException("Ordre natif modifié pendant la vérification.");
+                throw new InvalidOperationException("Native order changed during the check.");
         }
         var ordered=plan.Order.Select(slot=>entries[slot]).ToArray();
         if(scope.Storage is { } recheck)bank.RequireOpenForSort(recheck);
         if(!client.IsLoggedIn || !player.IsLoaded || player.ContentId!=owner || ItemOrderModule.Instance()!=module
             || SelectSorter(module,scope)!=sorter || module->CharacterContentId!=owner || sorter->SortFunctionIndex!=-1 || sorter->Items.Count!=capacity)
-            throw new InvalidOperationException("Contexte natif modifié avant application.");
-        if(sorter->Items.First!=vector)throw new InvalidOperationException("Table native remplacée avant application.");
+            throw new InvalidOperationException("Native context changed before applying.");
+        if(sorter->Items.First!=vector)throw new InvalidOperationException("Native table replaced before applying.");
         for(var index=0;index<capacity;index++)
         {
             var entry=sorter->Items[index].Value;var previous=original[index];
             if((nint)entry!=destinations[index] || entry->Page!=previous.Page || entry->Slot!=previous.Slot
                 || entry->Index!=previous.Index || entry->Flags!=previous.Flags)
-                throw new InvalidOperationException("Entrée native modifiée avant application.");
+                throw new InvalidOperationException("Native entry changed before applying.");
         }
         // All allocations/lookups and validation precede the first write. Entries include native Index/Flags unchanged.
         for(var index=0;index<capacity;index++)

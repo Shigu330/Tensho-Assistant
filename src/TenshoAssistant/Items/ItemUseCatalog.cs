@@ -26,12 +26,14 @@ public sealed class ItemUseCatalog
             cancellation.ThrowIfCancellationRequested();
             if(leve is null || leve.RowId==0 || leve.LeveId==0 || string.IsNullOrWhiteSpace(leve.Name) || leve.Level<0 || leve.Requests is not {Count:>0 and <=16}
                 || leve.Requests.Any(request=>request is null || request.ItemId==0 || request.Quantity is <=0) || !seen.Add(leve.RowId))
-                throw new ArgumentException("Ligne de mandat invalide ou identité dupliquée.",nameof(leves));
+                throw new ArgumentException("Invalid leve row or duplicated identity.",nameof(leves));
             copied.Add(leve with {Requests=Array.AsReadOnly(leve.Requests.ToArray())});
         }
         byItem=copied.SelectMany(leve=>leve.Requests.Select(request=>request.ItemId).Distinct().Select(id=>(Id:id,Leve:leve))).GroupBy(row=>row.Id)
             .ToFrozenDictionary(group=>group.Key,group=>(IReadOnlyList<ItemLeveUse>)Array.AsReadOnly(group.Select(row=>row.Leve)
                 .OrderBy(leve=>leve.Level).ThenBy(leve=>leve.Name,StringComparer.OrdinalIgnoreCase).ThenBy(leve=>leve.RowId).ToArray()));
+        // 0.363 (g, C-14): by leve, for the accepted crafting leves (first CraftLeve row of a leve).
+        byLeve=copied.GroupBy(leve=>leve.LeveId).ToFrozenDictionary(group=>group.Key,group=>group.OrderBy(leve=>leve.RowId).First());
         this.supplies=CopySet(supplies,cancellation);this.aquarium=CopySet(aquarium,cancellation);
         Language=language;DataVersion=version;UnresolvedLeveRows=unresolvedLeveRows;LeveCount=copied.Count;
     }
@@ -40,6 +42,9 @@ public sealed class ItemUseCatalog
         var copied=new HashSet<uint>();foreach(var value in values){token.ThrowIfCancellationRequested();if(value!=0)copied.Add(value);}return copied.ToFrozenSet();
     }
     public IReadOnlyList<ItemLeveUse> LevesFor(uint item)=>byItem.GetValueOrDefault(item) ?? [];
+    private readonly FrozenDictionary<uint,ItemLeveUse> byLeve;
+    /// <summary>The crafting request of a leve (Leve row), or null for a leve that is not a crafting leve.</summary>
+    public ItemLeveUse? ForLeve(uint leveId)=>byLeve.GetValueOrDefault(leveId);
     public bool IsSupplyCandidate(uint item)=>supplies.Contains(item);
     public bool IsAquariumFish(uint item)=>aquarium.Contains(item);
 }

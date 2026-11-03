@@ -52,33 +52,39 @@ internal static class InventoryNativeReader
         return new InventorySnapshot(observedAt, source, containers);
     }
 
+    // 0.329 (R-14): the visual order is optional. A failed read (signature lost after a game update) leaves DisplayIndex -1:
+    // quantities are still captured, and the preview and the sort refuse a stack without a position, as for an inconsistent order.
     private static unsafe Dictionary<(int Container, int Slot), int> ReadDisplayOrder(InventoryOwnerId owner,
         GameInventoryType[] types)
     {
-        var result = new Dictionary<(int, int), int>();
-        var module = ItemOrderModule.Instance();
-        if (module == null || types.Length == 0) return result;
-        var first = (int)types[0];
-        ItemOrderModuleSorter* sorter = first switch
+        try
         {
-            0 => module->InventorySorter,
-            4000 => module->SaddleBagSorter,
-            4100 => module->PremiumSaddleBagSorter,
-            10000 when module->ActiveRetainerId == owner.Value => module->GetActiveRetainerSorter(),
-            _ => null,
-        };
-        var expected = first switch { 0 => 140, 10000 => 175, 4000 or 4100 => 70, _ => 0 };
-        if (sorter == null || expected == 0 || sorter->Items.Count != expected
-            || sorter->SortFunctionIndex != -1) return result;
-        var perContainer = first == 10000 ? 25 : 35;
-        for (var index = 0; index < expected; index++)
-        {
-            var entry = sorter->Items[index].Value;
-            if (entry == null || entry->Slot >= perContainer || entry->Page >= expected / perContainer
-                || !result.TryAdd((first + entry->Page, entry->Slot), index))
-                return new();
+            var result = new Dictionary<(int, int), int>();
+            var module = ItemOrderModule.Instance();
+            if (module == null || types.Length == 0) return result;
+            var first = (int)types[0];
+            ItemOrderModuleSorter* sorter = first switch
+            {
+                0 => module->InventorySorter,
+                4000 => module->SaddleBagSorter,
+                4100 => module->PremiumSaddleBagSorter,
+                10000 when module->ActiveRetainerId == owner.Value => module->GetActiveRetainerSorter(),
+                _ => null,
+            };
+            var expected = first switch { 0 => 140, 10000 => 175, 4000 or 4100 => 70, _ => 0 };
+            if (sorter == null || expected == 0 || sorter->Items.Count != expected
+                || sorter->SortFunctionIndex != -1) return result;
+            var perContainer = first == 10000 ? 25 : 35;
+            for (var index = 0; index < expected; index++)
+            {
+                var entry = sorter->Items[index].Value;
+                if (entry == null || entry->Slot >= perContainer || entry->Page >= expected / perContainer
+                    || !result.TryAdd((first + entry->Page, entry->Slot), index))
+                    return new();
+            }
+            return result;
         }
-        return result;
+        catch (Exception) { return new(); }
     }
 
     private static unsafe InventoryReadEvidence ReadEvidence(InventoryContainer* container, InventoryType expected) =>

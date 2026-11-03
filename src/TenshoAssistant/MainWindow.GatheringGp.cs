@@ -5,11 +5,16 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// GP planning page (LazyGatherer-like): best use of GP over a node's attempts for the chosen gathering job and level, from typed or copied
+// values (character GP, observed node) and declared active effects; actions and costs from the game's Action / ActionTransient sheets,
+// solved on « Compare » (Gathering/GpOptimizer.cs), thresholds, and the Bountiful II estimate (0.224, community rule cited in
+// docs/evidence/0.224-bountiful-base.md, editable). Values copied for another character are dropped.
 internal sealed partial class MainWindow
 {
     private uint gpJob=16;
     private int gpLevel=100,gpBudget=600,gpAttempts=4,gpBaseYield=1,gpSuccess=100,gpBoon=15,gpBountiful=3;
     private bool gpYieldActive,gpGift1Active,gpGift2Active,gpTidingsActive,gpOtherEffects;
+    private bool gpMoreActions=true; // R-09 (0.410): Solid Reason / Ageless Words and Clear Vision / Flora Mastery in the comparison
     private int gpFirstAttemptBonus;
     private ulong gpCopiedOwner;
     private DateTimeOffset? gpCopiedAt;
@@ -24,9 +29,20 @@ internal sealed partial class MainWindow
     private void DrawGatheringGp()
     {
         Heading(localization.Get("GpUi.Title"),localization.Get("GpUi.Subtitle"));
+        // 0.391 (g, X-06): the on-screen GP tick bar.
+        BoolSetting("GpTick.Setting","GpTick.SettingTip",()=>configuration.GpTickBar,value=>configuration.GpTickBar=value,c=>c.GpTickBar);
+        // 0.403 (g, R-08): GP alert at a threshold (0 = full).
+        BoolSetting("GpTick.AlertSetting","GpTick.AlertSettingTip",()=>configuration.GpAlert,value=>configuration.GpAlert=value,c=>c.GpAlert);
+        if(configuration.GpAlert)
+        {
+            ImGui.Indent();
+            IntSetting("GpTick.Threshold","GpTick.ThresholdTip",()=>configuration.GpAlertThreshold,value=>configuration.GpAlertThreshold=value,0,2000,DefaultConfiguration.GpAlertThreshold);
+            ImGui.Unindent();
+        }
         DrawGatheringObservation();
+        // 0.330: a catalogue failure (sheet changed by a game update) is shown translated, its detail in developer mode only (R-14).
         if(gpActions.State.Catalog is not { } catalog)
-        { ImGui.TextWrapped(gpActions.State.Error ?? localization.Get("GpUi.Loading")); return; }
+        { if(gpActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Gp"); else ImGui.TextWrapped(localization.Get("GpUi.Loading")); return; }
         ImGui.TextWrapped(localization.Get("GpUi.Help"));
         var stats=characterStats.State;
         var canCopy=stats.CharacterId!=0 && stats.JobId is 16 or 17 && stats.CurrentGp is not null
@@ -45,8 +61,10 @@ internal sealed partial class MainWindow
         if(gpCopiedAt is { } date) ImGui.TextDisabled(localization.Format("GpUi.Copied",date.ToLocalTime().ToString("T")));
         var changed=false; var resourceChanged=false;
         if(ImGui.RadioButton(localization.Get("GpUi.Miner"),gpJob==16)) { gpJob=16; changed=resourceChanged=true; }
+        Tip("GpUi.JobTip");
         ImGui.SameLine(); if(ImGui.RadioButton(localization.Get("GpUi.Botanist"),gpJob==17)) { gpJob=17; changed=resourceChanged=true; }
-        if(ImGui.CollapsingHeader(localization.Get("GpUi.Scenario"),ImGuiTreeNodeFlags.DefaultOpen))
+        Tip("GpUi.JobTip");
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("GpUi.Scenario"),ImGuiTreeNodeFlags.DefaultOpen))
         {
             if(ImGui.BeginTable("GpInputs",ImGui.GetContentRegionAvail().X<760 ? 1:2,ImGuiTableFlags.SizingStretchSame))
             {
@@ -54,14 +72,19 @@ internal sealed partial class MainWindow
                 {
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
                     resourceChanged|=ImGui.InputInt(localization.Get("GpUi.Level"),ref gpLevel,0);
+                    Tip("GpUi.LevelTip");
                     ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110); resourceChanged|=ImGui.InputInt(localization.Get("GpUi.Budget"),ref gpBudget,0);
+                    Tip("GpUi.BudgetTip");
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Attempts"),ref gpAttempts,0);
+                    Tip("GpUi.AttemptsTip");
                     ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("GpUi.Yield"),ref gpBaseYield,0);
                     if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GpUi.YieldHelp"));
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Success"),ref gpSuccess,0);
+                    Tip("GpUi.SuccessTip");
                     ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("GpUi.Boon"),ref gpBoon,0);
+                    Tip("GpUi.BoonTip");
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Bountiful"),ref gpBountiful,0);
                     if(ImGui.IsItemHovered()) WrappedTooltip(localization.Get("GpUi.BountifulHelp"));
@@ -71,7 +94,7 @@ internal sealed partial class MainWindow
                 finally { ImGui.EndTable(); }
             }
         }
-        if(ImGui.CollapsingHeader(localization.Get("GpUi.Effects")))
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("GpUi.Effects")))
         {
             ImGui.TextWrapped(localization.Get("GpUi.EffectsHelp"));
             changed|=DrawGpDeclaredEffect(catalog,GpEffect.Yield,localization.Get("GpUi.YieldActive"),ref gpYieldActive);
@@ -79,14 +102,18 @@ internal sealed partial class MainWindow
             changed|=DrawGpDeclaredEffect(catalog,GpEffect.BoonChance2,localization.Get("GpUi.Gift2"),ref gpGift2Active);
             changed|=DrawGpDeclaredEffect(catalog,GpEffect.BoonYield,localization.Get("GpUi.Tidings"),ref gpTidingsActive);
             ImGui.SetNextItemWidth(110);changed|=ImGui.InputInt(localization.Get("GpUi.FirstBonus"),ref gpFirstAttemptBonus,0);
+            Tip("GpUi.FirstHelp");
             ImGui.TextWrapped(localization.Get("GpUi.FirstHelp"));
             changed|=ImGui.Checkbox(localization.Get("GpUi.OtherEffect"),ref gpOtherEffects);
+            Tip("GpUi.OtherEffectTip");
         }
+        changed|=ImGui.Checkbox(localization.Get("GpUi.MoreActions"),ref gpMoreActions);
+        Tip("GpUi.MoreActionsTip");
         if(resourceChanged) { gpCopiedOwner=0; gpCopiedAt=null; }
         if(changed || resourceChanged) { gpResult=null; gpError=null; }
         if(ImGui.Button(localization.Get("GpUi.Compare")))
         {
-            try { gpResult=GpOptimizer.Solve(new(gpJob,gpLevel,gpBudget,gpAttempts,gpBaseYield,gpSuccess,gpBoon,gpBountiful,new(gpYieldActive,gpGift1Active,gpGift2Active,gpTidingsActive,gpFirstAttemptBonus,gpOtherEffects)),catalog); gpError=null; }
+            try { gpResult=GpOptimizer.Solve(new(gpJob,gpLevel,gpBudget,gpAttempts,gpBaseYield,gpSuccess,gpBoon,gpBountiful,new(gpYieldActive,gpGift1Active,gpGift2Active,gpTidingsActive,gpFirstAttemptBonus,gpOtherEffects),gpMoreActions),catalog); gpError=null; }
             catch(ArgumentException) { gpResult=null; gpError=gpOtherEffects ? localization.Get("GpUi.Unsupported"):localization.Get("GpUi.Invalid"); }
         }
         if(gpError is { } error) ImGui.TextWrapped(error);
@@ -102,12 +129,20 @@ internal sealed partial class MainWindow
         {
             DrawItemIcon(new ItemDefinition(0,use.Action.Name,false,use.Action.Icon),new Vector2(28)); ImGui.SameLine();
             var repeat=use.Action.Spec.Effect is GpEffect.Bountiful1 or GpEffect.Bountiful2;
-            ImGui.TextWrapped(localization.Format("GpUi.Use",use.Action.Name,use.Count,use.Action.Spec.Cost*use.Count) + (repeat ? result.Scenario.Effects.FirstAttemptBonus>0 ? localization.Get("GpUi.AfterFirst"):localization.Get("GpUi.BeforeEach") : localization.Get("GpUi.BeforeAttempts")));
+            var when=use.Action.Spec.Effect switch
+            {
+                GpEffect.Attempt=>localization.Get("GpUi.WhenAttemptUsed"),
+                GpEffect.NextSuccess=>localization.Get("GpUi.WithBountiful"),
+                _=>repeat ? result.Scenario.Effects.FirstAttemptBonus>0 ? localization.Get("GpUi.AfterFirst"):localization.Get("GpUi.BeforeEach") : localization.Get("GpUi.BeforeAttempts"),
+            };
+            ImGui.TextWrapped(localization.Format("GpUi.Use",use.Action.Name,use.Count,use.Action.Spec.Cost*use.Count)+when);
             if(ImGui.IsItemHovered()) WrappedTooltip(use.Action.Description);
         }
+        if(best.Actions.Any(use=>use.Action.Spec.Effect==GpEffect.Attempt) && result.Scenario.Level>=GpScenario.EurekaLevel)
+            ImGui.TextWrapped(localization.Get("GpUi.Eureka"));
         if(result.NextUpgrade is { } next)
             ImGui.TextColored(Accent,localization.Format("GpUi.Next",next.Cost,next.Cost-result.Scenario.Budget,next.ExpectedYield.ToString("0.00")));
-        if(ImGui.CollapsingHeader(localization.Get("GpUi.Thresholds")))
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("GpUi.Thresholds")))
         {
             if(ImGui.BeginTable("GpFrontier",3,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
             {
@@ -130,7 +165,9 @@ internal sealed partial class MainWindow
         var metadata=catalog.Actions.First(action=>action.Spec.JobId==gpJob && action.Spec.Effect==effect);
         DrawItemIcon(new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(24));
         if(ImGui.IsItemHovered())WrappedTooltip(metadata.Description);
-        ImGui.SameLine();return ImGui.Checkbox(label,ref active);
+        ImGui.SameLine();var toggled=ImGui.Checkbox(label,ref active);
+        Tip("GpUi.ActiveEffectTip");
+        return toggled;
     }
 
     // Bountiful II estimate (0.224): gathering rating of the current gathering job against the context item's base value; « Use » fills

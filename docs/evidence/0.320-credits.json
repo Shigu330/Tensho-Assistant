@@ -1,0 +1,1285 @@
+{
+ "date": "2026-11-02",
+ "version": "0.320",
+ "note": "Inventaire en lecture seule (relevés du code, de la documentation et des licences en ligne, fusionnés et contre-vérifiés).",
+ "entries": [
+  {
+   "id": "Dalamud",
+   "kind": "library",
+   "name": "Dalamud",
+   "author": "goatcorp",
+   "license": "AGPL-3.0",
+   "license_url": "https://github.com/goatcorp/Dalamud/blob/master/LICENSE",
+   "url": "https://github.com/goatcorp/Dalamud",
+   "use": "Hôte du plugin : services (données du jeu, framework, état du joueur, chat, commandes, barre d'infos serveur, menus contextuels, textures, hooks), fenêtres et sauvegarde de la configuration.",
+   "files": [
+    "src/TenshoAssistant/Plugin.cs",
+    "src/TenshoAssistant/Configuration.Dalamud.cs",
+    "src/TenshoAssistant/MapViewWindow.cs",
+    "src/TenshoAssistant/Macros/MacroChainBridge.Dalamud.cs",
+    "src/TenshoAssistant/Items/ItemContextMenuBridge.Dalamud.cs",
+    "src/TenshoAssistant/Collections/CollectionReader.Dalamud.cs",
+    "src/TenshoAssistant/**/*.Dalamud.cs"
+   ],
+   "copied": "rien (assemblage de l'hôte référencé Private=false, refusé dans le paquet par scripts/Verify.ps1:92 ; code UnlockState lu au commit 1e51469 pour des faits, aucune implémentation copiée)",
+   "evidence": "133 fichiers .cs avec « using Dalamud. » dont 46 *.Dalamud.cs ; Plugin.cs:25 « Plugin : IDalamudPlugin ». Licence : API GitHub /repos/goatcorp/Dalamud/license = AGPL-3.0, texte AGPL v3 sans titulaire (relevés du 2026-11-02). docs/project/REFERENCES.md REF-DALAMUD, REF-COLL-002, REF-COLL-003."
+  },
+  {
+   "id": "DalamudBindingsImGui",
+   "kind": "library",
+   "name": "Dalamud.Bindings.ImGui",
+   "author": "Juna Meinhold",
+   "license": "MIT",
+   "license_url": "https://github.com/goatcorp/Dalamud/blob/master/imgui/Dalamud.Bindings.ImGui/LICENSE.txt",
+   "url": "https://github.com/goatcorp/Dalamud/tree/master/imgui/Dalamud.Bindings.ImGui",
+   "use": "Liaison C# de Dear ImGui qui dessine toute l'interface (fenêtre principale, carte, panneaux à côté des fenêtres du jeu).",
+   "files": [
+    "src/TenshoAssistant/MainWindow.cs",
+    "src/TenshoAssistant/MapViewWindow.cs",
+    "src/TenshoAssistant/BankImportOverlay.cs",
+    "src/TenshoAssistant/Alarms/AlarmDtrEntry.Dalamud.cs",
+    "src/TenshoAssistant/UI/UiComponents.cs",
+    "src/TenshoAssistant/UI/FfxivTheme.cs",
+    "src/TenshoAssistant/UI/Components/SettingRow.cs",
+    "src/TenshoAssistant/UI/Navigation/MainWindow.CategoryNavigation.cs"
+   ],
+   "copied": "rien (assemblage fourni par Dalamud, refusé dans le paquet par scripts/Verify.ps1:92)",
+   "evidence": "« using Dalamud.Bindings.ImGui » dans 89 fichiers .cs. Licence : LICENSE.txt du dossier imgui/Dalamud.Bindings.ImGui lu le 2026-11-02 (MIT, Copyright (c) 2023 Juna Meinhold), distinct de l'AGPL de la racine du dépôt."
+  },
+  {
+   "id": "DearImGui",
+   "kind": "library",
+   "name": "Dear ImGui",
+   "author": "Omar Cornut",
+   "license": "MIT",
+   "license_url": "https://github.com/ocornut/imgui/blob/master/LICENSE.txt",
+   "url": "https://github.com/ocornut/imgui",
+   "use": "Bibliothèque d'interface native sous Dalamud.Bindings.ImGui (cimgui.dll livré par Dalamud).",
+   "files": [
+    "src/TenshoAssistant/MainWindow.cs",
+    "src/TenshoAssistant/MapViewWindow.cs",
+    "src/TenshoAssistant/UI/UiComponents.cs"
+   ],
+   "copied": "rien (natif chargé par Dalamud)",
+   "evidence": "cimgui.dll présent dans %APPDATA%/XIVLauncher/addon/Hooks/dev ; utilisé par toutes les fenêtres ImGui. Licence : API GitHub /repos/ocornut/imgui/license = MIT, « Copyright (c) 2014-2026 Omar Cornut » (2026-11-02)."
+  },
+  {
+   "id": "FFXIVClientStructs",
+   "kind": "library",
+   "name": "FFXIVClientStructs, InteropGenerator.Runtime",
+   "author": "aers",
+   "license": "MIT",
+   "license_url": "https://github.com/aers/FFXIVClientStructs/blob/main/LICENSE",
+   "url": "https://github.com/aers/FFXIVClientStructs",
+   "use": "Structures natives du client (inventaires, agents, fenêtres, atelier de compagnie, alarmes, macros, carte, mini-jeux, état du joueur) lues sur le thread framework puis copiées ; type CStringPointer d'InteropGenerator.Runtime pour les chaînes de Triple Triad.",
+   "files": [
+    "src/TenshoAssistant/MiniGames/TriadObservationReader.Dalamud.cs",
+    "src/TenshoAssistant/Alarms/AlarmService.Dalamud.cs",
+    "src/TenshoAssistant/Character/CharacterStatsReader.Dalamud.cs",
+    "src/TenshoAssistant/Craft/CraftLiveReader.Dalamud.cs",
+    "src/TenshoAssistant/Fashion/FashionCheckReader.Dalamud.cs",
+    "src/TenshoAssistant/FreeCompany/VoyageWatcher.Dalamud.cs",
+    "src/TenshoAssistant/Gathering/GatheringObservationReader.Dalamud.cs",
+    "src/TenshoAssistant/Inventory/BankInventoryBridge.Dalamud.cs",
+    "src/TenshoAssistant/Macros/MacroWriter.Dalamud.cs",
+    "src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs",
+    "src/TenshoAssistant/MiniGames/TriadObservationReader.Dalamud.cs"
+   ],
+   "copied": "rien (assemblages fournis par Dalamud, refusés dans le paquet ; aucun offset numérique ajouté)",
+   "evidence": "30 fichiers .cs mentionnent FFXIVClientStructs ; TriadObservationReader.Dalamud.cs:138 « InteropGenerator.Runtime.CStringPointer » (version 1.0.0+dd57986b, même commit que FFXIVClientStructs.dll 7.57.0.9414). Licence : API GitHub = MIT, « Copyright (c) 2021-2023 aers » (2026-11-02) et section FFXIVCLIENTSTRUCTS du licenses.txt de Hooks/dev."
+  },
+  {
+   "id": "Lumina",
+   "kind": "library",
+   "name": "Lumina",
+   "author": "NotAdam",
+   "license": "WTFPL",
+   "license_url": "https://github.com/NotAdam/Lumina/blob/master/LICENSE",
+   "url": "https://github.com/NotAdam/Lumina",
+   "use": "Lecture des fichiers du jeu installé (sqpack) : dépôts et versions des données, dispositions LGB des PNJ.",
+   "files": [
+    "src/TenshoAssistant/MiniGames/TriadNpcLoader.Dalamud.cs",
+    "src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs",
+    "src/TenshoAssistant/Caching/GameCacheIdentity.Dalamud.cs",
+    "src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs",
+    "tools/ShopCurrencyProbe/Program.cs"
+   ],
+   "copied": "rien (assemblage fourni par Dalamud)",
+   "evidence": "Lumina.Data.Files.LgbFile / Lumina.Data.Parsing.Layer dans TriadNpcLoader.Dalamud.cs et NpcVendorLoader.Dalamud.cs ; 13 csproj de tools/ référencent Hooks/dev/Lumina.dll (version 7.7.0). Licence : API GitHub /repos/NotAdam/Lumina/license = WTFPL v2 (2026-11-02)."
+  },
+  {
+   "id": "LuminaExcel",
+   "kind": "library",
+   "name": "Lumina.Excel",
+   "author": "WorkingRobot, NotAdam",
+   "license": "WTFPL",
+   "license_url": "https://github.com/NotAdam/Lumina.Excel/blob/master/LICENSE",
+   "url": "https://github.com/NotAdam/Lumina.Excel",
+   "use": "Feuilles typées du jeu (Item, Recipe, Quest, Map, Weather, SubmarinePart…) d'où viennent presque toutes les listes.",
+   "files": [
+    "src/TenshoAssistant/Plugin.cs",
+    "src/TenshoAssistant/Items/ItemCatalogLoader.Dalamud.cs",
+    "src/TenshoAssistant/Craft/RecipeCatalogLoader.Dalamud.cs",
+    "src/TenshoAssistant/Gathering/GatheringCatalogLoader.Dalamud.cs",
+    "src/TenshoAssistant/Maps/MapCatalogLoader.Dalamud.cs",
+    "src/TenshoAssistant/Quests/QuestReader.Dalamud.cs",
+    "src/TenshoAssistant/Collections/CompletionCopy.Lumina.cs",
+    "src/TenshoAssistant/**/*Copy.Lumina.cs"
+   ],
+   "copied": "rien (lu à l'exécution depuis le jeu installé)",
+   "evidence": "« Lumina.Excel.Sheets » dans 33 fichiers .cs, 9 fichiers *Copy.Lumina.cs ; Sdk.props : Reference Lumina.Excel Private=false ; version 7.5.1 (société « WorkingRobot, NotAdam »). Licence : API GitHub /repos/NotAdam/Lumina.Excel/license = WTFPL v2 (2026-11-02)."
+  },
+  {
+   "id": "NewtonsoftJson",
+   "kind": "library",
+   "name": "Newtonsoft.Json",
+   "author": "James Newton-King",
+   "license": "MIT",
+   "license_url": "https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md",
+   "url": "https://github.com/JamesNK/Newtonsoft.Json",
+   "use": "Sérialisation de la configuration du plugin par Dalamud (SavePluginConfig), contrôlée par la sonde ConfigSerializationProbe.",
+   "files": [
+    "src/TenshoAssistant/Configuration.cs",
+    "src/TenshoAssistant/Plugin.cs",
+    "tools/ConfigSerializationProbe/Program.cs"
+   ],
+   "copied": "rien",
+   "evidence": "Aucun « using Newtonsoft » dans src (usage indirect par Dalamud) ; tools/ConfigSerializationProbe/Program.cs:1 « using Newtonsoft.Json » et :35 « PASS Newtonsoft.Json … configuration v1 ». Licence : API GitHub /repos/JamesNK/Newtonsoft.Json/license = MIT."
+  },
+  {
+   "id": "DotNetRuntime",
+   "kind": "library",
+   "name": ".NET 10",
+   "author": ".NET Foundation, Microsoft",
+   "license": "MIT",
+   "license_url": "https://github.com/dotnet/runtime/blob/main/LICENSE.TXT",
+   "url": "https://github.com/dotnet/runtime",
+   "use": "System.Net.Http (tous les appels réseau), System.Text.Json (cache disque, réponses communautaires, langues), collections ; System.Reflection.MetadataLoadContext pour ApiProbe.",
+   "files": [
+    "src/TenshoAssistant/Community/BoundedHttp.cs",
+    "src/TenshoAssistant/Caching/DataCache.cs",
+    "src/TenshoAssistant/Localization/LocalizationManager.cs",
+    "src/TenshoAssistant/Market/MarketService.cs",
+    "src/TenshoAssistant/Alarms/DiscordNotifier.cs",
+    "src/TenshoAssistant/Inventory/BankFileStore.cs",
+    "tools/ApiProbe/Program.cs"
+   ],
+   "copied": "rien",
+   "evidence": "System.Text.Json dans 21 fichiers .cs, HttpClient dans 13 ; tools/ApiProbe/ApiProbe.csproj référence System.Reflection.MetadataLoadContext.dll. Licence : LICENSE.TXT de dotnet/runtime = MIT (lu le 2026-11-02)."
+  },
+  {
+   "id": "FontAwesome",
+   "kind": "library",
+   "name": "Font Awesome Free",
+   "author": "Fonticons, Inc.",
+   "license": "CC-BY-4.0 AND OFL-1.1",
+   "license_url": "https://github.com/FortAwesome/Font-Awesome/blob/7.x/LICENSE.txt",
+   "url": "https://fontawesome.com/license/free",
+   "use": "Icônes de l'interface (barre latérale, boutons, tuiles, répertoire des outils) via UiBuilder.IconFont et FontAwesomeIcon.",
+   "files": [
+    "src/TenshoAssistant/MainWindow.Tools.cs",
+    "src/TenshoAssistant/MainWindow.Home.cs",
+    "src/TenshoAssistant/MainWindow.MapView.cs",
+    "src/TenshoAssistant/MainWindow.Alarms.cs",
+    "src/TenshoAssistant/UI/Components/SettingRow.cs",
+    "src/TenshoAssistant/UI/Navigation/MainWindow.CategoryNavigation.cs"
+   ],
+   "copied": "rien (police chargée par Dalamud, glyphes référencés par identifiant, aucun fichier d'icône dans le dépôt)",
+   "evidence": "FontAwesomeIcon dans 13 fichiers .cs. LICENSE.txt (branche 7.x) lu le 2026-11-02 : icônes CC BY 4.0, polices SIL OFL 1.1, code MIT (le code n'est pas utilisé par Tensho) ; attribution demandée. Version embarquée par Dalamud non relevée."
+  },
+  {
+   "id": "SubmarineTracker",
+   "kind": "embedded",
+   "name": "SubmarineTracker",
+   "author": "Infi (Infiziert90)",
+   "license": "MIT",
+   "license_url": "https://github.com/Infiziert90/SubmarineTracker/blob/master/LICENSE",
+   "url": "https://github.com/Infiziert90/SubmarineTracker",
+   "use": "Seuils T2/T3, Normal/Optimal et faveur par secteur des sous-marins (embarqués) et formules de distance et de durée des trajets (comprises en lisant son code).",
+   "files": [
+    "src/TenshoAssistant/FreeCompany/Data/submarine-breakpoints.csv",
+    "src/TenshoAssistant/FreeCompany/VoyageWatcher.Dalamud.cs",
+    "src/TenshoAssistant/FreeCompany/VesselBuilds.cs",
+    "src/TenshoAssistant/FreeCompany/VoyagePlanner.cs",
+    "src/TenshoAssistant/MainWindow.VesselBuilds.cs",
+    "src/TenshoAssistant/MainWindow.RoutePlanner.cs",
+    "src/TenshoAssistant/TenshoAssistant.csproj"
+   ],
+   "copied": "données : Data/Sectors.cs MapBreakpoints (143 lignes, commit 04c54d770f815cd416bbade1ac5b178b551a32b5) copiées telles quelles dans submarine-breakpoints.csv avec le texte MIT complet ; formules (SubExplPretty.cs, Data/Voyage.cs : floor(longueur × 0,035), floor(longueur × 3990 / (vitesse × 100) × 60) s, 12 h fixes, 5 secteurs au plus) lues seulement, code Tensho original",
+   "evidence": "TenshoAssistant.csproj:15 EmbeddedResource ; lu par GetManifestResourceStream (VoyageWatcher.Dalamud.cs:193) ; en-tête du CSV : source, commit, licence MIT complète. VesselBuilds.cs:22 et VoyagePlanner.cs:35-41 citent la source. Licence : API GitHub = MIT, « Copyright (c) 2023 Infi » (2026-11-02). Preuves : docs/evidence/0.315-vessel-builds.md, docs/evidence/0.309-submarine-routes.md."
+  },
+  {
+   "id": "SubmersibleLootSpreadsheet",
+   "kind": "embedded",
+   "name": "Submersible Loot Spreadsheet",
+   "author": "Elena (saerielle)",
+   "license": "none",
+   "license_url": "",
+   "url": "https://docs.google.com/spreadsheets/d/1eiuGRrQTjJ5n4ogybKOBxJRT7EiJLlX93fge-Z8MmD4",
+   "use": "Origine amont des seuils de secteurs repris par SubmarineTracker et embarqués dans Tensho. Licence non revérifiée.",
+   "files": [
+    "src/TenshoAssistant/FreeCompany/Data/submarine-breakpoints.csv"
+   ],
+   "copied": "indirectement : les seuils embarqués viennent de cette feuille par SubmarineTracker (MIT) ; rien pris directement à la feuille",
+   "evidence": "submarine-breakpoints.csv lignes 13-14 (« Upstream credit … Submersible Loot Spreadsheet by Elena (saerielle) and the community » et l'adresse Google Sheets). docs/evidence/0.315-vessel-builds.md:114 et DEC-021 : feuille « sans licence » ; non revérifié le 2026-11-02."
+  },
+  {
+   "id": "FFXIVGachaSpreadsheet",
+   "kind": "embedded",
+   "name": "FFXIVGachaSpreadsheet (XIVStats)",
+   "author": "Infi (Infiziert90)",
+   "license": "MIT",
+   "license_url": "https://github.com/Infiziert90/FFXIVGachaSpreadsheet/blob/master/LICENSE",
+   "url": "https://github.com/Infiziert90/FFXIVGachaSpreadsheet",
+   "use": "Butin moyen par secteur pour classer les trajets de sous-marin (instantané embarqué) et pièces et teintures de la Revue de mode de la semaine (téléchargées). Avis MIT complet dans submarine-loot.json.",
+   "files": [
+    "src/TenshoAssistant/FreeCompany/Data/submarine-loot.json",
+    "src/TenshoAssistant/FreeCompany/VoyageWatcher.Dalamud.cs",
+    "src/TenshoAssistant/FreeCompany/VoyagePlanner.cs",
+    "src/TenshoAssistant/MainWindow.RoutePlanner.cs",
+    "src/TenshoAssistant/Fashion/FashionDataService.cs",
+    "src/TenshoAssistant/Fashion/FashionData.cs",
+    "src/TenshoAssistant/MainWindow.Fashion.cs",
+    "src/TenshoAssistant/MainWindow.FashionWeek.cs",
+    "tools/submarine-loot.py"
+   ],
+   "hosts": [
+    "raw.githubusercontent.com"
+   ],
+   "copied": "submarine-loot.json (24 508 octets) : website/static/data/Submarines.json téléchargé le 2026-11-02 (SHA-256 ca900aef…d44c) réduit par tools/submarine-loot.py au nombre de relevés et au total par objet (143 secteurs), avec une ligne « Source » mais sans le texte MIT complet ; FashionReport.json et LastUpdate.json seulement lus à l'exécution (cache « Revue de mode »)",
+   "evidence": "TenshoAssistant.csproj:14 EmbeddedResource ; VoyageWatcher.Dalamud.cs:142 GetManifestResourceStream ; FashionDataService.cs:10 « https://raw.githubusercontent.com/Infiziert90/FFXIVGachaSpreadsheet/refs/heads/master/website/static/data/ », :68 FashionReport.json, :103 LastUpdate.json. Aucun réglage ne coupe la Revue de mode (bouton Récupérer, ou une fois à l'affichage des emplacements, MainWindow.FashionWeek.cs:76 et :221). Licence : API GitHub = MIT, « Copyright (c) 2023 Infi ». Preuve : docs/evidence/0.309-submarine-routes.md."
+  },
+  {
+   "id": "CharacterPanelRefined",
+   "kind": "embedded",
+   "name": "Character Panel Refined",
+   "author": "Kouzukii",
+   "license": "MIT",
+   "license_url": "https://github.com/Kouzukii/ffxiv-characterstatus-refined/blob/master/LICENSE",
+   "url": "https://github.com/Kouzukii/ffxiv-characterstatus-refined",
+   "use": "Table du modificateur de statistique principale des niveaux 1 à 100 (absente des feuilles du jeu) et plugin de référence de la page Personnage. Avis MIT complet en tête de Character/StatFormulas.cs.",
+   "files": [
+    "src/TenshoAssistant/Character/StatFormulas.cs",
+    "src/TenshoAssistant/Character/StatFormulas.cs",
+    "src/TenshoAssistant/Character/CharacterStatsReader.Dalamud.cs",
+    "src/TenshoAssistant/MainWindow.Character.cs",
+    "src/TenshoAssistant/MainWindow.Gear.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "100 valeurs de CharacterPanelRefined/LevelModifiers.cs (colonne principale, lue le 2026-10-31) dans StatFormulas.cs, avec un commentaire de source mais sans le texte de licence",
+   "evidence": "StatFormulas.cs:16-17 « Taken as data from Character Panel Refined (Kouzukii, MIT, CharacterPanelRefined/LevelModifiers.cs, read 2026-10-31) » ; MainWindow.Tools.cs (fiche « Character Panel Refined »). Licence : API GitHub = MIT, « Copyright (c) 2022 Kouzukii » (2026-11-02). Preuve : docs/evidence/0.182.0-paramgrow-probe.log."
+  },
+  {
+   "id": "Universalis",
+   "kind": "online",
+   "name": "Universalis",
+   "author": "karashiiro, Universalis-FFXIV",
+   "license": "MIT",
+   "license_url": "https://github.com/Universalis-FFXIV/Universalis/blob/v2/LICENSE",
+   "url": "https://universalis.app",
+   "use": "Prix du marché au survol ou au clic, annonces et historique de la page Marché, coût de préparation et liste des centres de données.",
+   "files": [
+    "src/TenshoAssistant/Market/MarketService.cs",
+    "src/TenshoAssistant/Market/MarketBoardService.cs",
+    "src/TenshoAssistant/Market/MarketBoard.cs",
+    "src/TenshoAssistant/Items/ItemHoverReader.Dalamud.cs",
+    "src/TenshoAssistant/MainWindow.Market.cs",
+    "src/TenshoAssistant/MainWindow.MarketBoard.cs",
+    "src/TenshoAssistant/MainWindow.MarketHover.cs",
+    "src/TenshoAssistant/MainWindow.PreparationCost.cs"
+   ],
+   "hosts": [
+    "universalis.app"
+   ],
+   "setting": "MarketPricesOnHover",
+   "copied": "rien (réponses de l'API v2 lues à l'exécution, caches disque « Prix » et « market-board »)",
+   "evidence": "MarketService.cs:142 « https://universalis.app/api/v2/aggregated/{world}/{itemId} » ; MarketBoardService.cs:52 /api/v2/data-centers et :101 /api/v2/{scope}/{itemId}?listings=…&entries=…. MarketPricesOnHover ne coupe que le survol : la page Marché et le coût de préparation interrogent au clic sans réglage. MIT = licence du code (API GitHub 2026-11-02) ; aucune licence ni condition des données trouvée. Preuve : docs/evidence/0.270-universalis-listings.md."
+  },
+  {
+   "id": "GarlandTools",
+   "kind": "online",
+   "name": "Garland Tools",
+   "author": "Chris Faulhaber (ufx)",
+   "license": "MIT",
+   "license_url": "https://github.com/ufx/GarlandTools/blob/master/LICENSE",
+   "url": "https://www.garlandtools.org",
+   "use": "Sources d'objets quand le jeu n'en connaît aucune, butin des contenus et des monstres.",
+   "files": [
+    "src/TenshoAssistant/Community/GarlandClient.cs",
+    "src/TenshoAssistant/Community/GarlandItemSources.cs",
+    "src/TenshoAssistant/Duties/DutyLootService.cs",
+    "src/TenshoAssistant/Duties/DutyLootDocument.cs",
+    "src/TenshoAssistant/Monsters/MonsterLootService.cs",
+    "src/TenshoAssistant/Plugin.cs",
+    "src/TenshoAssistant/MainWindow.Duties.cs",
+    "src/TenshoAssistant/MainWindow.DutyFinder.cs",
+    "src/TenshoAssistant/MainWindow.Monsters.cs",
+    "src/TenshoAssistant/MainWindow.MarketHover.cs",
+    "src/TenshoAssistant/MainWindow.FishingSources.cs"
+   ],
+   "hosts": [
+    "www.garlandtools.org"
+   ],
+   "setting": "CommunityGarland",
+   "copied": "rien dans la DLL (documents JSON lus à l'exécution, cache « Sources ») ; un document copié comme jeu d'essai hors DLL : tests/TenshoAssistant.Tests/Fixtures/garland-instance-30028.json (4 Ko, contient du texte du jeu) ; code ufx/GarlandTools lu au commit 04cadd2 pour la sémantique, non copié",
+   "evidence": "GarlandClient.cs:67 « https://www.garlandtools.org/db/doc/{route}/{id}.json » via BoundedHttp. Plugin.cs:130 Enabled=()=>configuration.CommunityGarland pour GarlandItemSourceService seulement ; DutyLootService et MonsterLootService (Plugin.cs:76-77) n'ont pas ce garde, le panneau de la Recherche de mission dépend de ShowDutyFinderLoot (MainWindow.DutyFinder.cs:25). MIT = licence du code (API GitHub 2026-11-02) ; licence des données non publiée (page /db/ : « FINAL FANTASY XIV © … SQUARE ENIX », « not affiliated with Square Enix »)."
+  },
+  {
+   "id": "ConsoleGamesWiki",
+   "kind": "online",
+   "name": "FFXIV Console Games Wiki",
+   "author": "",
+   "license": "GFDL-1.2-or-later",
+   "license_url": "https://ffxiv.consolegameswiki.com/wiki/FFXIV_Wiki:About",
+   "url": "https://ffxiv.consolegameswiki.com",
+   "use": "Mode d'obtention des objets, butin et lieux des monstres et carnet d'exploration (météo et heure des panoramas), en anglais.",
+   "files": [
+    "src/TenshoAssistant/Community/WikiItemAcquisition.cs",
+    "src/TenshoAssistant/Monsters/WikiMonsterSources.cs",
+    "src/TenshoAssistant/Monsters/MonsterHoverSources.cs",
+    "src/TenshoAssistant/Maps/WikiVistas.cs",
+    "src/TenshoAssistant/Plugin.cs",
+    "src/TenshoAssistant/MainWindow.Monsters.cs",
+    "src/TenshoAssistant/MainWindow.MarketHover.cs",
+    "src/TenshoAssistant/MainWindow.MapView.cs",
+    "src/TenshoAssistant/MainWindow.SourceLinks.cs"
+   ],
+   "hosts": [
+    "ffxiv.consolegameswiki.com"
+   ],
+   "setting": "CommunityWiki",
+   "copied": "rien (wikitexte et HTML lus à l'exécution par index.php?action=raw et api.php?action=parse, caches « wiki-items », « wiki-monsters », « wiki-vistas »)",
+   "evidence": "WikiItemAcquisition.cs:20, WikiMonsterSources.cs:114, WikiVistas.cs:19. CommunityWiki ne coupe que WikiItemAcquisitionService (Plugin.cs:133) ; le survol des monstres dépend de MonsterSourcesOnHover et ItemUsagesOnHover (MainWindow.MarketHover.cs:121), la page Monstres (bouton) et WikiVistaSource (Plugin.cs:136) n'ont aucun réglage. Licence : FFXIV_Wiki:About (action=raw) « All content is available under GNU Free Documentation License » et MediaWiki:Copyrightwarning « 1.2 or any later version », contenus Square Enix exclus (lus le 2026-11-02)."
+  },
+  {
+   "id": "LuminaSupplemental",
+   "kind": "online",
+   "name": "LuminaSupplemental",
+   "author": "Critical-Impact",
+   "license": "GPL-3.0",
+   "license_url": "https://github.com/Critical-Impact/LuminaSupplemental/blob/main/LICENSE",
+   "url": "https://github.com/Critical-Impact/LuminaSupplemental",
+   "use": "Données absentes des feuilles : butin des coffres et des boss, monstres qui lâchent un objet, ALEA, entreprises, boutiques et positions des PNJ, objets demandés par les quêtes.",
+   "files": [
+    "src/TenshoAssistant/Community/LuminaSupplemental.cs",
+    "src/TenshoAssistant/Npcs/NpcVendorCatalog.cs",
+    "src/TenshoAssistant/Plugin.cs",
+    "src/TenshoAssistant/MainWindow.Lumina.cs",
+    "src/TenshoAssistant/MainWindow.ItemUses.cs",
+    "src/TenshoAssistant/MainWindow.SourceLinks.cs",
+    "src/TenshoAssistant/MainWindow.Monsters.cs",
+    "src/TenshoAssistant/MainWindow.Duties.cs",
+    "src/TenshoAssistant/MainWindow.DutyFinder.cs",
+    "src/TenshoAssistant/MainWindow.ItemContextMenu.cs"
+   ],
+   "hosts": [
+    "raw.githubusercontent.com"
+   ],
+   "setting": "CommunityLumina",
+   "copied": "rien dans le dépôt ni dans la DLL : CSV « Generated » (DungeonBossChest, DungeonBossDrop, DungeonChest, DungeonChestItem, MobDrop, FateItem, RetainerVentureItem, StoreItem, ItemSupplement, ENpcShop, ENpcPlace, QuestRequiredItem) téléchargés au premier usage, cache « lumina-supplemental »",
+   "evidence": "LuminaSupplemental.cs:9 « (Critical-Impact, GPL-3.0 …) » et :159 « https://raw.githubusercontent.com/Critical-Impact/LuminaSupplemental/main/src/LuminaSupplemental.Excel/Generated/ » (4 Mo par fichier) ; Plugin.cs:235 Enabled=()=>configuration.CommunityLumina ; MainWindow.ItemUses.cs:132. L'arbre de déblocage des dirigeables annoncé « embarqué » par DEC-023 n'existe pas dans FreeCompany/Data/. Licence : API GitHub = GPL-3.0, texte non personnalisé (2026-11-02)."
+  },
+  {
+   "id": "GatherBuddy",
+   "kind": "online",
+   "name": "GatherBuddy",
+   "author": "Ottermandias",
+   "license": "Apache-2.0",
+   "license_url": "https://github.com/Ottermandias/GatherBuddy/blob/main/LICENSE",
+   "url": "https://github.com/Ottermandias/GatherBuddy",
+   "use": "Appâts, prises en chaîne, touche et ferrage, fenêtres ET, météo, leurres et prédateurs des poissons pour l'aide à la pêche et la page Récolte ; plugin de référence de l'outil Récolte.",
+   "files": [
+    "src/TenshoAssistant/Community/GatherBuddyFish.cs",
+    "src/TenshoAssistant/Plugin.cs",
+    "src/TenshoAssistant/MainWindow.FishingPanel.cs",
+    "src/TenshoAssistant/MainWindow.GatheringFish.cs",
+    "src/TenshoAssistant/MainWindow.FishingSources.cs",
+    "src/TenshoAssistant/MainWindow.Gathering.cs",
+    "src/TenshoAssistant/MainWindow.Alarms.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "hosts": [
+    "api.github.com",
+    "raw.githubusercontent.com"
+   ],
+   "setting": "CommunityGatherBuddy",
+   "copied": "rien dans le dépôt ni dans la DLL : fichiers GatherBuddy.GameData/Data/Fish/Data*.cs téléchargés et lus comme données par un analyseur original, cache « gatherbuddy-fish »",
+   "evidence": "GatherBuddyFish.cs:146 « https://api.github.com/repos/Ottermandias/GatherBuddy/contents/GatherBuddy.GameData/Data/Fish », :147 « https://raw.githubusercontent.com/Ottermandias/GatherBuddy/main/…/Data/Fish/ » ; Plugin.cs:181 Enabled=()=>configuration.CommunityGatherBuddy ; MainWindow.Tools.cs fiche « GatherBuddy ». Licence : API GitHub = Apache-2.0, texte standard, pas de NOTICE (404) (2026-11-02)."
+  },
+  {
+   "id": "FFXIVTeamcraft",
+   "kind": "online",
+   "name": "FFXIV Teamcraft",
+   "author": "Flavien Normand, ffxiv-teamcraft",
+   "license": "MIT",
+   "license_url": "https://github.com/ffxiv-teamcraft/ffxiv-teamcraft/blob/staging/LICENSE",
+   "url": "https://github.com/ffxiv-teamcraft/ffxiv-teamcraft",
+   "use": "Secondes avant la touche par poisson et par lieu de pêche.",
+   "files": [
+    "src/TenshoAssistant/Community/FishBiteTimes.cs",
+    "src/TenshoAssistant/Plugin.cs",
+    "src/TenshoAssistant/MainWindow.FishingPanel.cs",
+    "src/TenshoAssistant/MainWindow.GatheringFish.cs",
+    "src/TenshoAssistant/MainWindow.Advanced.cs"
+   ],
+   "hosts": [
+    "gubal.ffxivteamcraft.com"
+   ],
+   "setting": "CommunityTeamcraftBites",
+   "copied": "rien (une requête GraphQL par lieu, cache « teamcraft-bites »)",
+   "evidence": "FishBiteTimes.cs:36-42 (« gubal.ffxivteamcraft.com GraphQL … Teamcraft is MIT », Endpoint https://gubal.ffxivteamcraft.com/graphql), POST :86 ; Plugin.cs:184 Enabled=()=>configuration.CommunityTeamcraftBites. MIT = licence du code (API GitHub, « Copyright (c) 2017 Flavien Normand ») ; licence des relevés non publiée. Preuve : docs/evidence/0.231-teamcraft-bite-times.md."
+  },
+  {
+   "id": "Discord",
+   "kind": "online",
+   "name": "Discord",
+   "author": "Discord Inc.",
+   "license": "proprietary",
+   "license_url": "",
+   "url": "https://discord.com/developers/docs/resources/webhook",
+   "use": "Envoi des alarmes Tensho dans un salon Discord par l'adresse de webhook saisie par le joueur, désactivé par défaut.",
+   "files": [
+    "src/TenshoAssistant/Alarms/DiscordNotifier.cs",
+    "src/TenshoAssistant/Alarms/DiscordWebhook.cs",
+    "src/TenshoAssistant/MainWindow.Discord.cs",
+    "src/TenshoAssistant/MainWindow.Alarms.cs",
+    "src/TenshoAssistant/Plugin.cs"
+   ],
+   "hosts": [
+    "discord.com",
+    "discordapp.com",
+    "ptb.discord.com",
+    "canary.discord.com"
+   ],
+   "setting": "Discord.Enabled",
+   "copied": "rien (envoi seulement)",
+   "evidence": "DiscordWebhook.cs:16 Enabled (faux par défaut) et liste des hôtes acceptés, IsValidUrl (HTTPS, /api/[vN/]webhooks/<id>/<jeton>) ; DiscordNotifier.cs:122-123 POST JSON, User-Agent :45 avec l'adresse du dépôt Tensho. Configuration.cs:190 propriété Discord (R-12, 0.319). Service propriétaire : aucune licence de code ou de données concernée ; conditions du service non relevées."
+  },
+  {
+   "id": "GatherBuddyReborn",
+   "kind": "rule",
+   "name": "GatherBuddyReborn",
+   "author": "FFXIV-CombatReborn",
+   "license": "Apache-2.0",
+   "license_url": "https://raw.githubusercontent.com/FFXIV-CombatReborn/GatherBuddyReborn/main/LICENSE",
+   "url": "https://github.com/FFXIV-CombatReborn/GatherBuddyReborn",
+   "use": "Valeur cible de météo par période de 8 h ET (graine, décalages 11 et 8, modulo 100) pour les prévisions et les fenêtres de pêche ; référence lue pour les feuilles de récolte et les sources de poissons.",
+   "files": [
+    "src/TenshoAssistant/Gathering/WeatherForecast.cs",
+    "src/TenshoAssistant/MainWindow.Weather.cs",
+    "tools/WeatherProbe/Program.cs",
+    "tools/GatheringRequirementsProbe/Program.cs"
+   ],
+   "copied": "la formule seulement (faits étudiés au commit a204f2f45cb98302dbe938921255c3a6d617c775, implémentation originale) ; la sonde GatheringRequirementsProbe télécharge IlvConvertTable.csv pour comparaison sans le stocker",
+   "evidence": "WeatherForecast.cs:35-44 Target() sans commentaire de source ; source consignée dans docs/project/REFERENCES.md REF-GATHER-WEATHER-001 (WeatherManager.Computation.cs), REF-GATHER, REF-GATHER-FISH-006/007. tools/GatheringRequirementsProbe/Program.cs:27 raw.githubusercontent.com/FFXIV-CombatReborn/GatherBuddyReborn/{commit}/GatherBuddy/CustomInfo/IlvConvertTable.csv (sonde, pas le plugin). Licence : LICENSE brut lu le 2026-11-02 = Apache License 2.0."
+  },
+  {
+   "id": "FrozenRabbitTome",
+   "kind": "rule",
+   "name": "frozen_rabbit_tome",
+   "author": "",
+   "license": "none",
+   "license_url": "",
+   "url": "",
+   "use": "Estimation +3 / +2 / +1 selon la récolte face à ⌊base × 1,1⌋ et ⌊base × 0,9⌋, affichée « estimé » et modifiable.",
+   "files": [
+    "src/TenshoAssistant/Gathering/BountifulEstimate.cs",
+    "src/TenshoAssistant/MainWindow.GatheringGp.cs",
+    "src/TenshoAssistant/MainWindow.GatheringPanel.cs"
+   ],
+   "copied": "la règle seulement (fait relevé), code original",
+   "evidence": "BountifulEstimate.cs:6 « Community rule, not an official formula: shown as an estimate, never forced ». docs/evidence/0.224-bountiful-base.md:11 « outil frozen_rabbit_tome, sans licence, fait relevé sans copie de code, 2026-11-01 » ; DEC-012, DEC-021, DEC-022. Adresse de l'outil non consignée."
+  },
+  {
+   "id": "SubmersiblesDurabilitySheet",
+   "kind": "rule",
+   "name": "Submersibles durability damage",
+   "author": "",
+   "license": "unknown",
+   "license_url": "",
+   "url": "",
+   "use": "Estimation (335 + rang du secteur − rang de la pièce) × 7 par secteur, 30 000 par pièce, pour le nombre de voyages avant réparation.",
+   "files": [
+    "src/TenshoAssistant/FreeCompany/VesselBuilds.cs",
+    "src/TenshoAssistant/MainWindow.VesselBuilds.cs"
+   ],
+   "copied": "la formule seulement, présentée comme « estimation communautaire », code original",
+   "evidence": "VesselBuilds.cs:65-68 et :113 (« community « Submersibles durability damage » sheet, quoted by SubmarineTracker ») ; docs/evidence/0.315-vessel-builds.md (section « Usure ») ; REFERENCES.md « Règles communautaires ». Licence et adresse de la feuille non relevées."
+  },
+  {
+   "id": "VesselCostCapacity",
+   "kind": "rule",
+   "name": "Parts cost <= capacity",
+   "author": "SubmarineTracker, Argus",
+   "license": "unknown",
+   "license_url": "",
+   "url": "",
+   "use": "Rejet des montages de sous-marin ou de dirigeable dont le coût des pièces dépasse la capacité du rang.",
+   "files": [
+    "src/TenshoAssistant/FreeCompany/VesselBuilds.cs",
+    "src/TenshoAssistant/MainWindow.VesselBuilds.cs"
+   ],
+   "copied": "la règle seulement, code original",
+   "evidence": "VesselBuilds.cs:67-68 « the rule « total components ≤ capacity » used by the community tools » ; docs/evidence/0.315-vessel-builds.md nomme SubmarineTracker et Argus, cohérente avec 11 montages publiés, non vérifiée en jeu sous le rang 50. Règle partagée : licence non attribuable."
+  },
+  {
+   "id": "VesselBuildNaming",
+   "kind": "rule",
+   "name": "SSUC++ notation",
+   "author": "",
+   "license": "unknown",
+   "license_url": "",
+   "url": "",
+   "use": "Nom court d'un montage de sous-marin : une lettre par pièce (S, U, W, C, Y) et « + » pour une pièce modifiée.",
+   "files": [
+    "src/TenshoAssistant/FreeCompany/VesselBuilds.cs",
+    "src/TenshoAssistant/MainWindow.VesselBuilds.cs"
+   ],
+   "copied": "la convention seulement, code original",
+   "evidence": "VesselBuilds.cs:132-133 « Short build name used by the community … » ; docs/evidence/0.315-vessel-builds.md « Notation des montages : convention communautaire ». Aucune source nommée."
+  },
+  {
+   "id": "AllaganStudiesMathWizard",
+   "kind": "rule",
+   "name": "Allagan Studies: How to be a math wizard",
+   "author": "Allagan Studies",
+   "license": "unknown",
+   "license_url": "",
+   "url": "",
+   "use": "Formules des statistiques de combat (taux de critique, coup direct, bonus de dégâts…) des pages Personnage et Équipement, absentes des données du jeu.",
+   "files": [
+    "src/TenshoAssistant/Character/StatFormulas.cs",
+    "src/TenshoAssistant/Character/CharacterStatsReader.Dalamud.cs",
+    "src/TenshoAssistant/MainWindow.Character.cs",
+    "src/TenshoAssistant/MainWindow.Gear.cs"
+   ],
+   "copied": "les formules seulement, code original",
+   "evidence": "StatFormulas.cs:10-11 « the formulas from the community (Allagan Studies, « How to be a math wizard » third edition, and akhmorning.com), as the game does not publish them » ; Sub et Div lus dans ParamGrow (docs/evidence/0.182.0-paramgrow-probe.log). Aucune fiche dans REFERENCES.md ; adresse du document et licence non relevées."
+  },
+  {
+   "id": "AkhMorning",
+   "kind": "rule",
+   "name": "akhmorning.com",
+   "author": "",
+   "license": "unknown",
+   "license_url": "",
+   "url": "https://www.akhmorning.com",
+   "use": "Formules des statistiques de combat citées avec Allagan Studies.",
+   "files": [
+    "src/TenshoAssistant/Character/StatFormulas.cs"
+   ],
+   "copied": "les formules seulement ; table complète non récupérée (« page AkhMorning sans tableau lisible » selon le CHANGELOG), aucune valeur reprise",
+   "evidence": "StatFormulas.cs:10-11 ; CHANGELOG.md (entrées 0.183/0.184). Aucune fiche dans REFERENCES.md ; licence non relevée."
+  },
+  {
+   "id": "FashionReportWeek",
+   "kind": "rule",
+   "name": "Fashion Report week",
+   "author": "",
+   "license": "unknown",
+   "license_url": "",
+   "url": "",
+   "use": "Semaines comptées depuis le mardi 2018-01-30 08:00 UTC, ligne FashionCheckWeeklyTheme = semaine + 9.",
+   "files": [
+    "src/TenshoAssistant/Fashion/FashionCheck.cs",
+    "src/TenshoAssistant/MainWindow.FashionWeek.cs"
+   ],
+   "copied": "la relation seulement, code original",
+   "evidence": "FashionCheck.cs:45-47 « FashionCheckWeeklyTheme row = week + 9 (relation used by the community tools for this sheet; the shown theme name lets the player check it) ». Aucune source nommée (Avant-Garde, lu pour la fenêtre, est un candidat non consigné)."
+  },
+  {
+   "id": "GlamourAllJobs74",
+   "kind": "rule",
+   "name": "Glamour for every job (7.4)",
+   "author": "SQUARE ENIX",
+   "license": "proprietary",
+   "license_url": "",
+   "url": "https://www.finalfantasyxiv.com",
+   "use": "Option « toutes les classes » : armures et accessoires de tout job et niveau proposés en mirage, armes toujours liées au job.",
+   "files": [
+    "src/TenshoAssistant/Gear/GearCatalog.cs",
+    "src/TenshoAssistant/MainWindow.Gear.cs",
+    "src/TenshoAssistant/Configuration.cs"
+   ],
+   "setting": "GearAllJobs",
+   "copied": "le fait seulement, code original",
+   "evidence": "GearCatalog.cs:51-54 (« since patch 7.4 any armor or accessory can be a glamour whatever the job and level; weapons stay job-locked ») et :90 ; Configuration.cs:164 GearAllJobs (faux par défaut). REFERENCES.md « Règles communautaires » et DEC-020, CHANGELOG 0.311 ; adresse exacte du communiqué non consignée ; pas de sonde des données du jeu."
+  },
+  {
+   "id": "Craftimizer",
+   "kind": "reference",
+   "name": "Craftimizer",
+   "author": "Asriel Camora (WorkingRobot)",
+   "license": "MIT",
+   "license_url": "https://github.com/WorkingRobot/Craftimizer/blob/main/LICENSE",
+   "url": "https://github.com/WorkingRobot/Craftimizer",
+   "use": "Référence fonctionnelle de l'artisanat : écriture des macros dans le jeu, table des actions, conditions et modèle de simulation ; plugin de référence de l'outil Artisanat.",
+   "files": [
+    "src/TenshoAssistant/Macros/MacroWriter.Dalamud.cs",
+    "src/TenshoAssistant/MainWindow.CraftSimulation.cs",
+    "src/TenshoAssistant/Craft/CraftSimulation.cs",
+    "src/TenshoAssistant/Craft/CraftActionCatalogLoader.Dalamud.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (« functional reference only, no code copied » ; faits et formules comparés au commit 1d4a2c67ea47a25d68701e8e69c8744dbbd56d86)",
+   "evidence": "MacroWriter.Dalamud.cs:11 « functional reference only, no code copied » ; MainWindow.CraftSimulation.cs:43 « as Craftimizer does » ; MainWindow.Tools.cs fiche « Craftimizer ». REFERENCES.md REF-CRAFT-SIM-001, REF-CRAFT-MACRO-001, REF-CRAFT-ACTIONS-002. Licence : API GitHub = MIT, « Copyright (c) 2023 Asriel Camora »."
+  },
+  {
+   "id": "TeamcraftSimulator",
+   "kind": "reference",
+   "name": "ffxiv-teamcraft/simulator",
+   "author": "Flavien Normand, ffxiv-teamcraft",
+   "license": "MIT",
+   "license_url": "https://github.com/ffxiv-teamcraft/simulator/blob/master/LICENSE",
+   "url": "https://github.com/ffxiv-teamcraft/simulator",
+   "use": "Second modèle de simulation d'artisanat étudié pour les gains de progression et de qualité.",
+   "files": [
+    "src/TenshoAssistant/Craft/CraftSimulation.cs"
+   ],
+   "copied": "rien (formules comparées au commit 74e167a05ba279526d2ddd457a048e234bedbad9, aucun code embarqué)",
+   "evidence": "Aucune mention dans src ; consigné dans docs/project/REFERENCES.md REF-CRAFT-SIM-001. Licence : LICENSE brut (master) relu le 2026-11-02 = MIT, « Copyright (c) 2019 Flavien Normand »."
+  },
+  {
+   "id": "Artisan",
+   "kind": "reference",
+   "name": "Artisan",
+   "author": "PunishXIV",
+   "license": "BSD-3-Clause",
+   "license_url": "https://github.com/PunishXIV/Artisan/blob/main/LICENCE.md",
+   "url": "https://github.com/PunishXIV/Artisan",
+   "use": "Référence secondaire de l'artisanat (séparer la simulation du choix d'action). Licence relue lors d'un relevé précédent.",
+   "files": [],
+   "copied": "rien (lu seulement, référence historique au commit 247c2df)",
+   "evidence": "REFERENCES.md REF-ARTISAN ; docs/evidence/0.318-plugin-gaps.json (BSD-3-Clause, LICENCE.md). Aucune mention dans src."
+  },
+  {
+   "id": "Mappy",
+   "kind": "reference",
+   "name": "Mappy",
+   "author": "MidoriKami, harbingerftw",
+   "license": "AGPL-3.0-or-later",
+   "license_url": "https://github.com/harbingerftw/Mappy/blob/master/LICENSE",
+   "url": "https://github.com/harbingerftw/Mappy",
+   "use": "Modèle de la carte Tensho : couches, carte du jeu gardée ouverte hors écran, cible du jeu en premier, liste des icônes sous le curseur.",
+   "files": [
+    "src/TenshoAssistant/Configuration.cs",
+    "src/TenshoAssistant/MainWindow.MapView.cs",
+    "src/TenshoAssistant/Maps/MapCatalog.cs",
+    "src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (« reference only, AGPL, not copied »)",
+   "evidence": "MapCatalog.cs:79 « read the way Mappy does (reference only, AGPL, not copied) » ; NativeMapReplacer.Dalamud.cs:20 ; MainWindow.MapView.cs:51, :925 ; Configuration.cs:3. Licence : en-tête du LICENSE « Copyright (C) 2022 MidoriKami », AGPL v3 « or (at your option) any later version » (GitHub : NOASSERTION ; MidoriKami/Mappy répond 404 le 2026-11-02)."
+  },
+  {
+   "id": "SortaKinda",
+   "kind": "reference",
+   "name": "SortaKinda",
+   "author": "MidoriKami",
+   "license": "AGPL-3.0-or-later",
+   "license_url": "https://github.com/MidoriKami/SortaKinda/blob/master/LICENSE",
+   "url": "https://github.com/MidoriKami/SortaKinda",
+   "use": "Modèle de la page d'organisation de l'inventaire (règles de tri par conteneur, aperçu, application).",
+   "files": [
+    "src/TenshoAssistant/MainWindow.SortPreview.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (faits d'API seulement, commit 95a1bf9161f4bc595c21094eeaae9fda556f4b4b)",
+   "evidence": "MainWindow.SortPreview.cs:8 « like SortaKinda » ; REFERENCES.md REF-SORT, REF-SORT-NATIVE-002. Licence : LICENSE lu le 2026-11-02, « Copyright (C) 2023 MidoriKami », AGPL v3 « or any later version » (GitHub : NOASSERTION)."
+  },
+  {
+   "id": "AvantGarde",
+   "kind": "reference",
+   "name": "Avant-Garde",
+   "author": "NeNeppie",
+   "license": "AGPL-3.0",
+   "license_url": "https://github.com/NeNeppie/AvantGarde/blob/main/LICENSE",
+   "url": "https://github.com/NeNeppie/AvantGarde",
+   "use": "Disposition de la fenêtre FashionCheck (catégorie de l'emplacement n = AtkValue 2 + 11 × n, nœud 8 + n) et plugin de référence de la Revue de mode.",
+   "files": [
+    "src/TenshoAssistant/Fashion/FashionCheckReader.Dalamud.cs",
+    "src/TenshoAssistant/MainWindow.Fashion.cs",
+    "src/TenshoAssistant/MainWindow.FashionWeek.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (« read only; this code is original »)",
+   "evidence": "FashionCheckReader.Dalamud.cs:9 et :49 « layout learned from the Avant-Garde plugin, AGPL, read only; this code is original ». REFERENCES.md REF-FASHION-AVANTGARDE. Licence : API GitHub = AGPL-3.0, texte non personnalisé (2026-11-02)."
+  },
+  {
+   "id": "TriadBuddy",
+   "kind": "reference",
+   "name": "TriadBuddy",
+   "author": "MgAl2O4",
+   "license": "MIT",
+   "license_url": "https://github.com/MgAl2O4/FFTriadBuddyDalamud/blob/main/LICENSE",
+   "url": "https://github.com/MgAl2O4/FFTriadBuddyDalamud",
+   "use": "Modèle des aides de Triple Triad : conseils en partie, taux de victoire des decks, mise en évidence dans l'éditeur, PNJ et cartes manquantes.",
+   "files": [
+    "src/TenshoAssistant/MainWindow.TripleTriad.cs",
+    "src/TenshoAssistant/MainWindow.TriadAdvice.cs",
+    "src/TenshoAssistant/MainWindow.TriadDecks.cs",
+    "src/TenshoAssistant/MainWindow.TriadNpcs.cs",
+    "src/TenshoAssistant/MainWindow.TriadRequest.cs",
+    "src/TenshoAssistant/MiniGames/TriadMatchSimulator.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (modèle fonctionnel ; UIReaderTriadGame.cs lu au commit 1bffa57 selon docs/goals/TRIAD-002.md)",
+   "evidence": "« like TriadBuddy » / « as TriadBuddy » dans MainWindow.TriadAdvice.cs:10, MainWindow.TriadDecks.cs:11, MainWindow.TriadRequest.cs:9, MainWindow.TriadNpcs.cs:8, MainWindow.TripleTriad.cs:9, TriadMatchSimulator.cs:15. Licence MIT : API GitHub 2026-11-02 dans docs/evidence/0.318-plugin-gaps.json."
+  },
+  {
+   "id": "FFTriadBuddy",
+   "kind": "reference",
+   "name": "FFTriadBuddy",
+   "author": "MgAl2O4",
+   "license": "MIT",
+   "license_url": "https://github.com/MgAl2O4/FFTriadBuddy/blob/master/LICENSE",
+   "url": "https://github.com/MgAl2O4/FFTriadBuddy",
+   "use": "Règles de Triple Triad (TriadGameModifier, TriadGameSimulation, TriadCard) étudiées pour le moteur du solveur.",
+   "files": [
+    "src/TenshoAssistant/MiniGames/TripleTriadSolver.cs"
+   ],
+   "copied": "rien (« aucune implémentation copiée ; moteur original », commit 425f72ecb3ba1580943e62b83097a0bf5a4e69e7)",
+   "evidence": "docs/goals/TRIAD-001C.md, TRIAD-001D.md, TRIAD-001E.md ; aucune mention dans src. Licence : LICENSE brut (master) lu le 2026-11-02 = MIT, « Copyright (c) 2019 MgAl2O4 »."
+  },
+  {
+   "id": "LodestoneTripleTriadGuide",
+   "kind": "reference",
+   "name": "Lodestone Triple Triad guide",
+   "author": "SQUARE ENIX",
+   "license": "proprietary",
+   "license_url": "",
+   "url": "https://na.finalfantasyxiv.com/lodestone/playguide/contentsguide/goldsaucer/tripletriad/",
+   "use": "Noms et principes des règles de Triple Triad.",
+   "files": [
+    "src/TenshoAssistant/MiniGames/TripleTriadSolver.cs"
+   ],
+   "copied": "rien (faits)",
+   "evidence": "docs/goals/TRIAD-001C.md, TRIAD-001D.md, TRIAD-001E.md. Contenu officiel « © SQUARE ENIX » (pied de page du Lodestone lu le 2026-11-02), aucune licence ouverte."
+  },
+  {
+   "id": "EzMiniCactpot",
+   "kind": "reference",
+   "name": "ezMiniCactpot",
+   "author": "daemitus, Minmoose, MidoriKami",
+   "license": "GPL-3.0",
+   "license_url": "https://github.com/Etheirys/EzMiniCactpot/blob/main/LICENSE",
+   "url": "https://github.com/Etheirys/EzMiniCactpot",
+   "use": "Modèle de la page Mini Cactpot et de sa surcouche sur la fenêtre du jeu (lecture de LotteryDaily, retrait en fin de ticket).",
+   "files": [
+    "src/TenshoAssistant/MainWindow.MiniCactpot.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (modèle fonctionnel ; ancien arbre MidoriKami/EzMiniCactpot 63173af lu le 2026-10-29)",
+   "evidence": "MainWindow.MiniCactpot.cs:7 et :32 « like ezMiniCactpot ». Licence GPL-3.0 (dépôt Etheirys) : API GitHub 2026-11-02 dans docs/evidence/0.318-plugin-gaps.json ; l'ancien arbre MidoriKami n'avait pas de LICENSE (REFERENCES.md:426)."
+  },
+  {
+   "id": "LazyGatherer",
+   "kind": "reference",
+   "name": "LazyGatherer",
+   "author": "Hiroa",
+   "license": "AGPL-3.0",
+   "license_url": "https://github.com/Hiroa/LazyGatherer/blob/main/LICENSE",
+   "url": "https://github.com/Hiroa/LazyGatherer",
+   "use": "Modèle de la page de planification des PR de récolte et de la lecture de la fenêtre de récolte.",
+   "files": [
+    "src/TenshoAssistant/MainWindow.GatheringGp.cs",
+    "src/TenshoAssistant/Gathering/GatheringObservationReader.Dalamud.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (faits ciblés au commit 0bb8ec9a47dc4521411c705221cdeda361015d75)",
+   "evidence": "MainWindow.GatheringGp.cs:8 « GP planning page (LazyGatherer-like) » ; REFERENCES.md REF-GATHER-NATIVE-004, docs/goals/GP-ACTIVE-005.md. Licence AGPL-3.0 : docs/evidence/0.318-plugin-gaps.json."
+  },
+  {
+   "id": "ItemUse",
+   "kind": "reference",
+   "name": "Item Use",
+   "author": "PunishedPineapple",
+   "license": "AGPL-3.0",
+   "license_url": "https://github.com/PunishedPineapple/ItemUse/blob/main/LICENSE",
+   "url": "https://github.com/PunishedPineapple/ItemUse",
+   "use": "Modèle de l'onglet Utilisations d'un objet (rouleaux, recettes, Grande Compagnie, aquarium).",
+   "files": [
+    "src/TenshoAssistant/MainWindow.ItemUses.cs",
+    "src/TenshoAssistant/Items/ItemUseCatalog.cs",
+    "src/TenshoAssistant/MainWindow.ItemContextMenu.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (faits seulement)",
+   "evidence": "MainWindow.ItemUses.cs:7 « Item Use (item sheet › Usages) » ; MainWindow.Tools.cs fiche « Item Use ». Licence : LICENSE lu le 2026-11-02 = AGPL-3.0 (docs/evidence/0.318-plugin-gaps.json)."
+  },
+  {
+   "id": "DutyLootPreview",
+   "kind": "reference",
+   "name": "Duty Loot Preview",
+   "author": "grittyfrog",
+   "license": "none",
+   "license_url": "",
+   "url": "https://github.com/grittyfrog/DutyLootPreview",
+   "use": "Modèle de la page Butin des contenus et du panneau à côté de la Recherche de mission.",
+   "files": [
+    "src/TenshoAssistant/MainWindow.Duties.cs",
+    "src/TenshoAssistant/MainWindow.DutyFinder.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (modèle fonctionnel, lu seulement)",
+   "evidence": "MainWindow.Duties.cs:9 « Duty Loot Preview-like » ; MainWindow.DutyFinder.cs:10 « as Duty Loot Preview ». docs/evidence/0.318-plugin-gaps.json : aucune licence (API GitHub /license : 404, 2026-11-02)."
+  },
+  {
+   "id": "MonsterLootHunter",
+   "kind": "reference",
+   "name": "Monster Loot Hunter",
+   "author": "Sylf (danielbrenom)",
+   "license": "MIT",
+   "license_url": "https://github.com/danielbrenom/MonsterLootHunter/blob/main/LICENSE",
+   "url": "https://github.com/danielbrenom/MonsterLootHunter",
+   "use": "Modèle de la page Butin des monstres (monstres qui lâchent l'objet choisi, route Garland identifiée).",
+   "files": [
+    "src/TenshoAssistant/MainWindow.Monsters.cs",
+    "src/TenshoAssistant/MainWindow.ItemContextMenu.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (modèle fonctionnel, lu au commit 1e603af)",
+   "evidence": "MainWindow.Monsters.cs:8 « like Monster Loot Hunter » ; docs/goals/LOOT-001.md. Licence MIT : docs/evidence/0.318-plugin-gaps.json."
+  },
+  {
+   "id": "QuestTracker",
+   "kind": "reference",
+   "name": "QuestTracker",
+   "author": "isaiahcat, keifufu",
+   "license": "AGPL-3.0",
+   "license_url": "https://github.com/keifufu/QuestTracker/blob/master/LICENSE",
+   "url": "https://github.com/keifufu/QuestTracker",
+   "use": "Modèle de la page Quêtes (toutes les quêtes avec la progression observée).",
+   "files": [
+    "src/TenshoAssistant/MainWindow.Quests.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (modèle fonctionnel)",
+   "evidence": "MainWindow.Quests.cs:9 « like QuestTracker ». Licence AGPL-3.0 : docs/evidence/0.318-plugin-gaps.json."
+  },
+  {
+   "id": "PriceInsight",
+   "kind": "reference",
+   "name": "Price Insight",
+   "author": "Kouzukii",
+   "license": "MIT",
+   "license_url": "https://github.com/Kouzukii/ffxiv-priceinsight/blob/main/LICENSE",
+   "url": "https://github.com/Kouzukii/ffxiv-priceinsight",
+   "use": "Plugin de référence de l'outil Marché (prix au survol), nom affiché dans le répertoire des outils.",
+   "files": [
+    "src/TenshoAssistant/MainWindow.Tools.cs",
+    "src/TenshoAssistant/MainWindow.ItemContextMenu.cs",
+    "src/TenshoAssistant/MainWindow.Items.cs"
+   ],
+   "copied": "rien (nom affiché seulement)",
+   "evidence": "MainWindow.Tools.cs (fiche « Market.Name », « Price Insight ») ; OpenContextTool(« Price Insight ») dans MainWindow.ItemContextMenu.cs:31. Licence MIT : LICENSE lu le 2026-11-02 (docs/evidence/0.318-plugin-gaps.json)."
+  },
+  {
+   "id": "BlueMageHelper",
+   "kind": "reference",
+   "name": "Blue Mage Helper",
+   "author": "Infi, Sl0nderman, harbingerftw",
+   "license": "none",
+   "license_url": "",
+   "url": "https://github.com/harbingerftw/BlueMageHelper",
+   "use": "Plugin de référence de l'outil Magie bleue, nom affiché dans le répertoire des outils.",
+   "files": [
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (nom affiché seulement)",
+   "evidence": "MainWindow.Tools.cs (fiche « BlueMagic.Name », « Blue Mage Helper ») ; docs/project/ROADMAP.md BLU-001. docs/evidence/0.318-plugin-gaps.json : aucune licence (API GitHub /license : 404, 2026-11-02)."
+  },
+  {
+   "id": "MacroChain",
+   "kind": "reference",
+   "name": "Macro Chain",
+   "author": "Caraxi",
+   "license": "none",
+   "license_url": "",
+   "url": "https://github.com/Caraxi/MacroChain",
+   "use": "Modèle de l'enchaînement des macros (/tenshonext) et de l'état d'exécution des macros.",
+   "files": [
+    "src/TenshoAssistant/Macros/MacroChainBridge.Dalamud.cs",
+    "src/TenshoAssistant/Macros/MacroChainService.cs",
+    "src/TenshoAssistant/MainWindow.MacroChain.cs",
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (comportement reproduit, code original ; « aucune licence de réutilisation établie »)",
+   "evidence": "MainWindow.Tools.cs fiche « Macro Chain » ; REFERENCES.md REF-MACRO-BRIDGE-20261028, docs/goals/MACRO-001A.md. API GitHub /repos/Caraxi/MacroChain/license « Not Found », racine sans LICENSE (2026-11-02) : tous droits réservés par défaut."
+  },
+  {
+   "id": "CollectionsSeventh",
+   "kind": "reference",
+   "name": "Collections",
+   "author": "Seventh",
+   "license": "none",
+   "license_url": "",
+   "url": "https://github.com/Seventhxiv/Collections",
+   "use": "Plugin de référence de la page Collections, nom affiché dans le répertoire des outils.",
+   "files": [
+    "src/TenshoAssistant/MainWindow.Tools.cs"
+   ],
+   "copied": "rien (nom affiché seulement)",
+   "evidence": "MainWindow.Tools.cs (fiche « Collections.Name », « Collections ») ; docs/project/ROADMAP.md COLL-001. Le code ne nomme pas l'auteur : identification par docs/evidence/0.318-plugin-gaps.json (aucune licence, API GitHub /license 404)."
+  },
+  {
+   "id": "HimbeertoniRaidTool",
+   "kind": "reference",
+   "name": "HimbeertoniRaidTool",
+   "author": "Koenari",
+   "license": "MIT",
+   "license_url": "https://github.com/Koenari/HimbeertoniRaidTool/blob/main/LICENSE.md",
+   "url": "https://github.com/Koenari/HimbeertoniRaidTool",
+   "use": "Idées pour le planificateur d'équipement (lu seulement).",
+   "files": [],
+   "copied": "rien (idées seulement ; dépôt, commit et fichiers lus non consignés)",
+   "evidence": "Aucune mention dans src ; docs/project/REFERENCES.md REF-GEAR-R11 « READ_ONLY ». Licence MIT : docs/evidence/0.318-plugin-gaps.json."
+  },
+  {
+   "id": "Glamourer",
+   "kind": "reference",
+   "name": "Glamourer",
+   "author": "Ottermandias",
+   "license": "Apache-2.0",
+   "license_url": "https://github.com/Ottermandias/Glamourer/blob/main/LICENSE",
+   "url": "https://github.com/Ottermandias/Glamourer",
+   "use": "Idées pour le planificateur d'équipement (lu seulement).",
+   "files": [],
+   "copied": "rien (idées seulement)",
+   "evidence": "Aucune mention dans src ; docs/project/REFERENCES.md REF-GEAR-R11 « READ_ONLY ». Licence : LICENSE brut lu le 2026-11-02 = Apache License 2.0."
+  },
+  {
+   "id": "XivGear",
+   "kind": "reference",
+   "name": "xivgear.app",
+   "author": "",
+   "license": "none",
+   "license_url": "",
+   "url": "https://xivgear.app",
+   "use": "Idées pour le planificateur d'équipement (lu seulement, jamais embarqué).",
+   "files": [],
+   "copied": "rien",
+   "evidence": "Aucune mention dans src ; REFERENCES.md REF-GEAR-R11 « xivgear.app (aucune licence) » ; DEC-021. API GitHub /repos/xiv-gear-planner/gear-planner : license null, pas de LICENSE, README et package.json sans licence (2026-11-02)."
+  },
+  {
+   "id": "Argus",
+   "kind": "reference",
+   "name": "Argus",
+   "author": "",
+   "license": "unknown",
+   "license_url": "",
+   "url": "https://github.com/ofnature/Argus",
+   "use": "Confirmation de la règle « coût ≤ capacité » des montages ; ses seuils de dirigeables (sources sans licence) ne sont pas repris. Dépôt probable : ofnature/Argus (MIT), non confirmé.",
+   "files": [
+    "src/TenshoAssistant/FreeCompany/VesselBuilds.cs"
+   ],
+   "copied": "rien",
+   "evidence": "VesselBuilds.cs:67-68 dit seulement « used by the community tools » ; REFERENCES.md REF-FC-ARGUS : « MIT selon l'équipe de recherche 0.315, mais ni la licence, ni le dépôt, ni le commit ne sont consignés ». Recherche GitHub du 2026-11-02 : ofnature/Argus (« FFXIV submarine & airship tracker », plugin Dalamud), LICENSE MIT : dépôt probable, non confirmé par la preuve 0.315."
+  },
+  {
+   "id": "GatheringOptimizer",
+   "kind": "reference",
+   "name": "GatheringOptimizer",
+   "author": "belzaru17",
+   "license": "MIT",
+   "license_url": "https://github.com/belzaru17/GatheringOptimizer/blob/main/LICENSE",
+   "url": "https://github.com/belzaru17/GatheringOptimizer",
+   "use": "Comparaison pour le bonus de Récolte abondante II (il laisse la valeur manuelle).",
+   "files": [],
+   "copied": "rien (lu seulement)",
+   "evidence": "docs/evidence/0.224-bountiful-base.md ; REFERENCES.md « Règles communautaires » ; aucune mention dans src. Licence : API GitHub = MIT, « Copyright (c) 2024 belzaru17 » (2026-11-02)."
+  },
+  {
+   "id": "SaintCoinach",
+   "kind": "reference",
+   "name": "SaintCoinach",
+   "author": "xivapi",
+   "license": "WTFPL",
+   "license_url": "https://github.com/xivapi/SaintCoinach/blob/master/LICENSE",
+   "url": "https://github.com/xivapi/SaintCoinach",
+   "use": "Définitions des récompenses de quêtes (Quest.json, QuestRewards.cs) pour la projection native. Licence relue lors d'un relevé précédent.",
+   "files": [],
+   "copied": "rien (faits ciblés au commit 0b22b78f97951bb66bfa78fb561aa4c7bf7af7cd)",
+   "evidence": "REFERENCES.md REF-QUEST-REWARDS-003 (« WTFPL v2 vérifiée dans LICENSE »), REF-GATHER-FISH-SOURCES-007. Aucune mention dans src."
+  },
+  {
+   "id": "AllaganTools",
+   "kind": "reference",
+   "name": "Allagan Tools (InventoryTools)",
+   "author": "Critical-Impact",
+   "license": "GPL-3.0",
+   "license_url": "https://github.com/Critical-Impact/InventoryTools/blob/main/LICENSE",
+   "url": "https://github.com/Critical-Impact/InventoryTools",
+   "use": "Référence secondaire de l'inventaire et des sources de récompenses de quêtes ; plugin non utilisé à l'exécution (DEC-013).",
+   "files": [],
+   "copied": "rien (faits seulement, commit 70a9f410d9a8ab97bef6bcf795415ea2d7c75097)",
+   "evidence": "REFERENCES.md REF-INVENTORY, REF-QUEST-CURRENCIES-005-STUDY. Licence : API GitHub = GPL-3.0, texte non personnalisé (2026-11-02). La mention « Allagan » de StatFormulas.cs vise Allagan Studies, pas ce plugin."
+  },
+  {
+   "id": "Questionable",
+   "kind": "reference",
+   "name": "Questionable",
+   "author": "PunishXIV",
+   "license": "AGPL-3.0",
+   "license_url": "https://github.com/PunishXIV/Questionable/blob/master/LICENSE",
+   "url": "https://github.com/PunishXIV/Questionable",
+   "use": "Sémantique des jointures de prérequis de quêtes (EQuestJoin).",
+   "files": [],
+   "copied": "rien (lu seulement, commit bb2bf7cfa0d3e410254f9a364271cbcbe856adb5)",
+   "evidence": "docs/goals/QUEST-002.md:26 (EQuestJoin.cs, QuestInfo.cs). Licence : LICENSE brut (master) lu le 2026-11-02 = GNU AGPL v3, texte non personnalisé."
+  },
+  {
+   "id": "SamplePlugin",
+   "kind": "reference",
+   "name": "Dalamud SamplePlugin",
+   "author": "goatcorp",
+   "license": "AGPL-3.0",
+   "license_url": "https://github.com/goatcorp/SamplePlugin/blob/master/LICENSE.md",
+   "url": "https://github.com/goatcorp/SamplePlugin",
+   "use": "Modèle du démarrage du plugin (IDalamudPlugin, WindowSystem, configuration).",
+   "files": [
+    "src/TenshoAssistant/Plugin.cs"
+   ],
+   "copied": "rien (faits techniques, commit b8477da)",
+   "evidence": "REFERENCES.md REF-SAMPLE. Licence : LICENSE.md brut (master) relu le 2026-11-02 = GNU AGPL v3, texte non personnalisé."
+  },
+  {
+   "id": "XIVShinies",
+   "kind": "reference",
+   "name": "XIV-Shinies",
+   "author": "XIV-Shinies",
+   "license": "MIT",
+   "license_url": "https://github.com/XIV-Shinies/xiv-shinies-plugin/blob/HEAD/LICENSE",
+   "url": "https://github.com/XIV-Shinies/xiv-shinies-plugin",
+   "use": "Référence secondaire des collections (collecteurs par domaine, couverture explicite).",
+   "files": [],
+   "copied": "rien (faits techniques, commit e6f4341)",
+   "evidence": "REFERENCES.md REF-SHINIES ; licence MIT dans docs/evidence/0.318-plugin-gaps.json. Aucune mention dans src."
+  },
+  {
+   "id": "Tomestone",
+   "kind": "reference",
+   "name": "Dalamud.Tomestone",
+   "author": "TomestoneGG",
+   "license": "AGPL-3.0",
+   "license_url": "https://github.com/TomestoneGG/Dalamud.Tomestone/blob/HEAD/LICENSE.md",
+   "url": "https://github.com/TomestoneGG/Dalamud.Tomestone",
+   "use": "Référence secondaire des domaines de collection.",
+   "files": [],
+   "copied": "rien (faits techniques, commit d9e6968)",
+   "evidence": "REFERENCES.md REF-TOMESTONE ; licence AGPL-3.0 dans docs/evidence/0.318-plugin-gaps.json. Aucune mention dans src (les « Tomestone » du code désignent la monnaie du jeu)."
+  },
+  {
+   "id": "FfxivTodo",
+   "kind": "reference",
+   "name": "ffxiv-todo",
+   "author": "datamachine",
+   "license": "MIT",
+   "license_url": "https://github.com/datamachine/ffxiv-todo/blob/main/LICENSE",
+   "url": "https://github.com/datamachine/ffxiv-todo",
+   "use": "Référence secondaire des prérequis de quêtes (ALL/ANY, inconnu préservé).",
+   "files": [],
+   "copied": "rien (faits techniques, commit ef5f5ba)",
+   "evidence": "REFERENCES.md REF-QUEST. Licence : LICENSE brut (main) relu le 2026-11-02 = MIT."
+  },
+  {
+   "id": "Tsukimichi",
+   "kind": "reference",
+   "name": "Tsukimichi",
+   "author": "xenofei",
+   "license": "MIT",
+   "license_url": "https://github.com/xenofei/Tsukimichi/blob/main/LICENSE",
+   "url": "https://github.com/xenofei/Tsukimichi",
+   "use": "Référence secondaire des instantanés (fraîcheur et portée des données).",
+   "files": [],
+   "copied": "rien (faits techniques, commit a82116a)",
+   "evidence": "REFERENCES.md REF-SNAPSHOT. Licence : LICENSE brut (main) relu le 2026-11-02 = MIT."
+  },
+  {
+   "id": "AutoRetainer",
+   "kind": "reference",
+   "name": "AutoRetainer",
+   "author": "PunishXIV",
+   "license": "unknown",
+   "license_url": "",
+   "url": "https://github.com/PunishXIV/AutoRetainer",
+   "use": "Référence lue pour les expéditions de la compagnie libre. Licence non revérifiée.",
+   "files": [],
+   "copied": "rien (structures prises dans FFXIVClientStructs)",
+   "evidence": "docs/evidence/0.307-fc-voyages.md:16 « Références de plugins (SubmarineTracker, AutoRetainer…) : non copiées » ; licence BSD-3-Clause (api.github.com, 2026-11-02) dans docs/evidence/0.318-plugin-gaps.json ; REFERENCES.md dit encore « licence non relevée »."
+  },
+  {
+   "id": "FinalFantasyXIV",
+   "kind": "game",
+   "name": "FINAL FANTASY XIV",
+   "author": "SQUARE ENIX CO., LTD.",
+   "license": "proprietary",
+   "license_url": "https://support.na.square-enix.com/rule.php?id=5382",
+   "url": "https://www.finalfantasyxiv.com",
+   "use": "Données, textes, icônes, textures de carte et polices (Trump Gothic) du jeu lus à l'exécution ; mention : « FINAL FANTASY est une marque déposée de Square Enix Holdings Co., Ltd. FINAL FANTASY XIV © SQUARE ENIX CO., LTD. Tous droits réservés. Tensho Assistant n'est ni affilié à SQUARE ENIX ni approuvé par elle. » La table des gains du Mini Cactpot, affichée par le jeu, est recopiée dans le code de Tensho.",
+   "files": [
+    "src/TenshoAssistant/MiniGames/MiniCactpotSolver.cs",
+    "src/TenshoAssistant/Plugin.cs",
+    "src/TenshoAssistant/Items/ItemCatalogLoader.Dalamud.cs",
+    "src/TenshoAssistant/Maps/MapProjection.cs",
+    "src/TenshoAssistant/Maps/MapCatalogLoader.Dalamud.cs",
+    "src/TenshoAssistant/UI/Components/ItemCell.cs",
+    "src/TenshoAssistant/UI/UiComponents.cs",
+    "src/TenshoAssistant/MainWindow.MapView.cs",
+    "src/TenshoAssistant/MainWindow.MapLocalLists.cs",
+    "src/TenshoAssistant/MiniGames/MiniCactpotSolver.cs",
+    "src/TenshoAssistant/**/*.Dalamud.cs",
+    "src/TenshoAssistant/**/*Copy.Lumina.cs"
+   ],
+   "copied": "rien dans la DLL (lu depuis l'installation du joueur et copié en mémoire) ; table des gains du Mini Cactpot codée en dur (MiniCactpotSolver.cs:9, sans source) ; extraits de sondes dans docs/evidence/ ; texte du jeu dans le jeu d'essai tests/TenshoAssistant.Tests/Fixtures/garland-instance-30028.json",
+   "evidence": "Jeu propriétaire : pied de page du Lodestone « © SQUARE ENIX » (lu le 2026-11-02) ; la mention habituelle suit celle de garlandtools.org/db (« FINAL FANTASY is a registered trademark of Square Enix Holdings Co., Ltd. », « FINAL FANTASY XIV © … SQUARE ENIX CO., LTD. All Rights Reserved. », « not affiliated with Square Enix », lus le 2026-11-02). MapProjection.cs:12-16 chemins ui/map/…_m.tex ; GetFromGameIcon/GameIconLookup dans ItemCell.cs, MainWindow.MapView.cs, MainWindow.MapLocalLists.cs ; Plugin.cs:339-344 GameFontFamily.TrumpGothic 24 et 19 px ; 33 fichiers lisent Lumina.Excel.Sheets ; ordre des sources DEC-011."
+  },
+  {
+   "id": "DalamudNetSdk",
+   "kind": "tool",
+   "name": "Dalamud.NET.Sdk 15.0.0",
+   "author": "goatcorp",
+   "license": "MIT",
+   "license_url": "https://licenses.nuget.org/MIT",
+   "url": "https://github.com/goatcorp/Dalamud.NET.Sdk",
+   "use": "SDK MSBuild du plugin : cible net10.0-windows, références Dalamud non copiées, verrouillage des paquets.",
+   "files": [
+    "src/TenshoAssistant/TenshoAssistant.csproj",
+    "global.json"
+   ],
+   "copied": "rien",
+   "evidence": "TenshoAssistant.csproj:1 « <Project Sdk=\"Dalamud.NET.Sdk\"> » ; global.json msbuild-sdks 15.0.0 ; nuspec du cache NuGet local (~/.nuget/packages/dalamud.net.sdk/15.0.0) : <license type=\"expression\">MIT</license>, auteurs « XIVLauncher and Dalamud contributors ». Sdk.props ajoute aussi Serilog, ImPlot, ImGuizmo et Microsoft.Extensions.ObjectPool, non utilisés par le code."
+  },
+  {
+   "id": "DalamudPackager",
+   "kind": "tool",
+   "name": "DalamudPackager 15.0.0",
+   "author": "Anna Clemens, goatcorp",
+   "license": "EUPL-1.2",
+   "license_url": "https://licenses.nuget.org/EUPL-1.2",
+   "url": "https://github.com/goatcorp/DalamudPackager",
+   "use": "Produit le paquet du plugin (latest.zip) et complète le manifeste (version, InternalName, DalamudApiLevel).",
+   "files": [
+    "src/TenshoAssistant/packages.lock.json",
+    "src/TenshoAssistant/TenshoAssistant.json",
+    "src/TenshoAssistant/TenshoAssistant.csproj"
+   ],
+   "copied": "rien (outil de build, PrivateAssets)",
+   "evidence": "packages.lock.json : DalamudPackager Direct 15.0.0 ; nuspec du cache NuGet local : <license type=\"expression\">EUPL-1.2</license>, auteurs « Anna Clemens, goatcorp contributors » (lu le 2026-11-02)."
+  },
+  {
+   "id": "ReproducibleBuilds",
+   "kind": "tool",
+   "name": "DotNet.ReproducibleBuilds 1.2.39",
+   "author": ".NET Foundation",
+   "license": "MIT",
+   "license_url": "https://licenses.nuget.org/MIT",
+   "url": "https://github.com/dotnet/reproducible-builds",
+   "use": "Réglages de compilation reproductible ajoutés par Dalamud.NET.Sdk.",
+   "files": [
+    "src/TenshoAssistant/packages.lock.json"
+   ],
+   "copied": "rien (PrivateAssets=All)",
+   "evidence": "packages.lock.json : DotNet.ReproducibleBuilds Direct 1.2.39 ; nuspec du cache NuGet local : licence MIT, « .NET Foundation and Contributors » (lu le 2026-11-02)."
+  },
+  {
+   "id": "DotNetSdk",
+   "kind": "tool",
+   "name": ".NET SDK 10.0.403",
+   "author": ".NET Foundation, Microsoft",
+   "license": "MIT",
+   "license_url": "https://github.com/dotnet/sdk/blob/main/LICENSE.TXT",
+   "url": "https://github.com/dotnet/sdk",
+   "use": "Compilation du plugin, des tests et des sondes (scripts/Verify.ps1, workflow CodeQL).",
+   "files": [
+    "global.json",
+    "src/TenshoAssistant/TenshoAssistant.csproj",
+    "tests/TenshoAssistant.Tests/TenshoAssistant.Tests.csproj",
+    "tools/ApiProbe/ApiProbe.csproj"
+   ],
+   "copied": "rien",
+   "evidence": "global.json « sdk » 10.0.403 ; .github/workflows/CodeQL.yml (setup-dotnet avec global-json-file). Licence : LICENSE.TXT de dotnet/sdk lu le 2026-11-02 = MIT."
+  },
+  {
+   "id": "PowerShell",
+   "kind": "tool",
+   "name": "PowerShell 7",
+   "author": "Microsoft",
+   "license": "MIT",
+   "license_url": "https://github.com/PowerShell/PowerShell/blob/master/LICENSE.txt",
+   "url": "https://github.com/PowerShell/PowerShell",
+   "use": "Scripts de vérification, de commit et de release (scripts/Verify.ps1, scripts/Release.ps1).",
+   "files": [
+    "scripts/Verify.ps1",
+    "scripts/Release.ps1",
+    "src/TenshoAssistant/MainWindow.Advanced.cs"
+   ],
+   "copied": "rien",
+   "evidence": "scripts/Verify.ps1 et scripts/Release.ps1 ; MainWindow.Advanced.cs:157 copie la commande « .\\scripts\\Verify.ps1 ». Licence : LICENSE.txt brut relu le 2026-11-02 = MIT, « Copyright (c) Microsoft Corporation »."
+  },
+  {
+   "id": "Python",
+   "kind": "tool",
+   "name": "Python",
+   "author": "Python Software Foundation",
+   "license": "PSF-2.0",
+   "license_url": "https://github.com/python/cpython/blob/main/LICENSE",
+   "url": "https://www.python.org",
+   "use": "Exécute tools/submarine-loot.py qui réduit Submarines.json en submarine-loot.json.",
+   "files": [
+    "tools/submarine-loot.py",
+    "src/TenshoAssistant/FreeCompany/Data/submarine-loot.json"
+   ],
+   "copied": "rien",
+   "evidence": "tools/submarine-loot.py:4 « Usage: python -I tools/submarine-loot.py <Submarines.json> <output.json> » ; DEC-021. Licence : LICENSE de cpython relu le 2026-11-02 = Python Software Foundation License Version 2."
+  },
+  {
+   "id": "GitHubCli",
+   "kind": "tool",
+   "name": "GitHub CLI",
+   "author": "GitHub Inc.",
+   "license": "MIT",
+   "license_url": "https://github.com/cli/cli/blob/trunk/LICENSE",
+   "url": "https://cli.github.com",
+   "use": "Création des releases GitHub (tag Stable-x.y.z, latest.zip) par Verify.ps1 -Release.",
+   "files": [
+    "scripts/Release.ps1"
+   ],
+   "copied": "rien",
+   "evidence": "scripts/Release.ps1:113-117 (recherche de gh, « winget install GitHub.cli ») et :158 « gh release create » ; CONTRIBUTING.md « Versions and releases ». Licence : LICENSE brut (trunk) lu le 2026-11-02 = MIT, « Copyright (c) 2019 GitHub Inc. »."
+  },
+  {
+   "id": "CodeQL",
+   "kind": "tool",
+   "name": "CodeQL",
+   "author": "GitHub",
+   "license": "MIT",
+   "license_url": "https://github.com/github/codeql-action/blob/main/LICENSE",
+   "url": "https://github.com/github/codeql-action",
+   "use": "Analyse de sécurité du code C# dans GitHub Actions.",
+   "files": [
+    ".github/workflows/CodeQL.yml"
+   ],
+   "copied": "rien",
+   "evidence": ".github/workflows/CodeQL.yml : github/codeql-action/init@v3 et analyze@v3, actions/checkout@v4, actions/setup-dotnet@v4. Licence : LICENSE brut de codeql-action lu le 2026-11-02 = MIT ; la licence du moteur CodeQL lui-même (conditions GitHub) n'a pas été relevée."
+  },
+  {
+   "id": "ClaudeCode",
+   "kind": "tool",
+   "name": "Claude Code",
+   "author": "Anthropic PBC",
+   "license": "proprietary",
+   "license_url": "https://github.com/anthropics/claude-code/blob/main/LICENSE.md",
+   "url": "https://claude.com/claude-code",
+   "use": "Agent IA qui a généré le code et l'icône du plugin, sous la direction de l'auteur qui le teste en jeu.",
+   "files": [
+    "src/TenshoAssistant/TenshoAssistant.json",
+    "src/TenshoAssistant/TenshoAssistant.csproj",
+    "src/TenshoAssistant/images/icon.png"
+   ],
+   "copied": "rien (outil ; le code produit est sous la GPL v3 du projet)",
+   "evidence": "TenshoAssistant.json Description « AI disclosure: the code and the icon were generated with an AI coding agent (Claude), directed and tested in game by the author » ; README « AI usage disclosure ». Licence : LICENSE.md d'anthropics/claude-code lu le 2026-11-02 : « © Anthropic PBC. All rights reserved », usage soumis aux Commercial Terms of Service."
+  }
+ ],
+ "notes": "Contre-vérification en lecture seule faite le 2026-11-02 : aucun fichier n'a été modifié. Résultat : 72 entrées sans doublon, tirées des trois relevés (environ 140 lignes).\n\nFUSIONS (même projet, un seul id) :\n- Dalamud ×3, FFXIVClientStructs ×3 (InteropGenerator.Runtime y est rattaché : même dépôt, même commit dd57986b), Lumina ×3 (Lumina.Excel reste à part : dépôt distinct), DearImGui ×2, Dalamud.Bindings.ImGui ×2.\n- Font Awesome ×3, Universalis ×3, Garland Tools ×3, Console Games Wiki ×3, LuminaSupplemental ×3.\n- GatherBuddy ×3 (avec sa fiche du répertoire des outils), Teamcraft ×3 → FFXIVTeamcraft.\n- FFXIVGachaSpreadsheet ×4 : la Revue de mode en ligne et le butin des sous-marins embarqué donnent une seule entrée « embedded », avec l'hôte raw.githubusercontent.com.\n- SubmarineTracker : les seuils embarqués et la règle SubmarineVoyageFormulas donnent une seule entrée.\n- Character Panel Refined ×2 (avec sa fiche du répertoire).\n- WeatherForecastFormula et la référence GatherBuddyReborn donnent l'entrée rule GatherBuddyReborn.\n- BountifulYieldBonus et FrozenRabbitTome → FrozenRabbitTome. SubmarineDurability et SubmersiblesDurabilitySheet → SubmersiblesDurabilitySheet.\n- CommunityVesselRules est réparti dans VesselCostCapacity et VesselBuildNaming. CombatStatFormulas est séparé en deux projets : AllaganStudiesMathWizard et AkhMorning.\n- Patch74Glamour → GlamourAllJobs74. InventoryTools → AllaganTools. XivgearApp → XivGear.\n- GameFonts est rattaché à FinalFantasyXIV : la police Trump Gothic est lue dans les fichiers du jeu.\n- « DotNet » (relevé 2) est séparé en DotNetRuntime et DotNetSdk. « DalamudNetSdk et DalamudPackager » est séparé en deux entrées. ClaudeAgent → ClaudeCode.\n\nDÉSACCORDS DE LICENCE (licence retenue → raison) :\n- Dalamud.Bindings.ImGui : AGPL-3.0 (relevé 1, déduite de la racine) contre MIT → MIT. Le LICENSE.txt du dossier dit « Copyright (c) 2023 Juna Meinhold ».\n- Console Games Wiki : unknown (relevés 1 et 2) contre GFDL-1.2-or-later → GFDL-1.2-or-later. Sources : pages FFXIV_Wiki:About et MediaWiki:Copyrightwarning. Les contenus de Square Enix sont exclus de cette licence.\n- Lumina : unknown (relevé 2) → WTFPL. Dalamud.NET.Sdk et DalamudPackager : unknown (relevé 2) → MIT et EUPL-1.2. J'ai relu les nuspec dans ~/.nuget/packages.\n- .NET, PowerShell, Python, gh, CodeQL : unknown (relevé 2) → MIT, MIT, PSF-2.0, MIT, MIT. Les LICENSE de PowerShell, cpython, cli/cli et codeql-action ont été relus aujourd'hui. Pour CodeQL, MIT couvre seulement l'action ; les conditions du moteur ne sont pas relevées.\n- Licences relues aujourd'hui :\n  - ffxiv-teamcraft/simulator : MIT, (c) 2019 Flavien Normand (le relevé 2 disait unknown).\n  - FFTriadBuddy : MIT, (c) 2019 MgAl2O4 (le relevé 2 disait unknown).\n  - Questionable : AGPL-3.0, LICENSE de la branche master (le relevé 2 disait unknown).\n  - SamplePlugin : AGPL-3.0 (le relevé 2 disait « non revérifiée »).\n  - ffxiv-todo et Tsukimichi : MIT (le relevé 2 disait « non revérifiée »).\n- Claude : unknown (relevé 2) → none. Le LICENSE.md d'anthropics/claude-code dit « All rights reserved ».\n- Submersible Loot Spreadsheet : unknown (relevé 1) contre none → none. Sources : DEC-021 et docs/evidence/0.315-vessel-builds.md:114 (« sans licence ») ; non revérifié aujourd'hui.\n- Collections (Seventh), Blue Mage Helper, Duty Loot Preview, Macro Chain : unknown (relevé 1) → none. Pour chacun, l'API /license répond 404 et il n'y a pas de LICENSE, ce qui correspond à la convention « sans licence publiée ».\n- Mappy et SortaKinda : AGPL-3.0 → AGPL-3.0-or-later, d'après l'en-tête du LICENSE. Pour Mappy, l'URL harbingerftw/Mappy est gardée : c'est celle des docs, et MidoriKami/Mappy répond 404.\n- Font Awesome : le relevé 3 ajoute MIT. Gardé « CC-BY-4.0 AND OFL-1.1 » car Tensho n'utilise que la police et les glyphes. La version livrée par Dalamud n'est pas relevée.\n- Universalis, Garland Tools, Teamcraft : MIT est la licence vérifiée du CODE. Les conditions des DONNÉES ne sont ni publiées ni trouvées (le relevé 2 mettait unknown). La page de crédits doit le dire.\n- Argus : le dépôt ofnature/Argus (MIT) est une identification probable du relevé 3, que la preuve 0.315 ne confirme pas. À confirmer par l'utilisateur, sinon passer en unknown.\n- Jeu et Discord : none (propriétaires, aucune licence ouverte). « © SQUARE ENIX » est vérifié au pied de page du Lodestone. La mention habituelle reprend celle de garlandtools.org/db (marque déposée, © SQUARE ENIX CO., LTD. All Rights Reserved, non affilié).\n\nCONTRÔLE DU CODE :\n- Hôtes contactés par src : ce sont seulement universalis.app, www.garlandtools.org, ffxiv.consolegameswiki.com, raw.githubusercontent.com, api.github.com, gubal.ffxivteamcraft.com et le webhook Discord. Aucun hôte n'est sans entrée.\n  - github.com n'apparaît que comme l'adresse du dépôt Tensho (User-Agent, bouton copier) : jamais contacté.\n  - Hors plugin : tools/GatheringRequirementsProbe/Program.cs:27 télécharge depuis raw.githubusercontent.com, et scripts/Release.ps1 s'adresse au dépôt Tensho.\n- Données embarquées : exactement 2 fichiers (csproj:14-15) plus les langues.\n  - L'arbre de déblocage des dirigeables (LuminaSupplemental) annoncé par DEC-023 n'est pas dans FreeCompany/Data/.\n- Ajouts trouvés pendant la contre-vérification :\n  - Jeu d'essai copié de Garland, hors DLL : tests/TenshoAssistant.Tests/Fixtures/garland-instance-30028.json (texte de Square Enix).\n  - Table des gains du Mini Cactpot codée en dur sans source (MiniGames/MiniCactpotSolver.cs:9), rattachée à l'entrée « game ».\n  - Price Insight, Item Use, Monster Loot Hunter et Craftimizer sont aussi des cibles de OpenContextTool.\n- Réglages : tous existent dans Configuration.cs. Discord.Enabled est défini dans Alarms/DiscordWebhook.cs:16, sous la propriété Discord de Configuration.cs:190. Plusieurs ne coupent qu'une partie des appels :\n  - MarketPricesOnHover : seulement le survol. La page Marché et le coût de préparation interrogent quand même.\n  - CommunityGarland : seulement GarlandItemSourceService. DutyLoot et MonsterLoot ne sont pas concernés ; le panneau de la Recherche de mission dépend de ShowDutyFinderLoot.\n  - CommunityWiki : seulement l'acquisition d'objets. Le survol des monstres dépend de MonsterSourcesOnHover et ItemUsagesOnHover ; la page Monstres et les panoramas n'ont aucun réglage.\n  - FFXIVGachaSpreadsheet (Revue de mode) : aucun réglage.\n  - Le commentaire de Configuration.cs sur MonsterSourcesOnHover parle d'une requête Garland, mais le survol utilise WikiMonsterSources (Plugin.cs:118-121). Commentaire périmé.\n- Avis de licence à reprendre dans la section crédits, faute de texte complet dans les fichiers copiés :\n  - MIT complet d'Infi pour submarine-loot.json (seulement une ligne « Source »).\n  - MIT complet de Kouzukii pour les 100 valeurs de StatFormulas.cs.\n- Divers :\n  - WeatherForecast.cs n'a aucun commentaire de source ; la source est seulement dans REFERENCES.md REF-GATHER-WEATHER-001.\n  - de.json et ja.json ont _meta.author = « Community », sans traducteur nommé.\n  - La section actuelle « Sources » du panneau contributeur (MainWindow.Advanced.cs:186-199) ne liste que 10 sources.\n  - Hors périmètre : CodeQL.yml se déclenche sur une branche « Stable » qui n'existe pas (branches Devloppement et main) ; seule la tâche hebdomadaire tourne.\n- Rien n'a été retiré pour non-usage. Toutes les entrées des relevés sont lues (docs, code), copiées ou contactées. Les paquets que Sdk.props ajoute sans les utiliser (Serilog, ImPlot, ImGuizmo, ObjectPool) n'ont pas d'entrée.\n\nÉtat : contre-vérification seulement, rien de COMPILED, TESTED ni VALIDATED_IN_GAME pour R-13. Commande de test une fois la section codée : .\\scripts\\Verify.ps1 depuis C:\\Plugins-ff14."
+}

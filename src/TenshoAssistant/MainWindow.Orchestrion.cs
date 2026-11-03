@@ -5,6 +5,9 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Orchestrion part of the Collections page: filter by music category (game data) and a details panel for the chosen roll, also
+// opened from an orchestrion roll item (item usages). Whether the music is obtained is separate from roll stock; an unconfirmed
+// state is not « missing ».
 internal sealed partial class MainWindow
 {
     private uint? orchestrionCategoryFilter;
@@ -31,7 +34,9 @@ internal sealed partial class MainWindow
         }
         var selected=orchestrionCategories.FirstOrDefault(entry=>entry.Music!.CategoryId==orchestrionCategoryFilter);
         ImGui.SetNextItemWidth(280);
-        if(!ImGui.BeginCombo(localization.Get("OrchestrionDetails.Category")+"###OrchestrionCategory",selected?.Music?.CategoryName ?? localization.Get("OrchestrionDetails.AllCategories")))return;
+        var open=ImGui.BeginCombo(localization.Get("OrchestrionDetails.Category")+"###OrchestrionCategory",selected?.Music?.CategoryName ?? localization.Get("OrchestrionDetails.AllCategories"));
+        Tip("OrchestrionDetails.CategoryTip");
+        if(!open)return;
         try
         {
             if(ImGui.Selectable(localization.Get("OrchestrionDetails.AllCategories"),orchestrionCategoryFilter is null))orchestrionCategoryFilter=null;
@@ -56,7 +61,8 @@ internal sealed partial class MainWindow
             {
                 ImGui.TextColored(Accent,entry.Name);
                 ImGui.TextDisabled(entry.Music is {CategoryName.Length:>0} music ? music.CategoryName:localization.Get("OrchestrionDetails.UnknownCategory"));
-                ImGui.TextColored(entry.ConfirmedUnlocked ? Success:Muted,localization.Get(entry.ConfirmedUnlocked ? "OrchestrionDetails.Acquired":"CollectionState.Unknown"));
+                ImGui.TextColored(entry.ConfirmedUnlocked ? Success:Muted,localization.Get(entry.ConfirmedUnlocked ? "OrchestrionDetails.Acquired":CollectionStateOf(entry)==Collections.CollectionAcquisition.NotAcquired ? "CollectionState.NotAcquired":"CollectionState.Unknown"));
+                DrawOrchestrionFavorite(entry.Id);
                 ImGui.TextWrapped(localization.Get("OrchestrionDetails.Help"));
                 if(!string.IsNullOrWhiteSpace(entry.Description)){ImGui.Separator();ImGui.TextWrapped(entry.Description);}
                 ImGui.Separator();
@@ -67,10 +73,7 @@ internal sealed partial class MainWindow
                     if(items.Count==0)ImGui.TextWrapped(localization.Get("OrchestrionDetails.Empty"));
                     foreach(var item in items)
                     {
-                        DrawItemIcon(item,new Vector2(32));var clicked=ImGui.IsItemClicked();ImGui.SameLine();
-                        clicked|=ImGui.SmallButton($"{item.Name}##MusicItem{item.Id}");
-                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("OrchestrionDetails.ItemHelp"));
-                        if(clicked){SelectItem(item.Id);page=Page.Items;focusStocksTab=true;ImGui.CloseCurrentPopup();}
+                        if(ItemCell(item,item.Id,32)){page=Page.Items;focusStocksTab=true;ImGui.CloseCurrentPopup();}
                     }
                 }
             }

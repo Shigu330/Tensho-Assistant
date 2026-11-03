@@ -6,12 +6,29 @@ using TenshoAssistant.Quests;
 
 namespace TenshoAssistant;
 
+// Quests page (Progression), like QuestTracker: every quest of the game's Quest sheet with the character's observed progress,
+// filtered by journal section then genre (completion % in the lists, 0.283–0.284), search, state; ARR main scenario quests of the
+// other starting cities and options not taken (other Grand Companies, branches) are left out unless shown (0.285–0.286). Details:
+// steps, previous / next quests, quest giver on the Tensho map, rewards (MainWindow.QuestRewards.cs); up to 64 followed quests.
 internal sealed partial class MainWindow
 {
     private QuestState? questViewState;
     private IReadOnlyList<QuestEntry>? questMetadataEntries;
     private string questViewQuery = "";
     private string questViewCategory = "";
+    // 0.283 (user request): main kind = journal section, then its genres as sub-categories.
+    private string questSection = "", questViewSection = "";
+    private (string Name, byte Id)[] questSections = [];
+    private (string Section, string Genre)[] questGenres = [];
+    // 0.284 (user request): completion of each kind and category, shown in the drop-down lists (computed with the quest list).
+    private Dictionary<string, (int Done, int Total)> questSectionStats = [], questGenreStats = [];
+    // 0.285 (user request): ARR main scenario quests of the two other starting cities are left out of lists and percentages
+    // (docs/evidence/0.285-quest-start-cities.md); « show » brings them back in the lists.
+    private HashSet<uint> questOtherCity = [];
+    private string? questPlayerCity;
+    private bool questShowOtherCities, questViewShowOtherCities;
+    private string QuestStatLabel(string name, Dictionary<string, (int Done, int Total)> stats)
+        => stats.TryGetValue(name, out var stat) && stat.Total > 0 ? localization.Format("QuestsBrowser.Completion", name, stat.Done, stat.Total, 100 * stat.Done / stat.Total) : name;
     private int questViewFilter = -1;
     private string[] questCategories = [];
     private QuestEntry[] questMatches = [];
@@ -33,13 +50,26 @@ internal sealed partial class MainWindow
             questLinks = new(state.Entries);
             questCategories = state.Entries.Select(entry => entry.Category).Where(name => !string.IsNullOrWhiteSpace(name))
                 .Distinct(StringComparer.Ordinal).OrderBy(name => name, StringComparer.Ordinal).ToArray();
+            questSections = state.Entries.Where(entry => entry.Section.Length > 0).Select(entry => (entry.Section, entry.SectionId))
+                .Distinct().OrderBy(section => section.SectionId).ToArray();
+            questGenres = state.Entries.Where(entry => entry.Category.Length > 0).Select(entry => (entry.Section, entry.Category)).Distinct()
+                .OrderBy(pair => pair.Category, StringComparer.CurrentCulture).ToArray();
+            var cities = QuestStartCities.Of(state.Entries);
+            questPlayerCity = QuestStartCities.PlayerCity(state.Entries, cities);
+            questOtherCity = questPlayerCity is { } city ? cities.Where(pair => pair.Value != city).Select(pair => pair.Key).ToHashSet() : [];
+            // 0.286: plus the options not taken (other Grand Companies, other branches), see QuestAlternatives.
+            questOtherCity.UnionWith(QuestAlternatives.NotPlayable(state.Entries));
+            questSectionStats = state.Entries.Where(entry => entry.Section.Length > 0 && !questOtherCity.Contains(entry.Id)).GroupBy(entry => entry.Section)
+                .ToDictionary(group => group.Key, group => (group.Count(entry => entry.Progress == QuestProgress.Complete), group.Count()));
+            questGenreStats = state.Entries.Where(entry => entry.Category.Length > 0 && !questOtherCity.Contains(entry.Id)).GroupBy(entry => entry.Category)
+                .ToDictionary(group => group.Key, group => (group.Count(entry => entry.Progress == QuestProgress.Complete), group.Count()));
             questActiveCount = state.Entries.Count(entry => entry.Progress == QuestProgress.Active);
             questCompleteCount = state.Entries.Count(entry => entry.Progress == QuestProgress.Complete);
         }
         if (ImGui.Button(localization.Get("QuestsBrowser.Refresh"))) quests.RequestRefresh();
         ImGui.SameLine();
         ImGui.TextDisabled(state.Loading ? localization.Get("QuestsBrowser.Loading") : state.ObservedAt is { } date ? localization.Format("QuestsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("QuestsBrowser.Offline"));
-        if (state.Error is { } error) {ImGui.TextWrapped(localization.Get("QuestsBrowser.Error"));if(developerMode)ImGui.TextWrapped(error);}
+        if (state.Error is { } error) {ImGui.TextWrapped(localization.Get("QuestsBrowser.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Quests,state.ObservedAt,state.FromCache);
         DrawFollowedQuests();
         if (ImGui.SmallButton(localization.Get("QuestsBrowser.Catalogue")+"###QuestCatalogue")) questShowDetails = false;
@@ -51,29 +81,57 @@ internal sealed partial class MainWindow
         if (questShowDetails && selectedQuestId != 0) { DrawQuestDetails(); return; }
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##QuestSearch", localization.Get("QuestsBrowser.Search"), ref questQuery, 128);
+        Tip("QuestsBrowser.SearchTip");
         ImGui.SetNextItemWidth(260);
-        if (ImGui.BeginCombo(localization.Get("QuestsBrowser.Category")+"###QuestCategory", string.IsNullOrWhiteSpace(questCategory) ? localization.Get("QuestsBrowser.All") : questCategory))
+        if (ImGui.BeginCombo(localization.Get("QuestsBrowser.Section")+"###QuestSection", questSection.Length == 0 ? localization.Get("QuestsBrowser.All") : QuestStatLabel(questSection, questSectionStats)))
+        {
+            try
+            {
+                if (ImGui.Selectable(localization.Get("QuestsBrowser.All"), questSection.Length == 0)) { questSection = ""; questCategory = ""; }
+                foreach (var (section, _) in questSections)
+                    if (ImGui.Selectable(QuestStatLabel(section, questSectionStats) + "##" + section, questSection == section)) { questSection = section; questCategory = ""; }
+            }
+            finally { ImGui.EndCombo(); }
+        }
+        Tip("QuestsBrowser.SectionTip");
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(260);
+        if (ImGui.BeginCombo(localization.Get("QuestsBrowser.Category")+"###QuestCategory", string.IsNullOrWhiteSpace(questCategory) ? localization.Get("QuestsBrowser.All") : QuestStatLabel(questCategory, questGenreStats)))
         {
             try
             {
                 if (ImGui.Selectable(localization.Get("QuestsBrowser.All"), string.IsNullOrWhiteSpace(questCategory))) questCategory = string.Empty;
-                foreach (var category in questCategories)
-                    if (ImGui.Selectable(category, questCategory == category)) questCategory = category;
+                // Sub-categories of the chosen kind only (every genre when no kind is chosen).
+                foreach (var category in questSection.Length == 0 ? questCategories : questGenres.Where(pair => pair.Section == questSection).Select(pair => pair.Genre).Distinct())
+                    if (ImGui.Selectable(QuestStatLabel(category, questGenreStats) + "##" + category, questCategory == category)) questCategory = category;
             }
             finally { ImGui.EndCombo(); }
         }
-        var labels = new[] { "All", "Active", "Complete", "Unknown" };
+        Tip("QuestsBrowser.CategoryTip");
+        // Plural filter label; QuestsBrowser.Unknown stays the singular state of one quest (QuestProgressLabel).
+        var labels = new[] { "All", "Active", "Complete", "Unconfirmed" };
         for (var index = 0; index < labels.Length; index++)
         {
             if (index > 0) ImGui.SameLine();
             if (ImGui.RadioButton(localization.Get("QuestsBrowser."+labels[index])+"###QuestFilter"+index, questFilter == index)) questFilter = index;
+            QuestFilterTip(index switch { 1 => QuestSourceProgressFilter.Active, 2 => QuestSourceProgressFilter.Complete, 3 => QuestSourceProgressFilter.Unconfirmed, _ => QuestSourceProgressFilter.All });
         }
         ImGui.TextDisabled(localization.Format("QuestsBrowser.Count",questActiveCount,questCompleteCount));
+        if (questOtherCity.Count > 0)
+        {
+            ImGui.SameLine();
+            ImGui.Checkbox(localization.Format("QuestsBrowser.OtherCities", questOtherCity.Count) + "###QuestOtherCities", ref questShowOtherCities);
+            if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("QuestsBrowser.OtherCitiesHelp", questPlayerCity ?? localization.Get("QuestsBrowser.CityUnknown")));
+        }
         ImGui.TextWrapped(localization.Get("QuestsBrowser.Help"));
         if (!ReferenceEquals(questViewState?.Entries, state.Entries) || questViewQuery != questQuery
-            || questViewCategory != questCategory || questViewFilter != questFilter)
+            || questViewCategory != questCategory || questViewFilter != questFilter || questViewSection != questSection
+            || questViewShowOtherCities != questShowOtherCities)
         {
-            questMatches = state.Entries.Where(entry => (string.IsNullOrWhiteSpace(questCategory) || entry.Category == questCategory)
+            questViewSection = questSection; questViewShowOtherCities = questShowOtherCities;
+            questMatches = state.Entries.Where(entry => (questShowOtherCities || !questOtherCity.Contains(entry.Id))
+                && (questSection.Length == 0 || entry.Section == questSection)
+                && (string.IsNullOrWhiteSpace(questCategory) || entry.Category == questCategory)
                 && (questFilter == 0 || entry.Progress == (questFilter == 1 ? QuestProgress.Active : questFilter == 2 ? QuestProgress.Complete : QuestProgress.Unconfirmed))
                 && (string.IsNullOrWhiteSpace(questQuery) || entry.Name.Contains(questQuery.Trim(), StringComparison.OrdinalIgnoreCase)
                     || entry.Id.ToString(CultureInfo.InvariantCulture) == questQuery.Trim())).ToArray();
@@ -102,8 +160,10 @@ internal sealed partial class MainWindow
                 if (ImGui.IsItemClicked()) SelectQuest(entry.Id);
                 ImGui.SameLine();
                 if (ImGui.Selectable($"{entry.Name}##quest{entry.Id}", selectedQuestId == entry.Id)) SelectQuest(entry.Id);
-                if (ImGui.IsItemHovered()) WrappedTooltip(developerMode ? $"{entry.Name}\n{entry.Category}\nID: {entry.Id}":$"{entry.Name}\n{entry.Category}");
+                if (ImGui.IsItemHovered()) WrappedTooltip(developerMode ? $"{entry.Name}\n{entry.Section} › {entry.Category}\nID: {entry.Id}":$"{entry.Name}\n{entry.Section} › {entry.Category}");
+                QuestMenu($"QuestMenu{entry.Id}", entry.Id, entry.Name);
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Category);
+                if (entry.Section.Length > 0 && ImGui.IsItemHovered()) WrappedTooltip(entry.Section);
                 ImGui.TableNextColumn();
                 ImGui.TextColored(entry.Progress == QuestProgress.Complete ? Success : Muted,
                     QuestProgressLabel(entry));
@@ -129,7 +189,7 @@ internal sealed partial class MainWindow
     private void DrawQuestDetails()
     {
         if (selectedQuestId == 0) return;
-        if (!ImGui.CollapsingHeader(localization.Get("QuestDetails.Title")+"###QuestDetailsHeader", ImGuiTreeNodeFlags.DefaultOpen)) return;
+        if (!TenshoAssistant.UI.UiComponents.Header(localization.Get("QuestDetails.Title")+"###QuestDetailsHeader", ImGuiTreeNodeFlags.DefaultOpen)) return;
         if (questNavigation.Count > 0)
         {
             if (ImGui.SmallButton(localization.Get("QuestDetails.Back")+"###QuestBack")) selectedQuestId = questNavigation.Pop();
@@ -142,7 +202,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine(); ImGui.TextColored(Accent, entry.Name);
         var followed = configuration.FollowedQuests?.Contains(entry.Id) == true;
         if (ImGui.SmallButton(localization.Get(followed ? "QuestDetails.Unfollow":"QuestDetails.Follow"))) SaveFollowedQuest(entry.Id, !followed);
-        ImGui.TextDisabled(entry.Category);
+        ImGui.TextDisabled(entry.Section.Length > 0 ? $"{entry.Section} › {entry.Category}" : entry.Category);
         if(entry.IsRepeatable)ImGui.TextDisabled(localization.Get("QuestDetails.Repeatable"));
         if(developerMode)ImGui.TextDisabled($"ID {entry.Id}");
         ImGui.TextUnformatted(QuestProgressLabel(entry));
@@ -151,7 +211,7 @@ internal sealed partial class MainWindow
             ImGui.TextUnformatted(localization.Format("QuestDetails.Level",entry.Level));
         if(entry.AdditionalLevel!=0)ImGui.TextUnformatted(localization.Format("QuestDetails.OtherLevel",entry.AdditionalLevel));
         if (!string.IsNullOrWhiteSpace(entry.Zone)) ImGui.TextUnformatted(localization.Format("QuestDetails.Zone",entry.Zone));
-        if (developerMode && entry.IssuerId != 0) ImGui.TextDisabled($"Issuer ID: {entry.IssuerId}");
+        if (developerMode && entry.IssuerId != 0) ImGui.TextDisabled(localization.Format("DevMode.IssuerId",entry.IssuerId));
         if (entry.IssuerMapId != 0 && entry.IssuerTerritoryId != 0)
         {
             var issuerMap = maps.State.Catalog?.Find(entry.IssuerMapId);
@@ -203,6 +263,7 @@ internal sealed partial class MainWindow
             ImGui.SameLine();
         }
         if (ImGui.SmallButton($"{linked?.Name ?? localization.Format("QuestDetails.Quest",id)}##{direction}{id}")) SelectQuest(id);
+        QuestMenu($"QuestLinkMenu{direction}{id}", id, linked?.Name ?? localization.Format("QuestDetails.Quest",id));
         ImGui.SameLine();
         ImGui.TextDisabled(linked is null ? localization.Get("QuestDetails.MissingLink") : QuestProgressLabel(linked));
     }
@@ -217,6 +278,18 @@ internal sealed partial class MainWindow
         QuestProgress.Active => localization.Format("QuestsBrowser.Sequence",sequence?.ToString() ?? "—"),
         _ => localization.Get("QuestsBrowser.Unknown")
     };
+
+    // State filters of the Quests page and of an item's quest sources; literal keys, so the tooltip key test sees them.
+    private void QuestFilterTip(QuestSourceProgressFilter filter)
+    {
+        switch (filter)
+        {
+            case QuestSourceProgressFilter.All: Tip("QuestsBrowser.AllTip"); break;
+            case QuestSourceProgressFilter.Active: Tip("QuestsBrowser.ActiveTip"); break;
+            case QuestSourceProgressFilter.Complete: Tip("QuestsBrowser.CompleteTip"); break;
+            case QuestSourceProgressFilter.Unconfirmed: Tip("QuestsBrowser.UnconfirmedTip"); break;
+        }
+    }
 
     private void SaveFollowedQuest(uint id, bool follow)
     {
@@ -243,7 +316,7 @@ internal sealed partial class MainWindow
     private void DrawFollowedQuests()
     {
         var followed = configuration.FollowedQuests;
-        if (ImGui.CollapsingHeader(localization.Format("QuestsBrowser.Followed",followed?.Count ?? 0)+"###FollowedQuests"))
+        if (TenshoAssistant.UI.UiComponents.Header(localization.Format("QuestsBrowser.Followed",followed?.Count ?? 0)+"###FollowedQuests"))
         {
             ImGui.TextDisabled(localization.Get("QuestsBrowser.FollowHelp"));
             if (followed is not { Count: > 0 }) ImGui.TextWrapped(localization.Get("QuestsBrowser.FollowEmpty"));

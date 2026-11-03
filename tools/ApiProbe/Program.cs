@@ -49,11 +49,14 @@ foreach (var name in args)
         : context.LoadFromAssemblyPath(Path.Combine(directory, library));
     var type = targetAssembly.GetType(name, true)!;
     Console.WriteLine($"TYPE {type}");
-    foreach (var attribute in type.GetCustomAttributesData()) Console.WriteLine($"ATTRIBUTE {attribute}");
+    foreach (var attribute in type.GetCustomAttributesData()) Console.WriteLine($"ATTRIBUTE {attribute.AttributeType.Name} {string.Join(", ",attribute.ConstructorArguments.Select(argument=>argument.Value is System.Collections.ObjectModel.ReadOnlyCollection<System.Reflection.CustomAttributeTypedArgument> list ? string.Join("|",list.Select(item=>item.Value)):argument.Value))}");
     foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
     {
         if (member is MethodInfo method && method.IsSpecialName) continue;
         Console.WriteLine($"  {member}");
         if (member is FieldInfo field && field.IsLiteral) Console.WriteLine($"    = {field.GetRawConstantValue()}");
     }
+    // 0.356: internal fields too (fixed-size arrays behind Span properties show their length in the type name), with their offset.
+    foreach (var field in type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+        Console.WriteLine($"  internal {field.FieldType.Name} {field.Name} {field.GetCustomAttributesData().FirstOrDefault(data => data.AttributeType.Name == "FieldOffsetAttribute")?.ConstructorArguments.FirstOrDefault().Value}");
 }

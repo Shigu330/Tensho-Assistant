@@ -5,6 +5,9 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Live craft › next action: projects one step ahead, under the observed condition, every action the client marks usable (cooldowns
+// excluded), with ranges where combo or unique-action history is unknown (Craft/CraftLiveProjection.cs); sortable. Recomputed only for a
+// new observed frame or action catalogue; no rotation and nothing executed.
 internal sealed partial class MainWindow
 {
     private CraftLiveFrame? projectionFrame;private CraftActionCatalog? projectionCatalog;private CraftProjectionResult? projectionResult;
@@ -14,7 +17,7 @@ internal sealed partial class MainWindow
     private CraftActionProjection[] sortedProjectionRows=[];
     private void DrawCraftProjection(CraftLiveState state)
     {
-        if(!ImGui.CollapsingHeader(localization.Get("CraftProjectionUi.Title"),ImGuiTreeNodeFlags.DefaultOpen))return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftProjectionUi.Title"),ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextWrapped(localization.Get("CraftProjectionUi.Help"));
         if(state.Frame is not { } frame || craftActions.State.Catalog is not { } catalog)return;
         var now=DateTimeOffset.UtcNow;
@@ -25,11 +28,11 @@ internal sealed partial class MainWindow
         if(projectionResult is not { } result)return;
         if(frame.Recipe is { } recipe && projectionRecipe!=recipe.RecipeId)
         {projectionRecipe=recipe.RecipeId;projectionTarget=recipe.Simulation?.Quality ?? 0;}
-        ImGui.SetNextItemWidth(110);ImGui.InputInt(localization.Get("CraftProjectionUi.Target"),ref projectionTarget,0);
+        ImGui.SetNextItemWidth(110);ImGui.InputInt(localization.Get("CraftProjectionUi.Target"),ref projectionTarget,0);Tip("CraftProjectionUi.TargetTip");
         if(projectionTarget<0 || projectionTarget>(frame.Recipe?.Simulation?.Quality ?? 0)){ImGui.TextWrapped(localization.Get("CraftProjectionUi.Invalid"));return;}
-        if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Quality"),projectionSort==0))projectionSort=0;ImGui.SameLine();
-        if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Progress"),projectionSort==1))projectionSort=1;ImGui.SameLine();
-        if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Durability"),projectionSort==2))projectionSort=2;
+        if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Quality"),projectionSort==0))projectionSort=0;Tip("CraftProjectionUi.SortTip");ImGui.SameLine();
+        if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Progress"),projectionSort==1))projectionSort=1;Tip("CraftProjectionUi.SortTip");ImGui.SameLine();
+        if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Durability"),projectionSort==2))projectionSort=2;Tip("CraftProjectionUi.SortTip");
         foreach(var issue in result.Issues)DrawCraftIssue(issue);
         if(result.Actions.Count==0){ImGui.TextDisabled(localization.Get("CraftProjectionUi.Empty"));return;}
         ImGui.TextDisabled(localization.Get("CraftProjectionUi.SortHelp"));

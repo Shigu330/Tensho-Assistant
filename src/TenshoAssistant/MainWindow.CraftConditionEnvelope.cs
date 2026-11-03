@@ -3,6 +3,9 @@ using TenshoAssistant.Craft;
 
 namespace TenshoAssistant;
 
+// Craft simulator › conditions: conservative quality range of the fixed sequence over the model's condition changes, starting Normal
+// (Good and Poor return to Normal, Excellent forces Poor), for a Good quality bonus of ×1.50, ×1.75 or both; no probability and no HQ
+// guarantee. Evaluated in Draw only when the simulation result or the scenario changes (Craft/CraftConditionEnvelope.cs).
 internal sealed partial class MainWindow
 {
     private CraftSimulationResult? conditionEnvelopeSource;
@@ -12,7 +15,7 @@ internal sealed partial class MainWindow
 
     private void DrawCraftConditionEnvelope(CraftSimulationResult simulation)
     {
-        if(!ImGui.CollapsingHeader(localization.Get("CraftConditions.Title")+"###CraftConditions"))return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftConditions.Title")+"###CraftConditions"))return;
         ImGui.TextWrapped(localization.Get("CraftConditions.Help"));
         ImGui.SetNextItemWidth(330);
         var scenario = localization.Get(conditionEnvelopeTool switch {1=>"CraftConditions.Standard",2=>"CraftConditions.Enhanced",_=>"CraftConditions.Both"});
@@ -26,6 +29,7 @@ internal sealed partial class MainWindow
             }
             finally {ImGui.EndCombo();}
         }
+        Tip("CraftConditions.ScenarioTip");
         if(!ReferenceEquals(conditionEnvelopeSource,simulation))
         {
             conditionEnvelopeSource=simulation;conditionEnvelope=null;conditionEnvelopeError=null;
@@ -40,7 +44,7 @@ internal sealed partial class MainWindow
         if(conditionEnvelopeError is { } errorText)
         {
             ImGui.TextWrapped(localization.Get("CraftConditions.Error"));
-            if(developerMode)ImGui.TextWrapped(errorText);
+            if(developerMode)ImGui.TextWrapped(RawMessage(errorText));
         }
         if(conditionEnvelope is not { } result)return;
         ImGui.TextColored(Accent,localization.Format("CraftConditions.Result",result.Quality,simulation.Final.Quality));

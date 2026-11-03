@@ -51,9 +51,9 @@ public sealed class WeatherCatalog
         for(var index=0;index<count;index++)
         {
             var time=DateTimeOffset.FromUnixTimeSeconds(start+index*1400L);var target=Target(time);WeatherDefinition? weather=null;string? reason=null;
-            if(zone is null || zone.RateId==0 || zone.Shares.Count==0)reason="Table météo absente.";
-            else if(zone.Individual)reason="Météo individuelle / forcée non couverte.";
-            else if(zone.Shares.Any(share=>share.Chance is <0 or >100) || zone.Shares.Sum(share=>(long)share.Chance)>100)reason="Table météo incohérente.";
+            if(zone is null || zone.RateId==0 || zone.Shares.Count==0)reason="Weather table missing.";
+            else if(zone.Individual)reason="Individual / forced weather not covered.";
+            else if(zone.Shares.Any(share=>share.Chance is <0 or >100) || zone.Shares.Sum(share=>(long)share.Chance)>100)reason="Inconsistent weather table.";
             else
             {
                 var cumulative=0;
@@ -62,7 +62,7 @@ public sealed class WeatherCatalog
                     cumulative+=share.Chance;if(target>=cumulative)continue;
                     weather=Weather(share.WeatherId);break;
                 }
-                if(weather is null)reason="Tirage non couvert ou météo native inconnue.";
+                if(weather is null)reason="Roll not covered or native weather unknown.";
             }
             result.Add(new(time,time.AddSeconds(1400),(int)((start+index*1400L)/175%24),weather,reason));
         }

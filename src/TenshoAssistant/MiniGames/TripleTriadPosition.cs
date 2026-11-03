@@ -37,13 +37,13 @@ public readonly struct TriadPosition
         ArgumentNullException.ThrowIfNull(blue); ArgumentNullException.ThrowIfNull(red); ArgumentNullException.ThrowIfNull(placements);
         if (!Enum.IsDefined(first)) throw new ArgumentOutOfRangeException(nameof(first));
         if ((rules & ~(TriadRules.Reverse | TriadRules.FallenAce | TriadRules.Same | TriadRules.Plus | TriadRules.Order | TriadRules.Ascension | TriadRules.Descension)) != 0)
-            throw new ArgumentOutOfRangeException(nameof(rules), "Règles non couvertes.");
+            throw new ArgumentOutOfRangeException(nameof(rules), "Rules not covered.");
         if ((rules & (TriadRules.Ascension | TriadRules.Descension)) == (TriadRules.Ascension | TriadRules.Descension))
-            throw new ArgumentException("Bonus et Malus ne peuvent pas être appliqués simultanément.", nameof(rules));
+            throw new ArgumentException("Ascension and Descension cannot be applied at once.", nameof(rules));
         var left = blue.ToArray(); var right = red.ToArray();
         foreach (var deck in new[] { left, right })
             if (deck.Length != 5 || deck.Any(card => card is null || !card.IsValid) || deck.Select(card => card.Id).Distinct().Count() != 5)
-                throw new ArgumentException("Chaque main initiale doit contenir cinq cartes connues et distinctes.");
+                throw new ArgumentException("Each starting hand must hold five known, distinct cards.");
         var cards = Array.AsReadOnly(left.Concat(right).ToArray());
         ulong board = 0;
         ushort blueCells = 0, remaining = 1023;
@@ -51,9 +51,9 @@ public readonly struct TriadPosition
         foreach (var place in placements)
         {
             if (place.CardIndex is < 0 or > 9 || place.Square is < 0 or > 8 || !Enum.IsDefined(place.Owner))
-                throw new ArgumentException("Carte, case ou couleur invalide.");
+                throw new ArgumentException("Invalid card, cell or colour.");
             if ((remaining & (1 << place.CardIndex)) == 0 || ((board >> (place.Square * 4)) & 15) != 0)
-                throw new ArgumentException("Une carte et une case ne peuvent être utilisées qu'une fois.");
+                throw new ArgumentException("A card and a cell can be used only once.");
             board |= (ulong)(place.CardIndex + 1) << (place.Square * 4);
             remaining &= (ushort)~(1 << place.CardIndex);
             if (place.Owner == TriadPlayer.Blue) blueCells |= (ushort)(1 << place.Square);
@@ -62,9 +62,9 @@ public readonly struct TriadPosition
         var firstCount = first == TriadPlayer.Blue ? bluePlayed : redPlayed;
         var secondCount = first == TriadPlayer.Blue ? redPlayed : bluePlayed;
         if (firstCount < secondCount || firstCount > secondCount + 1)
-            throw new ArgumentException("Le nombre de cartes jouées ne correspond pas à une alternance des tours.");
+            throw new ArgumentException("The number of cards played does not match alternating turns.");
         if ((rules & TriadRules.Order) != 0 && remaining != ((31 & ~((1 << bluePlayed) - 1)) | ((31 & ~((1 << redPlayed) - 1)) << 5)))
-            throw new ArgumentException("Les cartes jouées ne respectent pas l'ordre des mains initiales.");
+            throw new ArgumentException("The cards played do not follow the order of the starting hands.");
         var familyMasks = new ushort[10];
         for (var index = 0; index < 10; index++)
             if (cards[index].TypeId != 0)
@@ -101,7 +101,7 @@ public readonly struct TriadPosition
     }
     public IReadOnlyList<TriadMove> LegalMoves()
     {
-        if (!IsInitialized) throw new InvalidOperationException("Position non initialisée.");
+        if (!IsInitialized) throw new InvalidOperationException("Position not initialised.");
         var moves = new List<TriadMove>();
         if (!IsTerminal)
             for (var card = Turn == TriadPlayer.Blue ? 0 : 5; card < (Turn == TriadPlayer.Blue ? 5 : 10); card++)
@@ -113,7 +113,7 @@ public readonly struct TriadPosition
     public TriadPosition Play(TriadMove move)
     {
         if (!CanPlayCard(move.CardIndex) || move.Square is < 0 or > 8 || CardAt(move.Square) >= 0)
-            throw new ArgumentException("Coup impossible dans cette position.");
+            throw new ArgumentException("Move impossible in this position.");
         return PlayUnchecked(move.CardIndex, move.Square);
     }
 

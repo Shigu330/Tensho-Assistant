@@ -46,11 +46,14 @@ public static class WikiVistaParser
             var cells=row.Groups[2].Value.Split("||").Select(Content).ToArray();
             // ARR: name, zone, coords, weather, time, emote, comment. Later: name, zone, coords, emote, comment.
             if(cells.Length is not (5 or 7))continue;
-            var coords=Regex.Match(cells[2],@"\{\{coords\|\s*([0-9.]+)\s*,\s*([0-9.]+)",RegexOptions.None,Limit);
-            if(!coords.Success)continue;
+            // 0.401 (user report « The input string '27.2.' was not in a correct format »): a number followed by a stray dot on the wiki is
+            // read without it; a coordinate that still is not a number skips that row instead of failing the whole page.
+            var coords=Regex.Match(cells[2],@"\{\{coords\|\s*(\d+(?:\.\d+)?)\.?\s*,\s*(\d+(?:\.\d+)?)",RegexOptions.None,Limit);
+            if(!coords.Success || !float.TryParse(coords.Groups[1].Value,NumberStyles.Float,CultureInfo.InvariantCulture,out var x)
+               || !float.TryParse(coords.Groups[2].Value,NumberStyles.Float,CultureInfo.InvariantCulture,out var y))continue;
             var weathers=cells.Length==7 ? Regex.Matches(cells[3],@"\[\[([^\]|]+)(?:\|[^\]]*)?\]\]",RegexOptions.None,Limit).Select(match=>match.Groups[1].Value.Trim()).Distinct().ToArray():[];
             rows.Add(new(section,int.Parse(row.Groups[1].Value,CultureInfo.InvariantCulture),Clean(cells[0]),Clean(cells[1]),
-                float.Parse(coords.Groups[1].Value,CultureInfo.InvariantCulture),float.Parse(coords.Groups[2].Value,CultureInfo.InvariantCulture),
+                x,y,
                 weathers,cells.Length==7 ? Clean(cells[4]):"",Clean(cells[^2]),Clean(cells[^1])));
             if(rows.Count>2000)throw new InvalidDataException("Too many wiki vista rows.");
         }
@@ -87,13 +90,18 @@ public sealed class WikiVistaSource:IDisposable
     private WikiVistaState state=new(false,null,null);private bool started;
     public WikiVistaSource(Func<TimeSpan> lifetime,DataCache? disk){this.lifetime=lifetime;this.disk=disk;}
     public WikiVistaState State=>Volatile.Read(ref state);
+    // 0.324: the wiki switch (Settings › Advanced): off = no download, a copy on disk is still shown whatever its age; turned on again,
+    // the next request loads normally.
+    public Func<bool>? Enabled { get; set; }
+    private volatile bool stoppedOff;
     /// <summary>Starts the first load (disk cache, else network); later calls do nothing unless forced after an error.</summary>
     public void Request(bool retry=false)
     {
         lock(disposal)
         {
-            if(disposal.IsCancellationRequested || started && !(retry && State.Error is not null))return;
-            started=true;Volatile.Write(ref state,new(true,State.Document,null));
+            var resume=stoppedOff && Enabled?.Invoke()!=false;
+            if(disposal.IsCancellationRequested || started && !(retry && State.Error is not null) && !resume)return;
+            started=true;stoppedOff=false;Volatile.Write(ref state,new(true,State.Document,null));
         }
         _=Task.Run(LoadAsync);
     }
@@ -102,9 +110,11 @@ public sealed class WikiVistaSource:IDisposable
         try
         {
             var token=disposal.Token;
-            if(disk is not null && await disk.ReadAsync<WikiVistaDocument>(Family,"en",Version,token).ConfigureAwait(false) is { } saved
-               && CacheAge.Fresh(saved.RecordedAt,DateTimeOffset.UtcNow,lifetime()) && saved.Value.Rows is { Count:>0 })
+            var saved=disk is null ? null:await disk.ReadAsync<WikiVistaDocument>(Family,"en",Version,token).ConfigureAwait(false);
+            var usable=saved is not null && saved.Value.Rows is { Count:>0 };
+            if(usable && CacheAge.Fresh(saved!.RecordedAt,DateTimeOffset.UtcNow,lifetime()))
             {Volatile.Write(ref state,new(false,saved.Value,null));return;}
+            if(Enabled?.Invoke()==false){stoppedOff=true;Volatile.Write(ref state,new(false,usable ? saved!.Value:State.Document,null));return;}
             var text=await BoundedHttp.ReadAsync(http,new Uri(WikiVistaParser.Url),GarlandClient.MaximumBytes,token).ConfigureAwait(false);
             var document=WikiVistaParser.Parse(text,DateTimeOffset.UtcNow);
             Volatile.Write(ref state,new(false,document,null));

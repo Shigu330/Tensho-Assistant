@@ -5,6 +5,11 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Panel beside the game's Crafting Log (setting CraftLogHelperEnabled, also turned on by the plan's « Simulate » button, which asks the
+// game to open the log at the recipe): the selected recipe, its saved sequence and a suggested macro searched on a worker by
+// Craft/CraftLogSession (350 ms after the selection settles; 0.327: only once asked when CraftLogAutoSolve is off; cached on disk for the
+// craft calculations duration), text copy, copy into
+// the game's macros and « Edit » in the simulator. The log is read by Craft/CraftLogReader on the framework thread.
 internal sealed partial class MainWindow
 {
     private readonly CraftLogObservationService craftLog=new();
@@ -14,6 +19,8 @@ internal sealed partial class MainWindow
     private DateTimeOffset craftLogStableSince;
     private bool craftLogStarted;
     private bool craftLogForceRefresh;
+    // 0.327 (CraftLogAutoSolve off): the character and recipe the player asked a search for; (0, 0) = none (a real one is never 0).
+    private (ulong Owner,uint RecipeId) craftLogRequested;
     private string? craftLogOpenError;
 
     private void OpenCraftLog(RecipeDefinition recipe)
@@ -27,7 +34,7 @@ internal sealed partial class MainWindow
                 configuration.CraftLogHelperEnabled=true;
                 try{save();}catch{configuration.CraftLogHelperEnabled=false;throw;}
             }
-            craftLog.RequestOpen(new(owner,recipe.RecipeId,recipe.ResultItemId));craftLogOpenError=null;
+            craftLog.RequestOpen(new(owner,recipe.RecipeId,recipe.ResultItemId));craftLogRequested=(owner,recipe.RecipeId);craftLogOpenError=null;
         }
         catch(Exception error){craftLogOpenError=localization.Get("CraftLogUi.OpenError");log.Warning(error,"Could not request crafting log.");}
     }
@@ -41,15 +48,15 @@ internal sealed partial class MainWindow
         var now=DateTimeOffset.UtcNow;var observed=craftLog.Observation;
         if(windowDisposed || !configuration.CraftLogHelperEnabled || observed is null || observed.Revision!=craftLog.Revision || !observed.Fresh(now))
         {ClearCraftLogCalculation();return;}
-        var context=CraftLogContext.Resolve(observed,characterStats.State,recipeCatalog.State.Catalog,now);
+        var context=CraftLogContext.Resolve(observed,characterStats.State,recipeCatalog.State.Catalog,now,ManipulationLearned?.Invoke(observed.CurrentJobId)==true);
         var actions=craftActions.State.Catalog;
         var presets=(IReadOnlyList<CraftPreset>?)configuration.CraftPresets ?? Array.Empty<CraftPreset>();
         CraftLogInput? input=context is {Recipe:{ } recipe,Stats:{ } stats} && actions is not null
-            ? new(observed.Owner,recipe,stats,actions,presets,new(recipe.Simulation!.Quality,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true):null;
+            ? new(observed.Owner,recipe,stats,actions,presets,new(recipe.Simulation!.Quality,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,craftMacroBuffWait),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true):null;
         if(input!=craftLogInput)
         {craftLogSession.Cancel();craftLogInput=input;craftLogStableSince=now;craftLogStarted=false;craftLogForceRefresh=false;}
         if(now<craftLogStableSince)craftLogStableSince=now;
-        if(input is not null && !craftLogStarted && now-craftLogStableSince>=TimeSpan.FromMilliseconds(350))
+        if(CraftLogSession.ShouldStart(input,craftLogStarted,now-craftLogStableSince,configuration.CraftLogAutoSolve,craftLogRequested))
         {craftLogStarted=true;_=craftLogSession.StartAsync(input,craftLogForceRefresh);craftLogForceRefresh=false;}
         using var theme=TenshoAssistant.UI.FfxivTheme.Apply();
         var viewport=ImGui.GetMainViewport();var width=Math.Min(350,viewport.WorkSize.X);var height=Math.Min(590,viewport.WorkSize.Y);
@@ -71,16 +78,23 @@ internal sealed partial class MainWindow
                 if(selected.Simulation is { } parameters)ImGui.TextUnformatted(localization.Format("CraftLogUi.Parameters",parameters.Progress.ToString("N0"),parameters.Quality.ToString("N0"),parameters.Durability));
             }
             if(context.Stats is { } current)ImGui.TextUnformatted(localization.Format("CraftLogUi.Stats",current.Craftsmanship,current.Control,current.Cp,current.Level));
-            if(context.Issue is { } issue){ImGui.TextWrapped(context.Recipe is { } linked && issue==$"Équipez le métier {linked.CraftType} pour calculer avec ses attributs." ? localization.Format("CraftMessages.Equip",linked.CraftType) : CraftMessage(issue));return;}
-            if(actions is null){ImGui.TextWrapped(craftActions.State.Error ?? localization.Get("CraftLogUi.ActionsLoading"));return;}
+            if(context.Issue is { } issue){ImGui.TextWrapped(context.Recipe is { } linked && issue==$"Equip the {linked.CraftType} job to calculate with its attributes." ? localization.Format("CraftMessages.Equip",linked.CraftType) : CraftMessage(issue));return;}
+            if(actions is null){if(craftActions.State.Error is { } failure)DrawDataError(failure,"ServiceErrors.Craft");else ImGui.TextWrapped(localization.Get("CraftLogUi.ActionsLoading"));return;}
             ImGui.TextWrapped(localization.Format("CraftLogUi.Assumptions",context.StartingQuality.ToString("N0"))
                 +(context.Recipe?.Simulation?.Collectable==true ? localization.Get("CraftLogUi.CollectableHelp"):localization.Get("CraftLogUi.NoHq")));
             if(context.Recipe is { } forSimulator && ImGui.SmallButton(localization.Get("CraftLogUi.OpenSimulator"))){OpenCraftSimulation(forSimulator);IsOpen=true;}
             var state=craftLogSession.State;
-            if(state.Loading || !craftLogStarted)ImGui.TextDisabled(localization.Get("CraftLogUi.Calculating"));
+            // 0.327: with « compute automatically » off, the search waits for this button (« Recalculate » and the plan's « Simulate » also ask).
+            var waitsForRequest=!craftLogStarted && CraftLogSession.WaitsForRequest(input,configuration.CraftLogAutoSolve,craftLogRequested);
+            if(waitsForRequest)
+            {
+                if(ImGui.SmallButton(localization.Get("CraftLogUi.Compute")) && input is not null)craftLogRequested=(input.Owner,input.Recipe.RecipeId);
+                Tip("CraftLogUi.ComputeTip");
+            }
+            else if(state.Loading || !craftLogStarted)ImGui.TextDisabled(localization.Get("CraftLogUi.Calculating"));
             if(state.Error is { } error)DrawDataError(error,"ServiceErrors.Craft");
             if(state.CalculatedAt is { } calculated)DrawCacheStamp(TenshoAssistant.Caching.CacheArea.CraftCalculations,calculated,state.FromCache);
-            if(ImGui.SmallButton(localization.Get("CraftLogUi.Recalculate"))){craftLogSession.Cancel();craftLogStarted=false;craftLogStableSince=now;craftLogForceRefresh=true;}
+            if(!waitsForRequest && ImGui.SmallButton(localization.Get("CraftLogUi.Recalculate"))){craftLogSession.Cancel();craftLogStarted=false;craftLogStableSince=now;craftLogForceRefresh=true;if(input is not null)craftLogRequested=(input.Owner,input.Recipe.RecipeId);}
             if(state.Result is not { } result)return;
             DrawCraftLogMacro(localization.Get("CraftLogUi.Saved"),result.Saved,actions);
             DrawCraftLogMacro(localization.Get("CraftLogUi.Suggested"),result.Suggested,actions);
@@ -96,7 +110,7 @@ internal sealed partial class MainWindow
         {
             ImGui.Separator();ImGui.TextColored(Accent,title);
             if(macro is null){ImGui.TextDisabled(localization.Get("CraftLogUi.NoSequence"));return;}
-            ImGui.TextWrapped(macro.Name=="Macro proposée" ? localization.Get("CraftLogUi.Suggested"):macro.Name);
+            ImGui.TextWrapped(macro.Name=="Suggested macro" ? localization.Get("CraftLogUi.Suggested"):macro.Name);
             var simulation=macro.Simulation;var maximum=craftLogInput!.Recipe.Simulation!.Quality;
             ImGui.TextWrapped(localization.Format("CraftLogUi.Summary",simulation.Final.Quality.ToString("N0"),maximum.ToString("N0"),macro.Export.Actions,macro.Export.WaitSeconds));
             var job=craftLogInput.Recipe.CraftTypeId+8;var steps=simulation.Steps;

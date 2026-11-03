@@ -25,13 +25,17 @@ public sealed record TriadNpcCatalog(IReadOnlyList<TriadNpc> Npcs, IReadOnlyDict
             .ThenBy(row => row.Item1.Name, StringComparer.CurrentCulture).ToArray();
     }
 }
-public sealed record TriadNpcState(TriadNpcCatalog? Catalog, bool Loading, string? Error, IReadOnlySet<uint>? Beaten);
+/// <summary>BeatenUnavailable (0.331, R-14): the native beaten-NPC read failed (maybe after a game update); Beaten is then null.</summary>
+public sealed record TriadNpcState(TriadNpcCatalog? Catalog, bool Loading, string? Error, IReadOnlySet<uint>? Beaten, bool BeatenUnavailable = false);
 
 public sealed class TriadNpcService
 {
+    // 0.331 (audit): Publish/Fail run on the loader's worker, SetBeaten on the framework thread; the gate keeps a stale copy from
+    // writing the catalogue back to null.
+    private readonly object gate = new();
     private TriadNpcState state = new(null, true, null, null);
     public TriadNpcState State => Volatile.Read(ref state);
-    internal void Publish(TriadNpcCatalog catalog) { var current = State; Volatile.Write(ref state, current with { Catalog = catalog, Loading = false, Error = null }); }
-    internal void Fail(Exception error) { var current = State; Volatile.Write(ref state, current with { Loading = false, Error = error.Message }); }
-    internal void SetBeaten(IReadOnlySet<uint>? beaten) { var current = State; Volatile.Write(ref state, current with { Beaten = beaten }); }
+    internal void Publish(TriadNpcCatalog catalog) { lock (gate) { var current = State; Volatile.Write(ref state, current with { Catalog = catalog, Loading = false, Error = null }); } }
+    internal void Fail(Exception error) { lock (gate) { var current = State; Volatile.Write(ref state, current with { Loading = false, Error = error.Message }); } }
+    internal void SetBeaten(IReadOnlySet<uint>? beaten, bool unavailable = false) { lock (gate) { var current = State; Volatile.Write(ref state, current with { Beaten = beaten, BeatenUnavailable = unavailable && beaten is null }); } }
 }

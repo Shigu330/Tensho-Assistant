@@ -4,8 +4,10 @@
 )
 # Git steps after a green Verify.ps1 (called by Verify.ps1 -Commit / -Release; see CONTRIBUTING.md 'Versions et releases').
 #   Commit  : on Devloppement, commits every change as 'x.y.z' with the CHANGELOG entry as body, then pushes Devloppement.
-#   Release : from a clean Devloppement, updates repo.json (Dalamud custom repository), merges into main and pushes it,
-#             tags Stable-x.y.z, creates the GitHub release with latest.zip (GitHub CLI 'gh'), then brings Devloppement up to date.
+#   Release : from a clean Devloppement, commits repo.json (Dalamud custom repository), merges into main and tags Stable-x.y.z
+#             (local steps); then pushes the tag, creates the GitHub release with latest.zip (GitHub CLI 'gh'), pushes main
+#             (repo.json) last, and brings Devloppement up to date. A release stopped halfway (tag pushed, GitHub release or main
+#             missing) is resumed by running the same command again: only the missing steps run.
 # -DryRun prints every command without running it.
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
@@ -22,6 +24,13 @@ function Step([string]$Text, [scriptblock]$Action) {
 function Stop-Release([string]$Text) { Write-Host $Text -ForegroundColor Yellow; exit 2 }
 # Changed paths that are only documentation (*.md, docs/, repo.json).
 function Test-DocsOnly([string[]]$Paths) { -not ($Paths | Where-Object { $_ -notmatch '(\.md$|^docs/|^repo\.json$)' }) }
+# True when a native command succeeds. Its output is dropped and, as in Invoke-Git, stderr cannot become a terminating error
+# (Windows PowerShell 5.1 does that under 'Stop' for « release not found » from gh).
+function Test-Native([scriptblock]$Command) {
+    $previous = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+    try { & $Command *> $null; return ($LASTEXITCODE -eq 0) }
+    finally { $ErrorActionPreference = $previous }
+}
 function Invoke-Git([string[]]$Arguments) {
     # Windows PowerShell 5.1 turns any git line on stderr (e.g. 'From https://…' of a fetch) into a terminating error when redirected:
     # stderr is captured as plain text and only the exit code decides.
@@ -93,6 +102,12 @@ try {
             [IO.File]::WriteAllText($message, "$subject`n`n$commitNotes`n", [Text.UTF8Encoding]::new($false))
             if ($since -ne $version) { Write-Output "Commit message covers the versions after $since." }
             if ($DryRun) { Write-Output "--- commit message ---`n$subject`n`n$commitNotes`n----------------------" }
+            # 0.323: the files « git add -A » adds for the first time are listed; a new archive, binary or file over 5 MB outside the
+            # ignored folders stops the commit (exit code 2) instead of being published by mistake.
+            $untracked = @(Invoke-Git @('-c', 'core.quotePath=false', 'ls-files', '--others', '--exclude-standard') | Where-Object { $_ })
+            if ($untracked.Count -gt 0) { Write-Output "New files to add ($($untracked.Count)):"; $untracked | ForEach-Object { Write-Output "  + $_" } }
+            $blocked = @($untracked | Where-Object { $_ -match '\.(zip|7z|dll|exe|pdb)$' -or ((Test-Path -LiteralPath $_ -PathType Leaf) -and (Get-Item -LiteralPath $_).Length -gt 5MB) })
+            if ($blocked.Count -gt 0) { Stop-Release "Not committed: new archive, binary or large file(s): $($blocked -join ', '). Move them out of the repository or add them to .gitignore." }
             Step "git add -A" { git add -A }
             Step "git commit -F <message '$subject'>" { git commit -F $message }
         }
@@ -105,21 +120,55 @@ try {
         return
     }
 
-    # Release: stop early when this version is out or nothing is new since the last release.
-    if ($released) { Stop-Release "Version $version is already released: $releaseUrl. Raise <Version> (and the CHANGELOG entry) for a new release." }
-    Invoke-Git @('fetch', 'origin', $releaseBranch) | Out-Null
-    $newCommits = @(Invoke-Git @('log', '--format=%s', "origin/$releaseBranch..HEAD") | Where-Object { $_ })
-    if ($newCommits.Count -eq 0) { Stop-Release "Nothing new on $developBranch since the last release (origin/$releaseBranch)." }
+    # Release (0.323): every check first; then the tag and the GitHub release with its zip; main, which carries repo.json (what the
+    # players' Dalamud reads), is pushed only last, so repo.json never points at a download that does not exist yet. When the tag exists
+    # but its GitHub release does not (gh failed last time), the release is resumed: only the missing steps run.
     # gh from PATH, else its usual install folders (a terminal opened before installing GitHub CLI does not see it yet).
     $command = Get-Command gh -ErrorAction SilentlyContinue; $gh = if ($command) { $command.Source } else { $null }
     foreach ($candidate in @("$env:ProgramFiles\GitHub CLI\gh.exe", "$env:LOCALAPPDATA\Programs\GitHub CLI\gh.exe")) { if (-not $gh -and (Test-Path -LiteralPath $candidate)) { $gh = $candidate } }
     if (-not $gh) {
         throw "GitHub CLI 'gh' not found: install it (winget install GitHub.cli), then run 'gh auth login' once."
     }
+    $resume = $false; $hasRelease = $false
+    if ($released) {
+        # 0.326: a release is finished when GitHub has it AND origin/main contains its tag; otherwise the missing steps are resumed.
+        $hasRelease = Test-Native { & $gh release view $tag --repo $repository }
+        Invoke-Git @('fetch', 'origin', '--tags') | Out-Null
+        $mainHasTag = (Test-Native { git rev-parse --verify --quiet "refs/tags/$tag" }) -and (Test-Native { git merge-base --is-ancestor $tag "origin/$releaseBranch" })
+        if ($hasRelease -and $mainHasTag) { Stop-Release "Version $version is already released: $releaseUrl. Raise <Version> (and the CHANGELOG entry) for a new release." }
+        $resume = $true
+        $missing = if (-not $hasRelease) { 'its GitHub release' } else { "origin/$releaseBranch (repo.json)" }
+        Write-Output "Tag $tag exists but $missing is missing: resuming the release (only the missing steps run)."
+    }
+    if (-not (Test-Native { & $gh auth status })) { throw "GitHub CLI is not logged in: run 'gh auth login' once." }
     if (Invoke-Git @('status', '--porcelain')) { Stop-Release "Uncommitted changes: run '.\scripts\Verify.ps1 -Commit' first, then -Release." }
-    if (Invoke-Git @('tag', '--list', $tag)) { Stop-Release "Tag $tag already exists: raise <Version> for a new release." }
-    $remoteTag = & git ls-remote --tags origin "refs/tags/$tag"
-    if ($remoteTag) { Stop-Release "Tag $tag already exists on GitHub." }
+    Invoke-Git @('fetch', 'origin') | Out-Null
+    $behind = [int](Invoke-Git @('rev-list', '--count', "HEAD..origin/$developBranch"))
+    if ($behind -gt 0) { Stop-Release "$developBranch is $behind commit(s) behind origin/${developBranch}: pull first (git pull)." }
+    if (-not (Test-Native { git merge-base --is-ancestor "origin/$releaseBranch" HEAD })) { Stop-Release "origin/$releaseBranch has commits that $developBranch does not have (a change merged on GitHub?): merge origin/$releaseBranch into $developBranch first." }
+    $zip = Join-Path $root 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip'
+    if (-not (Test-Path -LiteralPath $zip)) { throw "Package not found: $zip (run .\scripts\Verify.ps1 first)." }
+    $notesFile = Join-Path ([IO.Path]::GetTempPath()) "tensho-notes-$version.md"
+
+    if ($resume) {
+        Invoke-Git @('fetch', 'origin', '--tags') | Out-Null
+        $commit = (Invoke-Git @('rev-list', '-n', '1', $tag)).Trim()
+        $lastReleased = @(Invoke-Git @('tag', '--list', 'Stable-*') | ForEach-Object { $_ -replace '^Stable-', '' } | Where-Object { $_ -match '^\d+\.\d+\.\d+$' -and [version]$_ -lt [version]$version } | Sort-Object { [version]$_ } -Descending | Select-Object -First 1)
+        if ($lastReleased.Count -gt 0) { $notes = Get-NotesSince $lastReleased[0] }
+        [IO.File]::WriteAllText($notesFile, $notes, [Text.UTF8Encoding]::new($false))
+        if (-not (& git ls-remote --tags origin "refs/tags/$tag")) { Step "git push origin $tag" { git push origin $tag } }
+        if (-not $hasRelease) { Step "gh release create $tag latest.zip" { & $gh release create $tag $zip --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag } }
+        Step "git push origin ${commit}:$releaseBranch" { git push origin "${commit}:refs/heads/$releaseBranch" }
+        # A run stopped after « checkout main » left main checked out: Devloppement is the branch brought up to date.
+        Step "git checkout $developBranch" { git checkout $developBranch }
+        Step "git merge --ff-only $tag (on $developBranch)" { git merge --ff-only $commit }
+        Step "git push origin $developBranch" { git push origin $developBranch }
+        Write-Output ($(if ($DryRun) { "DRY RUN: nothing was published ($tag)." } else { "RELEASE $tag published (resumed): $releaseUrl" }))
+        return
+    }
+
+    $newCommits = @(Invoke-Git @('log', '--format=%s', "origin/$releaseBranch..HEAD") | Where-Object { $_ })
+    if ($newCommits.Count -eq 0) { Stop-Release "Nothing new on $developBranch since the last release (origin/$releaseBranch)." }
 
     # Release notes: every version since the last published release (highest Stable-x.y.z tag here or on GitHub).
     Invoke-Git @('fetch', 'origin', '--tags') | Out-Null
@@ -129,7 +178,6 @@ try {
     # repo.json: Dalamud custom repository entry built from the packaged manifest, pointing at this release's zip.
     $output = 'src\TenshoAssistant\bin\x64\Release'
     $manifest = Get-Content -Raw -LiteralPath (Join-Path $output 'TenshoAssistant.json') | ConvertFrom-Json
-    $zip = Join-Path $root (Join-Path $output 'TenshoAssistant\latest.zip')
     $download = "https://github.com/$repository/releases/download/$tag/latest.zip"
     $entry = [ordered]@{
         Author = $manifest.Author; Name = $manifest.Name; InternalName = $manifest.InternalName
@@ -142,20 +190,19 @@ try {
         LastUpdate = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds(); Changelog = $notes
     }
     $json = ConvertTo-Json @($entry) -Depth 4
-    $notesFile = Join-Path ([IO.Path]::GetTempPath()) "tensho-notes-$version.md"
     [IO.File]::WriteAllText($notesFile, $notes, [Text.UTF8Encoding]::new($false))
 
+    # Local steps first: repo.json committed on Devloppement, merged into main, tagged. Nothing is public yet.
     Step "write repo.json ($version)" { [IO.File]::WriteAllText((Join-Path $root 'repo.json'), $json + "`n", [Text.UTF8Encoding]::new($false)) }
     Step "git commit repo.json" { git add repo.json; git commit -m "$version · repo.json" }
-    Step "git push origin $developBranch" { git push origin $developBranch }
     # The release branch is GitHub's main: the local main is set to origin/main before merging (no local Stable branch needed).
-    Step "git fetch origin" { git fetch origin }
     Step "git checkout -B $releaseBranch origin/$releaseBranch" { git checkout -B $releaseBranch "origin/$releaseBranch" }
     Step "git merge --no-ff $developBranch" { git merge --no-ff $developBranch -m "Release $version" }
-    Step "git push origin $releaseBranch" { git push origin $releaseBranch }
     Step "git tag -a $tag" { git tag -a $tag -m "Tensho Assistant $version" }
+    # Public steps: the tag and the GitHub release with the zip, then main (repo.json) last, then Devloppement.
     Step "git push origin $tag" { git push origin $tag }
-    Step "gh release create $tag latest.zip" { & $gh release create $tag $zip --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --target $releaseBranch }
+    Step "gh release create $tag latest.zip" { & $gh release create $tag $zip --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag }
+    Step "git push origin $releaseBranch" { git push origin $releaseBranch }
     Step "git checkout $developBranch" { git checkout $developBranch }
     Step "git merge --ff-only $releaseBranch" { git merge --ff-only $releaseBranch }
     Step "git push origin $developBranch" { git push origin $developBranch }

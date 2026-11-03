@@ -5,18 +5,51 @@ using TenshoAssistant.Craft;
 
 namespace TenshoAssistant;
 
+// 0.408 (user request): the item sheet's Craft tab keeps a short view (recipe, ingredients and stocks, links); the full preparation
+// below is the Crafting page's « Preparation » tab, linked both ways.
+// Crafting › Preparation: crafts needed for a target quantity and the direct ingredients against recorded stocks (live inventory
+// and saved Bank; unknown shown as unknown), copy as text; buttons to the Crafting Log panel and the detailed simulator, then the
+// preparation cost (MainWindow.PreparationCost.cs) and the full chain (MainWindow.CraftChain.cs). Built in Draw from cached holdings
+// (Craft/CraftPlan.cs, direct ingredients only).
 internal sealed partial class MainWindow
 {
-    private void DrawCraftPlan(RecipeDefinition recipe)
+    private void DrawCraftLinks(RecipeDefinition recipe)
     {
         if(ImGui.SmallButton(localization.Get("PlanUi.Simulate"))) OpenCraftLog(recipe);
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("PlanUi.Detailed"))) OpenCraftSimulation(recipe);
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get("PlanUi.OpenPreparation"))) OpenCraftPreparation(recipe);
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("PlanUi.OpenPreparationTip"));
         if(craftLogOpenError is { } openError)ImGui.TextWrapped(openError);
         if(craftLog.Error is { } nativeError)DrawDataError(nativeError,"ServiceErrors.CraftLog");
-        if (!ImGui.CollapsingHeader(localization.Get("PlanUi.Prepare")+"##CraftPlan", ImGuiTreeNodeFlags.DefaultOpen)) return;
+    }
+
+    private void OpenCraftPreparation(RecipeDefinition recipe)
+    {
+        OpenCraftSimulation(recipe);
+        focusCraftPage=CraftPageTab.Preparation;
+    }
+
+    // An item named in the preparation opens its sheet in Items, on its recipes when it has some.
+    private void OpenCraftItem(uint id)
+    {
+        SelectItem(id);
+        page=Page.Items;
+        focusCraftTab=recipeCatalog.State.Catalog?.ForResult(id).Count>0;
+    }
+
+    private void DrawCraftPlan(RecipeDefinition recipe)
+    {
+        // 0.424 (user report « recorded: unknown »): the holdings cache was refreshed only by the Items views; opened on its own, the
+        // Crafting page read an empty cache and kept it.
+        RefreshRecipeHoldingsCache();
+        if(ImGui.SmallButton(localization.Get("PlanUi.Simulate"))) OpenCraftLog(recipe);
+        if(craftLogOpenError is { } openError)ImGui.TextWrapped(openError);
+        if(craftLog.Error is { } nativeError)DrawDataError(nativeError,"ServiceErrors.CraftLog");
         ImGui.SetNextItemWidth(150);
         ImGui.InputInt(localization.Get("PlanUi.Target")+"##CraftPlanTarget", ref craftPlanTarget);
+        Tip("PlanUi.TargetTip");
         craftPlanTarget = Math.Clamp(craftPlanTarget, 1, 999999);
         var plan = CraftPlan.Build(recipe, craftPlanTarget, GetRecipeHoldings);
         ImGui.TextColored(Accent, localization.Format("PlanUi.Summary",plan.Crafts.ToString("N0"),plan.Produced.ToString("N0")));
@@ -46,7 +79,7 @@ internal sealed partial class MainWindow
                         DrawItemIcon(item, new Vector2(24));
                         var clicked = ImGui.IsItemClicked();
                         ImGui.SameLine();
-                        if (ImGui.SmallButton(item?.Name ?? $"ID {material.ItemId}") || clicked) SelectItem(material.ItemId);
+                        if (ImGui.SmallButton(item?.Name ?? $"ID {material.ItemId}") || clicked) OpenCraftItem(material.ItemId);
                         ImGui.SameLine();
                         if (ImGui.SmallButton(localization.Get("PlanUi.Locations"))) OpenGathering(material.ItemId);
                     }
@@ -68,6 +101,16 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped(localization.Get("PlanUi.UnknownStock"));
         if (plan.Materials.Any(material => material.Holdings.HasCached))
             ImGui.TextDisabled(localization.Get("PlanUi.Imported"));
+        // A-09 (0.423): the target as a Teamcraft list (import link built here; copied, or opened on click).
+        if (TeamcraftExport.Link([(recipe.ResultItemId, recipe.RecipeId, (long)plan.Requested)]) is { } teamcraft)
+        {
+            if (ImGui.Button(localization.Get("PlanUi.TeamcraftCopy"))) ImGui.SetClipboardText(teamcraft);
+            if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("PlanUi.TeamcraftTip"));
+            ImGui.SameLine();
+            if (ImGui.Button(localization.Get("PlanUi.TeamcraftOpen"))) Dalamud.Utility.Util.OpenLink(teamcraft);
+            if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("PlanUi.TeamcraftTip"));
+            ImGui.SameLine();
+        }
         if (ImGui.Button(localization.Get("PlanUi.Copy")))
         {
             var text = new StringBuilder();

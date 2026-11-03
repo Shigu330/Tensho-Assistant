@@ -47,7 +47,7 @@ public sealed class DutyLootService : IDisposable
         {
             if (disposed || !state.Loading) return;
             generation++; request?.Cancel();
-            state = state with { Loading = false, Error = "Consultation annulée." };
+            state = state with { Loading = false, Error = "Lookup cancelled." };
         }
     }
     public async Task RequestAsync(bool force = false, CancellationToken cancellation = default)
@@ -86,7 +86,7 @@ public sealed class DutyLootService : IDisposable
             {
                 if (disposed || ticket != generation) return;
                 state = state with { Loading = false, Error = error is OperationCanceledException
-                    ? "Consultation annulée ou délai dépassé." : $"Lecture du butin impossible : {error.Message}" };
+                    ? "Lookup cancelled or timed out." : $"Loot could not be read: {error.Message}" };
             }
         }
         finally
@@ -98,7 +98,7 @@ public sealed class DutyLootService : IDisposable
                     request = null;
                     // A borrowed handler may ignore cancellation and return late without throwing.
                     if (!disposed && ticket == generation && state.Loading)
-                        state = state with { Loading = false, Error = "Consultation annulée ou délai dépassé." };
+                        state = state with { Loading = false, Error = "Lookup cancelled or timed out." };
                 }
                 source.Dispose();
             }

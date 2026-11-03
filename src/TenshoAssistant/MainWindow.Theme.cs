@@ -3,6 +3,9 @@ using TenshoAssistant.UI;
 
 namespace TenshoAssistant;
 
+// Plugin theme: follow the game's interface theme (read by UI/GameThemeReader.Dalamud.cs) or pick one of the Tensho palettes
+// (UI/ThemePalettes.cs: approximations of the game themes, not extracted assets). Applied once per frame before the plugin
+// windows; the setting (Settings › Interface) has a tooltip and « ↺ » back to the default (follow the game).
 internal sealed partial class MainWindow
 {
     private Func<uint?> gameTheme=()=>null;
@@ -17,14 +20,19 @@ internal sealed partial class MainWindow
             ? localization.Format("Settings.ThemeDetected",localization.Get("Theme."+ThemePalettes.FromGame(value)),value):localization.Get("Settings.ThemeUnknown"));
         var mode=Math.Clamp(configuration.ThemeMode,0,Enum.GetValues<PluginTheme>().Length);
         ImGui.SetNextItemWidth(320);
-        if(!ImGui.BeginCombo(localization.Get("Settings.Theme"),mode==0 ? follow:localization.Get("Theme."+(PluginTheme)(mode-1))))return;
-        try
+        if(ImGui.BeginCombo(localization.Get("Settings.Theme"),mode==0 ? follow:localization.Get("Theme."+(PluginTheme)(mode-1))))
         {
-            if(ImGui.Selectable(follow,mode==0))SaveTheme(0);
-            foreach(var theme in Enum.GetValues<PluginTheme>())
-                if(ImGui.Selectable(localization.Get("Theme."+theme),mode==(int)theme+1))SaveTheme((int)theme+1);
+            try
+            {
+                if(ImGui.Selectable(follow,mode==0))SaveTheme(0);
+                foreach(var theme in Enum.GetValues<PluginTheme>())
+                    if(ImGui.Selectable(localization.Get("Theme."+theme),mode==(int)theme+1))SaveTheme((int)theme+1);
+            }
+            finally{ImGui.EndCombo();}
         }
-        finally{ImGui.EndCombo();}
+        Tip("SettingTips.Theme");
+        // 0.261: « ↺ » back to the default (follow the game).
+        if(DefaultButton("Theme",configuration.ThemeMode!=DefaultConfiguration.ThemeMode))SaveTheme(DefaultConfiguration.ThemeMode);
     }
     private void SaveTheme(int mode)
     {

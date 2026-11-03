@@ -14,9 +14,9 @@ public static class MiniCactpotSolver
         ArgumentNullException.ThrowIfNull(input);
         if (input.Count != 9 || input.Any(value => value is < 0 or > 9)
             || input.Where(value => value != 0).Distinct().Count() != input.Count(value => value != 0))
-            throw new ArgumentException("Saisir neuf cases, sans doublons parmi les chiffres de 1 à 9.", nameof(input));
+            throw new ArgumentException("Enter nine cells, without duplicates among the numbers 1 to 9.", nameof(input));
         var known = input.Count(value => value != 0);
-        if (known is < 1 or > 4) throw new ArgumentException("Saisir entre un et quatre chiffres révélés.", nameof(input));
+        if (known is < 1 or > 4) throw new ArgumentException("Enter between one and four revealed numbers.", nameof(input));
         var board = input.ToArray();
         var memo = new Dictionary<ulong, double>();
         var steps = 0;

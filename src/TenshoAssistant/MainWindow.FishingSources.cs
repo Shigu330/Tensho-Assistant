@@ -5,22 +5,26 @@ using TenshoAssistant.Monsters;
 
 namespace TenshoAssistant;
 
+// « Other sources » of a fish (Gathering page): Garland Tools' item document, fetched on request (one request at a time, cached for the
+// sources duration): for each spot linked to the game's fishing spots, the ET window, weather and previous weather, alarm and coming windows
+// (MainWindow.FishingForecast.cs), zone weather, and the bait routes with mooches. Shown below GatherBuddy when it knows the fish, alone
+// otherwise.
 internal sealed partial class MainWindow
 {
     private void DrawFishingSources(GatheringCatalog catalog)
     {
-        if(catalog.Fishing.ForItem((uint)itemId).Count==0 || !ImGui.CollapsingHeader(localization.Get("FishingSources.Title")+"###FishingCommunity"))return;
+        if(catalog.Fishing.ForItem((uint)itemId).Count==0 || !TenshoAssistant.UI.UiComponents.Header(localization.Get("FishingSources.Title")+"###FishingCommunity"))return;
         ImGui.TextWrapped(localization.Get("FishingSources.Help"));
         var state=monsterLoot.State;
         if(state.ItemId!=(uint)itemId)return;
         ImGui.BeginDisabled(state.Loading);
         try
         {
-            if(ImGui.Button(localization.Get(state.Item is null ? "FishingSources.Fetch":"FishingSources.Refresh")))_ = monsterLoot.RequestItemAsync(state.Item is not null);
+            if(SourceButton(localization.Get(state.Item is null ? "FishingSources.Fetch":"FishingSources.Refresh"),state.Item is null || configuration.CommunityGarland))_ = monsterLoot.RequestItemAsync(state.Item is not null);
         }
         finally{ImGui.EndDisabled();}
         if(state.Loading)ImGui.TextDisabled(localization.Get("FishingSources.Loading"));
-        if(state.Error is { } error){ImGui.TextWrapped(localization.Get("FishingSources.Error"));if(developerMode)ImGui.TextWrapped(error);}
+        if(state.Error is { } error){ImGui.TextWrapped(localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"FishingSources.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
         if(state.Item is not { } document)return;
         ImGui.TextDisabled(localization.Format("FishingSources.Fetched",document.FetchedAt.ToLocalTime().ToString("g")));
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,document.FetchedAt);
@@ -34,7 +38,7 @@ internal sealed partial class MainWindow
             {
                 var native=spot.SpotId is { } id ? catalog.ForFishingSpot(id):null;
                 var title=native is null ? localization.Get("FishingSources.Unlinked"):$"{native.Zone} · {native.Place}";
-                if(!ImGui.CollapsingHeader(localization.Format("FishingSources.Variant",title,index+1)+"###FishingSource"))continue;
+                if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("FishingSources.Variant",title,index+1)+"###FishingSource"))continue;
                 if(spot.Conditions is { } conditions)
                 {
                     ImGui.TextColored(Accent,localization.Get("FishingSources.Times"));
@@ -67,11 +71,8 @@ internal sealed partial class MainWindow
                             try
                             {
                                 if(step>0)ImGui.TextDisabled(localization.Get("FishingSources.Mooch"));
-                                DrawItemIcon(item,new Vector2(28));var clicked=ImGui.IsItemClicked();ImGui.SameLine();
-                                ImGui.BeginDisabled(item is null);
-                                try{clicked|=ImGui.SmallButton(item?.Name ?? localization.Get("FishingSources.UnknownItem"));}
-                                finally{ImGui.EndDisabled();}
-                                if(clicked && item is not null)SelectItem(item.Id);
+                                if(item is not null)ItemCell(item,item.Id,28);
+                                else ImGui.TextDisabled(localization.Get("FishingSources.UnknownItem"));
                             }
                             finally{ImGui.PopID();}
                         }

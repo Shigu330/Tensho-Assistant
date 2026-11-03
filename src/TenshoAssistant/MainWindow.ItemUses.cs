@@ -4,6 +4,10 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Item Use (item sheet › Usages): orchestrion roll state, recipes that use the item, Grand Company supply and aquarium candidates, craft
+// leves and their requests (game sheets through ItemUseCatalog: CraftLeve, GCSupplyDuty, AquariumFish), then references from other tools
+// (0.209): the item as a vendor currency, what it gives (LuminaSupplemental ItemSupplement: desynthesis, coffers…) and the quests that ask
+// for it. Static catalogue evidence only: no daily demand, accepted leve or unlock is inferred.
 internal sealed partial class MainWindow
 {
     private bool focusUsesTab;
@@ -14,7 +18,7 @@ internal sealed partial class MainWindow
         DrawRecipeResultHeader();var id=(uint)itemId;
         if(SelectedItem is {OrchestrionId:>0} roll)
         {
-            var music=collections.State.Entries.FirstOrDefault(entry=>entry.Kind==TenshoAssistant.Collections.CollectionKind.Orchestrion && entry.Id==roll.OrchestrionId);
+            var music=CollectionEntryOf(TenshoAssistant.Collections.CollectionKind.Orchestrion,roll.OrchestrionId);
             ImGui.TextColored(Accent,localization.Get("ItemUsesUi.Roll"));
             ImGui.TextWrapped(music is {ConfirmedUnlocked:true} ? localization.Get("ItemUsesUi.Acquired"):localization.Get("ItemUsesUi.UnknownMusic"));
             ImGui.BeginDisabled(music is null);
@@ -52,7 +56,7 @@ internal sealed partial class MainWindow
                 DrawItemIcon(new ItemDefinition(0,leve.Name,false,leve.IconId),new Vector2(24));ImGui.SameLine();
                 var job=string.IsNullOrWhiteSpace(leve.Job) ? localization.Get("ItemUsesUi.UnknownJob"):leve.Job;
                 var level=leve.Level>0 ? localization.Format("QuestDetails.Level",leve.Level):localization.Get("ItemUsesUi.UnknownLevel");
-                if(!ImGui.CollapsingHeader($"{leve.Name} · {job} · {level}"))continue;
+                if(!TenshoAssistant.UI.UiComponents.Header($"{leve.Name} · {job} · {level}"))continue;
                 if(!string.IsNullOrWhiteSpace(leve.Place))ImGui.TextWrapped(localization.Format("ItemUseCounts.Place",leve.Place));
                 ImGui.TextDisabled(localization.Get("ItemUsesUi.Requests"));
                 for(var index=0;index<leve.Requests.Count;index++)
@@ -60,10 +64,8 @@ internal sealed partial class MainWindow
                     var request=leve.Requests[index];var item=itemCatalog.State.Catalog?.Find(request.ItemId);ImGui.PushID(index);
                     try
                     {
-                        DrawItemIcon(item,new Vector2(28));var click=ImGui.IsItemClicked();ImGui.SameLine();
-                        click|=ImGui.SmallButton(item?.Name ?? localization.Format("CraftPresetMessages.Item",request.ItemId));
-                        ImGui.SameLine();ImGui.TextUnformatted(request.Quantity is { } quantity ? $"× {quantity}":localization.Get("ItemUsesUi.Quantity"));
-                        if(click){SelectItem(request.ItemId);focusUsesTab=true;}
+                        var quantityText=request.Quantity is { } quantity ? $"× {quantity}":localization.Get("ItemUsesUi.Quantity");
+                        if(ItemCell(item,request.ItemId,28,$"{item?.Name ?? localization.Format("CraftPresetMessages.Item",request.ItemId)}  {quantityText}"))focusUsesTab=true;
                     }
                     finally{ImGui.PopID();}
                 }
@@ -80,7 +82,7 @@ internal sealed partial class MainWindow
     {
         var items=itemCatalog.State.Catalog;
         var paid=npcVendors?.State.Catalog?.PaidWith(id) ?? [];
-        if(paid.Count>0 && ImGui.CollapsingHeader(localization.Format("ItemUseRefs.Currency",paid.Select(offer=>offer.Sale.ItemId).Distinct().Count())+"###UseCurrency"))
+        if(paid.Count>0 && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.Currency",paid.Select(offer=>offer.Sale.ItemId).Distinct().Count())+"###UseCurrency"))
         {
             ImGui.TextDisabled(localization.Get("ItemUseRefs.CurrencyHelp"));
             foreach(var vendor in paid.GroupBy(offer=>offer.Vendor.NpcId).OrderByDescending(group=>group.Count()).Take(8))
@@ -94,11 +96,10 @@ internal sealed partial class MainWindow
                     foreach(var offer in vendor.DistinctBy(offer=>offer.Sale.ItemId).Take(12))
                     {
                         var bought=items?.Find(offer.Sale.ItemId);
-                        DrawItemIcon(bought,new Vector2(20));var click=ImGui.IsItemClicked();ImGui.SameLine();
                         var cost=offer.Sale.Costs.FirstOrDefault(entry=>entry.CurrencyItemId==id);
-                        click|=ImGui.Selectable($"{bought?.Name ?? offer.Sale.ItemId.ToString()} · {cost?.Amount.ToString("N0") ?? "?"}##Buy{offer.Sale.ShopId}/{offer.Sale.ItemId}");
-                        if(ImGui.IsItemHovered())DrawItemInfoTooltip(offer.Sale.ItemId);
-                        if(click){SelectItem(offer.Sale.ItemId);focusUsesTab=false;}
+                        ImGui.PushID((int)offer.Sale.ShopId);
+                        try{if(ItemCell(bought,offer.Sale.ItemId,20,$"{bought?.Name ?? offer.Sale.ItemId.ToString()} · {cost?.Amount.ToString("N0") ?? "?"}"))focusUsesTab=false;}
+                        finally{ImGui.PopID();}
                     }
                     ImGui.Unindent();
                 }
@@ -108,7 +109,7 @@ internal sealed partial class MainWindow
         if(lumina?.State.Data is { } data)
         {
             var given=data.GivesOf(id);
-            if(given.Count>0 && ImGui.CollapsingHeader(localization.Format("ItemUseRefs.Gives",given.Sum(kind=>kind.Count))+"###UseGives"))
+            if(given.Count>0 && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.Gives",given.Sum(kind=>kind.Count))+"###UseGives"))
                 foreach(var (kind,count,list) in given)
                 {
                     ImGui.TextColored(Accent,localization.Get("ItemUseRefs.Kind"+(kind is >= 1 and <= 19 ? kind:0))+(count>list.Count ? " "+localization.Format("HoverUi.SupplementMore",count-list.Count):""));
@@ -116,15 +117,14 @@ internal sealed partial class MainWindow
                     foreach(var result in list)
                     {
                         var got=items?.Find(result);
-                        DrawItemIcon(got,new Vector2(20));DrawCollectionMark(got);var click=ImGui.IsItemClicked();ImGui.SameLine();
-                        click|=ImGui.Selectable($"{got?.Name ?? result.ToString()}##Gives{kind}/{result}");
-                        if(ImGui.IsItemHovered())DrawItemInfoTooltip(result);
-                        if(click){SelectItem(result);focusUsesTab=true;}
+                        ImGui.PushID(kind.ToString());
+                        try{if(ItemCell(got,result,20,got is null ? result.ToString():null))focusUsesTab=true;}
+                        finally{ImGui.PopID();}
                     }
                     ImGui.Unindent();
                 }
             var asked=data.QuestsRequiring(id);
-            if(asked.Count>0 && ImGui.CollapsingHeader(localization.Format("ItemUseRefs.Quests",asked.Count)+"###UseQuests"))
+            if(asked.Count>0 && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.Quests",asked.Count)+"###UseQuests"))
                 foreach(var (questId,name,quantity,hq) in asked)
                     if(ImGui.Selectable(localization.Format("ItemUseRefs.Quest",name.Length>0 ? name:questId.ToString(),quantity)+(hq ? " HQ":"")+$"##AskQuest{questId}"))
                     {page=Page.Quests;SelectQuest(questId);}

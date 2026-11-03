@@ -41,11 +41,11 @@ public static class CraftChain
         void Need(uint item, long amount, int depth)
         {
             cancellation.ThrowIfCancellationRequested();
-            if (++needs > maxNeeds) throw new InvalidOperationException("La chaîne dépasse la limite de besoins ; réduisez la quantité ou choisissez une sous-recette.");
+            if (++needs > maxNeeds) throw new InvalidOperationException("The chain exceeds the needs limit; reduce the quantity or choose a sub-recipe.");
             if (!available.TryGetValue(item, out var stock))
             {
                 var observation = holdings(item);
-                if (observation.Nq < 0 || observation.Hq < 0) throw new InvalidDataException("Stock négatif invalide.");
+                if (observation.Nq < 0 || observation.Hq < 0) throw new InvalidDataException("Invalid negative stock.");
                 observations[item] = observation with { Rows = Array.AsReadOnly(observation.Rows.ToArray()) };
                 stock = observation.HasObservation ? observation.Total : 0;
             }
@@ -82,12 +82,12 @@ public static class CraftChain
         {
             cancellation.ThrowIfCancellationRequested();
             if (recipe.RecipeId == 0 || recipe.ResultItemId == 0 || recipe.ResultAmount <= 0 || recipe.Ingredients.Count == 0)
-                throw new ArgumentException("Recette sans résultat, rendement ou ingrédients valides.", nameof(root));
+                throw new ArgumentException("Recipe without a valid result, yield or ingredients.", nameof(root));
             var crafts = (amount - 1) / recipe.ResultAmount + 1;
             var produced = checked(crafts * recipe.ResultAmount);
             foreach (var ingredient in recipe.Ingredients)
             {
-                if (ingredient.ItemId == 0 || ingredient.Amount <= 0) throw new ArgumentException("Ingrédient invalide.", nameof(root));
+                if (ingredient.ItemId == 0 || ingredient.Amount <= 0) throw new ArgumentException("Invalid ingredient.", nameof(root));
                 Need(ingredient.ItemId, checked(crafts * ingredient.Amount), depth + 1);
             }
             // Do not merge repeated steps: this order preserves all dependencies.

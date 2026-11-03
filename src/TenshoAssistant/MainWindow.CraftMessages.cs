@@ -2,49 +2,51 @@ using Dalamud.Bindings.ImGui;
 
 namespace TenshoAssistant;
 
+// Craft messages: the craft domain (Craft/*.cs) explains rejections and issues in French sentences; each known sentence is mapped to a
+// localization key (CraftMessages.*), the raw text is shown only in developer mode. No simulation rule lives here.
 internal sealed partial class MainWindow
 {
     // Presentation adapter for legacy domain explanations; simulation data and rules remain unchanged.
     private string? CraftMessageKey(string message)=>message switch
     {
-        "Paramètres de simulation absents pour cette recette." => "CraftMessages.NoParameters",
-        "Recette experte, ajustée, spécialisée ou à qualité imposée hors périmètre de cette simulation." => "CraftMessages.SpecialRecipe",
-        "Qualité maximale du collectionnable absente ou incompatible." => "CraftMessages.CollectableQuality",
-        "Paramètres natifs incomplets ou incompatibles avec le modèle." => "CraftMessages.NativeParameters",
-        "Habileté ou contrôle sous le minimum de la recette." => "CraftMessages.MinimumStats",
+        "Simulation parameters missing for this recipe." => "CraftMessages.NoParameters",
+        "Expert, adjusted, specialist or fixed-quality recipe outside this simulation's scope." => "CraftMessages.SpecialRecipe",
+        "Collectable maximum quality missing or incompatible." => "CraftMessages.CollectableQuality",
+        "Native parameters incomplete or incompatible with the model." => "CraftMessages.NativeParameters",
+        "Craftsmanship or control below the recipe's minimum." => "CraftMessages.MinimumStats",
         "100 actions maximum." => "CraftMessages.ActionLimit",
-        "Condition ou bonus favorable non pris en charge." => "CraftMessages.Condition",
+        "Favourable condition or bonus not supported." => "CraftMessages.Condition",
         "Action non prise en charge." => "CraftMessages.UnsupportedAction",
-        "Niveau insuffisant pour cette action." => "CraftMessages.Level",
-        "Utilisation de Manipulation non confirmée dans le scénario." => "CraftMessages.Manipulation",
-        "Action réservée au premier tour." => "CraftMessages.FirstTurn",
-        "Main preste exige dix niveaux de plus que la recette." => "CraftMessages.TrainedEye",
-        "Action incompatible avec Parcimonie." => "CraftMessages.WasteNot",
-        "Dix degrés de Calme intérieur requis." => "CraftMessages.QuietTen",
-        "Main suprême utilisable une seule fois par synthèse." => "CraftMessages.TrainedOnce",
-        "Calme intérieur requis pour Byregot." => "CraftMessages.Byregot",
-        "Cette recette ne possède pas de cible de qualité." => "CraftMessages.NoQuality",
-        "PS insuffisants pour cette action." => "CraftMessages.Cp",
-        "Sélection du carnet trop ancienne ou invalide." => "CraftMessages.LogOld",
-        "Recette non reliée au catalogue courant ; aucun rapprochement par nom." => "CraftMessages.LogRecipe",
-        "Qualité initiale du carnet absente ou qualité maximale incompatible ; calcul suspendu." => "CraftMessages.LogQuality",
-        "Qualité initiale du carnet hors des limites de la recette." => "CraftMessages.QualityBounds",
-        "En attente des attributs récents du personnage." => "CraftMessages.StatsWaiting",
-        "Attributs d’artisanat incomplets ou incompatibles." => "CraftMessages.StatsIncomplete",
-        "Aucune synthèse terminée trouvée dans les limites de recherche." => "CraftMessages.NoCompletion",
-        "La séquence termine sous la qualité cible." => "CraftMessages.BelowTarget",
-        "Observation absente ou trop ancienne." => "CraftMessages.ObservationOld",
-        "Action ou animation en cours." => "CraftMessages.Animating",
-        "Identité de recette non établie." => "CraftMessages.RecipeIdentity",
-        "Valeurs natives typées absentes, incohérentes ou condition hors des quatre états ordinaires." => "CraftMessages.TypedValues",
-        "Bonus d'outil favorable inconnu : les gains de qualité concernés restent inconnus, les autres ressources restent projetées." => "CraftMessages.ToolBonus",
-        "Ressources affichées, valeurs natives et recette non concordantes ou synthèse terminée." => "CraftMessages.Inconsistent",
-        "Disponibilité des actions native non établie pour ce métier." => "CraftMessages.Availability",
-        "Lecture complète des statuts non établie ; absence d'effet inconnue." => "CraftMessages.Statuses",
-        "Métadonnées des effets incomplètes." => "CraftMessages.EffectMetadata",
-        "Deux effets Parcimonie simultanés : état incohérent." => "CraftMessages.WasteNotConflict",
-        "Habileté ou Contrôle sous le minimum de la recette." => "CraftMessages.MinimumStats",
-        _=>null,
+        "Level too low for this action." => "CraftMessages.Level",
+        "Use of Manipulation not confirmed in the scenario." => "CraftMessages.Manipulation",
+        "Action reserved for the first step." => "CraftMessages.FirstTurn",
+        "Quick Innovation needs ten levels more than the recipe." => "CraftMessages.TrainedEye",
+        "Action incompatible with Waste Not." => "CraftMessages.WasteNot",
+        "Ten stacks of Inner Quiet required." => "CraftMessages.QuietTen",
+        "Trained Perfection can be used only once per synthesis." => "CraftMessages.TrainedOnce",
+        "Inner Quiet required for Byregot." => "CraftMessages.Byregot",
+        "This recipe has no quality target." => "CraftMessages.NoQuality",
+        "Not enough CP for this action." => "CraftMessages.Cp",
+        "Crafting log selection too old or invalid." => "CraftMessages.LogOld",
+        "Recipe not linked to the current catalogue; no matching by name." => "CraftMessages.LogRecipe",
+        "Crafting log starting quality missing or maximum quality incompatible; calculation suspended." => "CraftMessages.LogQuality",
+        "Crafting log starting quality outside the recipe's limits." => "CraftMessages.QualityBounds",
+        "Waiting for the character's recent attributes." => "CraftMessages.StatsWaiting",
+        "Crafting attributes incomplete or incompatible." => "CraftMessages.StatsIncomplete",
+        "No finished synthesis found within the search limits." => "CraftMessages.NoCompletion",
+        "The sequence ends below the target quality." => "CraftMessages.BelowTarget",
+        "Observation missing or too old." => "CraftMessages.ObservationOld",
+        "Action or animation in progress." => "CraftMessages.Animating",
+        "Recipe identity not established." => "CraftMessages.RecipeIdentity",
+        "Typed native values missing, inconsistent, or condition outside the four ordinary states." => "CraftMessages.TypedValues",
+        "Favourable tool bonus unknown: the affected quality gains stay unknown, the other resources are still projected." => "CraftMessages.ToolBonus",
+        "Displayed resources, native values and recipe do not agree, or synthesis finished." => "CraftMessages.Inconsistent",
+        "Native action availability not established for this job." => "CraftMessages.Availability",
+        "Full status reading not established; absence of an effect unknown." => "CraftMessages.Statuses",
+        "Effect metadata incomplete." => "CraftMessages.EffectMetadata",
+        "Two Waste Not effects at once: inconsistent state." => "CraftMessages.WasteNotConflict",
+        "Craftsmanship or Control below the recipe's minimum." => "CraftMessages.MinimumStats",
+        _=>TenshoAssistant.UI.UiMessages.Key(message),
     };
     private string CraftMessage(string message)=>CraftMessageKey(message) is { } key ? localization.Get(key):message;
 
@@ -52,14 +54,15 @@ internal sealed partial class MainWindow
     {
         var key=CraftMessageKey(message);
         if(key is not null){ImGui.TextWrapped(localization.Get(key));return;}
-        const string transitionSuffix=" : disponible côté client, aucune transition compatible dans le modèle.";
+        const string transitionSuffix=": available client-side, no compatible transition in the model.";
         if(message.EndsWith(transitionSuffix,StringComparison.Ordinal))
             ImGui.TextWrapped(localization.Format("CraftMessages.NoTransition",message[..^transitionSuffix.Length]));
         else
             ImGui.TextWrapped(localization.Get(
-                message.StartsWith("Statut ",StringComparison.Ordinal) ? "CraftMessages.DuplicateEffect":
-                message.StartsWith("Compteur du statut ",StringComparison.Ordinal) ? "CraftMessages.UnknownCounter":
-                message.StartsWith("Effet ",StringComparison.Ordinal) ? "CraftMessages.UnsupportedEffect":"CraftMessages.Uninterpreted"));
-        if(developerMode)ImGui.TextWrapped(message);
+                // 0.406: « Status counter » first, it also starts with « Status ».
+                message.StartsWith("Status counter ",StringComparison.Ordinal) ? "CraftMessages.UnknownCounter":
+                message.StartsWith("Status ",StringComparison.Ordinal) ? "CraftMessages.DuplicateEffect":
+                message.StartsWith("Effect ",StringComparison.Ordinal) ? "CraftMessages.UnsupportedEffect":"CraftMessages.Uninterpreted"));
+        if(developerMode)ImGui.TextWrapped(RawMessage(message));
     }
 }

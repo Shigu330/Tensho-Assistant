@@ -41,14 +41,14 @@ public static class InventorySortRules
         =>(query ?? "").Split(';',StringSplitOptions.TrimEntries|StringSplitOptions.RemoveEmptyEntries);
     public static void Validate(InventorySortProfile profile,InventorySortScope scope)
     {
-        if(!MatchesScope(profile,scope))throw new InvalidOperationException("Le profil appartient à un autre personnage ou rangement.");
+        if(!MatchesScope(profile,scope))throw new InvalidOperationException("The profile belongs to another character or storage.");
         ValidateContent(profile.Criteria,profile.Zones,scope.Capacity);
     }
     internal static void ValidateContent(IReadOnlyList<InventorySortCriterion> criteria,IReadOnlyList<InventorySortZone> zones,int capacity)
     {
         if(criteria is null || zones is null || criteria.Count is <1 or >InventorySortPreview.MaximumCriteria || criteria.Any(c=>c is null || !Enum.IsDefined(c.Field))
             || criteria.Select(c=>c.Field).Distinct().Count()!=criteria.Count || zones.Count>32)
-            throw new InvalidOperationException("Critères ou nombre de zones invalides.");
+            throw new InvalidOperationException("Invalid criteria or number of zones.");
         var reserved=new bool[capacity];
         foreach(var zone in zones)
         {
@@ -59,10 +59,10 @@ public static class InventorySortRules
                 || zone.SellPriceMax!=0 && zone.SellPriceMin>zone.SellPriceMax || !Rarities.Contains(zone.Rarity)
                 || new[]{zone.Unique,zone.Untradable,zone.Dyeable,zone.Repairable,zone.Collectable}.Any(filter=>!Enum.IsDefined(filter))
                 || zone.Start<0 || zone.Count<=0 || zone.Start>capacity-zone.Count || zone.Preserve && (zone.ReverseFill || zone.ShareUnused))
-                throw new InvalidOperationException("Zone invalide : nom, filtres ou limites de cases.");
+                throw new InvalidOperationException("Invalid zone: name, filters or slot limits.");
             for(var slot=zone.Start;slot<zone.Start+zone.Count;slot++)
             {
-                if(reserved[slot])throw new InvalidOperationException("Les zones de cases ne doivent pas se chevaucher.");
+                if(reserved[slot])throw new InvalidOperationException("Slot zones must not overlap.");
                 reserved[slot]=true;
             }
         }
@@ -70,14 +70,14 @@ public static class InventorySortRules
     public static InventorySortProfile Load(IEnumerable<InventorySortProfile>? saved,InventorySortScope scope,InventorySortField legacy,bool descending)
     {
         var matches=(saved ?? []).Where(profile=>profile is not null && MatchesScope(profile,scope)).Take(2).ToArray();
-        if(matches.Length>1)throw new InvalidOperationException("Plusieurs profils existent pour ce rangement ; réinitialisez son brouillon puis enregistrez-le.");
+        if(matches.Length>1)throw new InvalidOperationException("Several profiles exist for this storage; reset its draft, then save it.");
         var profile=matches.SingleOrDefault() ?? Default(scope,legacy,descending);Validate(profile,scope);return Copy(profile);
     }
     public static List<InventorySortProfile> Save(IEnumerable<InventorySortProfile>? saved,InventorySortProfile profile,InventorySortScope scope)
     {
         Validate(profile,scope);
         var next=(saved ?? []).Where(value=>value is not null && !MatchesScope(value,scope)).ToList();
-        if(next.Count>=128)throw new InvalidOperationException("La limite de 128 profils de rangement est atteinte.");
+        if(next.Count>=128)throw new InvalidOperationException("The limit of 128 storage profiles is reached.");
         next.Add(Copy(profile));return next;
     }
 
@@ -106,7 +106,7 @@ public static class InventorySortRules
         {
             // A protected zone needs actual visual indices, never a guessed packed order from an old cache.
             var physical=scope.Extract(source);
-            if(physical.Count!=all.Stacks.Count)throw new InvalidOperationException("Les positions visuelles ne couvrent pas exactement le rangement protégé.");
+            if(physical.Count!=all.Stacks.Count)throw new InvalidOperationException("The visual positions do not exactly cover the protected storage.");
             foreach(var zone in profile.Zones.Where(zone=>zone.Preserve))
             foreach(var value in all.Stacks.Where(value=>value.Stack.DisplayIndex>=zone.Start && value.Stack.DisplayIndex<zone.Start+zone.Count))
             {slots[value.Stack.DisplayIndex]=value;remaining.Remove(value);}
@@ -124,7 +124,7 @@ public static class InventorySortRules
         }
         var free=Enumerable.Range(0,scope.Capacity).Where(slot=>!reserved[slot]).ToArray();
         if(remaining.Count>free.Length)
-            throw new InvalidOperationException("Les cases non réservées ne suffisent pas aux autres piles. Réduisez les zones ou libérez des cases.");
+            throw new InvalidOperationException("The unreserved slots are not enough for the other stacks. Shrink the zones or free some slots.");
         for(var index=0;index<remaining.Count;index++)slots[free[index]]=remaining[index];
         return new(scope.Capacity,Array.AsReadOnly(slots.OfType<InventoryPreviewStack>().ToArray()),Array.AsReadOnly(slots));
     }

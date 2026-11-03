@@ -4,6 +4,9 @@ using TenshoAssistant.MiniGames;
 
 namespace TenshoAssistant;
 
+// Mini Cactpot page (Gold Saucer), like ezMiniCactpot: the ticket is typed in by hand or, with the opt-in observation, copied from
+// the game's window; the solver (MiniGames/, on a worker) advises which cell to reveal, then which line to pick. With the
+// observation on, the advice is also framed in green over the game's window. Reading only: the player still clicks.
 internal sealed partial class MainWindow
 {
     private readonly int[] cactpotBoard=new int[9];
@@ -69,7 +72,7 @@ internal sealed partial class MainWindow
                 MiniCactpotObservationStatus.Observed when observation.Frame is {Revealed:>4}=>localization.Get("CactpotUi.Finished"),
                 _=>observation.CanSolve(DateTimeOffset.UtcNow) ? localization.Get("CactpotUi.Advice"):localization.Get("CactpotUi.Waiting")
             });
-            if(developerMode && observation.Error is { } error)ImGui.TextWrapped(error);
+            if(developerMode && observation.Error is { } error)ImGui.TextWrapped(RawMessage(error));
             if(observation.ObservedAt is { } observed)ImGui.TextDisabled(localization.Format("CactpotCounts.Observed",observed.ToLocalTime().ToString("HH:mm:ss")));
         }
         else ImGui.TextWrapped(localization.Get("CactpotUi.InputHelp"));
@@ -96,7 +99,7 @@ internal sealed partial class MainWindow
         var state=cactpotSolve.State;
         ImGui.TextDisabled(localization.Format("CactpotCounts.Revealed",cactpotBoard.Count(value=>value!=0)));
         if(state.Loading)ImGui.TextDisabled(localization.Get("CactpotUi.Calculating"));
-        if(state.Error is { } errorText){ImGui.TextWrapped(localization.Get("CactpotCounts.Error"));if(developerMode)ImGui.TextWrapped(errorText);}
+        if(state.Error is { } errorText){ImGui.TextWrapped(localization.Get("CactpotCounts.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(errorText));}
         if(state.Result is not { } result)return;
         ImGui.TextColored(Accent,result.ChooseLine ? localization.Get("CactpotUi.ChooseLine"):localization.Get("CactpotUi.ChooseCell"));
         ImGui.TextUnformatted(localization.Format("CactpotCounts.Reward",result.ExpectedReward));

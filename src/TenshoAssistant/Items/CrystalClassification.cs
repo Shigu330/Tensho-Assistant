@@ -10,6 +10,24 @@ public static class CrystalClassifier
     public static readonly string[] Elements = ["Feu", "Glace", "Vent", "Terre", "Foudre", "Eau"];
     public static readonly string[] Sizes = ["Éclats", "Cristaux", "Agrégats"];
 
+    // 0.322: the English item name first (the catalogue keeps it for every client language), the French name as a fallback; the result
+    // keeps the French canonical values above, which the page maps to its translated keys. A German or Japanese client used to leave
+    // every crystal unclassified.
+    private static readonly string[] EnglishElements = ["FIRE", "ICE", "WIND", "EARTH", "LIGHTNING", "WATER"];
+    private static readonly string[] EnglishSizes = ["SHARD", "CRYSTAL", "CLUSTER"];
+
+    public static CrystalClassification? Classify(string name, string? englishName)
+    {
+        if (!string.IsNullOrWhiteSpace(englishName))
+        {
+            var upper = englishName.ToUpperInvariant();
+            var element = Array.FindIndex(EnglishElements, value => upper.StartsWith(value + " ", StringComparison.Ordinal));
+            var size = Array.FindIndex(EnglishSizes, value => upper.EndsWith(" " + value, StringComparison.Ordinal));
+            if (element >= 0 && size >= 0) return new(Elements[element], Sizes[size]);
+        }
+        return Classify(name);
+    }
+
     public static CrystalClassification? Classify(string name)
     {
         ArgumentNullException.ThrowIfNull(name);

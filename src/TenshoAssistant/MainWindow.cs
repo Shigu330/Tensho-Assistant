@@ -21,9 +21,13 @@ using TenshoAssistant.UI;
 
 namespace TenshoAssistant;
 
+// Main Tensho window (/tensho). This file holds the shell: header (title, version, optional local and Eorzea clocks), the left
+// navigation grouped by category (Objects, Production, World, Progression, Gold Saucer, Preferences; folds kept in the
+// configuration, 0.264), the context item with its tool icons, and the page switch with a per-page draw-time ring shown in
+// Diagnostics (0.290–0.292). Each page or tool is a partial file MainWindow.<Tool>.cs; services are created in Plugin.cs.
 internal sealed partial class MainWindow : Window, IDisposable
 {
-    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Character, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms }
+    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Chocobo, Events, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms, Storage, Reminders, FreeCompany, Gear, Credits, Leves, HuntingLog, OceanFishing }
     // Read from the active theme each time: the game theme can change while the plugin runs.
     private static Vector4 Accent => FfxivTheme.Gold;
     private static Vector4 Success => FfxivTheme.Success;
@@ -93,6 +97,9 @@ internal sealed partial class MainWindow : Window, IDisposable
     private bool focusCraftTab;
     private bool focusStocksTab;
     private bool focusBankTab;
+    // 0.292: last 120 draw times of each page (ring); Diagnostics shows the median (steady cost) and the maximum (spikes such as a
+    // first icon load), a moving average mixed both and kept the spike of a page left just after opening it.
+    private readonly Dictionary<Page, (double[] Samples, int Next, int Count)> pageDrawMs = [];
     private ItemCatalog? searchedCatalog;
     private IReadOnlyList<ItemDefinition> searchResults = [];
     private readonly Stack<uint> craftHistory = [];
@@ -143,6 +150,8 @@ internal sealed partial class MainWindow : Window, IDisposable
         this.bankBridge = bankBridge;
         this.textures = textures;
         this.gameGui = gameGui;
+        // 0.327 (queue step e): Home as before, or the last page used when that setting is on (developerMode is known here).
+        page = InitialPage();
         Size = new Vector2(1040, 700);
         SizeCondition = ImGuiCond.FirstUseEver;
         SizeConstraints = new WindowSizeConstraints
@@ -152,13 +161,52 @@ internal sealed partial class MainWindow : Window, IDisposable
         };
     }
 
-    public override void PreDraw()=>FfxivTheme.Push();
-    public override void PostDraw()=>FfxivTheme.Pop();
+    // 0.394 (user request): the chosen text font for the whole window, pushed after the theme and popped first.
+    private IDisposable? bodyFontScope;
+    public override void PreDraw(){FfxivTheme.Push();bodyFontScope=TenshoAssistant.UI.UiComponents.BodyFont is { Available:true } font ? font.Push():null;}
+    public override void PostDraw(){bodyFontScope?.Dispose();bodyFontScope=null;FfxivTheme.Pop();}
 
     internal void OpenSettings(){page=Page.Settings;IsOpen=true;}
+    internal void OpenAlarms(){page=Page.Alarms;IsOpen=true;}
+    // 0.344 (g, I-02): from the currency entry of the server bar.
+    internal void OpenCurrencies(){page=Page.Storage;focusCurrencyTab=true;IsOpen=true;}
+
+    // 0.327 (queue step e): opening page. Off (default): Home when the plugin loads, as before (the reopened window keeps its page
+    // during a session). On: the page shown is kept in memory as it changes and written to disk only when the window closes or the
+    // plugin unloads, never on each page change.
+    private Page? rememberedPage;
+    private bool lastPageDirty;
+
+    private Page InitialPage()
+    {
+        if(!configuration.OpenOnLastPage || !Enum.TryParse<Page>(configuration.LastPage,out var saved) || !Enum.IsDefined(saved)
+            || (saved==Page.Diagnostics && !developerMode))return Page.Home;
+        rememberedPage=saved;
+        return saved;
+    }
+
+    private void RememberPage()
+    {
+        if(!configuration.OpenOnLastPage || page==rememberedPage)return;
+        rememberedPage=page;
+        configuration.LastPage=page.ToString();
+        lastPageDirty=true;
+    }
+
+    private void SaveLastPage()
+    {
+        RememberPage();
+        if(!lastPageDirty)return;
+        try{save();lastPageDirty=false;}
+        catch(Exception error){log.Warning(error,"The last page used could not be saved.");}
+    }
+
+    public override void OnClose()=>SaveLastPage();
 
     public override void Draw()
     {
+        RememberPage();
+        DrawGameFrame();
         monsterLoot.SelectItem((uint)Math.Max(0,itemId));
         ValidateGpCopy();
         ValidateCraftCopy();
@@ -198,10 +246,16 @@ internal sealed partial class MainWindow : Window, IDisposable
                     if (showContent)
                     {
                         DrawCategoryNavigation();
+                        // 0.290 (R-06 step 6): draw time of each page, averaged, shown in Diagnostics (developer mode).
+                        var drawStarted = System.Diagnostics.Stopwatch.GetTimestamp();
+                        var drawnPage = page;
                         switch (page)
                         {
                             case Page.Home: DrawHome(); break;
                             case Page.Items: DrawItems(); break;
+                            case Page.Storage: DrawStorage(); break;
+                            case Page.Reminders: DrawReminders(); break;
+                            case Page.FreeCompany: DrawFreeCompany(); break;
                             case Page.Gathering: DrawGatheringBrowser(); break;
                             case Page.Maps: DrawMaps(); break;
                             case Page.DutyLoot: DrawDutyLoot(); break;
@@ -221,11 +275,21 @@ internal sealed partial class MainWindow : Window, IDisposable
                             case Page.TripleTriad: DrawTripleTriad(); break;
                             case Page.Market: DrawMarket(); break;
                             case Page.Quests: DrawQuests(); break;
-                            case Page.Character: DrawCharacterStats(); break;
+                            case Page.Chocobo: DrawChocoboPage(); break;
+                            case Page.Leves: DrawLeves(); break;
+                            case Page.HuntingLog: DrawHuntingLog(); break;
+                            case Page.OceanFishing: DrawOceanFishing(); break;
+                            case Page.Events: DrawEventsPage(); break;
+                            case Page.Gear: DrawGearPlanner(); break;
                             case Page.MiniCactpot: DrawMiniCactpot(); break;
                             case Page.Settings: DrawSettings(); break;
                             case Page.Diagnostics: DrawDiagnostics(); break;
+                            case Page.Credits: DrawCredits(); break;
                         }
+                        var drawMs = System.Diagnostics.Stopwatch.GetElapsedTime(drawStarted).TotalMilliseconds;
+                        var ring = pageDrawMs.TryGetValue(drawnPage, out var known) ? known : (Samples: new double[120], Next: 0, Count: 0);
+                        ring.Samples[ring.Next] = drawMs;
+                        pageDrawMs[drawnPage] = (ring.Samples, (ring.Next + 1) % ring.Samples.Length, Math.Min(ring.Count + 1, ring.Samples.Length));
                     }
                 }
                 finally { ImGui.EndChild(); }
@@ -240,29 +304,61 @@ internal sealed partial class MainWindow : Window, IDisposable
 
     private void DrawNavigation()
     {
-        ImGui.TextDisabled(localization.Get("Navigation.Workspace"));
+        // R-06 step 2 (0.264): pages grouped by category, each category folds (kept in the configuration); the hub pages of the map
+        // and the Gold Saucer are now direct entries, the sub-pages of crafting, gathering and collections stay in their own tab bar.
         Navigation(localization.Get("Navigation.Home"), Page.Home);
-        Navigation(localization.Get("Navigation.Items"), Page.Items);
-        ImGui.Spacing();
-        ImGui.TextDisabled(localization.Get("Navigation.Modules"));
-        Navigation(localization.Get("Navigation.Crafting"), Page.CraftSimulation);
-        Navigation(localization.Get("Navigation.Gathering"), Page.Gathering);
-        Navigation(localization.Get("Navigation.Collection"), Page.Collections);
-        Navigation(localization.Get("Navigation.Quests"), Page.Quests);
-        Navigation(localization.Get("Navigation.Map"), Page.Maps);
-        Navigation(localization.Get("Navigation.Market"), Page.Market);
-        Navigation(localization.Get("Navigation.Automation"), Page.MacroChain);
-        Navigation(localization.Format("Navigation.Alarms",configuration.Alarms?.Count ?? 0), Page.Alarms);
-        Navigation(localization.Get("Navigation.Combat"), Page.Character);
-        Navigation(localization.Get("Category.GoldSaucer"), Page.MiniCactpot);
+        if (NavigationCategory("Objects", Page.Items, Page.Storage, Page.SortPreview, Page.Market))
+        {
+            Navigation(localization.Get("Navigation.Items"), Page.Items);
+            Navigation(localization.Get("Navigation.Storage"), Page.Storage);
+            Navigation(localization.Get("Category.Sorting"), Page.SortPreview);
+            Navigation(localization.Get("Navigation.Market"), Page.Market);
+        }
+        if (NavigationCategory("Production", Page.CraftSimulation, Page.Gathering, Page.OceanFishing, Page.MacroChain))
+        {
+            Navigation(localization.Get("Navigation.Crafting"), Page.CraftSimulation);
+            Navigation(localization.Get("Navigation.Gathering"), Page.Gathering);
+            Navigation(localization.Get("Navigation.OceanFishing"), Page.OceanFishing);
+            Navigation(localization.Get("Category.MacroChain"), Page.MacroChain);
+        }
+        if (NavigationCategory("World", Page.Maps, Page.Weather, Page.Alarms, Page.Reminders, Page.FreeCompany, Page.NpcVendors, Page.DutyLoot, Page.MonsterLoot))
+        {
+            Navigation(localization.Get("Navigation.Map"), Page.Maps);
+            Navigation(localization.Get("Category.Weather"), Page.Weather);
+            Navigation(localization.Format("Navigation.Alarms",configuration.Alarms?.Count ?? 0), Page.Alarms);
+            Navigation(localization.Get("Navigation.Reminders"), Page.Reminders);
+            Navigation(localization.Get("Navigation.FreeCompany"), Page.FreeCompany);
+            Navigation(localization.Get("Category.NpcVendors"), Page.NpcVendors);
+            Navigation(localization.Get("Category.DutyLoot"), Page.DutyLoot);
+            Navigation(localization.Get("Category.MonsterLoot"), Page.MonsterLoot);
+        }
+        // 0.341 (user request): the Character page is gone (the Gear page shows the same real values); the chocobo has its own page.
+        if (NavigationCategory("Progression", Page.Quests, Page.Events, Page.Collections, Page.Gear, Page.Chocobo, Page.Leves, Page.HuntingLog))
+        {
+            Navigation(localization.Get("Navigation.Quests"), Page.Quests);
+            Navigation(localization.Get("Navigation.Events"), Page.Events);
+            Navigation(localization.Get("Navigation.Collection"), Page.Collections);
+            Navigation(localization.Get("Navigation.Gear"), Page.Gear);
+            Navigation(localization.Get("Navigation.Chocobo"), Page.Chocobo);
+            Navigation(localization.Get("Navigation.Leves"), Page.Leves);
+            Navigation(localization.Get("Navigation.HuntingLog"), Page.HuntingLog);
+        }
+        if (NavigationCategory("GoldSaucer", Page.Fashion, Page.TripleTriad, Page.MiniCactpot))
+        {
+            Navigation(localization.Get("Category.Fashion"), Page.Fashion);
+            Navigation(localization.Get("Category.Triad"), Page.TripleTriad);
+            Navigation(localization.Get("Category.Cactpot"), Page.MiniCactpot);
+        }
+        if (NavigationCategory("Preferences", Page.Settings, Page.Credits, Page.Diagnostics))
+        {
+            Navigation(localization.Get("Navigation.Settings"), Page.Settings);
+            // R-13 (0.320): everything Tensho uses, shown to every player.
+            Navigation(localization.Get("Navigation.Credits"), Page.Credits);
+            if (developerMode) Navigation(localization.Get("Navigation.Diagnostics"), Page.Diagnostics);
+        }
         ImGui.Spacing();
         ImGui.Separator();
-        ImGui.TextDisabled(localization.Get("Navigation.Preferences"));
-        Navigation(localization.Get("Navigation.Settings"), Page.Settings);
-        if (developerMode) Navigation(localization.Get("Navigation.Diagnostics"), Page.Diagnostics);
-        ImGui.Spacing();
-        ImGui.Separator();
-        ImGui.TextDisabled(localization.Get("Navigation.ContextItem"));
+        using (TenshoAssistant.UI.UiComponents.PushSectionFont()) ImGui.TextDisabled(localization.Get("Navigation.ContextItem"));
         if (SelectedItem is { } selected)
         {
             DrawItemIcon(selected, new Vector2(32));
@@ -275,6 +371,14 @@ internal sealed partial class MainWindow : Window, IDisposable
         else ImGui.TextWrapped(localization.Get("Navigation.SelectItem"));
     }
 
+    private static Page NavigationPage(Page current)=>current switch
+    {
+        Page.CraftLive or Page.CraftPresets=>Page.CraftSimulation,
+        Page.GatheringGp=>Page.Gathering,
+        Page.BlueMagic=>Page.Collections,
+        _=>current,
+    };
+
     private void Navigation(string label, Page destination)
     {
         var selectedCategory=page switch
@@ -282,9 +386,6 @@ internal sealed partial class MainWindow : Window, IDisposable
             Page.CraftLive or Page.CraftPresets=>Page.CraftSimulation,
             Page.GatheringGp=>Page.Gathering,
             Page.BlueMagic=>Page.Collections,
-            Page.Weather or Page.DutyLoot or Page.MonsterLoot or Page.NpcVendors=>Page.Maps,
-            Page.SortPreview=>Page.MacroChain,
-            Page.Fashion or Page.TripleTriad=>Page.MiniCactpot,
             _=>page,
         };
         if (UiComponents.NavigationItem(label, selectedCategory == destination))

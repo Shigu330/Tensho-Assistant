@@ -6,20 +6,34 @@ using TenshoAssistant.Quests;
 
 namespace TenshoAssistant;
 
-// Right-click menu of the Tensho map: lists of what is on the shown map, in tabs (quests by category, FATEs, gathering by
-// type, aetherytes). A click places the game flag there (aetherytes: teleport). Positions come from the cached index
-// (MapLocalIndexLoader, DataCache « catalog-map-positions »); quests and gathering reuse their already cached catalogues.
+// Right-click menu of the Tensho map: lists of what is on the shown map, in tabs (quests by category, FATEs of the current zone,
+// gathering by type, aetherytes, NPC vendors, Triple Triad NPCs, sightseeing vistas, aether currents). A click places the game
+// flag there (aetherytes: teleport); a right click opens the row's own menu (matching Tensho tool). Positions come from the cached
+// index (MapLocalIndexLoader, DataCache « catalog-map-positions »); quests, gathering, vendors and Triad NPCs reuse their already
+// cached catalogues.
 internal sealed partial class MainWindow
 {
     private bool mapLocalShowComplete;private bool mapTeleportRequested;private bool mapLocalCloseMenu;
     private string mapLocalQuestCategory="",mapLocalGatheringType="";
+    // 0.328: the lists of the shown tab, rebuilt only when what they are made of changes (the menu stays open for seconds; quests and
+    // gathering sources are walked in full, MapCatalog.Equivalent walks every map).
+    private (object? Entries,object? Index,uint MapId,bool Complete,IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> Groups) mapLocalQuestCache=(null,null,0,false,[]);
+    private (uint MapId,object? Catalog,object? Index,IReadOnlyList<(string Type,IReadOnlyList<MapLocalGatheringPoint> Points)> Groups) mapLocalGatheringCache=(0,null,null,[]);
+    private (object? Catalog,uint MapId,IReadOnlySet<uint> Ids) mapLocalEquivalentCache=(null,0,new HashSet<uint>());
+    private (object? Maps,object? Index,MapLocalKind Kind,MapLocalPosition[] Rows) mapLocalCollectibleCache=(null,null,default,[]);
 
     private void DrawMapLocalLists(MapDefinition map,MapLiveState? live)
     {
-        var open=ImGui.BeginChild("MapLocalLists",new Vector2(640,360),true);
+        // 0.400 (user report « framing »): wide enough for every tab name (8 since 0.401), at most 90 % of the screen; when the screen is
+        // narrower the tabs scroll with arrows instead of being cut.
+        var style=ImGui.GetStyle();
+        var tabs=new[]{"MapLocal.Quests","MapLocal.Fates","MapLocal.Gathering","MapLocal.Aetherytes","MapLocal.Vendors","MapLocal.TripleTriad","MapLocal.Currents","VistaLog.Tab"};
+        var needed=tabs.Sum(key=>ImGui.CalcTextSize(localization.Get(key)).X+style.FramePadding.X*2+style.ItemInnerSpacing.X)+style.WindowPadding.X*2+8;
+        var width=Math.Clamp(needed,640,Math.Max(640,ImGui.GetMainViewport().WorkSize.X*0.9f));
+        var open=ImGui.BeginChild("MapLocalLists",new Vector2(width,360),true);
         try
         {
-            if(!open || !ImGui.BeginTabBar("MapLocalTabs"))return;
+            if(!open || !ImGui.BeginTabBar("MapLocalTabs",ImGuiTabBarFlags.FittingPolicyScroll))return;
             try
             {
                 if(ImGui.BeginTabItem(localization.Get("MapLocal.Quests"))){try{DrawLocalQuests(map);}finally{ImGui.EndTabItem();}}
@@ -27,8 +41,11 @@ internal sealed partial class MainWindow
                 if(ImGui.BeginTabItem(localization.Get("MapLocal.Gathering"))){try{DrawLocalGathering(map);}finally{ImGui.EndTabItem();}}
                 if(ImGui.BeginTabItem(localization.Get("MapLocal.Aetherytes"))){try{DrawLocalAetherytes(map);}finally{ImGui.EndTabItem();}}
                 if(ImGui.BeginTabItem(localization.Get("MapLocal.Vendors"))){try{DrawLocalVendors(map);}finally{ImGui.EndTabItem();}}
-                if(ImGui.BeginTabItem(localization.Get("MapLocal.Sightseeing"))){try{DrawLocalCollectibles(map,live,MapLocalKind.Sightseeing);}finally{ImGui.EndTabItem();}}
+                if(ImGui.BeginTabItem(localization.Get("MapLocal.TripleTriad"))){try{DrawLocalTriad(map);}finally{ImGui.EndTabItem();}}
                 if(ImGui.BeginTabItem(localization.Get("MapLocal.Currents"))){try{DrawLocalCollectibles(map,live,MapLocalKind.AetherCurrent);}finally{ImGui.EndTabItem();}}
+                // 0.361 (g, C-11): the whole sightseeing log, every zone. 0.401 (user report): the zone-only « Sightseeing » tab is gone, this
+                // log covers it.
+                if(ImGui.BeginTabItem(localization.Get("VistaLog.Tab"))){try{DrawVistaLog(live);}finally{ImGui.EndTabItem();}}
             }
             finally{ImGui.EndTabBar();}
         }
@@ -62,8 +79,11 @@ internal sealed partial class MainWindow
         if(LocalIndexOrStatus() is not { } index)return;
         var state=quests.State;
         if(state.Entries.Count==0){ImGui.TextDisabled(localization.Get(state.Loading ? "MapLocal.QuestsLoading":"MapLocal.QuestsNone"));return;}
-        ImGui.Checkbox(localization.Get("MapLocal.ShowComplete"),ref mapLocalShowComplete);
-        var groups=MapLocalLists.Quests(state.Entries,index,map.MapId,mapLocalShowComplete);
+        ImGui.Checkbox(localization.Get("MapLocal.ShowComplete"),ref mapLocalShowComplete);Tip("MapLocal.ShowCompleteTip");
+        var cache=mapLocalQuestCache;
+        if(!ReferenceEquals(cache.Entries,state.Entries) || !ReferenceEquals(cache.Index,index) || cache.MapId!=map.MapId || cache.Complete!=mapLocalShowComplete)
+            mapLocalQuestCache=(state.Entries,index,map.MapId,mapLocalShowComplete,MapLocalLists.Quests(state.Entries,index,map.MapId,mapLocalShowComplete));
+        var groups=mapLocalQuestCache.Groups;
         if(groups.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
         DrawSplitView("Quest",groups,ref mapLocalQuestCategory,item=>
         {
@@ -71,7 +91,7 @@ internal sealed partial class MainWindow
             var status=item.Quest.Progress switch{QuestProgress.Active=>localization.Get("MapLocal.Active"),QuestProgress.Complete=>localization.Get("MapLocal.Complete"),_=>""};
             DrawSmallGameIcon(item.Position.Data);
             if(ImGui.Selectable($"{localization.Format("MapLocal.Level",item.Quest.Level)}  {item.Quest.Name}  {status}##Quest{item.Quest.Id}"))FlagAt(map,world);
-            ToolMenu($"QuestTool{item.Quest.Id}","MapLocal.OpenQuestTool",()=>{SelectQuest(item.Quest.Id);questShowDetails=true;page=Page.Quests;});
+            QuestMenu($"QuestTool{item.Quest.Id}",item.Quest.Id,item.Quest.Name);
             if(ImGui.IsItemHovered())WrappedTooltip(CoordinateText(map,world)+"\n"+localization.Get("MapLocal.ClickFlag"));
         });
     }
@@ -98,12 +118,13 @@ internal sealed partial class MainWindow
     {
         if(LocalIndexOrStatus() is not { } index)return;
         if(gatheringCatalog.State.Catalog is not { } catalog){ImGui.TextDisabled(localization.Get("MapLocal.GatheringLoading"));return;}
-        var groups=MapLocalLists.Gathering(catalog.Sources,index,map.MapId);
+        if(mapLocalGatheringCache.MapId!=map.MapId || !ReferenceEquals(mapLocalGatheringCache.Catalog,catalog) || !ReferenceEquals(mapLocalGatheringCache.Index,index))
+            mapLocalGatheringCache=(map.MapId,catalog,index,MapLocalLists.Gathering(catalog.Sources,index,map.MapId));
+        var groups=mapLocalGatheringCache.Groups;
         if(groups.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
         var items=itemCatalog.State.Catalog;
         DrawSplitView("Gathering",groups,ref mapLocalGatheringType,point=>
         {
-            var names=string.Join(", ",point.Items.Select(id=>items?.Find(id)?.Name ?? $"#{id}"));
             var label=$"{localization.Format("MapLocal.Level",point.Level)}  {point.Place}{(point.Hidden ? " "+localization.Get("MapLocal.Hidden"):"")}";
             DrawSmallGameIcon(point.Icon);
             if(point.Position is { } position)
@@ -117,7 +138,7 @@ internal sealed partial class MainWindow
             {
                 ImGui.TextDisabled(label);
                 GatheringToolMenu($"GatheringTool{point.BaseId}",point.Items);
-                if(ImGui.IsItemHovered())WrappedTooltip(names+"\n"+localization.Get("MapLocal.NoPosition"));
+                if(ImGui.IsItemHovered())WrappedTooltip(string.Join(", ",point.Items.Select(id=>items?.Find(id)?.Name ?? $"#{id}"))+"\n"+localization.Get("MapLocal.NoPosition"));
             }
         });
     }
@@ -150,30 +171,55 @@ internal sealed partial class MainWindow
     private void DrawLocalCollectibles(MapDefinition map,MapLiveState? live,MapLocalKind kind)
     {
         if(LocalIndexOrStatus() is not { } index)return;
-        var rows=(maps.State.Catalog?.Equivalent(map) ?? [map.MapId]).SelectMany(id=>index.OnMap(kind,id)).ToList();
-        if(rows.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
+        var mapIds=EquivalentMaps(map);
+        if(!ReferenceEquals(mapLocalCollectibleCache.Maps,mapIds) || !ReferenceEquals(mapLocalCollectibleCache.Index,index) || mapLocalCollectibleCache.Kind!=kind)
+            mapLocalCollectibleCache=(mapIds,index,kind,mapIds.SelectMany(id=>index.OnMap(kind,id)).OrderBy(row=>row.Id).ToArray());
+        var rows=mapLocalCollectibleCache.Rows;
+        if(rows.Length==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
         var collected=kind==MapLocalKind.Sightseeing ? live?.Sightseen:live?.UnlockedCurrents;
         var done=collected is null ? 0:rows.Count(row=>collected.Contains(row.Id));
-        ImGui.TextDisabled(collected is null ? localization.Get("MapView.CollectedUnknown"):localization.Format("MapLocal.CollectedCount",done,rows.Count));
-        // Vista numbers follow the sightseeing log order (row order from the first row of the sheet).
-        var first=kind==MapLocalKind.Sightseeing ? 2162688u:0u;
-        foreach(var row in rows.OrderBy(row=>row.Id))
+        ImGui.TextDisabled(collected is null ? localization.Get("MapView.CollectedUnknown"):localization.Format("MapLocal.CollectedCount",done,rows.Length));
+        // The log numbers beyond A Realm Reborn come from the wiki (loaded once, as on hovering a vista; off with the wiki switch).
+        if(kind==MapLocalKind.Sightseeing)wikiVistas?.Request();
+        foreach(var row in rows)
         {
             var world=new Vector3(row.X,0,row.Z);
             bool? state=collected is null ? null:collected.Contains(row.Id);
             var mark=state switch{true=>"[x]",false=>"[ ]",_=>"[?]"};
             var name=kind==MapLocalKind.Sightseeing
-                ? $"n° {row.Id-first+1:000}  {row.Name}"
-                : row.Data!=0 ? localization.Get("MapView.CurrentQuest")+(quests.State.Entries.FirstOrDefault(entry=>entry.Id==row.Data)?.Name is { Length:>0 } quest ? " · "+quest:""):localization.Get("MapView.CurrentField");
+                ? (VistaNumber(row) is { Length:>0 } number ? number+"  "+row.Name:row.Name)
+                : row.Data!=0 ? localization.Get("MapView.CurrentQuest")+(QuestOf(row.Data)?.Name is { Length:>0 } quest ? " · "+quest:""):localization.Get("MapView.CurrentField");
             ImGui.PushStyleColor(ImGuiCol.Text,state==true ? UI.FfxivTheme.TextMuted:UI.FfxivTheme.Text);
             try{if(ImGui.Selectable($"{mark}  {name}  ({CoordinateText(map,world)})##Collectible{kind}{row.Id}"))FlagAt(map,world);}
             finally{ImGui.PopStyleColor();}
+            // 0.328: the vista tooltip says « right click: create an alarm »; the row has that menu, as the vista on the Tensho map.
+            if(kind==MapLocalKind.Sightseeing && map.TerritoryId!=0 && ImGui.BeginPopupContextItem($"VistaAlarm{row.Id}"))
+            {
+                try{DrawVistaAlarmEntry(row,map.TerritoryId);}
+                finally{ImGui.EndPopup();}
+            }
             if(ImGui.IsItemHovered())
             {
                 if(kind==MapLocalKind.Sightseeing)DrawSightseeingTooltip(row,state);
                 else WrappedTooltip(localization.Get("MapLocal.ClickFlag"));
             }
         }
+    }
+    // 0.328: the sightseeing log number, as in the vista tooltip: the wiki's when its row is matched (numbering restarts in each
+    // expansion), else the sheet row order, which is the log number only for the 80 A Realm Reborn vistas (no number beyond).
+    private string VistaNumber(MapLocalPosition vista)
+    {
+        if(WikiVistaFor(vista) is { } wiki)return localization.Format(wiki.Section==0 ? "MapView.VistaNumberArr":"MapView.VistaNumberEx",wiki.Number,ExpansionName(wiki.Section));
+        var order=vista.Id-2162688u;
+        return order<80 ? localization.Format("MapView.VistaNumberArr",(int)order+1):"";
+    }
+    // Maps showing the same ground as the shown map (MapCatalog.Equivalent walks every map), kept per catalogue and map.
+    private IReadOnlySet<uint> EquivalentMaps(MapDefinition map)
+    {
+        var catalog=maps.State.Catalog;
+        if(mapLocalEquivalentCache.Ids.Count==0 || mapLocalEquivalentCache.MapId!=map.MapId || !ReferenceEquals(mapLocalEquivalentCache.Catalog,catalog))
+            mapLocalEquivalentCache=(catalog,map.MapId,(catalog?.Equivalent(map) ?? [map.MapId]).ToHashSet());
+        return mapLocalEquivalentCache.Ids;
     }
 
     // NPC vendors of the map from the cached vendor catalogue, by name; click = flag, hover = shops.
@@ -190,8 +236,35 @@ internal sealed partial class MainWindow
             // Same icon as on the map: the game's icon the vendor stands by (MAP-017), else the icon of its kind.
             DrawSmallGameIcon(VendorMarker(vendorMarkers,MapProjection.PixelFromWorld(new Vector3(spot.WorldX,0,spot.WorldZ),map),VendorIconOf(vendor))?.Icon ?? VendorIconOf(vendor));
             if(ImGui.Selectable($"{name}  (X {spot.X:0.0}  Y {spot.Y:0.0})##Vendor{vendor.NpcId}/{spot.X}/{spot.Y}")){PlaceFlagFromMapView(map,spot.X,spot.Y);ImGui.CloseCurrentPopup();}
-            ToolMenu($"VendorTool{vendor.NpcId}/{spot.X}/{spot.Y}","MapLocal.OpenVendorTool",()=>{npcVendorFocus=vendor.NpcId;page=Page.NpcVendors;});
+            NpcMenu($"VendorTool{vendor.NpcId}/{spot.X}/{spot.Y}",name,vendor.NpcId,vendor.Locations);
             if(ImGui.IsItemHovered())WrappedTooltip(VendorLabel(vendor)+"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
+        }
+    }
+
+    // Triple Triad NPCs of the map (0.244, R-03), from the cached Triad NPC catalogue: beaten state, missing reward cards;
+    // click = flag, right click = Triple Triad tool. Not beaten first, as in the Triad tool.
+    private void DrawLocalTriad(MapDefinition map)
+    {
+        var state=triadNpcs?.State;
+        if(state?.Catalog is not { } catalog){ImGui.TextDisabled(localization.Get(state?.Error is null ? "TriadNpcs.Loading":"TriadNpcs.Error"));return;}
+        var mapIds=EquivalentMaps(map);
+        var entries=TriadEntriesById();
+        bool? Beaten(uint match)=>state.Beaten is { } beaten ? beaten.Contains(match):null;
+        var rows=catalog.ToFace(Beaten,id=>entries.TryGetValue(id,out var entry) && entry.ConfirmedUnlocked,false).Where(row=>mapIds.Contains(row.Npc.MapId)).ToArray();
+        if(rows.Length==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
+        if(state.Beaten is null)ImGui.TextDisabled(localization.Get(state.BeatenUnavailable ? "TriadNpcs.BeatenUnavailable":"TriadNpcs.BeatenUnknown"));
+        foreach(var (npc,beaten,missing) in rows)
+        {
+            var mark=beaten switch{true=>"[x]",false=>"[ ]",_=>"[?]"};
+            var lacking=missing.Count>0 ? "  "+localization.Format("MapLocal.TriadMissing",missing.Count):"";
+            ImGui.PushStyleColor(ImGuiCol.Text,beaten==true && missing.Count==0 ? UI.FfxivTheme.TextMuted:UI.FfxivTheme.Text);
+            try{if(ImGui.Selectable($"{mark}  {npc.Name}  (X {npc.X:0.0}  Y {npc.Y:0.0}){lacking}##LocalTriad{npc.MatchId}")){PlaceFlagFromMapView(map,npc.X,npc.Y);ImGui.CloseCurrentPopup();}}
+            finally{ImGui.PopStyleColor();}
+            NpcMenu($"TriadTool{npc.MatchId}",npc.Name,0,[new(map.TerritoryId,map.MapId,map.Zone,npc.X,npc.Y,0,0,0)],("MapLocal.OpenTriadTool",()=>OpenTriadTab("Npcs")));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("TriadNpcs.Tooltip",npc.Fee,npc.RewardCards.Count==0 ? "—"
+                :string.Join(", ",npc.RewardCards.Select(id=>entries.TryGetValue(id,out var entry) ? entry.Name:id.ToString())))
+                +"\n"+localization.Get("TriadNpcs.Beaten")+" : "+localization.Get(beaten==true ? "TriadNpcs.Yes":beaten==false ? "TriadNpcs.No":"TriadNpcs.Unknown")
+                +"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
         }
     }
 

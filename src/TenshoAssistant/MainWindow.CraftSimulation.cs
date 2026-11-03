@@ -5,6 +5,11 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Craft simulator page: recipe chosen from the item sheet (expert, level-scaled, specialist and required-quality recipes refused),
+// attributes typed or copied from the current job, the action sequence (Action / CraftAction sheets), « Simulate » on click
+// (Craft/CraftSimulation.cs, 100 actions at most), step table, condition range, macro export as text pages and the copy into the game's
+// macros (0.191: Macros/MacroWriter writes on the framework thread on the player's click; chained pages become the Macro chain plan,
+// 0.196), presets and the bounded search (MainWindow.CraftSolver.cs).
 internal sealed partial class MainWindow
 {
     private RecipeDefinition? simulationRecipe;
@@ -17,23 +22,32 @@ internal sealed partial class MainWindow
     private string? simulationError;
     private CraftSimulationResult? macroExportSimulation;
     private CraftMacroExport? craftMacroExport;
-    private int craftMacroExtraWait;
     private TenshoAssistant.Macros.MacroWriter? macroWriter;
     internal void ConfigureMacroWriter(TenshoAssistant.Macros.MacroWriter writer)=>macroWriter=writer;
     private string? macroChainApplied;
+    // 0.330: what « Start the macro chain » may run. The click remembers the character and the page texts it sends; only a « Done »
+    // result whose plan is saved turns them into the written chain, any other result (Writing, NoRoom, Failed, failed save) clears it.
+    private (ulong Owner,string[] Texts)? requestedChain;
+    private (ulong Owner,string[] Texts,List<TenshoAssistant.Macros.MacroSlot> Plan)? writtenChain;
     // After a chained copy (0.196): the written slots become the Macro Chain plan once, then a button starts the chain.
     private void ApplyWrittenChain()
     {
-        if(configuration.MacroCopy is not { Chain:true } || macroWriter?.Result is not { } written || written==macroChainApplied)return;
-        var parts=written.Split(':');
-        if(parts is not ["Done",_,_,var bookText,var list] || !uint.TryParse(bookText,out var book))return;
+        if(macroWriter?.Result is not { } written || written==macroChainApplied)return;
         macroChainApplied=written;
+        // 0.330 review: a copy made with « Chain pages » off is consumed here and never becomes the saved chain plan later.
+        if(configuration.MacroCopy is not { Chain:true }){writtenChain=null;return;}
+        var parts=written.Split(':');
+        if(parts is not ["Done",_,_,var bookText,var list] || !uint.TryParse(bookText,out var book)){writtenChain=null;return;}
         var slots=list.Split(',').Select(uint.Parse).ToArray();
         var plan=slots.Select((index,page)=>new TenshoAssistant.Macros.MacroSlot(book,index,TenshoAssistant.Macros.MacroSlotPlan.Name(configuration.MacroCopy.Prefix,page+1,slots.Length))).ToList();
         var previous=configuration.MacroChainPlan;
         configuration.MacroChainPlan=plan;
-        try{save();macroPlanLoaded=false;macroChain.RequestRefresh();}
-        catch(Exception error){configuration.MacroChainPlan=previous;log.Warning(error,"Macro chain plan could not be saved.");}
+        try
+        {
+            save();macroPlanLoaded=false;macroChain.RequestRefresh();
+            writtenChain=requestedChain is { } request && request.Texts.Length==slots.Length ? (request.Owner,request.Texts,plan):null;
+        }
+        catch(Exception error){configuration.MacroChainPlan=previous;writtenChain=null;log.Warning(error,"Macro chain plan could not be saved.");}
     }
     // 0.191: write the pages into the game's macros, inside the range set in Settings (as Craftimizer does); 0.192: also in the craft log panel.
     private void DrawMacroToGame(IReadOnlyList<CraftMacroPage> pages,bool small)
@@ -43,13 +57,19 @@ internal sealed partial class MainWindow
         // Narrow craft log panel (0.195): short label, the range in the tooltip; the prediction wraps.
         var label=(small ? localization.Get("CraftMacro.ToGameShort"):localization.Get("CraftMacro.ToGame")+$" ({where})")+"##MacroToGame";
         if((small ? ImGui.SmallButton(label):ImGui.Button(label)) && macroWriter is not null)
+        {
+            requestedChain=(macroChain.State.CharacterId,pages.Select(page=>page.Text).ToArray());writtenChain=null;macroChainApplied=null;
             macroWriter.Request(pages.Select(page=>page.Lines).ToArray(),copy);
+        }
         if(ImGui.IsItemHovered())WrappedTooltip(where+"\n"+localization.Get(copy.OverwriteAny ? "CraftMacro.ToGameAny":"CraftMacro.ToGameSafe"));
         // 0.194: prediction before the click, same rule as the copy, from the slot states copied each second.
         ApplyWrittenChain();
-        if(copy.Chain && macroChainApplied is not null && (configuration.MacroChainPlan?.Count ?? 0)>0)
+        // 0.330: only under the very pages of the last chained copy, for the character it wrote to, while the saved plan is still the one
+        // that copy wrote (another recipe, a later failed copy or a plan saved on the Macro sequences page hides it).
+        if(copy.Chain && writtenChain is { } chain && chain.Owner!=0 && chain.Owner==macroChain.State.CharacterId
+            && ReferenceEquals(configuration.MacroChainPlan,chain.Plan) && pages.Select(page=>page.Text).SequenceEqual(chain.Texts))
         {
-            if(ImGui.SmallButton(localization.Get("CraftMacro.StartChain")+"##MacroChainStart"))macroChain.RequestStart(configuration.MacroChainPlan!);
+            if(ImGui.SmallButton(localization.Get("CraftMacro.StartChain")+"##MacroChainStart"))macroChain.RequestStart(chain.Plan);
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftMacro.StartChainHelp"));
         }
         if(macroWriter?.SlotsOf(copy.Book) is { } states)
@@ -66,7 +86,6 @@ internal sealed partial class MainWindow
         }
         else ImGui.TextDisabled(localization.Get("CraftMacro.WillUnknown"));
     }
-    private bool craftMacroEcho=true;
     private string? craftMacroError;
     private void OpenCraftSimulation(RecipeDefinition recipe)
     {
@@ -77,7 +96,7 @@ internal sealed partial class MainWindow
             simulationLevel=100; simulationManipulation=false;
             craftSolveTarget=recipe.Simulation?.Quality ?? 0;
         }
-        simulationRecipe=recipe; SelectItem(recipe.ResultItemId); page=Page.CraftSimulation;
+        simulationRecipe=recipe; SelectItem(recipe.ResultItemId); page=Page.CraftSimulation; focusCraftPage=CraftPageTab.Simulation;
     }
     private void ValidateCraftCopy()
     {
@@ -86,18 +105,44 @@ internal sealed partial class MainWindow
         simulationLevel=1; simulationResult=null; simulationManipulation=false;
         simulationError=localization.Get("SimulationHelp.Changed");
     }
+    private enum CraftPageTab { None, Simulation, Preparation }
+    private CraftPageTab focusCraftPage;
     private void DrawCraftSimulation()
     {
         Heading(localization.Get("CraftSimulation.Title"),localization.Get("CraftSimulation.Description"));
         if(ImGui.SmallButton(localization.Get("CraftSimulation.Live"))) page=Page.CraftLive;
-        if(ImGui.SmallButton(localization.Get("CraftSimulation.Notebook"))) { page=Page.Items; focusCraftTab=true; }
+        // 0.424 (user report): « Back to the item » — the recipe's item sheet, Craft tab.
+        if(ImGui.SmallButton(localization.Get("CraftSimulation.Notebook"))) { if(simulationRecipe is { } shown)SelectItem(shown.ResultItemId); page=Page.Items; focusCraftTab=true; }
+        // 0.423 (user report): with no recipe chosen, the item in context's own recipe (its first one) is taken, on Preparation.
+        if(simulationRecipe is null && itemId>0 && recipeCatalog.State.Catalog?.ForResult((uint)itemId) is { Count:>0 } own)OpenCraftPreparation(PreferredRecipe(own));
         if(simulationRecipe is not { } recipe) { ImGui.TextWrapped(localization.Get("CraftSimulation.ChooseRecipe")); return; }
         var resultItem=itemCatalog.State.Catalog?.Find(recipe.ResultItemId);
         DrawItemIcon(resultItem,new Vector2(36)); ImGui.SameLine();
         ImGui.TextColored(Accent,localization.Format("SimulationHelp.Recipe",resultItem?.Name ?? localization.Format("BankUi.Item",recipe.ResultItemId),recipe.CraftType,recipe.Level));
         if(developerMode)ImGui.TextDisabled($"ID {recipe.RecipeId}");
+        // 0.405 (user request): this recipe in the game's crafting log.
+        if(ImGui.SmallButton(localization.Get("GameLogs.Recipe")))OpenGameRecipe(recipe);
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GameLogs.RecipeTip"));
+        // A-12 (0.427): level, Craftsmanship and Control against the recipe; the job's gear set on click.
+        DrawCraftReadiness(recipe);
+        // 0.408 (user request): the full preparation (quantities, cost, sub-recipe chain) is a tab of this page; the item sheet keeps
+        // a short view with a link here.
+        var preparation=false;
+        if(ImGui.BeginTabBar("CraftPageTabs"))
+        {
+            try
+            {
+                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.SimulationTab")+"###CraftSimulationTab",focusCraftPage==CraftPageTab.Simulation ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None))
+                    ImGui.EndTabItem();
+                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.PreparationTab")+"###CraftPreparationTab",focusCraftPage==CraftPageTab.Preparation ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None))
+                { preparation=true; ImGui.EndTabItem(); }
+            }
+            finally { ImGui.EndTabBar(); }
+        }
+        focusCraftPage=CraftPageTab.None;
+        if(preparation) { DrawCraftPlan(recipe); return; }
         if(CraftSimulation.Unsupported(recipe) is { } unsupported) { ImGui.TextWrapped(CraftMessage(unsupported)); return; }
-        if(craftActions.State.Catalog is not { } catalog) { ImGui.TextWrapped(craftActions.State.Error ?? localization.Get("SimulationHelp.Loading")); return; }
+        if(craftActions.State.Catalog is not { } catalog) { if(craftActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Craft"); else ImGui.TextWrapped(localization.Get("SimulationHelp.Loading")); return; }
         DrawCraftPresetSave();
         var p=recipe.Simulation!; var job=recipe.CraftTypeId+8;
         if(p.Collectable)ImGui.TextColored(Accent,localization.Get("SimulationHelp.Collectable"));
@@ -118,18 +163,22 @@ internal sealed partial class MainWindow
         finally { ImGui.EndDisabled(); }
         if(simulationCopiedAt is { } copiedAt) ImGui.TextDisabled(localization.Format("SimulationHelp.Copied",copiedAt.ToLocalTime().ToString("T")));
         var changed=false;
-        if(ImGui.CollapsingHeader(localization.Get("CraftSimulation.Attributes")+"###SimulationAttributes",ImGuiTreeNodeFlags.DefaultOpen))
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftSimulation.Attributes")+"###SimulationAttributes",ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Level")+"###SimLevel",ref simulationLevel,0);
-            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Craftsmanship")+"###SimCraftsmanship",ref simulationCs,0);
-            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Control")+"###SimControl",ref simulationControl,0);
-            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Cp")+"###SimCp",ref simulationCp,0);
-            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Format("CraftSimulation.StartingQuality",p.MaxStartingQuality)+"###SimQuality",ref simulationQuality,0);
-            changed|=ImGui.Checkbox(localization.Get("CraftSimulation.Manipulation")+"###SimManipulation",ref simulationManipulation);
+            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Level")+"###SimLevel",ref simulationLevel,0); Tip("CraftSimulation.LevelTip");
+            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Craftsmanship")+"###SimCraftsmanship",ref simulationCs,0); Tip("CraftSimulation.CraftsmanshipTip");
+            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Control")+"###SimControl",ref simulationControl,0); Tip("CraftSimulation.ControlTip");
+            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Cp")+"###SimCp",ref simulationCp,0); Tip("CraftSimulation.CpTip");
+            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Format("CraftSimulation.StartingQuality",p.MaxStartingQuality)+"###SimQuality",ref simulationQuality,0); Tip("CraftSimulation.StartingQualityTip");
+            changed|=ImGui.Checkbox(localization.Get("CraftSimulation.Manipulation")+"###SimManipulation",ref simulationManipulation); Tip("CraftSimulation.ManipulationTip");
+            // A-02 (0.420): food and medicine added to the attributes.
+            if(DrawCraftConsumables()){simulationResult=null;simulationError=null;}
         }
         if(changed) { simulationCopiedOwner=0; simulationCopiedAt=null; simulationResult=null; simulationError=null; }
         DrawCraftSearch();
-        if(ImGui.CollapsingHeader(localization.Get("CraftSimulation.AddAction")+"###SimAddAction",ImGuiTreeNodeFlags.DefaultOpen))
+        // A-08 (0.425): a pasted macro as the sequence.
+        DrawCraftMacroImport(catalog,job);
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftSimulation.AddAction")+"###SimAddAction",ImGuiTreeNodeFlags.DefaultOpen))
         {
             var columns=Math.Max(1,(int)(ImGui.GetContentRegionAvail().X/175));
             if(ImGui.BeginTable("CraftActionPalette",columns,ImGuiTableFlags.SizingStretchSame))
@@ -165,7 +214,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         if(ImGui.Button(localization.Get("CraftSequence.Simulate")))
         {
-            try { simulationResult=CraftSimulation.Run(recipe,new(simulationLevel,simulationCs,simulationControl,simulationCp,simulationManipulation),simulationQuality,simulationActions); simulationError=null; }
+            try { simulationResult=CraftSimulation.Run(recipe,EffectiveCraftStats(),simulationQuality,simulationActions); simulationError=null; }
             catch(ArgumentException error)
             {
                 simulationResult=null;
@@ -217,16 +266,18 @@ internal sealed partial class MainWindow
     private void DrawCraftMacroExport(CraftSimulationResult result,uint job,CraftActionCatalog catalog)
     {
         if(!ReferenceEquals(macroExportSimulation,result)) { craftMacroExport=null; craftMacroError=null; macroExportSimulation=result; }
-        if(!ImGui.CollapsingHeader(localization.Get("CraftMacro.Title")+"###CraftMacroExport")) return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftMacro.Title")+"###CraftMacroExport")) return;
         ImGui.TextWrapped(localization.Get("CraftMacro.Help"));
         DrawToolSettingsLink("CraftMacroExport");
         ImGui.TextDisabled(localization.Format("CraftMacro.Options",craftMacroExtraWait,localization.Get(craftMacroEcho ? "CraftMacro.Yes":"CraftMacro.No")));
+        // A-10 (0.422): Macro Chain loaded and pages chained: they end with its /nextmacro.
+        if(configuration.MacroCopy?.Chain==true && MacroChainLoaded?.Invoke()==true)ImGui.TextDisabled(localization.Get("CraftMacro.MacroChain"));
         ImGui.BeginDisabled(result.Final.Finish!=CraftFinish.Completed || result.Error is not null);
         try
         {
             if(ImGui.Button(localization.Get("CraftMacro.Prepare")))
             {
-                try { craftMacroExport=CraftMacroExporter.Build(result,job,catalog,craftMacroExtraWait,craftMacroEcho,configuration.MacroCopy?.Chain==true); craftMacroError=null; }
+                try { craftMacroExport=CraftMacroExporter.Build(result,job,catalog,craftMacroExtraWait,craftMacroEcho,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true); craftMacroError=null; }
                 catch(ArgumentException error) { craftMacroExport=null; craftMacroError="CraftMacro.Failed"; log.Warning(error,"Could not export craft macros."); }
             }
         }
@@ -242,7 +293,7 @@ internal sealed partial class MainWindow
             ImGui.PushID(block.Number);
             try
             {
-                if(ImGui.CollapsingHeader(localization.Format("CraftMacro.Block",block.Number,export.Pages.Count,block.Lines.Count)+"###MacroBlock",ImGuiTreeNodeFlags.DefaultOpen))
+                if(TenshoAssistant.UI.UiComponents.Header(localization.Format("CraftMacro.Block",block.Number,export.Pages.Count,block.Lines.Count)+"###MacroBlock",ImGuiTreeNodeFlags.DefaultOpen))
                 {
                     if(ImGui.SmallButton(localization.Get("CraftMacro.Copy"))) ImGui.SetClipboardText(block.Text);
                     foreach(var line in block.Lines) ImGui.TextUnformatted(line);

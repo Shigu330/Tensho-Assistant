@@ -22,7 +22,10 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
 
 ## À chaque version livrée
 
-1. Incrémenter `<Version>` dans `src/TenshoAssistant/TenshoAssistant.csproj` (seule source de version ; `TenshoAssistant.json` ne contient
+1. Incrémenter `<Version>` dans `src/TenshoAssistant/TenshoAssistant.csproj` selon la règle de numérotation (DEC-024) :
+   **X**.y.z = grandes étapes, sur décision de l'utilisateur seulement (1.0.0 = première publication sur le dépôt Dalamud) ;
+   x.**Y**.0 = nos versions (utilisateur et agent : l'agent monte ce nombre et remet le troisième à 0) ;
+   x.y.**Z** = versions de la communauté (contributions extérieures). Seule source de version ; `TenshoAssistant.json` ne contient
    ni version ni InternalName ni DalamudApiLevel : DalamudPackager les remplit, `Verify.ps1` le contrôle).
 2. `.\scripts\Verify.ps1` vert (0 avertissement, 0 erreur) — ne jamais demander un essai en jeu avant, et donner la version de DLL produite.
 3. Ajouter l'entrée en tête de [CHANGELOG.md](CHANGELOG.md) (demande, cause, correction, preuves, résultat de Verify, « non validé en jeu »),
@@ -32,7 +35,8 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
    `.\scripts\Verify.ps1 -Release` (Devloppement fusionnée dans main, tag `Stable-x.y.z`, release GitHub avec `latest.zip`, `repo.json`) ; `-DryRun` pour voir
    les commandes. L'agent ne lance pas ces options sans demande explicite (voir CONTRIBUTING.md « Versions and releases »).
 6. Toute preuve citée par le code (sonde, extrait de journal) va dans `docs/evidence/` et est référencée par ce chemin.
-   `checkpoints/` est un dossier local de travail, ignoré par git (les anciennes archives `.zip` n'y sont plus utiles).
+   `checkpoints/` est un dossier local de travail, ignoré par git. Demande utilisateur (2026-11-02) : avant toute grosse modification,
+   un zip de sauvegarde des fichiers du dépôt (sans bin/obj) y est créé (`backup-<horodatage>-<contexte>.zip`).
 
 ## Compte rendu (consignes utilisateur)
 

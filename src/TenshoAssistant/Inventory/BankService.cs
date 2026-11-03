@@ -27,14 +27,37 @@ public sealed class InventoryBankService : IDisposable
     public Task Completion => completion.Task;
     public BankState State => Volatile.Read(ref state);
 
+    /// <summary>0.345 (g, I-03): erases every saved storage of one character (the « Erase this character » button); queued like an import.</summary>
+    public Task<BankImportResult> EraseCharacterAsync(ulong character)
+    {
+        lock (gate)
+        {
+            if (disposed) return Rejected("The bank is stopped.");
+            if (state.Loading) return Rejected("The bank is still loading.");
+            if (loadFailed) return Rejected("Bank loading failed; nothing is changed to protect the file.");
+            if (pending is not null) return Rejected("An import is already running.");
+            if (character == 0) return Rejected("Unknown character.");
+            var request = new ImportRequest(null, character);
+            pending = request;
+            Publish(new(state.Entries, false, true, null));
+            if (!requests.Writer.TryWrite(request))
+            {
+                pending = null;
+                Publish(new(state.Entries, false, false, state.Error));
+                request.Result.TrySetResult(new(false, "The save service is unavailable."));
+            }
+            return request.Result.Task;
+        }
+    }
+
     public Task<BankImportResult> ImportAsync(BankEntry entry)
     {
         lock (gate)
         {
-            if (disposed) return Rejected("La banque est arrêtée.");
-            if (state.Loading) return Rejected("La banque est encore en cours de chargement.");
-            if (loadFailed) return Rejected("Le chargement de la banque a échoué ; les imports sont bloqués pour préserver le fichier.");
-            if (pending is not null) return Rejected("Un import est déjà en cours.");
+            if (disposed) return Rejected("The bank is stopped.");
+            if (state.Loading) return Rejected("The bank is still loading.");
+            if (loadFailed) return Rejected("Bank loading failed; imports are blocked to protect the file.");
+            if (pending is not null) return Rejected("An import is already running.");
             try { BankEntryValidator.Validate(entry); }
             catch (ArgumentException ex) { return Rejected(ex.Message); }
 
@@ -45,7 +68,7 @@ public sealed class InventoryBankService : IDisposable
             {
                 pending = null;
                 Publish(new(state.Entries, false, false, state.Error));
-                request.Result.TrySetResult(new(false, "Le service de sauvegarde est indisponible."));
+                request.Result.TrySetResult(new(false, "The save service is unavailable."));
             }
             return request.Result.Task;
         }
@@ -72,7 +95,7 @@ public sealed class InventoryBankService : IDisposable
                 {
                     if (disposed) return;
                     loadFailed = true;
-                    Publish(new(state.Entries, false, false, $"Impossible de charger la banque : {ex.Message}"));
+                    Publish(new(state.Entries, false, false, $"The bank could not be loaded: {ex.Message}"));
                     ready.TrySetResult();
                 }
             }
@@ -83,17 +106,18 @@ public sealed class InventoryBankService : IDisposable
                 lock (gate)
                 {
                     if (disposed) return;
-                    next = state.Entries.Where(e => e.Key != request.Entry.Key).Append(request.Entry).ToArray();
+                    next = request.Erase != 0 ? state.Entries.Where(e => e.Key.CharacterId != request.Erase).ToArray()
+                        : state.Entries.Where(e => e.Key != request.Entry!.Key).Append(request.Entry!).ToArray();
                 }
                 string? error = null;
                 try { store.Save(Array.AsReadOnly(next)); }
-                catch (Exception ex) { error = $"Échec de sauvegarde de la banque : {ex.Message}"; }
+                catch (Exception ex) { error = $"Bank save failed: {ex.Message}"; }
                 lock (gate)
                 {
                     if (disposed) return;
                     Publish(new(error is null ? next : state.Entries, false, false, state.Error));
                     pending = null;
-                    request.Result.TrySetResult(new(error is null, error ?? "Import sauvegardé dans la banque."));
+                    request.Result.TrySetResult(new(error is null, error ?? (request.Erase != 0 ? "Character erased." : "Import saved in the bank.")));
                 }
             }
         }
@@ -104,8 +128,8 @@ public sealed class InventoryBankService : IDisposable
                 if (!disposed)
                 {
                     loadFailed = true;
-                    Publish(new(state.Entries, false, false, $"Service de banque arrêté : {ex.Message}"));
-                    pending?.Result.TrySetResult(new(false, $"Service de banque arrêté : {ex.Message}"));
+                    Publish(new(state.Entries, false, false, $"Bank service stopped: {ex.Message}"));
+                    pending?.Result.TrySetResult(new(false, $"Bank service stopped: {ex.Message}"));
                     pending = null;
                 }
             }
@@ -139,7 +163,7 @@ public sealed class InventoryBankService : IDisposable
             if (disposed) return;
             disposed = true;
             requests.Writer.TryComplete();
-            pending?.Result.TrySetResult(new(false, "Banque arrêtée ; import annulé."));
+            pending?.Result.TrySetResult(new(false, "Bank stopped; import cancelled."));
             pending = null;
             Publish(new(state.Entries, false, false, state.Error));
             ready.TrySetResult();
@@ -147,7 +171,8 @@ public sealed class InventoryBankService : IDisposable
         }
     }
 
-    private sealed record ImportRequest(BankEntry Entry)
+    // 0.345 (g, I-03): Erase != 0 = erase every entry of that character (its file is deleted by the store) instead of importing Entry.
+    private sealed record ImportRequest(BankEntry? Entry, ulong Erase = 0)
     {
         public TaskCompletionSource<BankImportResult> Result { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
     }

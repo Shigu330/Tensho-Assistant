@@ -1,0 +1,31 @@
+# AirshipUnlock (airship sectors), embedded by Tensho Assistant (DEC-023, point 3, 0.336). Values kept as published.
+# Source: LuminaSupplemental, src/LuminaSupplemental.Excel/Generated/AirshipUnlock.csv, commit bd265c2b39868387937ae5b0c038593af997e0f9
+#   https://github.com/Critical-Impact/LuminaSupplemental — original file SHA-256 3e0391634238058496fae2af400ebd3817d259fa65f642d5001658c926287e50
+# Licence: GNU General Public License v3.0 (GPL-3.0), Copyright (C) Critical-Impact and LuminaSupplemental contributors.
+# This file is distributed under the same licence as Tensho Assistant (GPL-3.0); full licence text: LICENSE at the root of the repository.
+# There is no warranty, to the extent permitted by law (GPL-3.0 sections 15 and 16).
+AirshipExplorationPointId,AirshipExplorationPointUnlockId,SurveillanceRequired,RankRequired
+0,0,0,1
+1,0,0,1
+2,0,0,4
+3,1,0,7
+4,1,0,10
+5,4,0,14
+6,4,0,17
+7,6,0,20
+8,7,0,24
+9,6,0,27
+10,5,0,30
+11,9,0,34
+12,10,0,37
+13,10,0,40
+14,12,0,44
+15,11,0,47
+16,15,90,50
+17,16,90,50
+18,14,90,50
+19,18,90,50
+20,19,90,50
+21,19,0,50
+23,18,0,50
+24,20,0,50

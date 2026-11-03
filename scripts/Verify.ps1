@@ -1,13 +1,18 @@
 ﻿param(
     [string]$DotNet,
-    # After a green run (0.219): -Commit commits and pushes Devloppement; -Release publishes Stable, the tag, the GitHub release and repo.json.
+    # After a green run (0.219): -Commit commits and pushes Devloppement; -Release merges Devloppement into main, tags Stable-x.y.z,
+    # creates the GitHub release with latest.zip, then publishes main (which carries repo.json).
     [switch]$Commit,
     [switch]$Release,
     [switch]$DryRun,
     # Re-run everything even when this exact source state already passed (see the stamp below).
-    [switch]$Force
+    [switch]$Force,
+    # 0.323: contributors without the game: builds the test project only (pure logic, no Dalamud), runs the tests and the language
+    # validation, skips the plugin build and the package. Not enough for a release.
+    [switch]$TestsOnly
 )
 $ErrorActionPreference = 'Stop'
+if ($TestsOnly -and ($Commit -or $Release)) { throw '-TestsOnly checks the logic only: it cannot be combined with -Commit or -Release.' }
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $taskRoot = Split-Path -Parent $PSScriptRoot
 if (-not $DotNet) {
@@ -20,10 +25,20 @@ if (-not $DotNet) {
 }
 # Stamp of the last green run (0.219): version + SHA-256 of every git-tracked or new file except *.md, docs/ and repo.json. When nothing
 # changed since that run (e.g. -Commit then -Release) and the DLL is still there, the build/tests/package checks are not run again.
+# 0.323: the Dalamud version (Dalamud.dll in DALAMUD_HOME, else XIVLauncher's dev hooks) and the SDK version are part of the stamp, so
+# an update of either runs every check again.
+function Get-TaskEnvironment {
+    $dalamudHome = if ($env:DALAMUD_HOME) { $env:DALAMUD_HOME } else { Join-Path $env:APPDATA 'XIVLauncher\addon\Hooks\dev' }
+    $dalamud = Join-Path $dalamudHome 'Dalamud.dll'
+    $dalamudVersion = if (Test-Path -LiteralPath $dalamud) { (Get-Item -LiteralPath $dalamud).VersionInfo.FileVersion } else { 'none' }
+    $sdk = try { (& $DotNet --version 2>$null | Select-Object -First 1) } catch { 'unknown' }
+    return "dalamud=$dalamudVersion;sdk=$sdk"
+}
 function Get-TaskFingerprint {
     $files = & git -C $taskRoot ls-files -co --exclude-standard | Where-Object { $_ -notmatch '(\.md$|^docs/|^repo\.json$)' } | Sort-Object
     $hasher = [Security.Cryptography.SHA256]::Create()
     try {
+        $environment = [Text.Encoding]::UTF8.GetBytes((Get-TaskEnvironment) + "`n"); [void]$hasher.TransformBlock($environment, 0, $environment.Length, $null, 0)
         foreach ($file in $files) {
             $path = Join-Path $taskRoot $file
             if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { continue }
@@ -37,10 +52,29 @@ function Get-TaskFingerprint {
 }
 $taskStampFile = Join-Path $taskRoot 'artifacts\verify-stamp.json'
 $taskVersionNow = ([xml](Get-Content -Raw -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\TenshoAssistant.csproj'))).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
-# -Release of a version already published: stop before building anything (scripts/Release.ps1 checks it again).
-if ($Release -and ((& git -C $taskRoot tag --list "Stable-$taskVersionNow") -or (& git -C $taskRoot ls-remote --tags origin "refs/tags/Stable-$taskVersionNow"))) {
-    Write-Host "Version $taskVersionNow is already released (tag Stable-$taskVersionNow): raise <Version> and the CHANGELOG entry for a new release." -ForegroundColor Yellow
-    exit 2
+# -Release when the tag already exists: not stopped here (0.326). Release.ps1 stops if the release is complete (GitHub release and
+# main), and otherwise resumes the missing steps of a release stopped halfway.
+if ($Release -and (& git -C $taskRoot tag --list "Stable-$taskVersionNow")) {
+    Write-Host "Tag Stable-$taskVersionNow exists: Release.ps1 will stop if that release is complete, or resume its missing steps." -ForegroundColor Yellow
+}
+# 0.323: the CHANGELOG entry is checked here too (Release.ps1 still stops on it): a warning while working, before -Commit refuses it.
+$taskChangelog = Get-Content -LiteralPath (Join-Path $taskRoot 'CHANGELOG.md') -Encoding UTF8
+$taskTopEntry = $taskChangelog | Where-Object { $_ -match '^## (\d+\.\d+\.\d+)\s*$' } | Select-Object -First 1
+if ($taskTopEntry -ne "## $taskVersionNow") { Write-Host "WARNING: the top entry of CHANGELOG.md is '$taskTopEntry', not '## $taskVersionNow' (-Commit will refuse it)." -ForegroundColor Yellow }
+if ($TestsOnly) {
+    Push-Location $taskRoot
+    try {
+        & $DotNet build tests/TenshoAssistant.Tests -c Release --nologo
+        if ($LASTEXITCODE -ne 0) { throw 'Test project build failed.' }
+        & $DotNet run --project tests/TenshoAssistant.Tests -c Release --no-build
+        if ($LASTEXITCODE -ne 0) { throw 'Managed tests failed.' }
+        $taskLanguages = & $DotNet run --project tests/TenshoAssistant.Tests -c Release --no-build -- --validate-localization src/TenshoAssistant/Localization/Languages
+        if ($LASTEXITCODE -ne 0) { $taskLanguages | ForEach-Object { Write-Host "$_" }; throw 'Localization validation failed.' }
+        Write-Output 'PASS localization metadata, duplicate keys and format compatibility (partial translations allowed)'
+        Write-Output "TESTS ONLY ${taskVersionNow}: the plugin was not built nor packaged (that needs Dalamud: run Verify.ps1 without -TestsOnly)."
+    }
+    finally { Pop-Location }
+    exit 0
 }
 $taskFingerprint = Get-TaskFingerprint
 $taskSkip = $false
@@ -56,8 +90,9 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Release build failed.' }
     & $DotNet run --project tests/TenshoAssistant.Tests -c Release --no-build
     if ($LASTEXITCODE -ne 0) { throw 'Managed tests failed.' }
-    & $DotNet run --project tests/TenshoAssistant.Tests -c Release --no-build -- --validate-localization src/TenshoAssistant/Localization/Languages | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw 'Localization validation failed.' }
+    # 0.323: the validator's report (MISSING / UNKNOWN keys) is shown when it fails; it was always discarded.
+    $taskLanguages = & $DotNet run --project tests/TenshoAssistant.Tests -c Release --no-build -- --validate-localization src/TenshoAssistant/Localization/Languages
+    if ($LASTEXITCODE -ne 0) { $taskLanguages | ForEach-Object { Write-Host "$_" }; throw 'Localization validation failed.' }
     Write-Output 'PASS localization metadata, duplicate keys and format compatibility (partial translations allowed)'
     $taskOutput = Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release'
     $taskManifest = Get-Content -Raw -LiteralPath (Join-Path $taskOutput 'TenshoAssistant.json') | ConvertFrom-Json
@@ -85,17 +120,9 @@ try {
             $taskCanonicalHash = (Get-FileHash -LiteralPath (Join-Path $taskOutput $taskExpected) -Algorithm SHA256).Hash
             if ($taskZipHash -ne $taskCanonicalHash) { throw "Package entry differs from canonical x64 Release output: $taskExpected" }
         }
-        $taskLanguageSource = Join-Path $taskRoot 'src\TenshoAssistant\Localization\Languages'
-        foreach ($taskLanguageFile in Get-ChildItem -LiteralPath $taskLanguageSource -Filter '*.json' -File) {
-            $taskLanguageEntry = 'Localization/Languages/' + $taskLanguageFile.Name
-            $taskLanguageMatches = @($taskZip.Entries | Where-Object { $_.FullName.Replace('\', '/') -ceq $taskLanguageEntry })
-            if ($taskLanguageMatches.Count -ne 1) { throw "Missing or duplicate language package entry: $taskLanguageEntry" }
-            $taskLanguageStream = $taskLanguageMatches[0].Open()
-            $taskLanguageHasher = [Security.Cryptography.SHA256]::Create()
-            try { $taskLanguageHash = [BitConverter]::ToString($taskLanguageHasher.ComputeHash($taskLanguageStream)).Replace('-', '') }
-            finally { $taskLanguageHasher.Dispose(); $taskLanguageStream.Dispose() }
-            $taskLanguageSourceHash = (Get-FileHash -LiteralPath $taskLanguageFile.FullName -Algorithm SHA256).Hash
-            if ($taskLanguageHash -ne $taskLanguageSourceHash) { throw "Packaged language differs from source: $taskLanguageEntry" }
+        # 0.248: the languages are embedded in the DLL only; no language file may ship beside it.
+        if (@($taskEntries | Where-Object { $_.Replace([char]92, [char]47) -like 'Localization/*' }).Count) {
+            throw 'Language files must be embedded in TenshoAssistant.dll, not shipped in the package.'
         }
         if (@($taskEntries | Where-Object { $_ -match '(^|/)(Dalamud|FFXIVClientStructs|Lumina|Dalamud.Bindings.ImGui)\.dll$' }).Count) {
             throw 'Host assemblies must not be redistributed in the plugin package.'

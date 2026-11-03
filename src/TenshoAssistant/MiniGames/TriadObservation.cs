@@ -64,7 +64,7 @@ public sealed class TriadObservedFrame
             BoardRects = context.BoardRects is { Count: 9 } boardRects && boardRects.All(rect => rect.Valid) ? Array.AsReadOnly(boardRects.ToArray()) : null,
         };
         ArgumentNullException.ThrowIfNull(blue); ArgumentNullException.ThrowIfNull(red); ArgumentNullException.ThrowIfNull(board);
-        if (blue.Count != 5 || red.Count != 5 || board.Count != 9) throw new ArgumentException("Observation Triple Triade incomplète.");
+        if (blue.Count != 5 || red.Count != 5 || board.Count != 9) throw new ArgumentException("Incomplete Triple Triad observation.");
         NativePhase = phase;
         BlueHand = Array.AsReadOnly(blue.Select(TriadObservedCard.Copy).ToArray());
         RedHand = Array.AsReadOnly(red.Select(TriadObservedCard.Copy).ToArray());

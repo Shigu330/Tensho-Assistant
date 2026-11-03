@@ -3,11 +3,14 @@ using Dalamud.Bindings.ImGui;
 
 namespace TenshoAssistant;
 
+// Macro observation section of the Diagnostics page: read-only trace of the game's running macro (current line, lock, wait time,
+// copied from RaptureShellModule by Macros/MacroObservationReader.Dalamud.cs), last 10 rows shown, full trace copied to the
+// clipboard. Off by default (opt-in observation). Very short macros can fall between two reads: no row is not proof of absence.
 internal sealed partial class MainWindow
 {
     private void DrawMacroObservation()
     {
-        if (!ImGui.CollapsingHeader(localization.Get("MacroObserverUi.Title"))) return;
+        if (!TenshoAssistant.UI.UiComponents.Header(localization.Get("MacroObserverUi.Title"))) return;
         var state = macroObservations.State;
         DrawToolSettingsLink("MacroObservation");
         ImGui.TextDisabled(state.Enabled ? localization.Get("MacroObserverUi.Enabled"):localization.Get("MacroObserverUi.Disabled"));

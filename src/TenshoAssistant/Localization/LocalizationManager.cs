@@ -53,6 +53,9 @@ internal sealed class LocalizationManager
     public string Get(string key)
         => ShowKeys ? key : selected.GetValueOrDefault(key) ?? english.GetValueOrDefault(key) ?? $"[{key}]";
 
+    /// <summary>Whether a text exists for this key in the chosen language or in English (for optional texts with a fallback).</summary>
+    public bool Has(string key) => selected.ContainsKey(key) || english.ContainsKey(key);
+
     public string Format(string key, params object[] args)
     {
         try { return string.Format(System.Globalization.CultureInfo.InvariantCulture, Get(key), args); }

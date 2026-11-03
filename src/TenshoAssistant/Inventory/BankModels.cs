@@ -1,6 +1,9 @@
 namespace TenshoAssistant.Inventory;
 
-public enum BankStorageKind { Retainer, Saddlebag, PremiumSaddlebag, Armoury, GlamourDresser, Armoire }
+// 0.345 (g, I-03): Bags, Crystals and Currency added last (saved as numbers: existing files keep their kinds). They are the character's
+// own bags, crystals and currencies, recorded so the other characters' can be seen; the logged-in character shows its live ones.
+// 0.350 (g, I-09): FreeCompanyChest added last; recorded per character who opened it (the chest belongs to the company).
+public enum BankStorageKind { Retainer, Saddlebag, PremiumSaddlebag, Armoury, GlamourDresser, Armoire, Bags, Crystals, Currency, FreeCompanyChest }
 public readonly record struct BankKey(ulong CharacterId, BankStorageKind Kind, ulong StorageId);
 public sealed record BankEntry(BankKey Key, string Name, InventorySnapshot Snapshot);
 
@@ -12,6 +15,16 @@ public static class BankStorageScope
     // Armoury chest (0.235): main hand, off hand, head, body, hands, legs, feet, ears, neck, wrists, rings, soul crystals (InventoryType ids;
     // the old waist container 3204 is left out).
     private static readonly IReadOnlyList<int> Armoury = Array.AsReadOnly(new[] { 3500, 3200, 3201, 3202, 3203, 3205, 3206, 3207, 3208, 3209, 3300, 3400 });
+    private static readonly IReadOnlyList<int> Bags = Array.AsReadOnly(new[] { 0, 1, 2, 3 });
+    private static readonly IReadOnlyList<int> Crystals = Array.AsReadOnly(new[] { 2001 });
+    private static readonly IReadOnlyList<int> Currency = Array.AsReadOnly(new[] { 2000 });
+    // 0.350 (g, I-09): the five pages of the company chest, its gil and its crystals (InventoryType 20000–20004, 22000, 22001).
+    private static readonly IReadOnlyList<int> FreeCompany = Array.AsReadOnly(new[] { 20000, 20001, 20002, 20003, 20004, 22000, 22001 });
+
+    /// <summary>0.345: the character's own bags, crystals and currencies (recorded for the overview of every character).</summary>
+    public static bool IsCharacterOwn(BankStorageKind kind) => kind is BankStorageKind.Bags or BankStorageKind.Crystals or BankStorageKind.Currency;
+    /// <summary>0.345: storages the sort preview can arrange (the game sorts these; a list of what may be sorted, not of what may not).</summary>
+    public static bool Sortable(BankStorageKind kind) => kind is BankStorageKind.Retainer or BankStorageKind.Saddlebag or BankStorageKind.PremiumSaddlebag;
 
     public static IReadOnlyList<int> ContainerIds(BankStorageKind kind) => kind switch
     {
@@ -22,6 +35,10 @@ public static class BankStorageScope
         // Glamour dresser and armoire (0.236): one virtual container each (not game InventoryType ids), filled from MirageManager and Cabinet.
         BankStorageKind.GlamourDresser => [25000],
         BankStorageKind.Armoire => [25001],
+        BankStorageKind.Bags => Bags,
+        BankStorageKind.Crystals => Crystals,
+        BankStorageKind.Currency => Currency,
+        BankStorageKind.FreeCompanyChest => FreeCompany,
         _ => throw new ArgumentOutOfRangeException(nameof(kind)),
     };
 }

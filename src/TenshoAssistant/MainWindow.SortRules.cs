@@ -4,6 +4,11 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Sort rule editor of the Inventory organization page, one draft per storage scope: ordered sort criteria (name, game category,
+// quantity, quality, item / equip level, rarity, sell price, item id; each reversible), then zones — named slot ranges filled by
+// items, categories, equipment slots, traits, rarity, quality and level / price ranges, or « protected » (left exactly as in the
+// game) — plus reusable templates (MainWindow.SortTemplates.cs). Saved per character and storage in the configuration's sort
+// profiles; editing never sorts.
 internal sealed partial class MainWindow
 {
     private InventorySortProfile? sortRulesDraft;
@@ -54,10 +59,12 @@ internal sealed partial class MainWindow
                     }
                     finally{ImGui.EndCombo();}
                 }
+                Tip("SortUi.SortFieldTip");
                 ImGui.SameLine();if(ImGui.Checkbox(localization.Get("SortUi.Descending"),ref descending))criteriaChanged=true;
+                Tip("SortUi.DescendingTip");
                 criteria[index]=new((InventorySortField)sortField,descending);
                 ImGui.SameLine();
-                if(index>0 && ImGui.SmallButton(localization.Get("SortUi.MoveUp"))){(criteria[index-1],criteria[index])=(criteria[index],criteria[index-1]);criteriaChanged=true;}
+                if(index>0){if(ImGui.SmallButton(localization.Get("SortUi.MoveUp"))){(criteria[index-1],criteria[index])=(criteria[index],criteria[index-1]);criteriaChanged=true;}Tip("SortUi.MoveUpTip");}
                 ImGui.SameLine();
                 if(criteria.Count>1 && ImGui.SmallButton(localization.Get("SortUi.Remove"))){criteria.RemoveAt(index);criteriaChanged=true;break;}
             }
@@ -67,7 +74,7 @@ internal sealed partial class MainWindow
         {criteria.Add(new(Enum.GetValues<InventorySortField>().First(value=>!criteria.Any(c=>c.Field==value))));criteriaChanged=true;}
         if(criteriaChanged){draft=draft with{Criteria=Array.AsReadOnly(criteria.ToArray())};sortRulesError=null;}
 
-        if(ImGui.CollapsingHeader(localization.Format("SortUi.Zones",draft.Zones.Count)+"###SortZones"))
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Format("SortUi.Zones",draft.Zones.Count)+"###SortZones"))
         {
             ImGui.TextWrapped(localization.Get("SortUi.ZonesHelp"));
             var zones=draft.Zones.ToList();var changed=false;
@@ -85,18 +92,19 @@ internal sealed partial class MainWindow
                         var itemLevelMin=zone.ItemLevelMin;var itemLevelMax=zone.ItemLevelMax;var equipLevelMin=zone.EquipLevelMin;var equipLevelMax=zone.EquipLevelMax;
                         var sellMin=(int)Math.Min(zone.SellPriceMin,int.MaxValue);var sellMax=(int)Math.Min(zone.SellPriceMax,int.MaxValue);var rarity=zone.Rarity;
                         var traits=new[]{(int)zone.Unique,(int)zone.Untradable,(int)zone.Dyeable,(int)zone.Repairable,(int)zone.Collectable};
-                        changed|=ImGui.InputText(localization.Get("SortUi.ZoneName"),ref name,80);
-                        ImGui.SetNextItemWidth(100);changed|=ImGui.InputInt(localization.Get("SortUi.FirstSlot"),ref start);
-                        ImGui.SetNextItemWidth(100);changed|=ImGui.InputInt(localization.Get("SortUi.SlotCount"),ref count);
+                        changed|=ImGui.InputText(localization.Get("SortUi.ZoneName"),ref name,80);Tip("SortUi.ZoneNameTip");
+                        ImGui.SetNextItemWidth(100);changed|=ImGui.InputInt(localization.Get("SortUi.FirstSlot"),ref start);Tip("SortUi.FirstSlotTip");
+                        ImGui.SetNextItemWidth(100);changed|=ImGui.InputInt(localization.Get("SortUi.SlotCount"),ref count);Tip("SortUi.SlotCountTip");
                         var preserve=zone.Preserve;var reverse=zone.ReverseFill;var share=zone.ShareUnused;
                         var marketable=(int)zone.Marketable;var potentialHq=(int)zone.CanBeHq;var equipment=zone.Equipment;
                         if(ImGui.Checkbox(localization.Get("SortUi.Protect"),ref preserve)){changed=true;if(preserve){reverse=false;share=false;}}
+                        Tip("SortUi.ProtectHelp");
                         if(preserve)ImGui.TextWrapped(localization.Get("SortUi.ProtectHelp"));
                         ImGui.BeginDisabled(preserve);
                         try
                         {
-                            changed|=ImGui.Checkbox(localization.Get("SortUi.ShareUnused"),ref share);
-                            changed|=ImGui.Checkbox(localization.Get("SortUi.Reverse"),ref reverse);
+                            changed|=ImGui.Checkbox(localization.Get("SortUi.ShareUnused"),ref share);Tip("SortUi.ShareUnusedTip");
+                            changed|=ImGui.Checkbox(localization.Get("SortUi.Reverse"),ref reverse);Tip("SortUi.ReverseTip");
                             var categories=InventorySortRules.Categories(zone);
                             ImGui.TextUnformatted(localization.Get("SortUi.Categories"));
                             if(categories.Count==0)ImGui.TextDisabled(localization.Get("SortUi.AllCategories"));
@@ -113,13 +121,14 @@ internal sealed partial class MainWindow
                             if(categories.Count<InventorySortRules.MaxZoneCategories)
                             {
                                 ImGui.SetNextItemWidth(250);
-                                if(ImGui.BeginCombo("##AddCategory",localization.Get("SortUi.AddCategory")))
+                                var addCategory=ImGui.BeginCombo("##AddCategory",localization.Get("SortUi.AddCategory"));Tip("SortUi.AddCategoryTip");
+                                if(addCategory)
                                 {
                                     try
                                     {
                                         if(ImGui.IsWindowAppearing()){sortCategoryFilter="";ImGui.SetKeyboardFocusHere();}
                                         ImGui.SetNextItemWidth(-1);
-                                        ImGui.InputTextWithHint("##CategoryFilter",localization.Get("SortUi.CategoryFilterHint"),ref sortCategoryFilter,64);
+                                        ImGui.InputTextWithHint("##CategoryFilter",localization.Get("SortUi.CategoryFilterHint"),ref sortCategoryFilter,64);Tip("SortUi.CategoryFilterTip");
                                         var filter=sortCategoryFilter.Trim();var shown=0;
                                         foreach(var value in catalog.Categories.Where(value=>!categories.Contains(value.Id)
                                             && (filter.Length==0 || System.Globalization.CultureInfo.InvariantCulture.CompareInfo.IndexOf(value.Name,filter,
@@ -133,21 +142,22 @@ internal sealed partial class MainWindow
                                     finally{ImGui.EndCombo();}
                                 }
                             }
-                            ImGui.SetNextItemWidth(170);changed|=ImGui.Combo(localization.Get("SortUi.Quality"),ref quality,localization.Get("SortUi.QualityChoices"));
+                            ImGui.SetNextItemWidth(170);changed|=ImGui.Combo(localization.Get("SortUi.Quality"),ref quality,localization.Get("SortUi.QualityChoices"));Tip("SortUi.QualityTip");
                             ImGui.TextUnformatted(localization.Get("SortUi.Items"));
                             if(itemIds is not { Count:>0 })ImGui.TextDisabled(localization.Get("SortUi.NoItems"));
                             else if(DrawSortChips(itemIds.Select(id=>(id,localization.Format("SortUi.ItemChip",catalog.Find(id)?.Name ?? localization.Format("BankUi.Item",id),id))).ToArray()).Removed is { } removedItem)
                             {itemIds=SortIds(itemIds.Where(id=>id!=removedItem));changed=true;}
-                            changed|=ImGui.InputTextWithHint("##ZoneQuery",localization.Get("SortUi.QueryHint"),ref query,128);
+                            changed|=ImGui.InputTextWithHint("##ZoneQuery",localization.Get("SortUi.QueryHint"),ref query,128);Tip("SortUi.SelectionHelp");
                             ImGui.TextDisabled(localization.Get("SortUi.SelectionHelp"));
-                            ImGui.SetNextItemWidth(170);changed|=ImGui.Combo(localization.Get("SortUi.Marketable"),ref marketable,localization.Get("SortUi.BooleanChoices"));
-                            ImGui.SetNextItemWidth(170);changed|=ImGui.Combo(localization.Get("SortUi.CanHq"),ref potentialHq,localization.Get("SortUi.BooleanChoices"));
+                            ImGui.SetNextItemWidth(170);changed|=ImGui.Combo(localization.Get("SortUi.Marketable"),ref marketable,localization.Get("SortUi.BooleanChoices"));Tip("SortUi.PropertyFilterTip");
+                            ImGui.SetNextItemWidth(170);changed|=ImGui.Combo(localization.Get("SortUi.CanHq"),ref potentialHq,localization.Get("SortUi.BooleanChoices"));Tip("SortUi.PropertyFilterTip");
                             ImGui.SetNextItemWidth(250);
                             if(ImGui.BeginCombo(localization.Get("SortUi.Equipment"),localization.Get("SortUi."+(SortEquipmentChoices.FirstOrDefault(value=>value.Mask==equipment).Name ?? "MultipleSlots"))))
                             {
                                 try{foreach(var value in SortEquipmentChoices)if(ImGui.Selectable(localization.Get("SortUi."+value.Name),equipment==value.Mask)){equipment=value.Mask;changed=true;}}
                                 finally{ImGui.EndCombo();}
                             }
+                            Tip("SortUi.EquipmentTip");
                             if(ImGui.TreeNode(localization.Get("SortUi.Advanced")+"###Advanced"))
                             {
                                 try
@@ -158,8 +168,9 @@ internal sealed partial class MainWindow
                                     var rarityIndex=Math.Max(0,InventorySortRules.Rarities.ToList().IndexOf(rarity));
                                     ImGui.SetNextItemWidth(170);
                                     if(ImGui.Combo(localization.Get("SortUi.RarityFilter"),ref rarityIndex,localization.Get("SortUi.RarityChoices"))){rarity=InventorySortRules.Rarities[rarityIndex];changed=true;}
+                                    Tip("SortUi.RarityFilterTip");
                                     for(var trait=0;trait<traits.Length;trait++)
-                                    {ImGui.SetNextItemWidth(170);changed|=ImGui.Combo(localization.Get("SortUi."+SortTraitLabels[trait])+$"##Trait{trait}",ref traits[trait],localization.Get("SortUi.BooleanChoices"));}
+                                    {ImGui.SetNextItemWidth(170);changed|=ImGui.Combo(localization.Get("SortUi."+SortTraitLabels[trait])+$"##Trait{trait}",ref traits[trait],localization.Get("SortUi.BooleanChoices"));Tip("SortUi.PropertyFilterTip");}
                                     ImGui.TextDisabled(localization.Get("SortUi.AdvancedHelp"));
                                 }
                                 finally{ImGui.TreePop();}
@@ -172,7 +183,7 @@ internal sealed partial class MainWindow
                             ItemLevelMin=itemLevelMin,ItemLevelMax=itemLevelMax,EquipLevelMin=equipLevelMin,EquipLevelMax=equipLevelMax,SellPriceMin=(uint)sellMin,SellPriceMax=(uint)sellMax,Rarity=rarity,
                             Unique=(InventoryPropertyFilter)traits[0],Untradable=(InventoryPropertyFilter)traits[1],Dyeable=(InventoryPropertyFilter)traits[2],
                             Repairable=(InventoryPropertyFilter)traits[3],Collectable=(InventoryPropertyFilter)traits[4]};
-                        if(index>0 && ImGui.SmallButton(localization.Get("SortUi.Priority"))){(zones[index-1],zones[index])=(zones[index],zones[index-1]);changed=true;}
+                        if(index>0){if(ImGui.SmallButton(localization.Get("SortUi.Priority"))){(zones[index-1],zones[index])=(zones[index],zones[index-1]);changed=true;}Tip("SortUi.PriorityTip");}
                         ImGui.SameLine();if(ImGui.SmallButton(localization.Get("SortUi.DeleteZone"))){zones.RemoveAt(index);changed=true;break;}
                     }
                     finally{ImGui.TreePop();}
@@ -217,9 +228,9 @@ internal sealed partial class MainWindow
         try
         {
             var changed=false;
-            ImGui.SetNextItemWidth(90);changed|=ImGui.InputInt("##Min",ref min,0);
+            ImGui.SetNextItemWidth(90);changed|=ImGui.InputInt("##Min",ref min,0);Tip("MarketBoard.MinHelp");
             ImGui.SameLine();ImGui.TextUnformatted("–");ImGui.SameLine();
-            ImGui.SetNextItemWidth(90);changed|=ImGui.InputInt("##Max",ref max,0);
+            ImGui.SetNextItemWidth(90);changed|=ImGui.InputInt("##Max",ref max,0);Tip("MarketBoard.MaxHelp");
             ImGui.SameLine();ImGui.TextUnformatted(localization.Get(key));
             min=Math.Clamp(min,0,limit);max=Math.Clamp(max,0,limit);
             return changed;
@@ -231,7 +242,7 @@ internal sealed partial class MainWindow
     {var values=ids.Distinct().ToArray();return values.Length==0 ? null:Array.AsReadOnly(values);}
 
     // Removable labels wrapped on the available width; an ordered list numbers them and offers "<" to raise one.
-    private static (uint? Removed,uint? Raised) DrawSortChips(IReadOnlyList<(uint Id,string Label)> chips,bool ordered=false)
+    private (uint? Removed,uint? Raised) DrawSortChips(IReadOnlyList<(uint Id,string Label)> chips,bool ordered=false)
     {
         uint? removed=null,raised=null;
         var style=ImGui.GetStyle();
@@ -246,9 +257,11 @@ internal sealed partial class MainWindow
             if(raise)
             {
                 if(ImGui.SmallButton($"<##Raise{chips[index].Id}"))raised=chips[index].Id;
+                Tip("SortUi.RaiseChipTip");
                 ImGui.SameLine();
             }
             if(ImGui.SmallButton($"{label}##Chip{chips[index].Id}"))removed=chips[index].Id;
+            Tip("SortUi.RemoveChipTip");
         }
         return (removed,raised);
     }

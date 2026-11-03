@@ -6,6 +6,10 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Weather page (World): forecast of a zone computed from the game's weather rate tables (Gathering/WeatherForecast.cs): the current
+// and next 11 Eorzea periods (8 ET hours each) with local and ET times, a search for the next occurrences of one weather (about
+// three real days ahead), the zone's weather shares, and alarm buttons (Alarms/) for a coming period or weather. Opened from the
+// Maps page, the alarms and the gathering / fishing tools through OpenWeather.
 internal sealed partial class MainWindow
 {
     private uint weatherTerritory;private string weatherZone="";private long weatherPeriod=-1;private WeatherCatalog? weatherViewCatalog;
@@ -21,7 +25,7 @@ internal sealed partial class MainWindow
         if(weather.State.Catalog is not { } catalog)
         {
             ImGui.TextWrapped(localization.Get(weather.State.Error is null ? "WeatherDetails.Loading":"WeatherDetails.Error"));
-            if(developerMode && weather.State.Error is { } error)ImGui.TextWrapped(error);
+            if(developerMode && weather.State.Error is { } error)ImGui.TextWrapped(RawMessage(error));
             DrawAlarmsLink();
             return;
         }
@@ -49,7 +53,7 @@ internal sealed partial class MainWindow
                     else
                     {
                         ImGui.TextWrapped(localization.Get("WeatherDetails.Unknown"));
-                        if(developerMode && entry.UnknownReason is { } reason)ImGui.TextWrapped(reason);
+                        if(developerMode && entry.UnknownReason is { } reason)ImGui.TextWrapped(RawMessage(reason));
                     }
                     ImGui.TableNextColumn();
                     // Single alarm at the start of this period (not for the current one, already started).
@@ -61,7 +65,7 @@ internal sealed partial class MainWindow
             finally{ImGui.EndTable();}
         }
         DrawWeatherSearch(catalog,now);
-        if(catalog.Zone(weatherTerritory) is { } zone && ImGui.CollapsingHeader(localization.Get("WeatherDetails.Coverage")+"###WeatherCoverage"))
+        if(catalog.Zone(weatherTerritory) is { } zone && TenshoAssistant.UI.UiComponents.Header(localization.Get("WeatherDetails.Coverage")+"###WeatherCoverage"))
         {
             var total=zone.Shares.Sum(share=>(long)share.Chance);ImGui.TextUnformatted(localization.Format("WeatherDetails.Rates",total));
             foreach(var share in zone.Shares)ImGui.TextUnformatted($"{catalog.Weather(share.WeatherId)?.Name ?? localization.Get("WeatherDetails.Unknown")} : {share.Chance} %");
@@ -75,10 +79,10 @@ internal sealed partial class MainWindow
     private void DrawWeatherZonePicker(WeatherCatalog catalog)
     {
         ImGui.SetNextItemWidth(260);
-        if(!ImGui.BeginCombo(localization.Get("Weather.Zone")+"##WeatherZone",weatherZone.Length>0 ? weatherZone:localization.Get("Weather.ChooseZone")))return;
+        var open=ImGui.BeginCombo(localization.Get("Weather.Zone")+"##WeatherZone",weatherZone.Length>0 ? weatherZone:localization.Get("Weather.ChooseZone"));Tip("Weather.ZoneTip");if(!open)return;
         try
         {
-            ImGui.SetNextItemWidth(-1);ImGui.InputTextWithHint("##WeatherZoneQuery",localization.Get("Weather.ZoneSearch"),ref weatherZoneQuery,64);
+            ImGui.SetNextItemWidth(-1);ImGui.InputTextWithHint("##WeatherZoneQuery",localization.Get("Weather.ZoneSearch"),ref weatherZoneQuery,64);Tip("Weather.ZoneSearchTip");
             foreach(var map in (maps.State.Catalog?.Entries ?? []).Where(map=>map.TerritoryId!=0 && map.Zone.Length>0 && catalog.Zone(map.TerritoryId) is { RateId:not 0 })
                 .DistinctBy(map=>map.TerritoryId).Where(map=>weatherZoneQuery.Length==0 || map.Zone.Contains(weatherZoneQuery,StringComparison.CurrentCultureIgnoreCase)).Take(200))
                 if(ImGui.Selectable($"{map.Zone}##Zone{map.TerritoryId}",map.TerritoryId==weatherTerritory))OpenWeather(map.TerritoryId,map.Zone);
@@ -89,7 +93,7 @@ internal sealed partial class MainWindow
     // Next occurrences of one weather of the zone (about three real days ahead), with single or daily alarms.
     private void DrawWeatherSearch(WeatherCatalog catalog,DateTimeOffset now)
     {
-        if(catalog.Zone(weatherTerritory) is not { } zone || !ImGui.CollapsingHeader(localization.Get("Weather.SearchTitle")+"###WeatherSearch",ImGuiTreeNodeFlags.DefaultOpen))return;
+        if(catalog.Zone(weatherTerritory) is not { } zone || !TenshoAssistant.UI.UiComponents.Header(localization.Get("Weather.SearchTitle")+"###WeatherSearch",ImGuiTreeNodeFlags.DefaultOpen))return;
         var choices=zone.Shares.Where(share=>share.Chance>0).Select(share=>catalog.Weather(share.WeatherId)).OfType<WeatherDefinition>().DistinctBy(row=>row.Id).ToArray();
         if(choices.Length==0){ImGui.TextDisabled(localization.Get("WeatherDetails.Unknown"));return;}
         ImGui.SetNextItemWidth(200);
@@ -98,6 +102,7 @@ internal sealed partial class MainWindow
             try{foreach(var choice in choices)if(ImGui.Selectable($"{choice.Name}##W{choice.Id}",choice.Id==weatherSearchId))weatherSearchId=choice.Id;}
             finally{ImGui.EndCombo();}
         }
+        Tip("Weather.SearchWeatherTip");
         if(weatherSearchId==0 || catalog.Weather(weatherSearchId) is not { } wanted)return;
         var key=(weatherTerritory,weatherSearchId,now.ToUnixTimeSeconds()/1400);
         if(key!=weatherSearchKey)
@@ -113,13 +118,16 @@ internal sealed partial class MainWindow
         }
         AlarmButton("WeatherDaily",localization.Format("Alarms.WeatherDailyTooltip",wanted.Name),
             ()=>AlarmSchedule.ForWindows($"{wanted.Name} · {weatherZone}",[0,480,960],DefaultAlarmLead,weatherTerritory,0,[wanted.Id])
-                .Select(created=>{created.Group=$"{wanted.Name} · {weatherZone}";created.IconId=wanted.Icon;return created;}).ToArray());
+                .Select(created=>{created.Group=$"{wanted.Name} · {weatherZone}";created.IconId=wanted.Icon;return created;}).ToArray(),daily:true);
         ImGui.SameLine();ImGui.TextUnformatted(localization.Format("Weather.EveryTime",wanted.Name));
         if(weatherSearchResult.Count==0)ImGui.TextDisabled(localization.Get("Weather.NotSoon"));
         foreach(var entry in weatherSearchResult)
         {
-            AlarmButton($"Search{entry.StartsAt.ToUnixTimeSeconds()}",localization.Format("Alarms.PeriodTooltip",wanted.Name,entry.StartsAt.ToLocalTime().ToString("g")),
-                ()=>[new TenshoAlarm{Label=$"{wanted.Name} · {weatherZone}",Group=$"{wanted.Name} · {weatherZone}",IconId=wanted.Icon,Repeat=AlarmRepeat.Once,At=entry.StartsAt,LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead),TerritoryId=weatherTerritory}]);
+            // 0.330: no bell for a period already started (a single alarm in the past never rings), as in the forecast table; its space keeps the list aligned.
+            if(entry.StartsAt>now)
+                AlarmButton($"Search{entry.StartsAt.ToUnixTimeSeconds()}",localization.Format("Alarms.PeriodTooltip",wanted.Name,entry.StartsAt.ToLocalTime().ToString("g")),
+                    ()=>[new TenshoAlarm{Label=$"{wanted.Name} · {weatherZone}",Group=$"{wanted.Name} · {weatherZone}",IconId=wanted.Icon,Repeat=AlarmRepeat.Once,At=entry.StartsAt,LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead),TerritoryId=weatherTerritory}]);
+            else AlarmButtonSpace();
             ImGui.SameLine();
             ImGui.TextUnformatted(localization.Format("Weather.Occurrence",entry.StartsAt.ToLocalTime().ToString("g"),entry.EndsAt.ToLocalTime().ToString("t"),$"{entry.EtHour:00}–{(entry.EtHour+8)%24:00}",
                 Math.Max(0,(int)(entry.StartsAt-now).TotalMinutes)));

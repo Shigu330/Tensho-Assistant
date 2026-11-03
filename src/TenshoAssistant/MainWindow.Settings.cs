@@ -3,6 +3,11 @@ using TenshoAssistant.Inventory;
 
 namespace TenshoAssistant;
 
+// Settings page, in tabs: General (window opening, header clocks), Interface (language, theme, item hover parts, context menu),
+// Modules (per-tool options and the opt-in game observations), Map (MainWindow.MapView.cs settings, per-map icon list), Data (Duty
+// Finder loot, character panel, automatic storage capture, cache durations, links to saved profiles), Advanced
+// (MainWindow.Advanced.cs) and, in developer mode, Debug (translation keys and language report). Every change is saved at once
+// and rolled back if the save fails.
 internal sealed partial class MainWindow
 {
     private string? requestedSettingsTab;
@@ -45,40 +50,22 @@ internal sealed partial class MainWindow
     private void DrawGeneralSettings()
     {
         ImGui.TextColored(Accent, localization.Get("Settings.Window"));
-        var openOnLoad = configuration.OpenOnLoad;
-        var openOnLogin = configuration.OpenOnLogin;
-        var loadChanged = ImGui.Checkbox(localization.Get("Settings.OpenOnLoad"), ref openOnLoad);
-        Tip("Settings.OpenOnLoadHelp");
+        // 0.324: shared setting rows (tooltip and « ↺ »).
+        BoolSetting("Settings.OpenOnLoad","Settings.OpenOnLoadHelp",()=>configuration.OpenOnLoad,value=>configuration.OpenOnLoad=value,c=>c.OpenOnLoad);
         ImGui.TextDisabled(localization.Get("Settings.OpenOnLoadHelp"));
         ImGui.Spacing();
-        var loginChanged = ImGui.Checkbox(localization.Get("Settings.OpenOnLogin"), ref openOnLogin);
-        Tip("Settings.OpenOnLoginHelp");
+        BoolSetting("Settings.OpenOnLogin","Settings.OpenOnLoginHelp",()=>configuration.OpenOnLogin,value=>configuration.OpenOnLogin=value,c=>c.OpenOnLogin);
         ImGui.TextDisabled(localization.Get("Settings.OpenOnLoginHelp"));
-        if (loadChanged || loginChanged)
-        {
-            var previous = configuration.OpenOnLoad;
-            var previousLogin = configuration.OpenOnLogin;
-            configuration.OpenOnLoad = openOnLoad;
-            configuration.OpenOnLogin = openOnLogin;
-            try
-            {
-                save();
-                saveError = null;
-            }
-            catch (Exception error)
-            {
-                configuration.OpenOnLoad = previous;
-                configuration.OpenOnLogin = previousLogin;
-                saveError = localization.Get("Common.SaveError");
-                log.Error(error, "Could not persist Tensho configuration.");
-            }
-        }
+        ImGui.Spacing();
+        // 0.327 (queue step e): opening page, shared row (tooltip and « ↺ »); turning it on remembers the current page at once.
+        BoolSetting("Settings.OpenOnLastPage","SettingTips.OpenOnLastPage",()=>configuration.OpenOnLastPage,value=>{configuration.OpenOnLastPage=value;rememberedPage=null;RememberPage();},c=>c.OpenOnLastPage);
         ImGui.Spacing(); ImGui.Separator();
         DrawHeaderSettings();
     }
     private void DrawInterfaceSettings()
     {
         ImGui.TextColored(Accent, localization.Get("Settings.Interface"));
+        DrawFontSettings();
         var languageCode = localization.CurrentCode;
         var currentLanguage = localization.AvailableLanguages.FirstOrDefault(language => language.Code == languageCode);
         if (ImGui.BeginCombo(localization.Get("Settings.Language") + "###InterfaceLanguage", string.IsNullOrEmpty(currentLanguage.NativeName) ? languageCode : currentLanguage.NativeName))
@@ -103,71 +90,84 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.EndCombo(); }
         }
+        Tip("SettingTips.Language");
         ImGui.TextDisabled(localization.Format("Localization.LoadedLanguages", localization.AvailableLanguages.Count));
         DrawThemeSetting();
+        BoolSetting("Settings.GameFrames","SettingTips.GameFrames",()=>configuration.GameFrames,value=>configuration.GameFrames=value,c=>c.GameFrames);
         ImGui.TextColored(Accent, localization.Get("Settings.ObjectsMarket"));
         ImGui.TextDisabled(localization.Get("Advanced.MarketMoved"));
-        var hoverUsages=configuration.ItemUsagesOnHover;
-        if(ImGui.Checkbox(localization.Get("Settings.UsageHover"),ref hoverUsages))
-        {
-            var previous=configuration.ItemUsagesOnHover;configuration.ItemUsagesOnHover=hoverUsages;
-            try{save();saveError=null;}
-            catch(Exception error){configuration.ItemUsagesOnHover=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save item usage hover preference.");}
-        }
-        Tip("InterfaceHelp.UsageHelp");
+        // 0.324: shared setting rows (tooltip and « ↺ »); monsters on hover read the wiki, so they are greyed while that source is off.
+        BoolSetting("Settings.UsageHover","InterfaceHelp.UsageHelp",()=>configuration.ItemUsagesOnHover,value=>configuration.ItemUsagesOnHover=value,c=>c.ItemUsagesOnHover);
+        ImGui.BeginDisabled(!configuration.ItemUsagesOnHover || !configuration.CommunityWiki);
+        try{BoolSetting("Settings.MonsterHover",configuration.CommunityWiki ? "InterfaceHelp.MonsterHoverHelp":"Advanced.SourceOffTip",()=>configuration.MonsterSourcesOnHover,value=>configuration.MonsterSourcesOnHover=value,c=>c.MonsterSourcesOnHover);}
+        finally{ImGui.EndDisabled();}
+        // e) (audit 2026-11-02): the four parts of the panel under the game's item tooltip, under « item uses » that turns that panel on
+        // (greyed while it is off). Tensho's own item tooltips and the item sheet always show every part.
+        ImGui.Indent();
         ImGui.BeginDisabled(!configuration.ItemUsagesOnHover);
         try
         {
-            var hoverMonsters=configuration.MonsterSourcesOnHover;
-            if(ImGui.Checkbox(localization.Get("Settings.MonsterHover"),ref hoverMonsters))
-            {
-                var previous=configuration.MonsterSourcesOnHover;configuration.MonsterSourcesOnHover=hoverMonsters;
-                try{save();saveError=null;}
-                catch(Exception error){configuration.MonsterSourcesOnHover=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save monster hover preference.");}
-            }
-            Tip("InterfaceHelp.MonsterHoverHelp");
+            BoolSetting("Settings.HoverCollection","Settings.HoverCollectionTip",()=>configuration.HoverShowCollection,value=>configuration.HoverShowCollection=value,c=>c.HoverShowCollection);
+            BoolSetting("Settings.HoverStock","Settings.HoverStockTip",()=>configuration.HoverShowStock,value=>configuration.HoverShowStock=value,c=>c.HoverShowStock);
+            BoolSetting("Settings.HoverUsages","Settings.HoverUsagesTip",()=>configuration.HoverShowUsages,value=>configuration.HoverShowUsages=value,c=>c.HoverShowUsages);
+            BoolSetting("Settings.HoverSources","Settings.HoverSourcesTip",()=>configuration.HoverShowSources,value=>configuration.HoverShowSources=value,c=>c.HoverShowSources);
+            // 0.377 (g, M-07): comparison with the worn piece.
+            BoolSetting("Settings.HoverCompare","Settings.HoverCompareTip",()=>configuration.HoverShowCompare,value=>configuration.HoverShowCompare=value,c=>c.HoverShowCompare);
         }
-        finally{ImGui.EndDisabled();}
-        var itemMenu=configuration.ItemContextMenuEnabled;
-        if(ImGui.Checkbox(localization.Get("Settings.ContextMenu"),ref itemMenu))
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
+        // e) (audit 2026-11-02): the whole panel under the game's item tooltip (prices included) is left out while bound by duty.
+        BoolSetting("Settings.HoverHideInDuty","Settings.HoverHideInDutyTip",()=>configuration.HoverHideInDuty,value=>configuration.HoverHideInDuty=value,c=>c.HoverHideInDuty);
+        BoolSetting("Settings.ContextMenu","InterfaceHelp.MenuHelp",()=>configuration.ItemContextMenuEnabled,value=>configuration.ItemContextMenuEnabled=value,c=>c.ItemContextMenuEnabled);
+        // 0.327 (queue step e): number of item search results, shared row (tooltip and « ↺ »).
+        IntSetting("Settings.ItemSearchLimit","SettingTips.ItemSearchLimit",()=>Configuration.BoundedItemSearchLimit(configuration.ItemSearchLimit),value=>configuration.ItemSearchLimit=value,Configuration.MinimumItemSearchLimit,Configuration.MaximumItemSearchLimit,DefaultConfiguration.ItemSearchLimit);
+        // e) (audit 2026-11-02): scope the Market page opens on; a choice made on that page is saved here too. Plain names: the region
+        // would need the Universalis data centre table, which this page must not ask for.
+        var scopeNow=MarketScopeShown;
+        ImGui.SetNextItemWidth(200);
+        if(ImGui.BeginCombo(localization.Get("Settings.MarketScope")+"###MarketBoardScope",localization.Get("Settings.MarketScope"+scopeNow)))
         {
-            var previous=configuration.ItemContextMenuEnabled;configuration.ItemContextMenuEnabled=itemMenu;
-            try{save();saveError=null;}
-            catch(Exception error){configuration.ItemContextMenuEnabled=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save item context menu preference.");}
+            try
+            {
+                foreach(var scope in Enum.GetValues<TenshoAssistant.Market.MarketScope>())
+                    if(ImGui.Selectable(localization.Get("Settings.MarketScope"+scope),scope==scopeNow) && scope!=configuration.MarketBoardScope)SaveSetting("Settings.MarketScope",()=>configuration.MarketBoardScope,value=>configuration.MarketBoardScope=value,scope);
+            }
+            finally{ImGui.EndCombo();}
         }
-        Tip("InterfaceHelp.MenuHelp");
+        Tip("Settings.MarketScopeTip");
+        if(DefaultButton("MarketBoardScope",configuration.MarketBoardScope!=DefaultConfiguration.MarketBoardScope))
+            SaveSetting("Settings.MarketScope",()=>configuration.MarketBoardScope,value=>configuration.MarketBoardScope=value,DefaultConfiguration.MarketBoardScope);
         ImGui.Spacing(); ImGui.Separator();
     }
     private void DrawModuleSettings()
     {
         ImGui.TextWrapped(localization.Get("Observation.SavedHelp"));
-        if(ImGui.CollapsingHeader(localization.Get("ModuleSettings.Craft"),ImGuiTreeNodeFlags.DefaultOpen))
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ModuleSettings.Craft"),ImGuiTreeNodeFlags.DefaultOpen))
         {
-            var logHelper=configuration.CraftLogHelperEnabled;
-            if(ImGui.Checkbox(localization.Get("ModuleSettings.CraftLog"),ref logHelper))
-            {
-                var previous=configuration.CraftLogHelperEnabled;configuration.CraftLogHelperEnabled=logHelper;
-                try{save();saveError=null;}
-                catch(Exception error){configuration.CraftLogHelperEnabled=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save crafting log helper preference.");}
-            }
+            // 0.321: the checkbox saved the configuration on every frame (its « if » only guarded the tooltip); the shared row saves on click.
+            BoolSetting("ModuleSettings.CraftLog","SettingTips.CraftLog",()=>configuration.CraftLogHelperEnabled,value=>configuration.CraftLogHelperEnabled=value,c=>c.CraftLogHelperEnabled);
             ImGui.TextWrapped(localization.Get("ModuleSettings.CraftLogHelp"));
+            // 0.327 (audit 2026-11-02, queue step e): compute as soon as a recipe is selected (default, as before) or only on request.
+            ImGui.Indent();
+            ImGui.BeginDisabled(!configuration.CraftLogHelperEnabled);
+            try{BoolSetting("ModuleSettings.CraftLogAutoSolve","ModuleSettings.CraftLogAutoSolveTip",()=>configuration.CraftLogAutoSolve,value=>configuration.CraftLogAutoSolve=value,c=>c.CraftLogAutoSolve);}
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
             DrawObservationSetting("Craft", localization.Get("ModuleSettings.ObserveCraft"),craftLive.State.Enabled,craftLive.SetEnabled);
             ImGui.TextWrapped(localization.Get("ModuleSettings.CraftHelp"));
             ImGui.TextColored(Accent,localization.Get("ModuleSettings.Search"));
-            ImGui.SetNextItemWidth(130);
-            if(ImGui.InputInt(localization.Get("ModuleSettings.Steps"),ref craftSolveSteps,0))craftSolveSteps=Math.Clamp(craftSolveSteps,1,100);
-            ImGui.SetNextItemWidth(130);
-            if(ImGui.InputInt(localization.Get("ModuleSettings.Width"),ref craftSolveWidth,0))craftSolveWidth=Math.Clamp(craftSolveWidth,1,512);
-            ImGui.SetNextItemWidth(130);
-            if(ImGui.InputInt(localization.Get("ModuleSettings.Budget"),ref craftSolveBudget,0))craftSolveBudget=Math.Clamp(craftSolveBudget,1,500000);
+            // 0.321 (review 0.316, point 6): saved, with « ↺ »; bounds unchanged.
+            var search=CraftSearchOptions;var searchDefaults=DefaultConfiguration.CraftSearch;
+            IntSetting("ModuleSettings.Steps","SettingTips.Steps",()=>search.Steps,value=>search.Steps=value,1,100,searchDefaults.Steps);
+            IntSetting("ModuleSettings.Width","SettingTips.Width",()=>search.Width,value=>search.Width=value,1,512,searchDefaults.Width);
+            IntSetting("ModuleSettings.Budget","SettingTips.Budget",()=>search.Budget,value=>search.Budget=value,1,500000,searchDefaults.Budget);
             ValidateCraftSearch();
             ImGui.TextDisabled(localization.Get("ModuleSettings.SearchHelp"));
             ImGui.TextColored(Accent,localization.Get("ModuleSettings.Export"));
-            ImGui.SetNextItemWidth(130);
-            var exportChanged=ImGui.InputInt(localization.Get("ModuleSettings.Wait"),ref craftMacroExtraWait,0);
-            if(exportChanged)craftMacroExtraWait=Math.Clamp(craftMacroExtraWait,0,3);
-            exportChanged|=ImGui.Checkbox(localization.Get("ModuleSettings.Echo"),ref craftMacroEcho);
-            if(exportChanged){craftMacroExport=null;craftMacroError=null;}
+            var exportBefore=(search.ExtraWait,search.Echo,search.BuffExtraWait);
+            IntSetting("ModuleSettings.Wait","SettingTips.Wait",()=>search.ExtraWait,value=>search.ExtraWait=value,0,3,searchDefaults.ExtraWait);
+            // X-12 (0.419): the buffs' extra wait apart (shown as the actions' one until changed).
+            IntSetting("ModuleSettings.BuffWait","SettingTips.BuffWait",()=>search.BuffExtraWait ?? search.ExtraWait,value=>search.BuffExtraWait=value,0,3,searchDefaults.ExtraWait);
+            BoolSetting("ModuleSettings.Echo","SettingTips.Echo",()=>configuration.CraftSearch.Echo,value=>configuration.CraftSearch.Echo=value,c=>c.CraftSearch.Echo);
+            if(exportBefore!=(search.ExtraWait,search.Echo,search.BuffExtraWait)){craftMacroExport=null;craftMacroError=null;}
             ImGui.TextDisabled(localization.Get("ModuleSettings.ExportHelp"));
             // Game macros used by « Copy into the game's macros » (0.191).
             var copy=configuration.MacroCopy ??= new();
@@ -183,11 +183,24 @@ internal sealed partial class MainWindow
                 }
                 finally{ImGui.EndCombo();}
             }
+            Tip("SettingTips.MacroBook");
+            var macroDefaults=DefaultConfiguration.MacroCopy;
+            if(DefaultButton("MacroBook",book!=macroDefaults.Book)){book=macroDefaults.Book;copyChanged=true;}
             ImGui.SetNextItemWidth(100);copyChanged|=ImGui.InputInt(localization.Get("ModuleSettings.MacroStart"),ref start,0);
+            Tip("SettingTips.MacroStart");
+            if(DefaultButton("MacroStart",start!=macroDefaults.Start)){start=macroDefaults.Start;if(end<start)end=macroDefaults.End;copyChanged=true;}
             ImGui.SetNextItemWidth(100);copyChanged|=ImGui.InputInt(localization.Get("ModuleSettings.MacroEnd"),ref end,0);
+            Tip("SettingTips.MacroEnd");
+            if(DefaultButton("MacroEnd",end!=macroDefaults.End)){end=macroDefaults.End;if(start>end)start=macroDefaults.Start;copyChanged=true;}
             ImGui.SetNextItemWidth(160);copyChanged|=ImGui.InputText(localization.Get("ModuleSettings.MacroPrefix"),ref prefix,12);
+            Tip("SettingTips.MacroPrefix");
+            if(DefaultButton("MacroPrefix",prefix!=macroDefaults.Prefix)){prefix=macroDefaults.Prefix;copyChanged=true;}
             copyChanged|=ImGui.Checkbox(localization.Get("ModuleSettings.MacroOverwrite"),ref any);
+            Tip("SettingTips.MacroOverwrite");
+            if(DefaultButton("MacroOverwrite",any!=macroDefaults.OverwriteAny)){any=macroDefaults.OverwriteAny;copyChanged=true;}
             if(ImGui.Checkbox(localization.Get("ModuleSettings.MacroChain"),ref chain)){copyChanged=true;craftMacroExport=null;}
+            Tip("SettingTips.MacroChain");
+            if(DefaultButton("MacroChain",chain!=macroDefaults.Chain)){chain=macroDefaults.Chain;copyChanged=true;craftMacroExport=null;}
             if(copyChanged)
             {
                 start=Math.Clamp(start,0,99);end=Math.Clamp(end,start,99);
@@ -197,15 +210,27 @@ internal sealed partial class MainWindow
             }
             ImGui.TextDisabled(localization.Get("ModuleSettings.MacroCopyHelp"));
         }
-        if(ImGui.CollapsingHeader(localization.Get("Alarms.SettingsTitle"),ImGuiTreeNodeFlags.DefaultOpen))DrawAlarmSettings();
-        if(ImGui.CollapsingHeader(localization.Get("ModuleSettings.Gathering"),ImGuiTreeNodeFlags.DefaultOpen))
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("Alarms.SettingsTitle"),ImGuiTreeNodeFlags.DefaultOpen))DrawAlarmSettings();
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ModuleSettings.Gathering"),ImGuiTreeNodeFlags.DefaultOpen))
         {
-            DrawObservationSetting("Gathering", localization.Get("ModuleSettings.ObserveGathering"),gatheringObservation.State.Enabled,gatheringObservation.SetEnabled);
-            BoolSetting("FishingPanel.Setting","FishingPanel.SettingTip",()=>configuration.FishingPanel,value=>configuration.FishingPanel=value);
-            BoolSetting("GatheringPanel.Setting","GatheringPanel.SettingTip",()=>configuration.GatheringPanel,value=>{configuration.GatheringPanel=value;if(value)gatheringObservation.SetEnabled(true);});
+            // 0.330 (audit): the gathering help needs the node observation, both rows go through SaveGatheringChoice. « Observe » shows the
+            // reader's state, on by default through the help (rule applied at load).
+            if(ObservationRow("Gathering",localization.Get("ModuleSettings.ObserveGathering"),gatheringObservation.State.Enabled,GatheringObservationWanted(DefaultConfiguration),"ModuleSettings.ObserveGatheringTip") is { } observe)
+                SaveGatheringChoice(observe,observe ? null:false);
+            BoolSetting("FishingPanel.Setting","FishingPanel.SettingTip",()=>configuration.FishingPanel,value=>configuration.FishingPanel=value,c=>c.FishingPanel);
+            // 0.399 (user request): « Go there » teleports at once.
+            BoolSetting("GatheringDetails.GoThereSetting","GatheringDetails.GoThereSettingTip",()=>configuration.GoThereTeleport,value=>configuration.GoThereTeleport=value,c=>c.GoThereTeleport);
+            // 0.412 (g, R-10): « Go there » also wears the job's gear set.
+            BoolSetting("GatheringDetails.GoThereEquipSetting","GatheringDetails.GoThereEquipSettingTip",()=>configuration.GoThereEquip,value=>configuration.GoThereEquip=value,c=>c.GoThereEquip);
+            var gatheringPanel=configuration.GatheringPanel;
+            if(ImGui.Checkbox(localization.Get("GatheringPanel.Setting")+"###GatheringPanel.Setting",ref gatheringPanel))SaveGatheringChoice(gatheringPanel ? true:null,gatheringPanel);
+            Tip("GatheringPanel.SettingTip");
+            if(BoolDefaultButton("GatheringPanel.Setting",DefaultConfiguration.GatheringPanel,configuration.GatheringPanel))
+                SaveGatheringChoice(DefaultConfiguration.GatheringPanel ? true:null,DefaultConfiguration.GatheringPanel);
             ImGui.TextWrapped(localization.Get("ModuleSettings.GatheringHelp"));
         }
-        if(ImGui.CollapsingHeader(localization.Get("ModuleSettings.Games"),ImGuiTreeNodeFlags.DefaultOpen))
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("Gear.Title"),ImGuiTreeNodeFlags.DefaultOpen))DrawGearSettings();
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ModuleSettings.Games"),ImGuiTreeNodeFlags.DefaultOpen))
         {
             DrawObservationSetting("Cactpot", localization.Get("ModuleSettings.ObserveCactpot"),cactpotObservation.State.Enabled,enabled=>
             {
@@ -213,9 +238,19 @@ internal sealed partial class MainWindow
                 Array.Clear(cactpotBoard);cactpotObservedOwner=0;InvalidateCactpot();
             });
             DrawObservationSetting("Triad", localization.Get("ModuleSettings.ObserveTriad"),triadObservation.State.Enabled,triadObservation.SetEnabled);
+            // 0.327 (audit 2026-11-02, queue step e): one switch per in-game aid, all on as before; they act only while the observation is on.
+            ImGui.Indent();
+            ImGui.BeginDisabled(!triadObservation.State.Enabled);
+            try
+            {
+                BoolSetting("ModuleSettings.TriadMatchOverlay","ModuleSettings.TriadMatchOverlayTip",()=>configuration.TriadMatchOverlay,value=>configuration.TriadMatchOverlay=value,c=>c.TriadMatchOverlay);
+                BoolSetting("ModuleSettings.TriadChallengePanel","ModuleSettings.TriadChallengePanelTip",()=>configuration.TriadChallengePanel,value=>configuration.TriadChallengePanel=value,c=>c.TriadChallengePanel);
+                BoolSetting("ModuleSettings.TriadDeckEditor","ModuleSettings.TriadDeckEditorTip",()=>configuration.TriadDeckEditorHighlight,value=>configuration.TriadDeckEditorHighlight=value,c=>c.TriadDeckEditorHighlight);
+            }
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
             ImGui.TextWrapped(localization.Get("ModuleSettings.GamesHelp"));
         }
-        if(ImGui.CollapsingHeader(localization.Get("ModuleSettings.Macros"),ImGuiTreeNodeFlags.DefaultOpen))
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ModuleSettings.Macros"),ImGuiTreeNodeFlags.DefaultOpen))
         {
             DrawObservationSetting("Macros", localization.Get("ModuleSettings.ObserveMacros"),macroObservations.State.Enabled,macroObservations.SetEnabled);
             ImGui.TextWrapped(localization.Get("ModuleSettings.MacroHelp"));
@@ -223,43 +258,26 @@ internal sealed partial class MainWindow
     }
     private void DrawDataSettings()
     {
-        var finder=configuration.ShowDutyFinderLoot;
-        var finderChanged=ImGui.Checkbox(localization.Get("DutyFinder.Setting"),ref finder);Tip("Advanced.DutyFinderTip");
-        if(finderChanged)
-        {
-            configuration.ShowDutyFinderLoot=finder;
-            try{save();}catch(Exception error){configuration.ShowDutyFinderLoot=!finder;log.Warning(error,"Duty finder setting could not be saved.");}
-        }
-        var panel=configuration.ShowCharacterPanel;
-        var panelChanged=ImGui.Checkbox(localization.Get("CharacterStats.Setting"),ref panel);Tip("Advanced.CharacterPanelTip");
-        if(panelChanged)
-        {
-            configuration.ShowCharacterPanel=panel;
-            try{save();}catch(Exception error){configuration.ShowCharacterPanel=!panel;log.Warning(error,"Character panel setting could not be saved.");}
-        }
-        var auto=configuration.AutoBankCapture;
-        var autoChanged=ImGui.Checkbox(localization.Get("BankUi.AutoSetting"),ref auto);Tip("BankUi.AutoSettingHelp");
-        if(autoChanged)
-        {
-            configuration.AutoBankCapture=auto;
-            try{save();}catch(Exception error){configuration.AutoBankCapture=!auto;log.Warning(error,"Bank capture setting could not be saved.");}
-        }
+        // 0.324: shared setting rows (tooltip and « ↺ »).
+        BoolSetting("DutyFinder.Setting","Advanced.DutyFinderTip",()=>configuration.ShowDutyFinderLoot,value=>configuration.ShowDutyFinderLoot=value,c=>c.ShowDutyFinderLoot);
+        BoolSetting("CharacterStats.Setting","Advanced.CharacterPanelTip",()=>configuration.ShowCharacterPanel,value=>configuration.ShowCharacterPanel=value,c=>c.ShowCharacterPanel);
+        BoolSetting("BankUi.AutoSetting","BankUi.AutoSettingHelp",()=>configuration.AutoBankCapture,value=>configuration.AutoBankCapture=value,c=>c.AutoBankCapture);
         ImGui.TextDisabled(localization.Get("BankUi.AutoSettingHelp"));
         DrawCacheSettings();
-        if(ImGui.CollapsingHeader(localization.Get("ModuleSettings.Profiles")))
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ModuleSettings.Profiles")))
         {
             ImGui.TextWrapped(localization.Get("ModuleSettings.ProfilesHelp"));
             if(ImGui.Button(localization.Get("ModuleSettings.SortProfiles")))page=Page.SortPreview;
             if(ImGui.Button(localization.Get("ModuleSettings.Presets")))page=Page.CraftPresets;
             if(ImGui.Button(localization.Get("ModuleSettings.Bookmarks")))page=Page.Maps;
-            if(ImGui.Button(localization.Get("ModuleSettings.Deck")))page=Page.TripleTriad;
+            if(ImGui.Button(localization.Get("ModuleSettings.Deck")))OpenTriadTab("Deck");
             if(ImGui.Button(localization.Get("ModuleSettings.Quests")))page=Page.Quests;
             if(ImGui.Button(localization.Get("ModuleSettings.MacroSequence")))page=Page.MacroChain;
         }
     }
     private void DrawDeveloperSettings()
     {
-        if (developerMode && ImGui.CollapsingHeader(localization.Get("Settings.DebugLocalization") + "###LocalizationDebug"))
+        if (developerMode && TenshoAssistant.UI.UiComponents.Header(localization.Get("Settings.DebugLocalization") + "###LocalizationDebug"))
         {
             var showKeys = localization.ShowKeys;
             if (ImGui.Checkbox(localization.Get("Developer.ShowKeys") + "###ShowTranslationKeys", ref showKeys)) localization.ShowKeys = showKeys;
@@ -279,14 +297,13 @@ internal sealed partial class MainWindow
         ImGui.Spacing(); ImGui.Separator();
     }
 
+    // 0.330 (audit): « ↺ » like every setting row; the default is the one applied at load (Plugin.cs), off for these observations.
     private void DrawObservationSetting(string id,string label,bool enabled,Action<bool> apply)
     {
-        var clicked=ImGui.Checkbox(label+"###Observe"+id,ref enabled);
-        Tip("Advanced.ObservationTip");
-        if(!clicked)return;
+        if(ObservationRow(id,label,enabled,false,"Advanced.ObservationTip") is not { } value)return;
         configuration.Observations ??= new();
         var hadPrevious=configuration.Observations.TryGetValue(id,out var previous);
-        configuration.Observations[id]=enabled;
+        configuration.Observations[id]=value;
         try { save();saveError=null; }
         catch(Exception error)
         {
@@ -296,8 +313,41 @@ internal sealed partial class MainWindow
             log.Warning(error,"Could not save observation preference {Observation}",id);
             return;
         }
-        apply(enabled);
+        apply(value);
     }
+
+    /// <summary>An observation checkbox with its tooltip and « ↺ »; the value to save when it is ticked, unticked or reset, else null.</summary>
+    private bool? ObservationRow(string id,string label,bool enabled,bool fallback,string tipKey)
+    {
+        var clicked=ImGui.Checkbox(label+"###Observe"+id,ref enabled);
+        Tip(tipKey);
+        if(BoolDefaultButton("Observe"+id,fallback,enabled)){enabled=fallback;clicked=true;}
+        return clicked ? enabled:null;
+    }
+
+    // 0.330 (audit): one rule for the gathering observation and the gathering help, which reads it. Unticking the observation also turns the
+    // help off, ticking the help also saves the observation (null = unchanged), in one save rolled back together; the reader then follows
+    // GatheringObservationWanted, as at load and after « Restore all defaults ».
+    private void SaveGatheringChoice(bool? observe,bool? panel)
+    {
+        var observations=configuration.Observations ??= new();
+        var hadPrevious=observations.TryGetValue("Gathering",out var previous);var previousPanel=configuration.GatheringPanel;
+        if(observe is { } wanted)observations["Gathering"]=wanted;
+        if(panel is { } shown)configuration.GatheringPanel=shown;
+        try{save();saveError=null;}
+        catch(Exception error)
+        {
+            if(hadPrevious)observations["Gathering"]=previous;else observations.Remove("Gathering");
+            configuration.GatheringPanel=previousPanel;
+            saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save the gathering observation and help.");
+            return;
+        }
+        ApplyGatheringObservation();
+    }
+
+    /// <summary>The gathering node is read while its observation is chosen or the gathering help is on (also the rule at load, Plugin.cs).</summary>
+    internal static bool GatheringObservationWanted(Configuration settings)=>settings.Observations?.GetValueOrDefault("Gathering")==true || settings.GatheringPanel;
+    private void ApplyGatheringObservation()=>gatheringObservation.SetEnabled(GatheringObservationWanted(configuration));
 
     private void DrawToolSettingsLink(string id)
     {

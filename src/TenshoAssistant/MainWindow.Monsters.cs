@@ -5,6 +5,10 @@ using TenshoAssistant.Monsters;
 
 namespace TenshoAssistant;
 
+// Monster loot page (World), like Monster Loot Hunter: monsters that drop the selected item. LuminaSupplemental (MobDrop, names
+// from the game's BNpcName sheet) first, then the consolegameswiki page of the item (fetched on request, cached with the
+// « Sources » duration), then Garland Tools as a folded complement (monster pages, zone → map). Community data: names and places
+// are not native monster ids and do not prove current spawns.
 internal sealed partial class MainWindow
 {
     private uint selectedMonsterMap;
@@ -14,14 +18,14 @@ internal sealed partial class MainWindow
     {
         // LuminaSupplemental first (0.190): monsters dropping the item, from MobDrop with names from the game sheet BNpcName.
         lumina?.Request();
-        if(lumina?.State.Data?.MonstersOf(id) is { Count:>0 } mobs && ImGui.CollapsingHeader(localization.Get("MonsterUi.Lumina")+"###LuminaMonsters",ImGuiTreeNodeFlags.DefaultOpen))
+        if(lumina?.State.Data?.MonstersOf(id) is { Count:>0 } mobs && TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.Lumina")+"###LuminaMonsters",ImGuiTreeNodeFlags.DefaultOpen))
         {
             foreach(var mob in mobs)ImGui.BulletText(mob);
             ImGui.TextDisabled(localization.Get("MonsterUi.LuminaHelp"));
         }
         if(wikiMonsterSources is not { } wiki)return;
         wiki.Select(id);
-        if(!ImGui.CollapsingHeader(localization.Get("WikiMonsters.Title")+"###WikiMonsters",ImGuiTreeNodeFlags.DefaultOpen))return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("WikiMonsters.Title")+"###WikiMonsters",ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextWrapped(localization.Get("WikiMonsters.Help"));
         var view=wiki.State;
         ImGui.BeginDisabled(view.Loading);
@@ -29,40 +33,40 @@ internal sealed partial class MainWindow
         {
             if(ImGui.SmallButton(localization.Get("WikiMonsters.Fetch")))_=wiki.RequestAsync();
             ImGui.SameLine();
-            if(ImGui.SmallButton(localization.Get("WikiMonsters.Refresh")))_=wiki.RequestAsync(true);
+            if(SourceButton(localization.Get("WikiMonsters.Refresh"),configuration.CommunityWiki,true))_=wiki.RequestAsync(true);
         }
         finally{ImGui.EndDisabled();}
         if(view.Loading)ImGui.TextDisabled(localization.Get("WikiMonsters.Loading"));
         if(view.Error is { } error)
-        {ImGui.TextWrapped(localization.Get("WikiMonsters.Error"));if(developerMode)ImGui.TextWrapped(error);}
+        {ImGui.TextWrapped(localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"WikiMonsters.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
         if(view.Document is not { } document)return;
         ImGui.TextWrapped(document.Url);
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,document.FetchedAt);
         if(document.Monsters.Count==0)ImGui.TextWrapped(localization.Get("WikiMonsters.Empty"));
         foreach(var row in document.Monsters)
-        {ImGui.TextWrapped($"{row.Name} · {row.Level} · {row.Location}");}
+        {ImGui.TextWrapped($"{CommunityMonster(row.Name)} · {row.Level} · {CommunityPlace(row.Location)}");}
     }
     private void DrawMonsterLoot()
     {
         Heading(localization.Get("MonsterUi.Title"),localization.Get("MonsterUi.Subtitle"));
-        if (ImGui.CollapsingHeader(localization.Get("MonsterUi.Choose")+"##Monster",itemId <= 0 ? ImGuiTreeNodeFlags.DefaultOpen : ImGuiTreeNodeFlags.None))
+        if (TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.Choose")+"##Monster",itemId <= 0 ? ImGuiTreeNodeFlags.DefaultOpen : ImGuiTreeNodeFlags.None))
             DrawItemSearch(160);
         monsterLoot.SelectItem(itemId > 0 ? (uint)itemId : 0);
         var state = monsterLoot.State;
         if (state.ItemId == 0) { ImGui.TextWrapped(localization.Get("MonsterUi.Help")); return; }
         DrawItemIcon(SelectedItem,new Vector2(40)); ImGui.SameLine();
         ImGui.TextColored(Accent,SelectedItem?.Name ?? localization.Format("MonsterUi.Item",state.ItemId));
-        // The wiki is the primary source; Garland stays as a folded complement for monster pages and map links.
+        // LuminaSupplemental, then the wiki (DrawWikiMonsterSources); Garland stays as a folded complement for monster pages and map links.
         DrawWikiMonsterSources(state.ItemId);
-        if (!ImGui.CollapsingHeader(localization.Get("MonsterUi.GarlandSection")+"###GarlandMonsters")) return;
+        if (!TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.GarlandSection")+"###GarlandMonsters")) return;
         if (state.Loading) { if (ImGui.Button(localization.Get("MonsterUi.Cancel")+"##Monster")) monsterLoot.Cancel(); ImGui.SameLine(); ImGui.TextDisabled(localization.Get("MonsterUi.Loading")); }
         else
         {
             if (ImGui.Button(localization.Get("MonsterUi.Fetch"))) _ = monsterLoot.RequestItemAsync();
             if (state.Item is not null)
-            { ImGui.SameLine(); if (ImGui.SmallButton(localization.Get("MonsterUi.Refresh")+"##Monster")) _ = monsterLoot.RequestItemAsync(true); }
+            { ImGui.SameLine(); if (SourceButton(localization.Get("MonsterUi.Refresh")+"##Monster",configuration.CommunityGarland,true)) _ = monsterLoot.RequestItemAsync(true); }
         }
-        if (state.Error is { } error) { ImGui.TextWrapped(localization.Get("MonsterUi.Error")); if(developerMode)ImGui.TextWrapped(error); }
+        if (state.Error is { } error) { ImGui.TextWrapped(localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"MonsterUi.Error")); if(developerMode)ImGui.TextWrapped(RawMessage(error)); }
         ImGui.TextWrapped(localization.Get("MonsterUi.Source"));
         if (state.Item is not { } itemDocument) return;
         ImGui.TextDisabled(localization.Format("MonsterSource.Retrieved",itemDocument.FetchedAt.ToLocalTime().ToString("g")));
@@ -93,6 +97,7 @@ internal sealed partial class MainWindow
                             if (ImGui.Selectable($"{(monster.Name.Length == 0 ? localization.Format("MonsterUi.UnnamedMonster",monster.Id) : monster.Name)}##Mob{monster.Id}",state.MonsterId == monster.Id))
                             { monsterLoot.SelectMonster(monster.Id); selectedMonsterMap=0; }
                             if (developerMode && ImGui.IsItemHovered()) WrappedTooltip(localization.Format("Developer.SourceReference",monster.Id));
+                            MonsterMenu($"MonsterMenu{monster.Id}",monster.Id,monster.Name.Length == 0 ? localization.Format("MonsterUi.UnnamedMonster",monster.Id) : monster.Name);
                             ImGui.TableNextColumn(); ImGui.TextUnformatted(monster.Level.Length == 0 ? localization.Get("MonsterUi.Missing") : monster.Level);
                             ImGui.TableNextColumn(); ImGui.TextUnformatted(MonsterZone(monster.PlaceNameId));
                         }
@@ -112,7 +117,7 @@ internal sealed partial class MainWindow
         {
             if (ImGui.Button(localization.Get("MonsterUi.FetchMonster"))) _ = monsterLoot.RequestMonsterAsync();
             if (state.Monster is not null)
-            { ImGui.SameLine(); if (ImGui.SmallButton(localization.Get("MonsterUi.RefreshMonster")+"##Monster")) _ = monsterLoot.RequestMonsterAsync(true); }
+            { ImGui.SameLine(); if (SourceButton(localization.Get("MonsterUi.RefreshMonster")+"##Monster",configuration.CommunityGarland,true)) _ = monsterLoot.RequestMonsterAsync(true); }
         }
         finally { ImGui.EndDisabled(); }
         if (state.Monster is not { } detail) return;
@@ -132,7 +137,7 @@ internal sealed partial class MainWindow
             { dutyLoot.Select(duty); showDutyDetails=true; page=Page.DutyLoot; }
             else if (duty is null) ImGui.TextDisabled(localization.Format("MonsterUi.Instance",detail.InstanceId));
         }
-        if (ImGui.CollapsingHeader(localization.Format("MonsterUi.OtherItems",detail.DropItemIds.Count)+"##Monster"))
+        if (TenshoAssistant.UI.UiComponents.Header(localization.Format("MonsterUi.OtherItems",detail.DropItemIds.Count)+"##Monster"))
         {
             if (!detail.HasDrops) ImGui.TextDisabled(localization.Get("MonsterUi.NoDrops"));
             var showItems=ImGui.BeginChild("MonsterDropItems",new Vector2(0,155),true);
@@ -148,10 +153,7 @@ internal sealed partial class MainWindow
                         for (var index=clipper.DisplayStart;index<clipper.DisplayEnd;index++)
                         {
                             var id=detail.DropItemIds[index]; var item=itemCatalog.State.Catalog?.Find(id);
-                            DrawItemIcon(item,new Vector2(24)); var clicked=ImGui.IsItemClicked(); ImGui.SameLine();
-                            ImGui.BeginDisabled(item is null || id>int.MaxValue);
-                            try { if ((ImGui.SmallButton($"{item?.Name ?? localization.Format("MonsterUi.Item",id)}##MobDrop{id}") || clicked) && item is not null && id<=int.MaxValue) SelectItem(id); }
-                            finally { ImGui.EndDisabled(); }
+                            ItemCell(item,id,24,item is null ? localization.Format("MonsterUi.Item",id):null);
                         }
                     }
                     finally { clipper.End(); clipper.Destroy(); }
@@ -167,10 +169,14 @@ internal sealed partial class MainWindow
         var choices=maps.State.Catalog?.ForPlace(monster.PlaceNameId);
         if (choices is null || choices.Count==0) { ImGui.TextDisabled(localization.Get("MonsterUi.NoMap")); return; }
         var chosen=choices.Count==1 ? choices[0] : choices.FirstOrDefault(map=>map.MapId==selectedMonsterMap);
-        if (choices.Count>1 && ImGui.BeginCombo(localization.Get("MonsterUi.Map")+"##Monster",chosen?.Zone ?? localization.Get("MonsterUi.ChooseMap")))
+        if (choices.Count>1)
         {
-            try { foreach(var map in choices) if(ImGui.Selectable(localization.Format("MonsterUi.MapChoice",map.Zone,map.Subzone,map.MapId),map.MapId==selectedMonsterMap)) selectedMonsterMap=map.MapId; }
-            finally { ImGui.EndCombo(); }
+            if (ImGui.BeginCombo(localization.Get("MonsterUi.Map")+"##Monster",chosen?.Zone ?? localization.Get("MonsterUi.ChooseMap")))
+            {
+                try { foreach(var map in choices) if(ImGui.Selectable(localization.Format("MonsterUi.MapChoice",map.Zone,map.Subzone,map.MapId),map.MapId==selectedMonsterMap)) selectedMonsterMap=map.MapId; }
+                finally { ImGui.EndCombo(); }
+            }
+            Tip("MonsterUi.MapTip");
         }
         if (chosen is not null && ImGui.SmallButton(localization.Get("MonsterUi.OpenMap")+"##Monster"))
         {

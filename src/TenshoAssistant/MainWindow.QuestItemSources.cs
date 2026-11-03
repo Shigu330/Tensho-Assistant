@@ -5,6 +5,9 @@ using TenshoAssistant.Quests;
 
 namespace TenshoAssistant;
 
+// « Quests offering this item » section of the item usages: quests whose rewards list the item (quest reward index from the game
+// data), with the character's observed progress, a progress filter and a search; a row opens the quest in the Quests page.
+// Catalogue candidates only: choices, variants and prerequisites are not checked, nor whether the reward can still be obtained.
 internal sealed partial class MainWindow
 {
     private string questSourceQuery="";
@@ -17,11 +20,11 @@ internal sealed partial class MainWindow
     private static readonly (QuestSourceProgressFilter Filter,string Key)[] QuestSourceFilters=
     [
         (QuestSourceProgressFilter.All,"QuestsBrowser.All"),(QuestSourceProgressFilter.Active,"QuestsBrowser.Active"),
-        (QuestSourceProgressFilter.Complete,"QuestsBrowser.Complete"),(QuestSourceProgressFilter.Unconfirmed,"QuestsBrowser.Unknown")
+        (QuestSourceProgressFilter.Complete,"QuestsBrowser.Complete"),(QuestSourceProgressFilter.Unconfirmed,"QuestsBrowser.Unconfirmed")
     ];
     private void DrawQuestItemSources(uint item)
     {
-        if(!ImGui.CollapsingHeader(localization.Get("QuestSources.Title")))return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("QuestSources.Title")))return;
         var state=quests.State;
         if(ImGui.SmallButton(localization.Get("QuestSources.Refresh")))quests.RequestRefresh();
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Quests,state.ObservedAt,state.FromCache);
@@ -36,12 +39,14 @@ internal sealed partial class MainWindow
         }
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##QuestSourceSearch",localization.Get("QuestSources.Search"),ref questSourceQuery,128);
+        Tip("QuestSources.SearchTip");
         if(!string.IsNullOrEmpty(questSourceQuery) && ImGui.SmallButton(localization.Get("QuestSources.Clear")))questSourceQuery="";
         for(var position=0;position<QuestSourceFilters.Length;position++)
         {
             if(position>0)ImGui.SameLine();
             var (filter,key)=QuestSourceFilters[position];
             if(ImGui.RadioButton(localization.Get(key)+"###QuestSourceFilter"+position,questSourceFilter==filter))questSourceFilter=filter;
+            QuestFilterTip(filter);
         }
         // QuestState is replaced on every observation, invalidation or index completion: its reference keys the join cache.
         if(!ReferenceEquals(state,questSourceCachedState) || item!=questSourceCachedItem || questSourceQuery!=questSourceCachedQuery || questSourceFilter!=questSourceCachedFilter)

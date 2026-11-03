@@ -1,8 +1,10 @@
 namespace TenshoAssistant.MiniGames;
 
 public sealed record TriadCardDefinition(uint Id, int Number, int Stars, int Top, int Right, int Bottom, int Left,
-    uint TypeId, string TypeName, string Description)
+    uint TypeId, string TypeName, string Description, bool Extra = false)
 {
+    /// <summary>Notebook number as the game prints it: « 12 » or, for the Ex. series, « Ex. 12 ».</summary>
+    public string Label => Extra ? $"Ex. {Number}" : Number.ToString(System.Globalization.CultureInfo.InvariantCulture);
     public bool IsValid => Id != 0 && Number > 0 && Stars is >= 1 and <= 5
         && Top is >= 1 and <= 10 && Right is >= 1 and <= 10 && Bottom is >= 1 and <= 10 && Left is >= 1 and <= 10;
     public uint IconId => checked(88000 + Id);

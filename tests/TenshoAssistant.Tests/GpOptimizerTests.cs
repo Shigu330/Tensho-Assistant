@@ -95,7 +95,7 @@ internal static class GpOptimizerTests
         ("GP catalog fails closed for missing duplicate or changed semantic bindings",()=>
         {
             var source=Catalog().Actions.ToList(); var catalog=new GpActionCatalog(source,"test"); source.Clear();
-            Check(catalog.Actions.Count==20,"producer collection detached");
+            Check(catalog.Actions.Count==24,"producer collection detached");
             Reject(()=>new GpActionCatalog(catalog.Actions.Skip(1),"missing"));
             Reject(()=>new GpActionCatalog(catalog.Actions.Skip(1).Append(catalog.Actions.Last()),"duplicate"));
             Reject(()=>new GpActionCatalog(catalog.Actions.Select((action,index)=>index==0 ? action with {Spec=action.Spec with {Cost=1}}:action),"changed cost"));

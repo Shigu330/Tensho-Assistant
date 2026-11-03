@@ -25,8 +25,8 @@ public static class FishingForecast
         if(conditions.Weather is {Count:>0})fields|=FishingConditionFields.Weather;
         if(conditions.PreviousWeather is {Count:>0})fields|=FishingConditionFields.PreviousWeather;
         FishingForecastResult Empty(string error)=>new(now,end,fields,Array.AsReadOnly(Array.Empty<FishingForecastSpan>()),error);
-        if(conditions.Error is not null)return Empty("Conditions non interprétables ; aucune plage calculée.");
-        if(fields==FishingConditionFields.None)return Empty("Aucune condition exploitable renseignée ; aucune plage déduite.");
+        if(conditions.Error is not null)return Empty("Conditions cannot be interpreted; no window computed.");
+        if(fields==FishingConditionFields.None)return Empty("No usable condition reported; no window deduced.");
         var useTime=fields.HasFlag(FishingConditionFields.Time);
         var weather=catalog.Forecast(territory,now,periods);
         var previous=startSeconds>=1400 ? catalog.Forecast(territory,DateTimeOffset.FromUnixTimeSeconds(startSeconds-1400),1)[0]:null;

@@ -4,7 +4,12 @@ using TenshoAssistant.Caching;
 
 namespace TenshoAssistant.Fashion;
 
-public sealed record FashionDataState(FashionDataset? Dataset,bool Loading,string? Error);
+/// <summary>
+/// 0.331: why the last request brought nothing new while the data already shown stay valid (15 s between two refreshes, cancelled),
+/// so the page can say so instead of « data unavailable »; Error keeps its text for the developer mode.
+/// </summary>
+public enum FashionNotice { None, Throttled, Cancelled }
+public sealed record FashionDataState(FashionDataset? Dataset,bool Loading,string? Error,FashionNotice Notice=FashionNotice.None);
 public sealed class FashionDataService : IDisposable
 {
     public const string DataBase="https://raw.githubusercontent.com/Infiziert90/FFXIVGachaSpreadsheet/refs/heads/master/website/static/data/";
@@ -19,6 +24,9 @@ public sealed class FashionDataService : IDisposable
     private long? lastRequest;
     private bool disposed;
     public FashionDataState State=>Volatile.Read(ref state);
+    // 0.321 (review 0.316, point 2): the source's switch (Settings › Advanced). Off: no download; a fresh copy on disk is still read.
+    public Func<bool>? Enabled { get; set; }
+    public bool Disabled=>Enabled?.Invoke()==false;
     private Func<TimeSpan> cacheLifetime=()=>FreshFor;
     private DataCache? disk;
     public TimeSpan CacheLifetime=>Volatile.Read(ref cacheLifetime)();
@@ -30,7 +38,7 @@ public sealed class FashionDataService : IDisposable
         lock(gate)
         {
             if(disposed || !state.Loading) return;
-            generation++; request?.Cancel(); state=state with {Loading=false,Error="Consultation annulée."};
+            generation++; request?.Cancel(); state=state with {Loading=false,Error="Lookup cancelled.",Notice=FashionNotice.Cancelled};
         }
     }
     public async Task RequestAsync(bool force=false,CancellationToken cancellation=default)
@@ -40,9 +48,9 @@ public sealed class FashionDataService : IDisposable
         {
             if(disposed || state.Loading || cancellation.IsCancellationRequested) return;
             if(!force && state.Dataset is { } saved && CacheAge.Fresh(saved.FetchedAt,clock.GetUtcNow(),CacheLifetime))
-            { state=state with {Error=null}; return; }
+            { state=state with {Error=null,Notice=FashionNotice.None}; return; }
             source=CancellationTokenSource.CreateLinkedTokenSource(cancellation); source.CancelAfter(TimeSpan.FromSeconds(12));
-            request=source; ticket=++generation; state=state with {Loading=true,Error=null};
+            request=source; ticket=++generation; state=state with {Loading=true,Error=null,Notice=FashionNotice.None};
         }
         try
         {
@@ -59,8 +67,10 @@ public sealed class FashionDataService : IDisposable
             lock(gate)
             {
                 if(disposed || ticket!=generation || source.IsCancellationRequested)return;
+                // Source turned off: no network, the state keeps what it had (the page says the source is off).
+                if(Disabled){state=state with {Loading=false,Error=null};return;}
                 if(lastRequest is { } last && clock.GetElapsedTime(last)<TimeSpan.FromSeconds(15))
-                {state=state with {Loading=false,Error="Patientez quinze secondes entre deux actualisations du répertoire."};return;}
+                {state=state with {Loading=false,Error="Wait fifteen seconds between two refreshes of the directory.",Notice=FashionNotice.Throttled};return;}
                 lastRequest=clock.GetTimestamp();
             }
             // Fixed public URLs only; the operation sends no player state and performs no upload.
@@ -82,7 +92,7 @@ public sealed class FashionDataService : IDisposable
             lock(gate)
             {
                 if(disposed || ticket!=generation) return;
-                state=state with {Loading=false,Error=error is OperationCanceledException ? "Consultation annulée ou délai dépassé.":$"Lecture des associations impossible : {error.Message}"};
+                state=state with {Loading=false,Error=error is OperationCanceledException ? "Lookup cancelled or timed out.":$"Associations could not be read: {error.Message}"};
             }
         }
         finally
@@ -92,7 +102,7 @@ public sealed class FashionDataService : IDisposable
                 if(ReferenceEquals(request,source))
                 {
                     request=null;
-                    if(!disposed && ticket==generation && state.Loading) state=state with {Loading=false,Error="Consultation annulée ou délai dépassé."};
+                    if(!disposed && ticket==generation && state.Loading) state=state with {Loading=false,Error="Lookup cancelled or timed out."};
                 }
                 source.Dispose();
             }

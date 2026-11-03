@@ -1,0 +1,61 @@
+name: Bug report
+description: Something in Tensho Assistant does not work as expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for the report. Please check the [open issues](https://github.com/Shigu330/Tensho-Assistant/issues) first.
+        Security problems go through the private report instead (see SECURITY.md), never a public issue.
+  - type: input
+    id: version
+    attributes:
+      label: Tensho version
+      description: First line of the diagnostic report (Settings › Advanced › Help and reporting › Copy the diagnostic report), e.g. « Tensho Assistant 0.323.0 ».
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: Game client language and Dalamud version
+      description: For example « French client, Dalamud API 15 » (Dalamud's version is in /xlsettings › About).
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The page, the button or setting, what you did.
+      placeholder: |
+        1. Open Map › …
+        2. Right-click …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual result
+      description: What you expected, and what happened instead (a screenshot helps).
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Diagnostic report
+      description: Paste the text of « Copy the diagnostic report ». It holds no character data, but it names your market world and the item in context; remove them if you prefer.
+      render: text
+  - type: textarea
+    id: log
+    attributes:
+      label: Log excerpt (optional)
+      description: Lines mentioning Tensho from /xllog, if any.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I am on the latest released version (or I say which build I use above).
+          required: true
+        - label: I read the diagnostic report before pasting it.
+          required: false

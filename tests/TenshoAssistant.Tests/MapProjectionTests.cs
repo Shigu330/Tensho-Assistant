@@ -59,10 +59,11 @@ internal static class MapProjectionTests
         ("Zoom follow keeps icons readable when zoomed out and is clamped",()=>
         {
             var settings=new TenshoAssistant.MapViewSettings();
-            Check(Near(settings.ZoomFactor(1),1) && Near(settings.ZoomFactor(0.4f),MathF.Sqrt(0.4f)),"default half follow: 40 % zoom keeps 63 % size");
+            // 0.289: default follow 15 % (the user's tuned value).
+            Check(Near(settings.ZoomFactor(1),1) && Near(settings.ZoomFactor(0.4f),MathF.Pow(0.4f,0.15f)),"default 15 % follow: 40 % zoom keeps 87 % size");
             settings.ZoomFollow=0;Check(Near(settings.ZoomFactor(0.4f),1),"fixed size");
             settings.ZoomFollow=5;Check(Near(settings.ZoomFactor(0.4f),0.4f),"clamped to proportional");
-            settings.ZoomFollow=float.NaN;Check(Near(settings.ZoomFactor(0.25f),0.5f),"invalid = half");
+            settings.ZoomFollow=float.NaN;Check(Near(settings.ZoomFactor(0.25f),MathF.Pow(0.25f,0.15f)),"invalid = default 15 %");
         }),
         ("Per-map icon overrides win over the global table, priorities clamp and reset per scope",()=>
         {
@@ -76,9 +77,10 @@ internal static class MapProjectionTests
             settings.Reset(696);
             Check(!settings.HasMapOverrides(696) && settings.SizeOf(60453,696)==1.5f,"back to global for one map");
             settings.Reset(0);
-            Check(settings.SizeOf(60453,696)==1 && settings.PriorityOf(60453,696)==0,"global reset");
+            // 0.289: a global reset goes back to the default table (aetheryte 60453 drawn at +1, party members at 50 %).
+            Check(settings.SizeOf(60453,696)==1 && settings.PriorityOf(60453,696)==1 && settings.SizeOf(TenshoAssistant.MapViewSettings.PartyGlyph,1)==0.5f,"global reset to defaults");
             var old=System.Text.Json.JsonSerializer.Deserialize<TenshoAssistant.MapViewSettings>("{\"IconSizes\":{\"60453\":0}}")!;
-            Check(old.SizeOf(60453,696)==0 && old.PriorityOf(60453,696)==0,"0.111 configuration still applies");
+            Check(old.SizeOf(60453,696)==0 && old.PriorityOf(60453,696)==1,"0.111 configuration still applies (priority from the 0.289 defaults)");
         }),
         ("Per-icon sizes default to 100 %, hide at 0, clamp and survive JSON",()=>
         {

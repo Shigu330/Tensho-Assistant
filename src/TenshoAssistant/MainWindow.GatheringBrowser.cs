@@ -1,10 +1,14 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 using TenshoAssistant.Gathering;
 using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Gathering page: resources searched by name and by zone or place, filtered by gathering type (job icons); the resource list on the left,
+// the selected resource's details on the right (MainWindow.Gathering.cs), with the Eorzea clock, the fishing help button and links to
+// stocks, recipes and prices. Game data only (GatheringCatalog); the match list is rebuilt only when the query, zone, filter or data change.
 internal sealed partial class MainWindow
 {
     private GatheringCatalog? sourceViewCatalog;
@@ -16,6 +20,13 @@ internal sealed partial class MainWindow
     private uint? sourceTypeFilter;
     private uint? sourceViewTypeFilter;
     private ItemDefinition[] sourceMatches = [];
+    // 0.402 (g, R-05): the character's notebooks (Gathering/NotebookReader), « hide what is in the notebook », and the export folder.
+    internal Gathering.NotebookReader? NotebookSource { get; set; }
+    internal Func<string>? NotebookExportFolder { get; set; }
+    private bool sourceHideDone;
+    private object? sourceViewNotebook;
+    private bool sourceViewHideDone;
+    private string? notebookExportMessage;
     private GatheringSource[] sourceTypes = [];
 
     private void DrawGatheringBrowser()
@@ -23,11 +34,12 @@ internal sealed partial class MainWindow
         Heading(localization.Get("GatheringBrowser.Title"),localization.Get("GatheringBrowser.Description"));
         DrawFishingPanelButton();
         DrawGatheringClock();
+        DrawCollectableTable();
         if (gatheringCatalog.State.Catalog is not { } sources)
         {
             var state = gatheringCatalog.State;
             ImGui.TextWrapped(state.Error is null ? localization.Format("GatheringBrowser.Loading",state.Copied,state.Total):localization.Get("GatheringBrowser.Error"));
-            if(developerMode && state.Error is { } error)ImGui.TextWrapped(error);
+            if(developerMode && state.Error is { } error)ImGui.TextWrapped(RawMessage(error));
             return;
         }
         if (itemCatalog.State.Catalog is not { } items) { DrawCatalogStatus(); return; }
@@ -35,9 +47,12 @@ internal sealed partial class MainWindow
             sourceTypes = sources.Sources.DistinctBy(source => source.TypeId).OrderBy(source => source.TypeId).ToArray();
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##SourceSearch", localization.Get("GatheringBrowser.Search"), ref sourceQuery, 128);
+        Tip("GatheringBrowser.SearchTip");
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##SourceZoneSearch", localization.Get("GatheringBrowser.ZoneSearch"), ref sourceZoneQuery, 128);
+        Tip("GatheringBrowser.ZoneSearchTip");
         if (ImGui.SmallButton(localization.Get("GatheringBrowser.AllJobs")+"###SourceAllJobs")) sourceTypeFilter = null;
+        Tip("GatheringBrowser.AllJobsTip");
         foreach (var type in sourceTypes)
         {
             ImGui.SameLine();
@@ -52,14 +67,19 @@ internal sealed partial class MainWindow
         }
         ImGui.SameLine();
         if (ImGui.SmallButton(localization.Get("GatheringBrowser.Reset")+"###SourceReset")) { sourceQuery = ""; sourceZoneQuery = ""; sourceTypeFilter = null; }
+        Tip("GatheringBrowser.ResetTip");
+        var notebook = DrawNotebookBar(items);
         if (!ReferenceEquals(sourceViewCatalog, sources) || !ReferenceEquals(sourceViewItems, items)
-            || sourceViewQuery != sourceQuery || sourceViewZoneQuery != sourceZoneQuery || sourceViewTypeFilter != sourceTypeFilter)
+            || sourceViewQuery != sourceQuery || sourceViewZoneQuery != sourceZoneQuery || sourceViewTypeFilter != sourceTypeFilter
+            || !ReferenceEquals(sourceViewNotebook, sourceHideDone ? notebook : null) || sourceViewHideDone != sourceHideDone)
         {
+            sourceViewNotebook = sourceHideDone ? notebook : null; sourceViewHideDone = sourceHideDone;
             sourceMatches = sources.Sources
                 .Where(source => (sourceTypeFilter is null || source.TypeId == sourceTypeFilter)
                     && (string.IsNullOrWhiteSpace(sourceZoneQuery) || SourceContains(source.Zone, sourceZoneQuery) || SourceContains(source.Place, sourceZoneQuery)))
                 .Select(source => source.ItemId).Distinct().Select(items.Find).OfType<ItemDefinition>()
                 .Where(item => string.IsNullOrWhiteSpace(sourceQuery) || SourceContains(item.Name, sourceQuery) || item.Id.ToString() == sourceQuery.Trim())
+                .Where(item => !sourceHideDone || notebook?.Done(item.Id) != true)
                 .OrderBy(item => item.Name, StringComparer.CurrentCultureIgnoreCase).ThenBy(item => item.Id).ToArray();
             sourceViewCatalog = sources; sourceViewItems = items;
             sourceViewQuery = sourceQuery; sourceViewZoneQuery = sourceZoneQuery; sourceViewTypeFilter = sourceTypeFilter;
@@ -89,12 +109,16 @@ internal sealed partial class MainWindow
                             ImGui.PushID((int)item.Id);
                             try
                             {
-                                DrawItemIcon(item, new Vector2(28));
-                                var clicked = ImGui.IsItemClicked();
-                                ImGui.SameLine();
-                                if (ImGui.Selectable(item.Name, itemId == item.Id, ImGuiSelectableFlags.None, new Vector2(0, 28)) || clicked)
-                                { SelectItem(item.Id); gatheringTypeFilter = sourceTypeFilter; }
-                                if (ImGui.IsItemHovered()) WrappedTooltip(item.Name);
+                                if (ItemCell(item, item.Id, 28)) gatheringTypeFilter = sourceTypeFilter;
+                                // 0.402 (g, R-05): already in the character's notebook.
+                                if (notebook?.Done(item.Id) == true)
+                                {
+                                    ImGui.SameLine();
+                                    ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
+                                    try { ImGui.TextColored(Success, Dalamud.Interface.FontAwesomeIcon.Check.ToIconString()); }
+                                    finally { ImGui.PopFont(); }
+                                    if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("Notebooks.DoneTip"));
+                                }
                             }
                             finally { ImGui.PopID(); }
                         }

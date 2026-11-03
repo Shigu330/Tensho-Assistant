@@ -1,42 +1,64 @@
 # Backlog ciblé
 
-## Ouvert — état au 0.154.0 (2026-10-31)
+## Ouvert — état au 0.315.0 (2026-11-02, relu contre le CHANGELOG et le code)
+
+Les points qui attendent une décision ou un relevé en jeu sont regroupés dans la [ROADMAP](ROADMAP.md), section « À décider / à
+revoir » ; les tests en jeu en attente, dans sa section « Tests à faire en jeu ». L'ordre de passage est dans
+[STATUS](../ai/STATUS.md) (« Prochaine action »).
 
 Carte (MAP-001, plan : [MAP-016-PLAN](../goals/MAP-016-PLAN.md))
 - Icônes des commissionnaires (ex. commises de Rowena) : corrigé en 0.155 (MAP-017), validé en jeu 2026-10-31.
-- Repères d'exploration en pause : positions vérifiées, mais la météo exigée vient du wiki (absente des données du jeu).
+- Repères d'exploration : **clos** (était « en pause » au 0.154) ; météo du wiki citée, affichée et utilisée par les alarmes depuis 0.201.
 - Icône de type de quête approximative (71141 calculé contre 71151 vu en jeu) ; correspondance `ObjectiveId` en partie non prouvée.
+  Toujours ouvert au 0.315 : relevé en jeu attendu (seul point « avant D17 » restant).
+- Type de marqueur des mandats (repères au bord de la carte, 0.298) : inconnu, à relever en jeu avec un mandat accepté.
+- Cadres et textures du jeu tirés des ULD (R-06 étape 6) : possible plus tard, à décider.
 
 Objets et collections
-- Sources encore inconnues pour certains objets (ex. Alsvid) ; autres types de collection à couvrir (COLL-001).
-- Marchands PNJ : monnaies codées hors mémoquartz (assignats), InclusionShop, boutiques de compagnie libre.
-- Injection du texte dans l'infobulle native du jeu (HEAVY, optionnel).
+- Sources encore inconnues pour certains objets (Alsvid, PNJ du Certificat végétal) : inconnu documenté (décision 2026-11-01) ;
+  autres types de collection à couvrir (COLL-001).
+- Marchands PNJ : monnaies codées et InclusionShop déjà traités (ligne périmée au 0.154) ; boutiques de compagnie libre (FccShop)
+  **faites en 0.295**, validées en jeu. Ligne close.
+- Injection du texte dans l'infobulle native du jeu : **abandonnée** (décision utilisateur 2026-11-01).
 - Monnaies de quête sans objet direct : inconnu documenté ([QUEST-CURRENCIES-005-STUDY](../goals/QUEST-CURRENCIES-005-STUDY.md)).
 
-Inventaire et tri : SORT-ARMOURY-009 (arsenal, HEAVY), SORT-AUTO-010 (opt-in). Cache disque des petits catalogues (cartes, donjons,
+Inventaire et tri : arsenal, coffre à apparence et armoire lus comme rangements (0.235–0.240, à valider en jeu) ; leur tri
+(SORT-ARMOURY-009, HEAVY) et SORT-AUTO-010 (opt-in) : après publication. Cache disque des petits catalogues (cartes, donjons,
 usages) non fait, gain faible.
 
-Récolte : bonus natif d'Abondance inconnu (sources divergentes), ne pas inventer de formule.
+Récolte : bonus d'Abondance **fait en 0.224** comme estimation (règle communautaire citée, affichée « estimé », modifiable), à
+valider en jeu ; l'ancienne note « ne pas inventer de formule » reste vraie : aucune formule officielle. Pêche en mer non couverte
+(pas de source de données utilisable).
 
-Publication (PUBLISH-018, côté code fait en 0.156, voir [PUBLISHING](PUBLISHING.md)) : soumission D17 éventuelle (décision de l'utilisateur) ; il manque au minimum `images/icon.png`, le `manifest.toml` du dépôt
-D17 et la déclaration d'usage de l'IA (voir [CONTRIBUTING](../../CONTRIBUTING.md#publication-dalamud)).
+Compagnie libre, Rappels, Équipement (R-07, R-08, R-11) : restes et choix ouverts dans la ROADMAP (« À décider / à revoir ») :
+table des seuils de sous-marin, arbre de déblocage des dirigeables (LuminaSupplemental, GPL-3.0), planificateur de trajets de
+dirigeable, règle de capacité sous le rang 50, escouade et Planeurs d'Ehcatl, étape 4 de R-11. R-09 (événements) : pas commencé.
+
+Publication (PUBLISH-018, voir [PUBLISHING](PUBLISHING.md)) : soumission D17 éventuelle (décision de l'utilisateur). Côté code fait
+(0.156–0.157) : icône `src/TenshoAssistant/images/icon.png` (générée par IA, déclarée), `manifest.toml` prêt, brouillon de PR avec la
+déclaration d'IA. L'ancienne mention « il manque `images/icon.png`, `manifest.toml` et la déclaration d'IA » est périmée depuis 0.157.
+Reste à l'auteur : commit et push, hash du commit dans `manifest.toml`, texte de PR et déclaration réécrits par lui (voir
+[CONTRIBUTING](../../CONTRIBUTING.md#publication-dalamud)) ; traductions allemande et japonaise partielles, non relues.
 
 Les 17 lignes de la [ROADMAP](ROADMAP.md) restent PARTIAL.
 
 ## Revue des points ouverts (2026-11-01, avant publication D17)
 Décision utilisateur : publier après résolution ; l'injection de texte dans l'infobulle native du jeu n'est **pas** faite.
+Suivi au 0.315 (2026-11-02) ajouté en fin de chaque décision : seul le point des icônes de quête reste ouvert.
 
 | Point | Constat | Décision |
 |---|---|---|
-| Bonus d'Abondance (Récolte abondante II, actions 272/273) | GatheringOptimizer (MIT) le demande à la main ; frozen_rabbit_tome (sans licence, fait relevé seulement) : +3 si récolte ≥ ⌊base × 1,1⌋, +2 si ≥ ⌊base × 0,9⌋, sinon +1, base = valeur « Gathering » de l'item level du point (table item-level de Teamcraft, issue de la feuille du jeu ItemLevel). Règle communautaire, non officielle. | **Faire** : préremplir le bonus avec cette règle (stat de récolte lue, item level du point par sonde), affiché « estimé », modifiable. |
-| Revue de mode : coffre à apparence et armoire | Lisibles dans le client (dresser d'apparence, armoire) ; donne un « possédé » plus juste. | **Faire** (sonde avant usage). |
-| Vendeurs : boutiques de compagnie libre | Feuille FccShop non lue (InclusionShop et monnaies codées déjà traitées, ligne du backlog périmée). | **Faire** (petit). |
-| Icônes de quête : nom des variantes, 71141 vs 71151 | Sens des variantes absent des données ; seule l'observation en jeu le donne. | **Faire seulement avec un relevé en jeu** de l'utilisateur ; sinon laisser « variante n ». |
+| Bonus d'Abondance (Récolte abondante II, actions 272/273) | GatheringOptimizer (MIT) le demande à la main ; frozen_rabbit_tome (sans licence, fait relevé seulement) : +3 si récolte ≥ ⌊base × 1,1⌋, +2 si ≥ ⌊base × 0,9⌋, sinon +1, base = valeur « Gathering » de l'item level du point (table item-level de Teamcraft, issue de la feuille du jeu ItemLevel). Règle communautaire, non officielle. | **Faire** : préremplir le bonus avec cette règle (stat de récolte lue, item level du point par sonde), affiché « estimé », modifiable. → **FAIT 0.224** ([preuve](../evidence/0.224-bountiful-base.md)), à valider en jeu. |
+| Revue de mode : coffre à apparence et armoire | Lisibles dans le client (dresser d'apparence, armoire) ; donne un « possédé » plus juste. | **Faire** (sonde avant usage). → **FAIT 0.235–0.240** (élargi à l'arsenal, lu sans autre plugin, relié à la Banque), à valider en jeu. |
+| Vendeurs : boutiques de compagnie libre | Feuille FccShop non lue (InclusionShop et monnaies codées déjà traitées, ligne du backlog périmée). | **Faire** (petit). → **FAIT 0.295** ([preuve](../evidence/0.295-fcc-shops.md)), validé en jeu. |
+| Icônes de quête : nom des variantes, 71141 vs 71151 | Sens des variantes absent des données ; seule l'observation en jeu le donne. | **Faire seulement avec un relevé en jeu** de l'utilisateur ; sinon laisser « variante n ». → **Ouvert** : aucun relevé au 0.315. |
+| Carte : cible de quête du journal qui reste (demande 2026-11-01, R-01) | L'icône « Cible indiquée par le jeu (journal) » ne pouvait pas être retirée. | **Faire**. → **FAIT 0.242–0.243** (retrait au clic droit, puis automatique), à valider en jeu. |
+| Carte : « flèches boussole » vers une cible hors de la vue (demande 2026-11-01) | — | **Faire**. → **FAIT 0.297** sous forme d'icônes au bord de la carte, un réglage par type ; validé en jeu. |
 | Revue de mode : score | Aucune donnée de score par pièce dans les sources. | **Ne pas faire** (serait inventé). |
 | Suppression d'une alarme du jeu depuis Tensho | Pas de sous-commande /alarm par alarme (seulement « clear » = tout) ; DeleteAlarm(index) non prouvé. | **Ne pas faire** (risque d'effacer la mauvaise alarme) ; rappel manuel conservé. |
 | Sources inconnues restantes (Alsvid, PNJ du Certificat végétal) | Absentes du jeu, de Garland et de LuminaSupplemental. | **Ne pas faire** : inconnu documenté. |
 | Repères d'exploration (météo du wiki) | Météo du wiki déjà affichée et utilisée par les alarmes (0.201). | **Clos** (source wiki citée). |
-| Compléments des 17 outils (rotation adaptative, tri d'arsenal, règles Triad natives…) | Gros chantiers, non nécessaires pour publier. | **Après publication**, au cas par cas. |
+| Compléments des 17 outils (rotation adaptative, tri d'arsenal, règles Triad natives…) | Gros chantiers, non nécessaires pour publier. | **Après publication**, au cas par cas. → **Repris** dans le plan c) ([GAPS](GAPS.md), étape g de la [ROADMAP](ROADMAP.md)) : rotation adaptative A-04 retenue, tri de l'arsenal I-14 plus tard ; règles natives de Triple Triade non relevées par la comparaison, restent ici. |
 | Injection dans l'infobulle native | — | **Abandonné** (décision utilisateur). |
 
 ## Archive

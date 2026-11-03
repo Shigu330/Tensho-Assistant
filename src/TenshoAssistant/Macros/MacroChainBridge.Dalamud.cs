@@ -39,8 +39,8 @@ internal sealed unsafe class MacroChainBridge : IDisposable
         {
             registrations.Register(() =>
             {
-                if (!commands.AddHandler(MacroDefinition.Marker, new CommandInfo(OnMarker) { HelpMessage = "Marqueur de dernière ligne pour les séquences Tensho.", ShowInHelp = false }))
-                    throw new InvalidOperationException("Commande /tenshonext déjà enregistrée.");
+                if (!commands.AddHandler(MacroDefinition.Marker, new CommandInfo(OnMarker) { HelpMessage = "Last-line marker for Tensho sequences.", ShowInHelp = false }))
+                    throw new InvalidOperationException("Command /tenshonext already registered.");
             }, () => commands.RemoveHandler(MacroDefinition.Marker));
             registrations.Register(() => framework.Update += Update, () => framework.Update -= Update);
         }
@@ -67,7 +67,7 @@ internal sealed unsafe class MacroChainBridge : IDisposable
     private static MacroDefinition ReadMacro(RaptureMacroModule* module, uint book, uint index)
     {
         var macro = module->GetMacro(book, index);
-        if (macro == null) throw new InvalidOperationException("Emplacement de macro indisponible.");
+        if (macro == null) throw new InvalidOperationException("Macro slot unavailable.");
         var lines = new string[15];
         for (var line = 0; line < lines.Length; line++) lines[line] = macro->Lines[line].ToString();
         return MacroDefinition.Copy(new(book, index, macro->Name.ToString()), macro->IconId, lines);
@@ -106,13 +106,13 @@ internal sealed unsafe class MacroChainBridge : IDisposable
                 if (service.TakeStart() is { } start)
                 {
                     if (owner == 0 || start.CharacterId != owner || module == null || shell == null)
-                        throw new InvalidOperationException("Personnage ou macros indisponibles.");
+                        throw new InvalidOperationException("Character or macros unavailable.");
                     if (shell->MacroCurrentLine >= 0 || shell->MacroLocked || shell->IsTextCommandUnavailable)
-                        throw new InvalidOperationException("Une macro est déjà active, verrouillée ou indisponible.");
+                        throw new InvalidOperationException("A macro is already active, locked or unavailable.");
                     var plan = start.Plan.Select(slot => ReadMacro(module, slot.Book, slot.Index)).ToArray();
                     foreach (var macro in plan)
                         if (macro.ValidationError() is { } error) throw new InvalidOperationException($"{macro.Slot.Name} : {error}");
-                    if (ReadOwner() != owner) throw new InvalidOperationException("Le personnage a changé.");
+                    if (ReadOwner() != owner) throw new InvalidOperationException("The character changed.");
                     EnsureHook(); prepared = Array.AsReadOnly(plan); sequence.Start(owner, plan.Select(macro => macro.Slot));
                 }
                 if (shell != null && module != null)
@@ -120,7 +120,7 @@ internal sealed unsafe class MacroChainBridge : IDisposable
                     var state = sequence.State;
                     // Absence of a marker is a failure, never a successful end inferred from idle.
                     if (state.Pending is not null && updateNumber > requestedAt && shell->MacroCurrentLine < 0)
-                        sequence.Fail("Marqueur de fin non reçu : macro interrompue, refusée ou modifiée.");
+                        sequence.Fail("End marker not received: macro interrupted, refused or changed.");
                     var request = sequence.PrepareNext(owner, true, shell->MacroCurrentLine >= 0 || shell->IsTextCommandUnavailable, shell->MacroLocked);
                     if (request is not null)
                     {
@@ -129,7 +129,7 @@ internal sealed unsafe class MacroChainBridge : IDisposable
                         if (validationError is not null || definition.Slot.Name != request.Slot.Name
                             || sequence.State.Completed >= prepared.Count
                             || !definition.Lines.SequenceEqual(prepared[sequence.State.Completed].Lines, StringComparer.Ordinal))
-                            sequence.Fail(validationError ?? "La macro a changé ; relancez la séquence après vérification.");
+                            sequence.Fail(validationError ?? "The macro changed; start the sequence again after checking it.");
                         else
                         {
                             requestedAt = updateNumber;
@@ -145,7 +145,7 @@ internal sealed unsafe class MacroChainBridge : IDisposable
                     }
                 }
                 else if (sequence.State.Status is MacroSequenceStatus.Ready or MacroSequenceStatus.AwaitingStart or MacroSequenceStatus.Running)
-                    sequence.Fail("État natif indisponible.");
+                    sequence.Fail("Native state unavailable.");
                 service.Publish(owner, position >= 0, null, sequence.State);
             }
             catch (Exception error)
@@ -163,7 +163,7 @@ internal sealed unsafe class MacroChainBridge : IDisposable
             try { AcceptMarker(arguments); }
             catch (Exception error)
             {
-                sequence.Fail("Échec de lecture du marqueur ; enchaînement arrêté.");
+                sequence.Fail("Marker reading failed; chain stopped.");
                 service.SetError(error.Message);
                 log.Warning(error, "Tensho macro marker could not be validated.");
             }
@@ -173,16 +173,16 @@ internal sealed unsafe class MacroChainBridge : IDisposable
     {
             if (disposed || sequence.State.Pending is not { } pending) return;
             if (!framework.IsInFrameworkUpdateThread || arguments.Length != 0 || ReadOwner() != pending.CharacterId)
-            { sequence.Fail("Marqueur reçu hors du contexte attendu."); return; }
+            { sequence.Fail("Marker received outside the expected context."); return; }
             var shell = RaptureShellModule.Instance();
-            if (shell == null) { sequence.Fail("État natif indisponible au marqueur."); return; }
+            if (shell == null) { sequence.Fail("Native state unavailable at the marker."); return; }
             var nativeLines = new string[15];
             for (var index = 0; index < 15; index++)
                 nativeLines[index] = shell->MacroLines[index].ToString();
             if (!MacroMarkerProtocol.Matches(pending, ReadOwner(), shell->MacroName.ToString(), shell->MacroCurrentLine, nativeLines, arguments))
             {
                 var footer = Array.FindIndex(nativeLines, line => line.Trim() == MacroDefinition.Marker);
-                sequence.Fail($"Marqueur non concordant : ligne native {shell->MacroCurrentLine}, marqueur {footer}, nom natif « {shell->MacroName} », attendu « {pending.Slot.Name} ». Enchaînement arrêté.");
+                sequence.Fail($"Marker mismatch: native line {shell->MacroCurrentLine}, marker {footer}, native name « {shell->MacroName} », expected « {pending.Slot.Name} ». Chain stopped.");
                 return;
             }
             if (sequence.State.Status == MacroSequenceStatus.AwaitingStart) sequence.ObserveStart(pending);

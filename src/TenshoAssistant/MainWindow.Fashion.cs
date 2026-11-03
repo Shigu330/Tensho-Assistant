@@ -6,6 +6,10 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Fashion Report page (Avant-Garde-like): « This week » first (MainWindow.FashionWeek.cs), then every hint category of the game
+// (FashionCheckThemeCategory sheet) with the gear the community reported for it, and a search of reported items by slot and name. Reports
+// come from FFXIVGachaSpreadsheet (Infiziert90, MIT), fetched on « Fetch » (or once when the week's slots are shown) and cached on disk for
+// the Fashion Report duration. Owned state = known stock of any storage Tensho reads (armoury chest, glamour dresser, armoire included).
 internal sealed partial class MainWindow
 {
     private string fashionHintQuery="",fashionItemQuery="";
@@ -31,8 +35,8 @@ internal sealed partial class MainWindow
         Heading(localization.Get("FashionUi.Title"),localization.Get("FashionUi.Description"));
         var native=fashionHints.State;
         // 0.213: the week first (theme, 11 slots of the game window, gear per slot), then every category.
-        if(native.Catalog is not null && ImGui.CollapsingHeader(localization.Get("FashionWeek.Title")+"###FashionWeek",ImGuiTreeNodeFlags.DefaultOpen))DrawFashionWeek();
-        if(!ImGui.CollapsingHeader(localization.Get("FashionWeek.AllTitle")+"###FashionAll",fashionShowItems ? ImGuiTreeNodeFlags.DefaultOpen:ImGuiTreeNodeFlags.None))return;
+        if(native.Catalog is not null && TenshoAssistant.UI.UiComponents.Header(localization.Get("FashionWeek.Title")+"###FashionWeek",ImGuiTreeNodeFlags.DefaultOpen))DrawFashionWeek();
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("FashionWeek.AllTitle")+"###FashionAll",fashionShowItems ? ImGuiTreeNodeFlags.DefaultOpen:ImGuiTreeNodeFlags.None))return;
         ImGui.TextWrapped(localization.Get("FashionUi.Help"));
         if(native.Catalog is not { } catalog) { if(native.Error is { } hintError)DrawDataError(hintError,"ServiceErrors.Fashion");else ImGui.TextWrapped(localization.Get("FashionUi.LoadingHints")); return; }
         var state=fashionData.State; var dataset=state.Dataset;
@@ -40,9 +44,10 @@ internal sealed partial class MainWindow
         else
         {
             if(ImGui.Button(localization.Get("FashionUi.Fetch"))) _=fashionData.RequestAsync();
-            if(dataset is not null) { ImGui.SameLine(); if(ImGui.SmallButton(localization.Get("FashionUi.Refresh"))) _=fashionData.RequestAsync(true); }
+            if(dataset is not null) { ImGui.SameLine(); if(SourceButton(localization.Get("FashionUi.Refresh"),configuration.CommunityFashion,true)) _=fashionData.RequestAsync(true); }
         }
-        if(state.Error is { } error) DrawDataError(error,"ServiceErrors.Fashion");
+        if(state.Notice!=FashionNotice.None && dataset is not null) ImGui.TextWrapped(localization.Get("FashionUi."+state.Notice));
+        else if(state.Error is { } error) DrawDataError(error,"ServiceErrors.Fashion");
         if(dataset is not null)
         {
             ImGui.TextDisabled(localization.Format("FashionDates.Fetched",dataset.FetchedAt.ToLocalTime().ToString("g")));
@@ -65,7 +70,7 @@ internal sealed partial class MainWindow
             if(ImGui.SmallButton(localization.Get("FashionUi.Back"))) fashionShowItems=false;
             DrawFashionItems(dataset); return;
         }
-        ImGui.SetNextItemWidth(-1); ImGui.InputTextWithHint("##FashionHintSearch",localization.Get("FashionUi.HintQuery"),ref fashionHintQuery,128);
+        ImGui.SetNextItemWidth(-1); ImGui.InputTextWithHint("##FashionHintSearch",localization.Get("FashionUi.HintQuery"),ref fashionHintQuery,128); Tip("FashionUi.HintQueryTip");
         if(fashionHintsNeedFilter || fashionHintQueryView!=fashionHintQuery)
         {
             var query=fashionHintQuery.Trim();
@@ -106,8 +111,9 @@ internal sealed partial class MainWindow
             try { foreach(var pair in FashionSlots) if(ImGui.Selectable(localization.Get("FashionSlot."+pair.Name),pair.Slot==fashionSlot)) fashionSlot=pair.Slot; }
             finally { ImGui.EndCombo(); }
         }
-        ImGui.SetNextItemWidth(-1); ImGui.InputTextWithHint("##FashionItemSearch",localization.Get("FashionUi.ItemQuery"),ref fashionItemQuery,128);
-        if(dataset is null) { ImGui.TextWrapped(localization.Get("FashionUi.NeedFetch")); return; }
+        Tip("FashionUi.SlotTip");
+        ImGui.SetNextItemWidth(-1); ImGui.InputTextWithHint("##FashionItemSearch",localization.Get("FashionUi.ItemQuery"),ref fashionItemQuery,128); Tip("FashionUi.ItemQueryTip");
+        if(dataset is null) { ImGui.TextWrapped(localization.Get(fashionData.Disabled ? "FashionUi.SourceOff":"FashionUi.NeedFetch")); return; }
         var items=itemCatalog.State.Catalog;
         if(items is null) { DrawCatalogStatus(); return; }
         if(!ReferenceEquals(fashionItemDataView,dataset) || !ReferenceEquals(fashionItemsView,items) || fashionItemHintView!=fashionHintId
@@ -145,6 +151,9 @@ internal sealed partial class MainWindow
                     ImGui.BeginDisabled(!selectable);
                     try { if((ImGui.Selectable($"{item?.Name ?? localization.Format("BankUi.Item",id)}##FashionItem{id}",itemId==id,ImGuiSelectableFlags.None,new Vector2(0,28)) || clicked) && selectable) SelectItem(id); }
                     finally { ImGui.EndDisabled(); }
+                    // 0.255: common item tooltip first (the fashion details follow it) and the tools menu.
+                    if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) && item is not null) DrawItemInfoTooltip(id);
+                    ItemLinksMenu($"FashionLinks{id}",item);
                     if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(localization.Format("UiFragments.Equipment",item?.Name ?? localization.Get("FashionUi.Unresolved"),item is null ? localization.Get("UiFragments.Unknown"):FashionSlotNames(item.Equipment))+(developerMode ? $"\nID {id}":""));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Match.Reports.ToString("N0"));
                     ImGui.TableNextColumn();

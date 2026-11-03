@@ -1,7 +1,8 @@
 namespace TenshoAssistant.Caching;
 
 public enum CacheArea { Prices, Quests, Collections, Sources, Fashion, ImportedStock, CraftCalculations, Completion }
-public enum CacheRetention { FiveMinutes, OneHour, OneDay, SevenDays }
+// 0.281 (user request): Never = data are kept and never read again on their own; only a refresh button reads them again.
+public enum CacheRetention { FiveMinutes, OneHour, OneDay, SevenDays, Never }
 
 public sealed class CachePreferences
 {
@@ -20,9 +21,11 @@ public sealed class CachePreferences
         var selected=area switch{CacheArea.Prices=>Prices,CacheArea.Quests=>Quests,CacheArea.Collections=>Collections,CacheArea.Sources=>Sources,CacheArea.Fashion=>Fashion,CacheArea.ImportedStock=>ImportedStock,CacheArea.CraftCalculations=>CraftCalculations,CacheArea.Completion=>Completion,_=>throw new ArgumentOutOfRangeException(nameof(area))};
         return Enum.IsDefined(selected) ? selected:area==CacheArea.Quests ? CacheRetention.FiveMinutes:area is CacheArea.Sources or CacheArea.Fashion or CacheArea.Completion ? CacheRetention.SevenDays:CacheRetention.OneDay;
     }
+    // A century rather than TimeSpan.MaxValue: date arithmetic (recorded date + lifetime) must not overflow.
+    public static readonly TimeSpan NeverExpires=TimeSpan.FromDays(36500);
     public TimeSpan Duration(CacheArea area)=>Duration(Get(area));
     public static TimeSpan Duration(CacheRetention value)=>value switch
-    {CacheRetention.FiveMinutes=>TimeSpan.FromMinutes(5),CacheRetention.OneHour=>TimeSpan.FromHours(1),CacheRetention.OneDay=>TimeSpan.FromDays(1),CacheRetention.SevenDays=>TimeSpan.FromDays(7),_=>throw new ArgumentOutOfRangeException(nameof(value))};
+    {CacheRetention.FiveMinutes=>TimeSpan.FromMinutes(5),CacheRetention.OneHour=>TimeSpan.FromHours(1),CacheRetention.OneDay=>TimeSpan.FromDays(1),CacheRetention.SevenDays=>TimeSpan.FromDays(7),CacheRetention.Never=>NeverExpires,_=>throw new ArgumentOutOfRangeException(nameof(value))};
     public CachePreferences With(CacheArea area,CacheRetention value)
     {
         if(!Enum.IsDefined(value))throw new ArgumentOutOfRangeException(nameof(value));
@@ -34,5 +37,5 @@ public sealed class CachePreferences
 public static class CacheAge
 {
     public static bool Fresh(DateTimeOffset? recordedAt,DateTimeOffset now,TimeSpan duration)=>recordedAt is { } date && duration>TimeSpan.Zero && now>=date && now-date<duration;
-    public static string Label(TimeSpan duration)=>duration.TotalDays>=1 ? $"{duration.TotalDays:0} j":duration.TotalHours>=1 ? $"{duration.TotalHours:0} h":$"{duration.TotalMinutes:0} min";
+    public static string Label(TimeSpan duration)=>duration>=CachePreferences.NeverExpires ? "∞":duration.TotalDays>=1 ? $"{duration.TotalDays:0} j":duration.TotalHours>=1 ? $"{duration.TotalHours:0} h":$"{duration.TotalMinutes:0} min";
 }

@@ -3,12 +3,14 @@ using TenshoAssistant.Gathering;
 
 namespace TenshoAssistant;
 
+// The game's fishing log for the selected fish (FishParameter / FishingNoteInfo sheets): description, whether the log reports a time or a
+// weather restriction (unknown kept as unknown) and the folklore book. Game data only.
 internal sealed partial class MainWindow
 {
     private void DrawFishingNotebook(GatheringCatalog catalog)
     {
         var entries=catalog.Fishing.ForItem((uint)itemId);
-        if(entries.Count==0 || !ImGui.CollapsingHeader(localization.Get("FishingNotebook.Title")+"###FishingNotebook"))return;
+        if(entries.Count==0 || !TenshoAssistant.UI.UiComponents.Header(localization.Get("FishingNotebook.Title")+"###FishingNotebook"))return;
         string Restriction(bool? value)=>localization.Get(value switch{true=>"FishingNotebook.Reported",false=>"FishingNotebook.NotReported",_=>"FishingNotebook.Unknown"});
         foreach(var entry in entries)
         {

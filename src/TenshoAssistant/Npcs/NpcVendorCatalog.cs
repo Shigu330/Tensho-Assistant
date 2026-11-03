@@ -3,10 +3,18 @@ using TenshoAssistant.Caching;
 
 namespace TenshoAssistant.Npcs;
 
-public enum NpcShopKind { Gil, GrandCompany, Special }
+// 0.295: FreeCompany = company credit shops (FccShop, docs/evidence/0.295-fcc-shops.md).
+public enum NpcShopKind { Gil, GrandCompany, Special, FreeCompany }
 // CurrencyItemId 0 means the game encodes the currency indirectly (RawCurrency) and it is not resolved: never guessed.
-public sealed record NpcCost(uint CurrencyItemId,uint Amount,uint RawCurrency=0);
-public sealed record NpcShopSale(uint ShopId,NpcShopKind Kind,string ShopName,uint ItemId,uint Quantity,bool Hq,IReadOnlyList<NpcCost> Costs);
+public sealed record NpcCost(uint CurrencyItemId,uint Amount,uint RawCurrency=0)
+{
+    /// <summary>Company credits are not an item: this reserved id (outside the Item sheet) names them.</summary>
+    public const uint CompanyCredits=0xFFFF0FCC;
+}
+// RequiredRank: free company rank needed to buy (FccShop), 0 = none.
+// 0.352 (g, I-11): QuestRequired / AchievementRequired = what unlocks the article in the shop (GilShopItem, SpecialShop), 0 = nothing.
+public sealed record NpcShopSale(uint ShopId,NpcShopKind Kind,string ShopName,uint ItemId,uint Quantity,bool Hq,IReadOnlyList<NpcCost> Costs,byte RequiredRank=0,
+    uint QuestRequired=0,uint AchievementRequired=0);
 // X/Y are map coordinates as shown in game; World* are kept to place the map flag exactly.
 public sealed record NpcLocation(uint TerritoryId,uint MapId,string Zone,float X,float Y,float WorldX,float WorldY,float WorldZ);
 public sealed record NpcVendor(uint NpcId,string Name,IReadOnlyList<uint> ShopIds,IReadOnlyList<NpcLocation> Locations);

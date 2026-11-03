@@ -72,10 +72,11 @@ internal sealed partial class MainWindow
         var state=triadObservation.State;
         return state is { Status:TriadObservationStatus.Observed, Frame:{ } frame, ObservedAt:{ } at } && DateTimeOffset.UtcNow-at<=TimeSpan.FromSeconds(2) ? frame:null;
     }
-    // Overlay on the game's Triple Triad window: best card in hand and best square, every frame while the observation is on.
+    // Overlay on the game's Triple Triad window: best card in hand and best square, every frame while the observation is on and its own
+    // switch TriadMatchOverlay (0.327, on by default) too; off, no advice is started for the overlay (the Observed match tab keeps its own).
     internal void DrawTriadOverlay()
     {
-        if(windowDisposed || FreshTriadFrame() is not { } frame)return;
+        if(windowDisposed || !configuration.TriadMatchOverlay || FreshTriadFrame() is not { } frame)return;
         if(TriadAdviceFor(frame,out _) is not { Problem:TriadAdviceProblem.None, Best:[var best,..] })return;
         if(frame.Context is not { BlueRects:{ } hand, BoardRects:{ } squares })return;
         var draw=ImGui.GetForegroundDrawList();

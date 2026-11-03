@@ -5,6 +5,10 @@ using TenshoAssistant.Craft;
 
 namespace TenshoAssistant;
 
+// Item sheet › Craft › preparation: the full intermediate-craft chain for the target quantity, computed on « Calculate » on a worker
+// (Craft/CraftChainSession, results of another context rejected or marked stale): raw materials still missing after the live inventory
+// and the saved Bank, a recipe choice for items with several recipes, links to gathering and prices, copy as text. Recipes from the game's
+// Recipe sheet (RecipeCatalog); unknown or imported stocks are flagged, never taken as zero.
 internal sealed partial class MainWindow
 {
     private readonly CraftChainSession craftChain = new();
@@ -15,13 +19,13 @@ internal sealed partial class MainWindow
     {
         if (recipeCatalog.State.Catalog is not { } catalog) return;
         var character = bankBridge.State.CharacterId;
-        craftChain.ValidateContext(character, (uint)Math.Max(0, itemId), craftPlanTarget, catalog);
+        craftChain.ValidateContext(character, recipe.ResultItemId, craftPlanTarget, catalog);
         var state = craftChain.State;
         if (ImGui.Button(localization.Get("ChainUi.Calculate")))
         {
             if(preparationPrices.State.Context?.IsChain==true) preparationPrices.Cancel();
-            _ = craftChain.StartAsync(new(character, (uint)Math.Max(0, itemId), recipe, craftPlanTarget, catalog, inventory.Current, bank.State,
-                craftChainChoices, craftChainChoiceRevision));
+            _ = craftChain.StartAsync(new(character, recipe.ResultItemId, recipe, craftPlanTarget, catalog, inventory.Current, bank.State,
+                craftChainChoices, craftChainChoiceRevision, id => ClassifyCrystal(id) is not null));
         }
         if (craftChainChoices.Count > 0)
         {
@@ -44,7 +48,7 @@ internal sealed partial class MainWindow
         if (result.HasCached) ImGui.TextDisabled(localization.Get("ChainUi.Imported"));
         if (result.HasUnresolved) ImGui.TextColored(Accent, localization.Get("ChainUi.Partial"));
         ImGui.TextWrapped(localization.Get("ChainUi.Help"));
-        if (ImGui.CollapsingHeader(localization.Format("ChainUi.Steps",result.Steps.Count)+"##ChainSteps"))
+        if (TenshoAssistant.UI.UiComponents.Header(localization.Format("ChainUi.Steps",result.Steps.Count)+"##ChainSteps"))
         {
             DrawChainList("ChainStepsList", result.Steps.Count, index =>
             {
@@ -59,7 +63,7 @@ internal sealed partial class MainWindow
                 finally { ImGui.PopID(); }
             });
         }
-        if (ImGui.CollapsingHeader(localization.Format("ChainUi.Materials",result.Materials.Count)+"##ChainMaterials", ImGuiTreeNodeFlags.DefaultOpen))
+        if (TenshoAssistant.UI.UiComponents.Header(localization.Format("ChainUi.Materials",result.Materials.Count)+"##ChainMaterials", ImGuiTreeNodeFlags.DefaultOpen))
         {
             if (result.Materials.Count == 0) ImGui.TextColored(Success, localization.Get("ChainUi.Covered"));
             DrawChainList("ChainMaterialsList", result.Materials.Count, index =>
@@ -81,8 +85,10 @@ internal sealed partial class MainWindow
             });
         }
 
+        // 0.416 (g, R-14): the raw materials by zone.
+        DrawChainGatheringRoute(result);
         var choices = result.Materials.Where(material => material.Reason == CraftChainReason.RecipeChoice).ToArray();
-        if (choices.Length > 0 && ImGui.CollapsingHeader(localization.Get("ChainUi.Choose")+"##ChainChoices", ImGuiTreeNodeFlags.DefaultOpen))
+        if (choices.Length > 0 && TenshoAssistant.UI.UiComponents.Header(localization.Get("ChainUi.Choose")+"##ChainChoices", ImGuiTreeNodeFlags.DefaultOpen))
         {
             DrawChainList("ChainChoicesList", choices.Length, index =>
             {
@@ -105,6 +111,7 @@ internal sealed partial class MainWindow
                         }
                         finally { ImGui.EndCombo(); }
                     }
+                    Tip("ChainUi.ChoiceTip");
                 }
                 finally { ImGui.PopID(); }
             });
@@ -130,7 +137,7 @@ internal sealed partial class MainWindow
         DrawItemIcon(item, new Vector2(24));
         var clicked = ImGui.IsItemClicked();
         ImGui.SameLine();
-        if (ImGui.SmallButton(item?.Name ?? $"ID {id}") || clicked) SelectItem(id);
+        if (ImGui.SmallButton(item?.Name ?? $"ID {id}") || clicked) OpenCraftItem(id);
     }
     private static void DrawChainList(string id, int count, Action<int> drawRow)
     {

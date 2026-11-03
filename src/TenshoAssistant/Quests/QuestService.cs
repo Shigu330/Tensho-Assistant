@@ -3,6 +3,15 @@ namespace TenshoAssistant.Quests;
 public enum QuestProgress { Unconfirmed, Active, Complete }
 public sealed record QuestEntry(uint Id, string Name, string Category, uint Icon, QuestProgress Progress, byte? Sequence)
 {
+    // 0.283: journal section (« Épopée », « Quêtes annexes », « Chroniques d'une nouvelle ère »…) above the genre held in Category
+    // (docs/evidence/0.283-quest-journal-sections.md); SectionId keeps the game's order, 255 = none.
+    public string Section { get; init; } = "";
+    public byte SectionId { get; init; } = 255;
+    // 0.285: journal genre id and place of the quest (starting-city lines of the ARR main scenario, QuestStartCities).
+    public uint GenreId { get; init; }
+    public string Place { get; init; } = "";
+    // 0.286: quests this one excludes (Quest.QuestLock, e.g. the other Grand Companies) — QuestAlternatives.
+    public IReadOnlyList<uint> LockIds { get; init; } = Array.Empty<uint>();
     public IReadOnlyList<uint> PreviousQuestIds { get; init; } = Array.Empty<uint>();
     public byte PreviousQuestJoin { get; init; }
     // Unknown7 in the installed schema: retained raw; no step-satisfaction inference.
@@ -40,7 +49,7 @@ public sealed class QuestLinks
     public QuestEntry? Find(uint id) => entries.GetValueOrDefault(id);
     public IReadOnlyList<QuestEntry> Following(uint id) => next.GetValueOrDefault(id) ?? Array.Empty<QuestEntry>();
     public static string JoinLabel(byte mode) => mode switch
-    { 1 => "Toutes les quêtes liées", 2 => "Au moins une des quêtes liées", _ => $"Condition non interprétée (mode {mode})" };
+    { 1 => "All linked quests", 2 => "At least one of the linked quests", _ => $"Condition not interpreted (mode {mode})" };
     public bool CompletionEvidence(QuestEntry entry) => entry.PreviousQuestIds.Count > 0 && entry.PreviousQuestJoin switch
     {
         1 => entry.PreviousQuestIds.All(id => Find(id)?.Progress == QuestProgress.Complete),

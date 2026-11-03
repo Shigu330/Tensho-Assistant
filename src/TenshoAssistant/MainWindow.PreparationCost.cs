@@ -7,6 +7,10 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// « Indicative purchase cost » sections of the craft plan and of the craft chain: ingredients short against recorded stock (or all
+// of them) priced NQ, HQ or cheapest from the Universalis minimums of the current world (Market/PreparationCost.cs). Missing prices
+// are fetched only when the player starts a bounded list (PreparationPriceSession). Unit minimum × quantity: not a purchasable
+// basket (no listing depth, no tax); unknown stock or price stays unknown, never zero. Copyable as text.
 internal sealed partial class MainWindow
 {
     private readonly PreparationPriceSession preparationPrices=new();
@@ -21,12 +25,14 @@ internal sealed partial class MainWindow
     private uint[] preparationListIds=[];
     private void DrawPreparationCost(RecipeDefinition recipe,CraftPlan plan)
     {
-        if (!ImGui.CollapsingHeader(localization.Get("CostUi.Title"))) return;
+        if (!TenshoAssistant.UI.UiComponents.Header(localization.Get("CostUi.Title"))) return;
         var world=market.State;
         ImGui.SetNextItemWidth(230);
         var changed=ImGui.Combo(localization.Get("CostUi.Quantities")+"##Cost",ref costBasisIndex,new[] {localization.Get("CostUi.Shortfall"),localization.Get("CostUi.AllRequired")},2);
+        Tip("CostUi.QuantitiesTip");
         ImGui.SetNextItemWidth(230);
         changed |= ImGui.Combo(localization.Get("CostUi.Quality")+"##Cost",ref costQualityIndex,new[] {"NQ","HQ",localization.Get("CostUi.Cheapest")},3);
+        Tip("CostUi.QualityTip");
         if(changed) {preparationPrices.Cancel(); preparationCostError=null;}
         PreparationCostEstimate estimate;
         try
@@ -34,12 +40,12 @@ internal sealed partial class MainWindow
             estimate=PreparationCost.Build(plan,world.WorldId,(PreparationCostBasis)costBasisIndex,(PreparationPriceQuality)costQualityIndex,
                 id=>itemCatalog.State.Catalog?.Find(id),id=>market.GetCached(world.WorldId,id),DateTimeOffset.UtcNow,market.CacheLifetime);
         }
-        catch(Exception error) {ImGui.TextWrapped(localization.Get("CostUi.EstimateError")); if(developerMode)ImGui.TextWrapped(error.Message); return;}
+        catch(Exception error) {ImGui.TextWrapped(localization.Get("CostUi.EstimateError")); if(developerMode)ImGui.TextWrapped(RawMessage(error.Message)); return;}
         DrawPreparationCostDetails(recipe,plan.Requested,estimate);
     }
     private void DrawChainCost(RecipeDefinition recipe,CraftChainState chain,bool stale)
     {
-        if(chain.Result is not { } result || !ImGui.CollapsingHeader(localization.Get("CostUi.Chain"))) return;
+        if(chain.Result is not { } result || !TenshoAssistant.UI.UiComponents.Header(localization.Get("CostUi.Chain"))) return;
         if(chain.Input?.ChoiceRevision!=craftChainChoiceRevision)
         {ImGui.TextWrapped(localization.Get("CostUi.ChoicesChanged"));return;}
         ImGui.PushID("ChainCost");
@@ -50,6 +56,7 @@ internal sealed partial class MainWindow
             if(result.HasUnresolved) ImGui.TextWrapped(localization.Get("CostUi.Unresolved"));
             ImGui.SetNextItemWidth(230);
             if(ImGui.Combo(localization.Get("CostUi.Quality")+"##Cost",ref costQualityIndex,new[] {"NQ","HQ",localization.Get("CostUi.Cheapest")},3)) preparationPrices.Cancel();
+            Tip("CostUi.QualityTip");
             try
             {
                 var world=market.State;
@@ -65,7 +72,7 @@ internal sealed partial class MainWindow
                 var estimate=chainCostView;
                 DrawPreparationCostDetails(recipe,result.Requested,estimate,true,chain.Input.ChoiceRevision,chain.CalculatedAt,stale);
             }
-            catch(Exception error) {ImGui.TextWrapped(localization.Get("CostUi.EstimateError")); if(developerMode)ImGui.TextWrapped(error.Message);}
+            catch(Exception error) {ImGui.TextWrapped(localization.Get("CostUi.EstimateError")); if(developerMode)ImGui.TextWrapped(RawMessage(error.Message));}
         }
         finally {ImGui.PopID();}
     }
@@ -92,7 +99,7 @@ internal sealed partial class MainWindow
             {
                 try
                 {
-                    _=preparationPrices.StartAsync(market,new(bankBridge.State.CharacterId,world.WorldId,(uint)itemId,recipe.RecipeId,craftPlanTarget,costBasisIndex,costQualityIndex,chain,chainRevision),ids);
+                    _=preparationPrices.StartAsync(market,new(bankBridge.State.CharacterId,world.WorldId,recipe.ResultItemId,recipe.RecipeId,craftPlanTarget,costBasisIndex,costQualityIndex,chain,chainRevision),ids);
                     preparationCostError=null;
                 }
                 catch(Exception error) {preparationCostError=error.Message;}
@@ -109,7 +116,7 @@ internal sealed partial class MainWindow
             if(batch.Error is { } error) DrawDataError(error,"ServiceErrors.Price");
         }
         if(preparationCostError is { } failed) DrawDataError(failed,"ServiceErrors.Price");
-        ImGui.TextWrapped(localization.Format("CostUi.Privacy",market.CacheLifetime.ToString("g")));
+        ImGui.TextWrapped(localization.Format("CostUi.Privacy",localization.Get("CacheDuration."+CacheChoiceKeys[(int)configuration.Cache.Get(TenshoAssistant.Caching.CacheArea.Prices)])));
         var costed=estimate.Lines.Count(line=>line.Cost is not null);
         if(estimate.KnownSubtotal is not { } subtotal) ImGui.TextColored(Accent,localization.Get("CostUi.Overflow"));
         else if(estimate.Lines.Count==0) ImGui.TextColored(Success,localization.Get("CostUi.NoPurchases"));
@@ -138,8 +145,7 @@ internal sealed partial class MainWindow
                     try
                     {
                         var item=itemCatalog.State.Catalog?.Find(line.ItemId);
-                        DrawItemIcon(item,new Vector2(22)); var clicked=ImGui.IsItemClicked(); ImGui.SameLine();
-                        if(ImGui.SmallButton(item?.Name ?? $"ID {line.ItemId}") || clicked) SelectItem(line.ItemId);
+                        ItemCell(item,line.ItemId,22,item is null ? $"ID {line.ItemId}":null);
                         ImGui.TableNextColumn(); ImGui.TextUnformatted(line.Quantity?.ToString("N0") ?? localization.Get("CostUi.Verify"));
                         ImGui.TableNextColumn(); ImGui.TextUnformatted(line.UnitPrice is { } unit ? $"{unit:N0} {(line.HighQuality==true ? "HQ" : "NQ")}" : "—");
                         if(ImGui.IsItemHovered() && line.Quote is { } quote)

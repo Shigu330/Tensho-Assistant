@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest a tool or an improvement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tensho reads the game's own data first and uses community data only when the game does not have it, always credited.
+        Combat, PvP, parsers and anything that automates the game are out of scope (Dalamud's plugin rules).
+        The planned work is in [ROADMAP](https://github.com/Shigu330/Tensho-Assistant/blob/Devloppement/docs/project/ROADMAP.md) and the comparison with other plugins in [GAPS](https://github.com/Shigu330/Tensho-Assistant/blob/Devloppement/docs/project/GAPS.md).
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Items, storage, sorting, market
+        - Crafting, macros
+        - Gathering, fishing, weather, alarms
+        - Map
+        - Collections, quests, duties, loot, Fashion Report
+        - Character, gear, free company, reminders
+        - Gold Saucer (Triple Triad, Mini Cactpot)
+        - Settings, languages, other
+    validations:
+      required: true
+  - type: textarea
+    id: need
+    attributes:
+      label: What you need
+      description: The problem it solves in game, in your own words.
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Where the data could come from (optional)
+      description: A game sheet or window, or a community source with its licence. Code under AGPL or without a licence can only be read, never copied.
+  - type: textarea
+    id: example
+    attributes:
+      label: Existing plugin or example (optional)

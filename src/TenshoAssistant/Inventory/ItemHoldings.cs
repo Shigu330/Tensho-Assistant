@@ -1,10 +1,18 @@
 namespace TenshoAssistant.Inventory;
 
 public enum StorageFilter { All, PlayerBags, Chocobo, Retainers }
-public enum StorageCategory { PlayerBags, Chocobo, Retainer, Armoury, GlamourDresser, Armoire }
+public enum StorageCategory { PlayerBags, Chocobo, Retainer, Armoury, GlamourDresser, Armoire, FreeCompany }
 
+/// <summary>Which storage a row is, for its translated name (0.322: the names were French literals shown to every player).</summary>
+public enum StorageLabel { PlayerBags, Crystals, SaddlebagMissing, Saddlebag, PremiumSaddlebag, Retainer, RetainersMissing, Armoury, GlamourDresser, Armoire, FreeCompanyChest }
+
+/// <summary>A storage's quantities; <see cref="Name"/> is the retainer's own name (from the game) and empty for the other storages,
+/// whose shown name comes from <see cref="Label"/>.</summary>
 public sealed record StorageHolding(StorageCategory Category, string Name, InventoryCoverage Coverage,
-    bool IsCached, DateTimeOffset? ObservedAt, long Nq, long Hq);
+    bool IsCached, DateTimeOffset? ObservedAt, long Nq, long Hq)
+{
+    public StorageLabel Label { get; init; }
+}
 
 public sealed record ItemHoldingsSummary(IReadOnlyList<StorageHolding> Rows, long Nq, long Hq,
     bool HasObservation, bool HasUnknown, bool HasCached, bool IsExact)
@@ -16,7 +24,7 @@ public sealed record ItemHoldingsSummary(IReadOnlyList<StorageHolding> Rows, lon
 public static class ItemHoldings
 {
     public static ItemHoldingsSummary Build(uint itemId, ulong characterId, InventorySnapshot? live,
-        IReadOnlyList<BankEntry> bankEntries, StorageFilter filter = StorageFilter.All, bool includeCrystals = false)
+        IReadOnlyList<BankEntry> bankEntries, StorageFilter filter = StorageFilter.All, bool includeCrystals = false, bool crystal = false)
     {
         if (itemId == 0) throw new ArgumentOutOfRangeException(nameof(itemId));
         ArgumentNullException.ThrowIfNull(bankEntries);
@@ -26,19 +34,20 @@ public static class ItemHoldings
         if (filter is StorageFilter.All or StorageFilter.PlayerBags)
         {
             rows.Add(characterId == 0 || live is null
-                ? Unknown(StorageCategory.PlayerBags, "Sacs du personnage")
-                : Observe(StorageCategory.PlayerBags, "Sacs du personnage", false, live,
-                    Enumerable.Range(0, 4).Select(id => new InventoryLocation(new(characterId), new(id)))));
+                ? Unknown(StorageCategory.PlayerBags, "") with { Label = StorageLabel.PlayerBags }
+                : Observe(StorageCategory.PlayerBags, "", false, live,
+                    Enumerable.Range(0, 4).Select(id => new InventoryLocation(new(characterId), new(id)))) with { Label = StorageLabel.PlayerBags });
             if (includeCrystals && characterId != 0 && live is not null)
-                rows.Add(Observe(StorageCategory.PlayerBags, "Cristaux", false, live,
-                    [new InventoryLocation(new(characterId), new(2001))]));
+                rows.Add(Observe(StorageCategory.PlayerBags, "", false, live,
+                    [new InventoryLocation(new(characterId), new(2001))]) with { Label = StorageLabel.Crystals });
         }
 
         // Armoury chest (0.235): counted with the character's own storage when it has been read.
         if (filter is StorageFilter.All or StorageFilter.PlayerBags)
             foreach (var entry in bankEntries)
                 if (characterId != 0 && entry.Key.CharacterId == characterId && entry.Key.Kind is BankStorageKind.Armoury or BankStorageKind.GlamourDresser or BankStorageKind.Armoire)
-                    rows.Add(ObserveBank(entry, entry.Key.Kind switch { BankStorageKind.GlamourDresser => StorageCategory.GlamourDresser, BankStorageKind.Armoire => StorageCategory.Armoire, _ => StorageCategory.Armoury }, entry.Name));
+                    rows.Add(ObserveBank(entry, entry.Key.Kind switch { BankStorageKind.GlamourDresser => StorageCategory.GlamourDresser, BankStorageKind.Armoire => StorageCategory.Armoire, _ => StorageCategory.Armoury }, "")
+                        with { Label = entry.Key.Kind switch { BankStorageKind.GlamourDresser => StorageLabel.GlamourDresser, BankStorageKind.Armoire => StorageLabel.Armoire, _ => StorageLabel.Armoury } });
 
         if (filter is StorageFilter.All or StorageFilter.Chocobo)
         {
@@ -48,9 +57,9 @@ public static class ItemHoldings
                 if (characterId == 0 || entry.Key.CharacterId != characterId
                     || entry.Key.Kind is not (BankStorageKind.Saddlebag or BankStorageKind.PremiumSaddlebag)) continue;
                 hasStandard |= entry.Key.Kind == BankStorageKind.Saddlebag;
-                rows.Add(ObserveBank(entry, StorageCategory.Chocobo, entry.Name));
+                rows.Add(ObserveBank(entry, StorageCategory.Chocobo, "") with { Label = entry.Key.Kind == BankStorageKind.Saddlebag ? StorageLabel.Saddlebag : StorageLabel.PremiumSaddlebag });
             }
-            if (!hasStandard) rows.Add(Unknown(StorageCategory.Chocobo, "Sacoche chocobo non importée"));
+            if (!hasStandard) rows.Add(Unknown(StorageCategory.Chocobo, "") with { Label = StorageLabel.SaddlebagMissing });
         }
 
         if (filter is StorageFilter.All or StorageFilter.Retainers)
@@ -61,10 +70,18 @@ public static class ItemHoldings
                 if (characterId == 0 || entry.Key.CharacterId != characterId
                     || entry.Key.Kind != BankStorageKind.Retainer) continue;
                 hasRetainer = true;
-                rows.Add(ObserveBank(entry, StorageCategory.Retainer, $"Servant : {entry.Name}"));
+                var row = ObserveBank(entry, StorageCategory.Retainer, entry.Name) with { Label = StorageLabel.Retainer };
+                // 0.329: a retainer's crystal container is never imported: for a crystal its row is a lower bound, not a known zero.
+                rows.Add(crystal && row.Coverage == InventoryCoverage.Complete ? row with { Coverage = InventoryCoverage.Partial } : row);
             }
-            if (!hasRetainer) rows.Add(Unknown(StorageCategory.Retainer, "Servants non importés"));
+            if (!hasRetainer) rows.Add(Unknown(StorageCategory.Retainer, "") with { Label = StorageLabel.RetainersMissing });
         }
+
+        // 0.350 (g, I-09): the company chest, as recorded when this character last opened it (no row when never opened: it may not exist).
+        if (filter is StorageFilter.All)
+            foreach (var entry in bankEntries)
+                if (characterId != 0 && entry.Key.CharacterId == characterId && entry.Key.Kind == BankStorageKind.FreeCompanyChest)
+                    rows.Add(ObserveBank(entry, StorageCategory.FreeCompany, "") with { Label = StorageLabel.FreeCompanyChest });
 
         long nq = 0, hq = 0;
         foreach (var row in rows)
@@ -76,7 +93,8 @@ public static class ItemHoldings
             rows.Any(r => r.Coverage != InventoryCoverage.Unknown),
             rows.Any(r => r.Coverage != InventoryCoverage.Complete),
             rows.Any(r => r.IsCached && r.Coverage != InventoryCoverage.Unknown),
-            filter == StorageFilter.PlayerBags && rows[0].Coverage == InventoryCoverage.Complete);
+            // 0.329: every summed row counts, not only the bags: a cached armoury, dresser or armoire copy is never a current total.
+            filter == StorageFilter.PlayerBags && rows.All(r => !r.IsCached && r.Coverage == InventoryCoverage.Complete));
 
         StorageHolding ObserveBank(BankEntry entry, StorageCategory category, string name)
         {

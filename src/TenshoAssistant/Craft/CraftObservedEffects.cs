@@ -16,19 +16,19 @@ public static class CraftObservedEffects
     public static CraftEffectObservation Decode(CraftLiveFrame frame,CraftActionCatalog catalog)
     {
         var issues=new List<string>();var effects=new List<CraftObservedEffect>();var raw=frame.Raw;
-        if(!raw.StatusesComplete)issues.Add("Lecture complète des statuts non établie ; absence d'effet inconnue.");
-        if(Specs.Any(spec=>catalog.FindStatus(spec.Id) is null))issues.Add("Métadonnées des effets incomplètes.");
+        if(!raw.StatusesComplete)issues.Add("Full status reading not established; absence of an effect unknown.");
+        if(Specs.Any(spec=>catalog.FindStatus(spec.Id) is null))issues.Add("Effect metadata incomplete.");
         foreach(var spec in Specs)
         {
             var matches=raw.Statuses.Where(status=>status.Id==spec.Id).ToArray();if(matches.Length==0)continue;
             var metadata=catalog.FindStatus(spec.Id);
-            if(matches.Length>1)issues.Add($"Statut {spec.Id} présent plusieurs fois.");
+            if(matches.Length>1)issues.Add($"Status {spec.Id} present several times.");
             int? counter=spec.MaxCounter==0 ? null:matches.Length==1 && matches[0].Param>=1 && matches[0].Param<=spec.MaxCounter ? matches[0].Param:null;
-            if(spec.MaxCounter>0 && counter is null)issues.Add($"Compteur du statut {spec.Id} inconnu ou hors limites.");
-            if(spec.Unsupported)issues.Add($"Effet {metadata?.Name ?? spec.Id.ToString()} non modélisé.");
+            if(spec.MaxCounter>0 && counter is null)issues.Add($"Status counter {spec.Id} unknown or out of bounds.");
+            if(spec.Unsupported)issues.Add($"Effect {metadata?.Name ?? spec.Id.ToString()} not modelled.");
             if(metadata is not null)effects.Add(new(metadata,counter,spec.Indefinite,!spec.Unsupported));
         }
-        if(raw.Statuses.Any(status=>status.Id==252) && raw.Statuses.Any(status=>status.Id==257))issues.Add("Deux effets Parcimonie simultanés : état incohérent.");
+        if(raw.Statuses.Any(status=>status.Id==252) && raw.Statuses.Any(status=>status.Id==257))issues.Add("Two Waste Not effects at once: inconsistent state.");
         var perfection=raw.Statuses.Count(status=>status.Id==3813);
         bool? used=perfection==1 ? true:perfection==0 && raw.StatusesComplete && frame.UiStep==1 && (raw.StateFlags&2)==0 ? false:null;
         var procs=new List<string>();

@@ -1,6 +1,6 @@
 <Project Sdk="Dalamud.NET.Sdk">
   <PropertyGroup>
-    <Version>0.242.0</Version>
+    <Version>0.430.0</Version>
     <AssemblyName>TenshoAssistant</AssemblyName>
     <RootNamespace>TenshoAssistant</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -9,8 +9,13 @@
     <OutputPath>$(MSBuildProjectDirectory)\bin\x64\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="Localization\Languages\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- 0.248: languages live only inside the DLL (embedded); an optional Localization/Languages folder still overrides them. -->
     <EmbeddedResource Include="Localization\Languages\*.json" />
+    <EmbeddedResource Include="FreeCompany\Data\submarine-loot.json" />
+    <EmbeddedResource Include="FreeCompany\Data\submarine-breakpoints.csv" />
+    <EmbeddedResource Include="FreeCompany\Data\airship-unlock.csv" />
+    <EmbeddedResource Include="FreeCompany\Data\airship-drop.csv" />
+    <EmbeddedResource Include="Events\Data\festival-names.csv" />
     <!-- Plugin icon shown by Dalamud (images/icon.png next to the DLL); generated with AI, declared in the manifest description. -->
     <None Include="images\icon.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

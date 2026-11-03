@@ -1,0 +1,23 @@
+# 0.323: editor defaults matching the files as they are (no style rule is enforced: the code mixes « if( » and « if ( »).
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{yml,yaml,json,csproj,props,targets}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+# Windows PowerShell 5.1 needs the BOM to read non-ASCII characters in scripts.
+[*.ps1]
+charset = utf-8-bom
+
+[*.{bat,cmd}]
+end_of_line = crlf

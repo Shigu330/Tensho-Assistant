@@ -5,8 +5,11 @@ using TenshoAssistant.Items;
 namespace TenshoAssistant;
 
 /// <summary>
-/// In-game fishing help (0.226): while the fisher is fishing, the nearest fishing spot of the zone with its fish (game data) and, for each
-/// fish, the bait routes community data gives for that spot (Garland, one request at a time, cached), time window and weather.
+/// In-game fishing help (0.226): while a fisher is fishing (setting FishingPanel), or opened by hand (button, « /tensho peche », 0.228), the
+/// nearest fishing spot of the zone with its fish (game data) in a compact table (0.232): stock, bait route with mooches, bite and hookset,
+/// Teamcraft bite time at this spot (0.231) against a stopwatch started with the cast, then ET window, weathers, lure, snagging and
+/// predators — GatherBuddy data first (Apache-2.0, 0.227), Garland's item sources otherwise. Job, position and fishing state come from the
+/// plugin (copied on the framework thread); community data are requested once and cached.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -19,6 +22,8 @@ internal sealed partial class MainWindow
     private Func<(uint Job,uint Territory,float X,float Z,bool Fishing)?>? fishingNow;
     // Opened by the button or « /tensho peche » (0.228): shown whatever the job and even when not fishing, until closed.
     private bool fishingPanelManual;
+    // 0.398 (g, R-04): the bait in hand, copied on the framework thread (Gathering/FishingBaitReader); null = not a fisher or not read.
+    internal Func<uint?>? FishingBait { get; set; }
     internal void ToggleFishingPanel()=>fishingPanelManual=!fishingPanelManual;
     private Func<uint,float,float,(uint Id,string Name,float X,float Z,uint[] Fish)?>? fishingSpotAt;
     internal void ConfigureFishingHelp(Func<(uint Job,uint Territory,float X,float Z,bool Fishing)?> now,Func<uint,float,float,(uint Id,string Name,float X,float Z,uint[] Fish)?> spotAt)
@@ -58,6 +63,16 @@ internal sealed partial class MainWindow
             gatherBuddyFish?.Request();
             // 0.232: one row per fish (fish, bait route, bite, bite time, conditions); every detail stays in the tooltips.
             var rows=here.Fish.Select(fishId=>FishRow(fishId,here.Id)).ToArray();
+            // 0.398 (g, R-04): the bait in hand and its stock; the fish whose route starts with it are marked in the table.
+            var inHand=FishingBait?.Invoke() is > 0 and var baitId ? baitId:(uint?)null;
+            if(inHand is { } held)
+            {
+                var baitItem=items?.Find(held);var baitStock=GetRecipeHoldings(held);
+                ImGui.TextDisabled(localization.Get("FishingPanel.BaitInHand"));ImGui.SameLine();
+                ItemCell(baitItem,held,20,$"{baitItem?.Name ?? held.ToString()}{(baitStock.HasObservation ? $" ×{baitStock.Total:N0}":"")}");
+                ImGui.SameLine();
+                ImGui.TextColored(Success,localization.Format("FishingPanel.BaitMatches",rows.Count(row=>row.Route.Count>0 && row.Route[0]==held)));
+            }
             var withConditions=rows.Any(row=>row.Conditions.Length>0);
             if(ImGui.BeginTable("FishingRows",withConditions ? 5:4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingFixedFit|ImGuiTableFlags.BordersInnerV))
             {
@@ -71,28 +86,29 @@ internal sealed partial class MainWindow
                         {
                             ImGui.TableNextRow();
                             ImGui.TableNextColumn();
-                            DrawItemIcon(fish,new Vector2(22));var clicked=ImGui.IsItemClicked();DrawCollectionMark(fish);ImGui.SameLine();
                             var stock=GetRecipeHoldings(row.FishId);
-                            clicked|=ImGui.Selectable($"{fish?.Name ?? row.FishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}##Fish",false,ImGuiSelectableFlags.None,new Vector2(0,22));
-                            if(ImGui.IsItemHovered())DrawItemInfoTooltip(row.FishId);
-                            ItemLinksMenu($"FishMenu{row.FishId}",fish);
-                            if(clicked)SelectItem(row.FishId);
+                            ItemCell(fish,row.FishId,22,$"{fish?.Name ?? row.FishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
                             ImGui.TableNextColumn();
                             for(var step=0;step<row.Route.Count;step++)
                             {
                                 if(step>0){ImGui.SameLine(0,2);ImGui.TextDisabled("›");ImGui.SameLine(0,2);}
                                 var bait=items?.Find(row.Route[step]);
                                 DrawItemIcon(bait,new Vector2(22));
+                                // 0.398: green frame around the first bait when it is the one in hand.
+                                if(step==0 && inHand==row.Route[0])
+                                    ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin()-new Vector2(1),ImGui.GetItemRectMax()+new Vector2(1),ImGui.GetColorU32(Success),3,ImDrawFlags.None,2);
                                 if(ImGui.IsItemHovered())WrappedTooltip((bait?.Name ?? row.Route[step].ToString())+(step==0 ? "":"\n"+localization.Get("FishingSources.Mooch"))+"\n"+localization.Get("FishingPanel.RightClick"));
-                                ItemLinksMenu($"BaitMenu{row.FishId}/{step}",bait);
                             }
                             if(row.Route.Count==0)ImGui.TextDisabled("?");
                             ImGui.TableNextColumn();
-                            if(row.Bite is { } bite)
+                            // 0.330: « !!! » only for a legendary bite; any other bite is « ? » in a muted colour, and only known hooksets are named
+                            // (an unknown one showed a raw key).
+                            var bite=(row.Bite is "Weak" or "Strong" or "Legendary") ? row.Bite:null;var hook=(row.HookSet is "Precise" or "Powerful") ? row.HookSet:null;
+                            if(bite is not null || hook is not null)
                             {
-                                var colour=bite switch{"Weak"=>new Vector4(0.45f,0.85f,0.45f,1),"Strong"=>new Vector4(0.95f,0.80f,0.30f,1),_=>new Vector4(0.95f,0.35f,0.35f,1)};
-                                ImGui.TextColored(colour,(bite switch{"Weak"=>"!","Strong"=>"!!",_=>"!!!"})+(row.HookSet is { } hook ? " "+localization.Get("FishingPanel.HookShort"+hook):""));
-                                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FishingPanel.Bite"+bite)+(row.HookSet is { } hookFull ? " · "+localization.Get("FishingPanel.Hook"+hookFull):""));
+                                var colour=bite switch{"Weak"=>new Vector4(0.45f,0.85f,0.45f,1),"Strong"=>new Vector4(0.95f,0.80f,0.30f,1),"Legendary"=>new Vector4(0.95f,0.35f,0.35f,1),_=>Muted};
+                                ImGui.TextColored(colour,(bite switch{"Weak"=>"!","Strong"=>"!!","Legendary"=>"!!!",_=>"?"})+(hook is not null ? " "+localization.Get("FishingPanel.HookShort"+hook):""));
+                                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(bite is not null ? "FishingPanel.Bite"+bite:"FishingPanel.BiteUnknown")+(hook is not null ? " · "+localization.Get("FishingPanel.Hook"+hook):""));
                             }
                             else ImGui.TextDisabled("—");
                             ImGui.TableNextColumn();

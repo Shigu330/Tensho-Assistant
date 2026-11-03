@@ -12,27 +12,28 @@ public sealed record CraftLogOpenRequest(ulong Owner,uint RecipeId,uint ItemId);
 
 public sealed record CraftLogContext(RecipeDefinition? Recipe,CraftStats? Stats,string? Issue,int StartingQuality=0)
 {
-    public static CraftLogContext Resolve(CraftLogObservation observation,CharacterStatsState stats,RecipeCatalog? catalog,DateTimeOffset now)
+    // X-11 (0.419): manipulation = the job has learned Manipulation (IUnlockState, read by the caller); it used to be always off.
+    public static CraftLogContext Resolve(CraftLogObservation observation,CharacterStatsState stats,RecipeCatalog? catalog,DateTimeOffset now,bool manipulation=false)
     {
-        if(!observation.Fresh(now))return new(null,null,"Sélection du carnet trop ancienne ou invalide.");
+        if(!observation.Fresh(now))return new(null,null,"Crafting log selection too old or invalid.");
         var recipe=catalog?.ForResult(observation.ItemId).FirstOrDefault(row=>row.RecipeId==observation.RecipeId && row.CraftTypeId==observation.CraftTypeId);
-        if(recipe is null)return new(null,null,"Recette non reliée au catalogue courant ; aucun rapprochement par nom.");
+        if(recipe is null)return new(null,null,"Recipe not linked to the current catalogue; no matching by name.");
         if(CraftSimulation.Unsupported(recipe) is { } unsupported)return new(recipe,null,unsupported);
         var p=recipe.Simulation!;
         if(p.Quality>0 && (observation.StartingQuality is null || observation.MaximumQuality!=p.Quality))
-            return new(recipe,null,"Qualité initiale du carnet absente ou qualité maximale incompatible ; calcul suspendu.");
+            return new(recipe,null,"Crafting log starting quality missing or maximum quality incompatible; calculation suspended.");
         var starting=observation.StartingQuality ?? 0;
-        if(starting<0 || starting>p.MaxStartingQuality)return new(recipe,null,"Qualité initiale du carnet hors des limites de la recette.");
-        if(observation.CurrentJobId!=recipe.CraftTypeId+8)return new(recipe,null,$"Équipez le métier {recipe.CraftType} pour calculer avec ses attributs.");
+        if(starting<0 || starting>p.MaxStartingQuality)return new(recipe,null,"Crafting log starting quality outside the recipe's limits.");
+        if(observation.CurrentJobId!=recipe.CraftTypeId+8)return new(recipe,null,$"Equip the {recipe.CraftType} job to calculate with its attributes.");
         if(stats.CharacterId!=observation.Owner || stats.ObservedAt is not { } date || now<date || now-date>TimeSpan.FromSeconds(3))
-            return new(recipe,null,"En attente des attributs récents du personnage.");
-        if(stats.JobId!=recipe.CraftTypeId+8)return new(recipe,null,$"Équipez le métier {recipe.CraftType} pour calculer avec ses attributs.");
+            return new(recipe,null,"Waiting for the character's recent attributes.");
+        if(stats.JobId!=recipe.CraftTypeId+8)return new(recipe,null,$"Equip the {recipe.CraftType} job to calculate with its attributes.");
         if(!stats.Values.TryGetValue("Craftsmanship",out var cs) || !stats.Values.TryGetValue("Control",out var control)
             || !stats.Values.TryGetValue("CraftingPoints",out var cp) || stats.Level is <1 or >100 || cs is <0 or >100000 || control is <0 or >100000 || cp is <0 or >10000)
-            return new(recipe,null,"Attributs d’artisanat incomplets ou incompatibles.");
+            return new(recipe,null,"Crafting attributes incomplete or incompatible.");
         if(cs<recipe.Simulation!.RequiredCraftsmanship || control<recipe.Simulation.RequiredControl)
-            return new(recipe,null,"Habileté ou contrôle sous le minimum de la recette.");
-        return new(recipe,new(stats.Level,cs,control,cp,false),null,starting);
+            return new(recipe,null,"Craftsmanship or control below the recipe's minimum.");
+        return new(recipe,new(stats.Level,cs,control,cp,manipulation),null,starting);
     }
 }
 

@@ -4,6 +4,11 @@ using Lumina.Excel.Sheets;
 
 namespace TenshoAssistant.Market;
 
+/// <summary>
+/// Copies the character's current world, its data center and the names of that data center's public worlds (game World sheet)
+/// into MarketService on the framework thread, only when the character or world changes; cleared when logged out. A failed read
+/// is retried after 5 s. Unsubscribed on dispose.
+/// </summary>
 internal sealed class MarketWorldReader : IDisposable
 {
     private readonly MarketService service;

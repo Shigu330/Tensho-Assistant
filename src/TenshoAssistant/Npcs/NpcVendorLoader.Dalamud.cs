@@ -64,7 +64,7 @@ internal sealed class NpcVendorLoader : IDisposable
                 {
                     dataVersion=string.Join(";",data.GameData.Repositories.Values.OrderBy(r=>r.Name).Select(r=>$"{r.Name}={r.Version}"));
                     cacheScope=data.Language.ToString();
-                    cacheVersion=NpcVendorCache.Version($"{dataVersion};schema={typeof(GilShop).Assembly.GetName().Version}");
+                    cacheVersion=NpcVendorCache.Version($"{dataVersion};schema={typeof(GilShop).Assembly.GetName().Version};fcc-295;req-352");
                 }
                 if(!cacheChecked && cache is not null)
                 {
@@ -131,7 +131,12 @@ internal sealed class NpcVendorLoader : IDisposable
                 var name=shop.Name.ExtractText();
                 foreach(var entry in entries)
                     if(entry.Item.RowId!=0 && items.TryGetRow(entry.Item.RowId,out var item))
-                    {sales.Add(new(shop.RowId,NpcShopKind.Gil,name,entry.Item.RowId,1,false,[new(GilItemId,item.PriceMid)]));shops.Add(shop.RowId);}
+                    {
+                        // 0.352 (g, I-11): the first quest the article asks for, and its achievement (0 = none).
+                        var quest=entry.QuestRequired.Select(required=>required.RowId).FirstOrDefault(id=>id!=0);
+                        sales.Add(new(shop.RowId,NpcShopKind.Gil,name,entry.Item.RowId,1,false,[new(GilItemId,item.PriceMid)],0,quest,entry.AchievementRequired.RowId));
+                        shops.Add(shop.RowId);
+                    }
             }
             yield return ++count;
         }
@@ -159,8 +164,21 @@ internal sealed class NpcVendorLoader : IDisposable
                     .Select(cost=>NpcShopLinks.Currency(encoding,cost.ItemCost.RowId,cost.CurrencyCost,cost.CostType)).ToArray();
                 foreach(var receive in entry.ReceiveItems)
                     if(receive.Item.RowId!=0 && receive.ReceiveCount>0)
-                    {sales.Add(new(shop.RowId,NpcShopKind.Special,name,receive.Item.RowId,receive.ReceiveCount,receive.ReceiveHq,Array.AsReadOnly(costs)));shops.Add(shop.RowId);}
+                    {sales.Add(new(shop.RowId,NpcShopKind.Special,name,receive.Item.RowId,receive.ReceiveCount,receive.ReceiveHq,Array.AsReadOnly(costs),0,entry.Quest.RowId,entry.AchievementUnlock.RowId));shops.Add(shop.RowId);}
             }
+            yield return ++count;
+        }
+        // Free company credit shops (0.295, probe docs/evidence/0.295-fcc-shops.md): item, price in company credits, company rank.
+        foreach(var shop in data.GetExcelSheet<FccShop>())
+        {
+            var name=shop.Name.ExtractText();
+            foreach(var entry in shop.ItemData)
+                if(entry.Item.RowId!=0 && entry.Cost>0)
+                {
+                    sales.Add(new(shop.RowId,NpcShopKind.FreeCompany,name,entry.Item.RowId,1,false,[new(NpcCost.CompanyCredits,entry.Cost)],
+                        (byte)Math.Min(entry.FCRankRequired.RowId,255u)));
+                    shops.Add(shop.RowId);
+                }
             yield return ++count;
         }
         // Indirections from an NPC to its shops.

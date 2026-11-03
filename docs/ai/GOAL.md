@@ -1,27 +1,27 @@
 # GOAL actif
 
-ID: TRIAD-003 — finir l'outil Triple Triade comme TriadBuddy (demande utilisateur 2026-10-31). Plan : [TRIAD-003-PLAN](../goals/TRIAD-003-PLAN.md).
-ÉTAPE 1: conseil pendant le match superposé au jeu. Avant de lier, prouver en jeu : règles appliquées, joueur au trait, PNJ, positions.
+ID: R-11 — planificateurs d'équipement (demande utilisateur 2026-11-02). Plan et avancement : [R-11](../goals/R-11.md).
 
-DONE (0.159.0): sonde PNJ ([preuve](../evidence/0.159.0-triad-npc-probe.log)) ; capture de match dans dalamud.log.
+FAIT (0.310–0.315) :
+- Étape 1 (0.310) : page Équipement façon fenêtre Personnage (statistiques lues / prévues / écart, choix par emplacement avec
+  filtres, plan par job, essayage, partage par code) ; mirage pour tous les jobs (0.311) ; matérias et plafonds (0.312–0.313).
+  Validée en jeu (rapports utilisateur 2026-11-02).
+- Étape 2 (0.314) : sources et possession (✓ / ✗, filtre « Seulement ce que je possède », « Pièces à obtenir »). Validée en jeu.
+- Étape 3 (0.315) : montages de sous-marins et de dirigeables (page Compagnie libre › Montages, meilleurs montages pour un trajet,
+  seuils de SubmarineTracker, MIT). **Non validée en jeu.** Pas de planificateur de trajets de dirigeable : aucune donnée sous
+  licence compatible.
 
-DONE (0.160.0): preuves du match (tour, règles, carte imposée, PNJ, positions) ; inversion droite/gauche corrigée ; cartes cachées
-depuis le deck du PNJ ; conseil superposé (meilleure carte + meilleure case) et texte dans Match observé.
+RESTE : étape 4 (autres équipements utiles : barde de chocobo, escouade…), à décider avec l'utilisateur.
 
-DONE (0.161.0): panneau de la fenêtre de défi — % de victoire estimés par deck (decks du jeu + deck Tensho) et génération de deck
-depuis les cartes possédées ; conseil en match 0.160 validé par l'utilisateur.
+SUITE (file d'attente de STATUS « Prochaine action », une à la fois, dans cet ordre) :
+a) retour en jeu de 0.315 ; b) tour des `.md` et des descriptions des outils, feuille de route complétée (en cours) ;
+c) plan de ce qui manque par rapport aux plugins existants (comparaison, licences) ; d) tour du code : réglages manquants, outils
+de développement pour la communauté open source ; e) améliorations générales, la carte d'abord ; puis publication D17 (côté
+auteur ; seul point « avant D17 » encore ouvert : icônes de quête 71141 / 71151, sur relevé en jeu).
+Points à décider et tests en jeu : [ROADMAP](../project/ROADMAP.md) (« À décider / à revoir », « Tests à faire en jeu »).
+VALIDATION : Verify.ps1 vert ; rapport utilisateur en jeu.
 
-PROTOCOLE EN JEU (DLL 0.161.0.0):
-1. Observation Triple Triade active ; Collections ouvertes une fois (cartes possédées chargées).
-2. Cibler un PNJ et lui parler jusqu'à la fenêtre de défi : un panneau Tensho apparaît à droite (PNJ, règles, % par deck).
-3. « Générer un deck pour ce PNJ » : quelques secondes, puis 5 cartes et leur % ; « Enregistrer comme deck Tensho » ; composer le deck
-   dans l'éditeur du jeu et vérifier que son % apparaît ensuite dans la liste.
-4. Comparer les % avec l'impression en match (estimations, pas des promesses).
-
-DONE (0.162.0): liste des decks Tensho par PNJ (suppression) ; aide-mémoire des cartes à côté de l'éditeur de decks du jeu
-(ouvrir l'éditeur de decks du jeu avec l'observation active : panneau « Tensho — deck à composer »).
-
-EN COURS (0.163): surbrillance des cartes du deck dans l'éditeur de decks du jeu — capture en attente (voir STATUS).
-
-SUITE: liste des PNJ (étape 3 du plan), infos de carte ; CACTPOT-019 à valider ; PUBLISH-018 côté auteur.
-VALIDATION: Verify.ps1 vert ; rapport utilisateur en jeu.
+Anciens GOAL :
+- R-06 (refonte de l'interface, 0.247–0.294) : terminé pour l'essentiel ([R-06](../goals/R-06.md)) ; reste les réglages utiles
+  manquants (étape 5, repris au point d) et les cadres et textures du jeu (étape 6, à décider).
+- TRIAD-003 (Triple Triade) : terminé et validé en jeu (STATUS, rapports 2026-10-31 et 2026-11-01).

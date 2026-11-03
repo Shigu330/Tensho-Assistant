@@ -10,3 +10,9 @@ TestResults/
 
 # Local working checkpoints (logs, notes, source zips): git history, CHANGELOG.md and docs/evidence/ replace them.
 checkpoints/
+
+# 0.323: per-user agent settings, OS thumbnails, Python caches (tools/ has a Python script)
+.claude/settings.local.json
+Thumbs.db
+desktop.ini
+__pycache__/

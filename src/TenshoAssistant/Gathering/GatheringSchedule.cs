@@ -16,20 +16,29 @@ public sealed class GatheringSchedule
     public GatheringScheduleKind Kind { get; }
     public IReadOnlyList<GatheringWindow> Windows { get; }
     public string Key { get; }
+    /// <summary>Limited: the windows, language-neutral (HH:MM–HH:MM ET). Other kinds: French developer text for logs only; the UI shows <see cref="TextKey"/>.</summary>
     public string Label { get; }
+    /// <summary>Localization key of the UI text of a kind without windows (GatheringTime.Unknown / Unrestricted / NoWindow / Invalid); null for Limited.</summary>
+    public string? TextKey { get; }
+    /// <summary>ET minutes at which a window really opens, in order: the 00:00 piece of a window crossing midnight is not an opening.</summary>
+    public IReadOnlyList<int> OpeningMinutes { get; }
 
     private GatheringSchedule(GatheringScheduleKind kind, IEnumerable<GatheringWindow> windows)
     {
         Kind = kind;
         Windows = Array.AsReadOnly(windows.ToArray());
         Key = $"{kind}:{string.Join(';', Windows.Select(w => $"{w.StartMinute}-{w.EndMinute}"))}";
+        TextKey = kind == GatheringScheduleKind.Limited ? null : $"GatheringTime.{kind}";
+        // 0.330: Normalize stores a window crossing midnight as (start,1440) + (0,end); it opens once, at its start (one alarm, not one at 00:00).
+        OpeningMinutes = Array.AsReadOnly(Windows.Where(w => !(w.StartMinute == 0 && Windows.Any(o => o.StartMinute > 0 && o.EndMinute == 1440)))
+            .Select(w => w.StartMinute).ToArray());
         Label = kind switch
         {
-            GatheringScheduleKind.Unrestricted => "Sans restriction horaire ET",
+            GatheringScheduleKind.Unrestricted => "No ET time restriction",
             GatheringScheduleKind.Limited => string.Join(" · ", Windows.Select(w => $"{Time(w.StartMinute)}–{Time(w.EndMinute)}")) + " ET",
-            GatheringScheduleKind.NoWindow => "Aucune fenêtre ET renseignée",
-            GatheringScheduleKind.Invalid => "Horaire ET non interprétable",
-            _ => "Horaire ET inconnu / non couvert",
+            GatheringScheduleKind.NoWindow => "No ET window reported",
+            GatheringScheduleKind.Invalid => "ET schedule cannot be interpreted",
+            _ => "ET schedule unknown / not covered",
         };
     }
 

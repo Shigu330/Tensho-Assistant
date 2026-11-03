@@ -2,6 +2,10 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Opening a tool for an item from the game's inventory menu (Items/ItemContextMenuBridge) or the context item panel (0.208): each route
+// (usages, stocks, craft, gathering, NPC vendors, market, monster loot, duty loot, collection, quest, sources, tools) lands on its page or
+// item sheet tab. RelevantRoutes keeps only the tools that have something for the item (an unloaded catalogue keeps its tool: unknown is
+// not none); the inventory menu, the item right-click menu, the context tool icons and the item sheet tabs share it.
 internal sealed partial class MainWindow
 {
     internal void OpenItemContext(ItemMenuRequest request)
@@ -24,7 +28,7 @@ internal sealed partial class MainWindow
             case ItemContextRoute.Gathering:OpenContextTool("GatherBuddy");break;
             case ItemContextRoute.Tools:toolQuery=string.Empty;page=Page.Home;break;
             case ItemContextRoute.NpcVendors:page=Page.NpcVendors;break;
-            case ItemContextRoute.Market:OpenContextTool("Price Insight");break;
+            case ItemContextRoute.Market:OpenContextTool("Price Insight");marketFocusSummary=true;break;
             case ItemContextRoute.MonsterLoot:OpenContextTool("Monster Loot Hunter");break;
             case ItemContextRoute.DutyLoot:
                 // First duty that drops it (LuminaSupplemental, then Garland), filtered on the item; else the duty list searched by name.
@@ -35,13 +39,13 @@ internal sealed partial class MainWindow
             case ItemContextRoute.Collection:
                 if(CollectionOf(SelectedItem) is { } entry)
                 {
-                    if(entry.Kind==Collections.CollectionKind.TripleTriad){page=Page.TripleTriad;selectedTriad=entry.Id;}
-                    else{page=Page.Collections;collectionKind=entry.Kind;focusCollectionKind=entry.Kind;if(entry.Kind==Collections.CollectionKind.Orchestrion)focusOrchestrionTab=true;}
+                    if(entry.Kind==Collections.CollectionKind.TripleTriad)ShowTriadCard(entry.Id);
+                    else{page=Page.Collections;collectionKind=entry.Kind;focusCollectionKind=entry.Kind;collectionFilter=0;if(entry.Kind==Collections.CollectionKind.Orchestrion){focusOrchestrionTab=true;orchestrionCategoryFilter=entry.Music?.CategoryId;}}
                     collectionQuery=entry.Name;
                 }
-                else page=Page.Items;
+                else OpenItemSheet();
                 break;
-            case ItemContextRoute.Sources:page=Page.Items;break;
+            case ItemContextRoute.Sources:OpenItemSheet();break;
             case ItemContextRoute.Quest:
                 if(quests.State.RewardIndex?.ForItem(itemId) is { Count:>0 } rewards){page=Page.Quests;SelectQuest(rewards[0].QuestId);}
                 else page=Page.Quests;

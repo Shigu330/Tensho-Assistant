@@ -42,6 +42,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly GpCatalogService gpActions = new();
     private readonly CollectionService collections = new();
     private readonly MarketService market = new();
+    private readonly MarketBoardService marketBoard = new();
     private readonly ItemHoverService itemHover = new();
     private readonly QuestService quests = new();
     private readonly CharacterStatsService characterStats = new();
@@ -60,16 +61,25 @@ public sealed class Plugin : IDalamudPlugin
     private readonly FashionDataService fashionData=new();
     private readonly BankImportOverlay bankOverlay;
     private Func<bool> autoBankCapture = () => true;
+    // 0.394: the font settings, read by Draw (the configuration is a constructor local).
+    private Func<UI.FontSettings?> fontSettings = () => null;
     private readonly ItemContextMenuBridge? itemContextMenu;
     private readonly DataCache? dataCache;
     private CommandInfo? commandInfo;
     private int commandLocalizationRevision=-1;
+    private Func<Alarms.AlarmDtrEntry?>? alarmBar;
+    private Market.UndercutWatcher? undercut;
+    // 0.349 (g, X-07): the chat, for the « /tensho wiki | lodestone » answers.
+    private readonly IChatGui chatGui;
+    // R-12 (0.414): items whose « Open » chat link handler is registered (command id = item id), all removed on unload.
+    private readonly HashSet<uint> alarmLinks=[];
 
     public Plugin(IDalamudPluginInterface pluginInterface, ICommandManager commands, IPluginLog log,
         IGameInventory inventory, IPlayerState player, IClientState client, IFramework framework, IDataManager data, IGameGui gameGui,
-        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,ITargetManager targets,IPartyList partyList,IChatGui chat)
+        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,ITargetManager targets,IPartyList partyList,IChatGui chat,IDtrBar dtrBar,IKeyState keyState,IMarketBoard marketBoardEvents)
     {
         this.log = log;
+        chatGui = chat;
         localization = new LocalizationManager((error, message) => log.Warning(error, message), pluginInterface.AssemblyLocation.DirectoryName);
         dutyLoot = new DutyLootService(garland);
         monsterLoot = new MonsterLootService(garland);
@@ -77,21 +87,31 @@ public sealed class Plugin : IDalamudPlugin
         {
             registrations.Register(()=>{},()=>dataCache?.Dispose());
             registrations.Register(() => { }, market.Dispose);
+            registrations.Register(() => { }, marketBoard.Dispose);
             registrations.Register(() => { }, garland.Dispose);
             registrations.Register(() => { }, dutyLoot.Dispose);
             registrations.Register(() => { }, monsterLoot.Dispose);
             registrations.Register(() => { }, fashionData.Dispose);
             var configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             autoBankCapture = () => configuration.AutoBankCapture;
+            fontSettings = () => configuration.Fonts;
             if (configuration.Version != 1)
                 throw new NotSupportedException($"Unsupported configuration version: {configuration.Version}");
             dataCache=new DataCache(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"DataCache-v1"));
             market.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Prices),dataCache);
+            marketBoard.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Prices),dataCache);
             garland.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache);
+            // 0.324: each source switch stops every request of its source (it used to cover part of it only).
+            garland.Enabled=()=>configuration.CommunityGarland;
+            market.Enabled=()=>configuration.CommunityUniversalis;
+            marketBoard.Enabled=()=>configuration.CommunityUniversalis;
             fashionData.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Fashion),dataCache);
+            fashionData.Enabled=()=>configuration.CommunityFashion;
             MarketWorldReader? marketReader = null;
             registrations.Register(() => marketReader = new MarketWorldReader(market, framework, player, client, log, data), () => marketReader?.Dispose());
-            var bank = new InventoryBankService(new FileInventoryBankStore(
+            // 0.345 (g, I-03): one file per character (InventoryBank/<id>.json); the former shared file is split once.
+            var bank = new InventoryBankService(new PerCharacterBankStore(
+                Path.Combine(pluginInterface.GetPluginConfigDirectory(), "InventoryBank"),
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(), "InventoryBank.json")));
             registrations.Register(() => { }, bank.Dispose);
             IReadOnlyList<(uint,uint)>? cabinet = null;
@@ -111,12 +131,30 @@ public sealed class Plugin : IDalamudPlugin
             UI.GameThemeReader? themeReader=null;
             registrations.Register(()=>themeReader=new UI.GameThemeReader(gameConfig,log),()=>themeReader?.Dispose());
             mainWindow.ConfigureTheme(()=>themeReader?.GameValue);
-            var wikiSources=new WikiMonsterSources(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache);
+            var wikiSources=new WikiMonsterSources(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
             registrations.Register(()=>{},wikiSources.Dispose);
             mainWindow.ConfigureWikiSources(wikiSources);
             var monsterHover=new Monsters.MonsterHoverSources(wikiSources);
             registrations.Register(()=>{},monsterHover.Dispose);
             mainWindow.ConfigureMonsterHover(monsterHover);
+            // g, C-13 (0.367): monsters that teach a blue magic spell, from the wiki's spell page (English action name), on click only.
+            // 0.387 (user report « never gives the monster »): the AozAction → Action link resolved in the client's language, so the wiki
+            // was asked for the French page (« Mauvaise_haleine »: missing) and said « no monster ». The name now comes from the English
+            // Action sheet by row; family « -2 » drops the empty answers cached under the wrong title.
+            var blueWiki=new WikiMonsterSources(id=>data.GetExcelSheet<Lumina.Excel.Sheets.AozAction>().GetRowOrDefault(id) is { Action.RowId:not 0 } aoz
+                    ? data.GetExcelSheet<Lumina.Excel.Sheets.Action>(Dalamud.Game.ClientLanguage.English).GetRowOrDefault(aoz.Action.RowId)?.Name.ExtractText():null,
+                ()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,family:"wiki-blue-spells-2"){Enabled=()=>configuration.CommunityWiki};
+            registrations.Register(()=>{},blueWiki.Dispose);
+            mainWindow.BlueSpellWiki=blueWiki;
+            // 0.395 (user request): the wiki's spellbook table (one page for every spell) read when the Blue magic page opens, copy first.
+            var blueIndex=new BlueSpellWikiIndex(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,()=>configuration.CommunityWiki);
+            registrations.Register(()=>{},blueIndex.Dispose);
+            mainWindow.BlueSpellIndex=blueIndex;
+            mainWindow.GameNames=new Items.GameNames(data,log);
+            Dictionary<string,uint>? englishPlaces=null;
+            mainWindow.EnglishPlaceId=name=>(englishPlaces??=data.GetExcelSheet<Lumina.Excel.Sheets.PlaceName>(Dalamud.Game.ClientLanguage.English)
+                .Where(row=>!row.Name.IsEmpty).GroupBy(row=>row.Name.ExtractText(),StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(group=>group.Key,group=>group.First().RowId,StringComparer.OrdinalIgnoreCase)).GetValueOrDefault(name.Trim());
             Maps.MapLiveReader? mapLive=null;
             registrations.Register(()=>mapLive=new Maps.MapLiveReader(framework,client,objects,data,condition,fateTable,partyList,log),()=>mapLive?.Dispose());
             var mapLocal=new Maps.MapLocalIndexService();
@@ -129,27 +167,65 @@ public sealed class Plugin : IDalamudPlugin
             var wikiItems=new Community.WikiItemAcquisitionService(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
             registrations.Register(()=>{},wikiItems.Dispose);
             mainWindow.ConfigureWikiItems(wikiItems);
-            var wikiVistas=new Maps.WikiVistaSource(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache);
+            var wikiVistas=new Maps.WikiVistaSource(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
             registrations.Register(()=>{},wikiVistas.Dispose);
             mainWindow.ConfigureWikiVistas(wikiVistas);
             Maps.NativeMapReplacer? mapReplacer=null;
-            registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,()=>configuration.MapView,mainWindow.ShowMapFromGame,()=>mainWindow.MapViewOpen,mainWindow.CloseMapFromGame,log),()=>mapReplacer?.Dispose());
+            registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,()=>configuration.MapView,mainWindow.ShowMapFromGame,()=>mainWindow.MapViewOpen,()=>mainWindow.MapViewVisible(),mainWindow.CloseMapFromGame,log),()=>mapReplacer?.Dispose());
             mainWindow.ConfigureGameMapOpener(()=>mapReplacer?.OpenGameMap());
             Macros.MacroWriter? macroWriter=null;
             registrations.Register(()=>macroWriter=new Macros.MacroWriter(framework,log,outcome=>
             {
                 var parts=outcome.Split(':');
-                var text=parts[0]=="Done" ? localization.Format("CraftMacro.Written",parts[1],parts[2]):localization.Get("CraftMacro.Write"+parts[0]);
+                // 0.330 (audit): the exact slot list (« Done:first:last:book:list »); occupied slots are skipped, so « first to last » could
+                // suggest they were overwritten.
+                var text=parts[0]=="Done" ? localization.Format("CraftMacro.Written",parts[4].Replace(",",", ")):localization.Get("CraftMacro.Write"+parts[0]);
                 if(parts[0]=="Done")chat.Print("[Tensho] "+text);else chat.PrintError("[Tensho] "+text);
             }),()=>macroWriter?.Dispose());
             mainWindow.ConfigureMacroWriter(macroWriter!);
+            // R-12 (0.319): Discord webhook posts on their own worker; registered before the alarm service so it is released after it.
+            var discord=new Alarms.DiscordNotifier();
+            registrations.Register(()=>{},discord.Dispose);
+            mainWindow.ConfigureDiscord(discord);
+            // Reminders and vessel returns made before 0.319 have no source: recognized once by their group, for the Discord categories.
+            var migrated=false;
+            foreach(var alarm in configuration.Alarms ?? [])
+                migrated|=Alarms.DiscordWebhook.AssignLegacySource(alarm,localization.Get("Reminders.Title"),localization.Get("FreeCompany.Title"));
+            if(migrated)try{pluginInterface.SavePluginConfig(configuration);}catch(Exception error){log.Warning(error,"Alarm sources could not be saved.");}
             Alarms.AlarmService? alarms=null;
+            registrations.Register(()=>{},()=>{chat.RemoveChatLinkHandler();alarmLinks.Clear();});
             registrations.Register(()=>alarms=new Alarms.AlarmService(framework,condition,log,configuration,()=>pluginInterface.SavePluginConfig(configuration),
-                ()=>weather.State.Catalog,line=>
+                ()=>weather.State.Catalog,(alarm,line)=>
                 {
                     // « label|minutes|local time » from the service, localized here.
                     var parts=line.Split('|');
-                    if(parts.Length>=3)chat.Print("[Tensho] "+localization.Format("Alarms.Ring",string.Join('|',parts[..^2]),parts[^2],parts[^1]));
+                    if(parts.Length<3)return;
+                    // R-12 (0.414): the game's map link to the alarm's gathering point, and « Open » (Tensho on the item), when known.
+                    var message=new Dalamud.Game.Text.SeStringHandling.SeStringBuilder()
+                        .AddText("[Tensho] "+localization.Format("Alarms.Ring",string.Join('|',parts[..^2]),parts[^2],parts[^1]));
+                    if(mainWindow.AlarmPlace(alarm) is { } place)
+                        message.AddText(" ").AddMapLink(place.TerritoryId,place.MapId,place.X,place.Y,0.05f);
+                    if(alarm.ItemId is > 0 and < uint.MaxValue)
+                    {
+                        if(alarmLinks.Add(alarm.ItemId) && alarmLinks.Count>256){chat.RemoveChatLinkHandler();alarmLinks.Clear();alarmLinks.Add(alarm.ItemId);}
+                        var link=chat.AddChatLinkHandler(alarm.ItemId,(item,_)=>{mainWindow.OpenAlarmItem(item);mainWindow.IsOpen=true;});
+                        message.AddText(" ").Add(link).AddUiForeground(localization.Get("Alarms.OpenInTensho"),500)
+                            .Add(Dalamud.Game.Text.SeStringHandling.Payloads.RawPayload.LinkTerminator);
+                    }
+                    chat.Print(message.Build());
+                },alarm=>
+                {
+                    // An item alarm without its job (fish forecast, alarms before 0.203) takes it from the gathering catalogue, as the
+                    // Alarms page sorts it, so the Discord category matches; stored on the alarm, saved with its next change.
+                    if(alarm.JobId==0 && alarm.ItemId!=0)alarm.JobId=Alarms.AlarmSchedule.JobOfAlarm(alarm,item=>gatheringCatalog.State.Catalog?.ForItem(item));
+                    return Alarms.DiscordWebhook.ShouldSend(configuration.Discord,alarm);
+                },(alarm,minutes,occurrence)=>
+                {
+                    // Framework thread: the character's name is read here, only when the player allowed it.
+                    var settings=configuration.Discord;
+                    var character=settings.IncludeCharacter ? objects.LocalPlayer?.Name.TextValue:null;
+                    var content=Alarms.DiscordWebhook.Format(settings,localization.Get("Discord.DefaultTemplate"),alarm.DiscordMessage,alarm.Label,minutes,occurrence.ToLocalTime(),character);
+                    discord.Enqueue(new(settings.WebhookUrl,Alarms.DiscordWebhook.Payload(settings,content)));
                 }),()=>alarms?.Dispose());
             mainWindow.ConfigureAlarms(alarms!);
             var gatherBuddyFish=new Community.GatherBuddyFishService(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityGatherBuddy};
@@ -161,6 +237,15 @@ public sealed class Plugin : IDalamudPlugin
             // Fishing help (0.226): the FishingSpot of the player's territory nearest to the player. FishingSpot X/Z are map pixels
             // (0–2048, probe PROBE_FISHSPOT: spot 35 X 668 Z 1120 at scale 200 = map 7.7, 12.2 as Garland): world = (pixel − 1024) / scale − offset.
             Dictionary<uint,List<(uint Id,string Name,float X,float Z,uint[] Fish)>>? fishingSpots=null;
+            // g, R-05 (0.402): fishing, spearfishing and gathering notebooks, read while the Gathering page shows them.
+            Gathering.NotebookReader? notebooks=null;
+            registrations.Register(()=>notebooks=new Gathering.NotebookReader(framework,client,data,log),()=>notebooks?.Dispose());
+            mainWindow.NotebookSource=notebooks;
+            mainWindow.NotebookExportFolder=()=>Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Exports");
+            // g, R-04 (0.398): the bait in hand for the fishing help.
+            Gathering.FishingBaitReader? baitReader=null;
+            registrations.Register(()=>baitReader=new Gathering.FishingBaitReader(framework,objects,log),()=>baitReader?.Dispose());
+            mainWindow.FishingBait=()=>baitReader?.Bait;
             mainWindow.ConfigureFishingHelp(()=>
             {
                 var local=objects.LocalPlayer;
@@ -212,16 +297,327 @@ public sealed class Plugin : IDalamudPlugin
             var dutyFinder=new Duties.DutyFinderService();
             Duties.DutyFinderReader? dutyFinderReader=null;
             registrations.Register(()=>dutyFinderReader=new Duties.DutyFinderReader(dutyFinder,framework,gameGui,log,()=>mainWindow.DeveloperMode),()=>dutyFinderReader?.Dispose());
-            mainWindow.ConfigureDutyFinder(dutyFinder);
+            var dutyFinderLoot=new DutyLootService(garland);registrations.Register(()=>{},dutyFinderLoot.Dispose);
+            mainWindow.ConfigureDutyFinder(dutyFinder,dutyFinderLoot);
             var triadNpcs=new TriadNpcService();
             TriadNpcLoader? triadNpcLoader=null;
             registrations.Register(()=>triadNpcLoader=new TriadNpcLoader(triadNpcs,data,framework,client,player,log),()=>triadNpcLoader?.Dispose());
             mainWindow.ConfigureTriadNpcs(triadNpcs);
+            mainWindow.ConfigureMarketBoard(marketBoard);
+            Alarms.AlarmDtrEntry? alarmBar=null;
+            registrations.Register(()=>alarmBar=new Alarms.AlarmDtrEntry(dtrBar,framework,gameGui,configuration,localization.Get,mainWindow.OpenAlarms),()=>alarmBar?.Dispose());
+            // 0.344 (g, I-02): currency balances and threshold alerts (chat and sound with the alarm options, Discord in its own category),
+            // and their server bar entry. Registered after the Discord notifier, so released before it.
+            Inventory.CurrencyWatcher? currencies=null;
+            registrations.Register(()=>currencies=new Inventory.CurrencyWatcher(framework,client,player,data,configuration,log){Crossed=crossed=>
+            {
+                // Framework thread. One chat line and one sound for the whole batch; silence in duties as for the alarms.
+                var options=configuration.AlarmOptions ?? new();
+                var inDuty=options.MuteInDuties && condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
+                var lines=string.Join(" · ",crossed.Select(Alarms.CurrencyDtrEntry.Line));
+                if(options.ChatAllowed(inDuty))chat.Print("[Tensho] "+localization.Format("Currencies.Alert",lines));
+                if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
+                var settings=configuration.Discord;
+                if(Alarms.DiscordWebhook.ShouldSend(settings,Alarms.AlarmSource.Currency))
+                    try
+                    {
+                        var character=settings.IncludeCharacter ? objects.LocalPlayer?.Name.TextValue:null;
+                        var message=localization.Format("Currencies.Alert",lines);
+                        var content=Alarms.DiscordWebhook.Format(settings,message,message,message,0,DateTimeOffset.Now,character);
+                        discord.Enqueue(new(settings.WebhookUrl,Alarms.DiscordWebhook.Payload(settings,content)));
+                    }
+                    catch(Exception error){log.Warning("Currency alert could not be queued for Discord ({Error}).",error.GetType().Name);}
+            }},()=>currencies?.Dispose());
+            mainWindow.Currencies=()=>currencies;
+            // 0.366 (g, C-10): duty ready (IClientState.CfPop, framework thread): chat line and sound with the alarm options, Discord in its
+            // own category; nothing when the alert is off. Unsubscribed on dispose.
+            void OnDutyPop(Lumina.Excel.Sheets.ContentFinderCondition duty)
+            {
+                try
+                {
+                    var options=configuration.AlarmOptions ?? new();
+                    if(!options.DutyPopAlert)return;
+                    var inDuty=options.MuteInDuties && condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
+                    var name=duty.Name.ExtractText();
+                    var message=localization.Format("DutyPop.Message",name.Length>0 ? name:localization.Get("DutyPop.Roulette"));
+                    if(options.ChatAllowed(inDuty))chat.Print("[Tensho] "+message);
+                    if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
+                    var settings=configuration.Discord;
+                    if(Alarms.DiscordWebhook.ShouldSend(settings,Alarms.AlarmSource.DutyPop))
+                    {
+                        var character=settings.IncludeCharacter ? objects.LocalPlayer?.Name.TextValue:null;
+                        var content=Alarms.DiscordWebhook.Format(settings,message,message,message,0,DateTimeOffset.Now,character);
+                        discord.Enqueue(new(settings.WebhookUrl,Alarms.DiscordWebhook.Payload(settings,content)));
+                    }
+                }
+                catch(Exception error){log.Warning("Duty ready alert failed ({Error}).",error.GetType().Name);}
+            }
+            registrations.Register(()=>client.CfPop+=OnDutyPop,()=>client.CfPop-=OnDutyPop);
+            Alarms.CurrencyDtrEntry? currencyBar=null;
+            registrations.Register(()=>currencyBar=new Alarms.CurrencyDtrEntry(dtrBar,framework,configuration,()=>currencies?.State,localization.Get,mainWindow.OpenCurrencies),()=>currencyBar?.Dispose());
+            this.alarmBar=()=>alarmBar;
+            FreeCompany.VoyageWatcher? voyages=null;
+            // g, M-10 (0.379): voyage loot history, one local file (VoyageHistory.json), 180 days.
+            var voyageHistory=new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"VoyageHistory.json"),(error,message)=>log.Warning(error,message));
+            registrations.Register(()=>voyages=new FreeCompany.VoyageWatcher(framework,data,configuration,()=>pluginInterface.SavePluginConfig(configuration),log){Observed=voyageHistory.Observe},()=>voyages?.Dispose());
+            mainWindow.VoyageHistorySource=voyageHistory;
+            mainWindow.SubmarineCatalog=()=>voyages?.Catalog;
+            mainWindow.VesselParts=()=>voyages?.PartCatalog;
+            mainWindow.SubmarineCatalogFailed=()=>voyages?.CatalogFailed==true;
+            mainWindow.VesselPartsFailed=()=>voyages?.PartCatalogFailed==true;
+            mainWindow.AirshipCatalog=()=>voyages?.AirshipCatalog;
+            mainWindow.AirshipCatalogFailed=()=>voyages?.AirshipCatalogFailed==true;
+            // 0.337 (DEC-023 3): airship leg times and distances from the game's own functions, on the framework thread, on request.
+            FreeCompany.AirshipVoyageTable? airshipTable=null;
+            registrations.Register(()=>airshipTable=new FreeCompany.AirshipVoyageTable(framework,client,log),()=>airshipTable?.Dispose());
+            mainWindow.AirshipTable=()=>airshipTable?.State;
+            mainWindow.RequestAirshipTable=(speed,points)=>airshipTable?.Request(speed,points);
+            mainWindow.VoyageReadUnavailable=()=>voyages?.ReadUnavailable==true;
+            Gear.GearLoader? gear=null;
+            registrations.Register(()=>gear=new Gear.GearLoader(framework,data,client,log),()=>gear?.Dispose());
+            // g, M-12 (0.383): the game's gear sets and the job levels (ClassJob ExpArrayIndex), read while the Gear page shows them.
+            var expIndex=data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Where(row=>row.ExpArrayIndex>=0).ToDictionary(row=>row.RowId,row=>(int)row.ExpArrayIndex);
+            Gear.GameGearsetReader? gameGearsets=null;
+            registrations.Register(()=>gameGearsets=new Gear.GameGearsetReader(framework,client,log,expIndex),()=>gameGearsets?.Dispose());
+            mainWindow.GearsetSource=gameGearsets;
+            // g, X-06 (0.391): gatherer GP regeneration tick (on-screen bar, off by default).
+            Gathering.RegenTickReader? regenTick=null;
+            // g, R-08 (0.403): GP alert at the threshold (chat line and sound with the alarm options), once per rise.
+            registrations.Register(()=>regenTick=new Gathering.RegenTickReader(framework,objects,condition,()=>configuration.GpTickBar,log)
+            {
+                Alert=()=>configuration.GpAlert ? configuration.GpAlertThreshold:null,
+                Reached=(gp,max)=>
+                {
+                    var options=configuration.AlarmOptions ?? new();
+                    var inDuty=options.MuteInDuties && condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
+                    if(options.ChatAllowed(inDuty))chat.Print("[Tensho] "+localization.Format("GpTick.Alert",gp,max));
+                    if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
+                },
+            },()=>regenTick?.Dispose());
+            mainWindow.RegenTick=()=>regenTick?.State;
+            // g, R-01 (0.392): ocean fishing timetable from the game's loop (IKDRouteTable) and voyages (IKDRoute), built on first use.
+            var ocean=new Lazy<Gathering.OceanSchedule?>(()=>
+            {
+                try
+                {
+                    var routes=data.GetExcelSheet<Lumina.Excel.Sheets.IKDRoute>().Where(row=>!row.Name.IsEmpty).ToDictionary(row=>row.RowId,row=>new Gathering.OceanRoute(row.RowId,row.Name.ExtractText(),
+                        row.Spot.Zip(row.Time).Where(pair=>pair.First.RowId!=0)
+                            .Select(pair=>new Gathering.OceanStop(pair.First.ValueNullable?.PlaceName.ValueNullable?.Name.ExtractText() ?? "",Gathering.OceanSchedule.TimeOf(pair.Second.RowId))).ToArray()));
+                    var loop=data.GetExcelSheet<Lumina.Excel.Sheets.IKDRouteTable>().OrderBy(row=>row.RowId).Select(row=>(row.Route.RowId,row.Unknown0)).ToArray();
+                    return loop.Length>0 ? new Gathering.OceanSchedule(loop,routes):null;
+                }
+                catch(Exception error){log.Warning(error,"Ocean fishing timetable unavailable.");return null;}
+            });
+            mainWindow.OceanTimetable=()=>ocean.Value;
+            // g, R-07 (0.418): the voyage in progress and the game's ocean fishing data (routes, places, fish of each spot, missions).
+            var oceanVoyageData=new Lazy<Gathering.OceanVoyageData?>(()=>
+            {
+                try
+                {
+                    var routes=data.GetExcelSheet<Lumina.Excel.Sheets.IKDRoute>().Where(row=>!row.Name.IsEmpty)
+                        .ToDictionary(row=>row.RowId,row=>(row.Spot.Select(spot=>spot.RowId).Where(id=>id!=0).ToArray(),row.Time.Select(time=>time.RowId).ToArray()));
+                    var spots=data.GetExcelSheet<Lumina.Excel.Sheets.IKDSpot>().Where(row=>row.PlaceName.RowId!=0)
+                        .ToDictionary(row=>row.RowId,row=>new Gathering.OceanSpot(row.RowId,row.PlaceName.ValueNullable?.Name.ExtractText() ?? "",row.SpotMain.RowId,row.SpotSub.RowId));
+                    var fishingSpots=data.GetExcelSheet<Lumina.Excel.Sheets.FishingSpot>();
+                    var spotFish=new Dictionary<uint,IReadOnlyList<uint>>();
+                    foreach(var id in spots.Values.SelectMany(spot=>new[]{spot.MainSpot,spot.SpectralSpot}).Where(id=>id!=0).Distinct())
+                        if(fishingSpots.GetRowOrDefault(id) is { } fishingSpot)spotFish[id]=fishingSpot.Item.Select(item=>item.RowId).Where(item=>item!=0).ToArray();
+                    var missions=data.GetExcelSheet<Lumina.Excel.Sheets.IKDPlayerMissionCondition>().Where(row=>!row.Unknown0.IsEmpty)
+                        .ToDictionary(row=>row.RowId,row=>new Gathering.OceanMission(row.Unknown0.ExtractText(),row.Unknown1));
+                    return new Gathering.OceanVoyageData(routes,spots,spotFish,missions);
+                }
+                catch(Exception error){log.Warning(error,"Ocean fishing voyage data unavailable.");return null;}
+            });
+            mainWindow.OceanVoyageData=()=>oceanVoyageData.Value;
+            OceanVoyageReader? oceanVoyageReader=null;
+            registrations.Register(()=>mainWindow.OceanVoyage=oceanVoyageReader=new OceanVoyageReader(framework,client,log),()=>oceanVoyageReader?.Dispose());
+            // 0.388 (user request): position of the game's inventory window, for the sort button drawn above it.
+            Inventory.InventoryWindowReader? inventoryWindow=null;
+            registrations.Register(()=>inventoryWindow=new Inventory.InventoryWindowReader(framework,gameGui,()=>configuration.InventorySortButton,log),()=>inventoryWindow?.Dispose());
+            mainWindow.InventoryWindow=inventoryWindow;
+            // g, M-06 (0.376): repair and materia extraction alert (chat and sound with the alarm options), once per crossing.
+            Gear.GearWearWatcher? gearWear=null;
+            registrations.Register(()=>gearWear=new Gear.GearWearWatcher(framework,client,()=>gear?.Equipped ?? [],()=>configuration.GearWear ?? new(),log){Crossed=(repair,extract,state)=>
+            {
+                var options=configuration.AlarmOptions ?? new();
+                var inDuty=options.MuteInDuties && condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
+                if(options.ChatAllowed(inDuty))
+                {
+                    if(repair)chat.Print("[Tensho] "+localization.Format("GearWear.AlertRepair",state.ToRepair,state.LowestCondition ?? 0));
+                    if(extract)chat.Print("[Tensho] "+localization.Format("GearWear.AlertExtract",state.ToExtract));
+                }
+                if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
+            }},()=>gearWear?.Dispose());
+            mainWindow.GearCatalog=()=>gear?.Catalog;
+            mainWindow.EquippedGear=()=>gear?.Equipped ?? [];
+            // 0.340 (R-11 step 4): the companion chocobo and its bardings, read on the framework thread while the page shows them.
+            Gear.ChocoboReader? chocobo=null;
+            registrations.Register(()=>chocobo=new Gear.ChocoboReader(framework,client,unlocks,data,log),()=>chocobo?.Dispose());
+            mainWindow.Chocobo=()=>{chocobo?.Want();return chocobo?.State;};
+            mainWindow.ChocoboUnavailable=()=>chocobo?.Unavailable==true;
+            mainWindow.StainName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Stain>().GetRowOrDefault(id)?.Name.ExtractText();
+            // 0.342 (R-09): running festivals (GameMain), their quests (Quest.Festival) and English names (LuminaSupplemental, embedded).
+            Events.FestivalReader? festivals=null;
+            registrations.Register(()=>festivals=new Events.FestivalReader(framework,client,data,log),()=>festivals?.Dispose());
+            mainWindow.Festivals=()=>festivals;
+            // 0.348 (g, I-10): gear sets read on request for the storage report; stack sizes from the game data.
+            Inventory.GearsetReader? gearsets=null;
+            registrations.Register(()=>gearsets=new Inventory.GearsetReader(framework,player,log),()=>gearsets?.Dispose());
+            mainWindow.Gearsets=()=>gearsets;
+            // 0.353 (g, I-12): key items (EventItem) by name, from the game data, the list built once.
+            (uint Id,string Name,uint Icon)[]? keyItems=null;
+            mainWindow.KeyItemSearch=text=>
+            {
+                var wanted=text.Trim();
+                if(wanted.Length==0)return [];
+                keyItems??=data.GetExcelSheet<Lumina.Excel.Sheets.EventItem>().Where(row=>!row.Name.IsEmpty).Select(row=>(row.RowId,row.Name.ExtractText(),(uint)row.Icon)).ToArray();
+                return keyItems.Where(item=>item.Name.Contains(wanted,StringComparison.CurrentCultureIgnoreCase)).Take(30).ToArray();
+            };
+            // 0.352 (g, I-11): names of the quests and achievements that unlock shop articles.
+            mainWindow.QuestNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Quest>().GetRowOrDefault(id)?.Name.ExtractText();
+            mainWindow.AchievementNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Achievement>().GetRowOrDefault(id)?.Name.ExtractText();
+            // 0.351 (g, I-04): gil journal, one file per character (GilJournal/<id>.json), kept 90 days.
+            Inventory.GilWatcher? gilWatcher=null;
+            registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),log),()=>gilWatcher?.Dispose());
+            mainWindow.GilJournalState=()=>gilWatcher?.State;
+            mainWindow.StackSizeOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id)?.StackSize ?? 0;
+            // 0.347 (g, I-08): at an NPC shop, the bags' items labelled « to sell » and « important » (chat; sound if turned on).
+            Items.ItemNoteShopReminder? shopReminder=null;
+            registrations.Register(()=>shopReminder=new Items.ItemNoteShopReminder(framework,gameGui,configuration,()=>inventoryService.Current,()=>player.IsLoaded ? player.ContentId:0,
+                (toSell,important)=>
+                {
+                    var items=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();
+                    string Names(IReadOnlyList<(uint Item,long Quantity)> list)=>string.Join(", ",list.Take(10).Select(entry=>$"{items.GetRowOrDefault(entry.Item)?.Name.ExtractText() ?? $"#{entry.Item}"} ×{entry.Quantity}"))
+                        +(list.Count>10 ? " …":"");
+                    if(toSell.Count>0)chat.Print("[Tensho] "+localization.Format("ItemNotes.ShopToSell",Names(toSell)));
+                    if(important.Count>0)
+                    {
+                        chat.Print("[Tensho] "+localization.Format("ItemNotes.ShopImportant",Names(important)));
+                        if(configuration.ItemNoteImportantSound)Alarms.AlarmService.PlaySound((configuration.AlarmOptions ?? new()).Sound,log);
+                    }
+                },log),()=>shopReminder?.Dispose());
+            // 0.346 (g, I-07): lowest offer minus 1 copied to the clipboard when the player opens an item's offers (off by default).
+            registrations.Register(()=>undercut=new Market.UndercutWatcher(marketBoardEvents,framework,configuration,(item,lowest,paste,hq)=>
+                chat.Print("[Tensho] "+localization.Format("Undercut.Copied",data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(item)?.Name.ExtractText() ?? $"#{item}",
+                    lowest.ToString("N0"),paste.ToString("N0"),hq ? " HQ":"")),log),()=>undercut?.Dispose());
+            mainWindow.WorldName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.World>().GetRowOrDefault(id)?.Name.ExtractText();
+            mainWindow.TerritoryName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id) is { } territory && territory.PlaceName.RowId!=0
+                ? territory.PlaceName.Value.Name.ExtractText():null;
+            mainWindow.GrandCompanyNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GrandCompany>().GetRowOrDefault(id)?.Name.ExtractText();
+            mainWindow.EquippedGearUnavailable=()=>gear?.Unavailable==true;
+            // 0.333: names of the squadron's mission and training (Reminders).
+            // g, C-02 (0.356): daily roulettes = Duty Finder roulettes with a completion index (docs/evidence/0.356-roulettes.md).
+            var dailyRoulettes=data.GetExcelSheet<Lumina.Excel.Sheets.ContentRoulette>()
+                .Where(row=>row.IsInDutyFinder && row.CompletionArrayIndex>=0 && !row.Name.IsEmpty && row.RowId<=byte.MaxValue)
+                .OrderBy(row=>row.SortKey).Select(row=>new Reminders.RouletteRow((byte)row.RowId,(byte)row.ContentRouletteRoleBonus.RowId)).ToArray();
+            mainWindow.DailyRoulettes=()=>dailyRoulettes;
+            // g, M-11 (0.382): challenge log entries (ContentsNote rows with a name; docs/evidence/0.382-counters.md).
+            var challengeRows=data.GetExcelSheet<Lumina.Excel.Sheets.ContentsNote>().Where(row=>!row.Name.IsEmpty && row.RowId<=int.MaxValue).Select(row=>(int)row.RowId).ToArray();
+            mainWindow.ChallengeRows=()=>challengeRows;
+            // g, M-04 (0.374): one status file per character (Characters/<local character id>.json): ventures, counters, « done » boxes.
+            Character.CharacterStatusWatcher? characterStatus=null;
+            registrations.Register(()=>characterStatus=new Character.CharacterStatusWatcher(framework,player,log,configuration,()=>pluginInterface.SavePluginConfig(configuration),
+                ()=>dailyRoulettes,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Characters")),()=>characterStatus?.Dispose());
+            mainWindow.CharacterStatusSource=characterStatus;
+            // g, C-03 (0.357): items the armoire takes, for the storage report.
+            IReadOnlySet<uint>? cabinetItems=null;
+            // g, C-14 (0.363): guildleves (Leve sheet, copied once) and the character's progress, read while the page shows them.
+            IReadOnlyList<Leves.LeveDefinition>? leveList=null;
+            IReadOnlyList<Leves.LeveDefinition> LeveList()=>leveList??=data.GetExcelSheet<Lumina.Excel.Sheets.Leve>()
+                .Where(row=>!row.Name.IsEmpty && row.ClassJobLevel>0)
+                .Select(row=>new Leves.LeveDefinition(row.RowId,row.Name.ExtractText(),row.ClassJobLevel,row.LeveAssignmentType.RowId,
+                    row.LeveAssignmentType.ValueNullable?.Name.ExtractText() ?? "",(uint)Math.Max(0,row.LeveAssignmentType.ValueNullable?.Icon ?? 0),
+                    row.LeveClient.ValueNullable?.Name.ExtractText() ?? "",row.PlaceNameStartZone.ValueNullable?.Name.ExtractText() ?? "",row.GilReward,row.AllowanceCost))
+                .OrderBy(leve=>leve.Level).ThenBy(leve=>leve.Name,StringComparer.CurrentCulture).ToArray();
+            Leves.LeveProgressReader? leveReader=null;
+            registrations.Register(()=>leveReader=new Leves.LeveProgressReader(framework,client,unlocks,data,log,LeveList),()=>leveReader?.Dispose());
+            mainWindow.LeveDefinitions=LeveList;
+            // g, M-01 (0.371): automatic alarms at the ventures' end and the vessels' return (on by default, Alarms settings).
+            // g, M-14 (0.384): the deciphered treasure map's spot (game functions checked, TreasureSpot → Level).
+            Maps.TreasureMapReader? treasureMap=null;
+            registrations.Register(()=>treasureMap=new Maps.TreasureMapReader(framework,client,data,log),()=>treasureMap?.Dispose());
+            mainWindow.TreasureMap=()=>treasureMap?.Spot;
+            // g, M-03 (0.373): map links of the chat, kept for the Maps page this session (map settings switch, on by default).
+            Maps.ChatMapLinkWatcher? chatLinks=null;
+            registrations.Register(()=>chatLinks=new Maps.ChatMapLinkWatcher(chatGui,client,log,()=>configuration.MapView.ChatLinks),()=>chatLinks?.Dispose());
+            mainWindow.ChatLinkHistory=chatLinks?.History;
+            Alarms.AutoAlarmWatcher? autoAlarms=null;
+            registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>pluginInterface.SavePluginConfig(configuration),localization.Get),
+                ()=>autoAlarms?.Dispose());
+            // g, X-02 (0.370): the music playing now (BGMSystem, memory only) and its roll (BGM file = OrchestrionPath file).
+            Collections.BgmReader? bgm=null;
+            registrations.Register(()=>bgm=new Collections.BgmReader(framework,client,log),()=>bgm?.Dispose());
+            Dictionary<uint,uint>? rollByBgm=null;
+            mainWindow.PlayingRoll=()=>
+            {
+                bgm?.Want();
+                if(bgm?.Playing is not { } playing)return null;
+                rollByBgm??=BuildRollByBgm();
+                return rollByBgm.TryGetValue(playing,out var roll) ? roll:null;
+            };
+            mainWindow.MusicRead=()=>bgm?.Playing is not null;
+            Dictionary<uint,uint> BuildRollByBgm()
+            {
+                var rolls=data.GetExcelSheet<Lumina.Excel.Sheets.OrchestrionPath>().Where(row=>row.RowId!=0 && !row.File.IsEmpty)
+                    .GroupBy(row=>row.File.ExtractText(),StringComparer.OrdinalIgnoreCase).ToDictionary(group=>group.Key,group=>group.First().RowId,StringComparer.OrdinalIgnoreCase);
+                return data.GetExcelSheet<Lumina.Excel.Sheets.BGM>().Where(row=>!row.File.IsEmpty)
+                    .Select(row=>(row.RowId,Roll:rolls.GetValueOrDefault(row.File.ExtractText()))).Where(pair=>pair.Roll!=0).ToDictionary(pair=>pair.RowId,pair=>pair.Roll);
+            }
+            // g, X-03 (0.369): wear a title (click), or the job's title on a job change when the player turned it on.
+            Collections.TitleChanger? titleChanger=null;
+            registrations.Register(()=>mainWindow.TitleChangerSource=titleChanger=new Collections.TitleChanger(framework,client,player,log,
+                ()=>configuration.JobTitlesEnabled,()=>configuration.JobTitles),()=>titleChanger?.Dispose());
+            // g, C-15 (0.368): achievement progress, read passively; asked from the server only on the player's click.
+            Collections.AchievementProgressWatcher? achievementProgress=null;
+            registrations.Register(()=>mainWindow.AchievementProgressSource=achievementProgress=new Collections.AchievementProgressWatcher(framework,client,player,log),
+                ()=>achievementProgress?.Dispose());
+            // g, C-04 (0.365): hairstyles, accessories, glasses, bardings, portraits, master books, McGuffins, Occult Crescent lore.
+            Collections.ExtraCollectionReader? extraCollections=null;
+            registrations.Register(()=>extraCollections=new Collections.ExtraCollectionReader(framework,client,unlocks,data,log),()=>extraCollections?.Dispose());
+            mainWindow.ExtraCollections=()=>{extraCollections?.Want();return extraCollections?.State;};
+            mainWindow.ExtraCollectionsUnavailable=()=>extraCollections?.Unavailable==true;
+            // g, C-12 (0.364): hunting log (MonsterNote, copied once) and the kills the game holds, read while the page shows them.
+            IReadOnlyList<Hunting.HuntEntry>? huntEntries=null;
+            mainWindow.HuntEntries=()=>huntEntries??=data.GetExcelSheet<Lumina.Excel.Sheets.MonsterNote>().Where(row=>!row.Name.IsEmpty && row.RowId>=10000)
+                .Select(row=>new Hunting.HuntEntry(row.RowId,row.Name.ExtractText(),row.MonsterNoteTarget.Select((target,index)=>(target,index))
+                    .Where(pair=>pair.target.RowId!=0 && pair.index<row.Count.Count && row.Count[pair.index]>0 && pair.target.ValueNullable is not null)
+                    .Select(pair=>new Hunting.HuntTarget(pair.target.Value.BNpcName.ValueNullable?.Singular.ExtractText() ?? "",row.Count[pair.index],
+                        string.Join(" / ",pair.target.Value.PlaceNameZone.Where(zone=>zone.RowId!=0).Select(zone=>zone.ValueNullable?.Name.ExtractText() ?? "").Where(name=>name.Length>0))))
+                    .ToArray()))
+                .Where(entry=>entry.Targets.Count>0).ToArray();
+            Hunting.HuntingLogReader? huntReader=null;
+            registrations.Register(()=>huntReader=new Hunting.HuntingLogReader(framework,client,log),()=>huntReader?.Dispose());
+            mainWindow.HuntGrandCompany=()=>huntReader?.GrandCompany;
+            mainWindow.HuntSlots=()=>{huntReader?.Want();return huntReader?.State;};
+            mainWindow.HuntUnavailable=()=>huntReader?.Unavailable==true;
+            mainWindow.LeveProgress=()=>{leveReader?.Want();return leveReader?.State;};
+            mainWindow.LeveProgressUnavailable=()=>leveReader?.Unavailable==true;
+            // g, C-05 (0.362): glamour dresser outfits (MirageStoreSetItem: outfit item → pieces), read once.
+            IReadOnlyList<Collections.OutfitDefinition>? outfits=null;
+            mainWindow.OutfitDefinitions=()=>outfits??=data.GetExcelSheet<Lumina.Excel.Sheets.MirageStoreSetItem>()
+                .Select(row=>new Collections.OutfitDefinition(row.RowId,new[]{row.MainHand.RowId,row.OffHand.RowId,row.Head.RowId,row.Body.RowId,row.Hands.RowId,
+                    row.Legs.RowId,row.Feet.RowId,row.Earrings.RowId,row.Necklace.RowId,row.Bracelets.RowId,row.Ring.RowId}.Where(piece=>piece!=0).Distinct().ToArray()))
+                .Where(outfit=>outfit.SetItemId!=0 && outfit.Pieces.Count>1).ToArray();
+            // g, C-07 (0.358): how an item looks, for the glamour dresser duplicates.
+            mainWindow.ItemLookOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id) is { } look
+                ? new Inventory.ItemLook(look.ModelMain,look.ModelSub,look.EquipSlotCategory.RowId,look.DyeCount):null;
+            mainWindow.CabinetItems=()=>cabinetItems??=data.GetExcelSheet<Lumina.Excel.Sheets.Cabinet>().Where(row=>row.Item.RowId!=0).Select(row=>row.Item.RowId).ToHashSet();
+            mainWindow.RouletteName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentRoulette>().GetRowOrDefault(id)?.Name.ExtractText();
+            mainWindow.SquadronMissionName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyExpedition>().GetRowOrDefault(id)?.Name.ExtractText();
+            mainWindow.SquadronTrainingName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyTraining>().GetRowOrDefault(id)?.Name.ExtractText();
+            // 0.321: a failing Try On (game function moved) is logged once and its buttons turn off for the session.
+            mainWindow.TryOnItem=item=>
+            {
+                var opened=Items.TryOn.Item(item,error=>log.Warning(error,"Try On is unavailable (game update?)."));
+                if(Items.TryOn.Failed)mainWindow.TryOnItem=null;
+                return opened;
+            };
+            mainWindow.PlayerGrandCompany = () => player.IsLoaded ? player.GrandCompany.RowId : 0;
             var npcVendors=new Npcs.NpcVendorService();
             Npcs.NpcVendorLoader? npcLoader=null;
             registrations.Register(()=>npcLoader=new Npcs.NpcVendorLoader(npcVendors,data,framework,log,dataCache),()=>npcLoader?.Dispose());
             mainWindow.ConfigureNpcVendors(npcVendors);
-            itemContextMenu=new ItemContextMenuBridge(configuration,contextMenus,player,client,itemCatalog,log,localization,gameGui){Relevant=mainWindow.RelevantRoutes};
+            itemContextMenu=new ItemContextMenuBridge(configuration,contextMenus,player,client,itemCatalog,log,localization,gameGui){Relevant=mainWindow.RelevantRoutes,Title=mainWindow.RouteTitle,Sources=mainWindow.SourceMenu,Links=mainWindow.ExternalLinksFor};
             registrations.Register(()=>{ },itemContextMenu.Dispose);
             InventoryVisualSortBridge? sortBridge=null;
             registrations.Register(()=>sortBridge=new InventoryVisualSortBridge(visualSort,inventory,player,client,framework,log,bankBridge),()=>sortBridge?.Dispose());
@@ -230,12 +626,17 @@ public sealed class Plugin : IDalamudPlugin
             MacroObservationReader? macroObserver = null;
             registrations.Register(() => macroObserver = new MacroObservationReader(macroObservations, framework, player, client, log), () => macroObserver?.Dispose());
             ItemHoverReader? hoverReader = null;
-            registrations.Register(() => hoverReader = new ItemHoverReader(configuration, market, itemHover, itemCatalog, gameGui, player, client, framework, log),
+            registrations.Register(() => hoverReader = new ItemHoverReader(configuration, market, itemHover, itemCatalog, gameGui, player, client, framework, log) { InDuty = () => mapLive?.State is { InDuty: true }, Keys = keyState },
                 () => hoverReader?.Dispose());
             MapCatalogLoader? mapLoader = null;
             registrations.Register(() => mapLoader = new MapCatalogLoader(maps, data, framework, log), () => mapLoader?.Dispose());
             DutyCatalogLoader? dutyLoader = null;
             registrations.Register(() => dutyLoader = new DutyCatalogLoader(duties, data, framework, log), () => dutyLoader?.Dispose());
+            // g, C-01 (0.355): unlocked / completed duties, read on the framework thread while the Duty loot page shows them.
+            DutyProgressReader? dutyProgress = null;
+            registrations.Register(() => dutyProgress = new DutyProgressReader(framework, client, unlocks, data, log, () => duties.State.Catalog), () => dutyProgress?.Dispose());
+            mainWindow.DutyProgressSource = () => { dutyProgress?.Want(); return dutyProgress?.State; };
+            mainWindow.DutyProgressUnavailable = () => dutyProgress?.Unavailable == true;
             CharacterStatsReader? statsReader = null;
             registrations.Register(() => statsReader = new CharacterStatsReader(characterStats, framework, player, client, log,objects,data,gameGui), () => statsReader?.Dispose());
             GpCatalogLoader? gpLoader=null;
@@ -247,6 +648,40 @@ public sealed class Plugin : IDalamudPlugin
             CraftLiveReader? craftLiveReader=null;
             registrations.Register(()=>craftLiveReader=new CraftLiveReader(craftLive,recipeCatalog,craftActions,itemCatalog,framework,player,client,gameGui,objects,log),()=>craftLiveReader?.Dispose());
             CraftLogReader? craftLogReader=null;
+            // A-02 (0.420): crafting food and medicine from the game's sheets (Item › ItemAction › ItemFood), built on first use.
+            var craftConsumables=new Lazy<IReadOnlyList<Craft.CraftConsumable>>(()=>
+            {
+                try
+                {
+                    var foods=data.GetExcelSheet<Lumina.Excel.Sheets.ItemFood>();var list=new List<Craft.CraftConsumable>();
+                    foreach(var item in data.GetExcelSheet<Lumina.Excel.Sheets.Item>().Where(row=>row.ItemAction.RowId!=0 && !row.Name.IsEmpty))
+                    {
+                        if(item.ItemAction.ValueNullable is not { } action || action.Data.Count<2 || (uint)action.Data[0] is not (Craft.CraftConsumables.WellFed or Craft.CraftConsumables.Medicated)
+                           || foods.GetRowOrDefault(action.Data[1]) is not { } food)continue;
+                        var bonuses=food.Params.Where(param=>param.BaseParam.RowId is Craft.CraftConsumables.Craftsmanship or Craft.CraftConsumables.Control or Craft.CraftConsumables.Cp)
+                            .Select(param=>new Craft.CraftBonus(param.BaseParam.RowId,param.IsRelative,param.Value,param.Max,param.ValueHQ,param.MaxHQ)).ToArray();
+                        if(bonuses.Length>0)list.Add(new(item.RowId,item.Name.ExtractText(),(uint)action.Data[0]==Craft.CraftConsumables.Medicated,bonuses));
+                    }
+                    return list.OrderByDescending(item=>item.Bonuses.Sum(bonus=>bonus.MaxHq)).ThenBy(item=>item.Name,StringComparer.CurrentCultureIgnoreCase).ToArray();
+                }
+                catch(Exception error){log.Warning(error,"Crafting food and medicine unavailable.");return [];}
+            });
+            mainWindow.CraftConsumableList=()=>craftConsumables.Value;
+            // A-11 (0.421): recipes crafted at least once (QuestManager.IsRecipeComplete), read while a crafting view asks.
+            Craft.RecipeLogReader? recipeLog=null;
+            registrations.Register(()=>mainWindow.RecipeLog=recipeLog=new Craft.RecipeLogReader(framework,client,log,()=>recipeCatalog.State.Catalog),()=>recipeLog?.Dispose());
+            // A-10 (0.422): Macro Chain (Caraxi, InternalName « MacroChain ») loaded: exported pages use its /nextmacro.
+            var macroChainCheckedAt=DateTimeOffset.MinValue;var macroChainLoaded=false;
+            mainWindow.MacroChainLoaded=()=>
+            {
+                // Checked at most every 5 seconds (asked from Draw).
+                var now=DateTimeOffset.UtcNow;
+                if(now>=macroChainCheckedAt){macroChainCheckedAt=now.AddSeconds(5);macroChainLoaded=pluginInterface.InstalledPlugins.Any(plugin=>plugin.InternalName=="MacroChain" && plugin.IsLoaded);}
+                return macroChainLoaded;
+            };
+            // X-11 (0.419): Manipulation learned by the job, from its action row (CraftActionCatalog) and the game's unlock state.
+            mainWindow.ManipulationLearned=job=>craftActions.State.Catalog?.Find(job,Craft.CraftActionKind.Manipulation) is { } manipulation
+                && data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(manipulation.NativeId) is { } action && unlocks.IsActionUnlocked(action);
             registrations.Register(()=>craftLogReader=new CraftLogReader(mainWindow.CraftLog,recipeCatalog,configuration,framework,player,client,gameGui,log),()=>craftLogReader?.Dispose());
             FashionHintLoader? fashionLoader=null;
             registrations.Register(()=>fashionLoader=new FashionHintLoader(fashionHints,data,framework,log),()=>fashionLoader?.Dispose());
@@ -265,6 +700,10 @@ public sealed class Plugin : IDalamudPlugin
             MiniCactpotObservationReader? cactpotReader=null;
             GatheringObservationReader? gatheringReader=null;
             registrations.Register(()=>gatheringReader=new GatheringObservationReader(gatheringObservation,framework,player,client,gameGui,objects,log),()=>gatheringReader?.Dispose());
+            CollectableReader? collectableReader=null;
+            SpearfishingReader? spearfishingReader=null;
+            registrations.Register(()=>mainWindow.Spearfishing=spearfishingReader=new SpearfishingReader(framework,gameGui,client,log),()=>spearfishingReader?.Dispose());
+            registrations.Register(()=>mainWindow.Collectables=collectableReader=new CollectableReader(framework,gameGui,client,data,log),()=>collectableReader?.Dispose());
             registrations.Register(()=>cactpotReader=new MiniCactpotObservationReader(cactpotObservation,framework,player,client,gameGui,log),()=>cactpotReader?.Dispose());
             registrations.Register(() => triadReader = new TriadObservationReader(triadObservation, framework, player, client, gameGui, log, () => targets.Target?.BaseId ?? 0, data, () => mainWindow.DeveloperMode),
                 () => triadReader?.Dispose());
@@ -283,7 +722,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(() => inventoryReader = new DalamudInventoryReader(inventoryService, inventory, player, client, framework, log),
                 () => inventoryReader?.Dispose());
             craftLive.SetEnabled(configuration.Observations?.GetValueOrDefault("Craft") == true);
-            gatheringObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Gathering") == true || configuration.GatheringPanel);
+            gatheringObservation.SetEnabled(MainWindow.GatheringObservationWanted(configuration));
             cactpotObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Cactpot") == true);
             triadObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Triad") == true);
             macroObservations.SetEnabled(configuration.Observations?.GetValueOrDefault("Macros") == true);
@@ -296,6 +735,9 @@ public sealed class Plugin : IDalamudPlugin
                 if (!commands.AddHandler(Command,commandInfo))
                     throw new InvalidOperationException($"Command already registered: {Command}");
             }, () => commands.RemoveHandler(Command));
+            // 0.394 (user request): titles, sections and text fonts from the settings (TrumpGothic 24 / 19 and Dalamud's font by default).
+            registrations.Register(() => { fonts = new UI.FontManager(pluginInterface.UiBuilder, log); fonts.Apply(configuration.Fonts ?? new()); },
+                () => { fonts?.Dispose(); fonts = null; });
             registrations.Register(() => pluginInterface.UiBuilder.Draw += Draw,
                 () => pluginInterface.UiBuilder.Draw -= Draw);
             registrations.Register(() => pluginInterface.UiBuilder.OpenMainUi += Open,
@@ -320,12 +762,27 @@ public sealed class Plugin : IDalamudPlugin
     private void OnCommand(string command, string arguments)
     {
         if (arguments.Trim().ToLowerInvariant() is "peche" or "pêche" or "fish" or "fishing") { mainWindow?.ToggleFishingPanel(); return; }
+        // 0.349 (g, X-07): « /tensho wiki <item> » and « /tensho lodestone <item> » open the item's page in the browser.
+        var parts = arguments.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+        // 0.381 (g, X-01): « /tensho todo <task> » adds a free task to Reminders › Your tasks.
+        if (parts.Length >= 1 && parts[0].ToLowerInvariant() is "todo" or "tache" or "tâche")
+        {
+            chatGui.Print("[Tensho] " + (parts.Length > 1 ? mainWindow.AddTaskFromCommand(parts[1]) : localization.Get("PersonalTasks.CommandUsage")));
+            return;
+        }
+        if (parts.Length >= 1 && parts[0].ToLowerInvariant() is "wiki" or "lodestone")
+        {
+            if (mainWindow?.OpenExternal(parts[0].ToLowerInvariant() == "wiki", parts.Length > 1 ? parts[1] : "") is { } problem) chatGui.Print("[Tensho] " + problem);
+            return;
+        }
         Open();
     }
     private void Open() => mainWindow.IsOpen = true;
     private void OpenConfig()=>mainWindow.OpenSettings();
+    private UI.FontManager? fonts;
     private void Draw()
     {
+        fonts?.Apply(fontSettings() ?? new());
         if(commandInfo is not null && commandLocalizationRevision!=localization.Revision)
         {commandInfo.HelpMessage=localization.Get("Plugin.CommandHelp");commandLocalizationRevision=localization.Revision;}
         if(itemContextMenu?.Take() is { } request)mainWindow.OpenItemContext(request);
@@ -336,7 +793,13 @@ public sealed class Plugin : IDalamudPlugin
         if (!autoBankCapture()) bankOverlay.Draw();
         mainWindow.DrawCraftLogHelper();
         mainWindow.DrawItemHover();
+        undercut?.FlushClipboard();
         mainWindow.DrawCactpotOverlay();
+        mainWindow.DrawTaskPanel();
+        mainWindow.DrawWearBar();
+        mainWindow.DrawInventorySortButton();
+        mainWindow.DrawRegenTickBar();
+        alarmBar?.Invoke()?.DrawTooltip();
         mainWindow.DrawTriadOverlay();
         mainWindow.DrawTriadRequestPanel();
         mainWindow.DrawTriadDeckReminder();
@@ -344,6 +807,11 @@ public sealed class Plugin : IDalamudPlugin
         mainWindow.DrawDutyFinderPanel();
         mainWindow.DrawFashionCheckPanel();
         mainWindow.DrawGatheringPanel();
+        mainWindow.DrawCollectablePanel();
+        mainWindow.DrawTrackerWindow();
+        mainWindow.DrawSpearfishingPanel();
+        mainWindow.DrawOceanVoyagePanel();
+        mainWindow.ProcessGameLogRequest();
         mainWindow.DrawFishingPanel();
     }
 

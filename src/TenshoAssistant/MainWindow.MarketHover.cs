@@ -6,21 +6,34 @@ using TenshoAssistant.Market;
 
 namespace TenshoAssistant;
 
+// Item hover panel, drawn every frame under the game's item tooltip (else above or beside it; the mouse is only a fallback), with
+// two opt-in parts: item information and market prices (Universalis: current world, then the cheapest listing of the data center).
+// The information body (DrawItemInfoBody) is the common Tensho item tooltip: collection state, stock in known storages, usages and
+// how to obtain it: game data and LuminaSupplemental first (vendors, quests, achievements, duties, monsters, FATEs, ventures,
+// crafts, gathering), then the consolegameswiki « Acquisition » section. Garland Tools is asked for every item put in context
+// (duties, monsters, exchanges); « How to get it » shows it only when nothing else is known.
 internal sealed partial class MainWindow
 {
     private Vector2 hoverPanelSize=new(380,300);
     private (uint Item,object? Live,object? Bank,ulong Character) hoverHoldingsKey;
     private ItemHoldingsSummary? hoverHoldings;
     private Monsters.MonsterHoverSources? monsterHover;
+    // 0.343 (I-01): world names outside the data center (region cheapest), from the World sheet (set by Plugin).
+    internal Func<uint,string?>? WorldName { get; set; }
     internal void ConfigureMonsterHover(Monsters.MonsterHoverSources service)=>monsterHover=service;
     public void DrawItemHover()
     {
         var observed=itemHover.State;var now=DateTimeOffset.UtcNow;
         if(windowDisposed || !observed.Fresh(now) || observed.Item is not { } hovered)return;
         var priced=MarketHoverTracker.Eligible(hovered,itemCatalog.State.Catalog);
-        var prices=configuration.MarketPricesOnHover && market.State.WorldId!=0 && priced is not null;
-        var usages=configuration.ItemUsagesOnHover && observed.Stable(now);
-        if(!prices && !usages)return;
+        var prices=configuration.CommunityUniversalis && configuration.MarketPricesOnHover && market.State.WorldId!=0 && priced is not null;
+        // e) (audit 2026-11-02): each part of the item information can be turned off; with nothing left to draw for this item the
+        // information is left out (no empty panel).
+        var item=itemCatalog.State.Catalog?.Find(hovered.ItemId);
+        var usages=configuration.ItemUsagesOnHover && observed.Stable(now) && HoverInfoShown(item,hovered.ItemId);
+        // 0.377 (g, M-07): the hovered piece against the worn one(s) of its slot, first (the most direct use).
+        var compare=configuration.ItemUsagesOnHover && observed.Stable(now) ? HoverComparisons(hovered.ItemId,hovered.Kind==Items.ItemHoverKind.Hq):[];
+        if(!prices && !usages && compare.Count==0)return;
         using var theme=TenshoAssistant.UI.FfxivTheme.Apply();
         var viewport=ImGui.GetMainViewport();
         var (position,width)=HoverPlacement(observed.Anchor,viewport);
@@ -33,7 +46,6 @@ internal sealed partial class MainWindow
         try
         {
             if(!visible)return;
-            var item=itemCatalog.State.Catalog?.Find(hovered.ItemId);
             ImGui.PushTextWrapPos(width is { } wrap ? wrap-ImGui.GetStyle().WindowPadding.X:Math.Min(350,Math.Max(120,viewport.WorkSize.X-32)));
             try
             {
@@ -43,17 +55,20 @@ internal sealed partial class MainWindow
                     DrawItemIcon(item,new Vector2(28));ImGui.SameLine();
                     ImGui.TextColored(Accent,item?.Name ?? localization.Format("HoverUi.Item",hovered.ItemId));
                 }
+                if(compare.Count>0)
+                {
+                    DrawHoverComparisons(compare);
+                    if(usages)ImGui.Separator();
+                }
                 if(usages)
                 {
-                    DrawItemCollection(item);
-                    DrawHoveredStock(hovered.ItemId);
-                    DrawHoveredSources(hovered.ItemId,observed.StableSince is { } since ? now-since:TimeSpan.Zero);
-                    DrawHoveredUsages(hovered.ItemId);
+                    // 0.257: same content as Tensho's item tooltip (it showed only collection, stock and usages).
+                    DrawItemInfoBody(item,hovered.ItemId,hoverPanel:true);
                 }
                 if(prices)
                 {
-                    if(usages)ImGui.Separator();
-                    DrawHoveredPrices(priced!,item?.CanBeHq ?? true);
+                    if(usages || compare.Count>0)ImGui.Separator();
+                    DrawHoveredPrices(priced!,item?.CanBeHq ?? true,observed.Stack);
                 }
             }
             finally{ImGui.PopTextWrapPos();}
@@ -87,7 +102,7 @@ internal sealed partial class MainWindow
         var live=inventory.Current;var bankState=bank.State;var character=bankBridge.State.CharacterId;
         if(hoverHoldings is null || hoverHoldingsKey!=(id,live,bankState,character))
         {
-            hoverHoldings=ItemHoldings.Build(id,character,live,bankState.Entries,StorageFilter.All,includeCrystals:true);
+            hoverHoldings=ItemHoldings.Build(id,character,live,bankState.Entries,StorageFilter.All,includeCrystals:true,crystal:ClassifyCrystal(id) is not null);
             hoverHoldingsKey=(id,live,bankState,character);
         }
         var summary=hoverHoldings;
@@ -96,7 +111,7 @@ internal sealed partial class MainWindow
         ImGui.TextUnformatted(localization.Format(summary.HasUnknown ? "HoverUi.OwnedPartial":"HoverUi.Owned",summary.Total.ToString("N0"),summary.Nq.ToString("N0"),summary.Hq.ToString("N0")));
         var rows=summary.Rows.Where(row=>row.Nq+row.Hq>0).OrderByDescending(row=>row.Nq+row.Hq).ToArray();
         if(rows.Length>0)
-            ImGui.TextDisabled(string.Join(" · ",rows.Take(4).Select(row=>localization.Format("HoverUi.StorageRow",row.Name,(row.Nq+row.Hq).ToString("N0"))))
+            ImGui.TextDisabled(string.Join(" · ",rows.Take(4).Select(row=>localization.Format("HoverUi.StorageRow",StorageRowName(row),(row.Nq+row.Hq).ToString("N0"))))
                 +(rows.Length>4 ? localization.Format("HoverUi.More",rows.Length-4):""));
     }
 
@@ -115,13 +130,13 @@ internal sealed partial class MainWindow
         }
         // Only materials that can be monster drops are looked up; equipment, crafted and gathered items never trigger a request.
         if(Monsters.MonsterDropCandidates.Eligible(itemCatalog.State.Catalog?.Find(id),crafted.Count>0,gathered.Count>0)
-            && monsterHover?.Observe(id,hoveredFor,configuration.MonsterSourcesOnHover) is { } monsters)
+            && monsterHover?.Observe(id,hoveredFor,configuration.CommunityWiki && configuration.MonsterSourcesOnHover) is { } monsters)
         {
             if(monsters.Document is { Monsters.Count:>0 } document)
             {
                 var first=document.Monsters[0];
-                var head=first.Level.Length>0 ? localization.Format("HoverUi.MonsterLevel",first.Name,first.Level):first.Name;
-                if(first.Location.Length>0)head+=" · "+first.Location;
+                var head=first.Level.Length>0 ? localization.Format("HoverUi.MonsterLevel",CommunityMonster(first.Name),first.Level):CommunityMonster(first.Name);
+                if(first.Location.Length>0)head+=" · "+CommunityPlace(first.Location);
                 lines.Add(localization.Format("HoverUi.Monsters",head)+(document.Monsters.Count>1 ? localization.Format("HoverUi.More",document.Monsters.Count-1):""));
             }
             monsterStatus=monsters.Status switch
@@ -149,7 +164,7 @@ internal sealed partial class MainWindow
             :item.TripleTriadCardId!=0 ? (Collections.CollectionKind.TripleTriad,item.TripleTriadCardId)
             :item.OrchestrionId!=0 ? (Collections.CollectionKind.Orchestrion,item.OrchestrionId):null;
         if(link is not { } target)return;
-        var entry=collections.State.Entries.FirstOrDefault(row=>row.Kind==target.Kind && row.Id==target.Id);
+        var entry=CollectionEntryOf(target.Kind,target.Id);
         var acquisition=CollectionStateOf(entry);
         var colour=acquisition switch{Collections.CollectionAcquisition.Acquired=>UI.FfxivTheme.Success,Collections.CollectionAcquisition.NotAcquired=>UI.FfxivTheme.Error,_=>UI.FfxivTheme.TextMuted};
         ImGui.TextColored(colour,localization.Format("HoverUi.Collection",localization.Get("HoverUi.CollectionKind"+target.Kind),localization.Get("HoverUi.Collection"+acquisition)));
@@ -163,6 +178,7 @@ internal sealed partial class MainWindow
         var state=collections.State;
         // 0.241 (R-02): Triple Triad cards and orchestrion rolls are tracked like mounts and minions.
         return entry.Kind is Collections.CollectionKind.Mount or Collections.CollectionKind.Companion or Collections.CollectionKind.TripleTriad or Collections.CollectionKind.Orchestrion && !state.Loading && state.CharacterId!=0
+            && !(entry.Kind==Collections.CollectionKind.Orchestrion && state.CategoryIssues?.Any(issue=>issue.Kind==Collections.CollectionKind.Orchestrion)==true)
             ? Collections.CollectionAcquisition.NotAcquired:Collections.CollectionAcquisition.Unknown;
     }
     // Collection entry an item unlocks, if any.
@@ -173,7 +189,9 @@ internal sealed partial class MainWindow
             :item.CompanionId!=0 ? (Collections.CollectionKind.Companion,item.CompanionId)
             :item.TripleTriadCardId!=0 ? (Collections.CollectionKind.TripleTriad,item.TripleTriadCardId)
             :item.OrchestrionId!=0 ? (Collections.CollectionKind.Orchestrion,item.OrchestrionId):null;
-        return link is { } target ? collections.State.Entries.FirstOrDefault(row=>row.Kind==target.Kind && row.Id==target.Id):null;
+        if(link is not { } target)return null;
+        // 0.275: indexed once per collection state (0.290: shared index, UI/Components/DataIndexes.cs).
+        return CollectionEntryOf(target.Kind,target.Id);
     }
     // Right click on an item row: open its collection entry (mount, minion, card, roll) in the Collections page.
     private void ItemCollectionMenu(string id,Items.ItemDefinition? item)
@@ -181,10 +199,15 @@ internal sealed partial class MainWindow
         if(CollectionOf(item) is not { } entry || !ImGui.BeginPopupContextItem(id))return;
         try
         {
-            if(ImGui.Selectable(localization.Get("HoverUi.OpenCollection")))
+            if(ImGui.Selectable(localization.Get(entry.Kind==Collections.CollectionKind.TripleTriad ? "ItemMenu.OpenTriad":"HoverUi.OpenCollection")))
             {
-                if(entry.Kind==Collections.CollectionKind.TripleTriad)page=Page.TripleTriad;
-                else{page=Page.Collections;collectionKind=entry.Kind;focusCollectionKind=entry.Kind;if(entry.Kind==Collections.CollectionKind.Orchestrion)focusOrchestrionTab=true;}
+                if(entry.Kind==Collections.CollectionKind.TripleTriad)ShowTriadCard(entry.Id);
+                else
+                {
+                    // 0.331: the state filter and the roll's category are reset to the entry's, which they could hide (as OpenOrchestrionFromItem).
+                    page=Page.Collections;collectionKind=entry.Kind;focusCollectionKind=entry.Kind;collectionFilter=0;
+                    if(entry.Kind==Collections.CollectionKind.Orchestrion){focusOrchestrionTab=true;orchestrionCategoryFilter=entry.Music?.CategoryId;}
+                }
                 collectionQuery=entry.Name;IsOpen=true;
             }
             if(item is not null){ImGui.Separator();DrawSourceLinks([item]);}
@@ -215,6 +238,11 @@ internal sealed partial class MainWindow
                 _=>[],
             };
             if(items.Count==0 && entry.Kind is Collections.CollectionKind.Mount or Collections.CollectionKind.Companion)ImGui.TextDisabled(localization.Get("HoverUi.CollectionNoItem"));
+            // 0.387: the 0.365 kinds without a teaching item in the game data say so instead of an empty tooltip.
+            if(items.Count==0 && entry.Kind is Collections.CollectionKind.Glasses or Collections.CollectionKind.Portrait or Collections.CollectionKind.McGuffin
+                   or Collections.CollectionKind.OccultLore or Collections.CollectionKind.Hairstyle or Collections.CollectionKind.Ornament or Collections.CollectionKind.Barding
+                   or Collections.CollectionKind.MasterBook)
+                ImGui.TextDisabled(localization.Get("HoverUi.CollectionHowUnknown"));
             // Achievements rewarding the entry directly (title or item) are listed even without an unlocking item.
             foreach(var achievement in AchievementsRewarding(items.Select(item=>item.Id)).Take(3))
                 ImGui.TextUnformatted(localization.Format("HoverUi.CollectionAchievement",achievement));
@@ -241,7 +269,9 @@ internal sealed partial class MainWindow
                 // Garland only when the plugin's own data knows nothing (0.146, user request).
                 if(known==0)DrawFallbackSources(item.Id);
             }
-            ImGui.TextDisabled(localization.Get("SourceLinks.Hint"));
+            // 0.331: the right-click menu exists for these kinds only (MainWindow.Collections.cs), not for emotes.
+            if(entry.Kind is Collections.CollectionKind.Mount or Collections.CollectionKind.Companion or Collections.CollectionKind.TripleTriad or Collections.CollectionKind.Orchestrion)
+                ImGui.TextDisabled(localization.Get("SourceLinks.Hint"));
             ImGui.PopTextWrapPos();
         }
         finally{ImGui.EndTooltip();}
@@ -280,7 +310,13 @@ internal sealed partial class MainWindow
         var known=DrawGarlandSources(itemId);
         if(known>0 || itemSources?.Get(itemId) is not { Loading:false })return;
         known=DrawWikiAcquisition(itemId);
-        if(known==0 && wikiItems?.Get(itemId) is { Loading:false })ImGui.TextDisabled(localization.Get("HoverUi.CollectionNoSource"));
+        if(known!=0 || wikiItems?.Get(itemId) is not { Loading:false })return;
+        // 0.329: a source turned off (Settings › Advanced) was not asked: say so instead of naming it among the sources looked up.
+        ImGui.TextDisabled(localization.Get((configuration.CommunityGarland,configuration.CommunityWiki) switch
+        {
+            (true,true)=>"HoverUi.CollectionNoSource",(false,true)=>"HoverUi.CollectionNoSourceGarlandOff",
+            (true,false)=>"HoverUi.CollectionNoSourceWikiOff",_=>"HoverUi.CollectionNoSourceOff",
+        }));
     }
     internal void ConfigureItemSources(Community.GarlandItemSourceService service)=>itemSources=service;
     // Garland sources of an item (duties, monsters, FATEs, quests, achievements, leves), loaded on first display; count shown.
@@ -298,7 +334,7 @@ internal sealed partial class MainWindow
         }
         foreach(var group in list.Sources.GroupBy(source=>source.Type).Take(6))
             ImGui.TextUnformatted(localization.Format("HoverUi.GarlandSource",localization.Get("HoverUi.GarlandType_"+group.Key),
-                string.Join(", ",group.Select(source=>source.Name).Distinct().Take(3))+(group.Count()>3 ? localization.Format("HoverUi.More",group.Count()-3):"")));
+                string.Join(", ",group.Select(CommunityGarland).Distinct().Take(3))+(group.Count()>3 ? localization.Format("HoverUi.More",group.Count()-3):"")));
         ImGui.TextDisabled(localization.Get("HoverUi.GarlandCredit"));
         return list.Sources.Count+(list.Trades?.Count ?? 0);
     }
@@ -306,60 +342,95 @@ internal sealed partial class MainWindow
     // Achievements whose reward is one of these items (Achievement.Item, kept by the collection observation).
     private IEnumerable<string> AchievementsRewarding(IEnumerable<uint> itemIds)
     {
-        var wanted=itemIds.ToHashSet();
-        if(wanted.Count==0)return [];
-        return collections.State.Entries.Where(entry=>entry.Kind==Collections.CollectionKind.Achievement && entry.Achievement is { RewardItemId:not 0 } metadata && wanted.Contains(metadata.RewardItemId))
-            .Select(entry=>entry.Name).Distinct();
+        // 0.290: achievements indexed by reward item instead of a scan of every collection row.
+        return itemIds.Distinct().SelectMany(AchievementsRewardingItem).Select(entry=>entry.Name).Distinct();
     }
 
     // Item tooltip for the tool lists (NPC vendors…): icon, name, category and levels, collection state, stock and uses.
     private void DrawItemInfoTooltip(uint id)
     {
+        if(ItemTooltipAlreadyDrawn(id))return;
         var item=itemCatalog.State.Catalog?.Find(id);
         ImGui.BeginTooltip();
         try
         {
             ImGui.PushTextWrapPos(ImGui.GetFontSize()*24);
-            DrawItemIcon(item,new Vector2(32));ImGui.SameLine();
+            DrawItemImage(item,new Vector2(32));ImGui.SameLine();
             ImGui.BeginGroup();
             ImGui.TextColored(Accent,item?.Name ?? localization.Format("HoverUi.Item",id));
             if(item is { UiCategoryName.Length:>0 })ImGui.TextDisabled(item.UiCategoryName);
             ImGui.EndGroup();
             if(item is { ItemLevel:>1 })ImGui.TextDisabled(localization.Format("HoverUi.Levels",item.ItemLevel,item.EquipLevel));
-            DrawItemCollection(item);
-            DrawHoveredStock(id);
-            DrawHoveredUsages(id);
-            // How to obtain the item itself (0.144: the sources follow the unlocking item, not only the collection page).
-            ImGui.TextColored(Accent,localization.Get("HoverUi.HowToGet"));
-            var known=0;
-            if(npcVendors?.State.Catalog?.ForItem(id) is { Count:>0 } offers){known++;ImGui.TextUnformatted(localization.Format("HoverUi.VendorCount",offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));}
-            if(quests.State.RewardIndex?.ForItem(id) is { Count:>0 } rewards){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionQuests",string.Join(", ",rewards.Take(3).Select(reward=>reward.Name))));}
-            foreach(var achievement in AchievementsRewarding([id]).Take(3)){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionAchievement",achievement));}
-            foreach(var dutyId in LuminaDutiesOf(id).Take(3))
-                if(duties.State.Catalog?.Find(dutyId) is { } lootDuty){known++;ImGui.TextUnformatted(localization.Format("HoverUi.LuminaDuty",lootDuty.Name));}
-            if(lumina?.State.Data is { } supplement)
-            {
-                if(supplement.MonstersOf(id) is { Count:>0 } mobs){known++;ImGui.TextWrapped(localization.Format("HoverUi.LuminaMonsters",string.Join(", ",mobs.Take(4))));}
-                if(supplement.FatesOf(id) is { Count:>0 } fates){known++;ImGui.TextWrapped(localization.Format("HoverUi.LuminaFates",string.Join(", ",fates.Take(3))));}
-                if(supplement.FromVenture(id)){known++;ImGui.TextUnformatted(localization.Get("HoverUi.LuminaVenture"));}
-                foreach(var (kind,count,sources) in supplement.SupplementsOf(id))
-                {
-                    known++;
-                    var names=string.Join(", ",sources.Take(3).Select(source=>itemCatalog.State.Catalog?.Find(source)?.Name ?? source.ToString()));
-                    ImGui.TextWrapped(localization.Format("HoverUi.Supplement"+(kind is >= 1 and <= 19 ? kind:0),names)+(count>3 ? localization.Format("HoverUi.SupplementMore",count-3):""));
-                }
-                if(supplement.StorePriceCents(id) is { } cents){known++;ImGui.TextUnformatted(localization.Format("HoverUi.LuminaStore",(cents/100m).ToString("0.00",System.Globalization.CultureInfo.InvariantCulture)));}
-            }
-            if(recipeCatalog.State.Catalog?.ForResult(id) is { Count:>0 } recipes){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionCraft",recipes.Count));}
-            if(gatheringCatalog.State.Catalog?.ForItem(id) is { Count:>0 } gathered){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionGathering",gathered[0].TypeName,gathered[0].Zone));}
-            if(item is { IsMarketable:true })ImGui.TextDisabled(localization.Get("HoverUi.CollectionMarket"));
-            if(known==0)DrawFallbackSources(id);
+            if(ShowIds)ImGui.TextDisabled($"ID {id}");
+            DrawItemInfoBody(item,id);
             ImGui.PopTextWrapPos();
         }
         finally{ImGui.EndTooltip();}
     }
 
+    // 0.257: the body of the common item tooltip (collection, stock, usages, how to get it), also drawn under the game's tooltip so
+    // both show the same; the header (icon, name) is left to the caller.
+    // e) (audit 2026-11-02): hoverPanel = the panel under the game's item tooltip, whose four parts follow Settings › Interface;
+    // Tensho's own item tooltips and the item sheet (hoverPanel false) always draw every part.
+    private void DrawItemInfoBody(Items.ItemDefinition? item,uint id,bool hoverPanel=false)
+    {
+        // 0.347 (g, I-08): the player's own note first.
+        DrawItemNoteLine(id);
+        if(!hoverPanel || configuration.HoverShowCollection)DrawItemCollection(item);
+        if(!hoverPanel || configuration.HoverShowStock)DrawHoveredStock(id);
+        // 0.346 (g, I-06): NPC sale price (Item.PriceLow, game data), and the hovered stack's when the game tooltip is for one of the
+        // player's slots; for NQ (the HQ price is not in the sheet); nothing when the item does not sell to NPCs (price 0).
+        if(item is { SellPrice:>0 } sold)
+        {
+            var stack=hoverPanel ? itemHover.State.Stack:null;
+            ImGui.TextDisabled(stack is > 1 and var count
+                ? localization.Format("HoverUi.NpcSaleStack",sold.SellPrice.ToString("N0"),count,(sold.SellPrice*(long)count).ToString("N0"))
+                :localization.Format("HoverUi.NpcSale",sold.SellPrice.ToString("N0")));
+        }
+        if(!hoverPanel || configuration.HoverShowUsages)DrawHoveredUsages(id);
+        // « How to get it » is the last part: hidden, its Garland / wiki fallback is not asked from the hover either.
+        if(hoverPanel && !configuration.HoverShowSources)return;
+        // How to obtain the item itself (0.144: the sources follow the unlocking item, not only the collection page).
+        ImGui.TextColored(Accent,localization.Get("HoverUi.HowToGet"));
+        var known=0;
+        if(npcVendors?.State.Catalog?.ForItem(id) is { Count:>0 } offers){known++;ImGui.TextUnformatted(localization.Format("HoverUi.VendorCount",offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));}
+        if(quests.State.RewardIndex?.ForItem(id) is { Count:>0 } rewards){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionQuests",string.Join(", ",rewards.Take(3).Select(reward=>reward.Name))));}
+        foreach(var achievement in AchievementsRewarding([id]).Take(3)){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionAchievement",achievement));}
+        foreach(var dutyId in LuminaDutiesOf(id).Take(3))
+            if(duties.State.Catalog?.Find(dutyId) is { } lootDuty){known++;ImGui.TextUnformatted(localization.Format("HoverUi.LuminaDuty",lootDuty.Name));}
+        if(lumina?.State.Data is { } supplement)
+        {
+            if(supplement.MonstersOf(id) is { Count:>0 } mobs){known++;ImGui.TextWrapped(localization.Format("HoverUi.LuminaMonsters",string.Join(", ",mobs.Take(4))));}
+            if(supplement.FatesOf(id) is { Count:>0 } fates){known++;ImGui.TextWrapped(localization.Format("HoverUi.LuminaFates",string.Join(", ",fates.Take(3))));}
+            if(supplement.FromVenture(id)){known++;ImGui.TextUnformatted(localization.Get("HoverUi.LuminaVenture"));}
+            foreach(var (kind,count,sources) in supplement.SupplementsOf(id))
+            {
+                known++;
+                var names=string.Join(", ",sources.Take(3).Select(source=>itemCatalog.State.Catalog?.Find(source)?.Name ?? source.ToString()));
+                ImGui.TextWrapped(localization.Format("HoverUi.Supplement"+(kind is >= 1 and <= 19 ? kind:0),names)+(count>3 ? localization.Format("HoverUi.SupplementMore",count-3):""));
+            }
+            if(supplement.StorePriceCents(id) is { } cents){known++;ImGui.TextUnformatted(localization.Format("HoverUi.LuminaStore",(cents/100m).ToString("0.00",System.Globalization.CultureInfo.InvariantCulture)));}
+        }
+        if(recipeCatalog.State.Catalog?.ForResult(id) is { Count:>0 } recipes){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionCraft",recipes.Count));}
+        if(gatheringCatalog.State.Catalog?.ForItem(id) is { Count:>0 } gathered){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionGathering",gathered[0].TypeName,gathered[0].Zone));}
+        if(item is { IsMarketable:true })ImGui.TextDisabled(localization.Get("HoverUi.CollectionMarket"));
+        if(known==0)DrawFallbackSources(id);
+    }
+
+    // e): true when a part turned on has something to draw for this item; Stock and « How to get it » always draw their heading.
+    // Cheap lookups, cut short with the default settings (stock on).
+    private bool HoverInfoShown(Items.ItemDefinition? item,uint id)=>configuration.HoverShowStock || configuration.HoverShowSources
+        || configuration.HoverShowCollection && item is { MountId:not 0 } or { CompanionId:not 0 } or { TripleTriadCardId:not 0 } or { OrchestrionId:not 0 }
+        || configuration.HoverShowUsages && HoveredUsageLines(id).Count>0;
+
     private void DrawHoveredUsages(uint id)
+    {
+        var lines=HoveredUsageLines(id);
+        if(lines.Count==0)return;
+        ImGui.TextColored(Accent,localization.Get("HoverUi.Usages"));
+        foreach(var line in lines)ImGui.TextWrapped(line);
+    }
+    private List<string> HoveredUsageLines(uint id)
     {
         var lines=new List<string>();
         if(recipeCatalog.State.Catalog is { } recipes && recipes.ForIngredient(id).Count is > 0 and var count)lines.Add(localization.Format("HoverUi.RecipeCount",count));
@@ -369,19 +440,24 @@ internal sealed partial class MainWindow
             if(uses.IsSupplyCandidate(id))lines.Add(localization.Get("HoverUi.Supply"));
             if(uses.IsAquariumFish(id))lines.Add(localization.Get("HoverUi.Aquarium"));
         }
-        if(lines.Count==0)return;
-        ImGui.TextColored(Accent,localization.Get("HoverUi.Usages"));
-        foreach(var line in lines)ImGui.TextWrapped(line);
+        return lines;
     }
 
-    private void DrawHoveredPrices(MarketHoverItem hovered,bool canBeHq)
+    private void DrawHoveredPrices(MarketHoverItem hovered,bool canBeHq,uint? stack)
     {
         var state=market.State;var quote=market.GetCached(state.WorldId,hovered.ItemId);var background=market.BackgroundState;var now=DateTimeOffset.UtcNow;
         ImGui.TextColored(Accent,localization.Format("HoverUi.Prices",state.WorldName));
         if(quote is { } prices)
         {
-            DrawPriceLine("NQ",prices.Nq.Minimum);
-            if(canBeHq)DrawPriceLine("HQ",prices.Hq.Minimum);
+            // 0.343 (I-01): under each minimum, the last sale, the average sale price and the sales per day (unknown = « — »).
+            DrawPriceLine("NQ",prices.Nq.Minimum);DrawSaleLine(prices.Nq);
+            if(canBeHq){DrawPriceLine("HQ",prices.Hq.Minimum);DrawSaleLine(prices.Hq);}
+            // The hovered stack at the minimum of its own quality (lowest listing × quantity: an order of size, not a sale).
+            if(stack is > 1 and var count && (hovered.Hq ? prices.Hq.Minimum:prices.Nq.Minimum) is { } unit)
+            {
+                ImGui.TextUnformatted(localization.Format("HoverUi.Stack",count,(unit*count).ToString("N0")));
+                DrawGilIcon();
+            }
             ImGui.TextDisabled(prices.UploadedAt is { } date ? localization.Format("HoverUi.Uploaded",date.ToLocalTime().ToString("g")):localization.Get("HoverUi.UnknownDate"));
             if(!prices.HasRecentUpload(now))ImGui.TextColored(Accent,localization.Get("HoverUi.Old"));
             if(prices.NqCheapest is not null || canBeHq && prices.HqCheapest is not null)
@@ -390,13 +466,31 @@ internal sealed partial class MainWindow
                 DrawCheapest("NQ",prices.NqCheapest,state,now);
                 if(canBeHq)DrawCheapest("HQ",prices.HqCheapest,state,now);
             }
-            ImGui.TextDisabled(localization.Format("HoverUi.Fetched",prices.FetchedAt.ToLocalTime().ToString("T")));
+            // 0.343 (I-01): cheapest of the whole region, shown only when cheaper than the data center's.
+            if(Cheaper(prices.NqRegion,prices.NqCheapest) || canBeHq && Cheaper(prices.HqRegion,prices.HqCheapest))
+            {
+                ImGui.TextColored(Accent,localization.Get("HoverUi.Region"));
+                if(Cheaper(prices.NqRegion,prices.NqCheapest))DrawCheapest("NQ",prices.NqRegion,state,now);
+                if(canBeHq && Cheaper(prices.HqRegion,prices.HqCheapest))DrawCheapest("HQ",prices.HqRegion,state,now);
+            }
+            // 0.329: date and time, as on the Market page: a quote restored from the disk cache can be from another day.
+            ImGui.TextDisabled(localization.Format("HoverUi.Fetched",prices.FetchedAt.ToLocalTime().ToString("g")));
             if(!market.IsFresh(prices,now))ImGui.TextDisabled(localization.Get("HoverUi.Expired"));
+            if(configuration.HoverPriceRefresh)ImGui.TextDisabled(localization.Get("HoverUi.RefreshHint"));
         }
         else ImGui.TextWrapped(background?.ItemId==hovered.ItemId && background.WorldId==state.WorldId
             ? background.Loading ? localization.Get("HoverUi.Loading"):background.Error is not null ? localization.Get("HoverUi.Error") : localization.Get("HoverUi.NoPrices")
             :localization.Get("HoverUi.Pending"));
         ImGui.TextDisabled(localization.Get("HoverUi.Source"));
+    }
+
+    private static bool Cheaper(MarketListing? region,MarketListing? dataCenter)=>region is { } cheapest && (dataCenter is null || cheapest.Price<dataCenter.Price);
+
+    private void DrawSaleLine(MarketQualityPrice price)
+    {
+        var last=price.RecentSale is { } sale ? sale.ToString("N0")+(price.SaleAt is { } at ? $" ({at.ToLocalTime():g})":""):"—";
+        ImGui.TextDisabled(localization.Format("HoverUi.Sales",last,price.Average is { } average ? average.ToString("N0"):"—",
+            price.Velocity is { } velocity ? velocity.ToString("0.#"):"—"));
     }
 
     // Amounts end with the game's Gil icon instead of a currency word.
@@ -415,7 +509,7 @@ internal sealed partial class MainWindow
     private void DrawCheapest(string quality,MarketListing? listing,MarketState state,DateTimeOffset now)
     {
         if(listing is not { } cheapest){ImGui.TextDisabled(localization.Format("HoverUi.NoListing",quality));return;}
-        var world=cheapest.WorldId==state.WorldId ? localization.Get("HoverUi.ThisWorld"):state.NameOf(cheapest.WorldId) ?? localization.Format("HoverUi.WorldId",cheapest.WorldId);
+        var world=cheapest.WorldId==state.WorldId ? localization.Get("HoverUi.ThisWorld"):state.NameOf(cheapest.WorldId) ?? WorldName?.Invoke(cheapest.WorldId) ?? localization.Format("HoverUi.WorldId",cheapest.WorldId);
         ImGui.TextUnformatted(localization.Format("HoverUi.PriceLine",quality,cheapest.Price.ToString("N0")));
         DrawGilIcon();ImGui.SameLine(0,6);ImGui.TextUnformatted(localization.Format("HoverUi.CheapestWorld",world));
         if(!MarketQuote.Recent(cheapest.UploadedAt,now))

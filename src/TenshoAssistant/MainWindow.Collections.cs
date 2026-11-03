@@ -6,6 +6,11 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Collections page, also drawn as the Blue magic page: mounts, minions, emotes, orchestrion rolls (with categories), titles and achievements
+// (categories and detail popup: MainWindow.Completion.cs), blue magic spells; obtained / not obtained / unknown filter with counts, the
+// ✓ / ✗ badge (0.275), how-to-obtain tooltips and the right-click menu (an entry unlocked by one item opens that item's menu, 0.274).
+// Lists come from the game sheets and unlock states from Collections/CollectionReader (framework thread), cached for the Collections
+// duration; titles and achievements are known only once their game window was opened this session.
 internal sealed partial class MainWindow
 {
     private CollectionState? collectionViewState;
@@ -16,6 +21,12 @@ internal sealed partial class MainWindow
     private CollectionEntry[] collectionViewMatches = [];
     private uint? collectionViewMusicCategory;
     private uint? collectionViewAchievementCategory;
+    // 0.365 (g, C-04): the kinds read by ExtraCollectionReader, in the user's order (GAPS.md C-04).
+    internal Func<IReadOnlyList<CollectionEntry>?>? ExtraCollections { get; set; }
+    internal Func<bool>? ExtraCollectionsUnavailable { get; set; }
+    private static readonly CollectionKind[] ExtraKinds=[CollectionKind.Hairstyle,CollectionKind.Ornament,CollectionKind.Glasses,CollectionKind.Barding,
+        CollectionKind.Portrait,CollectionKind.MasterBook,CollectionKind.McGuffin,CollectionKind.OccultLore];
+    private object? collectionViewExtra;
     private void DrawCollections(bool blueMagic = false)
     {
         Heading(localization.Get(blueMagic ? "Category.BlueMagic":"CollectionsBrowser.Title"),localization.Get(blueMagic ? "CollectionsBrowser.BlueDescription":"CollectionsBrowser.Description"));
@@ -23,8 +34,10 @@ internal sealed partial class MainWindow
         if (ImGui.Button(localization.Get("CollectionsBrowser.Refresh"))) collections.RequestRefresh();
         ImGui.SameLine();
         ImGui.TextDisabled(state.Loading ? localization.Get("CollectionsBrowser.Loading") : state.ObservedAt is { } date ? localization.Format("CollectionsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("CollectionsBrowser.Offline"));
-        if (state.Error is { } error) { ImGui.TextWrapped(localization.Get("CollectionsBrowser.Error"));if(developerMode)ImGui.TextWrapped(error); }
+        if (state.Error is { } error) { ImGui.TextWrapped(localization.Get("CollectionsBrowser.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error)); }
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Collections,state.ObservedAt,state.FromCache);
+        // 0.360 (g, C-09): the Wishlist tab, set again by its tab on every frame it is shown.
+        collectionWishlistTab=false;collectionOutfitTab=false;
         if (!blueMagic && ImGui.BeginTabBar("CollectionKinds"))
         {
             try
@@ -35,18 +48,29 @@ internal sealed partial class MainWindow
                 if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Orchestrion")+"###CollectionMusic",focusOrchestrionTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusOrchestrionTab=false;collectionKind = CollectionKind.Orchestrion; ImGui.EndTabItem(); }
                 if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Titles")+"###CollectionTitles",focusTitleTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusTitleTab=false;collectionKind=CollectionKind.Title;ImGui.EndTabItem(); }
                 if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Achievements")+"###CollectionAchievements",focusAchievementTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusAchievementTab=false;collectionKind=CollectionKind.Achievement;ImGui.EndTabItem(); }
+                foreach(var extraKind in ExtraKinds)
+                    if (ImGui.BeginTabItem(localization.Get("ExtraCollections."+extraKind)+"###Collection"+extraKind)) { collectionKind=extraKind; ImGui.EndTabItem(); }
+                if (ImGui.BeginTabItem(localization.Get("Outfits.Title")+"###CollectionOutfits")) { collectionOutfitTab=true; ImGui.EndTabItem(); }
+                if (ImGui.BeginTabItem(localization.Get("Wishlist.Title")+"###CollectionWishlist")) { collectionWishlistTab=true; ImGui.EndTabItem(); }
             }
             finally { ImGui.EndTabBar(); }
         }
+        if(collectionWishlistTab){DrawWishlist();return;}
+        if(collectionOutfitTab){DrawOutfits();return;}
         var kind = blueMagic ? CollectionKind.BlueMagic : collectionKind;
-        if(kind==CollectionKind.Orchestrion)DrawOrchestrionCategories(state);
-        if(kind==CollectionKind.Achievement)DrawAchievementCategories(state);
+        var extra = ExtraKinds.Contains(kind) ? ExtraCollections?.Invoke() : null;
+        if (ExtraKinds.Contains(kind) && extra is null)
+            ImGui.TextDisabled(localization.Get(ExtraCollectionsUnavailable?.Invoke()==true ? "ExtraCollections.Unavailable":"ExtraCollections.Loading"));
+        if(kind==CollectionKind.Orchestrion){DrawOrchestrionPlayer(state);DrawOrchestrionCategories(state);}
+        if(kind==CollectionKind.Achievement){DrawTrackedAchievements(state);DrawAchievementCategories(state);}
+        if(kind==CollectionKind.Title)DrawTitleTools(state);
         foreach(var issue in state.CategoryIssues ?? [])if(issue.Kind==kind)ImGui.TextWrapped(issue.Reason);
         ImGui.SetNextItemWidth(-1);
         // 0.144: titles and achievements are only known once the game sent their list (its window opened once this session).
         if(kind==CollectionKind.Title && collections.TitleListLoaded==false)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("CollectionsBrowser.TitlesNotLoaded"));
         if(kind==CollectionKind.Achievement && collections.AchievementListLoaded==false)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("CollectionsBrowser.AchievementsNotLoaded"));
         ImGui.InputTextWithHint("##CollectionSearch", localization.Get("CollectionsBrowser.Search"), ref collectionQuery, 128);
+        Tip("CollectionsBrowser.SearchTip");
         var completion=kind is CollectionKind.Title or CollectionKind.Achievement;
         if(!completion && collectionFilter==3)collectionFilter=0;
         var filters = completion ? new[]{"All",kind==CollectionKind.Achievement ? "Completed":"Acquired","Unknown",kind==CollectionKind.Achievement ? "NotCompleted":"NotAcquired"}:new[] { "All", "Acquired", "Unconfirmed" };
@@ -54,24 +78,51 @@ internal sealed partial class MainWindow
         {
             if (index > 0) ImGui.SameLine();
             if (ImGui.RadioButton(localization.Get("CollectionsBrowser."+filters[index])+"###CollectionFilter"+index, collectionFilter == index)) collectionFilter = index;
+            // Literal keys, so the tooltip key test sees them.
+            switch (index)
+            {
+                case 0: Tip("CollectionsBrowser.AllTip"); break;
+                case 1: Tip("CollectionsBrowser.AcquiredTip"); break;
+                case 2: if (completion) Tip("CollectionsBrowser.UnknownTip"); else Tip("CollectionsBrowser.UnconfirmedTip"); break;
+                case 3: Tip("CollectionsBrowser.NotAcquiredTip"); break;
+            }
         }
+        DrawCollectionSourceFilter(kind);
+        // 0.395 (user request): the blue magic list sorted by the lowest level of the monsters that teach each spell (wiki, read on opening).
+        if(blueMagic)DrawBlueSpellOrder();
+        var blueOrder=blueMagic ? blueSpellOrder:0;var blueRevision=blueMagic && blueSpellOrder!=0 ? BlueSpellIndex?.Revision ?? 0:0;
+        var sourceFilter=HasSourceFilter(kind) ? collectionSourceFilter:-1;
         var musicCategory=kind==CollectionKind.Orchestrion ? orchestrionCategoryFilter:null;
         var achievementCategory=kind==CollectionKind.Achievement ? achievementCategoryFilter:null;
-        if (!ReferenceEquals(collectionViewState, state) || collectionViewKind != kind
-            || collectionViewFilter != collectionFilter || collectionViewQuery != collectionQuery || collectionViewMusicCategory!=musicCategory || collectionViewAchievementCategory!=achievementCategory)
+        if (!ReferenceEquals(collectionViewState, state) || !ReferenceEquals(collectionViewExtra, extra) || collectionViewKind != kind
+            || collectionViewFilter != collectionFilter || collectionViewQuery != collectionQuery || collectionViewMusicCategory!=musicCategory || collectionViewAchievementCategory!=achievementCategory
+            || collectionViewSourceFilter!=sourceFilter || collectionViewSourceRevision!=collectionSourceRevision
+            || collectionViewBlueOrder!=blueOrder || collectionViewBlueRevision!=blueRevision)
         {
-            collectionViewState = state; collectionViewKind = kind;
+            collectionViewBlueOrder=blueOrder;collectionViewBlueRevision=blueRevision;
+            collectionViewSourceFilter=sourceFilter;collectionViewSourceRevision=collectionSourceRevision;
+            collectionViewState = state; collectionViewKind = kind; collectionViewExtra = extra;
             collectionViewFilter = collectionFilter; collectionViewQuery = collectionQuery;
             collectionViewMusicCategory=musicCategory;
             collectionViewAchievementCategory=achievementCategory;
-            collectionViewEntries = state.Entries.Where(entry => entry.Kind == kind)
+            collectionViewEntries = (ExtraKinds.Contains(kind) ? extra ?? [] : state.Entries).Where(entry => entry.Kind == kind)
                 .Where(entry=>musicCategory is null || entry.Music?.CategoryId==musicCategory)
                 .Where(entry=>achievementCategory is null || entry.Achievement?.CategoryId==achievementCategory)
                 .OrderBy(entry=>kind==CollectionKind.Orchestrion ? entry.Music?.CategoryOrder ?? int.MaxValue:kind==CollectionKind.Achievement ? entry.Achievement?.KindOrder ?? int.MaxValue:0)
                 .ThenBy(entry=>kind==CollectionKind.Achievement ? entry.Achievement?.CategoryOrder ?? int.MaxValue:0)
-                .ThenBy(entry => blueMagic ? entry.Number:kind==CollectionKind.Orchestrion ? entry.Music?.Order ?? int.MaxValue:kind==CollectionKind.Title ? entry.Title?.Order ?? int.MaxValue:kind==CollectionKind.Achievement ? entry.Achievement?.Order ?? int.MaxValue:0)
+                .ThenBy(entry => blueMagic || kind is CollectionKind.Ornament or CollectionKind.McGuffin ? entry.Number:kind==CollectionKind.Orchestrion ? entry.Music?.Order ?? int.MaxValue:kind==CollectionKind.Title ? entry.Title?.Order ?? int.MaxValue:kind==CollectionKind.Achievement ? entry.Achievement?.Order ?? int.MaxValue:0)
                 .ThenBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase).ToArray();
-            collectionViewMatches = collectionViewEntries.Where(entry => (collectionFilter == 0 || (collectionFilter == 1 ? entry.Acquisition==CollectionAcquisition.Acquired:collectionFilter==2 ? entry.Acquisition==CollectionAcquisition.Unknown:entry.Acquisition==CollectionAcquisition.NotAcquired))
+            if(blueOrder!=0)collectionViewEntries=Monsters.BlueSpellSources.SortByMonsterLevel(collectionViewEntries,entry=>BlueSpellLevel(entry.Number),blueOrder);
+            // 0.331: « Unconfirmed » (non-completion kinds) = everything the game does not confirm as obtained, by the same rule as the
+            // ✓ / ✗ badge (CollectionStateOf), so a mount or minion read as not unlocked stays listed there.
+            bool StateMatches(CollectionEntry entry)=>collectionFilter switch
+            {
+                0=>true,
+                1=>entry.Acquisition==CollectionAcquisition.Acquired,
+                2=>completion ? entry.Acquisition==CollectionAcquisition.Unknown:CollectionStateOf(entry)!=CollectionAcquisition.Acquired,
+                _=>entry.Acquisition==CollectionAcquisition.NotAcquired,
+            };
+            collectionViewMatches = collectionViewEntries.Where(entry => StateMatches(entry) && CollectionSourceMatches(entry,sourceFilter)
                 && (string.IsNullOrWhiteSpace(collectionQuery) || entry.Name.Contains(collectionQuery.Trim(), StringComparison.OrdinalIgnoreCase))).ToArray();
         }
         var entries = collectionViewEntries;
@@ -109,13 +160,16 @@ internal sealed partial class MainWindow
                     finally{ImGui.PopFont();}
                 }
                 else DrawItemIcon(musicItem ?? new ItemDefinition(0, entry.Name, false, entry.IconId), new Vector2(32));
+                // An item icon (orchestrion roll) carries its own badge; the other entries get it here.
+                if(musicItem is null)DrawEntryMark(entry);
                 if(kind==CollectionKind.TripleTriad)TriadCardTooltip(entry.Id);
                 if(kind==CollectionKind.Orchestrion && ImGui.IsItemClicked()){selectedOrchestrion=entry.Id;openMusicDetails=true;}
                 if(kind==CollectionKind.Achievement && ImGui.IsItemClicked()){selectedCompletionKind=kind;selectedCompletionId=entry.Id;openCompletionDetails=true;}
                 ImGui.SameLine();
                 if (blueMagic)
                 {
-                    if (ImGui.Selectable($"{entry.Number} · {entry.Name}##{entry.Id}"))
+                    var teachingLevel=BlueSpellLevel(entry.Number);
+                    if (ImGui.Selectable($"{entry.Card?.Label ?? entry.Number.ToString()} · {entry.Name}"+(teachingLevel is { } spellLevel ? " · "+localization.Format("BlueSpellSources.LevelShort",spellLevel):"")+$"##{entry.Id}"))
                     { selectedBlueSpell = entry.Id; openDetails = true; }
                 }
                 else if(kind==CollectionKind.Orchestrion)
@@ -126,18 +180,26 @@ internal sealed partial class MainWindow
                 {
                     if(ImGui.Selectable($"{entry.Name}##Completion{kind}{entry.Id}")){selectedCompletionKind=kind;selectedCompletionId=entry.Id;openCompletionDetails=true;}
                 }
-                else ImGui.TextUnformatted(entry.Name);
+                else ImGui.TextUnformatted(entry.Kind==CollectionKind.Portrait && entry.Description.Length>0
+                    ? $"{entry.Name} · {localization.Get("ExtraCollections.Portrait"+entry.Description)}":entry.Name);
                 // 0.142: how to obtain it (items, vendors, quests, recipes) for mounts, minions, emotes, cards and rolls.
                 if (ImGui.IsItemHovered())
                 {
                     if(entry.Kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.Emote or CollectionKind.TripleTriad or CollectionKind.Orchestrion)DrawCollectionTooltip(entry);
+                    // 0.387 (user report): the 0.365 kinds — the teaching item's full tooltip (how to obtain it) when the game data gives one,
+                    // else the collection tooltip saying how to obtain it is not known.
+                    else if(entry.ItemId!=0)DrawItemInfoTooltip(entry.ItemId);
+                    else if(ExtraKinds.Contains(entry.Kind))DrawCollectionTooltip(entry);
                     else WrappedTooltip(developerMode ? $"{entry.Name}\n{entry.Kind} : {entry.Id}":entry.Name);
                 }
                 // 0.178: right click = links to the sources (NPC vendor, achievement, quest, recipe, gathering).
-                if(entry.Kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.TripleTriad or CollectionKind.Orchestrion)
+                if(entry.Kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.TripleTriad or CollectionKind.Orchestrion || entry.ItemId!=0)
                     CollectionSourcesMenu($"CollectionSources{entry.Kind}{entry.Id}",entry);
                 ImGui.TableNextColumn();
-                ImGui.TextColored(entry.ConfirmedUnlocked ? Success : Muted,CollectionAcquisitionLabel(entry));
+                // 0.331: the State column says what the ✓ / ✗ badge shows: a mount, minion, card or roll read as not unlocked (CollectionStateOf)
+                // reads « not acquired at observation », not « unconfirmed »; every other row keeps its label.
+                ImGui.TextColored(entry.ConfirmedUnlocked ? Success : Muted,entry.Acquisition==CollectionAcquisition.Unknown && CollectionStateOf(entry)==CollectionAcquisition.NotAcquired
+                    ? localization.Get("CollectionState.NotAcquired"):CollectionAcquisitionLabel(entry));
             }
             }
             finally { clipper.End(); clipper.Destroy(); }
@@ -165,6 +227,7 @@ internal sealed partial class MainWindow
                     ImGui.TextWrapped(string.IsNullOrWhiteSpace(spell.Location) ? localization.Get("BlueSpell.MissingLocation") : localization.Format("BlueSpell.Location",spell.Location));
                     ImGui.TextColored(spell.ConfirmedUnlocked ? Success : Muted,localization.Get(spell.ConfirmedUnlocked ? "BlueSpell.Learned":"CollectionState.Unknown"));
                     if (ImGui.Button(localization.Get("BlueSpell.Copy"))) ImGui.SetClipboardText(spell.Name);
+                    DrawBlueSpellMonsters(spell.Id);
                 }
                 if (ImGui.Button(localization.Get("BlueSpell.Close"))) ImGui.CloseCurrentPopup();
             }

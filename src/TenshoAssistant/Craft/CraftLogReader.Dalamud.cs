@@ -55,7 +55,7 @@ internal sealed class CraftLogReader : IDisposable
                 {
                     var recipe=recipes.State.Catalog?.ForResult(request.ItemId).FirstOrDefault(row=>row.RecipeId==request.RecipeId);
                     var agent=AgentRecipeNote.Instance();
-                    if(recipe is null || agent==null){service.Clear("Carnet indisponible ou catalogue de recettes encore en lecture.");return;}
+                    if(recipe is null || agent==null){service.Clear("Crafting log unavailable or recipe catalogue still loading.");return;}
                     agent->OpenRecipeByRecipeId(request.RecipeId);nextRead=0;
                 }
                 var handle=gui.GetAddonByName("RecipeNote");
@@ -80,7 +80,7 @@ internal sealed class CraftLogReader : IDisposable
             }
             catch(Exception error)
             {
-                service.Clear("Lecture du carnet de synthèse indisponible.");
+                service.Clear("Crafting log reading unavailable.");
                 nextRead=now+Stopwatch.Frequency;
                 if(now>=nextWarning){nextWarning=now+5*Stopwatch.Frequency;log.Warning(error,"Tensho crafting log unavailable.");}
             }

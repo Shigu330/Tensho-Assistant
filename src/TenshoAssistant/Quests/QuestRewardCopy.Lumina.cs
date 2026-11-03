@@ -21,7 +21,7 @@ public static class QuestRewardCopy
             }
             else if(mode==6 && reference.RowType==typeof(QuestClassJobReward))
             {
-                if(!jobs.TryGetRow(reference.RowId,out var variants)){Missing("job",reference.RowId,slot,"Table de récompenses par métier absente.");continue;}
+                if(!jobs.TryGetRow(reference.RowId,out var variants)){Missing("job",reference.RowId,slot,"Job reward table missing.");continue;}
                 if(variants.Count>128)throw new InvalidDataException("Too many quest job reward variants.");
                 foreach(var variant in variants)
                 for(var index=0;index<variant.RewardItem.Count;index++)
@@ -29,19 +29,19 @@ public static class QuestRewardCopy
                     var id=variant.RewardItem[index].RowId;if(id==0)continue;
                     uint amount=index<variant.RewardAmount.Count ? variant.RewardAmount[index]:0u;
                     var category=variant.ClassJobCategory.RowId;
-                    var label=category==0 ? "Métier non renseigné":variant.ClassJobCategory.Value.Name.ExtractText();
+                    var label=category==0 ? "Job not given":variant.ClassJobCategory.Value.Name.ExtractText();
                     items.Add(new(id,amount==0 ? null:amount,QuestRewardRule.ClassJob,"job",index,
                         ConditionId:category,ConditionLabel:label,SourceId:reference.RowId,Variant:variant.SubrowId,ParentSlot:slot));
                 }
             }
             else if(mode==7 && reference.RowType==typeof(BeastRankBonus))
             {
-                if(!bonuses.TryGetRow(reference.RowId,out var bonus) || bonus.Item.RowId==0){Missing("rank",reference.RowId,slot,"Bonus de rang non résolu.");continue;}
+                if(!bonuses.TryGetRow(reference.RowId,out var bonus) || bonus.Item.RowId==0){Missing("rank",reference.RowId,slot,"Rank bonus not resolved.");continue;}
                 for(var index=0;index<bonus.ItemQuantity.Count;index++)
                     items.Add(new(bonus.Item.RowId,bonus.ItemQuantity[index],QuestRewardRule.TribeRankVariant,"rank",slot,
-                        ConditionLabel:$"Variante de rang {index+1}",SourceId:reference.RowId,Variant:index));
+                        ConditionLabel:$"Rank variant {index+1}",SourceId:reference.RowId,Variant:index));
             }
-            else Missing("fixed",reference.RowId,slot,"Type de récompense non interprété ; ce numéro n’est pas converti en Item.");
+            else Missing("fixed",reference.RowId,slot,"Reward type not interpreted; this number is not converted to an Item.");
         }
         for(var index=0;index<row.OptionalItemReward.Count;index++)
         {
@@ -60,12 +60,12 @@ public static class QuestRewardCopy
         }
         if(row.CurrencyRewardCount>0)
         {
-            if(row.CurrencyReward.RowId==0)Missing("currency",0,0,"Monnaie non reliée à un Item ; quantité conservée.",row.CurrencyRewardCount);
+            if(row.CurrencyReward.RowId==0)Missing("currency",0,0,"Currency not linked to an Item; quantity kept.",row.CurrencyRewardCount);
             else items.Add(new(row.CurrencyReward.RowId,row.CurrencyRewardCount,QuestRewardRule.Currency,"currency",0));
         }
         if(row.TomestoneCountReward>0)
         {
-            if(!tomestones.TryGetValue(row.TomestoneReward,out var id) || id is null)Missing("tomestone",row.TomestoneReward,0,"Type de mémoquartz absent ou ambigu.",row.TomestoneCountReward);
+            if(!tomestones.TryGetValue(row.TomestoneReward,out var id) || id is null)Missing("tomestone",row.TomestoneReward,0,"Tomestone type missing or ambiguous.",row.TomestoneCountReward);
             else items.Add(new(id.Value,row.TomestoneCountReward,QuestRewardRule.Currency,"tomestone",0));
         }
         return new(mode,row.GilReward,items,unresolved,row.OtherReward.RowId!=0 || row.EmoteReward.RowId!=0 || row.ActionReward.RowId!=0

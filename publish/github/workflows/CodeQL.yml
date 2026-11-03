@@ -1,0 +1,38 @@
+# Draft (0.323), not active: GitHub only runs workflows placed in .github/workflows. See publish/github/README.md.
+# Replaces .github/workflows/CodeQL.yml, which watches a « Stable » branch that does not exist on GitHub and builds without Dalamud
+# (its weekly run fails). « build-mode: none » analyses the C# sources without building, so no Dalamud is needed.
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "main", "Devloppement" ]
+  pull_request:
+    branches: [ "main", "Devloppement" ]
+  schedule:
+    - cron: '0 5 * * 1'
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    name: Analyze C#
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: csharp
+          build-mode: none
+          config-file: ./.github/codeql/codeql-config.yml
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:csharp"
