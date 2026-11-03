@@ -103,6 +103,15 @@ Gestion par l'agent, accordée par l'utilisateur le 2026-11-03 (« OK fais le »
 - Avant chaque commit : aucun secret (adresse Discord, jeton) dans les fichiers suivis ; `checkpoints/`, `bin/`, `obj/` restent ignorés.
 - Fins de ligne : avertissements « LF will be replaced by CRLF » sans effet (`* text=auto`) ; la normalisation complète
   (`git add --renormalize .`, décision de 0.323) reste à décider, juste après un commit propre.
+GitHub (issues, milestones, labels ; tenus par l'agent depuis le 2026-11-03, en anglais) :
+- Milestone 2 « Gameplay modules & feature integration » : #10–#17 (domaines ; commentaire d'état à 0.446), #22 campagne de tests
+  en jeu (h), #23 sondes en jeu, #24 décisions en attente. Une issue de domaine se ferme quand la campagne l'a validée en jeu.
+- Milestone 3 « Update resilience & deep work » : #25 R-14, #26 I-05, #27 I-15, #28 A-03 / A-04 Raphael, #29 N-10, #30 relecture
+  du hook A-14 (label ultracode). Milestone « 1.0.0 — Dalamud publication » : #31 D17.
+- Labels ajoutés : in-game-test, probe, decision, ultracode. Une issue est commentée quand une version la fait avancer (numéro de
+  version) et fermée seulement sur preuve (Verify vert pour le code, rapport de l'utilisateur pour le jeu).
+- CodeQL (.github/workflows/CodeQL.yml) : échouait depuis le 2026-10-31 (branche « Stable » inexistante, Dalamud absent du runner) ;
+  corrigé en 0.446 (branches main et Devloppement, Dalamud officiel téléchargé pour la compilation).
 
 ## Blocages connus
 - Bonus d'Abondance : règle communautaire (frozen_rabbit_tome) appliquée comme estimation citée (0.224) ; à comparer en jeu.

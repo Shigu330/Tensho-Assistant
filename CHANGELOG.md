@@ -15,6 +15,10 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
   faites marquées : 36 lignes « État » dans MAP, ITEMS, CRAFT-GATHER et TOOLS-PROPOSALS, alternatives faites dans G-PROPOSALS.
 - Git confié à l'agent (accord du 2026-11-03) : CLAUDE.md, RULES et STATUS « Git » ; commit et push par `Verify.ps1 -Commit`, release
   seulement sur ta demande. Release.ps1 : variable facultative `TENSHO_COMMIT_TRAILER`, ajoutée en fin de message de commit.
+- GitHub (demande du 2026-11-03) : milestone 2 renommée, milestones 3 (résistance aux mises à jour, travaux en séance) et 1.0.0
+  (publication Dalamud), labels in-game-test, probe, decision, ultracode, état à 0.446 commenté sur #10–#17, issues #22–#31.
+  CodeQL corrigé : le workflow visait une branche « Stable » inexistante et la compilation échouait faute de Dalamud sur le runner
+  (branches main et Devloppement, distribution officielle de Dalamud téléchargée pour ses assemblies de référence).
 - Tests : HuntAlert446Tests (1 cas). Verify.ps1 (agent) : 809/809, 0 avertissement, 0 erreur ; DLL 0.446.0.0. Non validé en jeu.
 ### English
 - N-09: optional local chat line and alarm sound when an A or S hunt mark appears nearby (off by default).
@@ -22,6 +26,8 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 - Documentation pass: README pages, commands and features up to 0.446; status, roadmap and proposals marked with what is already done.
 - Git is now handled by the agent (commit and push per version); releases stay on the maintainer's request. Release.ps1: optional
   TENSHO_COMMIT_TRAILER appended to the commit message.
+- GitHub: milestones 3 (update resilience and deep work) and 1.0.0 (Dalamud publication), new labels, issues #22–#31, state
+  comments on #10–#17. CodeQL fixed: it targeted a missing « Stable » branch and failed without Dalamud on the runner.
 
 ## 0.445.0
 - Feuille de route, domaine 6, N-05 (ton choix dans GAPS : PaissaDB accepté, surveillance régulière par réglage, lecture seule, rien

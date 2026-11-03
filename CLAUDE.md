@@ -19,7 +19,8 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
   validation des langues, paquet). Sondes de données en lecture seule : `tools/ShopCurrencyProbe`, `tools/ApiProbe`.
 - **Git géré par l'agent (accord de l'utilisateur, 2026-11-03)** : commit et push de chaque version sur `Devloppement` par
   `.\scripts\Verify.ps1 -Commit` (après `-Commit -DryRun`). Release seulement sur demande explicite de l'utilisateur. Jamais de push forcé,
-  de réécriture d'historique ni de réglage GitHub sans accord ; plan détaillé : [docs/ai/STATUS.md](docs/ai/STATUS.md) « Git ».
+  de réécriture d'historique ni de réglage GitHub sans accord ; issues, milestones et labels GitHub tenus par l'agent (en anglais) ;
+  plan détaillé : [docs/ai/STATUS.md](docs/ai/STATUS.md) « Git ».
 
 ## À chaque version livrée
 
