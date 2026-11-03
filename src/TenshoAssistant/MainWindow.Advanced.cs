@@ -45,6 +45,7 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.HeaderEt","Advanced.HeaderEtTip",()=>configuration.ShowHeaderEorzeaTime,value=>configuration.ShowHeaderEorzeaTime=value,c=>c.ShowHeaderEorzeaTime);
         BoolSetting("Advanced.HomeTools","Advanced.HomeToolsTip",()=>configuration.HomeShowTools,value=>configuration.HomeShowTools=value,c=>c.HomeShowTools);
         BoolSetting("Advanced.AlarmServerBar","Advanced.AlarmServerBarTip",()=>configuration.AlarmServerBar,value=>configuration.AlarmServerBar=value,c=>c.AlarmServerBar);
+        BoolSetting("Advanced.ReminderServerBar","Advanced.ReminderServerBarTip",()=>configuration.ReminderServerBar,value=>configuration.ReminderServerBar=value,c=>c.ReminderServerBar);
         // 0.426 (user request): close Tensho when it opens a game window.
         BoolSetting("Advanced.CloseOnGameWindow","Advanced.CloseOnGameWindowTip",()=>configuration.CloseOnGameWindow,value=>configuration.CloseOnGameWindow=value,c=>c.CloseOnGameWindow);
         // 0.415 (g, R-13): pinned tracking window.

@@ -6,7 +6,7 @@ namespace TenshoAssistant.Alarms;
 /// <summary>
 /// g, M-01 (0.371): every 30 seconds on the framework thread, while logged in and when « automatic alarms » is on (default): reads the
 /// retainer ventures (RetainerManager, known once the retainer list was opened at a summoning bell) and the saved vessel returns
-/// (Configuration.Voyages, kept by VoyageWatcher), then syncs the automatic alarms (AutoAlarms) and saves when they changed.
+/// (Configuration.Voyages, kept by VoyageWatcher), and the squadron's mission and training (0.455), then syncs the automatic alarms (AutoAlarms) and saves when they changed.
 /// </summary>
 public sealed unsafe class AutoAlarmWatcher : IDisposable
 {
@@ -49,6 +49,16 @@ public sealed unsafe class AutoAlarmWatcher : IDisposable
                 if(vessel.ReturnAt is { } back)
                     events.Add(new($"vessel:{vessel.HouseId}/{vessel.Kind}/{vessel.Slot}",string.Format(text("AutoAlarms.Vessel"),vessel.Name),
                         text("AutoAlarms.VesselGroup"),back,AlarmSource.Voyage));
+            // 0.455 (user request, in-game campaign): the squadron's mission and training, as the Reminders page reads them (PlayerState).
+            var player=FFXIVClientStructs.FFXIV.Client.Game.UI.PlayerState.Instance();
+            if(player!=null && player->IsLoaded)
+            {
+                var group=text("AutoAlarms.SquadronGroup");
+                if(player->ActiveGcArmyExpedition!=0 && player->SquadronMissionCompletionTimestamp>0)
+                    events.Add(new("squadron:mission",text("AutoAlarms.SquadronMission"),group,DateTimeOffset.FromUnixTimeSeconds(player->SquadronMissionCompletionTimestamp),AlarmSource.Reminder));
+                if(player->ActiveGcArmyTraining!=0 && player->SquadronTrainingCompletionTimestamp>0)
+                    events.Add(new("squadron:training",text("AutoAlarms.SquadronTraining"),group,DateTimeOffset.FromUnixTimeSeconds(player->SquadronTrainingCompletionTimestamp),AlarmSource.Reminder));
+            }
             configuration.Alarms??=[];
             if(AutoAlarms.Sync(configuration.Alarms,events,now,options.LeadMinutes))save();
             warned=false;

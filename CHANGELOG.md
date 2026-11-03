@@ -3,6 +3,23 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.455.0
+- Campagne de tests en jeu, lot 1 (retours de l'utilisateur, 2026-11-04) :
+  - Journal de l'or : « +0 / =1 276 » venait du signe − (U+2212), que la police du jeu affiche « = ». Les totaux et les dernières variations
+    sont maintenant des tableaux (zéro affiché « — »), et ce signe est remplacé par « - » dans tous les textes.
+  - Escouade : l'alarme n'existait que par le bouton de la ligne, visible seulement pendant une mission. Les alarmes automatiques couvrent
+    maintenant la fin de la mission et de l'entraînement (comme les tâches de servant et les vaisseaux).
+  - Barre du serveur : une entrée séparée pour les rappels, avec sa propre icône et le nombre de rappels terminés (tâches de servant, vaisseaux
+    revenus, mission et entraînement d'escouade, parcelles mûres) ; survol = la liste ; clic = page Rappels ; réglage dans Avancé (activé). L'icône
+    des alarmes garde le nombre d'alarmes actives (choix de l'utilisateur).
+- Validé en jeu par l'utilisateur (lot 1) : ouverture de la fenêtre, liste des graines, parcelle de test et ses boutons, croisements, message hors
+  caserne, lien partake.gg, réglage retiré, journal de l'or sans fausse entrée. Cases cochées dans TESTING.md.
+- Tests : Campaign455Tests (4 cas). Verify.ps1 (agent) : 847/847, 0 avertissement, 0 erreur ; DLL 0.455.0.0. Non validé en jeu.
+### English
+- In-game campaign, batch 1. Gil journal: tables instead of lines; the U+2212 minus sign, which the game font shows as « = », is replaced
+  everywhere. Automatic alarms now cover the squadron's mission and training. The server bar has a separate reminders entry with its own icon and
+  the number of finished reminders; the alarm icon keeps the number of active alarms.
+
 ## 0.454.0
 - R-14, troisième lot : les derniers constats confirmés par l'audit.
   - Titre par classe : la liste est commune à tous vos personnages ; seul un titre que ce personnage possède est envoyé au jeu.

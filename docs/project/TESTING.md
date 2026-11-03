@@ -714,6 +714,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.455 : retours du lot 1** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Journal de l'or (Stockage › Gils) : tableaux lisibles, plus de « = » ; une dépense apparaît en « - ».
+- [ ] Barre du serveur : deux icônes, l'horloge des alarmes (nombre d'alarmes actives) et celle des rappels (nombre de terminés) ; survol = la
+  liste ; clic = la bonne page ; le réglage Avancé masque celle des rappels.
+- [ ] Mission ou entraînement d'escouade lancé : une alarme automatique apparaît dans la page Alarmes et sonne à la fin ; l'icône des rappels monte de 1.
+
 **0.454 : R-14, indisponible plutôt que « lecture »** — pendant la campagne de tests en jeu de la fin (étape h)
 
 - [ ] Titre par classe : réglé sur un personnage ; sur un autre qui ne le possède pas, changer de classe ne change pas le titre.
@@ -723,7 +730,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.453 : R-14, valeurs inconnues** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Journal de l'or : à la connexion, aucune fausse entrée « + tout l'or » ; un achat est bien noté.
+- [x] Journal de l'or : à la connexion, aucune fausse entrée « + tout l'or » ; un achat est bien noté.
 - [ ] Rappels à l'écran titre ou de sélection : pas de zéros ni de rôle ; une fois connecté, les compteurs apparaissent.
 - [ ] Prix de sous-cotation : après une sonnette, le prix est copié ; sans aucune sonnette depuis le lancement du jeu, rien n'est copié.
 - [ ] Revue de mode : les catégories s'affichent comme avant.
@@ -741,7 +748,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.451 : N-06 missions d'escouade (sonde en jeu)** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Hors de la caserne : « Lire l'escouade » affiche « L'escouade n'est pas chargée… ».
+- [x] Hors de la caserne : « Lire l'escouade » affiche « L'escouade n'est pas chargée… ».
 - [ ] À la caserne, escouade ouverte : « Lire l'escouade » liste les 8 membres (classe, niveau, « occupé » pour ceux en mission ou à
   l'entraînement) et le bonus d'entraînement ; comparer avec la fenêtre du jeu.
 - [ ] Attributs d'un membre : comparer « P / M / T » affiché avec la fiche du membre dans le jeu (classe, niveau). Un écart prouverait que
@@ -752,13 +759,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.450 : N-14 croisements** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Rappels › Journal de jardinage › Croisements : « Lecture des paires… » puis la liste ; les graines sont nommées dans la langue
+- [x] Rappels › Journal de jardinage › Croisements : « Lecture des paires… » puis la liste ; les graines sont nommées dans la langue
   du jeu ; « Ce qui donne cette graine » et « Ce que cette graine peut donner » montrent des paires cohérentes avec un croisement connu.
-- [ ] La ligne grise annonce 3 768 paires et 1 nom écarté (« Gysahl Green Seeds » dans l'infobulle) ; le journal de Dalamud le dit aussi.
+- [x] La ligne grise annonce 3 768 paires et 1 nom écarté (« Gysahl Green Seeds » dans l'infobulle) ; le journal de Dalamud le dit aussi.
 
 **0.449 : liste des graines du journal de jardinage** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Rappels › Journal de jardinage › « Liste des graines » : les noms sont dans la langue du jeu ; la recherche filtre ; choisir une
+- [x] Rappels › Journal de jardinage › « Liste des graines » : les noms sont dans la langue du jeu ; la recherche filtre ; choisir une
   graine remplit son nom, la pousse et l'entretien (par exemple 120 h et 48 h pour les graines de paprika) ; les valeurs restent modifiables.
 - [ ] Comparer une graine plantée en jeu avec l'heure de récolte affichée (données Lotlab, non vérifiées par Tensho).
 
@@ -774,8 +781,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Train de chasse : « Envoyer » est grisé tant qu'aucun drapeau n'a été posé depuis le train ; après « Drapeau suivant », choisir
   /p (en groupe) puis « Envoyer » : une seule ligne dans le chat du groupe, avec le bon nom, le bon rang, la bonne zone, et <flag> devenu
   le lien du drapeau ; un second clic avant 5 s ne fait rien.
-- [ ] Page Événements : « Événements de joueurs (partake.gg) » ouvre le site dans le navigateur.
-- [ ] Réglages : la case « Chercher les monstres sur le wiki au survol » n'existe plus ; le panneau au survol montre toujours ses sources.
+- [x] Page Événements : « Événements de joueurs (partake.gg) » ouvre le site dans le navigateur.
+- [x] Réglages : la case « Chercher les monstres sur le wiki au survol » n'existe plus ; le panneau au survol montre toujours ses sources.
 - [ ] Tri : déplacer un objet dans les sacs pendant que la page Tri est ouverte : l'éditeur de règles reste affiché (ligne « Rangement
   modifié »), l'aperçu revient tout seul.
 

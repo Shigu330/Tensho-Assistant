@@ -68,6 +68,7 @@ public sealed class Plugin : IDalamudPlugin
     private CommandInfo? commandInfo;
     private int commandLocalizationRevision=-1;
     private Func<Alarms.AlarmDtrEntry?>? alarmBar;
+    private Func<Alarms.ReminderDtrEntry?>? reminderBar;
     private Market.UndercutWatcher? undercut;
     // 0.349 (g, X-07): the chat, for the « /tensho wiki | lodestone » answers.
     private readonly IChatGui chatGui;
@@ -309,6 +310,10 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.ConfigureMarketBoard(marketBoard);
             Alarms.AlarmDtrEntry? alarmBar=null;
             registrations.Register(()=>alarmBar=new Alarms.AlarmDtrEntry(dtrBar,framework,gameGui,configuration,localization.Get,mainWindow.OpenAlarms),()=>alarmBar?.Dispose());
+            // 0.455 (user request): reminders apart from alarms in the server bar.
+            Alarms.ReminderDtrEntry? reminderBar=null;
+            registrations.Register(()=>reminderBar=new Alarms.ReminderDtrEntry(dtrBar,framework,gameGui,player,log,configuration,localization.Get,mainWindow.OpenReminders),()=>reminderBar?.Dispose());
+            this.reminderBar=()=>reminderBar;
             // 0.344 (g, I-02): currency balances and threshold alerts (chat and sound with the alarm options, Discord in its own category),
             // and their server bar entry. Registered after the Discord notifier, so released before it.
             Inventory.CurrencyWatcher? currencies=null;
@@ -922,6 +927,7 @@ public sealed class Plugin : IDalamudPlugin
             ("InventorySort",mainWindow.DrawInventorySortButton),
             ("RegenTick",mainWindow.DrawRegenTickBar),
             ("AlarmBar",()=>alarmBar?.Invoke()?.DrawTooltip()),
+            ("ReminderBar",()=>reminderBar?.Invoke()?.DrawTooltip()),
             ("TriadOverlay",mainWindow.DrawTriadOverlay),
             ("TriadRequest",mainWindow.DrawTriadRequestPanel),
             ("TriadDeck",mainWindow.DrawTriadDeckReminder),

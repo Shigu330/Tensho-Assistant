@@ -168,6 +168,7 @@ internal sealed partial class MainWindow : Window, IDisposable
 
     internal void OpenSettings(){page=Page.Settings;IsOpen=true;}
     internal void OpenAlarms(){page=Page.Alarms;IsOpen=true;}
+    internal void OpenReminders(){page=Page.Reminders;IsOpen=true;}
     // 0.344 (g, I-02): from the currency entry of the server bar.
     internal void OpenCurrencies(){page=Page.Storage;focusCurrencyTab=true;IsOpen=true;}
 

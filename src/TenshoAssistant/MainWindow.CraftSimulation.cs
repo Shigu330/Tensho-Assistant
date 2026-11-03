@@ -271,7 +271,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(step is null ? "—":$"{step.After.Progress} (+{step.ProgressGain})");
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(step is null ? "—":$"{step.After.Quality} (+{step.QualityGain})");
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(step?.After.Durability.ToString() ?? "—");
-                    ImGui.TableNextColumn(); ImGui.TextUnformatted(step is null ? "—":$"{step.After.Cp} (−{step.CpCost})");
+                    ImGui.TableNextColumn(); ImGui.TextUnformatted(step is null ? "—":$"{step.After.Cp} (-{step.CpCost})");
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(step?.After.InnerQuiet.ToString() ?? "—");
                 }
             }
