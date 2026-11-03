@@ -327,10 +327,10 @@ internal sealed partial class MainWindow
                         ? InventoryCoverage.Complete : InventoryCoverage.Partial, positioned)));
             }
         }
-        catch (InvalidOperationException) when (copied.All(container => container.Location.Container.Value is >= 3200 and < 4000 or >= 25000))
+        catch (InvalidOperationException) when (copied.All(container => InventoryDisplayLayout.HasNoBagLayout(container.Location.Container.Value)))
         {
-            // Armoury chest, glamour dresser and armoire (0.237) have no bag layout: their pieces in order, 35 per page (5 × 7).
-            var stacks = copied.SelectMany(container => container.Stacks.OrderBy(stack => stack.Slot)).ToArray();
+            // Armoury chest, glamour dresser, armoire (0.237) and company chest (0.463) have no bag layout: their pieces in order, 35 per page (5 × 7).
+            var stacks = copied.OrderBy(container => container.Location.Container.Value).SelectMany(container => container.Stacks.OrderBy(stack => stack.Slot)).ToArray();
             var coverage = copied.All(c => c.Coverage == InventoryCoverage.Complete) ? InventoryCoverage.Complete : InventoryCoverage.Partial;
             for (var page = 0; page * 35 < stacks.Length; page++)
                 frames.Add((localization.Format("BankUi.Bag", name, page + 1), new InventoryContainerSnapshot(copied[0].Location, coverage,

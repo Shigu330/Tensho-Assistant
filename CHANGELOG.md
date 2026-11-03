@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.463.0
+- Coffre de compagnie (retour du lot 3) : la lecture passait depuis 0.462 (cases à quantité 0 confirmées comme cause, la lecture a réussi à 00:54), mais la page Banque refusait de l'afficher : « ordre
+  visuel indisponible », car le jeu ne garde pas d'ordre d'affichage pour ce coffre. Il s'affiche comme l'arsenal : onglets puis cases, 35 objets par cadre, gils et cristaux compris.
+  L'organisation par onglet du jeu (50 cases) n'est pas reproduite.
+- Tests : Storage463Tests (1 cas). Verify.ps1 (agent) : 864/864, 0 avertissement, 0 erreur ; DLL 0.463.0.0. Non validé en jeu.
+### English
+- Company chest: shown in the Bank in slot order, like the armoury chest (the game keeps no display order for it, which refused the whole tab).
+
 ## 0.462.0
 - Retours du lot 3 (2026-11-04) ; le reste du lot est validé, sauf le point 12 reporté par l'utilisateur :
   - Comparaison sous l'infobulle : les statistiques passaient côte à côte sur une ligne et se coupaient lettre par lettre (« Vitalité » à la verticale). Le nom de la pièce, puis le

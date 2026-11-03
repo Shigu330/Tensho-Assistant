@@ -718,7 +718,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] Survol d'une pièce d'équipement : la comparaison est lisible, les statistiques en grille.
 - [ ] Clic droit sur un objet › Tensho : plus de « Tous les outils avec cet objet » ; le reste du menu est là.
-- [ ] Ouvrir le coffre de compagnie, puis tous ses onglets : Banque › Coffre de compagnie liste les objets ; sinon, envoyer la ligne « Inventory slot inconsistent » du journal.
+- [ ] Ouvrir le coffre de compagnie, puis tous ses onglets : Banque › Coffre de compagnie liste les objets, plus de message « ordre visuel » (0.463) ; les quantités sont justes.
 
 **0.461 : grille du journal** — pendant la campagne de tests en jeu (étape h)
 
