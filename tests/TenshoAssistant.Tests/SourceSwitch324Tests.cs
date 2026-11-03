@@ -62,7 +62,8 @@ internal static class SourceSwitch324Tests
             Check(Regex.Matches(plugin,@"\{Enabled=\(\)=>configuration\.CommunityWiki\}").Count == 4,"wiki monsters, item acquisition, vistas and blue magic spells (0.367) get the wiki switch");
             var hover = File.ReadAllText(Path.Combine(Source,"Items","ItemHoverReader.Dalamud.cs")) + File.ReadAllText(Path.Combine(Source,"MainWindow.MarketHover.cs"));
             Check(Regex.Matches(hover,@"configuration\.CommunityUniversalis && configuration\.MarketPricesOnHover").Count == 2,"hover prices follow Universalis");
-            Check(hover.Contains("configuration.CommunityWiki && configuration.MonsterSourcesOnHover",StringComparison.Ordinal),"hover monsters follow the wiki");
+            // 0.447 (decided 2026-11-03): the dead « monsters on hover » setting and its wiki lookup are gone.
+            Check(!hover.Contains("MonsterSourcesOnHover",StringComparison.Ordinal),"no wiki lookup on hover any more");
             Check(MarketService.SourceOff.EndsWith(SourceDisabledException.Suffix,StringComparison.Ordinal) && MarketBoardService.SourceOff == MarketService.SourceOff,"one recognisable message");
         }),
         ("Settings: the older options now have their « ↺ » (review 0.316 point 3.3)",() =>
@@ -82,7 +83,7 @@ internal static class SourceSwitch324Tests
                 foreach (var id in ids) Check(text.Contains("DefaultButton(" + id,StringComparison.Ordinal),file + ": " + id);
             }
             var settings = Read("MainWindow.Settings.cs");
-            foreach (var key in new[] { "Settings.OpenOnLoad","Settings.OpenOnLogin","Settings.UsageHover","Settings.MonsterHover","Settings.ContextMenu","DutyFinder.Setting","CharacterStats.Setting","BankUi.AutoSetting" })
+            foreach (var key in new[] { "Settings.OpenOnLoad","Settings.OpenOnLogin","Settings.UsageHover","Settings.ContextMenu","DutyFinder.Setting","CharacterStats.Setting","BankUi.AutoSetting" })
             {
                 Check(settings.Contains("BoolSetting(\"" + key + "\"",StringComparison.Ordinal),"shared row: " + key);
                 Check(!settings.Contains("ImGui.Checkbox(localization.Get(\"" + key + "\")",StringComparison.Ordinal),"no bare checkbox left: " + key);

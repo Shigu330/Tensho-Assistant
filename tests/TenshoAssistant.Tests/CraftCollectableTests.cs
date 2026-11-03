@@ -45,7 +45,11 @@ internal static class CraftCollectableTests
         {
             var recipe=Recipe();var p=recipe.Simulation!;
             Check(CraftSimulation.Unsupported(recipe) is null,"ordinary collectible accepted");
-            foreach(var excluded in new[]{p with {Expert=true},p with {LevelScaled=true},p with {Specialist=true},p with {RequiredQuality=10},p with {Quality=0}})
+            // 0.434 (A-13): specialist recipes are simulated with « Specialist » ticked (refused without it).
+            Check(CraftSimulation.Unsupported(recipe with {Simulation=p with {Specialist=true}}) is null,"specialist recipe accepted");
+            // 0.435 (A-07): expert recipes are simulated (normal condition at every step).
+            Check(CraftSimulation.Unsupported(recipe with {Simulation=p with {Expert=true}}) is null,"expert recipe accepted");
+            foreach(var excluded in new[]{p with {LevelScaled=true},p with {RequiredQuality=10},p with {Quality=0}})
                 Check(CraftSimulation.Unsupported(recipe with {Simulation=excluded}) is not null,"special case remains explicitly unsupported");
         }),
         ("Inner Quiet gains single double combo and capped stacks before a maximum potency Byregot",()=>

@@ -17,7 +17,8 @@ public sealed record MapFlightState(uint TerritoryId,int Total,int Unlocked,bool
 public sealed record MapEventMarker(uint MapId,uint Icon,Vector3 Position,float Radius,string Tooltip,uint ObjectiveId=0,byte MarkerType=0,uint DataId=0);
 
 // Nearby game objects shown on the map (coffers, gathering points); Level is the gathering level when known, else 0.
-public enum MapObjectKind { Treasure, Gathering }
+// N-09 (0.441): HuntMark = a living hunt mark (NotoriousMonster by BNpcBase); Level holds its rank (1 B, 2 A, 3 S).
+public enum MapObjectKind { Treasure, Gathering, HuntMark }
 public sealed record MapObjectMarker(MapObjectKind Kind,string Name,Vector3 Position,int Level);
 
 // FATE running in the current zone (IFateTable): FATEs have no static map position in the game data (0.114 probe), only live ones.
@@ -47,6 +48,8 @@ internal sealed class MapLiveReader : IDisposable
     private readonly uint[] allCurrents;private readonly uint[] adventureRows;private int loggedVistas=-1,loggedNative=-1;private int logUnlock=-1,logUnlockEx=-1;
     private IReadOnlyList<MapFateMarker> fates=[];
     private readonly Dictionary<uint,int> gatheringLevels=[];
+    // N-09 (0.441): hunt marks by BNpcBase → rank (docs/evidence/0.441-hunt-marks.md).
+    private readonly Dictionary<uint,int> huntMarks=[];
     private long teleport;private int costsRequest;private IReadOnlyDictionary<uint,uint>? teleportCosts;
     /// <summary>Queues a teleport to an aetheryte (game action, normal gil cost); sent on the next framework tick.</summary>
     public void Teleport(uint aetheryteId)=>Interlocked.Exchange(ref teleport,aetheryteId);
@@ -82,6 +85,8 @@ internal sealed class MapLiveReader : IDisposable
             foreach(var territory in data.GetExcelSheet<TerritoryType>())mounts[territory.RowId]=territory.Mount;
             foreach(var point in data.GetExcelSheet<GatheringPoint>())
                 if(point.GatheringPointBase.RowId!=0 && point.GatheringPointBase.IsValid)gatheringLevels[point.RowId]=point.GatheringPointBase.Value.GatheringLevel;
+            foreach(var mark in data.GetExcelSheet<NotoriousMonster>())
+                if(mark.BNpcBase.RowId!=0 && mark.Rank is >= 1 and <= 3)huntMarks.TryAdd(mark.BNpcBase.RowId,mark.Rank);
         }
         catch(Exception error){log.Warning(error,"Aether current data unavailable; flight state stays unknown.");}
         framework.Update+=Update;
@@ -148,10 +153,13 @@ internal sealed class MapLiveReader : IDisposable
             {
                 Dalamud.Game.ClientState.Objects.Enums.ObjectKind.Treasure=>MapObjectKind.Treasure,
                 Dalamud.Game.ClientState.Objects.Enums.ObjectKind.GatheringPoint=>MapObjectKind.Gathering,
+                Dalamud.Game.ClientState.Objects.Enums.ObjectKind.BattleNpc when huntMarks.ContainsKey(item.BaseId)
+                    && item is Dalamud.Game.ClientState.Objects.Types.IBattleNpc { CurrentHp:>0 }=>MapObjectKind.HuntMark,
                 _=>(MapObjectKind?)null,
             };
             if(kind is null || !item.IsTargetable)continue;
-            result.Add(new(kind.Value,item.Name.TextValue,item.Position,kind==MapObjectKind.Gathering ? gatheringLevels.GetValueOrDefault(item.BaseId):0));
+            result.Add(new(kind.Value,item.Name.TextValue,item.Position,kind==MapObjectKind.Gathering ? gatheringLevels.GetValueOrDefault(item.BaseId)
+                :kind==MapObjectKind.HuntMark ? huntMarks.GetValueOrDefault(item.BaseId):0));
         }
         return result.AsReadOnly();
     }

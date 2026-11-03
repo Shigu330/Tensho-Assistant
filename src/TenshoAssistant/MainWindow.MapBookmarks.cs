@@ -137,7 +137,21 @@ internal sealed partial class MainWindow
                     if (SaveBookmarks(items => { var merged = MapBookmarks.Merge(items, imported); added = merged.Added; skipped = merged.Skipped; return merged.Bookmarks; }))
                     { bookmarkImport = ""; bookmarkShareMessage = localization.Format("MapsUi.ShareImported", added, skipped); }
                 }
-                catch (FormatException) { bookmarkShareMessage = localization.Get("MapsUi.ShareInvalid"); }
+                catch (FormatException)
+                {
+                    // N-11 (0.437): not a share code: « Place ( x , y ) » lines (hunt sites, chat), matched to the zones by name.
+                    var list = maps.State.Catalog is { } catalog
+                        ? MapBookmarks.ParseCoordinateList(bookmarkImport, name => catalog.Entries.FirstOrDefault(map => map.Zone.Equals(name, StringComparison.CurrentCultureIgnoreCase)),
+                            localization.Get("MapsUi.PastedGroup"))
+                        : (Bookmarks: (IReadOnlyList<MapBookmark>)[], Unknown: 0);
+                    if (list.Bookmarks.Count == 0) bookmarkShareMessage = localization.Get("MapsUi.ShareInvalid");
+                    else
+                    {
+                        var added = 0; var skipped = 0;
+                        if (SaveBookmarks(items => { var merged = MapBookmarks.Merge(items, list.Bookmarks); added = merged.Added; skipped = merged.Skipped; return merged.Bookmarks; }))
+                        { bookmarkImport = ""; bookmarkShareMessage = localization.Format("MapsUi.PastedImported", added, skipped, list.Unknown); }
+                    }
+                }
             }
         }
         finally { ImGui.EndDisabled(); }

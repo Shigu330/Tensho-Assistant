@@ -59,7 +59,7 @@ internal static class ReviewFixes322Tests
             var description = manifest.RootElement.GetProperty("Description").GetString() ?? "";
             var words = new Dictionary<string,string> { ["Universalis"] = "Universalis", ["GarlandTools"] = "Garland", ["ConsoleGamesWiki"] = "Wiki",
                 ["LuminaSupplemental"] = "LuminaSupplemental", ["GatherBuddy"] = "GatherBuddy", ["FFXIVTeamcraft"] = "Teamcraft", ["Discord"] = "Discord",
-                ["FFXIVGachaSpreadsheet"] = "FFXIVGachaSpreadsheet",
+                ["FFXIVGachaSpreadsheet"] = "FFXIVGachaSpreadsheet", ["PaissaDB"] = "PaissaDB", ["Partake"] = "partake.gg",
                 // 0.349 (g, X-07): Lodestone pages opened in the browser on a click (credited with the game).
                 ["FinalFantasyXIV"] = "Lodestone" };
             foreach (var credit in TenshoAssistant.Credits.CreditCatalog.All.Where(credit => credit.Hosts.Count > 0))

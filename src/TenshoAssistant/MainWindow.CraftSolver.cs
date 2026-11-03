@@ -13,7 +13,7 @@ internal sealed partial class MainWindow
     private string? loggedCraftSearchError;
     private CraftSolveInput? craftSolveSignature;
     private readonly record struct CraftSearchViewKey(ulong Owner,RecipeDefinition Recipe,int Level,int Craftsmanship,int Control,int Cp,bool Manipulation,
-        int StartingQuality,int Target,int Steps,int Width,int Budget,int ExtraWait,int ContextItem,int? BuffExtraWait=null);
+        int StartingQuality,int Target,int Steps,int Width,int Budget,int ExtraWait,int ContextItem,int? BuffExtraWait=null,string Forbidden="");
     private CraftSearchViewKey? craftSearchViewKey;
     private int craftSolveRevision,craftSolveTarget;
     // 0.321: search limits and export options come from the saved settings (Settings › Modules › Crafting).
@@ -23,6 +23,8 @@ internal sealed partial class MainWindow
     private int craftSolveBudget=>CraftSearchOptions.BoundedBudget;
     private int craftMacroExtraWait=>CraftSearchOptions.BoundedExtraWait;
     private int? craftMacroBuffWait=>CraftSearchOptions.BoundedBuffExtraWait;
+    // 0.438 (user request): the forbidden actions' key.
+    private string craftForbidden=>CraftActionRules.Key(CraftSearchOptions.ForbiddenActions);
     private bool craftMacroEcho=>CraftSearchOptions.Echo;
     private void ValidateCraftSearch()
     {
@@ -33,11 +35,11 @@ internal sealed partial class MainWindow
         }
         var effective=EffectiveCraftStats();
         var key=new CraftSearchViewKey(bankBridge.State.CharacterId,recipe,simulationLevel,effective.Craftsmanship,effective.Control,effective.Cp,simulationManipulation,
-            simulationQuality,craftSolveTarget,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,itemId,craftMacroBuffWait);
+            simulationQuality,craftSolveTarget,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,itemId,craftMacroBuffWait,craftForbidden);
         if(craftSearchViewKey!=key || craftSolveSignature is null)
         {
             craftSolveSignature=new(key.Owner,0,recipe,new(key.Level,key.Craftsmanship,key.Control,key.Cp,key.Manipulation),key.StartingQuality,
-                new(key.Target,key.Steps,key.Width,key.Budget,key.ExtraWait,key.BuffExtraWait));
+                new(key.Target,key.Steps,key.Width,key.Budget,key.ExtraWait,key.BuffExtraWait,key.Forbidden));
             craftSearchViewKey=key;craftSolveRevision++;craftSolve.Cancel();
         }
         craftSolve.ValidateContext(key.Owner,craftSolveRevision,recipe.RecipeId);

@@ -48,7 +48,9 @@ internal static class CraftProjectionTests
         ("Live projection known effects reject unmodeled status and preserve protection",()=>
         {
             var catalog=Catalog();var raw=Raw(catalog);
-            Check(Build(raw with {Statuses=[new(2190,3,0)]},catalog).Actions.Count==0,"unmodeled FinalAppraisal cannot alter completion silently");
+            // 0.434 (A-13): Expedience (Daring Touch) stays outside the model; Final Appraisal is modelled and projected.
+            Check(Build(raw with {Statuses=[new(3812,1,0)]},catalog).Actions.Count==0,"unmodeled Expedience cannot alter the projection silently");
+            Check(Build(raw with {Statuses=[new(2190,3,0)]},catalog).Actions.Count>0,"Final Appraisal projected");
             var protectedResult=Build(raw with {Statuses=[new(3813,0,0)],Numbers=raw.Numbers with {Durability="10"},NumbersNative=raw.NumbersNative! with {Durability=10}},catalog);
             var groundwork=protectedResult.Actions.Single(row=>row.Metadata.Spec.Kind==CraftActionKind.Groundwork);
             Check(groundwork.Durability==new CraftRange(10,10) && groundwork.Progress==new CraftRange(467,467),"active protection affects full Groundwork efficiency");

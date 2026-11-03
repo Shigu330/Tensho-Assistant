@@ -96,7 +96,8 @@ internal static class CraftSimulationTests
         ("Craft unsupported recipes invalid parameters bounds and cancellation fail closed",()=>
         {
             var p=Recipe().Simulation!;
-            foreach(var bad in new[]{p with {Expert=true},p with {LevelScaled=true},p with {Specialist=true},p with {Collectable=true,Quality=0},p with {RequiredQuality=1},p with {ProgressDivider=0}})
+            // 0.435 (A-07): expert recipes are simulated now; a specialist recipe without « Specialist » still fails closed.
+            foreach(var bad in new[]{p with {LevelScaled=true},p with {Specialist=true},p with {Collectable=true,Quality=0},p with {RequiredQuality=1},p with {ProgressDivider=0}})
                 Throws<ArgumentException>(()=>CraftSimulation.Run(Recipe(bad),Stats,0,[]));
             Throws<ArgumentException>(()=>CraftSimulation.Run(Recipe(p with {RequiredCraftsmanship=1001}),Stats,0,[]));
             Throws<ArgumentOutOfRangeException>(()=>CraftSimulation.Run(Recipe(),Stats,-1,[]));

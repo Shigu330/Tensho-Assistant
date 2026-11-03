@@ -101,6 +101,8 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped(localization.Get("PlanUi.UnknownStock"));
         if (plan.Materials.Any(material => material.Holdings.HasCached))
             ImGui.TextDisabled(localization.Get("PlanUi.Imported"));
+        // A-05 (0.433): the target into the chosen crafting list.
+        DrawAddToCraftList(recipe,plan.Requested);
         // A-09 (0.423): the target as a Teamcraft list (import link built here; copied, or opened on click).
         if (TeamcraftExport.Link([(recipe.ResultItemId, recipe.RecipeId, (long)plan.Requested)]) is { } teamcraft)
         {

@@ -1,6 +1,6 @@
 # Carte Tensho : propositions d'amélioration (audit du 2026-11-02, étape e)
 
-Liste établie par un audit multi-agents en lecture seule de la carte (0.327). **Rien n'est implémenté** : vous choisissez ce qu'on
+Liste établie par un audit multi-agents en lecture seule de la carte (0.327). **Rien n'était implémenté** à l'audit (relu le 2026-11-03 : les propositions faites depuis, à l'étape g, portent une ligne « État ») : vous choisissez ce qu'on
 ajoute (règle du 2026-11-02 : les décisions sont gardées pour la fin, voir [ROADMAP](ROADMAP.md) « Décisions reportées à la fin »).
 Les défauts trouvés par le même audit sont corrigés en 0.328 ([CHANGELOG](../../CHANGELOG.md)) ; P0 en fait partie.
 
@@ -9,6 +9,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P0 — Afficher la carte du jeu quand la carte Tensho ne peut pas s'afficher
 
+- **État (relu le 2026-11-03)** : FAIT 0.328 (défauts de l’audit).
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs`.
 - **Ce que le joueur obtient** : Aujourd'hui, si l'on appuie sur M pendant que la carte Tensho est masquée, aucune carte ne s'affiche. C'est le cas en combat ou en mission avec « Masquer en combat » ou « Masquer en mission » cochés, ou quand le catalogue des cartes n'est pas encore chargé ou a échoué. Avec le repli, la carte du jeu reste visible chaque fois que la carte Tensho ne peut pas se dessiner.
 - **Comment, taille, dépendances** : Passer au remplaçant une fonction « carte Tensho affichable » (catalogue chargé et pas de masquage en cours) à la place de MapViewOpen. Si elle répond non quand AreaMap apparaît, garder la carte du jeu (keepGameMap). Si la carte Tensho se masque pendant l'hébergement (début d'un combat), appeler Restore(unit). Taille S. Aucune sonde. Test en jeu : appuyer sur M en combat avec l'option cochée. Une décision : si l'utilisateur préfère « aucune carte en combat », ce choix devient un réglage (avec infobulle et ↺).
@@ -30,6 +31,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P3 — Éthérite la plus proche du drapeau ou d'un point, avec son coût
 
+- **État (relu le 2026-11-03)** : en partie : éthérite la plus proche avec son coût pour les liens du chat (0.373) et « Y aller » des lieux de récolte (0.397) ; pas encore depuis le drapeau ou un point quelconque.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Clic droit sur la carte ou sur le drapeau : l'entrée « Se téléporter à l'éthérite la plus proche » donne le nom et le coût réel en gils, puis demande la confirmation habituelle. Plus besoin de chercher soi-même l'éthérite à côté d'un drapeau posé (train de chasse, rendez-vous).
 - **Comment, taille, dépendances** : Calcul en pixels de texture sur la carte affichée, parmi les marqueurs dont AetheryteId≠0. Coût lu dans TeleportCosts : s'il est absent, la ligne dit « coût inconnu (non harmonisée ?) », jamais 0. Entrée ajoutée au menu général et au menu de l'icône du drapeau. Limite dite à l'écran : seulement les éthérites de cette carte, sans temps de trajet. Les éclats d'éthernet (DataType 4, icône 60430, sens de la clé inconnu dans 0.107.0-aetheryte-probe.log) restent exclus tant qu'ils ne sont pas sondés. Taille S. Aucune sonde pour DataType 3. Pas de nouvelle décision : c'est une partie de M-03, déjà retenu (DEC-025), faisable seule dès maintenant.
@@ -37,6 +39,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P4 — Liens de carte du chat (M-03) : liste, drapeau et éthérite la plus proche
 
+- **État (relu le 2026-11-03)** : FAIT 0.373 (M-03).
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Les liens de carte vus dans le chat (trains de chasse, cartes au trésor, rendez-vous) sont gardés dans une liste de la carte Tensho, filtrable par canal. Un clic pose le drapeau et centre la carte. Un bouton propose l'éthérite la plus proche, téléportation toujours sur clic.
 - **Comment, taille, dépendances** : Nouveau lecteur Maps/ChatMapLinks.Dalamud.cs : abonnement à ChatMessage avec un propriétaire et un Dispose. Il copie le MapLinkPayload (territoire, carte, X/Y), le canal et l'heure dans un historique borné. Affichage dans la carte : onglet du clic droit ou panneau. Il dépend de la proposition « éthérite la plus proche ». Taille M. Sonde en jeu seulement si l'on lit aussi les coordonnées écrites en texte sans lien : format « X / Y » selon la langue, risque de faux positifs. Décision restante : avancer M-03 dans e) ou le laisser en g) ; taille de l'historique ; lire ou non le texte libre (recommandé : liens seulement).
@@ -65,6 +68,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P8 — Favoris dessinés sur la carte, ajoutés au clic droit, avec note (M-08)
 
+- **État (relu le 2026-11-03)** : FAIT 0.378 (M-08).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Maps/MapBookmarks.cs`.
 - **Ce que le joueur obtient** : Les favoris s'affichent sur la carte Tensho, avec une icône réglable comme les autres. Un clic droit « Ajouter aux favoris ici » enregistre le point, avec une note et un groupe en option. « Copier les coordonnées » met X/Y dans le presse-papiers. Les favoris peuvent se partager par un code texte.
 - **Comment, taille, dépendances** : Nouvelle couche dessinée (clé de glyphe comme GlyphVista, avec taille et priorité dans le tableau des icônes). Champs Note et Group ajoutés au record en nullable, pour que les anciennes configurations se chargent. Entrée de menu avec saisie du nom. Code de partage sur le modèle de TENSHO-GEAR1 (aucun site tiers). Taille S. Aucune sonde. Décisions restantes : format du partage ; portée globale ou par personnage (recommandé : globale, comme aujourd'hui).
@@ -100,6 +104,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P13 — Emplacement de la carte au trésor déchiffrée (M-14)
 
+- **État (relu le 2026-11-03)** : FAIT 0.384 (M-14).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : La carte au trésor déchiffrée que l'on possède est dessinée sur la carte Tensho, avec une icône, un repère au bord et le drapeau en un clic, sans chercher sur internet.
 - **Comment, taille, dépendances** : Sonde en jeu d'abord, avec une carte déchiffrée en poche, puis consigner dans docs/evidence. Ensuite : lecture sur le framework, protégée (R-14), copie de la position (carte, X/Z), nouvelle couche avec taille et priorité, et repère au bord. Taille M. Pas de décision (déjà retenu), sauf l'éventuelle avance de g) vers e).
@@ -135,6 +140,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P18 — Cadres et textures du jeu (ULD), en commençant par la carte
 
+- **État (relu le 2026-11-03)** : en partie : cadre du jeu derrière la fenêtre principale (0.332, réglage désactivé) ; pas sur la carte.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : La fenêtre de la carte (boutons d'outils, cadre, menus) reprend les cadres et textures de l'interface du jeu, dans la même DLL et sans ressource externe. Les autres fenêtres suivent ensuite.
 - **Comment, taille, dépendances** : Sonde d'abord : chemins .uld et numéros de parties des boutons et du cadre de la carte du jeu (tools/ApiProbe), avec une capture, consignés dans docs/evidence. Ensuite : chargement unique hors Draw, une partie par bouton, et repli sur le dessin ImGui actuel si une partie manque (R-14). Taille M pour la carte, L pour toute l'interface. Décision : périmètre (carte seule ou tout de suite tout) et degré d'imitation (boutons, cadre, fond).

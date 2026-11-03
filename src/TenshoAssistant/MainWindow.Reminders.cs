@@ -67,9 +67,24 @@ internal sealed partial class MainWindow
             // 0.372 (M-02): Wondrous Tails and hunt bills, read from the game.
             var bingo=timers?.Bingo;
             Row("Bingo",FontAwesomeIcon.Book,bingo is null ? localization.Get("Reminders.Unknown"):!bingo.Held ? localization.Get("Reminders.BingoNone")
-                :localization.Format("Reminders.BingoState",bingo.Stickers,bingo.SecondChance),bingo?.Expires>now ? bingo.Expires:null,null);
+                :localization.Format("Reminders.BingoState",bingo.Stickers,bingo.SecondChance),bingo?.Expires>now ? bingo.Expires:null,null,
+                // N-03 (0.439): line odds now and after a shuffle, while fewer than 9 stickers are placed.
+                ()=>{
+                    // N-02 (0.443): the tasks still to do (open) and those to claim.
+                    if(bingo is { Held:true, Tasks:{ } tasks } && BingoTaskName is { } taskName)
+                    {
+                        foreach(var (order,status) in tasks.Where(task=>task.Status is 0 or 1).DistinctBy(task=>task.Order))
+                            ImGui.TextColored(status==1 ? UI.FfxivTheme.Success:Muted,localization.Format(status==1 ? "Reminders.BingoClaim":"Reminders.BingoTask",taskName(order)));
+                    }
+                    if(bingo is not { Held:true, Placed:{ } placed } || Reminders.WondrousTailsLines.Odds(placed) is not { } odds)return;
+                    var shuffled=Reminders.WondrousTailsLines.Shuffled();
+                    ImGui.TextDisabled(localization.Format("Reminders.BingoOdds",Percent(odds.AtLeastOne),Percent(odds.AtLeastTwo),Percent(odds.Three)));
+                    ImGui.TextDisabled(localization.Format("Reminders.BingoShuffle",Percent(shuffled.AtLeastOne),Percent(shuffled.AtLeastTwo),Percent(shuffled.Three)));
+                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Reminders.BingoOddsHelp"));
+                    static string Percent(double value)=>(value*100).ToString("0.#");
+                });
             Row("HuntBills",FontAwesomeIcon.Crosshairs,timers?.HuntBillsHeld is { } bills ? localization.Format("Reminders.HuntBillsState",bills):localization.Get("Reminders.Unknown"),
-                weekly,lastWeekly);
+                weekly,lastWeekly,()=>DrawHuntBills(timers?.HuntBills));
             // 0.382 (g, M-11): challenge log (once the game loaded it) and Doman Enclave donations, weekly.
             Row("ChallengeLog",FontAwesomeIcon.ClipboardList,timers?.ChallengeLog is { } challenge ? localization.Format("Reminders.ChallengeLogState",challenge.Done,challenge.Total)
                 :localization.Get("Reminders.ChallengeLogUnknown"),weekly,lastWeekly);
@@ -95,6 +110,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndTable();}
         ImGui.TextDisabled(localization.Get("Reminders.Help"));
         DrawPersonalTasks();
+        DrawGardenJournal();
         DrawDailyRoulettes(timers);
         DrawCharacterStatuses();
 

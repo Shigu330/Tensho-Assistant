@@ -134,9 +134,6 @@ public sealed class Plugin : IDalamudPlugin
             var wikiSources=new WikiMonsterSources(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
             registrations.Register(()=>{},wikiSources.Dispose);
             mainWindow.ConfigureWikiSources(wikiSources);
-            var monsterHover=new Monsters.MonsterHoverSources(wikiSources);
-            registrations.Register(()=>{},monsterHover.Dispose);
-            mainWindow.ConfigureMonsterHover(monsterHover);
             // g, C-13 (0.367): monsters that teach a blue magic spell, from the wiki's spell page (English action name), on click only.
             // 0.387 (user report « never gives the monster »): the AozAction → Action link resolved in the client's language, so the wiki
             // was asked for the French page (« Mauvaise_haleine »: missing) and said « no monster ». The name now comes from the English
@@ -679,6 +676,55 @@ public sealed class Plugin : IDalamudPlugin
                 if(now>=macroChainCheckedAt){macroChainCheckedAt=now.AddSeconds(5);macroChainLoaded=pluginInterface.InstalledPlugins.Any(plugin=>plugin.InternalName=="MacroChain" && plugin.IsLoaded);}
                 return macroChainLoaded;
             };
+            // N-01 (0.440): hunt orders' targets (MobHuntOrder subrows → MobHuntTarget) and bill names (MobHuntOrderType › EventItem),
+            // in the game's language, built on first use.
+            var huntOrders=new Lazy<Dictionary<uint,IReadOnlyList<Reminders.HuntOrderTarget>>>(()=>
+            {
+                var orders=new Dictionary<uint,IReadOnlyList<Reminders.HuntOrderTarget>>();
+                try
+                {
+                    foreach(var group in data.GetSubrowExcelSheet<Lumina.Excel.Sheets.MobHuntOrder>())
+                        orders[group.RowId]=group.Select(order=>new Reminders.HuntOrderTarget(order.SubrowId,Community.CommunityNames.Name("A",order.Target.ValueNullable?.Name.ValueNullable?.Singular.ExtractText()),
+                            order.Target.ValueNullable?.Map.RowId ?? 0,order.Target.ValueNullable?.PlaceName.ValueNullable?.Name.ExtractText() ?? "",order.NeededKills,order.Target.ValueNullable?.FATE.RowId ?? 0)).ToArray();
+                }
+                catch(Exception error){log.Warning(error,"Hunt orders unavailable.");}
+                return orders;
+            });
+            mainWindow.HuntOrderTargets=row=>huntOrders.Value.GetValueOrDefault(row) ?? [];
+            mainWindow.HuntBillName=index=>data.GetExcelSheet<Lumina.Excel.Sheets.MobHuntOrderType>().GetRowOrDefault(index)?.EventItem.ValueNullable?.Name.ExtractText() is { Length:>0 } name ? name:$"#{index}";
+            // N-02 (0.443): Wondrous Tails task names: type 0 = an instance (its ContentFinderCondition name), else WeeklyBingoText.
+            var bingoDuties=new Lazy<Dictionary<uint,string>>(()=>
+            {
+                var names=new Dictionary<uint,string>();
+                try{foreach(var duty in data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>())if(duty.ContentLinkType==1 && duty.Content.RowId!=0 && !duty.Name.IsEmpty)names.TryAdd(duty.Content.RowId,duty.Name.ExtractText());}
+                catch(Exception error){log.Warning(error,"Wondrous Tails duty names unavailable.");}
+                return names;
+            });
+            mainWindow.BingoTaskName=order=>data.GetExcelSheet<Lumina.Excel.Sheets.WeeklyBingoOrderData>().GetRowOrDefault(order) is { } row
+                ? row.Type==0 && bingoDuties.Value.TryGetValue(row.Data.RowId,out var duty) ? Community.CommunityNames.Name("A",duty)
+                    :row.Text.ValueNullable?.Description.ExtractText() is { Length:>0 } text ? text:$"#{order}"
+                :$"#{order}";
+            // X-09 (0.444): residential districts (TerritoryType, intended use 13), in the game's language.
+            var housingDistricts=new Lazy<IReadOnlyList<(uint,string)>>(()=>
+            {
+                try{return data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().Where(row=>row.TerritoryIntendedUse.RowId==13 && row.PlaceName.RowId!=0)
+                    .Select(row=>(row.RowId,row.PlaceName.ValueNullable?.Name.ExtractText() ?? "")).Where(row=>row.Item2.Length>0).ToArray();}
+                catch(Exception error){log.Warning(error,"Residential districts unavailable.");return [];}
+            });
+            mainWindow.HousingDistricts=()=>housingDistricts.Value;
+            // N-05 (0.445): PaissaDB open plots (read only), its new plots said in the chat while the watch is on.
+            var paissa=new Community.PaissaDbService();
+            registrations.Register(()=>{},paissa.Dispose);
+            mainWindow.Paissa=paissa;
+            mainWindow.PlotAlert=text=>framework.RunOnFrameworkThread(()=>chat.Print("[Tensho] "+text));
+            mainWindow.ChatNotice=text=>chat.Print("[Tensho] "+text);
+            // X-13 (0.447): the conductor's call, sent to the chosen channel on click only, on the framework thread.
+            mainWindow.SendHuntCall=command=>framework.RunOnFrameworkThread(()=>Maps.HuntAnnouncer.Send(command,log));
+            // A-05 (0.433): crafting lists in a file of their own (like the Bank).
+            mainWindow.CraftListStore=new Craft.CraftListStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"CraftLists.json"),(error,message)=>log.Warning(error,message));
+            // A-14 (0.436): crafting rotation recorder (read-only hook on UseAction, only while recording).
+            Craft.CraftRecorder? craftRecorder=null;
+            registrations.Register(()=>mainWindow.CraftRecorder=craftRecorder=new Craft.CraftRecorder(interop,log,()=>craftActions.State.Catalog),()=>craftRecorder?.Dispose());
             // X-11 (0.419): Manipulation learned by the job, from its action row (CraftActionCatalog) and the game's unlock state.
             mainWindow.ManipulationLearned=job=>craftActions.State.Catalog?.Find(job,Craft.CraftActionKind.Manipulation) is { } manipulation
                 && data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(manipulation.NativeId) is { } action && unlocks.IsActionUnlocked(action);
@@ -812,6 +858,9 @@ public sealed class Plugin : IDalamudPlugin
         mainWindow.DrawSpearfishingPanel();
         mainWindow.DrawOceanVoyagePanel();
         mainWindow.ProcessGameLogRequest();
+        mainWindow.ObserveHuntTrain();
+        mainWindow.ObserveGarden();
+        mainWindow.WatchPlots();
         mainWindow.DrawFishingPanel();
     }
 

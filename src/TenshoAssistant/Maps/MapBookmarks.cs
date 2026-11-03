@@ -78,6 +78,37 @@ public static class MapBookmarks
         return (Array.AsReadOnly(list.ToArray()), added, imported.Count - added);
     }
 
+    // N-11 (0.437): « Place ( 12.3 , 4.5 ) » lines pasted from hunt sites (Siren, Bear, Faloop) or the chat; coordinates with a dot.
+    private static readonly System.Text.RegularExpressions.Regex CoordinateLine = new(
+        @"(?<place>[^()\n]+?)\s*\(\s*(?:x\s*:?\s*)?(?<x>\d{1,2}(?:\.\d+)?)\s*,\s*(?:y\s*:?\s*)?(?<y>\d{1,2}(?:\.\d+)?)",
+        System.Text.RegularExpressions.RegexOptions.CultureInvariant | System.Text.RegularExpressions.RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
+
+    /// <summary>
+    /// N-11 (0.437): bookmarks from pasted « Place ( x , y ) » lines: the place is the end of the text before the parenthesis that names a
+    /// map zone (game icons and labels before it ignored); lines with no known zone are counted, never guessed. 200 lines at most.
+    /// </summary>
+    public static (IReadOnlyList<MapBookmark> Bookmarks, int Unknown) ParseCoordinateList(string text, Func<string, MapDefinition?> zone, string group)
+    {
+        ArgumentNullException.ThrowIfNull(zone);
+        var found = new List<MapBookmark>(); var unknown = 0;
+        foreach (var line in (text ?? "").Split('\n').Take(200))
+        {
+            var match = CoordinateLine.Match(line);
+            if (!match.Success) continue;
+            var place = new string(match.Groups["place"].Value.Where(character => character is not (>= '' and <= '')).ToArray()).Trim();
+            var words = place.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            MapDefinition? map = null;
+            for (var start = 0; start < words.Length && map is null; start++) map = zone(string.Join(' ', words[start..]).Trim(':', '-', '·', ' '));
+            if (map is null) { unknown++; continue; }
+            var x = float.Parse(match.Groups["x"].Value, System.Globalization.CultureInfo.InvariantCulture);
+            var y = float.Parse(match.Groups["y"].Value, System.Globalization.CultureInfo.InvariantCulture);
+            var name = string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{map.Zone} ({x:0.0}, {y:0.0})");
+            if (name.Length > NameLimit) name = name[..NameLimit];
+            found.Add(Create(map, name, x, y) with { Group = CleanGroup(group) });
+        }
+        return (Array.AsReadOnly(found.ToArray()), unknown);
+    }
+
     public static MapBookmark Create(MapDefinition map, string name, float x, float y)
     {
         ArgumentNullException.ThrowIfNull(map);

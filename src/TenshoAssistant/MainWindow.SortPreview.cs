@@ -12,6 +12,8 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     private InventorySnapshot? sortingViewSnapshot;
+    // 0.447: the scope last seen complete and when (keeps the rules editor through the 250 ms invalidation of DEC-004).
+    private (InventorySortScope Scope,DateTimeOffset At)? sortLastComplete;
     private ItemCatalog? sortingViewCatalog;
     private InventorySortResult? sortingViewResult;
     private InventorySortProfile? sortingViewRules;
@@ -75,9 +77,20 @@ internal sealed partial class MainWindow
             && container.Location.Container.Value>=scope.FirstContainer && container.Location.Container.Value<scope.FirstContainer+scope.ContainerCount).ToArray() ?? [];
         if (containers.Length != scope.ContainerCount || containers.Any(container => container.Coverage != InventoryCoverage.Complete))
         {
+            // 0.447 (decided 2026-11-03, audit 0.329 defect 7): DEC-004 stays (the inventory is invalidated, then read again 250 ms
+            // later); the rules editor stays on screen through that gap, for the scope that was complete less than 2 s ago. The
+            // preview and « Apply » never use an old list: they wait for the new complete one.
+            if(sortLastComplete is { } last && last.Scope==scope && DateTimeOffset.UtcNow-last.At<TimeSpan.FromSeconds(2)
+                && itemCatalog.State.Catalog is { } waitingCatalog)
+            {
+                ImGui.TextDisabled(localization.Get("SortUi.Updating"));
+                DrawSortRules(scope,waitingCatalog);
+                return;
+            }
             ImGui.TextWrapped(localization.Get("SortUi.Coverage"));
             return;
         }
+        sortLastComplete=(scope,DateTimeOffset.UtcNow);
         if (itemCatalog.State.Catalog is not { } catalog) { DrawCatalogStatus(); return; }
         var rules=DrawSortRules(scope,catalog);if(rules is null)return;
         var capacity=scope.Capacity;

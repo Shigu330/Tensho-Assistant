@@ -2,9 +2,9 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "Stable" ]
+    branches: [ "main", "Devloppement" ]
   pull_request:
-    branches: [ "Stable" ]
+    branches: [ "main" ]
   schedule:
     - cron: '0 5 * * 1'
 
@@ -34,6 +34,14 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
+
+      # Dalamud.NET.Sdk stops the build when Dalamud is not installed (~/.xlcore/dalamud/Hooks/dev on Linux): the official
+      # distribution is unpacked there for its reference assemblies only; nothing from it is run.
+      - name: Download Dalamud
+        run: |
+          mkdir -p "$HOME/.xlcore/dalamud/Hooks/dev"
+          curl -sSfL https://goatcorp.github.io/dalamud-distrib/latest.zip -o "$RUNNER_TEMP/dalamud.zip"
+          unzip -q "$RUNNER_TEMP/dalamud.zip" -d "$HOME/.xlcore/dalamud/Hooks/dev"
 
       - name: Restore
         run: dotnet restore TenshoAssistant.sln

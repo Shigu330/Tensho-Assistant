@@ -1,0 +1,13 @@
+# Activated in 0.447 (draft of 0.323, publish/github).
+# Keeps the GitHub Actions used by the workflows up to date (one grouped pull request a week, on Devloppement). The plugin itself has
+# no NuGet package to update: Dalamud.NET.Sdk follows Dalamud's API levels and is raised by hand.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "Devloppement"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:
+        patterns: [ "*" ]

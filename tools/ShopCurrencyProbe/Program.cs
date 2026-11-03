@@ -145,6 +145,54 @@ if(Environment.GetEnvironmentVariable("PROBE_GEAR") is { Length:>0 })
     Console.WriteLine($"MATERIA {materia.RowId} param {materia.BaseParam.RowId} values {string.Join(",",materia.Value)}");
     return;
 }
+// PROBE_HOUSING (0.444, X-09): residential districts (TerritoryType by intended use) with their place names.
+if(Environment.GetEnvironmentVariable("PROBE_HOUSING") is { Length:>0 })
+{
+    foreach(var use in data.Excel.GetSheet<TerritoryType>().Where(row=>!row.PlaceName.ValueNullable?.Name.IsEmpty ?? false).GroupBy(row=>row.TerritoryIntendedUse.RowId).Where(group=>group.Key is 13 or 14 or 15 or 16))
+        Console.WriteLine($"USE {use.Key} "+string.Join(" | ",use.Take(8).Select(row=>$"{row.RowId} '{row.PlaceName.ValueNullable?.Name.ExtractText()}'")));
+    return;
+}
+// PROBE_BINGO (0.443, N-02): Wondrous Tails tasks (WeeklyBingoOrderData): type, data row, text.
+if(Environment.GetEnvironmentVariable("PROBE_BINGO") is { Length:>0 })
+{
+    var cfc=data.Excel.GetSheet<ContentFinderCondition>();
+    foreach(var type in data.Excel.GetSheet<WeeklyBingoOrderData>().GroupBy(row=>row.Type).OrderBy(group=>group.Key))
+        Console.WriteLine($"TYPE {type.Key} rows {type.Count()} e.g. "+string.Join(" | ",type.Take(3).Select(row=>$"{row.RowId}: data {row.Data.RowId} cfc '{(type.Key==0 ? cfc.GetRowOrDefault(row.Data.RowId)?.Name.ExtractText():"")}' text '{row.Text.ValueNullable?.Description.ExtractText()}'")));
+    return;
+}
+// PROBE_NOTORIOUS (0.441, N-09): hunt marks (NotoriousMonster): rank values with examples.
+if(Environment.GetEnvironmentVariable("PROBE_NOTORIOUS") is { Length:>0 })
+{
+    var rows=data.Excel.GetSheet<NotoriousMonster>(Language.English).Where(row=>row.BNpcBase.RowId!=0).ToArray();
+    foreach(var rank in rows.GroupBy(row=>row.Rank).OrderBy(group=>group.Key))
+        Console.WriteLine($"RANK {rank.Key} rows {rank.Count()} e.g. "+string.Join(" | ",rank.Take(4).Select(row=>$"{row.BNpcName.ValueNullable?.Singular.ExtractText()} base {row.BNpcBase.RowId}")));
+    return;
+}
+// PROBE_MOBHUNT (0.440, N-01): MobHuntOrderType rows (mark index → bill item, order start, amount) and one order's targets.
+if(Environment.GetEnvironmentVariable("PROBE_MOBHUNT") is { Length:>0 })
+{
+    var types=data.Excel.GetSheet<MobHuntOrderType>(Language.English);
+    foreach(var type in types)
+        Console.WriteLine($"TYPE {type.RowId} type {type.Type} amount {type.OrderAmount} start {type.OrderStart.RowId} item '{type.EventItem.ValueNullable?.Name.ExtractText()}' quest {type.Quest.RowId}");
+    var orders=data.Excel.GetSubrowSheet<MobHuntOrder>(Language.English);
+    foreach(var group in orders.Take(3))
+        foreach(var order in group)
+            Console.WriteLine($"ORDER {order.RowId}.{order.SubrowId} kills {order.NeededKills} type {order.Type} rank {order.Rank} target '{order.Target.ValueNullable?.Name.ValueNullable?.Singular.ExtractText()}' map {order.Target.ValueNullable?.Map.RowId} place '{order.Target.ValueNullable?.PlaceName.ValueNullable?.Name.ExtractText()}' fate {order.Target.ValueNullable?.FATE.RowId}");
+    Console.WriteLine($"ORDERGROUPS {orders.Count}");
+    return;
+}
+// PROBE_CRAFTACTIONS (0.434, A-13): carpenter rows of CraftAction (and Action for crafter buffs) by English name: id, level, CP,
+// the canonical row of each name, so the simulator's specs match the sheet the catalogue loader checks.
+if(Environment.GetEnvironmentVariable("PROBE_CRAFTACTIONS") is { Length:>0 })
+{
+    var names=new[]{"Rapid Synthesis","Hasty Touch","Daring Touch","Intensive Synthesis","Precise Touch","Tricks of the Trade","Final Appraisal","Heart and Soul","Quick Innovation","Careful Observation","Basic Synthesis","Innovation"};
+    var crafts=data.Excel.GetSheet<CraftAction>(Language.English);
+    foreach(var row in crafts.Where(row=>names.Contains(row.Name.ExtractText()) && row.ClassJob.RowId==8 || row.Name.ExtractText().Contains("Daring")))
+        Console.WriteLine($"CRAFTACTION {row.RowId} '{row.Name.ExtractText()}' job {row.ClassJob.RowId} lv {row.ClassJobLevel} cost {row.Cost} CRP {row.CRP.RowId} ALC {row.ALC.RowId}");
+    foreach(var row in data.Excel.GetSheet<Lumina.Excel.Sheets.Action>(Language.English).Where(row=>names.Contains(row.Name.ExtractText()) && row.ClassJob.RowId==8))
+        Console.WriteLine($"ACTION {row.RowId} '{row.Name.ExtractText()}' job {row.ClassJob.RowId} lv {row.ClassJobLevel} costType {row.PrimaryCostType} cost {row.PrimaryCostValue} second {row.SecondaryCostType}/{row.SecondaryCostValue.RowId}");
+    return;
+}
 // PROBE_RECIPEROWS (0.428, user report « cannot display a recipe »): every Recipe row of an item (by French name), with its flags.
 if(Environment.GetEnvironmentVariable("PROBE_RECIPEROWS") is { Length:>0 } recipeName)
 {
@@ -205,7 +253,7 @@ if(Environment.GetEnvironmentVariable("PROBE_GPACTIONS") is { Length:>0 })
     foreach(var trait in data.Excel.GetSheet<Trait>(Language.English).Where(row=>row.ClassJob.RowId is 16 or 17 && !row.Name.IsEmpty).OrderBy(row=>row.Level))
         Console.WriteLine($"TRAIT {trait.RowId} job {trait.ClassJob.RowId} lv {trait.Level} '{trait.Name.ExtractText()}' :: {traitText.GetRowOrDefault(trait.RowId)?.Description.ExtractText().Replace((char)10,(char)32)}");
     var status=data.Excel.GetSheet<Status>(Language.English);
-    foreach(var id in new uint[]{2765,757,2668,3910,225})Console.WriteLine($"STATUS {id} '{status.GetRowOrDefault(id)?.Name.ExtractText()}' :: {status.GetRowOrDefault(id)?.Description.ExtractText().Replace((char)10,(char)32)}");
+    foreach(var id in new uint[]{2765,757,2668,3910,225,2190,2665,3812,2226})Console.WriteLine($"STATUS {id} '{status.GetRowOrDefault(id)?.Name.ExtractText()}' :: {status.GetRowOrDefault(id)?.Description.ExtractText().Replace((char)10,(char)32)}");
     return;
 }
 // PROBE_COLLECTABLES (0.409, R-06): collectable shops, their items, collectability thresholds and scrip rewards (Currency column).

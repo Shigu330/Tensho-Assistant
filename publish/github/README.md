@@ -1,4 +1,8 @@
-# GitHub automation drafts (not active)
+# GitHub automation drafts
+
+**Activated in 0.447 (2026-11-03, DEC-026):** `CodeQL.yml` (fixed in 0.446), `build.yml` and `dependabot.yml` now live in `.github/`;
+main and Devloppement are protected against force pushes and deletion, and the `Stable-*` tags are protected (repository rulesets).
+The text below is the original note of 0.323.
 
 Prepared in 0.323 (queue step d). GitHub runs workflows only from `.github/workflows/` and reads Dependabot only from
 `.github/dependabot.yml`, so nothing here runs until the maintainer moves it. Nothing was pushed or changed on GitHub by the agent.

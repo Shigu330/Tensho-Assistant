@@ -14,6 +14,7 @@ internal sealed partial class MainWindow
     private uint projectionRecipe;private int projectionTarget,projectionSort;
     private CraftProjectionResult? sortedProjectionSource;
     private int sortedProjectionOrder=-1;
+    private string sortedProjectionForbidden="";
     private CraftActionProjection[] sortedProjectionRows=[];
     private void DrawCraftProjection(CraftLiveState state)
     {
@@ -43,10 +44,12 @@ internal sealed partial class MainWindow
                 ImGui.TableSetupColumn(localization.Get("CraftProjectionUi.Action"),ImGuiTableColumnFlags.WidthStretch,2);
                 foreach(var title in new[]{localization.Get("CraftProjectionUi.AfterProgress"),localization.Get("CraftProjectionUi.AfterQuality"),localization.Get("CraftProjectionUi.AfterDurability"),localization.Get("CraftProjectionUi.Cp"),localization.Get("CraftProjectionUi.Quiet"),localization.Get("CraftProjectionUi.Result")})ImGui.TableSetupColumn(title);
                 ImGui.TableHeadersRow();
-                if(!ReferenceEquals(sortedProjectionSource,result) || sortedProjectionOrder!=projectionSort)
+                // 0.438 (user request): forbidden actions are not shown.
+                var forbiddenKey=craftForbidden;
+                if(!ReferenceEquals(sortedProjectionSource,result) || sortedProjectionOrder!=projectionSort || sortedProjectionForbidden!=forbiddenKey)
                 {
-                    sortedProjectionSource=result;sortedProjectionOrder=projectionSort;
-                    sortedProjectionRows=result.Actions.OrderBy(row=>row.Broken).ThenByDescending(row=>projectionSort==0 ? row.Quality?.Min ?? -1:projectionSort==1 ? row.Progress.Min:row.Durability.Min).ThenBy(row=>row.CpCost.Max).ToArray();
+                    sortedProjectionSource=result;sortedProjectionOrder=projectionSort;sortedProjectionForbidden=forbiddenKey;
+                    sortedProjectionRows=result.Actions.Where(row=>!CraftActionRules.Forbidden(forbiddenKey,row.Metadata.Spec.Kind)).OrderBy(row=>row.Broken).ThenByDescending(row=>projectionSort==0 ? row.Quality?.Min ?? -1:projectionSort==1 ? row.Progress.Min:row.Durability.Min).ThenBy(row=>row.CpCost.Max).ToArray();
                 }
                 var rows=sortedProjectionRows;
                 foreach(var row in rows)

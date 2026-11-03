@@ -11,7 +11,8 @@ internal static class CraftReadiness427Tests
             var ui=Read("MainWindow.CraftReadiness.cs");
             Check(ui.Contains("gearsets?.JobLevels.TryGetValue(job,out var known)==true ? known:null") && ui.Contains("level?.ToString() ?? \"?\""),"level known or « ? »");
             Check(ui.Contains("var worn=stats.JobId==job") && ui.Contains("worn ? stats.Values[\"Control\"].ToString():\"?\""),"attributes of the worn job only");
-            Check(ui.Contains("+\"###CraftEquip\"))GearsetSource!.Equip(set.Number);") && ui.Contains("GameGearsets.ForJob(sets,job)"),"equip on click, lowest set");
+            // 0.438: the equip button is shared with the crafting log panel (DrawEquipRecipeJob).
+            Check(ui.Contains("+\"###\"+id))GearsetSource!.Equip(set.Number);") && ui.Contains("GameGearsets.ForJob(sets,job)") && ui.Contains("if(!worn)DrawEquipRecipeJob(recipe,\"CraftEquip\");"),"equip on click, lowest set");
             Check(Read("MainWindow.CraftSimulation.cs").Contains("DrawCraftReadiness(recipe);"),"shown on the Crafting page");
         }),
     ];

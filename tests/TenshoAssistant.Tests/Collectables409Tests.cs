@@ -51,5 +51,17 @@ internal static class Collectables409Tests
             var ui=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CollectableTable.cs"));
             Check(ui.Contains("Tip(\"CollectableTable.SearchTip\")") && ui.Contains("clipper.End();clipper.Destroy();") && ui.Contains("CollectableTable.ItemReward"),"table");
         }),
+        ("Held collectables 0.432: tier and scrips by the first scrip rule; items the game does not take for scrips left out",() =>
+        {
+            var catalog=new CollectableCatalog([
+                new(30970,"Arc long",50,50,110,150,190,45,49,54,true),
+                new(31101,"Madrier",80,80,360,540,720,5,10,15,false),
+            ]);
+            Check(Collectables.Value(catalog,new(30970,160)) is { Tier:CollectableTier.Mid, Scrips:49 },"mid tier");
+            Check(Collectables.Value(catalog,new(30970,100)) is { Tier:CollectableTier.Below, Scrips:0 },"below");
+            Check(Collectables.Value(catalog,new(30970,190))!.Scrips==54 && Collectables.Value(catalog,new(31101,800)) is null && Collectables.Value(catalog,new(5,1)) is null,"high; item rewards and unknown: none");
+            var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/CollectableReader.Dalamud.cs"));
+            Check(reader.Contains("now>Volatile.Read(ref holdingsWanted)") && reader.Contains("item->IsCollectable()") && reader.Contains("container->IsLoaded"),"bags read only while asked");
+        }),
     ];
 }

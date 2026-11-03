@@ -3,7 +3,9 @@ using System.Collections.Frozen;
 namespace TenshoAssistant.Craft;
 
 public enum CraftActionKind { BasicSynthesis,CarefulSynthesis,Groundwork,BasicTouch,StandardTouch,AdvancedTouch,Byregot,MastersMend,Observe,Veneration,Innovation,GreatStrides,WasteNot,WasteNot2,Manipulation,Reflect,MuscleMemory,
-    DelicateSynthesis,PreparatoryTouch,PrudentSynthesis,PrudentTouch,RefinedTouch,TrainedEye,TrainedFinesse,ImmaculateMend,TrainedPerfection }
+    DelicateSynthesis,PreparatoryTouch,PrudentSynthesis,PrudentTouch,RefinedTouch,TrainedEye,TrainedFinesse,ImmaculateMend,TrainedPerfection,
+    // A-13 (0.434): game sheets (docs/evidence/0.434-craft-actions.md), effects as Craftimizer (MIT) models them, read only.
+    FinalAppraisal,CarefulObservation,HeartAndSoul,QuickInnovation,IntensiveSynthesis,PreciseTouch,TricksOfTheTrade,RapidSynthesis,HastyTouch }
 public sealed record CraftActionSpec(CraftActionKind Kind,uint CanonicalId,int Level,int Cp,int Durability);
 public sealed record CraftActionMetadata(CraftActionSpec Spec,uint JobId,uint NativeId,string Name,uint Icon,string Description);
 public sealed class CraftActionCatalog
@@ -19,7 +21,10 @@ public sealed class CraftActionCatalog
         new(CraftActionKind.DelicateSynthesis,100323,76,32,10),new(CraftActionKind.PreparatoryTouch,100299,71,40,20),
         new(CraftActionKind.PrudentSynthesis,100427,88,18,5),new(CraftActionKind.PrudentTouch,100227,66,25,5),
         new(CraftActionKind.RefinedTouch,100443,92,24,10),new(CraftActionKind.TrainedEye,100283,80,250,0),
-        new(CraftActionKind.TrainedFinesse,100435,90,32,0),new(CraftActionKind.ImmaculateMend,100467,98,112,0),new(CraftActionKind.TrainedPerfection,100475,100,0,0)
+        new(CraftActionKind.TrainedFinesse,100435,90,32,0),new(CraftActionKind.ImmaculateMend,100467,98,112,0),new(CraftActionKind.TrainedPerfection,100475,100,0,0),
+        new(CraftActionKind.FinalAppraisal,19012,42,1,0),new(CraftActionKind.CarefulObservation,100395,55,0,0),new(CraftActionKind.HeartAndSoul,100419,86,0,0),
+        new(CraftActionKind.QuickInnovation,100459,96,0,0),new(CraftActionKind.IntensiveSynthesis,100315,78,6,10),new(CraftActionKind.PreciseTouch,100128,53,18,10),
+        new(CraftActionKind.TricksOfTheTrade,100371,13,0,0),new(CraftActionKind.RapidSynthesis,100363,9,0,10),new(CraftActionKind.HastyTouch,100355,9,0,10)
     });
     public static IReadOnlyList<CraftActionSpec> Specs=>specs;
     private readonly FrozenDictionary<(uint Job,CraftActionKind Kind),CraftActionMetadata> rows;
@@ -39,6 +44,8 @@ public sealed class CraftActionCatalog
         rows=copied.ToFrozenDictionary(row=>(row.JobId,row.Spec.Kind)); DataVersion=version;
     }
     public CraftActionMetadata? Find(uint jobId,CraftActionKind kind)=>rows.GetValueOrDefault((jobId,kind));
+    /// <summary>A-14 (0.436): the model's action of a native Action or CraftAction id (any crafting job), or null.</summary>
+    public CraftActionKind? KindOf(uint nativeId)=>rows.Values.FirstOrDefault(row=>row.NativeId==nativeId)?.Spec.Kind;
     public CraftStatusMetadata? FindStatus(uint id)=>statuses.GetValueOrDefault(id);
 }
 public sealed record CraftActionCatalogState(CraftActionCatalog? Catalog,string? Error);

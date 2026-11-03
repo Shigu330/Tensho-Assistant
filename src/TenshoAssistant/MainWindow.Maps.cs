@@ -32,6 +32,12 @@ internal sealed partial class MainWindow
         if (ImGui.Button(localization.Get("MapView.OpenCurrent"))) OpenMapView(0);
         DrawMapBookmarks(catalog);
         DrawChatMapLinks(catalog);
+        // N-15 (0.442): hunt train recorder.
+        DrawHuntTrain(catalog);
+        // X-09 (0.444): place directory.
+        DrawPlaceDirectory();
+        // N-05 (0.445): plots for sale (PaissaDB).
+        DrawPlots();
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##MapSearch", localization.Get("MapsUi.Search"), ref mapQuery, 128);
         Tip("MapsUi.SearchTip");

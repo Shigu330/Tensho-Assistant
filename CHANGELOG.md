@@ -3,6 +3,279 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.448.0
+- N-08 (décision du 2026-11-03, DEC-026) : « Journal de jardinage » dans la page Rappels. Pour chaque parcelle ou pot : lieu et graine
+  (vos mots), durée de pousse et intervalle d'entretien tapés en heures (le jeu ne les donne pas : rien n'est deviné, 0 = pas de rappel
+  d'entretien). Tensho affiche l'heure de récolte et le prochain entretien ; boutons « Entretenu », « Replanter », « Retirer » ;
+  64 parcelles au plus. Réglage « Me le rappeler dans le chat » (activé) : une ligne dans le chat, et le son des alarmes s'il est activé,
+  quand une parcelle est mûre ou à entretenir, une fois chacune (gardé sur disque : pas de répétition après un redémarrage), vérifié
+  toutes les 10 s. Le journal est gardé par « Tout remettre par défaut ». Rien n'est lu dans le jeu.
+- CI : le premier passage du workflow « Build and test » (0.447) a trouvé un test qui dépendait des fins de ligne (Paissa445Tests lisait
+  Configuration.cs sans normaliser CRLF) : corrigé.
+- Tests : Garden448Tests (3 cas). Verify.ps1 (agent) : 813/813, 0 avertissement, 0 erreur ; DLL 0.448.0.0. Non validé en jeu.
+### English
+- N-08: garden journal on the Reminders page: beds and pots with the growing and tending hours you type (the game does not give
+  them), harvest and tending times, optional chat reminders once each.
+- CI: a test no longer depends on the files' line endings.
+
+## 0.447.0
+- Décisions du 2026-11-03 (DEC-026), premier lot appliqué :
+  - X-13 : bouton « Envoyer » à côté de « Copier l'annonce » dans le train de chasse : l'annonce part dans le canal choisi
+    (/sh, /y, /p, /fc, /ls1, /cwl1), avec le lien du drapeau, seulement sur clic, une fois le drapeau posé sur l'étape depuis le train,
+    5 s d'écart ; texte nettoyé (ni barre oblique, ni chevrons, ni caractère de contrôle), ligne vérifiée de nouveau juste avant le jeu
+    (UIModule.ProcessChatBoxEntry, comme les alarmes du jeu). L'annonce nomme maintenant l'étape dont le drapeau a été posé en dernier
+    (en 0.446, après « Drapeau suivant », elle nommait l'étape d'après).
+  - X-04 : bouton « Événements de joueurs (partake.gg) » en haut de la page Événements (lien ouvert dans le navigateur, rien de lu) ;
+    crédit et description du plugin mis à jour.
+  - Réglage « Monstres au survol » retiré avec son service (MonsterHoverSources) et ses textes : il ne commandait plus rien.
+  - Tri : pendant la relecture de 250 ms qui suit un mouvement d'objet (DEC-004, gardée), l'éditeur de règles reste affiché avec
+    « Rangement modifié : nouvelle lecture » ; l'aperçu et « Appliquer » attendent toujours une liste complète.
+- GitHub : branches main et Devloppement protégées (ni push forcé ni suppression), tags Stable-* protégés ; workflow « Build and test »
+  (Verify.ps1 sur Windows à chaque push) et Dependabot (actions GitHub, chaque semaine) activés depuis les brouillons de 0.323.
+- Fins de ligne : `git add --renormalize .` ne change rien (dépôt déjà en LF) ; décision de 0.323 close.
+- Tests : Decisions447Tests (5 cas) ; MonsterHoverSourcesTests retirés avec le service. Verify.ps1 (agent) : 810/810, 0 avertissement,
+  0 erreur ; DLL 0.447.0.0. Non validé en jeu (l'envoi au chat et le lien <flag> envoyé sont à essayer en jeu).
+### English
+- X-13: the hunt train call can now be sent to a chosen chat channel (/sh, /y, /p, /fc, /ls1, /cwl1) on click, with the flag link,
+  once the flag was placed from the train, 5 s apart; the text is cleaned and checked again before reaching the game. The call names
+  the stop flagged last.
+- X-04: « Player events (partake.gg) » link on the Events page; nothing is read from the site.
+- Removed the « Look up monsters on the wiki when hovering » setting, which no longer did anything.
+- Sorting: the rules editor stays on screen while the bags are read again after a move; preview and sorting still wait for a full read.
+- GitHub: protected branches and Stable tags; « Build and test » workflow and Dependabot enabled.
+
+## 0.446.0
+- Feuille de route, domaine 6, N-09 (suite) : réglage « Annoncer les marques A et S proches » (Cartes › Train de chasse, désactivé
+  par défaut) : quand la lecture de la carte voit une marque A ou S autour de toi, une ligne dans ton chat (« Marque S en vue : … —
+  zone ( x , y ) »), une fois par marque, et le son des alarmes si elles en jouent un. Rien n'est envoyé aux autres joueurs.
+- X-13 en partie : bouton « Copier l'annonce » dans le train de chasse : « Prochaine marque : nom (rang) — zone <flag> » copié dans le
+  presse-papiers pour l'étape suivante ; collé dans le chat du jeu, <flag> devient le lien du drapeau. Tensho n'envoie rien lui-même
+  (envoyer au chat sur clic : laissé à ta décision, G-PROPOSALS).
+- Documentation relue (demande du 2026-11-03) : README (pages, commandes et fonctions jusqu'à 0.446, crédit PaissaDB), GOAL, STATUS
+  (prochaine action, plan « Git », dernière release Stable-0.430.0), ROADMAP, PROJECT, USER-REQUESTS, PUBLISHING ; propositions déjà
+  faites marquées : 36 lignes « État » dans MAP, ITEMS, CRAFT-GATHER et TOOLS-PROPOSALS, alternatives faites dans G-PROPOSALS.
+- Git confié à l'agent (accord du 2026-11-03) : CLAUDE.md, RULES et STATUS « Git » ; commit et push par `Verify.ps1 -Commit`, release
+  seulement sur ta demande. Release.ps1 : variable facultative `TENSHO_COMMIT_TRAILER`, ajoutée en fin de message de commit.
+- GitHub (demande du 2026-11-03) : milestone 2 renommée, milestones 3 (résistance aux mises à jour, travaux en séance) et 1.0.0
+  (publication Dalamud), labels in-game-test, probe, decision, ultracode, état à 0.446 commenté sur #10–#17, issues #22–#31.
+  CodeQL corrigé : le workflow visait une branche « Stable » inexistante et la compilation échouait faute de Dalamud sur le runner
+  (branches main et Devloppement, distribution officielle de Dalamud téléchargée pour ses assemblies de référence).
+- Tests : HuntAlert446Tests (1 cas). Verify.ps1 (agent) : 809/809, 0 avertissement, 0 erreur ; DLL 0.446.0.0. Non validé en jeu.
+### English
+- N-09: optional local chat line and alarm sound when an A or S hunt mark appears nearby (off by default).
+- X-13 (partly): copy the hunt train conductor's call for the next stop, with <flag>, to the clipboard; nothing is sent by Tensho.
+- Documentation pass: README pages, commands and features up to 0.446; status, roadmap and proposals marked with what is already done.
+- Git is now handled by the agent (commit and push per version); releases stay on the maintainer's request. Release.ps1: optional
+  TENSHO_COMMIT_TRAILER appended to the commit message.
+- GitHub: milestones 3 (update resilience and deep work) and 1.0.0 (Dalamud publication), new labels, issues #22–#31, state
+  comments on #10–#17. CodeQL fixed: it targeted a missing « Stable » branch and failed without Dalamud on the runner.
+
+## 0.445.0
+- Feuille de route, domaine 6, N-05 (ton choix dans GAPS : PaissaDB accepté, surveillance régulière par réglage, lecture seule, rien
+  envoyé d'autre). Cartes › « Terrains en vente (PaissaDB) » :
+  - « Consulter (monde) » : les parcelles libres du monde où tu te trouves (quartier dans la langue du jeu, secteur et parcelle comptés
+    à partir de 1, taille, prix, loterie ou premier arrivé, inscrits) ; filtre de taille.
+  - Réglage « Surveiller les terrains en vente » (désactivé par défaut, intervalle 10 à 240 min, 30 par défaut) : à chaque lecture,
+    une ligne dans le chat pour chaque parcelle nouvellement libre de la taille choisie (rien à la première lecture).
+  - Seul le numéro du monde est envoyé, réponse bornée à 2 Mo, une requête à la fois. Crédit PaissaDB (aucune licence indiquée par le
+    projet) ajouté, manifeste mis à jour. Serveurs publics NA seulement (limite de PaissaDB).
+- Laissé pour ton retour (G-PROPOSALS) : N-08 journal de jardinage (les feuilles du jeu ne donnent pas la durée de pousse).
+- Tests : Paissa445Tests (1 cas) ; test du manifeste complété. Verify.ps1 (agent) : 808/808, 0 avertissement, 0 erreur ; DLL 0.445.0.0. Non validé en jeu.
+### English
+- N-05: open plots of the current world from PaissaDB (read only, world id only), with an optional watch announcing new plots in chat.
+
+## 0.444.0
+- Feuille de route, domaine 6, X-09 : annuaire des lieux. Cartes › « Annuaire des lieux » (replié) : adresses résidentielles (nom, monde,
+  quartier du jeu, secteur, parcelle ou appartement, note), ajoutées par un petit formulaire, copiées en texte, retirées avec Ctrl.
+  Gardées dans la configuration (100 au plus), conservées par « Tout remettre par défaut ». Quartiers lus dans la feuille du jeu
+  (usage résidentiel), dans la langue du jeu.
+- Pas fait (noté dans G-PROPOSALS) : N-14 planificateur de croisements, faute de source des paires (les données LuminaSupplemental
+  donnent « graine → résultat » par parent seulement).
+- Preuve : docs/evidence/0.444-housing.md.
+- Tests : PlaceDirectory444Tests (1 cas). Verify.ps1 (agent) : 807/807, 0 avertissement, 0 erreur ; DLL 0.444.0.0. Non validé en jeu.
+### English
+- X-09: a place directory of residential addresses (world, district, ward, plot or apartment, note), copied as text.
+
+## 0.443.0
+- Feuille de route, domaine 6, N-02 : contenus du Livre d'or. Rappels › Livre d'or : sous l'état et l'expiration, chaque tâche encore
+  à faire (« À faire : … ») et chaque vignette à réclamer (en vert), nommées dans la langue du jeu (la mission pour les tâches d'une
+  instance, sinon le texte du jeu : « donjons (nv 50) »…). Les chances de lignes (0.439) suivent.
+  - Lecture : tâches et états du jeu (GetWeeklyBingoTaskStatus, adresse vérifiée). Sans synchronisation de groupe (ton choix).
+- Preuve : docs/evidence/0.443-bingo-tasks.md.
+- Tests : BingoTasks443Tests (1 cas). Verify.ps1 (agent) : 806/806, 0 avertissement, 0 erreur ; DLL 0.443.0.0. Non validé en jeu.
+### English
+- N-02: Wondrous Tails tasks still to do and stickers to claim, named in the game's language.
+
+## 0.442.0
+- Feuille de route, domaine 6, N-15 : enregistreur de train de chasse. Cartes › « Train de chasse » (replié).
+  - « Enregistrer » : chaque marque A ou S chargée par le jeu autour de toi (et B si coché) est notée une fois par carte, avec sa
+    position et l'heure.
+  - « Drapeau suivant » pose le drapeau du jeu sur la première étape pas encore faite ; « Drapeau » sur une étape précise.
+  - « Copier la liste » : lignes « Nom — Zone ( x , y ) », que l'import des favoris (0.437) et les sites de chasse relisent.
+  - Liste gardée pour la session (64 étapes au plus) ; « Effacer » avec Ctrl.
+  - Lecture : la carte en direct (marques de la 0.441), une fois par seconde, seulement pendant l'enregistrement.
+- Tests : HuntTrain442Tests (1 cas, export relu par l import des favoris). Verify.ps1 (agent) : 805/805, 0 avertissement, 0 erreur ; DLL 0.442.0.0. Non validé en jeu.
+### English
+- N-15: hunt train recorder (A/S marks met, once per map, next flag, export as « Name — Zone ( x , y ) » lines).
+
+## 0.441.0
+- Feuille de route, domaine 6, N-09 : radar des marques de chasse. Sur la carte Tensho, nouvelle couche « Marques de chasse proches »
+  (réglage de la carte, activée par défaut) : les marques vivantes que le jeu a chargées autour de toi, icône crâne bleue (rang B),
+  orange (A) ou rouge (S), nom et rang au survol.
+  - Rang lu dans la feuille du jeu NotoriousMonster par BNpcBase ; seulement les marques vivantes et ciblables de la table d'objets.
+  - Pas encore : points d'apparition fixes et alertes (noté dans G-PROPOSALS).
+- Preuve : docs/evidence/0.441-hunt-marks.md.
+- Tests : HuntMarks441Tests (1 cas). Verify.ps1 (agent) : 804/804, 0 avertissement, 0 erreur ; DLL 0.441.0.0. Non validé en jeu.
+### English
+- N-09: nearby living hunt marks (B, A, S) on the Tensho map, coloured by rank, from the game's NotoriousMonster sheet.
+
+## 0.440.0
+- Feuille de route, domaine 6, N-01 : contrats de chasse. Rappels › Contrats de chasse : sous le nombre de contrats, chaque contrat
+  détenu, avec ses cibles.
+  - Pour chaque cible : nom, lieu, victimes faites / demandées, mention « ALÉA » pour les marques d'élite ; en vert quand c'est fini,
+    et « terminé (à rendre) » quand tout le contrat l'est.
+  - « Carte » ouvre la carte Tensho sur la zone de la cible. Les données du jeu donnent la zone et le lieu, pas de position : pas de
+    drapeau ni de téléportation directe (noté dans G-PROPOSALS).
+  - Lecture : le contrat détenu de chaque index (fonction du jeu GetObtainedHuntOrderRowId, adresse vérifiée) et les compteurs
+    (MobHunt.CurrentKills) ; noms et lieux dans la langue du jeu (MobHuntOrder, MobHuntTarget, MobHuntOrderType).
+- À confirmer en jeu : le compteur de chaque cible (index de sous-ligne).
+- Preuve : docs/evidence/0.440-hunt-bills.md.
+- Tests : HuntBills440Tests (1 cas) ; test 0.372 mis à jour. Verify.ps1 (agent) : 803/803, 0 avertissement, 0 erreur ; DLL 0.440.0.0. Non validé en jeu.
+### English
+- N-01: held hunt bills with their targets (name, place, kills / needed, FATE marks) and the Tensho map on the target's zone.
+
+## 0.439.0
+- Feuille de route, domaine 6, N-03 : probabilités de lignes du Livre d'or. Rappels › Livre d'or (moins de 9 vignettes posées) :
+  chances d'avoir au moins 1, 2 et 3 lignes à 9 vignettes, d'abord avec la grille actuelle, puis après un mélange (seconde chance).
+  - Calcul exact : toutes les répartitions des vignettes restantes sur les cases vides sont comptées (au plus 11 440) ; les 10 lignes
+    sont les 4 rangées, les 4 colonnes et les 2 diagonales.
+  - Lecture des 16 cases : fonction du jeu IsWeeklyBingoStickerPlaced, adresse vérifiée avant l'appel. L'ordre des cases (par rangée
+    ou par colonne) ne change pas le résultat : une transposition échange rangées et colonnes et garde les diagonales.
+- Tests : WondrousTails439Tests (1 cas, comparé à un comptage indépendant case par case). Verify.ps1 (agent) : 802/802,
+  0 avertissement, 0 erreur ; DLL 0.439.0.0. Non validé en jeu.
+### English
+- N-03: Wondrous Tails line odds (at least 1, 2, 3 lines with 9 stickers), now and after a shuffle, exact count.
+
+## 0.438.0
+- Demande de l'utilisateur : des réglages pour interdire certaines actions, dans toutes les interfaces liées ; et le panneau lié au
+  carnet d'artisanat qui disait seulement « mauvais métier », sans moyen de changer.
+  - Paramètres › Artisanat › « Actions interdites » : une case par action (nom du jeu, niveau), « Tout autoriser ». Une action interdite
+    n'est jamais proposée :
+    - recherche de rotation ;
+    - assistant du carnet, y compris ses séquences sauvegardées (une séquence qui en contient est écartée) ;
+    - synthèse en cours (lignes masquées).
+  - Simulateur manuel : actions interdites grisées (infobulle) ; une séquence importée, enregistrée ou chargée qui en contient est
+    signalée.
+  - Panneau du carnet d'artisanat : avec le mauvais métier, bouton « Équiper (métier) » (ensemble de ce métier au plus petit numéro, sur
+    clic, même demande vérifiée qu'en 0.385) ; « aucun ensemble » dit s'il n'y en a pas. Même bouton partagé avec la page Artisanat.
+- Tests : CraftRules438Tests (2 cas, dont une recherche qui évite toutes les actions d'une première solution) ; test 0.427 mis à jour.
+  Verify.ps1 (agent) : 801/801, 0 avertissement, 0 erreur ; DLL 0.438.0.0. Non validé en jeu.
+### English
+- User request: forbidden crafting actions (setting), never proposed by the search, the crafting log assistant (saved sequences too)
+  or the live synthesis, greyed out in the simulator; « Equip (job) » in the crafting log panel when the wrong job is worn.
+
+## 0.437.0
+- Feuille de route, domaine 6, N-11 : coordonnées collées vers les favoris de la carte. Dans Cartes › favoris, le champ d'import
+  accepte, en plus des codes TENSHO-MAP1, des lignes « Lieu ( x , y ) » collées depuis Siren, Bear, Faloop ou le chat.
+  - Le lieu est reconnu par le nom de zone du jeu, à la fin du texte avant la parenthèse ; les icônes du jeu et les préfixes
+    (« Siren: », « B rank – »…) sont ignorés.
+  - Chaque ligne devient un favori « Zone (x, y) » dans le groupe « Coordonnées collées ».
+  - Les lieux inconnus sont comptés, jamais devinés ; 200 lignes au plus, limite de 200 favoris inchangée.
+- Tests : PastedCoordinates437Tests (1 cas). Verify.ps1 (agent) : 799/799, 0 avertissement, 0 erreur ; DLL 0.437.0.0. Non validé en jeu.
+### English
+- N-11: pasted « Place ( x , y ) » lines (Siren, Bear, Faloop, chat) imported as map bookmarks, zones matched by the game's names.
+
+## 0.436.0
+- Feuille de route, A-14 (ton choix dans GAPS : hook en lecture de l'action utilisée) : Artisanat › Simulation › « Enregistrer une
+  rotation ».
+  - « Enregistrer », fabriquer à la main dans le jeu, « Arrêter » : les actions d'artisanat acceptées par le jeu sont notées dans
+    l'ordre (100 au plus) ; « Utiliser comme séquence » les met dans le simulateur (simulation, macro, séquence sauvegardée).
+  - Hook sur ActionManager.UseAction du jeu : adresse vérifiée avant ; la fonction du jeu est toujours appelée d'abord et son résultat
+    rendu tel quel ; rien n'est modifié ni envoyé. Le hook n'est actif que pendant l'enregistrement (désactivé à l'arrêt, retiré au
+    déchargement du plugin).
+  - Les actions d'artisanat hors du modèle (Toucher audacieux…) sont seulement comptées.
+- Tests : CraftRecorder436Tests (2 cas). Verify.ps1 (agent) : 798/798, 0 avertissement, 0 erreur ; DLL 0.436.0.0. Non validé en jeu.
+### English
+- A-14: crafting rotation recorder (read-only hook on the game's UseAction, only while recording; the game's function always runs
+  first, unchanged); the recorded actions become the simulator's sequence.
+
+## 0.435.0
+- Feuille de route, A-07 : recettes expertes et conditions étendues.
+  - Les recettes expertes ne sont plus refusées par le simulateur. Chaque étape est simulée en condition normale, et c'est dit à
+    l'écran (en jeu, les conditions spéciales changent le résultat).
+  - Le moteur connaît les conditions des recettes expertes, avec les arrondis de Craftimizer (MIT, lu seulement) :
+    - souple : PS / 2 ;
+    - robuste et solide : solidité / 2, même avec Parcimonie ;
+    - malléable : progression × 1,5 ;
+    - amorcée : buffs + 2 étapes ;
+    - centrée et bon présage : sans effet ici.
+  - La synthèse en direct refuse toujours les recettes expertes : l'ordre des conditions 4 à 10 dans le jeu n'est pas prouvé (à
+    vérifier en jeu, valeurs brutes en mode développeur).
+- Preuve : docs/evidence/0.434-craft-actions.md (partie 0.435).
+- Tests : CraftConditions435Tests (2 cas) ; deux anciens tests mis à jour (recettes expertes acceptées). Verify.ps1 (agent) :
+  796/796, 0 avertissement, 0 erreur ; DLL 0.435.0.0. Non validé en jeu.
+### English
+- A-07: expert recipes simulated (normal condition at every step, said on screen) and the expert conditions' effects in the engine
+  (Pliant, Sturdy, Robust, Malleable, Primed); live synthesis still refuses expert recipes until the condition ids are proven in game.
+
+## 0.434.0
+- Feuille de route, A-13 : neuf actions ajoutées au simulateur d'artisanat (niveaux et PS lus dans les feuilles du jeu, effets tels que
+  Craftimizer, MIT, les modélise, lus seulement) :
+  - Appréciation finale : arrête la progression juste avant la fin, une fois, pendant 5 étapes ; ne compte pas comme une étape ;
+  - Synthèse intensive, Toucher précis, Ficelles du métier : condition Bonne ou Excellente, ou Cœur et âme ;
+  - Cœur et âme, Innovation éclair, Observation méticuleuse : actions de spécialiste ;
+  - Synthèse rapide (50 %) et Toucher précipité (60 %) : le simulateur suppose leur réussite et le dit ; la recherche de rotation ne
+    les utilise pas.
+- Nouvelle case « Spécialiste » dans les attributs : elle ouvre les actions de spécialiste et les recettes de spécialiste (refusées
+  avant).
+- Synthèse en cours : Appréciation finale et Cœur et âme observés sont pris en compte dans la projection (avant : projection refusée).
+- Laissé de côté : Toucher audacieux (la feuille du jeu le donne sans métier ; il dépend d'un succès aléatoire).
+- Preuve : docs/evidence/0.434-craft-actions.md.
+- Tests : CraftActions434Tests (4 cas) ; trois anciens tests mis à jour (recettes de spécialiste acceptées, effets observés modélisés,
+  énumération sans actions aléatoires). Verify.ps1 (agent) : 794/794, 0 avertissement, 0 erreur ; DLL 0.434.0.0. Non validé en jeu.
+### English
+- A-13: nine more crafting actions in the simulator (Final Appraisal, Intensive Synthesis, Precise Touch, Tricks of the Trade, Heart
+  and Soul, Quick Innovation, Careful Observation, Rapid Synthesis, Hasty Touch) and a « Specialist » setting; chance actions assumed
+  successful in the manual simulator and left out of the search.
+
+## 0.433.0
+- Feuille de route, A-05 (ton choix dans GAPS : un fichier à part, comme la Banque) : listes de fabrication à plusieurs objets.
+  - Page Artisanat › « Listes de fabrication » (repliée, visible avec ou sans recette) : créer une liste par son nom, la choisir, la
+    supprimer (Ctrl + clic) ; ses objets avec leur quantité (modifiable), un clic ouvre la Préparation de la recette, « Retirer ».
+  - Total des ingrédients directs de toute la liste, face aux stocks recensés (requis, recensé, à compléter) ; toute la liste en lien
+    Teamcraft (copie).
+  - Préparation › « Ajouter à la liste « … » » : l'objet de la recette et la quantité à produire vont dans la liste choisie.
+  - Fichier « CraftLists.json » dans le dossier du plugin, écrit par fichier temporaire ; un fichier illisible n'est jamais écrasé.
+    32 listes de 64 objets au plus.
+- Pas fait : la chaîne des sous-recettes pour toute une liste (une recette à la fois, comme avant).
+- Tests : CraftLists433Tests (2 cas). Verify.ps1 (agent) : 790/790, 0 avertissement, 0 erreur ; DLL 0.433.0.0. Non validé en jeu.
+### English
+- A-05: crafting lists of several items (own file), with quantities, the whole list's direct ingredients against stocks, a Teamcraft
+  link, and « Add to the list » from Preparation.
+
+## 0.432.0
+- Feuille de route, A-15 : valeur des collectionnables de l'inventaire. Page Récolte › « Collectionnables » › « Dans vos sacs ».
+  - Pour chaque collectionnable des sacs : sa collectionnabilité, le palier atteint et les assignats de ce palier ; le total en haut.
+  - Les objets que le jeu ne reprend pas contre des assignats sont seulement comptés à part.
+  - Lecture : les 4 sacs, toutes les 5 s et seulement pendant que le tableau est ouvert. La collectionnabilité vient d'un champ de
+    l'objet (lu directement, aucune fonction du jeu appelée).
+- À confirmer en jeu : la valeur lue pour un collectionnable fabriqué (collectionnabilité attendue, comme pour la récolte).
+- Tests : Collectables409Tests (1 cas de plus). Verify.ps1 (agent) : 788/788, 0 avertissement, 0 erreur ; DLL 0.432.0.0. Non validé en jeu.
+### English
+- A-15: collectables in the bags with their collectability, tier reached and scrips, and the total, in the collectables table.
+
+## 0.431.0
+- Feuille de route, A-06 (ton choix dans GAPS : plus basse annonce du monde, centre de données en option, dernière vente à côté).
+  Artisanat › Préparation › Coût indicatif des achats : nouvelle partie « Bénéfice ».
+  - Prix de l'objet fabriqué : plus basse annonce de ton monde, ou du centre de données (case, avec le monde) ; NQ ou HQ (case).
+  - Prix × quantité à produire, moins le coût des achats ; dernière vente affichée à côté.
+  - Coût des achats incomplet ou prix inconnu : rien n'est calculé (dit à l'écran). Taxes et profondeur des offres non comptées.
+  - Le prix de l'objet fabriqué est demandé avec ceux des ingrédients (« Consulter les prix de la liste », même cache Universalis).
+- Tests : CraftProfit431Tests (1 cas). Verify.ps1 (agent) : 787/787, 0 avertissement, 0 erreur ; DLL 0.431.0.0. Non validé en jeu.
+### English
+- A-06: crafting profit in the preparation cost: the crafted item's lowest listing (world, or data center) × quantity minus the
+  purchases, last sale beside it; nothing computed when a price or the cost is incomplete.
+
 ## 0.430.0
 - Remarque de l'utilisateur : le carnet du jeu montre parfois des recettes au-dessus du niveau du métier (par tranches de niveaux).
   Le blocage par niveau ajouté en 0.428 refusait donc à tort des recettes que le jeu sait ouvrir. Il est retiré : le jeu décide.

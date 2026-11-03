@@ -11,7 +11,8 @@ public static class CraftObservedEffects
     public static IReadOnlyList<CraftStatusSpec> Specs {get;}=Array.AsReadOnly(new CraftStatusSpec[]
     {
         new(251,10,true),new(252,4),new(2226,4),new(254,3),new(2189,4),new(257,8),new(2191,5),new(1164,8),
-        new(3813,0,true),new(2190,5,false,true),new(2665,0,true,true),new(3812,1,false,true)
+        // A-13 (0.434): Final Appraisal (2190) and Heart and Soul (2665) are modelled; Expedience (3812, Daring Touch) is not.
+        new(3813,0,true),new(2190,5),new(2665,0,true),new(3812,1,false,true)
     });
     public static CraftEffectObservation Decode(CraftLiveFrame frame,CraftActionCatalog catalog)
     {

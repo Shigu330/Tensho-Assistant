@@ -31,7 +31,7 @@ internal static class CommunityNames407Tests
             Check(Read("MainWindow.Monsters.cs").Contains("{CommunityMonster(row.Name)} · {row.Level} · {CommunityPlace(row.Location)}"),"wiki monsters page");
             Check(Read("MainWindow.BlueSpellSources.cs").Contains("{CommunityMonster(row.Name)} · {row.Level} · {CommunityPlace(row.Location)}"),"blue spell monsters");
             var hover=Read("MainWindow.MarketHover.cs");
-            Check(hover.Contains("CommunityMonster(first.Name)") && hover.Contains("CommunityPlace(first.Location)") && hover.Contains("group.Select(CommunityGarland)"),"hover");
+            Check(hover.Contains("group.Select(CommunityGarland)"),"hover");
             var names=Read("Items/GameNames.Lumina.cs");
             Check(names.Contains("ClientLanguage.English") && names.Contains("Task.Run(Build)") && names.Contains("string.Equals(gameEnglish.Trim(),english.Trim()"),
                 "built off the framework thread from the English sheets; Garland ids kept only when the English names match");

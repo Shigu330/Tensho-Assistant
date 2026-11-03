@@ -9,10 +9,12 @@ public sealed record GameTimerSnapshot(DateTimeOffset ReadAt,uint? AlliedQuestsL
     int? DeliveriesLeft,IReadOnlyList<(string Name,DateTimeOffset? Done)>? Ventures,
     SquadronTimer? SquadronMission=null,SquadronTimer? SquadronTraining=null,IReadOnlyList<RouletteDaily>? Roulettes=null,
     WondrousTails? Bingo=null,int? HuntBillsHeld=null,DateTimeOffset? NextMapAllowance=null,
-    (int Done,int Total)? ChallengeLog=null,(int Donated,int Allowance)? DomanEnclave=null);
+    (int Done,int Total)? ChallengeLog=null,(int Donated,int Allowance)? DomanEnclave=null,IReadOnlyList<HuntBillProgress>? HuntBills=null);
 
 /// <summary>g, M-02 (0.372): the Wondrous Tails journal (PlayerState): held or not, stickers placed, expiry, second chance points.</summary>
-public sealed record WondrousTails(bool Held,int Stickers,DateTimeOffset? Expires,uint SecondChance);
+// N-03 (0.439): Placed = the 16 cells as bits (IsWeeklyBingoStickerPlaced, address checked); null when not read.
+// N-02 (0.443): Tasks = the 16 tasks (WeeklyBingoOrderData row, status 0 open, 1 claimable, 2 claimed); null when not read.
+public sealed record WondrousTails(bool Held,int Stickers,DateTimeOffset? Expires,uint SecondChance,ushort? Placed=null,IReadOnlyList<(uint Order,int Status)>? Tasks=null);
 
 /// <summary>A daily duty roulette: done today (null = not read) and the role that gets the bonus (null = none or not known).</summary>
 public sealed record RouletteDaily(byte Id,bool? Completed,RouletteRole? Bonus);
@@ -103,22 +105,51 @@ public static unsafe class GameTimers
             catch(Exception){daily=null;}
         // g, M-02 (0.372): Wondrous Tails (PlayerState, memory), hunt bills held (MobHunt.ObtainedFlags, one bit per mark bill) and the
         // next treasure map allowance (UIState.GetNextMapAllowanceTimestamp, address checked). Each guarded on its own.
-        WondrousTails? bingo=null;int? bills=null;DateTimeOffset? nextMap=null;
+        WondrousTails? bingo=null;int? bills=null;DateTimeOffset? nextMap=null;IReadOnlyList<HuntBillProgress>? huntBills=null;
         try
         {
             var state=PlayerState.Instance();
             if(state!=null && state->IsLoaded)
+            {
+                ushort? placed=null;
+                if(state->HasWeeklyBingoJournal && (nint)PlayerState.MemberFunctionPointers.IsWeeklyBingoStickerPlaced!=0)
+                {
+                    ushort cells=0;
+                    for(var cell=0;cell<16;cell++)if(state->IsWeeklyBingoStickerPlaced(cell))cells|=(ushort)(1<<cell);
+                    placed=cells;
+                }
+                List<(uint,int)>? tasks=null;
+                if(state->HasWeeklyBingoJournal && (nint)PlayerState.MemberFunctionPointers.GetWeeklyBingoTaskStatus!=0)
+                {
+                    tasks=[];var orders=state->WeeklyBingoOrderData;
+                    for(var task=0;task<16 && task<orders.Length;task++)tasks.Add((orders[task],(int)state->GetWeeklyBingoTaskStatus(task)));
+                }
                 bingo=state->HasWeeklyBingoJournal
-                    ? new(true,state->WeeklyBingoNumPlacedStickers,Unix(state->GetWeeklyBingoExpireUnixTimestamp()),state->WeeklyBingoNumSecondChancePoints)
+                    ? new(true,state->WeeklyBingoNumPlacedStickers,Unix(state->GetWeeklyBingoExpireUnixTimestamp()),state->WeeklyBingoNumSecondChancePoints,placed,tasks)
                     :new(false,0,null,0);
+            }
         }
         catch(Exception){bingo=null;}
         try
         {
             var hunt=MobHunt.Instance();
             if(hunt!=null)bills=System.Numerics.BitOperations.PopCount((uint)hunt->ObtainedFlags & ((1u<<MobHunt.MaxMarkIndex)-1));
+            // N-01 (0.440): each held bill's order (GetObtainedHuntOrderRowId, address checked) and its targets' kills (CurrentKills).
+            if(hunt!=null && (nint)MobHunt.MemberFunctionPointers.GetObtainedHuntOrderRowId!=0)
+            {
+                var held=new List<HuntBillProgress>();
+                for(var index=0;index<MobHunt.MaxMarkIndex;index++)
+                {
+                    if((hunt->ObtainedFlags & (1<<index))==0)continue;
+                    var row=hunt->GetObtainedHuntOrderRowId((byte)index);
+                    if(row<=0)continue;
+                    var counts=hunt->CurrentKills[index].Counts;
+                    held.Add(new((byte)index,(uint)row,counts.ToArray()));
+                }
+                huntBills=held;
+            }
         }
-        catch(Exception){bills=null;}
+        catch(Exception){bills=null;huntBills=null;}
         try
         {
             var ui=UIState.Instance();
@@ -143,7 +174,7 @@ public static unsafe class GameTimers
             if(enclave!=null && enclave->State.Allowance>0)doman=(enclave->State.Donated,enclave->State.Allowance);
         }
         catch(Exception){doman=null;}
-        return new(DateTimeOffset.UtcNow,allied,leves,nextLeves,deliveries,ventures,mission,training,daily,bingo,bills,nextMap,challenge,doman);
+        return new(DateTimeOffset.UtcNow,allied,leves,nextLeves,deliveries,ventures,mission,training,daily,bingo,bills,nextMap,challenge,doman,huntBills);
         static DateTimeOffset? Unix(int seconds)=>seconds>0 ? DateTimeOffset.FromUnixTimeSeconds(seconds):null;
     }
 }

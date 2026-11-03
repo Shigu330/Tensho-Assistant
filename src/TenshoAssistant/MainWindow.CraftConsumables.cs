@@ -10,11 +10,13 @@ internal sealed partial class MainWindow
     internal Func<IReadOnlyList<CraftConsumable>>? CraftConsumableList { get; set; }
     private CraftConsumable? simulationFood,simulationMedicine;
     private bool simulationFoodHq=true,simulationMedicineHq=true;
+    // A-13 (0.434): the job is a specialist (specialist actions and recipes).
+    private bool simulationSpecialist;
 
     private CraftStats EffectiveCraftStats()
     {
         var (cs,control,cp)=CraftConsumables.Apply(simulationCs,simulationControl,simulationCp,simulationFood,simulationFoodHq,simulationMedicine,simulationMedicineHq);
-        return new(simulationLevel,cs,control,cp,simulationManipulation);
+        return new(simulationLevel,cs,control,cp,simulationManipulation,simulationSpecialist);
     }
 
     private bool DrawCraftConsumables()

@@ -1,6 +1,6 @@
 # Artisanat et récolte : propositions d'amélioration (audit du 2026-11-02, étape e)
 
-Liste établie par un audit multi-agents en lecture seule (0.329). **Rien n'est implémenté** : vous choisissez ce qu'on ajoute
+Liste établie par un audit multi-agents en lecture seule (0.329). **Rien n'était implémenté** à l'audit (relu le 2026-11-03 : les propositions faites depuis, à l'étape g, portent une ligne « État ») : vous choisissez ce qu'on ajoute
 (règle du 2026-11-02, [ROADMAP](ROADMAP.md) « Décisions reportées à la fin »). Les défauts trouvés par le même audit sont corrigés en
 0.330 ([CHANGELOG](../../CHANGELOG.md)). Plusieurs propositions recoupent des manques déjà retenus pour l'étape g)
 ([GAPS](GAPS.md), I-*) : elles le disent.
@@ -9,6 +9,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C0 — K1 — A-01, partie anticipée : choisir la qualité visée dans le panneau du carnet
 
+- **État (relu le 2026-11-03)** : en partie 0.419 (A-01 : seuils des collectionnables comme cibles de qualité de la recherche) ; choix libre de la qualité dans le panneau du carnet non fait.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.CraftLog.cs`.
 - **Ce que le joueur obtient** : Dans le panneau à côté du carnet de synthèse, vous choisissez la cible : qualité maximale (comme aujourd'hui), une valeur tapée ou un pourcentage du maximum. Pour un objet livré en NQ, un collectionnable à palier bas ou une montée de niveau, la macro proposée devient plus courte et coûte moins de PS. Les paliers exacts des collectionnables viendront ensuite avec A-01, après la sonde.
 - **Comment, taille, dépendances** : Réglage « Cible du carnet » (maximum / valeur / %), avec infobulle et ↺ ; il entre dans CraftLogInput.Options, donc dans la clé du cache (CraftLogSession.CacheKey). Afficher « cible : N / max » au-dessus des macros. Taille S. Dépendances : aucune ; les paliers des collectionnables (CollectablesShopRefine…) restent pour A-01. Sonde : aucune pour cette partie. Décision : valeur par défaut (recommandé : maximum, comme aujourd'hui).
@@ -16,6 +17,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C1 — K2 — X-11, anticipé : Manipulation dans la macro proposée quand elle est apprise
 
+- **État (relu le 2026-11-03)** : FAIT 0.419 (X-11).
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Craft/CraftLogObservation.cs`.
 - **Ce que le joueur obtient** : À partir du niveau 65, la macro proposée par le panneau du carnet peut utiliser Manipulation, comme celles qu'un artisan utilise vraiment : plus de solidité, souvent plus de qualité ou moins d'étapes.
 - **Comment, taille, dépendances** : Étape 1 (S, sans sonde) : case « Manipulation apprise » par personnage, désactivée par défaut, avec infobulle et ↺, passée à CraftLogContext.Resolve. Étape 2 (S, après sonde) : lecture du déblocage réel sur le thread du framework (Action.UnlockLink et état de déblocage FFXIVClientStructs, à sonder), gardée R-14, la case restant en secours. Taille S. Dépendances : aucune. Décision : étape 1 seule ou les deux (recommandé : les deux).
@@ -58,6 +60,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C7 — G1 — R-13, partie anticipée : points à horaire ouverts maintenant ou bientôt
 
+- **État (relu le 2026-11-03)** : en partie 0.415 (R-13 : fenêtre de suivi des objets des alarmes) ; liste « ouverts maintenant ou bientôt » non faite.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.GatheringBrowser.cs`.
 - **Ce que le joueur obtient** : Sur la page Récolte, un onglet « Maintenant » liste tous les points à horaire ET (mineur, botaniste) ouverts, puis ceux qui ouvrent dans l'heure réelle, triés par prochaine fenêtre, avec compte à rebours, zone, niveau et bouton d'alarme. Filtres : métier, niveau, objets cachés. Vous savez où aller sans chercher objet par objet.
 - **Comment, taille, dépendances** : Index des sources à horaire Limited, prochaine fenêtre calculée une fois par minute ET (cache, jamais à chaque image), ItemCell et alarme existants (DrawGatheringAlarmButton). Poissons exclus tant que R-02 (météo) n'est pas fait. Taille S-M. Dépendances : aucune ; R-13 reprendra la liste pour sa fenêtre épinglée. Sonde : aucune. Décision : horizon « bientôt » (recommandé : une heure réelle, réglage avec infobulle et ↺).
@@ -72,6 +75,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C9 — G3 — R-02, partie anticipée : « possible maintenant ? » dans l'aide à la pêche
 
+- **État (relu le 2026-11-03)** : en partie 0.396 (R-02 : prochaines fenêtres sur la fiche du poisson) ; pas dans l’aide à la pêche.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.FishingPanel.cs`.
 - **Ce que le joueur obtient** : Chaque poisson de l'aide à la pêche et de « Comment le pêcher » montre trois pastilles : créneau ET ouvert, météo actuelle conforme, météo précédente conforme (✓ / ✗ / ?). Vous voyez tout de suite quels poissons sont possibles là, maintenant, sans croiser vous-même avec la page Météo.
 - **Comment, taille, dépendances** : Météo actuelle et précédente du territoire calculées une fois par période de 1 400 s (cache, comme MainWindow.Weather.cs), comparées aux ids GatherBuddy ; créneau par GatheringTime. Taille S. Dépendances : aucune ; la liste des prochaines fenêtres réelles reste pour R-02. Sonde : aucune. Décision : aucune.
@@ -86,6 +90,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C11 — K8 — A-13, partie anticipée : simuler les recettes de spécialiste sans les actions de spécialiste
 
+- **État (relu le 2026-11-03)** : FAIT 0.434-0.435 (A-13 : réglage « Spécialiste », recettes de spécialiste acceptées).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Craft/CraftSimulation.cs`.
 - **Ce que le joueur obtient** : Les recettes réservées aux spécialistes (non expertes) ne sont plus refusées : simulateur, recherche et panneau du carnet les calculent avec les actions ordinaires, avec la mention « actions de spécialiste non modélisées ». La macro reste valable, juste moins optimisée.
 - **Comment, taille, dépendances** : Accepter Specialist quand Expert, LevelScaled et RequiredQuality sont faux ; texte d'avertissement traduit dans les trois vues. Taille S. Dépendances : A-13 ajoutera ensuite les actions. Sonde : aucune ; une synthèse de spécialiste comparée en jeu. Décision : aucune.
@@ -107,6 +112,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C14 — K11 — A-12, partie anticipée : fiche de recette complète (livre de maître, synthèse rapide, HQ, prérequis, écart chiffré)
 
+- **État (relu le 2026-11-03)** : en partie 0.427 (A-12 : niveau, Habileté, Contrôle face au personnage, « Équiper ») ; livre de maître, synthèse rapide et HQ non faits.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Craft/RecipeCatalogLoader.Dalamud.cs`.
 - **Ce que le joueur obtient** : La recette (onglet Craft de la fiche objet et panneau du carnet) dit : livre de recettes de maître requis (et s'il est lu), synthèse rapide possible, HQ possible, spécialiste requis, objet ou statut requis, et l'écart chiffré « Habileté 3 950 / 4 000 : −50 ». Vous savez pourquoi une recette n'est pas faisable.
 - **Comment, taille, dépendances** : Copier ces colonnes de Recipe dans RecipeDefinition (version de cache du catalogue à monter). Afficher dans DrawCraftBook et le panneau. État « lu » du livre après sonde (état client FFXIVClientStructs, à sonder), sinon « non vérifié ». Taille S. Dépendances : le changement d'ensemble sur clic reste dans A-12 (étape g). Décision : aucune.
@@ -121,6 +127,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C16 — K13 — Bibliothèque des séquences : recherche, renommer, dupliquer, copier et coller en texte (A-08, partie texte)
 
+- **État (relu le 2026-11-03)** : en partie 0.425 (A-08 : import d’une macro collée) ; recherche, renommer, dupliquer non faits.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.CraftPresets.cs`.
 - **Ce que le joueur obtient** : La page des séquences enregistrées se cherche par nom, objet ou métier et se trie ; une séquence se renomme, se duplique, se copie en texte de macro et, dans l'autre sens, une macro /ac collée devient une séquence vérifiable dans le simulateur.
 - **Comment, taille, dépendances** : Filtres et tri mis en cache ; Rename et Duplicate purs dans CraftPresets (même Commit) ; copie par CraftMacroExporter ; analyse des lignes /ac contre les noms d'actions du catalogue dans la langue du client, lignes inconnues signalées. Taille S-M. Dépendances : les liens en ligne de A-08 restent pour l'étape g. Sonde : aucune. Décision : aucune nouvelle.
@@ -128,6 +135,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C17 — K14 — Options d'export des macros : attentes séparées (X-12), son, écho final, icône
 
+- **État (relu le 2026-11-03)** : en partie 0.419 (X-12 : attente à part pour les buffs) ; son, écho final, icône non faits.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Craft/CraftMacroExport.cs`.
 - **Ce que le joueur obtient** : Vous réglez l'attente des actions et celle des effets séparément, choisissez le son de fin (ou aucun), l'écho sur chaque page ou seulement sur la dernière, et l'icône des macros écrites dans le jeu au lieu du « ? » imposé.
 - **Comment, taille, dépendances** : Champs dans CraftSearchSettings (configuration), chacun avec infobulle et ↺, mêmes bornes que l'attente actuelle ; ils entrent dans la clé du cache du carnet. Icône : liste des icônes de macro du jeu (feuille à sonder) ou celle de l'objet fabriqué si valide. Taille S. Sonde : feuille des icônes de macro. Décision : valeurs par défaut (recommandé : inchangées).
@@ -149,6 +157,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C20 — K17 — A-09, partie anticipée : ouvrir la préparation ou la chaîne dans Teamcraft
 
+- **État (relu le 2026-11-03)** : FAIT 0.423 (A-09 : lien Teamcraft depuis la préparation).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.CraftChain.cs`.
 - **Ce que le joueur obtient** : Un bouton « Teamcraft » copie (ou ouvre sur clic) le lien d'import de l'objet préparé et de sa quantité ; la liste apparaît dans Teamcraft avec ses sous-crafts. Tensho n'envoie rien lui-même.
 - **Comment, taille, dépendances** : Fonction pure de construction du lien (testée), bouton dans DrawCraftPlan et DrawCraftChain ; ouverture du navigateur seulement sur clic. Taille S. Dépendances : A-05 étendra à plusieurs objets. Sonde : un lien essayé à la main. Décision : copier ou ouvrir (recommandé : les deux boutons).
@@ -184,6 +193,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C25 — G9 — R-14 (récolte), partie anticipée : type de source des matières brutes de la chaîne
 
+- **État (relu le 2026-11-03)** : FAIT 0.416 (R-14 : matières brutes de la chaîne en liste de récolte par zone, celles sans lieu à part).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.CraftChain.cs`.
 - **Ce que le joueur obtient** : Chaque matière brute manquante porte ses sources en icônes (mineur, botaniste, pêche avec horaire ou non, marchand PNJ, monstre, marché) et un regroupement par zone en tête. Vous voyez d'un coup ce qui se récolte, s'achète ou se chasse.
 - **Comment, taille, dépendances** : Étiquettes calculées une fois par résultat de chaîne (cache par identité du résultat), regroupement par zone des sources de récolte ; les horaires détaillés et l'itinéraire restent pour R-14. Taille S. Dépendances : I3 (prix PNJ) pour le prix en face du marchand. Sonde : aucune. Décision : aucune.
@@ -191,6 +201,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C26 — G5 — R-04, partie anticipée : stock des appâts dans l'aide à la pêche
 
+- **État (relu le 2026-11-03)** : FAIT 0.398 (R-04 : appât en main et son stock).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.FishingPanel.cs`.
 - **Ce que le joueur obtient** : Sous chaque appât de la route : « ×37 », en rouge à zéro. Vous ne partez plus pêcher un poisson sans son appât. La détection de l'appât porté viendra avec R-04.
 - **Comment, taille, dépendances** : Même GetRecipeHoldings que pour les poissons (cache existant), sur l'aide à la pêche et « Comment le pêcher ». Taille S. Dépendances : R-04 pour l'appât porté (sonde PlayerState.FishingBait). Sonde : aucune pour cette partie. Décision : aucune.
@@ -212,6 +223,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C29 — G10 — R-15, partie anticipée : poissons au harpon dans la page Récolte
 
+- **État (relu le 2026-11-03)** : en partie : carnet du harpon sur la page Récolte (0.402) et aide au harpon à côté de la fenêtre du jeu (0.417).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Gathering/GatheringCatalogLoader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Les poissons au harpon apparaissent dans la recherche de la page Récolte avec leur lieu, comme les autres ressources. L'aide sur la fenêtre du harpon viendra avec R-15.
 - **Comment, taille, dépendances** : Sonde d'abord (tools/GatheringProbe) : nombre de références SpearfishingItem, lien avec SpearfishingNotebook et les lieux, consigné dans docs/evidence. Puis lignes de source « harpon » (métier pêcheur, AlarmSchedule.JobOf déjà prêt). Taille S-M. Dépendances : aucune. Décision : aucune.

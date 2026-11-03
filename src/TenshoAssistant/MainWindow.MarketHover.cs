@@ -17,10 +17,8 @@ internal sealed partial class MainWindow
     private Vector2 hoverPanelSize=new(380,300);
     private (uint Item,object? Live,object? Bank,ulong Character) hoverHoldingsKey;
     private ItemHoldingsSummary? hoverHoldings;
-    private Monsters.MonsterHoverSources? monsterHover;
     // 0.343 (I-01): world names outside the data center (region cheapest), from the World sheet (set by Plugin).
     internal Func<uint,string?>? WorldName { get; set; }
-    internal void ConfigureMonsterHover(Monsters.MonsterHoverSources service)=>monsterHover=service;
     public void DrawItemHover()
     {
         var observed=itemHover.State;var now=DateTimeOffset.UtcNow;
@@ -113,45 +111,6 @@ internal sealed partial class MainWindow
         if(rows.Length>0)
             ImGui.TextDisabled(string.Join(" · ",rows.Take(4).Select(row=>localization.Format("HoverUi.StorageRow",StorageRowName(row),(row.Nq+row.Hq).ToString("N0"))))
                 +(rows.Length>4 ? localization.Format("HoverUi.More",rows.Length-4):""));
-    }
-
-    private void DrawHoveredSources(uint id,TimeSpan hoveredFor)
-    {
-        var lines=new List<string>();
-        string? monsterStatus=null;
-        var crafted=recipeCatalog.State.Catalog?.ForResult(id) ?? [];
-        var gathered=gatheringCatalog.State.Catalog?.ForItem(id) ?? [];
-        if(crafted.Count>0)
-            lines.Add(localization.Format("HoverUi.Craftable",crafted.Count,string.Join(", ",crafted.Select(recipe=>recipe.CraftType).Where(name=>name.Length>0).Distinct().Take(3))));
-        if(gathered.Count>0)
-        {
-            var first=gathered[0];
-            lines.Add(localization.Format("HoverUi.Gathered",first.TypeName,first.Level,first.Zone)+(gathered.Count>1 ? localization.Format("HoverUi.More",gathered.Count-1):""));
-        }
-        // Only materials that can be monster drops are looked up; equipment, crafted and gathered items never trigger a request.
-        if(Monsters.MonsterDropCandidates.Eligible(itemCatalog.State.Catalog?.Find(id),crafted.Count>0,gathered.Count>0)
-            && monsterHover?.Observe(id,hoveredFor,configuration.CommunityWiki && configuration.MonsterSourcesOnHover) is { } monsters)
-        {
-            if(monsters.Document is { Monsters.Count:>0 } document)
-            {
-                var first=document.Monsters[0];
-                var head=first.Level.Length>0 ? localization.Format("HoverUi.MonsterLevel",CommunityMonster(first.Name),first.Level):CommunityMonster(first.Name);
-                if(first.Location.Length>0)head+=" · "+CommunityPlace(first.Location);
-                lines.Add(localization.Format("HoverUi.Monsters",head)+(document.Monsters.Count>1 ? localization.Format("HoverUi.More",document.Monsters.Count-1):""));
-            }
-            monsterStatus=monsters.Status switch
-            {
-                Monsters.MonsterHoverStatus.Loading=>localization.Get("HoverUi.MonstersLoading"),
-                Monsters.MonsterHoverStatus.Unavailable=>localization.Get("HoverUi.MonstersUnavailable"),
-                _=>monsters.Stale && monsters.Document is { Monsters.Count:>0 } ? localization.Get("HoverUi.MonstersOld"):null,
-            };
-        }
-        if(quests.State.RewardIndex?.ForItem(id) is { Count:>0 } rewards)lines.Add(localization.Format("HoverUi.QuestRewards",rewards.Count));
-        if(lines.Count==0 && monsterStatus is null && HoveredNpcCount(id)==0)return;
-        ImGui.TextColored(Accent,localization.Get("HoverUi.Obtain"));
-        DrawHoveredNpcs(id);
-        foreach(var line in lines)ImGui.TextWrapped(line);
-        if(monsterStatus is not null)ImGui.TextDisabled(monsterStatus);
     }
 
     // Collection state of what the item unlocks (mount, minion, Triple Triad card, orchestrion roll), from the collection

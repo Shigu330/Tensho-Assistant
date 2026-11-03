@@ -33,6 +33,8 @@
     <Compile Include="../../src/TenshoAssistant/Maps/MapLocalIndex.cs" Link="Maps/MapLocalIndex.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/WikiVistas.cs" Link="Maps/WikiVistas.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/ChatMapLinks.cs" Link="Maps/ChatMapLinks.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/HuntTrain.cs" Link="Maps/HuntTrain.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/PlaceDirectory.cs" Link="Maps/PlaceDirectory.cs" />
     <Compile Include="../../src/TenshoAssistant/MiniGames/*.cs" Exclude="../../src/TenshoAssistant/MiniGames/*.Dalamud.cs" Link="MiniGames/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Character/CharacterStatsService.cs" Link="Character/CharacterStatsService.cs" />
     <Compile Include="../../src/TenshoAssistant/Character/StatFormulas.cs" Link="Character/StatFormulas.cs" />
@@ -42,6 +44,9 @@
     <Compile Include="../../src/TenshoAssistant/Quests/QuestAlternatives.cs" Link="Quests/QuestAlternatives.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/ResetSchedule.cs" Link="Reminders/ResetSchedule.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/PersonalTasks.cs" Link="Reminders/PersonalTasks.cs" />
+    <Compile Include="../../src/TenshoAssistant/Reminders/GardenJournal.cs" Link="Reminders/GardenJournal.cs" />
+    <Compile Include="../../src/TenshoAssistant/Reminders/WondrousTailsOdds.cs" Link="Reminders/WondrousTailsOdds.cs" />
+    <Compile Include="../../src/TenshoAssistant/Reminders/HuntBills.cs" Link="Reminders/HuntBills.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/Voyages.cs" Link="FreeCompany/Voyages.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/VoyageHistory.cs" Link="FreeCompany/VoyageHistory.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/VoyagePlanner.cs" Link="FreeCompany/VoyagePlanner.cs" />
@@ -105,6 +110,9 @@
     <Compile Include="../../src/TenshoAssistant/Craft/CraftMacroImport.cs" Link="Craft/CraftMacroImport.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftActionCatalog.cs" Link="Craft/CraftActionCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftPlan.cs" Link="Craft/CraftPlan.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftLists.cs" Link="Craft/CraftLists.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftRecording.cs" Link="Craft/CraftRecording.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/CraftActionRules.cs" Link="Craft/CraftActionRules.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftChain.cs" Link="Craft/CraftChain.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftChainSession.cs" Link="Craft/CraftChainSession.cs" />
   </ItemGroup>
