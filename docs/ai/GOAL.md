@@ -10,7 +10,7 @@ RESTE (ordre proposé, détail dans [STATUS](STATUS.md) « Prochaine action » e
 1) git : 0.431–0.451 publiées (Stable-0.451.0, 2026-11-03) ; décisions faites (DEC-026, DEC-027) ;
 2) décisions par lots (G-PROPOSALS, ROADMAP « Décisions reportées à la fin », lignes « État » des fichiers de propositions) ;
 3) h) campagne de tests en jeu guidée de tout le plugin ([TESTING](../project/TESTING.md)), sondes en jeu comprises ;
-4) séance ultracode : g2) R-14, I-05, I-15, A-03 / A-04 (Raphael), N-10, relecture du hook A-14 ;
+4) g2 sans ultracode : R-14, I-05, I-15, A-03 / A-04 (Raphael), N-10, relecture du hook A-14 ;
 5) publication D17 à la version 1.0.0, moment fixé par l'auteur.
 VALIDATION : Verify.ps1 vert ; rapports de l'utilisateur en jeu.
 

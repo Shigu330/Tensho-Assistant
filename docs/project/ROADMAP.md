@@ -1,7 +1,7 @@
 # Roadmap des 17 plugins
 
 État au 0.446.0 (2026-11-03, relu contre le CHANGELOG, STATUS et le code) : les 17 lignes restent PARTIAL (aucune validation en jeu
-complète). Files a) à g) faites ; restent g2) (R-14, en ultracode), h) (tests en jeu avec l'utilisateur) et les décisions
+complète). Files a) à g) faites ; restent g2) (R-14, sans ultracode), h) (tests en jeu avec l'utilisateur) et les décisions
 ([G-PROPOSALS](G-PROPOSALS.md)). Dernière release publiée : Stable-0.451.0 (2026-11-03,
 versions 0.431 à 0.451 ; plan de commit et de release : [STATUS](../ai/STATUS.md) « Git »). Détail par version : [CHANGELOG.md](../../CHANGELOG.md) ; validé en jeu / à valider : [STATUS](../ai/STATUS.md).
 

@@ -1,7 +1,7 @@
 # État courant (mis à jour 2026-11-03)
 
 VERSION: 0.451.0.0 (dernière release : Stable-0.451.0, publiée le 2026-11-03 par l'agent, à ta demande ; notes : beaucoup de tests en jeu restent à faire) — Verify.ps1 (agent) 823/823, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
-GOAL: fin de la file — commit et release, décisions par lots, tests en jeu (étape h), séance ultracode (g2) ; voir [GOAL](GOAL.md) et « Prochaine action ».
+GOAL: fin de la file — commit et release, décisions par lots, tests en jeu (étape h), g2 sans ultracode ; voir [GOAL](GOAL.md) et « Prochaine action ».
 QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-11-02 : forfait Max, 5 h à 0 %, semaine à 0 % (réinit. jeudi 23:00).
 
 ## Validé en jeu (rapports utilisateur, 2026-10-30/31)
@@ -83,9 +83,16 @@ Restent, dans cet ordre proposé :
    reportées à la fin », lignes « État » des quatre fichiers de propositions (MAP, ITEMS, CRAFT-GATHER, TOOLS).
 3) h) Campagne de tests en jeu guidée de tout le plugin ([TESTING](../project/TESTING.md)), avec l'utilisateur, avec les sondes en
    jeu nécessaires (N-04, N-07, M-09, A-07, R-06, icônes 71141 / 71151, marqueur des mandats, drapeau 60561).
-4) Séance ultracode avec l'utilisateur : g2) R-14 (résistance aux mises à jour), I-05, I-15, A-03 / A-04 (Raphael), N-10, relecture du
+4) g2, sans ultracode (décision de l'utilisateur, 2026-11-03 : trop coûteux, plus de workflows) : R-14 (résistance aux mises à jour), I-05, I-15,
+   A-03 / A-04 (Raphael, DEC-028, [étude](../evidence/0.451-raphael-study.md)), N-10, relecture du
    hook A-14.
 5) Publication D17 à la version 1.0.0, moment fixé par l'auteur (DEC-023).
+Travail déjà payé, à reprendre sans relancer d'agents (fichiers locaux, ignorés par git, sous `checkpoints/`) :
+- `r14-audit-2026-11-03.json` : audit R-14 des 93 fichiers ; 99 constats dont 23 confirmés (aucun plantage parmi eux), 4 réfutés, et 72 non
+  tranchés, dont 68 sans vérification à cause de la limite de session (12 de ces 72 sont classés « plantage », à vérifier d'abord). Relecture des
+  hooks A-14 finie : à garder avec des corrections. La revue de complétude n'a pas tourné.
+- `features-design-2026-11-03.json` : conceptions de I-05, I-15 et N-10 ; I-05 et I-15 relues (à corriger sur quelques points), N-10 sans relecture.
+XIVAPI v2 ne remplace aucune source externe : [preuve](../evidence/0.451-xivapi-v2.md).
 RÈGLE (2026-11-02) : décisions gardées pour la fin, sauf si bloquant ; l'agent applique le choix recommandé et le note.
 
 ## Git (plan du 2026-11-03)

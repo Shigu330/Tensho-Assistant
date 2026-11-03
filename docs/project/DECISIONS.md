@@ -274,3 +274,13 @@ Decision: (1) N-06 : codé depuis les feuilles du jeu (GcArmyExpedition, GcArmyM
 Reason: Choix de l'utilisateur (2026-11-03) ; la règle de réussite de l'escouade est dans les feuilles du jeu ; seules ces deux sources ont une licence compatible.
 Consequences: 0.449 (point 3), 0.450 (point 2), 0.451 (point 1) ; données embarquées avec leur avis de licence, crédits ajoutés ; aucune requête réseau.
 References: docs/evidence/0.448-n06-n14-sources.md, docs/project/G-PROPOSALS.md
+
+DEC-ID: DEC-028
+Timestamp: 2026-11-03 Europe/Brussels (séance ultracode, après Stable-0.451.0)
+Problem: A-03 / A-04 : dépendance native Raphael (licence, build hors ligne de Plogon, taille), et solveur des suggestions pendant la synthèse.
+Evidence: docs/evidence/0.451-raphael-study.md (Raphael.Net 5.0.0 MIT, raphael-rs Apache-2.0, Craftimizer publié sur D17 avec la même version figée par packages.lock.json, raphael_bindings.dll win-x64 566 784 octets).
+Options: Raphael en option ou solveur C# seul ; A-04 avec le solveur Tensho (exact, depuis l'état observé) ou Raphael relancé (approximatif).
+Decision: (1) A-03 : Raphael.Net 5.0.0 ajouté en option, réglage « Solveur : Tensho / Raphael », Tensho par défaut ; chaque macro Raphael rejouée dans CraftSimulation avant d'être proposée ; calcul hors du thread du jeu, annulable, un seul à la fois ; avis MIT et Apache-2.0, crédits. (2) A-04 : suggestions pendant la synthèse avec le solveur C# de Tensho, depuis l'état observé (condition et effets compris), affichage seulement.
+Reason: Choix de l'utilisateur (2026-11-03, séance ultracode).
+Consequences: Ordre de la séance : R-14 et A-14 d'abord, puis I-05, I-15, N-10, A-03 / A-04 ; package vérifié (raphael_bindings.dll dans latest.zip).
+References: docs/evidence/0.451-raphael-study.md, docs/project/G-PROPOSALS.md, GitHub issue #28
