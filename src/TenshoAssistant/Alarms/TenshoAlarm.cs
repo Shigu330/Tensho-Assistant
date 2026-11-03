@@ -30,6 +30,13 @@ public sealed class TenshoAlarm
     public bool Enabled { get; set; } = true;
     // Occurrence already handled (fired or skipped for its weather), so it is not handled twice.
     public DateTimeOffset LastOccurrence { get; set; }
+    // R-12 (0.319): tool that created the alarm (Discord categories; older alarms: Other, the gathering job then decides), whether it
+    // goes to Discord when the webhook is on, and its own Discord message (empty = the template of the settings).
+    public AlarmSource Source { get; set; }
+    // 0.371 (g, M-01): key of the deadline an automatic alarm follows (AutoAlarms); empty for the player's own alarms.
+    public string AutoKey { get; set; } = "";
+    public bool Discord { get; set; } = true;
+    public string DiscordMessage { get; set; } = "";
 }
 
 /// <summary>Settings of the alarm system: default reminder lead, game alarm sound (AlarmSoundEffect 0–5), chat line, silence in duties.</summary>
@@ -40,12 +47,24 @@ public sealed class AlarmSettings
     public bool PlaySound { get; set; } = true;
     public bool Chat { get; set; } = true;
     public bool MuteInDuties { get; set; } = true;
+    // Queue step e (audit 2026-11-02): with MuteInDuties, no [Tensho] chat line in a duty either. Off by default (the line stays, as
+    // before); Discord and the alarms copied into the game are not affected.
+    public bool MuteChatInDuties { get; set; }
     // Also create daily ET alarms in the game's alarm list through « /alarm » (0.205); weather-conditioned ones only on request,
     // the game not checking the weather.
     public bool UseGameAlarms { get; set; }
     public bool GameIncludeWeather { get; set; }
     // Delay between two « /alarm » commands sent to the game (Settings › Advanced, 250–5000 ms).
     public int GameCommandDelayMs { get; set; } = 500;
+    // 0.366 (g, C-10): a chat line and the alarm sound when a duty is ready (Duty Finder pop); off by default.
+    public bool DutyPopAlert { get; set; }
+    // 0.371 (g, M-01): automatic alarms at the ventures' end and the vessels' return (user's choice: on by default).
+    public bool AutoAlarms { get; set; } = true;
+
+    /// <summary>Whether a ringing Tensho alarm plays its sound: not in a duty while MuteInDuties is on.</summary>
+    public bool SoundAllowed(bool inDuty) => PlaySound && !(MuteInDuties && inDuty);
+    /// <summary>Whether it writes its [Tensho] chat line: not in a duty when MuteInDuties and MuteChatInDuties are both on.</summary>
+    public bool ChatAllowed(bool inDuty) => Chat && !(MuteInDuties && MuteChatInDuties && inDuty);
 }
 
 public static class AlarmSchedule
@@ -85,7 +104,9 @@ public static class AlarmSchedule
     public static (AlarmCheck Check, DateTimeOffset Occurrence) Check(TenshoAlarm alarm, DateTimeOffset now, Func<DateTimeOffset, uint?>? weatherAt = null)
     {
         ArgumentNullException.ThrowIfNull(alarm);
-        if (!alarm.Enabled || Next(alarm, now.AddSeconds(-1)) is not { } occurrence || occurrence == alarm.LastOccurrence) return (AlarmCheck.None, default);
+        // 0.331: an occurrence up to 30 s past is still due (with a lead of 0 it rang only within one second, which a long frame or a
+        // loading screen could skip); LastOccurrence keeps it from ringing twice.
+        if (!alarm.Enabled || Next(alarm, now.AddSeconds(-30)) is not { } occurrence || occurrence == alarm.LastOccurrence) return (AlarmCheck.None, default);
         if (occurrence.AddMinutes(-ClampLead(alarm.Repeat, alarm.LeadMinutes)) > now) return (AlarmCheck.None, occurrence);
         if (alarm.Weathers.Count > 0 && (weatherAt?.Invoke(occurrence) is not { } weather || !alarm.Weathers.Contains(weather))) return (AlarmCheck.SkipWeather, occurrence);
         if (alarm.PreviousWeathers.Count > 0 && (weatherAt?.Invoke(occurrence.AddSeconds(-1400)) is not { } previous || !alarm.PreviousWeathers.Contains(previous)))
@@ -109,6 +130,16 @@ public static class AlarmSchedule
     /// (docs/evidence/0.203-gathering-jobs.md).
     /// </summary>
     public static uint JobOf(uint gatheringType, bool fishing) => fishing ? 18u : gatheringType switch { 0 or 1 => 16u, 2 or 3 => 17u, 4 or 5 or 100 => 18u, _ => 0u };
+
+    /// <summary>Job of an alarm: the one stored, else the only job among the item's gathering sources (alarms made before 0.203, or
+    /// by a tool that does not store it); 0 when none or several.</summary>
+    public static uint JobOfAlarm(TenshoAlarm alarm, Func<uint, IReadOnlyList<TenshoAssistant.Gathering.GatheringSource>?> sourcesOf)
+    {
+        ArgumentNullException.ThrowIfNull(alarm);
+        if (alarm.JobId != 0 || alarm.ItemId == 0 || sourcesOf(alarm.ItemId) is not { Count: > 0 } sources) return alarm.JobId;
+        var jobs = sources.Select(source => JobOf(source.TypeId, source.IsFishing)).Where(job => job != 0).Distinct().ToArray();
+        return jobs.Length == 1 ? jobs[0] : 0;
+    }
 
     /// <summary>Adds alarms, skipping one with the same label and timing; false when the list would exceed the maximum.</summary>
     public static bool Add(List<TenshoAlarm> alarms, IEnumerable<TenshoAlarm> added)

@@ -10,6 +10,8 @@ public sealed record CraftMacroExport(IReadOnlyList<CraftMacroPage> Pages,int Ac
 
 public static class CraftMacroExporter
 {
+    /// <summary>A-10 (0.422): Macro Chain's last-line command (its plugin manifest, InternalName « MacroChain »).</summary>
+    public const string MacroChainNext="/nextmacro";
     public static int BaseWait(CraftActionKind action)=>action switch
     {
         CraftActionKind.Veneration or CraftActionKind.Innovation or CraftActionKind.GreatStrides
@@ -18,20 +20,26 @@ public static class CraftMacroExporter
         _=>throw new ArgumentOutOfRangeException(nameof(action))
     };
 
-    public static CraftMacroExport Build(CraftSimulationResult simulation,uint job,CraftActionCatalog catalog,int extraWait=0,bool echo=true,bool chain=false)
+    /// <summary>X-12 (0.419): the wait of an action line — its base wait plus the extra wait of actions, or of buffs (2-second actions)
+    /// when buffExtraWait is set; unset, buffs take the actions' extra wait as before.</summary>
+    public static int Wait(CraftActionKind action,int extraWait,int? buffExtraWait)
+        =>BaseWait(action)+(BaseWait(action)==2 && buffExtraWait is { } buff ? buff:extraWait);
+
+    /// <param name="macroChain">A-10 (0.422): Caraxi's Macro Chain plugin is loaded: pages end with its « /nextmacro » instead of Tensho's marker.</param>
+    public static CraftMacroExport Build(CraftSimulationResult simulation,uint job,CraftActionCatalog catalog,int extraWait=0,bool echo=true,bool chain=false,int? buffExtraWait=null,bool macroChain=false)
     {
         ArgumentNullException.ThrowIfNull(simulation); ArgumentNullException.ThrowIfNull(catalog);
-        if(extraWait is <0 or >3 || job is <8 or >15) throw new ArgumentOutOfRangeException(nameof(extraWait));
+        if(extraWait is <0 or >3 || buffExtraWait is <0 or >3 || job is <8 or >15) throw new ArgumentOutOfRangeException(nameof(extraWait));
         if(simulation.Final.Finish!=CraftFinish.Completed || simulation.Error is not null || simulation.InvalidAction is not null || simulation.Steps.Count is <1 or >100)
-            throw new ArgumentException("Terminez une simulation valide avant l'export.",nameof(simulation));
+            throw new ArgumentException("Finish a valid simulation before exporting.",nameof(simulation));
         var lines=new List<string>(); var seconds=0;
         foreach(var step in simulation.Steps)
         {
-            var action=catalog.Find(job,step.Action) ?? throw new ArgumentException("Métadonnées de l'action indisponibles.",nameof(catalog));
+            var action=catalog.Find(job,step.Action) ?? throw new ArgumentException("Action metadata unavailable.",nameof(catalog));
             var name=action.Name;
             if(string.IsNullOrWhiteSpace(name) || name.Length>128 || name.Any(character=>char.IsControl(character) || character is '"' or '\u2028' or '\u2029'))
-                throw new ArgumentException("Nom natif incompatible avec une ligne de macro.",nameof(catalog));
-            var wait=BaseWait(step.Action)+extraWait;
+                throw new ArgumentException("Native name incompatible with a macro line.",nameof(catalog));
+            var wait=Wait(step.Action,extraWait,buffExtraWait);
             lines.Add($"/ac \"{name}\" <wait.{wait.ToString(CultureInfo.InvariantCulture)}>"); seconds+=wait;
         }
         // Tensho Macro Chain (0.196): the last line of every page is the marker « /tenshonext » (Macros/MacroChainService.cs).
@@ -40,7 +48,7 @@ public static class CraftMacroExporter
         {
             var page=chunks[index].ToList();
             if(echo) page.Add($"/echo Tensho {index+1}/{chunks.Length} <se.1>");
-            if(chain) page.Add(TenshoAssistant.Macros.MacroDefinition.Marker);
+            if(chain) page.Add(macroChain ? MacroChainNext : TenshoAssistant.Macros.MacroDefinition.Marker);
             pages.Add(new(index+1,Array.AsReadOnly(page.ToArray())));
         }
         return new(Array.AsReadOnly(pages.ToArray()),lines.Count,seconds,Math.Max(0,simulation.PlannedActions-simulation.Steps.Count));

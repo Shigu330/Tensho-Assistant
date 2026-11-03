@@ -6,6 +6,10 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Duty loot page (Duty Loot Preview-like): duties from the game sheets (InstanceContent → ContentFinderCondition), searched by name and
+// category; the selected duty's loot fetched from Garland Tools only on « Fetch » (Duties/DutyLootService: one request at a time,
+// cached) and merged with LuminaSupplemental (MainWindow.Lumina.cs); items filtered by origin (rewards, fight coffers, zone coffers), by
+// kind and « not obtained only » (MainWindow.LootFilters.cs), each an ItemCell with the item tooltip and tools menu (0.252).
 internal sealed partial class MainWindow
 {
     private string dutyQuery = "";
@@ -23,7 +27,16 @@ internal sealed partial class MainWindow
     private string dutyViewItemQuery = "";
     private int dutyViewSourceFilter = -1;
     private int dutyViewLanguageRevision=-1;
+    // 0.331: collections state the list was filtered with (« not obtained only » depends on it, as in the Duty Finder panel since 0.326).
+    private object? dutyViewCollections;
     private (uint Id, string Name, DutyLootEntry[] Sources)[] dutyItemMatches = [];
+    // g, C-01 (0.355): unlocked / completed status of each duty (Duties/DutyProgressReader), « not completed » filters.
+    internal Func<DutyProgressState?>? DutyProgressSource { get; set; }
+    internal Func<bool>? DutyProgressUnavailable { get; set; }
+    private DutyProgressFilter dutyProgressFilter;
+    private object? dutyViewProgress;
+    private DutyProgressFilter dutyViewProgressFilter;
+    private (int Completed,int Known) dutyProgressCount;
 
     private void DrawDutyLoot()
     {
@@ -39,6 +52,7 @@ internal sealed partial class MainWindow
         if (dutyLoot.State.Duty is not null && ImGui.SmallButton(localization.Get("DutyUi.Selected"))) showDutyDetails = true;
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##DutySearch",localization.Get("DutyUi.Search"),ref dutyQuery,128);
+        Tip("DutyUi.SearchTip");
         if (!ReferenceEquals(dutyViewCatalog,catalog))
             dutyCategories = catalog.Entries.Select(duty => duty.Category).Where(name => !string.IsNullOrWhiteSpace(name))
                 .Distinct(StringComparer.Ordinal).OrderBy(name => name,StringComparer.CurrentCultureIgnoreCase).ToArray();
@@ -53,20 +67,47 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.EndCombo(); }
         }
-        if (!ReferenceEquals(dutyViewCatalog,catalog) || dutyViewQuery != dutyQuery || dutyViewCategory != dutyCategory)
+        Tip("DutyUi.CategoryTip");
+        var progress = DutyProgressSource?.Invoke();
+        // Without a status read the filter does nothing (unknown is never « not completed »).
+        var progressFilter = progress is null ? DutyProgressFilter.All : dutyProgressFilter;
+        ImGui.SameLine(); ImGui.SetNextItemWidth(240);
+        ImGui.BeginDisabled(progress is null);
+        try
+        {
+            if (ImGui.BeginCombo(localization.Get("DutyProgress.Filter"),localization.Get("DutyProgress.Filter" + dutyProgressFilter)))
+            {
+                try
+                {
+                    foreach (var filter in Enum.GetValues<DutyProgressFilter>())
+                        if (ImGui.Selectable(localization.Get("DutyProgress.Filter" + filter),dutyProgressFilter == filter)) dutyProgressFilter = filter;
+                }
+                finally { ImGui.EndCombo(); }
+            }
+            Tip("DutyProgress.FilterTip");
+        }
+        finally { ImGui.EndDisabled(); }
+        if (!ReferenceEquals(dutyViewCatalog,catalog) || dutyViewQuery != dutyQuery || dutyViewCategory != dutyCategory
+            || !ReferenceEquals(dutyViewProgress,progress) || dutyViewProgressFilter != progressFilter)
         {
             var query = dutyQuery.Trim();
             dutyMatches = catalog.Entries.Where(duty => (dutyCategory.Length == 0 || duty.Category == dutyCategory)
                 && (query.Length == 0 || duty.Name.Contains(query,StringComparison.CurrentCultureIgnoreCase)
-                    || duty.DutyId.ToString(CultureInfo.InvariantCulture) == query)).ToArray();
-            dutyViewCatalog = catalog; dutyViewQuery = dutyQuery; dutyViewCategory = dutyCategory;
+                    || duty.DutyId.ToString(CultureInfo.InvariantCulture) == query)
+                && DutyProgress.Matches(progressFilter,progress?.Of(duty.InstanceId))).ToArray();
+            dutyProgressCount = progress is null ? default : DutyProgress.Count(catalog.Entries.Where(duty => dutyCategory.Length == 0 || duty.Category == dutyCategory),progress);
+            dutyViewCatalog = catalog; dutyViewQuery = dutyQuery; dutyViewCategory = dutyCategory; dutyViewProgress = progress; dutyViewProgressFilter = progressFilter;
         }
         ImGui.TextDisabled(localization.Format("DutyCounts.Duties",dutyMatches.Length));
-        if (!ImGui.BeginTable("DutyCatalog",3,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp)) return;
+        ImGui.SameLine();
+        if (progress is not null) ImGui.TextDisabled(localization.Format("DutyProgress.Count",dutyProgressCount.Completed,dutyProgressCount.Known));
+        else ImGui.TextDisabled(localization.Get(DutyProgressUnavailable?.Invoke() == true ? "DutyProgress.Unavailable" : "DutyProgress.Unknown"));
+        if (!ImGui.BeginTable("DutyCatalog",4,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp)) return;
         try
         {
             ImGui.TableSetupColumn(localization.Get("DutyUi.Duty"),ImGuiTableColumnFlags.WidthStretch,3);
-            ImGui.TableSetupColumn(localization.Get("DutyUi.Type")); ImGui.TableSetupColumn(localization.Get("DutyUi.Level")); ImGui.TableHeadersRow();
+            ImGui.TableSetupColumn(localization.Get("DutyUi.Type")); ImGui.TableSetupColumn(localization.Get("DutyUi.Level"));
+            ImGui.TableSetupColumn(localization.Get("DutyProgress.Column")); ImGui.TableHeadersRow();
             var clipper = ImGui.ImGuiListClipper();
             try
             {
@@ -83,6 +124,7 @@ internal sealed partial class MainWindow
                     if (developerMode && ImGui.IsItemHovered()) WrappedTooltip($"Duty {duty.DutyId} · instance {duty.InstanceId} · territory {duty.TerritoryId}");
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(duty.Category);
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(duty.Level.ToString(CultureInfo.InvariantCulture));
+                    ImGui.TableNextColumn(); DrawDutyStatus(progress?.Of(duty.InstanceId));
                 }
             }
             finally { clipper.End(); clipper.Destroy(); }
@@ -97,21 +139,24 @@ internal sealed partial class MainWindow
         DrawItemIcon(new ItemDefinition(0,duty.Name,false,duty.Icon),new Vector2(32)); ImGui.SameLine();
         ImGui.TextColored(Accent,duty.Name);
         ImGui.TextDisabled(localization.Format("DutyCounts.Level",duty.Category,duty.Level));
-        if(developerMode)ImGui.TextDisabled($"Duty {duty.DutyId} / instance {duty.InstanceId}");
+        ImGui.SameLine(); DrawDutyStatus(DutyProgressSource?.Invoke()?.Of(duty.InstanceId));
+        if(developerMode)ImGui.TextDisabled(localization.Format("DevMode.DutyInstance",duty.DutyId,duty.InstanceId));
         if (state.Loading)
         { if (ImGui.Button(localization.Get("DutyUi.Cancel"))) dutyLoot.Cancel(); ImGui.SameLine(); ImGui.TextDisabled(localization.Get("DutyUi.Loading")); }
         else
         {
             if (ImGui.Button(localization.Get("DutyUi.Fetch"))) _ = dutyLoot.RequestAsync();
             if (state.Document is not null)
-            { ImGui.SameLine(); if (ImGui.Button(localization.Get("DutyUi.Refresh"))) _ = dutyLoot.RequestAsync(true); }
+            { ImGui.SameLine(); if (SourceButton(localization.Get("DutyUi.Refresh"),configuration.CommunityGarland)) _ = dutyLoot.RequestAsync(true); }
         }
         if (state.Error is { } error) DrawDataError(error,"ServiceErrors.Duty");
         ImGui.TextWrapped(localization.Get("DutyUi.Source"));
         if (DutyDocument(state) is not { } document)
         { ImGui.TextDisabled(localization.Get("DutyUi.NeedFetch")); return; }
-        ImGui.TextDisabled(localization.Format("DutyCounts.Fetched",document.FetchedAt.ToLocalTime().ToString("g")));
-        DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,document.FetchedAt);
+        // 0.331: date and cache stamp of the Garland document only (a LuminaSupplemental-only merge was dated « now », nothing being fetched).
+        if (state.Document is { } fetched)
+        { ImGui.TextDisabled(localization.Format("DutyCounts.Fetched",fetched.FetchedAt.ToLocalTime().ToString("g"))); DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,fetched.FetchedAt); }
+        else ImGui.TextDisabled(localization.Get("DutyFinder.Lumina"));
         if (!document.HasRewards || !document.HasFights || !document.HasCoffers)
             ImGui.TextWrapped(localization.Get("DutyUi.Partial"));
         if (document.HasUnparsedFightDrops)
@@ -125,17 +170,20 @@ internal sealed partial class MainWindow
         }
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##DutyItemSearch",localization.Get("DutyUi.ItemQuery"),ref dutyItemQuery,128);
+        Tip("DutyUi.ItemQueryTip");
         var labels = new[] { localization.Get("DutyUi.AllSources"), localization.Get("DutyUi.Rewards"), localization.Get("DutyUi.FightCoffers"), localization.Get("DutyUi.ZoneCoffers") };
         for (var index = 0; index < labels.Length; index++)
         {
             if (index > 0) ImGui.SameLine();
             if (ImGui.RadioButton(labels[index],dutySourceFilter == index)) dutySourceFilter = index;
+            Tip("DutyUi.SourceFilterTip");
         }
         DrawLootKindFilter("DutyLoot");
         var items = itemCatalog.State.Catalog;
         if (dutyViewLootKind != lootKind || dutyViewLootMissing != lootMissingOnly) { dutyViewDocument = null; dutyViewLootKind = lootKind; dutyViewLootMissing = lootMissingOnly; }
         if (!ReferenceEquals(dutyViewDocument,document) || !ReferenceEquals(dutyViewItems,items)
-            || dutyViewItemQuery != dutyItemQuery || dutyViewSourceFilter != dutySourceFilter || dutyViewLanguageRevision!=localization.Revision)
+            || dutyViewItemQuery != dutyItemQuery || dutyViewSourceFilter != dutySourceFilter || dutyViewLanguageRevision!=localization.Revision
+            || (lootMissingOnly && !ReferenceEquals(dutyViewCollections,collections.State)))
         {
             var query = dutyItemQuery.Trim();
             dutyItemMatches = document.Entries.Where(entry => dutySourceFilter == 0 || (int)entry.Kind == dutySourceFilter-1)
@@ -145,7 +193,7 @@ internal sealed partial class MainWindow
                     || item.Id.ToString(CultureInfo.InvariantCulture) == query)
                 .OrderBy(item => item.Name,StringComparer.CurrentCultureIgnoreCase).ThenBy(item => item.Id).ToArray();
             dutyViewDocument = document; dutyViewItems = items; dutyViewItemQuery = dutyItemQuery; dutyViewSourceFilter = dutySourceFilter;
-            dutyViewLanguageRevision=localization.Revision;
+            dutyViewLanguageRevision=localization.Revision; dutyViewCollections=collections.State;
         }
         ImGui.TextDisabled(localization.Format("DutyCounts.Items",dutyItemMatches.Length));
         if (dutyItemMatches.Length == 0) { ImGui.TextWrapped(localization.Get("DutyUi.Empty")); return; }
@@ -164,18 +212,13 @@ internal sealed partial class MainWindow
                     var item = dutyItemMatches[index];
                     var local = items?.Find(item.Id);
                     ImGui.TableNextRow(); ImGui.TableNextColumn();
-                    DrawItemIcon(local,new Vector2(28)); var clicked = ImGui.IsItemClicked(); DrawCollectionMark(local); ImGui.SameLine();
-                    var selectable = local is not null && item.Id <= int.MaxValue;
-                    ImGui.BeginDisabled(!selectable);
-                    try
+                    // 0.186: full item tooltip and right click = links to the other tools (ItemCell since 0.252).
+                    if (local is not null && item.Id <= int.MaxValue) ItemCell(local,item.Id,28,item.Name);
+                    else
                     {
-                        if ((ImGui.Selectable($"{item.Name}##DutyLoot{item.Id}",itemId == item.Id,ImGuiSelectableFlags.None,new Vector2(0,28)) || clicked) && selectable)
-                            SelectItem(item.Id);
+                        DrawItemIcon(local,new Vector2(28)); ImGui.SameLine(); ImGui.TextDisabled(item.Name);
+                        if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("UiFragments.MissingItem"));
                     }
-                    finally { ImGui.EndDisabled(); }
-                    // 0.186: full item tooltip and right click = links to the other tools.
-                    if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) { if (selectable) DrawItemInfoTooltip(item.Id); else WrappedTooltip(localization.Get("UiFragments.MissingItem")); }
-                    ItemLinksMenu($"DutyLootLinks{item.Id}",local);
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted(item.Sources.Length == 1 ? DutySourceLabel(item.Sources[0]) : $"{item.Sources.Length} sources");
                     if (ImGui.IsItemHovered())
@@ -192,4 +235,15 @@ internal sealed partial class MainWindow
         DutyLootSourceKind.FightCoffer => localization.Format("DutyCounts.Fight",entry.SourceIndex+1) + (string.IsNullOrWhiteSpace(entry.SourceName) ? "" : $" · {entry.SourceName}"),
         _ => localization.Format("DutyCounts.Coffer",entry.SourceIndex+1)
     };
+
+    private void DrawDutyStatus(DutyStatus? status)
+    {
+        switch (status)
+        {
+            case DutyStatus.Completed: ImGui.TextColored(Success,localization.Get("DutyProgress.Completed")); break;
+            case DutyStatus.Unlocked: ImGui.TextColored(Accent,localization.Get("DutyProgress.Unlocked")); break;
+            case DutyStatus.Locked: ImGui.TextDisabled(localization.Get("DutyProgress.Locked")); break;
+            default: ImGui.TextDisabled("—"); break;
+        }
+    }
 }

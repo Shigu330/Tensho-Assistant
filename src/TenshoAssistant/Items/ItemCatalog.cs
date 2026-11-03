@@ -83,6 +83,27 @@ public sealed class ItemCatalog
     public IReadOnlyList<ItemDefinition> ForMount(uint mountId)=>byMount.GetValueOrDefault(mountId) ?? [];
     public IReadOnlyList<ItemDefinition> ForCompanion(uint companionId)=>byCompanion.GetValueOrDefault(companionId) ?? [];
 
+    /// <summary>
+    /// 0.353 (g, I-12): search by name (all words, any order) and by filters together; with filters, an empty name lists every item
+    /// they keep. At most <paramref name="limit"/> results (1 to 100), in the catalogue's order.
+    /// </summary>
+    public IReadOnlyList<ItemDefinition> Search(string query, int limit, ItemSearchFilter filter)
+    {
+        ArgumentNullException.ThrowIfNull(query); ArgumentNullException.ThrowIfNull(filter);
+        if (filter.IsEmpty) return Search(query, limit);
+        if (limit is < 1 or > 100) throw new ArgumentOutOfRangeException(nameof(limit));
+        if (query.Length > 128) return [];
+        var tokens = Normalize(query.Trim()).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var results = new List<ItemDefinition>(limit);
+        foreach (var entry in searchable)
+        {
+            if (!filter.Matches(entry.Item) || tokens.Length > 0 && !MatchesAll(entry.SearchName, tokens)) continue;
+            results.Add(entry.Item);
+            if (results.Count == limit) break;
+        }
+        return results.AsReadOnly();
+    }
+
     public IReadOnlyList<ItemDefinition> Search(string query, int limit = 30)
     {
         ArgumentNullException.ThrowIfNull(query);

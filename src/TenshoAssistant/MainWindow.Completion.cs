@@ -4,6 +4,9 @@ using TenshoAssistant.Collections;
 
 namespace TenshoAssistant;
 
+// Titles and achievements of the Collections page: the achievement category filter and the detail popup (title forms, prefix or suffix,
+// achievement kind / category / points, reward item as an ItemCell, reward title and the achievements that give a title). Rows from the
+// game sheets with the unlock state Collections/CollectionReader copies; nothing native is read here.
 internal sealed partial class MainWindow
 {
     private bool focusTitleTab,focusAchievementTab,completionDetailsRequested;
@@ -43,7 +46,9 @@ internal sealed partial class MainWindow
         }
         var current=achievementCategories.FirstOrDefault(entry=>entry.Achievement!.CategoryId==achievementCategoryFilter);
         ImGui.SetNextItemWidth(330);
-        if(!ImGui.BeginCombo(localization.Get("CompletionDetails.Category")+"###AchievementCategory",current?.Achievement?.CategoryName ?? localization.Get("OrchestrionDetails.AllCategories")))return;
+        var open=ImGui.BeginCombo(localization.Get("CompletionDetails.Category")+"###AchievementCategory",current?.Achievement?.CategoryName ?? localization.Get("OrchestrionDetails.AllCategories"));
+        Tip("CompletionDetails.CategoryTip");
+        if(!open)return;
         try
         {
             if(ImGui.Selectable(localization.Get("OrchestrionDetails.AllCategories"),achievementCategoryFilter is null))achievementCategoryFilter=null;
@@ -80,20 +85,20 @@ internal sealed partial class MainWindow
                     ImGui.TextWrapped(localization.Format("CompletionDetails.Gender",title.Masculine,title.Feminine));
                     ImGui.TextDisabled(localization.Get(title.IsPrefix ? "CompletionDetails.Prefix":"CompletionDetails.Suffix"));
                     ImGui.TextColored(Accent,localization.Format("CompletionDetails.Related",relatedCompletion.Length));
+                    DrawTitleActions(entry);
                 }
                 if(entry.Achievement is { } achievement)
                 {
                     ImGui.TextDisabled(localization.Format("CompletionDetails.Points",achievement.KindName,achievement.CategoryName,achievement.Points));
                     ImGui.TextWrapped(entry.Description);
+                    DrawAchievementProgress(entry);
                     if(achievement.RewardItemId!=0)
                     {
                         var item=itemCatalog.State.Catalog?.Find(achievement.RewardItemId);
                         if(item is null)ImGui.TextWrapped(localization.Get("CompletionDetails.MissingItem"));
                         else
                         {
-                            DrawItemIcon(item,new Vector2(32));var clicked=ImGui.IsItemClicked();ImGui.SameLine();
-                            clicked|=ImGui.SmallButton(localization.Format("CompletionDetails.Item",item.Name));
-                            if(clicked){SelectItem(item.Id);page=Page.Items;focusStocksTab=true;ImGui.CloseCurrentPopup();}
+                            if(ItemCell(item,item.Id,32,localization.Format("CompletionDetails.Item",item.Name))){page=Page.Items;focusStocksTab=true;ImGui.CloseCurrentPopup();}
                         }
                     }
                     if(achievement.RewardTitleId!=0 && relatedCompletion.Length==0)ImGui.TextWrapped(localization.Get("CompletionDetails.MissingTitle"));

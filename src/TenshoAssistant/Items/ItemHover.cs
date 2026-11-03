@@ -8,7 +8,8 @@ public readonly record struct ItemHoverAnchor(float X,float Y,float Width,float 
 {
     public bool Valid=>float.IsFinite(X) && float.IsFinite(Y) && Width is >=40 and <=4000 && Height is >=20 and <=4000;
 }
-public sealed record ItemHoverState(bool Enabled,ulong Owner,ItemHoverItem? Item,DateTimeOffset? ObservedAt,DateTimeOffset? StableSince,ItemHoverAnchor? Anchor=null)
+// 0.343 (I-01): Stack = quantity of the hovered inventory slot (null when the tooltip is not for one of the player's slots).
+public sealed record ItemHoverState(bool Enabled,ulong Owner,ItemHoverItem? Item,DateTimeOffset? ObservedAt,DateTimeOffset? StableSince,ItemHoverAnchor? Anchor=null,uint? Stack=null)
 {
     public bool Fresh(DateTimeOffset now)=>Enabled && Owner!=0 && Item is not null && ObservedAt is { } date && now>=date && now-date<=TimeSpan.FromSeconds(2);
     public bool Stable(DateTimeOffset now)=>Fresh(now) && StableSince is { } since && now>=since && now-since>=TimeSpan.FromMilliseconds(600);
@@ -35,7 +36,8 @@ public sealed class ItemHoverService : IDisposable
             if(disposed)return;
             var item=enabled && owner!=0 ? Normalize(raw,catalog):null;
             var changed=state.Enabled!=enabled || state.Owner!=owner || state.Item!=item || state.ObservedAt>now;
-            state=new(enabled,enabled ? owner:0,item,item is null ? null:now,item is null ? null:changed ? now:state.StableSince,item is null ? null:state.Anchor);
+            state=new(enabled,enabled ? owner:0,item,item is null ? null:now,item is null ? null:changed ? now:state.StableSince,item is null ? null:state.Anchor,
+                item is null || changed ? null:state.Stack);
         }
     }
     /// <summary>Records where the game's tooltip is drawn; an invalid or hidden tooltip removes the anchor.</summary>
@@ -46,6 +48,16 @@ public sealed class ItemHoverService : IDisposable
             if(disposed)return;
             var value=anchor is { Valid:true } ? anchor:null;
             if(state.Anchor!=value)state=state with{Anchor=value};
+        }
+    }
+    /// <summary>0.343: quantity of the hovered slot, read on the framework thread; null when not one of the player's slots.</summary>
+    public void SetStack(uint? quantity)
+    {
+        lock(gate)
+        {
+            if(disposed)return;
+            var value=quantity is > 0 and <= 999999 ? quantity:null;
+            if(state.Stack!=value)state=state with{Stack=value};
         }
     }
     public void Clear(){lock(gate)if(!disposed)state=new(false,0,null,null,null);}

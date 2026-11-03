@@ -40,7 +40,10 @@ public sealed class FishBiteTimeService : IDisposable
 {
     private const string Family = "teamcraft-bites", Version = "v1";
     private static readonly Uri Endpoint = new("https://gubal.ffxivteamcraft.com/graphql");
-    private readonly HttpClient client = new() { Timeout = TimeSpan.FromSeconds(20) };
+    // 0.321 (review 0.316, point 3): replies read within 1 MiB by BoundedHttp (they were loaded whole, then measured).
+    public const int MaximumBytes = 1024 * 1024;
+    private readonly HttpClient client;
+    private readonly bool ownsClient;
     private readonly CancellationTokenSource cancellation = new();
     private readonly Func<TimeSpan> lifetime;
     private readonly DataCache? cache;
@@ -48,9 +51,16 @@ public sealed class FishBiteTimeService : IDisposable
     private readonly Dictionary<uint, FishBiteSpotState> states = [];
     private readonly Queue<uint> pending = new();
     private Task? worker;
+    // 0.330: true from the worker's start until it finds the queue empty, under the same lock (a spot queued while the finished worker
+    // was still « running » used to start no worker and stay loading).
+    private bool draining;
     public Func<bool>? Enabled { get; set; }
 
-    public FishBiteTimeService(Func<TimeSpan> lifetime, DataCache? cache) { this.lifetime = lifetime; this.cache = cache; }
+    public FishBiteTimeService(Func<TimeSpan> lifetime, DataCache? cache, HttpClient? client = null)
+    {
+        this.lifetime = lifetime; this.cache = cache;
+        ownsClient = client is null; this.client = client ?? new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
+    }
 
     /// <summary>Bite times of every fish of the spot; the first call queues the request.</summary>
     public FishBiteSpotState Get(uint spotId)
@@ -61,7 +71,7 @@ public sealed class FishBiteTimeService : IDisposable
             if (states.TryGetValue(spotId, out var known)) return known;
             var loading = new FishBiteSpotState(null, true, null); states[spotId] = loading;
             pending.Enqueue(spotId);
-            if (worker is null || worker.IsCompleted) worker = Task.Run(DrainAsync);
+            if (!draining || worker is { IsFaulted: true }) { draining = true; worker = Task.Run(DrainAsync); }
             return loading;
         }
     }
@@ -71,7 +81,7 @@ public sealed class FishBiteTimeService : IDisposable
         while (true)
         {
             uint spot;
-            lock (gate) { if (pending.Count == 0 || cancellation.IsCancellationRequested) return; spot = pending.Dequeue(); }
+            lock (gate) { if (pending.Count == 0 || cancellation.IsCancellationRequested) { draining = false; return; } spot = pending.Dequeue(); }
             FishBiteSpotState result;
             try
             {
@@ -79,14 +89,14 @@ public sealed class FishBiteTimeService : IDisposable
                 var cached = cache is null ? null : await cache.ReadAsync<FishBiteCache>(Family, spot.ToString(), Version, token).ConfigureAwait(false);
                 List<int[]> rows;
                 if (cached is not null && DateTimeOffset.UtcNow - cached.RecordedAt <= lifetime()) rows = cached.Value.Rows;
+                // 0.326: Teamcraft turned off while this spot waited: forget it, so it is asked again once the switch is back on.
+                else if (Enabled?.Invoke() == false) { lock (gate) states.Remove(spot); continue; }
                 else
                 {
                     var query = "query($spot:Int){biteTimes:bite_time_per_fish_per_spot(where:{spot:{_eq:$spot},flooredBiteTime:{_gt:1,_lt:600},occurences:{_gte:3}}){itemId flooredBiteTime occurences}}";
                     var body = JsonSerializer.Serialize(new { query, variables = new { spot = (int)spot } });
-                    using var response = await client.PostAsync(Endpoint, new StringContent(body, Encoding.UTF8, "application/json"), token).ConfigureAwait(false);
-                    response.EnsureSuccessStatusCode();
-                    var text = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
-                    if (text.Length > 1024 * 1024) throw new InvalidDataException("Bite time response too large.");
+                    var request = new HttpRequestMessage(HttpMethod.Post, Endpoint) { Content = new StringContent(body, Encoding.UTF8, "application/json") };
+                    var text = await BoundedHttp.SendAsync(client, request, MaximumBytes, token).ConfigureAwait(false);
                     using var document = JsonDocument.Parse(text);
                     rows = document.RootElement.GetProperty("data").GetProperty("biteTimes").EnumerateArray().Take(4000)
                         .Select(row => new[] { row.GetProperty("itemId").GetInt32(), row.GetProperty("flooredBiteTime").GetInt32(), row.GetProperty("occurences").GetInt32() })
@@ -95,11 +105,11 @@ public sealed class FishBiteTimeService : IDisposable
                 }
                 result = new(FishBiteTimeSummary.Summarize(rows.Where(row => row.Length == 3 && row[0] > 0).Select(row => ((uint)row[0], row[1], row[2]))), false, null);
             }
-            catch (OperationCanceledException) when (cancellation.IsCancellationRequested) { return; }
+            catch (OperationCanceledException) when (cancellation.IsCancellationRequested) { lock (gate) draining = false; return; }
             catch (Exception error) { result = new(null, false, error.Message); }
             lock (gate) states[spot] = result;
         }
     }
 
-    public void Dispose() { cancellation.Cancel(); cancellation.Dispose(); client.Dispose(); }
+    public void Dispose() { cancellation.Cancel(); cancellation.Dispose(); if (ownsClient) client.Dispose(); }
 }

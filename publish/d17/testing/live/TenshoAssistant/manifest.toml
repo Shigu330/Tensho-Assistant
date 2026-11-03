@@ -4,4 +4,4 @@ repository = "https://github.com/Shigu330/Tensho-Assistant.git"
 commit = "REPLACE_WITH_PUSHED_COMMIT_HASH"
 owners = ["Shigu330"]
 project_path = "src/TenshoAssistant"
-changelog = "First submission: inventory and storage, sorting rules, crafting simulator, gathering and fishing windows, a map replacing the game map, collections with how to obtain items, quests, optional market prices, loot, Fashion Report, Mini Cactpot, Triple Triad, character stats and macro chains."
+changelog = "First submission: items and storage (bags, retainers, saddlebags, armoury, glamour dresser, armoire), sorting rules, market listings and prices, crafting simulator, gathering and fishing windows, a map replacing the game map, weather, alarms and calendar reminders, free company voyages and builds, quests, collections with how to obtain items, a gear planner, loot, Fashion Report, Mini Cactpot, Triple Triad, character stats, macro chains, an optional Discord webhook for alarms (off by default) and a Credits page."

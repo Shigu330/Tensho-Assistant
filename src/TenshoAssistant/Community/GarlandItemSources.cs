@@ -87,6 +87,12 @@ public sealed class GarlandItemSourceService:IDisposable
     public GarlandItemSourceService(GarlandClient garland){this.garland=garland;}
     // Settings › Advanced (0.206): when off, nothing is requested and the source is simply absent.
     public Func<bool>? Enabled { get; set; }
+    /// <summary>What is already known for the item, without requesting anything (null = nothing yet).</summary>
+    public GarlandItemSourceState? Peek(uint itemId)
+    {
+        if(itemId==0 || Enabled?.Invoke()==false)return null;
+        lock(gate)return states.TryGetValue(itemId,out var known) ? known:null;
+    }
     public GarlandItemSourceState Get(uint itemId)
     {
         if(itemId==0 || Enabled?.Invoke()==false)return new(null,false,null);
@@ -114,6 +120,8 @@ public sealed class GarlandItemSourceService:IDisposable
                 result=new(list,false,null);
             }
             catch(OperationCanceledException) when(lifetime.IsCancellationRequested){return;}
+            // 0.326: Garland turned off while this item waited: forget it, so it is asked again once the switch is back on.
+            catch(SourceDisabledException){lock(gate){if(!disposed)states.Remove(id);}continue;}
             catch(Exception error){result=new(null,false,error.Message);}
             lock(gate){if(!disposed)states[id]=result;}
         }
@@ -124,7 +132,7 @@ public sealed class GarlandItemSourceService:IDisposable
         for(var attempt=0;;attempt++)
         {
             try{return await garland.ReadDocumentAsync(GarlandResource.Item,id,lifetime.Token).ConfigureAwait(false);}
-            catch(InvalidOperationException) when(attempt<5){await Task.Delay(GarlandClient.RequestInterval,lifetime.Token).ConfigureAwait(false);}
+            catch(InvalidOperationException error) when(error is not SourceDisabledException && attempt<5){await Task.Delay(GarlandClient.RequestInterval,lifetime.Token).ConfigureAwait(false);}
         }
     }
     public void Dispose()

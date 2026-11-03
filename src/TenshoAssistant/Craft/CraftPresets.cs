@@ -10,14 +10,14 @@ public static class CraftPresets
     public static CraftPreset Create(RecipeDefinition recipe,string name,IEnumerable<CraftActionKind> actions)
     {
         var copied=actions.Take(101).ToArray();var preset=new CraftPreset(Guid.NewGuid(),name.Trim(),recipe.RecipeId,recipe.ResultItemId,recipe.CraftTypeId,Array.AsReadOnly(copied),DateTimeOffset.UtcNow);
-        if(!Valid(preset))throw new ArgumentException("Nom de 1–80 caractères et séquence de 1–100 actions reconnues requis.");return preset;
+        if(!Valid(preset))throw new ArgumentException("A name of 1–80 characters and a sequence of 1–100 recognised actions are required.");return preset;
     }
     public static IReadOnlyList<CraftPreset> Add(IReadOnlyList<CraftPreset> source,CraftPreset preset)
     {
-        if(!Valid(preset))throw new ArgumentException("Séquence sauvegardée invalide.");
-        if(source.Count>=Capacity)throw new InvalidOperationException("Limite de 100 séquences sauvegardées.");
+        if(!Valid(preset))throw new ArgumentException("Invalid saved sequence.");
+        if(source.Count>=Capacity)throw new InvalidOperationException("Limit of 100 saved sequences.");
         if(source.Any(row=>row is not null && (row.Id==preset.Id || row.RecipeId==preset.RecipeId && string.Equals(row.Name?.Trim(),preset.Name.Trim(),StringComparison.OrdinalIgnoreCase))))
-            throw new InvalidOperationException("Ce nom existe déjà pour cette recette.");
+            throw new InvalidOperationException("This name already exists for this recipe.");
         return Array.AsReadOnly(source.Append(preset with {Actions=Array.AsReadOnly(preset.Actions.ToArray())}).ToArray());
     }
     public static RecipeDefinition? Resolve(CraftPreset? preset,RecipeCatalog? catalog)=>Valid(preset) ? catalog?.ForResult(preset!.ResultItemId).FirstOrDefault(recipe=>recipe.RecipeId==preset.RecipeId && recipe.CraftTypeId==preset.CraftTypeId):null;

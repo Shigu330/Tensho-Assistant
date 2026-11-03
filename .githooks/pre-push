@@ -1,0 +1,9 @@
+#!/bin/sh
+# Optional local hook (0.323): runs .\scripts\Verify.ps1 before every push and stops the push when it fails.
+# Not active by default. To turn it on, once, from the repository root:  git config core.hooksPath .githooks
+# To turn it off:  git config --unset core.hooksPath
+if command -v pwsh >/dev/null 2>&1; then
+  pwsh -NoProfile -File ./scripts/Verify.ps1
+else
+  powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/Verify.ps1
+fi

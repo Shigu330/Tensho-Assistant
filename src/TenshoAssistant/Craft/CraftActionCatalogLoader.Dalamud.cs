@@ -37,7 +37,7 @@ internal sealed class CraftActionCatalogLoader : IDisposable
                                 12=>canonical.LTW.RowId,13=>canonical.WVR.RowId,14=>canonical.ALC.RowId,_=>canonical.CUL.RowId};
                             var row=crafts.GetRow(id);
                             if(row.ClassJob.RowId!=job || row.ClassJobLevel!=spec.Level || row.Cost!=spec.Cp)
-                                throw new InvalidOperationException($"Action artisanale {id} incompatible avec le modèle.");
+                                throw new InvalidOperationException($"Crafting action {id} incompatible with the model.");
                             copied.Add(new(spec,job,id,row.Name.ExtractText(),row.Icon,row.Description.ExtractText()));
                         }
                     }
@@ -45,7 +45,7 @@ internal sealed class CraftActionCatalogLoader : IDisposable
                     {
                         var row=actions.GetRow(spec.CanonicalId);
                         if(row.ClassJobLevel!=spec.Level || row.PrimaryCostType!=8 || row.PrimaryCostValue!=spec.Cp || row.SecondaryCostType!=0 || row.SecondaryCostValue.RowId!=0)
-                            throw new InvalidOperationException($"Effet artisanal {spec.CanonicalId} incompatible avec le modèle.");
+                            throw new InvalidOperationException($"Crafting effect {spec.CanonicalId} incompatible with the model.");
                         var description=descriptions.GetRow(spec.CanonicalId).Description.ExtractText();
                         for(uint job=8;job<=15;job++) copied.Add(new(spec,job,row.RowId,row.Name.ExtractText(),row.Icon,description));
                     }

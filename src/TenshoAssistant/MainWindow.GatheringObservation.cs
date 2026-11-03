@@ -4,11 +4,14 @@ using TenshoAssistant.Gathering;
 
 namespace TenshoAssistant;
 
+// Gathering node observation (opt-in): the game's Gathering window copied five times a second on the framework thread
+// (Gathering/GatheringObservationReader): attempts, and each slot's item, success, gatherer's boon and quantity; « Prepare » copies job,
+// level, GP and attempts into the GP planning tool. Shown on the Gathering pages.
 internal sealed partial class MainWindow
 {
     private void DrawGatheringObservation()
     {
-        if(!ImGui.CollapsingHeader(localization.Get("GatheringObservation.Title")+"###GatheringObservation"))return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("GatheringObservation.Title")+"###GatheringObservation"))return;
         var state=gatheringObservation.State;var enabled=state.Enabled;
         DrawToolSettingsLink("GatheringObservation");
         if(!enabled)ImGui.TextDisabled(localization.Get("GatheringObservation.Disabled"));
@@ -24,7 +27,7 @@ internal sealed partial class MainWindow
                 GatheringObservationStatus.Error=>"GatheringObservation.Error",
                 _=>"GatheringObservation.Waiting"
             }));
-            if(developerMode && state.Error is { } error)ImGui.TextWrapped(error);
+            if(developerMode && state.Error is { } error)ImGui.TextWrapped(RawMessage(error));
             return;
         }
         var frame=state.Frame!;
@@ -44,11 +47,9 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.PushID(slot.Index);
                     try
                     {
-                        var item=itemCatalog.State.Catalog?.Find(slot.ItemId);DrawItemIcon(item,new Vector2(28));var click=ImGui.IsItemClicked();ImGui.SameLine();
-                        ImGui.BeginDisabled(slot.ItemId==0);
-                        try{click|=ImGui.SmallButton(item?.Name ?? (slot.ItemId==0 ? localization.Get("GatheringObservation.Special"):localization.Format("CraftPresetMessages.Item",slot.ItemId)));}
-                        finally{ImGui.EndDisabled();}
-                        if(click && slot.ItemId!=0)SelectItem(slot.ItemId);
+                        var item=itemCatalog.State.Catalog?.Find(slot.ItemId);
+                        if(slot.ItemId==0)ImGui.TextDisabled(localization.Get("GatheringObservation.Special"));
+                        else ItemCell(item,slot.ItemId,28,item is null ? localization.Format("CraftPresetMessages.Item",slot.ItemId):null);
                         ImGui.TableNextColumn();ImGui.TextUnformatted(slot.SuccessPercent is { } success ? $"{success} %":localization.Get("GatheringObservation.Unknown"));
                         ImGui.TableNextColumn();ImGui.TextUnformatted(slot.BoonPercent is { } boon ? $"{boon} %":localization.Get("GatheringObservation.Unknown"));
                         ImGui.TableNextColumn();ImGui.TextUnformatted(slot.DisplayedQuantity?.ToString() ?? localization.Get("GatheringObservation.Unknown"));

@@ -24,8 +24,8 @@ public static class TriadMatchSimulator
         CancellationToken cancellation = default)
     {
         ArgumentNullException.ThrowIfNull(deck); ArgumentNullException.ThrowIfNull(npcFixed); ArgumentNullException.ThrowIfNull(npcVariable);
-        if (deck.Count != 5 || deck.Select(card => card.Id).Distinct().Count() != 5) throw new ArgumentException("Le deck doit contenir cinq cartes distinctes.", nameof(deck));
-        if (npcFixed.Count + npcVariable.Count < 5) throw new ArgumentException("Deck du PNJ incomplet.");
+        if (deck.Count != 5 || deck.Select(card => card.Id).Distinct().Count() != 5) throw new ArgumentException("The deck must hold five distinct cards.", nameof(deck));
+        if (npcFixed.Count + npcVariable.Count < 5) throw new ArgumentException("NPC deck incomplete.");
         if (games is < 1 or > 100_000 || depth is < 1 or > 3) throw new ArgumentOutOfRangeException(nameof(games));
         rules &= ~TriadRules.Order;
         var random = new Random(seed);

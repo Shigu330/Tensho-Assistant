@@ -4,7 +4,8 @@ using TenshoAssistant.Inventory;
 namespace TenshoAssistant.Craft;
 
 public sealed record CraftChainInput(ulong CharacterId, uint ContextItemId, RecipeDefinition Recipe, int Requested,
-    RecipeCatalog Catalog, InventorySnapshot? Live, BankState Bank, IReadOnlyDictionary<uint, uint>? RecipeChoices = null, int ChoiceRevision = 0);
+    RecipeCatalog Catalog, InventorySnapshot? Live, BankState Bank, IReadOnlyDictionary<uint, uint>? RecipeChoices = null, int ChoiceRevision = 0,
+    Func<uint, bool>? IsCrystal = null);
 public sealed record CraftChainState(CraftChainInput? Input, CraftChainResult? Result, DateTimeOffset? CalculatedAt, bool Loading, string? Error);
 
 /// <summary>Owns manual calculations and rejects publications after context changes or disposal.</summary>
@@ -35,7 +36,8 @@ public sealed class CraftChainSession : IDisposable
                 try
                 {
                     var result = CraftChain.Build(input.Recipe, input.Requested, input.Catalog,
-                        id => ItemHoldings.Build(id, input.CharacterId, input.Live, input.Bank.Entries, includeCrystals: true), token,
+                        id => ItemHoldings.Build(id, input.CharacterId, input.Live, input.Bank.Entries, includeCrystals: true,
+                            crystal: input.IsCrystal?.Invoke(id) == true), token,
                         recipeChoices: input.RecipeChoices);
                     lock (gate)
                         if (!disposed && ticket == generation)
@@ -45,7 +47,7 @@ public sealed class CraftChainSession : IDisposable
                 {
                     lock (gate)
                         if (!disposed && ticket == generation)
-                            state = new(input, null, null, false, error is OperationCanceledException ? "Calcul annulé." : error.Message);
+                            state = new(input, null, null, false, error is OperationCanceledException ? "Calculation cancelled." : error.Message);
                 }
             });
         }

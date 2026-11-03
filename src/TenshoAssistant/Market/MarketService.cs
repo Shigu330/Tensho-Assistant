@@ -12,6 +12,12 @@ public sealed record MarketState(uint WorldId, string WorldName, uint ItemId, Ma
 }
 public sealed record MarketBackgroundState(uint WorldId, uint ItemId, bool Loading, string? Error, DateTimeOffset? RetryAt = null);
 
+/// <summary>
+/// Universalis prices of one item on the current world (https://universalis.app/api/v2/aggregated/{world}/{item}), for the Market
+/// page (manual), the craft cost lists (preparation) and the item hover panel (background). One request at a time (a manual request
+/// preempts the others, a preparation one preempts the hover), 3 s between requests, 12 s timeout, 1 MB response cap; quotes kept in
+/// memory and on disk (DataCache « market ») for the « Prices » cache duration.
+/// </summary>
 public sealed class MarketService : IDisposable
 {
     private enum Purpose { Manual, Hover, Preparation }
@@ -34,6 +40,9 @@ public sealed class MarketService : IDisposable
     public bool IsFresh(MarketQuote quote,DateTimeOffset now)=>CacheAge.Fresh(quote.FetchedAt,now,CacheLifetime);
     public void ConfigureCache(Func<TimeSpan> lifetime,DataCache store){lock(gate){cacheLifetime=lifetime;disk=store;}}
     public MarketBackgroundState? BackgroundState => Volatile.Read(ref backgroundState);
+    // 0.324: the « Universalis » switch (Settings › Advanced); off = no request for prices, hover or preparation (copies still read).
+    public const string SourceOff = "Universalis" + Community.SourceDisabledException.Suffix;
+    public Func<bool>? Enabled { get; set; }
     public MarketState State => Volatile.Read(ref state);
 
     public MarketService(HttpClient? client = null)
@@ -69,8 +78,8 @@ public sealed class MarketService : IDisposable
     }
     public async Task RequestAsync(uint itemId, bool force = false, bool background = false)
         => _ = await RequestCoreAsync(itemId,force,background ? Purpose.Hover : Purpose.Manual).ConfigureAwait(false);
-    public Task<MarketFetchResult> RequestHoverAsync(uint itemId,ulong character,uint world)
-        => RequestCoreAsync(itemId,false,Purpose.Hover,character,world);
+    public Task<MarketFetchResult> RequestHoverAsync(uint itemId,ulong character,uint world,bool force=false)
+        => RequestCoreAsync(itemId,force,Purpose.Hover,character,world);
 
     public Task<MarketFetchResult> RequestForPreparationAsync(uint itemId, ulong character, uint world, CancellationToken cancellation = default)
         => RequestCoreAsync(itemId,false,Purpose.Preparation,character,world,cancellation);
@@ -83,13 +92,24 @@ public sealed class MarketService : IDisposable
         expectedWorld ??= savedWorld;expectedOwner ??= savedOwner;
         if(!force && savedWorld!=0 && itemId!=0 && disk is { } store && GetCached(savedWorld,itemId) is null)
         {
-            var saved=await store.ReadAsync<MarketQuote>("market",$"{savedWorld}:{itemId}","universalis-aggregated-v2",externalCancellation).ConfigureAwait(false);
+            // 0.343 (I-01): v3 adds velocity, average and region; v2 copies lack them and are fetched again.
+            var saved=await store.ReadAsync<MarketQuote>("market",$"{savedWorld}:{itemId}","universalis-aggregated-v3",externalCancellation).ConfigureAwait(false);
             lock(gate)if(!disposed && owner==savedOwner && state.WorldId==savedWorld && saved?.Value is { } value
                 && value.WorldId==savedWorld && value.ItemId==itemId && value.FetchedAt==saved.RecordedAt && value.Nq is not null && value.Hq is not null)
             {
                 if(cache.Count>=128)cache.Remove(cache.MinBy(pair=>pair.Value.FetchedAt).Key);
                 cache[(savedWorld,itemId)]=value;
             }
+        }
+        if (Enabled?.Invoke() == false)
+        {
+            lock (gate)
+                if (!disposed && purpose == Purpose.Manual && itemId != 0)
+                {
+                    var known = cache.GetValueOrDefault((state.WorldId, itemId));
+                    state = state with { ItemId = itemId, Quote = known, Loading = false, Error = known is null ? SourceOff : null };
+                }
+            return new(MarketFetchStatus.Failed, Error: SourceOff);
         }
         uint world;
         ulong requestOwner;
@@ -118,8 +138,10 @@ public sealed class MarketService : IDisposable
             }
             if (lastRequest is { } last && Stopwatch.GetElapsedTime(last) < TimeSpan.FromSeconds(3))
             {
-                if (purpose == Purpose.Hover) backgroundState = new(world, itemId, false, "Patientez quelques secondes.");
-                else if (purpose == Purpose.Manual) state = state with { ItemId = itemId, Quote = null, Error = "Patientez quelques secondes avant une nouvelle requête." };
+                // 0.329: the 3 s pause is not a failure: the hover panel shows « pending » (the tracker asks again at its next slot, no
+                // error for 5 s) and a manual lookup keeps the quote already known, as a failed read does (0.281).
+                if (purpose == Purpose.Hover) backgroundState = null;
+                else if (purpose == Purpose.Manual) state = state with { ItemId = itemId, Quote = cache.GetValueOrDefault((world, itemId)), Loading = false, Error = "Wait a few seconds before a new request." };
                 return new(MarketFetchStatus.Cooldown,RetryAfter:TimeSpan.FromSeconds(3)-Stopwatch.GetElapsedTime(last));
             }
             lastRequest = Stopwatch.GetTimestamp();
@@ -141,7 +163,7 @@ public sealed class MarketService : IDisposable
                 if (externalCancellation.IsCancellationRequested) { requestActive = false; return new(MarketFetchStatus.Cancelled); }
                 if (!cache.ContainsKey((world,itemId)) && cache.Count >= 128) cache.Remove(cache.MinBy(pair => pair.Value.FetchedAt).Key);
                 cache[(world, itemId)] = quote;
-                if(disk is { } diskStore)_=diskStore.WriteAsync("market",$"{world}:{itemId}","universalis-aggregated-v2",quote,quote.FetchedAt);
+                if(disk is { } diskStore)_=diskStore.WriteAsync("market",$"{world}:{itemId}","universalis-aggregated-v3",quote,quote.FetchedAt);
                 requestActive = false;
                 if (purpose == Purpose.Hover) backgroundState = new(world, itemId, false, null);
                 else if (purpose == Purpose.Manual) state = state with { Quote = quote, Loading = false, Error = null };
@@ -154,9 +176,10 @@ public sealed class MarketService : IDisposable
             {
                 if (disposed || ticket != generation) return Interrupted();
                 requestActive = false;
-                var message = error is OperationCanceledException ? "Requête annulée ou délai dépassé." : $"Lecture des prix impossible : {error.Message}";
+                var message = error is OperationCanceledException ? "Request cancelled or timed out." : $"Prices could not be read: {error.Message}";
                 if (purpose == Purpose.Hover) backgroundState = new(world, itemId, false, message, DateTimeOffset.UtcNow.AddSeconds(30));
-                else if (purpose == Purpose.Manual) state = state with { Loading = false, Quote = null, Error = message };
+                // 0.281: a failed read keeps showing the last known quote (memory or disk cache, even expired) next to the error.
+                else if (purpose == Purpose.Manual) state = state with { Loading = false, Quote = cache.GetValueOrDefault((world, itemId)), Error = message };
                 return new(externalCancellation.IsCancellationRequested ? MarketFetchStatus.Cancelled : MarketFetchStatus.Failed,Error:message);
             }
         }

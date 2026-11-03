@@ -25,7 +25,11 @@ internal sealed class AlarmService : IDisposable
     private readonly Configuration configuration;
     private readonly Action save;
     private readonly Func<WeatherCatalog?> weather;
-    private readonly Action<string> chat;
+    // R-12 (0.414): the ringing alarm goes with its line, so the chat message can carry its map link and item link.
+    private readonly Action<TenshoAlarm,string> chat;
+    // R-12 (0.319): whether a ringing alarm goes to Discord, and the hand-off (queued, posted on the notifier's worker).
+    private readonly Func<TenshoAlarm, bool>? wantsDiscord;
+    private readonly Action<TenshoAlarm, int, DateTimeOffset>? toDiscord;
     private readonly object gate = new();
     private IReadOnlyList<GameAlarm>? gameAlarms;
     private long nextCheck;
@@ -34,6 +38,10 @@ internal sealed class AlarmService : IDisposable
     private readonly Queue<(Guid Id, string Name, string Command)> outgoing = new();
     private long nextSend;
     private string? gameStatus;
+    // 0.331: alarms of this batch not sent because another Tensho alarm holds their game name (« NameTaken » stays shown until the next batch).
+    private int nameTaken;
+    // Last failure of the game alarm copy, logged once per message (framework thread only).
+    private string? gameAlarmsError;
     public string? GameStatus { get { lock (gate) return gameStatus; } }
     public int Pending { get { lock (gate) return outgoing.Count; } }
 
@@ -42,18 +50,21 @@ internal sealed class AlarmService : IDisposable
     {
         var count = 0;
         lock (gate)
+        {
+            if (outgoing.Count == 0) nameTaken = 0;
             foreach (var alarm in alarms)
                 if (GameAlarmCommand.Build(alarm, sound, mute) is { } command && !outgoing.Any(item => item.Id == alarm.Id))
                 { outgoing.Enqueue((alarm.Id, GameAlarmCommand.Name(alarm.Label, alarm.EtMinute), command)); count++; }
+        }
         return count;
     }
     public IReadOnlyList<GameAlarm>? GameAlarms { get { lock (gate) return gameAlarms; } }
 
     public AlarmService(IFramework framework, ICondition condition, IPluginLog log, Configuration configuration, Action save,
-        Func<WeatherCatalog?> weather, Action<string> chat)
+        Func<WeatherCatalog?> weather, Action<TenshoAlarm,string> chat, Func<TenshoAlarm, bool>? wantsDiscord = null, Action<TenshoAlarm, int, DateTimeOffset>? toDiscord = null)
     {
         this.framework = framework; this.condition = condition; this.log = log; this.configuration = configuration; this.save = save;
-        this.weather = weather; this.chat = chat;
+        this.weather = weather; this.chat = chat; this.wantsDiscord = wantsDiscord; this.toDiscord = toDiscord;
         framework.Update += OnUpdate;
     }
 
@@ -107,14 +118,31 @@ internal sealed class AlarmService : IDisposable
                     alarm.Index, (int)alarm.SoundEffect, alarm.Timestamp, (int)alarm.Flags));
             }
             lock (gate) gameAlarms = list.AsReadOnly();
+            gameAlarmsError = null;
         }
-        catch (Exception error) { log.Warning(error, "Game alarms could not be read."); lock (gate) gameAlarms = null; }
+        // 0.331: a lasting failure (after a game update) is logged once per message, not every second.
+        catch (Exception error)
+        {
+            if (gameAlarmsError != error.Message) log.Warning(error, "Game alarms could not be read.");
+            gameAlarmsError = error.Message; lock (gate) gameAlarms = null;
+        }
     }
+
+    // Under the gate: the state after one command of the queue.
+    private string SendState() => nameTaken > 0 ? "NameTaken" : outgoing.Count == 0 ? "Done" : "Sending";
 
     private unsafe void SendNext()
     {
         (Guid Id, string Name, string Command) next;
         lock (gate) { if (outgoing.Count == 0) return; next = outgoing.Dequeue(); }
+        // 0.331: nothing reaches the game for an alarm deleted while its command waited (Tensho would no longer know that game alarm),
+        // nor for one whose game name another Tensho alarm already holds (same start of label, same ET minute): it keeps ringing in Tensho.
+        var owner = configuration.Alarms?.FirstOrDefault(alarm => alarm.Id == next.Id);
+        if (owner is null || configuration.Alarms!.Any(alarm => alarm.Id != next.Id && alarm.GameName == next.Name))
+        {
+            lock (gate) { if (owner is not null) nameTaken++; gameStatus = SendState(); }
+            return;
+        }
         try
         {
             var agent = AgentAlarm.Instance(); var ui = UIModule.Instance();
@@ -130,9 +158,8 @@ internal sealed class AlarmService : IDisposable
                 try { ui->ProcessChatBoxEntry(text); }
                 finally { text->Dtor(true); }
             }
-            var owner = configuration.Alarms?.FirstOrDefault(alarm => alarm.Id == next.Id);
-            if (owner is not null) { owner.GameName = next.Name; save(); }
-            lock (gate) gameStatus = outgoing.Count == 0 ? "Done" : "Sending";
+            owner.GameName = next.Name; save();
+            lock (gate) gameStatus = SendState();
         }
         catch (Exception error) { log.Warning(error, "Game alarm command could not be sent."); lock (gate) { gameStatus = "Failed"; outgoing.Clear(); } }
     }
@@ -146,20 +173,38 @@ internal sealed class AlarmService : IDisposable
         var changed = AlarmSchedule.RemoveExpired(alarms, now) > 0;
         foreach (var alarm in alarms)
         {
-            // Alarms copied into the game ring there (the game's own sound and message), not twice.
-            if (alarm.GameName.Length > 0) continue;
+            // Alarms copied into the game ring there (the game's own sound and message), not twice; only Discord still gets them (R-12).
+            var inGame = alarm.GameName.Length > 0;
+            var discord = toDiscord is not null && (wantsDiscord?.Invoke(alarm) ?? false);
+            if (inGame && !discord) continue;
+            // 0.331: a weather condition is not checked before the weather catalogue is known; the occurrence is left for later, not skipped.
+            if (catalog is null && alarm.Weathers.Count + alarm.PreviousWeathers.Count > 0) continue;
             var (check, occurrence) = AlarmSchedule.Check(alarm, now, time => WeatherAt(catalog, alarm.TerritoryId, time));
             if (check == AlarmCheck.None) continue;
             alarm.LastOccurrence = occurrence; changed = true;
             if (check != AlarmCheck.Fire) continue;
             var minutes = Math.Max(0, (int)Math.Ceiling((occurrence - now).TotalMinutes));
-            if (settings.Chat) chat($"{alarm.Label}|{minutes}|{occurrence.ToLocalTime():HH:mm}");
-            if (settings.PlaySound && !(settings.MuteInDuties && condition[ConditionFlag.BoundByDuty]))
-                try { var agent = AgentAlarm.Instance(); if (agent != null) agent->PlayAlarmSoundEffect((AlarmSoundEffect)Math.Clamp(settings.Sound, 0, 5)); }
-                catch (Exception error) { log.Warning(error, "Game alarm sound could not be played."); }
+            if (!inGame)
+            {
+                // Silence in duties: the sound, and the chat line too with MuteChatInDuties. The duty flag (Dalamud's ICondition, framework
+                // thread) is read only while the silence is on; Discord below and the alarms copied into the game are not affected.
+                var inDuty = settings.MuteInDuties && condition[ConditionFlag.BoundByDuty];
+                if (settings.ChatAllowed(inDuty)) chat(alarm,$"{alarm.Label}|{minutes}|{occurrence.ToLocalTime():HH:mm}");
+                if (settings.SoundAllowed(inDuty)) PlaySound(settings.Sound, log);
+            }
+            if (discord)
+                try { toDiscord!(alarm, minutes, occurrence); }
+                catch (Exception error) { log.Warning("Discord message could not be queued ({Error}).", error.GetType().Name); }
         }
         if (!changed) return;
         try { save(); } catch (Exception error) { log.Warning(error, "Alarm state could not be saved."); }
+    }
+
+    /// <summary>The game's alarm sound (0 to 5), framework thread; shared with the currency alerts (0.344).</summary>
+    public static unsafe void PlaySound(int sound, IPluginLog log)
+    {
+        try { var agent = AgentAlarm.Instance(); if (agent != null) agent->PlayAlarmSoundEffect((AlarmSoundEffect)Math.Clamp(sound, 0, 5)); }
+        catch (Exception error) { log.Warning(error, "Game alarm sound could not be played."); }
     }
 
     public void Dispose() { framework.Update -= OnUpdate; }

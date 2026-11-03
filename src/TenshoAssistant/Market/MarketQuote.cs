@@ -2,11 +2,14 @@ using System.Text.Json;
 
 namespace TenshoAssistant.Market;
 
-public sealed record MarketQualityPrice(decimal? Minimum, decimal? RecentSale, DateTimeOffset? SaleAt);
+// 0.343 (I-01): Average = average sale price, Velocity = sales per day, both on the world (Universalis averageSalePrice / dailySaleVelocity).
+public sealed record MarketQualityPrice(decimal? Minimum, decimal? RecentSale, DateTimeOffset? SaleAt, decimal? Average = null, decimal? Velocity = null);
 // Cheapest listing across the data center of the queried world, with the world that holds it.
 public sealed record MarketListing(decimal Price, uint WorldId, DateTimeOffset? UploadedAt);
+// 0.343 (I-01): NqRegion / HqRegion = cheapest listing of the whole region (Universalis minListing.region), with its world.
 public sealed record MarketQuote(uint WorldId, uint ItemId, DateTimeOffset FetchedAt, DateTimeOffset? UploadedAt,
-    MarketQualityPrice Nq, MarketQualityPrice Hq, MarketListing? NqCheapest = null, MarketListing? HqCheapest = null)
+    MarketQualityPrice Nq, MarketQualityPrice Hq, MarketListing? NqCheapest = null, MarketListing? HqCheapest = null,
+    MarketListing? NqRegion = null, MarketListing? HqRegion = null)
 {
     public bool HasRecentUpload(DateTimeOffset now) => Recent(UploadedAt, now);
     public static bool Recent(DateTimeOffset? uploaded, DateTimeOffset now) => uploaded is { } date
@@ -17,7 +20,7 @@ public sealed record MarketQuote(uint WorldId, uint ItemId, DateTimeOffset Fetch
         using var document = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 32 });
         var root = document.RootElement;
         if (!root.TryGetProperty("results", out var results) || results.ValueKind != JsonValueKind.Array)
-            throw new InvalidDataException("Réponse Universalis invalide.");
+            throw new InvalidDataException("Invalid Universalis response.");
         foreach (var row in results.EnumerateArray())
         {
             if (!row.TryGetProperty("itemId", out var id) || id.GetUInt32() != itemId) continue;
@@ -26,20 +29,22 @@ public sealed record MarketQuote(uint WorldId, uint ItemId, DateTimeOffset Fetch
                 foreach (var time in times.EnumerateArray())
                     if (time.TryGetProperty("worldId", out var world) && world.TryGetUInt32(out var key)) uploads[key] = Timestamp(time, "timestamp");
             return new(worldId, itemId, fetchedAt.ToUniversalTime(), uploads.GetValueOrDefault(worldId), ReadQuality(row, "nq"), ReadQuality(row, "hq"),
-                Cheapest(row, "nq", uploads), Cheapest(row, "hq", uploads));
+                Cheapest(row, "nq", uploads), Cheapest(row, "hq", uploads), Cheapest(row, "nq", uploads, "region"), Cheapest(row, "hq", uploads, "region"));
         }
-        throw new InvalidDataException("Objet non résolu par Universalis pour ce monde.");
+        throw new InvalidDataException("Item not resolved by Universalis for this world.");
     }
     private static MarketQualityPrice ReadQuality(JsonElement row, string quality)
     {
         if (!row.TryGetProperty(quality, out var value)) return new(null, null, null);
         var min = Scope(value, "minListing", "world");
         var sale = Scope(value, "recentPurchase", "world");
-        return new(Price(min), Price(sale), sale is { } entry ? Timestamp(entry, "timestamp") : null);
+        var velocity = Scope(value, "dailySaleVelocity", "world") is { } speed && speed.TryGetProperty("quantity", out var quantity)
+            && quantity.TryGetDecimal(out var perDay) && perDay >= 0 ? perDay : (decimal?)null;
+        return new(Price(min), Price(sale), sale is { } entry ? Timestamp(entry, "timestamp") : null, Price(Scope(value, "averageSalePrice", "world")), velocity);
     }
     // A data-center minimum without an identified world is dropped rather than attributed to the current world.
-    private static MarketListing? Cheapest(JsonElement row, string quality, IReadOnlyDictionary<uint, DateTimeOffset?> uploads)
-        => row.TryGetProperty(quality, out var value) && Scope(value, "minListing", "dc") is { } dc && Price(dc) is { } price
+    private static MarketListing? Cheapest(JsonElement row, string quality, IReadOnlyDictionary<uint, DateTimeOffset?> uploads, string scope = "dc")
+        => row.TryGetProperty(quality, out var value) && Scope(value, "minListing", scope) is { } dc && Price(dc) is { } price
             && dc.TryGetProperty("worldId", out var world) && world.TryGetUInt32(out var worldId) && worldId != 0
             ? new(price, worldId, uploads.GetValueOrDefault(worldId)) : null;
     private static JsonElement? Scope(JsonElement value, string field, string scope) =>

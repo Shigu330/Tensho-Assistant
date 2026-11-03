@@ -7,6 +7,9 @@ namespace TenshoAssistant;
 /// <summary>
 /// Clickable sources (0.178): the « how to obtain » tooltip cannot be clicked, so a right click on a collection entry or an item opens a
 /// menu with one link per known source — NPC vendor (vendor tool, map flag), achievement, quest, recipe, gathering.
+/// Since 0.251 the lines are grouped by kind in hover sub-menus (« Exchanges (12) »…), computed once (SourceLines) and drawn either in
+/// Tensho or in the game's inventory menu (0.256). Shops known only from LuminaSupplemental (ENpcShop / ENpcPlace) are added; Grand
+/// Company seals of another company than the character's are left out (0.296).
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -19,18 +22,24 @@ internal sealed partial class MainWindow
             CollectionKind.Companion=>catalog.ForCompanion(entry.Id),
             CollectionKind.TripleTriad=>catalog.ForTriadCard(entry.Id),
             CollectionKind.Orchestrion=>catalog.ForOrchestrion(entry.Id),
+            // 0.387: the teaching item of the 0.365 kinds, when known.
+            _ when entry.ItemId!=0 && catalog.Find(entry.ItemId) is { } teaching=>[teaching],
             _=>[],
         };
     }
 
     // Right-click menu of a collection row: the source links of its unlocking items.
+    // 0.274: an entry unlocked by a single item (roll, card, mount item…) gets that item's full menu — the same tools and grouped
+    // sources as a right click on the item itself; entries with several unlocking items keep the combined source list.
     private void CollectionSourcesMenu(string id,CollectionEntry entry)
     {
+        var unlocking=UnlockItemsOf(entry);
+        if(unlocking.Count==1){ItemLinksMenu(id,unlocking[0]);return;}
         if(!ImGui.BeginPopupContextItem(id))return;
         try
         {
             ImGui.TextColored(Accent,entry.Name);
-            if(!DrawSourceLinks(UnlockItemsOf(entry)))ImGui.TextDisabled(localization.Get("SourceLinks.None"));
+            if(!DrawSourceLinks(unlocking))ImGui.TextDisabled(localization.Get("SourceLinks.None"));
             ImGui.Separator();
             ImGui.TextDisabled(localization.Get("SourceLinks.WikiNote"));
         }
@@ -42,8 +51,12 @@ internal sealed partial class MainWindow
         line.Heading.Equals("Achievement",StringComparison.OrdinalIgnoreCase) || line.Heading.Equals("Achievements",StringComparison.OrdinalIgnoreCase)
             ? collections.State.Entries.FirstOrDefault(entry=>entry.Kind==CollectionKind.Achievement && entry.Achievement is { EnglishName.Length:>0 } metadata
                 && metadata.EnglishName.Equals(line.Text,StringComparison.OrdinalIgnoreCase)):null;
+    // 0.331: the state filter and the category are reset to the achievement's, which they could hide (as OpenCompletion).
     private void OpenAchievement(CollectionEntry achievement)
-    {page=Page.Collections;collectionKind=CollectionKind.Achievement;focusCollectionKind=CollectionKind.Achievement;focusAchievementTab=true;collectionQuery=achievement.Name;IsOpen=true;}
+    {
+        page=Page.Collections;collectionKind=CollectionKind.Achievement;focusCollectionKind=CollectionKind.Achievement;focusAchievementTab=true;collectionQuery=achievement.Name;
+        collectionFilter=0;achievementCategoryFilter=achievement.Achievement?.CategoryId;IsOpen=true;
+    }
 
     private string VendorPlace(Npcs.NpcVendor vendor)=>vendor.Locations.FirstOrDefault() is { } place ? NpcPlace(place):localization.Get("NpcUi.NoLocation");
     // Vendor line (opens the vendor tool) and, when placed, its map flag sub-link.
@@ -66,114 +79,148 @@ internal sealed partial class MainWindow
                 data.PlaceOf(npc) is { } place ? new Npcs.NpcLocation(place.TerritoryId,place.MapId,maps.State.Catalog?.Find(place.MapId)?.Zone ?? "",place.X,place.Y,0,0,0):null))
             .ToArray();
     }
-    private void DrawLuminaNpcLink(uint itemId,uint npcId,Npcs.NpcLocation? location,string label)
-    {
-        // No vendor-tool entry for these NPCs: the line places the map flag when the position is known.
-        if(ImGui.Selectable(label+$"##SrcLNpc{itemId}/{npcId}") && location is not null && maps.State.Catalog?.Find(location.MapId) is { } map)PlaceFlagFromMapView(map,location.X,location.Y);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(location is null ? "SourceLinks.LuminaNpc":"SourceLinks.LuminaNpcFlag"));
-    }
-
     /// <summary>Menu entries for the sources of these items; false when none is known.</summary>
+    // 0.251 (user request): the sources are grouped by kind, each group a sub-menu that opens on hover (« Échanges (12) »…);
+    // lines with the same text are shown once (the same NPC listed under several ids). Craft and gathering stay one line each.
+    // 0.256: the lines are computed once (SourceLines) and drawn either in Tensho (ImGui) or in the game's inventory menu.
+    private enum SourceGroup { Achievements, Duties, FromItems, Trades, Vendors, Quests, Craft, Gathering }
+    internal sealed record ItemSourceLine(int Group,string Text,Action Open,Action? Flag=null,string? Hint=null);
+
     private bool DrawSourceLinks(IReadOnlyList<ItemDefinition> items)
     {
-        var any=false;
+        var lines=SourceLines(items);
+        var index=0;
+        void Draw(ItemSourceLine line)
+        {
+            index++;
+            if(ImGui.Selectable(line.Text+$"##SrcLine{index}"))line.Open();
+            if(line.Hint is not null && ImGui.IsItemHovered())WrappedTooltip(line.Hint);
+            if(line.Flag is not null && ImGui.Selectable("    "+localization.Get("SourceLinks.Flag")+$"##SrcFlag{index}"))line.Flag();
+        }
+        foreach(var group in lines.GroupBy(line=>(SourceGroup)line.Group).OrderBy(group=>group.Key))
+        {
+            if(group.Key is SourceGroup.Craft or SourceGroup.Gathering){foreach(var line in group)Draw(line);continue;}
+            if(!ImGui.BeginMenu(SourceGroupLabel(group.Key,group)+$"##SrcGroup{group.Key}"))continue;
+            try{foreach(var line in group)Draw(line);}
+            finally{ImGui.EndMenu();}
+        }
+        return lines.Count>0;
+    }
+    // Currency sub-lines are not counted as sources.
+    private string SourceGroupLabel(SourceGroup group,IEnumerable<ItemSourceLine> lines)
+        =>localization.Format("SourceLinks.Group"+group,lines.Count(line=>!line.Text.StartsWith("    ",StringComparison.Ordinal)));
+
+    /// <summary>Sources of one item for the game's inventory menu: (group label, lines); craft and gathering are groups of one line.</summary>
+    internal IReadOnlyList<(string Label,IReadOnlyList<ItemSourceLine> Lines)> SourceMenu(uint id)
+    {
+        if(itemCatalog.State.Catalog?.Find(id) is not { } item)return [];
+        return SourceLines([item]).GroupBy(line=>(SourceGroup)line.Group).OrderBy(group=>group.Key)
+            .Select(group=>(group.Key is SourceGroup.Craft or SourceGroup.Gathering ? group.First().Text:SourceGroupLabel(group.Key,group),(IReadOnlyList<ItemSourceLine>)group.ToArray()))
+            .ToArray();
+    }
+
+    // 0.296 (user request): Grand Company seals (items 20 storm, 21 serpent, 22 flame = 19 + company id, as the vendor loader) of a
+    // company other than the character's are left out of the sources; unknown company (0) = everything shown.
+    internal Func<uint>? PlayerGrandCompany { get; set; }
+    private bool OtherCompanySeal(uint currency)
+        => PlayerGrandCompany?.Invoke() is { } company and >= 1 and <= 3 && currency is 20 or 21 or 22 && currency != 19 + company;
+
+    // 0.359: request=false reads only what the community services already hold (no wiki or Garland request), for the Collections filter.
+    private List<ItemSourceLine> SourceLines(IReadOnlyList<ItemDefinition> items,bool request=true)
+    {
+        var lines=new List<ItemSourceLine>();
+        Community.WikiItemAcquisitionState? Wiki(uint id)=>request ? wikiItems?.Get(id):wikiItems?.Peek(id);
+        Community.GarlandItemSourceState? Garland(uint id)=>request ? itemSources?.Get(id):itemSources?.Peek(id);
+        void Add(SourceGroup group,string text,Action open,Action? flag=null,string? hint=null)
+        {if(!lines.Any(line=>line.Group==(int)group && line.Text==text))lines.Add(new((int)group,text,()=>{open();IsOpen=true;},flag,hint));}
+        Action? FlagAt(Npcs.NpcLocation? place)=>place is not null && maps.State.Catalog?.Find(place.MapId) is { } map ? ()=>PlaceFlagFromMapView(map,place.X,place.Y):null;
+        void Vendor(SourceGroup group,uint itemId,Npcs.NpcVendor vendor,string text)
+            =>Add(group,text,()=>{npcVendorFocus=vendor.NpcId;page=Page.NpcVendors;},FlagAt(vendor.Locations.FirstOrDefault()));
+        // No vendor-tool entry for LuminaSupplemental NPCs: the line places the map flag when the position is known.
+        void LuminaNpc(SourceGroup group,Npcs.NpcLocation? location,string text)
+            =>Add(group,text,FlagAt(location) ?? (()=>{}),null,localization.Get(location is null ? "SourceLinks.LuminaNpc":"SourceLinks.LuminaNpcFlag"));
+        void Currency(uint currencyId,string text)=>Add(SourceGroup.Trades,text,()=>{SelectItem(currencyId);OpenItemSheet();});
         var ids=items.Select(item=>item.Id).ToArray();
         var shownVendors=new HashSet<uint>();
-        foreach(var achievement in collections.State.Entries.Where(entry=>entry.Kind==CollectionKind.Achievement && entry.Achievement is { RewardItemId:not 0 } metadata && ids.Contains(metadata.RewardItemId)).Take(4))
-        {
-            any=true;
-            if(ImGui.Selectable(localization.Format("SourceLinks.Achievement",achievement.Name)+$"##SrcAch{achievement.Id}"))OpenAchievement(achievement);
-        }
+        foreach(var achievement in ids.SelectMany(AchievementsRewardingItem).Distinct().Take(4))
+            Add(SourceGroup.Achievements,localization.Format("SourceLinks.Achievement",achievement.Name),()=>OpenAchievement(achievement));
         // Sources known only from the community data, made clickable when they name something of the game (0.180): an achievement named
         // by the wiki, the currency of a Garland exchange (opens the currency item and its own sources).
         foreach(var item in items.Take(3))
         {
-            foreach(var line in wikiItems?.Get(item.Id).Page?.Lines ?? [])
+            foreach(var line in Wiki(item.Id)?.Page?.Lines ?? [])
                 if(AchievementNamed(line) is { } named)
-                {any=true;if(ImGui.Selectable(localization.Format("SourceLinks.Achievement",named.Name)+$"##SrcWikiAch{item.Id}/{named.Id}"))OpenAchievement(named);}
-            // Duties from LuminaSupplemental (ContentFinderCondition id = DutyId, 0.188), then those named by Garland.
-            foreach(var dutyId in LuminaDutiesOf(item.Id).Take(4))
-                if(duties.State.Catalog?.Find(dutyId) is { } lootDuty)
-                {
-                    any=true;
-                    if(ImGui.Selectable(localization.Format("SourceLinks.Duty",lootDuty.Name)+$"##SrcLumina{item.Id}/{lootDuty.DutyId}"))
-                    {dutyLoot.Select(lootDuty);showDutyDetails=true;dutyItemQuery="";page=Page.DutyLoot;IsOpen=true;}
-                }
-            // Duties named by Garland (« instance », InstanceContent id) open in the duty loot tool (0.181).
-            foreach(var source in (itemSources?.Get(item.Id).List?.Sources ?? []).Where(source=>source.Type=="instance").Take(4))
-                if(duties.State.Catalog?.Entries.FirstOrDefault(duty=>duty.InstanceId==source.Id) is { } duty)
-                {
-                    any=true;
-                    if(ImGui.Selectable(localization.Format("SourceLinks.Duty",duty.Name)+$"##SrcDuty{item.Id}/{duty.DutyId}"))
-                    {dutyLoot.Select(duty);showDutyDetails=true;dutyItemQuery="";page=Page.DutyLoot;IsOpen=true;}
-                }
+                    Add(SourceGroup.Achievements,localization.Format("SourceLinks.Achievement",named.Name),()=>OpenAchievement(named));
+            // Duties from LuminaSupplemental (ContentFinderCondition id = DutyId, 0.188), then those named by Garland (« instance », 0.181).
+            var dutyList=LuminaDutiesOf(item.Id).Take(4).Select(id=>duties.State.Catalog?.Find(id))
+                .Concat((Garland(item.Id)?.List?.Sources ?? []).Where(source=>source.Type=="instance").Take(4)
+                    .Select(source=>duties.State.Catalog?.Entries.FirstOrDefault(duty=>duty.InstanceId==source.Id)));
+            foreach(var duty in dutyList)
+                if(duty is { } lootDuty)
+                    Add(SourceGroup.Duties,localization.Format("SourceLinks.Duty",lootDuty.Name),()=>{dutyLoot.Select(lootDuty);showDutyDetails=true;dutyItemQuery="";page=Page.DutyLoot;});
             // Items the item comes from (LuminaSupplemental ItemSupplement, 0.197): opens the source item and its own sources.
             foreach(var (kind,_,sources) in lumina?.State.Data?.SupplementsOf(item.Id) ?? [])
                 foreach(var source in sources.Take(4))
                 {
-                    any=true;
                     var name=itemCatalog.State.Catalog?.Find(source)?.Name ?? source.ToString();
-                    if(ImGui.Selectable(localization.Format("HoverUi.Supplement"+(kind is >= 1 and <= 19 ? kind:0),name)+$"##SrcSupp{item.Id}/{kind}/{source}")){SelectItem(source);page=Page.Items;IsOpen=true;}
+                    Add(SourceGroup.FromItems,localization.Format("HoverUi.Supplement"+(kind is >= 1 and <= 19 ? kind:0),name),()=>{SelectItem(source);OpenItemSheet();});
                 }
             // Garland exchanges (0.199): the line opens the NPC that sells the item for that currency (game's shops) when one is known, the
             // currency item is a sub-link; with no known NPC the line says so and opens the currency.
             var offers=npcVendors?.State.Catalog?.ForItem(item.Id) ?? [];
-            foreach(var trade in itemSources?.Get(item.Id).List?.Trades ?? [])
+            foreach(var trade in (Garland(item.Id)?.List?.Trades ?? []).Where(trade=>!OtherCompanySeal(trade.CurrencyId)))
             {
-                any=true;
                 var currencyName=itemCatalog.State.Catalog?.Find(trade.CurrencyId)?.Name ?? trade.CurrencyId.ToString();
+                var currencyText="    "+localization.Format("SourceLinks.Currency",currencyName);
                 var sellers=offers.Where(offer=>offer.Sale.Costs.Any(cost=>cost.CurrencyItemId==trade.CurrencyId)).Select(offer=>offer.Vendor).DistinctBy(vendor=>vendor.NpcId).Take(4).ToArray();
                 if(sellers.Length==0 && LuminaSellers(item.Id,trade.CurrencyId) is { Count:>0 } luminaSellers)
                 {
-                    foreach(var (npcId,name,location) in luminaSellers)
-                        DrawLuminaNpcLink(item.Id,npcId,location,localization.Format("SourceLinks.TradeAt",trade.Amount,currencyName,name,location is null ? localization.Get("NpcUi.NoLocation"):NpcPlace(location)));
-                    if(ImGui.Selectable("    "+localization.Format("SourceLinks.Currency",currencyName)+$"##SrcCur{item.Id}/{trade.CurrencyId}")){SelectItem(trade.CurrencyId);page=Page.Items;IsOpen=true;}
+                    foreach(var (_,name,location) in luminaSellers)
+                        LuminaNpc(SourceGroup.Trades,location,localization.Format("SourceLinks.TradeAt",trade.Amount,currencyName,name,location is null ? localization.Get("NpcUi.NoLocation"):NpcPlace(location)));
+                    Currency(trade.CurrencyId,currencyText);
                     continue;
                 }
                 if(sellers.Length==0)
                 {
-                    if(ImGui.Selectable(localization.Format("SourceLinks.TradeNoNpc",trade.Amount,currencyName)+$"##SrcTrade{item.Id}/{trade.CurrencyId}")){SelectItem(trade.CurrencyId);page=Page.Items;IsOpen=true;}
+                    Currency(trade.CurrencyId,localization.Format("SourceLinks.TradeNoNpc",trade.Amount,currencyName));
                     continue;
                 }
                 foreach(var vendor in sellers)
                 {
                     shownVendors.Add(vendor.NpcId);
-                    DrawVendorLink(item.Id,vendor,localization.Format("SourceLinks.TradeAt",trade.Amount,currencyName,NpcName(vendor),VendorPlace(vendor)));
+                    Vendor(SourceGroup.Trades,item.Id,vendor,localization.Format("SourceLinks.TradeAt",trade.Amount,currencyName,NpcName(vendor),VendorPlace(vendor)));
                 }
-                if(ImGui.Selectable("    "+localization.Format("SourceLinks.Currency",currencyName)+$"##SrcCur{item.Id}/{trade.CurrencyId}")){SelectItem(trade.CurrencyId);page=Page.Items;IsOpen=true;}
+                Currency(trade.CurrencyId,currencyText);
             }
         }
         foreach(var item in items.Take(3))
         {
-            foreach(var vendor in (npcVendors?.State.Catalog?.ForItem(item.Id) ?? []).Select(offer=>offer.Vendor).DistinctBy(vendor=>vendor.NpcId).Where(vendor=>!shownVendors.Contains(vendor.NpcId)).Take(6))
-            {
-                any=true;
-                DrawVendorLink(item.Id,vendor,localization.Format("SourceLinks.Vendor",NpcName(vendor),VendorPlace(vendor)));
-            }
+            foreach(var vendor in (npcVendors?.State.Catalog?.ForItem(item.Id) ?? [])
+                .Where(offer=>offer.Sale.Costs.Count==0 || !offer.Sale.Costs.All(cost=>OtherCompanySeal(cost.CurrencyItemId))).Select(offer=>offer.Vendor).DistinctBy(vendor=>vendor.NpcId).Where(vendor=>!shownVendors.Contains(vendor.NpcId)).Take(6))
+                Vendor(SourceGroup.Vendors,item.Id,vendor,localization.Format("SourceLinks.Vendor",NpcName(vendor),VendorPlace(vendor)));
             // Shops without an NPC in the sheets, opened by an NPC known to LuminaSupplemental (ENpcShop, 0.199).
-            if(itemSources?.Get(item.Id).List?.Trades is not { Count:>0 })
+            if(Garland(item.Id)?.List?.Trades is not { Count:>0 })
                 foreach(var (npcId,name,location) in LuminaSellers(item.Id,null).Where(seller=>!shownVendors.Contains(seller.NpcId)))
-                {
-                    any=true;
-                    DrawLuminaNpcLink(item.Id,npcId,location,localization.Format("SourceLinks.Vendor",name,location is null ? localization.Get("NpcUi.NoLocation"):NpcPlace(location)));
-                }
+                    LuminaNpc(SourceGroup.Vendors,location,localization.Format("SourceLinks.Vendor",name,location is null ? localization.Get("NpcUi.NoLocation"):NpcPlace(location)));
             if(quests.State.RewardIndex?.ForItem(item.Id) is { Count:>0 } rewards)
                 foreach(var reward in rewards.Take(4))
-                {
-                    any=true;
-                    if(ImGui.Selectable(localization.Format("SourceLinks.Quest",reward.Name)+$"##SrcQuest{item.Id}/{reward.QuestId}")){page=Page.Quests;SelectQuest(reward.QuestId);IsOpen=true;}
-                }
+                    Add(SourceGroup.Quests,localization.Format("SourceLinks.Quest",reward.Name),()=>{page=Page.Quests;SelectQuest(reward.QuestId);});
             if(recipeCatalog.State.Catalog?.ForResult(item.Id) is { Count:>0 })
             {
-                any=true;
-                if(ImGui.Selectable(localization.Format("SourceLinks.Craft",item.Name)+$"##SrcCraft{item.Id}")){SelectItem(item.Id);page=Page.CraftSimulation;IsOpen=true;}
+                var craftId=item.Id;
+                // 0.423 (user report): the Crafting page opened with no recipe (« choose a recipe »); it now opens the item's recipe on Preparation.
+                Add(SourceGroup.Craft,localization.Format("SourceLinks.Craft",item.Name),()=>
+                {
+                    if(recipeCatalog.State.Catalog?.ForResult(craftId) is { Count:>0 } own)OpenCraftPreparation(PreferredRecipe(own));
+                    else{SelectItem(craftId);page=Page.CraftSimulation;}
+                });
             }
             if(gatheringCatalog.State.Catalog?.ForItem(item.Id) is { Count:>0 } gathered)
             {
-                any=true;
-                if(ImGui.Selectable(localization.Format("SourceLinks.Gathering",gathered[0].TypeName,gathered[0].Zone)+$"##SrcGather{item.Id}")){SelectItem(item.Id);page=Page.Gathering;IsOpen=true;}
+                var gatherId=item.Id;
+                Add(SourceGroup.Gathering,localization.Format("SourceLinks.Gathering",gathered[0].TypeName,gathered[0].Zone),()=>{SelectItem(gatherId);page=Page.Gathering;});
             }
         }
-        return any;
+        return lines;
     }
 }

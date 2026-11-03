@@ -43,9 +43,9 @@ public static class PreparationCost
     {
         ArgumentNullException.ThrowIfNull(chain);
         if (chain.Materials.Count==0 && chain.Observations.Count==0)
-            throw new ArgumentException("Aucune observation ne permet d'établir l'absence de besoins.",nameof(chain));
+            throw new ArgumentException("No observation can establish that there are no needs.",nameof(chain));
         if (chain.Materials.Any(material => material.ItemId == 0 || material.Amount < 1 || !Enum.IsDefined(material.Reason)))
-            throw new ArgumentException("Besoins de chaîne invalides.",nameof(chain));
+            throw new ArgumentException("Invalid chain needs.",nameof(chain));
         var unobserved = chain.Observations.Values.Any(stock => !stock.HasObservation)
             || chain.Materials.Any(material => !chain.Observations.TryGetValue(material.ItemId,out var stock) || !stock.HasObservation);
         var uncertain = chain.HasUnknown || unobserved;
@@ -70,7 +70,7 @@ public static class PreparationCost
         foreach (var material in demands)
         {
             if (material.ItemId == 0 || material.Required < 1 || !seen.Add(material.ItemId) || material.Quantity is < 0 || material.Quantity > material.Required)
-                throw new ArgumentException("Préparation invalide.",nameof(demands));
+                throw new ArgumentException("Invalid preparation.",nameof(demands));
             var unknownStock = material.StockUncertain;
             var cachedStock = material.CachedStock;
             var quantity = material.Quantity;

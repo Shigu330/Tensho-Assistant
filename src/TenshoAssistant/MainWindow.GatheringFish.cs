@@ -7,9 +7,10 @@ using TenshoAssistant.Items;
 namespace TenshoAssistant;
 
 /// <summary>
-/// « How to catch it » for a fish on the Gathering page (0.230), from GatherBuddy first: bait route with mooches, bite and hookset, lure,
-/// snagging, predators, ET window with the next openings, weathers and previous weathers, and the matching alarm (daily ET with the
-/// weather condition), the zone weather and map. Garland stays below as « other sources ».
+/// « How to catch it » for a fish on the Gathering page (0.230), from GatherBuddy first (Apache-2.0, requested once and cached): bait route
+/// with mooches, bite and hookset, lure, snagging, predators, ET window with the next openings, weathers and previous weathers, Teamcraft
+/// bite time at each spot (0.231), and the matching alarm (daily ET with the weather condition), the zone weather and map. Garland stays
+/// below as « other sources ».
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -24,7 +25,7 @@ internal sealed partial class MainWindow
             if(spots.Length>0 && gatherBuddyFish?.State is { Loading:true })ImGui.TextDisabled(localization.Get("FishingPanel.GatherBuddyLoading"));
             return false;
         }
-        if(!ImGui.CollapsingHeader(localization.Get("GatheringFish.Title")+"###GatherBuddyFish",ImGuiTreeNodeFlags.DefaultOpen))return true;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("GatheringFish.Title")+"###GatherBuddyFish",ImGuiTreeNodeFlags.DefaultOpen))return true;
         var items=itemCatalog.State.Catalog;
         // Bait route: bait → mooched fish → … → this fish.
         var route=data.Route(fishId);
@@ -34,10 +35,7 @@ internal sealed partial class MainWindow
             var bait=items?.Find(route[step]);
             if(step>0){ImGui.SameLine();ImGui.TextDisabled("→");ImGui.SameLine();}
             DrawItemIcon(bait,new Vector2(28));
-            var clicked=ImGui.IsItemClicked();
-            if(ImGui.IsItemHovered())DrawItemInfoTooltip(route[step]);
-            ItemLinksMenu($"GbBaitMenu{step}",bait);
-            if(clicked && bait is not null)SelectItem(bait.Id);
+            if(ImGui.IsItemClicked() && bait is not null)SelectItem(bait.Id);
         }
         if(route.Count>0)
         {
@@ -58,6 +56,8 @@ internal sealed partial class MainWindow
         var weathers=weather.State.Catalog;
         if(fish.Transitions.Count>0)ImGui.TextWrapped(localization.Format("FishingPanel.Previous",string.Join(", ",fish.Transitions.Select(id=>weathers?.Weather(id)?.Name ?? id.ToString()))));
         if(fish.Weathers.Count>0)ImGui.TextWrapped(localization.Format("FishingPanel.Weather",string.Join(", ",fish.Weathers.Select(id=>weathers?.Weather(id)?.Name ?? id.ToString()))));
+        // 0.396 (g, R-02): the next real windows (ET hours, weather and previous weather together) of the first spot's zone.
+        if(spots.FirstOrDefault() is { } windowSpot && weathers is not null)DrawFishWindows(fish,weathers,windowSpot.TerritoryId,SelectedItem?.Name ?? fishId.ToString());
         // Links: alarm on every window (with the weather condition), zone weather and map of the first spot, fishing help.
         var spot=spots.FirstOrDefault();
         // Bite time at each spot of the fish (Teamcraft reports, 0.231).
@@ -69,14 +69,7 @@ internal sealed partial class MainWindow
             }
         if(spot is not null)
         {
-            var starts=fish.StartMinute is { } minute ? [minute]:(fish.Weathers.Count+fish.Transitions.Count>0 ? new[]{0,480,960}:[]);
-            if(starts.Length>0)
-            {
-                AlarmButton($"GbFish{fishId}",localization.Format("Alarms.FishTooltip",starts.Length),
-                    ()=>AlarmSchedule.ForWindows(SelectedItem?.Name ?? fishId.ToString(),starts,DefaultAlarmLead,spot.TerritoryId,fishId,fish.Weathers,fish.Transitions)
-                        .Select(created=>{created.JobId=18;return created;}).ToArray());
-                ImGui.SameLine();
-            }
+            if(GatherBuddyFishAlarmButton($"GbFish{fishId}",fish,spot.TerritoryId,SelectedItem?.Name ?? fishId.ToString()))ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("GatheringDetails.ZoneWeather")+"##GbWeather"))OpenWeather(spot.TerritoryId,spot.Zone);
             ImGui.SameLine();
             if(spot.MapId!=0 && ImGui.SmallButton(localization.Get("GatheringDetails.ZoneMap")+"##GbMap"))ShowMapOnTenshoMap(spot.MapId);

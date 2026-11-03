@@ -15,6 +15,9 @@ internal sealed class NativeMapReplacer : IDisposable
     private readonly IFramework framework;private readonly IGameGui gui;private readonly IClientState client;private readonly IPluginLog log;
     private readonly Func<MapViewSettings> settings;private readonly Action<GameMapRequest> open;
     private readonly Func<bool> tenshoOpen;private readonly Action closeTensho;
+    // 0.328 (R-14): whether the Tensho map can draw now (catalogue ready, not hidden in combat or a duty); when it cannot, M keeps
+    // the game map on screen instead of hosting it off screen with no map shown at all.
+    private readonly Func<bool> canShow;
     private bool wasVisible;private bool keepGameMap;private bool disposed;private DateTimeOffset retryAt;
     private int openRequest;private bool bypass;private DateTimeOffset bypassUntil;
     // 0.151: the game map is kept open off screen while the Tensho map shows (as Mappy does) instead of being closed, so the
@@ -23,9 +26,9 @@ internal sealed class NativeMapReplacer : IDisposable
     /// <summary>Opens the game map without replacing it (tool button); done on the next framework tick.</summary>
     public void OpenGameMap()=>Interlocked.Exchange(ref openRequest,1);
     public NativeMapReplacer(IFramework framework,IGameGui gui,IClientState client,Func<MapViewSettings> settings,Action<GameMapRequest> open,
-        Func<bool> tenshoOpen,Action closeTensho,IPluginLog log)
+        Func<bool> tenshoOpen,Func<bool> canShow,Action closeTensho,IPluginLog log)
     {
-        this.framework=framework;this.gui=gui;this.client=client;this.settings=settings;this.open=open;this.tenshoOpen=tenshoOpen;this.closeTensho=closeTensho;this.log=log;
+        this.framework=framework;this.gui=gui;this.client=client;this.settings=settings;this.open=open;this.tenshoOpen=tenshoOpen;this.canShow=canShow;this.closeTensho=closeTensho;this.log=log;
         framework.Update+=Update;
     }
     private unsafe void Update(IFramework _)
@@ -35,19 +38,26 @@ internal sealed class NativeMapReplacer : IDisposable
         try
         {
             var options=settings();
-            if(Interlocked.Exchange(ref openRequest,0)==1)
-            {
-                var agent=AgentMap.Instance();
-                if(agent!=null){bypass=true;bypassUntil=now.AddSeconds(2);agent->Show();}
-            }
-            if(bypass && now>bypassUntil)bypass=false;
             var addon=gui.GetAddonByName("AreaMap");
             var unit=addon.IsNull ? null:(AtkUnitBase*)addon.Address;
             var visible=unit!=null && addon.IsVisible;
+            // 0.328: handled once the addon is read. A hosted game map is brought back on screen and no longer hosted (Show did
+            // nothing on a map already open, and bypass is only read when the map appears); the Tensho map stays open.
+            if(Interlocked.Exchange(ref openRequest,0)==1)
+            {
+                if(hosted && visible){hosted=false;keepGameMap=true;Restore(unit);}
+                else
+                {
+                    var agent=AgentMap.Instance();
+                    if(agent!=null){bypass=true;bypassUntil=now.AddSeconds(2);agent->Show();}
+                }
+            }
+            if(bypass && now>bypassUntil)bypass=false;
             if(visible && !wasVisible)
             {
-                // Decided once, when the game map appears: kept for the whole time it stays open.
-                keepGameMap=!options.ReplaceGameMap || bypass;
+                // Decided once, when the game map appears: kept for the whole time it stays open, and kept too when the Tensho
+                // map cannot draw then (canShow, 0.328).
+                keepGameMap=!options.ReplaceGameMap || bypass || !canShow();
                 bypass=false;
                 if(!keepGameMap)
                 {

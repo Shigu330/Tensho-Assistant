@@ -1,0 +1,24 @@
+name: Translation
+description: Fix or add a translation of Tensho's interface.
+labels: ["translation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The texts live in `src/TenshoAssistant/Localization/Languages/<code>.json`; how to add or check a language is explained in
+        [Localization/README.md](https://github.com/Shigu330/Tensho-Assistant/blob/Devloppement/Localization/README.md).
+        A pull request is welcome too; `.\scripts\Verify.ps1 -TestsOnly` checks the language files without the game.
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      placeholder: de, ja, fr, en…
+    validations:
+      required: true
+  - type: textarea
+    id: texts
+    attributes:
+      label: Texts
+      description: The key (or a screenshot of where the text shows), the current text and your proposal.
+    validations:
+      required: true

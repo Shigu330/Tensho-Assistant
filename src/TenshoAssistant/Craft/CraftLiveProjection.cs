@@ -19,30 +19,30 @@ public static class CraftLiveProjection
         var issues=new List<string>();var rows=new List<CraftActionProjection>();
         CraftProjectionResult Result()=>new(Array.AsReadOnly(rows.ToArray()),Array.AsReadOnly(issues.ToArray()));
         if(!observation.Enabled || observation.Owner==0 || observation.Status!=CraftLiveStatusKind.Observed || observation.Frame is not { } frame || observation.ObservedAt is not { } date
-            || now<date || now-date>TimeSpan.FromSeconds(2)) {issues.Add("Observation absente ou trop ancienne.");return Result();}
+            || now<date || now-date>TimeSpan.FromSeconds(2)) {issues.Add("Observation missing or too old.");return Result();}
         var raw=frame.Raw;
-        if(frame.Animating){issues.Add("Action ou animation en cours.");return Result();}
-        if(frame.Recipe is not { } recipe){issues.Add("Identité de recette non établie.");return Result();}
+        if(frame.Animating){issues.Add("Action or animation in progress.");return Result();}
+        if(frame.Recipe is not { } recipe){issues.Add("Recipe identity not established.");return Result();}
         if(CraftSimulation.Unsupported(recipe) is { } unsupported){issues.Add(unsupported);return Result();}
         // Handler conditions are one-based; Synthesis AtkValues conditions are zero-based.
         if(raw.NumbersNative is not { } native || native.Step is <1 or >101 || native.ResultItemId!=recipe.ResultItemId || native.Condition>3 || raw.Condition!=native.Condition+1 || native.Expert)
-        {issues.Add("Valeurs natives typées absentes, incohérentes ou condition hors des quatre états ordinaires.");return Result();}
+        {issues.Add("Typed native values missing, inconsistent, or condition outside the four ordinary states.");return Result();}
         var condition=(CraftStepCondition)native.Condition;var goodPercent=150;var goodKnown=true;
         if(condition==CraftStepCondition.Good)
         {
             if(raw.Tool is not {ItemId:>0,GoodQualityPercent:150 or 175} tool || tool.JobId!=raw.JobId)
-            {issues.Add("Bonus d'outil favorable inconnu : les gains de qualité concernés restent inconnus, les autres ressources restent projetées.");goodKnown=false;}
+            {issues.Add("Favourable tool bonus unknown: the affected quality gains stay unknown, the other resources are still projected.");goodKnown=false;}
             else goodPercent=tool.GoodQualityPercent!.Value;
         }
         var p=recipe.Simulation!;
         if(native.MaxProgress!=p.Progress || native.MaxQuality!=p.Quality || native.MaxDurability!=p.Durability || frame.Progress!=native.Progress || (frame.Quality!=native.Quality && !(p.Quality==0 && native.Quality==0))
             || frame.Durability!=native.Durability || frame.UiStep!=native.Step || native.Progress>=native.MaxProgress || native.Durability==0)
-        {issues.Add("Ressources affichées, valeurs natives et recette non concordantes ou synthèse terminée.");return Result();}
+        {issues.Add("Displayed resources, native values and recipe do not agree, or synthesis finished.");return Result();}
         var effects=CraftObservedEffects.Decode(frame,catalog);
         if(!effects.CountersKnown){issues.AddRange(effects.Issues);return Result();}
         if(!raw.ActionsComplete || raw.ActionsNative is not { } actions || actions.Count!=CraftActionCatalog.Specs.Count || actions.Select(action=>action.Kind).Distinct().Count()!=CraftActionCatalog.Specs.Count
             || actions.Any(action=>catalog.Find(raw.JobId,action.Kind)?.NativeId!=action.NativeId))
-        {issues.Add("Disponibilité des actions native non établie pour ce métier.");return Result();}
+        {issues.Add("Native action availability not established for this job.");return Result();}
         int Counter(uint id)=>effects.Effects.FirstOrDefault(effect=>effect.Metadata.Id==id)?.Counter ?? 0;
         var protection=effects.Effects.Any(effect=>effect.Metadata.Id==3813);
         CraftSimulationResult initial;
@@ -62,7 +62,7 @@ public static class CraftLiveProjection
                 var next=CraftSimulation.Apply(p,initial.Stats,recipe.Level,initial.BaseProgress,initial.BaseQuality,state,action.Kind,out _,condition,goodPercent);
                 if(next is not null)alternatives.Add(next);
             }
-            if(alternatives.Count==0){issues.Add($"{catalog.Find(raw.JobId,action.Kind)?.Name} : disponible côté client, aucune transition compatible dans le modèle.");continue;}
+            if(alternatives.Count==0){issues.Add($"{catalog.Find(raw.JobId,action.Kind)?.Name}: available client-side, no compatible transition in the model.");continue;}
             CraftRange Range(Func<CraftSimStep,int> value)=>new(alternatives.Min(value),alternatives.Max(value));
             var qualityKnown=goodKnown || p.Quality==0 || !CraftSimulation.IncreasesQuality(action.Kind) || action.Kind==CraftActionKind.TrainedEye;
             rows.Add(new(catalog.Find(raw.JobId,action.Kind)!,Range(step=>step.After.Progress),qualityKnown ? Range(step=>step.After.Quality):null,Range(step=>step.After.Durability),

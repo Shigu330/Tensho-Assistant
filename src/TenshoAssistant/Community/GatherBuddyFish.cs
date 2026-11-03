@@ -9,10 +9,12 @@ namespace TenshoAssistant.Community;
 /// How to catch a fish according to GatherBuddy (Ottermandias/GatherBuddy, Apache-2.0, GatherBuddy.GameData/Data/Fish/Data*.cs), read as
 /// data (0.227): bait items, the fish to mooch from, hookset and bite (« ! » weak, « !! » strong, « !!! » legendary), ET window in minutes,
 /// weathers and previous weathers (Weather sheet ids), lure, predators to catch first (fish, count) and snagging.
+/// R-15 (0.417): spearfishing size and speed (« .Spear(data, SpearfishSize.X, SpearfishSpeed.Y) »), as the game's values
+/// (Gathering/Spearfishing.cs); null when not given or « Unknown ».
 /// </summary>
 public sealed record GatherBuddyFish(uint FishId, IReadOnlyList<uint> Baits, IReadOnlyList<uint> Mooches, string? HookSet, string? Bite,
     int? StartMinute, int? EndMinute, IReadOnlyList<uint> Weathers, IReadOnlyList<uint> Transitions, string? Lure,
-    IReadOnlyList<(uint Fish, int Count)> Predators, bool Snag);
+    IReadOnlyList<(uint Fish, int Count)> Predators, bool Snag, int? SpearSize = null, int? SpearSpeed = null);
 
 public sealed class GatherBuddyFishData
 {
@@ -20,6 +22,8 @@ public sealed class GatherBuddyFishData
     public int Count => fish.Count;
     public GatherBuddyFishData(Dictionary<uint, GatherBuddyFish> fish) { this.fish = fish; }
     public GatherBuddyFish? Find(uint fishId) => fish.GetValueOrDefault(fishId);
+    /// <summary>R-15 (0.417): every fish with a known spearfishing size and speed.</summary>
+    public IEnumerable<GatherBuddyFish> Spearfish => fish.Values.Where(entry => entry.SpearSize is not null && entry.SpearSpeed is not null);
 
     /// <summary>
     /// Bait route before the fish: its bait, or its mooch chain. GatherBuddy writes a mooch either as the whole chain (« Mooch(data, bait,
@@ -58,7 +62,7 @@ public sealed class GatherBuddyFishData
                 if (calls.Count == 0 || calls[0].Name != "Apply" || Numbers(calls[0].Arguments) is not [var id, ..] || id == 0) continue;
                 var baits = new List<uint>(); var mooches = new List<uint>(); var weathers = new List<uint>(); var transitions = new List<uint>();
                 var predators = new List<(uint, int)>();
-                string? hook = null, bite = null, lure = null; int? start = null, stop = null; var snag = false;
+                string? hook = null, bite = null, lure = null; int? start = null, stop = null, spearSize = null, spearSpeed = null; var snag = false;
                 foreach (var (name, arguments) in calls.Skip(1))
                     switch (name)
                     {
@@ -67,17 +71,22 @@ public sealed class GatherBuddyFishData
                         case "Weather": weathers.AddRange(Numbers(arguments)); break;
                         case "Transition": transitions.AddRange(Numbers(arguments)); break;
                         case "Bite":
-                            hook = Word(arguments, "HookSet."); bite = Word(arguments, "BiteType."); break;
+                            // 0.330: only the known values are kept; GatherBuddy writes « Unknown » for fish not yet documented (unknown = null).
+                            hook = (Word(arguments, "HookSet.") is ("Precise" or "Powerful") and var hookSet) ? hookSet : null;
+                            bite = (Word(arguments, "BiteType.") is ("Weak" or "Strong" or "Legendary") and var biteType) ? biteType : null; break;
                         case "Time":
                             if (Numbers(arguments) is [var from, var to, ..]) { start = (int)from; stop = (int)to; }
                             break;
                         case "Lure": lure = Word(arguments, "Lure."); break;
+                        case "Spear":
+                            spearSize = Gathering.Spearfishing.Size(Word(arguments, "SpearfishSize."));
+                            spearSpeed = Gathering.Spearfishing.Speed(Word(arguments, "SpearfishSpeed.")); break;
                         case "Snag": snag = arguments.Contains("Required", StringComparison.Ordinal); break;
                         case "Predators":
                             foreach (var pair in Tuples(arguments)) predators.Add(pair);
                             break;
                     }
-                result[id] = new(id, baits, mooches, hook, bite, start, stop, weathers, transitions, lure, predators, snag);
+                result[id] = new(id, baits, mooches, hook, bite, start, stop, weathers, transitions, lure, predators, snag, spearSize, spearSpeed);
             }
         }
         return new(result);
@@ -145,24 +154,29 @@ public sealed class GatherBuddyFishService : IDisposable
     private const string Family = "gatherbuddy-fish", Version = "main-v1";
     private const string Listing = "https://api.github.com/repos/Ottermandias/GatherBuddy/contents/GatherBuddy.GameData/Data/Fish";
     private const string Raw = "https://raw.githubusercontent.com/Ottermandias/GatherBuddy/main/GatherBuddy.GameData/Data/Fish/";
-    private readonly HttpClient client = new() { Timeout = TimeSpan.FromSeconds(30) };
+    private readonly HttpClient client;
+    private readonly bool ownsClient;
     private readonly CancellationTokenSource cancellation = new();
     private readonly Func<TimeSpan> lifetime;
     private readonly DataCache? cache;
     private GatherBuddyFishState state = new(null, false, null);
     private int started;
+    private long retryAfter;
     public Func<bool>? Enabled { get; set; }
     public GatherBuddyFishState State => Enabled?.Invoke() == false ? new(null, false, null) : Volatile.Read(ref state);
 
-    public GatherBuddyFishService(Func<TimeSpan> lifetime, DataCache? cache)
+    // 0.330: a client can be given (managed tests, as FishBiteTimeService); the service's own keeps its 30 s timeout and User-Agent.
+    public GatherBuddyFishService(Func<TimeSpan> lifetime, DataCache? cache, HttpClient? client = null)
     {
         this.lifetime = lifetime; this.cache = cache;
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("TenshoAssistant");
+        ownsClient = client is null; this.client = client ?? new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+        if (ownsClient) this.client.DefaultRequestHeaders.UserAgent.ParseAdd("TenshoAssistant");
     }
 
     public void Request()
     {
-        if (Enabled?.Invoke() == false || Interlocked.Exchange(ref started, 1) == 1) return;
+        // R-10 (0.246): called from Draw; after a failure, no new attempt for 5 minutes (it used to retry every frame).
+        if (Enabled?.Invoke() == false || Environment.TickCount64 < Volatile.Read(ref retryAfter) || Interlocked.Exchange(ref started, 1) == 1) return;
         Volatile.Write(ref state, new(null, true, null));
         var token = cancellation.Token;
         _ = Task.Run(async () =>
@@ -172,23 +186,44 @@ public sealed class GatherBuddyFishService : IDisposable
                 var cached = cache is null ? null : await cache.ReadAsync<GatherBuddyFishCache>(Family, "all", Version, token).ConfigureAwait(false);
                 string text;
                 if (cached is not null && DateTimeOffset.UtcNow - cached.RecordedAt <= lifetime()) text = cached.Value.Text;
-                else
+                else try
                 {
+                    if (Abandoned()) return;
                     using var document = JsonDocument.Parse(await BoundedHttp.ReadAsync(client, new Uri(Listing), 256 * 1024, token).ConfigureAwait(false));
                     var names = document.RootElement.EnumerateArray().Select(entry => entry.GetProperty("name").GetString() ?? "")
                         .Where(name => name.StartsWith("Data", StringComparison.Ordinal) && name.EndsWith(".cs", StringComparison.Ordinal)).Take(80).ToArray();
                     var parts = new List<string>();
                     foreach (var name in names)
+                    {
+                        if (Abandoned()) return;
                         parts.Add(await BoundedHttp.ReadAsync(client, new Uri(Raw + Uri.EscapeDataString(name)), 512 * 1024, token).ConfigureAwait(false));
+                    }
                     text = string.Join("\n", parts);
                     if (cache is not null) await cache.WriteAsync(Family, "all", Version, new GatherBuddyFishCache(text), DateTimeOffset.UtcNow).ConfigureAwait(false);
                 }
+                // Network down or GitHub refusing: the expired copy is better than nothing (kept until a download succeeds).
+                catch (Exception) when (cached?.Value.Text is { Length: > 0 } && !token.IsCancellationRequested) { text = cached.Value.Text; }
                 Volatile.Write(ref state, new(GatherBuddyFishData.Parse([text]), false, null));
             }
-            catch (OperationCanceledException) { }
-            catch (Exception error) { Volatile.Write(ref state, new(null, false, error.Message)); Interlocked.Exchange(ref started, 0); }
+            // 0.330: only the plugin's own cancellation is silent; an HttpClient timeout (also an OperationCanceledException) is a failure: it
+            // ends the loading state and is retried after the pause, instead of leaving « downloading… » until the plugin reloads.
+            catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+            catch (Exception error)
+            {
+                Volatile.Write(ref state, new(null, false, error.Message));
+                Volatile.Write(ref retryAfter, Environment.TickCount64 + 300_000); Interlocked.Exchange(ref started, 0);
+            }
         }, token);
     }
 
-    public void Dispose() { cancellation.Cancel(); cancellation.Dispose(); client.Dispose(); }
+    // 0.330: GatherBuddy turned off during the download: the next requests are not sent and nothing is written as an error, so the download
+    // is asked again once the switch is back on (as the Garland, wiki and Teamcraft queues since 0.326).
+    private bool Abandoned()
+    {
+        if (Enabled?.Invoke() != false) return false;
+        Volatile.Write(ref state, new(null, false, null)); Interlocked.Exchange(ref started, 0);
+        return true;
+    }
+
+    public void Dispose() { cancellation.Cancel(); cancellation.Dispose(); if (ownsClient) client.Dispose(); }
 }

@@ -21,6 +21,9 @@ public sealed class GarlandClient : IDisposable
     private Func<TimeSpan> cacheLifetime=()=>TimeSpan.FromMinutes(30);
     private DataCache? disk;
     public TimeSpan CacheLifetime=>Volatile.Read(ref cacheLifetime)();
+    // 0.324: the « Garland Tools » switch (Settings › Advanced) now stops every Garland request, item sources, duty and monster loot
+    // alike (it stopped item sources only); copies kept on disk are still read.
+    public Func<bool>? Enabled { get; set; }
     public void ConfigureCache(Func<TimeSpan> lifetime,DataCache store){lock(gate){cacheLifetime=lifetime;disk=store;}}
     public async Task<GarlandResponse> ReadDocumentAsync(GarlandResource resource,ulong id,CancellationToken token,bool force=false)
     {
@@ -28,7 +31,7 @@ public sealed class GarlandClient : IDisposable
         if(!force && disk is { } store)
         {
             var saved=await store.ReadAsync<string>("sources",key,"garland-routes-fr3-en2-v1",token).ConfigureAwait(false);
-            if(saved is not null && CacheAge.Fresh(saved.RecordedAt,clock.GetUtcNow(),CacheLifetime))return new(saved.Value,saved.RecordedAt);
+            if(saved is not null && (CacheAge.Fresh(saved.RecordedAt,clock.GetUtcNow(),CacheLifetime) || Enabled?.Invoke()==false))return new(saved.Value,saved.RecordedAt);
         }
         var json=await ReadAsync(resource,id,token).ConfigureAwait(false);
         return new(json,clock.GetUtcNow());
@@ -57,6 +60,7 @@ public sealed class GarlandClient : IDisposable
         {
             ObjectDisposedException.ThrowIf(disposed,this);
             cancellation.ThrowIfCancellationRequested();
+            if (Enabled?.Invoke() == false) throw new SourceDisabledException("Garland Tools");
             if (lastRequest is { } last && clock.GetElapsedTime(last) < RequestInterval)
                 throw new InvalidOperationException("Patientez trois secondes entre deux consultations Garland Tools.");
             lastRequest = clock.GetTimestamp();

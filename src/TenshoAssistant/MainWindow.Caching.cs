@@ -3,14 +3,17 @@ using TenshoAssistant.Caching;
 
 namespace TenshoAssistant;
 
+// Settings › Data › cache: one duration per cache area (prices, quests, collections, completion, sources, Fashion Report, imported
+// stocks, craft calculations), from five minutes to « Never (on request only) » (0.281), saved in the configuration; and the date stamp
+// (latest or from disk, fresh or expired) other pages show. The disk store (Caching/DataCache.cs) does its I/O off the framework thread.
 internal sealed partial class MainWindow
 {
     private DataCache? dataCacheStore;
     internal void ConfigureDataCache(DataCache store){dataCacheStore=store;craftLogSession.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.CraftCalculations),store);}
-    private static readonly string[] CacheChoiceKeys=["FiveMinutes","OneHour","OneDay","SevenDays"];
+    private static readonly string[] CacheChoiceKeys=["FiveMinutes","OneHour","OneDay","SevenDays","Never"];
     private void DrawCacheSettings()
     {
-        if(!ImGui.CollapsingHeader(localization.Get("CacheUi.Title"),ImGuiTreeNodeFlags.DefaultOpen))return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("CacheUi.Title"),ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextWrapped(localization.Get("CacheUi.Help"));
         foreach(var (area,label) in new[]{(CacheArea.Prices,localization.Get("CacheUi.Prices")),(CacheArea.Quests,localization.Get("CacheUi.Quests")),
             (CacheArea.Collections,localization.Get("CacheUi.Collections")),(CacheArea.Completion,localization.Get("CacheUi.Completion")),(CacheArea.Sources,localization.Get("CacheUi.Sources")),
@@ -30,6 +33,15 @@ internal sealed partial class MainWindow
                     }
                 }
                 finally{ImGui.EndCombo();}
+            }
+            Tip("SettingTips.Cache"+area);
+            // 0.324: « ↺ » to the default duration of this area.
+            var byDefault=DefaultConfiguration.Cache.Get(area);
+            if(DefaultButton("Cache"+area,configuration.Cache.Get(area)!=byDefault))
+            {
+                var previous=configuration.Cache;configuration.Cache=previous.With(area,byDefault);
+                try{save();saveError=null;}
+                catch(Exception error){configuration.Cache=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not persist cache policy.");}
             }
         }
         ImGui.TextWrapped(localization.Get("CacheUi.QuestHelp"));

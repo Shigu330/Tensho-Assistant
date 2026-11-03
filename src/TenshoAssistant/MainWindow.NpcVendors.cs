@@ -5,29 +5,30 @@ using TenshoAssistant.Npcs;
 
 namespace TenshoAssistant;
 
+// NPC vendors page (World): the NPCs selling the selected item, from the game's shop sheets (Npcs/, cached): shop, cost with the
+// currency icons (company credits with the needed company rank, 0.295), place, and a click to flag it on the map. Also the vendor
+// sheet opened from the Tensho map (one NPC's places and stock) and the short vendor rows of the item hover panel.
 internal sealed partial class MainWindow
 {
     public const int HoverNpcLines=2;
     private NpcVendorService? npcVendors;
-    private string? npcFlagError;
     internal void ConfigureNpcVendors(NpcVendorService service)=>npcVendors=service;
 
     private void DrawNpcVendors()
     {
         Heading(localization.Get("NpcUi.Title"),localization.Get("NpcUi.Subtitle"));
-        if(ImGui.CollapsingHeader(localization.Get("NpcUi.Choose")+"##Npc",itemId<=0 ? ImGuiTreeNodeFlags.DefaultOpen:ImGuiTreeNodeFlags.None))DrawItemSearch(160);
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("NpcUi.Choose")+"##Npc",itemId<=0 ? ImGuiTreeNodeFlags.DefaultOpen:ImGuiTreeNodeFlags.None))DrawItemSearch(160);
         if(npcVendors?.State is not { } state)return;
         if(state.Catalog is not { } catalog)
         {
             ImGui.TextWrapped(state.Error is null ? localization.Format("NpcUi.Loading",state.Copied.ToString("N0")):localization.Get("NpcUi.Error"));
-            if(developerMode && state.Error is { } error)ImGui.TextWrapped(error);
+            if(developerMode && state.Error is { } error)ImGui.TextWrapped(RawMessage(error));
             return;
         }
         if(npcVendorFocus!=0 && catalog.Vendors.FirstOrDefault(vendor=>vendor.NpcId==npcVendorFocus) is { } focused){DrawNpcVendorSheet(catalog,focused);return;}
         if(itemId<=0){ImGui.TextWrapped(localization.Get("NpcUi.Help"));return;}
         var id=(uint)itemId;
         DrawItemIcon(SelectedItem,new Vector2(40));
-        if(ImGui.IsItemHovered())DrawItemInfoTooltip(id);
         ItemCollectionMenu("SelectedItemCollection",SelectedItem);
         ImGui.SameLine();
         ImGui.TextColored(Accent,SelectedItem?.Name ?? localization.Format("MonsterUi.Item",id));
@@ -36,7 +37,7 @@ internal sealed partial class MainWindow
         if(offers.Count==0){ImGui.TextWrapped(localization.Get("NpcUi.None"));return;}
         ImGui.TextDisabled(localization.Format("NpcUi.Count",offers.Count,offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));
         ImGui.TextDisabled(localization.Get("NpcUi.FlagHelp"));
-        if(npcFlagError is { } flagError)ImGui.TextColored(Accent,flagError);
+        if(mapOpenError is { } flagError)ImGui.TextColored(Accent,flagError);
         if(!ImGui.BeginTable("NpcOffers",4,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.ScrollY,new Vector2(0,Math.Clamp(offers.Count*26+30,90,420))))return;
         try
         {
@@ -54,7 +55,7 @@ internal sealed partial class MainWindow
                 {
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     ImGui.Selectable(NpcName(offer.Vendor)+"##Offer",false,ImGuiSelectableFlags.SpanAllColumns);
-                    DrawNpcFlagMenu(offer.Vendor);
+                    NpcMenu("NpcFlag",NpcName(offer.Vendor),offer.Vendor.NpcId,offer.Vendor.Locations);
                     ImGui.TableNextColumn();ImGui.TextUnformatted(offer.Vendor.Locations.Count==0 ? localization.Get("NpcUi.NoLocation")
                         :string.Join(" · ",offer.Vendor.Locations.Take(2).Select(NpcPlace))+(offer.Vendor.Locations.Count>2 ? localization.Format("HoverUi.More",offer.Vendor.Locations.Count-2):""));
                     ImGui.TableNextColumn();DrawNpcCosts(offer.Sale,18,true);
@@ -91,7 +92,7 @@ internal sealed partial class MainWindow
             var first=shop.First();
             var title=first.ShopName.Length>0 && !(localization.CurrentCode!="ja" && first.ShopName.Any(c=>c is >= '\u3040' and <= '\u30FF' or >= '\u4E00' and <= '\u9FFF'))
                 ? first.ShopName:localization.Get("MapLocal.ShopKind"+first.Kind);
-            if(!ImGui.CollapsingHeader($"{title} ({shop.Count()})##Shop{shop.Key}"))continue;
+            if(!TenshoAssistant.UI.UiComponents.Header($"{title} ({shop.Count()})##Shop{shop.Key}"))continue;
             if(!ImGui.BeginTable($"VendorShop{shop.Key}",2,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))continue;
             try
             {
@@ -110,28 +111,6 @@ internal sealed partial class MainWindow
         }
     }
 
-    // Right click on a vendor row: one entry per known position; the game map opens with its flag on that position.
-    private void DrawNpcFlagMenu(NpcVendor vendor)
-    {
-        if(!ImGui.BeginPopupContextItem("NpcFlag"))return;
-        try
-        {
-            ImGui.TextColored(Accent,NpcName(vendor));
-            if(vendor.Locations.Count==0)ImGui.TextDisabled(localization.Get("NpcUi.NoLocation"));
-            for(var index=0;index<vendor.Locations.Count;index++)
-            {
-                var location=vendor.Locations[index];
-                if(!ImGui.Selectable(localization.Format("NpcUi.Flag",NpcPlace(location))+$"##Flag{index}"))continue;
-                try
-                {
-                    npcFlagError=gameGui.OpenMapWithMapLink(new MapLinkPayload(location.TerritoryId,location.MapId,location.X,location.Y)) ? null:localization.Get("NpcUi.FlagError");
-                }
-                catch(Exception error){npcFlagError=localization.Get("NpcUi.FlagError");log.Warning(error,"Could not place the NPC map flag.");}
-            }
-        }
-        finally{ImGui.EndPopup();}
-    }
-
     // Generic NPC names are stored lowercase in the game data ("officier de la logistique"); only the first letter is raised.
     private string NpcName(NpcVendor vendor)=>vendor.Name.Length>0 ? char.ToUpper(vendor.Name[0],System.Globalization.CultureInfo.CurrentCulture)+vendor.Name[1..]
         :localization.Format("NpcUi.Unnamed",vendor.NpcId);
@@ -140,18 +119,31 @@ internal sealed partial class MainWindow
     // Amount followed by the currency's game icon; the name is only a tooltip (when the window accepts input) or a fallback text.
     private void DrawNpcCosts(NpcShopSale sale,float iconSize,bool tooltips)
     {
+        DrawNpcCostLine(sale,iconSize,tooltips);
+        // 0.352 (g, I-11): what unlocks the article, with done / to do from the quest journal and the achievements read.
+        if(sale.QuestRequired!=0 || sale.AchievementRequired!=0){ImGui.SameLine(0,6);DrawShopRequirement(sale);}
+    }
+
+    private void DrawNpcCostLine(NpcShopSale sale,float iconSize,bool tooltips)
+    {
         if(sale.Costs.Count==0){ImGui.TextDisabled(localization.Get("NpcUi.UnknownCost"));return;}
         for(var index=0;index<sale.Costs.Count;index++)
         {
             var cost=sale.Costs[index];
             if(index>0){ImGui.SameLine(0,4);ImGui.TextUnformatted("+");ImGui.SameLine(0,4);}
             ImGui.TextUnformatted(cost.Amount.ToString("N0"));ImGui.SameLine(0,3);
+            // 0.295: company credits (FccShop) are named, with the company rank the item needs.
+            if(cost.CurrencyItemId==NpcCost.CompanyCredits)
+            {
+                ImGui.TextUnformatted(localization.Get("NpcUi.CompanyCredits"));
+                if(sale.RequiredRank>0){ImGui.SameLine(0,4);ImGui.TextDisabled(localization.Format("NpcUi.CompanyRank",sale.RequiredRank));}
+                continue;
+            }
             var currency=cost.CurrencyItemId==0 ? null:itemCatalog.State.Catalog?.Find(cost.CurrencyItemId);
             if(currency is null)ImGui.TextDisabled(cost.CurrencyItemId==0 ? localization.Format("NpcUi.EncodedCurrency",cost.RawCurrency):localization.Format("MonsterUi.Item",cost.CurrencyItemId));
             else
             {
-                DrawItemIcon(currency,new Vector2(iconSize));
-                if(tooltips && ImGui.IsItemHovered())WrappedTooltip(currency.Name);
+                DrawItemIcon(currency,new Vector2(iconSize),tooltips);
             }
         }
         if(sale.Quantity>1 || sale.Hq){ImGui.SameLine(0,6);ImGui.TextDisabled(localization.Format("NpcUi.Receives",sale.Quantity,sale.Hq ? " HQ":""));}

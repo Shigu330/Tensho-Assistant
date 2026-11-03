@@ -7,8 +7,9 @@ namespace TenshoAssistant;
 
 /// <summary>
 /// Tensho deck list (0.162): decks generated for an NPC are saved under the NPC's name, listed in Triple Triad › Deck with their cards,
-/// and can be deleted. While the game's deck editor is open, a reminder panel beside it shows the chosen deck's cards in large (icon,
-/// card number, name, sides) so they are easy to find in the game's list, as TriadBuddy highlights them.
+/// and can be deleted. While the game's deck editor is open (Triad observation on), the chosen deck's cards are framed in green in the
+/// game's card list, following the scroll, with the deck name above the editor (0.164, like TriadBuddy; this replaced the 0.162
+/// reminder panel). Every card icon and name gives the card item's tooltip and right-click menu (0.198, 0.268).
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -33,13 +34,16 @@ internal sealed partial class MainWindow
         }))triadShownDeck=name;
     }
     // Tooltip of every card icon (0.198): the card item's full sheet (« Comment l'obtenir », links) when the card has an item, else its name.
+    // 0.268: also the card item's right-click menu (tools and sources), so every card icon or name answers the same way.
     private void TriadCardTooltip(uint id)
     {
+        var source=triadNpcs?.State.Catalog?.Cards.GetValueOrDefault(id);
+        if(source is { ItemId:>0 } && itemCatalog.State.Catalog?.Find(source.ItemId) is { } item)ItemLinksMenu(UniqueMenuId($"TriadCardMenu{id}"),item);
         if(!ImGui.IsItemHovered())return;
-        if(triadNpcs?.State.Catalog?.Cards.GetValueOrDefault(id) is { ItemId:>0 } source)DrawItemInfoTooltip(source.ItemId);
+        if(source is { ItemId:>0 })DrawItemInfoTooltip(source.ItemId);
         else WrappedTooltip(TriadCardName(id));
     }
-    private string TriadCardName(uint id)=>collections.State.Entries.FirstOrDefault(entry=>entry.Kind==CollectionKind.TripleTriad && entry.Id==id)?.Name ?? id.ToString();
+    private string TriadCardName(uint id)=>CollectionEntryOf(CollectionKind.TripleTriad,id)?.Name ?? id.ToString();
 
     // Triple Triad › Deck: the saved decks, each with its cards; « Show » picks the deck for the editor reminder, « Delete » removes it.
     private void DrawTriadSavedDecks()
@@ -59,6 +63,7 @@ internal sealed partial class MainWindow
                 if(ImGui.SmallButton(localization.Get("TriadDecks.Show")))triadShownDeck=deck.Name;
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("TriadDecks.Delete")))remove=deck.Name;
+                Tip("TriadDecks.DeleteTip");
                 foreach(var id in deck.Cards)
                 {
                     if(TriadCard(id) is { } card)DrawSmallGameIcon(card.IconId);
@@ -77,7 +82,8 @@ internal sealed partial class MainWindow
     // frame, following the scroll; the chosen deck is the one picked in Triple Triad › Deck (default: the last saved).
     internal void DrawTriadDeckReminder()
     {
-        if(windowDisposed || triadObservation.State is not { Enabled:true } || triadObservation.EditDeckWindow is null)return;
+        // 0.327: its own switch (TriadDeckEditorHighlight, on by default).
+        if(windowDisposed || !configuration.TriadDeckEditorHighlight || triadObservation.State is not { Enabled:true } || triadObservation.EditDeckWindow is null)return;
         var decks=configuration.TripleTriadDecks ?? [];
         if(decks.Count==0)return;
         var deck=decks.FirstOrDefault(entry=>entry.Name==triadShownDeck) ?? decks[^1];

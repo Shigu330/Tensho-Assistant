@@ -1,6 +1,8 @@
 namespace TenshoAssistant.Gathering;
 
-public enum GpEffect { Success, Yield, BoonChance1, BoonChance2, BoonYield, Bountiful1, Bountiful2 }
+// R-09 (0.410): Attempt = Solid Reason / Ageless Words (another attempt), NextSuccess = Clear Vision / Flora Mastery (+15 % on the next
+// attempt); game data in docs/evidence/0.410-gp-actions.md.
+public enum GpEffect { Success, Yield, BoonChance1, BoonChance2, BoonYield, Bountiful1, Bountiful2, Attempt, NextSuccess }
 public sealed record GpActionSpec(uint Id,uint JobId,int Level,int Cost,GpEffect Effect,int Magnitude);
 public sealed record GpAction(GpActionSpec Spec,string Name,uint Icon,string Description);
 
@@ -12,10 +14,12 @@ public sealed class GpActionCatalog
         new(239,16,30,400,GpEffect.Yield,1),new(241,16,40,500,GpEffect.Yield,2),
         new(21177,16,15,50,GpEffect.BoonChance1,10),new(25589,16,50,100,GpEffect.BoonChance2,30),new(21203,16,81,200,GpEffect.BoonYield,1),
         new(4073,16,24,100,GpEffect.Bountiful1,1),new(272,16,68,100,GpEffect.Bountiful2,0),
+        new(232,16,25,300,GpEffect.Attempt,1),new(4072,16,23,50,GpEffect.NextSuccess,15),
         new(218,17,4,50,GpEffect.Success,5),new(220,17,5,100,GpEffect.Success,15),new(294,17,10,250,GpEffect.Success,50),
         new(222,17,30,400,GpEffect.Yield,1),new(224,17,40,500,GpEffect.Yield,2),
         new(21178,17,15,50,GpEffect.BoonChance1,10),new(25590,17,50,100,GpEffect.BoonChance2,30),new(21204,17,81,200,GpEffect.BoonYield,1),
-        new(4087,17,24,100,GpEffect.Bountiful1,1),new(273,17,68,100,GpEffect.Bountiful2,0)
+        new(4087,17,24,100,GpEffect.Bountiful1,1),new(273,17,68,100,GpEffect.Bountiful2,0),
+        new(215,17,25,300,GpEffect.Attempt,1),new(4086,17,23,50,GpEffect.NextSuccess,15)
     });
     public static IReadOnlyList<GpActionSpec> Specs => specs;
     public IReadOnlyList<GpAction> Actions { get; }

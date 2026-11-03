@@ -25,7 +25,7 @@ public sealed class CraftLiveFrame
         ArgumentNullException.ThrowIfNull(raw);
         if(raw.Effects.Count>9 || raw.Statuses.Count>60 || raw.Cp>raw.MaxCp || raw.MaxCp is 0 or >10000 || raw.JobId is <8 or >15
             || raw.Stats.Level is <1 or >100 || raw.Stats.Craftsmanship<0 || raw.Stats.Control<0 || raw.ActionsNative?.Count>CraftActionCatalog.Specs.Count)
-            throw new ArgumentException("Observation de synthèse invalide.");
+            throw new ArgumentException("Invalid synthesis observation.");
         static string Bounded(string value)=>value.Length<=512 ? value:throw new ArgumentException("Texte natif trop long.");
         var n=raw.Numbers;
         Raw=raw with {ItemName=Bounded(raw.ItemName),ConditionText=Bounded(raw.ConditionText),EffectsOverflow=Bounded(raw.EffectsOverflow),

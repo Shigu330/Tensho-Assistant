@@ -7,6 +7,10 @@ using TenshoAssistant.UI;
 
 namespace TenshoAssistant;
 
+// « All tools » directory (Home page, optional): the tools grouped by domain, each with the community plugin it is modelled on
+// (shown as a name for orientation), a filter, a details popup and a link to its Tensho page. Also the item
+// context icons of the sidebar (DrawContextTools: the same useful routes as the inventory's « Tensho » item menu). The list is
+// fixed in PlannedTools; pages added later (weather, alarms, reminders, free company, gear, NPC vendors) joined it in 0.315.
 internal sealed partial class MainWindow
 {
     private sealed record PlannedTool(string Group, string Name, string Reference, string Description, FontAwesomeIcon Icon);
@@ -34,7 +38,17 @@ internal sealed partial class MainWindow
         new("Groups.Games", "Triad.Name", "TriadBuddy", "Triad.Description", FontAwesomeIcon.Clone),
         new("Groups.Character", "Character.Name", "Character Panel Refined", "Character.Description", FontAwesomeIcon.ChartBar),
         new("Groups.Character", "Macros.Name", "Macro Chain", "Macros.Description", FontAwesomeIcon.Link),
+        // 0.315 (docs pass): tools added since 0.200 that had no directory entry; Tensho's own tools use a « Tensho: » reference.
+        new("Groups.Character", "Gear.Name", "Tensho: Gear", "Gear.Description", FontAwesomeIcon.Tshirt),
+        new("Groups.Items", "FreeCompany.Name", "Tensho: FreeCompany", "FreeCompany.Description", FontAwesomeIcon.Ship),
+        new("Groups.Items", "NpcVendors.Name", "Tensho: NpcVendors", "NpcVendors.Description", FontAwesomeIcon.Store),
+        new("Groups.Gathering", "Weather.Name", "Tensho: Weather", "Weather.Description", FontAwesomeIcon.CloudSun),
+        new("Groups.Gathering", "Alarms.Name", "Tensho: Alarms", "Alarms.Description", FontAwesomeIcon.Bell),
+        new("Groups.Progress", "Reminders.Name", "Tensho: Reminders", "Reminders.Description", FontAwesomeIcon.CalendarCheck),
     ];
+    // 0.331 (audit): the directory draws a heading on each group change, so it lists the tools grouped (first-seen group order, array
+    // order inside a group); entries appended later no longer repeat a heading. Built once, after PlannedTools (same file).
+    private static readonly PlannedTool[] DirectoryTools = PlannedTools.GroupBy(tool => tool.Group).SelectMany(group => group).ToArray();
 
     private string ToolText(string key)=>localization.Get("ToolDirectory."+key);
 
@@ -42,9 +56,9 @@ internal sealed partial class MainWindow
     {
         Heading(localization.Get("Plugin.AllTools"), localization.Get("Plugin.AllToolsDescription"));
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##ToolFilter", localization.Get("Plugin.ToolFilterHint"), ref toolQuery, 128);
+        ImGui.InputTextWithHint("##ToolFilter", localization.Get("Plugin.ToolFilterHint"), ref toolQuery, 128); Tip("Plugin.ToolFilterTip");
         var found=false;var openDetails=false;string? previousGroup=null;
-        foreach(var tool in PlannedTools)
+        foreach(var tool in DirectoryTools)
         {
             if(!MatchesToolFilter($"{ToolText(tool.Group)} {ToolText(tool.Name)} {tool.Reference}"))continue;
             found=true;
@@ -93,7 +107,7 @@ internal sealed partial class MainWindow
             case "GatherBuddy":page=Page.Gathering;gatheringTypeFilter=null;break;
             case "LazyGatherer":page=Page.GatheringGp;break;
             case "SortaKinda":page=Page.SortPreview;break;
-            case "Banque d'objets":page=Page.Items;focusBankTab=true;break;
+            case "Banque d'objets":page=Page.Storage;focusBankTab=true;break;
             case "Item Use":page=Page.Items;focusUsesTab=true;break;
             case "Price Insight":page=Page.Market;break;
             case "Collections":page=Page.Collections;break;
@@ -105,8 +119,14 @@ internal sealed partial class MainWindow
             case "Avant-Garde":page=Page.Fashion;break;
             case "ezMiniCactpot":page=Page.MiniCactpot;break;
             case "TriadBuddy":page=Page.TripleTriad;break;
-            case "Character Panel Refined":page=Page.Character;break;
+            case "Character Panel Refined":page=Page.Gear;break;
             case "Macro Chain":page=Page.MacroChain;break;
+            case "Tensho: Gear":page=Page.Gear;break;
+            case "Tensho: FreeCompany":page=Page.FreeCompany;break;
+            case "Tensho: NpcVendors":page=Page.NpcVendors;break;
+            case "Tensho: Weather":page=Page.Weather;break;
+            case "Tensho: Alarms":page=Page.Alarms;break;
+            case "Tensho: Reminders":page=Page.Reminders;break;
             default:OpenToolDirectory(reference);break;
         }
     }
@@ -172,7 +192,7 @@ internal sealed partial class MainWindow
                 Items.ItemContextRoute.DutyLoot => (FontAwesomeIcon.Dungeon, localization.Get("ItemMenu.DutyLoot")),
                 Items.ItemContextRoute.MonsterLoot => (FontAwesomeIcon.Dragon, localization.Get("ItemMenu.MonsterLoot")),
                 Items.ItemContextRoute.Quest => (FontAwesomeIcon.Tasks, localization.Get("ItemMenu.Quest")),
-                Items.ItemContextRoute.Collection => (CollectionOf(item)?.Kind == Collections.CollectionKind.TripleTriad ? FontAwesomeIcon.Clone : FontAwesomeIcon.Trophy, localization.Get("HoverUi.OpenCollection")),
+                Items.ItemContextRoute.Collection => (CollectionOf(item)?.Kind == Collections.CollectionKind.TripleTriad ? FontAwesomeIcon.Clone : FontAwesomeIcon.Trophy, localization.Get(CollectionOf(item)?.Kind == Collections.CollectionKind.TripleTriad ? "ItemMenu.OpenTriad" : "HoverUi.OpenCollection")),
                 Items.ItemContextRoute.Stocks => (FontAwesomeIcon.Boxes, localization.Get("ItemsUi.Stocks")),
                 _ => (FontAwesomeIcon.InfoCircle, localization.Get("ItemMenu.Sources")),
             };

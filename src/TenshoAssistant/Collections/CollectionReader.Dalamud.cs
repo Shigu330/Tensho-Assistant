@@ -28,7 +28,7 @@ internal sealed partial class CollectionReader : IDisposable
     private ExcelSheet<OrchestrionUiparam>? orchestrionUi;
     private ExcelSheet<OrchestrionCategory>? orchestrionCategories;
     private bool orchestrionUnavailable,orchestrionUnlockUnavailable;
-    private string? orchestrionIssue;
+    private string? orchestrionIssue,blueIssue,triadIssue;
     private readonly List<CollectionEntry> entries = [];
     private int position;
     private ulong character;
@@ -39,6 +39,8 @@ internal sealed partial class CollectionReader : IDisposable
     private readonly Func<TimeSpan> completionLifetime;
     private readonly DataCache? disk;
     private string? cacheVersion;
+    // 0.278: cards now carry « Extra » (Ex. series); older cached collections are read again instead of losing it.
+    private const string CacheShape="|triad-ex-278";
     private Task<CachedValue<CollectionCacheData>?>? restore;
 
     public CollectionReader(CollectionService service, IDataManager data, IFramework framework,
@@ -64,7 +66,14 @@ internal sealed partial class CollectionReader : IDisposable
     }
     private void OnLogout(int type,int code)
     {
-        lock(gate){character=0;entries.Clear();position=0;restore=null;nextRefresh=0;ResetCompletion();service.Invalidate();scanning=service.State.Entries.Count==0;}
+        // 0.331: the kept catalogue is published again without character (no acquisition evidence, not loading); left invalidated, it
+        // stayed « loading » until the next login, nothing rescanning without a character.
+        lock(gate)
+        {
+            character=0;entries.Clear();position=0;restore=null;nextRefresh=0;ResetCompletion();service.Invalidate();
+            if(service.State.Entries.Count>0)service.Publish(0,service.State.Entries);
+            scanning=service.State.Entries.Count==0;
+        }
     }
     private void ReadUpdate()
     {
@@ -81,11 +90,11 @@ internal sealed partial class CollectionReader : IDisposable
             scanning = true;
             position = 0;
             entries.Clear();
-            orchestrionUnavailable=false;orchestrionUnlockUnavailable=false;orchestrionIssue=null;
+            orchestrionUnavailable=false;orchestrionUnlockUnavailable=false;orchestrionIssue=null;blueIssue=null;triadIssue=null;
             ResetCompletion();
             service.Invalidate();
-            if(force && owner!=0 && disk is not null)_=disk.InvalidateAsync("collections",owner.ToString(),cacheVersion ??= GameCacheIdentity.For(data));
-            restore=!force && owner!=0 && disk is not null ? disk.ReadAsync<CollectionCacheData>("collections",owner.ToString(),cacheVersion ??= GameCacheIdentity.For(data)):null;
+            if(force && owner!=0 && disk is not null)_=disk.InvalidateAsync("collections",owner.ToString(),cacheVersion ??= GameCacheIdentity.For(data)+CacheShape);
+            restore=!force && owner!=0 && disk is not null ? disk.ReadAsync<CollectionCacheData>("collections",owner.ToString(),cacheVersion ??= GameCacheIdentity.For(data)+CacheShape):null;
             scanning=restore is null;
         }
         if(restore is { } loading)
@@ -130,7 +139,7 @@ internal sealed partial class CollectionReader : IDisposable
                 }
                 catch(Exception error)
                 {
-                    orchestrionUnavailable=true;orchestrionIssue="Catalogue d’orchestrion indisponible ; les autres collections restent consultables.";
+                    orchestrionUnavailable=true;orchestrionIssue="Orchestrion catalogue unavailable; the other collections can still be browsed.";
                     log.Warning(error,"Orchestrion sheets unavailable; other collection categories retained.");
                 }
             }
@@ -186,7 +195,7 @@ internal sealed partial class CollectionReader : IDisposable
                             try{confirmed=unlocks.IsOrchestrionUnlocked(row);}
                             catch(Exception error)
                             {
-                                orchestrionUnlockUnavailable=true;orchestrionIssue="Acquisitions d’orchestrion partiellement lues ; les résultats non confirmés restent inconnus.";
+                                orchestrionUnlockUnavailable=true;orchestrionIssue="Orchestrion acquisitions partly read; unconfirmed results stay unknown.";
                                 log.Warning(error,"Orchestrion acquisitions unavailable; static catalogue retained.");
                             }
                         }
@@ -195,7 +204,7 @@ internal sealed partial class CollectionReader : IDisposable
                     catch(Exception error)
                     {
                         position=titleStart;
-                        orchestrionIssue="Catalogue d’orchestrion partiellement lu ; les autres collections restent consultables.";
+                        orchestrionIssue="Orchestrion catalogue partly read; the other collections can still be browsed.";
                         log.Warning(error,"Orchestrion row unavailable; other collection categories retained.");
                     }
                 }
@@ -205,18 +214,31 @@ internal sealed partial class CollectionReader : IDisposable
                     var name = row.Name.ExtractText();
                     if (row.RowId != 0 && !string.IsNullOrWhiteSpace(name) && cardDetails.TryGetRow(row.RowId, out var details))
                     {
-                        var card = new TriadCardDefinition(row.RowId, details.Order, details.TripleTriadCardRarity.Value.Stars,
-                            details.Top, details.Right, details.Bottom, details.Left, details.TripleTriadCardType.RowId,
-                            details.TripleTriadCardType.Value.Name.ExtractText(), row.Description.ExtractText());
-                        if (card.IsValid)
-                            entries.Add(new(CollectionKind.TripleTriad, row.RowId, name, card.IconId,
-                                character != 0 && unlocks.IsTripleTriadCardUnlocked(row), Card: card));
+                        // 0.331 (R-14): a rarity or type link that does not resolve skips this card (said as a category issue) instead
+                        // of failing every collection category, as the orchestrion rows already do.
+                        if (!details.TripleTriadCardRarity.IsValid || !details.TripleTriadCardType.IsValid)
+                            triadIssue = "Triple Triad card catalogue partly read; the other collections can still be browsed.";
+                        else
+                        {
+                            var card = new TriadCardDefinition(row.RowId, details.Order, details.TripleTriadCardRarity.Value.Stars,
+                                details.Top, details.Right, details.Bottom, details.Left, details.TripleTriadCardType.RowId,
+                                details.TripleTriadCardType.Value.Name.ExtractText(), row.Description.ExtractText(),
+                                // UIPriority ≠ 0 = « Ex. » card, numbered apart (docs/evidence/0.278-triad-ex-cards.md).
+                                details.UIPriority != 0);
+                            if (card.IsValid)
+                                entries.Add(new(CollectionKind.TripleTriad, row.RowId, name, card.IconId,
+                                    character != 0 && unlocks.IsTripleTriadCardUnlocked(row), Card: card));
+                        }
                     }
                 }
                 else
                 {
                     var row = blue.GetRowAt(position++ - mounts.Count - companions.Count - emotes.Count);
-                    if (row.RowId != 0 && row.Action.RowId != 0)
+                    // 0.331 (R-14): an action link that does not resolve skips this spell (said as a category issue), and a location that
+                    // does not resolve stays empty (BlueSpell.MissingLocation), instead of failing every collection category.
+                    if (row.RowId != 0 && row.Action.RowId != 0 && !row.Action.IsValid)
+                        blueIssue = "Blue magic spell catalogue partly read; the other collections can still be browsed.";
+                    else if (row.RowId != 0 && row.Action.RowId != 0)
                     {
                         var action = row.Action.Value;
                         var name = action.Name.ExtractText();
@@ -232,9 +254,12 @@ internal sealed partial class CollectionReader : IDisposable
                                 var source = details.Location;
                                 if (source.RowId != 0)
                                 {
-                                    if (source.RowType == typeof(PlaceName)) location = data.GetExcelSheet<PlaceName>().GetRow(source.RowId).Name.ExtractText();
-                                    else if (source.RowType == typeof(TerritoryType)) location = data.GetExcelSheet<TerritoryType>().GetRow(source.RowId).PlaceName.Value.Name.ExtractText();
-                                    else if (source.RowType == typeof(ContentFinderCondition)) location = data.GetExcelSheet<ContentFinderCondition>().GetRow(source.RowId).Name.ExtractText();
+                                    if (source.RowType == typeof(PlaceName))
+                                        location = data.GetExcelSheet<PlaceName>().TryGetRow(source.RowId, out var place) ? place.Name.ExtractText() : "";
+                                    else if (source.RowType == typeof(TerritoryType))
+                                        location = data.GetExcelSheet<TerritoryType>().TryGetRow(source.RowId, out var territory) ? territory.PlaceName.ValueNullable?.Name.ExtractText() ?? "" : "";
+                                    else if (source.RowType == typeof(ContentFinderCondition))
+                                        location = data.GetExcelSheet<ContentFinderCondition>().TryGetRow(source.RowId, out var content) ? content.Name.ExtractText() : "";
                                 }
                             }
                             entries.Add(new(CollectionKind.BlueMagic, row.RowId, name, action.Icon,
@@ -245,25 +270,30 @@ internal sealed partial class CollectionReader : IDisposable
                 if (Stopwatch.GetElapsedTime(start) >= TimeSpan.FromMilliseconds(2)) break;
             }
             if (position != total) return;
-            _=FinalizeCompletion();
+            // 0.331: true when the title or achievement list arrived during this pass (pass unstable): read again once published below,
+            // since CompletionLoadingChanged no longer sees the change.
+            var again=FinalizeCompletion();
             if(service.ConsumeRefresh())
             {
-                position=0;entries.Clear();orchestrionUnavailable=false;orchestrionUnlockUnavailable=false;orchestrionIssue=null;
+                position=0;entries.Clear();orchestrionUnavailable=false;orchestrionUnlockUnavailable=false;orchestrionIssue=null;blueIssue=null;triadIssue=null;
                 ResetCompletion();service.Invalidate();return;
             }
             var after = client.IsLoggedIn && player.IsLoaded ? player.ContentId : 0;
-            if (after != character) { service.Invalidate(); character = after; position = 0; entries.Clear(); orchestrionUnavailable=false;orchestrionUnlockUnavailable=false;orchestrionIssue=null; ResetCompletion();return; }
+            if (after != character) { service.Invalidate(); character = after; position = 0; entries.Clear(); orchestrionUnavailable=false;orchestrionUnlockUnavailable=false;orchestrionIssue=null;blueIssue=null;triadIssue=null; ResetCompletion();return; }
             var issues=new List<CollectionCategoryIssue>();
             if(orchestrionIssue is not null)issues.Add(new(CollectionKind.Orchestrion,orchestrionIssue));
+            if(blueIssue is not null)issues.Add(new(CollectionKind.BlueMagic,blueIssue));
+            if(triadIssue is not null)issues.Add(new(CollectionKind.TripleTriad,triadIssue));
             issues.AddRange(CompletionIssues());
             if(character!=0)ApplyCompletionMemory(character,entries,completionLifetime());
             service.Publish(character,entries,issues);
             if(character!=0 && disk is not null && service.State.ObservedAt is { } date)
-                _=disk.WriteAsync("collections",character.ToString(),cacheVersion ??= GameCacheIdentity.For(data),
+                _=disk.WriteAsync("collections",character.ToString(),cacheVersion ??= GameCacheIdentity.For(data)+CacheShape,
                     new CollectionCacheData(character,service.State.Entries,service.State.CategoryIssues,titlesCheckedAt,achievementsCheckedAt),date);
             entries.Clear();
             scanning = false;
             nextRefresh = 0;
+            if(again)service.RequestRefresh();
         }
         catch (Exception error)
         {

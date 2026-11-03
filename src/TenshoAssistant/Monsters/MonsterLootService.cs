@@ -49,7 +49,7 @@ public sealed class MonsterLootService : IDisposable
         lock (gate)
         {
             if (disposed || !state.Loading) return;
-            generation++; request?.Cancel(); state = state with { Loading=false, Error="Consultation annulée." };
+            generation++; request?.Cancel(); state = state with { Loading=false, Error="Lookup cancelled." };
         }
     }
     public Task RequestItemAsync(bool force = false,CancellationToken cancellation = default) => RequestAsync(false,force,cancellation);
@@ -102,7 +102,7 @@ public sealed class MonsterLootService : IDisposable
             {
                 if (disposed || ticket != generation) return;
                 state = state with { Loading=false, Error=error is OperationCanceledException
-                    ? "Consultation annulée ou délai dépassé." : $"Lecture des sources impossible : {error.Message}" };
+                    ? "Lookup cancelled or timed out." : $"Sources could not be read: {error.Message}" };
             }
         }
         finally
@@ -113,7 +113,7 @@ public sealed class MonsterLootService : IDisposable
                 {
                     request=null;
                     if (!disposed && ticket == generation && state.Loading)
-                        state = state with { Loading=false, Error="Consultation annulée ou délai dépassé." };
+                        state = state with { Loading=false, Error="Lookup cancelled or timed out." };
                 }
                 source.Dispose();
             }

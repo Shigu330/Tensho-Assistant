@@ -28,7 +28,7 @@ public sealed class MiniCactpotSolveSession : IDisposable
                     lock(gate)if(!disposed && ticket==generation)state=new(copied,owner,revision,result,false,null);
                 }
                 catch(Exception error)
-                {lock(gate)if(!disposed && ticket==generation)state=new(copied,owner,revision,null,false,error is OperationCanceledException ? "Calcul annulé.":error.Message);}
+                {lock(gate)if(!disposed && ticket==generation)state=new(copied,owner,revision,null,false,error is OperationCanceledException ? "Calculation cancelled.":error.Message);}
             });
         }
     }

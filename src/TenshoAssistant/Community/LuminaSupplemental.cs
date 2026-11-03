@@ -163,6 +163,7 @@ public sealed class LuminaSupplementalService : IDisposable
     private readonly DataCache? cache;
     private LuminaSupplementalState state = new(null, false, null);
     private int started;
+    private long retryAfter;
     public LuminaSupplementalState State => Enabled?.Invoke() == false ? new(null, false, null) : Volatile.Read(ref state);
 
     private readonly Func<uint, string?>? monsterName, fateName, npcName, questName;
@@ -175,7 +176,8 @@ public sealed class LuminaSupplementalService : IDisposable
     public void Request()
     {
         if (Enabled?.Invoke() == false) return;
-        if (Interlocked.Exchange(ref started, 1) == 1) return;
+        // R-10 (0.246): called from Draw; after a failure, no new attempt for 5 minutes (it used to retry every frame).
+        if (Environment.TickCount64 < Volatile.Read(ref retryAfter) || Interlocked.Exchange(ref started, 1) == 1) return;
         Volatile.Write(ref state, new(null, true, null));
         var token = cancellation.Token;
         _ = Task.Run(async () =>
@@ -187,14 +189,23 @@ public sealed class LuminaSupplementalService : IDisposable
                 {
                     var cached = cache is null ? null : await cache.ReadAsync<LuminaCsvCache>(Family, file, Version, token).ConfigureAwait(false);
                     if (cached is not null && DateTimeOffset.UtcNow - cached.RecordedAt <= lifetime()) { files[file] = cached.Value.Text; continue; }
-                    var text = await BoundedHttp.ReadAsync(client, new Uri(Base + file + ".csv"), 4 * 1024 * 1024, token).ConfigureAwait(false);
-                    files[file] = text;
-                    if (cache is not null) await cache.WriteAsync(Family, file, Version, new LuminaCsvCache(text), DateTimeOffset.UtcNow).ConfigureAwait(false);
+                    try
+                    {
+                        var text = await BoundedHttp.ReadAsync(client, new Uri(Base + file + ".csv"), 4 * 1024 * 1024, token).ConfigureAwait(false);
+                        files[file] = text;
+                        if (cache is not null) await cache.WriteAsync(Family, file, Version, new LuminaCsvCache(text), DateTimeOffset.UtcNow).ConfigureAwait(false);
+                    }
+                    // Network down or GitHub refusing: the expired copy is better than nothing (kept until a download succeeds).
+                    catch (Exception) when (cached?.Value.Text is { Length: > 0 } && !token.IsCancellationRequested) { files[file] = cached.Value.Text; }
                 }
                 Volatile.Write(ref state, new(new LuminaSupplementalData(files, monsterName, fateName, npcName, questName), false, null));
             }
             catch (OperationCanceledException) { }
-            catch (Exception error) { Volatile.Write(ref state, new(null, false, error.Message)); Interlocked.Exchange(ref started, 0); }
+            catch (Exception error)
+            {
+                Volatile.Write(ref state, new(null, false, error.Message));
+                Volatile.Write(ref retryAfter, Environment.TickCount64 + 300_000); Interlocked.Exchange(ref started, 0);
+            }
         }, token);
     }
 

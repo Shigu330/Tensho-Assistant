@@ -1,21 +1,155 @@
 # Références
 
-## Sources externes utilisées par le code — état au 0.154.0 (2026-10-31, relu contre le code)
+## Sources externes utilisées par le code — état au 0.315.0 (2026-11-02, relu contre le code ; remplace l'état au 0.154.0)
 
-| Service | Adresse appelée | Fichier | Déclenchement | Cache |
+Ordre (DEC-011) : données du jeu d'abord (Lumina / sqpack, structures FFXIVClientStructs), puis sources communautaires. Une source
+communautaire absente ou désactivée donne « inconnu », jamais une valeur devinée. Interrupteurs : Paramètres › Avancé › Sources
+communautaires (LuminaSupplemental, Garland, wiki, GatherBuddy, Teamcraft, prix au survol Universalis).
+
+### Lues à l'exécution (réseau)
+
+| Service | Licence | Adresse appelée | Fichier | Déclenchement | Cache |
+|---|---|---|---|---|---|
+| Universalis | API publique (licence non relevée) | `universalis.app/api/v2/aggregated/{monde}/{objet}` ; `/api/v2/{monde, centre ou région}/{objet}?listings=…&entries=…` ; `/api/v2/data-centers` | `Market/MarketService.cs`, `Market/MarketBoardService.cs` | prix : clic ou survol (option) ; annonces et historique : page Marché seulement (0.270) | « Prix » ; annonces aussi sur disque `market-board` (0.281) |
+| Garland Tools | MIT (code, REF-QUEST-REWARDS-003) | `garlandtools.org/db/doc/{route}/{id}.json` (objets, donjons, monstres) | `Community/GarlandClient.cs`, `Duties/DutyLootService.cs`, `Monsters/MonsterLootService.cs` | sources d'objet seulement si aucune source du jeu n'est connue ; butin des contenus et des monstres | « Sources » (`sources`) ; butin 30 min en mémoire |
+| Wiki FFXIV (consolegameswiki) | licence du contenu non relevée | API `parse` et `index.php?action=raw` | `Monsters/WikiMonsterSources.cs`, `Community/WikiItemAcquisition.cs`, `Maps/WikiVistas.cs` | survol ou consultation ; carnet d'exploration au survol d'un repère | « Sources » (`wiki-items`, `wiki-monsters`, `wiki-vistas`) |
+| LuminaSupplemental (Critical-Impact) | GPL-3.0 | `raw.githubusercontent.com/Critical-Impact/LuminaSupplemental/main/src/LuminaSupplemental.Excel/Generated/*.csv` | `Community/LuminaSupplemental.cs` | premier usage : butin des contenus (coffres, boss), sources d'objets (monstres, ALEA, entreprises, ItemSupplement, boutique, PNJ) | « Sources » (`lumina-supplemental`) |
+| GatherBuddy (Ottermandias) | Apache-2.0 | `api.github.com/repos/Ottermandias/GatherBuddy/contents/…/Data/Fish` puis `raw.githubusercontent.com/…/Data/Fish/Data*.cs` | `Community/GatherBuddyFish.cs` | aide à la pêche, Récolte (poissons) ; fichiers lus comme données (REF-FISH-GATHERBUDDY) | « Sources » (`gatherbuddy-fish`) |
+| Teamcraft (temps de touche) | MIT (code) ; relevés publics de ses utilisateurs, licence des données non relevée | `gubal.ffxivteamcraft.com/graphql` | `Community/FishBiteTimes.cs` | une requête par lieu de pêche (0.231) | « Sources » (`teamcraft-bites`) |
+| FFXIVGachaSpreadsheet (Infi) | MIT | `raw.githubusercontent.com/Infiziert90/FFXIVGachaSpreadsheet/refs/heads/master/website/static/data/` (`FashionReport.json`, `LastUpdate.json`) | `Fashion/FashionDataService.cs` | onglet Revue de mode | « Revue de mode » (`fashion`) |
+
+Bornes : Garland, wiki, LuminaSupplemental, GatherBuddy et Revue de mode passent par `Community/BoundedHttp.cs` (taille et durée
+bornées) ; Universalis a ses propres bornes (`MarketService` 1 Mo / 12 s ; `MarketBoardService` 4 Mo / 15 s, une requête à la fois,
+3 s d'écart) ; Teamcraft : délai 20 s, réponse refusée au-delà d'un million de caractères (contrôle fait après la lecture). Cache
+disque commun `Caching/DataCache.cs`, durées dans Paramètres › Données (dont « Jamais (seulement sur demande) », 0.281) ; 5 min
+d'attente après un échec et copie expirée en secours (0.246). Aucune ne contacte les serveurs du jeu. Détail :
+[0.246-cache-audit.md](../evidence/0.246-cache-audit.md).
+
+### Embarquées dans la DLL (données communautaires sous licence compatible, DEC-021)
+
+| Donnée | Source et licence | Fichier embarqué | Avis de licence | Depuis |
 |---|---|---|---|---|
-| Universalis | `universalis.app/api/v2/aggregated/{monde}/{objet}` | `Market/MarketService.cs` | clic ou survol (option) | durée « Prix » |
-| Garland Tools | `garlandtools.org/db/doc/{route}/{id}.json` (objets, donjons, monstres) | `Community/GarlandClient.cs` | consultation d'un objet/donjon ; sources d'objet seulement si aucune source du jeu n'est connue | durée « Sources » |
-| Wiki FFXIV (consolegameswiki) | API `parse` et `index.php?action=raw` | `Monsters/WikiMonsterSources.cs`, `Community/WikiItemAcquisition.cs`, `Maps/WikiVistas.cs` | survol ou consultation ; carnet d'exploration au survol d'un repère | durée « Sources » |
-| LuminaSupplemental (Critical-Impact, GPL-3.0) | `raw.githubusercontent.com/Critical-Impact/LuminaSupplemental/main/.../Generated/*.csv` | `Community/LuminaSupplemental.cs` | premier usage du butin des contenus ou des sources d'objets | durée « Sources » |
-| FFXIVGachaSpreadsheet (Infiziert90) | `raw.githubusercontent.com/.../website/static/data/` | `Fashion/FashionDataService.cs` | onglet Revue de mode | durée « Revue de mode » |
+| Seuils de butin des secteurs de sous-marin (143 lignes : T2 / T3, Normal / Optimal, faveur) | SubmarineTracker `Data/Sectors.cs` MapBreakpoints, commit 04c54d770f815cd416bbade1ac5b178b551a32b5, MIT (c) 2023 Infi ; à l'origine feuille « Submersible Loot Spreadsheet » (Elena / saerielle, sans licence) | `FreeCompany/Data/submarine-breakpoints.csv` | texte MIT complet en tête du fichier ; README | 0.315 |
+| Butin moyen par secteur de sous-marin (55 Ko depuis 0.335, pools par palier) | FFXIVGachaSpreadsheet `website/static/data/Submarines.json` (relevés communautaires), MIT (c) 2023 Infi ; téléchargé le 2026-11-02, SHA-256 ca900aef1a12425699f870c4ab273795fff4ed2b36f6f5a4abf581205353d44c | `FreeCompany/Data/submarine-loot.json`, produit par `tools/submarine-loot.py` | ligne « Source » (licence et copyright) dans le fichier, sans le texte MIT complet ; README | 0.309 |
+| Arbre de déblocage des secteurs de dirigeable (24 lignes) et butin possible (261 lignes, sans quantité ni taux) | LuminaSupplemental `src/LuminaSupplemental.Excel/Generated/AirshipUnlock.csv` et `AirshipDrop.csv`, commit bd265c2b39868387937ae5b0c038593af997e0f9, GPL-3.0 (Critical-Impact) ; SHA-256 dans l'en-tête de chaque fichier | `FreeCompany/Data/airship-unlock.csv`, `FreeCompany/Data/airship-drop.csv` | avis GPL-3.0 en tête des fichiers (même licence que Tensho, texte complet : LICENSE) ; README | 0.336 |
+| Modificateur de statistique principale, niveaux 1 à 100 | Character Panel Refined (Kouzukii) `LevelModifiers.cs`, MIT | table dans `Character/StatFormulas.cs` | commentaire de source (MIT) sans le texte de licence ; README, Paramètres › Avancé | 0.184 |
 
-Toutes passent par `Community/BoundedHttp.cs` (taille et durée bornées) et le cache disque (`Caching/DataCache.cs`). Aucune ne contacte
-les serveurs du jeu.
+Les fichiers de données sont des `EmbeddedResource` (`TenshoAssistant.csproj`) : rien n'est livré à côté de la DLL (DEC-017).
 
-Références de conception étudiées sans copie de code (lecture des faits uniquement) : Mappy (AGPL-3.0, carte hôte hors écran et
-liste des icônes survolées), SortaKinda (AGPL-3.0), GatherBuddy (Apache-2.0), Garland Tools (MIT), FFXIVClientStructs (`AgentMap`,
-`MapMarkerData`, `Utf8String`, `PlayerState`). Les preuves de lecture des feuilles du jeu sont dans [docs/evidence/](../evidence/).
+### Règles communautaires reprises comme faits (code original, présentées comme estimations, DEC-022)
+
+| Règle | Source | Code | Statut |
+|---|---|---|---|
+| Bonus de Récolte abondante II (+3 / +2 / +1 selon ⌊base × 1,1⌋ et ⌊base × 0,9⌋) | frozen_rabbit_tome (sans licence, fait relevé) ; GatheringOptimizer (MIT) laisse la valeur manuelle | outil PR, « estimé », modifiable | 0.224 ; [preuve](../evidence/0.224-bountiful-base.md) ; à valider en jeu |
+| Distance et durée d'un trajet de sous-marin (étapes, relevés, 12 h fixes, 5 secteurs au plus) | SubmarineTracker (MIT) `SubExplPretty.cs`, `Data/Voyage.cs`, lus | `FreeCompany/VoyagePlanner.cs` | 0.309 ; durée réelle non vérifiée en jeu |
+| Usure : (335 + rang du secteur − rang de la pièce) × 7 par secteur, 30 000 par pièce | feuille « Submersibles durability damage », reprise par SubmarineTracker | `FreeCompany/VesselBuilds.cs` | 0.315 ; estimation |
+| Coût total des pièces ≤ capacité | outils communautaires (SubmarineTracker, Argus), cohérente avec 11 montages de dirigeables publiés | `FreeCompany/VesselBuilds.cs` | 0.315 ; non vérifiée en jeu sous le rang 50 |
+| Nom court d'un montage (« SSUC++ ») | convention communautaire | `FreeCompany/VesselBuilds.cs` | 0.315 |
+| Mirage : toute armure ou tout accessoire, quel que soit le job ou le niveau ; armes et outils liés au job | patch 7.4 (décembre 2025) : presse (PC Gamer, Game Informer) et communiqué du patch, cités en CHANGELOG 0.311 ; pas de sonde des données du jeu | `Gear/GearCatalog.cs` (`AllJobs`), DEC-020 | 0.311 ; page validée en jeu (rapport utilisateur 2026-11-02, 0.310–0.314) |
+
+### Références lues, sans copie de code
+
+Lecture des faits uniquement : Mappy (AGPL-3.0, carte hôte hors écran et liste des icônes survolées), SortaKinda (AGPL-3.0),
+AvantGarde (AGPL-3.0, REF-FASHION-AVANTGARDE), GatherBuddy (Apache-2.0), Garland Tools (MIT), FFXIVClientStructs (MIT selon
+[0.307-fc-voyages.md](../evidence/0.307-fc-voyages.md) ; `AgentMap`, `MapMarkerData`, `Utf8String`, `PlayerState`, atelier de la
+compagnie, `MirageManager`, `UIState.Cabinet`, `AgentTryon`). Depuis 0.235 : SubmarineTracker (MIT, formules 0.309 ; ses seuils
+sont embarqués en 0.315, voir ci-dessus), AutoRetainer (0.307, non copié, licence non relevée), Argus (MIT, licence non consignée dans la preuve ; 0.315, règle
+« coût ≤ capacité » ; ses seuils de dirigeables viennent de sources sans licence et ne sont pas repris), HimbeertoniRaidTool (MIT,
+0.310), Glamourer (Apache-2.0, 0.310), xivgear.app (aucune licence publiée : lu seulement, 0.310). Allagan Tools n'est pas utilisé
+(DEC-013). Les preuves de lecture des feuilles du jeu sont dans [docs/evidence/](../evidence/).
+
+## Fiches 0.184 → 0.315 (relues contre le code le 2026-11-02)
+
+> Les fiches 0.213 (REF-FASHION-AVANTGARDE) et 0.227 (REF-FISH-GATHERBUDDY) sont à la fin de l'archive ci-dessous.
+
+### REF-FC-VOYAGES (0.307, 0.309, 0.315) — données du jeu
+SOURCE: FFXIVClientStructs (MIT) : `HousingManager.Instance()->WorkshopTerritory` (nul hors de l'atelier),
+`HousingWorkshopSubmersibleSubData` (rang, retour, expérience, nom, secteurs du trajet, butin, statistiques Base et Bonus, clés de
+pièces), `HousingWorkshopAirshipSubData` (totaux), `HousingManager.IsSubmarineExplorationUnlocked(byte)`. Feuilles :
+SubmarineExploration, SubmarineRank, SubmarinePart, SubmarineSpecCategory, AirshipExplorationPart / Point / Level /
+ParamType ; pièce ↔ objet par `Item.FilterGroup` 36 / 28 et `Item.AdditionalData`.
+EVIDENCE: [0.307-fc-voyages.md](../evidence/0.307-fc-voyages.md), [0.309-submarine-routes.md](../evidence/0.309-submarine-routes.md),
+[0.315-vessel-builds.md](../evidence/0.315-vessel-builds.md) (`tools/ApiProbe`, `tools/ShopCurrencyProbe` PROBE_SUBROUTES /
+PROBE_VESSELPARTS, lecture seule).
+CODE: `FreeCompany/VoyageWatcher.Dalamud.cs` (lecture dans l'atelier), `Voyages.cs`, `VoyagePlanner.cs`, `VesselBuilds.cs`.
+LIMITS (non vérifié en jeu) : moment où le jeu remplit ces données (entrée de l'atelier ou panneau des expéditions) ; Base = somme
+des pièces et Bonus = bonus de rang (la page affiche ⚠ en cas d'écart) ; durée réelle d'un voyage ; lecture des secteurs débloqués.
+
+### REF-FC-SUBMARINETRACKER (0.309 lu, 0.315 données embarquées)
+REPOSITORY: https://github.com/Infiziert90/SubmarineTracker — MIT, (c) 2023 Infi.
+COMMIT_OR_VERSION: 04c54d770f815cd416bbade1ac5b178b551a32b5 pour la copie des seuils (0.315) ; commit de la lecture 0.309 non consigné.
+FILES_READ: `SubExplPretty.cs` (distance et durée d'une étape), `Data/Voyage.cs` (12 h fixes, ordre de distance minimale, 5 secteurs
+au plus), `Data/Sectors.cs` (MapBreakpoints).
+USAGE: formules comprises, code Tensho original (0.309) ; MapBreakpoints copiés tels quels avec l'avis MIT (0.315), affichés comme
+« seuils communautaires ». Écart voulu : un secteur sans seuil rend le trajet « inconnu » (SubmarineTracker renvoie 0).
+LIMITS: contre les minimums observés de FFXIVGachaSpreadsheet, 75 secteurs sur 143 identiques ; la valeur embarquée est sous toutes les
+observations dans 19 secteurs (liste dans la preuve 0.315) : un palier « atteint » n'y est confirmé par aucun relevé.
+
+### REF-FC-GACHASPREADSHEET (0.309)
+REPOSITORY: https://github.com/Infiziert90/FFXIVGachaSpreadsheet — MIT, (c) 2023 Infi.
+USAGE: (1) à l'exécution, `FashionReport.json` pour la Revue de mode (avant 0.235) ; (2) embarqué en 0.309 : `Submarines.json`
+(143 secteurs, environ 200 millions d'objets relevés, empreinte ci-dessus) réduit par `tools/submarine-loot.py` au nombre de relevés et
+au total vu par objet, tous paliers confondus. Valeur d'un secteur = Σ (Total ÷ Records) × `Item.PriceLow` (données du jeu).
+LIMITS: le butin n'est pas dans les données du jeu (décidé côté serveur) ; valeur moyenne sur tous les paliers ; aucun relevé
+public équivalent pour les dirigeables.
+
+### REF-FC-ARGUS (0.315)
+LICENSE: MIT selon l'équipe de recherche 0.315, mais ni la licence, ni le dépôt, ni le commit ne sont consignés dans la preuve (à relever) ; lu seulement.
+USAGE: confirmation de la règle « coût ≤ capacité ». Ses seuils de dirigeables viennent de sources sans licence : non repris, d'où
+l'absence de planificateur de trajets de dirigeable (l'arbre de déblocage des dirigeables de LuminaSupplemental, GPL-3.0, est
+embarqué depuis 0.336, DEC-023).
+
+### REF-GEAR-R11 (0.310 → 0.314) — données du jeu
+SOURCE: Item (EquipSlotCategory, ClassJobCategory, LevelEquip, LevelItem, MateriaSlotCount, IsAdvancedMeldingPermitted,
+BaseParam / valeurs), EquipSlotCategory, ClassJobCategory, BaseParam (pourcentages par emplacement), ItemLevel, Materia ;
+`InventoryItem.GetMateriaId` / `GetMateriaGrade` ; `AgentTryon.TryOn` (statique).
+EVIDENCE: [0.310-gear-sheets.md](../evidence/0.310-gear-sheets.md), [0.312-materia.md](../evidence/0.312-materia.md) (PROBE_GEAR,
+PROBE_MELD, lecture seule).
+RULES: plafond = arrondi(ItemLevel[statistique] × BaseParam[emplacement] / 1000), égal à la plus haute statistique secondaire de la
+pièce (34830 : 111 ; 43047 : 374) ; grades VI, VIII, X et XII exclus en surmatérialisation ; mirage depuis 7.4 (tableau ci-dessus).
+READ_ONLY: HimbeertoniRaidTool (MIT), Glamourer (Apache-2.0), xivgear.app (aucune licence) — idées seulement ; dépôts, commits et
+fichiers lus non consignés.
+LIMITS: taux de réussite de la surmatérialisation non modélisé ; plafond d'une pièce couvrant plusieurs emplacements (pourcentage du
+torse) non vérifié en jeu. Pages 0.310–0.314 validées en jeu (rapport utilisateur 2026-11-02).
+
+### REF-BANK-STORAGES (0.235 → 0.240) — données du jeu
+SOURCE: `InventoryType` de l'arsenal (3500, 3200–3203, 3205–3209, 3300, 3400 ; ids vérifiés par réflexion de FFXIVClientStructs) ;
+`MirageManager.PrismBoxLoaded` / `PrismBoxItemIds` (+1 000 000 HQ, +500 000 collectionnable) ; `UIState.Cabinet.IsCabinetLoaded` /
+`IsItemInCabinet` avec la feuille Cabinet ; feuille MirageStoreSetItem (pièces d'une tenue, 0.240).
+CODE: `Inventory/BankInventoryBridge.Dalamud.cs`, `Inventory/BankModels.cs` (conteneurs virtuels 25000 et 25001).
+LIMITS: coffre et armoire connus seulement après leur ouverture en jeu ; 0.234–0.240 à valider en jeu. Sans autre plugin (DEC-013).
+
+### REF-MARKET-BOARD (0.270, 0.281)
+SOURCE: API Universalis, champs sondés le 2026-11-02 ([0.270-universalis-listings.md](../evidence/0.270-universalis-listings.md)) :
+`listings[]`, `recentHistory[]`, vitesses de vente ; portée monde sans `worldName`. Règle de jeu : une annonce s'achète en entier.
+CODE: `Market/MarketBoard.cs`, `Market/MarketBoardService.cs`.
+STATUS: validé en jeu (rapport utilisateur 2026-11-02, 0.270–0.271).
+
+### REF-FISH-TEAMCRAFT (0.231)
+REPOSITORY: ffxiv-teamcraft (MIT) ; API GraphQL publique de son client (`apps/client/src/app/apollo-client-factory.ts`), requête
+« BiteTimesPerFishPerSpotQuery » (`apps/client/src/app/pages/db/service/fish-data.gql.ts`).
+USAGE: `Community/FishBiteTimes.cs` garde, par poisson, les secondes avec au moins 3 relevés et 2 % des relevés du poisson ;
+intervalle et seconde la plus fréquente affichés. Preuve : [0.231-teamcraft-bite-times.md](../evidence/0.231-teamcraft-bite-times.md).
+STATUS: validé en jeu (capture 2026-11-01).
+
+### REF-CHAR-CPR-LEVELMOD (0.184)
+REPOSITORY: Character Panel Refined (Kouzukii), `CharacterPanelRefined/LevelModifiers.cs`, MIT, lu le 2026-10-31.
+USAGE: modificateur principal par niveau (absent des feuilles du jeu) embarqué dans `Character/StatFormulas.cs` ; colonnes secondaire
+et diviseur concordantes avec ParamGrow aux niveaux 50/70/80/90/100 ([0.182.0-paramgrow-probe.log](../evidence/0.182.0-paramgrow-probe.log)).
+STATUS: validé en jeu (« c'est ok », 2026-10-31).
+
+### Preuves de données du jeu 0.246 → 0.300 (sondes en lecture seule)
+
+| Version | Preuve | Fait établi |
+|---|---|---|
+| 0.246 | [0.246-r05-window-order.md](../evidence/0.246-r05-window-order.md) | Dalamud dessine les fenêtres des plugins après l'interface du jeu, sans API pour les intercaler (DEC-014) |
+| 0.278 | [0.278-triad-ex-cards.md](../evidence/0.278-triad-ex-cards.md) | `TripleTriadCardResident.UIPriority` ≠ 0 marque les 15 cartes Ex. |
+| 0.283 | [0.283-quest-journal-sections.md](../evidence/0.283-quest-journal-sections.md) | `Quest.JournalGenre` → `JournalCategory` → `JournalSection` |
+| 0.285 | [0.285-quest-start-cities.md](../evidence/0.285-quest-start-cities.md) | racines « Une visite s'impose » par cité de départ, chaînes `PreviousQuest` |
+| 0.286 | [0.286-quest-alternatives.md](../evidence/0.286-quest-alternatives.md) | `QuestLock` et `PreviousQuestJoin` (une seule quête précédente suffit) |
+| 0.292 | [0.292-draw-times.md](../evidence/0.292-draw-times.md) | temps d'affichage relevés en jeu par l'utilisateur (médianes sous 0,5 ms) |
+| 0.295 | [0.295-fcc-shops.md](../evidence/0.295-fcc-shops.md) | `FccShop` : objet, coût en crédits de compagnie, rang requis |
+| 0.300 | [0.300-calendar-resets.md](../evidence/0.300-calendar-resets.md) | heures de remise à zéro du Calendrier du jeu (capture utilisateur) |
 
 ## Fiches de référence (archive)
 

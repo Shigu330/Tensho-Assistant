@@ -10,6 +10,9 @@ public sealed class FileInventoryBankStore : IInventoryBankStore
 {
     private const int MaximumBytes = 16 * 1024 * 1024;
     private const int MaximumItems = 131072;
+    // 0.329: one bound for a container's slots and items, checked on save and on load. The glamour dresser holds 800 slots plus up
+    // to 11 pieces per stored outfit (800 × 12 = 9600): the old 4096, checked only on load, let a saved file block the whole bank.
+    private const int MaximumContainerSlots = 16384;
     private readonly string path;
     private readonly object gate = new();
     private bool loadFailed;
@@ -144,8 +147,9 @@ public sealed class FileInventoryBankStore : IInventoryBankStore
                 throw new InvalidDataException("Invalid bank containers.");
             foreach (var container in entry.Containers)
             {
-                if (container is null || container.Items is null || container.Items.Length > 4096)
+                if (container is null || container.Items is null || container.Items.Length > MaximumContainerSlots)
                     throw new InvalidDataException("Invalid bank item count.");
+                if (container.Slots is { Length: > MaximumContainerSlots }) throw new InvalidDataException("Too many stored slots.");
                 total = checked(total + container.Items.Length);
                 if (total > MaximumItems) throw new InvalidDataException("Too many bank items.");
             }
@@ -193,7 +197,7 @@ public sealed class FileInventoryBankStore : IInventoryBankStore
             var aggregate = new InventoryContainerSnapshot(new(new(owner), new(c.ContainerId)), InventoryCoverage.Complete, stacks);
             if (c.Slots is not { Length: > 0 }) return aggregate;
             // 0.239: armoire records saved by 0.236 carry Cabinet row numbers as slots (up to a few thousand): read them as they are.
-            if (c.Slots.Length > 4096) throw new InvalidDataException("Too many stored slots.");
+            if (c.Slots.Length > MaximumContainerSlots) throw new InvalidDataException("Too many stored slots.");
             var positioned = new InventoryContainerSnapshot(aggregate.Location, InventoryCoverage.Complete,
                 c.Slots.Select(slot => slot is null || slot.Slot is < 0 or >= 100000 || slot.DisplayIndex is < -1 or >= 175
                     ? throw new InvalidDataException("Invalid stored slot.")

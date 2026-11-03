@@ -28,13 +28,13 @@ public static class CraftSimulation
     public static string? Unsupported(RecipeDefinition recipe)
     {
         var p=recipe.Simulation;
-        if(p is null) return "Paramètres de simulation absents pour cette recette.";
+        if(p is null) return "Simulation parameters missing for this recipe.";
         if(p.Expert || p.LevelScaled || p.Specialist || p.RequiredQuality>0)
-            return "Recette experte, ajustée, spécialisée ou à qualité imposée hors périmètre de cette simulation.";
-        if(p.Collectable && p.Quality<=0)return "Qualité maximale du collectionnable absente ou incompatible.";
+            return "Expert, adjusted, specialist or fixed-quality recipe outside this simulation's scope.";
+        if(p.Collectable && p.Quality<=0)return "Collectable maximum quality missing or incompatible.";
         if(p.Durability<=0 || p.Progress<=0 || p.Quality<0 || p.ProgressDivider<=0 || p.ProgressModifier<=0
             || p.Quality>0 && (p.QualityDivider<=0 || p.QualityModifier<=0) || p.MaxStartingQuality<0 || p.MaxStartingQuality>p.Quality)
-            return "Paramètres natifs incomplets ou incompatibles avec le modèle.";
+            return "Native parameters incomplete or incompatible with the model.";
         return null;
     }
     public static CraftSimulationResult Run(RecipeDefinition recipe,CraftStats stats,int startingQuality,IEnumerable<CraftActionKind> sequence,CancellationToken cancellation=default)
@@ -45,7 +45,7 @@ public static class CraftSimulation
         var p=recipe.Simulation!;
         if(stats.Level is <1 or >100 || stats.Craftsmanship is <0 or >100000 || stats.Control is <0 or >100000 || stats.Cp is <0 or >10000
             || startingQuality<0 || startingQuality>p.MaxStartingQuality) throw new ArgumentOutOfRangeException(nameof(stats));
-        if(stats.Craftsmanship<p.RequiredCraftsmanship || stats.Control<p.RequiredControl) throw new ArgumentException("Habileté ou Contrôle sous le minimum de la recette.",nameof(stats));
+        if(stats.Craftsmanship<p.RequiredCraftsmanship || stats.Control<p.RequiredControl) throw new ArgumentException("Craftsmanship or Control below the recipe's minimum.",nameof(stats));
         var actions=sequence.Take(101).ToArray(); if(actions.Length>100) throw new ArgumentException("100 actions maximum.",nameof(sequence));
         // Single-precision base gain and truncation reproduce the verified game-model baseline.
         var progressBase=stats.Craftsmanship*10f/p.ProgressDivider+2;
@@ -68,22 +68,22 @@ public static class CraftSimulation
     internal static CraftSimStep? Apply(CraftRecipeParameters p,CraftStats stats,int recipeLevel,int bp,int bq,CraftSimState state,CraftActionKind kind,out string? error,
         CraftStepCondition condition=CraftStepCondition.Normal,int goodQualityPercent=150)
     {
-        if(!Enum.IsDefined(condition) || goodQualityPercent is not (150 or 175)){error="Condition ou bonus favorable non pris en charge.";return null;}
+        if(!Enum.IsDefined(condition) || goodQualityPercent is not (150 or 175)){error="Favourable condition or bonus not supported.";return null;}
         var spec=CraftActionCatalog.Specs.FirstOrDefault(spec=>spec.Kind==kind);
         var quality=IncreasesQuality(kind);
         var progress=kind is CraftActionKind.BasicSynthesis or CraftActionKind.CarefulSynthesis or CraftActionKind.Groundwork or CraftActionKind.MuscleMemory or CraftActionKind.DelicateSynthesis or CraftActionKind.PrudentSynthesis;
         var cp=spec?.Cp ?? 0;
         if(kind==CraftActionKind.StandardTouch && state.TouchCombo==1 || kind==CraftActionKind.AdvancedTouch && state.TouchCombo==2) cp=18;
-        error=spec is null ? "Action non prise en charge." : stats.Level<spec.Level ? "Niveau insuffisant pour cette action."
-            : kind==CraftActionKind.Manipulation && !stats.ManipulationAllowed ? "Utilisation de Manipulation non confirmée dans le scénario."
-            : (kind is CraftActionKind.MuscleMemory or CraftActionKind.Reflect or CraftActionKind.TrainedEye) && state.Step!=0 ? "Action réservée au premier tour."
-            : kind==CraftActionKind.TrainedEye && stats.Level<recipeLevel+10 ? "Main preste exige dix niveaux de plus que la recette."
-            : (kind is CraftActionKind.PrudentSynthesis or CraftActionKind.PrudentTouch) && state.WasteNot>0 ? "Action incompatible avec Parcimonie."
-            : kind==CraftActionKind.TrainedFinesse && state.InnerQuiet!=10 ? "Dix degrés de Calme intérieur requis."
-            : kind==CraftActionKind.TrainedPerfection && state.UsedTrainedPerfection ? "Main suprême utilisable une seule fois par synthèse."
-            : kind==CraftActionKind.Byregot && state.InnerQuiet==0 ? "Calme intérieur requis pour Byregot."
-            : quality && p.Quality==0 && kind!=CraftActionKind.DelicateSynthesis ? "Cette recette ne possède pas de cible de qualité."
-            : state.Cp<cp ? "PS insuffisants pour cette action." : null;
+        error=spec is null ? "Action non prise en charge." : stats.Level<spec.Level ? "Level too low for this action."
+            : kind==CraftActionKind.Manipulation && !stats.ManipulationAllowed ? "Use of Manipulation not confirmed in the scenario."
+            : (kind is CraftActionKind.MuscleMemory or CraftActionKind.Reflect or CraftActionKind.TrainedEye) && state.Step!=0 ? "Action reserved for the first step."
+            : kind==CraftActionKind.TrainedEye && stats.Level<recipeLevel+10 ? "Quick Innovation needs ten levels more than the recipe."
+            : (kind is CraftActionKind.PrudentSynthesis or CraftActionKind.PrudentTouch) && state.WasteNot>0 ? "Action incompatible with Waste Not."
+            : kind==CraftActionKind.TrainedFinesse && state.InnerQuiet!=10 ? "Ten stacks of Inner Quiet required."
+            : kind==CraftActionKind.TrainedPerfection && state.UsedTrainedPerfection ? "Trained Perfection can be used only once per synthesis."
+            : kind==CraftActionKind.Byregot && state.InnerQuiet==0 ? "Inner Quiet required for Byregot."
+            : quality && p.Quality==0 && kind!=CraftActionKind.DelicateSynthesis ? "This recipe has no quality target."
+            : state.Cp<cp ? "Not enough CP for this action." : null;
         if(error is not null) return null;
         var durabilityCost=state.TrainedPerfection ? 0:state.WasteNot>0 ? (spec!.Durability+1)/2:spec!.Durability;
         var efficiency=kind switch

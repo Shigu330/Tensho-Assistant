@@ -2,7 +2,8 @@ using TenshoAssistant.MiniGames;
 
 namespace TenshoAssistant.Collections;
 
-public enum CollectionKind { Mount, Companion, Emote, BlueMagic, TripleTriad, Orchestrion, Title, Achievement }
+// 0.365 (g, C-04): the kinds after Achievement are read by ExtraCollectionReader (not in the collections cache).
+public enum CollectionKind { Mount, Companion, Emote, BlueMagic, TripleTriad, Orchestrion, Title, Achievement, Hairstyle, Ornament, Glasses, Barding, Portrait, MasterBook, McGuffin, OccultLore }
 public enum CollectionAcquisition { Unknown, Acquired, NotAcquired }
 public sealed record TitleMetadata(string Masculine,string Feminine,bool IsPrefix,int Order);
 public sealed record AchievementMetadata(uint CategoryId,string CategoryName,int? CategoryOrder,uint KindId,string KindName,int? KindOrder,
@@ -11,7 +12,7 @@ public sealed record OrchestrionMetadata(uint CategoryId,string CategoryName,int
 public sealed record CollectionCategoryIssue(CollectionKind Kind,string Reason);
 public sealed record CollectionEntry(CollectionKind Kind, uint Id, string Name, uint IconId, bool ConfirmedUnlocked,
     int Number = 0, int Rank = 0, string Description = "", string Location = "", TriadCardDefinition? Card = null,OrchestrionMetadata? Music=null,
-    TitleMetadata? Title=null,AchievementMetadata? Achievement=null,bool NegativeConfirmed=false)
+    TitleMetadata? Title=null,AchievementMetadata? Achievement=null,bool NegativeConfirmed=false,uint ItemId=0)
 {
     public CollectionAcquisition Acquisition=>ConfirmedUnlocked ? CollectionAcquisition.Acquired:NegativeConfirmed ? CollectionAcquisition.NotAcquired:CollectionAcquisition.Unknown;
 }

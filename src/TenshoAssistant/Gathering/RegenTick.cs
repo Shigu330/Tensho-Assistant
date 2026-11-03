@@ -1,0 +1,46 @@
+namespace TenshoAssistant.Gathering;
+
+/// <summary>What the GP tick bar shows: GP now and at most, and where the 3-second regeneration cycle is (null = no tick seen yet).</summary>
+public sealed record RegenTickState(uint Gp,uint MaxGp,double? Progress,double? SecondsLeft);
+
+/// <summary>
+/// g, R-08 (0.403): says once when a gatherer's GP rises to the threshold (0 = the maximum); armed again once GP falls below it.
+/// The first read only sets the starting point (logging in with full GP is not an alert).
+/// </summary>
+public sealed class GpAlertTracker
+{
+    private uint? last;
+    public void Reset()=>last=null;
+    public static uint Target(uint maxGp,int threshold)=>threshold<=0 ? maxGp:Math.Min((uint)threshold,maxGp);
+    public bool Evaluate(uint gp,uint maxGp,int threshold)
+    {
+        var target=Target(maxGp,threshold);
+        var reached=last is { } before && before<target && gp>=target && maxGp>0;
+        last=gp;
+        return reached;
+    }
+}
+
+/// <summary>
+/// g, X-06 (0.391): the regeneration tick of a gatherer's GP (ideas from Tick Tracker, AGPL, read only; original code). The game adds GP
+/// every 3 seconds; a rise of GP while it was not full is taken as a tick, and the bar runs from it. A rise from a potion or an action
+/// can be taken for a tick: the next natural one puts the bar right again. A tick older than a minute is forgotten.
+/// </summary>
+public sealed class RegenTickTracker
+{
+    public static readonly TimeSpan Period=TimeSpan.FromSeconds(3);
+    private uint? last,lastMax;
+    private DateTimeOffset? tick;
+
+    public void Reset(){last=null;lastMax=null;tick=null;}
+
+    public RegenTickState Observe(uint gp,uint maxGp,DateTimeOffset now)
+    {
+        // Full means full against the maximum of the previous read: a higher maximum (gear changed) at full GP is not a tick.
+        if(last is { } before && gp>before && before<(lastMax ?? maxGp))tick=now;
+        last=gp;lastMax=maxGp;
+        if(tick is not { } at || now-at>TimeSpan.FromMinutes(1) || now<at)return new(gp,maxGp,null,null);
+        var into=(now-at).TotalSeconds%Period.TotalSeconds;
+        return new(gp,maxGp,into/Period.TotalSeconds,Period.TotalSeconds-into);
+    }
+}

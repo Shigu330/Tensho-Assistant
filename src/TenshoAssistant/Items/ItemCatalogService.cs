@@ -10,6 +10,6 @@ public sealed class ItemCatalogService
     internal void Publish(ItemCatalog catalog) => Interlocked.Exchange(ref state,
         new(catalog, state.RowsCopied, state.TotalRows, null));
     internal void Fail() => Interlocked.Exchange(ref state,
-        new(null, state.RowsCopied, state.TotalRows, "Catalogue indisponible. Consultez le journal Dalamud."));
+        new(null, state.RowsCopied, state.TotalRows, "Catalogue unavailable. See the Dalamud log."));
     internal void Clear() => Interlocked.Exchange(ref state, new(null, 0, 0, null));
 }

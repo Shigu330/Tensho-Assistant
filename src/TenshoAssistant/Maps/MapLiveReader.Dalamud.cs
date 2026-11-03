@@ -55,6 +55,9 @@ internal sealed class MapLiveReader : IDisposable
     /// first read. An aetheryte missing from it is not attuned (or not offered by the game): its cost is unknown, never zero.
     /// </summary>
     public IReadOnlyDictionary<uint,uint>? TeleportCosts=>Volatile.Read(ref teleportCosts);
+    // 0.328: the last cost read failed (the popup says so; prices depend on where the player stands, an old copy would mislead).
+    private volatile bool costsFailed;
+    public bool TeleportCostsFailed=>costsFailed;
     /// <summary>Asks for a fresh copy of the teleport costs, read on the next framework tick.</summary>
     public void RefreshTeleportCosts()=>Interlocked.Exchange(ref costsRequest,1);
     public MapLiveState? State=>Volatile.Read(ref state);
@@ -91,17 +94,39 @@ internal sealed class MapLiveReader : IDisposable
         {
             if(Interlocked.Exchange(ref removeFlag,0)==1)ClearFlag();
             if(Interlocked.Exchange(ref teleport,0) is var destination && destination>0)SendTeleport((uint)destination);
-            if(Interlocked.Exchange(ref costsRequest,0)==1)Volatile.Write(ref teleportCosts,ReadTeleportCosts());
+            if(Interlocked.Exchange(ref costsRequest,0)==1){try{Volatile.Write(ref teleportCosts,ReadTeleportCosts());costsFailed=false;}catch(Exception error){costsFailed=true;Failed("teleport costs",error);}}
             var player=client.IsLoggedIn ? objects.LocalPlayer:null;
             if(player is null){Volatile.Write(ref state,null);return;}
             var (flagMap,flag)=ReadFlag();
-            if(flights is null || now>=flightAt){flights=ReadFlights();(unlockedCurrents,sightseen)=ReadCollected();flightAt=now.AddSeconds(2);}
-            if(now>=eventsAt){events=ReadEvents();nearby=ReadObjects();fates=ReadFates();partyMarkers=ReadParty();eventsAt=now.AddMilliseconds(500);}
+            // 0.328 (R-14): each secondary read (here and the teleport costs above) has its own guard; a failure keeps that part's
+            // last copy and no longer removes the position or the flag. « flights is null || » was dropped from the test: with a
+            // failing read it retried every frame; the first tick still reads, flightAt starts at its default.
+            if(now>=flightAt)
+            {
+                try{flights=ReadFlights();}catch(Exception error){Failed("flights",error);}
+                try{(unlockedCurrents,sightseen)=ReadCollected();}catch(Exception error){Failed("collected",error);}
+                flightAt=now.AddSeconds(2);
+            }
+            if(now>=eventsAt)
+            {
+                try{events=ReadEvents();}catch(Exception error){Failed("events",error);}
+                // Objects, FATEs and party carry no map id: on a failure they are emptied, never kept from another zone.
+                try{nearby=ReadObjects();}catch(Exception error){nearby=[];Failed("objects",error);}
+                try{fates=ReadFates();}catch(Exception error){fates=[];Failed("FATEs",error);}
+                try{partyMarkers=ReadParty();}catch(Exception error){partyMarkers=[];Failed("party",error);}
+                eventsAt=now.AddMilliseconds(500);
+            }
             var inCombat=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             var inDuty=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty56];
             Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx));
         }
         catch(Exception error){Volatile.Write(ref state,null);retryAt=now.AddSeconds(5);log.Warning(error,"Map position unavailable; retry in five seconds.");}
+    }
+    // Parts whose read failed, logged once each (the reads repeat every half second or two seconds).
+    private readonly HashSet<string> failedReads=[];
+    private void Failed(string part,Exception error)
+    {
+        if(failedReads.Add(part))log.Warning(error,"Map {0} unavailable; the last copy is kept, position and flag still update.",part);
     }
     private unsafe IReadOnlyDictionary<uint,MapFlightState> ReadFlights()
     {
@@ -191,7 +216,8 @@ internal sealed class MapLiveReader : IDisposable
         var telepo=Telepo.Instance();var result=new Dictionary<uint,uint>();
         if(telepo==null)return result;
         var list=telepo->UpdateAetheryteList();
-        if(list==null)return result;
+        // 0.328 (R-14): length checked before the walk; a shifted layout would read past valid memory (not catchable).
+        if(list==null || list->LongCount is <0 or >512)return result;
         foreach(var entry in *list)
             if(entry.AetheryteId!=0 && entry.SubIndex==0 && entry.Ward==0 && entry.Plot==0)result.TryAdd(entry.AetheryteId,entry.GilCost);
         return result;
@@ -203,10 +229,14 @@ internal sealed class MapLiveReader : IDisposable
     {
         var agent=AgentMap.Instance();
         if(agent==null)return [];
-        var result=new List<MapEventMarker>();
+        // 0.328 (R-14): after a game update First/Last can be garbage and an access violation is not catchable: the vector
+        // length is checked first, and every visited entry counts (skipped ones too), not only the kept ones.
+        var count=agent->EventMarkers.LongCount;
+        if(count is <0 or >1024)return [];
+        var result=new List<MapEventMarker>();var visited=0;
         foreach(var marker in agent->EventMarkers)
         {
-            if(result.Count>=256)break;
+            if(++visited>1024 || result.Count>=256)break;
             if(marker.IconId==0 || marker.MapId==0 || !float.IsFinite(marker.Position.X) || !float.IsFinite(marker.Position.Z))continue;
             var tooltip=TooltipText(marker.TooltipString);
             // Evidence for the labels (0.134): once per icon, what the game gives (objective, type, readable tooltip).

@@ -86,6 +86,12 @@ public sealed class WikiItemAcquisitionService:IDisposable
     public WikiItemAcquisitionService(Func<uint,string?> englishName,Func<TimeSpan> lifetime,DataCache? disk){this.englishName=englishName;this.lifetime=lifetime;this.disk=disk;}
     // Settings › Advanced (0.206): when off, nothing is requested and the source is simply absent.
     public Func<bool>? Enabled { get; set; }
+    /// <summary>What is already known for the item, without requesting anything (null = nothing yet).</summary>
+    public WikiItemAcquisitionState? Peek(uint itemId)
+    {
+        if(itemId==0 || Enabled?.Invoke()==false)return null;
+        lock(gate)return states.TryGetValue(itemId,out var known) ? known:null;
+    }
     public WikiItemAcquisitionState Get(uint itemId)
     {
         if(itemId==0 || Enabled?.Invoke()==false)return new(null,false,null);
@@ -107,6 +113,8 @@ public sealed class WikiItemAcquisitionService:IDisposable
             WikiItemAcquisitionState result;
             try{result=new(await LoadAsync(id).ConfigureAwait(false),false,null);}
             catch(OperationCanceledException) when(disposal.IsCancellationRequested){return;}
+            // 0.326: the wiki was turned off while this item waited: forget it, so it is asked again once the switch is back on.
+            catch(SourceDisabledException){lock(gate){if(!disposed)states.Remove(id);}continue;}
             catch(Exception error){result=new(null,false,error.Message);}
             lock(gate){if(!disposed)states[id]=result;}
         }
@@ -120,6 +128,7 @@ public sealed class WikiItemAcquisitionService:IDisposable
         if(string.IsNullOrWhiteSpace(title) || title.Length>256)throw new InvalidDataException("English item name unavailable.");
         var wait=lastRequest+TimeSpan.FromSeconds(3)-DateTimeOffset.UtcNow;
         if(wait>TimeSpan.Zero)await Task.Delay(wait,token).ConfigureAwait(false);
+        if(Enabled?.Invoke()==false)throw new SourceDisabledException("FFXIV Console Games Wiki");
         lastRequest=DateTimeOffset.UtcNow;
         var text=await BoundedHttp.ReadAsync(http,new Uri(WikiItemAcquisitionParser.Url(title)),GarlandClient.MaximumBytes,token).ConfigureAwait(false);
         var page=WikiItemAcquisitionParser.Parse(text,id,title,DateTimeOffset.UtcNow);

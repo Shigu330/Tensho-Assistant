@@ -3,6 +3,10 @@ using TenshoAssistant.Items;
 namespace TenshoAssistant.Market;
 
 public sealed record MarketHoverItem(uint ItemId, bool Hq);
+/// <summary>
+/// Hover price policy: only marketable items (HQ only when the item can be HQ) are eligible; a price request is allowed once the
+/// same item has been hovered for 600 ms, then at most every 5 s. Character or world changes reset it.
+/// </summary>
 public sealed class MarketHoverTracker
 {
     private ulong owner;

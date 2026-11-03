@@ -5,8 +5,17 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Storage › Bank and Imports (on the Storage page since 0.280): the bank browser — origin tabs (all, character, each saved storage),
+// category / quality / search filters and the game's 5 × 7 bag grids; armoury chest, glamour dresser and armoire as lists of 35 per page
+// (0.237) — the import buttons while a retainer or saddlebag window is open, the « open it once » notices, and the per-storage stock table of
+// the item sheet. Sources: the live inventory and the saved Bank snapshots, copied by Inventory/BankInventoryBridge on the framework thread
+// (on request, or automatically with AutoBankCapture); glamour dresser and armoire are known once opened in the game (0.236). Views are
+// rebuilt only when their inputs change.
 internal sealed partial class MainWindow
 {
+    // 0.322: storage names translated from their kind (Inventory/StorageNames.cs).
+    private string StorageRowName(StorageHolding row)=>StorageNames.Of(localization,row);
+    private string BankEntryName(BankEntry entry)=>StorageNames.Of(localization,entry.Key.Kind,entry.Name);
     private readonly record struct BankItemRow(uint ItemId, long Nq, long Hq);
     private readonly record struct BankSourceViewKey(ulong Character,InventorySnapshot? Live,BankState Bank,ItemCatalog? Items,bool Personal,BankKey? Origin);
     private readonly record struct BankFrameViewKey(BankSourceViewKey Source,string Category,int Quality,string Query,int LanguageRevision,TenshoAssistant.Caching.CacheRetention Retention,long Second);
@@ -17,6 +26,8 @@ internal sealed partial class MainWindow
     private Dictionary<uint,(long Nq,long Hq)> bankSourceRows=[];
     private string[] bankSourceCategories=[];
     private InventoryContainerSnapshot[] bankSourcePersonal=[];
+    // 0.329: notice key when the character's four bags are not all read (no live inventory, or a bag still Unknown), else null.
+    private string? bankPersonalNotice;
     private BankFrameViewKey? bankFrameViewKey;
     private IReadOnlyList<(string Name,InventoryContainerSnapshot Container)> bankFrameGroups=[];
     private IReadOnlyList<string> bankFrameErrors=[];
@@ -24,13 +35,13 @@ internal sealed partial class MainWindow
     private bool bankHasVisibleItems;
 
     private static readonly StorageCategory[] StorageGroups =
-        [StorageCategory.PlayerBags, StorageCategory.Armoury, StorageCategory.GlamourDresser, StorageCategory.Armoire, StorageCategory.Chocobo, StorageCategory.Retainer];
+        [StorageCategory.PlayerBags, StorageCategory.Armoury, StorageCategory.GlamourDresser, StorageCategory.Armoire, StorageCategory.Chocobo, StorageCategory.Retainer, StorageCategory.FreeCompany];
 
     private void DrawStorageGroups(ItemHoldingsSummary summary)
     {
         foreach (var category in StorageGroups)
         {
-            var rows = summary.Rows.Where(row => row.Category == category).OrderBy(row => row.Name, StringComparer.Ordinal).ToArray();
+            var rows = summary.Rows.Where(row => row.Category == category).OrderBy(StorageRowName, StringComparer.CurrentCulture).ToArray();
             if (rows.Length == 0) continue;
             var label = category switch
             {
@@ -39,9 +50,10 @@ internal sealed partial class MainWindow
                 StorageCategory.Armoury => localization.Get("BankUi.Armoury"),
                 StorageCategory.GlamourDresser => localization.Get("BankUi.GlamourDresser"),
                 StorageCategory.Armoire => localization.Get("BankUi.Armoire"),
+                StorageCategory.FreeCompany => localization.Get("BankUi.FreeCompanyChest"),
                 _ => localization.Get("BankUi.Retainers"),
             };
-            if (!ImGui.CollapsingHeader(label, ImGuiTreeNodeFlags.DefaultOpen)) continue;
+            if (!TenshoAssistant.UI.UiComponents.Header(label, ImGuiTreeNodeFlags.DefaultOpen)) continue;
             if (!ImGui.BeginTable($"StorageGroup{category}", 5,
                     ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.RowBg)) continue;
             try
@@ -57,7 +69,7 @@ internal sealed partial class MainWindow
                     string Count(long count) => row.Coverage == InventoryCoverage.Unknown ? "—"
                         : row.Coverage == InventoryCoverage.Partial ? $"≥ {count:N0}" : count.ToString("N0");
                     ImGui.TableNextRow();
-                    ImGui.TableNextColumn(); ImGui.TextWrapped(row.Name);
+                    ImGui.TableNextColumn(); ImGui.TextWrapped(StorageRowName(row));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(Count(row.Nq));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(Count(row.Hq));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(Count(checked(row.Nq + row.Hq)));
@@ -78,7 +90,7 @@ internal sealed partial class MainWindow
 
     private void DrawImportManager()
     {
-        if (!ImGui.CollapsingHeader(localization.Get("BankUi.Imports"))) return;
+        if (!TenshoAssistant.UI.UiComponents.Header(localization.Get("BankUi.Imports"))) return;
         var state = bank.State;
         var menus = bankBridge.State;
         ImGui.TextWrapped(localization.Get("BankUi.ImportHelp"));
@@ -88,6 +100,7 @@ internal sealed partial class MainWindow
         if (menus.Retainer is null && menus.Saddlebag is null)
             ImGui.TextDisabled(localization.Get("BankUi.NoOpen"));
         if (menus.Message is { } message) DrawServiceMessage(message,"ServiceErrors.Bank");
+        if (menus.ReadsUnavailable) ImGui.TextColored(Accent,localization.Get("ServiceStatus.StorageReadUnavailable"));
         if (state.Loading) ImGui.TextWrapped(localization.Get("BankUi.Loading"));
         if (state.Error is { } error) DrawDataError(error,"ServiceErrors.Bank");
         if (menus.CharacterId == 0)
@@ -101,7 +114,7 @@ internal sealed partial class MainWindow
         ImGui.TextUnformatted(localization.Format("BankUi.Count",entries.Length));
         foreach (var entry in entries)
         {
-            ImGui.BulletText(entry.Key.Kind == BankStorageKind.Retainer ? localization.Format("BankUi.Retainer",entry.Name) : entry.Name);
+            ImGui.BulletText(BankEntryName(entry));
             ImGui.TextDisabled(localization.Format("BankUi.Last",entry.Snapshot.ObservedAt.ToLocalTime().ToString("g")));
             DrawCacheStamp(TenshoAssistant.Caching.CacheArea.ImportedStock,entry.Snapshot.ObservedAt,true);
         }
@@ -121,16 +134,39 @@ internal sealed partial class MainWindow
             ? localization.Get("BankUi.PersonalLive")
             : localization.Get("BankUi.OtherManual"));
 
-        var characterId = bankBridge.State.CharacterId;
+        // 0.345 (g, I-03): the Bank shows the logged-in character, or another one chosen here (its saved storages, bags included).
+        var loggedIn = bankBridge.State.CharacterId;
+        if(bankViewCharacter is { } chosen && !bankSnapshot.Entries.Any(entry=>entry.Key.CharacterId==chosen))bankViewCharacter=null;
+        var characterId = bankViewCharacter ?? loggedIn;
+        var others=bankSnapshot.Entries.Select(entry=>entry.Key.CharacterId).Where(id=>id!=loggedIn).Distinct().ToArray();
+        if(others.Length>0)
+        {
+            ImGui.SetNextItemWidth(260);
+            var shownName=characterId==loggedIn && loggedIn!=0 ? localization.Get("BankUi.LoggedIn"):CharacterName(bankSnapshot.Entries,characterId);
+            if(ImGui.BeginCombo(localization.Get("BankUi.CharacterChoice")+"##BankCharacter",shownName))
+            {
+                try
+                {
+                    if(loggedIn!=0 && ImGui.Selectable(localization.Get("BankUi.LoggedIn"),bankViewCharacter is null))bankViewCharacter=null;
+                    foreach(var id in others)
+                        if(ImGui.Selectable(CharacterName(bankSnapshot.Entries,id)+$"##BankCharacter{id}",bankViewCharacter==id))bankViewCharacter=id;
+                }
+                finally{ImGui.EndCombo();}
+            }
+            Tip("BankUi.CharacterChoiceTip");
+        }
         if (characterId == 0)
         {
             ImGui.TextWrapped(localization.Get("BankUi.LoginBank"));
             return;
         }
+        var live=characterId==loggedIn;
+        if(!live)bankPersonalFilter=false;
 
         if(!ReferenceEquals(bankEntriesSource,bankSnapshot) || bankEntriesCharacter!=characterId)
         {
-            bankEntriesView=bankSnapshot.Entries.Where(entry=>entry.Key.CharacterId==characterId)
+            // The logged-in character's own bags, crystals and currencies are shown live, not from their saved copy.
+            bankEntriesView=bankSnapshot.Entries.Where(entry=>entry.Key.CharacterId==characterId && (!live || !BankStorageScope.IsCharacterOwn(entry.Key.Kind)))
                 .OrderBy(entry=>entry.Key.Kind).ThenBy(entry=>entry.Name,StringComparer.Ordinal).ToArray();
             bankEntriesSource=bankSnapshot;bankEntriesCharacter=characterId;
         }
@@ -145,7 +181,7 @@ internal sealed partial class MainWindow
                     bankOriginFilter = null;
                     ImGui.EndTabItem();
                 }
-                if (ImGui.BeginTabItem(localization.Get("BankUi.Character")))
+                if (live && ImGui.BeginTabItem(localization.Get("BankUi.Character")))
                 {
                     bankPersonalFilter = true;
                     bankOriginFilter = null;
@@ -154,7 +190,7 @@ internal sealed partial class MainWindow
                 for (var index = 0; index < entries.Length; index++)
                 {
                     var entry = entries[index];
-                    var label = entry.Key.Kind == BankStorageKind.Retainer ? localization.Format("BankUi.Retainer",entry.Name) : entry.Name;
+                    var label = BankEntryName(entry);
                     if (ImGui.BeginTabItem($"{label}##BankOrigin{index}"))
                     {
                         bankPersonalFilter = false;
@@ -169,7 +205,7 @@ internal sealed partial class MainWindow
             ? entries.Where(entry => entry.Key == origin).ToArray()
             : entries;
 
-        var sourceKey=new BankSourceViewKey(characterId,inventory.Current,bankSnapshot,itemCatalog.State.Catalog,bankPersonalFilter,bankOriginFilter);
+        var sourceKey=new BankSourceViewKey(characterId,live ? inventory.Current:null,bankSnapshot,itemCatalog.State.Catalog,bankPersonalFilter,bankOriginFilter);
         if(bankSourceViewKey!=sourceKey)
         {
             var personal=sourceKey.Origin is null && sourceKey.Live is not null
@@ -187,6 +223,8 @@ internal sealed partial class MainWindow
             }
             bankSourceRows=aggregated;
             bankSourcePersonal=personal;
+            var read=personal.Count(container=>container.Coverage!=InventoryCoverage.Unknown);
+            bankPersonalNotice=!live || sourceKey.Origin is not null || (personal.Length==4 && read==4) ? null : read==0 ? "BankUi.Unavailable":"BankUi.UnreadBags";
             bankSourceCategories=aggregated.Keys.Select(id=>sourceKey.Items?.Find(id)?.UiCategoryName)
                 .Where(name=>!string.IsNullOrWhiteSpace(name)).Select(name=>name!).Distinct(StringComparer.Ordinal)
                 .OrderBy(name=>name,StringComparer.Ordinal).ToArray();
@@ -206,6 +244,7 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.EndCombo(); }
         }
+        Tip("BankUi.CategoryTip");
         ImGui.SameLine();
         ImGui.SetNextItemWidth(140);
         var qualityLabel = bankQualityFilter switch { 1 => localization.Get("BankUi.Nq"), 2 => localization.Get("BankUi.Hq"), _ => localization.Get("BankUi.Both") };
@@ -218,6 +257,7 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.EndCombo(); }
         }
+        Tip("BankUi.QualityTip");
         ImGui.SameLine();
         if (ImGui.SmallButton(localization.Get("BankUi.Reset")+"##BankFilters"))
         {
@@ -225,9 +265,11 @@ internal sealed partial class MainWindow
             bankQualityFilter = 0;
             bankQuery = string.Empty;
         }
+        Tip("BankUi.ResetTip");
         ImGui.SameLine();
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##BankQuery", localization.Get("BankUi.Search"), ref bankQuery, 128);
+        Tip("BankUi.SearchTip");
 
         var now=DateTimeOffset.UtcNow;
         var frameKey=new BankFrameViewKey(sourceKey,bankCategoryFilter,bankQualityFilter,bankQuery,localization.Revision,
@@ -239,23 +281,36 @@ internal sealed partial class MainWindow
             var errors=new List<string>();
             if(bankHasVisibleItems)
             {
-                if(bankOriginFilter is null)AddDisplayFrames(localization.Get("BankUi.Character"),bankSourcePersonal,groups,errors);
+                // 0.329: no grid while no bag is read (they would look like empty bags); one unread bag among read ones keeps the visual
+                // pages, which do not match physical bags.
+                if(bankOriginFilter is null && bankSourcePersonal.Any(container=>container.Coverage!=InventoryCoverage.Unknown))
+                    AddDisplayFrames(localization.Get("BankUi.Character"),bankSourcePersonal,groups,errors,live:true);
                 if(!bankPersonalFilter)
                     foreach(var entry in selectedEntries)
                     {
                         var expired=!TenshoAssistant.Caching.CacheAge.Fresh(entry.Snapshot.ObservedAt,now,configuration.Cache.Duration(TenshoAssistant.Caching.CacheArea.ImportedStock));
-                        AddDisplayFrames(localization.Format("BankUi.Frame",entry.Name,entry.Snapshot.ObservedAt.ToLocalTime().ToString("t"),expired ? localization.Get("BankUi.ExpiredSuffix"):""),entry.Snapshot.Containers.Values,groups,errors);
+                        // 0.329: the date too when the snapshot is not from today (« Stocks importés » keeps one for a day by default).
+                        var observed=entry.Snapshot.ObservedAt.ToLocalTime();
+                        AddDisplayFrames(localization.Format("BankUi.Frame",BankEntryName(entry),observed.ToString(observed.Date==now.ToLocalTime().Date ? "t":"g"),expired ? localization.Get("BankUi.ExpiredSuffix"):""),entry.Snapshot.Containers.Values,groups,errors);
                     }
             }
             bankFrameGroups=groups;bankFrameErrors=errors;bankFrameRows.Clear();bankFrameViewKey=frameKey;
         }
-        if(!bankHasVisibleItems){ImGui.TextDisabled(localization.Get("BankUi.Empty"));return;}
+        // 0.329: an unread inventory and an empty tab are said as such; « no match » only when a filter hides everything.
+        if(bankPersonalNotice is { } notice)ImGui.TextDisabled(localization.Get(notice));
+        if(!bankHasVisibleItems)
+        {
+            if(BankFiltering)ImGui.TextDisabled(localization.Get("BankUi.Empty"));
+            else if(bankPersonalNotice is null)ImGui.TextDisabled(localization.Get("BankUi.EmptyStorage"));
+            return;
+        }
         foreach(var error in bankFrameErrors)ImGui.TextWrapped(error);
         DrawInventoryFrames(bankFrameGroups);
     }
 
+    // live: the character's bags 0–3 read now (they cannot be reimported).
     private void AddDisplayFrames(string name, IEnumerable<InventoryContainerSnapshot> containers,
-        List<(string Name, InventoryContainerSnapshot Container)> frames,List<string> errors)
+        List<(string Name, InventoryContainerSnapshot Container)> frames,List<string> errors,bool live=false)
     {
         var copied = containers.ToArray();
         if (copied.Length == 0) return;
@@ -281,6 +336,14 @@ internal sealed partial class MainWindow
                 frames.Add((localization.Format("BankUi.Bag", name, page + 1), new InventoryContainerSnapshot(copied[0].Location, coverage,
                     stacks.Skip(page * 35).Take(35).Select((stack, index) => stack with { Slot = index, DisplayIndex = -1 }))));
         }
+        catch (InvalidOperationException) when (live && copied.All(container => container.Location.Container.Value is >= 0 and <= 3))
+        {
+            // 0.329: the game's visual order of the live bags can be unreadable (a game sort running, a game update): their known
+            // contents are shown anyway, one page per read bag in its own slot order (35 slots), with a note.
+            errors.Add(localization.Format("BankUi.PhysicalOrder", name));
+            foreach (var container in copied.Where(bag => bag.Coverage != InventoryCoverage.Unknown))
+                frames.Add((localization.Format("BankUi.Bag", name, container.Location.Container.Value + 1), container));
+        }
         catch (InvalidOperationException)
         {
             errors.Add(localization.Format("BankUi.Reimport",name));
@@ -291,7 +354,7 @@ internal sealed partial class MainWindow
     {
         if (groups.Count == 0)
         {
-            ImGui.TextDisabled(localization.Get("BankUi.Unavailable"));
+            if (bankFrameErrors.Count == 0 && bankPersonalNotice is null) ImGui.TextDisabled(localization.Get("BankUi.Unavailable"));
             return;
         }
         const int columns = 5;
@@ -299,8 +362,7 @@ internal sealed partial class MainWindow
         const float slotSize = 42;
         const float frameWidth = columns * 46 + 12;
         const float frameHeight = rows * 46 + 48;
-        var filtering = !string.IsNullOrWhiteSpace(bankCategoryFilter)
-            || bankQualityFilter != 0 || !string.IsNullOrWhiteSpace(bankQuery);
+        var filtering = BankFiltering;
         var displayedFrames = 0;
         var framesPerRow=Math.Max(1,(int)((ImGui.GetContentRegionAvail().X+ImGui.GetStyle().ItemSpacing.X)/(frameWidth+ImGui.GetStyle().ItemSpacing.X)));
         for (var groupIndex = 0; groupIndex < groups.Count; groupIndex++)
@@ -372,6 +434,8 @@ internal sealed partial class MainWindow
         return result;
     }
 
+    private bool BankFiltering=>!string.IsNullOrWhiteSpace(bankCategoryFilter) || bankQualityFilter!=0 || !string.IsNullOrWhiteSpace(bankQuery);
+
     private bool MatchesBankFilters(BankItemRow row)
     {
         var item = itemCatalog.State.Catalog?.Find(row.ItemId);
@@ -389,7 +453,8 @@ internal sealed partial class MainWindow
             || row.ItemId.ToString().Contains(query, StringComparison.OrdinalIgnoreCase));
     }
 
-    private void DrawBankSlot(BankItemRow row, float slotSize)
+    // 0.329: select false for the sort preview, whose own click only opens its zone menu (it must not replace the selected item).
+    private void DrawBankSlot(BankItemRow row, float slotSize, bool select = true)
     {
         var item = itemCatalog.State.Catalog?.Find(row.ItemId);
         ImGui.PushID((int)row.ItemId);
@@ -401,9 +466,7 @@ internal sealed partial class MainWindow
             drawList.AddRectFilled(slotMin, slotMax, ImGui.GetColorU32(itemId == (int)row.ItemId ? ImGuiCol.FrameBgActive : ImGuiCol.FrameBg), 4);
             ImGui.SetCursorScreenPos(slotMin + new Vector2(3));
             DrawItemIcon(item, new Vector2(slotSize - 6));
-            if (ImGui.IsItemClicked()) SelectItem(row.ItemId);
-            if (ImGui.IsItemHovered())
-                WrappedTooltip(localization.Format("BankUi.Tooltip",item?.Name ?? localization.Format("BankUi.Item",row.ItemId),row.Nq.ToString("N0"),row.Hq.ToString("N0")));
+            if (select && ImGui.IsItemClicked()) SelectItem(row.ItemId);
             var count = checked(row.Nq + row.Hq).ToString("N0");
             var countSize = ImGui.CalcTextSize(count);
             var countPosition = new Vector2(slotMax.X - countSize.X - 3, slotMax.Y - countSize.Y - 2);
@@ -436,7 +499,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(disabled);
         try
         {
-            if (ImGui.Button(localization.Format("BankUi.Refresh",context.Name)+$"##{context.Key.Kind}", new Vector2(-1, 28)))
+            if (ImGui.Button(localization.Format("BankUi.Refresh",StorageNames.Of(localization,context.Key.Kind,context.Name))+$"##{context.Key.Kind}", new Vector2(-1, 28)))
                 bankBridge.RequestImport(context.Key);
         }
         finally { ImGui.EndDisabled(); }

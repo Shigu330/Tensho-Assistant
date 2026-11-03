@@ -4,6 +4,9 @@ using TenshoAssistant.Gathering;
 
 namespace TenshoAssistant;
 
+// Coming fishing windows from Garland's conditions (ET window, weather, previous weather): the zone's next periods that match, or may
+// match when a condition is not reported, from the game's weather tables; upcoming ones get a one-off alarm. Computed on « Refresh » only
+// (Gathering/FishingForecast.cs) and kept while the fish, zone and data stay the same.
 internal sealed partial class MainWindow
 {
     private FishingConditions? fishingForecastConditions;
@@ -13,12 +16,12 @@ internal sealed partial class MainWindow
 
     private void DrawFishingForecast(FishingConditions conditions,uint territory)
     {
-        if(!ImGui.CollapsingHeader(localization.Get("FishingWindows.Title")+"###FishingForecast"))return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("FishingWindows.Title")+"###FishingForecast"))return;
         var catalog=weather.State.Catalog;
         if(catalog is null)
         {
             ImGui.TextWrapped(localization.Get(weather.State.Error is null ? "FishingWindows.Loading":"FishingWindows.Error"));
-            if(developerMode && weather.State.Error is { } error)ImGui.TextWrapped(error);
+            if(developerMode && weather.State.Error is { } error)ImGui.TextWrapped(RawMessage(error));
             return;
         }
         DrawGatheringClock();
@@ -31,7 +34,7 @@ internal sealed partial class MainWindow
         }
         if(!ReferenceEquals(conditions,fishingForecastConditions) || !ReferenceEquals(catalog,fishingForecastCatalog)
             || territory!=fishingForecastTerritory || (uint)itemId!=fishingForecastItem || fishingForecastResult is not { } result)return;
-        if(result.Error is not null){ImGui.TextWrapped(localization.Get("FishingWindows.Error"));if(developerMode)ImGui.TextWrapped(result.Error);return;}
+        if(result.Error is not null){ImGui.TextWrapped(localization.Get("FishingWindows.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(result.Error));return;}
         ImGui.TextDisabled(localization.Format("FishingForecast.Horizon",result.CalculatedAt.ToLocalTime().ToString("g"),result.HorizonEndsAt.ToLocalTime().ToString("g")));
         var missing=new List<string>();
         if(!result.ReportedFields.HasFlag(FishingConditionFields.Time))missing.Add(localization.Get("FishingWindows.Time"));
@@ -53,7 +56,8 @@ internal sealed partial class MainWindow
                 var name=SelectedItem?.Name ?? itemId.ToString();
                 AlarmButton($"FishSpan{span.StartsAt.ToUnixTimeSeconds()}",localization.Format("Alarms.PeriodTooltip",name,span.StartsAt.ToLocalTime().ToString("g")),
                     ()=>[new TenshoAssistant.Alarms.TenshoAlarm{Label=name,Repeat=TenshoAssistant.Alarms.AlarmRepeat.Once,At=span.StartsAt,
-                        LeadMinutes=TenshoAssistant.Alarms.AlarmSchedule.ClampLead(TenshoAssistant.Alarms.AlarmRepeat.Once,DefaultAlarmLead),TerritoryId=territory,ItemId=(uint)itemId}]);
+                        LeadMinutes=TenshoAssistant.Alarms.AlarmSchedule.ClampLead(TenshoAssistant.Alarms.AlarmRepeat.Once,DefaultAlarmLead),TerritoryId=territory,ItemId=(uint)itemId,
+                        JobId=18}]);
                 ImGui.SameLine();
             }
             ImGui.TextColored(span.ReportedConditionsMatch==true ? Accent:Muted,$"{spanStart.ToLocalTime():g}–{span.EndsAt.ToLocalTime():g} · {label}");

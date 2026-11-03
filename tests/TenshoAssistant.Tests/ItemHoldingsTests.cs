@@ -11,7 +11,7 @@ internal static class ItemHoldingsTests
             var result = ItemHoldings.Build(42, 1, Bags(1, 182), [Bank(1, BankStorageKind.Saddlebag, 0, 0, 26)]);
             Check(result.Nq == 182 && result.Hq == 26 && result.Total == 208, "recorded quantities");
             Check(result.HasObservation && result.HasCached && result.HasUnknown && !result.IsExact, "mixed scope flags");
-            Check(result.Rows.Count == 3 && result.Rows[2].Name == "Servants non importés", "missing retainers explicit");
+            Check(result.Rows.Count == 3 && result.Rows[2].Label == StorageLabel.RetainersMissing, "missing retainers explicit");
             Check(result.Rows[1].ObservedAt == Time.ToUniversalTime()
                 && result.Rows[1].ObservedAt!.Value.Offset == TimeSpan.Zero, "cached UTC timestamp");
         }),
@@ -78,7 +78,7 @@ internal static class ItemHoldingsTests
                 Container(1, 0, 10), Container(1, 1, 0), Container(1, 2, 0), Container(1, 3, 0),
                 Container(1, 2001, 25)]);
             var result = ItemHoldings.Build(42, 1, live, [], StorageFilter.All, includeCrystals: true);
-            Check(result.Total == 35 && result.Rows.Any(row => row.Name == "Cristaux" && row.Nq == 25),
+            Check(result.Total == 35 && result.Rows.Any(row => row.Label == StorageLabel.Crystals && row.Nq == 25),
                 "crystals are included only when requested");
         }),
         ("Holdings includes optional premium but requires standard chocobo placeholder", () =>
@@ -86,7 +86,7 @@ internal static class ItemHoldingsTests
             var premium = Bank(1, BankStorageKind.PremiumSaddlebag, 0, 4);
             var result = ItemHoldings.Build(42, 1, null, [premium], StorageFilter.Chocobo);
             Check(result.Total == 4 && result.Rows.Count == 2 && result.HasUnknown, "premium does not replace standard");
-            Check(result.Rows.Any(r => r.Name == "Sacoche chocobo non importée" && !r.IsCached), "standard placeholder");
+            Check(result.Rows.Any(r => r.Label == StorageLabel.SaddlebagMissing && !r.IsCached), "standard placeholder");
             var both = ItemHoldings.Build(42, 1, null, [premium, Bank(1, BankStorageKind.Saddlebag, 0, 3)], StorageFilter.Chocobo);
             Check(both.Total == 7 && both.Rows.Count == 2 && !both.HasUnknown, "both imports included");
         }),

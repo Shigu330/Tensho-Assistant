@@ -7,8 +7,9 @@ using TenshoAssistant.UI;
 namespace TenshoAssistant;
 
 /// <summary>
-/// Home (0.206): one tile per module of the navigation, each with a live line (counts, next alarm, market world…), the context item, the
-/// work in progress and the errors, then the tool directory.
+/// Home (0.206): catalogue status, work in progress (craft search and chain, Mini Cactpot), the next alarm and the failing modules, then ten
+/// tiles (crafting, gathering, collections, quests, map, market, alarms, macro chain, character, Gold Saucer) each with a live line, the
+/// context item with its tools, and the tool directory (setting HomeShowTools). Reads only states other services already copied.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -31,7 +32,7 @@ internal sealed partial class MainWindow
         }
         ImGui.Separator();
         if(revealHomeTools){ImGui.SetNextItemOpen(true);revealHomeTools=false;}
-        if(configuration.HomeShowTools && ImGui.CollapsingHeader(localization.Get("Plugin.AllTools")+"###HomeTools"))DrawTools();
+        if(configuration.HomeShowTools && TenshoAssistant.UI.UiComponents.Header(localization.Get("Plugin.AllTools")+"###HomeTools"))DrawTools();
     }
 
     // Work in progress, next alarm and errors, in one short block.
@@ -48,7 +49,7 @@ internal sealed partial class MainWindow
         var failed=new List<string>();
         if(itemCatalog.State.Error is not null)failed.Add(localization.Get("Navigation.Items"));
         if(recipeCatalog.State.Error is not null)failed.Add(localization.Get("Navigation.Crafting"));
-        if(market.State.Error is not null)failed.Add(localization.Get("Navigation.Market"));
+        if(market.State.Error is { } marketError && !SourceOff(marketError))failed.Add(localization.Get("Navigation.Market"));
         if(quests.State.Error is not null)failed.Add(localization.Get("Navigation.Quests"));
         if(failed.Count==0)return;
         ImGui.TextColored(FfxivTheme.Error,localization.Get("Home.Errors")+" "+string.Join(", ",failed));
@@ -58,11 +59,11 @@ internal sealed partial class MainWindow
     private (TenshoAlarm Alarm,DateTimeOffset At)? NextAlarm()
     {
         var now=DateTimeOffset.UtcNow;
-        return (configuration.Alarms ?? []).Where(alarm=>alarm.Enabled).Select(alarm=>(alarm,AlarmSchedule.Next(alarm,now)))
+        return (configuration.Alarms ?? []).Where(alarm=>alarm.Enabled).Select(alarm=>(alarm,NextAlarm(alarm,now)))
             .Where(pair=>pair.Item2 is not null).Select(pair=>((TenshoAlarm,DateTimeOffset)?)(pair.alarm,pair.Item2!.Value)).OrderBy(pair=>pair!.Value.Item2).FirstOrDefault();
     }
 
-    // One tile per module: icon, name, live line; a click opens the module.
+    // Ten fixed tiles (main modules): icon, name, live line; a click opens the module. The full list is the tool directory.
     private void DrawHomeTiles()
     {
         var alarmNext=NextAlarm();
@@ -75,8 +76,8 @@ internal sealed partial class MainWindow
             (FontAwesomeIcon.MapMarkedAlt,localization.Get("Navigation.Map"),localization.Get("Home.TileMap"),Page.Maps),
             (FontAwesomeIcon.Coins,localization.Get("Navigation.Market"),market.State.WorldName.Length>0 ? localization.Format("Home.TileMarket",market.State.WorldName):localization.Get("Home.TileMarketNone"),Page.Market),
             (FontAwesomeIcon.Bell,localization.Get("Alarms.PageTitle"),alarmNext is { } next ? localization.Format("Home.TileAlarm",next.At.ToLocalTime().ToString("t")):localization.Format("Home.TileAlarmNone",configuration.Alarms?.Count ?? 0),Page.Alarms),
-            (FontAwesomeIcon.Link,localization.Get("Navigation.Automation"),localization.Format("Home.TileMacros",configuration.MacroChainPlan?.Count ?? 0),Page.MacroChain),
-            (FontAwesomeIcon.ChartBar,localization.Get("Navigation.Combat"),localization.Get("Home.TileCharacter"),Page.Character),
+            (FontAwesomeIcon.Link,localization.Get("Category.MacroChain"),localization.Format("Home.TileMacros",configuration.MacroChainPlan?.Count ?? 0),Page.MacroChain),
+            (FontAwesomeIcon.ChartBar,localization.Get("Navigation.Gear"),localization.Get("Home.TileGear"),Page.Gear),
             (FontAwesomeIcon.Clone,localization.Get("Category.GoldSaucer"),localization.Get("Home.TileGoldSaucer"),Page.MiniCactpot),
         };
         var width=ImGui.GetContentRegionAvail().X;

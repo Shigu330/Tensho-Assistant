@@ -4,44 +4,22 @@ using TenshoAssistant.Character;
 
 namespace TenshoAssistant;
 
+// The panel beside the game's Character window (0.182, setting ShowCharacterPanel); the Character page was removed in 0.341 (user request:
+// the Gear page shows the same real values, with the same table and help, DrawDerivedStats):
+// combat jobs get derived values (critical rate and damage, direct hit, determination, speed, tenacity, piety, defenses) computed by
+// Character/StatFormulas.cs from the game's attributes and level modifiers (ParamGrow; main-stat table from Character Panel Refined, MIT);
+// gatherers and crafters show their own three attributes. Character/CharacterStatsReader copies the values on the framework thread.
 internal sealed partial class MainWindow
 {
     // Combat jobs (ClassJob category 30 war, 31 magic) get real values; gathering and crafting their own three attributes (0.182).
     private static bool CombatCategory(int category)=>category is 30 or 31;
 
-    private void DrawCharacterStats()
-    {
-        Heading(localization.Get("CharacterUi.Title"), localization.Get("CharacterUi.Description"));
-        var state = characterStats.State;
-        if (state.CharacterId == 0) { ImGui.TextWrapped(localization.Get("CharacterUi.Offline")); return; }
-        ImGui.TextColored(Accent,localization.Format("CharacterDates.Summary",state.Name,state.Job,state.Level));
-        ImGui.TextDisabled(localization.Format("CharacterDates.Observed",state.ObservedAt?.ToLocalTime().ToString("HH:mm:ss") ?? "—"));
-        if(CombatCategory(state.Category))
-        {
-            if(state.Modifiers.Div<=0){ImGui.TextWrapped(localization.Get("CharacterStats.NoModifiers"));return;}
-            DrawDerivedStats(state,true);
-            if(state.Modifiers.Main==0)ImGui.TextDisabled(localization.Format("CharacterStats.NoMain",state.Level));
-        }
-        else if(StatFormulas.Useful(state.Category) is { Count:>0 } useful && ImGui.BeginTable("CharacterUseful",2,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp))
-        {
-            try
-            {
-                foreach(var key in useful)
-                {
-                    ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("CharacterStats.Attr"+key));
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(state.Values.TryGetValue(key,out var value) ? value.ToString("N0"):localization.Get("CharacterUi.Unknown"));
-                }
-            }
-            finally{ImGui.EndTable();}
-        }
-        ImGui.TextDisabled(localization.Get("CharacterStats.Sources"));
-    }
-
     // Table of real values; with the raw attribute in the Tensho page, without it beside the game window (the game shows it).
     private void DrawDerivedStats(CharacterStatsState state,bool withRaw)
     {
         var rows=StatFormulas.Combat(state.Values,state.Category,state.Role,state.Modifiers);
-        if(!ImGui.BeginTable("CharacterDerived",withRaw ? 3:2,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp))return;
+        // 0.380 (g, M-09): one more column, the points to the next tier (wasted points in the help).
+        if(!ImGui.BeginTable("CharacterDerived",withRaw ? 4:3,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp))return;
         try
         {
             foreach(var row in rows)
@@ -51,6 +29,12 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextColored(Success,row.Value);
                 if(ImGui.IsItemHovered())DrawStatHelp(row,state.Modifiers);
                 if(withRaw){ImGui.TableNextColumn();ImGui.TextDisabled(row.Raw.ToString("N0"));}
+                ImGui.TableNextColumn();
+                if(StatFormulas.Tier(row.Key,row.Raw,state.Modifiers) is { } tier)
+                {
+                    ImGui.TextDisabled(localization.Format("CharacterStats.TierShort",tier.ToNext));
+                    if(ImGui.IsItemHovered())DrawStatHelp(row,state.Modifiers);
+                }
             }
         }
         finally{ImGui.EndTable();}
@@ -65,6 +49,8 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped(localization.Get("CharacterStats."+row.Key+"Help"));
             ImGui.TextDisabled(localization.Get("CharacterStats."+row.Key+"Formula"));
             ImGui.TextDisabled(localization.Format("CharacterStats.Modifiers",modifiers.Main,modifiers.Sub,modifiers.Div,row.Raw));
+            // 0.380 (g, M-09): stat tier.
+            if(StatFormulas.Tier(row.Key,row.Raw,modifiers) is { } tier)ImGui.TextColored(Accent,localization.Format("CharacterStats.Tier",tier.ToNext,tier.Wasted));
             ImGui.PopTextWrapPos();
         }
         finally{ImGui.EndTooltip();}

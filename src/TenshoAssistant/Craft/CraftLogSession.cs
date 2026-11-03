@@ -4,7 +4,7 @@ using TenshoAssistant.Caching;
 namespace TenshoAssistant.Craft;
 
 public sealed record CraftLogInput(ulong Owner,RecipeDefinition Recipe,CraftStats Stats,CraftActionCatalog Catalog,
-    IReadOnlyList<CraftPreset> Presets,CraftSolveOptions Options,int ExtraWait,bool Echo,long ObservationRevision=0,int StartingQuality=0,bool Chain=false);
+    IReadOnlyList<CraftPreset> Presets,CraftSolveOptions Options,int ExtraWait,bool Echo,long ObservationRevision=0,int StartingQuality=0,bool Chain=false,int? BuffExtraWait=null,bool MacroChain=false);
 public sealed record CraftLogMacro(string Name,CraftSimulationResult Simulation,CraftMacroExport Export);
 public sealed record CraftLogResult(CraftLogMacro? Saved,CraftLogMacro? Suggested,bool TargetReached,string? SearchIssue);
 public sealed record CraftLogState(CraftLogInput? Input,bool Loading,CraftLogResult? Result,string? Error,bool FromCache=false,DateTimeOffset? CalculatedAt=null);
@@ -22,6 +22,17 @@ public sealed class CraftLogSession : IDisposable
     private CraftLogState state=new(null,false,null,null);
     public CraftLogState State=>Volatile.Read(ref state);
     public CraftLogSession(Func<CraftLogInput,CancellationToken,CraftLogResult>? build=null)=>this.build=build ?? Build;
+    /// <summary>How long a crafting log selection must stay the same before its search starts (350 ms since the panel's first version).</summary>
+    public static readonly TimeSpan SettleDelay=TimeSpan.FromMilliseconds(350);
+    /// <summary>
+    /// 0.327: with « compute automatically » off (Configuration.CraftLogAutoSolve), the panel waits for the player's request, given for
+    /// one character and recipe (its « Compute » button, « Recalculate » or the plan's « Simulate this recipe »); while on, it never waits.
+    /// </summary>
+    public static bool WaitsForRequest(CraftLogInput? input,bool automatic,(ulong Owner,uint RecipeId) requested)
+        =>!automatic && input is not null && requested!=(input.Owner,input.Recipe.RecipeId);
+    /// <summary>A selection's search starts once, after it stayed the same for <see cref="SettleDelay"/>, unless it waits for a request.</summary>
+    public static bool ShouldStart([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] CraftLogInput? input,bool started,TimeSpan settled,bool automatic,(ulong Owner,uint RecipeId) requested)
+        =>input is not null && !started && settled>=SettleDelay && !WaitsForRequest(input,automatic,requested);
     public Task StartAsync(CraftLogInput input,bool force=false)
     {
         ArgumentNullException.ThrowIfNull(input);
@@ -74,7 +85,7 @@ public sealed class CraftLogSession : IDisposable
             {
                 if(macro is null)continue;
                 var simulation=CraftSimulation.Run(input.Recipe,input.Stats,input.StartingQuality,macro.Simulation.Steps.Select(step=>step.Action));
-                var export=CraftMacroExporter.Build(simulation,input.Recipe.CraftTypeId+8,input.Catalog,input.ExtraWait,input.Echo,input.Chain);
+                var export=CraftMacroExporter.Build(simulation,input.Recipe.CraftTypeId+8,input.Catalog,input.ExtraWait,input.Echo,input.Chain,input.BuffExtraWait,input.MacroChain);
                 if(simulation.RecipeId!=macro.Simulation.RecipeId || simulation.Final!=macro.Simulation.Final || simulation.StartingQuality!=macro.Simulation.StartingQuality || simulation.Stats!=macro.Simulation.Stats
                     || export.Actions!=macro.Export.Actions || export.WaitSeconds!=macro.Export.WaitSeconds
                     || !export.Pages.Select(page=>page.Text).SequenceEqual(macro.Export.Pages.Select(page=>page.Text)))return false;
@@ -97,18 +108,18 @@ public sealed class CraftLogSession : IDisposable
             {
                 var simulation=CraftSimulation.Run(input.Recipe,input.Stats,input.StartingQuality,preset.Actions,token);
                 if(simulation.Final.Finish!=CraftFinish.Completed || simulation.Error is not null)continue;
-                var export=CraftMacroExporter.Build(simulation,job,input.Catalog,input.ExtraWait,input.Echo,input.Chain);
+                var export=CraftMacroExporter.Build(simulation,job,input.Catalog,input.ExtraWait,input.Echo,input.Chain,input.BuffExtraWait,input.MacroChain);
                 if(CraftSolver.BetterCompletion(simulation.Final,export.WaitSeconds,saved?.Simulation.Final,saved?.Export.WaitSeconds ?? 0,input.Options.TargetQuality))
                     saved=new(preset.Name,simulation,export);
             }
             catch(ArgumentException){ /* An incompatible saved scenario must not prevent the new search. */ }
         }
-        var result=CraftSolver.Solve(input.Recipe,input.Stats,input.StartingQuality,input.Options with {ExtraWait=input.ExtraWait},token);
+        var result=CraftSolver.Solve(input.Recipe,input.Stats,input.StartingQuality,input.Options with {ExtraWait=input.ExtraWait,BuffExtraWait=input.BuffExtraWait},token);
         var suggested=result.Simulation is {Final.Finish:CraftFinish.Completed,Error:null} valid
-            ? new CraftLogMacro("Macro proposée",valid,CraftMacroExporter.Build(valid,job,input.Catalog,input.ExtraWait,input.Echo,input.Chain)):null;
+            ? new CraftLogMacro("Suggested macro",valid,CraftMacroExporter.Build(valid,job,input.Catalog,input.ExtraWait,input.Echo,input.Chain,input.BuffExtraWait,input.MacroChain)):null;
         token.ThrowIfCancellationRequested();
-        return new(saved,suggested,result.TargetReached,suggested is null ? "Aucune synthèse terminée trouvée dans les limites de recherche."
-            :result.TargetReached ? null:"La séquence termine sous la qualité cible.");
+        return new(saved,suggested,result.TargetReached,suggested is null ? "No finished synthesis found within the search limits."
+            :result.TargetReached ? null:"The sequence ends below the target quality.");
     }
     private void CancelCore(){generation++;cancellation?.Cancel();state=new(null,false,null,null);}
     public void Cancel(){lock(gate)if(!disposed)CancelCore();}

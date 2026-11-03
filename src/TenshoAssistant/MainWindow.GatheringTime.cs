@@ -3,6 +3,9 @@ using TenshoAssistant.Gathering;
 
 namespace TenshoAssistant;
 
+// Eorzea clock and gathering windows: the current ET time (the PC time stays in the header) and, for a timed schedule, whether it is open,
+// the next opening or closing with a countdown and the next openings in the tooltip (Gathering/GatheringTimeline.cs). Timelines are
+// cached and recomputed at most once a second.
 internal sealed partial class MainWindow
 {
     private long gatheringTimeSecond=-1;
@@ -14,9 +17,11 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,localization.Format("GatheringClock.Time",minute/60,minute%60));
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GatheringClock.Disclaimer"));
     }
+    // 0.330: text of a schedule for the UI and the copies: its windows (language-neutral) or the translated text of its kind.
+    private string ScheduleText(GatheringSchedule schedule)=>schedule.TextKey is { } key ? localization.Get(key):schedule.Label;
     private void DrawGatheringTime(GatheringSchedule schedule)
     {
-        ImGui.TextWrapped(schedule.Label);
+        ImGui.TextWrapped(ScheduleText(schedule));
         if(schedule.Kind!=GatheringScheduleKind.Limited)return;
         var now=DateTimeOffset.UtcNow;var second=now.ToUnixTimeSeconds();
         if(second!=gatheringTimeSecond){gatheringTimeSecond=second;gatheringTimeCache.Clear();}

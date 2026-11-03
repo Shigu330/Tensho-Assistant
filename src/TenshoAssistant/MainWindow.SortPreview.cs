@@ -5,39 +5,55 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Inventory organization page (Objects), like SortaKinda: choose the bags or an open storage (retainer, saddlebag), edit its rule
+// (MainWindow.SortRules.cs), see the sorted result in a slot grid, and apply that order to the open storage in the game
+// (InventoryVisualSort*: changes the displayed order, stacks and quantities are kept). Nothing is sorted until « Apply » is
+// clicked; saving a rule does not sort. A click on a previewed item adds it, its category or its name to a zone of the draft.
 internal sealed partial class MainWindow
 {
     private InventorySnapshot? sortingViewSnapshot;
     private ItemCatalog? sortingViewCatalog;
     private InventorySortResult? sortingViewResult;
     private InventorySortProfile? sortingViewRules;
+    // 0.329: why the preview of these inputs could not be built (kept with them, so it is not rebuilt every frame).
+    private string? sortingViewError;
     private string? sortApplyError;
     private uint sortSlotMenuItem;
     private void DrawSortPreview()
     {
         Heading(localization.Get("SortUi.Title"), localization.Get("SortUi.Subtitle"));
+        // 0.388 (user request): the button drawn on the game's inventory window.
+        BoolSetting("SortButton.Setting","SortButton.SettingTip",()=>configuration.InventorySortButton,value=>configuration.InventorySortButton=value,c=>c.InventorySortButton);
+        if(configuration.InventorySortButton)
+        {
+            ImGui.Indent();
+            IntSetting("SortButton.OffsetX","SortButton.OffsetXTip",()=>configuration.InventorySortButtonX,value=>configuration.InventorySortButtonX=value,0,400,DefaultConfiguration.InventorySortButtonX);
+            IntSetting("SortButton.OffsetY","SortButton.OffsetYTip",()=>configuration.InventorySortButtonY,value=>configuration.InventorySortButtonY=value,0,400,DefaultConfiguration.InventorySortButtonY);
+            ImGui.Unindent();
+        }
         var character = bankBridge.State.CharacterId;
         if (character == 0) { ImGui.TextDisabled(localization.Get("SortUi.Login")); return; }
         var entries = bank.State.Entries.Where(entry => entry.Key.CharacterId == character).ToArray();
         var open=new[]{bankBridge.State.Retainer,bankBridge.State.Saddlebag,bankBridge.State.Premium}
             .Where(context=>context is not null && context.Key.CharacterId==character).Select(context=>context!).ToArray();
         var captured=visualSort.State.Capture;
-        var choices=entries.Where(entry=>entry.Key.Kind is not (BankStorageKind.Armoury or BankStorageKind.GlamourDresser or BankStorageKind.Armoire)).Select(entry=>(entry.Key,entry.Name)).Concat(open.Select(context=>(context.Key,context.Name))).ToList();
+        var choices=entries.Where(entry=>BankStorageScope.Sortable(entry.Key.Kind)).Select(entry=>(entry.Key,Name:BankEntryName(entry))).Concat(open.Select(context=>(context.Key,Name:StorageNames.Of(localization,context.Key.Kind,context.Name)))).ToList();
         if(captured?.Scope.Storage is { } capturedKey && capturedKey.CharacterId==character)choices.Add((capturedKey,captured.Name));
         var origins=choices.DistinctBy(value=>value.Key).ToArray();
-        if(sortPreviewOrigin is { } selected && !origins.Any(origin=>origin.Key==selected))sortPreviewOrigin=null;
+        if(sortPreviewOrigin is { } selected && !origins.Any(origin=>origin.Key==selected)){sortPreviewOrigin=null;sortApplyError=null;}
         var chosenName=sortPreviewOrigin is { } chosenKey ? origins.First(origin=>origin.Key==chosenKey).Name:localization.Get("SortUi.Personal");
         ImGui.SetNextItemWidth(260);
         if (ImGui.BeginCombo(localization.Get("SortUi.Storage"), chosenName))
         {
             try
             {
-                if (ImGui.Selectable(localization.Get("SortUi.Personal"), sortPreviewOrigin is null)) sortPreviewOrigin = null;
+                if (ImGui.Selectable(localization.Get("SortUi.Personal"), sortPreviewOrigin is null)) { sortPreviewOrigin = null; sortApplyError = null; }
                 foreach (var origin in origins)
                     if (ImGui.Selectable($"{origin.Name}##{origin.Key}", sortPreviewOrigin == origin.Key)) {sortPreviewOrigin=origin.Key;sortApplyError=null;}
             }
             finally { ImGui.EndCombo(); }
         }
+        Tip("SortUi.StorageTip");
         var scope=sortPreviewOrigin is { } storage ? InventorySortScope.FromStorage(storage):InventorySortScope.Personal(character);
         var live=captured is not null && captured.Scope==scope ? captured:null;
         var context=open.FirstOrDefault(value=>value.Key==sortPreviewOrigin);
@@ -65,15 +81,17 @@ internal sealed partial class MainWindow
         if (itemCatalog.State.Catalog is not { } catalog) { DrawCatalogStatus(); return; }
         var rules=DrawSortRules(scope,catalog);if(rules is null)return;
         var capacity=scope.Capacity;
-        if (sortingViewResult is null || !ReferenceEquals(sortingViewSnapshot, snapshot) || !ReferenceEquals(sortingViewCatalog, catalog)
+        if ((sortingViewResult is null && sortingViewError is null) || !ReferenceEquals(sortingViewSnapshot, snapshot) || !ReferenceEquals(sortingViewCatalog, catalog)
             || !ReferenceEquals(sortingViewRules,rules))
         {
-            try{sortingViewResult=InventorySortRules.Build(containers,scope,rules,id=>InventorySortMetadata.FromItem(id,catalog.Find(id)));}
-            catch(Exception error){ImGui.TextWrapped(localization.Get("SortUi.PreviewError"));if(developerMode)ImGui.TextWrapped(error.Message);return;}
+            // 0.329: a failure is kept with its inputs like a result: built again only when one of them changes.
+            try{sortingViewResult=InventorySortRules.Build(containers,scope,rules,id=>InventorySortMetadata.FromItem(id,catalog.Find(id)));sortingViewError=null;}
+            catch(Exception error){sortingViewResult=null;sortingViewError=error.Message;}
             sortingViewSnapshot = snapshot; sortingViewCatalog = catalog;
             sortingViewRules=rules;
         }
-        var preview = sortingViewResult;
+        // 0.329: the reason is shown (known messages through UiMessages, raw text in developer mode only).
+        if(sortingViewResult is not { } preview){ImGui.TextWrapped(localization.Get("SortUi.PreviewError"));if(sortingViewError is { } failure)DrawSortMessage(failure);return;}
         ImGui.Spacing();
         if(scope.Storage is null || live is not null)
         {
@@ -135,7 +153,7 @@ internal sealed partial class MainWindow
                                     var stack=positioned.Stack;
                                     var corner=ImGui.GetCursorScreenPos();
                                     DrawBankSlot(new(stack.Item.Id.Value, stack.Item.IsHighQuality ? 0 : stack.Quantity,
-                                        stack.Item.IsHighQuality ? stack.Quantity : 0), slot);
+                                        stack.Item.IsHighQuality ? stack.Quantity : 0), slot, select:false);
                                     ImGui.SetCursorScreenPos(corner);ImGui.Dummy(new Vector2(slot));
                                     if(ImGui.IsItemClicked()){sortSlotMenuItem=stack.Item.Id.Value;openSlotMenu=true;}
                                 }

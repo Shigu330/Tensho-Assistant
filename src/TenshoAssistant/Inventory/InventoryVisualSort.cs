@@ -17,13 +17,13 @@ public sealed class InventoryVisualSortPlan
     public static InventoryVisualSortPlan Build(InventorySnapshot expected,InventorySortResult preview,InventorySortScope scope)
     {
         var physical=scope.Extract(expected);
-        if(preview.Capacity!=scope.Capacity || preview.Stacks.Count!=physical.Count)throw new InvalidOperationException("Aperçu incompatible avec le rangement.");
+        if(preview.Capacity!=scope.Capacity || preview.Stacks.Count!=physical.Count)throw new InvalidOperationException("Preview incompatible with the storage.");
         var order=new List<InventoryPhysicalSlot>(scope.Capacity);var seen=new HashSet<InventoryPhysicalSlot>();
         foreach(var value in preview.Stacks)
         {
             var slot=new InventoryPhysicalSlot(value.Origin.Container.Value,value.Stack.Slot);
             if(value.Origin.Owner.Value!=scope.InventoryOwner || !physical.TryGetValue(slot,out var stack) || stack!=value.Stack || !seen.Add(slot))
-                throw new InvalidOperationException("L’aperçu ne correspond plus aux piles observées.");
+                throw new InvalidOperationException("The preview no longer matches the observed stacks.");
             order.Add(slot);
         }
         var empty=new Queue<InventoryPhysicalSlot>();
@@ -35,24 +35,24 @@ public sealed class InventoryVisualSortPlan
         }
         if(preview.Slots is { } slots)
         {
-            if(slots.Count!=scope.Capacity)throw new InvalidOperationException("Positions d’aperçu incomplètes.");
+            if(slots.Count!=scope.Capacity)throw new InvalidOperationException("Incomplete preview positions.");
             order.Clear();var placed=new HashSet<InventoryPhysicalSlot>();
             foreach(var value in slots)
             {
                 if(value is null)
                 {
-                    if(!empty.TryDequeue(out var free))throw new InvalidOperationException("Nombre de cases vides incohérent.");
+                    if(!empty.TryDequeue(out var free))throw new InvalidOperationException("Inconsistent number of empty slots.");
                     order.Add(free);continue;
                 }
                 var slot=new InventoryPhysicalSlot(value.Origin.Container.Value,value.Stack.Slot);
                 if(value.Origin.Owner.Value!=scope.InventoryOwner || !seen.Contains(slot) || !physical.TryGetValue(slot,out var stack)
-                    || stack!=value.Stack || !placed.Add(slot))throw new InvalidOperationException("Positions d’aperçu différentes des piles observées.");
+                    || stack!=value.Stack || !placed.Add(slot))throw new InvalidOperationException("Preview positions differ from the observed stacks.");
                 order.Add(slot);
             }
-            if(!placed.SetEquals(seen) || empty.Count!=0)throw new InvalidOperationException("L’aperçu ne conserve pas toutes les piles et cases vides.");
+            if(!placed.SetEquals(seen) || empty.Count!=0)throw new InvalidOperationException("The preview does not keep every stack and empty slot.");
         }
         else while(empty.TryDequeue(out var free))order.Add(free);
-        if(order.Count!=scope.Capacity || order.Distinct().Count()!=scope.Capacity)throw new InvalidOperationException("Permutation incomplète.");
+        if(order.Count!=scope.Capacity || order.Distinct().Count()!=scope.Capacity)throw new InvalidOperationException("Incomplete permutation.");
         return new(scope,expected,order.ToArray());
     }
 
@@ -87,7 +87,7 @@ public sealed class InventoryVisualSortService : IDisposable
             if(disposed || state.Pending)return false;
             if(plan.Scope.Storage is not null && (state.Capture is not { } capture || capture.Scope!=plan.Scope
                 || !ReferenceEquals(capture.Snapshot,plan.Expected) || !capture.Fresh(plan.Owner,now)))return false;
-            pending=new(++revision,plan,now);state=state with{Pending=true,Message="Tri visuel demandé ; vérification du rangement en cours."};return true;
+            pending=new(++revision,plan,now);state=state with{Pending=true,Message="Visual sort requested; checking the storage."};return true;
         }
     }
     public InventoryVisualSortRequest? Take(ulong owner,DateTimeOffset now)
@@ -97,7 +97,7 @@ public sealed class InventoryVisualSortService : IDisposable
             if(disposed || pending is not { } request)return null;
             pending=null;
             if(owner==0 || owner!=request.Plan.Owner || now<request.RequestedAt || now-request.RequestedAt>TimeSpan.FromSeconds(3))
-            {state=state with{Pending=false,Message="Demande annulée : personnage ou date modifiés."};revision++;return null;}
+            {state=state with{Pending=false,Message="Request cancelled: character or date changed."};revision++;return null;}
             return request;
         }
     }
@@ -108,7 +108,7 @@ public sealed class InventoryVisualSortService : IDisposable
         lock(gate)
         {
             if(disposed || state.Pending || scope.Storage is null)return false;
-            capturing=new(++revision,scope,now);state=new(true,"Lecture du rangement ouvert…");return true;
+            capturing=new(++revision,scope,now);state=new(true,"Reading the open storage…");return true;
         }
     }
     public InventorySortCaptureRequest? TakeCapture(ulong owner,DateTimeOffset now)
@@ -118,7 +118,7 @@ public sealed class InventoryVisualSortService : IDisposable
             if(disposed || capturing is not { } request)return null;
             capturing=null;
             if(owner!=request.Scope.CharacterId || now<request.RequestedAt || now-request.RequestedAt>TimeSpan.FromSeconds(3))
-            {revision++;state=new(false,"Lecture annulée : personnage ou date modifiés.");return null;}
+            {revision++;state=new(false,"Reading cancelled: character or date changed.");return null;}
             return request;
         }
     }
@@ -132,9 +132,9 @@ public sealed class InventoryVisualSortService : IDisposable
             {
                 request.Scope.Extract(snapshot);
                 capture=new(request.Scope,snapshot,name);
-                if(!capture.Fresh(request.Scope.CharacterId,now))throw new InvalidOperationException("Capture périmée ou datée dans le futur.");
+                if(!capture.Fresh(request.Scope.CharacterId,now))throw new InvalidOperationException("Capture expired or dated in the future.");
             }
-            state=new(false,error ?? "Aperçu lu en direct. Vous pouvez comparer la règle avant de l’appliquer.",capture);
+            state=new(false,error ?? "Preview read live. You can compare the rule before applying it.",capture);
         }
     }
     public void Clear(){lock(gate){pending=null;capturing=null;revision++;state=new(false,null);}}

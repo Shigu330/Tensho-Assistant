@@ -17,13 +17,15 @@ internal sealed class TriadNpcLoader : IDisposable
     private readonly IFramework framework;
     private readonly IClientState client;
     private readonly IPlayerState player;
+    private readonly IPluginLog log;
     private readonly CancellationTokenSource cancellation = new();
     private long nextBeaten;
     private ulong beatenOwner;
+    private string? beatenFailure;
 
     public TriadNpcLoader(TriadNpcService service, IDataManager data, IFramework framework, IClientState client, IPlayerState player, IPluginLog log)
     {
-        this.service = service; this.framework = framework; this.client = client; this.player = player;
+        this.service = service; this.framework = framework; this.client = client; this.player = player; this.log = log;
         var token = cancellation.Token;
         _ = Task.Run(() =>
         {
@@ -119,11 +121,21 @@ internal sealed class TriadNpcLoader : IDisposable
         if (owner == beatenOwner && now < nextBeaten) return;
         nextBeaten = now + Stopwatch.Frequency * 5; beatenOwner = owner;
         if (owner == 0 || service.State.Catalog is not { } catalog) { service.SetBeaten(null); return; }
-        var ui = UIState.Instance();
-        if (ui == null) { service.SetBeaten(null); return; }
-        var beaten = new HashSet<uint>();
-        foreach (var npc in catalog.Npcs) if (ui->IsTripleTriadNpcBeaten(npc.MatchId)) beaten.Add(npc.MatchId);
-        service.SetBeaten(beaten);
+        // 0.331 (R-14): a failed native read gives « unavailable », never the last list (maybe another character's); retried every 5 s,
+        // logged once per message.
+        try
+        {
+            var ui = UIState.Instance();
+            if (ui == null) { service.SetBeaten(null); return; }
+            var beaten = new HashSet<uint>();
+            foreach (var npc in catalog.Npcs) if (ui->IsTripleTriadNpcBeaten(npc.MatchId)) beaten.Add(npc.MatchId);
+            service.SetBeaten(beaten); beatenFailure = null;
+        }
+        catch (Exception error)
+        {
+            service.SetBeaten(null, true);
+            if (beatenFailure != error.Message) { beatenFailure = error.Message; log.Warning(error, "Triple Triad beaten NPCs unavailable; retry in five seconds."); }
+        }
     }
 
     public void Dispose() { framework.Update -= OnUpdate; cancellation.Cancel(); cancellation.Dispose(); }

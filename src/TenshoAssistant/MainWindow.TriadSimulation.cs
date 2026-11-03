@@ -5,6 +5,10 @@ using TenshoAssistant.MiniGames;
 
 namespace TenshoAssistant;
 
+// Triple Triad › Simulation tab: a manual match with two known hands (blue / red), who starts and the rules (Reverse, Fallen Ace,
+// Same, Plus, Order, Ascension / Descension), confirmed before advice. « Advice » runs a bounded search on a worker
+// (TriadSolveSession) and lists the best moves (exact or estimated), each one playable on the board; undo keeps earlier positions.
+// The search assumes an opponent playing the best moves and gives no win probability.
 internal sealed partial class MainWindow
 {
     private readonly TriadSolveSession triadSolve = new();
@@ -51,22 +55,25 @@ internal sealed partial class MainWindow
     private void DrawTriadSimulation()
     {
         ImGui.TextWrapped(localization.Get("TriadSim.Help"));
-        var rulesChanged = ImGui.Checkbox(localization.Get("TriadSim.Reverse"), ref triadReverse);
+        var rulesChanged = ImGui.Checkbox(localization.Get("TriadSim.Reverse"), ref triadReverse); Tip("TriadSim.ReverseTip");
         ImGui.SameLine();
-        rulesChanged |= ImGui.Checkbox(localization.Get("TriadSim.FallenAce"), ref triadFallenAce);
+        rulesChanged |= ImGui.Checkbox(localization.Get("TriadSim.FallenAce"), ref triadFallenAce); Tip("TriadSim.FallenAceTip");
         ImGui.SameLine();
-        rulesChanged |= ImGui.Checkbox(localization.Get("TriadSim.Same"), ref triadSame);
+        rulesChanged |= ImGui.Checkbox(localization.Get("TriadSim.Same"), ref triadSame); Tip("TriadSim.SameTip");
         ImGui.SameLine();
-        rulesChanged |= ImGui.Checkbox(localization.Get("TriadSim.Plus"), ref triadPlus);
-        rulesChanged |= ImGui.Checkbox(localization.Get("TriadSim.Order"), ref triadOrder);
+        rulesChanged |= ImGui.Checkbox(localization.Get("TriadSim.Plus"), ref triadPlus); Tip("TriadSim.PlusTip");
+        rulesChanged |= ImGui.Checkbox(localization.Get("TriadSim.Order"), ref triadOrder); Tip("TriadSim.OrderTip");
         ImGui.SameLine(); ImGui.SetNextItemWidth(150);
-        rulesChanged |= ImGui.Combo(localization.Get("TriadSim.Families"), ref triadFamilyRule, new[] {localization.Get("TriadSim.NoEffect"), localization.Get("TriadSim.Ascension"), localization.Get("TriadSim.Descension")}, 3);
+        rulesChanged |= ImGui.Combo(localization.Get("TriadSim.Families"), ref triadFamilyRule, new[] {localization.Get("TriadSim.NoEffect"), localization.Get("TriadSim.Ascension"), localization.Get("TriadSim.Descension")}, 3); Tip("TriadSim.FamiliesTip");
         if (rulesChanged) { InvalidateTriadSimulation(true); triadRulesConfirmed = false; }
         if (ImGui.Checkbox(localization.Get("TriadSim.Confirm"), ref triadRulesConfirmed)) InvalidateTriadSimulation(false);
+        Tip("TriadSim.ConfirmTip");
         ImGui.TextWrapped(localization.Get("TriadSim.RulesHelp"));
         if (ImGui.RadioButton(localization.Get("TriadSim.Initial"), triadEditingHands)) triadEditingHands = true;
+        Tip("TriadSim.InitialTip");
         ImGui.SameLine();
         if (ImGui.RadioButton(localization.Get("TriadSim.BoardAdvice"), !triadEditingHands)) triadEditingHands = false;
+        Tip("TriadSim.BoardAdviceTip");
         if (triadEditingHands)
         {
             ImGui.TextWrapped(localization.Get("TriadSim.OrderHelp"));
@@ -79,10 +86,12 @@ internal sealed partial class MainWindow
             if (ImGui.SmallButton(localization.Get("TriadSim.Clear")))
             { triadBlueHand.Clear(); triadRedHand.Clear(); InvalidateTriadSimulation(true); }
             ImGui.SetNextItemWidth(240);
-            ImGui.InputTextWithHint("##SimulationCardSearch", localization.Get("TriadSim.Search"), ref triadSimulationQuery, 128);
+            ImGui.InputTextWithHint("##SimulationCardSearch", localization.Get("TriadSim.Search"), ref triadSimulationQuery, 128); Tip("TriadSim.SearchTip");
             if (ImGui.RadioButton(localization.Get("TriadSim.AddBlue"), triadAddHand == 0)) triadAddHand = 0;
+            Tip("TriadSim.AddHandTip");
             ImGui.SameLine();
             if (ImGui.RadioButton(localization.Get("TriadSim.AddRed"), triadAddHand == 1)) triadAddHand = 1;
+            Tip("TriadSim.AddHandTip");
             ImGui.SetNextItemWidth(320);
             if (ImGui.BeginCombo("##AddSimulationCard", localization.Get("TriadSim.Choose")))
             {
@@ -91,12 +100,12 @@ internal sealed partial class MainWindow
                     var target = triadAddHand == 0 ? triadBlueHand : triadRedHand;
                     var query = triadSimulationQuery.Trim();
                     foreach (var entry in triadCards.Where(entry => query.Length == 0
-                        || entry.Name.Contains(query, StringComparison.OrdinalIgnoreCase) || entry.Card!.Number.ToString() == query))
+                        || entry.Name.Contains(query, StringComparison.OrdinalIgnoreCase) || entry.Card!.Number.ToString() == query || entry.Card!.Label.Equals(query, StringComparison.OrdinalIgnoreCase)))
                     {
                         ImGui.BeginDisabled(target.Count >= 5 || target.Contains(entry.Id));
                         try
                         {
-                            if (ImGui.Selectable($"{entry.Card!.Number} · {entry.Name}##Sim{entry.Id}"))
+                            if (ImGui.Selectable($"{entry.Card!.Label} · {entry.Name}##Sim{entry.Id}"))
                                 AddTriadSimulationCard(entry.Id, triadAddHand == 1);
                         }
                         finally { ImGui.EndDisabled(); }
@@ -104,16 +113,18 @@ internal sealed partial class MainWindow
                 }
                 finally { ImGui.EndCombo(); }
             }
+            Tip("TriadSim.ChooseTip");
             DrawTriadHand(false, true);
             DrawTriadHand(true, true);
             if (ImGui.Checkbox(localization.Get("TriadSim.RedStarts"), ref triadRedStarts)) InvalidateTriadSimulation(true);
+            Tip("TriadSim.RedStartsTip");
             if (ImGui.Button(localization.Get("TriadSim.Start")))
             {
                 InvalidateTriadSimulation(true);
                 try
                 {
                     TriadCardDefinition Resolve(uint id) => triadCards.FirstOrDefault(entry => entry.Id == id)?.Card
-                        ?? throw new InvalidOperationException($"Carte indisponible : ID {id}.");
+                        ?? throw new InvalidOperationException($"Card unavailable: ID {id}.");
                     triadPosition = TriadPosition.Create(triadBlueHand.Select(Resolve), triadRedHand.Select(Resolve), triadRedStarts ? TriadPlayer.Red : TriadPlayer.Blue, SelectedTriadRules);
                     triadEditingHands = false;
                 }
@@ -177,10 +188,10 @@ internal sealed partial class MainWindow
                         {
                             var definition = position.Cards[token];
                             var entry = triadCards.FirstOrDefault(entry => entry.Id == definition.Id);
-                            DrawItemIcon(new ItemDefinition(0, entry?.Name ?? localization.Format("UiFragments.Card",definition.Number), false, definition.IconId), new Vector2(62));
+                            DrawItemIcon(new ItemDefinition(0, entry?.Name ?? localization.Format("UiFragments.Card",definition.Label), false, definition.IconId), new Vector2(62));
                             if (ImGui.IsItemHovered()) WrappedTooltip(TriadSimulationTooltip(entry?.Name, definition, token, position));
                             var blue = position.OwnerAt(square) == TriadPlayer.Blue;
-                            ImGui.TextColored(blue ? TriadBlue : TriadRed, $"{(blue ? localization.Get("TriadSim.Blue") : localization.Get("TriadSim.Red"))} · {definition.Number}");
+                            ImGui.TextColored(blue ? TriadBlue : TriadRed, $"{(blue ? localization.Get("TriadSim.Blue") : localization.Get("TriadSim.Red"))} · {definition.Label}");
                         }
                     }
                     finally { ImGui.PopID(); }
@@ -229,10 +240,10 @@ internal sealed partial class MainWindow
                     {
                         if (ImGui.SmallButton(localization.Get("TriadSim.Remove"))) remove = index;
                         ImGui.BeginDisabled(index == 0);
-                        try { if (ImGui.SmallButton("<")) { swapFrom = index; swapTo = index - 1; } }
+                        try { if (ImGui.SmallButton("<")) { swapFrom = index; swapTo = index - 1; } Tip("TriadSim.MoveTip"); }
                         finally { ImGui.EndDisabled(); }
                         ImGui.SameLine(); ImGui.BeginDisabled(index == hand.Count - 1);
-                        try { if (ImGui.SmallButton(">")) { swapFrom = index; swapTo = index + 1; } }
+                        try { if (ImGui.SmallButton(">")) { swapFrom = index; swapTo = index + 1; } Tip("TriadSim.MoveTip"); }
                         finally { ImGui.EndDisabled(); }
                     }
                 }
@@ -247,7 +258,7 @@ internal sealed partial class MainWindow
     private string TriadSimulationTooltip(string? name, TriadCardDefinition card, int token, TriadPosition? position)
     {
         static string Values(int top,int right,int bottom,int left) => $"↑{TriadCardDefinition.Value(top)} →{TriadCardDefinition.Value(right)} ↓{TriadCardDefinition.Value(bottom)} ←{TriadCardDefinition.Value(left)}";
-        var text = localization.Format("TriadDynamic.Base",name ?? card.Number.ToString(),Values(card.Top,card.Right,card.Bottom,card.Left));
+        var text = localization.Format("TriadDynamic.Base",name ?? card.Label,Values(card.Top,card.Right,card.Bottom,card.Left));
         if (position is { } state)
             text += "\n"+localization.Format("TriadDynamic.Effective",Values(state.EffectiveSide(token,0),state.EffectiveSide(token,1),state.EffectiveSide(token,2),state.EffectiveSide(token,3)),state.FamilyModifier(token));
         return text;
@@ -297,7 +308,7 @@ internal sealed partial class MainWindow
             ImGui.PushID($"Advice{candidate.Move.CardIndex}/{candidate.Move.Square}");
             try
             {
-                if (ImGui.SmallButton(localization.Format("UiFragments.Move",entry?.Name ?? localization.Format("UiFragments.Card",card.Number),candidate.Move.Square/3+1,candidate.Move.Square%3+1,blue,10-blue)))
+                if (ImGui.SmallButton(localization.Format("UiFragments.Move",entry?.Name ?? localization.Format("UiFragments.Card",card.Label),candidate.Move.Square/3+1,candidate.Move.Square%3+1,blue,10-blue)))
                 { ApplyTriadMove(candidate.Move); break; }
                 if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("TriadSim.Apply"));
             }

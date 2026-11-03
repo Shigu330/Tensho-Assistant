@@ -14,7 +14,7 @@ public static class InventoryDisplayLayout
         foreach (var stack in stacks)
         {
             if (stack.DisplayIndex < 0 || stack.DisplayIndex >= capacity || !seen.Add(stack.DisplayIndex))
-                throw new InvalidOperationException("Ordre visuel indisponible : actualisez ce rangement.");
+                throw new InvalidOperationException("Visual order unavailable: refresh this storage.");
             pages[stack.DisplayIndex / 35][stack.DisplayIndex % 35] = stack;
         }
         return pages;

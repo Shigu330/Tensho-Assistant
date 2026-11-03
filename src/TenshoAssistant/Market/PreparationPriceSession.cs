@@ -20,7 +20,21 @@ public sealed class PreparationPriceSession : IDisposable
         ArgumentNullException.ThrowIfNull(market); ArgumentNullException.ThrowIfNull(context); ArgumentNullException.ThrowIfNull(ids);
         var copied=ids.Distinct().ToArray();
         if (copied.Length > 32 || copied.Any(id=>id==0) || context.CharacterId==0 || context.WorldId==0 || context.ContextItemId==0
-            || context.RecipeId==0 || context.Requested<1) throw new ArgumentException("Liste de prix invalide.");
+            || context.RecipeId==0 || context.Requested<1) throw new ArgumentException("Invalid price list.");
+        return Run(market,context,copied);
+    }
+
+    /// <summary>0.335: a bounded list outside the craft plan (submarine route loot): only a character, a world and 1 to 32 items.</summary>
+    public Task StartListAsync(MarketService market, ulong character, uint world, IEnumerable<uint> ids)
+    {
+        ArgumentNullException.ThrowIfNull(market); ArgumentNullException.ThrowIfNull(ids);
+        var copied=ids.Distinct().ToArray();
+        if (copied.Length is 0 or > 32 || copied.Any(id=>id==0) || character==0 || world==0) throw new ArgumentException("Invalid price list.");
+        return Run(market,new(character,world,0,0,0,0,0),copied);
+    }
+
+    private Task Run(MarketService market, PreparationPriceContext context, uint[] copied)
+    {
         lock (gate)
         {
             if (disposed) return Task.CompletedTask;
@@ -49,7 +63,7 @@ public sealed class PreparationPriceSession : IDisposable
                                 await Task.Delay(delay < TimeSpan.FromMilliseconds(25) ? TimeSpan.FromMilliseconds(25) : delay,token).ConfigureAwait(false);
                                 continue;
                             }
-                            throw new InvalidOperationException(result.Error ?? (result.Status==MarketFetchStatus.ScopeChanged ? "Personnage ou monde modifié." : "Consultation interrompue."));
+                            throw new InvalidOperationException(result.Error ?? (result.Status==MarketFetchStatus.ScopeChanged ? "Character or world changed." : "Consultation interrompue."));
                         }
                         completed++;
                     }
@@ -59,7 +73,7 @@ public sealed class PreparationPriceSession : IDisposable
                 {
                     lock (gate)
                         if (!disposed && ticket==generation) state=new(context,list,completed,0,false,
-                            error is OperationCanceledException ? "Consultation annulée ou délai de deux minutes atteint." : error.Message);
+                            error is OperationCanceledException ? "Lookup cancelled or two-minute limit reached." : error.Message);
                 }
                 finally
                 {

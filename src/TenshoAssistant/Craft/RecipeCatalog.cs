@@ -19,6 +19,8 @@ public sealed class RecipeCatalog
     private readonly FrozenDictionary<uint, IReadOnlyList<RecipeDefinition>> byIngredient;
 
     public int Count { get; }
+    /// <summary>A-11 (0.421): every recipe of the catalogue.</summary>
+    public IEnumerable<RecipeDefinition> All => byResult.Values.SelectMany(list => list);
     public string Source { get; }
 
     private RecipeCatalog(string source, Dictionary<uint, List<RecipeDefinition>> recipes, CancellationToken cancellation)

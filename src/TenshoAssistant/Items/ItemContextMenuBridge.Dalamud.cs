@@ -65,12 +65,36 @@ internal sealed class ItemContextMenuBridge : IDisposable
                     if(!Current(token))return;
                     // 0.208: the same tools as the context item panel, only those useful for this item (Relevant), in the same order.
                     var routes=Relevant?.Invoke(token.Item.ItemId) ?? DefaultRoutes;
-                    click.OpenSubmenu(routes.Select(route=>(IMenuItem)Entry(RouteName(route),route,token)).ToArray());
+                    // 0.256: then the item's sources, grouped as in Tensho (one sub-menu per kind).
+                    var entries=routes.Select(route=>(IMenuItem)Entry(Title?.Invoke(route,token.Item.ItemId) ?? RouteName(route),route,token)).ToList();
+                    foreach(var (label,lines) in Sources?.Invoke(token.Item.ItemId) ?? [])
+                        entries.Add(lines.Count==1 && lines[0].Text==label ? Action(label,lines[0].Open):new MenuItem
+                        {
+                            Name=new SeStringBuilder().AddText(label).Build(),PrefixChar='T',IsSubmenu=true,
+                            OnClicked=group=>group.OpenSubmenu(lines.SelectMany(line=>line.Flag is { } flag
+                                ? new IMenuItem[]{Action(line.Text.Trim(),line.Open),Action("  ↳ "+localization.Get("SourceLinks.Flag"),flag)}
+                                :[Action(line.Text.Trim(),line.Open)]).ToArray()),
+                        });
+                    // 0.349 (g, X-07): the item on the wiki and the Lodestone, opened in the browser on this click.
+                    foreach(var (label,open) in Links?.Invoke(token.Item.ItemId) ?? [])entries.Add(Action(label,open));
+                    click.OpenSubmenu(entries.ToArray());
                 },
             });
         }
         catch(Exception error){session.Clear();log.Warning(error,"Could not add Tensho inventory context menu.");}
     }
+
+    // 0.349 (g, X-07): external pages of an item (label, open), computed by the main window; null = none.
+    public Func<uint,IReadOnlyList<(string Label,Action Open)>>? Links { get; set; }
+    // Label of a tool for this item (the main window knows, e.g., that a card's collection is the Triple Triad tool).
+    public Func<ItemContextRoute,uint,string>? Title { get; set; }
+    // Sources of an item, grouped like Tensho's right-click menu (computed by the main window); null = none shown.
+    public Func<uint,IReadOnlyList<(string Label,IReadOnlyList<MainWindow.ItemSourceLine> Lines)>>? Sources { get; set; }
+    private MenuItem Action(string name,Action open)=>new()
+    {
+        Name=new SeStringBuilder().AddText(name).Build(),PrefixChar='T',
+        OnClicked=_=>{if(!disposed)open();},
+    };
 
     // Tools useful for an item (computed by the main window from the loaded catalogues); null = every tool.
     public Func<uint,IReadOnlyList<ItemContextRoute>>? Relevant { get; set; }

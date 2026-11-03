@@ -5,6 +5,541 @@ using Lumina.Excel.Sheets;
 // Read-only evidence for NPC-VENDORS-014: how scrip exchanges encode currencies and how NPCs reach their shops.
 if(args.Length is <1 or >2)throw new ArgumentException("Supply installed sqpack directory and optionally an item name.");
 using var data=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.French,CacheFileResources=false});
+// PROBE_VESSELPARTS (R-11 step 3): submarine and airship build data — every field and row of SubmarinePart, SubmarineRank,
+// AirshipExplorationPart/Level/Point and SubmarineExploration (typed fields next to the raw column layout, to see unmapped columns),
+// and how a part row maps to its Item (name): items whose AdditionalData points to a part sheet, their FilterGroup and UI category.
+if(Environment.GetEnvironmentVariable("PROBE_VESSELPARTS") is { Length:>0 })
+{
+    string VpCell(object? value)
+    {
+        if(value is null)return "";
+        if(value is Lumina.Text.ReadOnly.ReadOnlySeString text)return text.ExtractText();
+        if(value is Lumina.Excel.RowRef reference)return $"{reference.RowId}";
+        var valueType=value.GetType();
+        if(valueType.IsGenericType && valueType.GetGenericTypeDefinition()==typeof(Lumina.Excel.RowRef<>))return $"{valueType.GetProperty("RowId")!.GetValue(value)}";
+        return value.ToString()??"";
+    }
+    string VpCsv(string text)=>text.Contains(',') || text.Contains('"') || text.Contains('\n') ? "\""+text.Replace("\"","\"\"").Replace("\n"," ")+"\"":text;
+    void VpTyped<T>(Language language) where T:struct,Lumina.Excel.IExcelRow<T>
+    {
+        var properties=typeof(T).GetProperties().Where(property=>property.Name is not ("RowOffset" or "ExcelPage")).ToArray();
+        var sheet=data.Excel.GetSheet<T>(language);
+        Console.WriteLine($"CSV {typeof(T).Name} ({language}) rows {sheet.Count} fields "+string.Join(",",properties.Select(property=>property.Name+":"+property.PropertyType.Name)));
+        Console.WriteLine(string.Join(",",properties.Select(property=>property.Name)));
+        foreach(var row in sheet)Console.WriteLine(string.Join(",",properties.Select(property=>VpCsv(VpCell(property.GetValue(row))))));
+        Console.WriteLine("END");
+    }
+    void VpRaw(string name,bool rows)
+    {
+        var raw=data.Excel.GetSheet<Lumina.Excel.RawRow>(null,name);
+        var columns=raw.Columns;
+        Console.WriteLine($"RAW {name} columns {columns.Count} rows {raw.Count} layout "+string.Join(" ",columns.Select((column,index)=>$"{index}:{column.Type}@{column.Offset}")));
+        if(!rows)return;
+        foreach(var row in raw)Console.WriteLine($"RAWROW {name} {row.RowId}: "+string.Join(" | ",Enumerable.Range(0,columns.Count).Select(index=>VpCell(row.ReadColumn(index)))));
+    }
+    Console.WriteLine("SHEETS "+string.Join(",",data.Excel.SheetNames.Where(sheetName=>sheetName.Contains("Submarine",StringComparison.OrdinalIgnoreCase) || sheetName.Contains("Airship",StringComparison.OrdinalIgnoreCase))));
+    foreach(var name in new[]{"SubmarinePart","SubmarineRank","SubmarineExploration","SubmarineMap","SubmarineSpecCategory","AirshipExplorationPart","AirshipExplorationLevel","AirshipExplorationPoint","AirshipExplorationParamType","AirshipSkyIsland"})
+        VpRaw(name,Environment.GetEnvironmentVariable("PROBE_VESSELPARTS")=="raw");
+    VpTyped<SubmarinePart>(Language.English);
+    VpTyped<SubmarineRank>(Language.English);
+    VpTyped<AirshipExplorationPart>(Language.English);
+    VpTyped<AirshipExplorationLevel>(Language.English);
+    VpTyped<AirshipExplorationPoint>(Language.English);
+    VpTyped<AirshipExplorationPoint>(Language.French);
+    VpTyped<SubmarineExploration>(Language.English);
+    VpTyped<SubmarineSpecCategory>(Language.English);
+    VpTyped<SubmarineSpecCategory>(Language.French);
+    VpTyped<AirshipExplorationParamType>(Language.English);
+    VpTyped<AirshipExplorationParamType>(Language.French);
+    VpTyped<SubmarineMap>(Language.English);
+    // Part → Item: AdditionalData typed reference (RowType) on every item, then the same items found by name for an independent check.
+    var vpItemsEnglish=data.Excel.GetSheet<Item>(Language.English);
+    var vpItemsFrench=data.Excel.GetSheet<Item>(Language.French);
+    var vpCategories=data.Excel.GetSheet<ItemUICategory>(Language.English);
+    foreach(var category in vpCategories.Where(category=>category.Name.ExtractText() is { } categoryName && (categoryName.Contains("Submersible",StringComparison.OrdinalIgnoreCase) || categoryName.Contains("Airship",StringComparison.OrdinalIgnoreCase) || categoryName.Contains("Submarine",StringComparison.OrdinalIgnoreCase))))
+        Console.WriteLine($"UICATEGORY {category.RowId} '{category.Name.ExtractText()}'");
+    var vpByType=vpItemsEnglish.Where(item=>item.AdditionalData.Is<SubmarinePart>() || item.AdditionalData.Is<AirshipExplorationPart>()).ToArray();
+    Console.WriteLine($"TYPED part items {vpByType.Length} filterGroups "+string.Join(",",vpByType.GroupBy(item=>(item.FilterGroup,item.AdditionalData.RowType?.Name)).Select(group=>$"{group.Key.FilterGroup}->{group.Key.Name}:{group.Count()}")));
+    var vpByName=vpItemsEnglish.Where(item=>item.Name.ExtractText() is { } itemName && (itemName.Contains("-class ",StringComparison.Ordinal) || itemName.Contains("-type ",StringComparison.Ordinal))
+        && (itemName.EndsWith(" Bow",StringComparison.Ordinal) || itemName.EndsWith(" Bridge",StringComparison.Ordinal) || itemName.EndsWith(" Hull",StringComparison.Ordinal) || itemName.EndsWith(" Stern",StringComparison.Ordinal)
+            || itemName.EndsWith(" Forecastle",StringComparison.Ordinal) || itemName.EndsWith(" Aftcastle",StringComparison.Ordinal) || itemName.EndsWith(" Rigging",StringComparison.Ordinal))).ToArray();
+    Console.WriteLine($"BYNAME part-like items {vpByName.Length}; not typed: "+string.Join(";",vpByName.Where(item=>!vpByType.Any(typed=>typed.RowId==item.RowId)).Select(item=>$"{item.RowId} {item.Name.ExtractText()} fg {item.FilterGroup} add {item.AdditionalData.RowId} type {item.AdditionalData.RowType?.Name} ui {item.ItemUICategory.RowId}")));
+    Console.WriteLine("CSV ItemToPart");
+    Console.WriteLine("ItemId,NameEn,NameFr,FilterGroup,AdditionalDataRowId,AdditionalDataSheet,ItemUICategory,ItemUICategoryName,LevelItem,PriceLow,FoundByName");
+    foreach(var item in vpByType.OrderBy(item=>item.AdditionalData.RowType?.Name).ThenBy(item=>item.AdditionalData.RowId))
+        Console.WriteLine(string.Join(",",new[]{$"{item.RowId}",VpCsv(item.Name.ExtractText()),VpCsv(vpItemsFrench.GetRow(item.RowId).Name.ExtractText()),$"{item.FilterGroup}",$"{item.AdditionalData.RowId}",item.AdditionalData.RowType?.Name??"",
+            $"{item.ItemUICategory.RowId}",VpCsv(item.ItemUICategory.IsValid ? item.ItemUICategory.Value.Name.ExtractText():""),$"{item.LevelItem.RowId}",$"{item.PriceLow}",$"{vpByName.Any(named=>named.RowId==item.RowId)}"}));
+    Console.WriteLine("END");
+    // Part rows without an item, and items pointing twice at the same part row.
+    var vpSubParts=data.Excel.GetSheet<SubmarinePart>();var vpAirParts=data.Excel.GetSheet<AirshipExplorationPart>();
+    Console.WriteLine("SUB parts without item: "+string.Join(",",vpSubParts.Where(part=>!vpByType.Any(item=>item.AdditionalData.Is<SubmarinePart>() && item.AdditionalData.RowId==part.RowId)).Select(part=>part.RowId)));
+    Console.WriteLine("AIR parts without item: "+string.Join(",",vpAirParts.Where(part=>!vpByType.Any(item=>item.AdditionalData.Is<AirshipExplorationPart>() && item.AdditionalData.RowId==part.RowId)).Select(part=>part.RowId)));
+    Console.WriteLine("Duplicate targets: "+string.Join(",",vpByType.GroupBy(item=>(item.AdditionalData.RowType?.Name,item.AdditionalData.RowId)).Where(group=>group.Count()>1).Select(group=>$"{group.Key.Name}#{group.Key.RowId}:{string.Join("/",group.Select(item=>item.RowId))}")));
+    // Independent consistency: the item's UI category (game text) against the part row's Slot, and the item name's class prefix against Class.
+    string VpPrefix(string itemName)=>itemName[..itemName.IndexOf(itemName.Contains("-class ",StringComparison.Ordinal) ? "-class ":"-type ",StringComparison.Ordinal)];
+    Console.WriteLine("SUB slot<->category "+string.Join(" ",vpByType.Where(item=>item.FilterGroup==36).GroupBy(item=>(vpSubParts.GetRow(item.AdditionalData.RowId).Slot,item.ItemUICategory.Value.Name.ExtractText())).Select(group=>$"slot{group.Key.Slot}={group.Key.Item2}x{group.Count()}")));
+    Console.WriteLine("AIR slot<->category "+string.Join(" ",vpByType.Where(item=>item.FilterGroup==28).GroupBy(item=>(vpAirParts.GetRow(item.AdditionalData.RowId).Slot,item.ItemUICategory.Value.Name.ExtractText())).Select(group=>$"slot{group.Key.Slot}={group.Key.Item2}x{group.Count()}")));
+    Console.WriteLine("SUB class<->name "+string.Join(" ",vpByType.Where(item=>item.FilterGroup==36).GroupBy(item=>(vpSubParts.GetRow(item.AdditionalData.RowId).Class,VpPrefix(item.Name.ExtractText()))).Select(group=>$"class{group.Key.Class}={group.Key.Item2}x{group.Count()}")));
+    Console.WriteLine("AIR class<->name "+string.Join(" ",vpByType.Where(item=>item.FilterGroup==28).GroupBy(item=>(vpAirParts.GetRow(item.AdditionalData.RowId).Class,VpPrefix(item.Name.ExtractText()))).Select(group=>$"class{group.Key.Class}={group.Key.Item2}x{group.Count()}")));
+    // Rank bonuses: cumulative totals (never decreasing) or per-rank increments?
+    var vpRanks=data.Excel.GetSheet<SubmarineRank>().Where(rank=>rank.RowId is >0 and <=145).ToArray();
+    Console.WriteLine("RANK bonuses non-decreasing: "+Enumerable.Range(1,vpRanks.Length-1).All(index=>vpRanks[index].SurveillanceBonus>=vpRanks[index-1].SurveillanceBonus && vpRanks[index].RetrievalBonus>=vpRanks[index-1].RetrievalBonus
+        && vpRanks[index].SpeedBonus>=vpRanks[index-1].SpeedBonus && vpRanks[index].RangeBonus>=vpRanks[index-1].RangeBonus && vpRanks[index].FavorBonus>=vpRanks[index-1].FavorBonus)
+        +"; last row with ExpToNext>0: "+data.Excel.GetSheet<SubmarineRank>().Where(rank=>rank.ExpToNext>0).Max(rank=>rank.RowId)
+        +"; airship last row with ExpToNext>0: "+data.Excel.GetSheet<AirshipExplorationLevel>().Where(level=>level.ExpToNext>0).Max(level=>level.RowId));
+    // Part tier components against the rank capacity at the part's own rank requirement (4 parts of the same tier).
+    foreach(var tier in vpSubParts.Where(part=>part.RowId>0).GroupBy(part=>(part.Rank,part.Components)))
+        Console.WriteLine($"SUB tier rank {tier.Key.Rank} components {tier.Key.Components} x4={tier.Key.Components*4} capacity@rank {data.Excel.GetSheet<SubmarineRank>().GetRow(tier.Key.Rank).Capacity}");
+    foreach(var tier in vpAirParts.Where(part=>part.RowId>0).GroupBy(part=>(part.Rank,part.Components)))
+        Console.WriteLine($"AIR tier rank {tier.Key.Rank} components {tier.Key.Components} x4={tier.Key.Components*4} capacity@rank {data.Excel.GetSheet<AirshipExplorationLevel>().GetRow(tier.Key.Rank).Capacity}");
+    Console.WriteLine("AIRPOINT unknown columns nonzero rows: "+string.Join(",",data.Excel.GetSheet<AirshipExplorationPoint>().Where(point=>point.Unknown0!=0 || point.Unknown1!=0 || point.Unknown2!=0).Select(point=>point.RowId)));
+    VpRaw("SubmarineExplorationLog",false);VpRaw("AirshipExplorationLog",false);
+    return;
+}
+// PROBE_MELD (0.312): melding caps — ItemLevel column per BaseParam, slot percentages, check against an item's own top substat.
+if(Environment.GetEnvironmentVariable("PROBE_MELD") is { Length:>0 })
+{
+    Console.WriteLine("ITEMLEVEL "+string.Join(",",typeof(ItemLevel).GetProperties().Where(property=>property.PropertyType==typeof(ushort)).Select(property=>property.Name)));
+    var levels=data.Excel.GetSheet<ItemLevel>();var baseParams=data.Excel.GetSheet<BaseParam>();
+    int Cap(uint level,uint param,string slotColumn,string levelColumn)
+    {
+        var row=levels.GetRow(level);var bp=baseParams.GetRow(param);
+        var value=(ushort)typeof(ItemLevel).GetProperty(levelColumn)!.GetValue(row)!;
+        var percent=(ushort)typeof(BaseParam).GetProperty(slotColumn)!.GetValue(bp)!;
+        return (int)Math.Round(value*percent/1000.0,MidpointRounding.AwayFromZero);
+    }
+    foreach(var id in new uint[]{34830,34831})
+    {
+        var item=data.Excel.GetSheet<Item>().GetRow(id);
+        var stats=string.Join(",",item.BaseParam.Zip(item.BaseParamValue).Where(pair=>pair.First.RowId!=0).Select(pair=>$"{pair.First.RowId}:{pair.Second}"));
+        Console.WriteLine($"ITEM {id} ilvl {item.LevelItem.RowId} stats {stats} advanced {item.IsAdvancedMeldingPermitted} capTen {Cap(item.LevelItem.RowId,19,"EarringPercent","Tenacity")} capCrit {Cap(item.LevelItem.RowId,27,"EarringPercent","CriticalHit")} capDet {Cap(item.LevelItem.RowId,44,"EarringPercent","Determination")} capSks {Cap(item.LevelItem.RowId,45,"EarringPercent","SkillSpeed")}");
+    }
+    // A 7.x body piece with its stats and caps.
+    var body=data.Excel.GetSheet<Item>().Where(row=>row.LevelEquip==100 && row.EquipSlotCategory.RowId==4 && row.LevelItem.RowId>=730).Take(2);
+    foreach(var item in body)
+    {
+        var stats=string.Join(",",item.BaseParam.Zip(item.BaseParamValue).Where(pair=>pair.First.RowId!=0).Select(pair=>$"{pair.First.RowId}:{pair.Second}"));
+        Console.WriteLine($"BODY {item.RowId} {item.Name.ExtractText()} ilvl {item.LevelItem.RowId} stats {stats} slots {item.MateriaSlotCount} advanced {item.IsAdvancedMeldingPermitted} capCrit {Cap(item.LevelItem.RowId,27,"ChestPercent","CriticalHit")} capDet {Cap(item.LevelItem.RowId,44,"ChestPercent","Determination")} capDh {Cap(item.LevelItem.RowId,22,"ChestPercent","DirectHitRate")}");
+    }
+    Console.WriteLine("MATERIA PROPS "+string.Join(",",typeof(Materia).GetProperties().Select(property=>property.Name+":"+property.PropertyType.Name)));
+    foreach(var materia in data.Excel.GetSheet<Materia>().Where(row=>row.BaseParam.RowId!=0).Take(30))
+        Console.WriteLine($"MATERIA {materia.RowId} param {materia.BaseParam.RowId} values {string.Join(",",materia.Value)} items {string.Join(",",materia.Item.Select(item=>item.RowId))} first {(materia.Item[0].IsValid ? materia.Item[0].Value.Name.ExtractText():"")}");
+    return;
+}
+// PROBE_GEAR (0.310): BaseParam names, ClassJob abbreviations against ClassJobCategory columns, a sample of gear rows.
+if(Environment.GetEnvironmentVariable("PROBE_GEAR") is { Length:>0 })
+{
+    foreach(var param in data.Excel.GetSheet<BaseParam>().Where(row=>!row.Name.IsEmpty).Take(80))Console.Write($"{param.RowId}={param.Name.ExtractText()}; ");
+    Console.WriteLine();
+    var english=data.Excel.GetSheet<ClassJob>(Language.English);
+    var columns=typeof(ClassJobCategory).GetProperties().Where(property=>property.PropertyType==typeof(bool)).Select(property=>property.Name).ToHashSet();
+    foreach(var job in english.Where(row=>!row.Abbreviation.IsEmpty))Console.Write($"{job.RowId}:{job.Abbreviation.ExtractText()}{(columns.Contains(job.Abbreviation.ExtractText()) ? "":"(MISSING)")} ");
+    Console.WriteLine();
+    var gear=data.Excel.GetSheet<Item>().Where(row=>row.EquipSlotCategory.RowId!=0 && row.LevelEquip==90).Take(4);
+    foreach(var item in gear)
+        Console.WriteLine($"ITEM {item.RowId} {item.Name.ExtractText()} slot {item.EquipSlotCategory.RowId} cjc {item.ClassJobCategory.RowId} '{item.ClassJobCategory.Value.Name.ExtractText()}' lvl {item.LevelEquip} ilvl {item.LevelItem.RowId} def {item.DefensePhys}/{item.DefenseMag} dmg {item.DamagePhys}/{item.DamageMag} materia {item.MateriaSlotCount} params "
+            +string.Join(",",item.BaseParam.Zip(item.BaseParamValue).Where(pair=>pair.First.RowId!=0).Select(pair=>$"{pair.First.RowId}:{pair.Second}"))
+            +" hq "+string.Join(",",item.BaseParamSpecial.Zip(item.BaseParamValueSpecial).Where(pair=>pair.First.RowId!=0).Select(pair=>$"{pair.First.RowId}:{pair.Second}")));
+    Console.WriteLine("SLOTCAT "+string.Join(",",typeof(EquipSlotCategory).GetProperties().Select(property=>property.Name)));
+    var materia=data.Excel.GetSheet<Materia>().First(row=>row.BaseParam.RowId!=0);
+    Console.WriteLine($"MATERIA {materia.RowId} param {materia.BaseParam.RowId} values {string.Join(",",materia.Value)}");
+    return;
+}
+// PROBE_RECIPEROWS (0.428, user report « cannot display a recipe »): every Recipe row of an item (by French name), with its flags.
+if(Environment.GetEnvironmentVariable("PROBE_RECIPEROWS") is { Length:>0 } recipeName)
+{
+    foreach(var recipe in data.Excel.GetSheet<Recipe>().Where(row=>row.ItemResult.RowId!=0 && row.ItemResult.ValueNullable?.Name.ExtractText()==recipeName))
+        Console.WriteLine($"RECIPE {recipe.RowId} craftType {recipe.CraftType.RowId} level {recipe.RecipeLevelTable.ValueNullable?.ClassJobLevel} secretBook {recipe.SecretRecipeBook.RowId} "
+            +$"expert {recipe.IsExpert} specialist {recipe.IsSpecializationRequired} quest {recipe.Quest.RowId} number {recipe.Number} hide? {recipe.CanHq}/{recipe.CanQuickSynth}");
+    return;
+}
+// PROBE_CRAFTFOOD (0.420, A-02): items whose ItemAction points (Data[1]) to an ItemFood row with crafting attributes
+// (BaseParam names in English), Data[0] (the status: well fed or medicated) and the values / caps (NQ and HQ).
+if(Environment.GetEnvironmentVariable("PROBE_CRAFTFOOD") is { Length:>0 })
+{
+    var baseParams=data.Excel.GetSheet<BaseParam>(Language.English);var foods=data.Excel.GetSheet<ItemFood>();var statuses=data.Excel.GetSheet<Status>(Language.English);
+    foreach(var bp in baseParams.Where(row=>row.RowId is 11 or 70 or 71))Console.WriteLine($"BASEPARAM {bp.RowId} '{bp.Name.ExtractText()}'");
+    var shown=0;var total=0;var data0=new Dictionary<uint,int>();
+    foreach(var item in data.Excel.GetSheet<Item>(Language.English).Where(row=>row.ItemAction.RowId!=0))
+    {
+        if(item.ItemAction.ValueNullable is not { } action || action.Data.Count<2)continue;
+        if(foods.GetRowOrDefault(action.Data[1]) is not { } food)continue;
+        var craft=food.Params.Where(param=>param.BaseParam.RowId is 11 or 70 or 71).ToArray();
+        if(craft.Length==0)continue;
+        total++;data0[action.Data[0]]=data0.GetValueOrDefault(action.Data[0])+1;
+        if(shown++<8)Console.WriteLine($"FOOD {item.RowId} '{item.Name.ExtractText()}' data0 {action.Data[0]} '{statuses.GetRowOrDefault(action.Data[0])?.Name.ExtractText()}' data2 {action.Data[2]} food {action.Data[1]} "
+            +string.Join(" | ",craft.Select(param=>$"bp{param.BaseParam.RowId} rel {param.IsRelative} {param.Value}%/max {param.Max} HQ {param.ValueHQ}%/max {param.MaxHQ}")));
+    }
+    Console.WriteLine($"TOTAL {total} by data0 "+string.Join(", ",data0.Select(pair=>$"{pair.Key}:{pair.Value}")));
+    return;
+}
+// PROBE_OCEANLIVE (0.418, R-07): mission conditions, time-of-day rows, spots (main / spectral) and their fish.
+if(Environment.GetEnvironmentVariable("PROBE_OCEANLIVE") is { Length:>0 })
+{
+    foreach(var row in data.Excel.GetSheet<IKDPlayerMissionCondition>(Language.English))Console.WriteLine($"MISSION {row.RowId} '{row.Unknown0.ExtractText()}' n {row.Unknown1}");
+    foreach(var row in data.Excel.GetSheet<IKDTimeDefine>())Console.WriteLine($"TIME {row.RowId} tod {row.TimeOfDay}");
+    foreach(var spot in data.Excel.GetSheet<IKDSpot>(Language.English).Where(row=>row.PlaceName.RowId!=0).Take(14))
+        Console.WriteLine($"SPOT {spot.RowId} '{spot.PlaceName.ValueNullable?.Name.ExtractText()}' main {spot.SpotMain.RowId} ({spot.SpotMain.ValueNullable?.Item.Count(item=>item.RowId!=0)} fish) sub {spot.SpotSub.RowId} ({spot.SpotSub.ValueNullable?.Item.Count(item=>item.RowId!=0)} fish)");
+    foreach(var route in data.Excel.GetSheet<IKDRoute>(Language.English).Where(row=>!row.Name.IsEmpty).Take(3))
+        Console.WriteLine($"ROUTE {route.RowId} spots {string.Join(",",route.Spot.Select(s=>s.RowId))} times {string.Join(",",route.Time.Select(t=>t.RowId))} instance {route.Instance.RowId}");
+    var fishParams=data.Excel.GetSheet<IKDFishParam>().Count(row=>row.Fish.RowId!=0);
+    Console.WriteLine($"IKDFISHPARAM {fishParams}");
+    return;
+}
+// PROBE_GATHERTYPE (0.411, R-10): GatheringType rows (names in English) and how many gathering point bases use each, to map a point to its job.
+if(Environment.GetEnvironmentVariable("PROBE_GATHERTYPE") is { Length:>0 })
+{
+    var bases=data.Excel.GetSheet<GatheringPointBase>().GroupBy(row=>row.GatheringType.RowId).ToDictionary(group=>group.Key,group=>group.Count());
+    foreach(var type in data.Excel.GetSheet<GatheringType>(Language.English))Console.WriteLine($"TYPE {type.RowId} '{type.Name.ExtractText()}' bases {bases.GetValueOrDefault(type.RowId)}");
+    foreach(var job in data.Excel.GetSheet<ClassJob>(Language.English).Where(row=>row.RowId is 16 or 17 or 18))Console.WriteLine($"JOB {job.RowId} '{job.Name.ExtractText()}'");
+    return;
+}
+// PROBE_GPACTIONS (0.410, R-09): every miner and botanist action (ClassJob 16/17): level, GP cost, English and French names, description.
+if(Environment.GetEnvironmentVariable("PROBE_GPACTIONS") is { Length:>0 })
+{
+    var english=data.Excel.GetSheet<Lumina.Excel.Sheets.Action>(Language.English);var transient=data.Excel.GetSheet<ActionTransient>(Language.English);
+    foreach(var row in data.Excel.GetSheet<Lumina.Excel.Sheets.Action>().Where(row=>row.ClassJob.RowId is 16 or 17 && !row.Name.IsEmpty).OrderBy(row=>row.ClassJob.RowId).ThenBy(row=>row.ClassJobLevel))
+        Console.WriteLine($"ACTION {row.RowId} job {row.ClassJob.RowId} lv {row.ClassJobLevel} costType {row.PrimaryCostType} cost {row.PrimaryCostValue} second {row.SecondaryCostType}/{row.SecondaryCostValue.RowId} "
+            +$"'{english.GetRowOrDefault(row.RowId)?.Name.ExtractText()}' / '{row.Name.ExtractText()}' :: {transient.GetRowOrDefault(row.RowId)?.Description.ExtractText().Replace((char)10,(char)32)}");
+    var traitText=data.Excel.GetSheet<TraitTransient>(Language.English);
+    foreach(var trait in data.Excel.GetSheet<Trait>(Language.English).Where(row=>row.ClassJob.RowId is 16 or 17 && !row.Name.IsEmpty).OrderBy(row=>row.Level))
+        Console.WriteLine($"TRAIT {trait.RowId} job {trait.ClassJob.RowId} lv {trait.Level} '{trait.Name.ExtractText()}' :: {traitText.GetRowOrDefault(trait.RowId)?.Description.ExtractText().Replace((char)10,(char)32)}");
+    var status=data.Excel.GetSheet<Status>(Language.English);
+    foreach(var id in new uint[]{2765,757,2668,3910,225})Console.WriteLine($"STATUS {id} '{status.GetRowOrDefault(id)?.Name.ExtractText()}' :: {status.GetRowOrDefault(id)?.Description.ExtractText().Replace((char)10,(char)32)}");
+    return;
+}
+// PROBE_COLLECTABLES (0.409, R-06): collectable shops, their items, collectability thresholds and scrip rewards (Currency column).
+if(Environment.GetEnvironmentVariable("PROBE_COLLECTABLES") is { Length:>0 })
+{
+    foreach(var shop in data.Excel.GetSheet<CollectablesShop>().Where(row=>!row.Name.IsEmpty))
+        Console.WriteLine($"SHOP {shop.RowId} '{shop.Name.ExtractText()}' rewardType {shop.RewardType} groups {string.Join(",",shop.ShopItems.Select(item=>item.RowId).Where(id=>id!=0))}");
+    var rows=data.Excel.GetSubrowSheet<CollectablesShopItem>().SelectMany(group=>group).Where(row=>row.Item.RowId!=0).ToArray();
+    Console.WriteLine($"ITEMS {rows.Length}");
+    foreach(var currency in rows.GroupBy(row=>row.CollectablesShopRewardScrip.ValueNullable?.Currency ?? 9999).OrderBy(group=>group.Key))
+        Console.WriteLine($"CURRENCY {currency.Key} rows {currency.Count()} e.g. "+string.Join(" | ",currency.Take(3).Select(row=>$"{row.RowId}.{row.SubrowId} {row.Item.ValueNullable?.Name.ExtractText()} grp '{row.CollectablesShopItemGroup.ValueNullable?.Name.ExtractText()}'")));
+    foreach(var row in rows.Where(row=>row.RowId is >= 0).GroupBy(row=>row.RowId).SelectMany(group=>group.Take(2)).Take(60))
+    {
+        var refine=row.CollectablesShopRefine.ValueNullable; var reward=row.CollectablesShopRewardScrip.ValueNullable;
+        Console.WriteLine($"ROW {row.RowId}.{row.SubrowId} item {row.Item.RowId} '{row.Item.ValueNullable?.Name.ExtractText()}' lv {row.LevelMin}-{row.LevelMax} stars {row.Stars} "
+            +$"refine {refine?.LowCollectability}/{refine?.MidCollectability}/{refine?.HighCollectability} scrip c{reward?.Currency} {reward?.LowReward}/{reward?.MidReward}/{reward?.HighReward} "
+            +$"grp '{row.CollectablesShopItemGroup.ValueNullable?.Name.ExtractText()}'");
+    }
+    var twice=rows.GroupBy(row=>row.Item.RowId).Where(group=>group.Count()>1).Take(5);
+    foreach(var group in twice)Console.WriteLine($"DUP item {group.Key} rows {string.Join(",",group.Select(row=>$"{row.RowId}.{row.SubrowId}"))}");
+    return;
+}
+// PROBE_LOGS (0.404): row numbers of the spearfishing and fishing notebooks.
+if(Environment.GetEnvironmentVariable("PROBE_LOGS") is { Length:>0 })
+{
+    var spear=data.Excel.GetSheet<SpearfishingItem>().Where(row=>row.Item.RowId!=0).Select(row=>row.RowId).ToArray();
+    Console.WriteLine($"SPEAR rows {spear.Length} min {spear.Min()} max {spear.Max()} first {string.Join(",",spear.Take(5))} last {string.Join(",",spear.TakeLast(5))}");
+    var fishRows=data.Excel.GetSheet<FishParameter>().Where(row=>row.IsInLog && row.Item.RowId!=0).Select(row=>row.RowId).ToArray();
+    Console.WriteLine($"FISH rows {fishRows.Length} min {fishRows.Min()} max {fishRows.Max()}");
+    var gather=data.Excel.GetSheet<GatheringItem>().Where(row=>row.Item.RowId!=0).Select(row=>row.RowId).ToArray();
+    Console.WriteLine($"GATHER rows {gather.Length} min {gather.Min()} max {gather.Max()}");
+    return;
+}
+// PROBE_OCEAN (0.392, R-01): ocean fishing route loop (IKDRouteTable), routes (IKDRoute: name, stops, time of day).
+if(Environment.GetEnvironmentVariable("PROBE_OCEAN") is { Length:>0 })
+{
+    var table=data.Excel.GetSheet<IKDRouteTable>().ToArray();
+    Console.WriteLine($"ROUTETABLE rows {table.Length}");
+    foreach(var row in table.Take(14))Console.WriteLine($"LOOP {row.RowId} aldenard {row.Route.RowId} othard {row.Unknown0}");
+    foreach(var route in data.Excel.GetSheet<IKDRoute>().Where(row=>!row.Name.IsEmpty))
+        Console.WriteLine($"ROUTE {route.RowId} '{route.Name.ExtractText()}' instance {route.Instance.RowId} stops "
+            +string.Join(" | ",route.Spot.Zip(route.Time).Where(pair=>pair.First.RowId!=0).Select(pair=>$"{pair.First.ValueNullable?.PlaceName.ValueNullable?.Name.ExtractText()} t{pair.Second.ValueNullable?.TimeOfDay}")));
+    Console.WriteLine("LOOPROUTES "+string.Join(",",table.Select(row=>row.Route.RowId))+" / "+string.Join(",",table.Select(row=>row.Unknown0)));
+    return;
+}
+// PROBE_UNLOCKS (0.387): item actions of the 0.365 collection kinds — data columns against the unlocked row's name.
+if(Environment.GetEnvironmentVariable("PROBE_UNLOCKS") is { Length:>0 })
+{
+    var orn=data.Excel.GetSheet<Ornament>();var gla=data.Excel.GetSheet<Glasses>();var bud=data.Excel.GetSheet<BuddyEquip>();var frame=data.Excel.GetSheet<BannerFrame>();
+    var bg=data.Excel.GetSheet<BannerBg>();var deco=data.Excel.GetSheet<BannerDecoration>();var mcg=data.Excel.GetSheet<McGuffin>();
+    string Label(uint type,uint key)=>type switch
+    {
+        20086=>orn.GetRowOrDefault(key)?.Singular.ExtractText() ?? "?",37312=>gla.GetRowOrDefault(key)?.Name.ExtractText() ?? "?",1013=>bud.GetRowOrDefault(key)?.Name.ExtractText() ?? "?",
+        29459=>"frame "+(frame.GetRowOrDefault(key)?.Name.ExtractText() ?? "?")+" | bg "+(bg.GetRowOrDefault(key)?.Name.ExtractText() ?? "?")+" | deco "+(deco.GetRowOrDefault(key)?.Name.ExtractText() ?? "?"),
+        _=>"mcguffin "+(mcg.GetRowOrDefault(key)?.UIData.ValueNullable?.Name.ExtractText() ?? "?"),
+    };
+    foreach(var type in new uint[]{20086,37312,1013,29459,25183,25174})
+        foreach(var item in data.Excel.GetSheet<Item>().Where(row=>!row.Name.IsEmpty && row.ItemAction.ValueNullable?.Action.RowId==type).Take(6))
+        {
+            var action=item.ItemAction.Value;
+            Console.WriteLine($"UNLOCK {type} item {item.RowId} '{item.Name.ExtractText()}' data "+string.Join(",",action.Data.ToArray().Take(5))
+                +" -> d0 "+Label(type,action.Data[0])+" / d1 "+Label(type,action.Data[1]));
+        }
+    Console.WriteLine("MCGUFFIN "+string.Join(" ; ",mcg.Where(row=>row.UIData.RowId!=0).Take(5).Select(row=>$"{row.RowId} {row.UIData.Value.Name.ExtractText()}")));
+    return;
+}
+// PROBE_HUNT (0.364, C-12): hunting log rows (MonsterNote) and their targets, to map rows to class, rank and entry.
+if(Environment.GetEnvironmentVariable("PROBE_HUNT") is { Length:>0 })
+{
+    var rows=data.Excel.GetSheet<MonsterNote>().Where(row=>!row.Name.IsEmpty).ToArray();
+    Console.WriteLine($"MONSTERNOTE rows {rows.Length} first {rows.First().RowId} last {rows.Last().RowId}");
+    foreach(var row in rows.Where(row=>row.RowId<200 || row.RowId%1000<12).Take(80))
+        Console.WriteLine($"NOTE {row.RowId} '{row.Name.ExtractText()}' reward {row.Reward} targets "+string.Join(" ; ",row.MonsterNoteTarget.Select((target,i)=>(target,i)).Where(t=>t.target.RowId!=0)
+            .Select(t=>$"{t.target.Value.BNpcName.Value.Singular.ExtractText()} x{row.Count[t.i]} zone {string.Join("/",t.target.Value.PlaceNameZone.Where(z=>z.RowId!=0).Select(z=>z.Value.Name.ExtractText()))}")));
+    Console.WriteLine("IDS "+string.Join(",",rows.Select(row=>row.RowId)));
+    return;
+}
+// PROBE_ROULETTE (0.356, C-02): duty roulettes shown in the Duty Finder, their role-bonus row and completion index.
+if(Environment.GetEnvironmentVariable("PROBE_ROULETTE") is { Length:>0 })
+{
+    foreach(var row in data.Excel.GetSheet<ContentRoulette>().Where(row=>!row.Name.IsEmpty))
+        Console.WriteLine($"ROULETTE {row.RowId} '{row.Name.ExtractText()}' finder {row.IsInDutyFinder} bonus {row.ContentRouletteRoleBonus.RowId} completion {row.CompletionArrayIndex} level {row.RequiredLevel} sort {row.SortKey}");
+    foreach(var row in data.Excel.GetSheet<ContentRouletteRoleBonus>())
+        Console.WriteLine($"ROLEBONUS {row.RowId} item {row.ItemRewardType.RowId} amount {row.RewardAmount}");
+    return;
+}
+// PROBE_CURRENCY (0.344, I-02): currency items (UI category « Currency »), tomestones and their weekly limits, Grand Company seal caps.
+if(Environment.GetEnvironmentVariable("PROBE_CURRENCY") is { Length:>0 })
+{
+    var itemSheet=data.Excel.GetSheet<Item>();
+    var categories=itemSheet.Where(row=>!row.Name.IsEmpty && row.ItemUICategory.RowId!=0).GroupBy(row=>row.ItemUICategory.RowId).ToDictionary(g=>g.Key,g=>g.Count());
+    var uiCats=data.Excel.GetSheet<ItemUICategory>();
+    foreach(var cat in uiCats.Where(row=>row.Name.ExtractText().Contains("onnaie",StringComparison.OrdinalIgnoreCase)))Console.WriteLine($"UICAT {cat.RowId} '{cat.Name.ExtractText()}' items {categories.GetValueOrDefault(cat.RowId)}");
+    foreach(var row in itemSheet.Where(row=>!row.Name.IsEmpty && row.ItemUICategory.RowId==100).Take(60))
+        Console.WriteLine($"CUR {row.RowId} '{row.Name.ExtractText()}' stack {row.StackSize} sort {row.ItemSortCategory.RowId} search {row.ItemSearchCategory.RowId}");
+    foreach(var row in data.Excel.GetSheet<TomestonesItem>())
+        Console.WriteLine($"TOME {row.RowId} item {row.Item.RowId} '{(row.Item.IsValid ? row.Item.Value.Name.ExtractText():"")}' tomestones {row.Tomestones.RowId} weekly {(row.Tomestones.IsValid ? row.Tomestones.Value.WeeklyLimit:0)} slot {row.CurrencyInventorySlot} stack {(row.Item.IsValid ? row.Item.Value.StackSize:0)}");
+    foreach(var row in data.Excel.GetSheet<GrandCompanyRank>().Take(20))Console.WriteLine($"GCRANK {row.RowId} max {row.MaxSeals} required {row.RequiredSeals}");
+    return;
+}
+// PROBE_FESTIVALNPC (0.342): event NPCs from the festival layers of each zone's planevent.lgb (Layer.FestivalID), with their shops.
+if(Environment.GetEnvironmentVariable("PROBE_FESTIVALNPC") is { Length:>0 })
+{
+    var started=System.Diagnostics.Stopwatch.StartNew();
+    var byFestival=new Dictionary<uint,HashSet<(uint Npc,uint Territory)>>();var files=0;var missing=0;
+    foreach(var territory in data.Excel.GetSheet<TerritoryType>())
+    {
+        var bg=territory.Bg.ExtractText();var cut=bg.IndexOf("/level/",StringComparison.Ordinal);
+        if(cut<0)continue;
+        var path=$"bg/{bg[..(cut+7)]}planevent.lgb";
+        var file=data.GetFile<Lumina.Data.Files.LgbFile>(path);
+        if(file is null){missing++;continue;}
+        files++;
+        foreach(var layer in file.Layers)
+        {
+            if(layer.FestivalID==0)continue;
+            foreach(var instance in layer.InstanceObjects)
+                if(instance.AssetType==Lumina.Data.Parsing.Layer.LayerEntryType.EventNPC && instance.Object is Lumina.Data.Parsing.Layer.LayerCommon.ENPCInstanceObject npc)
+                {
+                    if(!byFestival.TryGetValue(layer.FestivalID,out var set))byFestival[layer.FestivalID]=set=[];
+                    set.Add((npc.ParentData.ParentData.BaseId,territory.RowId));
+                }
+        }
+    }
+    Console.WriteLine($"LGB files {files} missing {missing} festivals {byFestival.Count} in {started.ElapsedMilliseconds} ms");
+    var festResidents=data.Excel.GetSheet<ENpcResident>();var festBases=data.Excel.GetSheet<ENpcBase>();
+    // 0.342: localized texts tied to each festival: CustomTalk (Name, MainOption, SubOption) of its NPCs, and its quests' genre.
+    var talks=data.Excel.GetSheet<CustomTalk>();
+    foreach(var festival in new uint[]{176,175,174,258,257,256,120,137})
+    {
+        if(!byFestival.TryGetValue(festival,out var talkSet)){Console.WriteLine($"TALK {festival} no layer");continue;}
+        var seen=new HashSet<uint>();
+        foreach(var (npc,_) in talkSet)
+            if(festBases.TryGetRow(npc,out var npcRow))
+                foreach(var value in npcRow.ENpcData.Select(d=>d.RowId).Where(id=>id>=720896 && id<786432))
+                    if(seen.Add(value) && talks.TryGetRow(value,out var talk))
+                        Console.WriteLine($"TALK {festival} npc '{(festResidents.TryGetRow(npc,out var who) ? who.Singular.ExtractText():"?")}' {value} name '{talk.Name.ExtractText()}' main '{talk.MainOption.ExtractText()}' sub '{talk.SubOption.ExtractText()}'");
+        if(seen.Count==0)Console.WriteLine($"TALK {festival} npcs {talkSet.Count}, no CustomTalk");
+    }
+    foreach(var festival in new uint[]{176,175,174,258})
+    {
+        if(!byFestival.TryGetValue(festival,out var set)){Console.WriteLine($"FEST {festival} no layer");continue;}
+        Console.WriteLine($"FEST {festival} npcs {set.Count}");
+        foreach(var (npc,territory) in set.Take(40))
+        {
+            var npcShops=festBases.TryGetRow(npc,out var row) ? row.ENpcData.Select(d=>d.RowId).Where(id=>id>=262144 && id<1900000).ToArray():[];
+            if(npcShops.Length==0)continue;
+            Console.WriteLine($"  NPC {npc} '{(festResidents.TryGetRow(npc,out var r) ? r.Singular.ExtractText():"?")}' territory {territory} data {string.Join(",",npcShops.Take(6))}");
+        }
+    }
+    return;
+}
+// PROBE_FESTIVAL (0.342): Festival rows with a name, and the quests linked to a festival (Quest.Festival), the last ones first.
+if(Environment.GetEnvironmentVariable("PROBE_FESTIVAL") is { Length:>0 })
+{
+    var festivals=data.Excel.GetSheet<Festival>();
+    Console.WriteLine($"FESTIVAL rows {festivals.Count} named {festivals.Count(row=>!row.Name.IsEmpty)} last {festivals.Max(row=>row.RowId)}");
+    foreach(var row in festivals.Where(row=>!row.Name.IsEmpty).Take(8))Console.WriteLine($"FESTIVAL {row.RowId} '{row.Name.ExtractText()}'");
+    var quests=data.Excel.GetSheet<Quest>().Where(row=>row.Festival.RowId!=0 && !row.Name.IsEmpty).ToArray();
+    Console.WriteLine($"QUESTS with festival {quests.Length} festivals {quests.Select(row=>row.Festival.RowId).Distinct().Count()}");
+    foreach(var group in quests.GroupBy(row=>row.Festival.RowId).OrderByDescending(group=>group.Key).Take(6))
+        Console.WriteLine($"FEST {group.Key} name '{(festivals.TryGetRow(group.Key,out var f) ? f.Name.ExtractText():"?")}' quests {group.Count()}: {string.Join(" | ",group.Take(4).Select(q=>$"{q.RowId} {q.Name.ExtractText()} begin {q.FestivalBegin} end {q.FestivalEnd} gil {q.GilReward} items {string.Join(",",q.Reward.Where(r=>r.RowId!=0).Select(r=>r.RowId).Take(3))}"))}");
+    return;
+}
+// PROBE_BARDING (0.340): chocobo barding rows (BuddyEquip) and the items whose ItemAction teaches them (action id, Data[0]).
+if(Environment.GetEnvironmentVariable("PROBE_BARDING") is { Length:>0 })
+{
+    var bardings=data.Excel.GetSheet<BuddyEquip>().Where(row=>!row.Name.IsEmpty).ToArray();
+    Console.WriteLine($"BARDING rows {bardings.Length}");
+    foreach(var row in bardings.Take(12))Console.WriteLine($"BARDING {row.RowId} '{row.Name.ExtractText()}' icons {row.IconHead},{row.IconBody},{row.IconLegs} gc {row.GrandCompany.RowId} order {row.Order}");
+    var byName=bardings.GroupBy(row=>row.Name.ExtractText()).ToDictionary(group=>group.Key,group=>group.First().RowId);
+    var actions=new Dictionary<uint,int>();var matched=0;var dataMatches=0;
+    foreach(var item in data.Excel.GetSheet<Item>())
+    {
+        if(item.ItemAction.RowId==0 || !item.ItemAction.IsValid)continue;
+        var name=item.Name.ExtractText();
+        if(!byName.TryGetValue(name,out var barding))continue;
+        matched++;var action=item.ItemAction.Value.Action.RowId;actions[action]=actions.GetValueOrDefault(action)+1;
+        if(item.ItemAction.Value.Data[0]==barding)dataMatches++;
+        if(matched<=6)Console.WriteLine($"ITEM {item.RowId} '{name}' action {action} data {string.Join(",",item.ItemAction.Value.Data.ToArray().Take(3))} barding {barding}");
+    }
+    Console.WriteLine($"MATCHED {matched} data0==row {dataMatches} actions {string.Join(" ",actions.Select(pair=>$"{pair.Key}x{pair.Value}"))}");
+    return;
+}
+// PROBE_MATERIARATE (0.338): overmeld success rates per row (materia grade?) and per advanced socket, NQ and HQ piece.
+if(Environment.GetEnvironmentVariable("PROBE_MATERIARATE") is { Length:>0 })
+{
+    foreach(var row in data.Excel.GetSheet<MateriaJoinRate>())
+        Console.WriteLine($"RATE {row.RowId} NQ {string.Join(" ",row.NQOvermeldPercentSlot)} HQ {string.Join(" ",row.HQOvermeldPercentSlot)}");
+    foreach(var row in data.Excel.GetSheet<MateriaJoinRateGatherCraft>())
+        Console.WriteLine($"RATEGC {row.RowId} NQ {string.Join(" ",row.NQOvermeldPercentSlot)} HQ {string.Join(" ",row.HQOvermeldPercentSlot)}");
+    return;
+}
+// PROBE_AIRSHIP (0.336): airship exploration points as the sheet holds them (row, names, rank, surveillance, tanks, distance, duration).
+if(Environment.GetEnvironmentVariable("PROBE_AIRSHIP") is { Length:>0 })
+{
+    foreach(var row in data.Excel.GetSheet<AirshipExplorationPoint>())
+        Console.WriteLine($"POINT {row.RowId} '{row.Name.ExtractText()}' short '{row.NameShort.ExtractText()}' rank {row.RankReq} surv {row.SurveillanceReq} tanks {row.CeruleumTankReq} dist {row.SurveyDistance} min {row.SurveyDurationmin} exp {row.ExpReward} xy {row.X},{row.Y} passengers {row.Passengers}");
+    return;
+}
+// PROBE_SUBROUTES (0.309): submarine sectors and the route planner on the real sheets and the embedded community loot.
+if(Environment.GetEnvironmentVariable("PROBE_SUBROUTES") is { Length:>0 })
+{
+    var rows=data.Excel.GetSheet<SubmarineExploration>().Where(row=>row.Map.RowId!=0).ToArray();
+    var sectors=rows.Select(row=>new TenshoAssistant.FreeCompany.SubmarineSector(row.RowId,row.Map.RowId,row.StartingPoint,row.RankReq,new System.Numerics.Vector3(row.X,row.Y,row.Z),row.SurveyDistance,row.SurveyDurationmin,row.ExpReward,row.Destination.ExtractText())).ToArray();
+    using var file=File.OpenRead(Path.Combine(AppContext.BaseDirectory,"../../../../../src/TenshoAssistant/FreeCompany/Data/submarine-loot.json"));
+    var (loot,source,built)=TenshoAssistant.FreeCompany.VoyagePlanner.ReadLoot(file);
+    var itemSheet=data.Excel.GetSheet<Item>();
+    double Price(uint id)=>itemSheet.TryGetRow(id,out var item) ? item.PriceLow:0;
+    foreach(var map in data.Excel.GetSheet<SubmarineMap>().Where(row=>row.RowId!=0 && !row.Name.IsEmpty))
+    {
+        var ofMap=sectors.Where(sector=>sector.Map==map.RowId).ToArray();
+        Console.WriteLine($"MAP {map.RowId} '{map.Name.ExtractText()}' sectors {ofMap.Length} start {ofMap.Count(sector=>sector.Start)} with loot {ofMap.Count(sector=>loot.ContainsKey(sector.Id))}");
+        var letters=rows.Where(row=>row.Map.RowId==map.RowId).ToDictionary(row=>row.RowId,row=>row.Location.ExtractText());
+        foreach(var (rank,speed,range) in new[]{(125,130,140),(70,80,90)})
+        {
+            var started=System.Diagnostics.Stopwatch.StartNew();
+            var routes=TenshoAssistant.FreeCompany.VoyagePlanner.Plan(ofMap,rank,speed,range,TenshoAssistant.FreeCompany.RouteGoal.ValuePerDay,id=>TenshoAssistant.FreeCompany.VoyagePlanner.ExpectedValue(loot.GetValueOrDefault(id),Price),3);
+            foreach(var route in routes)
+                Console.WriteLine($"  r{rank}/s{speed}/R{range} {string.Join("",route.Sectors.Select(id=>letters[id]))} dist {route.Distance} time {TimeSpan.FromSeconds(route.Seconds)} value {route.Value:N0} perDay {route.ValuePerDay:N0} ({started.ElapsedMilliseconds} ms)");
+        }
+    }
+    Console.WriteLine($"LOOT {source} {built} sectors {loot.Count}");
+    return;
+}
+// PROBE_FCC (0.295): Free Company credit shops — FccShop fields, which NPCs link to them (ENpcData), and the credit currency.
+if(Environment.GetEnvironmentVariable("PROBE_FCC") is { Length:>0 })
+{
+    var fcc=data.Excel.GetSheet<FccShop>();
+    Console.WriteLine("FCCSHOP PROPERTIES "+string.Join(",",typeof(FccShop).GetProperties().Select(property=>property.Name+":"+property.PropertyType.Name)));
+    foreach(var shop in fcc.Take(3))
+    {
+        var names=string.Join("; ",shop.ItemData.Take(4).Select(row=>$"{row.Item.RowId}={(row.Item.IsValid ? row.Item.Value.Name.ExtractText():"")} cost {row.Cost} rank {row.FCRankRequired.RowId}"));
+        Console.WriteLine($"FCC {shop.RowId} '{shop.Name.ExtractText()}' items {shop.ItemData.Count} :: {names}");
+    }
+    var ids=fcc.Select(row=>row.RowId).ToHashSet();
+    foreach(var npc in data.Excel.GetSheet<ENpcBase>().Where(npc=>npc.ENpcData.Any(link=>ids.Contains(link.RowId))))
+    {
+        var resident=data.Excel.GetSheet<ENpcResident>().TryGetRow(npc.RowId,out var r) ? r.Singular.ExtractText():"";
+        Console.WriteLine($"NPC {npc.RowId} '{resident}' -> {string.Join(",",npc.ENpcData.Where(link=>ids.Contains(link.RowId)).Select(link=>link.RowId))}");
+    }
+    return;
+}
+// PROBE_CHOICES (0.286): ARR main scenario quests that are alternatives (one of several): previous-quest joins and quest locks.
+if(Environment.GetEnvironmentVariable("PROBE_CHOICES") is { Length:>0 })
+{
+    var msq=data.Excel.GetSheet<Quest>().Where(row=>row.JournalGenre.RowId==1 && row.Name.ExtractText().Length>0).ToDictionary(row=>row.RowId);
+    string QuestName(uint id)=>msq.TryGetValue(id,out var q) ? q.Name.ExtractText():data.Excel.GetSheet<Quest>().TryGetRow(id,out var other) ? "~"+other.Name.ExtractText():id.ToString();
+    var names=new[]{"En bonne compagnie (Deux Vipères)","En bonne compagnie (Immortels)","En bonne compagnie (Maelstrom)","L'appel de la mer","Pour la prospérité d'Ul'dah","Que la Sylve vous protège","Une visite s'impose"};
+    foreach(var quest in msq.Values.Where(row=>names.Contains(row.Name.ExtractText()) || row.PreviousQuest.Count(link=>link.RowId!=0)>1 || row.QuestLock.Any(link=>link.RowId!=0)))
+        Console.WriteLine($"Q {quest.RowId} '{quest.Name.ExtractText()}' prevJoin={quest.PreviousQuestJoin} prev=[{string.Join("; ",quest.PreviousQuest.Where(l=>l.RowId!=0).Select(l=>QuestName(l.RowId)))}] lockJoin={quest.QuestLockJoin} lock=[{string.Join("; ",quest.QuestLock.Where(l=>l.RowId!=0).Select(l=>QuestName(l.RowId)))}] gc={quest.GrandCompany.RowId}");
+    return;
+}
+// PROBE_STARTCITY (0.285): ARR main scenario quests (genre 1) of each starting city: roots = genre-1 quests without a genre-1
+// previous quest; each quest's roots = the roots its previous-quest chain leads back to. One root = that city's own line.
+if(Environment.GetEnvironmentVariable("PROBE_STARTCITY") is { Length:>0 })
+{
+    var msq=data.Excel.GetSheet<Quest>().Where(row=>row.JournalGenre.RowId==1 && row.Name.ExtractText().Length>0).ToDictionary(row=>row.RowId);
+    IEnumerable<uint> Previous(Quest quest)=>quest.PreviousQuest.Select(link=>link.RowId).Where(id=>id!=0 && msq.ContainsKey(id));
+    var roots=msq.Values.Where(quest=>!Previous(quest).Any()).ToList();
+    foreach(var root in roots)Console.WriteLine($"ROOT {root.RowId} '{root.Name.ExtractText()}' join={root.PreviousQuestJoin} prev={string.Join(",",root.PreviousQuest.Select(link=>link.RowId).Where(id=>id!=0))} place={root.PlaceName.RowId} '{(root.PlaceName.IsValid ? root.PlaceName.Value.Name.ExtractText():"")}'");
+    var memo=new Dictionary<uint,HashSet<uint>>();
+    HashSet<uint> RootsOf(uint id)
+    {
+        if(memo.TryGetValue(id,out var known))return known;
+        memo[id]=[];
+        var previous=Previous(msq[id]).ToList();
+        var set=previous.Count==0 ? new HashSet<uint>{id}:previous.SelectMany(RootsOf).ToHashSet();
+        return memo[id]=set;
+    }
+    foreach(var group in msq.Keys.GroupBy(id=>string.Join("+",RootsOf(id).OrderBy(root=>root))).OrderBy(group=>group.Key))
+        Console.WriteLine($"ROOTSET [{group.Key}] quests {group.Count()} e.g. {string.Join(" | ",group.Take(3).Select(id=>msq[id].Name.ExtractText()))}");
+    return;
+}
+// PROBE_QUESTODD (0.284): « Accident de la route »… listed in genre 1 (ARR main scenario) but not main scenario quests; compare
+// their fields with a real main scenario quest to find what marks them.
+if(Environment.GetEnvironmentVariable("PROBE_QUESTODD") is { Length:>0 })
+{
+    var oddNames=new[]{"Accident de la route","Bombo échappé","Chasse à l'ombre","La Voie des Héritiers","Les Héritiers de la septième aube","Arpenteur des finitudes"};
+    foreach(var quest in data.Excel.GetSheet<Quest>().Where(row=>oddNames.Contains(row.Name.ExtractText().Trim())))
+    {
+        var fields=string.Join(" ",typeof(Quest).GetProperties().Where(property=>property.PropertyType.IsPrimitive || property.PropertyType.IsEnum)
+            .Select(property=>$"{property.Name}={property.GetValue(quest)}"));
+        var refs=$"genre={quest.JournalGenre.RowId} issuer={quest.IssuerStart.RowId} issuerLocation={quest.IssuerLocation.RowId} placeName={quest.PlaceName.RowId} expansion={quest.Expansion.RowId} eventIcon={quest.EventIconType.RowId} classJobCategory0={quest.ClassJobCategory0.RowId}";
+        Console.WriteLine($"QUEST {quest.RowId} '{quest.Name.ExtractText()}' {refs} {fields}");
+    }
+    Console.WriteLine("QUEST PROPERTIES "+string.Join(",",typeof(Quest).GetProperties().Where(property=>!property.PropertyType.IsPrimitive && !property.PropertyType.IsEnum).Select(property=>property.Name)));
+    foreach(var quest in data.Excel.GetSheet<Quest>().Where(row=>oddNames.Contains(row.Name.ExtractText().Trim())))
+    {
+        var town=typeof(Quest).GetProperty("StartTown")?.GetValue(quest);
+        var townId=town?.GetType().GetProperty("RowId")?.GetValue(town);
+        Console.WriteLine($"TOWN {quest.RowId} '{quest.Name.ExtractText()}' startTown={townId}");
+    }
+    var genre1=data.Excel.GetSheet<Quest>().Where(row=>row.JournalGenre.RowId==1).ToList();
+    Console.WriteLine($"GENRE1 total={genre1.Count} withIssuerLocation={genre1.Count(row=>row.IssuerLocation.RowId!=0)} withIcon={genre1.Count(row=>row.Icon!=0)}");
+    return;
+}
+// PROBE_QUESTGENRE (0.283): Quest → JournalGenre → JournalCategory → JournalSection, to group quests by kind (main scenario,
+// side quests, raids…) with their genre as sub-category.
+if(Environment.GetEnvironmentVariable("PROBE_QUESTGENRE") is { Length:>0 })
+{
+    foreach(var section in data.Excel.GetSheet<JournalSection>().Where(row=>row.Name.ExtractText().Length>0))
+        Console.WriteLine($"SECTION {section.RowId} '{section.Name.ExtractText()}'");
+    var categories=data.Excel.GetSheet<JournalCategory>().Where(row=>row.Name.ExtractText().Length>0).ToList();
+    foreach(var category in categories.Take(40))
+        Console.WriteLine($"CATEGORY {category.RowId} '{category.Name.ExtractText()}' section {category.JournalSection.RowId}");
+    Console.WriteLine($"CATEGORIES {categories.Count}");
+    foreach(var quest in data.Excel.GetSheet<Quest>().Where(row=>row.RowId is 65560 or 65677 or 66045 or 70000 or 69000).Where(row=>row.JournalGenre.IsValid))
+    {
+        var genre=quest.JournalGenre.Value;var category=genre.JournalCategory.Value;
+        Console.WriteLine($"QUEST {quest.RowId} '{quest.Name.ExtractText()}' genre {genre.RowId} '{genre.Name.ExtractText()}' category {category.RowId} '{category.Name.ExtractText()}' section {category.JournalSection.RowId} '{category.JournalSection.Value.Name.ExtractText()}'");
+    }
+    var bySection=data.Excel.GetSheet<Quest>().Where(row=>row.JournalGenre.IsValid && row.JournalGenre.RowId!=0 && row.Name.ExtractText().Length>0)
+        .GroupBy(row=>(Section:row.JournalGenre.Value.JournalCategory.Value.JournalSection.RowId,Genre:row.JournalGenre.Value.Name.ExtractText()));
+    foreach(var group in bySection.Where(group=>group.Key.Section is 0 or 1).OrderBy(group=>group.Key.Section))
+        Console.WriteLine($"SECTIONGENRE section {group.Key.Section} genre '{group.Key.Genre}' quests {group.Count()}");
+    return;
+}
+// PROBE_TRIAD (0.278): which TripleTriadCardResident field tells the « Ex. » cards (numbered apart in the game's notebook).
+if(Environment.GetEnvironmentVariable("PROBE_TRIAD") is { Length:>0 })
+{
+    var names=data.Excel.GetSheet<TripleTriadCard>();
+    var cardRows=data.Excel.GetSheet<TripleTriadCardResident>().Where(row=>row.Order is 1 or 2 or 3).ToList();
+    foreach(var row in cardRows)
+    {
+        var fields=string.Join(" ",typeof(TripleTriadCardResident).GetProperties().Where(property=>property.PropertyType.IsPrimitive)
+            .Select(property=>$"{property.Name}={property.GetValue(row)}"));
+        Console.WriteLine($"CARD {row.RowId} '{(names.TryGetRow(row.RowId,out var card) ? card.Name.ExtractText():"?")}' {fields}");
+    }
+    var allCards=data.Excel.GetSheet<TripleTriadCardResident>().Where(row=>row.Order>0).ToList();
+    foreach(var group in allCards.GroupBy(row=>row.UIPriority))
+        Console.WriteLine($"UIPRIORITY {group.Key}: {group.Count()} cards, Order {group.Min(row=>row.Order)}..{group.Max(row=>row.Order)}");
+    return;
+}
 // PROBE_LOCAL (0.114): proves the map « local lists » links — Quest.IssuerLocation, Fate.Location and
 // ExportedGatheringPoint are Level/positions on a map — before the plugin relies on them.
 if(Environment.GetEnvironmentVariable("PROBE_LOCAL") is { Length:>0 })

@@ -30,7 +30,7 @@ internal sealed class GpCatalogLoader : IDisposable
                     if(!sheet.TryGetRow(spec.Id,out var row) || row.ClassJob.RowId!=spec.JobId || row.ClassJobLevel!=spec.Level
                         || row.PrimaryCostType!=7 || row.PrimaryCostValue!=spec.Cost || row.SecondaryCostValue.RowId!=0
                         || !descriptions.TryGetRow(spec.Id,out var description))
-                        throw new InvalidOperationException($"Action de récolte {spec.Id} incompatible avec le modèle vérifié.");
+                        throw new InvalidOperationException($"Gathering action {spec.Id} incompatible with the checked model.");
                     copied.Add(new(spec,row.Name.ExtractText(),row.Icon,description.Description.ExtractText()));
                 }
                 if(position!=GpActionCatalog.Specs.Count) return;

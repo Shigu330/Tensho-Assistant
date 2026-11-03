@@ -3,13 +3,16 @@ using TenshoAssistant.Inventory;
 
 namespace TenshoAssistant;
 
+// Sort rule templates: a library of named rules shared by all characters (configuration), listed with their container layout.
+// Loading one replaces the current draft only (the storage profile must still be saved); saving stores the draft as a template.
+// No sorting is started from here.
 internal sealed partial class MainWindow
 {
     private Guid selectedSortTemplate;
     private string sortTemplateName=string.Empty;
     private InventorySortProfile DrawSortTemplates(InventorySortScope scope,InventorySortProfile draft)
     {
-        if(!ImGui.CollapsingHeader(localization.Get("SortUi.Templates")+"###SortTemplates"))return draft;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("SortUi.Templates")+"###SortTemplates"))return draft;
         ImGui.TextWrapped(localization.Get("SortUi.TemplatesHelp"));
         var templates=(configuration.InventorySortTemplates ?? []).Where(value=>value is not null).ToArray();
         var selected=templates.FirstOrDefault(value=>value.Id==selectedSortTemplate);
@@ -24,6 +27,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.EndCombo();}
         }
+        Tip("SortUi.TemplateTip");
         ImGui.BeginDisabled(selected is null || !InventorySortTemplates.Compatible(selected,scope));
         try
         {
@@ -35,7 +39,7 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndDisabled();}
         if(selected is not null && !InventorySortTemplates.Compatible(selected,scope))ImGui.TextWrapped(localization.Get("SortUi.Incompatible"));
-        ImGui.SetNextItemWidth(300);ImGui.InputText(localization.Get("SortUi.TemplateName"),ref sortTemplateName,80);
+        ImGui.SetNextItemWidth(300);ImGui.InputText(localization.Get("SortUi.TemplateName"),ref sortTemplateName,80);Tip("SortUi.TemplateNameTip");
         if(ImGui.Button(localization.Get("SortUi.CreateTemplate")))SaveSortTemplate(scope,draft,null);
         ImGui.BeginDisabled(selected is null);
         try
@@ -49,6 +53,7 @@ internal sealed partial class MainWindow
                 try{configuration.InventorySortTemplates=InventorySortTemplates.Delete(previous,selected!.Id);save();selectedSortTemplate=Guid.Empty;sortRulesError=null;}
                 catch(Exception error){configuration.InventorySortTemplates=previous;sortRulesError="SortUi.TemplateDeleteError";log.Warning(error,"Could not delete inventory sort template.");}
             }
+            Tip("SortUi.DeleteTemplateTip");
         }
         finally{ImGui.EndDisabled();}
         return draft;

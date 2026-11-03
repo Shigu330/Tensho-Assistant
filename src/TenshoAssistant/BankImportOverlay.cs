@@ -14,6 +14,8 @@ internal sealed class BankImportOverlay(InventoryBankService bank, BankInventory
         var menus = bridge.State;
         if (menus.Retainer is { } retainer) DrawPanel("Retainer", retainer, null, menus.Message);
         if (menus.Saddlebag is { } saddle) DrawPanel(localization.Get("BankUi.Chocobo"), saddle, menus.Premium, menus.Message);
+        // 0.350 (g, I-09): the company chest.
+        if (menus.FreeCompany is { } company) DrawPanel("FreeCompany", company, null, menus.Message);
     }
 
     private void DrawPanel(string id, BankMenuContext context, BankMenuContext? premium, string? message)
@@ -47,7 +49,7 @@ internal sealed class BankImportOverlay(InventoryBankService bank, BankInventory
 
     private void DrawSource(BankMenuContext context)
     {
-        ImGui.TextWrapped(context.Name);
+        ImGui.TextWrapped(StorageNames.Of(localization,context.Key.Kind,context.Name));
         var existing = bank.State.Entries.FirstOrDefault(entry => entry.Key == context.Key);
         ImGui.TextDisabled(existing is null ? localization.Get("BankUi.Never") : localization.Format("BankUi.Cache",existing.Snapshot.ObservedAt.ToLocalTime().ToString("g")));
         var disabled = !context.Loaded || bank.State.Loading || bank.State.Importing || bank.State.Error is not null;
@@ -57,6 +59,6 @@ internal sealed class BankImportOverlay(InventoryBankService bank, BankInventory
             if (ImGui.Button(localization.Get("BankUi.Import")+$"##{context.Key.Kind}", new Vector2(-1, 28))) bridge.RequestImport(context.Key);
         }
         finally { ImGui.EndDisabled(); }
-        if (!context.Loaded) ImGui.TextWrapped(localization.Get("BankUi.InventoryWaiting"));
+        if (!context.Loaded) ImGui.TextWrapped(localization.Get(context.Key.Kind == BankStorageKind.FreeCompanyChest ? "BankUi.ChestWaiting" : "BankUi.InventoryWaiting"));
     }
 }

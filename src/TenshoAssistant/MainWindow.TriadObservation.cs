@@ -5,6 +5,9 @@ using TenshoAssistant.MiniGames;
 
 namespace TenshoAssistant;
 
+// Triple Triad › Observation tab: state of the opt-in, read-only match observation (MiniGames/TriadObservationReader.Dalamud.cs),
+// the board and both hands as copied from the game's interface, the text form of the match advice (MainWindow.TriadAdvice.cs)
+// and a text copy of the observed frame to the clipboard. Nothing is sent to the game.
 internal sealed partial class MainWindow
 {
     private void DrawTriadObservation()

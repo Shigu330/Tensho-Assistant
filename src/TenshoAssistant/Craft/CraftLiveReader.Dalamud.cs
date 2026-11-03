@@ -39,11 +39,11 @@ internal sealed class CraftLiveReader : IDisposable
         var parent=&node->AtkResNode;var parents=0;
         while(parent!=null)
         {
-            if(++parents>32)throw new InvalidOperationException("Hiérarchie du texte de synthèse invalide.");
+            if(++parents>32)throw new InvalidOperationException("Invalid synthesis text hierarchy.");
             if(!parent->IsVisible())return "";
             parent=parent->ParentNode;
         }
-        if(node->NodeText.Length>2048)throw new InvalidOperationException("Texte de synthèse trop long.");
+        if(node->NodeText.Length>2048)throw new InvalidOperationException("Synthesis text too long.");
         return Dalamud.Game.Text.SeStringHandling.SeString.Parse(node->NodeText.AsSpan()).TextValue;
     }
     private unsafe void Update(IFramework unused)
@@ -91,10 +91,10 @@ internal sealed class CraftLiveReader : IDisposable
                 var statuses=new List<CraftLiveStatus>();
                 var statusCount=0;
                 var statusLength=local.StatusList.Length;
-                if(statusLength is <1 or >60)throw new InvalidOperationException("Longueur de liste des statuts incompatible.");
+                if(statusLength is <1 or >60)throw new InvalidOperationException("Incompatible status list length.");
                 foreach(var status in local.StatusList)
                 {
-                    if(statusCount++==60)throw new InvalidOperationException("Trop de statuts observés.");
+                    if(statusCount++==60)throw new InvalidOperationException("Too many statuses observed.");
                     if(status.StatusId!=0)statuses.Add(new(status.StatusId,status.Param,status.RemainingTime));
                 }
                 var raw=new CraftLiveRaw(recipe,handler->ItemResult,handler->CraftType,step,(byte)condition,(byte)handler->CraftFlags,(uint)handler->StateFlags,

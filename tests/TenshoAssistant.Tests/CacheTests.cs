@@ -124,7 +124,7 @@ internal static class CacheTests
         }),
         ("Market reload uses persisted prices until policy expiry and manual force bypasses freshness",()=>
         {
-            using var folder=new Folder();var date=DateTimeOffset.UtcNow.AddHours(-2);Wait(folder.Cache.WriteAsync("market","71:42","universalis-aggregated-v2",Quote(date),date));
+            using var folder=new Folder();var date=DateTimeOffset.UtcNow.AddHours(-2);Wait(folder.Cache.WriteAsync("market","71:42","universalis-aggregated-v3",Quote(date),date));
             using var handler=new Handler(_=>PriceJson);using var client=new HttpClient(handler);using var market=new MarketService(client);
             var ttl=TimeSpan.FromDays(1);market.ConfigureCache(()=>ttl,folder.Cache);market.SetWorld(1,71,"World");Wait(market.RequestAsync(42));
             Check(handler.Calls==0 && market.State.Quote?.FetchedAt==date,"fresh persisted quote reuses original date with no HTTP");

@@ -1,0 +1,4 @@
+# 0.325 tooltip ratchet: controls still without a tooltip. Format: file|identity|reason. Only remove lines; never add one for new code.
+MainWindow.MiniCactpot.cs|##Cactpot{index}|grid of the nine cells: the page help above explains the grid (review 0.316 audit)
+MainWindow.TripleTriad.cs|##Score|« Score rules » popup checkboxes: the popup shows TriadSort.ScoreHelp at its top
+MainWindow.TripleTriad.cs|TriadSim.Families|family rule of the same « Score rules » popup (help at its top)

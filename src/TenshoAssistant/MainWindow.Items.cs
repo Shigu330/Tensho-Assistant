@@ -8,6 +8,11 @@ using TenshoAssistant.Craft;
 
 namespace TenshoAssistant;
 
+// Items page (R-06 step 3, 0.272 and 0.280): item search (the result list folds, 0.292), manual item ID and the item sheet
+// (MainWindow.ItemSheet.cs). Also the views the sheet and the Storage page reuse: the Craft tab (« Made by » / « Used in », crafter
+// filters, breadcrumb, ingredients with stocks), the selected item's stocks per storage, the Crystals tab, and SelectItem (the previous
+// item goes to the breadcrumb). Item and recipe catalogues come from the game sheets (loaded in the background, cached); stocks from the
+// live inventory and the saved Bank, cached per item until either changes.
 internal sealed partial class MainWindow
 {
     private StorageFilter storageFilter;
@@ -17,79 +22,24 @@ internal sealed partial class MainWindow
     private InventorySnapshot? holdingsLive;
     private BankState? holdingsBank;
     private StorageFilter holdingsFilter;
+    private object? holdingsCatalog;
+    // 0.327 (queue step e): number of item search results (Settings › Interface), bounded on use, and the limit the shown results
+    // were searched with: a new value searches again and the « at most » notice follows it.
+    private int ItemSearchLimit => Configuration.BoundedItemSearchLimit(configuration.ItemSearchLimit);
+    private int searchedLimit;
 
     private void DrawItems()
     {
         Heading(localization.Get("ItemsUi.Title"), localization.Get("ItemsUi.Description"));
-        // New tab definition: reset persisted ImGui order once so Usages is inserted at its declared position.
-        if (ImGui.BeginTabBar("ItemWorkspaceTabs_Usages051"))
-        {
-            try
-            {
-                if (ImGui.BeginTabItem(localization.Get("ItemsUi.Search")))
-                {
-                    try
-                    {
-                        DrawItemSearch();
-                        DrawManualItemId();
-                        if (itemId > 0)
-                        {
-                            ImGui.Spacing();
-                            ImGui.TextDisabled(localization.Get("ItemsUi.Selected"));
-                            DrawRecipeResultHeader();
-                            ImGui.TextWrapped(localization.Get("ItemsUi.SelectedHelp"));
-                        }
-                    }
-                    finally { ImGui.EndTabItem(); }
-                }
-                if (ImGui.BeginTabItem(localization.Get("ItemsUi.Stocks"), focusStocksTab ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None))
-                {
-                    try { focusStocksTab = false; DrawSelectedItemHoldings(false); }
-                    finally { ImGui.EndTabItem(); }
-                }
-                var craftFlags = focusCraftTab ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None;
-                if (ImGui.BeginTabItem(localization.Get("ItemsUi.Craft"), craftFlags))
-                {
-                    try
-                    {
-                        focusCraftTab = false;
-                        DrawCraftTab();
-                    }
-                    finally { ImGui.EndTabItem(); }
-                }
-                if(ImGui.BeginTabItem(localization.Get("ItemsUi.Uses"),focusUsesTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None))
-                {
-                    try{focusUsesTab=false;DrawItemUses();}
-                    finally{ImGui.EndTabItem();}
-                }
-                if (ImGui.BeginTabItem(localization.Get("ItemsUi.Crystals")))
-                {
-                    try { DrawCrystalsTab(); }
-                    finally { ImGui.EndTabItem(); }
-                }
-                var bankFlags = focusBankTab ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None;
-                if (ImGui.BeginTabItem(localization.Get("ItemsUi.Bank"), bankFlags))
-                {
-                    try
-                    {
-                        focusBankTab = false;
-                        DrawBankBrowser();
-                    }
-                    finally { ImGui.EndTabItem(); }
-                }
-                if (ImGui.BeginTabItem(localization.Get("ItemsUi.Gathering"), focusGatherTab ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None))
-                {
-                    try { focusGatherTab = false; DrawGathering(); }
-                    finally { ImGui.EndTabItem(); }
-                }
-                if (ImGui.BeginTabItem(localization.Get("ItemsUi.Imports")))
-                {
-                    try { DrawImportManager(); }
-                    finally { ImGui.EndTabItem(); }
-                }
-            }
-            finally { ImGui.EndTabBar(); }
-        }
+        // 0.272 (R-06 step 3): the item sheet holds Stocks, Craft, Usages and Gathering; requests for those tabs (focus flags set
+        // by menus and other tools) open the sheet on the matching tab.
+        string? sheetTab = focusStocksTab ? "Stocks" : focusCraftTab ? "Craft" : focusUsesTab ? "Uses" : focusGatherTab ? "Gathering" : null;
+        focusStocksTab = focusCraftTab = focusUsesTab = focusGatherTab = false;
+        if (sheetTab is not null) itemSheetFocus = sheetTab;
+        // 0.280 (R-06 step 3): « Objets » is the search and the item sheet; storages, crystals and imports moved to « Rangements ».
+        DrawItemSearch();
+        DrawManualItemId();
+        DrawItemSheet();
     }
 
     private void DrawCraftTab()
@@ -135,7 +85,7 @@ internal sealed partial class MainWindow
             .ToArray();
         DrawCrystalElementTable(crystals);
         var other = crystals.Where(crystal => ClassifyCrystal(crystal.ItemId) is null).ToArray();
-        if (other.Length > 0 && ImGui.CollapsingHeader(localization.Format("RecipeUi.Unclassified",other.Length)))
+        if (other.Length > 0 && TenshoAssistant.UI.UiComponents.Header(localization.Format("RecipeUi.Unclassified",other.Length)))
             foreach (var crystal in other) DrawCrystalCell(crystal);
     }
 
@@ -194,7 +144,6 @@ internal sealed partial class MainWindow
             ImGui.SetCursorPosX(left + Math.Max(0, (available - iconSize.X) / 2));
             DrawItemIcon(item, iconSize);
             if (ImGui.IsItemClicked()) SelectItem(crystal.ItemId);
-            if (ImGui.IsItemHovered()) WrappedTooltip(item?.Name ?? localization.Format("BankUi.Item",crystal.ItemId));
             var label = crystal.Hq > 0 ? $"{crystal.Nq:N0} / {crystal.Hq:N0}" : $"{crystal.Nq:N0}";
             var labelWidth = ImGui.CalcTextSize(label).X;
             ImGui.SetCursorPosX(left + Math.Max(0, (available - labelWidth) / 2));
@@ -203,17 +152,28 @@ internal sealed partial class MainWindow
         finally { ImGui.PopID(); }
     }
 
+    // 0.322: classified once per item and catalogue (it ran for every cell on every frame), from the English name first.
+    private readonly Dictionary<uint,(string Element,string Size)?> crystalClasses=[];
+    private object? crystalClassesCatalog;
     private (string Element, string Size)? ClassifyCrystal(uint itemId)
     {
-        var name = itemCatalog.State.Catalog?.Find(itemId)?.Name;
-        var classification = string.IsNullOrWhiteSpace(name) ? null : CrystalClassifier.Classify(name);
-        return classification is null ? null : (classification.Element, classification.Size);
+        var catalog = itemCatalog.State.Catalog;
+        if (!ReferenceEquals(catalog, crystalClassesCatalog)) { crystalClasses.Clear(); crystalClassesCatalog = catalog; }
+        if (crystalClasses.TryGetValue(itemId, out var known)) return known;
+        var item = catalog?.Find(itemId);
+        var classification = item is null || string.IsNullOrWhiteSpace(item.Name) ? null : CrystalClassifier.Classify(item.Name, item.EnglishName);
+        (string, string)? result = classification is null ? null : (classification.Element, classification.Size);
+        if (catalog is not null) crystalClasses[itemId] = result;
+        return result;
     }
 
     private void DrawManualItemId()
     {
-        if (ImGui.CollapsingHeader(localization.Get("ItemsUi.Manual")))
+        if (TenshoAssistant.UI.UiComponents.Header(localization.Get("ItemsUi.Manual")))
+        {
             ImGui.InputInt(localization.Get("ItemsUi.BaseId"), ref itemId);
+            Tip("ItemsUi.BaseIdTip");
+        }
     }
 
     private void DrawSelectedItemHoldings(bool includeRecipes = true)
@@ -249,15 +209,21 @@ internal sealed partial class MainWindow
         var live = inventory.Current;
         var bankState = bank.State;
         var character = bankBridge.State.CharacterId;
+        var catalog = itemCatalog.State.Catalog;
         if (groupedHoldings is null || holdingsItem != (uint)itemId || holdingsCharacter != character
-            || !ReferenceEquals(holdingsLive, live) || !ReferenceEquals(holdingsBank, bankState) || holdingsFilter != storageFilter)
+            || !ReferenceEquals(holdingsLive, live) || !ReferenceEquals(holdingsBank, bankState) || holdingsFilter != storageFilter
+            || !ReferenceEquals(holdingsCatalog, catalog))
         {
-            groupedHoldings = ItemHoldings.Build((uint)itemId, character, live, bankState.Entries, storageFilter);
+            // 0.329: a crystal also counts the crystal bag (container 2001), as the sheet header and the hover do; it showed 0 here.
+            // Only for a crystal (classified from the catalogue), so other items keep their rows.
+            groupedHoldings = ItemHoldings.Build((uint)itemId, character, live, bankState.Entries, storageFilter,
+                includeCrystals: ClassifyCrystal((uint)itemId) is not null, crystal: ClassifyCrystal((uint)itemId) is not null);
             holdingsItem = (uint)itemId;
             holdingsCharacter = character;
             holdingsLive = live;
             holdingsBank = bankState;
             holdingsFilter = storageFilter;
+            holdingsCatalog = catalog;
         }
         var summary = groupedHoldings;
         DrawHoldingsSummary(summary);
@@ -265,13 +231,13 @@ internal sealed partial class MainWindow
         if (includeRecipes) DrawRecipes();
         if (bankState.Loading) ImGui.TextDisabled(localization.Get("HoldingsUi.Loading"));
         if (bankState.Error is { } error) DrawDataError(error,"ServiceErrors.Bank");
-        if (bankBridge.State.Message is { } message) DrawServiceMessage(message,"ServiceErrors.Bank");
+        // 0.329: the last import message (« saved », or an old « incomplete read ») is no longer repeated on every item's
+        // Stocks tab for the whole session; the Imports tab and the in-game panel show it.
     }
 
     private void DrawRecipes()
     {
-        ImGui.Spacing();
-        if (!ImGui.CollapsingHeader(localization.Get("ItemsUi.Craft"), ImGuiTreeNodeFlags.DefaultOpen)) return;
+        // 0.292: shown inside the sheet's « Craft lié » tab; the header that repeated the tab name is gone.
         ImGui.PushStyleColor(ImGuiCol.ChildBg, TenshoAssistant.UI.FfxivTheme.Panel);
         ImGui.PushStyleColor(ImGuiCol.Border, TenshoAssistant.UI.FfxivTheme.Border);
         var visible = ImGui.BeginChild("RecipePanel", new Vector2(-1, 0), true);
@@ -312,31 +278,55 @@ internal sealed partial class MainWindow
                 : localization.Get("RecipeUi.Loading")));
             return;
         }
-        DrawRecipeSection(localization.Get("RecipeUi.ProducedBy"), catalog.ForResult((uint)itemId), catalog.Source, false);
-        DrawRecipeSection(localization.Get("RecipeUi.UsedIn"), catalog.ForIngredient((uint)itemId), catalog.Source, true);
+        // 0.292 (user request): the two directions are tabs; a new item opens on the direction that has recipes.
+        var producedBy = catalog.ForResult((uint)itemId); var usedIn = catalog.ForIngredient((uint)itemId);
+        var openUsedIn = recipeTabsItem != itemId && producedBy.Count == 0 && usedIn.Count > 0;
+        var openProduced = recipeTabsItem != itemId && !openUsedIn;
+        recipeTabsItem = itemId;
+        if (!ImGui.BeginTabBar("RecipeDirections")) return;
+        try
+        {
+            if (ImGui.BeginTabItem($"{localization.Get("RecipeUi.ProducedBy")} ({producedBy.Count})###RecipeProduced", openProduced ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None))
+            { try { DrawRecipeSection(localization.Get("RecipeUi.ProducedBy"), producedBy, catalog.Source, false, false); } finally { ImGui.EndTabItem(); } }
+            if (ImGui.BeginTabItem($"{localization.Get("RecipeUi.UsedIn")} ({usedIn.Count})###RecipeUsedIn", openUsedIn ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None))
+            { try { DrawRecipeSection(localization.Get("RecipeUi.UsedIn"), usedIn, catalog.Source, true, false); } finally { ImGui.EndTabItem(); } }
+        }
+        finally { ImGui.EndTabBar(); }
     }
 
+    // 0.329: the history keeps the last CraftHistoryLimit items (every item click in the plugin lands here); the breadcrumb shows
+    // the last BreadcrumbShown places after « … » and wraps to the panel width (one line ran off the panel). « Back » walks it all.
+    private const int CraftHistoryLimit = 32, BreadcrumbShown = 10;
     private void DrawCraftBreadcrumb()
     {
         if (craftHistory.Count == 0) return;
         ImGui.Spacing();
         ImGui.TextDisabled(localization.Get("RecipeUi.Path"));
         var path = craftHistory.Reverse().Append((uint)itemId).ToArray();
-        for (var index = 0; index < path.Length; index++)
+        var first = Math.Max(0, path.Length - BreadcrumbShown);
+        if (first > 0) ImGui.TextDisabled("… ›");
+        var style = ImGui.GetStyle();
+        for (var index = first; index < path.Length; index++)
         {
-            if (index > 0) ImGui.SameLine();
             var item = itemCatalog.State.Catalog?.Find(path[index]);
             var label = item?.Name ?? $"ID {path[index]}";
-            if (index == path.Length - 1)
+            var last = index == path.Length - 1;
+            if (index > 0)
             {
                 ImGui.SameLine();
+                var width = ImGui.CalcTextSize(label).X + (last ? 0 : style.FramePadding.X * 2 + style.ItemSpacing.X + ImGui.CalcTextSize("›").X);
+                if (ImGui.GetContentRegionAvail().X < width) ImGui.NewLine();
+            }
+            if (last)
+            {
                 ImGui.TextColored(Accent, label);
                 continue;
             }
             if (ImGui.SmallButton($"{label}##Breadcrumb{index}"))
             {
+                // 0.329: oldest first, so the newest place left stays on top (it was pushed in reverse: « Back » went to the oldest).
                 craftHistory.Clear();
-                for (var previous = index - 1; previous >= 0; previous--) craftHistory.Push(path[previous]);
+                for (var previous = 0; previous < index; previous++) craftHistory.Push(path[previous]);
                 SelectItem(path[index], false);
                 return;
             }
@@ -345,10 +335,22 @@ internal sealed partial class MainWindow
         }
     }
 
-    private void DrawRecipeSection(string title, IReadOnlyList<RecipeDefinition> recipes, string source, bool showOutputs)
+    // The item left goes to the craft history, without its oldest places beyond CraftHistoryLimit.
+    private void RememberItem(uint next)
+    {
+        if (itemId <= 0 || itemId == next) return;
+        craftHistory.Push((uint)itemId);
+        if (craftHistory.Count <= CraftHistoryLimit) return;
+        var kept = craftHistory.Take(CraftHistoryLimit).Reverse().ToArray();
+        craftHistory.Clear();
+        foreach (var id in kept) craftHistory.Push(id);
+    }
+
+    private int recipeTabsItem;
+    private void DrawRecipeSection(string title, IReadOnlyList<RecipeDefinition> recipes, string source, bool showOutputs, bool withHeader = true)
     {
         var header = $"{title} ({recipes.Count})###RecipeSection{(showOutputs ? "Outputs" : "Inputs")}";
-        if (!ImGui.CollapsingHeader(header, ImGuiTreeNodeFlags.DefaultOpen)) return;
+        if (withHeader && !TenshoAssistant.UI.UiComponents.Header(header, ImGuiTreeNodeFlags.DefaultOpen)) return;
         if (recipes.Count == 0)
         {
             ImGui.TextDisabled(localization.Get("RecipeUi.NoRecipes"));
@@ -383,6 +385,7 @@ internal sealed partial class MainWindow
                 ImGui.TextColored(Accent, localization.Format("RecipeUi.JobLevel",recipe.CraftType,recipe.Level));
                 ImGui.SameLine();
                 ImGui.TextDisabled(localization.Format("RecipeUi.Yield",recipe.ResultAmount));
+                DrawRecipeCrafted(recipe);
                 ImGui.SameLine();
                 var craftable = GetCraftableCount(recipe);
                 ImGui.TextColored(craftable.LowerBound ? Muted : Success,
@@ -400,21 +403,34 @@ internal sealed partial class MainWindow
                         var item = itemCatalog.State.Catalog?.Find(ingredient.ItemId);
                         DrawRecipeIngredient(item, ingredient);
                     }
-                if (!showOutputs) DrawCraftPlan(recipe);
+                if (!showOutputs) DrawCraftLinks(recipe);
                 ImGui.Separator();
             }
             finally { ImGui.PopID(); }
         }
     }
 
+    // 0.329: the craft book's jobs (with the job id of their first recipe, for the icon) and its filtered, sorted recipes, recomputed
+    // only when their inputs change: Distinct/OrderBy, one First() per job, then Where and three OrderBy over every recipe ran on
+    // every frame (a shard or a crystal is used in thousands of recipes).
+    private object? craftBookTypesSource;
+    private (string Type, uint TypeId)[] craftBookTypes = [];
+    private (object? Recipes, object? Items, string Filter, string Query, object? NeverCrafted) craftBookMatchesKey;
+    private RecipeDefinition[] craftBookMatches = [];
+
     private void DrawCraftBookFilters(IReadOnlyList<RecipeDefinition> recipes)
     {
-        var craftTypes = recipes.Select(recipe => recipe.CraftType)
-            .Where(type => !string.IsNullOrWhiteSpace(type))
-            .Distinct(StringComparer.Ordinal)
-            .OrderBy(type => type, StringComparer.Ordinal)
-            .ToArray();
-        if (!craftTypes.Contains(craftBookFilter, StringComparer.Ordinal)) craftBookFilter = string.Empty;
+        if (!ReferenceEquals(craftBookTypesSource, recipes))
+        {
+            craftBookTypes = recipes.Where(recipe => !string.IsNullOrWhiteSpace(recipe.CraftType))
+                .GroupBy(recipe => recipe.CraftType, StringComparer.Ordinal)
+                .OrderBy(group => group.Key, StringComparer.Ordinal)
+                .Select(group => (group.Key, group.First().CraftTypeId))
+                .ToArray();
+            craftBookTypesSource = recipes;
+        }
+        var craftTypes = craftBookTypes;
+        if (!Array.Exists(craftTypes, type => string.Equals(type.Type, craftBookFilter, StringComparison.Ordinal))) craftBookFilter = string.Empty;
 
         ImGui.TextDisabled(localization.Get("RecipeUi.Book"));
         ImGui.PushFont(UiBuilder.IconFont);
@@ -426,7 +442,7 @@ internal sealed partial class MainWindow
         finally { ImGui.PopFont(); }
         if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("RecipeUi.AllJobs"));
 
-        foreach (var craftType in craftTypes)
+        foreach (var (craftType, craftTypeId) in craftTypes)
         {
             ImGui.SameLine();
             ImGui.PushID($"CraftBookFilter{craftType}");
@@ -437,11 +453,10 @@ internal sealed partial class MainWindow
                 var clicked = ImGui.Button("##CraftBookJob", new Vector2(38, 38));
                 var buttonPosition = ImGui.GetItemRectMin();
                 var buttonHovered = ImGui.IsItemHovered();
-                var job = recipes.First(recipe => recipe.CraftType == craftType);
                 ImGui.SetCursorScreenPos(buttonPosition + new Vector2(3));
                 // Native framed class icons: 62100 + ClassJob ID, crafters 8..15.
-                if (job.CraftTypeId < 8)
-                    DrawItemIcon(new ItemDefinition(0, craftType, false, 62108 + job.CraftTypeId), new Vector2(32));
+                if (craftTypeId < 8)
+                    DrawItemIcon(new ItemDefinition(0, craftType, false, 62108 + craftTypeId), new Vector2(32));
                 // 0.207: the icon was the last item, so the next SameLine started after it (3 px lower and further right each time);
                 // an invisible item over the button restores the button's place for the next one.
                 ImGui.SetCursorScreenPos(buttonPosition);
@@ -455,22 +470,53 @@ internal sealed partial class MainWindow
         ImGui.Spacing();
     }
 
+    // A-11 (0.421): the recipes crafted at least once, and « never crafted only » in the craft book.
+    internal Craft.RecipeLogReader? RecipeLog { get; set; }
+    private bool craftBookNeverCrafted;
+    private void DrawRecipeCrafted(RecipeDefinition recipe)
+    {
+        RecipeLog?.Want();
+        if (RecipeLog?.State?.WasCrafted(recipe.RecipeId) is not { } crafted) return;
+        ImGui.SameLine();
+        if (crafted) ImGui.TextDisabled(localization.Get("RecipeUi.Crafted"));
+        else ImGui.TextColored(Accent, localization.Get("RecipeUi.NeverCrafted"));
+        if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("RecipeUi.CraftedTip"));
+    }
     private void DrawCraftBook(IReadOnlyList<RecipeDefinition> recipes, string source)
     {
         DrawCraftBookFilters(recipes);
+        RecipeLog?.Want();
+        var recipeLog = RecipeLog?.State;
+        if (recipeLog is not null)
+        {
+            ImGui.Checkbox(localization.Get("RecipeUi.NeverCraftedOnly") + "###CraftBookNever", ref craftBookNeverCrafted);
+            Tip("RecipeUi.NeverCraftedOnlyTip");
+        }
         ImGui.TextColored(Accent, string.IsNullOrWhiteSpace(craftBookFilter) ? localization.Get("RecipeUi.AllJobs") : craftBookFilter);
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##CraftBookQuery", localization.Get("RecipeUi.Query"), ref craftBookQuery, 128);
-        var matches = recipes.Where(recipe => (string.IsNullOrWhiteSpace(craftBookFilter) || recipe.CraftType == craftBookFilter)
-                && (string.IsNullOrWhiteSpace(craftBookQuery)
-                    || (itemCatalog.State.Catalog?.Find(recipe.ResultItemId)?.Name.Contains(craftBookQuery.Trim(), StringComparison.OrdinalIgnoreCase) ?? false)))
-            .OrderBy(recipe => recipe.CraftTypeId).ThenBy(recipe => recipe.Level).ThenBy(recipe => recipe.RecipeId).ToArray();
+        Tip("RecipeUi.QueryTip");
+        var items = itemCatalog.State.Catalog;
+        var neverOnly = craftBookNeverCrafted && recipeLog is not null;
+        var matchesKey = ((object?)recipes, (object?)items, craftBookFilter, craftBookQuery, neverOnly ? (object?)recipeLog : null);
+        if (matchesKey != craftBookMatchesKey)
+        {
+            var query = craftBookQuery.Trim();
+            craftBookMatches = recipes.Where(recipe => (string.IsNullOrWhiteSpace(craftBookFilter) || recipe.CraftType == craftBookFilter)
+                    && (!neverOnly || recipeLog!.WasCrafted(recipe.RecipeId) == false)
+                    && (string.IsNullOrWhiteSpace(query)
+                        || (items?.Find(recipe.ResultItemId)?.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)))
+                .OrderBy(recipe => recipe.CraftTypeId).ThenBy(recipe => recipe.Level).ThenBy(recipe => recipe.RecipeId).ToArray();
+            craftBookMatchesKey = matchesKey;
+        }
+        var matches = craftBookMatches;
         if (matches.Length == 0)
         {
             ImGui.TextDisabled(localization.Get("RecipeUi.NoMatch"));
             return;
         }
-        if (!matches.Any(recipe => recipe.RecipeId == craftBookRecipe)) craftBookRecipe = matches[0].RecipeId;
+        var selectedIndex = Array.FindIndex(matches, recipe => recipe.RecipeId == craftBookRecipe);
+        if (selectedIndex < 0) { selectedIndex = 0; craftBookRecipe = matches[0].RecipeId; }
         ImGui.TextDisabled(localization.Format("RecipeUi.Using",matches.Length,SelectedItem?.Name ?? itemId.ToString()));
         if (!ImGui.BeginTable("CraftBookWorkspace", 2, ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.BordersInnerV)) return;
         try
@@ -484,22 +530,33 @@ internal sealed partial class MainWindow
             try
             {
                 if (visible)
-                    foreach (var recipe in matches)
+                {
+                    // 0.329: only the visible rows are drawn (fixed height: the 30 px selectable next to its 28 px icon).
+                    var clipper = ImGui.ImGuiListClipper();
+                    try
                     {
-                        ImGui.PushID((int)recipe.RecipeId);
-                        try
+                        clipper.Begin(matches.Length, 30 + ImGui.GetStyle().ItemSpacing.Y);
+                        while (clipper.Step())
+                        for (var index = clipper.DisplayStart; index < clipper.DisplayEnd; index++)
                         {
-                            var result = itemCatalog.State.Catalog?.Find(recipe.ResultItemId);
-                            DrawItemIcon(result, new Vector2(28));
-                            var clickedIcon = ImGui.IsItemClicked();
-                            ImGui.SameLine();
-                            if (ImGui.Selectable($"{result?.Name ?? recipe.ResultItemId.ToString()}##Recipe", craftBookRecipe == recipe.RecipeId,
-                                    ImGuiSelectableFlags.None, new Vector2(0, 30)) || clickedIcon)
-                                craftBookRecipe = recipe.RecipeId;
-                            if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("RecipeUi.JobLevel",recipe.CraftType,recipe.Level));
+                            var recipe = matches[index];
+                            ImGui.PushID((int)recipe.RecipeId);
+                            try
+                            {
+                                var result = items?.Find(recipe.ResultItemId);
+                                DrawItemIcon(result, new Vector2(28));
+                                var clickedIcon = ImGui.IsItemClicked();
+                                ImGui.SameLine();
+                                if (ImGui.Selectable($"{result?.Name ?? recipe.ResultItemId.ToString()}##Recipe", craftBookRecipe == recipe.RecipeId,
+                                        ImGuiSelectableFlags.None, new Vector2(0, 30)) || clickedIcon)
+                                    craftBookRecipe = recipe.RecipeId;
+                                if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("RecipeUi.JobLevel",recipe.CraftType,recipe.Level));
+                            }
+                            finally { ImGui.PopID(); }
                         }
-                        finally { ImGui.PopID(); }
                     }
+                    finally { clipper.End(); clipper.Destroy(); }
+                }
             }
             finally { ImGui.EndChild(); }
             ImGui.TableNextColumn();
@@ -508,7 +565,8 @@ internal sealed partial class MainWindow
             {
                 if (details)
                 {
-                    var selected = matches.First(recipe => recipe.RecipeId == craftBookRecipe);
+                    // A click in the list this frame may have chosen another recipe.
+                    var selected = matches[selectedIndex].RecipeId == craftBookRecipe ? matches[selectedIndex] : matches.First(recipe => recipe.RecipeId == craftBookRecipe);
                     DrawRecipeOutput(selected);
                     DrawRecipeSection(localization.Get("RecipeUi.SelectedRecipe"), new[] { selected }, source, false);
                 }
@@ -584,7 +642,7 @@ internal sealed partial class MainWindow
     {
         if (recipeHoldingsCache.TryGetValue(itemId, out var summary)) return summary;
         summary = ItemHoldings.Build(itemId, recipeHoldingsCharacter, recipeHoldingsLive,
-            recipeHoldingsBank?.Entries ?? [], StorageFilter.All, includeCrystals: true);
+            recipeHoldingsBank?.Entries ?? [], StorageFilter.All, includeCrystals: true, crystal: ClassifyCrystal(itemId) is not null);
         recipeHoldingsCache[itemId] = summary;
         return summary;
     }
@@ -640,13 +698,14 @@ internal sealed partial class MainWindow
     private void SelectItem(uint id, bool remember = true)
     {
         if (id > int.MaxValue) return;
-        if (remember && itemId > 0 && itemId != id) craftHistory.Push((uint)itemId);
+        if (remember) RememberItem(id);
         itemId = (int)id;
         if (itemCatalog.State.Catalog is not { } catalog) return;
         var item = catalog.Find(id);
         itemQuery = item?.Name ?? id.ToString();
         searchedCatalog = catalog;
-        searchResults = catalog.Search(itemQuery);
+        searchedLimit = ItemSearchLimit;
+        searchResults = catalog.Search(itemQuery, searchedLimit);
     }
 
     private void StorageTab(string label, StorageFilter filter)
@@ -695,19 +754,26 @@ internal sealed partial class MainWindow
         var state = itemCatalog.State;
         ImGui.SetNextItemWidth(-1);
         var changed = ImGui.InputTextWithHint("##ItemQuery", localization.Get("ItemsUi.Query"), ref itemQuery, 128);
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(localization.Format("ItemsUi.QueryTip", ItemSearchLimit));
         if (state.Catalog is not { } catalog)
         {
             DrawCatalogStatus();
             return;
         }
-        if (changed || !ReferenceEquals(searchedCatalog, catalog))
+        // 0.353 (g, I-12): filters, combined with the name (or alone).
+        changed |= DrawItemSearchFilters(catalog);
+        // 0.327 (queue step e): the limit is a setting; a new value searches again.
+        var limit = ItemSearchLimit;
+        if (changed || !ReferenceEquals(searchedCatalog, catalog) || searchedLimit != limit)
         {
-            searchResults = catalog.Search(itemQuery);
+            searchResults = catalog.Search(itemQuery, limit, itemSearchFilter);
             searchedCatalog = catalog;
+            searchedLimit = limit;
         }
-        if (string.IsNullOrWhiteSpace(itemQuery))
+        if (string.IsNullOrWhiteSpace(itemQuery) && itemSearchFilter.IsEmpty)
         {
             ImGui.TextDisabled(localization.Get("ItemsUi.QueryHelp"));
+            DrawKeyItemSearch();
             return;
         }
         if (searchResults.Count == 0)
@@ -715,6 +781,8 @@ internal sealed partial class MainWindow
             ImGui.TextUnformatted(localization.Get("ItemsUi.Empty"));
             return;
         }
+        // 0.292 (user request): the result list folds, leaving the room to the item sheet.
+        if (!TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemsUi.Results", searchResults.Count) + "###ItemResultsHeader", ImGuiTreeNodeFlags.DefaultOpen)) return;
         var height = Math.Clamp(searchResults.Count * 38f + 12, 64, maximumHeight);
         if (ImGui.BeginListBox("##ItemResults", new Vector2(-1, height)))
         {
@@ -726,30 +794,21 @@ internal sealed partial class MainWindow
                     ImGui.PushID((int)item.Id);
                     try
                     {
+                        // 0.329: a result goes to the craft history like every other item click (it skipped it: the breadcrumb
+                        // showed a path not taken), but keeps the typed query and its results (SelectItem would replace them).
                         DrawItemIcon(item, new Vector2(32));
-                        if (ImGui.IsItemClicked()) itemId = (int)item.Id;
+                        if (ImGui.IsItemClicked()) { RememberItem(item.Id); itemId = (int)item.Id; }
                         ImGui.SameLine();
                         if (ImGui.Selectable($"{item.Name}##Result", itemId == (int)item.Id,
-                                ImGuiSelectableFlags.None, new Vector2(0, 32))) itemId = (int)item.Id;
-                        if (ImGui.IsItemHovered()) WrappedTooltip(developerMode ? $"{item.Name}\nID: {item.Id}":item.Name);
+                                ImGuiSelectableFlags.None, new Vector2(0, 32))) { RememberItem(item.Id); itemId = (int)item.Id; }
+                        if (ImGui.IsItemHovered()) DrawItemInfoTooltip(item.Id);
+                        ItemLinksMenu($"SearchResult{item.Id}",item);
                     }
                     finally { ImGui.PopID(); }
                 }
             }
             finally { ImGui.EndListBox(); }
         }
-        if (searchResults.Count == 30) ImGui.TextDisabled(localization.Get("ItemsUi.Limit"));
-    }
-
-    private void DrawItemIcon(ItemDefinition? item, Vector2 size)
-    {
-        if (item is not null && item.IconId != 0
-            && textures.TryGetFromGameIcon(new GameIconLookup(item.IconId, false, true), out var shared)
-            && shared.TryGetWrap(out var texture, out _) && texture is not null)
-        {
-            // Borrowed for this UI frame only; ownership remains with Dalamud.
-            ImGui.Image(texture.Handle, size);
-        }
-        else ImGui.Dummy(size);
+        if (searchResults.Count == searchedLimit) ImGui.TextDisabled(localization.Format("ItemsUi.Limit", searchedLimit));
     }
 }

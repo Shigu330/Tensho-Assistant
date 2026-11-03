@@ -5,6 +5,9 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
+// Macro sequences page (Production): pick up to 32 game macros (personal or shared book, read through Macros/), order them, save
+// the plan in the configuration and start it explicitly. Each macro must end with its own /tenshonext line, which advances the
+// sequence; Tensho never edits saved macros and the marker does not prove that the game actions succeeded.
 internal sealed partial class MainWindow
 {
     private readonly List<MacroSlot> macroPlan = [];
@@ -17,6 +20,8 @@ internal sealed partial class MainWindow
         Heading(localization.Get("MacroUi.Title"), localization.Get("MacroUi.Description"));
         if (!macroPlanLoaded)
         {
+            // 0.330: a reload (after a chained copy) replaces the list; it was appended to the previous plan, so old pages ran again.
+            macroPlan.Clear(); macroPlanSaved = false; macroPlanError = null;
             macroPlan.AddRange((configuration.MacroChainPlan ?? []).Where(slot => slot is not null && slot.Book <= 1 && slot.Index < 100).Take(32));
             macroPlanLoaded = true; macroChain.RequestRefresh();
         }
@@ -36,7 +41,9 @@ internal sealed partial class MainWindow
         try
         {
             if (ImGui.RadioButton(localization.Get("MacroUi.Personal"), macroBook == 0)) macroBook = 0;
+            Tip("MacroUi.BookTip");
             ImGui.SameLine(); if (ImGui.RadioButton(localization.Get("MacroUi.Shared"), macroBook == 1)) macroBook = 1;
+            Tip("MacroUi.BookTip");
             var visible = ImGui.BeginChild("MacroCatalog", new Vector2(0, Math.Clamp(ImGui.GetContentRegionAvail().Y*.35f,90,190)), true);
             try
             {
@@ -72,8 +79,11 @@ internal sealed partial class MainWindow
                     {
                         if (ImGui.SmallButton(localization.Get("MacroUi.Remove"))) remove = true;
                         ImGui.SameLine();
-                        if (index > 0 && ImGui.SmallButton("↑"))
-                        { (macroPlan[index - 1], macroPlan[index]) = (macroPlan[index], macroPlan[index - 1]); macroPlanSaved = false; }
+                        if (index > 0)
+                        {
+                            if (ImGui.SmallButton("↑")) { (macroPlan[index - 1], macroPlan[index]) = (macroPlan[index], macroPlan[index - 1]); macroPlanSaved = false; }
+                            Tip("MacroUi.UpTip");
+                        }
                         ImGui.SameLine(); ImGui.TextUnformatted($"{index + 1}. {(slot.Book == 0 ? localization.Get("MacroUi.PersonalSlot") : localization.Get("MacroUi.SharedSlot"))} {slot.Index} · {slot.Name}");
                     }
                     finally { ImGui.PopID(); }

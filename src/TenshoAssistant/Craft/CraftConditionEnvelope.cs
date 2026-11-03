@@ -38,7 +38,7 @@ public static class CraftConditionEnvelope
                 {
                     var step=CraftSimulation.Apply(p,stats,recipe.Level,normal.BaseProgress,normal.BaseQuality,before with {Quality=value},baseline.Action,out _,condition,percent);
                     if(step is null || step.After with {Quality=baseline.After.Quality}!=baseline.After)
-                        throw new InvalidOperationException("Une condition affecte les ressources ou l’admissibilité : enveloppe non prise en charge.");
+                        throw new InvalidOperationException("A condition affects resources or eligibility: envelope not supported.");
                     var after=step.After.Quality;minimum=Math.Min(minimum,after);maximum=Math.Max(maximum,after);
                     foreach(var following in Next(condition))
                         next[following]=next.TryGetValue(following,out var previous) ? new(Math.Min(previous.Min,after),Math.Max(previous.Max,after)):new(after,after);

@@ -1,6 +1,6 @@
 namespace TenshoAssistant.Craft;
 
-public sealed record CraftSolveOptions(int TargetQuality,int MaxSteps=40,int BeamWidth=128,int MaxExpanded=100000,int ExtraWait=0);
+public sealed record CraftSolveOptions(int TargetQuality,int MaxSteps=40,int BeamWidth=128,int MaxExpanded=100000,int ExtraWait=0,int? BuffExtraWait=null);
 public sealed record CraftSolveResult(CraftSimulationResult? Simulation,int TargetQuality,bool TargetReached,int Expanded,int Depth,
     bool BeamPruned,bool NodeLimitReached,bool DepthLimitReached,int? WaitSeconds=null);
 
@@ -23,10 +23,10 @@ public static class CraftSolver
     {
         ArgumentNullException.ThrowIfNull(options);
         var initial=CraftSimulation.Run(recipe,stats,startingQuality,[],cancellation); var p=recipe.Simulation!;
-        if(options.TargetQuality<0 || options.TargetQuality>p.Quality || options.MaxSteps is <1 or >100 || options.BeamWidth is <1 or >512 || options.MaxExpanded is <1 or >500000 || options.ExtraWait is <0 or >3)
+        if(options.TargetQuality<0 || options.TargetQuality>p.Quality || options.MaxSteps is <1 or >100 || options.BeamWidth is <1 or >512 || options.MaxExpanded is <1 or >500000 || options.ExtraWait is <0 or >3 || options.BuffExtraWait is <0 or >3)
             throw new ArgumentOutOfRangeException(nameof(options));
         var actions=CraftActionCatalog.Specs.Where(spec=>spec.Level<=stats.Level && (spec.Kind!=CraftActionKind.Manipulation || stats.ManipulationAllowed)).ToArray();
-        var minimumWait=actions.Min(action=>CraftMacroExporter.BaseWait(action.Kind)+options.ExtraWait);
+        var minimumWait=actions.Min(action=>CraftMacroExporter.Wait(action.Kind,options.ExtraWait,options.BuffExtraWait));
         var beam=new List<Node>{new(initial.Final,null,default)}; Node? best=null;
         var expanded=0; var depth=0; var searchedDepth=0; var pruned=false; var limited=false; var depthLimited=false;
         bool Reached(Node node)=>node.State.Quality>=options.TargetQuality;
@@ -49,7 +49,7 @@ public static class CraftSolver
                     if((kind is CraftActionKind.MastersMend or CraftActionKind.ImmaculateMend) && node.State.Durability==p.Durability) continue;
                     var step=CraftSimulation.Apply(p,stats,recipe.Level,initial.BaseProgress,initial.BaseQuality,node.State,kind,out _);
                     if(step is null || step.After.Finish==CraftFinish.Broken) continue;
-                    var child=new Node(step.After,node,kind,node.WaitSeconds+CraftMacroExporter.BaseWait(kind)+options.ExtraWait);
+                    var child=new Node(step.After,node,kind,node.WaitSeconds+CraftMacroExporter.Wait(kind,options.ExtraWait,options.BuffExtraWait));
                     if(step.After.Finish==CraftFinish.Completed) {if(Better(child,best)) best=child;}
                     else
                     {

@@ -24,11 +24,11 @@ public sealed class MacroSequence : IDisposable
         if (character == 0) throw new ArgumentOutOfRangeException(nameof(character));
         var copied = plan.Take(33).ToArray();
         if (copied.Length is < 1 or > 32 || copied.Any(slot => slot is null || slot.Book > 1 || slot.Index > 99))
-            throw new ArgumentException("Une séquence contient de 1 à 32 macros, livre 0/1 et index 0–99.", nameof(plan));
+            throw new ArgumentException("A sequence holds 1 to 32 macros, book 0/1 and index 0–99.", nameof(plan));
         lock (gate)
         {
             ObjectDisposedException.ThrowIf(state.Status == MacroSequenceStatus.Disposed, this);
-            if (Active) throw new InvalidOperationException("Une séquence est déjà active.");
+            if (Active) throw new InvalidOperationException("A sequence is already active.");
             state = new(MacroSequenceStatus.Ready, character, Array.AsReadOnly(copied), 0, null, null);
         }
     }
@@ -38,7 +38,7 @@ public sealed class MacroSequence : IDisposable
         {
             ValidateOwnerCore(character);
             if (state.Status != MacroSequenceStatus.Ready) return null;
-            if (!shellAvailable) { StopCore(MacroSequenceStatus.Failed, "État natif indisponible."); return null; }
+            if (!shellAvailable) { StopCore(MacroSequenceStatus.Failed, "Native state unavailable."); return null; }
             if (busy || locked) return null;
             var request = new MacroRequest(checked(++token), character, state.Plan[state.Completed]);
             state = state with { Status = MacroSequenceStatus.AwaitingStart, Pending = request };
@@ -52,7 +52,7 @@ public sealed class MacroSequence : IDisposable
         {
             if (!Active || state.Pending?.Token != receipt.Token) return;
             if (state.Status != MacroSequenceStatus.AwaitingStart || state.Pending != receipt)
-            { StopCore(MacroSequenceStatus.Failed, "Le démarrage ne correspond pas à la demande possédée."); return; }
+            { StopCore(MacroSequenceStatus.Failed, "The start does not match the owned request."); return; }
             state = state with { Status = MacroSequenceStatus.Running };
         }
     }
@@ -63,26 +63,26 @@ public sealed class MacroSequence : IDisposable
         {
             if (!Active || state.Pending?.Token != receipt.Token) return;
             if (state.Pending != receipt || state.Status != MacroSequenceStatus.Running)
-            { StopCore(MacroSequenceStatus.Failed, "Fin reçue sans démarrage possédé confirmé."); return; }
-            if (interrupted) { StopCore(MacroSequenceStatus.Cancelled, "Macro interrompue ; étapes suivantes annulées."); return; }
+            { StopCore(MacroSequenceStatus.Failed, "End received without a confirmed owned start."); return; }
+            if (interrupted) { StopCore(MacroSequenceStatus.Cancelled, "Macro interrupted; next steps cancelled."); return; }
             var completed = state.Completed + 1;
             state = state with { Completed = completed, Pending = null,
                 Status = completed == state.Plan.Count ? MacroSequenceStatus.Complete : MacroSequenceStatus.Ready };
         }
     }
     public void ObserveExternalStart()
-    { lock (gate) { if (Active) StopCore(MacroSequenceStatus.Cancelled, "Une macro externe a pris la main."); } }
+    { lock (gate) { if (Active) StopCore(MacroSequenceStatus.Cancelled, "An external macro took over."); } }
     public void ValidateOwner(ulong character)
     { lock (gate) { ValidateOwnerCore(character); } }
     private void ValidateOwnerCore(ulong character)
     {
         if (Active && (character == 0 || character != state.CharacterId))
-            StopCore(MacroSequenceStatus.Cancelled, "Personnage changé ou déconnecté.");
+            StopCore(MacroSequenceStatus.Cancelled, "Character changed or logged out.");
     }
     public void Fail(string message)
     { lock (gate) { if (Active) StopCore(MacroSequenceStatus.Failed, message); } }
     public void Cancel()
-    { lock (gate) { if (Active) StopCore(MacroSequenceStatus.Cancelled, "Étapes suivantes annulées."); } }
+    { lock (gate) { if (Active) StopCore(MacroSequenceStatus.Cancelled, "Next steps cancelled."); } }
     private void StopCore(MacroSequenceStatus status, string message) => state = state with { Status = status, Pending = null, Message = message };
     public void Dispose()
     {

@@ -11,11 +11,11 @@ public sealed record InventorySortScope
     public int Capacity=>ContainerCount*SlotsPerContainer;
     public TimeSpan PreviewLifetime=>Storage is null ? TimeSpan.FromSeconds(3):TimeSpan.FromMinutes(2);
     private InventorySortScope(ulong character,BankKey? storage){CharacterId=character;Storage=storage;}
-    public static InventorySortScope Personal(ulong character)=>character!=0 ? new(character,null):throw new InvalidOperationException("Personnage non observé.");
+    public static InventorySortScope Personal(ulong character)=>character!=0 ? new(character,null):throw new InvalidOperationException("Character not observed.");
     public static InventorySortScope FromStorage(BankKey key)
     {
         if(key.CharacterId==0 || !Enum.IsDefined(key.Kind) || (key.Kind==BankStorageKind.Retainer ? key.StorageId==0:key.StorageId!=0))
-            throw new InvalidOperationException("Identité de rangement invalide.");
+            throw new InvalidOperationException("Invalid storage identity.");
         return new(key.CharacterId,key);
     }
     internal Dictionary<InventoryPhysicalSlot,InventoryStack> Extract(InventorySnapshot snapshot)
@@ -26,13 +26,13 @@ public sealed record InventorySortScope
         var containers=all.Where(c=>c.Location.Container.Value>=FirstContainer && c.Location.Container.Value<FirstContainer+ContainerCount).ToArray();
         if(containers.Length!=ContainerCount || containers.Any(c=>c.Location.Owner.Value!=InventoryOwner || c.Coverage!=InventoryCoverage.Complete)
             || Storage is not null && all.Length!=ContainerCount)
-            throw new InvalidOperationException("Tous les conteneurs du rangement doivent être entièrement observés pour le bon propriétaire.");
+            throw new InvalidOperationException("Every container of the storage must be fully observed for the right owner.");
         var values=new Dictionary<InventoryPhysicalSlot,InventoryStack>();var display=new HashSet<int>();
         foreach(var container in containers)
         foreach(var stack in container.Stacks)
         {
             if(stack.Slot<0 || stack.Slot>=SlotsPerContainer || stack.DisplayIndex<0 || stack.DisplayIndex>=Capacity || !display.Add(stack.DisplayIndex))
-                throw new InvalidOperationException("Ordre visuel du rangement incomplet ou incohérent.");
+                throw new InvalidOperationException("Storage visual order incomplete or inconsistent.");
             values.Add(new(container.Location.Container.Value,stack.Slot),stack);
         }
         return values;

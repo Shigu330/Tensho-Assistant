@@ -32,7 +32,7 @@ public sealed class CraftSolveSession : IDisposable
                 }
                 catch(Exception error)
                 {
-                    lock(gate) if(!disposed && ticket==generation) state=new(input,false,null,null,error is OperationCanceledException ? "Calcul annulé.":error.Message);
+                    lock(gate) if(!disposed && ticket==generation) state=new(input,false,null,null,error is OperationCanceledException ? "Calculation cancelled.":error.Message);
                 }
             });
         }

@@ -54,7 +54,7 @@ internal sealed partial class CollectionReader
         if(!titlesUnavailable)
         {
             try{titles ??= data.GetExcelSheet<Title>();}
-            catch(Exception error){titlesUnavailable=true;titlesIssue="Catalogue des titres indisponible ; les autres collections restent consultables.";log.Warning(error,"Title catalogue unavailable.");}
+            catch(Exception error){titlesUnavailable=true;titlesIssue="Title catalogue unavailable; the other collections can still be browsed.";log.Warning(error,"Title catalogue unavailable.");}
         }
         if(!achievementsUnavailable)
         {
@@ -67,7 +67,7 @@ internal sealed partial class CollectionReader
                 achievementCategories ??= data.GetExcelSheet<AchievementCategory>();
                 achievementKinds ??= data.GetExcelSheet<AchievementKind>();
             }
-            catch(Exception error){achievementsUnavailable=true;achievementsIssue="Catalogue des succès indisponible ; les autres collections restent consultables.";log.Warning(error,"Achievement catalogue unavailable.");}
+            catch(Exception error){achievementsUnavailable=true;achievementsIssue="Achievement catalogue unavailable; the other collections can still be browsed.";log.Warning(error,"Achievement catalogue unavailable.");}
         }
     }
 
@@ -94,12 +94,12 @@ internal sealed partial class CollectionReader
                     var before=unlocks.IsTitleListLoaded;var positive=unlocks.IsTitleUnlocked(row);var after=unlocks.IsTitleListLoaded;
                     titlesStable&=before && after;copied=CollectionAcquisitionEvidence.Observe(copied,positive,before,after);
                 }
-                catch(Exception error){titleUnlockFailed=true;titlesStable=false;titlesIssue="Acquisitions des titres partiellement lues ; les résultats restants sont inconnus.";log.Warning(error,"Title acquisition read unavailable.");}
+                catch(Exception error){titleUnlockFailed=true;titlesStable=false;titlesIssue="Title acquisitions partly read; the remaining results are unknown.";log.Warning(error,"Title acquisition read unavailable.");}
             }
             else titlesStable=false;
             entries.Add(copied);return true;
         }
-        catch(Exception error){titleRowFailed=true;titlesStable=false;titlesIssue="Catalogue des titres partiellement lu ; autres collections conservées.";log.Warning(error,"Title row unavailable.");return false;}
+        catch(Exception error){titleRowFailed=true;titlesStable=false;titlesIssue="Title catalogue partly read; other collections kept.";log.Warning(error,"Title row unavailable.");return false;}
     }
 
     private bool ReadAchievement(int index)
@@ -119,12 +119,12 @@ internal sealed partial class CollectionReader
                     var before=unlocks.IsAchievementListLoaded;var positive=unlocks.IsAchievementComplete(row);var after=unlocks.IsAchievementListLoaded;
                     achievementsStable&=before && after;copied=CollectionAcquisitionEvidence.Observe(copied,positive,before,after);
                 }
-                catch(Exception error){achievementUnlockFailed=true;achievementsStable=false;achievementsIssue="États des succès partiellement lus ; les résultats restants sont inconnus.";log.Warning(error,"Achievement acquisition read unavailable.");}
+                catch(Exception error){achievementUnlockFailed=true;achievementsStable=false;achievementsIssue="Achievement states partly read; the remaining results are unknown.";log.Warning(error,"Achievement acquisition read unavailable.");}
             }
             else achievementsStable=false;
             entries.Add(copied);return true;
         }
-        catch(Exception error){achievementRowFailed=true;achievementsStable=false;achievementsIssue="Catalogue des succès partiellement lu ; autres collections conservées.";log.Warning(error,"Achievement row unavailable.");return false;}
+        catch(Exception error){achievementRowFailed=true;achievementsStable=false;achievementsIssue="Achievement catalogue partly read; other collections kept.";log.Warning(error,"Achievement row unavailable.");return false;}
     }
 
     private bool FinalizeCompletion()
@@ -133,12 +133,12 @@ internal sealed partial class CollectionReader
         if(character!=0 && !titlesUnavailable)
         {
             try{titleLoaded=unlocks.IsTitleListLoaded;}
-            catch(Exception error){titlesIssue="Chargement des titres non vérifiable ; états négatifs inconnus.";titleUnlockFailed=true;log.Warning(error,"Title list coverage unavailable.");}
+            catch(Exception error){titlesIssue="Title loading cannot be checked; negative states unknown.";titleUnlockFailed=true;log.Warning(error,"Title list coverage unavailable.");}
         }
         if(character!=0 && !achievementsUnavailable)
         {
             try{achievementLoaded=unlocks.IsAchievementListLoaded;}
-            catch(Exception error){achievementsIssue="Chargement des succès non vérifiable ; états négatifs inconnus.";achievementUnlockFailed=true;log.Warning(error,"Achievement list coverage unavailable.");}
+            catch(Exception error){achievementsIssue="Achievement loading cannot be checked; negative states unknown.";achievementUnlockFailed=true;log.Warning(error,"Achievement list coverage unavailable.");}
         }
         var titleComplete=titlesStable && titleLoaded==true && !titleUnlockFailed && !titleRowFailed;
         completeTitles=titleComplete;
@@ -150,8 +150,8 @@ internal sealed partial class CollectionReader
             if(entry.Kind==CollectionKind.Title)entries[index]=CollectionAcquisitionEvidence.RequireStableCoverage(entry,titleComplete);
             if(entry.Kind==CollectionKind.Achievement)entries[index]=CollectionAcquisitionEvidence.RequireStableCoverage(entry,achievementComplete);
         }
-        if(character!=0 && !titleComplete)titlesIssue ??="Liste des titres non entièrement reçue pendant ce relevé : seules les acquisitions positives sont confirmées. Ouvrez les titres dans le jeu puis actualisez.";
-        if(character!=0 && !achievementComplete)achievementsIssue ??="Liste des succès non entièrement reçue pendant ce relevé : seuls les succès positifs sont confirmés. Ouvrez les succès dans le jeu puis actualisez.";
+        if(character!=0 && !titleComplete)titlesIssue ??="Title list not fully received during this reading: only positive acquisitions are confirmed. Open the titles in game, then refresh.";
+        if(character!=0 && !achievementComplete)achievementsIssue ??="Achievement list not fully received during this reading: only positive achievements are confirmed. Open the achievements in game, then refresh.";
         lastTitlesLoaded=titleLoaded;lastAchievementsLoaded=achievementLoaded;
         return titleLoaded==true && !titlesStable && !titleUnlockFailed && !titleRowFailed
             || achievementLoaded==true && !achievementsStable && !achievementUnlockFailed && !achievementRowFailed;

@@ -3,6 +3,10 @@ using TenshoAssistant.Inventory;
 
 namespace TenshoAssistant;
 
+// Diagnostics page (developer mode): build and configuration versions, the contributor help (MainWindow.Advanced.cs), draw time per page
+// (median and maximum of the last 120 frames, 0.290–0.292), the state of each catalogue and service (items, recipes, gathering, quest
+// rewards, hover, stats, Mini Cactpot, gathering node, craft chain), Bank imports and the live inventory coverage per container.
+// Read-only view of states copied elsewhere.
 internal sealed partial class MainWindow
 {
     private void DrawDiagnostics()
@@ -10,6 +14,18 @@ internal sealed partial class MainWindow
         Heading(localization.Get("DiagnosticsUi.Title"), localization.Get("DiagnosticsUi.Help"));
         ImGui.TextUnformatted(localization.Format("DiagnosticsUi.Build",BuildVersion,configuration.Version));
         DrawContributorHelp();
+        // 0.290 (R-06 step 6): average draw time per page (moving average while the page is open), slowest first.
+        if (TenshoAssistant.UI.UiComponents.Header(localization.Get("DiagnosticsUi.DrawTimes")))
+        {
+            ImGui.TextDisabled(localization.Get("DiagnosticsUi.DrawTimesHelp"));
+            var rows = pageDrawMs.Select(pair =>
+            {
+                var samples = pair.Value.Samples.Take(pair.Value.Count).Order().ToArray();
+                return (Page: pair.Key, Median: samples.Length == 0 ? 0 : samples[samples.Length / 2], Max: samples.Length == 0 ? 0 : samples[^1], Count: samples.Length);
+            }).OrderByDescending(row => row.Median);
+            foreach (var row in rows)
+                ImGui.TextUnformatted(localization.Format("DiagnosticsUi.DrawTimeLine", row.Page, row.Median.ToString("0.00"), row.Max.ToString("0.00"), row.Count));
+        }
         DrawMacroObservation();
         ImGui.Spacing();
         ImGui.TextColored(Accent, localization.Get("DiagnosticsUi.Items"));
@@ -61,7 +77,7 @@ internal sealed partial class MainWindow
         }
         else ImGui.TextDisabled(localization.Get("DiagnosticsUi.NoRewardIndex"));
         if (questState.RewardIndexError is { } rewardIndexError) ImGui.TextWrapped(localization.Format("DiagnosticsUi.RewardError",rewardIndexError));
-        ImGui.TextDisabled(localization.Format("DiagnosticsUi.Market",market.State.WorldName,localization.Get(configuration.MarketPricesOnHover ? "DiagnosticsUi.Enabled":"DiagnosticsUi.Disabled")));
+        ImGui.TextDisabled(localization.Format("DiagnosticsUi.Market",market.State.WorldName,localization.Get(configuration.CommunityUniversalis && configuration.MarketPricesOnHover ? "DiagnosticsUi.Enabled":"DiagnosticsUi.Disabled")));
         ImGui.TextDisabled(localization.Format("DiagnosticsUi.Hover",localization.Get(configuration.ItemUsagesOnHover ? "DiagnosticsUi.Enabled":"DiagnosticsUi.Disabled"),itemHover.State.Item is { } hovered ? hovered.ItemId.ToString():localization.Get("DiagnosticsUi.Absent")));
         if (market.State.Error is { } marketError) ImGui.TextWrapped(marketError);
         var stats = characterStats.State;

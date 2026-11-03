@@ -6,8 +6,10 @@ using TenshoAssistant.Items;
 namespace TenshoAssistant;
 
 /// <summary>
-/// Duty loot (0.207): a ✓ (obtained) or ✗ (not obtained) on the icon of collection items, and filters by kind — mount, minion, Triple Triad
-/// card, orchestrion roll, equipment, other — with « not obtained only », shared by the duty loot tool and the Duty Finder panel.
+/// Obtained ✓ / not obtained ✗ badge and loot filters (0.207): the badge on collection items (cards and orchestrion rolls too since 0.241),
+/// drawn by every item icon through ItemCell and on Collections / Triple Triad notebook entries since 0.275, nothing when the state is
+/// unknown; and the kind filter (mount, minion, Triple Triad card, orchestrion roll, equipment, other) with « not obtained only », shared by
+/// the duty loot tool and the Duty Finder panel. States come from the Collections unlock copy.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -43,8 +45,13 @@ internal sealed partial class MainWindow
     // or not a collection item.
     private void DrawCollectionMark(ItemDefinition? item)
     {
-        var state=CollectionStateOf(CollectionOf(item));
-        if(state==CollectionAcquisition.Unknown || CollectionOf(item) is null)return;
+        if(CollectionOf(item) is { } entry)DrawEntryMark(entry);
+    }
+    // 0.275: the same badge for a collection entry drawn without an item icon (Collections lists, Triple Triad notebook).
+    private void DrawEntryMark(CollectionEntry entry)
+    {
+        var state=CollectionStateOf(entry);
+        if(state==CollectionAcquisition.Unknown)return;
         var max=ImGui.GetItemRectMax();var size=Math.Max(9f,(ImGui.GetItemRectSize().Y)*0.45f);
         var min=max-new Vector2(size);var draw=ImGui.GetWindowDrawList();
         var obtained=state==CollectionAcquisition.Acquired;

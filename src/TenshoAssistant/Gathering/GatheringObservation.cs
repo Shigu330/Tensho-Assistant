@@ -16,7 +16,7 @@ public sealed class GatheringObservedFrame
     public uint JobId {get;}public int Level {get;}public uint Gp {get;}public uint MaxGp {get;}public byte NativeStatus {get;}
     public int? Attempts {get;}public int? TotalAttempts {get;}
     public IReadOnlyList<GatheringObservedSlot> Slots {get;}
-    public string Source=>"FFXIVClientStructs.AddonGathering · valeurs UI affichées, non normalisées";
+    public string Source=>"FFXIVClientStructs.AddonGathering · UI values as shown, not normalised";
     internal static int? Number(string? text,int minimum,int maximum,bool percent=false)
     {
         if(text is null || text.Length>64)return null;
@@ -30,7 +30,7 @@ public sealed class GatheringObservedFrame
         ArgumentNullException.ThrowIfNull(slots);
         if(job is not (16 or 17) || level is <1 or >100 || gp>maxGp || maxGp>10000 || status is not (1 or 2)
             || slots.Count!=8 || slots.Any(slot=>slot is null || slot.Index is <0 or >7) || slots.Select(slot=>slot.Index).Distinct().Count()!=8)
-            throw new ArgumentException("Observation du point incomplète ou incompatible.");
+            throw new ArgumentException("Gathering point observation incomplete or incompatible.");
         JobId=job;Level=level;Gp=gp;MaxGp=maxGp;NativeStatus=status;
         var left=Number(attempts,0,12);var maximum=Number(total,1,12);
         Attempts=left is { } count && maximum is { } cap && count<=cap ? count:null;TotalAttempts=maximum;

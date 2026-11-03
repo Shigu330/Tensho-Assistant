@@ -8,14 +8,17 @@ namespace TenshoAssistant;
 /// <summary>
 /// TRIAD-003 (0.161), as TriadBuddy: a panel beside the NPC challenge window with the estimated win rate of each saved deck (the game's
 /// decks and the Tensho deck) and a deck generated from the owned cards for this NPC and these rules. Simulations run off the framework
-/// thread; nothing is written to the game (the player builds the deck in the game's deck editor).
+/// thread; nothing is written to the game (the player builds the deck in the game's deck editor). In the deck choice window (0.165)
+/// the estimated win rate is written beside each deck row and the best deck is framed in green.
 /// </summary>
 internal sealed partial class MainWindow
 {
     private readonly object triadOddsGate=new();
     private CancellationTokenSource? triadOddsCancel,triadGenerateCancel;
     private string triadOddsKey=string.Empty;
-    private Dictionary<string,TriadDeckOdds?> triadOdds=[];
+    // 0.331 (audit): keyed by the deck's position in TriadRequestDecks (two game decks can share a name); triadOddsKey holds every
+    // name and card in order, so a position always means the same deck.
+    private Dictionary<int,TriadDeckOdds?> triadOdds=[];
     private TriadDeckSuggestion? triadGenerated;
     private bool triadGenerating;
     private string triadGeneratedKey=string.Empty;
@@ -38,7 +41,8 @@ internal sealed partial class MainWindow
 
     internal void DrawTriadRequestPanel()
     {
-        if(windowDisposed || triadObservation.State is not { Enabled:true } || triadObservation.Request is not { } request)return;
+        // 0.327: its own switch (TriadChallengePanel, on by default); off, no panel, no deck choice odds and no simulation started.
+        if(windowDisposed || !configuration.TriadChallengePanel || triadObservation.State is not { Enabled:true } || triadObservation.Request is not { } request)return;
         var npcFixed=request.NpcFixed.Select(id=>TriadCard(id)).OfType<TriadCardDefinition>().ToList();
         var npcVariable=request.NpcVariable.Select(id=>TriadCard(id)).OfType<TriadCardDefinition>().ToList();
         var rules=TriadMatchAdvisor.RulesOf(request.RuleIds);var forced=TriadMatchSimulator.ForcedOf(request.RuleIds);
@@ -61,11 +65,12 @@ internal sealed partial class MainWindow
             ImGui.Separator();
             ImGui.TextDisabled(localization.Get("TriadRequest.Odds"));
             if(decks.Count==0)ImGui.TextDisabled(localization.Get("TriadRequest.NoDecks"));
-            Dictionary<string,TriadDeckOdds?> odds;lock(triadOddsGate)odds=triadOdds;
-            foreach(var (name,deck) in decks)
+            Dictionary<int,TriadDeckOdds?> odds;lock(triadOddsGate)odds=triadOdds;
+            for(var index=0;index<decks.Count;index++)
             {
+                var (name,deck)=decks[index];
                 if(deck is null){ImGui.TextDisabled(localization.Format("TriadRequest.DeckUnknown",name));continue;}
-                ImGui.TextUnformatted(odds.TryGetValue(name,out var value) && value is { } result
+                ImGui.TextUnformatted(odds.TryGetValue(index,out var value) && value is { } result
                     ? localization.Format("TriadRequest.DeckOdds",name,(result.Win*100).ToString("0"),(result.Draw*100).ToString("0"))
                     : localization.Format("TriadRequest.DeckCalculating",name));
             }
@@ -78,7 +83,8 @@ internal sealed partial class MainWindow
                     StartTriadGenerate(request,owned,npcFixed,npcVariable,rules,forced,decks.Select(deck=>deck.Deck).OfType<IReadOnlyList<TriadCardDefinition>>().ToList());
             }
             finally{ImGui.EndDisabled();}
-            if(owned.Count<5)ImGui.TextDisabled(localization.Get("TriadRequest.NoOwned"));
+            // 0.331 (audit): collections are read on their own at login; « still being read » only while they are, else too few confirmed.
+            if(owned.Count<5)ImGui.TextDisabled(localization.Get(collections.State.Loading ? "TriadRequest.NoOwned":"TriadRequest.FewOwned"));
             if(triadGenerating)ImGui.TextDisabled(localization.Get("TriadRequest.Generating"));
             if(triadGenerated is { } generated && triadGeneratedKey==TriadRequestKey(request))
             {
@@ -87,7 +93,7 @@ internal sealed partial class MainWindow
                 {
                     DrawSmallGameIcon(card.IconId);
                     TriadCardTooltip(card.Id);
-                    var name=collections.State.Entries.FirstOrDefault(entry=>entry.Kind==CollectionKind.TripleTriad && entry.Id==card.Id)?.Name ?? card.Id.ToString();
+                    var name=CollectionEntryOf(CollectionKind.TripleTriad,card.Id)?.Name ?? card.Id.ToString();
                     ImGui.TextUnformatted($"{name}  {new string('★',card.Stars)}  {TriadCardDefinition.Value(card.Top)} {TriadCardDefinition.Value(card.Right)} {TriadCardDefinition.Value(card.Bottom)} {TriadCardDefinition.Value(card.Left)}");
                 }
                 if(ImGui.Button(localization.Get("TriadRequest.SaveTensho")))SaveGeneratedDeck(request,generated);
@@ -102,12 +108,12 @@ internal sealed partial class MainWindow
     {
         var rows=triadObservation.SelDeckRows;
         if(rows.Count==0)return;
-        Dictionary<string,TriadDeckOdds?> odds;lock(triadOddsGate)odds=triadOdds;
+        Dictionary<int,TriadDeckOdds?> odds;lock(triadOddsGate)odds=triadOdds;
         var found=new List<(TriadRect Row,TriadDeckOdds Odds)>();
         foreach(var (cards,row) in rows)
         {
-            var match=decks.FirstOrDefault(deck=>deck.Deck is { } list && list.Select(card=>card.Id).Order().SequenceEqual(cards.Order()));
-            if(match.Deck is not null && odds.TryGetValue(match.Name,out var value) && value is { } result)found.Add((row,result));
+            var match=decks.FindIndex(deck=>deck.Deck is { } list && list.Select(card=>card.Id).Order().SequenceEqual(cards.Order()));
+            if(match>=0 && odds.TryGetValue(match,out var value) && value is { } result)found.Add((row,result));
         }
         if(found.Count==0)return;
         var draw=ImGui.GetForegroundDrawList();var best=found.Max(entry=>entry.Odds.Score);
@@ -135,13 +141,14 @@ internal sealed partial class MainWindow
             var cancel=new CancellationTokenSource();triadOddsCancel=cancel;var token=cancel.Token;
             _=Task.Run(()=>
             {
-                foreach(var (name,deck) in decks)
+                for(var index=0;index<decks.Count;index++)
                 {
+                    var deck=decks[index].Deck;
                     if(deck is null || token.IsCancellationRequested)continue;
                     try
                     {
                         var odds=TriadMatchSimulator.Estimate(deck,npcFixed,npcVariable,rules,forced,400,17,1,token);
-                        lock(triadOddsGate)if(triadOddsKey==key)triadOdds=new(triadOdds){[name]=odds};
+                        lock(triadOddsGate)if(triadOddsKey==key)triadOdds=new(triadOdds){[index]=odds};
                     }
                     catch(OperationCanceledException){return;}
                     catch(Exception error){log.Warning(error,"Triple Triad deck estimate failed.");}

@@ -7,12 +7,12 @@ public sealed record MacroDefinition(MacroSlot Slot, uint IconId, IReadOnlyList<
         new(slot, icon, Array.AsReadOnly(lines.Take(16).ToArray()));
     public string? ValidationError()
     {
-        if (Lines.Count is < 1 or > 15 || Lines.All(string.IsNullOrWhiteSpace)) return "Macro vide ou trop longue.";
+        if (Lines.Count is < 1 or > 15 || Lines.All(string.IsNullOrWhiteSpace)) return "Empty or too long macro.";
         var used = Lines.Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
         if (used.Length < 2 || used[^1].Trim() != Marker || used.Count(line => line.Trim() == Marker) != 1)
-            return $"Terminez la macro par une seule ligne {Marker}, après ses commandes.";
+            return $"End the macro with a single {Marker} line, after its commands.";
         if (used.Any(line => line.Trim().StartsWith(Marker + " ", StringComparison.OrdinalIgnoreCase)))
-            return "Le marqueur ne prend aucun argument.";
+            return "The marker takes no argument.";
         return null;
     }
 }
@@ -56,11 +56,11 @@ public sealed class MacroChainService
         var copied = plan.Take(33).ToArray();
         lock (gate)
         {
-            if (state.CharacterId == 0) { ErrorCore("Connectez un personnage avant de lancer une séquence."); return; }
+            if (state.CharacterId == 0) { ErrorCore("Log in a character before starting a sequence."); return; }
             if (start is not null || state.Sequence.Status is MacroSequenceStatus.Ready or MacroSequenceStatus.AwaitingStart or MacroSequenceStatus.Running)
-            { ErrorCore("Une séquence ou demande est déjà en cours."); return; }
+            { ErrorCore("A sequence or request is already running."); return; }
             if (copied.Length is < 1 or > 32 || copied.Any(slot => slot is null || slot.Book > 1 || slot.Index > 99))
-            { ErrorCore("Choisissez entre 1 et 32 macros valides."); return; }
+            { ErrorCore("Choose between 1 and 32 valid macros."); return; }
             start = new(state.CharacterId, Array.AsReadOnly(copied));
             state = state with { Error = null };
         }

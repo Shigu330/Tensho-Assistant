@@ -21,7 +21,7 @@ public static class TripleTriadSolver
     public static TriadSolveResult Solve(TriadPosition position, TriadSolveOptions? options = null, CancellationToken cancellation = default)
     {
         options ??= new();
-        if (!position.IsInitialized) throw new ArgumentException("Position non initialisée.", nameof(position));
+        if (!position.IsInitialized) throw new ArgumentException("Position not initialised.", nameof(position));
         if (options.NodeLimit is < 1 or > 10_000_000 || options.Milliseconds is < 1 or > 30_000 || options.MaxDepth is < 1 or > 9)
             throw new ArgumentOutOfRangeException(nameof(options));
         cancellation.ThrowIfCancellationRequested();

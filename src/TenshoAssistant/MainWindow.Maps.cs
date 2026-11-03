@@ -5,6 +5,9 @@ using TenshoAssistant.Maps;
 
 namespace TenshoAssistant;
 
+// Maps page (World): opens the Tensho map, lists the game maps (search by region / zone / subzone, game data), and for the chosen
+// map takes X / Y coordinates to place the game flag (game map link), with bookmarks, weather and the zone's gathering resources.
+// Also the flag placement used by the Tensho map (PlaceFlagFromMapView), which keeps the Tensho map open and centred on the flag.
 internal sealed partial class MainWindow
 {
     private string mapQuery = "";
@@ -23,13 +26,15 @@ internal sealed partial class MainWindow
         if (state.Catalog is not { } catalog)
         {
             ImGui.TextWrapped(state.Error is null ? localization.Format("MapCounts.Loading",state.Copied,state.Total):localization.Get("MapCounts.Error"));
-            if(developerMode && state.Error is { } error)ImGui.TextWrapped(error);
+            if(developerMode && state.Error is { } error)ImGui.TextWrapped(RawMessage(error));
             return;
         }
         if (ImGui.Button(localization.Get("MapView.OpenCurrent"))) OpenMapView(0);
         DrawMapBookmarks(catalog);
+        DrawChatMapLinks(catalog);
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##MapSearch", localization.Get("MapsUi.Search"), ref mapQuery, 128);
+        Tip("MapsUi.SearchTip");
         if (!ReferenceEquals(mapViewCatalog, catalog) || mapViewQuery != mapQuery)
         { mapMatches = catalog.Search(mapQuery); mapViewCatalog = catalog; mapViewQuery = mapQuery; }
         ImGui.TextDisabled(localization.Format("MapCounts.Count",mapMatches.Count));
@@ -61,15 +66,15 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent, selected.Zone);
         if(ImGui.SmallButton(localization.Get("MapsUi.Weather"))) OpenWeather(selected.TerritoryId,selected.Zone);
         ImGui.TextUnformatted($"{selected.Region} · {selected.Subzone}");
-        ImGui.SetNextItemWidth(110); var changedX = ImGui.InputFloat("X##MapX", ref mapX, 0, 0, "%.1f");
-        ImGui.SameLine(); ImGui.SetNextItemWidth(110); var changedY = ImGui.InputFloat("Y##MapY", ref mapY, 0, 0, "%.1f");
+        ImGui.SetNextItemWidth(110); var changedX = ImGui.InputFloat("X##MapX", ref mapX, 0, 0, "%.1f"); Tip("MapsUi.CoordinatesTip");
+        ImGui.SameLine(); ImGui.SetNextItemWidth(110); var changedY = ImGui.InputFloat("Y##MapY", ref mapY, 0, 0, "%.1f"); Tip("MapsUi.CoordinatesTip");
         if (changedX || changedY) bookmarkSaved = false;
         var valid = MapCatalog.CoordinatesValid(mapX, mapY);
         ImGui.BeginDisabled(!valid);
         try
         {
             if (ImGui.Button(localization.Get("MapsUi.Open")))
-                OpenMapPoint(selected, mapX, mapY);
+                OpenMapPointFromPage(selected, mapX, mapY);
         }
         finally { ImGui.EndDisabled(); }
         if (!valid) ImGui.TextWrapped(localization.Get("MapsUi.InvalidCoordinates"));
@@ -88,9 +93,19 @@ internal sealed partial class MainWindow
     {
         mapOwnFlagUntil=DateTimeOffset.UtcNow.AddSeconds(2);
         OpenMapPoint(map,x,y);
-        if(mapOpenError is not null){mapOwnFlagUntil=default;return;}
+        if(mapOpenError is not null){mapOwnFlagUntil=default;mapErrorUntil=DateTimeOffset.UtcNow.AddSeconds(5);return;}
         // Centre the Tensho map on the new flag; following the player would move it away at once.
         mapViewMapId=map.MapId;mapViewFollow=false;mapCenterRequest=MapProjection.PixelFromCoordinate(new Vector2(x,y),map);
+    }
+    // Maps page « Open game map » and bookmark icon. 0.328: with the game map replaced, the link's « show map » request for the
+    // player's own zone was taken for the M toggle (a following Tensho map closed, the game map hidden: nothing left on screen), and
+    // a closed Tensho map opened without the point. Placed as from the Tensho map instead: request ignored, Tensho map open on the flag.
+    private void OpenMapPointFromPage(MapDefinition map,float x,float y)
+    {
+        // 0.426 (user request): the game map opened from a Tensho page closes Tensho (setting CloseOnGameWindow).
+        if(!configuration.MapView.ReplaceGameMap || !MapViewVisible()){OpenMapPoint(map,x,y);if(mapOpenError is null)CloseForGameWindow();return;}
+        PlaceFlagFromMapView(map,x,y);
+        if(mapOpenError is null)mapViewOpen=true;
     }
     private void OpenMapPoint(MapDefinition map, float x, float y)
     {

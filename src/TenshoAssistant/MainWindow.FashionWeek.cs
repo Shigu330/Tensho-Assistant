@@ -8,8 +8,10 @@ namespace TenshoAssistant;
 
 /// <summary>
 /// Fashion Report of the week (0.213), in the spirit of Avant-Garde (behaviour only, no code): the weekly theme (FashionCheckWeeklyTheme),
-/// the hint category of each of the 11 slots read from the game window, and for each slot the gear reported for that category
-/// (FFXIVGachaSpreadsheet data), owned pieces first, the others dimmed, by popularity; also as a panel beside the game's window.
+/// the hint category of each of the 11 slots read from the game window (Fashion/FashionCheckReader, framework thread), and for each slot the
+/// gear reported for that category and the dyes of the week (0.215), both from FFXIVGachaSpreadsheet (MIT; fetched once when the slots are
+/// shown, cached); owned pieces first (any known storage, armoury chest / glamour dresser / armoire since 0.235–0.240), the others dimmed,
+/// by popularity. Also a panel beside the game's window, with a Tensho button over each of its slot rows (0.219–0.223).
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -56,10 +58,18 @@ internal sealed partial class MainWindow
     {
         var options=configuration.FashionOptions??=new();
         var owned=options.OwnedFirst;var dim=options.DimUnowned;var popular=options.ByPopularity;var panel=options.ShowPanel;var changed=false;
-        changed|=ImGui.Checkbox(localization.Get("FashionWeek.OwnedFirst"),ref owned);Tip("FashionWeek.OwnedFirstTip");ImGui.SameLine();
-        changed|=ImGui.Checkbox(localization.Get("FashionWeek.Dim"),ref dim);Tip("FashionWeek.DimTip");ImGui.SameLine();
+        // 0.324: « ↺ » after each option.
+        var defaults=DefaultConfiguration.FashionOptions;
+        changed|=ImGui.Checkbox(localization.Get("FashionWeek.OwnedFirst"),ref owned);Tip("FashionWeek.OwnedFirstTip");
+        if(DefaultButton("FashionOwnedFirst",owned!=defaults.OwnedFirst)){owned=defaults.OwnedFirst;changed=true;}
+        ImGui.SameLine();
+        changed|=ImGui.Checkbox(localization.Get("FashionWeek.Dim"),ref dim);Tip("FashionWeek.DimTip");
+        if(DefaultButton("FashionDim",dim!=defaults.DimUnowned)){dim=defaults.DimUnowned;changed=true;}
+        ImGui.SameLine();
         changed|=ImGui.Checkbox(localization.Get("FashionWeek.Popular"),ref popular);Tip("FashionWeek.PopularTip");
+        if(DefaultButton("FashionPopular",popular!=defaults.ByPopularity)){popular=defaults.ByPopularity;changed=true;}
         changed|=ImGui.Checkbox(localization.Get("FashionWeek.Panel"),ref panel);Tip("FashionWeek.PanelTip");
+        if(DefaultButton("FashionPanel",panel!=defaults.ShowPanel)){panel=defaults.ShowPanel;changed=true;}
         if(!changed)return;
         var previous=configuration.FashionOptions;
         configuration.FashionOptions=new(){OwnedFirst=owned,DimUnowned=dim,ByPopularity=popular,ShowPanel=panel};
@@ -72,7 +82,7 @@ internal sealed partial class MainWindow
         if(fashionData.State.Dataset is null)
         {
             if(!fashionAutoFetched && !fashionData.State.Loading){fashionAutoFetched=true;_=fashionData.RequestAsync();}
-            ImGui.TextDisabled(localization.Get(fashionData.State.Loading ? "FashionUi.Loading":"FashionUi.NeedFetch"));
+            ImGui.TextDisabled(localization.Get(fashionData.State.Loading ? "FashionUi.Loading":fashionData.Disabled ? "FashionUi.SourceOff":"FashionUi.NeedFetch"));
         }
         RefreshRecipeHoldingsCache();
         for(var slot=0;slot<FashionWeek.SlotCount && slot<frame.Categories.Count;slot++)
@@ -232,7 +242,7 @@ internal sealed partial class MainWindow
         {
             if(!open){fashionOpenSlot=-1;return;}
             if(!visible)return;
-            if(fashionData.State.Dataset is null)ImGui.TextDisabled(localization.Get(fashionData.State.Loading ? "FashionUi.Loading":"FashionUi.NeedFetch"));
+            if(fashionData.State.Dataset is null)ImGui.TextDisabled(localization.Get(fashionData.State.Loading ? "FashionUi.Loading":fashionData.Disabled ? "FashionUi.SourceOff":"FashionUi.NeedFetch"));
             DrawFashionSlotBody(frame,slot,true);
             ImGui.Separator();
             ImGui.TextDisabled(localization.Get("FashionWeek.PanelSource"));

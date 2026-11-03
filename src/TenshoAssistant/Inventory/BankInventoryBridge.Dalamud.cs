@@ -9,7 +9,8 @@ namespace TenshoAssistant.Inventory;
 
 internal sealed record BankMenuContext(BankKey Key, string Name, string AddonName, Vector2 Anchor, bool Loaded);
 internal sealed record BankMenuState(ulong CharacterId, BankMenuContext? Retainer, BankMenuContext? Saddlebag,
-    BankMenuContext? Premium, string? Message, IReadOnlyList<(ulong Id, string Name)>? KnownRetainers = null);
+    BankMenuContext? Premium, string? Message, IReadOnlyList<(ulong Id, string Name)>? KnownRetainers = null, bool ReadsUnavailable = false,
+    BankMenuContext? FreeCompany = null);
 
 /// <summary>Observes menu anchors on framework, and copies inventory only after an explicit import request.</summary>
 internal sealed class BankInventoryBridge : IDisposable
@@ -36,6 +37,10 @@ internal sealed class BankInventoryBridge : IDisposable
     private readonly Func<uint, IReadOnlyList<uint>> outfitPieces;
     private readonly Dictionary<BankKey, TimeSpan> autoCaptured = [];
     private IReadOnlyList<(ulong Id, string Name)>? knownRetainers;
+    // 0.329 (R-14): optional reads that failed once (logged once); the first failure of each posts ReadUnavailable.
+    private const string ReadUnavailable = "A storage could not be read (perhaps after a game update); the other storages are still recorded.";
+    private readonly HashSet<string> failedReads = [];
+    private bool importingSilent;
     private bool disposed;
     private BankMenuState state = new(0, null, null, null, null);
     public BankMenuState State => Volatile.Read(ref state);
@@ -71,14 +76,14 @@ internal sealed class BankInventoryBridge : IDisposable
     internal BankMenuContext RequireOpenForSort(BankKey key)
     {
         if(!framework.IsInFrameworkUpdateThread || framework.IsFrameworkUnloading)
-            throw new InvalidOperationException("La lecture du rangement exige le thread framework.");
+            throw new InvalidOperationException("Reading a storage requires the framework thread.");
         lock(gate)
         {
-            if(disposed || CharacterId!=key.CharacterId)throw new InvalidOperationException("Personnage du rangement modifié.");
+            if(disposed || CharacterId!=key.CharacterId)throw new InvalidOperationException("Storage character changed.");
             var context=key.Kind==BankStorageKind.Retainer ? GetRetainer(CharacterId):GetSaddle(CharacterId,key.Kind);
             if(context?.Key!=key || !context.Loaded || key.Kind==BankStorageKind.Retainer
                 && (lastRetainer!=key || Stopwatch.GetElapsedTime(started)-retainerSince<TimeSpan.FromMilliseconds(500)))
-                throw new InvalidOperationException("Ouvrez le bon rangement et attendez son chargement complet.");
+                throw new InvalidOperationException("Open the right storage and wait until it is fully loaded.");
             return context;
         }
     }
@@ -104,10 +109,12 @@ internal sealed class BankInventoryBridge : IDisposable
             if (now < nextPoll && requested is null && importing?.IsCompleted != true) return;
             nextPoll = now + TimeSpan.FromMilliseconds(100);
             var contextUpdated = false;
+            var character = 0UL;
             try
             {
-                var character = CharacterId;
-                var retainer = GetRetainer(character);
+                character = CharacterId;
+                // 0.329 (R-14): each optional native read is guarded on its own, so one lost signature no longer hides the others.
+                var retainer = Optional(GetRetainer, character, null, "retainer");
                 if (retainer?.Key != lastRetainer)
                 {
                     lastRetainer = retainer?.Key;
@@ -115,37 +122,55 @@ internal sealed class BankInventoryBridge : IDisposable
                 }
                 if (retainer is not null && now - retainerSince < TimeSpan.FromMilliseconds(500))
                     retainer = retainer with { Loaded = false };
-                var saddle = GetSaddle(character, BankStorageKind.Saddlebag);
-                var premium = GetSaddle(character, BankStorageKind.PremiumSaddlebag);
+                var saddle = Optional(c => GetSaddle(c, BankStorageKind.Saddlebag), character, null, "saddlebag");
+                var premium = Optional(c => GetSaddle(c, BankStorageKind.PremiumSaddlebag), character, null, "premium saddlebag");
+                // 0.350 (g, I-09): the company chest, while its window is open (the game sends its pages only then).
+                var company = Optional(GetFreeCompany, character, null, "company chest");
                 // Armoury chest (0.235): always in memory once logged in; read like a storage, kept in the Bank, refreshed every 30 s.
                 var armoury = character == 0 ? null : new BankMenuContext(new BankKey(character, BankStorageKind.Armoury, 0), "Arsenal", "",
-                    Vector2.Zero, IsLoaded(BankStorageKind.Armoury));
+                    Vector2.Zero, Optional(static _ => IsLoaded(BankStorageKind.Armoury), character, false, "armoury"));
                 // Glamour dresser and armoire (0.236): known once opened in the game this session (PrismBoxLoaded, IsCabinetLoaded).
-                var dresser = character == 0 ? null : new BankMenuContext(new BankKey(character, BankStorageKind.GlamourDresser, 0), "Coffre à apparence", "",
-                    Vector2.Zero, DresserLoaded());
+                var dresser = character == 0 ? null : new BankMenuContext(new BankKey(character, BankStorageKind.GlamourDresser, 0), "Glamour dresser", "",
+                    Vector2.Zero, Optional(static _ => DresserLoaded(), character, false, "glamour dresser"));
                 var armoire = character == 0 ? null : new BankMenuContext(new BankKey(character, BankStorageKind.Armoire, 0), "Armoire", "",
-                    Vector2.Zero, ArmoireLoaded());
+                    Vector2.Zero, Optional(static _ => ArmoireLoaded(), character, false, "armoire"));
+                // 0.345 (g, I-03): the character's own bags, crystals and currencies, recorded like the armoury so the other characters'
+                // can be seen; named after the character (« Name (World) ») for the overview of every character.
+                var who = character == 0 ? "" : CharacterLabel();
+                BankMenuContext? Own(BankStorageKind kind, string read) => character == 0 || who.Length == 0 ? null
+                    : new BankMenuContext(new BankKey(character, kind, 0), who, "", Vector2.Zero, Optional(_ => IsLoaded(kind), character, false, read));
+                var bags = Own(BankStorageKind.Bags, "bags");
+                var crystals = Own(BankStorageKind.Crystals, "crystals");
+                var currencies = Own(BankStorageKind.Currency, "currencies");
                 var message = state.Message;
                 if (importing?.IsCompleted == true)
                 {
-                    message = importing.GetAwaiter().GetResult().Message;
+                    // Review 0.329: a silent automatic import (armoury, dresser, armoire) only reports a failure, never « saved ».
+                    var result = importing.GetAwaiter().GetResult();
+                    if (!importingSilent || !result.Success) message = result.Message;
                     importing = null;
                 }
-                knownRetainers = ReadKnownRetainers(character) ?? (character == state.CharacterId ? knownRetainers : null);
-                Volatile.Write(ref state, new(character, retainer, saddle, premium, message, knownRetainers));
+                knownRetainers = Optional(ReadKnownRetainers, character, null, "retainer list") ?? (character == state.CharacterId ? knownRetainers : null);
+                Volatile.Write(ref state, new(character, retainer, saddle, premium, message, knownRetainers, failedReads.Count > 0, company));
                 contextUpdated = true;
-                var open = new[] { retainer, saddle, premium, armoury, dresser, armoire }.Where(context => context is { Loaded: true }).Select(context => context!.Key).ToHashSet();
+                var open = new[] { retainer, saddle, premium, armoury, dresser, armoire, bags, crystals, currencies, company }.Where(context => context is { Loaded: true }).Select(context => context!.Key).ToHashSet();
                 foreach (var gone in autoCaptured.Keys.Where(openKey => !open.Contains(openKey)).ToArray()) autoCaptured.Remove(gone);
-                if (requested is null && importing is null && autoCapture() && !bank.State.Loading && !bank.State.Importing && bank.State.Error is null)
+                // 0.329: the setting covers what its label says (retainers, saddlebags); armoury, dresser and armoire have no import
+                // button, so they are recorded whatever the setting.
+                var auto = autoCapture();
+                if (requested is null && importing is null && !bank.State.Loading && !bank.State.Importing && bank.State.Error is null)
                     foreach (var openKey in open)
-                        if (!autoCaptured.TryGetValue(openKey, out var last)
-                            || now - last >= (openKey.Kind is BankStorageKind.Armoury or BankStorageKind.GlamourDresser or BankStorageKind.Armoire ? TimeSpan.FromMinutes(2) : TimeSpan.FromSeconds(30)))
+                    {
+                        var always = openKey.Kind is BankStorageKind.Armoury or BankStorageKind.GlamourDresser or BankStorageKind.Armoire || BankStorageScope.IsCharacterOwn(openKey.Kind);
+                        if ((auto || always) && (!autoCaptured.TryGetValue(openKey, out var last)
+                            || now - last >= (always ? TimeSpan.FromMinutes(2) : TimeSpan.FromSeconds(30))))
                         { autoCaptured[openKey] = now; requested = openKey; break; }
+                    }
                 if (requested is not { } key) return;
                 requested = null;
-                var context = new[] { retainer, saddle, premium, armoury, dresser, armoire }.FirstOrDefault(c => c?.Key == key);
+                var context = new[] { retainer, saddle, premium, armoury, dresser, armoire, bags, crystals, currencies, company }.FirstOrDefault(c => c?.Key == key);
                 if (context is null || !context.Loaded || character != key.CharacterId)
-                    throw new InvalidOperationException("Inventaire fermé, propriétaire changé ou conteneurs non chargés. Rouvrez le rangement et réessayez.");
+                    throw new InvalidOperationException("Inventory closed, owner changed or containers not loaded. Reopen the storage and try again.");
 
                 var types = BankStorageScope.ContainerIds(key.Kind).Select(id => (GameInventoryType)id).ToArray();
                 var owner = new InventoryOwnerId(key.Kind == BankStorageKind.Retainer ? key.StorageId : key.CharacterId);
@@ -156,20 +181,45 @@ internal sealed class BankInventoryBridge : IDisposable
                     _ => InventoryNativeReader.Capture(inventory, owner, types, $"Dalamud/manual-bank/{key.Kind}"),
                 };
                 var after = key.Kind == BankStorageKind.Retainer ? GetRetainer(CharacterId)
-                    : key.Kind == BankStorageKind.Armoury ? (IsLoaded(BankStorageKind.Armoury) ? context : null)
-                    : key.Kind is BankStorageKind.GlamourDresser or BankStorageKind.Armoire ? context : GetSaddle(CharacterId, key.Kind);
+                    : key.Kind == BankStorageKind.Armoury || BankStorageScope.IsCharacterOwn(key.Kind) ? (IsLoaded(key.Kind) ? context : null)
+                    : key.Kind is BankStorageKind.GlamourDresser or BankStorageKind.Armoire ? context
+                    : key.Kind == BankStorageKind.FreeCompanyChest ? GetFreeCompany(CharacterId) : GetSaddle(CharacterId, key.Kind);
                 if (CharacterId != key.CharacterId || after?.Key != key || after?.Loaded != true
                     || snapshot.Containers.Values.Any(c => c.Coverage != InventoryCoverage.Complete))
-                    throw new InvalidOperationException("Lecture incomplète ou identité modifiée. L'ancien cache est conservé ; réessayez une fois l'inventaire chargé.");
+                    throw new InvalidOperationException("Incomplete reading or identity changed. The old cache is kept; try again once the inventory is loaded.");
                 importing = bank.ImportAsync(new BankEntry(key, context.Name, snapshot));
-                Volatile.Write(ref state, state with { Message = "Import en cours…" });
+                importingSilent = key.Kind is BankStorageKind.Armoury or BankStorageKind.GlamourDresser or BankStorageKind.Armoire || BankStorageScope.IsCharacterOwn(key.Kind);
+                if (!importingSilent) Volatile.Write(ref state, state with { Message = "Import en cours…" });
             }
             catch (Exception error)
             {
                 if (state.Message != error.Message) log.Warning(error, "Tensho manual inventory import/context failed.");
+                // 0.329 (R-14): the character comes from the Dalamud API, not from the failed read; publishing 0 signed it out of every stock.
+                // Another character's retainer list is dropped here, or the next poll would take it for this one's.
+                if (!contextUpdated && character != state.CharacterId) knownRetainers = null;
                 Volatile.Write(ref state, contextUpdated ? state with { Message = error.Message }
-                    : new(0, null, null, null, error.Message));
+                    : new(character, null, null, null, error.Message, knownRetainers, failedReads.Count > 0, null));
             }
+        }
+    }
+
+    // 0.345: « Name (World) » of the logged-in character (Dalamud IPlayerState), stored as the name of its own storages; empty when not known.
+    private string CharacterLabel()
+    {
+        var name = player.CharacterName;
+        if (string.IsNullOrWhiteSpace(name)) return "";
+        var world = player.HomeWorld.IsValid ? player.HomeWorld.Value.Name.ExtractText() : "";
+        return world.Length > 0 ? $"{name} ({world})" : name;
+    }
+
+    // An optional native read: a failure (signature lost after a game update) reads as "not open", logged once per read.
+    private T Optional<T>(Func<ulong, T> read, ulong character, T fallback, string name)
+    {
+        try { return read(character); }
+        catch (Exception error)
+        {
+            if (failedReads.Add(name)) { log.Warning(error, "Tensho storage read unavailable ({Read}); other storages stay recorded.", name); }
+            return fallback;
         }
     }
 
@@ -209,12 +259,22 @@ internal sealed class BankInventoryBridge : IDisposable
         return new(key, retainer->NameString, addon.Name, addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(key.Kind));
     }
 
+    // 0.350 (g, I-09): the company chest window; loaded once every page (and gil, crystals) has been received from the game.
+    private BankMenuContext? GetFreeCompany(ulong character)
+    {
+        if (character == 0) return null;
+        var addon = FindVisible("FreeCompanyChest");
+        if (addon.IsNull) return null;
+        return new(new BankKey(character, BankStorageKind.FreeCompanyChest, 0), "Company chest", addon.Name,
+            addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(BankStorageKind.FreeCompanyChest));
+    }
+
     private BankMenuContext? GetSaddle(ulong character, BankStorageKind kind)
     {
         if (character == 0) return null;
         var addon = FindVisible("InventoryBuddy", "InventoryBuddy2");
         if (addon.IsNull) return null;
-        return new(new BankKey(character, kind, 0), kind == BankStorageKind.Saddlebag ? "Sacoche chocobo" : "Sacoche chocobo supplémentaire",
+        return new(new BankKey(character, kind, 0), kind == BankStorageKind.Saddlebag ? "Sacoche chocobo" : "Premium chocobo saddlebag",
             addon.Name, addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(kind));
     }
 
@@ -225,7 +285,7 @@ internal sealed class BankInventoryBridge : IDisposable
     private unsafe InventorySnapshot DresserSnapshot(InventoryOwnerId owner)
     {
         var mirage = MirageManager.Instance();
-        if (mirage == null || !mirage->PrismBoxLoaded) throw new InvalidOperationException("Coffre à apparence non chargé.");
+        if (mirage == null || !mirage->PrismBoxLoaded) throw new InvalidOperationException("Glamour dresser not loaded.");
         var stacks = new List<InventoryStack>();
         var ids = mirage->PrismBoxItemIds;
         for (var slot = 0; slot < ids.Length; slot++)
@@ -246,7 +306,7 @@ internal sealed class BankInventoryBridge : IDisposable
     private unsafe InventorySnapshot ArmoireSnapshot(InventoryOwnerId owner)
     {
         var ui = FFXIVClientStructs.FFXIV.Client.Game.UI.UIState.Instance();
-        if (ui == null || !ui->Cabinet.IsCabinetLoaded()) throw new InvalidOperationException("Armoire non chargée.");
+        if (ui == null || !ui->Cabinet.IsCabinetLoaded()) throw new InvalidOperationException("Armoire not loaded.");
         var stacks = new List<InventoryStack>();
         // Slots are numbered in order (0.238: Cabinet row ids exceed the stored slot bound of 1000).
         foreach (var (row, item) in cabinetRows())

@@ -73,7 +73,7 @@ public sealed class DataCache : IDisposable
             finally{io.Release();}
         }
         catch(OperationCanceledException){return null;}
-        catch(Exception failure){Volatile.Write(ref error,"Cache local indisponible : "+failure.Message);return null;}
+        catch(Exception failure){Volatile.Write(ref error,"Local cache unavailable: "+failure.Message);return null;}
         });
         reads=Task.WhenAll(reads,pending);return pending;
         }
@@ -105,7 +105,7 @@ public sealed class DataCache : IDisposable
                     }
                     finally{io.Release();}
                 }
-                catch(Exception failure){if(failure is not OperationCanceledException)Volatile.Write(ref error,"Cache local non sauvegardé : "+failure.Message);return false;}
+                catch(Exception failure){if(failure is not OperationCanceledException)Volatile.Write(ref error,"Local cache not saved: "+failure.Message);return false;}
                 finally{if(temporary is not null)try{File.Delete(temporary);}catch(Exception cleanup) when(cleanup is IOException or UnauthorizedAccessException){} }
             });
             writes=pending;return pending;

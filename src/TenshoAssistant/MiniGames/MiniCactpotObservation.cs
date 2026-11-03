@@ -11,7 +11,7 @@ public sealed class MiniCactpotObservedFrame
     public IReadOnlyList<int> Board {get;}
     public int Revealed {get;}
     public bool Playable=>Revealed is >=1 and <=4;
-    public string Source=>"FFXIVClientStructs.AddonLotteryDaily.GameNumbers · ordre ligne/colonne";
+    public string Source=>"FFXIVClientStructs.AddonLotteryDaily.GameNumbers · row/column order";
     // Overlay (0.158): screen rectangles of the 9 cells (row by row) and of the 8 line buttons in the solver's line order
     // (rows, columns, diagonal ↘, diagonal ↙); null when a button could not be read, so nothing is drawn.
     public IReadOnlyList<MiniCactpotRect>? Tiles {get;}
@@ -21,7 +21,7 @@ public sealed class MiniCactpotObservedFrame
         ArgumentNullException.ThrowIfNull(board);
         var values=board.ToArray();
         if(values.Length!=9 || values.Any(value=>value is <0 or >9) || values.Where(value=>value!=0).Distinct().Count()!=values.Count(value=>value!=0))
-            throw new ArgumentException("Plateau observé incomplet, hors bornes ou chiffres répétés.",nameof(board));
+            throw new ArgumentException("Observed board incomplete, out of bounds or with repeated numbers.",nameof(board));
         Board=Array.AsReadOnly(values);Revealed=values.Count(value=>value!=0);
         Tiles=tiles is { Count:9 } && tiles.All(rect=>rect.Valid) ? Array.AsReadOnly(tiles.ToArray()):null;
         Lanes=lanes is { Count:8 } && lanes.All(rect=>rect.Valid) ? Array.AsReadOnly(lanes.ToArray()):null;

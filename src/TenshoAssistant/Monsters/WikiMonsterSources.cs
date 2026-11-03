@@ -68,7 +68,9 @@ public static class MonsterDropCandidates
 public sealed class WikiMonsterSources : IDisposable
 {
     public static readonly TimeSpan RequestInterval=TimeSpan.FromSeconds(3);
-    private const string Family="wiki-monsters",Version="wiki-parse-v1";
+    private const string Version="wiki-parse-v1";
+    // 0.367 (g, C-13): the blue magic spell pages use their own disk family (spell ids, not item ids).
+    private readonly string Family;
     private readonly object gate=new();
     private readonly Func<uint,string?> englishName;
     private readonly Func<TimeSpan> lifetime;
@@ -83,8 +85,10 @@ public sealed class WikiMonsterSources : IDisposable
     private DateTimeOffset lastRequest;
     private WikiMonsterState state=new(0,false,null,null);
     public WikiMonsterState State=>Volatile.Read(ref state);
-    public WikiMonsterSources(Func<uint,string?> englishName,Func<TimeSpan> lifetime,DataCache? disk=null,HttpClient? http=null)
-    {this.englishName=englishName;this.lifetime=lifetime;this.disk=disk;this.http=http ?? new HttpClient{Timeout=TimeSpan.FromSeconds(15)};ownsHttp=http is null;}
+    // 0.324: the wiki switch (Settings › Advanced) now stops monster lookups too, on the page and on hover; copies are still read.
+    public Func<bool>? Enabled { get; set; }
+    public WikiMonsterSources(Func<uint,string?> englishName,Func<TimeSpan> lifetime,DataCache? disk=null,HttpClient? http=null,string family="wiki-monsters")
+    {Family=family;this.englishName=englishName;this.lifetime=lifetime;this.disk=disk;this.http=http ?? new HttpClient{Timeout=TimeSpan.FromSeconds(15)};ownsHttp=http is null;}
     public bool IsFresh(WikiMonsterDocument document)=>CacheAge.Fresh(document.FetchedAt,DateTimeOffset.UtcNow,lifetime());
 
     /// <summary>Memory or disk copy, whatever its age; never touches the network.</summary>
@@ -106,6 +110,7 @@ public sealed class WikiMonsterSources : IDisposable
         lock(gate)
         {
             ObjectDisposedException.ThrowIf(disposed,this);
+            if(Enabled?.Invoke()==false)throw new SourceDisabledException("FFXIV Console Games Wiki");
             if(DateTimeOffset.UtcNow-lastRequest<RequestInterval)throw new InvalidOperationException("Please wait three seconds before another wiki request.");
             lastRequest=DateTimeOffset.UtcNow;
         }

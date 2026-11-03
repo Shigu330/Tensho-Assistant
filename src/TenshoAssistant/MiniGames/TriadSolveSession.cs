@@ -34,7 +34,7 @@ public sealed class TriadSolveSession : IDisposable
                 {
                     lock (gate)
                         if (!disposed && ticket == generation)
-                            state = new(position, owner, revision, null, false, error is OperationCanceledException ? "Calcul annulé." : error.Message);
+                            state = new(position, owner, revision, null, false, error is OperationCanceledException ? "Calculation cancelled." : error.Message);
                 }
             });
         }

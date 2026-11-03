@@ -12,15 +12,22 @@
 
    Missing translations are allowed and fall back to English. Invalid JSON,
    metadata, formats, placeholders, duplicate keys and unknown keys must be fixed.
+   `.\scripts\Verify.ps1` runs the same validation, and also fails when a setting tooltip named in the code is missing in
+   `en.json` or `fr.json`.
 
 6. Submit a pull request.
 
 English is the reference language. Missing keys fall back to English, then to `[Key.Name]`.
 
+Current state (2026-11-02): English and French are complete (French must stay complete); German (`de.json`) and Japanese
+(`ja.json`) only translate a few dozen keys and have not been reviewed by native speakers. The completion of each language is
+shown in Settings → Debug and in the contributor panel of Diagnostics (developer mode).
+
 Language files are discovered automatically; no enum or C# window changes are needed.
-The build embeds bundled languages for DLL-only development installs and also
-packages the editable JSON files. External values override bundled values.
-Use Settings → Interface to enable Developer mode, then Settings → Debug → Reload translations
+Since 0.248 the languages live only inside `TenshoAssistant.dll` (embedded resources); the package ships no
+language file. To test a translation, create a `Localization/Languages` folder next to the installed DLL and put
+the JSON file there: external values override bundled values.
+Use Settings → Advanced to enable Developer mode, then Settings → Debug → Reload translations
 to load edits from the installed plugin's `Localization/Languages` directory.
 The same panel can show translation keys. Reloading is explicit; JSON is never
 parsed by the normal translation lookup during rendering.

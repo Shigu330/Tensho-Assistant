@@ -32,6 +32,8 @@ internal sealed unsafe class QuestReader : IDisposable
     private readonly Func<TimeSpan> cacheLifetime;
     private readonly DataCache? disk;
     private string? cacheVersion;
+    // 0.283: entries carry the journal section; older cached quest lists are read again.
+    private const string QuestCacheShape="|quest-locks-286";
     private Task<CachedValue<QuestCacheData>?>? restore;
     public QuestReader(QuestService service, IDataManager data, IFramework framework,
         IPlayerState player, IClientState client, IUnlockState unlocks, IPluginLog log,Func<TimeSpan>? cacheLifetime=null,DataCache? disk=null)
@@ -44,7 +46,14 @@ internal sealed unsafe class QuestReader : IDisposable
     }
     private void OnLogout(int type,int code)
     {
-        lock(gate){character=0;entries.Clear();position=0;restore=null;nextRefresh=0;service.Invalidate();scanning=service.State.Entries.Count==0;}
+        // 0.331: the kept catalogue is published again without character (no progress, not loading, reward index rebuilt); left
+        // invalidated, it stayed « loading » with no reward index until the next login, nothing rescanning without a character.
+        lock(gate)
+        {
+            character=0;entries.Clear();position=0;restore=null;nextRefresh=0;service.Invalidate();
+            if(service.State.Entries.Count>0)service.Publish(0,service.State.Entries);
+            scanning=service.State.Entries.Count==0;
+        }
     }
     private void OnUpdate(IFramework unused)
     {
@@ -59,8 +68,8 @@ internal sealed unsafe class QuestReader : IDisposable
                 character = owner; position = 0; entries.Clear(); scanning = true;
                 rewardReadUnavailable=false;rewardErrorLogged=false;
                 service.Invalidate();
-                if(force && owner!=0 && disk is not null)_=disk.InvalidateAsync("quests",owner.ToString(),cacheVersion ??= GameCacheIdentity.For(data));
-                restore=!force && owner!=0 && disk is not null ? disk.ReadAsync<QuestCacheData>("quests",owner.ToString(),cacheVersion ??= GameCacheIdentity.For(data)):null;
+                if(force && owner!=0 && disk is not null)_=disk.InvalidateAsync("quests",owner.ToString(),cacheVersion ??= GameCacheIdentity.For(data)+QuestCacheShape);
+                restore=!force && owner!=0 && disk is not null ? disk.ReadAsync<QuestCacheData>("quests",owner.ToString(),cacheVersion ??= GameCacheIdentity.For(data)+QuestCacheShape):null;
                 scanning=restore is null;
             }
             if(restore is { } loading)
@@ -93,18 +102,33 @@ internal sealed unsafe class QuestReader : IDisposable
                             : unlocks.IsQuestCompleted(row) ? QuestProgress.Complete : QuestProgress.Unconfirmed;
                         byte? sequence = progress == QuestProgress.Active ? QuestManager.GetQuestSequence(row.RowId) : null;
                         var rewards=CopyRewards(row,out var rewardError);
-                        entries.Add(new(row.RowId, name, row.JournalGenre.Value.Name.ExtractText(), row.Icon, progress, sequence)
+                        var sectionName = ""; var sectionId = (byte)255;
+                        if (row.JournalGenre.IsValid && row.JournalGenre.Value.JournalCategory.IsValid
+                            && row.JournalGenre.Value.JournalCategory.Value.JournalSection.IsValid)
                         {
+                            var section = row.JournalGenre.Value.JournalCategory.Value.JournalSection;
+                            sectionName = section.Value.Name.ExtractText();
+                            sectionId = section.RowId < 255 ? (byte)section.RowId : (byte)255;
+                        }
+                        // 0.331 (R-14): every sheet link checked before it is read; one that does not resolve gives an empty or 0 value
+                        // instead of failing the whole quest catalogue.
+                        entries.Add(new(row.RowId, name, row.JournalGenre.IsValid ? row.JournalGenre.Value.Name.ExtractText() : "", row.Icon, progress, sequence)
+                        {
+                            Section = sectionName,
+                            SectionId = sectionId,
+                            GenreId = row.JournalGenre.RowId,
+                            Place = row.PlaceName.IsValid ? row.PlaceName.Value.Name.ExtractText() : "",
                             PreviousQuestIds = Array.AsReadOnly(row.PreviousQuest.Select(link => link.RowId).Where(id => id != 0).Distinct().ToArray()),
                             PreviousQuestJoin = row.PreviousQuestJoin,
+                            LockIds = Array.AsReadOnly(row.QuestLock.Select(link => link.RowId).Where(id => id != 0).Distinct().ToArray()),
                             PreviousQuestStep = row.Unknown7,
                             IsRepeatable = row.IsRepeatable,
                             Level = row.ClassJobLevel.FirstOrDefault(),
                             AdditionalLevel = row.ClassJobLevel.Skip(1).FirstOrDefault(),
-                            Zone = row.PlaceName.RowId == 0 ? "" : row.PlaceName.Value.Name.ExtractText(),
+                            Zone = row.PlaceName.RowId == 0 || !row.PlaceName.IsValid ? "" : row.PlaceName.Value.Name.ExtractText(),
                             IssuerId = row.IssuerStart.RowId,
-                            IssuerMapId = row.IssuerLocation.RowId == 0 ? 0 : row.IssuerLocation.Value.Map.RowId,
-                            IssuerTerritoryId = row.IssuerLocation.RowId == 0 ? 0 : row.IssuerLocation.Value.Territory.RowId
+                            IssuerMapId = row.IssuerLocation.RowId == 0 || !row.IssuerLocation.IsValid ? 0 : row.IssuerLocation.Value.Map.RowId,
+                            IssuerTerritoryId = row.IssuerLocation.RowId == 0 || !row.IssuerLocation.IsValid ? 0 : row.IssuerLocation.Value.Territory.RowId
                             ,Rewards=rewards,RewardsError=rewardError
                         });
                     }
@@ -115,7 +139,7 @@ internal sealed unsafe class QuestReader : IDisposable
                 if (after != character) { service.Invalidate(); character = after; position = 0; entries.Clear(); rewardReadUnavailable=false;rewardErrorLogged=false;return; }
                 service.Publish(character, entries);
                 if(character!=0 && disk is not null && service.State.ObservedAt is { } date)
-                    _=disk.WriteAsync("quests",character.ToString(),cacheVersion ??= GameCacheIdentity.For(data),new QuestCacheData(character,service.State.Entries),date);
+                    _=disk.WriteAsync("quests",character.ToString(),cacheVersion ??= GameCacheIdentity.For(data)+QuestCacheShape,new QuestCacheData(character,service.State.Entries),date);
                 entries.Clear(); scanning = false;
                 nextRefresh = 0;
             }
@@ -130,7 +154,7 @@ internal sealed unsafe class QuestReader : IDisposable
     private QuestRewardSnapshot? CopyRewards(Quest row,out string? error)
     {
         error=null;
-        if(rewardReadUnavailable){error="Récompenses non disponibles dans ce relevé ; progression et autres données conservées.";return null;}
+        if(rewardReadUnavailable){error="Rewards not available in this reading; progress and other data kept.";return null;}
         try
         {
             rewardJobs ??= data.GetSubrowExcelSheet<QuestClassJobReward>();
@@ -140,13 +164,13 @@ internal sealed unsafe class QuestReader : IDisposable
         }
         catch(Exception failure)
         {
-            rewardReadUnavailable=true;error="Tables de récompenses indisponibles ; autres données de quête conservées.";
+            rewardReadUnavailable=true;error="Reward tables unavailable; other quest data kept.";
             log.Warning(failure,"Quest reward tables unavailable; quest observations retained.");return null;
         }
         try{return QuestRewardCopy.FromRow(row,rewardJobs,rewardBonuses,rewardTomestones,rewardDataVersion);}
         catch(Exception failure)
         {
-            error="Récompenses de cette quête non interprétables ; autres données conservées.";
+            error="This quest's rewards cannot be interpreted; other data kept.";
             if(!rewardErrorLogged){rewardErrorLogged=true;log.Warning(failure,"Quest reward row unavailable; other observations retained.");}
             return null;
         }

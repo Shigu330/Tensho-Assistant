@@ -13,6 +13,27 @@ public sealed record DerivedStat(string Key, string Value, int Raw, string Attri
 /// </summary>
 public static class StatFormulas
 {
+    // The table below is taken from Character Panel Refined (https://github.com/Kouzukii/ffxiv-characterstatus-refined),
+    // under this licence (notice added 0.320, R-13):
+    // Copyright (c) 2022 Kouzukii
+    //
+    // Permission is hereby granted, free of charge, to any person obtaining a copy
+    // of this software and associated documentation files (the "Software"), to deal
+    // in the Software without restriction, including without limitation the rights
+    // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    // copies of the Software, and to permit persons to whom the Software is
+    // furnished to do so, subject to the following conditions:
+    //
+    // The above copyright notice and this permission notice shall be included in all
+    // copies or substantial portions of the Software.
+    //
+    // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    // SOFTWARE.
     // Main stat modifier per level, levels 1–100 (0.184): not in the game sheets. Taken as data from Character Panel Refined (Kouzukii, MIT,
     // CharacterPanelRefined/LevelModifiers.cs, read 2026-10-31), whose Sub and Div columns match ParamGrow at levels 50/70/80/90/100
     // (docs/evidence/0.182.0-paramgrow-probe.log). Unknown levels give no Main-based value.
@@ -68,6 +89,43 @@ public static class StatFormulas
         rows.Add(new("MagicDefense", Percent(Math.Floor(15.0 * magic / m.Div)), magic, "MagicDefense"));
         return rows;
     }
+
+    /// <summary>
+    /// g, M-09 (0.380): the stat tier of a derived value (user's choice: kept as information on one's own character, DEC-009). Points still
+    /// needed for the value to move to its next step, and points above the current step that change nothing (« wasted »). The
+    /// floor(K × (x − base) / Div) formulas above are solved exactly; the GCD is searched step by step. Null when the key has no formula
+    /// or the modifiers are unknown.
+    /// </summary>
+    public static (int ToNext, int Wasted)? Tier(string key, int raw, LevelModifiers m)
+    {
+        if (m.Div <= 0) return null;
+        (int K, int Base)? linear = key switch
+        {
+            "CritRate" or "CritDamage" => (200, m.Sub),
+            "DirectRate" => (550, m.Sub),
+            "SpeedBonus" => (130, m.Sub),
+            "Tenacity" => (112, m.Sub),
+            "Determination" when m.Main > 0 => (140, m.Main),
+            "Piety" when m.Main > 0 => (150, m.Main),
+            "Defense" or "MagicDefense" => (15, 0),
+            _ => null,
+        };
+        if (linear is { } line)
+        {
+            long q = FloorDiv((long)line.K * (raw - line.Base), m.Div);
+            var next = line.Base + CeilDiv((q + 1) * m.Div, line.K);
+            var start = line.Base + CeilDiv(q * m.Div, line.K);
+            return ((int)(next - raw), (int)(raw - start));
+        }
+        if (key != "Gcd") return null;
+        double Gcd(int speed) => Math.Floor(Math.Floor((1000 + Math.Ceiling(-130.0 * (speed - m.Sub) / m.Div)) * 2500 / 1000) / 10) / 100;
+        var now = Gcd(raw); var limit = 4 * m.Div;
+        var up = 1; while (up < limit && Gcd(raw + up) == now) up++;
+        var down = 0; while (down < limit && raw - down - 1 >= 0 && Gcd(raw - down - 1) == now) down++;
+        return up >= limit ? null : (up, down);
+    }
+    private static long FloorDiv(long a, long b) => a / b - (a % b != 0 && (a < 0) != (b < 0) ? 1 : 0);
+    private static long CeilDiv(long a, long b) => -FloorDiv(-a, b);
 
     /// <summary>Attributes useful to the job's category: combat, gathering (32) or crafting (33).</summary>
     public static IReadOnlyList<string> Useful(int category) => category switch

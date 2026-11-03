@@ -35,7 +35,7 @@ internal sealed class GatheringObservationReader : IDisposable
     private static unsafe GatheringRawSlot[] Copy(AddonGathering* addon)
     {
         if(addon->ItemIds.Length!=8 || addon->ItemFlags.Length!=8 || addon->GatheredItemComponentCheckbox.Length!=8)
-            throw new InvalidOperationException("Nombre de lignes de récolte incompatible.");
+            throw new InvalidOperationException("Incompatible number of gathering rows.");
         var copied=new GatheringRawSlot[8];
         for(var index=0;index<8;index++)
         {

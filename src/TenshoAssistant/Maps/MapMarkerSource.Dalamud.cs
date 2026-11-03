@@ -16,14 +16,19 @@ internal sealed class MapMarkerSource
 {
     private readonly IDataManager data;private readonly IPluginLog log;
     private readonly Dictionary<uint,IReadOnlyList<MapIconMarker>> cache=[];
+    // 0.328: ranges whose read threw, kept apart from the cache so a failure is « unavailable », never « no icons »;
+    // not retried (For runs from Draw, a retry would throw every frame).
+    private readonly HashSet<uint> failed=[];
     private Dictionary<uint,MapDefinition>? overviews;
     private Dictionary<uint,uint>? regionMaps;
     private List<uint>? regionOrder;
     private uint worldMap;
     public MapMarkerSource(IDataManager data,IPluginLog log){this.data=data;this.log=log;}
+    /// <summary>True when the fixed markers of this range could not be read (For then returns an empty list).</summary>
+    public bool Failed(uint range)=>failed.Contains(range);
     public IReadOnlyList<MapIconMarker> For(uint range)
     {
-        if(range==0)return [];
+        if(range==0 || failed.Contains(range))return [];
         if(cache.TryGetValue(range,out var known))return known;
         var markers=new List<MapIconMarker>();
         try
@@ -35,7 +40,7 @@ internal sealed class MapMarkerSource
                     if(row.Icon!=0 || label.Length>0)markers.Add(new(row.X,row.Y,row.Icon,label,row.DataType==1 ? row.DataKey.RowId:0,row.DataType==3 ? row.DataKey.RowId:0));
                 }
         }
-        catch(Exception error){log.Warning(error,"Map markers unavailable for range {0}.",range);}
+        catch(Exception error){log.Warning(error,"Map markers unavailable for range {0}.",range);failed.Add(range);return [];}
         return cache[range]=markers.AsReadOnly();
     }
 
