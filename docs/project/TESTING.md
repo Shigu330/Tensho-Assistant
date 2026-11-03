@@ -714,6 +714,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.448 : N-08 journal de jardinage** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Rappels › Journal de jardinage : ajouter une parcelle (lieu, graine, pousse 1 h, entretien 0) : « Mûr le … » une heure plus tard ;
+  à l'heure dite, une seule ligne « Jardin : … est mûr » dans le chat ; « Replanter » repart de zéro ; « Retirer » l'enlève.
+- [ ] Avec un entretien (par exemple 1 h sur une pousse de 3 h) : la ligne « entretenir » arrive une fois ; « Entretenu » repousse le suivant.
+- [ ] Redémarrer le jeu après un rappel : il n'est pas répété.
+
 **0.447 : décisions du 2026-11-03 (DEC-026)** — pendant la campagne de tests en jeu de la fin (étape h)
 
 - [ ] Train de chasse : « Envoyer » est grisé tant qu'aucun drapeau n'a été posé depuis le train ; après « Drapeau suivant », choisir

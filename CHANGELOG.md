@@ -3,6 +3,21 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.448.0
+- N-08 (décision du 2026-11-03, DEC-026) : « Journal de jardinage » dans la page Rappels. Pour chaque parcelle ou pot : lieu et graine
+  (vos mots), durée de pousse et intervalle d'entretien tapés en heures (le jeu ne les donne pas : rien n'est deviné, 0 = pas de rappel
+  d'entretien). Tensho affiche l'heure de récolte et le prochain entretien ; boutons « Entretenu », « Replanter », « Retirer » ;
+  64 parcelles au plus. Réglage « Me le rappeler dans le chat » (activé) : une ligne dans le chat, et le son des alarmes s'il est activé,
+  quand une parcelle est mûre ou à entretenir, une fois chacune (gardé sur disque : pas de répétition après un redémarrage), vérifié
+  toutes les 10 s. Le journal est gardé par « Tout remettre par défaut ». Rien n'est lu dans le jeu.
+- CI : le premier passage du workflow « Build and test » (0.447) a trouvé un test qui dépendait des fins de ligne (Paissa445Tests lisait
+  Configuration.cs sans normaliser CRLF) : corrigé.
+- Tests : Garden448Tests (3 cas). Verify.ps1 (agent) : 813/813, 0 avertissement, 0 erreur ; DLL 0.448.0.0. Non validé en jeu.
+### English
+- N-08: garden journal on the Reminders page: beds and pots with the growing and tending hours you type (the game does not give
+  them), harvest and tending times, optional chat reminders once each.
+- CI: a test no longer depends on the files' line endings.
+
 ## 0.447.0
 - Décisions du 2026-11-03 (DEC-026), premier lot appliqué :
   - X-13 : bouton « Envoyer » à côté de « Copier l'annonce » dans le train de chasse : l'annonce part dans le canal choisi

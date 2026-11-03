@@ -113,7 +113,8 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
 - **Reminders**: the game calendar timers (supply missions, custom deliveries, Fashion Report, allied society quests, leve allowances,
   treasure maps, retainer ventures, company voyages, Grand Company squadron) with resets and alarm buttons; Wondrous Tails (tasks, line
   odds), hunt bills (targets and kills), daily roulettes and role bonus, challenge log, Doman Enclave; « done » boxes per character, all
-  your characters at a glance, your own tasks (daily, weekly, every n hours, once, counters) with an optional on-screen panel.
+  your characters at a glance, your own tasks (daily, weekly, every n hours, once, counters) with an optional on-screen panel, and a
+  garden journal (growing and tending hours you type, harvest and tending reminders).
 
 ### Free company
 
@@ -410,7 +411,8 @@ Ce que fait le code aujourd'hui. La validation en jeu de chaque partie est suivi
   alliés, autorisations de mandats, cartes au trésor, tâches de servant, expéditions de la compagnie, escouade de Grande Compagnie) avec
   remises à zéro et alarmes ; Livre d'or (tâches, chances de lignes), contrats de chasse (cibles et victimes), missions aléatoires du
   jour et bonus de rôle, carnet d'objectifs, Enclave de Doman ; cases « fait » par personnage, vue de tous vos personnages, vos propres
-  tâches (chaque jour, chaque semaine, toutes les n heures, une fois, compteurs) avec un panneau à l'écran en option.
+  tâches (chaque jour, chaque semaine, toutes les n heures, une fois, compteurs) avec un panneau à l'écran en option, et un journal de
+  jardinage (durées de pousse et d'entretien tapées par vous, rappels de récolte et d'entretien).
 
 ### Compagnie libre
 

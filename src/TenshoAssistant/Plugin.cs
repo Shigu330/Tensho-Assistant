@@ -859,6 +859,7 @@ public sealed class Plugin : IDalamudPlugin
         mainWindow.DrawOceanVoyagePanel();
         mainWindow.ProcessGameLogRequest();
         mainWindow.ObserveHuntTrain();
+        mainWindow.ObserveGarden();
         mainWindow.WatchPlots();
         mainWindow.DrawFishingPanel();
     }

@@ -110,6 +110,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndTable();}
         ImGui.TextDisabled(localization.Get("Reminders.Help"));
         DrawPersonalTasks();
+        DrawGardenJournal();
         DrawDailyRoulettes(timers);
         DrawCharacterStatuses();
 

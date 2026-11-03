@@ -27,6 +27,8 @@ public static class ConfigurationReset
         "OrchestrionFavorites",
         // 0.375 (g, M-05): the player's own tasks.
         "PersonalTasks",
+        // 0.448 (N-08): the garden journal.
+        "GardenBeds",
     };
 
     public static readonly IReadOnlySet<string> Reset = new HashSet<string>
@@ -77,6 +79,8 @@ public static class ConfigurationReset
         "HuntMarkAlert",
         // 0.447 (X-13): chat channel of the conductor's call.
         "HuntAnnounceChannel",
+        // 0.448 (N-08): garden journal reminders.
+        "GardenAlerts",
         // 0.403 (g, R-08): GP alert and its threshold.
         "GpAlert", "GpAlertThreshold",
     };
@@ -400,6 +404,11 @@ public sealed partial class Configuration
     private List<Reminders.PersonalTask>? personalTasks;
     public List<Reminders.PersonalTask>? PersonalTasks { get=>Volatile.Read(ref personalTasks); set=>Volatile.Write(ref personalTasks,value); }
     public bool TaskPanel { get; set; }
+    // 0.448 (N-08, DEC-026): the garden journal (64 beds at most, durations typed by the player) and its chat reminders (on: the player
+    // only gets them for beds they noted).
+    private List<Reminders.GardenBed>? gardenBeds;
+    public List<Reminders.GardenBed>? GardenBeds { get=>Volatile.Read(ref gardenBeds); set=>Volatile.Write(ref gardenBeds,value); }
+    public bool GardenAlerts { get; set; } = true;
     // 0.403 (g, R-08): chat line and sound when a gatherer's GP rises to the threshold (0 = full); off by default.
     public bool GpAlert { get; set; }
     public int GpAlertThreshold { get; set; }

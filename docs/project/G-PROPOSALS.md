@@ -102,6 +102,6 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 | N-10 (atelier de l'île, solveur) | Gros : lecture de l'offre et de la demande du jeu et solveur ; à faire en ultracode, avec toi |
 | N-04 (loterie immobilière) | État des mises du joueur : structure du jeu non trouvée dans FFXIVClientStructs (à sonder en jeu) |
 | N-12 (conditions d'apparition des rangs S), N-13 (meubles visibles), X-14 (outils d'aménagement) | Règles communautaires par marque, lecture des meubles et correctifs d'affichage : sources et risques à décider ensemble |
-| N-08 (journal de jardinage) | Les feuilles du jeu ne donnent pas la durée de pousse ni l’entretien : journal possible seulement avec des durées tapées par toi ; à décider |
+| N-08 (journal de jardinage) | FAIT 0.448 (décidé le 2026-11-03, DEC-026) : journal avec durées tapées par le joueur, page Rappels |
 | N-14 (planificateur de croisements de jardinage) | Les données LuminaSupplemental ne donnent pas les paires de graines ; il faut choisir une source communautaire (licence à vérifier) |
 | I-15 (recherche dans les fenêtres d'inventaire du jeu) | Touche l'interface du jeu : à faire en ultracode, avec l'utilisateur |
