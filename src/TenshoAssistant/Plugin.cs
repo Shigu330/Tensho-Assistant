@@ -680,6 +680,10 @@ public sealed class Plugin : IDalamudPlugin
                 return squadronSheets;
             };
             mainWindow.SquadronMemberName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ENpcResident>().GetRowOrDefault(id)?.Singular.ExtractText();
+            // 0.460 (DEC-027 follow-up, user request): plantings read from the chat.
+            Reminders.GardenChatWatcher? gardenWatcher=null;
+            registrations.Register(()=>gardenWatcher=new Reminders.GardenChatWatcher(chatGui,framework,data,client,log,()=>configuration.GardenDetect,
+                id=>mainWindow.GardenSeedCatalog?.Invoke().Any(row=>row.Item1.SeedId==id)==true,mainWindow.GardenPlanted),()=>gardenWatcher?.Dispose());
             mainWindow.SquadronTrainingName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyTraining>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.321: a failing Try On (game function moved) is logged once and its buttons turn off for the session.
             mainWindow.TryOnItem=item=>

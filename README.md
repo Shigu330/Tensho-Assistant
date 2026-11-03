@@ -115,7 +115,7 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
   odds), hunt bills (targets and kills), daily roulettes and role bonus, challenge log, Doman Enclave; « done » boxes per character, all
   your characters at a glance, your own tasks (daily, weekly, every n hours, once, counters) with an optional on-screen panel, and a
   squadron mission planner (best parties of four from the game's data, estimate not yet checked in game).
-- **Garden**: a journal of your beds and pots (growing and tending hours filled from a seed list or typed, harvest and tending reminders), and
+- **Garden**: a journal of your beds and pots (plantings noted automatically from the game's chat lines, or by hand; hours filled from a seed list; harvest and tending reminders), and
   crossbreeding pairs with a planting plan for the seed you want.
 
 ### Free company
@@ -415,8 +415,8 @@ Ce que fait le code aujourd'hui. La validation en jeu de chaque partie est suivi
   jour et bonus de rôle, carnet d'objectifs, Enclave de Doman ; cases « fait » par personnage, vue de tous vos personnages, vos propres
   tâches (chaque jour, chaque semaine, toutes les n heures, une fois, compteurs) avec un panneau à l'écran en option, et un planificateur
   des missions d'escouade (meilleurs groupes de quatre d'après les données du jeu, estimation pas encore vérifiée en jeu).
-- **Jardinage** : un journal de vos parcelles et pots (durées de pousse et d'entretien remplies depuis une liste de graines ou tapées, rappels de
-  récolte et d'entretien), et les paires de croisement avec un plan de plantation pour la graine voulue.
+- **Jardinage** : un journal de vos parcelles et pots (plantations notées d'office depuis les lignes du chat du jeu, ou à la main ; durées remplies depuis une liste de graines ;
+  rappels de récolte et d'entretien), et les paires de croisement avec un plan de plantation pour la graine voulue.
 
 ### Compagnie libre
 

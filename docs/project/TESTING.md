@@ -714,6 +714,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.460 : plantations détectées depuis le chat** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Planter dans un potager : une ligne « Jardin : … noté dans le journal » arrive ; la page Jardinage montre le bon potager, le bon emplacement, la bonne graine et les durées.
+- [ ] Replanter au même emplacement : la ligne est remplacée, pas doublée. Un pot : une ligne « pot ».
+- [ ] Un joueur qui écrit la même phrase dans le chat n'ajoute rien. Réglage décoché : plus rien n'est noté.
+- [ ] Entretenir et récolter : envoyer le résultat à l'agent, qui lit les lignes « Garden chat capture » de dalamud.log pour trouver leurs messages.
+
 **0.459 : icône des terminés, page Jardinage** — pendant la campagne de tests en jeu (étape h)
 
 - [x] Barre du serveur : trois icônes au plus : horloge (alarmes actives), rappels (reste à faire), terminés (visible seulement s'il y en a) ; chaque infobulle a sa liste.

@@ -31,6 +31,24 @@ internal sealed partial class MainWindow
         SaveReminders();
     }
 
+    /// <summary>
+    /// 0.460 (user request, in-game campaign): a planting read from the chat (Reminders/GardenChatWatcher): noted in the journal with the seed's hours. An unknown seed is
+    /// never guessed: the player is told to note it.
+    /// </summary>
+    internal void GardenPlanted(GardenChatEvent found,uint? seedId,string? zone)
+    {
+        var seeds=GardenSeedCatalog?.Invoke() ?? [];
+        var known=seedId is { } id ? seeds.FirstOrDefault(row=>row.Seed.SeedId==id):default;
+        if(known.Seed is null){ChatNotice?.Invoke(localization.Get("Garden.DetectedUnknown"));return;}
+        var at=zone ?? localization.Get("Garden.DetectedHere");
+        var place=found.Kind==GardenChatKind.PlantedBed ? localization.Format("Garden.PlaceBed",at,found.Patch ?? 0,found.Bed ?? 0):localization.Format("Garden.PlacePot",at);
+        var beds=GardenJournal.Detected(configuration.GardenBeds,place,known.Name,GardenSeeds.GrowHours(known.Seed),GardenSeeds.TendHours(known.Seed),DateTimeOffset.UtcNow);
+        if(beds is null){ChatNotice?.Invoke(localization.Get("Garden.Full"));return;}
+        configuration.GardenBeds=beds;
+        ChatNotice?.Invoke(localization.Format("Garden.DetectedNotice",known.Name,place));
+        SaveReminders();
+    }
+
     // 0.459 (user request, in-game campaign): the garden has its own page, out of Reminders.
     private void DrawGardenPage()
     {
@@ -45,6 +63,7 @@ internal sealed partial class MainWindow
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("Garden.Title",beds.Count)+"###GardenJournal"))return;
         ImGui.TextDisabled(localization.Get("Garden.Help"));
         BoolSetting("Garden.Alerts","Garden.AlertsTip",()=>configuration.GardenAlerts,value=>configuration.GardenAlerts=value,c=>c.GardenAlerts);
+        BoolSetting("Garden.Detect","Garden.DetectTip",()=>configuration.GardenDetect,value=>configuration.GardenDetect=value,c=>c.GardenDetect);
         var now=DateTimeOffset.UtcNow;GardenBed? removed=null;var changed=false;
         foreach(var bed in beds)
         {

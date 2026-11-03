@@ -3,6 +3,24 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.460.0
+- Demande de l'utilisateur pendant la campagne de tests : détecter le jardinage. Tensho lit les lignes du chat du jeu ; quand le jeu annonce une plantation (potager avec son
+  numéro et son emplacement, ou pot), elle s'ajoute au journal avec :
+  - la graine, lue dans la fenêtre de plantation (AgentHousingPlant, lecture seule) ;
+  - l'heure et les durées de cette graine ;
+  - le lieu (zone, quartier et terrain quand le jeu les donne).
+  Une nouvelle plantation au même emplacement remplace l'ancienne. Une ligne dans le chat confirme. Si la graine n'a pas pu être lue, ou n'est pas dans la liste (bleuets),
+  rien n'est deviné : le chat demande de l'ajouter à la main.
+- Le texte de la page Jardinage et le réglage « Noter les plantations depuis le chat » (activé) expliquent que cela vient du chat. Les lignes viennent de la feuille LogMessage,
+  dans la langue du jeu ; une ligne envoyée par un joueur ne compte jamais. Rien n'est envoyé ni fait dans le jeu.
+- Limites : deux pots ne se distinguent pas, chaque plantation en pot ajoute une ligne. L'entretien et la récolte ne sont pas encore détectés (messages à identifier).
+  Pour les trouver, dans une maison ou sur un terrain, les lignes système (sans expéditeur) vont pour l'instant dans le journal de Dalamud, en local (« Garden chat capture »).
+- Croisements : le texte dit maintenant que les fleurs en pot, dont celles de Dawntrail, ne se croisent pas (preuve : docs/evidence/0.459-garden-detection.md).
+- Tests : GardenChat460Tests (3 cas). Verify.ps1 (agent) : 858/858, 0 avertissement, 0 erreur ; DLL 0.460.0.0. Non validé en jeu.
+### English
+- Garden: plantings are detected from the game's chat lines and added to the journal with the seed read in the planting window, its time and hours. Explained on the page, with
+  a setting (on). Nothing is sent or done in the game. Tending and harvesting are not detected yet. Crossbreeding text: flowerpot flowers do not crossbreed.
+
 ## 0.459.0
 - Demandes de l'utilisateur pendant la campagne de tests :
   - Barre du serveur : une troisième icône pour les rappels terminés (tâches de servant, vaisseaux revenus, escouade, parcelles mûres), visible seulement s'il y

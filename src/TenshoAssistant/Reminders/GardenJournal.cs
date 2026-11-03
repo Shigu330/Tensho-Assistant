@@ -50,6 +50,15 @@ public static class GardenJournal
     public static GardenBed Plant(string place,string seed,int growHours,int tendHours,DateTimeOffset now)
         =>new(){Place=place,Seed=seed,PlantedAt=now,GrowHours=ClampGrow(growHours),TendHours=ClampTend(tendHours)};
 
+    /// <summary>0.460: a planting seen in the chat: replaces the bed noted at the same place (it was dug up or harvested), or null when the journal is full.</summary>
+    public static List<GardenBed>? Detected(IEnumerable<GardenBed>? beds,string place,string seed,int growHours,int tendHours,DateTimeOffset now)
+    {
+        var kept=(beds ?? []).Where(bed=>bed.Place!=place).ToList();
+        if(kept.Count>=Capacity)return null;
+        kept.Add(Plant(place,seed,growHours,tendHours,now));
+        return kept;
+    }
+
     public static void Tend(GardenBed bed,DateTimeOffset now){bed.TendedAt=now;bed.TendSaidFor=null;}
 
     /// <summary>The same seed planted again in the same place now (reminders start over).</summary>
