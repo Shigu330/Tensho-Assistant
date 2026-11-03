@@ -601,6 +601,22 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.CabinetItems=()=>cabinetItems??=data.GetExcelSheet<Lumina.Excel.Sheets.Cabinet>().Where(row=>row.Item.RowId!=0).Select(row=>row.Item.RowId).ToHashSet();
             mainWindow.RouletteName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentRoulette>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.SquadronMissionName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyExpedition>().GetRowOrDefault(id)?.Name.ExtractText();
+            // 0.449 (DEC-027): the embedded garden seeds (Lotlab), named in the game's language, read once.
+            IReadOnlyList<(Reminders.GardenSeed,string)>? gardenSeeds=null;
+            mainWindow.GardenSeedCatalog=()=>gardenSeeds??=((Func<IReadOnlyList<(Reminders.GardenSeed,string)>>)(()=>
+            {
+                try
+                {
+                    using var stream=typeof(Plugin).Assembly.GetManifestResourceStream("TenshoAssistant.Reminders.Data.garden-seeds.csv")
+                        ?? throw new InvalidOperationException("Embedded garden seeds are missing.");
+                    using var reader=new StreamReader(stream);
+                    var items=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();
+                    return Reminders.GardenSeeds.Read(reader)
+                        .Select(seed=>(seed,items.GetRowOrDefault(seed.SeedId)?.Name.ExtractText() ?? ""))
+                        .Where(pair=>pair.Item2.Length>0).OrderBy(pair=>pair.Item2,StringComparer.CurrentCultureIgnoreCase).ToArray();
+                }
+                catch(Exception error){log.Warning(error,"Garden seeds unavailable.");return [];}
+            }))();
             mainWindow.SquadronTrainingName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyTraining>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.321: a failing Try On (game function moved) is logged once and its buttons turn off for the session.
             mainWindow.TryOnItem=item=>

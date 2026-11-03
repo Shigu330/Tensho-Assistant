@@ -3,6 +3,23 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.449.0
+- Recherche des sources de N-06 et N-14 (DEC-026, point 11), soumise et décidée le 2026-11-03 (DEC-027), preuve
+  docs/evidence/0.448-n06-n14-sources.md. Escouade : la règle de réussite est dans la feuille GcArmyExpedition (PercentBase,
+  Percent…Met, PercentAllMet), donc aucune source communautaire n'est nécessaire. Croisements : paires MIT de nick75g. Jardin : durées
+  GPL-3.0 de Lotlab. Squadronista et SquadronSolver n'ont pas de licence : lus pour comprendre, rien copié.
+- N-08 complété (DEC-027, point 3) : dans le journal de jardinage, une « Liste des graines » (noms dans la langue du jeu, avec
+  recherche) remplit la graine, ses heures de pousse et ses heures d'entretien. Les données viennent de Lotlab/FFXIV-Gardening-Tracker
+  (GPL-3.0, 107 graines par identifiant d'objet) ; l'entretien est le délai avant flétrissement, 0 = pas de rappel. Les valeurs restent
+  modifiables avant de planter. Données embarquées (Reminders/Data/garden-seeds.csv, construites par tools/garden-data.py avec l'avis
+  GPL-3.0) et crédit « FFXIV Gardening Tracker ». Aucune requête réseau.
+- Tests : GardenSeeds449Tests (3 cas). Verify.ps1 (agent) : 816/816, 0 avertissement, 0 erreur ; DLL 0.449.0.0. Non validé en jeu.
+### English
+- Source search for N-06 and N-14 (DEC-027): the squadron success rule is in the game's GcArmyExpedition sheet; crossbreeds will use
+  nick75g's MIT data, garden durations Lotlab's GPL-3.0 data.
+- Garden journal: a seed list (game language, searchable) fills the seed and its growing and tending hours from Lotlab's Gardening
+  Tracker data (GPL-3.0, embedded and credited); the values stay editable.
+
 ## 0.448.0
 - N-08 (décision du 2026-11-03, DEC-026) : « Journal de jardinage » dans la page Rappels. Pour chaque parcelle ou pot : lieu et graine
   (vos mots), durée de pousse et intervalle d'entretien tapés en heures (le jeu ne les donne pas : rien n'est deviné, 0 = pas de rappel

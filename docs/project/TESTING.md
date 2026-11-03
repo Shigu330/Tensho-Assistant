@@ -714,6 +714,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.449 : liste des graines du journal de jardinage** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Rappels › Journal de jardinage › « Liste des graines » : les noms sont dans la langue du jeu ; la recherche filtre ; choisir une
+  graine remplit son nom, la pousse et l'entretien (par exemple 120 h et 48 h pour les graines de paprika) ; les valeurs restent modifiables.
+- [ ] Comparer une graine plantée en jeu avec l'heure de récolte affichée (données Lotlab, non vérifiées par Tensho).
+
 **0.448 : N-08 journal de jardinage** — pendant la campagne de tests en jeu de la fin (étape h)
 
 - [ ] Rappels › Journal de jardinage : ajouter une parcelle (lieu, graine, pousse 1 h, entretien 0) : « Mûr le … » une heure plus tard ;

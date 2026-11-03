@@ -265,3 +265,12 @@ Decision: (1) Les choix provisoires de G-PROPOSALS sont confirmés en bloc (leur
 Reason: Choix de l'utilisateur (2026-11-03).
 Consequences: 0.447 (points 2, 3, 4, 8), 0.448 (point 12) ; GitHub et CI hors du plugin ; issue #24 mise à jour ; G-PROPOSALS et ROADMAP marqués « DÉCIDÉ 2026-11-03 ». L'envoi au chat (point 3) est la seule fonction de Tensho qui écrit dans un canal visible des autres joueurs : clic seulement, canal parmi une liste fixe, texte nettoyé, 5 s d'écart, vérifié de nouveau avant l'appel au jeu.
 References: docs/project/G-PROPOSALS.md, docs/project/ROADMAP.md, tests/TenshoAssistant.Tests/Decisions447Tests.cs, GitHub issue #24
+
+DEC-ID: DEC-027
+Timestamp: 2026-11-03 Europe/Brussels (0.449)
+Problem: Sources de N-06 (escouade) et N-14 (croisements), DEC-026 point 11 ; recherche : docs/evidence/0.448-n06-n14-sources.md.
+Options: N-06 depuis le jeu seul avec sonde, ou attendre les tests en jeu ; N-14 avec les paires MIT de nick75g, ou pas de N-14 ; N-08 durées pré-remplies (Lotlab GPL-3.0) ou tapées seulement.
+Decision: (1) N-06 : codé depuis les feuilles du jeu (GcArmyExpedition, GcArmyMemberGrow, GcArmyTraining) et FFXIVClientStructs, avec une sonde en jeu ; le pourcentage reste « non validé en jeu » jusqu'à la sonde. (2) N-14 : paires MIT de nick75g/FFXIV-Crossbreed-Helper, reliées aux objets par les noms anglais de la feuille Item et affichées dans la langue du jeu (« corrélation vers le fr », choix de l'utilisateur) ; noms non trouvés écartés et comptés. (3) N-08 : durées de pousse et d'entretien pré-remplies depuis Lotlab/FFXIV-Gardening-Tracker (GPL-3.0), toujours modifiables.
+Reason: Choix de l'utilisateur (2026-11-03) ; la règle de réussite de l'escouade est dans les feuilles du jeu ; seules ces deux sources ont une licence compatible.
+Consequences: 0.449 (point 3), 0.450 (point 2), 0.451 (point 1) ; données embarquées avec leur avis de licence, crédits ajoutés ; aucune requête réseau.
+References: docs/evidence/0.448-n06-n14-sources.md, docs/project/G-PROPOSALS.md

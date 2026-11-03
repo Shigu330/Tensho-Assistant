@@ -45,6 +45,7 @@
     <Compile Include="../../src/TenshoAssistant/Reminders/ResetSchedule.cs" Link="Reminders/ResetSchedule.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/PersonalTasks.cs" Link="Reminders/PersonalTasks.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/GardenJournal.cs" Link="Reminders/GardenJournal.cs" />
+    <Compile Include="../../src/TenshoAssistant/Reminders/GardenSeeds.cs" Link="Reminders/GardenSeeds.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/WondrousTailsOdds.cs" Link="Reminders/WondrousTailsOdds.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/HuntBills.cs" Link="Reminders/HuntBills.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/Voyages.cs" Link="FreeCompany/Voyages.cs" />

@@ -97,11 +97,11 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 |---|---|
 | I-05 (annonces des servants au marché) | Lit de nouvelles fenêtres du jeu et appelle Universalis : à faire en ultracode, avec l'utilisateur |
 | A-03, A-04 (solveur Raphael et suggestions adaptatives) | Ajoute une dépendance native (binaire Rust de Raphael.Net) au paquet : licence, build hors ligne de Plogon et taille à vérifier ensemble, en ultracode |
-| N-06 (escouade, composition des missions) | La formule de réussite n'est pas dans les feuilles du jeu (seuils et bonus seulement) : source communautaire à choisir (licence à vérifier) |
+| N-06 (escouade, composition des missions) | Recherche faite le 2026-11-03 ([preuve](../evidence/0.448-n06-n14-sources.md)) : la règle de réussite EST dans la feuille GcArmyExpedition (PercentBase, Percent…Met, PercentAllMet) ; aucune source communautaire nécessaire (Squadronista et SquadronSolver sans licence, non lus pour copie). Reste : sonde en jeu (jeu de seuils actif, attributs des membres, affinités) ; à décider |
 | N-07 (île sanctuaire, carte des ressources) | MJIGatheringItem donne X, Y et un rayon par ressource, mais l'unité n'est pas prouvée : à vérifier en jeu avant de placer les zones sur la carte |
 | N-10 (atelier de l'île, solveur) | Gros : lecture de l'offre et de la demande du jeu et solveur ; à faire en ultracode, avec toi |
 | N-04 (loterie immobilière) | État des mises du joueur : structure du jeu non trouvée dans FFXIVClientStructs (à sonder en jeu) |
 | N-12 (conditions d'apparition des rangs S), N-13 (meubles visibles), X-14 (outils d'aménagement) | Règles communautaires par marque, lecture des meubles et correctifs d'affichage : sources et risques à décider ensemble |
 | N-08 (journal de jardinage) | FAIT 0.448 (décidé le 2026-11-03, DEC-026) : journal avec durées tapées par le joueur, page Rappels |
-| N-14 (planificateur de croisements de jardinage) | Les données LuminaSupplemental ne donnent pas les paires de graines ; il faut choisir une source communautaire (licence à vérifier) |
+| N-14 (planificateur de croisements de jardinage) | Recherche faite le 2026-11-03 ([preuve](../evidence/0.448-n06-n14-sources.md)) : seule source licenciée nick75g/FFXIV-Crossbreed-Helper (MIT, 3 886 paires par noms anglais, sans Dawntrail, origine non indiquée) ; ffxivgardening.com sans conditions (inconnu) ; à décider |
 | I-15 (recherche dans les fenêtres d'inventaire du jeu) | Touche l'interface du jeu : à faire en ultracode, avec l'utilisateur |
