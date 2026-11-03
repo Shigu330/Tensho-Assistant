@@ -4,6 +4,7 @@ Résumé par version, tiré des notes de vérification (historique détaillé : 
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
 ## 0.451.0
+- Release Stable-0.451.0 (demande de l'utilisateur, 2026-11-03) : les notes précisent qu'il reste beaucoup de tests en jeu à faire.
 - N-06 (DEC-027, point 1) : section « Missions d'escouade » dans la page Rappels. Tout vient du jeu, aucune source communautaire :
   - « Lire l'escouade » (sur clic, sur le thread du jeu, lecture de champs seulement) copie les membres (classe, niveau, état, affinités)
     et le bonus d'entraînement depuis GcArmyManager.Data (FFXIVClientStructs). Le jeu ne les charge qu'à la caserne : sinon, un message
@@ -20,6 +21,9 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
     Dalamud (en anglais), pour comparer avec la fenêtre du jeu.
 - Tests : Squadron451Tests (4 cas). Verify.ps1 (agent) : 823/823, 0 avertissement, 0 erreur ; DLL 0.451.0.0. Non validé en jeu.
 ### English
+- **Important: much in-game testing is still to do.** The versions since 0.431 (this release included) are compiled and pass
+  the automated tests, but most of their features have not been validated in game yet; a guided in-game test campaign is planned
+  (checklist: docs/project/TESTING.md). Please report anything that does not behave as described.
 - N-06: a « Squadron missions » section on the Reminders page: reads your squadron in the barracks on click and ranks the parties of
   four for a mission from the game's sheets (requirements, success percent parts, attributes by class and level, training bonus); the
   percent is shown as an estimate until checked in game, chemistry is not counted; « Write to the log » records the values for the probe.
