@@ -9,6 +9,17 @@ namespace TenshoAssistant;
 // with the lowest number, on click only (GameGearsetReader.Equip, checked). Unknown values are said, not guessed.
 internal sealed partial class MainWindow
 {
+    /// <summary>« Equip (job) » for the recipe's job (its gear set with the lowest number), on click only; said when there is none.</summary>
+    private void DrawEquipRecipeJob(RecipeDefinition recipe,string id)
+    {
+        var job=recipe.CraftTypeId+8;
+        GearsetSource?.Want();
+        if(GearsetSource?.State?.Sets is not { } sets){ImGui.NewLine();return;}
+        if(GameGearsets.ForJob(sets,job) is not { } set){ImGui.TextDisabled(localization.Format("CraftReadiness.NoSet",JobName(job)));return;}
+        if(ImGui.SmallButton(localization.Format("GatheringDetails.Equip",JobName(job))+"###"+id))GearsetSource!.Equip(set.Number);
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("GatheringDetails.EquipTip",set.Number,set.Name.Length>0 ? set.Name:JobName(job)));
+    }
+
     private void DrawCraftReadiness(RecipeDefinition recipe)
     {
         if(recipe.Simulation is not { } p)return;
@@ -29,11 +40,7 @@ internal sealed partial class MainWindow
             ImGui.TextColored(ok switch{true=>UI.FfxivTheme.Success,false=>UI.FfxivTheme.Error,null=>Muted},text);
             ImGui.SameLine();
         }
-        if(!worn && gearsets?.Sets is { } sets && GameGearsets.ForJob(sets,job) is { } set)
-        {
-            if(ImGui.SmallButton(localization.Format("GatheringDetails.Equip",JobName(job))+"###CraftEquip"))GearsetSource!.Equip(set.Number);
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("GatheringDetails.EquipTip",set.Number,set.Name.Length>0 ? set.Name:JobName(job)));
-        }
+        if(!worn)DrawEquipRecipeJob(recipe,"CraftEquip");
         else ImGui.NewLine();
         if(!worn)ImGui.TextDisabled(localization.Get("CraftReadiness.WearJob"));
     }

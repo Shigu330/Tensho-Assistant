@@ -99,9 +99,11 @@ try {
             $lastCommitted = @(Invoke-Git @('log', '-200', '--format=%s') | ForEach-Object { if ($_ -match '^(\d+\.\d+\.\d+)') { $Matches[1] } } | Select-Object -First 1)
             $since = if ($lastCommitted.Count -gt 0 -and [version]$lastCommitted[0] -lt [version]$version) { $lastCommitted[0] } else { $version }
             $commitNotes = if ($since -eq $version) { $notes } else { Get-NotesSince $since }
-            [IO.File]::WriteAllText($message, "$subject`n`n$commitNotes`n", [Text.UTF8Encoding]::new($false))
+            # 0.446: optional last line (e.g. the agent's 'Co-Authored-By: …'), from the environment; empty for the maintainer's own commits.
+            $trailer = if ($env:TENSHO_COMMIT_TRAILER) { "`n$($env:TENSHO_COMMIT_TRAILER.Trim())`n" } else { '' }
+            [IO.File]::WriteAllText($message, "$subject`n`n$commitNotes`n$trailer", [Text.UTF8Encoding]::new($false))
             if ($since -ne $version) { Write-Output "Commit message covers the versions after $since." }
-            if ($DryRun) { Write-Output "--- commit message ---`n$subject`n`n$commitNotes`n----------------------" }
+            if ($DryRun) { Write-Output "--- commit message ---`n$subject`n`n$commitNotes`n$trailer----------------------" }
             # 0.323: the files « git add -A » adds for the first time are listed; a new archive, binary or file over 5 MB outside the
             # ignored folders stops the commit (exit code 2) instead of being published by mistake.
             $untracked = @(Invoke-Git @('-c', 'core.quotePath=false', 'ls-files', '--others', '--exclude-standard') | Where-Object { $_ })

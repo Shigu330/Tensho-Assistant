@@ -39,8 +39,21 @@ public sealed class CollectableCatalog
 public sealed record CollectableWindowFrame(string ItemName,string? Chance,int? Gp,int? MaxGp,int? Integrity,int? MaxIntegrity,
     IReadOnlyList<string> RawValues,float X,float Y,float Width,DateTimeOffset ObservedAt);
 
+/// <summary>A-15 (0.432): a collectable held in the bags (base item, collectability as the game stores it).</summary>
+public sealed record HeldCollectable(uint ItemId,int Collectability);
+/// <summary>Its turn-in value: the scrip rule used, the tier reached and the scrips of that tier (0 below the low threshold).</summary>
+public sealed record CollectableValue(HeldCollectable Held,CollectableRule Rule,CollectableTier Tier,int Scrips);
+
 public static class Collectables
 {
+    /// <summary>A-15 (0.432): the value of a held collectable by the first scrip rule of its item; null when the game takes none.</summary>
+    public static CollectableValue? Value(CollectableCatalog catalog,HeldCollectable held)
+    {
+        if(catalog.For(held.ItemId).FirstOrDefault(rule=>rule.Scrips) is not { } rule)return null;
+        var tier=Tier(rule,held.Collectability);
+        return new(held,rule,tier,tier switch{CollectableTier.High=>rule.RewardHigh,CollectableTier.Mid=>rule.RewardMid,CollectableTier.Low=>rule.RewardLow,_=>0});
+    }
+
     /// <summary>
     /// A-01 (0.419): the quality a crafted collectable needs for a collectability (collectability = quality / 10, rounded down: the
     /// game's rule as Teamcraft (MIT) and Craftimizer code it, read only), capped at the recipe's maximum quality.

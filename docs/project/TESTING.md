@@ -714,6 +714,88 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.446 : N-09 alerte des marques, X-13 annonce** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Cartes › Train de chasse : cocher « Annoncer les marques A et S proches » ; près d'une marque A ou S, une seule ligne dans le
+  chat (nom, rang, zone, coordonnées justes) et le son des alarmes s'il est activé ; une marque B ne dit rien.
+- [ ] Avec au moins une étape : « Copier l'annonce », coller dans le chat du jeu après avoir posé le drapeau : <flag> devient le lien.
+
+**0.445 : N-05 terrains en vente** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Cartes › Terrains en vente › « Consulter » sur un monde NA : la liste correspond au jeu (panneau de vente des quartiers) ; cocher
+  la surveillance : une parcelle nouvellement libre est annoncée dans le chat à la lecture suivante.
+
+**0.444 : X-09 annuaire des lieux** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Cartes › Annuaire : ajouter une maison (monde, quartier, secteur, parcelle), un appartement ; « Copier » ; le lieu reste après
+  un rechargement du plugin et après « Tout remettre par défaut ».
+
+**0.443 : N-02 tâches du Livre d'or** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Rappels › Livre d'or : la liste « À faire » correspond aux cases du journal ; une tâche finie passe en « à réclamer » (vert), puis
+  disparaît une fois la vignette posée.
+
+**0.442 : N-15 train de chasse** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Pendant un train : « Enregistrer », chaque marque A/S apparaît une fois avec sa position ; « Drapeau suivant » ; « Copier la
+  liste » puis coller dans l'import des favoris : les points tombent au bon endroit.
+
+**0.441 : N-09 marques de chasse** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Près d'une marque B, A ou S : elle apparaît sur la carte Tensho avec la bonne couleur et son rang ; morte, elle disparaît ;
+  décocher la couche la masque.
+
+**0.440 : N-01 contrats de chasse** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Avec un contrat de chasse en main : Rappels montre ses cibles et les victimes (comparer au journal des contrats du jeu) ; tuer une
+  cible fait monter le compteur ; « Carte » ouvre la bonne zone.
+
+**0.439 : N-03 probabilités du Livre d'or** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Livre d'or avec 3 à 8 vignettes : Rappels affiche les chances de lignes, actuelles et après mélange ; poser une vignette change
+  les chances ; à 9 vignettes, plus rien.
+
+**0.438 : actions interdites, équiper depuis le carnet** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Interdire Œil de l'expert et Manipulation : ni la recherche, ni l'assistant du carnet, ni la synthèse en cours ne les proposent ;
+  grisées dans le simulateur. Carnet ouvert avec le mauvais métier : « Équiper (métier) » change d'ensemble et le calcul démarre.
+
+**0.437 : N-11 coordonnées collées** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Coller une liste de Siren ou Faloop dans l'import des favoris : un favori par ligne, au bon endroit sur la carte ; lieux inconnus
+  comptés dans le message.
+
+**0.436 : A-14 enregistreur de rotation** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] « Enregistrer », fabriquer à la main (avec un buff, une action de qualité, une de progression), « Arrêter » : la liste est
+  exacte et dans l'ordre ; « Utiliser comme séquence » ; le jeu se comporte comme d'habitude pendant l'enregistrement (aucune action
+  bloquée) ; après « Arrêter », rien n'est plus noté.
+
+**0.435 : A-07 recettes expertes** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Recette experte : le simulateur l'accepte et affiche « chaque étape en condition normale ». Pendant une synthèse experte en jeu,
+  mode développeur : noter la condition brute affichée pour souple, robuste, malléable, amorcée (pour ouvrir la projection en direct).
+
+**0.434 : A-13 actions du simulateur** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Comparer au jeu : Appréciation finale (progression arrêtée à 1 de la fin), Synthèse intensive / Toucher précis après Cœur et âme
+  (spécialiste), Innovation éclair, Ficelles du métier (+20 PS). Synthèse en cours avec Appréciation finale active : projection affichée.
+
+**0.433 : A-05 listes de fabrication** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Créer une liste, y ajouter deux recettes depuis Préparation, changer une quantité, retirer un objet ; les ingrédients totaux et
+  « à compléter » sont justes ; la liste est toujours là après un rechargement du plugin ; lien Teamcraft de la liste.
+
+**0.432 : A-15 collectionnables des sacs** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Avec des collectionnables dans les sacs (récoltés et fabriqués) : « Dans vos sacs » montre leur collectionnabilité comme le jeu,
+  le bon palier et les assignats du marchand.
+
+**0.431 : A-06 bénéfice d'artisanat** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Préparation › « Consulter les prix de la liste » : le prix de l'objet fabriqué apparaît dans « Bénéfice », avec la dernière vente ;
+  case « Prix du centre de données » : autre monde affiché ; bénéfice = prix × quantité − achats.
+
 **0.428-0.429 : recette refusée par le carnet du jeu** — pendant la campagne de tests en jeu de la fin (étape h)
 
 - [ ] Carnet d'artisanat déjà ouvert sur une autre recette (ou un autre métier) : « Ouvrir dans le carnet » le ferme et le rouvre sur la

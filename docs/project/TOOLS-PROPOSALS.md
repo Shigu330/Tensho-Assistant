@@ -1,6 +1,6 @@
 # Alarmes, compagnie libre, quêtes, équipement, mini-jeux : propositions d'amélioration (audit du 2026-11-02, étape e)
 
-Liste établie par un audit multi-agents en lecture seule (0.330). **Rien n'est implémenté** : vous choisissez ce qu'on ajoute
+Liste établie par un audit multi-agents en lecture seule (0.330). **Rien n'était implémenté** à l'audit (relu le 2026-11-03 : les propositions faites depuis, à l'étape g, portent une ligne « État ») : vous choisissez ce qu'on ajoute
 (règle du 2026-11-02, [ROADMAP](ROADMAP.md) « Décisions reportées à la fin »). Les défauts trouvés par le même audit sont corrigés en
 0.331 ([CHANGELOG](../../CHANGELOG.md)). Plusieurs propositions recoupent des manques déjà retenus pour l'étape g)
 ([GAPS](GAPS.md), I-*) : elles le disent.
@@ -9,6 +9,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T0 — Alarmes en heure réelle : à la main, chaque jour, chaque semaine ou à chaque remise à zéro (X-10, partie anticipée)
 
+- **État (relu le 2026-11-03)** : en partie 0.386 (X-10 : alarme unique à une date locale) ; chaque jour, chaque semaine ou à chaque remise non fait.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Alarms/TenshoAlarm.cs`.
 - **Ce que le joueur obtient** : Une alarme posée une seule fois revient d'elle-même : « 30 min avant la remise hebdomadaire », « chaque jour à 21:00 », « fin des missions de ravitaillement ». La cloche des Rappels propose « à chaque remise à zéro » au lieu d'une alarme unique qui disparaît après avoir sonné. Vous pouvez aussi poser à la main une alarme à une heure locale, ou un minuteur (« dans 45 min »).
 - **Comment, taille, dépendances** : Ajouter AlarmRepeat.RealDaily (heure locale), RealWeekly (jour + heure) et Reset (clé de ResetSchedule : quotidien 15:00 UTC, ravitaillement 20:00 UTC, hebdomadaire mardi 08:00 UTC, mandats 00:00/12:00 UTC). AlarmSchedule.Next les calcule (fonction pure, avec tests). Formulaire « à la main » : heure ET, heure locale ou minuteur. Copie dans le jeu : ET seulement, comme aujourd'hui (avec « lt », le sens de « rp » n'est pas prouvé : docs/evidence/0.205-alarm-command.md). Taille S-M. Dépendances : aucune ; Discord inchangé (catégorie Rappels). Sonde : aucune. Décision : la cloche des Rappels crée-t-elle une alarme récurrente par défaut (recommandé : oui).
@@ -16,6 +17,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T1 — Rappels par personnage : cases « fait » et carte au trésor de chaque personnage (M-04, partie anticipée)
 
+- **État (relu le 2026-11-03)** : FAIT 0.374 (M-04 : cases « fait » par personnage).
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Configuration.cs`.
 - **Ce que le joueur obtient** : Avec plusieurs personnages, cocher « Revue de mode faite » ou « carte au trésor ouverte » sur l'un ne coche plus les autres. Chaque personnage garde son attente de 18 h et ses cases jusqu'à la remise à zéro.
 - **Comment, taille, dépendances** : Clé par ContentId du personnage connecté : Dictionary<ulong,…> pour ReminderDone et TreasureMapAt. À la première connexion, les anciennes valeurs passent au personnage connecté (migration testée). Hors connexion, la page dit « personnage inconnu » et rien n'est cochable. Taille S. Dépendances : aucune ; prépare M-04 (vue de plusieurs personnages). Sonde : aucune. Décision : aucune (déjà prise pour M-04).
@@ -23,6 +25,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T2 — Alarme de retour des vaisseaux créée d'office à chaque relevé (M-01, partie expéditions)
 
+- **État (relu le 2026-11-03)** : FAIT 0.371 (M-01).
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/FreeCompany/VoyageWatcher.Dalamud.cs`.
 - **Ce que le joueur obtient** : Dès que vous passez à l'atelier, chaque sous-marin et chaque dirigeable en route a son alarme de retour, et son message Discord si vous l'avez réglé, sans cliquer sur la cloche de chaque ligne. Un trajet relancé remplace l'ancienne alarme.
 - **Comment, taille, dépendances** : Après Voyages.Merge (VoyageWatcher.Dalamud.cs:122, thread du framework), pour chaque vaisseau en route : une alarme Once avec Source=Voyage et une clé stable (maison + type + emplacement). Elle est remplacée si l'heure change et retirée si le vaisseau est revenu. Respecter AlarmSchedule.Maximum (60) et le dire. Réglage « Alarmes de retour automatiques » (activé, infobulle, ↺). Taille S. Dépendances : aucune ; la partie servants de M-01 suit « Tâches de servants : une ligne par servant ». Sonde : aucune. Décision : déjà prise (DEC-025).
@@ -51,6 +54,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T6 — Carte au trésor : prochaine allocation lue dans le jeu (M-02, partie anticipée)
 
+- **État (relu le 2026-11-03)** : FAIT 0.372 (M-02).
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`.
 - **Ce que le joueur obtient** : La ligne « Cartes au trésor » des Rappels donne l'heure réelle de la prochaine carte, comme le Calendrier du jeu, sans clic sur « ouverte ». Le bouton manuel reste en secours.
 - **Comment, taille, dépendances** : Sonde tools/ApiProbe (propriétaire, type, unité), preuve dans docs/evidence/. Lecture dans GameTimers.Read, sur le thread du framework et gardée R-14 : valeur absente ou hors bornes = « indisponible après une mise à jour du jeu », avec repli sur le bouton. Taille S. Dépendances : « Rappels par personnage », séance de relevés. Sonde : oui, plus un relevé comparé au Calendrier. Décision : aucune.
@@ -58,6 +62,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T7 — Missions aléatoires du jour faites ou non, dans les Rappels (C-02, partie anticipée)
 
+- **État (relu le 2026-11-03)** : FAIT 0.356 (C-02).
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`.
 - **Ce que le joueur obtient** : Les Rappels listent vos missions aléatoires (expert, niveaux, alliance…) avec une coche lue dans le jeu. Vous voyez d'un coup d'œil celles qui restent avant la remise quotidienne, avec une alarme.
 - **Comment, taille, dépendances** : Sonde du propriétaire et de l'index attendu, preuve dans docs/evidence/. Lecture une fois par seconde avec les autres compteurs, gardée R-14 ; une ligne repliable « Missions aléatoires (n restantes) ». Relever en jeu l'heure de remise (fenêtre de la Recherche de mission) avant de l'afficher. Taille S. Dépendances : séance de relevés ; l'alerte de bonus de rôle reste à C-02 en g). Décision : aucune (choix fait).
@@ -65,6 +70,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T8 — Contenus terminés ou non, avec un filtre « non terminés » (C-01, partie anticipée)
 
+- **État (relu le 2026-11-03)** : FAIT 0.355 (C-01).
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.Duties.cs`.
 - **Ce que le joueur obtient** : La liste des contenus marque ✓ ceux que vous avez déjà terminés et peut n'afficher que les autres. Le panneau de la Recherche de mission le dit aussi.
 - **Comment, taille, dépendances** : Sonde en jeu sur un contenu fait et un non fait (preuve dans docs/evidence/). Lecture sur le thread du framework à l'ouverture de la page, puis à chaque changement de zone ; copie en ensemble d'identifiants, gardée R-14 (« indisponible après une mise à jour du jeu »). Taille S. Dépendances : séance de relevés. Décision : aucune (choix fait).
@@ -72,6 +78,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T9 — Équipement : améliorations que vous possédez déjà (M-12, partie anticipée)
 
+- **État (relu le 2026-11-03)** : FAIT 0.383 (M-12).
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.Gear.cs`.
 - **Ce que le joueur obtient** : Pour le job porté, Tensho signale par emplacement toute pièce de meilleur niveau d'objet que celle portée, utilisable à votre niveau, déjà présente dans vos sacs, l'arsenal, une sacoche ou chez un servant. Il dit où la prendre.
 - **Comment, taille, dépendances** : Calcul hors Draw, refait quand l'équipement porté, les stocks ou le job changent : GearRules.Fits, niveau ≤ niveau du job, niveau d'objet > pièce portée. Liste « Améliorations possédées » avec le rangement et un bouton « Essayer ». Taille S-M. Dépendances : rangements relevés par la Banque. Sonde : aucune. Décision : compter le coffre à apparence et l'armoire (recommandé : non, ces pièces ne se portent pas directement).
@@ -121,6 +128,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T16 — Tâches de servants : une ligne par servant, avec alarme
 
+- **État (relu le 2026-11-03)** : en partie 0.371 (alarme automatique à la fin de chaque tâche de servant) et 0.374 (vue de vos personnages).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Reminders.cs`.
 - **Ce que le joueur obtient** : La ligne « Tâches de servants » se déplie : pour chaque servant, sa tâche finie ou son heure de fin, une cloche, et une alarme « quand toutes sont finies ».
 - **Comment, taille, dépendances** : Ligne repliable (TreeNode) dans la même table ; alarmes Once avec Source=Reminder (catégorie Discord « Rappels ») ; copie des heures de fin gardée par personnage pour l'Accueil. Taille S. Dépendances : « Rappels par personnage ». Les alarmes d'office de M-01 pour les servants restent en g), ou suivent la même option que les vaisseaux. Sonde : aucune. Décision : aucune.
@@ -163,6 +171,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T22 — Équipement : état et symbiose des pièces portées (M-06, partie affichage)
 
+- **État (relu le 2026-11-03)** : FAIT 0.376 (M-06).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Gear/GearLoader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Sur la page Équipement, chaque pièce portée affiche son état (%) et sa symbiose. Une pièce à réparer, ou prête pour l'extraction de matéria, ressort.
 - **Comment, taille, dépendances** : Sonder les échelles (pièce à 100 % puis usée, symbiose à 100 %), preuve dans docs/evidence/. Deux champs de plus dans EquippedPiece, copiés au même relevé et gardés R-14. Affichage seulement : l'alerte et la barre restent dans M-06. Taille S. Dépendances : séance de relevés. Décision : aucune.

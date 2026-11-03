@@ -52,7 +52,7 @@ internal sealed partial class MainWindow
         var actions=craftActions.State.Catalog;
         var presets=(IReadOnlyList<CraftPreset>?)configuration.CraftPresets ?? Array.Empty<CraftPreset>();
         CraftLogInput? input=context is {Recipe:{ } recipe,Stats:{ } stats} && actions is not null
-            ? new(observed.Owner,recipe,stats,actions,presets,new(recipe.Simulation!.Quality,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,craftMacroBuffWait),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true):null;
+            ? new(observed.Owner,recipe,stats,actions,presets,new(recipe.Simulation!.Quality,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,craftMacroBuffWait,craftForbidden),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true):null;
         if(input!=craftLogInput)
         {craftLogSession.Cancel();craftLogInput=input;craftLogStableSince=now;craftLogStarted=false;craftLogForceRefresh=false;}
         if(now<craftLogStableSince)craftLogStableSince=now;
@@ -78,7 +78,14 @@ internal sealed partial class MainWindow
                 if(selected.Simulation is { } parameters)ImGui.TextUnformatted(localization.Format("CraftLogUi.Parameters",parameters.Progress.ToString("N0"),parameters.Quality.ToString("N0"),parameters.Durability));
             }
             if(context.Stats is { } current)ImGui.TextUnformatted(localization.Format("CraftLogUi.Stats",current.Craftsmanship,current.Control,current.Cp,current.Level));
-            if(context.Issue is { } issue){ImGui.TextWrapped(context.Recipe is { } linked && issue==$"Equip the {linked.CraftType} job to calculate with its attributes." ? localization.Format("CraftMessages.Equip",linked.CraftType) : CraftMessage(issue));return;}
+            if(context.Issue is { } issue)
+            {
+                var wrongJob=context.Recipe is { } linked && issue==$"Equip the {linked.CraftType} job to calculate with its attributes.";
+                ImGui.TextWrapped(wrongJob ? localization.Format("CraftMessages.Equip",context.Recipe!.CraftType) : CraftMessage(issue));
+                // 0.438 (user request): the recipe's job, worn from here on click.
+                if(wrongJob)DrawEquipRecipeJob(context.Recipe!,"CraftLogEquip");
+                return;
+            }
             if(actions is null){if(craftActions.State.Error is { } failure)DrawDataError(failure,"ServiceErrors.Craft");else ImGui.TextWrapped(localization.Get("CraftLogUi.ActionsLoading"));return;}
             ImGui.TextWrapped(localization.Format("CraftLogUi.Assumptions",context.StartingQuality.ToString("N0"))
                 +(context.Recipe?.Simulation?.Collectable==true ? localization.Get("CraftLogUi.CollectableHelp"):localization.Get("CraftLogUi.NoHq")));

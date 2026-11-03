@@ -1,6 +1,7 @@
 namespace TenshoAssistant.Craft;
 
-public sealed record CraftSolveOptions(int TargetQuality,int MaxSteps=40,int BeamWidth=128,int MaxExpanded=100000,int ExtraWait=0,int? BuffExtraWait=null);
+// 0.438 (user request): Forbidden = the key of the actions the player forbids (CraftActionRules), never used by the search.
+public sealed record CraftSolveOptions(int TargetQuality,int MaxSteps=40,int BeamWidth=128,int MaxExpanded=100000,int ExtraWait=0,int? BuffExtraWait=null,string Forbidden="");
 public sealed record CraftSolveResult(CraftSimulationResult? Simulation,int TargetQuality,bool TargetReached,int Expanded,int Depth,
     bool BeamPruned,bool NodeLimitReached,bool DepthLimitReached,int? WaitSeconds=null);
 
@@ -25,7 +26,10 @@ public static class CraftSolver
         var initial=CraftSimulation.Run(recipe,stats,startingQuality,[],cancellation); var p=recipe.Simulation!;
         if(options.TargetQuality<0 || options.TargetQuality>p.Quality || options.MaxSteps is <1 or >100 || options.BeamWidth is <1 or >512 || options.MaxExpanded is <1 or >500000 || options.ExtraWait is <0 or >3 || options.BuffExtraWait is <0 or >3)
             throw new ArgumentOutOfRangeException(nameof(options));
-        var actions=CraftActionCatalog.Specs.Where(spec=>spec.Level<=stats.Level && (spec.Kind!=CraftActionKind.Manipulation || stats.ManipulationAllowed)).ToArray();
+        // A-13 (0.434): no action that succeeds by chance, nor Careful Observation or Final Appraisal (no use under the normal condition).
+        var actions=CraftActionCatalog.Specs.Where(spec=>spec.Level<=stats.Level && (spec.Kind!=CraftActionKind.Manipulation || stats.ManipulationAllowed)
+            && !CraftSimulation.Random(spec.Kind) && spec.Kind is not (CraftActionKind.CarefulObservation or CraftActionKind.FinalAppraisal)
+            && !CraftActionRules.Forbidden(options.Forbidden,spec.Kind)).ToArray();
         var minimumWait=actions.Min(action=>CraftMacroExporter.Wait(action.Kind,options.ExtraWait,options.BuffExtraWait));
         var beam=new List<Node>{new(initial.Final,null,default)}; Node? best=null;
         var expanded=0; var depth=0; var searchedDepth=0; var pruned=false; var limited=false; var depthLimited=false;

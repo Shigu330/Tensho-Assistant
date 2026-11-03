@@ -43,7 +43,8 @@ internal static class CraftOptimizationTests
             foreach(var cp in new[]{50,100})foreach(var extra in new[]{0,2})
             {
                 var stats=new CraftStats(21,1000,1000,cp);var terminals=new List<(int Wait,int Steps)>();
-                var kinds=CraftActionCatalog.Specs.Where(spec=>spec.Level<=21).Select(spec=>spec.Kind).ToArray();
+                // 0.434 (A-13): the search leaves out actions that succeed by chance; the enumeration too.
+                var kinds=CraftActionCatalog.Specs.Where(spec=>spec.Level<=21 && !CraftSimulation.Random(spec.Kind)).Select(spec=>spec.Kind).ToArray();
                 void Visit(CraftActionKind[] sequence)
                 {
                     var simulation=CraftSimulation.Run(recipe,stats,0,sequence);

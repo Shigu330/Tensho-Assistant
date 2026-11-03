@@ -1,6 +1,6 @@
 # Objets, banque, tri et marché : propositions d'amélioration (audit du 2026-11-02, étape e)
 
-Liste établie par un audit multi-agents en lecture seule (0.328). **Rien n'est implémenté** : vous choisissez ce qu'on ajoute
+Liste établie par un audit multi-agents en lecture seule (0.328). **Rien n'était implémenté** à l'audit (relu le 2026-11-03 : les propositions faites depuis, à l'étape g, portent une ligne « État ») : vous choisissez ce qu'on ajoute
 (règle du 2026-11-02, [ROADMAP](ROADMAP.md) « Décisions reportées à la fin »). Les défauts trouvés par le même audit sont corrigés en
 0.329 ([CHANGELOG](../../CHANGELOG.md)). Plusieurs propositions recoupent des manques déjà retenus pour l'étape g)
 ([GAPS](GAPS.md), I-*) : elles le disent.
@@ -23,6 +23,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I2 — I-01, partie anticipée : dernière vente et touche d'actualisation au survol
 
+- **État (relu le 2026-11-03)** : FAIT 0.343 (I-01 : dernière vente, Ctrl+Alt pour actualiser).
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.MarketHover.cs`.
 - **Ce que le joueur obtient** : Sous l'infobulle d'un objet, vous voyez déjà le prix le plus bas NQ/HQ du monde et le moins cher du centre de données. S'y ajoutent la dernière vente (prix et date) et une touche à tenir pour relire le prix, sans ouvrir la page Marché. Ensuite, après une sonde : prix de la région, ventes par jour et prix moyen.
 - **Comment, taille, dépendances** : Étape 1 (S, aucune sonde) : afficher RecentSale/SaleAt NQ et HQ dans DrawHoveredPrices. La touche est lue sur le thread framework (IKeyState, dans Items/ItemHoverReader.Dalamud.cs) ; elle demande une lecture forcée, au plus toutes les 3 s (cadence de Market/MarketService.cs:138). Réglage « Touche d'actualisation » (aucune / Alt / Ctrl / Maj) avec infobulle et ↺. Étape 2 (S) : sonde d'une réponse aggregated (réponse tronquée dans docs/evidence), puis lecture de minListing.region, dailySaleVelocity et averageSalePrice dans MarketQuote.Parse (même requête ; monter la version de cache « universalis-aggregated-v2 »). Le prix de la pile attend la sonde de la quantité survolée (partagée avec I-06). Décision : la touche par défaut (recommandé : Alt, comme Price Insight, avec « aucune » possible).
@@ -51,6 +52,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I6 — I-06, partie anticipée : prix de vente au PNJ, à l'unité
 
+- **État (relu le 2026-11-03)** : FAIT 0.346 (I-06, prix NQ seulement).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MarketHover.cs`.
 - **Ce que le joueur obtient** : Sous l'infobulle et dans l'en-tête de la fiche objet : « Vente au PNJ : X gils l'unité », pour choisir vite entre le marché et le marchand. Le total de la pile vient après la sonde de la quantité survolée.
 - **Comment, taille, dépendances** : Une ligne dans le panneau de survol : cinquième partie « Prix PNJ », avec sa case, son infobulle et son ↺, comme les HoverShow*. Même ligne dans les « faits » de la fiche. Valeur 0 : rien n'est affiché (le sens « invendable » n'est pas prouvé). HQ : aucun prix tant qu'il n'est pas relevé, sans coefficient deviné. Taille S. Sonde : quantité de la pile survolée (AgentItemDetail ou InventoryItem, partagée avec I-01) pour le total ; relevé en jeu pour un prix HQ. Décision : aucune nouvelle.
@@ -58,6 +60,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I7 — I-12, partie anticipée : filtres de catégorie et d'emplacement, niveaux dans les résultats
 
+- **État (relu le 2026-11-03)** : FAIT 0.353 (I-12).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Items.cs`.
 - **Ce que le joueur obtient** : La recherche d'objets accepte un filtre de catégorie du jeu, d'emplacement d'équipement et de niveau ; chaque résultat montre sa catégorie et ses niveaux. Trouver « toutes les bagues de niveau 90 », ou un matériau parmi des homonymes, devient direct.
 - **Comment, taille, dépendances** : ItemCatalog.Search(query, limit, filtre) avec catégorie, emplacement (EquipmentSlots) et bornes de niveau ; requête vide permise quand un filtre est posé. Combos et champs avec infobulle, bouton « Effacer les filtres ». Recalcul seulement quand la requête ou un filtre change (comme aujourd'hui, MainWindow.Items.cs:679-684). Taille S. Sonde : aucune. Le filtre de job (ClassJobCategory) et les objets clés (EventItem) restent en g : colonnes à ajouter au catalogue. Décision : aucune nouvelle.
@@ -65,6 +68,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I8 — X-07, partie anticipée : ouvrir l'objet sur Universalis, Garland Tools, Teamcraft ou le wiki
 
+- **État (relu le 2026-11-03)** : en partie 0.349 (X-07 : wiki et Lodestone) ; Universalis, Garland Tools et Teamcraft pas dans ce menu.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.DutyFinder.cs`.
 - **Ce que le joueur obtient** : Clic droit sur un objet, dans les fenêtres Tensho et dans le menu « Tensho » du jeu : « Ouvrir sur… » ouvre la page de l'objet dans le navigateur.
 - **Comment, taille, dépendances** : Sous-menu « Ouvrir sur » : Universalis (/market/{id}), Garland Tools (#item/{id}), Teamcraft (fiche de l'objet par ID), consolegameswiki (titre anglais). Lodestone : recherche par nom seulement, car les données du jeu ne donnent aucun identifiant Lodestone. Util.OpenLink sur clic seulement. Case « Liens externes » avec infobulle et ↺. Crédits et manifeste complétés (sites nommés). Taille S. Sonde : vérifier une fois chaque forme d'URL (docs/evidence). Décision : la liste des sites (recommandé : les quatre ci-dessus) et les commandes /wiki, /lodestone (recommandé : non, le menu suffit).
@@ -79,6 +83,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I10 — Cristaux et gils des servants dans le relevé du servant
 
+- **État (relu le 2026-11-03)** : en partie : gils des servants dans le journal des gils (0.351) ; cristaux des servants non vérifiés.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Inventory/BankInventoryBridge.Dalamud.cs`.
 - **Ce que le joueur obtient** : Les cristaux confiés aux servants comptent dans l'onglet Cristaux (une colonne par servant), dans le « manquant » de l'artisanat et au survol. Les gils de chaque servant sont gardés, avec la date du relevé.
 - **Comment, taille, dépendances** : Sonde d'abord : RetainerCrystals (12001) et RetainerGil (12000) sont-ils chargés quand InventoryRetainer est ouvert (IsLoaded, taille) ? Relevé par tools/ApiProbe ou le journal en mode développeur, dans docs/evidence. Puis un groupe de conteneurs à part (nouveau BankStorageKind, ou schéma 2 du fichier) pour ne changer ni la validation « groupe exact » (BankEntryValidator) ni la portée du tri (10000-10006). Taille M. Dépendance : aucune ; prépare I-03 et I-04. Décision : avancer cette partie avant g (recommandé : oui, cristaux d'abord).
@@ -93,6 +98,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I12 — Rapport du coffre à apparence : pièces pour l'armoire et doublons
 
+- **État (relu le 2026-11-03)** : FAIT 0.357 (C-03, pièces pour l’armoire) et 0.358 (C-07, apparences identiques).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Inventory/BankInventoryBridge.Dalamud.cs`.
 - **Ce que le joueur obtient** : Un rapport, sans rien déplacer, liste les pièces du coffre à apparence que l'armoire peut accueillir, et les pièces en double entre coffre à apparence, armoire, sacs et arsenal. Vous savez quoi retirer pour libérer des places du coffre.
 - **Comment, taille, dépendances** : Projection pure sur les relevés (BankEntry GlamourDresser et Armoire, sacs, arsenal) : « accepté par l'armoire » = objet présent dans cabinetRows ; doublon = même objet dans deux rangements. Une section de la page Rangements, recalculée seulement quand un relevé change. Taille S-M. Sonde : aucune nouvelle ; validation en jeu de 0.236-0.240 d'abord. Décision : ajouter ce rapport, nouveau (recommandé : oui, après cette validation en jeu).
@@ -100,6 +106,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I13 — I-10, partie anticipée : piles non regroupées
 
+- **État (relu le 2026-11-03)** : FAIT 0.348 (I-10).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Items/ItemCatalogLoader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Un rapport des objets répartis en plusieurs piles incomplètes dans un même rangement (sacs, sacoches, servants), par exemple : « 3 piles de minerai de fer (12, 40, 99) tiendraient en 2 ».
 - **Comment, taille, dépendances** : Ajouter Item.StackSize au catalogue (ItemCatalogLoader.Dalamud.cs:135-142, avec une version du cache d'objets montée). Projection pure par rangement : même objet, même qualité, NQ et HQ séparés. La partie « arsenal hors des sets d'équipement » attend une sonde de RaptureGearsetModule et reste en g. Taille S. Sonde : aucune pour les piles. Décision : aucune nouvelle.
@@ -128,6 +135,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I17 — I-13, partie anticipée : valeur en gils d'une monnaie
 
+- **État (relu le 2026-11-03)** : FAIT 0.354 (I-13).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.ItemUses.cs`.
 - **Ce que le joueur obtient** : Dans « Usages › Monnaie » d'un objet-monnaie (sceaux, marques, écus…), un bouton « Lire les prix » donne pour chaque article sa valeur au marché et le gain en gils par unité de monnaie, du plus rentable au moins rentable.
 - **Comment, taille, dépendances** : Liste bornée lancée au clic : PreparationPriceSession, ou mieux la requête par lots de la proposition « Prix Universalis par lots ». Valeur = minimum du monde ÷ coût. Articles non échangeables marqués « non vendable ». Le solde et « combien je peux en acheter » attendent I-02 ; les monnaies codées restent « inconnues ». Taille M. Dépendance : les lots Universalis (recommandé). Décision : aucune nouvelle.
@@ -135,6 +143,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I18 — I-07, partie anticipée : copier « prix le plus bas − 1 » depuis la page Marché
 
+- **État (relu le 2026-11-03)** : en partie 0.346 (I-07 : à l’ouverture des offres dans le jeu) ; pas depuis la page Marché.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.MarketBoard.cs`.
 - **Ce que le joueur obtient** : Sur l'onglet Annonces de Tensho, un bouton copie le prix le plus bas moins 1 (NQ ou HQ). Vos propres servants sont marqués, pour ne pas vous sous-coter.
 - **Comment, taille, dépendances** : Bouton avec infobulle, qui ignore les annonces de vos servants (KnownRetainers) et affiche la date de l'annonce, car Universalis peut être en retard sur le jeu. La version complète (offres du jeu lues à l'ouverture de la liste, IMarketBoard) reste en g. Taille S. Sonde : aucune. Décision : faire cette version tôt (recommandé : seulement si vous la voulez avant g ; sinon attendre I-07 complet, plus fiable).

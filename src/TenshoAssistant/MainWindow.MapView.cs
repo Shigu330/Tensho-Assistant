@@ -482,6 +482,7 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value,MapDefaults.ShowTreasure);
                 changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value,MapDefaults.ShowVendors);
                 changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value,MapDefaults.ShowGathering);
+                changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value,MapDefaults.ShowHuntMarks);
                 changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
             }
             if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionPlayer")))
@@ -985,7 +986,7 @@ internal sealed partial class MainWindow
             if(live?.Objects is { } nearby && live.MapId==map.MapId)
                 foreach(var item in nearby)
                 {
-                    if(item.Kind==MapObjectKind.Treasure ? !settings.ShowTreasure:!settings.ShowGathering)continue;
+                    if(item.Kind switch{MapObjectKind.Treasure=>!settings.ShowTreasure,MapObjectKind.HuntMark=>!settings.ShowHuntMarks,_=>!settings.ShowGathering})continue;
                     var kindSize=settings.SizeOf(item.Kind==MapObjectKind.Treasure ? TreasureIcon:GlyphNearbyGathering,map.MapId);
                     if(kindSize<=0)continue;
                     var at=origin+mapPan+MapProjection.PixelFromWorld(item.Position,map)*mapZoom;
@@ -998,12 +999,16 @@ internal sealed partial class MainWindow
                     }
                     else
                     {
-                        var symbol=(item.Kind==MapObjectKind.Treasure ? FontAwesomeIcon.BoxOpen:FontAwesomeIcon.Leaf).ToIconString();
-                        var colour=item.Kind==MapObjectKind.Treasure ? new Vector4(0.98f,0.82f,0.30f,1):new Vector4(0.55f,0.90f,0.55f,1);
+                        var symbol=(item.Kind switch{MapObjectKind.Treasure=>FontAwesomeIcon.BoxOpen,MapObjectKind.HuntMark=>FontAwesomeIcon.Skull,_=>FontAwesomeIcon.Leaf}).ToIconString();
+                        // N-09 (0.441): marks coloured by rank (B blue, A orange, S red).
+                        var colour=item.Kind switch{MapObjectKind.Treasure=>new Vector4(0.98f,0.82f,0.30f,1),
+                            MapObjectKind.HuntMark=>item.Level switch{3=>new Vector4(0.95f,0.30f,0.30f,1),2=>new Vector4(0.98f,0.62f,0.25f,1),_=>new Vector4(0.45f,0.70f,0.98f,1)},
+                            _=>new Vector4(0.55f,0.90f,0.55f,1)};
                         draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
                         draw.AddText(UiBuilder.IconFont,glyph,at-new Vector2(glyph/2),ImGui.GetColorU32(colour),symbol);
                     }
-                    var label=item.Kind==MapObjectKind.Gathering && item.Level>0 ? localization.Format("MapView.GatheringLabel",item.Name,item.Level):item.Name;
+                    var label=item.Kind==MapObjectKind.Gathering && item.Level>0 ? localization.Format("MapView.GatheringLabel",item.Name,item.Level)
+                        :item.Kind==MapObjectKind.HuntMark ? localization.Format("MapView.HuntMarkLabel",item.Name,item.Level switch{3=>"S",2=>"A",_=>"B"}):item.Name;
                     if(hovered && Vector2.Distance(io.MousePos,at)<=glyph){tooltip=label;tooltipPoint=null;}
                 }
             if(settings.ShowFlag && settings.SizeOf(FlagIcon,map.MapId)>0 && live is { Flag:{ } flag } && live.FlagMapId==map.MapId)

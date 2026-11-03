@@ -1,13 +1,13 @@
 # Roadmap des 17 plugins
 
-État au 0.315.0 (2026-11-02, relu contre le CHANGELOG 0.235–0.315, STATUS et le code) : les 17 lignes restent PARTIAL. Depuis le
-0.154, le travail a porté surtout sur les demandes utilisateur R-01 à R-11 (carte, refonte de l'interface, compagnie libre, rappels,
-équipement). Dernière release publiée : Stable-0.242.0 (tag git du commit « Release 0.242.0 ») ; 0.243 à 0.315 ne sont pas encore
-commitées (les commits sont faits par l'utilisateur). Détail par version : [CHANGELOG.md](../../CHANGELOG.md) ; validé en jeu / à valider : [STATUS](../ai/STATUS.md).
+État au 0.446.0 (2026-11-03, relu contre le CHANGELOG, STATUS et le code) : les 17 lignes restent PARTIAL (aucune validation en jeu
+complète). Files a) à g) faites ; restent g2) (R-14, en ultracode), h) (tests en jeu avec l'utilisateur) et les décisions
+([G-PROPOSALS](G-PROPOSALS.md)). Dernière release publiée : Stable-0.430.0 (2026-11-03) ; 0.431 à 0.446
+ne sont pas encore commitées (plan de commit et de release : [STATUS](../ai/STATUS.md) « Git »). Détail par version : [CHANGELOG.md](../../CHANGELOG.md) ; validé en jeu / à valider : [STATUS](../ai/STATUS.md).
 
 Source autoritaire : docs/ai/PROMPT-MAITRE.md, §4. Toutes les lignes sont conservées. State décrit le travail ; Coverage décrit la capacité réellement validée. TODO/READY/ACTIVE/BLOCKED/DONE ; NOT_STARTED/PARTIAL/FUNCTIONAL/REPLACEABLE. NEEDS_STUDY est une note d'incertitude, pas une suppression. Aucun pourcentage arbitraire.
 
-## Demandes utilisateur R-01 à R-11 (état au 0.315)
+## Demandes utilisateur R-01 à R-14 (état au 0.446)
 
 Détail des demandes : [USER-REQUESTS](USER-REQUESTS.md). « Validé » = rapport ou capture de l'utilisateur ; sinon, à valider en jeu.
 
@@ -19,39 +19,40 @@ Détail des demandes : [USER-REQUESTS](USER-REQUESTS.md). « Validé » = rappor
 | R-04 | Carte : clic droit sur une icône = son propre menu | 0.245 ; bouton souris des réglages d'icônes 0.298 | 0.297–0.299 (« Retirer le drapeau » dans ces menus, bouton souris) | — |
 | R-05 | Ordre des fenêtres | clos sans code (2026-11-01, [preuve](../evidence/0.246-r05-window-order.md)) | — | — |
 | R-06 | Refonte de l'interface ([plan](../goals/R-06.md)) | étapes 1 (0.247–0.263), 2 (0.264), 4 (0.270–0.271) ; 3 pour l'essentiel (fiche objet 0.272, Rangements 0.280) ; 5 en partie (↺ 0.249–0.262, « Tout remettre par défaut » 0.258, infobulles de tous les réglages 0.287, réglages de carte 0.288–0.289) ; 6 : légèreté (0.290–0.292) et police de titre du jeu (0.293–0.294) | 0.265–0.271, 0.276–0.279, 0.287–0.294 | réglages utiles manquants (étape 5, point d) ; cadres et textures du jeu (étape 6, avant D17) ; `FilteredTable` retiré du plan (DEC-023) |
-| R-07 | Compagnie libre | page et expéditions 0.307, meilleurs trajets 0.309, montages 0.315 | non | décidé (DEC-023, file f) : seuils de 19 secteurs signalés, prix du marché et paliers, arbre de déblocage et planificateur (distance, durée) des dirigeables |
-| R-08 | Rappels | page 0.300, icône et infobulle dans la barre du serveur 0.300–0.302, expéditions 0.307 | non | escouade, Planeurs d'Ehcatl (sonde, file f) |
+| R-07 | Compagnie libre | page et expéditions 0.307, meilleurs trajets 0.309, montages 0.315 ; suite DEC-023 faite : secteurs signalés 0.334, prix du marché et paliers 0.335, dirigeables 0.336–0.337 ; historique 0.379 | non | à valider en jeu (étape h) |
+| R-08 | Rappels | page 0.300, icône et infobulle dans la barre du serveur 0.300–0.302, expéditions 0.307, escouade 0.333 ; puis étape g (M-01 à M-05, N-01 à N-03) | non | Planeurs d'Ehcatl laissés (rien de lisible, 0.334) ; à valider en jeu |
 | R-09 | Événements saisonniers | page Événements (0.342) : en cours, quêtes, boutiques, noms | 0.342 | à valider ; pas de dates à venir (aucune source fiable) |
 | R-10 | Audit des caches | 0.246 ([audit](../evidence/0.246-cache-audit.md)), revérifié 0.281 (durée « Jamais ») | — | — |
-| R-11 | Équipement ([plan](../goals/R-11.md)) | étape 1 (0.310), mirage (0.311), matérias et plafonds (0.312–0.313), sources et possession (0.314), montages de vaisseaux (0.315) | 0.310–0.314 | 0.315 à valider ; étape 4 : barde de chocobo FAITE 0.340 (escouade retirée, défaut recommandé, décision de la fin) |
+| R-11 | Équipement ([plan](../goals/R-11.md)) | étape 1 (0.310), mirage (0.311), matérias et plafonds (0.312–0.313), sources et possession (0.314), montages de vaisseaux (0.315) | 0.310–0.314 | 0.315 et 0.340 à valider ; étape 4 : barde de chocobo FAITE 0.340, page Chocobo 0.341 (escouade retirée, défaut recommandé, décision de la fin) |
 | R-12 | Webhook Discord pour les alarmes ([demande](USER-REQUESTS.md)) | 0.319 | non | à valider en jeu (étape h) ; utilisé ensuite par C-10, I-02, M-01 |
 | R-13 | Page « Crédits » complète dans le plugin ([demande](USER-REQUESTS.md)) | 0.320 | non | à valider en jeu (étape h) |
 | R-14 | Résistance aux mises à jour de FF14, dans la logique du code ([demande](USER-REQUESTS.md)) | règle pour le nouveau code (0.319) | — | passage complet vers la toute fin (g2) |
 
 Pages ajoutées hors des 17 plugins (barre latérale, `Page` de `MainWindow.cs`) : Rangements (0.280), Météo et Alarmes, Rappels
-(0.300), Compagnie libre (0.307 : onglets Vaisseaux, Meilleurs trajets, Montages), Équipement (0.310), PNJ vendeurs.
+(0.300), Compagnie libre (0.307 : onglets Vaisseaux, Meilleurs trajets, Montages), Équipement (0.310), PNJ vendeurs, Crédits (0.320),
+Chocobo (0.341, la page Personnage est retirée), Événements (0.342), Mandats (0.363), Bestiaire (0.364), Pêche en mer (0.392).
 
 ## File d'attente (STATUS « Prochaine action », demandes du 2026-11-02)
 
 Une à la fois, dans cet ordre :
 
-1. **a)** 0.315 livrée (montages) : attendre le retour en jeu.
+1. **a)** Fait 0.315 (montages) ; retour en jeu repris à l'étape h).
 2. **b)** Fait 0.316 : tour des `.md` et des descriptions des outils dans le code ; feuille de route complétée (ce document :
    points à décider, tests à faire). Décisions prises le 2026-11-02 (0.317, [DEC-023](DECISIONS.md)), voir « À décider / à revoir ».
 3. **c)** Fait 0.318 : plan de ce qui manque à Tensho par rapport aux plugins existants ([GAPS](GAPS.md) : 17 références, dépôt
    officiel, dépôts non officiels conformes aux règles), puis choix de l'utilisateur ([DEC-025](DECISIONS.md)) : étape g) ci-dessous.
    Juste après c) : **R-12**, webhook Discord pour les alarmes ([USER-REQUESTS](USER-REQUESTS.md)).
-4. **d)** Tour du code : réglages qui manquent, outils de développement pour la communauté open source, amélioration du dépôt git
+4. **d)** Fait 0.321–0.326 : tour du code : réglages qui manquent, outils de développement pour la communauté open source, amélioration du dépôt git
    et de GitHub (rien n'est poussé ni réglé sur GitHub sans accord).
-5. **e)** Améliorations générales : la carte d'abord, puis les autres outils ; cadres et textures du jeu (ULD) avant D17.
-6. **f)** Suite des décisions du 2026-11-02 ([DEC-023](DECISIONS.md)), dans cet ordre : 1) seuils des 19 secteurs signalés ;
+5. **e)** Fait 0.327–0.332 : améliorations générales : la carte d'abord, puis les autres outils ; cadres et textures du jeu (ULD) avant D17.
+6. **f)** Fait 0.333–0.342 : suite des décisions du 2026-11-02 ([DEC-023](DECISIONS.md)), dans cet ordre : 1) seuils des 19 secteurs signalés ;
    2) valeur des trajets (prix du marché, puis paliers si la source le permet) ; 3) dirigeables (arbre de déblocage embarqué, puis
    planificateur distance et durée) ; 4) taux de surmatérialisation ; 5) R-11 étape 4 (barde de chocobo, puis escouade) ;
    6) rappels de l'escouade et des Planeurs d'Ehcatl (sonde) ; 7) R-09 événements saisonniers (sonde).
 7. **Publication D17** ([PUBLISHING](PUBLISHING.md)) : à la version 1.0.0, moment fixé par l'auteur. Côté code : fait (0.156–0.157).
    Côté auteur : commit et push, hash du commit dans `manifest.toml`, texte de PR et déclaration d'IA réécrits par l'auteur.
    Avant D17 : cadres ULD (e) ; icônes de quête 71141 / 71151 seulement avec un relevé en jeu.
-8. **g)** Ajouts retenus du plan c) ([GAPS](GAPS.md), 101 manques, choix précis dans sa colonne « Choix »), domaine par domaine
+8. **g)** Fait 0.343–0.446 (sauf les points laissés dans [G-PROPOSALS](G-PROPOSALS.md) « Écarts laissés ») : ajouts retenus du plan c) ([GAPS](GAPS.md), 101 manques, choix précis dans sa colonne « Choix »), domaine par domaine
    dans l'ordre choisi par l'utilisateur ; dans un domaine, valeur haute et petite taille d'abord ; un manque = une version :
    1) Inventaire et marché : I-01, I-02, I-03, I-04, I-05, I-06, I-07, I-08, I-09, I-10, X-07, I-11, I-12, I-13, I-15 ;
    2) Collections : C-01, C-02, C-03, C-04, C-05, C-06, C-07, C-08, C-09, C-10, C-11, C-12, C-13, C-14, C-15, X-02, X-03, X-04 ;
@@ -84,7 +85,7 @@ Points encore ouverts : chacun attend un relevé en jeu ou se règle dans une é
 | Icônes de quête 71141 / 71151 | [BACKLOG](BACKLOG.md) ; [0.211-event-icons](../evidence/0.211-event-icons.md) | Le sens des variantes n'est pas dans les données du jeu : les réglages affichent « variante n ». | Relevé en jeu avant D17, sinon garder « variante n ». |
 | Bonus d'Abondance estimé (0.224) | [BACKLOG](BACKLOG.md), « Revue des points ouverts » ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) | Règle communautaire non officielle, affichée « estimé » et modifiable. | À comparer en jeu avec le bonus réel. |
 | Matérias : pièce sur plusieurs emplacements | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » | Une pièce qui couvre plusieurs emplacements prend le pourcentage du torse. | Relevé en jeu (plafond affiché contre le jeu). |
-| Réglages utiles manquants | [R-06](../goals/R-06.md) étape 5 ; audit du point d) (2026-11-02) | Liste établie par l'audit : 0.324 a fait les interrupteurs de sources et les ↺. Restent des réglages de confort. | Étape e), d'abord ceux sans question (choix recommandé appliqué) : nombre de résultats de recherche d'objets, portée du marché mémorisée, trois interrupteurs des aides Triple Triad, calcul automatique de l'aide du carnet, survol masqué en mission, silence en mission pour la ligne de discussion, page d'ouverture (Accueil ou dernière page), quatre parties du panneau au survol. Les autres valeurs restent figées tant qu'aucun besoin n'est signalé. |
+| Réglages utiles manquants | [R-06](../goals/R-06.md) étape 5 ; audit du point d) (2026-11-02) | FAIT 0.327 (relu le 2026-11-03) : nombre de résultats de recherche, portée du marché mémorisée, aides Triple Triad, calcul automatique du carnet, survol masqué en mission, silence en mission de la ligne de discussion, page d'ouverture, parties du panneau au survol. | Tests en jeu de l'étape h). |
 
 ### Décisions reportées à la fin (choix provisoire de l'agent, à confirmer à l'étape h)
 
@@ -105,11 +106,11 @@ Points encore ouverts : chacun attend un relevé en jeu ou se règle dans une é
 | Étape g) : propositions et choix provisoires | Tenus au fil de g) dans [G-PROPOSALS](G-PROPOSALS.md) : choix provisoires appliqués (I-01, I-02, I-03…), idées repérées en codant, écarts laissés pour une séance ensemble (I-05, I-15). | [G-PROPOSALS](G-PROPOSALS.md) |
 | Alertes de monnaies (I-02, 0.344) | Choix provisoires de l'agent : seuil 80 % du plafond pour toutes (mémoquartz compris ; Currency Watchdog prend 70 % pour eux) ; sans Grande Compagnie, pas d'alerte de sceaux ; une monnaie déjà au-dessus au chargement est listée sans message ; pas de rappel à la connexion ; monnaies suivies : sceaux de la compagnie actuelle, marques, cristaux-trophées, sceaux alliés, Centurio, insignes de chasse, gemmes bicolores, assignats d'Azurée, assignats mauves et orange, mémoquartz permanent, standard et limité. Cristaux, mandats et gils non suivis. À confirmer ou changer. | Inventory/Currencies.cs, MainWindow.Currencies.cs |
 | Touche d'actualisation du prix survolé (I-01, 0.343) | Choix provisoire de l'agent : Ctrl+Alt pendant le survol (les touches F et les lettres sont prises par le jeu), réglable (désactivable). Garder Ctrl+Alt, ou une autre combinaison ? | MainWindow.MarketHover.cs, Items/ItemHoverReader.Dalamud.cs |
-| Carte : quoi ajouter (étape e) | 28 propositions de l'audit du 2026-11-02, rien d'implémenté : zoom à l'ouverture gardé, taille des étiquettes, éthérite la plus proche avec son coût, liens de carte du chat, coordonnées et distances, favoris dessinés, recherche sur la carte, cadres du jeu (ULD)… Recommandé, par valeur : P1, P2, P3 puis P4 (M-03), P6, P8. P0 (repli sur la carte du jeu) est corrigé en 0.328. | [MAP-PROPOSALS](MAP-PROPOSALS.md) |
-| Objets, banque, tri, marché : quoi ajouter (étape e) | 23 propositions de l'audit du 2026-11-02, rien d'implémenté : pièces portées comptées dans les stocks, servant renvoyé signalé, prix des marchands PNJ dans le coût de préparation, prix Universalis par lots, annuler le dernier tri… Recommandé, par valeur : I0, I1, I3, puis I4 et I14. Plusieurs avancent des manques déjà retenus pour g) (I-01, I-06, I-07, I-10, I-12, I-13, X-07). | [ITEMS-PROPOSALS](ITEMS-PROPOSALS.md) |
+| Carte : quoi ajouter (étape e) | 28 propositions de l'audit du 2026-11-02, en partie faites depuis à l'étape g (ligne « État » de chaque proposition, relu le 2026-11-03) : zoom à l'ouverture gardé, taille des étiquettes, éthérite la plus proche avec son coût, liens de carte du chat, coordonnées et distances, favoris dessinés, recherche sur la carte, cadres du jeu (ULD)… Recommandé, par valeur : P1, P2, P3 puis P4 (M-03), P6, P8. P0 (repli sur la carte du jeu) est corrigé en 0.328. | [MAP-PROPOSALS](MAP-PROPOSALS.md) |
+| Objets, banque, tri, marché : quoi ajouter (étape e) | 23 propositions de l'audit du 2026-11-02, en partie faites depuis à l'étape g (ligne « État » de chaque proposition, relu le 2026-11-03) : pièces portées comptées dans les stocks, servant renvoyé signalé, prix des marchands PNJ dans le coût de préparation, prix Universalis par lots, annuler le dernier tri… Recommandé, par valeur : I0, I1, I3, puis I4 et I14. Plusieurs avancent des manques déjà retenus pour g) (I-01, I-06, I-07, I-10, I-12, I-13, X-07). | [ITEMS-PROPOSALS](ITEMS-PROPOSALS.md) |
 | Inventaire vidé 250 ms à chaque changement (audit 0.329, défaut 7) | Non corrigé : la correction contredit DEC-004 (« invalidation atomique, collecte coalescée 250 ms ») et ses tests. Effet : l'éditeur de tri et les stocks clignotent un court instant après chaque mouvement d'objet. Recommandé : garder DEC-004 et faire garder à l'éditeur de tri la dernière liste complète (jamais pour l'aperçu ni le tri). | `MainWindow.SortPreview.cs` ; DEC-004 |
-| Artisanat et récolte : quoi ajouter (étape e) | 37 propositions de l'audit du 2026-11-02, rien d'implémenté : qualité visée dans le carnet, Manipulation dans la macro proposée, séquences essayées sur toutes les recettes, suivi de la séquence pendant la synthèse, points à horaire ouverts maintenant, « possible maintenant ? » pour la pêche… Recommandé : C0, C1, C5, C7, puis C8 et C10 ; C33 (une séance de relevés en jeu avant de coder) d'abord pour ce qui demande une sonde. | [CRAFT-GATHER-PROPOSALS](CRAFT-GATHER-PROPOSALS.md) |
-| Alarmes, compagnie libre, quêtes, équipement, mini-jeux : quoi ajouter (étape e) | 30 propositions de l'audit du 2026-11-02, rien d'implémenté : alarmes en heure réelle, rappels par personnage, alarme de retour des vaisseaux d'office, colonnes Niveau et Zone des quêtes, drapeau sur la position d'un monstre, missions aléatoires du jour… Recommandé : T0, T1, T2, T3, T4 ; T5 (une séance de relevés en jeu) d'abord pour ce qui demande une sonde. | [TOOLS-PROPOSALS](TOOLS-PROPOSALS.md) |
+| Artisanat et récolte : quoi ajouter (étape e) | 37 propositions de l'audit du 2026-11-02, en partie faites depuis à l'étape g (ligne « État » de chaque proposition, relu le 2026-11-03) : qualité visée dans le carnet, Manipulation dans la macro proposée, séquences essayées sur toutes les recettes, suivi de la séquence pendant la synthèse, points à horaire ouverts maintenant, « possible maintenant ? » pour la pêche… Recommandé : C0, C1, C5, C7, puis C8 et C10 ; C33 (une séance de relevés en jeu avant de coder) d'abord pour ce qui demande une sonde. | [CRAFT-GATHER-PROPOSALS](CRAFT-GATHER-PROPOSALS.md) |
+| Alarmes, compagnie libre, quêtes, équipement, mini-jeux : quoi ajouter (étape e) | 30 propositions de l'audit du 2026-11-02, en partie faites depuis à l'étape g (ligne « État » de chaque proposition, relu le 2026-11-03) : alarmes en heure réelle, rappels par personnage, alarme de retour des vaisseaux d'office, colonnes Niveau et Zone des quêtes, drapeau sur la position d'un monstre, missions aléatoires du jour… Recommandé : T0, T1, T2, T3, T4 ; T5 (une séance de relevés en jeu) d'abord pour ce qui demande une sonde. | [TOOLS-PROPOSALS](TOOLS-PROPOSALS.md) |
 | Cadre des fenêtres du jeu (0.332) | Réglage désactivé par défaut tant que l'aspect n'a pas été vu en jeu. Recommandé après essai : l'activer par défaut, puis l'étendre à la fenêtre de la carte et aux panneaux, et ajouter les séparateurs du jeu (Journal_Separator, WindowA_Line, déjà prouvés). | `UI/Components/GameFrame.cs` ; docs/evidence/0.332-uld-window-frame.md |
 | Escouade dans R-11 étape 4 (sonde 0.332) | L'équipement d'un membre d'escouade n'est qu'une apparence (mirage, teintures), sans caractéristiques : rien à planifier. Recommandé : retirer l'escouade de R-11 étape 4 et garder la barde de chocobo. Les rappels mission et entraînement sont faits (0.333). Appliqué en 0.340 (barde faite, escouade non planifiée) ; à confirmer à la fin. | docs/evidence/0.332-squadron-probe.md |
 | « Monstres au survol » sans effet (relevé en 0.327) | Rien n'est retiré en attendant votre choix. Le réglage ne commande plus rien : la fonction qui lisait les monstres du wiki au survol (`DrawHoveredSources`) n'est plus appelée depuis la refonte du panneau, qui montre déjà les monstres dans « Comment l'obtenir » (données du jeu, LuminaSupplemental, puis Garland et le wiki), désormais réglable par la case « Sources ». Recommandé : retirer la case et le code mort ; sinon la rebrancher (requêtes wiki au survol). | `MainWindow.MarketHover.cs` (DrawHoveredSources), `Monsters/MonsterHoverSources.cs` |

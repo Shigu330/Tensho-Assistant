@@ -81,6 +81,9 @@ public static class CreditCatalog
             ["Community/GatherBuddyFish.cs", "Plugin.cs", "MainWindow.FishingPanel.cs", "MainWindow.GatheringFish.cs", "MainWindow.FishingSources.cs", "MainWindow.Gathering.cs", "MainWindow.Alarms.cs", "MainWindow.Tools.cs"], ["api.github.com", "raw.githubusercontent.com"], "CommunityGatherBuddy", false),
         new("FFXIVTeamcraft", CreditKind.Online, "FFXIV Teamcraft", "Flavien Normand, ffxiv-teamcraft", "MIT", "https://github.com/ffxiv-teamcraft/ffxiv-teamcraft", "https://github.com/ffxiv-teamcraft/ffxiv-teamcraft/blob/staging/LICENSE",
             ["Community/FishBiteTimes.cs", "Plugin.cs", "MainWindow.FishingPanel.cs", "MainWindow.GatheringFish.cs", "MainWindow.Advanced.cs", "Gear/GearCatalog.cs", "MainWindow.Gear.cs", "Craft/TeamcraftExport.cs", "MainWindow.CraftPlan.cs"], ["gubal.ffxivteamcraft.com", "ffxivteamcraft.com"], "CommunityTeamcraftBites", false),
+        // 0.445 (N-05): open plots, read only, the world id only is sent; no licence stated by the project.
+        new("PaissaDB", CreditKind.Online, "PaissaDB", "zhudotexe", "none", "https://github.com/zhudotexe/FFXIV_PaissaDB", "",
+            ["Community/PaissaDb.cs", "MainWindow.Plots.cs", "Plugin.cs"], ["paissadb.zhu.codes"], "PlotWatch", false),
         new("Discord", CreditKind.Online, "Discord", "Discord Inc.", "proprietary", "https://discord.com/developers/docs/resources/webhook", "",
             ["Alarms/DiscordNotifier.cs", "Alarms/DiscordWebhook.cs", "MainWindow.Discord.cs", "MainWindow.Alarms.cs", "Plugin.cs"], ["discord.com", "discordapp.com", "ptb.discord.com", "canary.discord.com"], "Discord.Enabled", false),
         new("GatherBuddyReborn", CreditKind.Rule, "GatherBuddyReborn", "FFXIV-CombatReborn", "Apache-2.0", "https://github.com/FFXIV-CombatReborn/GatherBuddyReborn", "https://raw.githubusercontent.com/FFXIV-CombatReborn/GatherBuddyReborn/main/LICENSE",

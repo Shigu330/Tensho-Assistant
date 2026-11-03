@@ -161,6 +161,8 @@ internal sealed partial class MainWindow
             IntSetting("ModuleSettings.Budget","SettingTips.Budget",()=>search.Budget,value=>search.Budget=value,1,500000,searchDefaults.Budget);
             ValidateCraftSearch();
             ImGui.TextDisabled(localization.Get("ModuleSettings.SearchHelp"));
+            // 0.438 (user request): actions the player forbids, everywhere crafting actions are proposed.
+            DrawForbiddenActions(search);
             ImGui.TextColored(Accent,localization.Get("ModuleSettings.Export"));
             var exportBefore=(search.ExtraWait,search.Echo,search.BuffExtraWait);
             IntSetting("ModuleSettings.Wait","SettingTips.Wait",()=>search.ExtraWait,value=>search.ExtraWait=value,0,3,searchDefaults.ExtraWait);

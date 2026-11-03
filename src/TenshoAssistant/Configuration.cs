@@ -9,7 +9,7 @@ public static class ConfigurationReset
 {
     public static readonly IReadOnlySet<string> Kept = new HashSet<string>
     {
-        "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "CraftPresets", "TripleTriadDeck",
+        "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
         "Voyages", "GearPlans", "GearMateria", "SubmarineUnlocked", "VesselPlans",
@@ -71,6 +71,10 @@ public static class ConfigurationReset
         "TrackerWindow",
         // 0.426 (user request): Tensho closes when it opens a game window.
         "CloseOnGameWindow",
+        // 0.445 (domain 6, N-05): PaissaDB plot watch.
+        "PlotWatch", "PlotWatchMinutes", "PlotWatchSize",
+        // 0.446 (N-09): alert when an A or S hunt mark appears nearby.
+        "HuntMarkAlert",
         // 0.403 (g, R-08): GP alert and its threshold.
         "GpAlert", "GpAlertThreshold",
     };
@@ -94,6 +98,8 @@ public sealed class CraftSearchSettings
     // X-12 (0.419): extra wait of the buffs (2-second actions) apart from the other actions; null = same as ExtraWait (before 0.419).
     public int? BuffExtraWait { get; set; }
     public int? BoundedBuffExtraWait => BuffExtraWait is { } wait ? Math.Clamp(wait, 0, 3) : null;
+    // 0.438 (user request): crafting actions the player forbids (names of CraftActionKind); empty by default.
+    public List<string> ForbiddenActions { get; set; } = [];
 }
 
 /// <summary>Tensho map display settings (MAP-016, Mappy-like): each layer can be turned off; values are clamped on use.</summary>
@@ -113,6 +119,8 @@ public sealed class MapViewSettings
     // 0.107: nearby objects, teleport, per-layer options and replacing the game map (requested by the user, on by default).
     public bool ShowTreasure { get; set; } = true;
     public bool ShowGathering { get; set; } = true;
+    // N-09 (0.441): living hunt marks streamed around the player (B, A, S).
+    public bool ShowHuntMarks { get; set; } = true;
     public bool GatheringLabels { get; set; } = true;
     public bool QuestTooltips { get; set; } = true;
     public bool ShowViewCone { get; set; } = true;
@@ -406,8 +414,17 @@ public sealed partial class Configuration
     public bool GoThereEquip { get; set; }
     // 0.415 (g, R-13): small pinned window of the tracked alarms' items, soonest first (off by default).
     public bool TrackerWindow { get; set; }
+    // X-09 (0.444): the place directory (residential addresses); empty by default.
+    public List<Maps.PlaceAddress>? PlaceDirectory { get; set; }
     // 0.426 (user request): Tensho closes once it has opened a game window (crafting or gathering log, game map); on by default.
     public bool CloseOnGameWindow { get; set; } = true;
+    // 0.445 (N-05): read the open plots of the current world from PaissaDB every N minutes and say the new ones (off by default);
+    // size filter: 0 any, 1 small, 2 medium, 3 large.
+    public bool PlotWatch { get; set; }
+    public int PlotWatchMinutes { get; set; } = 30;
+    public int PlotWatchSize { get; set; }
+    // 0.446 (N-09): a chat line (and the alarm sound if the alarms play one) when an A or S hunt mark appears nearby; off by default.
+    public bool HuntMarkAlert { get; set; }
     // 0.394 (user request): titles, sections and text fonts (family and size); null = defaults.
     public UI.FontSettings? Fonts { get; set; }
     // 0.391 (g, X-06): on-screen GP regeneration tick bar of gatherers (off by default).

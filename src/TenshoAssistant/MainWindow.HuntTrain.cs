@@ -1,0 +1,92 @@
+using System.Numerics;
+using Dalamud.Bindings.ImGui;
+using TenshoAssistant.Maps;
+
+namespace TenshoAssistant;
+
+/// <summary>
+/// N-15 (0.442): Maps › « Hunt train » (folded): while recording, the A and S marks (and B when asked) the map's live reading meets are
+/// noted once per map with their position; « Next flag » puts the game's flag on the first stop not visited and marks it; the list
+/// copies as « Name — Zone ( x , y ) » lines (the bookmark import reads them back). Kept for the session.
+/// </summary>
+internal sealed partial class MainWindow
+{
+    private IReadOnlyList<HuntTrainStop> huntTrain=[];
+    private bool huntTrainRecording,huntTrainRankB;
+    private DateTimeOffset huntTrainObservedAt;
+
+    // 0.446 (N-09): marks already announced (map and name), so each A or S mark is said once per session (forgotten past 200).
+    private readonly HashSet<string> huntMarksAnnounced=[];
+    internal Action<string>? ChatNotice { get; set; }
+
+    /// <summary>Called every frame: notes the marks met (once a second, while recording) and announces the A and S marks (setting).</summary>
+    internal void ObserveHuntTrain()
+    {
+        if(!huntTrainRecording && !configuration.HuntMarkAlert)return;
+        var now=DateTimeOffset.UtcNow;
+        if(now<huntTrainObservedAt)return;
+        huntTrainObservedAt=now.AddSeconds(1);
+        if(mapLive?.State is not { Objects:{ } nearby } live || maps.State.Catalog?.Find(live.MapId) is not { } map)return;
+        if(configuration.HuntMarkAlert)
+            foreach(var item in nearby.Where(item=>item.Kind==MapObjectKind.HuntMark && item.Level>=2))
+            {
+                if(!huntMarksAnnounced.Add($"{map.MapId}/{item.Name}"))continue;
+                var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(item.Position,map),map);
+                ChatNotice?.Invoke(localization.Format("HuntTrain.MarkAlert",item.Name,item.Level==3 ? "S":"A",map.Zone,
+                    coordinate.X.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),coordinate.Y.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture)));
+                if(configuration.AlarmOptions.PlaySound)Alarms.AlarmService.PlaySound(configuration.AlarmOptions.Sound,log);
+            }
+        if(huntMarksAnnounced.Count>200)huntMarksAnnounced.Clear();
+        if(!huntTrainRecording)return;
+        foreach(var item in nearby.Where(item=>item.Kind==MapObjectKind.HuntMark && (item.Level>=2 || huntTrainRankB)))
+        {
+            var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(item.Position,map),map);
+            huntTrain=HuntTrain.Add(huntTrain,new(item.Name,item.Level,map.MapId,map.TerritoryId,map.Zone,coordinate.X,coordinate.Y,now));
+        }
+    }
+
+    private void DrawHuntTrain(MapCatalog catalog)
+    {
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("HuntTrain.Title",huntTrain.Count)+"###HuntTrain"))return;
+        ImGui.TextWrapped(localization.Get("HuntTrain.Help"));
+        ImGui.Checkbox(localization.Get("HuntTrain.Record")+"###HuntTrainRecord",ref huntTrainRecording);
+        Tip("HuntTrain.RecordTip");
+        ImGui.SameLine();
+        ImGui.Checkbox(localization.Get("HuntTrain.RankB")+"###HuntTrainB",ref huntTrainRankB);
+        Tip("HuntTrain.RankBTip");
+        BoolSetting("HuntTrain.MarkAlertSetting","HuntTrain.MarkAlertSettingTip",()=>configuration.HuntMarkAlert,value=>configuration.HuntMarkAlert=value,c=>c.HuntMarkAlert);
+        if(huntTrain.Count==0){ImGui.TextDisabled(localization.Get("HuntTrain.Empty"));return;}
+        if(HuntTrain.Next(huntTrain) is { } next && ImGui.SmallButton(localization.Get("HuntTrain.NextFlag")) && catalog.Find(huntTrain[next].MapId) is { } nextMap)
+        {
+            OpenMapPointFromPage(nextMap,huntTrain[next].X,huntTrain[next].Y);
+            huntTrain=HuntTrain.MarkVisited(huntTrain,next);
+        }
+        // X-13 (0.446): the conductor's announcement, copied (never sent): the game turns « <flag> » into the flag's link when pasted.
+        // The next stop not visited, else the last one.
+        var called=huntTrain[HuntTrain.Next(huntTrain) ?? huntTrain.Count-1];
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get("HuntTrain.Announce")))
+            ImGui.SetClipboardText(localization.Format("HuntTrain.AnnounceText",called.Name,called.Rank switch{3=>"S",2=>"A",_=>"B"},called.Zone)+" <flag>");
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("HuntTrain.AnnounceTip"));
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get("HuntTrain.Copy")))ImGui.SetClipboardText(HuntTrain.Export(huntTrain));
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get("HuntTrain.Clear")) && ImGui.GetIO().KeyCtrl){huntTrain=[];return;}
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("HuntTrain.ClearTip"));
+        for(var index=0;index<huntTrain.Count;index++)
+        {
+            var stop=huntTrain[index];
+            ImGui.PushID($"Train{index}");
+            try
+            {
+                var rank=stop.Rank switch{3=>"S",2=>"A",_=>"B"};
+                ImGui.TextColored(stop.Visited ? Muted:Accent,localization.Format("HuntTrain.Stop",index+1,stop.Name,rank,stop.Zone,stop.X.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),
+                    stop.Y.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),stop.SeenAt.ToLocalTime().ToString("t")));
+                ImGui.SameLine();
+                if(ImGui.SmallButton(localization.Get("HuntTrain.Flag")) && catalog.Find(stop.MapId) is { } map)
+                {OpenMapPointFromPage(map,stop.X,stop.Y);huntTrain=HuntTrain.MarkVisited(huntTrain,index);}
+            }
+            finally{ImGui.PopID();}
+        }
+    }
+}

@@ -10,7 +10,14 @@ internal sealed partial class MainWindow
     private string? CraftMessageKey(string message)=>message switch
     {
         "Simulation parameters missing for this recipe." => "CraftMessages.NoParameters",
-        "Expert, adjusted, specialist or fixed-quality recipe outside this simulation's scope." => "CraftMessages.SpecialRecipe",
+        "Adjusted or fixed-quality recipe outside this simulation's scope." => "CraftMessages.SpecialRecipe",
+        // A-13 (0.434): specialist actions and recipes, favourable-condition actions.
+        "Specialist recipe: tick Specialist in the attributes." => "CraftMessages.SpecialistRecipe",
+        "Specialist action: tick Specialist in the attributes." => "CraftMessages.SpecialistAction",
+        "Heart and Soul can be used only once per synthesis." => "CraftMessages.HeartAndSoulOnce",
+        "Quick Innovation: once per synthesis, without Innovation active." => "CraftMessages.QuickInnovation",
+        "Careful Observation can be used three times per synthesis." => "CraftMessages.CarefulObservation",
+        "Good or Excellent condition, or Heart and Soul, required." => "CraftMessages.Favourable",
         "Collectable maximum quality missing or incompatible." => "CraftMessages.CollectableQuality",
         "Native parameters incomplete or incompatible with the model." => "CraftMessages.NativeParameters",
         "Craftsmanship or control below the recipe's minimum." => "CraftMessages.MinimumStats",

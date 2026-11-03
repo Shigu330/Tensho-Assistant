@@ -103,7 +103,7 @@ public sealed class CraftLogSession : IDisposable
         {
             token.ThrowIfCancellationRequested();
             if(!CraftPresets.Valid(preset) || preset.RecipeId!=input.Recipe.RecipeId || preset.ResultItemId!=input.Recipe.ResultItemId
-                || preset.CraftTypeId!=input.Recipe.CraftTypeId)continue;
+                || preset.CraftTypeId!=input.Recipe.CraftTypeId || CraftActionRules.UsesForbidden(preset.Actions,input.Options.Forbidden))continue;
             try
             {
                 var simulation=CraftSimulation.Run(input.Recipe,input.Stats,input.StartingQuality,preset.Actions,token);

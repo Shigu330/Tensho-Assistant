@@ -23,6 +23,7 @@ internal sealed partial class MainWindow
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("CollectableTable.Title",catalog?.Count ?? 0)+"###CollectableTable"))return;
         if(catalog is null){ImGui.TextDisabled(localization.Get("CollectablePanel.Loading"));return;}
         ImGui.TextWrapped(localization.Get("CollectableTable.Help"));
+        DrawHeldCollectables(reader,catalog);
         ImGui.SetNextItemWidth(280);
         ImGui.InputTextWithHint("###CollectableQuery",localization.Get("CollectableTable.Search"),ref collectableQuery,80);
         Tip("CollectableTable.SearchTip");
@@ -64,6 +65,20 @@ internal sealed partial class MainWindow
             finally{clipper.End();clipper.Destroy();}
         }
         finally{ImGui.EndTable();}
+    }
+
+    // A-15 (0.432): the collectables in the bags, their tier and scrips (first scrip rule of the item), with the total.
+    private void DrawHeldCollectables(CollectableReader reader,CollectableCatalog catalog)
+    {
+        reader.WantHoldings();
+        if(reader.Holdings is not { } held){ImGui.TextDisabled(localization.Get("CollectableTable.HeldReading"));return;}
+        var values=held.Select(item=>Gathering.Collectables.Value(catalog,item)).OfType<CollectableValue>().ToArray();
+        ImGui.TextColored(Accent,localization.Format("CollectableTable.Held",held.Count,values.Sum(value=>value.Scrips)));
+        var items=itemCatalog.State.Catalog;
+        foreach(var value in values.OrderByDescending(value=>value.Scrips).Take(30))
+            ImGui.TextDisabled(localization.Format("CollectableTable.HeldRow",items?.Find(value.Held.ItemId)?.Name ?? $"ID {value.Held.ItemId}",value.Held.Collectability,
+                localization.Get("CollectableTable.Tier"+value.Tier),value.Scrips));
+        if(held.Count>values.Length)ImGui.TextDisabled(localization.Format("CollectableTable.HeldOther",held.Count-values.Length));
     }
 
     // The item's own thresholds, on its Gathering view (nothing when the game takes no collectable of it).

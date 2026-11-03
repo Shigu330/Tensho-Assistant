@@ -56,8 +56,11 @@ public static class CraftLiveProjection
             foreach(var combo in combos)
             foreach(var usage in usages)
             {
+                // A-13 (0.434): Final Appraisal (2190) and Heart and Soul (2665) as observed; the uses of the specialist actions are not
+                // shown by the game: taken as not used (the game's own availability then refuses what is spent).
                 var state=new CraftSimState((int)native.Step-1,(int)native.Progress,(int)native.Quality,(int)native.Durability,(int)raw.Cp,Counter(251),
-                    Counter(2226),Counter(2189),Counter(254),Math.Max(Counter(252),Counter(257)),Counter(1164),Counter(2191),combo,CraftFinish.InProgress,protection,usage);
+                    Counter(2226),Counter(2189),Counter(254),Math.Max(Counter(252),Counter(257)),Counter(1164),Counter(2191),combo,CraftFinish.InProgress,protection,usage,
+                    Counter(2190),effects.Effects.Any(effect=>effect.Metadata.Id==2665));
                 // Native availability narrows impossible resource/history alternatives; no hidden alternative is chosen as fact.
                 var next=CraftSimulation.Apply(p,initial.Stats,recipe.Level,initial.BaseProgress,initial.BaseQuality,state,action.Kind,out _,condition,goodPercent);
                 if(next is not null)alternatives.Add(next);

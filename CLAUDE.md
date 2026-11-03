@@ -17,8 +17,9 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
 - Dépôt Windows : `C:\Plugins-ff14` (GitHub : Shigu330/Tensho-Assistant, branches Devloppement (travail) et main (releases) ; analyse CodeQL dans .github/workflows). Session desktop avec PowerShell : l'agent compile et teste.
 - SDK .NET 10.0.403 (global.json), Dalamud.NET.Sdk 15 ; build et tests : `.\scripts\Verify.ps1` (compile Release, tests managés,
   validation des langues, paquet). Sondes de données en lecture seule : `tools/ShopCurrencyProbe`, `tools/ApiProbe`.
-- **Les commits sont faits par l'application de bureau de l'utilisateur.** L'agent ne commit pas, ne pousse pas, ne réécrit pas l'historique
-  sans demande explicite.
+- **Git géré par l'agent (accord de l'utilisateur, 2026-11-03)** : commit et push de chaque version sur `Devloppement` par
+  `.\scripts\Verify.ps1 -Commit` (après `-Commit -DryRun`). Release seulement sur demande explicite de l'utilisateur. Jamais de push forcé,
+  de réécriture d'historique ni de réglage GitHub sans accord ; plan détaillé : [docs/ai/STATUS.md](docs/ai/STATUS.md) « Git ».
 
 ## À chaque version livrée
 
@@ -31,9 +32,10 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
 3. Ajouter l'entrée en tête de [CHANGELOG.md](CHANGELOG.md) (demande, cause, correction, preuves, résultat de Verify, « non validé en jeu »),
    en français, suivie d'une sous-section `### English` (résumé en anglais : c'est elle qui sert aux commits et aux releases GitHub).
 4. Mettre à jour [docs/ai/STATUS.md](docs/ai/STATUS.md) (version, à valider, prochaine action).
-5. Commit et release : faits par l'utilisateur avec `.\scripts\Verify.ps1 -Commit` (branche `Devloppement`, commit + push) puis
-   `.\scripts\Verify.ps1 -Release` (Devloppement fusionnée dans main, tag `Stable-x.y.z`, release GitHub avec `latest.zip`, `repo.json`) ; `-DryRun` pour voir
-   les commandes. L'agent ne lance pas ces options sans demande explicite (voir CONTRIBUTING.md « Versions and releases »).
+5. Commit : fait par l'agent à la fin de la version, `.\scripts\Verify.ps1 -Commit -DryRun` puis `-Commit` (branche `Devloppement`,
+   commit + push ; `$env:TENSHO_COMMIT_TRAILER` ajoute la ligne `Co-Authored-By` de l'agent). Release : `.\scripts\Verify.ps1 -Release`
+   (Devloppement fusionnée dans main, tag `Stable-x.y.z`, release GitHub avec `latest.zip`, `repo.json`), seulement sur demande explicite
+   de l'utilisateur ; `-DryRun` pour voir les commandes. L'utilisateur peut aussi les lancer lui-même (CONTRIBUTING.md « Versions and releases »).
 6. Toute preuve citée par le code (sonde, extrait de journal) va dans `docs/evidence/` et est référencée par ce chemin.
    `checkpoints/` est un dossier local de travail, ignoré par git. Demande utilisateur (2026-11-02) : avant toute grosse modification,
    un zip de sauvegarde des fichiers du dépôt (sans bin/obj) y est créé (`backup-<horodatage>-<contexte>.zip`).

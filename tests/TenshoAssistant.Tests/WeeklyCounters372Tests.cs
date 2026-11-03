@@ -10,7 +10,7 @@ internal static class WeeklyCounters372Tests
         {
             var timers = Read("Reminders/GameTimers.Dalamud.cs");
             Check(timers.Contains("(nint)UIState.MemberFunctionPointers.GetNextMapAllowanceTimestamp!=0",StringComparison.Ordinal)
-                && timers.Contains("catch(Exception){bingo=null;}",StringComparison.Ordinal) && timers.Contains("catch(Exception){bills=null;}",StringComparison.Ordinal)
+                && timers.Contains("catch(Exception){bingo=null;}",StringComparison.Ordinal) && timers.Contains("catch(Exception){bills=null;huntBills=null;}",StringComparison.Ordinal)
                 && timers.Contains("catch(Exception){nextMap=null;}",StringComparison.Ordinal),"guarded each on its own");
             var page = Read("MainWindow.Reminders.cs");
             Check(page.Contains("var mapReady=timers?.NextMapAllowance ?? mapAt?.AddHours(18);",StringComparison.Ordinal),"game time first, manual time as fallback");

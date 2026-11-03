@@ -40,8 +40,11 @@ internal static class CraftObservedEffectsTests
         }),
         ("Observed craft unsupported effects and native proc bits remain separate facts",()=>
         {
-            var result=CraftObservedEffects.Decode(Frame([new(2190,3,0),new(2665,0,0)],flags:0x38000002),Catalog());
+            // 0.434 (A-13): Final Appraisal (2190) and Heart and Soul (2665) are modelled now; Expedience (3812, Daring Touch) is not.
+            var result=CraftObservedEffects.Decode(Frame([new(3812,1,0)],flags:0x38000002),Catalog());
             Check(!result.CountersKnown && result.Effects.All(effect=>!effect.Supported),"effects outside simulator not silently discarded");
+            var modelled=CraftObservedEffects.Decode(Frame([new(2190,3,0),new(2665,0,0)]),Catalog());
+            Check(modelled.CountersKnown && modelled.Effects.All(effect=>effect.Supported),"Final Appraisal and Heart and Soul modelled");
             Check(result.NativeProcs.SequenceEqual(new[]{"StandardTouchProc","AdvancedTouchProc","ObservedProc"}),"raw native named flags, not converted into simulated combo");
             Throws<NotSupportedException>(()=>((IList<string>)result.Issues).Clear());
         })

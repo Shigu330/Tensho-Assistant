@@ -113,6 +113,8 @@ internal sealed partial class MainWindow
         if(ImGui.SmallButton(localization.Get("CraftSimulation.Live"))) page=Page.CraftLive;
         // 0.424 (user report): « Back to the item » — the recipe's item sheet, Craft tab.
         if(ImGui.SmallButton(localization.Get("CraftSimulation.Notebook"))) { if(simulationRecipe is { } shown)SelectItem(shown.ResultItemId); page=Page.Items; focusCraftTab=true; }
+        // A-05 (0.433): crafting lists, with or without a recipe shown.
+        DrawCraftLists();
         // 0.423 (user report): with no recipe chosen, the item in context's own recipe (its first one) is taken, on Preparation.
         if(simulationRecipe is null && itemId>0 && recipeCatalog.State.Catalog?.ForResult((uint)itemId) is { Count:>0 } own)OpenCraftPreparation(PreferredRecipe(own));
         if(simulationRecipe is not { } recipe) { ImGui.TextWrapped(localization.Get("CraftSimulation.ChooseRecipe")); return; }
@@ -146,6 +148,8 @@ internal sealed partial class MainWindow
         DrawCraftPresetSave();
         var p=recipe.Simulation!; var job=recipe.CraftTypeId+8;
         if(p.Collectable)ImGui.TextColored(Accent,localization.Get("SimulationHelp.Collectable"));
+        // A-07 (0.435): expert recipes simulated in the normal condition, said so.
+        if(p.Expert)ImGui.TextColored(Accent,localization.Get("CraftSimulation.ExpertNormal"));
         ImGui.TextDisabled(localization.Format("SimulationHelp.Parameters",p.Progress,p.Quality,p.Durability,p.RequiredCraftsmanship,p.RequiredControl));
         ImGui.TextWrapped(localization.Get("SimulationHelp.Model"));
         var stats=characterStats.State;
@@ -171,6 +175,8 @@ internal sealed partial class MainWindow
             ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Cp")+"###SimCp",ref simulationCp,0); Tip("CraftSimulation.CpTip");
             ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Format("CraftSimulation.StartingQuality",p.MaxStartingQuality)+"###SimQuality",ref simulationQuality,0); Tip("CraftSimulation.StartingQualityTip");
             changed|=ImGui.Checkbox(localization.Get("CraftSimulation.Manipulation")+"###SimManipulation",ref simulationManipulation); Tip("CraftSimulation.ManipulationTip");
+            // A-13 (0.434): specialist job.
+            changed|=ImGui.Checkbox(localization.Get("CraftSimulation.Specialist")+"###SimSpecialist",ref simulationSpecialist); Tip("CraftSimulation.SpecialistTip");
             // A-02 (0.420): food and medicine added to the attributes.
             if(DrawCraftConsumables()){simulationResult=null;simulationError=null;}
         }
@@ -178,6 +184,8 @@ internal sealed partial class MainWindow
         DrawCraftSearch();
         // A-08 (0.425): a pasted macro as the sequence.
         DrawCraftMacroImport(catalog,job);
+        // A-14 (0.436): a rotation played by hand, recorded.
+        DrawCraftRecorder(catalog,job);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftSimulation.AddAction")+"###SimAddAction",ImGuiTreeNodeFlags.DefaultOpen))
         {
             var columns=Math.Max(1,(int)(ImGui.GetContentRegionAvail().X/175));
@@ -191,14 +199,16 @@ internal sealed partial class MainWindow
                         ImGui.TableNextColumn(); ImGui.PushID((int)spec.Kind);
                         try
                         {
-                            ImGui.BeginDisabled(simulationActions.Count>=100 || simulationLevel<spec.Level || spec.Kind==CraftActionKind.Manipulation && !simulationManipulation);
+                            // 0.438 (user request): forbidden actions greyed out (Settings › Crafting).
+                            var forbidden=CraftActionRules.Forbidden(craftForbidden,spec.Kind);
+                            ImGui.BeginDisabled(forbidden || simulationActions.Count>=100 || simulationLevel<spec.Level || spec.Kind==CraftActionKind.Manipulation && !simulationManipulation);
                             try
                             {
                                 DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(26)); var click=ImGui.IsItemClicked();
                                 if(ImGui.IsItemHovered()) WrappedTooltip(action.Description);
                                 ImGui.SameLine(); click|=ImGui.SmallButton(action.Name);
-                                if(ImGui.IsItemHovered()) WrappedTooltip(localization.Format("SimulationHelp.Action",action.Description,spec.Level,spec.Cp));
-                                if(click && simulationActions.Count<100 && simulationLevel>=spec.Level && (spec.Kind!=CraftActionKind.Manipulation || simulationManipulation))
+                                if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(forbidden ? localization.Get("CraftRules.ForbiddenTip"):localization.Format("SimulationHelp.Action",action.Description,spec.Level,spec.Cp));
+                                if(click && !forbidden && simulationActions.Count<100 && simulationLevel>=spec.Level && (spec.Kind!=CraftActionKind.Manipulation || simulationManipulation))
                                 { simulationActions.Add(spec.Kind); simulationResult=null; }
                             }
                             finally { ImGui.EndDisabled(); }
@@ -218,7 +228,9 @@ internal sealed partial class MainWindow
             catch(ArgumentException error)
             {
                 simulationResult=null;
-                simulationError=localization.Get(error.ParamName=="stats" ? "SimulationHelp.InvalidStats" : error.ParamName=="sequence" ? "CraftMessages.ActionLimit" : "ServiceErrors.Craft");
+                // 0.434: a known reason (specialist recipe…) is shown as such; the others keep the generic message.
+                simulationError=CraftMessageKey(error.Message) is not null ? error.Message
+                    : localization.Get(error.ParamName=="stats" ? "SimulationHelp.InvalidStats" : error.ParamName=="sequence" ? "CraftMessages.ActionLimit" : "ServiceErrors.Craft");
                 log.Warning(error,"Craft simulation rejected its input.");
             }
         }
@@ -228,6 +240,10 @@ internal sealed partial class MainWindow
             var state=result.Final;
             ImGui.TextColored(state.Finish==CraftFinish.Completed ? Success:Accent,localization.Format("CraftSequence.Result",localization.Get(state.Finish switch {CraftFinish.Completed=>"CraftSequence.Completed",CraftFinish.Broken=>"CraftSequence.Broken",_=>"CraftSequence.Incomplete"}),state.Progress,p.Progress,state.Quality,p.Quality,state.Durability,state.Cp));
             if(result.InvalidAction is { } invalid) ImGui.TextWrapped(localization.Format("SimulationHelp.Invalid",invalid+1,CraftMessage(result.Error ?? "—")));
+            // A-13 (0.434): success assumed for the actions left to chance.
+            if(result.Steps.Any(step=>CraftSimulation.Random(step.Action))) ImGui.TextColored(Accent,localization.Get("CraftSimulation.RandomAssumed"));
+            // 0.438 (user request): a sequence (imported, recorded, saved) with a forbidden action is said so.
+            if(CraftActionRules.UsesForbidden(simulationActions,craftForbidden)) ImGui.TextColored(Accent,localization.Get("CraftRules.SequenceUsesForbidden"));
             if(result.Steps.Count<result.PlannedActions) ImGui.TextDisabled(localization.Format("CraftSequence.Skipped",result.PlannedActions-result.Steps.Count));
             DrawCraftConditionEnvelope(result);
             DrawCraftMacroExport(result,job,catalog);

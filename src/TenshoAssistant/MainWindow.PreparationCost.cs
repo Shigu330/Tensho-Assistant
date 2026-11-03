@@ -90,6 +90,8 @@ internal sealed partial class MainWindow
             preparationListSource=estimate;preparationListCatalog=items;
         }
         var ids=preparationListIds;
+        // A-06 (0.431): the crafted item's own price too, for the profit (same request, same cache).
+        if(items?.Find(recipe.ResultItemId) is {IsMarketable:true} && Array.IndexOf(ids,recipe.ResultItemId)<0) ids=[..ids,recipe.ResultItemId];
         var batch=preparationPrices.State;
         if(ids.Length>32) ImGui.TextWrapped(localization.Get("CostUi.BatchLimit"));
         ImGui.BeginDisabled(world.WorldId==0 || bankBridge.State.CharacterId==0 || ids.Length==0 || ids.Length>32 || batch.Loading);
@@ -126,6 +128,7 @@ internal sealed partial class MainWindow
         if(estimate.StockUncertain) ImGui.TextWrapped(localization.Get("CostUi.Uncertain"));
         if(estimate.CachedStock) ImGui.TextDisabled(localization.Get("CostUi.Imported"));
         if(estimate.StalePrices) ImGui.TextColored(Accent,localization.Get("CostUi.OldPrices"));
+        DrawCraftProfit(recipe,requested,estimate,world.WorldId,chain);
         if(ImGui.BeginTable("PreparationPrices",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp))
         {
             try

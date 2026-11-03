@@ -20,6 +20,10 @@ internal sealed class CollectableReader : IDisposable
     private bool disposed;private long nextRead;private int warned;private int loading;
     private CollectableWindowFrame? frame;private CollectableCatalog? catalog;
     public CollectableWindowFrame? Frame=>Volatile.Read(ref frame);
+    // A-15 (0.432): the collectables in the bags (Inventory1-4), read every 5 s while a view asks (WantHoldings, 5 s window).
+    private IReadOnlyList<HeldCollectable>? holdings;private long holdingsWanted;private long nextHoldings;
+    public IReadOnlyList<HeldCollectable>? Holdings=>Volatile.Read(ref holdings);
+    public void WantHoldings()=>Volatile.Write(ref holdingsWanted,Stopwatch.GetTimestamp()+Stopwatch.Frequency*5);
     public CollectableCatalog? Catalog
     {
         get
@@ -62,6 +66,7 @@ internal sealed class CollectableReader : IDisposable
         {
             if(disposed || !framework.IsInFrameworkUpdateThread || framework.IsFrameworkUnloading)return;
             var now=Stopwatch.GetTimestamp();if(now<nextRead)return;nextRead=now+Stopwatch.Frequency/5;
+            ReadHoldings(now);
             try
             {
                 var handle=gui.GetAddonByName("GatheringMasterpiece");
@@ -93,6 +98,33 @@ internal sealed class CollectableReader : IDisposable
                 if(Interlocked.Exchange(ref warned,1)==0)log.Warning(error,"Collectable window unavailable; retry in five seconds.");
             }
         }
+    }
+
+    private unsafe void ReadHoldings(long now)
+    {
+        if(now<nextHoldings || now>Volatile.Read(ref holdingsWanted))return;
+        nextHoldings=now+Stopwatch.Frequency*5;
+        try
+        {
+            if(!client.IsLoggedIn){Volatile.Write(ref holdings,null);return;}
+            var manager=FFXIVClientStructs.FFXIV.Client.Game.InventoryManager.Instance();
+            if(manager==null)return;
+            var held=new List<HeldCollectable>();
+            foreach(var type in new[]{FFXIVClientStructs.FFXIV.Client.Game.InventoryType.Inventory1,FFXIVClientStructs.FFXIV.Client.Game.InventoryType.Inventory2,
+                FFXIVClientStructs.FFXIV.Client.Game.InventoryType.Inventory3,FFXIVClientStructs.FFXIV.Client.Game.InventoryType.Inventory4})
+            {
+                var container=manager->GetInventoryContainer(type);
+                if(container==null || !container->IsLoaded)continue;
+                for(var slot=0;slot<container->Size && slot<64;slot++)
+                {
+                    var item=container->GetInventorySlot(slot);
+                    if(item==null || item->GetItemId()==0 || !item->IsCollectable())continue;
+                    held.Add(new(item->GetBaseItemId(),item->GetSpiritbondOrCollectability()));
+                }
+            }
+            Volatile.Write(ref holdings,held.ToArray());
+        }
+        catch(Exception error){Volatile.Write(ref holdings,null);if(Interlocked.Exchange(ref warned,1)==0)log.Warning(error,"Collectables in the bags could not be read.");}
     }
 
     private static string Short(string? text)=>text is null ? "" : text.Length>48 ? text[..48]+"…":text;
