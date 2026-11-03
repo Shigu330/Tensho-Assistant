@@ -3,6 +3,23 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.450.0
+- N-14 (DEC-027, point 2) : section « Croisements » sous le journal de jardinage. On choisit une graine pour voir les paires qui la
+  donnent, ou ce qu'elle peut donner et avec quelle graine la planter. Les paires viennent de nick75g/FFXIV-Crossbreed-Helper (MIT,
+  avis complet dans Reminders/Data/garden-crosses.csv, construit par tools/garden-data.py ; crédit « FFXIV Crossbreed Helper »).
+- La source ne donne que des noms anglais. Chaque nom est relié à son objet par la feuille Item anglaise du jeu, puis affiché dans la
+  langue du jeu (choix de l'utilisateur : « corrélation vers le fr »). Un nom inconnu de la feuille n'est pas deviné : ses lignes sont
+  écartées, comptées et listées dans l'infobulle et le journal de Dalamud (attendu : « Gysahl Green Seeds »).
+- Les 3 886 lignes de la source donnent 3 768 paires distinctes : 118 lignes sont des doublons exacts, comptés une fois. 49 graines
+  ont des paires. Les graines de Dawntrail ne sont pas couvertes (la source date de 2024), ce que la section indique.
+- Lecture une seule fois, hors de l'image (tâche de fond), à la première ouverture de la section. Aucune requête réseau, rien n'est
+  lu dans la mémoire du jeu.
+- Tests : GardenCrosses450Tests (3 cas). Verify.ps1 (agent) : 819/819, 0 avertissement, 0 erreur ; DLL 0.450.0.0. Non validé en jeu.
+### English
+- N-14: a « Crossbreeding » section under the garden journal: for a seed, the pairs that give it, or what it can give and with which
+  seed. Pairs from nick75g's FFXIV Crossbreed Helper (MIT, embedded with its notice and credited), English names linked to the game's
+  items and shown in the game's language; unknown names are left out and reported; Dawntrail seeds are not covered.
+
 ## 0.449.0
 - Recherche des sources de N-06 et N-14 (DEC-026, point 11), soumise et décidée le 2026-11-03 (DEC-027), preuve
   docs/evidence/0.448-n06-n14-sources.md. Escouade : la règle de réussite est dans la feuille GcArmyExpedition (PercentBase,

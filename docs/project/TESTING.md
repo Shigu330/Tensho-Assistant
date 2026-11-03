@@ -714,6 +714,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.450 : N-14 croisements** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Rappels › Journal de jardinage › Croisements : « Lecture des paires… » puis la liste ; les graines sont nommées dans la langue
+  du jeu ; « Ce qui donne cette graine » et « Ce que cette graine peut donner » montrent des paires cohérentes avec un croisement connu.
+- [ ] La ligne grise annonce 3 768 paires et 1 nom écarté (« Gysahl Green Seeds » dans l'infobulle) ; le journal de Dalamud le dit aussi.
+
 **0.449 : liste des graines du journal de jardinage** — pendant la campagne de tests en jeu de la fin (étape h)
 
 - [ ] Rappels › Journal de jardinage › « Liste des graines » : les noms sont dans la langue du jeu ; la recherche filtre ; choisir une

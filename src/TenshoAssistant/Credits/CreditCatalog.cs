@@ -70,6 +70,9 @@ public static class CreditCatalog
         // 0.449 (DEC-027, point 3): seed growing and wilting hours, built by tools/garden-data.py with the GPL-3.0 notice in the header.
         new("LotlabGardening", CreditKind.Embedded, "FFXIV Gardening Tracker", "Lotlab", "GPL-3.0", "https://github.com/Lotlab/FFXIV-Gardening-Tracker", "https://github.com/Lotlab/FFXIV-Gardening-Tracker/blob/master/LICENSE.txt",
             ["Reminders/Data/garden-seeds.csv", "Reminders/GardenSeeds.cs", "MainWindow.Garden.cs", "TenshoAssistant.csproj"], [], "", true),
+        // 0.450 (DEC-027, point 2): crossbreeding pairs, built by tools/garden-data.py with the MIT notice in the header.
+        new("CrossbreedHelper", CreditKind.Embedded, "FFXIV Crossbreed Helper", "Nick75 (nick75g)", "MIT", "https://github.com/nick75g/FFXIV-Crossbreed-Helper", "https://github.com/nick75g/FFXIV-Crossbreed-Helper/blob/main/LICENSE",
+            ["Reminders/Data/garden-crosses.csv", "Reminders/GardenCrosses.cs", "MainWindow.GardenCrosses.cs", "TenshoAssistant.csproj"], [], "", true),
         new("CharacterPanelRefined", CreditKind.Embedded, "Character Panel Refined", "Kouzukii", "MIT", "https://github.com/Kouzukii/ffxiv-characterstatus-refined", "https://github.com/Kouzukii/ffxiv-characterstatus-refined/blob/master/LICENSE",
             ["Character/StatFormulas.cs", "Character/StatFormulas.cs", "Character/CharacterStatsReader.Dalamud.cs", "MainWindow.Character.cs", "MainWindow.Gear.cs", "MainWindow.Tools.cs"], [], "", true),
         new("Universalis", CreditKind.Online, "Universalis", "karashiiro, Universalis-FFXIV", "MIT", "https://universalis.app", "https://github.com/Universalis-FFXIV/Universalis/blob/v2/LICENSE",

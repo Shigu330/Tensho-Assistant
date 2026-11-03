@@ -68,6 +68,7 @@ internal sealed partial class MainWindow
         if(removed is not null){configuration.GardenBeds=beds.Where(bed=>bed!=removed).ToList();changed=true;}
         if(changed)SaveReminders();
         DrawNewBed(beds);
+        DrawGardenCrosses();
     }
 
     private void DrawNewBed(List<GardenBed> beds)

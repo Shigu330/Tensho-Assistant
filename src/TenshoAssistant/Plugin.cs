@@ -617,6 +617,25 @@ public sealed class Plugin : IDalamudPlugin
                 }
                 catch(Exception error){log.Warning(error,"Garden seeds unavailable.");return [];}
             }))();
+            // 0.450 (DEC-027): the crossbreeds (nick75g, English names linked through the English Item sheet), read once off the frame.
+            Task<(Reminders.GardenCrossData,IReadOnlyDictionary<uint,string>)>? gardenCrosses=null;
+            mainWindow.GardenCrossCatalog=()=>gardenCrosses??=Task.Run(()=>
+            {
+                try
+                {
+                    var english=Reminders.GardenCrosses.EnglishIndex(data.GetExcelSheet<Lumina.Excel.Sheets.Item>(Dalamud.Game.ClientLanguage.English)
+                        .Select(row=>(row.RowId,row.Name.ExtractText())));
+                    using var stream=typeof(Plugin).Assembly.GetManifestResourceStream("TenshoAssistant.Reminders.Data.garden-crosses.csv")
+                        ?? throw new InvalidOperationException("Embedded garden crossbreeds are missing.");
+                    using var reader=new StreamReader(stream);
+                    var crosses=Reminders.GardenCrosses.Read(reader,english);
+                    if(crosses.Unmatched.Count>0)log.Information($"Garden crossbreeds: {crosses.Unmatched.Count} source names not in the English Item sheet: {string.Join(", ",crosses.Unmatched)}.");
+                    var items=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();
+                    IReadOnlyDictionary<uint,string> names=crosses.Seeds.ToDictionary(id=>id,id=>items.GetRowOrDefault(id)?.Name.ExtractText() ?? "");
+                    return (crosses,names);
+                }
+                catch(Exception error){log.Warning(error,"Garden crossbreeds unavailable.");throw;}
+            });
             mainWindow.SquadronTrainingName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyTraining>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.321: a failing Try On (game function moved) is logged once and its buttons turn off for the session.
             mainWindow.TryOnItem=item=>

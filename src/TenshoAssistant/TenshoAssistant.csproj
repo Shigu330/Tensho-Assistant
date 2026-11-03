@@ -1,6 +1,6 @@
 <Project Sdk="Dalamud.NET.Sdk">
   <PropertyGroup>
-    <Version>0.449.0</Version>
+    <Version>0.450.0</Version>
     <AssemblyName>TenshoAssistant</AssemblyName>
     <RootNamespace>TenshoAssistant</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -17,6 +17,7 @@
     <EmbeddedResource Include="FreeCompany\Data\airship-drop.csv" />
     <EmbeddedResource Include="Events\Data\festival-names.csv" />
     <EmbeddedResource Include="Reminders\Data\garden-seeds.csv" />
+    <EmbeddedResource Include="Reminders\Data\garden-crosses.csv" />
     <!-- Plugin icon shown by Dalamud (images/icon.png next to the DLL); generated with AI, declared in the manifest description. -->
     <None Include="images\icon.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
