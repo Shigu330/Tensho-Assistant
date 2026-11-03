@@ -3,6 +3,21 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.456.0
+- Demande de l'utilisateur pendant la campagne de tests : un plan pour obtenir le plus possible d'une graine. Dans Croisements, mode « Ce qui donne cette
+  graine » :
+  - les paires qui peuvent donner le moins d'autres graines passent en tête, avec « seulement cette graine » ou le nombre d'autres graines (leurs noms au
+    survol) ;
+  - un clic sur une paire montre le plan du potager de luxe : 8 parcelles en cercle, numérotées dans l'ordre de plantation, les deux graines en alternance
+    (4 de chacune), la plus lente d'abord (durées Lotlab) ;
+  - le texte dit que la parcelle 1 ne donne pas de croisement, et donne la terre (Thanalan Topsoil Grade 3 environ 90 %, Grade 2 environ 50 %), au nom du jeu.
+- Les règles viennent du wiki Console Games, reformulées et créditées, non vérifiées par Tensho (docs/evidence/0.456-garden-grid.md). La disposition exacte
+  des parcelles est à comparer en jeu. Les probabilités de chaque résultat ne sont pas connues : Tensho ne les affiche pas.
+- Tests : GardenPlan456Tests (3 cas). Verify.ps1 (agent) : 850/850, 0 avertissement, 0 erreur ; DLL 0.456.0.0. Non validé en jeu.
+### English
+- Crossbreeding: to get as many of a seed as possible, the pairs that can give the fewest other seeds come first, and a click shows a planting plan for
+  the Deluxe Garden Patch (8 beds, numbered order, seeds alternating, soil). Rules from the Console Games Wiki, credited, not checked by Tensho.
+
 ## 0.455.0
 - Campagne de tests en jeu, lot 1 (retours de l'utilisateur, 2026-11-04) :
   - Journal de l'or : « +0 / =1 276 » venait du signe − (U+2212), que la police du jeu affiche « = ». Les totaux et les dernières variations

@@ -644,7 +644,7 @@ public sealed class Plugin : IDalamudPlugin
                     var crosses=Reminders.GardenCrosses.Read(reader,english);
                     if(crosses.Unmatched.Count>0)log.Information($"Garden crossbreeds: {crosses.Unmatched.Count} source names not in the English Item sheet: {string.Join(", ",crosses.Unmatched)}.");
                     var items=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();
-                    IReadOnlyDictionary<uint,string> names=crosses.Seeds.ToDictionary(id=>id,id=>items.GetRowOrDefault(id)?.Name.ExtractText() ?? "");
+                    IReadOnlyDictionary<uint,string> names=crosses.Seeds.Concat([MainWindow.GardenTopsoil3,MainWindow.GardenTopsoil2]).Distinct().ToDictionary(id=>id,id=>items.GetRowOrDefault(id)?.Name.ExtractText() ?? "");
                     return (crosses,names);
                 }
                 catch(Exception error){log.Warning(error,"Garden crossbreeds unavailable.");throw;}

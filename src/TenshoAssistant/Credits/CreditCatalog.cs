@@ -95,6 +95,9 @@ public static class CreditCatalog
             ["MainWindow.Events.cs"], ["www.partake.gg"], "", false),
         new("Discord", CreditKind.Online, "Discord", "Discord Inc.", "proprietary", "https://discord.com/developers/docs/resources/webhook", "",
             ["Alarms/DiscordNotifier.cs", "Alarms/DiscordWebhook.cs", "MainWindow.Discord.cs", "MainWindow.Alarms.cs", "Plugin.cs"], ["discord.com", "discordapp.com", "ptb.discord.com", "canary.discord.com"], "Discord.Enabled", false),
+        // 0.456: the planting rules of crossbreeding (facts, in our own words): docs/evidence/0.456-garden-grid.md.
+        new("GardeningGuide", CreditKind.Rule, "Gardening Guide (FFXIV Console Games Wiki)", "", "GFDL-1.2-or-later", "https://ffxiv.consolegameswiki.com/wiki/Gardening_Guide", "https://ffxiv.consolegameswiki.com/wiki/FFXIV_Wiki:About",
+            ["Reminders/GardenCrosses.cs", "MainWindow.GardenCrosses.cs"], [], "", false),
         new("GatherBuddyReborn", CreditKind.Rule, "GatherBuddyReborn", "FFXIV-CombatReborn", "Apache-2.0", "https://github.com/FFXIV-CombatReborn/GatherBuddyReborn", "https://raw.githubusercontent.com/FFXIV-CombatReborn/GatherBuddyReborn/main/LICENSE",
             ["Gathering/WeatherForecast.cs", "MainWindow.Weather.cs"], [], "", true),
         new("FrozenRabbitTome", CreditKind.Rule, "frozen_rabbit_tome", "", "none", "", "",
