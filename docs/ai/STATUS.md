@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-03)
 
-VERSION: 0.451.0.0 (dernière release : Stable-0.448.0, publiée le 2026-11-03 par l'agent, à ta demande) — Verify.ps1 (agent) 823/823, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.451.0.0 (dernière release : Stable-0.451.0, publiée le 2026-11-03 par l'agent, à ta demande ; notes : beaucoup de tests en jeu restent à faire) — Verify.ps1 (agent) 823/823, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: fin de la file — commit et release, décisions par lots, tests en jeu (étape h), séance ultracode (g2) ; voir [GOAL](GOAL.md) et « Prochaine action ».
 QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-11-02 : forfait Max, 5 h à 0 %, semaine à 0 % (réinit. jeudi 23:00).
 
@@ -78,7 +78,7 @@ Restent, dans cet ordre proposé :
 1) Décisions du 2026-11-03 ([DEC-026](../project/DECISIONS.md)) : 0.447, 0.448 (journal de jardinage, N-08) et release Stable-0.448.0
    faites ; recherche de sources N-06 / N-14 faite le 2026-11-03 ([preuve](../evidence/0.448-n06-n14-sources.md)), décidé (DEC-027) :
    0.449 durées Lotlab du journal de jardinage, 0.450 croisements N-14 et 0.451 escouade N-06 FAITS ;
-   la sonde N-06 se fait pendant la campagne de tests en jeu (TESTING 0.451).
+   la sonde N-06 se fait pendant la campagne de tests en jeu (TESTING 0.451) ; release Stable-0.451.0 faite.
 2) Décisions par lots : [G-PROPOSALS](../project/G-PROPOSALS.md) (choix provisoires, écarts bloqués, idées), ROADMAP « Décisions
    reportées à la fin », lignes « État » des quatre fichiers de propositions (MAP, ITEMS, CRAFT-GATHER, TOOLS).
 3) h) Campagne de tests en jeu guidée de tout le plugin ([TESTING](../project/TESTING.md)), avec l'utilisateur, avec les sondes en
@@ -89,9 +89,9 @@ Restent, dans cet ordre proposé :
 RÈGLE (2026-11-02) : décisions gardées pour la fin, sauf si bloquant ; l'agent applique le choix recommandé et le note.
 
 ## Git (plan du 2026-11-03)
-État relevé le 2026-11-03 : release **Stable-0.448.0** publiée par l'agent à 17:25 (décision DEC-026 ; CI verte avant) ; avant elle, Stable-0.430.0 publiée le 2026-11-03 à 12:27 (commits « 0.430.0 », « 0.430.0 · repo.json »,
+État relevé le 2026-11-03 : release **Stable-0.451.0** publiée par l'agent à 18:57 (notes : beaucoup de tests en jeu restent à faire) ; avant elle, **Stable-0.448.0** publiée par l'agent à 17:25 (décision DEC-026 ; CI verte avant) ; avant elle, Stable-0.430.0 publiée le 2026-11-03 à 12:27 (commits « 0.430.0 », « 0.430.0 · repo.json »,
 « Release 0.430.0 ») ; 0.431 à 0.446 commitées et poussées sur Devloppement le 2026-11-03 (un commit « 0.446.0 », le premier fait par l'agent ;
-57 fichiers modifiés, 38 nouveaux : code, tests, preuves ; aucune archive, aucun binaire) ; main = Devloppement = Stable-0.448.0 ; GitHub CLI
+57 fichiers modifiés, 38 nouveaux : code, tests, preuves ; aucune archive, aucun binaire) ; main = Devloppement = Stable-0.451.0 ; GitHub CLI
 connecté (compte Shigu330).
 Outils (CONTRIBUTING « Versions and releases ») : `.\scripts\Verify.ps1 -Commit` (contrôles, puis commit de tout sur Devloppement,
 sujet « x.y.z », corps = notes anglaises depuis le dernier commit, push) ; `.\scripts\Verify.ps1 -Release` (repo.json, fusion dans
