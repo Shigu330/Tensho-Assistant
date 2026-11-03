@@ -714,6 +714,29 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.451 : N-06 missions d'escouade (sonde en jeu)** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Hors de la caserne : « Lire l'escouade » affiche « L'escouade n'est pas chargée… ».
+- [ ] À la caserne, escouade ouverte : « Lire l'escouade » liste les 8 membres (classe, niveau, « occupé » pour ceux en mission ou à
+  l'entraînement) et le bonus d'entraînement ; comparer avec la fenêtre du jeu.
+- [ ] Attributs d'un membre : comparer « P / M / T » affiché avec la fiche du membre dans le jeu (classe, niveau). Un écart prouverait que
+  les colonnes de GcArmyMemberGrow sont mal lues, ou que les affinités ou l'équipement comptent.
+- [ ] Choisir la mission de la fenêtre du jeu, puis le jeu d'exigences qui correspond à ses valeurs ; former le groupe proposé dans le
+  jeu et comparer ses totaux et le taux de réussite affiché par le jeu avec « ≈ … % ».
+- [ ] « Écrire dans le journal » : copier les lignes « Squadron probe: » du journal de Dalamud dans docs/evidence/ (sonde N-06).
+
+**0.450 : N-14 croisements** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Rappels › Journal de jardinage › Croisements : « Lecture des paires… » puis la liste ; les graines sont nommées dans la langue
+  du jeu ; « Ce qui donne cette graine » et « Ce que cette graine peut donner » montrent des paires cohérentes avec un croisement connu.
+- [ ] La ligne grise annonce 3 768 paires et 1 nom écarté (« Gysahl Green Seeds » dans l'infobulle) ; le journal de Dalamud le dit aussi.
+
+**0.449 : liste des graines du journal de jardinage** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Rappels › Journal de jardinage › « Liste des graines » : les noms sont dans la langue du jeu ; la recherche filtre ; choisir une
+  graine remplit son nom, la pousse et l'entretien (par exemple 120 h et 48 h pour les graines de paprika) ; les valeurs restent modifiables.
+- [ ] Comparer une graine plantée en jeu avec l'heure de récolte affichée (données Lotlab, non vérifiées par Tensho).
+
 **0.448 : N-08 journal de jardinage** — pendant la campagne de tests en jeu de la fin (étape h)
 
 - [ ] Rappels › Journal de jardinage : ajouter une parcelle (lieu, graine, pousse 1 h, entretien 0) : « Mûr le … » une heure plus tard ;

@@ -2,8 +2,8 @@
 
 État au 0.446.0 (2026-11-03, relu contre le CHANGELOG, STATUS et le code) : les 17 lignes restent PARTIAL (aucune validation en jeu
 complète). Files a) à g) faites ; restent g2) (R-14, en ultracode), h) (tests en jeu avec l'utilisateur) et les décisions
-([G-PROPOSALS](G-PROPOSALS.md)). Dernière release publiée : Stable-0.430.0 (2026-11-03) ; 0.431 à 0.446
-ne sont pas encore commitées (plan de commit et de release : [STATUS](../ai/STATUS.md) « Git »). Détail par version : [CHANGELOG.md](../../CHANGELOG.md) ; validé en jeu / à valider : [STATUS](../ai/STATUS.md).
+([G-PROPOSALS](G-PROPOSALS.md)). Dernière release publiée : Stable-0.448.0 (2026-11-03,
+versions 0.431 à 0.448 ; plan de commit et de release : [STATUS](../ai/STATUS.md) « Git »). Détail par version : [CHANGELOG.md](../../CHANGELOG.md) ; validé en jeu / à valider : [STATUS](../ai/STATUS.md).
 
 Source autoritaire : docs/ai/PROMPT-MAITRE.md, §4. Toutes les lignes sont conservées. State décrit le travail ; Coverage décrit la capacité réellement validée. TODO/READY/ACTIVE/BLOCKED/DONE ; NOT_STARTED/PARTIAL/FUNCTIONAL/REPLACEABLE. NEEDS_STUDY est une note d'incertitude, pas une suppression. Aucun pourcentage arbitraire.
 

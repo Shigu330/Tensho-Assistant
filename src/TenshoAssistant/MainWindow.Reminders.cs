@@ -111,6 +111,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Get("Reminders.Help"));
         DrawPersonalTasks();
         DrawGardenJournal();
+        DrawSquadronPlanner();
         DrawDailyRoulettes(timers);
         DrawCharacterStatuses();
 

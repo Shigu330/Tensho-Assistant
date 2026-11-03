@@ -9,7 +9,7 @@ La décision de soumettre appartient à l'auteur ; l'alternative est un dépôt 
 Décision de l'auteur (2026-11-02, DEC-023) : soumission à la version 1.0.0 ; avant, cadres et textures du jeu (ULD) ; traductions
 allemande et japonaise gardées dans le paquet (partielles, repli anglais).
 Ce dépôt personnel existe : `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`, mis à jour par
-`Verify.ps1 -Release` (dernière release publiée selon les tags git : `Stable-0.430.0`, 2026-11-03).
+`Verify.ps1 -Release` (dernière release publiée selon les tags git : `Stable-0.448.0`, 2026-11-03).
 
 ## État de la liste de contrôle
 

@@ -601,6 +601,72 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.CabinetItems=()=>cabinetItems??=data.GetExcelSheet<Lumina.Excel.Sheets.Cabinet>().Where(row=>row.Item.RowId!=0).Select(row=>row.Item.RowId).ToHashSet();
             mainWindow.RouletteName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentRoulette>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.SquadronMissionName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyExpedition>().GetRowOrDefault(id)?.Name.ExtractText();
+            // 0.449 (DEC-027): the embedded garden seeds (Lotlab), named in the game's language, read once.
+            IReadOnlyList<(Reminders.GardenSeed,string)>? gardenSeeds=null;
+            mainWindow.GardenSeedCatalog=()=>gardenSeeds??=((Func<IReadOnlyList<(Reminders.GardenSeed,string)>>)(()=>
+            {
+                try
+                {
+                    using var stream=typeof(Plugin).Assembly.GetManifestResourceStream("TenshoAssistant.Reminders.Data.garden-seeds.csv")
+                        ?? throw new InvalidOperationException("Embedded garden seeds are missing.");
+                    using var reader=new StreamReader(stream);
+                    var items=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();
+                    return Reminders.GardenSeeds.Read(reader)
+                        .Select(seed=>(seed,items.GetRowOrDefault(seed.SeedId)?.Name.ExtractText() ?? ""))
+                        .Where(pair=>pair.Item2.Length>0).OrderBy(pair=>pair.Item2,StringComparer.CurrentCultureIgnoreCase).ToArray();
+                }
+                catch(Exception error){log.Warning(error,"Garden seeds unavailable.");return [];}
+            }))();
+            // 0.450 (DEC-027): the crossbreeds (nick75g, English names linked through the English Item sheet), read once off the frame.
+            Task<(Reminders.GardenCrossData,IReadOnlyDictionary<uint,string>)>? gardenCrosses=null;
+            mainWindow.GardenCrossCatalog=()=>gardenCrosses??=Task.Run(()=>
+            {
+                try
+                {
+                    var english=Reminders.GardenCrosses.EnglishIndex(data.GetExcelSheet<Lumina.Excel.Sheets.Item>(Dalamud.Game.ClientLanguage.English)
+                        .Select(row=>(row.RowId,row.Name.ExtractText())));
+                    using var stream=typeof(Plugin).Assembly.GetManifestResourceStream("TenshoAssistant.Reminders.Data.garden-crosses.csv")
+                        ?? throw new InvalidOperationException("Embedded garden crossbreeds are missing.");
+                    using var reader=new StreamReader(stream);
+                    var crosses=Reminders.GardenCrosses.Read(reader,english);
+                    if(crosses.Unmatched.Count>0)log.Information($"Garden crossbreeds: {crosses.Unmatched.Count} source names not in the English Item sheet: {string.Join(", ",crosses.Unmatched)}.");
+                    var items=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();
+                    IReadOnlyDictionary<uint,string> names=crosses.Seeds.ToDictionary(id=>id,id=>items.GetRowOrDefault(id)?.Name.ExtractText() ?? "");
+                    return (crosses,names);
+                }
+                catch(Exception error){log.Warning(error,"Garden crossbreeds unavailable.");throw;}
+            });
+            // 0.451 (DEC-027, N-06): the squadron read on click on the framework thread (loaded by the game in the barracks only), and the
+            // sheets of the planner, read once: missions with their six requirement sets, attributes by class and level, class names.
+            mainWindow.ReadSquadron=()=>framework.RunOnFrameworkThread(()=>
+            {
+                try{return Reminders.SquadronReader.Read();}
+                catch(Exception error){log.Warning(error,"Squadron unreadable (game update?).");return null;}
+            });
+            Reminders.SquadronSheets? squadronSheets=null;var squadronSheetsFailed=false;
+            mainWindow.SquadronSheetData=()=>
+            {
+                if(squadronSheets is not null || squadronSheetsFailed)return squadronSheets;
+                try
+                {
+                    var missions=data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyExpedition>().Where(row=>!row.Name.IsEmpty)
+                        .Select(row=>new Reminders.SquadronMission(row.RowId,row.Name.ExtractText(),row.RequiredLevel,row.GcArmyExpeditionType.RowId,row.PercentBase,
+                            row.ExpeditionParams.Select(set=>new Reminders.SquadronRequirement(new(set.RequiredPhysical,set.RequiredMental,set.RequiredTactical),
+                                set.PercentPhysicalMet,set.PercentMentalMet,set.PercentTacticalMet,set.PercentAllMet)).ToArray()))
+                        .OrderBy(mission=>mission.Type).ThenBy(mission=>mission.Level).ThenBy(mission=>mission.Id).ToArray();
+                    var grow=new Dictionary<uint,(IReadOnlyList<Reminders.SquadronStats>,Reminders.SquadronStats?)>();
+                    foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyMemberGrow>())
+                        if(row.ClassJob.RowId!=0)
+                            grow[row.ClassJob.RowId]=(row.MemberParams.Select(level=>new Reminders.SquadronStats(level.Physical,level.Mental,level.Tactical)).ToArray(),
+                                new Reminders.SquadronStats(row.Unknown1,row.Unknown2,row.Unknown3));
+                    var jobs=data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>();
+                    var classNames=grow.Keys.ToDictionary(job=>job,job=>jobs.GetRowOrDefault(job)?.Name.ExtractText() ?? "");
+                    squadronSheets=new(missions,grow,classNames);
+                }
+                catch(Exception error){squadronSheetsFailed=true;log.Warning(error,"Squadron sheets unreadable (game update?).");}
+                return squadronSheets;
+            };
+            mainWindow.SquadronMemberName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ENpcResident>().GetRowOrDefault(id)?.Singular.ExtractText();
             mainWindow.SquadronTrainingName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyTraining>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.321: a failing Try On (game function moved) is logged once and its buttons turn off for the session.
             mainWindow.TryOnItem=item=>

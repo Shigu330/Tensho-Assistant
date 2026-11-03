@@ -3,6 +3,65 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.451.0
+- Release Stable-0.451.0 (demande de l'utilisateur, 2026-11-03) : les notes précisent qu'il reste beaucoup de tests en jeu à faire.
+- N-06 (DEC-027, point 1) : section « Missions d'escouade » dans la page Rappels. Tout vient du jeu, aucune source communautaire :
+  - « Lire l'escouade » (sur clic, sur le thread du jeu, lecture de champs seulement) copie les membres (classe, niveau, état, affinités)
+    et le bonus d'entraînement depuis GcArmyManager.Data (FFXIVClientStructs). Le jeu ne les charge qu'à la caserne : sinon, un message
+    l'explique.
+  - Les missions et leurs 6 jeux d'exigences viennent de GcArmyExpedition. Le joueur choisit celui que montre la fenêtre du jeu (le jeu
+    actif n'est pas encore connu).
+  - Les attributs d'un membre viennent de GcArmyMemberGrow, sur la ligne de sa classe (colonne ClassJob) et à l'indice de son niveau.
+    Le niveau 60 est dans les quatre colonnes qui suivent la collection (Unknown0 à 3 chez Lumina) : les valeurs suivent celles du
+    niveau 59 (ex. 129/31/52 puis 130/31/53).
+  - Les 5 meilleurs groupes de quatre membres libres sont classés par pourcentage, puis par attributs atteints, puis par manque le plus
+    petit. Pourcentage = PercentBase + chaque attribut atteint + PercentAll si les trois le sont ; il est affiché « ≈ », comme une
+    estimation non vérifiée en jeu. Les affinités ne sont pas comptées (colonnes sans nom).
+  - « Écrire dans le journal » est la sonde en jeu : l'escouade lue, les attributs utilisés et les groupes vont dans le journal de
+    Dalamud (en anglais), pour comparer avec la fenêtre du jeu.
+- Tests : Squadron451Tests (4 cas). Verify.ps1 (agent) : 823/823, 0 avertissement, 0 erreur ; DLL 0.451.0.0. Non validé en jeu.
+### English
+- **Important: much in-game testing is still to do.** The versions since 0.431 (this release included) are compiled and pass
+  the automated tests, but most of their features have not been validated in game yet; a guided in-game test campaign is planned
+  (checklist: docs/project/TESTING.md). Please report anything that does not behave as described.
+- N-06: a « Squadron missions » section on the Reminders page: reads your squadron in the barracks on click and ranks the parties of
+  four for a mission from the game's sheets (requirements, success percent parts, attributes by class and level, training bonus); the
+  percent is shown as an estimate until checked in game, chemistry is not counted; « Write to the log » records the values for the probe.
+
+## 0.450.0
+- N-14 (DEC-027, point 2) : section « Croisements » sous le journal de jardinage. On choisit une graine pour voir les paires qui la
+  donnent, ou ce qu'elle peut donner et avec quelle graine la planter. Les paires viennent de nick75g/FFXIV-Crossbreed-Helper (MIT,
+  avis complet dans Reminders/Data/garden-crosses.csv, construit par tools/garden-data.py ; crédit « FFXIV Crossbreed Helper »).
+- La source ne donne que des noms anglais. Chaque nom est relié à son objet par la feuille Item anglaise du jeu, puis affiché dans la
+  langue du jeu (choix de l'utilisateur : « corrélation vers le fr »). Un nom inconnu de la feuille n'est pas deviné : ses lignes sont
+  écartées, comptées et listées dans l'infobulle et le journal de Dalamud (attendu : « Gysahl Green Seeds »).
+- Les 3 886 lignes de la source donnent 3 768 paires distinctes : 118 lignes sont des doublons exacts, comptés une fois. 49 graines
+  ont des paires. Les graines de Dawntrail ne sont pas couvertes (la source date de 2024), ce que la section indique.
+- Lecture une seule fois, hors de l'image (tâche de fond), à la première ouverture de la section. Aucune requête réseau, rien n'est
+  lu dans la mémoire du jeu.
+- Tests : GardenCrosses450Tests (3 cas). Verify.ps1 (agent) : 819/819, 0 avertissement, 0 erreur ; DLL 0.450.0.0. Non validé en jeu.
+### English
+- N-14: a « Crossbreeding » section under the garden journal: for a seed, the pairs that give it, or what it can give and with which
+  seed. Pairs from nick75g's FFXIV Crossbreed Helper (MIT, embedded with its notice and credited), English names linked to the game's
+  items and shown in the game's language; unknown names are left out and reported; Dawntrail seeds are not covered.
+
+## 0.449.0
+- Recherche des sources de N-06 et N-14 (DEC-026, point 11), soumise et décidée le 2026-11-03 (DEC-027), preuve
+  docs/evidence/0.448-n06-n14-sources.md. Escouade : la règle de réussite est dans la feuille GcArmyExpedition (PercentBase,
+  Percent…Met, PercentAllMet), donc aucune source communautaire n'est nécessaire. Croisements : paires MIT de nick75g. Jardin : durées
+  GPL-3.0 de Lotlab. Squadronista et SquadronSolver n'ont pas de licence : lus pour comprendre, rien copié.
+- N-08 complété (DEC-027, point 3) : dans le journal de jardinage, une « Liste des graines » (noms dans la langue du jeu, avec
+  recherche) remplit la graine, ses heures de pousse et ses heures d'entretien. Les données viennent de Lotlab/FFXIV-Gardening-Tracker
+  (GPL-3.0, 107 graines par identifiant d'objet) ; l'entretien est le délai avant flétrissement, 0 = pas de rappel. Les valeurs restent
+  modifiables avant de planter. Données embarquées (Reminders/Data/garden-seeds.csv, construites par tools/garden-data.py avec l'avis
+  GPL-3.0) et crédit « FFXIV Gardening Tracker ». Aucune requête réseau.
+- Tests : GardenSeeds449Tests (3 cas). Verify.ps1 (agent) : 816/816, 0 avertissement, 0 erreur ; DLL 0.449.0.0. Non validé en jeu.
+### English
+- Source search for N-06 and N-14 (DEC-027): the squadron success rule is in the game's GcArmyExpedition sheet; crossbreeds will use
+  nick75g's MIT data, garden durations Lotlab's GPL-3.0 data.
+- Garden journal: a seed list (game language, searchable) fills the seed and its growing and tending hours from Lotlab's Gardening
+  Tracker data (GPL-3.0, embedded and credited); the values stay editable.
+
 ## 0.448.0
 - N-08 (décision du 2026-11-03, DEC-026) : « Journal de jardinage » dans la page Rappels. Pour chaque parcelle ou pot : lieu et graine
   (vos mots), durée de pousse et intervalle d'entretien tapés en heures (le jeu ne les donne pas : rien n'est deviné, 0 = pas de rappel

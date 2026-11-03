@@ -6,9 +6,12 @@ namespace TenshoAssistant;
 // N-08 (0.448, DEC-026): the garden journal on the Reminders page. The player notes each bed or pot (place, seed, growing and tending
 // hours they type: the game's sheets give neither); Tensho shows when it is ripe and when to tend it, and says it once in the chat
 // (with the alarms' sound) when the reminders are on. Nothing is read from the game.
+// 0.449 (DEC-027): picking a seed fills its growing and tending hours from the embedded Lotlab data (still editable).
 internal sealed partial class MainWindow
 {
-    private string newBedPlace="",newBedSeed="";
+    /// <summary>The embedded garden seeds with their names in the game's language (set by the plugin).</summary>
+    internal Func<IReadOnlyList<(GardenSeed Seed,string Name)>>? GardenSeedCatalog { get; set; }
+    private string newBedPlace="",newBedSeed="",gardenSeedSearch="";
     private int newBedGrow=1,newBedTend;
     private string? newBedError;
     private DateTimeOffset gardenObservedAt;
@@ -65,6 +68,7 @@ internal sealed partial class MainWindow
         if(removed is not null){configuration.GardenBeds=beds.Where(bed=>bed!=removed).ToList();changed=true;}
         if(changed)SaveReminders();
         DrawNewBed(beds);
+        DrawGardenCrosses();
     }
 
     private void DrawNewBed(List<GardenBed> beds)
@@ -72,6 +76,8 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(160);
         ImGui.InputTextWithHint("##NewBedPlace",localization.Get("Garden.PlaceHint"),ref newBedPlace,GardenJournal.MaximumText);
         Tip("Garden.PlaceTip");
+        ImGui.SameLine();
+        DrawSeedPicker();
         ImGui.SameLine();
         ImGui.SetNextItemWidth(160);
         ImGui.InputTextWithHint("##NewBedSeed",localization.Get("Garden.SeedHint"),ref newBedSeed,GardenJournal.MaximumText);
@@ -100,5 +106,36 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(beds.Count>=GardenJournal.Capacity ? "Garden.Full":"Garden.PlantTip"));
         if(newBedError is { } error)ImGui.TextColored(UI.FfxivTheme.Error,error);
+    }
+
+    private void DrawSeedPicker()
+    {
+        var seeds=GardenSeedCatalog?.Invoke() ?? [];
+        ImGui.BeginDisabled(seeds.Count==0);
+        try
+        {
+            ImGui.SetNextItemWidth(160);
+            var open=ImGui.BeginCombo("##NewBedSeedPick",localization.Get("Garden.SeedPick"));
+            if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(seeds.Count==0 ? "Garden.SeedPickNone":"Garden.SeedPickTip"));
+            if(open)
+            {
+                try
+                {
+                    ImGui.SetNextItemWidth(-1);
+                    ImGui.InputTextWithHint("##GardenSeedSearch",localization.Get("Garden.SeedSearch"),ref gardenSeedSearch,40);
+                    Tip("Garden.SeedSearchTip");
+                    foreach(var (seed,name) in seeds)
+                    {
+                        if(gardenSeedSearch.Length>0 && !name.Contains(gardenSeedSearch,StringComparison.CurrentCultureIgnoreCase))continue;
+                        if(!ImGui.Selectable(name+"##GardenSeed"+seed.SeedId))continue;
+                        newBedSeed=GardenSeeds.JournalName(name) ?? newBedSeed;
+                        newBedGrow=GardenSeeds.GrowHours(seed);
+                        newBedTend=GardenSeeds.TendHours(seed);
+                    }
+                }
+                finally{ImGui.EndCombo();}
+            }
+        }
+        finally{ImGui.EndDisabled();}
     }
 }
