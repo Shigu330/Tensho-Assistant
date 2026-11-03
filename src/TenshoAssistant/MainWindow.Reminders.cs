@@ -35,10 +35,10 @@ internal sealed partial class MainWindow
             }
         }
         var timers=reminderTimers;
-        if(!ImGui.BeginTable("Reminders",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!ImGui.BeginTable("Reminders",6,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
         try
         {
-            foreach(var key in new[]{"Task","State","Next","Done",""})ImGui.TableSetupColumn(key.Length==0 ? "":localization.Get("Reminders.Column"+key),key.Length==0 ? ImGuiTableColumnFlags.WidthFixed:ImGuiTableColumnFlags.None,key.Length==0 ? 28:0);
+            foreach(var key in new[]{"Task","State","Next","Done","Bar",""})ImGui.TableSetupColumn(key.Length==0 ? "":localization.Get("Reminders.Column"+key),key.Length==0 ? ImGuiTableColumnFlags.WidthFixed:ImGuiTableColumnFlags.None,key.Length==0 ? 28:0);
             ImGui.TableHeadersRow();
             var supplyReset=ResetSchedule.NextDaily(now,ResetSchedule.SupplyHour);
             Row("Supply",FontAwesomeIcon.Shield,localization.Get("Reminders.SupplyState"),supplyReset,ResetSchedule.PreviousDaily(now,ResetSchedule.SupplyHour));
@@ -155,6 +155,19 @@ internal sealed partial class MainWindow
                 if(ImGui.Checkbox("##Done"+key,ref done))SetReminderDone(key,done ? now:null);
                 Tip("Reminders.DoneTip");
             }
+            // 0.458 (user request, in-game campaign): what the Reminders icon of the server bar shows, chosen here.
+            ImGui.TableNextColumn();
+            if(ReminderCounts.BarRows.Contains(key))
+            {
+                var inBar=configuration.ReminderBarHidden?.Contains(key)!=true;
+                if(ImGui.Checkbox("##Bar"+key,ref inBar))
+                {
+                    var hidden=configuration.ReminderBarHidden ?? [];
+                    configuration.ReminderBarHidden=inBar ? hidden.Where(row=>row!=key).ToList():[..hidden.Where(row=>row!=key),key];
+                    SaveReminders();
+                }
+                Tip("Reminders.BarRowTip");
+            }
             ImGui.TableNextColumn();
             if(next is { } alarmAt && alarmAt>now)
                 AlarmButton("Reminder"+key,localization.Format("Reminders.AlarmTip",localization.Get("Reminders."+key)),
@@ -178,6 +191,11 @@ internal sealed partial class MainWindow
         squadronNames[(nameOf,id)]=name;
         return name;
     }
+
+    /// <summary>0.458: what is left to do for the Reminders icon: the rows the player keeps in the bar, then their own tasks marked « on screen ».</summary>
+    internal IReadOnlyList<string> ReminderTodoLines(DateTimeOffset now)
+        =>ReminderCounts.Todo(ReminderDoneAt,configuration.ReminderBarHidden,now).Select(row=>localization.Get("Reminders."+row))
+            .Concat(PersonalTasks.Pending(configuration.PersonalTasks,now).Select(task=>task.Name)).ToArray();
 
     private void SaveReminders()
     {

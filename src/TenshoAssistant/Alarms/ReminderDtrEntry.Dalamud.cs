@@ -8,8 +8,8 @@ using TenshoAssistant.Reminders;
 namespace TenshoAssistant.Alarms;
 
 /// <summary>
-/// 0.455 (user request, in-game campaign): reminders apart from alarms in the server info bar: their own icon and the number of finished
-/// reminders (ReminderCounts); hover lists them, click = the Reminders page. Read every 5 seconds on the framework thread once the character is
+/// 0.455, 0.458 (user requests, in-game campaign): reminders apart from alarms in the server info bar: their own icon and the number of things left
+/// to do (ReminderCounts; the Reminders page chooses them with its « Bar » boxes); hover lists them, click = the Reminders page. Read every 5 seconds on the framework thread once the character is
 /// loaded; a failed read hides the entry (logged once); removed on dispose.
 /// </summary>
 public sealed class ReminderDtrEntry : IDisposable
@@ -21,14 +21,16 @@ public sealed class ReminderDtrEntry : IDisposable
     private readonly Configuration configuration;
     private readonly Func<string,string> text;
     private readonly Dalamud.Game.Gui.Dtr.IDtrBarEntry entry;
+    private readonly Func<DateTimeOffset,IReadOnlyList<string>> todo;
     private IReadOnlyList<(FinishedKind Kind,int Count)> finished=[];
+    private IReadOnlyList<string> left=[];
     private (Vector2 Min,Vector2 Max)? bounds;
     private DateTimeOffset nextRead;
     private bool disposed,warned;
 
-    public ReminderDtrEntry(Dalamud.Plugin.Services.IDtrBar bar,IFramework framework,IGameGui gui,IPlayerState player,IPluginLog log,Configuration configuration,Func<string,string> text,Action open)
+    public ReminderDtrEntry(Dalamud.Plugin.Services.IDtrBar bar,IFramework framework,IGameGui gui,IPlayerState player,IPluginLog log,Configuration configuration,Func<string,string> text,Action open,Func<DateTimeOffset,IReadOnlyList<string>> todo)
     {
-        this.framework=framework;this.gui=gui;this.player=player;this.log=log;this.configuration=configuration;this.text=text;
+        this.framework=framework;this.gui=gui;this.player=player;this.log=log;this.configuration=configuration;this.text=text;this.todo=todo;
         entry=bar.Get("Tensho Assistant (Reminders)");
         entry.Shown=false;
         entry.OnClick=_=>open();
@@ -46,8 +48,9 @@ public sealed class ReminderDtrEntry : IDisposable
             var timers=GameTimers.Read();
             finished=ReminderCounts.Finished(timers.Ventures?.Select(venture=>venture.Done),configuration.Voyages,
                 timers.SquadronMission is { } mission ? (mission.Id,mission.Done):null,timers.SquadronTraining is { } training ? (training.Id,training.Done):null,
-                configuration.GardenBeds,now);
-            var shown=SeIconChar.QuestRepeatable.ToIconString()+" "+finished.Sum(item=>item.Count);
+                configuration.GardenBeds,now).Where(item=>configuration.ReminderBarHidden?.Contains(item.Kind.ToString())!=true).ToArray();
+            left=todo(now);
+            var shown=SeIconChar.QuestRepeatable.ToIconString()+" "+(finished.Sum(item=>item.Count)+left.Count);
             entry.Text=new SeStringBuilder().AddText(shown).Build();
             entry.Shown=true;
             bounds=AlarmDtrEntry.FindTextNode(gui,shown);
@@ -63,9 +66,10 @@ public sealed class ReminderDtrEntry : IDisposable
 
     private IEnumerable<string> Lines()
     {
-        if(finished.Count==0){yield return text("Reminders.BarNone");yield break;}
+        if(finished.Count==0 && left.Count==0){yield return text("Reminders.BarNone");yield break;}
         foreach(var (kind,count) in finished)
             yield return string.Format(System.Globalization.CultureInfo.CurrentCulture,text("Reminders.Bar"+kind),count);
+        foreach(var row in left)yield return row;
     }
 
     /// <summary>Tensho's tooltip below the entry while the mouse is over it (ImGui, from the plugin's draw).</summary>

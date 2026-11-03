@@ -714,6 +714,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.458 : icône des rappels, ce qui reste à faire** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Barre du serveur : le nombre et l'infobulle « Reste à faire » listent les rappels non cochés ; cocher « Fait » sur la page Rappels fait baisser le nombre (5 s au plus).
+- [ ] Décocher « Barre » sur une ligne : elle disparaît de l'infobulle ; recocher : elle revient ; le choix reste après un rechargement du plugin.
+- [ ] Une tâche personnelle affichée à l'écran apparaît dans la liste ; une tâche servant ou un vaisseau fini aussi.
+
 **0.457 : icônes des compétences** — pendant la campagne de tests en jeu (étape h)
 
 - [ ] Réglages › Artisanat › Actions interdites : chaque ligne a son icône, et la case se coche toujours.

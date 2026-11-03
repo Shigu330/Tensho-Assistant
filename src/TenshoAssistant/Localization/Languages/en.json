@@ -243,7 +243,7 @@
     "AlarmServerBar": "Alarm icon in the server bar",
     "AlarmServerBarTip": "Shows a clock and the number of active Tensho alarms in the game's info bar (next to the server name); hover = next alarm; click = Alarms page. Hidden without an active alarm.\nDefault: on.",
     "ReminderServerBar": "Reminders icon in the server bar",
-    "ReminderServerBarTip": "Shows its own icon and the number of finished reminders (ventures, vessels back, squadron, ripe beds) in the game's info bar; hover = the list; click = Reminders page.\nDefault: on.",
+    "ReminderServerBarTip": "Shows its own icon and the number of things left to do in the game's info bar: finished ventures, vessels back, squadron, ripe beds, reminders not done and your tasks marked on screen; hover = the list; click = Reminders page. The Reminders page chooses what it shows (« Bar » boxes).\nDefault: on.",
     "Teamcraft": "Teamcraft (bite times)",
     "TeamcraftTip": "Time between the cast and the bite, per fish and spot, from Teamcraft's public reports (gubal API, MIT licence). One request per fishing spot, cached.",
     "GatherBuddy": "GatherBuddy (fishing)",
@@ -3698,8 +3698,10 @@
     "Here": "Position"
   },
   "Reminders": {
-    "BarTitle": "Finished reminders",
-    "BarNone": "No finished reminder.",
+    "BarTitle": "Left to do",
+    "BarNone": "Nothing left to do for now.",
+    "BarRowTip": "Shows this reminder under the Reminders icon of the server bar while it is left to do.\nDefault: ticked.",
+    "ColumnBar": "Bar",
     "BarClick": "Click: Reminders page",
     "BarVentures": "Retainer ventures finished: {0}",
     "BarVoyages": "Vessels back: {0}",

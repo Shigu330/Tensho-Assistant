@@ -5,11 +5,28 @@ namespace TenshoAssistant.Reminders;
 public enum FinishedKind { Ventures, Voyages, SquadronMission, SquadronTraining, Garden }
 
 /// <summary>
-/// 0.455 (user request, in-game campaign): what is finished and waits for the player, for the Reminders icon of the server bar: retainer
-/// ventures and vessels back, squadron mission and training over, garden beds ripe. Kinds with nothing finished are left out.
+/// 0.455 (user request, in-game campaign): what waits for the player, for the Reminders icon of the server bar: retainer ventures and vessels back,
+/// squadron mission and training over, garden beds ripe (kinds with nothing finished are left out); 0.458: and the rows still to do.
 /// </summary>
 public static class ReminderCounts
 {
+    /// <summary>0.458: the Reminders rows with a « done » box: what stays to do until it is ticked or the game resets it.</summary>
+    public static readonly IReadOnlyList<string> CheckedRows=["Supply","Deliveries","Fashion","Allied","HuntBills","ChallengeLog","DomanEnclave"];
+    /// <summary>0.458: every row the player can show or hide in the server bar: the checked rows and the timers that finish.</summary>
+    public static readonly IReadOnlyList<string> BarRows=[..CheckedRows,nameof(FinishedKind.Ventures),nameof(FinishedKind.Voyages),nameof(FinishedKind.SquadronMission),nameof(FinishedKind.SquadronTraining)];
+
+    /// <summary>The last reset of a checked row, as the Reminders page counts it.</summary>
+    public static DateTimeOffset LastReset(string row,DateTimeOffset now)=>row switch
+    {
+        "Supply"=>ResetSchedule.PreviousDaily(now,ResetSchedule.SupplyHour),
+        "Allied"=>ResetSchedule.PreviousDaily(now,ResetSchedule.DailyHour),
+        _=>ResetSchedule.PreviousWeekly(now,ResetSchedule.WeeklyDay,ResetSchedule.WeeklyHour),
+    };
+
+    /// <summary>0.458 (user request, in-game campaign): the checked rows still to do since their reset, without those the player hid.</summary>
+    public static IReadOnlyList<string> Todo(Func<string,DateTimeOffset?> doneAt,IReadOnlyCollection<string>? hidden,DateTimeOffset now)
+        =>CheckedRows.Where(row=>hidden?.Contains(row)!=true && !ResetSchedule.DoneSince(doneAt(row),LastReset(row,now))).ToArray();
+
     public static IReadOnlyList<(FinishedKind Kind,int Count)> Finished(IEnumerable<DateTimeOffset?>? ventures,IEnumerable<VoyageVessel>? vessels,
         (ushort Id,DateTimeOffset? Done)? mission,(ushort Id,DateTimeOffset? Done)? training,IEnumerable<GardenBed>? beds,DateTimeOffset now)
     {

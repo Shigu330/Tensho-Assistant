@@ -3,6 +3,17 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.458.0
+- Demande de l'utilisateur pendant la campagne de tests : l'icône des rappels montre maintenant ce qui reste à faire, plus seulement ce qui est terminé.
+  Son nombre et son infobulle (« Reste à faire ») comptent : tâches de servant finies, vaisseaux revenus, mission et entraînement d'escouade finis,
+  parcelles mûres, rappels à case « Fait » non cochés depuis leur remise à zéro, et vos tâches affichées à l'écran.
+- Page Rappels : nouvelle colonne « Barre », une case par rappel, cochée par défaut, pour choisir ce que l'icône montre. Les tâches personnelles gardent
+  leur case « à l'écran » ; les parcelles mûres n'ont pas de case dans ce tableau (elles sont toujours comptées).
+- Tests : Todo458Tests (2 cas). Verify.ps1 (agent) : 853/853, 0 avertissement, 0 erreur ; DLL 0.458.0.0. Non validé en jeu.
+### English
+- The Reminders icon now shows what is left to do (finished timers, reminders not ticked since their reset, your on-screen tasks), and the Reminders page
+  has a « Bar » box per row to choose what it shows.
+
 ## 0.457.0
 - Demande de l'utilisateur pendant la campagne de tests : les compétences ont leur icône dans les deux listes qui n'en avaient pas : « Actions
   interdites » (Réglages › Artisanat) et les actions de l'enregistreur (icônes dans l'ordre, numéro et nom au survol). Icônes lues dans les

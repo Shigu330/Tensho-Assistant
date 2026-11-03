@@ -243,7 +243,7 @@
     "AlarmServerBar": "Icône d'alarme dans la barre du serveur",
     "AlarmServerBarTip": "Affiche une horloge et le nombre d'alarmes Tensho actives dans la barre d'informations du jeu (à côté du nom du serveur) ; survol = prochaine alarme ; clic = page Alarmes. Masquée sans alarme active.\nPar défaut : activé.",
     "ReminderServerBar": "Icône des rappels dans la barre du serveur",
-    "ReminderServerBarTip": "Affiche sa propre icône et le nombre de rappels terminés (tâches de servant, vaisseaux revenus, escouade, parcelles mûres) dans la barre d'informations du jeu ; survol = la liste ; clic = page Rappels.\nPar défaut : activé.",
+    "ReminderServerBarTip": "Affiche sa propre icône et le nombre de choses qui restent à faire dans la barre d'informations du jeu : tâches de servant finies, vaisseaux revenus, escouade, parcelles mûres, rappels non faits et vos tâches affichées à l'écran ; survol = la liste ; clic = page Rappels. La page Rappels choisit ce qu'elle montre (cases « Barre »).\nPar défaut : activé.",
     "Teamcraft": "Teamcraft (temps de touche)",
     "TeamcraftTip": "Temps entre le lancer et la touche, par poisson et lieu, d'après les relevés publics de Teamcraft (API gubal, licence MIT). Une requête par lieu de pêche, gardée en cache.",
     "GatherBuddy": "GatherBuddy (pêche)",
@@ -3698,8 +3698,10 @@
     "Here": "Position"
   },
   "Reminders": {
-    "BarTitle": "Rappels terminés",
-    "BarNone": "Aucun rappel terminé.",
+    "BarTitle": "Reste à faire",
+    "BarNone": "Rien à faire pour l'instant.",
+    "BarRowTip": "Affiche ce rappel sous l'icône des rappels de la barre du serveur tant qu'il reste à faire.\nPar défaut : coché.",
+    "ColumnBar": "Barre",
     "BarClick": "Clic : page Rappels",
     "BarVentures": "Tâches de servant terminées : {0}",
     "BarVoyages": "Vaisseaux revenus : {0}",

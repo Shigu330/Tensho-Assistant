@@ -37,7 +37,7 @@ public static class ConfigurationReset
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
         "HoverShowCompare",
-        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "AlarmBarTooltip",
+        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderBarHidden", "AlarmBarTooltip",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
         "CurrencyAlerts", "CurrencyServerBar", "CurrencyThresholds",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
@@ -264,6 +264,8 @@ public sealed partial class Configuration
     public bool AlarmServerBar { get; set; } = true;
     // 0.455: finished reminders in the server bar, apart from the alarms.
     public bool ReminderServerBar { get; set; } = true;
+    // 0.458: Reminders rows left out of that icon (their « Bar » box unticked); null = none.
+    public List<string>? ReminderBarHidden { get; set; }
     // 0.344 (g, I-02): currency threshold alerts (chat, sound and Discord with the alarm options) and their server bar entry, read on
     // the framework thread; thresholds in percent of the cap per currency item (missing = 80 %, 0 = off), replaced whole, never edited
     // in place (copy on write) so the framework thread never sees a dictionary being changed.

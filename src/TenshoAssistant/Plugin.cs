@@ -312,7 +312,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>alarmBar=new Alarms.AlarmDtrEntry(dtrBar,framework,gameGui,configuration,localization.Get,mainWindow.OpenAlarms),()=>alarmBar?.Dispose());
             // 0.455 (user request): reminders apart from alarms in the server bar.
             Alarms.ReminderDtrEntry? reminderBar=null;
-            registrations.Register(()=>reminderBar=new Alarms.ReminderDtrEntry(dtrBar,framework,gameGui,player,log,configuration,localization.Get,mainWindow.OpenReminders),()=>reminderBar?.Dispose());
+            registrations.Register(()=>reminderBar=new Alarms.ReminderDtrEntry(dtrBar,framework,gameGui,player,log,configuration,localization.Get,mainWindow.OpenReminders,mainWindow.ReminderTodoLines),()=>reminderBar?.Dispose());
             this.reminderBar=()=>reminderBar;
             // 0.344 (g, I-02): currency balances and threshold alerts (chat and sound with the alarm options, Discord in its own category),
             // and their server bar entry. Registered after the Discord notifier, so released before it.
