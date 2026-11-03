@@ -1,5 +1,6 @@
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Craft;
+using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
@@ -22,7 +23,18 @@ internal sealed partial class MainWindow
         if(recording){ImGui.SameLine();ImGui.TextColored(Accent,localization.Format("CraftRecorder.Recording",actions.Count));}
         if(craftRecorderMessage is { } message)ImGui.TextWrapped(message);
         if(actions.Count==0)return;
-        ImGui.TextDisabled(string.Join(" › ",actions.Select(kind=>catalog.Find(job,kind)?.Name ?? kind.ToString())));
+        // 0.457 (user request, in-game campaign): the recorded actions by their icons, in order; number and name on hover.
+        for(var index=0;index<actions.Count;index++)
+        {
+            if(index>0)
+            {
+                ImGui.SameLine();
+                if(ImGui.GetContentRegionAvail().X<24)ImGui.NewLine();
+            }
+            var metadata=catalog.Find(job,actions[index]);
+            DrawItemIcon(metadata is null ? null:new ItemDefinition(0,metadata.Name,false,metadata.Icon),new System.Numerics.Vector2(24));
+            if(ImGui.IsItemHovered())WrappedTooltip($"{index+1}. {metadata?.Name ?? actions[index].ToString()}");
+        }
         if(ignored>0)ImGui.TextDisabled(localization.Format("CraftRecorder.Ignored",ignored));
         if(ImGui.SmallButton(localization.Get("CraftRecorder.Use"))){simulationActions.Clear();simulationActions.AddRange(actions);simulationResult=null;simulationError=null;}
     }

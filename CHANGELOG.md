@@ -3,6 +3,15 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.457.0
+- Demande de l'utilisateur pendant la campagne de tests : les compétences ont leur icône dans les deux listes qui n'en avaient pas : « Actions
+  interdites » (Réglages › Artisanat) et les actions de l'enregistreur (icônes dans l'ordre, numéro et nom au survol). Icônes lues dans les
+  données du jeu, comme dans le simulateur. Dans « Actions interdites », l'icône est celle du Charpentier, comme le nom : certaines compétences ont
+  une icône par classe.
+- Tests : Icons457Tests (1 cas). Verify.ps1 (agent) : 851/851, 0 avertissement, 0 erreur ; DLL 0.457.0.0. Non validé en jeu.
+### English
+- Crafting actions now show their icons in « Forbidden actions » and in the recorder's list (number and name on hover).
+
 ## 0.456.0
 - Demande de l'utilisateur pendant la campagne de tests : un plan pour obtenir le plus possible d'une graine. Dans Croisements, mode « Ce qui donne cette
   graine » :

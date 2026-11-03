@@ -714,6 +714,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.457 : icônes des compétences** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Réglages › Artisanat › Actions interdites : chaque ligne a son icône, et la case se coche toujours.
+- [ ] Enregistreur d'artisanat : les actions notées s'affichent en icônes dans l'ordre ; le survol donne le numéro et le nom ; la ligne revient à la ligne si besoin.
+
 **0.456 : plan de plantation des croisements** — pendant la campagne de tests en jeu (étape h)
 
 - [ ] Croisements › « Ce qui donne cette graine » : les paires à « seulement cette graine » sont en tête ; le survol donne les autres graines.
