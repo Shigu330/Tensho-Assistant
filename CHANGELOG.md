@@ -3,6 +3,27 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.451.0
+- N-06 (DEC-027, point 1) : section « Missions d'escouade » dans la page Rappels. Tout vient du jeu, aucune source communautaire :
+  - « Lire l'escouade » (sur clic, sur le thread du jeu, lecture de champs seulement) copie les membres (classe, niveau, état, affinités)
+    et le bonus d'entraînement depuis GcArmyManager.Data (FFXIVClientStructs). Le jeu ne les charge qu'à la caserne : sinon, un message
+    l'explique.
+  - Les missions et leurs 6 jeux d'exigences viennent de GcArmyExpedition. Le joueur choisit celui que montre la fenêtre du jeu (le jeu
+    actif n'est pas encore connu).
+  - Les attributs d'un membre viennent de GcArmyMemberGrow, sur la ligne de sa classe (colonne ClassJob) et à l'indice de son niveau.
+    Le niveau 60 est dans les quatre colonnes qui suivent la collection (Unknown0 à 3 chez Lumina) : les valeurs suivent celles du
+    niveau 59 (ex. 129/31/52 puis 130/31/53).
+  - Les 5 meilleurs groupes de quatre membres libres sont classés par pourcentage, puis par attributs atteints, puis par manque le plus
+    petit. Pourcentage = PercentBase + chaque attribut atteint + PercentAll si les trois le sont ; il est affiché « ≈ », comme une
+    estimation non vérifiée en jeu. Les affinités ne sont pas comptées (colonnes sans nom).
+  - « Écrire dans le journal » est la sonde en jeu : l'escouade lue, les attributs utilisés et les groupes vont dans le journal de
+    Dalamud (en anglais), pour comparer avec la fenêtre du jeu.
+- Tests : Squadron451Tests (4 cas). Verify.ps1 (agent) : 823/823, 0 avertissement, 0 erreur ; DLL 0.451.0.0. Non validé en jeu.
+### English
+- N-06: a « Squadron missions » section on the Reminders page: reads your squadron in the barracks on click and ranks the parties of
+  four for a mission from the game's sheets (requirements, success percent parts, attributes by class and level, training bonus); the
+  percent is shown as an estimate until checked in game, chemistry is not counted; « Write to the log » records the values for the probe.
+
 ## 0.450.0
 - N-14 (DEC-027, point 2) : section « Croisements » sous le journal de jardinage. On choisit une graine pour voir les paires qui la
   donnent, ou ce qu'elle peut donner et avec quelle graine la planter. Les paires viennent de nick75g/FFXIV-Crossbreed-Helper (MIT,

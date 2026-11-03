@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-03)
 
-VERSION: 0.450.0.0 (dernière release : Stable-0.448.0, publiée le 2026-11-03 par l'agent, à ta demande) — Verify.ps1 (agent) 819/819, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.451.0.0 (dernière release : Stable-0.448.0, publiée le 2026-11-03 par l'agent, à ta demande) — Verify.ps1 (agent) 823/823, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: fin de la file — commit et release, décisions par lots, tests en jeu (étape h), séance ultracode (g2) ; voir [GOAL](GOAL.md) et « Prochaine action ».
 QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-11-02 : forfait Max, 5 h à 0 %, semaine à 0 % (réinit. jeudi 23:00).
 
@@ -77,8 +77,8 @@ Liste complète et à jour, version par version jusqu'à 0.448 : [TESTING](../pr
 Restent, dans cet ordre proposé :
 1) Décisions du 2026-11-03 ([DEC-026](../project/DECISIONS.md)) : 0.447, 0.448 (journal de jardinage, N-08) et release Stable-0.448.0
    faites ; recherche de sources N-06 / N-14 faite le 2026-11-03 ([preuve](../evidence/0.448-n06-n14-sources.md)), décidé (DEC-027) :
-   0.449 durées Lotlab du journal de jardinage FAIT ; 0.450 croisements N-14 FAIT ; à faire : 0.451 escouade N-06
-   (feuilles du jeu + sonde).
+   0.449 durées Lotlab du journal de jardinage, 0.450 croisements N-14 et 0.451 escouade N-06 FAITS ;
+   la sonde N-06 se fait pendant la campagne de tests en jeu (TESTING 0.451).
 2) Décisions par lots : [G-PROPOSALS](../project/G-PROPOSALS.md) (choix provisoires, écarts bloqués, idées), ROADMAP « Décisions
    reportées à la fin », lignes « État » des quatre fichiers de propositions (MAP, ITEMS, CRAFT-GATHER, TOOLS).
 3) h) Campagne de tests en jeu guidée de tout le plugin ([TESTING](../project/TESTING.md)), avec l'utilisateur, avec les sondes en

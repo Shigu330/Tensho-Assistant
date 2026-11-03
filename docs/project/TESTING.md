@@ -714,6 +714,17 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.451 : N-06 missions d'escouade (sonde en jeu)** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Hors de la caserne : « Lire l'escouade » affiche « L'escouade n'est pas chargée… ».
+- [ ] À la caserne, escouade ouverte : « Lire l'escouade » liste les 8 membres (classe, niveau, « occupé » pour ceux en mission ou à
+  l'entraînement) et le bonus d'entraînement ; comparer avec la fenêtre du jeu.
+- [ ] Attributs d'un membre : comparer « P / M / T » affiché avec la fiche du membre dans le jeu (classe, niveau). Un écart prouverait que
+  les colonnes de GcArmyMemberGrow sont mal lues, ou que les affinités ou l'équipement comptent.
+- [ ] Choisir la mission de la fenêtre du jeu, puis le jeu d'exigences qui correspond à ses valeurs ; former le groupe proposé dans le
+  jeu et comparer ses totaux et le taux de réussite affiché par le jeu avec « ≈ … % ».
+- [ ] « Écrire dans le journal » : copier les lignes « Squadron probe: » du journal de Dalamud dans docs/evidence/ (sonde N-06).
+
 **0.450 : N-14 croisements** — pendant la campagne de tests en jeu de la fin (étape h)
 
 - [ ] Rappels › Journal de jardinage › Croisements : « Lecture des paires… » puis la liste ; les graines sont nommées dans la langue

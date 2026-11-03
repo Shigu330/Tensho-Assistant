@@ -114,7 +114,8 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
   treasure maps, retainer ventures, company voyages, Grand Company squadron) with resets and alarm buttons; Wondrous Tails (tasks, line
   odds), hunt bills (targets and kills), daily roulettes and role bonus, challenge log, Doman Enclave; « done » boxes per character, all
   your characters at a glance, your own tasks (daily, weekly, every n hours, once, counters) with an optional on-screen panel, and a
-  garden journal (growing and tending hours you type, harvest and tending reminders).
+  garden journal (growing and tending hours filled from a seed list or typed, harvest and tending reminders, crossbreeding pairs), and
+  a squadron mission planner (best parties of four from the game's data, estimate not yet checked in game).
 
 ### Free company
 
@@ -412,7 +413,9 @@ Ce que fait le code aujourd'hui. La validation en jeu de chaque partie est suivi
   remises à zéro et alarmes ; Livre d'or (tâches, chances de lignes), contrats de chasse (cibles et victimes), missions aléatoires du
   jour et bonus de rôle, carnet d'objectifs, Enclave de Doman ; cases « fait » par personnage, vue de tous vos personnages, vos propres
   tâches (chaque jour, chaque semaine, toutes les n heures, une fois, compteurs) avec un panneau à l'écran en option, et un journal de
-  jardinage (durées de pousse et d'entretien tapées par vous, rappels de récolte et d'entretien).
+  jardinage (durées de pousse et d'entretien remplies depuis une liste de graines ou tapées, rappels de récolte et d'entretien, paires de
+  croisement), et un planificateur des missions d'escouade (meilleurs groupes de quatre d'après les données du jeu, estimation pas encore
+  vérifiée en jeu).
 
 ### Compagnie libre
 
