@@ -189,7 +189,10 @@ internal sealed class AlarmService : IDisposable
                 // Silence in duties: the sound, and the chat line too with MuteChatInDuties. The duty flag (Dalamud's ICondition, framework
                 // thread) is read only while the silence is on; Discord below and the alarms copied into the game are not affected.
                 var inDuty = settings.MuteInDuties && condition[ConditionFlag.BoundByDuty];
-                if (settings.ChatAllowed(inDuty)) chat(alarm,$"{alarm.Label}|{minutes}|{occurrence.ToLocalTime():HH:mm}");
+                // 0.452: a chat failure leaves the sound and Discord, as a Discord failure leaves the chat.
+                if (settings.ChatAllowed(inDuty))
+                    try { chat(alarm,$"{alarm.Label}|{minutes}|{occurrence.ToLocalTime():HH:mm}"); }
+                    catch (Exception error) { log.Warning(error, "Alarm chat line could not be written."); }
                 if (settings.SoundAllowed(inDuty)) PlaySound(settings.Sound, log);
             }
             if (discord)

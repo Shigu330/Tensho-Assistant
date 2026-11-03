@@ -13,9 +13,17 @@ public static class TryOn
     /// <summary>Set after the first failure: the Try On buttons stay greyed for the session.</summary>
     public static bool Failed { get; private set; }
 
-    public static bool Item(uint itemId, Action<Exception>? report = null)
+    public static unsafe bool Item(uint itemId, bool characterReady, Action<Exception>? report = null)
     {
         if (Failed) return false;
+        // R-14 (0.452): the game's Try On previews the loaded character: with none (title, character select, loading) no call is made.
+        if (!characterReady) return false;
+        if ((nint)AgentTryon.MemberFunctionPointers.TryOn == 0)
+        {
+            Failed = true;
+            report?.Invoke(new InvalidOperationException("AgentTryon.TryOn did not resolve."));
+            return false;
+        }
         try { return AgentTryon.TryOn(0, itemId, 0, 0, 0, false); }
         catch (Exception error) { Failed = true; report?.Invoke(error); return false; }
     }

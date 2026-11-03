@@ -12,9 +12,10 @@ namespace TenshoAssistant.Craft;
 /// </summary>
 public sealed unsafe class CraftRecorder : IDisposable
 {
-    private delegate bool UseActionDelegate(ActionManager* manager,ActionType type,uint actionId,ulong targetId,uint extraParam,ActionManager.UseActionMode mode,uint comboRouteId,bool* outOptAreaTargeted);
     private readonly IGameInteropProvider interop;private readonly IPluginLog log;private readonly Func<CraftActionCatalog?> catalog;
-    private Hook<UseActionDelegate>? hook;
+    // A-14 (0.452, review): ClientStructs' own delegate: its assembly disables runtime marshalling, so bool is the game's 1 byte. A delegate
+    // declared here marshalled it as a 4-byte BOOL, testing undefined bits: a refused action could read as accepted, and that « true » went back to the game.
+    private Hook<ActionManager.Delegates.UseAction>? hook;
     private int warned;
     public CraftRecording Recording { get; }=new();
 
@@ -28,7 +29,7 @@ public sealed unsafe class CraftRecorder : IDisposable
             if(hook is null)
             {
                 if((nint)ActionManager.MemberFunctionPointers.UseAction==0)return false;
-                hook=interop.HookFromAddress<UseActionDelegate>((nint)ActionManager.MemberFunctionPointers.UseAction,OnUseAction);
+                hook=interop.HookFromAddress<ActionManager.Delegates.UseAction>((nint)ActionManager.MemberFunctionPointers.UseAction,OnUseAction);
             }
             Recording.Start();
             hook.Enable();
@@ -45,10 +46,13 @@ public sealed unsafe class CraftRecorder : IDisposable
 
     private bool OnUseAction(ActionManager* manager,ActionType type,uint actionId,ulong targetId,uint extraParam,ActionManager.UseActionMode mode,uint comboRouteId,bool* outOptAreaTargeted)
     {
-        var result=hook!.Original(manager,type,actionId,targetId,extraParam,mode,comboRouteId,outOptAreaTargeted);
+        // A-14 (0.452, review): OriginalDisposeSafe: Original throws into the game's frames once the hook is disposed.
+        var result=hook!.OriginalDisposeSafe(manager,type,actionId,targetId,extraParam,mode,comboRouteId,outOptAreaTargeted);
         try
         {
-            if(result && Recording.Recording && type is ActionType.Action or ActionType.CraftAction)
+            // An action only queued returns true, then returns true again when the queue replays it (mode Queue): it is noted when it runs, once.
+            var queued=manager!=null && manager->ActionQueued && manager->QueuedActionType==type && manager->QueuedActionId==actionId;
+            if(result && Recording.Recording && CraftRecording.Runs(type is ActionType.Action or ActionType.CraftAction,mode==ActionManager.UseActionMode.Queue,queued))
             {
                 var known=catalog()?.KindOf(actionId);
                 if(known is not null || type==ActionType.CraftAction)Recording.Observe(known);
@@ -58,5 +62,5 @@ public sealed unsafe class CraftRecorder : IDisposable
         return result;
     }
 
-    public void Dispose(){Recording.Stop();hook?.Dispose();hook=null;}
+    public void Dispose(){Recording.Stop();hook?.Dispose();}
 }

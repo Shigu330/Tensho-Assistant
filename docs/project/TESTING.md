@@ -714,6 +714,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.452 : R-14 et hooks (A-14)** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Alarme sur un objet : la laisser sonner deux fois de suite ; la ligne de chat, le son et Discord arrivent à chaque sonnerie.
+- [ ] Enregistreur d'artisanat sur une classe autre que Charpentier : Veneration, Innovation, Great Strides, Waste Not, Manipulation et Final
+  Appraisal sont notés ; une action lancée pendant l'animation (mise en file) est notée une seule fois ; une action refusée ne l'est pas.
+- [ ] Synthèse en direct : la projection s'affiche maintenant (elle ne tournait pas avant) ; comparer ses chiffres à la synthèse.
+- [ ] Chaîne de macros : /macrolock pendant une chaîne, puis lancer une autre macro : la chaîne continue.
+- [ ] Try On depuis le menu d'un objet avec un personnage chargé ; à l'écran de sélection du personnage, rien ne se passe.
+- [ ] Musique en cours (orchestrion) et liste des cartes de l'éditeur de Triple Triade toujours lues.
+
 **0.451 : N-06 missions d'escouade (sonde en jeu)** — pendant la campagne de tests en jeu de la fin (étape h)
 
 - [ ] Hors de la caserne : « Lire l'escouade » affiche « L'escouade n'est pas chargée… ».

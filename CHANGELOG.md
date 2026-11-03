@@ -3,6 +3,42 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.452.0
+- R-14 et A-14 (demande de l'utilisateur, sans ultracode), à partir de l'audit gardé, chaque constat relu dans le code. Premier lot : ce qui
+  pouvait planter le jeu ou faire tomber toute l'interface.
+- Interface : Dalamud enveloppe tout le dessin de Tensho dans un seul catch, donc un panneau qui échouait (feuille perdue après une mise à
+  jour) remplaçait toutes les fenêtres par sa fenêtre d'erreur. Les 26 panneaux et observations de Plugin.Draw échouent maintenant seuls :
+  erreur écrite une fois, panneau coupé jusqu'au rechargement.
+- Chargement : trois feuilles lues au démarrage (ClassJob, ContentRoulette, ContentsNote) faisaient refuser tout le plugin si l'une ne se
+  chargeait plus ; seule leur fonction se coupe.
+- Hooks (A-14), revue finie : ils restent, avec ces corrections.
+  - Enregistreur : le retour `bool` était lu sur 4 octets au lieu d'un, donc une action refusée pouvait passer pour acceptée, et ce résultat
+    repartait au jeu ; il utilise le délégué de FFXIVClientStructs.
+  - Enregistreur : une action mise en file était notée deux fois ; elle l'est une fois, quand elle part.
+  - Chaîne de macros : plus aucune exception ne peut remonter dans le jeu, la fonction du jeu s'exécute toujours, et une macro refusée par
+    /macrolock n'arrête plus la chaîne.
+  - Les deux hooks utilisent OriginalDisposeSafe.
+- Bogues réels trouvés par l'audit :
+  - Alarmes : Dalamud refuse un second gestionnaire de lien pour le même objet, donc dès la deuxième sonnerie d'un objet, la ligne de chat, le
+    son et Discord étaient perdus. Le lien est gardé par objet, et un échec du chat n'empêche plus le son ni Discord.
+  - Effets de craft (Veneration, Innovation, Great Strides, Waste Not I et II, Manipulation, Final Appraisal) : ils ont une ligne Action par
+    classe, mais toutes les classes recevaient celle du Charpentier. L'enregistreur les perdait sur les 7 autres classes. Preuve :
+    docs/evidence/0.452-craft-buff-rows.md (vérifié sur XIVAPI v2).
+  - Synthèse en direct : le contrôle « tous les effets lus » ne pouvait presque jamais réussir (l'énumérateur saute les cases vides), donc la
+    projection en direct ne tournait pas. Elle va maintenant tourner, ce qui n'a jamais été essayé en jeu.
+- Lectures de la mémoire du jeu : liste des scènes de musique bornée ; parcours des nœuds de Triple Triade gardés comme ceux de la récolte ;
+  texture lue seulement quand son type le permet ; Try On seulement avec un personnage chargé et une fonction trouvée.
+- Tests : Resilience452Tests (6 cas) ; 6 tests déjà écrits adaptés au nouveau code. Verify.ps1 (agent) : 829/829, 0 avertissement, 0 erreur ;
+  DLL 0.452.0.0. Non validé en jeu.
+### English
+- R-14 / A-14, first batch from the saved audit (crash class). Each overlay now fails alone instead of replacing every Tensho window with
+  Dalamud's error window; sheets read at load no longer refuse the whole plugin.
+- Hook review finished: both hooks stay. The recorder reads the game's 1-byte bool correctly and notes a queued action once; the macro chain
+  hook can no longer throw into the game and ignores macros refused by /macrolock.
+- Fixed: from an item's second ring, an alarm lost its chat line, sound and Discord post. Crafting buffs use each class's own action row (the
+  recorder dropped them on 7 classes). The live craft projection could almost never run: it will now, untested in game.
+- Native lists bounded (music scenes, Triple Triad node walks); Try On needs a loaded character.
+
 ## 0.451.0
 - Release Stable-0.451.0 (demande de l'utilisateur, 2026-11-03) : les notes précisent qu'il reste beaucoup de tests en jeu à faire.
 - N-06 (DEC-027, point 1) : section « Missions d'escouade » dans la page Rappels. Tout vient du jeu, aucune source communautaire :

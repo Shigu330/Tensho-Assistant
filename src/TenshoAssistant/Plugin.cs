@@ -72,7 +72,7 @@ public sealed class Plugin : IDalamudPlugin
     // 0.349 (g, X-07): the chat, for the « /tensho wiki | lodestone » answers.
     private readonly IChatGui chatGui;
     // R-12 (0.414): items whose « Open » chat link handler is registered (command id = item id), all removed on unload.
-    private readonly HashSet<uint> alarmLinks=[];
+    private readonly Dictionary<uint,Dalamud.Game.Text.SeStringHandling.Payloads.DalamudLinkPayload> alarmLinks=[];
 
     public Plugin(IDalamudPluginInterface pluginInterface, ICommandManager commands, IPluginLog log,
         IGameInventory inventory, IPlayerState player, IClientState client, IFramework framework, IDataManager data, IGameGui gameGui,
@@ -204,8 +204,14 @@ public sealed class Plugin : IDalamudPlugin
                         message.AddText(" ").AddMapLink(place.TerritoryId,place.MapId,place.X,place.Y,0.05f);
                     if(alarm.ItemId is > 0 and < uint.MaxValue)
                     {
-                        if(alarmLinks.Add(alarm.ItemId) && alarmLinks.Count>256){chat.RemoveChatLinkHandler();alarmLinks.Clear();alarmLinks.Add(alarm.ItemId);}
-                        var link=chat.AddChatLinkHandler(alarm.ItemId,(item,_)=>{mainWindow.OpenAlarmItem(item);mainWindow.IsOpen=true;});
+                        // 0.452: Dalamud refuses a second handler for the same id (Dictionary.Add): from an item's second ring the chat line, the
+                        // sound and Discord were lost. One link per item, kept.
+                        if(!alarmLinks.TryGetValue(alarm.ItemId,out var link))
+                        {
+                            if(alarmLinks.Count>=256){chat.RemoveChatLinkHandler();alarmLinks.Clear();}
+                            link=chat.AddChatLinkHandler(alarm.ItemId,(item,_)=>{mainWindow.OpenAlarmItem(item);mainWindow.IsOpen=true;});
+                            alarmLinks[alarm.ItemId]=link;
+                        }
                         message.AddText(" ").Add(link).AddUiForeground(localization.Get("Alarms.OpenInTensho"),500)
                             .Add(Dalamud.Game.Text.SeStringHandling.Payloads.RawPayload.LinkTerminator);
                     }
@@ -373,7 +379,9 @@ public sealed class Plugin : IDalamudPlugin
             Gear.GearLoader? gear=null;
             registrations.Register(()=>gear=new Gear.GearLoader(framework,data,client,log),()=>gear?.Dispose());
             // g, M-12 (0.383): the game's gear sets and the job levels (ClassJob ExpArrayIndex), read while the Gear page shows them.
-            var expIndex=data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Where(row=>row.ExpArrayIndex>=0).ToDictionary(row=>row.RowId,row=>(int)row.ExpArrayIndex);
+            // R-14 (0.452): a sheet read here that no longer loads threw out of this constructor and Dalamud refused the whole plugin; it now
+            // turns its own feature off (logged).
+            var expIndex=LoadSheet("ClassJob",()=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Where(row=>row.ExpArrayIndex>=0).ToDictionary(row=>row.RowId,row=>(int)row.ExpArrayIndex),[]);
             Gear.GameGearsetReader? gameGearsets=null;
             registrations.Register(()=>gameGearsets=new Gear.GameGearsetReader(framework,client,log,expIndex),()=>gameGearsets?.Dispose());
             mainWindow.GearsetSource=gameGearsets;
@@ -504,12 +512,12 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.EquippedGearUnavailable=()=>gear?.Unavailable==true;
             // 0.333: names of the squadron's mission and training (Reminders).
             // g, C-02 (0.356): daily roulettes = Duty Finder roulettes with a completion index (docs/evidence/0.356-roulettes.md).
-            var dailyRoulettes=data.GetExcelSheet<Lumina.Excel.Sheets.ContentRoulette>()
+            var dailyRoulettes=LoadSheet("ContentRoulette",()=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentRoulette>()
                 .Where(row=>row.IsInDutyFinder && row.CompletionArrayIndex>=0 && !row.Name.IsEmpty && row.RowId<=byte.MaxValue)
-                .OrderBy(row=>row.SortKey).Select(row=>new Reminders.RouletteRow((byte)row.RowId,(byte)row.ContentRouletteRoleBonus.RowId)).ToArray();
+                .OrderBy(row=>row.SortKey).Select(row=>new Reminders.RouletteRow((byte)row.RowId,(byte)row.ContentRouletteRoleBonus.RowId)).ToArray(),[]);
             mainWindow.DailyRoulettes=()=>dailyRoulettes;
             // g, M-11 (0.382): challenge log entries (ContentsNote rows with a name; docs/evidence/0.382-counters.md).
-            var challengeRows=data.GetExcelSheet<Lumina.Excel.Sheets.ContentsNote>().Where(row=>!row.Name.IsEmpty && row.RowId<=int.MaxValue).Select(row=>(int)row.RowId).ToArray();
+            var challengeRows=LoadSheet("ContentsNote",()=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentsNote>().Where(row=>!row.Name.IsEmpty && row.RowId<=int.MaxValue).Select(row=>(int)row.RowId).ToArray(),[]);
             mainWindow.ChallengeRows=()=>challengeRows;
             // g, M-04 (0.374): one status file per character (Characters/<local character id>.json): ventures, counters, « done » boxes.
             Character.CharacterStatusWatcher? characterStatus=null;
@@ -671,7 +679,7 @@ public sealed class Plugin : IDalamudPlugin
             // 0.321: a failing Try On (game function moved) is logged once and its buttons turn off for the session.
             mainWindow.TryOnItem=item=>
             {
-                var opened=Items.TryOn.Item(item,error=>log.Warning(error,"Try On is unavailable (game update?)."));
+                var opened=Items.TryOn.Item(item,player.IsLoaded,error=>log.Warning(error,"Try On is unavailable (game update?)."));
                 if(Items.TryOn.Failed)mainWindow.TryOnItem=null;
                 return opened;
             };
@@ -902,33 +910,52 @@ public sealed class Plugin : IDalamudPlugin
         // The map's open state lives in MainWindow (game map key M, journal); its window follows it.
         if(mapWindow is not null)mapWindow.IsOpen=mainWindow.MapViewOpen;
         windows.Draw();
-        if (!autoBankCapture()) bankOverlay.Draw();
-        mainWindow.DrawCraftLogHelper();
-        mainWindow.DrawItemHover();
-        undercut?.FlushClipboard();
-        mainWindow.DrawCactpotOverlay();
-        mainWindow.DrawTaskPanel();
-        mainWindow.DrawWearBar();
-        mainWindow.DrawInventorySortButton();
-        mainWindow.DrawRegenTickBar();
-        alarmBar?.Invoke()?.DrawTooltip();
-        mainWindow.DrawTriadOverlay();
-        mainWindow.DrawTriadRequestPanel();
-        mainWindow.DrawTriadDeckReminder();
-        mainWindow.DrawCharacterPanel();
-        mainWindow.DrawDutyFinderPanel();
-        mainWindow.DrawFashionCheckPanel();
-        mainWindow.DrawGatheringPanel();
-        mainWindow.DrawCollectablePanel();
-        mainWindow.DrawTrackerWindow();
-        mainWindow.DrawSpearfishingPanel();
-        mainWindow.DrawOceanVoyagePanel();
-        mainWindow.ProcessGameLogRequest();
-        mainWindow.ObserveHuntTrain();
-        mainWindow.ObserveGarden();
-        mainWindow.WatchPlots();
-        mainWindow.DrawFishingPanel();
+        overlays??=
+        [
+            ("Bank",()=>{if(!autoBankCapture())bankOverlay.Draw();}),
+            ("CraftLog",mainWindow.DrawCraftLogHelper),
+            ("ItemHover",mainWindow.DrawItemHover),
+            ("UndercutClipboard",()=>undercut?.FlushClipboard()),
+            ("Cactpot",mainWindow.DrawCactpotOverlay),
+            ("TaskPanel",mainWindow.DrawTaskPanel),
+            ("WearBar",mainWindow.DrawWearBar),
+            ("InventorySort",mainWindow.DrawInventorySortButton),
+            ("RegenTick",mainWindow.DrawRegenTickBar),
+            ("AlarmBar",()=>alarmBar?.Invoke()?.DrawTooltip()),
+            ("TriadOverlay",mainWindow.DrawTriadOverlay),
+            ("TriadRequest",mainWindow.DrawTriadRequestPanel),
+            ("TriadDeck",mainWindow.DrawTriadDeckReminder),
+            ("Character",mainWindow.DrawCharacterPanel),
+            ("DutyFinder",mainWindow.DrawDutyFinderPanel),
+            ("FashionCheck",mainWindow.DrawFashionCheckPanel),
+            ("Gathering",mainWindow.DrawGatheringPanel),
+            ("Collectable",mainWindow.DrawCollectablePanel),
+            ("Tracker",mainWindow.DrawTrackerWindow),
+            ("Spearfishing",mainWindow.DrawSpearfishingPanel),
+            ("OceanVoyage",mainWindow.DrawOceanVoyagePanel),
+            ("GameLogRequest",mainWindow.ProcessGameLogRequest),
+            ("HuntTrain",mainWindow.ObserveHuntTrain),
+            ("Garden",mainWindow.ObserveGarden),
+            ("PlotWatch",mainWindow.WatchPlots),
+            ("Fishing",mainWindow.DrawFishingPanel),
+        ];
+        // R-14 (0.452): Dalamud calls this whole method inside one catch (UiBuilder.OnDraw): an overlay that threw (a sheet lost after a game
+        // update throws on every call) replaced every Tensho window with Dalamud's error window. Each one now fails alone, logged once.
+        for(var index=0;index<overlays.Length;index++)
+        {
+            var (name,draw)=overlays[index];
+            if(brokenOverlays.Contains(name))continue;
+            try{draw();}
+            catch(Exception error){brokenOverlays.Add(name);log.Error(error,$"Overlay {name} turned off until the plugin reloads (perhaps after a game update).");}
+        }
     }
+    private (string Name,Action Draw)[]? overlays;
+    private T LoadSheet<T>(string name,Func<T> read,T unavailable)
+    {
+        try{return read();}
+        catch(Exception error){log.Warning(error,$"Sheet {name} unavailable (perhaps after a game update); its feature stays off.");return unavailable;}
+    }
+    private readonly HashSet<string> brokenOverlays=[];
 
     public void Dispose()
     {

@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-03)
 
-VERSION: 0.451.0.0 (dernière release : Stable-0.451.0, publiée le 2026-11-03 par l'agent, à ta demande ; notes : beaucoup de tests en jeu restent à faire) — Verify.ps1 (agent) 823/823, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.452.0.0 (dernière release : Stable-0.451.0, publiée le 2026-11-03 par l'agent, à ta demande ; notes : beaucoup de tests en jeu restent à faire) — Verify.ps1 (agent) 829/829, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: fin de la file — commit et release, décisions par lots, tests en jeu (étape h), g2 sans ultracode ; voir [GOAL](GOAL.md) et « Prochaine action ».
 QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-11-02 : forfait Max, 5 h à 0 %, semaine à 0 % (réinit. jeudi 23:00).
 
@@ -90,7 +90,7 @@ Restent, dans cet ordre proposé :
 Travail déjà payé, à reprendre sans relancer d'agents (fichiers locaux, ignorés par git, sous `checkpoints/`) :
 - `r14-audit-2026-11-03.json` : audit R-14 des 93 fichiers ; 99 constats dont 23 confirmés (aucun plantage parmi eux), 4 réfutés, et 72 non
   tranchés, dont 68 sans vérification à cause de la limite de session (12 de ces 72 sont classés « plantage », à vérifier d'abord). Relecture des
-  hooks A-14 finie : à garder avec des corrections. La revue de complétude n'a pas tourné.
+  hooks A-14 finie, corrections faites en 0.452, avec les constats « plantage ». La revue de complétude n'a pas tourné.
 - `features-design-2026-11-03.json` : conceptions de I-05, I-15 et N-10 ; I-05 et I-15 relues (à corriger sur quelques points), N-10 sans relecture.
 XIVAPI v2 ne remplace aucune source externe : [preuve](../evidence/0.451-xivapi-v2.md).
 RÈGLE (2026-11-02) : décisions gardées pour la fin, sauf si bloquant ; l'agent applique le choix recommandé et le note.

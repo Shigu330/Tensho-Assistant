@@ -49,19 +49,29 @@ internal sealed unsafe class MacroChainBridge : IDisposable
     private void EnsureHook()
     {
         if (executeHook is not null) return;
+        // R-14 (0.452): an unresolved function is said in our words, not by Dalamud's « Address was <= 0 ».
+        if ((nint)RaptureShellModule.MemberFunctionPointers.ExecuteMacro == 0) throw new InvalidOperationException("The game's macro function is unavailable (perhaps after a game update).");
         executeHook = interop.HookFromAddress<ExecuteDelegate>((nint)RaptureShellModule.MemberFunctionPointers.ExecuteMacro, OnExecute);
         try { executeHook.Enable(); }
         catch { executeHook.Dispose(); executeHook = null; throw; }
     }
     private void OnExecute(RaptureShellModule* shell, RaptureMacroModule.Macro* macro)
     {
-        lock (gate)
+        // A-14 (0.452, review): nothing may leave a hook into the game's caller, and the game's function always runs. The observation is guarded;
+        // OriginalDisposeSafe still works if the plugin is unloading. A macro the game refuses (/macrolock) replaces nothing: it does not stop the chain.
+        try
         {
-            if (ownCallAddress != (nint)macro || ownCallThread != Environment.CurrentManagedThreadId)
-                sequence.ObserveExternalStart();
-            else { ownCallAddress = 0; ownCallThread = 0; }
-            executeHook!.Original(shell, macro);
+            lock (gate)
+            {
+                if (ownCallAddress != (nint)macro || ownCallThread != Environment.CurrentManagedThreadId)
+                {
+                    if (!disposed && (shell == null || !shell->MacroLocked)) sequence.ObserveExternalStart();
+                }
+                else { ownCallAddress = 0; ownCallThread = 0; }
+            }
         }
+        catch (Exception error) { log.Warning(error, "The macro chain could not observe a macro."); }
+        executeHook!.OriginalDisposeSafe(shell, macro);
     }
     private ulong ReadOwner() => client.IsLoggedIn && player.IsLoaded ? player.ContentId : 0;
     private static MacroDefinition ReadMacro(RaptureMacroModule* module, uint book, uint index)

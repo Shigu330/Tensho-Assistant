@@ -252,7 +252,7 @@ internal sealed class TriadObservationReader : IDisposable
         var count = 0;
         void Walk(AtkUldManager* manager, int depth)
         {
-            if (manager == null || depth > 4) return;
+            if (!Walkable(manager, depth)) return;
             for (var index = 0; index < manager->NodeListCount && count < 160; index++)
             {
                 var node = manager->NodeList[index];
@@ -264,7 +264,7 @@ internal sealed class TriadObservationReader : IDisposable
                     if (image->PartsList != null && image->PartId < image->PartsList->PartCount)
                     {
                         var asset = image->PartsList->Parts[image->PartId].UldAsset;
-                        if (asset != null && asset->AtkTexture.Resource != null && asset->AtkTexture.Resource->TexFileResourceHandle != null)
+                        if (asset != null && asset->AtkTexture.TextureType == TextureType.Resource && asset->AtkTexture.Resource != null && asset->AtkTexture.Resource->TexFileResourceHandle != null)
                             path = asset->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString();
                     }
                     if (allTextures || path.Contains("icon", StringComparison.OrdinalIgnoreCase))
@@ -279,10 +279,13 @@ internal sealed class TriadObservationReader : IDisposable
         lastEditDeck = line;
         log.Information("Triad {Window} capture: values={Values} images={Images}", unit->NameString, Values(unit), line);
     }
+    // R-14 (0.452): same guard as GatheringObservationReader: no node list, a count beyond its allocated size or a component not fully loaded is not walked.
+    private static unsafe bool Walkable(AtkUldManager* manager, int depth)
+        => manager != null && depth <= 4 && manager->NodeList != null && manager->NodeListCount <= manager->NodeListSize && manager->LoadedState == AtkLoadState.Loaded;
     // Visible card images of the editor's list: texture ui/icon/088000/088NNN(_hr1).tex = card NNN.
     private static unsafe void ListedCards(AtkUldManager* manager, int depth, List<(uint, TriadRect)> cards)
     {
-        if (manager == null || depth > 4) return;
+        if (!Walkable(manager, depth)) return;
         for (var index = 0; index < manager->NodeListCount && cards.Count < 200; index++)
         {
             var node = manager->NodeList[index];
@@ -292,7 +295,8 @@ internal sealed class TriadObservationReader : IDisposable
                 var image = (AtkImageNode*)node;
                 if (image->PartsList == null || image->PartId >= image->PartsList->PartCount) continue;
                 var asset = image->PartsList->Parts[image->PartId].UldAsset;
-                if (asset == null || asset->AtkTexture.Resource == null || asset->AtkTexture.Resource->TexFileResourceHandle == null) continue;
+                // R-14 (0.452): Resource is one arm of a union (Crest, KernelTexture at the same offset): read only when TextureType says Resource.
+                if (asset == null || asset->AtkTexture.TextureType != TextureType.Resource || asset->AtkTexture.Resource == null || asset->AtkTexture.Resource->TexFileResourceHandle == null) continue;
                 var path = asset->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString();
                 // Large card images use icon 088NNN, small ones 087NNN (both listed with each card in the editor's window values).
                 var at = path.IndexOf("icon/088000/", StringComparison.Ordinal); var baseIcon = 88000u;
