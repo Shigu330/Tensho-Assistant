@@ -96,11 +96,8 @@ internal sealed partial class MainWindow
         BoolSetting("Settings.GameFrames","SettingTips.GameFrames",()=>configuration.GameFrames,value=>configuration.GameFrames=value,c=>c.GameFrames);
         ImGui.TextColored(Accent, localization.Get("Settings.ObjectsMarket"));
         ImGui.TextDisabled(localization.Get("Advanced.MarketMoved"));
-        // 0.324: shared setting rows (tooltip and « ↺ »); monsters on hover read the wiki, so they are greyed while that source is off.
+        // 0.324: shared setting rows (tooltip and « ↺ »). 0.447: « monsters on hover » removed (it no longer did anything).
         BoolSetting("Settings.UsageHover","InterfaceHelp.UsageHelp",()=>configuration.ItemUsagesOnHover,value=>configuration.ItemUsagesOnHover=value,c=>c.ItemUsagesOnHover);
-        ImGui.BeginDisabled(!configuration.ItemUsagesOnHover || !configuration.CommunityWiki);
-        try{BoolSetting("Settings.MonsterHover",configuration.CommunityWiki ? "InterfaceHelp.MonsterHoverHelp":"Advanced.SourceOffTip",()=>configuration.MonsterSourcesOnHover,value=>configuration.MonsterSourcesOnHover=value,c=>c.MonsterSourcesOnHover);}
-        finally{ImGui.EndDisabled();}
         // e) (audit 2026-11-02): the four parts of the panel under the game's item tooltip, under « item uses » that turns that panel on
         // (greyed while it is off). Tensho's own item tooltips and the item sheet always show every part.
         ImGui.Indent();

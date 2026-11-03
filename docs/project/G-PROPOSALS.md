@@ -4,6 +4,9 @@ Ce document est tenu pendant le développement de l'étape g) (les écarts de GA
 choix faits à titre provisoire, pour les revoir ensemble avec l'utilisateur (étape h et décisions de la fin). Rien ici n'est encore
 décidé. Les choix provisoires sont aussi rappelés dans la [ROADMAP](ROADMAP.md), « Décisions reportées à la fin ».
 Relu le 2026-11-03 (0.446) : une alternative faite depuis est marquée « FAIT x.y » dans sa colonne ; il reste alors le choix lui-même à confirmer.
+**DÉCIDÉ 2026-11-03 (DEC-026)** : tous les choix provisoires ci-dessous sont confirmés par l'utilisateur, sauf X-13 (envoi au chat sur clic
+ajouté en 0.447) ; leurs alternatives restent des idées. X-04 : simple lien (0.447). Écarts : A-03 / A-04 étudiés en séance ; N-06 et N-14 :
+source communautaire à chercher, licence d'abord ; N-08 : journal avec durées tapées (0.448).
 
 ## Choix provisoires (appliqués, à confirmer)
 

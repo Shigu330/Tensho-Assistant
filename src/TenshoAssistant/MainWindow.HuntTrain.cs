@@ -18,6 +18,10 @@ internal sealed partial class MainWindow
     // 0.446 (N-09): marks already announced (map and name), so each A or S mark is said once per session (forgotten past 200).
     private readonly HashSet<string> huntMarksAnnounced=[];
     internal Action<string>? ChatNotice { get; set; }
+    // X-13 (0.447): the stop whose flag was placed last from the train (the one the call names), the sender, and the last send (5 s apart).
+    private int? huntTrainCalled;
+    internal Action<string>? SendHuntCall { get; set; }
+    private DateTimeOffset huntCallSentAt;
 
     /// <summary>Called every frame: notes the marks met (once a second, while recording) and announces the A and S marks (setting).</summary>
     internal void ObserveHuntTrain()
@@ -56,22 +60,43 @@ internal sealed partial class MainWindow
         Tip("HuntTrain.RankBTip");
         BoolSetting("HuntTrain.MarkAlertSetting","HuntTrain.MarkAlertSettingTip",()=>configuration.HuntMarkAlert,value=>configuration.HuntMarkAlert=value,c=>c.HuntMarkAlert);
         if(huntTrain.Count==0){ImGui.TextDisabled(localization.Get("HuntTrain.Empty"));return;}
+        if(huntTrainCalled>=huntTrain.Count)huntTrainCalled=null;
         if(HuntTrain.Next(huntTrain) is { } next && ImGui.SmallButton(localization.Get("HuntTrain.NextFlag")) && catalog.Find(huntTrain[next].MapId) is { } nextMap)
         {
             OpenMapPointFromPage(nextMap,huntTrain[next].X,huntTrain[next].Y);
             huntTrain=HuntTrain.MarkVisited(huntTrain,next);
+            huntTrainCalled=next;
         }
-        // X-13 (0.446): the conductor's announcement, copied (never sent): the game turns « <flag> » into the flag's link when pasted.
-        // The next stop not visited, else the last one.
-        var called=huntTrain[HuntTrain.Next(huntTrain) ?? huntTrain.Count-1];
+        // X-13 (0.446): the conductor's announcement: the game turns « <flag> » into the flag's link. 0.447: it names the stop whose flag was
+        // placed last from the train, else the next stop not visited, else the last one.
+        var called=huntTrain[huntTrainCalled ?? HuntTrain.Next(huntTrain) ?? huntTrain.Count-1];
+        var announce=localization.Format("HuntTrain.AnnounceText",called.Name,called.Rank switch{3=>"S",2=>"A",_=>"B"},called.Zone);
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("HuntTrain.Announce")))
-            ImGui.SetClipboardText(localization.Format("HuntTrain.AnnounceText",called.Name,called.Rank switch{3=>"S",2=>"A",_=>"B"},called.Zone)+" <flag>");
+        if(ImGui.SmallButton(localization.Get("HuntTrain.Announce")))ImGui.SetClipboardText(announce+" <flag>");
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("HuntTrain.AnnounceTip"));
+        // X-13 (0.447, decided 2026-11-03): sent to the chosen channel on click only, once the flag is on that stop, 5 s apart.
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(70);
+        if(ImGui.BeginCombo("###HuntCallChannel",configuration.HuntAnnounceChannel))
+        {
+            foreach(var channel in HuntTrain.AnnounceChannels)
+                if(ImGui.Selectable(channel,channel==configuration.HuntAnnounceChannel))
+                {configuration.HuntAnnounceChannel=channel;try{save();}catch(Exception failure){log.Warning(failure,"Hunt call channel could not be saved.");}}
+            ImGui.EndCombo();
+        }
+        Tip("HuntTrain.ChannelTip");
+        ImGui.SameLine();
+        var command=HuntTrain.ChatCommand(configuration.HuntAnnounceChannel,announce);
+        var ready=huntTrainCalled is not null && command is not null && SendHuntCall is not null && DateTimeOffset.UtcNow-huntCallSentAt>=TimeSpan.FromSeconds(5);
+        ImGui.BeginDisabled(!ready);
+        if(ImGui.SmallButton(localization.Get("HuntTrain.Send")) && ready){SendHuntCall!(command!);huntCallSentAt=DateTimeOffset.UtcNow;}
+        ImGui.EndDisabled();
+        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+            WrappedTooltip(localization.Get(huntTrainCalled is null ? "HuntTrain.SendNeedsFlag":"HuntTrain.SendTip"));
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("HuntTrain.Copy")))ImGui.SetClipboardText(HuntTrain.Export(huntTrain));
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("HuntTrain.Clear")) && ImGui.GetIO().KeyCtrl){huntTrain=[];return;}
+        if(ImGui.SmallButton(localization.Get("HuntTrain.Clear")) && ImGui.GetIO().KeyCtrl){huntTrain=[];huntTrainCalled=null;return;}
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("HuntTrain.ClearTip"));
         for(var index=0;index<huntTrain.Count;index++)
         {
@@ -84,7 +109,7 @@ internal sealed partial class MainWindow
                     stop.Y.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),stop.SeenAt.ToLocalTime().ToString("t")));
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("HuntTrain.Flag")) && catalog.Find(stop.MapId) is { } map)
-                {OpenMapPointFromPage(map,stop.X,stop.Y);huntTrain=HuntTrain.MarkVisited(huntTrain,index);}
+                {OpenMapPointFromPage(map,stop.X,stop.Y);huntTrain=HuntTrain.MarkVisited(huntTrain,index);huntTrainCalled=index;}
             }
             finally{ImGui.PopID();}
         }

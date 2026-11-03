@@ -15,6 +15,7 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal Func<FestivalReader?>? Festivals { get; set; }
+    private const string PartakeAddress="https://www.partake.gg/";
     internal Func<uint,string?>? TerritoryName { get; set; }
     // Event shops per festival, computed once per vendor directory and layouts (not every frame: one festival places up to ~900 NPCs).
     private (NpcVendorCatalog Catalog,FestivalLayouts Layouts)? eventShopKey;
@@ -25,6 +26,9 @@ internal sealed partial class MainWindow
     private void DrawEventsPage()
     {
         Heading(localization.Get("Events.Title"),localization.Get("Events.Description"));
+        // X-04 (0.447, decided 2026-11-03): player events stay on partake.gg, opened on click only; Tensho reads nothing from the site.
+        if(ImGui.SmallButton(localization.Get("Events.Partake")))Dalamud.Utility.Util.OpenLink(PartakeAddress);
+        Tip("Events.PartakeTip");
         if(characterStats.State.CharacterId==0){ImGui.TextWrapped(localization.Get("CharacterUi.Offline"));return;}
         var reader=Festivals?.Invoke();
         reader?.Want();

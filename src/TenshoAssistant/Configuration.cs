@@ -42,7 +42,7 @@ public static class ConfigurationReset
         "GearOwnedOnly", "ShowHeaderClock", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "GameFrames", "AlarmOptions",
         "Discord", "ThemeMode", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
-        "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "MonsterSourcesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
+        "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
         // 0.347 (g, I-08): the two shop reminder settings (the notes themselves are saved data, kept by « restore every setting »).
         "ItemNoteShopReminder", "ItemNoteImportantSound",
         // 0.327: one switch per in-game Triple Triad aid.
@@ -75,6 +75,8 @@ public static class ConfigurationReset
         "PlotWatch", "PlotWatchMinutes", "PlotWatchSize",
         // 0.446 (N-09): alert when an A or S hunt mark appears nearby.
         "HuntMarkAlert",
+        // 0.447 (X-13): chat channel of the conductor's call.
+        "HuntAnnounceChannel",
         // 0.403 (g, R-08): GP alert and its threshold.
         "GpAlert", "GpAlertThreshold",
     };
@@ -370,13 +372,6 @@ public sealed partial class Configuration
     public bool HoverShowStock { get; set; } = true;
     public bool HoverShowUsages { get; set; } = true;
     public bool HoverShowSources { get; set; } = true;
-    // Default on: requested by the user; only active with ItemUsagesOnHover, after a stable hover, one Garland request at a time.
-    private bool monsterSourcesOnHover=true;
-    public bool MonsterSourcesOnHover
-    {
-        get => Volatile.Read(ref monsterSourcesOnHover);
-        set => Volatile.Write(ref monsterSourcesOnHover,value);
-    }
     public bool MarketPricesOnHover
     {
         get => Volatile.Read(ref marketPricesOnHover);
@@ -425,6 +420,8 @@ public sealed partial class Configuration
     public int PlotWatchSize { get; set; }
     // 0.446 (N-09): a chat line (and the alarm sound if the alarms play one) when an A or S hunt mark appears nearby; off by default.
     public bool HuntMarkAlert { get; set; }
+    // 0.447 (X-13): chat channel the conductor's call is sent to, on click only (one of HuntTrain.AnnounceChannels).
+    public string HuntAnnounceChannel { get; set; } = "/sh";
     // 0.394 (user request): titles, sections and text fonts (family and size); null = defaults.
     public UI.FontSettings? Fonts { get; set; }
     // 0.391 (g, X-06): on-screen GP regeneration tick bar of gatherers (off by default).

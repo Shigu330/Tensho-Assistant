@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-03)
 
-VERSION: 0.446.0.0 (dernière release : Stable-0.430.0, publiée le 2026-11-03 ; 0.431 à 0.446 non commitées) — Verify.ps1 (agent) 809/809, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.447.0.0 (dernière release : Stable-0.430.0, publiée le 2026-11-03 ; 0.431 à 0.447 commitées sur Devloppement) — Verify.ps1 (agent) 810/810, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: fin de la file — commit et release, décisions par lots, tests en jeu (étape h), séance ultracode (g2) ; voir [GOAL](GOAL.md) et « Prochaine action ».
 QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-11-02 : forfait Max, 5 h à 0 %, semaine à 0 % (réinit. jeudi 23:00).
 
@@ -54,7 +54,7 @@ QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-11-02 : forfait M
   « Retirer le drapeau » dans tous les menus. Reste à relever le type de marqueur des mandats (mandat accepté, carte ouverte).
 
 ## À valider en jeu
-Liste complète et à jour, version par version jusqu'à 0.446 : [TESTING](../project/TESTING.md) (cases « [ ] »). Ci-dessous, l'ancien résumé 0.224–0.262.
+Liste complète et à jour, version par version jusqu'à 0.447 : [TESTING](../project/TESTING.md) (cases « [ ] »). Ci-dessous, l'ancien résumé 0.224–0.262.
 - 0.224 : estimation du bonus de Récolte abondante II dans l'outil PR (en mineur/botaniste, objet récolté en contexte).
 - 0.225 : panneau d'aide à la récolte en jeu (mineur / botaniste séparés).
 - 0.226 : panneau d'aide à la pêche (poissons du lieu, appâts, créneau, météo) ; pêche en mer non couverte (pas de source).
@@ -75,7 +75,8 @@ Liste complète et à jour, version par version jusqu'à 0.446 : [TESTING](../pr
 ## Prochaine action
 (relu le 2026-11-03, 0.446) Files a) à g) FAITES (détail : [ROADMAP](../project/ROADMAP.md) « File d'attente », CHANGELOG 0.315–0.446).
 Restent, dans cet ordre proposé :
-1) Git : 0.431–0.446 commitées et poussées sur Devloppement (2026-11-03) ; release quand l'utilisateur le décide (plan « Git » ci-dessous).
+1) Décisions du 2026-11-03 ([DEC-026](../project/DECISIONS.md)) : 0.447 faite ; 0.448 journal de jardinage (N-08) ; puis release
+   Stable-0.448.0 (décidée) ; puis recherche de sources pour N-06 / N-14 (licence d'abord, à soumettre).
 2) Décisions par lots : [G-PROPOSALS](../project/G-PROPOSALS.md) (choix provisoires, écarts bloqués, idées), ROADMAP « Décisions
    reportées à la fin », lignes « État » des quatre fichiers de propositions (MAP, ITEMS, CRAFT-GATHER, TOOLS).
 3) h) Campagne de tests en jeu guidée de tout le plugin ([TESTING](../project/TESTING.md)), avec l'utilisateur, avec les sondes en

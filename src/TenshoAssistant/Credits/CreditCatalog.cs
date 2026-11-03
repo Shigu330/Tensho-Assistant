@@ -74,7 +74,7 @@ public static class CreditCatalog
         new("GarlandTools", CreditKind.Online, "Garland Tools", "Chris Faulhaber (ufx)", "MIT", "https://www.garlandtools.org", "https://github.com/ufx/GarlandTools/blob/master/LICENSE",
             ["Community/GarlandClient.cs", "Community/GarlandItemSources.cs", "Duties/DutyLootService.cs", "Duties/DutyLootDocument.cs", "Monsters/MonsterLootService.cs", "Plugin.cs", "MainWindow.Duties.cs", "MainWindow.DutyFinder.cs"], ["www.garlandtools.org"], "CommunityGarland", false),
         new("ConsoleGamesWiki", CreditKind.Online, "FFXIV Console Games Wiki", "", "GFDL-1.2-or-later", "https://ffxiv.consolegameswiki.com", "https://ffxiv.consolegameswiki.com/wiki/FFXIV_Wiki:About",
-            ["Community/WikiItemAcquisition.cs", "Monsters/WikiMonsterSources.cs", "Monsters/MonsterHoverSources.cs", "Maps/WikiVistas.cs", "Plugin.cs", "MainWindow.Monsters.cs", "MainWindow.MarketHover.cs", "MainWindow.MapView.cs"], ["ffxiv.consolegameswiki.com"], "CommunityWiki", false),
+            ["Community/WikiItemAcquisition.cs", "Monsters/WikiMonsterSources.cs", "Maps/WikiVistas.cs", "Plugin.cs", "MainWindow.Monsters.cs", "MainWindow.MarketHover.cs", "MainWindow.MapView.cs"], ["ffxiv.consolegameswiki.com"], "CommunityWiki", false),
         new("LuminaSupplemental", CreditKind.Online, "LuminaSupplemental", "Critical-Impact", "GPL-3.0", "https://github.com/Critical-Impact/LuminaSupplemental", "https://github.com/Critical-Impact/LuminaSupplemental/blob/main/LICENSE",
             ["Community/LuminaSupplemental.cs", "Npcs/NpcVendorCatalog.cs", "Plugin.cs", "MainWindow.Lumina.cs", "MainWindow.ItemUses.cs", "MainWindow.SourceLinks.cs", "MainWindow.Monsters.cs", "MainWindow.Duties.cs"], ["raw.githubusercontent.com"], "CommunityLumina", false),
         new("GatherBuddy", CreditKind.Online, "GatherBuddy", "Ottermandias", "Apache-2.0", "https://github.com/Ottermandias/GatherBuddy", "https://github.com/Ottermandias/GatherBuddy/blob/main/LICENSE",
@@ -84,6 +84,9 @@ public static class CreditCatalog
         // 0.445 (N-05): open plots, read only, the world id only is sent; no licence stated by the project.
         new("PaissaDB", CreditKind.Online, "PaissaDB", "zhudotexe", "none", "https://github.com/zhudotexe/FFXIV_PaissaDB", "",
             ["Community/PaissaDb.cs", "MainWindow.Plots.cs", "Plugin.cs"], ["paissadb.zhu.codes"], "PlotWatch", false),
+        // 0.447 (X-04, decided 2026-11-03): player events, opened in the player's browser on a click; nothing is fetched by Tensho.
+        new("Partake", CreditKind.Online, "Partake", "Partake", "proprietary", "https://www.partake.gg/", "",
+            ["MainWindow.Events.cs"], ["www.partake.gg"], "", false),
         new("Discord", CreditKind.Online, "Discord", "Discord Inc.", "proprietary", "https://discord.com/developers/docs/resources/webhook", "",
             ["Alarms/DiscordNotifier.cs", "Alarms/DiscordWebhook.cs", "MainWindow.Discord.cs", "MainWindow.Alarms.cs", "Plugin.cs"], ["discord.com", "discordapp.com", "ptb.discord.com", "canary.discord.com"], "Discord.Enabled", false),
         new("GatherBuddyReborn", CreditKind.Rule, "GatherBuddyReborn", "FFXIV-CombatReborn", "Apache-2.0", "https://github.com/FFXIV-CombatReborn/GatherBuddyReborn", "https://raw.githubusercontent.com/FFXIV-CombatReborn/GatherBuddyReborn/main/LICENSE",

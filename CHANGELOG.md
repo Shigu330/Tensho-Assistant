@@ -3,6 +3,32 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.447.0
+- Décisions du 2026-11-03 (DEC-026), premier lot appliqué :
+  - X-13 : bouton « Envoyer » à côté de « Copier l'annonce » dans le train de chasse : l'annonce part dans le canal choisi
+    (/sh, /y, /p, /fc, /ls1, /cwl1), avec le lien du drapeau, seulement sur clic, une fois le drapeau posé sur l'étape depuis le train,
+    5 s d'écart ; texte nettoyé (ni barre oblique, ni chevrons, ni caractère de contrôle), ligne vérifiée de nouveau juste avant le jeu
+    (UIModule.ProcessChatBoxEntry, comme les alarmes du jeu). L'annonce nomme maintenant l'étape dont le drapeau a été posé en dernier
+    (en 0.446, après « Drapeau suivant », elle nommait l'étape d'après).
+  - X-04 : bouton « Événements de joueurs (partake.gg) » en haut de la page Événements (lien ouvert dans le navigateur, rien de lu) ;
+    crédit et description du plugin mis à jour.
+  - Réglage « Monstres au survol » retiré avec son service (MonsterHoverSources) et ses textes : il ne commandait plus rien.
+  - Tri : pendant la relecture de 250 ms qui suit un mouvement d'objet (DEC-004, gardée), l'éditeur de règles reste affiché avec
+    « Rangement modifié : nouvelle lecture » ; l'aperçu et « Appliquer » attendent toujours une liste complète.
+- GitHub : branches main et Devloppement protégées (ni push forcé ni suppression), tags Stable-* protégés ; workflow « Build and test »
+  (Verify.ps1 sur Windows à chaque push) et Dependabot (actions GitHub, chaque semaine) activés depuis les brouillons de 0.323.
+- Fins de ligne : `git add --renormalize .` ne change rien (dépôt déjà en LF) ; décision de 0.323 close.
+- Tests : Decisions447Tests (5 cas) ; MonsterHoverSourcesTests retirés avec le service. Verify.ps1 (agent) : 810/810, 0 avertissement,
+  0 erreur ; DLL 0.447.0.0. Non validé en jeu (l'envoi au chat et le lien <flag> envoyé sont à essayer en jeu).
+### English
+- X-13: the hunt train call can now be sent to a chosen chat channel (/sh, /y, /p, /fc, /ls1, /cwl1) on click, with the flag link,
+  once the flag was placed from the train, 5 s apart; the text is cleaned and checked again before reaching the game. The call names
+  the stop flagged last.
+- X-04: « Player events (partake.gg) » link on the Events page; nothing is read from the site.
+- Removed the « Look up monsters on the wiki when hovering » setting, which no longer did anything.
+- Sorting: the rules editor stays on screen while the bags are read again after a move; preview and sorting still wait for a full read.
+- GitHub: protected branches and Stable tags; « Build and test » workflow and Dependabot enabled.
+
 ## 0.446.0
 - Feuille de route, domaine 6, N-09 (suite) : réglage « Annoncer les marques A et S proches » (Cartes › Train de chasse, désactivé
   par défaut) : quand la lecture de la carte voit une marque A ou S autour de toi, une ligne dans ton chat (« Marque S en vue : … —

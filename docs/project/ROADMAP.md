@@ -89,6 +89,10 @@ Points encore ouverts : chacun attend un relevé en jeu ou se règle dans une é
 
 ### Décisions reportées à la fin (choix provisoire de l'agent, à confirmer à l'étape h)
 
+Lot du 2026-11-03 ([DEC-026](DECISIONS.md)) : « Monstres au survol » retiré (0.447) ; inventaire 250 ms : DEC-004 gardée, éditeur du tri
+gardé à l'écran (0.447) ; fins de ligne : rien à normaliser ; GitHub : protections, Dependabot et compilation en CI activés (0.447) ;
+mémoquartz : 80 % confirmé ; choix de g) (G-PROPOSALS) confirmés en bloc. Les autres lignes restent à confirmer pendant les tests en jeu.
+
 | Point | Choix provisoire | Où le changer |
 |---|---|---|
 | R-12 Discord : valeurs par défaut | Envoi désactivé ; toutes les catégories cochées ; message « ⏰ [label] : dans [minutes] min ([time]) » ; nom « Tensho » ; nom du personnage non envoyé. | Réglages › Alarmes › Discord |

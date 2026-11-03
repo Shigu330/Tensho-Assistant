@@ -1,0 +1,47 @@
+# Activated in 0.447 (draft of 0.323, publish/github).
+# Builds the plugin, runs the tests and the language checks and packages it on every push and pull request, like .\scripts\Verify.ps1
+# on a contributor's PC. Dalamud's assemblies come from goatcorp's public distribution (the same files XIVLauncher installs).
+name: "Build and test"
+
+on:
+  push:
+    branches: [ "main", "Devloppement" ]
+  pull_request:
+    branches: [ "main", "Devloppement" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Verify
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Download Dalamud
+        shell: pwsh
+        run: |
+          $hooks = Join-Path $env:APPDATA 'XIVLauncher\addon\Hooks\dev'
+          New-Item -ItemType Directory -Force -Path $hooks | Out-Null
+          Invoke-WebRequest -Uri 'https://goatcorp.github.io/dalamud-distrib/latest.zip' -OutFile dalamud.zip
+          Expand-Archive -Path dalamud.zip -DestinationPath $hooks -Force
+          "DALAMUD_HOME=$hooks" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Verify (build, tests, languages, package)
+        shell: pwsh
+        run: ./scripts/Verify.ps1 -Force -DotNet dotnet
+
+      - name: Keep the package
+        uses: actions/upload-artifact@v4
+        with:
+          name: TenshoAssistant-latest
+          path: src/TenshoAssistant/bin/x64/Release/TenshoAssistant/latest.zip
+          retention-days: 7

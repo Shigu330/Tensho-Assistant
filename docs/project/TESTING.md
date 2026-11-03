@@ -714,6 +714,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.447 : décisions du 2026-11-03 (DEC-026)** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Train de chasse : « Envoyer » est grisé tant qu'aucun drapeau n'a été posé depuis le train ; après « Drapeau suivant », choisir
+  /p (en groupe) puis « Envoyer » : une seule ligne dans le chat du groupe, avec le bon nom, le bon rang, la bonne zone, et <flag> devenu
+  le lien du drapeau ; un second clic avant 5 s ne fait rien.
+- [ ] Page Événements : « Événements de joueurs (partake.gg) » ouvre le site dans le navigateur.
+- [ ] Réglages : la case « Chercher les monstres sur le wiki au survol » n'existe plus ; le panneau au survol montre toujours ses sources.
+- [ ] Tri : déplacer un objet dans les sacs pendant que la page Tri est ouverte : l'éditeur de règles reste affiché (ligne « Rangement
+  modifié »), l'aperçu revient tout seul.
+
 **0.446 : N-09 alerte des marques, X-13 annonce** — pendant la campagne de tests en jeu de la fin (étape h)
 
 - [ ] Cartes › Train de chasse : cocher « Annoncer les marques A et S proches » ; près d'une marque A ou S, une seule ligne dans le

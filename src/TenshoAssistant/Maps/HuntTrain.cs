@@ -31,4 +31,31 @@ public static class HuntTrain
 
     public static string Export(IEnumerable<HuntTrainStop> stops)
         =>string.Join("\n",stops.Select(stop=>string.Create(CultureInfo.InvariantCulture,$"{stop.Name} — {stop.Zone} ( {stop.X:0.0} , {stop.Y:0.0} )")));
+
+    /// <summary>X-13 (0.447): the chat channels the conductor's call can be sent to, and nothing else.</summary>
+    public static readonly IReadOnlyList<string> AnnounceChannels=["/sh","/y","/p","/fc","/ls1","/cwl1"];
+
+    public const int AnnounceMaximum=400;
+
+    /// <summary>
+    /// X-13 (0.447): the chat line « channel text &lt;flag&gt; » sent on the conductor's click, or null. The channel must be one of
+    /// AnnounceChannels; control characters and « &lt; &gt; / » are removed from the text, so the only text command is the channel and the only
+    /// placeholder is the final « &lt;flag&gt; ».
+    /// </summary>
+    public static string? ChatCommand(string channel,string text)
+    {
+        if(!AnnounceChannels.Contains(channel))return null;
+        var clean=new string(text.Where(character=>!char.IsControl(character) && character is not ('<' or '>' or '/')).ToArray()).Trim();
+        if(clean.Length==0)return null;
+        if(clean.Length>AnnounceMaximum)clean=clean[..AnnounceMaximum].TrimEnd();
+        return $"{channel} {clean} <flag>";
+    }
+
+    /// <summary>X-13 (0.447): true only for a line ChatCommand builds (checked again just before the game receives it).</summary>
+    public static bool IsChatCommand(string command)
+    {
+        var space=command.IndexOf(' ');
+        if(space<0 || !command.EndsWith(" <flag>",StringComparison.Ordinal))return false;
+        return ChatCommand(command[..space],command[(space+1)..^" <flag>".Length])==command;
+    }
 }

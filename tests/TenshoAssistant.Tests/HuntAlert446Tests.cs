@@ -12,7 +12,8 @@ internal static class HuntAlert446Tests
             var ui=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.HuntTrain.cs"));
             Check(ui.Contains("item.Kind==MapObjectKind.HuntMark && item.Level>=2") && ui.Contains("huntMarksAnnounced.Add("),"A and S only, once per mark");
             Check(ui.Contains("if(configuration.AlarmOptions.PlaySound)Alarms.AlarmService.PlaySound("),"sound follows the alarm options");
-            Check(ui.Contains("ImGui.SetClipboardText(localization.Format(\"HuntTrain.AnnounceText\"") && ui.Contains("+\" <flag>\"") && !ui.Contains("SendMessage"),"copied, never sent");
+            // 0.447: the call is also sent on click (decided 2026-11-03, Decisions447Tests); the copy stays.
+            Check(ui.Contains("localization.Format(\"HuntTrain.AnnounceText\"") && ui.Contains("ImGui.SetClipboardText(announce+\" <flag>\")"),"copied with <flag>");
             var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
             Check(plugin.Contains("mainWindow.ChatNotice=text=>chat.Print(\"[Tensho] \"+text);"),"local chat line only");
         }),

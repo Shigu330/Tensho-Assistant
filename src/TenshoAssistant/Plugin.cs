@@ -134,9 +134,6 @@ public sealed class Plugin : IDalamudPlugin
             var wikiSources=new WikiMonsterSources(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
             registrations.Register(()=>{},wikiSources.Dispose);
             mainWindow.ConfigureWikiSources(wikiSources);
-            var monsterHover=new Monsters.MonsterHoverSources(wikiSources);
-            registrations.Register(()=>{},monsterHover.Dispose);
-            mainWindow.ConfigureMonsterHover(monsterHover);
             // g, C-13 (0.367): monsters that teach a blue magic spell, from the wiki's spell page (English action name), on click only.
             // 0.387 (user report « never gives the monster »): the AozAction → Action link resolved in the client's language, so the wiki
             // was asked for the French page (« Mauvaise_haleine »: missing) and said « no monster ». The name now comes from the English
@@ -721,6 +718,8 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.Paissa=paissa;
             mainWindow.PlotAlert=text=>framework.RunOnFrameworkThread(()=>chat.Print("[Tensho] "+text));
             mainWindow.ChatNotice=text=>chat.Print("[Tensho] "+text);
+            // X-13 (0.447): the conductor's call, sent to the chosen channel on click only, on the framework thread.
+            mainWindow.SendHuntCall=command=>framework.RunOnFrameworkThread(()=>Maps.HuntAnnouncer.Send(command,log));
             // A-05 (0.433): crafting lists in a file of their own (like the Bank).
             mainWindow.CraftListStore=new Craft.CraftListStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"CraftLists.json"),(error,message)=>log.Warning(error,message));
             // A-14 (0.436): crafting rotation recorder (read-only hook on UseAction, only while recording).
