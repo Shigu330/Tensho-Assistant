@@ -46,6 +46,7 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.HomeTools","Advanced.HomeToolsTip",()=>configuration.HomeShowTools,value=>configuration.HomeShowTools=value,c=>c.HomeShowTools);
         BoolSetting("Advanced.AlarmServerBar","Advanced.AlarmServerBarTip",()=>configuration.AlarmServerBar,value=>configuration.AlarmServerBar=value,c=>c.AlarmServerBar);
         BoolSetting("Advanced.ReminderServerBar","Advanced.ReminderServerBarTip",()=>configuration.ReminderServerBar,value=>configuration.ReminderServerBar=value,c=>c.ReminderServerBar);
+        BoolSetting("Advanced.ReminderFinishedServerBar","Advanced.ReminderFinishedServerBarTip",()=>configuration.ReminderFinishedServerBar,value=>configuration.ReminderFinishedServerBar=value,c=>c.ReminderFinishedServerBar);
         // 0.426 (user request): close Tensho when it opens a game window.
         BoolSetting("Advanced.CloseOnGameWindow","Advanced.CloseOnGameWindowTip",()=>configuration.CloseOnGameWindow,value=>configuration.CloseOnGameWindow=value,c=>c.CloseOnGameWindow);
         // 0.415 (g, R-13): pinned tracking window.
@@ -271,7 +272,7 @@ internal sealed partial class MainWindow
     private static string PageSource(Page shown)=>shown switch
     {
         Page.Home=>"MainWindow.Home.cs",Page.Items=>"MainWindow.Items*.cs, MainWindow.ItemSheet.cs",Page.Storage=>"MainWindow.Storage.cs, MainWindow.Bank.cs",Page.Reminders=>"MainWindow.Reminders.cs, Reminders/",Page.Gathering or Page.GatheringGp=>"MainWindow.Gathering*.cs",
-        Page.Maps=>"MainWindow.Maps.cs, MainWindow.MapView.cs",Page.Weather=>"MainWindow.Weather.cs, Gathering/WeatherForecast.cs",
+        Page.Garden=>"MainWindow.Garden.cs, MainWindow.GardenCrosses.cs",Page.Maps=>"MainWindow.Maps.cs, MainWindow.MapView.cs",Page.Weather=>"MainWindow.Weather.cs, Gathering/WeatherForecast.cs",
         Page.Alarms=>"MainWindow.Alarms.cs, Alarms/",Page.MacroChain=>"MainWindow.MacroChain*.cs, Macros/",Page.Collections=>"MainWindow.Collections.cs, Collections/",
         Page.TripleTriad=>"MainWindow.TripleTriad.cs, MainWindow.Triad*.cs, MiniGames/",Page.MiniCactpot=>"MainWindow.MiniCactpot.cs, MiniGames/",
         Page.Market=>"MainWindow.Market*.cs, Market/",Page.Quests=>"MainWindow.Quests.cs, Quests/",Page.Chocobo=>"MainWindow.ChocoboBarding.cs, Gear/ChocoboBarding.cs, Gear/ChocoboReader.Dalamud.cs",Page.Events=>"MainWindow.Events.cs, Events/",

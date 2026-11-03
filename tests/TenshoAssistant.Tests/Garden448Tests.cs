@@ -43,7 +43,7 @@ internal static class Garden448Tests
             var ui=Read("MainWindow.Garden.cs");
             Check(ui.Contains("if(now-gardenObservedAt<TimeSpan.FromSeconds(10))return;") && ui.Contains("if(!configuration.GardenAlerts ||"),"throttled, setting");
             Check(!ui.Contains("unsafe") && !ui.Contains("FFXIVClientStructs"),"no game reading");
-            Check(Read("Plugin.cs").Contains("mainWindow.ObserveGarden") && Read("MainWindow.Reminders.cs").Contains("DrawGardenJournal();"),"wired");
+            Check(Read("Plugin.cs").Contains("mainWindow.ObserveGarden") && Read("MainWindow.Garden.cs").Contains("DrawGardenJournal();"),"wired");
         }),
     ];
 }

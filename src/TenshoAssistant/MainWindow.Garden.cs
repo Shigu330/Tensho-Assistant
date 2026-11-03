@@ -31,6 +31,14 @@ internal sealed partial class MainWindow
         SaveReminders();
     }
 
+    // 0.459 (user request, in-game campaign): the garden has its own page, out of Reminders.
+    private void DrawGardenPage()
+    {
+        Heading(localization.Get("Garden.PageTitle"),localization.Get("Garden.PageDescription"));
+        DrawGardenJournal();
+        DrawGardenCrosses();
+    }
+
     private void DrawGardenJournal()
     {
         var beds=configuration.GardenBeds ?? [];
@@ -68,7 +76,6 @@ internal sealed partial class MainWindow
         if(removed is not null){configuration.GardenBeds=beds.Where(bed=>bed!=removed).ToList();changed=true;}
         if(changed)SaveReminders();
         DrawNewBed(beds);
-        DrawGardenCrosses();
     }
 
     private void DrawNewBed(List<GardenBed> beds)

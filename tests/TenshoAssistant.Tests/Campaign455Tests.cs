@@ -24,7 +24,7 @@ internal static class Campaign455Tests
         {
             Check(Read("Alarms/AlarmDtrEntry.Dalamud.cs").Contains("SeIconChar.Clock.ToIconString()+\" \"+enabled.Length+time"),"alarms: the number switched on (user's choice, 2026-11-04)");
             var reminder=Read("Alarms/ReminderDtrEntry.Dalamud.cs");
-            Check(reminder.Contains("bar.Get(\"Tensho Assistant (Reminders)\")") && reminder.Contains("SeIconChar.QuestRepeatable") && reminder.Contains("if(!configuration.ReminderServerBar || !player.IsLoaded)"),"own entry");
+            Check(reminder.Contains("bar.Get(\"Tensho Assistant (Reminders)\")") && reminder.Contains("SeIconChar.QuestRepeatable") && reminder.Contains("if((!configuration.ReminderServerBar && !configuration.ReminderFinishedServerBar) || !player.IsLoaded)"),"own entry");
             Check(new TenshoAssistant.Configuration().ReminderServerBar && Read("Configuration.cs").Contains("\"ReminderServerBar\","),"setting on by default, reset");
             Check(Read("Plugin.cs").Contains("(\"ReminderBar\",()=>reminderBar?.Invoke()?.DrawTooltip())"),"tooltip drawn, isolated");
         }),

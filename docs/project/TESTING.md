@@ -714,6 +714,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.459 : icône des terminés, page Jardinage** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Barre du serveur : trois icônes au plus : horloge (alarmes actives), rappels (reste à faire), terminés (visible seulement s'il y en a) ; chaque infobulle a sa liste.
+- [ ] Monde › Jardinage : le journal et les croisements y sont, ils ne sont plus dans Rappels ; les parcelles déjà notées sont toujours là.
+
 **0.458 : icône des rappels, ce qui reste à faire** — pendant la campagne de tests en jeu (étape h)
 
 - [ ] Barre du serveur : le nombre et l'infobulle « Reste à faire » listent les rappels non cochés ; cocher « Fait » sur la page Rappels fait baisser le nombre (5 s au plus).

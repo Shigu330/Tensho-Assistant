@@ -3,6 +3,18 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.459.0
+- Demandes de l'utilisateur pendant la campagne de tests :
+  - Barre du serveur : une troisième icône pour les rappels terminés (tâches de servant, vaisseaux revenus, escouade, parcelles mûres), visible seulement s'il y
+    en a, avec son réglage dans Avancé. L'icône des rappels ne compte plus que ce qui reste à faire (rappels non cochés, tâches à l'écran). Les cases « Barre » de la
+    page Rappels valent pour les deux.
+  - Jardinage : nouvelle page dédiée dans la catégorie Monde, avec deux sections, le journal et les croisements. Il sort de la page Rappels ; ses rappels dans le chat
+    et ses parcelles enregistrées ne changent pas.
+- Tests : 2 cas ajoutés à Todo458Tests ; 3 tests déjà écrits adaptés. Verify.ps1 (agent) : 855/855, 0 avertissement, 0 erreur ; DLL 0.459.0.0. Non validé en jeu.
+### English
+- Server bar: a third icon for finished reminders, shown only when there are some; the reminders icon now counts only what is left to do.
+- Garden: its own page (World category) with the journal and the crossbreeds, out of Reminders.
+
 ## 0.458.0
 - Demande de l'utilisateur pendant la campagne de tests : l'icône des rappels montre maintenant ce qui reste à faire, plus seulement ce qui est terminé.
   Son nombre et son infobulle (« Reste à faire ») comptent : tâches de servant finies, vaisseaux revenus, mission et entraînement d'escouade finis,

@@ -27,7 +27,7 @@ namespace TenshoAssistant;
 // Diagnostics (0.290–0.292). Each page or tool is a partial file MainWindow.<Tool>.cs; services are created in Plugin.cs.
 internal sealed partial class MainWindow : Window, IDisposable
 {
-    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Chocobo, Events, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms, Storage, Reminders, FreeCompany, Gear, Credits, Leves, HuntingLog, OceanFishing }
+    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Chocobo, Events, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms, Storage, Reminders, FreeCompany, Gear, Credits, Leves, HuntingLog, OceanFishing, Garden }
     // Read from the active theme each time: the game theme can change while the plugin runs.
     private static Vector4 Accent => FfxivTheme.Gold;
     private static Vector4 Success => FfxivTheme.Success;
@@ -256,6 +256,7 @@ internal sealed partial class MainWindow : Window, IDisposable
                             case Page.Items: DrawItems(); break;
                             case Page.Storage: DrawStorage(); break;
                             case Page.Reminders: DrawReminders(); break;
+                            case Page.Garden: DrawGardenPage(); break;
                             case Page.FreeCompany: DrawFreeCompany(); break;
                             case Page.Gathering: DrawGatheringBrowser(); break;
                             case Page.Maps: DrawMaps(); break;
@@ -322,12 +323,13 @@ internal sealed partial class MainWindow : Window, IDisposable
             Navigation(localization.Get("Navigation.OceanFishing"), Page.OceanFishing);
             Navigation(localization.Get("Category.MacroChain"), Page.MacroChain);
         }
-        if (NavigationCategory("World", Page.Maps, Page.Weather, Page.Alarms, Page.Reminders, Page.FreeCompany, Page.NpcVendors, Page.DutyLoot, Page.MonsterLoot))
+        if (NavigationCategory("World", Page.Maps, Page.Weather, Page.Alarms, Page.Reminders, Page.Garden, Page.FreeCompany, Page.NpcVendors, Page.DutyLoot, Page.MonsterLoot))
         {
             Navigation(localization.Get("Navigation.Map"), Page.Maps);
             Navigation(localization.Get("Category.Weather"), Page.Weather);
             Navigation(localization.Format("Navigation.Alarms",configuration.Alarms?.Count ?? 0), Page.Alarms);
             Navigation(localization.Get("Navigation.Reminders"), Page.Reminders);
+            Navigation(localization.Get("Navigation.Garden"), Page.Garden);
             Navigation(localization.Get("Navigation.FreeCompany"), Page.FreeCompany);
             Navigation(localization.Get("Category.NpcVendors"), Page.NpcVendors);
             Navigation(localization.Get("Category.DutyLoot"), Page.DutyLoot);

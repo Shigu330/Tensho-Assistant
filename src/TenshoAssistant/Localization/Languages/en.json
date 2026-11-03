@@ -25,6 +25,7 @@
     "Gear": "Gear",
     "FreeCompany": "Free company",
     "Reminders": "Reminders",
+    "Garden": "Garden",
     "Storage": "Storage",
     "CategoryObjects": "ITEMS",
     "CategoryProduction": "PRODUCTION",
@@ -243,7 +244,9 @@
     "AlarmServerBar": "Alarm icon in the server bar",
     "AlarmServerBarTip": "Shows a clock and the number of active Tensho alarms in the game's info bar (next to the server name); hover = next alarm; click = Alarms page. Hidden without an active alarm.\nDefault: on.",
     "ReminderServerBar": "Reminders icon in the server bar",
-    "ReminderServerBarTip": "Shows its own icon and the number of things left to do in the game's info bar: finished ventures, vessels back, squadron, ripe beds, reminders not done and your tasks marked on screen; hover = the list; click = Reminders page. The Reminders page chooses what it shows (« Bar » boxes).\nDefault: on.",
+    "ReminderServerBarTip": "Shows its own icon and the number of things left to do in the game's info bar: reminders not ticked since their reset and your tasks marked on screen; hover = the list; click = Reminders page. The Reminders page chooses what it shows (« Bar » boxes).\nDefault: on.",
+    "ReminderFinishedServerBar": "Finished reminders icon in the server bar",
+    "ReminderFinishedServerBarTip": "Shows its own icon and the number of finished things (ventures, vessels back, squadron, ripe beds) in the game's info bar, only when there are some; hover = the list; click = Reminders page.\nDefault: on.",
     "Teamcraft": "Teamcraft (bite times)",
     "TeamcraftTip": "Time between the cast and the bite, per fish and spot, from Teamcraft's public reports (gubal API, MIT licence). One request per fishing spot, cached.",
     "GatherBuddy": "GatherBuddy (fishing)",
@@ -3698,9 +3701,10 @@
     "Here": "Position"
   },
   "Reminders": {
+    "BarFinishedTitle": "Finished reminders",
     "BarTitle": "Left to do",
     "BarNone": "Nothing left to do for now.",
-    "BarRowTip": "Shows this reminder under the Reminders icon of the server bar while it is left to do.\nDefault: ticked.",
+    "BarRowTip": "Shows this reminder in the server bar's reminder icons (left to do, or finished).\nDefault: ticked.",
     "ColumnBar": "Bar",
     "BarClick": "Click: Reminders page",
     "BarVentures": "Retainer ventures finished: {0}",
@@ -4429,6 +4433,8 @@
     "Logged": "Squadron written to the Dalamud log."
   },
   "Garden": {
+    "PageTitle": "Garden",
+    "PageDescription": "Your beds and pots with their reminders, and the crossbreeds of seeds with a planting plan.",
     "Title": "Garden journal ({0})",
     "Help": "Note your garden beds and pots. Pick the seed to fill its growing and tending hours (community data, Lotlab), or type them. Tensho shows when each is ripe and when to tend it.",
     "Alerts": "Remind me in the chat",

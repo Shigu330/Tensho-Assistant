@@ -25,6 +25,7 @@
     "Gear": "Équipement",
     "FreeCompany": "Compagnie libre",
     "Reminders": "Rappels",
+    "Garden": "Jardinage",
     "Storage": "Rangements",
     "CategoryObjects": "OBJETS",
     "CategoryProduction": "PRODUCTION",
@@ -243,7 +244,9 @@
     "AlarmServerBar": "Icône d'alarme dans la barre du serveur",
     "AlarmServerBarTip": "Affiche une horloge et le nombre d'alarmes Tensho actives dans la barre d'informations du jeu (à côté du nom du serveur) ; survol = prochaine alarme ; clic = page Alarmes. Masquée sans alarme active.\nPar défaut : activé.",
     "ReminderServerBar": "Icône des rappels dans la barre du serveur",
-    "ReminderServerBarTip": "Affiche sa propre icône et le nombre de choses qui restent à faire dans la barre d'informations du jeu : tâches de servant finies, vaisseaux revenus, escouade, parcelles mûres, rappels non faits et vos tâches affichées à l'écran ; survol = la liste ; clic = page Rappels. La page Rappels choisit ce qu'elle montre (cases « Barre »).\nPar défaut : activé.",
+    "ReminderServerBarTip": "Affiche sa propre icône et le nombre de choses qui restent à faire dans la barre d'informations du jeu : rappels non cochés depuis leur remise à zéro et vos tâches affichées à l'écran ; survol = la liste ; clic = page Rappels. La page Rappels choisit ce qu'elle montre (cases « Barre »).\nPar défaut : activé.",
+    "ReminderFinishedServerBar": "Icône des rappels terminés dans la barre du serveur",
+    "ReminderFinishedServerBarTip": "Affiche sa propre icône et le nombre de choses terminées (tâches de servant, vaisseaux revenus, escouade, parcelles mûres) dans la barre d'informations du jeu, seulement s'il y en a ; survol = la liste ; clic = page Rappels.\nPar défaut : activé.",
     "Teamcraft": "Teamcraft (temps de touche)",
     "TeamcraftTip": "Temps entre le lancer et la touche, par poisson et lieu, d'après les relevés publics de Teamcraft (API gubal, licence MIT). Une requête par lieu de pêche, gardée en cache.",
     "GatherBuddy": "GatherBuddy (pêche)",
@@ -3698,9 +3701,10 @@
     "Here": "Position"
   },
   "Reminders": {
+    "BarFinishedTitle": "Rappels terminés",
     "BarTitle": "Reste à faire",
     "BarNone": "Rien à faire pour l'instant.",
-    "BarRowTip": "Affiche ce rappel sous l'icône des rappels de la barre du serveur tant qu'il reste à faire.\nPar défaut : coché.",
+    "BarRowTip": "Affiche ce rappel dans les icônes de rappels de la barre du serveur (reste à faire, ou terminé).\nPar défaut : coché.",
     "ColumnBar": "Barre",
     "BarClick": "Clic : page Rappels",
     "BarVentures": "Tâches de servant terminées : {0}",
@@ -4429,6 +4433,8 @@
     "Logged": "Escouade écrite dans le journal de Dalamud."
   },
   "Garden": {
+    "PageTitle": "Jardinage",
+    "PageDescription": "Vos parcelles et vos pots avec leurs rappels, et les croisements de graines avec un plan de plantation.",
     "Title": "Journal de jardinage ({0})",
     "Help": "Notez vos parcelles et vos pots. Choisissez la graine pour remplir ses heures de pousse et d'entretien (données communautaires, Lotlab), ou tapez-les. Tensho montre quand chacun est mûr et quand l'entretenir.",
     "Alerts": "Me le rappeler dans le chat",
