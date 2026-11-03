@@ -14,7 +14,7 @@ internal sealed partial class MainWindow
     internal Func<uint,string?>? SquadronMemberName { get; set; }
     private Task<SquadronRaw?>? squadronRead;
     private SquadronRaw? squadron;
-    private bool squadronReadDone;
+    private bool squadronReadDone,squadronReadFailed;
     private uint squadronMission;
     private int squadronSet;
 
@@ -26,6 +26,7 @@ internal sealed partial class MainWindow
         {
             squadron=read.IsCompletedSuccessfully ? read.Result:null;
             squadronReadDone=true;
+            squadronReadFailed=!read.IsCompletedSuccessfully;
             squadronRead=null;
             if(squadron is { CurrentExpedition:>0 } current && squadronMission==0)squadronMission=current.CurrentExpedition;
         }
@@ -35,7 +36,8 @@ internal sealed partial class MainWindow
         if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Squadron.ReadTip"));
         if(squadron is null)
         {
-            if(squadronReadDone)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Squadron.NotLoaded"));
+            if(squadronReadFailed)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Squadron.Unavailable"));
+            else if(squadronReadDone)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Squadron.NotLoaded"));
             return;
         }
         if(SquadronSheetData?.Invoke() is not { } sheets){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Squadron.SheetsUnavailable"));return;}

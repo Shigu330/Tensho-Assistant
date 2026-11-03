@@ -222,10 +222,11 @@ internal sealed class MapLiveReader : IDisposable
     private static unsafe IReadOnlyDictionary<uint,uint> ReadTeleportCosts()
     {
         var telepo=Telepo.Instance();var result=new Dictionary<uint,uint>();
-        if(telepo==null)return result;
+        // 0.453 (R-14): unreadable throws (TeleportCostsFailed), an empty list read « none attuned ».
+        if(telepo==null)throw new InvalidOperationException("Teleport module unavailable.");
         var list=telepo->UpdateAetheryteList();
         // 0.328 (R-14): length checked before the walk; a shifted layout would read past valid memory (not catchable).
-        if(list==null || list->LongCount is <0 or >512)return result;
+        if(list==null || list->LongCount is <0 or >512)throw new InvalidOperationException("Teleport list unreadable.");
         foreach(var entry in *list)
             if(entry.AetheryteId!=0 && entry.SubIndex==0 && entry.Ward==0 && entry.Plot==0)result.TryAdd(entry.AetheryteId,entry.GilCost);
         return result;

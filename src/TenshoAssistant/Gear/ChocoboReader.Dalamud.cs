@@ -13,6 +13,7 @@ public sealed unsafe class ChocoboReader : IDisposable
 {
     private readonly IFramework framework;
     private readonly IClientState client;
+    private readonly IPlayerState player;
     private readonly IUnlockState unlocks;
     private readonly IDataManager data;
     private readonly IPluginLog log;
@@ -23,9 +24,9 @@ public sealed unsafe class ChocoboReader : IDisposable
     public ChocoboState? State=>Volatile.Read(ref state);
     public bool Unavailable { get; private set; }
 
-    public ChocoboReader(IFramework framework,IClientState client,IUnlockState unlocks,IDataManager data,IPluginLog log)
+    public ChocoboReader(IFramework framework,IClientState client,IPlayerState player,IUnlockState unlocks,IDataManager data,IPluginLog log)
     {
-        this.framework=framework;this.client=client;this.unlocks=unlocks;this.data=data;this.log=log;
+        this.framework=framework;this.client=client;this.player=player;this.unlocks=unlocks;this.data=data;this.log=log;
         framework.Update+=OnUpdate;
     }
 
@@ -39,7 +40,8 @@ public sealed unsafe class ChocoboReader : IDisposable
         var wantedUntil=new DateTimeOffset(Volatile.Read(ref wantedUntilTicks),TimeSpan.Zero);
         if(disposed || now<nextRead || now>wantedUntil)return;
         nextRead=now.AddSeconds(2);
-        if(!client.IsLoggedIn){Volatile.Write(ref state,null);return;}
+        // R-14 (0.453): before the character is loaded the game answers « not done » to everything: unknown, not zero.
+        if(!client.IsLoggedIn || !player.IsLoaded){Volatile.Write(ref state,null);return;}
         try
         {
             var ui=UIState.Instance();

@@ -4386,6 +4386,7 @@
     "Read": "Read the squadron",
     "ReadTip": "Reads the members and the training bonus from the game. The game holds them only while you are in your Grand Company barracks (open the squadron there first).",
     "NotLoaded": "The squadron is not loaded: go to your Grand Company barracks, open the squadron, then read again.",
+    "Unavailable": "The squadron could not be read (perhaps after a game update); details are in the Dalamud log.",
     "SheetsUnavailable": "The squadron data of the game could not be read; details are in the Dalamud log.",
     "MemberClass": "{0} {1}",
     "Stats": "{0} / {1} / {2}",

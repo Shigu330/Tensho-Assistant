@@ -47,29 +47,49 @@ public static unsafe class GameTimers
 
     public static GameTimerSnapshot Read(IReadOnlyList<RouletteRow>? roulettes=null,IReadOnlyList<int>? challengeRows=null)
     {
-        var quests=QuestManager.Instance();
+        // R-14 (0.453): before the character is loaded (title screen, character select) the game answers zeros (role bonus « Tank », every
+        // roulette open): unknown instead. Each counter guarded on its own: one signature lost after an update dropped every reminder.
+        var characterLoaded=false;
+        try{var loadedState=PlayerState.Instance();characterLoaded=loadedState!=null && loadedState->IsLoaded;}
+        catch(Exception){characterLoaded=false;}
         uint? allied=null;int? leves=null;DateTimeOffset? nextLeves=null;
-        if(quests!=null)
-        {
-            allied=quests->GetBeastTribeAllowance();
-            leves=quests->NumLeveAllowances;
-            var at=QuestManager.GetNextLeveAllowancesUnixTimestamp();
-            if(at>0)nextLeves=DateTimeOffset.FromUnixTimeSeconds(at);
-        }
-        var supply=SatisfactionSupplyManager.Instance();
-        int? deliveries=supply!=null ? supply->GetRemainingAllowances():null;
-        List<(string,DateTimeOffset?)>? ventures=null;
-        var retainers=RetainerManager.Instance();
-        if(retainers!=null && retainers->IsReady)
-        {
-            ventures=[];
-            for(var index=0u;index<retainers->GetRetainerCount();index++)
+        if(characterLoaded)
+            try
             {
-                var retainer=retainers->GetRetainerBySortedIndex(index);
-                if(retainer==null || retainer->RetainerId==0 || retainer->VentureId==0)continue;
-                ventures.Add((retainer->NameString,retainer->VentureComplete>0 ? DateTimeOffset.FromUnixTimeSeconds(retainer->VentureComplete):null));
+                var quests=QuestManager.Instance();
+                if(quests!=null)
+                {
+                    allied=quests->GetBeastTribeAllowance();
+                    leves=quests->NumLeveAllowances;
+                    var at=QuestManager.GetNextLeveAllowancesUnixTimestamp();
+                    if(at>0)nextLeves=DateTimeOffset.FromUnixTimeSeconds(at);
+                }
+            }
+            catch(Exception){allied=null;leves=null;nextLeves=null;}
+        int? deliveries=null;
+        if(characterLoaded)
+            try
+            {
+                var supply=SatisfactionSupplyManager.Instance();
+                deliveries=supply!=null ? supply->GetRemainingAllowances():null;
+            }
+            catch(Exception){deliveries=null;}
+        List<(string,DateTimeOffset?)>? ventures=null;
+        try
+        {
+            var retainers=RetainerManager.Instance();
+            if(retainers!=null && retainers->IsReady)
+            {
+                ventures=[];
+                for(var index=0u;index<retainers->GetRetainerCount();index++)
+                {
+                    var retainer=retainers->GetRetainerBySortedIndex(index);
+                    if(retainer==null || retainer->RetainerId==0 || retainer->VentureId==0)continue;
+                    ventures.Add((retainer->NameString,retainer->VentureComplete>0 ? DateTimeOffset.FromUnixTimeSeconds(retainer->VentureComplete):null));
+                }
             }
         }
+        catch(Exception){ventures=null;}
         // 0.333 (DEC-023 6, user request « mission and training »): the squadron's mission and training ends, held by PlayerState for
         // the whole session (docs/evidence/0.332-squadron-probe.md). Guarded on its own: a failure leaves them unknown, the rest stays.
         SquadronTimer? mission=null,training=null;
@@ -87,7 +107,7 @@ public static unsafe class GameTimers
         // address is resolved) and the role bonus the Duty Finder holds (AgentContentsFinder.ContentRouletteRoleBonuses, 11 entries,
         // indexed by the ContentRouletteRoleBonus row — rows 0 to 10, docs/evidence/0.356-roulettes.md). Guarded on its own.
         List<RouletteDaily>? daily=null;
-        if(roulettes is { Count:>0 })
+        if(characterLoaded && roulettes is { Count:>0 })
             try
             {
                 var content=InstanceContent.Instance();

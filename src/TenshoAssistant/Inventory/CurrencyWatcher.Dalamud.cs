@@ -86,9 +86,10 @@ public sealed unsafe class CurrencyWatcher : IDisposable
         foreach(var definition in fixedCurrencies)
         {
             long? amount=null,cap=definition.StackCap>0 ? definition.StackCap:null;
-            var managed=Guard(()=>currency!=null && Resolved((nint)CurrencyManager.MemberFunctionPointers.HasItem) && currency->HasItem(definition.ItemId) ? 1:0)==1;
-            if(!loaded){balances.Add(new(definition,null,cap));continue;}
-            if(managed)
+            // R-14 (0.453): CurrencyManager unknown (not created, function lost) is an unknown balance, not « count it in the bags ».
+            var managed=Guard(()=>currency!=null && Resolved((nint)CurrencyManager.MemberFunctionPointers.HasItem) ? (currency->HasItem(definition.ItemId) ? 1:0):null);
+            if(!loaded || managed is null){balances.Add(new(definition,null,cap));continue;}
+            if(managed==1)
             {
                 amount=Guard(()=>Resolved((nint)CurrencyManager.MemberFunctionPointers.GetItemCount) ? currency->GetItemCount(definition.ItemId):null);
                 if(Guard(()=>Resolved((nint)CurrencyManager.MemberFunctionPointers.GetItemMaxCount) ? currency->GetItemMaxCount(definition.ItemId):null) is > 0 and var max)cap=max;

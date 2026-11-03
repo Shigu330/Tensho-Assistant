@@ -48,7 +48,7 @@ internal static class Squadron451Tests
             Check(reader.Contains("manager->Data==null)return null;") && reader.Contains("Math.Min((int)data->MemberCount,MaximumMembers)")
                 && !reader.Contains("GetMemberCount(") && !reader.Contains("GetMember("),"fields only, bounded");
             var plugin=Read("Plugin.cs");
-            Check(plugin.Contains("mainWindow.ReadSquadron=()=>framework.RunOnFrameworkThread(()=>") && plugin.Contains("catch(Exception error){log.Warning(error,\"Squadron unreadable (game update?).\");return null;}"),"framework thread, guarded");
+            Check(plugin.Contains("mainWindow.ReadSquadron=()=>framework.RunOnFrameworkThread(()=>") && plugin.Contains("catch(Exception error){log.Warning(error,\"Squadron unreadable (game update?).\");throw;}"),"framework thread, guarded");
             Check(plugin.Contains("new Reminders.SquadronStats(row.Unknown1,row.Unknown2,row.Unknown3)") && plugin.Contains("if(squadronSheets is not null || squadronSheetsFailed)return squadronSheets;"),"level 60 columns, read once");
             var ui=Read("MainWindow.Squadron.cs");
             Check(ui.Split("ReadSquadron!()").Length==2 && ui.Contains("if(ImGui.Button(localization.Get(\"Squadron.Read\")))squadronRead=ReadSquadron!();"),"read on the button only");

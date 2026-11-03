@@ -3,6 +3,31 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.453.0
+- R-14, deuxième lot de l'audit : une valeur inconnue reste inconnue, jamais zéro, « aucun » ou « aucune catégorie ». Chaque constat a été
+  relu dans le code.
+  - Journal de l'or : l'or était lu avant le chargement du conteneur de monnaies. Ce 0 servait de point de départ à la connexion, puis
+    créait une fausse entrée « + tout l'or ». Il est lu après ce chargement, et chaque fonction est vérifiée.
+  - Prix de sous-cotation : tant que vos servants ne sont pas lus (ou si leur lecture échoue), aucun prix n'est copié, au lieu d'annoncer
+    « vos servants écartés ».
+  - Revue de mode : une valeur de case absente de la fenêtre n'est plus lue comme « aucune catégorie cette semaine » ; erreur écrite une fois.
+    Une valeur présente mais non textuelle reste lue comme vide, faute de preuve en jeu.
+  - Escouade : un échec de lecture dit maintenant « n'a pas pu être lue » au lieu d'envoyer le joueur à la caserne.
+  - Liste de téléportation illisible : affichée en échec au lieu de « aucune destination ».
+  - Mandats, collections supplémentaires, chocobo : lus seulement une fois le personnage chargé (le jeu répond « non » avant).
+  - Rappels : aucun compteur avant le chargement du personnage (l'écran titre montrait des zéros et le rôle « Tank »), et chaque compteur
+    a sa propre garde (une signature perdue faisait tout disparaître).
+  - Monnaies : CurrencyManager inconnu donne un solde inconnu, au lieu de compter dans les sacs.
+  - Macros : la lecture des emplacements est gardée, un module de barres absent n'empêche plus l'écriture, et les pages déjà écrites sont
+    sauvegardées même si une suivante échoue.
+- Tests : Resilience453Tests (9 cas) ; 3 tests déjà écrits adaptés au nouveau code. Verify.ps1 (agent) : 838/838, 0 avertissement, 0 erreur ;
+  DLL 0.453.0.0. Non validé en jeu.
+### English
+- R-14, second batch: an unknown value stays unknown. Gil is read once the currency container is loaded (no more fake « + all your gil »
+  entry at login); no undercut price while your retainers are unknown; a missing Fashion Report value is no longer « no category »; a failed
+  squadron or teleport read is said as such; unlock readers wait for the loaded character; Reminders show no zeros before login and each
+  counter is guarded alone; an unknown currency manager gives an unknown balance; the macro writer saves pages already written.
+
 ## 0.452.0
 - R-14 et A-14 (demande de l'utilisateur, sans ultracode), à partir de l'audit gardé, chaque constat relu dans le code. Premier lot : ce qui
   pouvait planter le jeu ou faire tomber toute l'interface.

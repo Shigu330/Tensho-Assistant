@@ -38,7 +38,9 @@ internal sealed class MacroWriter : IDisposable
     private unsafe void OnUpdate(IFramework _)
     {
         if (!framework.IsInFrameworkUpdateThread) return;
-        Snapshot();
+        // R-14 (0.453): outside the write's own guard: a lost signature threw on every frame, and blocked the write.
+        try { Snapshot(); }
+        catch (Exception error) { lock (gate) slots = null; if (!snapshotWarned) { snapshotWarned = true; log.Warning(error, "Macro slots could not be read."); } }
         (IReadOnlyList<IReadOnlyList<string>> Pages, MacroCopySettings Settings) work;
         lock (gate) { if (pending is not { } next) return; work = next; pending = null; }
         string outcome;
@@ -55,18 +57,24 @@ internal sealed class MacroWriter : IDisposable
             if (plan.Problem is { } problem) outcome = problem;
             else
             {
+                var wrote = false;
+                try
+                {
                 for (var page = 0; page < plan.Slots.Count; page++)
                 {
                     var macro = module->GetMacro(book, (uint)plan.Slots[page]);
                     if (macro == null) throw new InvalidOperationException("Macro slot unavailable.");
                     var text = Utf8String.FromString(string.Join('\n', work.Pages[page].Take(15)));
-                    try { module->ReplaceMacroLines(macro, text); }
+                    try { module->ReplaceMacroLines(macro, text); wrote = true; }
                     finally { text->Dtor(true); }
                     macro->Name.SetString(MacroSlotPlan.Name(work.Settings.Prefix, page + 1, plan.Slots.Count));
                     if (macro->IconId == 0) macro->SetIcon(DefaultIcon);
-                    RaptureHotbarModule.Instance()->ReloadMacroSlots((byte)book, (byte)plan.Slots[page]);
+                    // R-14 (0.453): no hotbar module: the slots refresh later, the macro is written all the same; a page already replaced is saved even if a later one fails.
+                    var hotbar = RaptureHotbarModule.Instance();
+                    if (hotbar != null) hotbar->ReloadMacroSlots((byte)book, (byte)plan.Slots[page]);
                 }
-                module->SetSavePendingFlag(true, book);
+                }
+                finally { if (wrote) module->SetSavePendingFlag(true, book); }
                 outcome = $"Done:{plan.Slots[0]}:{plan.Slots[^1]}:{book}:{string.Join(",", plan.Slots)}";
             }
         }
@@ -75,6 +83,7 @@ internal sealed class MacroWriter : IDisposable
         try { notify?.Invoke(outcome); } catch (Exception error) { log.Warning(error, "Macro copy status could not be shown."); }
     }
 
+    private bool snapshotWarned;
     private unsafe void Snapshot()
     {
         var now = System.Diagnostics.Stopwatch.GetTimestamp();

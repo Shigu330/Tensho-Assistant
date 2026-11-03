@@ -714,6 +714,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.453 : R-14, valeurs inconnues** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Journal de l'or : à la connexion, aucune fausse entrée « + tout l'or » ; un achat est bien noté.
+- [ ] Rappels à l'écran titre ou de sélection : pas de zéros ni de rôle ; une fois connecté, les compteurs apparaissent.
+- [ ] Prix de sous-cotation : après une sonnette, le prix est copié ; sans aucune sonnette depuis le lancement du jeu, rien n'est copié.
+- [ ] Revue de mode : les catégories s'affichent comme avant.
+- [ ] Téléportation : coûts affichés ; mandats, collections supplémentaires et chocobo lus une fois connecté.
+
 **0.452 : R-14 et hooks (A-14)** — pendant la campagne de tests en jeu de la fin (étape h)
 
 - [ ] Alarme sur un objet : la laisser sonner deux fois de suite ; la ligne de chat, le son et Discord arrivent à chaque sonnerie.

@@ -15,6 +15,7 @@ public sealed class ExtraCollectionReader : IDisposable
 {
     private readonly IFramework framework;
     private readonly IClientState client;
+    private readonly IPlayerState player;
     private readonly IUnlockState unlocks;
     private readonly IDataManager data;
     private readonly IPluginLog log;
@@ -29,9 +30,9 @@ public sealed class ExtraCollectionReader : IDisposable
     public IReadOnlyList<CollectionEntry>? State=>Volatile.Read(ref state);
     public bool Unavailable { get; private set; }
 
-    public ExtraCollectionReader(IFramework framework,IClientState client,IUnlockState unlocks,IDataManager data,IPluginLog log)
+    public ExtraCollectionReader(IFramework framework,IClientState client,IPlayerState player,IUnlockState unlocks,IDataManager data,IPluginLog log)
     {
-        this.framework=framework;this.client=client;this.unlocks=unlocks;this.data=data;this.log=log;
+        this.framework=framework;this.client=client;this.player=player;this.unlocks=unlocks;this.data=data;this.log=log;
         framework.Update+=OnUpdate;
     }
 
@@ -41,7 +42,8 @@ public sealed class ExtraCollectionReader : IDisposable
     {
         if(disposed || !framework.IsInFrameworkUpdateThread || framework.IsFrameworkUnloading)return;
         var now=DateTimeOffset.UtcNow;
-        if(!client.IsLoggedIn){steps=null;if(State is not null)Volatile.Write(ref state,null);return;}
+        // R-14 (0.453): before the character is loaded the game answers « not done » to everything: unknown, not zero.
+        if(!client.IsLoggedIn || !player.IsLoaded){steps=null;if(State is not null)Volatile.Write(ref state,null);return;}
         try
         {
             if(steps is null)

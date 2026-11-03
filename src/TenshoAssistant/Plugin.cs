@@ -457,7 +457,7 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.EquippedGear=()=>gear?.Equipped ?? [];
             // 0.340 (R-11 step 4): the companion chocobo and its bardings, read on the framework thread while the page shows them.
             Gear.ChocoboReader? chocobo=null;
-            registrations.Register(()=>chocobo=new Gear.ChocoboReader(framework,client,unlocks,data,log),()=>chocobo?.Dispose());
+            registrations.Register(()=>chocobo=new Gear.ChocoboReader(framework,client,player,unlocks,data,log),()=>chocobo?.Dispose());
             mainWindow.Chocobo=()=>{chocobo?.Want();return chocobo?.State;};
             mainWindow.ChocoboUnavailable=()=>chocobo?.Unavailable==true;
             mainWindow.StainName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Stain>().GetRowOrDefault(id)?.Name.ExtractText();
@@ -535,7 +535,7 @@ public sealed class Plugin : IDalamudPlugin
                     row.LeveClient.ValueNullable?.Name.ExtractText() ?? "",row.PlaceNameStartZone.ValueNullable?.Name.ExtractText() ?? "",row.GilReward,row.AllowanceCost))
                 .OrderBy(leve=>leve.Level).ThenBy(leve=>leve.Name,StringComparer.CurrentCulture).ToArray();
             Leves.LeveProgressReader? leveReader=null;
-            registrations.Register(()=>leveReader=new Leves.LeveProgressReader(framework,client,unlocks,data,log,LeveList),()=>leveReader?.Dispose());
+            registrations.Register(()=>leveReader=new Leves.LeveProgressReader(framework,client,player,unlocks,data,log,LeveList),()=>leveReader?.Dispose());
             mainWindow.LeveDefinitions=LeveList;
             // g, M-01 (0.371): automatic alarms at the ventures' end and the vessels' return (on by default, Alarms settings).
             // g, M-14 (0.384): the deciphered treasure map's spot (game functions checked, TreasureSpot → Level).
@@ -578,7 +578,7 @@ public sealed class Plugin : IDalamudPlugin
                 ()=>achievementProgress?.Dispose());
             // g, C-04 (0.365): hairstyles, accessories, glasses, bardings, portraits, master books, McGuffins, Occult Crescent lore.
             Collections.ExtraCollectionReader? extraCollections=null;
-            registrations.Register(()=>extraCollections=new Collections.ExtraCollectionReader(framework,client,unlocks,data,log),()=>extraCollections?.Dispose());
+            registrations.Register(()=>extraCollections=new Collections.ExtraCollectionReader(framework,client,player,unlocks,data,log),()=>extraCollections?.Dispose());
             mainWindow.ExtraCollections=()=>{extraCollections?.Want();return extraCollections?.State;};
             mainWindow.ExtraCollectionsUnavailable=()=>extraCollections?.Unavailable==true;
             // g, C-12 (0.364): hunting log (MonsterNote, copied once) and the kills the game holds, read while the page shows them.
@@ -649,7 +649,7 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.ReadSquadron=()=>framework.RunOnFrameworkThread(()=>
             {
                 try{return Reminders.SquadronReader.Read();}
-                catch(Exception error){log.Warning(error,"Squadron unreadable (game update?).");return null;}
+                catch(Exception error){log.Warning(error,"Squadron unreadable (game update?).");throw;}
             });
             Reminders.SquadronSheets? squadronSheets=null;var squadronSheetsFailed=false;
             mainWindow.SquadronSheetData=()=>

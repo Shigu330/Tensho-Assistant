@@ -4386,6 +4386,7 @@
     "Read": "Lire l'escouade",
     "ReadTip": "Lit les membres et le bonus d'entraînement dans le jeu. Le jeu ne les garde que pendant que vous êtes à la caserne de votre Grande Compagnie (ouvrez d'abord l'escouade là-bas).",
     "NotLoaded": "L'escouade n'est pas chargée : allez à la caserne de votre Grande Compagnie, ouvrez l'escouade, puis relisez.",
+    "Unavailable": "L'escouade n'a pas pu être lue (peut-être après une mise à jour du jeu) ; le détail est dans le journal de Dalamud.",
     "SheetsUnavailable": "Les données d'escouade du jeu n'ont pas pu être lues ; le détail est dans le journal de Dalamud.",
     "MemberClass": "{0} {1}",
     "Stats": "{0} / {1} / {2}",
