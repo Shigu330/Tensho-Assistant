@@ -716,7 +716,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.461 : grille du journal** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Monde › Jardinage : le potager est une grille ; la plante est dans la bonne case par rapport au vrai potager (emplacement 6 en bas au milieu) ; sinon, dire où elle est.
+- [x] Monde › Jardinage : le potager est une grille ; la plante est dans la bonne case par rapport au vrai potager (emplacement 6 en bas au milieu) ; sinon, dire où elle est.
 - [ ] « Entretenu » et « Retirer » marchent depuis la case ; plus de « Replanter ». Les pots restent en liste.
 
 **0.460 : plantations détectées depuis le chat** — pendant la campagne de tests en jeu (étape h)
