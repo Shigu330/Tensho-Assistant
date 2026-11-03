@@ -29,7 +29,8 @@ internal sealed class GatheringObservationReader : IDisposable
     private static unsafe string? Text(AtkResNode* node)
     {
         if(!Visible(node) || node->Type!=NodeType.Text)return null;
-        var text=node->GetAsAtkTextNode();if(text==null || text->NodeText.Length>64)return null;
+        // R-14 (0.454): type checked above: a plain cast, not a game function that a patch can leave unresolved.
+        var text=(AtkTextNode*)node;if(text->NodeText.Length>64)return null;
         return Dalamud.Game.Text.SeStringHandling.SeString.Parse(text->NodeText.AsSpan()).TextValue;
     }
     private static unsafe GatheringRawSlot[] Copy(AddonGathering* addon)

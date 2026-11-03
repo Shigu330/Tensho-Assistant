@@ -34,6 +34,11 @@ internal sealed class CollectableReader : IDisposable
         }
     }
 
+    /// <summary>R-14 (0.454): no retry this session (a lost sheet fails on every call): the pages say « unavailable », not « reading ».</summary>
+    public bool CatalogFailed { get; private set; }
+    /// <summary>R-14 (0.454): the last read of the bags failed; cleared by a good read.</summary>
+    public bool HoldingsUnavailable { get; private set; }
+
     public CollectableReader(IFramework framework,IGameGui gui,IClientState client,IDataManager data,IPluginLog log)
     {this.framework=framework;this.gui=gui;this.client=client;this.data=data;this.log=log;framework.Update+=Update;}
 
@@ -57,7 +62,7 @@ internal sealed class CollectableReader : IDisposable
                 }
             Volatile.Write(ref catalog,new CollectableCatalog(rules));
         }
-        catch(Exception error){log.Warning(error,"Collectable thresholds unavailable.");}
+        catch(Exception error){CatalogFailed=true;log.Warning(error,"Collectable thresholds unavailable.");}
     }
 
     private unsafe void Update(IFramework unused)
@@ -114,7 +119,8 @@ internal sealed class CollectableReader : IDisposable
                 FFXIVClientStructs.FFXIV.Client.Game.InventoryType.Inventory3,FFXIVClientStructs.FFXIV.Client.Game.InventoryType.Inventory4})
             {
                 var container=manager->GetInventoryContainer(type);
-                if(container==null || !container->IsLoaded)continue;
+                // R-14 (0.454): a bag not loaded yet: no incomplete list, the last read (or « Reading… ») stays.
+                if(container==null || !container->IsLoaded)return;
                 for(var slot=0;slot<container->Size && slot<64;slot++)
                 {
                     var item=container->GetInventorySlot(slot);
@@ -122,9 +128,9 @@ internal sealed class CollectableReader : IDisposable
                     held.Add(new(item->GetBaseItemId(),item->GetSpiritbondOrCollectability()));
                 }
             }
-            Volatile.Write(ref holdings,held.ToArray());
+            Volatile.Write(ref holdings,held.ToArray());HoldingsUnavailable=false;
         }
-        catch(Exception error){Volatile.Write(ref holdings,null);if(Interlocked.Exchange(ref warned,1)==0)log.Warning(error,"Collectables in the bags could not be read.");}
+        catch(Exception error){Volatile.Write(ref holdings,null);HoldingsUnavailable=true;if(Interlocked.Exchange(ref warned,1)==0)log.Warning(error,"Collectables in the bags could not be read.");}
     }
 
     private static string Short(string? text)=>text is null ? "" : text.Length>48 ? text[..48]+"…":text;

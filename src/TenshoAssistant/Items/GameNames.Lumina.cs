@@ -53,7 +53,8 @@ public sealed class GameNames
                 _=>null,
             };
         }
-        catch(Exception error){Warn(error);return null;}
+        // R-14 (0.454): a lost sheet throws on every call: the failure is kept like a missing name, or it threw every frame in the hover.
+        catch(Exception error){Warn(error);garland[(type,id)]=null;return null;}
     }
 
     private static string? Same(string english,string? gameEnglish,Func<string?> local)
@@ -78,12 +79,18 @@ public sealed class GameNames
                     if(name.Length>0 && local.TryGetValue(row,out var text) && text.Length>0)pairs.TryAdd(name,text);
                 return pairs;
             }
-            var monsters=Pairs(data.GetExcelSheet<BNpcName>(ClientLanguage.English).Select(row=>(row.RowId,row.Singular.ExtractText().Trim())),
-                data.GetExcelSheet<BNpcName>().ToDictionary(row=>row.RowId,row=>row.Singular.ExtractText().Trim()));
-            var places=Pairs(data.GetExcelSheet<PlaceName>(ClientLanguage.English).Select(row=>(row.RowId,row.Name.ExtractText().Trim())),
-                data.GetExcelSheet<PlaceName>().ToDictionary(row=>row.RowId,row=>row.Name.ExtractText().Trim()));
-            var duties=Pairs(data.GetExcelSheet<ContentFinderCondition>(ClientLanguage.English).Select(row=>(row.RowId,row.Name.ExtractText().Trim())),
-                data.GetExcelSheet<ContentFinderCondition>().ToDictionary(row=>row.RowId,row=>row.Name.ExtractText().Trim()));
+            // R-14 (0.454): each table on its own: a sheet lost after an update leaves only its names in English.
+            Dictionary<string,string> Safe(Func<Dictionary<string,string>> build)
+            {
+                try{return build();}
+                catch(Exception error){Warn(error);return [];}
+            }
+            var monsters=Safe(()=>Pairs(data.GetExcelSheet<BNpcName>(ClientLanguage.English).Select(row=>(row.RowId,row.Singular.ExtractText().Trim())),
+                data.GetExcelSheet<BNpcName>().ToDictionary(row=>row.RowId,row=>row.Singular.ExtractText().Trim())));
+            var places=Safe(()=>Pairs(data.GetExcelSheet<PlaceName>(ClientLanguage.English).Select(row=>(row.RowId,row.Name.ExtractText().Trim())),
+                data.GetExcelSheet<PlaceName>().ToDictionary(row=>row.RowId,row=>row.Name.ExtractText().Trim())));
+            var duties=Safe(()=>Pairs(data.GetExcelSheet<ContentFinderCondition>(ClientLanguage.English).Select(row=>(row.RowId,row.Name.ExtractText().Trim())),
+                data.GetExcelSheet<ContentFinderCondition>().ToDictionary(row=>row.RowId,row=>row.Name.ExtractText().Trim())));
             Volatile.Write(ref tables,new Tables(monsters,places,duties));
         }
         catch(Exception error){Warn(error);}

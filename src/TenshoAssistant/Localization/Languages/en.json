@@ -4636,6 +4636,8 @@
   },
   "Notebooks": {
     "Reading": "Reading the notebooks (log in)…",
+    "Unavailable": "The notebooks could not be read (perhaps after a game update); details are in the Dalamud log.",
+    "GatheringUnavailable": "The gathering notebook could not be read (perhaps after a game update): its count is unknown.",
     "Counts": "Notebooks: fishing {0}/{1} · spearfishing {2}/{3} · gathering {4}/{5}",
     "HideDone": "Hide what is already in the notebook",
     "HideDoneTip": "Hides the resources your character already caught or gathered (fishing, spearfishing and gathering notebooks).",
@@ -4816,6 +4818,7 @@
     "Title": "Collectable",
     "Resources": "GP {0}/{1} · integrity {2}/{3}",
     "Loading": "Reading the collectability thresholds…",
+    "Unavailable": "The collectability thresholds could not be read (perhaps after a game update); details are in the Dalamud log.",
     "NoRule": "No turn-in threshold known for this item in the game data.",
     "Thresholds": "Collectability thresholds: low {0} · mid {1} · high {2}",
     "Scrips": "Scrips per tier: {0} / {1} / {2}",
@@ -4825,6 +4828,7 @@
   },
   "CollectableTable": {
     "HeldReading": "Reading the collectables in your bags…",
+    "HeldUnavailable": "The collectables in your bags could not be read (perhaps after a game update); details are in the Dalamud log.",
     "Held": "In your bags: {0} collectable(s), {1} scrips in all",
     "HeldRow": "{0} · collectability {1} · {2} · {3} scrips",
     "HeldOther": "{0} other(s) not turned in for scrips.",

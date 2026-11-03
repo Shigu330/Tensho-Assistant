@@ -68,7 +68,8 @@ internal static class InventoryNativeReader
                 0 => module->InventorySorter,
                 4000 => module->SaddleBagSorter,
                 4100 => module->PremiumSaddleBagSorter,
-                10000 when module->ActiveRetainerId == owner.Value => module->GetActiveRetainerSorter(),
+                // 0.454 (R-14): the game function only once resolved; otherwise no visual order (-1), as for a failed read.
+                10000 when module->ActiveRetainerId == owner.Value && (nint)ItemOrderModule.MemberFunctionPointers.GetActiveRetainerSorter != 0 => module->GetActiveRetainerSorter(),
                 _ => null,
             };
             var expected = first switch { 0 => 140, 10000 => 175, 4000 or 4100 => 70, _ => 0 };

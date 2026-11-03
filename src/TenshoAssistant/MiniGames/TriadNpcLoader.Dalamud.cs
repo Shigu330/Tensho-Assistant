@@ -50,6 +50,9 @@ internal sealed class TriadNpcLoader : IDisposable
             foreach (var value in npc.ENpcData)
                 if (value.RowId != 0 && matches.HasRow(value.RowId) && !npcOfMatch.ContainsKey(value.RowId)) { npcOfMatch[value.RowId] = npc.RowId; break; }
         token.ThrowIfCancellationRequested();
+        // 0.454 (R-14): no card item or no NPC means the game data changed (ItemAction link, ENpcData links), not « nothing to win »: the catalogue
+        // fails and the page says it, instead of an empty list.
+        if (cardOfItem.Count == 0 || npcOfMatch.Count == 0) throw new InvalidOperationException($"Triple Triad data unrecognised: {cardOfItem.Count} card items, {npcOfMatch.Count} NPCs.");
         var wanted = npcOfMatch.Values.ToHashSet();
         var places = new Dictionary<uint, (uint Map, string Zone, float X, float Y)>();
         foreach (var level in data.GetExcelSheet<Level>())

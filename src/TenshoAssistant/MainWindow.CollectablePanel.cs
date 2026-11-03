@@ -27,7 +27,7 @@ internal sealed partial class MainWindow
             if(!visible)return;
             ImGui.TextColored(Accent,frame.ItemName);
             ImGui.TextDisabled(localization.Format("CollectablePanel.Resources",Shown(frame.Gp),Shown(frame.MaxGp),Shown(frame.Integrity),Shown(frame.MaxIntegrity)));
-            if(Collectables.Catalog is not { } catalog)ImGui.TextDisabled(localization.Get("CollectablePanel.Loading"));
+            if(Collectables.Catalog is not { } catalog)ImGui.TextDisabled(localization.Get(Collectables.CatalogFailed ? "CollectablePanel.Unavailable":"CollectablePanel.Loading"));
             else if(catalog.Named(frame.ItemName) is not { Count:>0 } rules)ImGui.TextWrapped(localization.Get("CollectablePanel.NoRule"));
             else
                 foreach(var rule in rules.DistinctBy(rule=>(rule.Low,rule.Mid,rule.High,rule.RewardLow,rule.RewardMid,rule.RewardHigh,rule.Scrips)).Take(4))

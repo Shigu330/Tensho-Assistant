@@ -4636,6 +4636,8 @@
   },
   "Notebooks": {
     "Reading": "Carnets en cours de lecture (connectez-vous)…",
+    "Unavailable": "Les carnets n'ont pas pu être lus (peut-être après une mise à jour du jeu) ; le détail est dans le journal de Dalamud.",
+    "GatheringUnavailable": "Le carnet de récolte n'a pas pu être lu (peut-être après une mise à jour du jeu) : son compte est inconnu.",
     "Counts": "Carnets : pêche {0}/{1} · pêche au harpon {2}/{3} · récolte {4}/{5}",
     "HideDone": "Masquer ce qui est déjà au carnet",
     "HideDoneTip": "Cache les ressources déjà attrapées ou récoltées par votre personnage (carnets de pêche, de pêche au harpon et de récolte).",
@@ -4816,6 +4818,7 @@
     "Title": "Collectionnable",
     "Resources": "PR {0}/{1} · intégrité {2}/{3}",
     "Loading": "Lecture des seuils de collectabilité…",
+    "Unavailable": "Les seuils de collectionnabilité n'ont pas pu être lus (peut-être après une mise à jour du jeu) ; le détail est dans le journal de Dalamud.",
     "NoRule": "Aucun seuil de remise connu pour cet objet dans les données du jeu.",
     "Thresholds": "Seuils de collectabilité : bas {0} · moyen {1} · haut {2}",
     "Scrips": "Assignats par palier : {0} / {1} / {2}",
@@ -4825,6 +4828,7 @@
   },
   "CollectableTable": {
     "HeldReading": "Lecture des collectionnables de vos sacs…",
+    "HeldUnavailable": "Les objets de collection de vos sacs n'ont pas pu être lus (peut-être après une mise à jour du jeu) ; le détail est dans le journal de Dalamud.",
     "Held": "Dans vos sacs : {0} collectionnable(s), {1} assignats en tout",
     "HeldRow": "{0} · collectionnabilité {1} · {2} · {3} assignats",
     "HeldOther": "{0} autre(s) sans remise contre des assignats.",

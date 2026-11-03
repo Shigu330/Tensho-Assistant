@@ -21,7 +21,7 @@ internal sealed partial class MainWindow
         if(Collectables is not { } reader)return;
         var catalog=reader.Catalog;
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("CollectableTable.Title",catalog?.Count ?? 0)+"###CollectableTable"))return;
-        if(catalog is null){ImGui.TextDisabled(localization.Get("CollectablePanel.Loading"));return;}
+        if(catalog is null){ImGui.TextDisabled(localization.Get(reader.CatalogFailed ? "CollectablePanel.Unavailable":"CollectablePanel.Loading"));return;}
         ImGui.TextWrapped(localization.Get("CollectableTable.Help"));
         DrawHeldCollectables(reader,catalog);
         ImGui.SetNextItemWidth(280);
@@ -71,7 +71,7 @@ internal sealed partial class MainWindow
     private void DrawHeldCollectables(CollectableReader reader,CollectableCatalog catalog)
     {
         reader.WantHoldings();
-        if(reader.Holdings is not { } held){ImGui.TextDisabled(localization.Get("CollectableTable.HeldReading"));return;}
+        if(reader.Holdings is not { } held){ImGui.TextDisabled(localization.Get(reader.HoldingsUnavailable ? "CollectableTable.HeldUnavailable":"CollectableTable.HeldReading"));return;}
         var values=held.Select(item=>Gathering.Collectables.Value(catalog,item)).OfType<CollectableValue>().ToArray();
         ImGui.TextColored(Accent,localization.Format("CollectableTable.Held",held.Count,values.Sum(value=>value.Scrips)));
         var items=itemCatalog.State.Catalog;

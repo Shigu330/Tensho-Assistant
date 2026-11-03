@@ -3,6 +3,32 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.454.0
+- R-14, troisième lot : les derniers constats confirmés par l'audit.
+  - Titre par classe : la liste est commune à tous vos personnages ; seul un titre que ce personnage possède est envoyé au jeu.
+  - Collections : une feuille liée qui ne se charge plus ne laisse de côté qu'une carte ou un lieu, plus toutes les catégories.
+  - Objets de collection et carnets : un échec affiche « n'a pas pu être lu » au lieu de « Lecture… » sans fin. Un sac pas encore chargé
+    ne publie plus une liste incomplète. Le carnet de récolte illisible est signalé au lieu d'afficher 0/0.
+  - Noms des pages communautaires : une feuille perdue est mémorisée (elle était relancée à chaque image du survol) et chaque table est
+    construite seule.
+  - Fonctions vérifiées avant l'appel : tri du servant, déplacement du nœud de la carte (la carte du jeu reste, au lieu d'un remplacement à
+    moitié fait toutes les 5 s).
+  - Carte au trésor : une fonction perdue est écrite une fois dans le journal, au lieu d'un « pas de carte » silencieux.
+  - Triple Triade : aucune carte ou aucun PNJ reconnu fait échouer le catalogue, au lieu d'une liste vide.
+  - Fenêtre de récolte : le nœud de texte est lu par un simple transtypage (une fonction du jeu de moins à risque).
+  - Message d'erreur en français dans le code remplacé par l'anglais (règle des langues).
+- Fin de cette passe R-14 : les 23 constats confirmés et les 12 classés « plantage » sont traités. Pour cinq lectures de feuille depuis les
+  panneaux, seule l'isolation de 0.452 s'applique : le panneau se coupe, sans valeur « inconnue » propre. Restent 44 constats jamais vérifiés
+  (quota épuisé pendant l'audit), aucun classé plantage : 21 mineurs, 19 dégradations silencieuses, 4 valeurs peut-être fausses (règles de
+  Triple Triade ×2, tenues partielles de la cabine, cases collectées de la carte). Liste locale : checkpoints/r14-audit-2026-11-03.json.
+- Tests : Resilience454Tests (5 cas) ; 2 tests déjà écrits adaptés au nouveau code. Verify.ps1 (agent) : 843/843, 0 avertissement, 0 erreur ;
+  DLL 0.454.0.0. Non validé en jeu.
+### English
+- R-14, third batch: the last confirmed findings. A title is only sent if this character owns it; a lost linked sheet leaves one card or location
+  instead of every collection; collectables and notebooks say « unavailable » instead of « reading » for ever; community names remember a lost
+  sheet; retainer sorter and map node move are checked before use; the treasure map failure is logged once; an unrecognised Triple Triad
+  catalogue fails instead of showing an empty list.
+
 ## 0.453.0
 - R-14, deuxième lot de l'audit : une valeur inconnue reste inconnue, jamais zéro, « aucun » ou « aucune catégorie ». Chaque constat a été
   relu dans le code.

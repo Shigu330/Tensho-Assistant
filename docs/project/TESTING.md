@@ -714,6 +714,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.454 : R-14, indisponible plutôt que « lecture »** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Titre par classe : réglé sur un personnage ; sur un autre qui ne le possède pas, changer de classe ne change pas le titre.
+- [ ] Objets de collection et carnets : affichés comme avant, sans message d'indisponibilité.
+- [ ] Carte Tensho à la place de la carte du jeu : fonctionne comme avant.
+- [ ] Inventaire d'un servant : l'ordre affiché suit toujours celui du jeu.
+
 **0.453 : R-14, valeurs inconnues** — pendant la campagne de tests en jeu de la fin (étape h)
 
 - [ ] Journal de l'or : à la connexion, aucune fausse entrée « + tout l'or » ; un achat est bien noté.

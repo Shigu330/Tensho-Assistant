@@ -42,7 +42,12 @@ public sealed unsafe class TreasureMapReader : IDisposable
         {
             var manager=EventItemManager.Instance();
             if(manager==null || (nint)EventItemManager.MemberFunctionPointers.GetTreasureHuntRank==0 || (nint)EventItemManager.MemberFunctionPointers.GetTreasureSpotSubKey==0)
-            {Volatile.Write(ref spot,null);return;}
+            {
+                Volatile.Write(ref spot,null);nextRead=now.AddSeconds(60);
+                // R-14 (0.454): said once, like a failed read; never a silent « no map ».
+                if(!warned){warned=true;log.Warning("The treasure map could not be read: game function not resolved (perhaps after a game update).");}
+                return;
+            }
             var rank=manager->GetTreasureHuntRank();var sub=manager->GetTreasureSpotSubKey();
             if(rank==0){lastKey=default;Volatile.Write(ref spot,null);return;}
             if(lastKey==(rank,sub) && Volatile.Read(ref spot) is not null)return;

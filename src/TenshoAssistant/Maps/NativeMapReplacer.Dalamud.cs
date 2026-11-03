@@ -18,7 +18,7 @@ internal sealed class NativeMapReplacer : IDisposable
     // 0.328 (R-14): whether the Tensho map can draw now (catalogue ready, not hidden in combat or a duty); when it cannot, M keeps
     // the game map on screen instead of hosting it off screen with no map shown at all.
     private readonly Func<bool> canShow;
-    private bool wasVisible;private bool keepGameMap;private bool disposed;private DateTimeOffset retryAt;
+    private bool moveWarned;private bool wasVisible;private bool keepGameMap;private bool disposed;private DateTimeOffset retryAt;
     private int openRequest;private bool bypass;private DateTimeOffset bypassUntil;
     // 0.151: the game map is kept open off screen while the Tensho map shows (as Mappy does) instead of being closed, so the
     // map agent stays active and keeps the quest and leve markers up to date; closing either window closes the other.
@@ -57,7 +57,11 @@ internal sealed class NativeMapReplacer : IDisposable
             {
                 // Decided once, when the game map appears: kept for the whole time it stays open, and kept too when the Tensho
                 // map cannot draw then (canShow, 0.328).
-                keepGameMap=!options.ReplaceGameMap || bypass || !canShow();
+                // R-14 (0.454): hosting needs the game's node move: when it did not resolve the game map simply stays (logged once), instead of a
+                // replacement half-run again every 5 s.
+                var canMove=(nint)AtkResNode.MemberFunctionPointers.SetPositionFloat!=0;
+                if(!canMove && !moveWarned){moveWarned=true;log.Warning("The game map cannot be replaced: its node move did not resolve (perhaps after a game update).");}
+                keepGameMap=!options.ReplaceGameMap || bypass || !canShow() || !canMove;
                 bypass=false;
                 if(!keepGameMap)
                 {
