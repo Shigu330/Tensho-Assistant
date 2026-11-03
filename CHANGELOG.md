@@ -3,6 +3,19 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.462.0
+- Retours du lot 3 (2026-11-04) ; le reste du lot est validé, sauf le point 12 reporté par l'utilisateur :
+  - Comparaison sous l'infobulle : les statistiques passaient côte à côte sur une ligne et se coupaient lettre par lettre (« Vitalité » à la verticale). Le nom de la pièce, puis le
+    niveau d'objet, puis une grille de statistiques deux par deux, comme l'infobulle du jeu.
+  - « Tous les outils avec cet objet » retiré des menus : devenu inutile.
+  - Coffre de compagnie vide : la lecture échouait d'un bloc (« Inventory slot inconsistent with requested bag », dalamud.log à 00:49:49). Cause supposée : des cases
+    qui nomment un objet avec une quantité de 0, comme les cristaux du coffre. Une telle case compte maintenant comme vide. Si l'erreur revient, le journal donne le coffre, la
+    case, l'objet et la quantité. Non vérifié en jeu.
+- Tests : Lot3Fixes462Tests (3 cas). Verify.ps1 (agent) : 863/863, 0 avertissement, 0 erreur ; DLL 0.462.0.0. Non validé en jeu.
+### English
+- Gear comparison under the tooltip: stats in a two-by-two grid like the game's tooltip, instead of wrapping letter by letter. « All tools for this item » removed from the menus.
+- Company chest: a slot naming an item with quantity 0 counts as empty, which failed the whole reading (suspected cause, not checked in game).
+
 ## 0.461.0
 - Demandes de l'utilisateur après l'essai au potager (détection validée : Shirogane 2-17, potager 1, emplacement 6, bonne graine) :
   - Page Jardinage : chaque potager s'affiche en grille de 3 × 3, sans centre, comme le plan de plantation, avec le numéro, la graine (couleur selon l'état), les heures et

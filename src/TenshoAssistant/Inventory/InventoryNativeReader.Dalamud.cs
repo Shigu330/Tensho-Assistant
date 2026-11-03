@@ -32,10 +32,12 @@ internal static class InventoryNativeReader
             var seenSlots = new HashSet<uint>();
             foreach (ref readonly var slot in slots)
             {
-                if (slot.IsEmpty) continue;
+                // 0.462 (in-game campaign): a slot that names an item with quantity 0 is empty (suspected: the company chest's crystal slots), it failed the whole chest.
+                if (slot.IsEmpty || slot.Quantity == 0) continue;
                 if (slot.ContainerType != bag || slot.InventorySlot >= slots.Length || !seenSlots.Add(slot.InventorySlot)
-                    || slot.BaseItemId == 0 || slot.Quantity <= 0)
-                    throw new InvalidOperationException("Inventory slot inconsistent with requested bag.");
+                    || slot.BaseItemId == 0 || slot.Quantity < 0)
+                    throw new InvalidOperationException("Inventory slot inconsistent with requested bag.",
+                        new InvalidDataException($"bag {(int)bag}, container {(int)slot.ContainerType}, slot {slot.InventorySlot} of {slots.Length}, item {slot.BaseItemId}, quantity {slot.Quantity}"));
                 stacks.Add(new InventoryStack(new InventoryItem(new InventoryItemId(slot.BaseItemId), slot.IsHq), slot.Quantity,
                     checked((int)slot.InventorySlot), displayOrder.GetValueOrDefault(((int)bag, (int)slot.InventorySlot), -1)));
             }

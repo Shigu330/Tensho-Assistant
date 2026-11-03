@@ -17,17 +17,21 @@ internal sealed partial class MainWindow
         foreach(var comparison in comparisons)
         {
             ImGui.TextDisabled(localization.Format("HoverUi.CompareWith",comparison.Worn.Name+(comparison.WornHq ? " HQ":"")));
-            ImGui.SameLine();
             var level=comparison.ItemLevelDelta;
             ImGui.TextColored(level>0 ? Success:level<0 ? UI.FfxivTheme.Error:Muted,localization.Format("HoverUi.CompareLevel",(level>0 ? "+":"")+level));
             if(comparison.Deltas.Count==0){ImGui.TextDisabled(localization.Get("HoverUi.CompareSame"));continue;}
-            var first=true;
-            foreach(var (param,delta) in comparison.Deltas.Take(8))
+            // 0.462 (user request, in-game campaign): stats two by two, as in the game's tooltip; side by side on one line they wrapped letter by letter.
+            if(!ImGui.BeginTable("HoverCompare"+comparison.Worn.Id,4,ImGuiTableFlags.SizingFixedFit))continue;
+            try
             {
-                if(!first)ImGui.SameLine();
-                first=false;
-                ImGui.TextColored(delta>0 ? Success:UI.FfxivTheme.Error,$"{localization.Get("Gear.Param"+param)} {(delta>0 ? "+":"")}{delta:N0}");
+                foreach(var (param,delta) in comparison.Deltas.Take(8))
+                {
+                    var color=delta>0 ? Success:UI.FfxivTheme.Error;
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("Gear.Param"+param));
+                    ImGui.TableNextColumn();ImGui.TextColored(color,$"{(delta>0 ? "+":"")}{delta:N0}");
+                }
             }
+            finally{ImGui.EndTable();}
         }
         ImGui.TextDisabled(localization.Get("HoverUi.CompareNote"));
     }
