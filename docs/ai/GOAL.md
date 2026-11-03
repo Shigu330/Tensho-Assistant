@@ -4,10 +4,10 @@ ID: FIN-DE-FILE — fin de la file d'attente (état relu le 2026-11-03, version 
 
 FAIT : files a) à g) de [ROADMAP](../project/ROADMAP.md) (0.315–0.446), dont l'étape g) : 101 manques choisis dans
 [GAPS](../project/GAPS.md), domaine par domaine, sauf les écarts laissés dans [G-PROPOSALS](../project/G-PROPOSALS.md)
-(« Écarts laissés pour une séance avec l'utilisateur »). Dernière release : Stable-0.430.0 (2026-11-03).
+(« Écarts laissés pour une séance avec l'utilisateur »). Dernière release : Stable-0.448.0 (2026-11-03).
 
 RESTE (ordre proposé, détail dans [STATUS](STATUS.md) « Prochaine action » et « Git ») :
-1) git : 0.431–0.446 commitées et poussées (2026-11-03) ; release quand l'utilisateur le décide ;
+1) git : 0.431–0.448 publiées (Stable-0.448.0, 2026-11-03) ; décisions du premier lot faites (DEC-026) ;
 2) décisions par lots (G-PROPOSALS, ROADMAP « Décisions reportées à la fin », lignes « État » des fichiers de propositions) ;
 3) h) campagne de tests en jeu guidée de tout le plugin ([TESTING](../project/TESTING.md)), sondes en jeu comprises ;
 4) séance ultracode : g2) R-14, I-05, I-15, A-03 / A-04 (Raphael), N-10, relecture du hook A-14 ;
