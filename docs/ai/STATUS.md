@@ -54,7 +54,7 @@ QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-11-02 : forfait M
   « Retirer le drapeau » dans tous les menus. Reste à relever le type de marqueur des mandats (mandat accepté, carte ouverte).
 
 ## Campagne de tests en jeu (étape h)
-Commencée le 2026-11-04 (lots dans l'ordre : 1 sur place FAIT ; 2 alarmes et chat ; 3 ville ; 4 caserne ; 5 atelier ; 6 récolte et pêche ; 7 carte et chasse ; 8 PNJ ; 9 collections ; 10 reste). Cases cochées dans TESTING.md ; l'agent lit dalamud.log après chaque lot.
+Commencée le 2026-11-04 (lots dans l'ordre : 1 sur place FAIT ; 2 alarmes et chat FAIT (rapport du 2026-11-04 : « tous est ok ») ; 3 ville ; 4 caserne ; 5 atelier ; 6 récolte et pêche ; 7 carte et chasse ; 8 PNJ ; 9 collections ; 10 reste). Cases cochées dans TESTING.md ; l'agent lit dalamud.log après chaque lot.
 
 ## À valider en jeu
 Liste complète et à jour, version par version jusqu'à 0.448 : [TESTING](../project/TESTING.md) (cases « [ ] »). Ci-dessous, l'ancien résumé 0.224–0.262.

@@ -245,10 +245,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Webhook Discord (R-12, 0.319)** — à faire pendant la campagne de tests en jeu de la fin (étape h de la file), avec un salon de test
 
-- [ ] Paramètres › Alarmes › Discord : coller l'adresse d'un webhook d'un salon de test, quitter le champ : « Adresse enregistrée :
+- [x] Paramètres › Alarmes › Discord : coller l'adresse d'un webhook d'un salon de test, quitter le champ : « Adresse enregistrée :
   https://discord.com/api/webhooks/1234…/*** » ; une adresse d'un autre site reste dans le champ avec le message rouge, non enregistrée.
-- [ ] « Envoyer un test » : le message d'essai arrive dans le salon, avec le nom « Tensho » ; la ligne d'état dit « Message envoyé. ».
-- [ ] Activer l'envoi, créer une alarme manuelle (page Alarmes) à une heure ET proche : à la sonnerie, le message arrive sur Discord
+- [x] « Envoyer un test » : le message d'essai arrive dans le salon, avec le nom « Tensho » ; la ligne d'état dit « Message envoyé. ».
+- [x] Activer l'envoi, créer une alarme manuelle (page Alarmes) à une heure ET proche : à la sonnerie, le message arrive sur Discord
   (et le chat et le son du jeu comme avant).
 - [ ] Décocher une catégorie, ou la case « Discord » d'un groupe : ses alarmes ne partent plus ; message propre à un groupe (créneaux du
   groupe) : il remplace le modèle.
@@ -716,30 +716,30 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.459 : icône des terminés, page Jardinage** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Barre du serveur : trois icônes au plus : horloge (alarmes actives), rappels (reste à faire), terminés (visible seulement s'il y en a) ; chaque infobulle a sa liste.
-- [ ] Monde › Jardinage : le journal et les croisements y sont, ils ne sont plus dans Rappels ; les parcelles déjà notées sont toujours là.
+- [x] Barre du serveur : trois icônes au plus : horloge (alarmes actives), rappels (reste à faire), terminés (visible seulement s'il y en a) ; chaque infobulle a sa liste.
+- [x] Monde › Jardinage : le journal et les croisements y sont, ils ne sont plus dans Rappels ; les parcelles déjà notées sont toujours là.
 
 **0.458 : icône des rappels, ce qui reste à faire** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Barre du serveur : le nombre et l'infobulle « Reste à faire » listent les rappels non cochés ; cocher « Fait » sur la page Rappels fait baisser le nombre (5 s au plus).
-- [ ] Décocher « Barre » sur une ligne : elle disparaît de l'infobulle ; recocher : elle revient ; le choix reste après un rechargement du plugin.
+- [x] Barre du serveur : le nombre et l'infobulle « Reste à faire » listent les rappels non cochés ; cocher « Fait » sur la page Rappels fait baisser le nombre (5 s au plus).
+- [x] Décocher « Barre » sur une ligne : elle disparaît de l'infobulle ; recocher : elle revient ; le choix reste après un rechargement du plugin.
 - [ ] Une tâche personnelle affichée à l'écran apparaît dans la liste ; une tâche servant ou un vaisseau fini aussi.
 
 **0.457 : icônes des compétences** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Réglages › Artisanat › Actions interdites : chaque ligne a son icône, et la case se coche toujours.
+- [x] Réglages › Artisanat › Actions interdites : chaque ligne a son icône, et la case se coche toujours.
 - [ ] Enregistreur d'artisanat : les actions notées s'affichent en icônes dans l'ordre ; le survol donne le numéro et le nom ; la ligne revient à la ligne si besoin.
 
 **0.456 : plan de plantation des croisements** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Croisements › « Ce qui donne cette graine » : les paires à « seulement cette graine » sont en tête ; le survol donne les autres graines.
-- [ ] Clic sur une paire : grille 3 × 3 sans centre ; la disposition correspond à votre potager de luxe (sinon, dire comment il est) ; noms des graines et de la terre en français.
+- [x] Croisements › « Ce qui donne cette graine » : les paires à « seulement cette graine » sont en tête ; le survol donne les autres graines.
+- [x] Clic sur une paire : grille 3 × 3 sans centre ; la disposition correspond à votre potager de luxe (sinon, dire comment il est) ; noms des graines et de la terre en français.
 - [ ] Planter une paire selon le plan : des graines croisées apparaissent à la récolte, sauf sur la parcelle 1.
 
 **0.455 : retours du lot 1** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Journal de l'or (Stockage › Gils) : tableaux lisibles, plus de « = » ; une dépense apparaît en « - ».
-- [ ] Barre du serveur : deux icônes, l'horloge des alarmes (nombre d'alarmes actives) et celle des rappels (nombre de terminés) ; survol = la
+- [x] Journal de l'or (Stockage › Gils) : tableaux lisibles, plus de « = » ; une dépense apparaît en « - ».
+- [x] Barre du serveur : deux icônes, l'horloge des alarmes (nombre d'alarmes actives) et celle des rappels (nombre de terminés) ; survol = la
   liste ; clic = la bonne page ; le réglage Avancé masque celle des rappels.
 - [ ] Mission ou entraînement d'escouade lancé : une alarme automatique apparaît dans la page Alarmes et sonne à la fin ; l'icône des rappels monte de 1.
 
@@ -760,7 +760,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.452 : R-14 et hooks (A-14)** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Alarme sur un objet : la laisser sonner deux fois de suite ; la ligne de chat, le son et Discord arrivent à chaque sonnerie.
+- [x] Alarme sur un objet : la laisser sonner deux fois de suite ; la ligne de chat, le son et Discord arrivent à chaque sonnerie.
 - [ ] Enregistreur d'artisanat sur une classe autre que Charpentier : Veneration, Innovation, Great Strides, Waste Not, Manipulation et Final
   Appraisal sont notés ; une action lancée pendant l'animation (mise en file) est notée une seule fois ; une action refusée ne l'est pas.
 - [ ] Synthèse en direct : la projection s'affiche maintenant (elle ne tournait pas avant) ; comparer ses chiffres à la synthèse.
@@ -967,7 +967,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.414 : R-12 alarme cliquable** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Une alarme Tensho d'objet récolté sonne : dans le chat, le lien de carte ouvre la carte du jeu sur le point ; « Ouvrir dans
+- [x] Une alarme Tensho d'objet récolté sonne : dans le chat, le lien de carte ouvre la carte du jeu sur le point ; « Ouvrir dans
   Tensho » ouvre la fiche de l'objet (onglet Récolte). Une alarme sans objet : message sans lien.
 
 **0.413 : R-11 tableau des collectionnables** — pendant la campagne de tests en jeu de la fin (étape h)
