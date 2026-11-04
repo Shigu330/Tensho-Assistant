@@ -24,6 +24,9 @@ public sealed unsafe class GearLoader : IDisposable
     private string? lastError;
 
     public GearCatalog? Catalog=>Volatile.Read(ref catalog);
+    private volatile bool catalogFailed;
+    /// <summary>0.492 (R-14): the catalog could not be built (a sheet changed after a game update): the pages say so, not « loading ».</summary>
+    public bool CatalogFailed=>catalogFailed;
     public IReadOnlyList<EquippedPiece> Equipped=>Volatile.Read(ref equipped);
     /// <summary>0.331 (R-14): the last read of the worn gear failed (perhaps after a game update); Equipped is then empty, not the old set.</summary>
     public bool Unavailable=>unavailable;
@@ -36,7 +39,7 @@ public sealed unsafe class GearLoader : IDisposable
         {
             try{Volatile.Write(ref catalog,Build(token));}
             catch(OperationCanceledException){}
-            catch(Exception error){log.Warning(error,"Tensho gear catalog could not be built.");}
+            catch(Exception error){catalogFailed=true;log.Warning(error,"Tensho gear catalog could not be built.");}
         },token);
         framework.Update+=OnUpdate;
     }

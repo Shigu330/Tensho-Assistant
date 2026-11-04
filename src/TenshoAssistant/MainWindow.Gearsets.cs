@@ -21,7 +21,7 @@ internal sealed partial class MainWindow
         var state=source.State;
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("GameGearsets.Title",state?.Sets.Count ?? 0)+"###GameGearsets"))return;
         ImGui.TextDisabled(localization.Get("GameGearsets.Help"));
-        if(state is null){ImGui.TextDisabled(localization.Get("GameGearsets.Reading"));return;}
+        if(state is null){ImGui.TextDisabled(localization.Get(source.Unavailable ? "GameGearsets.Unavailable":"GameGearsets.Reading"));return;}
         if(state.Sets.Count==0){ImGui.TextDisabled(localization.Get("GameGearsets.Empty"));return;}
         // Upgrades computed once per read and holdings (not every frame).
         var ownedKey=GearOwnedSource();

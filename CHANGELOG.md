@@ -3,6 +3,15 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.492.0
+- R-14, 5 constats relus contre le code et confirmés. Après une mise à jour du jeu qui casserait une feuille, la page le dit au lieu de mentir :
+  - Recettes, contenus, vendeurs : une copie vide est une erreur publiée, plus un catalogue vide qui se lit « aucune recette » ou « personne ne le vend » (les caches disque refusaient déjà ce cas).
+  - Équipement et barde de chocobo : un catalogue impossible à construire le dit, plus « Chargement » pendant toute la session.
+  - Ensembles du jeu : une lecture ratée le dit et retire les anciens ensembles, qui restaient affichés comme actuels.
+- Tests : TriadMatchAdvisorTests complété. Verify.ps1 (agent) : 929/929, 0 avertissement, 0 erreur ; DLL 0.492.0.0. Non validé en jeu (ces cas ne se produisent qu'après une mise à jour qui casse une feuille).
+### English
+- R-14: empty recipe, duty and vendor copies are reported as failures instead of empty catalogs. The gear pages and gear sets say when their data could not be read instead of loading forever or showing old sets.
+
 ## 0.491.0
 - Campagne de tests : close à la demande de l'utilisateur (« les dernières erreurs on verra en jeu ») ; les cases non cochées de TESTING restent ouvertes. Suite de la feuille de route : g2.
 - R-14, les 4 constats « valeur peut-être fausse » restés sans vérification, relus contre le code et confirmés. Ce qui n'est pas lu reste inconnu au lieu de passer pour un zéro :

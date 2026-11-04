@@ -4783,6 +4783,7 @@
     "ColumnVessel": "Vaisseau"
   },
   "GameGearsets": {
+    "Unavailable": "Les ensembles n'ont pas pu être lus (peut-être après une mise à jour du jeu).",
     "Random": "Job au hasard",
     "RandomTip": "Tire un job au hasard parmi vos ensembles d'équipement (un tirage par job, quel que soit le nombre d'ensembles), pour faire les quotidiens.",
     "BelowTop": "Seulement les jobs pas au niveau le plus haut",
@@ -5412,6 +5413,7 @@
     "NoItem": "—"
   },
   "Gear": {
+    "CatalogFailed": "Les données d'équipement du jeu n'ont pas pu être lues (peut-être après une mise à jour du jeu). Détails dans le journal.",
     "Worn": "Portée",
     "NotOwned": "Pas dans vos rangements connus.",
     "NotOwnedPartial": "Pas dans les rangements lus (certains ne sont pas encore importés : Banque).",

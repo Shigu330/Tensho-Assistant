@@ -135,6 +135,8 @@ internal sealed class RecipeCatalogLoader : IDisposable
             }
             service.Progress(position, sheet.Count);
             if (position != sheet.Count) return;
+            // 0.492 (R-14): no recipe copied means unreadable game data, not « no recipe » (the disk cache refuses it too).
+            if (rows.Count == 0) throw new InvalidDataException("Recipe sheet gave no recipe.");
             var managed = rows.ToArray();
             var version = dataVersion!;
             var token = cancellation.Token;

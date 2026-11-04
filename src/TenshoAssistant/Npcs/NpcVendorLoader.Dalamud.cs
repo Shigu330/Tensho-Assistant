@@ -99,6 +99,8 @@ internal sealed class NpcVendorLoader : IDisposable
                 var vendors=vendorShops.Select(pair=>new NpcVendor(pair.Key,names.GetValueOrDefault(pair.Key) ?? "",Array.AsReadOnly(pair.Value.Distinct().Order().ToArray()),
                     Array.AsReadOnly((locations.GetValueOrDefault(pair.Key) ?? []).ToArray()))).ToArray();
                 var rows=sales.ToArray();var version=dataVersion!;var buildToken=cancellation.Token;
+                // 0.492 (R-14): same check as the disk cache: no vendor or no sale means unreadable sheets, not « nobody sells it ».
+                if(vendors.Length==0 || rows.Length==0)throw new InvalidDataException("NPC vendor sheets gave no vendor or no sale.");
                 sales.Clear();vendorShops.Clear();locations.Clear();names.Clear();
                 if(cache is not null)toPersist=new(version,Array.AsReadOnly(vendors),Array.AsReadOnly(rows));
                 build=Task.Run<(NpcVendorCatalog?,Exception?,bool)>(()=>

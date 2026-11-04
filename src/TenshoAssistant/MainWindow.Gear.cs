@@ -15,6 +15,8 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal Func<GearCatalog?>? GearCatalog { get; set; }
+    internal Func<bool>? GearCatalogFailed { get; set; }
+    private string GearNotReady=>localization.Get(GearCatalogFailed?.Invoke()==true ? "Gear.CatalogFailed":"Gear.Loading");
     internal Func<uint,bool>? TryOnItem { get; set; }
     internal Func<IReadOnlyList<EquippedPiece>>? EquippedGear { get; set; }
     // 0.331 (R-14): the worn gear could not be read (GearLoader.Unavailable): the planner says so instead of computing on no worn set.
@@ -35,7 +37,7 @@ internal sealed partial class MainWindow
         var catalog=GearCatalog?.Invoke();
         var state=characterStats.State;
         if(state.CharacterId==0){ImGui.TextWrapped(localization.Get("CharacterUi.Offline"));return;}
-        if(catalog is null){ImGui.TextDisabled(localization.Get("Gear.Loading"));return;}
+        if(catalog is null){ImGui.TextDisabled(GearNotReady);return;}
         if(EquippedGearUnavailable?.Invoke()==true){ImGui.TextWrapped(localization.Get("Gear.WornUnavailable"));return;}
         var worn=(EquippedGear?.Invoke() ?? []).Where(piece=>catalog.Find(piece.ItemId) is not null).ToDictionary(piece=>piece.Slot);
         DrawGearWear(catalog);

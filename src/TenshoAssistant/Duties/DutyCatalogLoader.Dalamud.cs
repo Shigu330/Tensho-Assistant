@@ -57,6 +57,8 @@ internal sealed class DutyCatalogLoader : IDisposable
                 }
                 service.Progress(position,sheet.Count);
                 if (position != sheet.Count) return;
+                // 0.492 (R-14): no duty copied means unreadable game data, not « no duty »: the catch publishes the failure.
+                if (copied.Count == 0) throw new InvalidDataException("InstanceContent sheet gave no duty.");
                 var managed = copied.ToArray(); copied.Clear(); sheet = null;
                 var token = cancellation.Token;
                 build = Task.Run(() => new DutyCatalog(managed,token));

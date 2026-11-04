@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
     {
         Heading(localization.Get("ChocoboBarding.Title"),localization.Get("ChocoboBarding.Help"));
         if(characterStats.State.CharacterId==0){ImGui.TextWrapped(localization.Get("CharacterUi.Offline"));return;}
-        if(GearCatalog?.Invoke() is not { } catalog){ImGui.TextDisabled(localization.Get("Gear.Loading"));return;}
+        if(GearCatalog?.Invoke() is not { } catalog){ImGui.TextDisabled(GearNotReady);return;}
         var chocobo=Chocobo?.Invoke();
         if(ChocoboUnavailable?.Invoke()==true)ImGui.TextDisabled(localization.Get("ChocoboBarding.Unavailable"));
         else if(chocobo is null)ImGui.TextDisabled(localization.Get("ChocoboBarding.Loading"));

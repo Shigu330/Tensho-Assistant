@@ -459,6 +459,7 @@ public sealed class Plugin : IDalamudPlugin
                 if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
             }},()=>gearWear?.Dispose());
             mainWindow.GearCatalog=()=>gear?.Catalog;
+            mainWindow.GearCatalogFailed=()=>gear?.CatalogFailed==true;
             mainWindow.EquippedGear=()=>gear?.Equipped ?? [];
             // 0.340 (R-11 step 4): the companion chocobo and its bardings, read on the framework thread while the page shows them.
             Gear.ChocoboReader? chocobo=null;

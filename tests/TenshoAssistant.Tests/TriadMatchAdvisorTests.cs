@@ -55,6 +55,16 @@ internal static class TriadMatchAdvisorTests
             var panel=File.ReadAllText(Path.Combine(root,"MainWindow.TriadRequest.cs"));
             Check(panel.Contains("if(request.RulesKnown)") && panel.Contains("TriadRequest.RulesUnknown"),"no odds, and it says so");
         }),
+        ("Catalog loaders: an empty copy is a failure, a failed gear read says so (R-14)",()=>
+        {
+            var root=Path.GetFullPath("src/TenshoAssistant");
+            string Code(string file)=>File.ReadAllText(Path.Combine(root,file));
+            Check(Code("Craft/RecipeCatalogLoader.Dalamud.cs").Contains("if (rows.Count == 0) throw new InvalidDataException"),"recipes");
+            Check(Code("Duties/DutyCatalogLoader.Dalamud.cs").Contains("if (copied.Count == 0) throw new InvalidDataException"),"duties");
+            Check(Code("Npcs/NpcVendorLoader.Dalamud.cs").Contains("if(vendors.Length==0 || rows.Length==0)throw new InvalidDataException"),"vendors");
+            Check(Code("Gear/GearLoader.Dalamud.cs").Contains("catalogFailed=true;") && Code("MainWindow.Gear.cs").Contains("Gear.CatalogFailed") && Code("MainWindow.ChocoboBarding.cs").Contains("GearNotReady"),"gear catalog");
+            Check(Code("Gear/GameGearsetReader.Dalamud.cs").Contains("unavailable=true;") && Code("MainWindow.Gearsets.cs").Contains("source.Unavailable"),"gear sets");
+        }),
         ("Map and dresser readers: what is not read stays unknown (R-14)",()=>
         {
             var root=Path.GetFullPath("src/TenshoAssistant");

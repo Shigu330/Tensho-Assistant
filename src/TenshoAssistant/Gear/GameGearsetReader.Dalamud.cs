@@ -22,6 +22,9 @@ public sealed unsafe class GameGearsetReader : IDisposable
     private readonly IPluginLog log;
     private readonly IReadOnlyDictionary<uint,int> expIndex;
     private GearsetState? state;
+    private volatile bool unavailable;
+    /// <summary>0.492 (R-14): the last read failed (perhaps after a game update): State is then null, not the old sets.</summary>
+    public bool Unavailable=>unavailable;
     private long wantedUntil;
     private DateTimeOffset nextRead;
     private bool disposed,warned;
@@ -86,16 +89,19 @@ public sealed unsafe class GameGearsetReader : IDisposable
                 foreach(var (job,exp) in expIndex)
                     if(exp>=0 && exp<player->ClassJobLevels.Length && player->ClassJobLevels[exp] is > 0 and var level)levels[job]=level;
             Volatile.Write(ref state,new GearsetState(sets,levels));
+            unavailable=false;
             warned=false;
         }
         catch(Exception error)
         {
             nextRead=now.AddSeconds(30);
+            unavailable=true;
+            Volatile.Write(ref state,null);
             if(!warned){warned=true;log.Warning(error,"The game's gear sets could not be read.");}
         }
     }
 
-    private void OnLogout(int type,int code)=>Volatile.Write(ref state,null);
+    private void OnLogout(int type,int code){unavailable=false;Volatile.Write(ref state,null);}
 
     public void Dispose()
     {
