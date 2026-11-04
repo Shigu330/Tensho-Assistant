@@ -15,6 +15,8 @@ public sealed class GatheringObservedFrame
 {
     public uint JobId {get;}public int Level {get;}public uint Gp {get;}public uint MaxGp {get;}public byte NativeStatus {get;}
     public int? Attempts {get;}public int? TotalAttempts {get;}
+    /// <summary>0.515: the targeted node's row in the GatheringPoint sheet; 0 when not read.</summary>
+    public uint NodeId {get;}
     public IReadOnlyList<GatheringObservedSlot> Slots {get;}
     public string Source=>"FFXIVClientStructs.AddonGathering · UI values as shown, not normalised";
     internal static int? Number(string? text,int minimum,int maximum,bool percent=false)
@@ -25,17 +27,19 @@ public sealed class GatheringObservedFrame
             || !int.TryParse(value,NumberStyles.None,CultureInfo.InvariantCulture,out var number) || number<minimum || number>maximum)return null;
         return number;
     }
-    public GatheringObservedFrame(uint job,int level,uint gp,uint maxGp,byte status,string? attempts,string? total,IReadOnlyList<GatheringRawSlot> slots)
+    // 0.515: the game writes « -% » where a slot has no extra chance at all (crystals): none, not unknown.
+    internal static int? BoonNumber(string? text)=>text?.Replace(" ","")=="-%" ? 0:Number(text,0,100,true);
+    public GatheringObservedFrame(uint job,int level,uint gp,uint maxGp,byte status,string? attempts,string? total,IReadOnlyList<GatheringRawSlot> slots,uint nodeId=0)
     {
         ArgumentNullException.ThrowIfNull(slots);
         if(job is not (16 or 17) || level is <1 or >100 || gp>maxGp || maxGp>10000 || status is not (1 or 2)
             || slots.Count!=8 || slots.Any(slot=>slot is null || slot.Index is <0 or >7) || slots.Select(slot=>slot.Index).Distinct().Count()!=8)
             throw new ArgumentException("Gathering point observation incomplete or incompatible.");
-        JobId=job;Level=level;Gp=gp;MaxGp=maxGp;NativeStatus=status;
+        JobId=job;Level=level;Gp=gp;MaxGp=maxGp;NativeStatus=status;NodeId=nodeId;
         var left=Number(attempts,0,12);var maximum=Number(total,1,12);
         Attempts=left is { } count && maximum is { } cap && count<=cap ? count:null;TotalAttempts=maximum;
         Slots=Array.AsReadOnly(slots.Where(slot=>slot.Visible && slot.ItemId!=0).OrderBy(slot=>slot.Index)
-            .Select(slot=>new GatheringObservedSlot(slot.Index,slot.ContextResolved ? slot.BaseItemId:0,slot.ItemId,slot.Flags,Number(slot.Success,0,100,true),Number(slot.Boon,0,100,true),Number(slot.Quantity,1,20))).ToArray());
+            .Select(slot=>new GatheringObservedSlot(slot.Index,slot.ContextResolved ? slot.BaseItemId:0,slot.ItemId,slot.Flags,Number(slot.Success,0,100,true),BoonNumber(slot.Boon),Number(slot.Quantity,1,20))).ToArray());
     }
 }
 public sealed record GatheringObservationState(bool Enabled,ulong Owner,GatheringObservationStatus Status,DateTimeOffset? ObservedAt,GatheringObservedFrame? Frame,string? Error)
@@ -64,12 +68,12 @@ public sealed class GatheringObservationService : IDisposable
         }
     }
     private bool Accept(int ticket,ulong owner)=>!disposed && state.Enabled && owner!=0 && state.Owner==owner && generation==ticket;
-    internal void Publish(int ticket,ulong owner,uint job,int level,uint gp,uint maxGp,byte status,string? attempts,string? total,IReadOnlyList<GatheringRawSlot> slots)
+    internal void Publish(int ticket,ulong owner,uint job,int level,uint gp,uint maxGp,byte status,string? attempts,string? total,IReadOnlyList<GatheringRawSlot> slots,uint nodeId=0)
     {
         lock(gate)
         {
             if(!Accept(ticket,owner))return;
-            try{state=new(true,owner,GatheringObservationStatus.Observed,DateTimeOffset.UtcNow,new(job,level,gp,maxGp,status,attempts,total,slots),null);}
+            try{state=new(true,owner,GatheringObservationStatus.Observed,DateTimeOffset.UtcNow,new(job,level,gp,maxGp,status,attempts,total,slots,nodeId),null);}
             catch(ArgumentException error){generation++;state=new(true,owner,GatheringObservationStatus.Error,null,null,error.Message);}
         }
     }

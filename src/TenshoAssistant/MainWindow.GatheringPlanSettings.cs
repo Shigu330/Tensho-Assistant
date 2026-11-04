@@ -6,16 +6,12 @@ using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
-// 0.478 (user request, in-game campaign): the GP plan knows what the crafting list still needs, how many nodes that takes and the GP that comes back between them; actions can be forbidden, as for macros.
+// 0.478 (user request, in-game campaign): GP plan settings; actions can be forbidden, as for macros. 0.515: the plan is for the node in front of the player only; the crafting list only says what it still needs.
 internal sealed partial class MainWindow
 {
     private CraftList? gatherNeedsList;
     private RecipeCatalog? gatherNeedsCatalog;
     private volatile IReadOnlyDictionary<uint,long>? gatherNeeds;
-    private GpRoute? gatheringPanelRoute;
-    private string? gatheringPanelRouteKey;
-    private bool gatheringPanelBonus;
-    private readonly GatherNodeNorms gatherNodeNorms=new();
 
     private string GpForbidden=>GpActionRules.Joined(configuration.GpForbiddenActions);
     // 0.488 (user request): what the plan may not use on a job: what is forbidden in the settings, and what this job has not unlocked (a level is not enough: some come with a quest).
@@ -70,24 +66,10 @@ internal sealed partial class MainWindow
         return Math.Max(0,gross-(held.HasObservation ? held.Total:0));
     }
 
-    private void DrawGatheringListRoute(GpRoute route,long need,int seconds)
-    {
-        ImGui.PushTextWrapPos(0);
-        try
-        {
-            if(route.Reached)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ListNeed",need.ToString("N0"),route.Nodes,Math.Max(1,route.Nodes*seconds/60),route.GpSpent.ToString("N0")));
-            else ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("GatheringPanel.ListNeedTooMany",need.ToString("N0"),GpRoutes.MaxNodes));
-            if(GpRegenFor(gatheringPanelStart?.JobId ?? 0)<=0)ImGui.TextDisabled(localization.Get("GatheringPanel.ListNoRegen"));
-        }
-        finally{ImGui.PopTextWrapPos();}
-    }
-
     /// <summary>Settings › Modules › Gathering, and the GP page.</summary>
-    private void DrawGpListSettings()
+    private void DrawGpPlanSettings()
     {
         BoolSetting("GatheringPanel.ListSetting","GatheringPanel.ListSettingTip",()=>configuration.GatherPlanFromList,value=>configuration.GatherPlanFromList=value,c=>c.GatherPlanFromList);
-        BoolSetting("GatheringPanel.SaveForBonus","GatheringPanel.SaveForBonusTip",()=>configuration.GpSaveForBonus,value=>configuration.GpSaveForBonus=value,c=>c.GpSaveForBonus);
-        IntSetting("GatheringPanel.NodeSeconds","GatheringPanel.NodeSecondsTip",()=>configuration.GatherSecondsBetweenNodes,value=>configuration.GatherSecondsBetweenNodes=value,5,600,DefaultConfiguration.GatherSecondsBetweenNodes);
         IntSetting("GatheringPanel.Regen","GatheringPanel.RegenTip",()=>configuration.GpRegenPerTick,value=>configuration.GpRegenPerTick=value,0,50,DefaultConfiguration.GpRegenPerTick);
         if(configuration.GpRegenBase>0)ImGui.TextDisabled(localization.Format("GatheringPanel.RegenObserved",configuration.GpRegenBase,GpTraitBonus(16),GpTraitBonus(17),GpTraitBonus(18)));
         BoolSetting("CollectablePanel.UseScrutiny","CollectablePanel.UseScrutinyTip",()=>configuration.CollectableUseScrutiny,value=>configuration.CollectableUseScrutiny=value,c=>c.CollectableUseScrutiny);

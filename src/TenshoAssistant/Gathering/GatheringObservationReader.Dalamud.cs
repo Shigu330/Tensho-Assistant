@@ -84,7 +84,10 @@ internal sealed class GatheringObservationReader : IDisposable
                 {service.Missing(ticket,current,GatheringObservationStatus.NotReady);return;}
                 var unit=(AtkUnitBase*)handle.Address;
                 service.SetWindow(unit->RootNode==null ? null:(unit->X,unit->Y,unit->RootNode->Width*unit->Scale,unit->RootNode->Height*unit->Scale));
-                service.Publish(ticket,current,job,level,gp,maxGp,status,attempts,total,slots);
+                // 0.515: a gathering point's base id is its GatheringPoint row (docs/evidence/0.515-node-effects.md).
+                var target=local.TargetObject;
+                var node=target?.ObjectKind==Dalamud.Game.ClientState.Objects.Enums.ObjectKind.GatheringPoint ? target.BaseId:0;
+                service.Publish(ticket,current,job,level,gp,maxGp,status,attempts,total,slots,node);
             }
             catch(Exception error){service.Fail(ticket,current,error);nextRead=now+Stopwatch.Frequency*5;log.Warning(error,"Gathering observation unavailable; retry in five seconds.");}
         }

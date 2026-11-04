@@ -354,3 +354,13 @@ Decision: Gardé tel quel, sans changement de code, et déclaré dans la descrip
 Reason: Décision de l'utilisateur.
 Consequences: L'équipe peut demander de le retirer : ce serait alors à faire avant l'approbation. À revoir après la publication.
 References: docs/project/PUBLISHING.md, issue #31
+
+DEC-ID: DEC-036
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: Le plan de PR sur la liste de fabrication (0.478, 0.479) ne proposait rien sur un nœud à 5 tentatives avec 809 PR : le premier nœud vu comptait comme normal, et ses PR restaient gardés.
+Evidence: Capture de l'utilisateur ; réponses : « tampis on va retirer la lecture de la liste de recolte on fera que par node pas sur une serie de node », « si il faut quand meme effet du lieu pour ameliorer sur une node », « si 5/5 recolte au lieu de 4 c'est pas la meme que bonus recolte supplementaire », « il faut prendre en compte tous les effet pas que celui la ».
+Options: Corriger la détection du bonus et garder la série ; un seul nœud.
+Decision: Plan pour le seul nœud en cours. Tous les effets du lieu lus dans les feuilles du jeu : nommés, marqués déjà comptés pour les tentatives actives ; s'ils sont inactifs, ce qui manque et ce qu'ils rapporteraient quand c'est estimable. La ligne de la liste de fabrication reste, à titre d'information (« tu peux laisser le tooltip de la liste de fabrication c'est pratique »).
+Reason: Décision de l'utilisateur.
+Consequences: Les réglages de bonus et de secondes entre nœuds disparaissent ; celui de la liste ne commande plus que sa ligne. « PR par tic » reste pour la barre de PR.
+References: docs/evidence/0.515-node-effects.md

@@ -295,6 +295,24 @@ public sealed class Plugin : IDalamudPlugin
                 }
                 return bountifulBases.TryGetValue(item,out var value) ? value:null;
             });
+            // 0.515: a node's effects, read once per node (docs/evidence/0.515-node-effects.md). R-14: an unreadable sheet means no effect line, not a broken panel.
+            var nodeEffects=new Dictionary<uint,IReadOnlyList<Gathering.GatherNodeEffect>>();
+            mainWindow.ConfigureNodeEffects(node=>
+            {
+                if(nodeEffects.TryGetValue(node,out var known))return known;
+                var found=new List<Gathering.GatherNodeEffect>();
+                try
+                {
+                    var bonuses=data.GetExcelSheet<Lumina.Excel.Sheets.GatheringPointBonus>();
+                    if(data.GetExcelSheet<Lumina.Excel.Sheets.GatheringPoint>().TryGetRow(node,out var point))
+                        foreach(var link in point.GatheringPointBonus)
+                            if(link.RowId!=0 && bonuses.TryGetRow(link.RowId,out var bonus) && Gathering.GatherNodeEffects.From(bonus.Condition.RowId,bonus.ConditionValue,bonus.Condition.ValueNullable?.Text.ExtractText(),bonus.BonusType.RowId,bonus.BonusValue,bonus.BonusType.ValueNullable?.Text.ExtractText()) is { } effect)
+                                found.Add(effect);
+                }
+                catch(Exception error){log.Warning(error,"Node effects unavailable (perhaps after a game update).");}
+                nodeEffects[node]=found;
+                return found;
+            });
             mainWindow.ConfigureJobNames(job=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().TryGetRow(job,out var row) ? row.Name.ExtractText():null);
             var lumina=new Community.LuminaSupplementalService(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,
                 id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().TryGetRow(id,out var monster) ? monster.Singular.ExtractText():null,

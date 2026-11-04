@@ -711,6 +711,17 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.515 : aide à la récolte, plan du nœud et effet du lieu** — à voir en jouant
+
+- [ ] Nœud avec « PR ≧ 770 → tentatives +1 » (capture du 2026-11-04) : avec 809 PR, un plan d'actions apparaît, et la ligne « Effet du lieu actif : tentatives +1, déjà comptées (5 au lieu de 4) ».
+- [ ] Dépenser des PR sur ce nœud : le nombre de tentatives reste à 5 (la condition lue porte sur les PR maximum).
+- [ ] Un job avec moins de PR max que le seuil, ou Collecte ou Savoir-faire trop bas : la ligne « il manque N » et le rendement avec l'effet ; les tentatives lues sont sans l'effet.
+- [ ] Effet de quantité ou de chance supplémentaire actif : la fenêtre du jeu montre-t-elle déjà la valeur avec l'effet ? Sinon le plan la compte trop bas.
+- [ ] Cristal : « supp. 0 % » au lieu de « ? », et un plan.
+- [ ] Tous les effets : sur plusieurs lieux, chaque ligne de la case « Effet du lieu » du jeu a sa ligne dans le panneau, aussi sur un collectionnable.
+- [ ] Avec une liste de fabrication : « il en manque N, environ X nœuds comme celui-ci » ; le plan ne change pas selon la liste.
+- [ ] Paramètres › Modules › Récolte : plus de réglage de bonus ni de secondes entre deux nœuds ; le réglage de la liste cache sa ligne.
+
 **0.514 : panneaux libres en fenêtres Dalamud (#38)** — à voir en jouant
 
 - [ ] Fenêtre de suivi (réglage) : s'affiche à sa place habituelle, liste les alarmes, le nom ouvre l'objet, « Carte » ouvre le point ; la croix la ferme et décoche le réglage ; recocher la rouvre.
@@ -868,8 +879,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Fenêtre Collectionnable sur « Minerai de durium noble collectionnable » : nom complet, seuils 400 / 700 / 1000. Rien à faire de plus. En mode développeur, faire quelques actions : le journal note les valeurs de la fenêtre.
 - [x] Aide à la récolte : plus de texte coupé ; le nom, puis les taux dessous. Sur un collectionnable : pas de « plan non calculé » mais un message clair.
 - [x] Récolte › onglet Collectionnables : tableau trié en cliquant sur chaque colonne, dans les deux sens.
-- [x] Avec une liste de fabrication choisie qui demande un matériau récolté : la ligne « il en manque N, environ X nœuds », le plan réparti. Comparer après quelques nœuds. Les matières d'une recette intermédiaire comptent.
-- [x] Paramètres › Modules › Récolte : actions interdites jamais proposées (panneau et page PR) ; secondes entre deux nœuds ; PR par tic mesuré sur un nœud quand les PR remontent.
+- Plan réparti sur la liste de fabrication : retiré en 0.515 (DEC-036) ; la ligne « il en manque N » reste.
+- [x] Paramètres › Modules › Récolte : actions interdites jamais proposées (panneau et page PR) ; PR par tic mesuré sur un nœud quand les PR remontent.
 
 **0.476 : thème proposé par un outil** — TEMPLATES-001
 

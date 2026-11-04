@@ -22,6 +22,18 @@ internal static class Gathering478Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Crafting list raw needs: a recipe's materials over the whole list, shared materials added, an item without recipe as it is",() =>
+        {
+            RecipeDefinition Recipe(uint recipe,uint result,params (uint Id,int Amount)[] ingredients)=>new(recipe,result,1,"Test",100,ingredients.Select(row=>new RecipeIngredient(row.Id,row.Amount)).ToArray(),0,null);
+            var ingot=Recipe(1,100,(1000,2));var sword=Recipe(2,200,(100,3),(1000,1));var plate=Recipe(3,300,(1000,5));
+            var catalog=RecipeCatalog.Build([ingot,sword,plate],"fixture");
+            var list=new CraftList("L",[new(200,2),new(300,1),new(1000,7),new(2000,4)]);
+            var needs=CraftLists.RawNeeds(list,new Dictionary<uint,RecipeDefinition>{[200]=sword,[300]=plate},catalog);
+            Check(needs[1000]==2*(3*2+1)+5+7,"shared raw material: "+needs[1000]);
+            Check(needs[2000]==4,"an entry without recipe");
+            Check(!needs.ContainsKey(100) && !needs.ContainsKey(200),"nothing crafted is gathered");
+            Check(CraftLists.RawNeeds(new CraftList("E",[]),new Dictionary<uint,RecipeDefinition>(),catalog).Count==0,"empty list");
+        }),
         ("Collectable with a long name: the game's cut name finds its thresholds, only when it names one item",() =>
         {
             var catalog=new CollectableCatalog([Rule(36291,"Minerai de durium noble collectionnable",80,1000,10),Rule(35636,"Poings en durium noble collectionnables",80,494,10),Rule(9,"Bois collectionnable",50,100,1),Rule(10,"Bois collectionné",50,120,1)]);
@@ -56,39 +68,7 @@ internal static class Gathering478Tests
             Check(botanist.Best.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Yield),"the botanist's twin too");
             Check(GpActionRules.Joined(["b","a","a",""])=="a|b" && GpActionRules.Joined(null)=="","joined");
             Check(GpActionRules.Groups(Catalog()).All(group=>group.Miner is not null && group.Botanist is not null),"each action has its twin");
-            Check(Read("MainWindow.Settings.cs").Contains("DrawGpListSettings();") && Read("MainWindow.GatheringGp.cs").Contains("Forbidden:GpForbidden"),"in the settings and the GP page");
-        }),
-        ("GP route: the fewest nodes for the amount; GP shared out and coming back; the last node spends only what it needs",() =>
-        {
-            var whole=Node(800);
-            var baseYield=whole.Baseline;
-            Check(baseYield==4m,"fixture: 4 items per node without GP");
-            var small=GpRoutes.Build(whole,new(2,800,800,0))!;
-            Check(small is {Nodes:1,Reached:true,GpSpent:0},"two items: one node, no GP spent");
-            var one=GpRoutes.Build(whole,new(6,800,800,0))!;
-            Check(one is {Nodes:1,Reached:true} && one.First.Cost>0 && one.First.ExpectedYield>=6 && one.First==whole.Frontier.First(plan=>plan.ExpectedYield>=6),"one node, the cheapest plan that does it");
-            var noRegen=GpRoutes.Build(whole,new(200,800,800,0))!;
-            var regen=GpRoutes.Build(whole,new(200,800,800,300))!;
-            Check(noRegen.Reached && regen.Reached && regen.Nodes<noRegen.Nodes,$"GP coming back means fewer nodes: {regen.Nodes} against {noRegen.Nodes}");
-            Check(noRegen.GpSpent<=800,"no more GP spent than there is");
-            Check(noRegen.First.Cost<=800/noRegen.Nodes+1 || noRegen.Nodes==1,"the GP is shared, not all on the first node");
-            var poor=GpRoutes.Build(whole,new(40,0,800,0))!;
-            Check(poor is {Nodes:10,GpSpent:0} && poor.First.Cost==0,"no GP: only nodes");
-            Check(GpRoutes.Build(whole,new(0,800,800,0)) is null,"nothing needed: no route");
-            var never=GpRoutes.Build(Node(800,success:0),new(5,800,800,0))!;
-            Check(!never.Reached && never.Nodes==GpRoutes.MaxNodes,"out of reach is said");
-        }),
-        ("Crafting list raw needs: a recipe's materials over the whole list, shared materials added, an item without recipe as it is",() =>
-        {
-            RecipeDefinition Recipe(uint recipe,uint result,params (uint Id,int Amount)[] ingredients)=>new(recipe,result,1,"Test",100,ingredients.Select(row=>new RecipeIngredient(row.Id,row.Amount)).ToArray(),0,null);
-            var ingot=Recipe(1,100,(1000,2));var sword=Recipe(2,200,(100,3),(1000,1));var plate=Recipe(3,300,(1000,5));
-            var catalog=RecipeCatalog.Build([ingot,sword,plate],"fixture");
-            var list=new CraftList("L",[new(200,2),new(300,1),new(1000,7),new(2000,4)]);
-            var needs=CraftLists.RawNeeds(list,new Dictionary<uint,RecipeDefinition>{[200]=sword,[300]=plate},catalog);
-            Check(needs[1000]==2*(3*2+1)+5+7,"shared raw material: "+needs[1000]);
-            Check(needs[2000]==4,"an entry without recipe");
-            Check(!needs.ContainsKey(100) && !needs.ContainsKey(200),"nothing crafted is gathered");
-            Check(CraftLists.RawNeeds(new CraftList("E",[]),new Dictionary<uint,RecipeDefinition>(),catalog).Count==0,"empty list");
+            Check(Read("MainWindow.Settings.cs").Contains("DrawGpPlanSettings();") && Read("MainWindow.GatheringGp.cs").Contains("Forbidden:GpForbidden"),"in the settings and the GP page");
         }),
         ("Collectable window values: read from the in-game capture; anything missing or of another type gives no turn",() =>
         {
@@ -171,7 +151,7 @@ internal static class Gathering478Tests
             Check(CollectableAdvisor.Advise(close with {IntuitionChance=0},3,ore,focusBonus)!.Move!=CollectableMove.Focus,"chance not read: Focus not proposed");
             var panel=Read("MainWindow.CollectablePanel.cs");
             Check(panel.Contains("LearnCollectableBonuses(turn,active);") && panel.Contains("\"CollectablePanel.LearnScrutiny\"") && Read("Plugin.cs").Contains("status.StatusId==757"),"measured, asked for, status read");
-            Check(Read("Configuration.cs").Contains("\"CollectableUseFocus\"") && Read("MainWindow.GatheringListPlan.cs").Contains("\"CollectablePanel.UseFocus\"") && Read("MainWindow.GatheringListPlan.cs").Contains("\"CollectablePanel.UseScrutiny\""),"setting");
+            Check(Read("Configuration.cs").Contains("\"CollectableUseFocus\"") && Read("MainWindow.GatheringPlanSettings.cs").Contains("\"CollectablePanel.UseFocus\"") && Read("MainWindow.GatheringPlanSettings.cs").Contains("\"CollectablePanel.UseScrutiny\""),"setting");
         }),
         ("Collectable plan always ends: at the maximum, above high, with a free Meticulous and the smallest gains (a stack overflow closed the game, in-game report)",() =>
         {
@@ -327,7 +307,7 @@ internal static class Gathering478Tests
             Check(CollectableAdvisor.Advise(noBrazen,4,ore)!.Move!=CollectableMove.Brazen,"nor a roll the window does not offer");
             var locked=GpActionRules.Joined(GpActionCatalog.Specs.Where(spec=>spec.JobId==16 && spec.Effect==GpEffect.Attempt).Select(GpActionRules.Key));
             Check(Node(1000,locked).Frontier.All(plan=>plan.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Attempt)),"an action not learned leaves the GP plan");
-            var list=Read("MainWindow.GatheringListPlan.cs");
+            var list=Read("MainWindow.GatheringPlanSettings.cs");
             Check(list.Contains("!unlocked(spec.Id)") && Read("MainWindow.GatheringPanel.cs").Contains("Forbidden:GpForbiddenFor(start.JobId)") && Read("MainWindow.GatheringGp.cs").Contains("GpForbiddenFor(gpJob)") && Read("MainWindow.CollectablePanel.cs").Contains("GpForbiddenFor(job)"),"used by the panel, the GP page and the collectable plan");
             Check(Read("Plugin.cs").Contains("unlocks.IsActionUnlocked(row);"),"the game's unlock state");
         }),
@@ -343,36 +323,11 @@ internal static class Gathering478Tests
             Check(replacer.Contains("var waiting=visible && !wasVisible && now<startingUntil && options.ReplaceGameMap && !bypass && !canShow();") && replacer.Contains("if(visible && !wasVisible && !waiting)") && replacer.Contains("wasVisible=visible && !waiting;"),"the decision waits");
             Check(replacer.Contains("startingUntil=DateTimeOffset.UtcNow.AddSeconds(15)"),"not for ever: a map that cannot draw (combat, duty) still leaves the game's");
         }),
-        ("Major bonus: normal is the plainest node seen; a normal node keeps its GP, a bonus node spends it",() =>
-        {
-            var norms=new GatherNodeNorms();
-            var plain=new GatherNodeShape(4,1,10);
-            Check(norms.Observe(1,plain)==plain && !GatherNodeNorms.IsBonus(plain,plain),"the first node is normal");
-            Check(GatherNodeNorms.IsBonus(norms.Observe(1,plain with {Attempts=5}),plain with {Attempts=5}),"one attempt more");
-            Check(GatherNodeNorms.IsBonus(norms.Observe(1,plain with {Quantity=2}),plain with {Quantity=2}),"a higher quantity");
-            Check(GatherNodeNorms.IsBonus(norms.Observe(1,plain with {Boon=40}),plain with {Boon=40}) && !GatherNodeNorms.IsBonus(norms.Observe(1,plain with {Boon=39}),plain with {Boon=39}),"a much higher extra chance only");
-            var lower=new GatherNodeShape(3,1,10);
-            Check(norms.Observe(1,lower).Attempts==3 && norms.Observe(2,plain)==plain,"a plainer one becomes normal; by item");
-            var whole=Node(800);
-            var saved=GpRoutes.Build(whole,new(200,800,800,0,true,false))!;
-            Check(saved.First.Cost==0 && saved.GpSpent<=800,"normal node, GP not full of regen: plain gathering");
-            var overflow=GpRoutes.Build(whole,new(200,800,800,120,true,false))!;
-            Check(overflow.First.Cost<=120,"GP that would be lost may be spent: "+overflow.First.Cost);
-            var richer=Node(800,attempts:6);
-            var bonus=GpRoutes.Build(richer,new(200,800,800,0,true,true),Node(800))!;
-            Check(bonus.First.Cost>400 && bonus.First.Cost<=800,"bonus node: GP spent here: "+bonus.First.Cost);
-            var last=GpRoutes.Build(whole,new(6,800,800,0,true,false))!;
-            Check(last is {Nodes:1,Reached:true} && last.First.ExpectedYield>=6,"a node that can finish the list uses what it takes");
-            var plan=Read("MainWindow.GatheringPanel.cs");
-            Check(plan.Contains("Math.Clamp(first.Quantity ?? 1,1,20)") && plan.Contains("gatherNodeNorms.Observe(slot.ItemId,shape)") && plan.Contains("configuration.GpSaveForBonus,gatheringPanelBonus),usual)"),"wired");
-        }),
         ("Gathering panel: readable at its width; a collectable says where its GP goes; the regeneration is measured, or said to be unknown",() =>
         {
             var panel=Read("MainWindow.GatheringPanel.cs");
             Check(panel.Contains("\"GatheringPanel.CollectablePlan\"") && panel.Contains("Collectables?.Catalog?.For(slot.ItemId) is {Count:>0}"),"a collectable has no GP plan here, and says why");
             Check(panel.Contains("ImGui.PushTextWrapPos(0);") && panel.Contains("BeginGroup"),"texts wrap; name and rates on two lines");
-            Check(panel.Contains("GpRoutes.Build("),"route used");
-            Check(Read("MainWindow.GatheringListPlan.cs").Contains("\"GatheringPanel.ListNoRegen\""),"no invented regeneration");
             foreach(var language in new[]{"en","fr"})
             {
                 var texts=System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(Path.GetFullPath($"src/TenshoAssistant/Localization/Languages/{language}.json")))!["CollectablePanel"]!;

@@ -3,6 +3,16 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.515.0
+- Rapport de l'utilisateur en jeu (capture, 5 tentatives, effet du lieu « PR ≧ 770 → tentatives +1 ») : l'aide à la récolte ne proposait rien avec 809 PR. Cause : le plan sur la liste de fabrication gardait les PR pour un « nœud à bonus majeur », et le premier nœud vu comptait toujours comme normal.
+- Décision de l'utilisateur (DEC-036) : plus de plan sur une série de nœuds. Retirés : répartition des PR, « garder les PR pour les nœuds à bonus », secondes entre deux nœuds (`GpRoutes`, `GatherNodeNorms`, 2 réglages). Le panneau montre le meilleur plan du nœud en cours. La ligne de la liste de fabrication reste, à la demande de l'utilisateur : ce qu'il manque et le nombre de nœuds comme celui-ci, à titre d'information.
+- Tous les effets du lieu lus dans les feuilles du jeu, dans ses mots ([preuve](docs/evidence/0.515-node-effects.md)) : actif, le panneau le dit (tentatives : « déjà compté dans le plan, 5 au lieu de 4 ») ; inactif, il dit ce qu'il manque et, pour les tentatives, la quantité, la chance supplémentaire et le taux de récolte, le rendement avec lui ; une condition illisible par Tensho est affichée sans état. La condition du jeu porte sur les PR maximum, donc dépenser ne la perd pas (texte anglais du jeu, « Max GP » ; le français dit seulement « PR »).
+- Cristaux : le jeu écrit « -% » pour la chance supplémentaire ; c'est aucune, plus « ? », et leur plan se calcule.
+- Tests : GatherNodeEffects515Tests, tests de route retirés. Verify.ps1 (agent) : 979/979, 0 avertissement, 0 erreur ; DLL 0.515.0.0. Non validé en jeu.
+### English
+- The gathering help no longer plans GP over a series of nodes: it shows the best plan for the node in front of you. This fixes a plan that spent nothing with 809 GP on a node with an extra attempt. The crafting list line stays, as information.
+- All node effects are read from the game's sheets, in the game's words: an active one is named, an inactive one says what is missing and, when it can be estimated, what it would give. A crystal's « -% » extra chance now reads as none.
+
 ## 0.514.0
 - Demande de l'utilisateur (issue #38, règle Dalamud : « si ça ressemble à une fenêtre, utiliser l'API de fenêtres ») : fenêtre de suivi, tâches à l'écran, barre d'usure et barre de PR passent par le système de fenêtres de Dalamud (`PanelWindow`). Mêmes identifiants, donc positions gardées ; mêmes réglages. Échap ne les ferme pas (cela couperait le réglage). Une erreur ne coupe que le panneau concerné, comme avant, et le temps de dessin reste dans Diagnostics.
 - Vu en passant : pour le guide et la carte, `Plugin.Draw` recopie l'état dans `IsOpen` avant que `OnClose` puisse s'exécuter, ce qui peut annuler la croix de fermeture. L'état est maintenant écrit dès `PostDraw`, dans la même image. Déduit de la lecture du code et de la mémoire du fonctionnement de Dalamud, non observé en jeu.

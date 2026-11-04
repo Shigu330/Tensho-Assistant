@@ -237,7 +237,7 @@ internal sealed partial class MainWindow
             if(BoolDefaultButton("GatheringPanel.Setting",DefaultConfiguration.GatheringPanel,configuration.GatheringPanel))
                 SaveGatheringChoice(DefaultConfiguration.GatheringPanel ? true:null,DefaultConfiguration.GatheringPanel);
             ImGui.TextWrapped(localization.Get("ModuleSettings.GatheringHelp"));
-            DrawGpListSettings();
+            DrawGpPlanSettings();
         }
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("Gear.Title"),ImGuiTreeNodeFlags.DefaultOpen))DrawGearSettings();
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ModuleSettings.Games"),ImGuiTreeNodeFlags.DefaultOpen))

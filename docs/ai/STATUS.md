@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-04)
 
-VERSION: 0.514.0.0 (dernière release : Stable-0.451.0, 2026-11-03) — Verify.ps1 (agent) 976/976, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.515.0.0 (dernière release : Stable-0.451.0, 2026-11-03) — Verify.ps1 (agent) 979/979, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: préparer la 1.0.0 (publication Dalamud) ; voir [GOAL](GOAL.md) et [PUBLISHING](../project/PUBLISHING.md).
 QUOTA: réserve utilisateur 1 % (5 h et semaine). L'agent ne voit pas le compteur.
 
@@ -20,6 +20,7 @@ Sur rapports de l'utilisateur, détail dans [STATUS-ARCHIVE](STATUS-ARCHIVE.md) 
 
 ## À valider en jeu
 Liste complète : [TESTING](../project/TESTING.md), 284 cases ouvertes, aucune déclarée validée sans rapport ; elles se règlent quand l'utilisateur les signale en jouant. À essayer d'abord :
+- 0.515 aide à la récolte : plan du nœud, ligne « Effet du lieu », cristaux ;
 - 0.514 les 4 panneaux en fenêtres Dalamud, et la croix du guide et de la carte ;
 - 0.508 ventes des servants, 0.509 coup conseillé pendant la synthèse ;
 - 0.502–0.506 aide, guide, signaler un problème ; 0.511 aide qui suit la langue ;

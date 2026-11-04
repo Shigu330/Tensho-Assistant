@@ -53,7 +53,7 @@ public static class ConfigurationReset
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
-        "Discord", "ThemeMode", "ThemeModeBeforeTool", "GatherPlanFromList", "GpSaveForBonus", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableRiskTolerance", "GatherSecondsBetweenNodes", "GpRegenPerTick", "GpForbiddenActions", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
+        "Discord", "ThemeMode", "ThemeModeBeforeTool", "GatherPlanFromList", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
         // 0.347 (g, I-08): the two shop reminder settings (the notes themselves are saved data, kept by « restore every setting »).
         "ItemNoteShopReminder", "ItemNoteImportantSound",
@@ -362,10 +362,8 @@ public sealed partial class Configuration
     public TenshoAssistant.Alarms.DiscordSettings Discord { get; set; } = new();
     // 0 follows the game's interface theme; 1..6 force a PluginTheme (value - 1).
     public int ThemeMode { get; set; }
-    // 0.478 (user request, in-game campaign): the GP plan over a crafting list.
+    // 0.478 (user request, in-game campaign): what the crafting list still needs, in the gathering help; since 0.515 information only.
     public bool GatherPlanFromList { get; set; } = true;
-    // 0.479 (user request): normal nodes keep their GP for a node with a major bonus.
-    public bool GpSaveForBonus { get; set; } = true;
     // 0.480 (user report): Scrutiny in the collectable plan, and what the bonuses add, as measured in the game's window.
     public bool CollectableUseScrutiny { get; set; } = true;
     public bool CollectableUseRestore { get; set; } = true;
@@ -374,7 +372,6 @@ public sealed partial class Configuration
     public bool CollectableUseFocus { get; set; } = true;
     // 0.484 (user request): 100 chooses on the average alone, 0 on the worst outcome alone.
     public int CollectableRiskTolerance { get; set; } = 50;
-    public int GatherSecondsBetweenNodes { get; set; } = 30;
     public int GpRegenPerTick { get; set; }
     // 0.488: GP per tick without any Enhanced GP Regeneration trait, measured. Replaces GpRegenObserved, whose value could be wrong.
     public int GpRegenBase { get; set; }

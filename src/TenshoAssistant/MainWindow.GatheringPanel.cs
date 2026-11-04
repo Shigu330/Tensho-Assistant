@@ -83,7 +83,8 @@ internal sealed partial class MainWindow
             ImGui.PushTextWrapPos(0);
             try
             {
-                DrawGatheringPanelPlan(chosen,rating,items,(int)frame.MaxGp);
+                DrawGatheringPanelPlan(chosen,rating,items,frame);
+                DrawGatheringNodeEffects(frame,rating);
                 ImGui.TextDisabled(localization.Get("GatheringPanel.Footer"));
             }
             finally{ImGui.PopTextWrapPos();}
@@ -111,7 +112,11 @@ internal sealed partial class MainWindow
     }
 
     // GP plan for the chosen item from the node as it opened (TrackGatheringNode); recomputed only when those values change.
-    private void DrawGatheringPanelPlan(GatheringObservedSlot? slot,int rating,ItemCatalog? items,int maxGp)
+    private Func<uint,IReadOnlyList<GatherNodeEffect>>? nodeEffectsOf;
+    internal void ConfigureNodeEffects(Func<uint,IReadOnlyList<GatherNodeEffect>> read)=>nodeEffectsOf=read;
+    private readonly Dictionary<GatherNodeEffect,decimal> gatheringPanelEffectWith=[];
+    private string? gatheringPanelExtraKey;
+    private void DrawGatheringPanelPlan(GatheringObservedSlot? slot,int rating,ItemCatalog? items,GatheringObservedFrame frame)
     {
         // 0.478 (user report): a collectable's GP goes in the game's Collectable window, not in the actions of this plan; its rates here are not those of an ordinary gather.
         if(slot is not null && Collectables?.Catalog?.For(slot.ItemId) is {Count:>0}){ImGui.TextDisabled(localization.Get("GatheringPanel.CollectablePlan"));return;}
@@ -119,14 +124,13 @@ internal sealed partial class MainWindow
         var first=start.Slots.GetValueOrDefault((slot.Index,slot.RawItemId));
         var bountiful=bountifulBase?.Invoke(slot.ItemId) is { } baseValue ? BountifulEstimate.Bonus(rating,baseValue):null;
         var key=(start.JobId,start.Level,slot.Index,slot.ItemId,(int)start.Gp,start.Attempts,first.Late,first.Success,first.Boon,bountiful,catalog);
-        // 0.478: the route also follows what the list needs, the GP that comes back and the forbidden actions.
-        var need=GatherListNeed(slot.ItemId);var seconds=Math.Clamp(configuration.GatherSecondsBetweenNodes,5,600);
-        var regenPerNode=GpRegenFor(start.JobId)*seconds/3;
-        var routeKey=$"{need}|{maxGp}|{regenPerNode}|{GpForbiddenFor(start.JobId)}|{first.Quantity}|{configuration.GpSaveForBonus}";
-        if(routeKey!=gatheringPanelRouteKey){gatheringPanelRouteKey=routeKey;gatheringPanelKey=null;}
+        // 0.515: the node's effects, and what else can change the plan without changing the node.
+        var perception=GatheringPerception(start.JobId);
+        var extraKey=$"{GpForbiddenFor(start.JobId)}|{first.Quantity}|{frame.NodeId}|{frame.MaxGp}|{rating}|{perception}";
+        if(extraKey!=gatheringPanelExtraKey){gatheringPanelExtraKey=extraKey;gatheringPanelKey=null;}
         if(key!=gatheringPanelKey)
         {
-            gatheringPanelRoute=null;gatheringPanelBonus=false;
+            gatheringPanelEffectWith.Clear();
             gatheringPanelKey=key;gatheringPanelItem=slot.ItemId;gatheringPanelPlan=null;gatheringPanelLate=first.Late;
             // 0.330 (audit 7): an unread success, boon or attempt count is never replaced (it was 100 % success, 0 % boon): no plan, and the
             // panel names what is missing. An unknown Bountiful bonus uses the rule's floor, +1 (BountifulEstimate « else +1 »): a lower
@@ -144,33 +148,26 @@ internal sealed partial class MainWindow
                     var quantity=Math.Clamp(first.Quantity ?? 1,1,20);
                     var scenario=new GpScenario(start.JobId,start.Level,(int)start.Gp,attempts,quantity,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbiddenFor(start.JobId));
                     gatheringPanelPlan=GpOptimizer.Solve(scenario,catalog);
-                    var shape=new GatherNodeShape(attempts,quantity,boon);
-                    var normal=gatherNodeNorms.Observe(slot.ItemId,shape);
-                    gatheringPanelBonus=GatherNodeNorms.IsBonus(normal,shape);
-                    if(need>0 && maxGp>0)
-                    {
-                        var whole=scenario with {Budget=maxGp};
-                        var usual=gatheringPanelBonus ? GpOptimizer.Solve(whole with {Attempts=normal.Attempts,BaseYield=normal.Quantity,BoonPercent=normal.Boon},catalog):null;
-                        gatheringPanelRoute=GpRoutes.Build(GpOptimizer.Solve(whole,catalog),new(need,(int)start.Gp,maxGp,regenPerNode,configuration.GpSaveForBonus,gatheringPanelBonus),usual);
-                    }
+                    foreach(var effect in NodeEffects(frame))
+                        if(GatherNodeEffects.Missing(effect,(int)frame.MaxGp,rating,perception)>0 && GatherNodeEffects.With(scenario,effect) is { } better)
+                            gatheringPanelEffectWith[effect]=GpOptimizer.Solve(better,catalog).Best.ExpectedYield;
                 }
-                catch(ArgumentException){gatheringPanelPlan=null;gatheringPanelRoute=null;}
+                catch(ArgumentException){gatheringPanelPlan=null;gatheringPanelEffectWith.Clear();}
             }
         }
         ImGui.TextColored(Accent,localization.Format("GatheringPanel.PlanFor",items?.Find(gatheringPanelItem)?.Name ?? gatheringPanelItem.ToString()));
-        if(gatheringPanelRoute is { } route)
-        {
-            DrawGatheringListRoute(route,need,seconds);
-            if(configuration.GpSaveForBonus)ImGui.TextDisabled(localization.Get(gatheringPanelBonus ? "GatheringPanel.NodeBonus":"GatheringPanel.NodeNormal"));
-        }
+        var need=GatherListNeed(slot.ItemId);
         if(gatheringPanelPlan is not { } plan)
         {
+            if(need>0)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
             ImGui.TextDisabled(gatheringPanelLate ? localization.Get("GatheringPanel.AfterStart")
                 :gatheringPanelMissing.Length>0 ? localization.Format("GatheringPanel.Missing",string.Join(", ",gatheringPanelMissing.Select(localization.Get)))
                 :localization.Get("GatheringPanel.NoPlan"));
             return;
         }
-        var shown=gatheringPanelRoute?.First ?? plan.Best;
+        var shown=plan.Best;
+        // 0.515 (user request): the crafting list only says what it still needs; the plan is for this node.
+        if(need>0)ImGui.TextColored(Accent,shown.ExpectedYield>0 ? localization.Format("GatheringPanel.ListNeedNodes",need.ToString("N0"),Math.Ceiling(need/shown.ExpectedYield).ToString("N0")):localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
         ImGui.TextDisabled(localization.Format("GatheringPanel.Expected",shown.ExpectedYield.ToString("0.0"),plan.Baseline.ToString("0.0"),shown.Cost));
         if(start.Frozen)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanAtStart",plan.Scenario.Budget));
         if(gatheringPanelBountifulFloor)ImGui.TextDisabled(localization.Get("GatheringPanel.BountifulFloor"));
@@ -183,5 +180,26 @@ internal sealed partial class MainWindow
         }
         if(shown.Actions.Any(use=>use.Action.Spec.Effect==GpEffect.Attempt) && plan.Scenario.Level>=GpScenario.EurekaLevel)
             ImGui.TextDisabled(localization.Get("GpUi.Eureka"));
+    }
+
+    private IReadOnlyList<GatherNodeEffect> NodeEffects(GatheringObservedFrame frame)=>frame.NodeId!=0 && nodeEffectsOf is { } read ? read(frame.NodeId):[];
+    private int GatheringPerception(uint job)=>characterStats.State is var stats && stats.JobId==job && stats.Values.TryGetValue("Perception",out var known) ? (int)known:0;
+
+    // 0.515 (user request): every effect of the node, in the game's words. Five attempts from the node are not an action that adds one: the plan already counts them, and the line says so.
+    private void DrawGatheringNodeEffects(GatheringObservedFrame frame,int rating)
+    {
+        var perception=GatheringPerception(frame.JobId);
+        foreach(var effect in NodeEffects(frame))
+        {
+            var missing=GatherNodeEffects.Missing(effect,(int)frame.MaxGp,rating,perception);
+            if(missing is null)ImGui.TextDisabled(localization.Format("GatheringPanel.EffectUnknown",effect.Condition,effect.Text));
+            else if(missing>0)
+            {
+                ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("GatheringPanel.EffectMissing",effect.Condition,effect.Text,missing));
+                if(gatheringPanelEffectWith.TryGetValue(effect,out var with))ImGui.TextDisabled(localization.Format("GatheringPanel.EffectWith",with.ToString("0.0")));
+            }
+            else if(effect.Kind==GatherEffectKind.Attempts && frame.TotalAttempts is { } total)ImGui.TextColored(Success,localization.Format("GatheringPanel.EffectOnAttempts",effect.Text,total,total-effect.Value));
+            else ImGui.TextColored(Success,localization.Format("GatheringPanel.EffectOn",effect.Text));
+        }
     }
 }

@@ -5,6 +5,30 @@ using Lumina.Excel.Sheets;
 // Read-only evidence for NPC-VENDORS-014: how scrip exchanges encode currencies and how NPCs reach their shops.
 if(args.Length is <1 or >2)throw new ArgumentException("Supply installed sqpack directory and optionally an item name.");
 using var data=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.French,CacheFileResources=false});
+// PROBE_GATHERBONUS (0.515): node effects: GatheringCondition and GatheringPointBonusType in English and French, how often each pair is used, and the bonus rows of the normal manganese nodes.
+if(Environment.GetEnvironmentVariable("PROBE_GATHERBONUS") is { Length:>0 })
+{
+    var gbGame=data;
+    foreach(var language in new[]{Lumina.Data.Language.English,Lumina.Data.Language.French})
+    {
+        Console.WriteLine("language "+language);
+        foreach(var row in gbGame.GetExcelSheet<Lumina.Excel.Sheets.GatheringCondition>(language)!)Console.WriteLine($"condition {row.RowId}: {row.Text.ExtractText()}");
+        foreach(var row in gbGame.GetExcelSheet<Lumina.Excel.Sheets.GatheringPointBonusType>(language)!)Console.WriteLine($"type {row.RowId}: {row.Text.ExtractText()}");
+    }
+    var gbBonus=gbGame.GetExcelSheet<Lumina.Excel.Sheets.GatheringPointBonus>()!;
+    foreach(var group in gbBonus.GroupBy(row=>(Condition:row.Condition.RowId,Type:row.BonusType.RowId)).OrderBy(group=>group.Key))
+        Console.WriteLine($"pair condition {group.Key.Condition} type {group.Key.Type}: {group.Count()} rows, values {string.Join(",",group.Select(row=>row.BonusValue).Distinct().Order())}, needs {group.Min(row=>row.ConditionValue)}-{group.Max(row=>row.ConditionValue)}");
+    var gbPoints=gbGame.GetExcelSheet<Lumina.Excel.Sheets.GatheringPoint>()!;
+    var gbWith=gbPoints.Count(point=>point.GatheringPointBonus.Any(link=>link.RowId!=0));
+    Console.WriteLine($"points {gbPoints.Count} with a bonus {gbWith}");
+    foreach(var bonus in gbBonus.Where(row=>row.ConditionValue==770))
+    {
+        var users=gbPoints.Where(point=>point.GatheringPointBonus.Any(link=>link.RowId==bonus.RowId)).Select(point=>point.RowId).Take(6);
+        Console.WriteLine($"bonus row {bonus.RowId}: condition {bonus.Condition.RowId} >= {bonus.ConditionValue}, type {bonus.BonusType.RowId} value {bonus.BonusValue}; points {string.Join(",",users)}");
+    }
+    return;
+}
+
 // PROBE_VESSELPARTS (R-11 step 3): submarine and airship build data — every field and row of SubmarinePart, SubmarineRank,
 // AirshipExplorationPart/Level/Point and SubmarineExploration (typed fields next to the raw column layout, to see unmapped columns),
 // and how a part row maps to its Item (name): items whose AdditionalData points to a part sheet, their FilterGroup and UI category.
