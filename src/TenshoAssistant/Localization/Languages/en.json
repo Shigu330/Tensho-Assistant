@@ -74,6 +74,18 @@
     "Cancel": "Cancel"
   },
   "MyToolsUi": {
+    "Gallery": "Gallery",
+    "GalleryClose": "Close the gallery",
+    "GalleryTip": "Tools proposed by players, read by a person before being published.",
+    "GalleryHelp": "Tools from the plugin's repository. Each one is shown in full before you install it.",
+    "GalleryLoad": "Load the list",
+    "GalleryLoadTip": "Reads the list from GitHub. Nothing is read before this click, and nothing about you is sent.",
+    "GalleryLoading": "Reading…",
+    "GalleryEmpty": "The gallery is empty.",
+    "GalleryOpen": "See",
+    "GalleryOpenTip": "Reads this tool and shows what it holds. Nothing is installed yet.",
+    "GalleryInstalled": "Installed",
+    "GalleryCloseTool": "Close this tool",
     "Create": "Create a tool",
     "CreateTip": "Compose a tool block by block, without writing any file.",
     "Edit": "Edit",
@@ -117,6 +129,10 @@
     "LinkCancel": "Cancel"
   },
   "MyToolsErrors": {
+    "GalleryUnavailable": "The gallery could not be read. Try again later.",
+    "GalleryBroken": "The gallery's list cannot be read.",
+    "GalleryMismatch": "This tool is not the file the gallery's list announces. It was not opened.",
+    "GalleryLicense": "This tool is not under the gallery's free licence.",
     "Empty": "Nothing to read.",
     "TooLarge": "This tool is too large.",
     "NotJson": "This is not a tool: the text cannot be read.",
@@ -3084,6 +3100,7 @@
     "ProprietaryLicense": "proprietary, all rights reserved",
     "Footer": "Something missing or a licence to fix? Report it on Tensho's GitHub repository:",
     "Items": {
+      "ToolGallery": "Tools shared by players (My tools › Gallery): data only, no code, read from this plugin's repository on your click; nothing about you is sent.",
       "LuminaSupplementalAirships": "Airship sector unlock tree, possible loot list (without quantity or rate) and English names of seasonal events (embedded snapshots, GPL-3.0 notice at the top of the files).",
       "Dalamud": "Plugin host: game data, framework, player state, chat, commands, server info bar, context menus, textures, hooks, windows and saving the configuration.",
       "DalamudBindingsImGui": "C# binding of Dear ImGui that draws the whole interface (main window, map, panels next to the game's windows).",

@@ -96,6 +96,8 @@ public static class CreditCatalog
         new("PaissaDB", CreditKind.Online, "PaissaDB", "zhudotexe", "none", "https://github.com/zhudotexe/FFXIV_PaissaDB", "",
             ["Community/PaissaDb.cs", "MainWindow.Plots.cs", "Plugin.cs"], ["paissadb.zhu.codes"], "PlotWatch", false),
         // 0.447 (X-04, decided 2026-11-03): player events, opened in the player's browser on a click; nothing is fetched by Tensho.
+        new("ToolGallery", CreditKind.Online, "Tensho Assistant community tools", "Tensho Assistant contributors", "CC0-1.0", "https://github.com/Shigu330/Tensho-Assistant/tree/main/community-templates", "https://creativecommons.org/publicdomain/zero/1.0/",
+            ["MyTools/ToolGallery.cs", "MainWindow.MyTools.cs"], ["raw.githubusercontent.com"], "", false),
         new("Partake", CreditKind.Online, "Partake", "Partake", "proprietary", "https://www.partake.gg/", "",
             ["MainWindow.Events.cs"], ["www.partake.gg"], "", false),
         new("Discord", CreditKind.Online, "Discord", "Discord Inc.", "proprietary", "https://discord.com/developers/docs/resources/webhook", "",

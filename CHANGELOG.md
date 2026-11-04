@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.475.0
+- TEMPLATES-001 phases B5 et B6 : galerie d'outils communautaires. Dossier `community-templates/` (T4), licence CC0 (T5), deux outils d'exemple, `scripts/Update-ToolGallery.ps1` pour l'index, tests qui appliquent à chaque fichier les règles du plugin, relecture humaine par pull request (T7). Dans le plugin, la liste et un outil se lisent seulement sur clic (T6), avec taille bornée et empreinte vérifiée, puis passent par le même aperçu qu'un outil collé. Crédit et description du plugin mis à jour.
+- La galerie lit la branche `main` : elle restera vide tant qu'une release n'a pas publié ce dossier.
+- Tests : MyToolsGalleryTests (5). Verify.ps1 (agent) : 904/904, 0 avertissement, 0 erreur ; DLL 0.475.0.0. Non validé en jeu.
+### English
+- « My tools » gains a gallery of community tools, reviewed then published in `community-templates/` under CC0. The plugin reads it only on a click, bounded and checked against a fingerprint, and shows each tool in full before it is installed.
+
 ## 0.474.0
 - TEMPLATES-001 phase B3 : éditeur de « Mes outils » dans le jeu, sans écrire de JSON. Les sept blocs, l'ordre, la licence libre CC0 à cocher, le texte écrit dans la langue du plugin avec les autres langues gardées. Enregistrer passe par le même format strict qu'un fichier partagé. Un objet s'ajoute depuis l'objet sélectionné dans Tensho, jamais par un identifiant tapé.
 - Tests : MyToolsTests complété. Verify.ps1 (agent) : 899/899, 0 avertissement, 0 erreur ; DLL 0.474.0.0. Non validé en jeu.

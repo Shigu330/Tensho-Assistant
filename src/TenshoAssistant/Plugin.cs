@@ -814,6 +814,8 @@ public sealed class Plugin : IDalamudPlugin
             // TEMPLATES-001 (DEC-029): tools made of data, in a file of their own.
             TenshoAssistant.MyTools.ToolTemplateStore? myTools=null;
             registrations.Register(()=>mainWindow.MyToolsStore=myTools=new TenshoAssistant.MyTools.ToolTemplateStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"MyTools.json"),(error,message)=>log.Warning(error,message)),()=>myTools?.Dispose());
+            TenshoAssistant.MyTools.ToolGallery? toolGallery=null;
+            registrations.Register(()=>mainWindow.MyToolsGallery=toolGallery=new TenshoAssistant.MyTools.ToolGallery(),()=>toolGallery?.Dispose());
             mainWindow.CraftListStore=new Craft.CraftListStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"CraftLists.json"),(error,message)=>log.Warning(error,message));
             // A-14 (0.436): crafting rotation recorder (read-only hook on UseAction, only while recording).
             Craft.CraftRecorder? craftRecorder=null;

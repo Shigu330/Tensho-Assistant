@@ -74,6 +74,18 @@
     "Cancel": "Annuler"
   },
   "MyToolsUi": {
+    "Gallery": "Galerie",
+    "GalleryClose": "Fermer la galerie",
+    "GalleryTip": "Des outils proposés par des joueurs, lus par une personne avant publication.",
+    "GalleryHelp": "Des outils du dépôt du plugin. Chacun est montré en entier avant que vous l'installiez.",
+    "GalleryLoad": "Charger la liste",
+    "GalleryLoadTip": "Lit la liste sur GitHub. Rien n'est lu avant ce clic, et rien sur vous n'est envoyé.",
+    "GalleryLoading": "Lecture…",
+    "GalleryEmpty": "La galerie est vide.",
+    "GalleryOpen": "Voir",
+    "GalleryOpenTip": "Lit cet outil et montre ce qu'il contient. Rien n'est encore installé.",
+    "GalleryInstalled": "Installé",
+    "GalleryCloseTool": "Fermer cet outil",
     "Create": "Créer un outil",
     "CreateTip": "Composez un outil bloc par bloc, sans écrire de fichier.",
     "Edit": "Modifier",
@@ -117,6 +129,10 @@
     "LinkCancel": "Annuler"
   },
   "MyToolsErrors": {
+    "GalleryUnavailable": "La galerie n'a pas pu être lue. Réessayez plus tard.",
+    "GalleryBroken": "La liste de la galerie n'est pas lisible.",
+    "GalleryMismatch": "Cet outil n'est pas le fichier annoncé par la liste de la galerie. Il n'a pas été ouvert.",
+    "GalleryLicense": "Cet outil n'est pas sous la licence libre de la galerie.",
     "Empty": "Rien à lire.",
     "TooLarge": "Cet outil est trop gros.",
     "NotJson": "Ce n'est pas un outil : le texte n'est pas lisible.",
@@ -3084,6 +3100,7 @@
     "ProprietaryLicense": "propriétaire, tous droits réservés",
     "Footer": "Un oubli ou une licence à corriger ? Signalez-le sur le dépôt GitHub de Tensho :",
     "Items": {
+      "ToolGallery": "Outils partagés par des joueurs (Mes outils › Galerie) : données seulement, aucun code, lus depuis le dépôt du plugin sur votre clic ; rien sur vous n'est envoyé.",
       "LuminaSupplementalAirships": "Arbre de déblocage des secteurs de dirigeable, liste du butin possible (sans quantité ni taux) et noms anglais des événements saisonniers (instantanés embarqués, avis GPL-3.0 en tête des fichiers).",
       "Dalamud": "Hôte du plugin : services (données du jeu, framework, état du joueur, chat, commandes, barre d'infos serveur, menus contextuels, textures, hooks), fenêtres et sauvegarde de la configuration.",
       "DalamudBindingsImGui": "Liaison C# de Dear ImGui qui dessine toute l'interface (fenêtre principale, carte, panneaux à côté des fenêtres du jeu).",

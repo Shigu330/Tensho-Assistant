@@ -15,6 +15,8 @@ internal sealed partial class MainWindow
     private TemplateParse? myToolsPreview;
     private string? myToolRemoveArmed;
     private string? myToolPendingLink;
+    private bool myToolsGalleryOpen;
+    internal ToolGallery? MyToolsGallery{get;set;}
 
     private static string SafeLabel(string text)=>text.Replace("##","# #");
 
@@ -30,7 +32,11 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get(myToolsImporting ? "MyToolsUi.ImportClose":"MyToolsUi.Import"))){myToolsImporting=!myToolsImporting;myToolsPreview=null;}
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.ImportTip"));
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get(myToolsGalleryOpen ? "MyToolsUi.GalleryClose":"MyToolsUi.Gallery")))myToolsGalleryOpen=!myToolsGalleryOpen;
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.GalleryTip"));
         if(myToolsImporting)DrawMyToolsImport(store);
+        if(myToolsGalleryOpen)DrawMyToolsGallery(store);
         var tools=store.Tools;
         if(tools.Count==0){ImGui.Spacing();ImGui.TextDisabled(localization.Get("MyToolsUi.Empty"));return;}
         ImGui.Spacing();
@@ -84,6 +90,53 @@ internal sealed partial class MainWindow
         DrawMyToolPreview(store,template);
     }
 
+    // T6: nothing is read before this click.
+    private void DrawMyToolsGallery(ToolTemplateStore store)
+    {
+        if(MyToolsGallery is not { } gallery)return;
+        var state=gallery.State;
+        ImGui.Separator();
+        ImGui.TextDisabled(localization.Get("MyToolsUi.GalleryHelp"));
+        if(state.Entries is null && !state.Loading)
+        {
+            if(ImGui.SmallButton(localization.Get("MyToolsUi.GalleryLoad")))_=MyToolsGallery.LoadListAsync();
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.GalleryLoadTip"));
+        }
+        if(state.Loading)ImGui.TextDisabled(localization.Get("MyToolsUi.GalleryLoading"));
+        if(state.Problem is { } problem)
+        {
+            ImGui.PushTextWrapPos(0);
+            try{ImGui.TextColored(UI.FfxivTheme.Error,localization.Get($"MyToolsErrors.{problem.Code}"));}
+            finally{ImGui.PopTextWrapPos();}
+        }
+        if(state.Entries is { } entries)
+        {
+            if(entries.Count==0)ImGui.TextDisabled(localization.Get("MyToolsUi.GalleryEmpty"));
+            var language=localization.CurrentCode;
+            foreach(var entry in entries)
+            {
+                ImGui.PushID(entry.Id);
+                try
+                {
+                    ImGui.BeginDisabled(state.Loading);
+                    try{if(ImGui.SmallButton(localization.Get("MyToolsUi.GalleryOpen")))_=gallery.OpenAsync(entry);}
+                    finally{ImGui.EndDisabled();}
+                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.GalleryOpenTip"));
+                    ImGui.SameLine();
+                    ImGui.TextUnformatted(entry.Name.For(language));
+                    if(entry.Author is { } author){ImGui.SameLine();ImGui.TextDisabled(localization.Format("MyToolsUi.Author",author));}
+                    if(store.Tools.Any(tool=>tool.Template.Id==entry.Id)){ImGui.SameLine();ImGui.TextColored(Success,localization.Get("MyToolsUi.GalleryInstalled"));}
+                }
+                finally{ImGui.PopID();}
+            }
+        }
+        if(state.Opened?.Template is { } opened)
+        {
+            DrawMyToolPreview(store,opened);
+            if(ImGui.SmallButton(localization.Get("MyToolsUi.GalleryCloseTool")))gallery.CloseTool();
+        }
+    }
+
     /// <summary>Everything the file will do, before it is installed.</summary>
     private void DrawMyToolPreview(ToolTemplateStore store,ToolTemplate template)
     {
@@ -99,7 +152,7 @@ internal sealed partial class MainWindow
         if(replaces)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("MyToolsUi.Replaces"));
         if(ImGui.SmallButton(localization.Get("MyToolsUi.Install")))
         {
-            if(store.Install(template,ToolTemplateFormat.Serialize(template))){myToolSelected=template.Id;myToolsImporting=false;myToolsPreview=null;myToolsPasted="";return;}
+            if(store.Install(template,ToolTemplateFormat.Serialize(template))){myToolSelected=template.Id;myToolsImporting=false;myToolsPreview=null;myToolsPasted="";MyToolsGallery?.CloseTool();return;}
             myToolsPreview=new(null,new("Full"));return;
         }
         ImGui.Separator();
