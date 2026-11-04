@@ -13,6 +13,7 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal CollectableReader? Collectables { get; set; }
+    private string? collectableRawLogged;
 
     internal void DrawCollectablePanel()
     {
@@ -25,7 +26,9 @@ internal sealed partial class MainWindow
         try
         {
             if(!visible)return;
-            ImGui.TextColored(Accent,frame.ItemName);
+            // 0.478: the game's window cuts long names; the rules hold the whole one.
+            var named=Collectables.Catalog?.Named(frame.ItemName);
+            ImGui.TextColored(Accent,named is { Count:>0 } ? named[0].Name:frame.ItemName);
             ImGui.TextDisabled(localization.Format("CollectablePanel.Resources",Shown(frame.Gp),Shown(frame.MaxGp),Shown(frame.Integrity),Shown(frame.MaxIntegrity)));
             if(Collectables.Catalog is not { } catalog)ImGui.TextDisabled(localization.Get(Collectables.CatalogFailed ? "CollectablePanel.Unavailable":"CollectablePanel.Loading"));
             else if(catalog.Named(frame.ItemName) is not { Count:>0 } rules)ImGui.TextWrapped(localization.Get("CollectablePanel.NoRule"));
@@ -39,6 +42,8 @@ internal sealed partial class MainWindow
                 }
             ImGui.Separator();
             ImGui.TextWrapped(localization.Get("CollectablePanel.Unknown"));
+            // Developer mode: what the window holds goes to the log at each change, to find which value follows the collectability.
+            if(developerMode && string.Join(" | ",frame.RawValues) is var raw && raw!=collectableRawLogged){collectableRawLogged=raw;log.Information("Collectable window values: {Values}",raw);}
             if(developerMode && ImGui.CollapsingHeader(localization.Get("CollectablePanel.Raw")+"###CollectableRaw"))
                 foreach(var value in frame.RawValues)ImGui.TextDisabled(value);
         }

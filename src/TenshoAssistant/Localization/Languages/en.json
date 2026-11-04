@@ -610,6 +610,17 @@
     "Slot10": "Left ring"
   },
   "GatheringPanel": {
+    "CollectablePlan": "Collectable: no plan here. Its GP goes in the game's Collectable window, opened by gathering it.",
+    "ListNeed": "Crafting list: {0} missing. About {1} nodes, {2} min, {3} GP spent.",
+    "ListNeedTooMany": "Crafting list: {0} missing, out of reach in {1} nodes.",
+    "ListNoRegen": "GP that comes back: not seen yet, counted as 0. It is measured while your GP rises at a node, or you can set it in the settings.",
+    "ListSetting": "GP plan over the crafting list",
+    "ListSettingTip": "Shares GP over the nodes the selected crafting list still needs, assuming each node is like this one. An average. Intermediate items already made are not taken off.",
+    "NodeSeconds": "Seconds between two nodes",
+    "NodeSecondsTip": "Your estimate. It sets how much GP comes back between nodes. From 5 to 600.",
+    "Regen": "GP per tick (0: measured)",
+    "RegenTip": "The GP that comes back every 3 seconds. 0 uses the value measured in game.",
+    "RegenObserved": "Measured in game: {0} GP per tick.",
     "TitleMiner": "Gathering help · Miner",
     "TitleBotanist": "Gathering help · Botanist",
     "Miner": "Miner",
@@ -902,6 +913,7 @@
   "Home.Stocks": "View stocks",
   "Home.Recipes": "Related recipes",
   "Category": {
+    "GatheringCollectables": "Collectables",
     "GatheringGp": "GP planning",
     "BlueMagic": "Blue magic",
     "Weather": "Weather",
@@ -3339,6 +3351,10 @@
     "Presets": "Saved sequences"
   },
   "GpUi": {
+    "ForbiddenTitle": "Forbidden actions ({0})",
+    "ForbiddenHelp": "These actions are never planned, for the miner and the botanist.",
+    "ForbiddenActionTip": "Never plan this action.",
+    "ForbiddenClear": "Allow all",
     "MoreActions": "Also count Solid Reason / Ageless Words and Clear Vision / Flora Mastery",
     "MoreActionsTip": "Adds to the comparison the action that grants another attempt (300 GP) and the one giving +15 % on the next attempt (50 GP). Unticked: the calculation before 0.410.",
     "WhenAttemptUsed": " · after an attempt, when one is missing",
@@ -5054,7 +5070,7 @@
     "Thresholds": "Collectability thresholds: low {0} · mid {1} · high {2}",
     "Scrips": "Scrips per tier: {0} / {1} / {2}",
     "Levels": "Turn-in: level {0} to {1}",
-    "Unknown": "Current collectability: not read yet (to be confirmed in game); no action advised for now. The thresholds come from the game data.",
+    "Unknown": "Nothing to do here: this panel only gives the thresholds. Read the current collectability on the game's window.",
     "Raw": "Raw values of the window (developer mode)"
   },
   "CollectableTable": {

@@ -60,8 +60,10 @@ internal sealed partial class MainWindow
                 break;
             case Page.Gathering:
             case Page.GatheringGp:
+            case Page.GatheringCollectables:
                 CategoryLink("Navigation.Gathering",Page.Gathering);
                 CategoryLink("Category.GatheringGp",Page.GatheringGp);
+                CategoryLink("Category.GatheringCollectables",Page.GatheringCollectables);
                 break;
             case Page.Collections:
             case Page.BlueMagic:

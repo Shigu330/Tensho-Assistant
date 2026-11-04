@@ -111,9 +111,10 @@ internal sealed partial class MainWindow
         Tip("GpUi.MoreActionsTip");
         if(resourceChanged) { gpCopiedOwner=0; gpCopiedAt=null; }
         if(changed || resourceChanged) { gpResult=null; gpError=null; }
+        DrawGpForbiddenActions();
         if(ImGui.Button(localization.Get("GpUi.Compare")))
         {
-            try { gpResult=GpOptimizer.Solve(new(gpJob,gpLevel,gpBudget,gpAttempts,gpBaseYield,gpSuccess,gpBoon,gpBountiful,new(gpYieldActive,gpGift1Active,gpGift2Active,gpTidingsActive,gpFirstAttemptBonus,gpOtherEffects),gpMoreActions),catalog); gpError=null; }
+            try { gpResult=GpOptimizer.Solve(new(gpJob,gpLevel,gpBudget,gpAttempts,gpBaseYield,gpSuccess,gpBoon,gpBountiful,new(gpYieldActive,gpGift1Active,gpGift2Active,gpTidingsActive,gpFirstAttemptBonus,gpOtherEffects),gpMoreActions,Forbidden:GpForbidden),catalog); gpError=null; }
             catch(ArgumentException) { gpResult=null; gpError=gpOtherEffects ? localization.Get("GpUi.Unsupported"):localization.Get("GpUi.Invalid"); }
         }
         if(gpError is { } error) ImGui.TextWrapped(error);

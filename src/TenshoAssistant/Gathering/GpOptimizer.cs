@@ -8,7 +8,7 @@ public sealed record GpActiveEffects(bool Yield=false,bool Gift1=false,bool Gift
 // R-09 (0.410): MoreActions adds Solid Reason / Ageless Words (one more attempt each; from level 90, trait « Enhanced Solid Reason »:
 // 50 % chance of Eureka Moment, i.e. a free attempt with Wise to the World, counted on average) and Clear Vision / Flora Mastery (+15 %
 // on one attempt, placed on the Bountiful attempts first). Off, the model is the one before 0.410.
-public sealed record GpScenario(uint JobId,int Level,int Budget,int Attempts,int BaseYield,int SuccessPercent,int BoonPercent,int BountifulBonus,GpActiveEffects? Active=null,bool MoreActions=false)
+public sealed record GpScenario(uint JobId,int Level,int Budget,int Attempts,int BaseYield,int SuccessPercent,int BoonPercent,int BountifulBonus,GpActiveEffects? Active=null,bool MoreActions=false,string Forbidden="")
 {
     public const int EurekaLevel=90;
     public const decimal EurekaChance=0.5m;
@@ -35,7 +35,7 @@ public static class GpOptimizer
         if(input.BoonPercent>0 && input.BoonPercent<minimumBoon)
             throw new ArgumentException("The declared extra rate does not include the bonuses already active.",nameof(input));
         cancellation.ThrowIfCancellationRequested();
-        var available=catalog.Actions.Where(action=>action.Spec.JobId==input.JobId && action.Spec.Level<=input.Level).ToArray();
+        var available=catalog.Actions.Where(action=>action.Spec.JobId==input.JobId && action.Spec.Level<=input.Level && !GpActionRules.Forbidden(input.Forbidden,action.Spec)).ToArray();
         var chances=available.Where(action=>action.Spec.Effect==GpEffect.Success && input.SuccessPercent>0).Cast<GpAction?>().Prepend(null).ToArray();
         var yields=available.Where(action=>action.Spec.Effect==GpEffect.Yield && !active.Yield).Cast<GpAction?>().Prepend(null).ToArray();
         var gift1=available.FirstOrDefault(action=>action.Spec.Effect==GpEffect.BoonChance1 && input.BoonPercent>0 && !active.Gift1);

@@ -32,7 +32,16 @@ public sealed class CollectableCatalog
     }
     public IReadOnlyList<CollectableRule> For(uint itemId)=>byItem.GetValueOrDefault(itemId) ?? [];
     /// <summary>The rules of the item named in the game's Collectable window (its name as shown, icons removed).</summary>
-    public IReadOnlyList<CollectableRule> Named(string? shown)=>byName.GetValueOrDefault(Collectables.CleanName(shown)) ?? [];
+    public IReadOnlyList<CollectableRule> Named(string? shown)
+    {
+        var name=Collectables.CleanName(shown).Trim();
+        if(byName.TryGetValue(name,out var exact))return exact;
+        // 0.478 (in-game report, docs/evidence/0.478-collectable-truncated-name.md): the game's window cuts long names; the start of a name counts only if it names one item.
+        var cut=name.EndsWith("...",StringComparison.Ordinal) ? name[..^3]:name.EndsWith('…') ? name[..^1]:null;
+        if(cut is null || cut.Trim().Length<4)return [];
+        var found=byName.Where(row=>row.Key.StartsWith(cut,StringComparison.OrdinalIgnoreCase)).Take(2).ToArray();
+        return found.Length==1 ? found[0].Value:[];
+    }
 }
 
 /// <summary>What Tensho read in the game's Collectable window (AddonGatheringMasterpiece): texts as shown, numbers when they parse.</summary>
@@ -59,6 +68,20 @@ public static class Collectables
     /// game's rule as Teamcraft (MIT) and Craftimizer code it, read only), capped at the recipe's maximum quality.
     /// </summary>
     public static int QualityFor(int collectability,int maximumQuality)=>(int)Math.Clamp(collectability*10L,0,Math.Max(0,maximumQuality));
+
+    /// <summary>0.478 (user request): the table's columns: 0 item, 1 group, 2 level, 3 high threshold, 4 high reward.</summary>
+    public static CollectableRule[] Sorted(IEnumerable<CollectableRule> rules,int column,bool descending)
+    {
+        IEnumerable<CollectableRule> Order<T>(Func<CollectableRule,T> key)=>descending ? rules.OrderByDescending(key):rules.OrderBy(key);
+        return (column switch
+        {
+            0=>rules.Order(Comparer<CollectableRule>.Create((a,b)=>(descending ? -1:1)*string.Compare(a.Name,b.Name,StringComparison.CurrentCultureIgnoreCase))),
+            1=>rules.Order(Comparer<CollectableRule>.Create((a,b)=>(descending ? -1:1)*string.Compare(a.Group,b.Group,StringComparison.CurrentCultureIgnoreCase))),
+            3=>Order(rule=>rule.High),
+            4=>Order(rule=>rule.Scrips ? rule.RewardHigh:-1),
+            _=>Order(rule=>rule.LevelMin),
+        }).ToArray();
+    }
 
     /// <summary>R-11 (0.413): rules whose item or group name holds every word of the query (case ignored).</summary>
     public static CollectableRule[] Filter(IEnumerable<CollectableRule> rules,string? query)

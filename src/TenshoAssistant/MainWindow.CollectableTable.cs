@@ -15,35 +15,48 @@ internal sealed partial class MainWindow
     private string collectableQuery="";
     private (CollectableCatalog Catalog,string Query)? collectableViewKey;
     private CollectableRule[] collectableView=[];
+    private (int Column,bool Descending) collectableSort=(2,false);
+
+    // 0.478 (user request, in-game campaign): its own tab of the Gathering page.
+    private void DrawCollectablesPage()
+    {
+        Heading(localization.Format("CollectableTable.Title",Collectables?.Catalog?.Count ?? 0),localization.Get("CollectableTable.Help"));
+        DrawCollectableTable();
+    }
 
     private void DrawCollectableTable()
     {
         if(Collectables is not { } reader)return;
         var catalog=reader.Catalog;
-        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("CollectableTable.Title",catalog?.Count ?? 0)+"###CollectableTable"))return;
         if(catalog is null){ImGui.TextDisabled(localization.Get(reader.CatalogFailed ? "CollectablePanel.Unavailable":"CollectablePanel.Loading"));return;}
-        ImGui.TextWrapped(localization.Get("CollectableTable.Help"));
         DrawHeldCollectables(reader,catalog);
         ImGui.SetNextItemWidth(280);
         ImGui.InputTextWithHint("###CollectableQuery",localization.Get("CollectableTable.Search"),ref collectableQuery,80);
         Tip("CollectableTable.SearchTip");
         if(collectableViewKey is not { } key || !ReferenceEquals(key.Catalog,catalog) || key.Query!=collectableQuery)
         {
-            collectableView=Gathering.Collectables.Filter(catalog.All,collectableQuery);
+            collectableView=Gathering.Collectables.Sorted(Gathering.Collectables.Filter(catalog.All,collectableQuery),collectableSort.Column,collectableSort.Descending);
             collectableViewKey=(catalog,collectableQuery);
         }
         ImGui.TextDisabled(localization.Format("CollectableTable.Count",collectableView.Length));
         if(collectableView.Length==0)return;
-        if(!ImGui.BeginTable("CollectableRows",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.ScrollY,new Vector2(0,320)))return;
+        if(!ImGui.BeginTable("CollectableRows",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.ScrollY|ImGuiTableFlags.Sortable,new Vector2(0,Math.Max(320,ImGui.GetContentRegionAvail().Y))))return;
         try
         {
             ImGui.TableSetupScrollFreeze(0,1);
             ImGui.TableSetupColumn(localization.Get("CollectableTable.Item"),ImGuiTableColumnFlags.WidthStretch,3);
             ImGui.TableSetupColumn(localization.Get("CollectableTable.Group"),ImGuiTableColumnFlags.WidthStretch,2);
-            ImGui.TableSetupColumn(localization.Get("CollectableTable.Level"));
+            ImGui.TableSetupColumn(localization.Get("CollectableTable.Level"),ImGuiTableColumnFlags.DefaultSort);
             ImGui.TableSetupColumn(localization.Get("CollectableTable.Thresholds"));
             ImGui.TableSetupColumn(localization.Get("CollectableTable.Reward"));
             ImGui.TableHeadersRow();
+            var specs=ImGui.TableGetSortSpecs();
+            if(!specs.IsNull && specs.SpecsDirty && specs.SpecsCount>0)
+            {
+                collectableSort=(specs.Specs.ColumnIndex,specs.Specs.SortDirection==ImGuiSortDirection.Descending);
+                specs.SpecsDirty=false;
+                collectableView=Gathering.Collectables.Sorted(collectableView,collectableSort.Column,collectableSort.Descending);
+            }
             var clipper=ImGui.ImGuiListClipper();
             clipper.Begin(collectableView.Length);
             try

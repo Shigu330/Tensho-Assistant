@@ -714,6 +714,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.478 : retours du lot 6, récolte** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Fenêtre Collectionnable sur « Minerai de durium noble collectionnable » : nom complet, seuils 400 / 700 / 1000. Rien à faire de plus. En mode développeur, faire quelques actions : le journal note les valeurs de la fenêtre.
+- [ ] Aide à la récolte : plus de texte coupé ; le nom, puis les taux dessous. Sur un collectionnable : pas de « plan non calculé » mais un message clair.
+- [ ] Récolte › onglet Collectionnables : tableau trié en cliquant sur chaque colonne, dans les deux sens.
+- [ ] Avec une liste de fabrication choisie qui demande un matériau récolté : la ligne « il en manque N, environ X nœuds », le plan réparti. Comparer après quelques nœuds. Les matières d'une recette intermédiaire comptent.
+- [ ] Paramètres › Modules › Récolte : actions interdites jamais proposées (panneau et page PR) ; secondes entre deux nœuds ; PR par tic mesuré sur un nœud quand les PR remontent.
+
 **0.476 : thème proposé par un outil** — TEMPLATES-001
 
 - [ ] Éditeur : choisir un thème proposé, enregistrer. Le thème ne change pas tant qu'on n'a pas cliqué « Utiliser le thème… ». Ensuite, en haut de Mes outils, « Revenir au thème d'origine » remet l'ancien (0.477).

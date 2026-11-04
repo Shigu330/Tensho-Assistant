@@ -119,6 +119,7 @@
     <Compile Include="../../src/TenshoAssistant/Craft/CraftLists.cs" Link="Craft/CraftLists.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/RaphaelActions.cs" Link="Craft/RaphaelActions.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/RaphaelSequenceCache.cs" Link="Craft/RaphaelSequenceCache.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/GpRoute.cs" Link="Gathering/GpRoute.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftRecording.cs" Link="Craft/CraftRecording.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftActionRules.cs" Link="Craft/CraftActionRules.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftChain.cs" Link="Craft/CraftChain.cs" />

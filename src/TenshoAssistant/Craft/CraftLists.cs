@@ -52,6 +52,25 @@ public static class CraftLists
         return order.Select(id=>(id,totals[id])).ToArray();
     }
 
+    /// <summary>
+    /// 0.478 (user request): all the raw materials of a list, recipes followed to the end, before any stock: a material shared by two items is counted for both, and the caller takes the stock off once.
+    /// Intermediate items already made are therefore not taken off. An item without a chosen recipe is itself what is needed.
+    /// </summary>
+    public static IReadOnlyDictionary<uint,long> RawNeeds(CraftList list,IReadOnlyDictionary<uint,RecipeDefinition> recipes,RecipeCatalog catalog,CancellationToken cancellation=default)
+    {
+        var needs=new Dictionary<uint,long>();
+        void Add(uint item,long amount)=>needs[item]=checked(needs.GetValueOrDefault(item)+amount);
+        var nothing=new TenshoAssistant.Inventory.ItemHoldingsSummary([],0,0,false,false,false,false);
+        foreach(var entry in list.Entries)
+        {
+            cancellation.ThrowIfCancellationRequested();
+            if(!recipes.TryGetValue(entry.ItemId,out var recipe)){Add(entry.ItemId,entry.Quantity);continue;}
+            foreach(var material in CraftChain.Build(recipe,entry.Quantity,catalog,_=>nothing,cancellation).Materials)
+                if(material.Reason==CraftChainReason.RawMaterial)Add(material.ItemId,material.Amount);
+        }
+        return needs;
+    }
+
     public static IReadOnlyList<CraftList> Read(string path)
     {
         if(!File.Exists(path))return [];

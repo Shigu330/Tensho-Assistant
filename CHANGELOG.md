@@ -3,6 +3,18 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.478.0
+- Retours de l'utilisateur, lot 6.
+- Panneau Collectionnable : « Aucun seuil » venait du nom coupé par la fenêtre du jeu (« Minerai de durium noble c... »), alors que les seuils existent (400 / 700 / 1000, [preuve](docs/evidence/0.478-collectable-truncated-name.md)). Un nom coupé est cherché par son début s'il désigne un seul objet, et le nom complet est affiché. Le texte dit qu'il n'y a rien à faire. La collectabilité en cours n'a pas de champ nommé dans le jeu : en mode développeur, les valeurs de la fenêtre vont au journal pour la trouver.
+- Aide à la récolte : le nom, puis les taux dessous, et les textes vont à la ligne au lieu d'être coupés. Sur un collectionnable, un message remplace « Plan non calculé » : ses PR se dépensent dans la fenêtre Collectionnable.
+- Collectionnables : onglet à part dans Récolte, tableau trié sur chaque colonne dans les deux sens.
+- Plan de PR : prend la liste de fabrication choisie. Besoin en matières brutes (recettes suivies), moins le stock, puis nombre de nœuds et PR répartis, avec les PR regagnés entre deux nœuds. Hypothèses dites : chaque nœud comme celui-ci, moyenne, intermédiaires déjà faits non déduits. Les PR par tic sont mesurés en jeu, jamais supposés, ou réglés à la main. Actions interdites par réglage, pour le mineur et le botaniste, dans le panneau et la page PR.
+- Tests : Gathering478Tests (6). Verify.ps1 (agent) : 911/911, 0 avertissement, 0 erreur ; DLL 0.478.0.0. Non validé en jeu.
+### English
+- Collectable panel: thresholds are found when the game's window cuts a long name, and the text says nothing is needed from the player. The gathering panel no longer cuts its lines.
+- Collectables have their own sortable tab under Gathering.
+- The GP plan can follow the selected crafting list: raw materials still missing, nodes needed, GP shared across them with regeneration; GP actions can be forbidden as for macros.
+
 ## 0.477.0
 - Rapport de l'utilisateur en jeu : « aucun moyen de repasser au thème original ». Le retour n'existait que dans Réglages › Interface, à un autre endroit que le bouton qui change le thème. Le thème d'avant est maintenant retenu, et un bouton « Revenir au thème d'origine » reste en haut de « Mes outils » tant que le thème d'un outil est en place. Pour un thème appliqué en 0.476, rien n'avait été retenu : le bouton propose alors le réglage par défaut, suivre le jeu. Un choix dans les réglages oublie le thème retenu.
 - Tests : MyToolsTests complété. Verify.ps1 (agent) : 905/905, 0 avertissement, 0 erreur ; DLL 0.477.0.0. Non validé en jeu. Reste de « Mes outils » validé par l'utilisateur en jeu (rapport « reste ok »), galerie exceptée puisqu'elle attend une release.

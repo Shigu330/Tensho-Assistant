@@ -610,6 +610,17 @@
     "Slot10": "Bague gauche"
   },
   "GatheringPanel": {
+    "CollectablePlan": "Collectionnable : pas de plan ici. Ses PR se dépensent dans la fenêtre Collectionnable du jeu, ouverte en le récoltant.",
+    "ListNeed": "Liste de fabrication : il en manque {0}. Environ {1} nœuds, {2} min, {3} PR dépensés.",
+    "ListNeedTooMany": "Liste de fabrication : il en manque {0}, hors de portée en {1} nœuds.",
+    "ListNoRegen": "PR regagnés : pas encore vus, comptés à 0. Ils se mesurent quand vos PR remontent sur un nœud, ou se règlent dans les paramètres.",
+    "ListSetting": "Plan de PR sur la liste de fabrication",
+    "ListSettingTip": "Répartit les PR sur les nœuds qu'il reste à faire pour la liste de fabrication choisie, en supposant chaque nœud pareil à celui-ci. C'est une moyenne. Les objets intermédiaires déjà faits ne sont pas déduits.",
+    "NodeSeconds": "Secondes entre deux nœuds",
+    "NodeSecondsTip": "Votre estimation. Elle fixe les PR regagnés entre deux nœuds. De 5 à 600.",
+    "Regen": "PR par tic (0 : mesuré)",
+    "RegenTip": "Les PR regagnés toutes les 3 secondes. 0 utilise la valeur mesurée en jeu.",
+    "RegenObserved": "Mesuré en jeu : {0} PR par tic.",
     "TitleMiner": "Aide à la récolte · Mineur",
     "TitleBotanist": "Aide à la récolte · Botaniste",
     "Miner": "Mineur",
@@ -902,6 +913,7 @@
   "Home.Stocks": "Voir les stocks",
   "Home.Recipes": "Recettes liées",
   "Category": {
+    "GatheringCollectables": "Collectionnables",
     "GatheringGp": "Planification des PR",
     "BlueMagic": "Grimoire Mage bleu",
     "Weather": "Météo",
@@ -3339,6 +3351,10 @@
     "Presets": "Séquences sauvegardées"
   },
   "GpUi": {
+    "ForbiddenTitle": "Actions interdites ({0})",
+    "ForbiddenHelp": "Ces actions ne sont jamais prévues, pour le mineur comme pour le botaniste.",
+    "ForbiddenActionTip": "Ne jamais prévoir cette action.",
+    "ForbiddenClear": "Tout autoriser",
     "MoreActions": "Compter aussi Raison solide / Sagesse du fermier et Vision claire / Maîtrise florale",
     "MoreActionsTip": "Ajoute à la comparaison l’action qui rend un essai (300 PR) et celle qui donne +15 % sur l’essai suivant (50 PR). Décochée : le calcul d’avant la 0.410.",
     "WhenAttemptUsed": " · après un essai, quand il en manque un",
@@ -5054,7 +5070,7 @@
     "Thresholds": "Seuils de collectabilité : bas {0} · moyen {1} · haut {2}",
     "Scrips": "Assignats par palier : {0} / {1} / {2}",
     "Levels": "Remise : niveau {0} à {1}",
-    "Unknown": "Collectabilité en cours : pas encore lue (à confirmer en jeu) ; aucune action conseillée pour l’instant. Les seuils viennent des données du jeu.",
+    "Unknown": "Rien à faire ici : ce panneau donne seulement les seuils. La collectabilité en cours se lit sur la fenêtre du jeu.",
     "Raw": "Valeurs brutes de la fenêtre (mode développeur)"
   },
   "CollectableTable": {
