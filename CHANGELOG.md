@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.473.0
+- Demande de l'utilisateur, TEMPLATES-001 phases B0, B1, B2 et B4 ([DEC-029](docs/project/DECISIONS.md)) : page « Mes outils », sous l'accueil. Un outil est un fichier de données : titre, note, cases à remise à zéro, compteur, minuteur, objets (voulu, possédé, manque), lien. Il ne contient aucun code et n'envoie rien au jeu.
+- Format strict : champ ou bloc inconnu, valeur hors bornes ou lien non https refuse le fichier avec la raison. Textes nettoyés. Une ligne partagée compressée est lue avec une taille bornée. Tout est montré avant l'installation, et un lien s'ouvre seulement après une confirmation qui montre l'adresse.
+- Progression gardée dans `MyTools.json`, jamais écrasé s'il est illisible. Le partage ne contient ni cases ni compteurs. L'import par fichier n'est pas fait : coller le JSON suffit.
+- Tests : MyToolsTests (8). Verify.ps1 (agent) : 898/898, 0 avertissement, 0 erreur ; DLL 0.473.0.0. Non validé en jeu.
+### English
+- New « My tools » page: pages made of data (headings, notes, checklists with resets, counters, timers, item lists, links), shared as one line of text. A strict format refuses anything unknown; tools hold no code and send nothing to the game.
+
 ## 0.472.0
 - Demande de l'utilisateur : le chat personnalisable est retiré ([DEC-030](docs/project/DECISIONS.md)) : page Monde › Chat, fenêtre, réglages, textes, tests et plan. Il utilisera Chat 2 au besoin. Les fonctions qui lisent le chat pour autre chose restent (liens de carte, détection du jardinage). Les réglages déjà enregistrés par la 0.471 sont ignorés au chargement : essai fait avec le Newtonsoft.Json de Dalamud sur un fichier contenant ces types disparus.
 - Tests : un test vérifie le retrait. Verify.ps1 (agent) : 890/890, 0 avertissement, 0 erreur ; DLL 0.472.0.0. Non validé en jeu.

@@ -714,6 +714,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.473 : Mes outils (modèles sans code)** — TEMPLATES-001
+
+- [ ] « Mes outils » est juste sous l'accueil. Ajouter un outil : coller un JSON, Vérifier, l'aperçu montre tout, Installer.
+- [ ] Refus avec raison : champ inconnu, type de bloc inconnu, lien http, texte quelconque.
+- [ ] Cases, compteur, minuteurs : cocher, recharger le plugin, l'état revient ; une case quotidienne se décoche à la remise.
+- [ ] Bloc d'objets : icône, bulle, voulu, possédé, manque ; un identifiant inconnu est signalé.
+- [ ] Lien : le clic demande confirmation et montre l'adresse complète. Rien ne s'ouvre sans « Ouvrir ».
+- [ ] Copier pour partager, coller la ligne dans un autre personnage ou après retrait : même outil, progression à zéro.
+
 **0.470 : liste unique des pages** — pendant la campagne de tests en jeu (étape h)
 
 - [ ] Navigation : mêmes groupes, mêmes pages, même ordre qu'avant ; chaque page s'ouvre. Artisanat reste sélectionné sur Synthèse en cours et Séquences, Récolte sur PR, Collection sur Magie bleue. Diagnostics seulement en mode développeur.

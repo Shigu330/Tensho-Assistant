@@ -55,6 +55,7 @@ internal sealed partial class MainWindow
         // R-13 (0.320): everything Tensho uses, shown to every player.
         new(Page.Credits,"Preferences",PageLabel("Navigation.Credits"),DrawCredits,"MainWindow.Credits.cs, Credits/"),
         new(Page.Diagnostics,"Preferences",PageLabel("Navigation.Diagnostics"),DrawDiagnostics,"MainWindow.Diagnostics.cs, MainWindow.Advanced.cs",Visible:()=>developerMode),
+        new(Page.MyTools,null,PageLabel("Navigation.MyTools"),DrawMyTools,"MainWindow.MyTools.cs, MyTools/"),
         // New tools: scripts/New-Tool.ps1 adds their line above this one.
     ];
     /// <summary>The navigation's groups, in the order of the list; a page without a label is not an entry.</summary>
