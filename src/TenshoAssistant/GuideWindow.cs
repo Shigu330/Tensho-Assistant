@@ -18,7 +18,7 @@ internal sealed class GuideWindow : Window
 
     public override bool DrawConditions() => owner.GuideVisible();
     public override void PreDraw() { WindowName = owner.GuideTitle() + "###TenshoGuide"; owner.GuideThemePush(); }
-    public override void PostDraw() => owner.GuideThemePop();
+    public override void PostDraw() { owner.GuideThemePop(); if (!IsOpen) owner.CloseGuide(); } // 0.514: Plugin.Draw copies the state into IsOpen before OnClose could run.
     public override void Draw() => owner.DrawGuideContents();
     public override void OnClose() => owner.CloseGuide();
 }

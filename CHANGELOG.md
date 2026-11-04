@@ -3,6 +3,15 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.514.0
+- Demande de l'utilisateur (issue #38, règle Dalamud : « si ça ressemble à une fenêtre, utiliser l'API de fenêtres ») : fenêtre de suivi, tâches à l'écran, barre d'usure et barre de PR passent par le système de fenêtres de Dalamud (`PanelWindow`). Mêmes identifiants, donc positions gardées ; mêmes réglages. Échap ne les ferme pas (cela couperait le réglage). Une erreur ne coupe que le panneau concerné, comme avant, et le temps de dessin reste dans Diagnostics.
+- Vu en passant : pour le guide et la carte, `Plugin.Draw` recopie l'état dans `IsOpen` avant que `OnClose` puisse s'exécuter, ce qui peut annuler la croix de fermeture. L'état est maintenant écrit dès `PostDraw`, dans la même image. Déduit de la lecture du code et de la mémoire du fonctionnement de Dalamud, non observé en jeu.
+- Reste de l'issue #38 : relire les panneaux accrochés à une fenêtre du jeu.
+- Tests : PanelWindows514Tests. Verify.ps1 (agent) : 976/976, 0 avertissement, 0 erreur ; DLL 0.514.0.0. Non validé en jeu.
+### English
+- The tracker window, the on-screen tasks, the gear wear bar and the GP tick bar now use the Dalamud window system. Ids and settings are unchanged, so saved positions stay. Escape does not close them, and a panel that throws still turns off alone.
+- The guide and the map write their close button back in the same frame, so the next draw cannot undo it.
+
 ## 0.513.0
 - Question de l'utilisateur : « pourquoi toucher aux alarmes ? ». Erreur de l'agent en 0.512 : les documents disaient que les alarmes du jeu partaient sans clic. Relu dans le code : les commandes `/alarm` partent toujours d'un clic (ajouter une alarme avec le réglage actif, ou « Envoyer ») et les alarmes automatiques n'en créent jamais. Aucun changement de code ; manifeste, PUBLISHING, SECURITY, CONTRIBUTING et brouillon de PR corrigés.
 - Tests : aucun changement de logique. Verify.ps1 (agent) : 972/972, 0 avertissement, 0 erreur ; DLL 0.513.0.0. Non validé en jeu.

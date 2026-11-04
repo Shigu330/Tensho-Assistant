@@ -19,7 +19,7 @@ internal sealed class MapViewWindow : Window
 
     public override bool DrawConditions() => owner.MapViewVisible();
     public override void PreDraw() => owner.PrepareMapView(this);
-    public override void PostDraw() => owner.FinishMapView();
+    public override void PostDraw() { owner.FinishMapView(); if (!IsOpen) owner.CloseMapFromGame(); } // 0.514: Plugin.Draw copies the state into IsOpen before OnClose could run.
     public override void Draw()
     {
         // 0.489 (user report): the map is its own window, drawn with neither a page nor a panel: it has its line in Diagnostics.

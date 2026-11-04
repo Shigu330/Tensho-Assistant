@@ -711,6 +711,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.514 : panneaux libres en fenêtres Dalamud (#38)** — à voir en jouant
+
+- [ ] Fenêtre de suivi (réglage) : s'affiche à sa place habituelle, liste les alarmes, le nom ouvre l'objet, « Carte » ouvre le point ; la croix la ferme et décoche le réglage ; recocher la rouvre.
+- [ ] Tâches à l'écran : s'affiche avec une tâche marquée, cocher une tâche la fait sortir, cachée en combat ; la croix la ferme et décoche le réglage.
+- [ ] Barre d'usure : même place, mêmes valeurs ; sans titre ni croix ; le réglage l'affiche et la cache.
+- [ ] Barre de PR en mineur : se remplit, le repère du tic avance ; disparaît à PR pleins et sur un autre job ; PR mesurés même barre coupée.
+- [ ] Ces quatre panneaux ne prennent pas le focus en apparaissant, et Échap ne les ferme pas.
+- [ ] Guide et carte : la croix les ferme du premier coup.
+
 **0.510 : conseils de Triple Triade en JcE seulement** — à voir en jouant
 
 - [ ] Match contre un PNJ : conseils comme avant. Au Battlehall, en tournoi ou contre un joueur : pas de cadre, et le panneau dit pourquoi.

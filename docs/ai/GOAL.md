@@ -9,7 +9,7 @@ FAIT : files a) à g) et g2) de la [ROADMAP](../project/ROADMAP.md) ; prise en m
 RESTE, liste complète et ordre dans [PUBLISHING](../project/PUBLISHING.md) « Ce qui reste avant la soumission » :
 1) décisions de l'auteur sur les règles Dalamud : résumé court et accord à chaque fois ;
 2) séance de jeu sur la dernière version, puis release (DEC-033) ;
-3) fenêtres libres vers le système de fenêtres de Dalamud (issue #38), sur accord ;
+3) panneaux accrochés à une fenêtre du jeu : convertir ou présenter dans la PR (issue #38), sur accord ; les 4 panneaux libres sont faits en 0.514 ;
 4) captures pour l'installeur, passage en 1.0.0, PR et déclaration d'IA écrites par l'auteur.
 
 VALIDATION : Verify.ps1 vert, job CI « Build like the Dalamud repository » vert ; rapports de l'utilisateur en jeu ; la PR elle-même pour la compilation réseau coupé.

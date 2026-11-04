@@ -55,34 +55,32 @@ internal sealed partial class MainWindow
         catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Gear wear settings could not be saved.");}
     }
 
-    // Drawn by Plugin.Draw: the on-screen wear bar, only when it is on and the worn gear is known.
-    internal void DrawWearBar()
+    // The on-screen wear bar (a PanelWindow since 0.514), only when it is on and the worn gear is known.
+    private GearWearState wearBarState=new(0,0,null,null);
+    private PanelDefinition WearPanel=>new("WearBar","###TenshoWearBar",new Vector2(40,200),
+        ImGuiWindowFlags.NoTitleBar|ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav|ImGuiWindowFlags.NoScrollbar,
+        ()=>configuration.GearWear is { Bar:true },WearBarVisible,DrawWearBarContents,Alpha:0.6f);
+
+    private bool WearBarVisible()
     {
-        if(windowDisposed || configuration.GearWear is not { Bar:true } settings)return;
-        var state=GearWear.Evaluate(EquippedGear?.Invoke() ?? [],settings);
-        if(state.LowestCondition is null && state.HighestSpiritbond is null)return;
-        UI.FfxivTheme.Push();
-        try
+        if(windowDisposed || configuration.GearWear is not { Bar:true } settings)return false;
+        wearBarState=GearWear.Evaluate(EquippedGear?.Invoke() ?? [],settings);
+        return wearBarState.LowestCondition is not null || wearBarState.HighestSpiritbond is not null;
+    }
+
+    private void DrawWearBarContents()
+    {
+        var state=wearBarState;
+        if(state.LowestCondition is { } condition)
         {
-            ImGui.SetNextWindowPos(new Vector2(40,200),ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowBgAlpha(0.6f);
-            if(ImGui.Begin("###TenshoWearBar",ImGuiWindowFlags.NoTitleBar|ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav
-                   |ImGuiWindowFlags.NoScrollbar))
-            {
-                if(state.LowestCondition is { } condition)
-                {
-                    ImGui.TextColored(state.ToRepair>0 ? UI.FfxivTheme.Error:Success,localization.Format("GearWear.BarCondition",condition));
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GearWear.BarConditionTip"));
-                }
-                if(state.HighestSpiritbond is { } bond)
-                {
-                    if(state.LowestCondition is not null)ImGui.SameLine();
-                    ImGui.TextColored(state.ToExtract>0 ? Accent:Muted,localization.Format("GearWear.BarSpiritbond",bond.ToString("0")));
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GearWear.BarSpiritbondTip"));
-                }
-            }
-            ImGui.End();
+            ImGui.TextColored(state.ToRepair>0 ? UI.FfxivTheme.Error:Success,localization.Format("GearWear.BarCondition",condition));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GearWear.BarConditionTip"));
         }
-        finally{UI.FfxivTheme.Pop();}
+        if(state.HighestSpiritbond is { } bond)
+        {
+            if(state.LowestCondition is not null)ImGui.SameLine();
+            ImGui.TextColored(state.ToExtract>0 ? Accent:Muted,localization.Format("GearWear.BarSpiritbond",bond.ToString("0")));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GearWear.BarSpiritbondTip"));
+        }
     }
 }

@@ -18,7 +18,7 @@ les sources.
 ### Hôte et cycle de vie (`Plugin.cs`)
 
 - `Plugin` reçoit les services Dalamud par injection, charge `Configuration` v1 (une autre version lève une erreur, le fichier n'est
-  pas écrasé), crée les services, `MainWindow`, `MapViewWindow` et `GuideWindow` (même `WindowSystem`), et enregistre chaque lecteur, chargeur, pont
+  pas écrasé), crée les services, `MainWindow`, `MapViewWindow`, `GuideWindow` et les `PanelWindow` (suivi, tâches, barres ; même `WindowSystem`), et enregistre chaque lecteur, chargeur, pont
   et service réseau dans `RegistrationScope` : nettoyage en ordre inverse, idempotent, poursuivi après erreur ; un échec du
   constructeur déclenche le même nettoyage.
 - Commande `/tensho` (argument `peche`, `pêche`, `fish` ou `fishing` : ouvre ou ferme l'aide à la pêche), `OpenMainUi`,
@@ -53,7 +53,7 @@ les sources.
 | `Macros/` | chaîne de macros (`MacroSequence`, `MacroChainService` / `MacroChainBridge`, observation) ; écriture des macros d'artisanat dans le jeu (`MacroSlotPlan`, `MacroWriter`) |
 | `Caching/` | cache disque (`DataCache`), durées (`CachePreferences`), clés (`CatalogCacheKeys`, `GameCacheIdentity`), validation (`CacheSnapshots`) |
 | `Localization/` | `LocalizationManager`, `LocalizationValidator`, `Languages/*.json` (embarqués) |
-| `Help/`, `Guide/` | aide de chaque page et recherche (`HelpIndex`), signaler un problème (`ProblemReport`, formulaire GitHub prérempli), vidéos de la communauté (`CommunityHelp`, lues sur clic) ; guide de première prise en main (`GuideFlow`, `GuideWindow` dans le `WindowSystem`) ; 0.502–0.506, [ONBOARD-001](../goals/ONBOARD-001.md) |
+| `Help/`, `Guide/` | aide de chaque page et recherche (`HelpIndex`), signaler un problème (`ProblemReport`, formulaire GitHub prérempli), vidéos de la communauté (`CommunityHelp`, lues sur clic) ; guide de première prise en main (`GuideFlow` ; `GuideWindow.cs`, à la racine, dans le `WindowSystem`) ; 0.502–0.506, [ONBOARD-001](../goals/ONBOARD-001.md) |
 | `Diagnostics/` | auto-contrôle au rechargement en mode développeur (`SelfCheck`, `SelfCheckRunner`), mémoire de ce qui a déjà été vu ; 0.494–0.496 |
 | `Beastmaster/` | page dresseur, données du jeu lues brutes (`BeastCatalog`) ; sonde des fenêtres (`BeastWindowProbe`), sans panneau de conseil ; 0.500–0.501, DEC-032 |
 | `MyTools/` | outils du joueur et galerie communautaire, données seulement (`ToolGallery`, lue sur clic) ; terminé en 0.476, [TEMPLATES-001](../goals/TEMPLATES-001.md) |

@@ -31,6 +31,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly MainWindow mainWindow;
     private MapViewWindow? mapWindow;
     private GuideWindow? guideWindow;
+    private PanelWindow[] panelWindows = [];
     private readonly WindowSystem windows = new("TenshoAssistant");
     private readonly InventoryService inventoryService = new();
     private readonly InventoryVisualSortService visualSort=new();
@@ -921,6 +922,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(() => windows.AddWindow(mainWindow), () => windows.RemoveWindow(mainWindow));
             registrations.Register(() => windows.AddWindow(guideWindow = new GuideWindow(mainWindow)), () => { if (guideWindow is not null) windows.RemoveWindow(guideWindow); guideWindow = null; });
             registrations.Register(() => windows.AddWindow(mapWindow = new MapViewWindow(mainWindow)), () => { if (mapWindow is not null) windows.RemoveWindow(mapWindow); });
+            registrations.Register(() => { panelWindows = mainWindow.CreatePanelWindows(); foreach (var panel in panelWindows) windows.AddWindow(panel); }, () => { foreach (var panel in panelWindows) windows.RemoveWindow(panel); panelWindows = []; });
             registrations.Register(() =>
             {
                 commandInfo=new CommandInfo(OnCommand){HelpMessage=localization.Get("Plugin.CommandHelp")};
@@ -990,6 +992,7 @@ public sealed class Plugin : IDalamudPlugin
         // The map's open state lives in MainWindow (game map key M, journal); its window follows it.
         if(mapWindow is not null)mapWindow.IsOpen=mainWindow.MapViewOpen;
         if(guideWindow is not null)guideWindow.IsOpen=mainWindow.GuideOpen;
+        foreach(var panel in panelWindows)panel.Follow();
         windows.Draw();
         overlays??=
         [
@@ -999,10 +1002,8 @@ public sealed class Plugin : IDalamudPlugin
             ("UndercutClipboard",()=>undercut?.FlushClipboard()),
             ("Cactpot",mainWindow.DrawCactpotOverlay),
             ("CraftLive",mainWindow.DrawCraftLivePanel),
-            ("TaskPanel",mainWindow.DrawTaskPanel),
-            ("WearBar",mainWindow.DrawWearBar),
             ("InventorySort",mainWindow.DrawInventorySortButton),
-            ("RegenTick",mainWindow.DrawRegenTickBar),
+            ("RegenTick",mainWindow.ObserveRegenTick),
             ("AlarmBar",()=>alarmBar?.Invoke()?.DrawTooltip()),
             ("ReminderBar",()=>reminderBar?.Invoke()?.DrawTooltip()),
             ("TriadOverlay",mainWindow.DrawTriadOverlay),
@@ -1014,7 +1015,6 @@ public sealed class Plugin : IDalamudPlugin
             ("Gathering",mainWindow.DrawGatheringPanel),
             ("Collectable",mainWindow.DrawCollectablePanel),
             ("RetainerSales",mainWindow.DrawRetainerSalesPanel),
-            ("Tracker",mainWindow.DrawTrackerWindow),
             ("Spearfishing",mainWindow.DrawSpearfishingPanel),
             ("OceanVoyage",mainWindow.DrawOceanVoyagePanel),
             ("GameLogRequest",mainWindow.ProcessGameLogRequest),
