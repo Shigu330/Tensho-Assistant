@@ -69,11 +69,13 @@ internal sealed partial class MainWindow
         return seen || configuration.GuideWindowsDone?.Contains(key) == true;
     }
 
-    private void DrawGuideWindows(IReadOnlyList<GuideWindowTask> tasks)
+    private long guideChecklistNext;
+    private bool guideChecklistDone;
+    private void DrawGuideWindows(IReadOnlyList<GuideWindowTask> tasks, bool check = true)
     {
         foreach (var task in tasks)
         {
-            var done = GuideWindowDone(task.Key);
+            var done = check ? GuideWindowDone(task.Key) : configuration.GuideWindowsDone?.Contains(task.Key) == true;
             ImGui.TextColored(done ? Success : Muted, (done ? "✓ " : "○ ") + localization.Get($"Guide.Window{task.Key}"));
             if (!done) { ImGui.Indent(); ImGui.PushTextWrapPos(0); ImGui.TextDisabled(localization.Get($"Guide.Window{task.Key}Where")); ImGui.PopTextWrapPos(); ImGui.Unindent(); }
         }
@@ -94,10 +96,17 @@ internal sealed partial class MainWindow
         }
         if (configuration.GuideChecklistHidden || !configuration.GuideOffered) return;
         var tasks = GuideFlow.Windows(GuideChosen);
-        if (tasks.All(task => GuideWindowDone(task.Key))) return;
+        // 0.511: checked every two seconds: the collections are thousands of rows, and this runs in Draw. Finished is read from what is saved.
+        var now = System.Diagnostics.Stopwatch.GetTimestamp();
+        if (now >= guideChecklistNext)
+        {
+            guideChecklistNext = now + System.Diagnostics.Stopwatch.Frequency * 2;
+            guideChecklistDone = tasks.All(task => GuideWindowDone(task.Key));
+        }
+        if (guideChecklistDone) return;
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("Guide.Checklist")))
         {
-            DrawGuideWindows(tasks);
+            DrawGuideWindows(tasks, false);
             if (ImGui.SmallButton(localization.Get("Guide.ChecklistHide"))) { configuration.GuideChecklistHidden = true; SaveGuide(); }
             Tip("Guide.ChecklistHideTip");
         }

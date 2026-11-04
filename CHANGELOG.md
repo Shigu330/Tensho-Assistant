@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.511.0
+- Relecture du code de l'après-midi, sans essai en jeu. Deux défauts corrigés : la page Aide restait dans l'ancienne langue après un changement de langue ; la liste des fenêtres sur l'accueil parcourait les collections à chaque image, elle ne le fait plus que toutes les deux secondes.
+- Tests : GuideFlowTests complété. Verify.ps1 (agent) : 972/972, 0 avertissement, 0 erreur ; DLL 0.511.0.0. Non validé en jeu.
+### English
+- The Help page follows a language change. The Home checklist no longer scans the collections on every frame.
+
 ## 0.510.0
 - Décisions de l'utilisateur (DEC-033). Cadre des fenêtres du jeu retiré, code, réglage et textes (« rendu horrible »).
 - Conseils en JcE seulement : les conseils de match et les estimations de défi de Triple Triade ne valent plus que contre un PNJ, jamais au Battlehall, en tournoi ni contre un joueur. Le panneau le dit. Preuve : docs/evidence/0.510-triad-competitive.md.

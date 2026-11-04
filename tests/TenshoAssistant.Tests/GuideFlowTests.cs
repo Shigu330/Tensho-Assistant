@@ -59,6 +59,13 @@ internal static class GuideFlowTests
             var pages=Read("src/TenshoAssistant/MainWindow.cs");
             foreach(var stop in GuideFlow.Stops(null))Check(pages.Contains(" "+stop.Page+",") || pages.Contains(" "+stop.Page+" }"),"a stop that is not a page: "+stop.Page);
         }),
+        ("Guide and help: what runs in Draw stays light and follows the language",() =>
+        {
+            var guide=Read("src/TenshoAssistant/MainWindow.Guide.cs");
+            Check(guide.Contains("guideChecklistNext = now + System.Diagnostics.Stopwatch.Frequency * 2;") && guide.Contains("DrawGuideWindows(tasks, false);"),"the Home list reads what is saved, every two seconds");
+            var help=Read("src/TenshoAssistant/MainWindow.Help.cs");
+            Check(help.Contains("var language = localization.CurrentCode + \"|\" + helpQuery;"),"help rebuilt on a language change");
+        }),
         ("Guide: its red lines in the code",() =>
         {
             var code=Read("src/TenshoAssistant/MainWindow.Guide.cs");

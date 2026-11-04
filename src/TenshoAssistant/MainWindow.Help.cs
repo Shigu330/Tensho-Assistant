@@ -150,8 +150,14 @@ internal sealed partial class MainWindow
             }
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("Help.Pages"), ImGuiTreeNodeFlags.DefaultOpen))
         {
-            helpTopics ??= PageEntries.Select(entry => TopicOf(entry.Page)).ToArray();
-            if (helpKey != helpQuery) { helpKey = helpQuery; helpView = HelpIndex.Search(helpTopics, helpQuery); }
+            // 0.511: rebuilt when the language changes, or the help stayed in the old one.
+            var language = localization.CurrentCode + "|" + helpQuery;
+            if (helpKey != language)
+            {
+                helpKey = language;
+                helpTopics = PageEntries.Select(entry => TopicOf(entry.Page)).ToArray();
+                helpView = HelpIndex.Search(helpTopics, helpQuery);
+            }
             if (helpView.Count == 0) ImGui.TextDisabled(localization.Get("Help.NoResult"));
             foreach (var topic in helpView)
             {
