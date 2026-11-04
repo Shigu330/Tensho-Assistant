@@ -71,16 +71,12 @@ internal sealed partial class MainWindow
         if(now<craftLogStableSince)craftLogStableSince=now;
         if(CraftLogSession.ShouldStart(input,craftLogStarted,now-craftLogStableSince,configuration.CraftLogAutoSolve,craftLogRequested))
         {craftLogStarted=true;_=craftLogSession.StartAsync(input,craftLogForceRefresh);craftLogForceRefresh=false;}
-        using var theme=TenshoAssistant.UI.FfxivTheme.Apply();
         var viewport=ImGui.GetMainViewport();var width=Math.Min(380,viewport.WorkSize.X);var height=Math.Min(720,viewport.WorkSize.Y);
         var position=viewport.Pos+observed.Position+new Vector2(observed.Size.X+6,0);
         if(position.X+width>viewport.WorkPos.X+viewport.WorkSize.X)position.X=viewport.Pos.X+observed.Position.X-width-6;
         position=Vector2.Clamp(position,viewport.WorkPos,Vector2.Max(viewport.WorkPos,viewport.WorkPos+viewport.WorkSize-new Vector2(width,height)));
-        ImGui.SetNextWindowPos(position,ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(width,height),ImGuiCond.Always);
-        var visible=ImGui.Begin(localization.Get("CraftLogUi.Title")+"###TenshoCraftLog",ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoResize);
-        try
+        Panels?.Show("TenshoCraftLog",localization.Get("CraftLogUi.Title"),ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoResize,()=>{ImGui.SetNextWindowPos(position,ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(width,height),ImGuiCond.Always);},()=>
         {
-            if(!visible)return;
             // 0.469 (user request, in-game campaign): the panel in sections (recipe, your state, target, result), figures in a table, explanations in the tooltips of « (?) ».
             if(context.Recipe is { } selected)DrawCraftLogTitle(selected);
             DrawToolSettingsLink("CraftLog");
@@ -143,8 +139,7 @@ internal sealed partial class MainWindow
             if(result.Saved is not null)DrawCraftLogMacro(localization.Get("CraftLogUi.Saved"),result.Saved,actions);
             if(!result.SavedIsEnough)DrawCraftLogMacro(localization.Get("CraftLogUi.Suggested"),result.Suggested,actions,true);
             if(result.SearchIssue is { } searchIssue)ImGui.TextWrapped(CraftMessage(searchIssue));
-        }
-        finally{ImGui.End();}
+        });
     }
     private void DrawCraftLogMacro(string title,CraftLogMacro? macro,CraftActionCatalog catalog,bool canSave=false)
     {

@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.516.0
+- Décision de l'utilisateur (issue #38, règle Dalamud : « si ça ressemble à une fenêtre, utiliser l'API de fenêtres ») : les panneaux accrochés à une fenêtre du jeu passent aussi par le système de fenêtres de Dalamud : import de banque, Personnage, collectionnable, carnet d'artisanat, projection, outil de mission, Revue de mode, pêche, récolte, bouton de tri, survol d'objet, pêche en mer, ventes des servants, harpon, demande de Triple Triade.
+- Comment : un hôte commun (`AttachedPanels`). Chaque panneau décide encore à chaque image s'il s'affiche, puis demande sa fenêtre ; leur contenu ne change pas, mêmes identifiants. Dans `Plugin.Draw`, les panneaux passent maintenant avant `windows.Draw()`. Échap ne les ferme pas, ils ne s'épinglent pas, et une erreur ne coupe que le panneau concerné. Seule exception : les zones de clic invisibles de la Revue de mode, qui ne ressemblent pas à une fenêtre.
+- Tests : AttachedPanels516Tests (aucun `ImGui.Begin` hors de ces zones). Verify.ps1 (agent) : 982/982, 0 avertissement, 0 erreur ; DLL 0.516.0.0. Non validé en jeu. Sauvegarde : `checkpoints/backup-20261104-224219-before-panel-windows.zip`.
+### English
+- The panels attached to a game window now use the Dalamud window system too, through one shared host. Their contents and ids are unchanged; Escape does not close them, and a panel that throws turns off alone. Only exception: the invisible click zones of the Fashion Report.
+
 ## 0.515.0
 - Rapport de l'utilisateur en jeu (capture, 5 tentatives, effet du lieu « PR ≧ 770 → tentatives +1 ») : l'aide à la récolte ne proposait rien avec 809 PR. Cause : le plan sur la liste de fabrication gardait les PR pour un « nœud à bonus majeur », et le premier nœud vu comptait toujours comme normal.
 - Décision de l'utilisateur (DEC-036) : plus de plan sur une série de nœuds. Retirés : répartition des PR, « garder les PR pour les nœuds à bonus », secondes entre deux nœuds (`GpRoutes`, `GatherNodeNorms`, 2 réglages). Le panneau montre le meilleur plan du nœud en cours. La ligne de la liste de fabrication reste, à la demande de l'utilisateur : ce qu'il manque et le nombre de nœuds comme celui-ci, à titre d'information.

@@ -32,6 +32,7 @@ public sealed class Plugin : IDalamudPlugin
     private MapViewWindow? mapWindow;
     private GuideWindow? guideWindow;
     private PanelWindow[] panelWindows = [];
+    private AttachedPanels? attachedPanels;
     private readonly WindowSystem windows = new("TenshoAssistant");
     private readonly InventoryService inventoryService = new();
     private readonly InventoryVisualSortService visualSort=new();
@@ -940,6 +941,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(() => windows.AddWindow(mainWindow), () => windows.RemoveWindow(mainWindow));
             registrations.Register(() => windows.AddWindow(guideWindow = new GuideWindow(mainWindow)), () => { if (guideWindow is not null) windows.RemoveWindow(guideWindow); guideWindow = null; });
             registrations.Register(() => windows.AddWindow(mapWindow = new MapViewWindow(mainWindow)), () => { if (mapWindow is not null) windows.RemoveWindow(mapWindow); });
+            registrations.Register(() => { attachedPanels = new AttachedPanels(windows, mainWindow); mainWindow.Panels = attachedPanels; bankOverlay.Panels = attachedPanels; }, () => { mainWindow.Panels = null; bankOverlay.Panels = null; attachedPanels?.Dispose(); attachedPanels = null; });
             registrations.Register(() => { panelWindows = mainWindow.CreatePanelWindows(); foreach (var panel in panelWindows) windows.AddWindow(panel); }, () => { foreach (var panel in panelWindows) windows.RemoveWindow(panel); panelWindows = []; });
             registrations.Register(() =>
             {
@@ -1011,7 +1013,6 @@ public sealed class Plugin : IDalamudPlugin
         if(mapWindow is not null)mapWindow.IsOpen=mainWindow.MapViewOpen;
         if(guideWindow is not null)guideWindow.IsOpen=mainWindow.GuideOpen;
         foreach(var panel in panelWindows)panel.Follow();
-        windows.Draw();
         overlays??=
         [
             ("Bank",()=>{if(!autoBankCapture())bankOverlay.Draw();}),
@@ -1053,6 +1054,10 @@ public sealed class Plugin : IDalamudPlugin
             // 0.486 (user report): the panels beside the game's windows count too, in developer mode.
             if(started!=0)mainWindow.RecordOverlayDraw(name,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);
         }
+        // 0.516: the panels attached to a game window have asked above; all the windows are drawn after them.
+        attachedPanels?.Apply();
+        windows.Draw();
+        attachedPanels?.EndFrame();
     }
     private (string Name,Action Draw)[]? overlays;
     private T LoadSheet<T>(string name,Func<T> read,T unavailable)

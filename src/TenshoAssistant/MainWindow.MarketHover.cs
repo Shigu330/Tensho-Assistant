@@ -32,18 +32,10 @@ internal sealed partial class MainWindow
         // 0.377 (g, M-07): the hovered piece against the worn one(s) of its slot, first (the most direct use).
         var compare=configuration.ItemUsagesOnHover && observed.Stable(now) ? HoverComparisons(hovered.ItemId,hovered.Kind==Items.ItemHoverKind.Hq):[];
         if(!prices && !usages && compare.Count==0)return;
-        using var theme=TenshoAssistant.UI.FfxivTheme.Apply();
         var viewport=ImGui.GetMainViewport();
         var (position,width)=HoverPlacement(observed.Anchor,viewport);
-        ImGui.SetNextWindowPos(position,ImGuiCond.Always);
-        if(width is { } fixedWidth)ImGui.SetNextWindowSizeConstraints(new Vector2(fixedWidth,0),new Vector2(fixedWidth,viewport.WorkSize.Y));
-        else ImGui.SetNextWindowSizeConstraints(Vector2.Zero,viewport.WorkSize);
-        ImGui.SetNextWindowBgAlpha(0.94f);
-        var visible=ImGui.Begin(localization.Get("HoverUi.Title")+"###TenshoItemHover",ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize
-            | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav);
-        try
+        Panels?.Show("TenshoItemHover",localization.Get("HoverUi.Title"),ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav,()=>{ImGui.SetNextWindowPos(position,ImGuiCond.Always);if(width is { } fixedWidth)ImGui.SetNextWindowSizeConstraints(new Vector2(fixedWidth,0),new Vector2(fixedWidth,viewport.WorkSize.Y));else ImGui.SetNextWindowSizeConstraints(Vector2.Zero,viewport.WorkSize);ImGui.SetNextWindowBgAlpha(0.94f);},()=>
         {
-            if(!visible)return;
             ImGui.PushTextWrapPos(width is { } wrap ? wrap-ImGui.GetStyle().WindowPadding.X:Math.Min(350,Math.Max(120,viewport.WorkSize.X-32)));
             try
             {
@@ -71,8 +63,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.PopTextWrapPos();}
             hoverPanelSize=ImGui.GetWindowSize();
-        }
-        finally{ImGui.End();}
+        });
     }
 
     // Below the game tooltip, else above it, else beside it; the mouse position is only a fallback when no tooltip is visible.

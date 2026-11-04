@@ -34,15 +34,9 @@ internal sealed partial class MainWindow
         if(windowDisposed || !configuration.GatheringPanel || gatheringObservation.Window is not { } window
            || observed.Frame is not { } frame || !observed.Fresh(DateTimeOffset.UtcNow))return;
         TrackGatheringNode(observed.Owner,frame);
-        using var theme=UI.FfxivTheme.Apply();
-        ImGui.SetNextWindowPos(new Vector2(window.X+window.Width+6,window.Y),ImGuiCond.Always);
-        ImGui.SetNextWindowSize(new Vector2(360,0),ImGuiCond.Always);
         var miner=frame.JobId==16;
-        var visible=ImGui.Begin(localization.Get(miner ? "GatheringPanel.TitleMiner":"GatheringPanel.TitleBotanist")+"###TenshoGatheringPanel",
-            ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.AlwaysAutoResize);
-        try
+        Panels?.Show("TenshoGatheringPanel",localization.Get(miner ? "GatheringPanel.TitleMiner":"GatheringPanel.TitleBotanist"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.AlwaysAutoResize,()=>{ImGui.SetNextWindowPos(new Vector2(window.X+window.Width+6,window.Y),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(360,0),ImGuiCond.Always);},()=>
         {
-            if(!visible)return;
             // Job header: its own icon (ClassJob 62100 + job) and colour, so miner and botanist help never look alike.
             var colour=miner ? new Vector4(0.95f,0.65f,0.30f,1):new Vector4(0.45f,0.85f,0.45f,1);
             DrawItemIcon(new ItemDefinition(0,"",false,62100+frame.JobId),new Vector2(28));ImGui.SameLine();
@@ -88,8 +82,7 @@ internal sealed partial class MainWindow
                 ImGui.TextDisabled(localization.Get("GatheringPanel.Footer"));
             }
             finally{ImGui.PopTextWrapPos();}
-        }
-        finally{ImGui.End();}
+        });
     }
 
     // 0.330 (audit 8): the game's rates already include the actions bought at the node (Gift, Tidings…) and the optimizer, told of no

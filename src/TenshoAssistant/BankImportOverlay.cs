@@ -9,6 +9,8 @@ namespace TenshoAssistant;
 /// <summary>Companion panels attached to visible game menus; native pointers never enter Draw.</summary>
 internal sealed class BankImportOverlay(InventoryBankService bank, BankInventoryBridge bridge, LocalizationManager localization)
 {
+    public AttachedPanels? Panels { get; set; }
+
     public void Draw()
     {
         var menus = bridge.State;
@@ -20,20 +22,13 @@ internal sealed class BankImportOverlay(InventoryBankService bank, BankInventory
 
     private void DrawPanel(string id, BankMenuContext context, BankMenuContext? premium, string? message)
     {
-        using var theme=FfxivTheme.Apply();
         var viewport = ImGui.GetMainViewport();
         var position = viewport.Pos + context.Anchor;
         var minimum = viewport.WorkPos;
         var maximum = Vector2.Max(minimum, viewport.WorkPos + viewport.WorkSize - new Vector2(330, premium is null ? 170 : 240));
         position = Vector2.Clamp(position, minimum, maximum);
-        ImGui.SetNextWindowPos(position, ImGuiCond.Always);
-        ImGui.SetNextWindowSize(new Vector2(330, 0), ImGuiCond.Always);
-        var visible = ImGui.Begin(localization.Get("BankUi.OverlayTitle")+$"###TenshoBankImport{id}",
-            ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoSavedSettings
-            | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing);
-        try
+        Panels?.Show($"TenshoBankImport{id}",localization.Get("BankUi.OverlayTitle"),ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing,()=>{ImGui.SetNextWindowPos(position, ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(330, 0), ImGuiCond.Always);},()=>
         {
-            if (!visible) return;
             ImGui.TextUnformatted("Tensho · "+localization.Get("BankUi.OverlayTitle"));
             DrawSource(context);
             if (premium is not null && premium.Loaded)
@@ -43,8 +38,7 @@ internal sealed class BankImportOverlay(InventoryBankService bank, BankInventory
             }
             if (message is not null) ImGui.TextWrapped(UiMessages.Get(localization,message,"ServiceErrors.Bank"));
             if (bank.State.Error is not null) ImGui.TextWrapped(localization.Get("ServiceErrors.Bank"));
-        }
-        finally { ImGui.End(); }
+        });
     }
 
     private void DrawSource(BankMenuContext context)

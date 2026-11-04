@@ -1,13 +1,13 @@
 # État courant (mis à jour 2026-11-04)
 
-VERSION: 0.515.0.0 (dernière release : Stable-0.451.0, 2026-11-03) — Verify.ps1 (agent) 979/979, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.516.0.0 (dernière release : Stable-0.451.0, 2026-11-03) — Verify.ps1 (agent) 982/982, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: préparer la 1.0.0 (publication Dalamud) ; voir [GOAL](GOAL.md) et [PUBLISHING](../project/PUBLISHING.md).
 QUOTA: réserve utilisateur 1 % (5 h et semaine). L'agent ne voit pas le compteur.
 
 Historique (rapports de validation un par un, anciennes reprises, couverture des 17 plugins au 2026-11-02) : [STATUS-ARCHIVE](STATUS-ARCHIVE.md).
 
 ## Où en est le projet
-- Fait : files a) à g) de la [ROADMAP](../project/ROADMAP.md) (0.315–0.446), R-14 résistance aux mises à jour (0.452–0.454, 0.491–0.492, 0.507), solveur Raphael A-03 et A-04 (0.465, 0.509), modèles communautaires (0.476), auto-contrôle au rechargement (0.494–0.496), page dresseur (0.500), prise en main ONBOARD-001 (0.502–0.506), ventes des servants I-05 première version (0.508), cadre du jeu retiré et conseils en JcE seulement (0.510), panneaux libres en fenêtres Dalamud (0.514).
+- Fait : files a) à g) de la [ROADMAP](../project/ROADMAP.md) (0.315–0.446), R-14 résistance aux mises à jour (0.452–0.454, 0.491–0.492, 0.507), solveur Raphael A-03 et A-04 (0.465, 0.509), modèles communautaires (0.476), auto-contrôle au rechargement (0.494–0.496), page dresseur (0.500), prise en main ONBOARD-001 (0.502–0.506), ventes des servants I-05 première version (0.508), cadre du jeu retiré et conseils en JcE seulement (0.510), panneaux libres et panneaux accrochés au jeu en fenêtres Dalamud (0.514, 0.516), aide à la récolte par nœud avec les effets du lieu (0.515).
 - Abandonné : chat personnalisable ([DEC-030](../project/DECISIONS.md)).
 - Mis de côté par l'utilisateur : dresseur, suite (sonde 0.501, rangs, panneau du Dédale ; [DEC-032](../project/DECISIONS.md)) ; N-10 atelier de l'île ; I-14 et X-05.
 - À faire avec une séance en jeu : I-15, suite de I-05, sondes de l'issue #23 ([G-PROPOSALS](../project/G-PROPOSALS.md) « Écarts laissés »).
@@ -20,6 +20,7 @@ Sur rapports de l'utilisateur, détail dans [STATUS-ARCHIVE](STATUS-ARCHIVE.md) 
 
 ## À valider en jeu
 Liste complète : [TESTING](../project/TESTING.md), 284 cases ouvertes, aucune déclarée validée sans rapport ; elles se règlent quand l'utilisateur les signale en jouant. À essayer d'abord :
+- 0.516 tous les panneaux accrochés au jeu (fenêtres Dalamud) ;
 - 0.515 aide à la récolte : plan du nœud, ligne « Effet du lieu », cristaux ;
 - 0.514 les 4 panneaux en fenêtres Dalamud, et la croix du guide et de la carte ;
 - 0.508 ventes des servants, 0.509 coup conseillé pendant la synthèse ;
@@ -30,7 +31,7 @@ Après une release seulement : galerie de Mes outils (0.476) et liste de vidéos
 ## Prochaine action
 1) Décisions de l'auteur sur les points Dalamud ([PUBLISHING](../project/PUBLISHING.md) « Ce qui reste », points 4 à 7 ; titre selon le job décidé, DEC-035), avec son accord à chaque règle.
 2) Une séance de jeu sur la dernière version, puis une release (DEC-033 : pas de release avant cette séance).
-3) Panneaux accrochés à une fenêtre du jeu : les convertir ou les présenter dans la PR (issue #38), avec l'accord de l'auteur.
+3) Vérifier en jeu les fenêtres converties (issue #38).
 4) Passage en 1.0.0 et soumission, au moment choisi par l'auteur (DEC-023). La PR et la déclaration d'IA sont écrites par lui.
 Après chaque rechargement en mode développeur, l'agent lit les lignes « Selftest » de dalamud.log.
 

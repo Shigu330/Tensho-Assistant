@@ -95,18 +95,12 @@ internal sealed partial class MainWindow
         if(state.Frame is null)return;
         var addon=gameGui.GetAddonByName("Synthesis");
         if(addon.IsNull || !addon.IsVisible)return;
-        using var theme=TenshoAssistant.UI.FfxivTheme.Apply();
         var viewport=ImGui.GetMainViewport();var width=Math.Min(560,viewport.WorkSize.X);var height=Math.Min(460,viewport.WorkSize.Y);
         var position=viewport.Pos+addon.Position+new Vector2(addon.ScaledWidth+6,0);
         if(position.X+width>viewport.WorkPos.X+viewport.WorkSize.X)position.X=viewport.Pos.X+addon.Position.X-width-6;
         position=Vector2.Clamp(position,viewport.WorkPos,Vector2.Max(viewport.WorkPos,viewport.WorkPos+viewport.WorkSize-new Vector2(width,height)));
-        ImGui.SetNextWindowPos(position,ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(width,height),ImGuiCond.Always);
         // 0.468 (user request, in-game campaign): its cross turns its setting off.
-        var open=true;
-        var visible=ImGui.Begin(localization.Get("CraftProjectionUi.Title")+"###TenshoCraftLivePanel",ref open,ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize);
-        try{if(visible)DrawCraftProjectionBody(state);}
-        finally{ImGui.End();}
-        if(!open){configuration.CraftLivePanel=false;craftLive.SetEnabled(CraftLiveWanted(configuration));SaveReminders();}
+        Panels?.Show("TenshoCraftLivePanel",localization.Get("CraftProjectionUi.Title"),ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize,()=>{ImGui.SetNextWindowPos(position,ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(width,height),ImGuiCond.Always);},()=>DrawCraftProjectionBody(state),()=>{configuration.CraftLivePanel=false;craftLive.SetEnabled(CraftLiveWanted(configuration));SaveReminders();});
     }
 
     private void DrawCraftProjectionBody(CraftLiveState state)

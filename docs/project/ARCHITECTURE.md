@@ -18,13 +18,13 @@ les sources.
 ### Hôte et cycle de vie (`Plugin.cs`)
 
 - `Plugin` reçoit les services Dalamud par injection, charge `Configuration` v1 (une autre version lève une erreur, le fichier n'est
-  pas écrasé), crée les services, `MainWindow`, `MapViewWindow`, `GuideWindow` et les `PanelWindow` (suivi, tâches, barres ; même `WindowSystem`), et enregistre chaque lecteur, chargeur, pont
+  pas écrasé), crée les services, `MainWindow`, `MapViewWindow`, `GuideWindow`, les `PanelWindow` (suivi, tâches, barres) et `AttachedPanels` (panneaux à côté des fenêtres du jeu, 0.516 ; même `WindowSystem`), et enregistre chaque lecteur, chargeur, pont
   et service réseau dans `RegistrationScope` : nettoyage en ordre inverse, idempotent, poursuivi après erreur ; un échec du
   constructeur déclenche le même nettoyage.
 - Commande `/tensho` (argument `peche`, `pêche`, `fish` ou `fishing` : ouvre ou ferme l'aide à la pêche), `OpenMainUi`,
   `OpenConfigUi` (Paramètres), ouverture à la connexion (`OpenOnLogin`). Polices de titre du jeu (TrumpGothic 24 et 19 px, atlas de
   Dalamud ; police normale tant qu'elles ne sont pas prêtes), libérées au déchargement.
-- `Plugin.Draw` : demande venue du menu contextuel du jeu, thème, état d'ouverture de la carte, `windows.Draw()`, puis les panneaux
+- `Plugin.Draw` : demande venue du menu contextuel du jeu, thème, état d'ouverture de la carte, puis les panneaux (ils demandent leur fenêtre à `AttachedPanels`), enfin `windows.Draw()` (0.516). Panneaux
   posés à côté des fenêtres du jeu : import de banque (seulement si la capture automatique est coupée), aide du carnet de synthèse,
   survol d'objet, Mini Cactpot, infobulle de l'icône d'alarme, Triple Triade (match, demande de deck, rappel de deck), Personnage,
   outil de mission, Revue de mode, récolte, pêche.

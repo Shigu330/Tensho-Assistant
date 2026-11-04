@@ -2,14 +2,14 @@
 
 ID: D17-PREP — préparer la version 1.0.0, première publication sur le dépôt officiel Dalamud, au moment choisi par l'auteur (DEC-023). Suivi : issue GitHub #31.
 
-État relu le 2026-11-04, version 0.512 :
+État relu le 2026-11-04, version 0.516 :
 
 FAIT : files a) à g) et g2) de la [ROADMAP](../project/ROADMAP.md) ; prise en main [ONBOARD-001](../goals/ONBOARD-001.md) codée ; campagne guidée de tests en jeu close par l'utilisateur (les erreurs se règlent quand il les signale en jouant) ; compilation alignée sur celle de Dalamud (0.512).
 
 RESTE, liste complète et ordre dans [PUBLISHING](../project/PUBLISHING.md) « Ce qui reste avant la soumission » :
 1) décisions de l'auteur sur les règles Dalamud : résumé court et accord à chaque fois ;
 2) séance de jeu sur la dernière version, puis release (DEC-033) ;
-3) panneaux accrochés à une fenêtre du jeu : convertir ou présenter dans la PR (issue #38), sur accord ; les 4 panneaux libres sont faits en 0.514 ;
+3) vérifier en jeu les fenêtres converties en 0.514 et 0.516 (issue #38) ;
 4) captures pour l'installeur, passage en 1.0.0, PR et déclaration d'IA écrites par l'auteur.
 
 VALIDATION : Verify.ps1 vert, job CI « Build like the Dalamud repository » vert ; rapports de l'utilisateur en jeu ; la PR elle-même pour la compilation réseau coupé.

@@ -32,14 +32,8 @@ internal sealed partial class MainWindow
     internal void DrawCollectablePanel()
     {
         if(windowDisposed || !configuration.GatheringPanel || Collectables?.Frame is not { } frame)return;
-        using var theme=UI.FfxivTheme.Apply();
-        ImGui.SetNextWindowPos(new Vector2(frame.X+frame.Width+6,frame.Y),ImGuiCond.Always);
-        ImGui.SetNextWindowSize(new Vector2(360,0),ImGuiCond.Always);
-        var visible=ImGui.Begin(localization.Get("CollectablePanel.Title")+"###TenshoCollectablePanel",
-            ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.AlwaysAutoResize);
-        try
+        Panels?.Show("TenshoCollectablePanel",localization.Get("CollectablePanel.Title"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.AlwaysAutoResize,()=>{ImGui.SetNextWindowPos(new Vector2(frame.X+frame.Width+6,frame.Y),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(360,0),ImGuiCond.Always);},()=>
         {
-            if(!visible)return;
             // 0.478: the game's window cuts long names; the rules hold the whole one.
             if(!ReferenceEquals(collectableTurnRaw,frame.RawValues)){collectableTurnRaw=frame.RawValues;collectableTurn=CollectableTurn.Parse(frame.RawValues);}
             var turn=collectableTurn;
@@ -64,8 +58,7 @@ internal sealed partial class MainWindow
             if(developerMode && string.Join(" | ",frame.RawValues) is var raw && raw!=collectableRawLogged){collectableRawLogged=raw;log.Information("Collectable window values: {Values}",raw);}
             if(developerMode && ImGui.CollapsingHeader(localization.Get("CollectablePanel.Raw")+"###CollectableRaw"))
                 foreach(var value in frame.RawValues)ImGui.TextDisabled(value);
-        }
-        finally { ImGui.End(); }
+        });
         static string Shown(int? value)=>value?.ToString("N0") ?? "?";
     }
 

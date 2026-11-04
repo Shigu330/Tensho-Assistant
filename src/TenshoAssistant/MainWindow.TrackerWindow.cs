@@ -55,5 +55,7 @@ internal sealed partial class MainWindow
 
     /// <summary>0.514: the free-standing panels, as Dalamud windows; Plugin adds them to its window system.</summary>
     internal PanelWindow[] CreatePanelWindows()=>[new(this,TrackerPanel),new(this,TasksPanel),new(this,WearPanel),new(this,RegenTickPanel)];
+    /// <summary>0.516: the panels attached to a game window.</summary>
+    internal AttachedPanels? Panels { get; set; }
     internal void PanelFailed(string name,Exception error)=>log.Error(error,$"Overlay {name} turned off until the plugin reloads (perhaps after a game update).");
 }

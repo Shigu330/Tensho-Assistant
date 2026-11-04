@@ -19,8 +19,8 @@ internal sealed partial class MainWindow
         if(windowDisposed || !configuration.InventorySortButton || InventoryWindow?.Rect is not { } window)return;
         var character=bankBridge.State.CharacterId;
         if(character==0)return;
-        UI.FfxivTheme.Push();
-        try
+        Panels?.Show("TenshoInventorySort","",ImGuiWindowFlags.NoDecoration|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.AlwaysAutoResize
+            |ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav|ImGuiWindowFlags.NoBackground,()=>
         {
             var viewport=ImGui.GetMainViewport();
             var height=ImGui.GetFrameHeight();
@@ -30,16 +30,8 @@ internal sealed partial class MainWindow
             var right=Math.Clamp(configuration.InventorySortButtonX,0,400);var up=Math.Clamp(configuration.InventorySortButtonY,0,400);
             var position=viewport.Pos+new Vector2(window.X+right*scale,window.Y+window.Height-up*scale-height/2);
             ImGui.SetNextWindowPos(position,ImGuiCond.Always);
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding,Vector2.Zero);
-            bool shown;
-            try
-            {
-                shown=ImGui.Begin("###TenshoInventorySort",ImGuiWindowFlags.NoDecoration|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.AlwaysAutoResize
-                    |ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav|ImGuiWindowFlags.NoBackground);
-            }
-            finally{ImGui.PopStyleVar();}
-            if(shown)
-            {
+        },()=>
+        {
                 ImGui.BeginDisabled(visualSort.State.Pending);
                 try
                 {
@@ -68,10 +60,7 @@ internal sealed partial class MainWindow
                     ImGui.SameLine();
                     ImGui.TextDisabled(message);
                 }
-            }
-            ImGui.End();
-        }
-        finally{UI.FfxivTheme.Pop();}
+        },padding:Vector2.Zero);
     }
 
     // The same plan as the sort page's « Apply to my bags »: the four bags, the saved rules of this character's bags.

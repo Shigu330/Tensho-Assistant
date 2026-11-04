@@ -711,6 +711,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.516 : panneaux accrochés au jeu en fenêtres Dalamud (#38)** — à voir en jouant
+
+- [ ] Chaque panneau s'affiche au même endroit, avec le même contenu : carnet d'artisanat, projection pendant une synthèse, récolte, collectionnable, pêche, harpon, pêche en mer, survol d'objet, outil de mission, Revue de mode, Personnage, ventes des servants, demande de Triple Triade, import de banque (si la capture automatique est coupée), bouton « Trier ».
+- [ ] Il suit sa fenêtre du jeu quand elle bouge, et disparaît quand elle se ferme, sans rester une image de trop.
+- [ ] Les croix : projection (coupe son réglage), Revue de mode (ferme l'emplacement), pêche ouverte à la main.
+- [ ] Le bouton « Trier » trie, sans fond ni bord ; le panneau de survol ne prend pas les clics.
+- [ ] Échap ne ferme aucun de ces panneaux, et ils ne prennent pas le focus en apparaissant.
+- [ ] Une icône ou un menu Dalamud (épingle, opacité) n'apparaît pas sur ces panneaux.
+
 **0.515 : aide à la récolte, plan du nœud et effet du lieu** — à voir en jouant
 
 - [ ] Nœud avec « PR ≧ 770 → tentatives +1 » (capture du 2026-11-04) : avec 809 PR, un plan d'actions apparaît, et la ligne « Effet du lieu actif : tentatives +1, déjà comptées (5 au lieu de 4) ».

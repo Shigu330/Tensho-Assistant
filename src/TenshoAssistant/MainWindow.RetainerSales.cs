@@ -16,17 +16,12 @@ internal sealed partial class MainWindow
         if (windowDisposed || !configuration.RetainerSalesPanel || RetainerSalesSource?.Invoke() is not { } state || state.Status == RetainerSalesStatus.Closed) return;
         var addon = gameGui.GetAddonByName("RetainerSellList");
         if (addon.IsNull || !addon.IsVisible) return;
-        using var theme = TenshoAssistant.UI.FfxivTheme.Apply();
         var viewport = ImGui.GetMainViewport();
         var width = Math.Min(620, viewport.WorkSize.X);
         var position = viewport.Pos + addon.Position + new Vector2(addon.ScaledWidth + 6, 0);
         if (position.X + width > viewport.WorkPos.X + viewport.WorkSize.X) position.X = viewport.Pos.X + addon.Position.X - width - 6;
         position = Vector2.Clamp(position, viewport.WorkPos, Vector2.Max(viewport.WorkPos, viewport.WorkPos + viewport.WorkSize - new Vector2(width, 200)));
-        ImGui.SetNextWindowPos(position, ImGuiCond.Always);
-        ImGui.SetNextWindowSizeConstraints(new Vector2(width, 0), new Vector2(width, Math.Max(240, viewport.WorkSize.Y - 40)));
-        var visible = ImGui.Begin(localization.Get("RetainerSales.Title") + "###TenshoRetainerSales", ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse);
-        try { if (visible) DrawRetainerSalesContent(state); }
-        finally { ImGui.End(); }
+        Panels?.Show("TenshoRetainerSales", localization.Get("RetainerSales.Title"), ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse, () => { ImGui.SetNextWindowPos(position, ImGuiCond.Always); ImGui.SetNextWindowSizeConstraints(new Vector2(width, 0), new Vector2(width, Math.Max(240, viewport.WorkSize.Y - 40))); }, () => DrawRetainerSalesContent(state));
     }
 
     private void DrawRetainerSalesContent(RetainerSalesState state)

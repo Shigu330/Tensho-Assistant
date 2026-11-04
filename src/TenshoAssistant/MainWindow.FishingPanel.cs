@@ -35,15 +35,9 @@ internal sealed partial class MainWindow
         var automatic=configuration.FishingPanel && now.Fishing && now.Job==18;
         if(!automatic && !fishingPanelManual)return;
         var spot=fishingSpotAt?.Invoke(now.Territory,now.X,now.Z);
-        using var theme=UI.FfxivTheme.Apply();
-        var open=true;
-        var title=localization.Format("FishingPanel.Title",spot?.Name ?? localization.Get("FishingPanel.NoSpotTitle"))+"###TenshoFishingPanel";
-        var visible=fishingPanelManual ? ImGui.Begin(title,ref open,ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.AlwaysAutoResize)
-            :ImGui.Begin(title,ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.AlwaysAutoResize);
-        try
+        var title=localization.Format("FishingPanel.Title",spot?.Name ?? localization.Get("FishingPanel.NoSpotTitle"));
+        Panels?.Show("TenshoFishingPanel",title,ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.AlwaysAutoResize,null,()=>
         {
-            if(!open){fishingPanelManual=false;return;}
-            if(!visible)return;
             if(spot is not { } here){ImGui.TextWrapped(localization.Get("FishingPanel.NoSpot"));return;}
             ImGui.TextDisabled(localization.Get(now.Fishing ? "FishingPanel.Fishing":"FishingPanel.NotFishing"));
             if(now.Fishing && !fishingBefore)fishingSince=DateTimeOffset.UtcNow;
@@ -139,8 +133,7 @@ internal sealed partial class MainWindow
             ImGui.TextDisabled(localization.Get("FishingPanel.SourcesShort"));
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(gatherBuddyFish?.State.Data is not null ? "FishingPanel.FooterGatherBuddy":"FishingPanel.Footer"));
             if(gatherBuddyFish?.State is { Loading:true })ImGui.TextDisabled(localization.Get("FishingPanel.GatherBuddyLoading"));
-        }
-        finally{ImGui.End();}
+        },fishingPanelManual ? ()=>fishingPanelManual=false:null);
     }
 
     // Button that opens or closes the fishing help (Gathering pages).

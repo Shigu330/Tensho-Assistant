@@ -31,8 +31,8 @@ Report hints, Mini Cactpot and Triple Triad helpers, character stats and macro c
 - Embedded community data, licences kept in the files: SubmarineTracker and FFXIVGachaSpreadsheet (MIT), Character Panel Refined level table
   (MIT), LuminaSupplemental and FFXIV Gardening Tracker (GPL-3.0), FFXIV Crossbreed Helper (MIT). Every source is on the Credits page.
 - Only the local character's content id is used, as a key for its own saved data.
-- Panels shown beside game windows use `ImGui.Begin`; every free-standing window uses the Dalamud window system.
-  <!-- Update if the attached panels are converted too (docs/project/PUBLISHING.md, point 5). -->
+- Every window uses the Dalamud window system, panels beside game windows included. The only `ImGui.Begin` left: invisible click zones over the
+  Fashion Report slots (no background, no border).
 
 ## AI disclosure
 

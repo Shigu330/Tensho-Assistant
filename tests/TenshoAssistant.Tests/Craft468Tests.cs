@@ -107,7 +107,7 @@ internal static class Craft468Tests
         {
             Check(Read("MainWindow.Settings.cs").Contains("BoolSetting(\"CraftLiveUi.Panel\",\"CraftLiveUi.PanelTip\",()=>configuration.CraftLivePanel"),"setting");
             var panel=Read("MainWindow.CraftProjection.cs");
-            Check(panel.Contains("###TenshoCraftLivePanel\",ref open,") && panel.Contains("if(!open){configuration.CraftLivePanel=false;craftLive.SetEnabled(CraftLiveWanted(configuration));SaveReminders();}"),"cross");
+            Check(panel.Contains("\"TenshoCraftLivePanel\"") && panel.Contains("()=>{configuration.CraftLivePanel=false;craftLive.SetEnabled(CraftLiveWanted(configuration));SaveReminders();}"),"cross");
         }),
     ];
 }

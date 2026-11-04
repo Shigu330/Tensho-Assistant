@@ -32,7 +32,7 @@ Settings page.
 
 - `src/TenshoAssistant/Plugin.cs` registers the services, the command, the windows and the panels; every registration has its cleanup.
 - `MainWindow.cs` (split into `MainWindow.<Page>.cs` partial files) is the shell and page routing; `MapViewWindow.cs` is the Tensho map,
-  `GuideWindow.cs` the first-run guide, `PanelWindow.cs` the free-standing panels (tracker, tasks, wear and GP bars). All are Dalamud `WindowSystem` windows.
+  `GuideWindow.cs` the first-run guide, `PanelWindow.cs` the free-standing panels (tracker, tasks, wear and GP bars), `AttachedPanels.cs` the panels beside game windows. All are Dalamud `WindowSystem` windows.
 - One folder per domain (`Alarms`, `Beastmaster`, `Caching`, `Character`, `Collections`, `Community`, `Craft`, `Credits`, `Diagnostics`,
   `Duties`, `Events`, `Fashion`, `FreeCompany`, `Gathering`, `Gear`, `Guide`, `Help`, `Hunting`, `Inventory`, `Items`, `Leves`,
   `Localization`, `Macros`, `Maps`, `Market`, `MiniGames`, `Monsters`, `MyTools`, `Npcs`, `Quests`, `Reminders`). Files ending in `*.Dalamud.cs` touch the game (read on the framework thread,
@@ -338,7 +338,7 @@ l'objet dans le navigateur ; `/tenshonext` est le marqueur de fin de page de l'e
 
 - `src/TenshoAssistant/Plugin.cs` enregistre les services, la commande, les fenêtres et les panneaux ; chaque enregistrement a son nettoyage.
 - `MainWindow.cs` (découpée en fichiers partiels `MainWindow.<Page>.cs`) porte la navigation et les pages ; `MapViewWindow.cs` est la
-  carte Tensho, `GuideWindow.cs` le guide de première prise en main, `PanelWindow.cs` les panneaux libres (suivi, tâches, barres d'usure et de PR). Toutes sont des fenêtres du `WindowSystem` de Dalamud.
+  carte Tensho, `GuideWindow.cs` le guide de première prise en main, `PanelWindow.cs` les panneaux libres (suivi, tâches, barres d'usure et de PR), `AttachedPanels.cs` les panneaux à côté des fenêtres du jeu. Toutes sont des fenêtres du `WindowSystem` de Dalamud.
 - Un dossier par domaine ; les fichiers `*.Dalamud.cs` touchent le jeu (lecture sur le thread du framework, puis copie), les autres sont
   du C# pur et testé.
 - `UI/Components/` : modèles communs (`ItemCell`, `DetailPage`, `SettingRow` avec infobulle et bouton ↺, `EntityMenus`, `DataIndexes`).
