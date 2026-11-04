@@ -5,6 +5,10 @@ using TenshoAssistant.Help;
 // ONBOARD-001, lot 1 (DEC-031): every page has its help, in every language, like the tooltips: a page without help does not pass.
 internal static class HelpTests
 {
+    private sealed class FixedResponse(string body) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken token)=>Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK){Content=new StringContent(body)});
+    }
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static string Read(string path)=>File.ReadAllText(Path.GetFullPath(path));
 
@@ -58,6 +62,40 @@ internal static class HelpTests
             Check(ProblemReport.SearchAddress("map flag").EndsWith("/issues?q=is%3Aissue%20map%20flag",StringComparison.Ordinal),"search");
             var help=Read("src/TenshoAssistant/MainWindow.Help.cs");
             Check(!help.Contains("HttpClient") && help.Contains("Dalamud.Utility.Util.OpenLink(link.Url)"),"the browser opens, the plugin sends nothing");
+        }),
+        ("Community guides: hosts, rows and order; a broken list is refused whole",() =>
+        {
+            foreach(var good in new[]{"https://www.youtube.com/watch?v=abc","https://youtu.be/abc","https://github.com/Shigu330/Tensho-Assistant/blob/main/docs/x.md"})Check(CommunityHelpIndex.Allowed(good),good);
+            foreach(var bad in new[]{"http://www.youtube.com/watch?v=abc","https://evil.example/x","https://www.youtube.com.evil.example/x","https://github.com/someone/else","https://user@www.youtube.com/x","https://www.youtube.com:8443/x","youtube.com/x","javascript:alert(1)"})Check(!CommunityHelpIndex.Allowed(bad),bad);
+            HashSet<string> pages=["Maps"];
+            string Row(string page="Maps",string language="en",string title="A title",string address="https://youtu.be/abc")=>$$"""{"page":"{{page}}","language":"{{language}}","title":"{{title}}","address":"{{address}}","author":"Ann","forVersion":"0.506"}""";
+            string Doc(params string[] rows)=>$$"""{"schema":1,"guides":[{{string.Join(",",rows)}}]}""";
+            var parsed=CommunityHelpIndex.Parse(Doc(Row()),pages);
+            Check(parsed.Guides is { Count:1 } && parsed.Guides[0]==new CommunityGuide("Maps","en","A title","Ann","https://youtu.be/abc","0.506"),"a good row");
+            foreach(var bad in new[]{Row(page:"Nope"),Row(language:"english"),Row(title:""),Row(title:new string('x',121)),Row(address:"https://evil.example/x")})Check(CommunityHelpIndex.Parse(Doc(Row(),bad),pages).Problem=="Broken","refused whole: "+bad);
+            Check(CommunityHelpIndex.Parse("{broken",pages).Problem=="Broken" && CommunityHelpIndex.Parse("""{"schema":2,"guides":[]}""",pages).Problem=="Newer","broken, newer");
+            CommunityGuide[] guides=[new("Maps","en","E",null,"https://youtu.be/e",null),new("Maps","fr","F",null,"https://youtu.be/f",null),new("Maps","de","D",null,"https://youtu.be/d",null),new("Items","fr","I",null,"https://youtu.be/i",null)];
+            Check(CommunityHelpIndex.For(guides,"Maps","fr").Select(guide=>guide.Title).SequenceEqual(["F","E"]),"the player's language, then English, this page only");
+        }),
+        ("Community guides: the repository's list passes the plugin's rules; read on a click, bounded",() =>
+        {
+            var pages=Regex.Match(Read("src/TenshoAssistant/MainWindow.cs"),@"enum Page \{([^}]*)\}").Groups[1].Value.Split(',',StringSplitOptions.TrimEntries|StringSplitOptions.RemoveEmptyEntries).ToHashSet();
+            var index=CommunityHelpIndex.Parse(Read("community-help/index.json"),pages);
+            Check(index.Guides is not null,"community-help/index.json: "+index.Problem);
+            using var client=new HttpClient(new FixedResponse(new string(' ',CommunityHelpIndex.MaxBytes+1)));
+            using var tooBig=new CommunityHelpIndex(client);
+            tooBig.LoadAsync(pages).GetAwaiter().GetResult();
+            Check(tooBig.State is {Problem:"Broken",Guides:null,Loading:false},"too big");
+            using var fine=new HttpClient(new FixedResponse("""{"schema":1,"guides":[]}"""));
+            using var read=new CommunityHelpIndex(fine);
+            Check(read.State is {Guides:null,Loading:false},"nothing read before the click");
+            read.LoadAsync(pages).GetAwaiter().GetResult();
+            Check(read.State.Guides is { Count:0 },"read");
+            var help=Read("src/TenshoAssistant/MainWindow.Help.cs");
+            Check(help.Contains("Dalamud.Utility.Util.OpenLink(asked.Address)") && help.Contains("Help.GuidesConfirm"),"opened after showing its address");
+            Check(Read("CONTRIBUTING.md").Contains("community-help/README.md") && Read("community-help/README.md").Contains("\"address\""),"explained to contributors");
+            var script=Read("scripts/New-Tool.ps1");
+            Check(script.Contains("PageHelp") && script.Contains("Purpose") && script.Contains("Empty"),"a new tool gets its help");
         }),
         ("Help: the state of a page is the worst of what it depends on, and names real self-check lines",() =>
         {

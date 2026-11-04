@@ -355,6 +355,18 @@
     "HelpEmpty": "Aucun résultat : essayez un mot plus court."
   },
   "Help": {
+    "GuidesLoad": "Vidéos et guides",
+    "GuidesLoadTip": "Lit la liste des vidéos et guides de la communauté sur le dépôt du projet. Rien n'est lu sans ce clic.",
+    "GuidesBroken": "La liste n'a pas pu être utilisée.",
+    "GuidesNewer": "La liste demande une version plus récente de Tensho.",
+    "GuidesUnavailable": "La liste n'a pas pu être lue. Réessayez plus tard.",
+    "GuidesNone": "Pas encore de vidéo ni de guide pour cette page. Les vôtres sont les bienvenus : voir Aide.",
+    "GuidesTitle": "Vidéos et guides de la communauté",
+    "GuidesConfirm": "Ouvrir dans votre navigateur ? {0}",
+    "GuidesOpen": "Ouvrir",
+    "GuidesOpenTip": "Ouvre cette adresse dans votre navigateur.",
+    "GuidesCancel": "Annuler",
+    "GuidesCancelTip": "N'ouvre rien.",
     "KindBug": "Un bug",
     "KindIdea": "Une idée",
     "KindTranslation": "Une traduction",

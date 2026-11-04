@@ -51,7 +51,7 @@ $changes=@(
     "create  tests/TenshoAssistant.Tests/${Name}Tests.cs",
     "change  src/TenshoAssistant/MainWindow.cs (enum Page)",
     "change  src/TenshoAssistant/MainWindow.Pages.cs (category $Category)",
-    "change  src/TenshoAssistant/Localization/Languages/en.json and fr.json (Navigation.$Name, ${Name}Ui)",
+    "change  src/TenshoAssistant/Localization/Languages/en.json and fr.json (Navigation.$Name, ${Name}Ui, PageHelp)",
     "change  tests/TenshoAssistant.Tests/Program.cs and TenshoAssistant.Tests.csproj"
 )
 $changes | ForEach-Object {Write-Host $_}
@@ -112,14 +112,16 @@ $anchor='        // New tools: scripts/New-Tool.ps1 adds their line above this o
 Write-Text (Join-Path $src 'MainWindow.Pages.cs') (Replace-Once $list.Text $anchor "        new(Page.$Name,`"$Category`",PageLabel(`"Navigation.$Name`"),Draw$Name,`"MainWindow.$Name.cs, $Name/`"),`n$anchor" 'MainWindow.Pages.cs') $list.Crlf
 # Texts
 $texts=@{
-    en=@{Label=$LabelEn;Title=$LabelEn;Help='Describe this tool in one sentence.';Count='{0} rows'}
-    fr=@{Label=$LabelFr;Title=$LabelFr;Help='Décrivez cet outil en une phrase.';Count='{0} lignes'}
+    en=@{Label=$LabelEn;Title=$LabelEn;Help='Describe this tool in one sentence.';Count='{0} rows';Start='Say how to start.';Empty='Say what to do if it stays empty.'}
+    fr=@{Label=$LabelFr;Title=$LabelFr;Help='Décrivez cet outil en une phrase.';Count='{0} lignes';Start='Dites comment commencer.';Empty='Dites quoi faire si elle reste vide.'}
 }
 foreach($language in 'en','fr'){
     $path=Join-Path $src "Localization/Languages/$language.json"
     $json=Read-Text $path;$row=$texts[$language]
     $head="`n  `"Navigation`": {`n"
     $text=Replace-Once $json.Text $head "$head    `"$Name`": $(Json-Text $row.Label),`n" "$language.json"
+    $helpHead="`n  `"PageHelp`": {`n"
+    $text=Replace-Once $text $helpHead "$helpHead    `"${Name}Title`": $(Json-Text $row.Title),`n    `"${Name}Purpose`": $(Json-Text $row.Help),`n    `"${Name}Start`": $(Json-Text $row.Start),`n    `"${Name}Empty`": $(Json-Text $row.Empty),`n" "$language.json help"
     $text=Replace-Once $text $head "`n  `"${Name}Ui`": {`n    `"Title`": $(Json-Text $row.Title),`n    `"Help`": $(Json-Text $row.Help),`n    `"Count`": $(Json-Text $row.Count)`n  },$head" "$language.json"
     Write-Text $path $text $json.Crlf
 }

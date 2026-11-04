@@ -714,6 +714,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.506 : vidéos et guides de la communauté (ONBOARD-001, lots 7 et 8)** — après une release
+
+- [ ] « ? » › Vidéos et guides : la liste se lit sur `main`, donc rien avant une release : « n'a pas pu être lue ». Après une release : « pas encore de vidéo ». Avec une ligne ajoutée : le titre, l'adresse au survol, la confirmation, le navigateur.
+
 **0.505 : guide des premiers pas (ONBOARD-001, lots 4 à 6)** — à voir en jouant
 
 - [ ] Aide › Lancer le guide : les sept étapes, Retour, Suivant, Quitter à chaque étape ; le rouvrir reprend au même endroit ; fini, il repart du début.

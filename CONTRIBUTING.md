@@ -93,10 +93,16 @@ It builds and passes the tests as it is. It changes no version and commits nothi
 
 1. Write the tool. Prove any game data with a read-only probe (`tools/`), with its output in `docs/evidence/`. Read native memory on the framework thread and copy it; nothing heavy in the draw.
 2. Give each subscription an owner and a cleanup, registered in `Plugin.cs` with `registrations.Register`.
-3. Give each setting a tooltip and a « ↺ » button.
+3. Give each setting a tooltip and a « ↺ » button. Replace the texts of `PageHelp.<Name>Title`, `Purpose`, `Start` and `Empty`: the « ? » of your page shows them, and a test refuses a page without them. If the page depends on what the game gives, add it to `HelpIndex` so that its help says what is missing.
 4. Run `.\scripts\Verify.ps1`, add the `CHANGELOG.md` entry (third version number, x.y.Z) and open the pull request.
 
 A page reached only from another page's tabs has no name in the navigation: give its line `null` as label and its parent as last value, as `Page.CraftLive` does.
+
+## Help, videos and guides
+
+Each page has a short help in the language files (`PageHelp` section, English first, then French), shown by its « ? » and searched in the Help page. Keep it to what the page does, how to start and what to do when it stays empty, and say only what the code does. A wrong sentence is a bug: fix it in a pull request like any text.
+
+To propose a video or a written guide, see [community-help/README.md](community-help/README.md). It needs no code, no version and no CHANGELOG entry.
 
 ## Proposing a change
 

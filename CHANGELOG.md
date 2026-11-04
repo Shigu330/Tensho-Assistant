@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.506.0
+- ONBOARD-001, lots 7 et 8. Vidéos et guides de la communauté : `community-help/index.json`, vide pour commencer, proposé en pull request et vérifié par un test. Le « ? » et la page Aide le lisent sur clic. Un lien part vers le navigateur après confirmation de son adresse, seulement vers YouTube ou ce dépôt (G6). Une liste cassée est refusée en entier. Visible après la prochaine release, puisqu'elle est lue sur `main`.
+- Contributeurs : `scripts/New-Tool.ps1` crée les textes d'aide d'un nouvel outil ; CONTRIBUTING explique l'aide, les vidéos et les guides ; `community-help/README.md` donne les règles.
+- Tests : HelpTests complété. Verify.ps1 (agent) : 960/960, 0 avertissement, 0 erreur ; DLL 0.506.0.0. Non validé en jeu. `New-Tool.ps1` n'a été lancé qu'en vérification de son texte, pas en création réelle.
+### English
+- Community videos and guides: a reviewed list in community-help/, read on a click from the ? and the Help page; a link opens in the browser after showing its address, only to YouTube or this repository. New-Tool.ps1 now creates a new tool's help texts, and CONTRIBUTING explains help and guides.
+
 ## 0.505.0
 - ONBOARD-001, lots 4 à 6. Un guide des premiers pas : bienvenue et langue, sources en ligne avec leur interrupteur (défauts inchangés, G3), quelques réglages, intérêts (G4), fenêtres du jeu à ouvrir une fois, visite des pages, fin. On le quitte à chaque étape, il reprend là où il en était, depuis Aide. Nouvelle installation : il s'ouvre une fois à la première ouverture de Tensho. Joueur existant : une proposition unique sur l'accueil (G2).
 - Fenêtres à ouvrir : Tensho coche d'après ce que le jeu a réellement donné, et n'ouvre rien à la place du joueur. Ce qui reste figure sur l'accueil.

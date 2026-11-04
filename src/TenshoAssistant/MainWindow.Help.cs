@@ -59,6 +59,42 @@ internal sealed partial class MainWindow
         ImGui.Separator();
     }
 
+    // 0.506 (lot 7, G6, G7): the community's videos and guides for a page. The list is read on a click; a link goes to the browser after showing its address.
+    internal CommunityHelpIndex? CommunityHelp { get; set; }
+    private CommunityGuide? guideToOpen;
+    private void DrawCommunityGuides(string key)
+    {
+        if (CommunityHelp is not { } index) return;
+        ImGui.Spacing();
+        var state = index.State;
+        if (state.Guides is not { } guides)
+        {
+            ImGui.BeginDisabled(state.Loading);
+            try { if (ImGui.SmallButton(localization.Get("Help.GuidesLoad") + "##Guides" + key)) _ = index.LoadAsync(PageEntries.Select(entry => entry.Page.ToString()).ToHashSet()); }
+            finally { ImGui.EndDisabled(); }
+            Tip("Help.GuidesLoadTip");
+            if (state.Problem is { } problem) ImGui.TextDisabled(localization.Get("Help.Guides" + problem));
+            return;
+        }
+        var shown = CommunityHelpIndex.For(guides, key, localization.CurrentCode);
+        if (shown.Count == 0) { ImGui.TextDisabled(localization.Get("Help.GuidesNone")); return; }
+        ImGui.TextColored(Accent, localization.Get("Help.GuidesTitle"));
+        foreach (var guide in shown)
+        {
+            if (ImGui.Selectable($"{guide.Title}{(guide.Author is { } author ? " · " + author : "")}{(guide.ForVersion is { } version ? " · " + version : "")}##{guide.Address}")) guideToOpen = guide;
+            if (ImGui.IsItemHovered()) WrappedTooltip(guide.Address);
+        }
+        if (guideToOpen is { } asked && asked.Page == key)
+        {
+            ImGui.TextWrapped(localization.Format("Help.GuidesConfirm", asked.Address));
+            if (ImGui.SmallButton(localization.Get("Help.GuidesOpen") + "##Guide" + key)) { Dalamud.Utility.Util.OpenLink(asked.Address); guideToOpen = null; }
+            Tip("Help.GuidesOpenTip");
+            ImGui.SameLine();
+            if (ImGui.SmallButton(localization.Get("Help.GuidesCancel") + "##Guide" + key)) guideToOpen = null;
+            Tip("Help.GuidesCancelTip");
+        }
+    }
+
     private void DrawHelpText(HelpTopic topic)
     {
         ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + Math.Min(460, Math.Max(240, ImGui.GetContentRegionAvail().X)));
@@ -88,6 +124,7 @@ internal sealed partial class MainWindow
             ImGui.Separator();
             DrawHelpState();
             DrawHelpText(topic);
+            DrawCommunityGuides(topic.Key);
             ImGui.Spacing();
             if (ImGui.SmallButton(localization.Get("Help.AllHelp"))) { page = Page.Help; ImGui.CloseCurrentPopup(); }
             Tip("Help.AllHelpTip");
@@ -122,6 +159,7 @@ internal sealed partial class MainWindow
                 try
                 {
                     DrawHelpText(topic);
+                    DrawCommunityGuides(topic.Key);
                     if (Enum.TryParse<Page>(topic.Key, out var target) && target != Page.Help && ImGui.SmallButton(localization.Get("Help.OpenPage") + "##Open" + topic.Key)) page = target;
                 }
                 finally { ImGui.TreePop(); }

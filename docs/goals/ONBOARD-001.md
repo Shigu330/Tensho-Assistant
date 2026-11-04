@@ -74,7 +74,7 @@ La liste de l'étape 5 reste visible ensuite sur l'accueil, repliable, jusqu'à 
 ImGui ne lit pas de vidéo : **le lien s'ouvre dans le navigateur**, après confirmation qui montre l'adresse.
 
 - `community-help/index.json` : pour chaque entrée, page concernée, langue, titre, auteur, adresse, durée, version du jeu ou de Tensho.
-- Même circuit que `community-templates/` : lu sur `main`, sur clic, gardé en cache, proposé en pull request, vérifié par `scripts/Update-HelpIndex.ps1` et un test.
+- Même circuit que `community-templates/` : lu sur `main`, sur clic, gardé pendant la session, proposé en pull request, vérifié par un test (pas de script : ce fichier n'a pas d'empreinte à calculer).
 - **Liste blanche d'hôtes** (décision G6) : une adresse d'un autre site est refusée à la vérification et dans le plugin.
 - Tri par langue du plugin, puis l'anglais. Une vidéo plus ancienne que la page est marquée « peut-être dépassée ».
 - Règles dans `community-help/README.md` : aucune automatisation ni outil interdit montré, droits clairs, relecture en pull request, retrait sur demande de l'auteur.

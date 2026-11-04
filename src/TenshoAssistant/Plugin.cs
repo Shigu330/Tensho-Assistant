@@ -317,6 +317,8 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>beastLoader=new Beastmaster.BeastCatalogLoader(beasts,data,framework,client,player,log),()=>beastLoader?.Dispose());
             mainWindow.Beasts=beasts;
             mainWindow.GuideNewInstall=newInstall;
+            Help.CommunityHelpIndex? communityHelp=null;
+            registrations.Register(()=>mainWindow.CommunityHelp=communityHelp=new Help.CommunityHelpIndex(),()=>communityHelp?.Dispose());
             Beastmaster.BeastWindowProbe? beastProbe=null;
             registrations.Register(()=>beastProbe=new Beastmaster.BeastWindowProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>beastProbe?.Dispose());
             // 0.494 (user request): the self-check, on its own in developer mode, on request otherwise.
