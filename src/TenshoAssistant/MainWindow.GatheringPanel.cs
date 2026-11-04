@@ -113,6 +113,8 @@ internal sealed partial class MainWindow
     {
         // 0.478 (user report): a collectable's GP goes in the game's Collectable window, not in the actions of this plan; its rates here are not those of an ordinary gather.
         if(slot is not null && Collectables?.Catalog?.For(slot.ItemId) is {Count:>0}){ImGui.TextDisabled(localization.Get("GatheringPanel.CollectablePlan"));return;}
+        // 0.519 (user report): shards, crystals and clusters have their own actions, with no figure to compute: the actions, without an amount.
+        if(slot is not null && gatheringPanelStart is { } opened && items?.Find(slot.ItemId)?.UiCategoryId==GpCrystals.UiCategory){DrawGatheringCrystalPlan(slot,opened,items);return;}
         if(slot is null || gatheringPanelStart is not { } start || gpActions.State.Catalog is not { } catalog){ImGui.TextDisabled(localization.Get("GatheringPanel.NoPlan"));return;}
         var first=start.Slots.GetValueOrDefault((slot.Index,slot.RawItemId));
         var bountiful=bountifulBase?.Invoke(slot.ItemId) is { } baseValue ? BountifulEstimate.Bonus(rating,baseValue):null;
@@ -173,6 +175,25 @@ internal sealed partial class MainWindow
         }
         if(shown.Actions.Any(use=>use.Action.Spec.Effect==GpEffect.Attempt) && plan.Scenario.Level>=GpScenario.EurekaLevel)
             ImGui.TextDisabled(localization.Get("GpUi.Eureka"));
+    }
+
+    /// <summary>0.519: an action's name, icon and description from the game.</summary>
+    internal Func<uint,(string Name,uint Icon,string Description)?>? GatheringActionRow { get; set; }
+    private void DrawGatheringCrystalPlan(GatheringObservedSlot slot,GatheringNodeStart start,ItemCatalog items)
+    {
+        ImGui.TextColored(Accent,localization.Format("GatheringPanel.PlanFor",items.Find(slot.ItemId)?.Name ?? slot.ItemId.ToString()));
+        var need=GatherListNeed(slot.ItemId);
+        if(need>0)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
+        var actions=GpCrystals.For(start.JobId,start.Level,(int)start.Gp,slot.ItemId);
+        if(actions.Count==0){ImGui.TextDisabled(localization.Get("GatheringPanel.CrystalNone"));return;}
+        foreach(var action in actions)
+        {
+            if(GatheringActionRow?.Invoke(action.Id) is not { } row)continue;
+            DrawItemIcon(new ItemDefinition(0,row.Name,false,row.Icon),new Vector2(22));ImGui.SameLine();
+            ImGui.TextUnformatted($"{row.Name} · {action.Cost} {localization.Get("GatheringPanel.CrystalGp")}");
+            if(ImGui.IsItemHovered())WrappedTooltip(row.Description);
+        }
+        ImGui.TextDisabled(localization.Get("GatheringPanel.CrystalNote"));
     }
 
     private IReadOnlyList<GatherNodeEffect> NodeEffects(GatheringObservedFrame frame)=>frame.NodeId!=0 && nodeEffectsOf is { } read ? read(frame.NodeId):[];

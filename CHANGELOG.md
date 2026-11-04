@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.519.0
+- Rapport de l'utilisateur en jeu (captures) : sur un Cristal de vent, le plan proposait Récolte royale II et Extraction abondante ×3, « ≈ 15 objets », alors que le jeu en donne 8 à 30 par récolte et que les actions propres aux cristaux n'étaient pas proposées ([preuve](docs/evidence/0.519-crystal-actions.md)).
+- Éclats, cristaux et agrégats (catégorie d'objet du jeu) : le panneau propose Bénédiction de la nature, et Bénédiction des Douze pour les éclats seulement comme le dit son texte, selon le niveau et les PR. Aucune quantité n'est calculée : le jeu ne donne pas de chiffre.
+- Tests : GpCrystals519Tests. Verify.ps1 (agent) : 988/988, 0 avertissement, 0 erreur ; DLL 0.519.0.0. Non validé en jeu.
+### English
+- Shards, crystals and clusters now get their own actions in the gathering help (Nature's Bounty, and The Twelve's Bounty on shards), with no computed amount: the game gives no figure, and the old estimate was far from the real yields.
+
 ## 0.518.0
 - Rapport de l'utilisateur en jeu (capture) : carte, point d'Ostrakon Dékaokto « ouvert maintenant » alors qu'il n'est pas là. Cause : la ligne ne parlait que des heures ; ce point légendaire demande un tome ([preuve](docs/evidence/0.518-gather-tomes.md)).
 - Infobulle et liste de la carte : « ouvert, mais pas encore pour vous » et le nom du tome quand il n'est pas lu ; l'horloge du point passe en gris, et il sort des repères au bord de la carte. Si le niveau du métier est sous celui du point, le panneau l'écrit.

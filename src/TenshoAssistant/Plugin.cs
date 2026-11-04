@@ -902,6 +902,20 @@ public sealed class Plugin : IDalamudPlugin
             // 0.480: status 757, Scrutiny (Status sheet, docs/evidence/0.479-collectable-window-values.md).
             mainWindow.CollectableActionStatus=id=>Gathering.CollectableActionState.Status(id);
             // 0.517 (user report): IsActionUnlocked is false for a row without an unlock link, and 22 of the 24 gathering actions have none: they come with the level, which the plan checks (docs/evidence/0.517-gp-action-unlocks.md).
+            var gatheringActionRows=new Dictionary<uint,(string,uint,string)?>();
+            mainWindow.GatheringActionRow=id=>
+            {
+                if(gatheringActionRows.TryGetValue(id,out var known))return known;
+                (string,uint,string)? found=null;
+                try
+                {
+                    if(data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row)
+                        found=(row.Name.ExtractText(),row.Icon,data.GetExcelSheet<Lumina.Excel.Sheets.ActionTransient>().GetRowOrDefault(id)?.Description.ExtractText() ?? "");
+                }
+                catch(Exception error){log.Warning(error,"Gathering action {Id} unavailable (perhaps after a game update).",id);}
+                gatheringActionRows[id]=found;
+                return found;
+            };
             Gathering.GatherKnowledgeReader? gatherKnowledge=null;
             registrations.Register(()=>{gatherKnowledge=new Gathering.GatherKnowledgeReader(data,framework,client,player,log);mainWindow.GatherAccess=gatherKnowledge.Access;},()=>{mainWindow.GatherAccess=null;gatherKnowledge?.Dispose();});
             mainWindow.GpActionUnlocked=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row && (row.UnlockLink.RowId==0 || unlocks.IsActionUnlocked(row));

@@ -970,6 +970,9 @@
     "Slot10": "Bague gauche"
   },
   "GatheringPanel": {
+    "CrystalGp": "PR",
+    "CrystalNone": "Aucune action pour cet objet avec ces PR.",
+    "CrystalNote": "Actions propres aux éclats, cristaux et agrégats. Leur gain est aléatoire : le jeu ne donne pas de chiffre, aucun calcul ici.",
     "EffectOn": "Effet du lieu actif : {0}.",
     "EffectOnAttempts": "Effet du lieu actif : {0}, déjà compté dans le plan ({1} au lieu de {2}).",
     "EffectMissing": "Effet du lieu inactif : {0} → {1}. Il manque {2}.",
