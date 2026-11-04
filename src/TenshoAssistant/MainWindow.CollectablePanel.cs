@@ -22,6 +22,7 @@ internal sealed partial class MainWindow
     private CollectableTurn? collectableTurn;
     private (CollectableTurn Turn,int? Attempts,CollectableRule? Rule,CollectableBonuses Bonuses)? collectableAdviceKey;
     private CollectableAdvice? collectableAdvice;
+    private readonly Dictionary<uint,int> collectableChanceBase=[];
 
     internal void DrawCollectablePanel()
     {
@@ -63,14 +64,20 @@ internal sealed partial class MainWindow
         static string Shown(int? value)=>value?.ToString("N0") ?? "?";
     }
 
-    // 0.480 (user report): what each bonus adds, as the game itself shows it when its box alone is ticked or when Scrutiny is on.
+    // 0.481 (user report; the boxes were misread in 0.480): what each bonus adds, as the game shows it when its box is ticked or when Scrutiny is on. Both boxes: the sum, split if one is known.
     private void LearnCollectableBonuses(CollectableTurn turn,bool active)
     {
         if(turn.Extra is not { } extra || extra<=0)return;
-        var intuition=turn.EstimateIntuition && !turn.EstimateScrutiny && !active;
-        var scrutiny=turn.EstimateScrutiny && !turn.EstimateIntuition || active && !turn.EstimateIntuition && !turn.EstimateScrutiny;
-        if(intuition && configuration.CollectableIntuitionBonus!=extra){configuration.CollectableIntuitionBonus=extra;SaveReminders();}
-        if(scrutiny && configuration.CollectableScrutinyBonus!=extra){configuration.CollectableScrutinyBonus=extra;SaveReminders();}
+        var scrutiny=configuration.CollectableScrutinyGain;var intuition=configuration.CollectableIntuitionGain;
+        if(turn.EstimateScrutiny && turn.EstimateIntuition)
+        {
+            if(scrutiny>0 && extra>scrutiny)intuition=extra-scrutiny;
+            else if(intuition>0 && extra>intuition)scrutiny=extra-intuition;
+        }
+        else if(turn.EstimateScrutiny || active && !turn.EstimateIntuition)scrutiny=extra;
+        else if(turn.EstimateIntuition && !active)intuition=extra;
+        if(scrutiny==configuration.CollectableScrutinyGain && intuition==configuration.CollectableIntuitionGain)return;
+        configuration.CollectableScrutinyGain=scrutiny;configuration.CollectableIntuitionGain=intuition;SaveReminders();
     }
 
     // 0.479 (user request, in-game campaign): the current collectability and what to do next, from the values the window gives this turn. Nothing is executed.
@@ -80,8 +87,10 @@ internal sealed partial class MainWindow
         LearnCollectableBonuses(turn,active);
         var job=turn.ScourAction==22182 ? 16u:17u;
         var restore=configuration.CollectableUseRestore ? gpActions.State.Catalog?.Actions.FirstOrDefault(row=>row.Spec.JobId==job && row.Spec.Effect==GpEffect.Attempt && !GpActionRules.Forbidden(GpForbidden,row.Spec)):null;
-        var bonuses=new CollectableBonuses(configuration.CollectableScrutinyBonus,configuration.CollectableIntuitionBonus,gp ?? 0,
-            CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Cost ?? 0,CollectableActionInfo?.Invoke(turn.FocusAction)?.Cost ?? 0,active,configuration.CollectableUseScrutiny,restore?.Spec.Cost ?? 0,maximum ?? 0);
+        if(turn.IntuitionChance>0 && (!collectableChanceBase.TryGetValue(turn.ItemId,out var lowest) || turn.IntuitionChance<lowest))collectableChanceBase[turn.ItemId]=turn.IntuitionChance;
+        var bonuses=new CollectableBonuses(configuration.CollectableScrutinyGain,configuration.CollectableIntuitionGain,gp ?? 0,
+            CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Cost ?? 0,configuration.CollectableUseFocus ? CollectableActionInfo?.Invoke(turn.FocusAction)?.Cost ?? 0:0,active,configuration.CollectableUseScrutiny,restore?.Spec.Cost ?? 0,maximum ?? 0,
+            collectableChanceBase.GetValueOrDefault(turn.ItemId));
         var tier=rule is null ? CollectableTier.Below:Gathering.Collectables.Tier(rule,turn.Current);
         ImGui.ProgressBar(Math.Clamp((float)turn.Current/turn.Maximum,0,1),new Vector2(-1,ImGui.GetFrameHeight()),localization.Format("CollectablePanel.Current",turn.Current.ToString("N0"),turn.Maximum.ToString("N0"),localization.Get($"CollectablePanel.Tier{tier}")));
         // Worked out when something changes, not at each frame.
@@ -98,6 +107,7 @@ internal sealed partial class MainWindow
             CollectableMove.Brazen=>(turn.BrazenAction,localization.Format("CollectablePanel.Range",turn.BrazenMin,turn.BrazenMax)),
             CollectableMove.Scrutiny=>(turn.ScrutinyAction,localization.Format("CollectablePanel.ScrutinyGain",bonuses.ScrutinyBonus,bonuses.ScrutinyCost)),
             CollectableMove.Restore=>(restore?.Spec.Id ?? 0,localization.Format("CollectablePanel.RestoreGain",bonuses.RestoreCost)),
+            CollectableMove.Focus=>(turn.FocusAction,localization.Format("CollectablePanel.FocusGain",bonuses.FocusCost,bonuses.IntuitionBonus)),
             CollectableMove.Meticulous=>(turn.MeticulousAction,localization.Format("CollectablePanel.MeticulousGain",turn.Meticulous,turn.MeticulousChance)),
             _=>(turn.CollectAction,""),
         };
@@ -127,12 +137,12 @@ internal sealed partial class MainWindow
         ImGui.PushTextWrapPos(0);
         try
         {
-            if(advice.FocusHelps)ImGui.TextDisabled(localization.Format("CollectablePanel.FocusHelps",CollectableActionInfo?.Invoke(turn.FocusAction)?.Name ?? "",bonuses.FocusCost,bonuses.IntuitionBonus));
-            if(configuration.CollectableUseScrutiny && configuration.CollectableScrutinyBonus<=0)ImGui.TextDisabled(localization.Get("CollectablePanel.LearnScrutiny"));
-            if(configuration.CollectableIntuitionBonus<=0)ImGui.TextDisabled(localization.Get("CollectablePanel.LearnIntuition"));
-            if(turn.EstimateScrutiny || turn.EstimateIntuition)ImGui.TextDisabled(localization.Get("CollectablePanel.BoxesTicked"));
-            ImGui.TextDisabled(localization.Get("CollectablePanel.AdviceNote"));
+            if(configuration.CollectableUseScrutiny && configuration.CollectableScrutinyGain<=0)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("CollectablePanel.LearnScrutiny"));
+            if(configuration.CollectableIntuitionGain<=0)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("CollectablePanel.LearnIntuition"));
         }
         finally{ImGui.PopTextWrapPos();}
+        // 0.481 (user screenshot: the panel was too long): the method in a tooltip.
+        ImGui.TextDisabled(localization.Get("CollectablePanel.HowLabel"));
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("CollectablePanel.AdviceNote"));
     }
 }

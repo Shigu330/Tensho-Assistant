@@ -9,7 +9,7 @@ public static class ConfigurationReset
 {
     public static readonly IReadOnlySet<string> Kept = new HashSet<string>
     {
-        "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenObserved", "CollectableScrutinyBonus", "CollectableIntuitionBonus", "TripleTriadDeck",
+        "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenObserved", "CollectableScrutinyGain", "CollectableIntuitionGain", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
         "Voyages", "GearPlans", "GearMateria", "SubmarineUnlocked", "VesselPlans",
@@ -43,7 +43,7 @@ public static class ConfigurationReset
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "GameFrames", "AlarmOptions",
-        "Discord", "ThemeMode", "ThemeModeBeforeTool", "GatherPlanFromList", "GpSaveForBonus", "CollectableUseScrutiny", "CollectableUseRestore", "GatherSecondsBetweenNodes", "GpRegenPerTick", "GpForbiddenActions", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
+        "Discord", "ThemeMode", "ThemeModeBeforeTool", "GatherPlanFromList", "GpSaveForBonus", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "GatherSecondsBetweenNodes", "GpRegenPerTick", "GpForbiddenActions", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
         // 0.347 (g, I-08): the two shop reminder settings (the notes themselves are saved data, kept by « restore every setting »).
         "ItemNoteShopReminder", "ItemNoteImportantSound",
@@ -349,8 +349,9 @@ public sealed partial class Configuration
     // 0.480 (user report): Scrutiny in the collectable plan, and what the bonuses add, as measured in the game's window.
     public bool CollectableUseScrutiny { get; set; } = true;
     public bool CollectableUseRestore { get; set; } = true;
-    public int CollectableScrutinyBonus { get; set; }
-    public int CollectableIntuitionBonus { get; set; }
+    public int CollectableScrutinyGain { get; set; }
+    public int CollectableIntuitionGain { get; set; }
+    public bool CollectableUseFocus { get; set; } = true;
     public int GatherSecondsBetweenNodes { get; set; } = 30;
     public int GpRegenPerTick { get; set; }
     public int GpRegenObserved { get; set; }

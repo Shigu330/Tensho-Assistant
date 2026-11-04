@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.481.0
+- Rapport de l'utilisateur en jeu : « ne prend toujours pas en compte action inspection et œil ». Erreur de la 0.480 : les cases étaient lues à l'envers. Le journal montre que 54 est la case « Avec Inspection rigoureuse » (+175) et 56 la case « Avec Intuition » (+88) ([preuve](docs/evidence/0.479-collectable-window-values.md)). La valeur fausse apprise en 0.480 est abandonnée : il faut recocher les cases une fois.
+- Inspection rigoureuse et Œil du collectionneur entrent dans le calcul, ainsi qu'Intuition, au pourcentage affiché par le jeu (valeur 58). Ce qui est annoncé comme certain ne compte pas sur Intuition. Réglage pour ne pas utiliser Œil. Le panneau est raccourci : la méthode passe dans une bulle.
+- Contrôle sur une passe réelle de l'utilisateur (809 PR, 4 tentatives, 1000 atteint, 20 assignats, alors que la 0.480 prédisait 14) : le plan retrouve ce résultat, gardé comme test. Avec Raison solide, il annonce 21 assignats certains (3 récoltes au palier moyen) : cela suppose que le jeu accepte l'action comme le dit sa description, à vérifier.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 918/918, 0 avertissement, 0 erreur ; DLL 0.481.0.0. Non validé en jeu.
+### English
+- Fixes the estimate boxes, read the wrong way round in 0.480. Scrutiny, Collector's Focus and Intuition now count in the collectable plan's average; what is announced as certain never relies on Intuition.
+
 ## 0.480.0
 - **Plantage du jeu, causé par une version de travail de cette 0.480, jamais publiée en commit** : le journal de Windows donne `0xc00000fd` (dépassement de pile) à 10:14:09 dans `ffxiv_dx11.exe`. Le calcul du plan pouvait s'appeler sans fin avec une Sélection méthodique gratuite à la valeur maximale. Corrigé : le calcul s'arrête au seuil haut et au maximum, le nombre d'états est borné, un test couvre ces cas, et le calcul ne se refait que si quelque chose change, plus à chaque image.
 - Demandes de l'utilisateur : « assignats max et récolte max comme référence », « le plus rentable en assignats sur un seul nœud ». Le panneau donne la référence (palier haut, assignats par récolte, au mieux sans chance sur ce nœud, ou ce qui manque). Les PR vont où ils rapportent le plus, Inspection rigoureuse ou tentative regagnée par Raison solide ou Sagesse du fermier (sa description dit qu'elle rend 1 d'intégrité sur un collectionnable, [preuve](docs/evidence/0.410-gp-actions.md)). Réglage pour ne pas regagner de tentatives. L'Eurêka n'est pas comptée.
