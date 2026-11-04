@@ -3790,8 +3790,8 @@
     "Gp": "Les actions de récolte sont indisponibles : les données du jeu n’ont pas pu être lues (peut-être après une mise à jour du jeu)."
   },
   "DiagnosticsUi": {
-    "OverlayTimes": "Temps d'affichage des panneaux à côté du jeu",
-    "OverlayTimesHelp": "Médiane et maximum du temps de calcul des 120 dernières images de chaque panneau affiché hors de la fenêtre Tensho. Compté en mode développeur seulement. Un panneau garde ses derniers temps une fois fermé.",
+    "OverlayTimes": "Temps d'affichage de la carte et des panneaux à côté du jeu",
+    "OverlayTimesHelp": "Médiane et maximum du temps de calcul des 120 dernières images de la carte et de chaque panneau affiché hors de la fenêtre Tensho. Compté en mode développeur seulement. Un panneau garde ses derniers temps une fois fermé.",
     "DrawTimeLine": "{0}  médiane {1} ms · max {2} ms ({3} images)",
     "DrawTimes": "Temps d'affichage des pages",
     "DrawTimesHelp": "Médiane et maximum du temps de calcul des 120 dernières images de chaque page visitée (médiane = coût habituel, maximum = pics comme le premier chargement des icônes), la plus lente en premier. Restez quelques secondes sur une page pour une mesure fiable.",

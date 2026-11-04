@@ -20,6 +20,12 @@ internal sealed class MapViewWindow : Window
     public override bool DrawConditions() => owner.MapViewVisible();
     public override void PreDraw() => owner.PrepareMapView(this);
     public override void PostDraw() => owner.FinishMapView();
-    public override void Draw() => owner.DrawMapViewContents();
+    public override void Draw()
+    {
+        // 0.489 (user report): the map is its own window, drawn with neither a page nor a panel: it has its line in Diagnostics.
+        var started = owner.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
+        owner.DrawMapViewContents();
+        if (started != 0) owner.RecordOverlayDraw("Map", System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);
+    }
     public override void OnClose() => owner.CloseMapFromGame();
 }

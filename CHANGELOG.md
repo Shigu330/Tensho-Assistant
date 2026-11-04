@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.489.0
+- Rapport de l'utilisateur en jeu : la carte n'apparaissait pas dans les temps d'affichage. Elle a sa propre fenêtre, comptée ni comme page ni comme panneau. Diagnostics a maintenant une ligne « Map », en mode développeur.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 925/925, 0 avertissement, 0 erreur ; DLL 0.489.0.0. Non validé en jeu.
+### English
+- Diagnostics now lists the draw time of the Tensho map.
+
 ## 0.488.0
 - Rapports de l'utilisateur en jeu.
 - Panneau Collectionnable qui clignote : le journal montre la réponse du jeu pour Raison solide qui change en quelques secondes (statut 579, puis 0, puis 579, avec le verrou de chaque action). Le plan en dépendait et se recalculait, et le panneau raccourcissait pendant ce temps. La réponse du jeu ne change plus le plan, elle dit seulement d'attendre, et le dernier plan reste affiché pendant le calcul. La détection de l'arrêt du tic n'était pas en cause.

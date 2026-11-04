@@ -310,6 +310,7 @@ internal static class Gathering478Tests
             Check(Read("Plugin.cs").Contains("mainWindow.RecordOverlayDraw(name,") && Read("Plugin.cs").Contains("var started=mainWindow.DeveloperMode ?"),"measured in developer mode only");
             Check(Read("MainWindow.Diagnostics.cs").Contains("DiagnosticsUi.OverlayTimes") && Read("MainWindow.cs").Contains("overlayDrawMs"),"shown");
             Check(Read("MainWindow.cs").Contains("if (milliseconds < 0.02) return;"),"in-game report: a closed panel's zeros no longer push its times out");
+            Check(Read("MapViewWindow.cs").Contains("owner.RecordOverlayDraw(\"Map\","),"in-game report: the map has its line");
         }),
         ("The help follows what is unlocked: an action the window does not offer or the job has not learned is never advised",() =>
         {

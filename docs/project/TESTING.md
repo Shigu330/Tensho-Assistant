@@ -714,6 +714,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.489 : temps d'affichage de la carte** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Mode développeur, carte Tensho ouverte : Diagnostics a une ligne « Map », et elle reste une fois la carte fermée.
+
 **0.488 : clignotement, Raison solide, temps avant le plein** — pendant la campagne de tests en jeu (étape h)
 
 - [ ] Panneau Collectionnable : il ne clignote plus au début ni entre deux actions.

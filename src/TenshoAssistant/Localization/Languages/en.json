@@ -3790,8 +3790,8 @@
     "Gp": "Gathering actions are unavailable: the game data could not be read (possibly after a game update)."
   },
   "DiagnosticsUi": {
-    "OverlayTimes": "Draw time of the panels beside the game",
-    "OverlayTimesHelp": "Median and maximum draw time of the last 120 frames of each panel shown outside the Tensho window. Counted in developer mode only. A panel keeps its last times once closed.",
+    "OverlayTimes": "Draw time of the map and of the panels beside the game",
+    "OverlayTimesHelp": "Median and maximum draw time of the last 120 frames of the map and of each panel shown outside the Tensho window. Counted in developer mode only. A panel keeps its last times once closed.",
     "DrawTimeLine": "{0}  median {1} ms · max {2} ms ({3} frames)",
     "DrawTimes": "Page draw times",
     "DrawTimesHelp": "Median and maximum draw time over the last 120 frames of each visited page (median = usual cost, maximum = spikes such as the first icon load), slowest first. Stay a few seconds on a page for a reliable measure.",
