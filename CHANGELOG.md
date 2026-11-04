@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.471.0
+- Demande de l'utilisateur, CHAT-001 phases 0 et 1 ([DEC-029](docs/project/DECISIONS.md)) : nouvelle page Monde › Chat et une fenêtre de chat en lecture seule, désactivée par défaut, à côté de celle du jeu. Onglets par canal, couleurs, heure, canal, taille du texte, opacité, compteur de non-lus, jusqu'à 10 000 lignes, seules les lignes visibles sont dessinées. Elle lit ce que le jeu affiche, après les autres plugins, n'envoie rien et ne garde rien sur disque. Chat 2 actif : averti, jamais bloqué. La sonde (mode développeur) donne des compteurs, sans texte.
+- La page a été créée avec `scripts/New-Tool.ps1`.
+- Tests : ChatTests (6). Verify.ps1 (agent) : 895/895, 0 avertissement, 0 erreur ; DLL 0.471.0.0. Non validé en jeu.
+### English
+- New Chat page and a read-only chat window, off by default, beside the game's: tabs by channel, colours, time, text size, opacity, unread counts. It sends nothing and keeps nothing on disk.
+
 ## 0.470.0
 - Décisions de l'utilisateur sur le chat et les modèles communautaires : [DEC-029](docs/project/DECISIONS.md). Partie code des modèles (TEMPLATES-001).
 - Toutes les pages sont dans une seule liste, `MainWindow.Pages.cs` : la navigation, le dessin et la source montrée aux contributeurs la lisent. Trois listes séparées disparaissent, sans changement voulu à l'écran.

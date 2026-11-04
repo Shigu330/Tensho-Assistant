@@ -714,6 +714,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.471 : chat, phase 1 (lecture)** — CHAT-001
+
+- [ ] Monde › Chat : cocher la fenêtre ; elle s'ouvre avec Général et Social, et le chat du jeu ne change pas.
+- [ ] Une soirée à côté du chat du jeu : aucun message manquant ni en double dans Général, canaux bien rangés, lignes coupées entre les mots, texte lisible (accents, noms, glyphes du jeu retirés).
+- [ ] Remonter dans l'historique : le chat ne redescend pas tout seul, le compteur de l'onglet monte ; revenir en bas le remet à zéro.
+- [ ] Élargir la fenêtre, changer la taille du texte, l'heure, le canal, l'opacité, les couleurs, les onglets ; le jeu reste fluide avec 10 000 lignes.
+- [ ] La croix ferme la fenêtre, décoche le réglage et efface les messages. Déconnexion : effacés. Chat 2 actif : message d'avertissement.
+- [ ] Mode développeur : sonde du chat, puis « Écrire les compteurs dans le journal » ; me donner les deux lignes `Chat probe` pour préparer les liens.
+
 **0.470 : liste unique des pages** — pendant la campagne de tests en jeu (étape h)
 
 - [ ] Navigation : mêmes groupes, mêmes pages, même ordre qu'avant ; chaque page s'ouvre. Artisanat reste sélectionné sur Synthèse en cours et Séquences, Récolte sur PR, Collection sur Magie bleue. Diagnostics seulement en mode développeur.

@@ -2,7 +2,7 @@
 
 Demande de l'utilisateur (2026-11-04) : un chat custom avec les personnalisations de WoW, portées sur FF14, améliorées si possible, avec le plus de réglages possible, après vérification de ce que font les plugins existants. Les décisions à prendre sont à la fin.
 
-**Décidé le 2026-11-04 ([DEC-029](../project/DECISIONS.md))** : remplacement complet, tout de suite. Les colonnes « recommandation » de la fin sont gardées pour l'historique ; le choix fait est dans la dernière section. État : phase 0 à venir, rien n'a été essayé en jeu.
+**Décidé le 2026-11-04 ([DEC-029](../project/DECISIONS.md))** : remplacement complet, tout de suite. Les colonnes « recommandation » de la fin sont gardées pour l'historique ; le choix fait est dans la dernière section. État : phases 0 et 1 livrées en 0.471, non validées en jeu ; suite : phase 2 (liens), après le relevé de la sonde.
 
 ## Le point à trancher d'abord
 
