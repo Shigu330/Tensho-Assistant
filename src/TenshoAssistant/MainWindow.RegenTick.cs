@@ -12,6 +12,8 @@ internal sealed partial class MainWindow
 
     internal void DrawRegenTickBar()
     {
+        // 0.484: what a tick gives, for the GP plan: GP does not rise at a node, so it is seen here. A rise above 50 is a potion or an action; the smallest counts.
+        if(!windowDisposed && RegenTick?.Invoke() is {Gain:>0 and <=50} measured && (configuration.GpRegenObserved==0 || measured.Gain<configuration.GpRegenObserved)){configuration.GpRegenObserved=measured.Gain;SaveReminders();}
         if(windowDisposed || !configuration.GpTickBar || RegenTick?.Invoke() is not { } tick || tick.Gp>=tick.MaxGp)return;
         UI.FfxivTheme.Push();
         try
@@ -21,7 +23,7 @@ internal sealed partial class MainWindow
             if(ImGui.Begin("###TenshoGpTick",ImGuiWindowFlags.NoTitleBar|ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav
                    |ImGuiWindowFlags.NoScrollbar))
             {
-                var text=tick.SecondsLeft is { } left ? localization.Format("GpTick.Bar",tick.Gp,tick.MaxGp,left.ToString("0.0")):localization.Format("GpTick.Waiting",tick.Gp,tick.MaxGp);
+                var text=tick.Stalled ? localization.Format("GpTick.Stalled",tick.Gp,tick.MaxGp):tick.SecondsLeft is { } left ? localization.Format("GpTick.Bar",tick.Gp,tick.MaxGp,left.ToString("0.0")):localization.Format("GpTick.Waiting",tick.Gp,tick.MaxGp);
                 ImGui.ProgressBar((float)(tick.Progress ?? 0),new Vector2(180,ImGui.GetFrameHeight()),text);
                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GpTick.Tip"));
             }

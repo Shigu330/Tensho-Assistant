@@ -67,6 +67,7 @@ internal sealed partial class MainWindow
         IntSetting("GatheringPanel.Regen","GatheringPanel.RegenTip",()=>configuration.GpRegenPerTick,value=>configuration.GpRegenPerTick=value,0,50,DefaultConfiguration.GpRegenPerTick);
         if(configuration.GpRegenObserved>0)ImGui.TextDisabled(localization.Format("GatheringPanel.RegenObserved",configuration.GpRegenObserved));
         BoolSetting("CollectablePanel.UseScrutiny","CollectablePanel.UseScrutinyTip",()=>configuration.CollectableUseScrutiny,value=>configuration.CollectableUseScrutiny=value,c=>c.CollectableUseScrutiny);
+        IntSetting("CollectablePanel.Risk","CollectablePanel.RiskTip",()=>configuration.CollectableRiskTolerance,value=>configuration.CollectableRiskTolerance=value,0,100,DefaultConfiguration.CollectableRiskTolerance);
         BoolSetting("CollectablePanel.UseFocus","CollectablePanel.UseFocusTip",()=>configuration.CollectableUseFocus,value=>configuration.CollectableUseFocus=value,c=>c.CollectableUseFocus);
         BoolSetting("CollectablePanel.UseRestore","CollectablePanel.UseRestoreTip",()=>configuration.CollectableUseRestore,value=>configuration.CollectableUseRestore=value,c=>c.CollectableUseRestore);
         DrawGpForbiddenActions();

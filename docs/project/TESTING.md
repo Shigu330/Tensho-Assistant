@@ -714,6 +714,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.484 : risque accepté** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Barre de tic : à l'ouverture d'une fenêtre de récolte, après quelques secondes, elle dit que les PR ne remontent pas ; en la quittant, elle repart. Paramètres › Modules › Récolte montre les PR par tic mesurés.
+- [ ] Carte Tensho ouverte, plugin rechargé : elle revient seule, sans M deux fois. Carte du jeu hors combat : pas d'autre effet.
+- [ ] Panneau Collectionnable : « Calcul du plan… » apparaît à peine, le jeu ne se fige pas au changement de curseur.
+
+- [ ] Panneau Collectionnable, curseur « Risque accepté » : à 0 %, plus de Sélection instinctive sans nécessité et un « au pire » élevé ; à 100 %, le plan vise la meilleure moyenne. Le réglage reste après rechargement, et existe aussi dans Paramètres › Modules › Récolte.
+
 **0.483 : Raison solide selon le jeu** — pendant la campagne de tests en jeu (étape h)
 
 - [ ] Plan avec Raison solide : quand les tentatives sont sous le maximum et que le jeu la refuse, elle n'est plus conseillée ni comptée. Mode développeur : la ligne `Collectable restore action` du journal donne la réponse du jeu.

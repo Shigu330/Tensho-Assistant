@@ -3,6 +3,15 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.484.0
+- Demande de l'utilisateur : prendre en compte le risque, avec une tolérance réglable dans le panneau d'aide. Curseur « Risque accepté » dans le panneau Collectionnable, et dans Paramètres › Modules › Récolte, 50 % par défaut. Chaque tirage compte pour un mélange de sa moyenne et de son pire résultat : à 0 %, le pire décide ; à 100 %, la moyenne seule. Le panneau annonce la moyenne et le résultat si tous les tirages tournent mal.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 922/922, 0 avertissement, 0 erreur ; DLL 0.484.0.0. Non validé en jeu.
+- Le calcul prenait 0,8 s dans le pire cas mesuré : il se fait maintenant hors de l'affichage.
+- Rapports de l'utilisateur en jeu. Barre de tic : elle continuait de tourner alors que les PR ne remontaient plus, par exemple à l'ouverture d'une fenêtre de récolte. Au-delà de 4,5 s sans hausse, elle le dit, et repart à la hausse suivante. Les PR par tic se mesurent maintenant là, puisqu'ils ne remontent pas sur un nœud. Carte Tensho : au rechargement, la carte du jeu restée ouverte apparaissait avant que le catalogue soit prêt, et Tensho la gardait pour de bon. La décision attend maintenant jusqu'à 15 s. Une carte ouverte sans la carte du jeu (remplacement désactivé) ne revient pas seule.
+### English
+- The GP tick bar now says when GP has stopped rising, as at a gathering window. After a plugin reload, the Tensho map comes back by itself when the game map was hosted.
+- The collectable plan takes risk into account: a « Risk accepted » slider in the panel sets how much the worst outcome of each roll counts against its average, and the panel tells both.
+
 ## 0.483.0
 - Rapport de l'utilisateur en jeu : « Raison solide pas dispo au moment où il la demande ». La règle exacte n'est pas connue. Sous le maximum de tentatives, Tensho demande au jeu si l'action est utilisable (`ActionManager.GetActionStatus`, lecture seule) ; si le jeu refuse, elle n'est plus conseillée ni comptée. À tentatives pleines, le jeu ne peut pas encore répondre : le plan peut encore la compter pour plus tard, ce qui peut rester optimiste. Le journal note la réponse en mode développeur.
 - Tests : Gathering478Tests complété. Verify.ps1 (agent) : 919/919, 0 avertissement, 0 erreur ; DLL 0.483.0.0. Non validé en jeu.

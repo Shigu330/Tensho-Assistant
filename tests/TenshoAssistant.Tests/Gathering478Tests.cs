@@ -184,7 +184,7 @@ internal static class Gathering478Tests
                 Check(CollectableAdvisor.Advise(Turn(current,scour,low,high,meticulous,chance),attempts,ore,new(150,175,5000,200,100)) is not null,$"{chance} {current} {scour} {attempts}");
             var clock=System.Diagnostics.Stopwatch.StartNew();
             var heavy=CollectableAdvisor.Advise(Turn(0,177,88,265,132,8) with {IntuitionChance=13},6,ore,new(175,88,2000,200,100,false,true,300,6))!;
-            Check(heavy.Expected>0 && clock.ElapsedMilliseconds<500,"a hard case stays quick: "+clock.ElapsedMilliseconds+" ms");
+            Check(heavy.Expected>0 && clock.ElapsedMilliseconds<5000 && Read("MainWindow.CollectablePanel.cs").Contains("collectableAdviceRun=Task.Run("),"a hard case ends in reasonable time, off the draw: "+clock.ElapsedMilliseconds+" ms");
             var capped=Rule(1,"Capped",80,5000,20) with {Low=400,Mid=700,High=5000};
             Check(CollectableAdvisor.Advise(Turn(1000,177,88,265,132,100),4,capped)?.Move==CollectableMove.Collect,"at the window's maximum, even under the high threshold: collect");
         }),
@@ -236,6 +236,53 @@ internal static class Gathering478Tests
             Check(panel.Contains("attemptsNow<most && CollectableActionStatus?.Invoke(restore.Spec.Id) is { } status") && panel.Contains("if(status!=0)restore=null;"),"refused now: not planned");
             var state=Read("Gathering/CollectableActionState.Dalamud.cs");
             Check(state.Contains("GetActionStatus(ActionType.Action,action)") && state.Contains("MemberFunctionPointers.GetActionStatus==0") && !state.Contains("UseAction"),"guarded, read only");
+        }),
+        ("Risk accepted: at 0 what is certain decides, at 100 the average; the average and the worst are told",() =>
+        {
+            var ore=Rule(36291,"Ore",80,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=3,RewardMid=7,RewardHigh=20};
+            CollectableAdvice At(int current,int scour,int low,int high,int meticulous,int attempts,int risk)=>CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(current,scour,low,high,meticulous,false))!,attempts,ore,new(RiskTolerance:risk))!;
+            var bold=At(650,250,125,375,187,2,100);
+            var careful=At(650,250,125,375,187,2,0);
+            Check(bold.Move==CollectableMove.Brazen && careful.Move==CollectableMove.Scour,$"same floor: at 100 the roll, at 0 the sure gain: {bold.Move}, {careful.Move}");
+            Check(careful.Expected==careful.Worst,"a sure line: average and worst are the same");
+            Check(bold.Expected>bold.Worst && bold.Worst==7,$"a roll: both are told: {bold}");
+            // A gamble: a bad roll loses the tier that was safe.
+            var gamble100=At(450,250,125,375,187,2,100);
+            var gamble0=At(450,250,125,375,187,2,0);
+            Check(gamble0.Worst>=gamble100.Worst,$"the careful line never ends lower: {gamble0.Worst} against {gamble100.Worst}");
+            Check(gamble0.Expected<=gamble100.Expected,$"the bold line never averages lower: {gamble0.Expected} against {gamble100.Expected}");
+            var lucky=At(300,90,45,135,67,2,0);
+            Check(lucky is {Move:CollectableMove.Collect,Impossible:false},$"at 0 no roll is taken, but it is not called impossible: {lucky}");
+            Check(At(300,90,45,135,67,2,100).Move==CollectableMove.Brazen,"at 100 the roll is taken");
+            foreach(var risk in new[]{0,25,50,75,100})
+            {
+                var plan=CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(0,177,88,265,132,false))! with {IntuitionChance=13},4,ore,new(175,88,809,200,100,false,true,300,4,13,risk))!;
+                Check(plan.Worst<=plan.Expected && plan.Expected>=20 && plan.Worst>=7,$"real run at {risk} %: {plan}");
+            }
+            var panel=Read("MainWindow.CollectablePanel.cs");
+            Check(panel.Contains("ImGui.SliderInt(localization.Get(\"CollectablePanel.Risk\")") && panel.Contains("Math.Clamp(configuration.CollectableRiskTolerance,0,100)"),"set in the panel");
+            Check(new TenshoAssistant.Configuration().CollectableRiskTolerance==50 || Read("Configuration.cs").Contains("CollectableRiskTolerance { get; set; } = 50"),"default");
+        }),
+        ("GP tick: once GP stops rising, no tick is promised; it comes back with the next rise; what a tick gives is seen",() =>
+        {
+            var at=new DateTimeOffset(2026,11,4,10,0,0,TimeSpan.Zero);
+            var tracker=new RegenTickTracker();
+            Check(tracker.Observe(100,800,at) is {Stalled:false,Progress:null},"first read: waiting, not stopped");
+            var running=tracker.Observe(105,800,at.AddSeconds(3));
+            Check(running is {Stalled:false,Gain:5} && running.SecondsLeft is not null,"a rise: a tick");
+            Check(tracker.Observe(105,800,at.AddSeconds(6)) is {Stalled:false},"within a tick and a half: still running");
+            var stopped=tracker.Observe(105,800,at.AddSeconds(8));
+            Check(stopped is {Stalled:true,Progress:null,SecondsLeft:null},"in-game report: stopped, at a gathering window");
+            Check(tracker.Observe(105,800,at.AddSeconds(100)) is {Stalled:true},"still said after a long time");
+            Check(tracker.Observe(110,800,at.AddSeconds(101)) is {Stalled:false,Gain:5},"it rises again");
+            Check(tracker.Observe(800,800,at.AddSeconds(200)) is {Stalled:false},"full: not stopped");
+            Check(Read("MainWindow.RegenTick.cs").Contains("GpTick.Stalled") && Read("MainWindow.RegenTick.cs").Contains("configuration.GpRegenObserved=measured.Gain"),"said, and measured");
+        }),
+        ("Tensho map after a reload: the game map left open waits for the Tensho map to be able to draw, for a short time",() =>
+        {
+            var replacer=Read("Maps/NativeMapReplacer.Dalamud.cs");
+            Check(replacer.Contains("var waiting=visible && !wasVisible && now<startingUntil && options.ReplaceGameMap && !bypass && !canShow();") && replacer.Contains("if(visible && !wasVisible && !waiting)") && replacer.Contains("wasVisible=visible && !waiting;"),"the decision waits");
+            Check(replacer.Contains("startingUntil=DateTimeOffset.UtcNow.AddSeconds(15)"),"not for ever: a map that cannot draw (combat, duty) still leaves the game's");
         }),
         ("Major bonus: normal is the plainest node seen; a normal node keeps its GP, a bonus node spends it",() =>
         {

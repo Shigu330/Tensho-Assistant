@@ -24,7 +24,9 @@ internal sealed partial class MainWindow
     private IReadOnlyList<string>? collectableTurnRaw;
     private CollectableTurn? collectableTurn;
     private (CollectableTurn Turn,int? Attempts,CollectableRule? Rule,CollectableBonuses Bonuses)? collectableAdviceKey;
-    private CollectableAdvice? collectableAdvice;
+    private volatile CollectableAdvice? collectableAdvice;
+    private volatile bool collectableAdvicePending;
+    private Task? collectableAdviceRun;
     private int? collectableLastGp;
     private readonly Dictionary<uint,int> collectableChanceBase=[];
 
@@ -68,6 +70,16 @@ internal sealed partial class MainWindow
         static string Shown(int? value)=>value?.ToString("N0") ?? "?";
     }
 
+    // 0.484 (user request): the risk accepted, set here. Applied as the slider moves; saved when it is let go.
+    private void DrawCollectableRisk()
+    {
+        var risk=Math.Clamp(configuration.CollectableRiskTolerance,0,100);
+        ImGui.SetNextItemWidth(160);
+        if(ImGui.SliderInt(localization.Get("CollectablePanel.Risk")+"###CollectableRisk",ref risk,0,100,"%d %%"))configuration.CollectableRiskTolerance=risk;
+        Tip("CollectablePanel.RiskTip");
+        if(ImGui.IsItemDeactivatedAfterEdit())SaveReminders();
+    }
+
     // 0.481 (user report; the boxes were misread in 0.480): what each bonus adds, as the game shows it when its box is ticked or when Scrutiny is on. Both boxes: the sum, split if one is known.
     private void LearnCollectableBonuses(CollectableTurn turn,bool active)
     {
@@ -108,12 +120,29 @@ internal sealed partial class MainWindow
         }
         var bonuses=new CollectableBonuses(configuration.CollectableScrutinyGain,configuration.CollectableIntuitionGain,gp ?? 0,
             CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Cost ?? 0,configuration.CollectableUseFocus ? CollectableActionInfo?.Invoke(turn.FocusAction)?.Cost ?? 0:0,active,configuration.CollectableUseScrutiny,restore?.Spec.Cost ?? 0,maximum ?? 0,
-            collectableChanceBase.GetValueOrDefault(turn.ItemId));
+            collectableChanceBase.GetValueOrDefault(turn.ItemId),Math.Clamp(configuration.CollectableRiskTolerance,0,100));
         var tier=rule is null ? CollectableTier.Below:Gathering.Collectables.Tier(rule,turn.Current);
         ImGui.ProgressBar(Math.Clamp((float)turn.Current/turn.Maximum,0,1),new Vector2(-1,ImGui.GetFrameHeight()),localization.Format("CollectablePanel.Current",turn.Current.ToString("N0"),turn.Maximum.ToString("N0"),localization.Get($"CollectablePanel.Tier{tier}")));
         // Worked out when something changes, not at each frame.
         var adviceKey=(turn,attempts,rule,bonuses);
-        if(collectableAdviceKey!=adviceKey){collectableAdviceKey=adviceKey;collectableAdvice=attempts is { } count ? CollectableAdvisor.Advise(turn,count,rule,bonuses):null;}
+        // Off the draw: a hard case takes most of a second (0.484), and a stale result is not shown.
+        if(collectableAdviceKey!=adviceKey && collectableAdviceRun is null or {IsCompleted:true})
+        {
+            collectableAdviceKey=adviceKey;collectableAdvicePending=true;
+            var count=attempts ?? 0;
+            collectableAdviceRun=Task.Run(()=>
+            {
+                try{collectableAdvice=count>0 ? CollectableAdvisor.Advise(turn,count,rule,bonuses):null;}
+                catch(Exception error){collectableAdvice=null;log.Warning(error,"The collectable plan could not be worked out.");}
+                finally{collectableAdvicePending=false;}
+            });
+        }
+        if(collectableAdvicePending || collectableAdviceKey!=adviceKey)
+        {
+            ImGui.TextDisabled(localization.Get("CollectablePanel.Working"));
+            DrawCollectableRisk();
+            return;
+        }
         if(collectableAdvice is not { } advice)
         {
             ImGui.TextDisabled(localization.Get(rule is null ? "CollectablePanel.NoAdviceRule":"CollectablePanel.NoAdvice"));
@@ -130,6 +159,7 @@ internal sealed partial class MainWindow
             _=>(turn.CollectAction,""),
         };
         var info=CollectableActionInfo?.Invoke(action);
+        DrawCollectableRisk();
         ImGui.TextColored(Accent,localization.Get("CollectablePanel.Next"));
         DrawItemIcon(info is { } shown ? new TenshoAssistant.Items.ItemDefinition(0,shown.Name,false,shown.Icon):null,new Vector2(32));
         ImGui.SameLine();
@@ -143,7 +173,7 @@ internal sealed partial class MainWindow
                 if(rule is {Scrips:true,RewardHigh:>0})
                 {
                     ImGui.TextColored(Accent,advice.HighScrips is { } highest ? localization.Format("CollectablePanel.Reference",rule.RewardHigh,highest):localization.Format("CollectablePanel.ReferenceFar",rule.RewardHigh,advice.HighMissing));
-                    ImGui.TextWrapped(localization.Format("CollectablePanel.Expected",advice.Expected.ToString("0.0")));
+                    ImGui.TextWrapped(localization.Format("CollectablePanel.Expected",advice.Expected.ToString("0.0"),advice.Worst.ToString("0.#")));
                 }
                 ImGui.TextDisabled(advice.Target==CollectableTier.Below ? localization.Get("CollectablePanel.OutOfReach")
                     :advice.Scrips>0 ? localization.Format("CollectablePanel.Plan",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections,advice.Scrips)

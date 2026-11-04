@@ -1,7 +1,9 @@
 namespace TenshoAssistant.Gathering;
 
 /// <summary>What the GP tick bar shows: GP now and at most, and where the 3-second regeneration cycle is (null = no tick seen yet).</summary>
-public sealed record RegenTickState(uint Gp,uint MaxGp,double? Progress,double? SecondsLeft);
+/// <param name="Stalled">0.484: ticks were seen, and GP has not risen for longer than a tick, as when a gathering window is open.</param>
+/// <param name="Gain">0.484: the last natural-looking rise of GP, to know what a tick gives; 0 before the first.</param>
+public sealed record RegenTickState(uint Gp,uint MaxGp,double? Progress,double? SecondsLeft,bool Stalled=false,int Gain=0);
 
 /// <summary>
 /// g, R-08 (0.403): says once when a gatherer's GP rises to the threshold (0 = the maximum); armed again once GP falls below it.
@@ -31,16 +33,21 @@ public sealed class RegenTickTracker
     public static readonly TimeSpan Period=TimeSpan.FromSeconds(3);
     private uint? last,lastMax;
     private DateTimeOffset? tick;
+    private int gain;
+    /// <summary>0.484 (user report: the bar ran on while GP had stopped, at a gathering window): beyond this without a rise, no tick is promised.</summary>
+    public static readonly TimeSpan StallAfter=TimeSpan.FromSeconds(4.5);
 
-    public void Reset(){last=null;lastMax=null;tick=null;}
+    public void Reset(){last=null;lastMax=null;tick=null;gain=0;}
 
     public RegenTickState Observe(uint gp,uint maxGp,DateTimeOffset now)
     {
         // Full means full against the maximum of the previous read: a higher maximum (gear changed) at full GP is not a tick.
-        if(last is { } before && gp>before && before<(lastMax ?? maxGp))tick=now;
+        if(last is { } before && gp>before && before<(lastMax ?? maxGp)){tick=now;gain=(int)Math.Min(gp-before,int.MaxValue);}
         last=gp;lastMax=maxGp;
-        if(tick is not { } at || now-at>TimeSpan.FromMinutes(1) || now<at)return new(gp,maxGp,null,null);
+        if(tick is not { } at || now<at)return new(gp,maxGp,null,null,false,gain);
+        if(now-at>TimeSpan.FromMinutes(1))return new(gp,maxGp,null,null,gp<maxGp,gain);
+        if(gp<maxGp && now-at>StallAfter)return new(gp,maxGp,null,null,true,gain);
         var into=(now-at).TotalSeconds%Period.TotalSeconds;
-        return new(gp,maxGp,into/Period.TotalSeconds,Period.TotalSeconds-into);
+        return new(gp,maxGp,into/Period.TotalSeconds,Period.TotalSeconds-into,false,gain);
     }
 }

@@ -23,6 +23,9 @@ internal sealed class NativeMapReplacer : IDisposable
     // 0.151: the game map is kept open off screen while the Tensho map shows (as Mappy does) instead of being closed, so the
     // map agent stays active and keeps the quest and leve markers up to date; closing either window closes the other.
     private bool hosted;private string lastRequest="";
+    // 0.484 (user report: after a reload the Tensho map needed M twice): the game map stays open across a reload, and it appeared while the catalogue was still loading, so it was kept for good. For a
+    // short time after loading, the decision waits for the Tensho map to be able to draw.
+    private readonly DateTimeOffset startingUntil=DateTimeOffset.UtcNow.AddSeconds(15);
     /// <summary>Opens the game map without replacing it (tool button); done on the next framework tick.</summary>
     public void OpenGameMap()=>Interlocked.Exchange(ref openRequest,1);
     public NativeMapReplacer(IFramework framework,IGameGui gui,IClientState client,Func<MapViewSettings> settings,Action<GameMapRequest> open,
@@ -53,7 +56,8 @@ internal sealed class NativeMapReplacer : IDisposable
                 }
             }
             if(bypass && now>bypassUntil)bypass=false;
-            if(visible && !wasVisible)
+            var waiting=visible && !wasVisible && now<startingUntil && options.ReplaceGameMap && !bypass && !canShow();
+            if(visible && !wasVisible && !waiting)
             {
                 // Decided once, when the game map appears: kept for the whole time it stays open, and kept too when the Tensho
                 // map cannot draw then (canShow, 0.328).
@@ -83,7 +87,7 @@ internal sealed class NativeMapReplacer : IDisposable
                 }
             }
             if(!visible)keepGameMap=false;
-            wasVisible=visible;
+            wasVisible=visible && !waiting;
         }
         catch(Exception error){retryAt=now.AddSeconds(5);log.Warning(error,"Could not replace the game map; it stays open.");}
     }

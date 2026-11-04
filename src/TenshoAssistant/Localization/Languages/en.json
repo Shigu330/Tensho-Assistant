@@ -4829,6 +4829,7 @@
     "Failed": "Could not sort (see /xllog)"
   },
   "GpTick": {
+    "Stalled": "GP {0}/{1}: not rising at the moment",
     "AlertSetting": "GP alert at a threshold",
     "AlertSettingTip": "A chat message and the alarm sound when a gatherer's GP rises to the chosen threshold, once per rise. Not in combat; the alarm options apply.\nDefault: off.",
     "Threshold": "GP threshold",
@@ -5066,6 +5067,10 @@
     "IssuerId": "Issuer ID: {0}"
   },
   "CollectablePanel": {
+    "Working": "Working out the plan…",
+    "Expected": "With these moves: {0} scrips on average, {1} if every roll goes badly.",
+    "Risk": "Risk accepted",
+    "RiskTip": "At 0 %, the plan chooses on what is certain even if every roll goes badly. At 100 %, on the average alone, even if it can end with less. In between, a mix of both.\nDefault: 50 %.",
     "PlanGp": "This plan spends {0} of {1} GP, {2} left. GP coming back during the pass is not counted.",
     "Plan": "For sure, without luck: {0} tier: {1} Scour, then {2} gather(s): {3} scrips.",
     "PlanItems": "For sure, without luck: {0} tier: {1} Scour, then {2} gather(s).",
@@ -5075,7 +5080,7 @@
     "HowLabel": "How is this worked out? (hover)",
     "UseFocus": "Collectable plan: use Collector's Focus",
     "UseFocusTip": "The plan may spend GP on Collector's Focus when that earns more on average.",
-    "AdviceNote": "The average over the attempts left, from the gains the game shows this turn, done again after each action. It counts Intuition at the chance shown, Collector's Focus at 1.75 times that chance, and Scrutiny at what the game's box adds. Brazen is taken as even across its range. Eureka and Priming Touch are not counted. A box of the game's estimates may stay ticked: its bonus is taken out of the gains. Nothing is executed.",
+    "AdviceNote": "The score over the attempts left, a mix of average and worst outcome set by « Risk accepted », from the gains the game shows this turn, done again after each action. It counts Intuition at the chance shown, Collector's Focus at 1.75 times that chance, and Scrutiny at what the game's box adds. Brazen is taken as even across its range. Eureka and Priming Touch are not counted. A box of the game's estimates may stay ticked: its bonus is taken out of the gains. Nothing is executed.",
     "LearnScrutiny": "Scrutiny is not counted yet: tick « With Scrutiny » in the game's window once.",
     "LearnIntuition": "Intuition is not counted yet: tick « With Intuition » in the game's window once.",
     "RestoreGain": "+1 attempt, {0} GP",
@@ -5083,7 +5088,6 @@
     "ReferenceFar": "Reference: high tier, {0} scrips per gather. Without luck, {1} collectability is missing even with all your GP.",
     "UseRestore": "Collectable plan: restore attempts with GP",
     "UseRestoreTip": "The plan may spend GP on Solid Reason or Ageless Words for one more gather, when that earns more. Its Eureka chance is not counted.",
-    "Expected": "Best move on average: {0} scrips, luck included.",
     "MeticulousGain": "+{0}, {1} % chance of costing no attempt",
     "OutOfReach": "The low threshold is not certain with the attempts left: it depends on the rolls.",
     "ScrutinyGain": "+{0} on the next action, {1} GP",
