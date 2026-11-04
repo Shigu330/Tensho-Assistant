@@ -714,6 +714,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.502 : aide (ONBOARD-001, lot 1)** — à voir en jouant
+
+- [ ] Un « ? » en haut à droite de la fenêtre Tensho explique la page ouverte, sur toutes les pages ; « Toute l'aide » mène à Préférences › Aide.
+- [ ] Page Aide : la recherche trouve une page d'après ce qu'elle fait ; « Ouvrir cette page » y mène ; questions fréquentes.
+- [ ] Relire les textes : chaque phrase fausse est un bug. Ils ont été écrits d'après le code et les tests, sans tout rejouer.
+
 **0.501 : sonde des fenêtres du dresseur** — à faire en jeu, mode développeur
 
 - [ ] Ouvrir le bestiaire et cliquer sur quelques bêtes obtenues, de rangs différents. Ouvrir « Formation de l'équipe » depuis un plateau. Ouvrir la fiche d'un ennemi d'un plateau. L'agent lit ensuite les lignes `Beast window` de dalamud.log : rang de chaque bête, faiblesse des ennemis.

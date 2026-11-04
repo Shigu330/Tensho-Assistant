@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.502.0
+- Dresseur mis en attente sur décision de l'utilisateur. Suite de la feuille de route : prise en main (ONBOARD-001), lot 1.
+- Aide à chaque page : un « ? » en haut de la fenêtre explique la page ouverte (à quoi elle sert, comment commencer, que faire si elle reste vide). Nouvelle page Préférences › Aide : recherche, questions fréquentes, toutes les pages, rapport de bug. Un test refuse une page sans ses textes, en anglais et en français.
+- Limite : les textes viennent du code et des tests ; ils n'ont pas tous été rejoués en jeu.
+- Tests : HelpTests (3 cas). Verify.ps1 (agent) : 948/948, 0 avertissement, 0 erreur ; DLL 0.502.0.0. Non validé en jeu.
+### English
+- Help on every page: a "?" explains the open page, and a new Help page searches them all, with frequent questions and the bug report. A test refuses a page without its help texts.
+
 ## 0.501.0
 - Décision de l'utilisateur (DEC-032) : pour le dresseur, un panneau d'informations pour le Dédale, en JcE seulement, rien en JcJ. Pas encore codé : il lui faut le rang des bêtes et la faiblesse des ennemis.
 - Sonde en mode développeur : quand une fenêtre du dresseur est ouverte (fiche du bestiaire, formation de l'équipe, fiche d'un ennemi, plateau), ses textes et ses valeurs vont au journal, à chaque changement, en quantité limitée. Lecture seule. Les fenêtres de classement et de résultat sont exclues : elles nomment d'autres joueurs ou le personnage.

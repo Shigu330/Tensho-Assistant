@@ -53,6 +53,7 @@ internal sealed partial class MainWindow
         new(Page.Fashion,"GoldSaucer",PageLabel("Category.Fashion"),DrawFashion,"MainWindow.Fashion*.cs, Fashion/"),
         new(Page.TripleTriad,"GoldSaucer",PageLabel("Category.Triad"),DrawTripleTriad,"MainWindow.TripleTriad.cs, MainWindow.Triad*.cs, MiniGames/"),
         new(Page.MiniCactpot,"GoldSaucer",PageLabel("Category.Cactpot"),DrawMiniCactpot,"MainWindow.MiniCactpot.cs, MiniGames/"),
+        new(Page.Help,"Preferences",PageLabel("Navigation.Help"),DrawHelpPage,"MainWindow.Help.cs, Help/"),
         new(Page.Settings,"Preferences",PageLabel("Navigation.Settings"),DrawSettings,"MainWindow.Settings.cs, MainWindow.Advanced.cs"),
         // R-13 (0.320): everything Tensho uses, shown to every player.
         new(Page.Credits,"Preferences",PageLabel("Navigation.Credits"),DrawCredits,"MainWindow.Credits.cs, Credits/"),
