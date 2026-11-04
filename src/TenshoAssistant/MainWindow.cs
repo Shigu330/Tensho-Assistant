@@ -232,6 +232,7 @@ internal sealed partial class MainWindow : Window, IDisposable
     public override void Draw()
     {
         RememberPage();
+        OpenGuideOnce();
         DrawGameFrame();
         monsterLoot.SelectItem((uint)Math.Max(0,itemId));
         ValidateGpCopy();

@@ -3,9 +3,17 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.505.0
+- ONBOARD-001, lots 4 à 6. Un guide des premiers pas : bienvenue et langue, sources en ligne avec leur interrupteur (défauts inchangés, G3), quelques réglages, intérêts (G4), fenêtres du jeu à ouvrir une fois, visite des pages, fin. On le quitte à chaque étape, il reprend là où il en était, depuis Aide. Nouvelle installation : il s'ouvre une fois à la première ouverture de Tensho. Joueur existant : une proposition unique sur l'accueil (G2).
+- Fenêtres à ouvrir : Tensho coche d'après ce que le jeu a réellement donné, et n'ouvre rien à la place du joueur. Ce qui reste figure sur l'accueil.
+- Masqué en combat et en mission. « Tout remettre par défaut » ne relance pas le guide.
+- Tests : GuideFlowTests (6 cas). Verify.ps1 (agent) : 958/958, 0 avertissement, 0 erreur ; DLL 0.505.0.0. Non validé en jeu, et la vraie première installation n'a pas pu être essayée.
+### English
+- First-steps guide: welcome and language, online sources, a few settings, interests, game windows to open once (ticked from what the game really gave), a look around. It can be left at any step and resumed from Help. It opens once on a new install, and is only offered once to anyone else.
+
 ## 0.504.0
 - ONBOARD-001, lot 3 (G5). Aide › Signaler un problème : bug, idée ou traduction. Le rapport de diagnostic et l'auto-contrôle sont visibles et modifiables. « Ouvrir le formulaire GitHub » ouvre le navigateur sur le bon formulaire, rempli. Le plugin n'envoie rien et ne garde aucun jeton. Trop long : le texte passe dans le presse-papiers. « Déjà signalé ? » cherche dans le navigateur. Dossiers et adresses Discord sont retirés. Un problème de sécurité renvoie vers le signalement privé.
-- Tests : HelpTests complété. Verify.ps1 (agent) : VERIFYCOUNT, 0 avertissement, 0 erreur ; DLL 0.504.0.0. Non validé en jeu : le préremplissage vient de la documentation de GitHub, aucun formulaire réel n'a été ouvert.
+- Tests : HelpTests complété. Verify.ps1 (agent) : 952/952, 0 avertissement, 0 erreur ; DLL 0.504.0.0. Non validé en jeu : le préremplissage vient de la documentation de GitHub, aucun formulaire réel n'a été ouvert.
 ### English
 - Report a problem from the game: a form that opens the project's GitHub form filled in, in the browser. The plugin sends nothing and holds no token. The report is visible and editable first.
 

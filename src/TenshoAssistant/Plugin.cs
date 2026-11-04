@@ -30,6 +30,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly LocalizationManager localization;
     private readonly MainWindow mainWindow;
     private MapViewWindow? mapWindow;
+    private GuideWindow? guideWindow;
     private readonly WindowSystem windows = new("TenshoAssistant");
     private readonly InventoryService inventoryService = new();
     private readonly InventoryVisualSortService visualSort=new();
@@ -94,7 +95,9 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(() => { }, dutyLoot.Dispose);
             registrations.Register(() => { }, monsterLoot.Dispose);
             registrations.Register(() => { }, fashionData.Dispose);
-            var configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            var saved = pluginInterface.GetPluginConfig() as Configuration;
+            var newInstall = saved is null;
+            var configuration = saved ?? new Configuration();
             autoBankCapture = () => configuration.AutoBankCapture;
             fontSettings = () => configuration.Fonts;
             if (configuration.Version != 1)
@@ -313,6 +316,7 @@ public sealed class Plugin : IDalamudPlugin
             Beastmaster.BeastCatalogLoader? beastLoader=null;
             registrations.Register(()=>beastLoader=new Beastmaster.BeastCatalogLoader(beasts,data,framework,client,player,log),()=>beastLoader?.Dispose());
             mainWindow.Beasts=beasts;
+            mainWindow.GuideNewInstall=newInstall;
             Beastmaster.BeastWindowProbe? beastProbe=null;
             registrations.Register(()=>beastProbe=new Beastmaster.BeastWindowProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>beastProbe?.Dispose());
             // 0.494 (user request): the self-check, on its own in developer mode, on request otherwise.
@@ -907,6 +911,7 @@ public sealed class Plugin : IDalamudPlugin
             triadObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Triad") == true);
             macroObservations.SetEnabled(configuration.Observations?.GetValueOrDefault("Macros") == true);
             registrations.Register(() => windows.AddWindow(mainWindow), () => windows.RemoveWindow(mainWindow));
+            registrations.Register(() => windows.AddWindow(guideWindow = new GuideWindow(mainWindow)), () => { if (guideWindow is not null) windows.RemoveWindow(guideWindow); guideWindow = null; });
             registrations.Register(() => windows.AddWindow(mapWindow = new MapViewWindow(mainWindow)), () => { if (mapWindow is not null) windows.RemoveWindow(mapWindow); });
             registrations.Register(() =>
             {
@@ -976,6 +981,7 @@ public sealed class Plugin : IDalamudPlugin
         mainWindow.ApplyTheme();
         // The map's open state lives in MainWindow (game map key M, journal); its window follows it.
         if(mapWindow is not null)mapWindow.IsOpen=mainWindow.MapViewOpen;
+        if(guideWindow is not null)guideWindow.IsOpen=mainWindow.GuideOpen;
         windows.Draw();
         overlays??=
         [

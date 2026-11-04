@@ -63,10 +63,8 @@ internal sealed partial class MainWindow
         ImGui.Spacing(); ImGui.Separator();
         DrawHeaderSettings();
     }
-    private void DrawInterfaceSettings()
+    private void DrawLanguageSetting()
     {
-        ImGui.TextColored(Accent, localization.Get("Settings.Interface"));
-        DrawFontSettings();
         var languageCode = localization.CurrentCode;
         var currentLanguage = localization.AvailableLanguages.FirstOrDefault(language => language.Code == languageCode);
         if (ImGui.BeginCombo(localization.Get("Settings.Language") + "###InterfaceLanguage", string.IsNullOrEmpty(currentLanguage.NativeName) ? languageCode : currentLanguage.NativeName))
@@ -92,6 +90,13 @@ internal sealed partial class MainWindow
             finally { ImGui.EndCombo(); }
         }
         Tip("SettingTips.Language");
+    }
+
+    private void DrawInterfaceSettings()
+    {
+        ImGui.TextColored(Accent, localization.Get("Settings.Interface"));
+        DrawFontSettings();
+        DrawLanguageSetting();
         ImGui.TextDisabled(localization.Format("Localization.LoadedLanguages", localization.AvailableLanguages.Count));
         DrawThemeSetting();
         BoolSetting("Settings.GameFrames","SettingTips.GameFrames",()=>configuration.GameFrames,value=>configuration.GameFrames=value,c=>c.GameFrames);

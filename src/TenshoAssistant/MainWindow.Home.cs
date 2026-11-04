@@ -16,6 +16,7 @@ internal sealed partial class MainWindow
     private void DrawHome()
     {
         Heading(localization.Get("Home.Title"),localization.Get("Home.Description"));
+        DrawGuideOnHome();
         var items=itemCatalog.State;var recipes=recipeCatalog.State;
         var ready=items.Catalog is not null && recipes.Catalog is not null;
         UiComponents.StatusBadge(localization.Get(ready ? "Home.Ready":"Home.Loading"),ready ? Success:Accent);

@@ -17,6 +17,8 @@ public static class ConfigurationReset
         "NavigationCollapsed",
         // 0.503 (ONBOARD-001): the pages whose first-visit help was read.
         "HelpSeen",
+        // 0.505 (ONBOARD-001): where the guide stands: a reset of the settings does not start it again.
+        "GuideDone", "GuideOffered", "GuideStep", "GuideStop", "GuideInterests", "GuideWindowsDone", "GuideChecklistHidden",
         // 0.347 (g, I-08): the player's item notes and labels.
         "ItemNotes",
         // 0.360 (g, C-09): the player's wishlist.
@@ -260,6 +262,13 @@ public sealed partial class Configuration
     // 0.264: sidebar categories folded by the user (category keys).
     public HashSet<string>? NavigationCollapsed { get; set; }
     public HashSet<string>? HelpSeen { get; set; }
+    public bool GuideDone { get; set; }
+    public bool GuideOffered { get; set; }
+    public int GuideStep { get; set; }
+    public int GuideStop { get; set; }
+    public HashSet<string>? GuideInterests { get; set; }
+    public HashSet<string>? GuideWindowsDone { get; set; }
+    public bool GuideChecklistHidden { get; set; }
     public bool HelpBanners { get; set; } = true;
     public bool OpenOnLoad { get; set; }
     // Retainers and saddlebags copied into the bank cache each time they are opened (0.167), instead of an import button.

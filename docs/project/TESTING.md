@@ -714,6 +714,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.505 : guide des premiers pas (ONBOARD-001, lots 4 à 6)** — à voir en jouant
+
+- [ ] Aide › Lancer le guide : les sept étapes, Retour, Suivant, Quitter à chaque étape ; le rouvrir reprend au même endroit ; fini, il repart du début.
+- [ ] Sur l'accueil, joueur existant : une proposition unique, « Non merci » la retire pour de bon. Vraie première installation : il s'ouvre seul à la première ouverture de Tensho (à tester avec une configuration vide ou par un testeur).
+- [ ] Étape des fenêtres : ouvrir une fenêtre listée, son ✓ apparaît seul. Ce qui reste figure sur l'accueil, repliable, jusqu'à être masqué.
+- [ ] Le guide disparaît en combat et en mission, puis revient. La visite ouvre chaque page dans Tensho.
+
 **0.504 : signaler un problème (ONBOARD-001, lot 3)** — à voir en jouant
 
 - [ ] Aide › Signaler un problème : remplir, « Ouvrir le formulaire GitHub ». Le navigateur s'ouvre sur le bon formulaire, tous les champs remplis. Ne pas l'envoyer pour un essai. Le rapport est visible et modifiable avant, sans nom de personnage ni dossier.
