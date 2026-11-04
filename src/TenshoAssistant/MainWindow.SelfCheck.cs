@@ -56,6 +56,7 @@ internal sealed partial class MainWindow
                 : ExtraCollections?.Invoke() is { } extra ? Counted("extra collections", extra.Count, $"{extra.Count(entry => entry.ConfirmedUnlocked)}/{extra.Count} obtained")
                 : Diagnostics.SelfCheck.NotRead("extra collections", "not read yet")),
             Own("triad", SelfCheckTriad),
+            ("beastmaster", SelfCheckBeastmaster),
             Own("map", SelfCheckMap),
             Own("gear sets", () => GearsetSource is not { } source ? Diagnostics.SelfCheck.NotRead("gear sets", "no reader")
                 : source.State is { } sets ? Counted("gear sets", sets.Sets.Count, $"{sets.Sets.Count} sets, {sets.JobLevels.Count} job levels")
@@ -170,6 +171,17 @@ internal sealed partial class MainWindow
         var contradictions = catalog.Npcs.Count(npc => beaten.Contains(npc.MatchId) && npc.Available(done) == false);
         var detail = $"{catalog.Npcs.Count} npcs, {catalog.Npcs.Count - locked} available, {locked} quest needed, {beaten.Count} beaten, {contradictions} beaten but quest needed";
         return catalog.Npcs.Count > 0 && locked < catalog.Npcs.Count && contradictions == 0 ? Diagnostics.SelfCheck.Ok("triad", detail) : Diagnostics.SelfCheck.Suspect("triad", detail);
+    }
+
+    private SelfCheckLine SelfCheckBeastmaster()
+    {
+        if (Beasts?.State is not { } state) return Diagnostics.SelfCheck.NotRead("beastmaster", "no reader");
+        if (state.Error is not null) return Diagnostics.SelfCheck.Failed("beastmaster", state.Error);
+        if (state.Catalog is not { } catalog) return Diagnostics.SelfCheck.NotRead("beastmaster", "loading");
+        var ranks = catalog.Beasts.Count(beast => beast.Ranks.Count > 0);
+        var obtained = state.ObtainedUnavailable ? "read failed" : state.Obtained?.Count.ToString() ?? "not read yet";
+        var detail = $"{catalog.Beasts.Count} beasts, {ranks} with attributes, {obtained} obtained, {catalog.Boards.Count} boards, {catalog.Boards.Sum(board => board.Battles.Sum(battle => battle.Enemies.Count))} enemies";
+        return catalog.Beasts.Count > 0 && ranks == catalog.Beasts.Count && catalog.Boards.Count > 0 && !state.ObtainedUnavailable ? Diagnostics.SelfCheck.Ok("beastmaster", detail) : Diagnostics.SelfCheck.Suspect("beastmaster", detail);
     }
 
     private SelfCheckLine SelfCheckMap()

@@ -308,6 +308,11 @@ public sealed class Plugin : IDalamudPlugin
             TriadNpcLoader? triadNpcLoader=null;
             registrations.Register(()=>triadNpcLoader=new TriadNpcLoader(triadNpcs,data,framework,client,player,unlocks,log),()=>triadNpcLoader?.Dispose());
             mainWindow.ConfigureTriadNpcs(triadNpcs);
+            // 0.500 (user request): the Beastmaster page.
+            var beasts=new Beastmaster.BeastService();
+            Beastmaster.BeastCatalogLoader? beastLoader=null;
+            registrations.Register(()=>beastLoader=new Beastmaster.BeastCatalogLoader(beasts,data,framework,client,player,log),()=>beastLoader?.Dispose());
+            mainWindow.Beasts=beasts;
             // 0.494 (user request): the self-check, on its own in developer mode, on request otherwise.
             registrations.Register(()=>selfCheck=new Diagnostics.SelfCheckRunner(framework,client,player,log,()=>configuration.DeveloperMode,mainWindow.SelfCheckReady,mainWindow.PrepareSelfCheck,mainWindow.SelfCheckProbes,mainWindow.SelfCheckWindows,
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(),"SelfCheckSeen.json"),string.Join(";",data.GameData.Repositories.Values.OrderBy(repository=>repository.Name).Select(repository=>$"{repository.Name}:{repository.Version}"))),()=>selfCheck?.Dispose());

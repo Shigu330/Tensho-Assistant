@@ -3,6 +3,15 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.500.0
+- Demande de l'utilisateur : le dresseur et ses bêtes manquaient. Nouvelle page Progression › Dresseur, en lecture seule. Le conseil d'équipe viendra ensuite : ce qui rend une bête meilleure contre un ennemi n'est pas établi.
+- Bêtes : les 50, obtenues ou non (lu dans le jeu), classe, attaque automatique, textes d'Assaut et de Salve, cinq attributs au rang choisi, tri par colonne, recherche, classe. Plateaux : niveau, taille d'équipe, rang de synchronisation, ennemis et actions, gardien à part, bonus avec leurs points.
+- Les feuilles sont lues brutes, car les lignes typées de ce Lumina.Excel ne correspondent pas au jeu ; une autre disposition des colonnes donne une erreur affichée, jamais de fausses valeurs. Colonnes confirmées sur les captures de l'utilisateur (docs/evidence/0.500-xbm-columns.md).
+- Limites : la faiblesse des ennemis, les formes et les cibles des actions sont lues comme telles, non confirmées, et la page le dit. Le rang de chaque bête et sa taille ne sont pas lus.
+- Tests : BeastCatalogTests (5 cas). Verify.ps1 (agent) : 944/944, 0 avertissement, 0 erreur ; DLL 0.500.0.0. Passe automatique en jeu : 50 bêtes, 35 obtenues, comme les 35/50 de la capture du bestiaire ; 5 plateaux, 122 ennemis, aucune erreur au journal. Affichage de la page non validé en jeu.
+### English
+- New read-only Beastmaster page: the 50 beasts with class, attacks and attributes per rank, and the boards of the labyrinth with enemies and score bonuses. Team advice comes later. Enemy weakness is read as such and not yet confirmed.
+
 ## 0.499.0
 - Demande de l'utilisateur : un clic sur un lien vers la carte doit la faire passer au-dessus de Tensho. Elle restait derrière, surtout quand elle était déjà ouverte. Elle passe maintenant devant, une fois par demande.
 - Tests : SelfCheckTests complété. Verify.ps1 (agent) : 939/939, 0 avertissement, 0 erreur ; DLL 0.499.0.0. Non validé en jeu.

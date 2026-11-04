@@ -49,6 +49,7 @@ internal sealed partial class MainWindow
         new(Page.Chocobo,"Progression",PageLabel("Navigation.Chocobo"),DrawChocoboPage,"MainWindow.ChocoboBarding.cs, Gear/ChocoboBarding.cs, Gear/ChocoboReader.Dalamud.cs"),
         new(Page.Leves,"Progression",PageLabel("Navigation.Leves"),DrawLeves,"MainWindow.Leves.cs"),
         new(Page.HuntingLog,"Progression",PageLabel("Navigation.HuntingLog"),DrawHuntingLog,"MainWindow.HuntingLog.cs"),
+        new(Page.Beastmaster,"Progression",PageLabel("Navigation.Beastmaster"),DrawBeastmaster,"MainWindow.Beastmaster.cs, Beastmaster/"),
         new(Page.Fashion,"GoldSaucer",PageLabel("Category.Fashion"),DrawFashion,"MainWindow.Fashion*.cs, Fashion/"),
         new(Page.TripleTriad,"GoldSaucer",PageLabel("Category.Triad"),DrawTripleTriad,"MainWindow.TripleTriad.cs, MainWindow.Triad*.cs, MiniGames/"),
         new(Page.MiniCactpot,"GoldSaucer",PageLabel("Category.Cactpot"),DrawMiniCactpot,"MainWindow.MiniCactpot.cs, MiniGames/"),

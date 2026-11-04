@@ -714,6 +714,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.500 : page Dresseur** — à voir en jouant
+
+- [ ] Progression › Dresseur › Bêtes : 50 bêtes, nom, classe, attaque auto. comme le bestiaire. Rang 6 : Cu sith = FOR 161, INT 100, Rés. phys. 90, Rés. mag. 86, VIT 131. Une autre bête, à comparer aussi.
+- [ ] Le compteur « Bêtes obtenues » égale celui du bestiaire du jeu (35/50 sur la capture), et ✓ / ✗ suivent. Tri par colonne, recherche, classe et « Obtenues seulement ».
+- [ ] Plateaux : niveau, équipe et rang comme « Disposition du plateau » ; les bonus comme « Liste des bonus ».
+- [ ] « Faible : … » : comparer à la fiche d'un ennemi dans le jeu. **Lu comme tel, jamais vérifié.** Formes et cibles des actions aussi.
+
 **0.499 : la carte au-dessus de Tensho** — à voir en jouant
 
 - [ ] Depuis une page Tensho, cliquer un lien vers la carte (« Voir sur la carte », favori d'une autre carte) : la carte passe devant Tensho, qu'elle soit déjà ouverte ou non. Cliquer ensuite sur Tensho le remet devant.
