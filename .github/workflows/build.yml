@@ -19,10 +19,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
 
@@ -40,7 +40,7 @@ jobs:
         run: ./scripts/Verify.ps1 -Force -DotNet dotnet
 
       - name: Keep the package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: TenshoAssistant-latest
           path: src/TenshoAssistant/bin/x64/Release/TenshoAssistant/latest.zip
