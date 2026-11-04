@@ -8,7 +8,9 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 - Demande de l'utilisateur : dans le carnet, Manipulation est une case et l'icône du skill, sans texte. Repas et remède ont l'icône et la bulle de l'objet (aussi dans le simulateur) ; seuls ceux qui ont un bonus d'artisanat comptent, un autre repas se lit « aucun ».
 - Demande de l'utilisateur (« restyliser la fenêtre liée au carnet ») : panneau en sections (recette, votre état, cible, calcul, macro), chiffres en tableau, barre de qualité, section de séquence enregistrée masquée s'il n'y en a pas, explications dans la bulle de « (?) ». Le texte « Manipulation exclue : déblocage non observé » datait d'avant la détection : retiré.
 - Tests : GcSupply469Tests (6). Verify.ps1 (agent) : 885/885, 0 avertissement, 0 erreur ; DLL 0.469.0.0. Non validé en jeu.
+- Plans ajoutés, sans code : chat personnalisable ([CHAT-001](docs/goals/CHAT-001.md)) et modèles communautaires ([TEMPLATES-001](docs/goals/TEMPLATES-001.md)), avec les décisions à prendre.
 ### English
+- Plans added, without code: customisable chat and community templates, with the decisions to take.
 - Today's Grand Company request is now read from the game's supply missions window; item tooltips say requested, not among what was opened, or how to open it.
 - The crafting log panel is laid out in sections, with a table of figures, a quality bar and explanations in tooltips.
 - In the crafting log panel, Manipulation is a box with the skill's icon, and food and medicine show the item's icon and tooltip, only when they give a crafting bonus.
