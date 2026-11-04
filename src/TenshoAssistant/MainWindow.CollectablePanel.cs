@@ -189,19 +189,20 @@ internal sealed partial class MainWindow
                     if(advice.HighScrips is not { } highest)ImGui.TextColored(Accent,localization.Format("CollectablePanel.ReferenceFar",advice.HighMissing));
                     else if(highest!=advice.Worst)ImGui.TextColored(Accent,localization.Format("CollectablePanel.Reference",highest));
                 }
-                // 0.529 (user request): one plan on screen, the one of the chosen step. Only « Safe » follows the plan without luck, so only it lists that plan's actions and GP.
+                // 0.533 (user request: the moves on every step, not only on Safe): the moves of the chosen step and the GP they spend.
                 var safeStep=CollectableRisk.Snap(configuration.CollectableRiskTolerance)==CollectableRisk.Safe;
-                if(safeStep)
+                if(advice.Path is { Steps.Count:>0 } path)
                 {
-                    ImGui.TextDisabled(advice.Target==CollectableTier.Below ? localization.Get("CollectablePanel.OutOfReach")
-                        :localization.Format("CollectablePanel.PlanItems",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections));
-                    // 0.482 (user report: « 5 actions » for 4 attempts): the actions that cost no attempt, and where an extra attempt comes from, are said under the plan.
-                    if(advice.Scrutinies>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanScrutinies",advice.Scrutinies,CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Name ?? "",advice.Scrutinies*bonuses.ScrutinyCost));
-                    if(advice.Restores>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanRestores",advice.Restores,restore?.Name ?? "",advice.Restores*bonuses.RestoreCost,attempts ?? 0,(attempts ?? 0)+advice.Restores));
+                    string Named(CollectableMove move)=>CollectableActionInfo?.Invoke(move switch
+                    {
+                        CollectableMove.Scour=>turn.ScourAction,CollectableMove.Brazen=>turn.BrazenAction,CollectableMove.Meticulous=>turn.MeticulousAction,
+                        CollectableMove.Scrutiny=>turn.ScrutinyAction,CollectableMove.Focus=>turn.FocusAction,CollectableMove.Priming=>turn.PrimingAction,
+                        CollectableMove.Restore=>restore?.Spec.Id ?? 0,CollectableMove.Eureka=>job==16 ? 26521u:26522u,_=>turn.CollectAction,
+                    })?.Name ?? move.ToString();
+                    ImGui.TextDisabled(localization.Format("CollectablePanel.Path",string.Join(" → ",path.Steps.Select(step=>step.Count>1 ? $"{Named(step.Move)} ×{step.Count}":Named(step.Move))),path.Gp,bonuses.Gp));
                 }
-                else if(advice.Target!=CollectableTier.Below && advice.Scrips>0 && advice.Scrips!=advice.Worst)ImGui.TextDisabled(localization.Format("CollectablePanel.SafeWould",advice.Scrips));
-                // 0.482 (user report: GP must count): what this plan spends, against the GP there is.
-                if(safeStep && advice.Scrutinies*bonuses.ScrutinyCost+advice.Restores*bonuses.RestoreCost is > 0 and var planned)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanGp",planned,bonuses.Gp,Math.Max(0,bonuses.Gp-planned)));
+                if(advice.Target==CollectableTier.Below && safeStep)ImGui.TextDisabled(localization.Get("CollectablePanel.OutOfReach"));
+                if(!safeStep && advice.Target!=CollectableTier.Below && advice.Scrips>0 && advice.Scrips!=advice.Worst)ImGui.TextDisabled(localization.Format("CollectablePanel.SafeWould",advice.Scrips));
             }
         }
         finally{ImGui.PopTextWrapPos();}

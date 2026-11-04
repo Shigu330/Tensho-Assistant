@@ -711,6 +711,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.533 : les coups de chaque cran** — à voir en jouant
+
+- [ ] Chaque icône donne sa suite de coups et ses PR, et le premier coup est celui de « Prochaine action ». Après un tirage, la suite se recalcule.
+- [ ] Le nombre de tentatives de la suite correspond à ce qui reste, plus les tentatives rendues.
+
 **0.532 : panneau Collectionnable sans répétitions** — à voir en jouant
 
 - [ ] Plus de chiffre dit deux fois ; au survol de « Comment est-ce calculé ? », la tentative gratuite et la règle d'Œil et de Toucher.

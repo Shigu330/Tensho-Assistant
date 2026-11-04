@@ -48,10 +48,24 @@ internal static class Gathering478Tests
                 Check(!(s.Worst>=b.Worst && s.Expected>b.Expected+0.01m),$"{gp} GP, Scrutiny {on}: Safe {s.Expected}/{s.Worst} beats Balanced {b.Expected}/{b.Worst}");
                 Check(!(b.Worst>=l.Worst && b.Expected>l.Expected+0.01m),$"{gp} GP, Scrutiny {on}: Balanced {b.Expected}/{b.Worst} beats Luck {l.Expected}/{l.Worst}");
             }
+            // 0.533: every step has its moves, ends with what it gathers, never spends more GP than there is, nor gathers more than there are attempts.
+            foreach(var risk in CollectableRisk.Caps)foreach(var gp in new[]{0,300,423,625,823})
+            {
+                var plain=gains with {Gp=gp,RiskTolerance=risk};
+                var advice=CollectableAdvisor.Advise(turn,4,herb,plain)!;
+                Check(advice.Path is {Steps.Count:>0},$"moves at {risk}, {gp} GP");
+                Check(advice.Path!.Gp<=gp,$"GP at {risk}, {gp} GP: {advice.Path.Gp}");
+                var restores=advice.Path.Steps.Where(step=>step.Move==CollectableMove.Restore).Sum(step=>step.Count);
+                var used=advice.Path.Steps.Where(step=>step.Move is CollectableMove.Scour or CollectableMove.Brazen or CollectableMove.Meticulous or CollectableMove.Collect).Sum(step=>step.Count);
+                Check(used==4+restores,$"attempts at {risk}, {gp} GP: {used} for {restores} restored");
+                Check(advice.Path.Steps[^1].Move==CollectableMove.Collect || advice.Worst==0,$"ends by gathering at {risk}, {gp} GP");
+                Check(advice.Path.Steps[0].Move==advice.Move || advice.Path.Steps[0].Move==CollectableMove.Collect,$"starts with the move advised at {risk}, {gp} GP");
+            }
             var panel=Read("MainWindow.CollectablePanel.cs");
+            Check(panel.Contains("\"CollectablePanel.Path\"") && !panel.Contains("if(safeStep && advice.Scrutinies"),"the moves on every step");
             Check(panel.Contains("else if(highest!=advice.Worst)") && panel.Contains("advice.Scrips!=advice.Worst"),"a figure is not said twice");
             Check(panel.Contains("note+=Environment.NewLine+localization.Format(\"CollectablePanel.BonusWhenWorth\""),"what is always true is in the tooltip");
-            Check(panel.Contains("CollectablePanel.Cap{risk}Now") && panel.Contains("if(safeStep)") && panel.Contains("\"CollectablePanel.SafeWould\"") && panel.Contains("if(safeStep && advice.Scrutinies*bonuses.ScrutinyCost"),"one plan on screen");
+            Check(panel.Contains("CollectablePanel.Cap{risk}Now") && panel.Contains("\"CollectablePanel.SafeWould\""),"one plan on screen");
             foreach(var language in new[]{"en","fr"})foreach(var cap in CollectableRisk.Caps)
             {
                 var texts=Read($"Localization/Languages/{language}.json");

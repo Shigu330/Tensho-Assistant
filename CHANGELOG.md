@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.533.0
+- Demande de l'utilisateur (« il faut aussi la liste des skills utilisés pour chaque cap, il donne que pour Sûr ») : chaque cran montre maintenant ses coups, sans coup de chance, avec les PR qu'ils dépensent : par exemple, sur le nœud des captures à 625 PR, cran « Tentez votre chance » : « Sélection méthodique ×3 → Sagesse du fermier → Sélection méthodique → Sagesse du fermier → Sélection méthodique → Récolte. 600 PR sur 625 ». La suite vient du calcul du cran choisi, recalculée à chaque tour. Elle remplace les lignes propres à Sûr.
+- Tests : Gathering478Tests complété (coups, PR et tentatives sur chaque cran). Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.533.0.0. Non validé en jeu.
+### English
+- Every risk step now lists its moves and the GP they spend, on the line where no roll brings anything extra.
+
 ## 0.532.0
 - Rapport de l'utilisateur en jeu (trois captures, « texte répétitif sur les mêmes pages ») : le même chiffre revenait jusqu'à quatre fois. Chaque ligne dit maintenant ce que les autres ne disent pas : la référence du palier haut et « Sur Sûr » n'apparaissent que si leur chiffre diffère de la phrase du cran ; le nombre d'assignats par récolte n'est plus répété. Ce qui vaut sur tous les nœuds (tentative gratuite, Œil et Toucher) passe dans l'infobulle « Comment est-ce calculé ? ».
 - Les captures montraient aussi Équilibré sous Sûr (40,2 contre 43,9, même plancher de 20). Tous les crans gardent maintenant leur plancher avec la meilleure moyenne, pour tous les PR essayés.

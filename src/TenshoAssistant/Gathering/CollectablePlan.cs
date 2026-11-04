@@ -103,8 +103,19 @@ public enum CollectableMove { Scour,Brazen,Meticulous,Collect,Scrutiny,Restore,F
 /// <param name="HighMissing">What the sure plan lacks to reach the high threshold, all GP spent.</param>
 /// <param name="GainLow">0.482: what the move really adds now, without the bonus of a ticked box unless it is on the player.</param>
 /// <param name="GainHigh">The top of that gain, for Brazen.</param>
+/// <param name="Path">0.533: the moves of the chosen step, if no roll brings anything extra.</param>
 public sealed record CollectableAdvice(CollectableMove Move,CollectableTier Target,int Selections,int Collections,int Scrips,bool Impossible=false,int Scrutinies=0,decimal Expected=0,
-    int Restores=0,int? HighScrips=null,int HighMissing=0,int GainLow=0,int GainHigh=0,decimal Worst=0);
+    int Restores=0,int? HighScrips=null,int HighMissing=0,int GainLow=0,int GainHigh=0,decimal Worst=0,CollectablePath? Path=null);
+
+/// <summary>0.533 (user request): the moves of a plan, and the GP they spend. Compared by content, as the advice is.</summary>
+public sealed class CollectablePath(IReadOnlyList<(CollectableMove Move,int Count)> steps,int gp) : IEquatable<CollectablePath>
+{
+    public IReadOnlyList<(CollectableMove Move,int Count)> Steps {get;}=steps;
+    public int Gp {get;}=gp;
+    public bool Equals(CollectablePath? other)=>other is not null && Gp==other.Gp && Steps.SequenceEqual(other.Steps);
+    public override bool Equals(object? other)=>Equals(other as CollectablePath);
+    public override int GetHashCode()=>HashCode.Combine(Gp,Steps.Count);
+}
 
 /// <summary>
 /// 0.479: the plan for the attempts left, for the most scrips on this node: each attempt spent raising collectability is one less to collect, so what counts is the tier reached times the items collected.
@@ -300,6 +311,44 @@ public static class CollectableAdvisor
         if(sureValue<=0){sure=0;sureScrutinies=0;sureRestores=0;sureCollects=attempts;}
         var reached=sureValue>0 ? Collectables.Tier(rule,Reach(sure,sureScrutinies)):CollectableTier.Below;
         var scrips=rule.Scrips ? Reward(rule,reached)*sureCollects:0;
+        // 0.533 (user request): the plan's moves, on the line where no roll brings anything extra (a free Meticulous, an Intuition; Brazen at the middle of its range). The panel asks again at each turn, so luck changes the rest.
+        CollectablePath Walk()
+        {
+            memo.Clear();
+            var steps=new List<(CollectableMove Move,int Count)>();var spent=0;
+            void Add(CollectableMove move,int count=1)
+            {
+                if(steps.Count>0 && steps[^1].Move==move)steps[^1]=(move,steps[^1].Count+count);
+                else steps.Add((move,count));
+            }
+            var value=Math.Min(turn.Current,turn.Maximum);var left=attempts;var gp=gpNow;var active=bonuses.ScrutinyActive;var focus=false;var first=true;var priming=primingOn;
+            var move=result.Move;
+            for(var guard=0;guard<32;guard++)
+            {
+                var plus=active ? bonus:0;
+                switch(move)
+                {
+                    case CollectableMove.Scrutiny:Add(move);gp-=fullScrutinyCost;spent+=fullScrutinyCost;active=true;break;
+                    case CollectableMove.Focus:Add(move);gp-=fullFocusCost;spent+=fullFocusCost;focus=true;break;
+                    case CollectableMove.Priming:Add(move);gp-=fullPrimingCost;spent+=fullPrimingCost;priming=true;break;
+                    case CollectableMove.Restore:Add(move);gp-=restoreCost;spent+=restoreCost;left++;break;
+                    case CollectableMove.Eureka:Add(move);break;
+                    case CollectableMove.Scour:Add(move);value+=(first ? gains.Scour:gains.Later)+plus;left--;active=false;focus=false;first=false;break;
+                    case CollectableMove.Brazen:Add(move);value+=(first ? (gains.BrazenMin+gains.BrazenMax)/2:gains.Later)+plus;left--;active=false;focus=false;first=false;break;
+                    case CollectableMove.Meticulous:Add(move);value+=(first ? gains.Meticulous:gains.Later*3/4)+plus;left--;active=false;focus=false;first=false;priming=false;break;
+                    default:
+                        // The last moves: what is left is gathered, each restored attempt after the one it follows.
+                        var restores=restoreCost>0 && left>0 && bonuses.MaxAttempts>0 && Worth(rule,Collectables.Tier(rule,value))>0 ? gp/restoreCost:0;
+                        if(left>0)Add(CollectableMove.Collect,left);
+                        for(var restored=0;restored<restores;restored++){Add(CollectableMove.Restore);spent+=restoreCost;Add(CollectableMove.Collect);}
+                        return new(steps.AsReadOnly(),spent);
+                }
+                if(left<=0)return new(steps.AsReadOnly(),spent);
+                move=Best(value,left,gp,active,focus,first,priming).Move;
+            }
+            return new(steps.AsReadOnly(),spent);
+        }
+        var path=Walk();
         var onNow=bonuses.ScrutinyActive ? bonus:0;
         var (gainLow,gainHigh)=result.Move switch
         {
@@ -309,7 +358,7 @@ public static class CollectableAdvisor
             _=>(0,0),
         };
         return new(result.Move,reached,sure,sureCollects,scrips,false,sureScrutinies,result.Mean,sureRestores,
-            highCollects is { } most && rule.Scrips ? rule.RewardHigh*most:null,Math.Max(0,rule.High-furthest),gainLow,gainHigh,result.Worst);
+            highCollects is { } most && rule.Scrips ? rule.RewardHigh*most:null,Math.Max(0,rule.High-furthest),gainLow,gainHigh,result.Worst,path);
     }
     private static decimal Worth(CollectableRule rule,CollectableTier tier)
         =>rule.Scrips && rule.RewardHigh>0 ? Reward(rule,tier):tier switch{CollectableTier.High=>3,CollectableTier.Mid=>2,CollectableTier.Low=>1,_=>0};
