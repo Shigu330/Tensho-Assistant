@@ -8,8 +8,9 @@ public readonly record struct CraftRange(int Min,int Max)
     public override string ToString()=>Min==Max ? Min.ToString():$"{Min}–{Max}";
 }
 public sealed record CraftActionProjection(CraftActionMetadata Metadata,CraftRange Progress,CraftRange? Quality,CraftRange Durability,CraftRange CpCost,CraftRange InnerQuiet,
-    bool Completed,bool Broken,int Alternatives);
-public sealed record CraftProjectionResult(IReadOnlyList<CraftActionProjection> Actions,IReadOnlyList<string> Issues);
+    bool Completed,bool Broken,int Alternatives,bool OnlyInThisCondition=false);
+/// <summary>0.497 (user report): Condition = the state of the synthesis the rows were computed with; GoodPercent = the Good quality bonus, null when the tool's is unknown.</summary>
+public sealed record CraftProjectionResult(IReadOnlyList<CraftActionProjection> Actions,IReadOnlyList<string> Issues,CraftStepCondition? Condition=null,int? GoodPercent=null);
 
 /// <summary>Projects one action across compatible unknown combo/unique-action states; never executes or resolves a rotation.</summary>
 public static class CraftLiveProjection
@@ -17,7 +18,8 @@ public static class CraftLiveProjection
     public static CraftProjectionResult Build(CraftLiveState observation,CraftActionCatalog catalog,DateTimeOffset now)
     {
         var issues=new List<string>();var rows=new List<CraftActionProjection>();
-        CraftProjectionResult Result()=>new(Array.AsReadOnly(rows.ToArray()),Array.AsReadOnly(issues.ToArray()));
+        CraftStepCondition? seenCondition=null;int? seenGood=null;
+        CraftProjectionResult Result()=>new(Array.AsReadOnly(rows.ToArray()),Array.AsReadOnly(issues.ToArray()),seenCondition,seenGood);
         if(!observation.Enabled || observation.Owner==0 || observation.Status!=CraftLiveStatusKind.Observed || observation.Frame is not { } frame || observation.ObservedAt is not { } date
             || now<date || now-date>TimeSpan.FromSeconds(2)) {issues.Add("Observation missing or too old.");return Result();}
         var raw=frame.Raw;
@@ -34,6 +36,7 @@ public static class CraftLiveProjection
             {issues.Add("Favourable tool bonus unknown: the affected quality gains stay unknown, the other resources are still projected.");goodKnown=false;}
             else goodPercent=tool.GoodQualityPercent!.Value;
         }
+        seenCondition=condition;seenGood=goodKnown ? goodPercent:null;
         var p=recipe.Simulation!;
         if(native.MaxProgress!=p.Progress || native.MaxQuality!=p.Quality || native.MaxDurability!=p.Durability || frame.Progress!=native.Progress || (frame.Quality!=native.Quality && !(p.Quality==0 && native.Quality==0))
             || frame.Durability!=native.Durability || frame.UiStep!=native.Step || native.Progress>=native.MaxProgress || native.Durability==0)
@@ -70,7 +73,8 @@ public static class CraftLiveProjection
             var qualityKnown=goodKnown || p.Quality==0 || !CraftSimulation.IncreasesQuality(action.Kind) || action.Kind==CraftActionKind.TrainedEye;
             rows.Add(new(catalog.Find(raw.JobId,action.Kind)!,Range(step=>step.After.Progress),qualityKnown ? Range(step=>step.After.Quality):null,Range(step=>step.After.Durability),
                 Range(step=>step.CpCost),Range(step=>step.After.InnerQuiet),alternatives.All(step=>step.After.Finish==CraftFinish.Completed),
-                alternatives.All(step=>step.After.Finish==CraftFinish.Broken),alternatives.Count));
+                alternatives.All(step=>step.After.Finish==CraftFinish.Broken),alternatives.Count,
+                CraftSimulation.NeedsFavourable(action.Kind) && condition is CraftStepCondition.Good or CraftStepCondition.Excellent));
         }
         return Result();
     }

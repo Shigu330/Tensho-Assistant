@@ -17,6 +17,25 @@ internal static class CraftProjectionTests
     private static void Check(bool condition,string why){if(!condition)throw new Exception(why);}
     public static IEnumerable<(string Name,Action Run)> Cases=>new (string,Action)[]
     {
+        ("Projection follows the state of the synthesis: says it, and marks what only this state allows",()=>
+        {
+            var catalog=Catalog();var raw=Raw(catalog);
+            var normal=Build(raw,catalog);
+            Check(normal.Condition==CraftStepCondition.Normal && normal.Actions.All(row=>!row.OnlyInThisCondition) && normal.Actions.All(row=>row.Metadata.Spec.Kind!=CraftActionKind.PreciseTouch),"normal: nothing opened");
+            var good=Build(raw with {Condition=2,NumbersNative=raw.NumbersNative! with {Condition=1},Tool=new(1,8,150)},catalog);
+            Check(good.Condition==CraftStepCondition.Good && good.GoodPercent==150,"good: said, with its bonus");
+            Check(good.Actions.Single(row=>row.Metadata.Spec.Kind==CraftActionKind.PreciseTouch).OnlyInThisCondition && good.Actions.Single(row=>row.Metadata.Spec.Kind==CraftActionKind.TricksOfTheTrade).OnlyInThisCondition,"good: Precise Touch and Tricks of the Trade marked");
+            Check(!good.Actions.Single(row=>row.Metadata.Spec.Kind==CraftActionKind.BasicTouch).OnlyInThisCondition,"not the ordinary ones");
+            var touch=CraftActionKind.BasicTouch;
+            int Gain(CraftProjectionResult result)=>result.Actions.Single(row=>row.Metadata.Spec.Kind==touch).Quality!.Value.Min;
+            Check(Gain(good)>Gain(normal),"good raises the quality");
+            var poor=Build(raw with {Condition=4,NumbersNative=raw.NumbersNative! with {Condition=3}},catalog);
+            Check(poor.Condition==CraftStepCondition.Poor && Gain(poor)<Gain(normal),"poor lowers it");
+            var unknownTool=Build(raw with {Condition=2,NumbersNative=raw.NumbersNative! with {Condition=1}},catalog);
+            Check(unknownTool.Condition==CraftStepCondition.Good && unknownTool.GoodPercent is null,"tool not read: the bonus stays unknown");
+            var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CraftProjection.cs"));
+            Check(window.Contains("DrawProjectionCondition(result,frame.Raw.ConditionText);") && window.Contains("ThenByDescending(row=>row.OnlyInThisCondition)"),"shown, and first in the list");
+        }),
         ("Live projection preserves uncertain combo costs and refined stack alternatives",()=>
         {
             var catalog=Catalog();var result=Build(Raw(catalog),catalog);

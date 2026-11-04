@@ -2190,6 +2190,13 @@
     "Effective": "Effective: {0}\nFamily modifier: {1:+0;-0;0}"
   },
   "CraftProjectionUi": {
+    "ConditionLine": "State of the synthesis: {0}. {1}",
+    "ConditionNormal": "No bonus.",
+    "ConditionGood": "Quality × {0}. Next state: normal.",
+    "ConditionGoodUnknown": "Quality increased, bonus of the tool not read. Next state: normal.",
+    "ConditionExcellent": "Quality × 4. Next state: poor.",
+    "ConditionPoor": "Quality × 0.5: quality actions are worth less now. Next state: normal.",
+    "OnlyNow": "Only in this state",
     "Title": "Compare next actions · experimental",
     "Help": "Projects a single action under the observed ordinary condition, among actions eligible in the client excluding cooldowns. Ranges preserve possible combos; unknown quality remains unknown. No complete rotation, executed action or HQ guarantee.",
     "Old": "Observation too old to show a projection.",

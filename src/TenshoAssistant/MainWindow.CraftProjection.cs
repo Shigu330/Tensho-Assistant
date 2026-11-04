@@ -16,6 +16,23 @@ internal sealed partial class MainWindow
     private int sortedProjectionOrder=-1;
     private string sortedProjectionForbidden="";
     private CraftActionProjection[] sortedProjectionRows=[];
+    private CraftStepCondition? loggedProjectionCondition;
+    // 0.497 (user report): the state was used in the numbers but never shown: the window now says it, what it does, and which actions it opens.
+    private void DrawProjectionCondition(CraftProjectionResult result,string shownName)
+    {
+        if(result.Condition is not { } condition)return;
+        var effect=condition switch
+        {
+            CraftStepCondition.Good=>result.GoodPercent is { } percent ? localization.Format("CraftProjectionUi.ConditionGood",(percent/100m).ToString("0.##")):localization.Get("CraftProjectionUi.ConditionGoodUnknown"),
+            CraftStepCondition.Excellent=>localization.Get("CraftProjectionUi.ConditionExcellent"),
+            CraftStepCondition.Poor=>localization.Get("CraftProjectionUi.ConditionPoor"),
+            _=>localization.Get("CraftProjectionUi.ConditionNormal"),
+        };
+        var color=condition is CraftStepCondition.Good or CraftStepCondition.Excellent ? Success:condition==CraftStepCondition.Poor ? Accent:Muted;
+        ImGui.PushStyleColor(ImGuiCol.Text,color);
+        try{ImGui.TextWrapped(localization.Format("CraftProjectionUi.ConditionLine",shownName,effect));}
+        finally{ImGui.PopStyleColor();}
+    }
     private void DrawCraftProjection(CraftLiveState state)
     {
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftProjectionUi.Title"),ImGuiTreeNodeFlags.DefaultOpen))return;
@@ -52,7 +69,16 @@ internal sealed partial class MainWindow
         if(state.Frame is not { } frame || craftActions.State.Catalog is not { } catalog)return;
         var now=DateTimeOffset.UtcNow;
         if(!ReferenceEquals(projectionFrame,frame) || !ReferenceEquals(projectionCatalog,catalog))
-        {projectionFrame=frame;projectionCatalog=catalog;projectionResult=CraftLiveProjection.Build(state,catalog,now);}
+        {
+            projectionFrame=frame;projectionCatalog=catalog;projectionResult=CraftLiveProjection.Build(state,catalog,now);
+            // 0.497 (user report): what the game answers for the actions that depend on the state, once per state, for the evidence.
+            if(DeveloperMode && projectionResult?.Condition is { } seen && seen!=loggedProjectionCondition)
+            {
+                loggedProjectionCondition=seen;
+                var kinds=frame.Raw.ActionsNative?.Where(action=>CraftSimulation.NeedsFavourable(action.Kind)).Select(action=>$"{action.Kind}={action.Status}") ?? [];
+                log.Information("Craft condition {0}: game status {1}; {2} actions offered.",seen,string.Join(", ",kinds),projectionResult.Actions.Count);
+            }
+        }
         if(state.ObservedAt is not { } date || now<date || now-date>TimeSpan.FromSeconds(2))
         {ImGui.TextWrapped(localization.Get("CraftProjectionUi.Old"));return;}
         if(projectionResult is not { } result)return;
@@ -63,6 +89,7 @@ internal sealed partial class MainWindow
         if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Quality"),projectionSort==0))projectionSort=0;Tip("CraftProjectionUi.SortTip");ImGui.SameLine();
         if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Progress"),projectionSort==1))projectionSort=1;Tip("CraftProjectionUi.SortTip");ImGui.SameLine();
         if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Durability"),projectionSort==2))projectionSort=2;Tip("CraftProjectionUi.SortTip");
+        DrawProjectionCondition(result,frame.Raw.ConditionText);
         foreach(var issue in result.Issues)DrawCraftIssue(issue);
         if(result.Actions.Count==0){ImGui.TextDisabled(localization.Get("CraftProjectionUi.Empty"));return;}
         ImGui.TextDisabled(localization.Get("CraftProjectionUi.SortHelp"));
@@ -78,7 +105,7 @@ internal sealed partial class MainWindow
                 if(!ReferenceEquals(sortedProjectionSource,result) || sortedProjectionOrder!=projectionSort || sortedProjectionForbidden!=forbiddenKey)
                 {
                     sortedProjectionSource=result;sortedProjectionOrder=projectionSort;sortedProjectionForbidden=forbiddenKey;
-                    sortedProjectionRows=result.Actions.Where(row=>!CraftActionRules.Forbidden(forbiddenKey,row.Metadata.Spec.Kind)).OrderBy(row=>row.Broken).ThenByDescending(row=>projectionSort==0 ? row.Quality?.Min ?? -1:projectionSort==1 ? row.Progress.Min:row.Durability.Min).ThenBy(row=>row.CpCost.Max).ToArray();
+                    sortedProjectionRows=result.Actions.Where(row=>!CraftActionRules.Forbidden(forbiddenKey,row.Metadata.Spec.Kind)).OrderBy(row=>row.Broken).ThenByDescending(row=>row.OnlyInThisCondition).ThenByDescending(row=>projectionSort==0 ? row.Quality?.Min ?? -1:projectionSort==1 ? row.Progress.Min:row.Durability.Min).ThenBy(row=>row.CpCost.Max).ToArray();
                 }
                 var rows=sortedProjectionRows;
                 foreach(var row in rows)
@@ -89,7 +116,8 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();ImGui.TextUnformatted(row.Durability.ToString());ImGui.TableNextColumn();ImGui.TextUnformatted(row.CpCost.ToString());
                     ImGui.TableNextColumn();ImGui.TextUnformatted(row.InnerQuiet.ToString());ImGui.TableNextColumn();
                     var text=row.Broken ? localization.Get("CraftProjectionUi.Broken"):row.Completed ? row.Quality is null ? localization.Get("CraftProjectionUi.UnknownEnd"):row.Quality.Value.Min>=projectionTarget ? localization.Get("CraftProjectionUi.Reached"):localization.Get("CraftProjectionUi.Below"):localization.Get("CraftProjectionUi.Continue");
-                    ImGui.TextColored(row.Broken || row.Completed && (row.Quality is null || row.Quality.Value.Min<projectionTarget) ? Accent:row.Completed ? Success:Muted,text);
+                    if(row.OnlyInThisCondition && !row.Broken && !row.Completed)ImGui.TextColored(Success,localization.Get("CraftProjectionUi.OnlyNow"));
+                    else ImGui.TextColored(row.Broken || row.Completed && (row.Quality is null || row.Quality.Value.Min<projectionTarget) ? Accent:row.Completed ? Success:Muted,text);
                 }
             }
             finally{ImGui.EndTable();}

@@ -2190,6 +2190,13 @@
     "Effective": "Actuelles : {0}\nModificateur famille : {1:+0;-0;0}"
   },
   "CraftProjectionUi": {
+    "ConditionLine": "État de la synthèse : {0}. {1}",
+    "ConditionNormal": "Aucun bonus.",
+    "ConditionGood": "Qualité × {0}. État suivant : normal.",
+    "ConditionGoodUnknown": "Qualité augmentée, bonus de l'outil non lu. État suivant : normal.",
+    "ConditionExcellent": "Qualité × 4. État suivant : mauvais.",
+    "ConditionPoor": "Qualité × 0,5 : les actions de qualité rapportent moins maintenant. État suivant : normal.",
+    "OnlyNow": "Seulement dans cet état",
     "Title": "Comparer les prochains coups · expérimental",
     "Help": "Projection d'une seule action dans l'une des quatre conditions ordinaires observées, parmi les actions admissibles selon le client hors recharge. Les intervalles conservent les combos possibles ; une qualité inconnue reste inconnue. Aucune rotation complète ni action lancée, aucune garantie HQ.",
     "Old": "Observation trop ancienne pour afficher une projection.",

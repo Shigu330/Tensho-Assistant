@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.497.0
+- Rapport de l'utilisateur en jeu : « Comparer les prochains coups » ne vérifiait pas l'état pour prendre le bon coup. Relu dans le code : les chiffres utilisaient déjà l'état (Bon ×1,5 ou 1,75 selon l'outil, Excellent ×4, Mauvais ×0,5), mais rien ne l'affichait, et les coups permis par l'état restaient mêlés aux autres : une action comme Ficelles du métier, sans gain de qualité, finissait en bas.
+- La fenêtre dit maintenant l'état du jeu, son effet et l'état suivant. Les coups possibles seulement sur Bon ou Excellent passent en tête, marqués « Seulement dans cet état ». Ce n'est pas un conseil de rotation.
+- Non vérifié : je n'ai pas vu le cas signalé en jeu. Si le jeu refuse un de ces coups, il n'apparaît pas ; le mode développeur note à chaque état ce que le jeu répond pour eux.
+- Tests : CraftProjectionTests complété. Verify.ps1 (agent) : 937/937, 0 avertissement, 0 erreur ; DLL 0.497.0.0. Non validé en jeu.
+### English
+- "Compare the next moves" now shows the state of the synthesis, what it does and what comes next. Actions only allowed in that state come first and are marked.
+
 ## 0.496.0
 - Rapport de l'utilisateur en jeu : l'auto-contrôle n'enregistrait pas les OK. Pendant une synthèse, « synthesis » passait bien en OK et « crafting log » retombait en NOT_READ, car le jeu ferme le carnet : aucune passe ne pouvait tout montrer.
 - Nouvel état OK_SEEN : pas lisible maintenant, mais bien lu plus tôt, avec l'heure. En mode développeur, les 5 lignes de fenêtres sont surveillées chaque seconde : un OK est noté dès que la fenêtre est ouverte, sans lancer de passe. Gardé dans SelfCheckSeen.json, y compris après un rechargement. Une réponse en direct passe toujours avant (FAILED et SUSPECT ne sont jamais masqués) et une autre version des données du jeu efface tout, pour qu'un ancien OK ne cache pas une panne après une mise à jour.
