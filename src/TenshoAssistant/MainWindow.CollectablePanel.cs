@@ -183,26 +183,23 @@ internal sealed partial class MainWindow
             if(advice.Impossible)ImGui.TextWrapped(localization.Get("CollectablePanel.Impossible"));
             else
             {
+                // 0.532 (user report: the same figure four times): each line says what the others do not. The rewards are at the top, the floor and the average in the step's sentence.
                 if(rule is {Scrips:true,RewardHigh:>0})
                 {
-                    ImGui.TextColored(Accent,advice.HighScrips is { } highest ? localization.Format("CollectablePanel.Reference",rule.RewardHigh,highest):localization.Format("CollectablePanel.ReferenceFar",rule.RewardHigh,advice.HighMissing));
+                    if(advice.HighScrips is not { } highest)ImGui.TextColored(Accent,localization.Format("CollectablePanel.ReferenceFar",advice.HighMissing));
+                    else if(highest!=advice.Worst)ImGui.TextColored(Accent,localization.Format("CollectablePanel.Reference",highest));
                 }
                 // 0.529 (user request): one plan on screen, the one of the chosen step. Only « Safe » follows the plan without luck, so only it lists that plan's actions and GP.
                 var safeStep=CollectableRisk.Snap(configuration.CollectableRiskTolerance)==CollectableRisk.Safe;
                 if(safeStep)
                 {
                     ImGui.TextDisabled(advice.Target==CollectableTier.Below ? localization.Get("CollectablePanel.OutOfReach")
-                        :advice.Scrips>0 ? localization.Format("CollectablePanel.Plan",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections,advice.Scrips)
                         :localization.Format("CollectablePanel.PlanItems",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections));
                     // 0.482 (user report: « 5 actions » for 4 attempts): the actions that cost no attempt, and where an extra attempt comes from, are said under the plan.
                     if(advice.Scrutinies>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanScrutinies",advice.Scrutinies,CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Name ?? "",advice.Scrutinies*bonuses.ScrutinyCost));
                     if(advice.Restores>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanRestores",advice.Restores,restore?.Name ?? "",advice.Restores*bonuses.RestoreCost,attempts ?? 0,(attempts ?? 0)+advice.Restores));
                 }
-                else if(advice.Target!=CollectableTier.Below && advice.Scrips>0)ImGui.TextDisabled(localization.Format("CollectablePanel.SafeWould",advice.Scrips));
-                if(advice.Restores>0 && bonuses.EurekaChance>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanEureka",(bonuses.EurekaChance*100).ToString("0"),CollectableActionInfo?.Invoke(job==16 ? 26521u:26522u)?.Name ?? ""));
-                // 0.527 (user report): why Collector's Focus or Priming Touch may not be the move.
-                if(advice.Move is not (CollectableMove.Focus or CollectableMove.Priming) && (turn.FocusOpen && bonuses.FocusCost>0 || turn.PrimingOpen && bonuses.PrimingCost>0))
-                    ImGui.TextDisabled(localization.Format("CollectablePanel.BonusWhenWorth",CollectableActionInfo?.Invoke(turn.FocusAction)?.Name ?? "",turn.PrimingAction!=0 ? CollectableActionInfo?.Invoke(turn.PrimingAction)?.Name ?? "":""));
+                else if(advice.Target!=CollectableTier.Below && advice.Scrips>0 && advice.Scrips!=advice.Worst)ImGui.TextDisabled(localization.Format("CollectablePanel.SafeWould",advice.Scrips));
                 // 0.482 (user report: GP must count): what this plan spends, against the GP there is.
                 if(safeStep && advice.Scrutinies*bonuses.ScrutinyCost+advice.Restores*bonuses.RestoreCost is > 0 and var planned)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanGp",planned,bonuses.Gp,Math.Max(0,bonuses.Gp-planned)));
             }
@@ -217,6 +214,14 @@ internal sealed partial class MainWindow
         finally{ImGui.PopTextWrapPos();}
         // 0.481 (user screenshot: the panel was too long): the method in a tooltip.
         ImGui.TextDisabled(localization.Get("CollectablePanel.HowLabel"));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("CollectablePanel.AdviceNote"));
+        if(ImGui.IsItemHovered())
+        {
+            // 0.532: what stays true on every node goes here, not in the panel.
+            var note=localization.Get("CollectablePanel.AdviceNote");
+            if(bonuses.EurekaChance>0)note+=Environment.NewLine+localization.Format("CollectablePanel.PlanEureka",(bonuses.EurekaChance*100).ToString("0"),CollectableActionInfo?.Invoke(job==16 ? 26521u:26522u)?.Name ?? "");
+            if(turn.FocusOpen && bonuses.FocusCost>0 || turn.PrimingOpen && bonuses.PrimingCost>0)
+                note+=Environment.NewLine+localization.Format("CollectablePanel.BonusWhenWorth",CollectableActionInfo?.Invoke(turn.FocusAction)?.Name ?? "",turn.PrimingAction!=0 ? CollectableActionInfo?.Invoke(turn.PrimingAction)?.Name ?? "":"");
+            WrappedTooltip(note);
+        }
     }
 }

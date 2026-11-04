@@ -229,12 +229,12 @@ public static class CollectableAdvisor
             if(bold.Mean<=0)return new(CollectableMove.Collect,CollectableTier.Below,0,attempts,0,true);
             result=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn);
         }
-        // 0.531 (user capture): Safe looked at the floor at each roll, so a bolder plan could reach the same final floor with a better average (67.3 against 70.2, both 40). Safe keeps its floor
-        // and takes the boldest search that still holds it.
-        if(bonuses.RiskTolerance<=0)
+        // 0.531 (user capture): a step looked at the floor at each roll, so a bolder plan could reach the same final floor with a better average (67.3 against 70.2, both 40). A step keeps its floor
+        // and takes the boldest search that still holds it. 0.532 (user capture: Safe 43.9, Balanced 40.2, both 20): every step does, or Balanced could earn less than Safe for the same floor.
+        if(bonuses.RiskTolerance<100)
         {
             var floor=result.Worst;var safest=caution;
-            foreach(var step in new[]{0m,0.25m,0.5m,0.75m})
+            foreach(var step in new[]{0m,0.25m,0.5m,0.75m}.Where(step=>step<safest))
             {
                 caution=step;memo.Clear();
                 var bolder=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn);

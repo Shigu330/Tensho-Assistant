@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.532.0
+- Rapport de l'utilisateur en jeu (trois captures, « texte répétitif sur les mêmes pages ») : le même chiffre revenait jusqu'à quatre fois. Chaque ligne dit maintenant ce que les autres ne disent pas : la référence du palier haut et « Sur Sûr » n'apparaissent que si leur chiffre diffère de la phrase du cran ; le nombre d'assignats par récolte n'est plus répété. Ce qui vaut sur tous les nœuds (tentative gratuite, Œil et Toucher) passe dans l'infobulle « Comment est-ce calculé ? ».
+- Les captures montraient aussi Équilibré sous Sûr (40,2 contre 43,9, même plancher de 20). Tous les crans gardent maintenant leur plancher avec la meilleure moyenne, pour tous les PR essayés.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.532.0.0. Non validé en jeu.
+### English
+- The Collectable panel no longer repeats the same figure: each line says what the others do not, and what holds on every node moved to the tooltip. A step never earns less than a safer one for the same floor.
+
 ## 0.531.0
 - Rapport de l'utilisateur en jeu (trois captures, « desc ne colle pas au changement ») : la description restait générale alors que les chiffres changeaient. Elle dit maintenant ce que le cran donne sur ce nœud : par exemple « Garde au moins 40 assignats, et vise 70,2 en moyenne ». Elle remplace la ligne « Avec ces coups ».
 - Les captures montraient aussi un défaut : Sûr donnait 65,9 en moyenne et Équilibré 70,2, avec le même plancher de 40. Sûr ne regardait que le plancher. À plancher égal, il prend maintenant la meilleure moyenne.

@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-04)
 
-VERSION: 0.531.0.0 (dernière release : Stable-0.451.0, 2026-11-03) — Verify.ps1 (agent) 1000/1000, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.532.0.0 (dernière release : Stable-0.451.0, 2026-11-03) — Verify.ps1 (agent) 1000/1000, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: préparer la 1.0.0 (publication Dalamud) ; voir [GOAL](GOAL.md) et [PUBLISHING](../project/PUBLISHING.md).
 QUOTA: réserve utilisateur 1 % (5 h et semaine). L'agent ne voit pas le compteur.
 

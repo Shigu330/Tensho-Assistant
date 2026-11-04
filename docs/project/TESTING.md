@@ -711,6 +711,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.532 : panneau Collectionnable sans répétitions** — à voir en jouant
+
+- [ ] Plus de chiffre dit deux fois ; au survol de « Comment est-ce calculé ? », la tentative gratuite et la règle d'Œil et de Toucher.
+- [ ] D'un cran à l'autre, la moyenne ne baisse jamais à plancher égal.
+
 **0.531 : description chiffrée des crans** — à voir en jouant
 
 - [ ] Sur un même nœud, chaque icône change la phrase et ses chiffres. Sûr et Équilibré peuvent donner la même chose quand rien ne les sépare.

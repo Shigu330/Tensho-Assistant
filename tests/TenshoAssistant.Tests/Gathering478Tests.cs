@@ -40,7 +40,17 @@ internal static class Gathering478Tests
             var full=gains with {Gp=823};
             var safeFull=CollectableAdvisor.Advise(turn,4,herb,full)!;var middleFull=CollectableAdvisor.Advise(turn,4,herb,full with {RiskTolerance=50})!;
             Check(safeFull.Worst>=middleFull.Worst && safeFull.Expected>=middleFull.Expected-0.001m,$"Safe is not worse than Balanced on the same floor: {safeFull} against {middleFull}");
+            // 0.532: on no amount of GP does a step earn less than a safer one for the same floor.
+            foreach(var gp in new[]{100,200,300,423,523,623,723,823})foreach(var on in new[]{false,true})
+            {
+                var plain=gains with {Gp=gp,ScrutinyActive=on};
+                var s=CollectableAdvisor.Advise(turn,4,herb,plain)!;var b=CollectableAdvisor.Advise(turn,4,herb,plain with {RiskTolerance=50})!;var l=CollectableAdvisor.Advise(turn,4,herb,plain with {RiskTolerance=100})!;
+                Check(!(s.Worst>=b.Worst && s.Expected>b.Expected+0.01m),$"{gp} GP, Scrutiny {on}: Safe {s.Expected}/{s.Worst} beats Balanced {b.Expected}/{b.Worst}");
+                Check(!(b.Worst>=l.Worst && b.Expected>l.Expected+0.01m),$"{gp} GP, Scrutiny {on}: Balanced {b.Expected}/{b.Worst} beats Luck {l.Expected}/{l.Worst}");
+            }
             var panel=Read("MainWindow.CollectablePanel.cs");
+            Check(panel.Contains("else if(highest!=advice.Worst)") && panel.Contains("advice.Scrips!=advice.Worst"),"a figure is not said twice");
+            Check(panel.Contains("note+=Environment.NewLine+localization.Format(\"CollectablePanel.BonusWhenWorth\""),"what is always true is in the tooltip");
             Check(panel.Contains("CollectablePanel.Cap{risk}Now") && panel.Contains("if(safeStep)") && panel.Contains("\"CollectablePanel.SafeWould\"") && panel.Contains("if(safeStep && advice.Scrutinies*bonuses.ScrutinyCost"),"one plan on screen");
             foreach(var language in new[]{"en","fr"})foreach(var cap in CollectableRisk.Caps)
             {
