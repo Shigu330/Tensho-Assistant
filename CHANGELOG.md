@@ -3,6 +3,15 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.525.0
+- Rapport de l'utilisateur en jeu (« les saccades pour les déplacements des membres de mon groupe sur la carte ») : le groupe n'était lu que deux fois par seconde, et un membre hors de vue ne reçoit sa position du jeu que de temps en temps. Lu dix fois par seconde, position exacte quand le membre est en vue, et le repère glisse entre deux positions (`MapPartySmoother`). Un grand saut, comme une téléportation, reste direct.
+- Rapport de l'utilisateur en jeu (« le jeu lag au chargement du plugin ») : mesuré ([preuve](docs/evidence/0.525-load-cost.md)). La coupure de 1,2 à 1,9 s est une collecte complète de .NET, qui arrête tout le jeu, sur 2 rechargements sur 3 relevés ; le plugin ne la demande pas. Démarrage du jeu pas encore mesuré : une ligne « Load » du journal le dira. Corrigé : les données de vaisseaux se construisent hors du thread du framework (85 à 175 ms de moins).
+- Reste à chaque chargement : première image 200 à 400 ms, journal des gils 80 ms.
+- Tests : PartyAndLoad525Tests. Verify.ps1 (agent) : 995/995, 0 avertissement, 0 erreur ; DLL 0.525.0.0. Non validé en jeu.
+### English
+- Party members now glide on the map: read ten times a second, exact position when in view, smoothed between positions, a teleport stays a jump.
+- Load cost measured: the long pause is a full .NET collection, not requested by the plugin. Voyage data is now built off the framework thread, and a log line reports the cost of each load.
+
 ## 0.524.0
 - Rapport de l'utilisateur en jeu (« ctrl alt fonctionne pas pour actualiser les prix ») ; 0.523 validée (« c'est ok »). Cause : l'appui ne dure qu'un tic, et la borne de 5 s entre deux demandes se consommait à chaque tic, demande ou pas : ils ne tombaient presque jamais ensemble, depuis 0.343.
 - L'appui attend maintenant la borne, et seule une vraie demande la consomme. La pause de 3 s du marché ne le perd plus non plus : il attend le créneau suivant. Changer d'objet oublie l'appui. L'heure « Récupéré à » montre les secondes, sinon une actualisation dans la minute ne se voyait pas.

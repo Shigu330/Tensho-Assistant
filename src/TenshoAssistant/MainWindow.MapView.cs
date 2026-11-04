@@ -1053,7 +1053,7 @@ internal sealed partial class MainWindow
             if(settings.ShowParty && live?.Party is { } members && live.MapId==map.MapId && settings.SizeOf(GlyphParty,map.MapId) is var partySize and >0)
                 foreach(var member in members)
                 {
-                    var at=origin+mapPan+MapProjection.PixelFromWorld(member.Position,map)*mapZoom;var badge=Math.Max(6,baseIcon*0.8f*partySize);
+                    var at=origin+mapPan+MapProjection.PixelFromWorld(mapPartySmoother.At(member.Name,member.Position,io.DeltaTime),map)*mapZoom;var badge=Math.Max(6,baseIcon*0.8f*partySize);
                     draw.AddCircleFilled(at,badge*0.6f,ImGui.GetColorU32(new Vector4(0.15f,0.45f,0.95f,0.85f)),20);
                     if(member.Job!=0 && textures.TryGetFromGameIcon(new GameIconLookup(62100+member.Job),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
                         draw.AddImage(image.Handle,at-new Vector2(badge/2),at+new Vector2(badge/2));
@@ -1326,6 +1326,7 @@ internal sealed partial class MainWindow
         draw.AddCircle(at,radius,ImGui.GetColorU32(colour with{W=Math.Min(1,colour.W*2.5f+0.2f)}),48,2f);
     }
     // Gathering points of a map (cached catalogue + cached positions), rebuilt only when the map or a source changes.
+    private readonly MapPartySmoother mapPartySmoother=new();
     // 0.518 (user report): « open now » only speaks of the hours. A legendary point also asks for its tome, read by this character.
     internal Func<uint,TenshoAssistant.Gathering.GatherPointAccess?>? GatherAccess { get; set; }
     private Vector4 TimedPointColor(MapLocalGatheringPoint point)=>GatherAccess?.Invoke(point.BaseId)?.TomeMissing is not null ? Muted:point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:new Vector4(0.98f,0.62f,0.20f,1);

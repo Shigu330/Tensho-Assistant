@@ -100,6 +100,7 @@ internal sealed class MapLiveReader : IDisposable
         framework.Update+=Update;
     }
     private bool teleportFailed;
+    private DateTimeOffset partyAt;
     private void Update(IFramework _)
     {
         if(disposed || !framework.IsInFrameworkUpdateThread || framework.IsFrameworkUnloading)return;
@@ -130,8 +131,13 @@ internal sealed class MapLiveReader : IDisposable
                 // Objects, FATEs and party carry no map id: on a failure they are emptied, never kept from another zone.
                 try{nearby=ReadObjects();}catch(Exception error){nearby=[];Failed("objects",error);}
                 try{fates=ReadFates();}catch(Exception error){fates=[];Failed("FATEs",error);}
-                try{partyMarkers=ReadParty();}catch(Exception error){partyMarkers=[];Failed("party",error);}
                 eventsAt=now.AddMilliseconds(500);
+            }
+            // 0.525 (user report): the party is read more often than the rest; the map glides between positions (MapPartySmoother).
+            if(now>=partyAt)
+            {
+                try{partyMarkers=ReadParty();}catch(Exception error){partyMarkers=[];Failed("party",error);}
+                partyAt=now.AddMilliseconds(100);
             }
             var inCombat=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             var inDuty=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty56];
@@ -210,7 +216,8 @@ internal sealed class MapLiveReader : IDisposable
         foreach(var member in party)
         {
             if(member is null || member.EntityId==self || member.Territory.RowId!=client.TerritoryType || !float.IsFinite(member.Position.X))continue;
-            result.Add(new(member.Name.TextValue,member.ClassJob.RowId,member.Level,member.Position));
+            // A member in view has an exact position; the party list's comes from the server, from time to time.
+            result.Add(new(member.Name.TextValue,member.ClassJob.RowId,member.Level,member.GameObject?.Position ?? member.Position));
             if(result.Count>=8)break;
         }
         return result.AsReadOnly();
