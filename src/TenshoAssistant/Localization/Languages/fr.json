@@ -77,9 +77,12 @@
     "Cancel": "Annuler"
   },
   "MyToolsUi": {
+    "ThemeReturn": "Revenir au thème d'origine ({0})",
+    "ThemeReturnTip": "Remet le thème que vous aviez avant d'utiliser celui d'un outil. Le thème se change aussi dans Paramètres › Interface, où « Suivre le jeu » est le réglage par défaut.",
+    "ThemeGame": "celui du jeu",
     "ThemeProposed": "Propose le thème {0}. Rien ne change sans votre clic.",
     "ThemeApply": "Utiliser le thème {0}",
-    "ThemeApplyTip": "Change le thème du plugin. Le réglage du thème permet de revenir en arrière.",
+    "ThemeApplyTip": "Change le thème du plugin. Un bouton en haut de cette page remet celui d'origine.",
     "Gallery": "Galerie",
     "GalleryClose": "Fermer la galerie",
     "GalleryTip": "Des outils proposés par des joueurs, lus par une personne avant publication.",

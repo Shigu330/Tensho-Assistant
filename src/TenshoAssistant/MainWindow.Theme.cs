@@ -34,10 +34,12 @@ internal sealed partial class MainWindow
         // 0.261: « ↺ » back to the default (follow the game).
         if(DefaultButton("Theme",configuration.ThemeMode!=DefaultConfiguration.ThemeMode))SaveTheme(DefaultConfiguration.ThemeMode);
     }
-    private void SaveTheme(int mode)
+    /// <param name="before">0.477: the theme to come back to, when a tool's theme is chosen; any other choice forgets it.</param>
+    private void SaveTheme(int mode,int? before=null)
     {
-        var previous=configuration.ThemeMode;configuration.ThemeMode=mode;
+        var previous=configuration.ThemeMode;var previousBefore=configuration.ThemeModeBeforeTool;
+        configuration.ThemeMode=mode;configuration.ThemeModeBeforeTool=before;
         try{save();saveError=null;}
-        catch(Exception error){configuration.ThemeMode=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save theme preference.");}
+        catch(Exception error){configuration.ThemeMode=previous;configuration.ThemeModeBeforeTool=previousBefore;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save theme preference.");}
     }
 }

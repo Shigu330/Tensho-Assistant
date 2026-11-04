@@ -175,8 +175,12 @@ internal static class MyToolsTests
             Check(names.Length==ToolTemplateFormat.Themes.Count && names.Select(name=>name.ToLowerInvariant()).SequenceEqual(ToolTemplateFormat.Themes.Select(name=>name.Replace("-",""))),"same order as PluginTheme");
             Check(ToolTemplateFormat.ThemeMode("dark")==1 && ToolTemplateFormat.ThemeMode("clear-green")==6 && ToolTemplateFormat.ThemeMode("x")==0,"ThemeMode");
             var page=Read("MainWindow.MyTools.cs");
-            Check(page.Contains("\"MyToolsUi.ThemeProposed\"") && page.Contains("###MyToolThemeApply\"))SaveTheme("),"said in the preview, applied on a click");
-            Check(!page.Contains("configuration.ThemeMode=") && System.Text.RegularExpressions.Regex.Matches(page,"SaveTheme\\(").Count==1,"nowhere else");
+            Check(page.Contains("\"MyToolsUi.ThemeProposed\"") && page.Contains("###MyToolThemeApply\"))SaveTheme(ToolTemplateFormat.ThemeMode(theme),configuration.ThemeModeBeforeTool ?? configuration.ThemeMode);"),"said in the preview, applied on a click, the theme before it remembered");
+            Check(!page.Contains("configuration.ThemeMode=") && System.Text.RegularExpressions.Regex.Matches(page,"SaveTheme\\(").Count==2,"on these two clicks only");
+            Check(page.Contains("###MyToolThemeReturn\"))SaveTheme(target);") && page.Contains("DrawMyToolsThemeReturn(store);") && page.Contains("configuration.ThemeModeBeforeTool ?? (fromTool ? DefaultConfiguration.ThemeMode:current)"),"a way back, always in view on the page, even for a theme applied before it was remembered");
+            var theme=Read("MainWindow.Theme.cs");
+            Check(theme.Contains("configuration.ThemeMode=mode;configuration.ThemeModeBeforeTool=before;") && theme.Contains("configuration.ThemeModeBeforeTool=previousBefore;"),"a choice in the settings forgets it; a failed save restores both");
+            Check(TenshoAssistant.ConfigurationReset.Reset.Contains("ThemeModeBeforeTool"),"reset with the theme");
             var draft=ToolDraft.New();draft.Name=ToolDraft.With(draft.Name,"en","a");draft.Theme="light";
             Check(draft.Check().Template?.Theme=="light" && ToolDraft.From(draft.ToTemplate()).Theme=="light","editor");
         }),

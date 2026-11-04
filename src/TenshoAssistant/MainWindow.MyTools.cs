@@ -26,6 +26,7 @@ internal sealed partial class MainWindow
         if(MyToolsStore is not { } store)return;
         if(store.Unavailable){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("MyToolsUi.Unavailable"));return;}
         if(store.RefusedCount>0)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MyToolsUi.Refused",store.RefusedCount));
+        DrawMyToolsThemeReturn(store);
         if(myToolDraft is { } draft){DrawMyToolEditor(store,draft);return;}
         if(ImGui.SmallButton(localization.Get("MyToolsUi.Create"))){myToolDraft=ToolDraft.New();myToolDraftProblem=null;return;}
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.CreateTip"));
@@ -68,12 +69,24 @@ internal sealed partial class MainWindow
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.RemoveTip"));
         }
         else if(ImGui.SmallButton(localization.Get("MyToolsUi.RemoveConfirm"))){store.Remove(tool.Template.Id);myToolSelected=null;myToolRemoveArmed=null;}
-        // T8: a tool only proposes; the setting changes on this click, and « ↺ » in the settings brings it back.
+        // T8: a tool only proposes; the setting changes on this click, and the button at the top of the page brings it back.
         if(tool.Template.Theme is { } theme && configuration.ThemeMode!=ToolTemplateFormat.ThemeMode(theme))
         {
-            if(ImGui.SmallButton(localization.Format("MyToolsUi.ThemeApply",ThemeName(theme))+"###MyToolThemeApply"))SaveTheme(ToolTemplateFormat.ThemeMode(theme));
+            if(ImGui.SmallButton(localization.Format("MyToolsUi.ThemeApply",ThemeName(theme))+"###MyToolThemeApply"))SaveTheme(ToolTemplateFormat.ThemeMode(theme),configuration.ThemeModeBeforeTool ?? configuration.ThemeMode);
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.ThemeApplyTip"));
         }
+    }
+
+    // 0.477 (user report: no way back to the original theme): always in view on this page while a tool's theme is in use. Without a remembered theme (one applied by 0.476), « original » is the default: follow the game.
+    private void DrawMyToolsThemeReturn(ToolTemplateStore store)
+    {
+        var current=configuration.ThemeMode;
+        var fromTool=store.Tools.Any(tool=>tool.Template.Theme is { } theme && ToolTemplateFormat.ThemeMode(theme)==current);
+        var target=configuration.ThemeModeBeforeTool ?? (fromTool ? DefaultConfiguration.ThemeMode:current);
+        if(target==current)return;
+        var name=target==0 ? localization.Get("MyToolsUi.ThemeGame"):localization.Get("Theme."+(UI.PluginTheme)Math.Clamp(target-1,0,Enum.GetValues<UI.PluginTheme>().Length-1));
+        if(ImGui.SmallButton(localization.Format("MyToolsUi.ThemeReturn",name)+"###MyToolThemeReturn"))SaveTheme(target);
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.ThemeReturnTip"));
     }
 
     private string ThemeName(string theme)=>localization.Get("Theme."+(UI.PluginTheme)(ToolTemplateFormat.ThemeMode(theme)-1));

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.477.0
+- Rapport de l'utilisateur en jeu : « aucun moyen de repasser au thème original ». Le retour n'existait que dans Réglages › Interface, à un autre endroit que le bouton qui change le thème. Le thème d'avant est maintenant retenu, et un bouton « Revenir au thème d'origine » reste en haut de « Mes outils » tant que le thème d'un outil est en place. Pour un thème appliqué en 0.476, rien n'avait été retenu : le bouton propose alors le réglage par défaut, suivre le jeu. Un choix dans les réglages oublie le thème retenu.
+- Tests : MyToolsTests complété. Verify.ps1 (agent) : 905/905, 0 avertissement, 0 erreur ; DLL 0.477.0.0. Non validé en jeu. Reste de « Mes outils » validé par l'utilisateur en jeu (rapport « reste ok »), galerie exceptée puisqu'elle attend une release.
+### English
+- After using a tool's theme, a button at the top of « My tools » brings the original theme back.
+
 ## 0.476.0
 - TEMPLATES-001 phase B7 (T8) : un outil peut proposer un thème, seul réglage de la liste blanche. L'aperçu le dit et le thème ne change que sur le clic « Utiliser le thème… ». Tout autre réglage dans un fichier le fait refuser. Le webhook Discord ne peut donc pas être touché par un outil. La partie sans code des modèles est terminée.
 - Tests : MyToolsTests complété. Verify.ps1 (agent) : 905/905, 0 avertissement, 0 erreur ; DLL 0.476.0.0. Non validé en jeu.
