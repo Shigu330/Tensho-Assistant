@@ -15,7 +15,7 @@ Les décisions à prendre sont à la fin, avec un choix recommandé pour chacune
 | Données que le jeu ne donne qu'après ouverture d'une fenêtre | Servants, coffre à apparence, armoire, carnets, titres, succès, calendrier, atelier, bestiaire |
 | Rapport de bug | `BugReport()`, bouton « Copier le rapport » ; sans adresse Discord ni nom de personnage |
 | Tickets | Formulaires GitHub `bug_report.yml` (champs `version`, `client`, `steps`, `expected`, `report`, `log`), `feature_request.yml`, `tool_proposal.yml`, `translation.yml` ; vulnérabilités en privé |
-| Contenu communautaire | `community-templates/` : index signé par SHA-256, lu sur `main`, sur clic, relu en pull request. **Modèle à réutiliser pour les vidéos** |
+| Contenu communautaire | `community-templates/` : index avec empreinte SHA-256, lu sur `main`, sur clic, relu en pull request. **Modèle à réutiliser pour les vidéos** |
 | Vérifications en jeu | Auto-contrôle (0.494) : il peut dire si une fenêtre a été lue |
 
 ## Lignes rouges

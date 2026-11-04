@@ -79,6 +79,7 @@ Points encore ouverts : chacun attend un relevé en jeu ou se règle dans une é
 
 | Point | Source | Constat | Relevé ou étape attendus |
 |---|---|---|---|
+| Prise en main, aide, vidéos, tickets | [ONBOARD-001](../goals/ONBOARD-001.md) | Plan écrit, rien n'est codé, décisions G1 à G10 en attente |
 | Modèles communautaires | [TEMPLATES-001](../goals/TEMPLATES-001.md), [DEC-029](DECISIONS.md) | Terminés côté code en 0.476 | Validation en jeu ; galerie visible après une release |
 | Règle « coût ≤ capacité » sous le rang 50 | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Coût ≤ capacité » | Règle des outils communautaires. Cohérente avec 11 montages de dirigeables publiés ; non vérifiée en jeu sous le rang 50. | Relevé en jeu sur un vaisseau de rang inférieur à 50. |
 | Type de marqueur des mandats | CHANGELOG 0.298 ; STATUS (validé 0.297–0.299) | Le journal montre les types 0, 3 (quêtes), 4 et 6 ; aucun relevé ne dit lequel désigne un mandat. | Relevé en jeu : mandat accepté, carte ouverte, mode développeur. |
