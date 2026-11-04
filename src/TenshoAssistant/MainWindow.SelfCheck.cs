@@ -74,10 +74,12 @@ internal sealed partial class MainWindow
             Own("currencies", () => Currencies?.Invoke()?.State is not { } money ? Diagnostics.SelfCheck.NotRead("currencies", "no reader")
                 : money.Unavailable ? Diagnostics.SelfCheck.Failed("currencies", "read failed") : money.Reading is null ? Diagnostics.SelfCheck.NotRead("currencies", "not read yet") : Diagnostics.SelfCheck.Ok("currencies", "read")),
             Own("reminders", SelfCheckReminders),
-            ("craft window", () => Observed("craft window", craftLive.State.Enabled, craftLive.State.Status.ToString())),
-            ("gathering window", () => Observed("gathering window", gatheringObservation.State.Enabled, gatheringObservation.State.Status.ToString())),
-            ("triad window", () => Observed("triad window", triadObservation.State.Enabled, triadObservation.State.Status.ToString())),
-            ("cactpot window", () => Observed("cactpot window", cactpotObservation.State.Enabled, cactpotObservation.State.Status.ToString())),
+            // 0.495 (user report): named after what is watched. The Gathering log has no line: Tensho only opens it, it reads nothing from it.
+            ("crafting log", SelfCheckCraftingLog),
+            ("synthesis", () => Observed("synthesis", craftLive.State.Enabled, craftLive.State.Status.ToString(), "no synthesis running")),
+            ("gathering node", () => Observed("gathering node", gatheringObservation.State.Enabled, gatheringObservation.State.Status.ToString(), "no node open")),
+            ("triad match", () => Observed("triad match", triadObservation.State.Enabled, triadObservation.State.Status.ToString(), "no match running")),
+            ("cactpot ticket", () => Observed("cactpot ticket", cactpotObservation.State.Enabled, cactpotObservation.State.Status.ToString(), "no ticket open")),
         ];
     }
 
@@ -85,10 +87,17 @@ internal sealed partial class MainWindow
         => count > 0 ? Diagnostics.SelfCheck.Ok(domain, detail) : Diagnostics.SelfCheck.Suspect(domain, detail);
 
     // The windows of the game: closed is normal, the status says so.
-    private static SelfCheckLine Observed(string domain, bool enabled, string status)
+    private static SelfCheckLine Observed(string domain, bool enabled, string status, string closed)
         => !enabled ? Diagnostics.SelfCheck.NotRead(domain, "observation off")
-            : status == "AddonAbsent" ? Diagnostics.SelfCheck.NotRead(domain, "window closed")
+            : status == "AddonAbsent" ? Diagnostics.SelfCheck.NotRead(domain, closed)
             : status == "Error" ? Diagnostics.SelfCheck.Failed(domain, "status Error") : Diagnostics.SelfCheck.Ok(domain, status);
+
+    private SelfCheckLine SelfCheckCraftingLog()
+    {
+        if (!configuration.CraftLogHelperEnabled) return Diagnostics.SelfCheck.NotRead("crafting log", "help off");
+        if (craftLog.Error is { } error) return Diagnostics.SelfCheck.Failed("crafting log", error);
+        return craftLog.Observation is { } seen && seen.Fresh(DateTimeOffset.UtcNow) ? Diagnostics.SelfCheck.Ok("crafting log", $"recipe {seen.RecipeId}") : Diagnostics.SelfCheck.NotRead("crafting log", "not open");
+    }
 
     private SelfCheckLine SelfCheckVendors()
     {
@@ -177,7 +186,7 @@ internal sealed partial class MainWindow
     private void DrawSelfCheck()
     {
         if (!TenshoAssistant.UI.UiComponents.Header(localization.Get("DiagnosticsUi.SelfCheck"))) return;
-        ImGui.TextDisabled(localization.Get("DiagnosticsUi.SelfCheckHelp"));
+        ImGui.PushTextWrapPos(0);ImGui.TextDisabled(localization.Get("DiagnosticsUi.SelfCheckHelp"));ImGui.PopTextWrapPos();
         if (SelfCheck is not { } runner) return;
         ImGui.BeginDisabled(runner.Running);
         try { if (ImGui.SmallButton(localization.Get("DiagnosticsUi.SelfCheckRun"))) runner.Start("button"); }

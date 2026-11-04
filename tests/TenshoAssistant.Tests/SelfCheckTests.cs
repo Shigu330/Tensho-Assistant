@@ -41,6 +41,7 @@ internal static class SelfCheckTests
             var probes=Code("MainWindow.SelfCheck.cs");
             foreach(var word in new[]{"HttpClient","Equip(","stats.Name","CharacterId,","ContentId"})Check(!probes.Contains(word),"not in the probes: "+word);
             Check(Code("Plugin.cs").Contains("is \"selftest\""),"the command");
+            Check(probes.Contains("(\"crafting log\", SelfCheckCraftingLog)") && probes.Contains("\"no synthesis running\"") && probes.Contains("\"no node open\"") && !probes.Contains("window closed"),"in-game report: lines named after what they watch");
             Check(Code("MainWindow.Diagnostics.cs").Contains("DrawSelfCheck();"),"the Diagnostics section");
         }),
     ];

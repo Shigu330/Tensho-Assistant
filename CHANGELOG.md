@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.495.0
+- Rapport de l'utilisateur en jeu : carnet d'artisanat et carnet de récolte ouverts, l'auto-contrôle disait « craft window » et « gathering window : window closed ». La lecture était juste : ces lignes surveillent la synthèse en cours et un point de récolte ouvert, pas les carnets. Le libellé trompait.
+- Lignes renommées d'après ce qu'elles surveillent : synthesis, gathering node, triad match, cactpot ticket, avec le motif (« no synthesis running »…). Nouvelle ligne « crafting log », lue par l'aide du carnet. Le carnet de récolte n'a pas de ligne : Tensho l'ouvre, mais n'y lit rien.
+- Tests : SelfCheckTests complété. Verify.ps1 (agent) : 934/934, 0 avertissement, 0 erreur ; DLL 0.495.0.0. Passe automatique en jeu, carnet d'artisanat ouvert chez l'utilisateur : « crafting log OK, recipe 5623 », 26 OK, 4 NOT_READ, 0 SUSPECT, 0 FAILED. Le texte d'aide de la section passe à la ligne.
+### English
+- Self-check: the lines are named after what they watch (synthesis, gathering node, triad match, cactpot ticket), and a new line reads the crafting log.
+
 ## 0.494.0
 - Demande de l'utilisateur : un auto-contrôle, pour que l'agent vérifie sans lui ce que le plugin lit. Une passe en lecture seule écrit dans le journal une ligne par domaine (catalogues, personnage, sacs, quêtes, collections, Triple Triade, carte, ensembles, carnets, mandats, monnaies, rappels, fenêtres du jeu), avec OK, NOT_READ, SUSPECT ou FAILED, et un résumé.
 - Se lance seule en mode développeur, une fois par connexion et après chaque rechargement ; sinon `/tensho selftest` ou le bouton de Diagnostics. Une sonde par image. Aucune action de jeu, aucune requête réseau, des nombres seulement (ni nom ni identifiant, chemins retirés des erreurs).
