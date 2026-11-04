@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.529.0
+- Demande de l'utilisateur (« suive des caps plutôt que % », avec une description) : le risque du plan des collectionnables n'est plus un pourcentage, mais trois crans décrits : Sûr (0), Incertain (50), Tentez votre chance (100). Une valeur enregistrée va au cran le plus proche. Même choix dans les paramètres.
+- Un seul plan à l'écran, celui du cran choisi. Les deux plans se mêlaient : le coup conseillé suivait la moyenne, les lignes « Avant elles » et « Ce plan dépense » le plan sans chance. Ces lignes ne s'affichent plus que sur « Sûr » ; ailleurs, une ligne dit ce que « Sûr » garantirait.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.529.0.0. Non validé en jeu.
+### English
+- The collectable plan's risk is now three described steps: Safe, Uncertain, Try your luck. Only the chosen step's plan is shown, instead of two plans mixed together.
+
 ## 0.528.0
 - Capture de l'utilisateur : la prochaine action du panneau Collectionnable était coupée à sa largeur (« … sur la prochaine actio »), comme la ligne des seuils. Elles passent à la ligne.
 - Calcul relu sur la capture, 727 PR sans Inspection active : Inspection d'abord, 65,1 assignats en moyenne, comme prévu ([calcul](docs/evidence/0.527-priming-touch.md)). La consigne d'essai de Toucher était impraticable avec 823 PR au plus : corrigée.

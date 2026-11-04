@@ -22,6 +22,28 @@ internal static class Gathering478Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Collectable risk (0.529): three steps; a saved percentage lands on one; each step gives its plan, and only « Safe » lists the plan without luck",() =>
+        {
+            Check(CollectableRisk.Caps.SequenceEqual([0,50,100]),"steps");
+            Check(CollectableRisk.Snap(0)==0 && CollectableRisk.Snap(24)==0 && CollectableRisk.Snap(25)==50 && CollectableRisk.Snap(74)==50 && CollectableRisk.Snap(75)==100 && CollectableRisk.Snap(100)==100,"nearest");
+            var herb=Rule(43924,"Herb",90,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=3,RewardMid=7,RewardHigh=20};
+            var raw=Raw(0,200,100,300,150,false);raw[52]="52:text 24 %";
+            var turn=CollectableTurn.Parse(raw)! with {IntuitionChance=40};
+            var gains=new CollectableBonuses(250,100,625,200,100,false,true,300,4,40,0,0.5m,false,100,24);
+            var safe=CollectableAdvisor.Advise(turn,4,herb,gains)!;
+            var luck=CollectableAdvisor.Advise(turn,4,herb,gains with {RiskTolerance=100})!;
+            var middle=CollectableAdvisor.Advise(turn,4,herb,gains with {RiskTolerance=50})!;
+            Check(safe.Worst>=20,$"Safe: at least what is certain on the capture: {safe}");
+            Check(luck.Expected>safe.Expected-0.001m && luck.Worst<=safe.Worst,$"Try your luck: a better average for a lower floor: {luck} against {safe}");
+            Check(middle.Expected<=luck.Expected && middle.Worst>=luck.Worst,$"Uncertain, in between: {middle}");
+            var panel=Read("MainWindow.CollectablePanel.cs");
+            Check(panel.Contains("if(safeStep)") && panel.Contains("\"CollectablePanel.SafeWould\"") && panel.Contains("if(safeStep && advice.Scrutinies*bonuses.ScrutinyCost"),"one plan on screen");
+            foreach(var language in new[]{"en","fr"})foreach(var cap in CollectableRisk.Caps)
+            {
+                var texts=Read($"Localization/Languages/{language}.json");
+                Check(texts.Contains($"\"Cap{cap}\":") && texts.Contains($"\"Cap{cap}Tip\":"),$"{language}: step {cap} described");
+            }
+        }),
         ("Collectable plan (0.527): Priming Touch and Collector's Focus on the node of the report",() =>
         {
             var herb=Rule(43924,"Herb",90,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=3,RewardMid=7,RewardHigh=20};
@@ -292,7 +314,7 @@ internal static class Gathering478Tests
                 Check(plan.Worst<=plan.Expected && plan.Expected>=20 && plan.Worst>=7,$"real run at {risk} %: {plan}");
             }
             var panel=Read("MainWindow.CollectablePanel.cs");
-            Check(panel.Contains("ImGui.SliderInt(localization.Get(\"CollectablePanel.Risk\")") && panel.Contains("Math.Clamp(configuration.CollectableRiskTolerance,0,100)"),"set in the panel");
+            Check(panel.Contains("CollectableRisk.Snap(configuration.CollectableRiskTolerance)") && panel.Contains("ImGui.RadioButton(localization.Get($\"CollectablePanel.Cap{cap}\")"),"three steps");
             Check(new TenshoAssistant.Configuration().CollectableRiskTolerance==50 || Read("Configuration.cs").Contains("CollectableRiskTolerance { get; set; } = 50"),"default");
         }),
         ("GP tick: once GP stops rising, no tick is promised; it comes back with the next rise; what a tick gives is seen",() =>

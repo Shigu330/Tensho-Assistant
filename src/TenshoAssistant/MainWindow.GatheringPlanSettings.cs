@@ -73,7 +73,8 @@ internal sealed partial class MainWindow
         IntSetting("GatheringPanel.Regen","GatheringPanel.RegenTip",()=>configuration.GpRegenPerTick,value=>configuration.GpRegenPerTick=value,0,50,DefaultConfiguration.GpRegenPerTick);
         if(configuration.GpRegenBase>0)ImGui.TextDisabled(localization.Format("GatheringPanel.RegenObserved",configuration.GpRegenBase,GpTraitBonus(16),GpTraitBonus(17),GpTraitBonus(18)));
         BoolSetting("CollectablePanel.UseScrutiny","CollectablePanel.UseScrutinyTip",()=>configuration.CollectableUseScrutiny,value=>configuration.CollectableUseScrutiny=value,c=>c.CollectableUseScrutiny);
-        IntSetting("CollectablePanel.Risk","CollectablePanel.RiskTip",()=>configuration.CollectableRiskTolerance,value=>configuration.CollectableRiskTolerance=value,0,100,DefaultConfiguration.CollectableRiskTolerance);
+        DrawCollectableRisk();
+        if(DefaultButton("CollectableRisk",CollectableRisk.Snap(configuration.CollectableRiskTolerance)!=DefaultConfiguration.CollectableRiskTolerance)){configuration.CollectableRiskTolerance=DefaultConfiguration.CollectableRiskTolerance;SaveReminders();}
         BoolSetting("CollectablePanel.UseFocus","CollectablePanel.UseFocusTip",()=>configuration.CollectableUseFocus,value=>configuration.CollectableUseFocus=value,c=>c.CollectableUseFocus);
         BoolSetting("CollectablePanel.UsePriming","CollectablePanel.UsePrimingTip",()=>configuration.CollectableUsePriming,value=>configuration.CollectableUsePriming=value,c=>c.CollectableUsePriming);
         BoolSetting("CollectablePanel.UseRestore","CollectablePanel.UseRestoreTip",()=>configuration.CollectableUseRestore,value=>configuration.CollectableUseRestore=value,c=>c.CollectableUseRestore);

@@ -79,6 +79,15 @@ public sealed record CollectableBonuses(int ScrutinyBonus=0,int IntuitionBonus=0
     public static CollectableBonuses None{get;}=new();
 }
 
+/// <summary>0.529 (user request): the risk is three steps with a meaning, not a percentage: safe, uncertain, try your luck.</summary>
+public static class CollectableRisk
+{
+    public static readonly int[] Caps=[0,50,100];
+    public const int Safe=0;
+    /// <summary>The nearest step: a value saved by an older version lands on one.</summary>
+    public static int Snap(int value)=>value<25 ? 0:value<75 ? 50:100;
+}
+
 public enum CollectableMove { Scour,Brazen,Meticulous,Collect,Scrutiny,Restore,Focus,Eureka,Priming }
 /// <param name="Move">The best move now, on average.</param>
 /// <param name="Target">The tier reached without counting on luck; Below if none.</param>

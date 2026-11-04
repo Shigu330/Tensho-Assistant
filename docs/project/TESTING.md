@@ -711,6 +711,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.529 : trois crans de risque des collectionnables** — à voir en jouant
+
+- [ ] Panneau Collectionnable : Sûr, Incertain, Tentez votre chance, avec la description du cran choisi ; même choix dans Paramètres › Modules › Récolte.
+- [ ] Sur « Sûr » : le coup, le plan sans chance, ses actions et ses PR. Sur les deux autres : le coup, la moyenne, le pire cas, et la ligne « Sur Sûr… garantis ».
+- [ ] En changeant de cran, le coup conseillé suit.
+
 **0.527 : Toucher d'amorçage dans le plan des collectionnables** — à voir en jouant
 
 - [ ] Botaniste ou mineur niveau 95 et plus : commencer vers 623 PR, lancer Inspection soi-même (il reste 423 PR) : le panneau propose Toucher d'amorçage ; une fois lancé, il ne le repropose plus et compte 48 %. Depuis 727 PR, le plan passe par Inspection puis Sélection méthodique, sans Toucher : c'est prévu (capture du 2026-11-05).

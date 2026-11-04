@@ -63,13 +63,20 @@ internal sealed partial class MainWindow
     }
 
     // 0.484 (user request): the risk accepted, set here. Applied as the slider moves; saved when it is let go.
+    // 0.529 (user request): three steps, each with what it does, shared with the settings.
     private void DrawCollectableRisk()
     {
-        var risk=Math.Clamp(configuration.CollectableRiskTolerance,0,100);
-        ImGui.SetNextItemWidth(160);
-        if(ImGui.SliderInt(localization.Get("CollectablePanel.Risk")+"###CollectableRisk",ref risk,0,100,"%d %%"))configuration.CollectableRiskTolerance=risk;
-        Tip("CollectablePanel.RiskTip");
-        if(ImGui.IsItemDeactivatedAfterEdit())SaveReminders();
+        var risk=CollectableRisk.Snap(configuration.CollectableRiskTolerance);
+        ImGui.TextDisabled(localization.Get("CollectablePanel.Risk"));
+        foreach(var cap in CollectableRisk.Caps)
+        {
+            ImGui.SameLine();
+            if(ImGui.RadioButton(localization.Get($"CollectablePanel.Cap{cap}")+$"###CollectableRisk{cap}",risk==cap) && risk!=cap){configuration.CollectableRiskTolerance=cap;risk=cap;SaveReminders();}
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get($"CollectablePanel.Cap{cap}Tip"));
+        }
+        ImGui.PushTextWrapPos(0);
+        try{ImGui.TextDisabled(localization.Get($"CollectablePanel.Cap{risk}Tip"));}
+        finally{ImGui.PopTextWrapPos();}
     }
 
     // 0.481 (user report; the boxes were misread in 0.480): what each bonus adds, as the game shows it when its box is ticked or when Scrutiny is on. Both boxes: the sum, split if one is known.
@@ -111,7 +118,7 @@ internal sealed partial class MainWindow
         }
         var bonuses=new CollectableBonuses(configuration.CollectableScrutinyGain,configuration.CollectableIntuitionGain,gp ?? 0,
             CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Cost ?? 0,configuration.CollectableUseFocus ? CollectableActionInfo?.Invoke(turn.FocusAction)?.Cost ?? 0:0,active,configuration.CollectableUseScrutiny,restore?.Spec.Cost ?? 0,maximum ?? 0,
-            collectableChanceBase.GetValueOrDefault(turn.ItemId),Math.Clamp(configuration.CollectableRiskTolerance,0,100),restore is null ? 0:EurekaChanceFor?.Invoke(job) ?? 0,EurekaReady?.Invoke()==true,
+            collectableChanceBase.GetValueOrDefault(turn.ItemId),CollectableRisk.Snap(configuration.CollectableRiskTolerance),restore is null ? 0:EurekaChanceFor?.Invoke(job) ?? 0,EurekaReady?.Invoke()==true,
             configuration.CollectableUsePriming && turn.PrimingAction!=0 ? CollectableActionInfo?.Invoke(turn.PrimingAction)?.Cost ?? 0:0,collectableMeticulousBase.GetValueOrDefault(turn.ItemId));
         var tier=rule is null ? CollectableTier.Below:Gathering.Collectables.Tier(rule,turn.Current);
         ImGui.ProgressBar(Math.Clamp((float)turn.Current/turn.Maximum,0,1),new Vector2(-1,ImGui.GetFrameHeight()),localization.Format("CollectablePanel.Current",turn.Current.ToString("N0"),turn.Maximum.ToString("N0"),localization.Get($"CollectablePanel.Tier{tier}")));
@@ -171,19 +178,24 @@ internal sealed partial class MainWindow
                     ImGui.TextColored(Accent,advice.HighScrips is { } highest ? localization.Format("CollectablePanel.Reference",rule.RewardHigh,highest):localization.Format("CollectablePanel.ReferenceFar",rule.RewardHigh,advice.HighMissing));
                     ImGui.TextWrapped(localization.Format("CollectablePanel.Expected",advice.Expected.ToString("0.0"),advice.Worst.ToString("0.#")));
                 }
-                ImGui.TextDisabled(advice.Target==CollectableTier.Below ? localization.Get("CollectablePanel.OutOfReach")
-                    :advice.Scrips>0 ? localization.Format("CollectablePanel.Plan",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections,advice.Scrips)
-                    :localization.Format("CollectablePanel.PlanItems",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections));
-                // 0.482 (user report: « 5 actions » for 4 attempts): the actions that cost no attempt, and where an extra attempt comes from, are said under the plan.
-                if(advice.Scrutinies>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanScrutinies",advice.Scrutinies,CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Name ?? "",advice.Scrutinies*bonuses.ScrutinyCost));
-                if(advice.Restores>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanRestores",advice.Restores,restore?.Name ?? "",advice.Restores*bonuses.RestoreCost,attempts ?? 0,(attempts ?? 0)+advice.Restores));
+                // 0.529 (user request): one plan on screen, the one of the chosen step. Only « Safe » follows the plan without luck, so only it lists that plan's actions and GP.
+                var safeStep=CollectableRisk.Snap(configuration.CollectableRiskTolerance)==CollectableRisk.Safe;
+                if(safeStep)
+                {
+                    ImGui.TextDisabled(advice.Target==CollectableTier.Below ? localization.Get("CollectablePanel.OutOfReach")
+                        :advice.Scrips>0 ? localization.Format("CollectablePanel.Plan",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections,advice.Scrips)
+                        :localization.Format("CollectablePanel.PlanItems",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections));
+                    // 0.482 (user report: « 5 actions » for 4 attempts): the actions that cost no attempt, and where an extra attempt comes from, are said under the plan.
+                    if(advice.Scrutinies>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanScrutinies",advice.Scrutinies,CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Name ?? "",advice.Scrutinies*bonuses.ScrutinyCost));
+                    if(advice.Restores>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanRestores",advice.Restores,restore?.Name ?? "",advice.Restores*bonuses.RestoreCost,attempts ?? 0,(attempts ?? 0)+advice.Restores));
+                }
+                else if(advice.Target!=CollectableTier.Below && advice.Scrips>0)ImGui.TextDisabled(localization.Format("CollectablePanel.SafeWould",advice.Scrips));
                 if(advice.Restores>0 && bonuses.EurekaChance>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanEureka",(bonuses.EurekaChance*100).ToString("0"),CollectableActionInfo?.Invoke(job==16 ? 26521u:26522u)?.Name ?? ""));
                 // 0.527 (user report): why Collector's Focus or Priming Touch may not be the move.
                 if(advice.Move is not (CollectableMove.Focus or CollectableMove.Priming) && (turn.FocusOpen && bonuses.FocusCost>0 || turn.PrimingOpen && bonuses.PrimingCost>0))
                     ImGui.TextDisabled(localization.Format("CollectablePanel.BonusWhenWorth",CollectableActionInfo?.Invoke(turn.FocusAction)?.Name ?? "",turn.PrimingAction!=0 ? CollectableActionInfo?.Invoke(turn.PrimingAction)?.Name ?? "":""));
                 // 0.482 (user report: GP must count): what this plan spends, against the GP there is.
-                var planned=advice.Scrutinies*bonuses.ScrutinyCost+advice.Restores*bonuses.RestoreCost;
-                if(planned>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanGp",planned,bonuses.Gp,Math.Max(0,bonuses.Gp-planned)));
+                if(safeStep && advice.Scrutinies*bonuses.ScrutinyCost+advice.Restores*bonuses.RestoreCost is > 0 and var planned)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanGp",planned,bonuses.Gp,Math.Max(0,bonuses.Gp-planned)));
             }
         }
         finally{ImGui.PopTextWrapPos();}
