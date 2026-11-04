@@ -27,7 +27,6 @@ internal sealed partial class MainWindow
     private volatile CollectableAdvice? collectableAdvice;
     private volatile bool collectableAdvicePending;
     private Task? collectableAdviceRun;
-    private int? collectableLastGp;
     private readonly Dictionary<uint,int> collectableChanceBase=[];
 
     internal void DrawCollectablePanel()
@@ -100,23 +99,17 @@ internal sealed partial class MainWindow
     private void DrawCollectableAdvice(CollectableTurn turn,int? attempts,int? maximum,int? gp,CollectableRule? rule)
     {
         var active=ScrutinyActive?.Invoke()==true;
-        // 0.482: GP that comes back at a tick during a pass: a small rise, the smallest seen counts (as on a node).
-        if(gp is { } gpNow)
-        {
-            var risen=gpNow-(collectableLastGp ?? gpNow);
-            if(risen is >0 and <=50 && (configuration.GpRegenObserved==0 || risen<configuration.GpRegenObserved)){configuration.GpRegenObserved=risen;SaveReminders();}
-            collectableLastGp=gpNow;
-        }
         LearnCollectableBonuses(turn,active);
         var job=turn.ScourAction==22182 ? 16u:17u;
-        var restore=configuration.CollectableUseRestore ? gpActions.State.Catalog?.Actions.FirstOrDefault(row=>row.Spec.JobId==job && row.Spec.Effect==GpEffect.Attempt && !GpActionRules.Forbidden(GpForbidden,row.Spec)):null;
+        var restore=configuration.CollectableUseRestore ? gpActions.State.Catalog?.Actions.FirstOrDefault(row=>row.Spec.JobId==job && row.Spec.Effect==GpEffect.Attempt && !GpActionRules.Forbidden(GpForbiddenFor(job),row.Spec)):null;
         if(turn.IntuitionChance>0 && (!collectableChanceBase.TryGetValue(turn.ItemId,out var lowest) || turn.IntuitionChance<lowest))collectableChanceBase[turn.ItemId]=turn.IntuitionChance;
-        // Below the maximum, attempts can be restored: if the game says no now, the plan does not count on it. At the maximum it cannot say yet, the plan may still count on it for later.
+        // 0.488 (in-game log: status 579, then 0, then 579, within seconds): the game's answer changes with each action's lock. It no longer changes the plan, which made the panel blink; it only says to wait.
+        uint? restoreStatus=null;
         if(restore is not null && attempts is { } attemptsNow && maximum is { } most && attemptsNow<most && CollectableActionStatus?.Invoke(restore.Spec.Id) is { } status)
         {
             var seen=$"{status}|{attemptsNow}/{most}";
             if(developerMode && seen!=collectableRestoreLogged){collectableRestoreLogged=seen;log.Information("Collectable restore action {Action}: status {Status} at {Attempts}/{Maximum}",restore.Spec.Id,status,attemptsNow,most);}
-            if(status!=0)restore=null;
+            restoreStatus=status;
         }
         var bonuses=new CollectableBonuses(configuration.CollectableScrutinyGain,configuration.CollectableIntuitionGain,gp ?? 0,
             CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Cost ?? 0,configuration.CollectableUseFocus ? CollectableActionInfo?.Invoke(turn.FocusAction)?.Cost ?? 0:0,active,configuration.CollectableUseScrutiny,restore?.Spec.Cost ?? 0,maximum ?? 0,
@@ -137,7 +130,8 @@ internal sealed partial class MainWindow
                 finally{collectableAdvicePending=false;}
             });
         }
-        if(collectableAdvicePending || collectableAdviceKey!=adviceKey)
+        // While a new plan is worked out the last one stays (a shorter panel for a moment was a blink), unless it is another item's.
+        if(collectableAdvice is null && (collectableAdvicePending || collectableAdviceKey!=adviceKey))
         {
             ImGui.TextDisabled(localization.Get("CollectablePanel.Working"));
             DrawCollectableRisk();
@@ -153,7 +147,7 @@ internal sealed partial class MainWindow
             CollectableMove.Scour=>(turn.ScourAction,$"+{advice.GainLow}"),
             CollectableMove.Brazen=>(turn.BrazenAction,localization.Format("CollectablePanel.Range",advice.GainLow,advice.GainHigh)),
             CollectableMove.Scrutiny=>(turn.ScrutinyAction,localization.Format("CollectablePanel.ScrutinyGain",bonuses.ScrutinyBonus,bonuses.ScrutinyCost)),
-            CollectableMove.Restore=>(restore?.Spec.Id ?? 0,localization.Format("CollectablePanel.RestoreGain",bonuses.RestoreCost)),
+            CollectableMove.Restore=>(restore?.Spec.Id ?? 0,localization.Format(restoreStatus is null or 0 ? "CollectablePanel.RestoreGain":"CollectablePanel.RestoreWait",bonuses.RestoreCost)),
             CollectableMove.Focus=>(turn.FocusAction,localization.Format("CollectablePanel.FocusGain",bonuses.FocusCost,bonuses.IntuitionBonus)),
             CollectableMove.Meticulous=>(turn.MeticulousAction,localization.Format("CollectablePanel.MeticulousGain",advice.GainLow,turn.MeticulousChance)),
             _=>(turn.CollectAction,""),

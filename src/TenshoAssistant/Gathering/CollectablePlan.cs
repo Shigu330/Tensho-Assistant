@@ -8,7 +8,8 @@ namespace TenshoAssistant.Gathering;
 /// 0.481: values 54 and 56 are the game's boxes « with Scrutiny » and « with Intuition », which add those bonuses to the gains shown, whether they will happen or not. Value 58 holds Intuition's chance.
 /// </summary>
 public sealed record CollectableTurn(uint ItemId,int Current,int Maximum,int Scour,int BrazenMin,int BrazenMax,int Meticulous,bool EstimateScrutiny,bool EstimateIntuition,
-    uint ScourAction,uint BrazenAction,uint MeticulousAction,uint CollectAction,uint ScrutinyAction,uint FocusAction,int MeticulousChance=0,int IntuitionChance=0)
+    uint ScourAction,uint BrazenAction,uint MeticulousAction,uint CollectAction,uint ScrutinyAction,uint FocusAction,int MeticulousChance=0,int IntuitionChance=0,
+    bool ScourOpen=true,bool BrazenOpen=true,bool MeticulousOpen=true,bool ScrutinyOpen=true,bool FocusOpen=true)
 {
     /// <summary>
     /// What a bonus adds to the gains shown. Brazen goes from 50 to 150 % of the plain gain and a bonus adds the same to everything, so its width is the plain gain. Null when the numbers do not fit that
@@ -49,7 +50,9 @@ public sealed record CollectableTurn(uint ItemId,int Current,int Maximum,int Sco
             if(raw.Count<=index || !raw[index].StartsWith(label,StringComparison.Ordinal))return 0;
             return int.TryParse(new string(raw[index][label.Length..].Where(char.IsAsciiDigit).ToArray()),NumberStyles.None,CultureInfo.InvariantCulture,out var percent) && percent<=100 ? percent:0;
         }
-        return new(item,(int)current,(int)maximum,(int)scour,(int)low,(int)high,(int)meticulous,scrutiny,intuition,scourAction,brazenAction,meticulousAction,collectAction,scrutinyAction,focusAction,Percent(52),Percent(58));
+        return new(item,(int)current,(int)maximum,(int)scour,(int)low,(int)high,(int)meticulous,scrutiny,intuition,scourAction,brazenAction,meticulousAction,collectAction,scrutinyAction,focusAction,Percent(52),Percent(58),
+            // 0.488 (user request): the flag that follows each action's identifier: what the window offers this character. Absent: not held against it.
+            Flag(28) ?? true,Flag(31) ?? true,Flag(34) ?? true,Flag(40) ?? true,Flag(43) ?? true);
     }
 }
 
@@ -117,11 +120,11 @@ public static class CollectableAdvisor
         var bonuses=given ?? CollectableBonuses.None;
         var gains=Sure(turn,bonuses);
         var bonus=bonuses.UseScrutiny || bonuses.ScrutinyActive ? Math.Max(0,bonuses.ScrutinyBonus):0;
-        var scrutinyCost=bonuses.UseScrutiny && bonus>0 ? bonuses.ScrutinyCost:0;
+        var scrutinyCost=bonuses.UseScrutiny && bonus>0 && turn.ScrutinyOpen ? bonuses.ScrutinyCost:0;
         var fullScrutinyCost=scrutinyCost;
         var restoreCost=Math.Max(0,bonuses.RestoreCost);var gpNow=Math.Max(0,bonuses.Gp);
         var chance=Math.Clamp(turn.MeticulousChance,0,100)/100m;
-        var intuitionGain=Math.Max(0,bonuses.IntuitionBonus);var focusCost=Math.Max(0,bonuses.FocusCost);
+        var intuitionGain=Math.Max(0,bonuses.IntuitionBonus);var focusCost=turn.FocusOpen ? Math.Max(0,bonuses.FocusCost):0;
         var fullFocusCost=focusCost;
         var shownChance=Math.Clamp(turn.IntuitionChance,0,100)/100m;
         var usualChance=bonuses.IntuitionBase>0 ? Math.Clamp(bonuses.IntuitionBase,0,100)/100m:shownChance;
@@ -160,14 +163,14 @@ public static class CollectableAdvisor
             // In this order: on an equal score, collect now rather than spend; a sure gain rather than a roll; no GP rather than GP.
             var best=Certain(Collecting(value,left,gp),CollectableMove.Collect);
             void Consider(Outcome outcome,CollectableMove move){if(outcome.Score>best.Score+Margin)best=outcome with {Move=move};}
-            if(left>=2 && scour>0)Consider(After(scour,left-1,gp),CollectableMove.Scour);
-            if(meticulous>0)
+            if(left>=2 && scour>0 && turn.ScourOpen)Consider(After(scour,left-1,gp),CollectableMove.Scour);
+            if(meticulous>0 && turn.MeticulousOpen)
             {
                 // It costs no attempt at this chance; otherwise it costs one, and with the last one nothing is left to collect.
                 var paid=left>=2 ? After(meticulous,left-1,gp):Certain(0,CollectableMove.Collect);
                 Consider(chance>0 ? Roll(CollectableMove.Meticulous,(chance,After(meticulous,left,gp)),(1-chance,paid)):paid,CollectableMove.Meticulous);
             }
-            if(left>=2 && high>0)
+            if(left>=2 && high>0 && turn.BrazenOpen)
             {
                 var steps=first ? BrazenSteps:LaterBrazenSteps;
                 var rolls=new (decimal Weight,Outcome Branch)[steps];
@@ -176,7 +179,8 @@ public static class CollectableAdvisor
             }
             if(left>=2 && !active && scrutinyCost>0 && gp>=scrutinyCost)Consider(Best(value,left,gp-scrutinyCost,true,focus,first),CollectableMove.Scrutiny);
             if(left>=2 && !focus && !(first && focusOn) && focusCost>0 && gp>=focusCost && intuitionGain>0 && usualChance>0)Consider(Best(value,left,gp-focusCost,active,true,first),CollectableMove.Focus);
-            if(restoreCost>0 && gp>=restoreCost && left<bonuses.MaxAttempts)Consider(Best(value,left+1,gp-restoreCost,active,focus,first),CollectableMove.Restore);
+            // 0.488 (user request): only with one attempt left, so nothing is spent before it is needed.
+            if(restoreCost>0 && gp>=restoreCost && left==1 && left<bonuses.MaxAttempts)Consider(Best(value,left+1,gp-restoreCost,active,focus,first),CollectableMove.Restore);
             memo[key]=best;
             return best;
         }
@@ -209,6 +213,10 @@ public static class CollectableAdvisor
                 && Best(turn.Current,attempts,gpNow-fullFocusCost,bonuses.ScrutinyActive,true,true) is var focusFirst && focusFirst.Score>=result.Score-Margin)
                 result=focusFirst with {Move=CollectableMove.Focus};
         }
+
+        // The last gather ends the node: GP that can pay for one more goes first.
+        if(result.Move==CollectableMove.Collect && attempts==1 && restoreCost>0 && gpNow>=restoreCost && bonuses.MaxAttempts>1
+            && Worth(rule,Collectables.Tier(rule,Math.Min(turn.Current,turn.Maximum)))>0)result=result with {Move=CollectableMove.Restore};
 
         // The plan without luck, to say what is certain, and the reference: the high tier with the most gathers.
         int Reach(int selections,int scrutinies)=>selections==0 ? turn.Current:Math.Min(turn.Maximum,turn.Current+gains.Scour+(selections-1)*gains.Later+(scrutinies+(bonuses.ScrutinyActive ? 1:0))*bonus);

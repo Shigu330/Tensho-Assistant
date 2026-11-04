@@ -18,7 +18,31 @@ internal sealed partial class MainWindow
     private readonly GatherNodeNorms gatherNodeNorms=new();
 
     private string GpForbidden=>GpActionRules.Joined(configuration.GpForbiddenActions);
-    private int GpRegenPerTick=>configuration.GpRegenPerTick>0 ? configuration.GpRegenPerTick:configuration.GpRegenObserved;
+    // 0.488 (user request): what the plan may not use on a job: what is forbidden in the settings, and what this job has not unlocked (a level is not enough: some come with a quest).
+    internal Func<uint,bool>? GpActionUnlocked{get;set;}
+    private readonly Dictionary<uint,(string Locked,DateTimeOffset At)> gpLockedActions=[];
+    private string GpForbiddenFor(uint job)
+    {
+        var now=DateTimeOffset.UtcNow;
+        if(!gpLockedActions.TryGetValue(job,out var known) || now-known.At>=TimeSpan.FromSeconds(30))
+        {
+            var locked=GpActionUnlocked is { } unlocked ? GpActionCatalog.Specs.Where(spec=>spec.JobId==job && !unlocked(spec.Id)).Select(GpActionRules.Key):[];
+            gpLockedActions[job]=known=(GpActionRules.Joined(locked),now);
+        }
+        return GpActionRules.Joined(GpForbidden.Split('|').Concat(known.Locked.Split('|')));
+    }
+    // 0.488: the job's traits, from the game's unlock state; asked again from time to time, a trait can come with a level or a quest.
+    internal Func<uint,int>? GpTraitsUnlocked{get;set;}
+    private readonly Dictionary<uint,(int Bonus,DateTimeOffset At)> gpTraitBonus=[];
+    private int GpTraitBonus(uint job)
+    {
+        var now=DateTimeOffset.UtcNow;
+        if(gpTraitBonus.TryGetValue(job,out var known) && now-known.At<TimeSpan.FromSeconds(30))return known.Bonus;
+        var bonus=GpTraitsUnlocked?.Invoke(job) ?? 0;
+        gpTraitBonus[job]=(bonus,now);
+        return bonus;
+    }
+    private int GpRegenFor(uint job)=>GpRegen.Rate(configuration.GpRegenPerTick,configuration.GpRegenBase,GpTraitBonus(job));
 
     /// <summary>What the selected crafting list still needs of an item: all its raw materials, computed off the draw when the list changes, minus the stock known now.</summary>
     private long GatherListNeed(uint item)
@@ -53,7 +77,7 @@ internal sealed partial class MainWindow
         {
             if(route.Reached)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ListNeed",need.ToString("N0"),route.Nodes,Math.Max(1,route.Nodes*seconds/60),route.GpSpent.ToString("N0")));
             else ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("GatheringPanel.ListNeedTooMany",need.ToString("N0"),GpRoutes.MaxNodes));
-            if(GpRegenPerTick<=0)ImGui.TextDisabled(localization.Get("GatheringPanel.ListNoRegen"));
+            if(GpRegenFor(gatheringPanelStart?.JobId ?? 0)<=0)ImGui.TextDisabled(localization.Get("GatheringPanel.ListNoRegen"));
         }
         finally{ImGui.PopTextWrapPos();}
     }
@@ -65,7 +89,7 @@ internal sealed partial class MainWindow
         BoolSetting("GatheringPanel.SaveForBonus","GatheringPanel.SaveForBonusTip",()=>configuration.GpSaveForBonus,value=>configuration.GpSaveForBonus=value,c=>c.GpSaveForBonus);
         IntSetting("GatheringPanel.NodeSeconds","GatheringPanel.NodeSecondsTip",()=>configuration.GatherSecondsBetweenNodes,value=>configuration.GatherSecondsBetweenNodes=value,5,600,DefaultConfiguration.GatherSecondsBetweenNodes);
         IntSetting("GatheringPanel.Regen","GatheringPanel.RegenTip",()=>configuration.GpRegenPerTick,value=>configuration.GpRegenPerTick=value,0,50,DefaultConfiguration.GpRegenPerTick);
-        if(configuration.GpRegenObserved>0)ImGui.TextDisabled(localization.Format("GatheringPanel.RegenObserved",configuration.GpRegenObserved));
+        if(configuration.GpRegenBase>0)ImGui.TextDisabled(localization.Format("GatheringPanel.RegenObserved",configuration.GpRegenBase,GpTraitBonus(16),GpTraitBonus(17),GpTraitBonus(18)));
         BoolSetting("CollectablePanel.UseScrutiny","CollectablePanel.UseScrutinyTip",()=>configuration.CollectableUseScrutiny,value=>configuration.CollectableUseScrutiny=value,c=>c.CollectableUseScrutiny);
         IntSetting("CollectablePanel.Risk","CollectablePanel.RiskTip",()=>configuration.CollectableRiskTolerance,value=>configuration.CollectableRiskTolerance=value,0,100,DefaultConfiguration.CollectableRiskTolerance);
         BoolSetting("CollectablePanel.UseFocus","CollectablePanel.UseFocusTip",()=>configuration.CollectableUseFocus,value=>configuration.CollectableUseFocus=value,c=>c.CollectableUseFocus);

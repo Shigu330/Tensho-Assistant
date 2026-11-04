@@ -9,7 +9,7 @@ public static class ConfigurationReset
 {
     public static readonly IReadOnlySet<string> Kept = new HashSet<string>
     {
-        "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenObserved", "CollectableScrutinyGain", "CollectableIntuitionGain", "TripleTriadDeck",
+        "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenBase", "CollectableScrutinyGain", "CollectableIntuitionGain", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
         "Voyages", "GearPlans", "GearMateria", "SubmarineUnlocked", "VesselPlans",
@@ -356,7 +356,8 @@ public sealed partial class Configuration
     public int CollectableRiskTolerance { get; set; } = 50;
     public int GatherSecondsBetweenNodes { get; set; } = 30;
     public int GpRegenPerTick { get; set; }
-    public int GpRegenObserved { get; set; }
+    // 0.488: GP per tick without any Enhanced GP Regeneration trait, measured. Replaces GpRegenObserved, whose value could be wrong.
+    public int GpRegenBase { get; set; }
     public List<string>? GpForbiddenActions { get; set; } = [];
     // 0.477 (user report): the theme in use before a tool's was chosen, to come back to it. Null once the theme is chosen in the settings.
     public int? ThemeModeBeforeTool { get; set; }

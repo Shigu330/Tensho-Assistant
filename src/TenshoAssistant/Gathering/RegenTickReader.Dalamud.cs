@@ -41,7 +41,7 @@ public sealed class RegenTickReader : IDisposable
             {tracker.Reset();alert.Reset();Volatile.Write(ref state,null);return;}
             if(threshold is { } target && alert.Evaluate(local.CurrentGp,local.MaxGp,target))Reached?.Invoke(local.CurrentGp,local.MaxGp);
             else if(threshold is null)alert.Reset();
-            Volatile.Write(ref state,enabled() ? tracker.Observe(local.CurrentGp,local.MaxGp,DateTimeOffset.UtcNow):null);
+            Volatile.Write(ref state,enabled() ? tracker.Observe(local.CurrentGp,local.MaxGp,DateTimeOffset.UtcNow) with {JobId=local.ClassJob.RowId}:null);
             warned=false;
         }
         catch(Exception error)

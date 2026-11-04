@@ -2,8 +2,28 @@ namespace TenshoAssistant.Gathering;
 
 /// <summary>What the GP tick bar shows: GP now and at most, and where the 3-second regeneration cycle is (null = no tick seen yet).</summary>
 /// <param name="Stalled">0.484: ticks were seen, and GP has not risen for longer than a tick, as when a gathering window is open.</param>
-/// <param name="Gain">0.484: the last natural-looking rise of GP, to know what a tick gives; 0 before the first.</param>
-public sealed record RegenTickState(uint Gp,uint MaxGp,double? Progress,double? SecondsLeft,bool Stalled=false,int Gain=0);
+/// <param name="Gain">0.488: what the last tick gave: a rise one tick after the one before; 0 before two of them are seen.</param>
+public sealed record RegenTickState(uint Gp,uint MaxGp,double? Progress,double? SecondsLeft,bool Stalled=false,int Gain=0,uint JobId=0);
+
+/// <summary>
+/// 0.488 (user request): what a tick gives depends on the traits a job has unlocked: Enhanced GP Regeneration raises it by 1, then 2, then 3 in all, job by job (Trait sheet,
+/// docs/evidence/0.488-gp-regen-traits.md). A measure on one job gives the base, and the rate of each job follows from what it has unlocked.
+/// </summary>
+public static class GpRegen
+{
+    /// <summary>The job's three traits, in order; a job that gathers nothing has none.</summary>
+    public static IReadOnlyList<uint> Traits(uint job)=>job switch{16=>[192,236,239],17=>[193,237,240],18=>[194,238,241],_=>[]};
+    /// <summary>What the traits add: the total said by the highest one unlocked.</summary>
+    public static int Bonus(IEnumerable<uint> unlocked,uint job)
+    {
+        var traits=Traits(job);var bonus=0;
+        foreach(var trait in unlocked){var index=traits.ToList().IndexOf(trait);if(index>=0)bonus=Math.Max(bonus,index+1);}
+        return bonus;
+    }
+    public static int Base(int gain,int bonus)=>gain-bonus;
+    /// <summary>What a tick gives on a job: the setting if there is one, otherwise the measured base and its traits; 0 before any measure.</summary>
+    public static int Rate(int setting,int measuredBase,int bonus)=>setting>0 ? setting:measuredBase>0 ? measuredBase+bonus:0;
+}
 
 /// <summary>
 /// g, R-08 (0.403): says once when a gatherer's GP rises to the threshold (0 = the maximum); armed again once GP falls below it.
@@ -50,7 +70,12 @@ public sealed class RegenTickTracker
     public RegenTickState Observe(uint gp,uint maxGp,DateTimeOffset now)
     {
         // Full means full against the maximum of the previous read: a higher maximum (gear changed) at full GP is not a tick.
-        if(last is { } before && gp>before && before<(lastMax ?? maxGp)){tick=now;gain=(int)Math.Min(gp-before,int.MaxValue);}
+        if(last is { } before && gp>before && before<(lastMax ?? maxGp))
+        {
+            // 0.488 (in-game report: « full in 1:22 » for 56 GP): only a rise a tick after the previous one tells what a tick gives; the bar had kept the smallest rise ever seen, 2.
+            if(tick is { } previous && Math.Abs((now-previous).TotalSeconds-Period.TotalSeconds)<=0.6)gain=(int)Math.Min(gp-before,int.MaxValue);
+            tick=now;
+        }
         last=gp;lastMax=maxGp;
         if(tick is not { } at || now<at)return new(gp,maxGp,null,null,false,gain);
         if(now-at>TimeSpan.FromMinutes(1))return new(gp,maxGp,null,null,gp<maxGp,gain);

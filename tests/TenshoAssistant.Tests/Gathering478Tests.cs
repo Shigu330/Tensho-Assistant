@@ -195,6 +195,12 @@ internal static class Gathering478Tests
             var without=CollectableAdvisor.Advise(turn,4,ore,new(150,175,809,200,100))!;
             var with=CollectableAdvisor.Advise(turn,4,ore,new(150,175,809,200,100,false,true,300,4))!;
             Check(with.Expected>=without.Expected,$"more choices never earn less: {with.Expected} against {without.Expected}");
+            Check(with.Move!=CollectableMove.Restore,$"never at the start: {with}");
+            foreach(var left in new[]{2,3,4})
+                Check(CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(500,177,88,265,132,false))!,left,ore,new(0,0,809,0,0,false,true,300,4))!.Move!=CollectableMove.Restore,$"user request: not before the end, {left} attempts left");
+            Check(CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(1000,177,88,265,132,false))!,1,ore,new(0,0,700,0,0,false,true,300,4))!.Move==CollectableMove.Restore,"the last attempt: restore before it ends the node");
+            Check(CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(1000,177,88,265,132,false))!,1,ore,new(0,0,100,0,0,false,true,300,4))!.Move==CollectableMove.Collect,"no GP for it: collect");
+            Check(CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(1000,177,88,265,132,false))!,2,ore,new(0,0,700,0,0,false,true,300,4))!.Move==CollectableMove.Collect,"two attempts left: collect first");
             var done=CollectableTurn.Parse(Raw(1000,177,88,265,132,false))!;
             var full=CollectableAdvisor.Advise(done,3,ore,new(0,0,700,0,0,false,true,300,4))!;
             Check(full is {Move:CollectableMove.Collect,Target:CollectableTier.High,Collections:5,Restores:2,Scrips:100,HighScrips:100} && full.Expected==100,$"at high, the GP becomes gathers: {full}");
@@ -207,7 +213,9 @@ internal static class Gathering478Tests
             Check(filled.Move!=CollectableMove.Restore,$"nothing is restored at full attempts: {filled}");
             var used=CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(600,177,88,265,132,false))!,1,ore,new(0,0,809,0,0,false,true,300,4))!;
             Check(used.Move==CollectableMove.Restore && used.Expected>7,$"one attempt left at mid, GP for more: restore: {used}");
-            Check(Read("MainWindow.CollectablePanel.cs").Contains("collectableAdviceKey!=adviceKey"),"worked out when something changes, not at each frame");
+            var shown=Read("MainWindow.CollectablePanel.cs");
+            Check(shown.Contains("collectableAdviceKey!=adviceKey"),"worked out when something changes, not at each frame");
+            Check(shown.Contains("if(collectableAdvice is null && (collectableAdvicePending") && !shown.Contains("if(status!=0)restore=null;"),"in-game report: no blink, a passing refusal does not change the plan");
         }),
         ("Collectable plan against a real run: 809 GP, 4 attempts, gains read in game; the player reached high and 20 scrips, the plan must find it",() =>
         {
@@ -230,10 +238,10 @@ internal static class Gathering478Tests
             var end=CollectableTurn.Parse(Raw(1000,177,88,265,132,false))! with {IntuitionChance=13};
             Check(CollectableAdvisor.Advise(end,1,ore,measured with {Gp=227}) is {Move:CollectableMove.Collect,Scrips:20,Target:CollectableTier.High},"in-game capture: 1000, one attempt: collect, 20 scrips");
         }),
-        ("Restored attempts: the game's own answer decides, below the maximum; nothing is used",() =>
+        ("Restored attempts: the game's own answer says when to wait; nothing is used",() =>
         {
             var panel=Read("MainWindow.CollectablePanel.cs");
-            Check(panel.Contains("attemptsNow<most && CollectableActionStatus?.Invoke(restore.Spec.Id) is { } status") && panel.Contains("if(status!=0)restore=null;"),"refused now: not planned");
+            Check(panel.Contains("attemptsNow<most && CollectableActionStatus?.Invoke(restore.Spec.Id) is { } status") && panel.Contains("restoreStatus=status;") && panel.Contains("CollectablePanel.RestoreWait"),"refused now: the player waits, the plan stays");
             var state=Read("Gathering/CollectableActionState.Dalamud.cs");
             Check(state.Contains("GetActionStatus(ActionType.Action,action)") && state.Contains("MemberFunctionPointers.GetActionStatus==0") && !state.Contains("UseAction"),"guarded, read only");
         }),
@@ -269,14 +277,22 @@ internal static class Gathering478Tests
             var tracker=new RegenTickTracker();
             Check(tracker.Observe(100,800,at) is {Stalled:false,Progress:null},"first read: waiting, not stopped");
             var running=tracker.Observe(105,800,at.AddSeconds(3));
-            Check(running is {Stalled:false,Gain:5} && running.SecondsLeft is not null,"a rise: a tick");
-            Check(tracker.Observe(105,800,at.AddSeconds(6)) is {Stalled:false},"within a tick and a half: still running");
-            var stopped=tracker.Observe(105,800,at.AddSeconds(8));
+            Check(running is {Stalled:false,Gain:0} && running.SecondsLeft is not null,"a first rise: a tick, its size not told yet");
+            Check(tracker.Observe(107,800,at.AddSeconds(4)) is {Gain:0},"a rise out of time (in-game report: 2 was kept): not a tick's size");
+            Check(tracker.Observe(112,800,at.AddSeconds(7)) is {Gain:5},"a tick after it: 5");
+            Check(tracker.Observe(112,800,at.AddSeconds(10)) is {Stalled:false},"within a tick and a half: still running");
+            var stopped=tracker.Observe(112,800,at.AddSeconds(12));
             Check(stopped is {Stalled:true,Progress:null,SecondsLeft:null},"in-game report: stopped, at a gathering window");
-            Check(tracker.Observe(105,800,at.AddSeconds(100)) is {Stalled:true},"still said after a long time");
-            Check(tracker.Observe(110,800,at.AddSeconds(101)) is {Stalled:false,Gain:5},"it rises again");
+            Check(tracker.Observe(112,800,at.AddSeconds(100)) is {Stalled:true},"still said after a long time");
+            Check(tracker.Observe(115,800,at.AddSeconds(101)) is {Stalled:false,Gain:5},"it rises again; a rise after a pause does not change what a tick gives");
             Check(tracker.Observe(800,800,at.AddSeconds(200)) is {Stalled:false},"full: not stopped");
-            Check(Read("MainWindow.RegenTick.cs").Contains("GpTick.Stalled") && Read("MainWindow.RegenTick.cs").Contains("configuration.GpRegenObserved=measured.Gain"),"said, and measured");
+            Check(Read("MainWindow.RegenTick.cs").Contains("GpTick.Stalled") && Read("MainWindow.RegenTick.cs").Contains("measuredBase!=configuration.GpRegenBase"),"said, and the last measure kept");
+            Check(!Read("MainWindow.GatheringPanel.cs").Contains("GpRegenBase=") && !Read("MainWindow.CollectablePanel.cs").Contains("GpRegenBase="),"measured in one place only");
+            Check(GpRegen.Traits(16).SequenceEqual([192u,236u,239u]) && GpRegen.Traits(17).SequenceEqual([193u,237u,240u]) && GpRegen.Traits(18).SequenceEqual([194u,238u,241u]) && GpRegen.Traits(8).Count==0,"the traits of the sheet, job by job");
+            Check(GpRegen.Bonus([],16)==0 && GpRegen.Bonus([192],16)==1 && GpRegen.Bonus([192,236],16)==2 && GpRegen.Bonus([192,236,239],16)==3 && GpRegen.Bonus([236],16)==2 && GpRegen.Bonus([193],16)==0,"the highest unlocked gives the total; another job's does not count");
+            Check(GpRegen.Base(8,3)==5 && GpRegen.Rate(0,5,3)==8 && GpRegen.Rate(0,5,1)==6,"measured on one job, known on another");
+            Check(GpRegen.Rate(0,0,3)==0 && GpRegen.Rate(9,5,3)==9,"no measure: unknown, not invented; the setting wins");
+            Check(Read("Plugin.cs").Contains("unlocks.IsTraitUnlocked(row)"),"the game's unlock state");
         }),
         ("GP tick: the time until full, from what a tick gives; none while unknown or paused",() =>
         {
@@ -294,6 +310,25 @@ internal static class Gathering478Tests
             Check(Read("Plugin.cs").Contains("mainWindow.RecordOverlayDraw(name,") && Read("Plugin.cs").Contains("var started=mainWindow.DeveloperMode ?"),"measured in developer mode only");
             Check(Read("MainWindow.Diagnostics.cs").Contains("DiagnosticsUi.OverlayTimes") && Read("MainWindow.cs").Contains("overlayDrawMs"),"shown");
             Check(Read("MainWindow.cs").Contains("if (milliseconds < 0.02) return;"),"in-game report: a closed panel's zeros no longer push its times out");
+        }),
+        ("The help follows what is unlocked: an action the window does not offer or the job has not learned is never advised",() =>
+        {
+            var ore=Rule(36291,"Ore",80,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=3,RewardMid=7,RewardHigh=20};
+            string[] Flags(params int[] closed){var raw=Raw(0,177,88,265,132,false);foreach(var index in closed)raw[index]=$"{index}:bool False";return raw;}
+            var full=new CollectableBonuses(175,88,809,200,100,false,true,0,4,13);
+            Check(CollectableTurn.Parse(Flags())! is {ScrutinyOpen:true,FocusOpen:true,BrazenOpen:true},"nothing closed");
+            var noScrutiny=CollectableTurn.Parse(Flags(40))!;
+            Check(noScrutiny.ScrutinyOpen==false && CollectableAdvisor.Advise(noScrutiny,4,ore,full) is {Scrutinies:0} and {Target:CollectableTier.Low},"Scrutiny not offered: not counted, the plan is what is left");
+            Check(CollectableAdvisor.Advise(noScrutiny,4,ore,full)!.Move!=CollectableMove.Scrutiny,"nor advised");
+            var noFocus=CollectableTurn.Parse(Flags(40,43))! with {IntuitionChance=40};
+            Check(CollectableAdvisor.Advise(noFocus,3,ore,full)!.Move!=CollectableMove.Focus,"Collector's Focus below its level: not advised");
+            var noBrazen=CollectableTurn.Parse(Flags(31))!;
+            Check(CollectableAdvisor.Advise(noBrazen,4,ore)!.Move!=CollectableMove.Brazen,"nor a roll the window does not offer");
+            var locked=GpActionRules.Joined(GpActionCatalog.Specs.Where(spec=>spec.JobId==16 && spec.Effect==GpEffect.Attempt).Select(GpActionRules.Key));
+            Check(Node(1000,locked).Frontier.All(plan=>plan.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Attempt)),"an action not learned leaves the GP plan");
+            var list=Read("MainWindow.GatheringListPlan.cs");
+            Check(list.Contains("!unlocked(spec.Id)") && Read("MainWindow.GatheringPanel.cs").Contains("Forbidden:GpForbiddenFor(start.JobId)") && Read("MainWindow.GatheringGp.cs").Contains("GpForbiddenFor(gpJob)") && Read("MainWindow.CollectablePanel.cs").Contains("GpForbiddenFor(job)"),"used by the panel, the GP page and the collectable plan");
+            Check(Read("Plugin.cs").Contains("unlocks.IsActionUnlocked(row);"),"the game's unlock state");
         }),
         ("Tensho map after a reload: the game map left open waits for the Tensho map to be able to draw, for a short time",() =>
         {
@@ -329,7 +364,7 @@ internal static class Gathering478Tests
             var panel=Read("MainWindow.GatheringPanel.cs");
             Check(panel.Contains("\"GatheringPanel.CollectablePlan\"") && panel.Contains("Collectables?.Catalog?.For(slot.ItemId) is {Count:>0}"),"a collectable has no GP plan here, and says why");
             Check(panel.Contains("ImGui.PushTextWrapPos(0);") && panel.Contains("BeginGroup"),"texts wrap; name and rates on two lines");
-            Check(panel.Contains("configuration.GpRegenObserved=gained;") && panel.Contains("GpRoutes.Build("),"regeneration measured, route used");
+            Check(panel.Contains("GpRoutes.Build("),"route used");
             Check(Read("MainWindow.GatheringListPlan.cs").Contains("\"GatheringPanel.ListNoRegen\""),"no invented regeneration");
             foreach(var language in new[]{"en","fr"})
             {

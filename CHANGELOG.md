@@ -3,6 +3,17 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.488.0
+- Rapports de l'utilisateur en jeu.
+- Panneau Collectionnable qui clignote : le journal montre la réponse du jeu pour Raison solide qui change en quelques secondes (statut 579, puis 0, puis 579, avec le verrou de chaque action). Le plan en dépendait et se recalculait, et le panneau raccourcissait pendant ce temps. La réponse du jeu ne change plus le plan, elle dit seulement d'attendre, et le dernier plan reste affiché pendant le calcul. La détection de l'arrêt du tic n'était pas en cause.
+- Raison solide n'est plus conseillée qu'à la dernière tentative, avant qu'elle ferme le nœud.
+- Temps avant le plein faux : la mesure gardait la plus petite hausse jamais vue (2 PR). Une hausse ne compte plus que si elle arrive un tic après la précédente, et la dernière mesure remplace l'ancienne. Les mesures sur un nœud sont retirées.
+- Demande de l'utilisateur : tenir compte des PR débloqués. Les traits Enhanced GP Regeneration ajoutent +1, +2 puis +3, métier par métier ([preuve](docs/evidence/0.488-gp-regen-traits.md)). La mesure donne la base, et le taux de chaque métier est cette base plus ses traits débloqués, lus dans le jeu. L'ancienne valeur mesurée est abandonnée.
+- Demande de l'utilisateur : les aides suivent aussi ce qui est débloqué. Le plan de PR, la page PR et le plan de collection retirent les actions que le métier n'a pas apprises, lues dans le jeu (un niveau ne suffit pas, certaines viennent d'une quête), et le plan de collection celles que la fenêtre ne propose pas.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 925/925, 0 avertissement, 0 erreur ; DLL 0.488.0.0. Non validé en jeu.
+### English
+- The collectable panel no longer blinks, Solid Reason and Ageless Words are advised at the last attempt only, and the time until full GP uses a measure of real ticks.
+
 ## 0.487.0
 - Rapport de l'utilisateur en jeu : les temps des panneaux apparaissaient puis disparaissaient. Un panneau fermé enregistrait des temps nuls, qui chassaient ses vrais temps en 2 secondes. Seules les images réellement dessinées comptent maintenant, et un panneau garde ses derniers temps une fois fermé.
 - Tests : Gathering478Tests complété. Verify.ps1 (agent) : 924/924, 0 avertissement, 0 erreur ; DLL 0.487.0.0. Non validé en jeu.

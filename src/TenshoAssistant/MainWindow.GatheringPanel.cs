@@ -100,9 +100,6 @@ internal sealed partial class MainWindow
         if(gatheringPanelStart is not { } start || start.Owner!=owner || start.JobId!=frame.JobId || start.TotalAttempts!=frame.TotalAttempts
            || frame.Slots.Count>0 && !frame.Slots.Any(slot=>start.Slots.ContainsKey((slot.Index,slot.RawItemId))))
             gatheringPanelStart=start=new(owner,frame);
-        // 0.478: the GP that comes back at each tick, as the game gives it: a small rise while nothing is spent. The smallest seen counts (two ticks can fall between two reads).
-        var gained=(int)frame.Gp-(int)start.Gp;
-        if(!start.Frozen && gained is >0 and <=50 && (configuration.GpRegenObserved==0 || gained<configuration.GpRegenObserved)){configuration.GpRegenObserved=gained;SaveReminders();}
         start.Frozen|=frame.Gp<start.Gp || frame.Attempts<start.Attempts;
         if(!start.Frozen){start.Gp=frame.Gp;start.Attempts??=frame.Attempts;}
         foreach(var slot in frame.Slots)
@@ -124,8 +121,8 @@ internal sealed partial class MainWindow
         var key=(start.JobId,start.Level,slot.Index,slot.ItemId,(int)start.Gp,start.Attempts,first.Late,first.Success,first.Boon,bountiful,catalog);
         // 0.478: the route also follows what the list needs, the GP that comes back and the forbidden actions.
         var need=GatherListNeed(slot.ItemId);var seconds=Math.Clamp(configuration.GatherSecondsBetweenNodes,5,600);
-        var regenPerNode=GpRegenPerTick*seconds/3;
-        var routeKey=$"{need}|{maxGp}|{regenPerNode}|{GpForbidden}|{first.Quantity}|{configuration.GpSaveForBonus}";
+        var regenPerNode=GpRegenFor(start.JobId)*seconds/3;
+        var routeKey=$"{need}|{maxGp}|{regenPerNode}|{GpForbiddenFor(start.JobId)}|{first.Quantity}|{configuration.GpSaveForBonus}";
         if(routeKey!=gatheringPanelRouteKey){gatheringPanelRouteKey=routeKey;gatheringPanelKey=null;}
         if(key!=gatheringPanelKey)
         {
@@ -145,7 +142,7 @@ internal sealed partial class MainWindow
                 {
                     // 0.479: the quantity the game shows per gather; a node where it was not read counts one.
                     var quantity=Math.Clamp(first.Quantity ?? 1,1,20);
-                    var scenario=new GpScenario(start.JobId,start.Level,(int)start.Gp,attempts,quantity,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbidden);
+                    var scenario=new GpScenario(start.JobId,start.Level,(int)start.Gp,attempts,quantity,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbiddenFor(start.JobId));
                     gatheringPanelPlan=GpOptimizer.Solve(scenario,catalog);
                     var shape=new GatherNodeShape(attempts,quantity,boon);
                     var normal=gatherNodeNorms.Observe(slot.ItemId,shape);
