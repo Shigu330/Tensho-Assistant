@@ -2016,6 +2016,7 @@
     "DeleteTip": "Deletes this deck at once, without confirmation."
   },
   "TriadRequest": {
+    "RulesUnknown": "The rules could not be read: no odds for this match.",
     "RowOdds": "{0} % win · {1} % draw",
     "Title": "Tensho — Triple Triad",
     "UnknownNpc": "Unknown NPC (target the NPC)",
@@ -2041,6 +2042,7 @@
     "FewOwned": "Fewer than 5 confirmed owned cards: no deck to generate."
   },
   "TriadAdvice": {
+    "RulesUnknown": "The match rules could not be read: no advice for this move.",
     "NoMatch": "No match observed right now.",
     "Calculating": "Computing the advice…",
     "Waiting": "Advice on your turn.",

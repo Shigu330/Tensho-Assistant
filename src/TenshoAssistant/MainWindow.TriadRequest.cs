@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
     }
     private List<TriadCardDefinition> OwnedTriadCards()=>collections.State.Entries
         .Where(entry=>entry.Kind==CollectionKind.TripleTriad && entry.ConfirmedUnlocked && entry.Card is not null).Select(entry=>entry.Card!).ToList();
-    private static string TriadRequestKey(TriadRequestInfo request)=>$"{request.NpcId}|{string.Join('.',request.RuleIds)}";
+    private static string TriadRequestKey(TriadRequestInfo request)=>$"{request.NpcId}|{request.RulesKnown}|{string.Join('.',request.RuleIds)}";
 
     internal void DrawTriadRequestPanel()
     {
@@ -47,8 +47,12 @@ internal sealed partial class MainWindow
         var npcVariable=request.NpcVariable.Select(id=>TriadCard(id)).OfType<TriadCardDefinition>().ToList();
         var rules=TriadMatchAdvisor.RulesOf(request.RuleIds);var forced=TriadMatchSimulator.ForcedOf(request.RuleIds);
         var decks=TriadRequestDecks(request);
-        StartTriadOdds(request,decks,npcFixed,npcVariable,rules,forced);
-        DrawTriadSelDeckOdds(decks);
+        // 0.491 (R-14): no odds for a match whose rules could not be read.
+        if(request.RulesKnown)
+        {
+            StartTriadOdds(request,decks,npcFixed,npcVariable,rules,forced);
+            DrawTriadSelDeckOdds(decks);
+        }
         if(!request.Window.Valid)return;
         using var theme=UI.FfxivTheme.Apply();
         ImGui.SetNextWindowPos(new Vector2(request.Window.X+request.Window.Width+8,request.Window.Y),ImGuiCond.Always);
@@ -58,6 +62,7 @@ internal sealed partial class MainWindow
         {
             if(!visible)return;
             ImGui.TextColored(Accent,request.NpcName.Length>0 ? request.NpcName:localization.Get("TriadRequest.UnknownNpc"));
+            if(!request.RulesKnown){ImGui.TextWrapped(localization.Get("TriadRequest.RulesUnknown"));return;}
             ImGui.TextWrapped(localization.Format("TriadRequest.Rules",request.RuleNames is { Count:>0 } names ? string.Join(", ",names):localization.Get("TriadRequest.NoRules")));
             if(request.RuleIds.Contains(1u))ImGui.TextWrapped(localization.Get("TriadRequest.Roulette"));
             if(request.RuleIds.Contains(7u))ImGui.TextWrapped(localization.Get("TriadRequest.Random"));

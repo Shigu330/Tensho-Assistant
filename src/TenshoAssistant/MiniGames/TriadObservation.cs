@@ -30,17 +30,18 @@ public readonly record struct TriadRect(float X, float Y, float Width, float Hei
 /// from the TripleTriad sheet (docs/evidence/0.159.0-triad-npc-probe.log) and the slots' screen rectangles.
 /// </summary>
 public sealed record TriadMatchContext(IReadOnlyList<uint> RuleIds, int? ForcedSlot, uint NpcId, IReadOnlyList<uint> NpcFixed,
-    IReadOnlyList<uint> NpcVariable, IReadOnlyList<TriadRect>? BlueRects, IReadOnlyList<TriadRect>? BoardRects);
+    IReadOnlyList<uint> NpcVariable, IReadOnlyList<TriadRect>? BlueRects, IReadOnlyList<TriadRect>? BoardRects, bool RulesKnown = true);
 
 /// <summary>A deck saved in the game (GoldSaucerModule.Decks): name and card ids (0 = empty slot).</summary>
 public sealed record TriadGameDeck(int Index, string Name, IReadOnlyList<uint> Cards);
 /// <summary>
 /// The NPC challenge window « TripleTriadRequest » (TRIAD-003, capture docs/evidence/0.160.0-triad-match-capture.log): values 102–105 hold
 /// the match rules as TripleTriadRule ids (10, 12, 4, 9 = the rules then shown in the match), the NPC is the target; plus the window's
-/// screen rectangle and the player's saved decks.
+/// screen rectangle and the player's saved decks. The capture's request lines are cut at value 8 (a newline in the rules text), so that file
+/// does not show values 102–105 itself: the « Triad request rule values » log line gives them. RulesKnown false: the rules could not be read.
 /// </summary>
 public sealed record TriadRequestInfo(uint NpcId, IReadOnlyList<uint> RuleIds, IReadOnlyList<uint> NpcFixed, IReadOnlyList<uint> NpcVariable,
-    TriadRect Window, IReadOnlyList<TriadGameDeck> Decks, DateTimeOffset ObservedAt, string NpcName = "", IReadOnlyList<string>? RuleNames = null);
+    TriadRect Window, IReadOnlyList<TriadGameDeck> Decks, DateTimeOffset ObservedAt, string NpcName = "", IReadOnlyList<string>? RuleNames = null, bool RulesKnown = true);
 
 public sealed class TriadObservedFrame
 {

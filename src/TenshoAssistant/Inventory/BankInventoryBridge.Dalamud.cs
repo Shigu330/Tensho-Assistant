@@ -35,6 +35,8 @@ internal sealed class BankInventoryBridge : IDisposable
     private readonly Func<IReadOnlyList<(uint Row, uint Item)>> cabinetRows;
     // Pieces of an outfit stored as one item in the glamour dresser (MirageStoreSetItem: outfit item → pieces), 0.240.
     private readonly Func<uint, IReadOnlyList<uint>> outfitPieces;
+    private readonly HashSet<(uint Outfit, string Bits)> loggedOutfits = [];
+    private bool outfitSlotsFailed;
     private readonly Dictionary<BankKey, TimeSpan> autoCaptured = [];
     private IReadOnlyList<(ulong Id, string Name)>? knownRetainers;
     // 0.329 (R-14): optional reads that failed once (logged once); the first failure of each posts ReadUnavailable.
@@ -296,10 +298,32 @@ internal sealed class BankInventoryBridge : IDisposable
             if (id == 0) continue;
             stacks.Add(new(new(new(id), hq), 1, slot));
             // A whole outfit is stored as one item: its pieces count as owned too (numbered after the dresser's own slots).
-            foreach (var piece in outfitPieces(id))
-                if (piece != 0) stacks.Add(new(new(new(piece), false), 1, ids.Length + stacks.Count));
+            // 0.491 (R-14): since 7.4 an outfit may be incomplete (FCS MirageManager.IsSetSlotUnlocked; slot = MirageStoreSetItem column,
+            // 11 columns, 11 slots). No slot held, or the function unavailable: what the game says is not usable, all the pieces count as before.
+            var pieces = outfitPieces(id);
+            if (pieces.Count == 0) continue;
+            var held = OutfitSlots(mirage, (uint)slot, id, pieces.Count);
+            for (var column = 0; column < pieces.Count; column++)
+                if (pieces[column] != 0 && (held is null || held[column])) stacks.Add(new(new(new(pieces[column]), false), 1, ids.Length + stacks.Count));
         }
         return new(DateTimeOffset.UtcNow, "Dalamud/MirageManager.PrismBox", [new InventoryContainerSnapshot(new(owner, new(25000)), InventoryCoverage.Complete, stacks)]);
+    }
+
+    private unsafe bool[]? OutfitSlots(MirageManager* mirage, uint index, uint outfit, int count)
+    {
+        var held = new bool[count];
+        try
+        {
+            for (var column = 0; column < count; column++) held[column] = mirage->IsSetSlotUnlocked(index, column);
+        }
+        catch (Exception error)
+        {
+            if (!outfitSlotsFailed) { outfitSlotsFailed = true; log.Warning(error, "Outfit slot check unavailable: every piece of a stored outfit counts."); }
+            return null;
+        }
+        var bits = string.Concat(held.Select(value => value ? '1' : '0'));
+        if (loggedOutfits.Add((outfit, bits))) log.Information("Dresser outfit {0}: slots held {1}.", outfit, bits);
+        return held.Any(value => value) ? held : null;
     }
 
     // Armoire items: every Cabinet row whose item is stored (UIState.Cabinet.IsItemInCabinet).

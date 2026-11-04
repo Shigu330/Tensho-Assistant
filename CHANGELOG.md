@@ -3,6 +3,17 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.491.0
+- Campagne de tests : close à la demande de l'utilisateur (« les dernières erreurs on verra en jeu ») ; les cases non cochées de TESTING restent ouvertes. Suite de la feuille de route : g2.
+- R-14, les 4 constats « valeur peut-être fausse » restés sans vérification, relus contre le code et confirmés. Ce qui n'est pas lu reste inconnu au lieu de passer pour un zéro :
+  - Triple Triade, match : une règle illisible (valeur absente, autre type, nom hors de la feuille) ne disparaît plus en silence ; pas de conseil, et le panneau le dit. Coup masqué sans sa carte imposée : pas de conseil non plus. La feuille des règles a sa propre garde : illisible, elle ne coupe plus toute l'observation.
+  - Triple Triade, défi : les identifiants viennent de la feuille, plus d'une borne écrite en dur à 15. Règles illisibles : pas d'estimation au lieu de « Règles : aucune ». La preuve citée pour les valeurs 102–105 ne les montre pas (lignes de capture coupées à la valeur 8) : le code le dit, et le journal donne maintenant ces valeurs.
+  - Carte : feuille non lue, ou plus de panoramas que le tableau de bits du jeu : [?] au lieu de « non découvert ». Une garde par feuille.
+  - Coffre à apparence : depuis la 7.4 une tenue peut être rangée incomplète. Seules les pièces que le jeu dit présentes comptent (MirageManager.IsSetSlotUnlocked). Aucune présente ou fonction indisponible : toutes comptent, comme avant, et le journal le note. Le sens de cette fonction n'est pas encore confirmé en jeu.
+- Tests : TriadMatchAdvisorTests complété. Verify.ps1 (agent) : 928/928, 0 avertissement, 0 erreur ; DLL 0.491.0.0. Non validé en jeu.
+### English
+- R-14: what cannot be read stays unknown. Triple Triad rules not read give no advice and no odds instead of a no-rules answer; rule ids come from the sheet. The map shows unknown instead of "not discovered" when its sheets are unread. Outfits stored incomplete since 7.4 count only their stored pieces (not yet confirmed in game).
+
 ## 0.490.0
 - Demande de l'utilisateur, lot 7 : les favoris ne se retiraient que depuis la page Cartes. Le clic droit de la carte a un onglet Favoris, en premier : ceux de cette carte, puis les autres, avec « Retirer ». Un clic pose le drapeau, ou ouvre l'autre carte.
 - Tests : Gathering478Tests complété. Verify.ps1 (agent) : 926/926, 0 avertissement, 0 erreur ; DLL 0.490.0.0. Non validé en jeu.

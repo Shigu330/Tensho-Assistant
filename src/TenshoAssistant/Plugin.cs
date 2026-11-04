@@ -120,7 +120,7 @@ public sealed class Plugin : IDalamudPlugin
                 () => cabinet ??= data.GetExcelSheet<Lumina.Excel.Sheets.Cabinet>().Where(row => row.Item.RowId != 0).Select(row => (row.RowId, row.Item.RowId)).ToArray(),
                 set => data.GetExcelSheet<Lumina.Excel.Sheets.MirageStoreSetItem>().TryGetRow(set, out var outfit)
                     ? new[] { outfit.MainHand.RowId, outfit.OffHand.RowId, outfit.Head.RowId, outfit.Body.RowId, outfit.Hands.RowId, outfit.Legs.RowId,
-                        outfit.Feet.RowId, outfit.Earrings.RowId, outfit.Necklace.RowId, outfit.Bracelets.RowId, outfit.Ring.RowId }.Where(piece => piece != 0).ToArray()
+                        outfit.Feet.RowId, outfit.Earrings.RowId, outfit.Necklace.RowId, outfit.Bracelets.RowId, outfit.Ring.RowId }
                     : []);
             registrations.Register(() => { }, bankBridge.Dispose);
             bankOverlay = new BankImportOverlay(bank, bankBridge, localization);

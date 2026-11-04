@@ -23,6 +23,7 @@ internal sealed class TriadObservationReader : IDisposable
     // Capture lines only in developer mode (0.161): building them cost a 66 ms frame at the start of a match.
     private readonly Func<bool> capture;
     private Dictionary<string, uint>? ruleIds;
+    private string? loggedRequestRules;
     private uint deckNpc;
     private string deckNpcName = string.Empty;
     private uint[] deckFixed = [], deckVariable = [];
@@ -156,21 +157,36 @@ internal sealed class TriadObservationReader : IDisposable
     private unsafe TriadMatchContext Context(AddonTripleTriad* addon, byte phase)
     {
         var unit = &addon->AtkUnitBase;
-        if (data is not null) ruleIds ??= data.GetExcelSheet<TripleTriadRule>().Where(rule => rule.RowId != 0)
-            .Select(rule => (rule.RowId, Name: rule.Name.ExtractText())).Where(rule => rule.Name.Length > 0)
-            .GroupBy(rule => rule.Name).ToDictionary(group => group.Key, group => group.First().RowId);
+        LoadRuleIds();
         var rules = new List<uint>();
-        for (var index = 5; index <= 9 && index < unit->AtkValuesCount && unit->AtkValues != null; index++)
+        // 0.491 (R-14): a value missing, of another type, or a name the sheet does not know: the rules are unknown, the advice is not computed without them.
+        var known = ruleIds is { Count: > 0 } && unit->AtkValues != null && unit->AtkValuesCount > 9;
+        for (var index = 5; index <= 9 && known; index++)
         {
             var value = unit->AtkValues[index];
-            if (value.Type is AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString
-                && ruleIds?.TryGetValue(Bounded(value.String).Trim('"'), out var rule) == true && !rules.Contains(rule)) rules.Add(rule);
+            if (value.Type is not (AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString)) { known = false; break; }
+            var name = Bounded(value.String).Trim('"');
+            if (name.Length == 0) continue;
+            if (!ruleIds!.TryGetValue(name, out var rule)) known = false;
+            else if (!rules.Contains(rule)) rules.Add(rule);
         }
         int? forced = null;
         if (phase == 2 && unit->AtkValuesCount > 25 && unit->AtkValues != null && unit->AtkValues[25].Type == AtkValueType.Int) forced = unit->AtkValues[25].Int;
         var target = targetBaseId();
         if (deckNpc == 0 && target != 0) LoadDeck(target);
-        return new(rules, forced, deckNpc, deckFixed, deckVariable, Rects(addon->BlueDeck, unit->Scale), Rects(addon->Board, unit->Scale));
+        return new(rules, forced, deckNpc, deckFixed, deckVariable, Rects(addon->BlueDeck, unit->Scale), Rects(addon->Board, unit->Scale), known);
+    }
+    // 0.491 (R-14): the rule names in their own guard: an unreadable sheet costs the rules, not the whole observation. Tried once.
+    private void LoadRuleIds()
+    {
+        if (data is null || ruleIds is not null) return;
+        try
+        {
+            ruleIds = data.GetExcelSheet<TripleTriadRule>().Where(rule => rule.RowId != 0)
+                .Select(rule => (rule.RowId, Name: rule.Name.ExtractText())).Where(rule => rule.Name.Length > 0)
+                .GroupBy(rule => rule.Name).ToDictionary(group => group.Key, group => group.First().RowId);
+        }
+        catch (Exception error) { ruleIds = []; log.Warning(error, "Triple Triad rule names unavailable."); }
     }
     // Challenge window: rules (values 102–105, TripleTriadRule ids 1–15), NPC deck, window rectangle and the player's saved decks.
     private unsafe void ReadRequest(int ticket, ulong character)
@@ -194,13 +210,25 @@ internal sealed class TriadObservationReader : IDisposable
         // The challenge window can stay open under the deck choice (0.166): read the deck rows in both cases.
         ReadSelDeck(ticket, character);
         var unit = (AtkUnitBase*)handle.Address;
+        LoadRuleIds();
         var rules = new List<uint>();
-        for (var index = 102; index <= 105 && index < unit->AtkValuesCount && unit->AtkValues != null; index++)
-            if (unit->AtkValues[index].Type == AtkValueType.Int && unit->AtkValues[index].Int is >= 1 and <= 15 && !rules.Contains((uint)unit->AtkValues[index].Int))
-                rules.Add((uint)unit->AtkValues[index].Int);
-        if (data is not null) ruleIds ??= data.GetExcelSheet<TripleTriadRule>().Where(rule => rule.RowId != 0)
-            .Select(rule => (rule.RowId, Name: rule.Name.ExtractText())).Where(rule => rule.Name.Length > 0)
-            .GroupBy(rule => rule.Name).ToDictionary(group => group.Key, group => group.First().RowId);
+        // 0.491 (R-14): the sheet gives the valid ids. Window too short, sheet unread, or an id the sheet does not have: the rules are unknown, not « none ».
+        var rulesKnown = ruleIds is { Count: > 0 } && unit->AtkValues != null && unit->AtkValuesCount > 105;
+        var rawRules = "unavailable";
+        if (unit->AtkValues != null && unit->AtkValuesCount > 105)
+        {
+            var raw = new List<string>();
+            for (var index = 102; index <= 105; index++)
+            {
+                var value = unit->AtkValues[index];
+                raw.Add(value.Type == AtkValueType.Int ? $"{index}={value.Int}" : $"{index}:{value.Type}");
+                if (value.Type != AtkValueType.Int || value.Int <= 0) continue;
+                if (ruleIds?.ContainsValue((uint)value.Int) != true) rulesKnown = false;
+                else if (!rules.Contains((uint)value.Int)) rules.Add((uint)value.Int);
+            }
+            rawRules = string.Join(' ', raw);
+        }
+        if (rawRules != loggedRequestRules) { loggedRequestRules = rawRules; log.Information("Triad request rule values: {0} (known: {1}).", rawRules, rulesKnown); }
         var target = targetBaseId();
         if (target != 0 && target != deckNpc) LoadDeck(target);
         var root = unit->RootNode;
@@ -216,12 +244,12 @@ internal sealed class TriadObservationReader : IDisposable
                 if (cards.Any(card => card != 0)) decks.Add(new(index, deck.NameString, Array.AsReadOnly(cards)));
             }
         var previous = service.Request;
-        if (previous is not null && previous.NpcId == deckNpc && previous.RuleIds.SequenceEqual(rules) && previous.Window == window
+        if (previous is not null && previous.NpcId == deckNpc && previous.RuleIds.SequenceEqual(rules) && previous.RulesKnown == rulesKnown && previous.Window == window
             && previous.Decks.Count == decks.Count && previous.Decks.Zip(decks).All(pair => pair.First.Name == pair.Second.Name && pair.First.Cards.SequenceEqual(pair.Second.Cards)))
             return;
         var names = rules.Select(rule => ruleIds?.FirstOrDefault(pair => pair.Value == rule).Key ?? rule.ToString()).ToArray();
         service.PublishRequest(ticket, character, new(deckNpc, rules.AsReadOnly(), deckFixed, deckVariable, window, decks.AsReadOnly(), DateTimeOffset.UtcNow,
-            deckNpcName, Array.AsReadOnly(names)));
+            deckNpcName, Array.AsReadOnly(names), rulesKnown));
     }
     private unsafe void ReadEditDeck(int ticket, ulong character)
     {

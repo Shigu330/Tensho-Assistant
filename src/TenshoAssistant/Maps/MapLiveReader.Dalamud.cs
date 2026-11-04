@@ -71,12 +71,11 @@ internal sealed class MapLiveReader : IDisposable
     {
         this.framework=framework;this.client=client;this.objects=objects;this.log=log;this.condition=condition;this.fateTable=fateTable;this.party=party;Log=log;
         uint[] currentIds=[],vistaIds=[];
-        try
-        {
-            currentIds=data.GetExcelSheet<AetherCurrent>().Select(row=>row.RowId).ToArray();
-            vistaIds=data.GetExcelSheet<Adventure>().Select(row=>row.RowId).ToArray();
-        }
-        catch(Exception error){log.Warning(error,"Aether current or sightseeing rows unavailable.");}
+        // 0.491 (R-14): one guard per sheet, so that one sheet does not cost the other.
+        try{currentIds=data.GetExcelSheet<AetherCurrent>().Select(row=>row.RowId).ToArray();}
+        catch(Exception error){log.Warning(error,"Aether current rows unavailable.");}
+        try{vistaIds=data.GetExcelSheet<Adventure>().Select(row=>row.RowId).ToArray();}
+        catch(Exception error){log.Warning(error,"Sightseeing rows unavailable.");}
         allCurrents=currentIds;adventureRows=vistaIds;
         try
         {
@@ -165,20 +164,23 @@ internal sealed class MapLiveReader : IDisposable
     }
     // Unlocked aether currents and discovered vistas, copied as sets. Sightseeing index = Adventure row − first row
     // (rows are contiguous from 0x210000 in the probe); to confirm in game against the sightseeing log.
-    private unsafe (IReadOnlySet<uint>,IReadOnlySet<uint>) ReadCollected()
+    // 0.491 (R-14): null = unknown ([?] on the map): no player state, a sheet not read, or more vistas than the game's bit array. Never an empty set, which reads as « nothing collected ».
+    private unsafe (IReadOnlySet<uint>?,IReadOnlySet<uint>?) ReadCollected()
     {
         var player=PlayerState.Instance();
-        if(player==null)return (new HashSet<uint>(),new HashSet<uint>());
-        var unlocked=new HashSet<uint>();foreach(var id in allCurrents)if(player->IsAetherCurrentUnlocked(id))unlocked.Add(id);
+        if(player==null)return (null,null);
+        HashSet<uint>? unlocked=null;
+        if(allCurrents.Length>0){unlocked=[];foreach(var id in allCurrents)if(player->IsAetherCurrentUnlocked(id))unlocked.Add(id);}
         // Discovered vistas: the raw bit array (bit i = Adventure row i, ClientStructs: bitCount = Adventure row count) is used;
         // the native IsAdventureComplete is only compared and logged (0.128: the user saw completed vistas not hidden).
         var seen=new HashSet<uint>();var native=0;
         // ClientStructs: 0 = log not unlocked, 1 = ARR part 1, 2 = ARR part 2; Ex: 3 = « Sights of the North » done.
         logUnlock=player->SightseeingLogUnlockState;logUnlockEx=player->SightseeingLogUnlockStateEx;
         var bits=player->CompletedAdventures;
+        if(adventureRows.Length==0 || adventureRows.Length>bits.Length*8)return (unlocked,null);
         for(var index=0;index<adventureRows.Length;index++)
         {
-            if(index>>3<bits.Length && (bits[index>>3]>>(index&7)&1)!=0)seen.Add(adventureRows[index]);
+            if((bits[index>>3]>>(index&7)&1)!=0)seen.Add(adventureRows[index]);
             if(player->IsAdventureComplete((uint)index))native++;
         }
         if(seen.Count!=loggedVistas || native!=loggedNative)

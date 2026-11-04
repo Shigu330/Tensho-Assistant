@@ -1,6 +1,6 @@
 namespace TenshoAssistant.MiniGames;
 
-public enum TriadAdviceProblem { None, NotYourTurn, NoContext, UnknownCard, NpcDeckUnknown, DeckMismatch, Unsolvable }
+public enum TriadAdviceProblem { None, NotYourTurn, NoContext, UnknownCard, NpcDeckUnknown, DeckMismatch, Unsolvable, RulesUnknown }
 /// <summary>A move for the player: hand slot (0–4, as in the game window) and board square (0–8, row by row).</summary>
 public readonly record struct TriadAdviceMove(int HandSlot, int Square, double AverageDifference);
 public sealed record TriadAdvice(IReadOnlyList<TriadAdviceMove> Best, IReadOnlyList<TriadAdviceMove> All, int Hands, bool Exact, TriadAdviceProblem Problem)
@@ -37,6 +37,9 @@ public static class TriadMatchAdvisor
         ArgumentNullException.ThrowIfNull(frame); ArgumentNullException.ThrowIfNull(card);
         if (!frame.BlueToMove) return TriadAdvice.Failed(TriadAdviceProblem.NotYourTurn);
         if (frame.Context is not { } context) return TriadAdvice.Failed(TriadAdviceProblem.NoContext);
+        // 0.491 (R-14): rules not read, or a masked move without its imposed card: no advice rather than a move for another match.
+        if (!context.RulesKnown) return TriadAdvice.Failed(TriadAdviceProblem.RulesUnknown);
+        if (frame.NativePhase == 2 && context.ForcedSlot is null) return TriadAdvice.Failed(TriadAdviceProblem.UnknownCard);
         var blueHand = new List<(int Slot, TriadCardDefinition Card)>();
         for (var slot = 0; slot < 5; slot++)
         {

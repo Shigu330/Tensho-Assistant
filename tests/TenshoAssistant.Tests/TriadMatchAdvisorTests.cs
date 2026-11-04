@@ -43,6 +43,28 @@ internal static class TriadMatchAdvisorTests
             var free = TriadMatchAdvisor.Advise(Frame(1,Context(null)),Find,new TriadSolveOptions(Milliseconds:5000));
             Check(free.Problem == TriadAdviceProblem.None && free.All.Select(move => move.HandSlot).Distinct().Count() == 3,"free move: the three cards in hand are ranked");
         }),
+        ("Triad advice: rules not read, or a masked move without its card, give no advice (R-14)",()=>
+        {
+            Check(TriadMatchAdvisor.Advise(Frame(1,Context(null) with {RulesKnown=false}),Find).Problem == TriadAdviceProblem.RulesUnknown,"rules not read");
+            Check(TriadMatchAdvisor.Advise(Frame(2,Context(null)),Find).Problem == TriadAdviceProblem.UnknownCard,"masked move, imposed card not read");
+            Check(new TriadRequestInfo(1,[],[],[],default,[],DateTimeOffset.UtcNow).RulesKnown,"known unless said otherwise");
+            var root=Path.GetFullPath("src/TenshoAssistant");
+            var reader=File.ReadAllText(Path.Combine(root,"MiniGames/TriadObservationReader.Dalamud.cs"));
+            Check(reader.Contains("Triad request rule values") && reader.Contains("ContainsValue((uint)value.Int)") && !reader.Contains("is >= 1 and <= 15"),"ids from the sheet, values logged for the evidence");
+            Check(reader.Contains("catch (Exception error) { ruleIds = [];"),"an unreadable sheet does not cost the observation");
+            var panel=File.ReadAllText(Path.Combine(root,"MainWindow.TriadRequest.cs"));
+            Check(panel.Contains("if(request.RulesKnown)") && panel.Contains("TriadRequest.RulesUnknown"),"no odds, and it says so");
+        }),
+        ("Map and dresser readers: what is not read stays unknown (R-14)",()=>
+        {
+            var root=Path.GetFullPath("src/TenshoAssistant");
+            var map=File.ReadAllText(Path.Combine(root,"Maps/MapLiveReader.Dalamud.cs"));
+            Check(map.Contains("if(player==null)return (null,null);") && map.Contains("adventureRows.Length>bits.Length*8)return (unlocked,null);") && map.Contains("\"Sightseeing rows unavailable.\""),"unknown collected sets");
+            var bank=File.ReadAllText(Path.Combine(root,"Inventory/BankInventoryBridge.Dalamud.cs"));
+            Check(bank.Contains("mirage->IsSetSlotUnlocked(index, column)") && bank.Contains("held.Any(value => value) ? held : null") && bank.Contains("Dresser outfit {0}: slots held {1}."),"outfit pieces by slot, nothing held = as before, logged");
+            var plugin=File.ReadAllText(Path.Combine(root,"Plugin.cs"));
+            Check(plugin.Contains("outfit.Ring.RowId }") && !plugin.Contains("outfit.Ring.RowId }.Where"),"columns kept in order");
+        }),
         ("Triad frame keeps match context copies and drops incomplete rectangles",()=>
         {
             var rules = new List<uint>{4};

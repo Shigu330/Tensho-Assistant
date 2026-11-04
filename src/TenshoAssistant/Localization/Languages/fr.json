@@ -2016,6 +2016,7 @@
     "DeleteTip": "Supprime ce deck tout de suite, sans confirmation."
   },
   "TriadRequest": {
+    "RulesUnknown": "Les règles n'ont pas pu être lues : pas d'estimation pour ce match.",
     "RowOdds": "{0} % victoire · {1} % nul",
     "Title": "Tensho — Triple Triade",
     "UnknownNpc": "PNJ inconnu (ciblez le PNJ)",
@@ -2041,6 +2042,7 @@
     "FewOwned": "Moins de 5 cartes possédées confirmées : pas de deck à générer."
   },
   "TriadAdvice": {
+    "RulesUnknown": "Les règles du match n'ont pas pu être lues : pas de conseil pour ce coup.",
     "NoMatch": "Aucun match observé en ce moment.",
     "Calculating": "Calcul du conseil…",
     "Waiting": "Conseil à votre tour.",
