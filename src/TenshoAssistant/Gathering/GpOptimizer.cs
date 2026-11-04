@@ -41,7 +41,8 @@ public static class GpOptimizer
         var gift1=available.FirstOrDefault(action=>action.Spec.Effect==GpEffect.BoonChance1 && input.BoonPercent>0 && !active.Gift1);
         var gift2=available.FirstOrDefault(action=>action.Spec.Effect==GpEffect.BoonChance2 && input.BoonPercent>0 && !active.Gift2);
         var tidings=available.FirstOrDefault(action=>action.Spec.Effect==GpEffect.BoonYield && !active.Tidings);
-        var bountiful=available.FirstOrDefault(action=>action.Spec.Effect==(input.Level>=68 ? GpEffect.Bountiful2 : GpEffect.Bountiful1));
+        // 0.517: II comes with a quest: without it, the first one is still there.
+        var bountiful=(input.Level>=68 ? available.FirstOrDefault(action=>action.Spec.Effect==GpEffect.Bountiful2):null) ?? available.FirstOrDefault(action=>action.Spec.Effect==GpEffect.Bountiful1);
         var restore=input.MoreActions ? available.FirstOrDefault(action=>action.Spec.Effect==GpEffect.Attempt):null;
         var clear=input.MoreActions && input.SuccessPercent>0 ? available.FirstOrDefault(action=>action.Spec.Effect==GpEffect.NextSuccess):null;
         var eureka=input.Level>=GpScenario.EurekaLevel ? GpScenario.EurekaChance:0m;

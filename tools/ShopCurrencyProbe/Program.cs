@@ -5,6 +5,36 @@ using Lumina.Excel.Sheets;
 // Read-only evidence for NPC-VENDORS-014: how scrip exchanges encode currencies and how NPCs reach their shops.
 if(args.Length is <1 or >2)throw new ArgumentException("Supply installed sqpack directory and optionally an item name.");
 using var data=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.French,CacheFileResources=false});
+// PROBE_GPACTIONS (0.517): the gathering actions' UnlockLink, ClassJobLevel and IsRoleAction, to know what « unlocked » can mean for them.
+if(Environment.GetEnvironmentVariable("PROBE_GPACTIONS") is { Length:>0 })
+{
+    var gaSheet=data.GetExcelSheet<Lumina.Excel.Sheets.Action>()!;
+    foreach(var id in new uint[]{235,237,295,239,241,21177,25589,21203,4073,272,232,4072,218,220,294,222,224,21178,25590,21204,4087,273,215,4086})
+    {
+        var row=gaSheet.GetRow(id);
+        Console.WriteLine($"action {id}: {row.Name.ExtractText()} level {row.ClassJobLevel} unlock {row.UnlockLink.RowId} job {row.ClassJob.RowId} category {row.ClassJobCategory.RowId}");
+    }
+    return;
+}
+
+// PROBE_FOLKLORE (0.517): what a gathering point needs: GatheringSubCategory (tome, quest, division) and the points that use it.
+if(Environment.GetEnvironmentVariable("PROBE_FOLKLORE") is { Length:>0 })
+{
+    var fkPoints=data.GetExcelSheet<Lumina.Excel.Sheets.GatheringPoint>()!;
+    var fkUse=fkPoints.GroupBy(point=>point.GatheringSubCategory.RowId).ToDictionary(group=>group.Key,group=>group.Count());
+    foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.GatheringSubCategory>()!)
+    {
+        var book=row.FolkloreBook.ExtractText();
+        if(row.RowId==0 && book.Length==0)continue;
+        Console.WriteLine($"sub {row.RowId}: division {row.Division}, item {row.Item.RowId} {row.Item.ValueNullable?.Name.ExtractText()}, quest {row.Quest.RowId}, job {row.ClassJob.RowId}, book « {book} », points {fkUse.GetValueOrDefault(row.RowId)}");
+    }
+    Console.WriteLine($"points without sub: {fkUse.GetValueOrDefault(0u)} of {fkPoints.Count}");
+    var fkPlace=Environment.GetEnvironmentVariable("PROBE_FOLKLORE")!;
+    foreach(var point in fkPoints.Where(point=>point.PlaceName.ValueNullable?.Name.ExtractText().Contains(fkPlace,StringComparison.OrdinalIgnoreCase)==true))
+        Console.WriteLine($"point {point.RowId}: base {point.GatheringPointBase.RowId}, level {point.GatheringPointBase.Value.GatheringLevel}, type {point.Type}, sub {point.GatheringSubCategory.RowId}, place {point.PlaceName.Value.Name.ExtractText()}");
+    return;
+}
+
 // PROBE_GATHERBONUS (0.515): node effects: GatheringCondition and GatheringPointBonusType in English and French, how often each pair is used, and the bonus rows of the normal manganese nodes.
 if(Environment.GetEnvironmentVariable("PROBE_GATHERBONUS") is { Length:>0 })
 {

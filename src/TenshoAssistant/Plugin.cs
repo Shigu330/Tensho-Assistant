@@ -901,11 +901,13 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.CollectableActionInfo=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row ? (row.Name.ExtractText(),(uint)row.Icon,(int)row.PrimaryCostValue):null;
             // 0.480: status 757, Scrutiny (Status sheet, docs/evidence/0.479-collectable-window-values.md).
             mainWindow.CollectableActionStatus=id=>Gathering.CollectableActionState.Status(id);
-            mainWindow.GpActionUnlocked=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row && unlocks.IsActionUnlocked(row);
+            // 0.517 (user report): IsActionUnlocked is false for a row without an unlock link, and 22 of the 24 gathering actions have none: they come with the level, which the plan checks (docs/evidence/0.517-gp-action-unlocks.md).
+            mainWindow.GpActionUnlocked=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row && (row.UnlockLink.RowId==0 || unlocks.IsActionUnlocked(row));
             mainWindow.GpTraitsUnlocked=job=>
             {
                 var sheet=data.GetExcelSheet<Lumina.Excel.Sheets.Trait>();
-                return Gathering.GpRegen.Bonus(Gathering.GpRegen.Traits(job).Where(id=>sheet.GetRowOrDefault(id) is { } row && unlocks.IsTraitUnlocked(row)),job);
+                // 0.517: the same for a trait without a quest: it comes with the level.
+                return Gathering.GpRegen.Bonus(Gathering.GpRegen.Traits(job).Where(id=>sheet.GetRowOrDefault(id) is { } row && (row.Quest.RowId==0 ? player.GetClassJobLevel(row.ClassJob.Value)>=row.Level:unlocks.IsTraitUnlocked(row))),job);
             };
             mainWindow.ScrutinyActive=()=>objects.LocalPlayer is { } local && local.StatusList.Any(status=>status.StatusId==757);
             registrations.Register(()=>cactpotReader=new MiniCactpotObservationReader(cactpotObservation,framework,player,client,gameGui,log),()=>cactpotReader?.Dispose());

@@ -8,6 +8,25 @@ internal static class GatherNodeEffects515Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Unlocks (0.517): a gathering action or trait without an unlock link comes with the level; Dalamud answers false for those",() =>
+        {
+            var plugin=Read("Plugin.cs");
+            Check(plugin.Contains("(row.UnlockLink.RowId==0 || unlocks.IsActionUnlocked(row))"),"actions: 22 of 24 have no link");
+            Check(plugin.Contains("(row.Quest.RowId==0 ? player.GetClassJobLevel(row.ClassJob.Value)>=row.Level:unlocks.IsTraitUnlocked(row))"),"traits");
+            Check(!plugin.Contains("is { } row && unlocks.IsActionUnlocked(row);"),"the old form is gone");
+        }),
+        ("GP plan (0.517): the node of the report gets a paid plan; without Bountiful Yield II the first one is used",() =>
+        {
+            var catalog=new GpActionCatalog(GpActionCatalog.Specs.Select(spec=>new GpAction(spec,"A"+spec.Id,1,"D")),"test");
+            var node=new GpScenario(16,85,809,4,1,54,1,1,MoreActions:true);
+            var plan=GpOptimizer.Solve(node,catalog);
+            Check(plan.Best.Cost is >0 and <=809 && plan.Best.ExpectedYield>plan.Baseline,$"809 GP, 54 %: {plan.Best.ExpectedYield} for {plan.Best.Cost}, without GP {plan.Baseline}");
+            var noSecond=GpOptimizer.Solve(node with {Forbidden=GpActionRules.Key(GpActionCatalog.Specs.Single(spec=>spec.Id==272))},catalog);
+            var onlyBounty=GpActionRules.Joined(GpActionCatalog.Specs.Where(spec=>spec.JobId==16 && spec.Effect!=GpEffect.Bountiful1).Select(GpActionRules.Key));
+            var first=GpOptimizer.Solve(node with {Forbidden=onlyBounty},catalog);
+            Check(first.Best.Actions.Single().Action.Spec.Id==4073 && first.Best.Actions.Single().Count==4,"Bountiful Yield, every attempt");
+            Check(noSecond.Best.ExpectedYield>noSecond.Baseline,"still a plan");
+        }),
         ("Node effects: every row with words is kept, worded by the game; the plan knows the four it can estimate",() =>
         {
             var attempts=GatherNodeEffects.From(19,770,"Max GP ≥ ",18,1," Gathering Attempts/Integrity +")!;
@@ -43,6 +62,7 @@ internal static class GatherNodeEffects515Tests
             GatheringRawSlot[] Slots(string boon)=>Enumerable.Range(0,8).Select(index=>new GatheringRawSlot(index,index==0 ? 5u:0u,0,index==0,"100 %",boon,"1",index==0 ? 5u:0u,index==0)).ToArray();
             var frame=new GatheringObservedFrame(16,85,809,809,1,"5","5",Slots("-%"),33926);
             Check(frame.Slots[0].BoonPercent==0 && frame.NodeId==33926 && frame.Attempts==5,"read");
+            Check(new GatheringObservedFrame(16,85,809,809,1,"5","5",Slots("-")).Slots[0].BoonPercent==0 && new GatheringObservedFrame(16,85,809,809,1,"5","5",Slots("- %")).Slots[0].BoonPercent==0,"with or without its percent sign");
             Check(new GatheringObservedFrame(16,85,809,809,1,"5","5",Slots("?")).Slots[0].BoonPercent is null,"anything else stays unknown");
             Check(new GatheringObservedFrame(16,85,809,809,1,"5","5",Slots("4 %")).Slots[0].BoonPercent==4,"a number");
         }),

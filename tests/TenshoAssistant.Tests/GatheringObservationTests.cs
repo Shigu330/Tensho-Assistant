@@ -18,7 +18,7 @@ internal static class GatheringObservationTests
         }),
         ("Gathering observation preserves UI order identity and only visible rows",()=>
         {
-            var source=Slots();source[1]=source[1] with {Success="bad",Boon="-",Quantity="",Flags=123};
+            var source=Slots();source[1]=source[1] with {Success="bad",Boon="bad",Quantity="",Flags=123};
             var frame=new GatheringObservedFrame(16,100,0,900,1,"4","6",source);source[0]=source[0] with {ItemId=99,BaseItemId=99};
             Check(frame.Slots.Count==2 && frame.Slots[0].ItemId==10 && frame.Slots[1].Index==1 && frame.Slots[1].Flags==123,"row order and copied data");
             Check(frame.Slots[0].SuccessPercent==75 && frame.Slots[0].BoonPercent==0 && frame.Slots[0].DisplayedQuantity==3,"displayed values only");

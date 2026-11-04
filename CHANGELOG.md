@@ -3,6 +3,16 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.517.0
+- Rapport de l'utilisateur en jeu (capture, « plan toujours pas fonctionnel ») : 809 PR, 54 %, aucune action proposée. Vraie cause, que 0.515 ne corrigeait pas : le filtre des actions non apprises (0.488) demandait à Dalamud si l'action était débloquée, et Dalamud répond non quand elle n'a pas de lien de déblocage, soit 22 actions sur 24 ([preuve](docs/evidence/0.517-gp-action-unlocks.md)). Elles comptent maintenant comme acquises au niveau.
+- Même défaut pour les traits de regain de PR sans quête : ils comptent au niveau du métier.
+- Sans Extraction abondante II (quête), le plan prend la première, qui existe toujours.
+- Cristaux : le « ? » restait ; le jeu donne un tiret sans le signe %, il se lit maintenant « 0 % ».
+- Tests : GatherNodeEffects515Tests complété, dont le cas de la capture. Verify.ps1 (agent) : 984/984, 0 avertissement, 0 erreur ; DLL 0.517.0.0. Non validé en jeu.
+### English
+- The GP plan proposed nothing since 0.488: Dalamud answers « not unlocked » for an action without an unlock link, and 22 of the 24 gathering actions have none. They now count as learned at their level, and GP regeneration traits without a quest likewise.
+- Without Bountiful Yield II the plan uses the first one. A crystal's dash now reads as no extra chance.
+
 ## 0.516.0
 - Décision de l'utilisateur (issue #38, règle Dalamud : « si ça ressemble à une fenêtre, utiliser l'API de fenêtres ») : les panneaux accrochés à une fenêtre du jeu passent aussi par le système de fenêtres de Dalamud : import de banque, Personnage, collectionnable, carnet d'artisanat, projection, outil de mission, Revue de mode, pêche, récolte, bouton de tri, survol d'objet, pêche en mer, ventes des servants, harpon, demande de Triple Triade.
 - Comment : un hôte commun (`AttachedPanels`). Chaque panneau décide encore à chaque image s'il s'affiche, puis demande sa fenêtre ; leur contenu ne change pas, mêmes identifiants. Dans `Plugin.Draw`, les panneaux passent maintenant avant `windows.Draw()`. Échap ne les ferme pas, ils ne s'épinglent pas, et une erreur ne coupe que le panneau concerné. Seule exception : les zones de clic invisibles de la Revue de mode, qui ne ressemblent pas à une fenêtre.

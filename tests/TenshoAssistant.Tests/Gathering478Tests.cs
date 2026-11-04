@@ -309,7 +309,7 @@ internal static class Gathering478Tests
             Check(Node(1000,locked).Frontier.All(plan=>plan.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Attempt)),"an action not learned leaves the GP plan");
             var list=Read("MainWindow.GatheringPlanSettings.cs");
             Check(list.Contains("!unlocked(spec.Id)") && Read("MainWindow.GatheringPanel.cs").Contains("Forbidden:GpForbiddenFor(start.JobId)") && Read("MainWindow.GatheringGp.cs").Contains("GpForbiddenFor(gpJob)") && Read("MainWindow.CollectablePanel.cs").Contains("GpForbiddenFor(job)"),"used by the panel, the GP page and the collectable plan");
-            Check(Read("Plugin.cs").Contains("unlocks.IsActionUnlocked(row);"),"the game's unlock state");
+            Check(Read("Plugin.cs").Contains("(row.UnlockLink.RowId==0 || unlocks.IsActionUnlocked(row))"),"the game's unlock state");
         }),
         ("Map right-click menu: a Favorites tab first, to go to a favorite or remove it",() =>
         {

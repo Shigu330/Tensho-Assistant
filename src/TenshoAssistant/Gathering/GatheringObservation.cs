@@ -27,8 +27,8 @@ public sealed class GatheringObservedFrame
             || !int.TryParse(value,NumberStyles.None,CultureInfo.InvariantCulture,out var number) || number<minimum || number>maximum)return null;
         return number;
     }
-    // 0.515: the game writes « -% » where a slot has no extra chance at all (crystals): none, not unknown.
-    internal static int? BoonNumber(string? text)=>text?.Replace(" ","")=="-%" ? 0:Number(text,0,100,true);
+    // 0.515, 0.517: the game shows a dash where a slot has no extra chance at all (crystals): none, not unknown.
+    internal static int? BoonNumber(string? text)=>text?.Replace(" ","").TrimEnd('%') is "-" or "–" or "—" or "－" ? 0:Number(text,0,100,true);
     public GatheringObservedFrame(uint job,int level,uint gp,uint maxGp,byte status,string? attempts,string? total,IReadOnlyList<GatheringRawSlot> slots,uint nodeId=0)
     {
         ArgumentNullException.ThrowIfNull(slots);
