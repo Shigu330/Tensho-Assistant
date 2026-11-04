@@ -179,13 +179,17 @@ internal sealed partial class MainWindow
 
     /// <summary>0.519: an action's name, icon and description from the game.</summary>
     internal Func<uint,(string Name,uint Icon,string Description)?>? GatheringActionRow { get; set; }
+    /// <summary>0.522: the seconds left on an action's recast; null: unknown.</summary>
+    internal Func<uint,float?>? GatheringRecastLeft { get; set; }
     private void DrawGatheringCrystalPlan(GatheringObservedSlot slot,GatheringNodeStart start,ItemCatalog items)
     {
         ImGui.TextColored(Accent,localization.Format("GatheringPanel.PlanFor",items.Find(slot.ItemId)?.Name ?? slot.ItemId.ToString()));
         var need=GatherListNeed(slot.ItemId);
         if(need>0)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
-        var actions=GpCrystals.For(start.JobId,start.Level,(int)start.Gp);
-        if(actions.Count==0){ImGui.TextDisabled(localization.Get("GatheringPanel.CrystalNone"));return;}
+        // 0.522 (user report): an action still recasting is not advised, and its GP stays for the other; it says when it comes back.
+        var cooling=GpCrystals.WithRecast(start.JobId).Select(id=>(Id:id,Left:GatheringRecastLeft?.Invoke(id))).Where(row=>row.Left>0).ToArray();
+        var actions=GpCrystals.For(start.JobId,start.Level,(int)start.Gp,cooling.Select(row=>row.Id).ToArray());
+        if(actions.Count==0 && cooling.Length==0){ImGui.TextDisabled(localization.Get("GatheringPanel.CrystalNone"));return;}
         foreach(var action in actions)
         {
             if(GatheringActionRow?.Invoke(action.Id) is not { } row)continue;
@@ -193,6 +197,13 @@ internal sealed partial class MainWindow
             ImGui.TextUnformatted($"{row.Name} · {action.Cost} {localization.Get("GatheringPanel.CrystalGp")}");
             if(ImGui.IsItemHovered())WrappedTooltip(row.Description);
         }
+        foreach(var (id,left) in cooling)
+            if(GatheringActionRow?.Invoke(id) is { } row)
+            {
+                DrawItemIcon(new ItemDefinition(0,row.Name,false,row.Icon),new Vector2(22));ImGui.SameLine();
+                ImGui.TextDisabled(localization.Format("GatheringPanel.CrystalWait",row.Name,Math.Ceiling(left ?? 0).ToString("0")));
+                if(ImGui.IsItemHovered())WrappedTooltip(row.Description);
+            }
         ImGui.TextDisabled(localization.Get("GatheringPanel.CrystalNote"));
     }
 

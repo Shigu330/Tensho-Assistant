@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.522.0
+- Rapport de l'utilisateur en jeu (capture) : Bénédiction de la nature restait proposée pendant son temps de recharge, 180 s d'après la feuille du jeu ([preuve](docs/evidence/0.519-crystal-actions.md)). Elle n'est plus conseillée tant qu'elle recharge, ses PR restent pour Bénédiction des Douze, et une ligne dit dans combien de secondes elle revient. Temps lu dans le jeu ; s'il ne peut pas être lu, rien ne change.
+- Parmi les actions à PR de récolte, c'est la seule à avoir un temps de recharge : le plan des autres objets n'est pas touché.
+- Tests : GpCrystals519Tests complété. Verify.ps1 (agent) : 990/990, 0 avertissement, 0 erreur ; DLL 0.522.0.0. Non validé en jeu.
+### English
+- Nature's Bounty is no longer advised during its 180 s recast: its GP stays for The Twelve's Bounty, and a line says when it is back.
+
 ## 0.521.0
 - Rapport de l'utilisateur en jeu : Bénédiction des Douze change aussi la quantité sur les cristaux, comme Bénédiction de la nature, alors que le texte du jeu ne parle que des éclats. Le panneau propose les deux sur les éclats, les cristaux et les agrégats, selon le niveau et les PR.
 - Tests : GpCrystals519Tests adapté. Verify.ps1 (agent) : 989/989, 0 avertissement, 0 erreur ; DLL 0.521.0.0. Non validé en jeu.

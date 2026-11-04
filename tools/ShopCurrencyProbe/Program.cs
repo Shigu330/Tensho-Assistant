@@ -18,7 +18,7 @@ if(Environment.GetEnvironmentVariable("PROBE_GPACTIONS") is { Length:>0 })
     foreach(var row in gaSheet.Where(row=>row.ClassJob.RowId is 16 or 17 && row.ClassJobLevel>0 && !row.Name.IsEmpty).OrderBy(row=>row.ClassJob.RowId).ThenBy(row=>row.ClassJobLevel))
     {
         var text=data.GetExcelSheet<Lumina.Excel.Sheets.ActionTransient>()!.GetRowOrDefault(row.RowId)?.Description.ExtractText().Replace("\n"," ") ?? "";
-        Console.WriteLine($"all {row.RowId}: job {row.ClassJob.RowId} lv {row.ClassJobLevel} cost {row.PrimaryCostValue} type {row.PrimaryCostType} unlock {row.UnlockLink.RowId} {row.Name.ExtractText()} :: {text}");
+        Console.WriteLine($"all {row.RowId}: job {row.ClassJob.RowId} lv {row.ClassJobLevel} cost {row.PrimaryCostValue} type {row.PrimaryCostType} unlock {row.UnlockLink.RowId} recast {row.Recast100ms} group {row.CooldownGroup} {row.Name.ExtractText()} :: {text}");
     }
     var gaItems=data.GetExcelSheet<Lumina.Excel.Sheets.Item>()!;
     foreach(var id in Enumerable.Range(1,20).Select(id=>(uint)id).Append(5111u))

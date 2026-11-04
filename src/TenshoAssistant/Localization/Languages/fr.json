@@ -970,6 +970,7 @@
     "Slot10": "Bague gauche"
   },
   "GatheringPanel": {
+    "CrystalWait": "{0} : prête dans {1} s.",
     "CrystalGp": "PR",
     "CrystalNone": "Aucune action pour cet objet avec ces PR.",
     "CrystalNote": "Actions propres aux éclats, cristaux et agrégats. Leur gain est aléatoire : le jeu ne donne pas de chiffre, aucun calcul ici.",

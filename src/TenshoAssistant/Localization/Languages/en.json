@@ -970,6 +970,7 @@
     "Slot10": "Left ring"
   },
   "GatheringPanel": {
+    "CrystalWait": "{0}: ready in {1} s.",
     "CrystalGp": "GP",
     "CrystalNone": "No action for this one with this GP.",
     "CrystalNote": "Actions made for shards, crystals and clusters. What they give is random: the game gives no figure, so none is computed.",

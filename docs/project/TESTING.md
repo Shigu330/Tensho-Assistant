@@ -711,6 +711,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.522 : temps de recharge de Bénédiction de la nature** — à voir en jouant
+
+- [ ] Juste après l'avoir lancée, le panneau de récolte sur un cristal dit « prête dans N s », et N suit le compteur de la barre du jeu. Bénédiction des Douze reste proposée.
+- [ ] Le temps écoulé, elle redevient proposée.
+
 **0.520 : tentative gratuite dans le plan des collectionnables** — à voir en jouant
 
 - [ ] Niveau 90 et plus, PR pour Sagesse du fermier ou Raison solide : la moyenne dépasse le pire cas, et la ligne « 50 % de chances d'une tentative gratuite » apparaît.
