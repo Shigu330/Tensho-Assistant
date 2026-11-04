@@ -610,6 +610,10 @@
     "Slot10": "Left ring"
   },
   "GatheringPanel": {
+    "NodeNormal": "Normal node: plain gathering, GP kept for a node with a major bonus.",
+    "NodeBonus": "Major bonus on this node: GP is spent here.",
+    "SaveForBonus": "Keep GP for nodes with a major bonus",
+    "SaveForBonusTip": "A normal node spends only the GP that would be lost at the maximum. A node with more attempts, a higher quantity or a much higher extra chance than the plainest seen for this item spends it all. The first node seen counts as normal. Unticked: GP is shared evenly across the nodes.",
     "CollectablePlan": "Collectable: no plan here. Its GP goes in the game's Collectable window, opened by gathering it.",
     "ListNeed": "Crafting list: {0} missing. About {1} nodes, {2} min, {3} GP spent.",
     "ListNeedTooMany": "Crafting list: {0} missing, out of reach in {1} nodes.",
@@ -5062,6 +5066,20 @@
     "IssuerId": "Issuer ID: {0}"
   },
   "CollectablePanel": {
+    "Impossible": "The low threshold can no longer be reached with the attempts left: this gather will earn nothing.",
+    "Current": "{0} / {1} · {2}",
+    "TierBelow": "below the thresholds",
+    "TierLow": "low",
+    "TierMid": "mid",
+    "TierHigh": "high",
+    "Next": "Next action",
+    "Range": "+{0} to {1}",
+    "Plan": "Plan: reach {0} with {1} more action(s), then collect {2} time(s): {3} scrips.",
+    "PlanItems": "Plan: reach {0} with {1} more action(s), then collect {2} time(s).",
+    "OutOfReach": "The low threshold is out of reach for sure with the attempts left: only a good roll can get there.",
+    "AdviceNote": "Estimate from the gains the game shows this turn, done again after each action. It does not count Scrutiny, Collector's Focus or Priming Touch. Nothing is executed.",
+    "NoAdvice": "No plan: attempts not read.",
+    "NoAdviceRule": "No plan: no turn-in threshold known for this item.",
     "Title": "Collectable",
     "Resources": "GP {0}/{1} · integrity {2}/{3}",
     "Loading": "Reading the collectability thresholds…",

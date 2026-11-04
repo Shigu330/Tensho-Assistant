@@ -610,6 +610,10 @@
     "Slot10": "Bague gauche"
   },
   "GatheringPanel": {
+    "NodeNormal": "Nœud normal : récolte simple, PR gardés pour un nœud à bonus majeur.",
+    "NodeBonus": "Bonus majeur sur ce nœud : les PR se dépensent ici.",
+    "SaveForBonus": "Garder les PR pour les nœuds à bonus majeur",
+    "SaveForBonusTip": "Un nœud normal ne dépense que les PR qui seraient perdus au maximum. Un nœud qui a plus de tentatives, une quantité plus grande ou une chance supplémentaire bien plus forte que le plus simple vu pour cet objet dépense tout. Le premier nœud vu compte comme normal. Décoché : les PR sont répartis également entre les nœuds.",
     "CollectablePlan": "Collectionnable : pas de plan ici. Ses PR se dépensent dans la fenêtre Collectionnable du jeu, ouverte en le récoltant.",
     "ListNeed": "Liste de fabrication : il en manque {0}. Environ {1} nœuds, {2} min, {3} PR dépensés.",
     "ListNeedTooMany": "Liste de fabrication : il en manque {0}, hors de portée en {1} nœuds.",
@@ -5062,6 +5066,20 @@
     "IssuerId": "Donneur de quête n° {0}"
   },
   "CollectablePanel": {
+    "Impossible": "Le seuil bas ne peut plus être atteint avec les tentatives restantes : cette récolte ne rapportera rien.",
+    "Current": "{0} / {1} · {2}",
+    "TierBelow": "sous les seuils",
+    "TierLow": "bas",
+    "TierMid": "moyen",
+    "TierHigh": "haut",
+    "Next": "Prochaine action",
+    "Range": "+{0} à {1}",
+    "Plan": "Plan : atteindre le palier {0} en {1} action(s) de plus, puis récolter {2} fois : {3} assignats.",
+    "PlanItems": "Plan : atteindre le palier {0} en {1} action(s) de plus, puis récolter {2} fois.",
+    "OutOfReach": "Le seuil bas est hors de portée à coup sûr avec les tentatives restantes : seul un bon tirage peut y arriver.",
+    "AdviceNote": "Estimation d'après les gains que le jeu affiche à ce tour, refaite après chaque action. Elle ne compte ni Inspection rigoureuse, ni Œil du collectionneur, ni Toucher d'amorçage. Rien n'est exécuté.",
+    "NoAdvice": "Pas de plan : tentatives non lues.",
+    "NoAdviceRule": "Pas de plan : aucun seuil de remise connu pour cet objet.",
     "Title": "Collectionnable",
     "Resources": "PR {0}/{1} · intégrité {2}/{3}",
     "Loading": "Lecture des seuils de collectabilité…",

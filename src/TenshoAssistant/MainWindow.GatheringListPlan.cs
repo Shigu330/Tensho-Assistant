@@ -14,6 +14,8 @@ internal sealed partial class MainWindow
     private volatile IReadOnlyDictionary<uint,long>? gatherNeeds;
     private GpRoute? gatheringPanelRoute;
     private string? gatheringPanelRouteKey;
+    private bool gatheringPanelBonus;
+    private readonly GatherNodeNorms gatherNodeNorms=new();
 
     private string GpForbidden=>GpActionRules.Joined(configuration.GpForbiddenActions);
     private int GpRegenPerTick=>configuration.GpRegenPerTick>0 ? configuration.GpRegenPerTick:configuration.GpRegenObserved;
@@ -60,6 +62,7 @@ internal sealed partial class MainWindow
     private void DrawGpListSettings()
     {
         BoolSetting("GatheringPanel.ListSetting","GatheringPanel.ListSettingTip",()=>configuration.GatherPlanFromList,value=>configuration.GatherPlanFromList=value,c=>c.GatherPlanFromList);
+        BoolSetting("GatheringPanel.SaveForBonus","GatheringPanel.SaveForBonusTip",()=>configuration.GpSaveForBonus,value=>configuration.GpSaveForBonus=value,c=>c.GpSaveForBonus);
         IntSetting("GatheringPanel.NodeSeconds","GatheringPanel.NodeSecondsTip",()=>configuration.GatherSecondsBetweenNodes,value=>configuration.GatherSecondsBetweenNodes=value,5,600,DefaultConfiguration.GatherSecondsBetweenNodes);
         IntSetting("GatheringPanel.Regen","GatheringPanel.RegenTip",()=>configuration.GpRegenPerTick,value=>configuration.GpRegenPerTick=value,0,50,DefaultConfiguration.GpRegenPerTick);
         if(configuration.GpRegenObserved>0)ImGui.TextDisabled(localization.Format("GatheringPanel.RegenObserved",configuration.GpRegenObserved));

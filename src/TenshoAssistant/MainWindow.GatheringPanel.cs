@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
         public ulong Owner {get;}=owner;public uint JobId {get;}=frame.JobId;public int Level {get;}=frame.Level;public int? TotalAttempts {get;}=frame.TotalAttempts;
         public uint Gp {get;set;}=frame.Gp;public int? Attempts {get;set;}=frame.Attempts;public bool Frozen {get;set;}
         // Success and boon of each slot (index, raw item) as first read; Late: first read after GP was spent at the node.
-        public Dictionary<(int Index,uint RawItemId),(int? Success,int? Boon,bool Late)> Slots {get;}=[];
+        public Dictionary<(int Index,uint RawItemId),(int? Success,int? Boon,bool Late,int? Quantity)> Slots {get;}=[];
     }
 
     internal void DrawGatheringPanel()
@@ -108,8 +108,8 @@ internal sealed partial class MainWindow
         foreach(var slot in frame.Slots)
         {
             var at=(slot.Index,slot.RawItemId);
-            if(!start.Slots.TryGetValue(at,out var first))start.Slots[at]=(slot.SuccessPercent,slot.BoonPercent,start.Frozen);
-            else if(!start.Frozen && (first.Success is null || first.Boon is null))start.Slots[at]=(first.Success ?? slot.SuccessPercent,first.Boon ?? slot.BoonPercent,false);
+            if(!start.Slots.TryGetValue(at,out var first))start.Slots[at]=(slot.SuccessPercent,slot.BoonPercent,start.Frozen,slot.DisplayedQuantity);
+            else if(!start.Frozen && (first.Success is null || first.Boon is null))start.Slots[at]=(first.Success ?? slot.SuccessPercent,first.Boon ?? slot.BoonPercent,false,first.Quantity ?? slot.DisplayedQuantity);
         }
     }
 
@@ -125,11 +125,11 @@ internal sealed partial class MainWindow
         // 0.478: the route also follows what the list needs, the GP that comes back and the forbidden actions.
         var need=GatherListNeed(slot.ItemId);var seconds=Math.Clamp(configuration.GatherSecondsBetweenNodes,5,600);
         var regenPerNode=GpRegenPerTick*seconds/3;
-        var routeKey=$"{need}|{maxGp}|{regenPerNode}|{GpForbidden}";
+        var routeKey=$"{need}|{maxGp}|{regenPerNode}|{GpForbidden}|{first.Quantity}|{configuration.GpSaveForBonus}";
         if(routeKey!=gatheringPanelRouteKey){gatheringPanelRouteKey=routeKey;gatheringPanelKey=null;}
         if(key!=gatheringPanelKey)
         {
-            gatheringPanelRoute=null;
+            gatheringPanelRoute=null;gatheringPanelBonus=false;
             gatheringPanelKey=key;gatheringPanelItem=slot.ItemId;gatheringPanelPlan=null;gatheringPanelLate=first.Late;
             // 0.330 (audit 7): an unread success, boon or attempt count is never replaced (it was 100 % success, 0 % boon): no plan, and the
             // panel names what is missing. An unknown Bountiful bonus uses the rule's floor, +1 (BountifulEstimate « else +1 »): a lower
@@ -143,15 +143,29 @@ internal sealed partial class MainWindow
             {
                 try
                 {
-                    var scenario=new GpScenario(start.JobId,start.Level,(int)start.Gp,attempts,1,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbidden);
+                    // 0.479: the quantity the game shows per gather; a node where it was not read counts one.
+                    var quantity=Math.Clamp(first.Quantity ?? 1,1,20);
+                    var scenario=new GpScenario(start.JobId,start.Level,(int)start.Gp,attempts,quantity,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbidden);
                     gatheringPanelPlan=GpOptimizer.Solve(scenario,catalog);
-                    if(need>0 && maxGp>0)gatheringPanelRoute=GpRoutes.Build(GpOptimizer.Solve(scenario with {Budget=maxGp},catalog),new(need,(int)start.Gp,maxGp,regenPerNode));
+                    var shape=new GatherNodeShape(attempts,quantity,boon);
+                    var normal=gatherNodeNorms.Observe(slot.ItemId,shape);
+                    gatheringPanelBonus=GatherNodeNorms.IsBonus(normal,shape);
+                    if(need>0 && maxGp>0)
+                    {
+                        var whole=scenario with {Budget=maxGp};
+                        var usual=gatheringPanelBonus ? GpOptimizer.Solve(whole with {Attempts=normal.Attempts,BaseYield=normal.Quantity,BoonPercent=normal.Boon},catalog):null;
+                        gatheringPanelRoute=GpRoutes.Build(GpOptimizer.Solve(whole,catalog),new(need,(int)start.Gp,maxGp,regenPerNode,configuration.GpSaveForBonus,gatheringPanelBonus),usual);
+                    }
                 }
                 catch(ArgumentException){gatheringPanelPlan=null;gatheringPanelRoute=null;}
             }
         }
         ImGui.TextColored(Accent,localization.Format("GatheringPanel.PlanFor",items?.Find(gatheringPanelItem)?.Name ?? gatheringPanelItem.ToString()));
-        if(gatheringPanelRoute is { } route)DrawGatheringListRoute(route,need,seconds);
+        if(gatheringPanelRoute is { } route)
+        {
+            DrawGatheringListRoute(route,need,seconds);
+            if(configuration.GpSaveForBonus)ImGui.TextDisabled(localization.Get(gatheringPanelBonus ? "GatheringPanel.NodeBonus":"GatheringPanel.NodeNormal"));
+        }
         if(gatheringPanelPlan is not { } plan)
         {
             ImGui.TextDisabled(gatheringPanelLate ? localization.Get("GatheringPanel.AfterStart")

@@ -3,6 +3,15 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.479.0
+- Demandes de l'utilisateur, lot 6.
+- Plan de collection : le relevé en jeu de la fenêtre Collectionnable a donné l'objet, la collectabilité en cours et le gain de chaque action à ce tour ([preuve](docs/evidence/0.479-collectable-window-values.md)). Le panneau montre la collectabilité, le palier, la prochaine action et le plan. Chaque découpage des tentatives est comparé sur ce qu'il rapporte. Le plan est refait à chaque tour, rien n'est exécuté. Inspection rigoureuse, Œil du collectionneur et Toucher d'amorçage ne sont pas comptés. Lecture fondée sur un seul relevé : si une valeur manque ou change de type, pas de plan. Le panneau distingue un seuil qu'un bon tirage peut encore atteindre et un seuil devenu impossible (rapport en jeu : 0 avec une seule tentative).
+- Plan de PR sur la liste : un nœud normal récolte simplement et ne dépense que les PR qui seraient perdus au maximum ; un nœud à bonus majeur (plus de tentatives, quantité plus grande, chance supplémentaire nettement plus forte que le plus simple vu pour cet objet) dépense tout. Réglage pour revenir au partage égal. Le premier nœud vu compte comme normal. Le plan utilise maintenant la quantité affichée par le jeu au lieu de 1.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 914/914, 0 avertissement, 0 erreur ; DLL 0.479.0.0. Non validé en jeu.
+### English
+- The collectable panel now shows the current collectability, its tier, the next action and a plan, from the values the game's window gives each turn.
+- Over a crafting list, normal nodes keep their GP and a node with a major bonus spends it; the previous even sharing stays as a setting.
+
 ## 0.478.0
 - Retours de l'utilisateur, lot 6.
 - Panneau Collectionnable : « Aucun seuil » venait du nom coupé par la fenêtre du jeu (« Minerai de durium noble c... »), alors que les seuils existent (400 / 700 / 1000, [preuve](docs/evidence/0.478-collectable-truncated-name.md)). Un nom coupé est cherché par son début s'il désigne un seul objet, et le nom complet est affiché. Le texte dit qu'il n'y a rien à faire. La collectabilité en cours n'a pas de champ nommé dans le jeu : en mode développeur, les valeurs de la fenêtre vont au journal pour la trouver.

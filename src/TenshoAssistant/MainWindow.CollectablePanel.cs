@@ -14,6 +14,10 @@ internal sealed partial class MainWindow
 {
     internal CollectableReader? Collectables { get; set; }
     private string? collectableRawLogged;
+    // 0.479: an action's name and icon, from the game's sheet.
+    internal Func<uint,(string Name,uint Icon)?>? CollectableActionInfo{get;set;}
+    private IReadOnlyList<string>? collectableTurnRaw;
+    private CollectableTurn? collectableTurn;
 
     internal void DrawCollectablePanel()
     {
@@ -27,11 +31,14 @@ internal sealed partial class MainWindow
         {
             if(!visible)return;
             // 0.478: the game's window cuts long names; the rules hold the whole one.
-            var named=Collectables.Catalog?.Named(frame.ItemName);
+            if(!ReferenceEquals(collectableTurnRaw,frame.RawValues)){collectableTurnRaw=frame.RawValues;collectableTurn=CollectableTurn.Parse(frame.RawValues);}
+            var turn=collectableTurn;
+            // 0.479: the window names its item by identifier; the name is only for when its values cannot be read.
+            var named=turn is not null && Collectables.Catalog?.For(turn.ItemId) is {Count:>0} rows ? rows:Collectables.Catalog?.Named(frame.ItemName);
             ImGui.TextColored(Accent,named is { Count:>0 } ? named[0].Name:frame.ItemName);
             ImGui.TextDisabled(localization.Format("CollectablePanel.Resources",Shown(frame.Gp),Shown(frame.MaxGp),Shown(frame.Integrity),Shown(frame.MaxIntegrity)));
             if(Collectables.Catalog is not { } catalog)ImGui.TextDisabled(localization.Get(Collectables.CatalogFailed ? "CollectablePanel.Unavailable":"CollectablePanel.Loading"));
-            else if(catalog.Named(frame.ItemName) is not { Count:>0 } rules)ImGui.TextWrapped(localization.Get("CollectablePanel.NoRule"));
+            else if(named is not { Count:>0 } rules)ImGui.TextWrapped(localization.Get("CollectablePanel.NoRule"));
             else
                 foreach(var rule in rules.DistinctBy(rule=>(rule.Low,rule.Mid,rule.High,rule.RewardLow,rule.RewardMid,rule.RewardHigh,rule.Scrips)).Take(4))
                 {
@@ -41,7 +48,8 @@ internal sealed partial class MainWindow
                     if(rule.LevelMin>0)ImGui.TextDisabled(localization.Format("CollectablePanel.Levels",rule.LevelMin,rule.LevelMax));
                 }
             ImGui.Separator();
-            ImGui.TextWrapped(localization.Get("CollectablePanel.Unknown"));
+            if(turn is not null)DrawCollectableAdvice(turn,frame.Integrity,named?.FirstOrDefault(rule=>rule.Scrips) ?? named?.FirstOrDefault());
+            else ImGui.TextWrapped(localization.Get("CollectablePanel.Unknown"));
             // Developer mode: what the window holds goes to the log at each change, to find which value follows the collectability.
             if(developerMode && string.Join(" | ",frame.RawValues) is var raw && raw!=collectableRawLogged){collectableRawLogged=raw;log.Information("Collectable window values: {Values}",raw);}
             if(developerMode && ImGui.CollapsingHeader(localization.Get("CollectablePanel.Raw")+"###CollectableRaw"))
@@ -49,5 +57,36 @@ internal sealed partial class MainWindow
         }
         finally { ImGui.End(); }
         static string Shown(int? value)=>value?.ToString("N0") ?? "?";
+    }
+
+    // 0.479 (user request, in-game campaign): the current collectability and what to do next, from the values the window gives this turn. Nothing is executed.
+    private void DrawCollectableAdvice(CollectableTurn turn,int? attempts,CollectableRule? rule)
+    {
+        var tier=rule is null ? CollectableTier.Below:Gathering.Collectables.Tier(rule,turn.Current);
+        ImGui.ProgressBar(Math.Clamp((float)turn.Current/turn.Maximum,0,1),new Vector2(-1,ImGui.GetFrameHeight()),localization.Format("CollectablePanel.Current",turn.Current.ToString("N0"),turn.Maximum.ToString("N0"),localization.Get($"CollectablePanel.Tier{tier}")));
+        if(attempts is not { } left || CollectableAdvisor.Advise(turn,left,rule) is not { } advice)
+        {
+            ImGui.TextDisabled(localization.Get(rule is null ? "CollectablePanel.NoAdviceRule":"CollectablePanel.NoAdvice"));
+            return;
+        }
+        var (action,gain)=advice.Move switch
+        {
+            CollectableMove.Scour=>(turn.ScourAction,$"+{turn.Scour}"),
+            CollectableMove.Brazen=>(turn.BrazenAction,localization.Format("CollectablePanel.Range",turn.BrazenMin,turn.BrazenMax)),
+            CollectableMove.Meticulous=>(turn.MeticulousAction,$"+{turn.Meticulous}"),
+            _=>(turn.CollectAction,""),
+        };
+        var info=CollectableActionInfo?.Invoke(action);
+        ImGui.TextColored(Accent,localization.Get("CollectablePanel.Next"));
+        DrawItemIcon(info is { } shown ? new TenshoAssistant.Items.ItemDefinition(0,shown.Name,false,shown.Icon):null,new Vector2(32));
+        ImGui.SameLine();
+        ImGui.TextUnformatted(gain.Length>0 ? $"{info?.Name ?? advice.Move.ToString()} ({gain})":info?.Name ?? advice.Move.ToString());
+        ImGui.TextWrapped(advice.Impossible ? localization.Get("CollectablePanel.Impossible")
+            :advice.Target==CollectableTier.Below ? localization.Get("CollectablePanel.OutOfReach")
+            :advice.Scrips>0 ? localization.Format("CollectablePanel.Plan",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections,advice.Scrips)
+            :localization.Format("CollectablePanel.PlanItems",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections));
+        ImGui.PushTextWrapPos(0);
+        try{ImGui.TextDisabled(localization.Get("CollectablePanel.AdviceNote"));}
+        finally{ImGui.PopTextWrapPos();}
     }
 }

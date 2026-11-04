@@ -853,6 +853,7 @@ public sealed class Plugin : IDalamudPlugin
             SpearfishingReader? spearfishingReader=null;
             registrations.Register(()=>mainWindow.Spearfishing=spearfishingReader=new SpearfishingReader(framework,gameGui,client,log),()=>spearfishingReader?.Dispose());
             registrations.Register(()=>mainWindow.Collectables=collectableReader=new CollectableReader(framework,gameGui,client,data,log),()=>collectableReader?.Dispose());
+            mainWindow.CollectableActionInfo=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row ? (row.Name.ExtractText(),(uint)row.Icon):null;
             registrations.Register(()=>cactpotReader=new MiniCactpotObservationReader(cactpotObservation,framework,player,client,gameGui,log),()=>cactpotReader?.Dispose());
             registrations.Register(() => triadReader = new TriadObservationReader(triadObservation, framework, player, client, gameGui, log, () => targets.Target?.BaseId ?? 0, data, () => mainWindow.DeveloperMode),
                 () => triadReader?.Dispose());
