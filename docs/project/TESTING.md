@@ -137,15 +137,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Collections ✓/✗ (0.241, 0.274–0.275)**
 
-- [ ] 0.241 — Butin des contenus : cartes de Triple Triade et rouleaux d'orchestrion avec ✓/✗ ; « Non obtenus seulement » les garde
+- [x] 0.241 — Butin des contenus : cartes de Triple Triade et rouleaux d'orchestrion avec ✓/✗ ; « Non obtenus seulement » les garde
   quand ils ne sont pas obtenus.
-- [ ] 0.274 — Collections › orchestrion : clic droit sur une ligne débloquée par un seul objet = même menu que l'objet (outils + sources).
-- [ ] 0.275 — Pastille ✓/✗ sur toute icône d'objet de collection (fiche objet, sources, butins, Revue de mode, quêtes, marchands,
+- [x] 0.274 — Collections › orchestrion : clic droit sur une ligne débloquée par un seul objet = même menu que l'objet (outils + sources).
+- [x] 0.275 — Pastille ✓/✗ sur toute icône d'objet de collection (fiche objet, sources, butins, Revue de mode, quêtes, marchands,
   alarmes) ; collections pas encore lues : aucune pastille (jamais ✗ par défaut).
 
 **Carte (0.242–0.245, 0.259, 0.262, 0.308)**
 
-- [ ] 0.242–0.243 — Quête dont le journal indique une cible : icône « Cible indiquée par le jeu (journal) » ; clic droit sur la carte ›
+- [x] 0.242–0.243 — Quête dont le journal indique une cible : icône « Cible indiquée par le jeu (journal) » ; clic droit sur la carte ›
   « Retirer la cible indiquée par le jeu (journal) » la retire ; quête accomplie ou abandonnée : l'icône disparaît seule (environ 1 min).
 - [x] 0.244 — Clic droit sur la carte › onglet « Triple Triad » : PNJ de la carte avec [x] / [ ] / [?], cartes manquantes, coordonnées ;
   clic = drapeau, clic droit = outil Triple Triade, survol = prix d'entrée et cartes de récompense.
@@ -167,7 +167,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] 0.256 — Inventaire du jeu, clic droit sur un objet › Tensho : sous les outils, les mêmes sous-menus de sources que dans Tensho ;
   « ↳ Drapeau sur la carte » sous un PNJ placé.
 - [ ] 0.257 — Survol d'un objet de l'inventaire du jeu : le panneau Tensho sous l'infobulle montre aussi « Comment l'obtenir ».
-- [ ] 0.263 — Clic droit sur une quête (liste, quêtes liées, onglet Quêtes de la carte), un PNJ (PNJ vendeurs, onglets Vendeurs /
+- [x] 0.263 — Clic droit sur une quête (liste, quêtes liées, onglet Quêtes de la carte), un PNJ (PNJ vendeurs, onglets Vendeurs /
   Triple Triad de la carte, PNJ de Triple Triade) et un monstre (monstres d'un objet) : mêmes entrées partout (ouvrir l'outil ; pour
   chaque position : drapeau, « Voir sur la carte Tensho », météo de la zone).
 - [ ] 0.272 — Objets : choisir un objet = fiche complète (icône, stock total, dernier prix connu et sa date ; onglets Aperçu, Stocks,
@@ -211,12 +211,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Compagnie libre (0.307, 0.309, 0.315)**
 
-- [ ] 0.307 — Entrer dans l'atelier de la compagnie (ouvrir le panneau de contrôle des expéditions si rien n'apparaît) : MONDE ›
+- [x] 0.307 — Entrer dans l'atelier de la compagnie (ouvrir le panneau de contrôle des expéditions si rien n'apparaît) : MONDE ›
   Compagnie libre › Vaisseaux liste sous-marins et dirigeables (rang + barre d'expérience, trajet, retour : temps restant / « Rentré » /
   « Au port », butin du dernier voyage au clic, bouton d'alarme au retour) ; après la sortie, la dernière lecture reste (« Lu dans
   l'atelier : … »). Rappels › « Expéditions de la compagnie » : en mer / rentrés, prochain retour, « Détails ». Noter le moment où les
   données apparaissent (entrée dans l'atelier ou ouverture du panneau : non vérifié en jeu).
-- [ ] 0.309 — « Meilleurs trajets » : sous-marin lu, zone, tri (valeur par voyage, valeur par jour, expérience par jour) → au plus 25
+- [x] 0.309 — « Meilleurs trajets » : sous-marin lu, zone, tri (valeur par voyage, valeur par jour, expérience par jour) → au plus 25
   trajets (distance / autonomie, durée, valeur, gils par jour, expérience) ; survol = butin moyen, objet par objet. À comparer : durée
   calculée contre retour réel d'un voyage lancé.
 - [ ] 0.315 — « Montages » : choisir un vaisseau lu → statistiques lues / prévues / écart, coût / capacité, rang des pièces, réparation,
@@ -305,7 +305,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Survoler plusieurs objets, puis couper le wiki ou Garland (Paramètres › Avancé) : plus de téléchargement (journal Dalamud) ;
   rallumer : les sources de ces objets reviennent au survol suivant.
 - [ ] Duty Finder avec Garland coupé sur un contenu jamais vu (« Source désactivée »), rallumer : le butin se charge tout seul.
-- [ ] Duty Finder, « non obtenus seulement » coché juste après la connexion : la liste se remplit une fois les collections lues.
+- [x] Duty Finder, « non obtenus seulement » coché juste après la connexion : la liste se remplit une fois les collections lues.
 - [ ] Alarmes : le même objet dans deux sections (mineur et botaniste) : « Tout supprimer » n'arme que la section cliquée ;
   replier la section désarme le bouton.
 - [x] Revue de mode coupée : « Actualiser » grisé avec son infobulle ; Accueil sans « service en erreur » quand Universalis est coupé.
@@ -372,16 +372,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape f) — 0.336 : secteurs de dirigeable** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Compagnie › « Secteurs de dirigeable » : 23 secteurs de la Mer de nuages (pas le Diadème), rang, céruleum, durée de relevé et
+- [x] Compagnie › « Secteurs de dirigeable » : 23 secteurs de la Mer de nuages (pas le Diadème), rang, céruleum, durée de relevé et
   expérience égaux au panneau de vol du jeu ; « Débloqué par » cohérent avec l'ordre de découverte en jeu.
 - [ ] Survol de « n objets » : liste d'objets avec icône, sans quantité ; le filtre trouve un secteur par le nom d'un objet.
 - [ ] Paramètres › Crédits : LuminaSupplemental apparaît deux fois (téléchargé ; embarqué pour les dirigeables).
 
 **Étape f) — 0.337 : planificateur de dirigeables (appelle les fonctions de calcul du jeu)** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Secteurs de dirigeable, connecté : choisir un dirigeable lu à l'atelier ; plus de « Calcul des étapes par le jeu… » après une seconde ;
+- [x] Secteurs de dirigeable, connecté : choisir un dirigeable lu à l'atelier ; plus de « Calcul des étapes par le jeu… » après une seconde ;
   aucun plantage, rien dans le journal Dalamud.
-- [ ] Cocher les secteurs d'un voyage réel, puis comparer avec le panneau de vol de l'atelier (même dirigeable, mêmes secteurs) :
+- [x] Cocher les secteurs d'un voyage réel, puis comparer avec le panneau de vol de l'atelier (même dirigeable, mêmes secteurs) :
   distance et durée identiques ? Sinon, noter l'écart et les valeurs « Brut » du mode développeur (unité, 12 h, retour).
 - [ ] Déconnecté : « Connectez-vous avec un personnage » ; reconnecté : le calcul reprend.
 - [ ] « Meilleurs trajets » : classés par expérience par jour ; les secteurs sans expérience n'apparaissent que sous « Plus court », avec « ≥ ».
@@ -467,9 +467,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.350 : I-09 coffre de compagnie** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Ouvrir le coffre de compagnie : le panneau Tensho apparaît à côté ; tant qu'un onglet n'a pas été affiché, il le dit ; après les
+- [x] Ouvrir le coffre de compagnie : le panneau Tensho apparaît à côté ; tant qu'un onglet n'a pas été affiché, il le dit ; après les
   cinq onglets (et les cristaux), « Enregistrer » ; avec l'enregistrement automatique, c'est fait seul.
-- [ ] Banque : un onglet « Coffre de compagnie » ; le stock d'un objet du coffre (fiche d'objet, survol) compte la ligne « Coffre de
+- [x] Banque : un onglet « Coffre de compagnie » ; le stock d'un objet du coffre (fiche d'objet, survol) compte la ligne « Coffre de
   compagnie ».
 
 **Étape g) — 0.351 : I-04 journal des gils** — pendant la campagne de tests en jeu de la fin (étape h)
@@ -499,7 +499,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.355 : C-01 contenus débloqués / terminés** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Monde › Butin des contenus : la colonne « État » dit « Terminé » pour un donjon fait (ex. Sastasha), « Débloqué » pour un contenu
+- [x] Monde › Butin des contenus : la colonne « État » dit « Terminé » pour un donjon fait (ex. Sastasha), « Débloqué » pour un contenu
   ouvert mais pas fait, « Verrouillé » pour un contenu pas encore ouvert ; le compteur « X terminés sur Y lus » est plausible.
 - [ ] Filtre « Avancement › Non terminés » : les donjons faits disparaissent ; déconnecté, le filtre est grisé et l'état « — ».
 
@@ -523,13 +523,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.359 : C-08 filtre des collections par source** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Collections › Montures › Source « Marchands (gils) » puis « Succès » : les montures listées ont bien cette source dans leur menu
+- [x] Collections › Montures › Source « Marchands (gils) » puis « Succès » : les montures listées ont bien cette source dans leur menu
   du clic droit ; combiné avec « Non confirmés », la liste se réduit.
-- [ ] Le premier choix du filtre sur l'Orchestrion ne fait pas saccader le jeu de façon gênante (sinon : calcul à étaler).
+- [x] Le premier choix du filtre sur l'Orchestrion ne fait pas saccader le jeu de façon gênante (sinon : calcul à étaler).
 
 **Étape g) — 0.360 : C-09 liste de souhaits** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Clic droit sur une monture dans un butin (Butin des contenus) › « Ajouter à mes souhaits » ; Collections › Souhaits la montre
+- [x] Clic droit sur une monture dans un butin (Butin des contenus) › « Ajouter à mes souhaits » ; Collections › Souhaits la montre
   avec « Pas encore obtenu » ; clic droit sur la ligne donne ses sources ; « Retirer » l'enlève.
 - [ ] Un objet ordinaire ajouté montre « Possédé ×N » ou « Pas possédé » ; la liste reste après un redémarrage et après
   « Réinitialiser les réglages ».
@@ -542,7 +542,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.362 : C-05 tenues du coffre à apparence** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Ouvrir le coffre à apparence une fois. Collections › Tenues : une tenue déjà rangée dit « rangée » ; une tenue dont toutes les
+- [x] Ouvrir le coffre à apparence une fois. Collections › Tenues : une tenue déjà rangée dit « rangée » ; une tenue dont toutes les
   pièces sont dans le coffre dit « prête à ranger » (le jeu propose bien de la créer) ; les pièces ouvertes disent où elles sont.
 - [ ] Filtres « Incomplètes », « Toutes les pièces », « Rangées » et la recherche par nom.
 
@@ -562,7 +562,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.365 : C-04 nouveaux types de collection** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Collections : les onglets Coiffures, Accessoires de mode, Lunettes, Bardes, Portraits, Livres de maître, Objets de collection,
+- [x] Collections : les onglets Coiffures, Accessoires de mode, Lunettes, Bardes, Portraits, Livres de maître, Objets de collection,
   Archives occultes se remplissent en quelques secondes ; une coiffure ou un accessoire que vous avez dit « Obtenu », un autre non.
 - [ ] Les filtres Obtenu / Non confirmés et la recherche marchent dans ces onglets.
 
@@ -586,13 +586,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.369 : X-03 titres** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Collections › Titres › un titre obtenu › « Porter ce titre » : le titre change au-dessus du personnage ; « Aucun titre » le retire ;
+- [x] Collections › Titres › un titre obtenu › « Porter ce titre » : le titre change au-dessus du personnage ; « Aucun titre » le retire ;
   « Titre au hasard » en met un autre.
 - [ ] « Titre de <job> » puis « Changer de titre avec le job » coché : changer de job porte le titre choisi ; décoché : rien ne change.
 
 **Étape g) — 0.370 : X-02 musique en cours, rouleaux favoris** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Collections › Orchestrion : « Musique en cours » nomme la musique qu'on entend (en ville, puis en combat, puis dans une maison
+- [x] Collections › Orchestrion : « Musique en cours » nomme la musique qu'on entend (en ville, puis en combat, puis dans une maison
   avec un orchestrion) ; « Fiche » ouvre son rouleau.
 - [ ] Case « Favori » dans la fiche d'un rouleau : il apparaît dans « Rouleaux favoris ».
 
@@ -600,7 +600,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] Ouvrir la liste des servants à une cloche : dans les 30 secondes, une alarme « Venture de … terminée » par servant en venture
   apparaît dans Alarmes, à la bonne heure ; elle sonne à la fin.
-- [ ] Envoyer un vaisseau à l'atelier : une alarme « Retour de … » apparaît ; « Alarmes automatiques » décochée : plus aucune n'est créée.
+- [x] Envoyer un vaisseau à l'atelier : une alarme « Retour de … » apparaît ; « Alarmes automatiques » décochée : plus aucune n'est créée.
 
 **Étape g) — 0.372 : M-02 compteurs hebdomadaires** — pendant la campagne de tests en jeu de la fin (étape h)
 
@@ -653,7 +653,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.379 : M-10 historique du butin** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Après le retour d'un sous-marin, passer à l'atelier : Compagnie libre › Historique montre le voyage (retour, vaisseau, trajet,
+- [x] Après le retour d'un sous-marin, passer à l'atelier : Compagnie libre › Historique montre le voyage (retour, vaisseau, trajet,
   objets) ; le rendement par trajet compte un voyage ; un second passage n'ajoute pas de doublon.
 - [ ] « Copier en CSV » puis coller dans un tableur : une ligne par objet, colonnes lisibles.
 
@@ -700,7 +700,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] Grimoire du mage bleu, « Mauvaise haleine » › « Chercher sur le wiki » : les monstres (Capricious Cassie, Halitostroper…) avec
   « Drapeau » pour ceux qui ont des coordonnées ; un sort appris par quête dit « aucun monstre » avec l'adresse de la page.
-- [ ] Collections › Coiffures, Accessoires de mode, Bardes, Livres de maître : le survol montre l'objet et comment l'obtenir ; clic droit
+- [x] Collections › Coiffures, Accessoires de mode, Bardes, Livres de maître : le survol montre l'objet et comment l'obtenir ; clic droit
   : les sources. Lunettes, Portraits, Objets de collection, Archives : l'infobulle dit « obtention inconnue ». Tenues : survol d'une
   tenue ou d'une pièce = infobulle de l'objet.
 
@@ -1217,7 +1217,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.393 : Bestiaire et grande compagnie** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Page « Bestiaire » : seul le carnet de votre compagnie est dans la liste (Maelstrom pour l'utilisateur), choisi à l'ouverture ;
+- [x] Page « Bestiaire » : seul le carnet de votre compagnie est dans la liste (Maelstrom pour l'utilisateur), choisi à l'ouverture ;
   ses victimes sont celles du jeu.
 
 **0.390 : monstres du grimoire triés par niveau** — pendant la campagne de tests en jeu de la fin (étape h)
