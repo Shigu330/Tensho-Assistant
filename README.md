@@ -31,11 +31,11 @@ Settings page.
 ## Architecture
 
 - `src/TenshoAssistant/Plugin.cs` registers the services, the command, the windows and the panels; every registration has its cleanup.
-- `MainWindow.cs` (split into `MainWindow.<Page>.cs` partial files) is the shell and page routing; `MapViewWindow.cs` is the Tensho map.
-  Both are Dalamud `WindowSystem` windows.
-- One folder per domain (`Alarms`, `Caching`, `Character`, `Collections`, `Community`, `Craft`, `Credits`, `Duties`, `Events`,
-  `Fashion`, `FreeCompany`, `Gathering`, `Gear`, `Hunting`, `Inventory`, `Items`, `Leves`, `Localization`, `Macros`, `Maps`, `Market`,
-  `MiniGames`, `Monsters`, `Npcs`, `Quests`, `Reminders`). Files ending in `*.Dalamud.cs` touch the game (read on the framework thread,
+- `MainWindow.cs` (split into `MainWindow.<Page>.cs` partial files) is the shell and page routing; `MapViewWindow.cs` is the Tensho map,
+  `Guide/GuideWindow.cs` the first-run guide. All three are Dalamud `WindowSystem` windows.
+- One folder per domain (`Alarms`, `Beastmaster`, `Caching`, `Character`, `Collections`, `Community`, `Craft`, `Credits`, `Diagnostics`,
+  `Duties`, `Events`, `Fashion`, `FreeCompany`, `Gathering`, `Gear`, `Guide`, `Help`, `Hunting`, `Inventory`, `Items`, `Leves`,
+  `Localization`, `Macros`, `Maps`, `Market`, `MiniGames`, `Monsters`, `MyTools`, `Npcs`, `Quests`, `Reminders`). Files ending in `*.Dalamud.cs` touch the game (read on the framework thread,
   then copied); the others are pure C# and tested.
 - `UI/Components/` holds the shared templates: `ItemCell` (item icon and name with the common tooltip and tools menu), `DetailPage`,
   `SettingRow` (tooltip and « restore default » ↺ button), `EntityMenus` (quest, NPC, monster and place menus), `DataIndexes`.
@@ -338,7 +338,7 @@ l'objet dans le navigateur ; `/tenshonext` est le marqueur de fin de page de l'e
 
 - `src/TenshoAssistant/Plugin.cs` enregistre les services, la commande, les fenêtres et les panneaux ; chaque enregistrement a son nettoyage.
 - `MainWindow.cs` (découpée en fichiers partiels `MainWindow.<Page>.cs`) porte la navigation et les pages ; `MapViewWindow.cs` est la
-  carte Tensho. Les deux sont des fenêtres du `WindowSystem` de Dalamud.
+  carte Tensho, `Guide/GuideWindow.cs` le guide de première prise en main. Les trois sont des fenêtres du `WindowSystem` de Dalamud.
 - Un dossier par domaine ; les fichiers `*.Dalamud.cs` touchent le jeu (lecture sur le thread du framework, puis copie), les autres sont
   du C# pur et testé.
 - `UI/Components/` : modèles communs (`ItemCell`, `DetailPage`, `SettingRow` avec infobulle et bouton ↺, `EntityMenus`, `DataIndexes`).

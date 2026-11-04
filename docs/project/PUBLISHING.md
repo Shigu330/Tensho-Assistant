@@ -33,7 +33,7 @@ Par ordre. Les points marqués **règle Dalamud** demandent un résumé et l'acc
 
 | Exigence | État | Où |
 |---|---|---|
-| Compilation chez eux : Linux, SDK 10.0.101, réseau coupé, fichier de verrouillage | **`global.json` corrigé en 0.512** (il exigeait 10.0.403, leur image n'aurait pas compilé). Job CI qui reprend leur image et leur commande ; il garde le réseau | `global.json`, `.github/workflows/build.yml`, [relevé](../evidence/0.512-d17-build.md) |
+| Compilation chez eux : Linux, SDK 10.0.101, réseau coupé, fichier de verrouillage | **`global.json` corrigé en 0.512** (il exigeait 10.0.403, leur image n'aurait pas compilé). Job CI qui reprend leur image et leur commande, vert depuis 515a28b ; il garde le réseau | `global.json`, `.github/workflows/build.yml`, [relevé](../evidence/0.512-d17-build.md) |
 | Fichier `packages.lock.json` suivi par git | fait | `src/TenshoAssistant/packages.lock.json` |
 | Dépendance NuGet examinée par l'équipe | `Raphael.Net` 5.0.0 (MIT, bibliothèque native) ; même version que Craftimizer, déjà publié ; à présenter dans la PR | `TenshoAssistant.csproj` |
 | Manifeste JSON : Name, Author, Punchline, Description | fait ; Description réécrite en 0.512 : lignes coupées à la main comme le demande la documentation, résumé en première ligne, fonctions et réseau à jour | `src/TenshoAssistant/TenshoAssistant.json` |

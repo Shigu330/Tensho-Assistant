@@ -1,6 +1,6 @@
 # Architecture
 
-## Vue d'ensemble — état au 0.315.0 (2026-11-02, relu contre le code)
+## Vue d'ensemble — état au 0.315.0 (2026-11-02), carte des modules complétée le 2026-11-04 (0.512)
 
 > Carte du code, pas un journal : le détail par version est dans le [CHANGELOG](../../CHANGELOG.md), l'état en jeu dans
 > [STATUS](../ai/STATUS.md). Cette vue remplace celle du 0.154.0 (2026-10-31, historique git). Le code fait foi.
@@ -18,7 +18,7 @@ les sources.
 ### Hôte et cycle de vie (`Plugin.cs`)
 
 - `Plugin` reçoit les services Dalamud par injection, charge `Configuration` v1 (une autre version lève une erreur, le fichier n'est
-  pas écrasé), crée les services, `MainWindow` et `MapViewWindow` (même `WindowSystem`), et enregistre chaque lecteur, chargeur, pont
+  pas écrasé), crée les services, `MainWindow`, `MapViewWindow` et `GuideWindow` (même `WindowSystem`), et enregistre chaque lecteur, chargeur, pont
   et service réseau dans `RegistrationScope` : nettoyage en ordre inverse, idempotent, poursuivi après erreur ; un échec du
   constructeur déclenche le même nettoyage.
 - Commande `/tensho` (argument `peche`, `pêche`, `fish` ou `fishing` : ouvre ou ferme l'aide à la pêche), `OpenMainUi`,
@@ -53,6 +53,10 @@ les sources.
 | `Macros/` | chaîne de macros (`MacroSequence`, `MacroChainService` / `MacroChainBridge`, observation) ; écriture des macros d'artisanat dans le jeu (`MacroSlotPlan`, `MacroWriter`) |
 | `Caching/` | cache disque (`DataCache`), durées (`CachePreferences`), clés (`CatalogCacheKeys`, `GameCacheIdentity`), validation (`CacheSnapshots`) |
 | `Localization/` | `LocalizationManager`, `LocalizationValidator`, `Languages/*.json` (embarqués) |
+| `Help/`, `Guide/` | aide de chaque page et recherche (`HelpIndex`), signaler un problème (`ProblemReport`, formulaire GitHub prérempli), vidéos de la communauté (`CommunityHelp`, lues sur clic) ; guide de première prise en main (`GuideFlow`, `GuideWindow` dans le `WindowSystem`) ; 0.502–0.506, [ONBOARD-001](../goals/ONBOARD-001.md) |
+| `Diagnostics/` | auto-contrôle au rechargement en mode développeur (`SelfCheck`, `SelfCheckRunner`), mémoire de ce qui a déjà été vu ; 0.494–0.496 |
+| `Beastmaster/` | page dresseur, données du jeu lues brutes (`BeastCatalog`) ; sonde des fenêtres (`BeastWindowProbe`), sans panneau de conseil ; 0.500–0.501, DEC-032 |
+| `MyTools/` | outils du joueur et galerie communautaire, données seulement (`ToolGallery`, lue sur clic) ; terminé en 0.476, [TEMPLATES-001](../goals/TEMPLATES-001.md) |
 | `UI/` | thème (`FfxivTheme`, `ThemePalettes`, `GameThemeReader`), `UiComponents` (en-têtes, polices de titre), `UiMessages`, modèles communs `Components/`, barre des sous-pages `Navigation/` |
 | racine | `Plugin`, `Configuration` (+ `Configuration.Dalamud.cs`), `RegistrationScope`, `MainWindow.*.cs` (un partial par outil), `MapViewWindow`, `BankImportOverlay` |
 

@@ -345,7 +345,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Historique des objets : « Retour » revient à l'objet précédent ; le fil d'Ariane reste court.
 - [ ] Aperçu du tri impossible : la raison est affichée.
 
-**Étape e) — 0.332 : cadre du jeu** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape e) — 0.332 : cadre du jeu** — retiré en 0.510 (DEC-033), plus rien à tester
 
 
 **Étape f) — 0.333 : escouade** — pendant la campagne de tests en jeu de la fin (étape h)
