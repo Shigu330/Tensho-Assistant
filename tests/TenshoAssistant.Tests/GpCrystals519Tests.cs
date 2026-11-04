@@ -39,6 +39,11 @@ internal static class GpCrystals519Tests
             Check(panel.Contains("CollectableChoice.Best(scripRules)") && panel.Contains("\"GatheringPanel.ScripsBest\"") && panel.Contains("\"GatheringPanel.ScripsKinds\""),"shown");
             Check(Read("Gathering/CollectableReader.Dalamud.cs").Contains("reward?.Currency ?? -1"),"the sheet's kind");
         }),
+        ("Collectable panel (0.528): the next action and the thresholds wrap at the panel's width",() =>
+        {
+            var panel=Read("MainWindow.CollectablePanel.cs");
+            Check(panel.Contains("ImGui.TextWrapped(gain.Length>0 ?") && panel.Contains("ImGui.TextWrapped(localization.Format(\"CollectablePanel.Thresholds\""),"wrapped");
+        }),
         ("Crystal plan: no computed amount, drawn before the GP plan, by the item's game category",() =>
         {
             var panel=Read("MainWindow.GatheringPanel.cs");

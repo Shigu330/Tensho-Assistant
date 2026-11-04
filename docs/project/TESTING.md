@@ -713,7 +713,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.527 : Toucher d'amorçage dans le plan des collectionnables** — à voir en jouant
 
-- [ ] Botaniste ou mineur niveau 95 et plus, Inspection active, 723 PR environ : le panneau propose Toucher d'amorçage ; une fois lancé, il ne le repropose plus et compte 48 %.
+- [ ] Botaniste ou mineur niveau 95 et plus : commencer vers 623 PR, lancer Inspection soi-même (il reste 423 PR) : le panneau propose Toucher d'amorçage ; une fois lancé, il ne le repropose plus et compte 48 %. Depuis 727 PR, le plan passe par Inspection puis Sélection méthodique, sans Toucher : c'est prévu (capture du 2026-11-05).
 - [ ] Sous le niveau 95 : jamais proposé.
 - [x] (rapport de l'utilisateur, 2026-11-05) Toucher reste actif si une autre action passe avant la Sélection méthodique ; il ne retombe qu'après elle. Récolte non essayée.
 

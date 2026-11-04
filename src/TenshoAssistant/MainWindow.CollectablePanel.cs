@@ -47,8 +47,8 @@ internal sealed partial class MainWindow
                 foreach(var rule in rules.DistinctBy(rule=>(rule.Low,rule.Mid,rule.High,rule.RewardLow,rule.RewardMid,rule.RewardHigh,rule.Scrips)).Take(4))
                 {
                     ImGui.Separator();
-                    ImGui.TextUnformatted(localization.Format("CollectablePanel.Thresholds",rule.Low,rule.Mid,rule.High));
-                    if(rule.Scrips && rule.RewardHigh>0)ImGui.TextUnformatted(localization.Format("CollectablePanel.Scrips",rule.RewardLow,rule.RewardMid,rule.RewardHigh));
+                    ImGui.TextWrapped(localization.Format("CollectablePanel.Thresholds",rule.Low,rule.Mid,rule.High));
+                    if(rule.Scrips && rule.RewardHigh>0)ImGui.TextWrapped(localization.Format("CollectablePanel.Scrips",rule.RewardLow,rule.RewardMid,rule.RewardHigh));
                     if(rule.LevelMin>0)ImGui.TextDisabled(localization.Format("CollectablePanel.Levels",rule.LevelMin,rule.LevelMax));
                 }
             ImGui.Separator();
@@ -158,7 +158,8 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,localization.Get("CollectablePanel.Next"));
         DrawItemIcon(info is { } shown ? new TenshoAssistant.Items.ItemDefinition(0,shown.Name,false,shown.Icon):null,new Vector2(32));
         ImGui.SameLine();
-        ImGui.TextUnformatted(gain.Length>0 ? $"{info?.Name ?? advice.Move.ToString()} ({gain})":info?.Name ?? advice.Move.ToString());
+        // 0.528 (user capture): this line was cut at the panel's width.
+        ImGui.TextWrapped(gain.Length>0 ? $"{info?.Name ?? advice.Move.ToString()} ({gain})":info?.Name ?? advice.Move.ToString());
         ImGui.PushTextWrapPos(0);
         try
         {

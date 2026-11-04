@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.528.0
+- Capture de l'utilisateur : la prochaine action du panneau Collectionnable était coupée à sa largeur (« … sur la prochaine actio »), comme la ligne des seuils. Elles passent à la ligne.
+- Calcul relu sur la capture, 727 PR sans Inspection active : Inspection d'abord, 65,1 assignats en moyenne, comme prévu ([calcul](docs/evidence/0.527-priming-touch.md)). La consigne d'essai de Toucher était impraticable avec 823 PR au plus : corrigée.
+- Tests : GpCrystals519Tests complété. Verify.ps1 (agent) : 999/999, 0 avertissement, 0 erreur ; DLL 0.528.0.0. Non validé en jeu.
+### English
+- The Collectable panel's next action and thresholds now wrap at its width instead of being cut.
+
 ## 0.527.0
 - Rapport de l'utilisateur en jeu (captures) : le plan des collectionnables ne proposait ni Œil du collectionneur ni Toucher d'amorçage. Toucher n'existait pas dans le calcul : il y entre, à ×2 sur Sélection méthodique, confirmé par la capture (24 → 48 %). Œil y était déjà (40 → 70 %, confirmé aussi).
 - Les deux ne sont proposés que s'ils rapportent plus que les mêmes PR ailleurs, et le panneau le dit. Sur la capture, à 623 PR avec Inspection active, ce n'est pas le cas : deux tentatives rendues valent plus. À 423 ou 723 PR, Toucher est conseillé ([calcul](docs/evidence/0.527-priming-touch.md)).
