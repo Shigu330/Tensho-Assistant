@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.518.0
+- Rapport de l'utilisateur en jeu (capture) : carte, point d'Ostrakon Dékaokto « ouvert maintenant » alors qu'il n'est pas là. Cause : la ligne ne parlait que des heures ; ce point légendaire demande un tome ([preuve](docs/evidence/0.518-gather-tomes.md)).
+- Infobulle et liste de la carte : « ouvert, mais pas encore pour vous » et le nom du tome quand il n'est pas lu ; l'horloge du point passe en gris, et il sort des repères au bord de la carte. Si le niveau du métier est sous celui du point, le panneau l'écrit.
+- Les tomes lus et les niveaux sont copiés toutes les dix secondes sur le thread du framework ; inconnu ne dit rien.
+- Tests : GatherPointAccess518Tests. Verify.ps1 (agent) : 986/986, 0 avertissement, 0 erreur ; DLL 0.518.0.0. Non validé en jeu.
+### English
+- Map: a legendary gathering point was shown « open now » although the character has not read its tome. The tooltip now says so and names the tome, its clock turns grey and it leaves the edge markers. It also says when the job's level is under the point's.
+
 ## 0.517.0
 - Rapport de l'utilisateur en jeu (capture, « plan toujours pas fonctionnel ») : 809 PR, 54 %, aucune action proposée. Vraie cause, que 0.515 ne corrigeait pas : le filtre des actions non apprises (0.488) demandait à Dalamud si l'action était débloquée, et Dalamud répond non quand elle n'a pas de lien de déblocage, soit 22 actions sur 24 ([preuve](docs/evidence/0.517-gp-action-unlocks.md)). Elles comptent maintenant comme acquises au niveau.
 - Même défaut pour les traits de regain de PR sans quête : ils comptent au niveau du métier.

@@ -14,6 +14,18 @@ if(Environment.GetEnvironmentVariable("PROBE_GPACTIONS") is { Length:>0 })
         var row=gaSheet.GetRow(id);
         Console.WriteLine($"action {id}: {row.Name.ExtractText()} level {row.ClassJobLevel} unlock {row.UnlockLink.RowId} job {row.ClassJob.RowId} category {row.ClassJobCategory.RowId}");
     }
+    // 0.519: every miner and botanist action with its cost and text, and how crystals are told apart.
+    foreach(var row in gaSheet.Where(row=>row.ClassJob.RowId is 16 or 17 && row.ClassJobLevel>0 && !row.Name.IsEmpty).OrderBy(row=>row.ClassJob.RowId).ThenBy(row=>row.ClassJobLevel))
+    {
+        var text=data.GetExcelSheet<Lumina.Excel.Sheets.ActionTransient>()!.GetRowOrDefault(row.RowId)?.Description.ExtractText().Replace("\n"," ") ?? "";
+        Console.WriteLine($"all {row.RowId}: job {row.ClassJob.RowId} lv {row.ClassJobLevel} cost {row.PrimaryCostValue} type {row.PrimaryCostType} unlock {row.UnlockLink.RowId} {row.Name.ExtractText()} :: {text}");
+    }
+    var gaItems=data.GetExcelSheet<Lumina.Excel.Sheets.Item>()!;
+    foreach(var id in Enumerable.Range(1,20).Select(id=>(uint)id).Append(5111u))
+    {
+        var item=gaItems.GetRow(id);
+        Console.WriteLine($"item {id}: {item.Name.ExtractText()} uicat {item.ItemUICategory.RowId} search {item.ItemSearchCategory.RowId} stack {item.StackSize}");
+    }
     return;
 }
 

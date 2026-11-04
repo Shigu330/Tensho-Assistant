@@ -711,6 +711,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.518 : carte, tomes et niveau d'un point** — à voir en jouant
+
+- [ ] Point d'Ostrakon Dékaokto : « ouvert, mais pas encore pour vous », le nom du tome, horloge grise. Le journal écrit « Gathering knowledge: … » : les nombres entre crochets correspondent-ils aux tomes lus ?
+- [ ] Un point légendaire dont le tome est lu : « ouvert maintenant », en vert, sans ligne de tome.
+- [ ] Un point au-dessus du niveau du métier : la ligne « Mineur : niv. X, ce point : niv. Y ».
+
 **0.517 : plan de PR** — à voir en jouant
 
 - [ ] Sur un nœud à PR pleins : le panneau propose des actions, et elles existent toutes dans votre barre.

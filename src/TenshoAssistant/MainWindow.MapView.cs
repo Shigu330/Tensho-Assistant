@@ -971,7 +971,7 @@ internal sealed partial class MainWindow
                 {
                     var badge=Math.Max(6,item.Size*0.45f);var corner=item.At+new Vector2(item.Size*0.2f,-item.Size*0.6f);
                     draw.AddCircleFilled(corner+new Vector2(badge/2),badge*0.62f,ImGui.GetColorU32(new Vector4(0,0,0,0.75f)),16);
-                    draw.AddText(UiBuilder.IconFont,badge,corner,ImGui.GetColorU32(timedPoint.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:new Vector4(0.98f,0.62f,0.20f,1)),FontAwesomeIcon.Clock.ToIconString());
+                    draw.AddText(UiBuilder.IconFont,badge,corner,ImGui.GetColorU32(TimedPointColor(timedPoint)),FontAwesomeIcon.Clock.ToIconString());
                 }
                 if(item.Point is { } labelled && settings.GatheringLabels && mapZoom>=0.6f)
                     draw.AddText(item.At+new Vector2(item.Size*0.6f,-ImGui.GetFontSize()/2),ImGui.GetColorU32(UI.FfxivTheme.Text),localization.Format("MapLocal.Level",labelled.Level));
@@ -1286,8 +1286,7 @@ internal sealed partial class MainWindow
                     foreach(var line in lines.Skip(hit.Point is null ? 1:2))ImGui.TextDisabled(line);
                     if(hit.Point is { } point)
                     {
-                        if(point.Timed)ImGui.TextColored(point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:new Vector4(0.98f,0.62f,0.20f,1),
-                            localization.Format(point.ActiveAt(EorzeaMinutes()) ? "MapView.TimedOpen":"MapView.TimedClosed",point.Schedule!.Label));
+                        DrawPointAvailability(point);
                         var items=itemCatalog.State.Catalog;
                         foreach(var id in point.Items.Take(8))
                         {
@@ -1327,6 +1326,23 @@ internal sealed partial class MainWindow
         draw.AddCircle(at,radius,ImGui.GetColorU32(colour with{W=Math.Min(1,colour.W*2.5f+0.2f)}),48,2f);
     }
     // Gathering points of a map (cached catalogue + cached positions), rebuilt only when the map or a source changes.
+    // 0.518 (user report): « open now » only speaks of the hours. A legendary point also asks for its tome, read by this character.
+    internal Func<uint,TenshoAssistant.Gathering.GatherPointAccess?>? GatherAccess { get; set; }
+    private Vector4 TimedPointColor(MapLocalGatheringPoint point)=>GatherAccess?.Invoke(point.BaseId)?.TomeMissing is not null ? Muted:point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:new Vector4(0.98f,0.62f,0.20f,1);
+    private void DrawPointAvailability(MapLocalGatheringPoint point)
+    {
+        var access=GatherAccess?.Invoke(point.BaseId);
+        if(point.Timed)
+        {
+            var open=point.ActiveAt(EorzeaMinutes());
+            ImGui.TextColored(TimedPointColor(point),localization.Format(!open ? "MapView.TimedClosed":access?.TomeMissing is not null ? "MapView.TimedOpenNoTome":"MapView.TimedOpen",point.Schedule!.Label));
+        }
+        if(access is null)return;
+        if(access.TomeMissing is { } tome)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MapView.TomeMissing",tome));
+        if(access.JobLevel is { } level && level<point.Level)
+            ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MapView.PointLevelLow",localization.Get(access.JobId==TenshoAssistant.Gathering.GatherPointAccess.Miner ? "GatheringPanel.Miner":"GatheringPanel.Botanist"),level,point.Level));
+    }
+
     private (uint MapId,object? Catalog,object? Index,IReadOnlyList<MapLocalGatheringPoint> Points) mapGatheringCache=(0,null,null,[]);
     private IReadOnlyList<MapLocalGatheringPoint> MapGatheringPoints(MapDefinition map)
     {
@@ -1478,11 +1494,7 @@ internal sealed partial class MainWindow
             if(point.Icon!=0){DrawSmallGameIcon(point.Icon);}
             ImGui.TextColored(Accent,$"{point.Type} · {localization.Format("MapLocal.Level",point.Level)}{(point.Hidden ? " "+localization.Get("MapLocal.Hidden"):"")}");
             if(point.Place.Length>0)ImGui.TextDisabled(point.Place);
-            if(point.Timed)
-            {
-                var open=point.ActiveAt(EorzeaMinutes());
-                ImGui.TextColored(open ? UI.FfxivTheme.Success:new Vector4(0.98f,0.62f,0.20f,1),localization.Format(open ? "MapView.TimedOpen":"MapView.TimedClosed",point.Schedule!.Label));
-            }
+            DrawPointAvailability(point);
             var items=itemCatalog.State.Catalog;
             foreach(var id in point.Items.Take(16))
             {
@@ -1604,7 +1616,7 @@ internal sealed partial class MainWindow
         if(settings.EdgeGathering)
         {
             var minutes=EorzeaMinutes();
-            foreach(var point in gathering.Where(point=>point.Timed && point.Icon!=0 && settings.SizeOf(point.Icon,map.MapId)>0 && point.Position is not null && point.ActiveAt(minutes)))
+            foreach(var point in gathering.Where(point=>point.Timed && point.Icon!=0 && settings.SizeOf(point.Icon,map.MapId)>0 && point.Position is not null && point.ActiveAt(minutes) && GatherAccess?.Invoke(point.BaseId)?.TomeMissing is null))
                 targets.Add((MapProjection.PixelFromWorld(new Vector3(point.Position!.X,0,point.Position.Z),map),point.Icon,GatheringLabelOf(point),false,0));
         }
         if(settings.EdgeParty && settings.ShowParty && settings.SizeOf(GlyphParty,map.MapId)>0 && live?.Party is { } members && live.MapId==map.MapId)
