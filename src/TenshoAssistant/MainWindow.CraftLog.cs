@@ -14,7 +14,9 @@ internal sealed partial class MainWindow
 {
     private readonly CraftLogObservationService craftLog=new();
     internal CraftLogObservationService CraftLog=>craftLog;
-    private readonly CraftLogSession craftLogSession=new();
+    // 0.467 (user request, in-game campaign): the crafting log follows the solver chosen in the settings.
+    private readonly CraftLogSession craftLogSession=new((input,token)=>CraftLogSession.Build(input,token,RaphaelCraftSolver.Solve));
+    private string? loggedCraftLogRaphaelError;
     private CraftLogInput? craftLogInput;
     private DateTimeOffset craftLogStableSince;
     private bool craftLogStarted;
@@ -52,7 +54,7 @@ internal sealed partial class MainWindow
         var actions=craftActions.State.Catalog;
         var presets=(IReadOnlyList<CraftPreset>?)configuration.CraftPresets ?? Array.Empty<CraftPreset>();
         CraftLogInput? input=context is {Recipe:{ } recipe,Stats:{ } stats} && actions is not null
-            ? new(observed.Owner,recipe,stats,actions,presets,new(recipe.Simulation!.Quality,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,craftMacroBuffWait,craftForbidden),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true):null;
+            ? new(observed.Owner,recipe,stats,actions,presets,new(recipe.Simulation!.Quality,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,craftMacroBuffWait,craftForbidden,CraftSearchOptions.Raphael),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true):null;
         if(input!=craftLogInput)
         {craftLogSession.Cancel();craftLogInput=input;craftLogStableSince=now;craftLogStarted=false;craftLogForceRefresh=false;}
         if(now<craftLogStableSince)craftLogStableSince=now;
@@ -91,6 +93,15 @@ internal sealed partial class MainWindow
                 +(context.Recipe?.Simulation?.Collectable==true ? localization.Get("CraftLogUi.CollectableHelp"):localization.Get("CraftLogUi.NoHq")));
             if(context.Recipe is { } forSimulator && ImGui.SmallButton(localization.Get("CraftLogUi.OpenSimulator"))){OpenCraftSimulation(forSimulator);IsOpen=true;}
             var state=craftLogSession.State;
+            if(state.Result is { } solved)
+            {
+                if(solved.RaphaelError is { } raphaelError)
+                {
+                    if(loggedCraftLogRaphaelError!=raphaelError){loggedCraftLogRaphaelError=raphaelError;log.Warning("Raphael failed for the crafting log, Tensho's search was used: {Reason}",raphaelError);}
+                    ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("CraftLogUi.RaphaelFailed"));
+                }
+                else if(solved.UsedRaphael)ImGui.TextDisabled(localization.Get("CraftLogUi.ByRaphael"));
+            }
             // 0.327: with « compute automatically » off, the search waits for this button (« Recalculate » and the plan's « Simulate » also ask).
             var waitsForRequest=!craftLogStarted && CraftLogSession.WaitsForRequest(input,configuration.CraftLogAutoSolve,craftLogRequested);
             if(waitsForRequest)

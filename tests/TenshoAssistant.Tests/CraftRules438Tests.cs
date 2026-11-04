@@ -24,7 +24,7 @@ internal static class CraftRules438Tests
         ("Forbidden actions reach every interface; crafting log panel offers the job's gear set",() =>
         {
             Check(Read("Craft/CraftLogSession.cs").Contains("CraftActionRules.UsesForbidden(preset.Actions,input.Options.Forbidden))continue;"),"saved sequences of the assistant");
-            Check(Read("MainWindow.CraftLog.cs").Contains("craftMacroBuffWait,craftForbidden),") && Read("MainWindow.CraftSolver.cs").Contains("key.BuffExtraWait,key.Forbidden,key.Raphael));"),"assistant and search");
+            Check(Read("MainWindow.CraftLog.cs").Contains("craftMacroBuffWait,craftForbidden,CraftSearchOptions.Raphael),") && Read("MainWindow.CraftSolver.cs").Contains("key.BuffExtraWait,key.Forbidden,key.Raphael));"),"assistant and search");
             Check(Read("MainWindow.CraftSimulation.cs").Contains("ImGui.BeginDisabled(forbidden ||") && Read("MainWindow.CraftSimulation.cs").Contains("CraftRules.SequenceUsesForbidden"),"manual simulator");
             Check(Read("MainWindow.CraftProjection.cs").Contains("Where(row=>!CraftActionRules.Forbidden(forbiddenKey,row.Metadata.Spec.Kind))"),"live synthesis");
             Check(Read("MainWindow.CraftLog.cs").Contains("if(wrongJob)DrawEquipRecipeJob(context.Recipe!,\"CraftLogEquip\");"),"crafting log panel: equip the job");

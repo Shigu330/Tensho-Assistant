@@ -681,7 +681,7 @@
     "SolverTensho": "Tensho",
     "SolverTenshoTip": "Tensho's own bounded search, inside the plugin: fast, without proof it found the best sequence. It uses the limits below.\nDefault.",
     "SolverRaphael": "Raphael",
-    "SolverRaphaelTip": "Raphael, the solver also used by other crafting tools: it looks for the best sequence, can take longer and use more memory, and uses all processors but two. Its native library runs in the game's process: if it fails, the game can close. Its sequence is replayed in Tensho's simulator before it is proposed; a sequence that does not hold is refused.\nDefault: off.",
+    "SolverRaphaelTip": "Raphael, the solver also used by other crafting tools: it looks for the best sequence, can take longer and use more memory, and uses all processors but two. Its native library runs in the game's process: if it fails, the game can close. It also serves the crafting log panel, which then computes for each recipe you select. Its sequence is replayed in Tensho's simulator before it is proposed; a sequence that does not hold is refused.\nDefault: off.",
     "SettingRaphael": "Use the Raphael solver",
     "CollectLow": "Low {0}",
     "CollectMid": "Mid {0}",
@@ -2808,6 +2808,8 @@
     "ChestWaiting": "The game sends each chest page when you show it: open the five tabs (and the crystals) once, then record."
   },
   "CraftLogUi": {
+    "ByRaphael": "Solver: Raphael",
+    "RaphaelFailed": "Raphael failed; this suggestion comes from Tensho's search (details in the Dalamud log).",
     "Title": "Tensho · Crafting log",
     "Login": "Log in with a character before opening the crafting log.",
     "OpenError": "Could not open the crafting log.",

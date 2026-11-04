@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.467.0
+- Demande de l'utilisateur : le panneau du carnet d'artisanat suit le solveur choisi. Raphael a atteint 12 000/12 000 en 19 actions (rapport en jeu) là où le carnet, avec le solveur Tensho, proposait 7 308/12 000.
+  Une ligne « Solveur : Raphael » l'indique. Si Raphael échoue, la recherche Tensho répond, c'est dit dans le panneau et écrit dans le journal, et ce résultat n'est pas gardé en cache. Avec le calcul automatique,
+  Raphael calcule à chaque recette choisie (le calcul précédent est annulé) ; le cache du carnet distingue les deux solveurs.
+- Tests : Raphael465Tests complété. Verify.ps1 (agent) : 872/872, 0 avertissement, 0 erreur ; DLL 0.467.0.0. Recherche Raphael validée en jeu par l'utilisateur ; carnet non validé en jeu.
+### English
+- The crafting log panel now follows the chosen solver: with Raphael selected it computes with Raphael, says so, and falls back on Tensho's search if Raphael fails.
+
 ## 0.466.0
 - Raphael en jeu (rapport de l'utilisateur, 01:29) : la recherche échouait, car Raphael ne connaît pas le niveau de la recette et proposait Main preste (Trained Eye) en première action alors qu'il faut dix niveaux de plus que la recette. Le
   simulateur a refusé la séquence, comme prévu. Cette action n'est plus proposée à Raphael dans ce cas, et Heart and Soul non plus (il ne sert qu'à des actions hors de sa liste). Message d'erreur interne corrigé (il

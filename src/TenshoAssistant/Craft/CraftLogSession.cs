@@ -6,7 +6,8 @@ namespace TenshoAssistant.Craft;
 public sealed record CraftLogInput(ulong Owner,RecipeDefinition Recipe,CraftStats Stats,CraftActionCatalog Catalog,
     IReadOnlyList<CraftPreset> Presets,CraftSolveOptions Options,int ExtraWait,bool Echo,long ObservationRevision=0,int StartingQuality=0,bool Chain=false,int? BuffExtraWait=null,bool MacroChain=false);
 public sealed record CraftLogMacro(string Name,CraftSimulationResult Simulation,CraftMacroExport Export);
-public sealed record CraftLogResult(CraftLogMacro? Saved,CraftLogMacro? Suggested,bool TargetReached,string? SearchIssue);
+// 0.467: UsedRaphael = the suggestion comes from Raphael; RaphaelError = it failed and Tensho's search was used instead.
+public sealed record CraftLogResult(CraftLogMacro? Saved,CraftLogMacro? Suggested,bool TargetReached,string? SearchIssue,bool UsedRaphael=false,string? RaphaelError=null);
 public sealed record CraftLogState(CraftLogInput? Input,bool Loading,CraftLogResult? Result,string? Error,bool FromCache=false,DateTimeOffset? CalculatedAt=null);
 
 public sealed class CraftLogSession : IDisposable
@@ -21,7 +22,7 @@ public sealed class CraftLogSession : IDisposable
     public void ConfigureCache(Func<TimeSpan> lifetime,DataCache store){lock(gate){cacheLifetime=lifetime;disk=store;}}
     private CraftLogState state=new(null,false,null,null);
     public CraftLogState State=>Volatile.Read(ref state);
-    public CraftLogSession(Func<CraftLogInput,CancellationToken,CraftLogResult>? build=null)=>this.build=build ?? Build;
+    public CraftLogSession(Func<CraftLogInput,CancellationToken,CraftLogResult>? build=null)=>this.build=build ?? ((input,token)=>Build(input,token));
     /// <summary>How long a crafting log selection must stay the same before its search starts (350 ms since the panel's first version).</summary>
     public static readonly TimeSpan SettleDelay=TimeSpan.FromMilliseconds(350);
     /// <summary>
@@ -60,7 +61,8 @@ public sealed class CraftLogSession : IDisposable
                     lock(gate)if(!disposed && ticket==generation && !token.IsCancellationRequested)
                     {
                         state=new(input,false,result,null,fromCache,date);
-                        if(!fromCache && disk is { } writeStore)_=writeStore.WriteAsync("craft-calculations",key,"craft-model-v3",result,date);
+                        // 0.467: a suggestion made after a Raphael failure is not kept: the next opening tries Raphael again.
+                        if(!fromCache && result.RaphaelError is null && disk is { } writeStore)_=writeStore.WriteAsync("craft-calculations",key,"craft-model-v3",result,date);
                     }
                 }
                 catch(Exception error)
@@ -94,7 +96,8 @@ public sealed class CraftLogSession : IDisposable
         }
         catch(Exception){return false;}
     }
-    public static CraftLogResult Build(CraftLogInput input,CancellationToken token=default)
+    /// <param name="raphael">0.467 (user request, in-game campaign): the optional Raphael solver, used when the options ask for it; if it fails, Tensho's search answers and the error is returned.</param>
+    public static CraftLogResult Build(CraftLogInput input,CancellationToken token=default,Func<RecipeDefinition,CraftStats,int,CraftSolveOptions,CancellationToken,CraftSolveResult>? raphael=null)
     {
         token.ThrowIfCancellationRequested();
         if(CraftSimulation.Unsupported(input.Recipe) is { } issue)throw new ArgumentException(issue);
@@ -114,12 +117,18 @@ public sealed class CraftLogSession : IDisposable
             }
             catch(ArgumentException){ /* An incompatible saved scenario must not prevent the new search. */ }
         }
-        var result=CraftSolver.Solve(input.Recipe,input.Stats,input.StartingQuality,input.Options with {ExtraWait=input.ExtraWait,BuffExtraWait=input.BuffExtraWait},token);
+        var options=input.Options with {ExtraWait=input.ExtraWait,BuffExtraWait=input.BuffExtraWait};
+        CraftSolveResult? fromRaphael=null;string? raphaelError=null;
+        if(input.Options.Raphael && raphael is not null)
+            try{fromRaphael=raphael(input.Recipe,input.Stats,input.StartingQuality,options,token);}
+            catch(Exception error) when(error is not OperationCanceledException){raphaelError=error.Message;}
+        token.ThrowIfCancellationRequested();
+        var result=fromRaphael ?? CraftSolver.Solve(input.Recipe,input.Stats,input.StartingQuality,options,token);
         var suggested=result.Simulation is {Final.Finish:CraftFinish.Completed,Error:null} valid
             ? new CraftLogMacro("Suggested macro",valid,CraftMacroExporter.Build(valid,job,input.Catalog,input.ExtraWait,input.Echo,input.Chain,input.BuffExtraWait,input.MacroChain)):null;
         token.ThrowIfCancellationRequested();
         return new(saved,suggested,result.TargetReached,suggested is null ? "No finished synthesis found within the search limits."
-            :result.TargetReached ? null:"The sequence ends below the target quality.");
+            :result.TargetReached ? null:"The sequence ends below the target quality.",fromRaphael is not null,raphaelError);
     }
     private void CancelCore(){generation++;cancellation?.Cancel();state=new(null,false,null,null);}
     public void Cancel(){lock(gate)if(!disposed)CancelCore();}

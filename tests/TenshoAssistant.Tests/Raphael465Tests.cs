@@ -41,6 +41,14 @@ internal static class Raphael465Tests
             Check(Read("MainWindow.Settings.cs").Contains("BoolSetting(\"CraftSearch.SettingRaphael\""),"settings");
             Check(Read("TenshoAssistant.csproj").Contains("<PackageReference Include=\"Raphael.Net\" Version=\"5.0.0\" />") && Read("Credits/CreditCatalog.cs").Contains("new(\"RaphaelRs\","),"package, credits");
         }),
+        ("Crafting log (0.467): follows the solver chosen; a Raphael failure falls back on Tensho's search, said and not cached",() =>
+        {
+            var ui=Read("MainWindow.CraftLog.cs");
+            Check(ui.Contains("CraftLogSession.Build(input,token,RaphaelCraftSolver.Solve)") && ui.Contains("craftMacroBuffWait,craftForbidden,CraftSearchOptions.Raphael),"),"wired to the setting");
+            var session=Read("Craft/CraftLogSession.cs");
+            Check(session.Contains("if(input.Options.Raphael && raphael is not null)") && session.Contains("catch(Exception error) when(error is not OperationCanceledException){raphaelError=error.Message;}"),"fallback");
+            Check(session.Contains("if(!fromCache && result.RaphaelError is null && disk is { } writeStore)"),"not cached");
+        }),
     ];
 }
 

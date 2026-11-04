@@ -681,7 +681,7 @@
     "SolverTensho": "Tensho",
     "SolverTenshoTip": "La recherche bornée de Tensho, dans le plugin : rapide, sans preuve d'avoir trouvé la meilleure séquence. Elle utilise les limites ci-dessous.\nPar défaut.",
     "SolverRaphael": "Raphael",
-    "SolverRaphaelTip": "Raphael, le solveur utilisé aussi par d'autres outils d'artisanat : il cherche la meilleure séquence, peut prendre plus de temps et de mémoire, et utilise tous les processeurs sauf deux. Sa bibliothèque native tourne dans le processus du jeu : si elle échoue, le jeu peut se fermer. Sa séquence est rejouée dans le simulateur de Tensho avant d'être proposée ; une séquence qui ne tient pas est refusée.\nPar défaut : désactivé.",
+    "SolverRaphaelTip": "Raphael, le solveur utilisé aussi par d'autres outils d'artisanat : il cherche la meilleure séquence, peut prendre plus de temps et de mémoire, et utilise tous les processeurs sauf deux. Sa bibliothèque native tourne dans le processus du jeu : si elle échoue, le jeu peut se fermer. Il sert aussi au panneau du carnet d'artisanat, qui calcule alors pour chaque recette choisie. Sa séquence est rejouée dans le simulateur de Tensho avant d'être proposée ; une séquence qui ne tient pas est refusée.\nPar défaut : désactivé.",
     "SettingRaphael": "Utiliser le solveur Raphael",
     "CollectLow": "Bas {0}",
     "CollectMid": "Moyen {0}",
@@ -2808,6 +2808,8 @@
     "ChestWaiting": "Le jeu envoie chaque page du coffre quand vous l'affichez : ouvrez les cinq onglets (et les cristaux) une fois, puis enregistrez."
   },
   "CraftLogUi": {
+    "ByRaphael": "Solveur : Raphael",
+    "RaphaelFailed": "Raphael a échoué ; cette proposition vient de la recherche Tensho (détail dans le journal de Dalamud).",
     "Title": "Tensho · Carnet de synthèse",
     "Login": "Connectez un personnage avant d’ouvrir le carnet.",
     "OpenError": "Ouverture du carnet impossible.",
