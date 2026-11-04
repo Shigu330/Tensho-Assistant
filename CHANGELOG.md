@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.483.0
+- Rapport de l'utilisateur en jeu : « Raison solide pas dispo au moment où il la demande ». La règle exacte n'est pas connue. Sous le maximum de tentatives, Tensho demande au jeu si l'action est utilisable (`ActionManager.GetActionStatus`, lecture seule) ; si le jeu refuse, elle n'est plus conseillée ni comptée. À tentatives pleines, le jeu ne peut pas encore répondre : le plan peut encore la compter pour plus tard, ce qui peut rester optimiste. Le journal note la réponse en mode développeur.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 919/919, 0 avertissement, 0 erreur ; DLL 0.483.0.0. Non validé en jeu.
+### English
+- The collectable plan asks the game whether Solid Reason or Ageless Words can be used now, and stops counting on it when the game refuses.
+
 ## 0.482.0
 - Rapport de l'utilisateur en jeu : « ne conseille pas l'action Inspection ». L'ordre des actions ne change pas la moyenne, et l'égalité donnait « pas de PR maintenant » : Inspection restait pour plus tard. Une action bonus qui rapporte et peut passer d'abord est maintenant le coup conseillé, Inspection puis Œil du collectionneur.
 - Le gain affiché était celui de la case cochée du jeu (+352) au lieu du gain réel (+177) : corrigé. Le panneau indique aussi les Inspections du plan et leurs PR. Rapport « le texte fait 5 actions » pour 4 tentatives : la cinquième vient de Raison solide, et le panneau le dit maintenant (de 4 à 5 tentatives). Le plan limitait déjà ses actions aux PR disponibles ; le panneau montre maintenant ce qu'il dépense et ce qu'il reste, et mesure les PR regagnés. Les PR regagnés pendant la passe ne sont pas encore comptés dans le plan.

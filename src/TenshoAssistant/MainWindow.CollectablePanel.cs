@@ -18,6 +18,9 @@ internal sealed partial class MainWindow
     internal Func<uint,(string Name,uint Icon,int Cost)?>? CollectableActionInfo{get;set;}
     // 0.480: Scrutiny is on the player now (status read on the game's thread, as the draw is).
     internal Func<bool>? ScrutinyActive{get;set;}
+    // 0.483 (user report: Solid Reason not available when advised): the game's own answer for an action, 0 = usable now; null = unknown. Read only.
+    internal Func<uint,uint?>? CollectableActionStatus{get;set;}
+    private string? collectableRestoreLogged;
     private IReadOnlyList<string>? collectableTurnRaw;
     private CollectableTurn? collectableTurn;
     private (CollectableTurn Turn,int? Attempts,CollectableRule? Rule,CollectableBonuses Bonuses)? collectableAdviceKey;
@@ -96,6 +99,13 @@ internal sealed partial class MainWindow
         var job=turn.ScourAction==22182 ? 16u:17u;
         var restore=configuration.CollectableUseRestore ? gpActions.State.Catalog?.Actions.FirstOrDefault(row=>row.Spec.JobId==job && row.Spec.Effect==GpEffect.Attempt && !GpActionRules.Forbidden(GpForbidden,row.Spec)):null;
         if(turn.IntuitionChance>0 && (!collectableChanceBase.TryGetValue(turn.ItemId,out var lowest) || turn.IntuitionChance<lowest))collectableChanceBase[turn.ItemId]=turn.IntuitionChance;
+        // Below the maximum, attempts can be restored: if the game says no now, the plan does not count on it. At the maximum it cannot say yet, the plan may still count on it for later.
+        if(restore is not null && attempts is { } attemptsNow && maximum is { } most && attemptsNow<most && CollectableActionStatus?.Invoke(restore.Spec.Id) is { } status)
+        {
+            var seen=$"{status}|{attemptsNow}/{most}";
+            if(developerMode && seen!=collectableRestoreLogged){collectableRestoreLogged=seen;log.Information("Collectable restore action {Action}: status {Status} at {Attempts}/{Maximum}",restore.Spec.Id,status,attemptsNow,most);}
+            if(status!=0)restore=null;
+        }
         var bonuses=new CollectableBonuses(configuration.CollectableScrutinyGain,configuration.CollectableIntuitionGain,gp ?? 0,
             CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Cost ?? 0,configuration.CollectableUseFocus ? CollectableActionInfo?.Invoke(turn.FocusAction)?.Cost ?? 0:0,active,configuration.CollectableUseScrutiny,restore?.Spec.Cost ?? 0,maximum ?? 0,
             collectableChanceBase.GetValueOrDefault(turn.ItemId));

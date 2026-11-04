@@ -230,6 +230,13 @@ internal static class Gathering478Tests
             var end=CollectableTurn.Parse(Raw(1000,177,88,265,132,false))! with {IntuitionChance=13};
             Check(CollectableAdvisor.Advise(end,1,ore,measured with {Gp=227}) is {Move:CollectableMove.Collect,Scrips:20,Target:CollectableTier.High},"in-game capture: 1000, one attempt: collect, 20 scrips");
         }),
+        ("Restored attempts: the game's own answer decides, below the maximum; nothing is used",() =>
+        {
+            var panel=Read("MainWindow.CollectablePanel.cs");
+            Check(panel.Contains("attemptsNow<most && CollectableActionStatus?.Invoke(restore.Spec.Id) is { } status") && panel.Contains("if(status!=0)restore=null;"),"refused now: not planned");
+            var state=Read("Gathering/CollectableActionState.Dalamud.cs");
+            Check(state.Contains("GetActionStatus(ActionType.Action,action)") && state.Contains("MemberFunctionPointers.GetActionStatus==0") && !state.Contains("UseAction"),"guarded, read only");
+        }),
         ("Major bonus: normal is the plainest node seen; a normal node keeps its GP, a bonus node spends it",() =>
         {
             var norms=new GatherNodeNorms();
