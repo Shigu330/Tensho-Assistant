@@ -4829,7 +4829,7 @@
     "Failed": "Could not sort (see /xllog)"
   },
   "GpTick": {
-    "Stalled": "GP {0}/{1}: not rising at the moment",
+    "Stalled": "GP {0}/{1} · paused",
     "AlertSetting": "GP alert at a threshold",
     "AlertSettingTip": "A chat message and the alarm sound when a gatherer's GP rises to the chosen threshold, once per rise. Not in combat; the alarm options apply.\nDefault: off.",
     "Threshold": "GP threshold",

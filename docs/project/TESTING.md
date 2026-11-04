@@ -716,7 +716,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.484 : risque accepté** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Barre de tic : à l'ouverture d'une fenêtre de récolte, après quelques secondes, elle dit que les PR ne remontent pas ; en la quittant, elle repart. Paramètres › Modules › Récolte montre les PR par tic mesurés.
+- [ ] Barre de tic : à l'ouverture d'une fenêtre de récolte, après quelques secondes, elle affiche « pause » ; en la quittant, elle repart. Paramètres › Modules › Récolte montre les PR par tic mesurés.
 - [ ] Carte Tensho ouverte, plugin rechargé : elle revient seule, sans M deux fois. Carte du jeu hors combat : pas d'autre effet.
 - [ ] Panneau Collectionnable : « Calcul du plan… » apparaît à peine, le jeu ne se fige pas au changement de curseur.
 

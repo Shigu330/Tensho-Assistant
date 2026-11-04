@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.485.0
+- Demande de l'utilisateur : le texte de la barre de tic était coupé. Il affiche maintenant « PR 227/809 · pause ».
+- Verify.ps1 (agent) : 922/922, 0 avertissement, 0 erreur ; DLL 0.485.0.0. Non validé en jeu.
+### English
+- The GP tick bar now just says « paused » when GP stops rising; the longer text was cut.
+
 ## 0.484.0
 - Demande de l'utilisateur : prendre en compte le risque, avec une tolérance réglable dans le panneau d'aide. Curseur « Risque accepté » dans le panneau Collectionnable, et dans Paramètres › Modules › Récolte, 50 % par défaut. Chaque tirage compte pour un mélange de sa moyenne et de son pire résultat : à 0 %, le pire décide ; à 100 %, la moyenne seule. Le panneau annonce la moyenne et le résultat si tous les tirages tournent mal.
 - Tests : Gathering478Tests complété. Verify.ps1 (agent) : 922/922, 0 avertissement, 0 erreur ; DLL 0.484.0.0. Non validé en jeu.

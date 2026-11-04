@@ -4829,7 +4829,7 @@
     "Failed": "Tri impossible (voir /xllog)"
   },
   "GpTick": {
-    "Stalled": "PR {0}/{1} : ne remontent pas pour l'instant",
+    "Stalled": "PR {0}/{1} · pause",
     "AlertSetting": "Alerte PR au seuil",
     "AlertSettingTip": "Un message dans le chat et le son des alarmes quand les PR d'un récolteur remontent au seuil choisi, une fois par remontée. Pas en combat ; options des alarmes appliquées.\nPar défaut : désactivé.",
     "Threshold": "Seuil des PR",
