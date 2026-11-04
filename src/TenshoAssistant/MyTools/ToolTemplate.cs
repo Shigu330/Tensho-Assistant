@@ -27,4 +27,5 @@ public sealed record LinkBlock(TemplateText Label,string Url):TemplateBlock;
 /// TEMPLATES-001 (DEC-029): a tool made of data. It describes a page built from Tensho's blocks and holds no code, command or macro: nothing in it is ever run or sent to the game. The names of
 /// items always come from the game's data.
 /// </summary>
-public sealed record ToolTemplate(string Id,TemplateText Name,string? Author,string? License,IReadOnlyList<TemplateBlock> Blocks);
+/// <param name="Theme">T8: the one setting a tool may propose, by name (<see cref="ToolTemplateFormat.Themes"/>). Applied only on the player's click.</param>
+public sealed record ToolTemplate(string Id,TemplateText Name,string? Author,string? License,IReadOnlyList<TemplateBlock> Blocks,string? Theme=null);

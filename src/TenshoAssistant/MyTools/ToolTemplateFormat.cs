@@ -18,6 +18,9 @@ public static partial class ToolTemplateFormat
 {
     public const int Schema=1,MaxBytes=65536,MaxBlocks=100,MaxEntries=100,MaxItems=200,MaxLabel=200,MaxNote=2000,MaxLink=300,MaxAuthor=40,MaxWanted=999999,MaxTarget=999999;
     public const string SharePrefix="TENSHO1:";
+    /// <summary>T8: the settings a tool may propose are this list and nothing else. Same order as PluginTheme; a theme's ThemeMode is its position plus one (0 follows the game).</summary>
+    public static readonly IReadOnlyList<string> Themes=["dark","light","classic-ff","clear-blue","clear-white","clear-green"];
+    public static int ThemeMode(string theme)=>Math.Max(0,Themes.ToList().IndexOf(theme)+1);
     private const int MaxShareChars=120000;
 
     private sealed class Refused(string code,string where=""):Exception(code)
@@ -96,7 +99,7 @@ public static partial class ToolTemplateFormat
 
     private static ToolTemplate Read(JsonElement root)
     {
-        var fields=Fields(root,"tool","schema","id","name","author","license","blocks");
+        var fields=Fields(root,"tool","schema","id","name","author","license","settings","blocks");
         if(Need(fields,"schema","tool").ValueKind!=JsonValueKind.Number || !fields["schema"].TryGetInt32(out var schema) || schema!=Schema)throw new Refused("Schema");
         var id=Need(fields,"id","tool").ValueKind==JsonValueKind.String ? fields["id"].GetString():null;
         if(!ValidId(id))throw new Refused("BadId","tool.id");
@@ -104,8 +107,15 @@ public static partial class ToolTemplateFormat
         if(author.Length>MaxAuthor)throw new Refused("TooLong","tool.author");
         var license=OptionalText(fields,"license","tool");
         if(license is not null && !LicenseRule().IsMatch(license))throw new Refused("BadValue","tool.license");
+        string? theme=null;
+        if(fields.TryGetValue("settings",out var settings))
+        {
+            var proposed=Fields(settings,"tool.settings","theme");
+            theme=OptionalText(proposed,"theme","tool.settings");
+            if(theme is not null && !Themes.Contains(theme,StringComparer.Ordinal))throw new Refused("BadValue","tool.settings.theme");
+        }
         var rows=List(Need(fields,"blocks","tool"),MaxBlocks,"tool.blocks");
-        return new(id!,Text(Need(fields,"name","tool"),MaxLabel,"tool.name"),author.Length>0 ? author:null,license,rows.Select((row,index)=>Block(row,$"blocks[{index}]")).ToArray());
+        return new(id!,Text(Need(fields,"name","tool"),MaxLabel,"tool.name"),author.Length>0 ? author:null,license,rows.Select((row,index)=>Block(row,$"blocks[{index}]")).ToArray(),theme);
     }
 
     private static TemplateBlock Block(JsonElement element,string where)
@@ -178,6 +188,12 @@ public static partial class ToolTemplateFormat
             WriteText(json,"name",template.Name);
             if(template.Author is not null)json.WriteString("author",template.Author);
             if(template.License is not null)json.WriteString("license",template.License);
+            if(template.Theme is not null)
+            {
+                json.WriteStartObject("settings");
+                json.WriteString("theme",template.Theme);
+                json.WriteEndObject();
+            }
             json.WriteStartArray("blocks");
             foreach(var block in template.Blocks)WriteBlock(json,block);
             json.WriteEndArray();

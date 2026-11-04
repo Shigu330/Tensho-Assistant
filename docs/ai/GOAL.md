@@ -1,8 +1,8 @@
 # GOAL actif
 
-ID: TEMPLATES-001 partie B ([DEC-029](../project/DECISIONS.md), 2026-11-04). Partie code faite en 0.470. Le chat personnalisable est abandonné ([DEC-030](../project/DECISIONS.md)). La campagne de tests en jeu (lots 6 à 10) reprend ou s'intercale, au choix de l'utilisateur.
+ID: FIN-DE-FILE — retour à la campagne de tests en jeu (lots 6 à 10) et aux points ouverts de STATUS. Modèles communautaires (TEMPLATES-001) terminés côté code en 0.476, à valider en jeu ; le chat personnalisable est abandonné ([DEC-030](../project/DECISIONS.md)).
 
-Objectif précédent, en pause : FIN-DE-FILE — fin de la file d'attente (état relu le 2026-11-03, version 0.446.0).
+État de la file relu le 2026-11-03, version 0.446.0 :
 
 FAIT : files a) à g) de [ROADMAP](../project/ROADMAP.md) (0.315–0.446), dont l'étape g) : 101 manques choisis dans
 [GAPS](../project/GAPS.md), domaine par domaine, sauf les écarts laissés dans [G-PROPOSALS](../project/G-PROPOSALS.md)

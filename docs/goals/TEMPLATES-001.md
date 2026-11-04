@@ -2,7 +2,7 @@
 
 Demande de l'utilisateur (2026-11-04) : « prévois aussi un plan pour template communautaire ajout outils dans tensho ». Les décisions à prendre sont à la fin.
 
-**Décidé le 2026-11-04 ([DEC-029](../project/DECISIONS.md))** : les deux, code d'abord, tout de suite. A0, A1, A2 et A4 faits en 0.470. Partie sans code : format, page, blocs et partage faits en 0.473 ; le bloc d'objets ne montre pas encore les prix ; éditeur fait en 0.474 ; galerie faite en 0.475, visible après la prochaine release ; réglages à suivre.
+**Décidé le 2026-11-04 ([DEC-029](../project/DECISIONS.md))** : les deux, code d'abord, tout de suite. A0, A1, A2 et A4 faits en 0.470. Partie sans code : format, page, blocs et partage faits en 0.473 ; le bloc d'objets ne montre pas encore les prix ; éditeur fait en 0.474 ; galerie faite en 0.475, visible après la prochaine release ; thème proposé fait en 0.476. **Partie sans code terminée, non validée en jeu.**
 
 ## Deux sens possibles
 
@@ -61,9 +61,10 @@ Un modèle est un fichier de données qui décrit une page faite de blocs fourni
   "name": { "en": "Raid prep", "fr": "Préparation de raid" },
   "author": "pseudonyme",
   "license": "CC0-1.0",
+  "settings": { "theme": "clear-blue" },
   "blocks": [
     { "type": "heading", "text": { "en": "Food", "fr": "Repas" } },
-    { "type": "itemList", "items": [ { "id": 12345, "wanted": 10 } ], "show": ["owned", "price"] },
+    { "type": "items", "items": [ { "id": 12345, "wanted": 10 } ] },
     { "type": "checklist", "reset": "daily", "entries": [ { "en": "Roulette", "fr": "Roulette" } ] },
     { "type": "note", "text": { "en": "Free text", "fr": "Texte libre" } }
   ]
@@ -142,7 +143,7 @@ La taille est une estimation subjective, pas une mesure.
 | T3 | **Registre des pages tout de suite** (fait, 0.470) |
 | T4 et T5 | Dossier dans ce dépôt, CC0 |
 | T6 et T7 | Galerie dans le plugin, sur clic ; validation automatique et relecture |
-| T8 et T9 | Réglages en liste blanche ; sept blocs en première version |
+| T8 et T9 | Réglages en liste blanche (le thème seulement, appliqué sur clic) ; sept blocs en première version |
 | T10 | Case IA dans la pull request (recommandation appliquée, elle y était déjà) |
 
 ## Options étudiées (historique)

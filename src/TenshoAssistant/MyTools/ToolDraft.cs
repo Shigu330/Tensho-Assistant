@@ -15,11 +15,12 @@ public sealed class ToolDraft
     public TemplateText Name{get;set;}
     public string Author{get;set;}
     public bool FreeToShare{get;set;}
+    public string? Theme{get;set;}
     public List<TemplateBlock> Blocks{get;}
 
     private ToolDraft(string id,TemplateText name,string author,bool free,List<TemplateBlock> blocks){Id=id;Name=name;Author=author;FreeToShare=free;Blocks=blocks;}
     public static ToolDraft New()=>new("my-"+Convert.ToHexString(RandomNumberGenerator.GetBytes(5)).ToLowerInvariant(),Empty,"",false,[]);
-    public static ToolDraft From(ToolTemplate template)=>new(template.Id,template.Name,template.Author ?? "",template.License==FreeLicense,template.Blocks.ToList());
+    public static ToolDraft From(ToolTemplate template)=>new(template.Id,template.Name,template.Author ?? "",template.License==FreeLicense,template.Blocks.ToList()){Theme=template.Theme};
 
     public static readonly TemplateText Empty=new(new Dictionary<string,string>());
     public static TemplateText With(TemplateText text,string language,string value)
@@ -46,7 +47,7 @@ public sealed class ToolDraft
         (Blocks[index],Blocks[target])=(Blocks[target],Blocks[index]);
         return true;
     }
-    public ToolTemplate ToTemplate()=>new(Id,Name,Author.Trim().Length>0 ? Author.Trim():null,FreeToShare ? FreeLicense:null,Blocks.ToArray());
+    public ToolTemplate ToTemplate()=>new(Id,Name,Author.Trim().Length>0 ? Author.Trim():null,FreeToShare ? FreeLicense:null,Blocks.ToArray(),Theme);
     /// <summary>The tool as it will be saved, or what stops it.</summary>
     public TemplateParse Check()=>ToolTemplateFormat.Parse(ToolTemplateFormat.Serialize(ToTemplate()));
 }

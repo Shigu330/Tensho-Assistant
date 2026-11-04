@@ -68,7 +68,15 @@ internal sealed partial class MainWindow
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.RemoveTip"));
         }
         else if(ImGui.SmallButton(localization.Get("MyToolsUi.RemoveConfirm"))){store.Remove(tool.Template.Id);myToolSelected=null;myToolRemoveArmed=null;}
+        // T8: a tool only proposes; the setting changes on this click, and « ↺ » in the settings brings it back.
+        if(tool.Template.Theme is { } theme && configuration.ThemeMode!=ToolTemplateFormat.ThemeMode(theme))
+        {
+            if(ImGui.SmallButton(localization.Format("MyToolsUi.ThemeApply",ThemeName(theme))+"###MyToolThemeApply"))SaveTheme(ToolTemplateFormat.ThemeMode(theme));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.ThemeApplyTip"));
+        }
     }
+
+    private string ThemeName(string theme)=>localization.Get("Theme."+(UI.PluginTheme)(ToolTemplateFormat.ThemeMode(theme)-1));
 
     private void DrawMyToolsImport(ToolTemplateStore store)
     {
@@ -148,6 +156,7 @@ internal sealed partial class MainWindow
         if(unknown>0)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MyToolsUi.UnknownItems",unknown));
         foreach(var host in template.Blocks.OfType<LinkBlock>().Select(link=>ToolTemplateFormat.SafeLink(link.Url)?.IdnHost).OfType<string>().Distinct())
             ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MyToolsUi.LinksTo",host));
+        if(template.Theme is { } theme)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MyToolsUi.ThemeProposed",ThemeName(theme)));
         var replaces=store.Tools.Any(tool=>tool.Template.Id==template.Id);
         if(replaces)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("MyToolsUi.Replaces"));
         if(ImGui.SmallButton(localization.Get("MyToolsUi.Install")))

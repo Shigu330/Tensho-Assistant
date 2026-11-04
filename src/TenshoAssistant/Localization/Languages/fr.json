@@ -20,6 +20,9 @@
     "ToolFilterTip": "Partie du nom d'un domaine, d'un outil ou d'un plugin de référence ; accents et majuscules ignorés."
   },
   "MyToolsEditor": {
+    "Theme": "Thème proposé",
+    "ThemeTip": "Un thème à proposer avec cet outil. Le joueur choisit de l'utiliser ou non.",
+    "ThemeNone": "Aucun",
     "Language": "Vous écrivez dans la langue du plugin. Les autres langues de l'outil sont gardées.",
     "Name": "Nom de l'outil",
     "NameTip": "Son nom dans la liste.",
@@ -74,6 +77,9 @@
     "Cancel": "Annuler"
   },
   "MyToolsUi": {
+    "ThemeProposed": "Propose le thème {0}. Rien ne change sans votre clic.",
+    "ThemeApply": "Utiliser le thème {0}",
+    "ThemeApplyTip": "Change le thème du plugin. Le réglage du thème permet de revenir en arrière.",
     "Gallery": "Galerie",
     "GalleryClose": "Fermer la galerie",
     "GalleryTip": "Des outils proposés par des joueurs, lus par une personne avant publication.",

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.476.0
+- TEMPLATES-001 phase B7 (T8) : un outil peut proposer un thème, seul réglage de la liste blanche. L'aperçu le dit et le thème ne change que sur le clic « Utiliser le thème… ». Tout autre réglage dans un fichier le fait refuser. Le webhook Discord ne peut donc pas être touché par un outil. La partie sans code des modèles est terminée.
+- Tests : MyToolsTests complété. Verify.ps1 (agent) : 905/905, 0 avertissement, 0 erreur ; DLL 0.476.0.0. Non validé en jeu.
+### English
+- A tool in « My tools » may propose a theme, the only setting allowed. It changes only on the player's click, and any other setting in a file refuses it.
+
 ## 0.475.0
 - TEMPLATES-001 phases B5 et B6 : galerie d'outils communautaires. Dossier `community-templates/` (T4), licence CC0 (T5), deux outils d'exemple, `scripts/Update-ToolGallery.ps1` pour l'index, tests qui appliquent à chaque fichier les règles du plugin, relecture humaine par pull request (T7). Dans le plugin, la liste et un outil se lisent seulement sur clic (T6), avec taille bornée et empreinte vérifiée, puis passent par le même aperçu qu'un outil collé. Crédit et description du plugin mis à jour.
 - La galerie lit la branche `main` : elle restera vide tant qu'une release n'a pas publié ce dossier.

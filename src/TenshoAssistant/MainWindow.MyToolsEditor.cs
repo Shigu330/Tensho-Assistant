@@ -43,6 +43,11 @@ internal sealed partial class MainWindow
         var free=draft.FreeToShare;
         if(ImGui.Checkbox(localization.Get("MyToolsEditor.Free")+"###MyToolFree",ref free))draft.FreeToShare=free;
         Tip("MyToolsEditor.FreeTip");
+        var themes=new[]{localization.Get("MyToolsEditor.ThemeNone")}.Concat(Enum.GetValues<UI.PluginTheme>().Select(value=>localization.Get("Theme."+value))).ToArray();
+        var theme=draft.Theme is null ? 0:ToolTemplateFormat.ThemeMode(draft.Theme);
+        ImGui.SetNextItemWidth(320);
+        if(ImGui.Combo(localization.Get("MyToolsEditor.Theme")+"###MyToolTheme",ref theme,themes))draft.Theme=theme==0 ? null:ToolTemplateFormat.Themes[theme-1];
+        Tip("MyToolsEditor.ThemeTip");
         for(var index=0;index<draft.Blocks.Count;index++)
         {
             ImGui.PushID(index);

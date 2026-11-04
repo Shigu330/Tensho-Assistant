@@ -20,6 +20,9 @@
     "ToolFilterTip": "Part of a category, tool or reference plugin name; accents and case ignored."
   },
   "MyToolsEditor": {
+    "Theme": "Proposed theme",
+    "ThemeTip": "A theme to propose with this tool. The player chooses to use it or not.",
+    "ThemeNone": "None",
     "Language": "You write in the plugin's language. A tool's other languages are kept.",
     "Name": "Tool name",
     "NameTip": "Its name in the list.",
@@ -74,6 +77,9 @@
     "Cancel": "Cancel"
   },
   "MyToolsUi": {
+    "ThemeProposed": "Proposes the {0} theme. Nothing changes unless you click.",
+    "ThemeApply": "Use the {0} theme",
+    "ThemeApplyTip": "Changes the plugin's theme. The theme setting brings it back.",
     "Gallery": "Gallery",
     "GalleryClose": "Close the gallery",
     "GalleryTip": "Tools proposed by players, read by a person before being published.",

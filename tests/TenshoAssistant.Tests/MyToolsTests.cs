@@ -164,6 +164,22 @@ internal static class MyToolsTests
             var both=ToolDraft.With(new(new Dictionary<string,string>{["en"]="a"}),"fr","b");
             Check(both.Values.Count==2 && ToolDraft.With(both,"fr"," ").Values.Count==1,"other languages kept");
         }),
+        ("My tools settings: a tool may propose a theme, nothing else, and only a click applies it",() =>
+        {
+            var themed=ToolTemplateFormat.Parse(Tool("",""","settings":{"theme":"clear-blue"}"""));
+            Check(themed.Template?.Theme=="clear-blue" && ToolTemplateFormat.Parse(Tool("")).Template?.Theme is null,"read");
+            Check(ToolTemplateFormat.Parse(ToolTemplateFormat.Serialize(themed.Template!)).Template?.Theme=="clear-blue","written back");
+            Refused(Tool("",""","settings":{"theme":"neon"}"""),"BadValue");
+            foreach(var setting in new[]{"Discord","DiscordWebhook","MapView","themeMode"})Refused(Tool("",$$""","settings":{"{{setting}}":"x"}"""),"UnknownField");
+            var names=System.Text.RegularExpressions.Regex.Match(Read("UI/FfxivTheme.cs")+Read("UI/ThemePalettes.cs"),@"enum PluginTheme \{([^}]*)\}").Groups[1].Value.Split(',',StringSplitOptions.TrimEntries);
+            Check(names.Length==ToolTemplateFormat.Themes.Count && names.Select(name=>name.ToLowerInvariant()).SequenceEqual(ToolTemplateFormat.Themes.Select(name=>name.Replace("-",""))),"same order as PluginTheme");
+            Check(ToolTemplateFormat.ThemeMode("dark")==1 && ToolTemplateFormat.ThemeMode("clear-green")==6 && ToolTemplateFormat.ThemeMode("x")==0,"ThemeMode");
+            var page=Read("MainWindow.MyTools.cs");
+            Check(page.Contains("\"MyToolsUi.ThemeProposed\"") && page.Contains("###MyToolThemeApply\"))SaveTheme("),"said in the preview, applied on a click");
+            Check(!page.Contains("configuration.ThemeMode=") && System.Text.RegularExpressions.Regex.Matches(page,"SaveTheme\\(").Count==1,"nowhere else");
+            var draft=ToolDraft.New();draft.Name=ToolDraft.With(draft.Name,"en","a");draft.Theme="light";
+            Check(draft.Check().Template?.Theme=="light" && ToolDraft.From(draft.ToTemplate()).Theme=="light","editor");
+        }),
         ("My tools wiring: nothing sent to the game; links confirmed; the file is checked and shown before it is installed",() =>
         {
             var page=Read("MainWindow.MyTools.cs");

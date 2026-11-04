@@ -79,7 +79,7 @@ Points encore ouverts : chacun attend un relevé en jeu ou se règle dans une é
 
 | Point | Source | Constat | Relevé ou étape attendus |
 |---|---|---|---|
-| Modèles communautaires | [TEMPLATES-001](../goals/TEMPLATES-001.md), [DEC-029](DECISIONS.md) | Décidé ; partie code faite en 0.470 | Partie sans code à faire |
+| Modèles communautaires | [TEMPLATES-001](../goals/TEMPLATES-001.md), [DEC-029](DECISIONS.md) | Terminés côté code en 0.476 | Validation en jeu ; galerie visible après une release |
 | Règle « coût ≤ capacité » sous le rang 50 | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Coût ≤ capacité » | Règle des outils communautaires. Cohérente avec 11 montages de dirigeables publiés ; non vérifiée en jeu sous le rang 50. | Relevé en jeu sur un vaisseau de rang inférieur à 50. |
 | Type de marqueur des mandats | CHANGELOG 0.298 ; STATUS (validé 0.297–0.299) | Le journal montre les types 0, 3 (quêtes), 4 et 6 ; aucun relevé ne dit lequel désigne un mandat. | Relevé en jeu : mandat accepté, carte ouverte, mode développeur. |
 | Icône du drapeau 60561 | `MainWindow.MapView.cs` (`FlagIcon`) ; CHANGELOG 0.102 (« supposée ») ; audit de la carte 0.328 | L'identifiant de l'icône du drapeau n'est pas prouvé dans docs/evidence (la pose du drapeau, elle, est validée en jeu). | Relevé en jeu : drapeau posé, `AgentMap.FlagMapMarkers[0].MapMarker.IconId` lu sur le framework (sonde), journal dans docs/evidence. |

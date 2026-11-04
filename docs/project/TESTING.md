@@ -714,6 +714,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.476 : thème proposé par un outil** — TEMPLATES-001
+
+- [ ] Éditeur : choisir un thème proposé, enregistrer. Le thème ne change pas tant qu'on n'a pas cliqué « Utiliser le thème… » ; le réglage du thème permet de revenir en arrière.
+- [ ] Coller un outil avec `"settings":{"theme":"light"}` : l'aperçu le dit. Avec un autre réglage : refusé.
+
 **0.475 : galerie de Mes outils** — TEMPLATES-001
 
 - [ ] Après la prochaine release (la galerie est lue sur `main`) : Galerie › Charger la liste, Voir, l'aperçu, Installer. Avant cette release, le message « n'a pas pu être lue » est normal.
