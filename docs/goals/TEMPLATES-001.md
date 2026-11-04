@@ -50,7 +50,7 @@ Un modèle est un fichier de données qui décrit une page faite de blocs fourni
 - Routine du jour pour un artisan : cases remises à zéro chaque jour, liens vers les recettes.
 - Liste d'objets à récolter pour un événement, avec fenêtres horaires et carte.
 - Pense-bête de compagnie libre : horaires, liens, notes.
-- Thème ou profil du futur chat ([CHAT-001](CHAT-001.md)), règles anti-bruit.
+- Thème de l'interface.
 
 ### Format
 
@@ -85,7 +85,7 @@ L'identifiant d'objet ci-dessus est un exemple. Les noms affichés viennent touj
 | `mapLink` | Position sur la carte Tensho | Carte |
 | `timer` | Compte à rebours vers un horaire ou une remise à zéro | Horloge, `ResetSchedule` |
 | `link` | URL `https`, ouverte après confirmation | Rien |
-| `settingsPreset` | Valeurs de réglages listés (thème, profil de chat) | Réglages autorisés, appliqués après aperçu |
+| `settingsPreset` | Valeurs de réglages listés (thème) | Réglages autorisés, appliqués après aperçu |
 
 Chaque bloc correspond à une lecture existante de Tensho. Un modèle ne peut pas accéder à autre chose.
 
@@ -123,7 +123,7 @@ La taille est une estimation subjective, pas une mesure.
 | B4 | Partage : copier-coller et fichier, aperçu à l'import | Petite |
 | B5 | Galerie dans le dépôt, validation automatique | Petite |
 | B6 | Galerie dans le plugin, sur clic | Moyenne |
-| B7 | Préréglages (thèmes, chat), si CHAT-001 avance | Petite |
+| B7 | Préréglages (thèmes) | Petite |
 
 ### Essais en jeu à prévoir
 
@@ -158,6 +158,6 @@ La recommandation est donnée d'abord.
 | T5 | Licence des modèles partagés ? | **CC0-1.0**, déclarée à l'envoi | GPL v3 : cohérente avec le plugin, mais lourde pour une simple liste |
 | T6 | Galerie dans le plugin (B6) ? | **Oui, sur clic, plus tard** ; à vérifier avec l'équipe Dalamud avant D17 | Non : copier-coller et fichiers suffisent, aucun réseau et aucune question de règlement |
 | T7 | Qui valide ? | **Validation automatique plus relecture humaine pour entrer dans la galerie** ; ce qui est importé à la main reste à la responsabilité du joueur | Automatique seule : ouvert et sans effort, mais du texte déplaisant peut passer |
-| T8 | Modèles qui changent des réglages ? | **Oui, liste blanche et aperçu**, utile pour les thèmes et le chat | Non : plus simple, sans partage de thèmes |
+| T8 | Modèles qui changent des réglages ? | **Oui, liste blanche et aperçu**, utile pour les thèmes | Non : plus simple, sans partage de thèmes |
 | T9 | Blocs de la première version ? | **Titre, note, cases, compteur, minuteur, objets, lien** | Tous d'un coup : plus long avant un premier résultat |
 | T10 | Déclaration de l'IA pour les contributions ? | **Case obligatoire dans le modèle de pull request**, conforme à la politique reprise dans CONTRIBUTING.md | Rien : risque au moment de la publication D17 |

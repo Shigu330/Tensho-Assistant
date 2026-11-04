@@ -7,7 +7,6 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../../src/TenshoAssistant/Chat/*.cs" Exclude="../../src/TenshoAssistant/Chat/*.Dalamud.cs" Link="Chat/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Localization/*.cs" Link="Localization/%(Filename)%(Extension)" />
     <EmbeddedResource Include="../../src/TenshoAssistant/Localization/Languages/*.json" LogicalName="TenshoAssistant.Localization.Languages.%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Caching/*.cs" Exclude="../../src/TenshoAssistant/Caching/*.Dalamud.cs" Link="Caching/%(Filename)%(Extension)" />

@@ -79,7 +79,6 @@ Points encore ouverts : chacun attend un relevé en jeu ou se règle dans une é
 
 | Point | Source | Constat | Relevé ou étape attendus |
 |---|---|---|---|
-| Chat personnalisable | [CHAT-001](../goals/CHAT-001.md), [DEC-029](DECISIONS.md) | Décidé : remplacement complet, tout de suite | Services de traduction et d'émoticônes à choisir à la phase 8 (C9) |
 | Modèles communautaires | [TEMPLATES-001](../goals/TEMPLATES-001.md), [DEC-029](DECISIONS.md) | Décidé ; partie code faite en 0.470 | Partie sans code à faire |
 | Règle « coût ≤ capacité » sous le rang 50 | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Coût ≤ capacité » | Règle des outils communautaires. Cohérente avec 11 montages de dirigeables publiés ; non vérifiée en jeu sous le rang 50. | Relevé en jeu sur un vaisseau de rang inférieur à 50. |
 | Type de marqueur des mandats | CHANGELOG 0.298 ; STATUS (validé 0.297–0.299) | Le journal montre les types 0, 3 (quêtes), 4 et 6 ; aucun relevé ne dit lequel désigne un mandat. | Relevé en jeu : mandat accepté, carte ouverte, mode développeur. |

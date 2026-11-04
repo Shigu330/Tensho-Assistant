@@ -548,10 +548,6 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>treasureMap=new Maps.TreasureMapReader(framework,client,data,log),()=>treasureMap?.Dispose());
             mainWindow.TreasureMap=()=>treasureMap?.Spot;
             // g, M-03 (0.373): map links of the chat, kept for the Maps page this session (map settings switch, on by default).
-            // CHAT-001 (DEC-029): the chat window's copy of the messages, only while it is on.
-            Chat.ChatReader? chatReader=null;
-            registrations.Register(()=>chatReader=new Chat.ChatReader(chatGui,client,log,()=>mainWindow.ChatOptions,mainWindow.ChatMessages),()=>chatReader?.Dispose());
-            mainWindow.ChatTwoLoaded=()=>pluginInterface.InstalledPlugins.Any(plugin=>plugin.InternalName=="ChatTwo" && plugin.IsLoaded);
             Maps.ChatMapLinkWatcher? chatLinks=null;
             registrations.Register(()=>chatLinks=new Maps.ChatMapLinkWatcher(chatGui,client,log,()=>configuration.MapView.ChatLinks),()=>chatLinks?.Dispose());
             mainWindow.ChatLinkHistory=chatLinks?.History;
@@ -954,7 +950,6 @@ public sealed class Plugin : IDalamudPlugin
             ("UndercutClipboard",()=>undercut?.FlushClipboard()),
             ("Cactpot",mainWindow.DrawCactpotOverlay),
             ("CraftLive",mainWindow.DrawCraftLivePanel),
-            ("Chat",mainWindow.DrawChatWindow),
             ("TaskPanel",mainWindow.DrawTaskPanel),
             ("WearBar",mainWindow.DrawWearBar),
             ("InventorySort",mainWindow.DrawInventorySortButton),

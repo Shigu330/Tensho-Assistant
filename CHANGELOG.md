@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.472.0
+- Demande de l'utilisateur : le chat personnalisable est retiré ([DEC-030](docs/project/DECISIONS.md)) : page Monde › Chat, fenêtre, réglages, textes, tests et plan. Il utilisera Chat 2 au besoin. Les fonctions qui lisent le chat pour autre chose restent (liens de carte, détection du jardinage). Les réglages déjà enregistrés par la 0.471 sont ignorés au chargement : essai fait avec le Newtonsoft.Json de Dalamud sur un fichier contenant ces types disparus.
+- Tests : un test vérifie le retrait. Verify.ps1 (agent) : 890/890, 0 avertissement, 0 erreur ; DLL 0.472.0.0. Non validé en jeu.
+### English
+- The custom chat added in 0.471 is removed at the user's request: page, window, settings, texts and plan. Features that read chat lines for other purposes stay.
+
 ## 0.471.0
 - Demande de l'utilisateur, CHAT-001 phases 0 et 1 ([DEC-029](docs/project/DECISIONS.md)) : nouvelle page Monde › Chat et une fenêtre de chat en lecture seule, désactivée par défaut, à côté de celle du jeu. Onglets par canal, couleurs, heure, canal, taille du texte, opacité, compteur de non-lus, jusqu'à 10 000 lignes, seules les lignes visibles sont dessinées. Elle lit ce que le jeu affiche, après les autres plugins, n'envoie rien et ne garde rien sur disque. Chat 2 actif : averti, jamais bloqué. La sonde (mode développeur) donne des compteurs, sans texte.
 - La page a été créée avec `scripts/New-Tool.ps1`.

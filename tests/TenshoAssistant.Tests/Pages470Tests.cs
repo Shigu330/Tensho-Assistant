@@ -30,6 +30,13 @@ internal static class Pages470Tests
             foreach(var part in new[]{"enum Page","New tools: scripts/New-Tool.ps1","Navigation","Program.cs","TenshoAssistant.Tests.csproj","DryRun","^[A-Z][A-Za-z0-9]{2,39}$"})Check(script.Contains(part),part);
             Check(Read("CONTRIBUTING.md").Contains("scripts/New-Tool.ps1"),"described for contributors");
         }),
+        ("The custom chat was removed by the user's decision (DEC-030): no page, setting, text or file is left; the other features that read chat lines stay",() =>
+        {
+            Check(!Directory.Exists(Path.GetFullPath("src/TenshoAssistant/Chat")) && !File.Exists(Path.GetFullPath("src/TenshoAssistant/MainWindow.Chat.cs")),"files");
+            Check(!Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("Page.Chat") && !Read("src/TenshoAssistant/Configuration.cs").Contains("ChatSettings") && !Read("src/TenshoAssistant/Plugin.cs").Contains("ChatReader"),"wiring");
+            foreach(var language in new[]{"en","fr"})Check(!Read($"src/TenshoAssistant/Localization/Languages/{language}.json").Contains("\"ChatUi\""),language);
+            Check(File.Exists(Path.GetFullPath("src/TenshoAssistant/Maps/ChatMapLinkWatcher.Dalamud.cs")) && File.Exists(Path.GetFullPath("src/TenshoAssistant/Reminders/GardenChatWatcher.Dalamud.cs")),"map links and garden detection stay");
+        }),
         ("Contributions: a tool proposal form, and the pull request asks about automation, combat, sources, licence and AI use",() =>
         {
             Check(File.Exists(Path.GetFullPath(".github/ISSUE_TEMPLATE/tool_proposal.yml")),"form");

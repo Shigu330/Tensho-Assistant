@@ -294,3 +294,13 @@ Decision: Chat : C1 remplacement complet (contre la recommandation par couches) 
 Reason: Choix de l'utilisateur, 2026-11-04.
 Consequences: La campagne de tests en jeu (lots 6 à 10) passe après ces travaux, ou s'y intercale. Risques acceptés : doublon de Chat 2 possible à la publication 1.0.0 sans question préalable ; hooks de saisie à maintenir ; registre des pages refait pendant la campagne. Lignes rouges inchangées : aucun envoi automatique, code original, pas de combat. Reste à choisir pour C9 : le service de traduction et celui des émoticônes, à la phase 8.
 References: docs/goals/CHAT-001.md, docs/goals/TEMPLATES-001.md
+
+DEC-ID: DEC-030
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: Le chat personnalisable décidé en DEC-029 (points C1 à C12, livré en 0.471, phases 0 et 1).
+Evidence: Demande de l'utilisateur : « retire tout ce qui se rattache au chat, je prendrai Chat 2 si j'en ai besoin ».
+Options: Garder le code sans le poursuivre, ou le retirer.
+Decision: Chat personnalisable abandonné et retiré : page, fenêtre, réglages, textes, tests et plan CHAT-001. Annule les points C1 à C12 de DEC-029 et le point « chat » de T8. Les fonctions qui lisent les lignes du chat pour autre chose restent : liens de carte (ChatMapLinkWatcher), détection du jardinage (GardenChatWatcher), annonce de train de chasse et alarmes.
+Reason: Choix de l'utilisateur, 2026-11-04.
+Consequences: 0.472. L'ancien plan et le code restent dans l'historique git (commit bf30b72, 0.471.0). Les modèles communautaires (TEMPLATES-001) continuent.
+References: docs/project/DECISIONS.md (DEC-029), docs/goals/TEMPLATES-001.md
