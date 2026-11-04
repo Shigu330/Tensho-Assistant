@@ -72,6 +72,7 @@ public sealed class Plugin : IDalamudPlugin
     private Market.UndercutWatcher? undercut;
     // 0.349 (g, X-07): the chat, for the « /tensho wiki | lodestone » answers.
     private readonly IChatGui chatGui;
+    private Diagnostics.SelfCheckRunner? selfCheck;
     // R-12 (0.414): items whose « Open » chat link handler is registered (command id = item id), all removed on unload.
     private readonly Dictionary<uint,Dalamud.Game.Text.SeStringHandling.Payloads.DalamudLinkPayload> alarmLinks=[];
 
@@ -307,6 +308,9 @@ public sealed class Plugin : IDalamudPlugin
             TriadNpcLoader? triadNpcLoader=null;
             registrations.Register(()=>triadNpcLoader=new TriadNpcLoader(triadNpcs,data,framework,client,player,unlocks,log),()=>triadNpcLoader?.Dispose());
             mainWindow.ConfigureTriadNpcs(triadNpcs);
+            // 0.494 (user request): the self-check, on its own in developer mode, on request otherwise.
+            registrations.Register(()=>selfCheck=new Diagnostics.SelfCheckRunner(framework,client,player,log,()=>configuration.DeveloperMode,mainWindow.SelfCheckReady,mainWindow.PrepareSelfCheck,mainWindow.SelfCheckProbes),()=>selfCheck?.Dispose());
+            mainWindow.SelfCheck=selfCheck;
             mainWindow.ConfigureMarketBoard(marketBoard);
             Alarms.AlarmDtrEntry? alarmBar=null;
             registrations.Register(()=>alarmBar=new Alarms.AlarmDtrEntry(dtrBar,framework,gameGui,configuration,localization.Get,mainWindow.OpenAlarms),()=>alarmBar?.Dispose());
@@ -932,6 +936,13 @@ public sealed class Plugin : IDalamudPlugin
         if (arguments.Trim().ToLowerInvariant() is "peche" or "pêche" or "fish" or "fishing") { mainWindow?.ToggleFishingPanel(); return; }
         // 0.349 (g, X-07): « /tensho wiki <item> » and « /tensho lodestone <item> » open the item's page in the browser.
         var parts = arguments.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+        // 0.494: « /tensho selftest » writes the self-check to the log.
+        if (arguments.Trim().ToLowerInvariant() is "selftest")
+        {
+            selfCheck?.Start("command");
+            chatGui.Print("[Tensho] " + localization.Get("DiagnosticsUi.SelfCheckStarted"));
+            return;
+        }
         // 0.381 (g, X-01): « /tensho todo <task> » adds a free task to Reminders › Your tasks.
         if (parts.Length >= 1 && parts[0].ToLowerInvariant() is "todo" or "tache" or "tâche")
         {

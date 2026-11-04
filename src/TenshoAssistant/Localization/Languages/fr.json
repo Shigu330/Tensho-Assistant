@@ -3799,6 +3799,11 @@
     "Gp": "Les actions de récolte sont indisponibles : les données du jeu n’ont pas pu être lues (peut-être après une mise à jour du jeu)."
   },
   "DiagnosticsUi": {
+    "SelfCheck": "Auto-contrôle",
+    "SelfCheckHelp": "Ce que chaque partie de Tensho a lu, en nombres, écrit aussi dans le journal. Lecture seule, aucune requête vers un serveur. Se lance seul en mode développeur. NOT_READ est normal pour une fenêtre fermée. Plausible ne veut pas dire juste : seule la fenêtre du jeu peut confirmer une valeur.",
+    "SelfCheckRun": "Lancer l'auto-contrôle",
+    "SelfCheckRunTip": "Relit tout en quelques secondes et écrit le résultat dans le journal. Aussi : /tensho selftest",
+    "SelfCheckStarted": "Auto-contrôle lancé : le résultat va dans le journal et dans Diagnostics.",
     "OverlayTimes": "Temps d'affichage de la carte et des panneaux à côté du jeu",
     "OverlayTimesHelp": "Médiane et maximum du temps de calcul des 120 dernières images de la carte et de chaque panneau affiché hors de la fenêtre Tensho. Compté en mode développeur seulement. Un panneau garde ses derniers temps une fois fermé.",
     "DrawTimeLine": "{0}  médiane {1} ms · max {2} ms ({3} images)",

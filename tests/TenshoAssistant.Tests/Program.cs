@@ -991,6 +991,7 @@ var tests = new (string Name, Action Run)[]
 
 var failures = 0;
 tests = tests.Concat(DutyLootTests.Cases).ToArray();
+tests = tests.Concat(SelfCheckTests.Cases).ToArray();
 tests = tests.Concat(DutyLootServiceTests.Cases).ToArray();
 tests = tests.Concat(MonsterLootTests.Cases).ToArray();
 tests = tests.Concat(GpOptimizerTests.Cases).ToArray();

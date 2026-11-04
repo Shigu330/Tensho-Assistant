@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.494.0
+- Demande de l'utilisateur : un auto-contrôle, pour que l'agent vérifie sans lui ce que le plugin lit. Une passe en lecture seule écrit dans le journal une ligne par domaine (catalogues, personnage, sacs, quêtes, collections, Triple Triade, carte, ensembles, carnets, mandats, monnaies, rappels, fenêtres du jeu), avec OK, NOT_READ, SUSPECT ou FAILED, et un résumé.
+- Se lance seule en mode développeur, une fois par connexion et après chaque rechargement ; sinon `/tensho selftest` ou le bouton de Diagnostics. Une sonde par image. Aucune action de jeu, aucune requête réseau, des nombres seulement (ni nom ni identifiant, chemins retirés des erreurs).
+- Limites : plausible ne veut pas dire juste ; ni l'affichage ni les clics ne sont couverts ; les fenêtres fermées restent en NOT_READ.
+- Tests : SelfCheckTests (4 cas). Verify.ps1 (agent) : 934/934, 0 avertissement, 0 erreur ; DLL 0.494.0.0. Exécuté en jeu sans action de l'utilisateur : 25 OK, 4 NOT_READ (les fenêtres fermées), 0 SUSPECT, 0 FAILED, aucune erreur au journal (docs/evidence/0.494-selfcheck-first-pass.log). Triple Triade : 45 PNJ battus, aucun marqué « Quête requise », ce qui ne contredit pas la 0.493 sans la prouver. Le reste de la version n'est pas validé en jeu.
+### English
+- Self-check: a read-only pass writes to the log what each part of the plugin has read, as numbers, with OK, NOT_READ, SUSPECT or FAILED. It runs by itself in developer mode, or with /tensho selftest and a button in Diagnostics.
+
 ## 0.493.0
 - Rapport de l'utilisateur : Triple Triade ne détectait pas si un PNJ était vraiment disponible. La liste ne regardait que « battu » et les cartes manquantes, alors que la feuille TripleTriad du jeu liste les quêtes demandées (108 PNJ sur 146).
 - Page PNJ et cartes : colonne « Disponible » (Oui, Quête requise, ?), les quêtes au survol avec ✓, ces PNJ en dernier, case « Masquer les PNJ pas encore disponibles ». Cartes manquantes et clic droit de la carte : même mention. Si la quête qui ouvre le jeu n'est pas faite, la page le dit.

@@ -714,6 +714,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.494 : auto-contrôle** — à voir en jouant
+
+- [ ] Mode développeur : quelques secondes après un rechargement, le journal contient les lignes `Selftest …` et un résumé `Selftest done (auto)`. Sans saccade visible.
+- [ ] `/tensho selftest` et le bouton de Diagnostics relancent une passe ; Diagnostics montre les lignes.
+
 **0.493 : disponibilité des PNJ de Triple Triade** — à voir en jouant
 
 - [ ] Triple Triade › PNJ et cartes : colonne « Disponible ». Un PNJ marqué « Quête requise » refuse bien le défi ou n'est pas là en jeu, et un PNJ marqué « Oui » accepte. Le survol donne les quêtes, avec ✓ pour celles faites. À signaler surtout : un PNJ à deux quêtes dont une seule est faite (lecture « toutes » déduite, voir docs/evidence/0.493-triad-npc-requirements.md).

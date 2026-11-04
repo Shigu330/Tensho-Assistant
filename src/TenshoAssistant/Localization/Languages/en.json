@@ -3799,6 +3799,11 @@
     "Gp": "Gathering actions are unavailable: the game data could not be read (possibly after a game update)."
   },
   "DiagnosticsUi": {
+    "SelfCheck": "Self-check",
+    "SelfCheckHelp": "What each part of Tensho has read, as numbers, also written to the log. Read-only, no request to a server. Runs by itself in developer mode. NOT_READ is normal for a window that is closed. Plausible does not mean right: only the game's window can confirm a value.",
+    "SelfCheckRun": "Run the self-check",
+    "SelfCheckRunTip": "Reads again, over a few seconds, and writes the result to the log. Also: /tensho selftest",
+    "SelfCheckStarted": "Self-check started: the result goes to the log and to Diagnostics.",
     "OverlayTimes": "Draw time of the map and of the panels beside the game",
     "OverlayTimesHelp": "Median and maximum draw time of the last 120 frames of the map and of each panel shown outside the Tensho window. Counted in developer mode only. A panel keeps its last times once closed.",
     "DrawTimeLine": "{0}  median {1} ms · max {2} ms ({3} frames)",
