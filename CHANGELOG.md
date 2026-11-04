@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.526.0
+- Demande de l'utilisateur : Collections ne couvrait pas les légendes locales. Nouvel onglet avec les 36 tomes de mineur, botaniste et pêcheur, lu ou non, et comment obtenir chacun ([preuve](docs/evidence/0.526-folklore-tomes.md)).
+- La carte (0.518) ne voyait pas le douzième tome : FFXIVClientStructs déclare 11 bits, le tome d'Alexandrie est le bit 11. La lecture passe par les octets.
+- Tests : Folklore526Tests. Verify.ps1 (agent) : 997/997, 0 avertissement, 0 erreur ; DLL 0.526.0.0. Non validé en jeu.
+### English
+- Collections has a new Folklore tab: the 36 tomes of miner, botanist and fisher, read or not, with how to obtain each. The map now also sees the twelfth tome of each job.
+
 ## 0.525.0
 - Rapport de l'utilisateur en jeu (« les saccades pour les déplacements des membres de mon groupe sur la carte ») : le groupe n'était lu que deux fois par seconde, et un membre hors de vue ne reçoit sa position du jeu que de temps en temps. Lu dix fois par seconde, position exacte quand le membre est en vue, et le repère glisse entre deux positions (`MapPartySmoother`). Un grand saut, comme une téléportation, reste direct.
 - Rapport de l'utilisateur en jeu (« le jeu lag au chargement du plugin ») : mesuré ([preuve](docs/evidence/0.525-load-cost.md)). La coupure de 1,2 à 1,9 s est une collecte complète de .NET, qui arrête tout le jeu, sur 2 rechargements sur 3 relevés ; le plugin ne la demande pas. Démarrage du jeu pas encore mesuré : une ligne « Load » du journal le dira. Corrigé : les données de vaisseaux se construisent hors du thread du framework (85 à 175 ms de moins).

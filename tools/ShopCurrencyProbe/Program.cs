@@ -5,6 +5,29 @@ using Lumina.Excel.Sheets;
 // Read-only evidence for NPC-VENDORS-014: how scrip exchanges encode currencies and how NPCs reach their shops.
 if(args.Length is <1 or >2)throw new ArgumentException("Supply installed sqpack directory and optionally an item name.");
 using var data=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.French,CacheFileResources=false});
+// PROBE_LEGENDS (0.526): what the game calls « légendes locales », and every folklore tome: job, division, quest bit, item, how many points or fish use it.
+if(Environment.GetEnvironmentVariable("PROBE_LEGENDS") is { Length:>0 })
+{
+    foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.Addon>()!)
+    {
+        var text=row.Text.ExtractText();
+        if(text.Contains("gendes locales",StringComparison.OrdinalIgnoreCase) || text.Contains("gende locale",StringComparison.OrdinalIgnoreCase))Console.WriteLine($"addon {row.RowId}: {text.Replace("\n"," ")[..Math.Min(text.Length,120)]}");
+    }
+    foreach(var sheetRow in data.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>()!)
+    {
+        var text=sheetRow.Text.ExtractText();
+        if(text.Contains("gendes locales",StringComparison.OrdinalIgnoreCase))Console.WriteLine($"log {sheetRow.RowId}: {text[..Math.Min(text.Length,120)]}");
+    }
+    foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.Item>()!)
+    {
+        var name=row.Name.ExtractText();
+        if(name.StartsWith("Légendes",StringComparison.OrdinalIgnoreCase) || name.Contains("Lég.",StringComparison.OrdinalIgnoreCase))Console.WriteLine($"item {row.RowId}: {name} uicat {row.ItemUICategory.RowId} {row.ItemUICategory.ValueNullable?.Name.ExtractText()} action {row.ItemAction.RowId} type {row.ItemAction.ValueNullable?.Action.RowId} icon {row.Icon}");
+    }
+    foreach(var group in data.GetExcelSheet<Lumina.Excel.Sheets.GatheringSubCategory>()!.Where(row=>row.Item.RowId!=0).GroupBy(row=>(Job:row.ClassJob.RowId,row.Item.RowId,Bit:row.Quest.RowId,row.Division)).OrderBy(group=>group.Key.Job).ThenBy(group=>group.Key.Bit))
+        Console.WriteLine($"tome job {group.Key.Job} bit {group.Key.Bit} division {group.Key.Division} item {group.Key.RowId} {group.First().Item.Value.Name.ExtractText()} rows {group.Count()}");
+    return;
+}
+
 // PROBE_GPACTIONS (0.517): the gathering actions' UnlockLink, ClassJobLevel and IsRoleAction, to know what « unlocked » can mean for them.
 if(Environment.GetEnvironmentVariable("PROBE_GPACTIONS") is { Length:>0 })
 {

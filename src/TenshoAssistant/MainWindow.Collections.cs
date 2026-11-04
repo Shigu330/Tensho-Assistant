@@ -25,7 +25,7 @@ internal sealed partial class MainWindow
     internal Func<IReadOnlyList<CollectionEntry>?>? ExtraCollections { get; set; }
     internal Func<bool>? ExtraCollectionsUnavailable { get; set; }
     private static readonly CollectionKind[] ExtraKinds=[CollectionKind.Hairstyle,CollectionKind.Ornament,CollectionKind.Glasses,CollectionKind.Barding,
-        CollectionKind.Portrait,CollectionKind.MasterBook,CollectionKind.McGuffin,CollectionKind.OccultLore];
+        CollectionKind.Portrait,CollectionKind.MasterBook,CollectionKind.Folklore,CollectionKind.McGuffin,CollectionKind.OccultLore];
     private object? collectionViewExtra;
     private void DrawCollections(bool blueMagic = false)
     {
@@ -110,7 +110,7 @@ internal sealed partial class MainWindow
                 .Where(entry=>achievementCategory is null || entry.Achievement?.CategoryId==achievementCategory)
                 .OrderBy(entry=>kind==CollectionKind.Orchestrion ? entry.Music?.CategoryOrder ?? int.MaxValue:kind==CollectionKind.Achievement ? entry.Achievement?.KindOrder ?? int.MaxValue:0)
                 .ThenBy(entry=>kind==CollectionKind.Achievement ? entry.Achievement?.CategoryOrder ?? int.MaxValue:0)
-                .ThenBy(entry => blueMagic || kind is CollectionKind.Ornament or CollectionKind.McGuffin ? entry.Number:kind==CollectionKind.Orchestrion ? entry.Music?.Order ?? int.MaxValue:kind==CollectionKind.Title ? entry.Title?.Order ?? int.MaxValue:kind==CollectionKind.Achievement ? entry.Achievement?.Order ?? int.MaxValue:0)
+                .ThenBy(entry => blueMagic || kind is CollectionKind.Ornament or CollectionKind.McGuffin or CollectionKind.Folklore ? entry.Number:kind==CollectionKind.Orchestrion ? entry.Music?.Order ?? int.MaxValue:kind==CollectionKind.Title ? entry.Title?.Order ?? int.MaxValue:kind==CollectionKind.Achievement ? entry.Achievement?.Order ?? int.MaxValue:0)
                 .ThenBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase).ToArray();
             if(blueOrder!=0)collectionViewEntries=Monsters.BlueSpellSources.SortByMonsterLevel(collectionViewEntries,entry=>BlueSpellLevel(entry.Number),blueOrder);
             // 0.331: « Unconfirmed » (non-completion kinds) = everything the game does not confirm as obtained, by the same rule as the

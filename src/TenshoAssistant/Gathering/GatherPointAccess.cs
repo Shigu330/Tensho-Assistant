@@ -6,6 +6,17 @@ public sealed record GatherPointNeed(uint JobId,int? TomeBit,string? Tome);
 /// <summary>What the logged-in character has, copied on the framework thread.</summary>
 public sealed record GatherKnowledge(int MinerLevel,int BotanistLevel,IReadOnlySet<int> MinerTomes,IReadOnlySet<int> BotanistTomes);
 
+/// <summary>0.526: the tomes set in a job's array. By its bytes: FFXIVClientStructs declares 11 bits, and the sheet's twelfth tome is bit 11 (docs/evidence/0.526-folklore-tomes.md).</summary>
+public static class GatherTomeBits
+{
+    public static IReadOnlySet<int> Of(ReadOnlySpan<byte> bytes)
+    {
+        var set=new HashSet<int>();
+        for(var bit=0;bit<bytes.Length*8;bit++)if((bytes[bit>>3]>>(bit&7)&1)!=0)set.Add(bit);
+        return set;
+    }
+}
+
 /// <summary>What stops the player at a point: a tome not read, a job level under the point's. Null: nothing Tensho knows of.</summary>
 public sealed record GatherPointAccess(string? TomeMissing,uint JobId,int? JobLevel)
 {

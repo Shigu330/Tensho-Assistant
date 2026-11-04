@@ -191,7 +191,7 @@ internal sealed partial class MainWindow
             // 0.387: the 0.365 kinds without a teaching item in the game data say so instead of an empty tooltip.
             if(items.Count==0 && entry.Kind is Collections.CollectionKind.Glasses or Collections.CollectionKind.Portrait or Collections.CollectionKind.McGuffin
                    or Collections.CollectionKind.OccultLore or Collections.CollectionKind.Hairstyle or Collections.CollectionKind.Ornament or Collections.CollectionKind.Barding
-                   or Collections.CollectionKind.MasterBook)
+                   or Collections.CollectionKind.MasterBook or Collections.CollectionKind.Folklore)
                 ImGui.TextDisabled(localization.Get("HoverUi.CollectionHowUnknown"));
             // Achievements rewarding the entry directly (title or item) are listed even without an unlocking item.
             foreach(var achievement in AchievementsRewarding(items.Select(item=>item.Id)).Take(3))

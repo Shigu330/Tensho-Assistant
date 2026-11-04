@@ -50,10 +50,7 @@ internal sealed unsafe class GatherKnowledgeReader : IDisposable
         {
             var state=PlayerState.Instance();
             if(state==null){known=null;return;}
-            var minerTomes=new HashSet<int>();var botanistTomes=new HashSet<int>();
-            var minerBits=state->UnlockedMinerFolkloreTomesBitArray;var botanistBits=state->UnlockedBotanistFolkloreTomesBitArray;
-            for(var bit=0;bit<minerBits.BitCount;bit++)if(minerBits[bit])minerTomes.Add(bit);
-            for(var bit=0;bit<botanistBits.BitCount;bit++)if(botanistBits[bit])botanistTomes.Add(bit);
+            var minerTomes=GatherTomeBits.Of(state->UnlockedMinerFolkloreTomes);var botanistTomes=GatherTomeBits.Of(state->UnlockedBotanistFolkloreTomes);
             var levels=(miner is { } one ? player.GetClassJobLevel(one):(short)0,botanist is { } two ? player.GetClassJobLevel(two):(short)0);
             known=new(levels.Item1,levels.Item2,minerTomes,botanistTomes);
             // Said once per change, so a wrong reading can be told from the game's own tomes.

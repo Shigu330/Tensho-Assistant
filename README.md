@@ -162,6 +162,7 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
   Map, Data (in-game panels, automatic storage save, cache durations including « Never (on request only) »), Advanced (« Restore all
   defaults », developer mode, community sources on / off, hover prices, game command delay), Debug (developer mode). Each setting has a
   tooltip and a ↺ restore-default button. Game data is shown in the game client's language, Tensho's own texts in the plugin language.
+- **Folklore** tomes, read or not, are a tab of Collections.
 - **Credits**: everything Tensho uses (game, libraries, embedded and online data) with its licence and the setting tied to it.
 - Diagnostics (developer mode): draw time of each page (median and maximum of the last 120 frames) and a contributor panel (documents,
   source file of the shown page, data sources, probes, translation completeness).
