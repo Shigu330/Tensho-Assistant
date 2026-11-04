@@ -9,7 +9,7 @@ public static class ConfigurationReset
 {
     public static readonly IReadOnlySet<string> Kept = new HashSet<string>
     {
-        "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "TripleTriadDeck",
+        "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
         "Voyages", "GearPlans", "GearMateria", "SubmarineUnlocked", "VesselPlans",
@@ -241,6 +241,8 @@ public sealed partial class Configuration
     public List<TenshoAssistant.Craft.CraftPreset>? CraftPresets { get; set; } = [];
     // 0.468 (user request): the crafting log's quality target, by recipe; a recipe not listed aims at its maximum.
     public Dictionary<uint,int>? CraftLogTargets { get; set; } = [];
+    // 0.469 (user request): today's Grand Company request as seen in the game's supply missions window.
+    public TenshoAssistant.Items.GcSupplySeen? GcSupplySeen { get; set; }
     public List<uint> TripleTriadDeck { get; set; } = [];
     // Decks generated for an NPC (0.162), named after it; at most one per NPC.
     public List<TriadSavedDeck> TripleTriadDecks { get; set; } = [];

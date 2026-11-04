@@ -396,7 +396,7 @@ internal sealed partial class MainWindow
         if(itemUses.State.Catalog is { } uses)
         {
             if(uses.LevesFor(id).Count is > 0 and var leves)lines.Add(localization.Format("HoverUi.Leves",leves));
-            if(uses.IsSupplyCandidate(id))lines.Add(localization.Get("HoverUi.Supply"));
+            if(uses.IsSupplyCandidate(id))lines.Add(GcSupplyLine(id));
             if(uses.IsAquariumFish(id))lines.Add(localization.Get("HoverUi.Aquarium"));
         }
         return lines;

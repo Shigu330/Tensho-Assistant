@@ -854,6 +854,14 @@ public sealed class Plugin : IDalamudPlugin
             ItemCatalogLoader? catalogLoader = null;
             ItemUseCatalogLoader? usageLoader=null;
             registrations.Register(()=>usageLoader=new ItemUseCatalogLoader(itemUses,data,framework,log),()=>usageLoader?.Dispose());
+            // 0.469 (user request, in-game campaign): today's Grand Company request, read from the game's supply missions window.
+            mainWindow.GcSupply.Restore(configuration.GcSupplySeen);
+            Items.GcSupplyReader? gcSupplyReader=null;
+            registrations.Register(()=>gcSupplyReader=new Items.GcSupplyReader(framework,gameGui,client,player,data,log,()=>itemUses.State.Catalog,mainWindow.GcSupply,seen=>
+            {
+                configuration.GcSupplySeen=seen;
+                try{pluginInterface.SavePluginConfig(configuration);}catch(Exception error){log.Warning(error,"Today's Grand Company request could not be saved.");}
+            }),()=>gcSupplyReader?.Dispose());
             registrations.Register(() => catalogLoader = new ItemCatalogLoader(itemCatalog, data, framework, log, dataCache),
                 () => catalogLoader?.Dispose());
             RecipeCatalogLoader? recipeLoader = null;

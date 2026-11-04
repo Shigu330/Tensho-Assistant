@@ -41,14 +41,31 @@ internal sealed partial class MainWindow
 
     private void DrawCraftDetection(bool worn)
     {
-        var list=CraftConsumableList?.Invoke();
-        ImGui.TextDisabled(localization.Format("CraftSimulation.Detected",CraftConsumableName(CraftConsumables.FromStatus(list,craftDetected?.Food,false),craftDetected?.Food),
-            CraftConsumableName(CraftConsumables.FromStatus(list,craftDetected?.Medicine,true),craftDetected?.Medicine),CraftYesNo(simulationManipulation),CraftYesNo(craftDetected?.Specialist)));
+        DrawDetectedConsumables(craftDetected);
+        ImGui.SameLine();ImGui.AlignTextToFramePadding();
+        ImGui.TextDisabled(localization.Format("CraftSimulation.Detected",CraftYesNo(simulationManipulation),CraftYesNo(craftDetected?.Specialist)));
         if(worn && (craftDetected?.Food is > 0 || craftDetected?.Medicine is > 0))ImGui.TextDisabled(localization.Get("CraftSimulation.DetectedCounted"));
     }
 
-    private string CraftConsumableName((CraftConsumable Item,bool Hq)? consumable,ushort? param)
-        =>consumable is { } known ? known.Item.Name+(known.Hq ? " HQ":""):param is > 0 ? localization.Get("CraftSimulation.DetectedOther"):localization.Get("CraftSimulation.DetectedNone");
+    /// <summary>
+    /// 0.469 (user request, in-game campaign): the active food and medicine as the item's icon with its tooltip. Only those with a crafting bonus count (CraftConsumableList holds no others),
+    /// so a food for combat reads as none.
+    /// </summary>
+    private void DrawDetectedConsumables(CraftDetected? detected)
+    {
+        var list=CraftConsumableList?.Invoke();
+        DrawDetectedConsumable("CraftSimulation.DetectedFood",CraftConsumables.FromStatus(list,detected?.Food,false));
+        ImGui.SameLine();
+        DrawDetectedConsumable("CraftSimulation.DetectedMedicine",CraftConsumables.FromStatus(list,detected?.Medicine,true));
+    }
+    private void DrawDetectedConsumable(string labelKey,(CraftConsumable Item,bool Hq)? consumable)
+    {
+        ImGui.AlignTextToFramePadding();ImGui.TextUnformatted(localization.Get(labelKey));ImGui.SameLine();
+        if(consumable is not { } known){ImGui.TextDisabled(localization.Get("CraftSimulation.DetectedNone"));return;}
+        DrawItemIcon(itemCatalog.State.Catalog?.Find(known.Item.ItemId),new System.Numerics.Vector2(28));
+        if(ImGui.IsItemHovered())DrawItemInfoTooltip(known.Item.ItemId);
+        if(known.Hq){ImGui.SameLine();ImGui.TextDisabled("HQ");}
+    }
     private string CraftYesNo(bool? value)=>localization.Get(value switch{true=>"CraftSimulation.DetectedYes",false=>"CraftSimulation.DetectedNo",null=>"CraftSimulation.DetectedUnknown"});
 
     private bool CraftInput(string label,ref int value,bool? ok,string tip)

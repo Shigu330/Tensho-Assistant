@@ -10,6 +10,14 @@ namespace TenshoAssistant;
 // for it. Static catalogue evidence only: no daily demand, accepted leve or unlock is inferred.
 internal sealed partial class MainWindow
 {
+    // 0.469 (user request, in-game campaign): what the game's supply missions window showed today, or how to see it (Items/GcSupplyToday.cs).
+    internal TenshoAssistant.Items.GcSupplyToday GcSupply{get;}=new();
+    private string GcSupplyLine(uint item)=>localization.Get(GcSupply.Status(bankBridge.State.CharacterId,TenshoAssistant.Reminders.ResetSchedule.PreviousDaily(DateTimeOffset.UtcNow,TenshoAssistant.Reminders.ResetSchedule.SupplyHour),item) switch
+    {
+        TenshoAssistant.Items.GcSupplyStatus.Requested=>"GcSupply.Requested",
+        TenshoAssistant.Items.GcSupplyStatus.NotListed=>"GcSupply.NotListed",
+        _=>"GcSupply.NotObserved",
+    });
     private bool focusUsesTab;
     private void DrawItemUses()
     {
@@ -41,7 +49,7 @@ internal sealed partial class MainWindow
         }
         ImGui.Separator();
         if(catalog.IsSupplyCandidate(id))
-        {ImGui.TextColored(Accent,localization.Get("ItemUsesUi.Gc"));ImGui.TextWrapped(localization.Get("ItemUsesUi.GcHelp"));}
+        {ImGui.TextColored(Accent,localization.Get("ItemUsesUi.Gc"));ImGui.TextWrapped(GcSupplyLine(id));}
         if(catalog.IsAquariumFish(id))
         {ImGui.TextColored(Accent,localization.Get("ItemUsesUi.Aquarium"));ImGui.TextWrapped(localization.Get("ItemUsesUi.AquariumHelp"));}
         if(!catalog.IsSupplyCandidate(id) && !catalog.IsAquariumFish(id))ImGui.TextDisabled(localization.Get("ItemUsesUi.NoOther"));

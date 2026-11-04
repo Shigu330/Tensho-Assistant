@@ -3,6 +3,16 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.469.0
+- Demande de l'utilisateur (« j'ai pourtant ouvert calendrier et mission de ravitaillement ») : « demande du jour non observée » était un texte fixe, rien ne lisait cette fenêtre. Nouveau : `GcSupplyReader` lit la fenêtre du jeu ContentsInfoDetail (nom présent dans l'exécutable du jeu) une fois par seconde tant qu'elle est affichée, compare ses textes aux noms exacts des objets de livraison du catalogue (GCSupplyDuty), et garde le résultat par personnage jusqu'à la remise de 20:00 UTC. La mise en page n'a pas pu être sondée hors du jeu : une ligne `Grand Company supply window` du journal la documente. Les bulles disent demandée, absente de ce qui a été ouvert, ou comment ouvrir la fenêtre.
+- Demande de l'utilisateur : dans le carnet, Manipulation est une case et l'icône du skill, sans texte. Repas et remède ont l'icône et la bulle de l'objet (aussi dans le simulateur) ; seuls ceux qui ont un bonus d'artisanat comptent, un autre repas se lit « aucun ».
+- Demande de l'utilisateur (« restyliser la fenêtre liée au carnet ») : panneau en sections (recette, votre état, cible, calcul, macro), chiffres en tableau, barre de qualité, section de séquence enregistrée masquée s'il n'y en a pas, explications dans la bulle de « (?) ». Le texte « Manipulation exclue : déblocage non observé » datait d'avant la détection : retiré.
+- Tests : GcSupply469Tests (6). Verify.ps1 (agent) : 885/885, 0 avertissement, 0 erreur ; DLL 0.469.0.0. Non validé en jeu.
+### English
+- Today's Grand Company request is now read from the game's supply missions window; item tooltips say requested, not among what was opened, or how to open it.
+- The crafting log panel is laid out in sections, with a table of figures, a quality bar and explanations in tooltips.
+- In the crafting log panel, Manipulation is a box with the skill's icon, and food and medicine show the item's icon and tooltip, only when they give a crafting bonus.
+
 ## 0.468.0
 - Demandes de l'utilisateur (campagne en jeu), à propos du panneau du carnet et de Raphael.
 - « Raphael ne met pas en cache » : le disque montre que le carnet enregistrait bien ses résultats Raphael (fichiers du 2026-11-04, `UsedRaphael`). Le manque venait d'ailleurs : la recherche du simulateur n'a jamais eu de cache, et la clé du carnet contient la version de la DLL, les options de macro et la liste des séquences enregistrées, donc chaque version recalculait. Correction : `RaphaelSequenceCache` garde les séquences de Raphael sur disque (durée des calculs d'artisanat) selon ce dont Raphael dépend seulement (recette, attributs, qualité de départ, cible, actions interdites), pour le carnet et le simulateur. Une séquence gardée est rejouée dans le simulateur avant usage. « Recalculer » relance vraiment Raphael.

@@ -261,7 +261,7 @@ internal sealed partial class MainWindow
         if(itemUses.State.Catalog is { } nativeUses)
         {
             ImGui.TextUnformatted(localization.Format("UsePreviewUi.Leves",nativeUses.LevesFor((uint)itemId).Count));
-            if(nativeUses.IsSupplyCandidate((uint)itemId))ImGui.TextUnformatted(localization.Get("UsePreviewUi.Supply"));
+            if(nativeUses.IsSupplyCandidate((uint)itemId))ImGui.TextUnformatted(GcSupplyLine((uint)itemId));
             if(nativeUses.IsAquariumFish((uint)itemId))ImGui.TextUnformatted(localization.Get("UsePreviewUi.Aquarium"));
         }
         if (recipeCatalog.State.Catalog is not { } catalog)
