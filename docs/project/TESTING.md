@@ -720,7 +720,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.486 : temps d'affichage des panneaux** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Mode développeur, Diagnostics : la section « panneaux à côté du jeu » liste le panneau de récolte, Collectionnable et les autres une fois ouverts.
+- [ ] Mode développeur, Diagnostics : la section « panneaux à côté du jeu » liste le panneau de récolte, Collectionnable et les autres une fois ouverts, et leurs temps restent après la fermeture (0.487).
 
 **0.484 : risque accepté** — pendant la campagne de tests en jeu (étape h)
 

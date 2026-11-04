@@ -26,7 +26,7 @@ internal sealed partial class MainWindow
             foreach (var row in rows)
                 ImGui.TextUnformatted(localization.Format("DiagnosticsUi.DrawTimeLine", row.Page, row.Median.ToString("0.00"), row.Max.ToString("0.00"), row.Count));
         }
-        // 0.486 (user report): the panels beside the game's windows, which no page counted. Those that cost nothing (their window is closed) are left out.
+        // 0.486 (user report): the panels beside the game's windows, which no page counted. Their last real frames stay shown once they close.
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("DiagnosticsUi.OverlayTimes")))
         {
             ImGui.TextDisabled(localization.Get("DiagnosticsUi.OverlayTimesHelp"));
@@ -34,7 +34,7 @@ internal sealed partial class MainWindow
             {
                 var samples = pair.Value.Samples.Take(pair.Value.Count).Order().ToArray();
                 return (Name: pair.Key, Median: samples.Length == 0 ? 0 : samples[samples.Length / 2], Max: samples.Length == 0 ? 0 : samples[^1], Count: samples.Length);
-            }).Where(row => row.Max >= 0.05).OrderByDescending(row => row.Median);
+            }).OrderByDescending(row => row.Median);
             foreach (var row in rows)
                 ImGui.TextUnformatted(localization.Format("DiagnosticsUi.DrawTimeLine", row.Name, row.Median.ToString("0.00"), row.Max.ToString("0.00"), row.Count));
         }

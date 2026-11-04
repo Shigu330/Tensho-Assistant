@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.487.0
+- Rapport de l'utilisateur en jeu : les temps des panneaux apparaissaient puis disparaissaient. Un panneau fermé enregistrait des temps nuls, qui chassaient ses vrais temps en 2 secondes. Seules les images réellement dessinées comptent maintenant, et un panneau garde ses derniers temps une fois fermé.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 924/924, 0 avertissement, 0 erreur ; DLL 0.487.0.0. Non validé en jeu.
+### English
+- Diagnostics: a panel beside the game's windows keeps its last draw times once closed.
+
 ## 0.486.0
 - Demande de l'utilisateur : barre de tic avec une petite marque qui défile et le temps avant le plein. La barre se remplit vers le maximum de PR, la marque défile en 3 s à chaque tic, le texte donne le temps restant d'après les PR par tic mesurés. Tant qu'ils ne sont pas connus, le texte reste « tic dans… ». Une mesure faussée par une action ou une potion peut fausser ce temps.
 - Rapport de l'utilisateur : les temps d'affichage de Diagnostics ne comptaient que les pages. Les panneaux à côté des fenêtres du jeu ont maintenant leur section, en mode développeur.

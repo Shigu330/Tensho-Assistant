@@ -103,6 +103,8 @@ internal sealed partial class MainWindow : Window, IDisposable
     private readonly Dictionary<string, (double[] Samples, int Next, int Count)> overlayDrawMs = [];
     internal void RecordOverlayDraw(string name, double milliseconds)
     {
+        // 0.487 (user report: times appeared then went): a panel whose window is closed costs next to nothing, and its zeros pushed its real times out within 2 seconds. Only frames it really drew count.
+        if (milliseconds < 0.02) return;
         var ring = overlayDrawMs.TryGetValue(name, out var known) ? known : (Samples: new double[120], Next: 0, Count: 0);
         ring.Samples[ring.Next] = milliseconds;
         overlayDrawMs[name] = (ring.Samples, (ring.Next + 1) % ring.Samples.Length, Math.Min(ring.Count + 1, ring.Samples.Length));

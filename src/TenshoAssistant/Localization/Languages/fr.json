@@ -3791,7 +3791,7 @@
   },
   "DiagnosticsUi": {
     "OverlayTimes": "Temps d'affichage des panneaux à côté du jeu",
-    "OverlayTimesHelp": "Médiane et maximum du temps de calcul des 120 dernières images de chaque panneau affiché hors de la fenêtre Tensho. Compté en mode développeur seulement. Un panneau qui ne coûte rien n'est pas listé.",
+    "OverlayTimesHelp": "Médiane et maximum du temps de calcul des 120 dernières images de chaque panneau affiché hors de la fenêtre Tensho. Compté en mode développeur seulement. Un panneau garde ses derniers temps une fois fermé.",
     "DrawTimeLine": "{0}  médiane {1} ms · max {2} ms ({3} images)",
     "DrawTimes": "Temps d'affichage des pages",
     "DrawTimesHelp": "Médiane et maximum du temps de calcul des 120 dernières images de chaque page visitée (médiane = coût habituel, maximum = pics comme le premier chargement des icônes), la plus lente en premier. Restez quelques secondes sur une page pour une mesure fiable.",
