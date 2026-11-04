@@ -317,6 +317,12 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>beastLoader=new Beastmaster.BeastCatalogLoader(beasts,data,framework,client,player,log),()=>beastLoader?.Dispose());
             mainWindow.Beasts=beasts;
             mainWindow.GuideNewInstall=newInstall;
+            // 0.508 (I-05): the retainer sale list. Read only while it is open; Universalis on the panel's button only.
+            Market.RetainerSalesReader? retainerSales=null;
+            registrations.Register(()=>retainerSales=new Market.RetainerSalesReader(framework,gameGui,client,player,log,()=>configuration.RetainerSalesPanel),()=>retainerSales?.Dispose());
+            mainWindow.RetainerSalesSource=()=>retainerSales?.State ?? new(Market.RetainerSalesStatus.Closed,[],new HashSet<string>(),"",false);
+            Market.RetainerCompareService? retainerCompare=null;
+            registrations.Register(()=>mainWindow.RetainerCompare=retainerCompare=new Market.RetainerCompareService{Enabled=()=>configuration.CommunityUniversalis},()=>retainerCompare?.Dispose());
             Help.CommunityHelpIndex? communityHelp=null;
             registrations.Register(()=>mainWindow.CommunityHelp=communityHelp=new Help.CommunityHelpIndex(),()=>communityHelp?.Dispose());
             Beastmaster.BeastWindowProbe? beastProbe=null;
@@ -1007,6 +1013,7 @@ public sealed class Plugin : IDalamudPlugin
             ("FashionCheck",mainWindow.DrawFashionCheckPanel),
             ("Gathering",mainWindow.DrawGatheringPanel),
             ("Collectable",mainWindow.DrawCollectablePanel),
+            ("RetainerSales",mainWindow.DrawRetainerSalesPanel),
             ("Tracker",mainWindow.DrawTrackerWindow),
             ("Spearfishing",mainWindow.DrawSpearfishingPanel),
             ("OceanVoyage",mainWindow.DrawOceanVoyagePanel),

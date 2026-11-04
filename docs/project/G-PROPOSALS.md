@@ -105,3 +105,7 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 | N-08 (journal de jardinage) | FAIT 0.448 (décidé le 2026-11-03, DEC-026) : journal avec durées tapées par le joueur, page Rappels |
 | N-14 (planificateur de croisements de jardinage) | FAIT 0.450 (DEC-027) : paires MIT de nick75g reliées aux objets par la feuille Item anglaise, affichées dans la langue du jeu ([preuve](../evidence/0.448-n06-n14-sources.md)) |
 | I-15 (recherche dans les fenêtres d'inventaire du jeu) | Touche l'interface du jeu : à faire en ultracode, avec l'utilisateur |
+
+## Décision à prendre : ventes des servants (0.508, I-05)
+
+Choix appliqué par défaut : la comparaison avec Universalis se lance seulement sur le bouton du panneau. Autre choix possible : demander une fois à l'ouverture de la liste de ventes, sur réglage. Recommandé : garder le clic, jusqu'à votre avis après un essai.

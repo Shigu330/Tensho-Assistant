@@ -714,6 +714,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.508 : ventes des servants (I-05)** — à voir en jouant, à la sonnette
+
+- [ ] Ouvrir la liste de ventes d'un servant : le panneau « Vos ventes » s'affiche à côté, avec objets, quantités et prix comme le jeu, HQ compris.
+- [ ] « Comparer aux autres vendeurs » : l'autre vendeur le plus bas et l'état de chaque ligne. Vos autres servants ne comptent pas comme concurrents. Le bouton de prix copie la valeur ; aucun prix ne change dans le jeu.
+- [ ] L'agent lit ensuite les lignes `Retainer sale list` de dalamud.log : docs/evidence/0.508-retainer-sales.md.
+
 **0.506 : vidéos et guides de la communauté (ONBOARD-001, lots 7 et 8)** — après une release
 
 - [ ] « ? » › Vidéos et guides : la liste se lit sur `main`, donc rien avant une release : « n'a pas pu être lue ». Après une release : « pas encore de vidéo ». Avec une ligne ajoutée : le titre, l'adresse au survol, la confirmation, le navigateur.

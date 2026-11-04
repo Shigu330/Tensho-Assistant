@@ -113,6 +113,7 @@ internal sealed partial class MainWindow
         finally{if(!configuration.CommunityUniversalis)ImGui.EndDisabled();ImGui.Unindent();}
         // 0.346 (g, I-07): not tied to Universalis: it uses the offers the game shows when you open them.
         BoolSetting("Advanced.Undercut","Advanced.UndercutTip",()=>configuration.UndercutClipboard,value=>configuration.UndercutClipboard=value,c=>c.UndercutClipboard);
+        BoolSetting("Advanced.RetainerSales","Advanced.RetainerSalesTip",()=>configuration.RetainerSalesPanel,value=>configuration.RetainerSalesPanel=value,c=>c.RetainerSalesPanel);
 
         ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Advanced.AlarmsTitle"));

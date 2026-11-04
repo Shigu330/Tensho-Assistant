@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.508.0
+- I-05 (issue #26), première version : quand la liste de ventes d'un servant est ouverte, un panneau affiche vos objets et vos prix, tels que le jeu les montre. « Comparer aux autres vendeurs » demande à Universalis, sur clic seulement, les offres de votre monde d'origine : autre vendeur le plus bas, état de chaque ligne (sous-coté, même prix, le plus bas, aucun autre vendeur, inconnu). Un bouton copie le prix conseillé, rien d'autre n'est écrit.
+- Lecture seule : aucun prix n'est modifié, rien n'est déplacé. Vos propres servants ne comptent pas. Absence de données ou liste coupée : « inconnu », jamais « le plus bas ».
+- Écarts avec la conception, après sa relecture : prix lus dans la liste affichée et non dans le tableau partagé, requête sur clic seulement (décision laissée à l'utilisateur, G-PROPOSALS), service de requête à part. Preuve : docs/evidence/0.508-retainer-sales.md.
+- Tests : RetainerSalesTests (5 cas). Verify.ps1 (agent) : 969/969, 0 avertissement, 0 erreur ; DLL 0.508.0.0. **Non validé en jeu : la fenêtre n'a jamais été ouverte avec ce code.** Le journal note ce qu'il lit, pour le vérifier au premier essai.
+### English
+- Retainer sales, first version: beside a retainer's sale list, your items and prices as the game shows them. On a click, it compares them with other sellers through Universalis and can copy a price. It changes nothing in the game. Not validated in game yet.
+
 ## 0.507.0
 - R-14 : fin de la relecture des constats de l'audit, un par un contre le code. Beaucoup étaient déjà corrigés par 0.452 à 0.454 (alarme, escouade, rappels, mandats, carte, macros, monnaies). Restaient, et sont corrigés :
   - Une feuille facultative ne coûte plus que sa valeur : statistiques sans ParamGrow, rangements sans World, équipement sans taux de surmatérialisation ni bardes, survol sans la pile, une garde par feuille sur la carte (les marques de chasse n'y passaient plus en silence).
