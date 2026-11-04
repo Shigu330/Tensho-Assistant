@@ -355,6 +355,14 @@
     "HelpEmpty": "No result: try a shorter word."
   },
   "Help": {
+    "BannerTitle": "First visit",
+    "BannerSeen": "Got it",
+    "BannerSeenTip": "Hides this for good on this page. The « ? » keeps the help.",
+    "BannerMore": "Tell me more",
+    "StateReady": "On this character: everything is read.",
+    "StateWaiting": "On this character: some data is not read yet. See « If it stays empty ».",
+    "StateUnusual": "On this character: something read looks unusual. If the page looks wrong, report it.",
+    "StateFailed": "On this character: a read failed, perhaps after a game update. Please report it.",
     "Start": "How to start",
     "Empty": "If it stays empty",
     "ButtonTip": "Explains this page.",
@@ -427,6 +435,7 @@
     "Events": "Events"
   },
   "SettingTips": {
+    "HelpBanners": "The first time you open a page, two lines explain it, once. The « ? » always keeps the help.",
     "BuffWait": "Seconds added after buffs (Veneration, Innovation, Great Strides, Waste Not, Manipulation), which wait 2 s by default; the previous setting applies to the other actions (3 s by default). Until changed, it equals the actions’ one.\nDefault: 0.",
     "OpenOnLastPage": "Unticked: Tensho opens on Home when the plugin loads; during a session, the reopened window keeps its page. Ticked: the last page shown comes back, even after reloading Tensho or restarting the game (it is saved when the window or the plugin closes). The Diagnostics page only comes back in developer mode.\nDefault: off (Home).",
     "ViewConeColor": "View cone colour; its opacity is the setting just above. Default: the theme's gold.",
@@ -466,6 +475,7 @@
     "GameFrames": "Draws the game's window frame behind Tensho's main window (textures read from the game files). If a texture is missing, for example after a game update, the window keeps its normal look.\nDefault: off."
   },
   "Settings": {
+    "HelpBanners": "First-visit help on the pages",
     "HoverCompare": "Comparison with the worn piece",
     "HoverCompareTip": "Under a gear piece's tooltip: item level and stat difference with the piece worn in the same slot (both rings for a ring). Base values, no materia.",
     "ResetValue": "Restore the default value",

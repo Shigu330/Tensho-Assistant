@@ -19,6 +19,45 @@ internal sealed partial class MainWindow
         return new(help.ToString(), Text("Title"), Text("Purpose"), Text("Start"), Text("Empty"));
     }
 
+    // 0.503 (lot 2): what this page has read on this character. Published states only, refreshed every two seconds while the help is open.
+    private (Page Page, long Next, HelpPageState State, string[] Raw) helpState;
+    private bool helpPopupRequested;
+    private void DrawHelpState()
+    {
+        var domains = HelpIndex.DomainsOf(page.ToString());
+        if (domains.Count == 0) return;
+        var now = System.Diagnostics.Stopwatch.GetTimestamp();
+        if (helpState.Page != page || now >= helpState.Next)
+        {
+            var loggedIn = characterStats.State.CharacterId != 0;
+            var lines = SelfCheckProbes(loggedIn).Where(probe => domains.Contains(probe.Domain)).Select(probe => Diagnostics.SelfCheck.Run(probe.Domain, probe.Probe)).ToArray();
+            helpState = (page, now + System.Diagnostics.Stopwatch.Frequency * 2, HelpIndex.StateOf(lines), lines.Select(line => line.Format()).ToArray());
+        }
+        if (helpState.State == HelpPageState.Unknown) return;
+        ImGui.TextColored(helpState.State == HelpPageState.Ready ? Success : helpState.State == HelpPageState.Waiting ? Muted : Accent, localization.Get("Help.State" + helpState.State));
+        if (DeveloperMode) foreach (var raw in helpState.Raw) ImGui.TextDisabled(raw);
+        ImGui.Spacing();
+    }
+
+    // 0.503 (lot 2, G8): the first time a page is opened, two lines on it; it does not come back. Setting in General.
+    private void DrawHelpBanner()
+    {
+        if (!configuration.HelpBanners || page == Page.Help || configuration.HelpSeen?.Contains(page.ToString()) == true) return;
+        ImGui.TextColored(Accent, localization.Get("Help.BannerTitle"));
+        ImGui.TextWrapped(localization.Get($"PageHelp.{page}Purpose"));
+        void Seen()
+        {
+            (configuration.HelpSeen ??= []).Add(page.ToString());
+            try { save(); } catch (Exception error) { log.Warning(error, "The help seen could not be saved."); }
+        }
+        if (ImGui.SmallButton(localization.Get("Help.BannerSeen") + "##HelpBannerSeen")) Seen();
+        Tip("Help.BannerSeenTip");
+        ImGui.SameLine();
+        if (ImGui.SmallButton(localization.Get("Help.BannerMore") + "##HelpBannerMore")) { Seen(); helpPopupRequested = true; }
+        Tip("Help.ButtonTip");
+        ImGui.Separator();
+    }
+
     private void DrawHelpText(HelpTopic topic)
     {
         ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + Math.Min(460, Math.Max(240, ImGui.GetContentRegionAvail().X)));
@@ -38,7 +77,7 @@ internal sealed partial class MainWindow
     private void DrawPageHelpButton()
     {
         ImGui.SameLine(Math.Max(ImGui.GetCursorPosX(), ImGui.GetWindowContentRegionMax().X - 28));
-        if (ImGui.SmallButton("?##PageHelp")) ImGui.OpenPopup("PageHelpPopup");
+        if (ImGui.SmallButton("?##PageHelp") || helpPopupRequested) { helpPopupRequested = false; ImGui.OpenPopup("PageHelpPopup"); }
         Tip("Help.ButtonTip");
         if (!ImGui.BeginPopup("PageHelpPopup")) return;
         try
@@ -46,6 +85,7 @@ internal sealed partial class MainWindow
             var topic = TopicOf(page);
             ImGui.TextColored(Accent, topic.Title);
             ImGui.Separator();
+            DrawHelpState();
             DrawHelpText(topic);
             ImGui.Spacing();
             if (ImGui.SmallButton(localization.Get("Help.AllHelp"))) { page = Page.Help; ImGui.CloseCurrentPopup(); }

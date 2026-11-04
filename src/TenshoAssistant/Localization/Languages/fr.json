@@ -355,6 +355,14 @@
     "HelpEmpty": "Aucun résultat : essayez un mot plus court."
   },
   "Help": {
+    "BannerTitle": "Première visite",
+    "BannerSeen": "Compris",
+    "BannerSeenTip": "Masque ceci pour de bon sur cette page. Le « ? » garde l'aide.",
+    "BannerMore": "En savoir plus",
+    "StateReady": "Sur ce personnage : tout est lu.",
+    "StateWaiting": "Sur ce personnage : certaines données ne sont pas encore lues. Voir « Si elle reste vide ».",
+    "StateUnusual": "Sur ce personnage : une valeur lue semble inhabituelle. Si la page paraît fausse, signalez-le.",
+    "StateFailed": "Sur ce personnage : une lecture a échoué, peut-être après une mise à jour du jeu. Merci de le signaler.",
     "Start": "Pour commencer",
     "Empty": "Si elle reste vide",
     "ButtonTip": "Explique cette page.",
@@ -427,6 +435,7 @@
     "Events": "Événements"
   },
   "SettingTips": {
+    "HelpBanners": "La première fois que vous ouvrez une page, deux lignes l'expliquent, une seule fois. Le « ? » garde toujours l'aide.",
     "BuffWait": "Secondes ajoutées après les buffs (Vénération, Innovation, Grandes enjambées, Parcimonie, Manipulation), qui attendent 2 s de base ; le réglage précédent s’applique aux autres actions (3 s de base). Tant qu’il n’est pas changé, il vaut celui des actions.\nPar défaut : 0.",
     "OpenOnLastPage": "Décoché : Tensho s'ouvre sur l'Accueil au chargement du plugin ; pendant une session, la fenêtre rouverte garde sa page. Coché : la dernière page affichée revient, même après un rechargement de Tensho ou une relance du jeu (elle est enregistrée à la fermeture de la fenêtre ou du plugin). La page Diagnostics ne revient qu'en mode développeur.\nPar défaut : désactivé (Accueil).",
     "ViewConeColor": "Couleur du cône de vision ; son opacité est le réglage juste au-dessus. Par défaut : l'or du thème.",
@@ -466,6 +475,7 @@
     "GameFrames": "Dessine derrière la fenêtre principale de Tensho le cadre des fenêtres du jeu (textures lues dans les fichiers du jeu). Si une texture manque, par exemple après une mise à jour du jeu, la fenêtre garde son aspect normal.\nPar défaut : désactivé."
   },
   "Settings": {
+    "HelpBanners": "Aide à la première visite des pages",
     "HoverCompare": "Comparaison avec la pièce portée",
     "HoverCompareTip": "Sous l'infobulle d'une pièce d'équipement : différence de niveau d'objet et de statistiques avec la pièce portée au même emplacement (les deux bagues pour une bague). Valeurs de base, sans matérias.",
     "ResetValue": "Remettre la valeur par défaut",

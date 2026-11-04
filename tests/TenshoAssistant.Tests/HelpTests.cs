@@ -31,6 +31,24 @@ internal static class HelpTests
             Check(HelpIndex.Search(topics,"PICK item").Single().Key=="C","every word, any case");
             Check(HelpIndex.Search(topics,"nothing").Count==0,"no result");
         }),
+        ("Help: the state of a page is the worst of what it depends on, and names real self-check lines",() =>
+        {
+            Check(HelpIndex.StateOf([])==HelpPageState.Unknown,"nothing to say");
+            Check(HelpIndex.StateOf([TenshoAssistant.Diagnostics.SelfCheck.Ok("a","")])==HelpPageState.Ready,"read");
+            Check(HelpIndex.StateOf([new("a",TenshoAssistant.Diagnostics.SelfCheckStatus.Seen,"")])==HelpPageState.Ready,"read earlier");
+            Check(HelpIndex.StateOf([TenshoAssistant.Diagnostics.SelfCheck.Ok("a",""),TenshoAssistant.Diagnostics.SelfCheck.NotRead("b","")])==HelpPageState.Waiting,"waiting wins over read");
+            Check(HelpIndex.StateOf([TenshoAssistant.Diagnostics.SelfCheck.Suspect("a",""),TenshoAssistant.Diagnostics.SelfCheck.NotRead("b","")])==HelpPageState.Unusual,"unusual over waiting");
+            Check(HelpIndex.StateOf([TenshoAssistant.Diagnostics.SelfCheck.Suspect("a",""),TenshoAssistant.Diagnostics.SelfCheck.Failed("b","x")])==HelpPageState.Failed,"failed wins");
+            var probes=Read("src/TenshoAssistant/MainWindow.SelfCheck.cs");
+            foreach(var domain in HelpIndex.AllDomains)Check(probes.Contains($"\"{domain}\""),"no self-check line named "+domain);
+            Check(HelpIndex.DomainsOf("Credits").Count==0,"a page that reads nothing has no state");
+        }),
+        ("Help: first-visit banner once per page, kept across a reset, with its setting",() =>
+        {
+            var help=Read("src/TenshoAssistant/MainWindow.Help.cs");
+            Check(help.Contains("configuration.HelpSeen?.Contains(page.ToString())==true".Replace("==true"," == true")) && help.Contains("(configuration.HelpSeen ??= []).Add(page.ToString());"),"once per page");
+            Check(Read("src/TenshoAssistant/MainWindow.cs").Contains("DrawHelpBanner();"),"drawn above the page");
+        }),
         ("Help: « ? » on every page, and a page in the navigation",() =>
         {
             Check(Read("src/TenshoAssistant/MainWindow.cs").Contains("DrawPageHelpButton();"),"the button beside the title");

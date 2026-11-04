@@ -58,6 +58,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Get("Settings.OpenOnLoginHelp"));
         ImGui.Spacing();
         // 0.327 (queue step e): opening page, shared row (tooltip and « ↺ »); turning it on remembers the current page at once.
+        BoolSetting("Settings.HelpBanners","SettingTips.HelpBanners",()=>configuration.HelpBanners,value=>configuration.HelpBanners=value);
         BoolSetting("Settings.OpenOnLastPage","SettingTips.OpenOnLastPage",()=>configuration.OpenOnLastPage,value=>{configuration.OpenOnLastPage=value;rememberedPage=null;RememberPage();},c=>c.OpenOnLastPage);
         ImGui.Spacing(); ImGui.Separator();
         DrawHeaderSettings();

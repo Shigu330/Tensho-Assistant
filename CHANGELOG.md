@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.503.0
+- ONBOARD-001, lot 2. Première visite d'une page : un bandeau de deux lignes, une seule fois, avec « Compris » et « En savoir plus » ; réglage dans Paramètres › Général (G8). Le « ? » dit aussi où en est la page sur ce personnage (tout lu, en attente, inhabituel, échec), d'après l'auto-contrôle.
+- Tests : HelpTests complété. Verify.ps1 (agent) : 950/950, 0 avertissement, 0 erreur ; DLL 0.503.0.0. Non validé en jeu.
+### English
+- First-visit help on each page, once, with a setting. The "?" also says what the page has read on this character, from the self-check.
+
 ## 0.502.0
 - Dresseur mis en attente sur décision de l'utilisateur. Suite de la feuille de route : prise en main (ONBOARD-001), lot 1.
 - Aide à chaque page : un « ? » en haut de la fenêtre explique la page ouverte (à quoi elle sert, comment commencer, que faire si elle reste vide). Nouvelle page Préférences › Aide : recherche, questions fréquentes, toutes les pages, rapport de bug. Un test refuse une page sans ses textes, en anglais et en français.

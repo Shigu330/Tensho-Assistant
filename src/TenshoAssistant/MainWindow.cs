@@ -273,6 +273,7 @@ internal sealed partial class MainWindow : Window, IDisposable
                     if (showContent)
                     {
                         DrawCategoryNavigation();
+                        DrawHelpBanner();
                         // 0.290 (R-06 step 6): draw time of each page, averaged, shown in Diagnostics (developer mode).
                         var drawStarted = System.Diagnostics.Stopwatch.GetTimestamp();
                         var drawnPage = page;

@@ -15,6 +15,8 @@ public static class ConfigurationReset
         "Voyages", "GearPlans", "GearMateria", "SubmarineUnlocked", "VesselPlans",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
+        // 0.503 (ONBOARD-001): the pages whose first-visit help was read.
+        "HelpSeen",
         // 0.347 (g, I-08): the player's item notes and labels.
         "ItemNotes",
         // 0.360 (g, C-09): the player's wishlist.
@@ -33,6 +35,8 @@ public static class ConfigurationReset
 
     public static readonly IReadOnlySet<string> Reset = new HashSet<string>
     {
+        // 0.503 (ONBOARD-001): first-visit help on the pages.
+        "HelpBanners",
         // e) (audit 2026-11-02): the four parts of the item hover panel.
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
@@ -255,6 +259,8 @@ public sealed partial class Configuration
     public List<uint> FollowedQuests { get; set; } = [];
     // 0.264: sidebar categories folded by the user (category keys).
     public HashSet<string>? NavigationCollapsed { get; set; }
+    public HashSet<string>? HelpSeen { get; set; }
+    public bool HelpBanners { get; set; } = true;
     public bool OpenOnLoad { get; set; }
     // Retainers and saddlebags copied into the bank cache each time they are opened (0.167), instead of an import button.
     public bool AutoBankCapture { get; set; } = true;

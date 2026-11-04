@@ -718,6 +718,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] Un « ? » en haut à droite de la fenêtre Tensho explique la page ouverte, sur toutes les pages ; « Toute l'aide » mène à Préférences › Aide.
 - [ ] Page Aide : la recherche trouve une page d'après ce qu'elle fait ; « Ouvrir cette page » y mène ; questions fréquentes.
+- [ ] 0.503 : première ouverture d'une page, un bandeau de deux lignes ; « Compris » le retire pour de bon ; « En savoir plus » ouvre l'aide. Réglage dans Paramètres › Général. Le « ? » dit ce qui est lu ou non sur ce personnage.
 - [ ] Relire les textes : chaque phrase fausse est un bug. Ils ont été écrits d'après le code et les tests, sans tout rejouer.
 
 **0.501 : sonde des fenêtres du dresseur** — à faire en jeu, mode développeur
