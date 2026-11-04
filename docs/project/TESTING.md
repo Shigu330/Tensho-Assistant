@@ -714,6 +714,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.501 : sonde des fenêtres du dresseur** — à faire en jeu, mode développeur
+
+- [ ] Ouvrir le bestiaire et cliquer sur quelques bêtes obtenues, de rangs différents. Ouvrir « Formation de l'équipe » depuis un plateau. Ouvrir la fiche d'un ennemi d'un plateau. L'agent lit ensuite les lignes `Beast window` de dalamud.log : rang de chaque bête, faiblesse des ennemis.
+
 **0.500 : page Dresseur** — à voir en jouant
 
 - [ ] Progression › Dresseur › Bêtes : 50 bêtes, nom, classe, attaque auto. comme le bestiaire. Rang 6 : Cu sith = FOR 161, INT 100, Rés. phys. 90, Rés. mag. 86, VIT 131. Une autre bête, à comparer aussi.

@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.501.0
+- Décision de l'utilisateur (DEC-032) : pour le dresseur, un panneau d'informations pour le Dédale, en JcE seulement, rien en JcJ. Pas encore codé : il lui faut le rang des bêtes et la faiblesse des ennemis.
+- Sonde en mode développeur : quand une fenêtre du dresseur est ouverte (fiche du bestiaire, formation de l'équipe, fiche d'un ennemi, plateau), ses textes et ses valeurs vont au journal, à chaque changement, en quantité limitée. Lecture seule. Les fenêtres de classement et de résultat sont exclues : elles nomment d'autres joueurs ou le personnage.
+- Tests : BeastCatalogTests complété. Verify.ps1 (agent) : 945/945, 0 avertissement, 0 erreur ; DLL 0.501.0.0. Non validé en jeu.
+### English
+- Read-only developer probe for the Beastmaster windows, to find the rank of each beast and enemy weakness. Ranking and result windows are left out. Team help will be information only, for this PvE content.
+
 ## 0.500.0
 - Demande de l'utilisateur : le dresseur et ses bêtes manquaient. Nouvelle page Progression › Dresseur, en lecture seule. Le conseil d'équipe viendra ensuite : ce qui rend une bête meilleure contre un ennemi n'est pas établi.
 - Bêtes : les 50, obtenues ou non (lu dans le jeu), classe, attaque automatique, textes d'Assaut et de Salve, cinq attributs au rang choisi, tri par colonne, recherche, classe. Plateaux : niveau, taille d'équipe, rang de synchronisation, ennemis et actions, gardien à part, bonus avec leurs points.

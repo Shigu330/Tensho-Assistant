@@ -83,6 +83,15 @@ internal static class BeastCatalogTests
             Check(catalog.View("",null,false,null,1,BeastSort.Strength,true)[0].Id==2,"by strength at rank 1");
             Check(catalog.View("",null,false,null,3,BeastSort.Strength,true)[0].Id==2,"rank above the second beast's table keeps its value");
         }),
+        ("Beast window probe: developer mode only, bounded, never the ranking or result windows",() =>
+        {
+            var probe=File.ReadAllText(Path.Combine(Path.GetFullPath("src/TenshoAssistant"),"Beastmaster/BeastWindowProbe.Dalamud.cs"));
+            var windows=probe[probe.IndexOf("Windows =",StringComparison.Ordinal)..probe.IndexOf("private const int",StringComparison.Ordinal)];
+            Check(windows.Contains("XBMMonsterBookDetail") && windows.Contains("XBMPetParty") && windows.Contains("XBMBattleMonsterDetail"),"the windows wanted");
+            Check(!windows.Contains("XBMRanking") && !windows.Contains("XBMResult"),"other players and the character stay out");
+            Check(probe.Contains("!developerMode()") && probe.Contains("depth > MaximumDepth") && probe.Contains("found.Count < MaximumTexts") && probe.Contains("written >= MaximumLinesPerWindow"),"off by default, recursion and output bounded");
+            Check(probe.Contains("failed = true;") && probe.Contains("framework.Update -= OnUpdate"),"stops on failure, cleaned up");
+        }),
         ("Beastmaster page: raw reads guarded, read-only, in the self-check",() =>
         {
             string Code(string file)=>File.ReadAllText(Path.Combine(Path.GetFullPath("src/TenshoAssistant"),file));

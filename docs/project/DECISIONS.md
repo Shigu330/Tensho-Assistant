@@ -314,3 +314,13 @@ Decision: Tous les choix recommandés : l'aide avant le guide ; une proposition 
 Reason: Décision de l'utilisateur.
 Consequences: Issues #11, #12, #15, #16, #30 fermées sur rapport ou preuve ; BST-001, ONBOARD-001 et deux issues de suivi ouvertes ; étiquette ultracode retirée. Exception à DEC-009 pour le conseil d'équipe du dresseur : pas décidée, soumise à l'accord de l'utilisateur.
 References: docs/goals/ONBOARD-001.md, docs/ai/STATUS.md, CLAUDE.md
+
+DEC-ID: DEC-032
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: Conseil d'équipe du dresseur face aux règles Dalamud (combat, contenu compétitif) ; le Dédale bestial a des classements (fenêtre XBMRanking).
+Evidence: Réponse de l'utilisateur : « Je ne veux pas pour jcj mais que pour pve », après le résumé des règles.
+Options: Informations seulement ; pas de conseil ; équipe calculée.
+Decision: Panneau d'informations pour le Dédale bestial (JcE) : ennemis, actions, faiblesses une fois confirmées, ce que l'équipe couvre, bonus. Rien en JcJ. Pas de « meilleure équipe » calculée sans nouvelle décision. Exception limitée à DEC-009 : ni ACT ni mesure de combat.
+Reason: Choix de l'utilisateur, avec le choix recommandé pour la forme. Le JcE n'écarte pas les règles : celle sur le combat vaut aussi en JcE, et les classements peuvent compter comme contenu compétitif.
+Consequences: Contacter l'équipe d'approbation de Dalamud avant la 1.0.0 (issue #31), et retirer le panneau si elle refuse.
+References: docs/evidence/0.500-xbm-columns.md, issue #34
