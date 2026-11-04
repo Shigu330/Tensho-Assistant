@@ -718,6 +718,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] Mode développeur : quelques secondes après un rechargement, le journal contient les lignes `Selftest …` et un résumé `Selftest done (auto)`. Sans saccade visible.
 - [ ] `/tensho selftest` et le bouton de Diagnostics relancent une passe ; Diagnostics montre les lignes.
+- [ ] 0.496 : fenêtre ouverte puis refermée, sans lancer de passe : la passe suivante donne OK_SEEN avec l'heure. Ça reste après un rechargement.
 - [ ] 0.495 : carnet d'artisanat ouvert, la ligne « crafting log » donne une recette ; synthèse en cours, « synthesis » passe en OK ; point de récolte ouvert, « gathering node » aussi.
 
 **0.493 : disponibilité des PNJ de Triple Triade** — à voir en jouant

@@ -25,7 +25,35 @@ internal static class SelfCheckTests
             var failed=run.Step()!;
             Check(failed.Status==SelfCheckStatus.Failed && failed.Domain=="b" && failed.Detail=="InvalidOperationException: lost","thrown");
             Check(run.Step()!.Status==SelfCheckStatus.NotRead && run.Done && run.Step() is null,"last");
-            Check(SelfCheck.Summary("auto",run.Lines)=="Selftest done (auto): 1 ok, 1 not read, 0 suspect, 1 failed.","summary");
+            Check(SelfCheck.Summary("auto",run.Lines)=="Selftest done (auto): 1 ok, 0 seen earlier, 1 not read, 0 suspect, 1 failed.","summary");
+        }),
+        ("Self-check: a window is OK only when really read (first pass in game counted Waiting as OK)",() =>
+        {
+            Check(SelfCheck.Window("synthesis",true,"Observed","closed").Status==SelfCheckStatus.Ok,"read");
+            foreach(var status in new[]{"Waiting","Offline","NotReady","Disabled"})Check(SelfCheck.Window("synthesis",true,status,"closed") is {Status:SelfCheckStatus.NotRead} line && line.Detail==status,status);
+            Check(SelfCheck.Window("synthesis",true,"AddonAbsent","no synthesis running").Detail=="no synthesis running","closed");
+            Check(SelfCheck.Window("synthesis",true,"Error","closed").Status==SelfCheckStatus.Failed,"error");
+            Check(SelfCheck.Window("synthesis",false,"Observed","closed").Status==SelfCheckStatus.NotRead,"off");
+        }),
+        ("Self-check memory: an OK stays after the window closes, a live answer wins, another game version forgets",() =>
+        {
+            var at=new DateTimeOffset(2026,11,4,11,0,0,TimeSpan.Zero);
+            var memory=SelfCheckMemory.Empty("v1");
+            Check(memory.Record(SelfCheck.Ok("synthesis","Observed"),at),"first OK reaches the disk");
+            Check(!memory.Record(SelfCheck.Ok("synthesis","Observed"),at.AddSeconds(1)),"same OK a second later does not");
+            Check(memory.Record(SelfCheck.Ok("synthesis","Observed"),at.AddMinutes(6)),"its time, every few minutes");
+            Check(!memory.Record(SelfCheck.NotRead("gathering node","no node open"),at) && memory.Count==1,"only OK lines");
+            var closed=memory.Apply(SelfCheck.NotRead("synthesis","no synthesis running"));
+            Check(closed.Status==SelfCheckStatus.Seen && closed.Detail.StartsWith("Observed at ",StringComparison.Ordinal) && closed.Detail.Contains("no synthesis running",StringComparison.Ordinal),"seen earlier, and says what is true now");
+            Check(memory.Apply(SelfCheck.Failed("synthesis","lost")).Status==SelfCheckStatus.Failed,"a failure is never hidden");
+            Check(memory.Apply(SelfCheck.Suspect("synthesis","odd")).Status==SelfCheckStatus.Suspect,"nor a doubt");
+            Check(memory.Apply(SelfCheck.Ok("synthesis","Live")).Detail=="Live","a live OK stays itself");
+            Check(memory.Apply(SelfCheck.NotRead("triad match","no match running")).Status==SelfCheckStatus.NotRead,"never seen stays not read");
+            Check(SelfCheckLine.Label(SelfCheckStatus.Seen)=="OK_SEEN","label");
+            var saved=memory.Save();
+            Check(SelfCheckMemory.Load(saved,"v1").Count==1,"survives a reload");
+            Check(SelfCheckMemory.Load(saved,"v2").Count==0,"another version of the game's data forgets");
+            Check(SelfCheckMemory.Load("{broken",  "v1").Count==0 && SelfCheckMemory.Load(null,"v1").Count==0,"a damaged or missing file is empty");
         }),
         ("Self-check: an error is one line, bounded, without paths",() =>
         {

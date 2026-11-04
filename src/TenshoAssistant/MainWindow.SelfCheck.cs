@@ -74,23 +74,27 @@ internal sealed partial class MainWindow
             Own("currencies", () => Currencies?.Invoke()?.State is not { } money ? Diagnostics.SelfCheck.NotRead("currencies", "no reader")
                 : money.Unavailable ? Diagnostics.SelfCheck.Failed("currencies", "read failed") : money.Reading is null ? Diagnostics.SelfCheck.NotRead("currencies", "not read yet") : Diagnostics.SelfCheck.Ok("currencies", "read")),
             Own("reminders", SelfCheckReminders),
-            // 0.495 (user report): named after what is watched. The Gathering log has no line: Tensho only opens it, it reads nothing from it.
-            ("crafting log", SelfCheckCraftingLog),
-            ("synthesis", () => Observed("synthesis", craftLive.State.Enabled, craftLive.State.Status.ToString(), "no synthesis running")),
-            ("gathering node", () => Observed("gathering node", gatheringObservation.State.Enabled, gatheringObservation.State.Status.ToString(), "no node open")),
-            ("triad match", () => Observed("triad match", triadObservation.State.Enabled, triadObservation.State.Status.ToString(), "no match running")),
-            ("cactpot ticket", () => Observed("cactpot ticket", cactpotObservation.State.Enabled, cactpotObservation.State.Status.ToString(), "no ticket open")),
+            .. SelfCheckWindows(),
         ];
     }
+
+    // 0.495 (user report): named after what is watched. The Gathering log has no line: Tensho only opens it, it reads nothing from it.
+    // 0.496: published states only, cheap enough to be watched once a second (SelfCheckRunner).
+    internal IReadOnlyList<(string Domain, Func<SelfCheckLine> Probe)> SelfCheckWindows() => selfCheckWindows ??=
+    [
+        ("crafting log", SelfCheckCraftingLog),
+        ("synthesis", () => Observed("synthesis", craftLive.State.Enabled, craftLive.State.Status.ToString(), "no synthesis running")),
+        ("gathering node", () => Observed("gathering node", gatheringObservation.State.Enabled, gatheringObservation.State.Status.ToString(), "no node open")),
+        ("triad match", () => Observed("triad match", triadObservation.State.Enabled, triadObservation.State.Status.ToString(), "no match running")),
+        ("cactpot ticket", () => Observed("cactpot ticket", cactpotObservation.State.Enabled, cactpotObservation.State.Status.ToString(), "no ticket open")),
+    ];
+    private IReadOnlyList<(string Domain, Func<SelfCheckLine> Probe)>? selfCheckWindows;
 
     private static SelfCheckLine Counted(string domain, int count, string detail)
         => count > 0 ? Diagnostics.SelfCheck.Ok(domain, detail) : Diagnostics.SelfCheck.Suspect(domain, detail);
 
-    // The windows of the game: closed is normal, the status says so.
     private static SelfCheckLine Observed(string domain, bool enabled, string status, string closed)
-        => !enabled ? Diagnostics.SelfCheck.NotRead(domain, "observation off")
-            : status == "AddonAbsent" ? Diagnostics.SelfCheck.NotRead(domain, closed)
-            : status == "Error" ? Diagnostics.SelfCheck.Failed(domain, "status Error") : Diagnostics.SelfCheck.Ok(domain, status);
+        => Diagnostics.SelfCheck.Window(domain, enabled, status, closed);
 
     private SelfCheckLine SelfCheckCraftingLog()
     {
@@ -194,7 +198,7 @@ internal sealed partial class MainWindow
         Tip("DiagnosticsUi.SelfCheckRunTip");
         foreach (var line in runner.LastLines)
         {
-            var color = line.Status switch { SelfCheckStatus.Ok => Success, SelfCheckStatus.NotRead => Muted, _ => Accent };
+            var color = line.Status switch { SelfCheckStatus.Ok or SelfCheckStatus.Seen => Success, SelfCheckStatus.NotRead => Muted, _ => Accent };
             ImGui.TextColored(color, SelfCheckLine.Label(line.Status));
             ImGui.SameLine();
             ImGui.TextWrapped($"{line.Domain}: {line.Detail}");

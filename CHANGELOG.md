@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.496.0
+- Rapport de l'utilisateur en jeu : l'auto-contrôle n'enregistrait pas les OK. Pendant une synthèse, « synthesis » passait bien en OK et « crafting log » retombait en NOT_READ, car le jeu ferme le carnet : aucune passe ne pouvait tout montrer.
+- Nouvel état OK_SEEN : pas lisible maintenant, mais bien lu plus tôt, avec l'heure. En mode développeur, les 5 lignes de fenêtres sont surveillées chaque seconde : un OK est noté dès que la fenêtre est ouverte, sans lancer de passe. Gardé dans SelfCheckSeen.json, y compris après un rechargement. Une réponse en direct passe toujours avant (FAILED et SUSPECT ne sont jamais masqués) et une autre version des données du jeu efface tout, pour qu'un ancien OK ne cache pas une panne après une mise à jour.
+- Tests : SelfCheckTests complété. Verify.ps1 (agent) : 936/936, 0 avertissement, 0 erreur ; DLL 0.496.0.0. En jeu, le premier essai comptait à tort l'état Waiting comme OK : corrigé avant livraison (seul Observed compte), le fichier faux effacé. Le reste n'est pas validé en jeu.
+### English
+- Self-check: a new OK_SEEN state keeps what was read well earlier, with its time. In developer mode the game's windows are watched once a second and the result survives a reload; a new version of the game's data clears it.
+
 ## 0.495.0
 - Rapport de l'utilisateur en jeu : carnet d'artisanat et carnet de récolte ouverts, l'auto-contrôle disait « craft window » et « gathering window : window closed ». La lecture était juste : ces lignes surveillent la synthèse en cours et un point de récolte ouvert, pas les carnets. Le libellé trompait.
 - Lignes renommées d'après ce qu'elles surveillent : synthesis, gathering node, triad match, cactpot ticket, avec le motif (« no synthesis running »…). Nouvelle ligne « crafting log », lue par l'aide du carnet. Le carnet de récolte n'a pas de ligne : Tensho l'ouvre, mais n'y lit rien.

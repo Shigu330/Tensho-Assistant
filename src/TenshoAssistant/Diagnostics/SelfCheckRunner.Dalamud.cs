@@ -5,7 +5,8 @@ namespace TenshoAssistant.Diagnostics;
 /// <summary>
 /// Runs the self-check on the framework thread, one probe per frame. On its own in developer mode, once per login and after each reload of
 /// the plugin, when the catalogues are ready (or after two minutes); otherwise on request (« /tensho selftest », Diagnostics). Read-only:
-/// no game action, no network request.
+/// no game action, no network request. 0.496: in developer mode the windows of the game are watched once a second, so that an OK is recorded
+/// while the window is open, without a pass at that moment; kept in SelfCheckSeen.json (SelfCheckMemory).
 /// </summary>
 internal sealed class SelfCheckRunner : IDisposable
 {
@@ -25,13 +26,38 @@ internal sealed class SelfCheckRunner : IDisposable
     private bool autoDone;
     private SelfCheckRun? run;
     private IReadOnlyList<SelfCheckLine> lastLines = [];
+    private readonly Func<IReadOnlyList<(string Domain, Func<SelfCheckLine> Probe)>> windows;
+    private readonly string memoryFile;
+    private readonly SelfCheckMemory memory;
+    private DateTimeOffset nextWatch;
+    private bool saveFailed;
 
     public SelfCheckRunner(IFramework framework, IClientState client, IPlayerState player, IPluginLog log, Func<bool> developerMode, Func<bool> ready,
-        Action prepare, Func<bool, IReadOnlyList<(string Domain, Func<SelfCheckLine> Probe)>> probes)
+        Action prepare, Func<bool, IReadOnlyList<(string Domain, Func<SelfCheckLine> Probe)>> probes,
+        Func<IReadOnlyList<(string Domain, Func<SelfCheckLine> Probe)>> windows, string memoryFile, string gameVersion)
     {
         this.framework = framework; this.client = client; this.player = player; this.log = log;
         this.developerMode = developerMode; this.ready = ready; this.prepare = prepare; this.probes = probes;
+        this.windows = windows; this.memoryFile = memoryFile;
+        string? saved = null;
+        try { if (File.Exists(memoryFile)) saved = File.ReadAllText(memoryFile); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { log.Warning(error, "Self-check memory could not be read."); }
+        memory = SelfCheckMemory.Load(saved, gameVersion);
         framework.Update += OnUpdate;
+    }
+
+    private void Watch(DateTimeOffset now)
+    {
+        if (now < nextWatch || !client.IsLoggedIn || !player.IsLoaded || !developerMode()) return;
+        nextWatch = now + TimeSpan.FromSeconds(1);
+        var changed = false;
+        foreach (var (domain, probe) in windows()) changed |= memory.Record(SelfCheck.Run(domain, probe), now);
+        if (!changed) return;
+        try { File.WriteAllText(memoryFile, memory.Save()); saveFailed = false; }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+        {
+            if (!saveFailed) { saveFailed = true; log.Warning(error, "Self-check memory could not be saved."); }
+        }
     }
 
     public IReadOnlyList<SelfCheckLine> LastLines => Volatile.Read(ref lastLines);
@@ -44,6 +70,7 @@ internal sealed class SelfCheckRunner : IDisposable
         try
         {
             var now = DateTimeOffset.UtcNow;
+            Watch(now);
             var loggedIn = client.IsLoggedIn && player.IsLoaded;
             if (!loggedIn) { loadedAt = null; autoDone = false; }
             else if (!autoDone && developerMode())
@@ -61,10 +88,11 @@ internal sealed class SelfCheckRunner : IDisposable
             }
             if (startAt is { } start && now >= start) { startAt = null; Volatile.Write(ref run, new SelfCheckRun(probes(loggedIn))); }
             if (run is not { } current) return;
-            if (current.Step() is { } line) log.Information("{0}", line.Format());
+            if (current.Step() is { } line) log.Information("{0}", memory.Apply(line).Format());
             if (!current.Done) return;
-            log.Information("{0}", SelfCheck.Summary(reason, current.Lines));
-            Volatile.Write(ref lastLines, current.Lines);
+            var lines = current.Lines.Select(memory.Apply).ToArray();
+            log.Information("{0}", SelfCheck.Summary(reason, lines));
+            Volatile.Write(ref lastLines, lines);
             Volatile.Write(ref run, null);
         }
         catch (Exception error)
