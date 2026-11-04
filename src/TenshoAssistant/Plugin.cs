@@ -305,7 +305,7 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.ConfigureDutyFinder(dutyFinder,dutyFinderLoot);
             var triadNpcs=new TriadNpcService();
             TriadNpcLoader? triadNpcLoader=null;
-            registrations.Register(()=>triadNpcLoader=new TriadNpcLoader(triadNpcs,data,framework,client,player,log),()=>triadNpcLoader?.Dispose());
+            registrations.Register(()=>triadNpcLoader=new TriadNpcLoader(triadNpcs,data,framework,client,player,unlocks,log),()=>triadNpcLoader?.Dispose());
             mainWindow.ConfigureTriadNpcs(triadNpcs);
             mainWindow.ConfigureMarketBoard(marketBoard);
             Alarms.AlarmDtrEntry? alarmBar=null;

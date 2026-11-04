@@ -1973,6 +1973,13 @@
     "Gathering": "Gathering: {0} — {1}"
   },
   "TriadNpcs": {
+    "Available": "Available",
+    "QuestNeeded": "Quest needed",
+    "OnlyAvailable": "Hide NPCs not available yet",
+    "OnlyAvailableTip": "Hides NPCs whose quests, as listed by the game, are not done. An NPC whose state is not read stays shown. The game lists no other condition.",
+    "QuestsAll": "Needs these quests:",
+    "QuestsAny": "Needs one of these quests:",
+    "TrialMissing": "Triple Triad is not unlocked yet: quest \"{0}\".",
     "PacksTitle": "Card packs to buy first",
     "PacksHelp": "Ranked by the number of cards still missing (game data: each card's main pack). Hover a pack: where to buy it.",
     "PackLine": "{0}. {1}: {2} missing / {3} ({4} % new)",

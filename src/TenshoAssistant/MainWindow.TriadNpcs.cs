@@ -13,11 +13,12 @@ internal sealed partial class MainWindow
 {
     private TriadNpcService? triadNpcs;
     private bool triadNpcsOnlyOpen=true;
+    private bool triadNpcsOnlyAvailable;
     private string triadMissingQuery=string.Empty;
     private string? triadNpcsFocus;
     // 0.291 (R-06 step 6, measured 14 ms): the NPC ranking, the pack ranking and the missing-card list are rebuilt only when the
     // catalogue, the collections, the beaten list or a filter change; long lists are drawn through a clipper (visible rows only).
-    private (object? Catalog,object? Entries,object? Beaten,bool OnlyOpen) triadFaceKey;
+    private (object? Catalog,object? Entries,object? Beaten,bool OnlyOpen,bool OnlyAvailable) triadFaceKey;
     private IReadOnlyList<(TriadNpc Npc,bool? Beaten,IReadOnlyList<uint> Missing)> triadFaceRows=[];
     private (object? Catalog,object? Entries) triadPacksKey;
     private ((uint PackItemId,string PackName) Pack,int Total,uint[] Missing)[] triadPacks=[];
@@ -26,6 +27,13 @@ internal sealed partial class MainWindow
     private object? triadNpcNamesKey;
     private Dictionary<uint,TriadNpc> triadNpcNames=[];
     internal void ConfigureTriadNpcs(TriadNpcService service)=>triadNpcs=service;
+    // 0.493 (user report): what the NPC asks for, for its tooltips; a quest done has ✓.
+    private string TriadQuestLines(TriadNpc npc,IReadOnlySet<uint>? done)
+    {
+        if(npc.RequiredQuests.Count==0)return "";
+        var lines=npc.RequiredQuests.Select(quest=>"  "+(quest.Name.Length>0 ? quest.Name:quest.QuestId.ToString())+(done?.Contains(quest.QuestId)==true ? " ✓":""));
+        return "\n"+localization.Get(npc.AnyQuest ? "TriadNpcs.QuestsAny":"TriadNpcs.QuestsAll")+Environment.NewLine+string.Join(Environment.NewLine,lines);
+    }
 
     private void DrawTriadNpcs()
     {
@@ -37,6 +45,8 @@ internal sealed partial class MainWindow
         bool? Beaten(uint match)=>state.Beaten is { } beaten ? beaten.Contains(match):null;
         string Card(uint id)=>entries.TryGetValue(id,out var entry) ? entry.Name:id.ToString();
         if(state.Beaten is null)ImGui.TextDisabled(localization.Get(state.BeatenUnavailable ? "TriadNpcs.BeatenUnavailable":"TriadNpcs.BeatenUnknown"));
+        var questsDone=state.QuestsDone;
+        if(catalog.Trial is { } trial && questsDone is not null && !questsDone.Contains(trial.QuestId))ImGui.TextColored(Accent,localization.Format("TriadNpcs.TrialMissing",trial.Name));
         // 0.276 (user request): the three sections are sub-tabs (only the open one is computed) instead of stacked headers.
         DetailTabs("TriadNpcTabs",
         [
@@ -48,15 +58,17 @@ internal sealed partial class MainWindow
         void DrawNpcList()
         {
             ImGui.Checkbox(localization.Get("TriadNpcs.OnlyOpen"),ref triadNpcsOnlyOpen);Tip("TriadNpcs.OnlyOpenTip");
-            var faceKey=((object?)catalog,(object?)entries,(object?)state.Beaten,triadNpcsOnlyOpen);
-            if(faceKey!=triadFaceKey){triadFaceKey=faceKey;triadFaceRows=catalog.ToFace(Beaten,Owned,triadNpcsOnlyOpen);}
+            ImGui.Checkbox(localization.Get("TriadNpcs.OnlyAvailable"),ref triadNpcsOnlyAvailable);Tip("TriadNpcs.OnlyAvailableTip");
+            var faceKey=((object?)catalog,(object?)entries,(object?)state.Beaten,triadNpcsOnlyOpen,triadNpcsOnlyAvailable);
+            if(faceKey!=triadFaceKey){triadFaceKey=faceKey;triadFaceRows=catalog.ToFace(Beaten,Owned,triadNpcsOnlyOpen,npc=>npc.Available(questsDone),triadNpcsOnlyAvailable);}
             var rows=triadFaceRows;
             ImGui.TextDisabled(localization.Format("TriadNpcs.Count",rows.Count,catalog.Npcs.Count));
-            if(ImGui.BeginTable("TriadNpcTable",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.ScrollY|ImGuiTableFlags.SizingStretchProp,new System.Numerics.Vector2(0,Math.Max(200,ImGui.GetContentRegionAvail().Y))))
+            if(ImGui.BeginTable("TriadNpcTable",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.ScrollY|ImGuiTableFlags.SizingStretchProp,new System.Numerics.Vector2(0,Math.Max(200,ImGui.GetContentRegionAvail().Y))))
             {
                 try
                 {
                     ImGui.TableSetupColumn(localization.Get("TriadNpcs.Npc"));ImGui.TableSetupColumn(localization.Get("TriadNpcs.Place"));
+                    ImGui.TableSetupColumn(localization.Get("TriadNpcs.Available"));
                     ImGui.TableSetupColumn(localization.Get("TriadNpcs.Beaten"));ImGui.TableSetupColumn(localization.Get("TriadNpcs.MissingCards"));
                     ImGui.TableSetupScrollFreeze(0,1);ImGui.TableHeadersRow();
                     var clipper=ImGui.ImGuiListClipper();
@@ -73,8 +85,11 @@ internal sealed partial class MainWindow
                            && maps.State.Catalog?.Find(npc.MapId) is { } map)PlaceFlagFromMapView(map,npc.X,npc.Y);
                         NpcMenu($"TriadNpcMenu{npc.MatchId}",npc.Name,0,maps.State.Catalog?.Find(npc.MapId) is { } npcMap ? [new(npcMap.TerritoryId,npcMap.MapId,npcMap.Zone,npc.X,npc.Y,0,0,0)]:[]);
                         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("TriadNpcs.Tooltip",npc.Fee,npc.RewardCards.Count==0 ? "—":string.Join(", ",npc.RewardCards.Select(Card)))
-                            +(npc.MapId!=0 ? "\n"+localization.Get("TriadNpcs.ClickFlag"):""));
+                            +TriadQuestLines(npc,questsDone)+(npc.MapId!=0 ? "\n"+localization.Get("TriadNpcs.ClickFlag"):""));
                         ImGui.TableNextColumn();ImGui.TextUnformatted(place);
+                        ImGui.TableNextColumn();
+                        var available=npc.Available(questsDone);
+                        ImGui.TextColored(available==true ? Success:available==false ? Accent:Muted,localization.Get(available==true ? "TriadNpcs.Yes":available==false ? "TriadNpcs.QuestNeeded":"TriadNpcs.Unknown"));
                         ImGui.TableNextColumn();
                         ImGui.TextColored(beaten==true ? Success:beaten==false ? Accent:Muted,localization.Get(beaten==true ? "TriadNpcs.Yes":beaten==false ? "TriadNpcs.No":"TriadNpcs.Unknown"));
                         ImGui.TableNextColumn();
@@ -153,7 +168,7 @@ internal sealed partial class MainWindow
                         var where=new List<string>();
                         foreach(var match in source?.NpcMatchIds ?? [])
                             if(npcNames.TryGetValue(match,out var npc))
-                                where.Add(npc.Name+(npc.MapId!=0 ? $" ({npc.Zone})":"")+(Beaten(match)==true ? " ✓":""));
+                                where.Add(npc.Name+(npc.MapId!=0 ? $" ({npc.Zone})":"")+(Beaten(match)==true ? " ✓":"")+(npc.Available(questsDone)==false ? " · "+localization.Get("TriadNpcs.QuestNeeded"):""));
                         if(source is { PackName.Length:>0 })where.Add(localization.Format("TriadNpcs.Pack",source.PackName));
                         ImGui.TextDisabled(where.Count>0 ? string.Join(" · ",where):localization.Get("TriadNpcs.OtherSource"));
                         ImGui.EndGroup();

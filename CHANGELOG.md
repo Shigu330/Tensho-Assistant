@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.493.0
+- Rapport de l'utilisateur : Triple Triade ne détectait pas si un PNJ était vraiment disponible. La liste ne regardait que « battu » et les cartes manquantes, alors que la feuille TripleTriad du jeu liste les quêtes demandées (108 PNJ sur 146).
+- Page PNJ et cartes : colonne « Disponible » (Oui, Quête requise, ?), les quêtes au survol avec ✓, ces PNJ en dernier, case « Masquer les PNJ pas encore disponibles ». Cartes manquantes et clic droit de la carte : même mention. Si la quête qui ouvre le jeu n'est pas faite, la page le dit.
+- Limites : seules les quêtes sont lues, le jeu ne donne aucune autre condition (horaires à 0 sur les 146 lignes). Quêtes non lues : « ? », jamais « Quête requise ». PreviousQuestJoin 2 = une des quêtes (trois quêtes de villes exclusives) ; 1 = toutes est déduit, à confirmer en jeu. Preuve : docs/evidence/0.493-triad-npc-requirements.md.
+- Tests : TriadNpcCatalogTests complété. Verify.ps1 (agent) : 930/930, 0 avertissement, 0 erreur ; DLL 0.493.0.0. Non validé en jeu.
+### English
+- Triple Triad: the NPC list now shows whether an NPC is available, from the quests the game lists for it. Locked NPCs come last and can be hidden; the quests are in the tooltip. The map's Triple Triad tab says the same.
+
 ## 0.492.0
 - R-14, 5 constats relus contre le code et confirmés. Après une mise à jour du jeu qui casserait une feuille, la page le dit au lieu de mentir :
   - Recettes, contenus, vendeurs : une copie vide est une erreur publiée, plus un catalogue vide qui se lit « aucune recette » ou « personne ne le vend » (les caches disque refusaient déjà ce cas).

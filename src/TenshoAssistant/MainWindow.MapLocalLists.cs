@@ -251,21 +251,23 @@ internal sealed partial class MainWindow
         var mapIds=EquivalentMaps(map);
         var entries=TriadEntriesById();
         bool? Beaten(uint match)=>state.Beaten is { } beaten ? beaten.Contains(match):null;
-        var rows=catalog.ToFace(Beaten,id=>entries.TryGetValue(id,out var entry) && entry.ConfirmedUnlocked,false).Where(row=>mapIds.Contains(row.Npc.MapId)).ToArray();
+        var questsDone=state.QuestsDone;
+        var rows=catalog.ToFace(Beaten,id=>entries.TryGetValue(id,out var entry) && entry.ConfirmedUnlocked,false,npc=>npc.Available(questsDone)).Where(row=>mapIds.Contains(row.Npc.MapId)).ToArray();
         if(rows.Length==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
         if(state.Beaten is null)ImGui.TextDisabled(localization.Get(state.BeatenUnavailable ? "TriadNpcs.BeatenUnavailable":"TriadNpcs.BeatenUnknown"));
         foreach(var (npc,beaten,missing) in rows)
         {
             var mark=beaten switch{true=>"[x]",false=>"[ ]",_=>"[?]"};
-            var lacking=missing.Count>0 ? "  "+localization.Format("MapLocal.TriadMissing",missing.Count):"";
-            ImGui.PushStyleColor(ImGuiCol.Text,beaten==true && missing.Count==0 ? UI.FfxivTheme.TextMuted:UI.FfxivTheme.Text);
+            var locked=npc.Available(questsDone)==false;
+            var lacking=(missing.Count>0 ? "  "+localization.Format("MapLocal.TriadMissing",missing.Count):"")+(locked ? "  "+localization.Get("TriadNpcs.QuestNeeded"):"");
+            ImGui.PushStyleColor(ImGuiCol.Text,locked || (beaten==true && missing.Count==0) ? UI.FfxivTheme.TextMuted:UI.FfxivTheme.Text);
             try{if(ImGui.Selectable($"{mark}  {npc.Name}  (X {npc.X:0.0}  Y {npc.Y:0.0}){lacking}##LocalTriad{npc.MatchId}")){PlaceFlagFromMapView(map,npc.X,npc.Y);ImGui.CloseCurrentPopup();}}
             finally{ImGui.PopStyleColor();}
             NpcMenu($"TriadTool{npc.MatchId}",npc.Name,0,[new(map.TerritoryId,map.MapId,map.Zone,npc.X,npc.Y,0,0,0)],("MapLocal.OpenTriadTool",()=>OpenTriadTab("Npcs")));
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("TriadNpcs.Tooltip",npc.Fee,npc.RewardCards.Count==0 ? "—"
                 :string.Join(", ",npc.RewardCards.Select(id=>entries.TryGetValue(id,out var entry) ? entry.Name:id.ToString())))
                 +"\n"+localization.Get("TriadNpcs.Beaten")+" : "+localization.Get(beaten==true ? "TriadNpcs.Yes":beaten==false ? "TriadNpcs.No":"TriadNpcs.Unknown")
-                +"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
+                +TriadQuestLines(npc,questsDone)+"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
         }
     }
 

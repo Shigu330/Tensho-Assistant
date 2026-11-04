@@ -1973,6 +1973,13 @@
     "Gathering": "Récolte : {0} — {1}"
   },
   "TriadNpcs": {
+    "Available": "Disponible",
+    "QuestNeeded": "Quête requise",
+    "OnlyAvailable": "Masquer les PNJ pas encore disponibles",
+    "OnlyAvailableTip": "Masque les PNJ dont les quêtes demandées par le jeu ne sont pas faites. Un PNJ dont l'état n'est pas lu reste affiché. Le jeu n'indique aucune autre condition.",
+    "QuestsAll": "Demande ces quêtes :",
+    "QuestsAny": "Demande une de ces quêtes :",
+    "TrialMissing": "Triple Triade n'est pas encore débloqué : quête « {0} ».",
     "PacksTitle": "Lots de cartes à acheter en priorité",
     "PacksHelp": "Classés par nombre de cartes encore manquantes (données du jeu : lot principal de chaque carte). Survoler un lot : où l'acheter.",
     "PackLine": "{0}. {1} : {2} manquante(s) / {3} ({4} % de nouvelles)",
