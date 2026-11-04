@@ -344,3 +344,13 @@ Decision: global.json accepte 10.0.100 et plus (latestFeature) ; Verify.ps1 pren
 Reason: Demande de l'utilisateur de relever ce qui manque pour la 1.0.0 ; correction sûre et facile à défaire.
 Consequences: Le SDK local reste 10.0.403. Une nouvelle image chez Dalamud se suit dans le relevé. Le job garde le réseau : seule une vraie PR prouve la compilation réseau coupé.
 References: docs/project/PUBLISHING.md, issue #31
+
+DEC-ID: DEC-035
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: Titre selon le job : sur option désactivée par défaut, le titre change sans clic au changement de job, alors que Dalamud interdit les requêtes automatiques au serveur sans action du joueur.
+Evidence: Réponse de l'utilisateur après le résumé de la règle : « On garde juste comme ça on verra après publication dalamud ». src/TenshoAssistant/Collections/TitleChanger.Dalamud.cs
+Options: Clic seulement (conseil de l'agent) ; garder et présenter dans la PR.
+Decision: Gardé tel quel, sans changement de code, et déclaré dans la description du plugin et la PR.
+Reason: Décision de l'utilisateur.
+Consequences: L'équipe peut demander de le retirer : ce serait alors à faire avant l'approbation. À revoir après la publication.
+References: docs/project/PUBLISHING.md, issue #31

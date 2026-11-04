@@ -162,7 +162,7 @@ How the Dalamud repository builds a plugin (Linux, SDK 10.0.101, no network, loc
 CI job checks: [docs/evidence/0.512-d17-build.md](docs/evidence/0.512-d17-build.md). When you add code, keep these true:
 
 - external requests are triggered only by player action, an opened page or a setting, and each source has its switch;
-- actions that reach the game start on a click; one setting, off by default, acts without one (title by job), and it is under review for the submission; game alarms are sent only from a click (adding an alarm with the setting on, or « Send »), never by the automatic alarms;
+- actions that reach the game start on a click; one setting, off by default, acts without one (title by job), kept and declared in the submission (DEC-035); game alarms are sent only from a click (adding an alarm with the setting on, or « Send »), never by the automatic alarms;
 - a window that looks like a window uses the Dalamud window system;
 - the game map remains hidden and unmodified when the Tensho map replaces it.
 

@@ -16,7 +16,7 @@ Report hints, Mini Cactpot and Triple Triad helpers, character stats and macro c
   On window, equipping a job, sending the hunt train call to the chat channel the player picks. Game alarms use the game's `/alarm`
   command, sent when the player adds an alarm with the « game alarms » setting on (off by default) or presses « Send »; automatic alarms never create one.
 - One setting, off by default, acts without a click: wearing the title the player chose for a job when the job changes.
-  <!-- Decide before posting: keep and explain, or remove (docs/project/PUBLISHING.md, point 2). -->
+  <!-- Kept by the author's decision (DEC-035): explain it here in your own words. -->
 - No automation of crafting, dialogues or loot, no PvP feature, no parser. The solver and the suggested move only display advice. Triple
   Triad advice works against NPCs only, never in tournaments or against a player. The Beastmaster page lists game data.
 - Network: Universalis (world + item id), Garland Tools, FFXIV Console Games Wiki, Teamcraft's public bite time reports, PaissaDB (open

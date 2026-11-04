@@ -26,7 +26,7 @@ Liste complète : [TESTING](../project/TESTING.md), 284 cases ouvertes, aucune d
 Après une release seulement : galerie de Mes outils (0.476) et liste de vidéos (0.506), qui lisent la branche `main`.
 
 ## Prochaine action
-1) Décisions de l'auteur sur les points Dalamud ([PUBLISHING](../project/PUBLISHING.md) « Ce qui reste », points 2 à 7), avec son accord à chaque règle.
+1) Décisions de l'auteur sur les points Dalamud ([PUBLISHING](../project/PUBLISHING.md) « Ce qui reste », points 4 à 7 ; titre selon le job décidé, DEC-035), avec son accord à chaque règle.
 2) Une séance de jeu sur la dernière version, puis une release (DEC-033 : pas de release avant cette séance).
 3) Fenêtres libres converties vers le système de fenêtres de Dalamud (issue #38), si l'auteur est d'accord.
 4) Passage en 1.0.0 et soumission, au moment choisi par l'auteur (DEC-023). La PR et la déclaration d'IA sont écrites par lui.
