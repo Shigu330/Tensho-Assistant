@@ -5485,7 +5485,7 @@
     "BonusWhenWorth": "{0} and {1} are advised only when they earn more than the same GP elsewhere (a restored attempt, Scrutiny).",
     "Cap0": "Safe",
     "Cap0Tip": "Counts on no roll: the move that guarantees the most, even if everything goes badly.",
-    "Cap50": "Uncertain",
+    "Cap50": "Balanced",
     "Cap50Tip": "A middle way: the average and the worst case count as much as each other.",
     "Cap100": "Try your luck",
     "Cap100Tip": "Aims for the best average, even if a bad roll can end much lower.",

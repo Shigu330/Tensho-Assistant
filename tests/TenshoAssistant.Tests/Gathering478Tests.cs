@@ -314,7 +314,7 @@ internal static class Gathering478Tests
                 Check(plan.Worst<=plan.Expected && plan.Expected>=20 && plan.Worst>=7,$"real run at {risk} %: {plan}");
             }
             var panel=Read("MainWindow.CollectablePanel.cs");
-            Check(panel.Contains("CollectableRisk.Snap(configuration.CollectableRiskTolerance)") && panel.Contains("ImGui.RadioButton(localization.Get($\"CollectablePanel.Cap{cap}\")"),"three steps");
+            Check(panel.Contains("CollectableRisk.Snap(configuration.CollectableRiskTolerance)") && panel.Contains("FontAwesomeIcon.HandHolding:cap==50 ? FontAwesomeIcon.BalanceScale:FontAwesomeIcon.Dice") && panel.Contains("WrappedTooltip(localization.Get($\"CollectablePanel.Cap{cap}\")"),"three steps");
             Check(new TenshoAssistant.Configuration().CollectableRiskTolerance==50 || Read("Configuration.cs").Contains("CollectableRiskTolerance { get; set; } = 50"),"default");
         }),
         ("GP tick: once GP stops rising, no tick is promised; it comes back with the next rise; what a tick gives is seen",() =>

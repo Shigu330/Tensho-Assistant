@@ -1,5 +1,6 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 using TenshoAssistant.Gathering;
 
 namespace TenshoAssistant;
@@ -71,8 +72,16 @@ internal sealed partial class MainWindow
         foreach(var cap in CollectableRisk.Caps)
         {
             ImGui.SameLine();
-            if(ImGui.RadioButton(localization.Get($"CollectablePanel.Cap{cap}")+$"###CollectableRisk{cap}",risk==cap) && risk!=cap){configuration.CollectableRiskTolerance=cap;risk=cap;SaveReminders();}
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get($"CollectablePanel.Cap{cap}Tip"));
+            // 0.530 (user request): icons, the name in the tooltip: a hand holding an item, a scale, a die.
+            var icon=cap==0 ? FontAwesomeIcon.HandHolding:cap==50 ? FontAwesomeIcon.BalanceScale:FontAwesomeIcon.Dice;
+            var chosen=risk==cap;
+            if(chosen)ImGui.PushStyleColor(ImGuiCol.Button,Accent with {W=0.55f});
+            bool clicked;
+            ImGui.PushFont(UiBuilder.IconFont);
+            try{clicked=ImGui.Button(icon.ToIconString()+$"###CollectableRisk{cap}");}
+            finally{ImGui.PopFont();if(chosen)ImGui.PopStyleColor();}
+            if(clicked && !chosen){configuration.CollectableRiskTolerance=cap;risk=cap;SaveReminders();}
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get($"CollectablePanel.Cap{cap}")+Environment.NewLine+localization.Get($"CollectablePanel.Cap{cap}Tip"));
         }
         ImGui.PushTextWrapPos(0);
         try{ImGui.TextDisabled(localization.Get($"CollectablePanel.Cap{risk}Tip"));}

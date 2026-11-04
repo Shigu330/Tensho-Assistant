@@ -713,7 +713,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.529 : trois crans de risque des collectionnables** — à voir en jouant
 
-- [ ] Panneau Collectionnable : Sûr, Incertain, Tentez votre chance, avec la description du cran choisi ; même choix dans Paramètres › Modules › Récolte.
+- [ ] Panneau Collectionnable (0.530) : trois icônes, main, balance, dé ; le nom au survol ; le cran choisi coloré, sa description dessous ; même choix dans Paramètres › Modules › Récolte.
 - [ ] Sur « Sûr » : le coup, le plan sans chance, ses actions et ses PR. Sur les deux autres : le coup, la moyenne, le pire cas, et la ligne « Sur Sûr… garantis ».
 - [ ] En changeant de cran, le coup conseillé suit.
 

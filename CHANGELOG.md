@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.530.0
+- Demande de l'utilisateur (capture : « Tentez votre » coupé) : les crans de risque deviennent trois icônes, le nom dans l'infobulle : une main qui tient un objet (Sûr), une balance (Équilibré, ex-Incertain), un dé (Tentez votre chance). Le cran choisi est coloré.
+- Tests : Gathering478Tests adapté. Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.530.0.0. Non validé en jeu.
+### English
+- The collectable risk steps are now three icons with their name in the tooltip: a hand holding an item (Safe), a scale (Balanced), a die (Try your luck).
+
 ## 0.529.0
 - Demande de l'utilisateur (« suive des caps plutôt que % », avec une description) : le risque du plan des collectionnables n'est plus un pourcentage, mais trois crans décrits : Sûr (0), Incertain (50), Tentez votre chance (100). Une valeur enregistrée va au cran le plus proche. Même choix dans les paramètres.
 - Un seul plan à l'écran, celui du cran choisi. Les deux plans se mêlaient : le coup conseillé suivait la moyenne, les lignes « Avant elles » et « Ce plan dépense » le plan sans chance. Ces lignes ne s'affichent plus que sur « Sûr » ; ailleurs, une ligne dit ce que « Sûr » garantirait.

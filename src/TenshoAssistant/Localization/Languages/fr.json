@@ -5485,7 +5485,7 @@
     "BonusWhenWorth": "{0} et {1} ne sont proposés que s'ils rapportent plus que les mêmes PR ailleurs (tentative rendue, Inspection).",
     "Cap0": "Sûr",
     "Cap0Tip": "Ne compte sur aucun tirage : le coup qui garantit le plus, même si tout tourne mal.",
-    "Cap50": "Incertain",
+    "Cap50": "Équilibré",
     "Cap50Tip": "Un compromis : la moyenne et le pire cas comptent autant.",
     "Cap100": "Tentez votre chance",
     "Cap100Tip": "Vise la meilleure moyenne, même si un mauvais tirage peut finir bien plus bas.",
