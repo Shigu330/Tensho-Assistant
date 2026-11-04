@@ -714,6 +714,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.504 : signaler un problème (ONBOARD-001, lot 3)** — à voir en jouant
+
+- [ ] Aide › Signaler un problème : remplir, « Ouvrir le formulaire GitHub ». Le navigateur s'ouvre sur le bon formulaire, tous les champs remplis. Ne pas l'envoyer pour un essai. Le rapport est visible et modifiable avant, sans nom de personnage ni dossier.
+
 **0.502 : aide (ONBOARD-001, lot 1)** — à voir en jouant
 
 - [ ] Un « ? » en haut à droite de la fenêtre Tensho explique la page ouverte, sur toutes les pages ; « Toute l'aide » mène à Préférences › Aide.

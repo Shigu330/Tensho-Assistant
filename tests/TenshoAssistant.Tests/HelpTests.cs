@@ -31,6 +31,34 @@ internal static class HelpTests
             Check(HelpIndex.Search(topics,"PICK item").Single().Key=="C","every word, any case");
             Check(HelpIndex.Search(topics,"nothing").Count==0,"no result");
         }),
+        ("Report a problem: the form's address, with the field ids of the repository's forms",() =>
+        {
+            var link=ProblemReport.Link(new(ProblemKind.Bug,"Map & flag","Step 1","It works","Report text","0.504.0","fr"));
+            Check(!link.ReportLeftOut && link.Url.StartsWith(ProblemReport.Repository+"/issues/new?template=bug_report.yml&title=Map%20%26%20flag",StringComparison.Ordinal),"template and encoded title");
+            foreach(var part in new[]{"&version=0.504.0","&client=fr","&steps=Step%201","&expected=It%20works","&report=Report%20text"})Check(link.Url.Contains(part,StringComparison.Ordinal),part);
+            var form=Read(".github/ISSUE_TEMPLATE/bug_report.yml");
+            foreach(var id in new[]{"version","client","steps","expected","report"})Check(form.Contains("id: "+id,StringComparison.Ordinal),"bug form: "+id);
+            var idea=ProblemReport.Link(new(ProblemKind.Idea,"T","Want","Like this","R","v","c")).Url;
+            Check(idea.Contains("template=feature_request.yml") && idea.Contains("&need=Want") && idea.Contains("&example=Like%20this") && !idea.Contains("report="),"idea form");
+            Check(Read(".github/ISSUE_TEMPLATE/feature_request.yml").Contains("id: need") && Read(".github/ISSUE_TEMPLATE/feature_request.yml").Contains("id: example"),"idea ids");
+            var translation=ProblemReport.Link(new(ProblemKind.Translation,"T","Text","","R","v","de")).Url;
+            Check(translation.Contains("template=translation.yml") && translation.Contains("&language=de") && translation.Contains("&texts=Text"),"translation form");
+            Check(Read(".github/ISSUE_TEMPLATE/translation.yml").Contains("id: language") && Read(".github/ISSUE_TEMPLATE/translation.yml").Contains("id: texts"),"translation ids");
+        }),
+        ("Report a problem: too long goes to the clipboard, and nothing private leaves",() =>
+        {
+            var big=new string('x',7000);
+            var withoutReport=ProblemReport.Link(new(ProblemKind.Bug,"T","Step","","Short "+big,"v","c"));
+            Check(withoutReport.ReportLeftOut && !withoutReport.Url.Contains("report=") && withoutReport.Url.Contains("&steps=Step") && withoutReport.Url.Length<6000,"the report is dropped first");
+            var tooMuch=ProblemReport.Link(new(ProblemKind.Bug,"T",big,big,"","v","c"));
+            Check(tooMuch.ReportLeftOut && tooMuch.Url.Length<6000 && tooMuch.Url.Contains("&version=v"),"then the player's text");
+            var clean=ProblemReport.Clean("C:\\Users\\Someone\\log.txt and https://discord.com/api/webhooks/123/abc end");
+            Check(clean=="<path> and <webhook> end","folders and webhook");
+            Check(ProblemReport.Link(new(ProblemKind.Bug,"See C:\\Users\\Me\\a","","","","v","c")).Url.Contains("%3Cpath%3E"),"also in the title");
+            Check(ProblemReport.SearchAddress("map flag").EndsWith("/issues?q=is%3Aissue%20map%20flag",StringComparison.Ordinal),"search");
+            var help=Read("src/TenshoAssistant/MainWindow.Help.cs");
+            Check(!help.Contains("HttpClient") && help.Contains("Dalamud.Utility.Util.OpenLink(link.Url)"),"the browser opens, the plugin sends nothing");
+        }),
         ("Help: the state of a page is the worst of what it depends on, and names real self-check lines",() =>
         {
             Check(HelpIndex.StateOf([])==HelpPageState.Unknown,"nothing to say");

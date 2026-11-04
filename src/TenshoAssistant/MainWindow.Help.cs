@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Help;
 
@@ -90,6 +91,9 @@ internal sealed partial class MainWindow
             ImGui.Spacing();
             if (ImGui.SmallButton(localization.Get("Help.AllHelp"))) { page = Page.Help; ImGui.CloseCurrentPopup(); }
             Tip("Help.AllHelpTip");
+            ImGui.SameLine();
+            if (ImGui.SmallButton(localization.Get("Help.Contribute") + "##HelpProblem")) { problemRequested = true; problemReport = string.Empty; page = Page.Help; ImGui.CloseCurrentPopup(); }
+            Tip("Help.FormOpenTip");
         }
         finally { ImGui.EndPopup(); }
     }
@@ -121,11 +125,72 @@ internal sealed partial class MainWindow
                 finally { ImGui.TreePop(); }
             }
         }
-        if (TenshoAssistant.UI.UiComponents.Header(localization.Get("Help.Contribute")))
+        if (problemRequested) { problemRequested = false; ImGui.SetNextItemOpen(true); }
+        if (TenshoAssistant.UI.UiComponents.Header(localization.Get("Help.Contribute"))) DrawProblemForm();
+    }
+
+    // 0.504 (lot 3, G5): a form in the game, then the GitHub form filled in, in the player's browser. The plugin sends nothing and holds no token.
+    private bool problemRequested;
+    private int problemKind;
+    private string problemTitle = string.Empty, problemWhat = string.Empty, problemExpected = string.Empty, problemReport = string.Empty;
+    private bool problemLeftOut;
+
+    private string ProblemReportText()
+    {
+        var text = new StringBuilder(BugReport());
+        if (SelfCheck?.LastLines is { Count: > 0 } lines) foreach (var line in lines) text.AppendLine(line.Format());
+        text.AppendLine("Sent from the in-game form.");
+        return ProblemReport.Clean(text.ToString());
+    }
+
+    private void DrawProblemForm()
+    {
+        ImGui.TextWrapped(localization.Get("Help.ContributeText"));
+        for (var index = 0; index < 3; index++)
         {
-            ImGui.TextWrapped(localization.Get("Help.ContributeText"));
-            if (ImGui.SmallButton(localization.Get("Advanced.CopyReport") + "##HelpReport")) ImGui.SetClipboardText(BugReport());
-            Tip("Advanced.CopyReportTip");
+            if (index > 0) ImGui.SameLine();
+            if (ImGui.RadioButton(localization.Get(((ProblemKind)index) switch { ProblemKind.Idea => "Help.KindIdea", ProblemKind.Translation => "Help.KindTranslation", _ => "Help.KindBug" }), problemKind == index)) problemKind = index;
+            Tip("Help.KindTip");
         }
+        var kind = (ProblemKind)problemKind;
+        ImGui.SetNextItemWidth(Math.Min(520, ImGui.GetContentRegionAvail().X));
+        ImGui.InputTextWithHint("##ProblemTitle", localization.Get("Help.FormTitle"), ref problemTitle, 200); Tip("Help.FormTitleTip");
+        var size = new Vector2(Math.Min(520, ImGui.GetContentRegionAvail().X), 70);
+        ImGui.TextUnformatted(localization.Get(kind == ProblemKind.Bug ? "Help.FormWhat" : kind == ProblemKind.Idea ? "Help.FormNeed" : "Help.FormTexts"));
+        ImGui.InputTextMultiline("##ProblemWhat", ref problemWhat, 3000, size); Tip("Help.FormWhatTip");
+        if (kind != ProblemKind.Translation)
+        {
+            ImGui.TextUnformatted(localization.Get(kind == ProblemKind.Bug ? "Help.FormExpected" : "Help.FormExample"));
+            ImGui.InputTextMultiline("##ProblemExpected", ref problemExpected, 3000, size); Tip("Help.FormExpectedTip");
+        }
+        if (kind == ProblemKind.Bug)
+        {
+            ImGui.TextUnformatted(localization.Get("Help.FormReport"));
+            if (problemReport.Length == 0) problemReport = ProblemReportText();
+            ImGui.InputTextMultiline("##ProblemReport", ref problemReport, 8000, new Vector2(size.X, 130)); Tip("Help.FormReportTip");
+            if (ImGui.SmallButton(localization.Get("Help.FormRefresh"))) problemReport = ProblemReportText();
+            Tip("Help.FormRefreshTip");
+        }
+        ImGui.Spacing();
+        if (ImGui.SmallButton(localization.Get("Help.FormSearch")))
+            Dalamud.Utility.Util.OpenLink(ProblemReport.SearchAddress(problemTitle));
+        Tip("Help.FormSearchTip");
+        ImGui.SameLine();
+        ImGui.BeginDisabled(problemTitle.Trim().Length == 0);
+        try
+        {
+            if (ImGui.SmallButton(localization.Get("Help.FormOpen")))
+            {
+                var link = ProblemReport.Link(new(kind, problemTitle, problemWhat, problemExpected, problemReport, BuildVersion, kind == ProblemKind.Translation ? localization.CurrentCode : $"Plugin language {localization.CurrentCode}"));
+                problemLeftOut = link.ReportLeftOut;
+                if (link.ReportLeftOut) ImGui.SetClipboardText(ProblemReport.Clean($"{problemWhat}\n\n{problemExpected}\n\n{problemReport}"));
+                Dalamud.Utility.Util.OpenLink(link.Url);
+            }
+        }
+        finally { ImGui.EndDisabled(); }
+        Tip("Help.FormOpenTip");
+        if (problemLeftOut) ImGui.TextColored(Accent, localization.Get("Help.FormLeftOut"));
+        if (ImGui.SmallButton(localization.Get("Help.FormSecurity"))) Dalamud.Utility.Util.OpenLink(ProblemReport.SecurityAddress);
+        Tip("Help.FormSecurityTip");
     }
 }

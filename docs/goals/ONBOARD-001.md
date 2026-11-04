@@ -94,10 +94,10 @@ ImGui ne lit pas de vidéo : **le lien s'ouvre dans le navigateur**, après conf
 **Plan avec l'option 1 :**
 1. Bouton « Signaler un problème » : aide globale, Diagnostics, et chaque message d'erreur d'une page.
 2. Fenêtre : type (bug, idée, traduction), ce qui s'est passé, ce qui était attendu. La version, la langue, la page et le rapport sont préremplis et **visibles et modifiables**. L'auto-contrôle y est ajouté.
-3. **Avant d'envoyer** : recherche des tickets ouverts proches, sur clic, par l'API publique de GitHub (sans compte, nombre de requêtes limité, donc jamais automatique).
+3. **Avant d'envoyer** : recherche des tickets proches, sur clic, dans le navigateur. (Fait ainsi en 0.504 plutôt que par l'API de GitHub : le plugin n'a alors aucune requête à faire.)
 4. Ouverture de `issues/new?template=bug_report.yml&title=…&version=…&steps=…` : GitHub accepte le préremplissage des formulaires par les identifiants de champs. À vérifier à la mise en œuvre. Si l'adresse est trop longue, le rapport va dans le presse-papiers et le formulaire le demande.
 5. Nettoyage : aucun nom de personnage, chemin de dossier ou adresse Discord (nettoyage de `SelfCheck.Clean` réutilisé), avec un test.
-6. Étiquette `from-plugin` sur le formulaire, pour trier. Tri en anglais, comme aujourd'hui.
+6. Le rapport indique qu'il vient du formulaire du jeu. (Pas d'étiquette : GitHub demande les droits sur le dépôt pour en poser par l'adresse.) Tri en anglais, comme aujourd'hui.
 
 Une faille de sécurité reste signalée en privé : le bouton renvoie vers la page dédiée, jamais vers un ticket public. Sur le dépôt officiel, Dalamud a aussi son propre retour d'information dans l'installateur des plugins : à regarder au moment de D17.
 

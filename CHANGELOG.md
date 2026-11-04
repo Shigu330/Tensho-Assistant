@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.504.0
+- ONBOARD-001, lot 3 (G5). Aide › Signaler un problème : bug, idée ou traduction. Le rapport de diagnostic et l'auto-contrôle sont visibles et modifiables. « Ouvrir le formulaire GitHub » ouvre le navigateur sur le bon formulaire, rempli. Le plugin n'envoie rien et ne garde aucun jeton. Trop long : le texte passe dans le presse-papiers. « Déjà signalé ? » cherche dans le navigateur. Dossiers et adresses Discord sont retirés. Un problème de sécurité renvoie vers le signalement privé.
+- Tests : HelpTests complété. Verify.ps1 (agent) : VERIFYCOUNT, 0 avertissement, 0 erreur ; DLL 0.504.0.0. Non validé en jeu : le préremplissage vient de la documentation de GitHub, aucun formulaire réel n'a été ouvert.
+### English
+- Report a problem from the game: a form that opens the project's GitHub form filled in, in the browser. The plugin sends nothing and holds no token. The report is visible and editable first.
+
 ## 0.503.0
 - ONBOARD-001, lot 2. Première visite d'une page : un bandeau de deux lignes, une seule fois, avec « Compris » et « En savoir plus » ; réglage dans Paramètres › Général (G8). Le « ? » dit aussi où en est la page sur ce personnage (tout lu, en attente, inhabituel, échec), d'après l'auto-contrôle.
 - Tests : HelpTests complété. Verify.ps1 (agent) : 950/950, 0 avertissement, 0 erreur ; DLL 0.503.0.0. Non validé en jeu.
