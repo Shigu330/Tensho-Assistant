@@ -715,7 +715,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] Botaniste ou mineur niveau 95 et plus, Inspection active, 723 PR environ : le panneau propose Toucher d'amorçage ; une fois lancé, il ne le repropose plus et compte 48 %.
 - [ ] Sous le niveau 95 : jamais proposé.
-- [ ] Toucher reste-t-il actif si une autre Sélection passe avant la Sélection méthodique ? Le plan suppose que oui, d'après sa description.
+- [x] (rapport de l'utilisateur, 2026-11-05) Toucher reste actif si une autre action passe avant la Sélection méthodique ; il ne retombe qu'après elle. Récolte non essayée.
 
 **0.526 : légendes locales dans les Collections** — à voir en jouant
 
