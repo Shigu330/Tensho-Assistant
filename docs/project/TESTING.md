@@ -718,7 +718,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.524 : Ctrl+Alt actualise le prix survolé** — à voir en jouant
 
-- [ ] Survoler un objet vendable, attendre le prix, Ctrl+Alt : les secondes de « Récupéré à » changent. Maintenu : une seule demande. Relâché et rappuyé : au plus une toutes les 5 s.
+- [x] (rapport de l'utilisateur, 2026-11-04, « ctrl alt ok ») Survoler un objet vendable, attendre le prix, Ctrl+Alt : les secondes de « Récupéré à » changent. Maintenu : une seule demande. Relâché et rappuyé : au plus une toutes les 5 s.
 
 **0.523 : assignats des collectionnables d'un nœud** — à voir en jouant
 
