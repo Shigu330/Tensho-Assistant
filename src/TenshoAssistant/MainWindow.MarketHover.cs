@@ -424,7 +424,7 @@ internal sealed partial class MainWindow
                 if(canBeHq && Cheaper(prices.HqRegion,prices.HqCheapest))DrawCheapest("HQ",prices.HqRegion,state,now);
             }
             // 0.329: date and time, as on the Market page: a quote restored from the disk cache can be from another day.
-            ImGui.TextDisabled(localization.Format("HoverUi.Fetched",prices.FetchedAt.ToLocalTime().ToString("g")));
+            ImGui.TextDisabled(localization.Format("HoverUi.Fetched",prices.FetchedAt.ToLocalTime().ToString("G")));
             if(!market.IsFresh(prices,now))ImGui.TextDisabled(localization.Get("HoverUi.Expired"));
             if(configuration.HoverPriceRefresh)ImGui.TextDisabled(localization.Get("HoverUi.RefreshHint"));
         }

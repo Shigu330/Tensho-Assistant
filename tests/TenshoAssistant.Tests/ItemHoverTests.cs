@@ -60,6 +60,32 @@ internal static class ItemHoverTests
             Check(calls==1 && market.GetCached(71,42) is not null,"shared market cache");
             Check(coordinator.Observe(true,true,7,71,42,Catalog(),now.AddSeconds(8)) is null && calls==1,"fresh cache prevents second HTTP call");
         }),
+        ("Refresh key (0.524): a press of one tick is answered, within the 5 s bound, and forgotten on another item",()=>
+        {
+            var calls=0;using var http=new HttpClient(new MarketTestHandler((_,_)=>{calls++;return Task.FromResult(Response());}));
+            using var market=new MarketService(http);market.SetWorld(7,71,"World");using var context=new ItemHoverService();using var coordinator=new ItemHoverCoordinator(context,market);
+            var now=DateTimeOffset.UtcNow;
+            coordinator.Observe(true,true,7,71,42,Catalog(),now);
+            coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(600))!.GetAwaiter().GetResult();
+            Check(calls==1,"first price");
+            // Ticks with a fresh price take nothing from the bound: the press after them gets through, as it almost never did before.
+            for(var tick=0;tick<100;tick++)Check(coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(5700+tick*16)) is null,"fresh: nothing asked");
+            var pressed=coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(7400),true);
+            Check(pressed is not null,"the press of one tick is answered");
+            // The market's own 3 s pause (real time) is not the end of the press: it waits for the next slot, with no new press.
+            Check(pressed!.GetAwaiter().GetResult().Status==MarketFetchStatus.Cooldown && calls==1,"inside the market's pause");
+            Thread.Sleep(3100);
+            Check(coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(9000)) is null && calls==1,"inside the 5 s bound");
+            var waited=coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(12400));
+            Check(waited is not null,"then answered");waited!.GetAwaiter().GetResult();
+            Check(calls==2,"asked again although fresh");
+            Check(coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(12500)) is null && calls==2,"one request for that press");
+            // Another item forgets a press still waiting.
+            Check(coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(12600),true) is null,"waiting");
+            coordinator.Observe(true,true,7,71,0,Catalog(),now.AddMilliseconds(12700));
+            coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(12800));
+            Check(coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(20000)) is null && calls==2,"the press is gone, the price still fresh");
+        }),
         ("Stopping only price hover rejects a late reply while preserving usage context",()=>
         {
             var response=new TaskCompletionSource<HttpResponseMessage>(TaskCreationOptions.RunContinuationsAsynchronously);

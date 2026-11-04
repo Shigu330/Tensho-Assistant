@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.524.0
+- Rapport de l'utilisateur en jeu (« ctrl alt fonctionne pas pour actualiser les prix ») ; 0.523 validée (« c'est ok »). Cause : l'appui ne dure qu'un tic, et la borne de 5 s entre deux demandes se consommait à chaque tic, demande ou pas : ils ne tombaient presque jamais ensemble, depuis 0.343.
+- L'appui attend maintenant la borne, et seule une vraie demande la consomme. La pause de 3 s du marché ne le perd plus non plus : il attend le créneau suivant. Changer d'objet oublie l'appui. L'heure « Récupéré à » montre les secondes, sinon une actualisation dans la minute ne se voyait pas.
+- Tests : HoverPrices343Tests adapté. Verify.ps1 (agent) : 992/992, 0 avertissement, 0 erreur ; DLL 0.524.0.0. Non validé en jeu.
+### English
+- Ctrl+Alt now refreshes the hovered price: the key press lasted one tick while the 5 s bound was used up on every tick, so they almost never met. The fetched time now shows seconds.
+
 ## 0.523.0
 - Rapport de l'utilisateur en jeu (capture, Noix de coco et Rondin de palmier collectionnables) : l'aide à la récolte ne donnait pas les assignats pour choisir le meilleur. Chaque collectionnable du nœud montre ses assignats par palier, et celui qui paie le plus au palier haut est marqué.
 - Le marquage ne compare que des assignats du même type (colonne Currency de la feuille) ; sinon le panneau le dit. Le nom du type reste inconnu, comme relevé en 0.409 (`docs/evidence/0.409-collectables.md`).
