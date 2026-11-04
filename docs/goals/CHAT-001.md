@@ -2,15 +2,13 @@
 
 Demande de l'utilisateur (2026-11-04) : un chat custom avec les personnalisations de WoW, portées sur FF14, améliorées si possible, avec le plus de réglages possible, après vérification de ce que font les plugins existants. Les décisions à prendre sont à la fin.
 
-État : **plan, non commencé**. Aucune décision n'est encore prise. Rien ici n'a été essayé en jeu.
+**Décidé le 2026-11-04 ([DEC-029](../project/DECISIONS.md))** : remplacement complet, tout de suite. Les colonnes « recommandation » de la fin sont gardées pour l'historique ; le choix fait est dans la dernière section. État : phase 0 à venir, rien n'a été essayé en jeu.
 
 ## Le point à trancher d'abord
 
 **Chat 2 existe déjà, est actif et remplace entièrement la fenêtre du jeu.** Refaire tout ce qu'il fait serait le plus coûteux et n'apporterait rien par soi-même. L'intérêt de Tensho est ailleurs : ce que WoW a et que Chat 2 n'a pas (règles d'alerte, fenêtres de conversation, copie, thèmes, profils), et le lien avec les outils de Tensho (prix, sources, carte, rappels).
 
-Le plan avance donc par couches. Le chat du jeu reste en place tant que le nôtre ne sait pas tout faire, et on peut s'arrêter à la fin de chaque phase avec un outil utile.
-
-Voir la décision C1.
+Le plan proposait donc d'avancer par couches. **L'utilisateur a choisi le remplacement complet (C1).** L'ordre des phases reste le même, car il permet de livrer sans casser le chat : le chat du jeu reste en place tant que le nôtre ne sait pas tout faire. Mais les phases 5 et 6 sont maintenant dans l'objectif, sans point d'arrêt après la phase 4.
 
 ## Ce qui existe déjà
 
@@ -163,9 +161,26 @@ Chacun aura une bulle et un ↺, et sera trouvable par la recherche des réglage
 - Coexistence avec Chat 2, Simple Tweaks et NoSoliciting.
 - Patch du jeu : un hook qui ne se résout plus laisse le chat du jeu utilisable.
 
-## Décisions à prendre
+## Décisions prises (DEC-029)
 
-La recommandation est donnée d'abord. Les décisions **C1 à C4 sont à prendre avant de coder**, les autres avant leur phase.
+| Id | Choix |
+|---|---|
+| C1 | **Remplacement complet** |
+| C2 | **Tout de suite**, la campagne de tests attend ou s'intercale |
+| C3 | Prévenir sans bloquer si Chat 2 est actif |
+| C4 | **Pas de question à l'équipe Dalamud** ; le risque de refus pour doublon à la 1.0.0 est accepté, le module reste séparable |
+| C5 | Hooks au besoin, avec repli vers le chat du jeu |
+| C6 | Historique en fichiers locaux, désactivé par défaut |
+| C7 | Couleur par métier seulement si le jeu la montre |
+| C8 | Discord par règle choisie, nom masqué, `/tell` exclus par défaut |
+| C9 | **Traduction et émoticônes externes sur option, désactivées** ; services à choisir à la phase 8 |
+| C10 | Règles locales et liste partagée |
+| C11 | Code original |
+| C12 | Sections repliées et vue « essentiels » |
+
+## Options étudiées (historique)
+
+La recommandation est donnée d'abord.
 
 | Id | Question | Recommandation | Alternatives et conséquence |
 |---|---|---|---|

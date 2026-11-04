@@ -3,6 +3,15 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.470.0
+- Décisions de l'utilisateur sur le chat et les modèles communautaires : [DEC-029](docs/project/DECISIONS.md). Partie code des modèles (TEMPLATES-001).
+- Toutes les pages sont dans une seule liste, `MainWindow.Pages.cs` : la navigation, le dessin et la source montrée aux contributeurs la lisent. Trois listes séparées disparaissent, sans changement voulu à l'écran.
+- `scripts/New-Tool.ps1` crée le squelette d'un outil (page, partie pure, test, textes, enregistrement). Essai réel sur un outil temporaire : compilé et tests passés, puis retiré. Guide « Adding a tool » dans CONTRIBUTING.md, formulaire « Tool proposal » et règles ajoutées au modèle de pull request.
+- Tests : Pages470Tests (4). Verify.ps1 (agent) : 889/889, 0 avertissement, 0 erreur ; DLL 0.470.0.0. Non validé en jeu.
+### English
+- All pages now come from one list, `MainWindow.Pages.cs`, with no intended change on screen.
+- `scripts/New-Tool.ps1` creates the skeleton of a new tool; CONTRIBUTING.md gains "Adding a tool", and GitHub a « Tool proposal » form.
+
 ## 0.469.0
 - Demande de l'utilisateur (« j'ai pourtant ouvert calendrier et mission de ravitaillement ») : « demande du jour non observée » était un texte fixe, rien ne lisait cette fenêtre. Nouveau : `GcSupplyReader` lit la fenêtre du jeu ContentsInfoDetail (nom présent dans l'exécutable du jeu) une fois par seconde tant qu'elle est affichée, compare ses textes aux noms exacts des objets de livraison du catalogue (GCSupplyDuty), et garde le résultat par personnage jusqu'à la remise de 20:00 UTC. La mise en page n'a pas pu être sondée hors du jeu : une ligne `Grand Company supply window` du journal la documente. Les bulles disent demandée, absente de ce qui a été ouvert, ou comment ouvrir la fenêtre.
 - Demande de l'utilisateur : dans le carnet, Manipulation est une case et l'icône du skill, sans texte. Repas et remède ont l'icône et la bulle de l'objet (aussi dans le simulateur) ; seuls ceux qui ont un bonus d'artisanat comptent, un autre repas se lit « aucun ».

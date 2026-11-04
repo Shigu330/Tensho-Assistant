@@ -74,6 +74,30 @@ The tests read files by relative path (`src/TenshoAssistant/...`): run them from
   (xivgear.app…) are read to understand them, **never copied**.
 - Out of scope: ACT/IINACT, parsers, anything that provides an advantage in combat or PvP.
 
+## Adding a tool
+
+Discuss the idea first with the « Tool proposal » issue form. Then, from the repository root:
+
+```powershell
+.\scripts\New-Tool.ps1 -Name RetainerNotes -Category Objects -LabelEn "Retainer notes" -LabelFr "Notes de servants" -DryRun
+```
+
+Without `-DryRun`, `scripts/New-Tool.ps1` creates and registers the skeleton:
+
+- `MainWindow.<Name>.cs`: the page, its method `Draw<Name>`;
+- `<Name>/<Name>Model.cs`: the pure logic, compiled by the tests. Code that reads the game goes beside it, in a file named `*.Dalamud.cs`;
+- `tests/TenshoAssistant.Tests/<Name>Tests.cs`: replace its example;
+- the texts in `en.json` and `fr.json`, and one line in the list of pages, `MainWindow.Pages.cs`.
+
+It builds and passes the tests as it is. It changes no version and commits nothing. What is left to you:
+
+1. Write the tool. Prove any game data with a read-only probe (`tools/`), with its output in `docs/evidence/`. Read native memory on the framework thread and copy it; nothing heavy in the draw.
+2. Give each subscription an owner and a cleanup, registered in `Plugin.cs` with `registrations.Register`.
+3. Give each setting a tooltip and a « ↺ » button.
+4. Run `.\scripts\Verify.ps1`, add the `CHANGELOG.md` entry (third version number, x.y.Z) and open the pull request.
+
+A page reached only from another page's tabs has no name in the navigation: give its line `null` as label and its parent as last value, as `Page.CraftLive` does.
+
 ## Proposing a change
 
 1. One branch per subject; keep each subject small and verifiable.

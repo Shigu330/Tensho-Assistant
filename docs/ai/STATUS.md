@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-03)
 
-VERSION: 0.469.0.0 (dernière release : Stable-0.451.0, publiée le 2026-11-03 par l'agent, à ta demande ; notes : beaucoup de tests en jeu restent à faire) — Verify.ps1 (agent) 885/885, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.470.0.0 (dernière release : Stable-0.451.0, publiée le 2026-11-03 par l'agent, à ta demande ; notes : beaucoup de tests en jeu restent à faire) — Verify.ps1 (agent) 889/889, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: fin de la file — commit et release, décisions par lots, tests en jeu (étape h), g2 sans ultracode ; voir [GOAL](GOAL.md) et « Prochaine action ».
 QUOTA: réserve utilisateur 1 % (5 h et semaine). Relevé 2026-11-02 : forfait Max, 5 h à 0 %, semaine à 0 % (réinit. jeudi 23:00).
 
@@ -76,6 +76,7 @@ Liste complète et à jour, version par version jusqu'à 0.448 : [TESTING](../pr
   réglages de la carte), langues dans la DLL seule (0.248), alarmes de pêche avec météo (0.253–0.254).
 
 ## Prochaine action
+(2026-11-04) Décisions [DEC-029](../project/DECISIONS.md) : CHAT-001 (remplacement complet) et TEMPLATES-001, tout de suite. Fait : registre des pages, générateur, guide (0.470). À faire : phase 0 du chat, puis phases suivantes de [CHAT-001](../goals/CHAT-001.md) ; ensuite modèles sans code ; campagne en jeu (lots 6 à 10) à reprendre.
 (relu le 2026-11-03, 0.446) Files a) à g) FAITES (détail : [ROADMAP](../project/ROADMAP.md) « File d'attente », CHANGELOG 0.315–0.446).
 Restent, dans cet ordre proposé :
 1) Décisions du 2026-11-03 ([DEC-026](../project/DECISIONS.md)) : 0.447, 0.448 (journal de jardinage, N-08) et release Stable-0.448.0

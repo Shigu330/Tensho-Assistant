@@ -39,7 +39,7 @@ internal static class Todo458Tests
         {
             Check(!Read("MainWindow.Reminders.cs").Contains("DrawGardenJournal();"),"out of Reminders");
             var main=Read("MainWindow.cs");
-            Check(main.Contains("case Page.Garden: DrawGardenPage(); break;") && main.Contains("Navigation(localization.Get(\"Navigation.Garden\"), Page.Garden);"),"page and navigation");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Pages.cs")).Contains("new(Page.Garden,\"World\",PageLabel(\"Navigation.Garden\"),DrawGardenPage,"),"page and navigation");
             var garden=Read("MainWindow.Garden.cs");
             Check(garden.Contains("DrawGardenJournal();\n        DrawGardenCrosses();") && Read("MainWindow.GardenCrosses.cs").Contains("UiComponents.Header(localization.Get(\"Garden.Crosses\")"),"two sections");
         }),

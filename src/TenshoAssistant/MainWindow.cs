@@ -250,44 +250,7 @@ internal sealed partial class MainWindow : Window, IDisposable
                         // 0.290 (R-06 step 6): draw time of each page, averaged, shown in Diagnostics (developer mode).
                         var drawStarted = System.Diagnostics.Stopwatch.GetTimestamp();
                         var drawnPage = page;
-                        switch (page)
-                        {
-                            case Page.Home: DrawHome(); break;
-                            case Page.Items: DrawItems(); break;
-                            case Page.Storage: DrawStorage(); break;
-                            case Page.Reminders: DrawReminders(); break;
-                            case Page.Garden: DrawGardenPage(); break;
-                            case Page.FreeCompany: DrawFreeCompany(); break;
-                            case Page.Gathering: DrawGatheringBrowser(); break;
-                            case Page.Maps: DrawMaps(); break;
-                            case Page.DutyLoot: DrawDutyLoot(); break;
-                            case Page.MonsterLoot: DrawMonsterLoot(); break;
-                            case Page.NpcVendors: DrawNpcVendors(); break;
-                            case Page.GatheringGp: DrawGatheringGp(); break;
-                            case Page.Fashion: DrawFashion(); break;
-                            case Page.CraftSimulation: DrawCraftSimulation(); break;
-                            case Page.CraftLive: DrawCraftLive(); break;
-                            case Page.Weather: DrawWeather(); break;
-                            case Page.Alarms: DrawAlarmsPage(); break;
-                            case Page.CraftPresets: DrawCraftPresets(); break;
-                            case Page.MacroChain: DrawMacroChain(); break;
-                            case Page.SortPreview: DrawSortPreview(); break;
-                            case Page.Collections: DrawCollections(); break;
-                            case Page.BlueMagic: DrawCollections(true); break;
-                            case Page.TripleTriad: DrawTripleTriad(); break;
-                            case Page.Market: DrawMarket(); break;
-                            case Page.Quests: DrawQuests(); break;
-                            case Page.Chocobo: DrawChocoboPage(); break;
-                            case Page.Leves: DrawLeves(); break;
-                            case Page.HuntingLog: DrawHuntingLog(); break;
-                            case Page.OceanFishing: DrawOceanFishing(); break;
-                            case Page.Events: DrawEventsPage(); break;
-                            case Page.Gear: DrawGearPlanner(); break;
-                            case Page.MiniCactpot: DrawMiniCactpot(); break;
-                            case Page.Settings: DrawSettings(); break;
-                            case Page.Diagnostics: DrawDiagnostics(); break;
-                            case Page.Credits: DrawCredits(); break;
-                        }
+                        PageEntryFor(page)?.Draw();
                         var drawMs = System.Diagnostics.Stopwatch.GetElapsedTime(drawStarted).TotalMilliseconds;
                         var ring = pageDrawMs.TryGetValue(drawnPage, out var known) ? known : (Samples: new double[120], Next: 0, Count: 0);
                         ring.Samples[ring.Next] = drawMs;
@@ -308,57 +271,11 @@ internal sealed partial class MainWindow : Window, IDisposable
     {
         // R-06 step 2 (0.264): pages grouped by category, each category folds (kept in the configuration); the hub pages of the map
         // and the Gold Saucer are now direct entries, the sub-pages of crafting, gathering and collections stay in their own tab bar.
-        Navigation(localization.Get("Navigation.Home"), Page.Home);
-        if (NavigationCategory("Objects", Page.Items, Page.Storage, Page.SortPreview, Page.Market))
-        {
-            Navigation(localization.Get("Navigation.Items"), Page.Items);
-            Navigation(localization.Get("Navigation.Storage"), Page.Storage);
-            Navigation(localization.Get("Category.Sorting"), Page.SortPreview);
-            Navigation(localization.Get("Navigation.Market"), Page.Market);
-        }
-        if (NavigationCategory("Production", Page.CraftSimulation, Page.Gathering, Page.OceanFishing, Page.MacroChain))
-        {
-            Navigation(localization.Get("Navigation.Crafting"), Page.CraftSimulation);
-            Navigation(localization.Get("Navigation.Gathering"), Page.Gathering);
-            Navigation(localization.Get("Navigation.OceanFishing"), Page.OceanFishing);
-            Navigation(localization.Get("Category.MacroChain"), Page.MacroChain);
-        }
-        if (NavigationCategory("World", Page.Maps, Page.Weather, Page.Alarms, Page.Reminders, Page.Garden, Page.FreeCompany, Page.NpcVendors, Page.DutyLoot, Page.MonsterLoot))
-        {
-            Navigation(localization.Get("Navigation.Map"), Page.Maps);
-            Navigation(localization.Get("Category.Weather"), Page.Weather);
-            Navigation(localization.Format("Navigation.Alarms",configuration.Alarms?.Count ?? 0), Page.Alarms);
-            Navigation(localization.Get("Navigation.Reminders"), Page.Reminders);
-            Navigation(localization.Get("Navigation.Garden"), Page.Garden);
-            Navigation(localization.Get("Navigation.FreeCompany"), Page.FreeCompany);
-            Navigation(localization.Get("Category.NpcVendors"), Page.NpcVendors);
-            Navigation(localization.Get("Category.DutyLoot"), Page.DutyLoot);
-            Navigation(localization.Get("Category.MonsterLoot"), Page.MonsterLoot);
-        }
-        // 0.341 (user request): the Character page is gone (the Gear page shows the same real values); the chocobo has its own page.
-        if (NavigationCategory("Progression", Page.Quests, Page.Events, Page.Collections, Page.Gear, Page.Chocobo, Page.Leves, Page.HuntingLog))
-        {
-            Navigation(localization.Get("Navigation.Quests"), Page.Quests);
-            Navigation(localization.Get("Navigation.Events"), Page.Events);
-            Navigation(localization.Get("Navigation.Collection"), Page.Collections);
-            Navigation(localization.Get("Navigation.Gear"), Page.Gear);
-            Navigation(localization.Get("Navigation.Chocobo"), Page.Chocobo);
-            Navigation(localization.Get("Navigation.Leves"), Page.Leves);
-            Navigation(localization.Get("Navigation.HuntingLog"), Page.HuntingLog);
-        }
-        if (NavigationCategory("GoldSaucer", Page.Fashion, Page.TripleTriad, Page.MiniCactpot))
-        {
-            Navigation(localization.Get("Category.Fashion"), Page.Fashion);
-            Navigation(localization.Get("Category.Triad"), Page.TripleTriad);
-            Navigation(localization.Get("Category.Cactpot"), Page.MiniCactpot);
-        }
-        if (NavigationCategory("Preferences", Page.Settings, Page.Credits, Page.Diagnostics))
-        {
-            Navigation(localization.Get("Navigation.Settings"), Page.Settings);
-            // R-13 (0.320): everything Tensho uses, shown to every player.
-            Navigation(localization.Get("Navigation.Credits"), Page.Credits);
-            if (developerMode) Navigation(localization.Get("Navigation.Diagnostics"), Page.Diagnostics);
-        }
+        // 0.470 (TEMPLATES-001): the pages and their order come from one list, MainWindow.Pages.cs.
+        foreach(var group in PageGroups)
+            if(group.Category is null || NavigationCategory(group.Category,group.Pages))
+                foreach(var entry in group.Entries)
+                    if(entry.Visible?.Invoke()!=false)Navigation(entry.Label!(),entry.Page);
         ImGui.Spacing();
         ImGui.Separator();
         using (TenshoAssistant.UI.UiComponents.PushSectionFont()) ImGui.TextDisabled(localization.Get("Navigation.ContextItem"));
@@ -374,24 +291,11 @@ internal sealed partial class MainWindow : Window, IDisposable
         else ImGui.TextWrapped(localization.Get("Navigation.SelectItem"));
     }
 
-    private static Page NavigationPage(Page current)=>current switch
-    {
-        Page.CraftLive or Page.CraftPresets=>Page.CraftSimulation,
-        Page.GatheringGp=>Page.Gathering,
-        Page.BlueMagic=>Page.Collections,
-        _=>current,
-    };
+    private Page NavigationPage(Page current)=>PageEntryFor(current)?.Parent ?? current;
 
     private void Navigation(string label, Page destination)
     {
-        var selectedCategory=page switch
-        {
-            Page.CraftLive or Page.CraftPresets=>Page.CraftSimulation,
-            Page.GatheringGp=>Page.Gathering,
-            Page.BlueMagic=>Page.Collections,
-            _=>page,
-        };
-        if (UiComponents.NavigationItem(label, selectedCategory == destination))
+        if (UiComponents.NavigationItem(label, NavigationPage(page) == destination))
             page = destination;
     }
 

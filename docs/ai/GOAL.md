@@ -1,6 +1,8 @@
 # GOAL actif
 
-ID: FIN-DE-FILE — fin de la file d'attente (état relu le 2026-11-03, version 0.446.0).
+ID: CHAT-001 puis TEMPLATES-001 partie B ([DEC-029](../project/DECISIONS.md), 2026-11-04 : choix de l'utilisateur, tout de suite). Partie code des modèles faite en 0.470. Prochaine étape : phase 0 du chat (sonde en jeu), puis phase 1. La campagne de tests en jeu (lots 6 à 10) reprend ensuite ou s'intercale.
+
+Objectif précédent, en pause : FIN-DE-FILE — fin de la file d'attente (état relu le 2026-11-03, version 0.446.0).
 
 FAIT : files a) à g) de [ROADMAP](../project/ROADMAP.md) (0.315–0.446), dont l'étape g) : 101 manques choisis dans
 [GAPS](../project/GAPS.md), domaine par domaine, sauf les écarts laissés dans [G-PROPOSALS](../project/G-PROPOSALS.md)

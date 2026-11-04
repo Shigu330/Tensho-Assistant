@@ -284,3 +284,13 @@ Decision: (1) A-03 : Raphael.Net 5.0.0 ajouté en option, réglage « Solveur : 
 Reason: Choix de l'utilisateur (2026-11-03, séance ultracode).
 Consequences: Ordre de la séance : R-14 et A-14 d'abord, puis I-05, I-15, N-10, A-03 / A-04 ; package vérifié (raphael_bindings.dll dans latest.zip).
 References: docs/evidence/0.451-raphael-study.md, docs/project/G-PROPOSALS.md, GitHub issue #28
+
+DEC-ID: DEC-029
+Timestamp: 2026-11-04 Europe/Brussels (séance de décisions pendant la campagne en jeu)
+Problem: Portée et ordre du chat personnalisable (CHAT-001) et des modèles communautaires (TEMPLATES-001).
+Evidence: docs/goals/CHAT-001.md, docs/goals/TEMPLATES-001.md (relevé de Chat 2, Simple Tweaks, TidyChat, NoSoliciting, Chat Bubbles, addons WoW, règles de Dalamud).
+Options: Tableaux de décisions des deux plans, avec recommandations.
+Decision: Chat : C1 remplacement complet (contre la recommandation par couches) ; C2 tout de suite (contre la recommandation) ; C3 prévenir sans bloquer si Chat 2 est actif ; C4 ne pas demander à l'équipe Dalamud (contre la recommandation) ; C5 hooks au besoin, avec repli ; C6 historique en fichiers locaux, désactivé par défaut ; C7 couleur par métier seulement si le jeu la montre ; C8 Discord par règle choisie, nom masqué ; C9 traduction et émoticônes externes sur option, désactivées (service à choisir, contre la recommandation) ; C10 règles locales et liste partagée ; C11 code original ; C12 sections repliées et vue « essentiels ». Modèles : T1 les deux, code d'abord ; T2 tout de suite (contre la recommandation) ; T3 registre des pages tout de suite (contre la recommandation) ; T4 dossier dans ce dépôt ; T5 CC0 ; T6 galerie dans le plugin, sur clic ; T7 validation automatique et relecture ; T8 réglages en liste blanche ; T9 sept blocs en première version. T10 (case IA dans la pull request) : recommandation appliquée, le modèle la demandait déjà.
+Reason: Choix de l'utilisateur, 2026-11-04.
+Consequences: La campagne de tests en jeu (lots 6 à 10) passe après ces travaux, ou s'y intercale. Risques acceptés : doublon de Chat 2 possible à la publication 1.0.0 sans question préalable ; hooks de saisie à maintenir ; registre des pages refait pendant la campagne. Lignes rouges inchangées : aucun envoi automatique, code original, pas de combat. Reste à choisir pour C9 : le service de traduction et celui des émoticônes, à la phase 8.
+References: docs/goals/CHAT-001.md, docs/goals/TEMPLATES-001.md

@@ -2,7 +2,7 @@
 
 Demande de l'utilisateur (2026-11-04) : « prévois aussi un plan pour template communautaire ajout outils dans tensho ». Les décisions à prendre sont à la fin.
 
-État : **plan, non commencé**. Aucune décision n'est encore prise.
+**Décidé le 2026-11-04 ([DEC-029](../project/DECISIONS.md))** : les deux, code d'abord, tout de suite. A0, A1, A2 et A4 faits en 0.470. La partie sans code (B) reste à faire.
 
 ## Deux sens possibles
 
@@ -133,9 +133,21 @@ La taille est une estimation subjective, pas une mesure.
 - Remise à zéro quotidienne et hebdomadaire des cases.
 - Désinstallation d'un modèle : son état local part avec lui, rien d'autre ne change.
 
-## Décisions à prendre
+## Décisions prises (DEC-029)
 
-La recommandation est donnée d'abord. **T1 et T2 sont à prendre avant de commencer.**
+| Id | Choix |
+|---|---|
+| T1 | Les deux, code d'abord |
+| T2 | **Tout de suite** |
+| T3 | **Registre des pages tout de suite** (fait, 0.470) |
+| T4 et T5 | Dossier dans ce dépôt, CC0 |
+| T6 et T7 | Galerie dans le plugin, sur clic ; validation automatique et relecture |
+| T8 et T9 | Réglages en liste blanche ; sept blocs en première version |
+| T10 | Case IA dans la pull request (recommandation appliquée, elle y était déjà) |
+
+## Options étudiées (historique)
+
+La recommandation est donnée d'abord.
 
 | Id | Question | Recommandation | Alternatives et conséquence |
 |---|---|---|---|

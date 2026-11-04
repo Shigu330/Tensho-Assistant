@@ -10,8 +10,7 @@ internal static class Chocobo341Tests
         ("Chocobo page: own page in Progression, Character page gone, game-window panel kept, marks drawn from the icon font",() =>
         {
             var window = Read("MainWindow.cs");
-            Check(window.Contains("case Page.Chocobo: DrawChocoboPage(); break;",StringComparison.Ordinal) && !window.Contains("Page.Character",StringComparison.Ordinal),"Chocobo page, no Character page");
-            Check(window.Contains("Navigation(localization.Get(\"Navigation.Chocobo\"), Page.Chocobo);",StringComparison.Ordinal),"in the navigation");
+            var pages=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Pages.cs"));Check(pages.Contains("new(Page.Chocobo,\"Progression\",PageLabel(\"Navigation.Chocobo\"),DrawChocoboPage,",StringComparison.Ordinal) && !window.Contains("Page.Character",StringComparison.Ordinal),"Chocobo page, no Character page");
             Check(!Read("MainWindow.Home.cs").Contains("Page.Character",StringComparison.Ordinal) && Read("MainWindow.Tools.cs").Contains("case \"Character Panel Refined\":page=Page.Gear;",StringComparison.Ordinal),"home tile and tool directory point to Gear");
             var character = Read("MainWindow.Character.cs");
             Check(!character.Contains("DrawCharacterStats",StringComparison.Ordinal) && character.Contains("internal void DrawCharacterPanel()",StringComparison.Ordinal),"page removed, panel kept");
