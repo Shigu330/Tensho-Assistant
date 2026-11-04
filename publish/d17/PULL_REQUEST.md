@@ -13,9 +13,10 @@ Report hints, Mini Cactpot and Triple Triad helpers, character stats and macro c
 
 - Source: https://github.com/Shigu330/Tensho-Assistant (GPL-3.0)
 - Game actions start on a click: teleport, applying a sort, macro chains, writing crafting macros into the game's macros, opening the Try
-  On window, equipping a job, sending the hunt train call to the chat channel the player picks.
-- Two settings, both off by default, act without a click: game alarms created with the game's `/alarm` command, and wearing the title the
-  player chose for a job when the job changes. <!-- Decide before posting: keep and explain, or remove (docs/project/PUBLISHING.md, points 2 and 3). -->
+  On window, equipping a job, sending the hunt train call to the chat channel the player picks. Game alarms use the game's `/alarm`
+  command, sent when the player adds an alarm with the « game alarms » setting on (off by default) or presses « Send »; automatic alarms never create one.
+- One setting, off by default, acts without a click: wearing the title the player chose for a job when the job changes.
+  <!-- Decide before posting: keep and explain, or remove (docs/project/PUBLISHING.md, point 2). -->
 - No automation of crafting, dialogues or loot, no PvP feature, no parser. The solver and the suggested move only display advice. Triple
   Triad advice works against NPCs only, never in tournaments or against a player. The Beastmaster page lists game data.
 - Network: Universalis (world + item id), Garland Tools, FFXIV Console Games Wiki, Teamcraft's public bite time reports, PaissaDB (open

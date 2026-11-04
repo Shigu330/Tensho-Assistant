@@ -47,8 +47,8 @@ What the plugin does that matters for security (checked against the code on 2026
   `GilJournal/` since 0.351, 90 days) in the
   plugin's Dalamud configuration folder; translators can put language JSON files beside the DLL, which are validated when reloaded.
 - **Game**: game memory is read and copied; the actions that reach the game start on a click: teleport, applying an inventory sort, macro chains,
-  writing crafting macros into the game's macros, opening the Try On window, equipping a job, wearing a title, sending the hunt train call.
-  Two settings, off by default, act without a click: `/alarm` chat commands for game alarms, and wearing the title chosen for a job on a job change. Only the local character's content id is used, as a key for its own saved data.
+  writing crafting macros into the game's macros, opening the Try On window, equipping a job, wearing a title, sending the hunt train call, and `/alarm` chat commands for game alarms (when the player adds an alarm with the « game alarms » setting on, off by default, or on « Send »).
+  One setting, off by default, acts without a click: wearing the title chosen for a job on a job change. Only the local character's content id is used, as a key for its own saved data.
 - **Support report** (Settings › Advanced): copied to the clipboard on click; version, language, shown page, data states, errors,
   source settings, the market world name, alarm counts and the context item id.
 

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.513.0
+- Question de l'utilisateur : « pourquoi toucher aux alarmes ? ». Erreur de l'agent en 0.512 : les documents disaient que les alarmes du jeu partaient sans clic. Relu dans le code : les commandes `/alarm` partent toujours d'un clic (ajouter une alarme avec le réglage actif, ou « Envoyer ») et les alarmes automatiques n'en créent jamais. Aucun changement de code ; manifeste, PUBLISHING, SECURITY, CONTRIBUTING et brouillon de PR corrigés.
+- Tests : aucun changement de logique. Verify.ps1 (agent) : 972/972, 0 avertissement, 0 erreur ; DLL 0.513.0.0. Non validé en jeu.
+### English
+- Documents corrected: game alarms are only ever sent from a click (adding an alarm with the setting on, or Send); automatic alarms never create one. No code change.
+
 ## 0.512.0
 - Demande de l'utilisateur : remettre tous les .md et GitHub à l'étape actuelle, et relever ce qui manque pour la 1.0.0.
 - Compilation chez Dalamud : leur conteneur utilise le SDK 10.0.101 sous Linux, réseau coupé ; `global.json` exigeait 10.0.403, Tensho n'y aurait pas compilé. Il accepte maintenant 10.0.100 et plus, `Verify.ps1` prend le SDK 10.x local le plus récent, et un job CI compile avec leur image et leur commande ([relevé](docs/evidence/0.512-d17-build.md), DEC-034).
