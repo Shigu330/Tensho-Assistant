@@ -288,12 +288,12 @@ References: docs/evidence/0.451-raphael-study.md, docs/project/G-PROPOSALS.md, G
 DEC-ID: DEC-029
 Timestamp: 2026-11-04 Europe/Brussels (séance de décisions pendant la campagne en jeu)
 Problem: Portée et ordre du chat personnalisable (CHAT-001) et des modèles communautaires (TEMPLATES-001).
-Evidence: docs/goals/CHAT-001.md, docs/goals/TEMPLATES-001.md (relevé de Chat 2, Simple Tweaks, TidyChat, NoSoliciting, Chat Bubbles, addons WoW, règles de Dalamud).
+Evidence: CHAT-001 (document retiré avec le chat, DEC-030 ; voir git), docs/goals/TEMPLATES-001.md (relevé de Chat 2, Simple Tweaks, TidyChat, NoSoliciting, Chat Bubbles, addons WoW, règles de Dalamud).
 Options: Tableaux de décisions des deux plans, avec recommandations.
 Decision: Chat : C1 remplacement complet (contre la recommandation par couches) ; C2 tout de suite (contre la recommandation) ; C3 prévenir sans bloquer si Chat 2 est actif ; C4 ne pas demander à l'équipe Dalamud (contre la recommandation) ; C5 hooks au besoin, avec repli ; C6 historique en fichiers locaux, désactivé par défaut ; C7 couleur par métier seulement si le jeu la montre ; C8 Discord par règle choisie, nom masqué ; C9 traduction et émoticônes externes sur option, désactivées (service à choisir, contre la recommandation) ; C10 règles locales et liste partagée ; C11 code original ; C12 sections repliées et vue « essentiels ». Modèles : T1 les deux, code d'abord ; T2 tout de suite (contre la recommandation) ; T3 registre des pages tout de suite (contre la recommandation) ; T4 dossier dans ce dépôt ; T5 CC0 ; T6 galerie dans le plugin, sur clic ; T7 validation automatique et relecture ; T8 réglages en liste blanche ; T9 sept blocs en première version. T10 (case IA dans la pull request) : recommandation appliquée, le modèle la demandait déjà.
 Reason: Choix de l'utilisateur, 2026-11-04.
 Consequences: La campagne de tests en jeu (lots 6 à 10) passe après ces travaux, ou s'y intercale. Risques acceptés : doublon de Chat 2 possible à la publication 1.0.0 sans question préalable ; hooks de saisie à maintenir ; registre des pages refait pendant la campagne. Lignes rouges inchangées : aucun envoi automatique, code original, pas de combat. Reste à choisir pour C9 : le service de traduction et celui des émoticônes, à la phase 8.
-References: docs/goals/CHAT-001.md, docs/goals/TEMPLATES-001.md
+References: CHAT-001 (document retiré, voir git), docs/goals/TEMPLATES-001.md
 
 DEC-ID: DEC-030
 Timestamp: 2026-11-04 Europe/Brussels
@@ -334,3 +334,13 @@ Decision: Cadre des fenêtres du jeu retiré. Conseils de jeu en JcE seulement :
 Reason: Décision de l'utilisateur.
 Consequences: Les territoires 579, 940 et 941 coupent les conseils (docs/evidence/0.510-triad-competitive.md). Point « Conseil en match » de PUBLISHING traité ; le panneau du Dédale reste à demander à l'équipe avant la 1.0.0.
 References: docs/project/G-PROPOSALS.md, docs/project/PUBLISHING.md, issue #24, issue #31
+
+DEC-ID: DEC-034
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: La compilation du dépôt Dalamud utilise le SDK 10.0.101 sous Linux, réseau coupé ; global.json exigeait 10.0.403 (DEC d'origine), Tensho n'aurait pas compilé chez eux, et il n'avait jamais été compilé sous Linux.
+Evidence: docs/evidence/0.512-d17-build.md
+Options: Attendre la PR pour le découvrir ; assouplir global.json et compiler comme eux en CI.
+Decision: global.json accepte 10.0.100 et plus (latestFeature) ; Verify.ps1 prend le SDK 10.x local le plus récent ; job « Build like the Dalamud repository » dans build.yml. Choix de l'agent, sans effet sur le jeu.
+Reason: Demande de l'utilisateur de relever ce qui manque pour la 1.0.0 ; correction sûre et facile à défaire.
+Consequences: Le SDK local reste 10.0.403. Une nouvelle image chez Dalamud se suit dans le relevé. Le job garde le réseau : seule une vraie PR prouve la compilation réseau coupé.
+References: docs/project/PUBLISHING.md, issue #31

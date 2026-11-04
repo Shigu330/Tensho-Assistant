@@ -1,4 +1,7 @@
 # PROMPT MAÎTRE — TENSHO--ASSISTANT
+
+> Document d'origine (27 octobre 2026), figé. L'état courant est dans [STATUS](STATUS.md). Les décisions de [DECISIONS](../project/DECISIONS.md) le complètent et priment quand elles sont plus récentes, notamment DEC-009, DEC-032 et DEC-033 pour le combat.
+
 ## Plugin Dalamud All-in-One — développement autonome
 
 **Baseline technique intégrée : 27 octobre 2026**

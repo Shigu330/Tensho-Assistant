@@ -1,4 +1,4 @@
-# ONBOARD-001 : première prise en main, aide, vidéos et tickets (plan, rien n'est codé)
+# ONBOARD-001 : première prise en main, aide, vidéos et tickets (plan ; codé en 0.502 à 0.506, à valider en jeu)
 
 Demande de l'utilisateur (2026-11-04) : un plan complet, en pensant à l'open source et à la communauté, pour la première prise en main avec une interface guidée qu'on peut passer (visiter le plugin, donner des infos, faire les premiers réglages importants, ouvrir les bons menus une première fois, expliquer une première fois), une aide à chaque page et une aide globale, la possibilité d'ajouter des vidéos, et si possible un système de tickets GitHub depuis le jeu.
 

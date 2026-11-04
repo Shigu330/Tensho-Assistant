@@ -140,7 +140,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P18 — Cadres et textures du jeu (ULD), en commençant par la carte
 
-- **État (relu le 2026-11-03)** : en partie : cadre du jeu derrière la fenêtre principale (0.332, réglage désactivé) ; pas sur la carte.
+- **État (relu le 2026-11-04)** : abandonné : le cadre du jeu de 0.332 est retiré en 0.510 (DEC-033, rendu jugé mauvais).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : La fenêtre de la carte (boutons d'outils, cadre, menus) reprend les cadres et textures de l'interface du jeu, dans la même DLL et sans ressource externe. Les autres fenêtres suivent ensuite.
 - **Comment, taille, dépendances** : Sonde d'abord : chemins .uld et numéros de parties des boutons et du cadre de la carte du jeu (tools/ApiProbe), avec une capture, consignés dans docs/evidence. Ensuite : chargement unique hors Draw, une partie par bouton, et repli sur le dessin ImGui actuel si une partie manque (R-14). Taille M pour la carte, L pour toute l'interface. Décision : périmètre (carte seule ou tout de suite tout) et degré d'imitation (boutons, cadre, fond).

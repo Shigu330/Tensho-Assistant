@@ -1,24 +1,19 @@
 # GOAL actif
 
-ID: FIN-DE-FILE — (2026-11-04) campagne guidée close par l'utilisateur, les erreurs se règlent quand il les signale en jouant. Prise en main (ONBOARD-001) codée en 0.502 à 0.506, R-14 fini en 0.507, I-05 et A-04 en 0.508 et 0.509 : tout est à essayer en jeu. Restent : essais, I-15 et N-10 avec une séance en jeu (G-PROPOSALS), dresseur mis de côté, décisions Dalamud (G-PROPOSALS), une release sur demande, D17.
+ID: D17-PREP — préparer la version 1.0.0, première publication sur le dépôt officiel Dalamud, au moment choisi par l'auteur (DEC-023). Suivi : issue GitHub #31.
 
-État de la file relu le 2026-11-03, version 0.446.0 :
+État relu le 2026-11-04, version 0.512 :
 
-FAIT : files a) à g) de [ROADMAP](../project/ROADMAP.md) (0.315–0.446), dont l'étape g) : 101 manques choisis dans
-[GAPS](../project/GAPS.md), domaine par domaine, sauf les écarts laissés dans [G-PROPOSALS](../project/G-PROPOSALS.md)
-(« Écarts laissés pour une séance avec l'utilisateur »). Dernière release : Stable-0.451.0 (2026-11-03, notes : beaucoup de tests en jeu restent à faire).
+FAIT : files a) à g) et g2) de la [ROADMAP](../project/ROADMAP.md) ; prise en main [ONBOARD-001](../goals/ONBOARD-001.md) codée ; campagne guidée de tests en jeu close par l'utilisateur (les erreurs se règlent quand il les signale en jouant) ; compilation alignée sur celle de Dalamud (0.512).
 
-RESTE (ordre proposé, détail dans [STATUS](STATUS.md) « Prochaine action » et « Git ») :
-1) git : 0.431–0.451 publiées (Stable-0.451.0, 2026-11-03) ; décisions faites (DEC-026, DEC-027) ;
-2) décisions par lots (G-PROPOSALS, ROADMAP « Décisions reportées à la fin », lignes « État » des fichiers de propositions) ;
-3) h) campagne de tests en jeu guidée de tout le plugin ([TESTING](../project/TESTING.md)), sondes en jeu comprises ;
-4) g2 sans ultracode : R-14, I-05, I-15, A-03 / A-04 (Raphael), N-10, relecture du hook A-14 ;
-5) publication D17 à la version 1.0.0, moment fixé par l'auteur.
-VALIDATION : Verify.ps1 vert ; rapports de l'utilisateur en jeu.
+RESTE, liste complète et ordre dans [PUBLISHING](../project/PUBLISHING.md) « Ce qui reste avant la soumission » :
+1) décisions de l'auteur sur les règles Dalamud : résumé court et accord à chaque fois ;
+2) séance de jeu sur la dernière version, puis release (DEC-033) ;
+3) fenêtres libres vers le système de fenêtres de Dalamud (issue #38), sur accord ;
+4) captures pour l'installeur, passage en 1.0.0, PR et déclaration d'IA écrites par l'auteur.
 
-Anciens GOAL :
-- R-11 (planificateurs d'équipement, 0.310–0.315, étape 4 barde de chocobo 0.340) : fait ([R-11](../goals/R-11.md)) ; 0.310–0.314
-  validés en jeu, 0.315 et 0.340 à valider.
-- R-06 (refonte de l'interface, 0.247–0.294) : terminé pour l'essentiel ([R-06](../goals/R-06.md)) ; réglages utiles manquants faits
-  0.327 ; cadre du jeu derrière la fenêtre principale 0.332 (désactivé par défaut).
-- TRIAD-003 (Triple Triade) : terminé et validé en jeu (STATUS, rapports 2026-10-31 et 2026-11-01).
+VALIDATION : Verify.ps1 vert, job CI « Build like the Dalamud repository » vert ; rapports de l'utilisateur en jeu ; la PR elle-même pour la compilation réseau coupé.
+
+Hors de ce GOAL (mis de côté, [G-PROPOSALS](../project/G-PROPOSALS.md)) : dresseur, suite ; N-10 ; I-15 et suite de I-05 avec une séance en jeu.
+
+Anciens GOAL : FIN-DE-FILE (file a) à h), terminé le 2026-11-04) ; R-11 ([R-11](../goals/R-11.md), 0.310–0.315, 0.340) ; R-06 ([R-06](../goals/R-06.md), 0.247–0.294 ; le cadre du jeu de 0.332 est retiré en 0.510) ; TRIAD-003 (validé en jeu 2026-10-31 et 2026-11-01).

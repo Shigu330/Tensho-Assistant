@@ -1,6 +1,6 @@
 # Plan des manques par rapport aux plugins existants (point c)
 
-Relevé du 2026-11-02 (0.318), en lecture seule. Demande : « ce qui manque à Tensho par rapport aux plugins existants », élargie à
+Relevé du 2026-11-02 (0.318), en lecture seule. État au 2026-11-04 : l'étape g) est faite ; ce qui reste est dans [G-PROPOSALS](G-PROPOSALS.md) « Écarts laissés ». Demande : « ce qui manque à Tensho par rapport aux plugins existants », élargie à
 « pas que plugin de référence mais ceux du dépôt Dalamud (voir repo non officiel si ça respecte les règles Dalamud upload) », avec
 une phase de décision de l'utilisateur avant la feuille de route. La colonne « Choix » donne la décision de l'utilisateur (2026-11-02) ;
 les manques retenus sont dans la [ROADMAP](ROADMAP.md), étape g) de la file.
@@ -35,7 +35,7 @@ petite d'abord. Cette suite vient après R-12, d), e) et f) de la file (STATUS).
   documentation seule ne compte pas comme preuve. Licence lue dans le fichier LICENSE de chaque dépôt (environ 250 dépôts).
 - **Contre-vérification** adverse : licences, règles, sources de données (sondes `tools/ApiProbe`), et 30 affirmations de couverture
   relues dans le code (20 corrigées : statut, preuve ou numéro de ligne). Les corrections sont reportées ci-dessous (colonne « Note »).
-- Hors périmètre gardé : combat, ACT/IINACT, JcJ (DEC-009), et toute automatisation du jeu (règles Dalamud).
+- Hors périmètre gardé : combat, ACT/IINACT, JcJ (DEC-009), et toute automatisation du jeu (règles Dalamud). Exception ajoutée depuis : dresseur, informations seulement, JcE seulement (DEC-032).
 
 ## Règles qui encadrent chaque ajout
 

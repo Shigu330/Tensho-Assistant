@@ -1,6 +1,6 @@
 # Vérifications
 
-## Comment vérifier — état au 0.315.0 (2026-11-02, relu contre le code)
+## Comment vérifier — relu le 2026-11-04 (0.512)
 
 ### Tests automatiques
 
@@ -19,11 +19,10 @@ livré à côté de la DLL depuis 0.248 ; aucune assembly de l'hôte redistribu�
 - Même version et mêmes sources (hors `*.md`, `docs/`, `repo.json`) déjà passées au vert : les contrôles sont sautés (« SKIP checks »,
   `artifacts/verify-stamp.json`) ; `-Force` les relance.
 - Exécutable seul, après un build : `dotnet run --project tests/TenshoAssistant.Tests -c Release --no-build`, **depuis la racine du
-  dépôt**, avec le SDK que choisit Verify.ps1 (`%USERPROFILE%\.codex\dotnet-<version de global.json>\dotnet.exe` s'il existe, sinon
+  dépôt**, avec le SDK que choisit Verify.ps1 (le plus récent `%USERPROFILE%\.codex\dotnet-10.*\dotnet.exe` s'il existe, sinon
   `C:\ia-code\.tools\dotnet10\dotnet.exe`, sinon `dotnet`). Le test des infobulles de réglages lit `src/TenshoAssistant` et ses langues ; ceux de la compagnie libre lisent
   `src/TenshoAssistant/FreeCompany/Data/`.
-- Dernier passage : Verify.ps1 (agent) 569/569, 0 avertissement, 0 erreur, DLL 0.315.0.0 ([CHANGELOG](../../CHANGELOG.md)). Exécutable déjà
-  compilé relancé seul le 2026-11-02 pour cette relecture : 569/569.
+- Dernier passage : voir [STATUS](../ai/STATUS.md), première ligne. En CI, à chaque push : `Build and test` (dont une compilation à la manière du dépôt Dalamud, [relevé](../evidence/0.512-d17-build.md)) et CodeQL.
 
 Les tests couvrent la logique pure : 87 fichiers `*Tests.cs` (un par domaine : inventaire, banque et tri, artisanat et macros, récolte et
 pêche, météo et alarmes, carte et projection, marchands PNJ, collections, quêtes, sources Garland / wiki / LuminaSupplemental, cache
@@ -33,7 +32,7 @@ Ils ne couvrent pas : lecture de la mémoire du jeu (sacs, atelier de la compagn
 réelles (vérifiées par les sondes de `tools/`, sorties dans [docs/evidence/](../evidence/)), rendu ImGui et clics, requêtes HTTP réelles
 (Universalis, Garland, wiki, GitHub, Teamcraft : transport simulé ou extraits enregistrés).
 
-### Inventaire des tests (569 au 0.315.0)
+### Inventaire des tests (569 au 0.315.0 ; liste non reprise depuis, le nombre courant est dans STATUS)
 
 Sortie : une ligne `PASS <nom>` (ou `FAIL <nom>: …`) par test, puis `N/N passed`. Depuis le dernier inventaire de cette page (0.154.0,
 532 tests), **37 tests ajoutés**, aucun retiré : sortie actuelle comparée aux sources de `checkpoints/TenshoAssistant-0.153.0-source.zip`

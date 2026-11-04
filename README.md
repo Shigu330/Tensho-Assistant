@@ -176,7 +176,9 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
 ├── scripts/                  Verify.ps1 (build + tests + localization + package), Release.ps1 (git steps)
 ├── commit-release.bat        Verify -Commit then -Release (maintainer)
 ├── repo.json                 Dalamud custom repository entry (refreshed by each release)
-├── publish/d17/              draft submission for the official Dalamud repository
+├── publish/d17/              draft submission for the official Dalamud repository (what remains: docs/project/PUBLISHING.md)
+├── community-help/           help videos and guides listed in the plugin
+├── community-templates/      community tool gallery (data only)
 ├── docs/                     documentation map: docs/README.md
 │   ├── ai/                   agent steering (rules, status, goal)
 │   ├── project/              scope, roadmap, architecture, testing, references, decisions, publishing
@@ -189,7 +191,7 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
 
 ## Build and verification
 
-Requirements: Windows, .NET SDK 10.0.403 (`global.json`), Dalamud.NET.Sdk 15 (restored from NuGet during the build; it compiles against your Dalamud install, or `DALAMUD_HOME`). Without the game: `.\scripts\Verify.ps1 -TestsOnly` (tests and languages only).
+Requirements: Windows, .NET SDK 10.0 (`global.json` accepts 10.0.100 and newer), Dalamud.NET.Sdk 15 (restored from NuGet during the build; it compiles against your Dalamud install, or `DALAMUD_HOME`). Without the game: `.\scripts\Verify.ps1 -TestsOnly` (tests and languages only).
 
 ```powershell
 .\scripts\Verify.ps1                                 # Release build, managed tests, language files, package
@@ -260,6 +262,7 @@ Framework and tools:
 
 - Final Fantasy XIV and its game data (sheets read through Dalamud / Lumina), Dalamud and FFXIVClientStructs
 - Dalamud.NET SDK, .NET SDK and runtime, PowerShell scripts for verification and release
+- [Raphael.Net](https://github.com/WorkingRobot/Raphael.Net) by Asriel (MIT, NuGet, native library): the crafting solver
 
 Community data used by the plugin (licence compatible with GPL-3.0, or service API):
 
@@ -271,6 +274,7 @@ Community data used by the plugin (licence compatible with GPL-3.0, or service A
   `src/TenshoAssistant/FreeCompany/Data/submarine-breakpoints.csv`), originally from the community « Submersible Loot Spreadsheet »
   (Elena / saerielle); voyage formulas understood by reading its code (original code); wear estimate from the community « Submersibles
   durability damage » sheet that it quotes
+- [FFXIV Gardening Tracker](https://github.com/Lotlab/FFXIV-Gardening-Tracker) by Lotlab (GPL-3.0): garden seed times, embedded with its notice; FFXIV Crossbreed Helper by nick75g (MIT): garden crosses, embedded
 - level modifier table (main stat, levels 1–100) from Character Panel Refined by Kouzukii (MIT, full notice in `Character/StatFormulas.cs`)
 - [Universalis](https://universalis.app/) (market prices and listings), [Garland Tools](https://www.garlandtools.org/) (item, duty and
   monster sources), the [FFXIV Console Games Wiki](https://ffxiv.consolegameswiki.com/) (monster drops, sightseeing log, acquisition),
@@ -476,7 +480,7 @@ Voir la structure anglaise ci-dessus et la carte des documents [docs/README.md](
 
 ## Build et validation
 
-Prérequis : Windows, SDK .NET 10.0.403 (`global.json`), Dalamud.NET.Sdk 15 (restauré depuis NuGet pendant la compilation ; il compile avec votre Dalamud installé, ou `DALAMUD_HOME`). Sans le jeu : `.\scripts\Verify.ps1 -TestsOnly` (tests et langues seulement).
+Prérequis : Windows, SDK .NET 10.0 (`global.json` accepte 10.0.100 et plus), Dalamud.NET.Sdk 15 (restauré depuis NuGet pendant la compilation ; il compile avec votre Dalamud installé, ou `DALAMUD_HOME`). Sans le jeu : `.\scripts\Verify.ps1 -TestsOnly` (tests et langues seulement).
 
 ```powershell
 .\scripts\Verify.ps1                                  # compilation Release, tests, fichiers de langue, paquet
@@ -547,7 +551,7 @@ servent que lorsque le jeu ne les a pas, et sont toujours citées.
   (Infi, MIT : Revue de mode téléchargée, butin moyen des sous-marins embarqué) ; SubmarineTracker (Infi, MIT : seuils des secteurs
   embarqués, avis dans `src/TenshoAssistant/FreeCompany/Data/submarine-breakpoints.csv`, à l'origine la feuille communautaire
   « Submersible Loot Spreadsheet » d'Elena / saerielle ; formules de voyage comprises en lisant son code ; usure d'après la feuille
-  « Submersibles durability damage ») ; table des modificateurs de niveau de Character Panel Refined (Kouzukii, MIT, avis complet dans `Character/StatFormulas.cs`) ;
+  « Submersibles durability damage ») ; Raphael.Net (Asriel, MIT : solveur d'artisanat) ; FFXIV Gardening Tracker (Lotlab, GPL-3.0 : durées du jardinage, embarquées) et FFXIV Crossbreed Helper (nick75g, MIT : croisements, embarqués) ; table des modificateurs de niveau de Character Panel Refined (Kouzukii, MIT, avis complet dans `Character/StatFormulas.cs`) ;
   [Universalis](https://universalis.app/), [Garland Tools](https://www.garlandtools.org/), le [wiki FFXIV](https://ffxiv.consolegameswiki.com/),
   [PaissaDB](https://github.com/zhudotexe/FFXIV_PaissaDB) de zhudotexe (terrains en vente, lus sur clic ou par la surveillance facultative).
 - Lus pour comprendre, jamais copiés : Mappy et SortaKinda (AGPL-3.0-or-later) et les autres références de `docs/project/ROADMAP.md` ;

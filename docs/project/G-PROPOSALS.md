@@ -120,6 +120,8 @@ Règle : une règle Dalamud en jeu demande un résumé et son accord (mémoire, 
 | Conseil en match de Triple Triade | Aucun avantage en contenu compétitif | Décidé (DEC-033) : contre un PNJ seulement | **Fait en 0.510** |
 | Panneau du Dédale (DEC-032) | Combat et contenu compétitif | Informations seulement, demander à l'équipe avant la 1.0.0 | Page faite, panneau en attente, dresseur mis de côté |
 
+La liste complète de ce qui reste pour la 1.0.0 : [PUBLISHING](PUBLISHING.md) « Ce qui reste avant la soumission ». Compilation chez Dalamud : corrigée en 0.512 ([DEC-034](DECISIONS.md)).
+
 ## Écarts laissés pour une séance en jeu (2026-11-04)
 
 | Point | Pourquoi pas en autonomie | Ce qu'il faudrait |

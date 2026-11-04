@@ -3,6 +3,16 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.512.0
+- Demande de l'utilisateur : remettre tous les .md et GitHub à l'étape actuelle, et relever ce qui manque pour la 1.0.0.
+- Compilation chez Dalamud : leur conteneur utilise le SDK 10.0.101 sous Linux, réseau coupé ; `global.json` exigeait 10.0.403, Tensho n'y aurait pas compilé. Il accepte maintenant 10.0.100 et plus, `Verify.ps1` prend le SDK 10.x local le plus récent, et un job CI compile avec leur image et leur commande ([relevé](docs/evidence/0.512-d17-build.md), DEC-034).
+- Manifeste : Description réécrite (lignes coupées à la main, fonctions et réseau à jour, les deux réglages qui agissent sans clic sont nommés). `manifest.toml` : changelog à jour. Brouillon de PR relu contre le code.
+- Documents : STATUS raccourci, son historique déplacé dans `docs/ai/STATUS-ARCHIVE.md` ; GOAL, PUBLISHING (liste de ce qui reste, en ordre), ROADMAP, BACKLOG, TESTING, SECURITY, CONTRIBUTING, README (crédits : Raphael.Net, jardinage), CLAUDE.md, RULES, DECISIONS remis à jour.
+- Tests : aucun changement de logique. Verify.ps1 (agent) : 972/972, 0 avertissement, 0 erreur ; DLL 0.512.0.0. Non validé en jeu.
+### English
+- Build: the Dalamud repository compiles with SDK 10.0.101 on Linux, and `global.json` demanded 10.0.403, so the plugin could not have built there. It now accepts 10.0.100 and newer, and a new CI job builds with their image and command.
+- The manifest description is rewritten (wrapped by hand, up to date, naming the two settings that act without a click). All documents and GitHub issues now match the current stage; what remains for 1.0.0 is listed in `docs/project/PUBLISHING.md`.
+
 ## 0.511.0
 - Relecture du code de l'après-midi, sans essai en jeu. Deux défauts corrigés : la page Aide restait dans l'ancienne langue après un changement de langue ; la liste des fenêtres sur l'accueil parcourait les collections à chaque image, elle ne le fait plus que toutes les deux secondes.
 - Tests : GuideFlowTests complété. Verify.ps1 (agent) : 972/972, 0 avertissement, 0 erreur ; DLL 0.511.0.0. Non validé en jeu.
@@ -327,7 +337,7 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 - Demande de l'utilisateur : dans le carnet, Manipulation est une case et l'icône du skill, sans texte. Repas et remède ont l'icône et la bulle de l'objet (aussi dans le simulateur) ; seuls ceux qui ont un bonus d'artisanat comptent, un autre repas se lit « aucun ».
 - Demande de l'utilisateur (« restyliser la fenêtre liée au carnet ») : panneau en sections (recette, votre état, cible, calcul, macro), chiffres en tableau, barre de qualité, section de séquence enregistrée masquée s'il n'y en a pas, explications dans la bulle de « (?) ». Le texte « Manipulation exclue : déblocage non observé » datait d'avant la détection : retiré.
 - Tests : GcSupply469Tests (6). Verify.ps1 (agent) : 885/885, 0 avertissement, 0 erreur ; DLL 0.469.0.0. Non validé en jeu.
-- Plans ajoutés, sans code : chat personnalisable ([CHAT-001](docs/goals/CHAT-001.md)) et modèles communautaires ([TEMPLATES-001](docs/goals/TEMPLATES-001.md)), avec les décisions à prendre.
+- Plans ajoutés, sans code : chat personnalisable (CHAT-001 (document retiré depuis)) et modèles communautaires ([TEMPLATES-001](docs/goals/TEMPLATES-001.md)), avec les décisions à prendre.
 ### English
 - Plans added, without code: customisable chat and community templates, with the decisions to take.
 - Today's Grand Company request is now read from the game's supply missions window; item tooltips say requested, not among what was opened, or how to open it.

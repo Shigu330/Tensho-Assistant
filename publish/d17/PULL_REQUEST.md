@@ -1,33 +1,41 @@
-<!-- Draft prepared by the AI agent at the author's request (2026-10-31, checked against the code on 2026-11-02, version 0.315).
-The Dalamud AI policy asks that the AI disclosure and the pull request description be written by a human: reread it and adapt it in
-your own words before posting. -->
+<!-- Draft prepared by the AI agent at the author's request (first written 2026-10-31, checked against the code on 2026-11-04, version 0.512).
+The Dalamud AI policy asks that the AI disclosure and the pull request description be written by a human: rewrite it in your own words
+before posting. Do not post it as it is. -->
 
 # Tensho Assistant
 
-Tensho Assistant brings everyday tools together in one window (`/tensho`): items and storage (bags, retainers, saddlebags, armoury chest,
-glamour dresser, armoire), inventory sorting rules, market listings and prices, recipes and a crafting simulator, gathering and fishing
-with Eorzea time windows and weather, a map that replaces the game map, weather, alarms and game calendar reminders, free company
-submarine and airship voyages and builds, quests and rewards, collections with how to obtain each item, a gear planner (materia, try on,
-build sharing), duty and monster loot, Fashion Report hints, Mini Cactpot and Triple Triad helpers, character stats and macro chains.
+Tensho Assistant brings everyday tools together in one window (`/tensho`), with a skippable first-run guide and help on every page: items
+and storage (bags, retainers, saddlebags, armoury chest, glamour dresser, armoire), inventory sorting rules, market listings and prices,
+retainer sale prices compared on a click, recipes, a crafting simulator and solver, gathering and fishing with Eorzea time windows and
+weather, a map that replaces the game map, weather, alarms and reminders, free company voyages and builds, quests and rewards, collections
+with how to obtain each item, a gear planner (materia, try on, build sharing), duty and monster loot, Beastmaster information, Fashion
+Report hints, Mini Cactpot and Triple Triad helpers, character stats and macro chains.
 
 - Source: https://github.com/Shigu330/Tensho-Assistant (GPL-3.0)
-- Nothing runs on its own: teleport, applying a sort, macro chains, writing crafting macros into the game's macros and opening the Try On
-  window only start on a click. Game alarms are created with the game's `/alarm` command on a click, or automatically only when the
-  « game alarms » setting (off by default) is on. No automation of crafting, dialogues or loot, no combat or PvP feature, no parser.
-- Network: Universalis (world + item id), Garland Tools, FFXIV Console Games Wiki, Teamcraft's public bite time reports, and data files
-  hosted on GitHub (LuminaSupplemental, GatherBuddy, FFXIVGachaSpreadsheet), over HTTPS, only when the matching page is opened, an item is
-  hovered or a setting asks for it, with bounded responses, cached on disk. No player data is sent, no telemetry.
-- Discord (optional, off by default): Tensho alarms can be posted to a Discord webhook the player enters (Discord hosts only, HTTPS
-  POST). Only the alarm's message is sent, plus the character's name if the player enables it; the address is never logged.
-- Embedded community data under MIT: SubmarineTracker sector breakpoints (full MIT notice kept in the file) and FFXIVGachaSpreadsheet
-  submarine loot averages (licence and copyright named in the file's `Source` field); every source is credited in the README.
+- Game actions start on a click: teleport, applying a sort, macro chains, writing crafting macros into the game's macros, opening the Try
+  On window, equipping a job, sending the hunt train call to the chat channel the player picks.
+- Two settings, both off by default, act without a click: game alarms created with the game's `/alarm` command, and wearing the title the
+  player chose for a job when the job changes. <!-- Decide before posting: keep and explain, or remove (docs/project/PUBLISHING.md, points 2 and 3). -->
+- No automation of crafting, dialogues or loot, no PvP feature, no parser. The solver and the suggested move only display advice. Triple
+  Triad advice works against NPCs only, never in tournaments or against a player. The Beastmaster page lists game data.
+- Network: Universalis (world + item id), Garland Tools, FFXIV Console Games Wiki, Teamcraft's public bite time reports, PaissaDB (open
+  plots, on a click or with its optional watch), data files hosted on GitHub (LuminaSupplemental, GatherBuddy, FFXIVGachaSpreadsheet) and
+  this repository (community tool gallery and help videos, on a click), over HTTPS, only when the matching page is opened, an item is
+  hovered, the player clicks or a setting asks for it, with bounded responses, cached on disk. Each source has a switch. No player data is
+  sent, no telemetry.
+- Discord (optional, off by default): Tensho alarms and currency cap alerts can be posted to a Discord webhook the player enters (Discord
+  hosts only, HTTPS POST). Only the message is sent, plus the character's name if the player enables it; the address is never logged.
+- Reporting a problem opens a prefilled GitHub form in the player's browser; the plugin sends nothing.
+- NuGet dependency: Raphael.Net 5.0.0 (MIT, native solver library), the version Craftimizer uses.
+- Embedded community data, licences kept in the files: SubmarineTracker and FFXIVGachaSpreadsheet (MIT), Character Panel Refined level table
+  (MIT), LuminaSupplemental and FFXIV Gardening Tracker (GPL-3.0), FFXIV Crossbreed Helper (MIT). Every source is on the Credits page.
 - Only the local character's content id is used, as a key for its own saved data.
-- Panels shown beside game windows (storage import, crafting log, item hover, Character, Duty Finder, Fashion Report, gathering and
-  fishing help, Triple Triad requests) use `ImGui.Begin`; the main window and the map use the Dalamud window system.
+- Panels shown beside game windows use `ImGui.Begin`; the main window, the map and the guide use the Dalamud window system.
+  <!-- Update once the free-standing panels are converted (docs/project/PUBLISHING.md, point 5). -->
 
 ## AI disclosure
 
-- Code: **Auto**. The plugin was written by an AI coding agent (Claude). I define the features, check every version in game and report
+- Code: **Auto**. The plugin was written by an AI coding agent (Claude). I define the features, check versions in game and report
   what works or not; the agent proves game data links with read-only probes (kept in `docs/evidence/`).
 - Icon: generated by the AI agent (drawn with code), declared in the plugin description.
 - Translations: English and French; German and Japanese only have a few dozen keys, not reviewed by native speakers.

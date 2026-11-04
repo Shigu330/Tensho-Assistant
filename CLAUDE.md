@@ -15,8 +15,8 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
 ## Environnement
 
 - Dépôt Windows : `C:\Plugins-ff14` (GitHub : Shigu330/Tensho-Assistant, branches Devloppement (travail) et main (releases) ; analyse CodeQL dans .github/workflows). Session desktop avec PowerShell : l'agent compile et teste.
-- SDK .NET 10.0.403 (global.json), Dalamud.NET.Sdk 15 ; build et tests : `.\scripts\Verify.ps1` (compile Release, tests managés,
-  validation des langues, paquet). Sondes de données en lecture seule : `tools/ShopCurrencyProbe`, `tools/ApiProbe`.
+- SDK .NET 10.0 (global.json accepte 10.0.100 et plus, le dépôt Dalamud compile avec 10.0.101 ; local : 10.0.403), Dalamud.NET.Sdk 15 ; build et tests : `.\scripts\Verify.ps1` (compile Release, tests managés,
+  validation des langues, paquet). Sondes de données en lecture seule : `tools/` (liste dans `tools/README.md`).
 - **Git géré par l'agent (accord de l'utilisateur, 2026-11-03)** : commit et push de chaque version sur `Devloppement` par
   `.\scripts\Verify.ps1 -Commit` (après `-Commit -DryRun`). Release seulement sur demande explicite de l'utilisateur. Jamais de push forcé,
   de réécriture d'historique ni de réglage GitHub sans accord ; issues, milestones et labels GitHub tenus par l'agent (en anglais) ;
@@ -59,5 +59,5 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
 - Inconnu ≠ zéro ; absence de preuve ≠ preuve d'absence ; ne jamais inventer une donnée (sonder les données du jeu, citer la source).
 - Natif lu sur le thread framework puis copié ; rien de lourd dans Draw ; chaque abonnement a un propriétaire et un nettoyage.
 - Références AGPL (Mappy, SortaKinda…) : lues pour comprendre, **jamais copiées** (le projet est sous GPL v3, code original).
-- Hors périmètre : ACT/IINACT et tout domaine Combat (décision DEC-009).
-- Publication éventuelle sur le dépôt officiel Dalamud : voir [CONTRIBUTING.md](CONTRIBUTING.md#publication-dalamud) (règles D17, politique IA).
+- Hors périmètre : ACT/IINACT et tout domaine Combat (DEC-009), sauf l'exception du dresseur, informations seulement, JcE seulement (DEC-032) ; conseils de jeu en JcE seulement (DEC-033).
+- Publication sur le dépôt officiel Dalamud à la 1.0.0 : ce qui reste dans [docs/project/PUBLISHING.md](docs/project/PUBLISHING.md) ; voir aussi [CONTRIBUTING.md](CONTRIBUTING.md#publication-dalamud) (règles D17, politique IA).
