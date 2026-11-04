@@ -3,10 +3,21 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.507.0
+- R-14 : fin de la relecture des constats de l'audit, un par un contre le code. Beaucoup étaient déjà corrigés par 0.452 à 0.454 (alarme, escouade, rappels, mandats, carte, macros, monnaies). Restaient, et sont corrigés :
+  - Une feuille facultative ne coûte plus que sa valeur : statistiques sans ParamGrow, rangements sans World, équipement sans taux de surmatérialisation ni bardes, survol sans la pile, une garde par feuille sur la carte (les marques de chasse n'y passaient plus en silence).
+  - Un lien cassé saute sa ligne, pas tout le catalogue : recettes, contenus, vendeurs.
+  - Une fonction perdue est dite ou refusée, une ancienne lecture ne reste pas affichée comme actuelle : demande de progression d'un succès, ouverture du carnet, état des actions, recettes fabriquées, mandats, carnet de chasse (rien avant le chargement du personnage), armoire. Une téléportation ratée ne vide plus la carte. Cartes de région : tout ou rien.
+  - Le cache suit aussi la version de Dalamud, et une capture de fenêtre n'est plus coupée par un saut de ligne.
+- Laissés en l'état, jugés sans effet réel : #35 (lecture de la pile, validée en jeu par l'utilisateur, le constat ne se vérifie pas), #5, #27, #29, #31, #44, #47, #64, #65, #66, #67, #70 (journal seulement, ou panneau déjà isolé par 0.452). Liste dans l'issue #25.
+- Tests : Resilience507Tests (4 cas). Verify.ps1 (agent) : 964/964, 0 avertissement, 0 erreur ; DLL 0.507.0.0. Non validé en jeu : ces cas ne surviennent qu'après une mise à jour qui casse une feuille ou une fonction ; l'auto-contrôle couvrira ce jour-là.
+### English
+- R-14: the audit's findings read one by one. An optional sheet now costs only its own value, a dangling link skips its row rather than the whole catalog, a lost function is refused or logged, and old readings are no longer shown as current.
+
 ## 0.506.0
 - ONBOARD-001, lots 7 et 8. Vidéos et guides de la communauté : `community-help/index.json`, vide pour commencer, proposé en pull request et vérifié par un test. Le « ? » et la page Aide le lisent sur clic. Un lien part vers le navigateur après confirmation de son adresse, seulement vers YouTube ou ce dépôt (G6). Une liste cassée est refusée en entier. Visible après la prochaine release, puisqu'elle est lue sur `main`.
 - Contributeurs : `scripts/New-Tool.ps1` crée les textes d'aide d'un nouvel outil ; CONTRIBUTING explique l'aide, les vidéos et les guides ; `community-help/README.md` donne les règles.
-- Tests : HelpTests complété. Verify.ps1 (agent) : 960/960, 0 avertissement, 0 erreur ; DLL 0.506.0.0. Non validé en jeu. `New-Tool.ps1` n'a été lancé qu'en vérification de son texte, pas en création réelle.
+- Tests : HelpTests complété. Verify.ps1 (agent) : 960/960, 0 avertissement, 0 erreur ; DLL 0.506.0.0. Non validé en jeu. `New-Tool.ps1` lancé pour de vrai sur une copie du dépôt : les textes d'aide sont créés et les tests passent (961/961).
 ### English
 - Community videos and guides: a reviewed list in community-help/, read on a click from the ? and the Help page; a link opens in the browser after showing its address, only to YouTube or this repository. New-Tool.ps1 now creates a new tool's help texts, and CONTRIBUTING explains help and guides.
 

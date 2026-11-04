@@ -142,6 +142,8 @@ internal sealed class TriadObservationReader : IDisposable
         var bytes = (byte*)pointer.Value; var length = 0;
         while (length < 240 && bytes[length] != 0) length++;
         var text = Dalamud.Game.Text.SeStringHandling.SeString.Parse(new ReadOnlySpan<byte>(bytes, length)).TextValue;
+        // 0.507 (R-14): a line break here cut the capture lines, so docs/evidence/0.160.0-triad-match-capture.log stops at value 8.
+        text = text.ReplaceLineEndings(" ");
         return "\"" + (text.Length > 60 ? text[..60] : text).Replace(";", ",") + "\"";
     }
     private static unsafe string? Rect(AtkComponentBase* component)

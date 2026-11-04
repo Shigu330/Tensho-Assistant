@@ -228,7 +228,7 @@ internal sealed class NpcVendorLoader : IDisposable
             if(level.Type==8 && vendorShops.ContainsKey(level.Object.RowId) && level.Map.RowId!=0 && level.Map.IsValid)
             {
                 var map=level.Map.Value;
-                var zone=map.PlaceName.RowId!=0 ? map.PlaceName.Value.Name.ExtractText():"";
+                var zone=map.PlaceName.ValueNullable?.Name.ExtractText() ?? "";
                 if(!locations.TryGetValue(level.Object.RowId,out var list))locations[level.Object.RowId]=list=[];
                 if(list.Count<8)list.Add(new(level.Territory.RowId,map.RowId,zone,
                     NpcShopLinks.MapCoordinate(level.X,map.OffsetX,map.SizeFactor),NpcShopLinks.MapCoordinate(level.Z,map.OffsetY,map.SizeFactor),level.X,level.Y,level.Z));

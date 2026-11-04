@@ -77,19 +77,29 @@ internal sealed class MapLiveReader : IDisposable
         try{vistaIds=data.GetExcelSheet<Adventure>().Select(row=>row.RowId).ToArray();}
         catch(Exception error){log.Warning(error,"Sightseeing rows unavailable.");}
         allCurrents=currentIds;adventureRows=vistaIds;
+        // R-14 (0.507): one guard per sheet: a failing sheet no longer silently takes the others, hunt marks among them.
         try
         {
             foreach(var set in data.GetExcelSheet<AetherCurrentCompFlgSet>())
                 if(set.Territory.RowId!=0)currents.TryAdd(set.Territory.RowId,(set.RowId,set.AetherCurrents.Select(current=>current.RowId).Where(id=>id!=0).ToArray()));
             foreach(var territory in data.GetExcelSheet<TerritoryType>())mounts[territory.RowId]=territory.Mount;
+        }
+        catch(Exception error){log.Warning(error,"Aether current data unavailable; flight state stays unknown.");}
+        try
+        {
             foreach(var point in data.GetExcelSheet<GatheringPoint>())
                 if(point.GatheringPointBase.RowId!=0 && point.GatheringPointBase.IsValid)gatheringLevels[point.RowId]=point.GatheringPointBase.Value.GatheringLevel;
+        }
+        catch(Exception error){log.Warning(error,"Gathering point levels unavailable.");}
+        try
+        {
             foreach(var mark in data.GetExcelSheet<NotoriousMonster>())
                 if(mark.BNpcBase.RowId!=0 && mark.Rank is >= 1 and <= 3)huntMarks.TryAdd(mark.BNpcBase.RowId,mark.Rank);
         }
-        catch(Exception error){log.Warning(error,"Aether current data unavailable; flight state stays unknown.");}
+        catch(Exception error){log.Warning(error,"Hunt mark data unavailable: marks are not shown on the map.");}
         framework.Update+=Update;
     }
+    private bool teleportFailed;
     private void Update(IFramework _)
     {
         if(disposed || !framework.IsInFrameworkUpdateThread || framework.IsFrameworkUnloading)return;
@@ -97,7 +107,10 @@ internal sealed class MapLiveReader : IDisposable
         try
         {
             if(Interlocked.Exchange(ref removeFlag,0)==1)ClearFlag();
-            if(Interlocked.Exchange(ref teleport,0) is var destination && destination>0)SendTeleport((uint)destination);
+            // R-14 (0.507): a failed teleport no longer blanks the map for five seconds.
+            if(Interlocked.Exchange(ref teleport,0) is var destination && destination>0)
+                try{SendTeleport((uint)destination);}
+                catch(Exception error){if(!teleportFailed){teleportFailed=true;log.Warning(error,"The teleport could not be sent.");}}
             if(Interlocked.Exchange(ref costsRequest,0)==1){try{Volatile.Write(ref teleportCosts,ReadTeleportCosts());costsFailed=false;}catch(Exception error){costsFailed=true;Failed("teleport costs",error);}}
             var player=client.IsLoggedIn ? objects.LocalPlayer:null;
             if(player is null){Volatile.Write(ref state,null);return;}

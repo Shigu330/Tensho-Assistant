@@ -37,11 +37,16 @@ internal sealed class ItemHoverReader : IDisposable
                 var refresh=held && !refreshHeld && raw!=0 && configuration.HoverPriceRefresh;refreshHeld=held;
                 _=coordinator.Observe(prices,usages,owner,market.State.WorldId,raw,items.State.Catalog,now,refresh);
                 context.SetAnchor(raw==0 ? null:ReadTooltip());
-                context.SetStack(raw==0 ? null:ReadStack(raw));
+                // R-14 (0.507): the stack is an extra: its failure leaves it unknown, logged once, and no longer costs the price and the uses.
+                if(raw==0 || stackFailed)context.SetStack(null);
+                else
+                    try{context.SetStack(ReadStack(raw));}
+                    catch(Exception error){stackFailed=true;context.SetStack(null);log.Warning(error,"Stack of the hovered item unavailable.");}
             }
             catch(Exception error){coordinator.Clear();retryAt=now.AddSeconds(5);log.Warning(error,"Item hover context unavailable; retry in five seconds.");}
         }
     }
+    private bool stackFailed;
     // Only the visible game tooltip's screen rectangle is copied; no pointer outlives this call.
     private ItemHoverAnchor? ReadTooltip()
     {

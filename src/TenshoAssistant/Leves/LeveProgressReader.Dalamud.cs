@@ -72,7 +72,7 @@ public sealed unsafe class LeveProgressReader : IDisposable
         }
         catch(Exception error)
         {
-            pending=null;building=[];Unavailable=true;nextRead=now.AddSeconds(30);
+            pending=null;building=[];Unavailable=true;nextRead=now.AddSeconds(30);Volatile.Write(ref state,null);
             if(!warned){warned=true;log.Warning(error,"Guildleves could not be read.");}
         }
     }

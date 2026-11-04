@@ -78,7 +78,8 @@ internal sealed class CraftLiveReader : IDisposable
                 if(numbers is {Condition:<=3,Expert:false} && (uint)condition==numbers.Condition+1 && (nativeFlags&9)==0 && actions.State.Catalog is { } actionCatalog)
                 {
                     var manager=ActionManager.Instance();
-                    if(manager!=null)
+                    // R-14 (0.507): a lost function leaves the availability unknown (the comparison says so), and the rest of the reading stands.
+                    if(manager!=null && (nint)ActionManager.MemberFunctionPointers.GetActionStatus!=0)
                     foreach(var spec in CraftActionCatalog.Specs)
                     {
                         if(actionCatalog.Find(local.ClassJob.RowId,spec.Kind) is not { } metadata)continue;

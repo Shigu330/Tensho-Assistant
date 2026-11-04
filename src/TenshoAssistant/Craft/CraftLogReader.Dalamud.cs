@@ -55,7 +55,8 @@ internal sealed class CraftLogReader : IDisposable
                 {
                     var recipe=recipes.State.Catalog?.ForResult(request.ItemId).FirstOrDefault(row=>row.RecipeId==request.RecipeId);
                     var agent=AgentRecipeNote.Instance();
-                    if(recipe is null || agent==null){service.Clear("Crafting log unavailable or recipe catalogue still loading.");return;}
+                    // R-14 (0.507): the game function is checked first.
+                    if(recipe is null || agent==null || (nint)AgentRecipeNote.MemberFunctionPointers.OpenRecipeByRecipeIdInternal==0){service.Clear("Crafting log unavailable or recipe catalogue still loading.");return;}
                     agent->OpenRecipeByRecipeId(request.RecipeId);nextRead=0;
                 }
                 var handle=gui.GetAddonByName("RecipeNote");

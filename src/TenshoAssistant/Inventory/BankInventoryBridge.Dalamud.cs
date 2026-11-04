@@ -206,11 +206,19 @@ internal sealed class BankInventoryBridge : IDisposable
     }
 
     // 0.345: « Name (World) » of the logged-in character (Dalamud IPlayerState), stored as the name of its own storages; empty when not known.
+    private bool homeWorldFailed;
     private string CharacterLabel()
     {
         var name = player.CharacterName;
         if (string.IsNullOrWhiteSpace(name)) return "";
-        var world = player.HomeWorld.IsValid ? player.HomeWorld.Value.Name.ExtractText() : "";
+        // R-14 (0.507): the World sheet only adds to the label: its failure leaves the name alone, and every storage stays readable.
+        string world;
+        try { world = player.HomeWorld.IsValid ? player.HomeWorld.Value.Name.ExtractText() : ""; }
+        catch (Exception error)
+        {
+            world = "";
+            if (!homeWorldFailed) { homeWorldFailed = true; log.Warning(error, "Home world name unavailable."); }
+        }
         return world.Length > 0 ? $"{name} ({world})" : name;
     }
 
@@ -281,7 +289,7 @@ internal sealed class BankInventoryBridge : IDisposable
     }
 
     private static unsafe bool DresserLoaded() { var mirage = MirageManager.Instance(); return mirage != null && mirage->PrismBoxLoaded; }
-    private static unsafe bool ArmoireLoaded() { var ui = FFXIVClientStructs.FFXIV.Client.Game.UI.UIState.Instance(); return ui != null && ui->Cabinet.IsCabinetLoaded(); }
+    private static unsafe bool ArmoireLoaded() { var ui = FFXIVClientStructs.FFXIV.Client.Game.UI.UIState.Instance(); return ui != null && ui->Cabinet.IsCabinetLoaded() && (nint)FFXIVClientStructs.FFXIV.Client.Game.UI.Cabinet.MemberFunctionPointers.IsItemInCabinet != 0; }
 
     // Glamour dresser items (MirageManager.PrismBoxItemIds: 0 empty, +1 000 000 HQ, +500 000 collectable), one stack per stored piece.
     private unsafe InventorySnapshot DresserSnapshot(InventoryOwnerId owner)

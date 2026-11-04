@@ -993,6 +993,7 @@ var failures = 0;
 tests = tests.Concat(DutyLootTests.Cases).ToArray();
 tests = tests.Concat(SelfCheckTests.Cases).ToArray();
 tests = tests.Concat(HelpTests.Cases).ToArray();
+tests = tests.Concat(Resilience507Tests.Cases).ToArray();
 tests = tests.Concat(GuideFlowTests.Cases).ToArray();
 tests = tests.Concat(BeastCatalogTests.Cases).ToArray();
 tests = tests.Concat(DutyLootServiceTests.Cases).ToArray();

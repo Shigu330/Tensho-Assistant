@@ -45,13 +45,14 @@ internal sealed class DutyCatalogLoader : IDisposable
                     var row = sheet.GetRowAt(position++);
                     if (row.RowId != 0 && row.ContentFinderCondition.RowId != 0)
                     {
-                        var finder = row.ContentFinderCondition.Value;
+                        // R-14 (0.507): a dangling link skips this duty, not the whole catalogue.
+                        if (row.ContentFinderCondition.ValueNullable is not { } finder) continue;
                         var name = finder.Name.ExtractText();
                         // Content is polymorphic: only a reciprocal regular-instance link is accepted.
                         if (finder.ContentLinkType == 1 && finder.Content.RowId == row.RowId
                             && finder.TerritoryType.RowId != 0 && !string.IsNullOrWhiteSpace(name))
                             copied.Add(new(finder.RowId,row.RowId,finder.TerritoryType.RowId,name,
-                                finder.ContentType.Value.Name.ExtractText(),finder.ClassJobLevelRequired,finder.ContentType.Value.Icon));
+                                finder.ContentType.ValueNullable?.Name.ExtractText() ?? "",finder.ClassJobLevelRequired,finder.ContentType.ValueNullable?.Icon ?? 0));
                     }
                     if (Stopwatch.GetElapsedTime(start) >= TimeSpan.FromMilliseconds(2)) break;
                 }

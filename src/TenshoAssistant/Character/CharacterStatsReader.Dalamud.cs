@@ -62,8 +62,14 @@ internal sealed class CharacterStatsReader : IDisposable
                 // Job category, role and level modifiers from the game sheets (ClassJob, ParamGrow; 0.182).
                 var category=(int)job.Value.ClassJobCategory.RowId;var role=(int)job.Value.Role;
                 var modifiers=default(Character.LevelModifiers);
-                if(data is not null && data.GetExcelSheet<ParamGrow>().TryGetRow((uint)player.Level,out var grow))
-                    modifiers=new(StatFormulas.MainOf(player.Level) ?? 0,grow.BaseSpeed,grow.LevelModifier);
+                // R-14 (0.507): ParamGrow only feeds the derived values: its failure leaves them out, not the whole panel, and is logged once.
+                if(data is not null && !paramGrowFailed)
+                    try
+                    {
+                        if(data.GetExcelSheet<ParamGrow>().TryGetRow((uint)player.Level,out var grow))
+                            modifiers=new(StatFormulas.MainOf(player.Level) ?? 0,grow.BaseSpeed,grow.LevelModifier);
+                    }
+                    catch(Exception error){paramGrowFailed=true;log.Warning(error,"ParamGrow unavailable: derived values left out.");}
                 service.Publish(owner, player.CharacterName, job.RowId, job.Value.Name.ExtractText(), player.Level, values,currentGp,maximumGp,category,role,modifiers);
             }
             catch (Exception error)
@@ -73,6 +79,7 @@ internal sealed class CharacterStatsReader : IDisposable
             }
         }
     }
+    private bool paramGrowFailed;
     // The game's Character window, read every frame so the panel follows it when moved.
     private unsafe void ReadWindow()
     {

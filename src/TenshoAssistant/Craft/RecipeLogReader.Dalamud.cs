@@ -38,7 +38,14 @@ public sealed unsafe class RecipeLogReader : IDisposable
         nextRead=now.AddSeconds(10);
         try
         {
-            if((nint)QuestManager.MemberFunctionPointers.IsRecipeComplete==0 || catalog() is not { } recipes)return;
+            // R-14 (0.507): a lost function is logged once, and an old reading is not kept as current.
+            if((nint)QuestManager.MemberFunctionPointers.IsRecipeComplete==0)
+            {
+                Volatile.Write(ref state,null);
+                if(!warned){warned=true;log.Warning("The crafting log cannot be read: function not resolved.");}
+                return;
+            }
+            if(catalog() is not { } recipes)return;
             var crafted=new HashSet<uint>();var total=0;
             foreach(var recipe in recipes.All)
             {
@@ -51,6 +58,7 @@ public sealed unsafe class RecipeLogReader : IDisposable
         catch(Exception error)
         {
             nextRead=now.AddSeconds(30);
+            Volatile.Write(ref state,null);
             if(!warned){warned=true;log.Warning(error,"The crafting log could not be read.");}
         }
     }
