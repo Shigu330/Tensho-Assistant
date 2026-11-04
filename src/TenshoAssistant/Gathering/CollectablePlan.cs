@@ -155,7 +155,8 @@ public static class CollectableAdvisor
         var usualChance=bonuses.IntuitionBase>0 ? Math.Clamp(bonuses.IntuitionBase,0,100)/100m:shownChance;
         // The chance shown is much above the usual one: Collector's Focus is already on for this turn's action.
         var focusOn=shownChance>usualChance*1.4m;
-        var caution=1m-Math.Clamp(bonuses.RiskTolerance,0,100)/100m;
+        // 0.531 (user capture: Safe 65.9 on average, Balanced 70.2, both 40 at worst): a little of the average always counts, so that between two moves with the same floor the better one is taken.
+        var caution=Math.Min(0.99m,1m-Math.Clamp(bonuses.RiskTolerance,0,100)/100m);
         var memo=new Dictionary<(int Value,int Attempts,int Gp,bool Active,bool Focus,bool First,bool Priming),Outcome>();
         // Collecting: the attempts left, and those the GP left can restore on the way, each with its chance of a free one on average.
         Outcome Collecting(int value,int left,int gp)
@@ -227,6 +228,19 @@ public static class CollectableAdvisor
             caution=kept;memo.Clear();
             if(bold.Mean<=0)return new(CollectableMove.Collect,CollectableTier.Below,0,attempts,0,true);
             result=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn);
+        }
+        // 0.531 (user capture): Safe looked at the floor at each roll, so a bolder plan could reach the same final floor with a better average (67.3 against 70.2, both 40). Safe keeps its floor
+        // and takes the boldest search that still holds it.
+        if(bonuses.RiskTolerance<=0)
+        {
+            var floor=result.Worst;var safest=caution;
+            foreach(var step in new[]{0m,0.25m,0.5m,0.75m})
+            {
+                caution=step;memo.Clear();
+                var bolder=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn);
+                if(bolder.Worst>=floor){result=bolder;safest=step;break;}
+            }
+            caution=safest;memo.Clear();
         }
         // 0.482 (user report: Scrutiny not advised): the order of the actions does not change the score, so « no GP now » won the tie and the Scrutiny the plan needs came later. If a bonus action pays at
         // all and costs nothing to do first, it is the move now: it is the plain order to play, and it counts on the very next action.

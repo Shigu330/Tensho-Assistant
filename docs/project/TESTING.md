@@ -711,6 +711,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.531 : description chiffrée des crans** — à voir en jouant
+
+- [ ] Sur un même nœud, chaque icône change la phrase et ses chiffres. Sûr et Équilibré peuvent donner la même chose quand rien ne les sépare.
+- [ ] Sûr n'a plus une moyenne plus basse qu'Équilibré à plancher égal.
+
 **0.529 : trois crans de risque des collectionnables** — à voir en jouant
 
 - [ ] Panneau Collectionnable (0.530) : trois icônes, main, balance, dé ; le nom au survol ; le cran choisi coloré, sa description dessous ; même choix dans Paramètres › Modules › Récolte.

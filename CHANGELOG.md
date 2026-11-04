@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.531.0
+- Rapport de l'utilisateur en jeu (trois captures, « desc ne colle pas au changement ») : la description restait générale alors que les chiffres changeaient. Elle dit maintenant ce que le cran donne sur ce nœud : par exemple « Garde au moins 40 assignats, et vise 70,2 en moyenne ». Elle remplace la ligne « Avec ces coups ».
+- Les captures montraient aussi un défaut : Sûr donnait 65,9 en moyenne et Équilibré 70,2, avec le même plancher de 40. Sûr ne regardait que le plancher. À plancher égal, il prend maintenant la meilleure moyenne.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.531.0.0. Non validé en jeu.
+### English
+- The risk step's description now gives this node's figures. Safe now takes the better average between moves with the same floor.
+
 ## 0.530.0
 - Demande de l'utilisateur (capture : « Tentez votre » coupé) : les crans de risque deviennent trois icônes, le nom dans l'infobulle : une main qui tient un objet (Sûr), une balance (Équilibré, ex-Incertain), un dé (Tentez votre chance). Le cran choisi est coloré.
 - Tests : Gathering478Tests adapté. Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.530.0.0. Non validé en jeu.

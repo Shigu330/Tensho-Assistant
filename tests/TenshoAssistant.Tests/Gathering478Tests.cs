@@ -33,11 +33,15 @@ internal static class Gathering478Tests
             var safe=CollectableAdvisor.Advise(turn,4,herb,gains)!;
             var luck=CollectableAdvisor.Advise(turn,4,herb,gains with {RiskTolerance=100})!;
             var middle=CollectableAdvisor.Advise(turn,4,herb,gains with {RiskTolerance=50})!;
-            Check(safe.Worst>=20,$"Safe: at least what is certain on the capture: {safe}");
+            Check(safe.Worst>=20 && safe.Expected>=safe.Worst,$"Safe: at least what is certain on the capture: {safe}");
             Check(luck.Expected>safe.Expected-0.001m && luck.Worst<=safe.Worst,$"Try your luck: a better average for a lower floor: {luck} against {safe}");
             Check(middle.Expected<=luck.Expected && middle.Worst>=luck.Worst,$"Uncertain, in between: {middle}");
+            // 0.531: the capture at 823 GP: Safe had 65.9 on average and Balanced 70.2, both 40 at worst.
+            var full=gains with {Gp=823};
+            var safeFull=CollectableAdvisor.Advise(turn,4,herb,full)!;var middleFull=CollectableAdvisor.Advise(turn,4,herb,full with {RiskTolerance=50})!;
+            Check(safeFull.Worst>=middleFull.Worst && safeFull.Expected>=middleFull.Expected-0.001m,$"Safe is not worse than Balanced on the same floor: {safeFull} against {middleFull}");
             var panel=Read("MainWindow.CollectablePanel.cs");
-            Check(panel.Contains("if(safeStep)") && panel.Contains("\"CollectablePanel.SafeWould\"") && panel.Contains("if(safeStep && advice.Scrutinies*bonuses.ScrutinyCost"),"one plan on screen");
+            Check(panel.Contains("CollectablePanel.Cap{risk}Now") && panel.Contains("if(safeStep)") && panel.Contains("\"CollectablePanel.SafeWould\"") && panel.Contains("if(safeStep && advice.Scrutinies*bonuses.ScrutinyCost"),"one plan on screen");
             foreach(var language in new[]{"en","fr"})foreach(var cap in CollectableRisk.Caps)
             {
                 var texts=Read($"Localization/Languages/{language}.json");
@@ -297,8 +301,9 @@ internal static class Gathering478Tests
             CollectableAdvice At(int current,int scour,int low,int high,int meticulous,int attempts,int risk)=>CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(current,scour,low,high,meticulous,false))!,attempts,ore,new(RiskTolerance:risk))!;
             var bold=At(650,250,125,375,187,2,100);
             var careful=At(650,250,125,375,187,2,0);
-            Check(bold.Move==CollectableMove.Brazen && careful.Move==CollectableMove.Scour,$"same floor: at 100 the roll, at 0 the sure gain: {bold.Move}, {careful.Move}");
-            Check(careful.Expected==careful.Worst,"a sure line: average and worst are the same");
+            // 0.531: Brazen ends mid tier at worst, like Scour, and high at best: at the same floor Safe takes it too.
+            Check(bold.Move==CollectableMove.Brazen && careful.Move==CollectableMove.Brazen && careful.Worst==bold.Worst,$"same floor, the better average: {bold.Move}, {careful.Move}");
+            Check(careful.Expected>=careful.Worst,"the average is never under the floor");
             Check(bold.Expected>bold.Worst && bold.Worst==7,$"a roll: both are told: {bold}");
             // A gamble: a bad roll loses the tier that was safe.
             var gamble100=At(450,250,125,375,187,2,100);
@@ -306,7 +311,8 @@ internal static class Gathering478Tests
             Check(gamble0.Worst>=gamble100.Worst,$"the careful line never ends lower: {gamble0.Worst} against {gamble100.Worst}");
             Check(gamble0.Expected<=gamble100.Expected,$"the bold line never averages lower: {gamble0.Expected} against {gamble100.Expected}");
             var lucky=At(300,90,45,135,67,2,0);
-            Check(lucky is {Move:CollectableMove.Collect,Impossible:false},$"at 0 no roll is taken, but it is not called impossible: {lucky}");
+            // 0.531: nothing is certain here, so a roll costs nothing on the floor: Safe may take it, and it is not called impossible.
+            Check(lucky is {Impossible:false,Worst:0},$"not called impossible: {lucky}");
             Check(At(300,90,45,135,67,2,100).Move==CollectableMove.Brazen,"at 100 the roll is taken");
             foreach(var risk in new[]{0,25,50,75,100})
             {

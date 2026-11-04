@@ -5471,7 +5471,6 @@
   "CollectablePanel": {
     "RestoreWait": "+1 tentative, {0} PR : attendez un instant, le jeu n'est pas prêt",
     "Working": "Calcul du plan…",
-    "Expected": "Avec ces coups : {0} assignats en moyenne, {1} si tous les tirages tournent mal.",
     "Risk": "Risque accepté",
     "PlanGp": "Ce plan dépense {0} PR sur {1}, il en reste {2}. Les PR regagnés pendant la passe ne sont pas comptés.",
     "Plan": "À coup sûr, sans chance : palier {0} : {1} sélection(s), puis {2} récolte(s) : {3} assignats.",
@@ -5490,6 +5489,9 @@
     "Cap100": "Tentez votre chance",
     "Cap100Tip": "Vise la meilleure moyenne, même si un mauvais tirage peut finir bien plus bas.",
     "SafeWould": "Sur « Sûr », sans chance : {0} assignats garantis.",
+    "Cap0Now": "Garantit {0} assignats quoi qu'il arrive, {1} en moyenne avec les tirages.",
+    "Cap50Now": "Garde au moins {0} assignats, et vise {1} en moyenne.",
+    "Cap100Now": "Vise {1} assignats en moyenne, au risque de finir à {0}.",
     "PlanRestores": "{0} × {1}, {2} PR, à la dernière tentative : de {3} à {4} tentatives.",
     "FocusGain": "{0} PR, Intuition plus probable sur la prochaine action (+{1})",
     "HowLabel": "Comment est-ce calculé ? (survol)",

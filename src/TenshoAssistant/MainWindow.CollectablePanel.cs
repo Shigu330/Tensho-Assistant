@@ -65,7 +65,7 @@ internal sealed partial class MainWindow
 
     // 0.484 (user request): the risk accepted, set here. Applied as the slider moves; saved when it is let go.
     // 0.529 (user request): three steps, each with what it does, shared with the settings.
-    private void DrawCollectableRisk()
+    private void DrawCollectableRisk(CollectableAdvice? advice=null,CollectableRule? rule=null)
     {
         var risk=CollectableRisk.Snap(configuration.CollectableRiskTolerance);
         ImGui.TextDisabled(localization.Get("CollectablePanel.Risk"));
@@ -84,7 +84,8 @@ internal sealed partial class MainWindow
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Get($"CollectablePanel.Cap{cap}")+Environment.NewLine+localization.Get($"CollectablePanel.Cap{cap}Tip"));
         }
         ImGui.PushTextWrapPos(0);
-        try{ImGui.TextDisabled(localization.Get($"CollectablePanel.Cap{risk}Tip"));}
+        // 0.531 (user report: the description did not follow the change): with a plan in hand, what this step gives on this node, in figures.
+        try{ImGui.TextDisabled(advice is {Impossible:false} && rule is {Scrips:true,RewardHigh:>0} ? localization.Format($"CollectablePanel.Cap{risk}Now",advice.Worst.ToString("0.#"),advice.Expected.ToString("0.0")):localization.Get($"CollectablePanel.Cap{risk}Tip"));}
         finally{ImGui.PopTextWrapPos();}
     }
 
@@ -170,7 +171,7 @@ internal sealed partial class MainWindow
             _=>(turn.CollectAction,""),
         };
         var info=CollectableActionInfo?.Invoke(action);
-        DrawCollectableRisk();
+        DrawCollectableRisk(advice,rule);
         ImGui.TextColored(Accent,localization.Get("CollectablePanel.Next"));
         DrawItemIcon(info is { } shown ? new TenshoAssistant.Items.ItemDefinition(0,shown.Name,false,shown.Icon):null,new Vector2(32));
         ImGui.SameLine();
@@ -185,7 +186,6 @@ internal sealed partial class MainWindow
                 if(rule is {Scrips:true,RewardHigh:>0})
                 {
                     ImGui.TextColored(Accent,advice.HighScrips is { } highest ? localization.Format("CollectablePanel.Reference",rule.RewardHigh,highest):localization.Format("CollectablePanel.ReferenceFar",rule.RewardHigh,advice.HighMissing));
-                    ImGui.TextWrapped(localization.Format("CollectablePanel.Expected",advice.Expected.ToString("0.0"),advice.Worst.ToString("0.#")));
                 }
                 // 0.529 (user request): one plan on screen, the one of the chosen step. Only « Safe » follows the plan without luck, so only it lists that plan's actions and GP.
                 var safeStep=CollectableRisk.Snap(configuration.CollectableRiskTolerance)==CollectableRisk.Safe;
