@@ -713,7 +713,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.525 : groupe sur la carte, coût du chargement** — à voir en jouant
 
-- [ ] Membres du groupe sur la carte : déplacement fluide quand ils sont en vue ; à distance, ils glissent entre deux positions ; une téléportation saute d'un coup.
+- [x] (rapport de l'utilisateur, 2026-11-04, « groupe parfait ») Membres du groupe sur la carte : déplacement fluide quand ils sont en vue ; à distance, ils glissent entre deux positions ; une téléportation saute d'un coup.
 - [ ] Après une relance du jeu : l'agent lit les lignes « Load » de dalamud.log, pour le coût d'un vrai démarrage.
 
 **0.524 : Ctrl+Alt actualise le prix survolé** — à voir en jouant
