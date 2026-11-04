@@ -27,7 +27,7 @@ internal sealed partial class MainWindow
         "Level too low for this action." => "CraftMessages.Level",
         "Use of Manipulation not confirmed in the scenario." => "CraftMessages.Manipulation",
         "Action reserved for the first step." => "CraftMessages.FirstTurn",
-        "Quick Innovation needs ten levels more than the recipe." => "CraftMessages.TrainedEye",
+        "Trained Eye needs ten levels more than the recipe." => "CraftMessages.TrainedEye",
         "Action incompatible with Waste Not." => "CraftMessages.WasteNot",
         "Ten stacks of Inner Quiet required." => "CraftMessages.QuietTen",
         "Trained Perfection can be used only once per synthesis." => "CraftMessages.TrainedOnce",

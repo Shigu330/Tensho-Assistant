@@ -25,11 +25,16 @@ public static class RaphaelActions
         return null;
     }
 
-    /// <summary>The actions Raphael may use for these attributes.</summary>
-    public static IReadOnlyList<CraftActionKind> Pool(CraftStats stats,string forbidden)
+    /// <summary>
+    /// The actions Raphael may use for these attributes. Raphael does not know the recipe's level: 0.466 (in-game campaign): Trained Eye, which needs ten levels more than the recipe, is left out
+    /// here, or it gave a first step the game and the simulator refuse. Heart and Soul only serves actions that are not in the pool.
+    /// </summary>
+    public static IReadOnlyList<CraftActionKind> Pool(CraftStats stats,string forbidden,int recipeLevel)
         =>CraftActionCatalog.Specs.Where(spec=>Numbers.ContainsKey(spec.Kind) && spec.Level<=stats.Level
+                && spec.Kind!=CraftActionKind.HeartAndSoul
+                && (spec.Kind!=CraftActionKind.TrainedEye || stats.Level>=recipeLevel+10)
                 && (spec.Kind!=CraftActionKind.Manipulation || stats.ManipulationAllowed)
-                && (spec.Kind is not (CraftActionKind.HeartAndSoul or CraftActionKind.QuickInnovation) || stats.Specialist)
+                && (spec.Kind!=CraftActionKind.QuickInnovation || stats.Specialist)
                 && !CraftSimulation.Random(spec.Kind) && !CraftActionRules.Forbidden(forbidden,spec.Kind))
             .Select(spec=>spec.Kind).ToArray();
 

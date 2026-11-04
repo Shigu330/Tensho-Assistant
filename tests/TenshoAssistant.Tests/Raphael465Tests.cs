@@ -18,14 +18,15 @@ internal static class Raphael465Tests
         }),
         ("Raphael pool: level, Manipulation, specialist, forbidden; nothing left to chance",() =>
         {
-            var high=RaphaelActions.Pool(new CraftStats(100,4000,4000,600,true,true),"");
-            Check(high.Contains(CraftActionKind.Manipulation) && high.Contains(CraftActionKind.HeartAndSoul) && high.Contains(CraftActionKind.QuickInnovation),"all");
+            var high=RaphaelActions.Pool(new CraftStats(100,4000,4000,600,true,true),"",90);
+            Check(high.Contains(CraftActionKind.Manipulation) && high.Contains(CraftActionKind.QuickInnovation) && high.Contains(CraftActionKind.TrainedEye) && !high.Contains(CraftActionKind.HeartAndSoul),"all");
+            Check(!RaphaelActions.Pool(new CraftStats(100,4000,4000,600,true,true),"",91).Contains(CraftActionKind.TrainedEye),"Trained Eye: ten levels above the recipe (in-game report, 0.466)");
             Check(!high.Any(CraftSimulation.Random) && !high.Contains(CraftActionKind.HastyTouch) && !high.Contains(CraftActionKind.RapidSynthesis) && !high.Contains(CraftActionKind.TricksOfTheTrade),"no chance, no condition");
-            var plain=RaphaelActions.Pool(new CraftStats(100,4000,4000,600,false,false),"");
-            Check(!plain.Contains(CraftActionKind.Manipulation) && !plain.Contains(CraftActionKind.HeartAndSoul) && !plain.Contains(CraftActionKind.QuickInnovation),"not learned, no specialist");
-            var low=RaphaelActions.Pool(new CraftStats(10,100,100,100,true,false),"");
+            var plain=RaphaelActions.Pool(new CraftStats(100,4000,4000,600,false,false),"",90);
+            Check(!plain.Contains(CraftActionKind.Manipulation) && !plain.Contains(CraftActionKind.QuickInnovation),"not learned, no specialist");
+            var low=RaphaelActions.Pool(new CraftStats(10,100,100,100,true,false),"",1);
             Check(low.Contains(CraftActionKind.BasicSynthesis) && !low.Contains(CraftActionKind.Byregot),"level");
-            Check(!RaphaelActions.Pool(new CraftStats(100,4000,4000,600,true,true),CraftActionRules.Key(["Veneration"])).Contains(CraftActionKind.Veneration),"forbidden");
+            Check(!RaphaelActions.Pool(new CraftStats(100,4000,4000,600,true,true),CraftActionRules.Key(["Veneration"]),90).Contains(CraftActionKind.Veneration),"forbidden");
         }),
         ("Raphael: unknown action or nothing refused before the simulator; off by default; on a worker; the setting exists in both places; package and credits",() =>
         {

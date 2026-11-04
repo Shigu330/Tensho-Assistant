@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.466.0
+- Raphael en jeu (rapport de l'utilisateur, 01:29) : la recherche échouait, car Raphael ne connaît pas le niveau de la recette et proposait Main preste (Trained Eye) en première action alors qu'il faut dix niveaux de plus que la recette. Le
+  simulateur a refusé la séquence, comme prévu. Cette action n'est plus proposée à Raphael dans ce cas, et Heart and Soul non plus (il ne sert qu'à des actions hors de sa liste). Message d'erreur interne corrigé (il
+  nommait Quick Innovation au lieu de Trained Eye).
+- Tests : Raphael465Tests complété. Verify.ps1 (agent) : 871/871, 0 avertissement, 0 erreur ; DLL 0.466.0.0. Raphael a bien calculé en jeu ; séquence jouée non validée.
+### English
+- Raphael: it does not know the recipe's level and used Trained Eye too low, which the simulator refused: Trained Eye is now left out of its actions unless the job is ten levels above the recipe.
+
 ## 0.465.0
 - A-03 (DEC-028, demande de l'utilisateur) : solveur Raphael en option. Réglage « Solveur : Tensho / Raphael » dans Artisanat › Recherche, et « Utiliser le solveur Raphael » dans Paramètres › Modules ›
   Artisanat ; Tensho reste celui par défaut. Le calcul tourne hors du thread du jeu, annulable, un seul à la fois, avec tous les processeurs sauf deux. Il utilise les mêmes règles que la recherche Tensho :

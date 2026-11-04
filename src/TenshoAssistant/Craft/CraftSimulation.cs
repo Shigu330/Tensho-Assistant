@@ -93,7 +93,7 @@ public static class CraftSimulation
         error=spec is null ? "Action non prise en charge." : stats.Level<spec.Level ? "Level too low for this action."
             : kind==CraftActionKind.Manipulation && !stats.ManipulationAllowed ? "Use of Manipulation not confirmed in the scenario."
             : (kind is CraftActionKind.MuscleMemory or CraftActionKind.Reflect or CraftActionKind.TrainedEye) && state.Step!=0 ? "Action reserved for the first step."
-            : kind==CraftActionKind.TrainedEye && stats.Level<recipeLevel+10 ? "Quick Innovation needs ten levels more than the recipe."
+            : kind==CraftActionKind.TrainedEye && stats.Level<recipeLevel+10 ? "Trained Eye needs ten levels more than the recipe."
             : (kind is CraftActionKind.PrudentSynthesis or CraftActionKind.PrudentTouch) && state.WasteNot>0 ? "Action incompatible with Waste Not."
             : kind==CraftActionKind.TrainedFinesse && state.InnerQuiet!=10 ? "Ten stacks of Inner Quiet required."
             : kind==CraftActionKind.TrainedPerfection && state.UsedTrainedPerfection ? "Trained Perfection can be used only once per synthesis."

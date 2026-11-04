@@ -13,7 +13,7 @@ internal static class RaphaelCraftSolver
     {
         var parameters=recipe.Simulation ?? throw new ArgumentException("Recipe without simulation data.",nameof(recipe));
         var start=CraftSimulation.Run(recipe,stats,startingQuality,[],cancellation);
-        var pool=RaphaelActions.Pool(stats,options.Forbidden).Select(kind=>(Raphael.Action)(byte)RaphaelActions.Number(kind)!.Value).ToArray();
+        var pool=RaphaelActions.Pool(stats,options.Forbidden,recipe.Level).Select(kind=>(Raphael.Action)(byte)RaphaelActions.Number(kind)!.Value).ToArray();
         var config=new SolverConfig{AllowNonMaxQualitySolutions=true,ThreadCount=(ushort)Math.Clamp(Environment.ProcessorCount-2,1,ushort.MaxValue)};
         var input=new SolverInput
         {
