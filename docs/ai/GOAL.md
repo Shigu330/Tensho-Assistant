@@ -1,6 +1,6 @@
 # GOAL actif
 
-ID: FIN-DE-FILE — retour à la campagne de tests en jeu (lots 6 à 10) et aux points ouverts de STATUS. Modèles communautaires (TEMPLATES-001) terminés côté code en 0.476, à valider en jeu ; le chat personnalisable est abandonné ([DEC-030](../project/DECISIONS.md)).
+ID: FIN-DE-FILE — (2026-11-04) campagne guidée close par l'utilisateur, les erreurs se règlent quand il les signale en jouant. Prise en main (ONBOARD-001) codée en 0.502 à 0.506, R-14 fini en 0.507, I-05 et A-04 en 0.508 et 0.509 : tout est à essayer en jeu. Restent : essais, I-15 et N-10 avec une séance en jeu (G-PROPOSALS), dresseur mis de côté, décisions Dalamud (G-PROPOSALS), une release sur demande, D17.
 
 État de la file relu le 2026-11-03, version 0.446.0 :
 

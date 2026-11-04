@@ -109,3 +109,22 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 ## Décision à prendre : ventes des servants (0.508, I-05)
 
 Choix appliqué par défaut : la comparaison avec Universalis se lance seulement sur le bouton du panneau. Autre choix possible : demander une fois à l'ouverture de la liste de ventes, sur réglage. Recommandé : garder le clic, jusqu'à votre avis après un essai.
+
+## À décider avec l'utilisateur (relevé du 2026-11-04)
+
+Règle : une règle Dalamud en jeu demande un résumé et son accord (mémoire, CLAUDE.md).
+
+| Point | Règle | Conseil de l'agent | État |
+|---|---|---|---|
+| Titre selon le job | Pas de requête automatique au serveur sans action directe | Garder pour l'usage personnel, retirer ou passer au clic avant la soumission | Rien ne change sans accord |
+| Conseil en match de Triple Triade | Aucun avantage en contenu compétitif | Vérifier si Tensho peut reconnaître un tournoi et le couper là, sinon demander à l'équipe | Rien ne change sans accord |
+| Panneau du Dédale (DEC-032) | Combat et contenu compétitif | Informations seulement, demander à l'équipe avant la 1.0.0 | Page faite, panneau en attente, dresseur mis de côté |
+
+## Écarts laissés pour une séance en jeu (2026-11-04)
+
+| Point | Pourquoi pas en autonomie | Ce qu'il faudrait |
+|---|---|---|
+| I-15, recherche dans les fenêtres d'inventaire | Passe sur des pointeurs natifs à chaque image, 15 inconnues (numéros d'onglets, noms des grilles de servants, ordre des cases). Coder à l'aveugle peut faire planter le jeu | D'abord une sonde en lecture seule, avec l'utilisateur devant les fenêtres |
+| N-10, atelier de l'île | 16 inconnues (popularité, offre et demande, lecture après ouverture du carnet), conception jamais relue | Une relecture, puis une sonde devant l'agenda de l'île |
+| I-05, suite | Relevé des offres du jeu, vue de tous les servants | Après un essai de la 0.508 |
+| Dresseur, suite | Mis de côté par l'utilisateur | Sonde déjà en place (0.501) |

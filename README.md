@@ -19,9 +19,9 @@ The sidebar groups the pages in foldable categories (`MainWindow.cs`):
 | Items | **Items** (search and item sheet), **Storage**, **Inventory sorting**, **Market** |
 | Production | **Crafting**, **Gathering**, **Ocean fishing**, **Macro chain** |
 | World | **Map**, **Weather**, **Alarms**, **Reminders**, **Free company**, **NPC vendors**, **Duty loot**, **Monster loot** |
-| Progression | **Quests**, **Events**, **Collections** (with Blue magic), **Gear**, **Chocobo**, **Guildleves**, **Hunting log** |
+| Progression | **Quests**, **Events**, **Collections** (with Blue magic), **Gear**, **Chocobo**, **Guildleves**, **Hunting log**, **Beastmaster** |
 | Gold Saucer | **Fashion Report**, **Triple Triad**, **Mini Cactpot** |
-| Preferences | **Settings**, **Credits**, **Diagnostics** (developer mode only) |
+| Preferences | **Help**, **Settings**, **Credits**, **Diagnostics** (developer mode only) |
 
 Chat commands: `/tensho` opens the window; `/tensho fish` (also `fishing`, `peche`, `pêche`) opens or closes the fishing help;
 `/tensho todo <task>` adds a free task to Reminders; `/tensho wiki <item>` and `/tensho lodestone <item>` open the item's page in the
@@ -61,6 +61,7 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
   once opened in game), Characters (one file per character), Crystals, Currencies (caps, weekly tomestones, cap alerts), Gil journal
   (90 days, categorized changes), Report (stacks to merge, armoury pieces used by no gear set, armoire candidates, look-alike glamour
   items), Imports.
+- **Retainer sales**: beside a retainer's sale list, your items and prices as the game shows them; on a click, a comparison with other sellers through Universalis and a price to copy. Nothing is changed in the game.
 - **Inventory sorting**: profiles, templates, rules and protected zones with a preview; the sort is applied only on click.
 - **Market** (Universalis): Summary, Listings (world / data centre / region, quality, quantity and world filters, cheapest set of whole
   listings for N units, tax included) and Sale history; cached on disk, the last known board is shown, dated, when Universalis fails.
@@ -105,6 +106,8 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
   always shown; markers on the map edge for off-view targets, each kind switchable; position marker and view cone; area colours; hide in
   combat or duty; icon sizes and priorities.
 - **Weather**: forecasts by zone.
+- **Help**: a « ? » on every page, a first-visit note, a search across all the help, a first-steps guide you can leave at any step, community videos and guides read on a click, and a form that opens the project's GitHub ticket filled in, in your browser.
+- **Beastmaster**: the beasts with their attributes at a chosen rank, and the boards of the labyrinth with their enemies and bonuses.
 - **Alarms**: Tensho alarms (once at a date, every Eorzea day at an ET time, or at a real local date; weather conditions for fish), chat
   line with links and the game's alarm sound, optional copy into the game's alarm list through `/alarm` (off by default), automatic
   alarms for ventures and vessels, clocks of other time zones, an optional pinned tracking window. Alarm clock in the game's server info
