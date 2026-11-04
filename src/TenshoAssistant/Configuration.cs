@@ -52,7 +52,7 @@ public static class ConfigurationReset
         "CurrencyAlerts", "CurrencyServerBar", "CurrencyThresholds",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
-        "HomeShowTools", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "GameFrames", "AlarmOptions",
+        "HomeShowTools", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
         "Discord", "ThemeMode", "ThemeModeBeforeTool", "GatherPlanFromList", "GpSaveForBonus", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableRiskTolerance", "GatherSecondsBetweenNodes", "GpRegenPerTick", "GpForbiddenActions", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
         // 0.347 (g, I-08): the two shop reminder settings (the notes themselves are saved data, kept by « restore every setting »).
@@ -357,7 +357,6 @@ public sealed partial class Configuration
     // 0.324: Universalis as a whole (Market page, hover prices, preparation cost, data centres); « prices on hover » sits under it.
     public bool CommunityUniversalis { get; set; } = true;
     // 0.332 (step e, ULD): the game's window frame behind the main window; off until it is seen in game (decision kept for the end).
-    public bool GameFrames { get; set; }
     public TenshoAssistant.Alarms.AlarmSettings AlarmOptions { get; set; } = new();
     // R-12 (0.319): Tensho alarms posted to a Discord webhook, off by default; the address is a secret (never logged nor reported).
     public TenshoAssistant.Alarms.DiscordSettings Discord { get; set; } = new();

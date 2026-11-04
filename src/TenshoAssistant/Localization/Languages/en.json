@@ -597,8 +597,7 @@
     "CacheImportedStock": "After this time, retainer and saddlebag stocks are flagged as old (they stay shown).",
     "CacheCraftCalculations": "How long crafting calculations (simulations, rotations) are kept.",
     "AreaColour": "Colour and transparency of these areas on the map (click to choose it).",
-    "ItemSearchLimit": "How many items the search lists at most: Items page, and the item picker of Monster loot and NPC vendors. Higher = a longer list to scroll; beyond it, refine your search (10 to 100).\nDefault: 30.",
-    "GameFrames": "Draws the game's window frame behind Tensho's main window (textures read from the game files). If a texture is missing, for example after a game update, the window keeps its normal look.\nDefault: off."
+    "ItemSearchLimit": "How many items the search lists at most: Items page, and the item picker of Monster loot and NPC vendors. Higher = a longer list to scroll; beyond it, refine your search (10 to 100).\nDefault: 30."
   },
   "Settings": {
     "HelpBanners": "First-visit help on the pages",
@@ -648,8 +647,7 @@
     "MarketScopeTip": "Scope the Market page opens on: your world, data center or region (listings and sales read from Universalis). The choice made on the Market page is saved here too.\nDefault: data center.",
     "ItemSearchLimit": "Maximum item search results (10–100)",
     "DebugLocalization": "Localization diagnostics",
-    "ReloadTranslations": "Reload translations",
-    "GameFrames": "Game window frame"
+    "ReloadTranslations": "Reload translations"
   },
   "Localization": {
     "LoadedLanguages": "{0} languages loaded",
@@ -2411,6 +2409,7 @@
     "FewOwned": "Fewer than 5 confirmed owned cards: no deck to generate."
   },
   "TriadAdvice": {
+    "NotAgainstNpc": "Advice is only given against an NPC, never in a tournament or against a player.",
     "RulesUnknown": "The match rules could not be read: no advice for this move.",
     "NoMatch": "No match observed right now.",
     "Calculating": "Computing the advice…",

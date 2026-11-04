@@ -30,7 +30,7 @@ public readonly record struct TriadRect(float X, float Y, float Width, float Hei
 /// from the TripleTriad sheet (docs/evidence/0.159.0-triad-npc-probe.log) and the slots' screen rectangles.
 /// </summary>
 public sealed record TriadMatchContext(IReadOnlyList<uint> RuleIds, int? ForcedSlot, uint NpcId, IReadOnlyList<uint> NpcFixed,
-    IReadOnlyList<uint> NpcVariable, IReadOnlyList<TriadRect>? BlueRects, IReadOnlyList<TriadRect>? BoardRects, bool RulesKnown = true);
+    IReadOnlyList<uint> NpcVariable, IReadOnlyList<TriadRect>? BlueRects, IReadOnlyList<TriadRect>? BoardRects, bool RulesKnown = true, bool AgainstNpc = true);
 
 /// <summary>A deck saved in the game (GoldSaucerModule.Decks): name and card ids (0 = empty slot).</summary>
 public sealed record TriadGameDeck(int Index, string Name, IReadOnlyList<uint> Cards);

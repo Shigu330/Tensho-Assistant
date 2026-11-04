@@ -324,3 +324,13 @@ Decision: Panneau d'informations pour le Dédale bestial (JcE) : ennemis, action
 Reason: Choix de l'utilisateur, avec le choix recommandé pour la forme. Le JcE n'écarte pas les règles : celle sur le combat vaut aussi en JcE, et les classements peuvent compter comme contenu compétitif.
 Consequences: Contacter l'équipe d'approbation de Dalamud avant la 1.0.0 (issue #31), et retirer le panneau si elle refuse.
 References: docs/evidence/0.500-xbm-columns.md, issue #34
+
+DEC-ID: DEC-033
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: Six décisions ouvertes : release, conseil en match de Triple Triade, moment de la requête des ventes de servants, I-15, N-10, cadre des fenêtres du jeu.
+Evidence: Réponse de l'utilisateur : « Cadre fenêtre jeu à retirer rendu horrible » ; « Conseil que pve » ; « Reste OK je suis toujours au boulot donc pas de jeu ».
+Options: Les conseils de l'agent, ou les changer un par un.
+Decision: Cadre des fenêtres du jeu retiré. Conseils de jeu en JcE seulement : Triple Triade contre un PNJ, jamais en tournoi ni contre un joueur. Reste, conseils de l'agent : release après une session de jeu sur la dernière version ; ventes des servants, Universalis sur clic ; I-15 lors d'une séance en jeu avec l'utilisateur ; N-10 laissé de côté, seulement s'il sert à l'utilisateur.
+Reason: Décision de l'utilisateur.
+Consequences: Les territoires 579, 940 et 941 coupent les conseils (docs/evidence/0.510-triad-competitive.md). Point « Conseil en match » de PUBLISHING traité ; le panneau du Dédale reste à demander à l'équipe avant la 1.0.0.
+References: docs/project/G-PROPOSALS.md, docs/project/PUBLISHING.md, issue #24, issue #31

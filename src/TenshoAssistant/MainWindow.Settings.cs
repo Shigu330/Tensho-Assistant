@@ -99,7 +99,6 @@ internal sealed partial class MainWindow
         DrawLanguageSetting();
         ImGui.TextDisabled(localization.Format("Localization.LoadedLanguages", localization.AvailableLanguages.Count));
         DrawThemeSetting();
-        BoolSetting("Settings.GameFrames","SettingTips.GameFrames",()=>configuration.GameFrames,value=>configuration.GameFrames=value,c=>c.GameFrames);
         ImGui.TextColored(Accent, localization.Get("Settings.ObjectsMarket"));
         ImGui.TextDisabled(localization.Get("Advanced.MarketMoved"));
         // 0.324: shared setting rows (tooltip and « ↺ »). 0.447: « monsters on hover » removed (it no longer did anything).

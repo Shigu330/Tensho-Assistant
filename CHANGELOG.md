@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.510.0
+- Décisions de l'utilisateur (DEC-033). Cadre des fenêtres du jeu retiré, code, réglage et textes (« rendu horrible »).
+- Conseils en JcE seulement : les conseils de match et les estimations de défi de Triple Triade ne valent plus que contre un PNJ, jamais au Battlehall, en tournoi ni contre un joueur. Le panneau le dit. Preuve : docs/evidence/0.510-triad-competitive.md.
+- Tests : TriadMatchAdvisorTests complété, GameFrame332Tests retiré. Verify.ps1 (agent) : 971/971, 0 avertissement, 0 erreur ; DLL 0.510.0.0. Non validé en jeu.
+### English
+- The game window frame option is removed. Triple Triad advice and odds now only apply against an NPC, never in the Battlehall, in a tournament or against a player.
+
 ## 0.509.0
 - A-04 (DEC-028, issue #28), et suite de la remarque de l'utilisateur sur le bon coup selon l'état. « Comparer les prochains coups » conseille un coup, calculé d'après la synthèse telle qu'elle est : chaque coup permis par le jeu est joué sous l'état en cours, puis la suite est cherchée en condition normale. Affichage seulement, rien n'est joué. Hors du thread du jeu, annulé dès que l'état change, avec un réglage. Les actions interdites et les coups à chance ne sont pas proposés.
 - Limites : seul ce coup tient compte de l'état, le combo en cours est pris comme absent, et c'est une recherche limitée, pas une preuve. Le coût réel en jeu n'a pas été mesuré.

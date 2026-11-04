@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
         foreach(var card in frame.BlueHand.Concat(frame.RedHand).Concat(frame.Board))
             text.Append((int)card.Presence).Append(card.Owner).Append(card.Top).Append(card.Right).Append(card.Bottom).Append(card.Left).Append(card.TypeId).Append(',');
         if(frame.Context is { } context)
-            text.Append(context.RulesKnown).Append('|').Append(string.Join('.',context.RuleIds)).Append('|').Append(context.ForcedSlot).Append('|').Append(context.NpcId);
+            text.Append(context.RulesKnown).Append('|').Append(context.AgainstNpc).Append('|').Append(string.Join('.',context.RuleIds)).Append('|').Append(context.ForcedSlot).Append('|').Append(context.NpcId);
         return text.ToString();
     }
     /// <summary>Advice for this frame: starts a solve when the match changed; null while it runs or when it is not the player's turn.</summary>

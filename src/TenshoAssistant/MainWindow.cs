@@ -233,7 +233,6 @@ internal sealed partial class MainWindow : Window, IDisposable
     {
         RememberPage();
         OpenGuideOnce();
-        DrawGameFrame();
         monsterLoot.SelectItem((uint)Math.Max(0,itemId));
         ValidateGpCopy();
         ValidateCraftCopy();

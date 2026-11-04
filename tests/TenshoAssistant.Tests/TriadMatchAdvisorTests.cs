@@ -43,6 +43,16 @@ internal static class TriadMatchAdvisorTests
             var free = TriadMatchAdvisor.Advise(Frame(1,Context(null)),Find,new TriadSolveOptions(Milliseconds:5000));
             Check(free.Problem == TriadAdviceProblem.None && free.All.Select(move => move.HandSlot).Distinct().Count() == 3,"free move: the three cards in hand are ranked");
         }),
+        ("Triad advice: against an NPC only, never in a competitive place (DEC-033)",()=>
+        {
+            Check(TriadMatchAdvisor.Advise(Frame(1,Context(null) with {AgainstNpc=false}),Find).Problem == TriadAdviceProblem.NotAgainstNpc,"a competitive match");
+            Check(TriadMatchAdvisor.Advise(Frame(1,Context(null) with {NpcId=0}),Find).Problem == TriadAdviceProblem.NotAgainstNpc,"no NPC: a player");
+            Check(TriadMatchAdvisor.Advise(Frame(1,Context(null)),Find,new TriadSolveOptions(Milliseconds:5000)).Problem == TriadAdviceProblem.None,"against an NPC, as before");
+            foreach(var place in new uint[]{579,940,941})Check(TriadMatchAdvisor.Competitive(place),"competitive: "+place);
+            Check(!TriadMatchAdvisor.Competitive(144),"the Gold Saucer itself is not");
+            var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MiniGames/TriadObservationReader.Dalamud.cs"));
+            Check(reader.Contains("known, !TriadMatchAdvisor.Competitive(client.TerritoryType)") && reader.Contains("if (TriadMatchAdvisor.Competitive(client.TerritoryType))"),"match and challenge help both follow it");
+        }),
         ("Triad advice: rules not read, or a masked move without its card, give no advice (R-14)",()=>
         {
             Check(TriadMatchAdvisor.Advise(Frame(1,Context(null) with {RulesKnown=false}),Find).Problem == TriadAdviceProblem.RulesUnknown,"rules not read");

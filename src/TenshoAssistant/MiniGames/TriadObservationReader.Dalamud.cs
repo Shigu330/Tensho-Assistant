@@ -176,7 +176,7 @@ internal sealed class TriadObservationReader : IDisposable
         if (phase == 2 && unit->AtkValuesCount > 25 && unit->AtkValues != null && unit->AtkValues[25].Type == AtkValueType.Int) forced = unit->AtkValues[25].Int;
         var target = targetBaseId();
         if (deckNpc == 0 && target != 0) LoadDeck(target);
-        return new(rules, forced, deckNpc, deckFixed, deckVariable, Rects(addon->BlueDeck, unit->Scale), Rects(addon->Board, unit->Scale), known);
+        return new(rules, forced, deckNpc, deckFixed, deckVariable, Rects(addon->BlueDeck, unit->Scale), Rects(addon->Board, unit->Scale), known, !TriadMatchAdvisor.Competitive(client.TerritoryType));
     }
     // 0.491 (R-14): the rule names in their own guard: an unreadable sheet costs the rules, not the whole observation. Tried once.
     private void LoadRuleIds()
@@ -193,6 +193,13 @@ internal sealed class TriadObservationReader : IDisposable
     // Challenge window: rules (values 102–105, TripleTriadRule ids 1–15), NPC deck, window rectangle and the player's saved decks.
     private unsafe void ReadRequest(int ticket, ulong character)
     {
+        // 0.510 (DEC-033): no challenge help in a competitive place, odds included.
+        if (TriadMatchAdvisor.Competitive(client.TerritoryType))
+        {
+            if (service.Request is not null) service.PublishRequest(ticket, character, null);
+            heldRequest = null;
+            return;
+        }
         var handle = gui.GetAddonByName("TripleTriadRequest");
         if (handle.IsNull || !handle.IsReady || !handle.IsVisible || gui.GameUiHidden)
         {

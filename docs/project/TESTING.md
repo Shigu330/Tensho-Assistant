@@ -348,8 +348,6 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape e) — 0.332 : cadre du jeu** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Paramètres › Interface › « Cadre des fenêtres du jeu » coché : le cadre du jeu entoure la fenêtre principale, sans décalage ni
-  texture étirée de façon visible ; décoché : aspect habituel. Dire s'il faut l'activer par défaut et l'étendre (carte, panneaux).
 
 **Étape f) — 0.333 : escouade** — pendant la campagne de tests en jeu de la fin (étape h)
 
@@ -713,6 +711,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
+
+**0.510 : conseils de Triple Triade en JcE seulement** — à voir en jouant
+
+- [ ] Match contre un PNJ : conseils comme avant. Au Battlehall, en tournoi ou contre un joueur : pas de cadre, et le panneau dit pourquoi.
+- [ ] Paramètres › Interface : l'option « Cadre des fenêtres du jeu » n'existe plus.
 
 **0.509 : coup conseillé pendant une synthèse (A-04)** — à voir en jouant
 

@@ -597,8 +597,7 @@
     "CacheImportedStock": "Après cette durée, les stocks des servants et sacoches sont signalés comme anciens (ils restent affichés).",
     "CacheCraftCalculations": "Durée de conservation des calculs d'artisanat (simulations, rotations).",
     "AreaColour": "Couleur et transparence de ces zones sur la carte (cliquez pour la choisir).",
-    "ItemSearchLimit": "Nombre d'objets que la recherche liste au plus : page Objets, et choix de l'objet dans Butin des monstres et PNJ vendeurs. Plus haut = liste plus longue à parcourir ; au-delà, précisez la recherche (10 à 100).\nPar défaut : 30.",
-    "GameFrames": "Dessine derrière la fenêtre principale de Tensho le cadre des fenêtres du jeu (textures lues dans les fichiers du jeu). Si une texture manque, par exemple après une mise à jour du jeu, la fenêtre garde son aspect normal.\nPar défaut : désactivé."
+    "ItemSearchLimit": "Nombre d'objets que la recherche liste au plus : page Objets, et choix de l'objet dans Butin des monstres et PNJ vendeurs. Plus haut = liste plus longue à parcourir ; au-delà, précisez la recherche (10 à 100).\nPar défaut : 30."
   },
   "Settings": {
     "HelpBanners": "Aide à la première visite des pages",
@@ -648,8 +647,7 @@
     "MarketScopeTip": "Portée sur laquelle s'ouvre la page Marché : votre monde, votre centre de données ou votre région (annonces et ventes lues sur Universalis). Le choix fait sur la page Marché est gardé ici aussi.\nPar défaut : centre de données.",
     "ItemSearchLimit": "Résultats maximum de la recherche d'objets (10–100)",
     "DebugLocalization": "Diagnostic de localisation",
-    "ReloadTranslations": "Recharger les traductions",
-    "GameFrames": "Cadre des fenêtres du jeu"
+    "ReloadTranslations": "Recharger les traductions"
   },
   "Localization": {
     "LoadedLanguages": "{0} langues chargées",
@@ -2411,6 +2409,7 @@
     "FewOwned": "Moins de 5 cartes possédées confirmées : pas de deck à générer."
   },
   "TriadAdvice": {
+    "NotAgainstNpc": "Les conseils ne valent que contre un PNJ, jamais en tournoi ni contre un joueur.",
     "RulesUnknown": "Les règles du match n'ont pas pu être lues : pas de conseil pour ce coup.",
     "NoMatch": "Aucun match observé en ce moment.",
     "Calculating": "Calcul du conseil…",

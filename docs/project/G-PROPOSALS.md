@@ -117,7 +117,7 @@ Règle : une règle Dalamud en jeu demande un résumé et son accord (mémoire, 
 | Point | Règle | Conseil de l'agent | État |
 |---|---|---|---|
 | Titre selon le job | Pas de requête automatique au serveur sans action directe | Garder pour l'usage personnel, à revoir avant la soumission | **Décidé le 2026-11-04 : laissé tel quel** (« Laisse comme ça ») ; à revoir pour D17 |
-| Conseil en match de Triple Triade | Aucun avantage en contenu compétitif | Vérifier si Tensho peut reconnaître un tournoi et le couper là, sinon demander à l'équipe | Rien ne change sans accord |
+| Conseil en match de Triple Triade | Aucun avantage en contenu compétitif | Décidé (DEC-033) : contre un PNJ seulement | **Fait en 0.510** |
 | Panneau du Dédale (DEC-032) | Combat et contenu compétitif | Informations seulement, demander à l'équipe avant la 1.0.0 | Page faite, panneau en attente, dresseur mis de côté |
 
 ## Écarts laissés pour une séance en jeu (2026-11-04)
