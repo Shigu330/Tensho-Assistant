@@ -20,6 +20,32 @@ internal sealed partial class MainWindow
     {
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftProjectionUi.Title"),ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextWrapped(localization.Get("CraftProjectionUi.Help"));
+        DrawCraftProjectionBody(state);
+    }
+
+    /// <summary>
+    /// 0.464 (user request, in-game campaign): the projection beside the game's Synthesis window, so it is seen while crafting; off with its setting. Nothing is executed.
+    /// </summary>
+    internal void DrawCraftLivePanel()
+    {
+        if(windowDisposed || !configuration.CraftLivePanel)return;
+        var state=craftLive.State;
+        if(state.Frame is null)return;
+        var addon=gameGui.GetAddonByName("Synthesis");
+        if(addon.IsNull || !addon.IsVisible)return;
+        using var theme=TenshoAssistant.UI.FfxivTheme.Apply();
+        var viewport=ImGui.GetMainViewport();var width=Math.Min(560,viewport.WorkSize.X);var height=Math.Min(460,viewport.WorkSize.Y);
+        var position=viewport.Pos+addon.Position+new Vector2(addon.ScaledWidth+6,0);
+        if(position.X+width>viewport.WorkPos.X+viewport.WorkSize.X)position.X=viewport.Pos.X+addon.Position.X-width-6;
+        position=Vector2.Clamp(position,viewport.WorkPos,Vector2.Max(viewport.WorkPos,viewport.WorkPos+viewport.WorkSize-new Vector2(width,height)));
+        ImGui.SetNextWindowPos(position,ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(width,height),ImGuiCond.Always);
+        var visible=ImGui.Begin(localization.Get("CraftProjectionUi.Title")+"###TenshoCraftLivePanel",ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize);
+        try{if(visible)DrawCraftProjectionBody(state);}
+        finally{ImGui.End();}
+    }
+
+    private void DrawCraftProjectionBody(CraftLiveState state)
+    {
         if(state.Frame is not { } frame || craftActions.State.Catalog is not { } catalog)return;
         var now=DateTimeOffset.UtcNow;
         if(!ReferenceEquals(projectionFrame,frame) || !ReferenceEquals(projectionCatalog,catalog))

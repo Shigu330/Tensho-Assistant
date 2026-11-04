@@ -113,10 +113,27 @@ internal sealed partial class MainWindow
         if(ImGui.SmallButton(localization.Get("CraftSimulation.Live"))) page=Page.CraftLive;
         // 0.424 (user report): « Back to the item » — the recipe's item sheet, Craft tab.
         if(ImGui.SmallButton(localization.Get("CraftSimulation.Notebook"))) { if(simulationRecipe is { } shown)SelectItem(shown.ResultItemId); page=Page.Items; focusCraftTab=true; }
-        // A-05 (0.433): crafting lists, with or without a recipe shown.
-        DrawCraftLists();
         // 0.423 (user report): with no recipe chosen, the item in context's own recipe (its first one) is taken, on Preparation.
         if(simulationRecipe is null && itemId>0 && recipeCatalog.State.Catalog?.ForResult((uint)itemId) is { Count:>0 } own)OpenCraftPreparation(PreferredRecipe(own));
+        // 0.408 (user request): the full preparation (quantities, cost, sub-recipe chain) is a tab of this page; the item sheet keeps
+        // a short view with a link here.
+        // 0.464 (user request, in-game campaign): the crafting list is a tab too, with or without a recipe shown.
+        var preparation=false;var listsTab=false;
+        if(ImGui.BeginTabBar("CraftPageTabs"))
+        {
+            try
+            {
+                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.SimulationTab")+"###CraftSimulationTab",focusCraftPage==CraftPageTab.Simulation ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None))
+                    ImGui.EndTabItem();
+                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.PreparationTab")+"###CraftPreparationTab",focusCraftPage==CraftPageTab.Preparation ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None))
+                { preparation=true; ImGui.EndTabItem(); }
+                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.ListsTab")+"###CraftListsTab"))
+                { listsTab=true; ImGui.EndTabItem(); }
+            }
+            finally { ImGui.EndTabBar(); }
+        }
+        focusCraftPage=CraftPageTab.None;
+        if(listsTab) { DrawCraftLists(); return; }
         if(simulationRecipe is not { } recipe) { ImGui.TextWrapped(localization.Get("CraftSimulation.ChooseRecipe")); return; }
         var resultItem=itemCatalog.State.Catalog?.Find(recipe.ResultItemId);
         DrawItemIcon(resultItem,new Vector2(36)); ImGui.SameLine();
@@ -127,25 +144,9 @@ internal sealed partial class MainWindow
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GameLogs.RecipeTip"));
         // A-12 (0.427): level, Craftsmanship and Control against the recipe; the job's gear set on click.
         DrawCraftReadiness(recipe);
-        // 0.408 (user request): the full preparation (quantities, cost, sub-recipe chain) is a tab of this page; the item sheet keeps
-        // a short view with a link here.
-        var preparation=false;
-        if(ImGui.BeginTabBar("CraftPageTabs"))
-        {
-            try
-            {
-                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.SimulationTab")+"###CraftSimulationTab",focusCraftPage==CraftPageTab.Simulation ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None))
-                    ImGui.EndTabItem();
-                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.PreparationTab")+"###CraftPreparationTab",focusCraftPage==CraftPageTab.Preparation ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None))
-                { preparation=true; ImGui.EndTabItem(); }
-            }
-            finally { ImGui.EndTabBar(); }
-        }
-        focusCraftPage=CraftPageTab.None;
         if(preparation) { DrawCraftPlan(recipe); return; }
         if(CraftSimulation.Unsupported(recipe) is { } unsupported) { ImGui.TextWrapped(CraftMessage(unsupported)); return; }
         if(craftActions.State.Catalog is not { } catalog) { if(craftActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Craft"); else ImGui.TextWrapped(localization.Get("SimulationHelp.Loading")); return; }
-        DrawCraftPresetSave();
         var p=recipe.Simulation!; var job=recipe.CraftTypeId+8;
         if(p.Collectable)ImGui.TextColored(Accent,localization.Get("SimulationHelp.Collectable"));
         // A-07 (0.435): expert recipes simulated in the normal condition, said so.
@@ -155,23 +156,27 @@ internal sealed partial class MainWindow
         var stats=characterStats.State;
         var canCopy=stats.CharacterId!=0 && stats.JobId==job && TenshoAssistant.Caching.CacheAge.Fresh(stats.ObservedAt,DateTimeOffset.UtcNow,TimeSpan.FromSeconds(5))
             && stats.Values.ContainsKey("Craftsmanship") && stats.Values.ContainsKey("Control") && stats.Values.ContainsKey("CraftingPoints");
+        void CopyStats()
+        {
+            simulationLevel=stats.Level; simulationCs=stats.Values["Craftsmanship"]; simulationControl=stats.Values["Control"]; simulationCp=stats.Values["CraftingPoints"];
+            simulationCopiedOwner=stats.CharacterId; simulationCopiedAt=stats.ObservedAt; simulationResult=null; simulationError=null;
+        }
+        DetectCraftState(recipe,job,canCopy,CopyStats);
         ImGui.BeginDisabled(!canCopy);
         try
         {
-            if(ImGui.SmallButton(localization.Get("CraftSimulation.CopyStats")))
-            {
-                simulationLevel=stats.Level; simulationCs=stats.Values["Craftsmanship"]; simulationControl=stats.Values["Control"]; simulationCp=stats.Values["CraftingPoints"];
-                simulationCopiedOwner=stats.CharacterId; simulationCopiedAt=stats.ObservedAt; simulationResult=null; simulationError=null;
-            }
+            if(ImGui.SmallButton(localization.Get("CraftSimulation.CopyStats")))CopyStats();
         }
         finally { ImGui.EndDisabled(); }
+        DrawCraftDetection(canCopy);
         if(simulationCopiedAt is { } copiedAt) ImGui.TextDisabled(localization.Format("SimulationHelp.Copied",copiedAt.ToLocalTime().ToString("T")));
         var changed=false;
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftSimulation.Attributes")+"###SimulationAttributes",ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Level")+"###SimLevel",ref simulationLevel,0); Tip("CraftSimulation.LevelTip");
-            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Craftsmanship")+"###SimCraftsmanship",ref simulationCs,0); Tip("CraftSimulation.CraftsmanshipTip");
-            ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Control")+"###SimControl",ref simulationControl,0); Tip("CraftSimulation.ControlTip");
+            // 0.464 (user request, in-game campaign): green or red against the recipe.
+            changed|=CraftInput(localization.Get("CraftSimulation.Level")+"###SimLevel",ref simulationLevel,simulationLevel>=recipe.Level,"CraftSimulation.LevelTip");
+            changed|=CraftInput(localization.Get("CraftSimulation.Craftsmanship")+"###SimCraftsmanship",ref simulationCs,p.RequiredCraftsmanship>0 ? simulationCs>=p.RequiredCraftsmanship:null,"CraftSimulation.CraftsmanshipTip");
+            changed|=CraftInput(localization.Get("CraftSimulation.Control")+"###SimControl",ref simulationControl,p.RequiredControl>0 ? simulationControl>=p.RequiredControl:null,"CraftSimulation.ControlTip");
             ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Cp")+"###SimCp",ref simulationCp,0); Tip("CraftSimulation.CpTip");
             ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Format("CraftSimulation.StartingQuality",p.MaxStartingQuality)+"###SimQuality",ref simulationQuality,0); Tip("CraftSimulation.StartingQualityTip");
             changed|=ImGui.Checkbox(localization.Get("CraftSimulation.Manipulation")+"###SimManipulation",ref simulationManipulation); Tip("CraftSimulation.ManipulationTip");
@@ -219,6 +224,8 @@ internal sealed partial class MainWindow
                 finally { ImGui.EndTable(); }
             }
         }
+        // 0.464 (user request, in-game campaign): saving the sequence comes after adding its actions.
+        DrawCraftPresetSave();
         ImGui.TextColored(Accent,localization.Format("CraftSequence.Count",simulationActions.Count));
         if(ImGui.SmallButton(localization.Get("CraftSequence.Clear"))) { simulationActions.Clear(); simulationResult=null; simulationError=null; }
         ImGui.SameLine();

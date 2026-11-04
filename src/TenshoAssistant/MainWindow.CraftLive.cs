@@ -14,11 +14,15 @@ internal sealed partial class MainWindow
     private CraftLiveFrame? liveEffectsFrame;
     private CraftActionCatalog? liveEffectsCatalog;
     private CraftEffectObservation? liveEffectsObservation;
+    /// <summary>0.464: the synthesis is read when its setting or its panel asks.</summary>
+    internal static bool CraftLiveWanted(Configuration settings)=>settings.CraftLivePanel || settings.Observations?.GetValueOrDefault("Craft")==true;
+
     private void DrawCraftLive()
     {
         Heading(localization.Get("CraftLiveUi.Title"),localization.Get("CraftLiveUi.Description"));
         var state=craftLive.State;
         DrawToolSettingsLink("CraftLive");
+        BoolSetting("CraftLiveUi.Panel","CraftLiveUi.PanelTip",()=>configuration.CraftLivePanel,value=>{configuration.CraftLivePanel=value;craftLive.SetEnabled(CraftLiveWanted(configuration));},c=>c.CraftLivePanel);
         ImGui.TextWrapped(localization.Get("CraftLiveUi.Help"));
         ImGui.TextUnformatted(state.Status switch {CraftLiveStatusKind.Disabled=>localization.Get("CraftLiveUi.Disabled"),CraftLiveStatusKind.Waiting=>localization.Get("CraftLiveUi.Waiting"),CraftLiveStatusKind.Offline=>localization.Get("CraftLiveUi.Offline"),CraftLiveStatusKind.AddonAbsent=>localization.Get("CraftLiveUi.Absent"),CraftLiveStatusKind.NotReady=>localization.Get("CraftLiveUi.NotReady"),CraftLiveStatusKind.Error=>localization.Get("CraftLiveUi.Error"),_=>localization.Get("CraftLiveUi.Partial")});
         if(developerMode && state.Error is { } error)ImGui.TextWrapped(RawMessage(error));

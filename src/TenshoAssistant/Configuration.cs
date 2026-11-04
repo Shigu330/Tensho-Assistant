@@ -80,7 +80,7 @@ public static class ConfigurationReset
         // 0.447 (X-13): chat channel of the conductor's call.
         "HuntAnnounceChannel",
         // 0.448 (N-08): garden journal reminders.
-        "GardenAlerts", "GardenDetect",
+        "GardenAlerts", "GardenDetect", "CraftLivePanel",
         // 0.403 (g, R-08): GP alert and its threshold.
         "GpAlert", "GpAlertThreshold",
     };
@@ -417,6 +417,8 @@ public sealed partial class Configuration
     public bool GardenAlerts { get; set; } = true;
     // 0.460: plantings noted from the chat.
     public bool GardenDetect { get; set; } = true;
+    // 0.464: the next-action projection beside the game's Synthesis window.
+    public bool CraftLivePanel { get; set; } = true;
     // 0.403 (g, R-08): chat line and sound when a gatherer's GP rises to the threshold (0 = full); off by default.
     public bool GpAlert { get; set; }
     public int GpAlertThreshold { get; set; }

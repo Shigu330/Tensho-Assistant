@@ -3,6 +3,22 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.464.0
+- Retours du lot 5 (2026-11-04) ; le reste du lot est validé par l'utilisateur :
+  - Simulateur : « Conserver la séquence » vient maintenant après « Ajouter une action ».
+  - Détection au lieu des cases à remplir : Manipulation (action apprise), spécialiste (PlayerState.IsMeisterFlag), repas et remède actifs (effets Bien nourri et Médicamenté du
+    personnage, dont le paramètre désigne la ligne ItemFood, plus 10000 si HQ). Une ligne « Détecté » l'affiche, une fois par recette, et les cases restent modifiables. Métier porté : les attributs sont copiés
+    d'office et comptent déjà le repas et le remède, qui ne s'ajoutent donc pas deux fois. Métier non porté : ils sont choisis dans les listes.
+  - Couleurs : niveau, Habileté et Contrôle du simulateur sont en vert ou rouge selon la recette. Le niveau de la ligne de préparation vient aussi du métier porté : il restait gris tant que la lecture des
+    ensembles d'équipement n'avait pas répondu (cause probable, non prouvée).
+  - Artisanat : nouvel onglet « Liste de fabrication » : ingrédients en tableau (icône, requis, en stock, manquant en vert ou rouge), infobulle complète de l'objet au survol.
+  - Synthèse en direct : la projection s'affiche à côté de la fenêtre de synthèse du jeu. Réglage « Projection à côté de la synthèse » (activé), qui suffit à activer la lecture de la synthèse. Rien n'est exécuté.
+- Sonde N-06 enregistrée (docs/evidence/0.463-squadron-probe.log) : les totaux sont bien quatre membres plus le bonus d'entraînement, et l'utilisateur les rapporte conformes au jeu.
+- Tests : Craft464Tests (4 cas) ; un test déjà écrit adapté. Verify.ps1 (agent) : 868/868, 0 avertissement, 0 erreur ; DLL 0.464.0.0. Non validé en jeu.
+### English
+- Simulator: « Save the sequence » after « Add an action »; Manipulation, specialist, active food and medicine are detected; level and attributes in green or red against the recipe.
+- Crafting: a « Crafting list » tab with an ingredient table, icons and the full item tooltip. The next-action projection now shows beside the game's Synthesis window, with its own setting.
+
 ## 0.463.0
 - Coffre de compagnie (retour du lot 3) : la lecture passait depuis 0.462 (cases à quantité 0 confirmées comme cause, la lecture a réussi à 00:54), mais la page Banque refusait de l'afficher : « ordre
   visuel indisponible », car le jeu ne garde pas d'ordre d'affichage pour ce coffre. Il s'affiche comme l'arsenal : onglets puis cases, 35 objets par cadre, gils et cristaux compris.

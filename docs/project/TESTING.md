@@ -714,6 +714,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.464 : retours du lot 5** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Simulateur, métier porté : attributs copiés d'office, ligne « Détecté » juste (repas, remède, Manipulation, spécialiste) ; valeurs en vert ou rouge selon la recette ; « Conserver la séquence » après la palette.
+- [ ] Onglet « Liste de fabrication » : icônes, infobulle complète au survol, manquants en rouge.
+- [ ] Pendant une synthèse : la fenêtre de projection s'ouvre à côté de celle du jeu, se ferme avec elle, et ses chiffres correspondent au résultat de l'action jouée.
+
 **0.462 : retours du lot 3** — pendant la campagne de tests en jeu (étape h)
 
 - [ ] Survol d'une pièce d'équipement : la comparaison est lisible, les statistiques en grille.
@@ -795,7 +801,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
   les colonnes de GcArmyMemberGrow sont mal lues, ou que les affinités ou l'équipement comptent.
 - [x] Choisir la mission de la fenêtre du jeu, puis le jeu d'exigences qui correspond à ses valeurs ; former le groupe proposé dans le
   jeu et comparer ses totaux et le taux de réussite affiché par le jeu avec « ≈ … % ».
-- [ ] « Écrire dans le journal » : copier les lignes « Squadron probe: » du journal de Dalamud dans docs/evidence/ (sonde N-06).
+- [x] « Écrire dans le journal » : copier les lignes « Squadron probe: » du journal de Dalamud dans docs/evidence/ (sonde N-06).
 
 **0.450 : N-14 croisements** — pendant la campagne de tests en jeu de la fin (étape h)
 

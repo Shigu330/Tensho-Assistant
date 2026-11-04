@@ -181,6 +181,14 @@
     "RemoveFailed": "Could not remove this sequence. See the Dalamud log for details."
   },
   "CraftSimulation": {
+    "ListsTab": "Crafting list",
+    "Detected": "Detected: food {0} · medicine {1} · Manipulation {2} · specialist {3}",
+    "DetectedCounted": "The job is worn: the attributes read from the game already hold this food and medicine; the lists below add to them.",
+    "DetectedNone": "none",
+    "DetectedOther": "active, without crafting bonus",
+    "DetectedYes": "yes",
+    "DetectedNo": "no",
+    "DetectedUnknown": "unknown",
     "ExpertNormal": "Expert recipe: every step is simulated in the normal condition. In game, the special conditions (pliant, sturdy, malleable, primed…) change the result.",
     "Specialist": "Specialist",
     "SpecialistTip": "Ticked: the job is a specialist (Careful Observation, Heart and Soul, Quick Innovation, specialist recipes).",
@@ -2034,6 +2042,8 @@
     "SortTip": "Sorts actions by this value (low end of the range), highest first; unknown quality comes after known values, actions that break the synthesis last; ties go to the lowest CP cost."
   },
   "CraftLiveUi": {
+    "Panel": "Projection beside the synthesis",
+    "PanelTip": "While you craft, shows the next-action projection beside the game's Synthesis window. It only reads and shows; nothing is executed.\nDefault: on.",
     "Title": "Current synthesis",
     "Description": "Experimental observation and next-action comparison · read only",
     "Help": "Recipe, resources, effects and action eligibility are copied from the game. Comparison projects one action in ordinary conditions; combo/history remain ranges, and missing or ambiguous tool bonuses are not assumed standard.",
@@ -4962,6 +4972,10 @@
     "Help": "Lowest listing × quantity, minus the purchase cost above; taxes and listing depth not counted."
   },
   "CraftLists": {
+    "ColumnIngredient": "Ingredient",
+    "ColumnRequired": "Required",
+    "ColumnHeld": "Held",
+    "ColumnMissing": "Missing",
     "Title": "Crafting lists",
     "Unavailable": "The lists file cannot be read; it is not written over (see the log).",
     "List": "List",
@@ -4977,7 +4991,6 @@
     "QuantityTip": "Quantity to craft (1 to 999,999).",
     "Remove": "Remove",
     "Ingredients": "Direct ingredients of the whole list",
-    "IngredientRow": "{0} · required {1} · recorded {2} · to complete {3}",
     "Add": "Add to the list « {0} »",
     "AddTip": "Adds this recipe’s item and the quantity to produce to the list chosen in « Crafting lists ».",
     "Added": "Added to « {0} ».",

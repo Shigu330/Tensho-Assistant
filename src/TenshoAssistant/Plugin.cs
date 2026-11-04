@@ -740,13 +740,20 @@ public sealed class Plugin : IDalamudPlugin
                            || foods.GetRowOrDefault(action.Data[1]) is not { } food)continue;
                         var bonuses=food.Params.Where(param=>param.BaseParam.RowId is Craft.CraftConsumables.Craftsmanship or Craft.CraftConsumables.Control or Craft.CraftConsumables.Cp)
                             .Select(param=>new Craft.CraftBonus(param.BaseParam.RowId,param.IsRelative,param.Value,param.Max,param.ValueHQ,param.MaxHQ)).ToArray();
-                        if(bonuses.Length>0)list.Add(new(item.RowId,item.Name.ExtractText(),(uint)action.Data[0]==Craft.CraftConsumables.Medicated,bonuses));
+                        if(bonuses.Length>0)list.Add(new(item.RowId,item.Name.ExtractText(),(uint)action.Data[0]==Craft.CraftConsumables.Medicated,bonuses,action.Data[1]));
                     }
                     return list.OrderByDescending(item=>item.Bonuses.Sum(bonus=>bonus.MaxHq)).ThenBy(item=>item.Name,StringComparer.CurrentCultureIgnoreCase).ToArray();
                 }
                 catch(Exception error){log.Warning(error,"Crafting food and medicine unavailable.");return [];}
             });
             mainWindow.CraftConsumableList=()=>craftConsumables.Value;
+            // 0.464: food, medicine and specialist read from the game for the simulator; a failure leaves them unknown.
+            var craftDetectionWarned=false;
+            mainWindow.CraftDetectedNow=job=>
+            {
+                try{return Craft.CraftDetectionReader.Read(objects,job);}
+                catch(Exception error){if(!craftDetectionWarned){craftDetectionWarned=true;log.Warning(error,"Crafting food, medicine and specialist could not be read (perhaps after a game update).");}return null;}
+            };
             // A-11 (0.421): recipes crafted at least once (QuestManager.IsRecipeComplete), read while a crafting view asks.
             Craft.RecipeLogReader? recipeLog=null;
             registrations.Register(()=>mainWindow.RecipeLog=recipeLog=new Craft.RecipeLogReader(framework,client,log,()=>recipeCatalog.State.Catalog),()=>recipeLog?.Dispose());
@@ -850,7 +857,7 @@ public sealed class Plugin : IDalamudPlugin
             DalamudInventoryReader? inventoryReader = null;
             registrations.Register(() => inventoryReader = new DalamudInventoryReader(inventoryService, inventory, player, client, framework, log),
                 () => inventoryReader?.Dispose());
-            craftLive.SetEnabled(configuration.Observations?.GetValueOrDefault("Craft") == true);
+            craftLive.SetEnabled(MainWindow.CraftLiveWanted(configuration));
             gatheringObservation.SetEnabled(MainWindow.GatheringObservationWanted(configuration));
             cactpotObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Cactpot") == true);
             triadObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Triad") == true);
@@ -926,6 +933,7 @@ public sealed class Plugin : IDalamudPlugin
             ("ItemHover",mainWindow.DrawItemHover),
             ("UndercutClipboard",()=>undercut?.FlushClipboard()),
             ("Cactpot",mainWindow.DrawCactpotOverlay),
+            ("CraftLive",mainWindow.DrawCraftLivePanel),
             ("TaskPanel",mainWindow.DrawTaskPanel),
             ("WearBar",mainWindow.DrawWearBar),
             ("InventorySort",mainWindow.DrawInventorySortButton),

@@ -27,9 +27,10 @@ internal sealed partial class MainWindow
         GearsetSource?.Want();
         var gearsets=GearsetSource?.State;
         var parts=new List<(string Text,bool? Ok)>();
-        int? level=gearsets?.JobLevels.TryGetValue(job,out var known)==true ? known:null;
-        parts.Add((localization.Format("CraftReadiness.Level",recipe.Level,level?.ToString() ?? "?"),level is { } have ? have>=recipe.Level:null));
         var stats=characterStats.State;
+        // 0.464 (in-game campaign): the job worn gives its level too: the gear set reader may not have answered yet, and the line stayed grey.
+        int? level=gearsets?.JobLevels.TryGetValue(job,out var known)==true ? known:stats.JobId==job && stats.Level>0 ? stats.Level:null;
+        parts.Add((localization.Format("CraftReadiness.Level",recipe.Level,level?.ToString() ?? "?"),level is { } have ? have>=recipe.Level:null));
         var worn=stats.JobId==job && stats.Values.ContainsKey("Craftsmanship") && stats.Values.ContainsKey("Control");
         if(p.RequiredCraftsmanship>0)parts.Add((localization.Format("CraftReadiness.Craftsmanship",p.RequiredCraftsmanship,worn ? stats.Values["Craftsmanship"].ToString():"?"),
             worn ? stats.Values["Craftsmanship"]>=p.RequiredCraftsmanship:null));

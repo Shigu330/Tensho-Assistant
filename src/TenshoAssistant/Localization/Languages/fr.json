@@ -181,6 +181,14 @@
     "RemoveFailed": "Impossible de retirer cette séquence. Consultez le journal Dalamud pour les détails."
   },
   "CraftSimulation": {
+    "ListsTab": "Liste de fabrication",
+    "Detected": "Détecté : repas {0} · remède {1} · Manipulation {2} · spécialiste {3}",
+    "DetectedCounted": "Le métier est porté : les attributs lus dans le jeu comptent déjà ce repas et ce remède ; les listes ci-dessous s'y ajoutent.",
+    "DetectedNone": "aucun",
+    "DetectedOther": "actif, sans bonus d'artisanat",
+    "DetectedYes": "oui",
+    "DetectedNo": "non",
+    "DetectedUnknown": "inconnu",
     "ExpertNormal": "Recette experte : chaque étape est simulée en condition normale. En jeu, les conditions spéciales (souple, robuste, malléable, amorcée…) changent le résultat.",
     "Specialist": "Spécialiste",
     "SpecialistTip": "Coché : le métier est spécialiste (Observation méticuleuse, Cœur et âme, Innovation éclair, recettes de spécialiste).",
@@ -2034,6 +2042,8 @@
     "SortTip": "Trie les actions sur cette valeur (bas de l'intervalle), de la plus grande à la plus petite ; une qualité inconnue passe après les connues, les actions qui cassent la synthèse en dernier ; à égalité, la moins chère en PS."
   },
   "CraftLiveUi": {
+    "Panel": "Projection à côté de la synthèse",
+    "PanelTip": "Pendant une synthèse, affiche la projection de la prochaine action à côté de la fenêtre du jeu. Elle ne fait que lire et afficher ; rien n'est exécuté.\nPar défaut : activé.",
     "Title": "Synthèse en cours",
     "Description": "Observation et comparaison expérimentale du prochain coup · lecture seule",
     "Help": "Recette, ressources, effets et disponibilité des actions sont copiés depuis le jeu. La comparaison projette un seul coup dans les conditions ordinaires ; les combos/historiques restent des intervalles, et le bonus d'outil absent ou ambigu n'est pas supposé standard.",
@@ -4962,6 +4972,10 @@
     "Help": "Plus basse annonce × quantité, moins le coût des achats ci-dessus ; taxes et profondeur des offres non comptées."
   },
   "CraftLists": {
+    "ColumnIngredient": "Ingrédient",
+    "ColumnRequired": "Requis",
+    "ColumnHeld": "En stock",
+    "ColumnMissing": "Manquant",
     "Title": "Listes de fabrication",
     "Unavailable": "Le fichier des listes ne peut pas être lu ; il n’est pas écrasé (voir le journal).",
     "List": "Liste",
@@ -4977,7 +4991,6 @@
     "QuantityTip": "Quantité à fabriquer (1 à 999 999).",
     "Remove": "Retirer",
     "Ingredients": "Ingrédients directs de toute la liste",
-    "IngredientRow": "{0} · requis {1} · recensé {2} · à compléter {3}",
     "Add": "Ajouter à la liste « {0} »",
     "AddTip": "Ajoute l’objet de cette recette et la quantité à produire à la liste choisie dans « Listes de fabrication ».",
     "Added": "Ajouté à « {0} ».",

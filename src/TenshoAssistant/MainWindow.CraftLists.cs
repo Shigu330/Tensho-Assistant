@@ -18,7 +18,7 @@ internal sealed partial class MainWindow
 
     private void DrawCraftLists()
     {
-        if(CraftListStore is not { } store || !TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftLists.Title")+"###CraftLists"))return;
+        if(CraftListStore is not { } store)return;
         if(store.Unavailable){ImGui.TextWrapped(localization.Get("CraftLists.Unavailable"));return;}
         var lists=store.Lists;
         craftListIndex=Math.Clamp(craftListIndex,0,Math.Max(0,lists.Count-1));
@@ -56,8 +56,11 @@ internal sealed partial class MainWindow
             try
             {
                 var item=items?.Find(entry.ItemId);
-                DrawItemIcon(item,new Vector2(22));ImGui.SameLine();
+                DrawItemIcon(item,new Vector2(22));
+                if(ImGui.IsItemHovered())DrawItemInfoTooltip(entry.ItemId);
+                ImGui.SameLine();
                 if(ImGui.SmallButton(item?.Name ?? $"ID {entry.ItemId}") && recipes?.ForResult(entry.ItemId) is { Count:>0 } own)OpenCraftPreparation(PreferredRecipe(own));
+                if(ImGui.IsItemHovered())DrawItemInfoTooltip(entry.ItemId);
                 ImGui.SameLine();
                 var quantity=(int)Math.Min(entry.Quantity,int.MaxValue);
                 ImGui.SetNextItemWidth(110);
@@ -73,12 +76,31 @@ internal sealed partial class MainWindow
         var plans=list.Entries.Select(entry=>recipes?.ForResult(entry.ItemId) is { Count:>0 } own ? CraftPlan.Build(PreferredRecipe(own),(int)Math.Min(entry.Quantity,int.MaxValue),GetRecipeHoldings):null)
             .OfType<CraftPlan>().ToArray();
         ImGui.TextColored(Accent,localization.Get("CraftLists.Ingredients"));
-        foreach(var (itemId,required) in CraftLists.Ingredients(plans))
+        // 0.464 (user request, in-game campaign): a table with icons and the full item tooltip.
+        if(ImGui.BeginTable("CraftListIngredients",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))
         {
-            var held=GetRecipeHoldings(itemId);
-            var missing=held.HasObservation ? Math.Max(0,required-held.Total):(long?)null;
-            ImGui.TextDisabled(localization.Format("CraftLists.IngredientRow",items?.Find(itemId)?.Name ?? $"ID {itemId}",required.ToString("N0"),
-                held.HasObservation ? held.Total.ToString("N0"):"?",missing?.ToString("N0") ?? "?"));
+            try
+            {
+                foreach(var column in new[]{"ColumnIngredient","ColumnRequired","ColumnHeld","ColumnMissing"})ImGui.TableSetupColumn(localization.Get("CraftLists."+column));
+                ImGui.TableHeadersRow();
+                foreach(var (itemId,required) in CraftLists.Ingredients(plans))
+                {
+                    var held=GetRecipeHoldings(itemId);
+                    var missing=held.HasObservation ? Math.Max(0,required-held.Total):(long?)null;
+                    var ingredient=items?.Find(itemId);
+                    ImGui.TableNextRow();ImGui.TableNextColumn();
+                    DrawItemIcon(ingredient,new Vector2(24));
+                    if(ImGui.IsItemHovered())DrawItemInfoTooltip(itemId);
+                    ImGui.SameLine();ImGui.TextUnformatted(ingredient?.Name ?? $"ID {itemId}");
+                    if(ImGui.IsItemHovered())DrawItemInfoTooltip(itemId);
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(required.ToString("N0"));
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(held.HasObservation ? held.Total.ToString("N0"):"?");
+                    ImGui.TableNextColumn();
+                    if(missing is { } short_)ImGui.TextColored(short_>0 ? UI.FfxivTheme.Error:UI.FfxivTheme.Success,short_.ToString("N0"));
+                    else ImGui.TextDisabled("?");
+                }
+            }
+            finally{ImGui.EndTable();}
         }
         if(TeamcraftExport.Link(list.Entries.Select(entry=>(entry.ItemId,recipes?.ForResult(entry.ItemId) is { Count:>0 } own ? (uint?)PreferredRecipe(own).RecipeId:null,entry.Quantity))) is { } teamcraft)
         {
