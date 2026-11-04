@@ -816,8 +816,16 @@ public sealed class Plugin : IDalamudPlugin
             Craft.CraftRecorder? craftRecorder=null;
             registrations.Register(()=>mainWindow.CraftRecorder=craftRecorder=new Craft.CraftRecorder(interop,log,()=>craftActions.State.Catalog),()=>craftRecorder?.Dispose());
             // X-11 (0.419): Manipulation learned by the job, from its action row (CraftActionCatalog) and the game's unlock state.
-            mainWindow.ManipulationLearned=job=>craftActions.State.Catalog?.Find(job,Craft.CraftActionKind.Manipulation) is { } manipulation
-                && data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(manipulation.NativeId) is { } action && unlocks.IsActionUnlocked(action);
+            // 0.468: said once by job in the log, so a wrong detection can be told from the action's data.
+            var manipulationLogged=new HashSet<uint>();
+            mainWindow.ManipulationLearned=job=>
+            {
+                if(craftActions.State.Catalog?.Find(job,Craft.CraftActionKind.Manipulation) is not { } manipulation
+                    || data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(manipulation.NativeId) is not { } action)return false;
+                var unlocked=unlocks.IsActionUnlocked(action);
+                if(manipulationLogged.Add(job))log.Information("Manipulation for job {Job}: action {Action}, unlock link {Link}, unlocked {Unlocked}",job,manipulation.NativeId,action.UnlockLink.RowId,unlocked);
+                return unlocked;
+            };
             registrations.Register(()=>craftLogReader=new CraftLogReader(mainWindow.CraftLog,recipeCatalog,configuration,framework,player,client,gameGui,log),()=>craftLogReader?.Dispose());
             FashionHintLoader? fashionLoader=null;
             registrations.Register(()=>fashionLoader=new FashionHintLoader(fashionHints,data,framework,log),()=>fashionLoader?.Dispose());

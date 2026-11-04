@@ -714,6 +714,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.468 : carnet (cible, état, meilleure séquence) et cache de Raphael** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Raphael choisi, carnet : une recette calculée puis re-sélectionnée revient tout de suite, le tampon dit « Cache disque ». Après un changement d'option de macro ou une nouvelle version de la DLL : « Solveur : Raphael (séquence déjà calculée…) ».
+- [ ] Simulateur › Recherche avec Raphael : relancer la même recherche répond tout de suite, avec « déjà calculée » et un bouton « Recalculer ». La séquence calculée dans le carnet y est retrouvée à attributs et cible égaux.
+- [ ] Carnet : « Qualité cible » change le calcul quand on quitte le champ, « Maximum » la remet, elle revient pour cette recette après rechargement. Recette à collectionner : boutons des paliers.
+- [ ] Carnet : la ligne « Lu dans le jeu » donne repas, remède et spécialiste justes ; la case Manipulation et son « détectée : » sont justes pour ce métier. La case corrige le calcul si la détection se trompe (le journal Dalamud donne une ligne `Manipulation for job`).
+- [ ] Carnet : « Enregistrer comme meilleure séquence », puis la séquence apparaît dans la section enregistrée et rien n'est calculé ; une cible plus haute relance la recherche ; « Recalculer » aussi.
+- [ ] Réglages › Modules › Artisanat : la case de la fenêtre « Comparer les prochains coups » ; pendant une synthèse, la croix de la fenêtre la ferme et décoche le réglage.
+
 **0.467 : Raphael dans le carnet** — pendant la campagne de tests en jeu (étape h)
 
 - [ ] Raphael choisi : le panneau du carnet affiche « Solveur : Raphael » et sa proposition ; changer vite de recette n'accumule pas de calculs et le jeu reste fluide ; retour à Tensho : le panneau suit.

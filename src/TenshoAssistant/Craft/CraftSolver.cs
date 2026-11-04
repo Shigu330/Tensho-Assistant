@@ -1,9 +1,9 @@
 namespace TenshoAssistant.Craft;
 
 // 0.438 (user request): Forbidden = the key of the actions the player forbids (CraftActionRules), never used by the search.
-public sealed record CraftSolveOptions(int TargetQuality,int MaxSteps=40,int BeamWidth=128,int MaxExpanded=100000,int ExtraWait=0,int? BuffExtraWait=null,string Forbidden="",bool Raphael=false);
+public sealed record CraftSolveOptions(int TargetQuality,int MaxSteps=40,int BeamWidth=128,int MaxExpanded=100000,int ExtraWait=0,int? BuffExtraWait=null,string Forbidden="",bool Raphael=false,bool Fresh=false);
 public sealed record CraftSolveResult(CraftSimulationResult? Simulation,int TargetQuality,bool TargetReached,int Expanded,int Depth,
-    bool BeamPruned,bool NodeLimitReached,bool DepthLimitReached,int? WaitSeconds=null);
+    bool BeamPruned,bool NodeLimitReached,bool DepthLimitReached,int? WaitSeconds=null,bool FromCache=false);
 
 /// <summary>Deterministic bounded beam search. Failure to find a route does not prove impossibility.</summary>
 public static class CraftSolver

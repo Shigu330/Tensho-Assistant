@@ -10,8 +10,9 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     // A-03 (0.465, DEC-028): Raphael when the search asks for it, otherwise Tensho's own search.
+    // 0.468: its sequences are kept (RaphaelSequenceCache), shared with the crafting log.
     private readonly CraftSolveSession craftSolve=new((input,token)=>input.Options.Raphael
-        ? RaphaelCraftSolver.Solve(input.Recipe,input.Stats,input.StartingQuality,input.Options,token)
+        ? RaphaelSequences.Solve(input.Recipe,input.Stats,input.StartingQuality,input.Options,token)
         :CraftSolver.Solve(input.Recipe,input.Stats,input.StartingQuality,input.Options,token));
     private string? loggedCraftSearchError;
     private CraftSolveInput? craftSolveSignature;
@@ -105,6 +106,13 @@ internal sealed partial class MainWindow
         }
         else loggedCraftSearchError = null;
         if(state.Result is not { } result) return;
+        if(result.FromCache)
+        {
+            ImGui.TextDisabled(localization.Get("CraftSearchResults.FromCache"));ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("CraftSearchResults.Recalculate")) && craftSolveSignature is { } again)
+                _=craftSolve.StartAsync(again with {Revision=craftSolveRevision,Options=again.Options with {Fresh=true}});
+            Tip("CraftSearchResults.RecalculateTip");
+        }
         if(result.WaitSeconds is { } waits)ImGui.TextDisabled(localization.Format("CraftSearchResults.Waits",waits));
         ImGui.TextDisabled(localization.Format("CraftSearchResults.Statistics",result.Expanded,result.Depth,state.CalculatedAt?.ToLocalTime().ToString("T") ?? "—"));
         if(result.BeamPruned) ImGui.TextDisabled(localization.Get("CraftSearch.Pruned"));

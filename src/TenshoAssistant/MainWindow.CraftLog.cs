@@ -15,7 +15,9 @@ internal sealed partial class MainWindow
     private readonly CraftLogObservationService craftLog=new();
     internal CraftLogObservationService CraftLog=>craftLog;
     // 0.467 (user request, in-game campaign): the crafting log follows the solver chosen in the settings.
-    private readonly CraftLogSession craftLogSession=new((input,token)=>CraftLogSession.Build(input,token,RaphaelCraftSolver.Solve));
+    // 0.468: Raphael's sequences are kept (RaphaelSequenceCache), shared with the simulator's search.
+    private static readonly RaphaelSequenceCache RaphaelSequences=new(RaphaelCraftSolver.Solve);
+    private readonly CraftLogSession craftLogSession=new((input,token)=>CraftLogSession.Build(input,token,RaphaelSequences.Solve));
     private string? loggedCraftLogRaphaelError;
     private CraftLogInput? craftLogInput;
     private DateTimeOffset craftLogStableSince;
@@ -24,6 +26,13 @@ internal sealed partial class MainWindow
     // 0.327 (CraftLogAutoSolve off): the character and recipe the player asked a search for; (0, 0) = none (a real one is never 0).
     private (ulong Owner,uint RecipeId) craftLogRequested;
     private string? craftLogOpenError;
+    private readonly Dictionary<uint,bool> craftLogManipulation=[];
+    private CraftDetected? craftLogDetected;
+    private DateTimeOffset craftLogDetectedAt;
+    private uint craftLogDetectedJob;
+    private int craftLogTargetDraft;
+    private bool craftLogTargetEditing;
+    private string? craftLogSaveError;
 
     private void OpenCraftLog(RecipeDefinition recipe)
     {
@@ -50,18 +59,20 @@ internal sealed partial class MainWindow
         var now=DateTimeOffset.UtcNow;var observed=craftLog.Observation;
         if(windowDisposed || !configuration.CraftLogHelperEnabled || observed is null || observed.Revision!=craftLog.Revision || !observed.Fresh(now))
         {ClearCraftLogCalculation();return;}
-        var context=CraftLogContext.Resolve(observed,characterStats.State,recipeCatalog.State.Catalog,now,ManipulationLearned?.Invoke(observed.CurrentJobId)==true);
+        var job=observed.CurrentJobId;var manipulationDetected=ManipulationLearned?.Invoke(job)==true;
+        if(now-craftLogDetectedAt>=TimeSpan.FromSeconds(1) || craftLogDetectedJob!=job){craftLogDetectedAt=now;craftLogDetectedJob=job;craftLogDetected=CraftDetectedNow?.Invoke(job);}
+        var context=CraftLogContext.Resolve(observed,characterStats.State,recipeCatalog.State.Catalog,now,craftLogManipulation.TryGetValue(job,out var chosen) ? chosen:manipulationDetected,craftLogDetected?.Specialist==true);
         var actions=craftActions.State.Catalog;
         var presets=(IReadOnlyList<CraftPreset>?)configuration.CraftPresets ?? Array.Empty<CraftPreset>();
         CraftLogInput? input=context is {Recipe:{ } recipe,Stats:{ } stats} && actions is not null
-            ? new(observed.Owner,recipe,stats,actions,presets,new(recipe.Simulation!.Quality,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,craftMacroBuffWait,craftForbidden,CraftSearchOptions.Raphael),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true):null;
+            ? new(observed.Owner,recipe,stats,actions,presets,new(CraftLogTarget(recipe),craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,craftMacroBuffWait,craftForbidden,CraftSearchOptions.Raphael),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true):null;
         if(input!=craftLogInput)
         {craftLogSession.Cancel();craftLogInput=input;craftLogStableSince=now;craftLogStarted=false;craftLogForceRefresh=false;}
         if(now<craftLogStableSince)craftLogStableSince=now;
         if(CraftLogSession.ShouldStart(input,craftLogStarted,now-craftLogStableSince,configuration.CraftLogAutoSolve,craftLogRequested))
         {craftLogStarted=true;_=craftLogSession.StartAsync(input,craftLogForceRefresh);craftLogForceRefresh=false;}
         using var theme=TenshoAssistant.UI.FfxivTheme.Apply();
-        var viewport=ImGui.GetMainViewport();var width=Math.Min(350,viewport.WorkSize.X);var height=Math.Min(590,viewport.WorkSize.Y);
+        var viewport=ImGui.GetMainViewport();var width=Math.Min(350,viewport.WorkSize.X);var height=Math.Min(680,viewport.WorkSize.Y);
         var position=viewport.Pos+observed.Position+new Vector2(observed.Size.X+6,0);
         if(position.X+width>viewport.WorkPos.X+viewport.WorkSize.X)position.X=viewport.Pos.X+observed.Position.X-width-6;
         position=Vector2.Clamp(position,viewport.WorkPos,Vector2.Max(viewport.WorkPos,viewport.WorkPos+viewport.WorkSize-new Vector2(width,height)));
@@ -79,7 +90,11 @@ internal sealed partial class MainWindow
                 if(selected.Simulation?.Collectable==true)ImGui.TextColored(Accent,localization.Get("CraftLogUi.Collectable"));
                 if(selected.Simulation is { } parameters)ImGui.TextUnformatted(localization.Format("CraftLogUi.Parameters",parameters.Progress.ToString("N0"),parameters.Quality.ToString("N0"),parameters.Durability));
             }
-            if(context.Stats is { } current)ImGui.TextUnformatted(localization.Format("CraftLogUi.Stats",current.Craftsmanship,current.Control,current.Cp,current.Level));
+            if(context.Stats is { } current)
+            {
+                ImGui.TextUnformatted(localization.Format("CraftLogUi.Stats",current.Craftsmanship,current.Control,current.Cp,current.Level));
+                DrawCraftLogState(job,manipulationDetected,current.ManipulationAllowed);
+            }
             if(context.Issue is { } issue)
             {
                 var wrongJob=context.Recipe is { } linked && issue==$"Equip the {linked.CraftType} job to calculate with its attributes.";
@@ -92,6 +107,7 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped(localization.Format("CraftLogUi.Assumptions",context.StartingQuality.ToString("N0"))
                 +(context.Recipe?.Simulation?.Collectable==true ? localization.Get("CraftLogUi.CollectableHelp"):localization.Get("CraftLogUi.NoHq")));
             if(context.Recipe is { } forSimulator && ImGui.SmallButton(localization.Get("CraftLogUi.OpenSimulator"))){OpenCraftSimulation(forSimulator);IsOpen=true;}
+            if(context.Recipe is {Simulation.Quality:>0} aimed)DrawCraftLogTarget(aimed);
             var state=craftLogSession.State;
             if(state.Result is { } solved)
             {
@@ -100,7 +116,8 @@ internal sealed partial class MainWindow
                     if(loggedCraftLogRaphaelError!=raphaelError){loggedCraftLogRaphaelError=raphaelError;log.Warning("Raphael failed for the crafting log, Tensho's search was used: {Reason}",raphaelError);}
                     ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("CraftLogUi.RaphaelFailed"));
                 }
-                else if(solved.UsedRaphael)ImGui.TextDisabled(localization.Get("CraftLogUi.ByRaphael"));
+                else if(solved.UsedRaphael)ImGui.TextDisabled(localization.Get(solved.RaphaelCached ? "CraftLogUi.ByRaphaelKept":"CraftLogUi.ByRaphael"));
+                if(solved.SavedIsEnough)ImGui.TextWrapped(localization.Get("CraftLogUi.SavedIsEnough"));
             }
             // 0.327: with « compute automatically » off, the search waits for this button (« Recalculate » and the plan's « Simulate » also ask).
             var waitsForRequest=!craftLogStarted && CraftLogSession.WaitsForRequest(input,configuration.CraftLogAutoSolve,craftLogRequested);
@@ -115,13 +132,13 @@ internal sealed partial class MainWindow
             if(!waitsForRequest && ImGui.SmallButton(localization.Get("CraftLogUi.Recalculate"))){craftLogSession.Cancel();craftLogStarted=false;craftLogStableSince=now;craftLogForceRefresh=true;if(input is not null)craftLogRequested=(input.Owner,input.Recipe.RecipeId);}
             if(state.Result is not { } result)return;
             DrawCraftLogMacro(localization.Get("CraftLogUi.Saved"),result.Saved,actions);
-            DrawCraftLogMacro(localization.Get("CraftLogUi.Suggested"),result.Suggested,actions);
+            if(!result.SavedIsEnough)DrawCraftLogMacro(localization.Get("CraftLogUi.Suggested"),result.Suggested,actions,true);
             if(result.SearchIssue is { } searchIssue)ImGui.TextWrapped(CraftMessage(searchIssue));
             ImGui.TextWrapped(localization.Get("CraftLogUi.Objective"));
         }
         finally{ImGui.End();}
     }
-    private void DrawCraftLogMacro(string title,CraftLogMacro? macro,CraftActionCatalog catalog)
+    private void DrawCraftLogMacro(string title,CraftLogMacro? macro,CraftActionCatalog catalog,bool canSave=false)
     {
         ImGui.PushID(title);
         try
@@ -152,6 +169,7 @@ internal sealed partial class MainWindow
                 simulationResult=simulation;simulationError=null;macroExportSimulation=simulation;craftMacroExport=macro.Export;craftMacroError=null;
                 craftSolve.Cancel();IsOpen=true;
             }
+            if(canSave)DrawCraftLogSave(craftLogInput.Recipe,macro);
             if(ImGui.TreeNode(localization.Get("CraftLogUi.Text")))
             {
                 try{foreach(var block in macro.Export.Pages)foreach(var line in block.Lines)ImGui.TextUnformatted(line);}
@@ -159,5 +177,77 @@ internal sealed partial class MainWindow
             }
         }
         finally{ImGui.PopID();}
+    }
+    // 0.468 (user request, in-game campaign): what the attributes of the panel's calculation already hold (food, medicine, specialist, read from the game) and whether Manipulation is used;
+    // the box corrects it for this session if the detection is wrong.
+    private void DrawCraftLogState(uint job,bool detected,bool used)
+    {
+        var list=CraftConsumableList?.Invoke();
+        ImGui.TextWrapped(localization.Format("CraftLogUi.State",CraftConsumableName(CraftConsumables.FromStatus(list,craftLogDetected?.Food,false),craftLogDetected?.Food),
+            CraftConsumableName(CraftConsumables.FromStatus(list,craftLogDetected?.Medicine,true),craftLogDetected?.Medicine),CraftYesNo(craftLogDetected?.Specialist)));
+        Tip("CraftLogUi.StateTip");
+        var manipulation=used;
+        if(ImGui.Checkbox(localization.Get("CraftLogUi.Manipulation")+"###CraftLogManipulation",ref manipulation))
+        {
+            if(manipulation==detected)craftLogManipulation.Remove(job);
+            else craftLogManipulation[job]=manipulation;
+        }
+        Tip("CraftLogUi.ManipulationTip");
+        ImGui.SameLine();ImGui.TextDisabled(localization.Format("CraftLogUi.ManipulationDetected",CraftYesNo(detected)));
+    }
+    // 0.468 (user request, in-game campaign): the target of the panel's calculation, kept by recipe; applied once the field is left, so typing does not start a search for each digit.
+    private int CraftLogTarget(RecipeDefinition recipe)
+    {
+        var maximum=recipe.Simulation!.Quality;
+        return configuration.CraftLogTargets?.TryGetValue(recipe.RecipeId,out var target)==true ? Math.Clamp(target,0,maximum):maximum;
+    }
+    private void SetCraftLogTarget(RecipeDefinition recipe,int value)
+    {
+        var maximum=recipe.Simulation!.Quality;var target=Math.Clamp(value,0,maximum);
+        configuration.CraftLogTargets??=[];
+        if(target==maximum)configuration.CraftLogTargets.Remove(recipe.RecipeId);
+        else configuration.CraftLogTargets[recipe.RecipeId]=target;
+        craftLogTargetDraft=target;SaveReminders();
+    }
+    private void DrawCraftLogTarget(RecipeDefinition recipe)
+    {
+        var target=CraftLogTarget(recipe);var maximum=recipe.Simulation!.Quality;
+        if(!craftLogTargetEditing)craftLogTargetDraft=target;
+        ImGui.SetNextItemWidth(90);
+        ImGui.InputInt(localization.Get("CraftSearch.Target")+"###CraftLogTarget",ref craftLogTargetDraft,0);
+        craftLogTargetEditing=ImGui.IsItemActive();
+        Tip("CraftLogUi.TargetTip");
+        if(ImGui.IsItemDeactivatedAfterEdit())SetCraftLogTarget(recipe,craftLogTargetDraft);
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get("CraftLogUi.TargetMaximum")))SetCraftLogTarget(recipe,maximum);
+        if(Collectables?.Catalog?.For(recipe.ResultItemId) is not { Count:>0 } turnIns)return;
+        var rule=turnIns[0];var first=true;
+        foreach(var (labelKey,threshold) in new[]{("CraftSearch.CollectLow",rule.Low),("CraftSearch.CollectMid",rule.Mid),("CraftSearch.CollectHigh",rule.High)})
+        {
+            if(!first)ImGui.SameLine();
+            first=false;
+            var quality=Gathering.Collectables.QualityFor(threshold,maximum);
+            if(ImGui.SmallButton(localization.Format(labelKey,threshold)+"###CraftLog"+labelKey))SetCraftLogTarget(recipe,quality);
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("CraftSearch.CollectTip",threshold,quality));
+        }
+    }
+    // 0.468 (user request, in-game campaign): the suggestion kept as the recipe's best sequence; from then on, while it reaches the target, the panel shows it and computes nothing.
+    private void DrawCraftLogSave(RecipeDefinition recipe,CraftLogMacro macro)
+    {
+        var sequence=macro.Simulation.Steps.Select(step=>step.Action).ToArray();
+        var saved=(IReadOnlyList<CraftPreset>?)configuration.CraftPresets ?? [];
+        if(saved.Any(row=>row is not null && row.RecipeId==recipe.RecipeId && row.Actions.SequenceEqual(sequence))){ImGui.TextDisabled(localization.Get("CraftLogUi.AlreadySaved"));return;}
+        if(ImGui.SmallButton(localization.Get("CraftLogUi.SaveBest")))
+        {
+            try
+            {
+                var name=CraftPresets.UniqueName(saved,recipe.RecipeId,localization.Format("CraftLogUi.BestName",macro.Simulation.Final.Quality));
+                CraftPresets.Commit(configuration,save,source=>CraftPresets.Add(source,CraftPresets.Create(recipe,name,sequence)));
+                craftLogSaveError=null;
+            }
+            catch(Exception error){craftLogSaveError=localization.Get("CraftLogUi.SaveBestError");log.Warning(error,"Could not save the crafting log's sequence.");}
+        }
+        Tip("CraftLogUi.SaveBestTip");
+        if(craftLogSaveError is { } problem)ImGui.TextColored(UI.FfxivTheme.Warning,problem);
     }
 }

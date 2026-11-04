@@ -3,6 +3,19 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.468.0
+- Demandes de l'utilisateur (campagne en jeu), à propos du panneau du carnet et de Raphael.
+- « Raphael ne met pas en cache » : le disque montre que le carnet enregistrait bien ses résultats Raphael (fichiers du 2026-11-04, `UsedRaphael`). Le manque venait d'ailleurs : la recherche du simulateur n'a jamais eu de cache, et la clé du carnet contient la version de la DLL, les options de macro et la liste des séquences enregistrées, donc chaque version recalculait. Correction : `RaphaelSequenceCache` garde les séquences de Raphael sur disque (durée des calculs d'artisanat) selon ce dont Raphael dépend seulement (recette, attributs, qualité de départ, cible, actions interdites), pour le carnet et le simulateur. Une séquence gardée est rejouée dans le simulateur avant usage. « Recalculer » relance vraiment Raphael.
+- Qualité cible dans le panneau, gardée par recette (`CraftLogTargets`), avec « Maximum » et les paliers des objets à collectionner. La qualité ne s'applique qu'à la sortie du champ.
+- Le panneau montre repas, remède et spécialiste lus dans le jeu, et une case Manipulation avec ce qui est détecté. La case vaut jusqu'au rechargement. Spécialiste n'était jamais transmis au calcul du carnet : il l'est. Constat à vérifier en jeu : tous les calculs du 2026-11-04 ont Manipulation à non au niveau 100, d'où une ligne `Manipulation for job` dans le journal.
+- « Enregistrer comme meilleure séquence » sous la proposition. Si une séquence enregistrée termine la synthèse et atteint la cible, rien n'est calculé (« Recalculer » cherche quand même).
+- Fenêtre « Comparer les prochains coups » : réglage aussi dans Réglages › Modules › Artisanat, libellé au nom de la fenêtre, et croix qui décoche le réglage.
+- Tests : Craft468Tests (7). Verify.ps1 (agent) : 879/879, 0 avertissement, 0 erreur ; DLL 0.468.0.0. Non validé en jeu.
+### English
+- Raphael's sequences are now kept on disk for both the crafting log and the simulator's search, independently of the plugin version and macro options, and replayed in the simulator before use.
+- The crafting log panel gains a quality target by recipe, the food, medicine, specialist and Manipulation state, and a button to save the suggestion as the best sequence; a saved sequence reaching the target skips the search.
+- The « Compare next actions » window has a setting under Crafting and a close button that turns it off.
+
 ## 0.467.0
 - Demande de l'utilisateur : le panneau du carnet d'artisanat suit le solveur choisi. Raphael a atteint 12 000/12 000 en 19 actions (rapport en jeu) là où le carnet, avec le solveur Tensho, proposait 7 308/12 000.
   Une ligne « Solveur : Raphael » l'indique. Si Raphael échoue, la recherche Tensho répond, c'est dit dans le panneau et écrit dans le journal, et ce résultat n'est pas gardé en cache. Avec le calcul automatique,

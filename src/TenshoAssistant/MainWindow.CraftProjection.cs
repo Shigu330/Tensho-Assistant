@@ -39,9 +39,12 @@ internal sealed partial class MainWindow
         if(position.X+width>viewport.WorkPos.X+viewport.WorkSize.X)position.X=viewport.Pos.X+addon.Position.X-width-6;
         position=Vector2.Clamp(position,viewport.WorkPos,Vector2.Max(viewport.WorkPos,viewport.WorkPos+viewport.WorkSize-new Vector2(width,height)));
         ImGui.SetNextWindowPos(position,ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(width,height),ImGuiCond.Always);
-        var visible=ImGui.Begin(localization.Get("CraftProjectionUi.Title")+"###TenshoCraftLivePanel",ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize);
+        // 0.468 (user request, in-game campaign): its cross turns its setting off.
+        var open=true;
+        var visible=ImGui.Begin(localization.Get("CraftProjectionUi.Title")+"###TenshoCraftLivePanel",ref open,ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize);
         try{if(visible)DrawCraftProjectionBody(state);}
         finally{ImGui.End();}
+        if(!open){configuration.CraftLivePanel=false;craftLive.SetEnabled(CraftLiveWanted(configuration));SaveReminders();}
     }
 
     private void DrawCraftProjectionBody(CraftLiveState state)

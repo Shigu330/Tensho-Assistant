@@ -7,7 +7,8 @@ public sealed record CraftLogInput(ulong Owner,RecipeDefinition Recipe,CraftStat
     IReadOnlyList<CraftPreset> Presets,CraftSolveOptions Options,int ExtraWait,bool Echo,long ObservationRevision=0,int StartingQuality=0,bool Chain=false,int? BuffExtraWait=null,bool MacroChain=false);
 public sealed record CraftLogMacro(string Name,CraftSimulationResult Simulation,CraftMacroExport Export);
 // 0.467: UsedRaphael = the suggestion comes from Raphael; RaphaelError = it failed and Tensho's search was used instead.
-public sealed record CraftLogResult(CraftLogMacro? Saved,CraftLogMacro? Suggested,bool TargetReached,string? SearchIssue,bool UsedRaphael=false,string? RaphaelError=null);
+// 0.468: RaphaelCached = Raphael's sequence was already kept; SavedIsEnough = the best saved sequence reaches the target, so nothing was computed.
+public sealed record CraftLogResult(CraftLogMacro? Saved,CraftLogMacro? Suggested,bool TargetReached,string? SearchIssue,bool UsedRaphael=false,string? RaphaelError=null,bool RaphaelCached=false,bool SavedIsEnough=false);
 public sealed record CraftLogState(CraftLogInput? Input,bool Loading,CraftLogResult? Result,string? Error,bool FromCache=false,DateTimeOffset? CalculatedAt=null);
 
 public sealed class CraftLogSession : IDisposable
@@ -57,7 +58,7 @@ public sealed class CraftLogSession : IDisposable
                         if(saved is not null && CacheAge.Fresh(saved.RecordedAt,DateTimeOffset.UtcNow,cacheLifetime()) && ValidCached(input,saved.Value))
                         {result=saved.Value;date=saved.RecordedAt;fromCache=true;}
                     }
-                    token.ThrowIfCancellationRequested();if(result is null){result=build(input,token);date=DateTimeOffset.UtcNow;}
+                    token.ThrowIfCancellationRequested();if(result is null){result=build(force ? input with {Options=input.Options with {Fresh=true}}:input,token);date=DateTimeOffset.UtcNow;}
                     lock(gate)if(!disposed && ticket==generation && !token.IsCancellationRequested)
                     {
                         state=new(input,false,result,null,fromCache,date);
@@ -117,6 +118,8 @@ public sealed class CraftLogSession : IDisposable
             }
             catch(ArgumentException){ /* An incompatible saved scenario must not prevent the new search. */ }
         }
+        // 0.468 (user request, in-game campaign): a saved sequence that reaches the target is used as it is; « Recalculate » (Fresh) still searches.
+        if(!input.Options.Fresh && saved is not null && saved.Simulation.Final.Quality>=input.Options.TargetQuality)return new(saved,null,false,null,SavedIsEnough:true);
         var options=input.Options with {ExtraWait=input.ExtraWait,BuffExtraWait=input.BuffExtraWait};
         CraftSolveResult? fromRaphael=null;string? raphaelError=null;
         if(input.Options.Raphael && raphael is not null)
@@ -128,7 +131,7 @@ public sealed class CraftLogSession : IDisposable
             ? new CraftLogMacro("Suggested macro",valid,CraftMacroExporter.Build(valid,job,input.Catalog,input.ExtraWait,input.Echo,input.Chain,input.BuffExtraWait,input.MacroChain)):null;
         token.ThrowIfCancellationRequested();
         return new(saved,suggested,result.TargetReached,suggested is null ? "No finished synthesis found within the search limits."
-            :result.TargetReached ? null:"The sequence ends below the target quality.",fromRaphael is not null,raphaelError);
+            :result.TargetReached ? null:"The sequence ends below the target quality.",fromRaphael is not null,raphaelError,fromRaphael?.FromCache==true);
     }
     private void CancelCore(){generation++;cancellation?.Cancel();state=new(null,false,null,null);}
     public void Cancel(){lock(gate)if(!disposed)CancelCore();}

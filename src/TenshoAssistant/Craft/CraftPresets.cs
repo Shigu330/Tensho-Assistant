@@ -20,6 +20,13 @@ public static class CraftPresets
             throw new InvalidOperationException("This name already exists for this recipe.");
         return Array.AsReadOnly(source.Append(preset with {Actions=Array.AsReadOnly(preset.Actions.ToArray())}).ToArray());
     }
+    /// <summary>0.468: a name not yet used for this recipe (Add refuses a duplicate): the name, then « name (2) » and so on.</summary>
+    public static string UniqueName(IReadOnlyList<CraftPreset> source,uint recipeId,string name)
+    {
+        bool Used(string candidate)=>source.Any(row=>row is not null && row.RecipeId==recipeId && string.Equals(row.Name?.Trim(),candidate.Trim(),StringComparison.OrdinalIgnoreCase));
+        if(!Used(name))return name;
+        for(var number=2;;number++)if($"{name} ({number})" is var candidate && !Used(candidate))return candidate;
+    }
     public static RecipeDefinition? Resolve(CraftPreset? preset,RecipeCatalog? catalog)=>Valid(preset) ? catalog?.ForResult(preset!.ResultItemId).FirstOrDefault(recipe=>recipe.RecipeId==preset.RecipeId && recipe.CraftTypeId==preset.CraftTypeId):null;
     public static IReadOnlyList<CraftPreset> Remove(IReadOnlyList<CraftPreset> source,int index)
     {

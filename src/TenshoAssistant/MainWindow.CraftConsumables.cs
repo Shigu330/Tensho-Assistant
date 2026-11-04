@@ -42,13 +42,14 @@ internal sealed partial class MainWindow
     private void DrawCraftDetection(bool worn)
     {
         var list=CraftConsumableList?.Invoke();
-        string Name((CraftConsumable Item,bool Hq)? consumable,ushort? param)
-            =>consumable is { } known ? known.Item.Name+(known.Hq ? " HQ":""):param is > 0 ? localization.Get("CraftSimulation.DetectedOther"):localization.Get("CraftSimulation.DetectedNone");
-        string YesNo(bool? value)=>localization.Get(value switch{true=>"CraftSimulation.DetectedYes",false=>"CraftSimulation.DetectedNo",null=>"CraftSimulation.DetectedUnknown"});
-        ImGui.TextDisabled(localization.Format("CraftSimulation.Detected",Name(CraftConsumables.FromStatus(list,craftDetected?.Food,false),craftDetected?.Food),
-            Name(CraftConsumables.FromStatus(list,craftDetected?.Medicine,true),craftDetected?.Medicine),YesNo(simulationManipulation),YesNo(craftDetected?.Specialist)));
+        ImGui.TextDisabled(localization.Format("CraftSimulation.Detected",CraftConsumableName(CraftConsumables.FromStatus(list,craftDetected?.Food,false),craftDetected?.Food),
+            CraftConsumableName(CraftConsumables.FromStatus(list,craftDetected?.Medicine,true),craftDetected?.Medicine),CraftYesNo(simulationManipulation),CraftYesNo(craftDetected?.Specialist)));
         if(worn && (craftDetected?.Food is > 0 || craftDetected?.Medicine is > 0))ImGui.TextDisabled(localization.Get("CraftSimulation.DetectedCounted"));
     }
+
+    private string CraftConsumableName((CraftConsumable Item,bool Hq)? consumable,ushort? param)
+        =>consumable is { } known ? known.Item.Name+(known.Hq ? " HQ":""):param is > 0 ? localization.Get("CraftSimulation.DetectedOther"):localization.Get("CraftSimulation.DetectedNone");
+    private string CraftYesNo(bool? value)=>localization.Get(value switch{true=>"CraftSimulation.DetectedYes",false=>"CraftSimulation.DetectedNo",null=>"CraftSimulation.DetectedUnknown"});
 
     private bool CraftInput(string label,ref int value,bool? ok,string tip)
     {

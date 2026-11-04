@@ -74,7 +74,7 @@ internal static class CraftCollectableTests
             var context=CraftLogContext.Resolve(observation,stats,RecipeCatalog.Build([recipe],"fixture"),now);
             Check(context.Issue is null && context.Stats is not null,"same native collector selection guard as ordinary recipe");
             var preset=CraftPresets.Create(recipe,"Collection",[CraftActionKind.Reflect,CraftActionKind.GreatStrides,CraftActionKind.Byregot,CraftActionKind.BasicSynthesis]);
-            var result=CraftLogSession.Build(new(1,recipe,context.Stats!,Catalog(),new[]{preset},new(600,4,64,10000),0,true));
+            var result=CraftLogSession.Build(new(1,recipe,context.Stats!,Catalog(),new[]{preset},new(600,4,64,10000,Fresh:true),0,true));
             Check(result.Saved?.Name=="Collection" && result.Suggested is not null,"helper comparisons and automatic suggestion support collectors together");
         }),
     };

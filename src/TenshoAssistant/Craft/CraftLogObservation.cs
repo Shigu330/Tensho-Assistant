@@ -13,7 +13,7 @@ public sealed record CraftLogOpenRequest(ulong Owner,uint RecipeId,uint ItemId);
 public sealed record CraftLogContext(RecipeDefinition? Recipe,CraftStats? Stats,string? Issue,int StartingQuality=0)
 {
     // X-11 (0.419): manipulation = the job has learned Manipulation (IUnlockState, read by the caller); it used to be always off.
-    public static CraftLogContext Resolve(CraftLogObservation observation,CharacterStatsState stats,RecipeCatalog? catalog,DateTimeOffset now,bool manipulation=false)
+    public static CraftLogContext Resolve(CraftLogObservation observation,CharacterStatsState stats,RecipeCatalog? catalog,DateTimeOffset now,bool manipulation=false,bool specialist=false)
     {
         if(!observation.Fresh(now))return new(null,null,"Crafting log selection too old or invalid.");
         var recipe=catalog?.ForResult(observation.ItemId).FirstOrDefault(row=>row.RecipeId==observation.RecipeId && row.CraftTypeId==observation.CraftTypeId);
@@ -33,7 +33,7 @@ public sealed record CraftLogContext(RecipeDefinition? Recipe,CraftStats? Stats,
             return new(recipe,null,"Crafting attributes incomplete or incompatible.");
         if(cs<recipe.Simulation!.RequiredCraftsmanship || control<recipe.Simulation.RequiredControl)
             return new(recipe,null,"Craftsmanship or control below the recipe's minimum.");
-        return new(recipe,new(stats.Level,cs,control,cp,manipulation),null,starting);
+        return new(recipe,new(stats.Level,cs,control,cp,manipulation,specialist),null,starting);
     }
 }
 

@@ -704,6 +704,9 @@
     "UseHelp": "This replaces the simulator sequence. Inspect the steps and prepare macro text before trying it in game."
   },
   "CraftSearchResults": {
+    "FromCache": "Raphael's sequence computed earlier, replayed in the simulator.",
+    "Recalculate": "Recalculate",
+    "RecalculateTip": "Runs Raphael again instead of using the kept sequence.",
     "Description": "Find a completed synthesis reaching the target under normal conditions. Bounded search across {0} modeled actions: a proposal is not a universal optimum, and no result does not prove impossibility.",
     "Waits": "Planned waits: {0} s · actual duration also depends on latency and pauses between blocks.",
     "Statistics": "{0:N0} transitions examined · depth {1} · calculated at {2} (PC local time)",
@@ -2048,8 +2051,8 @@
     "SortTip": "Sorts actions by this value (low end of the range), highest first; unknown quality comes after known values, actions that break the synthesis last; ties go to the lowest CP cost."
   },
   "CraftLiveUi": {
-    "Panel": "Projection beside the synthesis",
-    "PanelTip": "While you craft, shows the next-action projection beside the game's Synthesis window. It only reads and shows; nothing is executed.\nDefault: on.",
+    "Panel": "« Compare next actions » window beside the synthesis",
+    "PanelTip": "While you craft, shows the next-action projection beside the game's Synthesis window. It only reads and shows; nothing is executed. Its cross turns this setting off.\nDefault: on.",
     "Title": "Current synthesis",
     "Description": "Experimental observation and next-action comparison · read only",
     "Help": "Recipe, resources, effects and action eligibility are copied from the game. Comparison projects one action in ordinary conditions; combo/history remain ranges, and missing or ambiguous tool bonuses are not assumed standard.",
@@ -2808,6 +2811,20 @@
     "ChestWaiting": "The game sends each chest page when you show it: open the five tabs (and the crystals) once, then record."
   },
   "CraftLogUi": {
+    "ByRaphaelKept": "Solver: Raphael (sequence already computed, nothing recalculated)",
+    "State": "Read from the game: food {0} · medicine {1} · specialist {2}",
+    "StateTip": "Read from your character. The attributes above come from the game, so they already count this food and this medicine.",
+    "Manipulation": "Manipulation",
+    "ManipulationTip": "Whether the calculation may use Manipulation. It is ticked when the game says the job has learned it. If that is wrong, change it here: it holds for this job until the plugin is reloaded.",
+    "ManipulationDetected": "detected: {0}",
+    "TargetTip": "Quality to reach, kept for this recipe. It counts once you leave the field. The search stops aiming higher, and a saved sequence reaching it is enough.",
+    "TargetMaximum": "Maximum",
+    "SaveBest": "Save as best sequence",
+    "SaveBestTip": "Keeps this sequence for this recipe. While it finishes the synthesis and reaches the target, this panel shows it and computes nothing; « Recalculate » still searches. Saved sequences are managed in the simulator.",
+    "SaveBestError": "This sequence could not be saved (details in the Dalamud log).",
+    "AlreadySaved": "Already saved for this recipe.",
+    "BestName": "Best sequence, quality {0}",
+    "SavedIsEnough": "The saved sequence reaches the target: nothing was calculated. « Recalculate » searches anyway.",
     "ByRaphael": "Solver: Raphael",
     "RaphaelFailed": "Raphael failed; this suggestion comes from Tensho's search (details in the Dalamud log).",
     "Title": "Tensho · Crafting log",

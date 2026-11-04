@@ -704,6 +704,9 @@
     "UseHelp": "Cela remplace la séquence du simulateur. Inspectez les étapes et préparez les textes de macros avant tout essai en jeu."
   },
   "CraftSearchResults": {
+    "FromCache": "Séquence de Raphael déjà calculée, rejouée dans le simulateur.",
+    "Recalculate": "Recalculer",
+    "RecalculateTip": "Relance Raphael au lieu d'utiliser la séquence gardée.",
     "Description": "Rechercher une synthèse terminée avec la qualité cible en condition normale. Recherche bornée parmi les {0} actions modélisées : une proposition n’est pas un optimum universel et une absence de résultat ne prouve pas l’impossibilité.",
     "Waits": "Attentes planifiées : {0} s · le temps réel dépend aussi de la latence et des pauses entre blocs.",
     "Statistics": "{0:N0} transitions examinées · profondeur {1} · calcul à {2} (heure locale du PC)",
@@ -2048,8 +2051,8 @@
     "SortTip": "Trie les actions sur cette valeur (bas de l'intervalle), de la plus grande à la plus petite ; une qualité inconnue passe après les connues, les actions qui cassent la synthèse en dernier ; à égalité, la moins chère en PS."
   },
   "CraftLiveUi": {
-    "Panel": "Projection à côté de la synthèse",
-    "PanelTip": "Pendant une synthèse, affiche la projection de la prochaine action à côté de la fenêtre du jeu. Elle ne fait que lire et afficher ; rien n'est exécuté.\nPar défaut : activé.",
+    "Panel": "Fenêtre « Comparer les prochains coups » à côté de la synthèse",
+    "PanelTip": "Pendant une synthèse, affiche la projection de la prochaine action à côté de la fenêtre du jeu. Elle ne fait que lire et afficher ; rien n'est exécuté. Sa croix décoche ce réglage.\nPar défaut : activé.",
     "Title": "Synthèse en cours",
     "Description": "Observation et comparaison expérimentale du prochain coup · lecture seule",
     "Help": "Recette, ressources, effets et disponibilité des actions sont copiés depuis le jeu. La comparaison projette un seul coup dans les conditions ordinaires ; les combos/historiques restent des intervalles, et le bonus d'outil absent ou ambigu n'est pas supposé standard.",
@@ -2808,6 +2811,20 @@
     "ChestWaiting": "Le jeu envoie chaque page du coffre quand vous l'affichez : ouvrez les cinq onglets (et les cristaux) une fois, puis enregistrez."
   },
   "CraftLogUi": {
+    "ByRaphaelKept": "Solveur : Raphael (séquence déjà calculée, rien n'a été recalculé)",
+    "State": "Lu dans le jeu : repas {0} · remède {1} · spécialiste {2}",
+    "StateTip": "Lu sur votre personnage. Les attributs ci-dessus viennent du jeu : ils comptent déjà ce repas et ce remède.",
+    "Manipulation": "Manipulation",
+    "ManipulationTip": "Indique si le calcul peut utiliser Manipulation. La case est cochée quand le jeu dit que le métier l'a apprise. Si c'est faux, changez-la ici : le choix vaut pour ce métier jusqu'au rechargement du plugin.",
+    "ManipulationDetected": "détectée : {0}",
+    "TargetTip": "Qualité à atteindre, gardée pour cette recette. Elle compte quand vous quittez le champ. La recherche ne vise pas plus haut, et une séquence enregistrée qui l'atteint suffit.",
+    "TargetMaximum": "Maximum",
+    "SaveBest": "Enregistrer comme meilleure séquence",
+    "SaveBestTip": "Garde cette séquence pour cette recette. Tant qu'elle termine la synthèse et atteint la cible, ce panneau l'affiche et ne calcule rien ; « Recalculer » lance quand même la recherche. Les séquences enregistrées se gèrent dans le simulateur.",
+    "SaveBestError": "Cette séquence n'a pas pu être enregistrée (détail dans le journal de Dalamud).",
+    "AlreadySaved": "Déjà enregistrée pour cette recette.",
+    "BestName": "Meilleure séquence, qualité {0}",
+    "SavedIsEnough": "La séquence enregistrée atteint la cible : rien n'a été calculé. « Recalculer » lance quand même la recherche.",
     "ByRaphael": "Solveur : Raphael",
     "RaphaelFailed": "Raphael a échoué ; cette proposition vient de la recherche Tensho (détail dans le journal de Dalamud).",
     "Title": "Tensho · Carnet de synthèse",
