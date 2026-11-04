@@ -76,6 +76,7 @@ Liste complète et à jour, version par version jusqu'à 0.448 : [TESTING](../pr
   réglages de la carte), langues dans la DLL seule (0.248), alarmes de pêche avec météo (0.253–0.254).
 
 ## Prochaine action
+(2026-11-04) Lot 6 de la campagne (récolte, pêche, harpon, plan de collection) validé en jeu par l'utilisateur sur la 0.489 (« tout est OK »), sauf la galerie de Mes outils, qui attend une release. Suite : lot 7 (carte, chasse, train).
 (2026-11-04) Modèles communautaires ([TEMPLATES-001](../goals/TEMPLATES-001.md)) terminés côté code en 0.476 ; la galerie lit `main`, donc une release la rendra visible. Chat personnalisable abandonné ([DEC-030](../project/DECISIONS.md)). Reprendre la campagne en jeu (lots 6 à 10).
 (relu le 2026-11-03, 0.446) Files a) à g) FAITES (détail : [ROADMAP](../project/ROADMAP.md) « File d'attente », CHANGELOG 0.315–0.446).
 Restent, dans cet ordre proposé :

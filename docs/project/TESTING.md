@@ -114,14 +114,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Pêche (0.232–0.233, 0.252–0.254)**
 
-- [ ] 0.232 — Aide à la pêche (`/tensho peche` ou en pêchant) : une ligne par poisson (stock, ✓/✗), route d'appâts en icônes, touche
+- [x] 0.232 — Aide à la pêche (`/tensho peche` ou en pêchant) : une ligne par poisson (stock, ✓/✗), route d'appâts en icônes, touche
   « ! / !! / !!! » en couleur avec le ferrage abrégé, temps de touche « 9–16 s (12) » en vert quand le chrono est dans l'intervalle ;
   colonne Conditions seulement si un poisson en a ; textes complets en infobulle ; « Sources (i) » ; fenêtre à la largeur du contenu.
-- [ ] 0.233 — Clic droit sur un poisson et sur un appât de l'aide à la pêche, puis sur un appât de « Comment le pêcher » (page
+- [x] 0.233 — Clic droit sur un poisson et sur un appât de l'aide à la pêche, puis sur un appât de « Comment le pêcher » (page
   Récolte) : menu des outils de l'objet (usages, artisanat, marché, butin…), puis ses sources.
-- [ ] 0.252 — Clic droit sur un appât : un seul menu (plus deux superposés). Panneau d'aide à la récolte en jeu : le nom de l'objet a
+- [x] 0.252 — Clic droit sur un appât : un seul menu (plus deux superposés). Panneau d'aide à la récolte en jeu : le nom de l'objet a
   l'infobulle complète et le clic droit.
-- [ ] 0.253–0.254 — Récolte, poisson à créneau ET et météo : bouton alarme présent sur la ligne de pêche ; l'alarme porte la plage ET,
+- [x] 0.253–0.254 — Récolte, poisson à créneau ET et météo : bouton alarme présent sur la ligne de pêche ; l'alarme porte la plage ET,
   la météo et la météo précédente, comme celle de « Comment le pêcher » ; poisson à météo sans plage horaire : une alarme par période
   météo (00, 08, 16 ET). Mineur / botaniste : alarme sur l'horaire seul.
 
@@ -706,40 +706,40 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.391 : X-06 tic de PR** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Page PR › cocher « Barre du tic de PR à l'écran », en mineur avec des PR pas pleins : la barre se remplit en 3 secondes et repart
+- [x] Page PR › cocher « Barre du tic de PR à l'écran », en mineur avec des PR pas pleins : la barre se remplit en 3 secondes et repart
   à chaque gain de PR ; elle disparaît à PR pleins, en combat et sur un autre job.
 
 **Étape g) — 0.392 : R-01 pêche en mer** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
+- [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
 **0.489 : temps d'affichage de la carte** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Mode développeur, carte Tensho ouverte : Diagnostics a une ligne « Map », et elle reste une fois la carte fermée.
+- [x] Mode développeur, carte Tensho ouverte : Diagnostics a une ligne « Map », et elle reste une fois la carte fermée.
 
 **0.488 : clignotement, Raison solide, temps avant le plein** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Panneau Collectionnable : il ne clignote plus au début ni entre deux actions.
-- [ ] Raison solide : conseillée seulement à la dernière tentative, puis le jeu l'accepte. Sinon le panneau dit d'attendre.
-- [ ] Barre de tic : quelques secondes après la remontée des PR, le temps avant le plein correspond à l'attente réelle. Paramètres › Modules › Récolte donne la base mesurée et les traits de chaque métier ; comparer sur deux métiers.
-- [ ] Aides : une action grisée dans la fenêtre du jeu ou non apprise par le métier n'est jamais conseillée (Toucher d'amorçage sous le niveau 95, action de quête non faite).
+- [x] Panneau Collectionnable : il ne clignote plus au début ni entre deux actions.
+- [x] Raison solide : conseillée seulement à la dernière tentative, puis le jeu l'accepte. Sinon le panneau dit d'attendre.
+- [x] Barre de tic : quelques secondes après la remontée des PR, le temps avant le plein correspond à l'attente réelle. Paramètres › Modules › Récolte donne la base mesurée et les traits de chaque métier ; comparer sur deux métiers.
+- [x] Aides : une action grisée dans la fenêtre du jeu ou non apprise par le métier n'est jamais conseillée (Toucher d'amorçage sous le niveau 95, action de quête non faite).
 
 **0.486 : barre de tic** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] La barre se remplit vers les PR pleins, une petite marque dorée défile en bas à chaque tic, le texte donne le temps avant le plein. Comparer ce temps à l'attente réelle. Tant que les PR par tic ne sont pas mesurés, le texte reste « tic dans… ». La bulle donne le prochain tic.
+- [x] La barre se remplit vers les PR pleins, une petite marque dorée défile en bas à chaque tic, le texte donne le temps avant le plein. Comparer ce temps à l'attente réelle. Tant que les PR par tic ne sont pas mesurés, le texte reste « tic dans… ». La bulle donne le prochain tic.
 
 **0.486 : temps d'affichage des panneaux** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Mode développeur, Diagnostics : la section « panneaux à côté du jeu » liste le panneau de récolte, Collectionnable et les autres une fois ouverts, et leurs temps restent après la fermeture (0.487).
+- [x] Mode développeur, Diagnostics : la section « panneaux à côté du jeu » liste le panneau de récolte, Collectionnable et les autres une fois ouverts, et leurs temps restent après la fermeture (0.487).
 
 **0.484 : risque accepté** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Barre de tic : à l'ouverture d'une fenêtre de récolte, après quelques secondes, elle affiche « pause » ; en la quittant, elle repart. Paramètres › Modules › Récolte montre les PR par tic mesurés.
-- [ ] Carte Tensho ouverte, plugin rechargé : elle revient seule, sans M deux fois. Carte du jeu hors combat : pas d'autre effet.
-- [ ] Panneau Collectionnable : « Calcul du plan… » apparaît à peine, le jeu ne se fige pas au changement de curseur.
+- [x] Barre de tic : à l'ouverture d'une fenêtre de récolte, après quelques secondes, elle affiche « pause » ; en la quittant, elle repart. Paramètres › Modules › Récolte montre les PR par tic mesurés.
+- [x] Carte Tensho ouverte, plugin rechargé : elle revient seule, sans M deux fois. Carte du jeu hors combat : pas d'autre effet.
+- [x] Panneau Collectionnable : « Calcul du plan… » apparaît à peine, le jeu ne se fige pas au changement de curseur.
 
-- [ ] Panneau Collectionnable, curseur « Risque accepté » : à 0 %, plus de Sélection instinctive sans nécessité et un « au pire » élevé ; à 100 %, le plan vise la meilleure moyenne. Le réglage reste après rechargement, et existe aussi dans Paramètres › Modules › Récolte.
+- [x] Panneau Collectionnable, curseur « Risque accepté » : à 0 %, plus de Sélection instinctive sans nécessité et un « au pire » élevé ; à 100 %, le plan vise la meilleure moyenne. Le réglage reste après rechargement, et existe aussi dans Paramètres › Modules › Récolte.
 
 **0.483 : Raison solide selon le jeu** — pendant la campagne de tests en jeu (étape h)
 
@@ -747,44 +747,44 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.482 : ordre des actions du plan** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Début de passe avec des PR : Inspection rigoureuse est conseillée d'abord si le plan en a besoin. Le gain affiché est le gain réel, pas celui de la case du jeu.
+- [x] Début de passe avec des PR : Inspection rigoureuse est conseillée d'abord si le plan en a besoin. Le gain affiché est le gain réel, pas celui de la case du jeu.
 
 **0.481 : Inspection, Œil et Intuition comptés** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Cocher une fois « Avec Inspection rigoureuse » et « Avec Intuition » : les deux avertissements disparaissent et le plan change. Les cases peuvent rester cochées, le conseil ne change pas.
-- [ ] Inspection rigoureuse conseillée quand elle rapporte plus ; après usage, l'action suivante n'est pas une deuxième Inspection et le gain affiché la contient.
-- [ ] Œil du collectionneur conseillé quand il rapporte plus ; après usage, le pourcentage d'Intuition du jeu monte et il n'est plus conseillé.
-- [ ] Panneau plus court, méthode dans la bulle de « Comment est-ce calculé ? ».
+- [x] Cocher une fois « Avec Inspection rigoureuse » et « Avec Intuition » : les deux avertissements disparaissent et le plan change. Les cases peuvent rester cochées, le conseil ne change pas.
+- [x] Inspection rigoureuse conseillée quand elle rapporte plus ; après usage, l'action suivante n'est pas une deuxième Inspection et le gain affiché la contient.
+- [x] Œil du collectionneur conseillé quand il rapporte plus ; après usage, le pourcentage d'Intuition du jeu monte et il n'est plus conseillé.
+- [x] Panneau plus court, méthode dans la bulle de « Comment est-ce calculé ? ».
 
 **0.480 : bonus dans le plan de collection** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Cocher « Avec Inspection rigoureuse » puis décocher, même chose pour « Avec Intuition » : les messages disparaissent, le plan ne change pas tant qu'une case reste cochée.
-- [ ] Plan avec Inspection : elle est conseillée seulement si elle rapporte plus ; les PR annoncés sont justes. Une fois utilisée, le gain affiché la contient et le conseil suivant passe à l'action.
-- [ ] Sélection méthodique à 8 % : plus conseillée pour son pourcentage. Comparer les conseils à votre expérience, et me donner les chiffres du panneau si l'un paraît faux.
-- [ ] Plus de plantage en mode collectionnable, y compris à la valeur maximale avec une Sélection méthodique.
-- [ ] Référence affichée : palier haut, assignats, ce qui manque. À la valeur voulue avec des PR restants : Raison solide conseillée pour une récolte de plus, et le jeu l'accepte.
-- [ ] Œil du collectionneur : proposé en option quand une Intuition atteindrait le palier suivant.
-- [ ] Mode développeur : le journal `Collectable window values` contient le pourcentage d'Intuition.
+- [x] Cocher « Avec Inspection rigoureuse » puis décocher, même chose pour « Avec Intuition » : les messages disparaissent, le plan ne change pas tant qu'une case reste cochée.
+- [x] Plan avec Inspection : elle est conseillée seulement si elle rapporte plus ; les PR annoncés sont justes. Une fois utilisée, le gain affiché la contient et le conseil suivant passe à l'action.
+- [x] Sélection méthodique à 8 % : plus conseillée pour son pourcentage. Comparer les conseils à votre expérience, et me donner les chiffres du panneau si l'un paraît faux.
+- [x] Plus de plantage en mode collectionnable, y compris à la valeur maximale avec une Sélection méthodique.
+- [x] Référence affichée : palier haut, assignats, ce qui manque. À la valeur voulue avec des PR restants : Raison solide conseillée pour une récolte de plus, et le jeu l'accepte.
+- [x] Œil du collectionneur : proposé en option quand une Intuition atteindrait le palier suivant.
+- [x] Mode développeur : le journal `Collectable window values` contient le pourcentage d'Intuition.
 
 **0.479 : plan de collection, PR et bonus de nœud** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Fenêtre Collectionnable : barre de collectabilité juste, palier juste, prochaine action avec icône et gain ; le plan se refait après chaque action. Comparer les gains affichés à ceux du jeu.
-- [ ] Plus aucune chance d'atteindre le seuil bas (par exemple 0 avec une seule tentative) : le panneau le dit, sans parler de tirage.
-- [ ] Bien noter si un conseil paraît mauvais, avec les chiffres du panneau.
-- [ ] Liste de fabrication : nœud normal, « récolte simple » et PR gardés ; un nœud avec une tentative ou une quantité de plus : « Bonus majeur », les PR se dépensent. Décocher le réglage redonne le partage égal.
+- [x] Fenêtre Collectionnable : barre de collectabilité juste, palier juste, prochaine action avec icône et gain ; le plan se refait après chaque action. Comparer les gains affichés à ceux du jeu.
+- [x] Plus aucune chance d'atteindre le seuil bas (par exemple 0 avec une seule tentative) : le panneau le dit, sans parler de tirage.
+- [x] Bien noter si un conseil paraît mauvais, avec les chiffres du panneau.
+- [x] Liste de fabrication : nœud normal, « récolte simple » et PR gardés ; un nœud avec une tentative ou une quantité de plus : « Bonus majeur », les PR se dépensent. Décocher le réglage redonne le partage égal.
 
 **0.478 : retours du lot 6, récolte** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Fenêtre Collectionnable sur « Minerai de durium noble collectionnable » : nom complet, seuils 400 / 700 / 1000. Rien à faire de plus. En mode développeur, faire quelques actions : le journal note les valeurs de la fenêtre.
-- [ ] Aide à la récolte : plus de texte coupé ; le nom, puis les taux dessous. Sur un collectionnable : pas de « plan non calculé » mais un message clair.
-- [ ] Récolte › onglet Collectionnables : tableau trié en cliquant sur chaque colonne, dans les deux sens.
-- [ ] Avec une liste de fabrication choisie qui demande un matériau récolté : la ligne « il en manque N, environ X nœuds », le plan réparti. Comparer après quelques nœuds. Les matières d'une recette intermédiaire comptent.
-- [ ] Paramètres › Modules › Récolte : actions interdites jamais proposées (panneau et page PR) ; secondes entre deux nœuds ; PR par tic mesuré sur un nœud quand les PR remontent.
+- [x] Fenêtre Collectionnable sur « Minerai de durium noble collectionnable » : nom complet, seuils 400 / 700 / 1000. Rien à faire de plus. En mode développeur, faire quelques actions : le journal note les valeurs de la fenêtre.
+- [x] Aide à la récolte : plus de texte coupé ; le nom, puis les taux dessous. Sur un collectionnable : pas de « plan non calculé » mais un message clair.
+- [x] Récolte › onglet Collectionnables : tableau trié en cliquant sur chaque colonne, dans les deux sens.
+- [x] Avec une liste de fabrication choisie qui demande un matériau récolté : la ligne « il en manque N, environ X nœuds », le plan réparti. Comparer après quelques nœuds. Les matières d'une recette intermédiaire comptent.
+- [x] Paramètres › Modules › Récolte : actions interdites jamais proposées (panneau et page PR) ; secondes entre deux nœuds ; PR par tic mesuré sur un nœud quand les PR remontent.
 
 **0.476 : thème proposé par un outil** — TEMPLATES-001
 
-- [ ] Éditeur : choisir un thème proposé, enregistrer. Le thème ne change pas tant qu'on n'a pas cliqué « Utiliser le thème… ». Ensuite, en haut de Mes outils, « Revenir au thème d'origine » remet l'ancien (0.477).
-- [ ] Coller un outil avec `"settings":{"theme":"light"}` : l'aperçu le dit. Avec un autre réglage : refusé.
+- [x] Éditeur : choisir un thème proposé, enregistrer. Le thème ne change pas tant qu'on n'a pas cliqué « Utiliser le thème… ». Ensuite, en haut de Mes outils, « Revenir au thème d'origine » remet l'ancien (0.477).
+- [x] Coller un outil avec `"settings":{"theme":"light"}` : l'aperçu le dit. Avec un autre réglage : refusé.
 
 **0.475 : galerie de Mes outils** — TEMPLATES-001
 
@@ -794,22 +794,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.474 : éditeur de Mes outils** — TEMPLATES-001
 
-- [ ] Créer un outil : ajouter chaque type de bloc, monter, descendre, retirer. Enregistrer un outil incomplet donne la raison sans rien perdre.
-- [ ] Bloc d'objets : sélectionner un objet dans la page Objets, revenir, « Ajouter… », régler la quantité.
-- [ ] Modifier un outil installé : les autres langues restent, la progression repart de zéro après enregistrement.
+- [x] Créer un outil : ajouter chaque type de bloc, monter, descendre, retirer. Enregistrer un outil incomplet donne la raison sans rien perdre.
+- [x] Bloc d'objets : sélectionner un objet dans la page Objets, revenir, « Ajouter… », régler la quantité.
+- [x] Modifier un outil installé : les autres langues restent, la progression repart de zéro après enregistrement.
 
 **0.473 : Mes outils (modèles sans code)** — TEMPLATES-001
 
-- [ ] « Mes outils » est juste sous l'accueil. Ajouter un outil : coller un JSON, Vérifier, l'aperçu montre tout, Installer.
-- [ ] Refus avec raison : champ inconnu, type de bloc inconnu, lien http, texte quelconque.
-- [ ] Cases, compteur, minuteurs : cocher, recharger le plugin, l'état revient ; une case quotidienne se décoche à la remise.
-- [ ] Bloc d'objets : icône, bulle, voulu, possédé, manque ; un identifiant inconnu est signalé.
-- [ ] Lien : le clic demande confirmation et montre l'adresse complète. Rien ne s'ouvre sans « Ouvrir ».
-- [ ] Copier pour partager, coller la ligne dans un autre personnage ou après retrait : même outil, progression à zéro.
+- [x] « Mes outils » est juste sous l'accueil. Ajouter un outil : coller un JSON, Vérifier, l'aperçu montre tout, Installer.
+- [x] Refus avec raison : champ inconnu, type de bloc inconnu, lien http, texte quelconque.
+- [x] Cases, compteur, minuteurs : cocher, recharger le plugin, l'état revient ; une case quotidienne se décoche à la remise.
+- [x] Bloc d'objets : icône, bulle, voulu, possédé, manque ; un identifiant inconnu est signalé.
+- [x] Lien : le clic demande confirmation et montre l'adresse complète. Rien ne s'ouvre sans « Ouvrir ».
+- [x] Copier pour partager, coller la ligne dans un autre personnage ou après retrait : même outil, progression à zéro.
 
 **0.470 : liste unique des pages** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Navigation : mêmes groupes, mêmes pages, même ordre qu'avant ; chaque page s'ouvre. Artisanat reste sélectionné sur Synthèse en cours et Séquences, Récolte sur PR, Collection sur Magie bleue. Diagnostics seulement en mode développeur.
+- [x] Navigation : mêmes groupes, mêmes pages, même ordre qu'avant ; chaque page s'ouvre. Artisanat reste sélectionné sur Synthèse en cours et Séquences, Récolte sur PR, Collection sur Magie bleue. Diagnostics seulement en mode développeur.
 
 **0.469 : demande du jour de la Grande Compagnie, icônes du carnet** — pendant la campagne de tests en jeu (étape h)
 
@@ -1094,17 +1094,17 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.418 : R-07 pêche en mer** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Pendant une traversée : le panneau montre l'escale, le moment, les poissons avec appât et touche ; pendant un courant spectral,
+- [x] Pendant une traversée : le panneau montre l'escale, le moment, les poissons avec appât et touche ; pendant un courant spectral,
   le message et les poissons spectraux ; missions avec avancement ; points ; escale suivante. Comparer à l'interface du jeu.
 
 **0.417 : R-15 aide au harpon** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Pêche au harpon : le panneau est à côté de la fenêtre ; pour chaque poisson, la taille et la vitesse ; le bon poisson de la zone
+- [x] Pêche au harpon : le panneau est à côté de la fenêtre ; pour chaque poisson, la taille et la vitesse ; le bon poisson de la zone
   en couleur. Mode développeur : noter la vitesse brute et la comparer à la vitesse affichée (valeurs GatherBuddy 100 à 600).
 
 **0.416 : R-14 liste de récolte par zone** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Artisanat › Préparation d'une recette à plusieurs matières récoltées › « Calculer la chaîne » › « Liste de récolte par zone » :
+- [x] Artisanat › Préparation d'une recette à plusieurs matières récoltées › « Calculer la chaîne » › « Liste de récolte par zone » :
   zones dans l'ordre, une ligne par matière, horaire, « Y aller » ; matières achetées listées à part.
 
 **0.415 : R-13 fenêtre de suivi** — pendant la campagne de tests en jeu de la fin (étape h)
@@ -1119,22 +1119,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.413 : R-11 tableau des collectionnables** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Page Récolte › « Collectionnables » : comparer quelques lignes (seuils, assignats) au marchand d'assignats du jeu ; filtre
+- [x] Page Récolte › « Collectionnables » : comparer quelques lignes (seuils, assignats) au marchand d'assignats du jeu ; filtre
   « Nv 91 » ; clic sur un objet ; vue Récolte d'un objet collectionnable : ses seuils sous son nom.
 
 **0.411 : R-10 équiper le métier** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Fiche d'un objet récolté › lieux : « Équiper Mineur » (ou Botaniste, Pêcheur) porte l'ensemble de ce métier au plus petit numéro ;
+- [x] Fiche d'un objet récolté › lieux : « Équiper Mineur » (ou Botaniste, Pêcheur) porte l'ensemble de ce métier au plus petit numéro ;
   sans ensemble pour ce métier, pas de bouton. 0.412 : réglage « Y aller : équiper aussi le métier » coché, « Y aller » équipe aussi.
 
 **0.410 : R-09 optimiseur PR** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Outil PR et panneau de récolte : avec beaucoup de PR, le plan propose Raison solide (ou Sagesse du fermier) et Vision claire
+- [x] Outil PR et panneau de récolte : avec beaucoup de PR, le plan propose Raison solide (ou Sagesse du fermier) et Vision claire
   quand elles rapportent ; au niveau 90 et plus, la ligne Eurêka s'affiche ; décocher la case de l'outil PR redonne l'ancien plan.
 
 **0.409 : R-06 collectionnables** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Ouvrir la fenêtre Collectionnable sur un point (mineur ou botaniste) : le panneau « Collectionnable » est à côté, avec l'objet,
+- [x] Ouvrir la fenêtre Collectionnable sur un point (mineur ou botaniste) : le panneau « Collectionnable » est à côté, avec l'objet,
   PR et intégrité, les seuils bas/moyen/haut et les assignats par palier comparés au jeu (marchand d'assignats). Mode développeur :
   noter l'index des valeurs brutes qui suit la collectabilité à chaque action (capture), pour l'étape suivante (action conseillée).
 
@@ -1162,12 +1162,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.403 : R-08 alerte PR** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Page PR › cocher « Alerte PR au seuil » (seuil 0) ; dépenser des PR en récolte puis attendre : un message et le son quand les
+- [x] Page PR › cocher « Alerte PR au seuil » (seuil 0) ; dépenser des PR en récolte puis attendre : un message et le son quand les
   PR sont pleins, une seule fois ; seuil 500 : l'alerte vient à 500.
 
 **Étape g) — 0.402 : R-05 carnets** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Page Récolte : les compteurs des carnets sont ceux du jeu (pêche, harpon, récolte) ; un poisson attrapé et un objet récolté ont
+- [x] Page Récolte : les compteurs des carnets sont ceux du jeu (pêche, harpon, récolte) ; un poisson attrapé et un objet récolté ont
   un ✓ ; « Masquer ce qui est déjà au carnet » les cache ; « Copier » et « Enregistrer en CSV » donnent un fichier lisible.
 
 **0.401 : panoramas** — pendant la campagne de tests en jeu de la fin (étape h)
@@ -1182,22 +1182,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.399 : « Y aller » sans question** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Réglages › Modules › Récolte, cocher « Y aller : téléporter tout de suite » : « Y aller » téléporte directement (drapeau posé) ;
+- [x] Réglages › Modules › Récolte, cocher « Y aller : téléporter tout de suite » : « Y aller » téléporte directement (drapeau posé) ;
   vers une zone dont l'éthérite n'est pas harmonisée : la question revient. Décoché : la question habituelle.
 
 **Étape g) — 0.398 : R-04 appât en main** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] En pêcheur, aide à la pêche ouverte : « Appât en main » montre l'appât choisi dans le jeu et son stock ; changer d'appât : la
+- [x] En pêcheur, aide à la pêche ouverte : « Appât en main » montre l'appât choisi dans le jeu et son stock ; changer d'appât : la
   ligne et les cadres verts suivent (confirme que FishingBait est l'objet).
 
 **Étape g) — 0.397 : R-03 « Y aller »** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Fiche d'un objet de récolte, « Y aller » sur un lieu : le drapeau se pose sur le point, la carte Tensho s'ouvre dessus et propose
+- [x] Fiche d'un objet de récolte, « Y aller » sur un lieu : le drapeau se pose sur le point, la carte Tensho s'ouvre dessus et propose
   l'éthérite la plus proche avec son coût ; « Oui » téléporte, « Non » ne fait rien. Même essai sur un lieu de pêche.
 
 **Étape g) — 0.396 : R-02 fenêtres des poissons** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Fiche d'un gros poisson à météo (par exemple un poisson légendaire) : « Prochaines fenêtres » donne des heures où la page Météo
+- [x] Fiche d'un gros poisson à météo (par exemple un poisson légendaire) : « Prochaines fenêtres » donne des heures où la page Météo
   montre bien la bonne météo et la bonne météo précédente, dans la bonne plage ET ; une alarme sonne au début d'une fenêtre.
 
 **0.395 : grimoire trié par niveau de monstre** — pendant la campagne de tests en jeu de la fin (étape h)
