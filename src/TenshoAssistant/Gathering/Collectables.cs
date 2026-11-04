@@ -9,9 +9,23 @@ namespace TenshoAssistant.Gathering;
 /// RewardType is 1 (scrip exchanges; RewardType 2 shops give items). The scrip's kind (Currency column) is not mapped: unknown, not shown.
 /// Evidence: docs/evidence/0.409-collectables.md.
 /// </summary>
-public sealed record CollectableRule(uint ItemId,string Name,int LevelMin,int LevelMax,int Low,int Mid,int High,int RewardLow,int RewardMid,int RewardHigh,bool Scrips,string Group="");
+public sealed record CollectableRule(uint ItemId,string Name,int LevelMin,int LevelMax,int Low,int Mid,int High,int RewardLow,int RewardMid,int RewardHigh,bool Scrips,string Group="",int ScripKind=-1);
 
 public enum CollectableTier { Below, Low, Mid, High }
+
+/// <summary>0.523 (user report): which of a node's collectables pays the most, at the high tier. Only between items of the same kind of scrip (the sheet's Currency column): the kinds are not worth the same, and their names are not known here.</summary>
+public static class CollectableChoice
+{
+    public static bool MixedKinds(IEnumerable<CollectableRule> rules)=>rules.Select(rule=>rule.ScripKind).Distinct().Count()>1;
+    /// <summary>The item, or null: fewer than two items, a tie, or different kinds.</summary>
+    public static uint? Best(IReadOnlyCollection<CollectableRule> rules)
+    {
+        if(rules.Count<2 || MixedKinds(rules))return null;
+        var top=rules.Max(rule=>rule.RewardHigh);
+        var best=rules.Where(rule=>rule.RewardHigh==top).Select(rule=>rule.ItemId).Distinct().ToArray();
+        return top>0 && best.Length==1 ? best[0]:null;
+    }
+}
 
 public sealed class CollectableCatalog
 {

@@ -970,6 +970,8 @@
     "Slot10": "Left ring"
   },
   "GatheringPanel": {
+    "ScripsBest": "{0} · the most at the high tier",
+    "ScripsKinds": "These items give different kinds of scrips: compare them yourself.",
     "CrystalWait": "{0}: ready in {1} s.",
     "CrystalGp": "GP",
     "CrystalNone": "No action for this one with this GP.",

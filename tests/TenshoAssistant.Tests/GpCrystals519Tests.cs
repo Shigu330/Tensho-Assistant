@@ -28,6 +28,17 @@ internal static class GpCrystals519Tests
             Check(panel.Contains("\"GatheringPanel.CrystalWait\"") && panel.Contains("Where(row=>row.Left>0)"),"said; an unknown recast is not a wait");
             Check(Read("Gathering/CollectableActionState.Dalamud.cs").Contains("MemberFunctionPointers.GetRecastTimeElapsed==0"),"guarded");
         }),
+        ("Collectables on a node (0.523): the one paying the most, only between scrips of one kind",() =>
+        {
+            CollectableRule Of(uint item,int high,int kind)=>new(item,"I"+item,80,90,600,800,1000,high/2,high*2/3,high,true,"",kind);
+            Check(CollectableChoice.Best([Of(1,34,4),Of(2,40,4)])==2,"the higher reward");
+            Check(CollectableChoice.Best([Of(1,34,4)]) is null,"one item: nothing to choose");
+            Check(CollectableChoice.Best([Of(1,34,4),Of(2,34,4)]) is null,"a tie");
+            Check(CollectableChoice.Best([Of(1,34,4),Of(2,40,6)]) is null && CollectableChoice.MixedKinds([Of(1,34,4),Of(2,40,6)]),"kinds are not worth the same");
+            var panel=Read("MainWindow.GatheringPanel.cs");
+            Check(panel.Contains("CollectableChoice.Best(scripRules)") && panel.Contains("\"GatheringPanel.ScripsBest\"") && panel.Contains("\"GatheringPanel.ScripsKinds\""),"shown");
+            Check(Read("Gathering/CollectableReader.Dalamud.cs").Contains("reward?.Currency ?? -1"),"the sheet's kind");
+        }),
         ("Crystal plan: no computed amount, drawn before the GP plan, by the item's game category",() =>
         {
             var panel=Read("MainWindow.GatheringPanel.cs");

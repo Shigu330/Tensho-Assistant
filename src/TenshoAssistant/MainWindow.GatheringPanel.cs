@@ -50,6 +50,9 @@ internal sealed partial class MainWindow
             RefreshRecipeHoldingsCache();
             var items=itemCatalog.State.Catalog;
             var chosen=frame.Slots.FirstOrDefault(slot=>slot.ItemId!=0 && slot.ItemId==(uint)Math.Max(0,itemId)) ?? frame.Slots.FirstOrDefault(slot=>slot.ItemId!=0);
+            // 0.523 (user report): the scrips of a node's collectables, to choose between them.
+            var scripRules=frame.Slots.Where(slot=>slot.ItemId!=0).Select(slot=>Collectables?.Catalog?.For(slot.ItemId).FirstOrDefault(rule=>rule.Scrips && rule.RewardHigh>0)).OfType<CollectableRule>().ToArray();
+            var bestScrips=CollectableChoice.Best(scripRules);
             foreach(var slot in frame.Slots.Where(slot=>slot.ItemId!=0))
             {
                 var item=items?.Find(slot.ItemId);
@@ -69,6 +72,12 @@ internal sealed partial class MainWindow
                     ItemLinksMenu($"GatheringSlot{slot.ItemId}",item);
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(slot.ItemId);
                     ImGui.TextDisabled(rates);
+                    if(scripRules.FirstOrDefault(rule=>rule.ItemId==slot.ItemId) is { } paid)
+                    {
+                        var scrips=localization.Format("CollectablePanel.Scrips",paid.RewardLow,paid.RewardMid,paid.RewardHigh);
+                        if(bestScrips==slot.ItemId)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ScripsBest",scrips));
+                        else ImGui.TextUnformatted(scrips);
+                    }
                     ImGui.EndGroup();
                 }
                 finally{ImGui.PopID();}
@@ -77,6 +86,7 @@ internal sealed partial class MainWindow
             ImGui.PushTextWrapPos(0);
             try
             {
+                if(CollectableChoice.MixedKinds(scripRules))ImGui.TextDisabled(localization.Get("GatheringPanel.ScripsKinds"));
                 DrawGatheringPanelPlan(chosen,rating,items,frame);
                 DrawGatheringNodeEffects(frame,rating);
                 ImGui.TextDisabled(localization.Get("GatheringPanel.Footer"));

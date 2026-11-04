@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.523.0
+- Rapport de l'utilisateur en jeu (capture, Noix de coco et Rondin de palmier collectionnables) : l'aide à la récolte ne donnait pas les assignats pour choisir le meilleur. Chaque collectionnable du nœud montre ses assignats par palier, et celui qui paie le plus au palier haut est marqué.
+- Le marquage ne compare que des assignats du même type (colonne Currency de la feuille) ; sinon le panneau le dit. Le nom du type reste inconnu, comme relevé en 0.409 (`docs/evidence/0.409-collectables.md`).
+- Tests : GpCrystals519Tests complété. Verify.ps1 (agent) : 991/991, 0 avertissement, 0 erreur ; DLL 0.523.0.0. Non validé en jeu.
+### English
+- The gathering help now shows each collectable's scrips per tier and marks the one paying the most at the high tier, between scrips of the same kind only.
+
 ## 0.522.0
 - Rapport de l'utilisateur en jeu (capture) : Bénédiction de la nature restait proposée pendant son temps de recharge, 180 s d'après la feuille du jeu ([preuve](docs/evidence/0.519-crystal-actions.md)). Elle n'est plus conseillée tant qu'elle recharge, ses PR restent pour Bénédiction des Douze, et une ligne dit dans combien de secondes elle revient. Temps lu dans le jeu ; s'il ne peut pas être lu, rien ne change.
 - Parmi les actions à PR de récolte, c'est la seule à avoir un temps de recharge : le plan des autres objets n'est pas touché.

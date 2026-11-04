@@ -58,7 +58,7 @@ internal sealed class CollectableReader : IDisposable
                     rules.Add(new(row.Item.RowId,row.Item.ValueNullable?.Name.ExtractText() ?? "",row.LevelMin,row.LevelMax,
                         refine.LowCollectability,refine.MidCollectability,refine.HighCollectability,
                         reward?.LowReward ?? 0,reward?.MidReward ?? 0,reward?.HighReward ?? 0,scripRows.Contains(row.RowId),
-                        row.CollectablesShopItemGroup.ValueNullable?.Name.ExtractText() ?? ""));
+                        row.CollectablesShopItemGroup.ValueNullable?.Name.ExtractText() ?? "",reward?.Currency ?? -1));
                 }
             Volatile.Write(ref catalog,new CollectableCatalog(rules));
         }

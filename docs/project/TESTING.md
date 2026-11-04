@@ -711,6 +711,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.523 : assignats des collectionnables d'un nœud** — à voir en jouant
+
+- [ ] Sur un nœud à deux collectionnables : les assignats par palier sous chacun, identiques au tableau Récolte › Collectionnables, et « le plus au palier haut » sur le bon.
+- [ ] Deux objets aux types d'assignats différents : la phrase « types différents », sans marquage.
+
 **0.522 : temps de recharge de Bénédiction de la nature** — à voir en jouant
 
 - [ ] Juste après l'avoir lancée, le panneau de récolte sur un cristal dit « prête dans N s », et N suit le compteur de la barre du jeu. Bénédiction des Douze reste proposée.
