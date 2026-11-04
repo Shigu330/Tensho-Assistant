@@ -714,6 +714,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.465 : solveur Raphael** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Artisanat › Recherche : choisir « Raphael », lancer : une séquence arrive, « Annuler » fonctionne ; le jeu reste fluide pendant le calcul.
+- [ ] La séquence jouée en jeu donne le résultat annoncé. Retour à « Tensho » : la recherche d'avant.
+- [ ] Le plugin se recharge sans erreur après un calcul.
+
 **0.464 : retours du lot 5** — pendant la campagne de tests en jeu (étape h)
 
 - [ ] Simulateur, métier porté : attributs copiés d'office, ligne « Détecté » juste (repas, remède, Manipulation, spécialiste) ; valeurs en vert ou rouge selon la recette ; « Conserver la séquence » après la palette.

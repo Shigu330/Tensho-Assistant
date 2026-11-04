@@ -110,7 +110,7 @@ try {
     $taskZip = [IO.Compression.ZipFile]::OpenRead((Join-Path $taskOutput 'TenshoAssistant\latest.zip'))
     try {
         $taskEntries = @($taskZip.Entries.FullName)
-        foreach ($taskExpected in @('TenshoAssistant.dll', 'TenshoAssistant.json')) {
+        foreach ($taskExpected in @('TenshoAssistant.dll', 'TenshoAssistant.json', 'Raphael.Net.dll', 'raphael_bindings.dll')) {
             if ($taskExpected -notin $taskEntries) { throw "Missing package entry: $taskExpected" }
             if (@($taskEntries | Where-Object { $_ -ceq $taskExpected }).Count -ne 1) { throw "Duplicate package entry: $taskExpected" }
             $taskZipStream = $taskZip.GetEntry($taskExpected).Open()

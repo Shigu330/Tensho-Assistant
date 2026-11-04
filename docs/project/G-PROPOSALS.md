@@ -96,7 +96,7 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 | Écart | Raison |
 |---|---|
 | I-05 (annonces des servants au marché) | Lit de nouvelles fenêtres du jeu et appelle Universalis : à faire en ultracode, avec l'utilisateur |
-| A-03, A-04 (solveur Raphael et suggestions adaptatives) | Ajoute une dépendance native (binaire Rust de Raphael.Net) au paquet : licence, build hors ligne de Plogon et taille à vérifier ensemble, en ultracode |
+| A-03, A-04 (solveur Raphael et suggestions adaptatives) | A-03 FAIT 0.465 (DEC-028, en option). A-04 reste à faire, avec le solveur Tensho |
 | N-06 (escouade, composition des missions) | FAIT 0.451 (DEC-027) : planificateur depuis les feuilles du jeu et GcArmyManager ; pourcentage « ≈ » jusqu'à la sonde en jeu (TESTING 0.451) ; affinités non comptées ([preuve](../evidence/0.448-n06-n14-sources.md)) |
 | N-07 (île sanctuaire, carte des ressources) | MJIGatheringItem donne X, Y et un rayon par ressource, mais l'unité n'est pas prouvée : à vérifier en jeu avant de placer les zones sur la carte |
 | N-10 (atelier de l'île, solveur) | Gros : lecture de l'offre et de la demande du jeu et solveur ; à faire en ultracode, avec toi |

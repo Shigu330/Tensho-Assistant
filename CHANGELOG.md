@@ -3,6 +3,17 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.465.0
+- A-03 (DEC-028, demande de l'utilisateur) : solveur Raphael en option. Réglage « Solveur : Tensho / Raphael » dans Artisanat › Recherche, et « Utiliser le solveur Raphael » dans Paramètres › Modules ›
+  Artisanat ; Tensho reste celui par défaut. Le calcul tourne hors du thread du jeu, annulable, un seul à la fois, avec tous les processeurs sauf deux. Il utilise les mêmes règles que la recherche Tensho :
+  niveau, Manipulation, actions interdites, rien au hasard, et les actions de spécialiste seulement pour un spécialiste. Sa séquence est rejouée dans le simulateur de Tensho et refusée si elle ne tient pas.
+- Le paquet contient maintenant Raphael.Net.dll et raphael_bindings.dll (win-x64), contrôlés par Verify ; crédits ajoutés.
+- Mesure hors du jeu : 1,5 s et 108 Mo, jusqu'à 8,3 s et 642 Mo sur une recette difficile d'essai (docs/evidence/0.451-raphael-study.md). Le carnet d'artisanat garde le solveur Tensho.
+- A-04 (suggestions depuis l'état en cours) n'est pas fait.
+- Tests : Raphael465Tests (3 cas). Verify.ps1 (agent) : 871/871, 0 avertissement, 0 erreur ; DLL 0.465.0.0. Non validé en jeu ; Raphael n'a tourné qu'hors du jeu.
+### English
+- A-03: optional Raphael solver (Raphael.Net 5.0.0): a solver choice in the crafting search and a setting; Tensho stays the default. Runs off the game's thread, cancellable; its sequence is replayed in Tensho's simulator and refused if it does not hold. The package now ships its native library.
+
 ## 0.464.0
 - Retours du lot 5 (2026-11-04) ; le reste du lot est validé par l'utilisateur :
   - Simulateur : « Conserver la séquence » vient maintenant après « Ajouter une action ».

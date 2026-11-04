@@ -677,6 +677,12 @@
     "Failed": "Impossible d’exporter cette séquence. Consultez le journal Dalamud pour les détails."
   },
   "CraftSearch": {
+    "Solver": "Solveur :",
+    "SolverTensho": "Tensho",
+    "SolverTenshoTip": "La recherche bornée de Tensho, dans le plugin : rapide, sans preuve d'avoir trouvé la meilleure séquence. Elle utilise les limites ci-dessous.\nPar défaut.",
+    "SolverRaphael": "Raphael",
+    "SolverRaphaelTip": "Raphael, le solveur utilisé aussi par d'autres outils d'artisanat : il cherche la meilleure séquence, peut prendre plus de temps et de mémoire, et utilise tous les processeurs sauf deux. Sa bibliothèque native tourne dans le processus du jeu : si elle échoue, le jeu peut se fermer. Sa séquence est rejouée dans le simulateur de Tensho avant d'être proposée ; une séquence qui ne tient pas est refusée.\nPar défaut : désactivé.",
+    "SettingRaphael": "Utiliser le solveur Raphael",
     "CollectLow": "Bas {0}",
     "CollectMid": "Moyen {0}",
     "CollectHigh": "Haut {0}",
@@ -2945,6 +2951,8 @@
       "SubmarineTracker": "Seuils T2/T3, Normal/Optimal et faveur par secteur des sous-marins (embarqués) et formules de distance et de durée des trajets (comprises en lisant son code).",
       "LotlabGardening": "Heures de pousse des graines et heures avant flétrissement (journal de jardinage), embarquées ; le joueur peut les changer.",
       "CrossbreedHelper": "Paires de croisement des graines du jardin (noms anglais reliés aux objets du jeu), embarquées.",
+      "RaphaelNet": "Solveur d'artisanat en option (Raphael.Net), désactivé par défaut ; ses séquences sont rejouées dans le simulateur de Tensho.",
+      "RaphaelRs": "Le solveur que Raphael.Net embarque comme bibliothèque native, à côté de la DLL.",
       "GardeningGuide": "Règles de plantation des croisements (alterner les graines, terre, moment où tout se décide), dans les mots de Tensho.",
       "SubmersibleLootSpreadsheet": "Origine amont des seuils de secteurs repris par SubmarineTracker et embarqués dans Tensho. Licence non revérifiée.",
       "FFXIVGachaSpreadsheet": "Butin moyen par secteur pour classer les trajets de sous-marin (instantané embarqué) et pièces et teintures de la Revue de mode de la semaine (téléchargées). Avis MIT complet dans submarine-loot.json.",

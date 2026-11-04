@@ -73,6 +73,11 @@ public static class CreditCatalog
         // 0.450 (DEC-027, point 2): crossbreeding pairs, built by tools/garden-data.py with the MIT notice in the header.
         new("CrossbreedHelper", CreditKind.Embedded, "FFXIV Crossbreed Helper", "Nick75 (nick75g)", "MIT", "https://github.com/nick75g/FFXIV-Crossbreed-Helper", "https://github.com/nick75g/FFXIV-Crossbreed-Helper/blob/main/LICENSE",
             ["Reminders/Data/garden-crosses.csv", "Reminders/GardenCrosses.cs", "MainWindow.GardenCrosses.cs", "TenshoAssistant.csproj"], [], "", true),
+        // A-03 (0.465, DEC-028): the optional crafting solver and its native library, shipped next to the DLL.
+        new("RaphaelNet", CreditKind.Library, "Raphael.Net 5.0.0", "Asriel Camora (WorkingRobot)", "MIT", "https://github.com/WorkingRobot/Raphael.Net", "https://github.com/WorkingRobot/Raphael.Net/blob/main/LICENSE",
+            ["Craft/RaphaelCraftSolver.Dalamud.cs", "Craft/RaphaelActions.cs", "TenshoAssistant.csproj"], [], "", false),
+        new("RaphaelRs", CreditKind.Library, "raphael-rs", "KonaeAkira", "Apache-2.0", "https://github.com/KonaeAkira/raphael-rs", "https://github.com/KonaeAkira/raphael-rs/blob/main/LICENSE",
+            ["Craft/RaphaelCraftSolver.Dalamud.cs", "TenshoAssistant.csproj"], [], "", false),
         new("CharacterPanelRefined", CreditKind.Embedded, "Character Panel Refined", "Kouzukii", "MIT", "https://github.com/Kouzukii/ffxiv-characterstatus-refined", "https://github.com/Kouzukii/ffxiv-characterstatus-refined/blob/master/LICENSE",
             ["Character/StatFormulas.cs", "Character/StatFormulas.cs", "Character/CharacterStatsReader.Dalamud.cs", "MainWindow.Character.cs", "MainWindow.Gear.cs", "MainWindow.Tools.cs"], [], "", true),
         new("Universalis", CreditKind.Online, "Universalis", "karashiiro, Universalis-FFXIV", "MIT", "https://universalis.app", "https://github.com/Universalis-FFXIV/Universalis/blob/v2/LICENSE",

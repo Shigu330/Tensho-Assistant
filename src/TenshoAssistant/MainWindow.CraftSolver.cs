@@ -9,11 +9,14 @@ namespace TenshoAssistant;
 // and an outdated search is cancelled. No result does not prove that none exists.
 internal sealed partial class MainWindow
 {
-    private readonly CraftSolveSession craftSolve=new();
+    // A-03 (0.465, DEC-028): Raphael when the search asks for it, otherwise Tensho's own search.
+    private readonly CraftSolveSession craftSolve=new((input,token)=>input.Options.Raphael
+        ? RaphaelCraftSolver.Solve(input.Recipe,input.Stats,input.StartingQuality,input.Options,token)
+        :CraftSolver.Solve(input.Recipe,input.Stats,input.StartingQuality,input.Options,token));
     private string? loggedCraftSearchError;
     private CraftSolveInput? craftSolveSignature;
     private readonly record struct CraftSearchViewKey(ulong Owner,RecipeDefinition Recipe,int Level,int Craftsmanship,int Control,int Cp,bool Manipulation,
-        int StartingQuality,int Target,int Steps,int Width,int Budget,int ExtraWait,int ContextItem,int? BuffExtraWait=null,string Forbidden="");
+        int StartingQuality,int Target,int Steps,int Width,int Budget,int ExtraWait,int ContextItem,int? BuffExtraWait=null,string Forbidden="",bool Specialist=false,bool Raphael=false);
     private CraftSearchViewKey? craftSearchViewKey;
     private int craftSolveRevision,craftSolveTarget;
     // 0.321: search limits and export options come from the saved settings (Settings › Modules › Crafting).
@@ -35,11 +38,11 @@ internal sealed partial class MainWindow
         }
         var effective=EffectiveCraftStats();
         var key=new CraftSearchViewKey(bankBridge.State.CharacterId,recipe,simulationLevel,effective.Craftsmanship,effective.Control,effective.Cp,simulationManipulation,
-            simulationQuality,craftSolveTarget,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,itemId,craftMacroBuffWait,craftForbidden);
+            simulationQuality,craftSolveTarget,craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,itemId,craftMacroBuffWait,craftForbidden,effective.Specialist,CraftSearchOptions.Raphael);
         if(craftSearchViewKey!=key || craftSolveSignature is null)
         {
-            craftSolveSignature=new(key.Owner,0,recipe,new(key.Level,key.Craftsmanship,key.Control,key.Cp,key.Manipulation),key.StartingQuality,
-                new(key.Target,key.Steps,key.Width,key.Budget,key.ExtraWait,key.BuffExtraWait,key.Forbidden));
+            craftSolveSignature=new(key.Owner,0,recipe,new(key.Level,key.Craftsmanship,key.Control,key.Cp,key.Manipulation,key.Specialist),key.StartingQuality,
+                new(key.Target,key.Steps,key.Width,key.Budget,key.ExtraWait,key.BuffExtraWait,key.Forbidden,key.Raphael));
             craftSearchViewKey=key;craftSolveRevision++;craftSolve.Cancel();
         }
         craftSolve.ValidateContext(key.Owner,craftSolveRevision,recipe.RecipeId);
@@ -71,7 +74,15 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Get("CraftSearch.TargetHelp"));
         ImGui.TextWrapped(localization.Get("CraftSearch.Priority"));
         DrawToolSettingsLink("CraftSearch");
-        ImGui.TextDisabled(localization.Format("CraftSearch.Limits",craftSolveSteps,craftSolveWidth,craftSolveBudget));
+        // A-03 (0.465, DEC-028): which solver; also in Settings › Modules › Crafting.
+        ImGui.TextUnformatted(localization.Get("CraftSearch.Solver"));
+        ImGui.SameLine();
+        if(ImGui.RadioButton(localization.Get("CraftSearch.SolverTensho"),!CraftSearchOptions.Raphael) && CraftSearchOptions.Raphael){CraftSearchOptions.Raphael=false;SaveReminders();}
+        Tip("CraftSearch.SolverTenshoTip");
+        ImGui.SameLine();
+        if(ImGui.RadioButton(localization.Get("CraftSearch.SolverRaphael"),CraftSearchOptions.Raphael) && !CraftSearchOptions.Raphael){CraftSearchOptions.Raphael=true;SaveReminders();}
+        Tip("CraftSearch.SolverRaphaelTip");
+        if(!CraftSearchOptions.Raphael)ImGui.TextDisabled(localization.Format("CraftSearch.Limits",craftSolveSteps,craftSolveWidth,craftSolveBudget));
         ValidateCraftSearch();
         var state=craftSolve.State;
         ImGui.BeginDisabled(state.Loading);

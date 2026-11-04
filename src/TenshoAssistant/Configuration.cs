@@ -106,6 +106,8 @@ public sealed class CraftSearchSettings
     public int? BoundedBuffExtraWait => BuffExtraWait is { } wait ? Math.Clamp(wait, 0, 3) : null;
     // 0.438 (user request): crafting actions the player forbids (names of CraftActionKind); empty by default.
     public List<string> ForbiddenActions { get; set; } = [];
+    // A-03 (0.465, DEC-028): the search uses Raphael (native library) instead of Tensho's own search; off by default.
+    public bool Raphael { get; set; }
 }
 
 /// <summary>Tensho map display settings (MAP-016, Mappy-like): each layer can be turned off; values are clamped on use.</summary>

@@ -677,6 +677,12 @@
     "Failed": "Could not export this sequence. See the Dalamud log for details."
   },
   "CraftSearch": {
+    "Solver": "Solver:",
+    "SolverTensho": "Tensho",
+    "SolverTenshoTip": "Tensho's own bounded search, inside the plugin: fast, without proof it found the best sequence. It uses the limits below.\nDefault.",
+    "SolverRaphael": "Raphael",
+    "SolverRaphaelTip": "Raphael, the solver also used by other crafting tools: it looks for the best sequence, can take longer and use more memory, and uses all processors but two. Its native library runs in the game's process: if it fails, the game can close. Its sequence is replayed in Tensho's simulator before it is proposed; a sequence that does not hold is refused.\nDefault: off.",
+    "SettingRaphael": "Use the Raphael solver",
     "CollectLow": "Low {0}",
     "CollectMid": "Mid {0}",
     "CollectHigh": "High {0}",
@@ -2945,6 +2951,8 @@
       "SubmarineTracker": "Submarine sector breakpoints (T2/T3, normal/optimal, favour), embedded, and the voyage distance and duration formulas, understood by reading its code.",
       "LotlabGardening": "Seed growing hours and hours before wilting (garden journal), embedded; the player can change them.",
       "CrossbreedHelper": "Crossbreeding pairs of garden seeds (English names linked to the game's items), embedded.",
+      "RaphaelNet": "Optional crafting solver (Raphael.Net), off by default; its sequences are replayed in Tensho's simulator.",
+      "RaphaelRs": "The solver Raphael.Net bundles as a native library next to the DLL.",
       "GardeningGuide": "Planting rules of crossbreeding (alternate the seeds, soil, when it is decided), in Tensho's own words.",
       "SubmersibleLootSpreadsheet": "Upstream origin of the sector breakpoints taken over by SubmarineTracker and embedded in Tensho. Licence not checked again.",
       "FFXIVGachaSpreadsheet": "Average loot per sector to rank submarine routes (embedded snapshot) and the week's Fashion Report pieces and dyes (downloaded). Full MIT notice in submarine-loot.json.",
