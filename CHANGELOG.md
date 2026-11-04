@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.498.0
+- Demande de l'utilisateur : quand Tensho est replié et qu'on lance quelque chose qui l'ouvre, il doit se rouvrir. Tout ce qui ouvre la fenêtre ou change sa page la déplie, pendant deux images ; elle se replie ensuite normalement.
+- `tools/XbmProbe` ajouté : sonde en lecture seule des feuilles du dresseur (XBM), lues brutes, car les lignes typées de ce Lumina.Excel ne correspondent pas toutes au jeu.
+- Tests : SelfCheckTests complété. Verify.ps1 (agent) : 938/938, 0 avertissement, 0 erreur ; DLL 0.498.0.0. Non validé en jeu.
+### English
+- The Tensho window unfolds when something asks for it while it is collapsed. New read-only probe tools/XbmProbe for the Beastmaster sheets.
+
 ## 0.497.0
 - Rapport de l'utilisateur en jeu : « Comparer les prochains coups » ne vérifiait pas l'état pour prendre le bon coup. Relu dans le code : les chiffres utilisaient déjà l'état (Bon ×1,5 ou 1,75 selon l'outil, Excellent ×4, Mauvais ×0,5), mais rien ne l'affichait, et les coups permis par l'état restaient mêlés aux autres : une action comme Ficelles du métier, sans gain de qualité, finissait en bas.
 - La fenêtre dit maintenant l'état du jeu, son effet et l'état suivant. Les coups possibles seulement sur Bon ou Excellent passent en tête, marqués « Seulement dans cet état ». Ce n'est pas un conseil de rotation.

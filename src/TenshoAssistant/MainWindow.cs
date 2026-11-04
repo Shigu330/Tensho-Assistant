@@ -172,7 +172,23 @@ internal sealed partial class MainWindow : Window, IDisposable
 
     // 0.394 (user request): the chosen text font for the whole window, pushed after the theme and popped first.
     private IDisposable? bodyFontScope;
-    public override void PreDraw(){FfxivTheme.Push();bodyFontScope=TenshoAssistant.UI.UiComponents.BodyFont is { Available:true } font ? font.Push():null;}
+    // 0.498 (user report): a window collapsed by its title bar stayed collapsed when something asked for it. Anything that opens the window or
+    // changes its page unfolds it; held two frames, then given back to the player, who can collapse it again.
+    private int unfoldFrames;
+    private Page? lastShownPage;
+    public new bool IsOpen
+    {
+        get=>base.IsOpen;
+        set{if(value)unfoldFrames=2;base.IsOpen=value;}
+    }
+    private void UnfoldWhenAsked()
+    {
+        if(lastShownPage is { } shown && shown!=page)unfoldFrames=2;
+        lastShownPage=page;
+        if(unfoldFrames>0){unfoldFrames--;Collapsed=false;CollapsedCondition=ImGuiCond.Always;}
+        else Collapsed=null;
+    }
+    public override void PreDraw(){UnfoldWhenAsked();FfxivTheme.Push();bodyFontScope=TenshoAssistant.UI.UiComponents.BodyFont is { Available:true } font ? font.Push():null;}
     public override void PostDraw(){bodyFontScope?.Dispose();bodyFontScope=null;FfxivTheme.Pop();}
 
     internal void OpenSettings(){page=Page.Settings;IsOpen=true;}

@@ -27,6 +27,14 @@ internal static class SelfCheckTests
             Check(run.Step()!.Status==SelfCheckStatus.NotRead && run.Done && run.Step() is null,"last");
             Check(SelfCheck.Summary("auto",run.Lines)=="Selftest done (auto): 1 ok, 0 seen earlier, 1 not read, 0 suspect, 1 failed.","summary");
         }),
+        ("Tensho window: asked for while collapsed, it unfolds; the player can still collapse it",() =>
+        {
+            var window=Code("MainWindow.cs");
+            Check(window.Contains("public new bool IsOpen") && window.Contains("set{if(value)unfoldFrames=2;base.IsOpen=value;}"),"every opening asks");
+            Check(window.Contains("shown!=page)unfoldFrames=2;"),"so does a change of page");
+            Check(window.Contains("Collapsed=false;CollapsedCondition=ImGuiCond.Always;") && window.Contains("else Collapsed=null;"),"held only for two frames");
+            Check(window.Contains("public override void PreDraw(){UnfoldWhenAsked();"),"before the window is drawn");
+        }),
         ("Self-check: a window is OK only when really read (first pass in game counted Waiting as OK)",() =>
         {
             Check(SelfCheck.Window("synthesis",true,"Observed","closed").Status==SelfCheckStatus.Ok,"read");

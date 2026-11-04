@@ -13,6 +13,7 @@ dotnet run --project tools/ShopCurrencyProbe -- "C:\Program Files (x86)\SquareEn
 | Probe | What it checks |
 |---|---|
 | `ApiProbe` | Members of Dalamud, FFXIVClientStructs and Lumina types by reflection on metadata only (`--find-method=`, `--find-struct=`, `--find-excel=`, or a full type name): used before calling a native API. Reads `%AppData%\XIVLauncher\addon\Hooks\dev`. |
+| `XbmProbe` | Every column of the Beastmaster (XBM) sheets, read raw: sqpack directory, then a language and optionally sheet names. |
 | `ShopCurrencyProbe` | The general probe: one block per `PROBE_*` environment variable (shops and currencies, NPC positions, vessel parts, gear and materia, quest genres and start cities, map markers, gathering levels, event icons…). Set the variable(s), run, keep the output as evidence. The list of variables is in the plugin's contributor panel (Diagnostics, developer mode). |
 | `CollectionProbe` | The collections projection (mounts, minions, cards…) built from the game sheets, and that it stays usable after the game data is released. |
 | `ConfigSerializationProbe` | That the plugin configuration round-trips through Newtonsoft.Json as Dalamud saves it. |

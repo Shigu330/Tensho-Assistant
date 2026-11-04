@@ -714,6 +714,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.498 : Tensho replié, puis demandé** — à voir en jouant
+
+- [ ] Replier la fenêtre Tensho par sa barre de titre, puis ouvrir quelque chose qui la demande (clic droit sur un objet › outil, `/tensho`, alarme) : elle se déplie sur la bonne page. Elle se replie encore normalement ensuite.
+
 **0.497 : état de la synthèse dans « Comparer les prochains coups »** — à voir en jouant
 
 - [ ] En haut de la fenêtre : l'état du jeu et son effet. Sur Bon ou Excellent, Touche précise, Synthèse intensive et Ficelles du métier (noms du jeu selon votre langue) passent en tête, marqués « Seulement dans cet état ». Sur Mauvais, la ligne le dit.
