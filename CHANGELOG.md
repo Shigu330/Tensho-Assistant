@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.490.0
+- Demande de l'utilisateur, lot 7 : les favoris ne se retiraient que depuis la page Cartes. Le clic droit de la carte a un onglet Favoris, en premier : ceux de cette carte, puis les autres, avec « Retirer ». Un clic pose le drapeau, ou ouvre l'autre carte.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 926/926, 0 avertissement, 0 erreur ; DLL 0.490.0.0. Non validé en jeu.
+### English
+- The Tensho map's right-click menu has a Favorites tab, first, to go to a favorite or remove it.
+
 ## 0.489.0
 - Rapport de l'utilisateur en jeu : la carte n'apparaissait pas dans les temps d'affichage. Elle a sa propre fenêtre, comptée ni comme page ni comme panneau. Diagnostics a maintenant une ligne « Map », en mode développeur.
 - Tests : Gathering478Tests complété. Verify.ps1 (agent) : 925/925, 0 avertissement, 0 erreur ; DLL 0.489.0.0. Non validé en jeu.

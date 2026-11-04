@@ -27,7 +27,7 @@ internal sealed partial class MainWindow
         // 0.400 (user report « framing »): wide enough for every tab name (8 since 0.401), at most 90 % of the screen; when the screen is
         // narrower the tabs scroll with arrows instead of being cut.
         var style=ImGui.GetStyle();
-        var tabs=new[]{"MapLocal.Quests","MapLocal.Fates","MapLocal.Gathering","MapLocal.Aetherytes","MapLocal.Vendors","MapLocal.TripleTriad","MapLocal.Currents","VistaLog.Tab"};
+        var tabs=new[]{"MapLocal.Favorites","MapLocal.Quests","MapLocal.Fates","MapLocal.Gathering","MapLocal.Aetherytes","MapLocal.Vendors","MapLocal.TripleTriad","MapLocal.Currents","VistaLog.Tab"};
         var needed=tabs.Sum(key=>ImGui.CalcTextSize(localization.Get(key)).X+style.FramePadding.X*2+style.ItemInnerSpacing.X)+style.WindowPadding.X*2+8;
         var width=Math.Clamp(needed,640,Math.Max(640,ImGui.GetMainViewport().WorkSize.X*0.9f));
         var open=ImGui.BeginChild("MapLocalLists",new Vector2(width,360),true);
@@ -36,6 +36,7 @@ internal sealed partial class MainWindow
             if(!open || !ImGui.BeginTabBar("MapLocalTabs",ImGuiTabBarFlags.FittingPolicyScroll))return;
             try
             {
+                if(ImGui.BeginTabItem(localization.Get("MapLocal.Favorites"))){try{DrawLocalFavorites(map);}finally{ImGui.EndTabItem();}}
                 if(ImGui.BeginTabItem(localization.Get("MapLocal.Quests"))){try{DrawLocalQuests(map);}finally{ImGui.EndTabItem();}}
                 if(ImGui.BeginTabItem(localization.Get("MapLocal.Fates"))){try{DrawLocalFates(map,live);}finally{ImGui.EndTabItem();}}
                 if(ImGui.BeginTabItem(localization.Get("MapLocal.Gathering"))){try{DrawLocalGathering(map);}finally{ImGui.EndTabItem();}}
@@ -266,6 +267,53 @@ internal sealed partial class MainWindow
                 +"\n"+localization.Get("TriadNpcs.Beaten")+" : "+localization.Get(beaten==true ? "TriadNpcs.Yes":beaten==false ? "TriadNpcs.No":"TriadNpcs.Unknown")
                 +"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
         }
+    }
+
+    // 0.490 (user request, in-game campaign): favorites could only be removed from the Maps page. Those of this map first, then the others; a click goes there, « Remove » takes one away.
+    private void DrawLocalFavorites(MapDefinition map)
+    {
+        var points=configuration.MapBookmarks ?? [];
+        if(points.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.FavoritesEmpty"));return;}
+        var catalog=maps.State.Catalog;
+        var remove=-1;
+        void Rows(bool here)
+        {
+            for(var index=0;index<points.Count;index++)
+            {
+                var point=points[index];
+                if(point is null || point.MapId==map.MapId!=here)continue;
+                MapDefinition? target=null;
+                var known=catalog is not null && MapBookmarks.TryResolve(point,catalog,out target);
+                ImGui.PushID(index);
+                try
+                {
+                    if(ImGui.SmallButton(localization.Get("MapsUi.Remove")))remove=index;
+                    Tip("MapLocal.FavoriteRemoveTip");
+                    ImGui.SameLine();
+                    var name=(point.Group is { } group ? $"[{group}] ":"")+point.Name.Replace("##","# #");
+                    var place=here || !known ? $"{point.X:F1}, {point.Y:F1}":$"{target!.Zone} · {point.X:F1}, {point.Y:F1}";
+                    if(!known)ImGui.TextDisabled(localization.Format("MapLocal.FavoriteUnknown",name));
+                    else if(ImGui.Selectable($"{name} ({place})###Favorite"))
+                    {
+                        if(here)FlagFromMap(map,point.X,point.Y);
+                        else OpenMapPointFromPage(target!,point.X,point.Y);
+                        ImGui.CloseCurrentPopup();
+                    }
+                    if(point.Note is { } note && ImGui.IsItemHovered())WrappedTooltip(note);
+                }
+                finally{ImGui.PopID();}
+            }
+        }
+        if(points.Any(point=>point is not null && point.MapId==map.MapId))Rows(true);
+        else ImGui.TextDisabled(localization.Get("MapLocal.FavoritesNoneHere"));
+        if(points.Any(point=>point is not null && point.MapId!=map.MapId))
+        {
+            ImGui.Spacing();
+            ImGui.TextColored(Accent,localization.Get("MapLocal.FavoritesElsewhere"));
+            Rows(false);
+        }
+        if(remove>=0 && SaveBookmarks(items=>MapBookmarks.RemoveAt(items,remove)))selectedBookmark=Guid.Empty;
+        if(bookmarkError is { } problem)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get(problem));
     }
 
     private void DrawLocalAetherytes(MapDefinition map)

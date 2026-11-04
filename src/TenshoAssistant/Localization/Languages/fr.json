@@ -5613,6 +5613,12 @@
     "UnconfirmedTip": "Sur au moins un secteur de ce trajet, le seuil communautaire (SubmarineTracker) est plus bas que toutes les observations de FFXIVGachaSpreadsheet : un palier affiché comme atteint peut ne pas l'être. Secteurs concernés : 81, 86, 92, 98, 105, 109, 111, 112, 121, 125, 126, 130, 132, 133, 144 à 148."
   },
   "MapLocal": {
+    "Favorites": "Favoris",
+    "FavoritesEmpty": "Aucun favori pour l'instant. Clic droit sur la carte › nom › Ajouter aux favoris.",
+    "FavoritesNoneHere": "Aucun favori sur cette carte.",
+    "FavoritesElsewhere": "Sur d'autres cartes",
+    "FavoriteRemoveTip": "Retire ce favori tout de suite.",
+    "FavoriteUnknown": "{0} : cette carte n'existe plus",
     "TripleTriad": "Triple Triad",
     "OpenTriadTool": "Ouvrir l'outil Triple Triad",
     "TriadMissing": "{0} carte(s) manquante(s)",

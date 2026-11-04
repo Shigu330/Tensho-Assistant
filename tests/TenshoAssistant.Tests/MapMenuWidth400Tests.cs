@@ -14,7 +14,7 @@ internal static class MapMenuWidth400Tests
             Check(code.Contains("ImGui.BeginTabBar(\"MapLocalTabs\",ImGuiTabBarFlags.FittingPolicyScroll)",StringComparison.Ordinal),"scrolling tabs");
             var drawn = Regex.Matches(code,@"BeginTabItem\(localization\.Get\(""([^""]+)""\)\)").Select(match=>match.Groups[1].Value).ToArray();
             var listed = Regex.Match(code,@"var tabs=new\[\]\{([^}]*)\}").Groups[1].Value.Split(',').Select(key=>key.Trim().Trim('"')).ToArray();
-            Check(drawn.Length==8 && drawn.SequenceEqual(listed) && !drawn.Contains("MapLocal.Sightseeing"),"width list = tabs drawn");
+            Check(drawn.Length==9 && drawn.SequenceEqual(listed) && !drawn.Contains("MapLocal.Sightseeing"),"width list = tabs drawn");
         }),
     ];
 }

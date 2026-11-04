@@ -331,6 +331,12 @@ internal static class Gathering478Tests
             Check(list.Contains("!unlocked(spec.Id)") && Read("MainWindow.GatheringPanel.cs").Contains("Forbidden:GpForbiddenFor(start.JobId)") && Read("MainWindow.GatheringGp.cs").Contains("GpForbiddenFor(gpJob)") && Read("MainWindow.CollectablePanel.cs").Contains("GpForbiddenFor(job)"),"used by the panel, the GP page and the collectable plan");
             Check(Read("Plugin.cs").Contains("unlocks.IsActionUnlocked(row);"),"the game's unlock state");
         }),
+        ("Map right-click menu: a Favorites tab first, to go to a favorite or remove it",() =>
+        {
+            var lists=Read("MainWindow.MapLocalLists.cs");
+            Check(lists.Contains("new[]{\"MapLocal.Favorites\",\"MapLocal.Quests\",") && lists.IndexOf("DrawLocalFavorites(map);",StringComparison.Ordinal)<lists.IndexOf("DrawLocalQuests(map);",StringComparison.Ordinal),"before Quests and FATEs");
+            Check(lists.Contains("MapBookmarks.RemoveAt(items,remove)") && lists.Contains("FlagFromMap(map,point.X,point.Y)") && lists.Contains("OpenMapPointFromPage(target!,point.X,point.Y)"),"removed, flagged here, opened elsewhere");
+        }),
         ("Tensho map after a reload: the game map left open waits for the Tensho map to be able to draw, for a short time",() =>
         {
             var replacer=Read("Maps/NativeMapReplacer.Dalamud.cs");

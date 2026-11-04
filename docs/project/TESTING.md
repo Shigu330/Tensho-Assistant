@@ -714,6 +714,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.490 : onglet Favoris de la carte** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Clic droit sur la carte Tensho : « Favoris » est le premier onglet, avant Quêtes et ALÉA. Les favoris de cette carte d'abord, puis les autres. Un clic pose le drapeau ou ouvre l'autre carte ; « Retirer » enlève le favori et son étoile.
+
 **0.489 : temps d'affichage de la carte** — pendant la campagne de tests en jeu (étape h)
 
 - [x] Mode développeur, carte Tensho ouverte : Diagnostics a une ligne « Map », et elle reste une fois la carte fermée.

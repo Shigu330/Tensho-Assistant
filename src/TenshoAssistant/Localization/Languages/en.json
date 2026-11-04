@@ -5613,6 +5613,12 @@
     "UnconfirmedTip": "On at least one sector of this route, the community breakpoint (SubmarineTracker) is lower than every FFXIVGachaSpreadsheet observation: a tier shown as reached may not be. Sectors: 81, 86, 92, 98, 105, 109, 111, 112, 121, 125, 126, 130, 132, 133, 144 to 148."
   },
   "MapLocal": {
+    "Favorites": "Favorites",
+    "FavoritesEmpty": "No favorite yet. Right-click the map › name › Add to favorites.",
+    "FavoritesNoneHere": "No favorite on this map.",
+    "FavoritesElsewhere": "On other maps",
+    "FavoriteRemoveTip": "Removes this favorite at once.",
+    "FavoriteUnknown": "{0}: this map no longer exists",
     "TripleTriad": "Triple Triad",
     "OpenTriadTool": "Open the Triple Triad tool",
     "TriadMissing": "{0} card(s) missing",
