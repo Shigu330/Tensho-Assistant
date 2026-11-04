@@ -5,6 +5,10 @@ public sealed record CraftSolveOptions(int TargetQuality,int MaxSteps=40,int Bea
 public sealed record CraftSolveResult(CraftSimulationResult? Simulation,int TargetQuality,bool TargetReached,int Expanded,int Depth,
     bool BeamPruned,bool NodeLimitReached,bool DepthLimitReached,int? WaitSeconds=null,bool FromCache=false);
 
+/// <summary>The synthesis as it stands (A-04): what the game allows now, under the condition it shows.</summary>
+public sealed record CraftSuggestInput(RecipeDefinition Recipe,CraftStats Stats,CraftSimState State,CraftStepCondition Condition,int GoodPercent,IReadOnlyList<CraftActionKind> Available);
+public sealed record CraftSuggestion(CraftActionKind Move,int FinalQuality,bool TargetReached,IReadOnlyList<CraftActionKind> Then);
+
 /// <summary>Deterministic bounded beam search. Failure to find a route does not prove impossibility.</summary>
 public static class CraftSolver
 {
@@ -26,12 +30,61 @@ public static class CraftSolver
         var initial=CraftSimulation.Run(recipe,stats,startingQuality,[],cancellation); var p=recipe.Simulation!;
         if(options.TargetQuality<0 || options.TargetQuality>p.Quality || options.MaxSteps is <1 or >100 || options.BeamWidth is <1 or >512 || options.MaxExpanded is <1 or >500000 || options.ExtraWait is <0 or >3 || options.BuffExtraWait is <0 or >3)
             throw new ArgumentOutOfRangeException(nameof(options));
+        var (best,expanded,searchedDepth,pruned,limited,depthLimited)=Search(recipe,stats,initial,initial.Final,options,cancellation);
+        cancellation.ThrowIfCancellationRequested();
+        CraftSimulationResult? simulation=null;
+        if(best is not null)
+        {
+            var sequence=new List<CraftActionKind>();
+            for(var node=best;node.Parent is not null;node=node.Parent) sequence.Add(node.Action);
+            sequence.Reverse(); simulation=CraftSimulation.Run(recipe,stats,startingQuality,sequence,cancellation);
+            if(simulation.Error is not null || simulation.Final!=best.State) throw new InvalidOperationException("Search replay mismatch.");
+        }
+        return new(simulation,options.TargetQuality,simulation?.Final.Quality>=options.TargetQuality,expanded,searchedDepth,pruned,limited,depthLimited,best?.WaitSeconds);
+    }
+
+    /// <summary>
+    /// A-04 (DEC-028, 0.509): the move to suggest from the synthesis as it stands. Each move the game allows now is played under the real condition, then the rest is
+    /// searched under the normal condition, which never counts on luck. It only proposes: nothing is played. Null when no move leads anywhere within the budget.
+    /// </summary>
+    public static CraftSuggestion? Suggest(CraftSuggestInput input,int target,string forbidden,CancellationToken cancellation=default,int beamWidth=32,int maxExpanded=3000)
+    {
+        var recipe=input.Recipe;var stats=input.Stats;var p=recipe.Simulation!;
+        var initial=CraftSimulation.Run(recipe,stats,0,[],cancellation);
+        var options=new CraftSolveOptions(Math.Clamp(target,0,p.Quality),BeamWidth:beamWidth,MaxExpanded:maxExpanded,Forbidden:forbidden);
+        CraftSuggestion? best=null;CraftSimState? bestFinal=null;var bestWait=0;
+        foreach(var kind in input.Available)
+        {
+            cancellation.ThrowIfCancellationRequested();
+            if(CraftSimulation.Random(kind) || CraftActionRules.Forbidden(forbidden,kind))continue;
+            var step=CraftSimulation.Apply(p,stats,recipe.Level,initial.BaseProgress,initial.BaseQuality,input.State,kind,out _,input.Condition,input.GoodPercent);
+            if(step is null || step.After.Finish==CraftFinish.Broken)continue;
+            CraftSimState final;var wait=0;var then=new List<CraftActionKind>();
+            if(step.After.Finish==CraftFinish.Completed)final=step.After;
+            else
+            {
+                var (found,_,_,_,_,_)=Search(recipe,stats,initial,step.After,options,cancellation);
+                if(found is null)continue;
+                final=found.State;wait=found.WaitSeconds;
+                for(var node=found;node.Parent is not null;node=node.Parent)then.Add(node.Action);
+                then.Reverse();
+            }
+            if(!BetterCompletion(final,wait,bestFinal,bestWait,options.TargetQuality))continue;
+            bestFinal=final;bestWait=wait;
+            best=new(kind,final.Quality,final.Quality>=options.TargetQuality,then.AsReadOnly());
+        }
+        return best;
+    }
+
+    private static (Node? Best,int Expanded,int Depth,bool Pruned,bool Limited,bool DepthLimited) Search(RecipeDefinition recipe,CraftStats stats,CraftSimulationResult initial,CraftSimState start,CraftSolveOptions options,CancellationToken cancellation)
+    {
+        var p=recipe.Simulation!;
         // A-13 (0.434): no action that succeeds by chance, nor Careful Observation or Final Appraisal (no use under the normal condition).
         var actions=CraftActionCatalog.Specs.Where(spec=>spec.Level<=stats.Level && (spec.Kind!=CraftActionKind.Manipulation || stats.ManipulationAllowed)
             && !CraftSimulation.Random(spec.Kind) && spec.Kind is not (CraftActionKind.CarefulObservation or CraftActionKind.FinalAppraisal)
             && !CraftActionRules.Forbidden(options.Forbidden,spec.Kind)).ToArray();
         var minimumWait=actions.Min(action=>CraftMacroExporter.Wait(action.Kind,options.ExtraWait,options.BuffExtraWait));
-        var beam=new List<Node>{new(initial.Final,null,default)}; Node? best=null;
+        var beam=new List<Node>{new(start,null,default)}; Node? best=null;
         var expanded=0; var depth=0; var searchedDepth=0; var pruned=false; var limited=false; var depthLimited=false;
         bool Reached(Node node)=>node.State.Quality>=options.TargetQuality;
         bool Better(Node candidate,Node? previous)=>BetterCompletion(candidate.State,candidate.WaitSeconds,previous?.State,previous?.WaitSeconds ?? 0,options.TargetQuality);
@@ -110,15 +163,6 @@ public static class CraftSolver
             else beam=nodes.ToList();
             if(depth==options.MaxSteps && beam.Count>0) depthLimited=true;
         }
-        cancellation.ThrowIfCancellationRequested();
-        CraftSimulationResult? simulation=null;
-        if(best is not null)
-        {
-            var sequence=new List<CraftActionKind>();
-            for(var node=best;node.Parent is not null;node=node.Parent) sequence.Add(node.Action);
-            sequence.Reverse(); simulation=CraftSimulation.Run(recipe,stats,startingQuality,sequence,cancellation);
-            if(simulation.Error is not null || simulation.Final!=best.State) throw new InvalidOperationException("Search replay mismatch.");
-        }
-        return new(simulation,options.TargetQuality,simulation?.Final.Quality>=options.TargetQuality,expanded,searchedDepth,pruned,limited,depthLimited,best?.WaitSeconds);
+        return (best,expanded,searchedDepth,pruned,limited,depthLimited);
     }
 }

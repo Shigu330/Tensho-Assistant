@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.509.0
+- A-04 (DEC-028, issue #28), et suite de la remarque de l'utilisateur sur le bon coup selon l'état. « Comparer les prochains coups » conseille un coup, calculé d'après la synthèse telle qu'elle est : chaque coup permis par le jeu est joué sous l'état en cours, puis la suite est cherchée en condition normale. Affichage seulement, rien n'est joué. Hors du thread du jeu, annulé dès que l'état change, avec un réglage. Les actions interdites et les coups à chance ne sont pas proposés.
+- Limites : seul ce coup tient compte de l'état, le combo en cours est pris comme absent, et c'est une recherche limitée, pas une preuve. Le coût réel en jeu n'a pas été mesuré.
+- Tests : CraftProjectionTests complété ; CraftSolver découpé pour partir de n'importe quel état, ses tests existants passent. Verify.ps1 (agent) : 971/971, 0 avertissement, 0 erreur ; DLL 0.509.0.0. Non validé en jeu.
+### English
+- During a synthesis, the comparison now suggests a next move, worked out from the current state with the plugin's own search. Display only; it plays nothing. It has a setting and respects forbidden actions.
+
 ## 0.508.0
 - I-05 (issue #26), première version : quand la liste de ventes d'un servant est ouverte, un panneau affiche vos objets et vos prix, tels que le jeu les montre. « Comparer aux autres vendeurs » demande à Universalis, sur clic seulement, les offres de votre monde d'origine : autre vendeur le plus bas, état de chaque ligne (sous-coté, même prix, le plus bas, aucun autre vendeur, inconnu). Un bouton copie le prix conseillé, rien d'autre n'est écrit.
 - Lecture seule : aucun prix n'est modifié, rien n'est déplacé. Vos propres servants ne comptent pas. Absence de données ou liste coupée : « inconnu », jamais « le plus bas ».

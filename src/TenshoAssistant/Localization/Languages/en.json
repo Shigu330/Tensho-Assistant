@@ -2552,6 +2552,11 @@
     "Effective": "Effective: {0}\nFamily modifier: {1:+0;-0;0}"
   },
   "CraftProjectionUi": {
+    "SuggestLoading": "Working out a move…",
+    "SuggestNone": "No move found that finishes the synthesis, within the search's limits.",
+    "SuggestReached": "Suggested: {0}. The search then reaches {1} quality, for a target of {2}.",
+    "SuggestBelow": "Suggested: {0}. The search then reaches {1} quality, under the target of {2}.",
+    "SuggestTip": "Worked out from the synthesis as it stands. Only this move uses the current state: the rest assumes a normal condition, so a good state can do better. A limited search, not a proof. Nothing is played for you.",
     "ConditionLine": "State of the synthesis: {0}. {1}",
     "ConditionNormal": "No bonus.",
     "ConditionGood": "Quality × {0}. Next state: normal.",
@@ -2586,6 +2591,8 @@
     "SortTip": "Sorts actions by this value (low end of the range), highest first; unknown quality comes after known values, actions that break the synthesis last; ties go to the lowest CP cost."
   },
   "CraftLiveUi": {
+    "Suggest": "Suggest a move during a synthesis",
+    "SuggestTip": "In the comparison, suggests a next move worked out from the current state of the synthesis. It only shows it: you play it yourself.",
     "Panel": "« Compare next actions » window beside the synthesis",
     "PanelTip": "While you craft, shows the next-action projection beside the game's Synthesis window. It only reads and shows; nothing is executed. Its cross turns this setting off.\nDefault: on.",
     "Title": "Current synthesis",

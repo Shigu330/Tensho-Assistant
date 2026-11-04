@@ -17,6 +17,51 @@ internal sealed partial class MainWindow
     private string sortedProjectionForbidden="";
     private CraftActionProjection[] sortedProjectionRows=[];
     private CraftStepCondition? loggedProjectionCondition;
+    // A-04 (DEC-028, 0.509): a suggested move, worked out off the game's thread for each new state of the synthesis. Display only.
+    private readonly object suggestGate=new();
+    private string suggestKey="";
+    private CancellationTokenSource? suggestCancel;
+    private CraftSuggestion? suggestion;
+    private bool suggestLoading;
+    private void UpdateCraftSuggestion(CraftProjectionResult result,string forbidden)
+    {
+        if(!configuration.CraftLiveSuggest || result.Suggest is not { } input || windowDisposed)
+        {
+            lock(suggestGate){suggestCancel?.Cancel();suggestCancel?.Dispose();suggestCancel=null;suggestKey="";suggestion=null;suggestLoading=false;}
+            return;
+        }
+        var target=projectionTarget;
+        var key=$"{input.State}|{input.Condition}|{input.GoodPercent}|{target}|{forbidden}|{string.Join(',',input.Available)}";
+        lock(suggestGate)
+        {
+            if(key==suggestKey)return;
+            suggestCancel?.Cancel();suggestCancel?.Dispose();
+            var source=new CancellationTokenSource();
+            suggestCancel=source;suggestKey=key;suggestion=null;suggestLoading=true;
+            var token=source.Token;
+            _=Task.Run(()=>
+            {
+                CraftSuggestion? found=null;
+                try{found=CraftSolver.Suggest(input,target,forbidden,token);}
+                catch(OperationCanceledException){return;}
+                catch(Exception error){log.Warning(error,"The next move could not be worked out.");}
+                lock(suggestGate)if(suggestKey==key && !token.IsCancellationRequested){suggestion=found;suggestLoading=false;}
+            },token);
+        }
+    }
+    private void DrawCraftSuggestion(CraftProjectionResult result,CraftActionCatalog catalog,uint job)
+    {
+        if(!configuration.CraftLiveSuggest || result.Suggest is null)return;
+        CraftSuggestion? found;bool loading;
+        lock(suggestGate){found=suggestion;loading=suggestLoading;}
+        if(loading){ImGui.TextDisabled(localization.Get("CraftProjectionUi.SuggestLoading"));return;}
+        if(found is null){ImGui.TextDisabled(localization.Get("CraftProjectionUi.SuggestNone"));return;}
+        string Name(CraftActionKind kind)=>catalog.Find(job,kind)?.Name ?? kind.ToString();
+        ImGui.PushStyleColor(ImGuiCol.Text,found.TargetReached ? Success:Accent);
+        try{ImGui.TextWrapped(localization.Format(found.TargetReached ? "CraftProjectionUi.SuggestReached":"CraftProjectionUi.SuggestBelow",Name(found.Move),found.FinalQuality,projectionTarget));}
+        finally{ImGui.PopStyleColor();}
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftProjectionUi.SuggestTip")+(found.Then.Count>0 ? "\n"+string.Join(" › ",found.Then.Take(8).Select(Name))+(found.Then.Count>8 ? " …":""):""));
+    }
     // 0.497 (user report): the state was used in the numbers but never shown: the window now says it, what it does, and which actions it opens.
     private void DrawProjectionCondition(CraftProjectionResult result,string shownName)
     {
@@ -90,6 +135,8 @@ internal sealed partial class MainWindow
         if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Progress"),projectionSort==1))projectionSort=1;Tip("CraftProjectionUi.SortTip");ImGui.SameLine();
         if(ImGui.RadioButton(localization.Get("CraftProjectionUi.Durability"),projectionSort==2))projectionSort=2;Tip("CraftProjectionUi.SortTip");
         DrawProjectionCondition(result,frame.Raw.ConditionText);
+        UpdateCraftSuggestion(result,craftForbidden);
+        DrawCraftSuggestion(result,catalog,frame.Raw.JobId);
         foreach(var issue in result.Issues)DrawCraftIssue(issue);
         if(result.Actions.Count==0){ImGui.TextDisabled(localization.Get("CraftProjectionUi.Empty"));return;}
         ImGui.TextDisabled(localization.Get("CraftProjectionUi.SortHelp"));

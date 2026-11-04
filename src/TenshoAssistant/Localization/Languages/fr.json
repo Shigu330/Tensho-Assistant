@@ -2552,6 +2552,11 @@
     "Effective": "Actuelles : {0}\nModificateur famille : {1:+0;-0;0}"
   },
   "CraftProjectionUi": {
+    "SuggestLoading": "Calcul d'un coup…",
+    "SuggestNone": "Aucun coup trouvé qui termine la synthèse, dans les limites de la recherche.",
+    "SuggestReached": "Conseillé : {0}. La recherche atteint ensuite {1} de qualité, pour une cible de {2}.",
+    "SuggestBelow": "Conseillé : {0}. La recherche atteint ensuite {1} de qualité, sous la cible de {2}.",
+    "SuggestTip": "Calculé d'après la synthèse telle qu'elle est. Seul ce coup tient compte de l'état en cours : la suite suppose une condition normale, un bon état peut donc faire mieux. Une recherche limitée, pas une preuve. Rien n'est joué à votre place.",
     "ConditionLine": "État de la synthèse : {0}. {1}",
     "ConditionNormal": "Aucun bonus.",
     "ConditionGood": "Qualité × {0}. État suivant : normal.",
@@ -2586,6 +2591,8 @@
     "SortTip": "Trie les actions sur cette valeur (bas de l'intervalle), de la plus grande à la plus petite ; une qualité inconnue passe après les connues, les actions qui cassent la synthèse en dernier ; à égalité, la moins chère en PS."
   },
   "CraftLiveUi": {
+    "Suggest": "Conseiller un coup pendant une synthèse",
+    "SuggestTip": "Dans la comparaison, conseille un prochain coup calculé d'après l'état en cours de la synthèse. Il ne fait que l'afficher : vous le jouez vous-même.",
     "Panel": "Fenêtre « Comparer les prochains coups » à côté de la synthèse",
     "PanelTip": "Pendant une synthèse, affiche la projection de la prochaine action à côté de la fenêtre du jeu. Elle ne fait que lire et afficher ; rien n'est exécuté. Sa croix décoche ce réglage.\nPar défaut : activé.",
     "Title": "Synthèse en cours",

@@ -10,7 +10,7 @@ public readonly record struct CraftRange(int Min,int Max)
 public sealed record CraftActionProjection(CraftActionMetadata Metadata,CraftRange Progress,CraftRange? Quality,CraftRange Durability,CraftRange CpCost,CraftRange InnerQuiet,
     bool Completed,bool Broken,int Alternatives,bool OnlyInThisCondition=false);
 /// <summary>0.497 (user report): Condition = the state of the synthesis the rows were computed with; GoodPercent = the Good quality bonus, null when the tool's is unknown.</summary>
-public sealed record CraftProjectionResult(IReadOnlyList<CraftActionProjection> Actions,IReadOnlyList<string> Issues,CraftStepCondition? Condition=null,int? GoodPercent=null);
+public sealed record CraftProjectionResult(IReadOnlyList<CraftActionProjection> Actions,IReadOnlyList<string> Issues,CraftStepCondition? Condition=null,int? GoodPercent=null,CraftSuggestInput? Suggest=null);
 
 /// <summary>Projects one action across compatible unknown combo/unique-action states; never executes or resolves a rotation.</summary>
 public static class CraftLiveProjection
@@ -18,8 +18,8 @@ public static class CraftLiveProjection
     public static CraftProjectionResult Build(CraftLiveState observation,CraftActionCatalog catalog,DateTimeOffset now)
     {
         var issues=new List<string>();var rows=new List<CraftActionProjection>();
-        CraftStepCondition? seenCondition=null;int? seenGood=null;
-        CraftProjectionResult Result()=>new(Array.AsReadOnly(rows.ToArray()),Array.AsReadOnly(issues.ToArray()),seenCondition,seenGood);
+        CraftStepCondition? seenCondition=null;int? seenGood=null;CraftSuggestInput? suggest=null;
+        CraftProjectionResult Result()=>new(Array.AsReadOnly(rows.ToArray()),Array.AsReadOnly(issues.ToArray()),seenCondition,seenGood,suggest);
         if(!observation.Enabled || observation.Owner==0 || observation.Status!=CraftLiveStatusKind.Observed || observation.Frame is not { } frame || observation.ObservedAt is not { } date
             || now<date || now-date>TimeSpan.FromSeconds(2)) {issues.Add("Observation missing or too old.");return Result();}
         var raw=frame.Raw;
@@ -53,6 +53,11 @@ public static class CraftLiveProjection
         catch(ArgumentException error){issues.Add(error.Message);return Result();}
         var combos=native.Step==1 ? new[]{0}:new[]{0,1,2};
         var usages=effects.UsedTrainedPerfection is { } used ? new[]{used}:new[]{false,true};
+        // A-04 (0.509): what a suggestion starts from. The combo is unknown here: taken as none, which never counts on a cheaper cost. Not without the tool's bonus.
+        if(goodKnown)
+            suggest=new(recipe,initial.Stats,new CraftSimState((int)native.Step-1,(int)native.Progress,(int)native.Quality,(int)native.Durability,(int)raw.Cp,Counter(251),
+                Counter(2226),Counter(2189),Counter(254),Math.Max(Counter(252),Counter(257)),Counter(1164),Counter(2191),0,CraftFinish.InProgress,protection,usages[0],
+                Counter(2190),effects.Effects.Any(effect=>effect.Metadata.Id==2665)),condition,goodPercent,Array.AsReadOnly(actions.Where(action=>action.Status==0).Select(action=>action.Kind).ToArray()));
         foreach(var action in actions.Where(action=>action.Status==0))
         {
             var alternatives=new List<CraftSimStep>();

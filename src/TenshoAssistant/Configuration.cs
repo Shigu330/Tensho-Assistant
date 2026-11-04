@@ -37,6 +37,8 @@ public static class ConfigurationReset
 
     public static readonly IReadOnlySet<string> Reset = new HashSet<string>
     {
+        // 0.509 (A-04): the suggested move during a synthesis.
+        "CraftLiveSuggest",
         // 0.508 (I-05): the panel beside the retainer sale list.
         "RetainerSalesPanel",
         // 0.503 (ONBOARD-001): first-visit help on the pages.
@@ -273,6 +275,7 @@ public sealed partial class Configuration
     public bool GuideChecklistHidden { get; set; }
     public bool HelpBanners { get; set; } = true;
     public bool RetainerSalesPanel { get; set; } = true;
+    public bool CraftLiveSuggest { get; set; } = true;
     public bool OpenOnLoad { get; set; }
     // Retainers and saddlebags copied into the bank cache each time they are opened (0.167), instead of an import button.
     public bool AutoBankCapture { get; set; } = true;
