@@ -95,16 +95,16 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 
 | Écart | Raison |
 |---|---|
-| I-05 (annonces des servants au marché) | Lit de nouvelles fenêtres du jeu et appelle Universalis : à faire en ultracode, avec l'utilisateur |
-| A-03, A-04 (solveur Raphael et suggestions adaptatives) | A-03 FAIT 0.465 (DEC-028, en option). A-04 reste à faire, avec le solveur Tensho |
+| I-05 (annonces des servants au marché) | Première version FAITE 0.508, à essayer en jeu ; la suite plus bas |
+| A-03, A-04 (solveur Raphael et suggestions adaptatives) | A-03 FAIT 0.465 (DEC-028, en option). A-04 FAIT 0.509, à essayer en jeu |
 | N-06 (escouade, composition des missions) | FAIT 0.451 (DEC-027) : planificateur depuis les feuilles du jeu et GcArmyManager ; pourcentage « ≈ » jusqu'à la sonde en jeu (TESTING 0.451) ; affinités non comptées ([preuve](../evidence/0.448-n06-n14-sources.md)) |
 | N-07 (île sanctuaire, carte des ressources) | MJIGatheringItem donne X, Y et un rayon par ressource, mais l'unité n'est pas prouvée : à vérifier en jeu avant de placer les zones sur la carte |
-| N-10 (atelier de l'île, solveur) | Gros : lecture de l'offre et de la demande du jeu et solveur ; à faire en ultracode, avec toi |
+| N-10 (atelier de l'île, solveur) | Gros : lecture de l'offre et de la demande du jeu et solveur ; à faire avec l'utilisateur, voir plus bas |
 | N-04 (loterie immobilière) | État des mises du joueur : structure du jeu non trouvée dans FFXIVClientStructs (à sonder en jeu) |
 | N-12 (conditions d'apparition des rangs S), N-13 (meubles visibles), X-14 (outils d'aménagement) | Règles communautaires par marque, lecture des meubles et correctifs d'affichage : sources et risques à décider ensemble |
 | N-08 (journal de jardinage) | FAIT 0.448 (décidé le 2026-11-03, DEC-026) : journal avec durées tapées par le joueur, page Rappels |
 | N-14 (planificateur de croisements de jardinage) | FAIT 0.450 (DEC-027) : paires MIT de nick75g reliées aux objets par la feuille Item anglaise, affichées dans la langue du jeu ([preuve](../evidence/0.448-n06-n14-sources.md)) |
-| I-15 (recherche dans les fenêtres d'inventaire du jeu) | Touche l'interface du jeu : à faire en ultracode, avec l'utilisateur |
+| I-15 (recherche dans les fenêtres d'inventaire du jeu) | Touche l'interface du jeu : à faire avec l'utilisateur, voir plus bas |
 
 ## Décision à prendre : ventes des servants (0.508, I-05)
 
@@ -116,7 +116,7 @@ Règle : une règle Dalamud en jeu demande un résumé et son accord (mémoire, 
 
 | Point | Règle | Conseil de l'agent | État |
 |---|---|---|---|
-| Titre selon le job | Pas de requête automatique au serveur sans action directe | Garder pour l'usage personnel, retirer ou passer au clic avant la soumission | Rien ne change sans accord |
+| Titre selon le job | Pas de requête automatique au serveur sans action directe | Garder pour l'usage personnel, à revoir avant la soumission | **Décidé le 2026-11-04 : laissé tel quel** (« Laisse comme ça ») ; à revoir pour D17 |
 | Conseil en match de Triple Triade | Aucun avantage en contenu compétitif | Vérifier si Tensho peut reconnaître un tournoi et le couper là, sinon demander à l'équipe | Rien ne change sans accord |
 | Panneau du Dédale (DEC-032) | Combat et contenu compétitif | Informations seulement, demander à l'équipe avant la 1.0.0 | Page faite, panneau en attente, dresseur mis de côté |
 
