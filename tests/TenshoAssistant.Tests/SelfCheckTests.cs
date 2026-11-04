@@ -27,6 +27,12 @@ internal static class SelfCheckTests
             Check(run.Step()!.Status==SelfCheckStatus.NotRead && run.Done && run.Step() is null,"last");
             Check(SelfCheck.Summary("auto",run.Lines)=="Selftest done (auto): 1 ok, 0 seen earlier, 1 not read, 0 suspect, 1 failed.","summary");
         }),
+        ("Map: a link brings it above the Tensho window",() =>
+        {
+            var view=Code("MainWindow.MapView.cs");
+            Check(view.Contains("mapViewOpen=true;mapViewToFront=true;}") && view.Contains("if(mapViewToFront){mapViewToFront=false;window.BringToFront();}"),"asked once, then free");
+            Check(Code("MainWindow.Maps.cs").Contains("{mapViewOpen=true;mapViewToFront=true;}"),"also from a page's link");
+        }),
         ("Tensho window: asked for while collapsed, it unfolds; the player can still collapse it",() =>
         {
             var window=Code("MainWindow.cs");

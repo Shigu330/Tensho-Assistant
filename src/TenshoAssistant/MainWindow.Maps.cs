@@ -111,7 +111,7 @@ internal sealed partial class MainWindow
         // 0.426 (user request): the game map opened from a Tensho page closes Tensho (setting CloseOnGameWindow).
         if(!configuration.MapView.ReplaceGameMap || !MapViewVisible()){OpenMapPoint(map,x,y);if(mapOpenError is null)CloseForGameWindow();return;}
         PlaceFlagFromMapView(map,x,y);
-        if(mapOpenError is null)mapViewOpen=true;
+        if(mapOpenError is null){mapViewOpen=true;mapViewToFront=true;}
     }
     private void OpenMapPoint(MapDefinition map, float x, float y)
     {

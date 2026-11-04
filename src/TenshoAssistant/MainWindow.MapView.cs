@@ -31,14 +31,16 @@ internal sealed partial class MainWindow
     private MapLocalIndexService? mapLocal;
     internal void ConfigureMapView(MapLiveReader live,MapMarkerSource markers,MapLocalIndexService local){mapLive=live;mapMarkers=markers;mapLocal=local;}
     // 0.328 (map audit #13): a chosen map opens whole, like NavigateMap; the old zoom and pan belonged to another map.
-    private void OpenMapView(uint mapId){mapViewMapId=mapId;mapViewFollow=mapId==0;mapFitRequested=mapId!=0;mapViewOpen=true;}
+    // 0.499 (user report): a link to the map brings it above the Tensho window instead of opening behind it.
+    private bool mapViewToFront;
+    private void OpenMapView(uint mapId){mapViewMapId=mapId;mapViewFollow=mapId==0;mapFitRequested=mapId!=0;mapViewOpen=true;mapViewToFront=true;}
     // Called when the game map is replaced: the same key (M) that opens the game map toggles the Tensho map.
     // Hosted game map (0.151): the replacer asks whether the Tensho map is still open, and closes it with the game map.
     internal bool MapViewOpen=>Volatile.Read(ref mapViewOpen);
     internal void CloseMapFromGame()=>Volatile.Write(ref mapViewOpen,false);
     internal void ShowMapFromGame(GameMapRequest request)
     {
-        if(DateTimeOffset.UtcNow<mapOwnFlagUntil){mapOwnFlagUntil=default;mapViewOpen=true;return;}
+        if(DateTimeOffset.UtcNow<mapOwnFlagUntil){mapOwnFlagUntil=default;mapViewOpen=true;mapViewToFront=true;return;}
         var mapId=maps.State.Catalog is { } catalog ? request.Resolve(catalog):request.Selected==request.Current ? 0:request.Selected;
         // A quest, aetheryte or FATE was asked (journal, link): never the M toggle, the map opens focused on it.
         var pointed=request.Pointed;
@@ -86,6 +88,7 @@ internal sealed partial class MainWindow
     internal void PrepareMapView(Dalamud.Interface.Windowing.Window window)
     {
         UI.FfxivTheme.Push();
+        if(mapViewToFront){mapViewToFront=false;window.BringToFront();}
         var settings=configuration.MapView;
         window.WindowName=localization.Get("MapView.Title")+"###TenshoMapView";
         // Sizes in screen pixels, set here rather than through Window.Size (which the window system scales).

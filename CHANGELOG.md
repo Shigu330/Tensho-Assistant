@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.499.0
+- Demande de l'utilisateur : un clic sur un lien vers la carte doit la faire passer au-dessus de Tensho. Elle restait derrière, surtout quand elle était déjà ouverte. Elle passe maintenant devant, une fois par demande.
+- Tests : SelfCheckTests complété. Verify.ps1 (agent) : 939/939, 0 avertissement, 0 erreur ; DLL 0.499.0.0. Non validé en jeu.
+### English
+- A link to the map now brings it above the Tensho window.
+
 ## 0.498.0
 - Demande de l'utilisateur : quand Tensho est replié et qu'on lance quelque chose qui l'ouvre, il doit se rouvrir. Tout ce qui ouvre la fenêtre ou change sa page la déplie, pendant deux images ; elle se replie ensuite normalement.
 - `tools/XbmProbe` ajouté : sonde en lecture seule des feuilles du dresseur (XBM), lues brutes, car les lignes typées de ce Lumina.Excel ne correspondent pas toutes au jeu.
