@@ -89,6 +89,7 @@ internal sealed partial class MainWindow
     }
 
     // 0.479 (user request, in-game campaign): the current collectability and what to do next, from the values the window gives this turn. Nothing is executed.
+    private readonly Dictionary<uint,int> collectableMeticulousBase=[];
     /// <summary>0.520: from the job's trait, Solid Reason's chance of a free attempt; and whether that free attempt is ready now.</summary>
     internal Func<uint,decimal>? EurekaChanceFor { get; set; }
     internal Func<bool>? EurekaReady { get; set; }
@@ -99,6 +100,7 @@ internal sealed partial class MainWindow
         var job=turn.ScourAction==22182 ? 16u:17u;
         var restore=configuration.CollectableUseRestore ? gpActions.State.Catalog?.Actions.FirstOrDefault(row=>row.Spec.JobId==job && row.Spec.Effect==GpEffect.Attempt && !GpActionRules.Forbidden(GpForbiddenFor(job),row.Spec)):null;
         if(turn.IntuitionChance>0 && (!collectableChanceBase.TryGetValue(turn.ItemId,out var lowest) || turn.IntuitionChance<lowest))collectableChanceBase[turn.ItemId]=turn.IntuitionChance;
+        if(turn.MeticulousChance>0 && (!collectableMeticulousBase.TryGetValue(turn.ItemId,out var lowestMeticulous) || turn.MeticulousChance<lowestMeticulous))collectableMeticulousBase[turn.ItemId]=turn.MeticulousChance;
         // 0.488 (in-game log: status 579, then 0, then 579, within seconds): the game's answer changes with each action's lock. It no longer changes the plan, which made the panel blink; it only says to wait.
         uint? restoreStatus=null;
         if(restore is not null && attempts is { } attemptsNow && maximum is { } most && attemptsNow<most && CollectableActionStatus?.Invoke(restore.Spec.Id) is { } status)
@@ -109,7 +111,8 @@ internal sealed partial class MainWindow
         }
         var bonuses=new CollectableBonuses(configuration.CollectableScrutinyGain,configuration.CollectableIntuitionGain,gp ?? 0,
             CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Cost ?? 0,configuration.CollectableUseFocus ? CollectableActionInfo?.Invoke(turn.FocusAction)?.Cost ?? 0:0,active,configuration.CollectableUseScrutiny,restore?.Spec.Cost ?? 0,maximum ?? 0,
-            collectableChanceBase.GetValueOrDefault(turn.ItemId),Math.Clamp(configuration.CollectableRiskTolerance,0,100),restore is null ? 0:EurekaChanceFor?.Invoke(job) ?? 0,EurekaReady?.Invoke()==true);
+            collectableChanceBase.GetValueOrDefault(turn.ItemId),Math.Clamp(configuration.CollectableRiskTolerance,0,100),restore is null ? 0:EurekaChanceFor?.Invoke(job) ?? 0,EurekaReady?.Invoke()==true,
+            configuration.CollectableUsePriming && turn.PrimingAction!=0 ? CollectableActionInfo?.Invoke(turn.PrimingAction)?.Cost ?? 0:0,collectableMeticulousBase.GetValueOrDefault(turn.ItemId));
         var tier=rule is null ? CollectableTier.Below:Gathering.Collectables.Tier(rule,turn.Current);
         ImGui.ProgressBar(Math.Clamp((float)turn.Current/turn.Maximum,0,1),new Vector2(-1,ImGui.GetFrameHeight()),localization.Format("CollectablePanel.Current",turn.Current.ToString("N0"),turn.Maximum.ToString("N0"),localization.Get($"CollectablePanel.Tier{tier}")));
         // Worked out when something changes, not at each frame.
@@ -145,6 +148,7 @@ internal sealed partial class MainWindow
             CollectableMove.Scrutiny=>(turn.ScrutinyAction,localization.Format("CollectablePanel.ScrutinyGain",bonuses.ScrutinyBonus,bonuses.ScrutinyCost)),
             CollectableMove.Restore=>(restore?.Spec.Id ?? 0,localization.Format(restoreStatus is null or 0 ? "CollectablePanel.RestoreGain":"CollectablePanel.RestoreWait",bonuses.RestoreCost)),
             CollectableMove.Eureka=>(job==16 ? 26521u:26522u,localization.Get("CollectablePanel.EurekaGain")),
+            CollectableMove.Priming=>(turn.PrimingAction,localization.Format("CollectablePanel.PrimingGain",bonuses.PrimingCost,Math.Min(100,Math.Max(1,bonuses.MeticulousBase)*2))),
             CollectableMove.Focus=>(turn.FocusAction,localization.Format("CollectablePanel.FocusGain",bonuses.FocusCost,bonuses.IntuitionBonus)),
             CollectableMove.Meticulous=>(turn.MeticulousAction,localization.Format("CollectablePanel.MeticulousGain",advice.GainLow,turn.MeticulousChance)),
             _=>(turn.CollectAction,""),
@@ -173,6 +177,9 @@ internal sealed partial class MainWindow
                 if(advice.Scrutinies>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanScrutinies",advice.Scrutinies,CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Name ?? "",advice.Scrutinies*bonuses.ScrutinyCost));
                 if(advice.Restores>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanRestores",advice.Restores,restore?.Name ?? "",advice.Restores*bonuses.RestoreCost,attempts ?? 0,(attempts ?? 0)+advice.Restores));
                 if(advice.Restores>0 && bonuses.EurekaChance>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanEureka",(bonuses.EurekaChance*100).ToString("0"),CollectableActionInfo?.Invoke(job==16 ? 26521u:26522u)?.Name ?? ""));
+                // 0.527 (user report): why Collector's Focus or Priming Touch may not be the move.
+                if(advice.Move is not (CollectableMove.Focus or CollectableMove.Priming) && (turn.FocusOpen && bonuses.FocusCost>0 || turn.PrimingOpen && bonuses.PrimingCost>0))
+                    ImGui.TextDisabled(localization.Format("CollectablePanel.BonusWhenWorth",CollectableActionInfo?.Invoke(turn.FocusAction)?.Name ?? "",turn.PrimingAction!=0 ? CollectableActionInfo?.Invoke(turn.PrimingAction)?.Name ?? "":""));
                 // 0.482 (user report: GP must count): what this plan spends, against the GP there is.
                 var planned=advice.Scrutinies*bonuses.ScrutinyCost+advice.Restores*bonuses.RestoreCost;
                 if(planned>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanGp",planned,bonuses.Gp,Math.Max(0,bonuses.Gp-planned)));

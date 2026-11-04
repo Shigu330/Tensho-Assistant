@@ -22,6 +22,33 @@ internal static class Gathering478Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Collectable plan (0.527): Priming Touch and Collector's Focus on the node of the report",() =>
+        {
+            var herb=Rule(43924,"Herb",90,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=3,RewardMid=7,RewardHigh=20};
+            var raw=Raw(0,200,100,300,150,false);raw[44]="44:uint 34872";raw[46]="46:bool True";raw[52]="52:text 24 %";
+            var turn=CollectableTurn.Parse(raw)!;
+            Check(turn is {PrimingAction:34872,PrimingOpen:true,MeticulousChance:24},$"read from the window: {turn}");
+            var gains=new CollectableBonuses(250,100,623,200,100,false,true,300,4,40,100,0.5m,false,100,24);
+            var scrutinyOn=gains with {ScrutinyActive=true};
+            // The capture: Scrutiny on, 623 GP. Two restored attempts (300 GP, 1.5 attempts each on average) earn more: no room for the others.
+            Check(CollectableAdvisor.Advise(turn with {IntuitionChance=40},4,herb,scrutinyOn)! is {Move:CollectableMove.Meticulous} capture && capture.Expected==CollectableAdvisor.Advise(turn with {IntuitionChance=40},4,herb,scrutinyOn with {PrimingCost=0})!.Expected,"623 GP: restored attempts first");
+            // 100 GP more: the spare GP goes to Priming Touch.
+            var spare=scrutinyOn with {Gp=723};
+            var with=CollectableAdvisor.Advise(turn with {IntuitionChance=40},4,herb,spare)!;
+            var without=CollectableAdvisor.Advise(turn with {IntuitionChance=40},4,herb,spare with {PrimingCost=0})!;
+            Check(with.Move==CollectableMove.Priming && with.Expected>without.Expected,$"723 GP: {with.Move} {with.Expected} against {without.Expected}");
+            var focusOff=CollectableAdvisor.Advise(turn with {IntuitionChance=40},4,herb,spare with {PrimingCost=0,FocusCost=0})!;
+            Check(without.Expected>focusOff.Expected,$"Collector's Focus counts too: {without.Expected} against {focusOff.Expected}");
+            Check(CollectableAdvisor.Advise(turn with {IntuitionChance=40,PrimingOpen=false},4,herb,spare)!.Move!=CollectableMove.Priming,"not offered by the window");
+            // The capture with both on: 48 % and 70 %: already on, not advised again.
+            Check(CollectableAdvisor.Advise(turn with {IntuitionChance=70,MeticulousChance=48},4,herb,spare)!.Move!=CollectableMove.Priming,"already on");
+            Check(CollectableAdvisor.Advise(turn with {IntuitionChance=40},4,herb,gains with {Gp=50})!.Move!=CollectableMove.Priming,"not without the GP");
+            // The third capture: 64 % after an Intuition is not Priming Touch: the chance counts as shown, and Priming is still possible.
+            var keen=turn with {Current=500,Scour=200,BrazenMin=300,BrazenMax=300,Meticulous=200,MeticulousChance=64,IntuitionChance=40};
+            var keenPlan=CollectableAdvisor.Advise(keen,4,herb,gains with {Gp=429,PrimingCost=0})!;
+            var usual=CollectableAdvisor.Advise(keen with {MeticulousChance=24},4,herb,gains with {Gp=429,PrimingCost=0})!;
+            Check(keenPlan.Expected>usual.Expected,$"64 % earns more than 24 %: {keenPlan.Expected} against {usual.Expected}");
+        }),
         ("Collectable plan (0.520): Solid Reason's free attempt counts in the average, never in the worst case; a free attempt ready comes before the last gather",() =>
         {
             var ore=Rule(36291,"Ore",80,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=14,RewardMid=21,RewardHigh=34};

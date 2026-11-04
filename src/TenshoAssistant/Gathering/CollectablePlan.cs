@@ -9,7 +9,7 @@ namespace TenshoAssistant.Gathering;
 /// </summary>
 public sealed record CollectableTurn(uint ItemId,int Current,int Maximum,int Scour,int BrazenMin,int BrazenMax,int Meticulous,bool EstimateScrutiny,bool EstimateIntuition,
     uint ScourAction,uint BrazenAction,uint MeticulousAction,uint CollectAction,uint ScrutinyAction,uint FocusAction,int MeticulousChance=0,int IntuitionChance=0,
-    bool ScourOpen=true,bool BrazenOpen=true,bool MeticulousOpen=true,bool ScrutinyOpen=true,bool FocusOpen=true)
+    bool ScourOpen=true,bool BrazenOpen=true,bool MeticulousOpen=true,bool ScrutinyOpen=true,bool FocusOpen=true,uint PrimingAction=0,bool PrimingOpen=false)
 {
     /// <summary>
     /// What a bonus adds to the gains shown. Brazen goes from 50 to 150 % of the plain gain and a bonus adds the same to everything, so its width is the plain gain. Null when the numbers do not fit that
@@ -52,7 +52,9 @@ public sealed record CollectableTurn(uint ItemId,int Current,int Maximum,int Sco
         }
         return new(item,(int)current,(int)maximum,(int)scour,(int)low,(int)high,(int)meticulous,scrutiny,intuition,scourAction,brazenAction,meticulousAction,collectAction,scrutinyAction,focusAction,Percent(52),Percent(58),
             // 0.488 (user request): the flag that follows each action's identifier: what the window offers this character. Absent: not held against it.
-            Flag(28) ?? true,Flag(31) ?? true,Flag(34) ?? true,Flag(40) ?? true,Flag(43) ?? true);
+            Flag(28) ?? true,Flag(31) ?? true,Flag(34) ?? true,Flag(40) ?? true,Flag(43) ?? true,
+            // 0.527: Priming Touch (value 44, its flag at 46, in the logs of 2026-11-04: false for the miner at level 85, true for the botanist at level 100).
+            Number(44) ?? 0,Flag(46)==true);
     }
 }
 
@@ -70,12 +72,14 @@ public sealed record CollectableTurn(uint ItemId,int Current,int Maximum,int Sco
 /// <param name="IntuitionBase">Intuition's usual chance: the lowest shown for this item. A much higher one this turn means Collector's Focus is on. 0: this turn's.</param>
 /// <param name="EurekaChance">0.520 (user report): what a restored attempt adds on average: from level 90, 50 % of Eureka Moment, hence of a free attempt (docs/evidence/0.410-gp-actions.md). Never in the worst case.</param>
 /// <param name="EurekaReady">Eureka Moment is on the player now: one free attempt, for sure.</param>
-public sealed record CollectableBonuses(int ScrutinyBonus=0,int IntuitionBonus=0,int Gp=0,int ScrutinyCost=0,int FocusCost=0,bool ScrutinyActive=false,bool UseScrutiny=true,int RestoreCost=0,int MaxAttempts=0,int IntuitionBase=0,int RiskTolerance=100,decimal EurekaChance=0,bool EurekaReady=false)
+/// <param name="PrimingCost">0.527 (user report): GP of Priming Touch, which doubles the chance that the next Meticulous costs no attempt (its description); 0: not planned.</param>
+/// <param name="MeticulousBase">Meticulous's usual chance: the lowest shown for this item. About twice that this turn means Priming Touch is on. 0: this turn's.</param>
+public sealed record CollectableBonuses(int ScrutinyBonus=0,int IntuitionBonus=0,int Gp=0,int ScrutinyCost=0,int FocusCost=0,bool ScrutinyActive=false,bool UseScrutiny=true,int RestoreCost=0,int MaxAttempts=0,int IntuitionBase=0,int RiskTolerance=100,decimal EurekaChance=0,bool EurekaReady=false,int PrimingCost=0,int MeticulousBase=0)
 {
     public static CollectableBonuses None{get;}=new();
 }
 
-public enum CollectableMove { Scour,Brazen,Meticulous,Collect,Scrutiny,Restore,Focus,Eureka }
+public enum CollectableMove { Scour,Brazen,Meticulous,Collect,Scrutiny,Restore,Focus,Eureka,Priming }
 /// <param name="Move">The best move now, on average.</param>
 /// <param name="Target">The tier reached without counting on luck; Below if none.</param>
 /// <param name="Selections">Actions of that sure plan.</param>
@@ -103,7 +107,7 @@ public sealed record CollectableAdvice(CollectableMove Move,CollectableTier Targ
 public static class CollectableAdvisor
 {
     private const decimal Margin=0.01m;
-    private const int BrazenSteps=5,LaterBrazenSteps=3,MaxStates=20000;
+    private const int BrazenSteps=5,LaterBrazenSteps=3,MaxStates=40000;
     private sealed record Gains(int Scour,int BrazenMin,int BrazenMax,int Meticulous,int Later);
     private readonly record struct Outcome(decimal Score,decimal Mean,decimal Worst,CollectableMove Move);
 
@@ -129,15 +133,21 @@ public static class CollectableAdvisor
         var scrutinyCost=bonuses.UseScrutiny && bonus>0 && turn.ScrutinyOpen ? bonuses.ScrutinyCost:0;
         var fullScrutinyCost=scrutinyCost;
         var restoreCost=Math.Max(0,bonuses.RestoreCost);var gpNow=Math.Max(0,bonuses.Gp);
-        var chance=Math.Clamp(turn.MeticulousChance,0,100)/100m;
-        var intuitionGain=Math.Max(0,bonuses.IntuitionBonus);var focusCost=turn.FocusOpen ? Math.Max(0,bonuses.FocusCost):0;
+        var shownMeticulous=Math.Clamp(turn.MeticulousChance,0,100)/100m;
+        var chance=bonuses.MeticulousBase>0 ? Math.Min(shownMeticulous,Math.Clamp(bonuses.MeticulousBase,0,100)/100m):shownMeticulous;
+        // The chance shown is twice the usual one: Priming Touch is already on. Any other higher chance is the game's own (capture of 2026-11-05: 64 % after an Intuition, « Keen Eye »): it counts as shown, this turn.
+        var primingOn=chance>0 && Math.Abs(shownMeticulous-chance*2)<=0.02m;
+        var primingCost=turn.PrimingOpen && turn.MeticulousOpen && chance>0 && !primingOn ? Math.Max(0,bonuses.PrimingCost):0;
+        var fullPrimingCost=primingCost;
+        // 0.527: Intuition gives half the plain gain: 88 for 177 (log, 0.481), 100 for 200 (capture of 2026-11-05: 250 + 150 + 100 = 500). The measure of another item would be wrong here; it only says that Intuition is known.
+        var intuitionGain=bonuses.IntuitionBonus>0 ? gains.Later/2:0;var focusCost=turn.FocusOpen ? Math.Max(0,bonuses.FocusCost):0;
         var fullFocusCost=focusCost;
         var shownChance=Math.Clamp(turn.IntuitionChance,0,100)/100m;
         var usualChance=bonuses.IntuitionBase>0 ? Math.Clamp(bonuses.IntuitionBase,0,100)/100m:shownChance;
         // The chance shown is much above the usual one: Collector's Focus is already on for this turn's action.
         var focusOn=shownChance>usualChance*1.4m;
         var caution=1m-Math.Clamp(bonuses.RiskTolerance,0,100)/100m;
-        var memo=new Dictionary<(int Value,int Attempts,int Gp,bool Active,bool Focus,bool First),Outcome>();
+        var memo=new Dictionary<(int Value,int Attempts,int Gp,bool Active,bool Focus,bool First,bool Priming),Outcome>();
         // Collecting: the attempts left, and those the GP left can restore on the way, each with its chance of a free one on average.
         Outcome Collecting(int value,int left,int gp)
         {
@@ -153,13 +163,13 @@ public static class CollectableAdvisor
             return new((1-caution)*mean+caution*kept.Min(row=>row.Branch.Score),kept.Sum(row=>row.Weight*row.Branch.Mean),kept.Min(row=>row.Branch.Worst),move);
         }
 
-        Outcome Best(int value,int left,int gp,bool active,bool focus,bool first)
+        Outcome Best(int value,int left,int gp,bool active,bool focus,bool first,bool priming)
         {
             value=Math.Min(value,turn.Maximum);
             // Nothing more to gain past the high threshold or the maximum. This also ends the search: a free Meticulous at the maximum would otherwise come back to the same state for ever, and a stack
             // overflow closes the game without a message (in-game report, 0.480). The memo and the bound on states keep it finite in every case.
             if(value>=turn.Maximum || value>=rule.High || left<=0 || memo.Count>MaxStates)return Collecting(value,left,gp);
-            var key=(value,left,gp,active,focus,first);
+            var key=(value,left,gp,active,focus,first,priming);
             if(memo.TryGetValue(key,out var known))return known;
             var plus=active ? bonus:0;
             var scour=(first ? gains.Scour:gains.Later)+plus;
@@ -168,42 +178,46 @@ public static class CollectableAdvisor
             var meticulous=(first ? gains.Meticulous:gains.Later*3/4)+plus;
             var luck=intuitionGain<=0 ? 0m:focus ? Math.Min(1m,usualChance*1.75m):first ? shownChance:usualChance;
             // After any Selection, at this action's chance of Intuition; Scrutiny and Focus are then used up.
-            Outcome After(int gained,int attemptsLeft,int gpLeft)
-                =>Roll(CollectableMove.Scour,(1-luck,Best(value+gained,attemptsLeft,gpLeft,false,false,false)),(luck,Best(value+gained+intuitionGain,attemptsLeft,gpLeft,false,false,false)));
+            // Priming Touch waits for the next Meticulous, its description says: other Selections leave it on.
+            Outcome After(int gained,int attemptsLeft,int gpLeft,bool primedAfter)
+                =>Roll(CollectableMove.Scour,(1-luck,Best(value+gained,attemptsLeft,gpLeft,false,false,false,primedAfter)),(luck,Best(value+gained+intuitionGain,attemptsLeft,gpLeft,false,false,false,primedAfter)));
             // In this order: on an equal score, collect now rather than spend; a sure gain rather than a roll; no GP rather than GP.
             var best=Collecting(value,left,gp);
             void Consider(Outcome outcome,CollectableMove move){if(outcome.Score>best.Score+Margin)best=outcome with {Move=move};}
-            if(left>=2 && scour>0 && turn.ScourOpen)Consider(After(scour,left-1,gp),CollectableMove.Scour);
+            if(left>=2 && scour>0 && turn.ScourOpen)Consider(After(scour,left-1,gp,priming),CollectableMove.Scour);
             if(meticulous>0 && turn.MeticulousOpen)
             {
                 // It costs no attempt at this chance; otherwise it costs one, and with the last one nothing is left to collect.
-                var paid=left>=2 ? After(meticulous,left-1,gp):new Outcome(0,0,0,CollectableMove.Collect);
-                Consider(chance>0 ? Roll(CollectableMove.Meticulous,(chance,After(meticulous,left,gp)),(1-chance,paid)):paid,CollectableMove.Meticulous);
+                var paid=left>=2 ? After(meticulous,left-1,gp,false):new Outcome(0,0,0,CollectableMove.Collect);
+                // This turn: the chance the game shows, plus the usual chance if Priming Touch is bought now. Later turns: the usual one, doubled by Priming Touch.
+                var free=first ? Math.Min(1m,shownMeticulous+(priming && !primingOn ? chance:0)):Math.Min(1m,priming ? chance*2:chance);
+                Consider(free>0 ? Roll(CollectableMove.Meticulous,(free,After(meticulous,left,gp,false)),(1-free,paid)):paid,CollectableMove.Meticulous);
             }
             if(left>=2 && high>0 && turn.BrazenOpen)
             {
                 var steps=first ? BrazenSteps:LaterBrazenSteps;
                 var rolls=new (decimal Weight,Outcome Branch)[steps];
-                for(var step=0;step<steps;step++)rolls[step]=(1m/steps,After(low+(high-low)*(2*step+1)/(2*steps),left-1,gp));
+                for(var step=0;step<steps;step++)rolls[step]=(1m/steps,After(low+(high-low)*(2*step+1)/(2*steps),left-1,gp,priming));
                 Consider(Roll(CollectableMove.Brazen,rolls),CollectableMove.Brazen);
             }
-            if(left>=2 && !active && scrutinyCost>0 && gp>=scrutinyCost)Consider(Best(value,left,gp-scrutinyCost,true,focus,first),CollectableMove.Scrutiny);
-            if(left>=2 && !focus && !(first && focusOn) && focusCost>0 && gp>=focusCost && intuitionGain>0 && usualChance>0)Consider(Best(value,left,gp-focusCost,active,true,first),CollectableMove.Focus);
+            if(left>=2 && !active && scrutinyCost>0 && gp>=scrutinyCost)Consider(Best(value,left,gp-scrutinyCost,true,focus,first,priming),CollectableMove.Scrutiny);
+            if(left>=2 && !focus && !(first && focusOn) && focusCost>0 && gp>=focusCost && intuitionGain>0 && usualChance>0)Consider(Best(value,left,gp-focusCost,active,true,first,priming),CollectableMove.Focus);
+            if(!priming && primingCost>0 && gp>=primingCost && meticulous>0)Consider(Best(value,left,gp-primingCost,active,focus,first,true),CollectableMove.Priming);
             // 0.488 (user request): only with one attempt left, so nothing is spent before it is needed.
-            if(restoreCost>0 && gp>=restoreCost && left==1 && left<bonuses.MaxAttempts)Consider(eureka>0 ? Roll(CollectableMove.Restore,(eureka,Best(value,left+2,gp-restoreCost,active,focus,first)),(1-eureka,Best(value,left+1,gp-restoreCost,active,focus,first))):Best(value,left+1,gp-restoreCost,active,focus,first),CollectableMove.Restore);
+            if(restoreCost>0 && gp>=restoreCost && left==1 && left<bonuses.MaxAttempts)Consider(eureka>0 ? Roll(CollectableMove.Restore,(eureka,Best(value,left+2,gp-restoreCost,active,focus,first,priming)),(1-eureka,Best(value,left+1,gp-restoreCost,active,focus,first,priming))):Best(value,left+1,gp-restoreCost,active,focus,first,priming),CollectableMove.Restore);
             memo[key]=best;
             return best;
         }
 
-        var result=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true);
+        var result=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn);
         if(result.Score<=0)
         {
             // A careful player may earn nothing for sure, yet luck could: only say impossible if even the bold search finds nothing.
             var kept=caution;caution=0;memo.Clear();
-            var bold=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true);
+            var bold=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn);
             caution=kept;memo.Clear();
             if(bold.Mean<=0)return new(CollectableMove.Collect,CollectableTier.Below,0,attempts,0,true);
-            result=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true);
+            result=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn);
         }
         // 0.482 (user report: Scrutiny not advised): the order of the actions does not change the score, so « no GP now » won the tie and the Scrutiny the plan needs came later. If a bonus action pays at
         // all and costs nothing to do first, it is the move now: it is the plain order to play, and it counts on the very next action.
@@ -212,16 +226,25 @@ public static class CollectableAdvisor
             decimal Without(bool scrutiny,bool focus)
             {
                 scrutinyCost=scrutiny ? 0:fullScrutinyCost;focusCost=focus ? 0:fullFocusCost;memo.Clear();
-                var worth=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true).Score;
+                var worth=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn).Score;
                 scrutinyCost=fullScrutinyCost;focusCost=fullFocusCost;memo.Clear();
                 return worth;
             }
             if(!bonuses.ScrutinyActive && fullScrutinyCost>0 && gpNow>=fullScrutinyCost && attempts>=2 && Without(true,false)<result.Score-Margin
-                && Best(turn.Current,attempts,gpNow-fullScrutinyCost,true,false,true) is var scrutinyFirst && scrutinyFirst.Score>=result.Score-Margin)
+                && Best(turn.Current,attempts,gpNow-fullScrutinyCost,true,false,true,primingOn) is var scrutinyFirst && scrutinyFirst.Score>=result.Score-Margin)
                 result=scrutinyFirst with {Move=CollectableMove.Scrutiny};
             else if(!focusOn && fullFocusCost>0 && gpNow>=fullFocusCost && attempts>=2 && intuitionGain>0 && usualChance>0 && Without(false,true)<result.Score-Margin
-                && Best(turn.Current,attempts,gpNow-fullFocusCost,bonuses.ScrutinyActive,true,true) is var focusFirst && focusFirst.Score>=result.Score-Margin)
+                && Best(turn.Current,attempts,gpNow-fullFocusCost,bonuses.ScrutinyActive,true,true,primingOn) is var focusFirst && focusFirst.Score>=result.Score-Margin)
                 result=focusFirst with {Move=CollectableMove.Focus};
+            // 0.527: Priming Touch, just before the Meticulous it doubles, when that is the move and it pays.
+            else if(result.Move==CollectableMove.Meticulous && fullPrimingCost>0 && gpNow>=fullPrimingCost)
+            {
+                primingCost=0;memo.Clear();
+                var without=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,false).Score;
+                primingCost=fullPrimingCost;memo.Clear();
+                var primed=Best(turn.Current,attempts,gpNow-fullPrimingCost,bonuses.ScrutinyActive,false,true,true);
+                if(primed.Score>without+Margin)result=primed with {Move=CollectableMove.Priming};
+            }
         }
 
         // The last gather ends the node: GP that can pay for one more goes first.

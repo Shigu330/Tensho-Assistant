@@ -711,6 +711,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.527 : Toucher d'amorçage dans le plan des collectionnables** — à voir en jouant
+
+- [ ] Botaniste ou mineur niveau 95 et plus, Inspection active, 723 PR environ : le panneau propose Toucher d'amorçage ; une fois lancé, il ne le repropose plus et compte 48 %.
+- [ ] Sous le niveau 95 : jamais proposé.
+- [ ] Toucher reste-t-il actif si une autre Sélection passe avant la Sélection méthodique ? Le plan suppose que oui, d'après sa description.
+
 **0.526 : légendes locales dans les Collections** — à voir en jouant
 
 - [x] (rapport de l'utilisateur, 2026-11-04, « legendes local ok ») Collections › Légendes locales : 36 tomes, marqués lus ou non comme dans votre personnage. Si un tome est mal marqué, la correspondance des bits est fausse : la carte se trompe aussi.

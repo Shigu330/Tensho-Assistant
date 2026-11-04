@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.527.0
+- Rapport de l'utilisateur en jeu (captures) : le plan des collectionnables ne proposait ni Œil du collectionneur ni Toucher d'amorçage. Toucher n'existait pas dans le calcul : il y entre, à ×2 sur Sélection méthodique, confirmé par la capture (24 → 48 %). Œil y était déjà (40 → 70 %, confirmé aussi).
+- Les deux ne sont proposés que s'ils rapportent plus que les mêmes PR ailleurs, et le panneau le dit. Sur la capture, à 623 PR avec Inspection active, ce n'est pas le cas : deux tentatives rendues valent plus. À 423 ou 723 PR, Toucher est conseillé ([calcul](docs/evidence/0.527-priming-touch.md)).
+- Réglage ajouté : Paramètres › Modules › Récolte, Toucher d'amorçage dans le plan.
+- Tests : Gathering478Tests complété, dont le nœud de la capture. Verify.ps1 (agent) : 998/998, 0 avertissement, 0 erreur ; DLL 0.527.0.0. Non validé en jeu.
+### English
+- Priming Touch now counts in the collectable plan (doubles the chance of a free Meticulous, confirmed in game). It and Collector's Focus are advised only when they earn more than the same GP elsewhere, and the panel says so.
+
 ## 0.526.0
 - Demande de l'utilisateur : Collections ne couvrait pas les légendes locales. Nouvel onglet avec les 36 tomes de mineur, botaniste et pêcheur, lu ou non, et comment obtenir chacun ([preuve](docs/evidence/0.526-folklore-tomes.md)).
 - La carte (0.518) ne voyait pas le douzième tome : FFXIVClientStructs déclare 11 bits, le tome d'Alexandrie est le bit 11. La lecture passe par les octets.

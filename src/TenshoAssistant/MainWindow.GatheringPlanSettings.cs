@@ -75,6 +75,7 @@ internal sealed partial class MainWindow
         BoolSetting("CollectablePanel.UseScrutiny","CollectablePanel.UseScrutinyTip",()=>configuration.CollectableUseScrutiny,value=>configuration.CollectableUseScrutiny=value,c=>c.CollectableUseScrutiny);
         IntSetting("CollectablePanel.Risk","CollectablePanel.RiskTip",()=>configuration.CollectableRiskTolerance,value=>configuration.CollectableRiskTolerance=value,0,100,DefaultConfiguration.CollectableRiskTolerance);
         BoolSetting("CollectablePanel.UseFocus","CollectablePanel.UseFocusTip",()=>configuration.CollectableUseFocus,value=>configuration.CollectableUseFocus=value,c=>c.CollectableUseFocus);
+        BoolSetting("CollectablePanel.UsePriming","CollectablePanel.UsePrimingTip",()=>configuration.CollectableUsePriming,value=>configuration.CollectableUsePriming=value,c=>c.CollectableUsePriming);
         BoolSetting("CollectablePanel.UseRestore","CollectablePanel.UseRestoreTip",()=>configuration.CollectableUseRestore,value=>configuration.CollectableUseRestore=value,c=>c.CollectableUseRestore);
         DrawGpForbiddenActions();
     }
