@@ -81,8 +81,10 @@ public enum CollectableMove { Scour,Brazen,Meticulous,Collect,Scrutiny,Restore,F
 /// <param name="Restores">Attempts restored in the sure plan.</param>
 /// <param name="HighScrips">The reference: the most scrips of the high tier on this node for sure; null if not reachable for sure.</param>
 /// <param name="HighMissing">What the sure plan lacks to reach the high threshold, all GP spent.</param>
+/// <param name="GainLow">0.482: what the move really adds now, without the bonus of a ticked box unless it is on the player.</param>
+/// <param name="GainHigh">The top of that gain, for Brazen.</param>
 public sealed record CollectableAdvice(CollectableMove Move,CollectableTier Target,int Selections,int Collections,int Scrips,bool Impossible=false,int Scrutinies=0,decimal Expected=0,
-    int Restores=0,int? HighScrips=null,int HighMissing=0);
+    int Restores=0,int? HighScrips=null,int HighMissing=0,int GainLow=0,int GainHigh=0);
 
 /// <summary>
 /// 0.479: the plan for the attempts left, for the most scrips on this node: each attempt spent raising collectability is one less to collect, so what counts is the tier reached times the items collected.
@@ -113,9 +115,11 @@ public static class CollectableAdvisor
         var gains=Sure(turn,bonuses);
         var bonus=bonuses.UseScrutiny || bonuses.ScrutinyActive ? Math.Max(0,bonuses.ScrutinyBonus):0;
         var scrutinyCost=bonuses.UseScrutiny && bonus>0 ? bonuses.ScrutinyCost:0;
+        var fullScrutinyCost=scrutinyCost;
         var restoreCost=Math.Max(0,bonuses.RestoreCost);var gpNow=Math.Max(0,bonuses.Gp);
         var chance=Math.Clamp(turn.MeticulousChance,0,100)/100m;
         var intuitionGain=Math.Max(0,bonuses.IntuitionBonus);var focusCost=Math.Max(0,bonuses.FocusCost);
+        var fullFocusCost=focusCost;
         var shownChance=Math.Clamp(turn.IntuitionChance,0,100)/100m;
         var usualChance=bonuses.IntuitionBase>0 ? Math.Clamp(bonuses.IntuitionBase,0,100)/100m:shownChance;
         // The chance shown is much above the usual one: Collector's Focus is already on for this turn's action.
@@ -169,6 +173,24 @@ public static class CollectableAdvisor
 
         var result=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true);
         if(result.Worth<=0)return new(CollectableMove.Collect,CollectableTier.Below,0,attempts,0,true);
+        // 0.482 (user report: Scrutiny not advised): the order of the actions does not change the average, so « no GP now » won the tie and the Scrutiny the plan needs came later. If a bonus action pays at
+        // all and costs nothing to do first, it is the move now: it is the plain order to play, and it counts on the very next action.
+        if(result.Move is CollectableMove.Scour or CollectableMove.Brazen or CollectableMove.Meticulous)
+        {
+            decimal Without(bool scrutiny,bool focus)
+            {
+                scrutinyCost=scrutiny ? 0:fullScrutinyCost;focusCost=focus ? 0:fullFocusCost;memo.Clear();
+                var worth=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true).Worth;
+                scrutinyCost=fullScrutinyCost;focusCost=fullFocusCost;memo.Clear();
+                return worth;
+            }
+            if(!bonuses.ScrutinyActive && fullScrutinyCost>0 && gpNow>=fullScrutinyCost && attempts>=2 && Without(true,false)<result.Worth-Margin
+                && Best(turn.Current,attempts,gpNow-fullScrutinyCost,true,false,true).Worth>=result.Worth-Margin)
+                result=(result.Worth,CollectableMove.Scrutiny);
+            else if(!focusOn && fullFocusCost>0 && gpNow>=fullFocusCost && attempts>=2 && intuitionGain>0 && usualChance>0 && Without(false,true)<result.Worth-Margin
+                && Best(turn.Current,attempts,gpNow-fullFocusCost,bonuses.ScrutinyActive,true,true).Worth>=result.Worth-Margin)
+                result=(result.Worth,CollectableMove.Focus);
+        }
 
         // The plan without luck, to say what is certain, and the reference: the high tier with the most gathers.
         int Reach(int selections,int scrutinies)=>selections==0 ? turn.Current:Math.Min(turn.Maximum,turn.Current+gains.Scour+(selections-1)*gains.Later+(scrutinies+(bonuses.ScrutinyActive ? 1:0))*bonus);
@@ -194,8 +216,16 @@ public static class CollectableAdvisor
         if(sureValue<=0){sure=0;sureScrutinies=0;sureRestores=0;sureCollects=attempts;}
         var reached=sureValue>0 ? Collectables.Tier(rule,Reach(sure,sureScrutinies)):CollectableTier.Below;
         var scrips=rule.Scrips ? Reward(rule,reached)*sureCollects:0;
+        var onNow=bonuses.ScrutinyActive ? bonus:0;
+        var (gainLow,gainHigh)=result.Move switch
+        {
+            CollectableMove.Scour=>(gains.Scour+onNow,gains.Scour+onNow),
+            CollectableMove.Brazen=>(gains.BrazenMin+onNow,gains.BrazenMax+onNow),
+            CollectableMove.Meticulous=>(gains.Meticulous+onNow,gains.Meticulous+onNow),
+            _=>(0,0),
+        };
         return new(result.Move,reached,sure,sureCollects,scrips,false,sureScrutinies,result.Worth,sureRestores,
-            highCollects is { } most && rule.Scrips ? rule.RewardHigh*most:null,Math.Max(0,rule.High-furthest));
+            highCollects is { } most && rule.Scrips ? rule.RewardHigh*most:null,Math.Max(0,rule.High-furthest),gainLow,gainHigh);
     }
     private static decimal Worth(CollectableRule rule,CollectableTier tier)
         =>rule.Scrips && rule.RewardHigh>0 ? Reward(rule,tier):tier switch{CollectableTier.High=>3,CollectableTier.Mid=>2,CollectableTier.Low=>1,_=>0};

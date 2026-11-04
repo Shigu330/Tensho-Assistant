@@ -22,6 +22,7 @@ internal sealed partial class MainWindow
     private CollectableTurn? collectableTurn;
     private (CollectableTurn Turn,int? Attempts,CollectableRule? Rule,CollectableBonuses Bonuses)? collectableAdviceKey;
     private CollectableAdvice? collectableAdvice;
+    private int? collectableLastGp;
     private readonly Dictionary<uint,int> collectableChanceBase=[];
 
     internal void DrawCollectablePanel()
@@ -84,6 +85,13 @@ internal sealed partial class MainWindow
     private void DrawCollectableAdvice(CollectableTurn turn,int? attempts,int? maximum,int? gp,CollectableRule? rule)
     {
         var active=ScrutinyActive?.Invoke()==true;
+        // 0.482: GP that comes back at a tick during a pass: a small rise, the smallest seen counts (as on a node).
+        if(gp is { } gpNow)
+        {
+            var risen=gpNow-(collectableLastGp ?? gpNow);
+            if(risen is >0 and <=50 && (configuration.GpRegenObserved==0 || risen<configuration.GpRegenObserved)){configuration.GpRegenObserved=risen;SaveReminders();}
+            collectableLastGp=gpNow;
+        }
         LearnCollectableBonuses(turn,active);
         var job=turn.ScourAction==22182 ? 16u:17u;
         var restore=configuration.CollectableUseRestore ? gpActions.State.Catalog?.Actions.FirstOrDefault(row=>row.Spec.JobId==job && row.Spec.Effect==GpEffect.Attempt && !GpActionRules.Forbidden(GpForbidden,row.Spec)):null;
@@ -103,12 +111,12 @@ internal sealed partial class MainWindow
         }
         var (action,gain)=advice.Move switch
         {
-            CollectableMove.Scour=>(turn.ScourAction,$"+{turn.Scour}"),
-            CollectableMove.Brazen=>(turn.BrazenAction,localization.Format("CollectablePanel.Range",turn.BrazenMin,turn.BrazenMax)),
+            CollectableMove.Scour=>(turn.ScourAction,$"+{advice.GainLow}"),
+            CollectableMove.Brazen=>(turn.BrazenAction,localization.Format("CollectablePanel.Range",advice.GainLow,advice.GainHigh)),
             CollectableMove.Scrutiny=>(turn.ScrutinyAction,localization.Format("CollectablePanel.ScrutinyGain",bonuses.ScrutinyBonus,bonuses.ScrutinyCost)),
             CollectableMove.Restore=>(restore?.Spec.Id ?? 0,localization.Format("CollectablePanel.RestoreGain",bonuses.RestoreCost)),
             CollectableMove.Focus=>(turn.FocusAction,localization.Format("CollectablePanel.FocusGain",bonuses.FocusCost,bonuses.IntuitionBonus)),
-            CollectableMove.Meticulous=>(turn.MeticulousAction,localization.Format("CollectablePanel.MeticulousGain",turn.Meticulous,turn.MeticulousChance)),
+            CollectableMove.Meticulous=>(turn.MeticulousAction,localization.Format("CollectablePanel.MeticulousGain",advice.GainLow,turn.MeticulousChance)),
             _=>(turn.CollectAction,""),
         };
         var info=CollectableActionInfo?.Invoke(action);
@@ -127,10 +135,15 @@ internal sealed partial class MainWindow
                     ImGui.TextColored(Accent,advice.HighScrips is { } highest ? localization.Format("CollectablePanel.Reference",rule.RewardHigh,highest):localization.Format("CollectablePanel.ReferenceFar",rule.RewardHigh,advice.HighMissing));
                     ImGui.TextWrapped(localization.Format("CollectablePanel.Expected",advice.Expected.ToString("0.0")));
                 }
-                if(advice.Restores>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanRestores",advice.Restores,restore?.Name ?? "",advice.Restores*bonuses.RestoreCost));
                 ImGui.TextDisabled(advice.Target==CollectableTier.Below ? localization.Get("CollectablePanel.OutOfReach")
                     :advice.Scrips>0 ? localization.Format("CollectablePanel.Plan",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections,advice.Scrips)
                     :localization.Format("CollectablePanel.PlanItems",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections));
+                // 0.482 (user report: « 5 actions » for 4 attempts): the actions that cost no attempt, and where an extra attempt comes from, are said under the plan.
+                if(advice.Scrutinies>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanScrutinies",advice.Scrutinies,CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Name ?? "",advice.Scrutinies*bonuses.ScrutinyCost));
+                if(advice.Restores>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanRestores",advice.Restores,restore?.Name ?? "",advice.Restores*bonuses.RestoreCost,attempts ?? 0,(attempts ?? 0)+advice.Restores));
+                // 0.482 (user report: GP must count): what this plan spends, against the GP there is.
+                var planned=advice.Scrutinies*bonuses.ScrutinyCost+advice.Restores*bonuses.RestoreCost;
+                if(planned>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanGp",planned,bonuses.Gp,Math.Max(0,bonuses.Gp-planned)));
             }
         }
         finally{ImGui.PopTextWrapPos();}

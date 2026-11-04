@@ -216,6 +216,11 @@ internal static class Gathering478Tests
             var start=CollectableTurn.Parse(Raw(0,177,88,265,132,false))! with {IntuitionChance=13};
             var plan=CollectableAdvisor.Advise(start,4,ore,measured)!;
             Check(plan is {HighScrips:20,HighMissing:0} && plan.Scrips>=20 && plan.Expected>=20,$"start: at least what the player reached: {plan}");
+            Check(plan.Move==CollectableMove.Scrutiny,$"in-game report: Scrutiny pays, so it is the move now, not later: {plan}");
+            var ticked=CollectableTurn.Parse(Raw(0,352,263,440,307,true))! with {IntuitionChance=13};
+            Check(CollectableAdvisor.Advise(ticked,4,ore,measured)==plan,"in-game capture: the box « with Scrutiny » ticked changes nothing");
+            var plainMove=CollectableAdvisor.Advise(ticked,4,ore,new CollectableBonuses(0,0,0))!;
+            Check(plainMove.GainLow<=177,$"the gain announced is the real one, not the box's +352: {plainMove}");
             Check(plan is {Target:CollectableTier.Mid,Selections:2,Scrutinies:2,Restores:1,Collections:3,Scrips:21},$"3 gathers at 7 with Solid Reason beat 1 at 20: {plan}");
             var noRestore=CollectableAdvisor.Advise(start,4,ore,measured with {RestoreCost=0})!;
             Check(noRestore is {Target:CollectableTier.High,Selections:3,Scrutinies:3,Collections:1,Scrips:20} && noRestore.Expected>=20,$"without restoring attempts, the player's own run: {noRestore}");

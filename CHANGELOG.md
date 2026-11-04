@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.482.0
+- Rapport de l'utilisateur en jeu : « ne conseille pas l'action Inspection ». L'ordre des actions ne change pas la moyenne, et l'égalité donnait « pas de PR maintenant » : Inspection restait pour plus tard. Une action bonus qui rapporte et peut passer d'abord est maintenant le coup conseillé, Inspection puis Œil du collectionneur.
+- Le gain affiché était celui de la case cochée du jeu (+352) au lieu du gain réel (+177) : corrigé. Le panneau indique aussi les Inspections du plan et leurs PR. Rapport « le texte fait 5 actions » pour 4 tentatives : la cinquième vient de Raison solide, et le panneau le dit maintenant (de 4 à 5 tentatives). Le plan limitait déjà ses actions aux PR disponibles ; le panneau montre maintenant ce qu'il dépense et ce qu'il reste, et mesure les PR regagnés. Les PR regagnés pendant la passe ne sont pas encore comptés dans le plan.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 918/918, 0 avertissement, 0 erreur ; DLL 0.482.0.0. Non validé en jeu.
+### English
+- The collectable plan now advises Scrutiny, then Collector's Focus, first when they pay, instead of leaving them for later, and shows the real gain rather than the one of a ticked box.
+
 ## 0.481.0
 - Rapport de l'utilisateur en jeu : « ne prend toujours pas en compte action inspection et œil ». Erreur de la 0.480 : les cases étaient lues à l'envers. Le journal montre que 54 est la case « Avec Inspection rigoureuse » (+175) et 56 la case « Avec Intuition » (+88) ([preuve](docs/evidence/0.479-collectable-window-values.md)). La valeur fausse apprise en 0.480 est abandonnée : il faut recocher les cases une fois.
 - Inspection rigoureuse et Œil du collectionneur entrent dans le calcul, ainsi qu'Intuition, au pourcentage affiché par le jeu (valeur 58). Ce qui est annoncé comme certain ne compte pas sur Intuition. Réglage pour ne pas utiliser Œil. Le panneau est raccourci : la méthode passe dans une bulle.
