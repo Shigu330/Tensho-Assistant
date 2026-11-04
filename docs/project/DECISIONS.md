@@ -304,3 +304,13 @@ Decision: Chat personnalisable abandonné et retiré : page, fenêtre, réglages
 Reason: Choix de l'utilisateur, 2026-11-04.
 Consequences: 0.472. L'ancien plan et le code restent dans l'historique git (commit bf30b72, 0.471.0). Les modèles communautaires (TEMPLATES-001) continuent.
 References: docs/project/DECISIONS.md (DEC-029), docs/goals/TEMPLATES-001.md
+
+DEC-ID: DEC-031
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: Plan de première prise en main, aide, vidéos et tickets (ONBOARD-001) ; dix décisions G1 à G10. GitHub n'était plus tenu à jour depuis 0.454.
+Evidence: Réponse de l'utilisateur : « oui pour tous mais tu ne gere pas completement le git issues est pas a jour » ; « je parlais demander mon accord quand tu as besoin par rapport au regle dalamud ».
+Options: Les choix recommandés du plan, ou les changer un par un.
+Decision: Tous les choix recommandés : l'aide avant le guide ; une proposition unique aux joueurs existants ; sources présentées, défauts inchangés ; visite selon les métiers ; formulaire GitHub prérempli, sans jeton ni serveur ; YouTube d'abord ; vidéos relues par l'utilisateur ; bandeau de première visite activé avec option ; anglais et français ; après le conseil Dresseur, avant D17. Les issues sont tenues à chaque version. Une règle Dalamud en jeu : résumé et accord de l'utilisateur.
+Reason: Décision de l'utilisateur.
+Consequences: Issues #11, #12, #15, #16, #30 fermées sur rapport ou preuve ; BST-001, ONBOARD-001 et deux issues de suivi ouvertes ; étiquette ultracode retirée. Exception à DEC-009 pour le conseil d'équipe du dresseur : pas décidée, soumise à l'accord de l'utilisateur.
+References: docs/goals/ONBOARD-001.md, docs/ai/STATUS.md, CLAUDE.md

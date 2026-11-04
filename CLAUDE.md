@@ -37,7 +37,8 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
    commit + push ; `$env:TENSHO_COMMIT_TRAILER` ajoute la ligne `Co-Authored-By` de l'agent). Release : `.\scripts\Verify.ps1 -Release`
    (Devloppement fusionnée dans main, tag `Stable-x.y.z`, release GitHub avec `latest.zip`, `repo.json`), seulement sur demande explicite
    de l'utilisateur ; `-DryRun` pour voir les commandes. L'utilisateur peut aussi les lancer lui-même (CONTRIBUTING.md « Versions and releases »).
-6. Toute preuve citée par le code (sonde, extrait de journal) va dans `docs/evidence/` et est référencée par ce chemin.
+6. Issues GitHub : commenter celles que la version fait avancer, en ouvrir une pour un travail nouveau, en anglais, et fermer sur preuve (Verify vert pour le code, rapport de l'utilisateur pour le jeu). Quand une règle Dalamud entre en jeu : résumé et accord de l'utilisateur.
+7. Toute preuve citée par le code (sonde, extrait de journal) va dans `docs/evidence/` et est référencée par ce chemin.
    `checkpoints/` est un dossier local de travail, ignoré par git. Demande utilisateur (2026-11-02) : avant toute grosse modification,
    un zip de sauvegarde des fichiers du dépôt (sans bin/obj) y est créé (`backup-<horodatage>-<contexte>.zip`).
 
