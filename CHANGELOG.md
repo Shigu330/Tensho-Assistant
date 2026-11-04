@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.474.0
+- TEMPLATES-001 phase B3 : éditeur de « Mes outils » dans le jeu, sans écrire de JSON. Les sept blocs, l'ordre, la licence libre CC0 à cocher, le texte écrit dans la langue du plugin avec les autres langues gardées. Enregistrer passe par le même format strict qu'un fichier partagé. Un objet s'ajoute depuis l'objet sélectionné dans Tensho, jamais par un identifiant tapé.
+- Tests : MyToolsTests complété. Verify.ps1 (agent) : 899/899, 0 avertissement, 0 erreur ; DLL 0.474.0.0. Non validé en jeu.
+### English
+- « My tools » gains an editor in the game: compose a tool block by block, without writing any file. Saving goes through the same strict format as a shared file.
+
 ## 0.473.0
 - Demande de l'utilisateur, TEMPLATES-001 phases B0, B1, B2 et B4 ([DEC-029](docs/project/DECISIONS.md)) : page « Mes outils », sous l'accueil. Un outil est un fichier de données : titre, note, cases à remise à zéro, compteur, minuteur, objets (voulu, possédé, manque), lien. Il ne contient aucun code et n'envoie rien au jeu.
 - Format strict : champ ou bloc inconnu, valeur hors bornes ou lien non https refuse le fichier avec la raison. Textes nettoyés. Une ligne partagée compressée est lue avec une taille bornée. Tout est montré avant l'installation, et un lien s'ouvre seulement après une confirmation qui montre l'adresse.

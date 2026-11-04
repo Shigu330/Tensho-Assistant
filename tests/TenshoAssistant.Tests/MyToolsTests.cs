@@ -135,6 +135,35 @@ internal static class MyToolsTests
             }
             Check(File.ReadAllText(path)=="not json","never written over");
         })),
+        ("My tools editor: only what the format accepts is saved; other languages are kept; blocks move",() =>
+        {
+            var draft=ToolDraft.New();
+            Check(ToolTemplateFormat.ValidId(draft.Id) && draft.Id!=ToolDraft.New().Id,"new id");
+            Check(draft.Check().Problem?.Code=="Missing","no name yet");
+            draft.Name=ToolDraft.With(draft.Name,"fr","Mon outil");
+            Check(draft.Check().Template is {Blocks.Count:0},"a name is enough: "+draft.Check().Problem?.Code);
+            foreach(var kind in Enum.GetValues<ToolBlockKind>())
+            {
+                var block=ToolDraft.NewBlock(kind);
+                draft.Blocks.Add(block);
+                Check(draft.Check().Problem is not null,"a new block is not complete: "+kind);
+                draft.Blocks.RemoveAt(0);
+            }
+            draft.Blocks.Add(new NoteBlock(new(new Dictionary<string,string>{["en"]="a"})));
+            draft.Blocks.Add(new HeadingBlock(new(new Dictionary<string,string>{["en"]="b"})));
+            Check(draft.Move(1,-1) && draft.Blocks[0] is HeadingBlock,"moved");
+            Check(!draft.Move(0,-1) && !draft.Move(1,1) && !draft.Move(9,1),"not past the ends");
+            draft.Blocks.Add(new LinkBlock(new(new Dictionary<string,string>{["en"]="c"}),"http://example.com"));
+            Check(draft.Check().Problem?.Code=="BadLink","the editor cannot make what an import refuses");
+            draft.Blocks.RemoveAt(2);
+            draft.FreeToShare=true;draft.Author=" Ann ";
+            var saved=draft.Check().Template!;
+            Check(saved.License==ToolDraft.FreeLicense && saved.Author=="Ann","licence and author");
+            var edited=ToolDraft.From(saved);
+            Check(edited.Id==saved.Id && edited.FreeToShare && edited.Blocks.Count==2,"edit an installed tool");
+            var both=ToolDraft.With(new(new Dictionary<string,string>{["en"]="a"}),"fr","b");
+            Check(both.Values.Count==2 && ToolDraft.With(both,"fr"," ").Values.Count==1,"other languages kept");
+        }),
         ("My tools wiring: nothing sent to the game; links confirmed; the file is checked and shown before it is installed",() =>
         {
             var page=Read("MainWindow.MyTools.cs");

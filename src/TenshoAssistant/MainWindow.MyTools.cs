@@ -24,6 +24,10 @@ internal sealed partial class MainWindow
         if(MyToolsStore is not { } store)return;
         if(store.Unavailable){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("MyToolsUi.Unavailable"));return;}
         if(store.RefusedCount>0)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MyToolsUi.Refused",store.RefusedCount));
+        if(myToolDraft is { } draft){DrawMyToolEditor(store,draft);return;}
+        if(ImGui.SmallButton(localization.Get("MyToolsUi.Create"))){myToolDraft=ToolDraft.New();myToolDraftProblem=null;return;}
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.CreateTip"));
+        ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get(myToolsImporting ? "MyToolsUi.ImportClose":"MyToolsUi.Import"))){myToolsImporting=!myToolsImporting;myToolsPreview=null;}
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.ImportTip"));
         if(myToolsImporting)DrawMyToolsImport(store);
@@ -43,6 +47,9 @@ internal sealed partial class MainWindow
     private void DrawMyToolActions(ToolTemplateStore store,InstalledTool tool)
     {
         if(tool.Template.Author is { } author){ImGui.TextDisabled(localization.Format("MyToolsUi.Author",author));ImGui.SameLine();}
+        if(ImGui.SmallButton(localization.Get("MyToolsUi.Edit"))){myToolDraft=ToolDraft.From(tool.Template);myToolDraftProblem=null;return;}
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.EditTip"));
+        ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("MyToolsUi.Share")))ImGui.SetClipboardText(ToolTemplateFormat.Encode(tool.Json));
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.ShareTip"));
         ImGui.SameLine();
