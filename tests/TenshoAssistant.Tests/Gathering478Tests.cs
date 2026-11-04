@@ -22,6 +22,23 @@ internal static class Gathering478Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Collectable plan (0.520): Solid Reason's free attempt counts in the average, never in the worst case; a free attempt ready comes before the last gather",() =>
+        {
+            var ore=Rule(36291,"Ore",80,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=14,RewardMid=21,RewardHigh=34};
+            var full=CollectableTurn.Parse(Raw(1000,177,88,265,132,false))!;
+            var without=CollectableAdvisor.Advise(full,3,ore,new CollectableBonuses(Gp:349,RestoreCost:300,MaxAttempts:6))!;
+            Check(without is {Expected:136m,Worst:136m,Restores:1},$"the capture before: {without}");
+            var with=CollectableAdvisor.Advise(full,3,ore,new CollectableBonuses(Gp:349,RestoreCost:300,MaxAttempts:6,EurekaChance:0.5m))!;
+            Check(with is {Expected:153m,Worst:136m,Restores:1,Scrips:136},$"3 + 1 + half a free one, the sure plan unchanged: {with}");
+            var ready=CollectableAdvisor.Advise(full,3,ore,new CollectableBonuses(MaxAttempts:6,EurekaReady:true))!;
+            Check(ready is {Expected:136m,Worst:136m,Collections:4},$"ready: one more for sure: {ready}");
+            var last=CollectableAdvisor.Advise(full,1,ore,new CollectableBonuses(MaxAttempts:6,EurekaReady:true))!;
+            Check(last.Move==CollectableMove.Eureka && last.Collections==2,$"before the last gather closes the node: {last}");
+            var turnBelow=CollectableTurn.Parse(Raw(0,177,88,265,132,false))!;
+            var one=CollectableAdvisor.Advise(full,1,ore,new CollectableBonuses(Gp:349,RestoreCost:300,MaxAttempts:6,EurekaChance:0.5m))!;
+            Check(one.Move==CollectableMove.Restore,$"the last attempt: restore first: {one}");
+            Check(CollectableAdvisor.Advise(turnBelow,4,ore,new CollectableBonuses(175,88,809,200,100,false,true,300,6,13,100,0.5m)) is {Expected:>0},"a search with the chance ends");
+        }),
         ("Crafting list raw needs: a recipe's materials over the whole list, shared materials added, an item without recipe as it is",() =>
         {
             RecipeDefinition Recipe(uint recipe,uint result,params (uint Id,int Amount)[] ingredients)=>new(recipe,result,1,"Test",100,ingredients.Select(row=>new RecipeIngredient(row.Id,row.Amount)).ToArray(),0,null);

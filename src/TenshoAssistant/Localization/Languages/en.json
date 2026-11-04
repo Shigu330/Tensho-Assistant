@@ -5474,6 +5474,8 @@
     "Plan": "For sure, without luck: {0} tier: {1} Scour, then {2} gather(s): {3} scrips.",
     "PlanItems": "For sure, without luck: {0} tier: {1} Scour, then {2} gather(s).",
     "PlanScrutinies": "Before them: {0} × {1}, {2} GP, no attempt used.",
+    "EurekaGain": "+1 free attempt",
+    "PlanEureka": "And {0} % chance of a free attempt ({1}): counted in the average, not in the worst case.",
     "PlanRestores": "{0} × {1}, {2} GP, with the last attempt: from {3} to {4} attempts.",
     "FocusGain": "{0} GP, Intuition more likely on the next action (+{1})",
     "HowLabel": "How is this worked out? (hover)",

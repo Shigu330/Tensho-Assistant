@@ -711,6 +711,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.520 : tentative gratuite dans le plan des collectionnables** — à voir en jouant
+
+- [ ] Niveau 90 et plus, PR pour Sagesse du fermier ou Raison solide : la moyenne dépasse le pire cas, et la ligne « 50 % de chances d'une tentative gratuite » apparaît.
+- [ ] Sous le niveau 90 : pas de cette ligne.
+- [ ] Étalage des connaissances prêt à la dernière tentative : le panneau le propose avant « Récolte ».
+
 **0.519 : éclats, cristaux et agrégats** — à voir en jouant
 
 - [ ] Cristal ou agrégat : le panneau propose Bénédiction de la nature, sans « ≈ N objets ».

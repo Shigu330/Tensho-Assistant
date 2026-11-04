@@ -3,6 +3,14 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.520.0
+- Rapport de l'utilisateur en jeu (capture de Sagesse du fermier, « pas pris en compte ») : le plan des collectionnables comptait la tentative rendue, mais pas son effet additionnel, 50 % de chances d'une tentative gratuite (niveau 90 et plus). Sur la capture : 136 en moyenne, soit 4 × 34.
+- La moyenne le compte maintenant (153 sur ce cas), jamais le pire cas (136) ; une ligne du panneau le dit. Si Étalage des connaissances est déjà prêt (statut 2765), la tentative gratuite compte pour de bon et passe avant la dernière récolte, qui fermerait le nœud.
+- Lecture de l'utilisateur à confirmer : c'est bien l'effet à 50 % qui manquait, la tentative elle-même figurait déjà au plan.
+- Tests : Gathering478Tests complété, dont le cas de la capture. Verify.ps1 (agent) : 989/989, 0 avertissement, 0 erreur ; DLL 0.520.0.0. Non validé en jeu.
+### English
+- The collectable plan now counts Solid Reason's and Ageless Words' 50 % chance of a free attempt in its average, never in its worst case. A free attempt already ready counts for sure and comes before the last gather.
+
 ## 0.519.0
 - Rapport de l'utilisateur en jeu (captures) : sur un Cristal de vent, le plan proposait Récolte royale II et Extraction abondante ×3, « ≈ 15 objets », alors que le jeu en donne 8 à 30 par récolte et que les actions propres aux cristaux n'étaient pas proposées ([preuve](docs/evidence/0.519-crystal-actions.md)).
 - Éclats, cristaux et agrégats (catégorie d'objet du jeu) : le panneau propose Bénédiction de la nature, et Bénédiction des Douze pour les éclats seulement comme le dit son texte, selon le niveau et les PR. Aucune quantité n'est calculée : le jeu ne donne pas de chiffre.

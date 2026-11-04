@@ -89,6 +89,9 @@ internal sealed partial class MainWindow
     }
 
     // 0.479 (user request, in-game campaign): the current collectability and what to do next, from the values the window gives this turn. Nothing is executed.
+    /// <summary>0.520: from the job's trait, Solid Reason's chance of a free attempt; and whether that free attempt is ready now.</summary>
+    internal Func<uint,decimal>? EurekaChanceFor { get; set; }
+    internal Func<bool>? EurekaReady { get; set; }
     private void DrawCollectableAdvice(CollectableTurn turn,int? attempts,int? maximum,int? gp,CollectableRule? rule)
     {
         var active=ScrutinyActive?.Invoke()==true;
@@ -106,7 +109,7 @@ internal sealed partial class MainWindow
         }
         var bonuses=new CollectableBonuses(configuration.CollectableScrutinyGain,configuration.CollectableIntuitionGain,gp ?? 0,
             CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Cost ?? 0,configuration.CollectableUseFocus ? CollectableActionInfo?.Invoke(turn.FocusAction)?.Cost ?? 0:0,active,configuration.CollectableUseScrutiny,restore?.Spec.Cost ?? 0,maximum ?? 0,
-            collectableChanceBase.GetValueOrDefault(turn.ItemId),Math.Clamp(configuration.CollectableRiskTolerance,0,100));
+            collectableChanceBase.GetValueOrDefault(turn.ItemId),Math.Clamp(configuration.CollectableRiskTolerance,0,100),restore is null ? 0:EurekaChanceFor?.Invoke(job) ?? 0,EurekaReady?.Invoke()==true);
         var tier=rule is null ? CollectableTier.Below:Gathering.Collectables.Tier(rule,turn.Current);
         ImGui.ProgressBar(Math.Clamp((float)turn.Current/turn.Maximum,0,1),new Vector2(-1,ImGui.GetFrameHeight()),localization.Format("CollectablePanel.Current",turn.Current.ToString("N0"),turn.Maximum.ToString("N0"),localization.Get($"CollectablePanel.Tier{tier}")));
         // Worked out when something changes, not at each frame.
@@ -141,6 +144,7 @@ internal sealed partial class MainWindow
             CollectableMove.Brazen=>(turn.BrazenAction,localization.Format("CollectablePanel.Range",advice.GainLow,advice.GainHigh)),
             CollectableMove.Scrutiny=>(turn.ScrutinyAction,localization.Format("CollectablePanel.ScrutinyGain",bonuses.ScrutinyBonus,bonuses.ScrutinyCost)),
             CollectableMove.Restore=>(restore?.Spec.Id ?? 0,localization.Format(restoreStatus is null or 0 ? "CollectablePanel.RestoreGain":"CollectablePanel.RestoreWait",bonuses.RestoreCost)),
+            CollectableMove.Eureka=>(job==16 ? 26521u:26522u,localization.Get("CollectablePanel.EurekaGain")),
             CollectableMove.Focus=>(turn.FocusAction,localization.Format("CollectablePanel.FocusGain",bonuses.FocusCost,bonuses.IntuitionBonus)),
             CollectableMove.Meticulous=>(turn.MeticulousAction,localization.Format("CollectablePanel.MeticulousGain",advice.GainLow,turn.MeticulousChance)),
             _=>(turn.CollectAction,""),
@@ -168,6 +172,7 @@ internal sealed partial class MainWindow
                 // 0.482 (user report: « 5 actions » for 4 attempts): the actions that cost no attempt, and where an extra attempt comes from, are said under the plan.
                 if(advice.Scrutinies>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanScrutinies",advice.Scrutinies,CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Name ?? "",advice.Scrutinies*bonuses.ScrutinyCost));
                 if(advice.Restores>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanRestores",advice.Restores,restore?.Name ?? "",advice.Restores*bonuses.RestoreCost,attempts ?? 0,(attempts ?? 0)+advice.Restores));
+                if(advice.Restores>0 && bonuses.EurekaChance>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanEureka",(bonuses.EurekaChance*100).ToString("0"),CollectableActionInfo?.Invoke(job==16 ? 26521u:26522u)?.Name ?? ""));
                 // 0.482 (user report: GP must count): what this plan spends, against the GP there is.
                 var planned=advice.Scrutinies*bonuses.ScrutinyCost+advice.Restores*bonuses.RestoreCost;
                 if(planned>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanGp",planned,bonuses.Gp,Math.Max(0,bonuses.Gp-planned)));

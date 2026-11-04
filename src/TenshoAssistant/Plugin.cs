@@ -926,6 +926,9 @@ public sealed class Plugin : IDalamudPlugin
                 return Gathering.GpRegen.Bonus(Gathering.GpRegen.Traits(job).Where(id=>sheet.GetRowOrDefault(id) is { } row && (row.Quest.RowId==0 ? player.GetClassJobLevel(row.ClassJob.Value)>=row.Level:unlocks.IsTraitUnlocked(row))),job);
             };
             mainWindow.ScrutinyActive=()=>objects.LocalPlayer is { } local && local.StatusList.Any(status=>status.StatusId==757);
+            // 0.520: Enhanced Solid Reason and Enhanced Ageless Words, Eureka Moment (docs/evidence/0.410-gp-actions.md).
+            mainWindow.EurekaReady=()=>objects.LocalPlayer is { } local && local.StatusList.Any(status=>status.StatusId==2765);
+            mainWindow.EurekaChanceFor=job=>data.GetExcelSheet<Lumina.Excel.Sheets.Trait>().GetRowOrDefault(job==16 ? 242u:243u) is { } row && (row.Quest.RowId==0 ? player.GetClassJobLevel(row.ClassJob.Value)>=row.Level:unlocks.IsTraitUnlocked(row)) ? Gathering.GpScenario.EurekaChance:0m;
             registrations.Register(()=>cactpotReader=new MiniCactpotObservationReader(cactpotObservation,framework,player,client,gameGui,log),()=>cactpotReader?.Dispose());
             registrations.Register(() => triadReader = new TriadObservationReader(triadObservation, framework, player, client, gameGui, log, () => targets.Target?.BaseId ?? 0, data, () => mainWindow.DeveloperMode),
                 () => triadReader?.Dispose());

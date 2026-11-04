@@ -5474,6 +5474,8 @@
     "Plan": "À coup sûr, sans chance : palier {0} : {1} sélection(s), puis {2} récolte(s) : {3} assignats.",
     "PlanItems": "À coup sûr, sans chance : palier {0} : {1} sélection(s), puis {2} récolte(s).",
     "PlanScrutinies": "Avant elles : {0} × {1}, {2} PR, sans coûter de tentative.",
+    "EurekaGain": "+1 tentative gratuite",
+    "PlanEureka": "Et {0} % de chances d'une tentative gratuite ({1}) : comptée dans la moyenne, pas dans le pire cas.",
     "PlanRestores": "{0} × {1}, {2} PR, à la dernière tentative : de {3} à {4} tentatives.",
     "FocusGain": "{0} PR, Intuition plus probable sur la prochaine action (+{1})",
     "HowLabel": "Comment est-ce calculé ? (survol)",
