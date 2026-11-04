@@ -66,6 +66,8 @@ internal sealed partial class MainWindow
         IntSetting("GatheringPanel.NodeSeconds","GatheringPanel.NodeSecondsTip",()=>configuration.GatherSecondsBetweenNodes,value=>configuration.GatherSecondsBetweenNodes=value,5,600,DefaultConfiguration.GatherSecondsBetweenNodes);
         IntSetting("GatheringPanel.Regen","GatheringPanel.RegenTip",()=>configuration.GpRegenPerTick,value=>configuration.GpRegenPerTick=value,0,50,DefaultConfiguration.GpRegenPerTick);
         if(configuration.GpRegenObserved>0)ImGui.TextDisabled(localization.Format("GatheringPanel.RegenObserved",configuration.GpRegenObserved));
+        BoolSetting("CollectablePanel.UseScrutiny","CollectablePanel.UseScrutinyTip",()=>configuration.CollectableUseScrutiny,value=>configuration.CollectableUseScrutiny=value,c=>c.CollectableUseScrutiny);
+        BoolSetting("CollectablePanel.UseRestore","CollectablePanel.UseRestoreTip",()=>configuration.CollectableUseRestore,value=>configuration.CollectableUseRestore=value,c=>c.CollectableUseRestore);
         DrawGpForbiddenActions();
     }
 

@@ -714,6 +714,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.480 : bonus dans le plan de collection** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Cocher « Avec Inspection rigoureuse » puis décocher, même chose pour « Avec Intuition » : les messages disparaissent, le plan ne change pas tant qu'une case reste cochée.
+- [ ] Plan avec Inspection : elle est conseillée seulement si elle rapporte plus ; les PR annoncés sont justes. Une fois utilisée, le gain affiché la contient et le conseil suivant passe à l'action.
+- [ ] Sélection méthodique à 8 % : plus conseillée pour son pourcentage. Comparer les conseils à votre expérience, et me donner les chiffres du panneau si l'un paraît faux.
+- [ ] Plus de plantage en mode collectionnable, y compris à la valeur maximale avec une Sélection méthodique.
+- [ ] Référence affichée : palier haut, assignats, ce qui manque. À la valeur voulue avec des PR restants : Raison solide conseillée pour une récolte de plus, et le jeu l'accepte.
+- [ ] Œil du collectionneur : proposé en option quand une Intuition atteindrait le palier suivant.
+- [ ] Mode développeur : le journal `Collectable window values` contient le pourcentage d'Intuition.
+
 **0.479 : plan de collection, PR et bonus de nœud** — pendant la campagne de tests en jeu (étape h)
 
 - [ ] Fenêtre Collectionnable : barre de collectabilité juste, palier juste, prochaine action avec icône et gain ; le plan se refait après chaque action. Comparer les gains affichés à ceux du jeu.

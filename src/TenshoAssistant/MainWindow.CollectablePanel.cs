@@ -15,9 +15,13 @@ internal sealed partial class MainWindow
     internal CollectableReader? Collectables { get; set; }
     private string? collectableRawLogged;
     // 0.479: an action's name and icon, from the game's sheet.
-    internal Func<uint,(string Name,uint Icon)?>? CollectableActionInfo{get;set;}
+    internal Func<uint,(string Name,uint Icon,int Cost)?>? CollectableActionInfo{get;set;}
+    // 0.480: Scrutiny is on the player now (status read on the game's thread, as the draw is).
+    internal Func<bool>? ScrutinyActive{get;set;}
     private IReadOnlyList<string>? collectableTurnRaw;
     private CollectableTurn? collectableTurn;
+    private (CollectableTurn Turn,int? Attempts,CollectableRule? Rule,CollectableBonuses Bonuses)? collectableAdviceKey;
+    private CollectableAdvice? collectableAdvice;
 
     internal void DrawCollectablePanel()
     {
@@ -48,7 +52,7 @@ internal sealed partial class MainWindow
                     if(rule.LevelMin>0)ImGui.TextDisabled(localization.Format("CollectablePanel.Levels",rule.LevelMin,rule.LevelMax));
                 }
             ImGui.Separator();
-            if(turn is not null)DrawCollectableAdvice(turn,frame.Integrity,named?.FirstOrDefault(rule=>rule.Scrips) ?? named?.FirstOrDefault());
+            if(turn is not null)DrawCollectableAdvice(turn,frame.Integrity,frame.MaxIntegrity,frame.Gp,named?.FirstOrDefault(rule=>rule.Scrips) ?? named?.FirstOrDefault());
             else ImGui.TextWrapped(localization.Get("CollectablePanel.Unknown"));
             // Developer mode: what the window holds goes to the log at each change, to find which value follows the collectability.
             if(developerMode && string.Join(" | ",frame.RawValues) is var raw && raw!=collectableRawLogged){collectableRawLogged=raw;log.Information("Collectable window values: {Values}",raw);}
@@ -59,12 +63,31 @@ internal sealed partial class MainWindow
         static string Shown(int? value)=>value?.ToString("N0") ?? "?";
     }
 
-    // 0.479 (user request, in-game campaign): the current collectability and what to do next, from the values the window gives this turn. Nothing is executed.
-    private void DrawCollectableAdvice(CollectableTurn turn,int? attempts,CollectableRule? rule)
+    // 0.480 (user report): what each bonus adds, as the game itself shows it when its box alone is ticked or when Scrutiny is on.
+    private void LearnCollectableBonuses(CollectableTurn turn,bool active)
     {
+        if(turn.Extra is not { } extra || extra<=0)return;
+        var intuition=turn.EstimateIntuition && !turn.EstimateScrutiny && !active;
+        var scrutiny=turn.EstimateScrutiny && !turn.EstimateIntuition || active && !turn.EstimateIntuition && !turn.EstimateScrutiny;
+        if(intuition && configuration.CollectableIntuitionBonus!=extra){configuration.CollectableIntuitionBonus=extra;SaveReminders();}
+        if(scrutiny && configuration.CollectableScrutinyBonus!=extra){configuration.CollectableScrutinyBonus=extra;SaveReminders();}
+    }
+
+    // 0.479 (user request, in-game campaign): the current collectability and what to do next, from the values the window gives this turn. Nothing is executed.
+    private void DrawCollectableAdvice(CollectableTurn turn,int? attempts,int? maximum,int? gp,CollectableRule? rule)
+    {
+        var active=ScrutinyActive?.Invoke()==true;
+        LearnCollectableBonuses(turn,active);
+        var job=turn.ScourAction==22182 ? 16u:17u;
+        var restore=configuration.CollectableUseRestore ? gpActions.State.Catalog?.Actions.FirstOrDefault(row=>row.Spec.JobId==job && row.Spec.Effect==GpEffect.Attempt && !GpActionRules.Forbidden(GpForbidden,row.Spec)):null;
+        var bonuses=new CollectableBonuses(configuration.CollectableScrutinyBonus,configuration.CollectableIntuitionBonus,gp ?? 0,
+            CollectableActionInfo?.Invoke(turn.ScrutinyAction)?.Cost ?? 0,CollectableActionInfo?.Invoke(turn.FocusAction)?.Cost ?? 0,active,configuration.CollectableUseScrutiny,restore?.Spec.Cost ?? 0,maximum ?? 0);
         var tier=rule is null ? CollectableTier.Below:Gathering.Collectables.Tier(rule,turn.Current);
         ImGui.ProgressBar(Math.Clamp((float)turn.Current/turn.Maximum,0,1),new Vector2(-1,ImGui.GetFrameHeight()),localization.Format("CollectablePanel.Current",turn.Current.ToString("N0"),turn.Maximum.ToString("N0"),localization.Get($"CollectablePanel.Tier{tier}")));
-        if(attempts is not { } left || CollectableAdvisor.Advise(turn,left,rule) is not { } advice)
+        // Worked out when something changes, not at each frame.
+        var adviceKey=(turn,attempts,rule,bonuses);
+        if(collectableAdviceKey!=adviceKey){collectableAdviceKey=adviceKey;collectableAdvice=attempts is { } count ? CollectableAdvisor.Advise(turn,count,rule,bonuses):null;}
+        if(collectableAdvice is not { } advice)
         {
             ImGui.TextDisabled(localization.Get(rule is null ? "CollectablePanel.NoAdviceRule":"CollectablePanel.NoAdvice"));
             return;
@@ -73,7 +96,9 @@ internal sealed partial class MainWindow
         {
             CollectableMove.Scour=>(turn.ScourAction,$"+{turn.Scour}"),
             CollectableMove.Brazen=>(turn.BrazenAction,localization.Format("CollectablePanel.Range",turn.BrazenMin,turn.BrazenMax)),
-            CollectableMove.Meticulous=>(turn.MeticulousAction,$"+{turn.Meticulous}"),
+            CollectableMove.Scrutiny=>(turn.ScrutinyAction,localization.Format("CollectablePanel.ScrutinyGain",bonuses.ScrutinyBonus,bonuses.ScrutinyCost)),
+            CollectableMove.Restore=>(restore?.Spec.Id ?? 0,localization.Format("CollectablePanel.RestoreGain",bonuses.RestoreCost)),
+            CollectableMove.Meticulous=>(turn.MeticulousAction,localization.Format("CollectablePanel.MeticulousGain",turn.Meticulous,turn.MeticulousChance)),
             _=>(turn.CollectAction,""),
         };
         var info=CollectableActionInfo?.Invoke(action);
@@ -81,12 +106,33 @@ internal sealed partial class MainWindow
         DrawItemIcon(info is { } shown ? new TenshoAssistant.Items.ItemDefinition(0,shown.Name,false,shown.Icon):null,new Vector2(32));
         ImGui.SameLine();
         ImGui.TextUnformatted(gain.Length>0 ? $"{info?.Name ?? advice.Move.ToString()} ({gain})":info?.Name ?? advice.Move.ToString());
-        ImGui.TextWrapped(advice.Impossible ? localization.Get("CollectablePanel.Impossible")
-            :advice.Target==CollectableTier.Below ? localization.Get("CollectablePanel.OutOfReach")
-            :advice.Scrips>0 ? localization.Format("CollectablePanel.Plan",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections,advice.Scrips)
-            :localization.Format("CollectablePanel.PlanItems",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections));
         ImGui.PushTextWrapPos(0);
-        try{ImGui.TextDisabled(localization.Get("CollectablePanel.AdviceNote"));}
+        try
+        {
+            if(advice.Impossible)ImGui.TextWrapped(localization.Get("CollectablePanel.Impossible"));
+            else
+            {
+                if(rule is {Scrips:true,RewardHigh:>0})
+                {
+                    ImGui.TextColored(Accent,advice.HighScrips is { } highest ? localization.Format("CollectablePanel.Reference",rule.RewardHigh,highest):localization.Format("CollectablePanel.ReferenceFar",rule.RewardHigh,advice.HighMissing));
+                    ImGui.TextWrapped(localization.Format("CollectablePanel.Expected",advice.Expected.ToString("0.0")));
+                }
+                if(advice.Restores>0)ImGui.TextDisabled(localization.Format("CollectablePanel.PlanRestores",advice.Restores,restore?.Name ?? "",advice.Restores*bonuses.RestoreCost));
+                ImGui.TextDisabled(advice.Target==CollectableTier.Below ? localization.Get("CollectablePanel.OutOfReach")
+                    :advice.Scrips>0 ? localization.Format("CollectablePanel.Plan",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections,advice.Scrips)
+                    :localization.Format("CollectablePanel.PlanItems",localization.Get($"CollectablePanel.Tier{advice.Target}"),advice.Selections,advice.Collections));
+            }
+        }
+        finally{ImGui.PopTextWrapPos();}
+        ImGui.PushTextWrapPos(0);
+        try
+        {
+            if(advice.FocusHelps)ImGui.TextDisabled(localization.Format("CollectablePanel.FocusHelps",CollectableActionInfo?.Invoke(turn.FocusAction)?.Name ?? "",bonuses.FocusCost,bonuses.IntuitionBonus));
+            if(configuration.CollectableUseScrutiny && configuration.CollectableScrutinyBonus<=0)ImGui.TextDisabled(localization.Get("CollectablePanel.LearnScrutiny"));
+            if(configuration.CollectableIntuitionBonus<=0)ImGui.TextDisabled(localization.Get("CollectablePanel.LearnIntuition"));
+            if(turn.EstimateScrutiny || turn.EstimateIntuition)ImGui.TextDisabled(localization.Get("CollectablePanel.BoxesTicked"));
+            ImGui.TextDisabled(localization.Get("CollectablePanel.AdviceNote"));
+        }
         finally{ImGui.PopTextWrapPos();}
     }
 }

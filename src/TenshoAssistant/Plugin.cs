@@ -853,7 +853,9 @@ public sealed class Plugin : IDalamudPlugin
             SpearfishingReader? spearfishingReader=null;
             registrations.Register(()=>mainWindow.Spearfishing=spearfishingReader=new SpearfishingReader(framework,gameGui,client,log),()=>spearfishingReader?.Dispose());
             registrations.Register(()=>mainWindow.Collectables=collectableReader=new CollectableReader(framework,gameGui,client,data,log),()=>collectableReader?.Dispose());
-            mainWindow.CollectableActionInfo=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row ? (row.Name.ExtractText(),(uint)row.Icon):null;
+            mainWindow.CollectableActionInfo=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row ? (row.Name.ExtractText(),(uint)row.Icon,(int)row.PrimaryCostValue):null;
+            // 0.480: status 757, Scrutiny (Status sheet, docs/evidence/0.479-collectable-window-values.md).
+            mainWindow.ScrutinyActive=()=>objects.LocalPlayer is { } local && local.StatusList.Any(status=>status.StatusId==757);
             registrations.Register(()=>cactpotReader=new MiniCactpotObservationReader(cactpotObservation,framework,player,client,gameGui,log),()=>cactpotReader?.Dispose());
             registrations.Register(() => triadReader = new TriadObservationReader(triadObservation, framework, player, client, gameGui, log, () => targets.Target?.BaseId ?? 0, data, () => mainWindow.DeveloperMode),
                 () => triadReader?.Dispose());

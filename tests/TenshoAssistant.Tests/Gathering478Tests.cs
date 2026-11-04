@@ -11,12 +11,12 @@ internal static class Gathering478Tests
     private static GpOptimization Node(int budget,string forbidden="",int attempts=4,int success=100)=>GpOptimizer.Solve(new(16,90,budget,attempts,1,success,0,1,MoreActions:true,Forbidden:forbidden),Catalog());
 
     // The window's values, as logged in game (docs/evidence/0.479-collectable-window-values.md).
-    private static string[] Raw(int current,int scour,int low,int high,int meticulous,bool intuition)
+    private static string[] Raw(int current,int scour,int low,int high,int meticulous,bool intuition,bool scrutiny=false)
     {
         var raw=Enumerable.Range(0,59).Select(index=>$"{index}:uint 0").ToArray();
         raw[2]="2:uint 36291";raw[13]=$"13:uint {current}";raw[14]="14:uint 1000";
         raw[26]="26:uint 22182";raw[29]="29:uint 22183";raw[32]="32:uint 22184";raw[35]="35:uint 240";raw[38]="38:uint 22185";
-        raw[48]=$"48:uint {scour}";raw[49]=$"49:uint {low}";raw[50]=$"50:uint {high}";raw[51]=$"51:uint {meticulous}";raw[54]=$"54:bool {(intuition ? "True":"False")}";
+        raw[48]=$"48:uint {scour}";raw[49]=$"49:uint {low}";raw[50]=$"50:uint {high}";raw[51]=$"51:uint {meticulous}";raw[52]="52:text 8 %";raw[53]=$"53:bool {(scrutiny ? "True":"False")}";raw[54]=$"54:bool {(intuition ? "True":"False")}";raw[41]="41:uint 21205";
         return raw;
     }
 
@@ -93,48 +93,109 @@ internal static class Gathering478Tests
         ("Collectable window values: read from the in-game capture; anything missing or of another type gives no turn",() =>
         {
             var turn1=CollectableTurn.Parse(Raw(0,352,263,440,307,true))!;
-            Check(turn1 is {ItemId:36291,Current:0,Maximum:1000,Scour:352,BrazenMin:263,BrazenMax:440,Meticulous:307,Intuition:true,ScourAction:22182,BrazenAction:22183,MeticulousAction:22184,CollectAction:240,ScrutinyAction:22185},"first turn");
-            Check(turn1.LaterGain==177,"Intuition: the plain gain comes from Brazen's range");
+            Check(turn1 is {ItemId:36291,Current:0,Maximum:1000,Scour:352,BrazenMin:263,BrazenMax:440,Meticulous:307,EstimateIntuition:true,EstimateScrutiny:false,ScourAction:22182,BrazenAction:22183,MeticulousAction:22184,CollectAction:240,ScrutinyAction:22185,FocusAction:21205},"first turn");
+            Check(turn1.Extra==175,"the box adds 175: Brazen's width is the plain gain");
             var turn3=CollectableTurn.Parse(Raw(588,177,88,265,132,false))!;
-            Check(turn3.Current==588 && turn3.LaterGain==177,"later turn");
+            Check(turn3.Current==588 && turn3.Extra==0,"later turn");
+            Check(CollectableTurn.Parse(Raw(373,177,177,265,177,false))!.Extra is null,"the raised floor after an Intuition does not fit the rule: nothing is deduced");
             Check(CollectableTurn.Parse(null) is null && CollectableTurn.Parse(Raw(0,352,263,440,307,true).Take(40).ToArray()) is null,"too short");
             var moved=Raw(0,352,263,440,307,true);moved[13]="13:text 0";Check(CollectableTurn.Parse(moved) is null,"another type");
             var over=Raw(0,352,263,440,307,true);over[13]="13:uint 2000";Check(CollectableTurn.Parse(over) is null,"impossible value");
             var evidence=File.ReadAllText(Path.GetFullPath("docs/evidence/0.479-collectable-window-values.md"));
             Check(evidence.Contains("| 13 (collectabilité) | 0 | 373 | 588 | 834 |"),"evidence kept");
         }),
-        ("Collectable plan: compares what each split earns, keeps the attempts that pay, and says when it is out of reach",() =>
+        ("Collectable plan: every move compared on what it earns on average; Meticulous at 8 % is not preferred for its chance",() =>
         {
             var ore=Rule(36291,"Ore",80,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=3,RewardMid=7,RewardHigh=20};
             CollectableAdvice Advise(int current,int scour,int low,int high,int meticulous,int attempts,bool intuition=false,CollectableRule? rule=null)=>CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(current,scour,low,high,meticulous,intuition))!,attempts,rule ?? ore)!;
-            var first=Advise(0,352,263,440,307,4,true);
-            Check(first is {Move:CollectableMove.Scour,Target:CollectableTier.Mid,Selections:3,Collections:1,Scrips:7},$"capture, first turn: {first}");
-            var second=Advise(373,177,177,265,177,3);
-            Check(second is {Move:CollectableMove.Meticulous,Target:CollectableTier.Mid,Selections:2,Collections:1},$"capture, second turn: Meticulous gains as much: {second}");
+            Check(CollectableTurn.Parse(Raw(0,177,88,265,132,false))!.MeticulousChance==8,"the chance shown by the game");
+            var first=Advise(0,177,88,265,132,4);
+            Check(first.Move!=CollectableMove.Meticulous && first.Expected>0,$"in-game capture: not Meticulous at 8 %: {first}");
+            Check(first is {Target:CollectableTier.Low,Selections:3,Collections:1,Scrips:3},$"what is certain: {first}");
+            Check(first.Expected>=3,"a move is never worth less than the sure plan: "+first.Expected);
+            Check(Advise(0,352,263,440,307,4,true)==first,"the box « with Intuition » is taken out of the plan");
+            var high=CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(0,177,88,265,132,false))! with {MeticulousChance=100},4,ore)!;
+            Check(high.Move==CollectableMove.Meticulous && high.Expected>first.Expected,$"at 100 % it is free: then it is the move: {high}");
             var done=Advise(834,177,88,265,132,1);
-            Check(done is {Move:CollectableMove.Collect,Target:CollectableTier.Mid,Selections:0,Collections:1,Scrips:7},$"last attempt: collect: {done}");
+            Check(done is {Move:CollectableMove.Collect,Target:CollectableTier.Mid,Selections:0,Collections:1,Scrips:7},$"last attempt, 8 % is not worth the item: collect: {done}");
             var keep=Advise(720,50,25,75,37,4);
             Check(keep is {Move:CollectableMove.Collect,Target:CollectableTier.Mid,Collections:4,Scrips:28},$"already at mid, high out of reach: every attempt collects: {keep}");
             var worth=Advise(720,177,88,265,132,4);
-            Check(worth is {Target:CollectableTier.High,Selections:2,Collections:2,Scrips:40},$"2×20 beats 4×7: {worth}");
+            Check(worth is {Target:CollectableTier.High,Selections:2,Collections:2,Scrips:40} && worth.Move!=CollectableMove.Collect,$"2×20 beats 4×7: {worth}");
             var climb=Advise(900,177,88,265,132,2);
-            Check(climb is {Target:CollectableTier.High,Selections:1,Collections:1,Scrips:20},$"one action more is worth it: {climb}");
+            Check(climb is {Target:CollectableTier.High,Selections:1,Collections:1,Scrips:20,Move:CollectableMove.Meticulous},$"Meticulous also reaches high here, and may cost nothing: {climb}");
             var roll=Advise(650,250,125,375,187,2);
-            Check(roll is {Move:CollectableMove.Brazen,Target:CollectableTier.Mid},$"a good roll may reach high, a bad one keeps mid: {roll}");
-            var sure=Advise(600,177,88,265,132,2);
-            Check(sure is {Move:CollectableMove.Meticulous,Target:CollectableTier.Mid,Selections:1},$"Meticulous is enough: {sure}");
-            var luck=Advise(300,90,45,135,67,2);
-            Check(luck is {Target:CollectableTier.Below,Selections:1,Collections:1,Scrips:0,Move:CollectableMove.Brazen,Impossible:false},$"out of reach for sure: only a roll can help: {luck}");
+            Check(roll.Move==CollectableMove.Brazen,$"a bad roll keeps mid, a good one reaches high: {roll}");
+            var lucky=Advise(300,90,45,135,67,2);
+            Check(lucky is {Target:CollectableTier.Below,Scrips:0,Move:CollectableMove.Brazen,Impossible:false},$"only a roll can reach low: {lucky}");
             var far=Advise(0,50,25,75,37,2);
             Check(far is {Target:CollectableTier.Below,Move:CollectableMove.Collect,Impossible:true},$"even the best roll is too low: said so: {far}");
             var last=Advise(0,177,88,265,132,1);
-            Check(last is {Target:CollectableTier.Below,Move:CollectableMove.Collect,Selections:0,Collections:1,Scrips:0,Impossible:true},$"in-game capture: 0 with one attempt left, no chance at all: {last}");
+            Check(last is {Target:CollectableTier.Below,Move:CollectableMove.Collect,Selections:0,Collections:1,Scrips:0},$"in-game capture: 0 with one attempt left: {last}");
             var goods=ore with {Scrips=false,RewardLow=0,RewardMid=0,RewardHigh=0};
-            Check(Advise(0,352,263,440,307,4,true,goods) is {Scrips:0,Target:CollectableTier.Low,Selections:2,Collections:2},"item rewards: tier times items, a tie keeps more items, no scrips announced");
-            Check(CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(0,352,263,440,307,true))!,0,ore) is null && CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(0,352,263,440,307,true))!,4,null) is null,"nothing to plan");
+            Check(Advise(0,177,88,265,132,4,false,goods) is {Scrips:0},"item rewards: no scrips announced");
+            Check(CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(0,177,88,265,132,false))!,0,ore) is null && CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(0,177,88,265,132,false))!,4,null) is null,"nothing to plan");
             var panel=Read("MainWindow.CollectablePanel.cs");
             Check(panel.Contains("DrawCollectableAdvice(turn,frame.Integrity,") && panel.Contains("Collectables.Catalog?.For(turn.ItemId)"),"shown, the item found by its identifier");
             Check(!panel.Contains("UseAction") && !panel.Contains("ProcessChatBox"),"nothing executed");
+        }),
+        ("Collectable plan with bonuses: Scrutiny counted once measured, GP spent only if it earns more; Focus proposed, never relied on",() =>
+        {
+            var ore=Rule(36291,"Ore",80,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=3,RewardMid=7,RewardHigh=20};
+            var turn=CollectableTurn.Parse(Raw(0,177,88,265,132,false))!;
+            var plain=CollectableAdvisor.Advise(turn,4,ore)!;
+            Check(CollectableAdvisor.Advise(turn,4,ore,new(0,0,809,200,100))==plain,"not measured yet: not counted");
+            var bonus=new CollectableBonuses(150,175,809,200,100);
+            var plan=CollectableAdvisor.Advise(turn,4,ore,bonus)!;
+            Check(plan is {Move:CollectableMove.Scrutiny,Target:CollectableTier.Mid,Selections:3,Collections:1,Scrips:7,Scrutinies:2} && plan.Expected>plain.Expected,$"it earns more: Scrutiny first: {plan}");
+            Check(CollectableAdvisor.Advise(turn,4,ore,bonus with {Gp=100})!.Move!=CollectableMove.Scrutiny,"not enough GP");
+            Check(CollectableAdvisor.Advise(turn,4,ore,bonus with {UseScrutiny=false})!.Move==plain.Move,"the setting");
+            Check(CollectableAdvisor.Advise(turn,4,ore,bonus with {ScrutinyCost=0})!.Move!=CollectableMove.Scrutiny,"an unknown cost is not planned");
+            var enough=CollectableTurn.Parse(Raw(900,177,88,265,132,false))!;
+            Check(CollectableAdvisor.Advise(enough,2,ore,bonus)!.Move==CollectableMove.Meticulous,"it reaches high without any GP: none spent for nothing");
+            var active=CollectableTurn.Parse(Raw(0,327,238,415,282,false))!;
+            Check(active.Extra==150,"Scrutiny on: the gains shown hold it");
+            var on=CollectableAdvisor.Advise(active,4,ore,bonus with {ScrutinyActive=true})!;
+            Check(on.Move!=CollectableMove.Scrutiny && on.Target==CollectableTier.Mid,$"already on: act now: {on}");
+            var close=CollectableTurn.Parse(Raw(200,177,88,265,132,false))!;
+            Check(CollectableAdvisor.Advise(close,3,ore,bonus with {ScrutinyBonus=0}) is {FocusHelps:true,Target:CollectableTier.Low},"an Intuition would reach mid: Focus proposed, the sure plan does not count on it");
+            Check(CollectableAdvisor.Advise(close,3,ore,bonus with {ScrutinyBonus=0,Gp=50}) is {FocusHelps:false},"no GP for Focus");
+            var panel=Read("MainWindow.CollectablePanel.cs");
+            Check(panel.Contains("LearnCollectableBonuses(turn,active);") && panel.Contains("\"CollectablePanel.LearnScrutiny\"") && Read("Plugin.cs").Contains("status.StatusId==757"),"measured, asked for, status read");
+            Check(Read("Configuration.cs").Contains("\"CollectableUseScrutiny\"") && Read("MainWindow.GatheringListPlan.cs").Contains("\"CollectablePanel.UseScrutiny\""),"setting");
+        }),
+        ("Collectable plan always ends: at the maximum, above high, with a free Meticulous and the smallest gains (a stack overflow closed the game, in-game report)",() =>
+        {
+            var ore=Rule(36291,"Ore",80,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=3,RewardMid=7,RewardHigh=20};
+            CollectableTurn Turn(int current,int scour,int low,int high,int meticulous,int chance)=>CollectableTurn.Parse(Raw(current,scour,low,high,meticulous,false))! with {MeticulousChance=chance};
+            foreach(var chance in new[]{0,8,50,100})
+            foreach(var current in new[]{0,834,999,1000})
+            foreach(var (scour,low,high,meticulous) in new[]{(177,88,265,132),(1,1,2,1),(2000,1000,3000,1500)})
+            foreach(var attempts in new[]{1,2,4,12})
+                Check(CollectableAdvisor.Advise(Turn(current,scour,low,high,meticulous,chance),attempts,ore,new(150,175,5000,200,100)) is not null,$"{chance} {current} {scour} {attempts}");
+            var capped=Rule(1,"Capped",80,5000,20) with {Low=400,Mid=700,High=5000};
+            Check(CollectableAdvisor.Advise(Turn(1000,177,88,265,132,100),4,capped)?.Move==CollectableMove.Collect,"at the window's maximum, even under the high threshold: collect");
+        }),
+        ("Collectable plan: the most scrips on one node: attempts restored with GP when that earns more, the high tier as the reference",() =>
+        {
+            var ore=Rule(36291,"Ore",80,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=3,RewardMid=7,RewardHigh=20};
+            var turn=CollectableTurn.Parse(Raw(0,177,88,265,132,false))!;
+            var without=CollectableAdvisor.Advise(turn,4,ore,new(150,175,809,200,100))!;
+            var with=CollectableAdvisor.Advise(turn,4,ore,new(150,175,809,200,100,false,true,300,4))!;
+            Check(with.Expected>=without.Expected,$"more choices never earn less: {with.Expected} against {without.Expected}");
+            var done=CollectableTurn.Parse(Raw(1000,177,88,265,132,false))!;
+            var full=CollectableAdvisor.Advise(done,3,ore,new(0,0,700,0,0,false,true,300,4))!;
+            Check(full is {Move:CollectableMove.Collect,Target:CollectableTier.High,Collections:5,Restores:2,Scrips:100,HighScrips:100} && full.Expected==100,$"at high, the GP becomes gathers: {full}");
+            Check(CollectableAdvisor.Advise(done,3,ore,new(0,0,700)) is {Collections:3,Scrips:60,HighScrips:60},"no restoring without its cost: the setting or a forbidden action");
+            var low=CollectableAdvisor.Advise(turn,4,ore)!;
+            Check(low.HighScrips is null && low.HighMissing==1000-531,$"high out of reach without luck: what is missing is said: {low}");
+            var reach=CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(700,177,88,265,132,false))!,4,ore)!;
+            Check(reach.HighScrips==40,$"reference: 2 actions, 2 gathers at 20: {reach}");
+            var filled=CollectableAdvisor.Advise(turn,4,ore,new(0,0,809,0,0,false,true,300,4))!;
+            Check(filled.Move!=CollectableMove.Restore,$"nothing is restored at full attempts: {filled}");
+            var used=CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(600,177,88,265,132,false))!,1,ore,new(0,0,809,0,0,false,true,300,4))!;
+            Check(used.Move==CollectableMove.Restore && used.Expected>7,$"one attempt left at mid, GP for more: restore: {used}");
+            Check(Read("MainWindow.CollectablePanel.cs").Contains("collectableAdviceKey!=adviceKey"),"worked out when something changes, not at each frame");
         }),
         ("Major bonus: normal is the plainest node seen; a normal node keeps its GP, a bonus node spends it",() =>
         {

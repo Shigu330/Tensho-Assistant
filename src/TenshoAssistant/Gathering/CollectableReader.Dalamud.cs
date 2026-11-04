@@ -91,6 +91,15 @@ internal sealed class CollectableReader : IDisposable
                         _=>$"{index}:{value.Type}",
                     });
                 }
+                // 0.480: the window's percentages (Intuition's chance is not among its values), for the log in developer mode. After the values, so their positions do not move.
+                if(unit->UldManager.NodeList!=null)
+                    for(var index=0;index<Math.Min((int)unit->UldManager.NodeListCount,256);index++)
+                    {
+                        var node=unit->UldManager.NodeList[index];
+                        if(node==null || node->Type!=NodeType.Text)continue;
+                        var shown=((AtkTextNode*)node)->NodeText;
+                        if(shown.Length is >0 and <=64 && shown.ToString().Contains('%'))values.Add($"node{node->NodeId}:{Short(shown.ToString())}");
+                    }
                 var name=Text(addon->ItemName);
                 if(name is null){Volatile.Write(ref frame,null);return;}
                 Volatile.Write(ref frame,new CollectableWindowFrame(name,Text(addon->ObtainChance),Collectables.Number(Text(addon->GPLeftover)),Collectables.Number(Text(addon->GPTotal)),
