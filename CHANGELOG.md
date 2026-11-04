@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.486.0
+- Demande de l'utilisateur : barre de tic avec une petite marque qui défile et le temps avant le plein. La barre se remplit vers le maximum de PR, la marque défile en 3 s à chaque tic, le texte donne le temps restant d'après les PR par tic mesurés. Tant qu'ils ne sont pas connus, le texte reste « tic dans… ». Une mesure faussée par une action ou une potion peut fausser ce temps.
+- Rapport de l'utilisateur : les temps d'affichage de Diagnostics ne comptaient que les pages. Les panneaux à côté des fenêtres du jeu ont maintenant leur section, en mode développeur.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 924/924, 0 avertissement, 0 erreur ; DLL 0.486.0.0. Non validé en jeu.
+### English
+- The GP tick bar fills towards full GP, a small highlight runs along it at each tick, and its text gives the time until full.
+
 ## 0.485.0
 - Demande de l'utilisateur : le texte de la barre de tic était coupé. Il affiche maintenant « PR 227/809 · pause ».
 - Verify.ps1 (agent) : 922/922, 0 avertissement, 0 erreur ; DLL 0.485.0.0. Non validé en jeu.

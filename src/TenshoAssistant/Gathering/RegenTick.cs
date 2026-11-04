@@ -31,6 +31,14 @@ public sealed class GpAlertTracker
 public sealed class RegenTickTracker
 {
     public static readonly TimeSpan Period=TimeSpan.FromSeconds(3);
+    /// <summary>0.486 (user request): the time until GP is full, at what a tick gives: null while it is not known, or paused.</summary>
+    public static TimeSpan? ToFull(RegenTickState state,int gainPerTick)
+    {
+        if(gainPerTick<=0 || state.Stalled || state.SecondsLeft is not { } left)return null;
+        if(state.Gp>=state.MaxGp)return TimeSpan.Zero;
+        var ticks=(long)Math.Ceiling((state.MaxGp-state.Gp)/(double)gainPerTick);
+        return TimeSpan.FromSeconds(left+(ticks-1)*Period.TotalSeconds);
+    }
     private uint? last,lastMax;
     private DateTimeOffset? tick;
     private int gain;

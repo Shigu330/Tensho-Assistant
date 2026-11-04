@@ -100,6 +100,13 @@ internal sealed partial class MainWindow : Window, IDisposable
     // 0.292: last 120 draw times of each page (ring); Diagnostics shows the median (steady cost) and the maximum (spikes such as a
     // first icon load), a moving average mixed both and kept the spike of a page left just after opening it.
     private readonly Dictionary<Page, (double[] Samples, int Next, int Count)> pageDrawMs = [];
+    private readonly Dictionary<string, (double[] Samples, int Next, int Count)> overlayDrawMs = [];
+    internal void RecordOverlayDraw(string name, double milliseconds)
+    {
+        var ring = overlayDrawMs.TryGetValue(name, out var known) ? known : (Samples: new double[120], Next: 0, Count: 0);
+        ring.Samples[ring.Next] = milliseconds;
+        overlayDrawMs[name] = (ring.Samples, (ring.Next + 1) % ring.Samples.Length, Math.Min(ring.Count + 1, ring.Samples.Length));
+    }
     private ItemCatalog? searchedCatalog;
     private IReadOnlyList<ItemDefinition> searchResults = [];
     private readonly Stack<uint> craftHistory = [];

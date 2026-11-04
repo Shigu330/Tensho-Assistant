@@ -23,9 +23,19 @@ internal sealed partial class MainWindow
             if(ImGui.Begin("###TenshoGpTick",ImGuiWindowFlags.NoTitleBar|ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav
                    |ImGuiWindowFlags.NoScrollbar))
             {
-                var text=tick.Stalled ? localization.Format("GpTick.Stalled",tick.Gp,tick.MaxGp):tick.SecondsLeft is { } left ? localization.Format("GpTick.Bar",tick.Gp,tick.MaxGp,left.ToString("0.0")):localization.Format("GpTick.Waiting",tick.Gp,tick.MaxGp);
-                ImGui.ProgressBar((float)(tick.Progress ?? 0),new Vector2(180,ImGui.GetFrameHeight()),text);
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GpTick.Tip"));
+                var gainPerTick=configuration.GpRegenPerTick>0 ? configuration.GpRegenPerTick:configuration.GpRegenObserved;
+                var full=RegenTickTracker.ToFull(tick,gainPerTick);
+                var text=tick.Stalled ? localization.Format("GpTick.Stalled",tick.Gp,tick.MaxGp):full is { } rest ? localization.Format("GpTick.Full",tick.Gp,tick.MaxGp,$"{(int)rest.TotalMinutes}:{rest.Seconds:00}"):tick.SecondsLeft is { } left ? localization.Format("GpTick.Bar",tick.Gp,tick.MaxGp,left.ToString("0.0")):localization.Format("GpTick.Waiting",tick.Gp,tick.MaxGp);
+                // 0.486 (user request): the bar fills towards full GP; a small highlight runs along its foot for the tick.
+                ImGui.ProgressBar(tick.MaxGp>0 ? Math.Clamp((float)tick.Gp/tick.MaxGp,0,1):0,new Vector2(180,ImGui.GetFrameHeight()),text);
+                if(ImGui.IsItemHovered())WrappedTooltip(tick.SecondsLeft is { } tip ? localization.Format("GpTick.Next",tip.ToString("0.0"))+Environment.NewLine+localization.Get("GpTick.Tip"):localization.Get("GpTick.Tip"));
+                if(tick.Progress is { } running)
+                {
+                    var from=ImGui.GetItemRectMin();var to=ImGui.GetItemRectMax();
+                    const float Mark=28,Height=3;
+                    var x=from.X+(to.X-from.X-Mark)*(float)Math.Clamp(running,0,1);
+                    ImGui.GetWindowDrawList().AddRectFilled(new Vector2(x,to.Y-Height),new Vector2(x+Mark,to.Y),ImGui.GetColorU32(Accent));
+                }
             }
             ImGui.End();
         }

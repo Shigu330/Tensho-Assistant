@@ -3790,6 +3790,8 @@
     "Gp": "Les actions de récolte sont indisponibles : les données du jeu n’ont pas pu être lues (peut-être après une mise à jour du jeu)."
   },
   "DiagnosticsUi": {
+    "OverlayTimes": "Temps d'affichage des panneaux à côté du jeu",
+    "OverlayTimesHelp": "Médiane et maximum du temps de calcul des 120 dernières images de chaque panneau affiché hors de la fenêtre Tensho. Compté en mode développeur seulement. Un panneau qui ne coûte rien n'est pas listé.",
     "DrawTimeLine": "{0}  médiane {1} ms · max {2} ms ({3} images)",
     "DrawTimes": "Temps d'affichage des pages",
     "DrawTimesHelp": "Médiane et maximum du temps de calcul des 120 dernières images de chaque page visitée (médiane = coût habituel, maximum = pics comme le premier chargement des icônes), la plus lente en premier. Restez quelques secondes sur une page pour une mesure fiable.",
@@ -4829,6 +4831,8 @@
     "Failed": "Tri impossible (voir /xllog)"
   },
   "GpTick": {
+    "Full": "PR {0}/{1} · plein {2}",
+    "Next": "Prochain tic dans {0} s.",
     "Stalled": "PR {0}/{1} · pause",
     "AlertSetting": "Alerte PR au seuil",
     "AlertSettingTip": "Un message dans le chat et le son des alarmes quand les PR d'un récolteur remontent au seuil choisi, une fois par remontée. Pas en combat ; options des alarmes appliquées.\nPar défaut : désactivé.",

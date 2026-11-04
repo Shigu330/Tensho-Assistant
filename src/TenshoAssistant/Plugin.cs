@@ -988,8 +988,11 @@ public sealed class Plugin : IDalamudPlugin
         {
             var (name,draw)=overlays[index];
             if(brokenOverlays.Contains(name))continue;
+            var started=mainWindow.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp():0;
             try{draw();}
             catch(Exception error){brokenOverlays.Add(name);log.Error(error,$"Overlay {name} turned off until the plugin reloads (perhaps after a game update).");}
+            // 0.486 (user report): the panels beside the game's windows count too, in developer mode.
+            if(started!=0)mainWindow.RecordOverlayDraw(name,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);
         }
     }
     private (string Name,Action Draw)[]? overlays;

@@ -278,6 +278,22 @@ internal static class Gathering478Tests
             Check(tracker.Observe(800,800,at.AddSeconds(200)) is {Stalled:false},"full: not stopped");
             Check(Read("MainWindow.RegenTick.cs").Contains("GpTick.Stalled") && Read("MainWindow.RegenTick.cs").Contains("configuration.GpRegenObserved=measured.Gain"),"said, and measured");
         }),
+        ("GP tick: the time until full, from what a tick gives; none while unknown or paused",() =>
+        {
+            RegenTickState At(uint gp,double? left,bool stalled=false)=>new(gp,800,left is null ? null:0.5,left,stalled,5);
+            Check(RegenTickTracker.ToFull(At(790,2),5)==TimeSpan.FromSeconds(2+3),"two ticks: this one, then 3 s");
+            Check(RegenTickTracker.ToFull(At(793,2),5)==TimeSpan.FromSeconds(2+3),"a part of a tick counts whole");
+            Check(RegenTickTracker.ToFull(At(795,1),5)==TimeSpan.FromSeconds(1),"the next tick fills it");
+            Check(RegenTickTracker.ToFull(At(800,1),5)==TimeSpan.Zero,"full");
+            Check(RegenTickTracker.ToFull(At(700,2),0) is null && RegenTickTracker.ToFull(At(700,null,true),5) is null && RegenTickTracker.ToFull(At(700,null),5) is null,"unknown gain, paused, no tick seen");
+            var bar=Read("MainWindow.RegenTick.cs");
+            Check(bar.Contains("(float)tick.Gp/tick.MaxGp") && bar.Contains("AddRectFilled") && bar.Contains("GpTick.Full"),"the bar shows GP, the highlight the tick");
+        }),
+        ("Diagnostics: the panels beside the game's windows have their draw time, in developer mode",() =>
+        {
+            Check(Read("Plugin.cs").Contains("mainWindow.RecordOverlayDraw(name,") && Read("Plugin.cs").Contains("var started=mainWindow.DeveloperMode ?"),"measured in developer mode only");
+            Check(Read("MainWindow.Diagnostics.cs").Contains("DiagnosticsUi.OverlayTimes") && Read("MainWindow.cs").Contains("overlayDrawMs"),"shown");
+        }),
         ("Tensho map after a reload: the game map left open waits for the Tensho map to be able to draw, for a short time",() =>
         {
             var replacer=Read("Maps/NativeMapReplacer.Dalamud.cs");

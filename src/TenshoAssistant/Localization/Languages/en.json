@@ -3790,6 +3790,8 @@
     "Gp": "Gathering actions are unavailable: the game data could not be read (possibly after a game update)."
   },
   "DiagnosticsUi": {
+    "OverlayTimes": "Draw time of the panels beside the game",
+    "OverlayTimesHelp": "Median and maximum draw time of the last 120 frames of each panel shown outside the Tensho window. Counted in developer mode only. A panel that costs nothing is left out.",
     "DrawTimeLine": "{0}  median {1} ms · max {2} ms ({3} frames)",
     "DrawTimes": "Page draw times",
     "DrawTimesHelp": "Median and maximum draw time over the last 120 frames of each visited page (median = usual cost, maximum = spikes such as the first icon load), slowest first. Stay a few seconds on a page for a reliable measure.",
@@ -4829,6 +4831,8 @@
     "Failed": "Could not sort (see /xllog)"
   },
   "GpTick": {
+    "Full": "GP {0}/{1} · full {2}",
+    "Next": "Next tick in {0} s.",
     "Stalled": "GP {0}/{1} · paused",
     "AlertSetting": "GP alert at a threshold",
     "AlertSettingTip": "A chat message and the alarm sound when a gatherer's GP rises to the chosen threshold, once per rise. Not in combat; the alarm options apply.\nDefault: off.",
