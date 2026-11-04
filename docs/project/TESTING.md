@@ -713,7 +713,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.526 : légendes locales dans les Collections** — à voir en jouant
 
-- [ ] Collections › Légendes locales : 36 tomes, marqués lus ou non comme dans votre personnage. Si un tome est mal marqué, la correspondance des bits est fausse : la carte se trompe aussi.
+- [x] (rapport de l'utilisateur, 2026-11-04, « legendes local ok ») Collections › Légendes locales : 36 tomes, marqués lus ou non comme dans votre personnage. Si un tome est mal marqué, la correspondance des bits est fausse : la carte se trompe aussi.
 - [ ] Clic droit ou survol d'un tome : comment l'obtenir.
 
 **0.525 : groupe sur la carte, coût du chargement** — à voir en jouant
