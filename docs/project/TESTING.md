@@ -719,8 +719,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.519 : éclats, cristaux et agrégats** — à voir en jouant
 
-- [ ] Cristal ou agrégat : le panneau propose Bénédiction de la nature, sans « ≈ N objets ».
-- [ ] Éclat : Bénédiction de la nature et Bénédiction des Douze. Sur un cristal, Bénédiction des Douze change-t-elle la quantité ? Si oui, elle doit aussi être proposée.
+- [ ] Éclat, cristal ou agrégat : le panneau propose Bénédiction de la nature et Bénédiction des Douze (0.521), sans « ≈ N objets ».
 - [ ] Les autres objets gardent leur plan de PR habituel.
 
 **0.518 : carte, tomes et niveau d'un point** — à voir en jouant

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.521.0
+- Rapport de l'utilisateur en jeu : Bénédiction des Douze change aussi la quantité sur les cristaux, comme Bénédiction de la nature, alors que le texte du jeu ne parle que des éclats. Le panneau propose les deux sur les éclats, les cristaux et les agrégats, selon le niveau et les PR.
+- Tests : GpCrystals519Tests adapté. Verify.ps1 (agent) : 989/989, 0 avertissement, 0 erreur ; DLL 0.521.0.0. Non validé en jeu.
+### English
+- The Twelve's Bounty and Nature's Bounty are now both proposed on shards, crystals and clusters, as reported in game.
+
 ## 0.520.0
 - Rapport de l'utilisateur en jeu (capture de Sagesse du fermier, « pas pris en compte ») : le plan des collectionnables comptait la tentative rendue, mais pas son effet additionnel, 50 % de chances d'une tentative gratuite (niveau 90 et plus). Sur la capture : 136 en moyenne, soit 4 × 34.
 - La moyenne le compte maintenant (153 sur ce cas), jamais le pire cas (136) ; une ligne du panneau le dit. Si Étalage des connaissances est déjà prêt (statut 2765), la tentative gratuite compte pour de bon et passe avant la dernière récolte, qui fermerait le nœud.

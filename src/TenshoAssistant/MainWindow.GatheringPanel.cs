@@ -184,7 +184,7 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,localization.Format("GatheringPanel.PlanFor",items.Find(slot.ItemId)?.Name ?? slot.ItemId.ToString()));
         var need=GatherListNeed(slot.ItemId);
         if(need>0)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
-        var actions=GpCrystals.For(start.JobId,start.Level,(int)start.Gp,slot.ItemId);
+        var actions=GpCrystals.For(start.JobId,start.Level,(int)start.Gp);
         if(actions.Count==0){ImGui.TextDisabled(localization.Get("GatheringPanel.CrystalNone"));return;}
         foreach(var action in actions)
         {
