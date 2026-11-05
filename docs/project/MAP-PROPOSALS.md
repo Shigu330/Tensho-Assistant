@@ -25,6 +25,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P2 — Taille des étiquettes réglée à part de celle des icônes
 
+- **État (relu le 2026-11-05)** : FAIT 0.543.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Les noms de lieux et les étiquettes de niveau des points de récolte restent lisibles à tous les zooms sans se chevaucher. Sur une carte de région très dézoomée, les noms rétrécissent ou se masquent sous un seuil choisi par le joueur. Les étiquettes de récolte et les repères au bord suivent la taille choisie.
 - **Comment, taille, dépendances** : Ajouter un « Suivi du zoom des noms » séparé (repli : la valeur actuelle) et un « zoom minimal pour afficher les noms », puis faire suivre la même règle aux étiquettes de récolte (seuil réglable, ou zoom minimal, à la place de 0,6). Ajouter éventuellement une échelle des repères au bord. Option : ne pas dessiner un nom qui en recouvre un autre déjà dessiné (test de rectangles, liste bornée par carte). Infobulle et ↺ partout. Taille S. Aucune sonde. Une décision : les valeurs par défaut (recommandé : celles d'aujourd'hui, rien ne change tant que le joueur ne règle rien).

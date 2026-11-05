@@ -485,6 +485,14 @@ internal sealed partial class MainWindow
                 if(ImGui.SliderFloat(localization.Get("MapView.PlaceNameScale"),ref names,50,150,"%.0f %%")){settings.PlaceNameScale=names/100;changed=true;}
                 Tip("SettingTips.PlaceNameScale");
                 if(DefaultButton("PlaceNameScale",settings.PlaceNameScale!=MapDefaults.PlaceNameScale)){settings.PlaceNameScale=MapDefaults.PlaceNameScale;changed=true;}
+                var nameFollow=MapViewSettings.ClampFollow(settings.NameZoomFollow ?? settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.NameZoomFollow"),ref nameFollow,0,100,"%.0f %%")){settings.NameZoomFollow=nameFollow/100;changed=true;}
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.NameZoomFollowHelp"));
+                if(DefaultButton("NameZoomFollow",settings.NameZoomFollow is not null)){settings.NameZoomFollow=null;changed=true;}
+                var nameMinimum=Math.Clamp(settings.NameMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.NameMinZoom"),ref nameMinimum,0,200,"%.0f %%")){settings.NameMinZoom=nameMinimum/100;changed=true;}
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.NameMinZoomHelp"));
+                if(DefaultButton("NameMinZoom",settings.NameMinZoom!=MapDefaults.NameMinZoom)){settings.NameMinZoom=MapDefaults.NameMinZoom;changed=true;}
                 changed|=SettingBox("MapView.ShowFlag",settings.ShowFlag,value=>settings.ShowFlag=value,MapDefaults.ShowFlag);
                 changed|=SettingBox("MapView.ShowBookmarks",settings.ShowBookmarks,value=>settings.ShowBookmarks=value,MapDefaults.ShowBookmarks);
             }
@@ -505,6 +513,14 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value,MapDefaults.ShowGathering);
                 changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value,MapDefaults.ShowHuntMarks);
                 changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
+                var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelMinZoom"),ref labelMinimum,0,200,"%.0f %%")){settings.GatheringLabelMinZoom=labelMinimum/100;changed=true;}
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.GatheringLabelMinZoomHelp"));
+                if(DefaultButton("GatheringLabelMinZoom",settings.GatheringLabelMinZoom!=MapDefaults.GatheringLabelMinZoom)){settings.GatheringLabelMinZoom=MapDefaults.GatheringLabelMinZoom;changed=true;}
+                var labelScale=Math.Clamp(settings.GatheringLabelScale,0.5f,2f)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelScale"),ref labelScale,50,200,"%.0f %%")){settings.GatheringLabelScale=labelScale/100;changed=true;}
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.GatheringLabelScaleHelp"));
+                if(DefaultButton("GatheringLabelScale",settings.GatheringLabelScale!=MapDefaults.GatheringLabelScale)){settings.GatheringLabelScale=MapDefaults.GatheringLabelScale;changed=true;}
             }
             if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionPlayer")))
             {
@@ -939,8 +955,8 @@ internal sealed partial class MainWindow
             // Place names first, under the icons, in large outlined text like the game map; they also follow the zoom.
             var font=ImGui.GetFont();var nameScale=Math.Clamp(float.IsFinite(settings.PlaceNameScale) ? settings.PlaceNameScale:1,0.5f,1.5f);
             // 0.152 (user choice « follow the zoom »): names scale with the map like the icons; only a 6 px floor keeps them drawable.
-            var nameSize=Math.Max(6,ImGui.GetFontSize()*2.4f*zoomFactor*nameScale);
-            foreach(var marker in settings.ShowPlaceNames ? markers.Where(marker=>marker.Icon==0):[])
+            var nameSize=Math.Max(6,ImGui.GetFontSize()*2.4f*settings.NameFactor(mapZoom)*nameScale);
+            foreach(var marker in settings.ShowPlaceNames && settings.NamesShown(mapZoom) ? markers.Where(marker=>marker.Icon==0):[])
             {
                 var centre=origin+mapPan+new Vector2(marker.X,marker.Y)*mapZoom;
                 var text=ImGui.CalcTextSize(marker.Label)*(nameSize/ImGui.GetFontSize());var corner=centre-text/2;
@@ -1014,8 +1030,11 @@ internal sealed partial class MainWindow
                     draw.AddCircleFilled(corner+new Vector2(badge/2),badge*0.62f,ImGui.GetColorU32(new Vector4(0,0,0,0.75f)),16);
                     draw.AddText(UiBuilder.IconFont,badge,corner,ImGui.GetColorU32(TimedPointColor(timedPoint)),FontAwesomeIcon.Clock.ToIconString());
                 }
-                if(item.Point is { } labelled && settings.GatheringLabels && mapZoom>=0.6f)
-                    draw.AddText(item.At+new Vector2(item.Size*0.6f,-ImGui.GetFontSize()/2),ImGui.GetColorU32(UI.FfxivTheme.Text),localization.Format("MapLocal.Level",labelled.Level));
+                if(item.Point is { } labelled && settings.GatheringLabels && settings.GatheringLabelShown(mapZoom))
+                {
+                    var labelSize=settings.GatheringLabelSize(ImGui.GetFontSize());
+                    draw.AddText(ImGui.GetFont(),labelSize,item.At+new Vector2(item.Size*0.6f,-labelSize/2),ImGui.GetColorU32(UI.FfxivTheme.Text),localization.Format("MapLocal.Level",labelled.Level));
+                }
                 if(hovered)
                 {
                     var distance=Vector2.Distance(io.MousePos,item.At);

@@ -8,6 +8,17 @@ internal static class MapZoom542Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Map labels (0.543): nothing changes until set; names and gathering labels have their own rules",() =>
+        {
+            var settings=new TenshoAssistant.MapViewSettings();
+            Check(settings.NameFactor(0.5f)==settings.ZoomFactor(0.5f) && settings.NamesShown(0.15f),"names as before");
+            Check(!settings.GatheringLabelShown(0.59f) && settings.GatheringLabelShown(0.6f) && settings.GatheringLabelSize(10)==10,"gathering labels as before");
+            settings.NameZoomFollow=0;settings.NameMinZoom=0.5f;settings.GatheringLabelMinZoom=0.2f;settings.GatheringLabelScale=1.5f;
+            Check(settings.NameFactor(0.25f)==1f && !settings.NamesShown(0.4f) && settings.NamesShown(0.5f),"names on their own");
+            Check(settings.GatheringLabelShown(0.2f) && settings.GatheringLabelSize(10)==15,"gathering labels on their own");
+            settings.GatheringLabelScale=float.NaN;settings.NameMinZoom=float.NaN;
+            Check(settings.GatheringLabelSize(10)==10 && settings.NamesShown(0.15f),"a bad saved value does no harm");
+        }),
         ("Map zoom at opening: last one by default, 50 % the first time; saved once at rest",() =>
         {
             var settings=new TenshoAssistant.MapViewSettings();

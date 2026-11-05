@@ -50,7 +50,7 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
 
 ## Quota
 
-- L'agent ne voit pas le compteur : ne jamais l'estimer. Réserve fixée par l'utilisateur : arrêt à **1 % restant** sur 5 h ou sur la semaine.
+- L'agent ne voit pas le compteur : ne jamais l'estimer. Réserve retirée par l'utilisateur le 2026-11-05 : coder tant que le quota le permet, et tenir `docs/ai/STATUS.md` (reprise) à jour à chaque version.
   Quand l'utilisateur transmet un relevé proche de la limite : finir la version en cours (Verify + CHANGELOG + STATUS), noter la reprise, s'arrêter.
 
 ## Méthode

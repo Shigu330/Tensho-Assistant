@@ -1,6 +1,6 @@
 # Plan global
 
-Plan du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisateur et réorganisé à sa demande ; détail de chaque point : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md). **Rien n'est lancé sans son feu vert.** L'ordre des phases et des points est une proposition de l'agent.
+Plan du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisateur et réorganisé à sa demande ; détail de chaque point : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md). **En cours depuis le 2026-11-05 (feu vert de l'utilisateur).** L'ordre des phases et des points est une proposition de l'agent.
 
 **La 1.0.0 vient après tout le plan** (décision de l'utilisateur, [DEC-037](DECISIONS.md)) : il veut un plugin complet, et accepte qu'une soumission jugée trop grosse puisse être refusée ([PUBLISHING](PUBLISHING.md), point 6).
 
@@ -42,7 +42,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
 | P1 | Zoom à l'ouverture, réglable et gardé entre les sessions | S |  |
-| P2 | Taille des étiquettes réglée à part de celle des icônes | S |  |
+| P2 | ~~Taille des étiquettes réglée à part de celle des icônes~~ fait en 0.543 | S |  |
 | P3 | Éthérite la plus proche du drapeau ou d'un point, avec son coût | S |  |
 | P5 | Molette : zoom depuis toute la fenêtre et pas réglable | S |  |
 | P9 | ALEA : bonus d'expérience et couleur selon le temps restant | S | La zone d'ALEA reste rose : pas de couleur selon le temps restant. |
@@ -196,13 +196,13 @@ P19 s'élargit en campagne guidée de fin : tout ce qui a été codé, avec les 
 
 ## Phase 7 : juste avant la 1.0.0
 
-Demande de l'utilisateur (2026-11-05) : tout remettre à jour une fois le plan codé, pour que rien ne décrive un état ancien.
+Demande de l'utilisateur (2026-11-05) : tout remettre à jour une fois le plan codé, dans un ordre logique, pour ne pas tout refaire. Chaque étape s'appuie sur la précédente :
 
-- La liste de tous les outils, sur l'accueil et partout où elle apparaît.
-- Tous les fichiers `.md` du dépôt.
-- L'aide et la prise en main du plugin.
-- Tous les fichiers `.md` en français et en anglais : l'anglais toujours en premier, avec une mention en français disant que la traduction est en bas.
-- Sur Git, tout en anglais si possible : messages de commit, issues, releases et ce que GitHub affiche.
+1. Revoir tous les crédits : ils dépendent de ce qui a été ajouté au code.
+2. La liste de tous les outils, sur l'accueil et partout où elle apparaît, en anglais et en français.
+3. L'aide et la prise en main du plugin : elles décrivent les outils.
+4. Tous les fichiers `.md` du dépôt, à jour puis en français et en anglais : l'anglais toujours en premier, avec une mention en français disant que la traduction est en bas.
+5. Sur Git, tout en anglais si possible : messages de commit, issues, releases et ce que GitHub affiche.
 
 ## Écartés à la revue
 

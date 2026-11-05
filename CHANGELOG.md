@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.543.0
+- Plan global, P2 : les noms de lieux suivaient le zoom comme les icônes et se chevauchaient une fois dézoomés ; les étiquettes de récolte avaient une taille et un seuil figés. Réglages : suivi du zoom des noms, zoom minimal des noms, seuil et taille des étiquettes de récolte. Par défaut, rien ne change.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1007/1007, 0 avertissement, 0 erreur ; DLL 0.543.0.0. Non validé en jeu.
+### English
+- Map place names can follow the zoom apart from the icons and hide under a chosen zoom. Gathering labels have their own size and threshold.
+
 ## 0.542.0
 - Tri des propositions, lot 1, P1 (demande de l'utilisateur) : la carte démarrait toujours à 50 %, et le zoom sur une quête ou un lien était figé à 100 % au moins. Trois réglages : zoom à l'ouverture (dernier zoom utilisé, gardé après une relance ; zoom fixe en suivant le personnage ; carte entière), valeur du zoom fixe, zoom sur une quête ou un lien. Par défaut, le dernier zoom, à 50 % la première fois. Il est enregistré après 2 secondes sans changement, jamais à chaque image. Une carte choisie s'ouvre toujours en entier.
 - Tests : MapZoom542Tests. Verify.ps1 (agent) : 1006/1006, 0 avertissement, 0 erreur ; DLL 0.542.0.0. Non validé en jeu.

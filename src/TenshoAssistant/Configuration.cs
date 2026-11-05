@@ -175,6 +175,15 @@ public sealed class MapViewSettings
     // 0.378 (g, M-08): the player's bookmarks drawn on the Tensho map (a click places the flag).
     public bool ShowBookmarks { get; set; } = true;
     public float PlaceNameScale { get; set; } = 1f;
+    // 0.543 (P2): names follow the zoom on their own (null: as the icons) and hide under a zoom; gathering labels have their size and threshold, 0.6 being the old fixed one.
+    public float? NameZoomFollow { get; set; }
+    public float NameMinZoom { get; set; }
+    public float GatheringLabelMinZoom { get; set; } = 0.6f;
+    public float GatheringLabelScale { get; set; } = 1f;
+    public float NameFactor(float zoom)=>MathF.Pow(Math.Max(0.01f,zoom),ClampFollow(NameZoomFollow ?? ZoomFollow));
+    public bool NamesShown(float zoom)=>zoom>=Math.Clamp(float.IsFinite(NameMinZoom) ? NameMinZoom:0,0,4);
+    public bool GatheringLabelShown(float zoom)=>zoom>=Math.Clamp(float.IsFinite(GatheringLabelMinZoom) ? GatheringLabelMinZoom:0.6f,0,4);
+    public float GatheringLabelSize(float font)=>font*Math.Clamp(float.IsFinite(GatheringLabelScale) ? GatheringLabelScale:1,0.5f,2f);
     public bool ReplaceGameMap { get; set; } = true;
     // 0.114: FATEs running in the zone (live), with their area.
     public bool ShowFates { get; set; } = true;
