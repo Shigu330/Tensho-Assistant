@@ -4,10 +4,10 @@ Résumé par version, tiré des notes de vérification (historique détaillé : 
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
 ## 0.607.0
-- Plan global, phase 4 : Monnaies : avec les alertes activées, Tensho prévient une fois quand les mémoquartz limités de la semaine atteignent leur plafond, dans le chat, par un son et sur Discord ; une case le retire.
-- Tests : Weekly cap. Verify.ps1 (agent) : 1110/1110, 0 avertissement, 0 erreur ; DLL 0.607.0.0. Non validé en jeu.
+- Plan global, phase 4 : Objets : section « Objets annotés » : ce qui a une note ou une étiquette, filtré par étiquette (Important, À vendre) et par texte dans le nom ou la note ; un clic ouvre l'objet.
+- Tests : Annotated. Verify.ps1 (agent) : 1110/1110, 0 avertissement, 0 erreur ; DLL 0.607.0.0. Non validé en jeu.
 ### English
-- Currencies: with alerts on, Tensho says once when the week's limited tomestones reach their limit, in chat, by sound and on Discord; a box removes it.
+- Items: « Annotated items » section: what has a note or a label, filtered by label (Important, To sell) and by text in the name or note; a click opens the item.
 
 ## 0.606.0
 - Plan global, phase 4 : Monnaies : avec les alertes activées, Tensho prévient une fois quand les mémoquartz limités de la semaine atteignent leur plafond, dans le chat, par un son et sur Discord ; une case le retire.
