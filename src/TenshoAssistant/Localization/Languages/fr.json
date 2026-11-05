@@ -1028,6 +1028,12 @@
     "BountifulFloor": "Bonus d'Abondance inconnu (valeur de récolte ou base de l'objet non lue) : le plan compte +1, le minimum de la règle."
   },
   "FishingPanel": {
+    "NowYes": "oui",
+    "NowNo": "non",
+    "NowUnknown": "?",
+    "NowWindow": "créneau : {0}",
+    "NowWeather": "météo : {0}",
+    "NowBefore": "météo d'avant : {0}",
     "BaitInHand": "Appât en main :",
     "BaitMatches": "{0} poisson(s) de ce lieu avec cet appât (cadre vert)",
     "RightClick": "Clic droit : autres outils pour cet objet",

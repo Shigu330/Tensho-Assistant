@@ -9,7 +9,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C0 — K1 — A-01, partie anticipée : choisir la qualité visée dans le panneau du carnet
 
-- **État (relu le 2026-11-03)** : en partie 0.419 (A-01 : seuils des collectionnables comme cibles de qualité de la recherche) ; choix libre de la qualité dans le panneau du carnet non fait.
+- **État (relu le 2026-11-05)** : déjà présent : `DrawCraftLogTarget` et `CraftLogTargets`, cible par recette dans le panneau du carnet, repérés à la revue du code.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.CraftLog.cs`.
 - **Ce que le joueur obtient** : Dans le panneau à côté du carnet de synthèse, vous choisissez la cible : qualité maximale (comme aujourd'hui), une valeur tapée ou un pourcentage du maximum. Pour un objet livré en NQ, un collectionnable à palier bas ou une montée de niveau, la macro proposée devient plus courte et coûte moins de PS. Les paliers exacts des collectionnables viendront ensuite avec A-01, après la sonde.
 - **Comment, taille, dépendances** : Réglage « Cible du carnet » (maximum / valeur / %), avec infobulle et ↺ ; il entre dans CraftLogInput.Options, donc dans la clé du cache (CraftLogSession.CacheKey). Afficher « cible : N / max » au-dessus des macros. Taille S. Dépendances : aucune ; les paliers des collectionnables (CollectablesShopRefine…) restent pour A-01. Sonde : aucune pour cette partie. Décision : valeur par défaut (recommandé : maximum, comme aujourd'hui).
@@ -79,6 +79,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C9 — G3 — R-02, partie anticipée : « possible maintenant ? » dans l'aide à la pêche
 
+- **État (relu le 2026-11-05)** : FAIT 0.568.
 - **État (relu le 2026-11-03)** : en partie 0.396 (R-02 : prochaines fenêtres sur la fiche du poisson) ; pas dans l’aide à la pêche.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.FishingPanel.cs`.
 - **Ce que le joueur obtient** : Chaque poisson de l'aide à la pêche et de « Comment le pêcher » montre trois pastilles : créneau ET ouvert, météo actuelle conforme, météo précédente conforme (✓ / ✗ / ?). Vous voyez tout de suite quels poissons sont possibles là, maintenant, sans croiser vous-même avec la page Météo.

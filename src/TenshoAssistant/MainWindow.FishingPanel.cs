@@ -1,3 +1,4 @@
+using TenshoAssistant.Gathering;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Items;
@@ -29,6 +30,25 @@ internal sealed partial class MainWindow
     internal void ConfigureFishingHelp(Func<(uint Job,uint Territory,float X,float Z,bool Fishing)?> now,Func<uint,float,float,(uint Id,string Name,float X,float Z,uint[] Fish)?> spotAt)
     {fishingNow=now;fishingSpotAt=spotAt;}
 
+    // 0.568 (C9): time window and weather now, against what GatherBuddy gives for this fish. The zone's weather is computed once per period.
+    private (uint Territory,long Period,uint? Current,uint? Previous) fishNowWeather;
+    private void DrawFishNow(uint fishId,uint territory)
+    {
+        if(gatherBuddyFish?.State.Data?.Find(fishId) is not { } fish)return;
+        var moment=DateTimeOffset.UtcNow;var period=moment.ToUnixTimeSeconds()/1400;
+        if(fishNowWeather.Territory!=territory || fishNowWeather.Period!=period)
+        {
+            var forecast=weather.State.Catalog;
+            fishNowWeather=(territory,period,forecast?.Forecast(territory,moment,1)[0].Weather?.Id,forecast?.Forecast(territory,moment.AddSeconds(-1400),1)[0].Weather?.Id);
+        }
+        string Mark(bool? value)=>localization.Get(value switch{true=>"FishingPanel.NowYes",false=>"FishingPanel.NowNo",_=>"FishingPanel.NowUnknown"});
+        var parts=new List<string>();
+        if(fish.StartMinute is not null && fish.EndMinute is not null)parts.Add(localization.Format("FishingPanel.NowWindow",Mark(FishNow.InWindow(fish.StartMinute,fish.EndMinute,EorzeaMinutes()))));
+        if(fish.Weathers.Count>0)parts.Add(localization.Format("FishingPanel.NowWeather",Mark(FishNow.WeatherFits(fish.Weathers,fishNowWeather.Current))));
+        if(fish.Transitions.Count>0)parts.Add(localization.Format("FishingPanel.NowBefore",Mark(FishNow.WeatherFits(fish.Transitions,fishNowWeather.Previous))));
+        if(parts.Count==0)return;
+        ImGui.TextDisabled(string.Join(" · ",parts));
+    }
     internal void DrawFishingPanel()
     {
         if(windowDisposed || fishingNow?.Invoke() is not { } now)return;
@@ -83,6 +103,7 @@ internal sealed partial class MainWindow
                             var stock=GetRecipeHoldings(row.FishId);
                             ItemCell(fish,row.FishId,22,$"{fish?.Name ?? row.FishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
                             if(ChainNeed(row.FishId,stock) is { } need)ImGui.TextColored(Accent,need);
+                            DrawFishNow(row.FishId,now.Territory);
                             ImGui.TableNextColumn();
                             for(var step=0;step<row.Route.Count;step++)
                             {

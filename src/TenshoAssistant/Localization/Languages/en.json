@@ -1028,6 +1028,12 @@
     "BountifulFloor": "Bountiful bonus unknown (gathering rating or item base not read): the plan counts +1, the rule's minimum."
   },
   "FishingPanel": {
+    "NowYes": "yes",
+    "NowNo": "no",
+    "NowUnknown": "?",
+    "NowWindow": "time: {0}",
+    "NowWeather": "weather: {0}",
+    "NowBefore": "weather before: {0}",
     "BaitInHand": "Bait in hand:",
     "BaitMatches": "{0} fish of this spot with this bait (green frame)",
     "RightClick": "Right click: other tools for this item",
