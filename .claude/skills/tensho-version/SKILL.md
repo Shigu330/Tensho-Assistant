@@ -29,6 +29,14 @@ bash scripts/agent/publish-version.sh
 - Si `check.sh` signale une erreur de compilation des tests, le résultat affiché vient de l'ancien binaire : corriger d'abord.
 - Ne pas dire « validé en jeu » sans rapport de l'utilisateur. Release seulement sur sa demande.
 
+## Outil LSP (csharp-ls)
+
+Plugin `csharp-lsp` et `csharp-ls` installés le 2026-11-05 ; .NET 10 lui est donné par `DOTNET_ROOT` dans `.claude/settings.local.json`. À préférer à grep pour trouver une définition, les références ou le type d'un symbole, et pour vérifier un nom avant de compiler.
+
+- `workspaceSymbol` marche partout. `hover`, `findReferences` et `documentSymbol` marchent sur les fichiers du plugin (`MainWindow.*.cs`).
+- Essai du 2026-11-05 : ils répondaient vide sur `UI/GameWindow.cs`, un fichier aussi lié au projet de tests. Sur ces fichiers partagés, passer par `workspaceSymbol` ou grep.
+- La ligne et la colonne commencent à 1 et doivent tomber sur le nom du symbole.
+
 ## Pièges du code
 
 - **Nouveau fichier `.cs` pur** dans un dossier que le projet de tests lie un par un (`Gathering/`, `Maps/`, `Quests/`, `Craft/`) : ajouter son `<Compile Include>` dans `tests/TenshoAssistant.Tests/TenshoAssistant.Tests.csproj`.
