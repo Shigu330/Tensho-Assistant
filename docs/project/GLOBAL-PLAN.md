@@ -1,8 +1,8 @@
 # Plan global
 
-Brouillon du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisateur ; détail de chaque point : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md). **Rien n'est lancé tant que l'utilisateur n'a pas relu ce plan.** L'ordre des phases et des points est une proposition de l'agent.
+Plan du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisateur ; détail de chaque point : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md). **Rien n'est lancé sans son feu vert.** L'ordre des phases et des points est une proposition de l'agent.
 
-**La place de la 1.0.0 reste à décider** (choix de l'utilisateur : « décider plus tard », en relisant ce plan). 100 points ont été cochés « avant la 1.0 » ; à placer, le point 6 de [PUBLISHING](PUBLISHING.md) rappelle que la soumission peut être refusée si elle dépasse ce que l'équipe Dalamud peut examiner.
+**La 1.0.0 vient après tout le plan** (décision de l'utilisateur, 2026-11-05, [DEC-037](DECISIONS.md)) : les 100 points cochés, puis la campagne de tests en jeu, puis la soumission. L'agent recommandait de la placer après la phase 2, car une soumission plus grosse est plus lourde à examiner et peut être refusée ([PUBLISHING](PUBLISHING.md), point 6) ; l'utilisateur a choisi en connaissance de cause.
 
 | Phase | Contenu | Points | Il faut en jeu |
 |---|---|---:|---|

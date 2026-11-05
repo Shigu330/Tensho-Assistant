@@ -14,7 +14,7 @@ reste le dépôt personnel, qui existe : `https://raw.githubusercontent.com/Shig
 
 ## Ce qui reste avant la soumission
 
-Par ordre. Les points marqués **règle Dalamud** demandent un résumé et l'accord de l'auteur (consigne du 2026-11-04).
+La soumission vient après tout le [plan global](GLOBAL-PLAN.md) (DEC-037). Par ordre. Les points marqués **règle Dalamud** demandent un résumé et l'accord de l'auteur (consigne du 2026-11-04).
 
 | # | Point | Qui | État |
 |---|---|---|---|

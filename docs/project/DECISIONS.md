@@ -364,3 +364,13 @@ Decision: Plan pour le seul nœud en cours. Tous les effets du lieu lus dans les
 Reason: Décision de l'utilisateur.
 Consequences: Les réglages de bonus et de secondes entre nœuds disparaissent ; celui de la liste ne commande plus que sa ligne. « PR par tic » reste pour la barre de PR.
 References: docs/evidence/0.515-node-effects.md
+
+DEC-ID: DEC-037
+Timestamp: 2026-11-05 Europe/Brussels
+Problem: Revue de toutes les propositions avec l'utilisateur : 100 points gardés pour avant la 1.0.0, 12 rejetés ([GLOBAL-PLAN](GLOBAL-PLAN.md)).
+Evidence: Réponses de l'utilisateur à la revue ; question « Où places-tu la 1.0.0 dans le plan ? », réponse « Après tout le plan ».
+Options: Après la phase 2 (recommandé par l'agent : publication plus tôt, moins de code à examiner) ; après tout le plan.
+Decision: La 1.0.0 et la soumission viennent après tout le plan global, campagne de tests en jeu comprise.
+Reason: Décision de l'utilisateur.
+Consequences: La publication arrive plus tard et la soumission est plus grosse à examiner ; l'équipe Dalamud peut la refuser si elle la juge trop lourde (PUBLISHING, point 6).
+References: docs/project/GLOBAL-PLAN.md

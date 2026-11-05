@@ -1,6 +1,6 @@
 # GOAL actif
 
-ID: D17-PREP — préparer la version 1.0.0, première publication sur le dépôt officiel Dalamud, au moment choisi par l'auteur (DEC-023). Suivi : issue GitHub #31.
+ID: D17-PREP — préparer la version 1.0.0, première publication sur le dépôt officiel Dalamud, au moment choisi par l'auteur (DEC-023), après tout le [plan global](../project/GLOBAL-PLAN.md) (DEC-037). Suivi : issue GitHub #31.
 
 État relu le 2026-11-04, version 0.516 :
 

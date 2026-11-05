@@ -30,11 +30,11 @@ Liste complète : [TESTING](../project/TESTING.md), 284 cases ouvertes, aucune d
 Dépôt personnel : installation et mise à jour fonctionnent (rapport de l'utilisateur, 2026-11-05, 0.539.0). Possible depuis cette release : galerie de Mes outils (0.476) et liste de vidéos (0.506), qui lisent la branche `main`.
 
 ## Prochaine action
-0) Propositions : **ne pas coder** tant que l'utilisateur n'a pas relu le [plan global](../project/GLOBAL-PLAN.md) (brouillon du 2026-11-05, place de la 1.0.0 à décider).
+0) [Plan global](../project/GLOBAL-PLAN.md) : la 1.0.0 vient après tout le plan (DEC-037). **Ne pas coder sans le feu vert de l'utilisateur.**
 1) Décisions de l'auteur sur les points Dalamud ([PUBLISHING](../project/PUBLISHING.md) « Ce qui reste », points 4 à 7 ; titre selon le job décidé, DEC-035), avec son accord à chaque règle.
 2) Fait le 2026-11-05 : release Stable-0.539.0, sur demande de l'utilisateur. La prochaine : une séance de jeu sur la dernière version d'abord (DEC-033).
 3) Vérifier en jeu les fenêtres converties (issue #38).
-4) Passage en 1.0.0 et soumission, au moment choisi par l'auteur (DEC-023). La PR et la déclaration d'IA sont écrites par lui.
+4) Passage en 1.0.0 et soumission, après tout le plan global (DEC-037), au moment choisi par l'auteur (DEC-023). La PR et la déclaration d'IA sont écrites par lui.
 Après chaque rechargement en mode développeur, l'agent lit les lignes « Selftest » de dalamud.log.
 
 ## Git
