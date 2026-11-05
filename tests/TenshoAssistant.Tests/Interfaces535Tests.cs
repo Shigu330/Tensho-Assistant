@@ -56,6 +56,15 @@ internal static class Interfaces535Tests
             Check(!Read("MainWindow.cs").Contains("BehindGame") && !Read("MainWindow.cs").Contains("Panels?.Show") && !Read("AttachedPanels.cs").Contains("\"TenshoAssistant"),"the main Tensho window neither hides the map nor is hidden");
             Check(Read("MapViewWindow.cs").Contains("aside.Hidden(lastPosition") && Read("MapViewWindow.cs").Contains("owner.MapBehindGame(at, lastSize)"),"the map uses the delay");
         }),
+        ("0.541: a tool's item list shows prices: lowest of NQ and HQ, unknown never free, asked only on the button",() =>
+        {
+            Check(TenshoAssistant.MyTools.ToolItemCost.Lowest(100,80)==80 && TenshoAssistant.MyTools.ToolItemCost.Lowest(null,80)==80 && TenshoAssistant.MyTools.ToolItemCost.Lowest(100,null)==100 && TenshoAssistant.MyTools.ToolItemCost.Lowest(null,null) is null,"lowest");
+            var cost=TenshoAssistant.MyTools.ToolItemCost.Missing([(2,10m),(0,null),(3,null),(null,5m)]);
+            Check(cost==(20m,2),"known 2 x 10; nothing missing is free; no price or no stock is unknown");
+            var tools=Read("MainWindow.MyTools.cs");
+            Check(tools.Contains("toolPrices.StartListAsync(market,character,worldId,unpriced.Take(ToolItemCost.MaximumAsked))") && tools.Contains("SourceButton(localization.Format(\"MyToolsUi.AskPrices\""),"on the button, within the session's limit");
+            Check(TenshoAssistant.MyTools.ToolItemCost.MaximumAsked==32,"the session's limit");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

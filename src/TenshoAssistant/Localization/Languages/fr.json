@@ -77,6 +77,12 @@
     "Cancel": "Annuler"
   },
   "MyToolsUi": {
+    "ColumnPrice": "Prix à l'unité",
+    "MissingCost": "Coût de ce qui manque : {0} gils",
+    "MissingCostUnknown": "Coût de ce qui manque : au moins {0} gils ({1} objets sans prix ou sans stock connu)",
+    "AskPrices": "Demander les prix ({0})",
+    "AskPricesTip": "Demande à Universalis les prix de votre monde, 32 objets au plus par clic. Le prix le plus bas est affiché, NQ ou HQ. Rien n'est demandé sans ce clic.",
+    "PricesLoading": "Prix : {0}/{1}…",
     "ThemeReturn": "Revenir au thème d'origine ({0})",
     "ThemeReturnTip": "Remet le thème que vous aviez avant d'utiliser celui d'un outil. Le thème se change aussi dans Paramètres › Interface, où « Suivre le jeu » est le réglage par défaut.",
     "ThemeGame": "celui du jeu",

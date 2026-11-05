@@ -18,6 +18,7 @@ internal sealed partial class MainWindow
         CancelTriadAdvice();
         CancelTriadRequest();
         preparationPrices.Dispose();
+        toolPrices.Dispose();
         routePrices.Dispose();
         currencyPrices.Dispose();
         cactpotSolve.Dispose();

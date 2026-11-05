@@ -724,6 +724,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.540) Journal du jardin : « Graines de centaurée » est dans la liste, avec 24 h ; une plantation de cette graine est reconnue dans le chat. Comparer la durée réelle.
 
+- [ ] (0.541) Mes outils, bloc d'objets : colonne de prix, coût de ce qui manque, bouton « Demander les prix ». Un objet invendable affiche un tiret.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

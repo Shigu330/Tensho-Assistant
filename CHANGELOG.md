@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.541.0
+- Plan global, phase 1 (issue #37) : le bloc d'objets de « Mes outils » ne montrait pas les prix. Nouvelle colonne « Prix à l'unité » (le plus bas de NQ et HQ dans le cache partagé), coût de ce qui manque, et bouton « Demander les prix », 32 objets au plus par clic. Un prix ou un stock inconnu est compté comme inconnu (« au moins »), jamais comme gratuit. Rien n'est demandé sans le clic.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1005/1005, 0 avertissement, 0 erreur ; DLL 0.541.0.0. Non validé en jeu.
+### English
+- The item block of My Tools now shows prices: price each, cost of what is missing, and a button that asks Universalis for them.
+
 ## 0.540.0
 - Plan global, phase 1 (issue #36) : les bleuets manquaient au journal du jardin : la ligne 108 de `GardeningSeed` n'est pas dans les données de Lotlab. « Graines de centaurée » (51189, récolte 51190) est ajoutée. Identifiants tirés des données du jeu ; 24 h sans flétrissement, déduits des 26 autres fleurs en pot, modifiables dans le journal (docs/evidence/0.540-cornflower-seed.md). Une plantation de cette graine lue dans le chat est donc reconnue.
 - Tests : GardenSeeds449Tests complété. Verify.ps1 (agent) : 1004/1004, 0 avertissement, 0 erreur ; DLL 0.540.0.0. Non validé en jeu.

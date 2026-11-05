@@ -2,7 +2,7 @@
 
 Demande de l'utilisateur (2026-11-04) : « prévois aussi un plan pour template communautaire ajout outils dans tensho ». Les décisions à prendre sont à la fin.
 
-**Décidé le 2026-11-04 ([DEC-029](../project/DECISIONS.md))** : les deux, code d'abord, tout de suite. A0, A1, A2 et A4 faits en 0.470. Partie sans code : format, page, blocs et partage faits en 0.473 ; le bloc d'objets ne montre pas encore les prix ; éditeur fait en 0.474 ; galerie faite en 0.475, visible après la prochaine release ; thème proposé fait en 0.476. **Partie sans code terminée, non validée en jeu.**
+**Décidé le 2026-11-04 ([DEC-029](../project/DECISIONS.md))** : les deux, code d'abord, tout de suite. A0, A1, A2 et A4 faits en 0.470. Partie sans code : format, page, blocs et partage faits en 0.473 ; le bloc d'objets montre les prix depuis 0.541 ; éditeur fait en 0.474 ; galerie faite en 0.475, visible après la prochaine release ; thème proposé fait en 0.476. **Partie sans code terminée, non validée en jeu.**
 
 ## Deux sens possibles
 
