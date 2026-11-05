@@ -33,7 +33,7 @@ Total avant la 1.0.0 : 99 points. Le bouton pour afficher ou cacher des icônes 
 |---|---|---|
 | Jardin | ~~Ajouter les Bleuets à la liste de graines~~ fait en 0.540 | #36 |
 | Objets | ~~Blocs d'objets sans prix~~ fait en 0.541 | #37 |
-| Escouade | Bouton d'alarme pour une mission en cours | #37 |
+| Escouade | ~~Bouton d'alarme pour une mission en cours~~ déjà présent : cloche de la ligne dans Rappels, et alarme automatique depuis 0.455 (`MainWindow.Reminders.cs`, `Alarms/AutoAlarmWatcher.Dalamud.cs`) ; à vérifier en phase 6 | #37 |
 
 Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 
