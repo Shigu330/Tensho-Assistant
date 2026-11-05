@@ -52,7 +52,7 @@ internal static class Interfaces535Tests
             foreach(var (file,addon) in new[]{("MainWindow.Character.cs","Character"),("MainWindow.GatheringPanel.cs","Gathering"),("MainWindow.CollectablePanel.cs","GatheringMasterpiece"),("MainWindow.SpearfishingPanel.cs","SpearFishing"),("MainWindow.DutyFinder.cs","ContentsFinder"),("MainWindow.TriadRequest.cs","TripleTriadRequest"),("MainWindow.CraftLog.cs","RecipeNote"),("MainWindow.FashionWeek.cs","FashionCheck")})
                 Check(Read(file).Contains($"WindowMoved(\"{addon}\","),"follows: "+addon);
             Check(Read("BankImportOverlay.cs").Contains("follow(context.AddonName"),"bank panel follows");
-            Check(Read("MainWindow.TrackerWindow.cs").Contains("Panels?.Over(at,size,mapOpenedWith.Present)==true") && Read("AttachedPanels.cs").Contains("window.Key == HoverPanel || Anchors.ContainsKey(window.Key)"),"the map leaves for attached panels, not for free ones");
+            Check(Read("MainWindow.TrackerWindow.cs").Contains("Panels?.Over(at,size)==true") && Read("AttachedPanels.cs").Contains("window.Key == HoverPanel || Anchors.ContainsKey(window.Key)"),"the map leaves for attached panels, not for free ones");
             Check(!Read("MainWindow.cs").Contains("BehindGame") && !Read("MainWindow.cs").Contains("Panels?.Show") && !Read("AttachedPanels.cs").Contains("\"TenshoAssistant"),"the main Tensho window neither hides the map nor is hidden");
             Check(Read("MapViewWindow.cs").Contains("aside.Hidden(lastPosition") && Read("MapViewWindow.cs").Contains("owner.MapBehindGame(at, lastSize)"),"the map uses the delay");
         }),

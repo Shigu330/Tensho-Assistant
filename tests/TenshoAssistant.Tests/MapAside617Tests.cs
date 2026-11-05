@@ -1,37 +1,23 @@
 using TenshoAssistant.UI;
 
-// 0.617 (user report): a window already open must not hide the map asked for.
+// 0.618 (user report): the enlarged map stays; at its usual size it steps aside.
 internal static class MapAside617Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
-    private static GameWindow Window(string name)=>new(name,100,100,300,300,1);
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Map aside: what was open first does not count, what comes later does",() =>
+        ("Map enlarged: by the button, or by its size after a reload; the usual size is not",() =>
         {
-            var with=new OpenedWith();
-            with.Opened([Window("ContentsFinder")]);
-            Check(with.Later([Window("ContentsFinder")]).Count==0,"already there");
-            Check(with.Later([Window("ContentsFinder"),Window("Inventory")]) is [{Name:"Inventory"}],"a new one counts");
+            Check(MapEnlarged.Is(true,400,300,1920,1080),"the button");
+            Check(MapEnlarged.Is(false,1728,972,1920,1080),"90 % of the screen, button state lost by a reload (the size in the user's file)");
+            Check(!MapEnlarged.Is(false,720,760,1920,1080),"the usual size");
+            Check(!MapEnlarged.Is(false,1800,500,1920,1080),"wide only");
         }),
-        ("Map aside: closed and opened again, it counts; a new opening starts over",() =>
+        ("Map enlarged: no stepping aside then, the same as before otherwise",() =>
         {
-            var with=new OpenedWith();
-            with.Opened([Window("ContentsFinder")]);
-            Check(with.Later([]).Count==0 && with.Present.Count==0,"closed: forgotten");
-            Check(with.Later([Window("ContentsFinder")]).Count==1,"opened again after the map");
-            with.Opened([Window("ContentsFinder")]);
-            Check(with.Later([Window("ContentsFinder")]).Count==0,"the map asked again");
-        }),
-        ("Map aside: wired on the map window and its panels",() =>
-        {
-            var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MapViewWindow.cs"));
-            Check(window.Contains("if(frame!=lastConditionFrame+1){owner.MapOpened();"),"on opening");
-            Check(window.Contains("if (lastPosition is { } before && (before != position || lastSize != size)) owner.MapOpened();"),"on « Enlarge », on moving and resizing: it must not vanish");
-            var tracker=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.TrackerWindow.cs"));
-            Check(tracker.Contains("Panels?.Over(at,size,mapOpenedWith.Present)"),"their panels too");
-            Check(tracker.Contains("Map {0}; windows coming after it"),"the reason in the log");
+            var tracker=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.TrackerWindow.cs")).Replace("\r\n","\n");
+            Check(tracker.Contains("if(UI.MapEnlarged.Is(mapRestore is not null,size.X,size.Y,screen.X,screen.Y))return false;\n        return BehindGame(at,size) || Panels?.Over(at,size)==true;"),"checked first");
         }),
     ];
 }

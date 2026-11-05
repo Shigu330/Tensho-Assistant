@@ -32,19 +32,14 @@ public static class GameWindows
 }
 
 /// <summary>
-/// 0.617 (user report): the game windows already open when an interface was opened do not make it step aside: asking for the map with a window open must show
-/// the map. Only what comes afterwards counts. A window that closes and opens again counts from then on.
+/// 0.618 (user report): the map enlarged is a view of the whole map: it stays, whatever window it touches. At its usual size it stays in a corner, and steps aside.
+/// Judged on its size too, so that it holds after a reload, which forgets the button's state.
 /// </summary>
-public sealed class OpenedWith
+public static class MapEnlarged
 {
-    private HashSet<string> present=[];
-    public IReadOnlySet<string> Present=>present;
-    public void Opened(IEnumerable<GameWindow> windows)=>present=windows.Select(window=>window.Name).ToHashSet();
-    public IReadOnlyList<GameWindow> Later(IReadOnlyList<GameWindow> windows)
-    {
-        present.IntersectWith(windows.Select(window=>window.Name));
-        return windows.Where(window=>!present.Contains(window.Name)).ToArray();
-    }
+    public const float Share=0.85f;
+    public static bool Is(bool enlargeButton,float width,float height,float screenWidth,float screenHeight)
+        =>enlargeButton || width>=screenWidth*Share && height>=screenHeight*Share;
 }
 
 /// <summary>0.539 (user request): an interface leaves at once and comes back only after a moment with nothing in front, so that going from one tooltip to the next does not make it blink.</summary>

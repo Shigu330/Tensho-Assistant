@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.618.0
+- Plan global, phase 5 : Carte (précision de l'utilisateur) : agrandie, elle reste visible quelles que soient les fenêtres du jeu ; à sa taille normale, elle s'efface comme avant. Remplace la règle de la 0.617, retirée. Reconnue aussi à sa taille après un rechargement.
+- Tests : Map enlarged. Verify.ps1 (agent) : 1127/1127, 0 avertissement, 0 erreur ; DLL 0.618.0.0. Non validé en jeu.
+### English
+- Map (user's precision): enlarged, it stays visible whatever game windows it touches; at its usual size it steps aside as before. Replaces the 0.617 rule, removed. Also recognised by its size after a reload.
+
 ## 0.617.0
 - Plan global, phase 5 : Carte (rapport de l'utilisateur) : cliquer sur « Agrandir » la rendait invisible, car elle touchait alors une fenêtre du jeu. Une fenêtre déjà là au moment où la carte s'ouvre, s'agrandit, se déplace ou change de taille ne la cache plus ; seules celles qui s'ouvrent après la font s'effacer. En mode développeur, le journal dit lesquelles.
 - Tests : Map aside. Verify.ps1 (agent) : 1128/1128, 0 avertissement, 0 erreur ; DLL 0.617.0.0. Non validé en jeu.
