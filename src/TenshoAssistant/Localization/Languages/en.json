@@ -3507,6 +3507,9 @@
     "DeleteTemplateTip": "Deletes the chosen template at once, without confirmation."
   },
   "BankUi": {
+    "OtherCharacters": "On your other characters:",
+    "OtherCharactersTip": "From what the Bank saved for them: a storage never read is not counted, so an absent character may still hold some.",
+    "OtherCharacterLine": "{0}: NQ {1} · HQ {2} (read {3})",
     "ListView": "Show as a list",
     "ListViewTip": "One item per line with NQ, HQ, total and its storages, instead of the bag grids. Click a column to sort. The tab and filters above still apply.",
     "ListItem": "Item",

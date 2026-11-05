@@ -860,6 +860,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.608) Préparation d'une recette à plusieurs ingrédients : « Lire les prix » répond en quelques secondes.
 
+- [ ] (0.609) Fiche d'un objet qu'un autre personnage possède : la ligne donne ses quantités.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

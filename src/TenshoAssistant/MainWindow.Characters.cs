@@ -17,6 +17,19 @@ internal sealed partial class MainWindow
     private ulong? bankViewCharacter;
 
     /// <summary>« Name (World) » saved with the character's own storages, else « Character …1234 » (last digits of the local id).</summary>
+    // 0.609: « Where is this item? »: the item sheet, on the other characters, from what the Bank saved.
+    private uint otherStocksItem;private ulong otherStocksCharacter;private BankState? otherStocksBank;private OtherCharacterStock[] otherStocks=[];
+    private void DrawOtherCharacterStocks(uint item,ulong character,BankState bank)
+    {
+        if(otherStocksItem!=item || otherStocksCharacter!=character || !ReferenceEquals(otherStocksBank,bank))
+        {otherStocks=OtherCharacterStocks.Of(item,character,bank.Entries);otherStocksItem=item;otherStocksCharacter=character;otherStocksBank=bank;}
+        if(otherStocks.Length==0)return;
+        ImGui.TextDisabled(localization.Get("BankUi.OtherCharacters"));
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("BankUi.OtherCharactersTip"));
+        foreach(var row in otherStocks)
+            ImGui.TextUnformatted(localization.Format("BankUi.OtherCharacterLine",CharacterName(bank.Entries,row.CharacterId),row.Nq.ToString("N0"),row.Hq.ToString("N0"),row.ObservedAt.ToLocalTime().ToString("d")));
+    }
+
     private static string CharacterName(IEnumerable<BankEntry> entries,ulong id)
         =>entries.FirstOrDefault(entry=>entry.Key.CharacterId==id && BankStorageScope.IsCharacterOwn(entry.Key.Kind) && entry.Name.Length>0)?.Name
             ?? $"…{id%10000:0000}";

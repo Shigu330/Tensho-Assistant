@@ -229,6 +229,7 @@ internal sealed partial class MainWindow
         var summary = groupedHoldings;
         DrawHoldingsSummary(summary);
         DrawStorageGroups(summary);
+        DrawOtherCharacterStocks((uint)itemId,character,bankState);
         if (includeRecipes) DrawRecipes();
         if (bankState.Loading) ImGui.TextDisabled(localization.Get("HoldingsUi.Loading"));
         if (bankState.Error is { } error) DrawDataError(error,"ServiceErrors.Bank");

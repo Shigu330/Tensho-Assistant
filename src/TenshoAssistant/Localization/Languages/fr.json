@@ -3507,6 +3507,9 @@
     "DeleteTemplateTip": "Supprime le modèle choisi tout de suite, sans confirmation."
   },
   "BankUi": {
+    "OtherCharacters": "Sur vos autres personnages :",
+    "OtherCharactersTip": "D'après ce que la Banque a enregistré pour eux : un rangement jamais lu n'est pas compté, un personnage absent peut donc en avoir.",
+    "OtherCharacterLine": "{0} : NQ {1} · HQ {2} (lu le {3})",
     "ListView": "Afficher en liste",
     "ListViewTip": "Un objet par ligne avec NQ, HQ, total et ses rangements, à la place des grilles de sacs. Cliquez sur une colonne pour trier. L'onglet et les filtres ci-dessus restent appliqués.",
     "ListItem": "Objet",

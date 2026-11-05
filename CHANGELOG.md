@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.609.0
+- Plan global, phase 4 : Fiche objet : « Sur vos autres personnages » donne, pour chacun, les quantités NQ et HQ et la date, d'après ce que la Banque a enregistré. Version compacte : pas de recherche globale, et un rangement jamais lu n'est pas compté.
+- Tests : Other stocks. Verify.ps1 (agent) : 1115/1115, 0 avertissement, 0 erreur ; DLL 0.609.0.0. Non validé en jeu.
+### English
+- Item sheet: « On your other characters » gives each one's NQ and HQ quantities and date, from what the Bank saved. Compact version: no global search, and a storage never read is not counted.
+
 ## 0.608.0
 - Plan global, I4 : Prix du coût de préparation et des listes : une seule requête Universalis pour toute la liste au lieu d'une par objet toutes les 3 secondes. Les objets sans réponse sont demandés seuls comme avant, et une panne du serveur arrête la liste. Preuve : docs/evidence/0.608-universalis-batch.md. La limite de 32 objets par liste reste en place.
 - Tests : Market batch. Verify.ps1 (agent) : 1113/1113, 0 avertissement, 0 erreur ; DLL 0.608.0.0. Non validé en jeu.
