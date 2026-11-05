@@ -173,7 +173,8 @@ internal sealed partial class MainWindow
             if(settings.OverlayZoneName)
             {
                 var name=MapName(map);var sub=map.TerritoryId!=0 && map.Subzone.Length>0 ? "> "+map.Subzone:null;
-                var size=new Vector2(Math.Max(ImGui.CalcTextSize(name).X,sub is null ? 0:ImGui.CalcTextSize(sub).X+indent)+pad*2,(sub is null ? 1:2)*line+pad*2);
+                var places=MapMenus.PlaceLines(live?.MapId ?? 0,map.MapId,live?.Area,live?.SubArea);
+                var size=new Vector2(places.Select(place=>ImGui.CalcTextSize(place).X+indent).Append(ImGui.CalcTextSize(name).X).Append(sub is null ? 0:ImGui.CalcTextSize(sub).X+indent).Max()+pad*2,((sub is null ? 1:2)+places.Count)*line+pad*2);
                 var at=start+new Vector2(38,0);
                 HeaderBand("MapOverlayNameBand",at,size,fade,area-(at-start));
                 ImGui.SetCursorPos(at);
@@ -182,6 +183,7 @@ internal sealed partial class MainWindow
                     ImGui.SetCursorPos(new Vector2(pad,pad));
                     HeaderEntry("Name",name,UI.FfxivTheme.Gold,0,null,false);
                     if(sub is not null)HeaderEntry("Sub",sub,grey,indent,null,false);
+                    for(var place=0;place<places.Count;place++)HeaderEntry($"Place{place}",places[place],grey,indent,null,false);
                 }
                 ImGui.EndChild();
             }
@@ -208,8 +210,10 @@ internal sealed partial class MainWindow
         var regionName=region is not null ? MapName(region):world;var zoneName=isZone ? MapName(map):"--";
         var arrow=ImGui.GetTextLineHeight();
         var widths=new List<float>{ImGui.CalcTextSize(regionName).X+arrow,ImGui.CalcTextSize(zoneName).X+arrow+(isZone ? 28:0)};
+        var placeLines=MapMenus.PlaceLines(live?.MapId ?? 0,map.MapId,live?.Area,live?.SubArea);
         if(floors.Count>1)widths.Add(ImGui.CalcTextSize(FloorName(map)).X+arrow);
         else if(isZone && map.Subzone.Length>0)widths.Add(indent+ImGui.CalcTextSize("> "+map.Subzone).X);
+        widths.AddRange(placeLines.Select(place=>indent+ImGui.CalcTextSize(place).X));
         var headerHeight=widths.Count*line+pad*2;
         var listCount=mapHeaderList switch{1=>regions.Length+1,2=>zones.Count+1,3=>floors.Count,_=>0};
         var at=start+new Vector2(toolsWidth+4,0);var room=area-(at-start);
@@ -256,6 +260,7 @@ internal sealed partial class MainWindow
                 }
             }
             else if(isZone && map.Subzone.Length>0)HeaderEntry("Subzone","> "+map.Subzone,grey,indent,null,false);
+            for(var place=0;place<placeLines.Count;place++)HeaderEntry($"Place{place}",placeLines[place],grey,indent,null,false);
         }
         ImGui.EndChild();
         mapOverlayHovered|=headerHovered;

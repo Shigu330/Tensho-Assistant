@@ -23,6 +23,15 @@ internal static class MapAside617Tests
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             Check(!view.Contains("floor.MapIndex.ToString()") && !view.Contains("$\"{map.MapIndex}\""),"both menus, the one above the map included (user report)");
         }),
+        ("Map place (0.621): where the player stands, as the game's map writes it",() =>
+        {
+            Check(TenshoAssistant.Maps.MapMenus.PlaceLines(12,12,"L'Octant","").SequenceEqual(["> L'Octant","> --"]),"captured in game: no sub-place is « -- »");
+            Check(TenshoAssistant.Maps.MapMenus.PlaceLines(12,12,"L'Octant","Quai").SequenceEqual(["> L'Octant","> Quai"]),"a sub-place");
+            Check(TenshoAssistant.Maps.MapMenus.PlaceLines(12,11,"L'Octant","").Count==0,"another map than the player's");
+            Check(TenshoAssistant.Maps.MapMenus.PlaceLines(0,0,"L'Octant","").Count==0 && TenshoAssistant.Maps.MapMenus.PlaceLines(12,12,"","").Count==0,"unknown");
+            var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs"));
+            Check(reader.Contains("try{ReadPlace();Read(\"place\");}catch(Exception error)"),"guarded on the framework thread");
+        }),
         ("Map enlarged: no stepping aside then, the same as before otherwise",() =>
         {
             var tracker=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.TrackerWindow.cs")).Replace("\r\n","\n");

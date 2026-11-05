@@ -17,6 +17,13 @@ public static class MapMenus
     /// 0.619 (user report: « 0 » in the menu): the name of a floor. The game gives a name, or a number for the floors of a dungeon; its main map has neither (Limsa's
     /// upper decks: map 11, index 0, no subzone, beside its Airship Landing), so it takes the zone's name.
     /// </summary>
+    /// <summary>
+    /// 0.621 (user report, compared in game): what the game's map writes under the zone: where the player stands (TerritoryInfo), then the sub-place or « -- ». Only for the
+    /// map the player is on. Nothing when the place is unknown.
+    /// </summary>
+    public static IReadOnlyList<string> PlaceLines(uint playerMap,uint shownMap,string? area,string? subArea)
+        =>playerMap==0 || playerMap!=shownMap || string.IsNullOrEmpty(area) ? []:["> "+area,"> "+(string.IsNullOrEmpty(subArea) ? "--":subArea)];
+
     public static string FloorLabel(MapDefinition map)=>map.Subzone.Length>0 ? map.Subzone:map.MapIndex>0 ? map.MapIndex.ToString():map.Zone;
     public static IReadOnlyList<IReadOnlyList<MapDefinition>> Zones(IEnumerable<MapDefinition> maps,MapDefinition? region)
         =>region is not { MenuCategory:>0 } ? []:maps.Where(map=>map.MenuCategory==region.MenuCategory && map.MenuPriority>region.MenuPriority && map.TerritoryId!=0)

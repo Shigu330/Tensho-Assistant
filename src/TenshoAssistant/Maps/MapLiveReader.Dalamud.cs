@@ -29,7 +29,7 @@ public sealed record MapFateMarker(uint Id,string Name,int Level,uint Icon,Vecto
 public sealed record MapLiveState(uint TerritoryId,uint MapId,Vector3 Position,float Rotation,DateTimeOffset ObservedAt,uint FlagMapId=0,Vector2? Flag=null,
     IReadOnlyDictionary<uint,MapFlightState>? Flights=null,IReadOnlyList<MapEventMarker>? Events=null,bool InCombat=false,bool InDuty=false,
     IReadOnlyList<MapObjectMarker>? Objects=null,IReadOnlyList<MapFateMarker>? Fates=null,IReadOnlyList<MapPartyMarker>? Party=null,
-    IReadOnlySet<uint>? UnlockedCurrents=null,IReadOnlySet<uint>? Sightseen=null,int SightseeingUnlock=-1,int SightseeingUnlockEx=-1);
+    IReadOnlySet<uint>? UnlockedCurrents=null,IReadOnlySet<uint>? Sightseen=null,int SightseeingUnlock=-1,int SightseeingUnlockEx=-1,string Area="",string SubArea="");
 
 // Party member in the same territory as the player (not the player): job icon = 62100 + ClassJob row.
 public sealed record MapPartyMarker(string Name,uint Job,int Level,Vector3 Position);
@@ -48,6 +48,17 @@ internal sealed class MapLiveReader : IDisposable
     private readonly uint[] allCurrents;private readonly uint[] adventureRows;private int loggedVistas=-1,loggedNative=-1;private int logUnlock=-1,logUnlockEx=-1;
     private IReadOnlyList<MapFateMarker> fates=[];
     private readonly Dictionary<uint,int> gatheringLevels=[];
+    // 0.621: where the player stands, as the game's map writes it. Names read again only when the place changes.
+    private readonly IDataManager placeData;
+    private uint areaId,subAreaId;private string areaName="",subAreaName="";
+    private unsafe void ReadPlace()
+    {
+        var info=TerritoryInfo.Instance();
+        if(info==null)return;
+        string Name(uint id)=>id==0 ? "":placeData.GetExcelSheet<Lumina.Excel.Sheets.PlaceName>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
+        if(info->AreaPlaceNameId!=areaId){areaId=info->AreaPlaceNameId;areaName=Name(areaId);}
+        if(info->SubAreaPlaceNameId!=subAreaId){subAreaId=info->SubAreaPlaceNameId;subAreaName=Name(subAreaId);}
+    }
     // N-09 (0.441): hunt marks by BNpcBase → rank (docs/evidence/0.441-hunt-marks.md).
     private readonly Dictionary<uint,int> huntMarks=[];
     private long teleport;private int costsRequest;private IReadOnlyDictionary<uint,uint>? teleportCosts;
@@ -68,7 +79,7 @@ internal sealed class MapLiveReader : IDisposable
     public void RemoveFlag()=>Interlocked.Exchange(ref removeFlag,1);
 
     public MapLiveReader(IFramework framework,IClientState client,IObjectTable objects,IDataManager data,ICondition condition,IFateTable fateTable,IPartyList party,IPluginLog log)
-    {
+    {placeData=data;
         this.framework=framework;this.client=client;this.objects=objects;this.log=log;this.condition=condition;this.fateTable=fateTable;this.party=party;Log=log;
         uint[] currentIds=[],vistaIds=[];
         // 0.491 (R-14): one guard per sheet, so that one sheet does not cost the other.
@@ -150,9 +161,10 @@ internal sealed class MapLiveReader : IDisposable
                 try{partyMarkers=ReadParty();Read("party");}catch(Exception error){partyMarkers=[];Failed("party",error);}
                 partyAt=now.AddMilliseconds(100);
             }
+            try{ReadPlace();Read("place");}catch(Exception error){areaName=subAreaName="";Failed("place",error);}
             var inCombat=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             var inDuty=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty56];
-            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx));
+            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName));
         }
         catch(Exception error){Volatile.Write(ref state,null);retryAt=now.AddSeconds(5);log.Warning(error,"Map position unavailable; retry in five seconds.");}
     }

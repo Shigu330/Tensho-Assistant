@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.621.0
+- Plan global, phase 5 : Carte (comparée au jeu par l'utilisateur) : sous la zone, Tensho écrit maintenant le lieu où se trouve le joueur, puis le sous-lieu ou « -- », comme la carte du jeu, seulement sur la carte où il est. Lu dans TerritoryInfo sur le thread framework, avec garde.
+- Tests : Map place. Verify.ps1 (agent) : 1129/1129, 0 avertissement, 0 erreur ; DLL 0.621.0.0. Non validé en jeu.
+### English
+- Map (compared with the game by the user): under the zone, Tensho now writes where the player stands, then the sub-place or « -- », like the game's map, only on the player's map. Read from TerritoryInfo on the framework thread, guarded.
+
 ## 0.620.0
 - Plan global, phase 5 : Carte (rapport de l'utilisateur) : le « 0 » restait dans le menu au-dessus de la carte ; il suit maintenant la même règle que l'autre menu. Plan : le JcJ, le classé, les timers et les instances particulières passent en dernier dans les essais en jeu.
 - Tests : Map floors. Verify.ps1 (agent) : 1128/1128, 0 avertissement, 0 erreur ; DLL 0.620.0.0. Non validé en jeu.

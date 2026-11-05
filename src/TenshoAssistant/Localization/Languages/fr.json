@@ -2988,6 +2988,7 @@
     "NpcSaleStack": "Vente au PNJ (NQ) : {0} gils l'unité, pile de {1} : {2} gils"
   },
   "MapView": {
+    "Partplace": "lieu",
     "ShowIconNames": "Noms des icônes",
     "ShowIconNamesHelp": "Écrit les noms que le jeu écrit à côté de certaines icônes (éthérites, lieux importants), du même côté, à partir du même zoom que les noms de lieux. Leur taille suit celle des noms de lieux. Sans cette case, ils restent dans l'infobulle de l'icône.\nPar défaut : activé.",
     "ShowHuntMarks": "Marques de chasse proches",
