@@ -5478,6 +5478,7 @@
     "UsePriming": "Collectable plan: Priming Touch",
     "UsePrimingTip": "The plan may spend GP on Priming Touch when doubling the chance of a free Meticulous earns more. From level 95.",
     "BonusWhenWorth": "{0} and {1} are advised only when they earn more than the same GP elsewhere (a restored attempt, Scrutiny).",
+    "BalancedSame": "On this node, nothing separates it from Safe: no plan lies between them.",
     "Cap0": "Safe",
     "Cap0Tip": "Counts on no roll: the move that guarantees the most, even if everything goes badly.",
     "Cap50": "Balanced",

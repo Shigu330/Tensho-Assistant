@@ -75,13 +75,16 @@ internal sealed partial class MainWindow
             // 0.530 (user request): icons, the name in the tooltip: a hand holding an item, a scale, a die.
             var icon=cap==0 ? FontAwesomeIcon.HandHolding:cap==50 ? FontAwesomeIcon.BalanceScale:FontAwesomeIcon.Dice;
             var chosen=risk==cap;
+            // 0.534 (user choice): greyed when it gives the same as Safe on this node; it stays clickable, and the setting is kept for the next node.
+            var same=advice is not null && cap==50 && collectableBalancedSame;
+            if(same)ImGui.PushStyleVar(ImGuiStyleVar.Alpha,0.4f);
             if(chosen)ImGui.PushStyleColor(ImGuiCol.Button,Accent with {W=0.55f});
             bool clicked;
             ImGui.PushFont(UiBuilder.IconFont);
             try{clicked=ImGui.Button(icon.ToIconString()+$"###CollectableRisk{cap}");}
-            finally{ImGui.PopFont();if(chosen)ImGui.PopStyleColor();}
+            finally{ImGui.PopFont();if(chosen)ImGui.PopStyleColor();if(same)ImGui.PopStyleVar();}
             if(clicked && !chosen){configuration.CollectableRiskTolerance=cap;risk=cap;SaveReminders();}
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get($"CollectablePanel.Cap{cap}")+Environment.NewLine+localization.Get($"CollectablePanel.Cap{cap}Tip"));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get($"CollectablePanel.Cap{cap}")+Environment.NewLine+localization.Get(same ? "CollectablePanel.BalancedSame":$"CollectablePanel.Cap{cap}Tip"));
         }
         ImGui.PushTextWrapPos(0);
         // 0.531 (user report: the description did not follow the change): with a plan in hand, what this step gives on this node, in figures.
@@ -107,6 +110,7 @@ internal sealed partial class MainWindow
 
     // 0.479 (user request, in-game campaign): the current collectability and what to do next, from the values the window gives this turn. Nothing is executed.
     private readonly Dictionary<uint,int> collectableMeticulousBase=[];
+    private volatile bool collectableBalancedSame;
     /// <summary>0.520: from the job's trait, Solid Reason's chance of a free attempt; and whether that free attempt is ready now.</summary>
     internal Func<uint,decimal>? EurekaChanceFor { get; set; }
     internal Func<bool>? EurekaReady { get; set; }
@@ -141,7 +145,12 @@ internal sealed partial class MainWindow
             var count=attempts ?? 0;
             collectableAdviceRun=Task.Run(()=>
             {
-                try{collectableAdvice=count>0 ? CollectableAdvisor.Advise(turn,count,rule,bonuses):null;}
+                // 0.534: Safe and Balanced are both worked out, to grey Balanced when nothing separates them on this node.
+                try
+                {
+                    collectableAdvice=count>0 ? CollectableAdvisor.Advise(turn,count,rule,bonuses):null;
+                    collectableBalancedSame=count>0 && CollectableRisk.Same(CollectableAdvisor.Advise(turn,count,rule,bonuses with {RiskTolerance=0}),CollectableAdvisor.Advise(turn,count,rule,bonuses with {RiskTolerance=50}));
+                }
                 catch(Exception error){collectableAdvice=null;log.Warning(error,"The collectable plan could not be worked out.");}
                 finally{collectableAdvicePending=false;}
             });

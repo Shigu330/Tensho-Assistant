@@ -5478,6 +5478,7 @@
     "UsePriming": "Plan de collection : Toucher d'amorçage",
     "UsePrimingTip": "Le plan peut dépenser des PR pour Toucher d'amorçage quand doubler les chances d'une Sélection méthodique gratuite rapporte plus. À partir du niveau 95.",
     "BonusWhenWorth": "{0} et {1} ne sont proposés que s'ils rapportent plus que les mêmes PR ailleurs (tentative rendue, Inspection).",
+    "BalancedSame": "Sur ce nœud, rien ne le sépare de Sûr : aucun plan n'existe entre les deux.",
     "Cap0": "Sûr",
     "Cap0Tip": "Ne compte sur aucun tirage : le coup qui garantit le plus, même si tout tourne mal.",
     "Cap50": "Équilibré",

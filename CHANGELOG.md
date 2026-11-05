@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.534.0
+- Choix de l'utilisateur, sur « sûr et équilibré exactement pareil » : l'icône d'Équilibré se grise quand elle donne la même chose que Sûr sur ce nœud, et son infobulle le dit. Elle reste cliquable. Calculé sur 40 situations : 18 n'ont qu'un résultat possible, 11 en ont deux, 11 en ont trois ; le risque y rapporte souvent 1 à 3 assignats en moyenne pour un plancher bien plus bas.
+- Les crans partent des plans que le nœud offre vraiment. Sûr prend le plancher le plus haut et, à plancher égal, la meilleure moyenne. Équilibré ne descend que si la moyenne gagne au moins la moitié de ce que le plancher perd : par exemple 20/38,3 devient 14/43,0, mais 20/43,9 reste devant 14/45,2.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.534.0.0. Non validé en jeu.
+### English
+- The Balanced icon is greyed when it gives the same as Safe on this node, and its tooltip says so. Safe takes the highest floor with the best average; Balanced lowers the floor only when the average gains at least half of what the floor loses.
+
 ## 0.533.0
 - Demande de l'utilisateur (« il faut aussi la liste des skills utilisés pour chaque cap, il donne que pour Sûr ») : chaque cran montre maintenant ses coups, sans coup de chance, avec les PR qu'ils dépensent : par exemple, sur le nœud des captures à 625 PR, cran « Tentez votre chance » : « Sélection méthodique ×3 → Sagesse du fermier → Sélection méthodique → Sagesse du fermier → Sélection méthodique → Récolte. 600 PR sur 625 ». La suite vient du calcul du cran choisi, recalculée à chaque tour. Elle remplace les lignes propres à Sûr.
 - Tests : Gathering478Tests complété (coups, PR et tentatives sur chaque cran). Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.533.0.0. Non validé en jeu.

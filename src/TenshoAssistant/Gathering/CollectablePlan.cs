@@ -86,6 +86,9 @@ public static class CollectableRisk
     public const int Safe=0;
     /// <summary>The nearest step: a value saved by an older version lands on one.</summary>
     public static int Snap(int value)=>value<25 ? 0:value<75 ? 50:100;
+    /// <summary>0.534 (user choice): two steps give the same thing when their floor and average are the same, once rounded as they are shown.</summary>
+    public static bool Same(CollectableAdvice? one,CollectableAdvice? other)
+        =>one is not null && other is not null && Math.Round(one.Worst,1)==Math.Round(other.Worst,1) && Math.Round(one.Expected,1)==Math.Round(other.Expected,1);
 }
 
 public enum CollectableMove { Scour,Brazen,Meticulous,Collect,Scrutiny,Restore,Focus,Eureka,Priming }
@@ -240,18 +243,21 @@ public static class CollectableAdvisor
             if(bold.Mean<=0)return new(CollectableMove.Collect,CollectableTier.Below,0,attempts,0,true);
             result=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn);
         }
-        // 0.531 (user capture): a step looked at the floor at each roll, so a bolder plan could reach the same final floor with a better average (67.3 against 70.2, both 40). A step keeps its floor
-        // and takes the boldest search that still holds it. 0.532 (user capture: Safe 43.9, Balanced 40.2, both 20): every step does, or Balanced could earn less than Safe for the same floor.
+        // 0.534 (user captures): the plans this node really offers, from several searches: the highest floor first, each lower floor only for a better average. Safe takes the first. Balanced goes further down
+        // as long as the average gains at least half of what the floor loses (2 scrips of floor for 1 of average): where nothing is worth it, it stays on Safe's plan, and the panel greys it.
         if(bonuses.RiskTolerance<100)
         {
-            var floor=result.Worst;var safest=caution;
-            foreach(var step in new[]{0m,0.25m,0.5m,0.75m}.Where(step=>step<safest))
+            var searched=new List<(Outcome Plan,decimal Search)>();
+            foreach(var step in new[]{0m,0.1m,0.2m,0.3m,0.4m,0.5m,0.6m,0.7m,0.8m,0.9m,0.99m})
             {
                 caution=step;memo.Clear();
-                var bolder=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn);
-                if(bolder.Worst>=floor){result=bolder;safest=step;break;}
+                searched.Add((Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn),step));
             }
-            caution=safest;memo.Clear();
+            var chosen=searched.OrderByDescending(row=>row.Plan.Worst).ThenByDescending(row=>row.Plan.Mean).First();
+            if(bonuses.RiskTolerance>0)
+                foreach(var next in searched.Where(row=>row.Plan.Worst<chosen.Plan.Worst).OrderByDescending(row=>row.Plan.Worst).ThenByDescending(row=>row.Plan.Mean))
+                    if(next.Plan.Mean>chosen.Plan.Mean && (next.Plan.Mean-chosen.Plan.Mean)*2>=chosen.Plan.Worst-next.Plan.Worst)chosen=next;
+            result=chosen.Plan;caution=chosen.Search;memo.Clear();
         }
         // 0.482 (user report: Scrutiny not advised): the order of the actions does not change the score, so « no GP now » won the tie and the Scrutiny the plan needs came later. If a bonus action pays at
         // all and costs nothing to do first, it is the move now: it is the plain order to play, and it counts on the very next action.

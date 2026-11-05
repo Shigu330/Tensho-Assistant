@@ -711,6 +711,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.534 : Équilibré grisé quand il revient au même** — à voir en jouant
+
+- [ ] Nœud où Sûr et Équilibré donnent les mêmes chiffres : la balance est grisée, l'infobulle le dit, et elle reste cliquable. Là où ils diffèrent : elle est normale.
+- [ ] Le panneau répond sans à-coup en changeant de cran ou de tour : trois calculs tournent maintenant en tâche de fond.
+
 **0.533 : les coups de chaque cran** — à voir en jouant
 
 - [ ] Chaque icône donne sa suite de coups et ses PR, et le premier coup est celui de « Prochaine action ». Après un tirage, la suite se recalcule.

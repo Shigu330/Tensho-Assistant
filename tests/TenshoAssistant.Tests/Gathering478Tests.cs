@@ -48,6 +48,17 @@ internal static class Gathering478Tests
                 Check(!(s.Worst>=b.Worst && s.Expected>b.Expected+0.01m),$"{gp} GP, Scrutiny {on}: Safe {s.Expected}/{s.Worst} beats Balanced {b.Expected}/{b.Worst}");
                 Check(!(b.Worst>=l.Worst && b.Expected>l.Expected+0.01m),$"{gp} GP, Scrutiny {on}: Balanced {b.Expected}/{b.Worst} beats Luck {l.Expected}/{l.Worst}");
             }
+            // 0.534: Safe and Balanced are the same on the capture (589 GP, two results only); they differ where a third result exists.
+            var capture=gains with {Gp=589};
+            Check(CollectableRisk.Same(CollectableAdvisor.Advise(turn,4,herb,capture),CollectableAdvisor.Advise(turn,4,herb,capture with {RiskTolerance=50})),"the capture: the same");
+            Check(!CollectableRisk.Same(CollectableAdvisor.Advise(turn,4,herb,capture),CollectableAdvisor.Advise(turn,4,herb,capture with {RiskTolerance=100})),"the capture: Try your luck differs");
+            var third=gains with {Gp=423,ScrutinyActive=true,MeticulousBase=8};
+            var thirdTurn=turn with {MeticulousChance=8};
+            var thirdSafe=CollectableAdvisor.Advise(thirdTurn,4,herb,third)!;var thirdMiddle=CollectableAdvisor.Advise(thirdTurn,4,herb,third with {RiskTolerance=50})!;
+            Check(!CollectableRisk.Same(thirdSafe,thirdMiddle),$"a node where Balanced has its own plan: {thirdSafe.Worst}/{thirdSafe.Expected} and {thirdMiddle.Worst}/{thirdMiddle.Expected}");
+            Check(CollectableRisk.Same(null,thirdSafe)==false,"nothing to compare");
+            var greyed=Read("MainWindow.CollectablePanel.cs");
+            Check(greyed.Contains("var same=advice is not null && cap==50 && collectableBalancedSame;") && greyed.Contains("ImGui.PushStyleVar(ImGuiStyleVar.Alpha,0.4f)") && greyed.Contains("\"CollectablePanel.BalancedSame\""),"greyed, said in its tooltip");
             // 0.533: every step has its moves, ends with what it gathers, never spends more GP than there is, nor gathers more than there are attempts.
             foreach(var risk in CollectableRisk.Caps)foreach(var gp in new[]{0,300,423,625,823})
             {
