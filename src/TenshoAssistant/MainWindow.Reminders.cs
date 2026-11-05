@@ -236,6 +236,7 @@ internal sealed partial class MainWindow
     /// <summary>0.558 (T17): from the Reminders page and the server bar, so that the bar's count does not wait for the page.</summary>
     internal void TickRemindersFromGame(GameTimerSnapshot timers)
     {
+        KeepHomeTimers(timers);
         if(!configuration.RemindersFromGame)return;
         var now=DateTimeOffset.UtcNow;
         foreach(var row in ReminderCounts.DoneByGame(timers.AlliedQuestsLeft,timers.DeliveriesLeft))

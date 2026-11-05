@@ -840,6 +840,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.598) Réglages › Alarmes › Discord › Un salon par catégorie : mettre une autre adresse pour une catégorie, faire sonner une alarme de cette catégorie et une autre, vérifier les deux salons.
 
+- [ ] (0.599) Accueil : vérifier chaque ligne d'« Aujourd'hui » contre Rappels, Compagnie, Quêtes et Alarmes, cliquer chacune, masquer une ligne et une tuile dans « Personnaliser ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

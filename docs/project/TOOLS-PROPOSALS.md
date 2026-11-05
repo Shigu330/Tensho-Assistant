@@ -89,6 +89,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T10 — Accueil : bloc « Aujourd'hui » et tuiles au choix
 
+- **État (relu le 2026-11-05)** : FAIT 0.599.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.Home.cs`.
 - **Ce que le joueur obtient** : À l'ouverture de Tensho, vous voyez ce qui compte maintenant : rappels non faits avant la prochaine remise, vaisseaux revenus ou prochain retour, tâches de servants terminées, quêtes suivies, les trois prochaines alarmes. Chaque ligne ouvre sa page. Vous choisissez aussi les tuiles de l'accueil (Rappels, Compagnie libre, Équipement…).
 - **Comment, taille, dépendances** : Déplacer la lecture de GameTimers dans un petit service sur Framework.Update (une fois par seconde, gardé R-14, copie immuable), lu par les Rappels et l'Accueil. Construire le bloc « Aujourd'hui » une fois par seconde (rien de lourd dans Draw). Liste des tuiles dans la configuration : ordre et case par tuile, avec infobulle et ↺. Taille M. Dépendances : « Rappels par personnage », alarmes de retour, « Tâches de servants ». Sonde : aucune. Décision : lignes affichées par défaut (recommandé : toutes, chacune masquable).

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.599.0
+- Plan global, T10 : Accueil : bloc « Aujourd'hui » : rappels à faire, ce qui est terminé (servants, vaisseaux, escouade, jardin), prochain vaisseau, quêtes suivies, trois prochaines alarmes ; un clic ouvre la page. « Personnaliser » choisit les lignes et les tuiles affichées (par défaut : toutes). Rien n'est lu du jeu ici, et le bloc est refait une fois par seconde.
+- Tests : Today. Verify.ps1 (agent) : 1094/1094, 0 avertissement, 0 erreur ; DLL 0.599.0.0. Non validé en jeu.
+### English
+- Home: « Today » block: reminders to do, what is finished (ventures, vessels, squadron, garden), next vessel, followed quests, next three alarms; a click opens the page. « Customize » picks the lines and tiles shown (all by default). Nothing is read from the game here, and the block is rebuilt once a second.
+
 ## 0.598.0
 - Plan global, T24 : Discord : chaque catégorie peut écrire dans son propre salon (une adresse de webhook par catégorie, vide : l'adresse principale). Adresses masquées, gardées lors d'une remise à zéro, jamais dans le journal ni les rapports.
 - Tests : Discord channels. Verify.ps1 (agent) : 1091/1091, 0 avertissement, 0 erreur ; DLL 0.598.0.0. Non validé en jeu.

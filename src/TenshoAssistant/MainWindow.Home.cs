@@ -24,6 +24,8 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Format("Home.Catalogues",items.Catalog?.Count ?? 0,recipes.Catalog?.Count ?? 0));
         DrawHomeAlerts();
         ImGui.Separator();
+        DrawHomeToday();
+        ImGui.Separator();
         DrawHomeTiles();
         if(SelectedItem is { } contextItem)
         {
@@ -42,7 +44,8 @@ internal sealed partial class MainWindow
         if(craftSolve.State.Loading)ImGui.TextColored(Accent,localization.Get("CraftSearch.Loading"));
         if(craftChain.State.Loading)ImGui.TextColored(Accent,localization.Get("Home.CraftChain"));
         if(cactpotSolve.State.Loading)ImGui.TextColored(Accent,localization.Get("Home.Cactpot"));
-        if(NextAlarm() is { } next)
+        // 0.599 (T10): the three next alarms are in « Today »; this line only while that one is hidden.
+        if(configuration.HomeTodayHidden?.Contains("Alarms")==true && NextAlarm() is { } next)
         {
             ImGui.TextColored(Success,localization.Format("Home.NextAlarm",next.Alarm.Label,next.At.ToLocalTime().ToString("t"),Math.Max(0,(int)(next.At-DateTimeOffset.UtcNow).TotalMinutes)));
             if(ImGui.IsItemClicked())page=Page.Alarms;
@@ -64,11 +67,11 @@ internal sealed partial class MainWindow
             .Where(pair=>pair.Item2 is not null).Select(pair=>((TenshoAlarm,DateTimeOffset)?)(pair.alarm,pair.Item2!.Value)).OrderBy(pair=>pair!.Value.Item2).FirstOrDefault();
     }
 
-    // Ten fixed tiles (main modules): icon, name, live line; a click opens the module. The full list is the tool directory.
-    private void DrawHomeTiles()
+    // Ten tiles (main modules): icon, name, live line; a click opens the module. 0.599 (T10): each one hidden from « Customize ». The full list is the tool directory.
+    private (FontAwesomeIcon Icon,string Name,string Line,Page Target)[] HomeTiles()
     {
         var alarmNext=NextAlarm();
-        var tiles=new (FontAwesomeIcon Icon,string Name,string Line,Page Target)[]
+        return new (FontAwesomeIcon Icon,string Name,string Line,Page Target)[]
         {
             (FontAwesomeIcon.Hammer,localization.Get("Navigation.Crafting"),localization.Format("Home.TileCraft",recipeCatalog.State.Catalog?.Count ?? 0),Page.CraftSimulation),
             (FontAwesomeIcon.Leaf,localization.Get("Navigation.Gathering"),localization.Format("Home.TileGathering",gatheringCatalog.State.Catalog?.Count ?? 0),Page.Gathering),
@@ -81,6 +84,11 @@ internal sealed partial class MainWindow
             (FontAwesomeIcon.ChartBar,localization.Get("Navigation.Gear"),localization.Get("Home.TileGear"),Page.Gear),
             (FontAwesomeIcon.Clone,localization.Get("Category.GoldSaucer"),localization.Get("Home.TileGoldSaucer"),Page.MiniCactpot),
         };
+    }
+    private void DrawHomeTiles()
+    {
+        var tiles=HomeTiles().Where(tile=>configuration.HomeTilesHidden?.Contains(tile.Target.ToString())!=true).ToArray();
+        if(tiles.Length==0)return;
         var width=ImGui.GetContentRegionAvail().X;
         var columns=Math.Clamp((int)(width/220),1,4);
         if(!ImGui.BeginTable("HomeTiles",columns,ImGuiTableFlags.SizingStretchSame))return;

@@ -56,7 +56,7 @@ public static class ConfigurationReset
         "CurrencyAlerts", "CurrencyServerBar", "CurrencyThresholds",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
-        "HomeShowTools", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
+        "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
         "Discord", "ThemeMode", "ThemeModeBeforeTool", "CraftLogTryAllPresets", "GatherPlanFromList", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
         // 0.347 (g, I-08): the two shop reminder settings (the notes themselves are saved data, kept by « restore every setting »).
@@ -398,6 +398,9 @@ public sealed partial class Configuration
     public bool ShowIds { get; set; }
     public bool DeveloperMode { get; set; }
     public bool HomeShowTools { get; set; } = true;
+    // 0.599 (T10): the lines of « Today » and the tiles hidden on Home.
+    public List<string>? HomeTodayHidden { get; set; }
+    public List<string>? HomeTilesHidden { get; set; }
     // 0.327 (queue step e): how many results the item search lists (Items page, item pickers of Monster loot and NPC vendors). Read
     // through BoundedItemSearchLimit, so a hand-edited value stays within what ItemCatalog.Search accepts (it throws outside 1–100).
     public int ItemSearchLimit { get; set; } = 30;
