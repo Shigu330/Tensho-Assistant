@@ -985,6 +985,7 @@
     "Slot10": "Left ring"
   },
   "GatheringPanel": {
+    "ChainNeed": "Still {0} for {1}",
     "ScripsBest": "{0} · the most at the high tier",
     "ScripsKinds": "These items give different kinds of scrips: compare them yourself.",
     "CrystalWait": "{0}: ready in {1} s.",

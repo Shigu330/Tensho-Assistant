@@ -192,6 +192,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C24 — G8 — Besoin restant de la préparation dans les aides de récolte et de pêche
 
+- **État (relu le 2026-11-05)** : FAIT 0.560.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.GatheringPanel.cs`.
 - **Ce que le joueur obtient** : Au point de récolte ou de pêche, l'objet utile à votre dernière chaîne d'artisanat est marqué : « Encore 14 pour Lingot de… ». Le nombre baisse à mesure que vous récoltez.
 - **Comment, taille, dépendances** : Restant = manque au calcul − (stock actuel − stock au calcul), borné à 0 ; lu depuis l'état de la session de chaîne, sans recalcul. Même mention dans l'aide à la pêche. Taille S. Dépendances : aucune ; A-05 (listes) l'étendra. Sonde : aucune. Décision : aucune.

@@ -9,6 +9,13 @@ public sealed record CraftChainStep(RecipeDefinition Recipe, long Crafts, long P
 public sealed record CraftChainResult(long Requested, long Produced, IReadOnlyList<CraftChainStep> Steps,
     IReadOnlyList<CraftChainMaterial> Materials, IReadOnlyDictionary<uint, ItemHoldingsSummary> Observations)
 {
+    /// <summary>0.560 (C24): what is still to find of a material: what was missing at the calculation, less what came in since. Null when the chain does not need it or its stock was unknown.</summary>
+    public long? Remaining(uint item,long stockNow)
+    {
+        var missing=Materials.Where(material=>material.ItemId==item).Sum(material=>material.Amount);
+        if(missing<=0 || !Observations.TryGetValue(item,out var seen) || !seen.HasObservation)return null;
+        return Math.Max(0,missing-Math.Max(0,stockNow-seen.Total));
+    }
     public bool HasUnresolved => Materials.Any(material => material.Reason != CraftChainReason.RawMaterial);
     public bool HasUnknown => Observations.Values.Any(value => !value.HasObservation || value.HasUnknown);
     public bool HasCached => Observations.Values.Any(value => value.HasCached);

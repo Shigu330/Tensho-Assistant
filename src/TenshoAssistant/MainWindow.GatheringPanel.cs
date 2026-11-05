@@ -26,6 +26,12 @@ internal sealed partial class MainWindow
         public Dictionary<(int Index,uint RawItemId),(int? Success,int? Boon,bool Late,int? Quantity)> Slots {get;}=[];
     }
 
+    /// <summary>0.560 (C24): what the last crafting chain still needs of this item; from the chain's state, nothing is computed again.</summary>
+    private string? ChainNeed(uint item,Inventory.ItemHoldingsSummary stock)
+    {
+        if(!stock.HasObservation || craftChain.State is not { Result:{ } result,Input:{ } input } || result.Remaining(item,stock.Total) is not { } left || left<=0)return null;
+        return localization.Format("GatheringPanel.ChainNeed",left.ToString("N0"),itemCatalog.State.Catalog?.Find(input.Recipe.ResultItemId)?.Name ?? input.Recipe.ResultItemId.ToString());
+    }
     internal void DrawGatheringPanel()
     {
         var observed=gatheringObservation.State;
@@ -62,6 +68,7 @@ internal sealed partial class MainWindow
                     DrawItemIcon(item,new Vector2(24));var clicked=ImGui.IsItemClicked();ImGui.SameLine();
                     var bountiful=bountifulBase?.Invoke(slot.ItemId) is { } baseValue ? BountifulEstimate.Bonus(rating,baseValue):null;
                     var stock=GetRecipeHoldings(slot.ItemId);
+                    var needed=ChainNeed(slot.ItemId,stock);
                     // 0.478 (user report: lines cut at the panel's width): the name, then its rates under it.
                     var rates=$"{slot.SuccessPercent?.ToString() ?? "?"} % · {localization.Format("GatheringPanel.Boon",slot.BoonPercent?.ToString() ?? "?")}"
                         +(bountiful is { } bonus ? " · "+localization.Format("GatheringPanel.Bountiful",bonus):"")
@@ -70,6 +77,7 @@ internal sealed partial class MainWindow
                     if(ImGui.Selectable((item?.Name ?? slot.ItemId.ToString())+"##Slot",ReferenceEquals(slot,chosen)) || clicked)SelectItem(slot.ItemId);
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(slot.ItemId);
                     ItemLinksMenu($"GatheringSlot{slot.ItemId}",item);
+                    if(needed is { } need)ImGui.TextColored(Accent,need);
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(slot.ItemId);
                     ImGui.TextDisabled(rates);
                     if(scripRules.FirstOrDefault(rule=>rule.ItemId==slot.ItemId) is { } paid)

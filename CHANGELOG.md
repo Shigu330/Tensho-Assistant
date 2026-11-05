@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.560.0
+- Plan global, C24 : dans les aides à la récolte et à la pêche, un objet utile à la dernière chaîne d'artisanat est marqué « Encore 14 pour… », et le nombre baisse à mesure de la récolte.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1024/1024, 0 avertissement, 0 erreur ; DLL 0.560.0.0. Non validé en jeu.
+### English
+- The gathering and fishing helps mark an item the last crafting chain still needs, and the number falls as you get it.
+
 ## 0.559.0
 - Plan global, C19 : au survol d'un matériau, dans la préparation et la chaîne : le détail par rangement (sacs, servant, sacoche), avec la date des relevés enregistrés. Rien n'est recalculé.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1023/1023, 0 avertissement, 0 erreur ; DLL 0.559.0.0. Non validé en jeu.

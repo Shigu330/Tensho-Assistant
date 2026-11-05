@@ -985,6 +985,7 @@
     "Slot10": "Bague gauche"
   },
   "GatheringPanel": {
+    "ChainNeed": "Encore {0} pour {1}",
     "ScripsBest": "{0} · le plus au palier haut",
     "ScripsKinds": "Ces objets donnent des assignats de types différents : à vous de comparer.",
     "CrystalWait": "{0} : prête dans {1} s.",

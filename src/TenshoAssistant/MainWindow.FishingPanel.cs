@@ -82,6 +82,7 @@ internal sealed partial class MainWindow
                             ImGui.TableNextColumn();
                             var stock=GetRecipeHoldings(row.FishId);
                             ItemCell(fish,row.FishId,22,$"{fish?.Name ?? row.FishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
+                            if(ChainNeed(row.FishId,stock) is { } need)ImGui.TextColored(Accent,need);
                             ImGui.TableNextColumn();
                             for(var step=0;step<row.Route.Count;step++)
                             {

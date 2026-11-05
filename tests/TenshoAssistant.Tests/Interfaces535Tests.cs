@@ -132,6 +132,14 @@ internal static class Interfaces535Tests
             Check(Read("MainWindow.CraftPlan.cs").Contains("DrawStorageDetail(material.Holdings);") && Read("MainWindow.CraftChain.cs").Contains("DrawStorageDetail(stored);"),"both tables");
             Check(Read("MainWindow.CraftPlan.cs").Contains("row.IsCached && row.ObservedAt is { } seen"),"a saved read shows its date");
         }),
+        ("0.560: the gathering help says what the last chain still needs",() =>
+        {
+            TenshoAssistant.Inventory.ItemHoldingsSummary Stock(long total)=>new([],total,0,true,false,false,true);
+            var result=new TenshoAssistant.Craft.CraftChainResult(1,1,[],[new(5,14,TenshoAssistant.Craft.CraftChainReason.RawMaterial)],new Dictionary<uint,TenshoAssistant.Inventory.ItemHoldingsSummary>{[5]=Stock(10)});
+            Check(result.Remaining(5,10)==14 && result.Remaining(5,13)==11,"falls as you gather");
+            Check(result.Remaining(5,99)==0 && result.Remaining(5,3)==14,"bounded");
+            Check(result.Remaining(6,10) is null,"not needed");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");
