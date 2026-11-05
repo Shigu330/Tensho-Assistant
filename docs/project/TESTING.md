@@ -802,6 +802,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.579) Équipement : cocher « Tous les jobs (mirage) » sur la page : la liste des pièces s'élargit, et la case des filtres suit.
 
+- [ ] (0.580) Équipement : choisir un autre job dans « Plan pour » : la liste de pièces est la sienne, le plan se garde, et revenir au job porté retrouve son plan.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

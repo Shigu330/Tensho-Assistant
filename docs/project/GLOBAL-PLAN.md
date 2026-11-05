@@ -106,7 +106,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 | T10 | Accueil : bloc « Aujourd'hui » et tuiles au choix | M |  |
 | T11 | Quêtes « disponibles maintenant » et quêtes de la zone actuelle | M |  |
 | T12 | Chemin vers une quête : prérequis restants, nombre et prochaine à faire | M |  |
-| T14 | Équipement : préparer le plan d'un autre job que celui porté | M |  |
+| T14 | ~~Équipement : préparer le plan d'un autre job que celui porté~~ fait en 0.580 | M |  |
 | T15 | Revue de mode : tenue de la semaine choisie, essayée en un clic, avec l'endroit de chaque pièce | M | Sur clic seulement. |
 | T24 | Discord : un salon par catégorie (plusieurs webhooks) | M |  |
 | T25 | Équipement : plusieurs plans nommés par job | S-M |  |

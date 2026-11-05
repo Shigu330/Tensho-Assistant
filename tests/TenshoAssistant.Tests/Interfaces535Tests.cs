@@ -264,6 +264,13 @@ internal static class Interfaces535Tests
             Check(page.Contains("BoolSetting(\"Gear.AllJobs\""),"on the page");
             Check(gear.Split("configuration.GearAllJobs=value").Length==3,"one setting, shown twice");
         }),
+        ("0.580: the gear page plans another job: no worn piece and no read value is lent to it",() =>
+        {
+            var gear=Read("MainWindow.Gear.cs");
+            Check(gear.Contains("Where(piece=>!otherJob && catalog.Find(piece.ItemId) is not null)"),"no worn piece");
+            Check(gear.Contains("Values=new Dictionary<string,int>(),Category=0,Role=0,Modifiers=default"),"no read value");
+            Check(gear.Contains("levels?.TryGetValue(gearJob,out var known)==true"),"a job whose level is known");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

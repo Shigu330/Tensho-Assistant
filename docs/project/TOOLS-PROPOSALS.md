@@ -117,6 +117,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T14 — Équipement : préparer le plan d'un autre job que celui porté
 
+- **État (relu le 2026-11-05)** : FAIT 0.580.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.Gear.cs`.
 - **Ce que le joueur obtient** : Un menu de job sur la page Équipement : vous préparez ou consultez le plan de votre soigneur en étant forgeron. Pièces, matérias, pièces à obtenir et essayage fonctionnent ; les attributs réels sont marqués « relevés sur le job porté seulement ».
 - **Comment, taille, dépendances** : Job affiché = job choisi (par défaut, le job porté) ; catalogue filtré pour ce job. Si ce job n'est pas porté, la colonne des attributs ne montre que la somme des pièces et des matérias, sans valeur réelle inventée. Taille M. Dépendances : niveaux des jobs pour le niveau de ce job (sinon un champ niveau). Sonde : aucune. Décision : aucune.
