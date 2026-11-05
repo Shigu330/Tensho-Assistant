@@ -122,6 +122,10 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 | Liste des objets annotés, filtre par étiquette | |
 | Écrire le fichier d'un personnage seulement s'il change | Technique |
 
+## Avant la phase 5 : coupure en JcJ et en contenu classé
+
+Tensho se coupe tout seul et repart tout seul, sans réglage (DEC-038). Pas codé : [plan et décisions à prendre](COMPETITIVE-OFF-PLAN.md). À faire après l'accord de l'utilisateur sur ce plan, pour que les essais de la phase 5 se fassent déjà avec.
+
 ## Phase 5 : relevés en jeu, puis code
 
 Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activité, pour ne pas changer sans cesse d'endroit dans le jeu.
@@ -186,7 +190,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | N-04, loterie immobilière | Sonde : structure du jeu à trouver | |
 | N-07, ressources de l'île | Vérifier l'unité des positions | |
 | N-10, atelier de l'île | Relire la conception, puis sonde | Mis de côté par DEC-033 ; repris à la revue |
-| Panneau du Dédale et suite du dresseur | **Règle Dalamud** : résumé, accord de l'utilisateur, puis contact de l'équipe (DEC-032) | Protections demandées par l'utilisateur : bloqué en JcJ, JcE seulement, pas de classé ; informations seulement |
+| Panneau du Dédale et suite du dresseur | À revoir avec la décision D1 de la [coupure compétitive](COMPETITIVE-OFF-PLAN.md). **Règle Dalamud** : résumé, accord de l'utilisateur, puis contact de l'équipe (DEC-032) | Protections demandées par l'utilisateur : bloqué en JcJ, JcE seulement, pas de classé ; informations seulement |
 
 ## Phase 6 : tests en jeu
 
