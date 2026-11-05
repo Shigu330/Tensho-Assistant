@@ -62,7 +62,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | C0 | A-01, partie anticipée : choisir la qualité visée dans le panneau du carnet | S |  |
 | C2 | ~~Essayer ses séquences sauvegardées sur toutes les recettes~~ fait en 0.552 | S |  |
 | C3 | Simuler un autre métier sans le porter : derniers attributs relevés par métier et attributs prévus de la page Équipement | S |  |
-| C4 | Seuils d'attributs d'une séquence : Habileté, Contrôle et PS minimum | S |  |
+| C4 | ~~Seuils d'attributs d'une séquence : Habileté, Contrôle et PS minimum~~ fait en 0.553 | S |  |
 | C9 | R-02, partie anticipée : « possible maintenant ? » dans l'aide à la pêche | S |  |
 | C12 | Qualité initiale calculée à partir des ingrédients HQ choisis | S |  |
 | C14 | A-12, partie anticipée : fiche de recette complète (livre de maître, synthèse rapide, HQ, prérequis, écart chiffré) | S |  |

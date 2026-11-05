@@ -19,6 +19,20 @@ internal sealed partial class MainWindow
     private ulong simulationCopiedOwner;
     private DateTimeOffset? simulationCopiedAt;
     private CraftSimulationResult? simulationResult;
+    // 0.553 (C4): the attributes a finished sequence needs, off the frame; only shown for the result they were computed from.
+    private (CraftSimulationResult Result,Task<CraftThresholds?> Task)? simulationThresholds;
+    private CancellationTokenSource? simulationThresholdsCancel;
+    private void StartSimulationThresholds(RecipeDefinition recipe,CraftStats stats,int quality,CraftSimulationResult result)
+    {
+        simulationThresholdsCancel?.Cancel();simulationThresholdsCancel?.Dispose();
+        var cancel=simulationThresholdsCancel=new CancellationTokenSource();var token=cancel.Token;var actions=simulationActions.ToArray();
+        simulationThresholds=(result,Task.Run(()=>
+        {
+            try{return CraftStatThresholds.Find(recipe,stats,quality,actions,token);}
+            catch(OperationCanceledException){return null;}
+            catch(Exception error){log.Warning(error,"The sequence's thresholds could not be computed.");return null;}
+        },token));
+    }
     private string? simulationError;
     private CraftSimulationResult? macroExportSimulation;
     private CraftMacroExport? craftMacroExport;
@@ -231,7 +245,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         if(ImGui.Button(localization.Get("CraftSequence.Simulate")))
         {
-            try { simulationResult=CraftSimulation.Run(recipe,EffectiveCraftStats(),simulationQuality,simulationActions); simulationError=null; }
+            try { simulationResult=CraftSimulation.Run(recipe,EffectiveCraftStats(),simulationQuality,simulationActions); StartSimulationThresholds(recipe,EffectiveCraftStats(),simulationQuality,simulationResult); simulationError=null; }
             catch(ArgumentException error)
             {
                 simulationResult=null;
@@ -295,6 +309,8 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Format("CraftMacro.Options",craftMacroExtraWait,localization.Get(craftMacroEcho ? "CraftMacro.Yes":"CraftMacro.No")));
         // A-10 (0.422): Macro Chain loaded and pages chained: they end with its /nextmacro.
         if(configuration.MacroCopy?.Chain==true && MacroChainLoaded?.Invoke()==true)ImGui.TextDisabled(localization.Get("CraftMacro.MacroChain"));
+        if(simulationThresholds is { } thresholds && ReferenceEquals(thresholds.Result,result) && thresholds.Task.IsCompletedSuccessfully && thresholds.Task.Result is { } needed)
+            ImGui.TextWrapped(localization.Format("CraftSimulation.Thresholds",needed.Craftsmanship,needed.Control,needed.Cp,needed.CraftsmanshipMargin,needed.ControlMargin,needed.CpMargin));
         ImGui.BeginDisabled(result.Final.Finish!=CraftFinish.Completed || result.Error is not null);
         try
         {

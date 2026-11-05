@@ -40,6 +40,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C4 — K5 — Seuils d'attributs d'une séquence : Habileté, Contrôle et PS minimum
 
+- **État (relu le 2026-11-05)** : FAIT 0.553.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.CraftSimulation.cs`.
 - **Ce que le joueur obtient** : Sous une simulation terminée : « Cette séquence tient avec au moins 3 950 Habileté, 3 820 Contrôle et 590 PS (marge : +120, +45, +12) ». Vous savez tout de suite si un plat, une matéria ou une pièce moins chère suffit, ou ce qui manque pour atteindre la cible.
 - **Comment, taille, dépendances** : Fonction pure CraftStatThresholds : dichotomie sur l'Habileté (la séquence termine), sur le Contrôle (qualité ≥ cible), PS = somme des coûts ; bornes de la recette (RequiredCraftsmanship, RequiredControl). Calcul sur une tâche annulable au changement de résultat, jamais dans Draw. Taille S. Dépendances : CraftSimulation.Run. Sonde : aucune (aucune donnée nouvelle). Décision : aucune.

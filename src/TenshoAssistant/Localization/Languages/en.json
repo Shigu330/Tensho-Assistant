@@ -686,6 +686,7 @@
     "RemoveFailed": "Could not remove this sequence. See the Dalamud log for details."
   },
   "CraftSimulation": {
+    "Thresholds": "This sequence holds, at this quality, with at least {0} Craftsmanship, {1} Control and {2} CP (margin: +{3}, +{4}, +{5}).",
     "Detected": "Detected: Manipulation {0} · specialist {1}",
     "DetectedFood": "Food",
     "DetectedMedicine": "Medicine",

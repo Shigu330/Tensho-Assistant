@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.553.0
+- Plan global, C4 : sous une simulation terminée, l'Habileté, le Contrôle et les PS minimum pour que la séquence finisse à la même qualité, avec la marge. Calcul hors du dessin, annulé si le résultat change, avec le moteur de simulation.
+- Tests : CraftThresholds553Tests. Verify.ps1 (agent) : 1017/1017, 0 avertissement, 0 erreur ; DLL 0.553.0.0. Non validé en jeu.
+### English
+- Under a finished simulation, the lowest Craftsmanship, Control and CP the sequence needs at that quality, with the margin.
+
 ## 0.552.0
 - Plan global, C2 : le panneau du carnet essaie aussi les séquences enregistrées pour d'autres recettes, et montre la meilleure qui termine, avec la recette d'origine. Réglage activé par défaut. La partie « Essayer mes séquences » du simulateur reste à faire.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1016/1016, 0 avertissement, 0 erreur ; DLL 0.552.0.0. Non validé en jeu.

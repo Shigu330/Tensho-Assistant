@@ -17,6 +17,7 @@ internal sealed partial class MainWindow
         triadSolve.Dispose();
         CancelTriadAdvice();
         CancelTriadRequest();
+        simulationThresholdsCancel?.Cancel();simulationThresholdsCancel?.Dispose();
         preparationPrices.Dispose();
         toolPrices.Dispose();
         routePrices.Dispose();

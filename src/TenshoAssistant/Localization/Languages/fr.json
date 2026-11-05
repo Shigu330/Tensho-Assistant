@@ -686,6 +686,7 @@
     "RemoveFailed": "Impossible de retirer cette séquence. Consultez le journal Dalamud pour les détails."
   },
   "CraftSimulation": {
+    "Thresholds": "Cette séquence tient, à cette qualité, avec au moins {0} d'Habileté, {1} de Contrôle et {2} PS (marge : +{3}, +{4}, +{5}).",
     "Detected": "Détecté : Manipulation {0} · spécialiste {1}",
     "DetectedFood": "Repas",
     "DetectedMedicine": "Remède",
