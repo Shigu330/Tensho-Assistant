@@ -1010,6 +1010,7 @@ tests = tests.Concat(CollectionRecent602Tests.Cases).ToArray();
 tests = tests.Concat(Workshops603Tests.Cases).ToArray();
 tests = tests.Concat(FishingHelp604Tests.Cases).ToArray();
 tests = tests.Concat(BankSave605Tests.Cases).ToArray();
+tests = tests.Concat(WeeklyCap606Tests.Cases).ToArray();
 tests = tests.Concat(SelfCheckTests.Cases).ToArray();
 tests = tests.Concat(HelpTests.Cases).ToArray();
 tests = tests.Concat(RetainerSalesTests.Cases).ToArray();

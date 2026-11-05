@@ -378,25 +378,29 @@ public sealed class Plugin : IDalamudPlugin
             // 0.344 (g, I-02): currency balances and threshold alerts (chat and sound with the alarm options, Discord in its own category),
             // and their server bar entry. Registered after the Discord notifier, so released before it.
             Inventory.CurrencyWatcher? currencies=null;
-            registrations.Register(()=>currencies=new Inventory.CurrencyWatcher(framework,client,player,data,configuration,log){Crossed=crossed=>
+            // Framework thread. One chat line and one sound for one alert; silence in duties as for the alarms.
+            void CurrencyNotice(string message)
             {
-                // Framework thread. One chat line and one sound for the whole batch; silence in duties as for the alarms.
                 var options=configuration.AlarmOptions ?? new();
                 var inDuty=options.MuteInDuties && condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
-                var lines=string.Join(" · ",crossed.Select(Alarms.CurrencyDtrEntry.Line));
-                if(options.ChatAllowed(inDuty))chat.Print("[Tensho] "+localization.Format("Currencies.Alert",lines));
+                if(options.ChatAllowed(inDuty))chat.Print("[Tensho] "+message);
                 if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
                 var settings=configuration.Discord;
                 if(Alarms.DiscordWebhook.ShouldSend(settings,Alarms.AlarmSource.Currency))
                     try
                     {
                         var character=settings.IncludeCharacter ? objects.LocalPlayer?.Name.TextValue:null;
-                        var message=localization.Format("Currencies.Alert",lines);
                         var content=Alarms.DiscordWebhook.Format(settings,message,message,message,0,DateTimeOffset.Now,character);
                         discord.Enqueue(new(Alarms.DiscordWebhook.UrlFor(settings,Alarms.AlarmSource.Currency),Alarms.DiscordWebhook.Payload(settings,content)));
                     }
                     catch(Exception error){log.Warning("Currency alert could not be queued for Discord ({Error}).",error.GetType().Name);}
-            }},()=>currencies?.Dispose());
+            }
+            registrations.Register(()=>currencies=new Inventory.CurrencyWatcher(framework,client,player,data,configuration,log)
+            {
+                Crossed=crossed=>CurrencyNotice(localization.Format("Currencies.Alert",string.Join(" · ",crossed.Select(Alarms.CurrencyDtrEntry.Line)))),
+                // 0.606: the weekly limit of the limited tomestones reached.
+                WeeklyCapReached=(got,limit)=>CurrencyNotice(localization.Format("Currencies.WeeklyCapAlert",got.ToString("N0"),limit.ToString("N0"))),
+            },()=>currencies?.Dispose());
             mainWindow.Currencies=()=>currencies;
             // 0.366 (g, C-10): duty ready (IClientState.CfPop, framework thread): chat line and sound with the alarm options, Discord in its
             // own category; nothing when the alert is off. Unsubscribed on dispose.

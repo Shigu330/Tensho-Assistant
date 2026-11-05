@@ -18,6 +18,7 @@ internal sealed partial class MainWindow
     {
         ImGui.TextWrapped(localization.Get("Currencies.Help"));
         BoolSetting("Currencies.Alerts","Currencies.AlertsTip",()=>configuration.CurrencyAlerts,value=>configuration.CurrencyAlerts=value,c=>c.CurrencyAlerts);
+        BoolSetting("Currencies.WeeklyCap","Currencies.WeeklyCapTip",()=>configuration.CurrencyWeeklyCapAlert,value=>configuration.CurrencyWeeklyCapAlert=value,c=>c.CurrencyWeeklyCapAlert);
         BoolSetting("Currencies.ServerBar","Currencies.ServerBarTip",()=>configuration.CurrencyServerBar,value=>configuration.CurrencyServerBar=value,c=>c.CurrencyServerBar);
         var watcher=Currencies?.Invoke();
         watcher?.Want();

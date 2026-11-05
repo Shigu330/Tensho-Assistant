@@ -117,7 +117,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 |---|---|
 | I4, prix Universalis par lots | Sonde par une requête web, sans le jeu |
 | N-12, conditions des rangs S | Choisir les sources, licence d'abord |
-| Alerte du plafond hebdomadaire des mémoquartz | |
+| ~~Alerte du plafond hebdomadaire des mémoquartz~~ fait en 0.606 | |
 | « Où est cet objet ? » sur tous les personnages | Gros changement des stocks |
 | Liste des objets annotés, filtre par étiquette | |
 | ~~Écrire le fichier d'un personnage seulement s'il change~~ fait en 0.605 | Technique |

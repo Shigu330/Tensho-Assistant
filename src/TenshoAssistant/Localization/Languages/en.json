@@ -6034,6 +6034,9 @@
     "Credit": "Data: PaissaDB (zhudotexe), public NA servers only."
   },
   "Currencies": {
+    "WeeklyCap": "Alert at the weekly tomestone limit",
+    "WeeklyCapTip": "With the alerts above: says once when the limited tomestones of the week reach their limit, in chat, by sound and on Discord like the other currency alerts.",
+    "WeeklyCapAlert": "Weekly limit of limited tomestones reached: {0} / {1}.",
     "Tab": "Currencies",
     "Help": "Your currencies, their cap and an alert when one gets close to its cap (so no gain is lost). Read from the game every 5 seconds. The alert goes once when the balance passes the threshold, in the chat with the alarm sound (silence in duties included), on Discord if you set it, and in the server bar; it comes back once the balance has gone back under the threshold. A currency already over it at load is listed without a message.",
     "Alerts": "Cap alerts",

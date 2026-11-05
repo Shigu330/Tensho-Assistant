@@ -25,6 +25,24 @@ public sealed record CurrencyReading(ulong Character,DateTimeOffset ReadAt,IRead
 /// are a real 0 and arm, so a later jump over the threshold is announced (0.344 fix check). A balance or cap
 /// not read changes nothing. Caps of 1 or less and of a million or more are not percentage caps (gil, MGP): never alerted.
 /// </summary>
+/// <summary>
+/// 0.606: true once when the limited tomestones of the week reach their limit. Already at the limit at the first reading of a character: no alert,
+/// nothing just happened. Under the limit again (the weekly reset) it can ring next week; an unknown or zero limit says nothing.
+/// </summary>
+public sealed class WeeklyCapTracker
+{
+    private ulong character;
+    private bool? below;
+    public bool Reached(ulong reader,int? got,int? limit)
+    {
+        if(reader!=character){character=reader;below=null;}
+        if(got is not { } have || limit is not {} cap || cap<=0)return false;
+        var wasBelow=below;
+        below=have<cap;
+        return wasBelow==true && have>=cap;
+    }
+}
+
 public sealed class CurrencyAlertTracker
 {
     public const int DefaultPercent=80,Hysteresis=2;

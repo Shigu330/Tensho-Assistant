@@ -6034,6 +6034,9 @@
     "Credit": "Données : PaissaDB (zhudotexe), serveurs publics NA seulement."
   },
   "Currencies": {
+    "WeeklyCap": "Alerte au plafond hebdomadaire des mémoquartz",
+    "WeeklyCapTip": "Avec les alertes ci-dessus : prévient une fois quand les mémoquartz limités de la semaine atteignent leur plafond, dans le chat, par un son et sur Discord comme les autres alertes de monnaies.",
+    "WeeklyCapAlert": "Plafond hebdomadaire des mémoquartz limités atteint : {0} / {1}.",
     "Tab": "Monnaies",
     "Help": "Vos monnaies, leur plafond et une alerte quand l'une approche du plafond (pour ne pas perdre de gains). Lu dans le jeu toutes les 5 secondes. L'alerte part une fois quand le solde passe le seuil, dans le chat avec le son des alarmes (silence en mission compris), sur Discord si vous l'avez réglé, et dans la barre du serveur ; elle revient quand le solde est repassé sous le seuil. Une monnaie déjà au-dessus au chargement est listée sans message.",
     "Alerts": "Alertes de plafond",
