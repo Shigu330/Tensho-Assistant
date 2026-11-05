@@ -782,6 +782,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.569) Rien à voir en temps normal ; après une mise à jour du jeu, la ligne de la carte et de Diagnostics nomme ce qui manque.
 
+- [ ] (0.570) Rappels : déplier les tâches de servants après la cloche ; les heures correspondent, et les deux cloches créent leur alarme.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

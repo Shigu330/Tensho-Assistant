@@ -4412,6 +4412,12 @@
     "Here": "Position"
   },
   "Reminders": {
+    "VenturesDetail": "By retainer",
+    "VentureNone": "{0}: no task",
+    "VentureDone": "{0}: finished",
+    "VentureAt": "{0}: {1}",
+    "VenturesAllAt": "All back: {0}",
+    "VenturesAllTip": "An alarm for when your last retainer is back.",
     "FromGame": "Tick from the game",
     "FromGameTip": "When the game reads 0 tribal quests or 0 special deliveries left, the box ticks itself until the reset. An unknown counter ticks nothing.\nDefault: on.",
     "BarFinishedTitle": "Finished reminders",

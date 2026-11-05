@@ -102,7 +102,32 @@ internal sealed partial class MainWindow
             var ventures=timers?.Ventures;
             var nextVenture=ventures?.Where(venture=>venture.Done>now).Select(venture=>venture.Done).Min();
             Row("Ventures",FontAwesomeIcon.Bell,ventures is null ? localization.Get("Reminders.VenturesUnknown")
-                :localization.Format("Reminders.VenturesState",ventures.Count,ventures.Count(venture=>venture.Done is { } done && done<=now)),nextVenture,null);
+                :localization.Format("Reminders.VenturesState",ventures.Count,ventures.Count(venture=>venture.Done is { } done && done<=now)),nextVenture,null,()=>
+            {
+                // 0.570 (T16): retainer by retainer, with a bell; and one bell for when they are all back.
+                if(ventures is not { Count:>0 } || !ImGui.TreeNode(localization.Get("Reminders.VenturesDetail")+"##VenturesDetail"))return;
+                try
+                {
+                    foreach(var (name,end) in ventures)
+                    {
+                        if(end is not { } at)ImGui.TextDisabled(localization.Format("Reminders.VentureNone",name));
+                        else if(at<=now)ImGui.TextColored(Success,localization.Format("Reminders.VentureDone",name));
+                        else
+                        {
+                            ImGui.TextUnformatted(localization.Format("Reminders.VentureAt",name,at.ToLocalTime().ToString("g")));
+                            ImGui.SameLine();
+                            AlarmButton("Venture"+name,localization.Format("Reminders.AlarmTip",name),()=>[new TenshoAlarm{Label=name,Group=localization.Get("Reminders.Title"),Source=AlarmSource.Reminder,Repeat=AlarmRepeat.Once,At=at,LeadMinutes=0}]);
+                        }
+                    }
+                    if(ventures.Where(venture=>venture.Done>now).Select(venture=>venture.Done).Max() is { } lastBack)
+                    {
+                        ImGui.TextUnformatted(localization.Format("Reminders.VenturesAllAt",lastBack.ToLocalTime().ToString("g")));
+                        ImGui.SameLine();
+                        AlarmButton("VenturesAll",localization.Get("Reminders.VenturesAllTip"),()=>[new TenshoAlarm{Label=localization.Get("Reminders.Ventures"),Group=localization.Get("Reminders.Title"),Source=AlarmSource.Reminder,Repeat=AlarmRepeat.Once,At=lastBack,LeadMinutes=0}]);
+                    }
+                }
+                finally{ImGui.TreePop();}
+            });
             // 0.333 (DEC-023 6): Grand Company squadron, mission and training, ends read from the game (PlayerState).
             SquadronRow("SquadronMission",FontAwesomeIcon.Flag,timers?.SquadronMission,SquadronMissionName);
             SquadronRow("SquadronTraining",FontAwesomeIcon.Dumbbell,timers?.SquadronTraining,SquadronTrainingName);

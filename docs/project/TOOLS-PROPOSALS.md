@@ -130,6 +130,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T16 — Tâches de servants : une ligne par servant, avec alarme
 
+- **État (relu le 2026-11-05)** : FAIT 0.570.
 - **État (relu le 2026-11-03)** : en partie 0.371 (alarme automatique à la fin de chaque tâche de servant) et 0.374 (vue de vos personnages).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Reminders.cs`.
 - **Ce que le joueur obtient** : La ligne « Tâches de servants » se déplie : pour chaque servant, sa tâche finie ou son heure de fin, une cloche, et une alarme « quand toutes sont finies ».

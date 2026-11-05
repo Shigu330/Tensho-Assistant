@@ -76,7 +76,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | C36 | R-14, partie artisanat et récolte : une aide illisible le dit au lieu de disparaître | S |  |
 | T3 | ~~Quêtes : colonnes Niveau et Zone, tri et filtre de niveau~~ fait en 0.550 | S |  |
 | T4 | ~~Monstres : drapeau sur la position du monstre, pas au centre de la carte~~ fait en 0.551 | S |  |
-| T16 | Tâches de servants : une ligne par servant, avec alarme | S |  |
+| T16 | ~~Tâches de servants : une ligne par servant, avec alarme~~ fait en 0.570 | S |  |
 | T17 | ~~Rappels cochés d'eux-mêmes quand le jeu le dit~~ fait en 0.558 | S |  |
 | T18 | ~~Discord : heure lue dans le fuseau de chaque membre, et balises [zone], [objet], [et]~~ fait en 0.564 | S |  |
 | T19 | ~~Alarmes : modifier le nom et l'heure, et « Me rappeler dans 5 min »~~ fait en 0.557 | S |  |

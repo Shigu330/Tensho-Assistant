@@ -184,6 +184,11 @@ internal static class Interfaces535Tests
             Check(TenshoAssistant.Gathering.FishNow.WeatherFits([1,2],2)==true && TenshoAssistant.Gathering.FishNow.WeatherFits([1,2],3)==false,"weather");
             Check(TenshoAssistant.Gathering.FishNow.WeatherFits([1],null) is null && TenshoAssistant.Gathering.FishNow.WeatherFits([],1) is null,"unknown weather or no condition");
         }),
+        ("0.570: retainer tasks one by one, with a bell, and one for the last back",() =>
+        {
+            var view=Read("MainWindow.Reminders.cs");
+            Check(view.Contains("AlarmButton(\"Venture\"+name") && view.Contains("AlarmButton(\"VenturesAll\""),"two bells");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

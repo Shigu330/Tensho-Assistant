@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.570.0
+- Plan global, T16 : la ligne des tâches de servants se déplie : par servant, sa tâche finie ou son heure de fin avec une cloche, et une alarme pour le retour du dernier. L'alarme automatique de 0.371 reste.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1033/1033, 0 avertissement, 0 erreur ; DLL 0.570.0.0. Non validé en jeu.
+### English
+- The retainer tasks line expands: each retainer with its end time and a bell, and one alarm for the last back.
+
 ## 0.569.0
 - Plan global, P15 : après une mise à jour du jeu, la carte dit ce qui ne se lit plus (vol, marqueurs de quête, ALEA, groupe…) au lieu de sembler vide, et Diagnostics aussi. Une partie qui se relit quitte la liste.
 - Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1032/1032, 0 avertissement, 0 erreur ; DLL 0.569.0.0. Non validé en jeu.

@@ -4412,6 +4412,12 @@
     "Here": "Position"
   },
   "Reminders": {
+    "VenturesDetail": "Par servant",
+    "VentureNone": "{0} : pas de tâche",
+    "VentureDone": "{0} : finie",
+    "VentureAt": "{0} : {1}",
+    "VenturesAllAt": "Tous revenus : {0}",
+    "VenturesAllTip": "Une alarme pour le retour de votre dernier servant.",
     "FromGame": "Cocher d'après le jeu",
     "FromGameTip": "Quand le jeu indique 0 quête de tribu ou 0 commande spéciale restante, la case se coche seule jusqu'à la remise. Un compteur inconnu ne coche rien.\nPar défaut : activé.",
     "BarFinishedTitle": "Rappels terminés",
