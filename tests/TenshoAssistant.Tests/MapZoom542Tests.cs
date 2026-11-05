@@ -8,6 +8,12 @@ internal static class MapZoom542Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Map (0.546): the flag on a left click is a setting, off by default, on an empty spot, not after a drag",() =>
+        {
+            Check(!new TenshoAssistant.MapViewSettings().FlagOnClick,"off by default");
+            var view=Read("MainWindow.MapView.cs");
+            Check(view.Contains("if(settings.FlagOnClick && hovered && top is null && linkUnderMouse is null && hoveredBookmark is null") && view.Contains("map.TerritoryId!=0 && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)"),"empty spot, zone map, no drag");
+        }),
         ("Map (0.545): the wheel keeps its old step until set, can be inverted, and a bad value does no harm",() =>
         {
             var settings=new TenshoAssistant.MapViewSettings();

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.546.0
+- Plan global, P16 : réglage, désactivé par défaut (demande de l'utilisateur) : un clic gauche bref sur un endroit vide d'une carte de zone pose le drapeau. Un glisser déplace toujours la carte, et un clic sur une icône garde son effet.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1010/1010, 0 avertissement, 0 erreur ; DLL 0.546.0.0. Non validé en jeu.
+### English
+- New setting, off by default: a short left click on an empty spot of a zone map places the flag.
+
 ## 0.545.0
 - Plan global, P5 : la molette ne zoomait que sur le fond de carte. Elle marche maintenant sur toute la fenêtre de la carte (colonne d'outils, curseur, noms posés dessus), autour du centre de la vue. Réglages : pas de la molette et sens inversé. Par défaut, le pas reste 15 %.
 - Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1009/1009, 0 avertissement, 0 erreur ; DLL 0.545.0.0. Non validé en jeu.

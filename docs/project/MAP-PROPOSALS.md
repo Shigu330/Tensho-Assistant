@@ -131,6 +131,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P16 — Option : clic gauche sur la carte pour poser le drapeau
 
+- **État (relu le 2026-11-05)** : FAIT 0.546.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Un clic gauche bref sur un endroit vide de la carte pose le drapeau, sans passer par le menu du clic droit ; un glisser déplace toujours la carte.
 - **Comment, taille, dépendances** : Au relâchement du bouton gauche sans glisser (mapDragged faux), sur une zone sans icône et sur une carte de zone (TerritoryId≠0), appeler PlaceFlagFromMapView. Réglage avec infobulle et ↺. Taille S. Relevé en jeu sur le comportement de la carte du jeu. Décision : activé ou non par défaut (recommandé : désactivé, pour ne rien changer).

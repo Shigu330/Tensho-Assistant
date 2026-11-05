@@ -493,6 +493,7 @@ internal sealed partial class MainWindow
                 if(ImGui.SliderFloat(localization.Get("MapView.NameMinZoom"),ref nameMinimum,0,200,"%.0f %%")){settings.NameMinZoom=nameMinimum/100;changed=true;}
                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.NameMinZoomHelp"));
                 if(DefaultButton("NameMinZoom",settings.NameMinZoom!=MapDefaults.NameMinZoom)){settings.NameMinZoom=MapDefaults.NameMinZoom;changed=true;}
+                changed|=SettingBox("MapView.FlagOnClick",settings.FlagOnClick,value=>settings.FlagOnClick=value,MapDefaults.FlagOnClick);
                 changed|=SettingBox("MapView.ShowFlag",settings.ShowFlag,value=>settings.ShowFlag=value,MapDefaults.ShowFlag);
                 changed|=SettingBox("MapView.ShowBookmarks",settings.ShowBookmarks,value=>settings.ShowBookmarks=value,MapDefaults.ShowBookmarks);
             }
@@ -1203,6 +1204,8 @@ internal sealed partial class MainWindow
             else if(hits.Count>0)DrawIconListTooltip(hits,top,settings);
             // Region and world maps: a click (not a drag) on a linked icon opens that map, like the game.
             if(linkUnderMouse is { } link && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)NavigateMap(link);
+            if(settings.FlagOnClick && hovered && top is null && linkUnderMouse is null && hoveredBookmark is null && tooltipPoint is null && sightseeingTip is null && map.TerritoryId!=0 && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)
+            {var spotClicked=MapProjection.CoordinateFromPixel((io.MousePos-origin-mapPan)/mapZoom,map);FlagFromMap(map,spotClicked.X,spotClicked.Y);}
         }
         finally{draw.PopClipRect();}
         if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right))
