@@ -752,6 +752,7 @@
     "InnerQuiet": "Inner Quiet"
   },
   "Advanced": {
+    "SnoozeMinutesTip": "How long the button that puts off an alarm waits.\nDefault: 5 minutes.",
     "RingOnTimeTip": "An alarm rings its lead ahead, then a second time at the exact time. Discord only gets the first.\nDefault: off.",
     "RetainerSales": "Panel beside the retainer sale list",
     "RetainerSalesTip": "While a retainer's sale list is open, shows your prices beside it. It reads the list and changes nothing. Comparing with other sellers asks Universalis, only on your click.",
@@ -1077,6 +1078,17 @@
     "Source": "GatherBuddy data (Ottermandias, Apache-2.0); game log and Garland further down."
   },
   "Alarms": {
+    "SnoozeMinutes": "Remind me again after (min)",
+    "Edit": "Edit",
+    "EditTip": "Changes this alarm's name and, for a one-off alarm, its date.",
+    "EditName": "Name",
+    "EditNameTip": "The alarm's name, saved when you leave the field.",
+    "EditDate": "Date",
+    "EditDateTip": "yyyy-MM-dd HH:mm, in your PC's time, in the future. Saved when you leave the field.",
+    "EditDateBad": "Not a future date in the form yyyy-MM-dd HH:mm: nothing is changed.",
+    "EditInGame": "This alarm is copied in the game's alarms: change that copy in the game by hand.",
+    "Snooze": "In {0} min",
+    "SnoozeTip": "Adds the same alarm once more in that many minutes. This alarm stays as it is.",
     "RingOnTime": "Ring again at the exact time",
     "DutyPop": "Alert when a duty is ready",
     "DutyPopTip": "A chat line and the alarm sound when the Duty Finder finds your party (same silence rules in duties). Also sent to Discord when its « Duty ready » category is ticked.",

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.557.0
+- Plan global, T19 : sur une alarme : « Modifier » (nom et, pour une alarme unique, date) et « Dans 5 min », qui ajoute la même alarme une fois de plus. Une alarme automatique ne se modifie pas, car elle suit son échéance. Pour une copie dans le jeu, un message dit de la corriger à la main.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1021/1021, 0 avertissement, 0 erreur ; DLL 0.557.0.0. Non validé en jeu.
+### English
+- Alarms can be edited (name and, for a one-off, date) and put off with a button that adds the same alarm a few minutes later.
+
 ## 0.556.0
 - Plan global, T20 : réglage, désactivé par défaut : une alarme sonne avec son avance, puis une seconde fois à l'heure exacte, sans doubler Discord. Une occurrence écartée pour sa météo ne sonne pas. Réglage général : pas d'option par alarme.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1020/1020, 0 avertissement, 0 erreur ; DLL 0.556.0.0. Non validé en jeu.

@@ -109,6 +109,16 @@ internal static class Interfaces535Tests
             Check(TenshoAssistant.Alarms.AlarmSchedule.OnTimeDue(noLead,at.AddSeconds(5)) is null,"no lead: the first ring was on time");
             Check(!new TenshoAssistant.Alarms.AlarmSettings().RingOnTime,"off by default");
         }),
+        ("0.557: an alarm can be put off and edited; the original stays",() =>
+        {
+            var now=new DateTimeOffset(2026,11,5,12,0,0,TimeSpan.Zero);
+            var alarm=new TenshoAssistant.Alarms.TenshoAlarm{Label="Mandragora",Group="G",ItemId=4,Repeat=TenshoAssistant.Alarms.AlarmRepeat.EorzeaDaily,EtMinute=60};
+            var later=TenshoAssistant.Alarms.AlarmSchedule.Snooze(alarm,now,5);
+            Check(later.Label=="Mandragora" && later.Group=="G" && later.ItemId==4 && later.Repeat==TenshoAssistant.Alarms.AlarmRepeat.Once && later.At==now.AddMinutes(5) && later.Id!=alarm.Id,"a new one-off alarm");
+            Check(alarm.Repeat==TenshoAssistant.Alarms.AlarmRepeat.EorzeaDaily,"the original stays");
+            Check(TenshoAssistant.Alarms.AlarmSchedule.Snooze(alarm,now,0).At==now.AddMinutes(1),"at least a minute");
+            Check(Read("MainWindow.Alarms.cs").Contains("if(alarm.AutoKey.Length==0 && ImGui.SmallButton(localization.Get(\"Alarms.Edit\")"),"an automatic alarm is not edited");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

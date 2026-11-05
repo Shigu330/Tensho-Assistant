@@ -152,6 +152,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T19 — Alarmes : modifier le nom et l'heure, et « Me rappeler dans 5 min »
 
+- **État (relu le 2026-11-05)** : FAIT 0.557.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Alarms.cs`.
 - **Ce que le joueur obtient** : Vous renommez une alarme ou changez son heure ET ou sa date sans la recréer. Une alarme qui vient de sonner peut être reportée de quelques minutes, depuis la page Alarmes ou l'infobulle de la barre du serveur.
 - **Comment, taille, dépendances** : Champs nom et heure, enregistrés en quittant le champ, comme pour Discord. Pour une alarme copiée dans le jeu, un message dit de corriger celle du jeu à la main (Alarms.DeleteInGame). « Reporter » crée une alarme Once au même nom ; durée réglable (5 min, infobulle, ↺). Taille S. Dépendances : aucune. Sonde : aucune. Décision : durée par défaut du report (recommandé : 5 min).

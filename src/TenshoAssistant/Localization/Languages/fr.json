@@ -752,6 +752,7 @@
     "InnerQuiet": "Calme intérieur"
   },
   "Advanced": {
+    "SnoozeMinutesTip": "Ce que le bouton de report d'une alarme attend.\nPar défaut : 5 minutes.",
     "RingOnTimeTip": "Une alarme sonne avec son avance, puis une seconde fois à l'heure exacte. Discord ne reçoit que le premier message.\nPar défaut : désactivé.",
     "RetainerSales": "Panneau à côté de la liste de ventes des servants",
     "RetainerSalesTip": "Quand la liste de ventes d'un servant est ouverte, affiche vos prix à côté. Il lit la liste et ne change rien. Comparer aux autres vendeurs interroge Universalis, seulement sur votre clic.",
@@ -1077,6 +1078,17 @@
     "Source": "Données GatherBuddy (Ottermandias, Apache-2.0) ; carnet du jeu et Garland plus bas."
   },
   "Alarms": {
+    "SnoozeMinutes": "Me rappeler après (min)",
+    "Edit": "Modifier",
+    "EditTip": "Change le nom de cette alarme et, pour une alarme unique, sa date.",
+    "EditName": "Nom",
+    "EditNameTip": "Le nom de l'alarme, enregistré quand vous quittez le champ.",
+    "EditDate": "Date",
+    "EditDateTip": "aaaa-mm-jj hh:mm, à l'heure de votre PC, dans le futur. Enregistrée quand vous quittez le champ.",
+    "EditDateBad": "Ce n'est pas une date future au format aaaa-mm-jj hh:mm : rien n'est changé.",
+    "EditInGame": "Cette alarme est copiée dans les alarmes du jeu : corrigez cette copie à la main dans le jeu.",
+    "Snooze": "Dans {0} min",
+    "SnoozeTip": "Ajoute la même alarme une fois de plus dans ce nombre de minutes. Cette alarme reste telle quelle.",
     "RingOnTime": "Sonner aussi à l'heure exacte",
     "DutyPop": "Alerte quand une mission est prête",
     "DutyPopTip": "Une ligne dans la discussion et le son des alarmes quand l'outil de recherche de mission trouve votre groupe (mêmes règles de silence en mission). Envoyée aussi à Discord si la catégorie « Mission prête » y est cochée.",

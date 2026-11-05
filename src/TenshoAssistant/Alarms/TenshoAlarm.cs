@@ -52,6 +52,8 @@ public sealed class AlarmSettings
     public bool MuteInDuties { get; set; } = true;
     // 0.556 (T20): ring a second time at the exact time; Discord only gets the first.
     public bool RingOnTime { get; set; }
+    // 0.557 (T19): how long « remind me later » waits.
+    public int SnoozeMinutes { get; set; } = 5;
     // Queue step e (audit 2026-11-02): with MuteInDuties, no [Tensho] chat line in a duty either. Off by default (the line stays, as
     // before); Discord and the alarms copied into the game are not affected.
     public bool MuteChatInDuties { get; set; }
@@ -117,6 +119,14 @@ public static class AlarmSchedule
         if (alarm.PreviousWeathers.Count > 0 && (weatherAt?.Invoke(occurrence.AddSeconds(-1400)) is not { } previous || !alarm.PreviousWeathers.Contains(previous)))
             return (AlarmCheck.SkipWeather, occurrence);
         return (AlarmCheck.Fire, occurrence);
+    }
+
+    /// <summary>0.557 (T19): the same alarm once more in a few minutes; the original is left alone.</summary>
+    public static TenshoAlarm Snooze(TenshoAlarm alarm, DateTimeOffset now, int minutes)
+    {
+        ArgumentNullException.ThrowIfNull(alarm);
+        return new TenshoAlarm { Label = alarm.Label, Group = alarm.Group, IconId = alarm.IconId, JobId = alarm.JobId, ItemId = alarm.ItemId, TerritoryId = alarm.TerritoryId,
+            Source = alarm.Source, Discord = alarm.Discord, DiscordMessage = alarm.DiscordMessage, Repeat = AlarmRepeat.Once, At = now.AddMinutes(Math.Clamp(minutes, 1, 1440)), LeadMinutes = 0 };
     }
 
     /// <summary>0.556 (T20): the occurrence to ring again at its exact time: it rang ahead, its time has come, and it has not rung twice. Without a lead the first ring was already on time.</summary>
