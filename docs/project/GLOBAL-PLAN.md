@@ -27,6 +27,8 @@ Total avant la 1.0.0 : 99 points. Le bouton pour afficher ou cacher des icônes 
 3. S'il y a du code à écrire ou une erreur, l'agent corrige, puis on refait ce même point.
 4. Seulement alors, le point suivant. Une session peut s'arrêter entre deux points.
 
+**Ordre (demande de l'utilisateur, 2026-11-06) :** d'abord ce qui se fait librement. **En tout dernier :** le JcJ et le classé, puis ce qui dépend d'un timer ou d'une instance particulière : match de l'arène, Crystalline Conflict, Frontline, tournois de Triple Triade, Lord of Verminion, Mahjong, Dédale, donjon profond, récolte du jardin, et tout point de la phase 5 ou 6 de ce type.
+
 ## Phase 1 : corrections sans le jeu
 
 | Où | Ce qui manque | Issue |

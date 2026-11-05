@@ -204,7 +204,7 @@ internal sealed partial class MainWindow
         var zones=MapMenus.Zones(catalog.Entries,region);
         var floors=zones.FirstOrDefault(entry=>entry.Any(floor=>floor.MapId==map.MapId)) ?? [];
         var isZone=map.TerritoryId!=0;var world=localization.Get("MapView.World");
-        static string FloorName(MapDefinition floor)=>floor.Subzone.Length>0 ? floor.Subzone:floor.MapIndex.ToString();
+        static string FloorName(MapDefinition floor)=>MapMenus.FloorLabel(floor);
         var regionName=region is not null ? MapName(region):world;var zoneName=isZone ? MapName(map):"--";
         var arrow=ImGui.GetTextLineHeight();
         var widths=new List<float>{ImGui.CalcTextSize(regionName).X+arrow,ImGui.CalcTextSize(zoneName).X+arrow+(isZone ? 28:0)};

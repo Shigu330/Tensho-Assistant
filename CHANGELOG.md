@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.620.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur) : le « 0 » restait dans le menu au-dessus de la carte ; il suit maintenant la même règle que l'autre menu. Plan : le JcJ, le classé, les timers et les instances particulières passent en dernier dans les essais en jeu.
+- Tests : Map floors. Verify.ps1 (agent) : 1128/1128, 0 avertissement, 0 erreur ; DLL 0.620.0.0. Non validé en jeu.
+### English
+- Map (user report): the « 0 » remained in the menu above the map; it now follows the same rule as the other menu. Plan: PvP, ranked content, timers and specific instances come last in the in-game checks.
+
 ## 0.619.0
 - Plan global, phase 5 : Carte (rapport de l'utilisateur) : le menu des étages affichait « 0 » pour une carte principale sans sous-zone, comme le Tillac de Limsa à côté de son aérodrome ; il affiche maintenant le nom de la zone.
 - Tests : Map floors. Verify.ps1 (agent) : 1128/1128, 0 avertissement, 0 erreur ; DLL 0.619.0.0. Non validé en jeu.

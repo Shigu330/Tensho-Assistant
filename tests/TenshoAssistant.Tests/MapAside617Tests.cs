@@ -20,6 +20,8 @@ internal static class MapAside617Tests
             Check(TenshoAssistant.Maps.MapMenus.FloorLabel(Map("Airship Landing",0))=="Airship Landing","a name");
             Check(TenshoAssistant.Maps.MapMenus.FloorLabel(Map("",3))=="3","a dungeon's floor");
             Check(TenshoAssistant.Maps.MapMenus.FloorLabel(Map("",0))=="Limsa Lominsa","no « 0 »");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
+            Check(!view.Contains("floor.MapIndex.ToString()") && !view.Contains("$\"{map.MapIndex}\""),"both menus, the one above the map included (user report)");
         }),
         ("Map enlarged: no stepping aside then, the same as before otherwise",() =>
         {
