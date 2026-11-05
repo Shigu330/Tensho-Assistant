@@ -177,6 +177,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C21 — K18 — « Que puis-je fabriquer ? » avec mes stocks
 
+- **État (relu le 2026-11-05)** : FAIT 0.592.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Items.cs`.
 - **Ce que le joueur obtient** : Une liste des recettes faisables tout de suite avec vos sacs et la Banque enregistrée, filtrée par métier et niveau, avec le nombre de fabrications possibles. Pratique pour écouler des matériaux ou monter un métier.
 - **Comment, taille, dépendances** : Calcul sur un worker annulable au clic (toutes les recettes, ingrédients directs), résultat gardé tant que l'inventaire et la Banque ne changent pas ; borne basse (≥) quand un stock est inconnu, comme aujourd'hui. Taille M. Dépendances : aucune. Sonde : aucune. Décision : ingrédients directs seulement ou sous-crafts compris (recommandé : directs d'abord).

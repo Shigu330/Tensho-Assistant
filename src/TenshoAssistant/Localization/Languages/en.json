@@ -659,6 +659,23 @@
     "LoadedLanguages": "{0} languages loaded",
     "ReferenceSummary": "Reference keys: {0} · languages: {1}"
   },
+  "CraftStock": {
+    "Help": "The recipes your bags and saved Bank can make now, from their direct ingredients. Useful to use up materials or level a job. What a sub-recipe could make first is not counted.",
+    "Search": "Search my stocks",
+    "Searching": "Searching…",
+    "Failed": "The search did not finish. See the Dalamud log for details.",
+    "Stale": "Your stocks have changed since this search.",
+    "Job": "Job",
+    "JobTip": "Only the recipes of this job.",
+    "MinLevel": "Level from",
+    "MaxLevel": "to",
+    "LevelTip": "Only the recipes between these two levels.",
+    "Count": "{0} recipes shown, of {1}",
+    "Undecided": "{0} other recipes need a material whose stock was never seen: not listed.",
+    "Empty": "No recipe with these filters.",
+    "Row": "{0} craft(s) · {1} lv. {2}",
+    "RowAtLeast": "at least {0} craft(s) · {1} lv. {2}"
+  },
   "CraftPresets": {
     "Search": "Name, item or job…",
     "SearchTip": "Shows the sequences with every word you type in their name, their item or their job.",
@@ -715,6 +732,7 @@
     "DetectedFood": "Food",
     "DetectedMedicine": "Medicine",
     "ListsTab": "Crafting list",
+    "StockTab": "What can I craft?",
     "DetectedCounted": "The job is worn: the attributes read from the game already hold this food and medicine; the lists below add to them.",
     "DetectedNone": "none",
     "DetectedYes": "yes",

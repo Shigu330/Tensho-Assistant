@@ -659,6 +659,23 @@
     "LoadedLanguages": "{0} langues chargées",
     "ReferenceSummary": "Clés de référence : {0} · langues : {1}"
   },
+  "CraftStock": {
+    "Help": "Les recettes que vos sacs et votre Banque enregistrée peuvent fabriquer maintenant, avec leurs ingrédients directs. Pratique pour écouler des matériaux ou monter un métier. Ce qu'une sous-recette pourrait fabriquer d'abord n'est pas compté.",
+    "Search": "Chercher dans mes stocks",
+    "Searching": "Recherche…",
+    "Failed": "La recherche n'a pas abouti. Consultez le journal Dalamud pour les détails.",
+    "Stale": "Vos stocks ont changé depuis cette recherche.",
+    "Job": "Métier",
+    "JobTip": "Seulement les recettes de ce métier.",
+    "MinLevel": "Niveau de",
+    "MaxLevel": "à",
+    "LevelTip": "Seulement les recettes entre ces deux niveaux.",
+    "Count": "{0} recettes affichées, sur {1}",
+    "Undecided": "{0} autres recettes demandent un matériau dont le stock n'a jamais été vu : non listées.",
+    "Empty": "Aucune recette avec ces filtres.",
+    "Row": "{0} fabrication(s) · {1} niv. {2}",
+    "RowAtLeast": "au moins {0} fabrication(s) · {1} niv. {2}"
+  },
   "CraftPresets": {
     "Search": "Nom, objet ou métier…",
     "SearchTip": "Affiche les séquences qui ont chaque mot saisi dans leur nom, leur objet ou leur métier.",
@@ -715,6 +732,7 @@
     "DetectedFood": "Repas",
     "DetectedMedicine": "Remède",
     "ListsTab": "Liste de fabrication",
+    "StockTab": "Que puis-je fabriquer ?",
     "DetectedCounted": "Le métier est porté : les attributs lus dans le jeu comptent déjà ce repas et ce remède ; les listes ci-dessous s'y ajoutent.",
     "DetectedNone": "aucun",
     "DetectedYes": "oui",

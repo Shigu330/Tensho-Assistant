@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.592.0
+- Plan global, C21 : Nouvel onglet « Que puis-je fabriquer ? » dans Artisanat : sur un clic, les recettes que les sacs et la Banque enregistrée peuvent fabriquer maintenant, avec le nombre de fabrications, filtrées par métier et niveau. Ingrédients directs seulement ; un stock jamais vu n'est pas compté comme zéro.
+- Tests : From stock. Verify.ps1 (agent) : 1069/1069, 0 avertissement, 0 erreur ; DLL 0.592.0.0. Non validé en jeu.
+### English
+- New « What can I craft? » tab in Crafting: on a click, the recipes the bags and saved Bank can make now, with the number of crafts, filtered by job and level. Direct ingredients only; a stock never seen is not taken as zero.
+
 ## 0.591.0
 - Plan global, C18 : Dans la chaîne de fabrication, une recette rencontrée plusieurs fois n'a plus qu'une ligne avec son total, chaque ligne venant après les recettes de ses ingrédients ; chaque ligne a ses boutons Carnet et Simuler et une case « fait », gardée jusqu'au prochain calcul.
 - Tests : Chain. Verify.ps1 (agent) : 1064/1064, 0 avertissement, 0 erreur ; DLL 0.591.0.0. Non validé en jeu.

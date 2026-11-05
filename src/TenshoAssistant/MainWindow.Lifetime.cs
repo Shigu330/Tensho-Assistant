@@ -11,6 +11,7 @@ internal sealed partial class MainWindow
         // 0.327 (queue step e): the last page used is written once more when the plugin unloads with the window open.
         SaveLastPage();
         craftChain.Dispose();
+        fromStockCancel?.Cancel();fromStockCancel?.Dispose();fromStockCancel=null;
         craftSolve.Dispose();
         craftLogSession.Dispose();
         craftLog.Reset();

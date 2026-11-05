@@ -160,7 +160,7 @@ internal sealed partial class MainWindow
         // 0.408 (user request): the full preparation (quantities, cost, sub-recipe chain) is a tab of this page; the item sheet keeps
         // a short view with a link here.
         // 0.464 (user request, in-game campaign): the crafting list is a tab too, with or without a recipe shown.
-        var preparation=false;var listsTab=false;
+        var preparation=false;var listsTab=false;var stockTab=false;
         if(ImGui.BeginTabBar("CraftPageTabs"))
         {
             try
@@ -171,11 +171,14 @@ internal sealed partial class MainWindow
                 { preparation=true; ImGui.EndTabItem(); }
                 if(ImGui.BeginTabItem(localization.Get("CraftSimulation.ListsTab")+"###CraftListsTab"))
                 { listsTab=true; ImGui.EndTabItem(); }
+                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.StockTab")+"###CraftStockTab"))
+                { stockTab=true; ImGui.EndTabItem(); }
             }
             finally { ImGui.EndTabBar(); }
         }
         focusCraftPage=CraftPageTab.None;
         if(listsTab) { DrawCraftLists(); return; }
+        if(stockTab) { DrawCraftFromStock(); return; }
         DrawSimulationRecipeSearch();
         if(simulationRecipe is not { } recipe) { ImGui.TextWrapped(localization.Get("CraftSimulation.ChooseRecipe")); return; }
         var resultItem=itemCatalog.State.Catalog?.Find(recipe.ResultItemId);

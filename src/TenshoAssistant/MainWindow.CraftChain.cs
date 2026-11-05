@@ -167,11 +167,11 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         if (ImGui.SmallButton(item?.Name ?? $"ID {id}") || clicked) OpenCraftItem(id);
     }
-    private static void DrawChainList(string id, int count, Action<int> drawRow)
+    private static void DrawChainList(string id, int count, Action<int> drawRow, float maxHeight = 260)
     {
         if (count == 0) return;
         var rowHeight = 24 + ImGui.GetStyle().ItemSpacing.Y;
-        var visible = ImGui.BeginChild(id, new Vector2(0, Math.Clamp(count * rowHeight + 8, 40, 260)), true);
+        var visible = ImGui.BeginChild(id, new Vector2(0, Math.Clamp(count * rowHeight + 8, 40, maxHeight)), true);
         try
         {
             if (!visible) return;
