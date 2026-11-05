@@ -315,9 +315,17 @@ internal sealed partial class MainWindow
                         if(configuration.Discord is { Enabled:true })
                         {
                             ImGui.SameLine();
-                            var toDiscord=members.All(alarm=>alarm.Discord);
-                            if(ImGui.Checkbox(localization.Get("Discord.GroupOn")+"##GroupDiscord",ref toDiscord)){foreach(var alarm in members)alarm.Discord=toDiscord;changed=true;}
-                            Tip("Discord.GroupOnTip");
+                            // 0.584 (user request): a reminder's alarms are set in Reminders only, no second box here.
+                            if(members.All(alarm=>DiscordWebhook.ReminderRowOf(alarm).Length>0))
+                            {
+                                ImGui.TextDisabled(localization.Get("Discord.SetInReminders"));
+                            }
+                            else
+                            {
+                                var toDiscord=members.All(alarm=>alarm.Discord);
+                                if(ImGui.Checkbox(localization.Get("Discord.GroupOn")+"##GroupDiscord",ref toDiscord)){foreach(var alarm in members)alarm.Discord=toDiscord;changed=true;}
+                                Tip("Discord.GroupOnTip");
+                            }
                         }
                         if(first.ItemId!=0){ImGui.SameLine();if(ImGui.SmallButton(localization.Get("Alarms.OpenItem"))){SelectItem(first.ItemId);OpenItemSheet();}}
                         if(first.TerritoryId!=0){ImGui.SameLine();if(ImGui.SmallButton(localization.Get("Navigation.Weather"))){OpenWeather(first.TerritoryId,maps.State.Catalog?.Entries.FirstOrDefault(map=>map.TerritoryId==first.TerritoryId)?.Zone ?? "");}}

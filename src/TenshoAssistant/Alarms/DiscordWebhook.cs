@@ -124,9 +124,9 @@ public static class DiscordWebhook
     }
     public static bool ReminderRowOn(DiscordSettings settings, TenshoAlarm alarm) => settings.ReminderRowsOff?.Contains(ReminderRowOf(alarm)) != true;
 
-    /// <summary>Whether a ringing alarm goes to Discord: setting on, valid address, the alarm's own switch and its category on.</summary>
+    /// <summary>Whether a ringing alarm goes to Discord: setting on, valid address, its category on, and its switch: for a reminder, the box of its row in Reminders (0.584: the only one), else the alarm's own.</summary>
     public static bool ShouldSend(DiscordSettings? settings, TenshoAlarm alarm) =>
-        settings is { Enabled: true } && IsValidUrl(settings.WebhookUrl) && alarm.Discord && CategoryOn(settings, SourceOf(alarm)) && ReminderRowOn(settings!, alarm);
+        settings is { Enabled: true } && IsValidUrl(settings.WebhookUrl) && (ReminderRowOf(alarm).Length > 0 ? ReminderRowOn(settings, alarm) : alarm.Discord) && CategoryOn(settings, SourceOf(alarm));
 
     /// <summary>
     /// The message text: the alarm's own message, else the template, else the default; placeholders replaced, [character] only when

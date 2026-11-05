@@ -3556,6 +3556,7 @@
     "Copy": "Copier bloc {0}/{1}"
   },
   "Discord": {
+    "SetInReminders": "Discord : réglé dans Rappels",
     "DutyPop": "Mission prête",
     "DutyPopTip": "Envoie l'alerte « mission prête » (Alarmes) quand elle est activée.",
     "Title": "Discord",

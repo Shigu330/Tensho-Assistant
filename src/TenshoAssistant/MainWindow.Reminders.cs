@@ -220,6 +220,19 @@ internal sealed partial class MainWindow
     }
 
     // Names of squadron missions and trainings from the game data (set by Plugin.cs), kept by id; « #id » when the row is unknown.
+    // 0.584: alarms made from a Reminders row before rows were kept: found once by their name, so that the row's box decides for them too.
+    private static readonly string[] ReminderAlarmRows=["Supply","Deliveries","Fashion","Allied","Leves","Treasure","Bingo","HuntBills","ChallengeLog","DomanEnclave","Voyages","Ventures","SquadronMission","SquadronTraining"];
+    private bool reminderAlarmsLinked;
+    internal void LinkReminderAlarms()
+    {
+        if(reminderAlarmsLinked)return;
+        reminderAlarmsLinked=true;
+        var names=ReminderAlarmRows.ToDictionary(row=>localization.Get("Reminders."+row),row=>row);
+        var changed=false;
+        foreach(var alarm in configuration.Alarms ?? [])
+            if(alarm.ReminderRow.Length==0 && alarm.AutoKey.Length==0 && names.TryGetValue(alarm.Label,out var row)){alarm.ReminderRow=row;changed=true;}
+        if(changed)SaveReminders();
+    }
     /// <summary>0.558 (T17): from the Reminders page and the server bar, so that the bar's count does not wait for the page.</summary>
     internal void TickRemindersFromGame(GameTimerSnapshot timers)
     {

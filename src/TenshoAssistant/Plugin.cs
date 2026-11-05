@@ -1052,6 +1052,7 @@ public sealed class Plugin : IDalamudPlugin
         if(mapWindow is not null)mapWindow.IsOpen=mainWindow.MapViewOpen;
         mainWindow.KeepMapZoom();
         mainWindow.KeepCraftStats();
+        mainWindow.LinkReminderAlarms();
         if(guideWindow is not null)guideWindow.IsOpen=mainWindow.GuideOpen;
         foreach(var panel in panelWindows)panel.Follow();
         overlays??=

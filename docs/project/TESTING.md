@@ -810,6 +810,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.583) Quêtes : sur une quête d'épopée lointaine, la liste et « À prendre ensuite » correspondent au journal du jeu.
 
+- [ ] (0.584) Alarmes : un groupe issu de Rappels n'a plus de case Discord ; décocher ou cocher la ligne dans Rappels décide seul de l'envoi.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

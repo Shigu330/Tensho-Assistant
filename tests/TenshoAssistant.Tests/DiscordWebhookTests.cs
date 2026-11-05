@@ -35,6 +35,11 @@ internal static class DiscordWebhookTests
             var settings = new DiscordSettings { Enabled = true, WebhookUrl = Url };
             var at = new DateTimeOffset(2026,11,2,14,5,0,TimeSpan.Zero);
             var off=new DiscordSettings{ReminderRowsOff=["Ventures"]};
+            var live=new DiscordSettings{Enabled=true,Reminders=true,WebhookUrl=settings.WebhookUrl.Length>0 ? settings.WebhookUrl:"https://discord.com/api/webhooks/1/abc",ReminderRowsOff=["Ventures"]};
+            var byRow=new TenshoAlarm{ReminderRow="Supply",Source=AlarmSource.Reminder,Discord=false};
+            Check(DiscordWebhook.ShouldSend(live,byRow),"0.584 a reminder follows its row, not an old switch of its own");
+            Check(!DiscordWebhook.ShouldSend(live,new TenshoAlarm{AutoKey="venture:1",Source=AlarmSource.Reminder}),"0.584 row off");
+            Check(!DiscordWebhook.ShouldSend(live,new TenshoAlarm{Source=AlarmSource.Reminder,Discord=false}),"0.584 not a row: its own switch");
             Check(DiscordWebhook.ReminderRowOf(new TenshoAlarm{AutoKey="venture:12"})=="Ventures" && DiscordWebhook.ReminderRowOf(new TenshoAlarm{AutoKey="squadron:mission"})=="SquadronMission" && DiscordWebhook.ReminderRowOf(new TenshoAlarm{ReminderRow="Supply"})=="Supply","0.578 the row");
             Check(!DiscordWebhook.ReminderRowOn(off,new TenshoAlarm{AutoKey="venture:12"}) && DiscordWebhook.ReminderRowOn(off,new TenshoAlarm{ReminderRow="Supply"}) && DiscordWebhook.ReminderRowOn(off,new TenshoAlarm()),"0.578 only the row switched off");
             var unix=at.ToUnixTimeSeconds();

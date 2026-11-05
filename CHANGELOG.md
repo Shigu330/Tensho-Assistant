@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.584.0
+- Plan global, Rappels : demande de l'utilisateur : le réglage Discord d'un rappel n'existe plus qu'à un endroit. Sur la page Alarmes, un groupe issu de Rappels dit « Discord : réglé dans Rappels » au lieu de sa case, et seule la case de la ligne dans Rappels décide. Les autres alarmes gardent la leur, et les alarmes de rappel plus anciennes sont reliées à leur ligne par leur nom.
+- Tests : DiscordWebhookTests complété. Verify.ps1 (agent) : 1045/1045, 0 avertissement, 0 erreur ; DLL 0.584.0.0. Non validé en jeu.
+### English
+- A reminder's Discord switch now exists in one place: the Alarms page says it is set in Reminders, and only that row's box decides. Other alarms keep their own.
+
 ## 0.583.0
 - Plan global, T12 : fiche d'une quête : ce qui reste à faire avant elle, dans l'ordre, et la prochaine à prendre. Parcours borné sans récursion, qui résiste à un cycle et à une très longue chaîne. Une condition illisible est dite.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1045/1045, 0 avertissement, 0 erreur ; DLL 0.583.0.0. Non validé en jeu.

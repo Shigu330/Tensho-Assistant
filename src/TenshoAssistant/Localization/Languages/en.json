@@ -3556,6 +3556,7 @@
     "Copy": "Copy block {0}/{1}"
   },
   "Discord": {
+    "SetInReminders": "Discord: set in Reminders",
     "DutyPop": "Duty ready",
     "DutyPopTip": "Sends the « duty ready » alert (Alarms) when it is on.",
     "Title": "Discord",
