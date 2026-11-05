@@ -868,6 +868,13 @@ internal sealed partial class MainWindow
         var key=target.QuestId & 0xFFFF;
         if(!state.Entries.Any(entry=>entry.Progress==Quests.QuestProgress.Active && (entry.Id & 0xFFFF)==key))mapGameTarget=null;
     }
+    // 0.544 (P3): from any point or the flag, the question of 0.373: nearest aetheryte of this map, its real cost, teleport only if confirmed.
+    private void DrawNearestAetheryteEntry(MapDefinition map)
+    {
+        if(map.TerritoryId==0)return;
+        if(ImGui.Selectable(localization.Get("MapView.NearestAetheryte")+"##NearestAetheryte"))AskNearestAetheryteAt(map,mapContextPixel,map.Zone);
+        Tip("MapView.NearestAetheryteTip");
+    }
     private bool mapDragged;
     // 0.328 (map audit #3): the zoom buttons and slider keep the texture pixel at the centre of the view where it is (canvas size of
     // the last frame; the tool column is drawn before the canvas). Only the mouse wheel zoomed around a point before.
@@ -1230,6 +1237,7 @@ internal sealed partial class MainWindow
                 ImGui.BeginDisabled(live?.Flag is null);
                 try{if(ImGui.Selectable(localization.Get("MapView.RemoveFlag")))mapLive?.RemoveFlag();}
                 finally{ImGui.EndDisabled();}
+                DrawNearestAetheryteEntry(map);
                 // 0.242 (R-01, first part): the journal target icon could not be removed; right click › remove it.
                 if(mapGameTarget is not null && ImGui.Selectable(localization.Get("MapView.RemoveGameTarget")))mapGameTarget=null;
                 ImGui.BeginDisabled(map.TerritoryId==0);
@@ -1287,6 +1295,7 @@ internal sealed partial class MainWindow
             finally{ImGui.EndDisabled();}
             // 0.299 (user request): the flag can be removed from every right-click menu that can place it.
             if(live?.Flag is not null && ImGui.Selectable(localization.Get("MapView.RemoveFlag")+"##IconRemoveFlag"))mapLive?.RemoveFlag();
+            DrawNearestAetheryteEntry(map);
             if(item.Fixed is { AetheryteId:not 0 } aetheryte && ImGui.Selectable(localization.Get("MapView.IconTeleport")))
                 {mapTeleportTarget=(aetheryte.AetheryteId,aetheryte.Label);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;}
             if(item.Fixed is { LinkMapId:not 0 } linked && ImGui.Selectable(localization.Get("MapView.IconOpenMap")))NavigateMap(linked.LinkMapId);

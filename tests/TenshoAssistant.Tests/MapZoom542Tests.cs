@@ -8,6 +8,12 @@ internal static class MapZoom542Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Map (0.544): nearest aetheryte from the general and the icon menus, through the same confirmed question",() =>
+        {
+            var view=Read("MainWindow.MapView.cs");
+            Check(view.Split("DrawNearestAetheryteEntry(map);").Length==3,"both menus");
+            Check(view.Contains("AskNearestAetheryteAt(map,mapContextPixel,map.Zone);"),"the question of 0.373, no flag placed");
+        }),
         ("Map labels (0.543): nothing changes until set; names and gathering labels have their own rules",() =>
         {
             var settings=new TenshoAssistant.MapViewSettings();

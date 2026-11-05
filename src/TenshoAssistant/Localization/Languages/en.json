@@ -2951,6 +2951,8 @@
     "Opacity": "Opacity",
     "Window": "Window",
     "HideBehindGame": "Step aside for game windows",
+    "NearestAetheryte": "Nearest aetheryte",
+    "NearestAetheryteTip": "Offers the aetheryte of this map nearest to this point, with its cost. You teleport only if you confirm. Only this map's aetherytes, and no travel time.",
     "NameZoomFollow": "Name zoom follow",
     "NameZoomFollowHelp": "How much place names follow the zoom, apart from the icons. 0%: fixed size on screen. 100%: proportional to the zoom.\nDefault: the same as the icons.",
     "NameMinZoom": "Hide names under this zoom",

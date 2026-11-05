@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.544.0
+- Plan global, P3 : depuis un point quelconque ou le drapeau, le clic droit de la carte propose l'éthérite la plus proche avec son coût. Déjà présent : le calcul et la question de 0.373, repris sans doublon. Téléportation seulement après confirmation.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1008/1008, 0 avertissement, 0 erreur ; DLL 0.544.0.0. Non validé en jeu.
+### English
+- The map's right-click menus now offer the nearest aetheryte of that map from any point or the flag, with its cost, after confirmation.
+
 ## 0.543.0
 - Plan global, P2 : les noms de lieux suivaient le zoom comme les icônes et se chevauchaient une fois dézoomés ; les étiquettes de récolte avaient une taille et un seuil figés. Réglages : suivi du zoom des noms, zoom minimal des noms, seuil et taille des étiquettes de récolte. Par défaut, rien ne change.
 - Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1007/1007, 0 avertissement, 0 erreur ; DLL 0.543.0.0. Non validé en jeu.

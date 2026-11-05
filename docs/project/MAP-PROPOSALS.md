@@ -33,6 +33,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P3 — Éthérite la plus proche du drapeau ou d'un point, avec son coût
 
+- **État (relu le 2026-11-05)** : FAIT 0.544.
 - **État (relu le 2026-11-03)** : en partie : éthérite la plus proche avec son coût pour les liens du chat (0.373) et « Y aller » des lieux de récolte (0.397) ; pas encore depuis le drapeau ou un point quelconque.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Clic droit sur la carte ou sur le drapeau : l'entrée « Se téléporter à l'éthérite la plus proche » donne le nom et le coût réel en gils, puis demande la confirmation habituelle. Plus besoin de chercher soi-même l'éthérite à côté d'un drapeau posé (train de chasse, rendez-vous).

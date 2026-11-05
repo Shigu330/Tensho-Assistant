@@ -2951,6 +2951,8 @@
     "Opacity": "Opacité",
     "Window": "Fenêtre",
     "HideBehindGame": "S'effacer devant les fenêtres du jeu",
+    "NearestAetheryte": "Éthérite la plus proche",
+    "NearestAetheryteTip": "Propose l'éthérite de cette carte la plus proche de ce point, avec son coût. Vous ne vous téléportez que si vous confirmez. Seulement les éthérites de cette carte, sans temps de trajet.",
     "NameZoomFollow": "Suivi du zoom des noms",
     "NameZoomFollowHelp": "À quel point les noms de lieux suivent le zoom, à part des icônes. 0 % : taille fixe à l'écran. 100 % : proportionnelle au zoom.\nPar défaut : comme les icônes.",
     "NameMinZoom": "Cacher les noms sous ce zoom",
