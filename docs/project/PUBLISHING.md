@@ -15,6 +15,8 @@ reste le dépôt personnel, qui existe : `https://raw.githubusercontent.com/Shig
 
 Réponse reçue sur le Discord de Dalamud, 2026-11-05 (hOst1k, question posée par l'auteur) : pas de limite de taille si le plugin respecte les règles ; plus il est gros, plus le premier examen est long ; mieux vaut ne pas viser trop complexe dès le départ, Simple Tweaks et « VanillaTweaks » (sans doute VanillaPlus) ayant grandi avec le temps. Rôle exact de cette personne dans l'équipe : non vérifié. À cette date : 57 419 lignes de C# dans le plugin, 123 519 lignes suivies par git. Reste la politique IA : une soumission « Auto » trop grosse pour que l'auteur en réponde peut être fermée.
 
+Suite du même échange, 2026-11-05 : après avoir appris les 57 000 lignes écrites avec un agent, goat répond que cette quantité de code n'est pas examinable, new Era ajoute que beaucoup de choses existent déjà dans d'autres plugins, et MidoriKami demande à l'équipe d'approbation (`@dalamud-pac`) s'il existe un repère de taille pour du code écrit par IA. **La soumission d'un seul bloc au dépôt officiel paraît donc compromise**, à revoir par l'auteur avec DEC-037. Le dépôt personnalisé marche déjà et n'attend pas cet examen. État à cette date : 1 120 tests, dont beaucoup lisent le code source sans l'exécuter ; 415 cases d'essai en jeu ouvertes contre 156 cochées ; premier commit le 2026-10-31.
+
 ## Ce qui reste avant la soumission
 
 La soumission vient après tout le [plan global](GLOBAL-PLAN.md) (DEC-037). Par ordre. Les points marqués **règle Dalamud** demandent un résumé et l'accord de l'auteur (consigne du 2026-11-04).
