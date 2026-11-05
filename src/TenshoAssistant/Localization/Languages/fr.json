@@ -1702,6 +1702,11 @@
     "AllTip": "Montre toutes les quêtes, quel que soit leur état."
   },
   "QuestDetails": {
+    "PathTitle": "Reste à faire avant cette quête : {0}",
+    "PathFirst": "À prendre ensuite : {0}",
+    "PathMore": "Et encore {0}.",
+    "PathUnknown": "Un prérequis n'a pas pu être lu : cette liste peut être incomplète.",
+    "PathCut": "La liste est trop longue : elle s'arrête ici.",
     "Title": "Fiche de quête",
     "Back": "Retour",
     "Close": "Fermer la fiche",

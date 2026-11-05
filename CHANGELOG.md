@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.583.0
+- Plan global, T12 : fiche d'une quête : ce qui reste à faire avant elle, dans l'ordre, et la prochaine à prendre. Parcours borné sans récursion, qui résiste à un cycle et à une très longue chaîne. Une condition illisible est dite.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1045/1045, 0 avertissement, 0 erreur ; DLL 0.583.0.0. Non validé en jeu.
+### English
+- A quest's sheet lists what is left to do before it, in order, and the next one to take.
+
 ## 0.582.0
 - Plan global, T11 : page Quêtes : filtres « Disponibles maintenant » (non commencée, prérequis connus faits) et « Cette zone ». Un niveau ou une étape que Tensho ne sait pas lire n'est pas vérifié, et l'infobulle le dit. Le donneur sur la carte reste sur la fiche de la quête.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1044/1044, 0 avertissement, 0 erreur ; DLL 0.582.0.0. Non validé en jeu.

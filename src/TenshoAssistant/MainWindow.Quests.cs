@@ -283,6 +283,7 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.TreePop(); }
         }
+        DrawQuestPath(entry);
         var following = questLinks.Following(entry.Id);
         if (ImGui.TreeNode(localization.Format("QuestDetails.Following",following.Count)+"###QuestFollowing"))
         {
@@ -320,6 +321,30 @@ internal sealed partial class MainWindow
     };
 
     // State filters of the Quests page and of an item's quest sources; literal keys, so the tooltip key test sees them.
+    // 0.583 (T12): computed once per quest and per published list.
+    private (QuestLinks Links,uint Id,TenshoAssistant.Quests.QuestList.QuestPath Path)? questPath;
+    private void DrawQuestPath(QuestEntry entry)
+    {
+        if(entry.PreviousQuestIds.Count==0)return;
+        if(questPath is not { } known || !ReferenceEquals(known.Links,questLinks) || known.Id!=entry.Id)
+        {
+            known=(questLinks,entry.Id,TenshoAssistant.Quests.QuestList.PathTo(questLinks,entry.Id));
+            questPath=known;
+        }
+        var path=known.Path;
+        if(path.Todo.Count>0 && ImGui.TreeNodeEx(localization.Format("QuestDetails.PathTitle",path.Todo.Count)+"###QuestPath"))
+        {
+            try
+            {
+                ImGui.TextColored(Accent,localization.Format("QuestDetails.PathFirst",path.Todo[0].Name));
+                foreach(var step in path.Todo.Take(30))DrawQuestLink(step.Id,"path");
+                if(path.Todo.Count>30)ImGui.TextDisabled(localization.Format("QuestDetails.PathMore",path.Todo.Count-30));
+            }
+            finally{ImGui.TreePop();}
+        }
+        if(path.Unknown)ImGui.TextDisabled(localization.Get("QuestDetails.PathUnknown"));
+        if(path.Cut)ImGui.TextDisabled(localization.Get("QuestDetails.PathCut"));
+    }
     private void QuestFilterTip(QuestSourceProgressFilter filter)
     {
         switch (filter)

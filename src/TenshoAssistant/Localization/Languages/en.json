@@ -1702,6 +1702,11 @@
     "AllTip": "Shows every quest, whatever its state."
   },
   "QuestDetails": {
+    "PathTitle": "Still to do before this quest: {0}",
+    "PathFirst": "Next to take: {0}",
+    "PathMore": "And {0} more.",
+    "PathUnknown": "A prerequisite could not be read: this list may be incomplete.",
+    "PathCut": "The list is too long: it stops here.",
     "Title": "Quest details",
     "Back": "Back",
     "Close": "Close details",

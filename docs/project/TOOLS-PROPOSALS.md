@@ -104,6 +104,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T12 — Chemin vers une quête : prérequis restants, nombre et prochaine à faire
 
+- **État (relu le 2026-11-05)** : FAIT 0.583.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Quests/QuestService.cs`.
 - **Ce que le joueur obtient** : Sur la fiche d'une quête (ou d'un contenu, avec « Débloqué par »), Tensho liste dans l'ordre toutes les quêtes encore à faire pour l'atteindre, leur nombre, et la première à prendre maintenant, avec un bouton carte. Utile pour une épopée, un job ou un donjon à débloquer.
 - **Comment, taille, dépendances** : Parcours borné sur un worker annulable : garde de cycle, plafond de nœuds, résultat publié et mis en cache par quête et par observation. Jointure 1 = toutes les branches ; jointure 2 = la branche déjà faite, sinon la plus courte ; mode inconnu = arrêt avec « condition non interprétée ». Liste repliable dans la fiche, un clic ouvre la quête. Taille M. Dépendances : aucune ; sert à « Débloqué par ». Sonde : aucune. Décision : aucune.

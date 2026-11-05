@@ -295,6 +295,22 @@ internal static class Interfaces535Tests
             Check(TenshoAssistant.Quests.QuestList.Available(links,open) && TenshoAssistant.Quests.QuestList.Available(links,free),"open");
             Check(!TenshoAssistant.Quests.QuestList.Available(links,locked),"locked");
         }),
+        ("0.583: the way to a quest lists what is left, first to take first, and survives a long chain and a cycle",() =>
+        {
+            TenshoAssistant.Quests.QuestEntry Of(uint id,TenshoAssistant.Quests.QuestProgress progress,byte join,params uint[] previous)=>new(id,"Q"+id,"C",0,progress,null){PreviousQuestIds=previous,PreviousQuestJoin=join};
+            var open=TenshoAssistant.Quests.QuestProgress.Unconfirmed;var done=TenshoAssistant.Quests.QuestProgress.Complete;
+            var links=new TenshoAssistant.Quests.QuestLinks([Of(1,done,0),Of(2,open,1,1),Of(3,open,1,2),Of(4,open,1,3)]);
+            Check(TenshoAssistant.Quests.QuestList.PathTo(links,4).Todo.Select(entry=>entry.Id).SequenceEqual(new uint[]{2,3}),"in order, without itself or what is done");
+            var either=new TenshoAssistant.Quests.QuestLinks([Of(1,done,0),Of(2,open,0),Of(3,open,2,1,2)]);
+            Check(TenshoAssistant.Quests.QuestList.PathTo(either,3).Todo.Count==0,"any of them, one done");
+            var cycle=new TenshoAssistant.Quests.QuestLinks([Of(1,open,1,2),Of(2,open,1,1)]);
+            Check(TenshoAssistant.Quests.QuestList.PathTo(cycle,1).Todo.Select(entry=>entry.Id).SequenceEqual(new uint[]{2}),"a cycle ends");
+            var chain=Enumerable.Range(1,5000).Select(index=>Of((uint)index,open,1,index>1 ? [(uint)index-1]:[])).ToArray();
+            var cut=TenshoAssistant.Quests.QuestList.PathTo(new TenshoAssistant.Quests.QuestLinks(chain),5000);
+            Check(cut.Cut,"a very long chain is cut, no stack overflow");
+            var unknown=new TenshoAssistant.Quests.QuestLinks([Of(1,open,9,2),Of(2,open,0)]);
+            Check(TenshoAssistant.Quests.QuestList.PathTo(unknown,1).Unknown,"unknown join");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");
