@@ -96,6 +96,9 @@ public sealed class InventoryBankService : IDisposable
         }
     }
 
+    // Only touched by the worker: when each entry's file copy was last written in this session.
+    private readonly Dictionary<BankKey, DateTimeOffset> savedAt = [];
+
     private async Task RunAsync()
     {
         try
@@ -133,7 +136,10 @@ public sealed class InventoryBankService : IDisposable
                         : state.Entries.Where(e => e.Key != request.Entry!.Key).Append(request.Entry!).ToArray();
                 }
                 string? error = null;
-                try { store.Save(Array.AsReadOnly(next)); }
+                // 0.605: the date is new in memory, the file is only rewritten when the contents changed or the saved date grows old.
+                var unchanged = false;
+                lock (gate) unchanged = request.Entry is { } incoming && BankEntryCompare.CanSkipSave(state.Entries.FirstOrDefault(e => e.Key == incoming.Key), incoming, savedAt);
+                try { if (!unchanged) { store.Save(Array.AsReadOnly(next)); if (request.Entry is { } saved) savedAt[saved.Key] = saved.Snapshot.ObservedAt; } }
                 catch (Exception ex) { error = $"Bank save failed: {ex.Message}"; }
                 lock (gate)
                 {

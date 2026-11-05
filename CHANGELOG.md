@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.605.0
+- Plan global, phase 4 : Banque : un rangement relevé d'office et inchangé n'est plus réécrit à chaque lecture (toutes les 2 minutes, ou 30 secondes) : le fichier n'est écrit que si son contenu change, ou au plus une fois par heure pour sa date. La date reste à jour en mémoire.
+- Tests : Bank save. Verify.ps1 (agent) : 1106/1106, 0 avertissement, 0 erreur ; DLL 0.605.0.0. Non validé en jeu.
+### English
+- Bank: a storage read automatically and unchanged is no longer rewritten at each reading (every 2 minutes, or 30 seconds): the file is written only when its contents change, or at most once an hour for its date. The date stays current in memory.
+
 ## 0.604.0
 - Plan global, C35 : Aide à la pêche : le joueur est copié sur le thread framework et l'affichage ne lit que cette copie ; les tables des postes de pêche et d'Abondance II sont construites hors de l'affichage à la première demande. Rien de visible, sinon moins d'à-coup à la première ouverture ; ces deux lignes peuvent manquer un court instant.
 - Tests : Fishing help. Verify.ps1 (agent) : 1104/1104, 0 avertissement, 0 erreur ; DLL 0.604.0.0. Non validé en jeu.

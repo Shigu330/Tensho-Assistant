@@ -852,6 +852,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.604) Pêcher : le panneau de pêche trouve bien le poste ; panneau de récolte : la ligne d'Abondance II s'affiche.
 
+- [ ] (0.605) Garder un sac ouvert : rien à voir, sinon moins d'écritures. Vérifier qu'un objet déplacé apparaît toujours dans la Banque et après un rechargement.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

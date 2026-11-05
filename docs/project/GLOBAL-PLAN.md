@@ -120,7 +120,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 | Alerte du plafond hebdomadaire des mémoquartz | |
 | « Où est cet objet ? » sur tous les personnages | Gros changement des stocks |
 | Liste des objets annotés, filtre par étiquette | |
-| Écrire le fichier d'un personnage seulement s'il change | Technique |
+| ~~Écrire le fichier d'un personnage seulement s'il change~~ fait en 0.605 | Technique |
 
 ## Avant la phase 5 : coupure en JcJ et en contenu classé
 
