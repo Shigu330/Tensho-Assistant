@@ -19,13 +19,23 @@ internal static class CompetitiveCut610Tests
         }),
         ("Competitive: the decision; in doubt, stopped",() =>
         {
-            var zones=new HashSet<uint>{579};
+            var zones=new HashSet<uint>{430};
             Check(CompetitiveZones.IsCut(true,100,true,zones,false),"IsPvP alone");
-            Check(CompetitiveZones.IsCut(true,579,false,zones,false),"a listed zone");
+            Check(CompetitiveZones.IsCut(true,430,false,zones,false),"a listed zone");
             Check(!CompetitiveZones.IsCut(true,100,false,zones,true),"it comes back outside");
             Check(CompetitiveZones.IsCut(true,100,false,null,false),"data unread: stopped");
             Check(CompetitiveZones.IsCut(true,0,false,zones,true) && !CompetitiveZones.IsCut(true,0,false,zones,false),"loading screen: unchanged");
             Check(!CompetitiveZones.IsCut(false,579,true,zones,true),"logged out: nothing to protect");
+        }),
+        ("Competitive (0.612): in the Battlehall, stopped in the arena's instance only",() =>
+        {
+            var zones=CompetitiveZones.Build([],[(579,true,9)]);
+            Check(zones.Contains(579),"still known as a place");
+            Check(!CompetitiveZones.IsCut(true,579,false,zones,false),"the public hall, PvE matches included: not stopped");
+            Check(CompetitiveZones.IsCut(true,579,false,zones,false,inInstance:true),"in the instance: stopped");
+            Check(!CompetitiveZones.IsCut(true,579,false,zones,true,inInstance:false),"out of it: back");
+            Check(CompetitiveZones.IsCut(true,579,false,null,false),"data unread: still stopped");
+            Check(CompetitiveZones.IsCut(true,940,false,zones,false) && !CompetitiveZones.InstanceOnly.Contains(831),"the other places stay stopped from the door");
         }),
         ("Competitive: every framework subscription goes through the gate",() =>
         {

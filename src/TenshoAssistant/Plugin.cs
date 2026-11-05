@@ -95,7 +95,7 @@ public sealed class Plugin : IDalamudPlugin
             // DEC-038: decided first: no service starts in PvP or ranked content.
             chatForCut=chat;
             TenshoAssistant.Competitive.CompetitiveWatcher? competitive=null;
-            registrations.Register(()=>competitive=new TenshoAssistant.Competitive.CompetitiveWatcher(framework,client,data,log),()=>competitive?.Dispose());
+            registrations.Register(()=>competitive=new TenshoAssistant.Competitive.CompetitiveWatcher(framework,client,data,log,gameGui,condition),()=>competitive?.Dispose());
             registrations.Register(()=>{},()=>dataCache?.Dispose());
             registrations.Register(() => { }, market.Dispose);
             registrations.Register(() => { }, marketBoard.Dispose);

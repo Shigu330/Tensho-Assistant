@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.612.0
+- Plan global, DEC-038 : Coupure compétitive : la Battlehall (territoire 579) est aussi un hall public avec des matchs JcE. Tensho n'y est plus coupé à l'arrivée ni pendant ces matchs, seulement dans l'instance de l'arène, d'après IsInPvPInstance ou BoundByDuty. Hypothèse à confirmer en jeu : le journal écrit les valeurs lues.
+- Tests : Competitive (0.612). Verify.ps1 (agent) : 1120/1120, 0 avertissement, 0 erreur ; DLL 0.612.0.0. Non validé en jeu.
+### English
+- Competitive cut: the Battlehall (territory 579) is also a public hall with PvE matches. Tensho is no longer cut on arrival or during those, only in the arena's instance, from IsInPvPInstance or BoundByDuty. A hypothesis to confirm in game: the log writes the values read.
+
 ## 0.611.0
 - Plan global, DEC-038 : Coupure compétitive : le journal dit le nombre de zones connues au chargement et chaque début ou fin de coupure, avec le territoire, pour vérifier les essais en jeu.
 - Tests : Competitive. Verify.ps1 (agent) : 1119/1119, 0 avertissement, 0 erreur ; DLL 0.611.0.0. Non validé en jeu.

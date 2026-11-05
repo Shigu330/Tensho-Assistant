@@ -1,4 +1,5 @@
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using Lumina.Excel.Sheets;
 
 namespace TenshoAssistant.Competitive;
@@ -48,10 +49,13 @@ internal sealed class CompetitiveWatcher : IDisposable
     private readonly IClientState client;
     private readonly IReadOnlySet<uint>? zones;
     private readonly IPluginLog log;
+    private readonly IGameGui gui;
+    private readonly ICondition condition;
+    private string arenaSeen="";
 
-    public CompetitiveWatcher(IFramework framework,IClientState client,IDataManager data,IPluginLog log)
+    public CompetitiveWatcher(IFramework framework,IClientState client,IDataManager data,IPluginLog log,IGameGui gui,ICondition condition)
     {
-        this.framework=framework;this.client=client;this.log=log;
+        this.framework=framework;this.client=client;this.log=log;this.gui=gui;this.condition=condition;
         try
         {
             zones=CompetitiveZones.Build(data.GetExcelSheet<TerritoryType>().Select(row=>(row.RowId,row.IsPvpZone)),
@@ -64,7 +68,17 @@ internal sealed class CompetitiveWatcher : IDisposable
         log.Information("Competitive cut: {0} zones known, cut now: {1}, territory {2}.",zones?.Count ?? -1,CompetitiveGate.Cut,client.TerritoryType);
         framework.Update+=Tick;
     }
-    private bool Decide()=>CompetitiveZones.IsCut(client.IsLoggedIn,(uint)client.TerritoryType,client.IsPvP,zones,CompetitiveGate.Cut);
+    // Only looked at in the places that need it. The values are logged when they change: they tell the public hall from the arena's instance in game.
+    private unsafe bool InArenaInstance()
+    {
+        if(!CompetitiveZones.InstanceOnly.Contains((uint)client.TerritoryType))return false;
+        var pvpInstance=GameMain.IsInPvPInstance();var bound=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
+        var main=GameMain.Instance();
+        var seen=$"instance area {(main!=null && main->IsInInstanceArea())}, PvP instance {pvpInstance}, bound by duty {bound}, content row {(main!=null && main->CurrentContentFinderConditionRow!=null)}, match window {gui.GetAddonByName("TripleTriad") is {IsNull:false,IsVisible:true}}";
+        if(seen!=arenaSeen){arenaSeen=seen;log.Information("Competitive arena check, territory {0}: {1}.",client.TerritoryType,seen);}
+        return pvpInstance || bound;
+    }
+    private bool Decide()=>CompetitiveZones.IsCut(client.IsLoggedIn,(uint)client.TerritoryType,client.IsPvP,zones,CompetitiveGate.Cut,InArenaInstance());
     private void Tick(IFramework _)
     {
         var now=Decide();
