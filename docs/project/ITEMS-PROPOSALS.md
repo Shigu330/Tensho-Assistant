@@ -125,6 +125,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I15 — Partager un modèle de tri en texte (copier / coller)
 
+- **État (relu le 2026-11-05)** : FAIT 0.566.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.SortTemplates.cs`.
 - **Ce que le joueur obtient** : Un modèle de rangement se copie en texte et se colle chez un autre joueur ou sur un autre PC.
 - **Comment, taille, dépendances** : Export : JSON versionné, compressé en base64, avec un préfixe du type « Tensho-Tri-1: », mis dans le presse-papiers. Import : taille bornée (par exemple 64 Kio), lecture stricte puis InventorySortTemplates.Validate, nouvel identifiant, nom unique. Les identifiants d'objets et de catégories sont ceux du jeu, indépendants de la langue. Infobulles sur les deux boutons. Taille S. Sonde : aucune. Décision : le format (recommandé : celui-ci).

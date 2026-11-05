@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.566.0
+- Plan global, I15 : un modèle de tri se copie en texte et se colle dans une autre bibliothèque. Le texte collé est vérifié et reçoit son propre identifiant ; il ne contient ni personnage ni objet possédé.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1029/1029, 0 avertissement, 0 erreur ; DLL 0.566.0.0. Non validé en jeu.
+### English
+- Sort templates can be copied as text and pasted elsewhere. Pasted text is checked first.
+
 ## 0.565.0
 - Plan global, I20 : l'aperçu du tri encadre en or les cases qui changeraient et en donne le nombre. Une pile dont la place n'a pas été lue ne compte pas.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1028/1028, 0 avertissement, 0 erreur ; DLL 0.565.0.0. Non validé en jeu.

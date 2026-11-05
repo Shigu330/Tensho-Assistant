@@ -3206,6 +3206,11 @@
     "MapTip": "Several maps share this place name: choose the one to open."
   },
   "SortUi": {
+    "TemplateCopy": "Copy as text",
+    "TemplateCopyTip": "Copies the chosen template as text, to share it. It holds no character and no item you own.",
+    "TemplatePaste": "Paste a template",
+    "TemplatePasteTip": "Adds the template copied to your clipboard to your library. It is checked first, and it changes nothing until you load it.",
+    "TemplatePasteBad": "The clipboard does not hold a valid sort template.",
     "Title": "Inventory organization",
     "Subtitle": "Preview a rule, then apply it to live storage.",
     "Login": "Log in with a character to prepare its inventory.",

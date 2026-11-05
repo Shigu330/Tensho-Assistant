@@ -3206,6 +3206,11 @@
     "MapTip": "Plusieurs cartes portent ce nom de lieu : choisissez celle à ouvrir."
   },
   "SortUi": {
+    "TemplateCopy": "Copier en texte",
+    "TemplateCopyTip": "Copie le modèle choisi en texte, pour le partager. Il ne contient ni personnage ni objet que vous possédez.",
+    "TemplatePaste": "Coller un modèle",
+    "TemplatePasteTip": "Ajoute à votre bibliothèque le modèle copié dans le presse-papiers. Il est d'abord vérifié, et il ne change rien tant que vous ne le chargez pas.",
+    "TemplatePasteBad": "Le presse-papiers ne contient pas de modèle de tri valide.",
     "Title": "Organisation de l'inventaire",
     "Subtitle": "Prévisualisez une règle, puis appliquez-la au rangement en direct.",
     "Login": "Connectez un personnage pour préparer son inventaire.",

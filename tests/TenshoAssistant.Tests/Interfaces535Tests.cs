@@ -163,6 +163,14 @@ internal static class Interfaces535Tests
             var view=Read("MainWindow.SortPreview.cs");
             Check(view.Contains("shown.Stack.DisplayIndex>=0 && shown.Stack.DisplayIndex!=position") && view.Contains("stack.DisplayIndex>=0 && stack.DisplayIndex!=target"),"count and frame agree");
         }),
+        ("0.566: a sort template goes to text and back, checked, with a new id; bad text is refused",() =>
+        {
+            var template=new TenshoAssistant.Inventory.InventorySortTemplate(Guid.NewGuid(),"Mine",4,35,[new(TenshoAssistant.Inventory.InventorySortField.ItemLevel,true)],[new("Zone",0,5,Query:"Ore")]);
+            var text=TenshoAssistant.Inventory.InventorySortTemplates.Encode(template);
+            var back=TenshoAssistant.Inventory.InventorySortTemplates.Decode(text);
+            Check(back is not null && back.Name=="Mine" && back.Id!=template.Id && back.Zones.Count==1 && back.Zones[0].Query=="Ore" && back.Criteria.Count==1 && back.Criteria[0].Descending,"round trip");
+            foreach(var bad in new[]{null,"","hello","TENSHO-SORT1:???","TENSHO-SORT1:e30="})Check(TenshoAssistant.Inventory.InventorySortTemplates.Decode(bad) is null,"refused: "+bad);
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");
