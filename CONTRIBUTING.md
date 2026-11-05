@@ -5,7 +5,7 @@
 ## Prerequisites
 
 - Windows, Final Fantasy XIV with XIVLauncher/Dalamud (development plugins enabled), for the full check and to try the plugin.
-- .NET SDK **10.0.403** (fixed by `global.json`, latest patch accepted). Dalamud.NET.Sdk 15 is restored from NuGet during the build, but
+- .NET SDK **10.0** (`global.json` accepts 10.0.100 and newer: the Dalamud repository builds with 10.0.101). Dalamud.NET.Sdk 15 is restored from NuGet during the build, but
   the Dalamud assemblies it compiles against come from your Dalamud install (`%AppData%\XIVLauncher\addon\Hooks\dev`), or from the folder
   named by the `DALAMUD_HOME` environment variable (for example an extracted Dalamud distribution).
 - PowerShell 7 recommended (`commit-release.bat` falls back to Windows PowerShell 5.1).
@@ -72,7 +72,37 @@ The tests read files by relative path (`src/TenshoAssistant/...`): run them from
   used with credit in the README « Credits » and, for embedded files, the licence notice kept in the file (example:
   `src/TenshoAssistant/FreeCompany/Data/submarine-breakpoints.csv`). References under AGPL (Mappy, SortaKinda…) or without a licence
   (xivgear.app…) are read to understand them, **never copied**.
-- Out of scope: ACT/IINACT, parsers, anything that provides an advantage in combat or PvP.
+- Out of scope: ACT/IINACT, parsers, anything that provides an advantage in combat or PvP. Game advice is for PvE only; Beastmaster content shows information only (DEC-032, DEC-033).
+
+## Adding a tool
+
+Discuss the idea first with the « Tool proposal » issue form. Then, from the repository root:
+
+```powershell
+.\scripts\New-Tool.ps1 -Name RetainerNotes -Category Objects -LabelEn "Retainer notes" -LabelFr "Notes de servants" -DryRun
+```
+
+Without `-DryRun`, `scripts/New-Tool.ps1` creates and registers the skeleton:
+
+- `MainWindow.<Name>.cs`: the page, its method `Draw<Name>`;
+- `<Name>/<Name>Model.cs`: the pure logic, compiled by the tests. Code that reads the game goes beside it, in a file named `*.Dalamud.cs`;
+- `tests/TenshoAssistant.Tests/<Name>Tests.cs`: replace its example;
+- the texts in `en.json` and `fr.json`, and one line in the list of pages, `MainWindow.Pages.cs`.
+
+It builds and passes the tests as it is. It changes no version and commits nothing. What is left to you:
+
+1. Write the tool. Prove any game data with a read-only probe (`tools/`), with its output in `docs/evidence/`. Read native memory on the framework thread and copy it; nothing heavy in the draw.
+2. Give each subscription an owner and a cleanup, registered in `Plugin.cs` with `registrations.Register`.
+3. Give each setting a tooltip and a « ↺ » button. Replace the texts of `PageHelp.<Name>Title`, `Purpose`, `Start` and `Empty`: the « ? » of your page shows them, and a test refuses a page without them. If the page depends on what the game gives, add it to `HelpIndex` so that its help says what is missing.
+4. Run `.\scripts\Verify.ps1`, add the `CHANGELOG.md` entry (third version number, x.y.Z) and open the pull request.
+
+A page reached only from another page's tabs has no name in the navigation: give its line `null` as label and its parent as last value, as `Page.CraftLive` does.
+
+## Help, videos and guides
+
+Each page has a short help in the language files (`PageHelp` section, English first, then French), shown by its « ? » and searched in the Help page. Keep it to what the page does, how to start and what to do when it stays empty, and say only what the code does. A wrong sentence is a bug: fix it in a pull request like any text.
+
+To propose a video or a written guide, see [community-help/README.md](community-help/README.md). It needs no code, no version and no CHANGELOG entry.
 
 ## Proposing a change
 
@@ -116,32 +146,31 @@ Custom Dalamud repository (install without the dev DLL): `https://raw.githubuser
 ## Dalamud publication
 
 The official repository ([DalamudPluginsD17](https://github.com/goatcorp/DalamudPluginsD17), [rules](https://dalamud.dev/plugin-publishing/submission))
-requires, among other things (as read on 2026-10-31, not re-checked since):
+requires, among other things (restrictions and AI policy re-read on 2026-11-04):
 
 - a public Git repository built from a specific commit; `manifest.toml` in `testing/live/<plugin>/` (repository, commit, owners, project_path, changelog);
 - `images/icon.png` sized 64×64 to 512×512 (preview PNGs up to 730×380, optional); `DalamudPackager`; deterministic version and `AssemblyVersion`
   (no timestamps); windows via the Dalamud window system; a detailed project status: [docs/project/PUBLISHING.md](docs/project/PUBLISHING.md);
 - [restrictions](https://dalamud.dev/plugin-publishing/restrictions): no automatic requests to the game server without player action, no
-  automated gameplay (crafting, dialogues, loot…), no advantage in combat/PvP, no bypassing the Mog Station, no collection of other players' credentials;
+  automated gameplay (crafting, dialogues, loot…), nothing that augments, alters or interferes with combat (combat-related plugins contact the approval team before submitting), no advantage in any competitive or PvP environment, no parsing, no bypassing the Mog Station, no collection of other players' account ids;
 - [AI policy](https://dalamud.dev/plugin-publishing/ai-policy): AI use must be **declared** in the pull request (written by a human);
-  a submission **entirely generated by AI without real human involvement is rejected**; the author must understand, test, and explain the code.
+  a submission **entirely generated by AI without real human involvement is rejected**, and twice means a ban; undisclosed AI use in a clearly AI-written submission means a ban; Copilot and Auto submissions are reviewed at the maintainers' discretion and may be closed if larger than the author can account for; the author must understand, test, and explain the code.
 
 **Current project status:** the code is written with an AI agent (level "Auto") under the direction and in-game testing of its author.
-Before any official submission, the author must be able to justify every choice; otherwise, distribute via a third-party plugin repository
-(custom repository URL in Dalamud). Things to verify before submission:
+Publication is planned at version 1.0.0. What remains, in order, and the state of every requirement: [docs/project/PUBLISHING.md](docs/project/PUBLISHING.md).
+How the Dalamud repository builds a plugin (Linux, SDK 10.0.101, no network, lock file) and what the `Build like the Dalamud repository`
+CI job checks: [docs/evidence/0.512-d17-build.md](docs/evidence/0.512-d17-build.md). When you add code, keep these true:
 
-- external requests (Universalis, Garland Tools, wiki, GitHub-hosted data of GatherBuddy, LuminaSupplemental and FFXIVGachaSpreadsheet,
-  Teamcraft) are triggered only by player action, an opened page or configured settings;
-- actions that reach the game only start on click: teleport, applying a sort, macro chains, writing crafting macros into the game's
-  macros, opening the game's Try On window; game alarms are sent as `/alarm` chat commands on click or when the « game alarms » setting
-  (off by default) is on;
+- external requests are triggered only by player action, an opened page or a setting, and each source has its switch;
+- actions that reach the game start on a click; one setting, off by default, acts without one (title by job), kept and declared in the submission (DEC-035); game alarms are sent only from a click (adding an alarm with the setting on, or « Send »), never by the automatic alarms;
+- a window that looks like a window uses the Dalamud window system: a free-standing panel through `PanelWindow`, one attached to a game window through `Panels?.Show(...)` (`AttachedPanels`);
 - the game map remains hidden and unmodified when the Tensho map replaces it.
 
 ---
 
 ## Summary
 
-Build and test with `./scripts/Verify.ps1` (.NET SDK 10.0.403) from the repository root; it must stay green with no warnings. Never invent
+Build and test with `./scripts/Verify.ps1` (.NET SDK 10.0) from the repository root; it must stay green with no warnings. Never invent
 game data: prove data links with a read-only probe (`tools/`) and keep the output in `docs/evidence/`. Unknown is not zero. Native memory is
 read on the framework thread and copied; native strings are read with a bound. UI text lives in `Localization/Languages/*.json` (English is
 the reference, French complete); every setting has a tooltip. AGPL or unlicensed references (Mappy, SortaKinda, xivgear.app) are read,

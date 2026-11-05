@@ -1,6 +1,6 @@
 # Règles durables
 
-- Projet neuf Tensho--Assistant. Les 17 plugins du prompt maître et de docs/project/ROADMAP.md déterminent le périmètre.
+- Projet Tensho Assistant. Les 17 plugins du prompt maître et de docs/project/ROADMAP.md déterminent le périmètre.
 - Un seul GOAL actif, petit et vérifiable. Pas de modules vides ni d'abstractions prématurées.
 - Source de vérité commune pour chaque domaine partagé. KEEP → EXTEND → REFACTOR → REPLACE → NEW.
 - Prompt maître > environnement local > source actuelle > références historiques > inférence. Aucune décision héritée d'Éorzéa ne fait autorité.
@@ -18,3 +18,4 @@
 - Une version = Verify.ps1 vert + entrée CHANGELOG.md + STATUS.md à jour (voir CLAUDE.md) ; preuves citées dans docs/evidence/ ; commit et push par l'agent (Verify.ps1 -Commit, accord du 2026-11-03), release sur demande de l'utilisateur.
 - Résistance aux mises à jour de FF14 (demande utilisateur 2026-11-02, R-14) : dans la logique même du code, toute lecture native (structure, fenêtre du jeu, index d'AtkValues, colonne de feuille) est gardée et échoue proprement en « indisponible après une mise à jour du jeu », jamais en plantage ni en valeur fausse ; toute nouvelle fonction suit cette règle. Le passage complet sur l'existant est l'étape R-14, vers la fin de la file.
 - Langues (consigne utilisateur 2026-11-03, 0.406) : les données du jeu (objets, lieux, PNJ, quêtes, actions, météos…) s'affichent dans la langue du client du jeu ; les textes propres à Tensho dans la langue choisie dans le plugin, l'anglais étant l'original (repli). Aucun texte français écrit dans le code : messages, erreurs et états en anglais, traduits par les fichiers de langue (nouveau message : l'écrire en anglais et l'ajouter à UI/InternalMessages.cs avec ses deux traductions) ; le mode développeur passe aussi par la traduction ; le journal (log) reste en anglais. Exceptions : textes du jeu reconnus en français (cristaux, fêtes), syntaxe de commandes du jeu, alias tapés par le joueur. Test : Languages406Tests.
+- Règles Dalamud (consigne utilisateur 2026-11-04) : quand une règle Dalamud entre en jeu, résumé court et accord de l'utilisateur ; l'agent ne décide pas seul. La PR et la déclaration d'IA sont écrites par l'auteur.

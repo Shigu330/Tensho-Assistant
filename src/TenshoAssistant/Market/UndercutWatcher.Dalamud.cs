@@ -18,7 +18,8 @@ public sealed unsafe class UndercutWatcher : IDisposable
     private readonly Action<uint,uint,uint,bool> announce;
     private readonly IPluginLog log;
     private readonly object gate=new();
-    private IReadOnlySet<ulong> retainers=new HashSet<ulong>();
+    // R-14 (0.453): null = not read yet (the game loads them at a summoning bell) or unreadable: no price is then claimed « own retainers left out ».
+    private IReadOnlySet<ulong>? retainers;
     private DateTimeOffset nextRetainers;
     private uint lastItem;
     private int lastRequest=-1;
@@ -46,7 +47,7 @@ public sealed unsafe class UndercutWatcher : IDisposable
             foreach(ref var retainer in manager->Retainers)if(retainer.RetainerId!=0)ids.Add(retainer.RetainerId);
             lock(gate)retainers=ids;
         }
-        catch(Exception error){if(!warned){warned=true;log.Warning(error,"Retainers could not be read for the undercut price.");}}
+        catch(Exception error){lock(gate)retainers=null;if(!warned){warned=true;log.Warning(error,"Retainers could not be read for the undercut price.");}}
     }
 
     private void OnOfferings(IMarketBoardCurrentOfferings offerings)
@@ -55,13 +56,14 @@ public sealed unsafe class UndercutWatcher : IDisposable
         {
             if(disposed || !configuration.UndercutClipboard || offerings.ItemListings.Count==0)return;
             var item=offerings.ItemListings[0].ItemId;
-            IReadOnlySet<ulong> own;
+            IReadOnlySet<ulong>? own;
             lock(gate)
             {
                 // The first page of a new request is the cheapest one: later pages of the same item are left alone.
                 if(item==lastItem && offerings.RequestId==lastRequest)return;
                 own=retainers;
             }
+            if(own is null)return;
             if(Undercut.Price(offerings.ItemListings.Select(listing=>new UndercutListing(listing.PricePerUnit,listing.IsHq,listing.RetainerId)),own) is not { } price)return;
             lock(gate){lastItem=item;lastRequest=offerings.RequestId;pending=price.Paste.ToString(System.Globalization.CultureInfo.InvariantCulture);}
             announce(item,price.Lowest,price.Paste,price.Hq);

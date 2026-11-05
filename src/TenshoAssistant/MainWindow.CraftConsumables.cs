@@ -12,6 +12,72 @@ internal sealed partial class MainWindow
     private bool simulationFoodHq=true,simulationMedicineHq=true;
     // A-13 (0.434): the job is a specialist (specialist actions and recipes).
     private bool simulationSpecialist;
+    internal Func<uint,CraftDetected?>? CraftDetectedNow { get; set; }
+    private CraftDetected? craftDetected;
+    private DateTimeOffset craftDetectedAt;
+    private (uint Recipe,uint Job,bool Worn)? craftDetectionFor;
+
+    /// <summary>
+    /// 0.464 (user request, in-game campaign): Manipulation, specialist, food and medicine detected instead of asked, once for a recipe (the boxes stay editable). With the job worn the
+    /// attributes are copied from the game and already hold the food and medicine; otherwise they are chosen in the lists, to be added to typed attributes.
+    /// </summary>
+    private void DetectCraftState(RecipeDefinition recipe,uint job,bool worn,Action copy)
+    {
+        var now=DateTimeOffset.UtcNow;
+        if(now-craftDetectedAt>=TimeSpan.FromSeconds(1)){craftDetectedAt=now;craftDetected=CraftDetectedNow?.Invoke(job);}
+        if(craftDetectionFor==(recipe.RecipeId,job,worn))return;
+        craftDetectionFor=(recipe.RecipeId,job,worn);
+        if(ManipulationLearned is { } learned)simulationManipulation=learned(job);
+        if(craftDetected?.Specialist is { } specialist)simulationSpecialist=specialist;
+        var list=CraftConsumableList?.Invoke();
+        if(worn){simulationFood=null;simulationMedicine=null;copy();}
+        else
+        {
+            if(CraftConsumables.FromStatus(list,craftDetected?.Food,false) is { } food){simulationFood=food.Item;simulationFoodHq=food.Hq;}
+            if(CraftConsumables.FromStatus(list,craftDetected?.Medicine,true) is { } medicine){simulationMedicine=medicine.Item;simulationMedicineHq=medicine.Hq;}
+        }
+        simulationResult=null;simulationError=null;
+    }
+
+    private void DrawCraftDetection(bool worn)
+    {
+        DrawDetectedConsumables(craftDetected);
+        ImGui.SameLine();ImGui.AlignTextToFramePadding();
+        ImGui.TextDisabled(localization.Format("CraftSimulation.Detected",CraftYesNo(simulationManipulation),CraftYesNo(craftDetected?.Specialist)));
+        if(worn && (craftDetected?.Food is > 0 || craftDetected?.Medicine is > 0))ImGui.TextDisabled(localization.Get("CraftSimulation.DetectedCounted"));
+    }
+
+    /// <summary>
+    /// 0.469 (user request, in-game campaign): the active food and medicine as the item's icon with its tooltip. Only those with a crafting bonus count (CraftConsumableList holds no others),
+    /// so a food for combat reads as none.
+    /// </summary>
+    private void DrawDetectedConsumables(CraftDetected? detected)
+    {
+        var list=CraftConsumableList?.Invoke();
+        DrawDetectedConsumable("CraftSimulation.DetectedFood",CraftConsumables.FromStatus(list,detected?.Food,false));
+        ImGui.SameLine();
+        DrawDetectedConsumable("CraftSimulation.DetectedMedicine",CraftConsumables.FromStatus(list,detected?.Medicine,true));
+    }
+    private void DrawDetectedConsumable(string labelKey,(CraftConsumable Item,bool Hq)? consumable)
+    {
+        ImGui.AlignTextToFramePadding();ImGui.TextUnformatted(localization.Get(labelKey));ImGui.SameLine();
+        if(consumable is not { } known){ImGui.TextDisabled(localization.Get("CraftSimulation.DetectedNone"));return;}
+        DrawItemIcon(itemCatalog.State.Catalog?.Find(known.Item.ItemId),new System.Numerics.Vector2(28));
+        if(ImGui.IsItemHovered())DrawItemInfoTooltip(known.Item.ItemId);
+        if(known.Hq){ImGui.SameLine();ImGui.TextDisabled("HQ");}
+    }
+    private string CraftYesNo(bool? value)=>localization.Get(value switch{true=>"CraftSimulation.DetectedYes",false=>"CraftSimulation.DetectedNo",null=>"CraftSimulation.DetectedUnknown"});
+
+    private bool CraftInput(string label,ref int value,bool? ok,string tip)
+    {
+        ImGui.SetNextItemWidth(110);
+        if(ok is { } good)ImGui.PushStyleColor(ImGuiCol.Text,good ? UI.FfxivTheme.Success:UI.FfxivTheme.Error);
+        bool changed;
+        try{changed=ImGui.InputInt(label,ref value,0);}
+        finally{if(ok is not null)ImGui.PopStyleColor();}
+        Tip(tip);
+        return changed;
+    }
 
     private CraftStats EffectiveCraftStats()
     {

@@ -124,9 +124,10 @@ internal sealed class RecipeCatalogLoader : IDisposable
                         var amount = row.AmountIngredient[i];
                         if (itemId != 0 && amount > 0) ingredients.Add(new(itemId, amount));
                     }
-                    var table=levelSheet.GetRow(row.RecipeLevelTable.RowId);
+                    // R-14 (0.507): a dangling link skips this recipe, not the whole catalogue.
+                    if(!levelSheet.TryGetRow(row.RecipeLevelTable.RowId,out var table))continue;
                     var level = table.ClassJobLevel;
-                    var craftType = craftSheet.GetRow(row.CraftType.RowId).Name.ExtractText();
+                    var craftType = craftSheet.TryGetRow(row.CraftType.RowId,out var craftRow) ? craftRow.Name.ExtractText():"";
                     var simulation=RecipeSimulationCopy.Copy(row,table);
                     rows.Add(new RecipeDefinition(row.RowId, row.ItemResult.RowId, row.AmountResult,
                         craftType, level, ingredients, row.CraftType.RowId,simulation));
@@ -135,6 +136,8 @@ internal sealed class RecipeCatalogLoader : IDisposable
             }
             service.Progress(position, sheet.Count);
             if (position != sheet.Count) return;
+            // 0.492 (R-14): no recipe copied means unreadable game data, not « no recipe » (the disk cache refuses it too).
+            if (rows.Count == 0) throw new InvalidDataException("Recipe sheet gave no recipe.");
             var managed = rows.ToArray();
             var version = dataVersion!;
             var token = cancellation.Token;

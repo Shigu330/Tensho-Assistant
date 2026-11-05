@@ -45,6 +45,8 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.HeaderEt","Advanced.HeaderEtTip",()=>configuration.ShowHeaderEorzeaTime,value=>configuration.ShowHeaderEorzeaTime=value,c=>c.ShowHeaderEorzeaTime);
         BoolSetting("Advanced.HomeTools","Advanced.HomeToolsTip",()=>configuration.HomeShowTools,value=>configuration.HomeShowTools=value,c=>c.HomeShowTools);
         BoolSetting("Advanced.AlarmServerBar","Advanced.AlarmServerBarTip",()=>configuration.AlarmServerBar,value=>configuration.AlarmServerBar=value,c=>c.AlarmServerBar);
+        BoolSetting("Advanced.ReminderServerBar","Advanced.ReminderServerBarTip",()=>configuration.ReminderServerBar,value=>configuration.ReminderServerBar=value,c=>c.ReminderServerBar);
+        BoolSetting("Advanced.ReminderFinishedServerBar","Advanced.ReminderFinishedServerBarTip",()=>configuration.ReminderFinishedServerBar,value=>configuration.ReminderFinishedServerBar=value,c=>c.ReminderFinishedServerBar);
         // 0.426 (user request): close Tensho when it opens a game window.
         BoolSetting("Advanced.CloseOnGameWindow","Advanced.CloseOnGameWindowTip",()=>configuration.CloseOnGameWindow,value=>configuration.CloseOnGameWindow=value,c=>c.CloseOnGameWindow);
         // 0.415 (g, R-13): pinned tracking window.
@@ -111,6 +113,7 @@ internal sealed partial class MainWindow
         finally{if(!configuration.CommunityUniversalis)ImGui.EndDisabled();ImGui.Unindent();}
         // 0.346 (g, I-07): not tied to Universalis: it uses the offers the game shows when you open them.
         BoolSetting("Advanced.Undercut","Advanced.UndercutTip",()=>configuration.UndercutClipboard,value=>configuration.UndercutClipboard=value,c=>c.UndercutClipboard);
+        BoolSetting("Advanced.RetainerSales","Advanced.RetainerSalesTip",()=>configuration.RetainerSalesPanel,value=>configuration.RetainerSalesPanel=value,c=>c.RetainerSalesPanel);
 
         ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Advanced.AlarmsTitle"));
@@ -208,7 +211,7 @@ internal sealed partial class MainWindow
         {
             try
             {
-                ImGui.TextWrapped(localization.Format("Contributor.CodeHere",PageSource(page)));
+                ImGui.TextWrapped(localization.Format("Contributor.CodeHere",PageEntryFor(page)?.Source ?? $"MainWindow.{page}.cs"));
                 ImGui.TextWrapped(localization.Get("Contributor.CodeRules"));
                 foreach(var folder in new[]{"Alarms","Caching","Character","Collections","Community","Credits","Craft","Duties","Fashion","FreeCompany","Gathering","Gear","Inventory","Items","Localization","Macros","Maps","Market","MiniGames","Monsters","Npcs","Quests","Reminders","UI"})
                 {ImGui.BulletText(folder+"/");Tip("Contributor.Folder"+folder);}
@@ -266,18 +269,4 @@ internal sealed partial class MainWindow
         ImGui.TextColored(active ? Success:Muted,(active ? "● ":"○ ")+name);Tip(key);
         ImGui.SameLine();ImGui.TextDisabled(localization.Get(key));
     }
-    // Source file of a page, to start reading the code from what is on screen.
-    private static string PageSource(Page shown)=>shown switch
-    {
-        Page.Home=>"MainWindow.Home.cs",Page.Items=>"MainWindow.Items*.cs, MainWindow.ItemSheet.cs",Page.Storage=>"MainWindow.Storage.cs, MainWindow.Bank.cs",Page.Reminders=>"MainWindow.Reminders.cs, Reminders/",Page.Gathering or Page.GatheringGp=>"MainWindow.Gathering*.cs",
-        Page.Maps=>"MainWindow.Maps.cs, MainWindow.MapView.cs",Page.Weather=>"MainWindow.Weather.cs, Gathering/WeatherForecast.cs",
-        Page.Alarms=>"MainWindow.Alarms.cs, Alarms/",Page.MacroChain=>"MainWindow.MacroChain*.cs, Macros/",Page.Collections=>"MainWindow.Collections.cs, Collections/",
-        Page.TripleTriad=>"MainWindow.TripleTriad.cs, MainWindow.Triad*.cs, MiniGames/",Page.MiniCactpot=>"MainWindow.MiniCactpot.cs, MiniGames/",
-        Page.Market=>"MainWindow.Market*.cs, Market/",Page.Quests=>"MainWindow.Quests.cs, Quests/",Page.Chocobo=>"MainWindow.ChocoboBarding.cs, Gear/ChocoboBarding.cs, Gear/ChocoboReader.Dalamud.cs",Page.Events=>"MainWindow.Events.cs, Events/",
-        Page.DutyLoot=>"MainWindow.Duties.cs, Duties/",Page.MonsterLoot=>"MainWindow.Monsters.cs, Monsters/",Page.BlueMagic=>"MainWindow.Collections.cs, Collections/",
-        Page.Gear=>"MainWindow.Gear.cs, Gear/",Page.Credits=>"MainWindow.Credits.cs, Credits/",Page.FreeCompany=>"MainWindow.FreeCompany.cs, MainWindow.RoutePlanner.cs, MainWindow.VesselBuilds.cs, FreeCompany/",
-        Page.Fashion=>"MainWindow.Fashion*.cs, Fashion/",Page.SortPreview=>"MainWindow.Sort*.cs, Inventory/",Page.NpcVendors=>"MainWindow.NpcVendors.cs, Npcs/",
-        Page.CraftSimulation or Page.CraftLive or Page.CraftPresets=>"MainWindow.Craft*.cs, Craft/",Page.Settings=>"MainWindow.Settings.cs, MainWindow.Advanced.cs",
-        Page.Diagnostics=>"MainWindow.Diagnostics.cs, MainWindow.Advanced.cs",_=>$"MainWindow.{shown}.cs",
-    };
 }

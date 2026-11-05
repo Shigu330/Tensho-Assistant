@@ -15,6 +15,7 @@ public sealed class ExtraCollectionReader : IDisposable
 {
     private readonly IFramework framework;
     private readonly IClientState client;
+    private readonly IPlayerState player;
     private readonly IUnlockState unlocks;
     private readonly IDataManager data;
     private readonly IPluginLog log;
@@ -29,9 +30,9 @@ public sealed class ExtraCollectionReader : IDisposable
     public IReadOnlyList<CollectionEntry>? State=>Volatile.Read(ref state);
     public bool Unavailable { get; private set; }
 
-    public ExtraCollectionReader(IFramework framework,IClientState client,IUnlockState unlocks,IDataManager data,IPluginLog log)
+    public ExtraCollectionReader(IFramework framework,IClientState client,IPlayerState player,IUnlockState unlocks,IDataManager data,IPluginLog log)
     {
-        this.framework=framework;this.client=client;this.unlocks=unlocks;this.data=data;this.log=log;
+        this.framework=framework;this.client=client;this.player=player;this.unlocks=unlocks;this.data=data;this.log=log;
         framework.Update+=OnUpdate;
     }
 
@@ -41,7 +42,8 @@ public sealed class ExtraCollectionReader : IDisposable
     {
         if(disposed || !framework.IsInFrameworkUpdateThread || framework.IsFrameworkUnloading)return;
         var now=DateTimeOffset.UtcNow;
-        if(!client.IsLoggedIn){steps=null;if(State is not null)Volatile.Write(ref state,null);return;}
+        // R-14 (0.453): before the character is loaded the game answers « not done » to everything: unknown, not zero.
+        if(!client.IsLoggedIn || !player.IsLoaded){steps=null;if(State is not null)Volatile.Write(ref state,null);return;}
         try
         {
             if(steps is null)
@@ -76,6 +78,22 @@ public sealed class ExtraCollectionReader : IDisposable
         return teaching.GetValueOrDefault((action,row));
     }
 
+    private unsafe IEnumerable<CollectionEntry> Folklore()
+    {
+        var state=FFXIVClientStructs.FFXIV.Client.Game.UI.PlayerState.Instance();
+        if(state==null)throw new InvalidOperationException("Player state unavailable.");
+        var miner=Gathering.GatherTomeBits.Of(state->UnlockedMinerFolkloreTomes);var botanist=Gathering.GatherTomeBits.Of(state->UnlockedBotanistFolkloreTomes);var fisher=Gathering.GatherTomeBits.Of(state->UnlockedFishingFolkloreTomes);
+        var entries=new List<CollectionEntry>();
+        foreach(var group in data.GetExcelSheet<GatheringSubCategory>().Where(row=>row.Item.RowId!=0 && row.Item.ValueNullable is not null).GroupBy(row=>row.Item.RowId).OrderBy(group=>group.First().ClassJob.RowId).ThenBy(group=>group.First().Quest.RowId))
+        {
+            var first=group.First();var bit=(int)first.Quest.RowId;
+            var read=first.ClassJob.RowId switch {16=>miner.Contains(bit),17=>botanist.Contains(bit),18=>fisher.Contains(bit),_=>false};
+            var item=first.Item.Value;
+            entries.Add(new(CollectionKind.Folklore,item.RowId,item.Name.ExtractText(),item.Icon,read,Number:(int)first.ClassJob.RowId*100+bit,ItemId:item.RowId));
+        }
+        return entries;
+    }
+
     // One step per sheet (each a few hundred rows at most); a failing sheet fails the read, logged once.
     private List<Func<IEnumerable<CollectionEntry>>> Steps()=>
     [
@@ -99,6 +117,8 @@ public sealed class ExtraCollectionReader : IDisposable
             .Select(row=>new CollectionEntry(CollectionKind.Portrait,200000+row.RowId,row.Name.ExtractText(),(uint)Math.Max(0,row.Icon),unlocks.IsBannerDecorationUnlocked(row),Description:"Decoration")),
         ()=>data.GetExcelSheet<SecretRecipeBook>().Where(row=>row.RowId!=0 && !row.Name.IsEmpty)
             .Select(row=>new CollectionEntry(CollectionKind.MasterBook,row.RowId,row.Name.ExtractText(),row.Item.ValueNullable?.Icon ?? 0,unlocks.IsSecretRecipeBookUnlocked(row),ItemId:row.Item.RowId)),
+        // 0.526 (user report): the game's « Légendes locales »: the folklore tomes of miner, botanist and fisher, one per region (docs/evidence/0.526-folklore-tomes.md).
+        Folklore,
         ()=>data.GetExcelSheet<McGuffin>().Where(row=>row.RowId!=0 && row.UIData.ValueNullable is { } ui && !ui.Name.IsEmpty)
             .Select(row=>new CollectionEntry(CollectionKind.McGuffin,row.RowId,row.UIData.Value.Name.ExtractText(),row.UIData.Value.Icon,unlocks.IsMcGuffinUnlocked(row),Number:row.UIData.Value.Order)),
         ()=>data.GetExcelSheet<MKDLore>().Where(row=>row.RowId!=0 && !row.Name.IsEmpty)

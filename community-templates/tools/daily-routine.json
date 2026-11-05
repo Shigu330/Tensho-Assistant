@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "daily-routine",
+  "name": { "en": "Daily routine", "fr": "Routine du jour" },
+  "author": "Tensho",
+  "license": "CC0-1.0",
+  "blocks": [
+    { "type": "heading", "text": { "en": "Every day", "fr": "Chaque jour" } },
+    { "type": "timer", "label": { "en": "Daily reset", "fr": "Remise quotidienne" }, "at": "daily" },
+    {
+      "type": "checklist",
+      "reset": "daily",
+      "entries": [
+        { "en": "Allied society daily quests", "fr": "Quêtes quotidiennes (peuples alliés)" },
+        { "en": "Hunt bills", "fr": "Contrats de chasse" }
+      ]
+    },
+    { "type": "heading", "text": { "en": "Grand Company", "fr": "Grande Compagnie" } },
+    { "type": "timer", "label": { "en": "Supply missions", "fr": "Missions de ravitaillement" }, "at": "supply" },
+    { "type": "note", "text": { "en": "These missions renew at their own hour, not at the daily reset.", "fr": "Ces missions se renouvellent à leur propre heure, pas à la remise quotidienne." } }
+  ]
+}

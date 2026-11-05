@@ -17,6 +17,7 @@ internal sealed class FashionCheckReader : IDisposable
     private readonly IPluginLog log;
     private readonly Func<bool> capture;
     private long nextRead;
+    private bool warned;
     private string? lastLogged;
 
     public FashionCheckReader(FashionCheckService service, IFramework framework, IGameGui gui, IPluginLog log, Func<bool> capture)
@@ -41,7 +42,8 @@ internal sealed class FashionCheckReader : IDisposable
             for (var slot = 0; slot < FashionWeek.SlotCount; slot++)
             {
                 var index = 2 + slot * 11;
-                if (index >= unit->AtkValuesCount) { categories[slot] = ""; continue; }
+                // R-14 (0.453): a slot value the window does not have is a changed layout (unknown), never « no category this week ».
+                if (unit->AtkValues == null || index >= unit->AtkValuesCount) throw new InvalidOperationException($"FashionCheck has {unit->AtkValuesCount} values, slot {slot} needs index {index}.");
                 var value = unit->AtkValues[index];
                 categories[slot] = value.Type is AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString
                     ? value.GetValueAsString() ?? "" : "";
@@ -55,6 +57,7 @@ internal sealed class FashionCheckReader : IDisposable
                     : new(node->ScreenX, node->ScreenY, node->Width * unit->Scale, node->Height * unit->Scale);
             }
             var frame = new FashionCheckFrame(categories, unit->X, unit->Y, unit->RootNode->Width * unit->Scale, unit->RootNode->Height * unit->Scale, DateTimeOffset.UtcNow, rects);
+            warned = false;
             var previous = service.Live;
             if (previous is null || !previous.Categories.SequenceEqual(categories) || previous.X != frame.X || previous.Y != frame.Y || previous.Width != frame.Width
                 || !(previous.Slots ?? []).SequenceEqual(rects))
@@ -62,7 +65,7 @@ internal sealed class FashionCheckReader : IDisposable
             var key = string.Join("|", categories) + " / " + string.Join(" ", rects.Select((rect, slot) => $"{slot}:{rect.X:0},{rect.Y:0},{rect.Width:0}x{rect.Height:0}"));
             if (capture() && key != lastLogged) { lastLogged = key; log.Information("Fashion Report categories and slot rectangles: {Categories}", key); }
         }
-        catch (Exception error) { service.Publish(null); nextRead = now + Stopwatch.Frequency * 5; log.Warning(error, "Fashion Report window unavailable."); }
+        catch (Exception error) { service.Publish(null); nextRead = now + Stopwatch.Frequency * 5; if (!warned) { warned = true; log.Warning(error, "Fashion Report window unavailable."); } }
     }
 
     public void Dispose() { framework.Update -= OnUpdate; service.Publish(null); }

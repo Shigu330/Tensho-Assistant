@@ -216,7 +216,11 @@ internal sealed partial class CollectionReader : IDisposable
                     {
                         // 0.331 (R-14): a rarity or type link that does not resolve skips this card (said as a category issue) instead
                         // of failing every collection category, as the orchestrion rows already do.
-                        if (!details.TripleTriadCardRarity.IsValid || !details.TripleTriadCardType.IsValid)
+                        // 0.454 (R-14): IsValid itself throws when the linked sheet no longer loads: guarded the same way.
+                        var linked = false;
+                        try { linked = details.TripleTriadCardRarity.IsValid && details.TripleTriadCardType.IsValid; }
+                        catch (Exception) { linked = false; }
+                        if (!linked)
                             triadIssue = "Triple Triad card catalogue partly read; the other collections can still be browsed.";
                         else
                         {
@@ -252,7 +256,9 @@ internal sealed partial class CollectionReader : IDisposable
                                 number = details.Number;
                                 description = details.Description.ExtractText();
                                 var source = details.Location;
+                                // 0.454 (R-14): a place sheet that no longer loads leaves this location empty, as a missing row does.
                                 if (source.RowId != 0)
+                                    try
                                 {
                                     if (source.RowType == typeof(PlaceName))
                                         location = data.GetExcelSheet<PlaceName>().TryGetRow(source.RowId, out var place) ? place.Name.ExtractText() : "";
@@ -261,6 +267,7 @@ internal sealed partial class CollectionReader : IDisposable
                                     else if (source.RowType == typeof(ContentFinderCondition))
                                         location = data.GetExcelSheet<ContentFinderCondition>().TryGetRow(source.RowId, out var content) ? content.Name.ExtractText() : "";
                                 }
+                                    catch (Exception) { location = ""; blueIssue = "Blue magic spell catalogue partly read; the other collections can still be browsed."; }
                             }
                             entries.Add(new(CollectionKind.BlueMagic, row.RowId, name, action.Icon,
                                 character != 0 && unlocks.IsAozActionUnlocked(row), number, row.Rank, description, location));

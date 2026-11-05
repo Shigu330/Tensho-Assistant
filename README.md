@@ -19,9 +19,9 @@ The sidebar groups the pages in foldable categories (`MainWindow.cs`):
 | Items | **Items** (search and item sheet), **Storage**, **Inventory sorting**, **Market** |
 | Production | **Crafting**, **Gathering**, **Ocean fishing**, **Macro chain** |
 | World | **Map**, **Weather**, **Alarms**, **Reminders**, **Free company**, **NPC vendors**, **Duty loot**, **Monster loot** |
-| Progression | **Quests**, **Events**, **Collections** (with Blue magic), **Gear**, **Chocobo**, **Guildleves**, **Hunting log** |
+| Progression | **Quests**, **Events**, **Collections** (with Blue magic), **Gear**, **Chocobo**, **Guildleves**, **Hunting log**, **Beastmaster** |
 | Gold Saucer | **Fashion Report**, **Triple Triad**, **Mini Cactpot** |
-| Preferences | **Settings**, **Credits**, **Diagnostics** (developer mode only) |
+| Preferences | **Help**, **Settings**, **Credits**, **Diagnostics** (developer mode only) |
 
 Chat commands: `/tensho` opens the window; `/tensho fish` (also `fishing`, `peche`, `pêche`) opens or closes the fishing help;
 `/tensho todo <task>` adds a free task to Reminders; `/tensho wiki <item>` and `/tensho lodestone <item>` open the item's page in the
@@ -31,11 +31,11 @@ Settings page.
 ## Architecture
 
 - `src/TenshoAssistant/Plugin.cs` registers the services, the command, the windows and the panels; every registration has its cleanup.
-- `MainWindow.cs` (split into `MainWindow.<Page>.cs` partial files) is the shell and page routing; `MapViewWindow.cs` is the Tensho map.
-  Both are Dalamud `WindowSystem` windows.
-- One folder per domain (`Alarms`, `Caching`, `Character`, `Collections`, `Community`, `Craft`, `Credits`, `Duties`, `Events`,
-  `Fashion`, `FreeCompany`, `Gathering`, `Gear`, `Hunting`, `Inventory`, `Items`, `Leves`, `Localization`, `Macros`, `Maps`, `Market`,
-  `MiniGames`, `Monsters`, `Npcs`, `Quests`, `Reminders`). Files ending in `*.Dalamud.cs` touch the game (read on the framework thread,
+- `MainWindow.cs` (split into `MainWindow.<Page>.cs` partial files) is the shell and page routing; `MapViewWindow.cs` is the Tensho map,
+  `GuideWindow.cs` the first-run guide, `PanelWindow.cs` the free-standing panels (tracker, tasks, wear and GP bars), `AttachedPanels.cs` the panels beside game windows. All are Dalamud `WindowSystem` windows.
+- One folder per domain (`Alarms`, `Beastmaster`, `Caching`, `Character`, `Collections`, `Community`, `Craft`, `Credits`, `Diagnostics`,
+  `Duties`, `Events`, `Fashion`, `FreeCompany`, `Gathering`, `Gear`, `Guide`, `Help`, `Hunting`, `Inventory`, `Items`, `Leves`,
+  `Localization`, `Macros`, `Maps`, `Market`, `MiniGames`, `Monsters`, `MyTools`, `Npcs`, `Quests`, `Reminders`). Files ending in `*.Dalamud.cs` touch the game (read on the framework thread,
   then copied); the others are pure C# and tested.
 - `UI/Components/` holds the shared templates: `ItemCell` (item icon and name with the common tooltip and tools menu), `DetailPage`,
   `SettingRow` (tooltip and « restore default » ↺ button), `EntityMenus` (quest, NPC, monster and place menus), `DataIndexes`.
@@ -61,6 +61,7 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
   once opened in game), Characters (one file per character), Crystals, Currencies (caps, weekly tomestones, cap alerts), Gil journal
   (90 days, categorized changes), Report (stacks to merge, armoury pieces used by no gear set, armoire candidates, look-alike glamour
   items), Imports.
+- **Retainer sales**: beside a retainer's sale list, your items and prices as the game shows them; on a click, a comparison with other sellers through Universalis and a price to copy. Nothing is changed in the game.
 - **Inventory sorting**: profiles, templates, rules and protected zones with a preview; the sort is applied only on click.
 - **Market** (Universalis): Summary, Listings (world / data centre / region, quality, quantity and world filters, cheapest set of whole
   listings for N units, tax included) and Sale history; cached on disk, the last known board is shown, dated, when Universalis fails.
@@ -105,6 +106,8 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
   always shown; markers on the map edge for off-view targets, each kind switchable; position marker and view cone; area colours; hide in
   combat or duty; icon sizes and priorities.
 - **Weather**: forecasts by zone.
+- **Help**: a « ? » on every page, a first-visit note, a search across all the help, a first-steps guide you can leave at any step, community videos and guides read on a click, and a form that opens the project's GitHub ticket filled in, in your browser.
+- **Beastmaster**: the beasts with their attributes at a chosen rank, and the boards of the labyrinth with their enemies and bonuses.
 - **Alarms**: Tensho alarms (once at a date, every Eorzea day at an ET time, or at a real local date; weather conditions for fish), chat
   line with links and the game's alarm sound, optional copy into the game's alarm list through `/alarm` (off by default), automatic
   alarms for ventures and vessels, clocks of other time zones, an optional pinned tracking window. Alarm clock in the game's server info
@@ -114,8 +117,9 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
   treasure maps, retainer ventures, company voyages, Grand Company squadron) with resets and alarm buttons; Wondrous Tails (tasks, line
   odds), hunt bills (targets and kills), daily roulettes and role bonus, challenge log, Doman Enclave; « done » boxes per character, all
   your characters at a glance, your own tasks (daily, weekly, every n hours, once, counters) with an optional on-screen panel, and a
-  garden journal (growing and tending hours filled from a seed list or typed, harvest and tending reminders, crossbreeding pairs), and
-  a squadron mission planner (best parties of four from the game's data, estimate not yet checked in game).
+  squadron mission planner (best parties of four from the game's data, estimate not yet checked in game).
+- **Garden**: a journal of your beds and pots (plantings noted automatically from the game's chat lines, or by hand; hours filled from a seed list; harvest and tending reminders), and
+  crossbreeding pairs with a planting plan for the seed you want.
 
 ### Free company
 
@@ -158,6 +162,7 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
   Map, Data (in-game panels, automatic storage save, cache durations including « Never (on request only) »), Advanced (« Restore all
   defaults », developer mode, community sources on / off, hover prices, game command delay), Debug (developer mode). Each setting has a
   tooltip and a ↺ restore-default button. Game data is shown in the game client's language, Tensho's own texts in the plugin language.
+- **Folklore** tomes, read or not, are a tab of Collections.
 - **Credits**: everything Tensho uses (game, libraries, embedded and online data) with its licence and the setting tied to it.
 - Diagnostics (developer mode): draw time of each page (median and maximum of the last 120 frames) and a contributor panel (documents,
   source file of the shown page, data sources, probes, translation completeness).
@@ -172,7 +177,9 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
 ├── scripts/                  Verify.ps1 (build + tests + localization + package), Release.ps1 (git steps)
 ├── commit-release.bat        Verify -Commit then -Release (maintainer)
 ├── repo.json                 Dalamud custom repository entry (refreshed by each release)
-├── publish/d17/              draft submission for the official Dalamud repository
+├── publish/d17/              draft submission for the official Dalamud repository (what remains: docs/project/PUBLISHING.md)
+├── community-help/           help videos and guides listed in the plugin
+├── community-templates/      community tool gallery (data only)
 ├── docs/                     documentation map: docs/README.md
 │   ├── ai/                   agent steering (rules, status, goal)
 │   ├── project/              scope, roadmap, architecture, testing, references, decisions, publishing
@@ -185,7 +192,7 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
 
 ## Build and verification
 
-Requirements: Windows, .NET SDK 10.0.403 (`global.json`), Dalamud.NET.Sdk 15 (restored from NuGet during the build; it compiles against your Dalamud install, or `DALAMUD_HOME`). Without the game: `.\scripts\Verify.ps1 -TestsOnly` (tests and languages only).
+Requirements: Windows, .NET SDK 10.0 (`global.json` accepts 10.0.100 and newer), Dalamud.NET.Sdk 15 (restored from NuGet during the build; it compiles against your Dalamud install, or `DALAMUD_HOME`). Without the game: `.\scripts\Verify.ps1 -TestsOnly` (tests and languages only).
 
 ```powershell
 .\scripts\Verify.ps1                                 # Release build, managed tests, language files, package
@@ -256,6 +263,7 @@ Framework and tools:
 
 - Final Fantasy XIV and its game data (sheets read through Dalamud / Lumina), Dalamud and FFXIVClientStructs
 - Dalamud.NET SDK, .NET SDK and runtime, PowerShell scripts for verification and release
+- [Raphael.Net](https://github.com/WorkingRobot/Raphael.Net) by Asriel (MIT, NuGet, native library): the crafting solver
 
 Community data used by the plugin (licence compatible with GPL-3.0, or service API):
 
@@ -267,6 +275,7 @@ Community data used by the plugin (licence compatible with GPL-3.0, or service A
   `src/TenshoAssistant/FreeCompany/Data/submarine-breakpoints.csv`), originally from the community « Submersible Loot Spreadsheet »
   (Elena / saerielle); voyage formulas understood by reading its code (original code); wear estimate from the community « Submersibles
   durability damage » sheet that it quotes
+- [FFXIV Gardening Tracker](https://github.com/Lotlab/FFXIV-Gardening-Tracker) by Lotlab (GPL-3.0): garden seed times, embedded with its notice; FFXIV Crossbreed Helper by nick75g (MIT): garden crosses, embedded
 - level modifier table (main stat, levels 1–100) from Character Panel Refined by Kouzukii (MIT, full notice in `Character/StatFormulas.cs`)
 - [Universalis](https://universalis.app/) (market prices and listings), [Garland Tools](https://www.garlandtools.org/) (item, duty and
   monster sources), the [FFXIV Console Games Wiki](https://ffxiv.consolegameswiki.com/) (monster drops, sightseeing log, acquisition),
@@ -330,7 +339,7 @@ l'objet dans le navigateur ; `/tenshonext` est le marqueur de fin de page de l'e
 
 - `src/TenshoAssistant/Plugin.cs` enregistre les services, la commande, les fenêtres et les panneaux ; chaque enregistrement a son nettoyage.
 - `MainWindow.cs` (découpée en fichiers partiels `MainWindow.<Page>.cs`) porte la navigation et les pages ; `MapViewWindow.cs` est la
-  carte Tensho. Les deux sont des fenêtres du `WindowSystem` de Dalamud.
+  carte Tensho, `GuideWindow.cs` le guide de première prise en main, `PanelWindow.cs` les panneaux libres (suivi, tâches, barres d'usure et de PR), `AttachedPanels.cs` les panneaux à côté des fenêtres du jeu. Toutes sont des fenêtres du `WindowSystem` de Dalamud.
 - Un dossier par domaine ; les fichiers `*.Dalamud.cs` touchent le jeu (lecture sur le thread du framework, puis copie), les autres sont
   du C# pur et testé.
 - `UI/Components/` : modèles communs (`ItemCell`, `DetailPage`, `SettingRow` avec infobulle et bouton ↺, `EntityMenus`, `DataIndexes`).
@@ -412,10 +421,10 @@ Ce que fait le code aujourd'hui. La validation en jeu de chaque partie est suivi
   alliés, autorisations de mandats, cartes au trésor, tâches de servant, expéditions de la compagnie, escouade de Grande Compagnie) avec
   remises à zéro et alarmes ; Livre d'or (tâches, chances de lignes), contrats de chasse (cibles et victimes), missions aléatoires du
   jour et bonus de rôle, carnet d'objectifs, Enclave de Doman ; cases « fait » par personnage, vue de tous vos personnages, vos propres
-  tâches (chaque jour, chaque semaine, toutes les n heures, une fois, compteurs) avec un panneau à l'écran en option, et un journal de
-  jardinage (durées de pousse et d'entretien remplies depuis une liste de graines ou tapées, rappels de récolte et d'entretien, paires de
-  croisement), et un planificateur des missions d'escouade (meilleurs groupes de quatre d'après les données du jeu, estimation pas encore
-  vérifiée en jeu).
+  tâches (chaque jour, chaque semaine, toutes les n heures, une fois, compteurs) avec un panneau à l'écran en option, et un planificateur
+  des missions d'escouade (meilleurs groupes de quatre d'après les données du jeu, estimation pas encore vérifiée en jeu).
+- **Jardinage** : un journal de vos parcelles et pots (plantations notées d'office depuis les lignes du chat du jeu, ou à la main ; durées remplies depuis une liste de graines ;
+  rappels de récolte et d'entretien), et les paires de croisement avec un plan de plantation pour la graine voulue.
 
 ### Compagnie libre
 
@@ -472,7 +481,7 @@ Voir la structure anglaise ci-dessus et la carte des documents [docs/README.md](
 
 ## Build et validation
 
-Prérequis : Windows, SDK .NET 10.0.403 (`global.json`), Dalamud.NET.Sdk 15 (restauré depuis NuGet pendant la compilation ; il compile avec votre Dalamud installé, ou `DALAMUD_HOME`). Sans le jeu : `.\scripts\Verify.ps1 -TestsOnly` (tests et langues seulement).
+Prérequis : Windows, SDK .NET 10.0 (`global.json` accepte 10.0.100 et plus), Dalamud.NET.Sdk 15 (restauré depuis NuGet pendant la compilation ; il compile avec votre Dalamud installé, ou `DALAMUD_HOME`). Sans le jeu : `.\scripts\Verify.ps1 -TestsOnly` (tests et langues seulement).
 
 ```powershell
 .\scripts\Verify.ps1                                  # compilation Release, tests, fichiers de langue, paquet
@@ -543,7 +552,7 @@ servent que lorsque le jeu ne les a pas, et sont toujours citées.
   (Infi, MIT : Revue de mode téléchargée, butin moyen des sous-marins embarqué) ; SubmarineTracker (Infi, MIT : seuils des secteurs
   embarqués, avis dans `src/TenshoAssistant/FreeCompany/Data/submarine-breakpoints.csv`, à l'origine la feuille communautaire
   « Submersible Loot Spreadsheet » d'Elena / saerielle ; formules de voyage comprises en lisant son code ; usure d'après la feuille
-  « Submersibles durability damage ») ; table des modificateurs de niveau de Character Panel Refined (Kouzukii, MIT, avis complet dans `Character/StatFormulas.cs`) ;
+  « Submersibles durability damage ») ; Raphael.Net (Asriel, MIT : solveur d'artisanat) ; FFXIV Gardening Tracker (Lotlab, GPL-3.0 : durées du jardinage, embarquées) et FFXIV Crossbreed Helper (nick75g, MIT : croisements, embarqués) ; table des modificateurs de niveau de Character Panel Refined (Kouzukii, MIT, avis complet dans `Character/StatFormulas.cs`) ;
   [Universalis](https://universalis.app/), [Garland Tools](https://www.garlandtools.org/), le [wiki FFXIV](https://ffxiv.consolegameswiki.com/),
   [PaissaDB](https://github.com/zhudotexe/FFXIV_PaissaDB) de zhudotexe (terrains en vente, lus sur clic ou par la surveillance facultative).
 - Lus pour comprendre, jamais copiés : Mappy et SortaKinda (AGPL-3.0-or-later) et les autres références de `docs/project/ROADMAP.md` ;

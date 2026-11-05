@@ -29,7 +29,8 @@ internal sealed class GatheringObservationReader : IDisposable
     private static unsafe string? Text(AtkResNode* node)
     {
         if(!Visible(node) || node->Type!=NodeType.Text)return null;
-        var text=node->GetAsAtkTextNode();if(text==null || text->NodeText.Length>64)return null;
+        // R-14 (0.454): type checked above: a plain cast, not a game function that a patch can leave unresolved.
+        var text=(AtkTextNode*)node;if(text->NodeText.Length>64)return null;
         return Dalamud.Game.Text.SeStringHandling.SeString.Parse(text->NodeText.AsSpan()).TextValue;
     }
     private static unsafe GatheringRawSlot[] Copy(AddonGathering* addon)
@@ -83,7 +84,10 @@ internal sealed class GatheringObservationReader : IDisposable
                 {service.Missing(ticket,current,GatheringObservationStatus.NotReady);return;}
                 var unit=(AtkUnitBase*)handle.Address;
                 service.SetWindow(unit->RootNode==null ? null:(unit->X,unit->Y,unit->RootNode->Width*unit->Scale,unit->RootNode->Height*unit->Scale));
-                service.Publish(ticket,current,job,level,gp,maxGp,status,attempts,total,slots);
+                // 0.515: a gathering point's base id is its GatheringPoint row (docs/evidence/0.515-node-effects.md).
+                var target=local.TargetObject;
+                var node=target?.ObjectKind==Dalamud.Game.ClientState.Objects.Enums.ObjectKind.GatheringPoint ? target.BaseId:0;
+                service.Publish(ticket,current,job,level,gp,maxGp,status,attempts,total,slots,node);
             }
             catch(Exception error){service.Fail(ticket,current,error);nextRead=now+Stopwatch.Frequency*5;log.Warning(error,"Gathering observation unavailable; retry in five seconds.");}
         }

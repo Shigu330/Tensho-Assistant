@@ -27,6 +27,8 @@ public sealed record CraftSimulationResult(uint RecipeId,CraftStats Stats,int St
 
 public static class CraftSimulation
 {
+    /// <summary>Actions the game allows only on Good or Excellent, or with Heart and Soul (docs/evidence/0.434-craft-actions.md).</summary>
+    internal static bool NeedsFavourable(CraftActionKind kind)=>kind is CraftActionKind.IntensiveSynthesis or CraftActionKind.PreciseTouch or CraftActionKind.TricksOfTheTrade;
     internal static bool IncreasesQuality(CraftActionKind kind)=>kind is CraftActionKind.BasicTouch or CraftActionKind.StandardTouch or CraftActionKind.AdvancedTouch or CraftActionKind.Byregot or CraftActionKind.Reflect
         or CraftActionKind.PreparatoryTouch or CraftActionKind.PrudentTouch or CraftActionKind.RefinedTouch or CraftActionKind.TrainedEye or CraftActionKind.TrainedFinesse or CraftActionKind.DelicateSynthesis
         or CraftActionKind.PreciseTouch or CraftActionKind.HastyTouch;
@@ -85,7 +87,7 @@ public static class CraftSimulation
             or CraftActionKind.IntensiveSynthesis or CraftActionKind.RapidSynthesis;
         var nonStep=NonStep(kind);
         var favourable=condition is CraftStepCondition.Good or CraftStepCondition.Excellent;
-        var needsFavourable=kind is CraftActionKind.IntensiveSynthesis or CraftActionKind.PreciseTouch or CraftActionKind.TricksOfTheTrade;
+        var needsFavourable=NeedsFavourable(kind);
         var cp=spec?.Cp ?? 0;
         if(kind==CraftActionKind.StandardTouch && state.TouchCombo==1 || kind==CraftActionKind.AdvancedTouch && state.TouchCombo==2) cp=18;
         // A-07 (0.435): Pliant halves the CP cost, rounded up.
@@ -93,7 +95,7 @@ public static class CraftSimulation
         error=spec is null ? "Action non prise en charge." : stats.Level<spec.Level ? "Level too low for this action."
             : kind==CraftActionKind.Manipulation && !stats.ManipulationAllowed ? "Use of Manipulation not confirmed in the scenario."
             : (kind is CraftActionKind.MuscleMemory or CraftActionKind.Reflect or CraftActionKind.TrainedEye) && state.Step!=0 ? "Action reserved for the first step."
-            : kind==CraftActionKind.TrainedEye && stats.Level<recipeLevel+10 ? "Quick Innovation needs ten levels more than the recipe."
+            : kind==CraftActionKind.TrainedEye && stats.Level<recipeLevel+10 ? "Trained Eye needs ten levels more than the recipe."
             : (kind is CraftActionKind.PrudentSynthesis or CraftActionKind.PrudentTouch) && state.WasteNot>0 ? "Action incompatible with Waste Not."
             : kind==CraftActionKind.TrainedFinesse && state.InnerQuiet!=10 ? "Ten stacks of Inner Quiet required."
             : kind==CraftActionKind.TrainedPerfection && state.UsedTrainedPerfection ? "Trained Perfection can be used only once per synthesis."

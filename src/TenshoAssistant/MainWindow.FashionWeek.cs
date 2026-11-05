@@ -184,7 +184,7 @@ internal sealed partial class MainWindow
             // golden frame when hovered or open; every slot, also those without a category this week.
             // The slot icon is the square at the mannequin side of the row: right end for the left column, left end for the right one.
             var icon=FashionSlotIcon(rect,slot);
-            ImGui.SetNextWindowPos(new Vector2(icon.X,icon.Y),ImGuiCond.Always);
+            ImGui.SetNextWindowPos(new Vector2(icon.X,icon.Y)+WindowMoved("FashionCheck",frame.X,frame.Y),ImGuiCond.Always);
             ImGui.SetNextWindowSize(new Vector2(icon.Width,icon.Height),ImGuiCond.Always);
             ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding,Vector2.Zero);
             try
@@ -229,24 +229,18 @@ internal sealed partial class MainWindow
         if(fashionData.State.Dataset is null && !fashionAutoFetched && !fashionData.State.Loading){fashionAutoFetched=true;_=fashionData.RequestAsync();}
         RefreshRecipeHoldingsCache();
         var width=340f;var height=320f;
-        var anchor=frame.Slots is { } rects && slot<rects.Count && rects[slot].Height>0 ? rects[slot].Y:frame.Y;
-        var x=slot<6 ? frame.X-width-6:frame.X+frame.Width+6;
+        var moved=WindowMoved("FashionCheck",frame.X,frame.Y);
+        var anchor=(frame.Slots is { } rects && slot<rects.Count && rects[slot].Height>0 ? rects[slot].Y:frame.Y)+moved.Y;
+        var x=(slot<6 ? frame.X-width-6:frame.X+frame.Width+6)+moved.X;
         var screen=ImGui.GetMainViewport().WorkSize;
-        ImGui.SetNextWindowPos(new Vector2(Math.Clamp(x,0,Math.Max(0,screen.X-width)),Math.Clamp(anchor,0,Math.Max(0,screen.Y-height))),ImGuiCond.Always);
-        ImGui.SetNextWindowSize(new Vector2(width,height),ImGuiCond.Always);
         var category=slot<frame.Categories.Count ? frame.Categories[slot]:"";
         var title=$"{localization.Get("FashionWeek.Slot"+slot)} · {(category.Length>0 ? category:localization.Get("FashionWeek.NoCategory"))}";
-        var open=true;
-        var visible=ImGui.Begin(title+"###TenshoFashionSlotWindow",ref open,ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove);
-        try
+        Panels?.Show("TenshoFashionSlotWindow",title,ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove,()=>{ImGui.SetNextWindowPos(new Vector2(Math.Clamp(x,0,Math.Max(0,screen.X-width)),Math.Clamp(anchor,0,Math.Max(0,screen.Y-height))),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(width,height),ImGuiCond.Always);},()=>
         {
-            if(!open){fashionOpenSlot=-1;return;}
-            if(!visible)return;
             if(fashionData.State.Dataset is null)ImGui.TextDisabled(localization.Get(fashionData.State.Loading ? "FashionUi.Loading":fashionData.Disabled ? "FashionUi.SourceOff":"FashionUi.NeedFetch"));
             DrawFashionSlotBody(frame,slot,true);
             ImGui.Separator();
             ImGui.TextDisabled(localization.Get("FashionWeek.PanelSource"));
-        }
-        finally{ImGui.End();}
+        },()=>fashionOpenSlot=-1);
     }
 }

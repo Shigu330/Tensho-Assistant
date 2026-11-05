@@ -12,9 +12,10 @@ internal sealed partial class MainWindow
     {
         NotebookSource?.Want();
         var notebook=NotebookSource?.State;
-        if(notebook is null){ImGui.TextDisabled(localization.Get("Notebooks.Reading"));return null;}
+        if(notebook is null){ImGui.TextDisabled(localization.Get(NotebookSource?.Unavailable==true ? "Notebooks.Unavailable":"Notebooks.Reading"));return null;}
         var fishing=notebook.Count(NotebookKind.Fishing);var spear=notebook.Count(NotebookKind.Spearfishing);var gathering=notebook.Count(NotebookKind.Gathering);
         ImGui.TextDisabled(localization.Format("Notebooks.Counts",fishing.Done,fishing.Total,spear.Done,spear.Total,gathering.Done,gathering.Total));
+        if(notebook.GatheringUnavailable)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Notebooks.GatheringUnavailable"));
         ImGui.Checkbox(localization.Get("Notebooks.HideDone")+"##HideDone",ref sourceHideDone);
         Tip("Notebooks.HideDoneTip");
         ImGui.SameLine();

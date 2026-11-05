@@ -78,7 +78,8 @@ internal sealed class CraftLiveReader : IDisposable
                 if(numbers is {Condition:<=3,Expert:false} && (uint)condition==numbers.Condition+1 && (nativeFlags&9)==0 && actions.State.Catalog is { } actionCatalog)
                 {
                     var manager=ActionManager.Instance();
-                    if(manager!=null)
+                    // R-14 (0.507): a lost function leaves the availability unknown (the comparison says so), and the rest of the reading stands.
+                    if(manager!=null && (nint)ActionManager.MemberFunctionPointers.GetActionStatus!=0)
                     foreach(var spec in CraftActionCatalog.Specs)
                     {
                         if(actionCatalog.Find(local.ClassJob.RowId,spec.Kind) is not { } metadata)continue;
@@ -90,11 +91,15 @@ internal sealed class CraftLiveReader : IDisposable
                 var copiedEffects=effects.Select(effect=>new CraftLiveEffect(Text(effect.Name),Text(effect.StepsRemaining))).Where(effect=>effect.Name.Length>0).ToArray();
                 var statuses=new List<CraftLiveStatus>();
                 var statusCount=0;
-                var statusLength=local.StatusList.Length;
+                // 0.452 (R-14): Dalamud's enumerator skips empty slots while Length counts them, so « every slot read » was almost never true and the
+                // live projection never ran. Each slot is read by index: complete means read, not occupied.
+                var statusList=local.StatusList;
+                var statusLength=statusList.Length;
                 if(statusLength is <1 or >60)throw new InvalidOperationException("Incompatible status list length.");
-                foreach(var status in local.StatusList)
+                for(var index=0;index<statusLength;index++)
                 {
-                    if(statusCount++==60)throw new InvalidOperationException("Too many statuses observed.");
+                    if(statusList[index] is not { } status)throw new InvalidOperationException("Incompatible status list length.");
+                    statusCount++;
                     if(status.StatusId!=0)statuses.Add(new(status.StatusId,status.Param,status.RemainingTime));
                 }
                 var raw=new CraftLiveRaw(recipe,handler->ItemResult,handler->CraftType,step,(byte)condition,(byte)handler->CraftFlags,(uint)handler->StateFlags,

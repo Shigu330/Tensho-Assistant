@@ -24,6 +24,9 @@ public sealed unsafe class GearLoader : IDisposable
     private string? lastError;
 
     public GearCatalog? Catalog=>Volatile.Read(ref catalog);
+    private volatile bool catalogFailed;
+    /// <summary>0.492 (R-14): the catalog could not be built (a sheet changed after a game update): the pages say so, not « loading ».</summary>
+    public bool CatalogFailed=>catalogFailed;
     public IReadOnlyList<EquippedPiece> Equipped=>Volatile.Read(ref equipped);
     /// <summary>0.331 (R-14): the last read of the worn gear failed (perhaps after a game update); Equipped is then empty, not the old set.</summary>
     public bool Unavailable=>unavailable;
@@ -36,9 +39,16 @@ public sealed unsafe class GearLoader : IDisposable
         {
             try{Volatile.Write(ref catalog,Build(token));}
             catch(OperationCanceledException){}
-            catch(Exception error){log.Warning(error,"Tensho gear catalog could not be built.");}
+            catch(Exception error){catalogFailed=true;log.Warning(error,"Tensho gear catalog could not be built.");}
         },token);
         framework.Update+=OnUpdate;
+    }
+
+    // R-14 (0.507): a sheet that only adds a part of the page costs that part, not the whole gear page.
+    private T Optional<T>(string what,Func<T> read,T fallback)
+    {
+        try{return read();}
+        catch(Exception error) when(error is not OperationCanceledException){log.Warning(error,"Gear data: {0} unavailable.",what);return fallback;}
     }
 
     private GearCatalog Build(CancellationToken token)
@@ -118,11 +128,11 @@ public sealed unsafe class GearLoader : IDisposable
                 .Where(entry=>entry.ItemId!=0 && entry.Value>0).ToArray()))
             .Where(kind=>kind.Grades.Count>0).ToArray();
         // 0.338 (DEC-023, point 8): overmeld success rates, row = materia grade, one column per advanced socket.
-        var combatRates=data.GetExcelSheet<MateriaJoinRate>().ToDictionary(row=>(int)row.RowId,row=>new OvermeldRate(row.NQOvermeldPercentSlot.ToArray(),row.HQOvermeldPercentSlot.ToArray()));
-        var craftRates=data.GetExcelSheet<MateriaJoinRateGatherCraft>().ToDictionary(row=>(int)row.RowId,row=>new OvermeldRate(row.NQOvermeldPercentSlot.ToArray(),row.HQOvermeldPercentSlot.ToArray()));
-        var bardings=data.GetExcelSheet<BuddyEquip>().Where(row=>!row.Name.IsEmpty)
+        var combatRates=Optional("overmeld rates",()=>data.GetExcelSheet<MateriaJoinRate>().ToDictionary(row=>(int)row.RowId,row=>new OvermeldRate(row.NQOvermeldPercentSlot.ToArray(),row.HQOvermeldPercentSlot.ToArray())),new Dictionary<int,OvermeldRate>());
+        var craftRates=Optional("crafter overmeld rates",()=>data.GetExcelSheet<MateriaJoinRateGatherCraft>().ToDictionary(row=>(int)row.RowId,row=>new OvermeldRate(row.NQOvermeldPercentSlot.ToArray(),row.HQOvermeldPercentSlot.ToArray())),new Dictionary<int,OvermeldRate>());
+        var bardings=Optional("bardings",()=>data.GetExcelSheet<BuddyEquip>().Where(row=>!row.Name.IsEmpty)
             .Select(row=>new BardingSet(row.RowId,row.Name.ExtractText(),row.IconHead,row.IconBody,row.IconLegs,row.GrandCompany.RowId,row.Order,bardingItems.GetValueOrDefault(row.RowId)))
-            .ToArray();
+            .ToArray(),Array.Empty<BardingSet>());
         return new GearCatalog(items,materia,combatRates,craftRates,bardings);
     }
 

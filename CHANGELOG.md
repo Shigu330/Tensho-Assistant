@@ -3,6 +3,805 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.539.0
+- Rapport de l'utilisateur en jeu : en déplaçant une fenêtre du jeu, le panneau de Tensho lié à elle suivait avec du retard, car sa position venait des lecteurs, rafraîchis 5 fois par seconde (1 fois pour le personnage). Un nouveau lecteur `UI/GameWindowFollower.Dalamud.cs` relit à chaque tick la seule position des fenêtres dont un panneau est affiché ; rien n'est lu quand aucun panneau ne le demande. Panneaux concernés : récolte, objets de collection, pêche au harpon, personnage, mission, carnet d'artisanat, Fashion Report, Triple Triade, import de banque.
+- Rapport de l'utilisateur en jeu : nos panneaux liés ne faisaient pas disparaître la carte (réglage « S'effacer devant les fenêtres du jeu »), alors que leur fenêtre le fait. Ils comptent maintenant, ainsi que le panneau de survol ; les panneaux placés librement (pêche, voyage en mer) ne comptent pas. Précision de l'utilisateur : la fenêtre principale de Tensho ne doit pas faire disparaître la carte ; c'est le cas, et un test le garde.
+- Demande de l'utilisateur : un délai avant le retour de la carte : elle part aussitôt et revient 1 seconde après que plus rien n'est devant, pour ne pas clignoter d'une infobulle à l'autre. Les autres panneaux et les barres ne changent pas.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1004/1004, 0 avertissement, 0 erreur ; DLL 0.539.0.0. Validé en jeu (rapport de l'utilisateur, 2026-11-05, « tous es ok ») : les panneaux suivent, la carte s'efface devant eux et revient après le délai.
+### English
+- Attached panels now follow their game window every tick instead of lagging behind it when it moves.
+- The map also steps aside for attached panels, and comes back one second after nothing is in front of it.
+
+## 0.538.0
+- Rapport de l'utilisateur en jeu (capture) : l'infobulle d'un objet du jeu passait sous la carte, car 0.537 ignorait les infobulles et les menus. Ils comptent maintenant comme les fenêtres. Le panneau de survol de Tensho, lui, reste affiché avec l'infobulle. 0.537 validée sur les fenêtres (« fenêtre ok »).
+- Tests : Interfaces535Tests adapté. Verify.ps1 (agent) : 1003/1003, 0 avertissement, 0 erreur ; DLL 0.538.0.0. Non validé en jeu.
+### English
+- Game tooltips and context menus now count too: an interface steps aside when one touches it.
+
+## 0.537.0
+- Demande de l'utilisateur en jeu, avec réglages : les interfaces de Tensho s'effacent quand une fenêtre du jeu passe devant, et reviennent ensuite ([relevé](docs/evidence/0.537-game-windows.md)). Le jeu ne peut pas dessiner par-dessus : c'est l'interface entière qui se cache.
+- Panneaux accrochés à une fenêtre du jeu : seulement ce qui passe devant leur fenêtre (activé par défaut). Barres et panneaux libres : ce qui les touche (activé par défaut). Carte : ce qui la touche (Paramètres de la carte, désactivé par défaut, car elle part en entier). Le bouton Trier suit la même règle, sans réglage.
+- Tests : Interfaces535Tests, avec les cas des captures. Verify.ps1 (agent) : 1003/1003, 0 avertissement, 0 erreur ; DLL 0.537.0.0. Non validé en jeu.
+### English
+- Tensho's panels, bars and, on a setting, the map step aside when a game window comes in front, and come back after. Three settings; the map's is off by default.
+
+## 0.536.0
+- Rapport de l'utilisateur en jeu (deux captures) : Trier faisait l'inverse : il restait sur le Bestiaire passé devant, et partait quand l'inventaire était devant. Dans une couche du jeu, la liste va de l'avant vers l'arrière ; le test était à l'envers.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1003/1003, 0 avertissement, 0 erreur ; DLL 0.536.0.0. Non validé en jeu.
+### English
+- The sort button now leaves when a game window is in front of the inventory: the order test was the wrong way round.
+
+## 0.535.0
+- Demandes de l'utilisateur en jeu.
+- Équilibré grisé ne se choisit plus. Un Équilibré enregistré s'affiche comme Sûr sur ce nœud, puisque c'est la même chose, et revient sur le nœud suivant où il a son plan.
+- Carte : réglage « Sans barre de titre », désactivé par défaut. Elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte.
+- Interfaces : tout panneau qui a une barre de titre peut se réduire et se fermer. Fermé, il reste fermé jusqu'à ce que la fenêtre du jeu parte. Le panneau de banque gagne une barre de titre. Restent sans : barres d'usure et de PR, survol d'objet, bouton Trier, qui dépendent de leur réglage ou de leur fenêtre.
+- Trier : le bouton disparaît quand une fenêtre du jeu passe devant, d'après l'ordre d'affichage du jeu ; les éléments du HUD et les grilles de l'inventaire ne comptent pas. Non vérifié en jeu : le nom de la fenêtre des filtres de tri ; le journal de débogage dit lesquelles comptent.
+- Tests : Interfaces535Tests. Verify.ps1 (agent) : 1003/1003, 0 avertissement, 0 erreur ; DLL 0.535.0.0. Non validé en jeu.
+### English
+- Balanced cannot be chosen while greyed. The map can drop its title bar (setting). Panels with a title bar can be collapsed and closed, staying closed until their game window goes away. The sort button hides when a game window covers it.
+
+## 0.534.0
+- Choix de l'utilisateur, sur « sûr et équilibré exactement pareil » : l'icône d'Équilibré se grise quand elle donne la même chose que Sûr sur ce nœud, et son infobulle le dit. Elle reste cliquable. Calculé sur 40 situations : 18 n'ont qu'un résultat possible, 11 en ont deux, 11 en ont trois ; le risque y rapporte souvent 1 à 3 assignats en moyenne pour un plancher bien plus bas.
+- Les crans partent des plans que le nœud offre vraiment. Sûr prend le plancher le plus haut et, à plancher égal, la meilleure moyenne. Équilibré ne descend que si la moyenne gagne au moins la moitié de ce que le plancher perd : par exemple 20/38,3 devient 14/43,0, mais 20/43,9 reste devant 14/45,2.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.534.0.0. Non validé en jeu.
+### English
+- The Balanced icon is greyed when it gives the same as Safe on this node, and its tooltip says so. Safe takes the highest floor with the best average; Balanced lowers the floor only when the average gains at least half of what the floor loses.
+
+## 0.533.0
+- Demande de l'utilisateur (« il faut aussi la liste des skills utilisés pour chaque cap, il donne que pour Sûr ») : chaque cran montre maintenant ses coups, sans coup de chance, avec les PR qu'ils dépensent : par exemple, sur le nœud des captures à 625 PR, cran « Tentez votre chance » : « Sélection méthodique ×3 → Sagesse du fermier → Sélection méthodique → Sagesse du fermier → Sélection méthodique → Récolte. 600 PR sur 625 ». La suite vient du calcul du cran choisi, recalculée à chaque tour. Elle remplace les lignes propres à Sûr.
+- Tests : Gathering478Tests complété (coups, PR et tentatives sur chaque cran). Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.533.0.0. Non validé en jeu.
+### English
+- Every risk step now lists its moves and the GP they spend, on the line where no roll brings anything extra.
+
+## 0.532.0
+- Rapport de l'utilisateur en jeu (trois captures, « texte répétitif sur les mêmes pages ») : le même chiffre revenait jusqu'à quatre fois. Chaque ligne dit maintenant ce que les autres ne disent pas : la référence du palier haut et « Sur Sûr » n'apparaissent que si leur chiffre diffère de la phrase du cran ; le nombre d'assignats par récolte n'est plus répété. Ce qui vaut sur tous les nœuds (tentative gratuite, Œil et Toucher) passe dans l'infobulle « Comment est-ce calculé ? ».
+- Les captures montraient aussi Équilibré sous Sûr (40,2 contre 43,9, même plancher de 20). Tous les crans gardent maintenant leur plancher avec la meilleure moyenne, pour tous les PR essayés.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.532.0.0. Non validé en jeu.
+### English
+- The Collectable panel no longer repeats the same figure: each line says what the others do not, and what holds on every node moved to the tooltip. A step never earns less than a safer one for the same floor.
+
+## 0.531.0
+- Rapport de l'utilisateur en jeu (trois captures, « desc ne colle pas au changement ») : la description restait générale alors que les chiffres changeaient. Elle dit maintenant ce que le cran donne sur ce nœud : par exemple « Garde au moins 40 assignats, et vise 70,2 en moyenne ». Elle remplace la ligne « Avec ces coups ».
+- Les captures montraient aussi un défaut : Sûr donnait 65,9 en moyenne et Équilibré 70,2, avec le même plancher de 40. Sûr ne regardait que le plancher. À plancher égal, il prend maintenant la meilleure moyenne.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.531.0.0. Non validé en jeu.
+### English
+- The risk step's description now gives this node's figures. Safe now takes the better average between moves with the same floor.
+
+## 0.530.0
+- Demande de l'utilisateur (capture : « Tentez votre » coupé) : les crans de risque deviennent trois icônes, le nom dans l'infobulle : une main qui tient un objet (Sûr), une balance (Équilibré, ex-Incertain), un dé (Tentez votre chance). Le cran choisi est coloré.
+- Tests : Gathering478Tests adapté. Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.530.0.0. Non validé en jeu.
+### English
+- The collectable risk steps are now three icons with their name in the tooltip: a hand holding an item (Safe), a scale (Balanced), a die (Try your luck).
+
+## 0.529.0
+- Demande de l'utilisateur (« suive des caps plutôt que % », avec une description) : le risque du plan des collectionnables n'est plus un pourcentage, mais trois crans décrits : Sûr (0), Incertain (50), Tentez votre chance (100). Une valeur enregistrée va au cran le plus proche. Même choix dans les paramètres.
+- Un seul plan à l'écran, celui du cran choisi. Les deux plans se mêlaient : le coup conseillé suivait la moyenne, les lignes « Avant elles » et « Ce plan dépense » le plan sans chance. Ces lignes ne s'affichent plus que sur « Sûr » ; ailleurs, une ligne dit ce que « Sûr » garantirait.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 1000/1000, 0 avertissement, 0 erreur ; DLL 0.529.0.0. Non validé en jeu.
+### English
+- The collectable plan's risk is now three described steps: Safe, Uncertain, Try your luck. Only the chosen step's plan is shown, instead of two plans mixed together.
+
+## 0.528.0
+- Capture de l'utilisateur : la prochaine action du panneau Collectionnable était coupée à sa largeur (« … sur la prochaine actio »), comme la ligne des seuils. Elles passent à la ligne.
+- Calcul relu sur la capture, 727 PR sans Inspection active : Inspection d'abord, 65,1 assignats en moyenne, comme prévu ([calcul](docs/evidence/0.527-priming-touch.md)). La consigne d'essai de Toucher était impraticable avec 823 PR au plus : corrigée.
+- Tests : GpCrystals519Tests complété. Verify.ps1 (agent) : 999/999, 0 avertissement, 0 erreur ; DLL 0.528.0.0. Non validé en jeu.
+### English
+- The Collectable panel's next action and thresholds now wrap at its width instead of being cut.
+
+## 0.527.0
+- Rapport de l'utilisateur en jeu (captures) : le plan des collectionnables ne proposait ni Œil du collectionneur ni Toucher d'amorçage. Toucher n'existait pas dans le calcul : il y entre, à ×2 sur Sélection méthodique, confirmé par la capture (24 → 48 %). Œil y était déjà (40 → 70 %, confirmé aussi).
+- Les deux ne sont proposés que s'ils rapportent plus que les mêmes PR ailleurs, et le panneau le dit. Sur la capture, à 623 PR avec Inspection active, ce n'est pas le cas : deux tentatives rendues valent plus. À 423 ou 723 PR, Toucher est conseillé ([calcul](docs/evidence/0.527-priming-touch.md)).
+- Réglage ajouté : Paramètres › Modules › Récolte, Toucher d'amorçage dans le plan.
+- Tests : Gathering478Tests complété, dont le nœud de la capture. Verify.ps1 (agent) : 998/998, 0 avertissement, 0 erreur ; DLL 0.527.0.0. Non validé en jeu.
+### English
+- Priming Touch now counts in the collectable plan (doubles the chance of a free Meticulous, confirmed in game). It and Collector's Focus are advised only when they earn more than the same GP elsewhere, and the panel says so.
+
+## 0.526.0
+- Demande de l'utilisateur : Collections ne couvrait pas les légendes locales. Nouvel onglet avec les 36 tomes de mineur, botaniste et pêcheur, lu ou non, et comment obtenir chacun ([preuve](docs/evidence/0.526-folklore-tomes.md)).
+- La carte (0.518) ne voyait pas le douzième tome : FFXIVClientStructs déclare 11 bits, le tome d'Alexandrie est le bit 11. La lecture passe par les octets.
+- Tests : Folklore526Tests. Verify.ps1 (agent) : 997/997, 0 avertissement, 0 erreur ; DLL 0.526.0.0. Non validé en jeu.
+### English
+- Collections has a new Folklore tab: the 36 tomes of miner, botanist and fisher, read or not, with how to obtain each. The map now also sees the twelfth tome of each job.
+
+## 0.525.0
+- Rapport de l'utilisateur en jeu (« les saccades pour les déplacements des membres de mon groupe sur la carte ») : le groupe n'était lu que deux fois par seconde, et un membre hors de vue ne reçoit sa position du jeu que de temps en temps. Lu dix fois par seconde, position exacte quand le membre est en vue, et le repère glisse entre deux positions (`MapPartySmoother`). Un grand saut, comme une téléportation, reste direct.
+- Rapport de l'utilisateur en jeu (« le jeu lag au chargement du plugin ») : mesuré ([preuve](docs/evidence/0.525-load-cost.md)). La coupure de 1,2 à 1,9 s est une collecte complète de .NET, qui arrête tout le jeu, sur 2 rechargements sur 3 relevés ; le plugin ne la demande pas. Démarrage du jeu pas encore mesuré : une ligne « Load » du journal le dira. Corrigé : les données de vaisseaux se construisent hors du thread du framework (85 à 175 ms de moins).
+- Reste à chaque chargement : première image 200 à 400 ms, journal des gils 80 ms. Rapport de l'utilisateur ensuite : désactiver puis réactiver le plugin ne donne aucun lag, et Ctrl+Alt marche (0.524 validée en jeu).
+- Tests : PartyAndLoad525Tests. Verify.ps1 (agent) : 995/995, 0 avertissement, 0 erreur ; DLL 0.525.0.0. Non validé en jeu.
+### English
+- Party members now glide on the map: read ten times a second, exact position when in view, smoothed between positions, a teleport stays a jump.
+- Load cost measured: the long pause is a full .NET collection, not requested by the plugin. Voyage data is now built off the framework thread, and a log line reports the cost of each load.
+
+## 0.524.0
+- Rapport de l'utilisateur en jeu (« ctrl alt fonctionne pas pour actualiser les prix ») ; 0.523 validée (« c'est ok »). Cause : l'appui ne dure qu'un tic, et la borne de 5 s entre deux demandes se consommait à chaque tic, demande ou pas : ils ne tombaient presque jamais ensemble, depuis 0.343.
+- L'appui attend maintenant la borne, et seule une vraie demande la consomme. La pause de 3 s du marché ne le perd plus non plus : il attend le créneau suivant. Changer d'objet oublie l'appui. L'heure « Récupéré à » montre les secondes, sinon une actualisation dans la minute ne se voyait pas.
+- Tests : HoverPrices343Tests adapté. Verify.ps1 (agent) : 992/992, 0 avertissement, 0 erreur ; DLL 0.524.0.0. Non validé en jeu.
+### English
+- Ctrl+Alt now refreshes the hovered price: the key press lasted one tick while the 5 s bound was used up on every tick, so they almost never met. The fetched time now shows seconds.
+
+## 0.523.0
+- Rapport de l'utilisateur en jeu (capture, Noix de coco et Rondin de palmier collectionnables) : l'aide à la récolte ne donnait pas les assignats pour choisir le meilleur. Chaque collectionnable du nœud montre ses assignats par palier, et celui qui paie le plus au palier haut est marqué.
+- Le marquage ne compare que des assignats du même type (colonne Currency de la feuille) ; sinon le panneau le dit. Le nom du type reste inconnu, comme relevé en 0.409 (`docs/evidence/0.409-collectables.md`).
+- Tests : GpCrystals519Tests complété. Verify.ps1 (agent) : 991/991, 0 avertissement, 0 erreur ; DLL 0.523.0.0. Non validé en jeu.
+### English
+- The gathering help now shows each collectable's scrips per tier and marks the one paying the most at the high tier, between scrips of the same kind only.
+
+## 0.522.0
+- Rapport de l'utilisateur en jeu (capture) : Bénédiction de la nature restait proposée pendant son temps de recharge, 180 s d'après la feuille du jeu ([preuve](docs/evidence/0.519-crystal-actions.md)). Elle n'est plus conseillée tant qu'elle recharge, ses PR restent pour Bénédiction des Douze, et une ligne dit dans combien de secondes elle revient. Temps lu dans le jeu ; s'il ne peut pas être lu, rien ne change.
+- Parmi les actions à PR de récolte, c'est la seule à avoir un temps de recharge : le plan des autres objets n'est pas touché.
+- Tests : GpCrystals519Tests complété. Verify.ps1 (agent) : 990/990, 0 avertissement, 0 erreur ; DLL 0.522.0.0. Non validé en jeu.
+### English
+- Nature's Bounty is no longer advised during its 180 s recast: its GP stays for The Twelve's Bounty, and a line says when it is back.
+
+## 0.521.0
+- Rapport de l'utilisateur en jeu : Bénédiction des Douze change aussi la quantité sur les cristaux, comme Bénédiction de la nature, alors que le texte du jeu ne parle que des éclats. Le panneau propose les deux sur les éclats, les cristaux et les agrégats, selon le niveau et les PR.
+- Tests : GpCrystals519Tests adapté. Verify.ps1 (agent) : 989/989, 0 avertissement, 0 erreur ; DLL 0.521.0.0. Non validé en jeu.
+### English
+- The Twelve's Bounty and Nature's Bounty are now both proposed on shards, crystals and clusters, as reported in game.
+
+## 0.520.0
+- Rapport de l'utilisateur en jeu (capture de Sagesse du fermier, « pas pris en compte ») : le plan des collectionnables comptait la tentative rendue, mais pas son effet additionnel, 50 % de chances d'une tentative gratuite (niveau 90 et plus). Sur la capture : 136 en moyenne, soit 4 × 34.
+- La moyenne le compte maintenant (153 sur ce cas), jamais le pire cas (136) ; une ligne du panneau le dit. Si Étalage des connaissances est déjà prêt (statut 2765), la tentative gratuite compte pour de bon et passe avant la dernière récolte, qui fermerait le nœud.
+- Lecture de l'utilisateur à confirmer : c'est bien l'effet à 50 % qui manquait, la tentative elle-même figurait déjà au plan.
+- Tests : Gathering478Tests complété, dont le cas de la capture. Verify.ps1 (agent) : 989/989, 0 avertissement, 0 erreur ; DLL 0.520.0.0. Non validé en jeu.
+### English
+- The collectable plan now counts Solid Reason's and Ageless Words' 50 % chance of a free attempt in its average, never in its worst case. A free attempt already ready counts for sure and comes before the last gather.
+
+## 0.519.0
+- Rapport de l'utilisateur en jeu (captures) : sur un Cristal de vent, le plan proposait Récolte royale II et Extraction abondante ×3, « ≈ 15 objets », alors que le jeu en donne 8 à 30 par récolte et que les actions propres aux cristaux n'étaient pas proposées ([preuve](docs/evidence/0.519-crystal-actions.md)).
+- Éclats, cristaux et agrégats (catégorie d'objet du jeu) : le panneau propose Bénédiction de la nature, et Bénédiction des Douze pour les éclats seulement comme le dit son texte, selon le niveau et les PR. Aucune quantité n'est calculée : le jeu ne donne pas de chiffre.
+- Tests : GpCrystals519Tests. Verify.ps1 (agent) : 988/988, 0 avertissement, 0 erreur ; DLL 0.519.0.0. Non validé en jeu.
+### English
+- Shards, crystals and clusters now get their own actions in the gathering help (Nature's Bounty, and The Twelve's Bounty on shards), with no computed amount: the game gives no figure, and the old estimate was far from the real yields.
+
+## 0.518.0
+- Rapport de l'utilisateur en jeu (capture) : carte, point d'Ostrakon Dékaokto « ouvert maintenant » alors qu'il n'est pas là. Cause : la ligne ne parlait que des heures ; ce point légendaire demande un tome ([preuve](docs/evidence/0.518-gather-tomes.md)).
+- Infobulle et liste de la carte : « ouvert, mais pas encore pour vous » et le nom du tome quand il n'est pas lu ; l'horloge du point passe en gris, et il sort des repères au bord de la carte. Si le niveau du métier est sous celui du point, le panneau l'écrit.
+- Les tomes lus et les niveaux sont copiés toutes les dix secondes sur le thread du framework ; inconnu ne dit rien.
+- Tests : GatherPointAccess518Tests. Verify.ps1 (agent) : 986/986, 0 avertissement, 0 erreur ; DLL 0.518.0.0. Non validé en jeu.
+### English
+- Map: a legendary gathering point was shown « open now » although the character has not read its tome. The tooltip now says so and names the tome, its clock turns grey and it leaves the edge markers. It also says when the job's level is under the point's.
+
+## 0.517.0
+- Rapport de l'utilisateur en jeu (capture, « plan toujours pas fonctionnel ») : 809 PR, 54 %, aucune action proposée. Vraie cause, que 0.515 ne corrigeait pas : le filtre des actions non apprises (0.488) demandait à Dalamud si l'action était débloquée, et Dalamud répond non quand elle n'a pas de lien de déblocage, soit 22 actions sur 24 ([preuve](docs/evidence/0.517-gp-action-unlocks.md)). Elles comptent maintenant comme acquises au niveau.
+- Même défaut pour les traits de regain de PR sans quête : ils comptent au niveau du métier.
+- Sans Extraction abondante II (quête), le plan prend la première, qui existe toujours.
+- Cristaux : le « ? » restait ; le jeu donne un tiret sans le signe %, il se lit maintenant « 0 % ».
+- Tests : GatherNodeEffects515Tests complété, dont le cas de la capture. Verify.ps1 (agent) : 984/984, 0 avertissement, 0 erreur ; DLL 0.517.0.0. Non validé en jeu.
+### English
+- The GP plan proposed nothing since 0.488: Dalamud answers « not unlocked » for an action without an unlock link, and 22 of the 24 gathering actions have none. They now count as learned at their level, and GP regeneration traits without a quest likewise.
+- Without Bountiful Yield II the plan uses the first one. A crystal's dash now reads as no extra chance.
+
+## 0.516.0
+- Décision de l'utilisateur (issue #38, règle Dalamud : « si ça ressemble à une fenêtre, utiliser l'API de fenêtres ») : les panneaux accrochés à une fenêtre du jeu passent aussi par le système de fenêtres de Dalamud : import de banque, Personnage, collectionnable, carnet d'artisanat, projection, outil de mission, Revue de mode, pêche, récolte, bouton de tri, survol d'objet, pêche en mer, ventes des servants, harpon, demande de Triple Triade.
+- Comment : un hôte commun (`AttachedPanels`). Chaque panneau décide encore à chaque image s'il s'affiche, puis demande sa fenêtre ; leur contenu ne change pas, mêmes identifiants. Dans `Plugin.Draw`, les panneaux passent maintenant avant `windows.Draw()`. Échap ne les ferme pas, ils ne s'épinglent pas, et une erreur ne coupe que le panneau concerné. Seule exception : les zones de clic invisibles de la Revue de mode, qui ne ressemblent pas à une fenêtre.
+- Tests : AttachedPanels516Tests (aucun `ImGui.Begin` hors de ces zones). Verify.ps1 (agent) : 982/982, 0 avertissement, 0 erreur ; DLL 0.516.0.0. Non validé en jeu. Sauvegarde : `checkpoints/backup-20261104-224219-before-panel-windows.zip`.
+### English
+- The panels attached to a game window now use the Dalamud window system too, through one shared host. Their contents and ids are unchanged; Escape does not close them, and a panel that throws turns off alone. Only exception: the invisible click zones of the Fashion Report.
+
+## 0.515.0
+- Rapport de l'utilisateur en jeu (capture, 5 tentatives, effet du lieu « PR ≧ 770 → tentatives +1 ») : l'aide à la récolte ne proposait rien avec 809 PR. Cause : le plan sur la liste de fabrication gardait les PR pour un « nœud à bonus majeur », et le premier nœud vu comptait toujours comme normal.
+- Décision de l'utilisateur (DEC-036) : plus de plan sur une série de nœuds. Retirés : répartition des PR, « garder les PR pour les nœuds à bonus », secondes entre deux nœuds (`GpRoutes`, `GatherNodeNorms`, 2 réglages). Le panneau montre le meilleur plan du nœud en cours. La ligne de la liste de fabrication reste, à la demande de l'utilisateur : ce qu'il manque et le nombre de nœuds comme celui-ci, à titre d'information.
+- Tous les effets du lieu lus dans les feuilles du jeu, dans ses mots ([preuve](docs/evidence/0.515-node-effects.md)) : actif, le panneau le dit (tentatives : « déjà compté dans le plan, 5 au lieu de 4 ») ; inactif, il dit ce qu'il manque et, pour les tentatives, la quantité, la chance supplémentaire et le taux de récolte, le rendement avec lui ; une condition illisible par Tensho est affichée sans état. La condition du jeu porte sur les PR maximum, donc dépenser ne la perd pas (texte anglais du jeu, « Max GP » ; le français dit seulement « PR »).
+- Cristaux : le jeu écrit « -% » pour la chance supplémentaire ; c'est aucune, plus « ? », et leur plan se calcule.
+- Tests : GatherNodeEffects515Tests, tests de route retirés. Verify.ps1 (agent) : 979/979, 0 avertissement, 0 erreur ; DLL 0.515.0.0. Non validé en jeu.
+### English
+- The gathering help no longer plans GP over a series of nodes: it shows the best plan for the node in front of you. This fixes a plan that spent nothing with 809 GP on a node with an extra attempt. The crafting list line stays, as information.
+- All node effects are read from the game's sheets, in the game's words: an active one is named, an inactive one says what is missing and, when it can be estimated, what it would give. A crystal's « -% » extra chance now reads as none.
+
+## 0.514.0
+- Demande de l'utilisateur (issue #38, règle Dalamud : « si ça ressemble à une fenêtre, utiliser l'API de fenêtres ») : fenêtre de suivi, tâches à l'écran, barre d'usure et barre de PR passent par le système de fenêtres de Dalamud (`PanelWindow`). Mêmes identifiants, donc positions gardées ; mêmes réglages. Échap ne les ferme pas (cela couperait le réglage). Une erreur ne coupe que le panneau concerné, comme avant, et le temps de dessin reste dans Diagnostics.
+- Vu en passant : pour le guide et la carte, `Plugin.Draw` recopie l'état dans `IsOpen` avant que `OnClose` puisse s'exécuter, ce qui peut annuler la croix de fermeture. L'état est maintenant écrit dès `PostDraw`, dans la même image. Déduit de la lecture du code et de la mémoire du fonctionnement de Dalamud, non observé en jeu.
+- Reste de l'issue #38 : relire les panneaux accrochés à une fenêtre du jeu.
+- Tests : PanelWindows514Tests. Verify.ps1 (agent) : 976/976, 0 avertissement, 0 erreur ; DLL 0.514.0.0. Non validé en jeu.
+### English
+- The tracker window, the on-screen tasks, the gear wear bar and the GP tick bar now use the Dalamud window system. Ids and settings are unchanged, so saved positions stay. Escape does not close them, and a panel that throws still turns off alone.
+- The guide and the map write their close button back in the same frame, so the next draw cannot undo it.
+
+## 0.513.0
+- Question de l'utilisateur : « pourquoi toucher aux alarmes ? ». Erreur de l'agent en 0.512 : les documents disaient que les alarmes du jeu partaient sans clic. Relu dans le code : les commandes `/alarm` partent toujours d'un clic (ajouter une alarme avec le réglage actif, ou « Envoyer ») et les alarmes automatiques n'en créent jamais. Aucun changement de code ; manifeste, PUBLISHING, SECURITY, CONTRIBUTING et brouillon de PR corrigés.
+- Tests : aucun changement de logique. Verify.ps1 (agent) : 972/972, 0 avertissement, 0 erreur ; DLL 0.513.0.0. Non validé en jeu.
+### English
+- Documents corrected: game alarms are only ever sent from a click (adding an alarm with the setting on, or Send); automatic alarms never create one. No code change.
+
+## 0.512.0
+- Demande de l'utilisateur : remettre tous les .md et GitHub à l'étape actuelle, et relever ce qui manque pour la 1.0.0.
+- Compilation chez Dalamud : leur conteneur utilise le SDK 10.0.101 sous Linux, réseau coupé ; `global.json` exigeait 10.0.403, Tensho n'y aurait pas compilé. Il accepte maintenant 10.0.100 et plus, `Verify.ps1` prend le SDK 10.x local le plus récent, et un job CI compile avec leur image et leur commande ([relevé](docs/evidence/0.512-d17-build.md), DEC-034).
+- Manifeste : Description réécrite (lignes coupées à la main, fonctions et réseau à jour, les deux réglages qui agissent sans clic sont nommés). `manifest.toml` : changelog à jour. Brouillon de PR relu contre le code.
+- Documents : STATUS raccourci, son historique déplacé dans `docs/ai/STATUS-ARCHIVE.md` ; GOAL, PUBLISHING (liste de ce qui reste, en ordre), ROADMAP, BACKLOG, TESTING, SECURITY, CONTRIBUTING, README (crédits : Raphael.Net, jardinage), CLAUDE.md, RULES, DECISIONS remis à jour.
+- Tests : aucun changement de logique. Verify.ps1 (agent) : 972/972, 0 avertissement, 0 erreur ; DLL 0.512.0.0. Non validé en jeu.
+### English
+- Build: the Dalamud repository compiles with SDK 10.0.101 on Linux, and `global.json` demanded 10.0.403, so the plugin could not have built there. It now accepts 10.0.100 and newer, and a new CI job builds with their image and command.
+- The manifest description is rewritten (wrapped by hand, up to date, naming the two settings that act without a click). All documents and GitHub issues now match the current stage; what remains for 1.0.0 is listed in `docs/project/PUBLISHING.md`.
+
+## 0.511.0
+- Relecture du code de l'après-midi, sans essai en jeu. Deux défauts corrigés : la page Aide restait dans l'ancienne langue après un changement de langue ; la liste des fenêtres sur l'accueil parcourait les collections à chaque image, elle ne le fait plus que toutes les deux secondes.
+- Tests : GuideFlowTests complété. Verify.ps1 (agent) : 972/972, 0 avertissement, 0 erreur ; DLL 0.511.0.0. Non validé en jeu.
+### English
+- The Help page follows a language change. The Home checklist no longer scans the collections on every frame.
+
+## 0.510.0
+- Décisions de l'utilisateur (DEC-033). Cadre des fenêtres du jeu retiré, code, réglage et textes (« rendu horrible »).
+- Conseils en JcE seulement : les conseils de match et les estimations de défi de Triple Triade ne valent plus que contre un PNJ, jamais au Battlehall, en tournoi ni contre un joueur. Le panneau le dit. Preuve : docs/evidence/0.510-triad-competitive.md.
+- Tests : TriadMatchAdvisorTests complété, GameFrame332Tests retiré. Verify.ps1 (agent) : 971/971, 0 avertissement, 0 erreur ; DLL 0.510.0.0. Non validé en jeu.
+### English
+- The game window frame option is removed. Triple Triad advice and odds now only apply against an NPC, never in the Battlehall, in a tournament or against a player.
+
+## 0.509.0
+- A-04 (DEC-028, issue #28), et suite de la remarque de l'utilisateur sur le bon coup selon l'état. « Comparer les prochains coups » conseille un coup, calculé d'après la synthèse telle qu'elle est : chaque coup permis par le jeu est joué sous l'état en cours, puis la suite est cherchée en condition normale. Affichage seulement, rien n'est joué. Hors du thread du jeu, annulé dès que l'état change, avec un réglage. Les actions interdites et les coups à chance ne sont pas proposés.
+- Limites : seul ce coup tient compte de l'état, le combo en cours est pris comme absent, et c'est une recherche limitée, pas une preuve. Le coût réel en jeu n'a pas été mesuré.
+- Tests : CraftProjectionTests complété ; CraftSolver découpé pour partir de n'importe quel état, ses tests existants passent. Verify.ps1 (agent) : 971/971, 0 avertissement, 0 erreur ; DLL 0.509.0.0. Non validé en jeu.
+### English
+- During a synthesis, the comparison now suggests a next move, worked out from the current state with the plugin's own search. Display only; it plays nothing. It has a setting and respects forbidden actions.
+
+## 0.508.0
+- I-05 (issue #26), première version : quand la liste de ventes d'un servant est ouverte, un panneau affiche vos objets et vos prix, tels que le jeu les montre. « Comparer aux autres vendeurs » demande à Universalis, sur clic seulement, les offres de votre monde d'origine : autre vendeur le plus bas, état de chaque ligne (sous-coté, même prix, le plus bas, aucun autre vendeur, inconnu). Un bouton copie le prix conseillé, rien d'autre n'est écrit.
+- Lecture seule : aucun prix n'est modifié, rien n'est déplacé. Vos propres servants ne comptent pas. Absence de données ou liste coupée : « inconnu », jamais « le plus bas ».
+- Écarts avec la conception, après sa relecture : prix lus dans la liste affichée et non dans le tableau partagé, requête sur clic seulement (décision laissée à l'utilisateur, G-PROPOSALS), service de requête à part. Preuve : docs/evidence/0.508-retainer-sales.md.
+- Tests : RetainerSalesTests (5 cas). Verify.ps1 (agent) : 969/969, 0 avertissement, 0 erreur ; DLL 0.508.0.0. **Non validé en jeu : la fenêtre n'a jamais été ouverte avec ce code.** Le journal note ce qu'il lit, pour le vérifier au premier essai.
+### English
+- Retainer sales, first version: beside a retainer's sale list, your items and prices as the game shows them. On a click, it compares them with other sellers through Universalis and can copy a price. It changes nothing in the game. Not validated in game yet.
+
+## 0.507.0
+- R-14 : fin de la relecture des constats de l'audit, un par un contre le code. Beaucoup étaient déjà corrigés par 0.452 à 0.454 (alarme, escouade, rappels, mandats, carte, macros, monnaies). Restaient, et sont corrigés :
+  - Une feuille facultative ne coûte plus que sa valeur : statistiques sans ParamGrow, rangements sans World, équipement sans taux de surmatérialisation ni bardes, survol sans la pile, une garde par feuille sur la carte (les marques de chasse n'y passaient plus en silence).
+  - Un lien cassé saute sa ligne, pas tout le catalogue : recettes, contenus, vendeurs.
+  - Une fonction perdue est dite ou refusée, une ancienne lecture ne reste pas affichée comme actuelle : demande de progression d'un succès, ouverture du carnet, état des actions, recettes fabriquées, mandats, carnet de chasse (rien avant le chargement du personnage), armoire. Une téléportation ratée ne vide plus la carte. Cartes de région : tout ou rien.
+  - Le cache suit aussi la version de Dalamud, et une capture de fenêtre n'est plus coupée par un saut de ligne.
+- Laissés en l'état, jugés sans effet réel : #35 (lecture de la pile, validée en jeu par l'utilisateur, le constat ne se vérifie pas), #5, #27, #29, #31, #44, #47, #64, #65, #66, #67, #70 (journal seulement, ou panneau déjà isolé par 0.452). Liste dans l'issue #25.
+- Tests : Resilience507Tests (4 cas). Verify.ps1 (agent) : 964/964, 0 avertissement, 0 erreur ; DLL 0.507.0.0. Non validé en jeu : ces cas ne surviennent qu'après une mise à jour qui casse une feuille ou une fonction ; l'auto-contrôle couvrira ce jour-là.
+### English
+- R-14: the audit's findings read one by one. An optional sheet now costs only its own value, a dangling link skips its row rather than the whole catalog, a lost function is refused or logged, and old readings are no longer shown as current.
+
+## 0.506.0
+- ONBOARD-001, lots 7 et 8. Vidéos et guides de la communauté : `community-help/index.json`, vide pour commencer, proposé en pull request et vérifié par un test. Le « ? » et la page Aide le lisent sur clic. Un lien part vers le navigateur après confirmation de son adresse, seulement vers YouTube ou ce dépôt (G6). Une liste cassée est refusée en entier. Visible après la prochaine release, puisqu'elle est lue sur `main`.
+- Contributeurs : `scripts/New-Tool.ps1` crée les textes d'aide d'un nouvel outil ; CONTRIBUTING explique l'aide, les vidéos et les guides ; `community-help/README.md` donne les règles.
+- Tests : HelpTests complété. Verify.ps1 (agent) : 960/960, 0 avertissement, 0 erreur ; DLL 0.506.0.0. Non validé en jeu. `New-Tool.ps1` lancé pour de vrai sur une copie du dépôt : les textes d'aide sont créés et les tests passent (961/961).
+### English
+- Community videos and guides: a reviewed list in community-help/, read on a click from the ? and the Help page; a link opens in the browser after showing its address, only to YouTube or this repository. New-Tool.ps1 now creates a new tool's help texts, and CONTRIBUTING explains help and guides.
+
+## 0.505.0
+- ONBOARD-001, lots 4 à 6. Un guide des premiers pas : bienvenue et langue, sources en ligne avec leur interrupteur (défauts inchangés, G3), quelques réglages, intérêts (G4), fenêtres du jeu à ouvrir une fois, visite des pages, fin. On le quitte à chaque étape, il reprend là où il en était, depuis Aide. Nouvelle installation : il s'ouvre une fois à la première ouverture de Tensho. Joueur existant : une proposition unique sur l'accueil (G2).
+- Fenêtres à ouvrir : Tensho coche d'après ce que le jeu a réellement donné, et n'ouvre rien à la place du joueur. Ce qui reste figure sur l'accueil.
+- Masqué en combat et en mission. « Tout remettre par défaut » ne relance pas le guide.
+- Tests : GuideFlowTests (6 cas). Verify.ps1 (agent) : 958/958, 0 avertissement, 0 erreur ; DLL 0.505.0.0. Non validé en jeu, et la vraie première installation n'a pas pu être essayée.
+### English
+- First-steps guide: welcome and language, online sources, a few settings, interests, game windows to open once (ticked from what the game really gave), a look around. It can be left at any step and resumed from Help. It opens once on a new install, and is only offered once to anyone else.
+
+## 0.504.0
+- ONBOARD-001, lot 3 (G5). Aide › Signaler un problème : bug, idée ou traduction. Le rapport de diagnostic et l'auto-contrôle sont visibles et modifiables. « Ouvrir le formulaire GitHub » ouvre le navigateur sur le bon formulaire, rempli. Le plugin n'envoie rien et ne garde aucun jeton. Trop long : le texte passe dans le presse-papiers. « Déjà signalé ? » cherche dans le navigateur. Dossiers et adresses Discord sont retirés. Un problème de sécurité renvoie vers le signalement privé.
+- Tests : HelpTests complété. Verify.ps1 (agent) : 952/952, 0 avertissement, 0 erreur ; DLL 0.504.0.0. Non validé en jeu : le préremplissage vient de la documentation de GitHub, aucun formulaire réel n'a été ouvert.
+### English
+- Report a problem from the game: a form that opens the project's GitHub form filled in, in the browser. The plugin sends nothing and holds no token. The report is visible and editable first.
+
+## 0.503.0
+- ONBOARD-001, lot 2. Première visite d'une page : un bandeau de deux lignes, une seule fois, avec « Compris » et « En savoir plus » ; réglage dans Paramètres › Général (G8). Le « ? » dit aussi où en est la page sur ce personnage (tout lu, en attente, inhabituel, échec), d'après l'auto-contrôle.
+- Tests : HelpTests complété. Verify.ps1 (agent) : 950/950, 0 avertissement, 0 erreur ; DLL 0.503.0.0. Non validé en jeu.
+### English
+- First-visit help on each page, once, with a setting. The "?" also says what the page has read on this character, from the self-check.
+
+## 0.502.0
+- Dresseur mis en attente sur décision de l'utilisateur. Suite de la feuille de route : prise en main (ONBOARD-001), lot 1.
+- Aide à chaque page : un « ? » en haut de la fenêtre explique la page ouverte (à quoi elle sert, comment commencer, que faire si elle reste vide). Nouvelle page Préférences › Aide : recherche, questions fréquentes, toutes les pages, rapport de bug. Un test refuse une page sans ses textes, en anglais et en français.
+- Limite : les textes viennent du code et des tests ; ils n'ont pas tous été rejoués en jeu.
+- Tests : HelpTests (3 cas). Verify.ps1 (agent) : 948/948, 0 avertissement, 0 erreur ; DLL 0.502.0.0. Non validé en jeu.
+### English
+- Help on every page: a "?" explains the open page, and a new Help page searches them all, with frequent questions and the bug report. A test refuses a page without its help texts.
+
+## 0.501.0
+- Décision de l'utilisateur (DEC-032) : pour le dresseur, un panneau d'informations pour le Dédale, en JcE seulement, rien en JcJ. Pas encore codé : il lui faut le rang des bêtes et la faiblesse des ennemis.
+- Sonde en mode développeur : quand une fenêtre du dresseur est ouverte (fiche du bestiaire, formation de l'équipe, fiche d'un ennemi, plateau), ses textes et ses valeurs vont au journal, à chaque changement, en quantité limitée. Lecture seule. Les fenêtres de classement et de résultat sont exclues : elles nomment d'autres joueurs ou le personnage.
+- Tests : BeastCatalogTests complété. Verify.ps1 (agent) : 945/945, 0 avertissement, 0 erreur ; DLL 0.501.0.0. Non validé en jeu.
+### English
+- Read-only developer probe for the Beastmaster windows, to find the rank of each beast and enemy weakness. Ranking and result windows are left out. Team help will be information only, for this PvE content.
+
+## 0.500.0
+- Demande de l'utilisateur : le dresseur et ses bêtes manquaient. Nouvelle page Progression › Dresseur, en lecture seule. Le conseil d'équipe viendra ensuite : ce qui rend une bête meilleure contre un ennemi n'est pas établi.
+- Bêtes : les 50, obtenues ou non (lu dans le jeu), classe, attaque automatique, textes d'Assaut et de Salve, cinq attributs au rang choisi, tri par colonne, recherche, classe. Plateaux : niveau, taille d'équipe, rang de synchronisation, ennemis et actions, gardien à part, bonus avec leurs points.
+- Les feuilles sont lues brutes, car les lignes typées de ce Lumina.Excel ne correspondent pas au jeu ; une autre disposition des colonnes donne une erreur affichée, jamais de fausses valeurs. Colonnes confirmées sur les captures de l'utilisateur (docs/evidence/0.500-xbm-columns.md).
+- Limites : la faiblesse des ennemis, les formes et les cibles des actions sont lues comme telles, non confirmées, et la page le dit. Le rang de chaque bête et sa taille ne sont pas lus.
+- Tests : BeastCatalogTests (5 cas). Verify.ps1 (agent) : 944/944, 0 avertissement, 0 erreur ; DLL 0.500.0.0. Passe automatique en jeu : 50 bêtes, 35 obtenues, comme les 35/50 de la capture du bestiaire ; 5 plateaux, 122 ennemis, aucune erreur au journal. Affichage de la page non validé en jeu.
+### English
+- New read-only Beastmaster page: the 50 beasts with class, attacks and attributes per rank, and the boards of the labyrinth with enemies and score bonuses. Team advice comes later. Enemy weakness is read as such and not yet confirmed.
+
+## 0.499.0
+- Demande de l'utilisateur : un clic sur un lien vers la carte doit la faire passer au-dessus de Tensho. Elle restait derrière, surtout quand elle était déjà ouverte. Elle passe maintenant devant, une fois par demande.
+- Tests : SelfCheckTests complété. Verify.ps1 (agent) : 939/939, 0 avertissement, 0 erreur ; DLL 0.499.0.0. Non validé en jeu.
+### English
+- A link to the map now brings it above the Tensho window.
+
+## 0.498.0
+- Demande de l'utilisateur : quand Tensho est replié et qu'on lance quelque chose qui l'ouvre, il doit se rouvrir. Tout ce qui ouvre la fenêtre ou change sa page la déplie, pendant deux images ; elle se replie ensuite normalement.
+- `tools/XbmProbe` ajouté : sonde en lecture seule des feuilles du dresseur (XBM), lues brutes, car les lignes typées de ce Lumina.Excel ne correspondent pas toutes au jeu.
+- Tests : SelfCheckTests complété. Verify.ps1 (agent) : 938/938, 0 avertissement, 0 erreur ; DLL 0.498.0.0. Non validé en jeu.
+### English
+- The Tensho window unfolds when something asks for it while it is collapsed. New read-only probe tools/XbmProbe for the Beastmaster sheets.
+
+## 0.497.0
+- Rapport de l'utilisateur en jeu : « Comparer les prochains coups » ne vérifiait pas l'état pour prendre le bon coup. Relu dans le code : les chiffres utilisaient déjà l'état (Bon ×1,5 ou 1,75 selon l'outil, Excellent ×4, Mauvais ×0,5), mais rien ne l'affichait, et les coups permis par l'état restaient mêlés aux autres : une action comme Ficelles du métier, sans gain de qualité, finissait en bas.
+- La fenêtre dit maintenant l'état du jeu, son effet et l'état suivant. Les coups possibles seulement sur Bon ou Excellent passent en tête, marqués « Seulement dans cet état ». Ce n'est pas un conseil de rotation.
+- Non vérifié : je n'ai pas vu le cas signalé en jeu. Si le jeu refuse un de ces coups, il n'apparaît pas ; le mode développeur note à chaque état ce que le jeu répond pour eux.
+- Tests : CraftProjectionTests complété. Verify.ps1 (agent) : 937/937, 0 avertissement, 0 erreur ; DLL 0.497.0.0. Non validé en jeu.
+### English
+- "Compare the next moves" now shows the state of the synthesis, what it does and what comes next. Actions only allowed in that state come first and are marked.
+
+## 0.496.0
+- Rapport de l'utilisateur en jeu : l'auto-contrôle n'enregistrait pas les OK. Pendant une synthèse, « synthesis » passait bien en OK et « crafting log » retombait en NOT_READ, car le jeu ferme le carnet : aucune passe ne pouvait tout montrer.
+- Nouvel état OK_SEEN : pas lisible maintenant, mais bien lu plus tôt, avec l'heure. En mode développeur, les 5 lignes de fenêtres sont surveillées chaque seconde : un OK est noté dès que la fenêtre est ouverte, sans lancer de passe. Gardé dans SelfCheckSeen.json, y compris après un rechargement. Une réponse en direct passe toujours avant (FAILED et SUSPECT ne sont jamais masqués) et une autre version des données du jeu efface tout, pour qu'un ancien OK ne cache pas une panne après une mise à jour.
+- Tests : SelfCheckTests complété. Verify.ps1 (agent) : 936/936, 0 avertissement, 0 erreur ; DLL 0.496.0.0. En jeu, le premier essai comptait à tort l'état Waiting comme OK : corrigé avant livraison (seul Observed compte), le fichier faux effacé. Le reste n'est pas validé en jeu.
+### English
+- Self-check: a new OK_SEEN state keeps what was read well earlier, with its time. In developer mode the game's windows are watched once a second and the result survives a reload; a new version of the game's data clears it.
+
+## 0.495.0
+- Rapport de l'utilisateur en jeu : carnet d'artisanat et carnet de récolte ouverts, l'auto-contrôle disait « craft window » et « gathering window : window closed ». La lecture était juste : ces lignes surveillent la synthèse en cours et un point de récolte ouvert, pas les carnets. Le libellé trompait.
+- Lignes renommées d'après ce qu'elles surveillent : synthesis, gathering node, triad match, cactpot ticket, avec le motif (« no synthesis running »…). Nouvelle ligne « crafting log », lue par l'aide du carnet. Le carnet de récolte n'a pas de ligne : Tensho l'ouvre, mais n'y lit rien.
+- Tests : SelfCheckTests complété. Verify.ps1 (agent) : 934/934, 0 avertissement, 0 erreur ; DLL 0.495.0.0. Passe automatique en jeu, carnet d'artisanat ouvert chez l'utilisateur : « crafting log OK, recipe 5623 », 26 OK, 4 NOT_READ, 0 SUSPECT, 0 FAILED. Le texte d'aide de la section passe à la ligne.
+### English
+- Self-check: the lines are named after what they watch (synthesis, gathering node, triad match, cactpot ticket), and a new line reads the crafting log.
+
+## 0.494.0
+- Demande de l'utilisateur : un auto-contrôle, pour que l'agent vérifie sans lui ce que le plugin lit. Une passe en lecture seule écrit dans le journal une ligne par domaine (catalogues, personnage, sacs, quêtes, collections, Triple Triade, carte, ensembles, carnets, mandats, monnaies, rappels, fenêtres du jeu), avec OK, NOT_READ, SUSPECT ou FAILED, et un résumé.
+- Se lance seule en mode développeur, une fois par connexion et après chaque rechargement ; sinon `/tensho selftest` ou le bouton de Diagnostics. Une sonde par image. Aucune action de jeu, aucune requête réseau, des nombres seulement (ni nom ni identifiant, chemins retirés des erreurs).
+- Limites : plausible ne veut pas dire juste ; ni l'affichage ni les clics ne sont couverts ; les fenêtres fermées restent en NOT_READ.
+- Tests : SelfCheckTests (4 cas). Verify.ps1 (agent) : 934/934, 0 avertissement, 0 erreur ; DLL 0.494.0.0. Exécuté en jeu sans action de l'utilisateur : 25 OK, 4 NOT_READ (les fenêtres fermées), 0 SUSPECT, 0 FAILED, aucune erreur au journal (docs/evidence/0.494-selfcheck-first-pass.log). Triple Triade : 45 PNJ battus, aucun marqué « Quête requise », ce qui ne contredit pas la 0.493 sans la prouver. Le reste de la version n'est pas validé en jeu.
+### English
+- Self-check: a read-only pass writes to the log what each part of the plugin has read, as numbers, with OK, NOT_READ, SUSPECT or FAILED. It runs by itself in developer mode, or with /tensho selftest and a button in Diagnostics.
+
+## 0.493.0
+- Rapport de l'utilisateur : Triple Triade ne détectait pas si un PNJ était vraiment disponible. La liste ne regardait que « battu » et les cartes manquantes, alors que la feuille TripleTriad du jeu liste les quêtes demandées (108 PNJ sur 146).
+- Page PNJ et cartes : colonne « Disponible » (Oui, Quête requise, ?), les quêtes au survol avec ✓, ces PNJ en dernier, case « Masquer les PNJ pas encore disponibles ». Cartes manquantes et clic droit de la carte : même mention. Si la quête qui ouvre le jeu n'est pas faite, la page le dit.
+- Limites : seules les quêtes sont lues, le jeu ne donne aucune autre condition (horaires à 0 sur les 146 lignes). Quêtes non lues : « ? », jamais « Quête requise ». PreviousQuestJoin 2 = une des quêtes (trois quêtes de villes exclusives) ; 1 = toutes est déduit, à confirmer en jeu. Preuve : docs/evidence/0.493-triad-npc-requirements.md.
+- Tests : TriadNpcCatalogTests complété. Verify.ps1 (agent) : 930/930, 0 avertissement, 0 erreur ; DLL 0.493.0.0. Non validé en jeu.
+### English
+- Triple Triad: the NPC list now shows whether an NPC is available, from the quests the game lists for it. Locked NPCs come last and can be hidden; the quests are in the tooltip. The map's Triple Triad tab says the same.
+
+## 0.492.0
+- R-14, 5 constats relus contre le code et confirmés. Après une mise à jour du jeu qui casserait une feuille, la page le dit au lieu de mentir :
+  - Recettes, contenus, vendeurs : une copie vide est une erreur publiée, plus un catalogue vide qui se lit « aucune recette » ou « personne ne le vend » (les caches disque refusaient déjà ce cas).
+  - Équipement et barde de chocobo : un catalogue impossible à construire le dit, plus « Chargement » pendant toute la session.
+  - Ensembles du jeu : une lecture ratée le dit et retire les anciens ensembles, qui restaient affichés comme actuels.
+- Tests : TriadMatchAdvisorTests complété. Verify.ps1 (agent) : 929/929, 0 avertissement, 0 erreur ; DLL 0.492.0.0. Non validé en jeu (ces cas ne se produisent qu'après une mise à jour qui casse une feuille).
+### English
+- R-14: empty recipe, duty and vendor copies are reported as failures instead of empty catalogs. The gear pages and gear sets say when their data could not be read instead of loading forever or showing old sets.
+
+## 0.491.0
+- Campagne de tests : close à la demande de l'utilisateur (« les dernières erreurs on verra en jeu ») ; les cases non cochées de TESTING restent ouvertes. Suite de la feuille de route : g2.
+- R-14, les 4 constats « valeur peut-être fausse » restés sans vérification, relus contre le code et confirmés. Ce qui n'est pas lu reste inconnu au lieu de passer pour un zéro :
+  - Triple Triade, match : une règle illisible (valeur absente, autre type, nom hors de la feuille) ne disparaît plus en silence ; pas de conseil, et le panneau le dit. Coup masqué sans sa carte imposée : pas de conseil non plus. La feuille des règles a sa propre garde : illisible, elle ne coupe plus toute l'observation.
+  - Triple Triade, défi : les identifiants viennent de la feuille, plus d'une borne écrite en dur à 15. Règles illisibles : pas d'estimation au lieu de « Règles : aucune ». La preuve citée pour les valeurs 102–105 ne les montre pas (lignes de capture coupées à la valeur 8) : le code le dit, et le journal donne maintenant ces valeurs.
+  - Carte : feuille non lue, ou plus de panoramas que le tableau de bits du jeu : [?] au lieu de « non découvert ». Une garde par feuille.
+  - Coffre à apparence : depuis la 7.4 une tenue peut être rangée incomplète. Seules les pièces que le jeu dit présentes comptent (MirageManager.IsSetSlotUnlocked). Aucune présente ou fonction indisponible : toutes comptent, comme avant, et le journal le note. Le sens de cette fonction n'est pas encore confirmé en jeu.
+- Tests : TriadMatchAdvisorTests complété. Verify.ps1 (agent) : 928/928, 0 avertissement, 0 erreur ; DLL 0.491.0.0. Non validé en jeu.
+### English
+- R-14: what cannot be read stays unknown. Triple Triad rules not read give no advice and no odds instead of a no-rules answer; rule ids come from the sheet. The map shows unknown instead of "not discovered" when its sheets are unread. Outfits stored incomplete since 7.4 count only their stored pieces (not yet confirmed in game).
+
+## 0.490.0
+- Demande de l'utilisateur, lot 7 : les favoris ne se retiraient que depuis la page Cartes. Le clic droit de la carte a un onglet Favoris, en premier : ceux de cette carte, puis les autres, avec « Retirer ». Un clic pose le drapeau, ou ouvre l'autre carte.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 926/926, 0 avertissement, 0 erreur ; DLL 0.490.0.0. Non validé en jeu.
+### English
+- The Tensho map's right-click menu has a Favorites tab, first, to go to a favorite or remove it.
+
+## 0.489.0
+- Rapport de l'utilisateur en jeu : la carte n'apparaissait pas dans les temps d'affichage. Elle a sa propre fenêtre, comptée ni comme page ni comme panneau. Diagnostics a maintenant une ligne « Map », en mode développeur.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 925/925, 0 avertissement, 0 erreur ; DLL 0.489.0.0. Non validé en jeu.
+### English
+- Diagnostics now lists the draw time of the Tensho map.
+
+## 0.488.0
+- Rapports de l'utilisateur en jeu.
+- Panneau Collectionnable qui clignote : le journal montre la réponse du jeu pour Raison solide qui change en quelques secondes (statut 579, puis 0, puis 579, avec le verrou de chaque action). Le plan en dépendait et se recalculait, et le panneau raccourcissait pendant ce temps. La réponse du jeu ne change plus le plan, elle dit seulement d'attendre, et le dernier plan reste affiché pendant le calcul. La détection de l'arrêt du tic n'était pas en cause.
+- Raison solide n'est plus conseillée qu'à la dernière tentative, avant qu'elle ferme le nœud.
+- Temps avant le plein faux : la mesure gardait la plus petite hausse jamais vue (2 PR). Une hausse ne compte plus que si elle arrive un tic après la précédente, et la dernière mesure remplace l'ancienne. Les mesures sur un nœud sont retirées.
+- Demande de l'utilisateur : tenir compte des PR débloqués. Les traits Enhanced GP Regeneration ajoutent +1, +2 puis +3, métier par métier ([preuve](docs/evidence/0.488-gp-regen-traits.md)). La mesure donne la base, et le taux de chaque métier est cette base plus ses traits débloqués, lus dans le jeu. L'ancienne valeur mesurée est abandonnée.
+- Demande de l'utilisateur : les aides suivent aussi ce qui est débloqué. Le plan de PR, la page PR et le plan de collection retirent les actions que le métier n'a pas apprises, lues dans le jeu (un niveau ne suffit pas, certaines viennent d'une quête), et le plan de collection celles que la fenêtre ne propose pas.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 925/925, 0 avertissement, 0 erreur ; DLL 0.488.0.0. Non validé en jeu.
+### English
+- The collectable panel no longer blinks, Solid Reason and Ageless Words are advised at the last attempt only, and the time until full GP uses a measure of real ticks.
+
+## 0.487.0
+- Rapport de l'utilisateur en jeu : les temps des panneaux apparaissaient puis disparaissaient. Un panneau fermé enregistrait des temps nuls, qui chassaient ses vrais temps en 2 secondes. Seules les images réellement dessinées comptent maintenant, et un panneau garde ses derniers temps une fois fermé.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 924/924, 0 avertissement, 0 erreur ; DLL 0.487.0.0. Non validé en jeu.
+### English
+- Diagnostics: a panel beside the game's windows keeps its last draw times once closed.
+
+## 0.486.0
+- Demande de l'utilisateur : barre de tic avec une petite marque qui défile et le temps avant le plein. La barre se remplit vers le maximum de PR, la marque défile en 3 s à chaque tic, le texte donne le temps restant d'après les PR par tic mesurés. Tant qu'ils ne sont pas connus, le texte reste « tic dans… ». Une mesure faussée par une action ou une potion peut fausser ce temps.
+- Rapport de l'utilisateur : les temps d'affichage de Diagnostics ne comptaient que les pages. Les panneaux à côté des fenêtres du jeu ont maintenant leur section, en mode développeur.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 924/924, 0 avertissement, 0 erreur ; DLL 0.486.0.0. Non validé en jeu.
+### English
+- The GP tick bar fills towards full GP, a small highlight runs along it at each tick, and its text gives the time until full.
+
+## 0.485.0
+- Demande de l'utilisateur : le texte de la barre de tic était coupé. Il affiche maintenant « PR 227/809 · pause ».
+- Verify.ps1 (agent) : 922/922, 0 avertissement, 0 erreur ; DLL 0.485.0.0. Non validé en jeu.
+### English
+- The GP tick bar now just says « paused » when GP stops rising; the longer text was cut.
+
+## 0.484.0
+- Demande de l'utilisateur : prendre en compte le risque, avec une tolérance réglable dans le panneau d'aide. Curseur « Risque accepté » dans le panneau Collectionnable, et dans Paramètres › Modules › Récolte, 50 % par défaut. Chaque tirage compte pour un mélange de sa moyenne et de son pire résultat : à 0 %, le pire décide ; à 100 %, la moyenne seule. Le panneau annonce la moyenne et le résultat si tous les tirages tournent mal.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 922/922, 0 avertissement, 0 erreur ; DLL 0.484.0.0. Non validé en jeu.
+- Le calcul prenait 0,8 s dans le pire cas mesuré : il se fait maintenant hors de l'affichage.
+- Rapports de l'utilisateur en jeu. Barre de tic : elle continuait de tourner alors que les PR ne remontaient plus, par exemple à l'ouverture d'une fenêtre de récolte. Au-delà de 4,5 s sans hausse, elle le dit, et repart à la hausse suivante. Les PR par tic se mesurent maintenant là, puisqu'ils ne remontent pas sur un nœud. Carte Tensho : au rechargement, la carte du jeu restée ouverte apparaissait avant que le catalogue soit prêt, et Tensho la gardait pour de bon. La décision attend maintenant jusqu'à 15 s. Une carte ouverte sans la carte du jeu (remplacement désactivé) ne revient pas seule.
+### English
+- The GP tick bar now says when GP has stopped rising, as at a gathering window. After a plugin reload, the Tensho map comes back by itself when the game map was hosted.
+- The collectable plan takes risk into account: a « Risk accepted » slider in the panel sets how much the worst outcome of each roll counts against its average, and the panel tells both.
+
+## 0.483.0
+- Rapport de l'utilisateur en jeu : « Raison solide pas dispo au moment où il la demande ». La règle exacte n'est pas connue. Sous le maximum de tentatives, Tensho demande au jeu si l'action est utilisable (`ActionManager.GetActionStatus`, lecture seule) ; si le jeu refuse, elle n'est plus conseillée ni comptée. À tentatives pleines, le jeu ne peut pas encore répondre : le plan peut encore la compter pour plus tard, ce qui peut rester optimiste. Le journal note la réponse en mode développeur.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 919/919, 0 avertissement, 0 erreur ; DLL 0.483.0.0. Non validé en jeu.
+### English
+- The collectable plan asks the game whether Solid Reason or Ageless Words can be used now, and stops counting on it when the game refuses.
+
+## 0.482.0
+- Rapport de l'utilisateur en jeu : « ne conseille pas l'action Inspection ». L'ordre des actions ne change pas la moyenne, et l'égalité donnait « pas de PR maintenant » : Inspection restait pour plus tard. Une action bonus qui rapporte et peut passer d'abord est maintenant le coup conseillé, Inspection puis Œil du collectionneur.
+- Le gain affiché était celui de la case cochée du jeu (+352) au lieu du gain réel (+177) : corrigé. Le panneau indique aussi les Inspections du plan et leurs PR. Rapport « le texte fait 5 actions » pour 4 tentatives : la cinquième vient de Raison solide, et le panneau le dit maintenant (de 4 à 5 tentatives). Le plan limitait déjà ses actions aux PR disponibles ; le panneau montre maintenant ce qu'il dépense et ce qu'il reste, et mesure les PR regagnés. Les PR regagnés pendant la passe ne sont pas encore comptés dans le plan.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 918/918, 0 avertissement, 0 erreur ; DLL 0.482.0.0. Non validé en jeu.
+### English
+- The collectable plan now advises Scrutiny, then Collector's Focus, first when they pay, instead of leaving them for later, and shows the real gain rather than the one of a ticked box.
+
+## 0.481.0
+- Rapport de l'utilisateur en jeu : « ne prend toujours pas en compte action inspection et œil ». Erreur de la 0.480 : les cases étaient lues à l'envers. Le journal montre que 54 est la case « Avec Inspection rigoureuse » (+175) et 56 la case « Avec Intuition » (+88) ([preuve](docs/evidence/0.479-collectable-window-values.md)). La valeur fausse apprise en 0.480 est abandonnée : il faut recocher les cases une fois.
+- Inspection rigoureuse et Œil du collectionneur entrent dans le calcul, ainsi qu'Intuition, au pourcentage affiché par le jeu (valeur 58). Ce qui est annoncé comme certain ne compte pas sur Intuition. Réglage pour ne pas utiliser Œil. Le panneau est raccourci : la méthode passe dans une bulle.
+- Contrôle sur une passe réelle de l'utilisateur (809 PR, 4 tentatives, 1000 atteint, 20 assignats, alors que la 0.480 prédisait 14) : le plan retrouve ce résultat, gardé comme test. Avec Raison solide, il annonce 21 assignats certains (3 récoltes au palier moyen) : cela suppose que le jeu accepte l'action comme le dit sa description, à vérifier.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 918/918, 0 avertissement, 0 erreur ; DLL 0.481.0.0. Non validé en jeu.
+### English
+- Fixes the estimate boxes, read the wrong way round in 0.480. Scrutiny, Collector's Focus and Intuition now count in the collectable plan's average; what is announced as certain never relies on Intuition.
+
+## 0.480.0
+- **Plantage du jeu, causé par une version de travail de cette 0.480, jamais publiée en commit** : le journal de Windows donne `0xc00000fd` (dépassement de pile) à 10:14:09 dans `ffxiv_dx11.exe`. Le calcul du plan pouvait s'appeler sans fin avec une Sélection méthodique gratuite à la valeur maximale. Corrigé : le calcul s'arrête au seuil haut et au maximum, le nombre d'états est borné, un test couvre ces cas, et le calcul ne se refait que si quelque chose change, plus à chaque image.
+- Demandes de l'utilisateur : « assignats max et récolte max comme référence », « le plus rentable en assignats sur un seul nœud ». Le panneau donne la référence (palier haut, assignats par récolte, au mieux sans chance sur ce nœud, ou ce qui manque). Les PR vont où ils rapportent le plus, Inspection rigoureuse ou tentative regagnée par Raison solide ou Sagesse du fermier (sa description dit qu'elle rend 1 d'intégrité sur un collectionnable, [preuve](docs/evidence/0.410-gp-actions.md)). Réglage pour ne pas regagner de tentatives. L'Eurêka n'est pas comptée.
+- Rapport de l'utilisateur en jeu : « actions et effets bonus pas pris en compte ». Correction d'une erreur de lecture de la 0.479 : la valeur 54 n'est pas une Intuition active, c'est la case d'estimation « Avec Intuition » du jeu ([preuve](docs/evidence/0.479-collectable-window-values.md)). Une case cochée est retirée du plan, car son bonus peut ne pas arriver.
+- Inspection rigoureuse entre dans le plan : son montant est lu quand sa case seule est cochée ou quand elle est active, son coût vient de la feuille du jeu, et les PR ne sont dépensés que si cela rapporte plus. Réglage pour ne pas l'utiliser. Œil du collectionneur est proposé en option quand une Intuition atteindrait le palier suivant, mais le plan n'y compte jamais. Toucher d'amorçage n'est pas compté.
+- Rapport de l'utilisateur : « même à 8 % il tente le skill plutôt qu'instinctive ». La règle qui préférait Sélection méthodique dès qu'elle suffisait est retirée. Chaque coup est comparé sur ce qu'il rapporte en moyenne sur les tentatives restantes, avec le pourcentage affiché par le jeu et l'intervalle de Sélection instinctive, supposé égal partout (le jeu ne donne pas plus). Le panneau donne cette moyenne et ce qui est certain sans chance.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 917/917, 0 avertissement, 0 erreur ; DLL 0.480.0.0. Non validé en jeu.
+### English
+- The collectable plan now counts Scrutiny once its bonus is read from the game's window, spends GP only if that earns more, and proposes Collector's Focus as an option. A ticked estimate box in the game is no longer taken as a certain bonus.
+
+## 0.479.0
+- Demandes de l'utilisateur, lot 6.
+- Plan de collection : le relevé en jeu de la fenêtre Collectionnable a donné l'objet, la collectabilité en cours et le gain de chaque action à ce tour ([preuve](docs/evidence/0.479-collectable-window-values.md)). Le panneau montre la collectabilité, le palier, la prochaine action et le plan. Chaque découpage des tentatives est comparé sur ce qu'il rapporte. Le plan est refait à chaque tour, rien n'est exécuté. Inspection rigoureuse, Œil du collectionneur et Toucher d'amorçage ne sont pas comptés. Lecture fondée sur un seul relevé : si une valeur manque ou change de type, pas de plan. Le panneau distingue un seuil qu'un bon tirage peut encore atteindre et un seuil devenu impossible (rapport en jeu : 0 avec une seule tentative).
+- Plan de PR sur la liste : un nœud normal récolte simplement et ne dépense que les PR qui seraient perdus au maximum ; un nœud à bonus majeur (plus de tentatives, quantité plus grande, chance supplémentaire nettement plus forte que le plus simple vu pour cet objet) dépense tout. Réglage pour revenir au partage égal. Le premier nœud vu compte comme normal. Le plan utilise maintenant la quantité affichée par le jeu au lieu de 1.
+- Tests : Gathering478Tests complété. Verify.ps1 (agent) : 914/914, 0 avertissement, 0 erreur ; DLL 0.479.0.0. Non validé en jeu.
+### English
+- The collectable panel now shows the current collectability, its tier, the next action and a plan, from the values the game's window gives each turn.
+- Over a crafting list, normal nodes keep their GP and a node with a major bonus spends it; the previous even sharing stays as a setting.
+
+## 0.478.0
+- Retours de l'utilisateur, lot 6.
+- Panneau Collectionnable : « Aucun seuil » venait du nom coupé par la fenêtre du jeu (« Minerai de durium noble c... »), alors que les seuils existent (400 / 700 / 1000, [preuve](docs/evidence/0.478-collectable-truncated-name.md)). Un nom coupé est cherché par son début s'il désigne un seul objet, et le nom complet est affiché. Le texte dit qu'il n'y a rien à faire. La collectabilité en cours n'a pas de champ nommé dans le jeu : en mode développeur, les valeurs de la fenêtre vont au journal pour la trouver.
+- Aide à la récolte : le nom, puis les taux dessous, et les textes vont à la ligne au lieu d'être coupés. Sur un collectionnable, un message remplace « Plan non calculé » : ses PR se dépensent dans la fenêtre Collectionnable.
+- Collectionnables : onglet à part dans Récolte, tableau trié sur chaque colonne dans les deux sens.
+- Plan de PR : prend la liste de fabrication choisie. Besoin en matières brutes (recettes suivies), moins le stock, puis nombre de nœuds et PR répartis, avec les PR regagnés entre deux nœuds. Hypothèses dites : chaque nœud comme celui-ci, moyenne, intermédiaires déjà faits non déduits. Les PR par tic sont mesurés en jeu, jamais supposés, ou réglés à la main. Actions interdites par réglage, pour le mineur et le botaniste, dans le panneau et la page PR.
+- Tests : Gathering478Tests (6). Verify.ps1 (agent) : 911/911, 0 avertissement, 0 erreur ; DLL 0.478.0.0. Non validé en jeu.
+### English
+- Collectable panel: thresholds are found when the game's window cuts a long name, and the text says nothing is needed from the player. The gathering panel no longer cuts its lines.
+- Collectables have their own sortable tab under Gathering.
+- The GP plan can follow the selected crafting list: raw materials still missing, nodes needed, GP shared across them with regeneration; GP actions can be forbidden as for macros.
+
+## 0.477.0
+- Rapport de l'utilisateur en jeu : « aucun moyen de repasser au thème original ». Le retour n'existait que dans Réglages › Interface, à un autre endroit que le bouton qui change le thème. Le thème d'avant est maintenant retenu, et un bouton « Revenir au thème d'origine » reste en haut de « Mes outils » tant que le thème d'un outil est en place. Pour un thème appliqué en 0.476, rien n'avait été retenu : le bouton propose alors le réglage par défaut, suivre le jeu. Un choix dans les réglages oublie le thème retenu.
+- Tests : MyToolsTests complété. Verify.ps1 (agent) : 905/905, 0 avertissement, 0 erreur ; DLL 0.477.0.0. Non validé en jeu. Reste de « Mes outils » validé par l'utilisateur en jeu (rapport « reste ok »), galerie exceptée puisqu'elle attend une release.
+### English
+- After using a tool's theme, a button at the top of « My tools » brings the original theme back.
+
+## 0.476.0
+- TEMPLATES-001 phase B7 (T8) : un outil peut proposer un thème, seul réglage de la liste blanche. L'aperçu le dit et le thème ne change que sur le clic « Utiliser le thème… ». Tout autre réglage dans un fichier le fait refuser. Le webhook Discord ne peut donc pas être touché par un outil. La partie sans code des modèles est terminée.
+- Tests : MyToolsTests complété. Verify.ps1 (agent) : 905/905, 0 avertissement, 0 erreur ; DLL 0.476.0.0. Non validé en jeu.
+### English
+- A tool in « My tools » may propose a theme, the only setting allowed. It changes only on the player's click, and any other setting in a file refuses it.
+
+## 0.475.0
+- TEMPLATES-001 phases B5 et B6 : galerie d'outils communautaires. Dossier `community-templates/` (T4), licence CC0 (T5), deux outils d'exemple, `scripts/Update-ToolGallery.ps1` pour l'index, tests qui appliquent à chaque fichier les règles du plugin, relecture humaine par pull request (T7). Dans le plugin, la liste et un outil se lisent seulement sur clic (T6), avec taille bornée et empreinte vérifiée, puis passent par le même aperçu qu'un outil collé. Crédit et description du plugin mis à jour.
+- La galerie lit la branche `main` : elle restera vide tant qu'une release n'a pas publié ce dossier.
+- Tests : MyToolsGalleryTests (5). Verify.ps1 (agent) : 904/904, 0 avertissement, 0 erreur ; DLL 0.475.0.0. Non validé en jeu.
+### English
+- « My tools » gains a gallery of community tools, reviewed then published in `community-templates/` under CC0. The plugin reads it only on a click, bounded and checked against a fingerprint, and shows each tool in full before it is installed.
+
+## 0.474.0
+- TEMPLATES-001 phase B3 : éditeur de « Mes outils » dans le jeu, sans écrire de JSON. Les sept blocs, l'ordre, la licence libre CC0 à cocher, le texte écrit dans la langue du plugin avec les autres langues gardées. Enregistrer passe par le même format strict qu'un fichier partagé. Un objet s'ajoute depuis l'objet sélectionné dans Tensho, jamais par un identifiant tapé.
+- Tests : MyToolsTests complété. Verify.ps1 (agent) : 899/899, 0 avertissement, 0 erreur ; DLL 0.474.0.0. Non validé en jeu.
+### English
+- « My tools » gains an editor in the game: compose a tool block by block, without writing any file. Saving goes through the same strict format as a shared file.
+
+## 0.473.0
+- Demande de l'utilisateur, TEMPLATES-001 phases B0, B1, B2 et B4 ([DEC-029](docs/project/DECISIONS.md)) : page « Mes outils », sous l'accueil. Un outil est un fichier de données : titre, note, cases à remise à zéro, compteur, minuteur, objets (voulu, possédé, manque), lien. Il ne contient aucun code et n'envoie rien au jeu.
+- Format strict : champ ou bloc inconnu, valeur hors bornes ou lien non https refuse le fichier avec la raison. Textes nettoyés. Une ligne partagée compressée est lue avec une taille bornée. Tout est montré avant l'installation, et un lien s'ouvre seulement après une confirmation qui montre l'adresse.
+- Progression gardée dans `MyTools.json`, jamais écrasé s'il est illisible. Le partage ne contient ni cases ni compteurs. L'import par fichier n'est pas fait : coller le JSON suffit.
+- Tests : MyToolsTests (8). Verify.ps1 (agent) : 898/898, 0 avertissement, 0 erreur ; DLL 0.473.0.0. Non validé en jeu.
+### English
+- New « My tools » page: pages made of data (headings, notes, checklists with resets, counters, timers, item lists, links), shared as one line of text. A strict format refuses anything unknown; tools hold no code and send nothing to the game.
+
+## 0.472.0
+- Demande de l'utilisateur : le chat personnalisable est retiré ([DEC-030](docs/project/DECISIONS.md)) : page Monde › Chat, fenêtre, réglages, textes, tests et plan. Il utilisera Chat 2 au besoin. Les fonctions qui lisent le chat pour autre chose restent (liens de carte, détection du jardinage). Les réglages déjà enregistrés par la 0.471 sont ignorés au chargement : essai fait avec le Newtonsoft.Json de Dalamud sur un fichier contenant ces types disparus.
+- Tests : un test vérifie le retrait. Verify.ps1 (agent) : 890/890, 0 avertissement, 0 erreur ; DLL 0.472.0.0. Non validé en jeu.
+### English
+- The custom chat added in 0.471 is removed at the user's request: page, window, settings, texts and plan. Features that read chat lines for other purposes stay.
+
+## 0.471.0
+- Demande de l'utilisateur, CHAT-001 phases 0 et 1 ([DEC-029](docs/project/DECISIONS.md)) : nouvelle page Monde › Chat et une fenêtre de chat en lecture seule, désactivée par défaut, à côté de celle du jeu. Onglets par canal, couleurs, heure, canal, taille du texte, opacité, compteur de non-lus, jusqu'à 10 000 lignes, seules les lignes visibles sont dessinées. Elle lit ce que le jeu affiche, après les autres plugins, n'envoie rien et ne garde rien sur disque. Chat 2 actif : averti, jamais bloqué. La sonde (mode développeur) donne des compteurs, sans texte.
+- La page a été créée avec `scripts/New-Tool.ps1`.
+- Tests : ChatTests (6). Verify.ps1 (agent) : 895/895, 0 avertissement, 0 erreur ; DLL 0.471.0.0. Non validé en jeu.
+### English
+- New Chat page and a read-only chat window, off by default, beside the game's: tabs by channel, colours, time, text size, opacity, unread counts. It sends nothing and keeps nothing on disk.
+
+## 0.470.0
+- Décisions de l'utilisateur sur le chat et les modèles communautaires : [DEC-029](docs/project/DECISIONS.md). Partie code des modèles (TEMPLATES-001).
+- Toutes les pages sont dans une seule liste, `MainWindow.Pages.cs` : la navigation, le dessin et la source montrée aux contributeurs la lisent. Trois listes séparées disparaissent, sans changement voulu à l'écran.
+- `scripts/New-Tool.ps1` crée le squelette d'un outil (page, partie pure, test, textes, enregistrement). Essai réel sur un outil temporaire : compilé et tests passés, puis retiré. Guide « Adding a tool » dans CONTRIBUTING.md, formulaire « Tool proposal » et règles ajoutées au modèle de pull request.
+- Tests : Pages470Tests (4). Verify.ps1 (agent) : 889/889, 0 avertissement, 0 erreur ; DLL 0.470.0.0. Non validé en jeu.
+### English
+- All pages now come from one list, `MainWindow.Pages.cs`, with no intended change on screen.
+- `scripts/New-Tool.ps1` creates the skeleton of a new tool; CONTRIBUTING.md gains "Adding a tool", and GitHub a « Tool proposal » form.
+
+## 0.469.0
+- Demande de l'utilisateur (« j'ai pourtant ouvert calendrier et mission de ravitaillement ») : « demande du jour non observée » était un texte fixe, rien ne lisait cette fenêtre. Nouveau : `GcSupplyReader` lit la fenêtre du jeu ContentsInfoDetail (nom présent dans l'exécutable du jeu) une fois par seconde tant qu'elle est affichée, compare ses textes aux noms exacts des objets de livraison du catalogue (GCSupplyDuty), et garde le résultat par personnage jusqu'à la remise de 20:00 UTC. La mise en page n'a pas pu être sondée hors du jeu : une ligne `Grand Company supply window` du journal la documente. Les bulles disent demandée, absente de ce qui a été ouvert, ou comment ouvrir la fenêtre.
+- Demande de l'utilisateur : dans le carnet, Manipulation est une case et l'icône du skill, sans texte. Repas et remède ont l'icône et la bulle de l'objet (aussi dans le simulateur) ; seuls ceux qui ont un bonus d'artisanat comptent, un autre repas se lit « aucun ».
+- Demande de l'utilisateur (« restyliser la fenêtre liée au carnet ») : panneau en sections (recette, votre état, cible, calcul, macro), chiffres en tableau, barre de qualité, section de séquence enregistrée masquée s'il n'y en a pas, explications dans la bulle de « (?) ». Le texte « Manipulation exclue : déblocage non observé » datait d'avant la détection : retiré.
+- Tests : GcSupply469Tests (6). Verify.ps1 (agent) : 885/885, 0 avertissement, 0 erreur ; DLL 0.469.0.0. Non validé en jeu.
+- Plans ajoutés, sans code : chat personnalisable (CHAT-001 (document retiré depuis)) et modèles communautaires ([TEMPLATES-001](docs/goals/TEMPLATES-001.md)), avec les décisions à prendre.
+### English
+- Plans added, without code: customisable chat and community templates, with the decisions to take.
+- Today's Grand Company request is now read from the game's supply missions window; item tooltips say requested, not among what was opened, or how to open it.
+- The crafting log panel is laid out in sections, with a table of figures, a quality bar and explanations in tooltips.
+- In the crafting log panel, Manipulation is a box with the skill's icon, and food and medicine show the item's icon and tooltip, only when they give a crafting bonus.
+
+## 0.468.0
+- Demandes de l'utilisateur (campagne en jeu), à propos du panneau du carnet et de Raphael.
+- « Raphael ne met pas en cache » : le disque montre que le carnet enregistrait bien ses résultats Raphael (fichiers du 2026-11-04, `UsedRaphael`). Le manque venait d'ailleurs : la recherche du simulateur n'a jamais eu de cache, et la clé du carnet contient la version de la DLL, les options de macro et la liste des séquences enregistrées, donc chaque version recalculait. Correction : `RaphaelSequenceCache` garde les séquences de Raphael sur disque (durée des calculs d'artisanat) selon ce dont Raphael dépend seulement (recette, attributs, qualité de départ, cible, actions interdites), pour le carnet et le simulateur. Une séquence gardée est rejouée dans le simulateur avant usage. « Recalculer » relance vraiment Raphael.
+- Qualité cible dans le panneau, gardée par recette (`CraftLogTargets`), avec « Maximum » et les paliers des objets à collectionner. La qualité ne s'applique qu'à la sortie du champ.
+- Le panneau montre repas, remède et spécialiste lus dans le jeu, et une case Manipulation avec ce qui est détecté. La case vaut jusqu'au rechargement. Spécialiste n'était jamais transmis au calcul du carnet : il l'est. Constat à vérifier en jeu : tous les calculs du 2026-11-04 ont Manipulation à non au niveau 100, d'où une ligne `Manipulation for job` dans le journal.
+- « Enregistrer comme meilleure séquence » sous la proposition. Si une séquence enregistrée termine la synthèse et atteint la cible, rien n'est calculé (« Recalculer » cherche quand même).
+- Fenêtre « Comparer les prochains coups » : réglage aussi dans Réglages › Modules › Artisanat, libellé au nom de la fenêtre, et croix qui décoche le réglage.
+- Tests : Craft468Tests (7). Verify.ps1 (agent) : 879/879, 0 avertissement, 0 erreur ; DLL 0.468.0.0. Non validé en jeu.
+### English
+- Raphael's sequences are now kept on disk for both the crafting log and the simulator's search, independently of the plugin version and macro options, and replayed in the simulator before use.
+- The crafting log panel gains a quality target by recipe, the food, medicine, specialist and Manipulation state, and a button to save the suggestion as the best sequence; a saved sequence reaching the target skips the search.
+- The « Compare next actions » window has a setting under Crafting and a close button that turns it off.
+
+## 0.467.0
+- Demande de l'utilisateur : le panneau du carnet d'artisanat suit le solveur choisi. Raphael a atteint 12 000/12 000 en 19 actions (rapport en jeu) là où le carnet, avec le solveur Tensho, proposait 7 308/12 000.
+  Une ligne « Solveur : Raphael » l'indique. Si Raphael échoue, la recherche Tensho répond, c'est dit dans le panneau et écrit dans le journal, et ce résultat n'est pas gardé en cache. Avec le calcul automatique,
+  Raphael calcule à chaque recette choisie (le calcul précédent est annulé) ; le cache du carnet distingue les deux solveurs.
+- Tests : Raphael465Tests complété. Verify.ps1 (agent) : 872/872, 0 avertissement, 0 erreur ; DLL 0.467.0.0. Recherche Raphael validée en jeu par l'utilisateur ; carnet non validé en jeu.
+### English
+- The crafting log panel now follows the chosen solver: with Raphael selected it computes with Raphael, says so, and falls back on Tensho's search if Raphael fails.
+
+## 0.466.0
+- Raphael en jeu (rapport de l'utilisateur, 01:29) : la recherche échouait, car Raphael ne connaît pas le niveau de la recette et proposait Main preste (Trained Eye) en première action alors qu'il faut dix niveaux de plus que la recette. Le
+  simulateur a refusé la séquence, comme prévu. Cette action n'est plus proposée à Raphael dans ce cas, et Heart and Soul non plus (il ne sert qu'à des actions hors de sa liste). Message d'erreur interne corrigé (il
+  nommait Quick Innovation au lieu de Trained Eye).
+- Tests : Raphael465Tests complété. Verify.ps1 (agent) : 871/871, 0 avertissement, 0 erreur ; DLL 0.466.0.0. Raphael a bien calculé en jeu ; séquence jouée non validée.
+### English
+- Raphael: it does not know the recipe's level and used Trained Eye too low, which the simulator refused: Trained Eye is now left out of its actions unless the job is ten levels above the recipe.
+
+## 0.465.0
+- A-03 (DEC-028, demande de l'utilisateur) : solveur Raphael en option. Réglage « Solveur : Tensho / Raphael » dans Artisanat › Recherche, et « Utiliser le solveur Raphael » dans Paramètres › Modules ›
+  Artisanat ; Tensho reste celui par défaut. Le calcul tourne hors du thread du jeu, annulable, un seul à la fois, avec tous les processeurs sauf deux. Il utilise les mêmes règles que la recherche Tensho :
+  niveau, Manipulation, actions interdites, rien au hasard, et les actions de spécialiste seulement pour un spécialiste. Sa séquence est rejouée dans le simulateur de Tensho et refusée si elle ne tient pas.
+- Le paquet contient maintenant Raphael.Net.dll et raphael_bindings.dll (win-x64), contrôlés par Verify ; crédits ajoutés.
+- Mesure hors du jeu : 1,5 s et 108 Mo, jusqu'à 8,3 s et 642 Mo sur une recette difficile d'essai (docs/evidence/0.451-raphael-study.md). Le carnet d'artisanat garde le solveur Tensho.
+- A-04 (suggestions depuis l'état en cours) n'est pas fait.
+- Tests : Raphael465Tests (3 cas). Verify.ps1 (agent) : 871/871, 0 avertissement, 0 erreur ; DLL 0.465.0.0. Non validé en jeu ; Raphael n'a tourné qu'hors du jeu.
+### English
+- A-03: optional Raphael solver (Raphael.Net 5.0.0): a solver choice in the crafting search and a setting; Tensho stays the default. Runs off the game's thread, cancellable; its sequence is replayed in Tensho's simulator and refused if it does not hold. The package now ships its native library.
+
+## 0.464.0
+- Retours du lot 5 (2026-11-04) ; le reste du lot est validé par l'utilisateur :
+  - Simulateur : « Conserver la séquence » vient maintenant après « Ajouter une action ».
+  - Détection au lieu des cases à remplir : Manipulation (action apprise), spécialiste (PlayerState.IsMeisterFlag), repas et remède actifs (effets Bien nourri et Médicamenté du
+    personnage, dont le paramètre désigne la ligne ItemFood, plus 10000 si HQ). Une ligne « Détecté » l'affiche, une fois par recette, et les cases restent modifiables. Métier porté : les attributs sont copiés
+    d'office et comptent déjà le repas et le remède, qui ne s'ajoutent donc pas deux fois. Métier non porté : ils sont choisis dans les listes.
+  - Couleurs : niveau, Habileté et Contrôle du simulateur sont en vert ou rouge selon la recette. Le niveau de la ligne de préparation vient aussi du métier porté : il restait gris tant que la lecture des
+    ensembles d'équipement n'avait pas répondu (cause probable, non prouvée).
+  - Artisanat : nouvel onglet « Liste de fabrication » : ingrédients en tableau (icône, requis, en stock, manquant en vert ou rouge), infobulle complète de l'objet au survol.
+  - Synthèse en direct : la projection s'affiche à côté de la fenêtre de synthèse du jeu. Réglage « Projection à côté de la synthèse » (activé), qui suffit à activer la lecture de la synthèse. Rien n'est exécuté.
+- Sonde N-06 enregistrée (docs/evidence/0.463-squadron-probe.log) : les totaux sont bien quatre membres plus le bonus d'entraînement, et l'utilisateur les rapporte conformes au jeu.
+- Tests : Craft464Tests (4 cas) ; un test déjà écrit adapté. Verify.ps1 (agent) : 868/868, 0 avertissement, 0 erreur ; DLL 0.464.0.0. Non validé en jeu.
+### English
+- Simulator: « Save the sequence » after « Add an action »; Manipulation, specialist, active food and medicine are detected; level and attributes in green or red against the recipe.
+- Crafting: a « Crafting list » tab with an ingredient table, icons and the full item tooltip. The next-action projection now shows beside the game's Synthesis window, with its own setting.
+
+## 0.463.0
+- Coffre de compagnie (retour du lot 3) : la lecture passait depuis 0.462 (cases à quantité 0 confirmées comme cause, la lecture a réussi à 00:54), mais la page Banque refusait de l'afficher : « ordre
+  visuel indisponible », car le jeu ne garde pas d'ordre d'affichage pour ce coffre. Il s'affiche comme l'arsenal : onglets puis cases, 35 objets par cadre, gils et cristaux compris.
+  L'organisation par onglet du jeu (50 cases) n'est pas reproduite.
+- Tests : Storage463Tests (1 cas). Verify.ps1 (agent) : 864/864, 0 avertissement, 0 erreur ; DLL 0.463.0.0. Non validé en jeu.
+### English
+- Company chest: shown in the Bank in slot order, like the armoury chest (the game keeps no display order for it, which refused the whole tab).
+
+## 0.462.0
+- Retours du lot 3 (2026-11-04) ; le reste du lot est validé, sauf le point 12 reporté par l'utilisateur :
+  - Comparaison sous l'infobulle : les statistiques passaient côte à côte sur une ligne et se coupaient lettre par lettre (« Vitalité » à la verticale). Le nom de la pièce, puis le
+    niveau d'objet, puis une grille de statistiques deux par deux, comme l'infobulle du jeu.
+  - « Tous les outils avec cet objet » retiré des menus : devenu inutile.
+  - Coffre de compagnie vide : la lecture échouait d'un bloc (« Inventory slot inconsistent with requested bag », dalamud.log à 00:49:49). Cause supposée : des cases
+    qui nomment un objet avec une quantité de 0, comme les cristaux du coffre. Une telle case compte maintenant comme vide. Si l'erreur revient, le journal donne le coffre, la
+    case, l'objet et la quantité. Non vérifié en jeu.
+- Tests : Lot3Fixes462Tests (3 cas). Verify.ps1 (agent) : 863/863, 0 avertissement, 0 erreur ; DLL 0.462.0.0. Non validé en jeu.
+### English
+- Gear comparison under the tooltip: stats in a two-by-two grid like the game's tooltip, instead of wrapping letter by letter. « All tools for this item » removed from the menus.
+- Company chest: a slot naming an item with quantity 0 counts as empty, which failed the whole reading (suspected cause, not checked in game).
+
+## 0.461.0
+- Demandes de l'utilisateur après l'essai au potager (détection validée : Shirogane 2-17, potager 1, emplacement 6, bonne graine) :
+  - Page Jardinage : chaque potager s'affiche en grille de 3 × 3, sans centre, comme le plan de plantation, avec le numéro, la graine (couleur selon l'état), les heures et
+    les boutons de chaque emplacement ; un emplacement libre dit « vide ». Les pots et les lieux tapés à la main restent en liste. La disposition suit le wiki (emplacement 1
+    en haut à gauche, puis sens horaire) : à comparer en jeu.
+  - Bouton « Replanter » retiré : une nouvelle plantation est détectée et remplace l'ancienne.
+- Tests : GardenGrid461Tests (2 cas) ; un test de Garden448 retiré avec le bouton. Verify.ps1 (agent) : 860/860, 0 avertissement, 0 erreur ; DLL 0.461.0.0. Non validé en jeu.
+### English
+- Garden page: each patch is drawn as a 3 × 3 grid (seed, state, times, buttons per bed), like the planting plan; pots and typed places stay a list. The « Replant » button
+  is gone: a new planting is detected and replaces the old one.
+
+## 0.460.0
+- Demande de l'utilisateur pendant la campagne de tests : détecter le jardinage. Tensho lit les lignes du chat du jeu ; quand le jeu annonce une plantation (potager avec son
+  numéro et son emplacement, ou pot), elle s'ajoute au journal avec :
+  - la graine, lue dans la fenêtre de plantation (AgentHousingPlant, lecture seule) ;
+  - l'heure et les durées de cette graine ;
+  - le lieu (zone, quartier et terrain quand le jeu les donne).
+  Une nouvelle plantation au même emplacement remplace l'ancienne. Une ligne dans le chat confirme. Si la graine n'a pas pu être lue, ou n'est pas dans la liste (bleuets),
+  rien n'est deviné : le chat demande de l'ajouter à la main.
+- Le texte de la page Jardinage et le réglage « Noter les plantations depuis le chat » (activé) expliquent que cela vient du chat. Les lignes viennent de la feuille LogMessage,
+  dans la langue du jeu ; une ligne envoyée par un joueur ne compte jamais. Rien n'est envoyé ni fait dans le jeu.
+- Limites : deux pots ne se distinguent pas, chaque plantation en pot ajoute une ligne. L'entretien et la récolte ne sont pas encore détectés (messages à identifier).
+  Pour les trouver, dans une maison ou sur un terrain, les lignes système (sans expéditeur) vont pour l'instant dans le journal de Dalamud, en local (« Garden chat capture »).
+- Croisements : le texte dit maintenant que les fleurs en pot, dont celles de Dawntrail, ne se croisent pas (preuve : docs/evidence/0.459-garden-detection.md).
+- Tests : GardenChat460Tests (3 cas). Verify.ps1 (agent) : 858/858, 0 avertissement, 0 erreur ; DLL 0.460.0.0. Non validé en jeu.
+### English
+- Garden: plantings are detected from the game's chat lines and added to the journal with the seed read in the planting window, its time and hours. Explained on the page, with
+  a setting (on). Nothing is sent or done in the game. Tending and harvesting are not detected yet. Crossbreeding text: flowerpot flowers do not crossbreed.
+
+## 0.459.0
+- Demandes de l'utilisateur pendant la campagne de tests :
+  - Barre du serveur : une troisième icône pour les rappels terminés (tâches de servant, vaisseaux revenus, escouade, parcelles mûres), visible seulement s'il y
+    en a, avec son réglage dans Avancé. L'icône des rappels ne compte plus que ce qui reste à faire (rappels non cochés, tâches à l'écran). Les cases « Barre » de la
+    page Rappels valent pour les deux.
+  - Jardinage : nouvelle page dédiée dans la catégorie Monde, avec deux sections, le journal et les croisements. Il sort de la page Rappels ; ses rappels dans le chat
+    et ses parcelles enregistrées ne changent pas.
+- Tests : 2 cas ajoutés à Todo458Tests ; 3 tests déjà écrits adaptés. Verify.ps1 (agent) : 855/855, 0 avertissement, 0 erreur ; DLL 0.459.0.0. Non validé en jeu.
+### English
+- Server bar: a third icon for finished reminders, shown only when there are some; the reminders icon now counts only what is left to do.
+- Garden: its own page (World category) with the journal and the crossbreeds, out of Reminders.
+
+## 0.458.0
+- Demande de l'utilisateur pendant la campagne de tests : l'icône des rappels montre maintenant ce qui reste à faire, plus seulement ce qui est terminé.
+  Son nombre et son infobulle (« Reste à faire ») comptent : tâches de servant finies, vaisseaux revenus, mission et entraînement d'escouade finis,
+  parcelles mûres, rappels à case « Fait » non cochés depuis leur remise à zéro, et vos tâches affichées à l'écran.
+- Page Rappels : nouvelle colonne « Barre », une case par rappel, cochée par défaut, pour choisir ce que l'icône montre. Les tâches personnelles gardent
+  leur case « à l'écran » ; les parcelles mûres n'ont pas de case dans ce tableau (elles sont toujours comptées).
+- Tests : Todo458Tests (2 cas). Verify.ps1 (agent) : 853/853, 0 avertissement, 0 erreur ; DLL 0.458.0.0. Non validé en jeu.
+### English
+- The Reminders icon now shows what is left to do (finished timers, reminders not ticked since their reset, your on-screen tasks), and the Reminders page
+  has a « Bar » box per row to choose what it shows.
+
+## 0.457.0
+- Demande de l'utilisateur pendant la campagne de tests : les compétences ont leur icône dans les deux listes qui n'en avaient pas : « Actions
+  interdites » (Réglages › Artisanat) et les actions de l'enregistreur (icônes dans l'ordre, numéro et nom au survol). Icônes lues dans les
+  données du jeu, comme dans le simulateur. Dans « Actions interdites », l'icône est celle du Charpentier, comme le nom : certaines compétences ont
+  une icône par classe.
+- Tests : Icons457Tests (1 cas). Verify.ps1 (agent) : 851/851, 0 avertissement, 0 erreur ; DLL 0.457.0.0. Non validé en jeu.
+### English
+- Crafting actions now show their icons in « Forbidden actions » and in the recorder's list (number and name on hover).
+
+## 0.456.0
+- Demande de l'utilisateur pendant la campagne de tests : un plan pour obtenir le plus possible d'une graine. Dans Croisements, mode « Ce qui donne cette
+  graine » :
+  - les paires qui peuvent donner le moins d'autres graines passent en tête, avec « seulement cette graine » ou le nombre d'autres graines (leurs noms au
+    survol) ;
+  - un clic sur une paire montre le plan du potager de luxe : 8 parcelles en cercle, numérotées dans l'ordre de plantation, les deux graines en alternance
+    (4 de chacune), la plus lente d'abord (durées Lotlab) ;
+  - le texte dit que la parcelle 1 ne donne pas de croisement, et donne la terre (Thanalan Topsoil Grade 3 environ 90 %, Grade 2 environ 50 %), au nom du jeu.
+- Les règles viennent du wiki Console Games, reformulées et créditées, non vérifiées par Tensho (docs/evidence/0.456-garden-grid.md). La disposition exacte
+  des parcelles est à comparer en jeu. Les probabilités de chaque résultat ne sont pas connues : Tensho ne les affiche pas.
+- Tests : GardenPlan456Tests (3 cas). Verify.ps1 (agent) : 850/850, 0 avertissement, 0 erreur ; DLL 0.456.0.0. Non validé en jeu.
+### English
+- Crossbreeding: to get as many of a seed as possible, the pairs that can give the fewest other seeds come first, and a click shows a planting plan for
+  the Deluxe Garden Patch (8 beds, numbered order, seeds alternating, soil). Rules from the Console Games Wiki, credited, not checked by Tensho.
+
+## 0.455.0
+- Campagne de tests en jeu, lot 1 (retours de l'utilisateur, 2026-11-04) :
+  - Journal de l'or : « +0 / =1 276 » venait du signe − (U+2212), que la police du jeu affiche « = ». Les totaux et les dernières variations
+    sont maintenant des tableaux (zéro affiché « — »), et ce signe est remplacé par « - » dans tous les textes.
+  - Escouade : l'alarme n'existait que par le bouton de la ligne, visible seulement pendant une mission. Les alarmes automatiques couvrent
+    maintenant la fin de la mission et de l'entraînement (comme les tâches de servant et les vaisseaux).
+  - Barre du serveur : une entrée séparée pour les rappels, avec sa propre icône et le nombre de rappels terminés (tâches de servant, vaisseaux
+    revenus, mission et entraînement d'escouade, parcelles mûres) ; survol = la liste ; clic = page Rappels ; réglage dans Avancé (activé). L'icône
+    des alarmes garde le nombre d'alarmes actives (choix de l'utilisateur).
+- Validé en jeu par l'utilisateur (lot 1) : ouverture de la fenêtre, liste des graines, parcelle de test et ses boutons, croisements, message hors
+  caserne, lien partake.gg, réglage retiré, journal de l'or sans fausse entrée. Cases cochées dans TESTING.md.
+- Tests : Campaign455Tests (4 cas). Verify.ps1 (agent) : 847/847, 0 avertissement, 0 erreur ; DLL 0.455.0.0. Non validé en jeu.
+### English
+- In-game campaign, batch 1. Gil journal: tables instead of lines; the U+2212 minus sign, which the game font shows as « = », is replaced
+  everywhere. Automatic alarms now cover the squadron's mission and training. The server bar has a separate reminders entry with its own icon and
+  the number of finished reminders; the alarm icon keeps the number of active alarms.
+
+## 0.454.0
+- R-14, troisième lot : les derniers constats confirmés par l'audit.
+  - Titre par classe : la liste est commune à tous vos personnages ; seul un titre que ce personnage possède est envoyé au jeu.
+  - Collections : une feuille liée qui ne se charge plus ne laisse de côté qu'une carte ou un lieu, plus toutes les catégories.
+  - Objets de collection et carnets : un échec affiche « n'a pas pu être lu » au lieu de « Lecture… » sans fin. Un sac pas encore chargé
+    ne publie plus une liste incomplète. Le carnet de récolte illisible est signalé au lieu d'afficher 0/0.
+  - Noms des pages communautaires : une feuille perdue est mémorisée (elle était relancée à chaque image du survol) et chaque table est
+    construite seule.
+  - Fonctions vérifiées avant l'appel : tri du servant, déplacement du nœud de la carte (la carte du jeu reste, au lieu d'un remplacement à
+    moitié fait toutes les 5 s).
+  - Carte au trésor : une fonction perdue est écrite une fois dans le journal, au lieu d'un « pas de carte » silencieux.
+  - Triple Triade : aucune carte ou aucun PNJ reconnu fait échouer le catalogue, au lieu d'une liste vide.
+  - Fenêtre de récolte : le nœud de texte est lu par un simple transtypage (une fonction du jeu de moins à risque).
+  - Message d'erreur en français dans le code remplacé par l'anglais (règle des langues).
+- Fin de cette passe R-14 : les 23 constats confirmés et les 12 classés « plantage » sont traités. Pour cinq lectures de feuille depuis les
+  panneaux, seule l'isolation de 0.452 s'applique : le panneau se coupe, sans valeur « inconnue » propre. Restent 44 constats jamais vérifiés
+  (quota épuisé pendant l'audit), aucun classé plantage : 21 mineurs, 19 dégradations silencieuses, 4 valeurs peut-être fausses (règles de
+  Triple Triade ×2, tenues partielles de la cabine, cases collectées de la carte). Liste locale : checkpoints/r14-audit-2026-11-03.json.
+- Tests : Resilience454Tests (5 cas) ; 2 tests déjà écrits adaptés au nouveau code. Verify.ps1 (agent) : 843/843, 0 avertissement, 0 erreur ;
+  DLL 0.454.0.0. Non validé en jeu.
+### English
+- R-14, third batch: the last confirmed findings. A title is only sent if this character owns it; a lost linked sheet leaves one card or location
+  instead of every collection; collectables and notebooks say « unavailable » instead of « reading » for ever; community names remember a lost
+  sheet; retainer sorter and map node move are checked before use; the treasure map failure is logged once; an unrecognised Triple Triad
+  catalogue fails instead of showing an empty list.
+
+## 0.453.0
+- R-14, deuxième lot de l'audit : une valeur inconnue reste inconnue, jamais zéro, « aucun » ou « aucune catégorie ». Chaque constat a été
+  relu dans le code.
+  - Journal de l'or : l'or était lu avant le chargement du conteneur de monnaies. Ce 0 servait de point de départ à la connexion, puis
+    créait une fausse entrée « + tout l'or ». Il est lu après ce chargement, et chaque fonction est vérifiée.
+  - Prix de sous-cotation : tant que vos servants ne sont pas lus (ou si leur lecture échoue), aucun prix n'est copié, au lieu d'annoncer
+    « vos servants écartés ».
+  - Revue de mode : une valeur de case absente de la fenêtre n'est plus lue comme « aucune catégorie cette semaine » ; erreur écrite une fois.
+    Une valeur présente mais non textuelle reste lue comme vide, faute de preuve en jeu.
+  - Escouade : un échec de lecture dit maintenant « n'a pas pu être lue » au lieu d'envoyer le joueur à la caserne.
+  - Liste de téléportation illisible : affichée en échec au lieu de « aucune destination ».
+  - Mandats, collections supplémentaires, chocobo : lus seulement une fois le personnage chargé (le jeu répond « non » avant).
+  - Rappels : aucun compteur avant le chargement du personnage (l'écran titre montrait des zéros et le rôle « Tank »), et chaque compteur
+    a sa propre garde (une signature perdue faisait tout disparaître).
+  - Monnaies : CurrencyManager inconnu donne un solde inconnu, au lieu de compter dans les sacs.
+  - Macros : la lecture des emplacements est gardée, un module de barres absent n'empêche plus l'écriture, et les pages déjà écrites sont
+    sauvegardées même si une suivante échoue.
+- Tests : Resilience453Tests (9 cas) ; 3 tests déjà écrits adaptés au nouveau code. Verify.ps1 (agent) : 838/838, 0 avertissement, 0 erreur ;
+  DLL 0.453.0.0. Non validé en jeu.
+### English
+- R-14, second batch: an unknown value stays unknown. Gil is read once the currency container is loaded (no more fake « + all your gil »
+  entry at login); no undercut price while your retainers are unknown; a missing Fashion Report value is no longer « no category »; a failed
+  squadron or teleport read is said as such; unlock readers wait for the loaded character; Reminders show no zeros before login and each
+  counter is guarded alone; an unknown currency manager gives an unknown balance; the macro writer saves pages already written.
+
+## 0.452.0
+- R-14 et A-14 (demande de l'utilisateur, sans ultracode), à partir de l'audit gardé, chaque constat relu dans le code. Premier lot : ce qui
+  pouvait planter le jeu ou faire tomber toute l'interface.
+- Interface : Dalamud enveloppe tout le dessin de Tensho dans un seul catch, donc un panneau qui échouait (feuille perdue après une mise à
+  jour) remplaçait toutes les fenêtres par sa fenêtre d'erreur. Les 26 panneaux et observations de Plugin.Draw échouent maintenant seuls :
+  erreur écrite une fois, panneau coupé jusqu'au rechargement.
+- Chargement : trois feuilles lues au démarrage (ClassJob, ContentRoulette, ContentsNote) faisaient refuser tout le plugin si l'une ne se
+  chargeait plus ; seule leur fonction se coupe.
+- Hooks (A-14), revue finie : ils restent, avec ces corrections.
+  - Enregistreur : le retour `bool` était lu sur 4 octets au lieu d'un, donc une action refusée pouvait passer pour acceptée, et ce résultat
+    repartait au jeu ; il utilise le délégué de FFXIVClientStructs.
+  - Enregistreur : une action mise en file était notée deux fois ; elle l'est une fois, quand elle part.
+  - Chaîne de macros : plus aucune exception ne peut remonter dans le jeu, la fonction du jeu s'exécute toujours, et une macro refusée par
+    /macrolock n'arrête plus la chaîne.
+  - Les deux hooks utilisent OriginalDisposeSafe.
+- Bogues réels trouvés par l'audit :
+  - Alarmes : Dalamud refuse un second gestionnaire de lien pour le même objet, donc dès la deuxième sonnerie d'un objet, la ligne de chat, le
+    son et Discord étaient perdus. Le lien est gardé par objet, et un échec du chat n'empêche plus le son ni Discord.
+  - Effets de craft (Veneration, Innovation, Great Strides, Waste Not I et II, Manipulation, Final Appraisal) : ils ont une ligne Action par
+    classe, mais toutes les classes recevaient celle du Charpentier. L'enregistreur les perdait sur les 7 autres classes. Preuve :
+    docs/evidence/0.452-craft-buff-rows.md (vérifié sur XIVAPI v2).
+  - Synthèse en direct : le contrôle « tous les effets lus » ne pouvait presque jamais réussir (l'énumérateur saute les cases vides), donc la
+    projection en direct ne tournait pas. Elle va maintenant tourner, ce qui n'a jamais été essayé en jeu.
+- Lectures de la mémoire du jeu : liste des scènes de musique bornée ; parcours des nœuds de Triple Triade gardés comme ceux de la récolte ;
+  texture lue seulement quand son type le permet ; Try On seulement avec un personnage chargé et une fonction trouvée.
+- Tests : Resilience452Tests (6 cas) ; 6 tests déjà écrits adaptés au nouveau code. Verify.ps1 (agent) : 829/829, 0 avertissement, 0 erreur ;
+  DLL 0.452.0.0. Non validé en jeu.
+### English
+- R-14 / A-14, first batch from the saved audit (crash class). Each overlay now fails alone instead of replacing every Tensho window with
+  Dalamud's error window; sheets read at load no longer refuse the whole plugin.
+- Hook review finished: both hooks stay. The recorder reads the game's 1-byte bool correctly and notes a queued action once; the macro chain
+  hook can no longer throw into the game and ignores macros refused by /macrolock.
+- Fixed: from an item's second ring, an alarm lost its chat line, sound and Discord post. Crafting buffs use each class's own action row (the
+  recorder dropped them on 7 classes). The live craft projection could almost never run: it will now, untested in game.
+- Native lists bounded (music scenes, Triple Triad node walks); Try On needs a loaded character.
+
 ## 0.451.0
 - Release Stable-0.451.0 (demande de l'utilisateur, 2026-11-03) : les notes précisent qu'il reste beaucoup de tests en jeu à faire.
 - N-06 (DEC-027, point 1) : section « Missions d'escouade » dans la page Rappels. Tout vient du jeu, aucune source communautaire :

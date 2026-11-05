@@ -35,11 +35,13 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
     public IReadOnlyDictionary<uint,AchievementProgress> Progress{get{lock(gate)return new Dictionary<uint,AchievementProgress>(progress);}}
 
     /// <summary>On the player's click (UI thread): ask the server once for this achievement's progress; one request per 3 seconds.</summary>
+    private DateTimeOffset failedUntil;
     public bool Request(uint achievementId)
     {
         lock(gate)
         {
-            if(disposed || achievementId==0 || DateTimeOffset.UtcNow-lastRequest<TimeSpan.FromSeconds(3))return false;
+            // R-14 (0.507): a function lost after a game update refuses the click, instead of accepting it and doing nothing.
+            if(disposed || achievementId==0 || DateTimeOffset.UtcNow-lastRequest<TimeSpan.FromSeconds(3) || (nint)Achievement.MemberFunctionPointers.RequestAchievementProgress==0)return false;
             pendingRequest=achievementId;lastRequest=DateTimeOffset.UtcNow;return true;
         }
     }
@@ -49,6 +51,8 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
         if(disposed || !framework.IsInFrameworkUpdateThread || framework.IsFrameworkUnloading)return;
         var now=DateTimeOffset.UtcNow;
         if(!client.IsLoggedIn){lock(gate){if(progress.Count>0){progress=[];character=0;}pendingRequest=0;}return;}
+        // R-14 (0.507): after a failure, a pause: the next line threw on every frame.
+        if(now<failedUntil)return;
         try
         {
             var achievement=Achievement.Instance();
@@ -74,7 +78,7 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
         }
         catch(Exception error)
         {
-            nextRead=now.AddSeconds(30);
+            failedUntil=now.AddSeconds(30);
             if(!warned){warned=true;log.Warning(error,"Achievement progress could not be read.");}
         }
     }

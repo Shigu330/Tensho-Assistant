@@ -72,12 +72,16 @@ public sealed unsafe class VoyageWatcher : IDisposable
         if(!catalogTried)
         {
             catalogTried=true;
-            try{Volatile.Write(ref catalog,BuildCatalog());}
-            catch(Exception error){CatalogFailed=true;log.Warning(error,"Submarine route data could not be built.");}
-            try{Volatile.Write(ref partCatalog,BuildPartCatalog());}
-            catch(Exception error){PartCatalogFailed=true;log.Warning(error,"Vessel part data could not be built.");}
-            try{Volatile.Write(ref airshipCatalog,BuildAirshipCatalog());}
-            catch(Exception error){AirshipCatalogFailed=true;log.Warning(error,"Airship sector data could not be built.");}
+            // 0.525 (user report: lag when the plugin loads; Dalamud logged 85 to 175 ms here at each load): sheets and embedded files only, so off the framework thread.
+            Task.Run(()=>
+            {
+                try{Volatile.Write(ref catalog,BuildCatalog());}
+                catch(Exception error){CatalogFailed=true;log.Warning(error,"Submarine route data could not be built.");}
+                try{Volatile.Write(ref partCatalog,BuildPartCatalog());}
+                catch(Exception error){PartCatalogFailed=true;log.Warning(error,"Vessel part data could not be built.");}
+                try{Volatile.Write(ref airshipCatalog,BuildAirshipCatalog());}
+                catch(Exception error){AirshipCatalogFailed=true;log.Warning(error,"Airship sector data could not be built.");}
+            });
         }
         var reading=true;
         try

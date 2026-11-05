@@ -7,7 +7,7 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace TenshoAssistant.Inventory;
 
-internal sealed record BankMenuContext(BankKey Key, string Name, string AddonName, Vector2 Anchor, bool Loaded);
+internal sealed record BankMenuContext(BankKey Key, string Name, string AddonName, Vector2 Anchor, bool Loaded, Vector2 AddonAt = default);
 internal sealed record BankMenuState(ulong CharacterId, BankMenuContext? Retainer, BankMenuContext? Saddlebag,
     BankMenuContext? Premium, string? Message, IReadOnlyList<(ulong Id, string Name)>? KnownRetainers = null, bool ReadsUnavailable = false,
     BankMenuContext? FreeCompany = null);
@@ -35,6 +35,8 @@ internal sealed class BankInventoryBridge : IDisposable
     private readonly Func<IReadOnlyList<(uint Row, uint Item)>> cabinetRows;
     // Pieces of an outfit stored as one item in the glamour dresser (MirageStoreSetItem: outfit item → pieces), 0.240.
     private readonly Func<uint, IReadOnlyList<uint>> outfitPieces;
+    private readonly HashSet<(uint Outfit, string Bits)> loggedOutfits = [];
+    private bool outfitSlotsFailed;
     private readonly Dictionary<BankKey, TimeSpan> autoCaptured = [];
     private IReadOnlyList<(ulong Id, string Name)>? knownRetainers;
     // 0.329 (R-14): optional reads that failed once (logged once); the first failure of each posts ReadUnavailable.
@@ -204,11 +206,19 @@ internal sealed class BankInventoryBridge : IDisposable
     }
 
     // 0.345: « Name (World) » of the logged-in character (Dalamud IPlayerState), stored as the name of its own storages; empty when not known.
+    private bool homeWorldFailed;
     private string CharacterLabel()
     {
         var name = player.CharacterName;
         if (string.IsNullOrWhiteSpace(name)) return "";
-        var world = player.HomeWorld.IsValid ? player.HomeWorld.Value.Name.ExtractText() : "";
+        // R-14 (0.507): the World sheet only adds to the label: its failure leaves the name alone, and every storage stays readable.
+        string world;
+        try { world = player.HomeWorld.IsValid ? player.HomeWorld.Value.Name.ExtractText() : ""; }
+        catch (Exception error)
+        {
+            world = "";
+            if (!homeWorldFailed) { homeWorldFailed = true; log.Warning(error, "Home world name unavailable."); }
+        }
         return world.Length > 0 ? $"{name} ({world})" : name;
     }
 
@@ -256,7 +266,7 @@ internal sealed class BankInventoryBridge : IDisposable
         var retainer = manager->GetActiveRetainer();
         if (retainer == null || retainer->RetainerId == 0 || retainer->RetainerId != manager->LastSelectedRetainerId) return null;
         var key = new BankKey(character, BankStorageKind.Retainer, retainer->RetainerId);
-        return new(key, retainer->NameString, addon.Name, addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(key.Kind));
+        return new(key, retainer->NameString, addon.Name, addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(key.Kind), addon.Position);
     }
 
     // 0.350 (g, I-09): the company chest window; loaded once every page (and gil, crystals) has been received from the game.
@@ -266,7 +276,7 @@ internal sealed class BankInventoryBridge : IDisposable
         var addon = FindVisible("FreeCompanyChest");
         if (addon.IsNull) return null;
         return new(new BankKey(character, BankStorageKind.FreeCompanyChest, 0), "Company chest", addon.Name,
-            addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(BankStorageKind.FreeCompanyChest));
+            addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(BankStorageKind.FreeCompanyChest), addon.Position);
     }
 
     private BankMenuContext? GetSaddle(ulong character, BankStorageKind kind)
@@ -275,11 +285,11 @@ internal sealed class BankInventoryBridge : IDisposable
         var addon = FindVisible("InventoryBuddy", "InventoryBuddy2");
         if (addon.IsNull) return null;
         return new(new BankKey(character, kind, 0), kind == BankStorageKind.Saddlebag ? "Sacoche chocobo" : "Premium chocobo saddlebag",
-            addon.Name, addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(kind));
+            addon.Name, addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(kind), addon.Position);
     }
 
     private static unsafe bool DresserLoaded() { var mirage = MirageManager.Instance(); return mirage != null && mirage->PrismBoxLoaded; }
-    private static unsafe bool ArmoireLoaded() { var ui = FFXIVClientStructs.FFXIV.Client.Game.UI.UIState.Instance(); return ui != null && ui->Cabinet.IsCabinetLoaded(); }
+    private static unsafe bool ArmoireLoaded() { var ui = FFXIVClientStructs.FFXIV.Client.Game.UI.UIState.Instance(); return ui != null && ui->Cabinet.IsCabinetLoaded() && (nint)FFXIVClientStructs.FFXIV.Client.Game.UI.Cabinet.MemberFunctionPointers.IsItemInCabinet != 0; }
 
     // Glamour dresser items (MirageManager.PrismBoxItemIds: 0 empty, +1 000 000 HQ, +500 000 collectable), one stack per stored piece.
     private unsafe InventorySnapshot DresserSnapshot(InventoryOwnerId owner)
@@ -296,10 +306,32 @@ internal sealed class BankInventoryBridge : IDisposable
             if (id == 0) continue;
             stacks.Add(new(new(new(id), hq), 1, slot));
             // A whole outfit is stored as one item: its pieces count as owned too (numbered after the dresser's own slots).
-            foreach (var piece in outfitPieces(id))
-                if (piece != 0) stacks.Add(new(new(new(piece), false), 1, ids.Length + stacks.Count));
+            // 0.491 (R-14): since 7.4 an outfit may be incomplete (FCS MirageManager.IsSetSlotUnlocked; slot = MirageStoreSetItem column,
+            // 11 columns, 11 slots). No slot held, or the function unavailable: what the game says is not usable, all the pieces count as before.
+            var pieces = outfitPieces(id);
+            if (pieces.Count == 0) continue;
+            var held = OutfitSlots(mirage, (uint)slot, id, pieces.Count);
+            for (var column = 0; column < pieces.Count; column++)
+                if (pieces[column] != 0 && (held is null || held[column])) stacks.Add(new(new(new(pieces[column]), false), 1, ids.Length + stacks.Count));
         }
         return new(DateTimeOffset.UtcNow, "Dalamud/MirageManager.PrismBox", [new InventoryContainerSnapshot(new(owner, new(25000)), InventoryCoverage.Complete, stacks)]);
+    }
+
+    private unsafe bool[]? OutfitSlots(MirageManager* mirage, uint index, uint outfit, int count)
+    {
+        var held = new bool[count];
+        try
+        {
+            for (var column = 0; column < count; column++) held[column] = mirage->IsSetSlotUnlocked(index, column);
+        }
+        catch (Exception error)
+        {
+            if (!outfitSlotsFailed) { outfitSlotsFailed = true; log.Warning(error, "Outfit slot check unavailable: every piece of a stored outfit counts."); }
+            return null;
+        }
+        var bits = string.Concat(held.Select(value => value ? '1' : '0'));
+        if (loggedOutfits.Add((outfit, bits))) log.Information("Dresser outfit {0}: slots held {1}.", outfit, bits);
+        return held.Any(value => value) ? held : null;
     }
 
     // Armoire items: every Cabinet row whose item is stored (UIState.Cabinet.IsItemInCabinet).

@@ -53,7 +53,7 @@ public sealed unsafe class AlarmDtrEntry : IDisposable
         var time=upcoming.Count==0 ? "":" · "+Remaining(upcoming[0].At-now);
         shownText=SeIconChar.Clock.ToIconString()+" "+enabled.Length+time;
         entry.Text=new SeStringBuilder().AddText(shownText).Build();
-        bounds=FindTextNode(shownText);
+        bounds=FindTextNode(gui,shownText);
         // Own tooltip when the entry was found on screen; else the game's.
         if(configuration.AlarmBarTooltip && bounds is not null)entry.Tooltip=null;
         else entry.Tooltip=upcoming.Count==0 ? text("Alarms.BarNone")
@@ -66,7 +66,7 @@ public sealed unsafe class AlarmDtrEntry : IDisposable
         =>left.TotalHours>=1 ? $"{(int)left.TotalHours} h {left.Minutes:00}":left.TotalMinutes>=1 ? $"{(int)left.TotalMinutes} min":"< 1 min";
 
     // The entry's text node in the server info bar addon: Dalamud adds it under the addon's root; matched by its text.
-    private (Vector2,Vector2)? FindTextNode(string wanted)
+    internal static (Vector2 Min,Vector2 Max)? FindTextNode(IGameGui gui,string wanted)
     {
         var addon=(AtkUnitBase*)gui.GetAddonByName("_DTR").Address;
         if(addon==null || !addon->IsVisible || addon->RootNode==null)return null;

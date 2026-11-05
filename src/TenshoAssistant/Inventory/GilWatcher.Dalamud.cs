@@ -53,13 +53,18 @@ public sealed unsafe class GilWatcher : IDisposable
             var id=player.IsLoaded ? player.ContentId:0;
             if(id!=character){Save(now);Switch(id,now);}
             if(id==0)return;
-            var inventory=InventoryManager.Instance();
-            long? newGil=inventory!=null && (nint)InventoryManager.MemberFunctionPointers.GetGil!=0 ? inventory->GetGil():null;
+            // R-14 (0.453): the balance only once the Currency container is loaded (as CurrencyWatcher, 0.344): before it GetGil gives 0, which
+            // became a starting point at login, then a « + all the gil » entry. Each function checked: a source lost after an update stays unknown.
+            var inventory=(nint)InventoryManager.StaticAddressPointers.pInstance!=0 ? InventoryManager.Instance():null;
+            var canOpen=inventory!=null && (nint)InventoryManager.MemberFunctionPointers.GetInventoryContainer!=0;
+            long? newGil=null;
+            if(canOpen && (nint)InventoryManager.MemberFunctionPointers.GetGil!=0
+                && inventory->GetInventoryContainer(InventoryType.Currency) is var wallet && wallet!=null && wallet->IsLoaded)newGil=inventory->GetGil();
             long? newCompany=null;
-            if(inventory!=null && (nint)InventoryManager.MemberFunctionPointers.GetFreeCompanyGil!=0
+            if(canOpen && (nint)InventoryManager.MemberFunctionPointers.GetFreeCompanyGil!=0
                 && inventory->GetInventoryContainer(InventoryType.FreeCompanyGil) is var chest && chest!=null && chest->IsLoaded)newCompany=inventory->GetFreeCompanyGil();
             long? newRetainers=null;
-            var manager=RetainerManager.Instance();
+            var manager=(nint)RetainerManager.StaticAddressPointers.pInstance!=0 ? RetainerManager.Instance():null;
             if(manager!=null && manager->IsReady)
             {
                 long sum=0;

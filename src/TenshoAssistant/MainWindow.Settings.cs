@@ -58,14 +58,13 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Get("Settings.OpenOnLoginHelp"));
         ImGui.Spacing();
         // 0.327 (queue step e): opening page, shared row (tooltip and « ↺ »); turning it on remembers the current page at once.
+        BoolSetting("Settings.HelpBanners","SettingTips.HelpBanners",()=>configuration.HelpBanners,value=>configuration.HelpBanners=value);
         BoolSetting("Settings.OpenOnLastPage","SettingTips.OpenOnLastPage",()=>configuration.OpenOnLastPage,value=>{configuration.OpenOnLastPage=value;rememberedPage=null;RememberPage();},c=>c.OpenOnLastPage);
         ImGui.Spacing(); ImGui.Separator();
         DrawHeaderSettings();
     }
-    private void DrawInterfaceSettings()
+    private void DrawLanguageSetting()
     {
-        ImGui.TextColored(Accent, localization.Get("Settings.Interface"));
-        DrawFontSettings();
         var languageCode = localization.CurrentCode;
         var currentLanguage = localization.AvailableLanguages.FirstOrDefault(language => language.Code == languageCode);
         if (ImGui.BeginCombo(localization.Get("Settings.Language") + "###InterfaceLanguage", string.IsNullOrEmpty(currentLanguage.NativeName) ? languageCode : currentLanguage.NativeName))
@@ -91,9 +90,15 @@ internal sealed partial class MainWindow
             finally { ImGui.EndCombo(); }
         }
         Tip("SettingTips.Language");
+    }
+
+    private void DrawInterfaceSettings()
+    {
+        ImGui.TextColored(Accent, localization.Get("Settings.Interface"));
+        DrawFontSettings();
+        DrawLanguageSetting();
         ImGui.TextDisabled(localization.Format("Localization.LoadedLanguages", localization.AvailableLanguages.Count));
         DrawThemeSetting();
-        BoolSetting("Settings.GameFrames","SettingTips.GameFrames",()=>configuration.GameFrames,value=>configuration.GameFrames=value,c=>c.GameFrames);
         ImGui.TextColored(Accent, localization.Get("Settings.ObjectsMarket"));
         ImGui.TextDisabled(localization.Get("Advanced.MarketMoved"));
         // 0.324: shared setting rows (tooltip and « ↺ »). 0.447: « monsters on hover » removed (it no longer did anything).
@@ -153,6 +158,11 @@ internal sealed partial class MainWindow
             ImGui.TextColored(Accent,localization.Get("ModuleSettings.Search"));
             // 0.321 (review 0.316, point 6): saved, with « ↺ »; bounds unchanged.
             var search=CraftSearchOptions;var searchDefaults=DefaultConfiguration.CraftSearch;
+            // A-03 (0.465, DEC-028): the optional Raphael solver.
+            // 0.468 (user request, in-game campaign): the projection window beside the synthesis, also here.
+            BoolSetting("CraftLiveUi.Panel","CraftLiveUi.PanelTip",()=>configuration.CraftLivePanel,value=>{configuration.CraftLivePanel=value;craftLive.SetEnabled(CraftLiveWanted(configuration));},c=>c.CraftLivePanel);
+            BoolSetting("CraftLiveUi.Suggest","CraftLiveUi.SuggestTip",()=>configuration.CraftLiveSuggest,value=>configuration.CraftLiveSuggest=value,c=>c.CraftLiveSuggest);
+            BoolSetting("CraftSearch.SettingRaphael","CraftSearch.SolverRaphaelTip",()=>search.Raphael,value=>search.Raphael=value,c=>c.CraftSearch?.Raphael==true);
             IntSetting("ModuleSettings.Steps","SettingTips.Steps",()=>search.Steps,value=>search.Steps=value,1,100,searchDefaults.Steps);
             IntSetting("ModuleSettings.Width","SettingTips.Width",()=>search.Width,value=>search.Width=value,1,512,searchDefaults.Width);
             IntSetting("ModuleSettings.Budget","SettingTips.Budget",()=>search.Budget,value=>search.Budget=value,1,500000,searchDefaults.Budget);
@@ -227,6 +237,7 @@ internal sealed partial class MainWindow
             if(BoolDefaultButton("GatheringPanel.Setting",DefaultConfiguration.GatheringPanel,configuration.GatheringPanel))
                 SaveGatheringChoice(DefaultConfiguration.GatheringPanel ? true:null,DefaultConfiguration.GatheringPanel);
             ImGui.TextWrapped(localization.Get("ModuleSettings.GatheringHelp"));
+            DrawGpPlanSettings();
         }
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("Gear.Title"),ImGuiTreeNodeFlags.DefaultOpen))DrawGearSettings();
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ModuleSettings.Games"),ImGuiTreeNodeFlags.DefaultOpen))
@@ -260,6 +271,8 @@ internal sealed partial class MainWindow
         // 0.324: shared setting rows (tooltip and « ↺ »).
         BoolSetting("DutyFinder.Setting","Advanced.DutyFinderTip",()=>configuration.ShowDutyFinderLoot,value=>configuration.ShowDutyFinderLoot=value,c=>c.ShowDutyFinderLoot);
         BoolSetting("CharacterStats.Setting","Advanced.CharacterPanelTip",()=>configuration.ShowCharacterPanel,value=>configuration.ShowCharacterPanel=value,c=>c.ShowCharacterPanel);
+        BoolSetting("Advanced.HidePanelsBehindGame","Advanced.HidePanelsBehindGameTip",()=>configuration.HidePanelsBehindGame,value=>configuration.HidePanelsBehindGame=value,c=>c.HidePanelsBehindGame);
+        BoolSetting("Advanced.HideBarsBehindGame","Advanced.HideBarsBehindGameTip",()=>configuration.HideBarsBehindGame,value=>configuration.HideBarsBehindGame=value,c=>c.HideBarsBehindGame);
         BoolSetting("BankUi.AutoSetting","BankUi.AutoSettingHelp",()=>configuration.AutoBankCapture,value=>configuration.AutoBankCapture=value,c=>c.AutoBankCapture);
         ImGui.TextDisabled(localization.Get("BankUi.AutoSettingHelp"));
         DrawCacheSettings();

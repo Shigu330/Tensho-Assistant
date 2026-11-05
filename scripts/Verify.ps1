@@ -16,11 +16,13 @@ if ($TestsOnly -and ($Commit -or $Release)) { throw '-TestsOnly checks the logic
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $taskRoot = Split-Path -Parent $PSScriptRoot
 if (-not $DotNet) {
-    # Prefer the locally installed pinned SDK; explicit -DotNet supports other hosts.
-    $taskSdkVersion = (Get-Content -Raw -LiteralPath (Join-Path $taskRoot 'global.json') | ConvertFrom-Json).sdk.version
-    $taskLocalSdk = Join-Path $env:USERPROFILE ".codex\dotnet-$taskSdkVersion\dotnet.exe"
+    # Prefer the newest locally installed .NET 10 SDK (global.json accepts 10.0.100 and newer); explicit -DotNet supports other hosts.
+    $taskLocalSdk = Get-ChildItem -LiteralPath (Join-Path $env:USERPROFILE '.codex') -Directory -Filter 'dotnet-10.*' -ErrorAction SilentlyContinue |
+        Sort-Object { [version]($_.Name -replace '^dotnet-', '') } -Descending |
+        ForEach-Object { Join-Path $_.FullName 'dotnet.exe' } |
+        Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
     $taskLegacySdk = 'C:\ia-code\.tools\dotnet10\dotnet.exe'
-    $DotNet = if (Test-Path -LiteralPath $taskLocalSdk) { $taskLocalSdk }
+    $DotNet = if ($taskLocalSdk) { $taskLocalSdk }
         elseif (Test-Path -LiteralPath $taskLegacySdk) { $taskLegacySdk } else { 'dotnet' }
 }
 # Stamp of the last green run (0.219): version + SHA-256 of every git-tracked or new file except *.md, docs/ and repo.json. When nothing
@@ -110,7 +112,7 @@ try {
     $taskZip = [IO.Compression.ZipFile]::OpenRead((Join-Path $taskOutput 'TenshoAssistant\latest.zip'))
     try {
         $taskEntries = @($taskZip.Entries.FullName)
-        foreach ($taskExpected in @('TenshoAssistant.dll', 'TenshoAssistant.json')) {
+        foreach ($taskExpected in @('TenshoAssistant.dll', 'TenshoAssistant.json', 'Raphael.Net.dll', 'raphael_bindings.dll')) {
             if ($taskExpected -notin $taskEntries) { throw "Missing package entry: $taskExpected" }
             if (@($taskEntries | Where-Object { $_ -ceq $taskExpected }).Count -ne 1) { throw "Duplicate package entry: $taskExpected" }
             $taskZipStream = $taskZip.GetEntry($taskExpected).Open()

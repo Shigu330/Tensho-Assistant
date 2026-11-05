@@ -17,6 +17,57 @@ internal static class CraftProjectionTests
     private static void Check(bool condition,string why){if(!condition)throw new Exception(why);}
     public static IEnumerable<(string Name,Action Run)> Cases=>new (string,Action)[]
     {
+        ("Suggestion (A-04): from the observed state, among what the game allows, never a forbidden or chance move",()=>
+        {
+            var catalog=Catalog();var raw=Raw(catalog);
+            var normal=Build(raw,catalog);
+            Check(normal.Suggest is { State.Progress:100,State.Quality:100,Condition:CraftStepCondition.Normal },"starts from what is read");
+            var input=normal.Suggest!;
+            var move=CraftSolver.Suggest(input,1000,"");
+            Check(move is not null && input.Available.Contains(move.Move),"among what the game allows");
+            Check(!CraftSimulation.Random(move!.Move),"no chance");
+            Check(CraftSolver.Suggest(input,1000,"")!.Move==move.Move,"the same state gives the same move");
+            var forbidden=CraftActionRules.Key([move.Move.ToString()]);
+            var other=CraftSolver.Suggest(input,1000,forbidden);
+            Check(other is null || other.Move!=move.Move,"a forbidden move is not suggested");
+            Check(CraftSolver.Suggest(input with {Available=[]},1000,"") is null,"nothing allowed: nothing suggested");
+            var near=input with {State=input.State with {Progress=999}};
+            var finish=CraftSolver.Suggest(near,0,"");
+            Check(finish is { TargetReached:true },"a target already met: it finishes");
+            using var cancelled=new CancellationTokenSource();cancelled.Cancel();
+            var stopped=false;
+            try{CraftSolver.Suggest(input,1000,"",cancelled.Token);}catch(OperationCanceledException){stopped=true;}
+            Check(stopped,"cancelled when the state moves on");
+        }),
+        ("Suggestion (A-04): the real condition counts for this move; without the tool's bonus nothing is suggested",()=>
+        {
+            var catalog=Catalog();var raw=Raw(catalog);
+            var good=Build(raw with {Condition=2,NumbersNative=raw.NumbersNative! with {Condition=1},Tool=new(1,8,150)},catalog).Suggest;
+            Check(good is { Condition:CraftStepCondition.Good,GoodPercent:150 },"good, with its bonus");
+            Check(good!.Available.Contains(CraftActionKind.PreciseTouch),"its moves are offered");
+            Check(Build(raw with {Condition=2,NumbersNative=raw.NumbersNative! with {Condition=1}},catalog).Suggest is null,"bonus unknown: no suggestion");
+            var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CraftProjection.cs"));
+            Check(window.Contains("_=Task.Run(()=>") && window.Contains("configuration.CraftLiveSuggest") && !window.Contains("UseAction"),"off the game's thread, with its setting, nothing played");
+        }),
+        ("Projection follows the state of the synthesis: says it, and marks what only this state allows",()=>
+        {
+            var catalog=Catalog();var raw=Raw(catalog);
+            var normal=Build(raw,catalog);
+            Check(normal.Condition==CraftStepCondition.Normal && normal.Actions.All(row=>!row.OnlyInThisCondition) && normal.Actions.All(row=>row.Metadata.Spec.Kind!=CraftActionKind.PreciseTouch),"normal: nothing opened");
+            var good=Build(raw with {Condition=2,NumbersNative=raw.NumbersNative! with {Condition=1},Tool=new(1,8,150)},catalog);
+            Check(good.Condition==CraftStepCondition.Good && good.GoodPercent==150,"good: said, with its bonus");
+            Check(good.Actions.Single(row=>row.Metadata.Spec.Kind==CraftActionKind.PreciseTouch).OnlyInThisCondition && good.Actions.Single(row=>row.Metadata.Spec.Kind==CraftActionKind.TricksOfTheTrade).OnlyInThisCondition,"good: Precise Touch and Tricks of the Trade marked");
+            Check(!good.Actions.Single(row=>row.Metadata.Spec.Kind==CraftActionKind.BasicTouch).OnlyInThisCondition,"not the ordinary ones");
+            var touch=CraftActionKind.BasicTouch;
+            int Gain(CraftProjectionResult result)=>result.Actions.Single(row=>row.Metadata.Spec.Kind==touch).Quality!.Value.Min;
+            Check(Gain(good)>Gain(normal),"good raises the quality");
+            var poor=Build(raw with {Condition=4,NumbersNative=raw.NumbersNative! with {Condition=3}},catalog);
+            Check(poor.Condition==CraftStepCondition.Poor && Gain(poor)<Gain(normal),"poor lowers it");
+            var unknownTool=Build(raw with {Condition=2,NumbersNative=raw.NumbersNative! with {Condition=1}},catalog);
+            Check(unknownTool.Condition==CraftStepCondition.Good && unknownTool.GoodPercent is null,"tool not read: the bonus stays unknown");
+            var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CraftProjection.cs"));
+            Check(window.Contains("DrawProjectionCondition(result,frame.Raw.ConditionText);") && window.Contains("ThenByDescending(row=>row.OnlyInThisCondition)"),"shown, and first in the list");
+        }),
         ("Live projection preserves uncertain combo costs and refined stack alternatives",()=>
         {
             var catalog=Catalog();var result=Build(Raw(catalog),catalog);

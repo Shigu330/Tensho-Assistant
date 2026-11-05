@@ -45,18 +45,21 @@ internal sealed class DutyCatalogLoader : IDisposable
                     var row = sheet.GetRowAt(position++);
                     if (row.RowId != 0 && row.ContentFinderCondition.RowId != 0)
                     {
-                        var finder = row.ContentFinderCondition.Value;
+                        // R-14 (0.507): a dangling link skips this duty, not the whole catalogue.
+                        if (row.ContentFinderCondition.ValueNullable is not { } finder) continue;
                         var name = finder.Name.ExtractText();
                         // Content is polymorphic: only a reciprocal regular-instance link is accepted.
                         if (finder.ContentLinkType == 1 && finder.Content.RowId == row.RowId
                             && finder.TerritoryType.RowId != 0 && !string.IsNullOrWhiteSpace(name))
                             copied.Add(new(finder.RowId,row.RowId,finder.TerritoryType.RowId,name,
-                                finder.ContentType.Value.Name.ExtractText(),finder.ClassJobLevelRequired,finder.ContentType.Value.Icon));
+                                finder.ContentType.ValueNullable?.Name.ExtractText() ?? "",finder.ClassJobLevelRequired,finder.ContentType.ValueNullable?.Icon ?? 0));
                     }
                     if (Stopwatch.GetElapsedTime(start) >= TimeSpan.FromMilliseconds(2)) break;
                 }
                 service.Progress(position,sheet.Count);
                 if (position != sheet.Count) return;
+                // 0.492 (R-14): no duty copied means unreadable game data, not « no duty »: the catch publishes the failure.
+                if (copied.Count == 0) throw new InvalidDataException("InstanceContent sheet gave no duty.");
                 var managed = copied.ToArray(); copied.Clear(); sheet = null;
                 var token = cancellation.Token;
                 build = Task.Run(() => new DutyCatalog(managed,token));

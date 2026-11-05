@@ -6,11 +6,25 @@ namespace TenshoAssistant.Craft;
 /// docs/evidence/0.420-craft-food.md. A relative bonus is the given percent of the attribute, capped; NQ and HQ have their own values.
 /// </summary>
 public sealed record CraftBonus(uint BaseParam,bool Relative,int Value,int Max,int ValueHq,int MaxHq);
-public sealed record CraftConsumable(uint ItemId,string Name,bool Medicine,IReadOnlyList<CraftBonus> Bonuses);
+public sealed record CraftConsumable(uint ItemId,string Name,bool Medicine,IReadOnlyList<CraftBonus> Bonuses,uint FoodRow=0);
+
+/// <summary>0.464: read from the game: the Param of Well Fed and Medicated (null: not active) and whether the job is a specialist (null: unknown).</summary>
+public sealed record CraftDetected(ushort? Food,ushort? Medicine,bool? Specialist);
 
 public static class CraftConsumables
 {
     public const uint Craftsmanship=70,Control=71,Cp=11,WellFed=48,Medicated=49;
+
+    /// <summary>
+    /// 0.464: the consumable of an active Well Fed or Medicated: its Param is the ItemFood row, plus 10000 for HQ (as Craftimizer, MIT, read to understand). A consumable
+    /// without crafting bonus is not in the list: null.
+    /// </summary>
+    public static (CraftConsumable Item,bool Hq)? FromStatus(IEnumerable<CraftConsumable>? list,ushort? param,bool medicine)
+    {
+        if(param is not { } value || value==0)return null;
+        var hq=value>10000;var row=hq ? (uint)(value-10000):value;
+        return list?.FirstOrDefault(item=>item.Medicine==medicine && item.FoodRow==row) is { } found ? (found,hq):null;
+    }
 
     /// <summary>The bonus one consumable gives to one attribute, from the attribute without consumables.</summary>
     public static int Bonus(CraftConsumable? consumable,bool hq,uint baseParam,int attribute)

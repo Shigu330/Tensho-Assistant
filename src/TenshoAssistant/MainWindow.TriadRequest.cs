@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
     }
     private List<TriadCardDefinition> OwnedTriadCards()=>collections.State.Entries
         .Where(entry=>entry.Kind==CollectionKind.TripleTriad && entry.ConfirmedUnlocked && entry.Card is not null).Select(entry=>entry.Card!).ToList();
-    private static string TriadRequestKey(TriadRequestInfo request)=>$"{request.NpcId}|{string.Join('.',request.RuleIds)}";
+    private static string TriadRequestKey(TriadRequestInfo request)=>$"{request.NpcId}|{request.RulesKnown}|{string.Join('.',request.RuleIds)}";
 
     internal void DrawTriadRequestPanel()
     {
@@ -47,17 +47,17 @@ internal sealed partial class MainWindow
         var npcVariable=request.NpcVariable.Select(id=>TriadCard(id)).OfType<TriadCardDefinition>().ToList();
         var rules=TriadMatchAdvisor.RulesOf(request.RuleIds);var forced=TriadMatchSimulator.ForcedOf(request.RuleIds);
         var decks=TriadRequestDecks(request);
-        StartTriadOdds(request,decks,npcFixed,npcVariable,rules,forced);
-        DrawTriadSelDeckOdds(decks);
-        if(!request.Window.Valid)return;
-        using var theme=UI.FfxivTheme.Apply();
-        ImGui.SetNextWindowPos(new Vector2(request.Window.X+request.Window.Width+8,request.Window.Y),ImGuiCond.Always);
-        ImGui.SetNextWindowSizeConstraints(new Vector2(300,0),new Vector2(420,900));
-        var visible=ImGui.Begin(localization.Get("TriadRequest.Title")+"###TenshoTriadRequest",ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse);
-        try
+        // 0.491 (R-14): no odds for a match whose rules could not be read.
+        if(request.RulesKnown)
         {
-            if(!visible)return;
+            StartTriadOdds(request,decks,npcFixed,npcVariable,rules,forced);
+            DrawTriadSelDeckOdds(decks);
+        }
+        if(!request.Window.Valid)return;
+        Panels?.Show("TenshoTriadRequest",localization.Get("TriadRequest.Title"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse,()=>{ImGui.SetNextWindowPos(new Vector2(request.Window.X+request.Window.Width+8,request.Window.Y)+WindowMoved("TripleTriadRequest",request.Window.X,request.Window.Y),ImGuiCond.Always);ImGui.SetNextWindowSizeConstraints(new Vector2(300,0),new Vector2(420,900));},()=>
+        {
             ImGui.TextColored(Accent,request.NpcName.Length>0 ? request.NpcName:localization.Get("TriadRequest.UnknownNpc"));
+            if(!request.RulesKnown){ImGui.TextWrapped(localization.Get("TriadRequest.RulesUnknown"));return;}
             ImGui.TextWrapped(localization.Format("TriadRequest.Rules",request.RuleNames is { Count:>0 } names ? string.Join(", ",names):localization.Get("TriadRequest.NoRules")));
             if(request.RuleIds.Contains(1u))ImGui.TextWrapped(localization.Get("TriadRequest.Roulette"));
             if(request.RuleIds.Contains(7u))ImGui.TextWrapped(localization.Get("TriadRequest.Random"));
@@ -100,8 +100,7 @@ internal sealed partial class MainWindow
                 ImGui.TextWrapped(localization.Get("TriadRequest.BuildInGame"));
             }
             ImGui.TextDisabled(localization.Get("TriadRequest.Estimate"));
-        }
-        finally{ImGui.End();}
+        });
     }
     // Deck choice window (0.165), like TriadBuddy: estimated win rate written beside each deck row, best deck framed in green.
     private void DrawTriadSelDeckOdds(List<(string Name,IReadOnlyList<TriadCardDefinition>? Deck)> decks)

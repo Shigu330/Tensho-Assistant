@@ -23,6 +23,7 @@ internal sealed class TriadObservationReader : IDisposable
     // Capture lines only in developer mode (0.161): building them cost a 66 ms frame at the start of a match.
     private readonly Func<bool> capture;
     private Dictionary<string, uint>? ruleIds;
+    private string? loggedRequestRules;
     private uint deckNpc;
     private string deckNpcName = string.Empty;
     private uint[] deckFixed = [], deckVariable = [];
@@ -141,6 +142,8 @@ internal sealed class TriadObservationReader : IDisposable
         var bytes = (byte*)pointer.Value; var length = 0;
         while (length < 240 && bytes[length] != 0) length++;
         var text = Dalamud.Game.Text.SeStringHandling.SeString.Parse(new ReadOnlySpan<byte>(bytes, length)).TextValue;
+        // 0.507 (R-14): a line break here cut the capture lines, so docs/evidence/0.160.0-triad-match-capture.log stops at value 8.
+        text = text.ReplaceLineEndings(" ");
         return "\"" + (text.Length > 60 ? text[..60] : text).Replace(";", ",") + "\"";
     }
     private static unsafe string? Rect(AtkComponentBase* component)
@@ -156,25 +159,47 @@ internal sealed class TriadObservationReader : IDisposable
     private unsafe TriadMatchContext Context(AddonTripleTriad* addon, byte phase)
     {
         var unit = &addon->AtkUnitBase;
-        if (data is not null) ruleIds ??= data.GetExcelSheet<TripleTriadRule>().Where(rule => rule.RowId != 0)
-            .Select(rule => (rule.RowId, Name: rule.Name.ExtractText())).Where(rule => rule.Name.Length > 0)
-            .GroupBy(rule => rule.Name).ToDictionary(group => group.Key, group => group.First().RowId);
+        LoadRuleIds();
         var rules = new List<uint>();
-        for (var index = 5; index <= 9 && index < unit->AtkValuesCount && unit->AtkValues != null; index++)
+        // 0.491 (R-14): a value missing, of another type, or a name the sheet does not know: the rules are unknown, the advice is not computed without them.
+        var known = ruleIds is { Count: > 0 } && unit->AtkValues != null && unit->AtkValuesCount > 9;
+        for (var index = 5; index <= 9 && known; index++)
         {
             var value = unit->AtkValues[index];
-            if (value.Type is AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString
-                && ruleIds?.TryGetValue(Bounded(value.String).Trim('"'), out var rule) == true && !rules.Contains(rule)) rules.Add(rule);
+            if (value.Type is not (AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString)) { known = false; break; }
+            var name = Bounded(value.String).Trim('"');
+            if (name.Length == 0) continue;
+            if (!ruleIds!.TryGetValue(name, out var rule)) known = false;
+            else if (!rules.Contains(rule)) rules.Add(rule);
         }
         int? forced = null;
         if (phase == 2 && unit->AtkValuesCount > 25 && unit->AtkValues != null && unit->AtkValues[25].Type == AtkValueType.Int) forced = unit->AtkValues[25].Int;
         var target = targetBaseId();
         if (deckNpc == 0 && target != 0) LoadDeck(target);
-        return new(rules, forced, deckNpc, deckFixed, deckVariable, Rects(addon->BlueDeck, unit->Scale), Rects(addon->Board, unit->Scale));
+        return new(rules, forced, deckNpc, deckFixed, deckVariable, Rects(addon->BlueDeck, unit->Scale), Rects(addon->Board, unit->Scale), known, !TriadMatchAdvisor.Competitive(client.TerritoryType));
+    }
+    // 0.491 (R-14): the rule names in their own guard: an unreadable sheet costs the rules, not the whole observation. Tried once.
+    private void LoadRuleIds()
+    {
+        if (data is null || ruleIds is not null) return;
+        try
+        {
+            ruleIds = data.GetExcelSheet<TripleTriadRule>().Where(rule => rule.RowId != 0)
+                .Select(rule => (rule.RowId, Name: rule.Name.ExtractText())).Where(rule => rule.Name.Length > 0)
+                .GroupBy(rule => rule.Name).ToDictionary(group => group.Key, group => group.First().RowId);
+        }
+        catch (Exception error) { ruleIds = []; log.Warning(error, "Triple Triad rule names unavailable."); }
     }
     // Challenge window: rules (values 102–105, TripleTriadRule ids 1–15), NPC deck, window rectangle and the player's saved decks.
     private unsafe void ReadRequest(int ticket, ulong character)
     {
+        // 0.510 (DEC-033): no challenge help in a competitive place, odds included.
+        if (TriadMatchAdvisor.Competitive(client.TerritoryType))
+        {
+            if (service.Request is not null) service.PublishRequest(ticket, character, null);
+            heldRequest = null;
+            return;
+        }
         var handle = gui.GetAddonByName("TripleTriadRequest");
         if (handle.IsNull || !handle.IsReady || !handle.IsVisible || gui.GameUiHidden)
         {
@@ -194,13 +219,25 @@ internal sealed class TriadObservationReader : IDisposable
         // The challenge window can stay open under the deck choice (0.166): read the deck rows in both cases.
         ReadSelDeck(ticket, character);
         var unit = (AtkUnitBase*)handle.Address;
+        LoadRuleIds();
         var rules = new List<uint>();
-        for (var index = 102; index <= 105 && index < unit->AtkValuesCount && unit->AtkValues != null; index++)
-            if (unit->AtkValues[index].Type == AtkValueType.Int && unit->AtkValues[index].Int is >= 1 and <= 15 && !rules.Contains((uint)unit->AtkValues[index].Int))
-                rules.Add((uint)unit->AtkValues[index].Int);
-        if (data is not null) ruleIds ??= data.GetExcelSheet<TripleTriadRule>().Where(rule => rule.RowId != 0)
-            .Select(rule => (rule.RowId, Name: rule.Name.ExtractText())).Where(rule => rule.Name.Length > 0)
-            .GroupBy(rule => rule.Name).ToDictionary(group => group.Key, group => group.First().RowId);
+        // 0.491 (R-14): the sheet gives the valid ids. Window too short, sheet unread, or an id the sheet does not have: the rules are unknown, not « none ».
+        var rulesKnown = ruleIds is { Count: > 0 } && unit->AtkValues != null && unit->AtkValuesCount > 105;
+        var rawRules = "unavailable";
+        if (unit->AtkValues != null && unit->AtkValuesCount > 105)
+        {
+            var raw = new List<string>();
+            for (var index = 102; index <= 105; index++)
+            {
+                var value = unit->AtkValues[index];
+                raw.Add(value.Type == AtkValueType.Int ? $"{index}={value.Int}" : $"{index}:{value.Type}");
+                if (value.Type != AtkValueType.Int || value.Int <= 0) continue;
+                if (ruleIds?.ContainsValue((uint)value.Int) != true) rulesKnown = false;
+                else if (!rules.Contains((uint)value.Int)) rules.Add((uint)value.Int);
+            }
+            rawRules = string.Join(' ', raw);
+        }
+        if (rawRules != loggedRequestRules) { loggedRequestRules = rawRules; log.Information("Triad request rule values: {0} (known: {1}).", rawRules, rulesKnown); }
         var target = targetBaseId();
         if (target != 0 && target != deckNpc) LoadDeck(target);
         var root = unit->RootNode;
@@ -216,12 +253,12 @@ internal sealed class TriadObservationReader : IDisposable
                 if (cards.Any(card => card != 0)) decks.Add(new(index, deck.NameString, Array.AsReadOnly(cards)));
             }
         var previous = service.Request;
-        if (previous is not null && previous.NpcId == deckNpc && previous.RuleIds.SequenceEqual(rules) && previous.Window == window
+        if (previous is not null && previous.NpcId == deckNpc && previous.RuleIds.SequenceEqual(rules) && previous.RulesKnown == rulesKnown && previous.Window == window
             && previous.Decks.Count == decks.Count && previous.Decks.Zip(decks).All(pair => pair.First.Name == pair.Second.Name && pair.First.Cards.SequenceEqual(pair.Second.Cards)))
             return;
         var names = rules.Select(rule => ruleIds?.FirstOrDefault(pair => pair.Value == rule).Key ?? rule.ToString()).ToArray();
         service.PublishRequest(ticket, character, new(deckNpc, rules.AsReadOnly(), deckFixed, deckVariable, window, decks.AsReadOnly(), DateTimeOffset.UtcNow,
-            deckNpcName, Array.AsReadOnly(names)));
+            deckNpcName, Array.AsReadOnly(names), rulesKnown));
     }
     private unsafe void ReadEditDeck(int ticket, ulong character)
     {
@@ -252,7 +289,7 @@ internal sealed class TriadObservationReader : IDisposable
         var count = 0;
         void Walk(AtkUldManager* manager, int depth)
         {
-            if (manager == null || depth > 4) return;
+            if (!Walkable(manager, depth)) return;
             for (var index = 0; index < manager->NodeListCount && count < 160; index++)
             {
                 var node = manager->NodeList[index];
@@ -264,7 +301,7 @@ internal sealed class TriadObservationReader : IDisposable
                     if (image->PartsList != null && image->PartId < image->PartsList->PartCount)
                     {
                         var asset = image->PartsList->Parts[image->PartId].UldAsset;
-                        if (asset != null && asset->AtkTexture.Resource != null && asset->AtkTexture.Resource->TexFileResourceHandle != null)
+                        if (asset != null && asset->AtkTexture.TextureType == TextureType.Resource && asset->AtkTexture.Resource != null && asset->AtkTexture.Resource->TexFileResourceHandle != null)
                             path = asset->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString();
                     }
                     if (allTextures || path.Contains("icon", StringComparison.OrdinalIgnoreCase))
@@ -279,10 +316,13 @@ internal sealed class TriadObservationReader : IDisposable
         lastEditDeck = line;
         log.Information("Triad {Window} capture: values={Values} images={Images}", unit->NameString, Values(unit), line);
     }
+    // R-14 (0.452): same guard as GatheringObservationReader: no node list, a count beyond its allocated size or a component not fully loaded is not walked.
+    private static unsafe bool Walkable(AtkUldManager* manager, int depth)
+        => manager != null && depth <= 4 && manager->NodeList != null && manager->NodeListCount <= manager->NodeListSize && manager->LoadedState == AtkLoadState.Loaded;
     // Visible card images of the editor's list: texture ui/icon/088000/088NNN(_hr1).tex = card NNN.
     private static unsafe void ListedCards(AtkUldManager* manager, int depth, List<(uint, TriadRect)> cards)
     {
-        if (manager == null || depth > 4) return;
+        if (!Walkable(manager, depth)) return;
         for (var index = 0; index < manager->NodeListCount && cards.Count < 200; index++)
         {
             var node = manager->NodeList[index];
@@ -292,7 +332,8 @@ internal sealed class TriadObservationReader : IDisposable
                 var image = (AtkImageNode*)node;
                 if (image->PartsList == null || image->PartId >= image->PartsList->PartCount) continue;
                 var asset = image->PartsList->Parts[image->PartId].UldAsset;
-                if (asset == null || asset->AtkTexture.Resource == null || asset->AtkTexture.Resource->TexFileResourceHandle == null) continue;
+                // R-14 (0.452): Resource is one arm of a union (Crest, KernelTexture at the same offset): read only when TextureType says Resource.
+                if (asset == null || asset->AtkTexture.TextureType != TextureType.Resource || asset->AtkTexture.Resource == null || asset->AtkTexture.Resource->TexFileResourceHandle == null) continue;
                 var path = asset->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName.ToString();
                 // Large card images use icon 088NNN, small ones 087NNN (both listed with each card in the editor's window values).
                 var at = path.IndexOf("icon/088000/", StringComparison.Ordinal); var baseIcon = 88000u;

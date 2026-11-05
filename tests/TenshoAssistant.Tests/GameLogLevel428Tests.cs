@@ -14,7 +14,7 @@ internal static class GameLogLevel428Tests
             var opener=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Items/GameLogOpener.Dalamud.cs"));
             Check(opener.Split("if(agent->AgentInterface.IsAgentActive()){agent->AgentInterface.Hide();return GameLogOpen.Closing;}").Length==3,"both logs closed first");
             Check(logs.Contains("if(result==GameLogOpen.Closing)return;") && logs.Contains("DateTimeOffset.UtcNow.AddSeconds(2)")
-                && File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("mainWindow.ProcessGameLogRequest();"),"retried each frame, 2 s at most");
+                && File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("mainWindow.ProcessGameLogRequest"),"retried each frame, 2 s at most");
             // 0.429 (user remark): several recipes: the worn job first, then a job at the recipe's level.
             Check(logs.Contains("private RecipeDefinition PreferredRecipe(") && logs.Contains("recipe.CraftTypeId+8==worn ? 0:1"),"recipe choice");
         }),

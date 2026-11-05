@@ -73,6 +73,11 @@ public static class CreditCatalog
         // 0.450 (DEC-027, point 2): crossbreeding pairs, built by tools/garden-data.py with the MIT notice in the header.
         new("CrossbreedHelper", CreditKind.Embedded, "FFXIV Crossbreed Helper", "Nick75 (nick75g)", "MIT", "https://github.com/nick75g/FFXIV-Crossbreed-Helper", "https://github.com/nick75g/FFXIV-Crossbreed-Helper/blob/main/LICENSE",
             ["Reminders/Data/garden-crosses.csv", "Reminders/GardenCrosses.cs", "MainWindow.GardenCrosses.cs", "TenshoAssistant.csproj"], [], "", true),
+        // A-03 (0.465, DEC-028): the optional crafting solver and its native library, shipped next to the DLL.
+        new("RaphaelNet", CreditKind.Library, "Raphael.Net 5.0.0", "Asriel Camora (WorkingRobot)", "MIT", "https://github.com/WorkingRobot/Raphael.Net", "https://github.com/WorkingRobot/Raphael.Net/blob/main/LICENSE",
+            ["Craft/RaphaelCraftSolver.Dalamud.cs", "Craft/RaphaelActions.cs", "TenshoAssistant.csproj"], [], "", false),
+        new("RaphaelRs", CreditKind.Library, "raphael-rs", "KonaeAkira", "Apache-2.0", "https://github.com/KonaeAkira/raphael-rs", "https://github.com/KonaeAkira/raphael-rs/blob/main/LICENSE",
+            ["Craft/RaphaelCraftSolver.Dalamud.cs", "TenshoAssistant.csproj"], [], "", false),
         new("CharacterPanelRefined", CreditKind.Embedded, "Character Panel Refined", "Kouzukii", "MIT", "https://github.com/Kouzukii/ffxiv-characterstatus-refined", "https://github.com/Kouzukii/ffxiv-characterstatus-refined/blob/master/LICENSE",
             ["Character/StatFormulas.cs", "Character/StatFormulas.cs", "Character/CharacterStatsReader.Dalamud.cs", "MainWindow.Character.cs", "MainWindow.Gear.cs", "MainWindow.Tools.cs"], [], "", true),
         new("Universalis", CreditKind.Online, "Universalis", "karashiiro, Universalis-FFXIV", "MIT", "https://universalis.app", "https://github.com/Universalis-FFXIV/Universalis/blob/v2/LICENSE",
@@ -91,10 +96,15 @@ public static class CreditCatalog
         new("PaissaDB", CreditKind.Online, "PaissaDB", "zhudotexe", "none", "https://github.com/zhudotexe/FFXIV_PaissaDB", "",
             ["Community/PaissaDb.cs", "MainWindow.Plots.cs", "Plugin.cs"], ["paissadb.zhu.codes"], "PlotWatch", false),
         // 0.447 (X-04, decided 2026-11-03): player events, opened in the player's browser on a click; nothing is fetched by Tensho.
+        new("ToolGallery", CreditKind.Online, "Tensho Assistant community tools", "Tensho Assistant contributors", "CC0-1.0", "https://github.com/Shigu330/Tensho-Assistant/tree/main/community-templates", "https://creativecommons.org/publicdomain/zero/1.0/",
+            ["MyTools/ToolGallery.cs", "MainWindow.MyTools.cs"], ["raw.githubusercontent.com"], "", false),
         new("Partake", CreditKind.Online, "Partake", "Partake", "proprietary", "https://www.partake.gg/", "",
             ["MainWindow.Events.cs"], ["www.partake.gg"], "", false),
         new("Discord", CreditKind.Online, "Discord", "Discord Inc.", "proprietary", "https://discord.com/developers/docs/resources/webhook", "",
             ["Alarms/DiscordNotifier.cs", "Alarms/DiscordWebhook.cs", "MainWindow.Discord.cs", "MainWindow.Alarms.cs", "Plugin.cs"], ["discord.com", "discordapp.com", "ptb.discord.com", "canary.discord.com"], "Discord.Enabled", false),
+        // 0.456: the planting rules of crossbreeding (facts, in our own words): docs/evidence/0.456-garden-grid.md.
+        new("GardeningGuide", CreditKind.Rule, "Gardening Guide (FFXIV Console Games Wiki)", "", "GFDL-1.2-or-later", "https://ffxiv.consolegameswiki.com/wiki/Gardening_Guide", "https://ffxiv.consolegameswiki.com/wiki/FFXIV_Wiki:About",
+            ["Reminders/GardenCrosses.cs", "MainWindow.GardenCrosses.cs"], [], "", false),
         new("GatherBuddyReborn", CreditKind.Rule, "GatherBuddyReborn", "FFXIV-CombatReborn", "Apache-2.0", "https://github.com/FFXIV-CombatReborn/GatherBuddyReborn", "https://raw.githubusercontent.com/FFXIV-CombatReborn/GatherBuddyReborn/main/LICENSE",
             ["Gathering/WeatherForecast.cs", "MainWindow.Weather.cs"], [], "", true),
         new("FrozenRabbitTome", CreditKind.Rule, "frozen_rabbit_tome", "", "none", "", "",

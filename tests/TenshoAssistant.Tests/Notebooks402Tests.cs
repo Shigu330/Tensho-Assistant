@@ -16,7 +16,7 @@ internal static class Notebooks402Tests
             Check(state.Count(NotebookKind.Fishing)==(1,2) && state.Count(NotebookKind.Gathering)==(1,1),"counts");
             var csv = Notebooks.Csv(state.Entries,id=>id==10 ? "=bad":"Fish "+id);
             Check(csv.Split('\n',StringSplitOptions.RemoveEmptyEntries).Length==5 && csv.Contains("\"'=bad\"",StringComparison.Ordinal),"csv");
-            Check(Read("Gathering/NotebookReader.Dalamud.cs").Contains("if((nint)QuestManager.MemberFunctionPointers.IsGatheringItemGathered!=0)",StringComparison.Ordinal),"function checked");
+            Check(Read("Gathering/NotebookReader.Dalamud.cs").Contains("var gatheringReadable=(nint)QuestManager.MemberFunctionPointers.IsGatheringItemGathered!=0;",StringComparison.Ordinal),"function checked");
         }),
     ];
 }

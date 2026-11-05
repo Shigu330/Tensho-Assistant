@@ -27,7 +27,7 @@ namespace TenshoAssistant;
 // Diagnostics (0.290–0.292). Each page or tool is a partial file MainWindow.<Tool>.cs; services are created in Plugin.cs.
 internal sealed partial class MainWindow : Window, IDisposable
 {
-    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Chocobo, Events, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms, Storage, Reminders, FreeCompany, Gear, Credits, Leves, HuntingLog, OceanFishing }
+    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Chocobo, Events, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms, Storage, Reminders, FreeCompany, Gear, Credits, Leves, HuntingLog, OceanFishing, Garden, MyTools, GatheringCollectables, Beastmaster, Help }
     // Read from the active theme each time: the game theme can change while the plugin runs.
     private static Vector4 Accent => FfxivTheme.Gold;
     private static Vector4 Success => FfxivTheme.Success;
@@ -100,6 +100,15 @@ internal sealed partial class MainWindow : Window, IDisposable
     // 0.292: last 120 draw times of each page (ring); Diagnostics shows the median (steady cost) and the maximum (spikes such as a
     // first icon load), a moving average mixed both and kept the spike of a page left just after opening it.
     private readonly Dictionary<Page, (double[] Samples, int Next, int Count)> pageDrawMs = [];
+    private readonly Dictionary<string, (double[] Samples, int Next, int Count)> overlayDrawMs = [];
+    internal void RecordOverlayDraw(string name, double milliseconds)
+    {
+        // 0.487 (user report: times appeared then went): a panel whose window is closed costs next to nothing, and its zeros pushed its real times out within 2 seconds. Only frames it really drew count.
+        if (milliseconds < 0.02) return;
+        var ring = overlayDrawMs.TryGetValue(name, out var known) ? known : (Samples: new double[120], Next: 0, Count: 0);
+        ring.Samples[ring.Next] = milliseconds;
+        overlayDrawMs[name] = (ring.Samples, (ring.Next + 1) % ring.Samples.Length, Math.Min(ring.Count + 1, ring.Samples.Length));
+    }
     private ItemCatalog? searchedCatalog;
     private IReadOnlyList<ItemDefinition> searchResults = [];
     private readonly Stack<uint> craftHistory = [];
@@ -163,11 +172,28 @@ internal sealed partial class MainWindow : Window, IDisposable
 
     // 0.394 (user request): the chosen text font for the whole window, pushed after the theme and popped first.
     private IDisposable? bodyFontScope;
-    public override void PreDraw(){FfxivTheme.Push();bodyFontScope=TenshoAssistant.UI.UiComponents.BodyFont is { Available:true } font ? font.Push():null;}
+    // 0.498 (user report): a window collapsed by its title bar stayed collapsed when something asked for it. Anything that opens the window or
+    // changes its page unfolds it; held two frames, then given back to the player, who can collapse it again.
+    private int unfoldFrames;
+    private Page? lastShownPage;
+    public new bool IsOpen
+    {
+        get=>base.IsOpen;
+        set{if(value)unfoldFrames=2;base.IsOpen=value;}
+    }
+    private void UnfoldWhenAsked()
+    {
+        if(lastShownPage is { } shown && shown!=page)unfoldFrames=2;
+        lastShownPage=page;
+        if(unfoldFrames>0){unfoldFrames--;Collapsed=false;CollapsedCondition=ImGuiCond.Always;}
+        else Collapsed=null;
+    }
+    public override void PreDraw(){UnfoldWhenAsked();FfxivTheme.Push();bodyFontScope=TenshoAssistant.UI.UiComponents.BodyFont is { Available:true } font ? font.Push():null;}
     public override void PostDraw(){bodyFontScope?.Dispose();bodyFontScope=null;FfxivTheme.Pop();}
 
     internal void OpenSettings(){page=Page.Settings;IsOpen=true;}
     internal void OpenAlarms(){page=Page.Alarms;IsOpen=true;}
+    internal void OpenReminders(){page=Page.Reminders;IsOpen=true;}
     // 0.344 (g, I-02): from the currency entry of the server bar.
     internal void OpenCurrencies(){page=Page.Storage;focusCurrencyTab=true;IsOpen=true;}
 
@@ -206,7 +232,7 @@ internal sealed partial class MainWindow : Window, IDisposable
     public override void Draw()
     {
         RememberPage();
-        DrawGameFrame();
+        OpenGuideOnce();
         monsterLoot.SelectItem((uint)Math.Max(0,itemId));
         ValidateGpCopy();
         ValidateCraftCopy();
@@ -223,6 +249,7 @@ internal sealed partial class MainWindow : Window, IDisposable
             var eorzea=Gathering.GatheringTime.MinuteOfDay(DateTimeOffset.UtcNow);
             ImGui.SameLine();ImGui.TextDisabled(localization.Format("LocalClock.HeaderEt",eorzea/60,eorzea%60));
         }
+        DrawPageHelpButton();
         ImGui.TextDisabled(localization.Get("Plugin.Subtitle"));
         ImGui.Separator();
 
@@ -246,46 +273,11 @@ internal sealed partial class MainWindow : Window, IDisposable
                     if (showContent)
                     {
                         DrawCategoryNavigation();
+                        DrawHelpBanner();
                         // 0.290 (R-06 step 6): draw time of each page, averaged, shown in Diagnostics (developer mode).
                         var drawStarted = System.Diagnostics.Stopwatch.GetTimestamp();
                         var drawnPage = page;
-                        switch (page)
-                        {
-                            case Page.Home: DrawHome(); break;
-                            case Page.Items: DrawItems(); break;
-                            case Page.Storage: DrawStorage(); break;
-                            case Page.Reminders: DrawReminders(); break;
-                            case Page.FreeCompany: DrawFreeCompany(); break;
-                            case Page.Gathering: DrawGatheringBrowser(); break;
-                            case Page.Maps: DrawMaps(); break;
-                            case Page.DutyLoot: DrawDutyLoot(); break;
-                            case Page.MonsterLoot: DrawMonsterLoot(); break;
-                            case Page.NpcVendors: DrawNpcVendors(); break;
-                            case Page.GatheringGp: DrawGatheringGp(); break;
-                            case Page.Fashion: DrawFashion(); break;
-                            case Page.CraftSimulation: DrawCraftSimulation(); break;
-                            case Page.CraftLive: DrawCraftLive(); break;
-                            case Page.Weather: DrawWeather(); break;
-                            case Page.Alarms: DrawAlarmsPage(); break;
-                            case Page.CraftPresets: DrawCraftPresets(); break;
-                            case Page.MacroChain: DrawMacroChain(); break;
-                            case Page.SortPreview: DrawSortPreview(); break;
-                            case Page.Collections: DrawCollections(); break;
-                            case Page.BlueMagic: DrawCollections(true); break;
-                            case Page.TripleTriad: DrawTripleTriad(); break;
-                            case Page.Market: DrawMarket(); break;
-                            case Page.Quests: DrawQuests(); break;
-                            case Page.Chocobo: DrawChocoboPage(); break;
-                            case Page.Leves: DrawLeves(); break;
-                            case Page.HuntingLog: DrawHuntingLog(); break;
-                            case Page.OceanFishing: DrawOceanFishing(); break;
-                            case Page.Events: DrawEventsPage(); break;
-                            case Page.Gear: DrawGearPlanner(); break;
-                            case Page.MiniCactpot: DrawMiniCactpot(); break;
-                            case Page.Settings: DrawSettings(); break;
-                            case Page.Diagnostics: DrawDiagnostics(); break;
-                            case Page.Credits: DrawCredits(); break;
-                        }
+                        PageEntryFor(page)?.Draw();
                         var drawMs = System.Diagnostics.Stopwatch.GetElapsedTime(drawStarted).TotalMilliseconds;
                         var ring = pageDrawMs.TryGetValue(drawnPage, out var known) ? known : (Samples: new double[120], Next: 0, Count: 0);
                         ring.Samples[ring.Next] = drawMs;
@@ -306,56 +298,11 @@ internal sealed partial class MainWindow : Window, IDisposable
     {
         // R-06 step 2 (0.264): pages grouped by category, each category folds (kept in the configuration); the hub pages of the map
         // and the Gold Saucer are now direct entries, the sub-pages of crafting, gathering and collections stay in their own tab bar.
-        Navigation(localization.Get("Navigation.Home"), Page.Home);
-        if (NavigationCategory("Objects", Page.Items, Page.Storage, Page.SortPreview, Page.Market))
-        {
-            Navigation(localization.Get("Navigation.Items"), Page.Items);
-            Navigation(localization.Get("Navigation.Storage"), Page.Storage);
-            Navigation(localization.Get("Category.Sorting"), Page.SortPreview);
-            Navigation(localization.Get("Navigation.Market"), Page.Market);
-        }
-        if (NavigationCategory("Production", Page.CraftSimulation, Page.Gathering, Page.OceanFishing, Page.MacroChain))
-        {
-            Navigation(localization.Get("Navigation.Crafting"), Page.CraftSimulation);
-            Navigation(localization.Get("Navigation.Gathering"), Page.Gathering);
-            Navigation(localization.Get("Navigation.OceanFishing"), Page.OceanFishing);
-            Navigation(localization.Get("Category.MacroChain"), Page.MacroChain);
-        }
-        if (NavigationCategory("World", Page.Maps, Page.Weather, Page.Alarms, Page.Reminders, Page.FreeCompany, Page.NpcVendors, Page.DutyLoot, Page.MonsterLoot))
-        {
-            Navigation(localization.Get("Navigation.Map"), Page.Maps);
-            Navigation(localization.Get("Category.Weather"), Page.Weather);
-            Navigation(localization.Format("Navigation.Alarms",configuration.Alarms?.Count ?? 0), Page.Alarms);
-            Navigation(localization.Get("Navigation.Reminders"), Page.Reminders);
-            Navigation(localization.Get("Navigation.FreeCompany"), Page.FreeCompany);
-            Navigation(localization.Get("Category.NpcVendors"), Page.NpcVendors);
-            Navigation(localization.Get("Category.DutyLoot"), Page.DutyLoot);
-            Navigation(localization.Get("Category.MonsterLoot"), Page.MonsterLoot);
-        }
-        // 0.341 (user request): the Character page is gone (the Gear page shows the same real values); the chocobo has its own page.
-        if (NavigationCategory("Progression", Page.Quests, Page.Events, Page.Collections, Page.Gear, Page.Chocobo, Page.Leves, Page.HuntingLog))
-        {
-            Navigation(localization.Get("Navigation.Quests"), Page.Quests);
-            Navigation(localization.Get("Navigation.Events"), Page.Events);
-            Navigation(localization.Get("Navigation.Collection"), Page.Collections);
-            Navigation(localization.Get("Navigation.Gear"), Page.Gear);
-            Navigation(localization.Get("Navigation.Chocobo"), Page.Chocobo);
-            Navigation(localization.Get("Navigation.Leves"), Page.Leves);
-            Navigation(localization.Get("Navigation.HuntingLog"), Page.HuntingLog);
-        }
-        if (NavigationCategory("GoldSaucer", Page.Fashion, Page.TripleTriad, Page.MiniCactpot))
-        {
-            Navigation(localization.Get("Category.Fashion"), Page.Fashion);
-            Navigation(localization.Get("Category.Triad"), Page.TripleTriad);
-            Navigation(localization.Get("Category.Cactpot"), Page.MiniCactpot);
-        }
-        if (NavigationCategory("Preferences", Page.Settings, Page.Credits, Page.Diagnostics))
-        {
-            Navigation(localization.Get("Navigation.Settings"), Page.Settings);
-            // R-13 (0.320): everything Tensho uses, shown to every player.
-            Navigation(localization.Get("Navigation.Credits"), Page.Credits);
-            if (developerMode) Navigation(localization.Get("Navigation.Diagnostics"), Page.Diagnostics);
-        }
+        // 0.470 (TEMPLATES-001): the pages and their order come from one list, MainWindow.Pages.cs.
+        foreach(var group in PageGroups)
+            if(group.Category is null || NavigationCategory(group.Category,group.Pages))
+                foreach(var entry in group.Entries)
+                    if(entry.Visible?.Invoke()!=false)Navigation(entry.Label!(),entry.Page);
         ImGui.Spacing();
         ImGui.Separator();
         using (TenshoAssistant.UI.UiComponents.PushSectionFont()) ImGui.TextDisabled(localization.Get("Navigation.ContextItem"));
@@ -371,24 +318,11 @@ internal sealed partial class MainWindow : Window, IDisposable
         else ImGui.TextWrapped(localization.Get("Navigation.SelectItem"));
     }
 
-    private static Page NavigationPage(Page current)=>current switch
-    {
-        Page.CraftLive or Page.CraftPresets=>Page.CraftSimulation,
-        Page.GatheringGp=>Page.Gathering,
-        Page.BlueMagic=>Page.Collections,
-        _=>current,
-    };
+    private Page NavigationPage(Page current)=>PageEntryFor(current)?.Parent ?? current;
 
     private void Navigation(string label, Page destination)
     {
-        var selectedCategory=page switch
-        {
-            Page.CraftLive or Page.CraftPresets=>Page.CraftSimulation,
-            Page.GatheringGp=>Page.Gathering,
-            Page.BlueMagic=>Page.Collections,
-            _=>page,
-        };
-        if (UiComponents.NavigationItem(label, selectedCategory == destination))
+        if (UiComponents.NavigationItem(label, NavigationPage(page) == destination))
             page = destination;
     }
 

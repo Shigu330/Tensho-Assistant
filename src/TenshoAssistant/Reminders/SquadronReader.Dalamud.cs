@@ -13,6 +13,8 @@ internal static class SquadronReader
 
     public static unsafe SquadronRaw? Read()
     {
+        // R-14 (0.453): an address lost after a game update throws; null below only means the game has not loaded the squadron.
+        if((nint)GcArmyManager.StaticAddressPointers.ppInstance==0)throw new InvalidOperationException("GcArmyManager did not resolve.");
         var manager=GcArmyManager.Instance();
         if(manager==null || manager->Data==null)return null;
         var data=manager->Data;

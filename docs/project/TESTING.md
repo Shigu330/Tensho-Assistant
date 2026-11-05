@@ -1,6 +1,6 @@
 # Vérifications
 
-## Comment vérifier — état au 0.315.0 (2026-11-02, relu contre le code)
+## Comment vérifier — relu le 2026-11-04 (0.512)
 
 ### Tests automatiques
 
@@ -19,11 +19,10 @@ livré à côté de la DLL depuis 0.248 ; aucune assembly de l'hôte redistribu�
 - Même version et mêmes sources (hors `*.md`, `docs/`, `repo.json`) déjà passées au vert : les contrôles sont sautés (« SKIP checks »,
   `artifacts/verify-stamp.json`) ; `-Force` les relance.
 - Exécutable seul, après un build : `dotnet run --project tests/TenshoAssistant.Tests -c Release --no-build`, **depuis la racine du
-  dépôt**, avec le SDK que choisit Verify.ps1 (`%USERPROFILE%\.codex\dotnet-<version de global.json>\dotnet.exe` s'il existe, sinon
+  dépôt**, avec le SDK que choisit Verify.ps1 (le plus récent `%USERPROFILE%\.codex\dotnet-10.*\dotnet.exe` s'il existe, sinon
   `C:\ia-code\.tools\dotnet10\dotnet.exe`, sinon `dotnet`). Le test des infobulles de réglages lit `src/TenshoAssistant` et ses langues ; ceux de la compagnie libre lisent
   `src/TenshoAssistant/FreeCompany/Data/`.
-- Dernier passage : Verify.ps1 (agent) 569/569, 0 avertissement, 0 erreur, DLL 0.315.0.0 ([CHANGELOG](../../CHANGELOG.md)). Exécutable déjà
-  compilé relancé seul le 2026-11-02 pour cette relecture : 569/569.
+- Dernier passage : voir [STATUS](../ai/STATUS.md), première ligne. En CI, à chaque push : `Build and test` (dont une compilation à la manière du dépôt Dalamud, [relevé](../evidence/0.512-d17-build.md)) et CodeQL.
 
 Les tests couvrent la logique pure : 87 fichiers `*Tests.cs` (un par domaine : inventaire, banque et tri, artisanat et macros, récolte et
 pêche, météo et alarmes, carte et projection, marchands PNJ, collections, quêtes, sources Garland / wiki / LuminaSupplemental, cache
@@ -33,7 +32,7 @@ Ils ne couvrent pas : lecture de la mémoire du jeu (sacs, atelier de la compagn
 réelles (vérifiées par les sondes de `tools/`, sorties dans [docs/evidence/](../evidence/)), rendu ImGui et clics, requêtes HTTP réelles
 (Universalis, Garland, wiki, GitHub, Teamcraft : transport simulé ou extraits enregistrés).
 
-### Inventaire des tests (569 au 0.315.0)
+### Inventaire des tests (569 au 0.315.0 ; liste non reprise depuis, le nombre courant est dans STATUS)
 
 Sortie : une ligne `PASS <nom>` (ou `FAIL <nom>: …`) par test, puis `N/N passed`. Depuis le dernier inventaire de cette page (0.154.0,
 532 tests), **37 tests ajoutés**, aucun retiré : sortie actuelle comparée aux sources de `checkpoints/TenshoAssistant-0.153.0-source.zip`
@@ -114,14 +113,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Pêche (0.232–0.233, 0.252–0.254)**
 
-- [ ] 0.232 — Aide à la pêche (`/tensho peche` ou en pêchant) : une ligne par poisson (stock, ✓/✗), route d'appâts en icônes, touche
+- [x] 0.232 — Aide à la pêche (`/tensho peche` ou en pêchant) : une ligne par poisson (stock, ✓/✗), route d'appâts en icônes, touche
   « ! / !! / !!! » en couleur avec le ferrage abrégé, temps de touche « 9–16 s (12) » en vert quand le chrono est dans l'intervalle ;
   colonne Conditions seulement si un poisson en a ; textes complets en infobulle ; « Sources (i) » ; fenêtre à la largeur du contenu.
-- [ ] 0.233 — Clic droit sur un poisson et sur un appât de l'aide à la pêche, puis sur un appât de « Comment le pêcher » (page
+- [x] 0.233 — Clic droit sur un poisson et sur un appât de l'aide à la pêche, puis sur un appât de « Comment le pêcher » (page
   Récolte) : menu des outils de l'objet (usages, artisanat, marché, butin…), puis ses sources.
-- [ ] 0.252 — Clic droit sur un appât : un seul menu (plus deux superposés). Panneau d'aide à la récolte en jeu : le nom de l'objet a
+- [x] 0.252 — Clic droit sur un appât : un seul menu (plus deux superposés). Panneau d'aide à la récolte en jeu : le nom de l'objet a
   l'infobulle complète et le clic droit.
-- [ ] 0.253–0.254 — Récolte, poisson à créneau ET et météo : bouton alarme présent sur la ligne de pêche ; l'alarme porte la plage ET,
+- [x] 0.253–0.254 — Récolte, poisson à créneau ET et météo : bouton alarme présent sur la ligne de pêche ; l'alarme porte la plage ET,
   la météo et la météo précédente, comme celle de « Comment le pêcher » ; poisson à météo sans plage horaire : une alarme par période
   météo (00, 08, 16 ET). Mineur / botaniste : alarme sur l'horaire seul.
 
@@ -131,25 +130,25 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
   Ouvrir une fois le coffre à apparence et l'armoire (auberge) : leurs sections apparaissent (avant : « Ouvrez une fois… »). Les trois
   s'affichent en pages de 35 cases, sans « ordre visuel indisponible ».
 - [ ] 0.238–0.239 — La Banque se charge (pas de « Les relevés de stocks ne sont pas disponibles ») ; servants et sacoches toujours là.
-- [ ] 0.240 — Tenue complète rangée au coffre : ses pièces comptent comme possédées (stocks, « possédé » de la Revue de mode).
+- [x] 0.240 — Tenue complète rangée au coffre : ses pièces comptent comme possédées (stocks, « possédé » de la Revue de mode).
 - [ ] 0.280 — Barre latérale › OBJETS : « Objets » (recherche + fiche) et « Rangements » (onglets Banque, Cristaux, Imports) ; le lien
   « Banque d'objets » de l'accueil ouvre l'onglet Banque.
 
 **Collections ✓/✗ (0.241, 0.274–0.275)**
 
-- [ ] 0.241 — Butin des contenus : cartes de Triple Triade et rouleaux d'orchestrion avec ✓/✗ ; « Non obtenus seulement » les garde
+- [x] 0.241 — Butin des contenus : cartes de Triple Triade et rouleaux d'orchestrion avec ✓/✗ ; « Non obtenus seulement » les garde
   quand ils ne sont pas obtenus.
-- [ ] 0.274 — Collections › orchestrion : clic droit sur une ligne débloquée par un seul objet = même menu que l'objet (outils + sources).
-- [ ] 0.275 — Pastille ✓/✗ sur toute icône d'objet de collection (fiche objet, sources, butins, Revue de mode, quêtes, marchands,
+- [x] 0.274 — Collections › orchestrion : clic droit sur une ligne débloquée par un seul objet = même menu que l'objet (outils + sources).
+- [x] 0.275 — Pastille ✓/✗ sur toute icône d'objet de collection (fiche objet, sources, butins, Revue de mode, quêtes, marchands,
   alarmes) ; collections pas encore lues : aucune pastille (jamais ✗ par défaut).
 
 **Carte (0.242–0.245, 0.259, 0.262, 0.308)**
 
-- [ ] 0.242–0.243 — Quête dont le journal indique une cible : icône « Cible indiquée par le jeu (journal) » ; clic droit sur la carte ›
+- [x] 0.242–0.243 — Quête dont le journal indique une cible : icône « Cible indiquée par le jeu (journal) » ; clic droit sur la carte ›
   « Retirer la cible indiquée par le jeu (journal) » la retire ; quête accomplie ou abandonnée : l'icône disparaît seule (environ 1 min).
-- [ ] 0.244 — Clic droit sur la carte › onglet « Triple Triad » : PNJ de la carte avec [x] / [ ] / [?], cartes manquantes, coordonnées ;
+- [x] 0.244 — Clic droit sur la carte › onglet « Triple Triad » : PNJ de la carte avec [x] / [ ] / [?], cartes manquantes, coordonnées ;
   clic = drapeau, clic droit = outil Triple Triade, survol = prix d'entrée et cartes de récompense.
-- [ ] 0.245 — Clic droit sur une icône : son menu (nom, « Placer le drapeau », « Se téléporter ici » sur une éthérite, « Ouvrir cette
+- [x] 0.245 — Clic droit sur une icône : son menu (nom, « Placer le drapeau », « Se téléporter ici » sur une éthérite, « Ouvrir cette
   carte » sur un lien de carte, ressources d'un point de récolte, « Menu général de la carte… ») ; ailleurs, le menu général.
 - [ ] 0.259 / 0.262 — Paramètres de la carte : chaque réglage a son infobulle ; un curseur ou une case changé fait apparaître ↺, qui
   remet la valeur par défaut.
@@ -163,11 +162,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
   une seule à la fois ; clic = objet en contexte ; clic droit = outils. Mode dev : ID de l'objet dans l'infobulle.
 - [ ] 0.251 — Clic droit sur un objet : sources en sous-menus par type avec leur nombre (Hauts faits, Contenus, À partir d'autres
   objets, Échanges, PNJ vendeurs, Quêtes) ; Fabrication et Récolte sur une ligne ; aucune ligne en double.
-- [ ] 0.255 — Récompenses de quête et Revue de mode : le nom de l'objet a l'infobulle complète et le clic droit.
-- [ ] 0.256 — Inventaire du jeu, clic droit sur un objet › Tensho : sous les outils, les mêmes sous-menus de sources que dans Tensho ;
+- [x] 0.255 — Récompenses de quête et Revue de mode : le nom de l'objet a l'infobulle complète et le clic droit.
+- [x] 0.256 — Inventaire du jeu, clic droit sur un objet › Tensho : sous les outils, les mêmes sous-menus de sources que dans Tensho ;
   « ↳ Drapeau sur la carte » sous un PNJ placé.
 - [ ] 0.257 — Survol d'un objet de l'inventaire du jeu : le panneau Tensho sous l'infobulle montre aussi « Comment l'obtenir ».
-- [ ] 0.263 — Clic droit sur une quête (liste, quêtes liées, onglet Quêtes de la carte), un PNJ (PNJ vendeurs, onglets Vendeurs /
+- [x] 0.263 — Clic droit sur une quête (liste, quêtes liées, onglet Quêtes de la carte), un PNJ (PNJ vendeurs, onglets Vendeurs /
   Triple Triad de la carte, PNJ de Triple Triade) et un monstre (monstres d'un objet) : mêmes entrées partout (ouvrir l'outil ; pour
   chaque position : drapeau, « Voir sur la carte Tensho », météo de la zone).
 - [ ] 0.272 — Objets : choisir un objet = fiche complète (icône, stock total, dernier prix connu et sa date ; onglets Aperçu, Stocks,
@@ -211,12 +210,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Compagnie libre (0.307, 0.309, 0.315)**
 
-- [ ] 0.307 — Entrer dans l'atelier de la compagnie (ouvrir le panneau de contrôle des expéditions si rien n'apparaît) : MONDE ›
+- [x] 0.307 — Entrer dans l'atelier de la compagnie (ouvrir le panneau de contrôle des expéditions si rien n'apparaît) : MONDE ›
   Compagnie libre › Vaisseaux liste sous-marins et dirigeables (rang + barre d'expérience, trajet, retour : temps restant / « Rentré » /
   « Au port », butin du dernier voyage au clic, bouton d'alarme au retour) ; après la sortie, la dernière lecture reste (« Lu dans
   l'atelier : … »). Rappels › « Expéditions de la compagnie » : en mer / rentrés, prochain retour, « Détails ». Noter le moment où les
   données apparaissent (entrée dans l'atelier ou ouverture du panneau : non vérifié en jeu).
-- [ ] 0.309 — « Meilleurs trajets » : sous-marin lu, zone, tri (valeur par voyage, valeur par jour, expérience par jour) → au plus 25
+- [x] 0.309 — « Meilleurs trajets » : sous-marin lu, zone, tri (valeur par voyage, valeur par jour, expérience par jour) → au plus 25
   trajets (distance / autonomie, durée, valeur, gils par jour, expérience) ; survol = butin moyen, objet par objet. À comparer : durée
   calculée contre retour réel d'un voyage lancé.
 - [ ] 0.315 — « Montages » : choisir un vaisseau lu → statistiques lues / prévues / écart, coût / capacité, rang des pièces, réparation,
@@ -245,10 +244,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Webhook Discord (R-12, 0.319)** — à faire pendant la campagne de tests en jeu de la fin (étape h de la file), avec un salon de test
 
-- [ ] Paramètres › Alarmes › Discord : coller l'adresse d'un webhook d'un salon de test, quitter le champ : « Adresse enregistrée :
+- [x] Paramètres › Alarmes › Discord : coller l'adresse d'un webhook d'un salon de test, quitter le champ : « Adresse enregistrée :
   https://discord.com/api/webhooks/1234…/*** » ; une adresse d'un autre site reste dans le champ avec le message rouge, non enregistrée.
-- [ ] « Envoyer un test » : le message d'essai arrive dans le salon, avec le nom « Tensho » ; la ligne d'état dit « Message envoyé. ».
-- [ ] Activer l'envoi, créer une alarme manuelle (page Alarmes) à une heure ET proche : à la sonnerie, le message arrive sur Discord
+- [x] « Envoyer un test » : le message d'essai arrive dans le salon, avec le nom « Tensho » ; la ligne d'état dit « Message envoyé. ».
+- [x] Activer l'envoi, créer une alarme manuelle (page Alarmes) à une heure ET proche : à la sonnerie, le message arrive sur Discord
   (et le chat et le son du jeu comme avant).
 - [ ] Décocher une catégorie, ou la case « Discord » d'un groupe : ses alarmes ne partent plus ; message propre à un groupe (créneaux du
   groupe) : il remplace le modèle.
@@ -270,7 +269,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] Paramètres › Modules › Artisanat : changer « Étapes », « Largeur », « Budget », « Attente » et « Écho », recharger le plugin : les
   valeurs restent ; le bouton ↺ remet chacune ; la case « Aide du carnet » s'enregistre au clic et montre son infobulle au survol.
-- [ ] Paramètres › Avancé › « Revue de mode (FFXIVGachaSpreadsheet) » décoché : la page Revue de mode dit « source désactivée » quand
+- [x] Paramètres › Avancé › « Revue de mode (FFXIVGachaSpreadsheet) » décoché : la page Revue de mode dit « source désactivée » quand
   aucune copie n'est gardée, sans téléchargement.
 - [ ] « Tout remettre par défaut » : les groupes repliés de la barre latérale restent repliés.
 - [ ] Marché hors ligne (réseau coupé) : le bouton de portée « Région » reste grisé, avec son infobulle ; pas de ralentissement.
@@ -305,10 +304,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Survoler plusieurs objets, puis couper le wiki ou Garland (Paramètres › Avancé) : plus de téléchargement (journal Dalamud) ;
   rallumer : les sources de ces objets reviennent au survol suivant.
 - [ ] Duty Finder avec Garland coupé sur un contenu jamais vu (« Source désactivée »), rallumer : le butin se charge tout seul.
-- [ ] Duty Finder, « non obtenus seulement » coché juste après la connexion : la liste se remplit une fois les collections lues.
+- [x] Duty Finder, « non obtenus seulement » coché juste après la connexion : la liste se remplit une fois les collections lues.
 - [ ] Alarmes : le même objet dans deux sections (mineur et botaniste) : « Tout supprimer » n'arme que la section cliquée ;
   replier la section désarme le bouton.
-- [ ] Revue de mode coupée : « Actualiser » grisé avec son infobulle ; Accueil sans « service en erreur » quand Universalis est coupé.
+- [x] Revue de mode coupée : « Actualiser » grisé avec son infobulle ; Accueil sans « service en erreur » quand Universalis est coupé.
 - [ ] Banque (client anglais) : les titres des cadres de la sacoche et de l'arsenal sont en anglais.
 - [ ] Première vraie release avec Verify.ps1 -Release : suivre la sortie de près (ordre et reprise vérifiés par l'analyse de syntaxe seulement).
 
@@ -319,20 +318,20 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Marché : choisir Monde, recharger → Monde gardé ; Région avec Universalis coupé → le message dit pourquoi.
 - [ ] Survol : décocher chaque partie (collection, stock, usages, comment l'obtenir) → elle disparaît du panneau sous l'infobulle du jeu
   seulement ; « masquer en mission » coché → pas de panneau dans un donjon.
-- [ ] Triple Triad (observation activée) : chacun des trois interrupteurs coupe son aide (cadre du match, défi d'un PNJ, éditeur de decks).
+- [x] Triple Triad (observation activée) : chacun des trois interrupteurs coupe son aide (cadre du match, défi d'un PNJ, éditeur de decks).
 - [ ] Carnet d'artisanat : « calcul automatique » décoché → bouton « Calculer » ; le décocher pendant un calcul garde « Calcul… ».
 - [ ] Alarmes : « pas de ligne de discussion en mission » coché (sous « Pas de son en mission ») → aucune ligne [Tensho] en donjon.
 
 **Étape e) — 0.328 : carte** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] « Remplacer la carte du jeu » et « Masquer en combat » cochés : M en combat montre la carte du jeu (plus d'écran sans carte).
-- [ ] Carte Tensho ouverte par M, bouton « Ouvrir la carte du jeu » : la carte du jeu revient à l'écran.
-- [ ] Zoom +, − et curseur sans suivre le personnage : la vue reste centrée au même endroit.
+- [x] « Remplacer la carte du jeu » et « Masquer en combat » cochés : M en combat montre la carte du jeu (plus d'écran sans carte).
+- [x] Carte Tensho ouverte par M, bouton « Ouvrir la carte du jeu » : la carte du jeu revient à l'écran.
+- [x] Zoom +, − et curseur sans suivre le personnage : la vue reste centrée au même endroit.
 - [ ] Repère au bord du drapeau au-dessus d'une icône de vendeur : un clic centre la carte sans déplacer le drapeau.
 - [ ] Drapeau masqué (taille 0) : plus de repère au bord ; zone de récolte masquée : son survol ne liste plus l'icône.
 - [ ] Icônes de la carte, ↺ d'une ligne : taille, priorité et mode du clic droit reviennent ; priorité grisée pour les couches Tensho.
-- [ ] Fenêtre de téléportation : le coût s'affiche (ou « indisponible » si la lecture échoue, jamais « Lecture… » sans fin).
-- [ ] Favoris : un nom en double dit « déjà utilisé », pas « Échec de sauvegarde » ; page Cartes, le bouton pose le drapeau.
+- [x] Fenêtre de téléportation : le coût s'affiche (ou « indisponible » si la lecture échoue, jamais « Lecture… » sans fin).
+- [x] Favoris : un nom en double dit « déjà utilisé », pas « Échec de sauvegarde » ; page Cartes, le bouton pose le drapeau.
 - [ ] Liste des panoramas (clic droit) : clic droit sur une ligne → alarme proposée ; numéro identique à l'infobulle.
 - [ ] Ville chargée : la carte reste fluide (vendeurs mis en cache), temps à relever dans Diagnostics si besoin.
 
@@ -346,10 +345,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Historique des objets : « Retour » revient à l'objet précédent ; le fil d'Ariane reste court.
 - [ ] Aperçu du tri impossible : la raison est affichée.
 
-**Étape e) — 0.332 : cadre du jeu** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape e) — 0.332 : cadre du jeu** — retiré en 0.510 (DEC-033), plus rien à tester
 
-- [ ] Paramètres › Interface › « Cadre des fenêtres du jeu » coché : le cadre du jeu entoure la fenêtre principale, sans décalage ni
-  texture étirée de façon visible ; décoché : aspect habituel. Dire s'il faut l'activer par défaut et l'étendre (carte, panneaux).
 
 **Étape f) — 0.333 : escouade** — pendant la campagne de tests en jeu de la fin (étape h)
 
@@ -372,16 +369,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape f) — 0.336 : secteurs de dirigeable** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Compagnie › « Secteurs de dirigeable » : 23 secteurs de la Mer de nuages (pas le Diadème), rang, céruleum, durée de relevé et
+- [x] Compagnie › « Secteurs de dirigeable » : 23 secteurs de la Mer de nuages (pas le Diadème), rang, céruleum, durée de relevé et
   expérience égaux au panneau de vol du jeu ; « Débloqué par » cohérent avec l'ordre de découverte en jeu.
 - [ ] Survol de « n objets » : liste d'objets avec icône, sans quantité ; le filtre trouve un secteur par le nom d'un objet.
 - [ ] Paramètres › Crédits : LuminaSupplemental apparaît deux fois (téléchargé ; embarqué pour les dirigeables).
 
 **Étape f) — 0.337 : planificateur de dirigeables (appelle les fonctions de calcul du jeu)** — pendant la campagne de tests en jeu (étape h)
 
-- [ ] Secteurs de dirigeable, connecté : choisir un dirigeable lu à l'atelier ; plus de « Calcul des étapes par le jeu… » après une seconde ;
+- [x] Secteurs de dirigeable, connecté : choisir un dirigeable lu à l'atelier ; plus de « Calcul des étapes par le jeu… » après une seconde ;
   aucun plantage, rien dans le journal Dalamud.
-- [ ] Cocher les secteurs d'un voyage réel, puis comparer avec le panneau de vol de l'atelier (même dirigeable, mêmes secteurs) :
+- [x] Cocher les secteurs d'un voyage réel, puis comparer avec le panneau de vol de l'atelier (même dirigeable, mêmes secteurs) :
   distance et durée identiques ? Sinon, noter l'écart et les valeurs « Brut » du mode développeur (unité, 12 h, retour).
 - [ ] Déconnecté : « Connectez-vous avec un personnage » ; reconnecté : le calcul reprend.
 - [ ] « Meilleurs trajets » : classés par expérience par jour ; les secteurs sans expérience n'apparaissent que sous « Plus court », avec « ≥ ».
@@ -414,7 +411,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] Survol d'un objet vendable : sous chaque prix, « Dernière vente · moyenne · ventes par jour » ; les mêmes que la page de l'objet
   sur universalis.app pour votre monde.
-- [ ] Survol d'une pile de l'inventaire : « Pile de N : ~X » (N = la quantité de la case) ; pas de ligne pour un objet hors de vos sacs.
+- [x] Survol d'une pile de l'inventaire : « Pile de N : ~X » (N = la quantité de la case) ; pas de ligne pour un objet hors de vos sacs.
 - [ ] « Le moins cher de la région » n'apparaît que s'il est moins cher que le centre de données, avec le nom du monde.
 - [ ] Ctrl+Alt pendant le survol : la date « Récupéré à » change ; maintenu, une seule demande ; Paramètres › Avancé, l'éteindre.
 
@@ -467,16 +464,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.350 : I-09 coffre de compagnie** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Ouvrir le coffre de compagnie : le panneau Tensho apparaît à côté ; tant qu'un onglet n'a pas été affiché, il le dit ; après les
+- [x] Ouvrir le coffre de compagnie : le panneau Tensho apparaît à côté ; tant qu'un onglet n'a pas été affiché, il le dit ; après les
   cinq onglets (et les cristaux), « Enregistrer » ; avec l'enregistrement automatique, c'est fait seul.
-- [ ] Banque : un onglet « Coffre de compagnie » ; le stock d'un objet du coffre (fiche d'objet, survol) compte la ligne « Coffre de
+- [x] Banque : un onglet « Coffre de compagnie » ; le stock d'un objet du coffre (fiche d'objet, survol) compte la ligne « Coffre de
   compagnie ».
 
 **Étape g) — 0.351 : I-04 journal des gils** — pendant la campagne de tests en jeu de la fin (étape h)
 
 - [ ] Acheter à un PNJ, vendre à un PNJ, réparer, se téléporter : Rangements › Gils montre chaque variation avec la bonne catégorie
   (Boutique PNJ, Réparation, Téléportation).
-- [ ] Ouvrir la cloche des servants : le solde des servants apparaît ; ouvrir le coffre de compagnie : son solde apparaît.
+- [x] Ouvrir la cloche des servants : le solde des servants apparaît ; ouvrir le coffre de compagnie : son solde apparaît.
 - [ ] Changer de personnage : chaque personnage a son journal ; la première lecture n'est pas comptée comme un gain.
 
 **Étape g) — 0.352 : I-11 conditions des articles de boutique** — pendant la campagne de tests en jeu de la fin (étape h)
@@ -499,7 +496,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.355 : C-01 contenus débloqués / terminés** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Monde › Butin des contenus : la colonne « État » dit « Terminé » pour un donjon fait (ex. Sastasha), « Débloqué » pour un contenu
+- [x] Monde › Butin des contenus : la colonne « État » dit « Terminé » pour un donjon fait (ex. Sastasha), « Débloqué » pour un contenu
   ouvert mais pas fait, « Verrouillé » pour un contenu pas encore ouvert ; le compteur « X terminés sur Y lus » est plausible.
 - [ ] Filtre « Avancement › Non terminés » : les donjons faits disparaissent ; déconnecté, le filtre est grisé et l'état « — ».
 
@@ -523,13 +520,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.359 : C-08 filtre des collections par source** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Collections › Montures › Source « Marchands (gils) » puis « Succès » : les montures listées ont bien cette source dans leur menu
+- [x] Collections › Montures › Source « Marchands (gils) » puis « Succès » : les montures listées ont bien cette source dans leur menu
   du clic droit ; combiné avec « Non confirmés », la liste se réduit.
-- [ ] Le premier choix du filtre sur l'Orchestrion ne fait pas saccader le jeu de façon gênante (sinon : calcul à étaler).
+- [x] Le premier choix du filtre sur l'Orchestrion ne fait pas saccader le jeu de façon gênante (sinon : calcul à étaler).
 
 **Étape g) — 0.360 : C-09 liste de souhaits** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Clic droit sur une monture dans un butin (Butin des contenus) › « Ajouter à mes souhaits » ; Collections › Souhaits la montre
+- [x] Clic droit sur une monture dans un butin (Butin des contenus) › « Ajouter à mes souhaits » ; Collections › Souhaits la montre
   avec « Pas encore obtenu » ; clic droit sur la ligne donne ses sources ; « Retirer » l'enlève.
 - [ ] Un objet ordinaire ajouté montre « Possédé ×N » ou « Pas possédé » ; la liste reste après un redémarrage et après
   « Réinitialiser les réglages ».
@@ -542,7 +539,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.362 : C-05 tenues du coffre à apparence** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Ouvrir le coffre à apparence une fois. Collections › Tenues : une tenue déjà rangée dit « rangée » ; une tenue dont toutes les
+- [x] Ouvrir le coffre à apparence une fois. Collections › Tenues : une tenue déjà rangée dit « rangée » ; une tenue dont toutes les
   pièces sont dans le coffre dit « prête à ranger » (le jeu propose bien de la créer) ; les pièces ouvertes disent où elles sont.
 - [ ] Filtres « Incomplètes », « Toutes les pièces », « Rangées » et la recherche par nom.
 
@@ -562,7 +559,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.365 : C-04 nouveaux types de collection** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Collections : les onglets Coiffures, Accessoires de mode, Lunettes, Bardes, Portraits, Livres de maître, Objets de collection,
+- [x] Collections : les onglets Coiffures, Accessoires de mode, Lunettes, Bardes, Portraits, Livres de maître, Objets de collection,
   Archives occultes se remplissent en quelques secondes ; une coiffure ou un accessoire que vous avez dit « Obtenu », un autre non.
 - [ ] Les filtres Obtenu / Non confirmés et la recherche marchent dans ces onglets.
 
@@ -586,21 +583,21 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.369 : X-03 titres** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Collections › Titres › un titre obtenu › « Porter ce titre » : le titre change au-dessus du personnage ; « Aucun titre » le retire ;
+- [x] Collections › Titres › un titre obtenu › « Porter ce titre » : le titre change au-dessus du personnage ; « Aucun titre » le retire ;
   « Titre au hasard » en met un autre.
 - [ ] « Titre de <job> » puis « Changer de titre avec le job » coché : changer de job porte le titre choisi ; décoché : rien ne change.
 
 **Étape g) — 0.370 : X-02 musique en cours, rouleaux favoris** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Collections › Orchestrion : « Musique en cours » nomme la musique qu'on entend (en ville, puis en combat, puis dans une maison
+- [x] Collections › Orchestrion : « Musique en cours » nomme la musique qu'on entend (en ville, puis en combat, puis dans une maison
   avec un orchestrion) ; « Fiche » ouvre son rouleau.
 - [ ] Case « Favori » dans la fiche d'un rouleau : il apparaît dans « Rouleaux favoris ».
 
 **Étape g) — 0.371 : M-01 alarmes automatiques** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Ouvrir la liste des servants à une cloche : dans les 30 secondes, une alarme « Venture de … terminée » par servant en venture
+- [x] Ouvrir la liste des servants à une cloche : dans les 30 secondes, une alarme « Venture de … terminée » par servant en venture
   apparaît dans Alarmes, à la bonne heure ; elle sonne à la fin.
-- [ ] Envoyer un vaisseau à l'atelier : une alarme « Retour de … » apparaît ; « Alarmes automatiques » décochée : plus aucune n'est créée.
+- [x] Envoyer un vaisseau à l'atelier : une alarme « Retour de … » apparaît ; « Alarmes automatiques » décochée : plus aucune n'est créée.
 
 **Étape g) — 0.372 : M-02 compteurs hebdomadaires** — pendant la campagne de tests en jeu de la fin (étape h)
 
@@ -610,7 +607,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.373 : M-03 liens de carte du chat** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Envoyer un lien de carte (drapeau puis <flag>) en équipe et en compagnie libre : il apparaît dans Cartes › « Liens de carte du
+- [x] Envoyer un lien de carte (drapeau puis <flag>) en équipe et en compagnie libre : il apparaît dans Cartes › « Liens de carte du
   chat », avec le bon lieu, les bonnes coordonnées et le bon canal au survol ; le filtre de canal le cache et le remontre.
 - [ ] « Drapeau » pose le drapeau du jeu au bon endroit ; « Éthérite » ouvre la carte Tensho sur le point et propose l'éthérite
   la plus proche avec son coût ; « Non » ne téléporte pas ; « Oui » téléporte.
@@ -645,15 +642,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.378 : M-08 favoris sur la carte** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Carte Tensho, clic droit › nom › « Ajouter aux favoris » : une étoile apparaît à cet endroit ; survol : nom, coordonnées ;
+- [x] Carte Tensho, clic droit › nom › « Ajouter aux favoris » : une étoile apparaît à cet endroit ; survol : nom, coordonnées ;
   clic : le drapeau du jeu se pose dessus.
-- [ ] Page Cartes : donner un groupe et une note à un favori, « Mettre à jour » : « [groupe] nom » dans la liste, note au survol.
-- [ ] « Copier le code de partage », le coller dans un autre client (ou après avoir retiré un favori) puis « Importer » : seuls les
+- [x] Page Cartes : donner un groupe et une note à un favori, « Mettre à jour » : « [groupe] nom » dans la liste, note au survol.
+- [x] « Copier le code de partage », le coller dans un autre client (ou après avoir retiré un favori) puis « Importer » : seuls les
   favoris absents sont ajoutés.
 
 **Étape g) — 0.379 : M-10 historique du butin** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Après le retour d'un sous-marin, passer à l'atelier : Compagnie libre › Historique montre le voyage (retour, vaisseau, trajet,
+- [x] Après le retour d'un sous-marin, passer à l'atelier : Compagnie libre › Historique montre le voyage (retour, vaisseau, trajet,
   objets) ; le rendement par trajet compte un voyage ; un second passage n'ajoute pas de doublon.
 - [ ] « Copier en CSV » puis coller dans un tableur : une ligne par objet, colonnes lisibles.
 
@@ -681,7 +678,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.384 : M-14 carte au trésor** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Déchiffrer une carte au trésor : dans les 5 secondes, Rappels › Cartes au trésor montre « Voir sur la carte » ; le bouton ouvre
+- [x] Déchiffrer une carte au trésor : dans les 5 secondes, Rappels › Cartes au trésor montre « Voir sur la carte » ; le bouton ouvre
   la carte Tensho sur le bon endroit (comparer avec la carte du jeu) et y pose le drapeau ; l'icône gemme est au même endroit.
 - [ ] Ouvrir le coffre : l'icône et le bouton disparaissent.
 
@@ -700,40 +697,451 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] Grimoire du mage bleu, « Mauvaise haleine » › « Chercher sur le wiki » : les monstres (Capricious Cassie, Halitostroper…) avec
   « Drapeau » pour ceux qui ont des coordonnées ; un sort appris par quête dit « aucun monstre » avec l'adresse de la page.
-- [ ] Collections › Coiffures, Accessoires de mode, Bardes, Livres de maître : le survol montre l'objet et comment l'obtenir ; clic droit
+- [x] Collections › Coiffures, Accessoires de mode, Bardes, Livres de maître : le survol montre l'objet et comment l'obtenir ; clic droit
   : les sources. Lunettes, Portraits, Objets de collection, Archives : l'infobulle dit « obtention inconnue ». Tenues : survol d'une
   tenue ou d'une pièce = infobulle de l'objet.
 
 **Étape g) — 0.391 : X-06 tic de PR** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Page PR › cocher « Barre du tic de PR à l'écran », en mineur avec des PR pas pleins : la barre se remplit en 3 secondes et repart
+- [x] Page PR › cocher « Barre du tic de PR à l'écran », en mineur avec des PR pas pleins : la barre se remplit en 3 secondes et repart
   à chaque gain de PR ; elle disparaît à PR pleins, en combat et sur un autre job.
 
 **Étape g) — 0.392 : R-01 pêche en mer** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
+- [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
+
+**0.537 : s'effacer devant les fenêtres du jeu** — à voir en jouant
+
+- [ ] Aide à la récolte ou carnet : une autre fenêtre du jeu passe devant et touche le panneau : il se cache ; elle part : il revient. Une fenêtre derrière ne fait rien.
+- [ ] Barre de PR, usure, suivi, tâches : une fenêtre du jeu les touche : elles se cachent. Le chat, les plaques de noms et le HUD ne les cachent pas.
+- [x] (rapport de l'utilisateur, 2026-11-05, « fenêtre ok ») Carte, réglage « S'effacer devant les fenêtres du jeu » coché : une fenêtre la touche : elle se cache sans se fermer.
+- [ ] Les trois réglages (Paramètres, carte). Rien ne disparaît sans raison ; sinon, le journal de débogage dit quelle fenêtre compte.
+- [ ] (0.538) Une infobulle ou un menu du jeu qui touche la carte ou un panneau : il s'efface, puis revient. Passer la souris sur plusieurs objets ne le fait pas clignoter de façon gênante.
+
+- [x] (rapport de l'utilisateur, 2026-11-05, « tous es ok ») (0.539) Déplacer une fenêtre du jeu qui a un panneau de Tensho (récolte, carnet, personnage, mission) : le panneau la suit sans retard visible.
+- [x] (rapport de l'utilisateur, 2026-11-05, « tous es ok ») (0.539) Réglage de la carte activé : un panneau lié qui touche la carte la fait disparaître ; passer d'une infobulle à l'autre ne la fait pas clignoter, et elle revient environ 1 seconde après.
+
+**0.535 : interfaces** — à voir en jouant
+
+- [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
+- [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
+- [ ] Panneaux à barre de titre (récolte, pêche, carnet, ventes…) : réduire et fermer marchent ; fermé, il revient en rouvrant la fenêtre du jeu.
+- [ ] Trier : disparaît sous la fenêtre des filtres de tri ou toute autre fenêtre devant, revient quand elle part ; ne disparaît pas sans raison.
+
+**0.534 : Équilibré grisé quand il revient au même** — à voir en jouant
+
+- [ ] Nœud où Sûr et Équilibré donnent les mêmes chiffres : la balance est grisée, l'infobulle le dit, et elle reste cliquable. Là où ils diffèrent : elle est normale.
+- [ ] Le panneau répond sans à-coup en changeant de cran ou de tour : trois calculs tournent maintenant en tâche de fond.
+
+**0.533 : les coups de chaque cran** — à voir en jouant
+
+- [ ] Chaque icône donne sa suite de coups et ses PR, et le premier coup est celui de « Prochaine action ». Après un tirage, la suite se recalcule.
+- [ ] Le nombre de tentatives de la suite correspond à ce qui reste, plus les tentatives rendues.
+
+**0.532 : panneau Collectionnable sans répétitions** — à voir en jouant
+
+- [ ] Plus de chiffre dit deux fois ; au survol de « Comment est-ce calculé ? », la tentative gratuite et la règle d'Œil et de Toucher.
+- [ ] D'un cran à l'autre, la moyenne ne baisse jamais à plancher égal.
+
+**0.531 : description chiffrée des crans** — à voir en jouant
+
+- [ ] Sur un même nœud, chaque icône change la phrase et ses chiffres. Sûr et Équilibré peuvent donner la même chose quand rien ne les sépare.
+- [ ] Sûr n'a plus une moyenne plus basse qu'Équilibré à plancher égal.
+
+**0.529 : trois crans de risque des collectionnables** — à voir en jouant
+
+- [ ] Panneau Collectionnable (0.530) : trois icônes, main, balance, dé ; le nom au survol ; le cran choisi coloré, sa description dessous ; même choix dans Paramètres › Modules › Récolte.
+- [ ] Sur « Sûr » : le coup, le plan sans chance, ses actions et ses PR. Sur les deux autres : le coup, la moyenne, le pire cas, et la ligne « Sur Sûr… garantis ».
+- [ ] En changeant de cran, le coup conseillé suit.
+
+**0.527 : Toucher d'amorçage dans le plan des collectionnables** — à voir en jouant
+
+- [ ] Botaniste ou mineur niveau 95 et plus : commencer vers 623 PR, lancer Inspection soi-même (il reste 423 PR) : le panneau propose Toucher d'amorçage ; une fois lancé, il ne le repropose plus et compte 48 %. Depuis 727 PR, le plan passe par Inspection puis Sélection méthodique, sans Toucher : c'est prévu (capture du 2026-11-05).
+- [ ] Sous le niveau 95 : jamais proposé.
+- [x] (rapport de l'utilisateur, 2026-11-05) Toucher reste actif si une autre action passe avant la Sélection méthodique ; il ne retombe qu'après elle. Récolte non essayée.
+
+**0.526 : légendes locales dans les Collections** — à voir en jouant
+
+- [x] (rapport de l'utilisateur, 2026-11-04, « legendes local ok ») Collections › Légendes locales : 36 tomes, marqués lus ou non comme dans votre personnage. Si un tome est mal marqué, la correspondance des bits est fausse : la carte se trompe aussi.
+- [ ] Clic droit ou survol d'un tome : comment l'obtenir.
+
+**0.525 : groupe sur la carte, coût du chargement** — à voir en jouant
+
+- [x] (rapport de l'utilisateur, 2026-11-04, « groupe parfait ») Membres du groupe sur la carte : déplacement fluide quand ils sont en vue ; à distance, ils glissent entre deux positions ; une téléportation saute d'un coup.
+- [ ] Après une relance du jeu : l'agent lit les lignes « Load » de dalamud.log, pour le coût d'un vrai démarrage.
+
+**0.524 : Ctrl+Alt actualise le prix survolé** — à voir en jouant
+
+- [x] (rapport de l'utilisateur, 2026-11-04, « ctrl alt ok ») Survoler un objet vendable, attendre le prix, Ctrl+Alt : les secondes de « Récupéré à » changent. Maintenu : une seule demande. Relâché et rappuyé : au plus une toutes les 5 s.
+
+**0.523 : assignats des collectionnables d'un nœud** — à voir en jouant
+
+- [x] Sur un nœud à deux collectionnables : les assignats par palier sous chacun, identiques au tableau Récolte › Collectionnables, et « le plus au palier haut » sur le bon (rapport de l'utilisateur, 2026-11-04).
+- [ ] Deux objets aux types d'assignats différents : la phrase « types différents », sans marquage.
+
+**0.522 : temps de recharge de Bénédiction de la nature** — à voir en jouant
+
+- [ ] Juste après l'avoir lancée, le panneau de récolte sur un cristal dit « prête dans N s », et N suit le compteur de la barre du jeu. Bénédiction des Douze reste proposée.
+- [ ] Le temps écoulé, elle redevient proposée.
+
+**0.520 : tentative gratuite dans le plan des collectionnables** — à voir en jouant
+
+- [ ] Niveau 90 et plus, PR pour Sagesse du fermier ou Raison solide : la moyenne dépasse le pire cas, et la ligne « 50 % de chances d'une tentative gratuite » apparaît.
+- [ ] Sous le niveau 90 : pas de cette ligne.
+- [ ] Étalage des connaissances prêt à la dernière tentative : le panneau le propose avant « Récolte ».
+
+**0.519 : éclats, cristaux et agrégats** — à voir en jouant
+
+- [ ] Éclat, cristal ou agrégat : le panneau propose Bénédiction de la nature et Bénédiction des Douze (0.521), sans « ≈ N objets ».
+- [ ] Les autres objets gardent leur plan de PR habituel.
+
+**0.518 : carte, tomes et niveau d'un point** — à voir en jouant
+
+- [ ] Point d'Ostrakon Dékaokto : « ouvert, mais pas encore pour vous », le nom du tome, horloge grise. Le journal écrit « Gathering knowledge: … » : les nombres entre crochets correspondent-ils aux tomes lus ?
+- [ ] Un point légendaire dont le tome est lu : « ouvert maintenant », en vert, sans ligne de tome.
+- [ ] Un point au-dessus du niveau du métier : la ligne « Mineur : niv. X, ce point : niv. Y ».
+
+**0.517 : plan de PR** — à voir en jouant
+
+- [ ] Sur un nœud à PR pleins : le panneau propose des actions, et elles existent toutes dans votre barre.
+- [ ] Une action que votre personnage n'a pas appris (par exemple un métier bas niveau) n'est pas proposée.
+- [ ] Cristal : « supp. 0 % ».
+
+**0.516 : panneaux accrochés au jeu en fenêtres Dalamud (#38)** — à voir en jouant
+
+- [ ] Chaque panneau s'affiche au même endroit, avec le même contenu : carnet d'artisanat, projection pendant une synthèse, récolte, collectionnable, pêche, harpon, pêche en mer, survol d'objet, outil de mission, Revue de mode, Personnage, ventes des servants, demande de Triple Triade, import de banque (si la capture automatique est coupée), bouton « Trier ».
+- [ ] Il suit sa fenêtre du jeu quand elle bouge, et disparaît quand elle se ferme, sans rester une image de trop.
+- [ ] Les croix : projection (coupe son réglage), Revue de mode (ferme l'emplacement), pêche ouverte à la main.
+- [ ] Le bouton « Trier » trie, sans fond ni bord ; le panneau de survol ne prend pas les clics.
+- [ ] Échap ne ferme aucun de ces panneaux, et ils ne prennent pas le focus en apparaissant.
+- [ ] Une icône ou un menu Dalamud (épingle, opacité) n'apparaît pas sur ces panneaux.
+
+**0.515 : aide à la récolte, plan du nœud et effet du lieu** — à voir en jouant
+
+- [ ] Nœud avec « PR ≧ 770 → tentatives +1 » (capture du 2026-11-04) : avec 809 PR, un plan d'actions apparaît, et la ligne « Effet du lieu actif : tentatives +1, déjà comptées (5 au lieu de 4) ».
+- [ ] Dépenser des PR sur ce nœud : le nombre de tentatives reste à 5 (la condition lue porte sur les PR maximum).
+- [ ] Un job avec moins de PR max que le seuil, ou Collecte ou Savoir-faire trop bas : la ligne « il manque N » et le rendement avec l'effet ; les tentatives lues sont sans l'effet.
+- [ ] Effet de quantité ou de chance supplémentaire actif : la fenêtre du jeu montre-t-elle déjà la valeur avec l'effet ? Sinon le plan la compte trop bas.
+- [ ] Cristal : « supp. 0 % » au lieu de « ? », et un plan.
+- [ ] Tous les effets : sur plusieurs lieux, chaque ligne de la case « Effet du lieu » du jeu a sa ligne dans le panneau, aussi sur un collectionnable.
+- [ ] Avec une liste de fabrication : « il en manque N, environ X nœuds comme celui-ci » ; le plan ne change pas selon la liste.
+- [ ] Paramètres › Modules › Récolte : plus de réglage de bonus ni de secondes entre deux nœuds ; le réglage de la liste cache sa ligne.
+
+**0.514 : panneaux libres en fenêtres Dalamud (#38)** — à voir en jouant
+
+- [ ] Fenêtre de suivi (réglage) : s'affiche à sa place habituelle, liste les alarmes, le nom ouvre l'objet, « Carte » ouvre le point ; la croix la ferme et décoche le réglage ; recocher la rouvre.
+- [ ] Tâches à l'écran : s'affiche avec une tâche marquée, cocher une tâche la fait sortir, cachée en combat ; la croix la ferme et décoche le réglage.
+- [ ] Barre d'usure : même place, mêmes valeurs ; sans titre ni croix ; le réglage l'affiche et la cache.
+- [ ] Barre de PR en mineur : se remplit, le repère du tic avance ; disparaît à PR pleins et sur un autre job ; PR mesurés même barre coupée.
+- [ ] Ces quatre panneaux ne prennent pas le focus en apparaissant, et Échap ne les ferme pas.
+- [ ] Guide et carte : la croix les ferme du premier coup.
+
+**0.510 : conseils de Triple Triade en JcE seulement** — à voir en jouant
+
+- [ ] Match contre un PNJ : conseils comme avant. Au Battlehall, en tournoi ou contre un joueur : pas de cadre, et le panneau dit pourquoi.
+- [ ] Paramètres › Interface : l'option « Cadre des fenêtres du jeu » n'existe plus.
+
+**0.509 : coup conseillé pendant une synthèse (A-04)** — à voir en jouant
+
+- [ ] Dans « Comparer les prochains coups », pendant une synthèse : « Conseillé : … » change à chaque coup et suit l'état (sur Bon, un coup de cet état devrait souvent sortir, sans que ce soit une règle). Rien n'est joué. Réglage dans Paramètres › Modules › Artisanat. Pas de saccade.
+- [ ] Le coup suivi jusqu'au bout donne un résultat proche de ce qui est annoncé (écart normal si l'état change).
+
+**0.508 : ventes des servants (I-05)** — à voir en jouant, à la sonnette
+
+- [ ] Ouvrir la liste de ventes d'un servant : le panneau « Vos ventes » s'affiche à côté, avec objets, quantités et prix comme le jeu, HQ compris.
+- [ ] « Comparer aux autres vendeurs » : l'autre vendeur le plus bas et l'état de chaque ligne. Vos autres servants ne comptent pas comme concurrents. Le bouton de prix copie la valeur ; aucun prix ne change dans le jeu.
+- [ ] L'agent lit ensuite les lignes `Retainer sale list` de dalamud.log : docs/evidence/0.508-retainer-sales.md.
+
+**0.506 : vidéos et guides de la communauté (ONBOARD-001, lots 7 et 8)** — après une release
+
+- [ ] « ? » › Vidéos et guides : la liste se lit sur `main`, donc rien avant une release : « n'a pas pu être lue ». Après une release : « pas encore de vidéo ». Avec une ligne ajoutée : le titre, l'adresse au survol, la confirmation, le navigateur.
+
+**0.505 : guide des premiers pas (ONBOARD-001, lots 4 à 6)** — à voir en jouant
+
+- [ ] Aide › Lancer le guide : les sept étapes, Retour, Suivant, Quitter à chaque étape ; le rouvrir reprend au même endroit ; fini, il repart du début.
+- [ ] Sur l'accueil, joueur existant : une proposition unique, « Non merci » la retire pour de bon. Vraie première installation : il s'ouvre seul à la première ouverture de Tensho (à tester avec une configuration vide ou par un testeur).
+- [ ] Étape des fenêtres : ouvrir une fenêtre listée, son ✓ apparaît seul. Ce qui reste figure sur l'accueil, repliable, jusqu'à être masqué.
+- [ ] Le guide disparaît en combat et en mission, puis revient. La visite ouvre chaque page dans Tensho.
+
+**0.504 : signaler un problème (ONBOARD-001, lot 3)** — à voir en jouant
+
+- [ ] Aide › Signaler un problème : remplir, « Ouvrir le formulaire GitHub ». Le navigateur s'ouvre sur le bon formulaire, tous les champs remplis. Ne pas l'envoyer pour un essai. Le rapport est visible et modifiable avant, sans nom de personnage ni dossier.
+
+**0.502 : aide (ONBOARD-001, lot 1)** — à voir en jouant
+
+- [ ] Un « ? » en haut à droite de la fenêtre Tensho explique la page ouverte, sur toutes les pages ; « Toute l'aide » mène à Préférences › Aide.
+- [ ] Page Aide : la recherche trouve une page d'après ce qu'elle fait ; « Ouvrir cette page » y mène ; questions fréquentes.
+- [ ] 0.503 : première ouverture d'une page, un bandeau de deux lignes ; « Compris » le retire pour de bon ; « En savoir plus » ouvre l'aide. Réglage dans Paramètres › Général. Le « ? » dit ce qui est lu ou non sur ce personnage.
+- [ ] Relire les textes : chaque phrase fausse est un bug. Ils ont été écrits d'après le code et les tests, sans tout rejouer.
+
+**0.501 : sonde des fenêtres du dresseur** — à faire en jeu, mode développeur
+
+- [ ] Ouvrir le bestiaire et cliquer sur quelques bêtes obtenues, de rangs différents. Ouvrir « Formation de l'équipe » depuis un plateau. Ouvrir la fiche d'un ennemi d'un plateau. L'agent lit ensuite les lignes `Beast window` de dalamud.log : rang de chaque bête, faiblesse des ennemis.
+
+**0.500 : page Dresseur** — à voir en jouant
+
+- [ ] Progression › Dresseur › Bêtes : 50 bêtes, nom, classe, attaque auto. comme le bestiaire. Rang 6 : Cu sith = FOR 161, INT 100, Rés. phys. 90, Rés. mag. 86, VIT 131. Une autre bête, à comparer aussi.
+- [ ] Le compteur « Bêtes obtenues » égale celui du bestiaire du jeu (35/50 sur la capture), et ✓ / ✗ suivent. Tri par colonne, recherche, classe et « Obtenues seulement ».
+- [ ] Plateaux : niveau, équipe et rang comme « Disposition du plateau » ; les bonus comme « Liste des bonus ».
+- [ ] « Faible : … » : comparer à la fiche d'un ennemi dans le jeu. **Lu comme tel, jamais vérifié.** Formes et cibles des actions aussi.
+
+**0.499 : la carte au-dessus de Tensho** — à voir en jouant
+
+- [ ] Depuis une page Tensho, cliquer un lien vers la carte (« Voir sur la carte », favori d'une autre carte) : la carte passe devant Tensho, qu'elle soit déjà ouverte ou non. Cliquer ensuite sur Tensho le remet devant.
+
+**0.498 : Tensho replié, puis demandé** — à voir en jouant
+
+- [ ] Replier la fenêtre Tensho par sa barre de titre, puis ouvrir quelque chose qui la demande (clic droit sur un objet › outil, `/tensho`, alarme) : elle se déplie sur la bonne page. Elle se replie encore normalement ensuite.
+
+**0.497 : état de la synthèse dans « Comparer les prochains coups »** — à voir en jouant
+
+- [ ] En haut de la fenêtre : l'état du jeu et son effet. Sur Bon ou Excellent, Touche précise, Synthèse intensive et Ficelles du métier (noms du jeu selon votre langue) passent en tête, marqués « Seulement dans cet état ». Sur Mauvais, la ligne le dit.
+- [ ] Mode développeur : le journal donne `Craft condition …: game status …` à chaque état. Si un de ces coups manque sur Bon, cette ligne dit ce que le jeu a répondu.
+
+**0.494 : auto-contrôle** — à voir en jouant
+
+- [ ] Mode développeur : quelques secondes après un rechargement, le journal contient les lignes `Selftest …` et un résumé `Selftest done (auto)`. Sans saccade visible.
+- [ ] `/tensho selftest` et le bouton de Diagnostics relancent une passe ; Diagnostics montre les lignes.
+- [ ] 0.496 : fenêtre ouverte puis refermée, sans lancer de passe : la passe suivante donne OK_SEEN avec l'heure. Ça reste après un rechargement.
+- [ ] 0.495 : carnet d'artisanat ouvert, la ligne « crafting log » donne une recette ; synthèse en cours, « synthesis » passe en OK ; point de récolte ouvert, « gathering node » aussi.
+
+**0.493 : disponibilité des PNJ de Triple Triade** — à voir en jouant
+
+- [ ] Triple Triade › PNJ et cartes : colonne « Disponible ». Un PNJ marqué « Quête requise » refuse bien le défi ou n'est pas là en jeu, et un PNJ marqué « Oui » accepte. Le survol donne les quêtes, avec ✓ pour celles faites. À signaler surtout : un PNJ à deux quêtes dont une seule est faite (lecture « toutes » déduite, voir docs/evidence/0.493-triad-npc-requirements.md).
+- [ ] « Masquer les PNJ pas encore disponibles » les retire ; clic droit sur la carte › Triple Triad : même mention, ces PNJ en dernier.
+
+**0.491 : R-14, valeurs inconnues** — à voir en jouant
+
+- [ ] Défi Triple Triade et match : règles et conseils comme avant, jamais « les règles n'ont pas pu être lues ». Le journal donne la ligne `Triad request rule values` (preuve à verser dans docs/evidence, défis à 1, 2 et 4 règles si possible).
+- [ ] Coffre à apparence ouvert avec une tenue complète : ses pièces comptent toujours comme possédées. Avec une tenue partielle : seules les pièces rangées comptent. Le journal donne `Dresser outfit … slots held` (preuve à verser dans docs/evidence).
+- [ ] Carte : panoramas et courants éthérés comme avant.
+
+**0.490 : onglet Favoris de la carte** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Clic droit sur la carte Tensho : « Favoris » est le premier onglet, avant Quêtes et ALÉA. Les favoris de cette carte d'abord, puis les autres. Un clic pose le drapeau ou ouvre l'autre carte ; « Retirer » enlève le favori et son étoile.
+
+**0.489 : temps d'affichage de la carte** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Mode développeur, carte Tensho ouverte : Diagnostics a une ligne « Map », et elle reste une fois la carte fermée.
+
+**0.488 : clignotement, Raison solide, temps avant le plein** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Panneau Collectionnable : il ne clignote plus au début ni entre deux actions.
+- [x] Raison solide : conseillée seulement à la dernière tentative, puis le jeu l'accepte. Sinon le panneau dit d'attendre.
+- [x] Barre de tic : quelques secondes après la remontée des PR, le temps avant le plein correspond à l'attente réelle. Paramètres › Modules › Récolte donne la base mesurée et les traits de chaque métier ; comparer sur deux métiers.
+- [x] Aides : une action grisée dans la fenêtre du jeu ou non apprise par le métier n'est jamais conseillée (Toucher d'amorçage sous le niveau 95, action de quête non faite).
+
+**0.486 : barre de tic** — pendant la campagne de tests en jeu (étape h)
+
+- [x] La barre se remplit vers les PR pleins, une petite marque dorée défile en bas à chaque tic, le texte donne le temps avant le plein. Comparer ce temps à l'attente réelle. Tant que les PR par tic ne sont pas mesurés, le texte reste « tic dans… ». La bulle donne le prochain tic.
+
+**0.486 : temps d'affichage des panneaux** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Mode développeur, Diagnostics : la section « panneaux à côté du jeu » liste le panneau de récolte, Collectionnable et les autres une fois ouverts, et leurs temps restent après la fermeture (0.487).
+
+**0.484 : risque accepté** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Barre de tic : à l'ouverture d'une fenêtre de récolte, après quelques secondes, elle affiche « pause » ; en la quittant, elle repart. Paramètres › Modules › Récolte montre les PR par tic mesurés.
+- [x] Carte Tensho ouverte, plugin rechargé : elle revient seule, sans M deux fois. Carte du jeu hors combat : pas d'autre effet.
+- [x] Panneau Collectionnable : « Calcul du plan… » apparaît à peine, le jeu ne se fige pas au changement de curseur.
+
+- [x] Panneau Collectionnable, curseur « Risque accepté » : à 0 %, plus de Sélection instinctive sans nécessité et un « au pire » élevé ; à 100 %, le plan vise la meilleure moyenne. Le réglage reste après rechargement, et existe aussi dans Paramètres › Modules › Récolte.
+
+**0.483 : Raison solide selon le jeu** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Plan avec Raison solide : quand les tentatives sont sous le maximum et que le jeu la refuse, elle n'est plus conseillée ni comptée. Mode développeur : la ligne `Collectable restore action` du journal donne la réponse du jeu.
+
+**0.482 : ordre des actions du plan** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Début de passe avec des PR : Inspection rigoureuse est conseillée d'abord si le plan en a besoin. Le gain affiché est le gain réel, pas celui de la case du jeu.
+
+**0.481 : Inspection, Œil et Intuition comptés** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Cocher une fois « Avec Inspection rigoureuse » et « Avec Intuition » : les deux avertissements disparaissent et le plan change. Les cases peuvent rester cochées, le conseil ne change pas.
+- [x] Inspection rigoureuse conseillée quand elle rapporte plus ; après usage, l'action suivante n'est pas une deuxième Inspection et le gain affiché la contient.
+- [x] Œil du collectionneur conseillé quand il rapporte plus ; après usage, le pourcentage d'Intuition du jeu monte et il n'est plus conseillé.
+- [x] Panneau plus court, méthode dans la bulle de « Comment est-ce calculé ? ».
+
+**0.480 : bonus dans le plan de collection** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Cocher « Avec Inspection rigoureuse » puis décocher, même chose pour « Avec Intuition » : les messages disparaissent, le plan ne change pas tant qu'une case reste cochée.
+- [x] Plan avec Inspection : elle est conseillée seulement si elle rapporte plus ; les PR annoncés sont justes. Une fois utilisée, le gain affiché la contient et le conseil suivant passe à l'action.
+- [x] Sélection méthodique à 8 % : plus conseillée pour son pourcentage. Comparer les conseils à votre expérience, et me donner les chiffres du panneau si l'un paraît faux.
+- [x] Plus de plantage en mode collectionnable, y compris à la valeur maximale avec une Sélection méthodique.
+- [x] Référence affichée : palier haut, assignats, ce qui manque. À la valeur voulue avec des PR restants : Raison solide conseillée pour une récolte de plus, et le jeu l'accepte.
+- [x] Œil du collectionneur : proposé en option quand une Intuition atteindrait le palier suivant.
+- [x] Mode développeur : le journal `Collectable window values` contient le pourcentage d'Intuition.
+
+**0.479 : plan de collection, PR et bonus de nœud** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Fenêtre Collectionnable : barre de collectabilité juste, palier juste, prochaine action avec icône et gain ; le plan se refait après chaque action. Comparer les gains affichés à ceux du jeu.
+- [x] Plus aucune chance d'atteindre le seuil bas (par exemple 0 avec une seule tentative) : le panneau le dit, sans parler de tirage.
+- [x] Bien noter si un conseil paraît mauvais, avec les chiffres du panneau.
+- [x] Liste de fabrication : nœud normal, « récolte simple » et PR gardés ; un nœud avec une tentative ou une quantité de plus : « Bonus majeur », les PR se dépensent. Décocher le réglage redonne le partage égal.
+
+**0.478 : retours du lot 6, récolte** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Fenêtre Collectionnable sur « Minerai de durium noble collectionnable » : nom complet, seuils 400 / 700 / 1000. Rien à faire de plus. En mode développeur, faire quelques actions : le journal note les valeurs de la fenêtre.
+- [x] Aide à la récolte : plus de texte coupé ; le nom, puis les taux dessous. Sur un collectionnable : pas de « plan non calculé » mais un message clair.
+- [x] Récolte › onglet Collectionnables : tableau trié en cliquant sur chaque colonne, dans les deux sens.
+- Plan réparti sur la liste de fabrication : retiré en 0.515 (DEC-036) ; la ligne « il en manque N » reste.
+- [x] Paramètres › Modules › Récolte : actions interdites jamais proposées (panneau et page PR) ; PR par tic mesuré sur un nœud quand les PR remontent.
+
+**0.476 : thème proposé par un outil** — TEMPLATES-001
+
+- [x] Éditeur : choisir un thème proposé, enregistrer. Le thème ne change pas tant qu'on n'a pas cliqué « Utiliser le thème… ». Ensuite, en haut de Mes outils, « Revenir au thème d'origine » remet l'ancien (0.477).
+- [x] Coller un outil avec `"settings":{"theme":"light"}` : l'aperçu le dit. Avec un autre réglage : refusé.
+
+**0.475 : galerie de Mes outils** — TEMPLATES-001
+
+- [ ] Après la prochaine release (la galerie est lue sur `main`) : Galerie › Charger la liste, Voir, l'aperçu, Installer. Avant cette release, le message « n'a pas pu être lue » est normal.
+- [ ] Sans clic, aucune requête : rien dans le journal au démarrage du plugin.
+- [ ] Remerciements : la ligne des outils communautaires est présente.
+
+**0.474 : éditeur de Mes outils** — TEMPLATES-001
+
+- [x] Créer un outil : ajouter chaque type de bloc, monter, descendre, retirer. Enregistrer un outil incomplet donne la raison sans rien perdre.
+- [x] Bloc d'objets : sélectionner un objet dans la page Objets, revenir, « Ajouter… », régler la quantité.
+- [x] Modifier un outil installé : les autres langues restent, la progression repart de zéro après enregistrement.
+
+**0.473 : Mes outils (modèles sans code)** — TEMPLATES-001
+
+- [x] « Mes outils » est juste sous l'accueil. Ajouter un outil : coller un JSON, Vérifier, l'aperçu montre tout, Installer.
+- [x] Refus avec raison : champ inconnu, type de bloc inconnu, lien http, texte quelconque.
+- [x] Cases, compteur, minuteurs : cocher, recharger le plugin, l'état revient ; une case quotidienne se décoche à la remise.
+- [x] Bloc d'objets : icône, bulle, voulu, possédé, manque ; un identifiant inconnu est signalé.
+- [x] Lien : le clic demande confirmation et montre l'adresse complète. Rien ne s'ouvre sans « Ouvrir ».
+- [x] Copier pour partager, coller la ligne dans un autre personnage ou après retrait : même outil, progression à zéro.
+
+**0.470 : liste unique des pages** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Navigation : mêmes groupes, mêmes pages, même ordre qu'avant ; chaque page s'ouvre. Artisanat reste sélectionné sur Synthèse en cours et Séquences, Récolte sur PR, Collection sur Magie bleue. Diagnostics seulement en mode développeur.
+
+**0.469 : demande du jour de la Grande Compagnie, icônes du carnet** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Ouvrir le calendrier du jeu puis les missions de ravitaillement : la bulle d'un objet demandé dit « demandée aujourd'hui ». Un autre objet possible dit « absente des demandes du jour que vous avez ouvertes ». Le journal Dalamud donne une ligne `Grand Company supply window`.
+- [ ] Après 20:00 UTC, ou avec un autre personnage : retour au message qui invite à ouvrir la fenêtre.
+- [ ] Carnet : panneau en sections (recette, votre état, cible, calcul, macro), chiffres en tableau, barre de qualité verte si la cible est atteinte ; explications dans la bulle de « (?) ».
+- [ ] Carnet : Manipulation est une case et l'icône du skill, sans texte ; la bulle dit ce qui est détecté. Repas et remède : icône et bulle de l'objet, « aucun » pour un repas sans bonus d'artisanat.
+
+**0.468 : carnet (cible, état, meilleure séquence) et cache de Raphael** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Raphael choisi, carnet : une recette calculée puis re-sélectionnée revient tout de suite, le tampon dit « Cache disque ». Après un changement d'option de macro ou une nouvelle version de la DLL : « Solveur : Raphael (séquence déjà calculée…) ».
+- [ ] Simulateur › Recherche avec Raphael : relancer la même recherche répond tout de suite, avec « déjà calculée » et un bouton « Recalculer ». La séquence calculée dans le carnet y est retrouvée à attributs et cible égaux.
+- [ ] Carnet : « Qualité cible » change le calcul quand on quitte le champ, « Maximum » la remet, elle revient pour cette recette après rechargement. Recette à collectionner : boutons des paliers.
+- [ ] Carnet : la ligne « Lu dans le jeu » donne repas, remède et spécialiste justes ; la case Manipulation et son « détectée : » sont justes pour ce métier. La case corrige le calcul si la détection se trompe (le journal Dalamud donne une ligne `Manipulation for job`).
+- [ ] Carnet : « Enregistrer comme meilleure séquence », puis la séquence apparaît dans la section enregistrée et rien n'est calculé ; une cible plus haute relance la recherche ; « Recalculer » aussi.
+- [ ] Réglages › Modules › Artisanat : la case de la fenêtre « Comparer les prochains coups » ; pendant une synthèse, la croix de la fenêtre la ferme et décoche le réglage.
+
+**0.467 : Raphael dans le carnet** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Raphael choisi : le panneau du carnet affiche « Solveur : Raphael » et sa proposition ; changer vite de recette n'accumule pas de calculs et le jeu reste fluide ; retour à Tensho : le panneau suit.
+
+**0.465 : solveur Raphael** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Artisanat › Recherche : choisir « Raphael », lancer : une séquence arrive, « Annuler » fonctionne ; le jeu reste fluide pendant le calcul.
+- [ ] La séquence jouée en jeu donne le résultat annoncé. Retour à « Tensho » : la recherche d'avant.
+- [ ] Le plugin se recharge sans erreur après un calcul.
+
+**0.464 : retours du lot 5** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Simulateur, métier porté : attributs copiés d'office, ligne « Détecté » juste (repas, remède, Manipulation, spécialiste) ; valeurs en vert ou rouge selon la recette ; « Conserver la séquence » après la palette.
+- [ ] Onglet « Liste de fabrication » : icônes, infobulle complète au survol, manquants en rouge.
+- [ ] Pendant une synthèse : la fenêtre de projection s'ouvre à côté de celle du jeu, se ferme avec elle, et ses chiffres correspondent au résultat de l'action jouée.
+
+**0.462 : retours du lot 3** — pendant la campagne de tests en jeu (étape h)
+
+- [ ] Survol d'une pièce d'équipement : la comparaison est lisible, les statistiques en grille.
+- [ ] Clic droit sur un objet › Tensho : plus de « Tous les outils avec cet objet » ; le reste du menu est là.
+- [x] Ouvrir le coffre de compagnie, puis tous ses onglets : Banque › Coffre de compagnie liste les objets, plus de message « ordre visuel » (0.463) ; les quantités sont justes.
+
+**0.461 : grille du journal** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Monde › Jardinage : le potager est une grille ; la plante est dans la bonne case par rapport au vrai potager (emplacement 6 en bas au milieu) ; sinon, dire où elle est.
+- [ ] « Entretenu » et « Retirer » marchent depuis la case ; plus de « Replanter ». Les pots restent en liste.
+
+**0.460 : plantations détectées depuis le chat** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Planter dans un potager : une ligne « Jardin : … noté dans le journal » arrive ; la page Jardinage montre le bon potager, le bon emplacement, la bonne graine et les durées.
+- [ ] Replanter au même emplacement : la ligne est remplacée, pas doublée. Un pot : une ligne « pot ».
+- [ ] Un joueur qui écrit la même phrase dans le chat n'ajoute rien. Réglage décoché : plus rien n'est noté.
+- [ ] Entretenir et récolter : envoyer le résultat à l'agent, qui lit les lignes « Garden chat capture » de dalamud.log pour trouver leurs messages.
+
+**0.459 : icône des terminés, page Jardinage** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Barre du serveur : trois icônes au plus : horloge (alarmes actives), rappels (reste à faire), terminés (visible seulement s'il y en a) ; chaque infobulle a sa liste.
+- [x] Monde › Jardinage : le journal et les croisements y sont, ils ne sont plus dans Rappels ; les parcelles déjà notées sont toujours là.
+
+**0.458 : icône des rappels, ce qui reste à faire** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Barre du serveur : le nombre et l'infobulle « Reste à faire » listent les rappels non cochés ; cocher « Fait » sur la page Rappels fait baisser le nombre (5 s au plus).
+- [x] Décocher « Barre » sur une ligne : elle disparaît de l'infobulle ; recocher : elle revient ; le choix reste après un rechargement du plugin.
+- [ ] Une tâche personnelle affichée à l'écran apparaît dans la liste ; une tâche servant ou un vaisseau fini aussi.
+
+**0.457 : icônes des compétences** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Réglages › Artisanat › Actions interdites : chaque ligne a son icône, et la case se coche toujours.
+- [ ] Enregistreur d'artisanat : les actions notées s'affichent en icônes dans l'ordre ; le survol donne le numéro et le nom ; la ligne revient à la ligne si besoin.
+
+**0.456 : plan de plantation des croisements** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Croisements › « Ce qui donne cette graine » : les paires à « seulement cette graine » sont en tête ; le survol donne les autres graines.
+- [x] Clic sur une paire : grille 3 × 3 sans centre ; la disposition correspond à votre potager de luxe (sinon, dire comment il est) ; noms des graines et de la terre en français.
+- [ ] Planter une paire selon le plan : des graines croisées apparaissent à la récolte, sauf sur la parcelle 1.
+
+**0.455 : retours du lot 1** — pendant la campagne de tests en jeu (étape h)
+
+- [x] Journal de l'or (Stockage › Gils) : tableaux lisibles, plus de « = » ; une dépense apparaît en « - ».
+- [x] Barre du serveur : deux icônes, l'horloge des alarmes (nombre d'alarmes actives) et celle des rappels (nombre de terminés) ; survol = la
+  liste ; clic = la bonne page ; le réglage Avancé masque celle des rappels.
+- [ ] Mission ou entraînement d'escouade lancé : une alarme automatique apparaît dans la page Alarmes et sonne à la fin ; l'icône des rappels monte de 1.
+
+**0.454 : R-14, indisponible plutôt que « lecture »** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [ ] Titre par classe : réglé sur un personnage ; sur un autre qui ne le possède pas, changer de classe ne change pas le titre.
+- [ ] Objets de collection et carnets : affichés comme avant, sans message d'indisponibilité.
+- [ ] Carte Tensho à la place de la carte du jeu : fonctionne comme avant.
+- [x] Inventaire d'un servant : l'ordre affiché suit toujours celui du jeu.
+
+**0.453 : R-14, valeurs inconnues** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [x] Journal de l'or : à la connexion, aucune fausse entrée « + tout l'or » ; un achat est bien noté.
+- [ ] Rappels à l'écran titre ou de sélection : pas de zéros ni de rôle ; une fois connecté, les compteurs apparaissent.
+- [x] Prix de sous-cotation : après une sonnette, le prix est copié ; sans aucune sonnette depuis le lancement du jeu, rien n'est copié.
+- [x] Revue de mode : les catégories s'affichent comme avant.
+- [ ] Téléportation : coûts affichés ; mandats, collections supplémentaires et chocobo lus une fois connecté.
+
+**0.452 : R-14 et hooks (A-14)** — pendant la campagne de tests en jeu de la fin (étape h)
+
+- [x] Alarme sur un objet : la laisser sonner deux fois de suite ; la ligne de chat, le son et Discord arrivent à chaque sonnerie.
+- [ ] Enregistreur d'artisanat sur une classe autre que Charpentier : Veneration, Innovation, Great Strides, Waste Not, Manipulation et Final
+  Appraisal sont notés ; une action lancée pendant l'animation (mise en file) est notée une seule fois ; une action refusée ne l'est pas.
+- [ ] Synthèse en direct : la projection s'affiche maintenant (elle ne tournait pas avant) ; comparer ses chiffres à la synthèse.
+- [ ] Chaîne de macros : /macrolock pendant une chaîne, puis lancer une autre macro : la chaîne continue.
+- [ ] Try On depuis le menu d'un objet avec un personnage chargé ; à l'écran de sélection du personnage, rien ne se passe.
+- [x] Musique en cours (orchestrion) et liste des cartes de l'éditeur de Triple Triade toujours lues.
 
 **0.451 : N-06 missions d'escouade (sonde en jeu)** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Hors de la caserne : « Lire l'escouade » affiche « L'escouade n'est pas chargée… ».
-- [ ] À la caserne, escouade ouverte : « Lire l'escouade » liste les 8 membres (classe, niveau, « occupé » pour ceux en mission ou à
+- [x] Hors de la caserne : « Lire l'escouade » affiche « L'escouade n'est pas chargée… ».
+- [x] À la caserne, escouade ouverte : « Lire l'escouade » liste les 8 membres (classe, niveau, « occupé » pour ceux en mission ou à
   l'entraînement) et le bonus d'entraînement ; comparer avec la fenêtre du jeu.
-- [ ] Attributs d'un membre : comparer « P / M / T » affiché avec la fiche du membre dans le jeu (classe, niveau). Un écart prouverait que
+- [x] Attributs d'un membre : comparer « P / M / T » affiché avec la fiche du membre dans le jeu (classe, niveau). Un écart prouverait que
   les colonnes de GcArmyMemberGrow sont mal lues, ou que les affinités ou l'équipement comptent.
-- [ ] Choisir la mission de la fenêtre du jeu, puis le jeu d'exigences qui correspond à ses valeurs ; former le groupe proposé dans le
+- [x] Choisir la mission de la fenêtre du jeu, puis le jeu d'exigences qui correspond à ses valeurs ; former le groupe proposé dans le
   jeu et comparer ses totaux et le taux de réussite affiché par le jeu avec « ≈ … % ».
-- [ ] « Écrire dans le journal » : copier les lignes « Squadron probe: » du journal de Dalamud dans docs/evidence/ (sonde N-06).
+- [x] « Écrire dans le journal » : copier les lignes « Squadron probe: » du journal de Dalamud dans docs/evidence/ (sonde N-06).
 
 **0.450 : N-14 croisements** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Rappels › Journal de jardinage › Croisements : « Lecture des paires… » puis la liste ; les graines sont nommées dans la langue
+- [x] Rappels › Journal de jardinage › Croisements : « Lecture des paires… » puis la liste ; les graines sont nommées dans la langue
   du jeu ; « Ce qui donne cette graine » et « Ce que cette graine peut donner » montrent des paires cohérentes avec un croisement connu.
-- [ ] La ligne grise annonce 3 768 paires et 1 nom écarté (« Gysahl Green Seeds » dans l'infobulle) ; le journal de Dalamud le dit aussi.
+- [x] La ligne grise annonce 3 768 paires et 1 nom écarté (« Gysahl Green Seeds » dans l'infobulle) ; le journal de Dalamud le dit aussi.
 
 **0.449 : liste des graines du journal de jardinage** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Rappels › Journal de jardinage › « Liste des graines » : les noms sont dans la langue du jeu ; la recherche filtre ; choisir une
+- [x] Rappels › Journal de jardinage › « Liste des graines » : les noms sont dans la langue du jeu ; la recherche filtre ; choisir une
   graine remplit son nom, la pousse et l'entretien (par exemple 120 h et 48 h pour les graines de paprika) ; les valeurs restent modifiables.
 - [ ] Comparer une graine plantée en jeu avec l'heure de récolte affichée (données Lotlab, non vérifiées par Tensho).
 
@@ -749,9 +1157,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Train de chasse : « Envoyer » est grisé tant qu'aucun drapeau n'a été posé depuis le train ; après « Drapeau suivant », choisir
   /p (en groupe) puis « Envoyer » : une seule ligne dans le chat du groupe, avec le bon nom, le bon rang, la bonne zone, et <flag> devenu
   le lien du drapeau ; un second clic avant 5 s ne fait rien.
-- [ ] Page Événements : « Événements de joueurs (partake.gg) » ouvre le site dans le navigateur.
-- [ ] Réglages : la case « Chercher les monstres sur le wiki au survol » n'existe plus ; le panneau au survol montre toujours ses sources.
-- [ ] Tri : déplacer un objet dans les sacs pendant que la page Tri est ouverte : l'éditeur de règles reste affiché (ligne « Rangement
+- [x] Page Événements : « Événements de joueurs (partake.gg) » ouvre le site dans le navigateur.
+- [x] Réglages : la case « Chercher les monstres sur le wiki au survol » n'existe plus ; le panneau au survol montre toujours ses sources.
+- [x] Tri : déplacer un objet dans les sacs pendant que la page Tri est ouverte : l'éditeur de règles reste affiché (ligne « Rangement
   modifié »), l'aperçu revient tout seul.
 
 **0.446 : N-09 alerte des marques, X-13 annonce** — pendant la campagne de tests en jeu de la fin (étape h)
@@ -762,7 +1170,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.445 : N-05 terrains en vente** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Cartes › Terrains en vente › « Consulter » sur un monde NA : la liste correspond au jeu (panneau de vente des quartiers) ; cocher
+- [x] Cartes › Terrains en vente › « Consulter » sur un monde NA : la liste correspond au jeu (panneau de vente des quartiers) ; cocher
   la surveillance : une parcelle nouvellement libre est annoncée dans le chat à la lecture suivante.
 
 **0.444 : X-09 annuaire des lieux** — pendant la campagne de tests en jeu de la fin (étape h)
@@ -893,17 +1301,17 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.418 : R-07 pêche en mer** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Pendant une traversée : le panneau montre l'escale, le moment, les poissons avec appât et touche ; pendant un courant spectral,
+- [x] Pendant une traversée : le panneau montre l'escale, le moment, les poissons avec appât et touche ; pendant un courant spectral,
   le message et les poissons spectraux ; missions avec avancement ; points ; escale suivante. Comparer à l'interface du jeu.
 
 **0.417 : R-15 aide au harpon** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Pêche au harpon : le panneau est à côté de la fenêtre ; pour chaque poisson, la taille et la vitesse ; le bon poisson de la zone
+- [x] Pêche au harpon : le panneau est à côté de la fenêtre ; pour chaque poisson, la taille et la vitesse ; le bon poisson de la zone
   en couleur. Mode développeur : noter la vitesse brute et la comparer à la vitesse affichée (valeurs GatherBuddy 100 à 600).
 
 **0.416 : R-14 liste de récolte par zone** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Artisanat › Préparation d'une recette à plusieurs matières récoltées › « Calculer la chaîne » › « Liste de récolte par zone » :
+- [x] Artisanat › Préparation d'une recette à plusieurs matières récoltées › « Calculer la chaîne » › « Liste de récolte par zone » :
   zones dans l'ordre, une ligne par matière, horaire, « Y aller » ; matières achetées listées à part.
 
 **0.415 : R-13 fenêtre de suivi** — pendant la campagne de tests en jeu de la fin (étape h)
@@ -913,27 +1321,27 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.414 : R-12 alarme cliquable** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Une alarme Tensho d'objet récolté sonne : dans le chat, le lien de carte ouvre la carte du jeu sur le point ; « Ouvrir dans
+- [x] Une alarme Tensho d'objet récolté sonne : dans le chat, le lien de carte ouvre la carte du jeu sur le point ; « Ouvrir dans
   Tensho » ouvre la fiche de l'objet (onglet Récolte). Une alarme sans objet : message sans lien.
 
 **0.413 : R-11 tableau des collectionnables** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Page Récolte › « Collectionnables » : comparer quelques lignes (seuils, assignats) au marchand d'assignats du jeu ; filtre
+- [x] Page Récolte › « Collectionnables » : comparer quelques lignes (seuils, assignats) au marchand d'assignats du jeu ; filtre
   « Nv 91 » ; clic sur un objet ; vue Récolte d'un objet collectionnable : ses seuils sous son nom.
 
 **0.411 : R-10 équiper le métier** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Fiche d'un objet récolté › lieux : « Équiper Mineur » (ou Botaniste, Pêcheur) porte l'ensemble de ce métier au plus petit numéro ;
+- [x] Fiche d'un objet récolté › lieux : « Équiper Mineur » (ou Botaniste, Pêcheur) porte l'ensemble de ce métier au plus petit numéro ;
   sans ensemble pour ce métier, pas de bouton. 0.412 : réglage « Y aller : équiper aussi le métier » coché, « Y aller » équipe aussi.
 
 **0.410 : R-09 optimiseur PR** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Outil PR et panneau de récolte : avec beaucoup de PR, le plan propose Raison solide (ou Sagesse du fermier) et Vision claire
+- [x] Outil PR et panneau de récolte : avec beaucoup de PR, le plan propose Raison solide (ou Sagesse du fermier) et Vision claire
   quand elles rapportent ; au niveau 90 et plus, la ligne Eurêka s'affiche ; décocher la case de l'outil PR redonne l'ancien plan.
 
 **0.409 : R-06 collectionnables** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Ouvrir la fenêtre Collectionnable sur un point (mineur ou botaniste) : le panneau « Collectionnable » est à côté, avec l'objet,
+- [x] Ouvrir la fenêtre Collectionnable sur un point (mineur ou botaniste) : le panneau « Collectionnable » est à côté, avec l'objet,
   PR et intégrité, les seuils bas/moyen/haut et les assignats par palier comparés au jeu (marchand d'assignats). Mode développeur :
   noter l'index des valeurs brutes qui suit la collectabilité à chaque action (capture), pour l'étape suivante (action conseillée).
 
@@ -961,12 +1369,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.403 : R-08 alerte PR** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Page PR › cocher « Alerte PR au seuil » (seuil 0) ; dépenser des PR en récolte puis attendre : un message et le son quand les
+- [x] Page PR › cocher « Alerte PR au seuil » (seuil 0) ; dépenser des PR en récolte puis attendre : un message et le son quand les
   PR sont pleins, une seule fois ; seuil 500 : l'alerte vient à 500.
 
 **Étape g) — 0.402 : R-05 carnets** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Page Récolte : les compteurs des carnets sont ceux du jeu (pêche, harpon, récolte) ; un poisson attrapé et un objet récolté ont
+- [x] Page Récolte : les compteurs des carnets sont ceux du jeu (pêche, harpon, récolte) ; un poisson attrapé et un objet récolté ont
   un ✓ ; « Masquer ce qui est déjà au carnet » les cache ; « Copier » et « Enregistrer en CSV » donnent un fichier lisible.
 
 **0.401 : panoramas** — pendant la campagne de tests en jeu de la fin (étape h)
@@ -976,27 +1384,27 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.400 : onglets du clic droit de la carte** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Clic droit sur la carte Tensho : les 9 onglets (Quêtes … Carnet d'exploration) ont leur nom entier ; sur un petit écran, des
+- [x] Clic droit sur la carte Tensho : les 9 onglets (Quêtes … Carnet d'exploration) ont leur nom entier ; sur un petit écran, des
   flèches font défiler les onglets.
 
 **0.399 : « Y aller » sans question** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Réglages › Modules › Récolte, cocher « Y aller : téléporter tout de suite » : « Y aller » téléporte directement (drapeau posé) ;
+- [x] Réglages › Modules › Récolte, cocher « Y aller : téléporter tout de suite » : « Y aller » téléporte directement (drapeau posé) ;
   vers une zone dont l'éthérite n'est pas harmonisée : la question revient. Décoché : la question habituelle.
 
 **Étape g) — 0.398 : R-04 appât en main** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] En pêcheur, aide à la pêche ouverte : « Appât en main » montre l'appât choisi dans le jeu et son stock ; changer d'appât : la
+- [x] En pêcheur, aide à la pêche ouverte : « Appât en main » montre l'appât choisi dans le jeu et son stock ; changer d'appât : la
   ligne et les cadres verts suivent (confirme que FishingBait est l'objet).
 
 **Étape g) — 0.397 : R-03 « Y aller »** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Fiche d'un objet de récolte, « Y aller » sur un lieu : le drapeau se pose sur le point, la carte Tensho s'ouvre dessus et propose
+- [x] Fiche d'un objet de récolte, « Y aller » sur un lieu : le drapeau se pose sur le point, la carte Tensho s'ouvre dessus et propose
   l'éthérite la plus proche avec son coût ; « Oui » téléporte, « Non » ne fait rien. Même essai sur un lieu de pêche.
 
 **Étape g) — 0.396 : R-02 fenêtres des poissons** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Fiche d'un gros poisson à météo (par exemple un poisson légendaire) : « Prochaines fenêtres » donne des heures où la page Météo
+- [x] Fiche d'un gros poisson à météo (par exemple un poisson légendaire) : « Prochaines fenêtres » donne des heures où la page Météo
   montre bien la bonne météo et la bonne météo précédente, dans la bonne plage ET ; une alarme sonne au début d'une fenêtre.
 
 **0.395 : grimoire trié par niveau de monstre** — pendant la campagne de tests en jeu de la fin (étape h)
@@ -1012,7 +1420,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.393 : Bestiaire et grande compagnie** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Page « Bestiaire » : seul le carnet de votre compagnie est dans la liste (Maelstrom pour l'utilisateur), choisi à l'ouverture ;
+- [x] Page « Bestiaire » : seul le carnet de votre compagnie est dans la liste (Maelstrom pour l'utilisateur), choisi à l'ouverture ;
   ses victimes sont celles du jeu.
 
 **0.390 : monstres du grimoire triés par niveau** — pendant la campagne de tests en jeu de la fin (étape h)
@@ -1022,9 +1430,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.388 : bouton « Trier » de l'inventaire** — pendant la campagne de tests en jeu de la fin (étape h)
 
-- [ ] Ouvrir l'inventaire (les trois dispositions : normale, grande, étendue) : le bouton « Trier » est en bas à gauche, sur la ligne
+- [x] Ouvrir l'inventaire (les trois dispositions : normale, grande, étendue) : le bouton « Trier » est en bas à gauche, sur la ligne
   des gils, et suit la fenêtre quand on la déplace ou qu'on change son échelle (dire si le placement doit être ajusté).
-- [ ] Clic : « Tri demandé », les sacs prennent l'ordre des règles de la page Tri › Mes sacs ; décocher l'interrupteur de la page Tri :
+- [x] Clic : « Tri demandé », les sacs prennent l'ordre des règles de la page Tri › Mes sacs ; décocher l'interrupteur de la page Tri :
   le bouton disparaît.
 
 ### Archive

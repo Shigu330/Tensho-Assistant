@@ -3,6 +3,12 @@ namespace TenshoAssistant.Inventory;
 /// <summary>Projects the game's display permutation without changing physical quantity snapshots.</summary>
 public static class InventoryDisplayLayout
 {
+    /// <summary>
+    /// Containers without a bag layout, shown in slot order: armoury chest, glamour dresser, armoire (0.237) and, 0.463 (in-game campaign), the company chest (20000 to 22001: pages, gil,
+    /// crystals), for which the game keeps no display order.
+    /// </summary>
+    public static bool HasNoBagLayout(int container)=>container is >= 3200 and < 4000 or >= 20000 and <= 22001 or >= 25000;
+
     public static IReadOnlyList<InventoryStack?[]> Build(IEnumerable<InventoryContainerSnapshot> source)
     {
         var containers = source.OrderBy(container => container.Location.Container.Value).ToArray();

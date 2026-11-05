@@ -24,7 +24,7 @@ internal static class CraftOptimizationTests
         {
             var recipe=Recipe();var fast=CraftPresets.Create(recipe,"Rapide",[CraftActionKind.BasicSynthesis]);
             var surplus=CraftPresets.Create(recipe,"Qualité superflue",[CraftActionKind.Reflect,CraftActionKind.BasicSynthesis]);
-            var result=CraftLogSession.Build(new(1,recipe,new(100,1000,1000,500),Catalog(),new[]{surplus,fast},new(700,4,64,10000),2,true,StartingQuality:800));
+            var result=CraftLogSession.Build(new(1,recipe,new(100,1000,1000,500),Catalog(),new[]{surplus,fast},new(700,4,64,10000,Fresh:true),2,true,StartingQuality:800));
             Check(result.Saved is {Name:"Rapide",Simulation.StartingQuality:800,Export.WaitSeconds:5},"once target reached extra quality never outweighs faster saved macro");
             Check(result.Suggested is {Simulation.StartingQuality:800,Export.WaitSeconds:5} && result.Suggested.Simulation.Final.Quality>=800,"worker search and export include material quality and extra waits");
         }),

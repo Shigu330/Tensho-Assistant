@@ -9,7 +9,7 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     private DataCache? dataCacheStore;
-    internal void ConfigureDataCache(DataCache store){dataCacheStore=store;craftLogSession.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.CraftCalculations),store);}
+    internal void ConfigureDataCache(DataCache store){dataCacheStore=store;craftLogSession.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.CraftCalculations),store);RaphaelSequences.Configure(()=>configuration.Cache.Duration(CacheArea.CraftCalculations),store);}
     private static readonly string[] CacheChoiceKeys=["FiveMinutes","OneHour","OneDay","SevenDays","Never"];
     private void DrawCacheSettings()
     {

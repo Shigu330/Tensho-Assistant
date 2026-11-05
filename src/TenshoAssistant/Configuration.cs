@@ -9,12 +9,16 @@ public static class ConfigurationReset
 {
     public static readonly IReadOnlySet<string> Kept = new HashSet<string>
     {
-        "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "TripleTriadDeck",
+        "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenBase", "CollectableScrutinyGain", "CollectableIntuitionGain", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
         "Voyages", "GearPlans", "GearMateria", "SubmarineUnlocked", "VesselPlans",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
+        // 0.503 (ONBOARD-001): the pages whose first-visit help was read.
+        "HelpSeen",
+        // 0.505 (ONBOARD-001): where the guide stands: a reset of the settings does not start it again.
+        "GuideDone", "GuideOffered", "GuideStep", "GuideStop", "GuideInterests", "GuideWindowsDone", "GuideChecklistHidden",
         // 0.347 (g, I-08): the player's item notes and labels.
         "ItemNotes",
         // 0.360 (g, C-09): the player's wishlist.
@@ -33,17 +37,23 @@ public static class ConfigurationReset
 
     public static readonly IReadOnlySet<string> Reset = new HashSet<string>
     {
+        // 0.509 (A-04): the suggested move during a synthesis.
+        "CraftLiveSuggest",
+        // 0.508 (I-05): the panel beside the retainer sale list.
+        "RetainerSalesPanel",
+        // 0.503 (ONBOARD-001): first-visit help on the pages.
+        "HelpBanners",
         // e) (audit 2026-11-02): the four parts of the item hover panel.
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
         "HoverShowCompare",
-        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "AlarmBarTooltip",
+        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "HidePanelsBehindGame", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
         "CurrencyAlerts", "CurrencyServerBar", "CurrencyThresholds",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
-        "HomeShowTools", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "GameFrames", "AlarmOptions",
-        "Discord", "ThemeMode", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
+        "HomeShowTools", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
+        "Discord", "ThemeMode", "ThemeModeBeforeTool", "GatherPlanFromList", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
         // 0.347 (g, I-08): the two shop reminder settings (the notes themselves are saved data, kept by « restore every setting »).
         "ItemNoteShopReminder", "ItemNoteImportantSound",
@@ -80,7 +90,7 @@ public static class ConfigurationReset
         // 0.447 (X-13): chat channel of the conductor's call.
         "HuntAnnounceChannel",
         // 0.448 (N-08): garden journal reminders.
-        "GardenAlerts",
+        "GardenAlerts", "GardenDetect", "CraftLivePanel",
         // 0.403 (g, R-08): GP alert and its threshold.
         "GpAlert", "GpAlertThreshold",
     };
@@ -106,6 +116,8 @@ public sealed class CraftSearchSettings
     public int? BoundedBuffExtraWait => BuffExtraWait is { } wait ? Math.Clamp(wait, 0, 3) : null;
     // 0.438 (user request): crafting actions the player forbids (names of CraftActionKind); empty by default.
     public List<string> ForbiddenActions { get; set; } = [];
+    // A-03 (0.465, DEC-028): the search uses Raphael (native library) instead of Tensho's own search; off by default.
+    public bool Raphael { get; set; }
 }
 
 /// <summary>Tensho map display settings (MAP-016, Mappy-like): each layer can be turned off; values are clamped on use.</summary>
@@ -128,6 +140,10 @@ public sealed class MapViewSettings
     // N-09 (0.441): living hunt marks streamed around the player (B, A, S).
     public bool ShowHuntMarks { get; set; } = true;
     public bool GatheringLabels { get; set; } = true;
+    // 0.535 (user request): the map without its title bar; off by default.
+    public bool HideTitleBar { get; set; }
+    // 0.537 (user request): the map steps aside when a game window comes in front; off by default: it goes whole.
+    public bool HideBehindGame { get; set; }
     public bool QuestTooltips { get; set; } = true;
     public bool ShowViewCone { get; set; } = true;
     // 0.288 (user request): player marker size, view cone length and opacity (fractions; clamped on use).
@@ -237,6 +253,10 @@ public sealed partial class Configuration
     public List<TenshoAssistant.Macros.MacroSlot> MacroChainPlan { get; set; } = [];
     public List<TenshoAssistant.Maps.MapBookmark> MapBookmarks { get; set; } = [];
     public List<TenshoAssistant.Craft.CraftPreset>? CraftPresets { get; set; } = [];
+    // 0.468 (user request): the crafting log's quality target, by recipe; a recipe not listed aims at its maximum.
+    public Dictionary<uint,int>? CraftLogTargets { get; set; } = [];
+    // 0.469 (user request): today's Grand Company request as seen in the game's supply missions window.
+    public TenshoAssistant.Items.GcSupplySeen? GcSupplySeen { get; set; }
     public List<uint> TripleTriadDeck { get; set; } = [];
     // Decks generated for an NPC (0.162), named after it; at most one per NPC.
     public List<TriadSavedDeck> TripleTriadDecks { get; set; } = [];
@@ -249,11 +269,25 @@ public sealed partial class Configuration
     public List<uint> FollowedQuests { get; set; } = [];
     // 0.264: sidebar categories folded by the user (category keys).
     public HashSet<string>? NavigationCollapsed { get; set; }
+    public HashSet<string>? HelpSeen { get; set; }
+    public bool GuideDone { get; set; }
+    public bool GuideOffered { get; set; }
+    public int GuideStep { get; set; }
+    public int GuideStop { get; set; }
+    public HashSet<string>? GuideInterests { get; set; }
+    public HashSet<string>? GuideWindowsDone { get; set; }
+    public bool GuideChecklistHidden { get; set; }
+    public bool HelpBanners { get; set; } = true;
+    public bool RetainerSalesPanel { get; set; } = true;
+    public bool CraftLiveSuggest { get; set; } = true;
     public bool OpenOnLoad { get; set; }
     // Retainers and saddlebags copied into the bank cache each time they are opened (0.167), instead of an import button.
     public bool AutoBankCapture { get; set; } = true;
     // Real combat stats panel beside the game's Character window (0.182).
     public bool ShowCharacterPanel { get; set; } = true;
+    // 0.537 (user request): Tensho's panels and bars step aside when a game window comes in front.
+    public bool HidePanelsBehindGame { get; set; } = true;
+    public bool HideBarsBehindGame { get; set; } = true;
     // Duty loot panel beside the game's Duty Finder (0.185).
     public bool ShowDutyFinderLoot { get; set; } = true;
     // Where crafting macros are written in the game's macros (0.191).
@@ -262,6 +296,12 @@ public sealed partial class Configuration
     public List<TenshoAssistant.Alarms.TenshoAlarm> Alarms { get; set; } = [];
     // 0.300: alarm clock in the game's server info bar while alarms are on.
     public bool AlarmServerBar { get; set; } = true;
+    // 0.455: finished reminders in the server bar, apart from the alarms.
+    public bool ReminderServerBar { get; set; } = true;
+    // 0.459: a third icon for what is finished.
+    public bool ReminderFinishedServerBar { get; set; } = true;
+    // 0.458: Reminders rows left out of that icon (their « Bar » box unticked); null = none.
+    public List<string>? ReminderBarHidden { get; set; }
     // 0.344 (g, I-02): currency threshold alerts (chat, sound and Discord with the alarm options) and their server bar entry, read on
     // the framework thread; thresholds in percent of the cap per currency item (missing = 80 %, 0 = off), replaced whole, never edited
     // in place (copy on write) so the framework thread never sees a dictionary being changed.
@@ -324,12 +364,29 @@ public sealed partial class Configuration
     // 0.324: Universalis as a whole (Market page, hover prices, preparation cost, data centres); « prices on hover » sits under it.
     public bool CommunityUniversalis { get; set; } = true;
     // 0.332 (step e, ULD): the game's window frame behind the main window; off until it is seen in game (decision kept for the end).
-    public bool GameFrames { get; set; }
     public TenshoAssistant.Alarms.AlarmSettings AlarmOptions { get; set; } = new();
     // R-12 (0.319): Tensho alarms posted to a Discord webhook, off by default; the address is a secret (never logged nor reported).
     public TenshoAssistant.Alarms.DiscordSettings Discord { get; set; } = new();
     // 0 follows the game's interface theme; 1..6 force a PluginTheme (value - 1).
     public int ThemeMode { get; set; }
+    // 0.478 (user request, in-game campaign): what the crafting list still needs, in the gathering help; since 0.515 information only.
+    public bool GatherPlanFromList { get; set; } = true;
+    // 0.480 (user report): Scrutiny in the collectable plan, and what the bonuses add, as measured in the game's window.
+    public bool CollectableUseScrutiny { get; set; } = true;
+    public bool CollectableUseRestore { get; set; } = true;
+    public int CollectableScrutinyGain { get; set; }
+    public int CollectableIntuitionGain { get; set; }
+    public bool CollectableUseFocus { get; set; } = true;
+    // 0.527 (user report): Priming Touch in the collectable plan.
+    public bool CollectableUsePriming { get; set; } = true;
+    // 0.484 (user request): 100 chooses on the average alone, 0 on the worst outcome alone.
+    public int CollectableRiskTolerance { get; set; } = 50;
+    public int GpRegenPerTick { get; set; }
+    // 0.488: GP per tick without any Enhanced GP Regeneration trait, measured. Replaces GpRegenObserved, whose value could be wrong.
+    public int GpRegenBase { get; set; }
+    public List<string>? GpForbiddenActions { get; set; } = [];
+    // 0.477 (user report): the theme in use before a tool's was chosen, to come back to it. Null once the theme is chosen in the settings.
+    public int? ThemeModeBeforeTool { get; set; }
     // 0.328 (map audit): « "MapView": null » in a hand-edited file becomes the defaults here, like Cache, so no draw path reads null.
     private MapViewSettings mapView=new();
     public MapViewSettings MapView {get=>mapView;set=>mapView=value ?? new();}
@@ -409,6 +466,10 @@ public sealed partial class Configuration
     private List<Reminders.GardenBed>? gardenBeds;
     public List<Reminders.GardenBed>? GardenBeds { get=>Volatile.Read(ref gardenBeds); set=>Volatile.Write(ref gardenBeds,value); }
     public bool GardenAlerts { get; set; } = true;
+    // 0.460: plantings noted from the chat.
+    public bool GardenDetect { get; set; } = true;
+    // 0.464: the next-action projection beside the game's Synthesis window.
+    public bool CraftLivePanel { get; set; } = true;
     // 0.403 (g, R-08): chat line and sound when a gatherer's GP rises to the threshold (0 = full); off by default.
     public bool GpAlert { get; set; }
     public int GpAlertThreshold { get; set; }

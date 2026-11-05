@@ -39,9 +39,12 @@ public sealed unsafe class BgmReader : IDisposable
         {
             var system=BGMSystem.Instance();
             var found=-1;
-            if(system!=null)
-                foreach(ref var scene in system->Scenes)
-                    if(scene.PlayingBgmId!=0){found=scene.PlayingBgmId;break;}
+            // R-14 (0.452): the scene list comes from game memory: its length is bounded and matched against NumScenes before the walk; a garbage
+            // First/Last is an access violation no catch can stop.
+            var count=system==null ? 0:system->Scenes.LongCount;
+            if(count is > 0 and <= 32 && count==system->NumScenes)
+                for(var index=0L;index<count;index++)
+                    if(system->Scenes[index].PlayingBgmId!=0){found=system->Scenes[index].PlayingBgmId;break;}
             Volatile.Write(ref playing,found);
             warned=false;
         }

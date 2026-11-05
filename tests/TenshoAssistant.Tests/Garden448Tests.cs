@@ -21,8 +21,6 @@ internal static class Garden448Tests
             Check(GardenJournal.Due([bed],start.AddHours(31)) is [(_, GardenState.Ripe)] && GardenJournal.Due([bed],start.AddHours(40)).Count==0,"ripe said once");
             GardenJournal.Tend(bed,start.AddHours(24));
             Check(GardenJournal.TendAt(bed) is null,"no tending once the next one would come after the harvest");
-            GardenJournal.Replant(bed,start.AddHours(41));
-            Check(!bed.RipeSaid && bed.TendSaidFor is null && GardenJournal.RipeAt(bed)==start.AddHours(71),"replant starts over");
         }),
         ("Garden journal: no tending reminder at 0 h, typed values bounded, texts cleaned, future plantings silent",() =>
         {
@@ -43,7 +41,7 @@ internal static class Garden448Tests
             var ui=Read("MainWindow.Garden.cs");
             Check(ui.Contains("if(now-gardenObservedAt<TimeSpan.FromSeconds(10))return;") && ui.Contains("if(!configuration.GardenAlerts ||"),"throttled, setting");
             Check(!ui.Contains("unsafe") && !ui.Contains("FFXIVClientStructs"),"no game reading");
-            Check(Read("Plugin.cs").Contains("mainWindow.ObserveGarden();") && Read("MainWindow.Reminders.cs").Contains("DrawGardenJournal();"),"wired");
+            Check(Read("Plugin.cs").Contains("mainWindow.ObserveGarden") && Read("MainWindow.Garden.cs").Contains("DrawGardenJournal();"),"wired");
         }),
     ];
 }

@@ -42,8 +42,11 @@ public sealed unsafe class HuntingLogReader : IDisposable
         nextRead=now.AddSeconds(2);
         try
         {
+            // R-14 (0.507): before the character is loaded the kills are zeros: unknown, not « nothing killed ».
+            var loaded=FFXIVClientStructs.FFXIV.Client.Game.UI.PlayerState.Instance();
+            if(loaded==null || !loaded->IsLoaded){Volatile.Write(ref state,null);return;}
             var manager=MonsterNoteManager.Instance();
-            if(manager==null){Unavailable=true;return;}
+            if(manager==null){Unavailable=true;Volatile.Write(ref state,null);return;}
             var slots=new List<HuntSlot>();
             foreach(ref var info in manager->RankData)
             {
@@ -59,6 +62,7 @@ public sealed unsafe class HuntingLogReader : IDisposable
         catch(Exception error)
         {
             Unavailable=true;nextRead=now.AddSeconds(30);
+            Volatile.Write(ref state,null);
             if(!warned){warned=true;log.Warning(error,"The hunting log could not be read.");}
         }
     }

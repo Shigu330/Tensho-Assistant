@@ -34,7 +34,6 @@ internal sealed partial class MainWindow
         Heading(localization.Get("GatheringBrowser.Title"),localization.Get("GatheringBrowser.Description"));
         DrawFishingPanelButton();
         DrawGatheringClock();
-        DrawCollectableTable();
         if (gatheringCatalog.State.Catalog is not { } sources)
         {
             var state = gatheringCatalog.State;

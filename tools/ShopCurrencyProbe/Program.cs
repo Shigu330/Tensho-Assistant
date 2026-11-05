@@ -5,6 +5,95 @@ using Lumina.Excel.Sheets;
 // Read-only evidence for NPC-VENDORS-014: how scrip exchanges encode currencies and how NPCs reach their shops.
 if(args.Length is <1 or >2)throw new ArgumentException("Supply installed sqpack directory and optionally an item name.");
 using var data=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.French,CacheFileResources=false});
+// PROBE_LEGENDS (0.526): what the game calls « légendes locales », and every folklore tome: job, division, quest bit, item, how many points or fish use it.
+if(Environment.GetEnvironmentVariable("PROBE_LEGENDS") is { Length:>0 })
+{
+    foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.Addon>()!)
+    {
+        var text=row.Text.ExtractText();
+        if(text.Contains("gendes locales",StringComparison.OrdinalIgnoreCase) || text.Contains("gende locale",StringComparison.OrdinalIgnoreCase))Console.WriteLine($"addon {row.RowId}: {text.Replace("\n"," ")[..Math.Min(text.Length,120)]}");
+    }
+    foreach(var sheetRow in data.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>()!)
+    {
+        var text=sheetRow.Text.ExtractText();
+        if(text.Contains("gendes locales",StringComparison.OrdinalIgnoreCase))Console.WriteLine($"log {sheetRow.RowId}: {text[..Math.Min(text.Length,120)]}");
+    }
+    foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.Item>()!)
+    {
+        var name=row.Name.ExtractText();
+        if(name.StartsWith("Légendes",StringComparison.OrdinalIgnoreCase) || name.Contains("Lég.",StringComparison.OrdinalIgnoreCase))Console.WriteLine($"item {row.RowId}: {name} uicat {row.ItemUICategory.RowId} {row.ItemUICategory.ValueNullable?.Name.ExtractText()} action {row.ItemAction.RowId} type {row.ItemAction.ValueNullable?.Action.RowId} icon {row.Icon}");
+    }
+    foreach(var group in data.GetExcelSheet<Lumina.Excel.Sheets.GatheringSubCategory>()!.Where(row=>row.Item.RowId!=0).GroupBy(row=>(Job:row.ClassJob.RowId,row.Item.RowId,Bit:row.Quest.RowId,row.Division)).OrderBy(group=>group.Key.Job).ThenBy(group=>group.Key.Bit))
+        Console.WriteLine($"tome job {group.Key.Job} bit {group.Key.Bit} division {group.Key.Division} item {group.Key.RowId} {group.First().Item.Value.Name.ExtractText()} rows {group.Count()}");
+    return;
+}
+
+// PROBE_GPACTIONS (0.517): the gathering actions' UnlockLink, ClassJobLevel and IsRoleAction, to know what « unlocked » can mean for them.
+if(Environment.GetEnvironmentVariable("PROBE_GPACTIONS") is { Length:>0 })
+{
+    var gaSheet=data.GetExcelSheet<Lumina.Excel.Sheets.Action>()!;
+    foreach(var id in new uint[]{235,237,295,239,241,21177,25589,21203,4073,272,232,4072,218,220,294,222,224,21178,25590,21204,4087,273,215,4086})
+    {
+        var row=gaSheet.GetRow(id);
+        Console.WriteLine($"action {id}: {row.Name.ExtractText()} level {row.ClassJobLevel} unlock {row.UnlockLink.RowId} job {row.ClassJob.RowId} category {row.ClassJobCategory.RowId}");
+    }
+    // 0.519: every miner and botanist action with its cost and text, and how crystals are told apart.
+    foreach(var row in gaSheet.Where(row=>row.ClassJob.RowId is 16 or 17 && row.ClassJobLevel>0 && !row.Name.IsEmpty).OrderBy(row=>row.ClassJob.RowId).ThenBy(row=>row.ClassJobLevel))
+    {
+        var text=data.GetExcelSheet<Lumina.Excel.Sheets.ActionTransient>()!.GetRowOrDefault(row.RowId)?.Description.ExtractText().Replace("\n"," ") ?? "";
+        Console.WriteLine($"all {row.RowId}: job {row.ClassJob.RowId} lv {row.ClassJobLevel} cost {row.PrimaryCostValue} type {row.PrimaryCostType} unlock {row.UnlockLink.RowId} recast {row.Recast100ms} group {row.CooldownGroup} {row.Name.ExtractText()} :: {text}");
+    }
+    var gaItems=data.GetExcelSheet<Lumina.Excel.Sheets.Item>()!;
+    foreach(var id in Enumerable.Range(1,20).Select(id=>(uint)id).Append(5111u))
+    {
+        var item=gaItems.GetRow(id);
+        Console.WriteLine($"item {id}: {item.Name.ExtractText()} uicat {item.ItemUICategory.RowId} search {item.ItemSearchCategory.RowId} stack {item.StackSize}");
+    }
+    return;
+}
+
+// PROBE_FOLKLORE (0.517): what a gathering point needs: GatheringSubCategory (tome, quest, division) and the points that use it.
+if(Environment.GetEnvironmentVariable("PROBE_FOLKLORE") is { Length:>0 })
+{
+    var fkPoints=data.GetExcelSheet<Lumina.Excel.Sheets.GatheringPoint>()!;
+    var fkUse=fkPoints.GroupBy(point=>point.GatheringSubCategory.RowId).ToDictionary(group=>group.Key,group=>group.Count());
+    foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.GatheringSubCategory>()!)
+    {
+        var book=row.FolkloreBook.ExtractText();
+        if(row.RowId==0 && book.Length==0)continue;
+        Console.WriteLine($"sub {row.RowId}: division {row.Division}, item {row.Item.RowId} {row.Item.ValueNullable?.Name.ExtractText()}, quest {row.Quest.RowId}, job {row.ClassJob.RowId}, book « {book} », points {fkUse.GetValueOrDefault(row.RowId)}");
+    }
+    Console.WriteLine($"points without sub: {fkUse.GetValueOrDefault(0u)} of {fkPoints.Count}");
+    var fkPlace=Environment.GetEnvironmentVariable("PROBE_FOLKLORE")!;
+    foreach(var point in fkPoints.Where(point=>point.PlaceName.ValueNullable?.Name.ExtractText().Contains(fkPlace,StringComparison.OrdinalIgnoreCase)==true))
+        Console.WriteLine($"point {point.RowId}: base {point.GatheringPointBase.RowId}, level {point.GatheringPointBase.Value.GatheringLevel}, type {point.Type}, sub {point.GatheringSubCategory.RowId}, place {point.PlaceName.Value.Name.ExtractText()}");
+    return;
+}
+
+// PROBE_GATHERBONUS (0.515): node effects: GatheringCondition and GatheringPointBonusType in English and French, how often each pair is used, and the bonus rows of the normal manganese nodes.
+if(Environment.GetEnvironmentVariable("PROBE_GATHERBONUS") is { Length:>0 })
+{
+    var gbGame=data;
+    foreach(var language in new[]{Lumina.Data.Language.English,Lumina.Data.Language.French})
+    {
+        Console.WriteLine("language "+language);
+        foreach(var row in gbGame.GetExcelSheet<Lumina.Excel.Sheets.GatheringCondition>(language)!)Console.WriteLine($"condition {row.RowId}: {row.Text.ExtractText()}");
+        foreach(var row in gbGame.GetExcelSheet<Lumina.Excel.Sheets.GatheringPointBonusType>(language)!)Console.WriteLine($"type {row.RowId}: {row.Text.ExtractText()}");
+    }
+    var gbBonus=gbGame.GetExcelSheet<Lumina.Excel.Sheets.GatheringPointBonus>()!;
+    foreach(var group in gbBonus.GroupBy(row=>(Condition:row.Condition.RowId,Type:row.BonusType.RowId)).OrderBy(group=>group.Key))
+        Console.WriteLine($"pair condition {group.Key.Condition} type {group.Key.Type}: {group.Count()} rows, values {string.Join(",",group.Select(row=>row.BonusValue).Distinct().Order())}, needs {group.Min(row=>row.ConditionValue)}-{group.Max(row=>row.ConditionValue)}");
+    var gbPoints=gbGame.GetExcelSheet<Lumina.Excel.Sheets.GatheringPoint>()!;
+    var gbWith=gbPoints.Count(point=>point.GatheringPointBonus.Any(link=>link.RowId!=0));
+    Console.WriteLine($"points {gbPoints.Count} with a bonus {gbWith}");
+    foreach(var bonus in gbBonus.Where(row=>row.ConditionValue==770))
+    {
+        var users=gbPoints.Where(point=>point.GatheringPointBonus.Any(link=>link.RowId==bonus.RowId)).Select(point=>point.RowId).Take(6);
+        Console.WriteLine($"bonus row {bonus.RowId}: condition {bonus.Condition.RowId} >= {bonus.ConditionValue}, type {bonus.BonusType.RowId} value {bonus.BonusValue}; points {string.Join(",",users)}");
+    }
+    return;
+}
+
 // PROBE_VESSELPARTS (R-11 step 3): submarine and airship build data — every field and row of SubmarinePart, SubmarineRank,
 // AirshipExplorationPart/Level/Point and SubmarineExploration (typed fields next to the raw column layout, to see unmapped columns),
 // and how a part row maps to its Item (name): items whose AdditionalData points to a part sheet, their FilterGroup and UI category.

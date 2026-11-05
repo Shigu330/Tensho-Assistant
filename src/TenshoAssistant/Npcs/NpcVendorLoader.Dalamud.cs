@@ -99,6 +99,8 @@ internal sealed class NpcVendorLoader : IDisposable
                 var vendors=vendorShops.Select(pair=>new NpcVendor(pair.Key,names.GetValueOrDefault(pair.Key) ?? "",Array.AsReadOnly(pair.Value.Distinct().Order().ToArray()),
                     Array.AsReadOnly((locations.GetValueOrDefault(pair.Key) ?? []).ToArray()))).ToArray();
                 var rows=sales.ToArray();var version=dataVersion!;var buildToken=cancellation.Token;
+                // 0.492 (R-14): same check as the disk cache: no vendor or no sale means unreadable sheets, not « nobody sells it ».
+                if(vendors.Length==0 || rows.Length==0)throw new InvalidDataException("NPC vendor sheets gave no vendor or no sale.");
                 sales.Clear();vendorShops.Clear();locations.Clear();names.Clear();
                 if(cache is not null)toPersist=new(version,Array.AsReadOnly(vendors),Array.AsReadOnly(rows));
                 build=Task.Run<(NpcVendorCatalog?,Exception?,bool)>(()=>
@@ -226,7 +228,7 @@ internal sealed class NpcVendorLoader : IDisposable
             if(level.Type==8 && vendorShops.ContainsKey(level.Object.RowId) && level.Map.RowId!=0 && level.Map.IsValid)
             {
                 var map=level.Map.Value;
-                var zone=map.PlaceName.RowId!=0 ? map.PlaceName.Value.Name.ExtractText():"";
+                var zone=map.PlaceName.ValueNullable?.Name.ExtractText() ?? "";
                 if(!locations.TryGetValue(level.Object.RowId,out var list))locations[level.Object.RowId]=list=[];
                 if(list.Count<8)list.Add(new(level.Territory.RowId,map.RowId,zone,
                     NpcShopLinks.MapCoordinate(level.X,map.OffsetX,map.SizeFactor),NpcShopLinks.MapCoordinate(level.Z,map.OffsetY,map.SizeFactor),level.X,level.Y,level.Z));

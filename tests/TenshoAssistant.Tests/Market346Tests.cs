@@ -17,7 +17,7 @@ internal static class Market346Tests
             var watcher = Read("Market/UndercutWatcher.Dalamud.cs");
             Check(watcher.Contains("board.OfferingsReceived+=OnOfferings;",StringComparison.Ordinal) && watcher.Contains("board.OfferingsReceived-=OnOfferings;",StringComparison.Ordinal),"subscribed and unsubscribed");
             Check(watcher.Contains("!configuration.UndercutClipboard",StringComparison.Ordinal) && !new TenshoAssistant.Configuration().UndercutClipboard,"off by default, honoured");
-            Check(Read("Plugin.cs").Contains("undercut?.FlushClipboard();",StringComparison.Ordinal),"clipboard written from the draw (ImGui)");
+            Check(Read("Plugin.cs").Contains("undercut?.FlushClipboard()",StringComparison.Ordinal),"clipboard written from the draw (ImGui)");
         }),
         ("NPC sale: unit price, and the hovered stack's, only for items sold to NPCs",() =>
         {

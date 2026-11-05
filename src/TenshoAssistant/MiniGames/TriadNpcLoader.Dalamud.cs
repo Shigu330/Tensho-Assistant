@@ -12,7 +12,11 @@ namespace TenshoAssistant.MiniGames;
 /// </summary>
 internal sealed class TriadNpcLoader : IDisposable
 {
-    private const uint CardItemAction = 3357, PackAcquisition = 8;
+    // TrialQuest: « Triple Triad Trial », the quest that opens the game (docs/evidence/0.493-triad-npc-requirements.md).
+    private const uint CardItemAction = 3357, PackAcquisition = 8, TrialQuest = 65973;
+    private readonly IDataManager data;
+    private readonly IUnlockState unlocks;
+    private uint[]? requiredQuests;
     private readonly TriadNpcService service;
     private readonly IFramework framework;
     private readonly IClientState client;
@@ -23,9 +27,9 @@ internal sealed class TriadNpcLoader : IDisposable
     private ulong beatenOwner;
     private string? beatenFailure;
 
-    public TriadNpcLoader(TriadNpcService service, IDataManager data, IFramework framework, IClientState client, IPlayerState player, IPluginLog log)
+    public TriadNpcLoader(TriadNpcService service, IDataManager data, IFramework framework, IClientState client, IPlayerState player, IUnlockState unlocks, IPluginLog log)
     {
-        this.service = service; this.framework = framework; this.client = client; this.player = player; this.log = log;
+        this.service = service; this.data = data; this.unlocks = unlocks; this.framework = framework; this.client = client; this.player = player; this.log = log;
         var token = cancellation.Token;
         _ = Task.Run(() =>
         {
@@ -39,6 +43,8 @@ internal sealed class TriadNpcLoader : IDisposable
     private static TriadNpcCatalog Build(IDataManager data, CancellationToken token)
     {
         var matches = data.GetExcelSheet<TripleTriad>();
+        var questSheet = data.GetExcelSheet<Quest>();
+        TriadRequiredQuest QuestOf(uint id) => new(id, questSheet.TryGetRow(id, out var quest) ? quest.Name.ExtractText() : "");
         var residents = data.GetExcelSheet<ENpcResident>();
         var cardOfItem = new Dictionary<uint, uint>();
         foreach (var item in data.GetExcelSheet<Item>())
@@ -50,6 +56,9 @@ internal sealed class TriadNpcLoader : IDisposable
             foreach (var value in npc.ENpcData)
                 if (value.RowId != 0 && matches.HasRow(value.RowId) && !npcOfMatch.ContainsKey(value.RowId)) { npcOfMatch[value.RowId] = npc.RowId; break; }
         token.ThrowIfCancellationRequested();
+        // 0.454 (R-14): no card item or no NPC means the game data changed (ItemAction link, ENpcData links), not « nothing to win »: the catalogue
+        // fails and the page says it, instead of an empty list.
+        if (cardOfItem.Count == 0 || npcOfMatch.Count == 0) throw new InvalidOperationException($"Triple Triad data unrecognised: {cardOfItem.Count} card items, {npcOfMatch.Count} NPCs.");
         var wanted = npcOfMatch.Values.ToHashSet();
         var places = new Dictionary<uint, (uint Map, string Zone, float X, float Y)>();
         foreach (var level in data.GetExcelSheet<Level>())
@@ -98,7 +107,8 @@ internal sealed class TriadNpcLoader : IDisposable
             var name = residents.TryGetRow(npcId, out var resident) ? resident.Singular.ExtractText() : "";
             places.TryGetValue(npcId, out var place);
             npcs.Add(new(matchId, npcId, name, place.Map, place.Zone ?? "", place.X, place.Y, Array.AsReadOnly(rewards),
-                Array.AsReadOnly(match.TripleTriadRule.Select(rule => rule.RowId).Where(rule => rule != 0).Distinct().ToArray()), match.Fee));
+                Array.AsReadOnly(match.TripleTriadRule.Select(rule => rule.RowId).Where(rule => rule != 0).Distinct().ToArray()), match.Fee,
+                Array.AsReadOnly(match.PreviousQuest.Select(quest => quest.RowId).Where(quest => quest != 0).Distinct().Select(QuestOf).ToArray()), match.PreviousQuestJoin == 2));
         }
         var cards = new Dictionary<uint, TriadCardSource>();
         var itemOfCard = cardOfItem.GroupBy(pair => pair.Value).ToDictionary(group => group.Key, group => group.Min(pair => pair.Key));
@@ -110,7 +120,7 @@ internal sealed class TriadNpcLoader : IDisposable
             cards[card.RowId] = new(card.RowId, itemOfCard.GetValueOrDefault(card.RowId),
                 Array.AsReadOnly((npcsOfCard.GetValueOrDefault(card.RowId) ?? []).ToArray()), pack?.RowId ?? 0, pack?.Name.ExtractText() ?? "");
         }
-        return new(npcs.AsReadOnly(), cards);
+        return new(npcs.AsReadOnly(), cards, questSheet.HasRow(TrialQuest) ? QuestOf(TrialQuest) : null);
     }
 
     private unsafe void OnUpdate(IFramework _)
@@ -129,7 +139,12 @@ internal sealed class TriadNpcLoader : IDisposable
             if (ui == null) { service.SetBeaten(null); return; }
             var beaten = new HashSet<uint>();
             foreach (var npc in catalog.Npcs) if (ui->IsTripleTriadNpcBeaten(npc.MatchId)) beaten.Add(npc.MatchId);
-            service.SetBeaten(beaten); beatenFailure = null;
+            // 0.493 (user report): the quests the NPCs ask for, read with the beaten list.
+            requiredQuests ??= catalog.Npcs.SelectMany(npc => npc.RequiredQuests).Select(quest => quest.QuestId).Append(TrialQuest).Distinct().ToArray();
+            var quests = data.GetExcelSheet<Quest>();
+            var done = new HashSet<uint>();
+            foreach (var id in requiredQuests) if (quests.TryGetRow(id, out var quest) && unlocks.IsQuestCompleted(quest)) done.Add(id);
+            service.SetBeaten(beaten, false, done); beatenFailure = null;
         }
         catch (Exception error)
         {

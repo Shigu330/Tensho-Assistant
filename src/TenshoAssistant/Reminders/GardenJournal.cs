@@ -20,8 +20,27 @@ public sealed class GardenBed
 
 public enum GardenState { Growing, ToTend, Ripe }
 
+/// <summary>0.461: where a bed sits: its place (« zone ward-plot »), its patch and its bed number, read from the journal's place text.</summary>
+public sealed record GardenSlot(string Zone,int Patch,int Bed);
+
 public static class GardenJournal
 {
+    private static readonly System.Text.RegularExpressions.Regex SlotText=new(@"^(.+) · \D*(\d+)\D+(\d+)$",System.Text.RegularExpressions.RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50));
+
+    /// <summary>0.461: the slot of a bed noted as « zone · patch N, bed M » (the format of the chat detection, in every language), or null for a free text or a pot.</summary>
+    public static GardenSlot? Slot(GardenBed bed)
+    {
+        var match=SlotText.Match(bed.Place);
+        if(!match.Success || !int.TryParse(match.Groups[2].Value,out var patch) || !int.TryParse(match.Groups[3].Value,out var number) || patch is <1 or >3 || number is <1 or >8)return null;
+        return new(match.Groups[1].Value,patch,number);
+    }
+
+    /// <summary>0.461: the beds of each patch, by zone then patch: what the page draws as grids.</summary>
+    public static IReadOnlyList<(string Zone,int Patch,IReadOnlyList<(int Number,GardenBed Bed)> Beds)> Grids(IEnumerable<GardenBed>? beds)
+        =>(beds ?? []).Select(bed=>(Bed:bed,Slot:Slot(bed))).Where(pair=>pair.Slot is not null)
+            .GroupBy(pair=>(pair.Slot!.Zone,pair.Slot.Patch)).OrderBy(group=>group.Key.Zone,StringComparer.CurrentCultureIgnoreCase).ThenBy(group=>group.Key.Patch)
+            .Select(group=>(group.Key.Zone,group.Key.Patch,(IReadOnlyList<(int,GardenBed)>)group.Select(pair=>(pair.Slot!.Bed,pair.Bed)).ToArray())).ToArray();
+
     public const int Capacity=64,MaximumText=40,MaximumGrowHours=720,MaximumTendHours=168;
 
     public static int ClampGrow(int hours)=>Math.Clamp(hours,1,MaximumGrowHours);
@@ -50,10 +69,16 @@ public static class GardenJournal
     public static GardenBed Plant(string place,string seed,int growHours,int tendHours,DateTimeOffset now)
         =>new(){Place=place,Seed=seed,PlantedAt=now,GrowHours=ClampGrow(growHours),TendHours=ClampTend(tendHours)};
 
-    public static void Tend(GardenBed bed,DateTimeOffset now){bed.TendedAt=now;bed.TendSaidFor=null;}
+    /// <summary>0.460: a planting seen in the chat: replaces the bed noted at the same place (it was dug up or harvested), or null when the journal is full.</summary>
+    public static List<GardenBed>? Detected(IEnumerable<GardenBed>? beds,string place,string seed,int growHours,int tendHours,DateTimeOffset now)
+    {
+        var kept=(beds ?? []).Where(bed=>bed.Place!=place).ToList();
+        if(kept.Count>=Capacity)return null;
+        kept.Add(Plant(place,seed,growHours,tendHours,now));
+        return kept;
+    }
 
-    /// <summary>The same seed planted again in the same place now (reminders start over).</summary>
-    public static void Replant(GardenBed bed,DateTimeOffset now){bed.PlantedAt=now;bed.TendedAt=null;bed.RipeSaid=false;bed.TendSaidFor=null;}
+    public static void Tend(GardenBed bed,DateTimeOffset now){bed.TendedAt=now;bed.TendSaidFor=null;}
 
     /// <summary>
     /// The reminders due now, each said once: a bed that became ripe, or whose tending came due. Marks them said on the beds (the

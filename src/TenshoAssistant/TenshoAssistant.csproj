@@ -1,13 +1,21 @@
 <Project Sdk="Dalamud.NET.Sdk">
   <PropertyGroup>
-    <Version>0.451.0</Version>
+    <Version>0.539.0</Version>
     <AssemblyName>TenshoAssistant</AssemblyName>
     <RootNamespace>TenshoAssistant</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PlatformTarget>x64</PlatformTarget>
+    <!-- 0.465 (A-03, DEC-028): Raphael.Net brings a native solver: its win-x64 library goes next to the DLL, as in Craftimizer. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <OutputPath>$(MSBuildProjectDirectory)\bin\x64\$(Configuration)\</OutputPath>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Raphael.Net" Version="5.0.0" />
+  </ItemGroup>
   <ItemGroup>
     <!-- 0.248: languages live only inside the DLL (embedded); an optional Localization/Languages folder still overrides them. -->
     <EmbeddedResource Include="Localization\Languages\*.json" />

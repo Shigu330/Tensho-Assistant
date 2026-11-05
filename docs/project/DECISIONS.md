@@ -274,3 +274,93 @@ Decision: (1) N-06 : codé depuis les feuilles du jeu (GcArmyExpedition, GcArmyM
 Reason: Choix de l'utilisateur (2026-11-03) ; la règle de réussite de l'escouade est dans les feuilles du jeu ; seules ces deux sources ont une licence compatible.
 Consequences: 0.449 (point 3), 0.450 (point 2), 0.451 (point 1) ; données embarquées avec leur avis de licence, crédits ajoutés ; aucune requête réseau.
 References: docs/evidence/0.448-n06-n14-sources.md, docs/project/G-PROPOSALS.md
+
+DEC-ID: DEC-028
+Timestamp: 2026-11-03 Europe/Brussels (séance ultracode, après Stable-0.451.0)
+Problem: A-03 / A-04 : dépendance native Raphael (licence, build hors ligne de Plogon, taille), et solveur des suggestions pendant la synthèse.
+Evidence: docs/evidence/0.451-raphael-study.md (Raphael.Net 5.0.0 MIT, raphael-rs Apache-2.0, Craftimizer publié sur D17 avec la même version figée par packages.lock.json, raphael_bindings.dll win-x64 566 784 octets).
+Options: Raphael en option ou solveur C# seul ; A-04 avec le solveur Tensho (exact, depuis l'état observé) ou Raphael relancé (approximatif).
+Decision: (1) A-03 : Raphael.Net 5.0.0 ajouté en option, réglage « Solveur : Tensho / Raphael », Tensho par défaut ; chaque macro Raphael rejouée dans CraftSimulation avant d'être proposée ; calcul hors du thread du jeu, annulable, un seul à la fois ; avis MIT et Apache-2.0, crédits. (2) A-04 : suggestions pendant la synthèse avec le solveur C# de Tensho, depuis l'état observé (condition et effets compris), affichage seulement.
+Reason: Choix de l'utilisateur (2026-11-03, séance ultracode).
+Consequences: Ordre de la séance : R-14 et A-14 d'abord, puis I-05, I-15, N-10, A-03 / A-04 ; package vérifié (raphael_bindings.dll dans latest.zip).
+References: docs/evidence/0.451-raphael-study.md, docs/project/G-PROPOSALS.md, GitHub issue #28
+
+DEC-ID: DEC-029
+Timestamp: 2026-11-04 Europe/Brussels (séance de décisions pendant la campagne en jeu)
+Problem: Portée et ordre du chat personnalisable (CHAT-001) et des modèles communautaires (TEMPLATES-001).
+Evidence: CHAT-001 (document retiré avec le chat, DEC-030 ; voir git), docs/goals/TEMPLATES-001.md (relevé de Chat 2, Simple Tweaks, TidyChat, NoSoliciting, Chat Bubbles, addons WoW, règles de Dalamud).
+Options: Tableaux de décisions des deux plans, avec recommandations.
+Decision: Chat : C1 remplacement complet (contre la recommandation par couches) ; C2 tout de suite (contre la recommandation) ; C3 prévenir sans bloquer si Chat 2 est actif ; C4 ne pas demander à l'équipe Dalamud (contre la recommandation) ; C5 hooks au besoin, avec repli ; C6 historique en fichiers locaux, désactivé par défaut ; C7 couleur par métier seulement si le jeu la montre ; C8 Discord par règle choisie, nom masqué ; C9 traduction et émoticônes externes sur option, désactivées (service à choisir, contre la recommandation) ; C10 règles locales et liste partagée ; C11 code original ; C12 sections repliées et vue « essentiels ». Modèles : T1 les deux, code d'abord ; T2 tout de suite (contre la recommandation) ; T3 registre des pages tout de suite (contre la recommandation) ; T4 dossier dans ce dépôt ; T5 CC0 ; T6 galerie dans le plugin, sur clic ; T7 validation automatique et relecture ; T8 réglages en liste blanche ; T9 sept blocs en première version. T10 (case IA dans la pull request) : recommandation appliquée, le modèle la demandait déjà.
+Reason: Choix de l'utilisateur, 2026-11-04.
+Consequences: La campagne de tests en jeu (lots 6 à 10) passe après ces travaux, ou s'y intercale. Risques acceptés : doublon de Chat 2 possible à la publication 1.0.0 sans question préalable ; hooks de saisie à maintenir ; registre des pages refait pendant la campagne. Lignes rouges inchangées : aucun envoi automatique, code original, pas de combat. Reste à choisir pour C9 : le service de traduction et celui des émoticônes, à la phase 8.
+References: CHAT-001 (document retiré, voir git), docs/goals/TEMPLATES-001.md
+
+DEC-ID: DEC-030
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: Le chat personnalisable décidé en DEC-029 (points C1 à C12, livré en 0.471, phases 0 et 1).
+Evidence: Demande de l'utilisateur : « retire tout ce qui se rattache au chat, je prendrai Chat 2 si j'en ai besoin ».
+Options: Garder le code sans le poursuivre, ou le retirer.
+Decision: Chat personnalisable abandonné et retiré : page, fenêtre, réglages, textes, tests et plan CHAT-001. Annule les points C1 à C12 de DEC-029 et le point « chat » de T8. Les fonctions qui lisent les lignes du chat pour autre chose restent : liens de carte (ChatMapLinkWatcher), détection du jardinage (GardenChatWatcher), annonce de train de chasse et alarmes.
+Reason: Choix de l'utilisateur, 2026-11-04.
+Consequences: 0.472. L'ancien plan et le code restent dans l'historique git (commit bf30b72, 0.471.0). Les modèles communautaires (TEMPLATES-001) continuent.
+References: docs/project/DECISIONS.md (DEC-029), docs/goals/TEMPLATES-001.md
+
+DEC-ID: DEC-031
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: Plan de première prise en main, aide, vidéos et tickets (ONBOARD-001) ; dix décisions G1 à G10. GitHub n'était plus tenu à jour depuis 0.454.
+Evidence: Réponse de l'utilisateur : « oui pour tous mais tu ne gere pas completement le git issues est pas a jour » ; « je parlais demander mon accord quand tu as besoin par rapport au regle dalamud ».
+Options: Les choix recommandés du plan, ou les changer un par un.
+Decision: Tous les choix recommandés : l'aide avant le guide ; une proposition unique aux joueurs existants ; sources présentées, défauts inchangés ; visite selon les métiers ; formulaire GitHub prérempli, sans jeton ni serveur ; YouTube d'abord ; vidéos relues par l'utilisateur ; bandeau de première visite activé avec option ; anglais et français ; après le conseil Dresseur, avant D17. Les issues sont tenues à chaque version. Une règle Dalamud en jeu : résumé et accord de l'utilisateur.
+Reason: Décision de l'utilisateur.
+Consequences: Issues #11, #12, #15, #16, #30 fermées sur rapport ou preuve ; BST-001, ONBOARD-001 et deux issues de suivi ouvertes ; étiquette ultracode retirée. Exception à DEC-009 pour le conseil d'équipe du dresseur : pas décidée, soumise à l'accord de l'utilisateur.
+References: docs/goals/ONBOARD-001.md, docs/ai/STATUS.md, CLAUDE.md
+
+DEC-ID: DEC-032
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: Conseil d'équipe du dresseur face aux règles Dalamud (combat, contenu compétitif) ; le Dédale bestial a des classements (fenêtre XBMRanking).
+Evidence: Réponse de l'utilisateur : « Je ne veux pas pour jcj mais que pour pve », après le résumé des règles.
+Options: Informations seulement ; pas de conseil ; équipe calculée.
+Decision: Panneau d'informations pour le Dédale bestial (JcE) : ennemis, actions, faiblesses une fois confirmées, ce que l'équipe couvre, bonus. Rien en JcJ. Pas de « meilleure équipe » calculée sans nouvelle décision. Exception limitée à DEC-009 : ni ACT ni mesure de combat.
+Reason: Choix de l'utilisateur, avec le choix recommandé pour la forme. Le JcE n'écarte pas les règles : celle sur le combat vaut aussi en JcE, et les classements peuvent compter comme contenu compétitif.
+Consequences: Contacter l'équipe d'approbation de Dalamud avant la 1.0.0 (issue #31), et retirer le panneau si elle refuse.
+References: docs/evidence/0.500-xbm-columns.md, issue #34
+
+DEC-ID: DEC-033
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: Six décisions ouvertes : release, conseil en match de Triple Triade, moment de la requête des ventes de servants, I-15, N-10, cadre des fenêtres du jeu.
+Evidence: Réponse de l'utilisateur : « Cadre fenêtre jeu à retirer rendu horrible » ; « Conseil que pve » ; « Reste OK je suis toujours au boulot donc pas de jeu ».
+Options: Les conseils de l'agent, ou les changer un par un.
+Decision: Cadre des fenêtres du jeu retiré. Conseils de jeu en JcE seulement : Triple Triade contre un PNJ, jamais en tournoi ni contre un joueur. Reste, conseils de l'agent : release après une session de jeu sur la dernière version ; ventes des servants, Universalis sur clic ; I-15 lors d'une séance en jeu avec l'utilisateur ; N-10 laissé de côté, seulement s'il sert à l'utilisateur.
+Reason: Décision de l'utilisateur.
+Consequences: Les territoires 579, 940 et 941 coupent les conseils (docs/evidence/0.510-triad-competitive.md). Point « Conseil en match » de PUBLISHING traité ; le panneau du Dédale reste à demander à l'équipe avant la 1.0.0.
+References: docs/project/G-PROPOSALS.md, docs/project/PUBLISHING.md, issue #24, issue #31
+
+DEC-ID: DEC-034
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: La compilation du dépôt Dalamud utilise le SDK 10.0.101 sous Linux, réseau coupé ; global.json exigeait 10.0.403 (DEC d'origine), Tensho n'aurait pas compilé chez eux, et il n'avait jamais été compilé sous Linux.
+Evidence: docs/evidence/0.512-d17-build.md
+Options: Attendre la PR pour le découvrir ; assouplir global.json et compiler comme eux en CI.
+Decision: global.json accepte 10.0.100 et plus (latestFeature) ; Verify.ps1 prend le SDK 10.x local le plus récent ; job « Build like the Dalamud repository » dans build.yml. Choix de l'agent, sans effet sur le jeu.
+Reason: Demande de l'utilisateur de relever ce qui manque pour la 1.0.0 ; correction sûre et facile à défaire.
+Consequences: Le SDK local reste 10.0.403. Une nouvelle image chez Dalamud se suit dans le relevé. Le job garde le réseau : seule une vraie PR prouve la compilation réseau coupé.
+References: docs/project/PUBLISHING.md, issue #31
+
+DEC-ID: DEC-035
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: Titre selon le job : sur option désactivée par défaut, le titre change sans clic au changement de job, alors que Dalamud interdit les requêtes automatiques au serveur sans action du joueur.
+Evidence: Réponse de l'utilisateur après le résumé de la règle : « On garde juste comme ça on verra après publication dalamud ». src/TenshoAssistant/Collections/TitleChanger.Dalamud.cs
+Options: Clic seulement (conseil de l'agent) ; garder et présenter dans la PR.
+Decision: Gardé tel quel, sans changement de code, et déclaré dans la description du plugin et la PR.
+Reason: Décision de l'utilisateur.
+Consequences: L'équipe peut demander de le retirer : ce serait alors à faire avant l'approbation. À revoir après la publication.
+References: docs/project/PUBLISHING.md, issue #31
+
+DEC-ID: DEC-036
+Timestamp: 2026-11-04 Europe/Brussels
+Problem: Le plan de PR sur la liste de fabrication (0.478, 0.479) ne proposait rien sur un nœud à 5 tentatives avec 809 PR : le premier nœud vu comptait comme normal, et ses PR restaient gardés.
+Evidence: Capture de l'utilisateur ; réponses : « tampis on va retirer la lecture de la liste de recolte on fera que par node pas sur une serie de node », « si il faut quand meme effet du lieu pour ameliorer sur une node », « si 5/5 recolte au lieu de 4 c'est pas la meme que bonus recolte supplementaire », « il faut prendre en compte tous les effet pas que celui la ».
+Options: Corriger la détection du bonus et garder la série ; un seul nœud.
+Decision: Plan pour le seul nœud en cours. Tous les effets du lieu lus dans les feuilles du jeu : nommés, marqués déjà comptés pour les tentatives actives ; s'ils sont inactifs, ce qui manque et ce qu'ils rapporteraient quand c'est estimable. La ligne de la liste de fabrication reste, à titre d'information (« tu peux laisser le tooltip de la liste de fabrication c'est pratique »).
+Reason: Décision de l'utilisateur.
+Consequences: Les réglages de bonus et de secondes entre nœuds disparaissent ; celui de la liste ne commande plus que sa ligne. « PR par tic » reste pour la barre de PR.
+References: docs/evidence/0.515-node-effects.md

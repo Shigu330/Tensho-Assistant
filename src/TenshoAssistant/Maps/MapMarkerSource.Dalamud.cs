@@ -44,6 +44,7 @@ internal sealed class MapMarkerSource
         return cache[range]=markers.AsReadOnly();
     }
 
+    public bool OverviewsFailed{get;private set;}
     private void LoadOverviews()
     {
         if(overviews is not null)return;
@@ -66,7 +67,8 @@ internal sealed class MapMarkerSource
                 }
             }
         }
-        catch(Exception error){log.Warning(error,"Overview maps unavailable.");}
+        // R-14 (0.507): all or nothing: a partial list would read as a map without its region.
+        catch(Exception error){overviews.Clear();regionMaps.Clear();ordered.Clear();worldMap=0;OverviewsFailed=true;log.Warning(error,"Overview maps unavailable.");}
         // The game's region menu follows the region map numbers (region/00 Noscea, region/01 forest, …).
         regionOrder.AddRange(ordered.OrderBy(entry=>entry.Index).Select(entry=>entry.MapId));
     }

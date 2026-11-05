@@ -13,6 +13,20 @@
         "requested": "[1.2.39, )",
         "resolved": "1.2.39",
         "contentHash": "fcFN01tDTIQqDuTwr1jUQK/geofiwjG5DycJQOnC72i1SsLAk1ELe+apBOuZ11UMQG8YKFZG1FgvjZPbqHyatg=="
+      },
+      "Raphael.Net": {
+        "type": "Direct",
+        "requested": "[5.0.0, )",
+        "resolved": "5.0.0",
+        "contentHash": "NSD9eUqKXLMKAjgMK6Ou0UxndYdmKV2S3Q52ndjxUIoO44OYwuQ72HOVqZUyTOxgBJfLPoPjGX2UyW71msM1uw=="
+      }
+    },
+    "net10.0-windows7.0/win-x64": {
+      "Raphael.Net": {
+        "type": "Direct",
+        "requested": "[5.0.0, )",
+        "resolved": "5.0.0",
+        "contentHash": "NSD9eUqKXLMKAjgMK6Ou0UxndYdmKV2S3Q52ndjxUIoO44OYwuQ72HOVqZUyTOxgBJfLPoPjGX2UyW71msM1uw=="
       }
     }
   }

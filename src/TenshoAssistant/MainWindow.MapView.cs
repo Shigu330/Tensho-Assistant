@@ -31,14 +31,16 @@ internal sealed partial class MainWindow
     private MapLocalIndexService? mapLocal;
     internal void ConfigureMapView(MapLiveReader live,MapMarkerSource markers,MapLocalIndexService local){mapLive=live;mapMarkers=markers;mapLocal=local;}
     // 0.328 (map audit #13): a chosen map opens whole, like NavigateMap; the old zoom and pan belonged to another map.
-    private void OpenMapView(uint mapId){mapViewMapId=mapId;mapViewFollow=mapId==0;mapFitRequested=mapId!=0;mapViewOpen=true;}
+    // 0.499 (user report): a link to the map brings it above the Tensho window instead of opening behind it.
+    private bool mapViewToFront;
+    private void OpenMapView(uint mapId){mapViewMapId=mapId;mapViewFollow=mapId==0;mapFitRequested=mapId!=0;mapViewOpen=true;mapViewToFront=true;}
     // Called when the game map is replaced: the same key (M) that opens the game map toggles the Tensho map.
     // Hosted game map (0.151): the replacer asks whether the Tensho map is still open, and closes it with the game map.
     internal bool MapViewOpen=>Volatile.Read(ref mapViewOpen);
     internal void CloseMapFromGame()=>Volatile.Write(ref mapViewOpen,false);
     internal void ShowMapFromGame(GameMapRequest request)
     {
-        if(DateTimeOffset.UtcNow<mapOwnFlagUntil){mapOwnFlagUntil=default;mapViewOpen=true;return;}
+        if(DateTimeOffset.UtcNow<mapOwnFlagUntil){mapOwnFlagUntil=default;mapViewOpen=true;mapViewToFront=true;return;}
         var mapId=maps.State.Catalog is { } catalog ? request.Resolve(catalog):request.Selected==request.Current ? 0:request.Selected;
         // A quest, aetheryte or FATE was asked (journal, link): never the M toggle, the map opens focused on it.
         var pointed=request.Pointed;
@@ -86,6 +88,7 @@ internal sealed partial class MainWindow
     internal void PrepareMapView(Dalamud.Interface.Windowing.Window window)
     {
         UI.FfxivTheme.Push();
+        if(mapViewToFront){mapViewToFront=false;window.BringToFront();}
         var settings=configuration.MapView;
         window.WindowName=localization.Get("MapView.Title")+"###TenshoMapView";
         // Sizes in screen pixels, set here rather than through Window.Size (which the window system scales).
@@ -97,7 +100,7 @@ internal sealed partial class MainWindow
         else ImGui.SetNextWindowSize(new Vector2(720,760),ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowSizeConstraints(new Vector2(320,280),new Vector2(float.MaxValue));
         ImGui.SetNextWindowBgAlpha(MapViewSettings.ClampOpacity(settings.Opacity));
-        window.Flags=ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | (settings.Locked ? ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize:0);
+        window.Flags=ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | (settings.Locked ? ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize:0) | (settings.HideTitleBar ? ImGuiWindowFlags.NoTitleBar:0);
     }
     internal void FinishMapView()=>UI.FfxivTheme.Pop();
     internal void DrawMapViewContents()
@@ -560,6 +563,8 @@ internal sealed partial class MainWindow
             {
                 changed|=SettingBox("MapView.ReplaceGameMap",settings.ReplaceGameMap,value=>settings.ReplaceGameMap=value,MapDefaults.ReplaceGameMap);
                 changed|=SettingBox("MapView.Locked",settings.Locked,value=>settings.Locked=value,MapDefaults.Locked);
+                changed|=SettingBox("MapView.HideTitleBar",settings.HideTitleBar,value=>settings.HideTitleBar=value,MapDefaults.HideTitleBar);
+                changed|=SettingBox("MapView.HideBehindGame",settings.HideBehindGame,value=>settings.HideBehindGame=value,MapDefaults.HideBehindGame);
                 changed|=SettingBox("MapView.HideInCombat",settings.HideInCombat,value=>settings.HideInCombat=value,MapDefaults.HideInCombat);
                 changed|=SettingBox("MapView.HideInDuty",settings.HideInDuty,value=>settings.HideInDuty=value,MapDefaults.HideInDuty);
             }
@@ -968,7 +973,7 @@ internal sealed partial class MainWindow
                 {
                     var badge=Math.Max(6,item.Size*0.45f);var corner=item.At+new Vector2(item.Size*0.2f,-item.Size*0.6f);
                     draw.AddCircleFilled(corner+new Vector2(badge/2),badge*0.62f,ImGui.GetColorU32(new Vector4(0,0,0,0.75f)),16);
-                    draw.AddText(UiBuilder.IconFont,badge,corner,ImGui.GetColorU32(timedPoint.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:new Vector4(0.98f,0.62f,0.20f,1)),FontAwesomeIcon.Clock.ToIconString());
+                    draw.AddText(UiBuilder.IconFont,badge,corner,ImGui.GetColorU32(TimedPointColor(timedPoint)),FontAwesomeIcon.Clock.ToIconString());
                 }
                 if(item.Point is { } labelled && settings.GatheringLabels && mapZoom>=0.6f)
                     draw.AddText(item.At+new Vector2(item.Size*0.6f,-ImGui.GetFontSize()/2),ImGui.GetColorU32(UI.FfxivTheme.Text),localization.Format("MapLocal.Level",labelled.Level));
@@ -1050,7 +1055,7 @@ internal sealed partial class MainWindow
             if(settings.ShowParty && live?.Party is { } members && live.MapId==map.MapId && settings.SizeOf(GlyphParty,map.MapId) is var partySize and >0)
                 foreach(var member in members)
                 {
-                    var at=origin+mapPan+MapProjection.PixelFromWorld(member.Position,map)*mapZoom;var badge=Math.Max(6,baseIcon*0.8f*partySize);
+                    var at=origin+mapPan+MapProjection.PixelFromWorld(mapPartySmoother.At(member.Name,member.Position,io.DeltaTime),map)*mapZoom;var badge=Math.Max(6,baseIcon*0.8f*partySize);
                     draw.AddCircleFilled(at,badge*0.6f,ImGui.GetColorU32(new Vector4(0.15f,0.45f,0.95f,0.85f)),20);
                     if(member.Job!=0 && textures.TryGetFromGameIcon(new GameIconLookup(62100+member.Job),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
                         draw.AddImage(image.Handle,at-new Vector2(badge/2),at+new Vector2(badge/2));
@@ -1283,8 +1288,7 @@ internal sealed partial class MainWindow
                     foreach(var line in lines.Skip(hit.Point is null ? 1:2))ImGui.TextDisabled(line);
                     if(hit.Point is { } point)
                     {
-                        if(point.Timed)ImGui.TextColored(point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:new Vector4(0.98f,0.62f,0.20f,1),
-                            localization.Format(point.ActiveAt(EorzeaMinutes()) ? "MapView.TimedOpen":"MapView.TimedClosed",point.Schedule!.Label));
+                        DrawPointAvailability(point);
                         var items=itemCatalog.State.Catalog;
                         foreach(var id in point.Items.Take(8))
                         {
@@ -1324,6 +1328,24 @@ internal sealed partial class MainWindow
         draw.AddCircle(at,radius,ImGui.GetColorU32(colour with{W=Math.Min(1,colour.W*2.5f+0.2f)}),48,2f);
     }
     // Gathering points of a map (cached catalogue + cached positions), rebuilt only when the map or a source changes.
+    private readonly MapPartySmoother mapPartySmoother=new();
+    // 0.518 (user report): « open now » only speaks of the hours. A legendary point also asks for its tome, read by this character.
+    internal Func<uint,TenshoAssistant.Gathering.GatherPointAccess?>? GatherAccess { get; set; }
+    private Vector4 TimedPointColor(MapLocalGatheringPoint point)=>GatherAccess?.Invoke(point.BaseId)?.TomeMissing is not null ? Muted:point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:new Vector4(0.98f,0.62f,0.20f,1);
+    private void DrawPointAvailability(MapLocalGatheringPoint point)
+    {
+        var access=GatherAccess?.Invoke(point.BaseId);
+        if(point.Timed)
+        {
+            var open=point.ActiveAt(EorzeaMinutes());
+            ImGui.TextColored(TimedPointColor(point),localization.Format(!open ? "MapView.TimedClosed":access?.TomeMissing is not null ? "MapView.TimedOpenNoTome":"MapView.TimedOpen",point.Schedule!.Label));
+        }
+        if(access is null)return;
+        if(access.TomeMissing is { } tome)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MapView.TomeMissing",tome));
+        if(access.JobLevel is { } level && level<point.Level)
+            ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MapView.PointLevelLow",localization.Get(access.JobId==TenshoAssistant.Gathering.GatherPointAccess.Miner ? "GatheringPanel.Miner":"GatheringPanel.Botanist"),level,point.Level));
+    }
+
     private (uint MapId,object? Catalog,object? Index,IReadOnlyList<MapLocalGatheringPoint> Points) mapGatheringCache=(0,null,null,[]);
     private IReadOnlyList<MapLocalGatheringPoint> MapGatheringPoints(MapDefinition map)
     {
@@ -1475,11 +1497,7 @@ internal sealed partial class MainWindow
             if(point.Icon!=0){DrawSmallGameIcon(point.Icon);}
             ImGui.TextColored(Accent,$"{point.Type} · {localization.Format("MapLocal.Level",point.Level)}{(point.Hidden ? " "+localization.Get("MapLocal.Hidden"):"")}");
             if(point.Place.Length>0)ImGui.TextDisabled(point.Place);
-            if(point.Timed)
-            {
-                var open=point.ActiveAt(EorzeaMinutes());
-                ImGui.TextColored(open ? UI.FfxivTheme.Success:new Vector4(0.98f,0.62f,0.20f,1),localization.Format(open ? "MapView.TimedOpen":"MapView.TimedClosed",point.Schedule!.Label));
-            }
+            DrawPointAvailability(point);
             var items=itemCatalog.State.Catalog;
             foreach(var id in point.Items.Take(16))
             {
@@ -1601,7 +1619,7 @@ internal sealed partial class MainWindow
         if(settings.EdgeGathering)
         {
             var minutes=EorzeaMinutes();
-            foreach(var point in gathering.Where(point=>point.Timed && point.Icon!=0 && settings.SizeOf(point.Icon,map.MapId)>0 && point.Position is not null && point.ActiveAt(minutes)))
+            foreach(var point in gathering.Where(point=>point.Timed && point.Icon!=0 && settings.SizeOf(point.Icon,map.MapId)>0 && point.Position is not null && point.ActiveAt(minutes) && GatherAccess?.Invoke(point.BaseId)?.TomeMissing is null))
                 targets.Add((MapProjection.PixelFromWorld(new Vector3(point.Position!.X,0,point.Position.Z),map),point.Icon,GatheringLabelOf(point),false,0));
         }
         if(settings.EdgeParty && settings.ShowParty && settings.SizeOf(GlyphParty,map.MapId)>0 && live?.Party is { } members && live.MapId==map.MapId)

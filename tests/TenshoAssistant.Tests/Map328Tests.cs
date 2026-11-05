@@ -22,7 +22,7 @@ internal static class Map328Tests
         ("Game map kept when the Tensho map cannot be drawn; « open the game map » brings a hosted map back",() =>
         {
             var replacer = Read("Maps/NativeMapReplacer.Dalamud.cs");
-            Check(replacer.Contains("keepGameMap=!options.ReplaceGameMap || bypass || !canShow();",StringComparison.Ordinal),"decided with canShow");
+            Check(replacer.Contains("keepGameMap=!options.ReplaceGameMap || bypass || !canShow() || !canMove;",StringComparison.Ordinal),"decided with canShow");
             Check(Read("Plugin.cs").Contains("()=>mainWindow.MapViewVisible()",StringComparison.Ordinal),"canShow is the map's own visibility (catalogue, combat, duty)");
         }),
         ("Live map reads: vectors bounded, each secondary read isolated so position and flag survive",() =>

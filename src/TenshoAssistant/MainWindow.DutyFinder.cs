@@ -32,13 +32,8 @@ internal sealed partial class MainWindow
         if(windowDisposed || !configuration.ShowDutyFinderLoot || dutyFinder?.Selection is not { } selection || dutyFinderLoot is not { } loot)return;
         // 0.207: no panel for a roulette (no fixed loot) or when no duty is selected.
         if(selection.Kind!=2 || selection.Id==0)return;
-        using var theme=UI.FfxivTheme.Apply();
-        ImGui.SetNextWindowPos(new Vector2(selection.X+selection.Width+6,selection.Y),ImGuiCond.Always);
-        ImGui.SetNextWindowSize(new Vector2(400,Math.Max(320,selection.Height)),ImGuiCond.Always);
-        var visible=ImGui.Begin(localization.Get("DutyFinder.Title")+"###TenshoDutyFinder",ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove);
-        try
+        Panels?.Show("TenshoDutyFinder",localization.Get("DutyFinder.Title"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove,()=>{ImGui.SetNextWindowPos(new Vector2(selection.X+selection.Width+6,selection.Y)+WindowMoved("ContentsFinder",selection.X,selection.Y),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(400,Math.Max(320,selection.Height)),ImGuiCond.Always);},()=>
         {
-            if(!visible)return;
             if(selection.Kind==1)
             {
                 ImGui.TextWrapped(localization.Get("DutyFinder.Roulette"));
@@ -56,8 +51,7 @@ internal sealed partial class MainWindow
             if(dutyFinderRequested!=duty.DutyId && loot.State is { Loading:false, Document:null })
             {dutyFinderRequested=duty.DutyId;_=loot.RequestAsync();}
             DrawDutyFinderLoot(loot,duty);
-        }
-        finally{ImGui.End();}
+        });
     }
 
     private void DrawDutyFinderLoot(DutyLootService loot,DutyDefinition duty)

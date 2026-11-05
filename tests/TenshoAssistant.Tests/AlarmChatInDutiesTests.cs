@@ -31,7 +31,7 @@ internal static class AlarmChatInDutiesTests
         {
             var service = Read("Alarms/AlarmService.Dalamud.cs");
             var rule = service.IndexOf("var inDuty = settings.MuteInDuties && condition[ConditionFlag.BoundByDuty];",StringComparison.Ordinal);
-            var chat = service.IndexOf("if (settings.ChatAllowed(inDuty)) chat(",StringComparison.Ordinal);
+            var chat = service.IndexOf("if (settings.ChatAllowed(inDuty))",StringComparison.Ordinal);
             var sound = service.IndexOf("if (settings.SoundAllowed(inDuty))",StringComparison.Ordinal);
             var discord = service.IndexOf("if (discord)",StringComparison.Ordinal);
             Check(rule > 0 && chat > rule && sound > chat && discord > sound,"duty read, then chat line, sound and Discord");

@@ -3,7 +3,7 @@ using TenshoAssistant.MiniGames;
 namespace TenshoAssistant.Collections;
 
 // 0.365 (g, C-04): the kinds after Achievement are read by ExtraCollectionReader (not in the collections cache).
-public enum CollectionKind { Mount, Companion, Emote, BlueMagic, TripleTriad, Orchestrion, Title, Achievement, Hairstyle, Ornament, Glasses, Barding, Portrait, MasterBook, McGuffin, OccultLore }
+public enum CollectionKind { Mount, Companion, Emote, BlueMagic, TripleTriad, Orchestrion, Title, Achievement, Hairstyle, Ornament, Glasses, Barding, Portrait, MasterBook, McGuffin, OccultLore, Folklore }
 public enum CollectionAcquisition { Unknown, Acquired, NotAcquired }
 public sealed record TitleMetadata(string Masculine,string Feminine,bool IsPrefix,int Order);
 public sealed record AchievementMetadata(uint CategoryId,string CategoryName,int? CategoryOrder,uint KindId,string KindName,int? KindOrder,

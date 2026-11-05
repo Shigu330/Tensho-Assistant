@@ -17,13 +17,8 @@ internal sealed partial class MainWindow
     internal void DrawOceanVoyagePanel()
     {
         if(windowDisposed || !configuration.FishingPanel || OceanVoyage?.Frame is not { } frame || frame.Status==4 || OceanVoyageData?.Invoke() is not { } data)return;
-        using var theme=UI.FfxivTheme.Apply();
-        ImGui.SetNextWindowPos(new Vector2(60,300),ImGuiCond.FirstUseEver);
-        var visible=ImGui.Begin(localization.Get("OceanVoyage.Title")+"###TenshoOceanVoyage",
-            ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.AlwaysAutoResize);
-        try
+        Panels?.Show("TenshoOceanVoyage",localization.Get("OceanVoyage.Title"),ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.AlwaysAutoResize,()=>{ImGui.SetNextWindowPos(new Vector2(60,300),ImGuiCond.FirstUseEver);},()=>
         {
-            if(!visible)return;
             if(OceanVoyages.Current(data,frame) is not { } stop){ImGui.TextDisabled(localization.Get("OceanVoyage.Unknown"));return;}
             ImGui.TextColored(Accent,localization.Format("OceanVoyage.Stop",stop.Index+1,stop.Spot.Place,localization.Get("OceanFishing.Time"+stop.Time)));
             if(stop.Spectral)ImGui.TextColored(UI.FfxivTheme.Success,localization.Get("OceanVoyage.Spectral"));
@@ -59,7 +54,6 @@ internal sealed partial class MainWindow
             ImGui.Separator();
             ImGui.TextUnformatted(localization.Format("OceanVoyage.Points",frame.Points.ToString("N0"),frame.Caught));
             ImGui.TextDisabled(localization.Get("OceanVoyage.Credit"));
-        }
-        finally{ImGui.End();}
+        });
     }
 }

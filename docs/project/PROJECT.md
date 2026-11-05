@@ -12,7 +12,7 @@ Architecture : un adaptateur Dalamud fin, des données managées communes et des
 
 Source : prompt maître fourni le 2026-10-27, conservé dans docs/ai/PROMPT-MAITRE.md. Les références héritées fournissent des faits techniques, jamais une ancienne roadmap.
 
-Hors périmètre (2026-10-31) : ACT/IINACT et parsers de combat ([DEC-009](DECISIONS.md)) ; toute automatisation de jeu ou tout avantage en combat/JcJ (règles Dalamud, voir [CONTRIBUTING](../../CONTRIBUTING.md#publication-dalamud)).
+Hors périmètre (2026-10-31) : ACT/IINACT et parsers de combat ([DEC-009](DECISIONS.md)) ; toute automatisation de jeu ou tout avantage en combat/JcJ (règles Dalamud, voir [CONTRIBUTING](../../CONTRIBUTING.md#publication-dalamud)). Exception du 2026-11-04 : dresseur, informations seulement, JcE seulement ([DEC-032](DECISIONS.md)) ; conseils de jeu en JcE seulement ([DEC-033](DECISIONS.md)).
 
 ## Extensions demandées par l'utilisateur (état au 2026-11-03, 0.446)
 

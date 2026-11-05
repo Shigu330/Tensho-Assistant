@@ -31,7 +31,7 @@ internal static class Barding340Tests
             Check(reader.Contains("now>wantedUntil",StringComparison.Ordinal) && reader.Contains("client.IsLoggedIn",StringComparison.Ordinal) && reader.Contains("catch(Exception error)",StringComparison.Ordinal),"only while wanted and logged in, guarded");
             Check(Read("Gear/GearLoader.Dalamud.cs").Contains("ChocoboBarding.TeachAction",StringComparison.Ordinal) && ChocoboBarding.TeachAction == 1013,"ItemAction 1013 teaches a barding");
             Check(File.ReadAllText(Path.GetFullPath("docs/evidence/0.340-chocobo-barding.md")).Contains("MATCHED 101 data0==row 101 actions 1013x101",StringComparison.Ordinal),"evidence of the probe");
-            Check(Read("Plugin.cs").Contains("new Gear.ChocoboReader(framework,client,unlocks,data,log),()=>chocobo?.Dispose());",StringComparison.Ordinal),"owned and disposed");
+            Check(Read("Plugin.cs").Contains("new Gear.ChocoboReader(framework,client,player,unlocks,data,log),()=>chocobo?.Dispose());",StringComparison.Ordinal),"owned and disposed");
         }),
     ];
 }

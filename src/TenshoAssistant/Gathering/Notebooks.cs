@@ -10,7 +10,8 @@ public enum NotebookKind { Fishing, Spearfishing, Gathering }
 public sealed record NotebookEntry(NotebookKind Kind,uint ItemId,bool Done);
 
 /// <summary>The character's notebooks as copied: entries by item (an item in two notebooks counts as done when done in either).</summary>
-public sealed record NotebookState(IReadOnlyList<NotebookEntry> Entries,DateTimeOffset ReadAt)
+/// <param name="GatheringUnavailable">R-14 (0.454): the gathering notebook could not be read (function lost): its 0/0 is unknown, not real.</param>
+public sealed record NotebookState(IReadOnlyList<NotebookEntry> Entries,DateTimeOffset ReadAt,bool GatheringUnavailable=false)
 {
     private readonly Dictionary<uint,bool> byItem=Entries.GroupBy(entry=>entry.ItemId).ToDictionary(group=>group.Key,group=>group.Any(entry=>entry.Done));
     /// <summary>True / false for an item of a notebook, null for an item in none.</summary>

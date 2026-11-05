@@ -71,26 +71,36 @@ internal sealed class MapLiveReader : IDisposable
     {
         this.framework=framework;this.client=client;this.objects=objects;this.log=log;this.condition=condition;this.fateTable=fateTable;this.party=party;Log=log;
         uint[] currentIds=[],vistaIds=[];
-        try
-        {
-            currentIds=data.GetExcelSheet<AetherCurrent>().Select(row=>row.RowId).ToArray();
-            vistaIds=data.GetExcelSheet<Adventure>().Select(row=>row.RowId).ToArray();
-        }
-        catch(Exception error){log.Warning(error,"Aether current or sightseeing rows unavailable.");}
+        // 0.491 (R-14): one guard per sheet, so that one sheet does not cost the other.
+        try{currentIds=data.GetExcelSheet<AetherCurrent>().Select(row=>row.RowId).ToArray();}
+        catch(Exception error){log.Warning(error,"Aether current rows unavailable.");}
+        try{vistaIds=data.GetExcelSheet<Adventure>().Select(row=>row.RowId).ToArray();}
+        catch(Exception error){log.Warning(error,"Sightseeing rows unavailable.");}
         allCurrents=currentIds;adventureRows=vistaIds;
+        // R-14 (0.507): one guard per sheet: a failing sheet no longer silently takes the others, hunt marks among them.
         try
         {
             foreach(var set in data.GetExcelSheet<AetherCurrentCompFlgSet>())
                 if(set.Territory.RowId!=0)currents.TryAdd(set.Territory.RowId,(set.RowId,set.AetherCurrents.Select(current=>current.RowId).Where(id=>id!=0).ToArray()));
             foreach(var territory in data.GetExcelSheet<TerritoryType>())mounts[territory.RowId]=territory.Mount;
+        }
+        catch(Exception error){log.Warning(error,"Aether current data unavailable; flight state stays unknown.");}
+        try
+        {
             foreach(var point in data.GetExcelSheet<GatheringPoint>())
                 if(point.GatheringPointBase.RowId!=0 && point.GatheringPointBase.IsValid)gatheringLevels[point.RowId]=point.GatheringPointBase.Value.GatheringLevel;
+        }
+        catch(Exception error){log.Warning(error,"Gathering point levels unavailable.");}
+        try
+        {
             foreach(var mark in data.GetExcelSheet<NotoriousMonster>())
                 if(mark.BNpcBase.RowId!=0 && mark.Rank is >= 1 and <= 3)huntMarks.TryAdd(mark.BNpcBase.RowId,mark.Rank);
         }
-        catch(Exception error){log.Warning(error,"Aether current data unavailable; flight state stays unknown.");}
+        catch(Exception error){log.Warning(error,"Hunt mark data unavailable: marks are not shown on the map.");}
         framework.Update+=Update;
     }
+    private bool teleportFailed;
+    private DateTimeOffset partyAt;
     private void Update(IFramework _)
     {
         if(disposed || !framework.IsInFrameworkUpdateThread || framework.IsFrameworkUnloading)return;
@@ -98,7 +108,10 @@ internal sealed class MapLiveReader : IDisposable
         try
         {
             if(Interlocked.Exchange(ref removeFlag,0)==1)ClearFlag();
-            if(Interlocked.Exchange(ref teleport,0) is var destination && destination>0)SendTeleport((uint)destination);
+            // R-14 (0.507): a failed teleport no longer blanks the map for five seconds.
+            if(Interlocked.Exchange(ref teleport,0) is var destination && destination>0)
+                try{SendTeleport((uint)destination);}
+                catch(Exception error){if(!teleportFailed){teleportFailed=true;log.Warning(error,"The teleport could not be sent.");}}
             if(Interlocked.Exchange(ref costsRequest,0)==1){try{Volatile.Write(ref teleportCosts,ReadTeleportCosts());costsFailed=false;}catch(Exception error){costsFailed=true;Failed("teleport costs",error);}}
             var player=client.IsLoggedIn ? objects.LocalPlayer:null;
             if(player is null){Volatile.Write(ref state,null);return;}
@@ -118,8 +131,13 @@ internal sealed class MapLiveReader : IDisposable
                 // Objects, FATEs and party carry no map id: on a failure they are emptied, never kept from another zone.
                 try{nearby=ReadObjects();}catch(Exception error){nearby=[];Failed("objects",error);}
                 try{fates=ReadFates();}catch(Exception error){fates=[];Failed("FATEs",error);}
-                try{partyMarkers=ReadParty();}catch(Exception error){partyMarkers=[];Failed("party",error);}
                 eventsAt=now.AddMilliseconds(500);
+            }
+            // 0.525 (user report): the party is read more often than the rest; the map glides between positions (MapPartySmoother).
+            if(now>=partyAt)
+            {
+                try{partyMarkers=ReadParty();}catch(Exception error){partyMarkers=[];Failed("party",error);}
+                partyAt=now.AddMilliseconds(100);
             }
             var inCombat=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             var inDuty=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty56];
@@ -165,20 +183,23 @@ internal sealed class MapLiveReader : IDisposable
     }
     // Unlocked aether currents and discovered vistas, copied as sets. Sightseeing index = Adventure row − first row
     // (rows are contiguous from 0x210000 in the probe); to confirm in game against the sightseeing log.
-    private unsafe (IReadOnlySet<uint>,IReadOnlySet<uint>) ReadCollected()
+    // 0.491 (R-14): null = unknown ([?] on the map): no player state, a sheet not read, or more vistas than the game's bit array. Never an empty set, which reads as « nothing collected ».
+    private unsafe (IReadOnlySet<uint>?,IReadOnlySet<uint>?) ReadCollected()
     {
         var player=PlayerState.Instance();
-        if(player==null)return (new HashSet<uint>(),new HashSet<uint>());
-        var unlocked=new HashSet<uint>();foreach(var id in allCurrents)if(player->IsAetherCurrentUnlocked(id))unlocked.Add(id);
+        if(player==null)return (null,null);
+        HashSet<uint>? unlocked=null;
+        if(allCurrents.Length>0){unlocked=[];foreach(var id in allCurrents)if(player->IsAetherCurrentUnlocked(id))unlocked.Add(id);}
         // Discovered vistas: the raw bit array (bit i = Adventure row i, ClientStructs: bitCount = Adventure row count) is used;
         // the native IsAdventureComplete is only compared and logged (0.128: the user saw completed vistas not hidden).
         var seen=new HashSet<uint>();var native=0;
         // ClientStructs: 0 = log not unlocked, 1 = ARR part 1, 2 = ARR part 2; Ex: 3 = « Sights of the North » done.
         logUnlock=player->SightseeingLogUnlockState;logUnlockEx=player->SightseeingLogUnlockStateEx;
         var bits=player->CompletedAdventures;
+        if(adventureRows.Length==0 || adventureRows.Length>bits.Length*8)return (unlocked,null);
         for(var index=0;index<adventureRows.Length;index++)
         {
-            if(index>>3<bits.Length && (bits[index>>3]>>(index&7)&1)!=0)seen.Add(adventureRows[index]);
+            if((bits[index>>3]>>(index&7)&1)!=0)seen.Add(adventureRows[index]);
             if(player->IsAdventureComplete((uint)index))native++;
         }
         if(seen.Count!=loggedVistas || native!=loggedNative)
@@ -195,7 +216,8 @@ internal sealed class MapLiveReader : IDisposable
         foreach(var member in party)
         {
             if(member is null || member.EntityId==self || member.Territory.RowId!=client.TerritoryType || !float.IsFinite(member.Position.X))continue;
-            result.Add(new(member.Name.TextValue,member.ClassJob.RowId,member.Level,member.Position));
+            // A member in view has an exact position; the party list's comes from the server, from time to time.
+            result.Add(new(member.Name.TextValue,member.ClassJob.RowId,member.Level,member.GameObject?.Position ?? member.Position));
             if(result.Count>=8)break;
         }
         return result.AsReadOnly();
@@ -222,10 +244,11 @@ internal sealed class MapLiveReader : IDisposable
     private static unsafe IReadOnlyDictionary<uint,uint> ReadTeleportCosts()
     {
         var telepo=Telepo.Instance();var result=new Dictionary<uint,uint>();
-        if(telepo==null)return result;
+        // 0.453 (R-14): unreadable throws (TeleportCostsFailed), an empty list read « none attuned ».
+        if(telepo==null)throw new InvalidOperationException("Teleport module unavailable.");
         var list=telepo->UpdateAetheryteList();
         // 0.328 (R-14): length checked before the walk; a shifted layout would read past valid memory (not catchable).
-        if(list==null || list->LongCount is <0 or >512)return result;
+        if(list==null || list->LongCount is <0 or >512)throw new InvalidOperationException("Teleport list unreadable.");
         foreach(var entry in *list)
             if(entry.AetheryteId!=0 && entry.SubIndex==0 && entry.Ward==0 && entry.Plot==0)result.TryAdd(entry.AetheryteId,entry.GilCost);
         return result;

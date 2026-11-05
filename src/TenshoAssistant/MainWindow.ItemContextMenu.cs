@@ -82,7 +82,6 @@ internal sealed partial class MainWindow
         if(CollectionOf(item) is not null)routes.Add(ItemContextRoute.Collection);
         routes.Add(ItemContextRoute.Stocks);
         routes.Add(ItemContextRoute.Sources);
-        routes.Add(ItemContextRoute.Tools);
         return routes;
     }
 }

@@ -62,18 +62,12 @@ internal sealed partial class MainWindow
         if(windowDisposed || !configuration.ShowCharacterPanel || characterStats.Window is not { } window)return;
         var state=characterStats.State;
         if(state.CharacterId==0 || !CombatCategory(state.Category) || state.Modifiers.Div<=0)return;
-        using var theme=UI.FfxivTheme.Apply();
-        ImGui.SetNextWindowPos(new Vector2(window.X+window.Width+6,window.Y),ImGuiCond.Always);
-        var visible=ImGui.Begin(localization.Get("CharacterStats.Panel")+"###TenshoCharacterPanel",
-            ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse);
-        try
+        Panels?.Show("TenshoCharacterPanel",localization.Get("CharacterStats.Panel"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse,()=>{ImGui.SetNextWindowPos(new Vector2(window.X+window.Width+6,window.Y)+WindowMoved("Character",window.X,window.Y),ImGuiCond.Always);},()=>
         {
-            if(!visible)return;
             ImGui.TextColored(Accent,localization.Format("CharacterStats.PanelJob",state.Job,state.Level));
             DrawDerivedStats(state,false);
             if(state.Modifiers.Main==0)ImGui.TextColored(Accent,localization.Format("CharacterStats.NoMain",state.Level));
             ImGui.TextDisabled(localization.Get("CharacterStats.HoverHint"));
-        }
-        finally{ImGui.End();}
+        });
     }
 }

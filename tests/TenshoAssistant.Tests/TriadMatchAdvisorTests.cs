@@ -43,6 +43,48 @@ internal static class TriadMatchAdvisorTests
             var free = TriadMatchAdvisor.Advise(Frame(1,Context(null)),Find,new TriadSolveOptions(Milliseconds:5000));
             Check(free.Problem == TriadAdviceProblem.None && free.All.Select(move => move.HandSlot).Distinct().Count() == 3,"free move: the three cards in hand are ranked");
         }),
+        ("Triad advice: against an NPC only, never in a competitive place (DEC-033)",()=>
+        {
+            Check(TriadMatchAdvisor.Advise(Frame(1,Context(null) with {AgainstNpc=false}),Find).Problem == TriadAdviceProblem.NotAgainstNpc,"a competitive match");
+            Check(TriadMatchAdvisor.Advise(Frame(1,Context(null) with {NpcId=0}),Find).Problem == TriadAdviceProblem.NotAgainstNpc,"no NPC: a player");
+            Check(TriadMatchAdvisor.Advise(Frame(1,Context(null)),Find,new TriadSolveOptions(Milliseconds:5000)).Problem == TriadAdviceProblem.None,"against an NPC, as before");
+            foreach(var place in new uint[]{579,940,941})Check(TriadMatchAdvisor.Competitive(place),"competitive: "+place);
+            Check(!TriadMatchAdvisor.Competitive(144),"the Gold Saucer itself is not");
+            var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MiniGames/TriadObservationReader.Dalamud.cs"));
+            Check(reader.Contains("known, !TriadMatchAdvisor.Competitive(client.TerritoryType)") && reader.Contains("if (TriadMatchAdvisor.Competitive(client.TerritoryType))"),"match and challenge help both follow it");
+        }),
+        ("Triad advice: rules not read, or a masked move without its card, give no advice (R-14)",()=>
+        {
+            Check(TriadMatchAdvisor.Advise(Frame(1,Context(null) with {RulesKnown=false}),Find).Problem == TriadAdviceProblem.RulesUnknown,"rules not read");
+            Check(TriadMatchAdvisor.Advise(Frame(2,Context(null)),Find).Problem == TriadAdviceProblem.UnknownCard,"masked move, imposed card not read");
+            Check(new TriadRequestInfo(1,[],[],[],default,[],DateTimeOffset.UtcNow).RulesKnown,"known unless said otherwise");
+            var root=Path.GetFullPath("src/TenshoAssistant");
+            var reader=File.ReadAllText(Path.Combine(root,"MiniGames/TriadObservationReader.Dalamud.cs"));
+            Check(reader.Contains("Triad request rule values") && reader.Contains("ContainsValue((uint)value.Int)") && !reader.Contains("is >= 1 and <= 15"),"ids from the sheet, values logged for the evidence");
+            Check(reader.Contains("catch (Exception error) { ruleIds = [];"),"an unreadable sheet does not cost the observation");
+            var panel=File.ReadAllText(Path.Combine(root,"MainWindow.TriadRequest.cs"));
+            Check(panel.Contains("if(request.RulesKnown)") && panel.Contains("TriadRequest.RulesUnknown"),"no odds, and it says so");
+        }),
+        ("Catalog loaders: an empty copy is a failure, a failed gear read says so (R-14)",()=>
+        {
+            var root=Path.GetFullPath("src/TenshoAssistant");
+            string Code(string file)=>File.ReadAllText(Path.Combine(root,file));
+            Check(Code("Craft/RecipeCatalogLoader.Dalamud.cs").Contains("if (rows.Count == 0) throw new InvalidDataException"),"recipes");
+            Check(Code("Duties/DutyCatalogLoader.Dalamud.cs").Contains("if (copied.Count == 0) throw new InvalidDataException"),"duties");
+            Check(Code("Npcs/NpcVendorLoader.Dalamud.cs").Contains("if(vendors.Length==0 || rows.Length==0)throw new InvalidDataException"),"vendors");
+            Check(Code("Gear/GearLoader.Dalamud.cs").Contains("catalogFailed=true;") && Code("MainWindow.Gear.cs").Contains("Gear.CatalogFailed") && Code("MainWindow.ChocoboBarding.cs").Contains("GearNotReady"),"gear catalog");
+            Check(Code("Gear/GameGearsetReader.Dalamud.cs").Contains("unavailable=true;") && Code("MainWindow.Gearsets.cs").Contains("source.Unavailable"),"gear sets");
+        }),
+        ("Map and dresser readers: what is not read stays unknown (R-14)",()=>
+        {
+            var root=Path.GetFullPath("src/TenshoAssistant");
+            var map=File.ReadAllText(Path.Combine(root,"Maps/MapLiveReader.Dalamud.cs"));
+            Check(map.Contains("if(player==null)return (null,null);") && map.Contains("adventureRows.Length>bits.Length*8)return (unlocked,null);") && map.Contains("\"Sightseeing rows unavailable.\""),"unknown collected sets");
+            var bank=File.ReadAllText(Path.Combine(root,"Inventory/BankInventoryBridge.Dalamud.cs"));
+            Check(bank.Contains("mirage->IsSetSlotUnlocked(index, column)") && bank.Contains("held.Any(value => value) ? held : null") && bank.Contains("Dresser outfit {0}: slots held {1}."),"outfit pieces by slot, nothing held = as before, logged");
+            var plugin=File.ReadAllText(Path.Combine(root,"Plugin.cs"));
+            Check(plugin.Contains("outfit.Ring.RowId }") && !plugin.Contains("outfit.Ring.RowId }.Where"),"columns kept in order");
+        }),
         ("Triad frame keeps match context copies and drops incomplete rectangles",()=>
         {
             var rules = new List<uint>{4};

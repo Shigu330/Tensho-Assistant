@@ -1,0 +1,31 @@
+# 0.494 : passe automatique après rechargement, 2026-11-04, personnage connecté, DLL 0.494 (journal Dalamud, nombres seulement)
+2026-11-04 12:13:22.808 +01:00 [INF] [TenshoAssistant] Selftest items              OK       50880 rows
+2026-11-04 12:13:22.821 +01:00 [INF] [TenshoAssistant] Selftest recipes            OK       13892 rows
+2026-11-04 12:13:22.834 +01:00 [INF] [TenshoAssistant] Selftest gathering          OK       4199 rows
+2026-11-04 12:13:22.850 +01:00 [INF] [TenshoAssistant] Selftest maps               OK       1223 rows
+2026-11-04 12:13:22.867 +01:00 [INF] [TenshoAssistant] Selftest duties             OK       672 rows
+2026-11-04 12:13:22.886 +01:00 [INF] [TenshoAssistant] Selftest vendors            OK       915 vendors, 39275 sales
+2026-11-04 12:13:22.901 +01:00 [INF] [TenshoAssistant] Selftest gear data          OK       built
+2026-11-04 12:13:22.917 +01:00 [INF] [TenshoAssistant] Selftest submarine data     OK       built
+2026-11-04 12:13:22.934 +01:00 [INF] [TenshoAssistant] Selftest airship data       OK       built
+2026-11-04 12:13:22.952 +01:00 [INF] [TenshoAssistant] Selftest character          OK       job 43, level 41, 22 values
+2026-11-04 12:13:22.969 +01:00 [INF] [TenshoAssistant] Selftest inventory          OK       5 containers, 5 complete, 142 stacks
+2026-11-04 12:13:22.984 +01:00 [INF] [TenshoAssistant] Selftest bank               OK       11 saved containers
+2026-11-04 12:13:23.002 +01:00 [INF] [TenshoAssistant] Selftest quests             OK       1890 done, 9 active, of 5373
+2026-11-04 12:13:23.028 +01:00 [INF] [TenshoAssistant] Selftest collections        OK       Mount 21/369, Companion 63/590, Emote 119/305, BlueMagic 10/124, TripleTriad 103/475, Orchestrion 37/886, Title 105/885, Achievement 662/4003
+2026-11-04 12:13:23.042 +01:00 [INF] [TenshoAssistant] Selftest extra collections  OK       68/2309 obtained
+2026-11-04 12:13:23.058 +01:00 [INF] [TenshoAssistant] Selftest triad              OK       142 npcs, 89 available, 53 quest needed, 45 beaten, 0 beaten but quest needed
+2026-11-04 12:13:23.072 +01:00 [INF] [TenshoAssistant] Selftest map                OK       map 370, currents 333, vistas 18
+2026-11-04 12:13:23.086 +01:00 [INF] [TenshoAssistant] Selftest gear sets          OK       19 sets, 42 job levels
+2026-11-04 12:13:23.102 +01:00 [INF] [TenshoAssistant] Selftest worn gear          OK       12 pieces
+2026-11-04 12:13:23.118 +01:00 [INF] [TenshoAssistant] Selftest hunting log        OK       12 logs
+2026-11-04 12:13:23.135 +01:00 [INF] [TenshoAssistant] Selftest leves              OK       149 done, 0 accepted, allowances 100
+2026-11-04 12:13:23.151 +01:00 [INF] [TenshoAssistant] Selftest duty progress      OK       672 duties
+2026-11-04 12:13:23.168 +01:00 [INF] [TenshoAssistant] Selftest chocobo            OK       rank 10, 10 bardings
+2026-11-04 12:13:23.184 +01:00 [INF] [TenshoAssistant] Selftest currencies         OK       read
+2026-11-04 12:13:23.202 +01:00 [INF] [TenshoAssistant] Selftest reminders          OK       5/7 counters read
+2026-11-04 12:13:23.221 +01:00 [INF] [TenshoAssistant] Selftest craft window       NOT_READ window closed
+2026-11-04 12:13:23.236 +01:00 [INF] [TenshoAssistant] Selftest gathering window   NOT_READ window closed
+2026-11-04 12:13:23.253 +01:00 [INF] [TenshoAssistant] Selftest triad window       NOT_READ window closed
+2026-11-04 12:13:23.269 +01:00 [INF] [TenshoAssistant] Selftest cactpot window     NOT_READ window closed
+2026-11-04 12:13:23.272 +01:00 [INF] [TenshoAssistant] Selftest done (auto): 25 ok, 4 not read, 0 suspect, 0 failed.

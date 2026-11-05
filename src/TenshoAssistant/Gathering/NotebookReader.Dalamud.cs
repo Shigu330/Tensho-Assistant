@@ -26,6 +26,9 @@ public sealed unsafe class NotebookReader : IDisposable
     private DateTimeOffset nextRead;
     private bool disposed,warned;
     public NotebookState? State=>Volatile.Read(ref state);
+    private bool unavailable;
+    /// <summary>R-14 (0.454): the last read failed: the page says it instead of « Reading… » for ever.</summary>
+    public bool Unavailable=>Volatile.Read(ref unavailable);
 
     public NotebookReader(IFramework framework,IClientState client,IDataManager data,IPluginLog log)
     {
@@ -51,14 +54,15 @@ public sealed unsafe class NotebookReader : IDisposable
             var entries=new List<NotebookEntry>(fish.Length+spear.Length+gathering.Length);
             Read(entries,NotebookKind.Fishing,fish,row=>player->IsFishCaught(row));
             Read(entries,NotebookKind.Spearfishing,spear,row=>player->IsSpearfishCaught(row));
-            if((nint)QuestManager.MemberFunctionPointers.IsGatheringItemGathered!=0)
+            var gatheringReadable=(nint)QuestManager.MemberFunctionPointers.IsGatheringItemGathered!=0;
+            if(gatheringReadable)
                 Read(entries,NotebookKind.Gathering,gathering,row=>QuestManager.IsGatheringItemGathered((ushort)row));
-            Volatile.Write(ref state,new NotebookState(entries,now));
-            warned=false;
+            Volatile.Write(ref state,new NotebookState(entries,now,!gatheringReadable));
+            warned=false;Volatile.Write(ref unavailable,false);
         }
         catch(Exception error)
         {
-            nextRead=now.AddSeconds(30);
+            nextRead=now.AddSeconds(30);Volatile.Write(ref unavailable,true);
             if(!warned){warned=true;log.Warning(error,"The gathering and fishing logs could not be read.");}
         }
     }

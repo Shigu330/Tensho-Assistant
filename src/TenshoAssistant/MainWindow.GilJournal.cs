@@ -35,17 +35,46 @@ internal sealed partial class MainWindow
             gilTotals=Enum.GetValues<GilSource>().Select(source=>GilJournal.Totals(state.Entries,source,since)).ToArray();
             gilViewKey=(state,gilPeriod);
         }
+        // 0.455 (user request, in-game campaign): tables instead of « +0 / −1 276 » lines; a zero is a dash.
+        static string Part(long value)=>value==0 ? "—":value.ToString("N0");
         foreach(var source in Enum.GetValues<GilSource>())
         {
             var totals=gilTotals[(int)source];
             if(totals.Count==0)continue;
             ImGui.TextColored(Accent,localization.Format("GilJournal.Source"+source,totals.Sum(total=>total.Gained-total.Spent).ToString("+#,0;-#,0;0")));
-            foreach(var (category,gained,spent) in totals)
-                ImGui.BulletText(localization.Format("GilJournal.Line",localization.Get("GilJournal.Category"+category),gained.ToString("N0"),spent.ToString("N0")));
+            if(!ImGui.BeginTable("GilTotals"+source,4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))continue;
+            try
+            {
+                foreach(var column in new[]{"ColumnCategory","ColumnGained","ColumnSpent","ColumnNet"})ImGui.TableSetupColumn(localization.Get("GilJournal."+column));
+                ImGui.TableHeadersRow();
+                foreach(var (category,gained,spent) in totals)
+                {
+                    ImGui.TableNextRow();
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("GilJournal.Category"+category));
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(Part(gained));
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(Part(spent));
+                    ImGui.TableNextColumn();ImGui.TextUnformatted((gained-spent).ToString("+#,0;-#,0;0"));
+                }
+            }
+            finally{ImGui.EndTable();}
         }
         if(gilTotals.All(totals=>totals.Count==0))ImGui.TextDisabled(localization.Get("GilJournal.Empty"));
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("GilJournal.Latest")))return;
-        foreach(var entry in state.Entries.TakeLast(50).Reverse())
-            ImGui.TextUnformatted($"{entry.At.ToLocalTime():g}  {entry.Delta:+#,0;-#,0}  → {entry.Balance:N0}  · {localization.Get("GilJournal.Category"+entry.Category)} · {localization.Get("GilJournal.Short"+entry.Source)}");
+        if(!ImGui.BeginTable("GilLatest",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        try
+        {
+            foreach(var column in new[]{"ColumnDate","ColumnChange","ColumnBalance","ColumnCategory","ColumnSource"})ImGui.TableSetupColumn(localization.Get("GilJournal."+column));
+            ImGui.TableHeadersRow();
+            foreach(var entry in state.Entries.TakeLast(50).Reverse())
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();ImGui.TextUnformatted(entry.At.ToLocalTime().ToString("g"));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(entry.Delta.ToString("+#,0;-#,0"));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(entry.Balance.ToString("N0"));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("GilJournal.Category"+entry.Category));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("GilJournal.Short"+entry.Source));
+            }
+        }
+        finally{ImGui.EndTable();}
     }
 }

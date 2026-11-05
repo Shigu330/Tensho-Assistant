@@ -99,7 +99,7 @@ internal sealed class ItemContextMenuBridge : IDisposable
     // Tools useful for an item (computed by the main window from the loaded catalogues); null = every tool.
     public Func<uint,IReadOnlyList<ItemContextRoute>>? Relevant { get; set; }
     private static readonly IReadOnlyList<ItemContextRoute> DefaultRoutes=[ItemContextRoute.Usages,ItemContextRoute.Stocks,ItemContextRoute.Craft,
-        ItemContextRoute.Gathering,ItemContextRoute.NpcVendors,ItemContextRoute.Market,ItemContextRoute.Sources,ItemContextRoute.Tools];
+        ItemContextRoute.Gathering,ItemContextRoute.NpcVendors,ItemContextRoute.Market,ItemContextRoute.Sources];
     private string RouteName(ItemContextRoute route)=>route switch
     {
         ItemContextRoute.Usages=>localization.Get("ItemUsesUi.Title"),

@@ -13,6 +13,7 @@ internal sealed class CraftActionCatalogLoader : IDisposable
     private readonly IPluginLog log;
     private readonly List<CraftActionMetadata> copied=[];
     private int position;
+    private GameAction[]? crafterActions;
     private bool stopped;
     public CraftActionCatalogLoader(CraftActionCatalogService service,IDataManager data,IFramework framework,IPluginLog log)
     { this.service=service; this.data=data; this.framework=framework; this.log=log; framework.Update+=Update; }
@@ -46,8 +47,19 @@ internal sealed class CraftActionCatalogLoader : IDisposable
                         var row=actions.GetRow(spec.CanonicalId);
                         if(row.ClassJobLevel!=spec.Level || row.PrimaryCostType!=8 || row.PrimaryCostValue!=spec.Cp || row.SecondaryCostType!=0 || row.SecondaryCostValue.RowId!=0)
                             throw new InvalidOperationException($"Crafting effect {spec.CanonicalId} incompatible with the model.");
-                        var description=descriptions.GetRow(spec.CanonicalId).Description.ExtractText();
-                        for(uint job=8;job<=15;job++) copied.Add(new(spec,job,row.RowId,row.Name.ExtractText(),row.Icon,description));
+                        // A-14 (0.452, review): the buffs have one Action row per class (Veneration: 19297 CRP … 19304 CUL), ids not always contiguous,
+                        // with the name, level and cost of the CRP row. All jobs used to get the CRP row: on the seven others the recorder dropped them
+                        // and the live reading asked the game about another class's action.
+                        var perJob=new Dictionary<uint,GameAction>();
+                        crafterActions??=actions.Where(candidate=>candidate.ClassJob.RowId is >= 8 and <= 15 && candidate.IsPlayerAction && candidate.PrimaryCostType==8).ToArray();
+                        foreach(var candidate in crafterActions)
+                            if(candidate.ClassJobLevel==spec.Level && candidate.PrimaryCostValue==spec.Cp && candidate.Name==row.Name && !perJob.ContainsKey(candidate.ClassJob.RowId))
+                                perJob[candidate.ClassJob.RowId]=candidate;
+                        for(uint job=8;job<=15;job++)
+                        {
+                            if(!perJob.TryGetValue(job,out var own))throw new InvalidOperationException($"Crafting effect {spec.CanonicalId} has no row for job {job}.");
+                            copied.Add(new(spec,job,own.RowId,own.Name.ExtractText(),own.Icon,descriptions.GetRow(own.RowId).Description.ExtractText()));
+                        }
                     }
                 }
                 if(position!=CraftActionCatalog.Specs.Count) return;
@@ -60,6 +72,6 @@ internal sealed class CraftActionCatalogLoader : IDisposable
             catch(Exception error) { service.Fail(error); log.Warning(error,"Craft action model catalog unavailable."); Stop(); }
         }
     }
-    private void Stop() { stopped=true; framework.Update-=Update; copied.Clear(); }
+    private void Stop() { stopped=true; framework.Update-=Update; copied.Clear(); crafterActions=null; }
     public void Dispose() { lock(gate) { if(!stopped) Stop(); service.Clear(); } }
 }

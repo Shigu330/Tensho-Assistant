@@ -17,8 +17,8 @@ internal static class Craft419Tests
         }),
         ("X-11: the crafting log assistant allows Manipulation only when the job has learned it",() =>
         {
-            Check(Read("Craft/CraftLogObservation.cs").Contains("return new(recipe,new(stats.Level,cs,control,cp,manipulation),null,starting);"),"passed through");
-            Check(Read("MainWindow.CraftLog.cs").Contains("ManipulationLearned?.Invoke(observed.CurrentJobId)==true"),"unknown = not learned");
+            Check(Read("Craft/CraftLogObservation.cs").Contains("return new(recipe,new(stats.Level,cs,control,cp,manipulation,specialist),null,starting);"),"passed through");
+            Check(Read("MainWindow.CraftLog.cs").Contains("ManipulationLearned?.Invoke(job)==true"),"unknown = not learned");
             Check(Read("Plugin.cs").Contains("unlocks.IsActionUnlocked(action)"),"game unlock state");
         }),
         ("X-12: buffs wait their own extra time; unset, as before",() =>

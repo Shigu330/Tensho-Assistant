@@ -19,10 +19,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
 
@@ -40,8 +40,47 @@ jobs:
         run: ./scripts/Verify.ps1 -Force -DotNet dotnet
 
       - name: Keep the package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: TenshoAssistant-latest
           path: src/TenshoAssistant/bin/x64/Release/TenshoAssistant/latest.zip
           retention-days: 7
+
+  d17:
+    # 0.512: same image and command as the Dalamud repository (docs/evidence/0.512-d17-build.md). It keeps the network, for Dalamud and the packages.
+    name: Build like the Dalamud repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container: mcr.microsoft.com/dotnet/sdk:10.0.101
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Download Dalamud
+        run: |
+          New-Item -ItemType Directory -Force -Path /work/dalamud | Out-Null
+          Invoke-WebRequest -Uri 'https://goatcorp.github.io/dalamud-distrib/latest.zip' -OutFile /tmp/dalamud.zip
+          Expand-Archive -Path /tmp/dalamud.zip -DestinationPath /work/dalamud -Force
+
+      - name: Restore from the lock file
+        working-directory: src/TenshoAssistant
+        run: dotnet restore --locked-mode -p:DalamudLibPath=/work/dalamud/
+
+      - name: Build
+        working-directory: src/TenshoAssistant
+        run: dotnet build -c Release -o /tmp/output -p:DalamudLibPath=/work/dalamud/ -p:IsPlogonBuild=True
+
+      - name: Check the output
+        run: |
+          foreach ($file in 'TenshoAssistant/latest.zip', 'TenshoAssistant/TenshoAssistant.json') {
+            if (-not (Test-Path "/tmp/output/$file")) { throw "missing: $file" }
+          }
+          $internal = 'Dalamud.dll', 'Dalamud.Bindings.ImGui.dll', 'Dalamud.Bindings.ImGuizmo.dll', 'Dalamud.Bindings.ImPlot.dll', 'ImGuiScene.dll'
+          $found = Get-ChildItem /tmp/output -Recurse -Filter *.dll | Where-Object { $internal -contains $_.Name }
+          if ($found) { throw "Dalamud's own DLL in the output: $($found.Name -join ', ')" }
+          $manifest = Get-Content -Raw /tmp/output/TenshoAssistant/TenshoAssistant.json | ConvertFrom-Json
+          if ($manifest.InternalName -ne 'TenshoAssistant') { throw "internal name: $($manifest.InternalName)" }
+          "Built $($manifest.AssemblyVersion), API level $($manifest.DalamudApiLevel)"

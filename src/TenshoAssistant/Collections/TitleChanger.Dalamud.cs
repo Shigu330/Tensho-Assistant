@@ -58,6 +58,10 @@ public sealed unsafe class TitleChanger : IDisposable
             var ui=UIState.Instance();
             if(ui==null || (nint)TitleController.MemberFunctionPointers.SendTitleIdUpdate==0)
             {if(!warned){warned=true;log.Warning("The worn title cannot be changed: function not resolved.");}return;}
+            // R-14 (0.454): JobTitles is shared by every character: only a title this character's list marks as obtained is sent (a set bit is reliable
+            // before the list arrived, an unset one is not, so nothing is sent then); « none » (0) is always allowed.
+            if(send!=0 && (!ui->TitleList.UnlockedTitlesBitArray.TryGet(send,out var owned) || !owned))
+            {if(!warned){warned=true;log.Warning($"Title {send} not confirmed as obtained by this character; not worn.");}return;}
             ui->TitleController.SendTitleIdUpdate(send);
         }
         catch(Exception error)

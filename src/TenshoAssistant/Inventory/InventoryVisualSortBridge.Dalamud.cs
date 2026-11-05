@@ -116,7 +116,7 @@ internal sealed class InventoryVisualSortBridge : IDisposable
             null=>module->InventorySorter,
             BankStorageKind.Saddlebag=>module->SaddleBagSorter,
             BankStorageKind.PremiumSaddlebag=>module->PremiumSaddleBagSorter,
-            BankStorageKind.Retainer when module->ActiveRetainerId==scope.InventoryOwner=>module->GetActiveRetainerSorter(),
+            BankStorageKind.Retainer when module->ActiveRetainerId==scope.InventoryOwner && (nint)ItemOrderModule.MemberFunctionPointers.GetActiveRetainerSorter!=0=>module->GetActiveRetainerSorter(),
             _=>null,
         };
     }

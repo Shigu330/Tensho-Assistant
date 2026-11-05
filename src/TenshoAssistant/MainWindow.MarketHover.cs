@@ -32,18 +32,10 @@ internal sealed partial class MainWindow
         // 0.377 (g, M-07): the hovered piece against the worn one(s) of its slot, first (the most direct use).
         var compare=configuration.ItemUsagesOnHover && observed.Stable(now) ? HoverComparisons(hovered.ItemId,hovered.Kind==Items.ItemHoverKind.Hq):[];
         if(!prices && !usages && compare.Count==0)return;
-        using var theme=TenshoAssistant.UI.FfxivTheme.Apply();
         var viewport=ImGui.GetMainViewport();
         var (position,width)=HoverPlacement(observed.Anchor,viewport);
-        ImGui.SetNextWindowPos(position,ImGuiCond.Always);
-        if(width is { } fixedWidth)ImGui.SetNextWindowSizeConstraints(new Vector2(fixedWidth,0),new Vector2(fixedWidth,viewport.WorkSize.Y));
-        else ImGui.SetNextWindowSizeConstraints(Vector2.Zero,viewport.WorkSize);
-        ImGui.SetNextWindowBgAlpha(0.94f);
-        var visible=ImGui.Begin(localization.Get("HoverUi.Title")+"###TenshoItemHover",ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize
-            | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav);
-        try
+        Panels?.Show("TenshoItemHover",localization.Get("HoverUi.Title"),ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav,()=>{ImGui.SetNextWindowPos(position,ImGuiCond.Always);if(width is { } fixedWidth)ImGui.SetNextWindowSizeConstraints(new Vector2(fixedWidth,0),new Vector2(fixedWidth,viewport.WorkSize.Y));else ImGui.SetNextWindowSizeConstraints(Vector2.Zero,viewport.WorkSize);ImGui.SetNextWindowBgAlpha(0.94f);},()=>
         {
-            if(!visible)return;
             ImGui.PushTextWrapPos(width is { } wrap ? wrap-ImGui.GetStyle().WindowPadding.X:Math.Min(350,Math.Max(120,viewport.WorkSize.X-32)));
             try
             {
@@ -71,8 +63,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.PopTextWrapPos();}
             hoverPanelSize=ImGui.GetWindowSize();
-        }
-        finally{ImGui.End();}
+        });
     }
 
     // Below the game tooltip, else above it, else beside it; the mouse position is only a fallback when no tooltip is visible.
@@ -200,7 +191,7 @@ internal sealed partial class MainWindow
             // 0.387: the 0.365 kinds without a teaching item in the game data say so instead of an empty tooltip.
             if(items.Count==0 && entry.Kind is Collections.CollectionKind.Glasses or Collections.CollectionKind.Portrait or Collections.CollectionKind.McGuffin
                    or Collections.CollectionKind.OccultLore or Collections.CollectionKind.Hairstyle or Collections.CollectionKind.Ornament or Collections.CollectionKind.Barding
-                   or Collections.CollectionKind.MasterBook)
+                   or Collections.CollectionKind.MasterBook or Collections.CollectionKind.Folklore)
                 ImGui.TextDisabled(localization.Get("HoverUi.CollectionHowUnknown"));
             // Achievements rewarding the entry directly (title or item) are listed even without an unlocking item.
             foreach(var achievement in AchievementsRewarding(items.Select(item=>item.Id)).Take(3))
@@ -396,7 +387,7 @@ internal sealed partial class MainWindow
         if(itemUses.State.Catalog is { } uses)
         {
             if(uses.LevesFor(id).Count is > 0 and var leves)lines.Add(localization.Format("HoverUi.Leves",leves));
-            if(uses.IsSupplyCandidate(id))lines.Add(localization.Get("HoverUi.Supply"));
+            if(uses.IsSupplyCandidate(id))lines.Add(GcSupplyLine(id));
             if(uses.IsAquariumFish(id))lines.Add(localization.Get("HoverUi.Aquarium"));
         }
         return lines;
@@ -433,7 +424,7 @@ internal sealed partial class MainWindow
                 if(canBeHq && Cheaper(prices.HqRegion,prices.HqCheapest))DrawCheapest("HQ",prices.HqRegion,state,now);
             }
             // 0.329: date and time, as on the Market page: a quote restored from the disk cache can be from another day.
-            ImGui.TextDisabled(localization.Format("HoverUi.Fetched",prices.FetchedAt.ToLocalTime().ToString("g")));
+            ImGui.TextDisabled(localization.Format("HoverUi.Fetched",prices.FetchedAt.ToLocalTime().ToString("G")));
             if(!market.IsFresh(prices,now))ImGui.TextDisabled(localization.Get("HoverUi.Expired"));
             if(configuration.HoverPriceRefresh)ImGui.TextDisabled(localization.Get("HoverUi.RefreshHint"));
         }

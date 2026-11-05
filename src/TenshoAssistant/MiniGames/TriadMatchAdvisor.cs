@@ -1,6 +1,6 @@
 namespace TenshoAssistant.MiniGames;
 
-public enum TriadAdviceProblem { None, NotYourTurn, NoContext, UnknownCard, NpcDeckUnknown, DeckMismatch, Unsolvable }
+public enum TriadAdviceProblem { None, NotYourTurn, NoContext, UnknownCard, NpcDeckUnknown, DeckMismatch, Unsolvable, RulesUnknown, NotAgainstNpc }
 /// <summary>A move for the player: hand slot (0–4, as in the game window) and board square (0–8, row by row).</summary>
 public readonly record struct TriadAdviceMove(int HandSlot, int Square, double AverageDifference);
 public sealed record TriadAdvice(IReadOnlyList<TriadAdviceMove> Best, IReadOnlyList<TriadAdviceMove> All, int Hands, bool Exact, TriadAdviceProblem Problem)
@@ -15,6 +15,9 @@ public sealed record TriadAdvice(IReadOnlyList<TriadAdviceMove> Best, IReadOnlyL
 /// </summary>
 public static class TriadMatchAdvisor
 {
+    /// <summary>The competitive Triple Triad places (docs/evidence/0.510-triad-competitive.md): the Battlehall, the Open Tournament, the Invitational Parlor.</summary>
+    public static bool Competitive(uint territory) => territory is 579 or 940 or 941;
+
     private const uint SyntheticBase = 1_000_000;
     // TripleTriadRule rows (docs/evidence/0.159.0-triad-npc-probe.log) the solver plays; the others change visibility, the deck or a
     // draw, not the move value. Chaos (9) and Order (8) impose the card: handled through the imposed slot.
@@ -37,6 +40,11 @@ public static class TriadMatchAdvisor
         ArgumentNullException.ThrowIfNull(frame); ArgumentNullException.ThrowIfNull(card);
         if (!frame.BlueToMove) return TriadAdvice.Failed(TriadAdviceProblem.NotYourTurn);
         if (frame.Context is not { } context) return TriadAdvice.Failed(TriadAdviceProblem.NoContext);
+        // 0.510 (DEC-033): advice against an NPC only, never in a competitive match.
+        if (!context.AgainstNpc || context.NpcId == 0) return TriadAdvice.Failed(TriadAdviceProblem.NotAgainstNpc);
+        // 0.491 (R-14): rules not read, or a masked move without its imposed card: no advice rather than a move for another match.
+        if (!context.RulesKnown) return TriadAdvice.Failed(TriadAdviceProblem.RulesUnknown);
+        if (frame.NativePhase == 2 && context.ForcedSlot is null) return TriadAdvice.Failed(TriadAdviceProblem.UnknownCard);
         var blueHand = new List<(int Slot, TriadCardDefinition Card)>();
         for (var slot = 0; slot < 5; slot++)
         {

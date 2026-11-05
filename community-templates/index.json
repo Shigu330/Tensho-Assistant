@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "tools": [
+    {
+      "id": "daily-routine",
+      "name": {
+        "en": "Daily routine",
+        "fr": "Routine du jour"
+      },
+      "author": "Tensho",
+      "sha256": "ab4e878e5a7524f143489e3815b6a55048db08b0f8fdf7a2d38f8cfc60bcb247"
+    },
+    {
+      "id": "weekly-routine",
+      "name": {
+        "en": "Weekly routine",
+        "fr": "Routine de la semaine"
+      },
+      "author": "Tensho",
+      "sha256": "1becd21f1d4db3e687f9dafdc4551f6f332b60674a57f0adc787df958bf1035b"
+    }
+  ]
+}

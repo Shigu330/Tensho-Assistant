@@ -1,0 +1,43 @@
+name: Tool proposal
+description: Propose a new tool or page for Tensho Assistant, that you would like to write or see written
+labels: ["tool-proposal"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What would the tool do?
+      description: One short paragraph, from the player's side.
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Where does its data come from?
+      description: A game sheet, a read-only probe, or a source with its licence. Tensho never invents a value.
+    validations:
+      required: true
+  - type: textarea
+    id: existing
+    attributes:
+      label: Does another plugin already do it?
+      description: Name it if you know one, and say what would be different here.
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Project rules
+      options:
+        - label: It automates no game action and sends nothing to the game's servers without a click.
+          required: true
+        - label: It gives no combat or PvP advantage, and uses no ACT or parser data.
+          required: true
+        - label: It shows only what a player can normally see.
+          required: true
+  - type: dropdown
+    id: who
+    attributes:
+      label: Who would write it?
+      options:
+        - I would like to write it (see "Adding a tool" in CONTRIBUTING.md)
+        - I am only suggesting it
+    validations:
+      required: true

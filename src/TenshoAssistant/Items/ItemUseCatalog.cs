@@ -12,7 +12,7 @@ public sealed class ItemUseCatalog
     private readonly FrozenSet<uint> supplies,aquarium;
     public string Language {get;}public string DataVersion {get;}
     public string Source=>"Lumina.Excel/CraftLeve+Leve+GCSupplyDuty+AquariumFish";
-    public int LeveCount {get;}public int SupplyItemCount=>supplies.Count;public int AquariumItemCount=>aquarium.Count;
+    public int LeveCount {get;}public int SupplyItemCount=>supplies.Count;public IReadOnlyCollection<uint> SupplyItems=>supplies;public int AquariumItemCount=>aquarium.Count;
     public int UnresolvedLeveRows {get;}
     public ItemUseCatalog(IEnumerable<ItemLeveUse> leves,IEnumerable<uint> supplies,IEnumerable<uint> aquarium,string language,string version,
         int unresolvedLeveRows=0,CancellationToken cancellation=default)

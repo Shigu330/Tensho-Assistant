@@ -137,46 +137,47 @@ internal sealed partial class MainWindow
         _=>localization.Get("PersonalTasks.Period"+task.Period),
     };
 
-    // Drawn by Plugin.Draw: the on-screen « to do » panel, only when it is on, a task is pending, and not in combat.
-    internal void DrawTaskPanel()
+    // The on-screen « to do » panel (a PanelWindow since 0.514), only when it is on, a task is pending, and not in combat.
+    private IReadOnlyList<PersonalTask> pendingOnScreen=[];
+    private PanelDefinition TasksPanel=>new("TaskPanel","###TenshoTaskPanel",new Vector2(40,260),
+        ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav,
+        ()=>configuration.TaskPanel,TaskPanelVisible,DrawTaskPanelContents,CloseTaskPanel,()=>localization.Get("PersonalTasks.PanelTitle"),0.75f);
+
+    private bool TaskPanelVisible()
     {
-        if(windowDisposed || !configuration.TaskPanel || mapLive?.State is { InCombat:true })return;
+        if(windowDisposed || !configuration.TaskPanel || mapLive?.State is { InCombat:true })return false;
+        pendingOnScreen=PersonalTasks.Pending(configuration.PersonalTasks,DateTimeOffset.UtcNow);
+        return pendingOnScreen.Count>0;
+    }
+
+    private void CloseTaskPanel()
+    {
+        if(!configuration.TaskPanel)return;
+        configuration.TaskPanel=false;SaveReminders();
+    }
+
+    private void DrawTaskPanelContents()
+    {
         var now=DateTimeOffset.UtcNow;
-        var pending=PersonalTasks.Pending(configuration.PersonalTasks,now);
-        if(pending.Count==0)return;
-        UI.FfxivTheme.Push();
-        try
+        foreach(var task in pendingOnScreen)
         {
-            ImGui.SetNextWindowPos(new Vector2(40,260),ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowBgAlpha(0.75f);
-            var open=true;
-            if(ImGui.Begin(localization.Get("PersonalTasks.PanelTitle")+"###TenshoTaskPanel",ref open,
-                   ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav))
+            ImGui.PushID(task.Id.ToString());
+            try
             {
-                foreach(var task in pending)
+                if(task.Period==TaskPeriod.Counter)
                 {
-                    ImGui.PushID(task.Id.ToString());
-                    try
-                    {
-                        if(task.Period==TaskPeriod.Counter)
-                        {
-                            if(ImGui.SmallButton("+")){PersonalTasks.Mark(task,true,now);SaveReminders();}
-                            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("PersonalTasks.DoneTip"));
-                            ImGui.SameLine();ImGui.TextUnformatted($"{task.Name} ({task.Count}/{PersonalTasks.ClampTarget(task.Target)})");
-                        }
-                        else
-                        {
-                            var done=false;
-                            if(ImGui.Checkbox(task.Name+"##PanelDone",ref done)){PersonalTasks.Mark(task,true,now);SaveReminders();}
-                            Tip("PersonalTasks.DoneTip");
-                        }
-                    }
-                    finally{ImGui.PopID();}
+                    if(ImGui.SmallButton("+")){PersonalTasks.Mark(task,true,now);SaveReminders();}
+                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("PersonalTasks.DoneTip"));
+                    ImGui.SameLine();ImGui.TextUnformatted($"{task.Name} ({task.Count}/{PersonalTasks.ClampTarget(task.Target)})");
+                }
+                else
+                {
+                    var done=false;
+                    if(ImGui.Checkbox(task.Name+"##PanelDone",ref done)){PersonalTasks.Mark(task,true,now);SaveReminders();}
+                    Tip("PersonalTasks.DoneTip");
                 }
             }
-            ImGui.End();
-            if(!open){configuration.TaskPanel=false;SaveReminders();}
+            finally{ImGui.PopID();}
         }
-        finally{UI.FfxivTheme.Pop();}
     }
 }

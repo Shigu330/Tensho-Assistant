@@ -20,12 +20,12 @@ Please do not open a public issue or disclose sensitive details about the vulner
 
 ## Scope
 
-What the plugin does that matters for security (checked against the code on 2026-11-02, version 0.326 of the `Devloppement` branch):
+What the plugin does that matters for security (checked against the code on 2026-11-04, version 0.512 of the `Devloppement` branch):
 
 - **Network**: HTTPS requests with a timeout and a size limit (`src/TenshoAssistant/Community/BoundedHttp.cs`, including Teamcraft's
   POST since 0.321; or the client's own limit for Universalis) to Universalis, Garland Tools, the FFXIV Console Games Wiki, Teamcraft's public reports
   (`gubal.ffxivteamcraft.com`, one GraphQL POST query carrying the fishing spot id) and GitHub-hosted data (`raw.githubusercontent.com`,
-  `api.github.com`: LuminaSupplemental, GatherBuddy, FFXIVGachaSpreadsheet); all others are GET, except the Discord webhook below.
+  `api.github.com`: LuminaSupplemental, GatherBuddy, FFXIVGachaSpreadsheet), PaissaDB (open plots, on a click or with its optional watch), and this repository (community tool gallery and help videos, on a click, data only, never code); all others are GET, except the Discord webhook below.
   Requests carry item, world, spot or page identifiers only; no player data, no telemetry. LuminaSupplemental, GatherBuddy,
   Teamcraft, the Fashion Report data (FFXIVGachaSpreadsheet), Universalis, Garland Tools and the wiki can each be turned off
   (Settings › Advanced); since 0.324 a switch stops every request to its source (0.326: requests already queued too). Copies
@@ -40,14 +40,15 @@ What the plugin does that matters for security (checked against the code on 2026
   masked in the settings, never written to the logs nor to the diagnostic report (`src/TenshoAssistant/Alarms/DiscordNotifier.cs`,
   `DiscordWebhook.cs`). Clearing it or turning sending off drops the queued messages.
 - **Links opened in the browser (0.349)**: an item's page on the FFXIV Console Games Wiki or the Lodestone opens in the player's own
-  browser only on a click (right-click menu, item sheet) or a `/tensho wiki|lodestone` command; Tensho itself sends nothing.
+  browser only on a click (right-click menu, item sheet) or a `/tensho wiki|lodestone` command; Tensho itself sends nothing. The same goes for
+  the prefilled GitHub form of « report a problem » (0.504), which the player reads and sends, and for help videos (YouTube, or this repository).
 - **Local files**: configuration through Dalamud, the disk cache (`DataCache-v1`) and the saved storages (one file per character in
   `InventoryBank/` since 0.345, the former `InventoryBank.json` kept as `.migrated`), the gil journal (one file per character in
   `GilJournal/` since 0.351, 90 days) in the
   plugin's Dalamud configuration folder; translators can put language JSON files beside the DLL, which are validated when reloaded.
-- **Game**: game memory is read and copied; the only actions that reach the game are teleport, applying an inventory sort, macro chains,
-  writing crafting macros into the game's macros, opening the Try On window, and `/alarm` chat commands for game alarms (on click, or
-  with the « game alarms » setting, off by default). Only the local character's content id is used, as a key for its own saved data.
+- **Game**: game memory is read and copied; the actions that reach the game start on a click: teleport, applying an inventory sort, macro chains,
+  writing crafting macros into the game's macros, opening the Try On window, equipping a job, wearing a title, sending the hunt train call, and `/alarm` chat commands for game alarms (when the player adds an alarm with the « game alarms » setting on, off by default, or on « Send »).
+  One setting, off by default, acts without a click: wearing the title chosen for a job on a job change. Only the local character's content id is used, as a key for its own saved data.
 - **Support report** (Settings › Advanced): copied to the clipboard on click; version, language, shown page, data states, errors,
   source settings, the market world name, alarm counts and the context item id.
 

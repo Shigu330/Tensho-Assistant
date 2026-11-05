@@ -16,14 +16,8 @@ internal sealed partial class MainWindow
     internal void DrawSpearfishingPanel()
     {
         if(windowDisposed || !configuration.FishingPanel || Spearfishing?.Frame is not { } frame)return;
-        using var theme=UI.FfxivTheme.Apply();
-        ImGui.SetNextWindowPos(new Vector2(frame.X+frame.Width+6,frame.Y),ImGuiCond.Always);
-        ImGui.SetNextWindowSize(new Vector2(340,0),ImGuiCond.Always);
-        var visible=ImGui.Begin(localization.Get("Spearfishing.Title")+"###TenshoSpearfishingPanel",
-            ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.AlwaysAutoResize);
-        try
+        Panels?.Show("TenshoSpearfishingPanel",localization.Get("Spearfishing.Title"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.AlwaysAutoResize,()=>{ImGui.SetNextWindowPos(new Vector2(frame.X+frame.Width+6,frame.Y)+WindowMoved("SpearFishing",frame.X,frame.Y),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(340,0),ImGuiCond.Always);},()=>
         {
-            if(!visible)return;
             gatherBuddyFish?.Request();
             var data=gatherBuddyFish?.State.Data;
             var catalog=gatheringCatalog.State.Catalog;var items=itemCatalog.State.Catalog;
@@ -45,7 +39,6 @@ internal sealed partial class MainWindow
             }
             if(shown==0)ImGui.TextDisabled(localization.Get("Spearfishing.NoFish"));
             ImGui.TextDisabled(localization.Get("Spearfishing.Credit"));
-        }
-        finally{ImGui.End();}
+        });
     }
 }

@@ -66,7 +66,7 @@ internal static class Currencies344Tests
             var after = both.Evaluate(Pair(1000,1300),changed);
             Check(after.Crossed.Count == 1 && after.Crossed[0].Currency.ItemId == 26807,"the other currency still alerts after one threshold changed");
             var watcher = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Inventory/CurrencyWatcher.Dalamud.cs"));
-            Check(watcher.Contains("container->IsLoaded",StringComparison.Ordinal) && watcher.Contains("if(!loaded){balances.Add(new(definition,null,cap));continue;}",StringComparison.Ordinal),"unknown until the Currency container is loaded");
+            Check(watcher.Contains("container->IsLoaded",StringComparison.Ordinal) && watcher.Contains("if(!loaded || managed is null){balances.Add(new(definition,null,cap));continue;}",StringComparison.Ordinal),"unknown until the Currency container is loaded");
             var tab = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Currencies.cs"));
             Check(tab.Contains("ImGui.IsItemDeactivatedAfterEdit() && currencyEdits.Remove(id,out var done)",StringComparison.Ordinal) && tab.Contains("else if(!ImGui.IsItemActive())currencyEdits.Remove(id);",StringComparison.Ordinal),"threshold saved once the field is left; a stale value is dropped");
         }),

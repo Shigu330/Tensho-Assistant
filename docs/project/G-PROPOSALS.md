@@ -29,7 +29,7 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 | 0.415 | R-13 | Fenêtre de suivi = objets des alarmes Tensho actives (pas de liste à part), 12 lignes, réglage désactivé par défaut, croix = décocher | Liste « suivis » indépendante des alarmes ; afficher si la fenêtre est ouverte en ce moment (durée de la fenêtre) |
 | 0.411 | R-10 | Bouton « Équiper (métier) » sur chaque lieu de récolte et de pêche, séparé de « Y aller » ; ensemble de plus petit numéro du métier ; clic seulement | Option « Y aller » équipe aussi : FAIT 0.412 (désactivée par défaut) ; choisir l’ensemble par nom ; relecture en ultracode (appel au jeu) |
 | 0.410 | R-09 | Raison solide / Sagesse du fermier et Vision claire / Maîtrise florale dans l’optimiseur ; case de l’outil PR cochée par défaut, toujours comptées dans le panneau en jeu ; Eurêka compté en moyenne (0,5 essai par Raison solide dès le niveau 90) ; Vision claire placée d’abord sur les essais avec Récolte abondante | Ajouter la régénération des PR pendant la récolte ; proposer Étalage des connaissances seulement quand Eurêka est lu en jeu |
-| 0.409 | R-06 | Panneau « Collectionnable » à côté de la fenêtre du jeu (même réglage que le panneau de récolte) : seuils et assignats par palier des données du jeu, PR et intégrité ; assignats affichés seulement pour les boutiques RewardType 1 (déduit des contenus des boutiques) ; collectabilité en cours non lue, aucune action conseillée | Action conseillée (règles propres à Tensho selon les seuils) une fois l’index de la collectabilité trouvé en jeu ; type d’assignat à relier (colonne Currency) ; relecture en ultracode du lecteur. Collectabilité des objets en sacs : FAIT 0.432 (A-15) |
+| 0.409 | R-06 | Panneau « Collectionnable » à côté de la fenêtre du jeu (même réglage que le panneau de récolte) : seuils et assignats par palier des données du jeu, PR et intégrité ; assignats affichés seulement pour les boutiques RewardType 1 (déduit des contenus des boutiques) ; collectabilité en cours non lue, aucune action conseillée | Action conseillée (règles propres à Tensho selon les seuils) une fois l’index de la collectabilité trouvé en jeu ; type d’assignat à relier (colonne Currency) ; relecture du lecteur. Collectabilité des objets en sacs : FAIT 0.432 (A-15) |
 | 0.403 | R-08 | « Alerte PR au seuil » en haut de la page PR, désactivée par défaut, seuil 0 = PR pleins ; une fois par remontée, réarmée sous le seuil, jamais à la première lecture ; chat et son selon les options des alarmes, pas en combat ; pas de Discord | Seuil par job ; catégorie Discord |
 | 0.402 | R-05 | Page Récolte : compteurs des trois carnets, ✓ à côté des ressources déjà au carnet, case « Masquer ce qui est déjà au carnet », export CSV dans le presse-papiers et dans un fichier (dossier du plugin, Exports) ; lecture toutes les 5 s quand la page est ouverte | Filtre « seulement ce qui manque » dans le panneau de pêche en jeu ; carnets dans la vue « Vos personnages » |
 | 0.398 | R-04 | Aide à la pêche : ligne « Appât en main » avec son stock et le nombre de poissons du lieu possibles avec lui ; cadre vert sur l'appât des poissons concernés ; lecture toutes les 0,5 s, pêcheur seulement | Trier les poissons pour mettre ceux de l'appât en main en tête ; alerte quand le stock d'appât est bas |
@@ -95,13 +95,38 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 
 | Écart | Raison |
 |---|---|
-| I-05 (annonces des servants au marché) | Lit de nouvelles fenêtres du jeu et appelle Universalis : à faire en ultracode, avec l'utilisateur |
-| A-03, A-04 (solveur Raphael et suggestions adaptatives) | Ajoute une dépendance native (binaire Rust de Raphael.Net) au paquet : licence, build hors ligne de Plogon et taille à vérifier ensemble, en ultracode |
+| I-05 (annonces des servants au marché) | Première version FAITE 0.508, à essayer en jeu ; la suite plus bas |
+| A-03, A-04 (solveur Raphael et suggestions adaptatives) | A-03 FAIT 0.465 (DEC-028, en option). A-04 FAIT 0.509, à essayer en jeu |
 | N-06 (escouade, composition des missions) | FAIT 0.451 (DEC-027) : planificateur depuis les feuilles du jeu et GcArmyManager ; pourcentage « ≈ » jusqu'à la sonde en jeu (TESTING 0.451) ; affinités non comptées ([preuve](../evidence/0.448-n06-n14-sources.md)) |
 | N-07 (île sanctuaire, carte des ressources) | MJIGatheringItem donne X, Y et un rayon par ressource, mais l'unité n'est pas prouvée : à vérifier en jeu avant de placer les zones sur la carte |
-| N-10 (atelier de l'île, solveur) | Gros : lecture de l'offre et de la demande du jeu et solveur ; à faire en ultracode, avec toi |
+| N-10 (atelier de l'île, solveur) | Gros : lecture de l'offre et de la demande du jeu et solveur ; à faire avec l'utilisateur, voir plus bas |
 | N-04 (loterie immobilière) | État des mises du joueur : structure du jeu non trouvée dans FFXIVClientStructs (à sonder en jeu) |
 | N-12 (conditions d'apparition des rangs S), N-13 (meubles visibles), X-14 (outils d'aménagement) | Règles communautaires par marque, lecture des meubles et correctifs d'affichage : sources et risques à décider ensemble |
 | N-08 (journal de jardinage) | FAIT 0.448 (décidé le 2026-11-03, DEC-026) : journal avec durées tapées par le joueur, page Rappels |
 | N-14 (planificateur de croisements de jardinage) | FAIT 0.450 (DEC-027) : paires MIT de nick75g reliées aux objets par la feuille Item anglaise, affichées dans la langue du jeu ([preuve](../evidence/0.448-n06-n14-sources.md)) |
-| I-15 (recherche dans les fenêtres d'inventaire du jeu) | Touche l'interface du jeu : à faire en ultracode, avec l'utilisateur |
+| I-15 (recherche dans les fenêtres d'inventaire du jeu) | Touche l'interface du jeu : à faire avec l'utilisateur, voir plus bas |
+
+## Décision à prendre : ventes des servants (0.508, I-05)
+
+Choix appliqué par défaut : la comparaison avec Universalis se lance seulement sur le bouton du panneau. Autre choix possible : demander une fois à l'ouverture de la liste de ventes, sur réglage. Recommandé : garder le clic, jusqu'à votre avis après un essai.
+
+## À décider avec l'utilisateur (relevé du 2026-11-04)
+
+Règle : une règle Dalamud en jeu demande un résumé et son accord (mémoire, CLAUDE.md).
+
+| Point | Règle | Conseil de l'agent | État |
+|---|---|---|---|
+| Titre selon le job | Pas de requête automatique au serveur sans action directe | Garder pour l'usage personnel, à revoir avant la soumission | **Décidé le 2026-11-04 : gardé tel quel** (DEC-035), présenté dans la PR ; à revoir après la publication |
+| Conseil en match de Triple Triade | Aucun avantage en contenu compétitif | Décidé (DEC-033) : contre un PNJ seulement | **Fait en 0.510** |
+| Panneau du Dédale (DEC-032) | Combat et contenu compétitif | Informations seulement, demander à l'équipe avant la 1.0.0 | Page faite, panneau en attente, dresseur mis de côté |
+
+La liste complète de ce qui reste pour la 1.0.0 : [PUBLISHING](PUBLISHING.md) « Ce qui reste avant la soumission ». Compilation chez Dalamud : corrigée en 0.512 ([DEC-034](DECISIONS.md)).
+
+## Écarts laissés pour une séance en jeu (2026-11-04)
+
+| Point | Pourquoi pas en autonomie | Ce qu'il faudrait |
+|---|---|---|
+| I-15, recherche dans les fenêtres d'inventaire | Passe sur des pointeurs natifs à chaque image, 15 inconnues (numéros d'onglets, noms des grilles de servants, ordre des cases). Coder à l'aveugle peut faire planter le jeu | D'abord une sonde en lecture seule, avec l'utilisateur devant les fenêtres |
+| N-10, atelier de l'île | 16 inconnues (popularité, offre et demande, lecture après ouverture du carnet), conception jamais relue | Une relecture, puis une sonde devant l'agenda de l'île |
+| I-05, suite | Relevé des offres du jeu, vue de tous les servants | Après un essai de la 0.508 |
+| Dresseur, suite | Mis de côté par l'utilisateur | Sonde déjà en place (0.501) |

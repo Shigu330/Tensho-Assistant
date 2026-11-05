@@ -15,6 +15,9 @@ public sealed class CraftRecording
     public void Start(){lock(gate){actions.Clear();ignored=0;Recording=true;}}
     public void Stop(){lock(gate)Recording=false;}
 
+    /// <summary>A-14 (0.452): an accepted call that really runs an action: a crafting type, not merely put in the game's queue (its replay runs it).</summary>
+    public static bool Runs(bool craftingType,bool replayedFromQueue,bool nowQueued)=>craftingType && (replayedFromQueue || !nowQueued);
+
     /// <summary>One action the game accepted (null: not a crafting action of the model).</summary>
     public void Observe(CraftActionKind? kind)
     {

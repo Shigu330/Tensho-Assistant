@@ -42,8 +42,10 @@ internal static class HoverPrices343Tests
             var reader = Read("Items/ItemHoverReader.Dalamud.cs");
             Check(reader.Contains("held && !refreshHeld",StringComparison.Ordinal) && reader.Contains("configuration.HoverPriceRefresh",StringComparison.Ordinal),"one request per press, setting honoured");
             Check(reader.Contains("slot->ItemId==id",StringComparison.Ordinal) && reader.Contains("DetailKind.InventoryItem",StringComparison.Ordinal),"stack only from the player's own slot holding that item");
-            Check(Read("Market/ItemHoverCoordinator.cs").Contains("if(!tracker.TakeRequest(now))return null;\n            if(refresh)",StringComparison.Ordinal)
-                || Read("Market/ItemHoverCoordinator.cs").Contains("if(!tracker.TakeRequest(now))return null;\r\n            if(refresh)",StringComparison.Ordinal),"refresh still bounded by the 5 s hover cadence");
+            var coordinator=Read("Market/ItemHoverCoordinator.cs").Replace("\r\n","\n");
+            Check(coordinator.Contains("refreshWanted|=refresh;") && coordinator.Contains("if(!refreshWanted && cached is not null && market.IsFresh(cached,now))return null;\n            if(!tracker.TakeRequest(now))return null;"),"0.524: the press waits for the 5 s bound, and only a real request takes it");
+            Check(coordinator.Contains("market.CancelBackground();refreshWanted=false;"),"another item forgets the press");
+            Check(Read("MainWindow.MarketHover.cs").Contains("prices.FetchedAt.ToLocalTime().ToString(\"G\")"),"the seconds show that it changed");
         }),
     ];
 }
