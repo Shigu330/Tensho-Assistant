@@ -67,6 +67,7 @@
     <Compile Include="../../src/TenshoAssistant/FreeCompany/AirshipPlanner.cs" Link="FreeCompany/AirshipPlanner.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/VesselBuilds.cs" Link="FreeCompany/VesselBuilds.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/GearCatalog.cs" Link="Gear/GearCatalog.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gear/GearPlanSets.cs" Link="Gear/GearPlanSets.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/GearWear.cs" Link="Gear/GearWear.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/GearCompare.cs" Link="Gear/GearCompare.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/Gearsets.cs" Link="Gear/Gearsets.cs" />

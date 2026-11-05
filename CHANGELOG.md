@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.593.0
+- Plan global, T25 : Page Équipement : plusieurs plans nommés par job. Liste des plans, nouveau plan (copie de l'actuel), renommer, supprimer ; en prendre un garde l'actuel tel quel, et le code de partage donne le plan affiché.
+- Tests : Gear plans. Verify.ps1 (agent) : 1074/1074, 0 avertissement, 0 erreur ; DLL 0.593.0.0. Non validé en jeu.
+### English
+- Gear page: several named plans per job. A list of plans, new plan (a copy of the current one), rename, delete; taking one keeps the current one as it is, and the share code gives the plan shown.
+
 ## 0.592.0
 - Plan global, C21 : Nouvel onglet « Que puis-je fabriquer ? » dans Artisanat : sur un clic, les recettes que les sacs et la Banque enregistrée peuvent fabriquer maintenant, avec le nombre de fabrications, filtrées par métier et niveau. Ingrédients directs seulement ; un stock jamais vu n'est pas compté comme zéro.
 - Tests : From stock. Verify.ps1 (agent) : 1069/1069, 0 avertissement, 0 erreur ; DLL 0.592.0.0. Non validé en jeu.

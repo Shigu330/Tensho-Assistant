@@ -205,6 +205,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T25 — Équipement : plusieurs plans nommés par job
 
+- **État (relu le 2026-11-05)** : FAIT 0.593.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Configuration.cs`.
 - **Ce que le joueur obtient** : Pour un même job, vous gardez « montée de niveau », « artisanat » et « meilleur possible », et passez de l'un à l'autre ; chacun se partage par code.
 - **Comment, taille, dépendances** : Liste nommée par job (nom, pièces, matérias) et choix du plan actif. Migration de l'ancien plan en « Plan 1 », avec test. Dupliquer, renommer, supprimer ; l'infobulle dit que la suppression est immédiate (règle 0.325). Taille S-M. Dépendances : aucune. Sonde : aucune. Décision : nombre maximum de plans (recommandé : 10 par job).

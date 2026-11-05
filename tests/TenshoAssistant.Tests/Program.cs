@@ -997,6 +997,7 @@ tests = tests.Concat(CraftFollow589Tests.Cases).ToArray();
 tests = tests.Concat(CraftPresets590Tests.Cases).ToArray();
 tests = tests.Concat(CraftChain591Tests.Cases).ToArray();
 tests = tests.Concat(CraftFromStock592Tests.Cases).ToArray();
+tests = tests.Concat(GearPlanSets593Tests.Cases).ToArray();
 tests = tests.Concat(SelfCheckTests.Cases).ToArray();
 tests = tests.Concat(HelpTests.Cases).ToArray();
 tests = tests.Concat(RetainerSalesTests.Cases).ToArray();
