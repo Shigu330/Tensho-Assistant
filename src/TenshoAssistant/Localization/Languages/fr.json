@@ -1836,6 +1836,17 @@
     "Progress": "Même relevé : {0:N0} en cours · {1:N0} terminées · {2:N0} non confirmées"
   },
   "MapsUi": {
+    "FindHint": "Chercher sur les cartes : lieu, éthérite, PNJ, quête, ressource…",
+    "FindTip": "Cherche sur toutes les cartes, à partir de deux lettres. Un clic ouvre la carte Tensho centrée sur le résultat. Les donneurs de quête sont ceux de votre liste de quêtes.",
+    "FindLoading": "Préparation de la recherche…",
+    "FindCount": "{0} résultats",
+    "FindMore": "Les {0} premiers résultats sur {1} : ajoutez un mot pour préciser.",
+    "FindPlace": "Lieu",
+    "FindAetheryte": "Éthérite",
+    "FindVendor": "Vendeur",
+    "FindTriad": "Triple Triad",
+    "FindQuest": "Quête",
+    "FindResource": "Ressource",
     "PastedGroup": "Coordonnées collées",
     "PastedImported": "{0} favori(s) ajouté(s) depuis des coordonnées, {1} déjà présent(s), {2} ligne(s) au lieu inconnu.",
     "Group": "Groupe (facultatif)",

@@ -91,7 +91,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
-| P10 | Recherche sur la carte (lieux, éthérites, PNJ, quêtes, ressources) | M | Depuis la section Carte du plugin, pas depuis la carte. |
+| P10 | ~~Recherche sur la carte (lieux, éthérites, PNJ, quêtes, ressources)~~ fait en 0.597 | M | Depuis la section Carte du plugin, pas depuis la carte. |
 | P12 | ~~Noms écrits à côté des icônes, comme la carte du jeu~~ fait en 0.596 | M |  |
 | I1 | ~~Signaler et effacer le relevé d'un servant renvoyé ou d'un ancien rangement~~ fait en 0.576 | S-M |  |
 | I3 | ~~Prix des marchands PNJ dans le coût de préparation et sur la page Marché~~ fait en 0.575 | S-M |  |

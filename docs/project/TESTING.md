@@ -836,6 +836,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.596) Comparer une carte Tensho et celle du jeu : les noms doivent être du même côté de leurs icônes. Essayer la case « Noms des icônes » et le zoom minimal.
 
+- [ ] (0.597) Section Carte : chercher un lieu, une éthérite, un vendeur, un PNJ de Triple Triad, une quête et une ressource, cliquer chacun et vérifier le centre de la carte.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

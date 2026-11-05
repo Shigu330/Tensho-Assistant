@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.597.0
+- Plan global, P10 : Section Carte du plugin : un champ cherche sur toutes les cartes un lieu, une éthérite, un vendeur, un PNJ de Triple Triad, un donneur de quête ou une ressource ; un clic ouvre la carte Tensho centrée sur le résultat, sans poser de drapeau. Liste préparée hors de l'affichage.
+- Tests : Map search. Verify.ps1 (agent) : 1087/1087, 0 avertissement, 0 erreur ; DLL 0.597.0.0. Non validé en jeu.
+### English
+- Plugin's Maps section: a field searches every map for a place, an aetheryte, a vendor, a Triple Triad NPC, a quest giver or a resource; a click opens the Tensho map centred on the result, without a flag. The list is prepared off the frame.
+
 ## 0.596.0
 - Plan global, P12 : Carte : les noms que le jeu écrit à côté de certaines icônes (éthérites, lieux importants) sont écrits sur la carte Tensho, du même côté, à partir du même zoom que les noms de lieux ; case « Noms des icônes » pour les retirer. Le côté vient de MapMarker.SubtextOrientation, mesuré sur les données du jeu (preuve : docs/evidence/0.596-map-label-orientation.md), à confirmer en jeu.
 - Tests : Map labels. Verify.ps1 (agent) : 1083/1083, 0 avertissement, 0 erreur ; DLL 0.596.0.0. Non validé en jeu.

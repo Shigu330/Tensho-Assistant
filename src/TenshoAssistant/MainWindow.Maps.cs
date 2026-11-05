@@ -30,6 +30,8 @@ internal sealed partial class MainWindow
             return;
         }
         if (ImGui.Button(localization.Get("MapView.OpenCurrent"))) OpenMapView(0);
+        // P10 (0.597): search everything on every map, from here rather than from the map.
+        DrawMapFind(catalog);
         DrawMapBookmarks(catalog);
         DrawChatMapLinks(catalog);
         // N-15 (0.442): hunt train recorder.

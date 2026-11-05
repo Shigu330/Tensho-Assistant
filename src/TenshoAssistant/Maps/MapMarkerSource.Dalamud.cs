@@ -31,18 +31,25 @@ internal sealed class MapMarkerSource
     {
         if(range==0 || failed.Contains(range))return [];
         if(cache.TryGetValue(range,out var known))return known;
-        var markers=new List<MapIconMarker>();
-        try
-        {
-            if(data.GetSubrowExcelSheet<MapMarker>().TryGetRow(range,out var rows))
-                foreach(var row in rows)
-                {
-                    var label=row.PlaceNameSubtext.RowId!=0 ? row.PlaceNameSubtext.Value.Name.ExtractText():"";
-                    if(row.Icon!=0 || label.Length>0)markers.Add(new(row.X,row.Y,row.Icon,label,row.DataType==1 ? row.DataKey.RowId:0,row.DataType==3 ? row.DataKey.RowId:0,row.SubtextOrientation));
-                }
-        }
+        try{return cache[range]=Copy(range);}
         catch(Exception error){log.Warning(error,"Map markers unavailable for range {0}.",range);failed.Add(range);return [];}
-        return cache[range]=markers.AsReadOnly();
+    }
+    /// <summary>0.597 (P10): the markers with a name, for work off the frame: touches neither the frame's cache nor its failures.</summary>
+    public IReadOnlyList<MapIconMarker> Read(uint range)
+    {
+        try{return range==0 ? []:Copy(range).Where(marker=>marker.Label.Length>0).ToArray();}
+        catch(Exception error){log.Warning(error,"Map markers unavailable for range {0}.",range);return [];}
+    }
+    private IReadOnlyList<MapIconMarker> Copy(uint range)
+    {
+        var markers=new List<MapIconMarker>();
+        if(data.GetSubrowExcelSheet<MapMarker>().TryGetRow(range,out var rows))
+            foreach(var row in rows)
+            {
+                var label=row.PlaceNameSubtext.RowId!=0 ? row.PlaceNameSubtext.Value.Name.ExtractText():"";
+                if(row.Icon!=0 || label.Length>0)markers.Add(new(row.X,row.Y,row.Icon,label,row.DataType==1 ? row.DataKey.RowId:0,row.DataType==3 ? row.DataKey.RowId:0,row.SubtextOrientation));
+            }
+        return markers.AsReadOnly();
     }
 
     public bool OverviewsFailed{get;private set;}

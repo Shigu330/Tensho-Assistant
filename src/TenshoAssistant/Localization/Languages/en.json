@@ -1836,6 +1836,17 @@
     "Progress": "Same snapshot: {0:N0} in progress · {1:N0} completed · {2:N0} unconfirmed"
   },
   "MapsUi": {
+    "FindHint": "Find on the maps: place, aetheryte, NPC, quest, resource…",
+    "FindTip": "Searches every map, from two letters. A click opens the Tensho map centred on the result. Quest givers are those of your journal list.",
+    "FindLoading": "Preparing the search…",
+    "FindCount": "{0} results",
+    "FindMore": "The first {0} of {1} results: add a word to narrow it down.",
+    "FindPlace": "Place",
+    "FindAetheryte": "Aetheryte",
+    "FindVendor": "Vendor",
+    "FindTriad": "Triple Triad",
+    "FindQuest": "Quest",
+    "FindResource": "Resource",
     "PastedGroup": "Pasted coordinates",
     "PastedImported": "{0} bookmark(s) added from coordinates, {1} already there, {2} line(s) with an unknown place.",
     "Group": "Group (optional)",

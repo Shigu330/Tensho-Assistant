@@ -88,6 +88,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P10 — Recherche sur la carte (lieux, éthérites, PNJ, quêtes, ressources)
 
+- **État (relu le 2026-11-05)** : FAIT 0.597.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Un champ de recherche dans la fenêtre de la carte trouve un nom de lieu, une éthérite, un PNJ vendeur ou de Triple Triad, un donneur de quête ou une ressource de récolte, sur toutes les cartes. Un clic ouvre la bonne carte, la centre et pose le drapeau.
 - **Comment, taille, dépendances** : Index de recherche construit une seule fois hors Draw (sur un worker), à partir des données déjà en cache : libellés MapMarker de toutes les plages, index local (quêtes, récolte), catalogue des PNJ vendeurs, PNJ Triple Triad. Liste de résultats bornée, avec clipper. Bouton loupe dans la colonne d'outils. Taille M. Sonde seulement pour l'éthernet (sens de la clé DataType 4). Une décision : périmètre des types cherchés (recommandé : tout sauf l'éthernet tant qu'il n'est pas sondé).
