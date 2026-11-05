@@ -21,6 +21,10 @@ for seed in sorted(seeds, key=lambda row: row["Index"]):
     grow = time.get("GrowTime", time.get("GrowthTime"))
     assert isinstance(grow, int) and grow > 0, seed
     lines.append(f"{seed['Seed']['Id']},{seed['Item']['Id']},{grow},{int(time['WiltTime'])}")
+# 0.540: a game row the source does not have yet (docs/evidence/0.540-cornflower-seed.md).
+if not any(seed["Seed"]["Id"] == 51189 for seed in seeds):
+    lines.append("# Not in the source: GardeningSeed row 108 (0.540, docs/evidence/0.540-cornflower-seed.md). Ids from the game; 24 h, no wilting: what the source gives for all 26 other pot flowers.")
+    lines.append("51189,51190,24,0")
 open(os.path.join(output, "garden-seeds.csv"), "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
 
 crosses = json.load(open(cross_file, encoding="utf-8"))

@@ -13,7 +13,8 @@ internal static class GardenSeeds449Tests
             var csv=Read("Reminders/Data/garden-seeds.csv");
             Check(csv.Contains("# Source: Lotlab/FFXIV-Gardening-Tracker") && csv.Contains("GNU General Public License v3.0"),"source and licence in the header");
             var seeds=GardenSeeds.Read(new StringReader(csv));
-            Check(seeds.Count==107 && seeds.Select(seed=>seed.SeedId).Distinct().Count()==107,"107 seeds");
+            Check(seeds.Single(seed=>seed.SeedId==51189) is {HarvestId:51190,GrowHours:24,WiltHours:0},"0.540: cornflower seeds, GardeningSeed row 108");
+            Check(seeds.Count==108 && seeds.Select(seed=>seed.SeedId).Distinct().Count()==108,"108 seeds");
             var pepper=seeds.Single(seed=>seed.SeedId==7715);
             Check(pepper.HarvestId==4785 && GardenSeeds.GrowHours(pepper)==120 && GardenSeeds.TendHours(pepper)==48,"paprika seeds 120 h, wilt after 48 h");
             Check(seeds.Any(seed=>seed.WiltHours==0) && seeds.Where(seed=>seed.WiltHours==0).All(seed=>GardenSeeds.TendHours(seed)==0),"no wilting: no tending reminder");
