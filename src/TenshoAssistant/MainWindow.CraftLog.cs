@@ -56,6 +56,7 @@ internal sealed partial class MainWindow
     }
     internal void DrawCraftLogHelper()
     {
+        if(!windowDisposed && configuration.CraftLogHelperEnabled && craftLog.Error is not null)DrawReadFailedPanel("TenshoCraftLogFailed","RecipeNote","CraftLog");
         var now=DateTimeOffset.UtcNow;var observed=craftLog.Observation;
         if(windowDisposed || !configuration.CraftLogHelperEnabled || observed is null || observed.Revision!=craftLog.Revision || !observed.Fresh(now))
         {ClearCraftLogCalculation();return;}
@@ -79,7 +80,7 @@ internal sealed partial class MainWindow
         Panels?.Show("TenshoCraftLog",localization.Get("CraftLogUi.Title"),ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoResize,()=>{ImGui.SetNextWindowPos(position,ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(width,height),ImGuiCond.Always);},()=>
         {
             // 0.469 (user request, in-game campaign): the panel in sections (recipe, your state, target, result), figures in a table, explanations in the tooltips of « (?) ».
-            if(context.Recipe is { } selected)DrawCraftLogTitle(selected);
+            if(context.Recipe is { } selected){DrawCraftLogTitle(selected);DrawRecipeFacts(selected);}
             DrawToolSettingsLink("CraftLog");
             if(context.Recipe is { } forSimulator)
             {

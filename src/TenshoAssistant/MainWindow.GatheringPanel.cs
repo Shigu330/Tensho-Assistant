@@ -35,6 +35,7 @@ internal sealed partial class MainWindow
     internal void DrawGatheringPanel()
     {
         var observed=gatheringObservation.State;
+        if(!windowDisposed && configuration.GatheringPanel && observed.Status==GatheringObservationStatus.Error)DrawReadFailedPanel("TenshoGatheringFailed","Gathering","Gathering");
         // 0.330: the node's opening values are forgotten when its window closes; a gather or an action only makes the reading « not ready ».
         if(windowDisposed || !configuration.GatheringPanel || observed.Status is not (GatheringObservationStatus.Observed or GatheringObservationStatus.NotReady))gatheringPanelStart=null;
         if(windowDisposed || !configuration.GatheringPanel || gatheringObservation.Window is not { } window

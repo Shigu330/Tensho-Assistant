@@ -5886,6 +5886,13 @@
     "Item": "requires: {0}",
     "Status": "requires status: {0}"
   },
+  "ReadFailed": {
+    "Panel": "{0}: unavailable, perhaps after a game update. See Diagnostics.",
+    "Diagnostics": "Readings unavailable, perhaps after a game update: {0}. The cause is in the Dalamud log.",
+    "CraftLog": "Crafting log help",
+    "CraftLive": "Live synthesis",
+    "Gathering": "Gathering help"
+  },
   "CraftReadiness": {
     "NoSet": "No {0} gear set in the game.",
     "Level": "Level {0} (you: {1})",

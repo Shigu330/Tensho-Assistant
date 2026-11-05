@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.601.0
+- Plan global, C36 : Si la lecture du carnet, de la synthèse ou de la récolte échoue, une courte ligne « indisponible » apparaît à côté de la fenêtre du jeu au lieu de rien, et Diagnostics nomme la lecture. La pêche n'est pas couverte. Aussi : la ligne de faits de C14 dans le panneau du carnet.
+- Tests : Failed reading. Verify.ps1 (agent) : 1099/1099, 0 avertissement, 0 erreur ; DLL 0.601.0.0. Non validé en jeu.
+### English
+- If reading the crafting log, the synthesis or gathering fails, a short « unavailable » line appears beside the game's window instead of nothing, and Diagnostics names the reading. Fishing is not covered. Also: C14's facts line in the Crafting Log panel.
+
 ## 0.600.0
 - Plan global, C14 : La recette dit, sur la fiche objet et dans le simulateur : HQ possible ou non, synthèse rapide et ses minimums, livre de maître, spécialiste, recette experte, objet et état requis, depuis la feuille Recipe du jeu. L'écart chiffré existait déjà dans le simulateur (A-12). Pas fait : savoir si le livre est lu, et l'affichage dans le panneau du carnet.
 - Tests : Recipe facts. Verify.ps1 (agent) : 1097/1097, 0 avertissement, 0 erreur ; DLL 0.600.0.0. Non validé en jeu.

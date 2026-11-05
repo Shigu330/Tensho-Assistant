@@ -292,6 +292,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C36 — G16 — R-14, partie artisanat et récolte : une aide illisible le dit au lieu de disparaître
 
+- **État (relu le 2026-11-05)** : FAIT 0.601.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/Craft/CraftLogReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Après une mise à jour du jeu, le panneau du carnet, l'aide à la récolte ou la synthèse en direct affichent « indisponible après une mise à jour du jeu » à leur place habituelle, et Diagnostics dit quelle lecture a échoué. Aujourd'hui, le panneau disparaît sans rien dire.
 - **Comment, taille, dépendances** : Statut par lecteur (carnet, synthèse, récolte, pêche) publié avec l'état, court message traduit à l'emplacement du panneau, ligne dans Diagnostics. Taille S. Dépendances : passage complet R-14 à l'étape g2. Sonde : aucune. Décision : aucune.

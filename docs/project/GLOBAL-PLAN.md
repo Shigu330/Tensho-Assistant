@@ -73,7 +73,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | C31 | ~~Météo de plusieurs zones en un tableau (zones favorites)~~ fait en 0.563 | S |  |
 | C32 | ~~Commandes « /tensho recolte » et « /tensho recette » (suite de I16)~~ fait en 0.555 | S |  |
 | C35 | Aide à la pêche : lectures du jeu et premières tables hors de Draw | S |  |
-| C36 | R-14, partie artisanat et récolte : une aide illisible le dit au lieu de disparaître | S |  |
+| C36 | ~~R-14, partie artisanat et récolte : une aide illisible le dit au lieu de disparaître~~ fait en 0.601 | S |  |
 | T3 | ~~Quêtes : colonnes Niveau et Zone, tri et filtre de niveau~~ fait en 0.550 | S |  |
 | T4 | ~~Monstres : drapeau sur la position du monstre, pas au centre de la carte~~ fait en 0.551 | S |  |
 | T16 | ~~Tâches de servants : une ligne par servant, avec alarme~~ fait en 0.570 | S |  |

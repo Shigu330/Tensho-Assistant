@@ -92,6 +92,7 @@ internal sealed partial class MainWindow
     {
         if(windowDisposed || !configuration.CraftLivePanel)return;
         var state=craftLive.State;
+        if(state.Status==CraftLiveStatusKind.Error){DrawReadFailedPanel("TenshoCraftLiveFailed","Synthesis","CraftLive");return;}
         if(state.Frame is null)return;
         var addon=gameGui.GetAddonByName("Synthesis");
         if(addon.IsNull || !addon.IsVisible)return;

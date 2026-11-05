@@ -5886,6 +5886,13 @@
     "Item": "demande : {0}",
     "Status": "demande l'état : {0}"
   },
+  "ReadFailed": {
+    "Panel": "{0} : indisponible, peut-être après une mise à jour du jeu. Voir Diagnostics.",
+    "Diagnostics": "Lectures indisponibles, peut-être après une mise à jour du jeu : {0}. La cause est dans le journal Dalamud.",
+    "CraftLog": "Aide du carnet",
+    "CraftLive": "Synthèse en direct",
+    "Gathering": "Aide à la récolte"
+  },
   "CraftReadiness": {
     "NoSet": "Aucun ensemble d’équipement {0} dans le jeu.",
     "Level": "Niveau {0} (vous : {1})",
