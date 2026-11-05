@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
             DrawTriadSelDeckOdds(decks);
         }
         if(!request.Window.Valid)return;
-        Panels?.Show("TenshoTriadRequest",localization.Get("TriadRequest.Title"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse,()=>{ImGui.SetNextWindowPos(new Vector2(request.Window.X+request.Window.Width+8,request.Window.Y),ImGuiCond.Always);ImGui.SetNextWindowSizeConstraints(new Vector2(300,0),new Vector2(420,900));},()=>
+        Panels?.Show("TenshoTriadRequest",localization.Get("TriadRequest.Title"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse,()=>{ImGui.SetNextWindowPos(new Vector2(request.Window.X+request.Window.Width+8,request.Window.Y)+WindowMoved("TripleTriadRequest",request.Window.X,request.Window.Y),ImGuiCond.Always);ImGui.SetNextWindowSizeConstraints(new Vector2(300,0),new Vector2(420,900));},()=>
         {
             ImGui.TextColored(Accent,request.NpcName.Length>0 ? request.NpcName:localization.Get("TriadRequest.UnknownNpc"));
             if(!request.RulesKnown){ImGui.TextWrapped(localization.Get("TriadRequest.RulesUnknown"));return;}

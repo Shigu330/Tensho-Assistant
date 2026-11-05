@@ -33,7 +33,7 @@ internal sealed partial class MainWindow
     internal void DrawCollectablePanel()
     {
         if(windowDisposed || !configuration.GatheringPanel || Collectables?.Frame is not { } frame)return;
-        Panels?.Show("TenshoCollectablePanel",localization.Get("CollectablePanel.Title"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.AlwaysAutoResize,()=>{ImGui.SetNextWindowPos(new Vector2(frame.X+frame.Width+6,frame.Y),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(360,0),ImGuiCond.Always);},()=>
+        Panels?.Show("TenshoCollectablePanel",localization.Get("CollectablePanel.Title"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.AlwaysAutoResize,()=>{ImGui.SetNextWindowPos(new Vector2(frame.X+frame.Width+6,frame.Y)+WindowMoved("GatheringMasterpiece",frame.X,frame.Y),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(360,0),ImGuiCond.Always);},()=>
         {
             // 0.478: the game's window cuts long names; the rules hold the whole one.
             if(!ReferenceEquals(collectableTurnRaw,frame.RawValues)){collectableTurnRaw=frame.RawValues;collectableTurn=CollectableTurn.Parse(frame.RawValues);}

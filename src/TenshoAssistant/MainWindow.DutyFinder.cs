@@ -32,7 +32,7 @@ internal sealed partial class MainWindow
         if(windowDisposed || !configuration.ShowDutyFinderLoot || dutyFinder?.Selection is not { } selection || dutyFinderLoot is not { } loot)return;
         // 0.207: no panel for a roulette (no fixed loot) or when no duty is selected.
         if(selection.Kind!=2 || selection.Id==0)return;
-        Panels?.Show("TenshoDutyFinder",localization.Get("DutyFinder.Title"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove,()=>{ImGui.SetNextWindowPos(new Vector2(selection.X+selection.Width+6,selection.Y),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(400,Math.Max(320,selection.Height)),ImGuiCond.Always);},()=>
+        Panels?.Show("TenshoDutyFinder",localization.Get("DutyFinder.Title"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove,()=>{ImGui.SetNextWindowPos(new Vector2(selection.X+selection.Width+6,selection.Y)+WindowMoved("ContentsFinder",selection.X,selection.Y),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(400,Math.Max(320,selection.Height)),ImGuiCond.Always);},()=>
         {
             if(selection.Kind==1)
             {

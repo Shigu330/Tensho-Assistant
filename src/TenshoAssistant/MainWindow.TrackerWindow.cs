@@ -65,7 +65,11 @@ internal sealed partial class MainWindow
         return UI.GameWindows.Covers(GameWindowList,at.X,at.Y,size.X,size.Y,screen.X,screen.Y);
     }
     internal bool BarBehindGame(Vector2 at,Vector2 size)=>configuration.HideBarsBehindGame && BehindGame(at,size);
-    internal bool MapBehindGame(Vector2 at,Vector2 size)=>configuration.MapView.HideBehindGame && BehindGame(at,size);
+    // 0.539 (user report): a panel attached to a game window goes with it: it hides the map as the window does.
+    internal bool MapBehindGame(Vector2 at,Vector2 size)=>configuration.MapView.HideBehindGame && (BehindGame(at,size) || Panels?.Over(at,size)==true);
+    /// <summary>0.539: where a game window is now against where its reader saw it, for the panels that follow it.</summary>
+    internal Func<string,float,float,Vector2>? GameWindowFollow { get; set; }
+    internal Vector2 WindowMoved(string addon,float x,float y)=>GameWindowFollow is { } follow ? follow(addon,x,y)-new Vector2(x,y):Vector2.Zero;
     /// <summary>0.516: the panels attached to a game window.</summary>
     internal AttachedPanels? Panels { get; set; }
     internal void PanelFailed(string name,Exception error)=>log.Error(error,$"Overlay {name} turned off until the plugin reloads (perhaps after a game update).");

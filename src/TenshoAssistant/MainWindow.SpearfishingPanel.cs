@@ -16,7 +16,7 @@ internal sealed partial class MainWindow
     internal void DrawSpearfishingPanel()
     {
         if(windowDisposed || !configuration.FishingPanel || Spearfishing?.Frame is not { } frame)return;
-        Panels?.Show("TenshoSpearfishingPanel",localization.Get("Spearfishing.Title"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.AlwaysAutoResize,()=>{ImGui.SetNextWindowPos(new Vector2(frame.X+frame.Width+6,frame.Y),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(340,0),ImGuiCond.Always);},()=>
+        Panels?.Show("TenshoSpearfishingPanel",localization.Get("Spearfishing.Title"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.AlwaysAutoResize,()=>{ImGui.SetNextWindowPos(new Vector2(frame.X+frame.Width+6,frame.Y)+WindowMoved("SpearFishing",frame.X,frame.Y),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(340,0),ImGuiCond.Always);},()=>
         {
             gatherBuddyFish?.Request();
             var data=gatherBuddyFish?.State.Data;

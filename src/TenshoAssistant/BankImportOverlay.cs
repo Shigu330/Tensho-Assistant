@@ -10,6 +10,8 @@ namespace TenshoAssistant;
 internal sealed class BankImportOverlay(InventoryBankService bank, BankInventoryBridge bridge, LocalizationManager localization)
 {
     public AttachedPanels? Panels { get; set; }
+    /// <summary>0.539: where a game window is now, for the panel that follows it.</summary>
+    public Func<string, float, float, Vector2>? Follow { get; set; }
 
     public void Draw()
     {
@@ -23,7 +25,8 @@ internal sealed class BankImportOverlay(InventoryBankService bank, BankInventory
     private void DrawPanel(string id, BankMenuContext context, BankMenuContext? premium, string? message)
     {
         var viewport = ImGui.GetMainViewport();
-        var position = viewport.Pos + context.Anchor;
+        var moved = context.AddonName.Length > 0 && Follow is { } follow ? follow(context.AddonName, context.AddonAt.X, context.AddonAt.Y) - context.AddonAt : Vector2.Zero;
+        var position = viewport.Pos + context.Anchor + moved;
         var minimum = viewport.WorkPos;
         var maximum = Vector2.Max(minimum, viewport.WorkPos + viewport.WorkSize - new Vector2(330, premium is null ? 170 : 240));
         position = Vector2.Clamp(position, minimum, maximum);

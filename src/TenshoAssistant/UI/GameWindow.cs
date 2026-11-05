@@ -22,8 +22,23 @@ public static class GameWindows
             if(window.Width<=0 || window.Height<=0 || window.Width>=screenWidth*0.9f && window.Height>=screenHeight*0.9f)continue;
             if(anchors?.Any(anchor=>window.Name.StartsWith(anchor,StringComparison.Ordinal))==true)continue;
             if(home is { } rank && window.Rank<=rank)continue;
-            if(x<window.X+window.Width && window.X<x+width && y<window.Y+window.Height && window.Y<y+height)return true;
+            if(Touch(x,y,width,height,window.X,window.Y,window.Width,window.Height))return true;
         }
         return false;
+    }
+
+    public static bool Touch(float x,float y,float width,float height,float otherX,float otherY,float otherWidth,float otherHeight)=>
+        x<otherX+otherWidth && otherX<x+width && y<otherY+otherHeight && otherY<y+height;
+}
+
+/// <summary>0.539 (user request): an interface leaves at once and comes back only after a moment with nothing in front, so that going from one tooltip to the next does not make it blink.</summary>
+public sealed class StepAside(TimeSpan hold)
+{
+    private TimeSpan? lastCovered;
+
+    public bool Hidden(bool covered,TimeSpan now)
+    {
+        if(covered){lastCovered=now;return true;}
+        return lastCovered is { } last && now-last<hold;
     }
 }

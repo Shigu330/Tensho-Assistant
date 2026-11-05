@@ -3,6 +3,15 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.539.0
+- Rapport de l'utilisateur en jeu : en déplaçant une fenêtre du jeu, le panneau de Tensho lié à elle suivait avec du retard, car sa position venait des lecteurs, rafraîchis 5 fois par seconde (1 fois pour le personnage). Un nouveau lecteur `UI/GameWindowFollower.Dalamud.cs` relit à chaque tick la seule position des fenêtres dont un panneau est affiché ; rien n'est lu quand aucun panneau ne le demande. Panneaux concernés : récolte, objets de collection, pêche au harpon, personnage, mission, carnet d'artisanat, Fashion Report, Triple Triade, import de banque.
+- Rapport de l'utilisateur en jeu : nos panneaux liés ne faisaient pas disparaître la carte (réglage « S'effacer devant les fenêtres du jeu »), alors que leur fenêtre le fait. Ils comptent maintenant, ainsi que le panneau de survol ; les panneaux placés librement (pêche, voyage en mer) ne comptent pas. Précision de l'utilisateur : la fenêtre principale de Tensho ne doit pas faire disparaître la carte ; c'est le cas, et un test le garde.
+- Demande de l'utilisateur : un délai avant le retour de la carte : elle part aussitôt et revient 1 seconde après que plus rien n'est devant, pour ne pas clignoter d'une infobulle à l'autre. Les autres panneaux et les barres ne changent pas.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1004/1004, 0 avertissement, 0 erreur ; DLL 0.539.0.0. Non validé en jeu.
+### English
+- Attached panels now follow their game window every tick instead of lagging behind it when it moves.
+- The map also steps aside for attached panels, and comes back one second after nothing is in front of it.
+
 ## 0.538.0
 - Rapport de l'utilisateur en jeu (capture) : l'infobulle d'un objet du jeu passait sous la carte, car 0.537 ignorait les infobulles et les menus. Ils comptent maintenant comme les fenêtres. Le panneau de survol de Tensho, lui, reste affiché avec l'infobulle. 0.537 validée sur les fenêtres (« fenêtre ok »).
 - Tests : Interfaces535Tests adapté. Verify.ps1 (agent) : 1003/1003, 0 avertissement, 0 erreur ; DLL 0.538.0.0. Non validé en jeu.

@@ -18,7 +18,10 @@ internal sealed class MapViewWindow : Window
     }
 
     // 0.537 (user request): on its setting, the map steps aside when a game window comes in front; its open state does not change.
-    public override bool DrawConditions() => owner.MapViewVisible() && !(lastPosition is { } at && owner.MapBehindGame(at, lastSize));
+    // 0.539 (user request): it comes back a moment after.
+    public override bool DrawConditions() => owner.MapViewVisible() && !aside.Hidden(lastPosition is { } at && owner.MapBehindGame(at, lastSize), System.Diagnostics.Stopwatch.GetElapsedTime(Started));
+    private static readonly long Started = System.Diagnostics.Stopwatch.GetTimestamp();
+    private readonly UI.StepAside aside = new(TimeSpan.FromSeconds(1));
     private System.Numerics.Vector2? lastPosition;
     private System.Numerics.Vector2 lastSize;
     public override void PreDraw() => owner.PrepareMapView(this);

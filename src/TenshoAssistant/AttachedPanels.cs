@@ -42,6 +42,15 @@ internal sealed class AttachedPanels : IDisposable
         return UI.GameWindows.Covers(owner.GameWindowList, position.X, position.Y, size.X, size.Y, screen.X, screen.Y, Anchors.GetValueOrDefault(id));
     }
 
+    /// <summary>0.539: whether a panel on screen that goes with a game window touches this place. The panels placed freely do not count: they are where the player wants them.</summary>
+    public bool Over(Vector2 at, Vector2 size)
+    {
+        foreach (var window in all.Values)
+            if (window.Request is not null && !window.Hidden && window.LastPosition is { } position && (window.Key == HoverPanel || Anchors.ContainsKey(window.Key))
+                && UI.GameWindows.Touch(at.X, at.Y, size.X, size.Y, position.X, position.Y, window.LastSize.X, window.LastSize.Y)) return true;
+        return false;
+    }
+
     /// <param name="prepare">The window's position and size (SetNextWindow…), run just before the window opens.</param>
     /// <param name="close">What the close button does; none means no close button.</param>
     /// <param name="padding">The window's padding, when it is not the theme's.</param>

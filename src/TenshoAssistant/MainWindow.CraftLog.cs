@@ -72,8 +72,9 @@ internal sealed partial class MainWindow
         if(CraftLogSession.ShouldStart(input,craftLogStarted,now-craftLogStableSince,configuration.CraftLogAutoSolve,craftLogRequested))
         {craftLogStarted=true;_=craftLogSession.StartAsync(input,craftLogForceRefresh);craftLogForceRefresh=false;}
         var viewport=ImGui.GetMainViewport();var width=Math.Min(380,viewport.WorkSize.X);var height=Math.Min(720,viewport.WorkSize.Y);
-        var position=viewport.Pos+observed.Position+new Vector2(observed.Size.X+6,0);
-        if(position.X+width>viewport.WorkPos.X+viewport.WorkSize.X)position.X=viewport.Pos.X+observed.Position.X-width-6;
+        var logAt=observed.Position+WindowMoved("RecipeNote",observed.Position.X,observed.Position.Y);
+        var position=viewport.Pos+logAt+new Vector2(observed.Size.X+6,0);
+        if(position.X+width>viewport.WorkPos.X+viewport.WorkSize.X)position.X=viewport.Pos.X+logAt.X-width-6;
         position=Vector2.Clamp(position,viewport.WorkPos,Vector2.Max(viewport.WorkPos,viewport.WorkPos+viewport.WorkSize-new Vector2(width,height)));
         Panels?.Show("TenshoCraftLog",localization.Get("CraftLogUi.Title"),ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoResize,()=>{ImGui.SetNextWindowPos(position,ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(width,height),ImGuiCond.Always);},()=>
         {

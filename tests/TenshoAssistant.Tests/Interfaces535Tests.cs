@@ -38,6 +38,24 @@ internal static class Interfaces535Tests
             Check(!Read("MainWindow.TrackerWindow.cs").Contains("NoCollapse") && !Read("MainWindow.PersonalTasks.cs").Contains("NoCollapse"),"free panels too");
             Check(!Read("BankImportOverlay.cs").Contains("NoDecoration"),"the bank panel has its title bar");
         }),
+        ("0.539: panels follow their game window every tick; the map leaves for them and comes back after a moment",() =>
+        {
+            var aside=new StepAside(TimeSpan.FromSeconds(1));
+            Check(!aside.Hidden(false,TimeSpan.Zero),"nothing in front");
+            Check(aside.Hidden(true,TimeSpan.FromSeconds(5)),"leaves at once");
+            Check(aside.Hidden(false,TimeSpan.FromSeconds(5.5)),"stays a moment");
+            Check(aside.Hidden(true,TimeSpan.FromSeconds(5.9)) && aside.Hidden(false,TimeSpan.FromSeconds(6.5)),"another tooltip starts the moment again");
+            Check(!aside.Hidden(false,TimeSpan.FromSeconds(7)),"comes back");
+            Check(GameWindows.Touch(0,0,10,10,5,5,10,10) && !GameWindows.Touch(0,0,10,10,10,0,10,10),"touching");
+            var follower=Read("UI/GameWindowFollower.Dalamud.cs");
+            Check(follower.Contains("if(wanted.IsEmpty)return;") && follower.Contains("now-asked>Stopwatch.Frequency") && follower.Contains("framework.Update-=OnUpdate"),"only what a panel asks, and cleaned");
+            foreach(var (file,addon) in new[]{("MainWindow.Character.cs","Character"),("MainWindow.GatheringPanel.cs","Gathering"),("MainWindow.CollectablePanel.cs","GatheringMasterpiece"),("MainWindow.SpearfishingPanel.cs","SpearFishing"),("MainWindow.DutyFinder.cs","ContentsFinder"),("MainWindow.TriadRequest.cs","TripleTriadRequest"),("MainWindow.CraftLog.cs","RecipeNote"),("MainWindow.FashionWeek.cs","FashionCheck")})
+                Check(Read(file).Contains($"WindowMoved(\"{addon}\","),"follows: "+addon);
+            Check(Read("BankImportOverlay.cs").Contains("follow(context.AddonName"),"bank panel follows");
+            Check(Read("MainWindow.TrackerWindow.cs").Contains("Panels?.Over(at,size)==true") && Read("AttachedPanels.cs").Contains("window.Key == HoverPanel || Anchors.ContainsKey(window.Key)"),"the map leaves for attached panels, not for free ones");
+            Check(!Read("MainWindow.cs").Contains("BehindGame") && !Read("MainWindow.cs").Contains("Panels?.Show") && !Read("AttachedPanels.cs").Contains("\"TenshoAssistant"),"the main Tensho window neither hides the map nor is hidden");
+            Check(Read("MapViewWindow.cs").Contains("aside.Hidden(lastPosition") && Read("MapViewWindow.cs").Contains("owner.MapBehindGame(at, lastSize)"),"the map uses the delay");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

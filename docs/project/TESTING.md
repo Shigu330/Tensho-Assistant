@@ -719,6 +719,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Les trois réglages (Paramètres, carte). Rien ne disparaît sans raison ; sinon, le journal de débogage dit quelle fenêtre compte.
 - [ ] (0.538) Une infobulle ou un menu du jeu qui touche la carte ou un panneau : il s'efface, puis revient. Passer la souris sur plusieurs objets ne le fait pas clignoter de façon gênante.
 
+- [ ] (0.539) Déplacer une fenêtre du jeu qui a un panneau de Tensho (récolte, carnet, personnage, mission) : le panneau la suit sans retard visible.
+- [ ] (0.539) Réglage de la carte activé : un panneau lié qui touche la carte la fait disparaître ; passer d'une infobulle à l'autre ne la fait pas clignoter, et elle revient environ 1 seconde après.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

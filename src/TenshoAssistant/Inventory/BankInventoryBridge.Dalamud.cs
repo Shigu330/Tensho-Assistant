@@ -7,7 +7,7 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace TenshoAssistant.Inventory;
 
-internal sealed record BankMenuContext(BankKey Key, string Name, string AddonName, Vector2 Anchor, bool Loaded);
+internal sealed record BankMenuContext(BankKey Key, string Name, string AddonName, Vector2 Anchor, bool Loaded, Vector2 AddonAt = default);
 internal sealed record BankMenuState(ulong CharacterId, BankMenuContext? Retainer, BankMenuContext? Saddlebag,
     BankMenuContext? Premium, string? Message, IReadOnlyList<(ulong Id, string Name)>? KnownRetainers = null, bool ReadsUnavailable = false,
     BankMenuContext? FreeCompany = null);
@@ -266,7 +266,7 @@ internal sealed class BankInventoryBridge : IDisposable
         var retainer = manager->GetActiveRetainer();
         if (retainer == null || retainer->RetainerId == 0 || retainer->RetainerId != manager->LastSelectedRetainerId) return null;
         var key = new BankKey(character, BankStorageKind.Retainer, retainer->RetainerId);
-        return new(key, retainer->NameString, addon.Name, addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(key.Kind));
+        return new(key, retainer->NameString, addon.Name, addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(key.Kind), addon.Position);
     }
 
     // 0.350 (g, I-09): the company chest window; loaded once every page (and gil, crystals) has been received from the game.
@@ -276,7 +276,7 @@ internal sealed class BankInventoryBridge : IDisposable
         var addon = FindVisible("FreeCompanyChest");
         if (addon.IsNull) return null;
         return new(new BankKey(character, BankStorageKind.FreeCompanyChest, 0), "Company chest", addon.Name,
-            addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(BankStorageKind.FreeCompanyChest));
+            addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(BankStorageKind.FreeCompanyChest), addon.Position);
     }
 
     private BankMenuContext? GetSaddle(ulong character, BankStorageKind kind)
@@ -285,7 +285,7 @@ internal sealed class BankInventoryBridge : IDisposable
         var addon = FindVisible("InventoryBuddy", "InventoryBuddy2");
         if (addon.IsNull) return null;
         return new(new BankKey(character, kind, 0), kind == BankStorageKind.Saddlebag ? "Sacoche chocobo" : "Premium chocobo saddlebag",
-            addon.Name, addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(kind));
+            addon.Name, addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(kind), addon.Position);
     }
 
     private static unsafe bool DresserLoaded() { var mirage = MirageManager.Instance(); return mirage != null && mirage->PrismBoxLoaded; }

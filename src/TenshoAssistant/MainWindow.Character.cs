@@ -62,7 +62,7 @@ internal sealed partial class MainWindow
         if(windowDisposed || !configuration.ShowCharacterPanel || characterStats.Window is not { } window)return;
         var state=characterStats.State;
         if(state.CharacterId==0 || !CombatCategory(state.Category) || state.Modifiers.Div<=0)return;
-        Panels?.Show("TenshoCharacterPanel",localization.Get("CharacterStats.Panel"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse,()=>{ImGui.SetNextWindowPos(new Vector2(window.X+window.Width+6,window.Y),ImGuiCond.Always);},()=>
+        Panels?.Show("TenshoCharacterPanel",localization.Get("CharacterStats.Panel"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse,()=>{ImGui.SetNextWindowPos(new Vector2(window.X+window.Width+6,window.Y)+WindowMoved("Character",window.X,window.Y),ImGuiCond.Always);},()=>
         {
             ImGui.TextColored(Accent,localization.Format("CharacterStats.PanelJob",state.Job,state.Level));
             DrawDerivedStats(state,false);
