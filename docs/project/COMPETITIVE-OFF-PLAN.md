@@ -10,6 +10,16 @@
 
 **Limite à dire clairement :** « détectable par SE » ne se mesure pas. Ce plan réduit ce que Tensho fait dans ces contenus à presque rien, il ne peut pas promettre que rien n'est détectable.
 
+## Précisions Dalamud (relues le 2026-11-05)
+
+Sources : [restrictions](https://dalamud.dev/plugin-publishing/restrictions), code de Dalamud (`Dalamud/Game/ClientState/ClientState.cs`).
+
+- **JcJ :** la page classe tout ce qui se fait en JcJ parmi les refus d'office (« Anything in PvP: Not allowed »). Couper tout Tensho va dans ce sens.
+- **« Compétitif » :** la règle interdit tout avantage en environnement compétitif, sans en donner de liste ni de définition. L'examen est subjectif. Pour un doute, la page demande de contacter l'équipe sur le Discord de Dalamud : c'est à l'auteur de le faire, pas à l'agent.
+- **« Détectable par SE » :** ce n'est pas un critère de Dalamud. Le plus proche : pas d'échange avec les serveurs du jeu qui soit automatique ou hors de ce que le jeu permet. Cette règle vaut partout, pas seulement en JcJ : l'inventaire de l'étape 1 la couvre aussi, y compris le réglage du titre par job (DEC-035).
+- **Pas de coupure offerte par Dalamud :** il donne `IsPvP`, `EnterPvP` et `LeavePvP`, rien qui arrête un plugin à sa place. Le gardien reste à écrire.
+- **`IsPvP` ne suffit pas :** Dalamud le déduit de `TerritoryType.IsPvpZone`. Il est donc faux à 579 (Battlehall) et aux territoires de Lord of Verminion, absents des 24 zones : il faut aussi `ContentFinderCondition.PvP`. Il est vrai au quai de Wolves' Den (250), le seul territoire que retire `IsPvPExcludingDen`.
+
 ## Ce qui existe déjà
 
 Seuls les conseils de Triple Triade sont coupés (`TriadMatchAdvisor.Competitive` : 579, 940, 941 ; DEC-033). Tout le reste de Tensho tourne en JcJ aujourd'hui : aucun code ne lit `IsPvP`.
@@ -19,9 +29,9 @@ Seuls les conseils de Triple Triade sont coupés (`TriadMatchAdvisor.Competitive
 | Niveau | Contenu | Comment on le sait |
 |---|---|---|
 | 1. Drapeaux du jeu | JcJ, Triple Triad Battlehall, Lord of Verminion | `IClientState.IsPvP` avec `EnterPvP` et `LeavePvP`, `TerritoryType.IsPvpZone`, `ContentFinderCondition.PvP` : les nouvelles cartes JcJ sont couvertes sans mise à jour |
-| 2. Liste relevée | Tournois de Triple Triade (940, 941), Dédale bestial (1339-1343), Mahjong (831) | Pas de drapeau : liste dans le code, avec sa preuve |
-| 3. À établir | Donjons profonds, courses de chocobos, pêche océanique, Restauration d'Ishgard, exploration cosmique, tout autre contenu avec un classement | Étape 1, puis décision D1 |
-| 4. Hors zone | Triple Triade contre un joueur, dans une zone normale | La zone ne suffit pas : décision D5 |
+| 2. Liste relevée | Tournois de Triple Triade (940, 941), Dédale bestial (1339-1343), Mahjong (831, classé ou non) | Pas de drapeau : liste dans le code, avec sa preuve |
+| 3. À établir | Donjons profonds, pêche océanique, Restauration d'Ishgard, exploration cosmique | Coupés si l'étape 1 établit leur classement (D1) ; un autre contenu classé trouvé là revient à l'utilisateur |
+| 4. Hors zone | Triple Triade contre un joueur, dans une zone normale | La zone ne suffit pas : seule la partie Triple Triade se coupe (D5) |
 
 ## Ce que « coupé » veut dire
 
@@ -35,7 +45,7 @@ Tensho reste chargé : c'est ce qui lui permet de repartir seul. Un seul gardien
 | Hooks | Désactivés (`CraftRecorder`, `MacroChainBridge`) |
 | Actions sur le jeu | Refusées : macros, tri, sets d'équipement, drapeau, téléportation, ouverture de fenêtres |
 | Réseau | Pas de nouvelle requête ; requêtes en cours annulées |
-| Alarmes et Discord | Décision D2 |
+| Alarmes et Discord | Rien pendant la coupure, pas de rattrapage (D2) |
 | Commandes `/tensho` | Une ligne qui dit que Tensho est coupé |
 | Données | Rien n'est effacé ; pas d'écriture du fichier de réglages |
 
@@ -46,11 +56,11 @@ Tensho reste chargé : c'est ce qui lui permet de repartir seul. Un seul gardien
 ## Étapes
 
 1. **Inventaire, sans le jeu.** Chercher les autres classements (fenêtres du jeu, ClientStructs, données). Lister chaque abonnement `Framework.Update`, hook, appel qui agit sur le jeu et requête réseau du plugin : 118 enregistrements dans `Plugin.cs`, 93 fichiers `.Dalamud.cs`.
-2. **Décisions** D1 à D5 avec l'utilisateur.
+2. **Décisions** D1 à D5 : prises, voir plus bas. Reste ce que l'inventaire trouvera de nouveau.
 3. **Gardien et détection.** Une règle pure et testée, branchée sur les événements du jeu. DEC mise à jour.
 4. **Affichage.** Coupure à l'entrée de `Draw`, carte du jeu rendue, barre de serveur, menus et infobulles.
 5. **Lectures, hooks, actions, réseau.** Chaque abonnement passe par le gardien. Un test parcourt le code et refuse tout nouvel abonnement qui n'y passe pas, comme celui des infobulles.
-6. **Alarmes et Discord**, selon D2.
+6. **Alarmes et Discord**, selon D2, et la ligne de chat de D3.
 7. **Documents.** `PUBLISHING.md`, `CONTRIBUTING.md`, aide et prise en main ; les conseils de Triple Triade passent par la même règle.
 8. **Essai en jeu**, un point à la fois : voir plus bas.
 
@@ -62,16 +72,22 @@ Taille : gros chantier, surtout l'étape 5. Place dans le plan global : avant la
 - Aucun réglage : aucune propriété de `Configuration` ni clé de langue ne permet de l'éviter.
 - Code : tout abonnement, hook et appel d'action passe par le gardien.
 
-Essais en jeu : quai de Wolves' Den ; match personnalisé de Crystalline Conflict ; Frontline ; Triple Triad Battlehall et tournoi ; Lord of Verminion ; Dédale ; Mahjong. Pour chacun : entrer avec la carte et des panneaux ouverts, tout doit disparaître et revenir à la sortie. Aussi : recharger le plugin en plein match ; se déconnecter en plein match ; vérifier `IsPvP` à 579, 506 et 589 à 591.
+Essais en jeu : quai de Wolves' Den ; match personnalisé de Crystalline Conflict ; Frontline ; Triple Triad Battlehall et tournoi ; Lord of Verminion ; Dédale ; Mahjong. Pour chacun : entrer avec la carte et des panneaux ouverts, tout doit disparaître et revenir à la sortie. Aussi : recharger le plugin en plein match ; se déconnecter en plein match.
 
-## Décisions à prendre
+## Décisions prises (2026-11-05, liste à cocher)
 
-| N° | Question | Recommandé |
+| N° | Question | Réponse de l'utilisateur |
 |---|---|---|
-| D1 | Quels contenus du niveau 3 coupent tout Tensho ? | Après l'étape 1 : tout contenu dont le classement est établi. Attention, cela peut retirer des outils que vous utilisez, par exemple le panneau de pêche océanique si elle a un classement |
-| D2 | Une alarme qui tombe pendant un match ? | Ni son, ni chat, ni Discord pendant le match, et pas de rattrapage à la sortie : la prochaine sonne normalement. L'alarme « mission prête » du Duty Finder avant d'entrer reste normale |
-| D3 | Tensho dit-il qu'il se coupe ? | Une ligne dans le chat à l'entrée, aucune à la sortie, en anglais et français selon la langue du plugin |
-| D4 | Le quai de Wolves' Den (zone sociale, `IsPvP` vrai) ? | Coupé aussi : c'est la règle la plus simple et elle ne laisse pas de cas à part |
-| D5 | Triple Triade contre un joueur dans une zone normale ? | Seule la partie Triple Triade se coupe (conseils et panneau de match, comme aujourd'hui), pas tout Tensho |
+| D1 | Quels contenus coupent tout Tensho, en plus du JcJ, de la Battlehall et de Lord of Verminion ? | Tournois de Triple Triade et Mahjong (classé et non classé, même territoire). Dédale bestial. Si l'inventaire établit leur classement : donjons profonds, pêche océanique, Restauration d'Ishgard, exploration cosmique. **Pas** les courses de chocobos, ni le reste du Gold Saucer |
+| D2 | Une alarme pendant une coupure ? | Rien : ni son, ni chat, ni Discord, et pas de rattrapage à la sortie |
+| D3 | Tensho prévient-il ? | Une ligne dans le chat à l'entrée, rien à la sortie |
+| D4 | Quai de Wolves' Den ? | Coupé |
+| D5 | Triple Triade contre un joueur en zone normale ? | Seule la partie Triple Triade se coupe |
 
-Conséquence à trancher avec D1 : si tout le Dédale coupe Tensho, le panneau du Dédale prévu par DEC-032 n'a plus d'objet. Recommandé : l'abandonner ; il n'y a alors plus à contacter l'équipe Dalamud pour lui, et la page du dresseur reste une liste d'informations hors du Dédale.
+Panneau du Dédale : abandonné. La page du dresseur reste une liste d'informations, hors du Dédale.
+
+Question à l'équipe Dalamud sur ce qui compte comme compétitif : pas retenue pour le moment. La règle n'en donne pas de liste : l'examen de la soumission peut donc juger autrement.
+
+Conséquence à connaître : si l'inventaire établit un classement pour la pêche océanique, le panneau de pêche océanique ne s'affiche plus pendant le voyage ; de même pour le craft et la récolte de Tensho pendant Ishgard et l'exploration cosmique.
+
+Code : pas commencé, à la demande de l'utilisateur. À lancer sur son feu vert, avant la phase 5.

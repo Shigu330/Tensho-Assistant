@@ -380,7 +380,7 @@ Timestamp: 2026-11-05 Europe/Brussels
 Problem: Tensho tourne partout en JcJ et en contenu classé ; seuls les conseils de Triple Triade y sont coupés (DEC-033).
 Evidence: Demande de l'utilisateur : « prevoir que en pvp le plugin se deactive et reactive apres pvp pas de reglages fais obligatoirement pareil pour match classer triad ou dresseur ou autre tous ce qui pourrais etre detecter par SE ou cree un impact sur des classements fais un plan pas de code pour ca pour le moment ». Règle Dalamud : pas d'avantage en environnement compétitif ou JcJ.
 Options: Une coupure par outil, ou une coupure de tout le plugin.
-Decision: Tout le plugin se coupe et repart seul en JcJ et en contenu classé, obligatoirement, sans réglage. Plan seulement pour le moment ; le périmètre exact attend les décisions D1 à D5.
+Decision: Tout le plugin se coupe et repart seul en JcJ et en contenu classé, obligatoirement, sans réglage. Plan seulement pour le moment. Choix D1 à D5 de la liste à cocher du 2026-11-05 : voir le plan. Panneau du Dédale de DEC-032 abandonné.
 Reason: Décision de l'utilisateur.
-Consequences: docs/project/COMPETITIVE-OFF-PLAN.md, docs/evidence/0.600-competitive-inventory.md. Le panneau du Dédale de DEC-032 est à revoir avec D1. À coder avant la phase 5, après accord sur le plan.
+Consequences: docs/project/COMPETITIVE-OFF-PLAN.md, docs/evidence/0.600-competitive-inventory.md. À coder sur le feu vert de l'utilisateur, avant la phase 5.
 References: DEC-032, DEC-033, CONTRIBUTING.md, docs/project/PUBLISHING.md
