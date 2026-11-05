@@ -68,7 +68,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | C14 | A-12, partie anticipée : fiche de recette complète (livre de maître, synthèse rapide, HQ, prérequis, écart chiffré) | S |  |
 | C15 | Simulateur plus direct : choix de la recette dans la page, résultat recalculé tout seul, glisser-déposer | S |  |
 | C17 | Options d'export des macros : attentes séparées (X-12), son, écho final, icône | S |  |
-| C19 | Où sont mes matériaux : détail par rangement dans la préparation et la chaîne | S |  |
+| C19 | ~~Où sont mes matériaux : détail par rangement dans la préparation et la chaîne~~ fait en 0.559 | S |  |
 | C24 | Besoin restant de la préparation dans les aides de récolte et de pêche | S |  |
 | C31 | Météo de plusieurs zones en un tableau (zones favorites) | S |  |
 | C32 | ~~Commandes « /tensho recolte » et « /tensho recette » (suite de I16)~~ fait en 0.555 | S |  |

@@ -3968,6 +3968,9 @@
     "QueryTip": "Keeps the recipes whose crafted item name contains this text; case is ignored."
   },
   "PlanUi": {
+    "Stored": "{0}: {1}",
+    "StoredCached": "{0}: {1} (read on {2})",
+    "StoredNone": "Nothing found in your known storages.",
     "TeamcraftCopy": "Copy the Teamcraft link",
     "TeamcraftOpen": "Open in Teamcraft",
     "TeamcraftTip": "Teamcraft list import link for this item and the quantity to produce. The link is built here; nothing is sent until you open it.",

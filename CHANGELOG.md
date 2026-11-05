@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.559.0
+- Plan global, C19 : au survol d'un matériau, dans la préparation et la chaîne : le détail par rangement (sacs, servant, sacoche), avec la date des relevés enregistrés. Rien n'est recalculé.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1023/1023, 0 avertissement, 0 erreur ; DLL 0.559.0.0. Non validé en jeu.
+### English
+- Hovering a material in the preparation and the chain lists which storage holds it, with the date of saved reads.
+
 ## 0.558.0
 - Plan global, T17 : quand le jeu indique 0 quête de tribu ou 0 commande spéciale restante, la case de Rappels se coche seule jusqu'à la remise, aussi pour le compteur de la barre du serveur. Un compteur inconnu ne coche rien. Réglage activé par défaut.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1022/1022, 0 avertissement, 0 erreur ; DLL 0.558.0.0. Non validé en jeu.

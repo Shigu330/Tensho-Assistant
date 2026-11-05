@@ -127,6 +127,11 @@ internal static class Interfaces535Tests
             Check(new TenshoAssistant.Configuration().RemindersFromGame,"on by default");
             Check(Read("Alarms/ReminderDtrEntry.Dalamud.cs").Contains("fromGame?.Invoke(timers);"),"also from the server bar");
         }),
+        ("0.559: a material's tooltip says which storage holds it, from the rows already computed",() =>
+        {
+            Check(Read("MainWindow.CraftPlan.cs").Contains("DrawStorageDetail(material.Holdings);") && Read("MainWindow.CraftChain.cs").Contains("DrawStorageDetail(stored);"),"both tables");
+            Check(Read("MainWindow.CraftPlan.cs").Contains("row.IsCached && row.ObservedAt is { } seen"),"a saved read shows its date");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

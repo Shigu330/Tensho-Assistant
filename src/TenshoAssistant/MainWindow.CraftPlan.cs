@@ -25,6 +25,14 @@ internal sealed partial class MainWindow
         if(craftLog.Error is { } nativeError)DrawDataError(nativeError,"ServiceErrors.CraftLog");
     }
 
+    /// <summary>0.559 (C19): where a material is, from the rows already computed: nothing is read again.</summary>
+    private void DrawStorageDetail(Inventory.ItemHoldingsSummary holdings)
+    {
+        var lines=holdings.Rows.Where(row=>row.Nq+row.Hq>0).Select(row=>row.IsCached && row.ObservedAt is { } seen
+            ? localization.Format("PlanUi.StoredCached",Inventory.StorageNames.Of(localization,row),(row.Nq+row.Hq).ToString("N0"),seen.ToLocalTime().ToString("d"))
+            : localization.Format("PlanUi.Stored",Inventory.StorageNames.Of(localization,row),(row.Nq+row.Hq).ToString("N0"))).ToArray();
+        WrappedTooltip(lines.Length>0 ? string.Join("\n",lines):localization.Get("PlanUi.StoredNone"));
+    }
     private void OpenCraftPreparation(RecipeDefinition recipe)
     {
         OpenCraftSimulation(recipe);
@@ -87,6 +95,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(material.Required.ToString("N0"));
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted(material.Holdings.HasObservation ? material.Holdings.Total.ToString("N0") : localization.Get("PlanUi.Unknown"));
+                    if (ImGui.IsItemHovered()) DrawStorageDetail(material.Holdings);
                     ImGui.TableNextColumn();
                     if (!material.Holdings.HasObservation) ImGui.TextDisabled(localization.Get("PlanUi.Verify"));
                     else ImGui.TextColored(material.Uncovered == 0 ? Success : Accent, material.Uncovered.ToString("N0"));

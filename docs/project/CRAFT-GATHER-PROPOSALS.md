@@ -154,6 +154,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C19 — K16 — Où sont mes matériaux : détail par rangement dans la préparation et la chaîne
 
+- **État (relu le 2026-11-05)** : FAIT 0.559.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.CraftPlan.cs`.
 - **Ce que le joueur obtient** : Au survol de « Relevé » d'un ingrédient : « Sacs 12 · Servant Lune 40 (relevé du 01/11) · Sacoche 8 ». Vous savez quel servant appeler avant de fabriquer, sans ouvrir la fiche de chaque objet.
 - **Comment, taille, dépendances** : Infobulle commune (même rendu que l'onglet Stocks de la fiche) sur les cellules de la préparation et des matériaux de la chaîne, à partir des Rows déjà calculées ; rien de recalculé à chaque image. Taille S. Sonde : aucune. Décision : aucune.

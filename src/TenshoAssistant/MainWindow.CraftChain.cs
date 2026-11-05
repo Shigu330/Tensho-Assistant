@@ -75,6 +75,7 @@ internal sealed partial class MainWindow
                     DrawChainItem(material.ItemId);
                     ImGui.SameLine(); ImGui.TextColored(material.Reason == CraftChainReason.RawMaterial ? Muted : Accent,
                         $"× {material.Amount:N0} · {ChainReason(material.Reason)}");
+                    if (ImGui.IsItemHovered() && result.Observations.TryGetValue(material.ItemId, out var stored)) DrawStorageDetail(stored);
                     ImGui.SameLine();
                     if (ImGui.SmallButton(localization.Get("ChainUi.Locations"))) OpenGathering(material.ItemId);
                     ImGui.SameLine();

@@ -3968,6 +3968,9 @@
     "QueryTip": "Garde les recettes dont le nom de l'objet fabriqué contient ce texte ; majuscules ignorées."
   },
   "PlanUi": {
+    "Stored": "{0} : {1}",
+    "StoredCached": "{0} : {1} (relevé du {2})",
+    "StoredNone": "Rien trouvé dans vos rangements connus.",
     "TeamcraftCopy": "Copier le lien Teamcraft",
     "TeamcraftOpen": "Ouvrir dans Teamcraft",
     "TeamcraftTip": "Lien d’import de liste Teamcraft pour cet objet et la quantité à produire. Le lien est construit ici ; rien n’est envoyé tant que vous ne l’ouvrez pas.",
