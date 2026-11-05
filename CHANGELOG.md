@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.579.0
+- Plan global, Équipement : demande de l'utilisateur : la case « Tous les jobs (mirage) » est aussi directement sur la page Équipement. Elle existait derrière le bouton de filtres et dans les Paramètres ; c'est le même réglage, sans doublon.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1041/1041, 0 avertissement, 0 erreur ; DLL 0.579.0.0. Non validé en jeu.
+### English
+- The All jobs (glamour) box is now on the gear page itself. It is the same setting as in the filters.
+
 ## 0.578.0
 - Plan global, Rappels : demande de l'utilisateur : dans Rappels, une case Discord par ligne décide si les alarmes de ce rappel partent sur Discord, y compris les alarmes automatiques (servants, escouade, vaisseaux). Par défaut, tout reste coché, et la catégorie des réglages garde son effet.
 - Tests : DiscordWebhookTests complété. Verify.ps1 (agent) : 1040/1040, 0 avertissement, 0 erreur ; DLL 0.578.0.0. Non validé en jeu.

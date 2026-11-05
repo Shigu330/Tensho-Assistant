@@ -257,6 +257,13 @@ internal static class Interfaces535Tests
             Check(reset==TenshoAssistant.Reminders.ResetSchedule.NextDaily(at,TenshoAssistant.Reminders.ResetSchedule.DailyHour),"the daily reset");
             Check(TenshoAssistant.Alarms.AlarmSchedule.Next(Alarm(TenshoAssistant.Alarms.AlarmRepeat.WeeklyReset),at)>at,"the weekly reset");
         }),
+        ("0.579: all jobs (glamour) is on the gear page itself, the same setting as in its filters",() =>
+        {
+            var gear=Read("MainWindow.Gear.cs");
+            var page=gear[gear.IndexOf("private void DrawGearPlanner()")..gear.IndexOf("DrawGearWear(catalog);")];
+            Check(page.Contains("BoolSetting(\"Gear.AllJobs\""),"on the page");
+            Check(gear.Split("configuration.GearAllJobs=value").Length==3,"one setting, shown twice");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

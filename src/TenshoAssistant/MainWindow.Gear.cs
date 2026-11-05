@@ -40,6 +40,8 @@ internal sealed partial class MainWindow
         if(catalog is null){ImGui.TextDisabled(GearNotReady);return;}
         if(EquippedGearUnavailable?.Invoke()==true){ImGui.TextWrapped(localization.Get("Gear.WornUnavailable"));return;}
         var worn=(EquippedGear?.Invoke() ?? []).Where(piece=>catalog.Find(piece.ItemId) is not null).ToDictionary(piece=>piece.Slot);
+        // 0.579 (user request): on the page itself, not only behind the filters button: the same setting.
+        BoolSetting("Gear.AllJobs","Gear.AllJobsTip",()=>configuration.GearAllJobs,value=>configuration.GearAllJobs=value,c=>c.GearAllJobs);
         DrawGearWear(catalog);
         DrawGameGearsets(catalog);
         var plans=configuration.GearPlans??=[];
