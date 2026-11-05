@@ -41,6 +41,8 @@ public static class ConfigurationReset
         "CraftLiveSuggest",
         // 0.589 (C5): the sequence followed during a synthesis.
         "CraftLiveFollow",
+        // 0.594 (I11): the Bank as a list.
+        "BankListView",
         // 0.508 (I-05): the panel beside the retainer sale list.
         "RetainerSalesPanel",
         // 0.503 (ONBOARD-001): first-visit help on the pages.
@@ -321,6 +323,7 @@ public sealed partial class Configuration
     public bool RetainerSalesPanel { get; set; } = true;
     public bool CraftLiveSuggest { get; set; } = true;
     public bool CraftLiveFollow { get; set; } = true;
+    public bool BankListView { get; set; }
     public bool OpenOnLoad { get; set; }
     // Retainers and saddlebags copied into the bank cache each time they are opened (0.167), instead of an import button.
     public bool AutoBankCapture { get; set; } = true;

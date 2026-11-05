@@ -286,6 +286,7 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##BankQuery", localization.Get("BankUi.Search"), ref bankQuery, 128);
         Tip("BankUi.SearchTip");
+        BoolSetting("BankUi.ListView","BankUi.ListViewTip",()=>configuration.BankListView,value=>configuration.BankListView=value,c=>c.BankListView);
 
         var now=DateTimeOffset.UtcNow;
         var frameKey=new BankFrameViewKey(sourceKey,bankCategoryFilter,bankQualityFilter,bankQuery,localization.Revision,
@@ -320,6 +321,7 @@ internal sealed partial class MainWindow
             else if(bankPersonalNotice is null)ImGui.TextDisabled(localization.Get("BankUi.EmptyStorage"));
             return;
         }
+        if(configuration.BankListView){DrawBankList(sourceKey,selectedEntries);return;}
         foreach(var error in bankFrameErrors)ImGui.TextWrapped(error);
         DrawInventoryFrames(bankFrameGroups);
     }

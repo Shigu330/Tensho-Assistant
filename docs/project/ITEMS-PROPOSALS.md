@@ -97,6 +97,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I11 — Vue en liste triable de la Banque
 
+- **État (relu le 2026-11-05)** : FAIT 0.594.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Bank.cs`.
 - **Ce que le joueur obtient** : En plus des grilles 5 × 7, une vue « Liste » : un objet par ligne, avec NQ, HQ, total et les rangements où il se trouve, triable par nom, quantité ou catégorie. Avec plusieurs servants, vous voyez enfin d'un coup d'œil où sont vos matériaux.
 - **Comment, taille, dépendances** : Bascule « Grille / Liste », mémorisée, avec infobulle et ↺. Table ImGui triable par en-tête, avec clipper, sur le modèle de MainWindow.MarketBoard.cs. Lignes recalculées seulement quand la source ou un filtre change. Recherche alignée sur la normalisation du catalogue. Taille S-M. Sonde : aucune. Décision : vue par défaut (recommandé : la grille, comme aujourd'hui).

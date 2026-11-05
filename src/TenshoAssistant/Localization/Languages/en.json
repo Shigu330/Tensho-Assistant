@@ -3470,6 +3470,11 @@
     "DeleteTemplateTip": "Deletes the chosen template at once, without confirmation."
   },
   "BankUi": {
+    "ListView": "Show as a list",
+    "ListViewTip": "One item per line with NQ, HQ, total and its storages, instead of the bag grids. Click a column to sort. The tab and filters above still apply.",
+    "ListItem": "Item",
+    "ListTotal": "Total",
+    "ListStorages": "Storages",
     "RetainerGone": "This retainer is no longer at the summoning bell: its read still counts in your stocks.",
     "Forget": "Erase this read",
     "ForgetConfirm": "Confirm: erase",

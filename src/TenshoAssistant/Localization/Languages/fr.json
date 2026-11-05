@@ -3470,6 +3470,11 @@
     "DeleteTemplateTip": "Supprime le modèle choisi tout de suite, sans confirmation."
   },
   "BankUi": {
+    "ListView": "Afficher en liste",
+    "ListViewTip": "Un objet par ligne avec NQ, HQ, total et ses rangements, à la place des grilles de sacs. Cliquez sur une colonne pour trier. L'onglet et les filtres ci-dessus restent appliqués.",
+    "ListItem": "Objet",
+    "ListTotal": "Total",
+    "ListStorages": "Rangements",
     "RetainerGone": "Ce servant n'est plus à la sonnette : son relevé compte encore dans vos stocks.",
     "Forget": "Effacer ce relevé",
     "ForgetConfirm": "Confirmer : effacer",

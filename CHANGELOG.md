@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.594.0
+- Plan global, I11 : Banque : case « Afficher en liste » : un objet par ligne avec NQ, HQ, total et ses rangements, à la place des grilles, triable par nom, catégorie ou quantité en cliquant sur la colonne ; l'onglet et les filtres restent appliqués.
+- Tests : Bank list. Verify.ps1 (agent) : 1077/1077, 0 avertissement, 0 erreur ; DLL 0.594.0.0. Non validé en jeu.
+### English
+- Bank: « Show as a list » box: one item per line with NQ, HQ, total and its storages, instead of the grids, sorted by name, category or quantity by clicking the column; the tab and filters still apply.
+
 ## 0.593.0
 - Plan global, T25 : Page Équipement : plusieurs plans nommés par job. Liste des plans, nouveau plan (copie de l'actuel), renommer, supprimer ; en prendre un garde l'actuel tel quel, et le code de partage donne le plan affiché.
 - Tests : Gear plans. Verify.ps1 (agent) : 1074/1074, 0 avertissement, 0 erreur ; DLL 0.593.0.0. Non validé en jeu.
