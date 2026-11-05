@@ -76,7 +76,8 @@ internal sealed class CompetitiveWatcher : IDisposable
         var main=GameMain.Instance();
         var seen=$"instance area {(main!=null && main->IsInInstanceArea())}, PvP instance {pvpInstance}, bound by duty {bound}, content row {(main!=null && main->CurrentContentFinderConditionRow!=null)}, match window {gui.GetAddonByName("TripleTriad") is {IsNull:false,IsVisible:true}}";
         if(seen!=arenaSeen){arenaSeen=seen;log.Information("Competitive arena check, territory {0}: {1}.",client.TerritoryType,seen);}
-        return pvpInstance || bound;
+        // Measured in the public hall (0.612 log): bound by duty and content row are true there, so only the game's PvP instance can tell.
+        return pvpInstance;
     }
     private bool Decide()=>CompetitiveZones.IsCut(client.IsLoggedIn,(uint)client.TerritoryType,client.IsPvP,zones,CompetitiveGate.Cut,InArenaInstance());
     private void Tick(IFramework _)
