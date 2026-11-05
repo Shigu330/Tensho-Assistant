@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.585.0
+- Plan global, Équipement : rapport de l'utilisateur en jeu : la liste « Plan pour » montrait deux jobs nommés 44 et 45 : ce sont des lignes vides de la feuille ClassJob, qui pointent sur le compteur du pugiliste. L'index des niveaux ignore les lignes sans nom, pour tous ses usages (docs/evidence/0.585-classjob-empty-rows.md). Le texte passe avant la liste, et le job porté prend sa majuscule.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1046/1046, 0 avertissement, 0 erreur ; DLL 0.585.0.0. Non validé en jeu.
+### English
+- The gear page's job list no longer shows two empty rows of the game's job sheet. Its label now comes before the list.
+
 ## 0.584.0
 - Plan global, Rappels : demande de l'utilisateur : le réglage Discord d'un rappel n'existe plus qu'à un endroit. Sur la page Alarmes, un groupe issu de Rappels dit « Discord : réglé dans Rappels » au lieu de sa case, et seule la case de la ligne dans Rappels décide. Les autres alarmes gardent la leur, et les alarmes de rappel plus anciennes sont reliées à leur ligne par leur nom.
 - Tests : DiscordWebhookTests complété. Verify.ps1 (agent) : 1045/1045, 0 avertissement, 0 erreur ; DLL 0.584.0.0. Non validé en jeu.

@@ -38,12 +38,14 @@ internal sealed partial class MainWindow
         var levels=GearsetSource?.State?.JobLevels;
         var shown=gearJob!=0 && gearJob!=real.JobId && levels?.TryGetValue(gearJob,out var known)==true
             ? real with {JobId=gearJob,Job=JobName(gearJob),Level=known,Values=new Dictionary<string,int>(),Category=0,Role=0,Modifiers=default}:real;
+        // 0.585 (user report): the label first, then the list.
+        ImGui.AlignTextToFramePadding();ImGui.TextUnformatted(localization.Get("Gear.PlanFor"));ImGui.SameLine();
         ImGui.SetNextItemWidth(180);
-        if(ImGui.BeginCombo(localization.Get("Gear.PlanFor")+"###GearJob",shown.Job))
+        if(ImGui.BeginCombo("###GearJob",JobName(shown.JobId)))
         {
             try
             {
-                if(ImGui.Selectable(localization.Format("Gear.WornJob",real.Job),shown.JobId==real.JobId))gearJob=0;
+                if(ImGui.Selectable(localization.Format("Gear.WornJob",JobName(real.JobId)),shown.JobId==real.JobId))gearJob=0;
                 foreach(var job in (levels?.Keys ?? []).Where(job=>job!=real.JobId).OrderBy(JobName,StringComparer.CurrentCultureIgnoreCase))
                     if(ImGui.Selectable(JobName(job)+$" · {levels![job]}###GearJob{job}",job==shown.JobId))gearJob=job;
             }

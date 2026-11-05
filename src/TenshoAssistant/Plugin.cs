@@ -432,7 +432,7 @@ public sealed class Plugin : IDalamudPlugin
             // g, M-12 (0.383): the game's gear sets and the job levels (ClassJob ExpArrayIndex), read while the Gear page shows them.
             // R-14 (0.452): a sheet read here that no longer loads threw out of this constructor and Dalamud refused the whole plugin; it now
             // turns its own feature off (logged).
-            var expIndex=LoadSheet("ClassJob",()=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Where(row=>row.ExpArrayIndex>=0).ToDictionary(row=>row.RowId,row=>(int)row.ExpArrayIndex),[]);
+            var expIndex=LoadSheet("ClassJob",()=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Where(row=>row.ExpArrayIndex>=0 && !row.Name.IsEmpty).ToDictionary(row=>row.RowId,row=>(int)row.ExpArrayIndex),[]);
             Gear.GameGearsetReader? gameGearsets=null;
             registrations.Register(()=>gameGearsets=new Gear.GameGearsetReader(framework,client,log,expIndex),()=>gameGearsets?.Dispose());
             mainWindow.GearsetSource=gameGearsets;
