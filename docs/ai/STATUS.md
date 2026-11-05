@@ -27,7 +27,7 @@ Liste complète : [TESTING](../project/TESTING.md), 284 cases ouvertes, aucune d
 - 0.508 ventes des servants, 0.509 coup conseillé pendant la synthèse ;
 - 0.502–0.506 aide, guide, signaler un problème ; 0.511 aide qui suit la langue ;
 - 0.497 fenêtre de comparaison, 0.499 carte au-dessus de Tensho, 0.500 page dresseur, 0.510 conseil de Triple Triade coupé en tournoi.
-Possible depuis la release 0.539.0 : galerie de Mes outils (0.476) et liste de vidéos (0.506), qui lisent la branche `main`.
+Dépôt personnel : installation et mise à jour fonctionnent (rapport de l'utilisateur, 2026-11-05, 0.539.0). Possible depuis cette release : galerie de Mes outils (0.476) et liste de vidéos (0.506), qui lisent la branche `main`.
 
 ## Prochaine action
 1) Décisions de l'auteur sur les points Dalamud ([PUBLISHING](../project/PUBLISHING.md) « Ce qui reste », points 4 à 7 ; titre selon le job décidé, DEC-035), avec son accord à chaque règle.
