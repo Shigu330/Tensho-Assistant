@@ -25,6 +25,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C2 — K3 — Essayer ses séquences sauvegardées sur toutes les recettes
 
+- **État (relu le 2026-11-05)** : FAIT 0.552.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Craft/CraftLogSession.cs`.
 - **Ce que le joueur obtient** : Le panneau du carnet essaie aussi vos séquences enregistrées pour d'autres recettes (la même macro sert souvent à toute une série de recettes de même difficulté, quel que soit le métier) et affiche la meilleure qui termine et atteint la cible, avec son nom et la recette d'origine. Une bibliothèque de quelques macros génériques suffit alors.
 - **Comment, taille, dépendances** : Dans CraftLogSession.Build (déjà sur un worker annulable), simuler toutes les séquences valides, garder les meilleures par CraftSolver.BetterCompletion, étiqueter « Séquence X (enregistrée pour Y) ». Réglage « Essayer les séquences des autres recettes » (activé, infobulle, ↺). Même chose dans le simulateur (« Essayer mes séquences »). Taille S. Sonde : aucune. Décision : activé par défaut (recommandé : oui).

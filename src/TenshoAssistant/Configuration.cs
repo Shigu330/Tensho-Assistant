@@ -53,7 +53,7 @@ public static class ConfigurationReset
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
-        "Discord", "ThemeMode", "ThemeModeBeforeTool", "GatherPlanFromList", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
+        "Discord", "ThemeMode", "ThemeModeBeforeTool", "CraftLogTryAllPresets", "GatherPlanFromList", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
         // 0.347 (g, I-08): the two shop reminder settings (the notes themselves are saved data, kept by « restore every setting »).
         "ItemNoteShopReminder", "ItemNoteImportantSound",
@@ -444,6 +444,8 @@ public sealed partial class Configuration
     // 0.327 (audit 2026-11-02, queue step e): the crafting log panel computes as soon as a recipe is selected (default, as before) or only
     // on request (its « Compute » button, « Recalculate » or the plan's « Simulate this recipe »). Read in Draw only.
     public bool CraftLogAutoSolve { get; set; } = true;
+    // 0.552 (C2): the crafting log panel also tries the sequences saved for other recipes.
+    public bool CraftLogTryAllPresets { get; set; } = true;
     public int SortPreviewField { get; set; }
     public bool SortPreviewDescending { get; set; }
     public List<TenshoAssistant.Inventory.InventorySortProfile>? InventorySortProfiles { get; set; }=[];

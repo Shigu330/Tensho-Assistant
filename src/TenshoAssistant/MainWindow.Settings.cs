@@ -151,7 +151,7 @@ internal sealed partial class MainWindow
             // 0.327 (audit 2026-11-02, queue step e): compute as soon as a recipe is selected (default, as before) or only on request.
             ImGui.Indent();
             ImGui.BeginDisabled(!configuration.CraftLogHelperEnabled);
-            try{BoolSetting("ModuleSettings.CraftLogAutoSolve","ModuleSettings.CraftLogAutoSolveTip",()=>configuration.CraftLogAutoSolve,value=>configuration.CraftLogAutoSolve=value,c=>c.CraftLogAutoSolve);}
+            try{BoolSetting("ModuleSettings.CraftLogTryAllPresets","ModuleSettings.CraftLogTryAllPresetsTip",()=>configuration.CraftLogTryAllPresets,value=>configuration.CraftLogTryAllPresets=value,c=>c.CraftLogTryAllPresets);BoolSetting("ModuleSettings.CraftLogAutoSolve","ModuleSettings.CraftLogAutoSolveTip",()=>configuration.CraftLogAutoSolve,value=>configuration.CraftLogAutoSolve=value,c=>c.CraftLogAutoSolve);}
             finally{ImGui.EndDisabled();ImGui.Unindent();}
             DrawObservationSetting("Craft", localization.Get("ModuleSettings.ObserveCraft"),craftLive.State.Enabled,craftLive.SetEnabled);
             ImGui.TextWrapped(localization.Get("ModuleSettings.CraftHelp"));

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.552.0
+- Plan global, C2 : le panneau du carnet essaie aussi les séquences enregistrées pour d'autres recettes, et montre la meilleure qui termine, avec la recette d'origine. Réglage activé par défaut. La partie « Essayer mes séquences » du simulateur reste à faire.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1016/1016, 0 avertissement, 0 erreur ; DLL 0.552.0.0. Non validé en jeu.
+### English
+- The crafting log panel also tries sequences saved for other recipes and says which recipe the best one was saved for.
+
 ## 0.551.0
 - Plan global, T4 : le bouton carte d'un monstre pose le drapeau à la position de sa fiche et ouvre la carte Tensho dessus, au lieu du centre. L'aide dit que la position vient de Garland Tools et qu'une apparition n'y est pas prouvée. Sans position, rien ne change.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1015/1015, 0 avertissement, 0 erreur ; DLL 0.551.0.0. Non validé en jeu.

@@ -65,7 +65,7 @@ internal sealed partial class MainWindow
         var actions=craftActions.State.Catalog;
         var presets=(IReadOnlyList<CraftPreset>?)configuration.CraftPresets ?? Array.Empty<CraftPreset>();
         CraftLogInput? input=context is {Recipe:{ } recipe,Stats:{ } stats} && actions is not null
-            ? new(observed.Owner,recipe,stats,actions,presets,new(CraftLogTarget(recipe),craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,craftMacroBuffWait,craftForbidden,CraftSearchOptions.Raphael),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true):null;
+            ? new(observed.Owner,recipe,stats,actions,presets,new(CraftLogTarget(recipe),craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,craftMacroBuffWait,craftForbidden,CraftSearchOptions.Raphael),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true,TryAllPresets:configuration.CraftLogTryAllPresets):null;
         if(input!=craftLogInput)
         {craftLogSession.Cancel();craftLogInput=input;craftLogStableSince=now;craftLogStarted=false;craftLogForceRefresh=false;}
         if(now<craftLogStableSince)craftLogStableSince=now;
@@ -144,6 +144,7 @@ internal sealed partial class MainWindow
     }
     private void DrawCraftLogMacro(string title,CraftLogMacro? macro,CraftActionCatalog catalog,bool canSave=false)
     {
+        if(macro is {SavedForItem:not 0})ImGui.TextDisabled(localization.Format("CraftLogUi.SavedFor",itemCatalog.State.Catalog?.Find(macro.SavedForItem)?.Name ?? macro.SavedForItem.ToString()));
         ImGui.PushID(title);
         try
         {

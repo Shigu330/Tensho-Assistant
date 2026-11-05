@@ -1921,6 +1921,8 @@
     "CraftLog": "Show macro helper beside the crafting log",
     "CraftLogHelp": "Saved preference. Follows the log recipe and proposes a macro using the equipped job attributes. Bounded background calculation; no action is executed.",
     "CraftLogAutoSolve": "Compute automatically when a recipe is selected",
+    "CraftLogTryAllPresets": "Try the sequences of other recipes",
+    "CraftLogTryAllPresetsTip": "Ticked: the crafting log panel also tries the sequences you saved for other recipes, and shows the best one that finishes. One macro often fits a whole series of recipes.\nDefault: on.",
     "CraftLogAutoSolveTip": "Ticked: the suggested macro is computed as soon as a recipe is selected in the crafting log (bounded background calculation, result kept in the cache). Unticked: on request; the panel waits for your click on « Compute the suggested macro », and the « Simulate this recipe » button of an item sheet also asks for it. The last recipe asked for is computed again by itself when you come back to it.\nDefault: on.",
     "ObserveCraft": "Observe current synthesis",
     "CraftHelp": "Read-only observation and next-action comparison; no crafting action is executed.",
@@ -3413,6 +3415,7 @@
     "NotObserved": "Possible Grand Company delivery · open the game's Timers, then Supply missions, to see today's request"
   },
   "CraftLogUi": {
+    "SavedFor": "Saved for: {0}",
     "SectionState": "Your state",
     "SectionTarget": "Target",
     "SectionResult": "Calculation",

@@ -1921,6 +1921,8 @@
     "CraftLog": "Afficher l’aide macro à côté du carnet de synthèse",
     "CraftLogHelp": "Préférence sauvegardée. Suit la recette du carnet et propose une macro à copier avec les attributs du métier équipé. Calcul borné en arrière-plan ; aucune action exécutée.",
     "CraftLogAutoSolve": "Calculer automatiquement à la sélection d’une recette",
+    "CraftLogTryAllPresets": "Essayer les séquences des autres recettes",
+    "CraftLogTryAllPresetsTip": "Coché : le panneau du carnet essaie aussi les séquences que vous avez enregistrées pour d'autres recettes, et montre la meilleure qui termine. Une même macro sert souvent à toute une série de recettes.\nPar défaut : activé.",
     "CraftLogAutoSolveTip": "Coché : la macro proposée est calculée dès qu’une recette est sélectionnée dans le carnet de synthèse (calcul borné en arrière-plan, résultat gardé en cache). Décoché : sur demande ; le panneau attend votre clic sur « Calculer la macro proposée », et le bouton « Simuler cette recette » d’une fiche d’objet demande aussi le calcul. La dernière recette demandée est recalculée d’elle-même quand vous y revenez.\nPar défaut : activé.",
     "ObserveCraft": "Observer la synthèse en cours",
     "CraftHelp": "Lecture seule et comparaison du prochain coup ; aucune action de craft lancée.",
@@ -3413,6 +3415,7 @@
     "NotObserved": "Livraison GC possible · ouvrez le calendrier du jeu, puis les missions de ravitaillement, pour voir la demande du jour"
   },
   "CraftLogUi": {
+    "SavedFor": "Enregistrée pour : {0}",
     "SectionState": "Votre état",
     "SectionTarget": "Cible",
     "SectionResult": "Calcul",

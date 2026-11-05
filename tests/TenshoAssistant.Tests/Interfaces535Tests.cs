@@ -81,6 +81,13 @@ internal static class Interfaces535Tests
             var monsters=Read("MainWindow.Monsters.cs");
             Check(monsters.Contains("if (monster.X is { } x && monster.Y is { } y)") && monsters.Contains("FlagFromMap(chosen,x,y);") && monsters.Contains("mapX=20.5f"),"known position, else as before");
         }),
+        ("0.552: the crafting log tries sequences saved for other recipes, when the setting asks",() =>
+        {
+            var session=Read("Craft/CraftLogSession.cs");
+            Check(session.Contains("!own && !input.TryAllPresets") && session.Contains("own ? 0:preset.ResultItemId"),"only on the setting, and it says for which recipe");
+            Check(new TenshoAssistant.Configuration().CraftLogTryAllPresets,"on by default");
+            Check(Read("MainWindow.CraftLog.cs").Contains("TryAllPresets:configuration.CraftLogTryAllPresets"),"passed to the session");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");
