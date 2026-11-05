@@ -12,6 +12,9 @@ La décision de soumettre appartient à l'auteur (DEC-023 : à la version 1.0.0)
 reste le dépôt personnel, qui existe : `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`, mis à jour par
 `Verify.ps1 -Release` (dernière release : `Stable-0.539.0`, 2026-11-05).
 
+
+Réponse reçue sur le Discord de Dalamud, 2026-11-05 (hOst1k, question posée par l'auteur) : pas de limite de taille si le plugin respecte les règles ; plus il est gros, plus le premier examen est long ; mieux vaut ne pas viser trop complexe dès le départ, Simple Tweaks et « VanillaTweaks » (sans doute VanillaPlus) ayant grandi avec le temps. Rôle exact de cette personne dans l'équipe : non vérifié. À cette date : 57 419 lignes de C# dans le plugin, 123 519 lignes suivies par git. Reste la politique IA : une soumission « Auto » trop grosse pour que l'auteur en réponde peut être fermée.
+
 ## Ce qui reste avant la soumission
 
 La soumission vient après tout le [plan global](GLOBAL-PLAN.md) (DEC-037). Par ordre. Les points marqués **règle Dalamud** demandent un résumé et l'accord de l'auteur (consigne du 2026-11-04).
