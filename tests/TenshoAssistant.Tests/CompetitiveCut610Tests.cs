@@ -45,6 +45,12 @@ internal static class CompetitiveCut610Tests
             Check(always.SequenceEqual(["AlarmDtrEntry.Dalamud.cs","CurrencyDtrEntry.Dalamud.cs","NativeMapReplacer.Dalamud.cs","ReminderDtrEntry.Dalamud.cs"]),"only what must undo something: "+string.Join(", ",always));
             foreach(var file in always)Check(File.ReadAllText(Code().First(path=>Path.GetFileName(path)==file)).Contains("CompetitiveGate.Cut)"),$"{file} acts on the cut");
         }),
+        ("Competitive (0.615): the chat is not read during a cut either",() =>
+        {
+            var listeners=Code().Where(file=>Regex.IsMatch(File.ReadAllText(file),@"\.ChatMessage\w*\s*\+=")).ToArray();
+            Check(listeners.Length>=2,"the chat listeners found");
+            foreach(var file in listeners)Check(File.ReadAllText(file).Contains("if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;"),Path.GetFileName(file)+" reads the chat during a cut");
+        }),
         ("Competitive: nothing shown, no command, no menu, no hook work, no way to turn it off",() =>
         {
             var plugin=Source("Plugin.cs");

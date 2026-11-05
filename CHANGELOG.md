@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.615.0
+- Plan global, DEC-038 : Coupure compétitive : un oubli corrigé. Les deux lecteurs du chat (jardin, liens de carte) lisaient encore pendant la coupure ; ils sont maintenant arrêtés, et un test l'impose.
+- Tests : Competitive (0.615). Verify.ps1 (agent) : 1121/1121, 0 avertissement, 0 erreur ; DLL 0.615.0.0. Non validé en jeu.
+### English
+- Competitive cut: a gap closed. The two chat listeners (garden, map links) still read during a cut; they now stop, enforced by a test.
+
 ## 0.614.0
 - Plan global, DEC-038 : Triple Triade : dans le hall de la Battlehall (579), l'aide de match revient contre un PNJ identifié, comme ailleurs. Contre un joueur, aucun PNJ n'est identifié : pas d'aide. Les tournois (940, 941) restent sans aide.
 - Tests : Triad advisor. Verify.ps1 (agent) : 1120/1120, 0 avertissement, 0 erreur ; DLL 0.614.0.0. Non validé en jeu.

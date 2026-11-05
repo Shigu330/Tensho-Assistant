@@ -28,6 +28,7 @@ public sealed class ChatMapLinkWatcher : IDisposable
 
     private void OnMessage(IChatMessage message)
     {
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
         if(disposed || !enabled())return;
         try
         {

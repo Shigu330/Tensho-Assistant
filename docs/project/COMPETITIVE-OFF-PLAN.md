@@ -95,7 +95,7 @@ Inventaire : les donjons profonds ont un classement (Lodestone), donc ils coupen
 
 ## Ce qui est codé (0.610)
 
-`Competitive/CompetitiveGate.Dalamud.cs` et `Competitive/CompetitiveZones.cs`. Rien n'est lu du jeu pendant la coupure : les abonnements au framework de 77 fichiers passent par le gardien, et un test refuse celui qui le contournerait. Affichage, commandes, menu contextuel, barre de serveur : coupés. Carte du jeu : rendue. Discord : ce qui attendait est abandonné. Une ligne dans le chat à l'entrée.
+`Competitive/CompetitiveGate.Dalamud.cs` et `Competitive/CompetitiveZones.cs`. Pendant la coupure, les abonnements au framework de 77 fichiers passent par le gardien, et un test refuse celui qui le contournerait. Depuis 0.615, les lecteurs du chat aussi : ils lisaient encore en 0.610 à 0.614, un oubli corrigé. Restent actifs, sans lire le jeu en combat : l'avis d'inventaire modifié, qui ne fait que marquer une relecture pour après, et le changement de réglage système du thème. Affichage, commandes, menu contextuel, barre de serveur : coupés. Carte du jeu : rendue. Discord : ce qui attendait est abandonné. Une ligne dans le chat à l'entrée.
 
 Écarts avec le plan, à connaître :
 
