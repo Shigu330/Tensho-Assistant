@@ -44,7 +44,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | P1 | Zoom à l'ouverture, réglable et gardé entre les sessions | S |  |
 | P2 | ~~Taille des étiquettes réglée à part de celle des icônes~~ fait en 0.543 | S |  |
 | P3 | ~~Éthérite la plus proche du drapeau ou d'un point, avec son coût~~ fait en 0.544 | S |  |
-| P5 | Molette : zoom depuis toute la fenêtre et pas réglable | S |  |
+| P5 | ~~Molette : zoom depuis toute la fenêtre et pas réglable~~ fait en 0.545 | S |  |
 | P9 | ALEA : bonus d'expérience et couleur selon le temps restant | S | La zone d'ALEA reste rose : pas de couleur selon le temps restant. |
 | P15 | État des lectures du jeu affiché sur la carte (R-14, partie carte) | S |  |
 | P16 | Option : clic gauche sur la carte pour poser le drapeau | S | Avec réglage. |

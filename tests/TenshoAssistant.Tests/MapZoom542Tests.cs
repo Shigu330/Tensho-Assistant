@@ -8,6 +8,18 @@ internal static class MapZoom542Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Map (0.545): the wheel keeps its old step until set, can be inverted, and a bad value does no harm",() =>
+        {
+            var settings=new TenshoAssistant.MapViewSettings();
+            Check(settings.WheelFactor(1)==1.15f && settings.WheelFactor(-1)==1/1.15f,"as before");
+            settings.WheelInvert=true;
+            Check(settings.WheelFactor(1)==1/1.15f && settings.WheelFactor(-1)==1.15f,"inverted");
+            settings.WheelInvert=false;settings.WheelStep=99;
+            Check(settings.WheelFactor(1)==1.5f,"bounded");
+            settings.WheelStep=float.NaN;
+            Check(settings.WheelFactor(1)==1.15f,"not finite");
+            Check(Read("MainWindow.MapView.cs").Contains("ImGui.IsWindowHovered(ImGuiHoveredFlags.RootAndChildWindows))ZoomTo(mapZoom*configuration.MapView.WheelFactor(io.MouseWheel));"),"over the whole window");
+        }),
         ("Map (0.544): nearest aetheryte from the general and the icon menus, through the same confirmed question",() =>
         {
             var view=Read("MainWindow.MapView.cs");

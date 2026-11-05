@@ -175,6 +175,15 @@ public sealed class MapViewSettings
     // 0.378 (g, M-08): the player's bookmarks drawn on the Tensho map (a click places the flag).
     public bool ShowBookmarks { get; set; } = true;
     public float PlaceNameScale { get; set; } = 1f;
+    // 0.545 (P5): the wheel's step and direction; 1.15 is what the map always did.
+    public float WheelStep { get; set; } = 1.15f;
+    public bool WheelInvert { get; set; }
+    /// <summary>By how much one wheel notch multiplies the zoom.</summary>
+    public float WheelFactor(float wheel)
+    {
+        var step=Math.Clamp(float.IsFinite(WheelStep) ? WheelStep:1.15f,1.02f,1.5f);
+        return wheel>0 != WheelInvert ? step:1/step;
+    }
     // 0.543 (P2): names follow the zoom on their own (null: as the icons) and hide under a zoom; gathering labels have their size and threshold, 0.6 being the old fixed one.
     public float? NameZoomFollow { get; set; }
     public float NameMinZoom { get; set; }

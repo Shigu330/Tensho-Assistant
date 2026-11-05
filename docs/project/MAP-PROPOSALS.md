@@ -50,6 +50,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P5 — Molette : zoom depuis toute la fenêtre et pas réglable
 
+- **État (relu le 2026-11-05)** : FAIT 0.545.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : La molette zoome partout au-dessus de la carte : sur le curseur de zoom, sur la colonne d'outils et sur les noms posés par-dessus la carte. Le pas de la molette est réglable et son sens peut être inversé.
 - **Comment, taille, dépendances** : Lire io.MouseWheel quand la fenêtre de la carte ou l'un de ses enfants est survolé (IsWindowHovered RootAndChildWindows). Au-dessus de la colonne ou du curseur, zoomer autour du centre du canevas. Ajouter MapViewSettings.WheelStep et WheelInvert, avec infobulle et ↺. Taille S. Aucune sonde. Une décision : préciser ce que visait la note, puisque la molette marche déjà sur le canevas (recommandé : les trois points ci-dessus).

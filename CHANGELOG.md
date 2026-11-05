@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.545.0
+- Plan global, P5 : la molette ne zoomait que sur le fond de carte. Elle marche maintenant sur toute la fenêtre de la carte (colonne d'outils, curseur, noms posés dessus), autour du centre de la vue. Réglages : pas de la molette et sens inversé. Par défaut, le pas reste 15 %.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1009/1009, 0 avertissement, 0 erreur ; DLL 0.545.0.0. Non validé en jeu.
+### English
+- The mouse wheel now zooms over the whole map window. Its step and direction are settings.
+
 ## 0.544.0
 - Plan global, P3 : depuis un point quelconque ou le drapeau, le clic droit de la carte propose l'éthérite la plus proche avec son coût. Déjà présent : le calcul et la question de 0.373, repris sans doublon. Téléportation seulement après confirmation.
 - Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1008/1008, 0 avertissement, 0 erreur ; DLL 0.544.0.0. Non validé en jeu.

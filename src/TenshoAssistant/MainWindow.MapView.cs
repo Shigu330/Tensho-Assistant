@@ -597,6 +597,11 @@ internal sealed partial class MainWindow
                 if(ImGui.SliderFloat(localization.Get("MapView.FocusZoom"),ref focus,15,400,"%.0f %%")){settings.FocusZoom=focus/100;changed=true;}
                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.FocusZoomHelp"));
                 if(DefaultButton("FocusZoom",settings.FocusZoom!=MapDefaults.FocusZoom)){settings.FocusZoom=MapDefaults.FocusZoom;changed=true;}
+                var wheel=(Math.Clamp(float.IsFinite(settings.WheelStep) ? settings.WheelStep:1.15f,1.02f,1.5f)-1)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.WheelStep"),ref wheel,2,50,"%.0f %%")){settings.WheelStep=1+wheel/100;changed=true;}
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.WheelStepHelp"));
+                if(DefaultButton("WheelStep",settings.WheelStep!=MapDefaults.WheelStep)){settings.WheelStep=MapDefaults.WheelStep;changed=true;}
+                changed|=SettingBox("MapView.WheelInvert",settings.WheelInvert,value=>settings.WheelInvert=value,MapDefaults.WheelInvert);
                 var follow=MapViewSettings.ClampFollow(settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.ZoomFollow"),ref follow,0,100,"%.0f %%")){settings.ZoomFollow=follow/100;changed=true;}
                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.ZoomFollowHelp"));
@@ -910,9 +915,11 @@ internal sealed partial class MainWindow
         {
             // Zoom around the cursor: the pixel under the mouse stays under the mouse.
             var before=(io.MousePos-origin-mapPan)/mapZoom;
-            mapZoom=MapProjection.ClampZoom(mapZoom*(io.MouseWheel>0 ? 1.15f:1/1.15f));
+            mapZoom=MapProjection.ClampZoom(mapZoom*configuration.MapView.WheelFactor(io.MouseWheel));
             mapPan=io.MousePos-origin-before*mapZoom;
         }
+        // 0.545 (P5): over the tool column, the slider or the names on the map, the wheel zooms around the centre of the view.
+        else if(io.MouseWheel!=0 && ImGui.IsWindowHovered(ImGuiHoveredFlags.RootAndChildWindows))ZoomTo(mapZoom*configuration.MapView.WheelFactor(io.MouseWheel));
         if(mapFitDelay>0 && --mapFitDelay==0)mapFitRequested=true;
         if(mapFocusRequest is { } focus)
         {
