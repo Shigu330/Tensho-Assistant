@@ -34,6 +34,9 @@ internal static class DiscordWebhookTests
         {
             var settings = new DiscordSettings { Enabled = true, WebhookUrl = Url };
             var at = new DateTimeOffset(2026,11,2,14,5,0,TimeSpan.Zero);
+            var off=new DiscordSettings{ReminderRowsOff=["Ventures"]};
+            Check(DiscordWebhook.ReminderRowOf(new TenshoAlarm{AutoKey="venture:12"})=="Ventures" && DiscordWebhook.ReminderRowOf(new TenshoAlarm{AutoKey="squadron:mission"})=="SquadronMission" && DiscordWebhook.ReminderRowOf(new TenshoAlarm{ReminderRow="Supply"})=="Supply","0.578 the row");
+            Check(!DiscordWebhook.ReminderRowOn(off,new TenshoAlarm{AutoKey="venture:12"}) && DiscordWebhook.ReminderRowOn(off,new TenshoAlarm{ReminderRow="Supply"}) && DiscordWebhook.ReminderRowOn(off,new TenshoAlarm()),"0.578 only the row switched off");
             var unix=at.ToUnixTimeSeconds();
             Check(DiscordWebhook.Format(settings,"[discordtime] [relative] [zone] [item]",null,"x",1,at,null,"Limsa","Fer") == $"<t:{unix}:t> <t:{unix}:R> Limsa Fer","0.564 markers");
             Check(DiscordWebhook.Format(settings,"[zone][item]",null,"x",1,at,null) == "","unknown names leave nothing");

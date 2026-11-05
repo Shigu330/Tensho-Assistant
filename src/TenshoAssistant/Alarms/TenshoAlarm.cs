@@ -39,6 +39,8 @@ public sealed class TenshoAlarm
     public AlarmSource Source { get; set; }
     // 0.371 (g, M-01): key of the deadline an automatic alarm follows (AutoAlarms); empty for the player's own alarms.
     public string AutoKey { get; set; } = "";
+    // 0.578 (user request): the row of the Reminders page this alarm comes from, for its Discord box.
+    public string ReminderRow { get; set; } = "";
     public bool Discord { get; set; } = true;
     public string DiscordMessage { get; set; } = "";
 }

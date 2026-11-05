@@ -15,6 +15,8 @@ public enum AlarmSource { Other, Gathering, Fishing, Reminder, Voyage, Currency,
 public sealed class DiscordSettings
 {
     public bool Enabled { get; set; }
+    // 0.578 (user request): rows of the Reminders page whose alarms stay off Discord.
+    public List<string>? ReminderRowsOff { get; set; }
     public string WebhookUrl { get; set; } = "";
     public string Username { get; set; } = "Tensho";
     // Empty = the localized default message. Placeholders: [label], [minutes], [time], [character].
@@ -109,9 +111,22 @@ public static class DiscordWebhook
     public static bool ShouldSend(DiscordSettings? settings, AlarmSource source) =>
         settings is { Enabled: true } && IsValidUrl(settings.WebhookUrl) && CategoryOn(settings, source);
 
+    /// <summary>0.578: the Reminders row of an alarm: the one that made it, or the deadline an automatic one follows. Empty: none.</summary>
+    public static string ReminderRowOf(TenshoAlarm alarm)
+    {
+        ArgumentNullException.ThrowIfNull(alarm);
+        if (alarm.ReminderRow.Length > 0) return alarm.ReminderRow;
+        if (alarm.AutoKey == "squadron:mission") return "SquadronMission";
+        if (alarm.AutoKey == "squadron:training") return "SquadronTraining";
+        if (alarm.AutoKey.StartsWith("venture:", StringComparison.Ordinal)) return "Ventures";
+        if (alarm.AutoKey.StartsWith("vessel:", StringComparison.Ordinal)) return "Voyages";
+        return "";
+    }
+    public static bool ReminderRowOn(DiscordSettings settings, TenshoAlarm alarm) => settings.ReminderRowsOff?.Contains(ReminderRowOf(alarm)) != true;
+
     /// <summary>Whether a ringing alarm goes to Discord: setting on, valid address, the alarm's own switch and its category on.</summary>
     public static bool ShouldSend(DiscordSettings? settings, TenshoAlarm alarm) =>
-        settings is { Enabled: true } && IsValidUrl(settings.WebhookUrl) && alarm.Discord && CategoryOn(settings, SourceOf(alarm));
+        settings is { Enabled: true } && IsValidUrl(settings.WebhookUrl) && alarm.Discord && CategoryOn(settings, SourceOf(alarm)) && ReminderRowOn(settings!, alarm);
 
     /// <summary>
     /// The message text: the alarm's own message, else the template, else the default; placeholders replaced, [character] only when

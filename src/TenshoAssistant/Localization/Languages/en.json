@@ -4442,6 +4442,8 @@
     "Here": "Position"
   },
   "Reminders": {
+    "ColumnDiscord": "Discord",
+    "DiscordRowTip": "Sends this reminder's alarms to Discord, row by row. It needs Discord on, and its Reminders category or Voyages category on, in the alarm settings.\nDefault: ticked.",
     "VenturesDetail": "By retainer",
     "VentureNone": "{0}: no task",
     "VentureDone": "{0}: finished",

@@ -23,7 +23,7 @@ internal static class Todo458Tests
         ("Reminders page: one « Bar » box per row, saved; the to-do icon counts what is left; same rows as the page's done boxes",() =>
         {
             var page=Read("MainWindow.Reminders.cs");
-            Check(page.Contains("ImGui.BeginTable(\"Reminders\",6,") && page.Contains("ImGui.Checkbox(\"##Bar\"+key,ref inBar)") && page.Contains("PersonalTasks.Pending(configuration.PersonalTasks,now)"),"boxes and tasks");
+            Check(page.Contains("ImGui.BeginTable(\"Reminders\",7,") && page.Contains("ImGui.Checkbox(\"##Bar\"+key,ref inBar)") && page.Contains("PersonalTasks.Pending(configuration.PersonalTasks,now)"),"boxes and tasks");
             var entry=Read("Alarms/ReminderDtrEntry.Dalamud.cs");
             Check(entry.Contains("SeIconChar.QuestRepeatable,todoLines.Count,") && entry.Contains("configuration.ReminderBarHidden?.Contains(item.Kind.ToString())!=true"),"count and filter");
             Check(Read("Configuration.cs").Contains("\"ReminderBarHidden\","),"reset with the settings");

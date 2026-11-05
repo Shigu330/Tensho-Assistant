@@ -4442,6 +4442,8 @@
     "Here": "Position"
   },
   "Reminders": {
+    "ColumnDiscord": "Discord",
+    "DiscordRowTip": "Envoie les alarmes de ce rappel sur Discord, ligne par ligne. Il faut Discord activé, et sa catégorie Rappels ou Vaisseaux activée, dans les réglages des alarmes.\nPar défaut : coché.",
     "VenturesDetail": "Par servant",
     "VentureNone": "{0} : pas de tâche",
     "VentureDone": "{0} : finie",
