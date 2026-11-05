@@ -285,6 +285,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C35 — G15 — Aide à la pêche : lectures du jeu et premières tables hors de Draw
 
+- **État (relu le 2026-11-05)** : FAIT 0.604.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/Plugin.cs`.
 - **Ce que le joueur obtient** : Rien de visible, sinon l'absence d'à-coup à la première ouverture de l'aide à la pêche ou du panneau de récolte, et une aide qui reste conforme aux règles du projet après une mise à jour.
 - **Comment, taille, dépendances** : Copier job, territoire, position et état de pêche sur IFramework.Update (comme les autres lecteurs) ; construire les deux tables avec le catalogue de récolte (worker, cache), lues ensuite sans feuille Excel. Taille S. Sonde : aucune. Décision : aucune.

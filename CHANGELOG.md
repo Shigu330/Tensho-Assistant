@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.604.0
+- Plan global, C35 : Aide à la pêche : le joueur est copié sur le thread framework et l'affichage ne lit que cette copie ; les tables des postes de pêche et d'Abondance II sont construites hors de l'affichage à la première demande. Rien de visible, sinon moins d'à-coup à la première ouverture ; ces deux lignes peuvent manquer un court instant.
+- Tests : Fishing help. Verify.ps1 (agent) : 1104/1104, 0 avertissement, 0 erreur ; DLL 0.604.0.0. Non validé en jeu.
+### English
+- Fishing help: the player is copied on the framework thread and the frame only reads that copy; the fishing spot and Bountiful II tables are built off the frame on first use. Nothing visible except less stutter on first opening; those two lines may be missing for a moment.
+
 ## 0.603.0
 - Plan global, T23 : Compagnie libre : avec des personnages dans plusieurs compagnies, chaque atelier a son cadre et la date de son relevé. Oublier une compagnie existait déjà. Pas fait : le nom de la compagnie (pas enregistré, cadres numérotés) et la valeur du dernier butin.
 - Tests : Workshops. Verify.ps1 (agent) : 1103/1103, 0 avertissement, 0 erreur ; DLL 0.603.0.0. Non validé en jeu.

@@ -248,7 +248,6 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.ConfigureBiteTimes(biteTimes);
             // Fishing help (0.226): the FishingSpot of the player's territory nearest to the player. FishingSpot X/Z are map pixels
             // (0–2048, probe PROBE_FISHSPOT: spot 35 X 668 Z 1120 at scale 200 = map 7.7, 12.2 as Garland): world = (pixel − 1024) / scale − offset.
-            Dictionary<uint,List<(uint Id,string Name,float X,float Z,uint[] Fish)>>? fishingSpots=null;
             // g, R-05 (0.402): fishing, spearfishing and gathering notebooks, read while the Gathering page shows them.
             Gathering.NotebookReader? notebooks=null;
             registrations.Register(()=>notebooks=new Gathering.NotebookReader(framework,client,data,log),()=>notebooks?.Dispose());
@@ -258,45 +257,61 @@ public sealed class Plugin : IDalamudPlugin
             Gathering.FishingBaitReader? baitReader=null;
             registrations.Register(()=>baitReader=new Gathering.FishingBaitReader(framework,objects,log),()=>baitReader?.Dispose());
             mainWindow.FishingBait=()=>baitReader?.Bait;
-            mainWindow.ConfigureFishingHelp(()=>
+            // 0.604 (C35): the player copied on the framework thread, again only when it changed; the two tables built off the frame on first use, nothing
+            // shown until they are ready, a failure logged once.
+            System.Runtime.CompilerServices.StrongBox<(uint Job,uint Territory,float X,float Z,bool Fishing)?> fishingNowCopy=new(null);
+            IFramework.OnUpdateDelegate copyFishingNow=_=>
             {
                 var local=objects.LocalPlayer;
-                return local is null ? null
+                (uint Job,uint Territory,float X,float Z,bool Fishing)? seen=local is null ? null
                     :(local.ClassJob.RowId,(uint)client.TerritoryType,local.Position.X,local.Position.Z,condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.Fishing]);
-            },(territory,x,z)=>
+                if(seen!=Volatile.Read(ref fishingNowCopy).Value)Volatile.Write(ref fishingNowCopy,new(seen));
+            };
+            registrations.Register(()=>framework.Update+=copyFishingNow,()=>framework.Update-=copyFishingNow);
+            Task<Dictionary<uint,List<(uint Id,string Name,float X,float Z,uint[] Fish)>>>? fishingSpotsTask=null;
+            mainWindow.ConfigureFishingHelp(()=>Volatile.Read(ref fishingNowCopy).Value,(territory,x,z)=>
             {
-                if(fishingSpots is null)
+                fishingSpotsTask??=Task.Run(()=>
                 {
-                    var spots=new Dictionary<uint,List<(uint,string,float,float,uint[])>>();
-                    foreach(var spot in data.GetExcelSheet<Lumina.Excel.Sheets.FishingSpot>())
+                    var spots=new Dictionary<uint,List<(uint Id,string Name,float X,float Z,uint[] Fish)>>();
+                    try
                     {
-                        if(spot.TerritoryType.RowId==0 || !spot.TerritoryType.IsValid)continue;
-                        var map=spot.TerritoryType.Value.Map.Value;var scale=Math.Max(1,(int)map.SizeFactor)/100f;
-                        var fish=spot.Item.Where(item=>item.RowId!=0).Select(item=>item.RowId).ToArray();
-                        if(fish.Length==0)continue;
-                        if(!spots.TryGetValue(spot.TerritoryType.RowId,out var list))spots[spot.TerritoryType.RowId]=list=[];
-                        list.Add((spot.RowId,spot.PlaceName.IsValid ? spot.PlaceName.Value.Name.ExtractText():"",(spot.X-1024)/scale-map.OffsetX,(spot.Z-1024)/scale-map.OffsetY,fish));
+                        foreach(var spot in data.GetExcelSheet<Lumina.Excel.Sheets.FishingSpot>())
+                        {
+                            if(spot.TerritoryType.RowId==0 || !spot.TerritoryType.IsValid)continue;
+                            var map=spot.TerritoryType.Value.Map.Value;var scale=Math.Max(1,(int)map.SizeFactor)/100f;
+                            var fish=spot.Item.Where(item=>item.RowId!=0).Select(item=>item.RowId).ToArray();
+                            if(fish.Length==0)continue;
+                            if(!spots.TryGetValue(spot.TerritoryType.RowId,out var list))spots[spot.TerritoryType.RowId]=list=[];
+                            list.Add((spot.RowId,spot.PlaceName.IsValid ? spot.PlaceName.Value.Name.ExtractText():"",(spot.X-1024)/scale-map.OffsetX,(spot.Z-1024)/scale-map.OffsetY,fish));
+                        }
                     }
-                    fishingSpots=spots;
-                }
-                return fishingSpots.TryGetValue(territory,out var candidates) && candidates.Count>0
+                    catch(Exception error){log.Warning(error,"Fishing spots unavailable (perhaps after a game update).");}
+                    return spots;
+                });
+                if(!fishingSpotsTask.IsCompletedSuccessfully)return null;
+                return fishingSpotsTask.Result.TryGetValue(territory,out var candidates) && candidates.Count>0
                     ? candidates.OrderBy(spot=>(spot.X-x)*(spot.X-x)+(spot.Z-z)*(spot.Z-z)).First():null;
             });
             // Bountiful II base of a gathered item (0.224): ItemLevel.Gathering at its GatheringItemLevelConvertTable row, highest of its
-            // gathering rows; built once on first use (docs/evidence/0.224-bountiful-base.md).
-            Dictionary<uint,int>? bountifulBases=null;
+            // gathering rows; 0.604: built off the frame on first use (docs/evidence/0.224-bountiful-base.md).
+            Task<Dictionary<uint,int>>? bountifulBases=null;
             mainWindow.ConfigureBountifulBase(item=>
             {
-                if(bountifulBases is null)
+                bountifulBases??=Task.Run(()=>
                 {
                     var bases=new Dictionary<uint,int>();
-                    var levels=data.GetExcelSheet<Lumina.Excel.Sheets.ItemLevel>();
-                    foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.GatheringItem>())
-                        if(row.Item.RowId!=0 && levels.TryGetRow(row.GatheringItemLevel.RowId,out var level) && level.Gathering>0)
-                            bases[row.Item.RowId]=Math.Max(bases.GetValueOrDefault(row.Item.RowId),(int)level.Gathering);
-                    bountifulBases=bases;
-                }
-                return bountifulBases.TryGetValue(item,out var value) ? value:null;
+                    try
+                    {
+                        var levels=data.GetExcelSheet<Lumina.Excel.Sheets.ItemLevel>();
+                        foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.GatheringItem>())
+                            if(row.Item.RowId!=0 && levels.TryGetRow(row.GatheringItemLevel.RowId,out var level) && level.Gathering>0)
+                                bases[row.Item.RowId]=Math.Max(bases.GetValueOrDefault(row.Item.RowId),(int)level.Gathering);
+                    }
+                    catch(Exception error){log.Warning(error,"Bountiful bases unavailable (perhaps after a game update).");}
+                    return bases;
+                });
+                return bountifulBases.IsCompletedSuccessfully && bountifulBases.Result.TryGetValue(item,out var value) ? value:null;
             });
             // 0.515: a node's effects, read once per node (docs/evidence/0.515-node-effects.md). R-14: an unreadable sheet means no effect line, not a broken panel.
             var nodeEffects=new Dictionary<uint,IReadOnlyList<Gathering.GatherNodeEffect>>();

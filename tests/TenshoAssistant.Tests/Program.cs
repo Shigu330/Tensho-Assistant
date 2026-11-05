@@ -1008,6 +1008,7 @@ tests = tests.Concat(RecipeFacts600Tests.Cases).ToArray();
 tests = tests.Concat(ReadFailed601Tests.Cases).ToArray();
 tests = tests.Concat(CollectionRecent602Tests.Cases).ToArray();
 tests = tests.Concat(Workshops603Tests.Cases).ToArray();
+tests = tests.Concat(FishingHelp604Tests.Cases).ToArray();
 tests = tests.Concat(SelfCheckTests.Cases).ToArray();
 tests = tests.Concat(HelpTests.Cases).ToArray();
 tests = tests.Concat(RetainerSalesTests.Cases).ToArray();
