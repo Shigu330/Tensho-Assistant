@@ -24,6 +24,8 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
 
 ## À chaque version livrée
 
+Déroulé et pièges du code : skill `.claude/skills/tensho-version/SKILL.md` ; scripts de l'agent : `scripts/agent/` (`new-version.py`, `check.sh`, `publish-version.sh`).
+
 1. Incrémenter `<Version>` dans `src/TenshoAssistant/TenshoAssistant.csproj` selon la règle de numérotation (DEC-024) :
    **X**.y.z = grandes étapes, sur décision de l'utilisateur seulement (1.0.0 = première publication sur le dépôt Dalamud) ;
    x.**Y**.0 = nos versions (utilisateur et agent : l'agent monte ce nombre et remet le troisième à 0) ;
