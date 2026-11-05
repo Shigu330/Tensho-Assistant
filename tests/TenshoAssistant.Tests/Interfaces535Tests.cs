@@ -22,8 +22,8 @@ internal static class Interfaces535Tests
             Check(!GameWindows.Covers([Of("Big",0,0,1920,1080,9000)],200,600,300,100,1920,1080),"a screen layer");
             Check(!GameWindows.Covers([Of("NoSize",0,0,0,0,9000)],0,0,300,100,1920,1080),"no size");
             Check(GameWindows.Covers([log],200,600,300,100,1920,1080,["Gathering"]),"its game window is not open: whatever touches it");
-            foreach(var name in new[]{"_ActionBar","NamePlate","CastBarEnemy","ChatLog","ChatLogPanel_0","ScenarioTree","CursorAddon","AreaMap","ItemDetail"})Check(GameWindows.Ignored(name),"not a window: "+name);
-            foreach(var name in new[]{"MonsterNote","InventoryExpansion","Character","RecipeNote"})Check(!GameWindows.Ignored(name),"a window: "+name);
+            foreach(var name in new[]{"_ActionBar","NamePlate","CastBarEnemy","ChatLog","ChatLogPanel_0","ScenarioTree","CursorAddon","AreaMap"})Check(GameWindows.Ignored(name),"not a window: "+name);
+            foreach(var name in new[]{"MonsterNote","InventoryExpansion","Character","RecipeNote","ItemDetail","ActionDetail","Tooltip","ContextMenu"})Check(!GameWindows.Ignored(name),"a window: "+name);
             var host=Read("AttachedPanels.cs");
             Check(host.Contains("[\"TenshoInventorySort\"] = [\"Inventory\"]") && host.Contains("id == HoverPanel || !owner.HidePanelsBehindGame && id != SortButton"),"each panel has its window; the sort button leaves whatever the setting");
             Check(Read("MapViewWindow.cs").Contains("owner.MapBehindGame(at, lastSize)") && Read("PanelWindow.cs").Contains("owner.BarBehindGame(at, lastSize)"),"map and bars");

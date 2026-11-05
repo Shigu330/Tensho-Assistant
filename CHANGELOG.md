@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.538.0
+- Rapport de l'utilisateur en jeu (capture) : l'infobulle d'un objet du jeu passait sous la carte, car 0.537 ignorait les infobulles et les menus. Ils comptent maintenant comme les fenêtres. Le panneau de survol de Tensho, lui, reste affiché avec l'infobulle. 0.537 validée sur les fenêtres (« fenêtre ok »).
+- Tests : Interfaces535Tests adapté. Verify.ps1 (agent) : 1003/1003, 0 avertissement, 0 erreur ; DLL 0.538.0.0. Non validé en jeu.
+### English
+- Game tooltips and context menus now count too: an interface steps aside when one touches it.
+
 ## 0.537.0
 - Demande de l'utilisateur en jeu, avec réglages : les interfaces de Tensho s'effacent quand une fenêtre du jeu passe devant, et reviennent ensuite ([relevé](docs/evidence/0.537-game-windows.md)). Le jeu ne peut pas dessiner par-dessus : c'est l'interface entière qui se cache.
 - Panneaux accrochés à une fenêtre du jeu : seulement ce qui passe devant leur fenêtre (activé par défaut). Barres et panneaux libres : ce qui les touche (activé par défaut). Carte : ce qui la touche (Paramètres de la carte, désactivé par défaut, car elle part en entier). Le bouton Trier suit la même règle, sans réglage.
