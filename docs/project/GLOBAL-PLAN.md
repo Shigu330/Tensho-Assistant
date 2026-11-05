@@ -41,7 +41,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
-| P1 | Zoom à l'ouverture, réglable et gardé entre les sessions | S |  |
+| P1 | ~~Zoom à l'ouverture, réglable et gardé entre les sessions~~ fait en 0.542 | S |  |
 | P2 | ~~Taille des étiquettes réglée à part de celle des icônes~~ fait en 0.543 | S |  |
 | P3 | ~~Éthérite la plus proche du drapeau ou d'un point, avec son coût~~ fait en 0.544 | S |  |
 | P5 | ~~Molette : zoom depuis toute la fenêtre et pas réglable~~ fait en 0.545 | S |  |
