@@ -27,6 +27,28 @@ internal sealed partial class MainWindow
     private static readonly CollectionKind[] ExtraKinds=[CollectionKind.Hairstyle,CollectionKind.Ornament,CollectionKind.Glasses,CollectionKind.Barding,
         CollectionKind.Portrait,CollectionKind.MasterBook,CollectionKind.Folklore,CollectionKind.McGuffin,CollectionKind.OccultLore];
     private object? collectionViewExtra;
+    // 0.602 (T28): compared once per reading, and saved only when something changed.
+    private CollectionState? collectionRecentState;
+    private void DrawCollectionRecent(CollectionState state)
+    {
+        if(!ReferenceEquals(collectionRecentState,state))
+        {
+            collectionRecentState=state;
+            if(state.CharacterId!=0 && !state.Loading && state.Error is null && !state.FromCache && state.Entries.Count>0)
+            {
+                var memories=configuration.CollectionMemories??=[];
+                if(!memories.TryGetValue(state.CharacterId,out var read))memories[state.CharacterId]=read=new();
+                if(CollectionRecent.Update(read,state.Entries,DateTimeOffset.UtcNow))
+                {
+                    try{save();saveError=null;}
+                    catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Recently obtained could not be saved.");}
+                }
+            }
+        }
+        if(configuration.CollectionMemories?.GetValueOrDefault(state.CharacterId) is not {Recent.Count:>0} memory)return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("CollectionsBrowser.Recent",memory.Recent.Count)+"###CollectionRecent"))return;
+        foreach(var gain in memory.Recent)ImGui.TextUnformatted(localization.Format("CollectionsBrowser.RecentLine",gain.At.ToLocalTime().ToString("d"),gain.Name));
+    }
     private void DrawCollections(bool blueMagic = false)
     {
         Heading(localization.Get(blueMagic ? "Category.BlueMagic":"CollectionsBrowser.Title"),localization.Get(blueMagic ? "CollectionsBrowser.BlueDescription":"CollectionsBrowser.Description"));
@@ -36,6 +58,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(state.Loading ? localization.Get("CollectionsBrowser.Loading") : state.ObservedAt is { } date ? localization.Format("CollectionsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("CollectionsBrowser.Offline"));
         if (state.Error is { } error) { ImGui.TextWrapped(localization.Get("CollectionsBrowser.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error)); }
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Collections,state.ObservedAt,state.FromCache);
+        if(!blueMagic)DrawCollectionRecent(state);
         // 0.360 (g, C-09): the Wishlist tab, set again by its tab on every frame it is shown.
         collectionWishlistTab=false;collectionOutfitTab=false;
         if (!blueMagic && ImGui.BeginTabBar("CollectionKinds"))
@@ -193,7 +216,7 @@ internal sealed partial class MainWindow
                     else WrappedTooltip(developerMode ? $"{entry.Name}\n{entry.Kind} : {entry.Id}":entry.Name);
                 }
                 // 0.178: right click = links to the sources (NPC vendor, achievement, quest, recipe, gathering).
-                if(entry.Kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.TripleTriad or CollectionKind.Orchestrion || entry.ItemId!=0)
+                if(entry.Kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.Emote or CollectionKind.TripleTriad or CollectionKind.Orchestrion || entry.ItemId!=0)
                     CollectionSourcesMenu($"CollectionSources{entry.Kind}{entry.Id}",entry);
                 ImGui.TableNextColumn();
                 // 0.331: the State column says what the ✓ / ✗ badge shows: a mount, minion, card or roll read as not unlocked (CollectionStateOf)

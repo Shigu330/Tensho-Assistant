@@ -229,6 +229,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T28 — Collections : « Obtenus récemment » et menu des sources pour les emotes
 
+- **État (relu le 2026-11-05)** : FAIT 0.602.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.Collections.cs`.
 - **Ce que le joueur obtient** : Une ligne « Obtenus récemment » liste, avec la date, ce que vous avez gagné depuis le relevé précédent (montures, mascottes, rouleaux…). Le clic droit sur une emote ouvre ses sources, comme pour les montures.
 - **Comment, taille, dépendances** : À chaque observation publiée, comparer avec les identifiants obtenus déjà enregistrés (par personnage, 200 entrées au plus, gardées 90 jours) ; liste en tête de la page. Ajouter Emote au menu des sources. Taille S. Dépendances : « Rappels par personnage » (clé par personnage). Sonde : aucune. Décision : durée de conservation (recommandé : 90 jours).

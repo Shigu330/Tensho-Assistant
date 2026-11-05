@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.602.0
+- Plan global, T28 : Collections : « Obtenus récemment » liste avec la date ce qui a été gagné depuis le relevé précédent (la première lecture sert de base ; ni les succès ni les types lus à part, coiffures et autres, ne sont suivis) ; le clic droit sur une emote ouvre ses sources.
+- Tests : Recent. Verify.ps1 (agent) : 1102/1102, 0 avertissement, 0 erreur ; DLL 0.602.0.0. Non validé en jeu.
+### English
+- Collections: « Recently obtained » lists with the date what was gained since the previous reading (the first reading is the baseline; achievements and the separately read kinds, hairstyles and others, are not followed); right-clicking an emote opens its sources.
+
 ## 0.601.0
 - Plan global, C36 : Si la lecture du carnet, de la synthèse ou de la récolte échoue, une courte ligne « indisponible » apparaît à côté de la fenêtre du jeu au lieu de rien, et Diagnostics nomme la lecture. La pêche n'est pas couverte. Aussi : la ligne de faits de C14 dans le panneau du carnet.
 - Tests : Failed reading. Verify.ps1 (agent) : 1099/1099, 0 avertissement, 0 erreur ; DLL 0.601.0.0. Non validé en jeu.

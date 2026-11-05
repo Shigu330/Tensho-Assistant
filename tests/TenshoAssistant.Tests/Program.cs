@@ -1006,6 +1006,7 @@ tests = tests.Concat(DiscordChannels598Tests.Cases).ToArray();
 tests = tests.Concat(HomeToday599Tests.Cases).ToArray();
 tests = tests.Concat(RecipeFacts600Tests.Cases).ToArray();
 tests = tests.Concat(ReadFailed601Tests.Cases).ToArray();
+tests = tests.Concat(CollectionRecent602Tests.Cases).ToArray();
 tests = tests.Concat(SelfCheckTests.Cases).ToArray();
 tests = tests.Concat(HelpTests.Cases).ToArray();
 tests = tests.Concat(RetainerSalesTests.Cases).ToArray();

@@ -82,6 +82,7 @@
     <Compile Include="../../src/TenshoAssistant/Market/*.cs" Exclude="../../src/TenshoAssistant/Market/*.Dalamud.cs" Link="Market/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Collections/CollectionService.cs" Link="Collections/CollectionService.cs" />
     <Compile Include="../../src/TenshoAssistant/Collections/Outfits.cs" Link="Collections/Outfits.cs" />
+    <Compile Include="../../src/TenshoAssistant/Collections/CollectionRecent.cs" Link="Collections/CollectionRecent.cs" />
     <Compile Include="../../src/TenshoAssistant/Leves/LeveCatalog.cs" Link="Leves/LeveCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Hunting/HuntingLog.cs" Link="Hunting/HuntingLog.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GatheringCatalog.cs" Link="Gathering/GatheringCatalog.cs" />

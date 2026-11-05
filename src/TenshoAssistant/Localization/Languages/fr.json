@@ -1606,6 +1606,8 @@
     "WaitQuick": "La copie de scénario attend l’arrêt de la récolte rapide."
   },
   "CollectionsBrowser": {
+    "Recent": "Obtenus récemment ({0})",
+    "RecentLine": "{0} · {1}",
     "Title": "Collections",
     "Description": "Montures, mascottes, emotes, orchestrion, titres et succès : catalogues du jeu et acquisitions observées ; survol d’une monture, d’une mascotte ou d’un morceau : comment l’obtenir ; clic droit : liens vers ses sources. Titres et succès distinguent les listes chargées des états inconnus.",
     "BlueDescription": "Sorts du catalogue natif · cliquez sur un sort pour ouvrir sa fiche",

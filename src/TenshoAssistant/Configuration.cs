@@ -12,7 +12,7 @@ public static class ConfigurationReset
         "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenBase", "CollectableScrutinyGain", "CollectableIntuitionGain", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
-        "Voyages", "GearPlans", "GearPlanSets", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
+        "Voyages", "GearPlans", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
         // 0.503 (ONBOARD-001): the pages whose first-visit help was read.
@@ -375,6 +375,8 @@ public sealed partial class Configuration
     public Dictionary<uint,Dictionary<TenshoAssistant.Gear.GearSlot,uint>>? GearPlans { get; set; }
     // 0.593 (T25): the other named plans of each job; the one in use stays in GearPlans and GearMateria.
     public Dictionary<uint,TenshoAssistant.Gear.GearPlanSet>? GearPlanSets { get; set; }
+    // 0.602 (T28): by character, what the collections held at the last reading and what was gained since.
+    public Dictionary<ulong,TenshoAssistant.Collections.CollectionMemory>? CollectionMemories { get; set; }
     public int GearLevelsBelow { get; set; } = 5;
     public bool GearExactOutsideCaps { get; set; } = true;
     public int GearMinItemLevel { get; set; }

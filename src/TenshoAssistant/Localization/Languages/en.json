@@ -1606,6 +1606,8 @@
     "WaitQuick": "Scenario copying waits for quick gathering to stop."
   },
   "CollectionsBrowser": {
+    "Recent": "Recently obtained ({0})",
+    "RecentLine": "{0} · {1}",
     "Title": "Collections",
     "Description": "Mounts, minions, emotes, orchestrion, titles and achievements: game catalogues and observed acquisitions; hover a mount, minion or song: how to obtain it; right-click: links to its sources. Titles and achievements distinguish loaded lists from unknown states.",
     "BlueDescription": "Native spell catalogue · click a spell to inspect it",
