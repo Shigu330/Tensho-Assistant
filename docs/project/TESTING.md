@@ -786,6 +786,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.571) Mini Cactpot : comparer la table affichée au ticket du jeu, somme par somme.
 
+- [ ] (0.572) Simulateur : chercher une recette et l'ouvrir ; ajouter une action : le résultat suit sans clic.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

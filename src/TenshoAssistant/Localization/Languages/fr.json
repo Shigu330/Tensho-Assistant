@@ -686,6 +686,8 @@
     "RemoveFailed": "Impossible de retirer cette séquence. Consultez le journal Dalamud pour les détails."
   },
   "CraftSimulation": {
+    "RecipeSearch": "Chercher une recette…",
+    "RecipeSearchTip": "Nom de l'objet fabriqué, 2 lettres au moins. Un clic ouvre sa simulation ici.",
     "UseRemembered": "Utiliser les derniers attributs relevés ({0})",
     "UseRememberedTip": "Remplit le niveau et les attributs relevés la dernière fois que vous portiez ce métier, nourriture et remède compris.",
     "Thresholds": "Cette séquence tient, à cette qualité, avec au moins {0} d'Habileté, {1} de Contrôle et {2} PS (marge : +{3}, +{4}, +{5}).",
@@ -1950,6 +1952,8 @@
     "CraftLog": "Afficher l’aide macro à côté du carnet de synthèse",
     "CraftLogHelp": "Préférence sauvegardée. Suit la recette du carnet et propose une macro à copier avec les attributs du métier équipé. Calcul borné en arrière-plan ; aucune action exécutée.",
     "CraftLogAutoSolve": "Calculer automatiquement à la sélection d’une recette",
+    "AutoSimulate": "Simuler automatiquement",
+    "AutoSimulateTip": "La simulation se relance après chaque changement de la séquence ou des attributs, sans clic.\nPar défaut : activé.",
     "ShowEnglishItemName": "Afficher le nom anglais des objets",
     "ShowEnglishItemNameTip": "Écrit le nom anglais d'un objet sous le sien, dans sa fiche et son infobulle, quand ils diffèrent. Utile pour les guides et pour échanger avec d'autres joueurs.\nPar défaut : désactivé.",
     "CraftLogTryAllPresets": "Essayer les séquences des autres recettes",

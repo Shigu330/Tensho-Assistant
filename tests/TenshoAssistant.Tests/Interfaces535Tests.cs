@@ -195,6 +195,13 @@ internal static class Interfaces535Tests
             Check(TenshoAssistant.MiniGames.MiniCactpotSolver.RewardOf(5)==0 && TenshoAssistant.MiniGames.MiniCactpotSolver.RewardOf(25)==0,"out of range");
             Check(Read("MainWindow.MiniCactpot.cs").Contains("DrawMiniCactpotRewards();"),"drawn");
         }),
+        ("0.572: the simulator finds its own recipe and runs once per change",() =>
+        {
+            var view=Read("MainWindow.CraftSimulation.cs");
+            Check(view.Contains("if(key==simulationAutoKey)return false;") && view.Contains("ImGui.Button(localization.Get(\"CraftSequence.Simulate\")) || SimulationAutoDue()"),"once per change");
+            Check(view.Contains("if(simulationRecipeQuery!=simulationRecipeShown)"),"the list is rebuilt only when the text changes");
+            Check(new TenshoAssistant.CraftSearchSettings().AutoSimulate,"on by default");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

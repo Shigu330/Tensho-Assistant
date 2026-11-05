@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.572.0
+- Plan global, C15 : le simulateur a sa propre recherche de recette, et le résultat se recalcule seul après chaque changement, une fois par changement (réglage activé par défaut). Le glisser-déposer des actions reste à faire.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1035/1035, 0 avertissement, 0 erreur ; DLL 0.572.0.0. Non validé en jeu.
+### English
+- The simulator has its own recipe search, and it runs again by itself once after each change.
+
 ## 0.571.0
 - Plan global, T29 : la page Mini Cactpot montre, repliée, la table des gains selon la somme de la ligne : celle que le conseil utilise déjà. Elle reste à comparer au ticket du jeu en phase 6.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1034/1034, 0 avertissement, 0 erreur ; DLL 0.571.0.0. Non validé en jeu.

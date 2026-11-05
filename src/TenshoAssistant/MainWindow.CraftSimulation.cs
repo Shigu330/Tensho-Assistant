@@ -101,6 +101,34 @@ internal sealed partial class MainWindow
         else ImGui.TextDisabled(localization.Get("CraftMacro.WillUnknown"));
     }
     private string? craftMacroError;
+    // 0.572 (C15): once per change, never at each frame; an error stays until something changes.
+    private string simulationAutoKey="";
+    private bool SimulationAutoDue()
+    {
+        if(!CraftSearchOptions.AutoSimulate || simulationResult is not null || simulationActions.Count==0)return false;
+        var key=$"{simulationRecipe?.RecipeId}|{EffectiveCraftStats()}|{simulationQuality}|{string.Join(',',simulationActions)}";
+        if(key==simulationAutoKey)return false;
+        simulationAutoKey=key;
+        return true;
+    }
+    // 0.572 (C15): a recipe chosen from this page; the list is rebuilt only when the text changes.
+    private string simulationRecipeQuery="",simulationRecipeShown="";private RecipeDefinition[] simulationRecipeHits=[];
+    private void DrawSimulationRecipeSearch()
+    {
+        ImGui.SetNextItemWidth(260);
+        ImGui.InputTextWithHint("##SimulationRecipeSearch",localization.Get("CraftSimulation.RecipeSearch"),ref simulationRecipeQuery,60);
+        Tip("CraftSimulation.RecipeSearchTip");
+        if(simulationRecipeQuery!=simulationRecipeShown)
+        {
+            simulationRecipeShown=simulationRecipeQuery;
+            var items=itemCatalog.State.Catalog;var recipes=recipeCatalog.State.Catalog;
+            simulationRecipeHits=simulationRecipeQuery.Trim().Length<2 || items is null || recipes is null ? []
+                :items.Search(simulationRecipeQuery,100).SelectMany(item=>recipes.ForResult(item.Id)).Take(12).ToArray();
+        }
+        foreach(var hit in simulationRecipeHits)
+            if(ImGui.Selectable($"{itemCatalog.State.Catalog?.Find(hit.ResultItemId)?.Name ?? hit.ResultItemId.ToString()} · {hit.CraftType}##SimulationRecipe{hit.RecipeId}",hit.RecipeId==simulationRecipe?.RecipeId))
+            {OpenCraftSimulation(hit);simulationRecipeQuery="";simulationRecipeShown="";simulationRecipeHits=[];}
+    }
     private void OpenCraftSimulation(RecipeDefinition recipe)
     {
         if(simulationRecipe?.RecipeId!=recipe.RecipeId)
@@ -148,6 +176,7 @@ internal sealed partial class MainWindow
         }
         focusCraftPage=CraftPageTab.None;
         if(listsTab) { DrawCraftLists(); return; }
+        DrawSimulationRecipeSearch();
         if(simulationRecipe is not { } recipe) { ImGui.TextWrapped(localization.Get("CraftSimulation.ChooseRecipe")); return; }
         var resultItem=itemCatalog.State.Catalog?.Find(recipe.ResultItemId);
         DrawItemIcon(resultItem,new Vector2(36)); ImGui.SameLine();
@@ -253,7 +282,7 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,localization.Format("CraftSequence.Count",simulationActions.Count));
         if(ImGui.SmallButton(localization.Get("CraftSequence.Clear"))) { simulationActions.Clear(); simulationResult=null; simulationError=null; }
         ImGui.SameLine();
-        if(ImGui.Button(localization.Get("CraftSequence.Simulate")))
+        if(ImGui.Button(localization.Get("CraftSequence.Simulate")) || SimulationAutoDue())
         {
             try { simulationResult=CraftSimulation.Run(recipe,EffectiveCraftStats(),simulationQuality,simulationActions); StartSimulationThresholds(recipe,EffectiveCraftStats(),simulationQuality,simulationResult); simulationError=null; }
             catch(ArgumentException error)

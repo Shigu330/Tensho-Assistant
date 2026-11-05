@@ -125,6 +125,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C15 — K12 — Simulateur plus direct : choix de la recette dans la page, résultat recalculé tout seul, glisser-déposer
 
+- **État (relu le 2026-11-05)** : FAIT 0.572.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.CraftSimulation.cs`.
 - **Ce que le joueur obtient** : Le simulateur a sa propre recherche de recette (nom, métier, niveau) ; le résultat se met à jour à chaque action ajoutée, déplacée ou retirée, sans clic sur « Simuler » ; les actions se déplacent par glisser-déposer ; deux barres montrent progression et qualité.
 - **Comment, taille, dépendances** : Recherche réutilisant le catalogue d'objets et RecipeCatalog.ForResult (index calculé une fois). Simulation relancée une fois par changement (clé de la séquence et des attributs), au plus 100 actions, jamais à chaque image. Glisser-déposer ImGui. Réglage « Simuler automatiquement » (activé, infobulle, ↺). Taille S. Sonde : aucune. Décision : recalcul automatique par défaut (recommandé : oui).

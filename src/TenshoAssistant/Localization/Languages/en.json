@@ -686,6 +686,8 @@
     "RemoveFailed": "Could not remove this sequence. See the Dalamud log for details."
   },
   "CraftSimulation": {
+    "RecipeSearch": "Find a recipe…",
+    "RecipeSearchTip": "Name of the crafted item, at least 2 letters. A click opens its simulation here.",
     "UseRemembered": "Use the last read attributes ({0})",
     "UseRememberedTip": "Fills in the level and attributes last read while you wore this job, food and medicine included.",
     "Thresholds": "This sequence holds, at this quality, with at least {0} Craftsmanship, {1} Control and {2} CP (margin: +{3}, +{4}, +{5}).",
@@ -1950,6 +1952,8 @@
     "CraftLog": "Show macro helper beside the crafting log",
     "CraftLogHelp": "Saved preference. Follows the log recipe and proposes a macro using the equipped job attributes. Bounded background calculation; no action is executed.",
     "CraftLogAutoSolve": "Compute automatically when a recipe is selected",
+    "AutoSimulate": "Simulate automatically",
+    "AutoSimulateTip": "The simulation runs again after each change of the sequence or the attributes, without a click.\nDefault: on.",
     "ShowEnglishItemName": "Show items' English names",
     "ShowEnglishItemNameTip": "Writes an item's English name under its own, in its sheet and its tooltip, when they differ. Useful for guides and for talking with other players.\nDefault: off.",
     "CraftLogTryAllPresets": "Try the sequences of other recipes",
