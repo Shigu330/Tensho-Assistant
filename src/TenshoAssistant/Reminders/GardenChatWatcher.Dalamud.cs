@@ -15,6 +15,8 @@ namespace TenshoAssistant.Reminders;
 internal sealed class GardenChatWatcher : IDisposable
 {
     private const uint PlantedBedRow=4015,PlantedPotRow=3448;
+    // 0.616: measured in game and in the sheet: tending and uprooting, bed then flowerpot.
+    private static readonly uint[] TendedRows=[4017,3450],UprootedRows=[4025,3452];
     private readonly IChatGui chat;
     private readonly IFramework framework;
     private readonly IDataManager data;
@@ -42,11 +44,14 @@ internal sealed class GardenChatWatcher : IDisposable
         try
         {
             var sheet=data.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>();
-            rules=new(Parts(sheet.GetRowOrDefault(PlantedBedRow)?.Text),Parts(sheet.GetRowOrDefault(PlantedPotRow)?.Text),GardenChat.BedComesFirst(client.ClientLanguage.ToString()));
+            rules=new(Parts(sheet.GetRowOrDefault(PlantedBedRow)?.Text),Parts(sheet.GetRowOrDefault(PlantedPotRow)?.Text),GardenChat.BedComesFirst(client.ClientLanguage.ToString()),Texts(sheet,TendedRows),Texts(sheet,UprootedRows));
         }
         catch(Exception error){rulesFailed=true;log.Warning(error,"Garden detection unavailable: its game messages could not be read (perhaps after a game update).");}
         return rules;
     }
+
+    private static IEnumerable<string?> Texts(Lumina.Excel.ExcelSheet<Lumina.Excel.Sheets.LogMessage> sheet,uint[] rows)
+        =>rows.Select(row=>Parts(sheet.GetRowOrDefault(row)?.Text) is { } parts ? string.Concat(parts):null).ToArray();
 
     private static IReadOnlyList<string?>? Parts(ReadOnlySeString? text)
     {
@@ -103,6 +108,7 @@ internal sealed class GardenChatWatcher : IDisposable
             var sender=message.Sender.TextValue.Trim();var text=message.Message.TextValue;
             if(sender.Length==0 && InHousing())log.Information("Garden chat capture: [{0}] {1}",(int)message.LogKind,text);
             if(Rules()?.Read(sender,text) is not { } found)return;
+            if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted){planted(found,null,Place());return;}
             var seed=chosenSeed!=0 && DateTimeOffset.UtcNow-chosenAt<TimeSpan.FromSeconds(60) ? chosenSeed:(uint?)null;
             chosenSeed=0;
             planted(found,seed,Place());

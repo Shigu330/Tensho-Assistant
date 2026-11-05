@@ -5328,6 +5328,8 @@
     "Logged": "Squadron written to the Dalamud log."
   },
   "Garden": {
+    "CareSeveral": "Garden: several beds are noted here and the game does not say which one: update it in the Garden page.",
+    "UprootedNotice": "Garden: {0} removed from the journal — {1}.",
     "PageTitle": "Garden",
     "PageDescription": "Your beds and pots with their reminders, and the crossbreeds of seeds with a planting plan. Plantings are noted automatically from the game's chat lines (setting below).",
     "Title": "Garden journal ({0})",

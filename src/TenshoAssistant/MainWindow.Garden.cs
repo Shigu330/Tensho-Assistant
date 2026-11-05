@@ -37,6 +37,7 @@ internal sealed partial class MainWindow
     /// </summary>
     internal void GardenPlanted(GardenChatEvent found,uint? seedId,string? zone)
     {
+        if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted){GardenCared(found.Kind,zone);return;}
         var seeds=GardenSeedCatalog?.Invoke() ?? [];
         var known=seedId is { } id ? seeds.FirstOrDefault(row=>row.Seed.SeedId==id):default;
         if(known.Seed is null){ChatNotice?.Invoke(localization.Get("Garden.DetectedUnknown"));return;}
@@ -46,6 +47,22 @@ internal sealed partial class MainWindow
         if(beds is null){ChatNotice?.Invoke(localization.Get("Garden.Full"));return;}
         configuration.GardenBeds=beds;
         ChatNotice?.Invoke(localization.Format("Garden.DetectedNotice",known.Name,place));
+        SaveReminders();
+    }
+
+    /// <summary>0.616: tending or uprooting read from the chat. The line does not say which bed: with one bed noted here it is that one, with several nothing is guessed.</summary>
+    private void GardenCared(GardenChatKind kind,string? zone)
+    {
+        var here=GardenJournal.At(configuration.GardenBeds,zone);
+        if(here.Length==0)return;
+        if(here.Length>1){ChatNotice?.Invoke(localization.Get("Garden.CareSeveral"));return;}
+        var bed=here[0];
+        if(kind==GardenChatKind.Tended)GardenJournal.Tend(bed,DateTimeOffset.UtcNow);
+        else
+        {
+            configuration.GardenBeds=(configuration.GardenBeds ?? []).Where(row=>row.Id!=bed.Id).ToList();
+            ChatNotice?.Invoke(localization.Format("Garden.UprootedNotice",bed.Seed,bed.Place));
+        }
         SaveReminders();
     }
 

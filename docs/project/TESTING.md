@@ -874,6 +874,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.615) Avec un lien de carte dans le chat pendant une coupure : il n'apparaît pas dans la liste des liens.
 
+- [ ] (0.616) Avec une seule plante notée : un entretien met à jour sa date, une plante arrachée la retire du journal. Avec plusieurs : une ligne de chat, rien ne change.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

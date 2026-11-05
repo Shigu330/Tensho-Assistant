@@ -78,6 +78,12 @@ public static class GardenJournal
         return kept;
     }
 
+    /// <summary>
+    /// 0.616: the beds noted at a place (« zone ward-plot »), for a game line that does not say which bed: only one can be acted on, nothing is guessed among several.
+    /// </summary>
+    public static GardenBed[] At(IEnumerable<GardenBed>? beds,string? place)
+        =>string.IsNullOrWhiteSpace(place) ? []:(beds ?? []).Where(bed=>bed.Place==place || bed.Place.StartsWith(place+" ·",StringComparison.Ordinal)).ToArray();
+
     public static void Tend(GardenBed bed,DateTimeOffset now){bed.TendedAt=now;bed.TendSaidFor=null;}
 
     /// <summary>

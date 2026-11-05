@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.616.0
+- Plan global, #36 : Jardin : l'entretien et la plante arrachée sont reconnus dans le chat, messages captés en jeu (LogMessage 4017, 3450, 4025, 3452). Avec un seul emplacement noté à cet endroit, le journal se met à jour ; avec plusieurs, rien n'est deviné et une ligne de chat le dit. Reste la récolte, en attente du timer.
+- Tests : Garden care. Verify.ps1 (agent) : 1125/1125, 0 avertissement, 0 erreur ; DLL 0.616.0.0. Non validé en jeu.
+### English
+- Garden: tending and uprooting are recognised in the chat, messages captured in game (LogMessage 4017, 3450, 4025, 3452). With one bed noted at that place the journal updates; with several nothing is guessed and a chat line says so. The harvest remains, waiting for the timer.
+
 ## 0.615.0
 - Plan global, DEC-038 : Coupure compétitive : un oubli corrigé. Les deux lecteurs du chat (jardin, liens de carte) lisaient encore pendant la coupure ; ils sont maintenant arrêtés, et un test l'impose.
 - Tests : Competitive (0.615). Verify.ps1 (agent) : 1121/1121, 0 avertissement, 0 erreur ; DLL 0.615.0.0. Non validé en jeu.

@@ -5328,6 +5328,8 @@
     "Logged": "Escouade écrite dans le journal de Dalamud."
   },
   "Garden": {
+    "CareSeveral": "Jardin : plusieurs emplacements sont notés ici et le jeu ne dit pas lequel : mettez-le à jour dans la page Jardin.",
+    "UprootedNotice": "Jardin : {0} retiré du journal — {1}.",
     "PageTitle": "Jardinage",
     "PageDescription": "Vos parcelles et vos pots avec leurs rappels, et les croisements de graines avec un plan de plantation. Les plantations sont notées d'office à partir des lignes du chat du jeu (réglage ci-dessous).",
     "Title": "Journal de jardinage ({0})",
