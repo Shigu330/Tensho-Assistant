@@ -33,6 +33,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T3 — Quêtes : colonnes Niveau et Zone, tri et filtre de niveau
 
+- **État (relu le 2026-11-05)** : FAIT 0.550.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.Quests.cs`.
 - **Ce que le joueur obtient** : La liste des quêtes montre le niveau et la zone de chaque quête. Vous la triez par niveau ou par zone et la limitez à une plage de niveaux, par exemple les quêtes annexes de votre niveau dans une zone.
 - **Comment, taille, dépendances** : Deux colonnes de plus, avec ImGuiTableFlags.Sortable. Le tri est refait seulement quand l'entrée change, comme questMatches (rien de lourd dans Draw). Champs « niveau de … à … » avec infobulle et ↺, mémorisés. Taille S. Dépendances : aucune. Sonde : aucune. Décision : aucune.

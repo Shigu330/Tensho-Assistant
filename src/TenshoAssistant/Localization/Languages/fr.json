@@ -1603,6 +1603,12 @@
     "CategoryTip": "Ne montre que les succès de cette catégorie du jeu."
   },
   "QuestsBrowser": {
+    "Level": "Niveau",
+    "Zone": "Zone",
+    "LevelFrom": "Niveau de",
+    "LevelFromTip": "Montre seulement les quêtes à partir de ce niveau. 0 : pas de limite. Une quête dont le niveau est inconnu est retirée quand une limite est réglée.",
+    "LevelTo": "à",
+    "LevelToTip": "Montre seulement les quêtes jusqu'à ce niveau. 0 : pas de limite.",
     "CityUnknown": "inconnue",
     "OtherCities": "Afficher les quêtes non jouables ({0})",
     "OtherCitiesHelp": "Quêtes que ce personnage ne peut plus faire : débuts d'épopée des autres cités de départ (votre cité : {0}), autres Grandes Compagnies, autres options d'un embranchement de l'épopée. Elles sont masquées et ne comptent pas dans les pourcentages.",

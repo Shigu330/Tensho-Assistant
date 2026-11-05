@@ -47,6 +47,7 @@
     <Compile Include="../../src/TenshoAssistant/Character/StatFormulas.cs" Link="Character/StatFormulas.cs" />
     <Compile Include="../../src/TenshoAssistant/Character/CharacterStatus.cs" Link="Character/CharacterStatus.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestService.cs" Link="Quests/QuestService.cs" />
+    <Compile Include="../../src/TenshoAssistant/Quests/QuestList.cs" Link="Quests/QuestList.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestStartCities.cs" Link="Quests/QuestStartCities.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestAlternatives.cs" Link="Quests/QuestAlternatives.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/ResetSchedule.cs" Link="Reminders/ResetSchedule.cs" />

@@ -74,7 +74,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | C32 | Commandes « /tensho recolte » et « /tensho recette » (suite de I16) | S |  |
 | C35 | Aide à la pêche : lectures du jeu et premières tables hors de Draw | S |  |
 | C36 | R-14, partie artisanat et récolte : une aide illisible le dit au lieu de disparaître | S |  |
-| T3 | Quêtes : colonnes Niveau et Zone, tri et filtre de niveau | S |  |
+| T3 | ~~Quêtes : colonnes Niveau et Zone, tri et filtre de niveau~~ fait en 0.550 | S |  |
 | T4 | Monstres : drapeau sur la position du monstre, pas au centre de la carte | S |  |
 | T16 | Tâches de servants : une ligne par servant, avec alarme | S |  |
 | T17 | Rappels cochés d'eux-mêmes quand le jeu le dit | S |  |

@@ -32,6 +32,8 @@ internal sealed partial class MainWindow
     private int questViewFilter = -1;
     private string[] questCategories = [];
     private QuestEntry[] questMatches = [];
+    private (int From, int To) questViewLevels;
+    private (int Column, bool Descending) questSort, questViewSort;
     private int questActiveCount;
     private int questCompleteCount;
     private QuestLinks questLinks = new(Array.Empty<QuestEntry>());
@@ -123,30 +125,53 @@ internal sealed partial class MainWindow
             ImGui.Checkbox(localization.Format("QuestsBrowser.OtherCities", questOtherCity.Count) + "###QuestOtherCities", ref questShowOtherCities);
             if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("QuestsBrowser.OtherCitiesHelp", questPlayerCity ?? localization.Get("QuestsBrowser.CityUnknown")));
         }
+        // 0.550 (T3).
+        var levelFrom = configuration.QuestList.LevelFrom; var levelTo = configuration.QuestList.LevelTo;
+        ImGui.SetNextItemWidth(90);
+        var levelsChanged = ImGui.InputInt(localization.Get("QuestsBrowser.LevelFrom") + "###QuestLevelFrom", ref levelFrom);
+        Tip("QuestsBrowser.LevelFromTip");
+        ImGui.SameLine(); ImGui.SetNextItemWidth(90);
+        levelsChanged |= ImGui.InputInt(localization.Get("QuestsBrowser.LevelTo") + "###QuestLevelTo", ref levelTo);
+        Tip("QuestsBrowser.LevelToTip");
+        if (levelsChanged)
+        {
+            configuration.QuestList.LevelFrom = Math.Clamp(levelFrom, 0, 999); configuration.QuestList.LevelTo = Math.Clamp(levelTo, 0, 999);
+            try { save(); } catch (Exception saveFailure) { log.Warning(saveFailure, "Could not save the quest levels."); }
+        }
         ImGui.TextWrapped(localization.Get("QuestsBrowser.Help"));
         if (!ReferenceEquals(questViewState?.Entries, state.Entries) || questViewQuery != questQuery
             || questViewCategory != questCategory || questViewFilter != questFilter || questViewSection != questSection
-            || questViewShowOtherCities != questShowOtherCities)
+            || questViewShowOtherCities != questShowOtherCities || questViewLevels != (configuration.QuestList.LevelFrom, configuration.QuestList.LevelTo) || questViewSort != questSort)
         {
+            questViewLevels = (configuration.QuestList.LevelFrom, configuration.QuestList.LevelTo); questViewSort = questSort;
             questViewSection = questSection; questViewShowOtherCities = questShowOtherCities;
-            questMatches = state.Entries.Where(entry => (questShowOtherCities || !questOtherCity.Contains(entry.Id))
+            questMatches = TenshoAssistant.Quests.QuestList.Sorted(state.Entries.Where(entry => (questShowOtherCities || !questOtherCity.Contains(entry.Id))
+                && TenshoAssistant.Quests.QuestList.InLevels(entry.Level, questViewLevels.From, questViewLevels.To)
                 && (questSection.Length == 0 || entry.Section == questSection)
                 && (string.IsNullOrWhiteSpace(questCategory) || entry.Category == questCategory)
                 && (questFilter == 0 || entry.Progress == (questFilter == 1 ? QuestProgress.Active : questFilter == 2 ? QuestProgress.Complete : QuestProgress.Unconfirmed))
                 && (string.IsNullOrWhiteSpace(questQuery) || entry.Name.Contains(questQuery.Trim(), StringComparison.OrdinalIgnoreCase)
-                    || entry.Id.ToString(CultureInfo.InvariantCulture) == questQuery.Trim())).ToArray();
+                    || entry.Id.ToString(CultureInfo.InvariantCulture) == questQuery.Trim())), questSort.Column, questSort.Descending);
             questViewState = state; questViewQuery = questQuery;
             questViewCategory = questCategory; questViewFilter = questFilter;
         }
         var matches = questMatches;
         if (matches.Length == 0) { ImGui.TextDisabled(localization.Get("QuestsBrowser.Empty")); return; }
-        if (!ImGui.BeginTable("QuestEntries", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp)) return;
+        if (!ImGui.BeginTable("QuestEntries", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.Sortable)) return;
         try
         {
             ImGui.TableSetupColumn(localization.Get("QuestsBrowser.Quest"), ImGuiTableColumnFlags.WidthStretch, 2);
+            ImGui.TableSetupColumn(localization.Get("QuestsBrowser.Level"));
+            ImGui.TableSetupColumn(localization.Get("QuestsBrowser.Zone"));
             ImGui.TableSetupColumn(localization.Get("QuestsBrowser.Category"));
             ImGui.TableSetupColumn(localization.Get("QuestsBrowser.Progress"));
             ImGui.TableHeadersRow();
+            var specs = ImGui.TableGetSortSpecs();
+            if (!specs.IsNull && specs.SpecsDirty && specs.SpecsCount > 0)
+            {
+                questSort = (specs.Specs.ColumnIndex, specs.Specs.SortDirection == ImGuiSortDirection.Descending);
+                specs.SpecsDirty = false;
+            }
             var clipper = ImGui.ImGuiListClipper();
             try
             {
@@ -162,6 +187,8 @@ internal sealed partial class MainWindow
                 if (ImGui.Selectable($"{entry.Name}##quest{entry.Id}", selectedQuestId == entry.Id)) SelectQuest(entry.Id);
                 if (ImGui.IsItemHovered()) WrappedTooltip(developerMode ? $"{entry.Name}\n{entry.Section} › {entry.Category}\nID: {entry.Id}":$"{entry.Name}\n{entry.Section} › {entry.Category}");
                 QuestMenu($"QuestMenu{entry.Id}", entry.Id, entry.Name);
+                ImGui.TableNextColumn(); if (entry.Level > 0) ImGui.TextUnformatted(entry.Level.ToString(CultureInfo.CurrentCulture)); else ImGui.TextDisabled("?");
+                ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Zone ?? "");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Category);
                 if (entry.Section.Length > 0 && ImGui.IsItemHovered()) WrappedTooltip(entry.Section);
                 ImGui.TableNextColumn();

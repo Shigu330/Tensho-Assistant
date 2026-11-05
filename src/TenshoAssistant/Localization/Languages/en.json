@@ -1603,6 +1603,12 @@
     "CategoryTip": "Shows only achievements of this game category."
   },
   "QuestsBrowser": {
+    "Level": "Level",
+    "Zone": "Zone",
+    "LevelFrom": "Level from",
+    "LevelFromTip": "Shows only quests from this level. 0: no limit. A quest whose level is unknown is left out when a limit is set.",
+    "LevelTo": "to",
+    "LevelToTip": "Shows only quests up to this level. 0: no limit.",
     "CityUnknown": "unknown",
     "OtherCities": "Show quests you cannot play ({0})",
     "OtherCitiesHelp": "Quests this character can no longer do: the other starting cities' main scenario openings (your city: {0}), the other Grand Companies, the other options of a main scenario branch. They are hidden and left out of the percentages.",

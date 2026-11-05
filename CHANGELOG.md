@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.550.0
+- Plan global, T3 : la liste des quêtes montre le niveau et la zone, se trie sur chaque colonne et se limite à une plage de niveaux, gardée entre les sessions. Une quête de niveau inconnu n'est pas prise pour le niveau 0.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1014/1014, 0 avertissement, 0 erreur ; DLL 0.550.0.0. Non validé en jeu.
+### English
+- The quest list shows level and zone, sorts on every column and can be limited to a level range.
+
 ## 0.549.0
 - Plan global, I0 : l'équipement porté compte comme possédé, sur une ligne « Équipement porté » : la Revue de mode ne dit plus « non possédé » pour une pièce portée, et le stock au survol et la fiche objet l'incluent. Le tri et la grille de la Banque restent sur les sacs.
 - Tests : ItemHoldingsTests complété. Verify.ps1 (agent) : 1013/1013, 0 avertissement, 0 erreur ; DLL 0.549.0.0. Non validé en jeu.

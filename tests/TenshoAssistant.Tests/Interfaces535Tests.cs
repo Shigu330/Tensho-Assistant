@@ -65,6 +65,17 @@ internal static class Interfaces535Tests
             Check(tools.Contains("toolPrices.StartListAsync(market,character,worldId,unpriced.Take(ToolItemCost.MaximumAsked))") && tools.Contains("SourceButton(localization.Format(\"MyToolsUi.AskPrices\""),"on the button, within the session's limit");
             Check(TenshoAssistant.MyTools.ToolItemCost.MaximumAsked==32,"the session's limit");
         }),
+        ("0.550: the quest list has a level range and sorted columns",() =>
+        {
+            Check(TenshoAssistant.Quests.QuestList.InLevels(0,0,0) && TenshoAssistant.Quests.QuestList.InLevels(50,0,0),"no limit: everything");
+            Check(!TenshoAssistant.Quests.QuestList.InLevels(0,10,0),"unknown level is not level 0");
+            Check(TenshoAssistant.Quests.QuestList.InLevels(50,50,50) && !TenshoAssistant.Quests.QuestList.InLevels(49,50,0) && !TenshoAssistant.Quests.QuestList.InLevels(51,0,50),"bounds");
+            TenshoAssistant.Quests.QuestEntry Of(uint id,string name,int level,string zone)=>new(id,name,"Cat",0,TenshoAssistant.Quests.QuestProgress.Unconfirmed,null){Level=(ushort)level,Zone=zone};
+            var list=new[]{Of(1,"B",10,"Z"),Of(2,"A",20,"Y"),Of(3,"C",10,"X")};
+            Check(TenshoAssistant.Quests.QuestList.Sorted(list,TenshoAssistant.Quests.QuestList.ColumnLevel,true).First().Id==2,"by level, descending");
+            Check(TenshoAssistant.Quests.QuestList.Sorted(list,TenshoAssistant.Quests.QuestList.ColumnLevel,false).Select(entry=>entry.Id).SequenceEqual(new uint[]{1,3,2}),"then by name");
+            Check(TenshoAssistant.Quests.QuestList.Sorted(list,TenshoAssistant.Quests.QuestList.ColumnZone,false).First().Id==3,"by zone");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");
