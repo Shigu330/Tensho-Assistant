@@ -171,13 +171,15 @@ internal sealed partial class MainWindow
             // 0.438 (user request): actions the player forbids, everywhere crafting actions are proposed.
             DrawForbiddenActions(search);
             ImGui.TextColored(Accent,localization.Get("ModuleSettings.Export"));
-            var exportBefore=(search.ExtraWait,search.Echo,search.BuffExtraWait);
+            var exportBefore=(search.ExtraWait,search.Echo,search.BuffExtraWait,search.EchoSound,search.EchoLastOnly);
             IntSetting("ModuleSettings.Wait","SettingTips.Wait",()=>search.ExtraWait,value=>search.ExtraWait=value,0,3,searchDefaults.ExtraWait);
             // X-12 (0.419): the buffs' extra wait apart (shown as the actions' one until changed).
             IntSetting("ModuleSettings.BuffWait","SettingTips.BuffWait",()=>search.BuffExtraWait ?? search.ExtraWait,value=>search.BuffExtraWait=value,0,3,searchDefaults.ExtraWait);
             BoolSetting("ModuleSettings.AutoSimulate","ModuleSettings.AutoSimulateTip",()=>configuration.CraftSearch.AutoSimulate,value=>configuration.CraftSearch.AutoSimulate=value,c=>c.CraftSearch.AutoSimulate);
             BoolSetting("ModuleSettings.Echo","SettingTips.Echo",()=>configuration.CraftSearch.Echo,value=>configuration.CraftSearch.Echo=value,c=>c.CraftSearch.Echo);
-            if(exportBefore!=(search.ExtraWait,search.Echo,search.BuffExtraWait)){craftMacroExport=null;craftMacroError=null;}
+            IntSetting("ModuleSettings.EchoSound","ModuleSettings.EchoSoundTip",()=>search.EchoSound,value=>search.EchoSound=value,0,16,searchDefaults.EchoSound);
+            BoolSetting("ModuleSettings.EchoLastOnly","ModuleSettings.EchoLastOnlyTip",()=>configuration.CraftSearch.EchoLastOnly,value=>configuration.CraftSearch.EchoLastOnly=value,c=>c.CraftSearch.EchoLastOnly);
+            if(exportBefore!=(search.ExtraWait,search.Echo,search.BuffExtraWait,search.EchoSound,search.EchoLastOnly)){craftMacroExport=null;craftMacroError=null;}
             ImGui.TextDisabled(localization.Get("ModuleSettings.ExportHelp"));
             // Game macros used by « Copy into the game's macros » (0.191).
             var copy=configuration.MacroCopy ??= new();

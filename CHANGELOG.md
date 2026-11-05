@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.573.0
+- Plan global, C17 : macros : son de la ligne de fin réglable de 1 à 16, ou aucun, et ligne de fin sur la dernière page seulement. Par défaut, rien ne change. L'attente séparée existait déjà (0.419). L'icône des macros reste à sonder en jeu.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1036/1036, 0 avertissement, 0 erreur ; DLL 0.573.0.0. Non validé en jeu.
+### English
+- Macro export: the end line's sound can be set from 1 to 16 or none, and the line can stay on the last page only.
+
 ## 0.572.0
 - Plan global, C15 : le simulateur a sa propre recherche de recette, et le résultat se recalcule seul après chaque changement, une fois par changement (réglage activé par défaut). Le glisser-déposer des actions reste à faire.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1035/1035, 0 avertissement, 0 erreur ; DLL 0.572.0.0. Non validé en jeu.

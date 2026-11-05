@@ -141,6 +141,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C17 — K14 — Options d'export des macros : attentes séparées (X-12), son, écho final, icône
 
+- **État (relu le 2026-11-05)** : FAIT 0.573.
 - **État (relu le 2026-11-03)** : en partie 0.419 (X-12 : attente à part pour les buffs) ; son, écho final, icône non faits.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Craft/CraftMacroExport.cs`.
 - **Ce que le joueur obtient** : Vous réglez l'attente des actions et celle des effets séparément, choisissez le son de fin (ou aucun), l'écho sur chaque page ou seulement sur la dernière, et l'icône des macros écrites dans le jeu au lieu du « ? » imposé.

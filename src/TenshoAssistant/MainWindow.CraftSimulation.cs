@@ -355,7 +355,7 @@ internal sealed partial class MainWindow
         {
             if(ImGui.Button(localization.Get("CraftMacro.Prepare")))
             {
-                try { craftMacroExport=CraftMacroExporter.Build(result,job,catalog,craftMacroExtraWait,craftMacroEcho,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true); craftMacroError=null; }
+                try { craftMacroExport=CraftMacroExporter.Build(result,job,catalog,craftMacroExtraWait,craftMacroEcho,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true,CraftSearchOptions.BoundedEchoSound,CraftSearchOptions.EchoLastOnly); craftMacroError=null; }
                 catch(ArgumentException error) { craftMacroExport=null; craftMacroError="CraftMacro.Failed"; log.Warning(error,"Could not export craft macros."); }
             }
         }

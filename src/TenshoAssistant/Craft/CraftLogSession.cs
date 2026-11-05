@@ -4,7 +4,7 @@ using TenshoAssistant.Caching;
 namespace TenshoAssistant.Craft;
 
 public sealed record CraftLogInput(ulong Owner,RecipeDefinition Recipe,CraftStats Stats,CraftActionCatalog Catalog,
-    IReadOnlyList<CraftPreset> Presets,CraftSolveOptions Options,int ExtraWait,bool Echo,long ObservationRevision=0,int StartingQuality=0,bool Chain=false,int? BuffExtraWait=null,bool MacroChain=false,bool TryAllPresets=false);
+    IReadOnlyList<CraftPreset> Presets,CraftSolveOptions Options,int ExtraWait,bool Echo,long ObservationRevision=0,int StartingQuality=0,bool Chain=false,int? BuffExtraWait=null,bool MacroChain=false,bool TryAllPresets=false,int EchoSound=1,bool EchoLastOnly=false);
 // 0.552 (C2): SavedForItem = the item of the recipe it was saved for, when that is another recipe.
 public sealed record CraftLogMacro(string Name,CraftSimulationResult Simulation,CraftMacroExport Export,uint SavedForItem=0);
 // 0.467: UsedRaphael = the suggestion comes from Raphael; RaphaelError = it failed and Tensho's search was used instead.
@@ -77,7 +77,7 @@ public sealed class CraftLogSession : IDisposable
     }
     private static string CacheKey(CraftLogInput input)=>Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
     {
-        input.Owner,input.Recipe,input.Stats,input.StartingQuality,input.Options,input.ExtraWait,input.Echo,
+        input.Owner,input.Recipe,input.Stats,input.StartingQuality,input.Options,input.ExtraWait,input.Echo,input.EchoSound,input.EchoLastOnly,
         input.Presets,Version=input.Catalog.DataVersion,ModelVersion=typeof(CraftSimulation).Assembly.GetName().Version?.ToString(),
         Actions=CraftActionCatalog.Specs.Select(spec=>input.Catalog.Find(input.Recipe.CraftTypeId+8,spec.Kind)).ToArray()
     })));
@@ -89,7 +89,7 @@ public sealed class CraftLogSession : IDisposable
             {
                 if(macro is null)continue;
                 var simulation=CraftSimulation.Run(input.Recipe,input.Stats,input.StartingQuality,macro.Simulation.Steps.Select(step=>step.Action));
-                var export=CraftMacroExporter.Build(simulation,input.Recipe.CraftTypeId+8,input.Catalog,input.ExtraWait,input.Echo,input.Chain,input.BuffExtraWait,input.MacroChain);
+                var export=CraftMacroExporter.Build(simulation,input.Recipe.CraftTypeId+8,input.Catalog,input.ExtraWait,input.Echo,input.Chain,input.BuffExtraWait,input.MacroChain,input.EchoSound,input.EchoLastOnly);
                 if(simulation.RecipeId!=macro.Simulation.RecipeId || simulation.Final!=macro.Simulation.Final || simulation.StartingQuality!=macro.Simulation.StartingQuality || simulation.Stats!=macro.Simulation.Stats
                     || export.Actions!=macro.Export.Actions || export.WaitSeconds!=macro.Export.WaitSeconds
                     || !export.Pages.Select(page=>page.Text).SequenceEqual(macro.Export.Pages.Select(page=>page.Text)))return false;
@@ -113,7 +113,7 @@ public sealed class CraftLogSession : IDisposable
             {
                 var simulation=CraftSimulation.Run(input.Recipe,input.Stats,input.StartingQuality,preset.Actions,token);
                 if(simulation.Final.Finish!=CraftFinish.Completed || simulation.Error is not null)continue;
-                var export=CraftMacroExporter.Build(simulation,job,input.Catalog,input.ExtraWait,input.Echo,input.Chain,input.BuffExtraWait,input.MacroChain);
+                var export=CraftMacroExporter.Build(simulation,job,input.Catalog,input.ExtraWait,input.Echo,input.Chain,input.BuffExtraWait,input.MacroChain,input.EchoSound,input.EchoLastOnly);
                 if(CraftSolver.BetterCompletion(simulation.Final,export.WaitSeconds,saved?.Simulation.Final,saved?.Export.WaitSeconds ?? 0,input.Options.TargetQuality))
                     saved=new(preset.Name,simulation,export,own ? 0:preset.ResultItemId);
             }
@@ -129,7 +129,7 @@ public sealed class CraftLogSession : IDisposable
         token.ThrowIfCancellationRequested();
         var result=fromRaphael ?? CraftSolver.Solve(input.Recipe,input.Stats,input.StartingQuality,options,token);
         var suggested=result.Simulation is {Final.Finish:CraftFinish.Completed,Error:null} valid
-            ? new CraftLogMacro("Suggested macro",valid,CraftMacroExporter.Build(valid,job,input.Catalog,input.ExtraWait,input.Echo,input.Chain,input.BuffExtraWait,input.MacroChain)):null;
+            ? new CraftLogMacro("Suggested macro",valid,CraftMacroExporter.Build(valid,job,input.Catalog,input.ExtraWait,input.Echo,input.Chain,input.BuffExtraWait,input.MacroChain,input.EchoSound,input.EchoLastOnly)):null;
         token.ThrowIfCancellationRequested();
         return new(saved,suggested,result.TargetReached,suggested is null ? "No finished synthesis found within the search limits."
             :result.TargetReached ? null:"The sequence ends below the target quality.",fromRaphael is not null,raphaelError,fromRaphael?.FromCache==true);

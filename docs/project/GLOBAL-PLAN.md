@@ -67,7 +67,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | C12 | Qualité initiale calculée à partir des ingrédients HQ choisis | S |  |
 | C14 | A-12, partie anticipée : fiche de recette complète (livre de maître, synthèse rapide, HQ, prérequis, écart chiffré) | S |  |
 | C15 | ~~Simulateur plus direct : choix de la recette dans la page, résultat recalculé tout seul, glisser-déposer~~ fait en 0.572 | S |  |
-| C17 | Options d'export des macros : attentes séparées (X-12), son, écho final, icône | S |  |
+| C17 | ~~Options d'export des macros : attentes séparées (X-12), son, écho final, icône~~ fait en 0.573 | S |  |
 | C19 | ~~Où sont mes matériaux : détail par rangement dans la préparation et la chaîne~~ fait en 0.559 | S |  |
 | C24 | ~~Besoin restant de la préparation dans les aides de récolte et de pêche~~ fait en 0.560 | S |  |
 | C31 | ~~Météo de plusieurs zones en un tableau (zones favorites)~~ fait en 0.563 | S |  |

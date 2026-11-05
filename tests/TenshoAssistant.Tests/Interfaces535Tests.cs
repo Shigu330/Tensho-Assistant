@@ -202,6 +202,15 @@ internal static class Interfaces535Tests
             Check(view.Contains("if(simulationRecipeQuery!=simulationRecipeShown)"),"the list is rebuilt only when the text changes");
             Check(new TenshoAssistant.CraftSearchSettings().AutoSimulate,"on by default");
         }),
+        ("0.573: the macro's end line has its sound and can stay on the last page; the panel's cache key follows",() =>
+        {
+            var export=Read("Craft/CraftMacroExport.cs");
+            Check(export.Contains("if(echo && (!echoLastOnly || index==chunks.Length-1))") && export.Contains("echoSound is >=1 and <=16"),"rule");
+            Check(Read("Craft/CraftLogSession.cs").Contains("input.Echo,input.EchoSound,input.EchoLastOnly,"),"in the cache key");
+            var settings=new TenshoAssistant.CraftSearchSettings();
+            Check(settings.BoundedEchoSound==1 && !settings.EchoLastOnly,"as before until set");
+            settings.EchoSound=99;Check(settings.BoundedEchoSound==16,"bounded");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

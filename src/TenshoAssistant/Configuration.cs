@@ -115,6 +115,10 @@ public sealed class CraftSearchSettings
     public int? BuffExtraWait { get; set; }
     // 0.572 (C15): the simulation runs again by itself after each change of the sequence or the attributes.
     public bool AutoSimulate { get; set; } = true;
+    // 0.573 (C17): the sound of the end-of-page line, 1 to 16, 0 for none; and that line on the last page only.
+    public int EchoSound { get; set; } = 1;
+    public bool EchoLastOnly { get; set; }
+    public int BoundedEchoSound => Math.Clamp(EchoSound, 0, 16);
     public int? BoundedBuffExtraWait => BuffExtraWait is { } wait ? Math.Clamp(wait, 0, 3) : null;
     // 0.438 (user request): crafting actions the player forbids (names of CraftActionKind); empty by default.
     public List<string> ForbiddenActions { get; set; } = [];

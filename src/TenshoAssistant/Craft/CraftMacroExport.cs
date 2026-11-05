@@ -26,7 +26,7 @@ public static class CraftMacroExporter
         =>BaseWait(action)+(BaseWait(action)==2 && buffExtraWait is { } buff ? buff:extraWait);
 
     /// <param name="macroChain">A-10 (0.422): Caraxi's Macro Chain plugin is loaded: pages end with its « /nextmacro » instead of Tensho's marker.</param>
-    public static CraftMacroExport Build(CraftSimulationResult simulation,uint job,CraftActionCatalog catalog,int extraWait=0,bool echo=true,bool chain=false,int? buffExtraWait=null,bool macroChain=false)
+    public static CraftMacroExport Build(CraftSimulationResult simulation,uint job,CraftActionCatalog catalog,int extraWait=0,bool echo=true,bool chain=false,int? buffExtraWait=null,bool macroChain=false,int echoSound=1,bool echoLastOnly=false)
     {
         ArgumentNullException.ThrowIfNull(simulation); ArgumentNullException.ThrowIfNull(catalog);
         if(extraWait is <0 or >3 || buffExtraWait is <0 or >3 || job is <8 or >15) throw new ArgumentOutOfRangeException(nameof(extraWait));
@@ -47,7 +47,8 @@ public static class CraftMacroExporter
         for(var index=0;index<chunks.Length;index++)
         {
             var page=chunks[index].ToList();
-            if(echo) page.Add($"/echo Tensho {index+1}/{chunks.Length} <se.1>");
+            // 0.573 (C17): the sound of 1 to 16, none at 0, and on the last page only if asked.
+            if(echo && (!echoLastOnly || index==chunks.Length-1)) page.Add($"/echo Tensho {index+1}/{chunks.Length}"+(echoSound is >=1 and <=16 ? $" <se.{echoSound}>":""));
             if(chain) page.Add(macroChain ? MacroChainNext : TenshoAssistant.Macros.MacroDefinition.Marker);
             pages.Add(new(index+1,Array.AsReadOnly(page.ToArray())));
         }

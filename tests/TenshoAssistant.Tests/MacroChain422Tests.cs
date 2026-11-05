@@ -14,7 +14,7 @@ internal static class MacroChain422Tests
             Check(CraftMacroExporter.MacroChainNext=="/nextmacro" && export.Contains("if(chain) page.Add(macroChain ? MacroChainNext : TenshoAssistant.Macros.MacroDefinition.Marker);"),"marker choice");
             var plugin=Read("Plugin.cs");
             Check(plugin.Contains("plugin.InternalName==\"MacroChain\" && plugin.IsLoaded") && plugin.Contains("macroChainCheckedAt=now.AddSeconds(5)"),"detected from the loaded plugins, at most every 5 s");
-            Check(Read("Craft/CraftLogSession.cs").Contains("input.BuffExtraWait,input.MacroChain)") && Read("MainWindow.CraftSimulation.cs").Contains("MacroChainLoaded?.Invoke()==true)"),"both exports");
+            Check(Read("Craft/CraftLogSession.cs").Contains("input.BuffExtraWait,input.MacroChain") && Read("MainWindow.CraftSimulation.cs").Contains("MacroChainLoaded?.Invoke()==true"),"both exports");
         }),
     ];
 }
