@@ -8,6 +8,13 @@ internal static class MapZoom542Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Map (0.587): the cog opens the Map tab of Settings; its settings have one home",() =>
+        {
+            var view=Read("MainWindow.MapView.cs");
+            Check(view.Contains("page=Page.Settings;requestedSettingsTab=\"Map\";IsOpen=true;BringToFront();"),"to Settings");
+            Check(!view.Contains("BeginPopup(\"MapViewSettings\")"),"no popup any more");
+            Check(Read("MainWindow.Settings.cs").Contains("DrawMapSettingsBody(shown);"),"the same body in Settings");
+        }),
         ("Map (0.586): a zone's flight comes from its own link to a set, so that the old zones have their wing",() =>
         {
             var reader=Read("Maps/MapLiveReader.Dalamud.cs");

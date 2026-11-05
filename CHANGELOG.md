@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.587.0
+- Plan global, Carte : demande de l'utilisateur : la roue dentée de la carte ouvre l'onglet Carte des Paramètres, au lieu d'une fenêtre surgissante devenue trop longue. Ce sont les mêmes réglages, et la liste des icônes reste celle de la carte affichée.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1048/1048, 0 avertissement, 0 erreur ; DLL 0.587.0.0. Non validé en jeu.
+### English
+- The map's cog now opens the Map tab of Settings instead of a long popup.
+
 ## 0.586.0
 - Plan global, Carte : rapport de l'utilisateur en jeu : pas d'aile sur les vieilles zones. Tensho lisait le lien depuis l'ensemble de courants, qui ne nomme que Mor Dhona, alors que toutes ces zones partagent l'ensemble 19 (docs/evidence/0.586-flight-sets.md). Il lit maintenant la colonne de chaque zone.
 - Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1047/1047, 0 avertissement, 0 erreur ; DLL 0.586.0.0. Non validé en jeu.

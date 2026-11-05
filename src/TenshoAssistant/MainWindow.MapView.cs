@@ -435,8 +435,8 @@ internal sealed partial class MainWindow
             // 0.547 (P20): the layers in one click, the same settings as the cog's.
             Place();if(ToolButton(FontAwesomeIcon.LayerGroup,"MapView.Layers",true,ImGui.IsPopupOpen("MapViewLayers")))ImGui.OpenPopup("MapViewLayers");
             DrawMapLayers();
-            Place();if(ToolButton(FontAwesomeIcon.Cog,"MapView.Settings",true,ImGui.IsPopupOpen("MapViewSettings")))ImGui.OpenPopup("MapViewSettings");
-            DrawMapSettings(map);
+            // 0.587 (user request): too many settings for a popup: the cog opens the Map tab of Settings.
+            Place();if(ToolButton(FontAwesomeIcon.Cog,"MapView.Settings",true,false)){page=Page.Settings;requestedSettingsTab="Map";IsOpen=true;BringToFront();}
             if(slider>0)ImGui.Spacing();
             Place();if(ToolButton(FontAwesomeIcon.Plus,"MapView.ZoomIn",true))ZoomTo(mapZoom*1.25f);
             // Slider centred in the column (when there is room for it), the zoom percentage written under the − button.
@@ -505,14 +505,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndPopup();}
     }
     // Mappy-like display settings, saved at each change; every layer can be turned off.
-    private void DrawMapSettings(MapDefinition? map)
-    {
-        if(!ImGui.BeginPopup("MapViewSettings"))return;
-        // The save error under the help line; Settings › Map writes it under its tabs already.
-        try{DrawMapSettingsBody(map);if(saveError is { } failed)ImGui.TextColored(UI.FfxivTheme.Error,failed);}
-        finally{ImGui.EndPopup();}
-    }
-    // Same body in the map's cog popup and in Settings › Map (0.153: every setting reachable from the Settings page).
+    // Settings › Map, opened by the map's cog since 0.587.
     private void DrawMapSettingsBody(MapDefinition? map)
     {
         {
