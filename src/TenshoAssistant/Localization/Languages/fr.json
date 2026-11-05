@@ -686,6 +686,8 @@
     "RemoveFailed": "Impossible de retirer cette séquence. Consultez le journal Dalamud pour les détails."
   },
   "CraftSimulation": {
+    "UseRemembered": "Utiliser les derniers attributs relevés ({0})",
+    "UseRememberedTip": "Remplit le niveau et les attributs relevés la dernière fois que vous portiez ce métier, nourriture et remède compris.",
     "Thresholds": "Cette séquence tient, à cette qualité, avec au moins {0} d'Habileté, {1} de Contrôle et {2} PS (marge : +{3}, +{4}, +{5}).",
     "Detected": "Détecté : Manipulation {0} · spécialiste {1}",
     "DetectedFood": "Repas",
@@ -3416,6 +3418,7 @@
     "NotObserved": "Livraison GC possible · ouvrez le calendrier du jeu, puis les missions de ravitaillement, pour voir la demande du jour"
   },
   "CraftLogUi": {
+    "Remembered": "Attributs relevés le {0}, pas ceux du métier que vous portez. Portez-le pour calculer avec les actuels.",
     "SavedFor": "Enregistrée pour : {0}",
     "SectionState": "Votre état",
     "SectionTarget": "Cible",

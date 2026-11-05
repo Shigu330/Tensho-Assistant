@@ -750,6 +750,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.553) Simulateur : les seuils affichés correspondent ; régler ces valeurs donne le même résultat. Comparer une macro en jeu aux seuils.
 
+- [ ] (0.554) Porter un métier d'artisan, puis un autre : le carnet calcule la recette du premier avec « relevés le… » ; porter le métier reprend les valeurs actuelles.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

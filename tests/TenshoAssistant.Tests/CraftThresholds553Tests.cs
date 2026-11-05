@@ -7,6 +7,17 @@ internal static class CraftThresholds553Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Other job (0.554): the attributes last read, marked; none or too low: wear the job",() =>
+        {
+            var recipe=new RecipeDefinition(123,456,1,"Menuiserie",100,[],0,new(80,100,1000,100,100,100,100,0,0,1000));
+            var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Craft/CraftLogObservation.cs")).Replace("\r\n","\n");
+            Check(source.Split("return WrongJob();").Length==3,"both wrong-job answers");
+            Check(source.Contains("RememberedAt=seen.SeenAt") && source.Contains("seen.Craftsmanship<p.RequiredCraftsmanship"),"marked, and under the recipe's minimum it is refused");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CraftLog.cs")).Replace("\r\n","\n");
+            Check(view.Contains("known.Level==state.Level && known.Craftsmanship==craftsmanship") && view.Contains("CraftLogUi.Remembered"),"saved only when changed; the panel says it");
+            Check(new TenshoAssistant.Configuration().LastCraftStats is null,"nothing until read");
+            _=recipe;
+        }),
         ("Sequence thresholds: the lowest attributes still finish at the same quality, one less does not",() =>
         {
             var recipe=new RecipeDefinition(123,456,1,"Menuiserie",100,[],0,new(80,100,1000,100,100,100,100,0,0,1000));

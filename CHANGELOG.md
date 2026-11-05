@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.554.0
+- Plan global, C3 : le panneau du carnet calcule avec les derniers attributs relevés du métier de la recette, marqués « relevés le… », au lieu de dire « Équipez le métier ». Le simulateur propose les mêmes valeurs. Écrit seulement quand ça change. Le bouton « Simuler avec ces attributs » de la page Équipement reste à faire.
+- Tests : CraftThresholds553Tests complété. Verify.ps1 (agent) : 1018/1018, 0 avertissement, 0 erreur ; DLL 0.554.0.0. Non validé en jeu.
+### English
+- The crafting log panel and the simulator can use a job's last read attributes when that job is not worn, always marked with the date.
+
 ## 0.553.0
 - Plan global, C4 : sous une simulation terminée, l'Habileté, le Contrôle et les PS minimum pour que la séquence finisse à la même qualité, avec la marge. Calcul hors du dessin, annulé si le résultat change, avec le moteur de simulation.
 - Tests : CraftThresholds553Tests. Verify.ps1 (agent) : 1017/1017, 0 avertissement, 0 erreur ; DLL 0.553.0.0. Non validé en jeu.

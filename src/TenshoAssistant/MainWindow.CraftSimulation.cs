@@ -176,6 +176,16 @@ internal sealed partial class MainWindow
             simulationCopiedOwner=stats.CharacterId; simulationCopiedAt=stats.ObservedAt; simulationResult=null; simulationError=null;
         }
         DetectCraftState(recipe,job,canCopy,CopyStats);
+        // 0.554 (C3): the job is not worn: its attributes as last read.
+        if(!canCopy && stats.CharacterId!=0 && RememberedCraftStats(stats.CharacterId,job) is { } seenStats)
+        {
+            if(ImGui.SmallButton(localization.Format("CraftSimulation.UseRemembered",seenStats.SeenAt.ToLocalTime().ToString("g"))))
+            {
+                simulationLevel=seenStats.Level;simulationCs=seenStats.Craftsmanship;simulationControl=seenStats.Control;simulationCp=seenStats.Cp;
+                simulationCopiedOwner=0;simulationCopiedAt=null;simulationResult=null;simulationError=null;
+            }
+            Tip("CraftSimulation.UseRememberedTip");
+        }
         ImGui.BeginDisabled(!canCopy);
         try
         {

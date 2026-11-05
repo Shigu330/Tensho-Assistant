@@ -33,6 +33,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C3 — K4 — Simuler un autre métier sans le porter : derniers attributs relevés par métier et attributs prévus de la page Équipement
 
+- **État (relu le 2026-11-05)** : FAIT 0.554.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.CraftSimulation.cs`.
 - **Ce que le joueur obtient** : Le carnet du jeu laisse parcourir les recettes de tous les métiers. Le panneau calcule alors avec les derniers attributs relevés du métier de la recette (marqués « relevés le … »), au lieu de dire « Équipez le métier ». Le simulateur propose les mêmes valeurs, et un bouton « Simuler avec ces attributs » sur la page Équipement envoie l'Habileté, le Contrôle et les PS prévus (pièces et matérias choisies) au simulateur.
 - **Comment, taille, dépendances** : Garder par personnage et par métier le dernier relevé (Habileté, Contrôle, PS, niveau, date) dans la configuration (données de l'utilisateur, comme les séquences). Résolution : métier porté d'abord, sinon relevé marqué, recalcul dès que le métier est porté. Bouton sur la page Équipement quand le métier affiché est un artisan. Taille S. Sonde : aucune. Décision : utiliser les relevés dans le panneau du carnet (recommandé : oui, toujours marqué, nourriture éventuelle comprise dans le relevé).

@@ -686,6 +686,8 @@
     "RemoveFailed": "Could not remove this sequence. See the Dalamud log for details."
   },
   "CraftSimulation": {
+    "UseRemembered": "Use the last read attributes ({0})",
+    "UseRememberedTip": "Fills in the level and attributes last read while you wore this job, food and medicine included.",
     "Thresholds": "This sequence holds, at this quality, with at least {0} Craftsmanship, {1} Control and {2} CP (margin: +{3}, +{4}, +{5}).",
     "Detected": "Detected: Manipulation {0} · specialist {1}",
     "DetectedFood": "Food",
@@ -3416,6 +3418,7 @@
     "NotObserved": "Possible Grand Company delivery · open the game's Timers, then Supply missions, to see today's request"
   },
   "CraftLogUi": {
+    "Remembered": "Attributes last read on {0}, not the job you are wearing. Wear it to compute with your current ones.",
     "SavedFor": "Saved for: {0}",
     "SectionState": "Your state",
     "SectionTarget": "Target",

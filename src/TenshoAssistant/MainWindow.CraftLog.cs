@@ -61,7 +61,7 @@ internal sealed partial class MainWindow
         {ClearCraftLogCalculation();return;}
         var job=observed.CurrentJobId;var manipulationDetected=ManipulationLearned?.Invoke(job)==true;
         if(now-craftLogDetectedAt>=TimeSpan.FromSeconds(1) || craftLogDetectedJob!=job){craftLogDetectedAt=now;craftLogDetectedJob=job;craftLogDetected=CraftDetectedNow?.Invoke(job);}
-        var context=CraftLogContext.Resolve(observed,characterStats.State,recipeCatalog.State.Catalog,now,craftLogManipulation.TryGetValue(job,out var chosen) ? chosen:manipulationDetected,craftLogDetected?.Specialist==true);
+        var context=CraftLogContext.Resolve(observed,characterStats.State,recipeCatalog.State.Catalog,now,craftLogManipulation.TryGetValue(job,out var chosen) ? chosen:manipulationDetected,craftLogDetected?.Specialist==true,job=>RememberedCraftStats(observed.Owner,job));
         var actions=craftActions.State.Catalog;
         var presets=(IReadOnlyList<CraftPreset>?)configuration.CraftPresets ?? Array.Empty<CraftPreset>();
         CraftLogInput? input=context is {Recipe:{ } recipe,Stats:{ } stats} && actions is not null
@@ -87,6 +87,7 @@ internal sealed partial class MainWindow
                 if(ImGui.SmallButton(localization.Get("CraftLogUi.OpenSimulator"))){OpenCraftSimulation(forSimulator);IsOpen=true;}
             }
             DrawCraftLogFigures(context.Recipe,context.Stats);
+            if(context.RememberedAt is { } rememberedAt)ImGui.TextColored(Accent,localization.Format("CraftLogUi.Remembered",rememberedAt.ToLocalTime().ToString("g")));
             if(context.Stats is { } current)
             {
                 CraftLogSection(localization.Get("CraftLogUi.SectionState"));
@@ -141,6 +142,20 @@ internal sealed partial class MainWindow
             if(!result.SavedIsEnough)DrawCraftLogMacro(localization.Get("CraftLogUi.Suggested"),result.Suggested,actions,true);
             if(result.SearchIssue is { } searchIssue)ImGui.TextWrapped(CraftMessage(searchIssue));
         });
+    }
+    private CraftJobStats? RememberedCraftStats(ulong owner,uint job)=>configuration.LastCraftStats?.GetValueOrDefault(owner)?.GetValueOrDefault(job);
+    /// <summary>0.554 (C3): each frame; only what changed is written, so a food or a piece of gear makes one save.</summary>
+    internal void KeepCraftStats()
+    {
+        var state=characterStats.State;
+        if(state.CharacterId==0 || state.JobId is <8 or >15 || state.Level<1 || state.ObservedAt is not { } seen
+            || !state.Values.TryGetValue("Craftsmanship",out var craftsmanship) || !state.Values.TryGetValue("Control",out var control) || !state.Values.TryGetValue("CraftingPoints",out var cp))return;
+        var all=configuration.LastCraftStats??=[];
+        if(!all.TryGetValue(state.CharacterId,out var jobs))all[state.CharacterId]=jobs=[];
+        if(jobs.TryGetValue(state.JobId,out var known) && known.Level==state.Level && known.Craftsmanship==craftsmanship && known.Control==control && known.Cp==cp)return;
+        jobs[state.JobId]=new(state.Level,craftsmanship,control,cp,seen);
+        try{save();}
+        catch(Exception error){log.Warning(error,"Could not save the crafting attributes.");}
     }
     private void DrawCraftLogMacro(string title,CraftLogMacro? macro,CraftActionCatalog catalog,bool canSave=false)
     {
