@@ -51,7 +51,7 @@ internal sealed partial class CollectionReader : IDisposable
         this.player = player; this.client = client; this.unlocks = unlocks; this.log = log;
         this.cacheLifetime=cacheLifetime ?? (()=>TimeSpan.FromDays(1));this.disk=disk;this.completionLifetime=completionLifetime ?? (()=>TimeSpan.FromDays(7));
         unlocks.Unlock+=OnCollectionUnlock;
-        try{framework.Update += OnUpdate;try{client.Logout+=OnLogout;}catch{framework.Update-=OnUpdate;throw;}}
+        try{TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);try{client.Logout+=OnLogout;}catch{TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);throw;}}
         catch{unlocks.Unlock-=OnCollectionUnlock;throw;}
     }
     private void OnCollectionUnlock(RowRef row)
@@ -317,7 +317,7 @@ internal sealed partial class CollectionReader : IDisposable
         {
         if (disposed) return;
         disposed = true;
-        framework.Update -= OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         client.Logout-=OnLogout;
         unlocks.Unlock-=OnCollectionUnlock;
         service.Clear();

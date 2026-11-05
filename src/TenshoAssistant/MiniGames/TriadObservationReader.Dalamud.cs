@@ -36,7 +36,7 @@ internal sealed class TriadObservationReader : IDisposable
     {
         this.service=service; this.framework=framework; this.player=player; this.client=client; this.gui=gui; this.log=log;
         this.targetBaseId=targetBaseId ?? (() => 0); this.data=data; this.capture=capture ?? (() => false);
-        framework.Update += Update;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
     }
     private ulong CurrentOwner => client.IsLoggedIn && player.IsLoaded ? player.ContentId : 0;
     private unsafe void Update(IFramework _)
@@ -413,7 +413,7 @@ internal sealed class TriadObservationReader : IDisposable
         lock (gate)
         {
             if (disposed) return;
-            disposed=true; framework.Update -= Update; service.Dispose();
+            disposed=true; TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update); service.Dispose();
         }
     }
 }

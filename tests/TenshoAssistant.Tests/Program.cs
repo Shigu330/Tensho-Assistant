@@ -1014,6 +1014,7 @@ tests = tests.Concat(WeeklyCap606Tests.Cases).ToArray();
 tests = tests.Concat(AnnotatedItems607Tests.Cases).ToArray();
 tests = tests.Concat(MarketBatch608Tests.Cases).ToArray();
 tests = tests.Concat(OtherStocks609Tests.Cases).ToArray();
+tests = tests.Concat(CompetitiveCut610Tests.Cases).ToArray();
 tests = tests.Concat(SelfCheckTests.Cases).ToArray();
 tests = tests.Concat(HelpTests.Cases).ToArray();
 tests = tests.Concat(RetainerSalesTests.Cases).ToArray();

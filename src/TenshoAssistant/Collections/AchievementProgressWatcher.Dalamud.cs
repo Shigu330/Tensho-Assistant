@@ -28,7 +28,7 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
     public AchievementProgressWatcher(IFramework framework,IClientState client,IPlayerState player,IPluginLog log)
     {
         this.framework=framework;this.client=client;this.player=player;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     /// <summary>What was seen for the current character (copy).</summary>
@@ -86,6 +86,6 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
     public void Dispose()
     {
         lock(gate){if(disposed)return;disposed=true;}
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

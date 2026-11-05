@@ -31,7 +31,7 @@ internal sealed class RetainerSalesReader : IDisposable
     public RetainerSalesReader(IFramework framework, IGameGui gui, IClientState client, IPlayerState player, IPluginLog log, Func<bool> enabled)
     {
         this.framework = framework; this.gui = gui; this.client = client; this.player = player; this.log = log; this.enabled = enabled;
-        framework.Update += OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private void Publish(RetainerSalesState next) => Volatile.Write(ref state, next);
@@ -85,5 +85,5 @@ internal sealed class RetainerSalesReader : IDisposable
         if (failure != reason) { failure = reason; log.Warning("Retainer sale list unavailable: {0}", reason); }
     }
 
-    public void Dispose() => framework.Update -= OnUpdate;
+    public void Dispose() => TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
 }

@@ -61,7 +61,7 @@ internal sealed class BankInventoryBridge : IDisposable
         this.client = client;
         this.framework = framework;
         this.log = log;
-        framework.Update += OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     public void RequestImport(BankKey key)
@@ -366,7 +366,7 @@ internal sealed class BankInventoryBridge : IDisposable
             if (disposed) return;
             disposed = true;
             requested = null;
-            framework.Update -= OnUpdate;
+            TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
             Volatile.Write(ref state, new(0, null, null, null, null));
         }
     }

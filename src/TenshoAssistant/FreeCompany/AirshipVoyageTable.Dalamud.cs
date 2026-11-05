@@ -30,7 +30,7 @@ public sealed unsafe class AirshipVoyageTable : IDisposable
     public AirshipVoyageTable(IFramework framework,IClientState client,IPluginLog log)
     {
         this.framework=framework;this.client=client;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     /// <summary>Asks for the table of this speed over these sectors (UI thread); computed at the next framework update if it changed.</summary>
@@ -98,6 +98,6 @@ public sealed unsafe class AirshipVoyageTable : IDisposable
     public void Dispose()
     {
         lock(gate){if(disposed)return;disposed=true;}
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

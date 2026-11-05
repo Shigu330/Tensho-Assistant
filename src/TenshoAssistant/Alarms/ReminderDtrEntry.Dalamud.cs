@@ -1,3 +1,4 @@
+using TenshoAssistant.Competitive;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.Gui.Dtr;
@@ -38,13 +39,15 @@ public sealed class ReminderDtrEntry : IDisposable
         finishedEntry=bar.Get("Tensho Assistant (Finished reminders)");
         todoEntry.Shown=false;finishedEntry.Shown=false;
         todoEntry.OnClick=_=>open();finishedEntry.OnClick=_=>open();
-        framework.Update+=OnUpdate;
+        CompetitiveGate.AddAlways(framework,OnUpdate);
     }
 
     private void Hide(){todoEntry.Shown=false;finishedEntry.Shown=false;todoBounds=null;finishedBounds=null;}
 
     private void OnUpdate(IFramework _)
     {
+        // DEC-038: gone from the server bar during a competitive cut; the next tick after it shows it again.
+        if(CompetitiveGate.Cut){todoEntry.Shown=false;finishedEntry.Shown=false;return;}
         var now=DateTimeOffset.UtcNow;
         if(disposed || now<nextRead)return;
         nextRead=now.AddSeconds(5);
@@ -108,7 +111,7 @@ public sealed class ReminderDtrEntry : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        CompetitiveGate.RemoveAlways(framework,OnUpdate);
         todoEntry.Remove();finishedEntry.Remove();
     }
 }

@@ -29,7 +29,7 @@ internal static class Events342Tests
         ("Festivals: read on the framework thread while shown, layouts checked before parsing, shops cached, evidence pinned",() =>
         {
             var reader = Read("Events/FestivalReader.Dalamud.cs");
-            Check(reader.Contains("framework.Update+=OnUpdate;",StringComparison.Ordinal) && reader.Contains("framework.Update-=OnUpdate;",StringComparison.Ordinal),"framework thread, removed on dispose");
+            Check(reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);",StringComparison.Ordinal) && reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);",StringComparison.Ordinal),"framework thread, removed on dispose");
             Check(reader.Contains("client.IsLoggedIn",StringComparison.Ordinal) && reader.Contains("catch(Exception error)",StringComparison.Ordinal),"logged in, guarded");
             var check = reader.IndexOf("NpcShopLinks.ValidLayout(bytes)",StringComparison.Ordinal);
             Check(check > 0 && reader.IndexOf("data.GetFile<Lumina.Data.Files.LgbFile>(path)",StringComparison.Ordinal) > check,"layout checked before Lumina parses it");

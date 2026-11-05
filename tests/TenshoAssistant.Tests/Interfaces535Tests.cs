@@ -48,7 +48,7 @@ internal static class Interfaces535Tests
             Check(!aside.Hidden(false,TimeSpan.FromSeconds(7)),"comes back");
             Check(GameWindows.Touch(0,0,10,10,5,5,10,10) && !GameWindows.Touch(0,0,10,10,10,0,10,10),"touching");
             var follower=Read("UI/GameWindowFollower.Dalamud.cs");
-            Check(follower.Contains("if(wanted.IsEmpty)return;") && follower.Contains("now-asked>Stopwatch.Frequency") && follower.Contains("framework.Update-=OnUpdate"),"only what a panel asks, and cleaned");
+            Check(follower.Contains("if(wanted.IsEmpty)return;") && follower.Contains("now-asked>Stopwatch.Frequency") && follower.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate)"),"only what a panel asks, and cleaned");
             foreach(var (file,addon) in new[]{("MainWindow.Character.cs","Character"),("MainWindow.GatheringPanel.cs","Gathering"),("MainWindow.CollectablePanel.cs","GatheringMasterpiece"),("MainWindow.SpearfishingPanel.cs","SpearFishing"),("MainWindow.DutyFinder.cs","ContentsFinder"),("MainWindow.TriadRequest.cs","TripleTriadRequest"),("MainWindow.CraftLog.cs","RecipeNote"),("MainWindow.FashionWeek.cs","FashionCheck")})
                 Check(Read(file).Contains($"WindowMoved(\"{addon}\","),"follows: "+addon);
             Check(Read("BankImportOverlay.cs").Contains("follow(context.AddonName"),"bank panel follows");

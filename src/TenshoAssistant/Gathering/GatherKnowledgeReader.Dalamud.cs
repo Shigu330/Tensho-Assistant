@@ -35,7 +35,7 @@ internal sealed unsafe class GatherKnowledgeReader : IDisposable
             }
         }
         catch(Exception error){needs.Clear();log.Warning(error,"Gathering point needs unavailable (perhaps after a game update).");}
-        framework.Update+=Update;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
     }
 
     public GatherPointAccess? Access(uint basePoint)=>GatherPointAccess.Of(needs.GetValueOrDefault(basePoint),known);
@@ -60,5 +60,5 @@ internal sealed unsafe class GatherKnowledgeReader : IDisposable
         catch(Exception error){failed=true;known=null;log.Warning(error,"Gathering tomes unavailable (perhaps after a game update).");}
     }
 
-    public void Dispose()=>framework.Update-=Update;
+    public void Dispose()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);
 }

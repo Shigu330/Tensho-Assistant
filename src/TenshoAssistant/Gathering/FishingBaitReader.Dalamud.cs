@@ -19,7 +19,7 @@ public sealed unsafe class FishingBaitReader : IDisposable
     public FishingBaitReader(IFramework framework,IObjectTable objects,IPluginLog log)
     {
         this.framework=framework;this.objects=objects;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework _)
@@ -44,6 +44,6 @@ public sealed unsafe class FishingBaitReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

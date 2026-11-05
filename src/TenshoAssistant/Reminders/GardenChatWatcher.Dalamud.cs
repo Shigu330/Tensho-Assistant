@@ -33,7 +33,7 @@ internal sealed class GardenChatWatcher : IDisposable
     {
         this.chat=chat;this.framework=framework;this.data=data;this.client=client;this.log=log;this.enabled=enabled;this.isSeed=isSeed;this.planted=planted;
         chat.ChatMessageUnhandled+=OnMessage;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private GardenChat? Rules()
@@ -117,6 +117,6 @@ internal sealed class GardenChatWatcher : IDisposable
         if(disposed)return;
         disposed=true;
         chat.ChatMessageUnhandled-=OnMessage;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

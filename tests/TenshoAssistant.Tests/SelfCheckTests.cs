@@ -79,7 +79,7 @@ internal static class SelfCheckTests
         ("Self-check: read-only, framework thread, developer mode on its own, numbers only",() =>
         {
             var runner=Code("Diagnostics/SelfCheckRunner.Dalamud.cs");
-            Check(runner.Contains("framework.IsInFrameworkUpdateThread") && runner.Contains("framework.Update -= OnUpdate") && runner.Contains("developerMode()"),"thread, cleanup, auto only in developer mode");
+            Check(runner.Contains("framework.IsInFrameworkUpdateThread") && runner.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate)") && runner.Contains("developerMode()"),"thread, cleanup, auto only in developer mode");
             var probes=Code("MainWindow.SelfCheck.cs");
             foreach(var word in new[]{"HttpClient","Equip(","stats.Name","CharacterId,","ContentId"})Check(!probes.Contains(word),"not in the probes: "+word);
             Check(Code("Plugin.cs").Contains("is \"selftest\""),"the command");

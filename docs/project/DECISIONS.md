@@ -382,5 +382,5 @@ Evidence: Demande de l'utilisateur : « prevoir que en pvp le plugin se deactive
 Options: Une coupure par outil, ou une coupure de tout le plugin.
 Decision: Tout le plugin se coupe et repart seul en JcJ et en contenu classé, obligatoirement, sans réglage. Plan seulement pour le moment. Choix D1 à D5 de la liste à cocher du 2026-11-05 : voir le plan. Panneau du Dédale de DEC-032 abandonné.
 Reason: Décision de l'utilisateur.
-Consequences: docs/project/COMPETITIVE-OFF-PLAN.md, docs/evidence/0.600-competitive-inventory.md. À coder sur le feu vert de l'utilisateur, avant la phase 5.
+Consequences: docs/project/COMPETITIVE-OFF-PLAN.md, docs/evidence/0.600-competitive-inventory.md. Codé en 0.610 sur le feu vert de l'utilisateur.
 References: DEC-032, DEC-033, CONTRIBUTING.md, docs/project/PUBLISHING.md

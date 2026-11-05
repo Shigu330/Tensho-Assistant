@@ -33,6 +33,7 @@ internal sealed class ItemContextMenuBridge : IDisposable
 
     private void OnMenuOpened(IMenuOpenedArgs args)
     {
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
         try
         {
             session.Clear();

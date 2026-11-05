@@ -32,7 +32,7 @@ internal sealed class DalamudInventoryReader : IDisposable
                 () => inventory.InventoryChanged -= OnInventoryChanged);
             registrations.Register(() => client.Login += OnLogin, () => client.Login -= OnLogin);
             registrations.Register(() => client.Logout += OnLogout, () => client.Logout -= OnLogout);
-            registrations.Register(() => framework.Update += OnUpdate, () => framework.Update -= OnUpdate);
+            registrations.Register(() => TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate), () => TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate));
         }
         catch
         {

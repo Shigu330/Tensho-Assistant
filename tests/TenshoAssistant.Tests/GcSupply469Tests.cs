@@ -44,7 +44,7 @@ internal static class GcSupply469Tests
         ("Wiring: the game's window read only, every line says the real status; panel icons, crafting bonus only",() =>
         {
             var reader=Read("Items/GcSupplyReader.Dalamud.cs");
-            Check(reader.Contains("\"ContentsInfoDetail\"") && reader.Contains("framework.Update-=Update;") && !reader.Contains("Fire"),"read only, with its cleanup");
+            Check(reader.Contains("\"ContentsInfoDetail\"") && reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);") && !reader.Contains("Fire"),"read only, with its cleanup");
             Check(Read("Plugin.cs").Contains("new Items.GcSupplyReader(") && Read("Configuration.cs").Contains("\"GcSupplySeen\""),"registered, kept");
             foreach(var file in new[]{"MainWindow.MarketHover.cs","MainWindow.Tools.cs","MainWindow.ItemUses.cs"})Check(Read(file).Contains("GcSupplyLine("),file);
             var panel=Read("MainWindow.CraftLog.cs");

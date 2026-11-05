@@ -17,7 +17,7 @@ internal sealed unsafe class MacroObservationReader : IDisposable
     public MacroObservationReader(MacroObservationService service, IFramework framework, IPlayerState player, IClientState client, IPluginLog log)
     {
         this.service = service; this.framework = framework; this.player = player; this.client = client; this.log = log;
-        framework.Update += Update;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
     }
     private void Update(IFramework unusedFramework)
     {
@@ -49,7 +49,7 @@ internal sealed unsafe class MacroObservationReader : IDisposable
         lock (gate)
         {
             if (disposed) return;
-            disposed = true; framework.Update -= Update; service.SetEnabled(false);
+            disposed = true; TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update); service.SetEnabled(false);
         }
     }
 }

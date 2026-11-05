@@ -108,7 +108,7 @@ internal sealed class MapLiveReader : IDisposable
                 if(mark.BNpcBase.RowId!=0 && mark.Rank is >= 1 and <= 3)huntMarks.TryAdd(mark.BNpcBase.RowId,mark.Rank);
         }
         catch(Exception error){log.Warning(error,"Hunt mark data unavailable: marks are not shown on the map.");}
-        framework.Update+=Update;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
     }
     private bool teleportFailed;
     private DateTimeOffset partyAt;
@@ -325,5 +325,5 @@ internal sealed class MapLiveReader : IDisposable
         var agent=AgentMap.Instance();
         if(agent!=null)agent->FlagMarkerCount=0;
     }
-    public void Dispose(){if(disposed)return;disposed=true;framework.Update-=Update;Volatile.Write(ref state,null);}
+    public void Dispose(){if(disposed)return;disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);Volatile.Write(ref state,null);}
 }

@@ -1,6 +1,6 @@
 # Plan : Tensho se coupe en JcJ et en contenu classé
 
-État : **plan, rien n'est codé.** Demande de l'utilisateur, 2026-11-05 : « prevoir que en pvp le plugin se deactive et reactive apres pvp pas de reglages fais obligatoirement pareil pour match classer triad ou dresseur ou autre tous ce qui pourrais etre detecter par SE ou cree un impact sur des classements ». Décision : DEC-038. Données : [docs/evidence/0.600-competitive-inventory.md](../evidence/0.600-competitive-inventory.md).
+État : **codé en 0.610, compilé et testé, pas essayé en jeu.** Demande de l'utilisateur, 2026-11-05 : « prevoir que en pvp le plugin se deactive et reactive apres pvp pas de reglages fais obligatoirement pareil pour match classer triad ou dresseur ou autre tous ce qui pourrais etre detecter par SE ou cree un impact sur des classements ». Décision : DEC-038. Données : [docs/evidence/0.600-competitive-inventory.md](../evidence/0.600-competitive-inventory.md).
 
 ## Ce qui est voulu
 
@@ -62,7 +62,7 @@ Tensho reste chargé : c'est ce qui lui permet de repartir seul. Un seul gardien
 5. **Lectures, hooks, actions, réseau.** Chaque abonnement passe par le gardien. Un test parcourt le code et refuse tout nouvel abonnement qui n'y passe pas, comme celui des infobulles.
 6. **Alarmes et Discord**, selon D2, et la ligne de chat de D3.
 7. **Documents.** `PUBLISHING.md`, `CONTRIBUTING.md`, aide et prise en main ; les conseils de Triple Triade passent par la même règle.
-8. **Essai en jeu**, un point à la fois : voir plus bas.
+8. **Essai en jeu**, un point à la fois : voir plus bas. **À faire.**
 
 Taille : gros chantier, surtout l'étape 5. Place dans le plan global : avant la phase 5, pour que les essais en jeu se fassent déjà avec cette coupure.
 
@@ -88,4 +88,16 @@ Panneau du Dédale : abandonné. La page du dresseur reste une liste d'informati
 
 Question à l'équipe Dalamud sur ce qui compte comme compétitif : pas retenue pour le moment. La règle n'en donne pas de liste : l'examen de la soumission peut donc juger autrement.
 
-Code : pas commencé, à la demande de l'utilisateur. À lancer sur son feu vert, avant la phase 5.
+Inventaire : les donjons profonds ont un classement (Lodestone), donc ils coupent Tensho ; la pêche en mer, Ishgard et l'exploration cosmique n'en ont pas d'après cette page.
+
+## Ce qui est codé (0.610)
+
+`Competitive/CompetitiveGate.Dalamud.cs` et `Competitive/CompetitiveZones.cs`. Rien n'est lu du jeu pendant la coupure : les 78 abonnements au framework passent par le gardien, et un test refuse celui qui le contournerait. Affichage, commandes, menu contextuel, barre de serveur : coupés. Carte du jeu : rendue. Discord : ce qui attendait est abandonné. Une ligne dans le chat à l'entrée.
+
+Écarts avec le plan, à connaître :
+
+- Les hooks restent posés (macro, enregistrement de séquence), mais laissent passer l'appel du jeu sans rien faire ; ils ne sont pas retirés.
+- Une requête web déjà partie finit normalement ; aucune nouvelle ne part, faute d'affichage et de ticks. Elle n'est pas annulée.
+- Un tri d'inventaire ou une écriture de macro déjà en cours s'arrête au milieu et reprend à la sortie. Pas essayé.
+- Une alarme dont l'heure tombe pendant le match ne sonne pas ensuite : le calcul regarde la prochaine occurrence. Une alarme dont le préavis commence pendant le match et dont l'heure tombe après sonne à la sortie.
+- Si les feuilles du jeu deviennent illisibles après une mise à jour, Tensho reste coupé partout tant qu'on est connecté, avec un avertissement dans le journal seulement.

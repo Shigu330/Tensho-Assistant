@@ -43,7 +43,7 @@ internal static class Airships337Tests
         ("Airship planner: the game's functions are called on the framework thread only, while logged in, after a pointer check, guarded",() =>
         {
             var table = Read("FreeCompany/AirshipVoyageTable.Dalamud.cs");
-            Check(table.Contains("framework.Update+=OnUpdate;",StringComparison.Ordinal) && table.Contains("framework.Update-=OnUpdate;",StringComparison.Ordinal),"framework thread, removed on dispose");
+            Check(table.Contains("TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);",StringComparison.Ordinal) && table.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);",StringComparison.Ordinal),"framework thread, removed on dispose");
             var check = table.IndexOf("(nint)HousingManager.MemberFunctionPointers.GetAirshipVoyageTimeAndDistance==0",StringComparison.Ordinal);
             var call = table.IndexOf("HousingManager.GetAirshipVoyageTimeAndDistance((byte)",StringComparison.Ordinal);
             Check(check > 0 && call > check && table.Contains("(nint)HousingManager.MemberFunctionPointers.GetAirshipSurveyDuration==0",StringComparison.Ordinal),"pointers checked before any call");

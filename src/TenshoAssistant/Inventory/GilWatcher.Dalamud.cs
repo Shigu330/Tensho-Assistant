@@ -33,7 +33,7 @@ public sealed unsafe class GilWatcher : IDisposable
     public GilWatcher(IFramework framework,IPlayerState player,IGameGui gui,string folder,IPluginLog log)
     {
         this.framework=framework;this.player=player;this.gui=gui;this.folder=folder;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     public static string FileName(ulong character)=>character.ToString(System.Globalization.CultureInfo.InvariantCulture)+".json";
@@ -120,7 +120,7 @@ public sealed unsafe class GilWatcher : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         Save(DateTimeOffset.UtcNow);
     }
 }

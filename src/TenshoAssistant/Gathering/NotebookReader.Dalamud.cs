@@ -33,8 +33,8 @@ public sealed unsafe class NotebookReader : IDisposable
     public NotebookReader(IFramework framework,IClientState client,IDataManager data,IPluginLog log)
     {
         this.framework=framework;this.client=client;this.data=data;this.log=log;
-        framework.Update+=OnUpdate;
-        try{client.Logout+=OnLogout;}catch{framework.Update-=OnUpdate;throw;}
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
+        try{client.Logout+=OnLogout;}catch{TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);throw;}
     }
 
     public void Want()=>Volatile.Write(ref wantedUntil,DateTimeOffset.UtcNow.AddSeconds(5).UtcTicks);
@@ -87,7 +87,7 @@ public sealed unsafe class NotebookReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         client.Logout-=OnLogout;
     }
 }

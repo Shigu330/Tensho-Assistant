@@ -25,7 +25,7 @@ internal sealed class MarketWorldReader : IDisposable
     public MarketWorldReader(MarketService service, IFramework framework, IPlayerState player, IClientState client, IPluginLog log, IDataManager data)
     {
         this.service = service; this.framework = framework; this.player = player; this.client = client; this.log = log; this.data = data;
-        framework.Update += Update;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
     }
     private void Update(IFramework _)
     {
@@ -75,7 +75,7 @@ internal sealed class MarketWorldReader : IDisposable
         {
             if (disposed) return;
             disposed = true;
-            framework.Update -= Update;
+            TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);
             Clear();
         }
     }

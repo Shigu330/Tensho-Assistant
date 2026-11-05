@@ -42,7 +42,7 @@ public sealed unsafe class CurrencyWatcher : IDisposable
     public CurrencyWatcher(IFramework framework,IClientState client,IPlayerState player,IDataManager data,Configuration configuration,IPluginLog log)
     {
         this.framework=framework;this.client=client;this.player=player;this.data=data;this.configuration=configuration;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     /// <summary>Called by the Currencies tab while shown (UI thread): reads keep going for 5 seconds even with alerts and bar off.</summary>
@@ -138,6 +138,6 @@ public sealed unsafe class CurrencyWatcher : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

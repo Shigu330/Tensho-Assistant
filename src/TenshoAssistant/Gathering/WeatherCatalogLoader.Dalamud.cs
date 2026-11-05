@@ -9,7 +9,7 @@ internal sealed class WeatherCatalogLoader : IDisposable
     private readonly object gate=new();private readonly WeatherCatalogService service;private readonly IDataManager data;private readonly IFramework framework;private readonly IPluginLog log;
     private readonly List<ZoneWeather> zones=[];private readonly Dictionary<uint,WeatherDefinition> weathers=[];private int position,weatherPosition;private bool stopped,englishUnavailable;
     public WeatherCatalogLoader(WeatherCatalogService service,IDataManager data,IFramework framework,IPluginLog log)
-    {this.service=service;this.data=data;this.framework=framework;this.log=log;framework.Update+=Update;}
+    {this.service=service;this.data=data;this.framework=framework;this.log=log;TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}
     private void Update(IFramework unused)
     {
         lock(gate)
@@ -63,6 +63,6 @@ internal sealed class WeatherCatalogLoader : IDisposable
             catch(Exception error){service.Fail(error);log.Warning(error,"Weather catalog unavailable.");Stop();}
         }
     }
-    private void Stop(){stopped=true;framework.Update-=Update;zones.Clear();weathers.Clear();}
+    private void Stop(){stopped=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);zones.Clear();weathers.Clear();}
     public void Dispose(){lock(gate){if(!stopped)Stop();service.Clear();}}
 }

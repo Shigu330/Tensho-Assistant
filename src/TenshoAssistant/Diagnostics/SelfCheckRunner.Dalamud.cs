@@ -43,7 +43,7 @@ internal sealed class SelfCheckRunner : IDisposable
         try { if (File.Exists(memoryFile)) saved = File.ReadAllText(memoryFile); }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException) { log.Warning(error, "Self-check memory could not be read."); }
         memory = SelfCheckMemory.Load(saved, gameVersion);
-        framework.Update += OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private void Watch(DateTimeOffset now)
@@ -102,5 +102,5 @@ internal sealed class SelfCheckRunner : IDisposable
         }
     }
 
-    public void Dispose() => framework.Update -= OnUpdate;
+    public void Dispose() => TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
 }

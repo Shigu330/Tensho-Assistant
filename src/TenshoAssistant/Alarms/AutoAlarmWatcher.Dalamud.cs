@@ -22,7 +22,7 @@ public sealed unsafe class AutoAlarmWatcher : IDisposable
     public AutoAlarmWatcher(IFramework framework,IClientState client,IPluginLog log,Configuration configuration,Action save,Func<string,string> text)
     {
         this.framework=framework;this.client=client;this.log=log;this.configuration=configuration;this.save=save;this.text=text;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework _)
@@ -74,6 +74,6 @@ public sealed unsafe class AutoAlarmWatcher : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

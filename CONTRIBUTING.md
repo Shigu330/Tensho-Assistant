@@ -161,6 +161,7 @@ Publication is planned at version 1.0.0. What remains, in order, and the state o
 How the Dalamud repository builds a plugin (Linux, SDK 10.0.101, no network, lock file) and what the `Build like the Dalamud repository`
 CI job checks: [docs/evidence/0.512-d17-build.md](docs/evidence/0.512-d17-build.md). When you add code, keep these true:
 
+- the whole plugin stops in PvP and ranked content, with no setting (DEC-038): every framework subscription goes through `CompetitiveGate`, and a test refuses one that does not;
 - external requests are triggered only by player action, an opened page or a setting, and each source has its switch;
 - actions that reach the game start on a click; one setting, off by default, acts without one (title by job), kept and declared in the submission (DEC-035); game alarms are sent only from a click (adding an alarm with the setting on, or « Send »), never by the automatic alarms;
 - a window that looks like a window uses the Dalamud window system: a free-standing panel through `PanelWindow`, one attached to a game window through `Panels?.Show(...)` (`AttachedPanels`);

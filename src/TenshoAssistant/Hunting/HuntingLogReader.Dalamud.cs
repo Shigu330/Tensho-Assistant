@@ -27,7 +27,7 @@ public sealed unsafe class HuntingLogReader : IDisposable
     public HuntingLogReader(IFramework framework,IClientState client,IPluginLog log)
     {
         this.framework=framework;this.client=client;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     /// <summary>Called by the page while it shows the log (UI thread): keeps the reads going for 5 seconds.</summary>
@@ -71,6 +71,6 @@ public sealed unsafe class HuntingLogReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

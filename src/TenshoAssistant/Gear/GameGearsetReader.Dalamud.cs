@@ -37,8 +37,8 @@ public sealed unsafe class GameGearsetReader : IDisposable
     public GameGearsetReader(IFramework framework,IClientState client,IPluginLog log,IReadOnlyDictionary<uint,int> expIndex)
     {
         this.framework=framework;this.client=client;this.log=log;this.expIndex=expIndex;
-        framework.Update+=OnUpdate;
-        try{client.Logout+=OnLogout;}catch{framework.Update-=OnUpdate;throw;}
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
+        try{client.Logout+=OnLogout;}catch{TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);throw;}
     }
 
     public void Want()=>Volatile.Write(ref wantedUntil,DateTimeOffset.UtcNow.AddSeconds(5).UtcTicks);
@@ -107,7 +107,7 @@ public sealed unsafe class GameGearsetReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         client.Logout-=OnLogout;
     }
 }

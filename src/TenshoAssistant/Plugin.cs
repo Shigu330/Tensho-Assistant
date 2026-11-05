@@ -92,6 +92,10 @@ public sealed class Plugin : IDalamudPlugin
         monsterLoot = new MonsterLootService(garland);
         try
         {
+            // DEC-038: decided first: no service starts in PvP or ranked content.
+            chatForCut=chat;
+            TenshoAssistant.Competitive.CompetitiveWatcher? competitive=null;
+            registrations.Register(()=>competitive=new TenshoAssistant.Competitive.CompetitiveWatcher(framework,client,data,log),()=>competitive?.Dispose());
             registrations.Register(()=>{},()=>dataCache?.Dispose());
             registrations.Register(() => { }, market.Dispose);
             registrations.Register(() => { }, marketBoard.Dispose);
@@ -267,7 +271,7 @@ public sealed class Plugin : IDalamudPlugin
                     :(local.ClassJob.RowId,(uint)client.TerritoryType,local.Position.X,local.Position.Z,condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.Fishing]);
                 if(seen!=Volatile.Read(ref fishingNowCopy).Value)Volatile.Write(ref fishingNowCopy,new(seen));
             };
-            registrations.Register(()=>framework.Update+=copyFishingNow,()=>framework.Update-=copyFishingNow);
+            registrations.Register(()=>TenshoAssistant.Competitive.CompetitiveGate.Add(framework,copyFishingNow),()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,copyFishingNow));
             Task<Dictionary<uint,List<(uint Id,string Name,float X,float Z,uint[] Fish)>>>? fishingSpotsTask=null;
             mainWindow.ConfigureFishingHelp(()=>Volatile.Read(ref fishingNowCopy).Value,(territory,x,z)=>
             {
@@ -402,6 +406,13 @@ public sealed class Plugin : IDalamudPlugin
                 WeeklyCapReached=(got,limit)=>CurrencyNotice(localization.Format("Currencies.WeeklyCapAlert",got.ToString("N0"),limit.ToString("N0"))),
             },()=>currencies?.Dispose());
             mainWindow.Currencies=()=>currencies;
+            // DEC-038: one chat line on entry, nothing on leaving; what waits for Discord does not leave during the cut.
+            TenshoAssistant.Competitive.CompetitiveGate.Changed+=isCut=>
+            {
+                if(!isCut)return;
+                discord.Clear();
+                chat.Print("[Tensho] "+localization.Get("Competitive.Off"));
+            };
             // 0.366 (g, C-10): duty ready (IClientState.CfPop, framework thread): chat line and sound with the alarm options, Discord in its
             // own category; nothing when the alert is off. Unsubscribed on dispose.
             void OnDutyPop(Lumina.Excel.Sheets.ContentFinderCondition duty)
@@ -1028,6 +1039,7 @@ public sealed class Plugin : IDalamudPlugin
     // « /tensho » opens the window; « /tensho peche » (or fish) opens or closes the fishing help (0.228).
     private void OnCommand(string command, string arguments)
     {
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut){chatForCut?.Print("[Tensho] "+localization.Get("Competitive.Off"));return;}
         if (arguments.Trim().ToLowerInvariant() is "peche" or "pêche" or "fish" or "fishing") { mainWindow?.ToggleFishingPanel(); return; }
         // 0.349 (g, X-07): « /tensho wiki <item> » and « /tensho lodestone <item> » open the item's page in the browser.
         var parts = arguments.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
@@ -1057,11 +1069,13 @@ public sealed class Plugin : IDalamudPlugin
         }
         Open();
     }
-    private void Open() => mainWindow.IsOpen = true;
-    private void OpenConfig()=>mainWindow.OpenSettings();
+    private void Open(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;mainWindow.IsOpen = true;}
+    private void OpenConfig(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;mainWindow.OpenSettings();}
+    private IChatGui? chatForCut;
     private UI.FontManager? fonts;
     private void Draw()
     {
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
         fonts?.Apply(fontSettings() ?? new());
         if(commandInfo is not null && commandLocalizationRevision!=localization.Revision)
         {commandInfo.HelpMessage=localization.Get("Plugin.CommandHelp");commandLocalizationRevision=localization.Revision;}

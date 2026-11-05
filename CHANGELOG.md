@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.610.0
+- Plan global, DEC-038 : Tensho se coupe tout seul en JcJ et en contenu classé, sans réglage, et repart tout seul : JcJ, Battlehall et tournois de Triple Triade, Lord of Verminion, Mahjong, Dédale bestial, donjons profonds, quai de Wolves' Den. Rien n'est lu du jeu : tous les abonnements au framework passent par un gardien, qu'un test impose. Affichage, commandes et menu contextuel coupés, barre de serveur masquée, carte du jeu rendue, Discord vidé, une ligne de chat à l'entrée. Écarts : COMPETITIVE-OFF-PLAN.md.
+- Tests : Competitive. Verify.ps1 (agent) : 1119/1119, 0 avertissement, 0 erreur ; DLL 0.610.0.0. Non validé en jeu.
+### English
+- Tensho stops on its own in PvP and ranked content, with no setting, and comes back on its own: PvP, Triple Triad Battlehall and tournaments, Lord of Verminion, Mahjong, Beastmaster labyrinth, deep dungeons, Wolves' Den pier. Nothing is read from the game: every framework subscription goes through a gate, enforced by a test. UI, commands and context menu off, server bar hidden, game map given back, Discord queue dropped, one chat line on entry. Gaps: COMPETITIVE-OFF-PLAN.md.
+
 ## 0.609.0
 - Plan global, phase 4 : Fiche objet : « Sur vos autres personnages » donne, pour chacun, les quantités NQ et HQ et la date, d'après ce que la Banque a enregistré. Version compacte : pas de recherche globale, et un rangement jamais lu n'est pas compté.
 - Tests : Other stocks. Verify.ps1 (agent) : 1115/1115, 0 avertissement, 0 erreur ; DLL 0.609.0.0. Non validé en jeu.

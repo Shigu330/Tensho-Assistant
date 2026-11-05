@@ -1342,6 +1342,9 @@
     "Error": "Quality variations cannot be calculated for this scenario. Technical details are available in developer mode.",
     "ScenarioTip": "Good-condition quality bonus used in this calculation: ×1.50, ×1.75, or both (the range then covers both factors)."
   },
+  "Competitive": {
+    "Off": "Tensho is paused here: PvP or ranked content. It comes back on its own when you leave."
+  },
   "Home": {
     "TodayTitle": "TODAY",
     "Customize": "Customize",

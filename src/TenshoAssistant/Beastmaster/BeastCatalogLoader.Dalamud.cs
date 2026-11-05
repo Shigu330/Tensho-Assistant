@@ -35,7 +35,7 @@ internal sealed class BeastCatalogLoader : IDisposable
             catch (OperationCanceledException) { }
             catch (Exception error) { log.Warning(error, "Beastmaster data unavailable."); service.Fail(error.Message); }
         }, token);
-        framework.Update += OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private static object? Cell(object? value) => value is ReadOnlySeString text ? text.ExtractText() : value;
@@ -97,5 +97,5 @@ internal sealed class BeastCatalogLoader : IDisposable
         }
     }
 
-    public void Dispose() { framework.Update -= OnUpdate; cancellation.Cancel(); cancellation.Dispose(); }
+    public void Dispose() { TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate); cancellation.Cancel(); cancellation.Dispose(); }
 }

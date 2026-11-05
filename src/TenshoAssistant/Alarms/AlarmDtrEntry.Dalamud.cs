@@ -1,3 +1,4 @@
+using TenshoAssistant.Competitive;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.Gui.Dtr;
@@ -36,11 +37,13 @@ public sealed unsafe class AlarmDtrEntry : IDisposable
         entry=bar.Get("Tensho Assistant");
         entry.Shown=false;
         entry.OnClick=_=>open();
-        framework.Update+=OnUpdate;
+        CompetitiveGate.AddAlways(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework _)
     {
+        // DEC-038: gone from the server bar during a competitive cut; the next tick after it shows it again.
+        if(CompetitiveGate.Cut){entry.Shown=false;return;}
         var now=DateTimeOffset.UtcNow;
         if(disposed || now<nextRefresh)return;
         nextRefresh=now.AddSeconds(1);
@@ -113,7 +116,7 @@ public sealed unsafe class AlarmDtrEntry : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        CompetitiveGate.RemoveAlways(framework,OnUpdate);
         entry.Remove();
     }
 }

@@ -41,7 +41,7 @@ public sealed unsafe class GearLoader : IDisposable
             catch(OperationCanceledException){}
             catch(Exception error){catalogFailed=true;log.Warning(error,"Tensho gear catalog could not be built.");}
         },token);
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     // R-14 (0.507): a sheet that only adds a part of the page costs that part, not the whole gear page.
@@ -192,7 +192,7 @@ public sealed unsafe class GearLoader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         cancellation.Cancel();
         cancellation.Dispose();
     }

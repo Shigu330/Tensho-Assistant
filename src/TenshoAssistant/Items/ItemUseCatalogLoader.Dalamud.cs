@@ -12,7 +12,7 @@ internal sealed class ItemUseCatalogLoader : IDisposable
     private ExcelSheet<CraftLeve>? craft;private ExcelSheet<GCSupplyDuty>? supply;private ExcelSheet<AquariumFish>? fish;
     private int position,unresolved;private bool stopped,disposed;private Task<(ItemUseCatalog? Catalog,Exception? Error)>? build;
     public ItemUseCatalogLoader(ItemUseCatalogService service,IDataManager data,IFramework framework,IPluginLog log)
-    {this.service=service;this.data=data;this.framework=framework;this.log=log;try{framework.Update+=Update;}catch{cancellation.Dispose();throw;}}
+    {this.service=service;this.data=data;this.framework=framework;this.log=log;try{TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}catch{cancellation.Dispose();throw;}}
     private void Update(IFramework unused)
     {
         if(!framework.IsInFrameworkUpdateThread || framework.IsFrameworkUnloading)return;
@@ -47,6 +47,6 @@ internal sealed class ItemUseCatalogLoader : IDisposable
             catch(Exception error){log.Warning(error,"Item usage catalogue unavailable.");service.Fail(error);Stop();}
         }
     }
-    private void Stop(){stopped=true;framework.Update-=Update;craft=null;supply=null;fish=null;leves.Clear();supplies.Clear();aquarium.Clear();}
+    private void Stop(){stopped=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);craft=null;supply=null;fish=null;leves.Clear();supplies.Clear();aquarium.Clear();}
     public void Dispose(){lock(gate){if(disposed)return;disposed=true;if(!stopped){cancellation.Cancel();Stop();}service.Clear();cancellation.Dispose();}}
 }

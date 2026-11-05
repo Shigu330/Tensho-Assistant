@@ -37,7 +37,7 @@ internal sealed class TriadNpcLoader : IDisposable
             catch (OperationCanceledException) { }
             catch (Exception error) { log.Warning(error, "Triple Triad NPC catalogue unavailable."); service.Fail(error); }
         }, token);
-        framework.Update += OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private static TriadNpcCatalog Build(IDataManager data, CancellationToken token)
@@ -153,5 +153,5 @@ internal sealed class TriadNpcLoader : IDisposable
         }
     }
 
-    public void Dispose() { framework.Update -= OnUpdate; cancellation.Cancel(); cancellation.Dispose(); }
+    public void Dispose() { TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate); cancellation.Cancel(); cancellation.Dispose(); }
 }

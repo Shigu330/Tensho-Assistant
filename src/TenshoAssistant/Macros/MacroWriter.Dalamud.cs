@@ -27,7 +27,7 @@ internal sealed class MacroWriter : IDisposable
 
     // Status for the player (0.193): the outcome code (« Done:first:last », « NoRoom »…), shown in the chat by the plugin.
     private readonly Action<string>? notify;
-    public MacroWriter(IFramework framework, IPluginLog log, Action<string>? notify = null) { this.framework = framework; this.log = log; this.notify = notify; framework.Update += OnUpdate; }
+    public MacroWriter(IFramework framework, IPluginLog log, Action<string>? notify = null) { this.framework = framework; this.log = log; this.notify = notify; TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate); }
 
     public void Request(IReadOnlyList<IReadOnlyList<string>> pages, MacroCopySettings settings)
     {
@@ -104,5 +104,5 @@ internal sealed class MacroWriter : IDisposable
         lock (gate) slots = copy;
     }
 
-    public void Dispose() { framework.Update -= OnUpdate; }
+    public void Dispose() { TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate); }
 }

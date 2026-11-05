@@ -65,7 +65,7 @@ internal sealed class AlarmService : IDisposable
     {
         this.framework = framework; this.condition = condition; this.log = log; this.configuration = configuration; this.save = save;
         this.weather = weather; this.chat = chat; this.wantsDiscord = wantsDiscord; this.toDiscord = toDiscord;
-        framework.Update += OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     public void OpenGameWindow() { lock (gate) openGameWindow = true; }
@@ -220,5 +220,5 @@ internal sealed class AlarmService : IDisposable
         catch (Exception error) { log.Warning(error, "Game alarm sound could not be played."); }
     }
 
-    public void Dispose() { framework.Update -= OnUpdate; }
+    public void Dispose() { TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate); }
 }

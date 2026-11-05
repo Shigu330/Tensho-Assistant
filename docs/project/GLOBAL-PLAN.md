@@ -124,7 +124,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 
 ## Avant la phase 5 : coupure en JcJ et en contenu classé
 
-Tensho se coupe tout seul et repart tout seul, sans réglage (DEC-038). Pas codé : [plan et décisions prises](COMPETITIVE-OFF-PLAN.md). À lancer sur le feu vert de l'utilisateur, pour que les essais de la phase 5 se fassent déjà avec.
+Tensho se coupe tout seul et repart tout seul, sans réglage (DEC-038). ~~À coder~~ fait en 0.610 : [plan, écarts et essais en jeu](COMPETITIVE-OFF-PLAN.md). Essai en jeu : premier point de la phase 5.
 
 ## Phase 5 : relevés en jeu, puis code
 

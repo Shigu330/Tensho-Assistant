@@ -22,7 +22,7 @@ internal sealed class DutyCatalogLoader : IDisposable
     public DutyCatalogLoader(DutyCatalogService service, IDataManager data, IFramework framework, IPluginLog log)
     {
         this.service = service; this.data = data; this.framework = framework; this.log = log;
-        try { framework.Update += Update; }
+        try { TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update); }
         catch { cancellation.Dispose(); throw; }
     }
     private void Update(IFramework unused)
@@ -68,7 +68,7 @@ internal sealed class DutyCatalogLoader : IDisposable
             catch (Exception error) { service.Fail(error); log.Warning(error,"Tensho duty catalog unavailable."); Stop(); }
         }
     }
-    private void Stop() { stopped = true; framework.Update -= Update; copied.Clear(); sheet = null; }
+    private void Stop() { stopped = true; TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update); copied.Clear(); sheet = null; }
     public void Dispose()
     {
         lock (gate)

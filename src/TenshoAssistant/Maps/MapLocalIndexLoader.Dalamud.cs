@@ -26,7 +26,7 @@ internal sealed class MapLocalIndexLoader : IDisposable
     public MapLocalIndexLoader(MapLocalIndexService service,IDataManager data,IFramework framework,IPluginLog log,Caching.DataCache? cache=null)
     {
         this.service=service;this.data=data;this.framework=framework;this.log=log;this.cache=cache;
-        try{framework.Update+=OnUpdate;}catch{cancellation.Dispose();throw;}
+        try{TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);}catch{cancellation.Dispose();throw;}
     }
 
     private void OnUpdate(IFramework _)
@@ -176,7 +176,7 @@ internal sealed class MapLocalIndexLoader : IDisposable
         }
     }
 
-    private void Stop(){stopped=true;framework.Update-=OnUpdate;copy?.Dispose();copy=null;cacheRead=null;toPersist=null;rows.Clear();}
+    private void Stop(){stopped=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);copy?.Dispose();copy=null;cacheRead=null;toPersist=null;rows.Clear();}
     public void Dispose()
     {
         lock(gate)

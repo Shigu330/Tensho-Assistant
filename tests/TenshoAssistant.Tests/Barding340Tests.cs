@@ -27,7 +27,7 @@ internal static class Barding340Tests
         ("Barding: read on the framework thread only while shown, guarded; teaching action and evidence pinned",() =>
         {
             var reader = Read("Gear/ChocoboReader.Dalamud.cs");
-            Check(reader.Contains("framework.Update+=OnUpdate;",StringComparison.Ordinal) && reader.Contains("framework.Update-=OnUpdate;",StringComparison.Ordinal),"framework thread, removed on dispose");
+            Check(reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);",StringComparison.Ordinal) && reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);",StringComparison.Ordinal),"framework thread, removed on dispose");
             Check(reader.Contains("now>wantedUntil",StringComparison.Ordinal) && reader.Contains("client.IsLoggedIn",StringComparison.Ordinal) && reader.Contains("catch(Exception error)",StringComparison.Ordinal),"only while wanted and logged in, guarded");
             Check(Read("Gear/GearLoader.Dalamud.cs").Contains("ChocoboBarding.TeachAction",StringComparison.Ordinal) && ChocoboBarding.TeachAction == 1013,"ItemAction 1013 teaches a barding");
             Check(File.ReadAllText(Path.GetFullPath("docs/evidence/0.340-chocobo-barding.md")).Contains("MATCHED 101 data0==row 101 actions 1013x101",StringComparison.Ordinal),"evidence of the probe");

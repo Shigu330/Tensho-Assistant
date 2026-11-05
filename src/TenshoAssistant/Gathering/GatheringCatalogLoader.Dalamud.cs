@@ -42,7 +42,7 @@ internal sealed class GatheringCatalogLoader : IDisposable
         this.framework = framework;
         this.log = log;
         this.cache = cache;
-        try { framework.Update += OnUpdate; }
+        try { TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate); }
         catch { cancellation.Dispose(); throw; }
     }
 
@@ -233,7 +233,7 @@ internal sealed class GatheringCatalogLoader : IDisposable
     private void Stop()
     {
         stopped = true;
-        framework.Update -= OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         rows.Clear();
         notebookRows.Clear();fishParameters=null;fishNotes=null;
         points = null;

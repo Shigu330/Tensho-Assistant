@@ -29,8 +29,8 @@ public sealed unsafe class TreasureMapReader : IDisposable
     public TreasureMapReader(IFramework framework,IClientState client,IDataManager data,IPluginLog log)
     {
         this.framework=framework;this.client=client;this.data=data;this.log=log;
-        framework.Update+=OnUpdate;
-        try{client.Logout+=OnLogout;}catch{framework.Update-=OnUpdate;throw;}
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
+        try{client.Logout+=OnLogout;}catch{TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);throw;}
     }
 
     private void OnUpdate(IFramework _)
@@ -75,7 +75,7 @@ public sealed unsafe class TreasureMapReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         client.Logout-=OnLogout;
     }
 }

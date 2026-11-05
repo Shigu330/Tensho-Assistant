@@ -11,7 +11,7 @@ internal sealed class MiniCactpotObservationReader : IDisposable
     private readonly IFramework framework;private readonly IPlayerState player;private readonly IClientState client;private readonly IGameGui gui;private readonly IPluginLog log;
     private bool disposed;private long nextRead;private ulong owner;
     public MiniCactpotObservationReader(MiniCactpotObservationService service,IFramework framework,IPlayerState player,IClientState client,IGameGui gui,IPluginLog log)
-    {this.service=service;this.framework=framework;this.player=player;this.client=client;this.gui=gui;this.log=log;framework.Update+=Update;}
+    {this.service=service;this.framework=framework;this.player=player;this.client=client;this.gui=gui;this.log=log;TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}
     private ulong CurrentOwner=>client.IsLoggedIn && player.IsLoaded ? player.ContentId:0;
     private static unsafe int[] Copy(AddonLotteryDaily* addon)
     {
@@ -65,5 +65,5 @@ internal sealed class MiniCactpotObservationReader : IDisposable
             catch(Exception error){service.Fail(ticket,current,error);nextRead=now+Stopwatch.Frequency*5;log.Warning(error,"Mini Cactpot observation unavailable; retry in five seconds.");}
         }
     }
-    public void Dispose(){lock(gate){if(disposed)return;disposed=true;framework.Update-=Update;service.Dispose();}}
+    public void Dispose(){lock(gate){if(disposed)return;disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);service.Dispose();}}
 }

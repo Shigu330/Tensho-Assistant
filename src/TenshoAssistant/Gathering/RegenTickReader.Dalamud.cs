@@ -27,7 +27,7 @@ public sealed class RegenTickReader : IDisposable
     public RegenTickReader(IFramework framework,IObjectTable objects,ICondition condition,Func<bool> enabled,IPluginLog log)
     {
         this.framework=framework;this.objects=objects;this.condition=condition;this.enabled=enabled;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework _)
@@ -55,6 +55,6 @@ public sealed class RegenTickReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

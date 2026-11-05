@@ -16,7 +16,7 @@ internal sealed class CraftLiveReader : IDisposable
     private readonly IGameGui gui; private readonly IObjectTable objects; private readonly IPluginLog log;
     private long nextRead; private ulong owner; private bool disposed;
     public CraftLiveReader(CraftLiveService service,RecipeCatalogService recipes,CraftActionCatalogService actions,ItemCatalogService items,IFramework framework,IPlayerState player,IClientState client,IGameGui gui,IObjectTable objects,IPluginLog log)
-    {this.service=service;this.recipes=recipes;this.actions=actions;this.items=items;this.framework=framework;this.player=player;this.client=client;this.gui=gui;this.objects=objects;this.log=log;framework.Update+=Update;}
+    {this.service=service;this.recipes=recipes;this.actions=actions;this.items=items;this.framework=framework;this.player=player;this.client=client;this.gui=gui;this.objects=objects;this.log=log;TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}
     private static unsafe uint? MainHand()
     {
         var manager=InventoryManager.Instance();var container=manager==null ? null:manager->GetInventoryContainer(InventoryType.EquippedItems);
@@ -119,5 +119,5 @@ internal sealed class CraftLiveReader : IDisposable
             catch(Exception error){service.Fail(ticket,current,error);nextRead=now+Stopwatch.Frequency*5;log.Warning(error,"Craft observation unavailable; retry in five seconds.");}
         }
     }
-    public void Dispose(){lock(gate){if(disposed)return;disposed=true;framework.Update-=Update;service.Dispose();}}
+    public void Dispose(){lock(gate){if(disposed)return;disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);service.Dispose();}}
 }

@@ -32,11 +32,19 @@ internal sealed class NativeMapReplacer : IDisposable
         Func<bool> tenshoOpen,Func<bool> canShow,Action closeTensho,IPluginLog log)
     {
         this.framework=framework;this.gui=gui;this.client=client;this.settings=settings;this.open=open;this.tenshoOpen=tenshoOpen;this.canShow=canShow;this.closeTensho=closeTensho;this.log=log;
-        framework.Update+=Update;
+        TenshoAssistant.Competitive.CompetitiveGate.AddAlways(framework,Update);
     }
     private unsafe void Update(IFramework _)
     {
         if(disposed || !framework.IsInFrameworkUpdateThread || framework.IsFrameworkUnloading)return;
+        // DEC-038: the game map is given back during a competitive cut; the next tick after it hides it again if the setting says so.
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)
+        {
+            if(!hosted)return;
+            hosted=false;
+            try{if(gui.GetAddonByName("AreaMap") is { IsNull:false } shown)Restore((AtkUnitBase*)shown.Address);}catch(Exception){}
+            return;
+        }
         var now=DateTimeOffset.UtcNow;if(now<retryAt)return;
         try
         {
@@ -117,7 +125,7 @@ internal sealed class NativeMapReplacer : IDisposable
     }
     public unsafe void Dispose()
     {
-        if(disposed)return;disposed=true;framework.Update-=Update;
+        if(disposed)return;disposed=true;TenshoAssistant.Competitive.CompetitiveGate.RemoveAlways(framework,Update);
         // Never leave the game map stuck off screen after an unload.
         try{if(hosted && gui.GetAddonByName("AreaMap") is { IsNull:false } addon)Restore((AtkUnitBase*)addon.Address);}catch(Exception error){log.Warning(error,"Could not restore the game map position.");}
     }

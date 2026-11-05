@@ -21,7 +21,7 @@ internal sealed class InventoryVisualSortBridge : IDisposable
         this.service=service;this.inventory=inventory;this.player=player;this.client=client;this.framework=framework;this.log=log;this.bank=bank;
         try
         {
-            registrations.Register(()=>framework.Update+=Update,()=>framework.Update-=Update);
+            registrations.Register(()=>TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update),()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update));
             registrations.Register(()=>client.Logout+=Logout,()=>client.Logout-=Logout);
         }
         catch{Dispose();throw;}

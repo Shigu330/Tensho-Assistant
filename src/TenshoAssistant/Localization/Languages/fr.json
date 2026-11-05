@@ -1342,6 +1342,9 @@
     "Error": "Les variations de qualité ne peuvent pas être calculées pour ce scénario. Les détails techniques sont disponibles en mode développeur.",
     "ScenarioTip": "Bonus de qualité de la condition Favorable dans ce calcul : ×1,50, ×1,75, ou les deux (l'enveloppe couvre alors les deux facteurs)."
   },
+  "Competitive": {
+    "Off": "Tensho est en pause ici : JcJ ou contenu classé. Il revient tout seul quand vous en sortez."
+  },
   "Home": {
     "TodayTitle": "AUJOURD'HUI",
     "Customize": "Personnaliser",

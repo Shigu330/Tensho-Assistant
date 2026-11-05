@@ -15,7 +15,7 @@ internal sealed class ItemHoverReader : IDisposable
         IGameGui gui,IPlayerState player,IClientState client,IFramework framework,IPluginLog log)
     {
         this.configuration=configuration;this.market=market;this.items=items;this.gui=gui;this.player=player;this.client=client;this.framework=framework;this.log=log;this.context=context;
-        coordinator=new(context,market);try{framework.Update+=Update;}catch{coordinator.Dispose();throw;}
+        coordinator=new(context,market);try{TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}catch{coordinator.Dispose();throw;}
     }
     /// <summary>e) (audit 2026-11-02): true while bound by duty, from the map's live copy (set by Plugin); no copy counts as « not in a duty ».</summary>
     public Func<bool> InDuty { get; init; } = ()=>false;
@@ -69,5 +69,5 @@ internal sealed class ItemHoverReader : IDisposable
         var slot=container->GetInventorySlot((int)agent->Index);
         return slot!=null && slot->ItemId==id ? (uint)slot->Quantity:null;
     }
-    public void Dispose(){lock(gate){if(disposed)return;disposed=true;framework.Update-=Update;coordinator.Dispose();}}
+    public void Dispose(){lock(gate){if(disposed)return;disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);coordinator.Dispose();}}
 }
