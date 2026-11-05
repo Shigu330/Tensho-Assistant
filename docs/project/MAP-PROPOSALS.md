@@ -17,6 +17,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P1 — Zoom à l'ouverture, réglable et gardé entre les sessions
 
+- **État (relu le 2026-11-05)** : FAIT 0.542.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : La carte s'ouvre au zoom choisi par le joueur : le dernier zoom utilisé (gardé après une relance du jeu), un pourcentage fixe en suivant le personnage, ou la carte entière. Le zoom appliqué quand on demande une quête ou un lien est réglable lui aussi. Aujourd'hui, la carte démarre toujours à 50 %.
 - **Comment, taille, dépendances** : Ajouter à MapViewSettings : OpenZoomMode (dernier, fixe, carte entière), OpenZoomPercent, FocusZoomPercent (100 % par défaut) et LastZoom. LastZoom est enregistré à la fermeture de la fenêtre ou après une pause, jamais à chaque image. Chaque réglage a son infobulle et son ↺. Les classer dans les listes de ConfigurationReset (un test l'exige). Taille S. Aucune sonde. Une décision : la valeur par défaut. Recommandé : « dernier zoom », avec 50 % la première fois, ce qui ne change rien pour l'utilisateur actuel.

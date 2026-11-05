@@ -201,6 +201,8 @@ Demande de l'utilisateur (2026-11-05) : tout remettre à jour une fois le plan c
 - La liste de tous les outils, sur l'accueil et partout où elle apparaît.
 - Tous les fichiers `.md` du dépôt.
 - L'aide et la prise en main du plugin.
+- Tous les fichiers `.md` en français et en anglais : l'anglais toujours en premier, avec une mention en français disant que la traduction est en bas.
+- Sur Git, tout en anglais si possible : messages de commit, issues, releases et ce que GitHub affiche.
 
 ## Écartés à la revue
 

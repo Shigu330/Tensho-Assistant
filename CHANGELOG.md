@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.542.0
+- Tri des propositions, lot 1, P1 (demande de l'utilisateur) : la carte démarrait toujours à 50 %, et le zoom sur une quête ou un lien était figé à 100 % au moins. Trois réglages : zoom à l'ouverture (dernier zoom utilisé, gardé après une relance ; zoom fixe en suivant le personnage ; carte entière), valeur du zoom fixe, zoom sur une quête ou un lien. Par défaut, le dernier zoom, à 50 % la première fois. Il est enregistré après 2 secondes sans changement, jamais à chaque image. Une carte choisie s'ouvre toujours en entier.
+- Tests : MapZoom542Tests. Verify.ps1 (agent) : 1006/1006, 0 avertissement, 0 erreur ; DLL 0.542.0.0. Non validé en jeu.
+### English
+- The map's zoom at opening is now a setting: last zoom used (kept across restarts), fixed zoom following the character, or the whole map. The zoom used on a quest or link is a setting too.
+
 ## 0.541.0
 - Plan global, phase 1 (issue #37) : le bloc d'objets de « Mes outils » ne montrait pas les prix. Nouvelle colonne « Prix à l'unité » (le plus bas de NQ et HQ dans le cache partagé), coût de ce qui manque, et bouton « Demander les prix », 32 objets au plus par clic. Un prix ou un stock inconnu est compté comme inconnu (« au moins »), jamais comme gratuit. Rien n'est demandé sans le clic.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1005/1005, 0 avertissement, 0 erreur ; DLL 0.541.0.0. Non validé en jeu.

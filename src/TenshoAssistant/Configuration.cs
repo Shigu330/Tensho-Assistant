@@ -188,6 +188,11 @@ public sealed class MapViewSettings
     // 0.151: areas per kind — shown or not, and colour (RGBA, the fill uses the alpha, the outline is stronger).
     // 0.153: how much icons and names follow the zoom — 0 = fixed size on screen (like the game), 1 = proportional to the map.
     public float ZoomFollow { get; set; } = 0.15f;
+    // 0.542 (P1): the zoom at opening. The last one starts at 50 %, what the map always did; the zoom of a quest or a link was fixed at 100 % at least.
+    public TenshoAssistant.Maps.MapOpenZoom OpenZoom { get; set; } = TenshoAssistant.Maps.MapOpenZoom.Last;
+    public float LastZoom { get; set; } = 0.5f;
+    public float OpenZoomValue { get; set; } = 0.5f;
+    public float FocusZoom { get; set; } = 1f;
     public static float ClampFollow(float value)=>float.IsFinite(value) ? Math.Clamp(value,0f,1f):0.15f;
     /// <summary>Zoom factor applied to icons and names: zoom^follow (1 at 100 % whatever the setting).</summary>
     public float ZoomFactor(float zoom)=>MathF.Pow(Math.Max(0.01f,zoom),ClampFollow(ZoomFollow));

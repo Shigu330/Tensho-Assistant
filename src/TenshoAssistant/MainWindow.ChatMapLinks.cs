@@ -101,7 +101,7 @@ internal sealed partial class MainWindow
     private void AskNearestAetheryteAt(MapDefinition map,Vector2 pixel,string place,bool flag=false,bool direct=false)
     {
         if(flag){var coordinate=MapProjection.CoordinateFromPixel(pixel,map);FlagFromMap(map,coordinate.X,coordinate.Y);}
-        OpenMapView(map.MapId);mapFitRequested=false;mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,1f));mapCenterRequest=pixel;
+        OpenMapView(map.MapId);mapFitRequested=false;mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,MapFocusZoom));mapCenterRequest=pixel;
         mapLive?.RefreshTeleportCosts();
         mapNearestRequest=(map.MapId,pixel,place,DateTimeOffset.UtcNow.AddSeconds(3),direct);
     }

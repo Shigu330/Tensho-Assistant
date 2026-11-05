@@ -1043,6 +1043,7 @@ public sealed class Plugin : IDalamudPlugin
         mainWindow.ApplyTheme();
         // The map's open state lives in MainWindow (game map key M, journal); its window follows it.
         if(mapWindow is not null)mapWindow.IsOpen=mainWindow.MapViewOpen;
+        mainWindow.KeepMapZoom();
         if(guideWindow is not null)guideWindow.IsOpen=mainWindow.GuideOpen;
         foreach(var panel in panelWindows)panel.Follow();
         overlays??=

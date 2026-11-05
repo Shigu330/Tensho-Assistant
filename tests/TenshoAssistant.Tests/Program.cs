@@ -991,6 +991,7 @@ var tests = new (string Name, Action Run)[]
 
 var failures = 0;
 tests = tests.Concat(DutyLootTests.Cases).ToArray();
+tests = tests.Concat(MapZoom542Tests.Cases).ToArray();
 tests = tests.Concat(SelfCheckTests.Cases).ToArray();
 tests = tests.Concat(HelpTests.Cases).ToArray();
 tests = tests.Concat(RetainerSalesTests.Cases).ToArray();

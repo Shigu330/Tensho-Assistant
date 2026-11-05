@@ -29,11 +29,29 @@ internal sealed partial class MainWindow
     // Vista under the mouse this frame and the one right-clicked (0.201: alarm for its ET window and weather).
     private MapLocalPosition? mapHoveredVista,mapContextVista;
     private MapLocalIndexService? mapLocal;
-    internal void ConfigureMapView(MapLiveReader live,MapMarkerSource markers,MapLocalIndexService local){mapLive=live;mapMarkers=markers;mapLocal=local;}
+    internal void ConfigureMapView(MapLiveReader live,MapMarkerSource markers,MapLocalIndexService local){mapLive=live;mapMarkers=markers;mapLocal=local;mapZoom=MapProjection.ClampZoom(configuration.MapView.OpenZoom==MapOpenZoom.Fixed ? configuration.MapView.OpenZoomValue:configuration.MapView.LastZoom);}
+    // 0.542 (P1): the zoom chosen for the opening; a chosen map still opens whole.
+    private readonly MapZoomMemory mapZoomMemory=new(TimeSpan.FromSeconds(2));
+    private void ApplyOpenZoom()
+    {
+        var settings=configuration.MapView;
+        if(settings.OpenZoom==MapOpenZoom.Fixed)mapZoom=MapProjection.ClampZoom(settings.OpenZoomValue);
+        else if(settings.OpenZoom==MapOpenZoom.Whole){mapViewFollow=false;mapFitRequested=true;}
+    }
+    private float MapFocusZoom=>MapProjection.ClampZoom(configuration.MapView.FocusZoom);
+    /// <summary>Each frame, also when the map closes just after a zoom. Only the last zoom is kept, and only when it has rested.</summary>
+    internal void KeepMapZoom()
+    {
+        var settings=configuration.MapView;
+        if(settings.OpenZoom!=MapOpenZoom.Last || mapZoomMemory.Tick(mapZoom,settings.LastZoom,TimeSpan.FromTicks(DateTimeOffset.UtcNow.UtcTicks)) is not { } rested)return;
+        settings.LastZoom=rested;
+        try{save();saveError=null;}
+        catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save the map zoom.");}
+    }
     // 0.328 (map audit #13): a chosen map opens whole, like NavigateMap; the old zoom and pan belonged to another map.
     // 0.499 (user report): a link to the map brings it above the Tensho window instead of opening behind it.
     private bool mapViewToFront;
-    private void OpenMapView(uint mapId){mapViewMapId=mapId;mapViewFollow=mapId==0;mapFitRequested=mapId!=0;mapViewOpen=true;mapViewToFront=true;}
+    private void OpenMapView(uint mapId){mapViewMapId=mapId;mapViewFollow=mapId==0;mapFitRequested=mapId!=0;if(mapId==0)ApplyOpenZoom();mapViewOpen=true;mapViewToFront=true;}
     // Called when the game map is replaced: the same key (M) that opens the game map toggles the Tensho map.
     // Hosted game map (0.151): the replacer asks whether the Tensho map is still open, and closes it with the game map.
     internal bool MapViewOpen=>Volatile.Read(ref mapViewOpen);
@@ -542,6 +560,27 @@ internal sealed partial class MainWindow
                 if(ImGui.SliderFloat(localization.Get("MapView.IconScale"),ref scale,50,200,"%.0f %%")){settings.IconScale=scale/100;changed=true;}
                 Tip("SettingTips.IconScale");
                 if(DefaultButton("IconScale",settings.IconScale!=MapDefaults.IconScale)){settings.IconScale=MapDefaults.IconScale;changed=true;}
+                // 0.542 (P1).
+                ImGui.SetNextItemWidth(160);
+                if(ImGui.BeginCombo(localization.Get("MapView.OpenZoom")+"###MapOpenZoom",localization.Get("MapView.OpenZoom"+settings.OpenZoom)))
+                {
+                    foreach(var mode in Enum.GetValues<MapOpenZoom>())
+                        if(ImGui.Selectable(localization.Get("MapView.OpenZoom"+mode),settings.OpenZoom==mode)){settings.OpenZoom=mode;changed=true;}
+                    ImGui.EndCombo();
+                }
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.OpenZoomHelp"));
+                if(DefaultButton("OpenZoom",settings.OpenZoom!=MapDefaults.OpenZoom)){settings.OpenZoom=MapDefaults.OpenZoom;changed=true;}
+                if(settings.OpenZoom==MapOpenZoom.Fixed)
+                {
+                    var opening=MapProjection.ClampZoom(settings.OpenZoomValue)*100;ImGui.SetNextItemWidth(160);
+                    if(ImGui.SliderFloat(localization.Get("MapView.OpenZoomValue"),ref opening,15,400,"%.0f %%")){settings.OpenZoomValue=opening/100;changed=true;}
+                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.OpenZoomValueHelp"));
+                    if(DefaultButton("OpenZoomValue",settings.OpenZoomValue!=MapDefaults.OpenZoomValue)){settings.OpenZoomValue=MapDefaults.OpenZoomValue;changed=true;}
+                }
+                var focus=MapFocusZoom*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.FocusZoom"),ref focus,15,400,"%.0f %%")){settings.FocusZoom=focus/100;changed=true;}
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.FocusZoomHelp"));
+                if(DefaultButton("FocusZoom",settings.FocusZoom!=MapDefaults.FocusZoom)){settings.FocusZoom=MapDefaults.FocusZoom;changed=true;}
                 var follow=MapViewSettings.ClampFollow(settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.ZoomFollow"),ref follow,0,100,"%.0f %%")){settings.ZoomFollow=follow/100;changed=true;}
                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.ZoomFollowHelp"));
@@ -827,7 +866,7 @@ internal sealed partial class MainWindow
     {
         var pixel=MapProjection.PixelFromWorld(world,map);
         mapViewOpen=true;mapViewMapId=map.MapId;mapViewFollow=false;mapFitRequested=false;
-        mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,1f));mapCenterRequest=pixel;
+        mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,MapFocusZoom));mapCenterRequest=pixel;
         if(!flag)return;
         var coordinate=MapProjection.CoordinateFromPixel(pixel,map);
         FlagFromMap(map,coordinate.X,coordinate.Y);
@@ -860,7 +899,7 @@ internal sealed partial class MainWindow
             {
                 mapGameTarget=focus.Target is { } world && focus.TargetIcon!=0 ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
                 mapGameTargetQuests=null;mapGameTargetSince=DateTimeOffset.UtcNow;mapGameTargetRefresh=default;
-                mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,1f));mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
+                mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,MapFocusZoom));mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
                 log.Information("Map focus found on map {0} for quest {1}, aetheryte {2}, FATE {3}.",map.MapId,focus.QuestId,focus.AetheryteId,focus.FateId);
             }
             else if(DateTimeOffset.UtcNow>=mapFocusUntil)

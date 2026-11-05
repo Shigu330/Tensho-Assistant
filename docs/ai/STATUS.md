@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-04)
 
-VERSION: 0.541.0.0 (dernière release : Stable-0.539.0, 2026-11-05) — Verify.ps1 (agent) 1005/1005, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.542.0.0 (dernière release : Stable-0.539.0, 2026-11-05) — Verify.ps1 (agent) 1006/1006, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: préparer la 1.0.0 (publication Dalamud) ; voir [GOAL](GOAL.md) et [PUBLISHING](../project/PUBLISHING.md).
 QUOTA: réserve utilisateur 1 % (5 h et semaine). L'agent ne voit pas le compteur. Dernier relevé de l'utilisateur (2026-11-05) : 5 h 14 %, réinitialisation à 4:50 ; semaine 94 %, réinitialisation à 23:00.
 
@@ -30,7 +30,7 @@ Liste complète : [TESTING](../project/TESTING.md), 284 cases ouvertes, aucune d
 Dépôt personnel : installation et mise à jour fonctionnent (rapport de l'utilisateur, 2026-11-05, 0.539.0). Possible depuis cette release : galerie de Mes outils (0.476) et liste de vidéos (0.506), qui lisent la branche `main`.
 
 ## Prochaine action
-0) [Plan global](../project/GLOBAL-PLAN.md) : phases 1 à 4 sans jouer, puis le jeu en dernier, un point à la fois ; la 1.0.0 après tout le plan (DEC-037). **Ne pas coder sans le feu vert de l'utilisateur.** Phase 1 finie. Reprise : phase 2, P1.
+0) [Plan global](../project/GLOBAL-PLAN.md) : phases 1 à 4 sans jouer, puis le jeu en dernier, un point à la fois ; la 1.0.0 après tout le plan (DEC-037). **Ne pas coder sans le feu vert de l'utilisateur.** Phase 1 finie. Reprise : phase 2, P2.
 1) Décisions de l'auteur sur les points Dalamud ([PUBLISHING](../project/PUBLISHING.md) « Ce qui reste », points 4 à 7 ; titre selon le job décidé, DEC-035), avec son accord à chaque règle.
 2) Fait le 2026-11-05 : release Stable-0.539.0, sur demande de l'utilisateur. La prochaine : une séance de jeu sur la dernière version d'abord (DEC-033).
 3) Vérifier en jeu les fenêtres converties (issue #38).
