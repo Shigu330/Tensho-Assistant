@@ -125,6 +125,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P15 — État des lectures du jeu affiché sur la carte (R-14, partie carte)
 
+- **État (relu le 2026-11-05)** : FAIT 0.569.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Après une mise à jour de FF14, la carte indique précisément ce qui ne marche plus (« marqueurs de quête indisponibles après une mise à jour du jeu », « téléportation indisponible »), au lieu d'une carte vide sans explication. Le reste continue de fonctionner.
 - **Comment, taille, dépendances** : Un statut par partie (position, drapeau, marqueurs, ALEA, objets, groupe, collectés, téléportation, remplacement), publié avec l'état. Chaque lecture est isolée dans son propre try, pour qu'une panne ne coupe pas les autres. Une ligne discrète sur la carte, et le même statut dans Diagnostics. Lié au repli sur la carte du jeu. Taille S à M. Pas de sonde. Décision : faire la partie carte maintenant ou l'intégrer à l'étape g2 R-14 (recommandé : maintenant, puisque e) commence par la carte).

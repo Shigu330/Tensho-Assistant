@@ -121,22 +121,22 @@ internal sealed class MapLiveReader : IDisposable
             // failing read it retried every frame; the first tick still reads, flightAt starts at its default.
             if(now>=flightAt)
             {
-                try{flights=ReadFlights();}catch(Exception error){Failed("flights",error);}
-                try{(unlockedCurrents,sightseen)=ReadCollected();}catch(Exception error){Failed("collected",error);}
+                try{flights=ReadFlights();Read("flights");}catch(Exception error){Failed("flights",error);}
+                try{(unlockedCurrents,sightseen)=ReadCollected();Read("collected");}catch(Exception error){Failed("collected",error);}
                 flightAt=now.AddSeconds(2);
             }
             if(now>=eventsAt)
             {
-                try{events=ReadEvents();}catch(Exception error){Failed("events",error);}
+                try{events=ReadEvents();Read("events");}catch(Exception error){Failed("events",error);}
                 // Objects, FATEs and party carry no map id: on a failure they are emptied, never kept from another zone.
-                try{nearby=ReadObjects();}catch(Exception error){nearby=[];Failed("objects",error);}
-                try{fates=ReadFates();}catch(Exception error){fates=[];Failed("FATEs",error);}
+                try{nearby=ReadObjects();Read("objects");}catch(Exception error){nearby=[];Failed("objects",error);}
+                try{fates=ReadFates();Read("FATEs");}catch(Exception error){fates=[];Failed("FATEs",error);}
                 eventsAt=now.AddMilliseconds(500);
             }
             // 0.525 (user report): the party is read more often than the rest; the map glides between positions (MapPartySmoother).
             if(now>=partyAt)
             {
-                try{partyMarkers=ReadParty();}catch(Exception error){partyMarkers=[];Failed("party",error);}
+                try{partyMarkers=ReadParty();Read("party");}catch(Exception error){partyMarkers=[];Failed("party",error);}
                 partyAt=now.AddMilliseconds(100);
             }
             var inCombat=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
@@ -149,8 +149,16 @@ internal sealed class MapLiveReader : IDisposable
     private readonly HashSet<string> failedReads=[];
     private void Failed(string part,Exception error)
     {
-        if(failedReads.Add(part))log.Warning(error,"Map {0} unavailable; the last copy is kept, position and flag still update.",part);
+        if(failedReads.Add(part)){log.Warning(error,"Map {0} unavailable; the last copy is kept, position and flag still update.",part);Volatile.Write(ref failedParts,failedReads.ToArray());}
     }
+    // 0.569 (P15): a part that reads again is no longer said to be down.
+    private void Read(string part)
+    {
+        if(failedReads.Remove(part))Volatile.Write(ref failedParts,failedReads.ToArray());
+    }
+    private string[] failedParts=[];
+    /// <summary>The parts whose last read failed, for the map's line and Diagnostics.</summary>
+    public IReadOnlyList<string> FailedParts=>Volatile.Read(ref failedParts);
     private unsafe IReadOnlyDictionary<uint,MapFlightState> ReadFlights()
     {
         var player=PlayerState.Instance();var result=new Dictionary<uint,MapFlightState>();

@@ -923,6 +923,12 @@ internal sealed partial class MainWindow
         if(ImGui.Selectable(localization.Get("MapView.NearestAetheryte")+"##NearestAetheryte"))AskNearestAetheryteAt(map,mapContextPixel,map.Zone);
         Tip("MapView.NearestAetheryteTip");
     }
+    private string? MapFailedParts()
+    {
+        var parts=mapLive?.FailedParts;
+        if(parts is not { Count:>0 })return null;
+        return localization.Format("MapView.PartsUnavailable",string.Join(", ",parts.Select(part=>localization.Get("MapView.Part"+part))));
+    }
     private bool mapDragged;
     // 0.328 (map audit #3): the zoom buttons and slider keep the texture pixel at the centre of the view where it is (canvas size of
     // the last frame; the tool column is drawn before the canvas). Only the mouse wheel zoomed around a point before.
@@ -1009,6 +1015,8 @@ internal sealed partial class MainWindow
             var markers=settings.ShowFixedIcons || settings.ShowPlaceNames ? mapMarkers?.For(map.MarkerRange) ?? []:[];
             if(mapMarkers?.Failed(map.MarkerRange)==true)
                 draw.AddText(origin+new Vector2(8,26),ImGui.GetColorU32(UI.FfxivTheme.TextMuted),localization.Get("MapView.MarkersUnavailable"));
+            // 0.569 (P15): what no longer reads after a game update, instead of a map that just looks empty.
+            if(MapFailedParts() is { } brokenParts)draw.AddText(origin+new Vector2(8,44),ImGui.GetColorU32(UI.FfxivTheme.Warning),brokenParts);
             // Place names first, under the icons, in large outlined text like the game map; they also follow the zoom.
             var font=ImGui.GetFont();var nameScale=Math.Clamp(float.IsFinite(settings.PlaceNameScale) ? settings.PlaceNameScale:1,0.5f,1.5f);
             // 0.152 (user choice « follow the zoom »): names scale with the map like the icons; only a 6 px floor keeps them drawable.

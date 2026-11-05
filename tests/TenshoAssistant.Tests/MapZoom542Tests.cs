@@ -8,6 +8,17 @@ internal static class MapZoom542Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Map (0.569): each part that stops reading is named, and leaves the list when it reads again",() =>
+        {
+            var reader=Read("Maps/MapLiveReader.Dalamud.cs");
+            foreach(var part in new[]{"flights","collected","events","objects","FATEs","party"})
+            {
+                Check(reader.Contains($"Read(\"{part}\");}}"),"cleared: "+part);
+                Check(reader.Contains($"Failed(\"{part}\",error)"),"said: "+part);
+                Check(Read("Localization/Languages/fr.json").Contains($"\"Part{part}\":") && Read("Localization/Languages/en.json").Contains($"\"Part{part}\":"),"named: "+part);
+            }
+            Check(Read("MainWindow.Diagnostics.cs").Contains("MapFailedParts()"),"Diagnostics too");
+        }),
         ("Map (0.548): a FATE's bonus is written in its line; its area keeps its colour",() =>
         {
             Check(Read("Maps/MapLiveReader.Dalamud.cs").Contains("fate.State.ToString(),fate.HasBonus));") && Read("MainWindow.MapLocalLists.cs").Contains("MapLocal.FateBonus"),"read and written");

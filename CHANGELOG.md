@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.569.0
+- Plan global, P15 : après une mise à jour du jeu, la carte dit ce qui ne se lit plus (vol, marqueurs de quête, ALEA, groupe…) au lieu de sembler vide, et Diagnostics aussi. Une partie qui se relit quitte la liste.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1032/1032, 0 avertissement, 0 erreur ; DLL 0.569.0.0. Non validé en jeu.
+### English
+- The map and Diagnostics now say which parts no longer read, perhaps after a game update. A part that reads again leaves the list.
+
 ## 0.568.0
 - Plan global, C9 : dans l'aide à la pêche, chaque poisson dit si son créneau, sa météo et sa météo d'avant sont bons maintenant (oui, non, ?), d'après GatherBuddy. Météo calculée une fois par période. C0 était déjà présent : rien à coder.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1031/1031, 0 avertissement, 0 erreur ; DLL 0.568.0.0. Non validé en jeu.

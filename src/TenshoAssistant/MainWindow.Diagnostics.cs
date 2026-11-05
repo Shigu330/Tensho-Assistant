@@ -38,6 +38,7 @@ internal sealed partial class MainWindow
             foreach (var row in rows)
                 ImGui.TextUnformatted(localization.Format("DiagnosticsUi.DrawTimeLine", row.Name, row.Median.ToString("0.00"), row.Max.ToString("0.00"), row.Count));
         }
+        if(MapFailedParts() is { } mapParts)ImGui.TextColored(UI.FfxivTheme.Warning,mapParts);
         DrawSelfCheck();
         DrawMacroObservation();
         ImGui.Spacing();
