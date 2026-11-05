@@ -142,6 +142,8 @@ public sealed class MapViewSettings
 {
     public bool ShowFixedIcons { get; set; } = true;
     public bool ShowPlaceNames { get; set; } = true;
+    // 0.596 (P12): the names the game writes beside some icons.
+    public bool ShowIconNames { get; set; } = true;
     public bool ShowQuests { get; set; } = true;
     public bool ShowQuestAreas { get; set; } = true;
     public bool ShowFlag { get; set; } = true;

@@ -6,7 +6,8 @@ namespace TenshoAssistant.Maps;
 // Fixed map icon in texture pixels (MapMarker X/Y), with its game icon and optional label. Icon 0 = a place name drawn as text.
 // LinkMapId: on region and world maps, DataType 1 markers open that map (probe: docs/evidence/0.103.0-maps-probe.log).
 // AetheryteId: DataType 3 markers are aetherytes (DataKey = Aetheryte row; probe docs/evidence/0.107.0-aetheryte-probe.log).
-public sealed record MapIconMarker(float X,float Y,uint Icon,string Label,uint LinkMapId=0,uint AetheryteId=0);
+// Orientation: where the game writes the label (MapMarker SubtextOrientation, Maps/MapLabels.cs).
+public sealed record MapIconMarker(float X,float Y,uint Icon,string Label,uint LinkMapId=0,uint AetheryteId=0,byte Orientation=0);
 
 /// <summary>
 /// Game data for the map window, copied once per key: fixed markers per range, and the overview maps (regions, world)
@@ -37,7 +38,7 @@ internal sealed class MapMarkerSource
                 foreach(var row in rows)
                 {
                     var label=row.PlaceNameSubtext.RowId!=0 ? row.PlaceNameSubtext.Value.Name.ExtractText():"";
-                    if(row.Icon!=0 || label.Length>0)markers.Add(new(row.X,row.Y,row.Icon,label,row.DataType==1 ? row.DataKey.RowId:0,row.DataType==3 ? row.DataKey.RowId:0));
+                    if(row.Icon!=0 || label.Length>0)markers.Add(new(row.X,row.Y,row.Icon,label,row.DataType==1 ? row.DataKey.RowId:0,row.DataType==3 ? row.DataKey.RowId:0,row.SubtextOrientation));
                 }
         }
         catch(Exception error){log.Warning(error,"Map markers unavailable for range {0}.",range);failed.Add(range);return [];}

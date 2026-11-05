@@ -102,6 +102,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P12 — Noms écrits à côté des icônes, comme la carte du jeu
 
+- **État (relu le 2026-11-05)** : FAIT 0.596.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs`.
 - **Ce que le joueur obtient** : Les noms que le jeu écrit à côté de certaines icônes (éthérites, lieux importants) sont écrits sur la carte Tensho avec le même placement, et pas seulement dans l'infobulle.
 - **Comment, taille, dépendances** : Sonder les valeurs de SubtextOrientation, comparées à une capture de la carte du jeu, et consigner le résultat dans docs/evidence. Copier la colonne dans MapIconMarker. Écrire le texte du côté indiqué, à la taille des noms (dépend de la proposition sur les étiquettes). Réglage on/off avec infobulle et ↺. Si la colonne est illisible, aucun texte. Taille M. Décision : l'activer par défaut ou non (recommandé : oui, comme le jeu).

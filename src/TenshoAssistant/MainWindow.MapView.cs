@@ -474,7 +474,7 @@ internal sealed partial class MainWindow
             void All(bool shown)
             {
                 settings.ShowQuests=settings.ShowFates=settings.ShowGathering=settings.ShowVendors=settings.ShowSightseeing=settings.ShowAetherCurrents=shown;
-                settings.ShowParty=settings.ShowBookmarks=settings.ShowHuntMarks=settings.ShowTreasure=settings.ShowFixedIcons=settings.ShowPlaceNames=shown;
+                settings.ShowParty=settings.ShowBookmarks=settings.ShowHuntMarks=settings.ShowTreasure=settings.ShowFixedIcons=settings.ShowPlaceNames=settings.ShowIconNames=shown;
                 changed=true;
             }
             if(ImGui.SmallButton(localization.Get("MapView.LayersAll")))All(true);
@@ -485,6 +485,7 @@ internal sealed partial class MainWindow
             ImGui.Separator();
             changed|=SettingBox("MapView.ShowFixedIcons",settings.ShowFixedIcons,value=>settings.ShowFixedIcons=value);
             changed|=SettingBox("MapView.ShowPlaceNames",settings.ShowPlaceNames,value=>settings.ShowPlaceNames=value);
+            changed|=SettingBox("MapView.ShowIconNames",settings.ShowIconNames,value=>settings.ShowIconNames=value);
             changed|=SettingBox("MapView.ShowQuests",settings.ShowQuests,value=>settings.ShowQuests=value);
             changed|=SettingBox("MapView.ShowFates",settings.ShowFates,value=>settings.ShowFates=value);
             changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value);
@@ -516,6 +517,7 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.TeleportOnClick",settings.TeleportOnClick,value=>settings.TeleportOnClick=value,MapDefaults.TeleportOnClick);
                 changed|=SettingBox("MapView.ChatLinks",settings.ChatLinks,value=>settings.ChatLinks=value,MapDefaults.ChatLinks);
                 changed|=SettingBox("MapView.ShowPlaceNames",settings.ShowPlaceNames,value=>settings.ShowPlaceNames=value,MapDefaults.ShowPlaceNames);
+                changed|=SettingBox("MapView.ShowIconNames",settings.ShowIconNames,value=>settings.ShowIconNames=value,MapDefaults.ShowIconNames);
                 var names=Math.Clamp(float.IsFinite(settings.PlaceNameScale) ? settings.PlaceNameScale:1,0.5f,1.5f)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.PlaceNameScale"),ref names,50,150,"%.0f %%")){settings.PlaceNameScale=names/100;changed=true;}
                 Tip("SettingTips.PlaceNameScale");
@@ -1081,6 +1083,15 @@ internal sealed partial class MainWindow
             {
                 if(textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
                     draw.AddImage(image.Handle,item.At-new Vector2(item.Size/2),item.At+new Vector2(item.Size/2));
+                // 0.596 (P12): the name the game writes beside this icon, on the side it uses. Smaller than the place names.
+                if(settings.ShowIconNames && settings.NamesShown(mapZoom) && item.Fixed is {Label.Length:>0} named)
+                {
+                    var iconNameSize=Math.Max(6,nameSize*0.55f);
+                    var iconNameAt=item.At+MapLabels.Offset(named.Orientation,item.Size,ImGui.CalcTextSize(named.Label)*(iconNameSize/ImGui.GetFontSize()));
+                    foreach(var shift in new[]{new Vector2(-1,0),new Vector2(1,0),new Vector2(0,-1),new Vector2(0,1)})
+                        draw.AddText(font,iconNameSize,iconNameAt+shift,ImGui.GetColorU32(new Vector4(0.96f,0.93f,0.84f,0.9f)),named.Label);
+                    draw.AddText(font,iconNameSize,iconNameAt,ImGui.GetColorU32(new Vector4(0.30f,0.22f,0.12f,1)),named.Label);
+                }
                 // Timed gathering points: a clock badge, green while open now, orange otherwise (0.130).
                 if(item.Point is { Timed:true } timedPoint)
                 {

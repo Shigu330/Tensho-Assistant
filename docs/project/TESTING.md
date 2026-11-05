@@ -834,6 +834,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.595) Règles de tri d'un rangement : une zone avec un job, une zone avec « Dans un set d'équipement » ; vérifier l'aperçu, puis le tri réel.
 
+- [ ] (0.596) Comparer une carte Tensho et celle du jeu : les noms doivent être du même côté de leurs icônes. Essayer la case « Noms des icônes » et le zoom minimal.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.596.0
+- Plan global, P12 : Carte : les noms que le jeu écrit à côté de certaines icônes (éthérites, lieux importants) sont écrits sur la carte Tensho, du même côté, à partir du même zoom que les noms de lieux ; case « Noms des icônes » pour les retirer. Le côté vient de MapMarker.SubtextOrientation, mesuré sur les données du jeu (preuve : docs/evidence/0.596-map-label-orientation.md), à confirmer en jeu.
+- Tests : Map labels. Verify.ps1 (agent) : 1083/1083, 0 avertissement, 0 erreur ; DLL 0.596.0.0. Non validé en jeu.
+### English
+- Map: the names the game writes beside some icons (aetherytes, important places) are written on Tensho's map, on the same side, from the same zoom as place names; an « Icon names » box removes them. The side comes from MapMarker.SubtextOrientation, measured on the game's data (evidence: docs/evidence/0.596-map-label-orientation.md), to confirm in game.
+
 ## 0.595.0
 - Plan global, I21 : Règles de tri : une zone peut ne prendre que l'équipement d'un job, ou les pièces de vos sets d'équipement du jeu (oui ou non). Tant que les sets ne sont pas lus, le tri réel attend et le dit ; rien ne bouge sur ce qui n'est pas lu.
 - Tests : Sort gear. Verify.ps1 (agent) : 1080/1080, 0 avertissement, 0 erreur ; DLL 0.595.0.0. Non validé en jeu.
