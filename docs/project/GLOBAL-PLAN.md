@@ -14,6 +14,7 @@ Plan du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisa
 | 4 | Idées, sonde web et sources sans le jeu | 6 | Non |
 | 5 | Relevés en jeu, puis le code qui en dépend | 27 | Oui, l'un après l'autre |
 | 6 | Tests en jeu de tout ce qui précède | 1 | Oui, l'un après l'autre |
+| 7 | Juste avant la 1.0.0 : listes d'outils, documents, aide | | Non |
 | Ensuite | Version 1.0.0 et soumission | | |
 | Après la 1.0.0 | C10, chrono de touche | 1 | |
 
@@ -192,6 +193,14 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | P19 | Tests en jeu de la carte encore en attente | S |  |
 
 P19 s'élargit en campagne guidée de fin : tout ce qui a été codé, avec les cases ouvertes de [TESTING](TESTING.md), selon le déroulement ci-dessus.
+
+## Phase 7 : juste avant la 1.0.0
+
+Demande de l'utilisateur (2026-11-05) : tout remettre à jour une fois le plan codé, pour que rien ne décrive un état ancien.
+
+- La liste de tous les outils, sur l'accueil et partout où elle apparaît.
+- Tous les fichiers `.md` du dépôt.
+- L'aide et la prise en main du plugin.
 
 ## Écartés à la revue
 
