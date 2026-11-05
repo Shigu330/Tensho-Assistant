@@ -17,12 +17,17 @@ internal sealed class MapViewWindow : Window
         RespectCloseHotkey = false;
     }
 
-    public override bool DrawConditions() => owner.MapViewVisible();
+    // 0.537 (user request): on its setting, the map steps aside when a game window comes in front; its open state does not change.
+    public override bool DrawConditions() => owner.MapViewVisible() && !(lastPosition is { } at && owner.MapBehindGame(at, lastSize));
+    private System.Numerics.Vector2? lastPosition;
+    private System.Numerics.Vector2 lastSize;
     public override void PreDraw() => owner.PrepareMapView(this);
     public override void PostDraw() { owner.FinishMapView(); if (!IsOpen) owner.CloseMapFromGame(); } // 0.514: Plugin.Draw copies the state into IsOpen before OnClose could run.
     public override void Draw()
     {
         // 0.489 (user report): the map is its own window, drawn with neither a page nor a panel: it has its line in Diagnostics.
+        lastPosition = Dalamud.Bindings.ImGui.ImGui.GetWindowPos();
+        lastSize = Dalamud.Bindings.ImGui.ImGui.GetWindowSize();
         var started = owner.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
         owner.DrawMapViewContents();
         if (started != 0) owner.RecordOverlayDraw("Map", System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);

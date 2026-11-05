@@ -919,6 +919,8 @@ public sealed class Plugin : IDalamudPlugin
                 gatheringActionRows[id]=found;
                 return found;
             };
+            UI.GameWindowsReader? gameWindows=null;
+            registrations.Register(()=>{gameWindows=new UI.GameWindowsReader(framework,client,gameGui,log,()=>mainWindow.DeveloperMode);mainWindow.GameWindowSource=()=>gameWindows.Windows;},()=>{mainWindow.GameWindowSource=null;gameWindows?.Dispose();});
             Gathering.GatherKnowledgeReader? gatherKnowledge=null;
             registrations.Register(()=>{gatherKnowledge=new Gathering.GatherKnowledgeReader(data,framework,client,player,log);mainWindow.GatherAccess=gatherKnowledge.Access;},()=>{mainWindow.GatherAccess=null;gatherKnowledge?.Dispose();});
             mainWindow.GpActionUnlocked=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row && (row.UnlockLink.RowId==0 || unlocks.IsActionUnlocked(row));

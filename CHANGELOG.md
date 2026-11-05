@@ -3,6 +3,13 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.537.0
+- Demande de l'utilisateur en jeu, avec réglages : les interfaces de Tensho s'effacent quand une fenêtre du jeu passe devant, et reviennent ensuite ([relevé](docs/evidence/0.537-game-windows.md)). Le jeu ne peut pas dessiner par-dessus : c'est l'interface entière qui se cache.
+- Panneaux accrochés à une fenêtre du jeu : seulement ce qui passe devant leur fenêtre (activé par défaut). Barres et panneaux libres : ce qui les touche (activé par défaut). Carte : ce qui la touche (Paramètres de la carte, désactivé par défaut, car elle part en entier). Le bouton Trier suit la même règle, sans réglage.
+- Tests : Interfaces535Tests, avec les cas des captures. Verify.ps1 (agent) : 1003/1003, 0 avertissement, 0 erreur ; DLL 0.537.0.0. Non validé en jeu.
+### English
+- Tensho's panels, bars and, on a setting, the map step aside when a game window comes in front, and come back after. Three settings; the map's is off by default.
+
 ## 0.536.0
 - Rapport de l'utilisateur en jeu (deux captures) : Trier faisait l'inverse : il restait sur le Bestiaire passé devant, et partait quand l'inventaire était devant. Dans une couche du jeu, la liste va de l'avant vers l'arrière ; le test était à l'envers.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1003/1003, 0 avertissement, 0 erreur ; DLL 0.536.0.0. Non validé en jeu.

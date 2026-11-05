@@ -55,6 +55,17 @@ internal sealed partial class MainWindow
 
     /// <summary>0.514: the free-standing panels, as Dalamud windows; Plugin adds them to its window system.</summary>
     internal PanelWindow[] CreatePanelWindows()=>[new(this,TrackerPanel),new(this,TasksPanel),new(this,WearPanel),new(this,RegenTickPanel)];
+    /// <summary>0.537: the game's windows, for the interfaces that step aside when one comes in front.</summary>
+    internal Func<IReadOnlyList<UI.GameWindow>>? GameWindowSource { get; set; }
+    internal IReadOnlyList<UI.GameWindow> GameWindowList=>GameWindowSource?.Invoke() ?? [];
+    internal bool HidePanelsBehindGame=>configuration.HidePanelsBehindGame;
+    private bool BehindGame(Vector2 at,Vector2 size)
+    {
+        var screen=ImGui.GetMainViewport().Size;
+        return UI.GameWindows.Covers(GameWindowList,at.X,at.Y,size.X,size.Y,screen.X,screen.Y);
+    }
+    internal bool BarBehindGame(Vector2 at,Vector2 size)=>configuration.HideBarsBehindGame && BehindGame(at,size);
+    internal bool MapBehindGame(Vector2 at,Vector2 size)=>configuration.MapView.HideBehindGame && BehindGame(at,size);
     /// <summary>0.516: the panels attached to a game window.</summary>
     internal AttachedPanels? Panels { get; set; }
     internal void PanelFailed(string name,Exception error)=>log.Error(error,$"Overlay {name} turned off until the plugin reloads (perhaps after a game update).");

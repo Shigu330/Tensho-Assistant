@@ -19,13 +19,6 @@ internal sealed partial class MainWindow
         if(windowDisposed || !configuration.InventorySortButton || InventoryWindow?.Rect is not { } window)return;
         var character=bankBridge.State.CharacterId;
         if(character==0)return;
-        // 0.535 (user request): a game window over the button (the sort filters, for one): the button leaves, as it would under that window.
-        {
-            var scale=Math.Clamp(window.Scale,0.5f,3f);
-            var buttonX=window.X+Math.Clamp(configuration.InventorySortButtonX,0,400)*scale;var buttonY=window.Y+window.Height-Math.Clamp(configuration.InventorySortButtonY,0,400)*scale-ImGui.GetFrameHeight()/2;
-            var buttonWidth=ImGui.CalcTextSize(localization.Get("SortButton.Label")).X+ImGui.GetFrameHeight()*2;
-            if(InventoryWindow.Above.Any(cover=>Inventory.InventoryCover.Covers(cover,buttonX,buttonY,buttonWidth,ImGui.GetFrameHeight(),ImGui.GetMainViewport().Size.X,ImGui.GetMainViewport().Size.Y)))return;
-        }
         Panels?.Show("TenshoInventorySort","",ImGuiWindowFlags.NoDecoration|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.AlwaysAutoResize
             |ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav|ImGuiWindowFlags.NoBackground,()=>
         {

@@ -271,6 +271,8 @@ internal sealed partial class MainWindow
         // 0.324: shared setting rows (tooltip and « ↺ »).
         BoolSetting("DutyFinder.Setting","Advanced.DutyFinderTip",()=>configuration.ShowDutyFinderLoot,value=>configuration.ShowDutyFinderLoot=value,c=>c.ShowDutyFinderLoot);
         BoolSetting("CharacterStats.Setting","Advanced.CharacterPanelTip",()=>configuration.ShowCharacterPanel,value=>configuration.ShowCharacterPanel=value,c=>c.ShowCharacterPanel);
+        BoolSetting("Advanced.HidePanelsBehindGame","Advanced.HidePanelsBehindGameTip",()=>configuration.HidePanelsBehindGame,value=>configuration.HidePanelsBehindGame=value,c=>c.HidePanelsBehindGame);
+        BoolSetting("Advanced.HideBarsBehindGame","Advanced.HideBarsBehindGameTip",()=>configuration.HideBarsBehindGame,value=>configuration.HideBarsBehindGame=value,c=>c.HideBarsBehindGame);
         BoolSetting("BankUi.AutoSetting","BankUi.AutoSettingHelp",()=>configuration.AutoBankCapture,value=>configuration.AutoBankCapture=value,c=>c.AutoBankCapture);
         ImGui.TextDisabled(localization.Get("BankUi.AutoSettingHelp"));
         DrawCacheSettings();

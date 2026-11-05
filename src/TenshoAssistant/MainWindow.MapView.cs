@@ -564,6 +564,7 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.ReplaceGameMap",settings.ReplaceGameMap,value=>settings.ReplaceGameMap=value,MapDefaults.ReplaceGameMap);
                 changed|=SettingBox("MapView.Locked",settings.Locked,value=>settings.Locked=value,MapDefaults.Locked);
                 changed|=SettingBox("MapView.HideTitleBar",settings.HideTitleBar,value=>settings.HideTitleBar=value,MapDefaults.HideTitleBar);
+                changed|=SettingBox("MapView.HideBehindGame",settings.HideBehindGame,value=>settings.HideBehindGame=value,MapDefaults.HideBehindGame);
                 changed|=SettingBox("MapView.HideInCombat",settings.HideInCombat,value=>settings.HideInCombat=value,MapDefaults.HideInCombat);
                 changed|=SettingBox("MapView.HideInDuty",settings.HideInDuty,value=>settings.HideInDuty=value,MapDefaults.HideInDuty);
             }

@@ -711,6 +711,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.537 : s'effacer devant les fenêtres du jeu** — à voir en jouant
+
+- [ ] Aide à la récolte ou carnet : une autre fenêtre du jeu passe devant et touche le panneau : il se cache ; elle part : il revient. Une fenêtre derrière ne fait rien.
+- [ ] Barre de PR, usure, suivi, tâches : une fenêtre du jeu les touche : elles se cachent. Le chat, les plaques de noms et le HUD ne les cachent pas.
+- [ ] Carte, réglage « S'effacer devant les fenêtres du jeu » coché : une fenêtre la touche : elle se cache sans se fermer. Décoché : rien.
+- [ ] Les trois réglages (Paramètres, carte). Rien ne disparaît sans raison ; sinon, le journal de débogage dit quelle fenêtre compte.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

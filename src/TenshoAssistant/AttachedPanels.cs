@@ -24,6 +24,24 @@ internal sealed class AttachedPanels : IDisposable
         this.owner = owner;
     }
 
+    // 0.537 (user request): each panel steps aside when a game window comes in front of the one it belongs to. Names: the readers of each game window.
+    private static readonly Dictionary<string, string[]> Anchors = new()
+    {
+        ["TenshoGatheringPanel"] = ["Gathering"], ["TenshoCollectablePanel"] = ["GatheringMasterpiece"], ["TenshoCraftLog"] = ["RecipeNote"], ["TenshoCraftLivePanel"] = ["Synthesis"],
+        ["TenshoSpearfishingPanel"] = ["SpearFishing"], ["TenshoCharacterPanel"] = ["Character"], ["TenshoDutyFinder"] = ["ContentsFinder"], ["TenshoFashionSlotWindow"] = ["FashionCheck"],
+        ["TenshoRetainerSales"] = ["RetainerSellList"], ["TenshoTriadRequest"] = ["TripleTriad", "GSInfoEditDeck"], ["TenshoInventorySort"] = ["Inventory"],
+        ["TenshoBankImportRetainer"] = ["Inventory", "Retainer"], ["TenshoBankImportFreeCompany"] = ["FreeCompanyChest", "Inventory"],
+    };
+    /// <summary>The hover panel goes with its tooltip; the sort button leaves whatever the setting.</summary>
+    private const string HoverPanel = "TenshoItemHover", SortButton = "TenshoInventorySort";
+
+    private bool Covered(string id, Vector2? at, Vector2 size)
+    {
+        if (at is not { } position || id == HoverPanel || !owner.HidePanelsBehindGame && id != SortButton) return false;
+        var screen = ImGui.GetMainViewport().Size;
+        return UI.GameWindows.Covers(owner.GameWindowList, position.X, position.Y, size.X, size.Y, screen.X, screen.Y, Anchors.GetValueOrDefault(id));
+    }
+
     /// <param name="prepare">The window's position and size (SetNextWindow…), run just before the window opens.</param>
     /// <param name="close">What the close button does; none means no close button.</param>
     /// <param name="padding">The window's padding, when it is not the theme's.</param>
@@ -43,7 +61,11 @@ internal sealed class AttachedPanels : IDisposable
     /// <summary>After every panel has asked, before the windows are drawn.</summary>
     public void Apply()
     {
-        foreach (var window in all.Values) window.IsOpen = window.Request is not null;
+        foreach (var window in all.Values)
+        {
+            window.IsOpen = window.Request is not null;
+            window.Hidden = window.Request is not null && Covered(window.Key, window.LastPosition, window.LastSize);
+        }
     }
 
     /// <summary>After the windows are drawn: a panel asks again on the next frame, or closes.</summary>
@@ -75,6 +97,10 @@ internal sealed class AttachedPanels : IDisposable
         private bool paddingPushed;
 
         public PanelRequest? Request { get; set; }
+        public bool Hidden { get; set; }
+        public string Key => id;
+        public Vector2? LastPosition { get; private set; }
+        public Vector2 LastSize { get; private set; }
 
         public AttachedWindow(AttachedPanels host, string id) : base("###" + id)
         {
@@ -87,7 +113,7 @@ internal sealed class AttachedPanels : IDisposable
             AllowClickthrough = false;
         }
 
-        public override bool DrawConditions() => Request is not null;
+        public override bool DrawConditions() => Request is not null && !Hidden;
 
         public override void PreDraw()
         {
@@ -105,6 +131,8 @@ internal sealed class AttachedPanels : IDisposable
         public override void Draw()
         {
             PopPadding();
+            LastPosition = ImGui.GetWindowPos();
+            LastSize = ImGui.GetWindowSize();
             if (Request is not { } request) return;
             var started = host.owner.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
             try { request.Contents(); }

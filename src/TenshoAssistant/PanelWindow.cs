@@ -14,6 +14,8 @@ internal sealed class PanelWindow : Window
     private readonly MainWindow owner;
     private readonly PanelDefinition panel;
     private bool broken;
+    private Vector2? lastPosition;
+    private Vector2 lastSize;
 
     public PanelWindow(MainWindow owner, PanelDefinition panel) : base(panel.Id, panel.Flags)
     {
@@ -30,7 +32,7 @@ internal sealed class PanelWindow : Window
 
     public override bool DrawConditions()
     {
-        try { return !broken && panel.Visible(); }
+        try { return !broken && panel.Visible() && !(lastPosition is { } at && owner.BarBehindGame(at, lastSize)); }
         catch (Exception error) { TurnOff(error); return false; }
     }
 
@@ -49,6 +51,8 @@ internal sealed class PanelWindow : Window
 
     public override void Draw()
     {
+        lastPosition = ImGui.GetWindowPos();
+        lastSize = ImGui.GetWindowSize();
         var started = owner.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
         try { panel.Contents(); }
         catch (Exception error) { TurnOff(error); }
