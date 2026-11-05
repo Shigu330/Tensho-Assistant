@@ -237,7 +237,7 @@ public sealed class Plugin : IDalamudPlugin
                     var settings=configuration.Discord;
                     var character=settings.IncludeCharacter ? objects.LocalPlayer?.Name.TextValue:null;
                     var content=Alarms.DiscordWebhook.Format(settings,localization.Get("Discord.DefaultTemplate"),alarm.DiscordMessage,alarm.Label,minutes,occurrence.ToLocalTime(),character,mainWindow.AlarmZoneName(alarm.TerritoryId),mainWindow.AlarmItemName(alarm.ItemId));
-                    discord.Enqueue(new(settings.WebhookUrl,Alarms.DiscordWebhook.Payload(settings,content)));
+                    discord.Enqueue(new(Alarms.DiscordWebhook.UrlFor(settings,Alarms.DiscordWebhook.SourceOf(alarm)),Alarms.DiscordWebhook.Payload(settings,content)));
                 }),()=>alarms?.Dispose());
             mainWindow.ConfigureAlarms(alarms!);
             var gatherBuddyFish=new Community.GatherBuddyFishService(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityGatherBuddy};
@@ -378,7 +378,7 @@ public sealed class Plugin : IDalamudPlugin
                         var character=settings.IncludeCharacter ? objects.LocalPlayer?.Name.TextValue:null;
                         var message=localization.Format("Currencies.Alert",lines);
                         var content=Alarms.DiscordWebhook.Format(settings,message,message,message,0,DateTimeOffset.Now,character);
-                        discord.Enqueue(new(settings.WebhookUrl,Alarms.DiscordWebhook.Payload(settings,content)));
+                        discord.Enqueue(new(Alarms.DiscordWebhook.UrlFor(settings,Alarms.AlarmSource.Currency),Alarms.DiscordWebhook.Payload(settings,content)));
                     }
                     catch(Exception error){log.Warning("Currency alert could not be queued for Discord ({Error}).",error.GetType().Name);}
             }},()=>currencies?.Dispose());
@@ -401,7 +401,7 @@ public sealed class Plugin : IDalamudPlugin
                     {
                         var character=settings.IncludeCharacter ? objects.LocalPlayer?.Name.TextValue:null;
                         var content=Alarms.DiscordWebhook.Format(settings,message,message,message,0,DateTimeOffset.Now,character);
-                        discord.Enqueue(new(settings.WebhookUrl,Alarms.DiscordWebhook.Payload(settings,content)));
+                        discord.Enqueue(new(Alarms.DiscordWebhook.UrlFor(settings,Alarms.AlarmSource.DutyPop),Alarms.DiscordWebhook.Payload(settings,content)));
                     }
                 }
                 catch(Exception error){log.Warning("Duty ready alert failed ({Error}).",error.GetType().Name);}

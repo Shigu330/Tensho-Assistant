@@ -3639,6 +3639,10 @@
     "Copy": "Copier bloc {0}/{1}"
   },
   "Discord": {
+    "Channels": "Un salon par catégorie",
+    "ChannelsHelp": "Chaque catégorie peut écrire dans son propre salon, par exemple les retours de vaisseaux dans celui de votre compagnie libre et les alarmes de récolte dans un salon privé. Vide : l'adresse principale ci-dessus. Ces adresses sont secrètes comme elle : gardées sur ce PC seulement, jamais écrites dans le journal ni les rapports.",
+    "ChannelHint": "Vide : l'adresse principale",
+    "ChannelTip": "Une adresse de webhook Discord pour cette catégorie. Enregistrée quand vous quittez le champ ; videz-le pour revenir à l'adresse principale. Ce qui attendait d'être envoyé est abandonné quand elle change.",
     "SetInReminders": "Discord : réglé dans Rappels",
     "DutyPop": "Mission prête",
     "DutyPopTip": "Envoie l'alerte « mission prête » (Alarmes) quand elle est activée.",

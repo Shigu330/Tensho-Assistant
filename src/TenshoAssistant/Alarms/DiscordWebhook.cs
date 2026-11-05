@@ -18,6 +18,8 @@ public sealed class DiscordSettings
     // 0.578 (user request): rows of the Reminders page whose alarms stay off Discord.
     public List<string>? ReminderRowsOff { get; set; }
     public string WebhookUrl { get; set; } = "";
+    // 0.598 (T24): another channel for a category; without one, the address above. Secrets like it: stored here only, never logged nor reported.
+    public Dictionary<AlarmSource,string>? CategoryUrls { get; set; }
     public string Username { get; set; } = "Tensho";
     // Empty = the localized default message. Placeholders: [label], [minutes], [time], [character].
     public string Template { get; set; } = "";
@@ -66,6 +68,13 @@ public static class DiscordWebhook
         return $"https://{uri.Host}/api/webhooks/{id[..4]}…/***";
     }
 
+    /// <summary>0.598 (T24): where a category posts: its own address when it has a valid one, else the main one.</summary>
+    public static string UrlFor(DiscordSettings settings, AlarmSource source)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        return settings.CategoryUrls?.GetValueOrDefault(source) is { } own && IsValidUrl(own) ? own : settings.WebhookUrl;
+    }
+
     public static bool IsValidRoleId(string? id) => id is not null && Snowflake.IsMatch(id.Trim());
 
     /// <summary>A role id typed or pasted (the bare id, or the mention « &lt;@&amp;id&gt; » Discord copies); "" to remove; null when not a role id.</summary>
@@ -109,7 +118,7 @@ public static class DiscordWebhook
 
     /// <summary>0.344: whether an alert that is not a Tensho alarm (currency thresholds) goes to Discord: setting on, valid address, category on.</summary>
     public static bool ShouldSend(DiscordSettings? settings, AlarmSource source) =>
-        settings is { Enabled: true } && IsValidUrl(settings.WebhookUrl) && CategoryOn(settings, source);
+        settings is { Enabled: true } && IsValidUrl(UrlFor(settings, source)) && CategoryOn(settings, source);
 
     /// <summary>0.578: the Reminders row of an alarm: the one that made it, or the deadline an automatic one follows. Empty: none.</summary>
     public static string ReminderRowOf(TenshoAlarm alarm)
@@ -126,7 +135,7 @@ public static class DiscordWebhook
 
     /// <summary>Whether a ringing alarm goes to Discord: setting on, valid address, its category on, and its switch: for a reminder, the box of its row in Reminders (0.584: the only one), else the alarm's own.</summary>
     public static bool ShouldSend(DiscordSettings? settings, TenshoAlarm alarm) =>
-        settings is { Enabled: true } && IsValidUrl(settings.WebhookUrl) && (ReminderRowOf(alarm).Length > 0 ? ReminderRowOn(settings, alarm) : alarm.Discord) && CategoryOn(settings, SourceOf(alarm));
+        settings is { Enabled: true } && IsValidUrl(UrlFor(settings, SourceOf(alarm))) && (ReminderRowOf(alarm).Length > 0 ? ReminderRowOn(settings, alarm) : alarm.Discord) && CategoryOn(settings, SourceOf(alarm));
 
     /// <summary>
     /// The message text: the alarm's own message, else the template, else the default; placeholders replaced, [character] only when

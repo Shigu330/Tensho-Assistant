@@ -3639,6 +3639,10 @@
     "Copy": "Copy block {0}/{1}"
   },
   "Discord": {
+    "Channels": "A channel per category",
+    "ChannelsHelp": "Each category can post to its own channel, for example vessel returns in your free company's channel and gathering alarms in a private one. Empty: the main address above. These addresses are secrets like it: stored on this PC only, never logged or reported.",
+    "ChannelHint": "Empty: the main address",
+    "ChannelTip": "A Discord webhook address for this category. Saved when you leave the field; empty it to go back to the main address. What was waiting to be sent is dropped when it changes.",
     "SetInReminders": "Discord: set in Reminders",
     "DutyPop": "Duty ready",
     "DutyPopTip": "Sends the « duty ready » alert (Alarms) when it is on.",

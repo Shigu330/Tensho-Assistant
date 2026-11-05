@@ -20,6 +20,39 @@ internal sealed partial class MainWindow
     private string? discordUrlEdit,discordNameEdit,discordTemplateEdit,discordRoleEdit;
     // Discord message of an alarm group being typed (Alarms page), by job section and group key (0.331: the same item can be in two sections).
     private readonly Dictionary<string,string> discordGroupEdits=[];
+    // 0.598 (T24): a channel per category, typed like the main address.
+    private readonly Dictionary<AlarmSource,string?> discordCategoryEdits=[];
+    private static readonly (AlarmSource Source,string Key)[] DiscordCategories=[(AlarmSource.Gathering,"Discord.Gathering"),(AlarmSource.Fishing,"Discord.Fishing"),(AlarmSource.Reminder,"Discord.Reminders"),
+        (AlarmSource.Voyage,"Discord.Voyages"),(AlarmSource.Other,"Discord.Other"),(AlarmSource.Currency,"Discord.Currencies"),(AlarmSource.DutyPop,"Discord.DutyPop")];
+    private void DrawDiscordCategoryChannels()
+    {
+        if(!ImGui.TreeNode(localization.Get("Discord.Channels")+"###DiscordChannels"))return;
+        try
+        {
+            ImGui.TextWrapped(localization.Get("Discord.ChannelsHelp"));
+            foreach(var (source,key) in DiscordCategories)
+            {
+                ImGui.PushID((int)source);
+                try
+                {
+                    var edit=discordCategoryEdits.GetValueOrDefault(source);
+                    string Read()=>configuration.Discord.CategoryUrls?.GetValueOrDefault(source) ?? "";
+                    var before=Read();
+                    DiscordText(key,"Discord.ChannelTip",ref edit,Read,value=>
+                    {
+                        var urls=configuration.Discord.CategoryUrls??=[];
+                        if(value.Length==0)urls.Remove(source);else urls[source]=value;
+                    },"",300,localization.Get("Discord.ChannelHint"),typed=>typed.Trim() is var url && (url.Length==0 || DiscordWebhook.IsValidUrl(url)) ? url:null,"Discord.UrlInvalid",ImGuiInputTextFlags.Password,reset:false);
+                    discordCategoryEdits[source]=edit;
+                    // A new or cleared address: what was queued for the old one is not sent, as for the main one.
+                    if(Read()!=before)discordNotifier?.Clear();
+                    if(edit is null && Read().Length>0)ImGui.TextDisabled(DiscordWebhook.Redact(Read()));
+                }
+                finally{ImGui.PopID();}
+            }
+        }
+        finally{ImGui.TreePop();}
+    }
 
     private void DrawDiscordSettings()
     {
@@ -60,6 +93,7 @@ internal sealed partial class MainWindow
             BoolSetting("Discord.DutyPop","Discord.DutyPopTip",()=>configuration.Discord.DutyPop,value=>configuration.Discord.DutyPop=value,c=>c.Discord.DutyPop);
         }
         finally{ImGui.Unindent();}
+        DrawDiscordCategoryChannels();
         BoolSetting("Discord.Character","Discord.CharacterTip",()=>configuration.Discord.IncludeCharacter,value=>configuration.Discord.IncludeCharacter=value,c=>c.Discord.IncludeCharacter);
         DiscordText("Discord.Mention","Discord.MentionTip",ref discordRoleEdit,()=>configuration.Discord.MentionRoleId,value=>configuration.Discord.MentionRoleId=value,DiscordDefaults.MentionRoleId,32,"",
             DiscordWebhook.RoleIdFrom,"Discord.MentionInvalid");
@@ -83,7 +117,7 @@ internal sealed partial class MainWindow
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Discord.Counts",shown.Sent,shown.Failed,shown.Dropped));
         }
         if(discordNotifier?.Block is { TotalSeconds:>0 } block)ImGui.TextColored(Accent,localization.Format("Discord.Blocked",Math.Ceiling(block.TotalSeconds)));
-        if(settings.Enabled && !DiscordWebhook.IsValidUrl(settings.WebhookUrl))ImGui.TextColored(Accent,localization.Get("Discord.NeedsUrl"));
+        if(settings.Enabled && !DiscordWebhook.IsValidUrl(settings.WebhookUrl) && settings.CategoryUrls is not {Count:>0})ImGui.TextColored(Accent,localization.Get("Discord.NeedsUrl"));
     }
 
     // For the diagnostic report: only whether the saved address has a webhook's shape, never the address.

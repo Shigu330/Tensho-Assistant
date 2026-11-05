@@ -108,7 +108,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 | T12 | ~~Chemin vers une quête : prérequis restants, nombre et prochaine à faire~~ fait en 0.583 | M |  |
 | T14 | ~~Équipement : préparer le plan d'un autre job que celui porté~~ fait en 0.580 | M |  |
 | T15 | ~~Revue de mode : tenue de la semaine choisie, essayée en un clic, avec l'endroit de chaque pièce~~ fait en 0.581 | M | Sur clic seulement. |
-| T24 | Discord : un salon par catégorie (plusieurs webhooks) | M |  |
+| T24 | ~~Discord : un salon par catégorie (plusieurs webhooks)~~ fait en 0.598 | M |  |
 | T25 | ~~Équipement : plusieurs plans nommés par job~~ fait en 0.593 | S-M |  |
 
 ## Phase 4 : idées, sonde web et sources sans le jeu

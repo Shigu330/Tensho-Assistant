@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.598.0
+- Plan global, T24 : Discord : chaque catégorie peut écrire dans son propre salon (une adresse de webhook par catégorie, vide : l'adresse principale). Adresses masquées, gardées lors d'une remise à zéro, jamais dans le journal ni les rapports.
+- Tests : Discord channels. Verify.ps1 (agent) : 1091/1091, 0 avertissement, 0 erreur ; DLL 0.598.0.0. Non validé en jeu.
+### English
+- Discord: each category can post to its own channel (one webhook address per category, empty: the main address). Addresses masked, kept by a reset, never in the log or reports.
+
 ## 0.597.0
 - Plan global, P10 : Section Carte du plugin : un champ cherche sur toutes les cartes un lieu, une éthérite, un vendeur, un PNJ de Triple Triad, un donneur de quête ou une ressource ; un clic ouvre la carte Tensho centrée sur le résultat, sans poser de drapeau. Liste préparée hors de l'affichage.
 - Tests : Map search. Verify.ps1 (agent) : 1087/1087, 0 avertissement, 0 erreur ; DLL 0.597.0.0. Non validé en jeu.

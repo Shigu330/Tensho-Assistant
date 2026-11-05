@@ -198,6 +198,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T24 — Discord : un salon par catégorie (plusieurs webhooks)
 
+- **État (relu le 2026-11-05)** : FAIT 0.598.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Alarms/DiscordWebhook.cs`.
 - **Ce que le joueur obtient** : Les retours de vaisseaux partent dans le salon de la compagnie libre, vos alarmes de récolte dans votre salon privé.
 - **Comment, taille, dépendances** : Adresse facultative par catégorie (vide = adresse principale). Chacune est masquée, vérifiée par IsValidUrl, jamais écrite dans les journaux ni dans le rapport de Diagnostics. File et pause de débit propres à chaque adresse ; « Envoyer un test » par adresse. Taille M. Dépendances : aucune. Sonde : aucune. Décision : nombre d'adresses (recommandé : une par catégorie existante).
