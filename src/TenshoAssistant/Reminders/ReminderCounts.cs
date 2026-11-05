@@ -24,6 +24,15 @@ public static class ReminderCounts
     };
 
     /// <summary>0.458 (user request, in-game campaign): the checked rows still to do since their reset, without those the player hid.</summary>
+    /// <summary>0.558 (T17): the rows the game itself says are done: its counter was read at 0. An unknown counter says nothing.</summary>
+    public static IReadOnlyList<string> DoneByGame(uint? alliedLeft,int? deliveriesLeft)
+    {
+        var rows=new List<string>();
+        if(alliedLeft==0)rows.Add("Allied");
+        if(deliveriesLeft==0)rows.Add("Deliveries");
+        return rows;
+    }
+
     public static IReadOnlyList<string> Todo(Func<string,DateTimeOffset?> doneAt,IReadOnlyCollection<string>? hidden,DateTimeOffset now)
         =>CheckedRows.Where(row=>hidden?.Contains(row)!=true && !ResetSchedule.DoneSince(doneAt(row),LastReset(row,now))).ToArray();
 

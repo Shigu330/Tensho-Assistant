@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.558.0
+- Plan global, T17 : quand le jeu indique 0 quête de tribu ou 0 commande spéciale restante, la case de Rappels se coche seule jusqu'à la remise, aussi pour le compteur de la barre du serveur. Un compteur inconnu ne coche rien. Réglage activé par défaut.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1022/1022, 0 avertissement, 0 erreur ; DLL 0.558.0.0. Non validé en jeu.
+### English
+- A reminder ticks itself when the game reads 0 tribal quests or 0 special deliveries left. An unknown counter ticks nothing.
+
 ## 0.557.0
 - Plan global, T19 : sur une alarme : « Modifier » (nom et, pour une alarme unique, date) et « Dans 5 min », qui ajoute la même alarme une fois de plus. Une alarme automatique ne se modifie pas, car elle suit son échéance. Pour une copie dans le jeu, un message dit de la corriger à la main.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1021/1021, 0 avertissement, 0 erreur ; DLL 0.557.0.0. Non validé en jeu.

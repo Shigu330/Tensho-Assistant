@@ -29,8 +29,10 @@ public sealed class ReminderDtrEntry : IDisposable
     private DateTimeOffset nextRead;
     private bool disposed,warned;
 
-    public ReminderDtrEntry(IDtrBar bar,IFramework framework,IGameGui gui,IPlayerState player,IPluginLog log,Configuration configuration,Func<string,string> text,Action open,Func<DateTimeOffset,IReadOnlyList<string>> todo)
+    private readonly Action<GameTimerSnapshot>? fromGame;
+    public ReminderDtrEntry(IDtrBar bar,IFramework framework,IGameGui gui,IPlayerState player,IPluginLog log,Configuration configuration,Func<string,string> text,Action open,Func<DateTimeOffset,IReadOnlyList<string>> todo,Action<GameTimerSnapshot>? fromGame=null)
     {
+        this.fromGame=fromGame;
         this.framework=framework;this.gui=gui;this.player=player;this.log=log;this.configuration=configuration;this.text=text;this.todo=todo;
         todoEntry=bar.Get("Tensho Assistant (Reminders)");
         finishedEntry=bar.Get("Tensho Assistant (Finished reminders)");
@@ -50,6 +52,7 @@ public sealed class ReminderDtrEntry : IDisposable
         try
         {
             var timers=GameTimers.Read();
+            fromGame?.Invoke(timers);
             var finished=ReminderCounts.Finished(timers.Ventures?.Select(venture=>venture.Done),configuration.Voyages,
                 timers.SquadronMission is { } mission ? (mission.Id,mission.Done):null,timers.SquadronTraining is { } training ? (training.Id,training.Done):null,
                 configuration.GardenBeds,now).Where(item=>configuration.ReminderBarHidden?.Contains(item.Kind.ToString())!=true).ToArray();

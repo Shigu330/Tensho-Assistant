@@ -77,7 +77,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | T3 | ~~Quêtes : colonnes Niveau et Zone, tri et filtre de niveau~~ fait en 0.550 | S |  |
 | T4 | ~~Monstres : drapeau sur la position du monstre, pas au centre de la carte~~ fait en 0.551 | S |  |
 | T16 | Tâches de servants : une ligne par servant, avec alarme | S |  |
-| T17 | Rappels cochés d'eux-mêmes quand le jeu le dit | S |  |
+| T17 | ~~Rappels cochés d'eux-mêmes quand le jeu le dit~~ fait en 0.558 | S |  |
 | T18 | Discord : heure lue dans le fuseau de chaque membre, et balises [zone], [objet], [et] | S |  |
 | T19 | ~~Alarmes : modifier le nom et l'heure, et « Me rappeler dans 5 min »~~ fait en 0.557 | S |  |
 | T20 | ~~Alarmes : sonner aussi à l'heure exacte~~ fait en 0.556 | S |  |

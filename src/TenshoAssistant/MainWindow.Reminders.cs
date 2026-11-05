@@ -27,7 +27,7 @@ internal sealed partial class MainWindow
         if(now-reminderTimersTriedAt>=wait)
         {
             reminderTimersTriedAt=now;
-            try{reminderTimers=GameTimers.Read(DailyRoulettes?.Invoke(),ChallengeRows?.Invoke());reminderTimersError=null;}
+            try{reminderTimers=GameTimers.Read(DailyRoulettes?.Invoke(),ChallengeRows?.Invoke());reminderTimersError=null;TickRemindersFromGame(reminderTimers);}
             catch(Exception error)
             {
                 if(reminderTimersError!=error.Message)log.Warning(error,"Game timers could not be read.");
@@ -109,6 +109,9 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndTable();}
         ImGui.TextDisabled(localization.Get("Reminders.Help"));
+        var fromGame=configuration.RemindersFromGame;
+        if(ImGui.Checkbox(localization.Get("Reminders.FromGame"),ref fromGame)){configuration.RemindersFromGame=fromGame;SaveReminders();}
+        Tip("Reminders.FromGameTip");
         DrawPersonalTasks();
         DrawSquadronPlanner();
         DrawDailyRoulettes(timers);
@@ -177,6 +180,14 @@ internal sealed partial class MainWindow
     }
 
     // Names of squadron missions and trainings from the game data (set by Plugin.cs), kept by id; « #id » when the row is unknown.
+    /// <summary>0.558 (T17): from the Reminders page and the server bar, so that the bar's count does not wait for the page.</summary>
+    internal void TickRemindersFromGame(GameTimerSnapshot timers)
+    {
+        if(!configuration.RemindersFromGame)return;
+        var now=DateTimeOffset.UtcNow;
+        foreach(var row in ReminderCounts.DoneByGame(timers.AlliedQuestsLeft,timers.DeliveriesLeft))
+            if(!ResetSchedule.DoneSince(ReminderDoneAt(row),ReminderCounts.LastReset(row,now)))SetReminderDone(row,now);
+    }
     internal Func<ushort,string?>? SquadronMissionName { get; set; }
     internal Func<ushort,string?>? SquadronTrainingName { get; set; }
     private readonly Dictionary<(Func<ushort,string?>,ushort),string> squadronNames=[];

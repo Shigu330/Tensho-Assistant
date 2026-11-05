@@ -138,6 +138,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T17 — Rappels cochés d'eux-mêmes quand le jeu le dit
 
+- **État (relu le 2026-11-05)** : FAIT 0.558.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Reminders.cs`.
 - **Ce que le joueur obtient** : Quand le jeu indique 0 commande spéciale ou 0 quête de tribu restante, la case « fait » se coche seule jusqu'à la remise. La coche manuelle reste pour le reste.
 - **Comment, taille, dépendances** : Fait = coche manuelle, ou compteur lu à 0 depuis la dernière remise (marqué « d'après le jeu ») ; un compteur inconnu ne permet aucune déduction. Réglage « Cocher d'après le jeu » (activé, infobulle, ↺). Taille S. Dépendances : aucune. Sonde : aucune. Décision : activé par défaut (recommandé : oui).

@@ -119,6 +119,14 @@ internal static class Interfaces535Tests
             Check(TenshoAssistant.Alarms.AlarmSchedule.Snooze(alarm,now,0).At==now.AddMinutes(1),"at least a minute");
             Check(Read("MainWindow.Alarms.cs").Contains("if(alarm.AutoKey.Length==0 && ImGui.SmallButton(localization.Get(\"Alarms.Edit\")"),"an automatic alarm is not edited");
         }),
+        ("0.558: a reminder ticks itself only when the game reads its counter at 0",() =>
+        {
+            Check(TenshoAssistant.Reminders.ReminderCounts.DoneByGame(0,0).SequenceEqual(["Allied","Deliveries"]),"both at 0");
+            Check(TenshoAssistant.Reminders.ReminderCounts.DoneByGame(null,null).Count==0,"unknown says nothing");
+            Check(TenshoAssistant.Reminders.ReminderCounts.DoneByGame(3,1).Count==0,"still to do");
+            Check(new TenshoAssistant.Configuration().RemindersFromGame,"on by default");
+            Check(Read("Alarms/ReminderDtrEntry.Dalamud.cs").Contains("fromGame?.Invoke(timers);"),"also from the server bar");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");
