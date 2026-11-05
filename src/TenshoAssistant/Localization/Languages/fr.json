@@ -3318,6 +3318,11 @@
     "MapTip": "Plusieurs cartes portent ce nom de lieu : choisissez celle à ouvrir."
   },
   "SortUi": {
+    "JobFilter": "Job du type d'objet",
+    "AnyJob": "Tous les jobs",
+    "JobFilterTip": "La zone ne prend que l'équipement que ce job peut porter. Ce qui n'est pas de l'équipement ne correspond à aucun job. La liste des jobs vient du jeu une fois lue, un instant après l'ouverture de cette page.",
+    "InGearset": "Dans un set d'équipement",
+    "InGearsetTip": "Oui : seulement les pièces de vos sets d'équipement du jeu. Non : tout le reste. Tant que les sets ne sont pas lus, cela ne correspond à rien.",
     "TemplateCopy": "Copier en texte",
     "TemplateCopyTip": "Copie le modèle choisi en texte, pour le partager. Il ne contient ni personnage ni objet que vous possédez.",
     "TemplatePaste": "Coller un modèle",
@@ -5446,6 +5451,8 @@
     "Group": "Alarmes à date"
   },
   "SortButton": {
+    "GearsetsNotRead": "Vos sets d'équipement sont en cours de lecture : appuyez de nouveau dans un instant.",
+    "GearNotReady": "La liste de l'équipement charge encore : appuyez de nouveau dans un instant.",
     "OffsetX": "Bouton : depuis la gauche",
     "OffsetXTip": "Distance du bouton « Trier » au bord gauche de la fenêtre d'inventaire (unités du jeu, suit l'échelle de la fenêtre). Par défaut : 24.",
     "OffsetY": "Bouton : depuis le bas",

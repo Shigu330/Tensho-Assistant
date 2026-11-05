@@ -832,6 +832,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.594) Banque : cocher « Afficher en liste », trier chaque colonne, filtrer, changer d'onglet, cliquer un objet.
 
+- [ ] (0.595) Règles de tri d'un rangement : une zone avec un job, une zone avec « Dans un set d'équipement » ; vérifier l'aperçu, puis le tri réel.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

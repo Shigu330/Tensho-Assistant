@@ -3318,6 +3318,11 @@
     "MapTip": "Several maps share this place name: choose the one to open."
   },
   "SortUi": {
+    "JobFilter": "Item type job",
+    "AnyJob": "Any job",
+    "JobFilterTip": "The zone takes only the gear this job can wear. Items that are not gear match no job. The list of jobs comes from the game once it has been read, a moment after this page opens.",
+    "InGearset": "In a gear set",
+    "InGearsetTip": "Yes: only the pieces of your gear sets in the game. No: everything else. While the sets are not read, it matches neither.",
     "TemplateCopy": "Copy as text",
     "TemplateCopyTip": "Copies the chosen template as text, to share it. It holds no character and no item you own.",
     "TemplatePaste": "Paste a template",
@@ -5446,6 +5451,8 @@
     "Group": "Dated alarms"
   },
   "SortButton": {
+    "GearsetsNotRead": "Your gear sets are being read: press again in a moment.",
+    "GearNotReady": "The gear list is still loading: press again in a moment.",
     "OffsetX": "Button: from the left",
     "OffsetXTip": "Distance of the « Sort » button from the inventory window's left edge (game units, follows the window's scale). Default: 24.",
     "OffsetY": "Button: from the bottom",

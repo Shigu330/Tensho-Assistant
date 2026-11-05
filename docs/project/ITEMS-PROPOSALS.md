@@ -178,6 +178,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I21 — Filtre de job et de set d'équipement dans les règles de tri
 
+- **État (relu le 2026-11-05)** : FAIT 0.595.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/Inventory/InventorySortRules.cs`.
 - **Ce que le joueur obtient** : Une zone de tri peut ne prendre que l'équipement d'un job, ou les pièces de vos sets d'équipement.
 - **Comment, taille, dépendances** : Copier ClassJobCategory (liste de jobs) dans le catalogue, puis ajouter un filtre de job à la zone. Pour les sets : sonde de RaptureGearsetModule d'abord. Taille M. Décision : l'ajouter, nouveau (recommandé : avec ou après I-14).

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.595.0
+- Plan global, I21 : Règles de tri : une zone peut ne prendre que l'équipement d'un job, ou les pièces de vos sets d'équipement du jeu (oui ou non). Tant que les sets ne sont pas lus, le tri réel attend et le dit ; rien ne bouge sur ce qui n'est pas lu.
+- Tests : Sort gear. Verify.ps1 (agent) : 1080/1080, 0 avertissement, 0 erreur ; DLL 0.595.0.0. Non validé en jeu.
+### English
+- Sorting rules: a zone can take only the gear of a job, or the pieces of your game gear sets (yes or no). While the sets are unread, a real sort waits and says so; nothing moves on what is unread.
+
 ## 0.594.0
 - Plan global, I11 : Banque : case « Afficher en liste » : un objet par ligne avec NQ, HQ, total et ses rangements, à la place des grilles, triable par nom, catégorie ou quantité en cliquant sur la colonne ; l'onglet et les filtres restent appliqués.
 - Tests : Bank list. Verify.ps1 (agent) : 1077/1077, 0 avertissement, 0 erreur ; DLL 0.594.0.0. Non validé en jeu.

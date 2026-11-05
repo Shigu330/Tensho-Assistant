@@ -76,7 +76,10 @@ internal sealed partial class MainWindow
             if(snapshot is null || containers.Length!=scope.ContainerCount || containers.Any(container=>container.Coverage!=InventoryCoverage.Complete))
                 return localization.Get("SortButton.NotRead");
             var rules=InventorySortRules.Load(configuration.InventorySortProfiles,scope,(InventorySortField)Math.Clamp(configuration.SortPreviewField,0,SortFieldLabels.Length-1),configuration.SortPreviewDescending);
-            var result=InventorySortRules.Build(containers,scope,rules,id=>InventorySortMetadata.FromItem(id,catalog.Find(id)));
+            // 0.595 (I21): asked now, read within two seconds: the player presses again; nothing moves on what is unread.
+            if(InventorySortRules.NeedsGearsets(rules)){GearsetSource?.Want();if(GearsetSource?.State is null)return localization.Get("SortButton.GearsetsNotRead");}
+            if(InventorySortRules.NeedsGear(rules) && GearCatalog?.Invoke() is null)return localization.Get("SortButton.GearNotReady");
+            var result=InventorySortRules.Build(containers,scope,rules,SortDescriber(catalog));
             return visualSort.Request(InventoryVisualSortPlan.Build(snapshot,result,scope),DateTimeOffset.UtcNow)
                 ? localization.Get("SortButton.Done"):localization.Get("SortButton.Busy");
         }
