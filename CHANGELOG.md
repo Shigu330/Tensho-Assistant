@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.611.0
+- Plan global, DEC-038 : Coupure compétitive : le journal dit le nombre de zones connues au chargement et chaque début ou fin de coupure, avec le territoire, pour vérifier les essais en jeu.
+- Tests : Competitive. Verify.ps1 (agent) : 1119/1119, 0 avertissement, 0 erreur ; DLL 0.611.0.0. Non validé en jeu.
+### English
+- Competitive cut: the log says how many zones are known at load, and each start or end of a cut with its territory, to check the in-game tests.
+
 ## 0.610.0
 - Plan global, DEC-038 : Tensho se coupe tout seul en JcJ et en contenu classé, sans réglage, et repart tout seul : JcJ, Battlehall et tournois de Triple Triade, Lord of Verminion, Mahjong, Dédale bestial, donjons profonds, quai de Wolves' Den. Rien n'est lu du jeu : tous les abonnements au framework passent par un gardien, qu'un test impose. Affichage, commandes et menu contextuel coupés, barre de serveur masquée, carte du jeu rendue, Discord vidé, une ligne de chat à l'entrée. Écarts : COMPETITIVE-OFF-PLAN.md.
 - Tests : Competitive. Verify.ps1 (agent) : 1119/1119, 0 avertissement, 0 erreur ; DLL 0.610.0.0. Non validé en jeu.

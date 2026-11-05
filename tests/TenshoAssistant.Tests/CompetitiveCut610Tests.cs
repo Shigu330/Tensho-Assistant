@@ -47,6 +47,7 @@ internal static class CompetitiveCut610Tests
             Check(Source("Macros/MacroChainBridge.Dalamud.cs").Contains("!TenshoAssistant.Competitive.CompetitiveGate.Cut"),"macro chain");
             Check(plugin.Contains("discord.Clear()"),"what waits for Discord does not leave during the cut");
             Check(!Source("Configuration.cs").Contains("Competitive"),"no setting");
+            Check(Source("Competitive/CompetitiveGate.Dalamud.cs").Contains("Competitive cut {0}: territory"),"each change in the log, for the in-game checks");
         }),
     ];
 }

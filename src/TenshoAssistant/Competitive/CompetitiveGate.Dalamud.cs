@@ -47,10 +47,11 @@ internal sealed class CompetitiveWatcher : IDisposable
     private readonly IFramework framework;
     private readonly IClientState client;
     private readonly IReadOnlySet<uint>? zones;
+    private readonly IPluginLog log;
 
     public CompetitiveWatcher(IFramework framework,IClientState client,IDataManager data,IPluginLog log)
     {
-        this.framework=framework;this.client=client;
+        this.framework=framework;this.client=client;this.log=log;
         try
         {
             zones=CompetitiveZones.Build(data.GetExcelSheet<TerritoryType>().Select(row=>(row.RowId,row.IsPvpZone)),
@@ -59,10 +60,18 @@ internal sealed class CompetitiveWatcher : IDisposable
         // In doubt, stopped: after a game update that breaks these sheets Tensho stays cut rather than running in PvP.
         catch(Exception error){zones=null;log.Warning(error,"Competitive zones unavailable: Tensho stays stopped while logged in.");}
         CompetitiveGate.Set(Decide(),false);
+        // What the in-game checks read in the log: the zones found, and each change.
+        log.Information("Competitive cut: {0} zones known, cut now: {1}, territory {2}.",zones?.Count ?? -1,CompetitiveGate.Cut,client.TerritoryType);
         framework.Update+=Tick;
     }
     private bool Decide()=>CompetitiveZones.IsCut(client.IsLoggedIn,(uint)client.TerritoryType,client.IsPvP,zones,CompetitiveGate.Cut);
-    private void Tick(IFramework _)=>CompetitiveGate.Set(Decide(),true);
+    private void Tick(IFramework _)
+    {
+        var now=Decide();
+        if(now==CompetitiveGate.Cut)return;
+        log.Information("Competitive cut {0}: territory {1}, PvP {2}.",now ? "on":"off",client.TerritoryType,client.IsPvP);
+        CompetitiveGate.Set(now,true);
+    }
     public void Dispose()
     {
         framework.Update-=Tick;
