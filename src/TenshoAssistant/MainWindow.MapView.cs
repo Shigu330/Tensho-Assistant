@@ -363,10 +363,10 @@ internal sealed partial class MainWindow
         // Floors of a multi-level map (dungeons), like the game's sub-map menu; a single map shows its subzone name instead.
         if(floors.Count>1)
         {
-            ImGui.SameLine();ImGui.SetNextItemWidth(MenuWidth(floors.Select(floor=>floor.Subzone.Length>0 ? floor.Subzone:floor.MapIndex.ToString()),false));
-            if(ImGui.BeginCombo("##MapFloor",map.Subzone.Length>0 ? map.Subzone:$"{map.MapIndex}"))
+            ImGui.SameLine();ImGui.SetNextItemWidth(MenuWidth(floors.Select(MapMenus.FloorLabel),false));
+            if(ImGui.BeginCombo("##MapFloor",MapMenus.FloorLabel(map)))
             {
-                try{foreach(var floor in floors)if(ImGui.Selectable($"{(floor.Subzone.Length>0 ? floor.Subzone:floor.MapIndex.ToString())}##Floor{floor.MapId}",floor.MapId==map.MapId))NavigateMap(floor.MapId);}
+                try{foreach(var floor in floors)if(ImGui.Selectable($"{MapMenus.FloorLabel(floor)}##Floor{floor.MapId}",floor.MapId==map.MapId))NavigateMap(floor.MapId);}
                 finally{ImGui.EndCombo();}
             }
             Tip("MapView.FloorTip");

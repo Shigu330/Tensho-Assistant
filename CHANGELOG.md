@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.619.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur) : le menu des étages affichait « 0 » pour une carte principale sans sous-zone, comme le Tillac de Limsa à côté de son aérodrome ; il affiche maintenant le nom de la zone.
+- Tests : Map floors. Verify.ps1 (agent) : 1128/1128, 0 avertissement, 0 erreur ; DLL 0.619.0.0. Non validé en jeu.
+### English
+- Map (user report): the floor menu showed « 0 » for a main map without a subzone, such as Limsa's upper decks beside its Airship Landing; it now shows the zone's name.
+
 ## 0.618.0
 - Plan global, phase 5 : Carte (précision de l'utilisateur) : agrandie, elle reste visible quelles que soient les fenêtres du jeu ; à sa taille normale, elle s'efface comme avant. Remplace la règle de la 0.617, retirée. Reconnue aussi à sa taille après un rechargement.
 - Tests : Map enlarged. Verify.ps1 (agent) : 1127/1127, 0 avertissement, 0 erreur ; DLL 0.618.0.0. Non validé en jeu.
