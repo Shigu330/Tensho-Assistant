@@ -8,6 +8,11 @@ internal static class MapZoom542Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Map (0.586): a zone's flight comes from its own link to a set, so that the old zones have their wing",() =>
+        {
+            var reader=Read("Maps/MapLiveReader.Dalamud.cs");
+            Check(reader.Contains("territory.AetherCurrentCompFlgSet.RowId") && reader.Contains("currents.TryAdd(territory.RowId,(linked,shared))"),"from TerritoryType");
+        }),
         ("Map (0.569): each part that stops reading is named, and leaves the list when it reads again",() =>
         {
             var reader=Read("Maps/MapLiveReader.Dalamud.cs");

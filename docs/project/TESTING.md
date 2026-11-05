@@ -814,6 +814,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.585) Équipement, « Plan pour » : le texte est à gauche de la liste ; ni 44 ni 45 ; le job porté a sa majuscule.
 
+- [ ] (0.586) Carte : menu de Noscea, Thanalan, forêts : l'aile s'affiche, colorée si vous pouvez voler ; comparer en essayant de voler dans une de ces zones.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

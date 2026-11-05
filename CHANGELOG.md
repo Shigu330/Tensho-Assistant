@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.586.0
+- Plan global, Carte : rapport de l'utilisateur en jeu : pas d'aile sur les vieilles zones. Tensho lisait le lien depuis l'ensemble de courants, qui ne nomme que Mor Dhona, alors que toutes ces zones partagent l'ensemble 19 (docs/evidence/0.586-flight-sets.md). Il lit maintenant la colonne de chaque zone.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1047/1047, 0 avertissement, 0 erreur ; DLL 0.586.0.0. Non validé en jeu.
+### English
+- The map's wing now shows on the old zones too (La Noscea, Thanalan, the Shroud, Coerthas): they share one aether current set, which only named Mor Dhona.
+
 ## 0.585.0
 - Plan global, Équipement : rapport de l'utilisateur en jeu : la liste « Plan pour » montrait deux jobs nommés 44 et 45 : ce sont des lignes vides de la feuille ClassJob, qui pointent sur le compteur du pugiliste. L'index des niveaux ignore les lignes sans nom, pour tous ses usages (docs/evidence/0.585-classjob-empty-rows.md). Le texte passe avant la liste, et le job porté prend sa majuscule.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1046/1046, 0 avertissement, 0 erreur ; DLL 0.585.0.0. Non validé en jeu.

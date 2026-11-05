@@ -80,9 +80,20 @@ internal sealed class MapLiveReader : IDisposable
         // R-14 (0.507): one guard per sheet: a failing sheet no longer silently takes the others, hunt marks among them.
         try
         {
+            // 0.586 (user report): each zone names its set in TerritoryType. All the old zones share set 19, which itself only names Mor Dhona (docs/evidence/0.586-flight-sets.md).
+            var sets=new Dictionary<uint,uint[]>();
             foreach(var set in data.GetExcelSheet<AetherCurrentCompFlgSet>())
-                if(set.Territory.RowId!=0)currents.TryAdd(set.Territory.RowId,(set.RowId,set.AetherCurrents.Select(current=>current.RowId).Where(id=>id!=0).ToArray()));
-            foreach(var territory in data.GetExcelSheet<TerritoryType>())mounts[territory.RowId]=territory.Mount;
+            {
+                var ids=set.AetherCurrents.Select(current=>current.RowId).Where(id=>id!=0).ToArray();
+                sets[set.RowId]=ids;
+                if(set.Territory.RowId!=0)currents.TryAdd(set.Territory.RowId,(set.RowId,ids));
+            }
+            foreach(var territory in data.GetExcelSheet<TerritoryType>())
+            {
+                mounts[territory.RowId]=territory.Mount;
+                var linked=territory.AetherCurrentCompFlgSet.RowId;
+                if(linked!=0 && sets.TryGetValue(linked,out var shared) && shared.Length>0)currents.TryAdd(territory.RowId,(linked,shared));
+            }
         }
         catch(Exception error){log.Warning(error,"Aether current data unavailable; flight state stays unknown.");}
         try
