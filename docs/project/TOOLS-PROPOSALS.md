@@ -41,6 +41,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T4 — Monstres : drapeau sur la position du monstre, pas au centre de la carte
 
+- **État (relu le 2026-11-05)** : FAIT 0.551.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.Monsters.cs`.
 - **Ce que le joueur obtient** : Sur la fiche d'un monstre qui laisse tomber l'objet, « Ouvrir la carte » pose le drapeau à l'endroit donné par Garland Tools et ouvre la carte Tensho dessus, avec la mention « position communautaire ». Aujourd'hui la carte s'ouvre au centre.
 - **Comment, taille, dépendances** : Si X et Y sont connus : convertir les coordonnées de carte en position monde (Maps/MapProjection) puis appeler ShowOnTenshoMap(map, position). Sinon, garder le comportement actuel. L'infobulle dit que la source est Garland et que l'apparition n'est pas prouvée. Taille S. Dépendances : carte Tensho. Sonde : aucune. Décision : aucune.

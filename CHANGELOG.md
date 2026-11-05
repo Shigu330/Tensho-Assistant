@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.551.0
+- Plan global, T4 : le bouton carte d'un monstre pose le drapeau à la position de sa fiche et ouvre la carte Tensho dessus, au lieu du centre. L'aide dit que la position vient de Garland Tools et qu'une apparition n'y est pas prouvée. Sans position, rien ne change.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1015/1015, 0 avertissement, 0 erreur ; DLL 0.551.0.0. Non validé en jeu.
+### English
+- A monster's map button now places the flag at its known position (community data from Garland Tools) and opens the Tensho map there.
+
 ## 0.550.0
 - Plan global, T3 : la liste des quêtes montre le niveau et la zone, se trie sur chaque colonne et se limite à une plage de niveaux, gardée entre les sessions. Une quête de niveau inconnu n'est pas prise pour le niveau 0.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1014/1014, 0 avertissement, 0 erreur ; DLL 0.550.0.0. Non validé en jeu.

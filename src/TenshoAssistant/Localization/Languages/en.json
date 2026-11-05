@@ -3162,7 +3162,7 @@
     "Map": "Location map",
     "ChooseMap": "Choose a map",
     "OpenMap": "View zone map",
-    "MapHelp": "The map is centered on the zone; the indicative position is not placed automatically.",
+    "MapHelp": "With a known position: the Tensho map on that point, with the flag. It comes from Garland Tools (community data), and a spawn there is not proven. Without one: the zone's map.",
     "Error": "The source request failed.",
     "Item": "Item {0}",
     "Count": "{0} monster references · click to select details",

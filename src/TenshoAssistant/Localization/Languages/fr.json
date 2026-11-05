@@ -3162,7 +3162,7 @@
     "Map": "Carte du lieu",
     "ChooseMap": "Choisir une carte",
     "OpenMap": "Consulter la carte de zone",
-    "MapHelp": "Carte centrée sur la zone ; la position indicative n'est pas placée automatiquement.",
+    "MapHelp": "Avec une position connue : la carte Tensho sur ce point, avec le drapeau. Elle vient de Garland Tools (donnée communautaire), et une apparition à cet endroit n'est pas prouvée. Sans position : la carte de la zone.",
     "Error": "La consultation de la source a échoué.",
     "Item": "Objet {0}",
     "Count": "{0} références de monstres · cliquez pour sélectionner une fiche",

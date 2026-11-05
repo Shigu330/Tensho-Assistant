@@ -76,6 +76,11 @@ internal static class Interfaces535Tests
             Check(TenshoAssistant.Quests.QuestList.Sorted(list,TenshoAssistant.Quests.QuestList.ColumnLevel,false).Select(entry=>entry.Id).SequenceEqual(new uint[]{1,3,2}),"then by name");
             Check(TenshoAssistant.Quests.QuestList.Sorted(list,TenshoAssistant.Quests.QuestList.ColumnZone,false).First().Id==3,"by zone");
         }),
+        ("0.551: a monster's map button places the flag at its known position, and says where it comes from",() =>
+        {
+            var monsters=Read("MainWindow.Monsters.cs");
+            Check(monsters.Contains("if (monster.X is { } x && monster.Y is { } y)") && monsters.Contains("FlagFromMap(chosen,x,y);") && monsters.Contains("mapX=20.5f"),"known position, else as before");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");
