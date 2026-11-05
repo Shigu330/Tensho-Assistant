@@ -128,6 +128,7 @@
     <Compile Include="../../src/TenshoAssistant/Gathering/GatherNodeEffects.cs" Link="Gathering/GatherNodeEffects.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GatherPointAccess.cs" Link="Gathering/GatherPointAccess.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GpCrystals.cs" Link="Gathering/GpCrystals.cs" />
+    <Compile Include="../../src/TenshoAssistant/Inventory/InventoryCover.cs" Link="Inventory/InventoryCover.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/CollectablePlan.cs" Link="Gathering/CollectablePlan.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftRecording.cs" Link="Craft/CraftRecording.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftActionRules.cs" Link="Craft/CraftActionRules.cs" />

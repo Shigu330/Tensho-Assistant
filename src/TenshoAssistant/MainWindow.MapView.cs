@@ -100,7 +100,7 @@ internal sealed partial class MainWindow
         else ImGui.SetNextWindowSize(new Vector2(720,760),ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowSizeConstraints(new Vector2(320,280),new Vector2(float.MaxValue));
         ImGui.SetNextWindowBgAlpha(MapViewSettings.ClampOpacity(settings.Opacity));
-        window.Flags=ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | (settings.Locked ? ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize:0);
+        window.Flags=ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | (settings.Locked ? ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize:0) | (settings.HideTitleBar ? ImGuiWindowFlags.NoTitleBar:0);
     }
     internal void FinishMapView()=>UI.FfxivTheme.Pop();
     internal void DrawMapViewContents()
@@ -563,6 +563,7 @@ internal sealed partial class MainWindow
             {
                 changed|=SettingBox("MapView.ReplaceGameMap",settings.ReplaceGameMap,value=>settings.ReplaceGameMap=value,MapDefaults.ReplaceGameMap);
                 changed|=SettingBox("MapView.Locked",settings.Locked,value=>settings.Locked=value,MapDefaults.Locked);
+                changed|=SettingBox("MapView.HideTitleBar",settings.HideTitleBar,value=>settings.HideTitleBar=value,MapDefaults.HideTitleBar);
                 changed|=SettingBox("MapView.HideInCombat",settings.HideInCombat,value=>settings.HideInCombat=value,MapDefaults.HideInCombat);
                 changed|=SettingBox("MapView.HideInDuty",settings.HideInDuty,value=>settings.HideInDuty=value,MapDefaults.HideInDuty);
             }

@@ -16,7 +16,7 @@ internal sealed partial class MainWindow
     private DateTimeOffset trackerRefresh;
 
     private PanelDefinition TrackerPanel=>new("Tracker","###TenshoTracker",new Vector2(40,240),
-        ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.AlwaysAutoResize,
+        ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.AlwaysAutoResize,
         ()=>configuration.TrackerWindow,()=>!windowDisposed && !gameGui.GameUiHidden,DrawTrackerContents,CloseTracker,()=>localization.Get("Tracker.Title"));
 
     private void CloseTracker()

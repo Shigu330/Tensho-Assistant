@@ -711,6 +711,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
 
+**0.535 : interfaces** — à voir en jouant
+
+- [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
+- [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
+- [ ] Panneaux à barre de titre (récolte, pêche, carnet, ventes…) : réduire et fermer marchent ; fermé, il revient en rouvrant la fenêtre du jeu.
+- [ ] Trier : disparaît sous la fenêtre des filtres de tri ou toute autre fenêtre devant, revient quand elle part ; ne disparaît pas sans raison.
+
 **0.534 : Équilibré grisé quand il revient au même** — à voir en jouant
 
 - [ ] Nœud où Sûr et Équilibré donnent les mêmes chiffres : la balance est grisée, l'infobulle le dit, et elle reste cliquable. Là où ils diffèrent : elle est normale.

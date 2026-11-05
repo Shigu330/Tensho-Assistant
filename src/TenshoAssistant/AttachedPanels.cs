@@ -14,6 +14,9 @@ internal sealed class AttachedPanels : IDisposable
     private readonly MainWindow owner;
     private readonly Dictionary<string, AttachedWindow> all = [];
     private readonly HashSet<string> broken = [];
+    // 0.535 (user request): closed by the player until the game window goes away; its last request, so that a short gap in a reading does not bring it back.
+    private readonly Dictionary<string, long> dismissed = [];
+    private const double DismissForgetSeconds = 3;
 
     public AttachedPanels(WindowSystem windows, MainWindow owner)
     {
@@ -27,6 +30,7 @@ internal sealed class AttachedPanels : IDisposable
     public void Show(string id, string title, ImGuiWindowFlags flags, Action? prepare, Action contents, Action? close = null, Vector2? padding = null)
     {
         if (broken.Contains(id)) return;
+        if (dismissed.ContainsKey(id)) { dismissed[id] = System.Diagnostics.Stopwatch.GetTimestamp(); return; }
         if (!all.TryGetValue(id, out var window))
         {
             window = new AttachedWindow(this, id);
@@ -46,6 +50,8 @@ internal sealed class AttachedPanels : IDisposable
     public void EndFrame()
     {
         foreach (var window in all.Values) window.Request = null;
+        foreach (var (id, last) in dismissed.ToArray())
+            if (System.Diagnostics.Stopwatch.GetElapsedTime(last).TotalSeconds >= DismissForgetSeconds) dismissed.Remove(id);
     }
 
     public void Dispose()
@@ -87,8 +93,9 @@ internal sealed class AttachedPanels : IDisposable
         {
             if (Request is not { } request) return;
             WindowName = request.Title + "###" + id;
-            Flags = request.Flags;
-            ShowCloseButton = request.Close is not null;
+            // 0.535 (user request): whatever has a title bar can be collapsed and closed.
+            Flags = request.Flags & ~ImGuiWindowFlags.NoCollapse;
+            ShowCloseButton = (request.Flags & ImGuiWindowFlags.NoTitleBar) == 0;
             UI.FfxivTheme.Push();
             try { request.Prepare?.Invoke(); }
             catch (Exception error) { host.TurnOff(id, error); }
@@ -110,7 +117,11 @@ internal sealed class AttachedPanels : IDisposable
             PopPadding();
             UI.FfxivTheme.Pop();
             // Apply copies the request into IsOpen before OnClose could run: the close button is answered here, in the same frame.
-            if (!IsOpen) Request?.Close?.Invoke();
+            if (!IsOpen && Request is { } request)
+            {
+                if (request.Close is { } close) close();
+                else host.dismissed[id] = System.Diagnostics.Stopwatch.GetTimestamp();
+            }
         }
 
         private void PopPadding()

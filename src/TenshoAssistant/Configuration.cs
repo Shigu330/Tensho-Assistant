@@ -140,6 +140,8 @@ public sealed class MapViewSettings
     // N-09 (0.441): living hunt marks streamed around the player (B, A, S).
     public bool ShowHuntMarks { get; set; } = true;
     public bool GatheringLabels { get; set; } = true;
+    // 0.535 (user request): the map without its title bar; off by default.
+    public bool HideTitleBar { get; set; }
     public bool QuestTooltips { get; set; } = true;
     public bool ShowViewCone { get; set; } = true;
     // 0.288 (user request): player marker size, view cone length and opacity (fractions; clamped on use).

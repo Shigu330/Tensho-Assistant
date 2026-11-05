@@ -140,7 +140,7 @@ internal sealed partial class MainWindow
     // The on-screen « to do » panel (a PanelWindow since 0.514), only when it is on, a task is pending, and not in combat.
     private IReadOnlyList<PersonalTask> pendingOnScreen=[];
     private PanelDefinition TasksPanel=>new("TaskPanel","###TenshoTaskPanel",new Vector2(40,260),
-        ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav,
+        ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav,
         ()=>configuration.TaskPanel,TaskPanelVisible,DrawTaskPanelContents,CloseTaskPanel,()=>localization.Get("PersonalTasks.PanelTitle"),0.75f);
 
     private bool TaskPanelVisible()

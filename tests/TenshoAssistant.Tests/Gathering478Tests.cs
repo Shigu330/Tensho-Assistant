@@ -58,7 +58,7 @@ internal static class Gathering478Tests
             Check(!CollectableRisk.Same(thirdSafe,thirdMiddle),$"a node where Balanced has its own plan: {thirdSafe.Worst}/{thirdSafe.Expected} and {thirdMiddle.Worst}/{thirdMiddle.Expected}");
             Check(CollectableRisk.Same(null,thirdSafe)==false,"nothing to compare");
             var greyed=Read("MainWindow.CollectablePanel.cs");
-            Check(greyed.Contains("var same=advice is not null && cap==50 && collectableBalancedSame;") && greyed.Contains("ImGui.PushStyleVar(ImGuiStyleVar.Alpha,0.4f)") && greyed.Contains("\"CollectablePanel.BalancedSame\""),"greyed, said in its tooltip");
+            Check(greyed.Contains("var same=balancedOff && cap==50;") && greyed.Contains("\"CollectablePanel.BalancedSame\""),"greyed, said in its tooltip");
             // 0.533: every step has its moves, ends with what it gathers, never spends more GP than there is, nor gathers more than there are attempts.
             foreach(var risk in CollectableRisk.Caps)foreach(var gp in new[]{0,300,423,625,823})
             {

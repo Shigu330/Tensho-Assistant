@@ -68,6 +68,9 @@ internal sealed partial class MainWindow
     private void DrawCollectableRisk(CollectableAdvice? advice=null,CollectableRule? rule=null)
     {
         var risk=CollectableRisk.Snap(configuration.CollectableRiskTolerance);
+        // 0.535 (user request): greyed means not choosable. A saved Balanced shows as Safe here, which gives the same, and comes back on the next node where it has its own plan.
+        var balancedOff=advice is not null && collectableBalancedSame;
+        if(balancedOff && risk==50)risk=CollectableRisk.Safe;
         ImGui.TextDisabled(localization.Get("CollectablePanel.Risk"));
         foreach(var cap in CollectableRisk.Caps)
         {
@@ -75,16 +78,16 @@ internal sealed partial class MainWindow
             // 0.530 (user request): icons, the name in the tooltip: a hand holding an item, a scale, a die.
             var icon=cap==0 ? FontAwesomeIcon.HandHolding:cap==50 ? FontAwesomeIcon.BalanceScale:FontAwesomeIcon.Dice;
             var chosen=risk==cap;
-            // 0.534 (user choice): greyed when it gives the same as Safe on this node; it stays clickable, and the setting is kept for the next node.
-            var same=advice is not null && cap==50 && collectableBalancedSame;
-            if(same)ImGui.PushStyleVar(ImGuiStyleVar.Alpha,0.4f);
+            // 0.534 (user choice): greyed when it gives the same as Safe on this node.
+            var same=balancedOff && cap==50;
+            if(same)ImGui.BeginDisabled();
             if(chosen)ImGui.PushStyleColor(ImGuiCol.Button,Accent with {W=0.55f});
             bool clicked;
             ImGui.PushFont(UiBuilder.IconFont);
             try{clicked=ImGui.Button(icon.ToIconString()+$"###CollectableRisk{cap}");}
-            finally{ImGui.PopFont();if(chosen)ImGui.PopStyleColor();if(same)ImGui.PopStyleVar();}
+            finally{ImGui.PopFont();if(chosen)ImGui.PopStyleColor();if(same)ImGui.EndDisabled();}
             if(clicked && !chosen){configuration.CollectableRiskTolerance=cap;risk=cap;SaveReminders();}
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get($"CollectablePanel.Cap{cap}")+Environment.NewLine+localization.Get(same ? "CollectablePanel.BalancedSame":$"CollectablePanel.Cap{cap}Tip"));
+            if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get($"CollectablePanel.Cap{cap}")+Environment.NewLine+localization.Get(same ? "CollectablePanel.BalancedSame":$"CollectablePanel.Cap{cap}Tip"));
         }
         ImGui.PushTextWrapPos(0);
         // 0.531 (user report: the description did not follow the change): with a plan in hand, what this step gives on this node, in figures.
@@ -199,7 +202,7 @@ internal sealed partial class MainWindow
                     else if(highest!=advice.Worst)ImGui.TextColored(Accent,localization.Format("CollectablePanel.Reference",highest));
                 }
                 // 0.533 (user request: the moves on every step, not only on Safe): the moves of the chosen step and the GP they spend.
-                var safeStep=CollectableRisk.Snap(configuration.CollectableRiskTolerance)==CollectableRisk.Safe;
+                var safeStep=CollectableRisk.Snap(configuration.CollectableRiskTolerance)==CollectableRisk.Safe || collectableBalancedSame && CollectableRisk.Snap(configuration.CollectableRiskTolerance)==50;
                 if(advice.Path is { Steps.Count:>0 } path)
                 {
                     string Named(CollectableMove move)=>CollectableActionInfo?.Invoke(move switch

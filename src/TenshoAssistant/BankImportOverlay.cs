@@ -27,9 +27,8 @@ internal sealed class BankImportOverlay(InventoryBankService bank, BankInventory
         var minimum = viewport.WorkPos;
         var maximum = Vector2.Max(minimum, viewport.WorkPos + viewport.WorkSize - new Vector2(330, premium is null ? 170 : 240));
         position = Vector2.Clamp(position, minimum, maximum);
-        Panels?.Show($"TenshoBankImport{id}",localization.Get("BankUi.OverlayTitle"),ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing,()=>{ImGui.SetNextWindowPos(position, ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(330, 0), ImGuiCond.Always);},()=>
+        Panels?.Show($"TenshoBankImport{id}",localization.Get("BankUi.OverlayTitle"),ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing,()=>{ImGui.SetNextWindowPos(position, ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(330, 0), ImGuiCond.Always);},()=>
         {
-            ImGui.TextUnformatted("Tensho · "+localization.Get("BankUi.OverlayTitle"));
             DrawSource(context);
             if (premium is not null && premium.Loaded)
             {

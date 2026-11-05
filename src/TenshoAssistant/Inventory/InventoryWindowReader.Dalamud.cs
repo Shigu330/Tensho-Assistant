@@ -1,10 +1,8 @@
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace TenshoAssistant.Inventory;
-
-/// <summary>Screen rectangle of the game's inventory window (whichever of its three layouts is shown).</summary>
-public readonly record struct InventoryWindowRect(float X,float Y,float Width,float Height,float Scale=1);
 
 /// <summary>
 /// 0.388 (user request: a sort button on the inventory window): every frame on the framework thread, while the button is on, copies the
@@ -22,6 +20,10 @@ public sealed unsafe class InventoryWindowReader : IDisposable
     private InventoryWindowRect? rect;
     private bool disposed,warned;
     public InventoryWindowRect? Rect{get{lock(gate)return rect;}}
+    private IReadOnlyList<InventoryWindowRect> above=[];
+    /// <summary>0.535 (user request): the game windows drawn above the inventory, so that the sort button can leave when one covers it. HUD parts (« _… ») and the inventory's own grids are left out.</summary>
+    public IReadOnlyList<InventoryWindowRect> Above{get{lock(gate)return above;}}
+    private string? aboveLogged;
 
     public InventoryWindowReader(IFramework framework,IGameGui gui,Func<bool> enabled,IPluginLog log)
     {
@@ -33,6 +35,7 @@ public sealed unsafe class InventoryWindowReader : IDisposable
     {
         if(disposed)return;
         InventoryWindowRect? found=null;
+        IReadOnlyList<InventoryWindowRect> covers=[];
         try
         {
             if(enabled() && !gui.GameUiHidden)
@@ -43,16 +46,47 @@ public sealed unsafe class InventoryWindowReader : IDisposable
                     var unit=(AtkUnitBase*)handle.Address;
                     if(unit->RootNode==null)continue;
                     found=new(unit->X,unit->Y,unit->RootNode->Width*unit->Scale,unit->RootNode->Height*unit->Scale,unit->Scale);
+                    covers=WindowsAbove(unit);
                     break;
                 }
             warned=false;
         }
         catch(Exception error)
         {
-            found=null;
+            found=null;covers=[];
             if(!warned){warned=true;log.Warning(error,"The inventory window could not be read.");}
         }
-        lock(gate)rect=found;
+        lock(gate){rect=found;above=covers;}
+    }
+
+    // The game draws its layers in order, and in a layer its list in order: what comes after the inventory is above it.
+    private List<InventoryWindowRect> WindowsAbove(AtkUnitBase* inventory)
+    {
+        var result=new List<InventoryWindowRect>();
+        var manager=RaptureAtkUnitManager.Instance();
+        if(manager==null)return result;
+        var layers=manager->AtkUnitManager.DepthLayers;
+        var passed=false;List<string>? names=null;
+        for(var layer=0;layer<layers.Length;layer++)
+        {
+            ref var list=ref layers[layer];
+            var count=Math.Min((int)list.Count,list.Entries.Length);
+            for(var index=0;index<count;index++)
+            {
+                AtkUnitBase* unit=list.Entries[index].Value;
+                if(unit==null)continue;
+                if(unit==inventory){passed=true;continue;}
+                if(!passed || !unit->IsVisible || unit->RootNode==null)continue;
+                var name=unit->NameString;
+                if(name.Length==0 || name[0]=='_' || name.StartsWith("Inventory",StringComparison.Ordinal))continue;
+                result.Add(new(unit->X,unit->Y,unit->RootNode->Width*unit->Scale,unit->RootNode->Height*unit->Scale,unit->Scale));
+                (names??=[]).Add(name);
+            }
+        }
+        // Said when it changes, to see in the log which windows count.
+        var said=names is null ? "":string.Join(",",names);
+        if(said!=aboveLogged){aboveLogged=said;log.Debug("Windows above the inventory: {Names}",said);}
+        return result;
     }
 
     public void Dispose()

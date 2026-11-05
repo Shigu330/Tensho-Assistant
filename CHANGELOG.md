@@ -3,6 +3,16 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.535.0
+- Demandes de l'utilisateur en jeu.
+- Équilibré grisé ne se choisit plus. Un Équilibré enregistré s'affiche comme Sûr sur ce nœud, puisque c'est la même chose, et revient sur le nœud suivant où il a son plan.
+- Carte : réglage « Sans barre de titre », désactivé par défaut. Elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte.
+- Interfaces : tout panneau qui a une barre de titre peut se réduire et se fermer. Fermé, il reste fermé jusqu'à ce que la fenêtre du jeu parte. Le panneau de banque gagne une barre de titre. Restent sans : barres d'usure et de PR, survol d'objet, bouton Trier, qui dépendent de leur réglage ou de leur fenêtre.
+- Trier : le bouton disparaît quand une fenêtre du jeu passe devant, d'après l'ordre d'affichage du jeu ; les éléments du HUD et les grilles de l'inventaire ne comptent pas. Non vérifié en jeu : le nom de la fenêtre des filtres de tri ; le journal de débogage dit lesquelles comptent.
+- Tests : Interfaces535Tests. Verify.ps1 (agent) : 1003/1003, 0 avertissement, 0 erreur ; DLL 0.535.0.0. Non validé en jeu.
+### English
+- Balanced cannot be chosen while greyed. The map can drop its title bar (setting). Panels with a title bar can be collapsed and closed, staying closed until their game window goes away. The sort button hides when a game window covers it.
+
 ## 0.534.0
 - Choix de l'utilisateur, sur « sûr et équilibré exactement pareil » : l'icône d'Équilibré se grise quand elle donne la même chose que Sûr sur ce nœud, et son infobulle le dit. Elle reste cliquable. Calculé sur 40 situations : 18 n'ont qu'un résultat possible, 11 en ont deux, 11 en ont trois ; le risque y rapporte souvent 1 à 3 assignats en moyenne pour un plancher bien plus bas.
 - Les crans partent des plans que le nœud offre vraiment. Sûr prend le plancher le plus haut et, à plancher égal, la meilleure moyenne. Équilibré ne descend que si la moyenne gagne au moins la moitié de ce que le plancher perd : par exemple 20/38,3 devient 14/43,0, mais 20/43,9 reste devant 14/45,2.
