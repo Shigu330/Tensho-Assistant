@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.565.0
+- Plan global, I20 : l'aperçu du tri encadre en or les cases qui changeraient et en donne le nombre. Une pile dont la place n'a pas été lue ne compte pas.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1028/1028, 0 avertissement, 0 erreur ; DLL 0.565.0.0. Non validé en jeu.
+### English
+- The sort preview frames in gold the slots that would change and counts them.
+
 ## 0.564.0
 - Plan global, T18 : nouvelles balises des messages Discord : [discordtime] (l'heure dans le fuseau de chaque lecteur), [relative], [et], [zone] et [item]. [time] ne change pas. Un nom inconnu ne laisse rien.
 - Tests : DiscordWebhookTests complété. Verify.ps1 (agent) : 1027/1027, 0 avertissement, 0 erreur ; DLL 0.564.0.0. Non validé en jeu.

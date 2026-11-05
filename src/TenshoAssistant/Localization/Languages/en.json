@@ -3249,6 +3249,7 @@
     "ItemChip": "{0} · ID {1}",
     "SelectionHelp": "An item matches if it is in the chosen list or if its name or ID contains one of the terms. With neither list nor terms, every item matches. Other filters still apply.",
     "ClickHelp": "Click an item in the preview to add it, its category or its name to a zone.",
+    "Moved": "Slots that would change, framed in gold: {0}",
     "NoEditableZone": "No filtered zone: create one below.",
     "AddItem": "Add this item",
     "AddItemCategory": "Add its category ({0})",

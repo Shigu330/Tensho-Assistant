@@ -137,6 +137,11 @@ internal sealed partial class MainWindow
         var spacing=ImGui.GetStyle().ItemSpacing.X;
         var framesPerRow=Math.Max(1,(int)((ImGui.GetContentRegionAvail().X+spacing)/(frameWidth+spacing)));
         ImGui.TextDisabled(localization.Get("SortUi.ClickHelp"));
+        // 0.565 (I20): what the sort would move; a stack whose place was not read (-1) says nothing.
+        var movedStacks=0;
+        for(var position=0;position<scope.ContainerCount*scope.SlotsPerContainer;position++)
+            if((preview.Slots is { } all ? all[position]:position<preview.Stacks.Count ? preview.Stacks[position]:null) is { } shown && shown.Stack.DisplayIndex>=0 && shown.Stack.DisplayIndex!=position)movedStacks++;
+        ImGui.TextDisabled(localization.Format("SortUi.Moved",movedStacks));
         var openSlotMenu=false;
         for (var bag = 0; bag < scope.ContainerCount; bag++)
         {
@@ -167,6 +172,7 @@ internal sealed partial class MainWindow
                                     var corner=ImGui.GetCursorScreenPos();
                                     DrawBankSlot(new(stack.Item.Id.Value, stack.Item.IsHighQuality ? 0 : stack.Quantity,
                                         stack.Item.IsHighQuality ? stack.Quantity : 0), slot, select:false);
+                                    if(stack.DisplayIndex>=0 && stack.DisplayIndex!=target)ImGui.GetWindowDrawList().AddRect(corner,corner+new Vector2(slot),ImGui.GetColorU32(UI.FfxivTheme.Gold),0,ImDrawFlags.None,2);
                                     ImGui.SetCursorScreenPos(corner);ImGui.Dummy(new Vector2(slot));
                                     if(ImGui.IsItemClicked()){sortSlotMenuItem=stack.Item.Id.Value;openSlotMenu=true;}
                                 }

@@ -158,6 +158,11 @@ internal static class Interfaces535Tests
             Check(view.Contains("period!=weatherFavoritesPeriod || weatherFavoritesGrid.Count!=favorites.Count") && view.Contains("WeatherFavoritePeriods=6,WeatherFavoriteZones=12"),"bounded, once per period");
             Check(Read("Configuration.cs").Contains("\"LastCraftStats\", \"WeatherFavorites\","),"the player's data");
         }),
+        ("0.565: the sort preview frames what would move; an unread place says nothing",() =>
+        {
+            var view=Read("MainWindow.SortPreview.cs");
+            Check(view.Contains("shown.Stack.DisplayIndex>=0 && shown.Stack.DisplayIndex!=position") && view.Contains("stack.DisplayIndex>=0 && stack.DisplayIndex!=target"),"count and frame agree");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

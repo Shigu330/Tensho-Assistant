@@ -3249,6 +3249,7 @@
     "ItemChip": "{0} · ID {1}",
     "SelectionHelp": "Un objet correspond s’il figure dans la liste ou si son nom ou son ID contient l’un des termes. Sans liste ni terme, tous les objets correspondent. Les autres filtres s’appliquent toujours.",
     "ClickHelp": "Cliquez un objet de l’aperçu pour l’ajouter, lui, sa catégorie ou son nom, à une zone.",
+    "Moved": "Cases qui changeraient, encadrées en or : {0}",
     "NoEditableZone": "Aucune zone filtrée : créez-en une ci-dessous.",
     "AddItem": "Ajouter cet objet",
     "AddItemCategory": "Ajouter sa catégorie ({0})",

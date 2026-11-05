@@ -164,6 +164,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I20 — Aperçu du tri : cases déplacées signalées
 
+- **État (relu le 2026-11-05)** : FAIT 0.565.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.SortPreview.cs`.
 - **Ce que le joueur obtient** : L'aperçu encadre les cases qui changent et dit combien d'objets bougent. « Appliquer » est grisé quand le tri ne changerait rien.
 - **Comment, taille, dépendances** : Comparer la case d'origine (DisplayIndex) à la case cible dans la projection en cache. Ajouter un cadre de couleur et un compteur ; le calcul suit la projection et ne se refait pas à chaque image. Taille S. Sonde : aucune. Décision : aucune.
