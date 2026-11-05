@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.536.0
+- Rapport de l'utilisateur en jeu (deux captures) : Trier faisait l'inverse : il restait sur le Bestiaire passé devant, et partait quand l'inventaire était devant. Dans une couche du jeu, la liste va de l'avant vers l'arrière ; le test était à l'envers.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1003/1003, 0 avertissement, 0 erreur ; DLL 0.536.0.0. Non validé en jeu.
+### English
+- The sort button now leaves when a game window is in front of the inventory: the order test was the wrong way round.
+
 ## 0.535.0
 - Demandes de l'utilisateur en jeu.
 - Équilibré grisé ne se choisit plus. Un Équilibré enregistré s'affiche comme Sûr sur ce nœud, puisque c'est la même chose, et revient sur le nœud suivant où il a son plan.

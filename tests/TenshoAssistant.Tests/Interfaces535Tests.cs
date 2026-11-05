@@ -22,6 +22,7 @@ internal static class Interfaces535Tests
             Check(button.Contains("InventoryWindow.Above.Any(cover=>Inventory.InventoryCover.Covers("),"used");
             var reader=Read("Inventory/InventoryWindowReader.Dalamud.cs");
             Check(reader.Contains("name[0]==\x27_\x27 || name.StartsWith(\"Inventory\"") && reader.Contains("Math.Min((int)list.Count,list.Entries.Length)"),"HUD and its own grids left out; the list bounded");
+            Check(reader.Contains("index<(layer==home ? Math.Min(place,count):count)") && reader.Contains("for(var layer=home;"),"0.536: above it: before it in its layer, and the higher layers");
         }),
         ("Panels: collapse and close on all that have a title bar; closed until the game window goes away",() =>
         {

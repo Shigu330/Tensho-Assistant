@@ -59,24 +59,32 @@ public sealed unsafe class InventoryWindowReader : IDisposable
         lock(gate){rect=found;above=covers;}
     }
 
-    // The game draws its layers in order, and in a layer its list in order: what comes after the inventory is above it.
+    // 0.536 (user captures: the button stayed over the Hunting log and left when the inventory was in front): in a layer, the list comes front to back, so what is above the inventory comes
+    // before it there; higher layers are above it too.
     private List<InventoryWindowRect> WindowsAbove(AtkUnitBase* inventory)
     {
         var result=new List<InventoryWindowRect>();
         var manager=RaptureAtkUnitManager.Instance();
         if(manager==null)return result;
         var layers=manager->AtkUnitManager.DepthLayers;
-        var passed=false;List<string>? names=null;
-        for(var layer=0;layer<layers.Length;layer++)
+        int home=-1,place=-1;
+        for(var layer=0;layer<layers.Length && home<0;layer++)
         {
             ref var list=ref layers[layer];
             var count=Math.Min((int)list.Count,list.Entries.Length);
             for(var index=0;index<count;index++)
+                if(list.Entries[index].Value==inventory){home=layer;place=index;break;}
+        }
+        if(home<0)return result;
+        List<string>? names=null;
+        for(var layer=home;layer<layers.Length;layer++)
+        {
+            ref var list=ref layers[layer];
+            var count=Math.Min((int)list.Count,list.Entries.Length);
+            for(var index=0;index<(layer==home ? Math.Min(place,count):count);index++)
             {
                 AtkUnitBase* unit=list.Entries[index].Value;
-                if(unit==null)continue;
-                if(unit==inventory){passed=true;continue;}
-                if(!passed || !unit->IsVisible || unit->RootNode==null)continue;
+                if(unit==null || !unit->IsVisible || unit->RootNode==null)continue;
                 var name=unit->NameString;
                 if(name.Length==0 || name[0]=='_' || name.StartsWith("Inventory",StringComparison.Ordinal))continue;
                 result.Add(new(unit->X,unit->Y,unit->RootNode->Width*unit->Scale,unit->RootNode->Height*unit->Scale,unit->Scale));
