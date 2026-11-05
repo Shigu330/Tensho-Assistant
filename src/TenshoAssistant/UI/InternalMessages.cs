@@ -63,6 +63,7 @@ internal static class InternalMessages
         ["Armoire not loaded."]="InternalMessages.ArmoireNotLoaded",
         ["Bank loading failed; nothing is changed to protect the file."]="InternalMessages.BankLoadingFailedNothingIsChanged",
         ["Character erased."]="InternalMessages.CharacterErased",
+        ["Read erased."]="InternalMessages.ReadErased",
         ["Character not observed."]="InternalMessages.CharacterNotObserved",
         ["Invalid storage identity."]="InternalMessages.InvalidStorageIdentity",
         ["Every container of the storage must be fully observed for the right owner."]="InternalMessages.EveryContainerOfTheStorageMust",

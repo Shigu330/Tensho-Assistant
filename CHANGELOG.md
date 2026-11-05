@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.576.0
+- Plan global, I1 : page Rangements : un servant qui n'est plus à la sonnette est signalé, jamais effacé tout seul, et « Effacer ce relevé » (deux clics) retire un relevé de vos stocks.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1039/1039, 0 avertissement, 0 erreur ; DLL 0.576.0.0. Non validé en jeu.
+### English
+- The storage page flags a retainer no longer at the bell, and a read can be erased with two clicks.
+
 ## 0.575.0
 - Plan global, I3 : le coût de préparation prend le prix en gils d'un PNJ quand il est plus bas que le marché, aussi pour un objet que le marché ne vend pas ; la ligne le marque. Réglage activé par défaut, à part si du HQ est demandé. La ligne du Résumé de la page Marché reste à faire.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1038/1038, 0 avertissement, 0 erreur ; DLL 0.575.0.0. Non validé en jeu.

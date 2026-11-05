@@ -3384,6 +3384,10 @@
     "DeleteTemplateTip": "Deletes the chosen template at once, without confirmation."
   },
   "BankUi": {
+    "RetainerGone": "This retainer is no longer at the summoning bell: its read still counts in your stocks.",
+    "Forget": "Erase this read",
+    "ForgetConfirm": "Confirm: erase",
+    "ForgetTip": "Removes this read from your stocks. Two clicks. The storage is read again the next time you open it.",
     "PlayerBags": "Character bags",
     "Worn": "Worn gear",
     "Crystals": "Crystals",
@@ -5496,6 +5500,7 @@
     "ArmoireNotLoaded": "Armoire not loaded.",
     "BankLoadingFailedNothingIsChanged": "Bank loading failed; nothing is changed to protect the file.",
     "CharacterErased": "Character erased.",
+    "ReadErased": "Read erased.",
     "CharacterNotObserved": "Character not observed.",
     "InvalidStorageIdentity": "Invalid storage identity.",
     "EveryContainerOfTheStorageMust": "Every container of the storage must be fully observed for the right owner.",

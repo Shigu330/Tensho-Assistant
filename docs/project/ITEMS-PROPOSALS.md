@@ -17,6 +17,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I1 — Signaler et effacer le relevé d'un servant renvoyé ou d'un ancien rangement
 
+- **État (relu le 2026-11-05)** : FAIT 0.576.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Inventory/BankService.cs`.
 - **Ce que le joueur obtient** : Un servant renvoyé ne compte plus pour toujours dans vos stocks. La page Rangements signale les servants enregistrés qui n'apparaissent plus à la sonnette, et un bouton « Effacer ce relevé » (deux clics) les retire. Vos totaux redeviennent justes : survol, fiche, « manquant » de l'artisanat, Revue de mode.
 - **Comment, taille, dépendances** : Ajouter InventoryBankService.DeleteAsync(BankKey), dans la même file bornée et avec la même écriture atomique (FileInventoryBankStore). Bouton dans « Imports » (DrawImportManager) avec la confirmation en deux clics de MainWindow.Alarms.cs. Mention « absent de la sonnette » quand KnownRetainers est connu et ne contient pas ce servant ; jamais d'effacement automatique. Taille S-M. Sonde : aucune. Décision : aucune nouvelle (partie du choix I-03, faisable avant g) ; à confirmer : effacement manuel seulement (recommandé).

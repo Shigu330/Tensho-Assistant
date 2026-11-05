@@ -236,6 +236,13 @@ internal static class Interfaces535Tests
             Check(high.Lines[0].UnitPrice==100 && !high.Lines[0].FromVendor,"the market when lower");
             Check(!Cost(TenshoAssistant.Market.PreparationPriceQuality.Hq,40).Lines[0].FromVendor,"HQ asked: not an NPC's");
         }),
+        ("0.576: one read can be erased, on two clicks, and a retainer gone from the bell is only said",() =>
+        {
+            var bank=Read("MainWindow.Bank.cs");
+            Check(bank.Contains("if(!armed)bankForgetArmed=entry.Key;") && bank.Contains("bank.ForgetAsync(entry.Key)"),"two clicks");
+            Check(bank.Contains("listed.All(known=>known.Id!=entry.Key.StorageId)"),"said when the bell does not list it");
+            Check(Read("Inventory/BankService.cs").Contains("state.Entries.Where(e => e.Key != forgotten)"),"only that read");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

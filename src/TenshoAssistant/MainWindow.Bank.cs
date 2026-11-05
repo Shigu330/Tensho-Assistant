@@ -88,6 +88,7 @@ internal sealed partial class MainWindow
         }
     }
 
+    private BankKey? bankForgetArmed;private volatile string? bankForgetMessage;
     private void DrawImportManager()
     {
         if (!TenshoAssistant.UI.UiComponents.Header(localization.Get("BankUi.Imports"))) return;
@@ -117,7 +118,22 @@ internal sealed partial class MainWindow
             ImGui.BulletText(BankEntryName(entry));
             ImGui.TextDisabled(localization.Format("BankUi.Last",entry.Snapshot.ObservedAt.ToLocalTime().ToString("g")));
             DrawCacheStamp(TenshoAssistant.Caching.CacheArea.ImportedStock,entry.Snapshot.ObservedAt,true);
+            // 0.576 (I1): a retainer the bell no longer lists is said, never erased by itself; two clicks erase a read.
+            if(entry.Key.Kind==BankStorageKind.Retainer && menus.KnownRetainers is { } listed && listed.All(known=>known.Id!=entry.Key.StorageId))
+                ImGui.TextColored(Accent,localization.Get("BankUi.RetainerGone"));
+            var armed=bankForgetArmed==entry.Key;
+            if(ImGui.SmallButton(localization.Get(armed ? "BankUi.ForgetConfirm":"BankUi.Forget")+$"##BankForget{entry.Key.Kind}{entry.Key.StorageId}"))
+            {
+                if(!armed)bankForgetArmed=entry.Key;
+                else
+                {
+                    bankForgetArmed=null;
+                    _=bank.ForgetAsync(entry.Key).ContinueWith(task=>bankForgetMessage=task.Result.Message,TaskScheduler.Default);
+                }
+            }
+            Tip("BankUi.ForgetTip");
         }
+        if(bankForgetMessage is { } forgetMessage)DrawServiceMessage(forgetMessage,"ServiceErrors.Bank");
         ImGui.TextWrapped(localization.Get("BankUi.Scope"));
     }
 

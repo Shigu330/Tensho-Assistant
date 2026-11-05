@@ -3384,6 +3384,10 @@
     "DeleteTemplateTip": "Supprime le modèle choisi tout de suite, sans confirmation."
   },
   "BankUi": {
+    "RetainerGone": "Ce servant n'est plus à la sonnette : son relevé compte encore dans vos stocks.",
+    "Forget": "Effacer ce relevé",
+    "ForgetConfirm": "Confirmer : effacer",
+    "ForgetTip": "Retire ce relevé de vos stocks. Deux clics. Le rangement est relu la prochaine fois que vous l'ouvrez.",
     "PlayerBags": "Sacs du personnage",
     "Worn": "Équipement porté",
     "Crystals": "Cristaux",
@@ -5496,6 +5500,7 @@
     "ArmoireNotLoaded": "Armoire non chargée.",
     "BankLoadingFailedNothingIsChanged": "Le chargement de la banque a échoué ; rien n'est modifié pour préserver le fichier.",
     "CharacterErased": "Personnage effacé.",
+    "ReadErased": "Relevé effacé.",
     "CharacterNotObserved": "Personnage non observé.",
     "InvalidStorageIdentity": "Identité de rangement invalide.",
     "EveryContainerOfTheStorageMust": "Tous les conteneurs du rangement doivent être entièrement observés pour le bon propriétaire.",

@@ -93,7 +93,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 |---|---|---|---|
 | P10 | Recherche sur la carte (lieux, éthérites, PNJ, quêtes, ressources) | M | Depuis la section Carte du plugin, pas depuis la carte. |
 | P12 | Noms écrits à côté des icônes, comme la carte du jeu | M |  |
-| I1 | Signaler et effacer le relevé d'un servant renvoyé ou d'un ancien rangement | S-M |  |
+| I1 | ~~Signaler et effacer le relevé d'un servant renvoyé ou d'un ancien rangement~~ fait en 0.576 | S-M |  |
 | I3 | ~~Prix des marchands PNJ dans le coût de préparation et sur la page Marché~~ fait en 0.575 | S-M |  |
 | I11 | Vue en liste triable de la Banque | S-M |  |
 | I21 | Filtre de job et de set d'équipement dans les règles de tri | M |  |
