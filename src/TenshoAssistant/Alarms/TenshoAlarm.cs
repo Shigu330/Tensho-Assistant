@@ -30,6 +30,9 @@ public sealed class TenshoAlarm
     public bool Enabled { get; set; } = true;
     // Occurrence already handled (fired or skipped for its weather), so it is not handled twice.
     public DateTimeOffset LastOccurrence { get; set; }
+    // 0.556 (T20): the occurrence that really rang (LastOccurrence also marks one skipped for its weather), and the one that rang again on time.
+    public DateTimeOffset LastRung { get; set; }
+    public DateTimeOffset LastOnTime { get; set; }
     // R-12 (0.319): tool that created the alarm (Discord categories; older alarms: Other, the gathering job then decides), whether it
     // goes to Discord when the webhook is on, and its own Discord message (empty = the template of the settings).
     public AlarmSource Source { get; set; }
@@ -47,6 +50,8 @@ public sealed class AlarmSettings
     public bool PlaySound { get; set; } = true;
     public bool Chat { get; set; } = true;
     public bool MuteInDuties { get; set; } = true;
+    // 0.556 (T20): ring a second time at the exact time; Discord only gets the first.
+    public bool RingOnTime { get; set; }
     // Queue step e (audit 2026-11-02): with MuteInDuties, no [Tensho] chat line in a duty either. Off by default (the line stays, as
     // before); Discord and the alarms copied into the game are not affected.
     public bool MuteChatInDuties { get; set; }
@@ -112,6 +117,14 @@ public static class AlarmSchedule
         if (alarm.PreviousWeathers.Count > 0 && (weatherAt?.Invoke(occurrence.AddSeconds(-1400)) is not { } previous || !alarm.PreviousWeathers.Contains(previous)))
             return (AlarmCheck.SkipWeather, occurrence);
         return (AlarmCheck.Fire, occurrence);
+    }
+
+    /// <summary>0.556 (T20): the occurrence to ring again at its exact time: it rang ahead, its time has come, and it has not rung twice. Without a lead the first ring was already on time.</summary>
+    public static DateTimeOffset? OnTimeDue(TenshoAlarm alarm, DateTimeOffset now)
+    {
+        ArgumentNullException.ThrowIfNull(alarm);
+        if (!alarm.Enabled || ClampLead(alarm.Repeat, alarm.LeadMinutes) == 0 || Next(alarm, now.AddSeconds(-30)) is not { } occurrence) return null;
+        return occurrence <= now && occurrence == alarm.LastRung && occurrence != alarm.LastOnTime ? occurrence : null;
     }
 
     /// <summary>Daily alarms for every ET window start of an item (gathering point or fish), without duplicates.</summary>

@@ -94,6 +94,21 @@ internal static class Interfaces535Tests
             foreach(var word in new[]{"\"objet\" or \"item\"","\"prix\" or \"price\"","\"recolte\" or \"récolte\" or \"gather\"","\"recette\" or \"recipe\""})Check(links.Contains(word),word);
             Check(Read("Plugin.cs").Contains("MainWindow.CommandRoute(parts[0]) is { } route"),"the command uses them");
         }),
+        ("0.556: an alarm can ring again on time, once, after really ringing ahead",() =>
+        {
+            var at=new DateTimeOffset(2026,11,5,12,0,0,TimeSpan.Zero);
+            TenshoAssistant.Alarms.TenshoAlarm Alarm()=>new(){Repeat=TenshoAssistant.Alarms.AlarmRepeat.Once,At=at,LeadMinutes=5};
+            var alarm=Alarm();
+            Check(TenshoAssistant.Alarms.AlarmSchedule.OnTimeDue(alarm,at) is null,"it has not rung ahead");
+            alarm.LastRung=at;
+            Check(TenshoAssistant.Alarms.AlarmSchedule.OnTimeDue(alarm,at.AddMinutes(-1)) is null,"not before its time");
+            Check(TenshoAssistant.Alarms.AlarmSchedule.OnTimeDue(alarm,at.AddSeconds(5))==at,"at its time");
+            alarm.LastOnTime=at;
+            Check(TenshoAssistant.Alarms.AlarmSchedule.OnTimeDue(alarm,at.AddSeconds(6)) is null,"once");
+            var noLead=Alarm();noLead.LeadMinutes=0;noLead.LastRung=at;
+            Check(TenshoAssistant.Alarms.AlarmSchedule.OnTimeDue(noLead,at.AddSeconds(5)) is null,"no lead: the first ring was on time");
+            Check(!new TenshoAssistant.Alarms.AlarmSettings().RingOnTime,"off by default");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

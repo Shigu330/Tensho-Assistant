@@ -752,6 +752,7 @@
     "InnerQuiet": "Inner Quiet"
   },
   "Advanced": {
+    "RingOnTimeTip": "An alarm rings its lead ahead, then a second time at the exact time. Discord only gets the first.\nDefault: off.",
     "RetainerSales": "Panel beside the retainer sale list",
     "RetainerSalesTip": "While a retainer's sale list is open, shows your prices beside it. It reads the list and changes nothing. Comparing with other sellers asks Universalis, only on your click.",
     "CloseOnGameWindow": "Close Tensho when it opens a game window",
@@ -1076,6 +1077,7 @@
     "Source": "GatherBuddy data (Ottermandias, Apache-2.0); game log and Garland further down."
   },
   "Alarms": {
+    "RingOnTime": "Ring again at the exact time",
     "DutyPop": "Alert when a duty is ready",
     "DutyPopTip": "A chat line and the alarm sound when the Duty Finder finds your party (same silence rules in duties). Also sent to Discord when its « Duty ready » category is ticked.",
     "BarTitle": "Upcoming alarms",

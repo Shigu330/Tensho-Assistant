@@ -752,6 +752,7 @@
     "InnerQuiet": "Calme intérieur"
   },
   "Advanced": {
+    "RingOnTimeTip": "Une alarme sonne avec son avance, puis une seconde fois à l'heure exacte. Discord ne reçoit que le premier message.\nPar défaut : désactivé.",
     "RetainerSales": "Panneau à côté de la liste de ventes des servants",
     "RetainerSalesTip": "Quand la liste de ventes d'un servant est ouverte, affiche vos prix à côté. Il lit la liste et ne change rien. Comparer aux autres vendeurs interroge Universalis, seulement sur votre clic.",
     "CloseOnGameWindow": "Fermer Tensho quand il ouvre une fenêtre du jeu",
@@ -1076,6 +1077,7 @@
     "Source": "Données GatherBuddy (Ottermandias, Apache-2.0) ; carnet du jeu et Garland plus bas."
   },
   "Alarms": {
+    "RingOnTime": "Sonner aussi à l'heure exacte",
     "DutyPop": "Alerte quand une mission est prête",
     "DutyPopTip": "Une ligne dans la discussion et le son des alarmes quand l'outil de recherche de mission trouve votre groupe (mêmes règles de silence en mission). Envoyée aussi à Discord si la catégorie « Mission prête » y est cochée.",
     "BarTitle": "Prochaines alarmes",

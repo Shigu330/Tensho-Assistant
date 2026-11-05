@@ -432,6 +432,10 @@ internal sealed partial class MainWindow
         if(DefaultButton("AlarmSound",sound!=defaults.Sound)){sound=defaults.Sound;changed=true;}
         changed|=ImGui.Checkbox(localization.Get("Alarms.Chat"),ref chat);Tip("Advanced.ChatTip");
         if(DefaultButton("AlarmChat",chat!=defaults.Chat)){chat=defaults.Chat;changed=true;}
+        var onTime=options.RingOnTime;
+        if(ImGui.Checkbox(localization.Get("Alarms.RingOnTime"),ref onTime)){options.RingOnTime=onTime;changed=true;}
+        Tip("Advanced.RingOnTimeTip");
+        if(DefaultButton("AlarmRingOnTime",onTime!=defaults.RingOnTime)){options.RingOnTime=defaults.RingOnTime;changed=true;}
         changed|=ImGui.Checkbox(localization.Get("Alarms.MuteInDuties"),ref mute);Tip("Advanced.MuteTip");
         if(DefaultButton("AlarmMute",mute!=defaults.MuteInDuties)){mute=defaults.MuteInDuties;changed=true;}
         // Queue step e (audit 2026-11-02): no [Tensho] chat line in a duty either; greyed while it can have no effect (no silence, no chat line).
@@ -468,7 +472,7 @@ internal sealed partial class MainWindow
         if(!changed)return;
         var previous=configuration.AlarmOptions;
         // 0.319: the command delay (Settings › Advanced) is kept; it went back to 500 ms whenever an alarm setting changed.
-        configuration.AlarmOptions=new(){LeadMinutes=Math.Clamp(lead,0,1440),Sound=Math.Clamp(sound,0,5),PlaySound=play,Chat=chat,MuteInDuties=mute,MuteChatInDuties=muteChat,
+        configuration.AlarmOptions=new(){RingOnTime=options.RingOnTime,LeadMinutes=Math.Clamp(lead,0,1440),Sound=Math.Clamp(sound,0,5),PlaySound=play,Chat=chat,MuteInDuties=mute,MuteChatInDuties=muteChat,
             UseGameAlarms=useGame,GameIncludeWeather=gameWeather,GameCommandDelayMs=previous.GameCommandDelayMs,DutyPopAlert=previous.DutyPopAlert,
             AutoAlarms=previous.AutoAlarms};
         try{save();}catch(Exception error){configuration.AlarmOptions=previous;log.Warning(error,"Alarm settings could not be saved.");}

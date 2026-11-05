@@ -179,10 +179,20 @@ internal sealed class AlarmService : IDisposable
             if (inGame && !discord) continue;
             // 0.331: a weather condition is not checked before the weather catalogue is known; the occurrence is left for later, not skipped.
             if (catalog is null && alarm.Weathers.Count + alarm.PreviousWeathers.Count > 0) continue;
+            if (settings.RingOnTime && !inGame && AlarmSchedule.OnTimeDue(alarm, now) is { } exact)
+            {
+                alarm.LastOnTime = exact; changed = true;
+                var dutyNow = settings.MuteInDuties && condition[ConditionFlag.BoundByDuty];
+                if (settings.ChatAllowed(dutyNow))
+                    try { chat(alarm,$"{alarm.Label}|0|{exact.ToLocalTime():HH:mm}"); }
+                    catch (Exception error) { log.Warning(error, "Alarm chat line could not be written."); }
+                if (settings.SoundAllowed(dutyNow)) PlaySound(settings.Sound, log);
+            }
             var (check, occurrence) = AlarmSchedule.Check(alarm, now, time => WeatherAt(catalog, alarm.TerritoryId, time));
             if (check == AlarmCheck.None) continue;
             alarm.LastOccurrence = occurrence; changed = true;
             if (check != AlarmCheck.Fire) continue;
+            alarm.LastRung = occurrence;
             var minutes = Math.Max(0, (int)Math.Ceiling((occurrence - now).TotalMinutes));
             if (!inGame)
             {

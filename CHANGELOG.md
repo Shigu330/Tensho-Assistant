@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.556.0
+- Plan global, T20 : réglage, désactivé par défaut : une alarme sonne avec son avance, puis une seconde fois à l'heure exacte, sans doubler Discord. Une occurrence écartée pour sa météo ne sonne pas. Réglage général : pas d'option par alarme.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1020/1020, 0 avertissement, 0 erreur ; DLL 0.556.0.0. Non validé en jeu.
+### English
+- New alarm setting, off by default: an alarm rings its lead ahead, then again at the exact time. Discord only gets the first.
+
 ## 0.555.0
 - Plan global, I16 : commandes « /tensho objet », « prix », « recolte » et « recette » (aussi item, price, gather, recipe), avec C32 : elles ouvrent le premier objet trouvé dans Tensho, comme wiki et lodestone.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1019/1019, 0 avertissement, 0 erreur ; DLL 0.555.0.0. Non validé en jeu.

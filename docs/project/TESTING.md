@@ -754,6 +754,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.555) Commandes : « /tensho prix » suivi d'un nom d'objet ouvre le marché de cet objet ; essayer aussi objet, recolte et recette, et un nom inconnu.
 
+- [ ] (0.556) Alarmes, réglage activé : l'alarme sonne avec son avance puis à l'heure ; une seule fois chacune, en chat comme en son.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

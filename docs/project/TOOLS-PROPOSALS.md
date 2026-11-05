@@ -159,6 +159,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T20 — Alarmes : sonner aussi à l'heure exacte
 
+- **État (relu le 2026-11-05)** : FAIT 0.556.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Alarms/AlarmService.Dalamud.cs`.
 - **Ce que le joueur obtient** : En plus du rappel N minutes avant, l'alarme peut sonner une seconde fois quand la fenêtre s'ouvre : point de récolte, poisson, retour de vaisseau.
 - **Comment, taille, dépendances** : Option par alarme, plus un réglage par défaut « Sonner aussi à l'heure » (désactivé, infobulle, ↺). Un second état « à l'heure traité » évite de sonner deux fois ; Discord seulement au premier son (débit). Tests de Check. Taille S. Dépendances : aucune. Sonde : aucune. Décision : envoyer aussi le second son sur Discord (recommandé : non).
