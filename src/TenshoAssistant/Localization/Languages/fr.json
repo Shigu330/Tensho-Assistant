@@ -2151,6 +2151,9 @@
     "Source": "Données du jeu · {0} · autres usages possibles hors de ces catalogues"
   },
   "CactpotUi": {
+    "RewardsTitle": "Gains selon la somme de la ligne",
+    "RewardsSum": "Somme",
+    "RewardsGain": "PGS",
     "Title": "Mini Cactpot",
     "Description": "Ticket manuel ou observé · conseils de révélation et de ligne",
     "Observed": "Observation activée (préférence sauvegardée).",

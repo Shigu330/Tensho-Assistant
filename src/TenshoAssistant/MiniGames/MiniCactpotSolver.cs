@@ -7,6 +7,8 @@ public sealed record MiniCactpotResult(bool ChooseLine, IReadOnlyList<double?> C
 public static class MiniCactpotSolver
 {
     private static readonly int[] Rewards = [0, 0, 0, 0, 0, 0, 10000, 36, 720, 360, 80, 252, 108, 72, 54, 180, 72, 180, 119, 36, 306, 1080, 144, 1800, 3600];
+    /// <summary>0.571 (T29): the gain of a line sum, 6 to 24, for the page's table.</summary>
+    public static int RewardOf(int sum)=>sum is >=6 and <=24 ? Rewards[sum]:0;
     private static readonly int[][] Lines = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
 
     public static MiniCactpotResult Solve(IReadOnlyList<int> input, CancellationToken cancellation = default)

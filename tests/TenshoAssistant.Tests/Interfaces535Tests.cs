@@ -189,6 +189,12 @@ internal static class Interfaces535Tests
             var view=Read("MainWindow.Reminders.cs");
             Check(view.Contains("AlarmButton(\"Venture\"+name") && view.Contains("AlarmButton(\"VenturesAll\""),"two bells");
         }),
+        ("0.571: the Mini Cactpot page shows the gains the advice uses",() =>
+        {
+            Check(TenshoAssistant.MiniGames.MiniCactpotSolver.RewardOf(6)==10000 && TenshoAssistant.MiniGames.MiniCactpotSolver.RewardOf(24)==3600,"ends");
+            Check(TenshoAssistant.MiniGames.MiniCactpotSolver.RewardOf(5)==0 && TenshoAssistant.MiniGames.MiniCactpotSolver.RewardOf(25)==0,"out of range");
+            Check(Read("MainWindow.MiniCactpot.cs").Contains("DrawMiniCactpotRewards();"),"drawn");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

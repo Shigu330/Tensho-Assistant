@@ -228,6 +228,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T29 — Mini Cactpot : table des gains prouvée et visible
 
+- **État (relu le 2026-11-05)** : FAIT 0.571.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MiniGames/MiniCactpotSolver.cs`.
 - **Ce que le joueur obtient** : Sous le conseil, le gain de chaque somme de ligne (6 à 24) s'affiche, comme sur le ticket du jeu : vous voyez ce que vise la ligne conseillée.
 - **Comment, taille, dépendances** : Chercher la table dans les données du jeu (sonde des feuilles du Gold Saucer) ou la relever sur le ticket en jeu ; preuve dans docs/evidence/ et test qui compare. Tableau repliable sous le conseil. Taille S. Dépendances : séance de relevés. Décision : aucune.

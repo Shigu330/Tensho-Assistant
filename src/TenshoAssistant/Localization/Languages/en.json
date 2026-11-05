@@ -2151,6 +2151,9 @@
     "Source": "Game data · {0} · other uses may exist outside these catalogues"
   },
   "CactpotUi": {
+    "RewardsTitle": "Gains by line sum",
+    "RewardsSum": "Sum",
+    "RewardsGain": "MGP",
     "Title": "Mini Cactpot",
     "Description": "Manual or observed ticket · reveal and line advice",
     "Observed": "Observation enabled (saved preference).",

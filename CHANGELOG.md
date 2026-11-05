@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.571.0
+- Plan global, T29 : la page Mini Cactpot montre, repliée, la table des gains selon la somme de la ligne : celle que le conseil utilise déjà. Elle reste à comparer au ticket du jeu en phase 6.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1034/1034, 0 avertissement, 0 erreur ; DLL 0.571.0.0. Non validé en jeu.
+### English
+- The Mini Cactpot page shows, folded, the gains by line sum that the advice uses.
+
 ## 0.570.0
 - Plan global, T16 : la ligne des tâches de servants se déplie : par servant, sa tâche finie ou son heure de fin avec une cloche, et une alarme pour le retour du dernier. L'alarme automatique de 0.371 reste.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1033/1033, 0 avertissement, 0 erreur ; DLL 0.570.0.0. Non validé en jeu.
