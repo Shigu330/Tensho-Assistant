@@ -2,7 +2,7 @@
 
 Plan du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisateur et réorganisé à sa demande ; détail de chaque point : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md). **En cours depuis le 2026-11-05 (feu vert de l'utilisateur).** L'ordre des phases et des points est une proposition de l'agent.
 
-**La 1.0.0 vient après tout le plan** (décision de l'utilisateur, [DEC-037](DECISIONS.md)) : il veut un plugin complet, et accepte qu'une soumission jugée trop grosse puisse être refusée ([PUBLISHING](PUBLISHING.md), point 6).
+**Depuis [DEC-039](DECISIONS.md) : pas de soumission au dépôt officiel, dépôt personnalisé seulement, règles Dalamud gardées.** **La 1.0.0 vient après tout le plan** (décision de l'utilisateur, [DEC-037](DECISIONS.md)) : il veut un plugin complet, et accepte qu'une soumission jugée trop grosse puisse être refusée ([PUBLISHING](PUBLISHING.md), point 6).
 
 **Tout ce qui demande de jouer vient en dernier, un point à la fois** (demande de l'utilisateur, 2026-11-05). Les phases 1 à 4 se font sans lui : `Verify.ps1` vert, commit et poussée, sans essai en jeu. Une compilation complète recharge la DLL si le jeu tourne : il n'a rien à faire pour autant.
 
@@ -15,7 +15,7 @@ Plan du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisa
 | 5 | Relevés en jeu, puis le code qui en dépend | 27 | Oui, l'un après l'autre |
 | 6 | Tests en jeu de tout ce qui précède | 1 | Oui, l'un après l'autre |
 | 7 | Juste avant la 1.0.0 : listes d'outils, documents, aide | | Non |
-| Ensuite | Version 1.0.0 et soumission | | |
+| Ensuite | Version 1.0.0, sur le dépôt personnalisé (pas de soumission, DEC-039) | | |
 | Après la 1.0.0 | C10, chrono de touche | 1 | |
 
 Total avant la 1.0.0 : 99 points. Le bouton pour afficher ou cacher des icônes sur la carte existe déjà (rapport de l'utilisateur) : la demande est retirée.

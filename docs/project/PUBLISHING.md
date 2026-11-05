@@ -1,5 +1,7 @@
 # Publication sur le dépôt officiel Dalamud (D17)
 
+**Depuis DEC-039 (2026-11-05) : pas de soumission.** Tensho reste sur le dépôt personnalisé. Ce document sert de liste des règles Dalamud, qui restent appliquées ; les étapes de soumission ne sont plus à faire.
+
 Règles relues le 2026-11-04 : [soumission](https://dalamud.dev/plugin-publishing/submission),
 [approbation](https://dalamud.dev/plugin-publishing/approval-process),
 [restrictions](https://dalamud.dev/plugin-publishing/restrictions), [politique IA](https://dalamud.dev/plugin-publishing/ai-policy),

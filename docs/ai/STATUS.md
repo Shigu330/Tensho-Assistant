@@ -1,7 +1,7 @@
 # État courant (mis à jour 2026-11-04)
 
 VERSION: 0.614.0.0 (dernière release : Stable-0.539.0, 2026-11-05) — Verify.ps1 (agent) 1120/1120, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
-GOAL: préparer la 1.0.0 (publication Dalamud) ; voir [GOAL](GOAL.md) et [PUBLISHING](../project/PUBLISHING.md).
+GOAL: finir le plan global, sur le dépôt personnalisé, sans soumission (DEC-039) ; voir [GOAL](GOAL.md) et [PUBLISHING](../project/PUBLISHING.md).
 QUOTA: plus de réserve (utilisateur, 2026-11-05) : coder tant que possible, reprise tenue à jour ici. L'agent ne voit pas le compteur. Dernier relevé de l'utilisateur (2026-11-05) : 5 h 0 %, réinitialisation à 9:50 ; semaine 95 %, réinitialisation à 23:00 (une vingtaine de versions ≈ 1 % de la semaine).
 
 Historique (rapports de validation un par un, anciennes reprises, couverture des 17 plugins au 2026-11-02) : [STATUS-ARCHIVE](STATUS-ARCHIVE.md).
@@ -34,7 +34,7 @@ Dépôt personnel : installation et mise à jour fonctionnent (rapport de l'util
 1) Décisions de l'auteur sur les points Dalamud ([PUBLISHING](../project/PUBLISHING.md) « Ce qui reste », points 4 à 7 ; titre selon le job décidé, DEC-035), avec son accord à chaque règle.
 2) Fait le 2026-11-05 : release Stable-0.539.0, sur demande de l'utilisateur. La prochaine : une séance de jeu sur la dernière version d'abord (DEC-033).
 3) Vérifier en jeu les fenêtres converties (issue #38).
-4) Passage en 1.0.0 et soumission, après tout le plan global (DEC-037), au moment choisi par l'auteur (DEC-023). La PR et la déclaration d'IA sont écrites par lui.
+4) Passage en 1.0.0 après tout le plan global, au moment choisi par l'auteur. Pas de soumission au dépôt officiel (DEC-039) ; règles Dalamud gardées.
 Après chaque rechargement en mode développeur, l'agent lit les lignes « Selftest » de dalamud.log.
 
 ## Git

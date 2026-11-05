@@ -27,7 +27,7 @@ Les contributeurs humains commencent par [README.md](README.md) et [CONTRIBUTING
 Déroulé et pièges du code : skill `.claude/skills/tensho-version/SKILL.md` ; scripts de l'agent : `scripts/agent/` (`new-version.py`, `check.sh`, `publish-version.sh`).
 
 1. Incrémenter `<Version>` dans `src/TenshoAssistant/TenshoAssistant.csproj` selon la règle de numérotation (DEC-024) :
-   **X**.y.z = grandes étapes, sur décision de l'utilisateur seulement (1.0.0 = première publication sur le dépôt Dalamud) ;
+   **X**.y.z = grandes étapes, sur décision de l'utilisateur seulement (1.0.0 = fin du plan global, sur le dépôt personnalisé, DEC-039) ;
    x.**Y**.0 = nos versions (utilisateur et agent : l'agent monte ce nombre et remet le troisième à 0) ;
    x.y.**Z** = versions de la communauté (contributions extérieures). Seule source de version ; `TenshoAssistant.json` ne contient
    ni version ni InternalName ni DalamudApiLevel : DalamudPackager les remplit, `Verify.ps1` le contrôle).
@@ -62,4 +62,4 @@ Déroulé et pièges du code : skill `.claude/skills/tensho-version/SKILL.md` ; 
 - Natif lu sur le thread framework puis copié ; rien de lourd dans Draw ; chaque abonnement a un propriétaire et un nettoyage.
 - Références AGPL (Mappy, SortaKinda…) : lues pour comprendre, **jamais copiées** (le projet est sous GPL v3, code original).
 - Hors périmètre : ACT/IINACT et tout domaine Combat (DEC-009), sauf l'exception du dresseur, informations seulement, JcE seulement (DEC-032) ; conseils de jeu en JcE seulement (DEC-033).
-- Publication sur le dépôt officiel Dalamud à la 1.0.0 : ce qui reste dans [docs/project/PUBLISHING.md](docs/project/PUBLISHING.md) ; voir aussi [CONTRIBUTING.md](CONTRIBUTING.md#publication-dalamud) (règles D17, politique IA).
+- Pas de soumission au dépôt officiel Dalamud (DEC-039) : dépôt personnalisé seulement, mais les règles Dalamud restent appliquées, liste dans [docs/project/PUBLISHING.md](docs/project/PUBLISHING.md) ; voir aussi [CONTRIBUTING.md](CONTRIBUTING.md#publication-dalamud) (règles D17, politique IA).

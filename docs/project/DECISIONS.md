@@ -384,3 +384,13 @@ Decision: Tout le plugin se coupe et repart seul en JcJ et en contenu classé, o
 Reason: Décision de l'utilisateur.
 Consequences: docs/project/COMPETITIVE-OFF-PLAN.md, docs/evidence/0.600-competitive-inventory.md. Codé en 0.610 sur le feu vert de l'utilisateur.
 References: DEC-032, DEC-033, CONTRIBUTING.md, docs/project/PUBLISHING.md
+
+DEC-ID: DEC-039
+Timestamp: 2026-11-05 Europe/Brussels
+Problem: Le 2026-11-05, sur le Discord de Dalamud, plusieurs membres de l'équipe jugent Tensho trop gros pour être relu et en grande partie déjà couvert par d'autres plugins.
+Evidence: Échange noté dans docs/project/PUBLISHING.md. Décision de l'utilisateur : « on continue tampis pour dalamud mais on tiens toujours a leurs consigne et regles ».
+Options: Découper en petits plugins ; se passer de Dalamud ; continuer sur le dépôt personnalisé.
+Decision: Pas de soumission au dépôt officiel. Tensho continue sur le dépôt personnalisé, et le plan continue. Les règles et consignes de Dalamud restent appliquées comme si le plugin était soumis. Remplace la partie soumission de DEC-023 et DEC-037.
+Reason: Décision de l'utilisateur.
+Consequences: La 1.0.0 marque la fin du plan global sur le dépôt personnalisé, sans PR D17 ; c'est toujours l'utilisateur qui la décide. docs/project/PUBLISHING.md reste la liste des règles à tenir, les étapes de soumission ne sont plus à faire. Un petit plugin séparé reste possible un jour, sur sa demande.
+References: DEC-023, DEC-037, docs/project/PUBLISHING.md
