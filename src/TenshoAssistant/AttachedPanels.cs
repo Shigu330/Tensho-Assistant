@@ -43,10 +43,12 @@ internal sealed class AttachedPanels : IDisposable
     }
 
     /// <summary>0.539: whether a panel on screen that goes with a game window touches this place. The panels placed freely do not count: they are where the player wants them.</summary>
-    public bool Over(Vector2 at, Vector2 size)
+    /// <param name="openedWith">0.617: the panels of these game windows do not count: they were there first.</param>
+    public bool Over(Vector2 at, Vector2 size, IReadOnlySet<string>? openedWith = null)
     {
         foreach (var window in all.Values)
-            if (window.Request is not null && !window.Hidden && window.LastPosition is { } position && (window.Key == HoverPanel || Anchors.ContainsKey(window.Key))
+            if (openedWith is not null && Anchors.TryGetValue(window.Key, out var anchors) && anchors.Any(anchor => openedWith.Any(name => name.StartsWith(anchor, StringComparison.Ordinal)))) continue;
+            else if (window.Request is not null && !window.Hidden && window.LastPosition is { } position && (window.Key == HoverPanel || Anchors.ContainsKey(window.Key))
                 && UI.GameWindows.Touch(at.X, at.Y, size.X, size.Y, position.X, position.Y, window.LastSize.X, window.LastSize.Y)) return true;
         return false;
     }

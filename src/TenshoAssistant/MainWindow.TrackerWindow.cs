@@ -66,7 +66,24 @@ internal sealed partial class MainWindow
     }
     internal bool BarBehindGame(Vector2 at,Vector2 size)=>configuration.HideBarsBehindGame && BehindGame(at,size);
     // 0.539 (user report): a panel attached to a game window goes with it: it hides the map as the window does.
-    internal bool MapBehindGame(Vector2 at,Vector2 size)=>configuration.MapView.HideBehindGame && (BehindGame(at,size) || Panels?.Over(at,size)==true);
+    internal bool MapBehindGame(Vector2 at,Vector2 size)
+    {
+        if(!configuration.MapView.HideBehindGame)return false;
+        var screen=ImGui.GetMainViewport().Size;
+        var later=mapOpenedWith.Later(GameWindowList);
+        var covered=UI.GameWindows.Covers(later,at.X,at.Y,size.X,size.Y,screen.X,screen.Y) || Panels?.Over(at,size,mapOpenedWith.Present)==true;
+        // What makes the map step aside, in the log on each change, to check a « map stays invisible » report.
+        if(covered!=mapWasCovered)
+        {
+            mapWasCovered=covered;
+            if(developerMode)log.Information("Map {0}; windows coming after it: {1}.",covered ? "steps aside":"comes back",string.Join(", ",later.Select(window=>window.Name)));
+        }
+        return covered;
+    }
+    private readonly UI.OpenedWith mapOpenedWith=new();
+    private bool mapWasCovered;
+    /// <summary>0.617: the map was just asked for: what is open now does not hide it.</summary>
+    internal void MapOpened()=>mapOpenedWith.Opened(GameWindowList);
     /// <summary>0.539: where a game window is now against where its reader saw it, for the panels that follow it.</summary>
     internal Func<string,float,float,Vector2>? GameWindowFollow { get; set; }
     internal Vector2 WindowMoved(string addon,float x,float y)=>GameWindowFollow is { } follow ? follow(addon,x,y)-new Vector2(x,y):Vector2.Zero;

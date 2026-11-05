@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.617.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur) : cliquer sur « Agrandir » la rendait invisible, car elle touchait alors une fenêtre du jeu. Une fenêtre déjà là au moment où la carte s'ouvre, s'agrandit, se déplace ou change de taille ne la cache plus ; seules celles qui s'ouvrent après la font s'effacer. En mode développeur, le journal dit lesquelles.
+- Tests : Map aside. Verify.ps1 (agent) : 1128/1128, 0 avertissement, 0 erreur ; DLL 0.617.0.0. Non validé en jeu.
+### English
+- Map (user report): clicking « Enlarge » made it invisible, because it then touched a game window. A window already there when the map opens, enlarges, moves or is resized no longer hides it; only those opened afterwards make it step aside. In developer mode, the log says which ones.
+
 ## 0.616.0
 - Plan global, #36 : Jardin : l'entretien et la plante arrachée sont reconnus dans le chat, messages captés en jeu (LogMessage 4017, 3450, 4025, 3452). Avec un seul emplacement noté à cet endroit, le journal se met à jour ; avec plusieurs, rien n'est deviné et une ligne de chat le dit. Reste la récolte, en attente du timer.
 - Tests : Garden care. Verify.ps1 (agent) : 1125/1125, 0 avertissement, 0 erreur ; DLL 0.616.0.0. Non validé en jeu.

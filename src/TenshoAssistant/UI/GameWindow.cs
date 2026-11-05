@@ -31,6 +31,22 @@ public static class GameWindows
         x<otherX+otherWidth && otherX<x+width && y<otherY+otherHeight && otherY<y+height;
 }
 
+/// <summary>
+/// 0.617 (user report): the game windows already open when an interface was opened do not make it step aside: asking for the map with a window open must show
+/// the map. Only what comes afterwards counts. A window that closes and opens again counts from then on.
+/// </summary>
+public sealed class OpenedWith
+{
+    private HashSet<string> present=[];
+    public IReadOnlySet<string> Present=>present;
+    public void Opened(IEnumerable<GameWindow> windows)=>present=windows.Select(window=>window.Name).ToHashSet();
+    public IReadOnlyList<GameWindow> Later(IReadOnlyList<GameWindow> windows)
+    {
+        present.IntersectWith(windows.Select(window=>window.Name));
+        return windows.Where(window=>!present.Contains(window.Name)).ToArray();
+    }
+}
+
 /// <summary>0.539 (user request): an interface leaves at once and comes back only after a moment with nothing in front, so that going from one tooltip to the next does not make it blink.</summary>
 public sealed class StepAside(TimeSpan hold)
 {

@@ -19,9 +19,17 @@ internal sealed class MapViewWindow : Window
 
     // 0.537 (user request): on its setting, the map steps aside when a game window comes in front; its open state does not change.
     // 0.539 (user request): it comes back a moment after.
-    public override bool DrawConditions() => owner.MapViewVisible() && !aside.Hidden(lastPosition is { } at && owner.MapBehindGame(at, lastSize), System.Diagnostics.Stopwatch.GetElapsedTime(Started));
+    public override bool DrawConditions()
+    {
+        // 0.617: asked again after a frame without it: what is open now does not hide it, and the moment's delay starts over.
+        var frame=Dalamud.Bindings.ImGui.ImGui.GetFrameCount();
+        if(frame!=lastConditionFrame+1){owner.MapOpened();aside=new(TimeSpan.FromSeconds(1));}
+        lastConditionFrame=frame;
+        return owner.MapViewVisible() && !aside.Hidden(lastPosition is { } at && owner.MapBehindGame(at, lastSize), System.Diagnostics.Stopwatch.GetElapsedTime(Started));
+    }
     private static readonly long Started = System.Diagnostics.Stopwatch.GetTimestamp();
-    private readonly UI.StepAside aside = new(TimeSpan.FromSeconds(1));
+    private UI.StepAside aside = new(TimeSpan.FromSeconds(1));
+    private int lastConditionFrame=-10;
     private System.Numerics.Vector2? lastPosition;
     private System.Numerics.Vector2 lastSize;
     public override void PreDraw() => owner.PrepareMapView(this);
@@ -29,8 +37,12 @@ internal sealed class MapViewWindow : Window
     public override void Draw()
     {
         // 0.489 (user report): the map is its own window, drawn with neither a page nor a panel: it has its line in Diagnostics.
-        lastPosition = Dalamud.Bindings.ImGui.ImGui.GetWindowPos();
-        lastSize = Dalamud.Bindings.ImGui.ImGui.GetWindowSize();
+        var position = Dalamud.Bindings.ImGui.ImGui.GetWindowPos();
+        var size = Dalamud.Bindings.ImGui.ImGui.GetWindowSize();
+        // 0.617 (user report): « Enlarge », or moving or resizing it by hand: what it now touches was there first and must not make it vanish. Hidden, it could not be moved back.
+        if (lastPosition is { } before && (before != position || lastSize != size)) owner.MapOpened();
+        lastPosition = position;
+        lastSize = size;
         var started = owner.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
         owner.DrawMapViewContents();
         if (started != 0) owner.RecordOverlayDraw("Map", System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);

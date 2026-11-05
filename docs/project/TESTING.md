@@ -876,6 +876,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.616) Avec une seule plante notée : un entretien met à jour sa date, une plante arrachée la retire du journal. Avec plusieurs : une ligne de chat, rien ne change.
 
+- [ ] (0.617) Cliquer sur « Agrandir » avec une fenêtre du jeu ouverte : la carte reste visible. Ouvrir ensuite une autre fenêtre par-dessus : elle s'efface, puis revient.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
