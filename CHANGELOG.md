@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.614.0
+- Plan global, DEC-038 : Triple Triade : dans le hall de la Battlehall (579), l'aide de match revient contre un PNJ identifié, comme ailleurs. Contre un joueur, aucun PNJ n'est identifié : pas d'aide. Les tournois (940, 941) restent sans aide.
+- Tests : Triad advisor. Verify.ps1 (agent) : 1120/1120, 0 avertissement, 0 erreur ; DLL 0.614.0.0. Non validé en jeu.
+### English
+- Triple Triad: in the Battlehall's hall (579), match help is back against an identified NPC, as elsewhere. Against a player no NPC is identified: no help. Tournaments (940, 941) stay without help.
+
 ## 0.613.0
 - Plan global, DEC-038 : Coupure compétitive, Battlehall : le journal montre que le hall public est lui aussi lié à un contenu (BoundByDuty vrai), donc seul IsInPvPInstance reste utilisé. Hall : plus de coupure, constaté. Vrai dans un match de l'arène : à confirmer.
 - Tests : Competitive (0.612). Verify.ps1 (agent) : 1120/1120, 0 avertissement, 0 erreur ; DLL 0.613.0.0. Non validé en jeu.

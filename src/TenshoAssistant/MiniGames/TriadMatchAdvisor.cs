@@ -15,8 +15,11 @@ public sealed record TriadAdvice(IReadOnlyList<TriadAdviceMove> Best, IReadOnlyL
 /// </summary>
 public static class TriadMatchAdvisor
 {
-    /// <summary>The competitive Triple Triad places (docs/evidence/0.510-triad-competitive.md): the Battlehall, the Open Tournament, the Invitational Parlor.</summary>
-    public static bool Competitive(uint territory) => territory is 579 or 940 or 941;
+    /// <summary>
+    /// The competitive Triple Triad places (docs/evidence/0.510-triad-competitive.md): the Open Tournament, the Invitational Parlor. 0.614 (user report, in game):
+    /// not the Battlehall (579), a hall with duels against NPCs: there, as everywhere, a match without an identified NPC gets no help.
+    /// </summary>
+    public static bool Competitive(uint territory) => territory is 940 or 941;
 
     private const uint SyntheticBase = 1_000_000;
     // TripleTriadRule rows (docs/evidence/0.159.0-triad-npc-probe.log) the solver plays; the others change visibility, the deck or a
