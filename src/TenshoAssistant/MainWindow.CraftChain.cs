@@ -14,6 +14,16 @@ internal sealed partial class MainWindow
     private readonly CraftChainSession craftChain = new();
     private readonly Dictionary<uint, uint> craftChainChoices = [];
     private int craftChainChoiceRevision;
+    // 0.591 (C18): the recipes ticked as done, for this calculation only: a new one starts from the stocks as they are.
+    private readonly HashSet<uint> craftChainDone = [];
+    private (CraftChainResult Source,IReadOnlyList<CraftChainStep> Steps)? craftChainMerged;
+    private IReadOnlyList<CraftChainStep> MergedChainSteps(CraftChainResult result)
+    {
+        if (craftChainMerged is { } known && ReferenceEquals(known.Source, result)) return known.Steps;
+        var steps = CraftChain.Merged(result.Steps);
+        craftChainMerged = (result, steps);
+        return steps;
+    }
 
     private void DrawCraftChain(RecipeDefinition recipe)
     {
@@ -24,6 +34,7 @@ internal sealed partial class MainWindow
         if (ImGui.Button(localization.Get("ChainUi.Calculate")))
         {
             if(preparationPrices.State.Context?.IsChain==true) preparationPrices.Cancel();
+            craftChainDone.Clear();
             _ = craftChain.StartAsync(new(character, recipe.ResultItemId, recipe, craftPlanTarget, catalog, inventory.Current, bank.State,
                 craftChainChoices, craftChainChoiceRevision, id => ClassifyCrystal(id) is not null));
         }
@@ -48,14 +59,30 @@ internal sealed partial class MainWindow
         if (result.HasCached) ImGui.TextDisabled(localization.Get("ChainUi.Imported"));
         if (result.HasUnresolved) ImGui.TextColored(Accent, localization.Get("ChainUi.Partial"));
         ImGui.TextWrapped(localization.Get("ChainUi.Help"));
-        if (TenshoAssistant.UI.UiComponents.Header(localization.Format("ChainUi.Steps",result.Steps.Count)+"##ChainSteps"))
+        var merged = MergedChainSteps(result);
+        var doneCount = merged.Count(step => craftChainDone.Contains(step.Recipe.RecipeId));
+        if (TenshoAssistant.UI.UiComponents.Header(localization.Format("ChainUi.Steps",merged.Count)+(doneCount>0 ? " · "+localization.Format("ChainUi.StepsDone",doneCount,merged.Count):"")+"###ChainSteps"))
         {
-            DrawChainList("ChainStepsList", result.Steps.Count, index =>
+            DrawChainList("ChainStepsList", merged.Count, index =>
             {
-                var step = result.Steps[index];
-                ImGui.PushID($"ChainStep{index}");
+                var step = merged[index];
+                ImGui.PushID($"ChainStep{step.Recipe.RecipeId}");
                 try
                 {
+                    var done = craftChainDone.Contains(step.Recipe.RecipeId);
+                    if (ImGui.Checkbox("###ChainStepDone", ref done))
+                    {
+                        if (done) craftChainDone.Add(step.Recipe.RecipeId);
+                        else craftChainDone.Remove(step.Recipe.RecipeId);
+                    }
+                    Tip("ChainUi.DoneTip");
+                    ImGui.SameLine();
+                    if (ImGui.SmallButton(localization.Get("ChainUi.Log"))) OpenCraftLog(step.Recipe);
+                    if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("ChainUi.LogTip"));
+                    ImGui.SameLine();
+                    if (ImGui.SmallButton(localization.Get("ChainUi.Simulate"))) OpenCraftSimulation(step.Recipe);
+                    if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("ChainUi.SimulateTip"));
+                    ImGui.SameLine();
                     DrawChainItem(step.Recipe.ResultItemId);
                     ImGui.SameLine();
                     ImGui.TextDisabled(localization.Format("ChainUi.Step",step.Crafts.ToString("N0"),step.Produced.ToString("N0"),step.Recipe.CraftType,step.Recipe.Level));
@@ -125,7 +152,7 @@ internal sealed partial class MainWindow
             if (stale || result.HasUnknown || result.HasCached) text.AppendLine(localization.Get("ChainUi.StockWarning"));
             if (state.Input.ChoiceRevision != craftChainChoiceRevision) text.AppendLine(localization.Get("ChainUi.ChoicesWarning"));
             if (result.HasUnresolved) text.AppendLine(localization.Get("ChainUi.PartialWarning"));
-            foreach (var step in result.Steps) text.AppendLine(localization.Format("ChainUi.CopyStep",step.Crafts,Name(step.Recipe.ResultItemId),step.Produced,step.Recipe.CraftType));
+            foreach (var step in merged) text.AppendLine(localization.Format("ChainUi.CopyStep",step.Crafts,Name(step.Recipe.ResultItemId),step.Produced,step.Recipe.CraftType));
             text.AppendLine(localization.Get("ChainUi.Missing"));
             foreach (var material in result.Materials) text.AppendLine($"{Name(material.ItemId)} × {material.Amount} — {ChainReason(material.Reason)}");
             ImGui.SetClipboardText(text.ToString());

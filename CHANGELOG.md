@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.591.0
+- Plan global, C18 : Dans la chaîne de fabrication, une recette rencontrée plusieurs fois n'a plus qu'une ligne avec son total, chaque ligne venant après les recettes de ses ingrédients ; chaque ligne a ses boutons Carnet et Simuler et une case « fait », gardée jusqu'au prochain calcul.
+- Tests : Chain. Verify.ps1 (agent) : 1064/1064, 0 avertissement, 0 erreur ; DLL 0.591.0.0. Non validé en jeu.
+### English
+- In the crafting chain, a recipe met several times is now one row with its total, each row after the recipes of its ingredients; each row has Log and Simulate buttons and a done box, kept until the next calculation.
+
 ## 0.590.0
 - Plan global, C16 : La page des séquences enregistrées se cherche par nom, objet ou métier et se trie ; une séquence se renomme, se duplique et se copie en texte. L'import d'une macro collée existait déjà dans le simulateur (0.425) et relit ce texte.
 - Tests : Sequences. Verify.ps1 (agent) : 1060/1060, 0 avertissement, 0 erreur ; DLL 0.590.0.0. Non validé en jeu.

@@ -4003,6 +4003,12 @@
     "ActiveEffectTip": "Tick if this effect is already active: it is not offered again and its past cost is not counted."
   },
   "ChainUi": {
+    "StepsDone": "{0}/{1} done",
+    "DoneTip": "Tick what you have crafted, to keep your place. Kept until the next calculation; nothing else changes.",
+    "Log": "Log",
+    "LogTip": "Opens the game's crafting log on this recipe.",
+    "Simulate": "Simulate",
+    "SimulateTip": "Opens this recipe in the simulator.",
     "Route": "Gathering list by zone ({0})",
     "RouteHelp": "The chain’s raw materials grouped by zone: first the zone that gathers the most of them, then the next ones. In each zone, the point with no time restriction first. Weather, unlocks and level are not checked.",
     "RouteZone": "{0} · {1} material(s)",

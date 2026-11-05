@@ -4003,6 +4003,12 @@
     "ActiveEffectTip": "Cochez si cet effet est déjà actif : il n'est pas proposé une seconde fois et son coût passé n'est pas compté."
   },
   "ChainUi": {
+    "StepsDone": "{0}/{1} faites",
+    "DoneTip": "Cochez ce que vous avez fabriqué, pour garder votre place. Gardé jusqu'au prochain calcul ; rien d'autre ne change.",
+    "Log": "Carnet",
+    "LogTip": "Ouvre le carnet d'artisanat du jeu sur cette recette.",
+    "Simulate": "Simuler",
+    "SimulateTip": "Ouvre cette recette dans le simulateur.",
     "Route": "Liste de récolte par zone ({0})",
     "RouteHelp": "Les matières brutes de la chaîne, regroupées par zone : d’abord la zone qui en récolte le plus, puis les suivantes. Dans chaque zone, le point sans restriction d’horaire d’abord. Météo, déblocages et niveau ne sont pas vérifiés.",
     "RouteZone": "{0} · {1} matière(s)",

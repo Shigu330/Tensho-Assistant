@@ -824,6 +824,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.590) Page des séquences : chercher un mot, changer l'ordre, renommer, dupliquer, copier en texte puis coller dans « Importer une macro » du simulateur.
 
+- [ ] (0.591) Préparation d'un objet à sous-recettes : calculer la chaîne, vérifier une ligne par recette et l'ordre, ouvrir le carnet et le simulateur depuis une ligne, cocher une étape.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

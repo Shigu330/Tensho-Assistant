@@ -153,6 +153,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C18 — K15 — Chaîne de fabrication : boutons par étape, étapes identiques regroupées, cases « fait »
 
+- **État (relu le 2026-11-05)** : FAIT 0.591.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.CraftChain.cs`.
 - **Ce que le joueur obtient** : Chaque étape de la chaîne a ses boutons « Carnet » (ouvre le carnet du jeu sur la recette) et « Simuler » ; les étapes répétées d'une même recette sont montrées regroupées (×N au total) ; vous cochez les étapes faites au fil de la session.
 - **Comment, taille, dépendances** : Regroupement à l'affichage seulement (somme par RecipeId, ordre de la première apparition), le calcul ne change pas. Boutons réutilisant OpenCraftLog (sur clic). Cases gardées pour la session (ou dans la configuration, à choisir). Taille S-M. Dépendances : A-05 (listes multi-objets) reprendra la vue. Sonde : aucune. Décision : cases gardées entre les sessions ou non (recommandé : session seulement).

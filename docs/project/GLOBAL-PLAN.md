@@ -100,7 +100,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 | C5 | ~~Suivre sa séquence pendant la synthèse : action suivante et écart avec le plan~~ fait en 0.589 | M | Information seulement, aucune action jouée. |
 | C7 | ~~R-13, partie anticipée : points à horaire ouverts maintenant ou bientôt~~ fait en 0.588 | S-M |  |
 | C16 | ~~Bibliothèque des séquences : recherche, renommer, dupliquer, copier et coller en texte (A-08, partie texte)~~ fait en 0.590 | S-M |  |
-| C18 | Chaîne de fabrication : boutons par étape, étapes identiques regroupées, cases « fait » | S-M |  |
+| C18 | ~~Chaîne de fabrication : boutons par étape, étapes identiques regroupées, cases « fait »~~ fait en 0.591 | S-M |  |
 | C21 | « Que puis-je fabriquer ? » avec mes stocks | M |  |
 | T0 | ~~Alarmes en heure réelle : à la main, chaque jour, chaque semaine ou à chaque remise à zéro (X-10, partie anticipée)~~ fait en 0.577 | S-M |  |
 | T10 | Accueil : bloc « Aujourd'hui » et tuiles au choix | M |  |
