@@ -11,6 +11,20 @@ public sealed record FashionCheckFrame(IReadOnlyList<string> Categories, float X
 /// <summary>Screen rectangle of one slot row of the game window (0.219), where Tensho puts its button.</summary>
 public readonly record struct FashionSlotRect(float X, float Y, float Width, float Height);
 
+/// <summary>0.581 (T15): the pieces chosen this week, by slot; another week's choice is dropped.</summary>
+public sealed class FashionOutfit
+{
+    public DateTimeOffset WeekStart { get; set; }
+    public Dictionary<int,uint> Slots { get; set; } = [];
+    public static Dictionary<int,uint> Current(FashionOutfit? outfit,DateTimeOffset weekStart)=>outfit is not null && outfit.WeekStart==weekStart ? outfit.Slots:[];
+    public static FashionOutfit Toggle(FashionOutfit? outfit,DateTimeOffset weekStart,int slot,uint item)
+    {
+        var slots=new Dictionary<int,uint>(Current(outfit,weekStart));
+        if(slots.TryGetValue(slot,out var known) && known==item)slots.Remove(slot);else slots[slot]=item;
+        return new(){WeekStart=weekStart,Slots=slots};
+    }
+}
+
 public sealed class FashionOptions
 {
     public bool OwnedFirst { get; set; } = true;

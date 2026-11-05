@@ -125,6 +125,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T15 — Revue de mode : tenue de la semaine choisie, essayée en un clic, avec l'endroit de chaque pièce
 
+- **État (relu le 2026-11-05)** : FAIT 0.581.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.FashionWeek.cs`.
 - **Ce que le joueur obtient** : Vous choisissez une pièce par emplacement parmi celles proposées pour la semaine. « Essayer la tenue » les met toutes dans la cabine d'essayage, et une liste dit où se trouve chaque pièce (sacs, arsenal, coffre à apparence, armoire, servant), lesquelles manquent et leurs sources.
 - **Comment, taille, dépendances** : Choix par emplacement gardé jusqu'à la remise hebdomadaire (mardi 08:00 UTC, docs/evidence/0.300-calendar-resets.md). Bouton « Essayer la tenue », sur clic seulement. Tableau emplacement → pièce → rangement, recalculé quand le choix ou les stocks changent. Taille M. Dépendances : aucune. Sonde : aucune. Décision : aucune.

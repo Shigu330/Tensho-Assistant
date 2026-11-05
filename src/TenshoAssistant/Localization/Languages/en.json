@@ -945,6 +945,13 @@
     "Kind19": "Auxesia gives"
   },
   "FashionWeek": {
+    "Outfit": "This week's outfit",
+    "OutfitEmpty": "Tick a piece in a slot to build this week's outfit.",
+    "OutfitPickTip": "Takes this piece for this slot in this week's outfit. Next week's reset drops the choice.",
+    "OutfitTry": "Try on the outfit",
+    "OutfitTryTip": "Puts the chosen pieces in the game's Try On window, on your click.",
+    "OutfitMissing": "not owned",
+    "OutfitHeld": "owned",
     "NoCategoryWeek": "No category for this slot this week.",
     "SlotButton": "{0} · {1} — open in the Tensho panel (gear and dyes)",
     "Dyes": "Dyes reported this week ({0})",

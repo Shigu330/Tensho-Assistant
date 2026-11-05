@@ -12,7 +12,7 @@ public static class ConfigurationReset
         "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenBase", "CollectableScrutinyGain", "CollectableIntuitionGain", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
-        "Voyages", "GearPlans", "LastCraftStats", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
+        "Voyages", "GearPlans", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
         // 0.503 (ONBOARD-001): the pages whose first-visit help was read.
@@ -383,6 +383,7 @@ public sealed partial class Configuration
     public bool FishingPanel { get; set; } = true;
     // Fashion Report of the week (0.213): owned first, dim the others, by popularity, panel beside the game window.
     public TenshoAssistant.Fashion.FashionOptions FashionOptions { get; set; } = new();
+    public TenshoAssistant.Fashion.FashionOutfit? FashionOutfit { get; set; }
     public bool ShowHeaderEorzeaTime { get; set; } = true;
     public bool ShowIds { get; set; }
     public bool DeveloperMode { get; set; }

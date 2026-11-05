@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.581.0
+- Plan global, T15 : Revue de mode : une case par pièce compose la tenue de la semaine, gardée jusqu'à la remise. La section dit quelles pièces sont possédées, avec le rangement au survol, et « Essayer la tenue » les met dans la cabine d'essayage, sur clic. Les sources des pièces manquantes restent dans la fiche d'objet.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1043/1043, 0 avertissement, 0 erreur ; DLL 0.581.0.0. Non validé en jeu.
+### English
+- Fashion Report: a box per piece builds the week's outfit. It says which pieces are owned and where, and a button tries them all on.
+
 ## 0.580.0
 - Plan global, T14 : page Équipement : un menu « Plan pour » prépare le plan d'un autre job sans le porter : pièces, matérias, essayage. Ses attributs réels ne sont pas affichés, car ils ne se lisent qu'en le portant, et aucune pièce portée ne lui est prêtée. La somme des pièces n'est pas encore affichée pour ce job.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1042/1042, 0 avertissement, 0 erreur ; DLL 0.580.0.0. Non validé en jeu.

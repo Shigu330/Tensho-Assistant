@@ -51,7 +51,33 @@ internal sealed partial class MainWindow
         if(fashionCheck?.Last is not { } frame){ImGui.TextWrapped(localization.Get("FashionWeek.OpenInGame"));return;}
         ImGui.TextDisabled(localization.Format("FashionWeek.Read",frame.ObservedAt.ToLocalTime().ToString("g")));
         if(frame.ObservedAt<FashionWeek.Bounds(now).Start)ImGui.TextColored(Accent,localization.Get("FashionWeek.OldRead"));
+        DrawFashionOutfit(now);
         DrawFashionSlots(frame,false);
+    }
+
+    // 0.581 (T15): the outfit chosen this week: where each piece is, what is missing, and all of it tried on with one click.
+    private void DrawFashionOutfit(DateTimeOffset now)
+    {
+        var slots=TenshoAssistant.Fashion.FashionOutfit.Current(configuration.FashionOutfit,FashionWeek.Bounds(now).Start);
+        if(slots.Count==0){ImGui.TextDisabled(localization.Get("FashionWeek.OutfitEmpty"));return;}
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("FashionWeek.Outfit")+"###FashionOutfit",ImGuiTreeNodeFlags.DefaultOpen))return;
+        ImGui.BeginDisabled(TryOnItem is null);
+        try{if(ImGui.Button(localization.Get("FashionWeek.OutfitTry")))foreach(var id in slots.Values)TryOnItem?.Invoke(id);}
+        finally{ImGui.EndDisabled();}
+        Tip("FashionWeek.OutfitTryTip");
+        foreach(var (slot,id) in slots.OrderBy(pair=>pair.Key))
+        {
+            var stock=GetRecipeHoldings(id);
+            ImGui.TextDisabled(localization.Get("FashionWeek.Slot"+slot));ImGui.SameLine();
+            ImGui.TextUnformatted(itemCatalog.State.Catalog?.Find(id)?.Name ?? id.ToString());ImGui.SameLine();
+            if(!stock.HasObservation)ImGui.TextDisabled("?");
+            else if(stock.Total==0)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("FashionWeek.OutfitMissing"));
+            else
+            {
+                ImGui.TextColored(Success,localization.Get("FashionWeek.OutfitHeld"));
+                if(ImGui.IsItemHovered())DrawStorageDetail(stock);
+            }
+        }
     }
 
     private void DrawFashionOptions()
@@ -115,12 +141,12 @@ internal sealed partial class MainWindow
     {
         var category=slot<frame.Categories.Count ? frame.Categories[slot]:"";
         var hint=FashionHintIdOf(category);
-        if(category.Length>0)DrawFashionSlotItems(FashionSlotCandidates(hint,FashionWeek.Slots[slot]),compact,hint);
+        if(category.Length>0)DrawFashionSlotItems(FashionSlotCandidates(hint,FashionWeek.Slots[slot]),compact,hint,slot);
         else ImGui.TextDisabled(localization.Get("FashionWeek.NoCategoryWeek"));
         if(slot<6)DrawFashionDyes(slot);
     }
 
-    private void DrawFashionSlotItems(IReadOnlyList<FashionCandidate> candidates,bool compact,uint hint)
+    private void DrawFashionSlotItems(IReadOnlyList<FashionCandidate> candidates,bool compact,uint hint,int slot)
     {
         if(hint==0){ImGui.TextDisabled(localization.Get("FashionWeek.UnknownCategory"));return;}
         if(candidates.Count==0){ImGui.TextDisabled(localization.Get("FashionWeek.NoData"));return;}
@@ -145,6 +171,16 @@ internal sealed partial class MainWindow
                 // Report count kept short at the end of the row; the full wording is in the tooltip of the count.
                 ImGui.SameLine();ImGui.TextDisabled($"×{entry.Match.Reports:N0}");
                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FashionWeek.Reports",entry.Match.Reports.ToString("N0")));
+                // 0.581 (T15): this piece for the week's outfit.
+                var weekStart=FashionWeek.Bounds(DateTimeOffset.UtcNow).Start;
+                var inOutfit=TenshoAssistant.Fashion.FashionOutfit.Current(configuration.FashionOutfit,weekStart).GetValueOrDefault(slot)==id;
+                ImGui.SameLine();
+                if(ImGui.Checkbox($"##FashionOutfit{slot}/{id}",ref inOutfit))
+                {
+                    configuration.FashionOutfit=TenshoAssistant.Fashion.FashionOutfit.Toggle(configuration.FashionOutfit,weekStart,slot,id);
+                    try{save();}catch(Exception error){log.Warning(error,"Could not save the outfit.");}
+                }
+                Tip("FashionWeek.OutfitPickTip");
                 if(clicked && item is not null){SelectItem(id);if(compact){page=Page.Fashion;IsOpen=true;}}
             }
             finally{if(dim)ImGui.PopStyleVar();}

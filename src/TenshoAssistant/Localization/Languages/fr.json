@@ -945,6 +945,13 @@
     "Kind19": "Auxesia donne"
   },
   "FashionWeek": {
+    "Outfit": "Tenue de la semaine",
+    "OutfitEmpty": "Cochez une pièce dans un emplacement pour composer la tenue de la semaine.",
+    "OutfitPickTip": "Prend cette pièce pour cet emplacement dans la tenue de la semaine. La remise de la semaine suivante efface le choix.",
+    "OutfitTry": "Essayer la tenue",
+    "OutfitTryTip": "Met les pièces choisies dans la cabine d'essayage du jeu, sur votre clic.",
+    "OutfitMissing": "non possédée",
+    "OutfitHeld": "possédée",
     "NoCategoryWeek": "Aucune catégorie pour cet emplacement cette semaine.",
     "SlotButton": "{0} · {1} — ouvrir dans le panneau Tensho (pièces et teintures)",
     "Dyes": "Teintures signalées cette semaine ({0})",

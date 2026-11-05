@@ -156,7 +156,7 @@ internal static class Interfaces535Tests
         {
             var view=Read("MainWindow.Weather.cs");
             Check(view.Contains("period!=weatherFavoritesPeriod || weatherFavoritesGrid.Count!=favorites.Count") && view.Contains("WeatherFavoritePeriods=6,WeatherFavoriteZones=12"),"bounded, once per period");
-            Check(Read("Configuration.cs").Contains("\"LastCraftStats\", \"WeatherFavorites\","),"the player's data");
+            Check(Read("Configuration.cs").Contains("\"WeatherFavorites\","),"the player's data");
         }),
         ("0.565: the sort preview frames what would move; an unread place says nothing",() =>
         {
@@ -270,6 +270,18 @@ internal static class Interfaces535Tests
             Check(gear.Contains("Where(piece=>!otherJob && catalog.Find(piece.ItemId) is not null)"),"no worn piece");
             Check(gear.Contains("Values=new Dictionary<string,int>(),Category=0,Role=0,Modifiers=default"),"no read value");
             Check(gear.Contains("levels?.TryGetValue(gearJob,out var known)==true"),"a job whose level is known");
+        }),
+        ("0.581: the week's outfit keeps one piece per slot, and another week's choice is dropped",() =>
+        {
+            var week=new DateTimeOffset(2026,11,3,8,0,0,TimeSpan.Zero);
+            var outfit=TenshoAssistant.Fashion.FashionOutfit.Toggle(null,week,1,10);
+            Check(TenshoAssistant.Fashion.FashionOutfit.Current(outfit,week)[1]==10,"chosen");
+            outfit=TenshoAssistant.Fashion.FashionOutfit.Toggle(outfit,week,1,11);
+            Check(TenshoAssistant.Fashion.FashionOutfit.Current(outfit,week)[1]==11 && outfit.Slots.Count==1,"one per slot");
+            outfit=TenshoAssistant.Fashion.FashionOutfit.Toggle(outfit,week,1,11);
+            Check(outfit.Slots.Count==0,"unticked");
+            outfit=TenshoAssistant.Fashion.FashionOutfit.Toggle(outfit,week,2,12);
+            Check(TenshoAssistant.Fashion.FashionOutfit.Current(outfit,week.AddDays(7)).Count==0,"another week");
         }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
