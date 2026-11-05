@@ -156,6 +156,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I19 — Nom anglais de l'objet dans la fiche et l'infobulle
 
+- **État (relu le 2026-11-05)** : FAIT 0.562.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.ItemSheet.cs`.
 - **Ce que le joueur obtient** : En option, le nom anglais de l'objet s'affiche sous son nom, utile avec les guides et les wikis en anglais.
 - **Comment, taille, dépendances** : Case « Nom anglais », désactivée par défaut, avec infobulle et ↺. Affiché seulement si le client n'est pas en anglais et si le nom diffère. Taille S. Sonde : aucune. Décision : l'ajouter (nouveau).

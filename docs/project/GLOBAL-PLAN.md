@@ -56,7 +56,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | I15 | Partager un modèle de tri en texte (copier / coller) | S |  |
 | I16 | ~~Commandes « /tensho objet » et « /tensho prix »~~ fait en 0.555 | S |  |
 | I18 | I-07, partie anticipée : copier « prix le plus bas − 1 » depuis la page Marché | S |  |
-| I19 | Nom anglais de l'objet dans la fiche et l'infobulle | S |  |
+| I19 | ~~Nom anglais de l'objet dans la fiche et l'infobulle~~ fait en 0.562 | S |  |
 | I20 | Aperçu du tri : cases déplacées signalées | S |  |
 | I22 | Calculs faits à chaque image (reportés à e) : coût de préparation et historique du marché | S |  |
 | C0 | A-01, partie anticipée : choisir la qualité visée dans le panneau du carnet | S |  |

@@ -1939,6 +1939,8 @@
     "CraftLog": "Show macro helper beside the crafting log",
     "CraftLogHelp": "Saved preference. Follows the log recipe and proposes a macro using the equipped job attributes. Bounded background calculation; no action is executed.",
     "CraftLogAutoSolve": "Compute automatically when a recipe is selected",
+    "ShowEnglishItemName": "Show items' English names",
+    "ShowEnglishItemNameTip": "Writes an item's English name under its own, in its sheet and its tooltip, when they differ. Useful for guides and for talking with other players.\nDefault: off.",
     "CraftLogTryAllPresets": "Try the sequences of other recipes",
     "CraftLogTryAllPresetsTip": "Ticked: the crafting log panel also tries the sequences you saved for other recipes, and shows the best one that finishes. One macro often fits a whole series of recipes.\nDefault: on.",
     "CraftLogAutoSolveTip": "Ticked: the suggested macro is computed as soon as a recipe is selected in the crafting log (bounded background calculation, result kept in the cache). Unticked: on request; the panel waits for your click on « Compute the suggested macro », and the « Simulate this recipe » button of an item sheet also asks for it. The last recipe asked for is computed again by itself when you come back to it.\nDefault: on.",

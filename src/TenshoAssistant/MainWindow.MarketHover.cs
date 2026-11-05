@@ -297,6 +297,10 @@ internal sealed partial class MainWindow
     }
 
     // Item tooltip for the tool lists (NPC vendors…): icon, name, category and levels, collection state, stock and uses.
+    private void DrawEnglishItemName(Items.ItemDefinition? item)
+    {
+        if(configuration.ShowEnglishItemName && item is {EnglishName.Length:>0} && !string.Equals(item.EnglishName,item.Name,StringComparison.Ordinal))ImGui.TextDisabled(item.EnglishName);
+    }
     private void DrawItemInfoTooltip(uint id)
     {
         if(ItemTooltipAlreadyDrawn(id))return;
@@ -304,6 +308,7 @@ internal sealed partial class MainWindow
         ImGui.BeginTooltip();
         try
         {
+            DrawEnglishItemName(item);
             ImGui.PushTextWrapPos(ImGui.GetFontSize()*24);
             DrawItemImage(item,new Vector2(32));ImGui.SameLine();
             ImGui.BeginGroup();

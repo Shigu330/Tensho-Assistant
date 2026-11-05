@@ -146,6 +146,12 @@ internal static class Interfaces535Tests
             foreach(var entry in new[]{"ItemMenu.CopyName","ItemMenu.LinkChat","ItemMenu.OpenOn","ExternalLinks.Universalis(item.Id)","ExternalLinks.Garland(item.Id)","ExternalLinks.Teamcraft("})Check(menu.Contains(entry),entry);
             Check(Read("Plugin.cs").Contains("chatGui.Print(new Dalamud.Game.Text.SeStringHandling.SeStringBuilder().AddItemLink(id,false).BuiltString)"),"printed locally, nothing sent");
         }),
+        ("0.562: an item's English name is shown only on the setting, and only when it differs",() =>
+        {
+            Check(!new TenshoAssistant.Configuration().ShowEnglishItemName,"off by default");
+            Check(Read("MainWindow.MarketHover.cs").Contains("configuration.ShowEnglishItemName && item is {EnglishName.Length:>0} && !string.Equals(item.EnglishName,item.Name"),"rule");
+            Check(Read("MainWindow.ItemSheet.cs").Contains("DrawEnglishItemName(item);"),"sheet");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

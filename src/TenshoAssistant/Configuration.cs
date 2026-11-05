@@ -47,7 +47,7 @@ public static class ConfigurationReset
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
         "HoverShowCompare",
-        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "HidePanelsBehindGame", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip",
+        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "HidePanelsBehindGame", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
         "CurrencyAlerts", "CurrencyServerBar", "CurrencyThresholds",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
@@ -446,6 +446,8 @@ public sealed partial class Configuration
     // 0.327 (audit 2026-11-02, queue step e): the crafting log panel computes as soon as a recipe is selected (default, as before) or only
     // on request (its « Compute » button, « Recalculate » or the plan's « Simulate this recipe »). Read in Draw only.
     public bool CraftLogAutoSolve { get; set; } = true;
+    // 0.562 (I19): an item's English name under its own, in the sheet and the tooltip; off by default.
+    public bool ShowEnglishItemName { get; set; }
     // 0.554 (C3): per character and job, the attributes last read; the player's data, kept by « reset all ».
     public Dictionary<ulong,Dictionary<uint,TenshoAssistant.Craft.CraftJobStats>>? LastCraftStats { get; set; }
     // 0.552 (C2): the crafting log panel also tries the sequences saved for other recipes.
