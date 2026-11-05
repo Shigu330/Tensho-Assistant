@@ -245,6 +245,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C31 — G12 — Météo de plusieurs zones en un tableau (zones favorites)
 
+- **État (relu le 2026-11-05)** : FAIT 0.563.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Weather.cs`.
 - **Ce que le joueur obtient** : La page Météo montre la météo actuelle et les prochaines de vos zones favorites, ou de toutes les zones d'une extension, sur une seule grille. Utile pour enchaîner poissons et points selon la météo.
 - **Comment, taille, dépendances** : Liste de zones favorites dans la configuration (données de l'utilisateur), grille recalculée une fois par période de 1 400 s ; clic sur une zone = vue actuelle. Taille S. Dépendances : aucune. Sonde : aucune. Décision : nombre de périodes (recommandé : 6).

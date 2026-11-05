@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.563.0
+- Plan global, C31 : page Météo : un tableau de vos zones, 12 au plus, sur les 6 prochaines périodes. Calculé une fois par période. Un clic sur une zone l'affiche.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1027/1027, 0 avertissement, 0 erreur ; DLL 0.563.0.0. Non validé en jeu.
+### English
+- The weather page has a table of your zones, up to 12, over the next 6 periods.
+
 ## 0.562.0
 - Plan global, I19 : réglage, désactivé par défaut : le nom anglais d'un objet sous le sien, dans sa fiche et son infobulle, quand ils diffèrent.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1026/1026, 0 avertissement, 0 erreur ; DLL 0.562.0.0. Non validé en jeu.

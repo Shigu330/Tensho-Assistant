@@ -16,6 +16,59 @@ internal sealed partial class MainWindow
     private IReadOnlyList<WeatherPeriod> weatherForecast=[];
     private string weatherZoneQuery="";private uint weatherSearchId;private IReadOnlyList<WeatherPeriod> weatherSearchResult=[];private (uint,uint,long) weatherSearchKey;
     private void OpenWeather(uint territory,string zone){weatherTerritory=territory;weatherZone=zone;weatherPeriod=-1;weatherSearchId=0;page=Page.Weather;}
+    // 0.563 (C31): several zones in one table, computed once per period (1 400 s), not at each frame.
+    private const int WeatherFavoritePeriods=6,WeatherFavoriteZones=12;
+    private long weatherFavoritesPeriod=-1;private readonly Dictionary<uint,IReadOnlyList<WeatherPeriod>> weatherFavoritesGrid=[];
+    private void DrawWeatherFavorites(WeatherCatalog catalog)
+    {
+        var favorites=configuration.WeatherFavorites;
+        if(weatherTerritory!=0)
+        {
+            var kept=favorites?.ContainsKey(weatherTerritory)==true;
+            if(kept || (favorites?.Count ?? 0)<WeatherFavoriteZones)
+            {
+                if(ImGui.SmallButton(localization.Get(kept ? "Weather.FavoriteRemove":"Weather.FavoriteAdd")+"##WeatherFavorite"))
+                {
+                    favorites=configuration.WeatherFavorites??=[];
+                    if(kept)favorites.Remove(weatherTerritory);else favorites[weatherTerritory]=weatherZone;
+                    weatherFavoritesPeriod=-1;
+                    try{save();}catch(Exception error){log.Warning(error,"Could not save the weather zones.");}
+                }
+                Tip("Weather.FavoriteTip");
+            }
+        }
+        if(favorites is not { Count:>0 })return;
+        var now=DateTimeOffset.UtcNow;var period=now.ToUnixTimeSeconds()/1400;
+        if(period!=weatherFavoritesPeriod || weatherFavoritesGrid.Count!=favorites.Count)
+        {
+            weatherFavoritesGrid.Clear();
+            foreach(var territory in favorites.Keys)weatherFavoritesGrid[territory]=catalog.Forecast(territory,now,WeatherFavoritePeriods);
+            weatherFavoritesPeriod=period;
+        }
+        if(!ImGui.BeginTable("WeatherFavorites",WeatherFavoritePeriods+1,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp))return;
+        try
+        {
+            ImGui.TableSetupColumn(localization.Get("Weather.Zone"));
+            var first=weatherFavoritesGrid.Values.FirstOrDefault();
+            for(var column=0;column<WeatherFavoritePeriods;column++)
+                ImGui.TableSetupColumn(first is not null && column<first.Count ? first[column].StartsAt.ToLocalTime().ToString("t"):"");
+            ImGui.TableHeadersRow();
+            foreach(var (territory,name) in favorites.OrderBy(pair=>pair.Value,StringComparer.CurrentCultureIgnoreCase))
+            {
+                ImGui.TableNextRow();ImGui.TableNextColumn();
+                if(ImGui.Selectable(name+$"##WeatherFavorite{territory}",territory==weatherTerritory))OpenWeather(territory,name);
+                if(!weatherFavoritesGrid.TryGetValue(territory,out var row))continue;
+                foreach(var entry in row.Take(WeatherFavoritePeriods))
+                {
+                    ImGui.TableNextColumn();
+                    if(entry.Weather is not { } value){ImGui.TextDisabled("?");continue;}
+                    DrawItemIcon(new ItemDefinition(0,value.Name,false,value.Icon),new Vector2(24));
+                    if(ImGui.IsItemHovered())WrappedTooltip($"{value.Name}\n{entry.StartsAt.ToLocalTime():g} · {entry.EtHour:00}–{(entry.EtHour+8)%24:00} ET");
+                }
+            }
+        }
+        finally{ImGui.EndTable();}
+    }
     private void DrawWeather()
     {
         Heading(localization.Get("Weather.Title"),weatherZone);
@@ -30,6 +83,7 @@ internal sealed partial class MainWindow
             return;
         }
         DrawWeatherZonePicker(catalog);
+        DrawWeatherFavorites(catalog);
         if(weatherTerritory==0){ImGui.TextWrapped(localization.Get("Weather.ChooseZone"));DrawAlarmsLink();return;}
         ImGui.TextWrapped(localization.Get("Weather.Help"));
         var now=DateTimeOffset.UtcNow;var period=now.ToUnixTimeSeconds()/1400;

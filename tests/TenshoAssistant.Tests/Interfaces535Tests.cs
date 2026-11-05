@@ -152,6 +152,12 @@ internal static class Interfaces535Tests
             Check(Read("MainWindow.MarketHover.cs").Contains("configuration.ShowEnglishItemName && item is {EnglishName.Length:>0} && !string.Equals(item.EnglishName,item.Name"),"rule");
             Check(Read("MainWindow.ItemSheet.cs").Contains("DrawEnglishItemName(item);"),"sheet");
         }),
+        ("0.563: the weather table of several zones is computed once per period, and kept by reset all",() =>
+        {
+            var view=Read("MainWindow.Weather.cs");
+            Check(view.Contains("period!=weatherFavoritesPeriod || weatherFavoritesGrid.Count!=favorites.Count") && view.Contains("WeatherFavoritePeriods=6,WeatherFavoriteZones=12"),"bounded, once per period");
+            Check(Read("Configuration.cs").Contains("\"LastCraftStats\", \"WeatherFavorites\","),"the player's data");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

@@ -12,7 +12,7 @@ public static class ConfigurationReset
         "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenBase", "CollectableScrutinyGain", "CollectableIntuitionGain", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
-        "Voyages", "GearPlans", "LastCraftStats", "GearMateria", "SubmarineUnlocked", "VesselPlans",
+        "Voyages", "GearPlans", "LastCraftStats", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
         // 0.503 (ONBOARD-001): the pages whose first-visit help was read.
@@ -446,6 +446,8 @@ public sealed partial class Configuration
     // 0.327 (audit 2026-11-02, queue step e): the crafting log panel computes as soon as a recipe is selected (default, as before) or only
     // on request (its « Compute » button, « Recalculate » or the plan's « Simulate this recipe »). Read in Draw only.
     public bool CraftLogAutoSolve { get; set; } = true;
+    // 0.563 (C31): the player's zones of the weather table, by territory, with the name shown when added.
+    public Dictionary<uint,string>? WeatherFavorites { get; set; }
     // 0.562 (I19): an item's English name under its own, in the sheet and the tooltip; off by default.
     public bool ShowEnglishItemName { get; set; }
     // 0.554 (C3): per character and job, the attributes last read; the player's data, kept by « reset all ».

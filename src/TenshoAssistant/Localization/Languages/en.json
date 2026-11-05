@@ -1366,6 +1366,9 @@
     "CountdownOpen": "Time until opening: {0:00}:{1:00}:{2:00}"
   },
   "Weather": {
+    "FavoriteAdd": "Add to my table",
+    "FavoriteRemove": "Remove from my table",
+    "FavoriteTip": "Your table shows the next periods of several zones, up to 12. A click on a zone shows it here.",
     "Zone": "Zone",
     "ChooseZone": "Choose a zone",
     "ZoneSearch": "Search a zone",

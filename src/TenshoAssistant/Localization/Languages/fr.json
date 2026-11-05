@@ -1366,6 +1366,9 @@
     "CountdownOpen": "Temps avant l'ouverture : {0:00}:{1:00}:{2:00}"
   },
   "Weather": {
+    "FavoriteAdd": "Ajouter à mon tableau",
+    "FavoriteRemove": "Retirer de mon tableau",
+    "FavoriteTip": "Votre tableau montre les prochaines périodes de plusieurs zones, 12 au plus. Un clic sur une zone l'affiche ici.",
     "Zone": "Zone",
     "ChooseZone": "Choisir une zone",
     "ZoneSearch": "Rechercher une zone",
