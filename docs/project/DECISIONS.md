@@ -371,6 +371,6 @@ Problem: Revue de toutes les propositions avec l'utilisateur : 100 points gardé
 Evidence: Réponses de l'utilisateur à la revue ; question « Où places-tu la 1.0.0 dans le plan ? », réponse « Après tout le plan ».
 Options: Après la phase 2 (recommandé par l'agent : publication plus tôt, moins de code à examiner) ; après tout le plan.
 Decision: La 1.0.0 et la soumission viennent après tout le plan global, campagne de tests en jeu comprise.
-Reason: Décision de l'utilisateur.
-Consequences: La publication arrive plus tard et la soumission est plus grosse à examiner ; l'équipe Dalamud peut la refuser si elle la juge trop lourde (PUBLISHING, point 6).
+Reason: Décision de l'utilisateur : « Si c'est refuser pour la taille je pourrais rien y faire mais je veux faire un plugin complet ».
+Consequences: La publication arrive plus tard et la soumission est plus grosse à examiner ; l'équipe Dalamud peut la refuser si elle la juge trop lourde (PUBLISHING, point 6). Tout ce qui demande de jouer vient en dernier, un point à la fois.
 References: docs/project/GLOBAL-PLAN.md

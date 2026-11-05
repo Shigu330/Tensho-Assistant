@@ -1,35 +1,42 @@
 # Plan global
 
-Plan du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisateur ; détail de chaque point : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md). **Rien n'est lancé sans son feu vert.** L'ordre des phases et des points est une proposition de l'agent.
+Plan du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisateur et réorganisé à sa demande ; détail de chaque point : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md). **Rien n'est lancé sans son feu vert.** L'ordre des phases et des points est une proposition de l'agent.
 
-**La 1.0.0 vient après tout le plan** (décision de l'utilisateur, 2026-11-05, [DEC-037](DECISIONS.md)) : les 100 points cochés, puis la campagne de tests en jeu, puis la soumission. L'agent recommandait de la placer après la phase 2, car une soumission plus grosse est plus lourde à examiner et peut être refusée ([PUBLISHING](PUBLISHING.md), point 6) ; l'utilisateur a choisi en connaissance de cause.
+**La 1.0.0 vient après tout le plan** (décision de l'utilisateur, [DEC-037](DECISIONS.md)) : il veut un plugin complet, et accepte qu'une soumission jugée trop grosse puisse être refusée ([PUBLISHING](PUBLISHING.md), point 6).
 
-| Phase | Contenu | Points | Il faut en jeu |
+**Tout ce qui demande de jouer vient en dernier, un point à la fois** (demande de l'utilisateur, 2026-11-05). Les phases 1 à 4 se font sans lui : `Verify.ps1` vert, commit et poussée, sans essai en jeu. Une compilation complète recharge la DLL si le jeu tourne : il n'a rien à faire pour autant.
+
+| Phase | Contenu | Points | Il faut jouer ? |
 |---|---|---:|---|
-| 1 | Corrections, en priorité | 5 | Relevés du jardin et de la régénération de PR |
-| 2 | Demande nouvelle et petites propositions | 44 | Essai à la fin |
-| 3 | Propositions moyennes | 19 | Essai à la fin |
-| 4 | Séances de relevés, puis propositions à sonder | 20 | Les relevés d'abord, avec l'utilisateur |
-| 5 | Gros chantiers | 6 | Sondes, et l'équipe Dalamud pour le Dédale |
-| 6 | Idées gardées | 5 | Une sonde pour les gils des servants |
-| 7 | Tests en jeu de tout ce qui précède | 1 | Campagne guidée, après le code |
-| Après la 1.0.0 | C10 | 1 | |
+| 1 | Corrections sans le jeu | 3 | Non |
+| 2 | Petites propositions | 43 | Non |
+| 3 | Propositions moyennes | 19 | Non |
+| 4 | Idées, sonde web et sources sans le jeu | 6 | Non |
+| 5 | Relevés en jeu, puis le code qui en dépend | 27 | Oui, l'un après l'autre |
+| 6 | Tests en jeu de tout ce qui précède | 1 | Oui, l'un après l'autre |
+| Ensuite | Version 1.0.0 et soumission | | |
+| Après la 1.0.0 | C10, chrono de touche | 1 | |
 
-Règles pour toutes les phases : une version par point, `Verify.ps1` vert, et les tests en jeu après le code (demande de l'utilisateur).
+Total avant la 1.0.0 : 99 points. Le bouton pour afficher ou cacher des icônes sur la carte existe déjà (rapport de l'utilisateur) : la demande est retirée.
 
-## Phase 1 : corrections
+## Déroulement en jeu (phases 5 et 6)
+
+1. L'agent donne **un seul point** : quoi faire dans le jeu, en quelques lignes.
+2. L'utilisateur le fait quand il veut, puis répond ; l'agent lit le journal.
+3. S'il y a du code à écrire ou une erreur, l'agent corrige, puis on refait ce même point.
+4. Seulement alors, le point suivant. Une session peut s'arrêter entre deux points.
+
+## Phase 1 : corrections sans le jeu
 
 | Où | Ce qui manque | Issue |
 |---|---|---|
-| Jardin | Reconnaître les messages d'entretien et de récolte, puis retirer les lignes de journal de capture | #36 |
-| Jardin | Ajouter les Bleuets | #36 |
-| Escouade | Bouton d'alarme pour une mission en cours | #37 |
-| Récolte | Mesurer la régénération de PR pendant la récolte | #37 |
+| Jardin | Ajouter les Bleuets à la liste de graines | #36 |
 | Objets | Blocs d'objets sans prix | #37 |
+| Escouade | Bouton d'alarme pour une mission en cours | #37 |
+
+Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 
 ## Phase 2 : petites propositions
-
-Demande nouvelle de l'utilisateur, en tête : **afficher ou cacher des icônes sur la carte**. À préciser à la relecture : la taille 0 d'une icône la cache déjà, dans les réglages.
 
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
@@ -101,61 +108,90 @@ Demande nouvelle de l'utilisateur, en tête : **afficher ou cacher des icônes s
 | T24 | Discord : un salon par catégorie (plusieurs webhooks) | M |  |
 | T25 | Équipement : plusieurs plans nommés par job | S-M |  |
 
-## Phase 4 : à sonder d'abord
+## Phase 4 : idées, sonde web et sources sans le jeu
 
-Une donnée n'est pas prouvée : le relevé précède le code. C33 et T5 sont ces relevés, regroupés en séances : ils passent en premier.
+| Point | Note |
+|---|---|
+| I4, prix Universalis par lots | Sonde par une requête web, sans le jeu |
+| N-12, conditions des rangs S | Choisir les sources, licence d'abord |
+| Alerte du plafond hebdomadaire des mémoquartz | |
+| « Où est cet objet ? » sur tous les personnages | Gros changement des stocks |
+| Liste des objets annotés, filtre par étiquette | |
+| Écrire le fichier d'un personnage seulement s'il change | Technique |
+
+## Phase 5 : relevés en jeu, puis code
+
+Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activité, pour ne pas changer sans cesse d'endroit dans le jeu.
+
+### Corrections
+
+| Où | Ce qu'il faut relever | Issue |
+|---|---|---|
+| Jardin | Un entretien et une récolte, pour reconnaître leurs messages ; puis retirer les lignes de journal de capture | #36 |
+| Récolte | La régénération de PR pendant une récolte | #37 |
+
+### Récolte et pêche
 
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
 | C33 | Une seule séance de relevés en jeu pour l'artisanat et la récolte, avant de coder | S-M |  |
-| T5 | Une séance de relevés en jeu pour ces outils, avant de coder | S |  |
+| C27 | Classe du point (normal, éphémère, légendaire…) et livre de folklore requis | S |  |
+| C28 | Durée de l'intuition et compte à rebours | S |  |
+| C29 | R-15, partie anticipée : poissons au harpon dans la page Récolte | S-M |  |
+| C30 | Relevé local de vos prises et temps de touche personnels | M |  |
+
+### Artisanat
+
+| N° | Proposition | Taille | Précision |
+|---|---|---|---|
+| C6 | Recettes à niveau ajusté, à qualité imposée et Exploration cosmique | M-L |  |
+| C13 | Chance HQ d'une qualité finale | S |  |
+| C22 | Projets de l'atelier de compagnie libre : matériaux par pièce et par phase | M |  |
+
+### Carte
+
+| N° | Proposition | Taille | Précision |
+|---|---|---|---|
 | P6 | Coordonnées du personnage toujours visibles et distances | S | Coordonnées du drapeau sous son icône de bord de carte, pas dans un coin ; avec réglage. |
 | P7 | Éthérites non harmonisées signalées et coût au survol | S |  |
 | P11 | Parties non découvertes masquées comme sur la carte du jeu | M | Avec réglage. |
 | P17 | Relevé du type de marqueur des mandats et de leurs zones | S |  |
 | P22 | Noms des variantes d'icônes de quête (71141 / 71151) | S |  |
-| I4 | Prix Universalis par lots : une requête pour toute une liste | M | Sonde par une requête web, sans relevé en jeu. |
+
+### Objets
+
+| N° | Proposition | Taille | Précision |
+|---|---|---|---|
 | I10 | Cristaux et gils des servants dans le relevé du servant | M |  |
-| C6 | Recettes à niveau ajusté, à qualité imposée et Exploration cosmique | M-L |  |
-| C13 | Chance HQ d'une qualité finale | S |  |
-| C22 | Projets de l'atelier de compagnie libre : matériaux par pièce et par phase | M |  |
-| C27 | Classe du point (normal, éphémère, légendaire…) et livre de folklore requis | S |  |
-| C28 | Durée de l'intuition et compte à rebours | S |  |
-| C29 | R-15, partie anticipée : poissons au harpon dans la page Récolte | S-M |  |
-| C30 | Relevé local de vos prises et temps de touche personnels | M |  |
+
+### Outils
+
+| N° | Proposition | Taille | Précision |
+|---|---|---|---|
+| T5 | Une séance de relevés en jeu pour ces outils, avant de coder | S |  |
 | T13 | Contenus et quêtes : « Débloqué par » et « Débloque » | M |  |
 | T21 | Personnage : niveaux et expérience de tous les jobs | S |  |
 | T26 | Dirigeables : trajet du dernier voyage reconstitué | S |  |
 | T27 | Actions de compagnie actives : heure de fin et alarme | M |  |
 
-## Phase 5 : gros chantiers
+### Gros chantiers et idée
 
 | Point | D'abord | Précision |
 |---|---|---|
+| Gils des servants dans la vue des personnages | Sonde à la cloche | |
 | I-05, suite des ventes des servants | Essayer la 0.508 | |
 | N-04, loterie immobilière | Sonde : structure du jeu à trouver | |
-| N-07, ressources de l'île | Vérifier l'unité des positions en jeu | |
+| N-07, ressources de l'île | Vérifier l'unité des positions | |
 | N-10, atelier de l'île | Relire la conception, puis sonde | Mis de côté par DEC-033 ; repris à la revue |
-| N-12, conditions des rangs S | Choisir les sources, licence d'abord | |
 | Panneau du Dédale et suite du dresseur | **Règle Dalamud** : résumé, accord de l'utilisateur, puis contact de l'équipe (DEC-032) | Protections demandées par l'utilisateur : bloqué en JcJ, JcE seulement, pas de classé ; informations seulement |
 
-## Phase 6 : idées gardées
-
-| Idée | Note |
-|---|---|
-| Alerte du plafond hebdomadaire des mémoquartz | |
-| « Où est cet objet ? » sur tous les personnages | Gros changement des stocks |
-| Gils des servants dans la vue des personnages | Sonde |
-| Liste des objets annotés, filtre par étiquette | Petite |
-| Écrire le fichier d'un personnage seulement s'il change | Technique |
-
-## Phase 7 : tests en jeu
+## Phase 6 : tests en jeu
 
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
 | P19 | Tests en jeu de la carte encore en attente | S |  |
 
-P19 s'élargit en campagne guidée de fin, sur tout ce qui a été codé, avec les cases ouvertes de [TESTING](TESTING.md).
+P19 s'élargit en campagne guidée de fin : tout ce qui a été codé, avec les cases ouvertes de [TESTING](TESTING.md), selon le déroulement ci-dessus.
 
 ## Écartés à la revue
 
