@@ -43,6 +43,19 @@ internal sealed partial class MainWindow
         if(VoyageReadUnavailable?.Invoke()==true)ImGui.TextColored(Accent,localization.Get("FreeCompany.ReadUnavailable"));
         if(vessels.Count==0){ImGui.TextWrapped(localization.Get("FreeCompany.NoData"));return;}
         var now=DateTimeOffset.UtcNow;
+        // 0.603 (T23): one frame per workshop: several companies are not mixed, each has the date of its own reading.
+        var workshops=FreeCompany.Voyages.Workshops(vessels);
+        for(var workshop=0;workshop<workshops.Count;workshop++)
+        {
+            ImGui.PushID(workshop);
+            try{DrawWorkshop(workshops[workshop],workshop+1,workshops.Count,now);}
+            finally{ImGui.PopID();}
+        }
+    }
+
+    private void DrawWorkshop(IReadOnlyList<VoyageVessel> vessels,int number,int count,DateTimeOffset now)
+    {
+        if(count>1)ImGui.TextColored(Accent,localization.Format("FreeCompany.Workshop",number));
         ImGui.TextDisabled(localization.Format("FreeCompany.ReadAt",vessels.Max(vessel=>vessel.ReadAt).ToLocalTime().ToString("g")));
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FreeCompany.ReadAtTip"));
         foreach(var kind in new[]{VesselKind.Submarine,VesselKind.Airship})

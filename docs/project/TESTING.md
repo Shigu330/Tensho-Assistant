@@ -848,6 +848,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.602) Collections : ouvrir une fois, obtenir une monture ou une emote, actualiser : elle apparaît dans « Obtenus récemment ». Clic droit sur une emote.
 
+- [ ] (0.603) Avec deux compagnies relevées : deux cadres, chacun avec sa date.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

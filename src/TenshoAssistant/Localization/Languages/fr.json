@@ -4668,6 +4668,7 @@
     "SquadronDone": "Terminé : {0} (à récupérer à la caserne)"
   },
   "FreeCompany": {
+    "Workshop": "Atelier {0}",
     "TabBuilds": "Montages",
     "TabVessels": "Vaisseaux",
     "TabRoutes": "Meilleurs trajets",

@@ -81,7 +81,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | T18 | ~~Discord : heure lue dans le fuseau de chaque membre, et balises [zone], [objet], [et]~~ fait en 0.564 | S |  |
 | T19 | ~~Alarmes : modifier le nom et l'heure, et « Me rappeler dans 5 min »~~ fait en 0.557 | S |  |
 | T20 | ~~Alarmes : sonner aussi à l'heure exacte~~ fait en 0.556 | S |  |
-| T23 | Compagnie libre : vaisseaux groupés par compagnie, ancien relevé effaçable, valeur du dernier butin | S |  |
+| T23 | ~~Compagnie libre : vaisseaux groupés par compagnie, ancien relevé effaçable, valeur du dernier butin~~ fait en 0.603 | S |  |
 | T28 | ~~Collections : « Obtenus récemment » et menu des sources pour les emotes~~ fait en 0.602 | S |  |
 | T29 | ~~Mini Cactpot : table des gains prouvée et visible~~ fait en 0.571 | S |  |
 

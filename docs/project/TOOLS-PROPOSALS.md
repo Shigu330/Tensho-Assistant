@@ -192,6 +192,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T23 — Compagnie libre : vaisseaux groupés par compagnie, ancien relevé effaçable, valeur du dernier butin
 
+- **État (relu le 2026-11-05)** : FAIT 0.603.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.FreeCompany.cs`.
 - **Ce que le joueur obtient** : Avec des personnages dans plusieurs compagnies, chaque atelier a son propre cadre (nom de la compagnie, date du relevé). Le relevé d'une compagnie quittée peut être effacé. Chaque vaisseau revenu affiche la valeur de son butin au prix PNJ.
 - **Comment, taille, dépendances** : Lire le nom de la compagnie au relevé (source à sonder ; à défaut, « Atelier n »). Un cadre (Header) par maison ; bouton « Effacer ce relevé » à deux clics. Valeur = Σ quantité × prix PNJ (le prix du marché viendra avec f) 2). Taille S. Dépendances : aucune. Sonde : nom de la compagnie. Décision : aucune.

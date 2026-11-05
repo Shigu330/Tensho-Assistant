@@ -4668,6 +4668,7 @@
     "SquadronDone": "Finished: {0} (collect it at the barracks)"
   },
   "FreeCompany": {
+    "Workshop": "Workshop {0}",
     "TabBuilds": "Builds",
     "TabVessels": "Vessels",
     "TabRoutes": "Best routes",
