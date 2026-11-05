@@ -222,6 +222,20 @@ internal static class Interfaces535Tests
             var center=TenshoAssistant.Market.PreparationCost.BuildDemands(demands,1,TenshoAssistant.Market.PreparationCostBasis.Missing,TenshoAssistant.Market.PreparationPriceQuality.Nq,_=>item,_=>quote,now,dataCenter:true);
             Check(center.Lines[0].UnitPrice==80 && center.Lines[0].BuyWorldId==2 && center.KnownSubtotal==240,"the data center's, with its world");
         }),
+        ("0.575: the preparation's cost takes an NPC's gil price when lower, also for what the market does not sell",() =>
+        {
+            var now=DateTimeOffset.UtcNow;
+            var quote=new TenshoAssistant.Market.MarketQuote(1,5,now,now,new(100,null,null),new(null,null,null));
+            var item=new TenshoAssistant.Items.ItemDefinition(5,"Ore",true,0){IsMarketable=true};
+            var free=new TenshoAssistant.Items.ItemDefinition(6,"Oil",false,0);
+            var demands=new[]{new TenshoAssistant.Market.PreparationCostDemand(5,3,3,false,false),new TenshoAssistant.Market.PreparationCostDemand(6,2,2,false,false)};
+            TenshoAssistant.Market.PreparationCostEstimate Cost(TenshoAssistant.Market.PreparationPriceQuality quality,decimal price)=>TenshoAssistant.Market.PreparationCost.BuildDemands(demands,1,TenshoAssistant.Market.PreparationCostBasis.Missing,quality,id=>id==5 ? item:free,id=>id==5 ? quote:null,now,vendor:_=>price);
+            var low=Cost(TenshoAssistant.Market.PreparationPriceQuality.Nq,40);
+            Check(low.Lines[0].UnitPrice==40 && low.Lines[0].FromVendor && low.Lines[1].UnitPrice==40 && low.KnownSubtotal==200,"lower, and not marketable");
+            var high=Cost(TenshoAssistant.Market.PreparationPriceQuality.Nq,400);
+            Check(high.Lines[0].UnitPrice==100 && !high.Lines[0].FromVendor,"the market when lower");
+            Check(!Cost(TenshoAssistant.Market.PreparationPriceQuality.Hq,40).Lines[0].FromVendor,"HQ asked: not an NPC's");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

@@ -32,6 +32,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I3 — Prix des marchands PNJ dans le coût de préparation et sur la page Marché
 
+- **État (relu le 2026-11-05)** : FAIT 0.575.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.PreparationCost.cs`.
 - **Ce que le joueur obtient** : Pour chaque ingrédient vendu en gils par un marchand PNJ, le coût de préparation montre le prix PNJ à côté du minimum du marché et peut retenir le moins cher. Le Résumé de la page Marché dit « Vendu par un PNJ : X gils » (nom et lieu, lien vers le marchand). Vous n'achetez plus au marché ce qui coûte moins cher chez un marchand.
 - **Comment, taille, dépendances** : Fonction pure « prix PNJ en gils » (offre NpcShopKind.Gil la moins chère, qualité de l'offre NpcShopSale.Hq) passée à PreparationCost.BuildDemands. Nouvelle colonne, état « PNJ » et choix de qualité « moins cher, PNJ compris ». Page Marché : une ligne au Résumé avec DrawVendorLink. Aucune requête réseau. Taille S-M. Sonde : aucune (feuilles déjà lues) ; un contrôle en jeu sur un objet connu. Dépendance : partie de A-06 (domaine Artisanat), faisable avant g. Décision : le PNJ entre-t-il dans le total « moins cher » (recommandé : oui, sur une ligne marquée « PNJ »).

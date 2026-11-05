@@ -4056,6 +4056,9 @@
     "Clusters": "Agrégats"
   },
   "CostUi": {
+    "Vendors": "Compter les prix PNJ",
+    "VendorsTip": "Le prix en gils d'un PNJ sert quand il est plus bas que celui du marché, aussi pour un objet que le marché ne vend pas. Demander du HQ les écarte.\nPar défaut : activé.",
+    "FromVendor": "PNJ",
     "DataCenter": "Le moins cher du centre de données",
     "DataCenterTip": "Calcule au prix le plus bas de votre centre de données, et chaque ligne nomme le monde où acheter. Décoché : les prix de votre monde. Aucune nouvelle requête : les prix déjà demandés servent.\nPar défaut : désactivé.",
     "Title": "Coût indicatif des achats",

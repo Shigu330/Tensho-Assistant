@@ -4056,6 +4056,9 @@
     "Clusters": "Clusters"
   },
   "CostUi": {
+    "Vendors": "Count NPC prices",
+    "VendorsTip": "An NPC's gil price is used when it is lower than the market's, also for items the market does not sell. Asking for HQ leaves them out.\nDefault: on.",
+    "FromVendor": "NPC",
     "DataCenter": "Cheapest of the data center",
     "DataCenterTip": "Costs at the cheapest offer of your data center, and each line names the world to buy on. Unticked: your world's prices. No new request: it uses the prices already asked.\nDefault: off.",
     "Title": "Indicative purchase cost",

@@ -47,7 +47,7 @@ public static class ConfigurationReset
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
         "HoverShowCompare",
-        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "HidePanelsBehindGame", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip",
+        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
         "CurrencyAlerts", "CurrencyServerBar", "CurrencyThresholds",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
@@ -454,6 +454,8 @@ public sealed partial class Configuration
     public bool CraftLogAutoSolve { get; set; } = true;
     // 0.574 (I5): the preparation's cost at the cheapest of the data center, instead of the player's world.
     public bool CostDataCenter { get; set; }
+    // 0.575 (I3): the preparation's cost also takes an NPC's gil price when lower.
+    public bool CostUseVendors { get; set; } = true;
     // 0.563 (C31): the player's zones of the weather table, by territory, with the name shown when added.
     public Dictionary<uint,string>? WeatherFavorites { get; set; }
     // 0.562 (I19): an item's English name under its own, in the sheet and the tooltip; off by default.

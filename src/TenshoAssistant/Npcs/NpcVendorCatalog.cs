@@ -101,6 +101,15 @@ public sealed class NpcVendorCatalog
     // Every sale of an item, also in shops no NPC of the sheets opens (0.199: matched with LuminaSupplemental ENpcShop).
     private readonly FrozenDictionary<uint,IReadOnlyList<NpcShopSale>> salesByItem;
     public IReadOnlyList<NpcShopSale> SalesOf(uint itemId)=>salesByItem.GetValueOrDefault(itemId) ?? [];
+    /// <summary>0.575 (I3): the lowest price in gil of one piece at an NPC, normal quality; null when no shop sells it for gil alone.</summary>
+    public uint? GilPrice(uint itemId)
+    {
+        uint? lowest=null;
+        foreach(var sale in SalesOf(itemId))
+            if(sale.Kind==NpcShopKind.Gil && !sale.Hq && sale.Quantity==1 && sale.Costs is [{CurrencyItemId:GilItem,Amount:>0} cost] && (lowest is null || cost.Amount<lowest))lowest=cost.Amount;
+        return lowest;
+    }
+    private const uint GilItem=1;
 
     public static NpcVendorCatalog Build(IEnumerable<NpcVendor> vendors,IEnumerable<NpcShopSale> sales,string source,CancellationToken cancellation=default)
     {

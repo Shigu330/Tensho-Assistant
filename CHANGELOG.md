@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.575.0
+- Plan global, I3 : le coût de préparation prend le prix en gils d'un PNJ quand il est plus bas que le marché, aussi pour un objet que le marché ne vend pas ; la ligne le marque. Réglage activé par défaut, à part si du HQ est demandé. La ligne du Résumé de la page Marché reste à faire.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1038/1038, 0 avertissement, 0 erreur ; DLL 0.575.0.0. Non validé en jeu.
+### English
+- The preparation's cost now takes an NPC's gil price when lower, also for items the market does not sell. The line is marked.
+
 ## 0.574.0
 - Plan global, I5 : le coût de préparation peut se calculer au moins cher du centre de données, et chaque ligne nomme alors le monde où acheter. Aucune nouvelle requête. Réglage désactivé par défaut.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1037/1037, 0 avertissement, 0 erreur ; DLL 0.574.0.0. Non validé en jeu.
