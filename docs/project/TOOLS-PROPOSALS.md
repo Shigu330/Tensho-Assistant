@@ -9,6 +9,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T0 — Alarmes en heure réelle : à la main, chaque jour, chaque semaine ou à chaque remise à zéro (X-10, partie anticipée)
 
+- **État (relu le 2026-11-05)** : FAIT 0.577.
 - **État (relu le 2026-11-03)** : en partie 0.386 (X-10 : alarme unique à une date locale) ; chaque jour, chaque semaine ou à chaque remise non fait.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Alarms/TenshoAlarm.cs`.
 - **Ce que le joueur obtient** : Une alarme posée une seule fois revient d'elle-même : « 30 min avant la remise hebdomadaire », « chaque jour à 21:00 », « fin des missions de ravitaillement ». La cloche des Rappels propose « à chaque remise à zéro » au lieu d'une alarme unique qui disparaît après avoir sonné. Vous pouvez aussi poser à la main une alarme à une heure locale, ou un minuteur (« dans 45 min »).

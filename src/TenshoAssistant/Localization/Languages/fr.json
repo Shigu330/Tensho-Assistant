@@ -1087,6 +1087,16 @@
     "Source": "Données GatherBuddy (Ottermandias, Apache-2.0) ; carnet du jeu et Garland plus bas."
   },
   "Alarms": {
+    "RealDaily": "Chaque jour à {0}",
+    "RealWeekly": "Chaque semaine, {0}",
+    "AtDailyReset": "À chaque remise à zéro du jour",
+    "AtWeeklyReset": "À chaque remise à zéro de la semaine",
+    "RepeatOnce": "Une fois",
+    "RepeatRealDaily": "Chaque jour",
+    "RepeatRealWeekly": "Chaque semaine",
+    "RepeatDailyReset": "À chaque remise à zéro du jour",
+    "RepeatWeeklyReset": "À chaque remise à zéro de la semaine",
+    "RepeatTip": "Une fois à la date ; à partir de la date, chaque jour ou chaque semaine à cette heure ; ou à chaque remise à zéro du jeu, sans date.",
     "SnoozeMinutes": "Me rappeler après (min)",
     "Edit": "Modifier",
     "EditTip": "Change le nom de cette alarme et, pour une alarme unique, sa date.",

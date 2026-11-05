@@ -102,7 +102,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 | C16 | Bibliothèque des séquences : recherche, renommer, dupliquer, copier et coller en texte (A-08, partie texte) | S-M |  |
 | C18 | Chaîne de fabrication : boutons par étape, étapes identiques regroupées, cases « fait » | S-M |  |
 | C21 | « Que puis-je fabriquer ? » avec mes stocks | M |  |
-| T0 | Alarmes en heure réelle : à la main, chaque jour, chaque semaine ou à chaque remise à zéro (X-10, partie anticipée) | S-M |  |
+| T0 | ~~Alarmes en heure réelle : à la main, chaque jour, chaque semaine ou à chaque remise à zéro (X-10, partie anticipée)~~ fait en 0.577 | S-M |  |
 | T10 | Accueil : bloc « Aujourd'hui » et tuiles au choix | M |  |
 | T11 | Quêtes « disponibles maintenant » et quêtes de la zone actuelle | M |  |
 | T12 | Chemin vers une quête : prérequis restants, nombre et prochaine à faire | M |  |

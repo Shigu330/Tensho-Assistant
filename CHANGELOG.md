@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.577.0
+- Plan global, T0 : alarmes en heure réelle : une fois, chaque jour, chaque semaine à partir d'une date, ou à chaque remise à zéro du jour ou de la semaine, sans date. Les alarmes existantes ne changent pas.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1040/1040, 0 avertissement, 0 erreur ; DLL 0.577.0.0. Non validé en jeu.
+### English
+- Alarms in real time can now repeat every day, every week, or at each daily or weekly reset.
+
 ## 0.576.0
 - Plan global, I1 : page Rangements : un servant qui n'est plus à la sonnette est signalé, jamais effacé tout seul, et « Effacer ce relevé » (deux clics) retire un relevé de vos stocks.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1039/1039, 0 avertissement, 0 erreur ; DLL 0.576.0.0. Non validé en jeu.

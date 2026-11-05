@@ -243,6 +243,20 @@ internal static class Interfaces535Tests
             Check(bank.Contains("listed.All(known=>known.Id!=entry.Key.StorageId)"),"said when the bell does not list it");
             Check(Read("Inventory/BankService.cs").Contains("state.Entries.Where(e => e.Key != forgotten)"),"only that read");
         }),
+        ("0.577: alarms in real time repeat by day, week or game reset",() =>
+        {
+            var at=new DateTimeOffset(2026,11,5,20,0,0,TimeSpan.Zero);
+            TenshoAssistant.Alarms.TenshoAlarm Alarm(TenshoAssistant.Alarms.AlarmRepeat repeat)=>new(){Repeat=repeat,At=at};
+            var daily=Alarm(TenshoAssistant.Alarms.AlarmRepeat.RealDaily);
+            Check(TenshoAssistant.Alarms.AlarmSchedule.Next(daily,at.AddHours(-1))==at,"before its first time");
+            Check(TenshoAssistant.Alarms.AlarmSchedule.Next(daily,at)==at.AddDays(1),"strictly after");
+            Check(TenshoAssistant.Alarms.AlarmSchedule.Next(daily,at.AddDays(3).AddHours(1))==at.AddDays(4),"days later");
+            var weekly=Alarm(TenshoAssistant.Alarms.AlarmRepeat.RealWeekly);
+            Check(TenshoAssistant.Alarms.AlarmSchedule.Next(weekly,at.AddDays(1))==at.AddDays(7),"a week on");
+            var reset=TenshoAssistant.Alarms.AlarmSchedule.Next(Alarm(TenshoAssistant.Alarms.AlarmRepeat.DailyReset),at);
+            Check(reset==TenshoAssistant.Reminders.ResetSchedule.NextDaily(at,TenshoAssistant.Reminders.ResetSchedule.DailyHour),"the daily reset");
+            Check(TenshoAssistant.Alarms.AlarmSchedule.Next(Alarm(TenshoAssistant.Alarms.AlarmRepeat.WeeklyReset),at)>at,"the weekly reset");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

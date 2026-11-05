@@ -212,9 +212,15 @@ internal sealed partial class MainWindow
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.LeadHint",alarm.LeadMinutes)+(weatherNote is null ? "":"\n"+localization.Get(weatherNote)));
     }
 
-    private string AlarmWhen(TenshoAlarm alarm)=>alarm.Repeat==AlarmRepeat.EorzeaDaily
-        ? localization.Format("Alarms.Daily",$"{alarm.EtMinute/60:00}:{alarm.EtMinute%60:00}")
-        : alarm.At.ToLocalTime().ToString("g");
+    private string AlarmWhen(TenshoAlarm alarm)=>alarm.Repeat switch
+    {
+        AlarmRepeat.EorzeaDaily=>localization.Format("Alarms.Daily",$"{alarm.EtMinute/60:00}:{alarm.EtMinute%60:00}"),
+        AlarmRepeat.RealDaily=>localization.Format("Alarms.RealDaily",alarm.At.ToLocalTime().ToString("t")),
+        AlarmRepeat.RealWeekly=>localization.Format("Alarms.RealWeekly",alarm.At.ToLocalTime().ToString("dddd t")),
+        AlarmRepeat.DailyReset=>localization.Get("Alarms.AtDailyReset"),
+        AlarmRepeat.WeeklyReset=>localization.Get("Alarms.AtWeeklyReset"),
+        _=>alarm.At.ToLocalTime().ToString("g"),
+    };
 
     // Alarm group (0.202): the item, or the weather / vista / name the alarm was created for, with its icon.
     private static string AlarmGroupKey(TenshoAlarm alarm)=>alarm.ItemId!=0 ? $"item:{alarm.ItemId}":alarm.Group.Length>0 ? alarm.Group

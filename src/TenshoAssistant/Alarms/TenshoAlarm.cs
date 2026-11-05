@@ -1,6 +1,7 @@
 namespace TenshoAssistant.Alarms;
 
-public enum AlarmRepeat { Once, EorzeaDaily }
+// 0.577 (T0): in real time: from a date (At), each day or week; or at each game reset.
+public enum AlarmRepeat { Once, EorzeaDaily, RealDaily, RealWeekly, DailyReset, WeeklyReset }
 public enum AlarmCheck { None, Fire, SkipWeather }
 
 /// <summary>
@@ -88,6 +89,15 @@ public static class AlarmSchedule
     {
         ArgumentNullException.ThrowIfNull(alarm);
         if (alarm.Repeat == AlarmRepeat.Once) return alarm.At > after ? alarm.At : null;
+        if (alarm.Repeat == AlarmRepeat.DailyReset) return TenshoAssistant.Reminders.ResetSchedule.NextDaily(after, TenshoAssistant.Reminders.ResetSchedule.DailyHour);
+        if (alarm.Repeat == AlarmRepeat.WeeklyReset) return TenshoAssistant.Reminders.ResetSchedule.NextWeekly(after, TenshoAssistant.Reminders.ResetSchedule.WeeklyDay, TenshoAssistant.Reminders.ResetSchedule.WeeklyHour);
+        if (alarm.Repeat is AlarmRepeat.RealDaily or AlarmRepeat.RealWeekly)
+        {
+            if (alarm.At > after) return alarm.At;
+            var days = alarm.Repeat == AlarmRepeat.RealDaily ? 1 : 7;
+            var periods = (long)Math.Floor((after - alarm.At).TotalDays / days) + 1;
+            return alarm.At.AddDays(periods * days);
+        }
         var minute = Math.Clamp(alarm.EtMinute, 0, 1439);
         var seconds = after.ToUnixTimeMilliseconds() / 1000.0;
         var occurrence = Math.Floor(seconds / EtDaySeconds) * EtDaySeconds + minute * EtMinuteSeconds;
