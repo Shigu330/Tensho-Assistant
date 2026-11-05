@@ -2645,6 +2645,22 @@
     "Effective": "Actuelles : {0}\nModificateur famille : {1:+0;-0;0}"
   },
   "CraftProjectionUi": {
+    "FollowPick": "Suivre",
+    "FollowPickTip": "La séquence à suivre pendant cette synthèse : celle du simulateur, une que vous avez enregistrée pour cette recette, ou la suggestion du panneau du carnet.",
+    "FollowSimulator": "La séquence du simulateur",
+    "FollowSuggested": "La suggestion du panneau du carnet",
+    "FollowCannot": "Cette séquence ne peut pas être simulée avec les attributs de cette synthèse.",
+    "FollowNext": "Action {0}/{1} : {2}",
+    "FollowDone": "La séquence est terminée.",
+    "FollowBlocked": "Le jeu ne propose pas cette action en ce moment.",
+    "FollowPlanned": "Plan : progression {0}, qualité {1}, solidité {2}, PS {3}",
+    "FollowNow": "Maintenant : progression {0}, qualité {1}, solidité {2}, PS {3}",
+    "FollowNoStart": "La qualité de départ n'a pas été vue : la qualité n'est pas comparée.",
+    "FollowOnPlan": "Conforme au plan.",
+    "FollowOff": "La synthèse a quitté le plan : une autre action, une chance qui a échoué ou d'autres attributs. Les actions suivantes peuvent ne plus convenir.",
+    "FollowOffStates": "La synthèse a quitté le plan, qui ne compte que sur l'état Normal. États joués : {0}. Les actions suivantes peuvent ne plus convenir.",
+    "FollowStateAt": "{0} (étape {1})",
+    "FollowStops": "Dans la simulation, cette séquence s'arrête à l'action {0} sur {1}.",
     "SuggestLoading": "Calcul d'un coup…",
     "SuggestNone": "Aucun coup trouvé qui termine la synthèse, dans les limites de la recherche.",
     "SuggestReached": "Conseillé : {0}. La recherche atteint ensuite {1} de qualité, pour une cible de {2}.",
@@ -2684,6 +2700,8 @@
     "SortTip": "Trie les actions sur cette valeur (bas de l'intervalle), de la plus grande à la plus petite ; une qualité inconnue passe après les connues, les actions qui cassent la synthèse en dernier ; à égalité, la moins chère en PS."
   },
   "CraftLiveUi": {
+    "Follow": "Suivre pendant une synthèse la séquence choisie",
+    "FollowTip": "Dans la fenêtre à côté de la synthèse, affiche l'action suivante de la séquence choisie et ses chiffres face à ceux du jeu. Elle ne fait que les afficher : c'est vous qui jouez les actions.",
     "Suggest": "Conseiller un coup pendant une synthèse",
     "SuggestTip": "Dans la comparaison, conseille un prochain coup calculé d'après l'état en cours de la synthèse. Il ne fait que l'afficher : vous le jouez vous-même.",
     "Panel": "Fenêtre « Comparer les prochains coups » à côté de la synthèse",

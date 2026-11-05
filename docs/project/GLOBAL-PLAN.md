@@ -97,7 +97,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 | I3 | ~~Prix des marchands PNJ dans le coût de préparation et sur la page Marché~~ fait en 0.575 | S-M |  |
 | I11 | Vue en liste triable de la Banque | S-M |  |
 | I21 | Filtre de job et de set d'équipement dans les règles de tri | M |  |
-| C5 | Suivre sa séquence pendant la synthèse : action suivante et écart avec le plan | M | Information seulement, aucune action jouée. |
+| C5 | ~~Suivre sa séquence pendant la synthèse : action suivante et écart avec le plan~~ fait en 0.589 | M | Information seulement, aucune action jouée. |
 | C7 | ~~R-13, partie anticipée : points à horaire ouverts maintenant ou bientôt~~ fait en 0.588 | S-M |  |
 | C16 | Bibliothèque des séquences : recherche, renommer, dupliquer, copier et coller en texte (A-08, partie texte) | S-M |  |
 | C18 | Chaîne de fabrication : boutons par étape, étapes identiques regroupées, cases « fait » | S-M |  |

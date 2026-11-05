@@ -24,6 +24,7 @@ internal sealed partial class MainWindow
         DrawToolSettingsLink("CraftLive");
         BoolSetting("CraftLiveUi.Panel","CraftLiveUi.PanelTip",()=>configuration.CraftLivePanel,value=>{configuration.CraftLivePanel=value;craftLive.SetEnabled(CraftLiveWanted(configuration));},c=>c.CraftLivePanel);
         BoolSetting("CraftLiveUi.Suggest","CraftLiveUi.SuggestTip",()=>configuration.CraftLiveSuggest,value=>configuration.CraftLiveSuggest=value,c=>c.CraftLiveSuggest);
+        BoolSetting("CraftLiveUi.Follow","CraftLiveUi.FollowTip",()=>configuration.CraftLiveFollow,value=>configuration.CraftLiveFollow=value,c=>c.CraftLiveFollow);
         ImGui.TextWrapped(localization.Get("CraftLiveUi.Help"));
         ImGui.TextUnformatted(state.Status switch {CraftLiveStatusKind.Disabled=>localization.Get("CraftLiveUi.Disabled"),CraftLiveStatusKind.Waiting=>localization.Get("CraftLiveUi.Waiting"),CraftLiveStatusKind.Offline=>localization.Get("CraftLiveUi.Offline"),CraftLiveStatusKind.AddonAbsent=>localization.Get("CraftLiveUi.Absent"),CraftLiveStatusKind.NotReady=>localization.Get("CraftLiveUi.NotReady"),CraftLiveStatusKind.Error=>localization.Get("CraftLiveUi.Error"),_=>localization.Get("CraftLiveUi.Partial")});
         if(developerMode && state.Error is { } error)ImGui.TextWrapped(RawMessage(error));

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.589.0
+- Plan global, C5 : Pendant une synthèse, la fenêtre à côté de la synthèse et la page Synthèse en cours suivent la séquence choisie (simulateur, séquence enregistrée pour la recette, suggestion du panneau du carnet) : action suivante, chiffres du plan contre ceux du jeu, avertissement quand ils se séparent, avec les états autres que Normal déjà joués. Réglage pour le retirer. Rien n'est joué.
+- Tests : Follow. Verify.ps1 (agent) : 1056/1056, 0 avertissement, 0 erreur ; DLL 0.589.0.0. Non validé en jeu.
+### English
+- During a synthesis, the window beside it and the live craft page follow the chosen sequence (simulator, saved for the recipe, Crafting Log panel's suggestion): next action, the plan's numbers against the game's, a warning when they part, with the non-Normal states already played. A setting turns it off. Nothing is played.
+
 ## 0.588.0
 - Plan global, C7 : page Récolte : une section liste les points à horaire ouverts maintenant, puis ceux qui ouvrent dans l'heure, avec le temps restant, la zone, le niveau et une cloche. Recalculée une fois par minute d'Éorzéa. Les poissons ne sont pas inclus : leur météo n'y est pas vérifiée. Les filtres de métier et de niveau restent à faire.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1049/1049, 0 avertissement, 0 erreur ; DLL 0.588.0.0. Non validé en jeu.

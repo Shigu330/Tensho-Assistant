@@ -2645,6 +2645,22 @@
     "Effective": "Effective: {0}\nFamily modifier: {1:+0;-0;0}"
   },
   "CraftProjectionUi": {
+    "FollowPick": "Follow",
+    "FollowPickTip": "The sequence to follow during this synthesis: the simulator's, one you saved for this recipe, or the Crafting Log panel's suggestion.",
+    "FollowSimulator": "The simulator's sequence",
+    "FollowSuggested": "The Crafting Log panel's suggestion",
+    "FollowCannot": "This sequence cannot be simulated with the attributes of this synthesis.",
+    "FollowNext": "Action {0}/{1}: {2}",
+    "FollowDone": "The sequence is finished.",
+    "FollowBlocked": "The game does not offer this action right now.",
+    "FollowPlanned": "Plan: progress {0}, quality {1}, durability {2}, CP {3}",
+    "FollowNow": "Now: progress {0}, quality {1}, durability {2}, CP {3}",
+    "FollowNoStart": "The starting quality was not seen: quality is not compared.",
+    "FollowOnPlan": "On plan.",
+    "FollowOff": "The synthesis has left the plan: another action, a chance that failed, or other attributes. The next actions may no longer fit.",
+    "FollowOffStates": "The synthesis has left the plan, which only counts on Normal. States played on: {0}. The next actions may no longer fit.",
+    "FollowStateAt": "{0} (step {1})",
+    "FollowStops": "In the simulation, this sequence stops at action {0} of {1}.",
     "SuggestLoading": "Working out a move…",
     "SuggestNone": "No move found that finishes the synthesis, within the search's limits.",
     "SuggestReached": "Suggested: {0}. The search then reaches {1} quality, for a target of {2}.",
@@ -2684,6 +2700,8 @@
     "SortTip": "Sorts actions by this value (low end of the range), highest first; unknown quality comes after known values, actions that break the synthesis last; ties go to the lowest CP cost."
   },
   "CraftLiveUi": {
+    "Follow": "Follow during a synthesis the sequence you chose",
+    "FollowTip": "In the window beside the synthesis, shows the next action of the chosen sequence and its numbers against the game's. It only shows them: you play the actions yourself.",
     "Suggest": "Suggest a move during a synthesis",
     "SuggestTip": "In the comparison, suggests a next move worked out from the current state of the synthesis. It only shows it: you play it yourself.",
     "Panel": "« Compare next actions » window beside the synthesis",

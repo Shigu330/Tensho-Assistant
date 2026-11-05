@@ -49,6 +49,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C5 — K6 — Suivre sa séquence pendant la synthèse : action suivante et écart avec le plan
 
+- **État (relu le 2026-11-05)** : FAIT 0.589.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.CraftLive.cs`.
 - **Ce que le joueur obtient** : Un petit panneau à côté de la fenêtre de synthèse du jeu suit la séquence choisie (celle du panneau du carnet ou du simulateur) : « Étape 7/22 : Innovation », progression et qualité attendues contre celles du jeu, et un avertissement quand une condition Bonne, Excellente ou Médiocre a fait diverger la synthèse. Utile pour qui fabrique à la main sans macro. Affichage seulement, rien n'est exécuté.
 - **Comment, taille, dépendances** : Réutiliser CraftLiveReader (observation opt-in déjà gardée) : comparer native.Step et les ressources à l'étape correspondante de la simulation, afficher l'action suivante et l'écart. Panneau accroché à la fenêtre Synthesis comme celui du carnet, réglage avec infobulle et ↺. Taille M. Dépendances : observation « Craft » ; A-04 remplacera plus tard l'action suivante par un nouveau calcul. Sonde : aucune ; relevé en jeu ensuite. Décision : quelle séquence suivre (recommandé : celle du panneau du carnet pour cette recette, sinon celle du simulateur).
