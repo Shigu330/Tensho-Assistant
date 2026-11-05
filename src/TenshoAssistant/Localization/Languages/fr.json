@@ -4056,6 +4056,8 @@
     "Clusters": "Agrégats"
   },
   "CostUi": {
+    "DataCenter": "Le moins cher du centre de données",
+    "DataCenterTip": "Calcule au prix le plus bas de votre centre de données, et chaque ligne nomme le monde où acheter. Décoché : les prix de votre monde. Aucune nouvelle requête : les prix déjà demandés servent.\nPar défaut : désactivé.",
     "Title": "Coût indicatif des achats",
     "Quantities": "Quantités",
     "Shortfall": "Écart aux stocks recensés",

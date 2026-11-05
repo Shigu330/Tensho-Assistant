@@ -790,6 +790,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.573) Macros : régler le son et « dernière page seulement » ; la macro copiée suit, et le son s'entend en jeu.
 
+- [ ] (0.574) Préparation : cocher « Le moins cher du centre de données » : les prix et les mondes suivent, à comparer avec le tableau du marché.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

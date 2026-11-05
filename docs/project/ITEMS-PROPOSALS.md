@@ -46,6 +46,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I5 — Coût de préparation au prix du centre de données (option de A-06)
 
+- **État (relu le 2026-11-05)** : FAIT 0.574.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Market/PreparationCost.cs`.
 - **Ce que le joueur obtient** : Le coût de préparation se calcule au monde actuel ou au moins cher du centre de données, avec le monde où acheter, pour qui change de monde pour faire ses achats.
 - **Comment, taille, dépendances** : Combo « Portée : monde / centre de données » avec infobulle, mémorisé avec ↺. Chaque ligne indique le monde (MarketState.NameOf). Copie texte complétée. Aucune nouvelle requête. Taille S. Sonde : aucune. Dépendance : partie de A-06, faisable avant g. Décision : aucune nouvelle (option déjà choisie).

@@ -50,7 +50,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | P16 | ~~Option : clic gauche sur la carte pour poser le drapeau~~ fait en 0.546 | S | Avec réglage. |
 | P20 | ~~Bouton « Couches » pour tout afficher ou masquer en un clic~~ fait en 0.547 | S |  |
 | I0 | ~~Compter les pièces portées dans les stocks et dans « possédé »~~ fait en 0.549 | S |  |
-| I5 | Coût de préparation au prix du centre de données (option de A-06) | S |  |
+| I5 | ~~Coût de préparation au prix du centre de données (option de A-06)~~ fait en 0.574 | S |  |
 | I8 | ~~X-07, partie anticipée : ouvrir l'objet sur Universalis, Garland Tools, Teamcraft ou le wiki~~ fait en 0.561 | S |  |
 | I9 | ~~Copier le nom de l'objet et lien d'objet dans le chat (local)~~ fait en 0.561 | S |  |
 | I15 | ~~Partager un modèle de tri en texte (copier / coller)~~ fait en 0.566 | S |  |

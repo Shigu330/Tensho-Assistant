@@ -17,7 +17,7 @@ internal sealed partial class MainWindow
     private int costBasisIndex;
     private int costQualityIndex;
     private string? preparationCostError;
-    private readonly record struct ChainCostViewKey(CraftChainResult Result,ItemCatalog? Items,uint World,int Quality,long Second,TimeSpan Lifetime);
+    private readonly record struct ChainCostViewKey(CraftChainResult Result,ItemCatalog? Items,uint World,int Quality,long Second,TimeSpan Lifetime,bool DataCenter);
     private ChainCostViewKey? chainCostViewKey;
     private PreparationCostEstimate? chainCostView;
     private PreparationCostEstimate? preparationListSource;
@@ -33,12 +33,15 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(230);
         changed |= ImGui.Combo(localization.Get("CostUi.Quality")+"##Cost",ref costQualityIndex,new[] {"NQ","HQ",localization.Get("CostUi.Cheapest")},3);
         Tip("CostUi.QualityTip");
+        var dataCenter=configuration.CostDataCenter;
+        if(ImGui.Checkbox(localization.Get("CostUi.DataCenter")+"##CostDataCenter",ref dataCenter)){configuration.CostDataCenter=dataCenter;try{save();}catch(Exception error){log.Warning(error,"Could not save the cost scope.");}}
+        Tip("CostUi.DataCenterTip");
         if(changed) {preparationPrices.Cancel(); preparationCostError=null;}
         PreparationCostEstimate estimate;
         try
         {
             estimate=PreparationCost.Build(plan,world.WorldId,(PreparationCostBasis)costBasisIndex,(PreparationPriceQuality)costQualityIndex,
-                id=>itemCatalog.State.Catalog?.Find(id),id=>market.GetCached(world.WorldId,id),DateTimeOffset.UtcNow,market.CacheLifetime);
+                id=>itemCatalog.State.Catalog?.Find(id),id=>market.GetCached(world.WorldId,id),DateTimeOffset.UtcNow,market.CacheLifetime,configuration.CostDataCenter);
         }
         catch(Exception error) {ImGui.TextWrapped(localization.Get("CostUi.EstimateError")); if(developerMode)ImGui.TextWrapped(RawMessage(error.Message)); return;}
         DrawPreparationCostDetails(recipe,plan.Requested,estimate);
@@ -62,11 +65,11 @@ internal sealed partial class MainWindow
                 var world=market.State;
                 var now=DateTimeOffset.UtcNow;
                 var items=itemCatalog.State.Catalog;
-                var key=new ChainCostViewKey(result,items,world.WorldId,costQualityIndex,now.ToUnixTimeSeconds(),market.CacheLifetime);
+                var key=new ChainCostViewKey(result,items,world.WorldId,costQualityIndex,now.ToUnixTimeSeconds(),market.CacheLifetime,configuration.CostDataCenter);
                 if(chainCostView is null || chainCostViewKey!=key)
                 {
                     chainCostView=PreparationCost.FromChain(result,world.WorldId,(PreparationPriceQuality)costQualityIndex,
-                        id=>items?.Find(id),id=>market.GetCached(world.WorldId,id),now,key.Lifetime);
+                        id=>items?.Find(id),id=>market.GetCached(world.WorldId,id),now,key.Lifetime,configuration.CostDataCenter);
                     chainCostViewKey=key;
                 }
                 var estimate=chainCostView;
@@ -151,6 +154,7 @@ internal sealed partial class MainWindow
                         ItemCell(item,line.ItemId,22,item is null ? $"ID {line.ItemId}":null);
                         ImGui.TableNextColumn(); ImGui.TextUnformatted(line.Quantity?.ToString("N0") ?? localization.Get("CostUi.Verify"));
                         ImGui.TableNextColumn(); ImGui.TextUnformatted(line.UnitPrice is { } unit ? $"{unit:N0} {(line.HighQuality==true ? "HQ" : "NQ")}" : "—");
+                        if(line.BuyWorldId!=0 && market.State.NameOf(line.BuyWorldId) is { } buyOn){ImGui.SameLine();ImGui.TextDisabled(buyOn);}
                         if(ImGui.IsItemHovered() && line.Quote is { } quote)
                             WrappedTooltip(localization.Format("CostUi.Quote",quote.WorldId,quote.FetchedAt.ToLocalTime().ToString("G"),quote.UploadedAt?.ToLocalTime().ToString("G") ?? localization.Get("CostUi.Unknown")));
                         ImGui.TableNextColumn(); ImGui.TextUnformatted(line.Cost?.ToString("N0") ?? localization.Get("CostUi.Unknown"));

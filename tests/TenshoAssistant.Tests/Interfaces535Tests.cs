@@ -211,6 +211,17 @@ internal static class Interfaces535Tests
             Check(settings.BoundedEchoSound==1 && !settings.EchoLastOnly,"as before until set");
             settings.EchoSound=99;Check(settings.BoundedEchoSound==16,"bounded");
         }),
+        ("0.574: the preparation's cost can use the cheapest of the data center, naming the world",() =>
+        {
+            var now=DateTimeOffset.UtcNow;
+            var quote=new TenshoAssistant.Market.MarketQuote(1,5,now,now,new(100,null,null),new(null,null,null),new(80,2,now));
+            var item=new TenshoAssistant.Items.ItemDefinition(5,"Ore",false,0){IsMarketable=true};
+            var demands=new[]{new TenshoAssistant.Market.PreparationCostDemand(5,3,3,false,false)};
+            var world=TenshoAssistant.Market.PreparationCost.BuildDemands(demands,1,TenshoAssistant.Market.PreparationCostBasis.Missing,TenshoAssistant.Market.PreparationPriceQuality.Nq,_=>item,_=>quote,now);
+            Check(world.Lines[0].UnitPrice==100 && world.Lines[0].BuyWorldId==0,"the world's price");
+            var center=TenshoAssistant.Market.PreparationCost.BuildDemands(demands,1,TenshoAssistant.Market.PreparationCostBasis.Missing,TenshoAssistant.Market.PreparationPriceQuality.Nq,_=>item,_=>quote,now,dataCenter:true);
+            Check(center.Lines[0].UnitPrice==80 && center.Lines[0].BuyWorldId==2 && center.KnownSubtotal==240,"the data center's, with its world");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

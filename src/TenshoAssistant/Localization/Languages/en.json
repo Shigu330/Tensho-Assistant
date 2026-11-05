@@ -4056,6 +4056,8 @@
     "Clusters": "Clusters"
   },
   "CostUi": {
+    "DataCenter": "Cheapest of the data center",
+    "DataCenterTip": "Costs at the cheapest offer of your data center, and each line names the world to buy on. Unticked: your world's prices. No new request: it uses the prices already asked.\nDefault: off.",
     "Title": "Indicative purchase cost",
     "Quantities": "Quantities",
     "Shortfall": "Shortfall against recorded stock",

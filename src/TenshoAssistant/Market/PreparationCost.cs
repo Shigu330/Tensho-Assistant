@@ -8,7 +8,7 @@ public enum PreparationPriceQuality { Nq, Hq, Cheapest }
 public enum PreparationCostStatus { Covered, Priced, UnknownStock, UnknownWorld, UnknownItem, NotMarketable, UnsupportedQuality, MissingQuote, WrongScope, MissingPrice, Overflow, UnresolvedChain }
 public sealed record PreparationCostDemand(uint ItemId, long Required, long? Quantity, bool StockUncertain, bool CachedStock, bool Unresolved = false);
 public sealed record PreparationCostLine(uint ItemId, long Required, long? Quantity, PreparationCostStatus Status,
-    decimal? UnitPrice, decimal? Cost, bool? HighQuality, MarketQuote? Quote, bool StockUncertain, bool CachedStock, bool StalePrice);
+    decimal? UnitPrice, decimal? Cost, bool? HighQuality, MarketQuote? Quote, bool StockUncertain, bool CachedStock, bool StalePrice, uint BuyWorldId = 0);
 public sealed record PreparationCostEstimate(uint WorldId, PreparationCostBasis Basis, PreparationPriceQuality Quality,
     DateTimeOffset EvaluatedAt, IReadOnlyList<PreparationCostLine> Lines, decimal? KnownSubtotal, bool InputStockUncertain = false, bool InputCachedStock = false)
 {
@@ -22,7 +22,7 @@ public sealed record PreparationCostEstimate(uint WorldId, PreparationCostBasis 
 public static class PreparationCost
 {
     public static PreparationCostEstimate Build(CraftPlan plan, uint world, PreparationCostBasis basis, PreparationPriceQuality quality,
-        Func<uint,ItemDefinition?> item, Func<uint,MarketQuote?> quote, DateTimeOffset now,TimeSpan? cacheLifetime=null)
+        Func<uint,ItemDefinition?> item, Func<uint,MarketQuote?> quote, DateTimeOffset now,TimeSpan? cacheLifetime=null,bool dataCenter=false)
     {
         ArgumentNullException.ThrowIfNull(plan);
         if (basis is not (PreparationCostBasis.Missing or PreparationCostBasis.AllRequired)) throw new ArgumentOutOfRangeException(nameof(basis));
@@ -35,11 +35,11 @@ public static class PreparationCost
                 !stockRelevant ? material.Required : !material.Holdings.HasObservation ? null : material.Uncovered,
                 stockRelevant && (!material.Holdings.HasObservation || material.Holdings.HasUnknown),stockRelevant && material.Holdings.HasCached));
         }
-        return BuildDemands(demands,world,basis,quality,item,quote,now,cacheLifetime:cacheLifetime);
+        return BuildDemands(demands,world,basis,quality,item,quote,now,cacheLifetime:cacheLifetime,dataCenter:dataCenter);
     }
 
     public static PreparationCostEstimate FromChain(CraftChainResult chain, uint world, PreparationPriceQuality quality,
-        Func<uint,ItemDefinition?> item, Func<uint,MarketQuote?> quote, DateTimeOffset now,TimeSpan? cacheLifetime=null)
+        Func<uint,ItemDefinition?> item, Func<uint,MarketQuote?> quote, DateTimeOffset now,TimeSpan? cacheLifetime=null,bool dataCenter=false)
     {
         ArgumentNullException.ThrowIfNull(chain);
         if (chain.Materials.Count==0 && chain.Observations.Count==0)
@@ -55,12 +55,12 @@ public static class PreparationCost
             return new PreparationCostDemand(group.Key,amount,unobserved ? null : amount,uncertain,chain.HasCached,
                 group.Any(material => material.Reason != CraftChainReason.RawMaterial));
         }).ToArray();
-        return BuildDemands(demands,world,PreparationCostBasis.TerminalChain,quality,item,quote,now,uncertain,chain.HasCached,cacheLifetime);
+        return BuildDemands(demands,world,PreparationCostBasis.TerminalChain,quality,item,quote,now,uncertain,chain.HasCached,cacheLifetime,dataCenter);
     }
 
     public static PreparationCostEstimate BuildDemands(IEnumerable<PreparationCostDemand> demands, uint world, PreparationCostBasis basis,
         PreparationPriceQuality quality, Func<uint,ItemDefinition?> item, Func<uint,MarketQuote?> quote, DateTimeOffset now,
-        bool inputStockUncertain = false, bool inputCachedStock = false,TimeSpan? cacheLifetime=null)
+        bool inputStockUncertain = false, bool inputCachedStock = false,TimeSpan? cacheLifetime=null,bool dataCenter=false)
     {
         ArgumentNullException.ThrowIfNull(demands); ArgumentNullException.ThrowIfNull(item); ArgumentNullException.ThrowIfNull(quote);
         if (!Enum.IsDefined(basis) || !Enum.IsDefined(quality)) throw new ArgumentOutOfRangeException(nameof(basis));
@@ -69,6 +69,7 @@ public static class PreparationCost
         var seen = new HashSet<uint>();
         foreach (var material in demands)
         {
+            uint buyWorld = 0;
             if (material.ItemId == 0 || material.Required < 1 || !seen.Add(material.ItemId) || material.Quantity is < 0 || material.Quantity > material.Required)
                 throw new ArgumentException("Invalid preparation.",nameof(demands));
             var unknownStock = material.StockUncertain;
@@ -93,6 +94,15 @@ public static class PreparationCost
                 decimal? nq = price.Nq.Minimum is > 0 ? price.Nq.Minimum : null;
                 decimal? high = definition.CanBeHq && price.Hq.Minimum is > 0 ? price.Hq.Minimum : null;
                 hq = quality == PreparationPriceQuality.Hq || quality == PreparationPriceQuality.Cheapest && high is { } hp && (nq is null || hp < nq);
+                // 0.574 (I5): the cheapest of the data center, with the world to buy on; without one, the world's own price.
+                if (dataCenter)
+                {
+                    var nqOffer = price.NqCheapest is { Price: > 0 } foundNq ? foundNq : null;
+                    var hqOffer = definition.CanBeHq && price.HqCheapest is { Price: > 0 } foundHq ? foundHq : null;
+                    nq = nqOffer?.Price ?? nq; high = hqOffer?.Price ?? high;
+                    hq = quality == PreparationPriceQuality.Hq || quality == PreparationPriceQuality.Cheapest && high is { } lower && (nq is null || lower < nq);
+                    buyWorld = (hq.Value ? hqOffer : nqOffer)?.WorldId ?? 0;
+                }
                 unit = hq.Value ? high : nq;
                 stale = !price.HasRecentUpload(now) || !Caching.CacheAge.Fresh(price.FetchedAt,now,cacheLifetime ?? TimeSpan.FromMinutes(5));
                 if (unit is null) status=PreparationCostStatus.MissingPrice;
@@ -108,7 +118,7 @@ public static class PreparationCost
                 try { subtotal=checked(total+lineCost); }
                 catch (OverflowException) { subtotal=null; }
             }
-            rows.Add(new(material.ItemId,material.Required,quantity,status,unit,cost,hq,price,unknownStock,cachedStock,stale));
+            rows.Add(new(material.ItemId,material.Required,quantity,status,unit,cost,hq,price,unknownStock,cachedStock,stale,buyWorld));
         }
         return new(world,basis,quality,now,Array.AsReadOnly(rows.ToArray()),subtotal,inputStockUncertain,inputCachedStock);
     }

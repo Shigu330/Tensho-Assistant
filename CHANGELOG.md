@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.574.0
+- Plan global, I5 : le coût de préparation peut se calculer au moins cher du centre de données, et chaque ligne nomme alors le monde où acheter. Aucune nouvelle requête. Réglage désactivé par défaut.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1037/1037, 0 avertissement, 0 erreur ; DLL 0.574.0.0. Non validé en jeu.
+### English
+- The preparation's cost can use the cheapest offer of the data center, naming the world to buy on.
+
 ## 0.573.0
 - Plan global, C17 : macros : son de la ligne de fin réglable de 1 à 16, ou aucun, et ligne de fin sur la dernière page seulement. Par défaut, rien ne change. L'attente séparée existait déjà (0.419). L'icône des macros reste à sonder en jeu.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1036/1036, 0 avertissement, 0 erreur ; DLL 0.573.0.0. Non validé en jeu.
