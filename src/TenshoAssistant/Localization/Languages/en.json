@@ -3319,6 +3319,7 @@
   },
   "BankUi": {
     "PlayerBags": "Character bags",
+    "Worn": "Worn gear",
     "Crystals": "Crystals",
     "SaddlebagMissing": "Chocobo saddlebag not imported",
     "Saddlebag": "Chocobo saddlebag",

@@ -9,6 +9,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I0 — Compter les pièces portées dans les stocks et dans « possédé »
 
+- **État (relu le 2026-11-05)** : FAIT 0.549.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Inventory/DalamudInventoryReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : L'équipement porté compte comme possédé. La Revue de mode de la semaine ne dit plus « non possédé » pour la pièce que vous portez. Le stock au survol et la fiche objet l'incluent, sur une ligne « Porté ». Les filtres « possédé » des autres outils le comptent aussi.
 - **Comment, taille, dépendances** : Ajouter GameInventoryType.EquippedItems (1000) à la capture faite sur le thread framework, avec le même lecteur IGameInventory et la même couverture. Ajouter une StorageLabel « Porté » (catégorie PlayerBags), traduite dans Inventory/StorageNames.cs. Le tri (InventorySortScope, conteneurs 0-3) et la grille de la Banque (MainWindow.Bank.cs:184-186, conteneurs 0-3) ne sont pas touchés : un test doit le vérifier, avec un relevé de tous les consommateurs de inventory.Current (Diagnostics, tri, Banque). Taille S. Sonde : aucune pour la lecture ; vérification en jeu ensuite (porter puis retirer une pièce). Décision : compter le porté partout comme possédé (recommandé : oui, sur une ligne à part pour rester visible).

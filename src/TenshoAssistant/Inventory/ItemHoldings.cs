@@ -4,7 +4,7 @@ public enum StorageFilter { All, PlayerBags, Chocobo, Retainers }
 public enum StorageCategory { PlayerBags, Chocobo, Retainer, Armoury, GlamourDresser, Armoire, FreeCompany }
 
 /// <summary>Which storage a row is, for its translated name (0.322: the names were French literals shown to every player).</summary>
-public enum StorageLabel { PlayerBags, Crystals, SaddlebagMissing, Saddlebag, PremiumSaddlebag, Retainer, RetainersMissing, Armoury, GlamourDresser, Armoire, FreeCompanyChest }
+public enum StorageLabel { PlayerBags, Crystals, SaddlebagMissing, Saddlebag, PremiumSaddlebag, Retainer, RetainersMissing, Armoury, GlamourDresser, Armoire, FreeCompanyChest, Worn }
 
 /// <summary>A storage's quantities; <see cref="Name"/> is the retainer's own name (from the game) and empty for the other storages,
 /// whose shown name comes from <see cref="Label"/>.</summary>
@@ -40,6 +40,10 @@ public static class ItemHoldings
             if (includeCrystals && characterId != 0 && live is not null)
                 rows.Add(Observe(StorageCategory.PlayerBags, "", false, live,
                     [new InventoryLocation(new(characterId), new(2001))]) with { Label = StorageLabel.Crystals });
+            // 0.549 (I0): what is worn counts as owned, on its own line. A copy saved before this version has no such container: no line, not an unknown one.
+            if (characterId != 0 && live is not null && live.Containers.ContainsKey(new InventoryLocation(new(characterId), new(1000))))
+                rows.Add(Observe(StorageCategory.PlayerBags, "", false, live,
+                    [new InventoryLocation(new(characterId), new(1000))]) with { Label = StorageLabel.Worn });
         }
 
         // Armoury chest (0.235): counted with the character's own storage when it has been read.

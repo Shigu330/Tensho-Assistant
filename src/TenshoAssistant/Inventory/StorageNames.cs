@@ -27,6 +27,7 @@ internal static class StorageNames
     {
         StorageLabel.PlayerBags => localization.Get("BankUi.PlayerBags"),
         StorageLabel.Crystals => localization.Get("BankUi.Crystals"),
+        StorageLabel.Worn => localization.Get("BankUi.Worn"),
         StorageLabel.SaddlebagMissing => localization.Get("BankUi.SaddlebagMissing"),
         StorageLabel.Saddlebag => localization.Get("BankUi.Saddlebag"),
         StorageLabel.PremiumSaddlebag => localization.Get("BankUi.PremiumSaddlebag"),
