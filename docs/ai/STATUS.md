@@ -30,7 +30,7 @@ Liste complète : [TESTING](../project/TESTING.md), 284 cases ouvertes, aucune d
 Dépôt personnel : installation et mise à jour fonctionnent (rapport de l'utilisateur, 2026-11-05, 0.539.0). Possible depuis cette release : galerie de Mes outils (0.476) et liste de vidéos (0.506), qui lisent la branche `main`.
 
 ## Prochaine action
-0) Propositions d'audit triées le 2026-11-05 : [PROPOSALS-TRIAGE](../project/PROPOSALS-TRIAGE.md) ; rien n'est lancé avant le choix de l'utilisateur. Non exigées pour la 1.0.0.
+0) Propositions : **ne pas coder** (demande de l'utilisateur, 2026-11-05). Tout est dans [PROPOSALS-TRIAGE](../project/PROPOSALS-TRIAGE.md) ; plan global à faire ensuite avec lui. Non exigées pour la 1.0.0.
 1) Décisions de l'auteur sur les points Dalamud ([PUBLISHING](../project/PUBLISHING.md) « Ce qui reste », points 4 à 7 ; titre selon le job décidé, DEC-035), avec son accord à chaque règle.
 2) Fait le 2026-11-05 : release Stable-0.539.0, sur demande de l'utilisateur. La prochaine : une séance de jeu sur la dernière version d'abord (DEC-033).
 3) Vérifier en jeu les fenêtres converties (issue #38).
