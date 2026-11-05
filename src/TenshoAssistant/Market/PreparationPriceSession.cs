@@ -48,6 +48,8 @@ public sealed class PreparationPriceSession : IDisposable
                 var completed=0;
                 try
                 {
+                    // 0.608 (I4): one request for the list; the loop below then finds them in the cache, and asks for the others as before.
+                    if(await market.FillCacheAsync(copied,context.CharacterId,context.WorldId,token).ConfigureAwait(false) is { } failed)throw new InvalidOperationException(failed);
                     foreach (var id in copied)
                     {
                         token.ThrowIfCancellationRequested();

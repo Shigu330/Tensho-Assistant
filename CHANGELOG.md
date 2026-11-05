@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.608.0
+- Plan global, I4 : Prix du coût de préparation et des listes : une seule requête Universalis pour toute la liste au lieu d'une par objet toutes les 3 secondes. Les objets sans réponse sont demandés seuls comme avant, et une panne du serveur arrête la liste. Preuve : docs/evidence/0.608-universalis-batch.md. La limite de 32 objets par liste reste en place.
+- Tests : Market batch. Verify.ps1 (agent) : 1113/1113, 0 avertissement, 0 erreur ; DLL 0.608.0.0. Non validé en jeu.
+### English
+- Prices of the preparation cost and lists: a single Universalis request for the whole list instead of one per item every 3 seconds. Items without an answer are asked alone as before, and a server failure stops the list. Evidence: docs/evidence/0.608-universalis-batch.md. The limit of 32 items per list stays.
+
 ## 0.607.0
 - Plan global, phase 4 : Objets : section « Objets annotés » : ce qui a une note ou une étiquette, filtré par étiquette (Important, À vendre) et par texte dans le nom ou la note ; un clic ouvre l'objet.
 - Tests : Annotated. Verify.ps1 (agent) : 1110/1110, 0 avertissement, 0 erreur ; DLL 0.607.0.0. Non validé en jeu.

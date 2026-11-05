@@ -37,6 +37,55 @@ public sealed class MarketService : IDisposable
     private Func<TimeSpan> cacheLifetime=()=>TimeSpan.FromMinutes(5);
     private DataCache? disk;
     public TimeSpan CacheLifetime=>Volatile.Read(ref cacheLifetime)();
+    /// <summary>0.608 (I4): what Universalis answers in one request (docs/evidence/0.608-universalis-batch.md: past it, items are dropped without a message).</summary>
+    public const int BatchMaximum=100;
+    public static uint[] BatchIds(IEnumerable<uint> ids,Func<uint,bool> known)
+    {
+        var missing=ids.Where(id=>id!=0).Distinct().Where(id=>!known(id)).Take(BatchMaximum).ToArray();
+        return missing.Length>=2 ? missing:[];
+    }
+
+    /// <summary>
+    /// 0.608 (I4): one request for a list: its quotes go to the cache, and the usual requests then find them. Under the same pause as the others. An item
+    /// without a price stays theirs. The message of a server failure is returned: the list stops there rather than asking again for each item.
+    /// </summary>
+    public async Task<string?> FillCacheAsync(IReadOnlyList<uint> ids,ulong expectedOwner,uint expectedWorld,CancellationToken token)
+    {
+        if(Enabled?.Invoke()==false)return null;
+        uint world;uint[] missing;
+        lock(gate)
+        {
+            if(disposed || requestActive || state.WorldId==0 || expectedWorld!=state.WorldId || expectedOwner==0 || expectedOwner!=owner)return null;
+            if(lastRequest is { } last && Stopwatch.GetElapsedTime(last)<TimeSpan.FromSeconds(3))return null;
+            world=state.WorldId;
+            var now=DateTimeOffset.UtcNow;
+            missing=BatchIds(ids,id=>cache.TryGetValue((world,id),out var known) && IsFresh(known,now));
+            if(missing.Length==0)return null;
+            lastRequest=Stopwatch.GetTimestamp();
+        }
+        try
+        {
+            var json=await client.GetStringAsync($"https://universalis.app/api/v2/aggregated/{world}/{string.Join(',',missing)}",token).ConfigureAwait(false);
+            var at=DateTimeOffset.UtcNow;
+            lock(gate)
+            {
+                if(disposed || state.WorldId!=world)return null;
+                foreach(var id in missing)
+                {
+                    MarketQuote quote;
+                    try{quote=MarketQuote.Parse(json,world,id,at);}
+                    catch(InvalidDataException){continue;}
+                    if(!cache.ContainsKey((world,id)) && cache.Count>=128)cache.Remove(cache.MinBy(pair=>pair.Value.FetchedAt).Key);
+                    cache[(world,id)]=quote;
+                    if(disk is { } diskStore)_=diskStore.WriteAsync("market",$"{world}:{id}","universalis-aggregated-v3",quote,quote.FetchedAt);
+                }
+                lastRequest=Stopwatch.GetTimestamp();
+            }
+            return null;
+        }
+        catch(Exception error) when(error is HttpRequestException or System.Text.Json.JsonException or InvalidDataException){return $"Prices could not be read: {error.Message}";}
+    }
+
     public bool IsFresh(MarketQuote quote,DateTimeOffset now)=>CacheAge.Fresh(quote.FetchedAt,now,CacheLifetime);
     public void ConfigureCache(Func<TimeSpan> lifetime,DataCache store){lock(gate){cacheLifetime=lifetime;disk=store;}}
     public MarketBackgroundState? BackgroundState => Volatile.Read(ref backgroundState);
