@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.607.0
+- Plan global, phase 4 : Monnaies : avec les alertes activées, Tensho prévient une fois quand les mémoquartz limités de la semaine atteignent leur plafond, dans le chat, par un son et sur Discord ; une case le retire.
+- Tests : Weekly cap. Verify.ps1 (agent) : 1110/1110, 0 avertissement, 0 erreur ; DLL 0.607.0.0. Non validé en jeu.
+### English
+- Currencies: with alerts on, Tensho says once when the week's limited tomestones reach their limit, in chat, by sound and on Discord; a box removes it.
+
 ## 0.606.0
 - Plan global, phase 4 : Monnaies : avec les alertes activées, Tensho prévient une fois quand les mémoquartz limités de la semaine atteignent leur plafond, dans le chat, par un son et sur Discord ; une case le retire.
 - Tests : Weekly cap. Verify.ps1 (agent) : 1108/1108, 0 avertissement, 0 erreur ; DLL 0.606.0.0. Non validé en jeu.

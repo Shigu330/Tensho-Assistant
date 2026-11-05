@@ -4844,6 +4844,13 @@
     "Copied": "{0}{3}: lowest offer {1}, price copied {2} (paste it with Ctrl+V)"
   },
   "ItemNotes": {
+    "ListTitle": "Annotated items ({0})",
+    "ListFilter": "Label",
+    "ListAll": "All",
+    "ListFilterTip": "Only the items with this label.",
+    "ListSearch": "Search in the names and notes…",
+    "ListSearchTip": "Shows the items with every word you type in their name or note.",
+    "ListEmpty": "No annotated item matches.",
     "Tab": "Note",
     "Help": "Your note and labels on this item, kept on this PC. They show in the item information (hover and sheet). When you open an NPC shop, the chat lists your bags' items « to sell to an NPC » and « important ».",
     "TextTip": "Free text (500 characters at most), saved when you leave the field.",

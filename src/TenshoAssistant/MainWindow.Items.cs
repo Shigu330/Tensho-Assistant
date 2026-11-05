@@ -30,6 +30,7 @@ internal sealed partial class MainWindow
 
     private void DrawItems()
     {
+        DrawAnnotatedItems();
         Heading(localization.Get("ItemsUi.Title"), localization.Get("ItemsUi.Description"));
         // 0.272 (R-06 step 3): the item sheet holds Stocks, Craft, Usages and Gathering; requests for those tabs (focus flags set
         // by menus and other tools) open the sheet on the matching tab.

@@ -4844,6 +4844,13 @@
     "Copied": "{0}{3} : offre la plus basse {1}, prix copié {2} (collez-le avec Ctrl+V)"
   },
   "ItemNotes": {
+    "ListTitle": "Objets annotés ({0})",
+    "ListFilter": "Étiquette",
+    "ListAll": "Tous",
+    "ListFilterTip": "Seulement les objets avec cette étiquette.",
+    "ListSearch": "Chercher dans les noms et les notes…",
+    "ListSearchTip": "Affiche les objets qui ont chaque mot saisi dans leur nom ou leur note.",
+    "ListEmpty": "Aucun objet annoté ne correspond.",
     "Tab": "Note",
     "Help": "Votre note et vos étiquettes sur cet objet, gardées sur ce PC. Elles s'affichent dans l'information de l'objet (survol et fiche). À l'ouverture d'une boutique de PNJ, le chat rappelle les objets « à vendre au PNJ » et les objets « importants » de vos sacs.",
     "TextTip": "Texte libre (500 caractères au plus), enregistré en quittant le champ.",
