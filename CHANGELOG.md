@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.622.0
+- Plan global, phase 5 : Carte (demande de l'utilisateur) : le sous-lieu ne s'écrit que s'il existe, sans le « -- » de la carte du jeu.
+- Tests : Map place. Verify.ps1 (agent) : 1129/1129, 0 avertissement, 0 erreur ; DLL 0.622.0.0. Non validé en jeu.
+### English
+- Map (user request): the sub-place is written only when there is one, without the game map's « -- ».
+
 ## 0.621.0
 - Plan global, phase 5 : Carte (comparée au jeu par l'utilisateur) : sous la zone, Tensho écrit maintenant le lieu où se trouve le joueur, puis le sous-lieu ou « -- », comme la carte du jeu, seulement sur la carte où il est. Lu dans TerritoryInfo sur le thread framework, avec garde.
 - Tests : Map place. Verify.ps1 (agent) : 1129/1129, 0 avertissement, 0 erreur ; DLL 0.621.0.0. Non validé en jeu.

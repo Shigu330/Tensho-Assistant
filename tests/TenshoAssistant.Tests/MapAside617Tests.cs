@@ -25,7 +25,7 @@ internal static class MapAside617Tests
         }),
         ("Map place (0.621): where the player stands, as the game's map writes it",() =>
         {
-            Check(TenshoAssistant.Maps.MapMenus.PlaceLines(12,12,"L'Octant","").SequenceEqual(["> L'Octant","> --"]),"captured in game: no sub-place is « -- »");
+            Check(TenshoAssistant.Maps.MapMenus.PlaceLines(12,12,"L'Octant","").SequenceEqual(["> L'Octant"]),"no sub-place: no line, not even the game's « -- » (user's choice)");
             Check(TenshoAssistant.Maps.MapMenus.PlaceLines(12,12,"L'Octant","Quai").SequenceEqual(["> L'Octant","> Quai"]),"a sub-place");
             Check(TenshoAssistant.Maps.MapMenus.PlaceLines(12,11,"L'Octant","").Count==0,"another map than the player's");
             Check(TenshoAssistant.Maps.MapMenus.PlaceLines(0,0,"L'Octant","").Count==0 && TenshoAssistant.Maps.MapMenus.PlaceLines(12,12,"","").Count==0,"unknown");

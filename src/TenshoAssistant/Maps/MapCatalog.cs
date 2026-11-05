@@ -18,11 +18,11 @@ public static class MapMenus
     /// upper decks: map 11, index 0, no subzone, beside its Airship Landing), so it takes the zone's name.
     /// </summary>
     /// <summary>
-    /// 0.621 (user report, compared in game): what the game's map writes under the zone: where the player stands (TerritoryInfo), then the sub-place or « -- ». Only for the
+    /// 0.621 (user report, compared in game): what the game's map writes under the zone: where the player stands (TerritoryInfo), then the sub-place when there is one (user's choice: no « -- »). Only for the
     /// map the player is on. Nothing when the place is unknown.
     /// </summary>
     public static IReadOnlyList<string> PlaceLines(uint playerMap,uint shownMap,string? area,string? subArea)
-        =>playerMap==0 || playerMap!=shownMap || string.IsNullOrEmpty(area) ? []:["> "+area,"> "+(string.IsNullOrEmpty(subArea) ? "--":subArea)];
+        =>playerMap==0 || playerMap!=shownMap || string.IsNullOrEmpty(area) ? []:string.IsNullOrEmpty(subArea) ? ["> "+area]:["> "+area,"> "+subArea];
 
     public static string FloorLabel(MapDefinition map)=>map.Subzone.Length>0 ? map.Subzone:map.MapIndex>0 ? map.MapIndex.ToString():map.Zone;
     public static IReadOnlyList<IReadOnlyList<MapDefinition>> Zones(IEnumerable<MapDefinition> maps,MapDefinition? region)
