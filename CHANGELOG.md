@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.582.0
+- Plan global, T11 : page Quêtes : filtres « Disponibles maintenant » (non commencée, prérequis connus faits) et « Cette zone ». Un niveau ou une étape que Tensho ne sait pas lire n'est pas vérifié, et l'infobulle le dit. Le donneur sur la carte reste sur la fiche de la quête.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1044/1044, 0 avertissement, 0 erreur ; DLL 0.582.0.0. Non validé en jeu.
+### English
+- The quest page has two more filters: available now and this zone. What Tensho cannot read is not checked, and the tooltip says so.
+
 ## 0.581.0
 - Plan global, T15 : Revue de mode : une case par pièce compose la tenue de la semaine, gardée jusqu'à la remise. La section dit quelles pièces sont possédées, avec le rangement au survol, et « Essayer la tenue » les met dans la cabine d'essayage, sur clic. Les sources des pièces manquantes restent dans la fiche d'objet.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1043/1043, 0 avertissement, 0 erreur ; DLL 0.581.0.0. Non validé en jeu.

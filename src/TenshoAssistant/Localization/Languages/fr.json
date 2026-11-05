@@ -1649,6 +1649,10 @@
     "CategoryTip": "Ne montre que les succès de cette catégorie du jeu."
   },
   "QuestsBrowser": {
+    "AvailableNow": "Disponibles maintenant",
+    "AvailableNowTip": "Les quêtes non commencées dont les prérequis connus sont faits. Un niveau ou une étape que Tensho ne sait pas lire n'est pas vérifié : le jeu peut encore refuser.",
+    "HereOnly": "Cette zone",
+    "HereOnlyTip": "Seulement les quêtes de la zone où vous êtes.",
     "Level": "Niveau",
     "Zone": "Zone",
     "LevelFrom": "Niveau de",

@@ -1649,6 +1649,10 @@
     "CategoryTip": "Shows only achievements of this game category."
   },
   "QuestsBrowser": {
+    "AvailableNow": "Available now",
+    "AvailableNowTip": "Quests not started whose known prerequisites are done. A level or a step Tensho cannot read is not checked: the game may still refuse.",
+    "HereOnly": "This zone",
+    "HereOnlyTip": "Only the quests of the zone you are in.",
     "Level": "Level",
     "Zone": "Zone",
     "LevelFrom": "Level from",

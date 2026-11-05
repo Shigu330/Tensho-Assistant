@@ -104,7 +104,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 | C21 | « Que puis-je fabriquer ? » avec mes stocks | M |  |
 | T0 | ~~Alarmes en heure réelle : à la main, chaque jour, chaque semaine ou à chaque remise à zéro (X-10, partie anticipée)~~ fait en 0.577 | S-M |  |
 | T10 | Accueil : bloc « Aujourd'hui » et tuiles au choix | M |  |
-| T11 | Quêtes « disponibles maintenant » et quêtes de la zone actuelle | M |  |
+| T11 | ~~Quêtes « disponibles maintenant » et quêtes de la zone actuelle~~ fait en 0.582 | M |  |
 | T12 | Chemin vers une quête : prérequis restants, nombre et prochaine à faire | M |  |
 | T14 | ~~Équipement : préparer le plan d'un autre job que celui porté~~ fait en 0.580 | M |  |
 | T15 | ~~Revue de mode : tenue de la semaine choisie, essayée en un clic, avec l'endroit de chaque pièce~~ fait en 0.581 | M | Sur clic seulement. |

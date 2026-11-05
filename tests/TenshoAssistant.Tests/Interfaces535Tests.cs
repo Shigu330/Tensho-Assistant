@@ -283,6 +283,18 @@ internal static class Interfaces535Tests
             outfit=TenshoAssistant.Fashion.FashionOutfit.Toggle(outfit,week,2,12);
             Check(TenshoAssistant.Fashion.FashionOutfit.Current(outfit,week.AddDays(7)).Count==0,"another week");
         }),
+        ("0.582: a quest is available when not started and its known prerequisites are done",() =>
+        {
+            TenshoAssistant.Quests.QuestEntry Of(uint id,TenshoAssistant.Quests.QuestProgress progress,params uint[] previous)=>new(id,"Q"+id,"C",0,progress,null){PreviousQuestIds=previous,PreviousQuestJoin=1};
+            var done=Of(1,TenshoAssistant.Quests.QuestProgress.Complete);
+            var open=Of(2,TenshoAssistant.Quests.QuestProgress.Unconfirmed,1);
+            var locked=Of(3,TenshoAssistant.Quests.QuestProgress.Unconfirmed,2);
+            var free=Of(4,TenshoAssistant.Quests.QuestProgress.Unconfirmed);
+            var links=new TenshoAssistant.Quests.QuestLinks([done,open,locked,free]);
+            Check(!TenshoAssistant.Quests.QuestList.Available(links,done),"done");
+            Check(TenshoAssistant.Quests.QuestList.Available(links,open) && TenshoAssistant.Quests.QuestList.Available(links,free),"open");
+            Check(!TenshoAssistant.Quests.QuestList.Available(links,locked),"locked");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

@@ -96,6 +96,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T11 — Quêtes « disponibles maintenant » et quêtes de la zone actuelle
 
+- **État (relu le 2026-11-05)** : FAIT 0.582.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.Quests.cs`.
 - **Ce que le joueur obtient** : Un filtre montre les quêtes que vous pouvez prendre : non faites, prérequis terminés, pas exclues par un autre choix (cité de départ, Grande Compagnie), niveau atteint. Un second filtre se limite à la zone où vous êtes, avec le donneur sur la carte. Les conditions que Tensho ne sait pas lire sont signalées (« condition non interprétée ») et ne comptent jamais comme remplies.
 - **Comment, taille, dépendances** : Calcul sur la liste publiée, pas dans Draw : non confirmée + CompletionEvidence + absente de questOtherCity. Niveau comparé à celui du job requis si « Niveaux et expérience de tous les jobs » est fait, sinon seulement affiché. Jointure inconnue ou étape requise : « à vérifier ». Zone : territoire courant, déjà lu par la carte. Taille M. Dépendances : niveaux des jobs pour le filtre de niveau ; colonne ClassJobCategory de Quest à sonder. Décision : inclure les quêtes répétables (recommandé : non par défaut).

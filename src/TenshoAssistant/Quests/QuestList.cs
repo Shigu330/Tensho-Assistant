@@ -12,6 +12,9 @@ public static class QuestList
         return (from<=0 || level>=from) && (to<=0 || level<=to);
     }
 
+    /// <summary>0.582 (T11): not started, and nothing known in its way: no prerequisite, or all it asks is done. What Tensho cannot read (level of the right job, a required step) stays out of this answer.</summary>
+    public static bool Available(QuestLinks links,QuestEntry entry)=>entry.Progress==QuestProgress.Unconfirmed && (entry.PreviousQuestIds.Count==0 || links.CompletionEvidence(entry));
+
     public static QuestEntry[] Sorted(IEnumerable<QuestEntry> entries,int column,bool descending)
     {
         Func<QuestEntry,IComparable> key=column switch

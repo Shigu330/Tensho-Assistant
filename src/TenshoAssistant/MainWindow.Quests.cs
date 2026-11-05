@@ -33,6 +33,8 @@ internal sealed partial class MainWindow
     private string[] questCategories = [];
     private QuestEntry[] questMatches = [];
     private (int From, int To) questViewLevels;
+    private bool questAvailableNow, questHereOnly;
+    private (bool, bool, string) questViewNarrow;
     private (int Column, bool Descending) questSort, questViewSort;
     private int questActiveCount;
     private int questCompleteCount;
@@ -138,15 +140,26 @@ internal sealed partial class MainWindow
             configuration.QuestList.LevelFrom = Math.Clamp(levelFrom, 0, 999); configuration.QuestList.LevelTo = Math.Clamp(levelTo, 0, 999);
             try { save(); } catch (Exception saveFailure) { log.Warning(saveFailure, "Could not save the quest levels."); }
         }
+        // 0.582 (T11).
+        ImGui.Checkbox(localization.Get("QuestsBrowser.AvailableNow")+"###QuestAvailableNow",ref questAvailableNow);
+        Tip("QuestsBrowser.AvailableNowTip");
+        ImGui.SameLine();
+        ImGui.Checkbox(localization.Get("QuestsBrowser.HereOnly")+"###QuestHereOnly",ref questHereOnly);
+        Tip("QuestsBrowser.HereOnlyTip");
+        var territoryHere=mapLive?.State?.TerritoryId ?? 0;
+        var zoneHere=questHereOnly && territoryHere!=0 ? maps.State.Catalog?.Entries.FirstOrDefault(map=>map.TerritoryId==territoryHere)?.Zone ?? "":"";
         ImGui.TextWrapped(localization.Get("QuestsBrowser.Help"));
         if (!ReferenceEquals(questViewState?.Entries, state.Entries) || questViewQuery != questQuery
             || questViewCategory != questCategory || questViewFilter != questFilter || questViewSection != questSection
-            || questViewShowOtherCities != questShowOtherCities || questViewLevels != (configuration.QuestList.LevelFrom, configuration.QuestList.LevelTo) || questViewSort != questSort)
+            || questViewShowOtherCities != questShowOtherCities || questViewLevels != (configuration.QuestList.LevelFrom, configuration.QuestList.LevelTo) || questViewSort != questSort || questViewNarrow != (questAvailableNow,questHereOnly,zoneHere))
         {
+            questViewNarrow = (questAvailableNow,questHereOnly,zoneHere);
             questViewLevels = (configuration.QuestList.LevelFrom, configuration.QuestList.LevelTo); questViewSort = questSort;
             questViewSection = questSection; questViewShowOtherCities = questShowOtherCities;
             questMatches = TenshoAssistant.Quests.QuestList.Sorted(state.Entries.Where(entry => (questShowOtherCities || !questOtherCity.Contains(entry.Id))
                 && TenshoAssistant.Quests.QuestList.InLevels(entry.Level, questViewLevels.From, questViewLevels.To)
+                && (!questAvailableNow || TenshoAssistant.Quests.QuestList.Available(questLinks, entry))
+                && (!questHereOnly || entry.Zone == zoneHere)
                 && (questSection.Length == 0 || entry.Section == questSection)
                 && (string.IsNullOrWhiteSpace(questCategory) || entry.Category == questCategory)
                 && (questFilter == 0 || entry.Progress == (questFilter == 1 ? QuestProgress.Active : questFilter == 2 ? QuestProgress.Complete : QuestProgress.Unconfirmed))
