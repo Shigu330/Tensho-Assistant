@@ -48,7 +48,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | P9 | ALEA : bonus d'expérience et couleur selon le temps restant | S | La zone d'ALEA reste rose : pas de couleur selon le temps restant. |
 | P15 | État des lectures du jeu affiché sur la carte (R-14, partie carte) | S |  |
 | P16 | ~~Option : clic gauche sur la carte pour poser le drapeau~~ fait en 0.546 | S | Avec réglage. |
-| P20 | Bouton « Couches » pour tout afficher ou masquer en un clic | S |  |
+| P20 | ~~Bouton « Couches » pour tout afficher ou masquer en un clic~~ fait en 0.547 | S |  |
 | I0 | Compter les pièces portées dans les stocks et dans « possédé » | S |  |
 | I5 | Coût de préparation au prix du centre de données (option de A-06) | S |  |
 | I8 | X-07, partie anticipée : ouvrir l'objet sur Universalis, Garland Tools, Teamcraft ou le wiki | S |  |

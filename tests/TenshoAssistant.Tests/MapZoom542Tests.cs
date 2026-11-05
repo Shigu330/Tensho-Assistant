@@ -8,6 +8,14 @@ internal static class MapZoom542Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Map (0.547): a layers button with the same settings, and all at once",() =>
+        {
+            var view=Read("MainWindow.MapView.cs");
+            Check(view.Contains("const int buttons=9;") && view.Contains("room-9*step-label"),"the column counts it");
+            Check(view.Contains("ToolButton(FontAwesomeIcon.LayerGroup,\"MapView.Layers\"") && view.Contains("DrawMapLayers();"),"the button");
+            foreach(var layer in new[]{"ShowQuests","ShowFates","ShowGathering","ShowVendors","ShowSightseeing","ShowAetherCurrents","ShowParty","ShowBookmarks","ShowHuntMarks","ShowTreasure","ShowFixedIcons","ShowPlaceNames"})
+                Check(view[view.IndexOf("private void DrawMapLayers()")..view.IndexOf("// Mappy-like display settings")].Contains($"SettingBox(\"MapView.{layer}\""),layer);
+        }),
         ("Map (0.546): the flag on a left click is a setting, off by default, on an empty spot, not after a drag",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().FlagOnClick,"off by default");

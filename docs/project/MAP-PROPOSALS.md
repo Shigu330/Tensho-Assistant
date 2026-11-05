@@ -161,6 +161,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P20 — Bouton « Couches » pour tout afficher ou masquer en un clic
 
+- **État (relu le 2026-11-05)** : FAIT 0.547.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Un bouton de la colonne d'outils ouvre une petite liste de couches (quêtes, ALEA, récolte, vendeurs, exploration, courants, groupe, favoris) qu'on affiche ou masque d'un clic, sans ouvrir les réglages.
 - **Comment, taille, dépendances** : Fenêtre surgissante qui reprend les cases existantes (SettingBox, mêmes clés, mêmes ↺), et un 9e bouton dans le calcul de la colonne. Taille S. Aucune sonde. Décision : liste des couches proposées.

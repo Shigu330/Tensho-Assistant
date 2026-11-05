@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.547.0
+- Plan global, P20 : bouton « Couches » dans la colonne d'outils : les couches de la carte en une petite liste, avec « Tout afficher » et « Tout masquer ». Ce sont les mêmes réglages que dans la roue dentée, sans doublon.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1011/1011, 0 avertissement, 0 erreur ; DLL 0.547.0.0. Non validé en jeu.
+### English
+- A Layers button in the map's tool column lists the layers, with show all and hide all. They are the same settings as in the cog.
+
 ## 0.546.0
 - Plan global, P16 : réglage, désactivé par défaut (demande de l'utilisateur) : un clic gauche bref sur un endroit vide d'une carte de zone pose le drapeau. Un glisser déplace toujours la carte, et un clic sur une icône garde son effet.
 - Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1010/1010, 0 avertissement, 0 erreur ; DLL 0.546.0.0. Non validé en jeu.

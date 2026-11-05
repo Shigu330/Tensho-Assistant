@@ -402,9 +402,9 @@ internal sealed partial class MainWindow
         // buttons, so the rest of the map stays draggable.
         var style=ImGui.GetStyle();var step=26+style.ItemSpacing.Y;var label=ImGui.GetTextLineHeightWithSpacing();
         var room=maxHeight>0 ? maxHeight:ImGui.GetContentRegionAvail().Y;
-        var slider=Math.Clamp(room-8*step-label-2*style.ItemSpacing.Y-style.WindowPadding.Y*2,0,80);
+        var slider=Math.Clamp(room-9*step-label-2*style.ItemSpacing.Y-style.WindowPadding.Y*2,0,80);
         if(slider<30)slider=0;
-        const int buttons=8;
+        const int buttons=9;
         var perColumn=slider>0 ? buttons:Math.Clamp((int)((room-label-style.WindowPadding.Y*2)/step),1,buttons);
         var columns=(buttons+perColumn-1)/perColumn;
         var width=34+(columns-1)*30;
@@ -432,6 +432,9 @@ internal sealed partial class MainWindow
                 mapFitDelay=2;
             }
             Place();if(ToolButton(FontAwesomeIcon.Map,"MapView.OpenGameMap",openGameMap is not null))openGameMap?.Invoke();
+            // 0.547 (P20): the layers in one click, the same settings as the cog's.
+            Place();if(ToolButton(FontAwesomeIcon.LayerGroup,"MapView.Layers",true,ImGui.IsPopupOpen("MapViewLayers")))ImGui.OpenPopup("MapViewLayers");
+            DrawMapLayers();
             Place();if(ToolButton(FontAwesomeIcon.Cog,"MapView.Settings",true,ImGui.IsPopupOpen("MapViewSettings")))ImGui.OpenPopup("MapViewSettings");
             DrawMapSettings(map);
             if(slider>0)ImGui.Spacing();
@@ -461,6 +464,45 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndChild();}
         return width;
+    }
+    private void DrawMapLayers()
+    {
+        if(!ImGui.BeginPopup("MapViewLayers"))return;
+        try
+        {
+            var settings=configuration.MapView;var changed=false;
+            void All(bool shown)
+            {
+                settings.ShowQuests=settings.ShowFates=settings.ShowGathering=settings.ShowVendors=settings.ShowSightseeing=settings.ShowAetherCurrents=shown;
+                settings.ShowParty=settings.ShowBookmarks=settings.ShowHuntMarks=settings.ShowTreasure=settings.ShowFixedIcons=settings.ShowPlaceNames=shown;
+                changed=true;
+            }
+            if(ImGui.SmallButton(localization.Get("MapView.LayersAll")))All(true);
+            Tip("MapView.LayersAllTip");
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("MapView.LayersNone")))All(false);
+            Tip("MapView.LayersNoneTip");
+            ImGui.Separator();
+            changed|=SettingBox("MapView.ShowFixedIcons",settings.ShowFixedIcons,value=>settings.ShowFixedIcons=value);
+            changed|=SettingBox("MapView.ShowPlaceNames",settings.ShowPlaceNames,value=>settings.ShowPlaceNames=value);
+            changed|=SettingBox("MapView.ShowQuests",settings.ShowQuests,value=>settings.ShowQuests=value);
+            changed|=SettingBox("MapView.ShowFates",settings.ShowFates,value=>settings.ShowFates=value);
+            changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value);
+            changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value);
+            changed|=SettingBox("MapView.ShowSightseeing",settings.ShowSightseeing,value=>settings.ShowSightseeing=value);
+            changed|=SettingBox("MapView.ShowAetherCurrents",settings.ShowAetherCurrents,value=>settings.ShowAetherCurrents=value);
+            changed|=SettingBox("MapView.ShowParty",settings.ShowParty,value=>settings.ShowParty=value);
+            changed|=SettingBox("MapView.ShowBookmarks",settings.ShowBookmarks,value=>settings.ShowBookmarks=value);
+            changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value);
+            changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value);
+            if(changed)
+            {
+                try{save();saveError=null;}
+                catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save map layers.");}
+            }
+            if(saveError is { } failed)ImGui.TextColored(UI.FfxivTheme.Error,failed);
+        }
+        finally{ImGui.EndPopup();}
     }
     // Mappy-like display settings, saved at each change; every layer can be turned off.
     private void DrawMapSettings(MapDefinition? map)
