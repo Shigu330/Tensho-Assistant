@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.588.0
+- Plan global, C7 : page Récolte : une section liste les points à horaire ouverts maintenant, puis ceux qui ouvrent dans l'heure, avec le temps restant, la zone, le niveau et une cloche. Recalculée une fois par minute d'Éorzéa. Les poissons ne sont pas inclus : leur météo n'y est pas vérifiée. Les filtres de métier et de niveau restent à faire.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1049/1049, 0 avertissement, 0 erreur ; DLL 0.588.0.0. Non validé en jeu.
+### English
+- The gathering page lists the timed points open now, then those opening within the hour, with a countdown and a bell.
+
 ## 0.587.0
 - Plan global, Carte : demande de l'utilisateur : la roue dentée de la carte ouvre l'onglet Carte des Paramètres, au lieu d'une fenêtre surgissante devenue trop longue. Ce sont les mêmes réglages, et la liste des icônes reste celle de la carte affichée.
 - Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1048/1048, 0 avertissement, 0 erreur ; DLL 0.587.0.0. Non validé en jeu.

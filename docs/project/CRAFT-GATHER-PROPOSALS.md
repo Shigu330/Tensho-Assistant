@@ -63,6 +63,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C7 — G1 — R-13, partie anticipée : points à horaire ouverts maintenant ou bientôt
 
+- **État (relu le 2026-11-05)** : FAIT 0.588.
 - **État (relu le 2026-11-03)** : en partie 0.415 (R-13 : fenêtre de suivi des objets des alarmes) ; liste « ouverts maintenant ou bientôt » non faite.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.GatheringBrowser.cs`.
 - **Ce que le joueur obtient** : Sur la page Récolte, un onglet « Maintenant » liste tous les points à horaire ET (mineur, botaniste) ouverts, puis ceux qui ouvrent dans l'heure réelle, triés par prochaine fenêtre, avec compte à rebours, zone, niveau et bouton d'alarme. Filtres : métier, niveau, objets cachés. Vous savez où aller sans chercher objet par objet.

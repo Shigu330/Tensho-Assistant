@@ -317,6 +317,12 @@ internal static class Interfaces535Tests
             var gear=Read("MainWindow.Gear.cs");
             Check(gear.IndexOf("ImGui.TextUnformatted(localization.Get(\"Gear.PlanFor\"))")<gear.IndexOf("ImGui.BeginCombo(\"###GearJob\""),"label first");
         }),
+        ("0.588: the gathering page lists the timed points open now or soon, once per Eorzea minute",() =>
+        {
+            var view=Read("MainWindow.GatheringBrowser.cs");
+            Check(view.Contains("if(key!=gatheringNowKey)") && view.Contains("DrawGatheringNow(sources);"),"once per Eorzea minute");
+            Check(Read("Gathering/GatheringTimeline.cs").Contains("source.IsFishing || source.Timing.Kind!=GatheringScheduleKind.Limited"),"timed, no fish");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

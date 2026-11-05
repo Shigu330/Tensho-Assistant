@@ -1349,6 +1349,10 @@
     "GoldSaucer": "Gold Saucer"
   },
   "GatheringBrowser": {
+    "NowTitle": "Open now or soon",
+    "NowEmpty": "No timed point opens within the hour.",
+    "NowOpen": "open for {0}:{1}",
+    "NowSoon": "in {0}:{1}",
     "Title": "Gathering & fishing",
     "Description": "Search for a resource or zone, filter by job, then select an item to inspect its locations; ET clock and in-game fishing help.",
     "Loading": "Loading sources: {0:N0}/{1:N0}",

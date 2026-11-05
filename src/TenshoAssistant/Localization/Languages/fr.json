@@ -1349,6 +1349,10 @@
     "GoldSaucer": "Gold Saucer"
   },
   "GatheringBrowser": {
+    "NowTitle": "Ouverts maintenant ou bientôt",
+    "NowEmpty": "Aucun point à horaire n'ouvre dans l'heure.",
+    "NowOpen": "ouvert encore {0}:{1}",
+    "NowSoon": "dans {0}:{1}",
     "Title": "Récolte & pêche",
     "Description": "Recherchez une ressource ou une zone, filtrez par métier, puis sélectionnez un objet pour consulter ses lieux ; horloge ET et aide à la pêche en jeu.",
     "Loading": "Chargement des sources : {0:N0}/{1:N0}",
