@@ -2,7 +2,9 @@ namespace TenshoAssistant.Craft;
 
 public sealed record CraftRecipeParameters(int Durability,int Progress,int Quality,int ProgressDivider,int QualityDivider,
     int ProgressModifier,int QualityModifier,int RequiredCraftsmanship,int RequiredControl,int MaxStartingQuality,
-    bool Expert=false,bool LevelScaled=false,bool Specialist=false,bool Collectable=false,int RequiredQuality=0);
+    bool Expert=false,bool LevelScaled=false,bool Specialist=false,bool Collectable=false,int RequiredQuality=0,
+    // 0.600 (C14): shown on the recipe (Craft/RecipeFacts.cs), not used by the simulation.
+    bool CanHq=false,bool QuickSynth=false,int QuickSynthCraftsmanship=0,int QuickSynthControl=0,string MasterBook="",uint RequiredItem=0,string RequiredStatus="");
 // A-13 (0.434): Specialist = the job is a specialist (Careful Observation, Heart and Soul, Quick Innovation, specialist recipes).
 public sealed record CraftStats(int Level,int Craftsmanship,int Control,int Cp,bool ManipulationAllowed=false,bool Specialist=false);
 public static class CraftRecipeQuality

@@ -382,6 +382,7 @@ internal sealed partial class MainWindow
             {
                 ImGui.Spacing();
                 if (showOutputs) DrawRecipeOutput(recipe);
+                DrawRecipeFacts(recipe);
                 ImGui.TextColored(Accent, localization.Format("RecipeUi.JobLevel",recipe.CraftType,recipe.Level));
                 ImGui.SameLine();
                 ImGui.TextDisabled(localization.Format("RecipeUi.Yield",recipe.ResultAmount));

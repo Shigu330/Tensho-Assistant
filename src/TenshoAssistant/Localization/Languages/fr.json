@@ -5875,6 +5875,17 @@
     "Result": "{0} action(s) importée(s), {1} ligne(s) ignorée(s).",
     "Unknown": "Noms inconnus : {0}"
   },
+  "RecipeFacts": {
+    "Hq": "HQ possible",
+    "NoHq": "pas de HQ",
+    "Quick": "synthèse rapide",
+    "QuickFrom": "synthèse rapide dès {0} d'Habileté et {1} de Contrôle",
+    "Book": "livre de maître : {0}",
+    "Specialist": "spécialiste seulement",
+    "Expert": "recette experte",
+    "Item": "demande : {0}",
+    "Status": "demande l'état : {0}"
+  },
   "CraftReadiness": {
     "NoSet": "Aucun ensemble d’équipement {0} dans le jeu.",
     "Level": "Niveau {0} (vous : {1})",

@@ -5875,6 +5875,17 @@
     "Result": "{0} action(s) imported, {1} line(s) ignored.",
     "Unknown": "Unknown names: {0}"
   },
+  "RecipeFacts": {
+    "Hq": "HQ possible",
+    "NoHq": "no HQ",
+    "Quick": "quick synthesis",
+    "QuickFrom": "quick synthesis from {0} Craftsmanship and {1} Control",
+    "Book": "master book: {0}",
+    "Specialist": "specialist only",
+    "Expert": "expert recipe",
+    "Item": "requires: {0}",
+    "Status": "requires status: {0}"
+  },
   "CraftReadiness": {
     "NoSet": "No {0} gear set in the game.",
     "Level": "Level {0} (you: {1})",

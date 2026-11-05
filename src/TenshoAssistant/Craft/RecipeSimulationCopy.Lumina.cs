@@ -13,6 +13,7 @@ internal static class RecipeSimulationCopy
         return new(table.Durability*row.DurabilityFactor/100,table.Difficulty*row.DifficultyFactor/100,quality,
             table.ProgressDivider,table.QualityDivider,table.ProgressModifier,table.QualityModifier,row.RequiredCraftsmanship,row.RequiredControl,
             checked((int)((long)quality*row.MaterialQualityFactor/100)),row.IsExpert,row.MaxAdjustableJobLevel.RowId!=0,row.IsSpecializationRequired,
-            collectable,checked((int)row.RequiredQuality));
+            collectable,checked((int)row.RequiredQuality),row.CanHq,row.CanQuickSynth,row.QuickSynthCraftsmanship,row.QuickSynthControl,
+            row.SecretRecipeBook.RowId!=0 ? row.SecretRecipeBook.Value.Name.ExtractText():"",row.ItemRequired.RowId,row.StatusRequired.RowId!=0 ? row.StatusRequired.Value.Name.ExtractText():"");
     }
 }

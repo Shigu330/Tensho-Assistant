@@ -119,6 +119,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C14 — K11 — A-12, partie anticipée : fiche de recette complète (livre de maître, synthèse rapide, HQ, prérequis, écart chiffré)
 
+- **État (relu le 2026-11-05)** : FAIT 0.600.
 - **État (relu le 2026-11-03)** : en partie 0.427 (A-12 : niveau, Habileté, Contrôle face au personnage, « Équiper ») ; livre de maître, synthèse rapide et HQ non faits.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Craft/RecipeCatalogLoader.Dalamud.cs`.
 - **Ce que le joueur obtient** : La recette (onglet Craft de la fiche objet et panneau du carnet) dit : livre de recettes de maître requis (et s'il est lu), synthèse rapide possible, HQ possible, spécialiste requis, objet ou statut requis, et l'écart chiffré « Habileté 3 950 / 4 000 : −50 ». Vous savez pourquoi une recette n'est pas faisable.

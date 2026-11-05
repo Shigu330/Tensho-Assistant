@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-04)
 
-VERSION: 0.599.0.0 (dernière release : Stable-0.539.0, 2026-11-05) — Verify.ps1 (agent) 1094/1094, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.600.0.0 (dernière release : Stable-0.539.0, 2026-11-05) — Verify.ps1 (agent) 1097/1097, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: préparer la 1.0.0 (publication Dalamud) ; voir [GOAL](GOAL.md) et [PUBLISHING](../project/PUBLISHING.md).
 QUOTA: plus de réserve (utilisateur, 2026-11-05) : coder tant que possible, reprise tenue à jour ici. L'agent ne voit pas le compteur. Dernier relevé de l'utilisateur (2026-11-05) : 5 h 0 %, réinitialisation à 9:50 ; semaine 95 %, réinitialisation à 23:00 (une vingtaine de versions ≈ 1 % de la semaine).
 
@@ -30,7 +30,7 @@ Liste complète : [TESTING](../project/TESTING.md), 284 cases ouvertes, aucune d
 Dépôt personnel : installation et mise à jour fonctionnent (rapport de l'utilisateur, 2026-11-05, 0.539.0). Possible depuis cette release : galerie de Mes outils (0.476) et liste de vidéos (0.506), qui lisent la branche `main`.
 
 ## Prochaine action
-0) [Plan global](../project/GLOBAL-PLAN.md) : phases 1 à 4 sans jouer, puis le jeu en dernier, un point à la fois ; la 1.0.0 après tout le plan (DEC-037). Feu vert donné le 2026-11-05 : enchaîner les phases 1 à 4 sans demander. Phase 1 finie. Reprise : phase 2 : C14, C35, C36, T23, T28, puis phase 4. [Coupure JcJ et classé](../project/COMPETITIVE-OFF-PLAN.md) : décisions prises, pas de code avant le feu vert de l'utilisateur (DEC-038). Phase 3 finie.
+0) [Plan global](../project/GLOBAL-PLAN.md) : phases 1 à 4 sans jouer, puis le jeu en dernier, un point à la fois ; la 1.0.0 après tout le plan (DEC-037). Feu vert donné le 2026-11-05 : enchaîner les phases 1 à 4 sans demander. Phase 1 finie. Reprise : phase 2, C35. [Coupure JcJ et classé](../project/COMPETITIVE-OFF-PLAN.md) : décisions prises, pas de code avant le feu vert de l'utilisateur (DEC-038). Phase 3 finie.
 1) Décisions de l'auteur sur les points Dalamud ([PUBLISHING](../project/PUBLISHING.md) « Ce qui reste », points 4 à 7 ; titre selon le job décidé, DEC-035), avec son accord à chaque règle.
 2) Fait le 2026-11-05 : release Stable-0.539.0, sur demande de l'utilisateur. La prochaine : une séance de jeu sur la dernière version d'abord (DEC-033).
 3) Vérifier en jeu les fenêtres converties (issue #38).

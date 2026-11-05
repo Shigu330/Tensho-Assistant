@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.600.0
+- Plan global, C14 : La recette dit, sur la fiche objet et dans le simulateur : HQ possible ou non, synthèse rapide et ses minimums, livre de maître, spécialiste, recette experte, objet et état requis, depuis la feuille Recipe du jeu. L'écart chiffré existait déjà dans le simulateur (A-12). Pas fait : savoir si le livre est lu, et l'affichage dans le panneau du carnet.
+- Tests : Recipe facts. Verify.ps1 (agent) : 1097/1097, 0 avertissement, 0 erreur ; DLL 0.600.0.0. Non validé en jeu.
+### English
+- The recipe says, on the item sheet and in the simulator: HQ possible or not, quick synthesis and its minimums, master book, specialist, expert, required item and status, from the game's Recipe sheet. The numeric gap already existed in the simulator (A-12). Not done: whether the book is read, and the Crafting Log panel.
+
 ## 0.599.0
 - Plan global, T10 : Accueil : bloc « Aujourd'hui » : rappels à faire, ce qui est terminé (servants, vaisseaux, escouade, jardin), prochain vaisseau, quêtes suivies, trois prochaines alarmes ; un clic ouvre la page. « Personnaliser » choisit les lignes et les tuiles affichées (par défaut : toutes). Rien n'est lu du jeu ici, et le bloc est refait une fois par seconde.
 - Tests : Today. Verify.ps1 (agent) : 1094/1094, 0 avertissement, 0 erreur ; DLL 0.599.0.0. Non validé en jeu.
