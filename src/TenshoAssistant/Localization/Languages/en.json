@@ -1813,6 +1813,8 @@
     "Bookmarks": "Bookmarked markers ({0})"
   },
   "MarketBoard": {
+    "CopyUndercut": "Copy {0} (lowest minus 1)",
+    "CopyUndercutTip": "Lowest offer without your retainers: {0} gil, read on {1}. The game may be ahead of this list. Only copied: you paste it yourself.",
     "NotMarketable": "This item cannot be sold on the market board.",
     "StaleCache": "Read failed: cached data from {0}.",
     "Waiting": "Cached data from {0}; new read in a few seconds.",

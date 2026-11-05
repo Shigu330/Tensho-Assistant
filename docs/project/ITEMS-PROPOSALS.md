@@ -149,6 +149,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I18 — I-07, partie anticipée : copier « prix le plus bas − 1 » depuis la page Marché
 
+- **État (relu le 2026-11-05)** : FAIT 0.567.
 - **État (relu le 2026-11-03)** : en partie 0.346 (I-07 : à l’ouverture des offres dans le jeu) ; pas depuis la page Marché.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.MarketBoard.cs`.
 - **Ce que le joueur obtient** : Sur l'onglet Annonces de Tensho, un bouton copie le prix le plus bas moins 1 (NQ ou HQ). Vos propres servants sont marqués, pour ne pas vous sous-coter.

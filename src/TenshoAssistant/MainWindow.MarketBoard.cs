@@ -186,6 +186,13 @@ internal sealed partial class MainWindow
             }
             else ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("MarketBoard.PlanNone"));
         }
+        // 0.567 (I18): from this page too: your retainers are left out, by name, and the date says how old the list is (the game itself may be ahead).
+        var ownRetainers=bankBridge.State.KnownRetainers?.Select(known=>known.Name).ToHashSet(StringComparer.Ordinal) ?? [];
+        if(Undercut.Price(board.Offers.Where(offer=>!ownRetainers.Contains(offer.Retainer) && offer.UnitPrice is >0 and <=uint.MaxValue).Select(offer=>new UndercutListing((uint)offer.UnitPrice,offer.Hq,0)),new HashSet<ulong>()) is { } lowest)
+        {
+            if(ImGui.SmallButton(localization.Format("MarketBoard.CopyUndercut",lowest.Paste.ToString("N0"))))ImGui.SetClipboardText(lowest.Paste.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("MarketBoard.CopyUndercutTip",lowest.Lowest.ToString("N0"),board.FetchedAt.ToLocalTime().ToString("g")));
+        }
         ImGui.TextDisabled(localization.Format("MarketBoard.Count",marketShown.Length,board.Offers.Count));
         if(marketShown.Length==0){ImGui.TextDisabled(localization.Get("MarketBoard.Empty"));return;}
         ImGui.TextDisabled(localization.Get("MarketBoard.SortHelp"));

@@ -171,6 +171,11 @@ internal static class Interfaces535Tests
             Check(back is not null && back.Name=="Mine" && back.Id!=template.Id && back.Zones.Count==1 && back.Zones[0].Query=="Ore" && back.Criteria.Count==1 && back.Criteria[0].Descending,"round trip");
             foreach(var bad in new[]{null,"","hello","TENSHO-SORT1:???","TENSHO-SORT1:e30="})Check(TenshoAssistant.Inventory.InventorySortTemplates.Decode(bad) is null,"refused: "+bad);
         }),
+        ("0.567: the market page copies the lowest offer minus 1, without your retainers",() =>
+        {
+            var board=Read("MainWindow.MarketBoard.cs");
+            Check(board.Contains("!ownRetainers.Contains(offer.Retainer)") && board.Contains("ImGui.SetClipboardText(lowest.Paste"),"only copied, own retainers left out");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

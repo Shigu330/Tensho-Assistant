@@ -55,7 +55,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | I9 | ~~Copier le nom de l'objet et lien d'objet dans le chat (local)~~ fait en 0.561 | S |  |
 | I15 | ~~Partager un modèle de tri en texte (copier / coller)~~ fait en 0.566 | S |  |
 | I16 | ~~Commandes « /tensho objet » et « /tensho prix »~~ fait en 0.555 | S |  |
-| I18 | I-07, partie anticipée : copier « prix le plus bas − 1 » depuis la page Marché | S |  |
+| I18 | ~~I-07, partie anticipée : copier « prix le plus bas − 1 » depuis la page Marché~~ fait en 0.567 | S |  |
 | I19 | ~~Nom anglais de l'objet dans la fiche et l'infobulle~~ fait en 0.562 | S |  |
 | I20 | ~~Aperçu du tri : cases déplacées signalées~~ fait en 0.565 | S |  |
 | I22 | Calculs faits à chaque image (reportés à e) : coût de préparation et historique du marché | S |  |

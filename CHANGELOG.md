@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.567.0
+- Plan global, I18 : page Marché : un bouton copie le prix le plus bas moins 1, sans vos servants, avec la date du relevé dans l'infobulle. Il reprend le calcul existant de la sous-cotation. Copié seulement : rien n'est mis en vente.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1030/1030, 0 avertissement, 0 erreur ; DLL 0.567.0.0. Non validé en jeu.
+### English
+- The market page can copy the lowest offer minus 1, without your retainers. It is only copied.
+
 ## 0.566.0
 - Plan global, I15 : un modèle de tri se copie en texte et se colle dans une autre bibliothèque. Le texte collé est vérifié et reçoit son propre identifiant ; il ne contient ni personnage ni objet possédé.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1029/1029, 0 avertissement, 0 erreur ; DLL 0.566.0.0. Non validé en jeu.

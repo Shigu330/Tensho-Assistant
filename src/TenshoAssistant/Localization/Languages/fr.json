@@ -1813,6 +1813,8 @@
     "Bookmarks": "Repères favoris ({0})"
   },
   "MarketBoard": {
+    "CopyUndercut": "Copier {0} (le plus bas moins 1)",
+    "CopyUndercutTip": "Offre la plus basse sans vos servants : {0} gils, relevée le {1}. Le jeu peut être en avance sur cette liste. Copié seulement : vous le collez vous-même.",
     "NotMarketable": "Cet objet ne se vend pas au marché.",
     "StaleCache": "Lecture impossible : données en cache du {0}.",
     "Waiting": "Données en cache du {0} ; nouvelle lecture dans quelques secondes.",
