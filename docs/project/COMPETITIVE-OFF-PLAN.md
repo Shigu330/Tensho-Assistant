@@ -30,7 +30,7 @@ Seuls les conseils de Triple Triade sont coupés (`TriadMatchAdvisor.Competitive
 |---|---|---|
 | 1. Drapeaux du jeu | JcJ, Triple Triad Battlehall, Lord of Verminion | `IClientState.IsPvP` avec `EnterPvP` et `LeavePvP`, `TerritoryType.IsPvpZone`, `ContentFinderCondition.PvP` : les nouvelles cartes JcJ sont couvertes sans mise à jour |
 | 2. Liste relevée | Tournois de Triple Triade (940, 941), Dédale bestial (1339-1343), Mahjong (831, classé ou non) | Pas de drapeau : liste dans le code, avec sa preuve |
-| 3. À établir | Donjons profonds, pêche océanique, Restauration d'Ishgard, exploration cosmique | Coupés si l'étape 1 établit leur classement (D1) ; un autre contenu classé trouvé là revient à l'utilisateur |
+| 3. À établir | Donjons profonds | Coupés si l'étape 1 établit leur classement (D1). Un autre contenu classé trouvé là, Ishgard ou l'exploration cosmique compris, revient à l'utilisateur avec sa preuve : rien n'est coupé sans son accord |
 | 4. Hors zone | Triple Triade contre un joueur, dans une zone normale | La zone ne suffit pas : seule la partie Triple Triade se coupe (D5) |
 
 ## Ce que « coupé » veut dire
@@ -78,7 +78,7 @@ Essais en jeu : quai de Wolves' Den ; match personnalisé de Crystalline Conflic
 
 | N° | Question | Réponse de l'utilisateur |
 |---|---|---|
-| D1 | Quels contenus coupent tout Tensho, en plus du JcJ, de la Battlehall et de Lord of Verminion ? | Tournois de Triple Triade et Mahjong (classé et non classé, même territoire). Dédale bestial. Si l'inventaire établit leur classement : donjons profonds, pêche océanique, Restauration d'Ishgard, exploration cosmique. **Pas** les courses de chocobos, ni le reste du Gold Saucer |
+| D1 | Quels contenus coupent tout Tensho, en plus du JcJ, de la Battlehall et de Lord of Verminion ? | Tournois de Triple Triade et Mahjong (classé et non classé, même territoire). Dédale bestial. Si l'inventaire établit leur classement : donjons profonds. **Pas** la pêche en mer (pas de classement, selon l'utilisateur), ni Ishgard et l'exploration cosmique (l'utilisateur pense qu'il n'y en a pas), ni les courses de chocobos et le reste du Gold Saucer |
 | D2 | Une alarme pendant une coupure ? | Rien : ni son, ni chat, ni Discord, et pas de rattrapage à la sortie |
 | D3 | Tensho prévient-il ? | Une ligne dans le chat à l'entrée, rien à la sortie |
 | D4 | Quai de Wolves' Den ? | Coupé |
@@ -87,7 +87,5 @@ Essais en jeu : quai de Wolves' Den ; match personnalisé de Crystalline Conflic
 Panneau du Dédale : abandonné. La page du dresseur reste une liste d'informations, hors du Dédale.
 
 Question à l'équipe Dalamud sur ce qui compte comme compétitif : pas retenue pour le moment. La règle n'en donne pas de liste : l'examen de la soumission peut donc juger autrement.
-
-Conséquence à connaître : si l'inventaire établit un classement pour la pêche océanique, le panneau de pêche océanique ne s'affiche plus pendant le voyage ; de même pour le craft et la récolte de Tensho pendant Ishgard et l'exploration cosmique.
 
 Code : pas commencé, à la demande de l'utilisateur. À lancer sur son feu vert, avant la phase 5.
