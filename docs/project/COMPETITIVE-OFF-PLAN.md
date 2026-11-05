@@ -72,6 +72,8 @@ Taille : gros chantier, surtout l'étape 5. Place dans le plan global : avant la
 - Aucun réglage : aucune propriété de `Configuration` ni clé de langue ne permet de l'éviter.
 - Code : tout abonnement, hook et appel d'action passe par le gardien.
 
+Essais déjà faits (2026-11-05, rapport de l'utilisateur et journal, 0.611) : quai de Wolves' Den, territoire 250 : coupé à l'entrée, ligne de chat, `/tensho` répond par la même ligne, repris seul à la sortie. Reste à essayer : un contenu détecté par le drapeau de ContentFinderCondition (Battlehall ou Lord of Verminion), un de la liste (Mahjong, tournoi, Dédale), un donjon profond, un Frontline ou Crystalline Conflict.
+
 Essais en jeu : quai de Wolves' Den ; match personnalisé de Crystalline Conflict ; Frontline ; Triple Triad Battlehall et tournoi ; Lord of Verminion ; Dédale ; Mahjong. Pour chacun : entrer avec la carte et des panneaux ouverts, tout doit disparaître et revenir à la sortie. Aussi : recharger le plugin en plein match ; se déconnecter en plein match.
 
 ## Décisions prises (2026-11-05, liste à cocher)
