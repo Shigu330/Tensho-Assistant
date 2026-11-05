@@ -114,6 +114,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I14 — Annuler le dernier tri
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Inventory/InventoryVisualSortBridge.Dalamud.cs`.
 - **Ce que le joueur obtient** : Après « Appliquer », un bouton « Annuler le dernier tri » remet l'ordre précédent des sacs ou du rangement ouvert, tant que rien n'a bougé depuis.
 - **Comment, taille, dépendances** : Garder l'ordre d'avant (copie managée des pages et des cases) avec l'instantané vérifié. « Annuler » construit un plan inverse soumis aux mêmes contrôles (plan.Matches, RequireOpenForSort, SortFunctionIndex). L'annulation est perdue au changement de personnage ou de rangement et au moindre mouvement d'objet. Taille S-M. Sonde : aucune ; test en jeu. Décision : un seul niveau d'annulation, pour la session (recommandé).

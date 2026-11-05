@@ -1,0 +1,172 @@
+# Plan global
+
+Brouillon du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisateur ; détail de chaque point : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md). **Rien n'est lancé tant que l'utilisateur n'a pas relu ce plan.** L'ordre des phases et des points est une proposition de l'agent.
+
+**La place de la 1.0.0 reste à décider** (choix de l'utilisateur : « décider plus tard », en relisant ce plan). 100 points ont été cochés « avant la 1.0 » ; à placer, le point 6 de [PUBLISHING](PUBLISHING.md) rappelle que la soumission peut être refusée si elle dépasse ce que l'équipe Dalamud peut examiner.
+
+| Phase | Contenu | Points | Il faut en jeu |
+|---|---|---:|---|
+| 1 | Corrections, en priorité | 5 | Relevés du jardin et de la régénération de PR |
+| 2 | Demande nouvelle et petites propositions | 44 | Essai à la fin |
+| 3 | Propositions moyennes | 19 | Essai à la fin |
+| 4 | Séances de relevés, puis propositions à sonder | 20 | Les relevés d'abord, avec l'utilisateur |
+| 5 | Gros chantiers | 6 | Sondes, et l'équipe Dalamud pour le Dédale |
+| 6 | Idées gardées | 5 | Une sonde pour les gils des servants |
+| 7 | Tests en jeu de tout ce qui précède | 1 | Campagne guidée, après le code |
+| Après la 1.0.0 | C10 | 1 | |
+
+Règles pour toutes les phases : une version par point, `Verify.ps1` vert, et les tests en jeu après le code (demande de l'utilisateur).
+
+## Phase 1 : corrections
+
+| Où | Ce qui manque | Issue |
+|---|---|---|
+| Jardin | Reconnaître les messages d'entretien et de récolte, puis retirer les lignes de journal de capture | #36 |
+| Jardin | Ajouter les Bleuets | #36 |
+| Escouade | Bouton d'alarme pour une mission en cours | #37 |
+| Récolte | Mesurer la régénération de PR pendant la récolte | #37 |
+| Objets | Blocs d'objets sans prix | #37 |
+
+## Phase 2 : petites propositions
+
+Demande nouvelle de l'utilisateur, en tête : **afficher ou cacher des icônes sur la carte**. À préciser à la relecture : la taille 0 d'une icône la cache déjà, dans les réglages.
+
+| N° | Proposition | Taille | Précision |
+|---|---|---|---|
+| P1 | Zoom à l'ouverture, réglable et gardé entre les sessions | S |  |
+| P2 | Taille des étiquettes réglée à part de celle des icônes | S |  |
+| P3 | Éthérite la plus proche du drapeau ou d'un point, avec son coût | S |  |
+| P5 | Molette : zoom depuis toute la fenêtre et pas réglable | S |  |
+| P9 | ALEA : bonus d'expérience et couleur selon le temps restant | S | La zone d'ALEA reste rose : pas de couleur selon le temps restant. |
+| P15 | État des lectures du jeu affiché sur la carte (R-14, partie carte) | S |  |
+| P16 | Option : clic gauche sur la carte pour poser le drapeau | S | Avec réglage. |
+| P20 | Bouton « Couches » pour tout afficher ou masquer en un clic | S |  |
+| I0 | Compter les pièces portées dans les stocks et dans « possédé » | S |  |
+| I5 | Coût de préparation au prix du centre de données (option de A-06) | S |  |
+| I8 | X-07, partie anticipée : ouvrir l'objet sur Universalis, Garland Tools, Teamcraft ou le wiki | S |  |
+| I9 | Copier le nom de l'objet et lien d'objet dans le chat (local) | S |  |
+| I15 | Partager un modèle de tri en texte (copier / coller) | S |  |
+| I16 | Commandes « /tensho objet » et « /tensho prix » | S |  |
+| I18 | I-07, partie anticipée : copier « prix le plus bas − 1 » depuis la page Marché | S |  |
+| I19 | Nom anglais de l'objet dans la fiche et l'infobulle | S |  |
+| I20 | Aperçu du tri : cases déplacées signalées | S |  |
+| I22 | Calculs faits à chaque image (reportés à e) : coût de préparation et historique du marché | S |  |
+| C0 | A-01, partie anticipée : choisir la qualité visée dans le panneau du carnet | S |  |
+| C2 | Essayer ses séquences sauvegardées sur toutes les recettes | S |  |
+| C3 | Simuler un autre métier sans le porter : derniers attributs relevés par métier et attributs prévus de la page Équipement | S |  |
+| C4 | Seuils d'attributs d'une séquence : Habileté, Contrôle et PS minimum | S |  |
+| C9 | R-02, partie anticipée : « possible maintenant ? » dans l'aide à la pêche | S |  |
+| C12 | Qualité initiale calculée à partir des ingrédients HQ choisis | S |  |
+| C14 | A-12, partie anticipée : fiche de recette complète (livre de maître, synthèse rapide, HQ, prérequis, écart chiffré) | S |  |
+| C15 | Simulateur plus direct : choix de la recette dans la page, résultat recalculé tout seul, glisser-déposer | S |  |
+| C17 | Options d'export des macros : attentes séparées (X-12), son, écho final, icône | S |  |
+| C19 | Où sont mes matériaux : détail par rangement dans la préparation et la chaîne | S |  |
+| C24 | Besoin restant de la préparation dans les aides de récolte et de pêche | S |  |
+| C31 | Météo de plusieurs zones en un tableau (zones favorites) | S |  |
+| C32 | Commandes « /tensho recolte » et « /tensho recette » (suite de I16) | S |  |
+| C35 | Aide à la pêche : lectures du jeu et premières tables hors de Draw | S |  |
+| C36 | R-14, partie artisanat et récolte : une aide illisible le dit au lieu de disparaître | S |  |
+| T3 | Quêtes : colonnes Niveau et Zone, tri et filtre de niveau | S |  |
+| T4 | Monstres : drapeau sur la position du monstre, pas au centre de la carte | S |  |
+| T16 | Tâches de servants : une ligne par servant, avec alarme | S |  |
+| T17 | Rappels cochés d'eux-mêmes quand le jeu le dit | S |  |
+| T18 | Discord : heure lue dans le fuseau de chaque membre, et balises [zone], [objet], [et] | S |  |
+| T19 | Alarmes : modifier le nom et l'heure, et « Me rappeler dans 5 min » | S |  |
+| T20 | Alarmes : sonner aussi à l'heure exacte | S |  |
+| T23 | Compagnie libre : vaisseaux groupés par compagnie, ancien relevé effaçable, valeur du dernier butin | S |  |
+| T28 | Collections : « Obtenus récemment » et menu des sources pour les emotes | S |  |
+| T29 | Mini Cactpot : table des gains prouvée et visible | S |  |
+
+## Phase 3 : propositions moyennes
+
+| N° | Proposition | Taille | Précision |
+|---|---|---|---|
+| P10 | Recherche sur la carte (lieux, éthérites, PNJ, quêtes, ressources) | M | Depuis la section Carte du plugin, pas depuis la carte. |
+| P12 | Noms écrits à côté des icônes, comme la carte du jeu | M |  |
+| I1 | Signaler et effacer le relevé d'un servant renvoyé ou d'un ancien rangement | S-M |  |
+| I3 | Prix des marchands PNJ dans le coût de préparation et sur la page Marché | S-M |  |
+| I11 | Vue en liste triable de la Banque | S-M |  |
+| I21 | Filtre de job et de set d'équipement dans les règles de tri | M |  |
+| C5 | Suivre sa séquence pendant la synthèse : action suivante et écart avec le plan | M | Information seulement, aucune action jouée. |
+| C7 | R-13, partie anticipée : points à horaire ouverts maintenant ou bientôt | S-M |  |
+| C16 | Bibliothèque des séquences : recherche, renommer, dupliquer, copier et coller en texte (A-08, partie texte) | S-M |  |
+| C18 | Chaîne de fabrication : boutons par étape, étapes identiques regroupées, cases « fait » | S-M |  |
+| C21 | « Que puis-je fabriquer ? » avec mes stocks | M |  |
+| T0 | Alarmes en heure réelle : à la main, chaque jour, chaque semaine ou à chaque remise à zéro (X-10, partie anticipée) | S-M |  |
+| T10 | Accueil : bloc « Aujourd'hui » et tuiles au choix | M |  |
+| T11 | Quêtes « disponibles maintenant » et quêtes de la zone actuelle | M |  |
+| T12 | Chemin vers une quête : prérequis restants, nombre et prochaine à faire | M |  |
+| T14 | Équipement : préparer le plan d'un autre job que celui porté | M |  |
+| T15 | Revue de mode : tenue de la semaine choisie, essayée en un clic, avec l'endroit de chaque pièce | M | Sur clic seulement. |
+| T24 | Discord : un salon par catégorie (plusieurs webhooks) | M |  |
+| T25 | Équipement : plusieurs plans nommés par job | S-M |  |
+
+## Phase 4 : à sonder d'abord
+
+Une donnée n'est pas prouvée : le relevé précède le code. C33 et T5 sont ces relevés, regroupés en séances : ils passent en premier.
+
+| N° | Proposition | Taille | Précision |
+|---|---|---|---|
+| C33 | Une seule séance de relevés en jeu pour l'artisanat et la récolte, avant de coder | S-M |  |
+| T5 | Une séance de relevés en jeu pour ces outils, avant de coder | S |  |
+| P6 | Coordonnées du personnage toujours visibles et distances | S | Coordonnées du drapeau sous son icône de bord de carte, pas dans un coin ; avec réglage. |
+| P7 | Éthérites non harmonisées signalées et coût au survol | S |  |
+| P11 | Parties non découvertes masquées comme sur la carte du jeu | M | Avec réglage. |
+| P17 | Relevé du type de marqueur des mandats et de leurs zones | S |  |
+| P22 | Noms des variantes d'icônes de quête (71141 / 71151) | S |  |
+| I4 | Prix Universalis par lots : une requête pour toute une liste | M | Sonde par une requête web, sans relevé en jeu. |
+| I10 | Cristaux et gils des servants dans le relevé du servant | M |  |
+| C6 | Recettes à niveau ajusté, à qualité imposée et Exploration cosmique | M-L |  |
+| C13 | Chance HQ d'une qualité finale | S |  |
+| C22 | Projets de l'atelier de compagnie libre : matériaux par pièce et par phase | M |  |
+| C27 | Classe du point (normal, éphémère, légendaire…) et livre de folklore requis | S |  |
+| C28 | Durée de l'intuition et compte à rebours | S |  |
+| C29 | R-15, partie anticipée : poissons au harpon dans la page Récolte | S-M |  |
+| C30 | Relevé local de vos prises et temps de touche personnels | M |  |
+| T13 | Contenus et quêtes : « Débloqué par » et « Débloque » | M |  |
+| T21 | Personnage : niveaux et expérience de tous les jobs | S |  |
+| T26 | Dirigeables : trajet du dernier voyage reconstitué | S |  |
+| T27 | Actions de compagnie actives : heure de fin et alarme | M |  |
+
+## Phase 5 : gros chantiers
+
+| Point | D'abord | Précision |
+|---|---|---|
+| I-05, suite des ventes des servants | Essayer la 0.508 | |
+| N-04, loterie immobilière | Sonde : structure du jeu à trouver | |
+| N-07, ressources de l'île | Vérifier l'unité des positions en jeu | |
+| N-10, atelier de l'île | Relire la conception, puis sonde | Mis de côté par DEC-033 ; repris à la revue |
+| N-12, conditions des rangs S | Choisir les sources, licence d'abord | |
+| Panneau du Dédale et suite du dresseur | **Règle Dalamud** : résumé, accord de l'utilisateur, puis contact de l'équipe (DEC-032) | Protections demandées par l'utilisateur : bloqué en JcJ, JcE seulement, pas de classé ; informations seulement |
+
+## Phase 6 : idées gardées
+
+| Idée | Note |
+|---|---|
+| Alerte du plafond hebdomadaire des mémoquartz | |
+| « Où est cet objet ? » sur tous les personnages | Gros changement des stocks |
+| Gils des servants dans la vue des personnages | Sonde |
+| Liste des objets annotés, filtre par étiquette | Petite |
+| Écrire le fichier d'un personnage seulement s'il change | Technique |
+
+## Phase 7 : tests en jeu
+
+| N° | Proposition | Taille | Précision |
+|---|---|---|---|
+| P19 | Tests en jeu de la carte encore en attente | S |  |
+
+P19 s'élargit en campagne guidée de fin, sur tout ce qui a été codé, avec les cases ouvertes de [TESTING](TESTING.md).
+
+## Écartés à la revue
+
+Ne pas refaire sans nouvelle demande :
+
+| Point | Raison donnée |
+|---|---|
+| P21 raccourcis, P23 amis, P24 téléportation par nom, P25 mini-carte | Refusés par l'utilisateur |
+| P26 clignotement, P27 teinte d'icône | Non retenus après explication |
+| C23 barres de raccourcis | Refusé |
+| I14 annuler un tri | « Aucun intérêt » |
+| I-15 recherche dans les fenêtres d'inventaire | « Pas l'intérêt » |
+| N-13 meubles visibles, X-14 aménagement | Non retenus après explication |
+| Prix moyen récent avant de coller | Non coché, donc rejeté |

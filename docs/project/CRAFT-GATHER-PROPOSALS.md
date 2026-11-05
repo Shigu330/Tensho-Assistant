@@ -180,6 +180,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C23 — K20 — Action suivante mise en évidence sur les barres de raccourcis
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Craft/CraftLiveReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Pendant une synthèse suivie (K6, puis A-04), l'action conseillée clignote sur vos barres comme une action combo du jeu. Vous fabriquez à la main sans quitter les barres des yeux. Rien n'est exécuté.
 - **Comment, taille, dépendances** : Nouveau hook en lecture/retour seul (ActionManager.IsActionHighlighted), créé seulement quand le réglage est activé (désactivé par défaut, infobulle, ↺), gardé R-14 (désactivé proprement si la signature change), libéré au Dispose. Taille M. Dépendances : K6 ou A-04 pour l'action conseillée. Sonde : signature dans FFXIVClientStructs. Décision : accepter un nouveau hook (recommandé : oui, désactivé par défaut).

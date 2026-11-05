@@ -92,6 +92,7 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 | 0.345 | Ne réécrire le fichier d'un personnage que si ses quantités ont changé | Économie d'écritures disque ; aujourd'hui une écriture toutes les 2 minutes par rangement relevé d'office |
 
 Tri des propositions des quatre audits (2026-11-05) : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md).
+Revue du 2026-11-05 avec l'utilisateur : [plan global](GLOBAL-PLAN.md). I-15, N-13 et X-14 sont écartés ; N-10 est repris.
 
 ## Écarts laissés pour une séance avec l'utilisateur
 

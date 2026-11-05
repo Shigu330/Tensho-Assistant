@@ -163,6 +163,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P21 — Raccourcis clavier dans la carte
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MapViewWindow.cs`.
 - **Ce que le joueur obtient** : Quand la carte a le focus : +/- pour zoomer, flèches pour la déplacer, Début pour la carte entière, une touche pour suivre le personnage.
 - **Comment, taille, dépendances** : Lire ImGui.IsKeyPressed seulement quand la fenêtre de la carte a le focus et qu'aucun champ texte n'est actif, pour ne pas voler les touches du jeu. Réglage on/off avec infobulle et ↺. Taille S. Aucune sonde. Décision : les touches (recommandé : désactivé par défaut).
@@ -177,6 +178,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P23 — Amis proches sur la carte
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Les amis présents autour du personnage, donc déjà chargés par le jeu, sont dessinés sur la carte Tensho comme les membres du groupe.
 - **Comment, taille, dépendances** : Dans ReadObjects, copier les joueurs avec StatusFlags.Friend (nom, position), au plus N. Nouvelle couche avec taille et priorité, désactivée par défaut. Membres de la compagnie libre : aucune source fiable connue (le tag n'identifie pas sûrement la compagnie), donc laissés de côté sans sonde. Taille S. Décision : ajouter ou non cette couche (vie privée).
@@ -184,6 +186,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P24 — Commande de téléportation par nom (/tensho tp)
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/Plugin.cs`.
 - **Ce que le joueur obtient** : Taper « /tensho tp Ul'dah » (ou un alias) lance la même demande de téléportation que le clic sur une éthérite de la carte, avec son coût.
 - **Comment, taille, dépendances** : Sous-commande qui cherche dans la liste des éthérites (feuille Aetheryte, en cache) puis ouvre la confirmation, ou téléporte directement si l'option le permet. C'est toujours une action explicite du joueur. Taille S. Aucune sonde. Décision : nom de la commande et alias.
@@ -191,6 +194,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P25 — Mini-carte Tensho
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Une petite fenêtre compacte qui suit le personnage (éthérites, groupe, ALEA, drapeau), redimensionnable et zoomable, à côté de la mini-carte du jeu ou à sa place.
 - **Comment, taille, dépendances** : Seconde fenêtre WindowSystem qui réutilise DrawMapCanvas en mode compact (sans menus). La rotation avec la caméra demande de lire l'orientation de la caméra (sonde). Taille L. Décision : la faire ou non, et rotation ou nord en haut.
@@ -198,6 +202,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P26 — Position mise en évidence au survol des listes du clic droit
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.MapLocalLists.cs`.
 - **Ce que le joueur obtient** : En survolant une ligne des onglets du clic droit (quête, PNJ, point de récolte), l'endroit correspondant clignote sur la carte en dessous.
 - **Comment, taille, dépendances** : Garder la position survolée de l'image en cours ; le canevas dessine un anneau pulsé à l'image suivante. Taille S. Aucune sonde. Pas de décision.
@@ -205,6 +210,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P27 — Couleur réglable par icône
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Chaque type d'icône peut recevoir une teinte, en plus de sa taille et de sa priorité, pour repérer d'un coup d'œil ce qui compte.
 - **Comment, taille, dépendances** : Table IconTints (globale et par carte, comme les tailles), appliquée par le paramètre de couleur d'AddImage. Pastille de couleur avec infobulle et ↺ sur chaque ligne. Taille S. Aucune sonde. Décision : utile ou non (faible valeur).

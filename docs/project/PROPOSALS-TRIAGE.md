@@ -4,7 +4,7 @@ Tri du 2026-11-05, à la version 0.539.0, des 95 propositions restées ouvertes 
 
 **Méthode et limites.** L'état vient d'une recherche dans le code et les textes de l'interface, sans lire chaque fonction ni essayer en jeu : un « non fait » peut être en partie fait. Valeur et taille (S, M) sont les estimations des audits. Le classement est une recommandation de l'agent : rien n'est décidé tant que l'utilisateur n'a pas choisi. Aucune de ces propositions n'est exigée pour la 1.0.0 ([PUBLISHING](PUBLISHING.md)).
 
-**Décision de l'utilisateur (2026-11-05) : aucun code sur ces propositions pour l'instant.** Tout est rassemblé ici, en [liste complète](#liste-complète) ; le plan global se fera ensuite, avec l'utilisateur.
+**Revue faite avec l'utilisateur le 2026-11-05 : ses décisions sont dans le [plan global](GLOBAL-PLAN.md), qui prime sur les recommandations ci-dessous.** Aucun code tant qu'il n'a pas relu ce plan.
 
 | Classe | Nombre | Recommandation |
 |---|---|---|
@@ -233,7 +233,7 @@ Détail : [TOOLS-PROPOSALS](TOOLS-PROPOSALS.md).
 | T18 | Discord : heure lue dans le fuseau de chaque membre, et balises [zone], [objet], [et] | Dans un salon partagé de compagnie libre, chaque membre lit l'heure de l'alarme dans son propre fuseau (et « dans 5 minutes »). Vos messages peuvent aussi donner la zone, l'objet et l'heure d'Éorzéa. | moyenne | S | Après 1.0.0 |
 | T19 | Alarmes : modifier le nom et l'heure, et « Me rappeler dans 5 min » | Vous renommez une alarme ou changez son heure ET ou sa date sans la recréer. Une alarme qui vient de sonner peut être reportée de quelques minutes, depuis la page Alarmes ou l'infobulle de la barre du serveur. | moyenne | S | Lot 2 |
 | T20 | Alarmes : sonner aussi à l'heure exacte | En plus du rappel N minutes avant, l'alarme peut sonner une seconde fois quand la fenêtre s'ouvre : point de récolte, poisson, retour de vaisseau. | moyenne | S | Lot 2 |
-| T21 | Personnage : niveaux et expérience de tous les jobs |  | moyenne | S | Sonde |
+| T21 | Personnage : niveaux et expérience de tous les jobs | Les niveaux et l'expérience de tous tes jobs sur la page Personnage. | moyenne | S | Sonde |
 | T23 | Compagnie libre : vaisseaux groupés par compagnie, ancien relevé effaçable, valeur du dernier butin | Avec des personnages dans plusieurs compagnies, chaque atelier a son propre cadre (nom de la compagnie, date du relevé). Le relevé d'une compagnie quittée peut être effacé. | moyenne | S | Après 1.0.0 |
 | T24 | Discord : un salon par catégorie (plusieurs webhooks) | Les retours de vaisseaux partent dans le salon de la compagnie libre, vos alarmes de récolte dans votre salon privé. | moyenne | M | Après 1.0.0 |
 | T25 | Équipement : plusieurs plans nommés par job | Pour un même job, vous gardez « montée de niveau », « artisanat » et « meilleur possible », et passez de l'un à l'autre ; chacun se partage par code. | moyenne | S-M | Après 1.0.0 |
