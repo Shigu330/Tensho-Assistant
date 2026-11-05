@@ -91,6 +91,8 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 | 0.346 | Sous-cotation : afficher aussi le prix moyen de vente récent avant de coller (garde-fou contre une offre trop basse) | Demande un appel Universalis de plus |
 | 0.345 | Ne réécrire le fichier d'un personnage que si ses quantités ont changé | Économie d'écritures disque ; aujourd'hui une écriture toutes les 2 minutes par rangement relevé d'office |
 
+Tri des propositions des quatre audits (2026-11-05) : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md).
+
 ## Écarts laissés pour une séance avec l'utilisateur
 
 | Écart | Raison |

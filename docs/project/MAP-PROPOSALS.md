@@ -112,6 +112,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P14 — Mesurer le temps d'affichage de la carte et l'alléger
 
+- **État (relu le 2026-11-05)** : FAIT pour la mesure, 0.489 (ligne « Map » des diagnostics) ; alléger reste à décider sur mesure (tri du 2026-11-05, [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md)).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : La carte, la fenêtre la plus chargée de Tensho, reste fluide, et son coût par image est visible dans Diagnostics, comme celui des autres pages.
 - **Comment, taille, dépendances** : Ajouter une ligne « Carte » au relevé de Diagnostics (même anneau de 120 images). Garder le regroupement des vendeurs par (carte, catalogue, ShowFixedIcons), comme mapGatheringCache, et les marqueurs filtrés par référence de live.Events. Taille S. Relevé en jeu par l'utilisateur, avant et après, comme en 0.292. Pas de décision.

@@ -68,6 +68,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C8 — G2 — Plan PA du panneau de récolte : quantité observée et effets déjà actifs
 
+- **État (relu le 2026-11-05)** : FAIT 0.515–0.517 (plan par nœud et effets du lieu ; tri du 2026-11-05, [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md)).
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.GatheringPanel.cs`.
 - **Ce que le joueur obtient** : Le plan PA du panneau en jeu tient compte de ce qui est déjà acheté sur le point (Rendement accru, Don de la terre, Bonne augure…) et de la quantité affichée : il ne propose plus une action déjà active et ne compte plus son effet deux fois. Le gain attendu affiché devient fiable.
 - **Comment, taille, dépendances** : Sonde d'abord : identifiants des statuts posés par chaque action (Lumina Status, avec tools/GatheringActionsProbe), puis lecture des statuts du joueur dans GatheringObservationReader (framework, gardée R-14). Remplir GpActiveEffects et le rendement de base (quantité affichée moins l'effet actif) ; « effets actifs inconnus » si la lecture échoue. Taille S-M. Dépendances : R-09 (Raisonnement solide, Eurêka) complétera le modèle. Décision : aucune.
@@ -259,6 +260,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C34 — K21 — Missions d'approvisionnement de la Grande Compagnie du jour
 
+- **État (relu le 2026-11-05)** : FAIT 0.469 (`Items/GcSupplyToday.cs` ; tri du 2026-11-05, [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.Reminders.cs`.
 - **Ce que le joueur obtient** : La liste des objets demandés aujourd'hui par votre Grande Compagnie (artisans et récolteurs), avec vos stocks et un lien vers la recette ou la récolte. Pratique pour la montée en niveau.
 - **Comment, taille, dépendances** : Sonde d'abord : où le client garde la liste du jour après ouverture de la fenêtre d'approvisionnement ou des minuteurs (FFXIVClientStructs, à sonder), aucune requête déclenchée par Tensho. Puis copie sur le framework, gardée R-14, affichée sur la page Rappels. Taille M. Dépendances : aucune. Décision : emplacement (recommandé : page Rappels).
