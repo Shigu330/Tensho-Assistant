@@ -16,7 +16,7 @@
     "Available": "Available",
     "ComingSoon": "Coming soon",
     "FoundationAvailable": "Foundation available",
-    "CommandHelp": "Open Tensho Assistant. /tensho fish (or peche): show or hide the fishing help. « wiki <item> » / « lodestone <item> » open the item's page. « todo <task> » adds a task to Reminders.",
+    "CommandHelp": "Open Tensho Assistant. /tensho fish (or peche): show or hide the fishing help. « wiki <item> » / « lodestone <item> » open the item's page. « todo <task> » adds a task to Reminders. « item <item> », « price », « gather », « recipe » open it in Tensho.",
     "ToolFilterTip": "Part of a category, tool or reference plugin name; accents and case ignored."
   },
   "MyToolsEditor": {

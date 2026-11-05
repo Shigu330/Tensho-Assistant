@@ -16,7 +16,7 @@
     "Available": "Disponible",
     "ComingSoon": "À venir",
     "FoundationAvailable": "Fondation disponible",
-    "CommandHelp": "Ouvrir Tensho Assistant. /tensho peche (ou fish) : afficher ou masquer l'aide à la pêche. « wiki <objet> » / « lodestone <objet> » ouvrent la page de l'objet. « todo <tâche> » ajoute une tâche aux Rappels.",
+    "CommandHelp": "Ouvrir Tensho Assistant. /tensho peche (ou fish) : afficher ou masquer l'aide à la pêche. « wiki <objet> » / « lodestone <objet> » ouvrent la page de l'objet. « todo <tâche> » ajoute une tâche aux Rappels. « objet <objet> », « prix », « recolte », « recette » l'ouvrent dans Tensho.",
     "ToolFilterTip": "Partie du nom d'un domaine, d'un outil ou d'un plugin de référence ; accents et majuscules ignorés."
   },
   "MyToolsEditor": {

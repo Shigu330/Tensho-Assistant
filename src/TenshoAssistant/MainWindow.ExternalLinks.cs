@@ -22,6 +22,25 @@ internal sealed partial class MainWindow
     }
 
     /// <summary>« /tensho wiki | lodestone &lt;item&gt; »: opens the page of the item named; returns what to tell the player, or null when opened.</summary>
+    // 0.555 (I16, C32): « /tensho item <name> », « price », « gather », « recipe », in French and English: the first item that matches, as for wiki and lodestone.
+    internal static ItemContextRoute? CommandRoute(string word)=>word.ToLowerInvariant() switch
+    {
+        "objet" or "item"=>ItemContextRoute.Stocks,
+        "prix" or "price"=>ItemContextRoute.Market,
+        "recolte" or "récolte" or "gather" or "gathering"=>ItemContextRoute.Gathering,
+        "recette" or "recipe" or "craft"=>ItemContextRoute.Craft,
+        _=>null,
+    };
+    internal string? OpenFromCommand(ItemContextRoute route,bool sheet,string text)
+    {
+        if(text.Trim().Length==0)return localization.Get("ExternalLinks.Usage");
+        if(itemCatalog.State.Catalog is not { } catalog)return localization.Get("ExternalLinks.Loading");
+        if(ExternalLinks.Find(catalog.Search(text,100),text) is not { } item)return localization.Format("ExternalLinks.NoItem",text.Trim());
+        if(sheet){SelectItem(item.Id);OpenItemSheet();}
+        else OpenRoute(route,item.Id);
+        IsOpen=true;
+        return null;
+    }
     internal string? OpenExternal(bool wiki,string text)
     {
         if(text.Trim().Length==0)return localization.Get("ExternalLinks.Usage");

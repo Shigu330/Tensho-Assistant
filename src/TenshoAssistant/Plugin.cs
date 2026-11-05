@@ -1024,6 +1024,12 @@ public sealed class Plugin : IDalamudPlugin
             chatGui.Print("[Tensho] " + (parts.Length > 1 ? mainWindow.AddTaskFromCommand(parts[1]) : localization.Get("PersonalTasks.CommandUsage")));
             return;
         }
+        if (parts.Length >= 1 && MainWindow.CommandRoute(parts[0]) is { } route)
+        {
+            var sheet = parts[0].ToLowerInvariant() is "objet" or "item";
+            if (mainWindow?.OpenFromCommand(route, sheet, parts.Length > 1 ? parts[1] : "") is { } failed) chatGui.Print("[Tensho] " + failed);
+            return;
+        }
         if (parts.Length >= 1 && parts[0].ToLowerInvariant() is "wiki" or "lodestone")
         {
             if (mainWindow?.OpenExternal(parts[0].ToLowerInvariant() == "wiki", parts.Length > 1 ? parts[1] : "") is { } problem) chatGui.Print("[Tensho] " + problem);

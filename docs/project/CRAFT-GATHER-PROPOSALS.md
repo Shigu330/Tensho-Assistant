@@ -250,6 +250,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C32 — G13 — Commandes « /tensho recolte » et « /tensho recette » (suite de I16)
 
+- **État (relu le 2026-11-05)** : FAIT 0.555, avec I16.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Plugin.cs`.
 - **Ce que le joueur obtient** : « /tensho recolte minerai de fer » ouvre la page Récolte sur l'objet, « /tensho recette … » ouvre son onglet Craft ; utilisables aussi dans une macro du jeu, comme /gather de GatherBuddy.
 - **Comment, taille, dépendances** : Même analyse d'arguments que I16, OpenGathering et l'onglet Craft ; mots français et anglais ; aide de la commande traduite. Taille S. Dépendances : I16. Sonde : aucune. Décision : mots-clés (recommandé : recolte/gather et recette/recipe).

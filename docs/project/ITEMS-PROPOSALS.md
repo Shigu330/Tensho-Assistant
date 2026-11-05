@@ -130,6 +130,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I16 — Commandes « /tensho objet » et « /tensho prix »
 
+- **État (relu le 2026-11-05)** : FAIT 0.555.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Plugin.cs`.
 - **Ce que le joueur obtient** : « /tensho objet minerai de fer » ouvre la fiche de l'objet, ou la recherche s'il y a plusieurs résultats ; « /tensho prix … » ouvre la page Marché. Les deux marchent aussi dans une macro du jeu.
 - **Comment, taille, dépendances** : Lire les arguments (mots français et anglais), chercher avec ItemCatalog.Search, puis SelectItem et OpenItemSheet, ou OpenRoute(Market). Traduire l'aide de la commande (Plugin.CommandHelp). Taille S. Sonde : aucune. Décision : les mots-clés (recommandé : objet/item et prix/price ; marchand/vendor en option).

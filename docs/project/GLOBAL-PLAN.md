@@ -54,7 +54,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | I8 | X-07, partie anticipée : ouvrir l'objet sur Universalis, Garland Tools, Teamcraft ou le wiki | S |  |
 | I9 | Copier le nom de l'objet et lien d'objet dans le chat (local) | S |  |
 | I15 | Partager un modèle de tri en texte (copier / coller) | S |  |
-| I16 | Commandes « /tensho objet » et « /tensho prix » | S |  |
+| I16 | ~~Commandes « /tensho objet » et « /tensho prix »~~ fait en 0.555 | S |  |
 | I18 | I-07, partie anticipée : copier « prix le plus bas − 1 » depuis la page Marché | S |  |
 | I19 | Nom anglais de l'objet dans la fiche et l'infobulle | S |  |
 | I20 | Aperçu du tri : cases déplacées signalées | S |  |
@@ -71,7 +71,7 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | C19 | Où sont mes matériaux : détail par rangement dans la préparation et la chaîne | S |  |
 | C24 | Besoin restant de la préparation dans les aides de récolte et de pêche | S |  |
 | C31 | Météo de plusieurs zones en un tableau (zones favorites) | S |  |
-| C32 | Commandes « /tensho recolte » et « /tensho recette » (suite de I16) | S |  |
+| C32 | ~~Commandes « /tensho recolte » et « /tensho recette » (suite de I16)~~ fait en 0.555 | S |  |
 | C35 | Aide à la pêche : lectures du jeu et premières tables hors de Draw | S |  |
 | C36 | R-14, partie artisanat et récolte : une aide illisible le dit au lieu de disparaître | S |  |
 | T3 | ~~Quêtes : colonnes Niveau et Zone, tri et filtre de niveau~~ fait en 0.550 | S |  |

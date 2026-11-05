@@ -88,6 +88,12 @@ internal static class Interfaces535Tests
             Check(new TenshoAssistant.Configuration().CraftLogTryAllPresets,"on by default");
             Check(Read("MainWindow.CraftLog.cs").Contains("TryAllPresets:configuration.CraftLogTryAllPresets"),"passed to the session");
         }),
+        ("0.555: item commands in French and English, added beside wiki and lodestone",() =>
+        {
+            var links=Read("MainWindow.ExternalLinks.cs");
+            foreach(var word in new[]{"\"objet\" or \"item\"","\"prix\" or \"price\"","\"recolte\" or \"récolte\" or \"gather\"","\"recette\" or \"recipe\""})Check(links.Contains(word),word);
+            Check(Read("Plugin.cs").Contains("MainWindow.CommandRoute(parts[0]) is { } route"),"the command uses them");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

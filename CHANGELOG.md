@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.555.0
+- Plan global, I16 : commandes « /tensho objet », « prix », « recolte » et « recette » (aussi item, price, gather, recipe), avec C32 : elles ouvrent le premier objet trouvé dans Tensho, comme wiki et lodestone.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1019/1019, 0 avertissement, 0 erreur ; DLL 0.555.0.0. Non validé en jeu.
+### English
+- New commands: /tensho item, price, gather and recipe, in French and English, open the first matching item in Tensho.
+
 ## 0.554.0
 - Plan global, C3 : le panneau du carnet calcule avec les derniers attributs relevés du métier de la recette, marqués « relevés le… », au lieu de dire « Équipez le métier ». Le simulateur propose les mêmes valeurs. Écrit seulement quand ça change. Le bouton « Simuler avec ces attributs » de la page Équipement reste à faire.
 - Tests : CraftThresholds553Tests complété. Verify.ps1 (agent) : 1018/1018, 0 avertissement, 0 erreur ; DLL 0.554.0.0. Non validé en jeu.
