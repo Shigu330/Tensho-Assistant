@@ -921,6 +921,7 @@ public sealed class Plugin : IDalamudPlugin
             };
             UI.GameWindowsReader? gameWindows=null;
             registrations.Register(()=>{gameWindows=new UI.GameWindowsReader(framework,client,gameGui,log,()=>mainWindow.DeveloperMode);mainWindow.GameWindowSource=()=>gameWindows.Windows;},()=>{mainWindow.GameWindowSource=null;gameWindows?.Dispose();});
+            mainWindow.ItemLinkToChat=id=>chatGui.Print(new Dalamud.Game.Text.SeStringHandling.SeStringBuilder().AddItemLink(id,false).BuiltString);
             UI.GameWindowFollower? gameWindowFollower=null;
             registrations.Register(()=>{gameWindowFollower=new UI.GameWindowFollower(framework,gameGui,log);mainWindow.GameWindowFollow=gameWindowFollower.At;bankOverlay.Follow=gameWindowFollower.At;},()=>{mainWindow.GameWindowFollow=null;bankOverlay.Follow=null;gameWindowFollower?.Dispose();});
             Gathering.GatherKnowledgeReader? gatherKnowledge=null;

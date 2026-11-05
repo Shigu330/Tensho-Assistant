@@ -2709,6 +2709,9 @@
     "Level": "{0} · niveau {1}"
   },
   "ItemMenu": {
+    "CopyName": "Copier le nom",
+    "LinkChat": "Lien dans mon chat",
+    "OpenOn": "Ouvrir sur",
     "TryOn": "Essayer (cabine d’essayage)",
     "OpenTriad": "Voir dans Triple Triade",
     "Quest": "Quête qui le donne",

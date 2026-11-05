@@ -140,6 +140,12 @@ internal static class Interfaces535Tests
             Check(result.Remaining(5,99)==0 && result.Remaining(5,3)==14,"bounded");
             Check(result.Remaining(6,10) is null,"not needed");
         }),
+        ("0.561: an item's menu copies its name, links it in your own chat and opens its pages",() =>
+        {
+            var menu=Read("MainWindow.DutyFinder.cs");
+            foreach(var entry in new[]{"ItemMenu.CopyName","ItemMenu.LinkChat","ItemMenu.OpenOn","ExternalLinks.Universalis(item.Id)","ExternalLinks.Garland(item.Id)","ExternalLinks.Teamcraft("})Check(menu.Contains(entry),entry);
+            Check(Read("Plugin.cs").Contains("chatGui.Print(new Dalamud.Game.Text.SeStringHandling.SeStringBuilder().AddItemLink(id,false).BuiltString)"),"printed locally, nothing sent");
+        }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
         {
             Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");

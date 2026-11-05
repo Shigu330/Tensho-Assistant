@@ -51,8 +51,8 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 | P20 | ~~Bouton « Couches » pour tout afficher ou masquer en un clic~~ fait en 0.547 | S |  |
 | I0 | ~~Compter les pièces portées dans les stocks et dans « possédé »~~ fait en 0.549 | S |  |
 | I5 | Coût de préparation au prix du centre de données (option de A-06) | S |  |
-| I8 | X-07, partie anticipée : ouvrir l'objet sur Universalis, Garland Tools, Teamcraft ou le wiki | S |  |
-| I9 | Copier le nom de l'objet et lien d'objet dans le chat (local) | S |  |
+| I8 | ~~X-07, partie anticipée : ouvrir l'objet sur Universalis, Garland Tools, Teamcraft ou le wiki~~ fait en 0.561 | S |  |
+| I9 | ~~Copier le nom de l'objet et lien d'objet dans le chat (local)~~ fait en 0.561 | S |  |
 | I15 | Partager un modèle de tri en texte (copier / coller) | S |  |
 | I16 | ~~Commandes « /tensho objet » et « /tensho prix »~~ fait en 0.555 | S |  |
 | I18 | I-07, partie anticipée : copier « prix le plus bas − 1 » depuis la page Marché | S |  |

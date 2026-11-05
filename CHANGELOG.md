@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.561.0
+- Plan global, I8 : le menu d'un objet copie son nom, affiche un lien dans votre propre chat (message local, rien n'est envoyé au serveur) et ouvre sa page sur Universalis, Garland Tools ou Teamcraft, sur clic. Avec I9. Le menu du jeu n'a pas encore ces entrées.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1025/1025, 0 avertissement, 0 erreur ; DLL 0.561.0.0. Non validé en jeu.
+### English
+- An item's menu now copies its name, prints a link in your own chat and opens its page on Universalis, Garland Tools or Teamcraft.
+
 ## 0.560.0
 - Plan global, C24 : dans les aides à la récolte et à la pêche, un objet utile à la dernière chaîne d'artisanat est marqué « Encore 14 pour… », et le nombre baisse à mesure de la récolte.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1024/1024, 0 avertissement, 0 erreur ; DLL 0.560.0.0. Non validé en jeu.

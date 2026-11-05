@@ -2709,6 +2709,9 @@
     "Level": "{0} · level {1}"
   },
   "ItemMenu": {
+    "CopyName": "Copy the name",
+    "LinkChat": "Link in my chat",
+    "OpenOn": "Open on",
     "TryOn": "Try on",
     "OpenTriad": "Show in Triple Triad",
     "Quest": "Quest that gives it",

@@ -764,6 +764,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.560) Calculer une chaîne, puis récolter un de ses matériaux : « Encore N pour… » apparaît et baisse.
 
+- [ ] (0.561) Menu d'un objet : copier le nom ; le lien s'affiche dans le chat, seulement pour vous ; les trois pages s'ouvrent sur le bon objet.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

@@ -69,6 +69,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I8 — X-07, partie anticipée : ouvrir l'objet sur Universalis, Garland Tools, Teamcraft ou le wiki
 
+- **État (relu le 2026-11-05)** : FAIT 0.561.
 - **État (relu le 2026-11-03)** : en partie 0.349 (X-07 : wiki et Lodestone) ; Universalis, Garland Tools et Teamcraft pas dans ce menu.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.DutyFinder.cs`.
 - **Ce que le joueur obtient** : Clic droit sur un objet, dans les fenêtres Tensho et dans le menu « Tensho » du jeu : « Ouvrir sur… » ouvre la page de l'objet dans le navigateur.
@@ -77,6 +78,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I9 — Copier le nom de l'objet et lien d'objet dans le chat (local)
 
+- **État (relu le 2026-11-05)** : FAIT 0.561, avec I8.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.DutyFinder.cs`.
 - **Ce que le joueur obtient** : Clic droit sur un objet : « Copier le nom », à coller dans la recherche du marché du jeu. « Lien dans le chat » : Tensho écrit dans votre seul chat un lien cliquable de l'objet, que vous partagez ensuite vous-même si vous le voulez.
 - **Comment, taille, dépendances** : ImGui.SetClipboardText(item.Name). Lien : SeStringBuilder.AddItemLink(id, hq) puis IChatGui.Print, un message local : rien n'est envoyé au serveur. Mêmes entrées dans le menu du jeu. Taille S. Sonde : aucune. Décision : ajouter ces entrées, non choisies en c) (recommandé : « Copier le nom » oui, le lien en option).

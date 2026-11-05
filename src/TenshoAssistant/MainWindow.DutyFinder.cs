@@ -146,6 +146,8 @@ internal sealed partial class MainWindow
 
     // Right click on an item: the other tools for it (0.186) — item sheet, market, recipes, collection, then its sources.
     // 0.233: the same useful tools as the inventory menu and the context item panel (RelevantRoutes), then the item's sources.
+    /// <summary>0.561 (I9): prints a link to this item in the player's own chat, set by the plugin.</summary>
+    internal Action<uint>? ItemLinkToChat { get; set; }
     private void ItemLinksMenu(string id,ItemDefinition? item)
     {
         if(item is null || !ImGui.BeginPopupContextItem(id))return;
@@ -159,6 +161,19 @@ internal sealed partial class MainWindow
                 && ImGui.Selectable(localization.Get("ItemMenu.TryOn")+$"##TryOn{item.Id}"))TryOnItem(item.Id);
             // 0.360 (g, C-09): add to or remove from the wishlist.
             DrawWishlistToggle(item);
+            // 0.561 (I8, I9): the item's name, a link in your own chat, and its pages on the web; nothing is sent to the game's server.
+            if(ImGui.Selectable(localization.Get("ItemMenu.CopyName")+$"##CopyName{item.Id}"))ImGui.SetClipboardText(item.Name);
+            if(ItemLinkToChat is not null && ImGui.Selectable(localization.Get("ItemMenu.LinkChat")+$"##LinkChat{item.Id}"))ItemLinkToChat(item.Id);
+            if(ImGui.BeginMenu(localization.Get("ItemMenu.OpenOn")+$"##OpenOn{item.Id}"))
+            {
+                try
+                {
+                    if(ImGui.MenuItem("Universalis"))Dalamud.Utility.Util.OpenLink(ExternalLinks.Universalis(item.Id));
+                    if(ImGui.MenuItem("Garland Tools"))Dalamud.Utility.Util.OpenLink(ExternalLinks.Garland(item.Id));
+                    if(ImGui.MenuItem("Teamcraft"))Dalamud.Utility.Util.OpenLink(ExternalLinks.Teamcraft(localization.CurrentCode,item.Id));
+                }
+                finally{ImGui.EndMenu();}
+            }
             // 0.405 (user request): the game's crafting / gathering log, opened on this item.
             DrawGameLogEntries(item);
             ImGui.Separator();
