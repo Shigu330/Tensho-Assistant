@@ -11,6 +11,8 @@ namespace TenshoAssistant;
 /// </summary>
 internal sealed partial class MainWindow
 {
+    internal string? AlarmItemName(uint item)=>item==0 ? null:itemCatalog.State.Catalog?.Find(item)?.Name;
+    internal string? AlarmZoneName(uint territory)=>territory==0 ? null:maps.State.Catalog?.Entries.FirstOrDefault(map=>map.TerritoryId==territory)?.Zone;
     private DiscordNotifier? discordNotifier;
     internal void ConfigureDiscord(DiscordNotifier notifier)=>discordNotifier=notifier;
     private static readonly DiscordSettings DiscordDefaults=new();

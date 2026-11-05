@@ -34,6 +34,10 @@ internal static class DiscordWebhookTests
         {
             var settings = new DiscordSettings { Enabled = true, WebhookUrl = Url };
             var at = new DateTimeOffset(2026,11,2,14,5,0,TimeSpan.Zero);
+            var unix=at.ToUnixTimeSeconds();
+            Check(DiscordWebhook.Format(settings,"[discordtime] [relative] [zone] [item]",null,"x",1,at,null,"Limsa","Fer") == $"<t:{unix}:t> <t:{unix}:R> Limsa Fer","0.564 markers");
+            Check(DiscordWebhook.Format(settings,"[zone][item]",null,"x",1,at,null) == "","unknown names leave nothing");
+            Check(DiscordWebhook.EorzeaClock(DateTimeOffset.FromUnixTimeSeconds(0)) == "00:00" && DiscordWebhook.EorzeaClock(DateTimeOffset.FromUnixTimeSeconds(175)) == "01:00","Eorzea time");
             Check(DiscordWebhook.Format(settings,"⏰ [label] : dans [minutes] min ([time])",null,"Poisson",3,at,"Tensho Tester") == "⏰ Poisson : dans 3 min (14:05)","default template, no character by default");
             settings.Template = "[label] ([minutes])";
             Check(DiscordWebhook.Format(settings,"default",null,"A",-2,at,null) == "A (0)","settings template, negative minutes shown as 0");

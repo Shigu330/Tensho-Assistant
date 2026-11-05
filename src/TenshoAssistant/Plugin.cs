@@ -236,7 +236,7 @@ public sealed class Plugin : IDalamudPlugin
                     // Framework thread: the character's name is read here, only when the player allowed it.
                     var settings=configuration.Discord;
                     var character=settings.IncludeCharacter ? objects.LocalPlayer?.Name.TextValue:null;
-                    var content=Alarms.DiscordWebhook.Format(settings,localization.Get("Discord.DefaultTemplate"),alarm.DiscordMessage,alarm.Label,minutes,occurrence.ToLocalTime(),character);
+                    var content=Alarms.DiscordWebhook.Format(settings,localization.Get("Discord.DefaultTemplate"),alarm.DiscordMessage,alarm.Label,minutes,occurrence.ToLocalTime(),character,mainWindow.AlarmZoneName(alarm.TerritoryId),mainWindow.AlarmItemName(alarm.ItemId));
                     discord.Enqueue(new(settings.WebhookUrl,Alarms.DiscordWebhook.Payload(settings,content)));
                 }),()=>alarms?.Dispose());
             mainWindow.ConfigureAlarms(alarms!);

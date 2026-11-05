@@ -117,14 +117,27 @@ public static class DiscordWebhook
     /// The message text: the alarm's own message, else the template, else the default; placeholders replaced, [character] only when
     /// allowed (else removed), the role mention first when set, cut to Discord's 2000 characters.
     /// </summary>
-    public static string Format(DiscordSettings settings, string defaultTemplate, string? alarmMessage, string label, int minutes, DateTimeOffset localTime, string? character)
+    /// <summary>Eorzea time at this moment, HH:mm (one Eorzean hour lasts 175 seconds).</summary>
+    public static string EorzeaClock(DateTimeOffset moment)
+    {
+        var minutes=moment.ToUnixTimeMilliseconds()*3600/175/1000/60%1440;
+        return $"{minutes/60:00}:{minutes%60:00}";
+    }
+
+    public static string Format(DiscordSettings settings, string defaultTemplate, string? alarmMessage, string label, int minutes, DateTimeOffset localTime, string? character, string? zone = null, string? item = null)
     {
         ArgumentNullException.ThrowIfNull(settings);
         var template = !string.IsNullOrWhiteSpace(alarmMessage) ? alarmMessage! : !string.IsNullOrWhiteSpace(settings.Template) ? settings.Template : defaultTemplate;
         var who = settings.IncludeCharacter ? character ?? "" : "";
         var text = template.Replace("[label]", label, StringComparison.Ordinal).Replace("[minutes]", Math.Max(0, minutes).ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal)
             .Replace("[time]", localTime.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal)
-            .Replace("[character]", who, StringComparison.Ordinal).Trim();
+            .Replace("[character]", who, StringComparison.Ordinal)
+            // 0.564 (T18): Discord writes these two in each reader's own time zone; the Eorzea time and the names of the zone and the item.
+            .Replace("[discordtime]", $"<t:{localTime.ToUnixTimeSeconds()}:t>", StringComparison.Ordinal)
+            .Replace("[relative]", $"<t:{localTime.ToUnixTimeSeconds()}:R>", StringComparison.Ordinal)
+            .Replace("[et]", EorzeaClock(localTime), StringComparison.Ordinal)
+            .Replace("[zone]", zone ?? "", StringComparison.Ordinal)
+            .Replace("[item]", item ?? "", StringComparison.Ordinal).Trim();
         if (settings.IncludeCharacter && who.Length > 0 && !template.Contains("[character]", StringComparison.Ordinal)) text = $"{text} — {who}";
         if (IsValidRoleId(settings.MentionRoleId)) text = $"<@&{settings.MentionRoleId.Trim()}> {text}";
         return text.Length <= ContentMaximum ? text : text[..(ContentMaximum - 1)] + "…";

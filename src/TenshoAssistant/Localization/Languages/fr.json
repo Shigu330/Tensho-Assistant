@@ -3511,7 +3511,7 @@
     "Username": "Nom de l'expéditeur",
     "UsernameTip": "Nom affiché par Discord pour les messages (80 caractères au plus ; un nom contenant « discord » ou « clyde » est refusé par Discord et remplacé par « Tensho »).\nPar défaut : Tensho.",
     "Template": "Message",
-    "TemplateTip": "Texte envoyé pour chaque alarme. Repères remplacés : [label] le nom de l'alarme, [minutes] les minutes avant l'heure, [time] l'heure locale, [character] le nom du personnage (si autorisé ci-dessous). Vide : le message par défaut. Une alarme peut avoir son propre message (page Alarmes, créneaux d'un groupe).",
+    "TemplateTip": "Texte envoyé pour chaque alarme. Repères remplacés : [label] le nom de l'alarme, [minutes] les minutes avant l'heure, [time] l'heure locale, [character] le nom du personnage (si autorisé ci-dessous), [discordtime] l'heure dans le fuseau de chaque lecteur, [relative] « dans 5 minutes », [et] l'heure d'Éorzéa, [zone] la zone, [item] l'objet. Vide : le message par défaut. Une alarme peut avoir son propre message (page Alarmes, créneaux d'un groupe).",
     "DefaultTemplate": "⏰ [label] : dans [minutes] min ([time])",
     "Categories": "Alarmes envoyées :",
     "Gathering": "Récolte (mineur, botaniste)",

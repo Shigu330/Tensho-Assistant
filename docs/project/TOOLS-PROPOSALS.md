@@ -146,6 +146,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T18 — Discord : heure lue dans le fuseau de chaque membre, et balises [zone], [objet], [et]
 
+- **État (relu le 2026-11-05)** : FAIT 0.564.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Alarms/DiscordWebhook.cs`.
 - **Ce que le joueur obtient** : Dans un salon partagé de compagnie libre, chaque membre lit l'heure de l'alarme dans son propre fuseau (et « dans 5 minutes »). Vos messages peuvent aussi donner la zone, l'objet et l'heure d'Éorzéa.
 - **Comment, taille, dépendances** : Nouvelles balises [discordtime] (<t:unix:t>), [relative] (<t:unix:R>), [zone], [objet] et [et]. Les noms sont résolus sur le thread du framework quand l'alarme sonne, puis passés au notificateur. [time] ne change pas. Tests de Format. Taille S. Dépendances : aucune. Sonde : aucune (syntaxe de Discord). Décision : changer le modèle par défaut (recommandé : non, garder l'actuel).

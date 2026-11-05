@@ -3511,7 +3511,7 @@
     "Username": "Sender name",
     "UsernameTip": "Name Discord shows for the messages (80 characters at most; a name containing « discord » or « clyde » is refused by Discord and replaced by « Tensho »).\nDefault: Tensho.",
     "Template": "Message",
-    "TemplateTip": "Text posted for each alarm. Replaced markers: [label] the alarm's name, [minutes] the minutes before the time, [time] the local time, [character] the character's name (if allowed below). Empty: the default message. An alarm can have its own message (Alarms page, a group's slots).",
+    "TemplateTip": "Text posted for each alarm. Replaced markers: [label] the alarm's name, [minutes] the minutes before the time, [time] the local time, [character] the character's name (if allowed below), [discordtime] the time in each reader's own time zone, [relative] « in 5 minutes », [et] the Eorzea time, [zone] the zone, [item] the item. Empty: the default message. An alarm can have its own message (Alarms page, a group's slots).",
     "DefaultTemplate": "⏰ [label]: in [minutes] min ([time])",
     "Categories": "Alarms posted:",
     "Gathering": "Gathering (miner, botanist)",

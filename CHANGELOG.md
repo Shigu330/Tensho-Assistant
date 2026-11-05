@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.564.0
+- Plan global, T18 : nouvelles balises des messages Discord : [discordtime] (l'heure dans le fuseau de chaque lecteur), [relative], [et], [zone] et [item]. [time] ne change pas. Un nom inconnu ne laisse rien.
+- Tests : DiscordWebhookTests complété. Verify.ps1 (agent) : 1027/1027, 0 avertissement, 0 erreur ; DLL 0.564.0.0. Non validé en jeu.
+### English
+- New Discord message markers: [discordtime] and [relative] read in each reader's time zone, [et], [zone] and [item].
+
 ## 0.563.0
 - Plan global, C31 : page Météo : un tableau de vos zones, 12 au plus, sur les 6 prochaines périodes. Calculé une fois par période. Un clic sur une zone l'affiche.
 - Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1027/1027, 0 avertissement, 0 erreur ; DLL 0.563.0.0. Non validé en jeu.
