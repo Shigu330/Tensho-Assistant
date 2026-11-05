@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-04)
 
-VERSION: 0.539.0.0 (dernière release : Stable-0.451.0, 2026-11-03) — Verify.ps1 (agent) 1004/1004, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.539.0.0 (dernière release : Stable-0.539.0, 2026-11-05) — Verify.ps1 (agent) 1004/1004, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: préparer la 1.0.0 (publication Dalamud) ; voir [GOAL](GOAL.md) et [PUBLISHING](../project/PUBLISHING.md).
 QUOTA: réserve utilisateur 1 % (5 h et semaine). L'agent ne voit pas le compteur.
 
@@ -27,11 +27,11 @@ Liste complète : [TESTING](../project/TESTING.md), 284 cases ouvertes, aucune d
 - 0.508 ventes des servants, 0.509 coup conseillé pendant la synthèse ;
 - 0.502–0.506 aide, guide, signaler un problème ; 0.511 aide qui suit la langue ;
 - 0.497 fenêtre de comparaison, 0.499 carte au-dessus de Tensho, 0.500 page dresseur, 0.510 conseil de Triple Triade coupé en tournoi.
-Après une release seulement : galerie de Mes outils (0.476) et liste de vidéos (0.506), qui lisent la branche `main`.
+Possible depuis la release 0.539.0 : galerie de Mes outils (0.476) et liste de vidéos (0.506), qui lisent la branche `main`.
 
 ## Prochaine action
 1) Décisions de l'auteur sur les points Dalamud ([PUBLISHING](../project/PUBLISHING.md) « Ce qui reste », points 4 à 7 ; titre selon le job décidé, DEC-035), avec son accord à chaque règle.
-2) Une séance de jeu sur la dernière version, puis une release (DEC-033 : pas de release avant cette séance).
+2) Fait le 2026-11-05 : release Stable-0.539.0, sur demande de l'utilisateur. La prochaine : une séance de jeu sur la dernière version d'abord (DEC-033).
 3) Vérifier en jeu les fenêtres converties (issue #38).
 4) Passage en 1.0.0 et soumission, au moment choisi par l'auteur (DEC-023). La PR et la déclaration d'IA sont écrites par lui.
 Après chaque rechargement en mode développeur, l'agent lit les lignes « Selftest » de dalamud.log.

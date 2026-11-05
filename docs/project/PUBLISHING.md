@@ -10,7 +10,7 @@ Liste relue contre le code à la version 0.512.
 
 La décision de soumettre appartient à l'auteur (DEC-023 : à la version 1.0.0). Un nouveau plugin passe d'abord par le canal de test. L'alternative
 reste le dépôt personnel, qui existe : `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`, mis à jour par
-`Verify.ps1 -Release` (dernière release : `Stable-0.451.0`, 2026-11-03).
+`Verify.ps1 -Release` (dernière release : `Stable-0.539.0`, 2026-11-05).
 
 ## Ce qui reste avant la soumission
 
