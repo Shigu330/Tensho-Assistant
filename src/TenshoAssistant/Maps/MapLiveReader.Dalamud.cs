@@ -22,7 +22,7 @@ public enum MapObjectKind { Treasure, Gathering, HuntMark }
 public sealed record MapObjectMarker(MapObjectKind Kind,string Name,Vector3 Position,int Level);
 
 // FATE running in the current zone (IFateTable): FATEs have no static map position in the game data (0.114 probe), only live ones.
-public sealed record MapFateMarker(uint Id,string Name,int Level,uint Icon,Vector3 Position,float Radius,int Progress,long SecondsLeft,string State);
+public sealed record MapFateMarker(uint Id,string Name,int Level,uint Icon,Vector3 Position,float Radius,int Progress,long SecondsLeft,string State,bool HasBonus=false);
 
 // Flights: every territory that has aether currents, refreshed every two seconds (menu wings and the header symbol).
 // Events: the game's quest/event markers, refreshed every half second. InCombat/InDuty drive the « hide » settings.
@@ -231,7 +231,7 @@ internal sealed class MapLiveReader : IDisposable
             if(result.Count>=64)break;
             if(fate is null || !float.IsFinite(fate.Position.X) || !float.IsFinite(fate.Position.Z))continue;
             result.Add(new(fate.FateId,fate.Name.TextValue,fate.Level,fate.MapIconId!=0 ? fate.MapIconId:fate.IconId,fate.Position,
-                float.IsFinite(fate.Radius) ? Math.Max(0,fate.Radius):0,fate.Progress,Math.Max(0,fate.TimeRemaining),fate.State.ToString()));
+                float.IsFinite(fate.Radius) ? Math.Max(0,fate.Radius):0,fate.Progress,Math.Max(0,fate.TimeRemaining),fate.State.ToString(),fate.HasBonus));
         }
         return result.AsReadOnly();
     }

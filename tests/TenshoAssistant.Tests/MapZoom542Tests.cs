@@ -8,6 +8,11 @@ internal static class MapZoom542Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Map (0.548): a FATE's bonus is written in its line; its area keeps its colour",() =>
+        {
+            Check(Read("Maps/MapLiveReader.Dalamud.cs").Contains("fate.State.ToString(),fate.HasBonus));") && Read("MainWindow.MapLocalLists.cs").Contains("MapLocal.FateBonus"),"read and written");
+            Check(Read("MainWindow.MapView.cs").Contains("settings.FateArea"),"the area keeps the setting's colour (user request)");
+        }),
         ("Map (0.547): a layers button with the same settings, and all at once",() =>
         {
             var view=Read("MainWindow.MapView.cs");

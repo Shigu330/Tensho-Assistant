@@ -6092,6 +6092,7 @@
     "FatesOtherZone": "Le jeu ne donne les ALEA que pour votre zone actuelle.",
     "FatesNone": "Aucune ALEA en cours dans la zone.",
     "FateLine": "Niv. {0}  {1}  {2} %",
+    "FateBonus": "  ·  bonus d'expérience",
     "FateTime": "  · {0}:{1}",
     "GatheringLoading": "Catalogue de récolte en chargement…",
     "Hidden": "(caché)",

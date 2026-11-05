@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.548.0
+- Plan global, P9 : une ALEA à bonus d'expérience le dit dans son libellé, sur la carte et dans la liste du clic droit (`IFate.HasBonus`). À la demande de l'utilisateur, la zone garde sa couleur rose : pas de couleur selon le temps restant.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1012/1012, 0 avertissement, 0 erreur ; DLL 0.548.0.0. Non validé en jeu.
+### English
+- A FATE with an EXP bonus says so in its label, on the map and in the right-click list. Its area keeps its colour.
+
 ## 0.547.0
 - Plan global, P20 : bouton « Couches » dans la colonne d'outils : les couches de la carte en une petite liste, avec « Tout afficher » et « Tout masquer ». Ce sont les mêmes réglages que dans la roue dentée, sans doublon.
 - Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1011/1011, 0 avertissement, 0 erreur ; DLL 0.547.0.0. Non validé en jeu.

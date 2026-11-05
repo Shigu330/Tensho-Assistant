@@ -80,6 +80,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P9 — ALEA : bonus d'expérience et couleur selon le temps restant
 
+- **État (relu le 2026-11-05)** : FAIT 0.548.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Sur la carte et dans l'onglet ALEA du clic droit, une ALEA avec bonus est marquée, et la couleur indique celles qui vont bientôt finir.
 - **Comment, taille, dépendances** : Copier HasBonus dans MapFateMarker sur le thread du framework, puis afficher le libellé et une couleur selon SecondsLeft. Les seuils sont un choix d'interface, réglable avec infobulle et ↺. Taille S. Relevé en jeu : vérifier que HasBonus correspond à l'icône de bonus du jeu. Pas de décision, sauf les seuils (recommandé : orange sous 5 min).

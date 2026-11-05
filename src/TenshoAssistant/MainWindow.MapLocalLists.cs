@@ -112,7 +112,7 @@ internal sealed partial class MainWindow
     private string FateLabel(MapFateMarker fate)
     {
         var left=fate.SecondsLeft>0 ? localization.Format("MapLocal.FateTime",fate.SecondsLeft/60,(fate.SecondsLeft%60).ToString("00")):"";
-        return localization.Format("MapLocal.FateLine",fate.Level,fate.Name,fate.Progress)+left;
+        return localization.Format("MapLocal.FateLine",fate.Level,fate.Name,fate.Progress)+left+(fate.HasBonus ? localization.Get("MapLocal.FateBonus"):"");
     }
 
     private void DrawLocalGathering(MapDefinition map)
