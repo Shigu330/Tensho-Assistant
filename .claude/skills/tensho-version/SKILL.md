@@ -36,6 +36,7 @@ Plugin `csharp-lsp` et `csharp-ls` installés le 2026-11-05 ; .NET 10 lui est do
 - `workspaceSymbol` marche partout. `hover`, `findReferences` et `documentSymbol` marchent sur les fichiers du plugin (`MainWindow.*.cs`).
 - Essai du 2026-11-05 : ils répondaient vide sur `UI/GameWindow.cs`, un fichier aussi lié au projet de tests. Sur ces fichiers partagés, passer par `workspaceSymbol` ou grep.
 - La ligne et la colonne commencent à 1 et doivent tomber sur le nom du symbole.
+- Ses diagnostics sont en retard après une édition par script : des « n'existe pas » juste après ne prouvent rien. `check.sh` fait foi.
 
 ## Pièges du code
 

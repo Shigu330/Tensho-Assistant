@@ -994,6 +994,7 @@ tests = tests.Concat(DutyLootTests.Cases).ToArray();
 tests = tests.Concat(MapZoom542Tests.Cases).ToArray();
 tests = tests.Concat(CraftThresholds553Tests.Cases).ToArray();
 tests = tests.Concat(CraftFollow589Tests.Cases).ToArray();
+tests = tests.Concat(CraftPresets590Tests.Cases).ToArray();
 tests = tests.Concat(SelfCheckTests.Cases).ToArray();
 tests = tests.Concat(HelpTests.Cases).ToArray();
 tests = tests.Concat(RetainerSalesTests.Cases).ToArray();

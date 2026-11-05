@@ -135,6 +135,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C16 — K13 — Bibliothèque des séquences : recherche, renommer, dupliquer, copier et coller en texte (A-08, partie texte)
 
+- **État (relu le 2026-11-05)** : FAIT 0.590.
 - **État (relu le 2026-11-03)** : en partie 0.425 (A-08 : import d’une macro collée) ; recherche, renommer, dupliquer non faits.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.CraftPresets.cs`.
 - **Ce que le joueur obtient** : La page des séquences enregistrées se cherche par nom, objet ou métier et se trie ; une séquence se renomme, se duplique, se copie en texte de macro et, dans l'autre sens, une macro /ac collée devient une séquence vérifiable dans le simulateur.

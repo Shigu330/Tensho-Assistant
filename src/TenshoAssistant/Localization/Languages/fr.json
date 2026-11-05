@@ -660,6 +660,23 @@
     "ReferenceSummary": "Clés de référence : {0} · langues : {1}"
   },
   "CraftPresets": {
+    "Search": "Nom, objet ou métier…",
+    "SearchTip": "Affiche les séquences qui ont chaque mot saisi dans leur nom, leur objet ou leur métier.",
+    "Sort": "Ordre",
+    "SortTip": "L'ordre de la liste ; rien ne change dans ce qui est enregistré.",
+    "SortSaved": "Comme enregistré",
+    "SortName": "Nom",
+    "SortItem": "Objet",
+    "SortJob": "Métier",
+    "SortNewest": "Les plus récentes",
+    "NoMatch": "Aucune séquence ne correspond à cette recherche.",
+    "Rename": "Renommer",
+    "RenameOk": "OK",
+    "RenameCancel": "Annuler",
+    "Duplicate": "Dupliquer",
+    "DuplicateTip": "Garde une copie de cette séquence sous le prochain nom libre, pour essayer une variante sans la perdre.",
+    "CopyText": "Copier en texte",
+    "CopyTextTip": "Copie les actions en lignes « /ac » d'un seul bloc, dans la langue du jeu. « Importer une macro » dans le simulateur les relit. Pour des pages de macro de 15 lignes, chargez-la dans le simulateur.",
     "Title": "Séquences d’artisanat sauvegardées",
     "Description": "Recettes et actions manuelles · aucune exécution automatique",
     "Browse": "Séquences sauvegardées",
@@ -675,6 +692,9 @@
     "RemoveTip": "Supprime cette séquence tout de suite, sans confirmation."
   },
   "CraftPresetMessages": {
+    "RenameFailed": "Impossible de renommer cette séquence : le nom doit faire de 1 à 80 caractères et être unique pour cette recette.",
+    "DuplicateFailed": "Impossible de dupliquer cette séquence : la liste est peut-être pleine ou le nom trop long. Consultez le journal Dalamud pour les détails.",
+    "CopyFailed": "Impossible de copier cette séquence : les noms de ses actions ne sont pas encore disponibles.",
     "Count": "{0}/{1} séquences · vérifiez les attributs et recalculez après chargement",
     "Item": "Objet {0}",
     "Details": "{0} · {1} actions · {2} (heure locale du PC)",

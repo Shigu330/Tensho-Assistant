@@ -822,6 +822,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.589) Lancer une synthèse sur une recette avec une séquence enregistrée : l'action suivante avance à chaque coup, « Conforme au plan » tant que les chiffres sont égaux, avertissement après un état Bonne ou une autre action.
 
+- [ ] (0.590) Page des séquences : chercher un mot, changer l'ordre, renommer, dupliquer, copier en texte puis coller dans « Importer une macro » du simulateur.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

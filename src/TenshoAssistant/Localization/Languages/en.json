@@ -660,6 +660,23 @@
     "ReferenceSummary": "Reference keys: {0} · languages: {1}"
   },
   "CraftPresets": {
+    "Search": "Name, item or job…",
+    "SearchTip": "Shows the sequences with every word you type in their name, their item or their job.",
+    "Sort": "Order",
+    "SortTip": "The order of the list; nothing is changed in what is saved.",
+    "SortSaved": "As saved",
+    "SortName": "Name",
+    "SortItem": "Item",
+    "SortJob": "Job",
+    "SortNewest": "Newest first",
+    "NoMatch": "No sequence matches this search.",
+    "Rename": "Rename",
+    "RenameOk": "OK",
+    "RenameCancel": "Cancel",
+    "Duplicate": "Duplicate",
+    "DuplicateTip": "Keeps a copy of this sequence under the next free name, to try a variant without losing it.",
+    "CopyText": "Copy as text",
+    "CopyTextTip": "Copies the actions as « /ac » lines in one block, in the game's language. « Import a macro » in the simulator reads them back. For macro pages of 15 lines, load it into the simulator.",
     "Title": "Saved crafting sequences",
     "Description": "Recipes and manual actions · no automatic execution",
     "Browse": "Saved sequences",
@@ -675,6 +692,9 @@
     "RemoveTip": "Deletes this sequence at once, without confirmation."
   },
   "CraftPresetMessages": {
+    "RenameFailed": "Could not rename this sequence: the name must be 1 to 80 characters and unique for this recipe.",
+    "DuplicateFailed": "Could not duplicate this sequence: the list may be full, or the name too long. See the Dalamud log for details.",
+    "CopyFailed": "Could not copy this sequence: the names of its actions are not available yet.",
     "Count": "{0}/{1} sequences · verify attributes and recalculate after loading",
     "Item": "Item {0}",
     "Details": "{0} · {1} actions · {2} (PC local time)",

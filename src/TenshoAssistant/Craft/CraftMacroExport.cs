@@ -26,6 +26,21 @@ public static class CraftMacroExporter
         =>BaseWait(action)+(BaseWait(action)==2 && buffExtraWait is { } buff ? buff:extraWait);
 
     /// <param name="macroChain">A-10 (0.422): Caraxi's Macro Chain plugin is loaded: pages end with its « /nextmacro » instead of Tensho's marker.</param>
+    /// <summary>
+    /// 0.590 (C16): a saved sequence as text: one line per action, in one block, not cut into pages; the simulator's import reads it back.
+    /// Null when an action has no name usable in a macro line.
+    /// </summary>
+    public static string? Text(IEnumerable<CraftActionKind> actions,Func<CraftActionKind,string?> nameOf)
+    {
+        var lines=new List<string>();
+        foreach(var action in actions)
+        {
+            var name=nameOf(action);
+            if(string.IsNullOrWhiteSpace(name) || name.Length>128 || name.Any(character=>char.IsControl(character) || character is '"' or '\u2028' or '\u2029'))return null;
+            lines.Add($"/ac \"{name}\" <wait.{Wait(action,0,null).ToString(CultureInfo.InvariantCulture)}>");
+        }
+        return lines.Count>0 ? string.Join('\n',lines):null;
+    }
     public static CraftMacroExport Build(CraftSimulationResult simulation,uint job,CraftActionCatalog catalog,int extraWait=0,bool echo=true,bool chain=false,int? buffExtraWait=null,bool macroChain=false,int echoSound=1,bool echoLastOnly=false)
     {
         ArgumentNullException.ThrowIfNull(simulation); ArgumentNullException.ThrowIfNull(catalog);

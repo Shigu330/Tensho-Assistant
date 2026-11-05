@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.590.0
+- Plan global, C16 : La page des séquences enregistrées se cherche par nom, objet ou métier et se trie ; une séquence se renomme, se duplique et se copie en texte. L'import d'une macro collée existait déjà dans le simulateur (0.425) et relit ce texte.
+- Tests : Sequences. Verify.ps1 (agent) : 1060/1060, 0 avertissement, 0 erreur ; DLL 0.590.0.0. Non validé en jeu.
+### English
+- The saved sequences' page can be searched by name, item or job and sorted; a sequence can be renamed, duplicated and copied as text. Importing a pasted macro already existed in the simulator (0.425) and reads that text back.
+
 ## 0.589.0
 - Plan global, C5 : Pendant une synthèse, la fenêtre à côté de la synthèse et la page Synthèse en cours suivent la séquence choisie (simulateur, séquence enregistrée pour la recette, suggestion du panneau du carnet) : action suivante, chiffres du plan contre ceux du jeu, avertissement quand ils se séparent, avec les états autres que Normal déjà joués. Réglage pour le retirer. Rien n'est joué.
 - Tests : Follow. Verify.ps1 (agent) : 1056/1056, 0 avertissement, 0 erreur ; DLL 0.589.0.0. Non validé en jeu.
