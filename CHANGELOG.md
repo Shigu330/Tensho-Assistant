@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.660.0
+- Plan global, 0.660 : Carte : les noms sont plus petits et plus proches de ceux du jeu : noms de lieux à 0,65 du réglage, noms à côté des icônes à 0,41, mesurés sur tes captures. Les noms à côté des icônes apparaissent dès 75 % de zoom au lieu de 100 %, valeur choisie à l'œil.
+- Tests : Map labels. Verify.ps1 (agent) : 1159/1159, 0 avertissement, 0 erreur ; DLL 0.660.0.0. Non validé en jeu.
+### English
+- Map: names are smaller and closer to the game's: place names at 0.65 of the setting, names beside icons at 0.41, measured on the user's captures. Names beside icons appear from 75 % zoom instead of 100 %, a value chosen by eye.
+
 ## 0.659.0
 - Plan global, 0.659 : Carte : une carte ouverte revient aussi à l'entrée dans un contenu en instance, une fois le joueur libre. Le JcJ et le contenu classé restent à part : la coupure compétitive annule l'attente.
 - Tests : Map resume. Verify.ps1 (agent) : 1159/1159, 0 avertissement, 0 erreur ; DLL 0.659.0.0. Non validé en jeu.

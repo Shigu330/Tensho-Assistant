@@ -58,9 +58,11 @@ public static class MapLabels
 {
     /// <summary>
     /// 0.623 (user report, with captures of the game's map): zoomed out, the game keeps only the names of map links; the others come back close up. The exact zoom of the
-    /// game is not known: this one is to adjust in game.
+    /// game is not known: this one is to adjust in game. 0.660 (user report, too late; docs/evidence/0.660-map-name-sizes.md): the game still writes them at about 0.94 of it; by eye below that.
     /// </summary>
-    public const float DetailZoom=1f;
+    public const float DetailZoom=0.75f;
+    /// <summary>0.660: the size of the names against the setting, measured on the widths of the same names on both maps.</summary>
+    public const float PlaceNameShare=0.65f,IconNameShare=0.41f;
     /// <summary>
     /// 0.631 (user capture, docs/evidence/0.631-region-zone-images.md): on a region map a link's icon is the picture of that whole zone (1024 px), drawn at its own size in the map's pixels.
     /// Normal map icons are far smaller.
@@ -76,7 +78,8 @@ public static class MapLabels
     public static bool OpensNamedMap(uint icon,uint dataType)=>dataType==0 && icon!=0;
     /// <summary>0.642 (user capture, too large once zoomed out): a place name's height on the map, read on the game's own map (about 18 px at zoom 0.39): it never exceeds this.</summary>
     public const float PlaceNameMapHeight=46f;
-    public static float PlaceNameSize(float size,float zoom,float scale)=>Math.Max(6,Math.Min(size,PlaceNameMapHeight*zoom*scale));
+    public static float PlaceNameSize(float size,float zoom,float scale)=>Math.Max(6,Math.Min(size*PlaceNameShare,PlaceNameMapHeight*zoom*scale));
+    public static float IconNameSize(float size)=>Math.Max(6,size*IconNameShare);
     /// <summary>0.645 (P7): an aetheryte missing from the game's teleport list. Unknown (list not read, or empty) says nothing.</summary>
     public static bool NotAttuned(uint aetheryte,IReadOnlyDictionary<uint,uint>? costs)=>aetheryte!=0 && costs is { Count:>0 } && !costs.ContainsKey(aetheryte);
     public static bool Shown(bool mapLink,float zoom)=>mapLink || zoom>=DetailZoom;

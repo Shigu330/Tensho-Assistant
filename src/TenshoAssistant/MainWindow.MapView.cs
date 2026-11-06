@@ -1153,7 +1153,7 @@ internal sealed partial class MainWindow
                 // 0.596 (P12): the name the game writes beside this icon, on the side it uses; drawn after the icons (0.623).
                 if(settings.ShowIconNames && settings.NamesShown(mapZoom) && item.Fixed is {Label.Length:>0} named && MapLabels.Shown(named.LinkMapId!=0,mapZoom))
                 {
-                    var iconNameSize=Math.Max(6,nameSize*0.55f);
+                    var iconNameSize=MapLabels.IconNameSize(nameSize);
                     var iconNameText=ImGui.CalcTextSize(named.Label)*(iconNameSize/ImGui.GetFontSize());
                     iconNames.Add((item.At+MapLabels.Offset(named.Orientation,item.Size,iconNameText),iconNameText,named.LinkMapId!=0,named.Label,iconNameSize,named.LinkMapId));
                 }
