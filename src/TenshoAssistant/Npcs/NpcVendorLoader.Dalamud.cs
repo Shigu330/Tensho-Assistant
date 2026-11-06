@@ -64,7 +64,7 @@ internal sealed class NpcVendorLoader : IDisposable
                 {
                     dataVersion=string.Join(";",data.GameData.Repositories.Values.OrderBy(r=>r.Name).Select(r=>$"{r.Name}={r.Version}"));
                     cacheScope=data.Language.ToString();
-                    cacheVersion=NpcVendorCache.Version($"{dataVersion};schema={typeof(GilShop).Assembly.GetName().Version};fcc-295;req-352");
+                    cacheVersion=NpcVendorCache.Version($"{dataVersion};schema={typeof(GilShop).Assembly.GetName().Version};fcc-295;req-352;service-679");
                 }
                 if(!cacheChecked && cache is not null)
                 {
@@ -222,6 +222,7 @@ internal sealed class NpcVendorLoader : IDisposable
             if(resolved.Count>0)vendorShops[npc.RowId]=[..resolved];
             yield return ++count;
         }
+        foreach(var id in NpcShopLinks.ServiceNpcs)vendorShops.TryAdd(id,[]);
         // Positions: Level rows of type 8 (event NPC) that point at a vendor.
         foreach(var level in data.GetExcelSheet<Level>())
         {
@@ -264,10 +265,16 @@ internal sealed class NpcVendorLoader : IDisposable
             }
         var residents=data.GetExcelSheet<ENpcResident>();
         foreach(var id in vendorShops.Keys.ToArray())
-        {names[id]=residents.TryGetRow(id,out var resident) ? resident.Singular.ExtractText():"";yield return ++count;}
+        {names[id]=residents.TryGetRow(id,out var resident) ? VendorName(id,resident):"";yield return ++count;}
     }
 
     // Event NPCs are placed by these two layout kinds (probe: docs/evidence/0.99.0-consigneur-probe.log).
+    private static string VendorName(uint id,ENpcResident resident)
+    {
+        var name=resident.Singular.ExtractText();
+        var title=NpcShopLinks.ServiceNpcs.Contains(id) ? resident.Title.ExtractText():"";
+        return title.Length>0 ? $"{name} · {title}":name;
+    }
     private static readonly string[] LayoutKinds=["planevent","planner"];
 
     // A missing, unexpected or unreadable layout only means no extra position for that territory.

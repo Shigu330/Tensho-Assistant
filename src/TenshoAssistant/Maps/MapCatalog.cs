@@ -107,6 +107,14 @@ public sealed class MapCatalog
         .Where(other => other.MapId == map.MapId || other.TerritoryId == map.TerritoryId && other.SizeFactor == map.SizeFactor
             && other.OffsetX == map.OffsetX && other.OffsetY == map.OffsetY)
         .Select(other => other.MapId).ToArray();
+    /// <summary>
+    /// 0.679 (user report): the versions of one drawing of the land, such as the Island Sanctuary's as it develops (maps 772, 773, 774, 780): the game may place a marker on any of them.
+    /// Stricter than Equivalent: the floors of a zone have the same frame but their own marker range, and a marker of another floor must not appear on this one.
+    /// </summary>
+    public IReadOnlyList<uint> SameLand(MapDefinition map) => Entries
+        .Where(other => other.MapId == map.MapId || other.MarkerRange != 0 && other.MarkerRange == map.MarkerRange && other.TerritoryId == map.TerritoryId
+            && other.SizeFactor == map.SizeFactor && other.OffsetX == map.OffsetX && other.OffsetY == map.OffsetY)
+        .Select(other => other.MapId).ToArray();
     public IReadOnlyList<MapDefinition> ForPlace(uint placeNameId) => byPlace.GetValueOrDefault(placeNameId) ?? Array.Empty<MapDefinition>();
     public IReadOnlyList<MapDefinition> Search(string query)
     {

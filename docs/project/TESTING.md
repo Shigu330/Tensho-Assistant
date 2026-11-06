@@ -1000,6 +1000,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.678) Production › Félicité insulaire : les mots de la page doivent être ceux de la fenêtre du jeu ; signaler « création » et « efficace » s'ils diffèrent.
 
+- [ ] (0.679) Félicité insulaire : le « ! » de l'objectif doit paraître sur la carte Tensho ; la carte doit rester en changeant de mode ; Marchandréa doit paraître près de la base ; passer près de Laracheteuse pour la capture.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

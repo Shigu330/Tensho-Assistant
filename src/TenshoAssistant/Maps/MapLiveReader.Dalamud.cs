@@ -344,7 +344,7 @@ internal sealed class MapLiveReader : IDisposable
             var tooltip=TooltipText(marker.TooltipString);
             // Evidence for the labels (0.134): once per icon, what the game gives (objective, type, readable tooltip).
             if(loggedEventIcons.Count<64 && loggedEventIcons.Add(marker.IconId))
-                Log?.Information("Map event marker icon {0}: objective {1}, type {2}, data {3}, tooltip {4} (length {5}, used {6}, size {7}), radius {8}, text \"{9}\".",marker.IconId,marker.ObjectiveId,marker.MarkerType,marker.DataId,
+                Log?.Information("Map event marker icon {0} on map "+marker.MapId+": objective {1}, type {2}, data {3}, tooltip {4} (length {5}, used {6}, size {7}), radius {8}, text \"{9}\".",marker.IconId,marker.ObjectiveId,marker.MarkerType,marker.DataId,
                     tooltip.Length>0 ? "read":"unread",marker.TooltipString==null ? -1:marker.TooltipString->StringLength,marker.TooltipString==null ? -1:marker.TooltipString->BufUsed,marker.TooltipString==null ? -1:marker.TooltipString->BufSize,marker.Radius,tooltip);
             result.Add(new(marker.MapId,marker.IconId,marker.Position,float.IsFinite(marker.Radius) ? Math.Max(0,marker.Radius):0,tooltip,marker.ObjectiveId,marker.MarkerType,marker.DataId,IsLeve(marker.IconId,marker.MarkerType,tooltip)));
         }

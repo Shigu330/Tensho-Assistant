@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.679.0
+- Plan global, Félicité insulaire, carte : Corrections, rapports de l'utilisateur. Le marqueur « ! » de l'objectif de développement manquait : l'île a plusieurs versions de sa carte dans le jeu et Tensho ne gardait que les repères de la version affichée. La carte Tensho disparaissait dans tous les modes : MJIPadGuide, invisible, comptait comme une fenêtre devant elle. Marchandréa (Divers) et Laracheteuse (Exportations) sont ajoutées comme PNJ de service, sans vente inventée : Marchandréa est placée d'après la feuille Level ; Laracheteuse n'a de position dans aucun fichier du jeu, une capture en mode développeur relève sa place. COMPILED et TESTED, non validé en jeu.
+- Tests : Island679Tests. Verify.ps1 (agent) : 1200/1200, 0 avertissement, 0 erreur ; DLL 0.679.0.0. Non validé en jeu.
+### English
+- Fixes from user reports. The development objective's marker was missing: the island has several versions of its map in the game and Tensho kept only the markers of the one shown. The Tensho map left in every mode: the invisible MJIPadGuide counted as a window in front of it. Marchandréa and Laracheteuse are added as service NPCs with no made-up sales: the first is placed from the Level sheet; the second is in no game file, and a developer-mode capture records its position. COMPILED and TESTED, not validated in game.
+
 ## 0.678.0
 - Plan global, Félicité insulaire : Correction, rapport de l'utilisateur : le jeu dit « Félicité insulaire », pas « Île sanctuaire ». Le reste de la page a été comparé à la feuille Addon du jeu : « entrain » devient « enthousiasme », « agenda » devient « carnet de fabrication » ou « planification », « offre » devient « disponibilité », « rang de l'île » devient « rang de félicité ». Ces mots étaient des traductions de l'agent. Textes français seulement. COMPILED et TESTED, non validé en jeu.
 - Tests : Languages. Verify.ps1 (agent) : 1195/1195, 0 avertissement, 0 erreur ; DLL 0.678.0.0. Non validé en jeu.

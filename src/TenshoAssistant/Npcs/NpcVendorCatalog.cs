@@ -47,6 +47,12 @@ public static class NpcShopLinks
     /// observation (2026-10-30: « Prêtresse à la robe noire », Wolves' Den, menu « Échanger des marques de loup » mêlée 1/2,
     /// distance) and docs/evidence/0.97.0-wolf-npc-probe.log: the only three wolf-mark shops (type 4) that no sheet references.
     /// </summary>
+    /// <summary>
+    /// 0.679 (user report): NPCs of a service whose shop is opened by script code, with no sheet to give it. They are placed on the map by name and title, with no sales.
+    /// Marchandréa, « Divers », and Laracheteuse, « Exportations », on the Island Sanctuary: docs/evidence/0.679-island-map.md.
+    /// </summary>
+    public static readonly IReadOnlyList<uint> ServiceNpcs=[1043463,1043464];
+
     public static readonly IReadOnlyDictionary<uint,IReadOnlyList<uint>> ObservedTalkShops=new Dictionary<uint,IReadOnlyList<uint>>
     {
         [721280]=[1769743,1770537,1769744],

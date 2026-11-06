@@ -7,7 +7,8 @@ public readonly record struct GameWindow(string Name,float X,float Y,float Width
 public static class GameWindows
 {
     // What the game keeps on screen without being a window in front of anything (log of 2026-11-05, docs/evidence/0.537-game-windows.md): HUD parts start with « _ ». 0.538 (user capture): its tooltips count, like its windows.
-    private static readonly string[] NotWindows=["_","NamePlate","CastBar","ChatLog","ScenarioTree","CursorAddon","AreaMap"];
+    // 0.679 (user report, log of 2026-11-06): MJIPadGuide is up in every mode of the Island Sanctuary with nothing to see, and made the map leave.
+    private static readonly string[] NotWindows=["_","NamePlate","CastBar","ChatLog","ScenarioTree","CursorAddon","AreaMap","MJIPadGuide"];
     public static bool Ignored(string name)=>NotWindows.Any(start=>name.StartsWith(start,StringComparison.Ordinal));
 
     /// <param name="anchors">The game window the interface belongs to, by the start of its name: it and its parts never cover it, and only what is in front of it counts. None: whatever touches it.</param>

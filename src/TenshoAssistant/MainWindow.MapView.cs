@@ -709,7 +709,8 @@ internal sealed partial class MainWindow
         var eventIcons=new HashSet<uint>();var fateIcons=new HashSet<uint>();var gatheringIcons=new HashSet<uint>();var targetIcons=new HashSet<uint>();
         if(mapLive?.State is { } live)
         {
-            foreach(var marker in live.Events ?? [])if(marker.MapId==map.MapId){icons.Add(marker.Icon);eventIcons.Add(marker.Icon);}
+            var sameLand=SameLandMaps(map);
+            foreach(var marker in live.Events ?? [])if(sameLand.Contains(marker.MapId)){icons.Add(marker.Icon);eventIcons.Add(marker.Icon);}
             if(live.MapId==map.MapId)foreach(var fate in live.Fates ?? [])if(fate.Icon!=0){icons.Add(fate.Icon);fateIcons.Add(fate.Icon);}
         }
         if(settings.ShowGathering)foreach(var point in MapGatheringPoints(map))if(point.Icon!=0){icons.Add(point.Icon);gatheringIcons.Add(point.Icon);}
@@ -1026,7 +1027,7 @@ internal sealed partial class MainWindow
             else if(DateTimeOffset.UtcNow>=mapFocusUntil)
             {
                 mapFocusRequest=null;mapCenterRequest=new Vector2(MapProjection.TextureSize/2f);mapFitRequested=false;
-                var seen=string.Join(" | ",(live?.Events ?? []).Where(marker=>marker.MapId==map.MapId).Take(12).Select(marker=>$"{marker.ObjectiveId}:{marker.Icon}:{marker.Tooltip}"));
+                var seen=string.Join(" | ",(live?.Events ?? []).Where(marker=>SameLandMaps(map).Contains(marker.MapId)).Take(12).Select(marker=>$"{marker.ObjectiveId}:{marker.Icon}:{marker.Tooltip}"));
                 log.Information("Map focus not found on map {0} for quest {1} (journal {2}); markers: {3}",map.MapId,focus.QuestId,focus.QuestLog,seen);
             }
             else mapCenterRequest=new Vector2(MapProjection.TextureSize/2f);
@@ -1085,7 +1086,8 @@ internal sealed partial class MainWindow
             uint? linkUnderMouse=null;
             // Areas first, under every icon: running FATEs, quest areas, gathering points of this map.
             var fates=settings.ShowFates && live?.Fates is { } running && live.MapId==map.MapId ? running:[];
-            var events=settings.ShowQuests && live?.Events is { } liveEvents ? liveEvents.Where(marker=>marker.MapId==map.MapId).ToArray():[];
+            var eventMaps=SameLandMaps(map);
+            var events=settings.ShowQuests && live?.Events is { } liveEvents ? liveEvents.Where(marker=>eventMaps.Contains(marker.MapId)).ToArray():[];
             var gathering=settings.ShowGathering ? MapGatheringPoints(map):[];
             // Areas per kind (0.151): quests (marker type 3), leves and other events, FATEs, gathering points; own switch and colour.
             if(settings.ShowFateAreas)
@@ -1756,6 +1758,16 @@ internal sealed partial class MainWindow
     }
     // Vendors standing on a map, with the shop names of each, rebuilt only when the map or the catalogue changes.
     private (uint MapId,object? Catalog,IReadOnlyList<(Npcs.NpcVendor Vendor,Npcs.NpcLocation Spot)> Rows,IReadOnlyDictionary<uint,(string Name,Npcs.NpcShopKind Kind,int Items)> Shops) mapVendorCache=(0,null,[],new Dictionary<uint,(string,Npcs.NpcShopKind,int)>());
+    // 0.679: worked out once per map, not on every frame.
+    private (uint MapId,MapCatalog? Catalog,HashSet<uint> Maps) mapSameLand=(0,null,[]);
+    private HashSet<uint> SameLandMaps(MapDefinition map)
+    {
+        var catalog=maps.State.Catalog;
+        if(mapSameLand.MapId==map.MapId && ReferenceEquals(mapSameLand.Catalog,catalog))return mapSameLand.Maps;
+        var same=(catalog?.SameLand(map) ?? [map.MapId]).ToHashSet();
+        mapSameLand=(map.MapId,catalog,same);
+        return same;
+    }
     private IReadOnlyList<(Npcs.NpcVendor Vendor,Npcs.NpcLocation Spot)> MapVendors(MapDefinition map)
     {
         if(npcVendors?.State.Catalog is not { } catalog)return [];
@@ -1805,6 +1817,8 @@ internal sealed partial class MainWindow
     private string VendorLabel(Npcs.NpcVendor vendor)
     {
         var name=vendor.Name.Length>0 ? vendor.Name:localization.Get("MapLocal.UnnamedVendor");
+        // 0.679: an NPC of a service whose shop no sheet gives: its name and title say what it does.
+        if(vendor.ShopIds.Count==0)return name;
         var lines=new List<string>();var unknown=0;
         foreach(var id in vendor.ShopIds.Distinct())
         {
