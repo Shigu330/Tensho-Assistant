@@ -56,6 +56,7 @@
     <Compile Include="../../src/TenshoAssistant/Quests/QuestStartCities.cs" Link="Quests/QuestStartCities.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestAlternatives.cs" Link="Quests/QuestAlternatives.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/ResetSchedule.cs" Link="Reminders/ResetSchedule.cs" />
+    <Compile Include="../../src/TenshoAssistant/Reminders/CompanyBenefits.cs" Link="Reminders/CompanyBenefits.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/HomeToday.cs" Link="Reminders/HomeToday.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/PersonalTasks.cs" Link="Reminders/PersonalTasks.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/GardenJournal.cs" Link="Reminders/GardenJournal.cs" />

@@ -27,7 +27,7 @@ internal sealed partial class MainWindow
         if(now-reminderTimersTriedAt>=wait)
         {
             reminderTimersTriedAt=now;
-            try{reminderTimers=GameTimers.Read(DailyRoulettes?.Invoke(),ChallengeRows?.Invoke());reminderTimersError=null;TickRemindersFromGame(reminderTimers);}
+            try{reminderTimers=GameTimers.Read(DailyRoulettes?.Invoke(),ChallengeRows?.Invoke(),CompanyActionNames);reminderTimersError=null;TickRemindersFromGame(reminderTimers);}
             catch(Exception error)
             {
                 if(reminderTimersError!=error.Message)log.Warning(error,"Game timers could not be read.");
@@ -131,6 +131,7 @@ internal sealed partial class MainWindow
             // 0.333 (DEC-023 6): Grand Company squadron, mission and training, ends read from the game (PlayerState).
             SquadronRow("SquadronMission",FontAwesomeIcon.Flag,timers?.SquadronMission,SquadronMissionName);
             SquadronRow("SquadronTraining",FontAwesomeIcon.Dumbbell,timers?.SquadronTraining,SquadronTrainingName);
+            CompanyActionsRow(timers?.CompanyBenefits);
         }
         finally{ImGui.EndTable();}
         ImGui.TextDisabled(localization.Get("Reminders.Help"));
@@ -155,6 +156,20 @@ internal sealed partial class MainWindow
                 if(timer.Done is { } end && end>now)next=end;
             }
             Row(key,icon,state,next,null);
+        }
+
+        // T27 (0.651): the active company actions and when each ends, known once the Actions tab was opened.
+        void CompanyActionsRow(IReadOnlyList<CompanyBenefit>? benefits)
+        {
+            string BenefitName(uint status)=>CompanyActionNames?.GetValueOrDefault(status) ?? $"#{status}";
+            string BenefitText(CompanyBenefit benefit)=>benefit.Ends is { } ends && ends>now
+                ? localization.Format("Reminders.CompanyActionLeft",BenefitName(benefit.Status),(int)(ends-now).TotalHours,(ends-now).Minutes):BenefitName(benefit.Status);
+            var state=benefits is null ? localization.Get("Reminders.CompanyActionsUnknown")
+                :benefits.Count==0 ? localization.Get("Reminders.CompanyActionsNone")
+                :string.Join(", ",benefits.Select(BenefitText));
+            if(benefits is { Count:>0 } && benefits.Any(benefit=>benefit.Ends is null))state+=" "+localization.Get("Reminders.CompanyActionsOpen");
+            DateTimeOffset? first=benefits?.Where(benefit=>benefit.Ends>now).Select(benefit=>benefit.Ends).Min();
+            Row("CompanyActions",FontAwesomeIcon.Users,state,first,null);
         }
 
         void Row(string key,FontAwesomeIcon icon,string state,DateTimeOffset? next,DateTimeOffset? lastReset,Action? extra=null)
@@ -243,6 +258,8 @@ internal sealed partial class MainWindow
             if(!ResetSchedule.DoneSince(ReminderDoneAt(row),ReminderCounts.LastReset(row,now)))SetReminderDone(row,now);
     }
     internal Func<ushort,string?>? SquadronMissionName { get; set; }
+    /// <summary>T27 (0.651): the Status rows the game marks as company actions, with their names (set by Plugin.cs).</summary>
+    internal IReadOnlyDictionary<uint,string>? CompanyActionNames { get; set; }
     internal Func<ushort,string?>? SquadronTrainingName { get; set; }
     private readonly Dictionary<(Func<ushort,string?>,ushort),string> squadronNames=[];
     private string SquadronName(Func<ushort,string?>? nameOf,ushort id)

@@ -5,7 +5,6 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace TenshoAssistant.Diagnostics;
@@ -25,9 +24,7 @@ public sealed unsafe class ReadingCapture : IDisposable
     private readonly Func<bool> enabled;
     private readonly IPluginLog log;
     private readonly Dictionary<string,int> lines=[];
-    private uint lastGp=uint.MaxValue;
-    private DateTime lastGpAt;
-    private string statuses="",synthesis="",timers="",retainer="",airship="";
+    private string statuses="",synthesis="",retainer="",airship="";
     private bool fishing,disposed,warned;
     private long slowAt;
 
@@ -55,19 +52,13 @@ public sealed unsafe class ReadingCapture : IDisposable
             var local=objects.LocalPlayer;
             if(local is null)return;
             var job=local.ClassJob.RowId;
-            if(job is 16 or 17 or 18)
-            {
-                ReadGp(local.CurrentGp,local.MaxGp);
-                ReadStatuses(local);
-            }
-            else lastGp=uint.MaxValue;
+            if(job is 16 or 17 or 18)ReadStatuses(local);
             var flag=condition[ConditionFlag.Fishing];
             if(flag!=fishing){fishing=flag;Line("fishing",200,$"fishing flag {flag}");}
             var now=DateTime.UtcNow.Ticks;
             if(now-slowAt<SlowPartEvery)return;
             slowAt=now;
             ReadSynthesis();
-            ReadCompanyTimers(local);
             ReadRetainer();
             ReadAirships();
             warned=false;
@@ -76,17 +67,6 @@ public sealed unsafe class ReadingCapture : IDisposable
         {
             if(!warned){warned=true;log.Warning(error,"A reading could not be made.");}
         }
-    }
-
-    // #37: the GP regeneration while gathering.
-    private void ReadGp(uint gp,uint max)
-    {
-        if(gp==lastGp)return;
-        var at=DateTime.UtcNow;
-        var handle=gui.GetAddonByName("Gathering");
-        if(lastGp!=uint.MaxValue)
-            Line("gp",300,$"{lastGp} -> {gp} / {max}, {(at-lastGpAt).TotalMilliseconds:F0} ms since the last change, gathering flag {condition[ConditionFlag.Gathering]}, window {!handle.IsNull && handle.IsVisible}");
-        lastGp=gp;lastGpAt=at;
     }
 
     // C28, G2: the statuses of a gatherer, 568 Fisher's Intuition and 2891 Spearfisher's Intuition among them.
@@ -116,18 +96,6 @@ public sealed unsafe class ReadingCapture : IDisposable
             else if(value.Type==AtkValueType.Bool)values.Append($" {index}={value.Bool}");
         }
         Line("synthesis",150,$"{text}; values:{values}");
-    }
-
-    // T27: the company action timers, with the statuses that may name the actions.
-    private void ReadCompanyTimers(Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter local)
-    {
-        var agent=AgentFreeCompany.Instance();
-        if(agent==null)return;
-        var remaining=agent->ActionTimeRemaining.TimeRemainingAtUpdate;
-        var text=$"{remaining[0]}, {remaining[1]}, {remaining[2]}";
-        if(text==timers)return;
-        timers=text;
-        Line("company",40,$"remaining at update {text}, {agent->ActionTimeRemaining.TimeSinceUpdate} since; statuses: {string.Join(", ",local.StatusList.Where(status=>status.StatusId!=0).Select(status=>$"{status.StatusId} ({status.RemainingTime:F0} s)"))}");
     }
 
     // I10: are the crystals and the gil of a retainer loaded while its inventory is open?

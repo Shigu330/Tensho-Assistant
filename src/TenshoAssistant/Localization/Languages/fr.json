@@ -4590,6 +4590,12 @@
     "Here": "Position"
   },
   "Reminders": {
+    "CompanyActions": "Bienfaits de compagnie",
+    "CompanyActionsHelp": "Les bienfaits de compagnie actifs sur votre personnage. Leur fin est connue une fois l'onglet Bienfaits de la fenêtre de compagnie ouvert.",
+    "CompanyActionsUnknown": "Non lu",
+    "CompanyActionsNone": "Aucun actif",
+    "CompanyActionLeft": "{0} ({1} h {2:00})",
+    "CompanyActionsOpen": "(temps restant connu après ouverture de l'onglet Bienfaits de la fenêtre de compagnie)",
     "ColumnDiscord": "Discord",
     "DiscordRowTip": "Envoie les alarmes de ce rappel sur Discord, ligne par ligne. Il faut Discord activé, et sa catégorie Rappels ou Vaisseaux activée, dans les réglages des alarmes.\nPar défaut : coché.",
     "VenturesDetail": "Par servant",

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.651.0
+- Plan global, T27 : Rappels (T27) : une ligne « Bienfaits de compagnie » nomme ceux actifs sur votre personnage et, une fois l'onglet Bienfaits de la fenêtre de compagnie ouvert, le temps restant de chacun, avec l'heure de la première fin et une cloche. Le nom vient du statut, sans le rang (« Prix d'ami », pas « Prix d'ami II »). Les minuteurs sont associés aux bienfaits dans l'ordre, ce que le relevé n'a pas pu prouver. La capture de relevés ne suit plus les PR ni ces minuteurs.
+- Tests : Company actions. Verify.ps1 (agent) : 1152/1152, 0 avertissement, 0 erreur ; DLL 0.651.0.0. Non validé en jeu.
+### English
+- Reminders (T27): a « Company actions » row names those active on your character and, once the Actions tab of the Free Company window was opened, the time left for each, with the time of the first end and a bell. The name comes from the status, without the rank. Timers are paired with actions in order, which the reading could not prove. The reading capture no longer follows GP or these timers.
+
 ## 0.650.0
 - Plan global, C33 : Relevés en jeu (phase 5, C33 et T5) : en mode développeur seulement, une capture temporaire écrit dans le journal ce que les points suivants attendent : PR pendant une récolte, statuts d'un récolteur dont l'intuition, chance HQ à côté de la qualité, lignes de chat d'une prise, minuteurs des actions de compagnie, cristaux et gils des servants, journaux de voyage des dirigeables. Rien n'est changé dans le jeu, et chaque partie a une limite de lignes. Coupée en JcJ et en contenu classé comme le reste.
 - Tests : Reading capture. Verify.ps1 (agent) : 1151/1151, 0 avertissement, 0 erreur ; DLL 0.650.0.0. Non validé en jeu.

@@ -4590,6 +4590,12 @@
     "Here": "Position"
   },
   "Reminders": {
+    "CompanyActions": "Company actions",
+    "CompanyActionsHelp": "The company actions active on your character. Their end is known once the Actions tab of the Free Company window was opened.",
+    "CompanyActionsUnknown": "Not read",
+    "CompanyActionsNone": "None active",
+    "CompanyActionLeft": "{0} ({1} h {2:00})",
+    "CompanyActionsOpen": "(time left known after opening the Actions tab of the Free Company window)",
     "ColumnDiscord": "Discord",
     "DiscordRowTip": "Sends this reminder's alarms to Discord, row by row. It needs Discord on, and its Reminders category or Voyages category on, in the alarm settings.\nDefault: ticked.",
     "VenturesDetail": "By retainer",

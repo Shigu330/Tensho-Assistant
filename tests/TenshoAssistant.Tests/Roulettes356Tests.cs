@@ -15,7 +15,7 @@ internal static class Roulettes356Tests
                 && timers.Contains("catch(Exception){daily=null;}",StringComparison.Ordinal),"bounded index, guarded on its own");
             var plugin = Read("Plugin.cs");
             Check(plugin.Contains("row.IsInDutyFinder && row.CompletionArrayIndex>=0",StringComparison.Ordinal),"daily = finder roulettes with a completion index");
-            Check(Read("MainWindow.Reminders.cs").Contains("GameTimers.Read(DailyRoulettes?.Invoke(),ChallengeRows?.Invoke())",StringComparison.Ordinal),"read with the Calendar counters");
+            Check(Read("MainWindow.Reminders.cs").Contains("GameTimers.Read(DailyRoulettes?.Invoke(),ChallengeRows?.Invoke(),CompanyActionNames)",StringComparison.Ordinal),"read with the Calendar counters");
             Check(File.Exists(Path.GetFullPath("docs/evidence/0.356-roulettes.md")),"evidence");
         }),
     ];

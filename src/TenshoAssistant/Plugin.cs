@@ -696,6 +696,7 @@ public sealed class Plugin : IDalamudPlugin
                 ? new Inventory.ItemLook(look.ModelMain,look.ModelSub,look.EquipSlotCategory.RowId,look.DyeCount):null;
             mainWindow.CabinetItems=()=>cabinetItems??=data.GetExcelSheet<Lumina.Excel.Sheets.Cabinet>().Where(row=>row.Item.RowId!=0).Select(row=>row.Item.RowId).ToHashSet();
             mainWindow.RouletteName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentRoulette>().GetRowOrDefault(id)?.Name.ExtractText();
+            mainWindow.CompanyActionNames=LoadSheet("Status",()=>data.GetExcelSheet<Lumina.Excel.Sheets.Status>().Where(row=>row.IsFcBuff).ToDictionary(row=>row.RowId,row=>row.Name.ExtractText()),[]);
             mainWindow.SquadronMissionName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyExpedition>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.449 (DEC-027): the embedded garden seeds (Lotlab), named in the game's language, read once.
             IReadOnlyList<(Reminders.GardenSeed,string)>? gardenSeeds=null;

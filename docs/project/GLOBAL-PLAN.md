@@ -181,7 +181,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | ~~T13~~ fait en 0.648 pour les contenus que les données nomment | Contenus et quêtes : « Débloqué par » et « Débloque » | M | Environ 130 contenus sur plus de 700 ; à compléter si une source sûre est trouvée. |
 | ~~T21~~ fait en 0.646 | Personnage : niveaux et expérience de tous les jobs | S |  |
 | T26 | Dirigeables : trajet du dernier voyage reconstitué | S |  |
-| T27 | Actions de compagnie actives : heure de fin et alarme | M |  |
+| ~~T27~~ fait en 0.651 | Actions de compagnie actives : heure de fin et alarme | M |  |
 
 ### Gros chantiers et idée
 

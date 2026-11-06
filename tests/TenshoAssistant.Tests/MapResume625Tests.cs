@@ -53,6 +53,18 @@ internal static class MapResume625Tests
             Check(loader.Contains("reference.RowType == typeof(SpearfishingItem)"),"read before the gathering items are filtered");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/GatheringCatalogCache.cs")).Contains("CopyRules=2"),"an old cache without them is rebuilt");
         }),
+        ("Company actions (T27): the statuses paired with the timers in order, or no end at all",() =>
+        {
+            var now=new DateTimeOffset(2026,11,6,10,0,0,TimeSpan.Zero);
+            // The reading of 2026-11-06: 19131 and 19135 seconds at the last update, 76 seconds ago.
+            var read=TenshoAssistant.Reminders.CompanyBenefits.Build([364,2932],[19131,19135,0],76,now);
+            Check(read[0].Status==364 && read[0].Ends==now.AddSeconds(19055),"first status, first timer");
+            Check(read[1].Status==2932 && read[1].Ends==now.AddSeconds(19059),"second status, second timer");
+            Check(TenshoAssistant.Reminders.CompanyBenefits.Build([364,2932],[0,0,0],0,now).All(benefit=>benefit.Ends is null),"window not opened: unknown");
+            Check(TenshoAssistant.Reminders.CompanyBenefits.Build([364],[19131,19135,0],0,now).All(benefit=>benefit.Ends is null),"counts differ: unknown");
+            Check(TenshoAssistant.Reminders.CompanyBenefits.Build([364],[50],76,now).All(benefit=>benefit.Ends is null),"run out: unknown");
+            Check(TenshoAssistant.Reminders.CompanyBenefits.Build([],[0,0,0],0,now).Count==0,"none active");
+        }),
         ("Reading capture: developer mode only, stopped by the competitive cut, limited",() =>
         {
             var code=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs"));
