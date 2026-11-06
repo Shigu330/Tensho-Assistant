@@ -33,6 +33,14 @@ internal static class MapLabels596Tests
             Check(view.Contains("if(overLink)linkUnderMouse=label.Link;"),"over the name");
             Check(view.IndexOf("if(overLink)linkUnderMouse=label.Link;")<view.IndexOf("if(linkUnderMouse is { } link && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)NavigateMap(link);"),"before the click is read");
         }),
+        ("Map labels (0.631): a link's whole-zone picture is not a small icon",() =>
+        {
+            Check(TenshoAssistant.Maps.MapLabels.IsZoneImage(855,1024),"Tuliyollal on Yok Tural");
+            Check(!TenshoAssistant.Maps.MapLabels.IsZoneImage(855,64),"a small link icon stays one");
+            Check(!TenshoAssistant.Maps.MapLabels.IsZoneImage(0,1024),"not a link");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
+            Check(view.IndexOf("0.631: the zones of a region map")<view.IndexOf("var icons=new List<MapIconDraw>();"),"under every icon");
+        }),
         ("Map labels: from the sheet, only for a drawn icon, with their setting",() =>
         {
             var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs"));

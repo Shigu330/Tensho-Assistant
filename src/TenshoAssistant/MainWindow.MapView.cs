@@ -1031,6 +1031,13 @@ internal sealed partial class MainWindow
                     draw.AddText(font,nameSize,corner+shift,outline,marker.Label);
                 draw.AddText(font,nameSize,corner,ImGui.GetColorU32(new Vector4(0.30f,0.22f,0.12f,1)),marker.Label);
             }
+            // 0.631: the zones of a region map, under everything else, like the game.
+            foreach(var marker in settings.ShowFixedIcons ? markers.Where(marker=>marker.Icon!=0 && marker.LinkMapId!=0 && settings.SizeOf(marker.Icon,map.MapId)>0):[])
+                if(textures.TryGetFromGameIcon(new GameIconLookup(marker.Icon),out var zoneShared) && zoneShared.TryGetWrap(out var zoneImage,out _) && zoneImage is not null && MapLabels.IsZoneImage(marker.LinkMapId,zoneImage.Width))
+                {
+                    var zoneAt=origin+mapPan+new Vector2(marker.X,marker.Y)*mapZoom;var zoneHalf=new Vector2(zoneImage.Width,zoneImage.Height)*mapZoom/2;
+                    draw.AddImage(zoneImage.Handle,zoneAt-zoneHalf,zoneAt+zoneHalf,Vector2.Zero,Vector2.One,ImGui.GetColorU32(new Vector4(1,1,1,opacity)));
+                }
             uint? linkUnderMouse=null;
             // Areas first, under every icon: running FATEs, quest areas, gathering points of this map.
             var fates=settings.ShowFates && live?.Fates is { } running && live.MapId==map.MapId ? running:[];
@@ -1088,7 +1095,7 @@ internal sealed partial class MainWindow
             var iconNames=new List<(Vector2 At,Vector2 Size,bool MapLink,string Text,float FontSize,uint Link)>();
             foreach(var item in icons)
             {
-                if(textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
+                if(textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null && !MapLabels.IsZoneImage(item.Fixed?.LinkMapId ?? 0,image.Width))
                     draw.AddImage(image.Handle,item.At-new Vector2(item.Size/2),item.At+new Vector2(item.Size/2));
                 // 0.596 (P12): the name the game writes beside this icon, on the side it uses; drawn after the icons (0.623).
                 if(settings.ShowIconNames && settings.NamesShown(mapZoom) && item.Fixed is {Label.Length:>0} named && MapLabels.Shown(named.LinkMapId!=0,mapZoom))

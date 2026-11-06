@@ -13,6 +13,11 @@ public static class MapLabels
     /// game is not known: this one is to adjust in game.
     /// </summary>
     public const float DetailZoom=1f;
+    /// <summary>
+    /// 0.631 (user capture, docs/evidence/0.631-region-zone-images.md): on a region map a link's icon is the picture of that whole zone (1024 px), drawn at its own size in the map's pixels.
+    /// Normal map icons are far smaller.
+    /// </summary>
+    public static bool IsZoneImage(uint linkMap,int width)=>linkMap!=0 && width>=256;
     public static bool Shown(bool mapLink,float zoom)=>mapLink || zoom>=DetailZoom;
 
     /// <summary>The names that fit, map links first, then in the order given: a name that would touch one already kept is left out.</summary>

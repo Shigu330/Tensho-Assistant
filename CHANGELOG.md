@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.631.0
+- Plan global, phase 5 : Carte (rapport et capture de l'utilisateur) : sur une carte de région, l'icône d'un lien est l'image de toute la zone. Tensho la réduisait à la taille d'une icône, d'où des taches blanches. Elle est maintenant dessinée à sa taille, sous les icônes, comme le jeu. Pas encore fait : les cristaux que le jeu ajoute sur ces cartes, et le clic sur toute la forme d'une zone.
+- Tests : Map labels. Verify.ps1 (agent) : 1138/1138, 0 avertissement, 0 erreur ; DLL 0.631.0.0. Non validé en jeu.
+### English
+- Map (user report and capture): on a region map, a link's icon is a picture of the whole zone. Tensho shrank it to icon size, hence white blotches. It is now drawn at its own size, under the icons, like the game. Not done yet: the crystals the game adds on these maps, and clicking anywhere on a zone's shape.
+
 ## 0.630.0
 - Plan global, phase 5 : Carte (rapport et captures de l'utilisateur) : pour une quête au-delà d'un PNJ de changement de zone, le jeu montre ce PNJ. Sonde temporaire, en lecture seule, dans le journal : à l'ouverture d'une quête, ce que le jeu garde pour la cible (marqueurs temporaires, d'événement et de quête), pour savoir où il range cet endroit. Rien ne change encore à l'écran.
 - Tests : Map request. Verify.ps1 (agent) : 1137/1137, 0 avertissement, 0 erreur ; DLL 0.630.0.0. Non validé en jeu.
