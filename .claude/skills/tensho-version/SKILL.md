@@ -48,6 +48,7 @@ Plugin `csharp-lsp` et `csharp-ls` installés le 2026-11-05 ; .NET 10 lui est do
 - **Pas de français dans le code**, sauf les mots tapés par les joueurs, listés dans `Languages406Tests.AllowedLiterals`. Le journal est en anglais.
 - **Message interne affiché** : l'ajouter à `UI/InternalMessages.cs` et aux deux langues.
 - **Natif** : lu sur le thread framework puis copié ; rien de lourd dans Draw ; pas de récursion sans borne sur des données du jeu (un plantage 0xc00000fd a déjà eu lieu), préférer une pile explicite.
+- **Fonction du jeu appelée (pas une simple lecture)** : un `try` ne rattrape pas une violation d'accès. Vérifier joueur chargé et hors chargement avant l'appel, surtout si l'appel n'est plus déclenché par un clic (plantage du 2026-11-06 : `UpdateAetheryteList` pendant un changement de zone, `docs/evidence/0.662-teleport-list-crash.md`).
 - **Tests sur le texte du code** : ils cherchent des extraits exacts. Après un changement de signature, relire le message du test en échec avant de toucher au code.
 - **Scripts Python d'édition** : un script qui échoue a pu s'appliquer en partie : vérifier avec `git status` et ne reprendre que le reste. Fichiers en CRLF : normaliser à la lecture et restaurer à l'écriture. Dans un heredoc, `\\n` devient un vrai saut de ligne : il casse le JSON et le C#.
 

@@ -7,6 +7,20 @@ internal static class MapResume625Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Teleport list (0.662): the game's function is called only with the player there for a moment",() =>
+        {
+            var at=new DateTimeOffset(2026,11,6,12,0,0,TimeSpan.Zero);
+            var gate=new TenshoAssistant.Maps.TeleportListGate();
+            Check(!gate.Allowed(false,false,at),"no player");
+            Check(!gate.Allowed(true,true,at.AddSeconds(1)),"between zones");
+            Check(!gate.Allowed(true,false,at.AddSeconds(2)),"just back");
+            Check(!gate.Allowed(true,false,at.AddSeconds(4)),"not yet");
+            Check(gate.Allowed(true,false,at.AddSeconds(5)),"settled");
+            Check(!gate.Allowed(false,false,at.AddSeconds(6)) && !gate.Allowed(true,false,at.AddSeconds(7)),"it starts again after a change of zone");
+            var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs")).Replace("\r\n","\n");
+            Check(reader.Contains("if(listAllowed && Interlocked.Exchange(ref costsRequest,0)==1)"),"a request waits, it is not spent");
+            Check(reader.IndexOf("listAllowed=teleportGate.Allowed")<reader.IndexOf("ReadTeleportCosts());"),"checked first");
+        }),
         ("Map resume: closed during an event, back once free for a moment, once",() =>
         {
             var at=new DateTimeOffset(2026,11,6,12,0,0,TimeSpan.Zero);

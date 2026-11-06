@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.662.0
+- Plan global, 0.662 : Plantage du jeu corrigé : Tensho appelait une fonction du jeu (la liste de téléportation) pendant un changement de zone, sans joueur chargé. Ce risque existait depuis la 0.645, quand le survol des éthérites a demandé cette liste à chaque changement de carte. La fonction n'est plus appelée qu'une fois le joueur présent depuis 3 secondes. Les coûts au survol arrivent donc un instant après l'arrivée.
+- Tests : Teleport list. Verify.ps1 (agent) : 1160/1160, 0 avertissement, 0 erreur ; DLL 0.662.0.0. Non validé en jeu.
+### English
+- Game crash fixed: Tensho called a game function (the teleport list) during a change of zone, with no player loaded. The risk existed since 0.645, when aetheryte hovering began asking for this list at each map change. The function is now called only once the player has been there for 3 seconds. Costs on hover therefore arrive a moment after arrival.
+
 ## 0.661.0
 - Plan global, 0.661 : Carte : fermer la carte avec sa touche pendant une incantation la laisse fermée, et elle ne revient plus juste avant le chargement : le joueur doit rester libre 1,5 seconde avant qu'elle revienne. Très dézoomée, une zone ne garde que ses noms de liens, comme le jeu : les noms de lieux partent sous 60 %, valeur choisie à l'œil. Les cartes de région et du monde gardent les leurs.
 - Tests : Map resume. Verify.ps1 (agent) : 1159/1159, 0 avertissement, 0 erreur ; DLL 0.661.0.0. Non validé en jeu.

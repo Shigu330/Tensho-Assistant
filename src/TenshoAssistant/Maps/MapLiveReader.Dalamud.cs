@@ -61,6 +61,7 @@ internal sealed class MapLiveReader : IDisposable
     }
     // N-09 (0.441): hunt marks by BNpcBase → rank (docs/evidence/0.441-hunt-marks.md).
     private readonly Dictionary<uint,int> huntMarks=[];
+    private readonly TeleportListGate teleportGate=new();
     private long teleport;private int costsRequest;private IReadOnlyDictionary<uint,uint>? teleportCosts;
     /// <summary>Queues a teleport to an aetheryte (game action, normal gil cost); sent on the next framework tick.</summary>
     public void Teleport(uint aetheryteId)=>Interlocked.Exchange(ref teleport,aetheryteId);
@@ -140,8 +141,10 @@ internal sealed class MapLiveReader : IDisposable
             if(Interlocked.Exchange(ref teleport,0) is var destination && destination>0)
                 try{SendTeleport((uint)destination);}
                 catch(Exception error){if(!teleportFailed){teleportFailed=true;log.Warning(error,"The teleport could not be sent.");}}
-            if(Interlocked.Exchange(ref costsRequest,0)==1){try{Volatile.Write(ref teleportCosts,ReadTeleportCosts());costsFailed=false;}catch(Exception error){costsFailed=true;Failed("teleport costs",error);}}
             var player=client.IsLoggedIn ? objects.LocalPlayer:null;
+            // 0.662: called only with the player there for a moment: see TeleportListGate.
+            var listAllowed=teleportGate.Allowed(player is not null,condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas51],DateTimeOffset.UtcNow);
+            if(listAllowed && Interlocked.Exchange(ref costsRequest,0)==1){try{Volatile.Write(ref teleportCosts,ReadTeleportCosts());costsFailed=false;}catch(Exception error){costsFailed=true;Failed("teleport costs",error);}}
             if(player is null){Volatile.Write(ref state,null);return;}
             var (flagMap,flag)=ReadFlag();
             // 0.328 (R-14): each secondary read (here and the teleport costs above) has its own guard; a failure keeps that part's

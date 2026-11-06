@@ -17,6 +17,21 @@ public sealed class MapClickMemory
         return true;
     }
 }
+/// <summary>
+/// 0.662 (game crash 2026-11-06 13:00, docs/evidence/0.662-teleport-list-crash.md): the game's teleport list is built by a function of the game that crashes it with no player loaded,
+/// and an access violation cannot be caught. It is only called once the player has been there for a moment; a request waits until then.
+/// </summary>
+public sealed class TeleportListGate
+{
+    public static readonly TimeSpan SettleFor=TimeSpan.FromSeconds(3);
+    private DateTimeOffset? since;
+    public bool Allowed(bool playerLoaded,bool betweenZones,DateTimeOffset now)
+    {
+        if(!playerLoaded || betweenZones){since=null;return false;}
+        since??=now;
+        return now-since>=SettleFor;
+    }
+}
 /// <summary>Closed by the game during an event, the map comes back once the player is free (see the note above).</summary>
 public sealed class MapResume
 {
