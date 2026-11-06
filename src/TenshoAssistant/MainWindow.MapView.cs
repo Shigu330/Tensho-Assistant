@@ -492,7 +492,8 @@ internal sealed partial class MainWindow
             void All(bool shown)
             {
                 settings.ShowQuests=settings.ShowFates=settings.ShowGathering=settings.ShowVendors=settings.ShowSightseeing=settings.ShowAetherCurrents=shown;
-                settings.ShowParty=settings.ShowBookmarks=settings.ShowHuntMarks=settings.ShowTreasure=settings.ShowFixedIcons=settings.ShowPlaceNames=settings.ShowIconNames=settings.ShowIslandResources=shown;
+                settings.ShowParty=settings.ShowBookmarks=settings.ShowHuntMarks=settings.ShowTreasure=settings.ShowFixedIcons=settings.ShowPlaceNames=settings.ShowIconNames=shown;
+                settings.ShowIslandPlants=settings.ShowIslandWood=settings.ShowIslandRocks=settings.ShowIslandEarth=settings.ShowIslandFishing=shown;
                 changed=true;
             }
             if(ImGui.SmallButton(localization.Get("MapView.LayersAll")))All(true);
@@ -507,8 +508,12 @@ internal sealed partial class MainWindow
             changed|=SettingBox("MapView.ShowQuests",settings.ShowQuests,value=>settings.ShowQuests=value);
             changed|=SettingBox("MapView.ShowFates",settings.ShowFates,value=>settings.ShowFates=value);
             changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value);
-            // 0.682 (user report): the island's resources could only be turned off from a section where nobody would look for them.
-            changed|=SettingBox("MapView.ShowIslandResources",settings.ShowIslandResources,value=>settings.ShowIslandResources=value);
+            // 0.684 (user request): the game's five kinds, in this menu only.
+            changed|=SettingBox("MapView.ShowIslandPlants",settings.ShowIslandPlants,value=>settings.ShowIslandPlants=value);
+            changed|=SettingBox("MapView.ShowIslandWood",settings.ShowIslandWood,value=>settings.ShowIslandWood=value);
+            changed|=SettingBox("MapView.ShowIslandRocks",settings.ShowIslandRocks,value=>settings.ShowIslandRocks=value);
+            changed|=SettingBox("MapView.ShowIslandEarth",settings.ShowIslandEarth,value=>settings.ShowIslandEarth=value);
+            changed|=SettingBox("MapView.ShowIslandFishing",settings.ShowIslandFishing,value=>settings.ShowIslandFishing=value);
             changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value);
             changed|=SettingBox("MapView.ShowSightseeing",settings.ShowSightseeing,value=>settings.ShowSightseeing=value);
             changed|=SettingBox("MapView.ShowAetherCurrents",settings.ShowAetherCurrents,value=>settings.ShowAetherCurrents=value);
@@ -570,7 +575,6 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value,MapDefaults.ShowTreasure);
                 changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value,MapDefaults.ShowVendors);
                 changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value,MapDefaults.ShowGathering);
-                changed|=SettingBox("MapView.ShowIslandResources",settings.ShowIslandResources,value=>settings.ShowIslandResources=value,MapDefaults.ShowIslandResources);
                 changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value,MapDefaults.ShowHuntMarks);
                 changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
                 var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
@@ -1106,7 +1110,7 @@ internal sealed partial class MainWindow
                     if(point.Position is { Radius:>0 } area)
                         DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(area.X,0,area.Z),map)*mapZoom,area.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,settings.GatheringAreaColor);
             // N-07 (0.667): the Island Sanctuary's resources; world coordinates, to compare with the game's map.
-            var islandPoints=settings.ShowIslandResources && map.TerritoryId==IslandResources.Territory ? IslandPoints ?? []:[];
+            IReadOnlyList<IslandPoint> islandPoints=map.TerritoryId==IslandResources.Territory ? (IslandPoints ?? []).Where(point=>settings.ShowsIslandKind(point.Kind)).ToArray():[];
             if(settings.ShowGatheringAreas)
                 foreach(var point in islandPoints.Where(point=>point.Radius>0))
                     DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(point.X,0,point.Y),map)*mapZoom,point.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,settings.GatheringAreaColor);
@@ -1558,9 +1562,19 @@ internal sealed partial class MainWindow
     // Event marker title: the game's tooltip when it could be read safely, else the name of a quest in progress with the same
     // objective id (0.134: a leve marker took a completed quest's name through a 16-bit id collision), else null → the
     // game's symbol name in the list.
+    internal Func<IReadOnlyList<IslandPlace>>? IslandPlacesLoad { get; set; }
+    private Task<IReadOnlyList<IslandPlace>>? islandPlaces;
+    private string? IslandMarkerName(MapEventMarker marker)
+    {
+        if(IslandPlacesLoad is not { } load || maps.State.Catalog?.Find(marker.MapId)?.TerritoryId!=IslandResources.Territory)return null;
+        islandPlaces??=Task.Run(load);
+        return islandPlaces.IsCompletedSuccessfully ? IslandResources.NearestName(islandPlaces.Result,marker.Position.X,marker.Position.Z):null;
+    }
     private string? EventLabel(MapEventMarker marker)
     {
         if(marker.Tooltip.Length>0)return marker.Tooltip;
+        // 0.684 (user report): the island's markers come with no text, a construction board among them; the sheet says what stands there.
+        if(marker.MarkerType!=3 && IslandMarkerName(marker) is { } islandName)return islandName;
         // Quest marker (type 3): exact quest row from DataId, whatever its progress.
         if(marker.MarkerType==3 && marker.DataId!=0 && QuestOf(marker.DataId+65536u) is { Name.Length:>0 } quest)return quest.Name;
         if(marker.ObjectiveId==0)return null;

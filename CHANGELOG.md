@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.684.0
+- Plan global, Félicité insulaire, carte : Demandes de l'utilisateur : les ressources de la Félicité insulaire se règlent par type, avec les cinq types du jeu (plantes, bois, roches, terre, pêche), dans le menu Affichage seulement. Deux lieux du même type au même endroit ne font plus qu'une icône. Le « ! » sans texte prend le nom de ce qui se trouve là, un panneau de construction par exemple. Le classement des objets par type est déduit des noms : aucune feuille ne le donne. COMPILED et TESTED, non validé en jeu.
+- Tests : Island679Tests. Verify.ps1 (agent) : 1213/1213, 0 avertissement, 0 erreur ; DLL 0.684.0.0. Non validé en jeu.
+### English
+- User requests: the Island Sanctuary's resources are set by kind, the game's five kinds, in the Display menu only. Two places of one kind on one spot make one icon. The marker with no text takes the name of what stands there, such as a construction board. Sorting items into kinds is inferred from their names: no sheet gives it. COMPILED and TESTED, not validated in game.
+
 ## 0.683.0
 - Plan global, W-02 : La Grande Mascarade, sujet choisi par l'utilisateur. Nouvelle page Progression › La Grande Mascarade : les 32 niveaux, réussis ou non, avec leurs ennemis, le temps standard et le temps idéal, et un filtre « Non réussis seulement ». Aucun conseil de combat : les faiblesses de la feuille ne sont pas reprises. Lecture seule, sans requête au serveur. COMPILED et TESTED, non validé en jeu.
 - Tests : MaskedCarnivale683Tests. Verify.ps1 (agent) : 1209/1209, 0 avertissement, 0 erreur ; DLL 0.683.0.0. Non validé en jeu.

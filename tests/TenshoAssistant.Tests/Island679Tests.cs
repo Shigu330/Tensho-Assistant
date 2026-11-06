@@ -1,3 +1,4 @@
+using TenshoAssistant;
 using TenshoAssistant.Maps;
 
 // 0.679 (user reports): on the Island Sanctuary, a marker placed on another version of its map, a pad guide taken for a window, two NPCs with no icon.
@@ -31,13 +32,47 @@ internal static class Island679Tests
             Check(view.Contains("liveEvents.Where(marker=>eventMaps.Contains(marker.MapId))"),"events");
             Check(!view.Contains("liveEvents.Where(marker=>marker.MapId==map.MapId)"),"not one map");
         }),
-        ("Island map: its resources are in the map's display menu, and All and None count them",() =>
+        ("Island map: the five kinds are in the map's display menu, once each, and All and None count them",() =>
         {
             var view=Read("MainWindow.MapView.cs");
             var popup=view.IndexOf("BeginPopup(\"MapViewLayers\")",StringComparison.Ordinal);
-            var box=view.IndexOf("SettingBox(\"MapView.ShowIslandResources\"",StringComparison.Ordinal);
-            Check(popup>=0 && box>popup && box<popup+3000,"in the display menu");
-            Check(view.Contains("settings.ShowIconNames=settings.ShowIslandResources=shown;"),"All and None");
+            foreach(var kind in new[]{"Plants","Wood","Rocks","Earth","Fishing"})
+            {
+                var box=view.IndexOf($"SettingBox(\"MapView.ShowIsland{kind}\"",StringComparison.Ordinal);
+                Check(popup>=0 && box>popup && box<popup+4000,kind+" in the display menu");
+                Check(view.LastIndexOf($"SettingBox(\"MapView.ShowIsland{kind}\"",StringComparison.Ordinal)==box,kind+" once");
+            }
+            Check(view.Contains("settings.ShowIslandPlants=settings.ShowIslandWood=settings.ShowIslandRocks=settings.ShowIslandEarth=settings.ShowIslandFishing=shown;"),"All and None");
+        }),
+        ("Island map: a place of one kind at the same spot is drawn once, and a far one or another kind stays apart",() =>
+        {
+            var points=IslandResources.Points([(37559,236,88,75),(37570,236,89,80),(37551,20,0,100),(37561,20,0,100),(37554,237,88,80)]);
+            Check(points.Count==3,"sand and clay make one, the palm one, the rock one");
+            var earth=points.Single(point=>point.Kind==IslandResourceKind.Earth);
+            Check(earth.Items.Count==2 && earth.Radius==80,"both items, the wider radius");
+            Check(points.Single(point=>point.Kind==IslandResourceKind.Wood).Items.Count==2,"two items of one place");
+            Check(points.Any(point=>point.Kind==IslandResourceKind.Rocks),"another kind beside it stays");
+        }),
+        ("Island map: each kind has its own switch, and an unknown item stays while any kind is on",() =>
+        {
+            var settings=new MapViewSettings{ShowIslandRocks=false};
+            Check(!settings.ShowsIslandKind(IslandResourceKind.Rocks) && settings.ShowsIslandKind(IslandResourceKind.Wood),"own switch");
+            Check(settings.ShowsIslandKind(null),"unknown, others on");
+            settings.ShowIslandPlants=settings.ShowIslandWood=settings.ShowIslandEarth=settings.ShowIslandFishing=false;
+            Check(!settings.ShowsIslandKind(null),"unknown, all off");
+        }),
+        ("Island map: every item of the sheet read on 2026-11-06 has a kind",() =>
+        {
+            var items=new uint[]{37551,37552,37553,37554,37555,37556,37557,37558,37559,37560,37561,37562,37563,37564,37565,37566,37567,37568,37569,37570,37571,37572,37573,37574,37575,37576,37577,37583,37584,37591,37586,39224,39225,39226,39227,39228,39887,39888,39889,39890,39891,39892,39893,41630,41631,41632,41633,41634};
+            Check(items.Length==48,"48 rows");
+            foreach(var item in items)Check(IslandResources.KindOf(item) is not null,"item "+item);
+        }),
+        ("Island map: a marker with no text takes the name of what stands there, within reach",() =>
+        {
+            IslandPlace[] places=[new(-281,244,"panneau de construction : installation 1"),new(-253.9f,238.7f,"panneau de construction : installation 2"),new(0,0,"")];
+            Check(IslandResources.NearestName(places,-281.5f,244.5f)=="Panneau de construction : installation 1","the nearest, first letter raised");
+            Check(IslandResources.NearestName(places,-200,200) is null,"nothing near");
+            Check(IslandResources.NearestName(places,0,0) is null,"an unnamed row is no name");
         }),
         ("Island modes: the pad guide is not a window in front of the map, and a real island window still is",() =>
         {

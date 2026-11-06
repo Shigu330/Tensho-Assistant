@@ -699,6 +699,13 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.CabinetItems=()=>cabinetItems??=data.GetExcelSheet<Lumina.Excel.Sheets.Cabinet>().Where(row=>row.Item.RowId!=0).Select(row=>row.Item.RowId).ToHashSet();
             mainWindow.RouletteName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentRoulette>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.IslandPoints=LoadSheet("MJIGatheringItem",()=>Maps.IslandResources.Points(data.GetExcelSheet<Lumina.Excel.Sheets.MJIGatheringItem>().Select(row=>(row.Item.RowId,(int)row.X,(int)row.Y,(int)row.Radius))),[]);
+            // 0.684: what stands on the island, to name the game's markers that come with no text; read once, off the framework, on the island only.
+            mainWindow.IslandPlacesLoad=()=>
+            {
+                var objects=data.GetExcelSheet<Lumina.Excel.Sheets.EObjName>();var people=data.GetExcelSheet<Lumina.Excel.Sheets.ENpcResident>();
+                return data.GetExcelSheet<Lumina.Excel.Sheets.Level>().Where(row=>row.Territory.RowId==Maps.IslandResources.Territory && row.Type is 45 or 8)
+                    .Select(row=>new Maps.IslandPlace(row.X,row.Z,row.Type==45 ? objects.GetRowOrDefault(row.Object.RowId)?.Singular.ExtractText() ?? "":people.GetRowOrDefault(row.Object.RowId)?.Singular.ExtractText() ?? "")).ToArray();
+            };
             mainWindow.WorkshopProjectsLoad=()=>FreeCompany.WorkshopProjectsLoader.Read(data);
             mainWindow.CompanyActionNames=LoadSheet("Status",()=>data.GetExcelSheet<Lumina.Excel.Sheets.Status>().Where(row=>row.IsFcBuff).ToDictionary(row=>row.RowId,row=>row.Name.ExtractText()),[]);
             // N-10 (0.671): the island's workshops, read on the player's click.

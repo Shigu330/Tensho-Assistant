@@ -244,8 +244,22 @@ public sealed class MapViewSettings
     public bool RightClickIgnored(uint icon)=>RightClickIgnore?.Contains(icon)==true;
     public bool ShowEventAreas { get; set; } = true;
     public bool ShowLeveAreas { get; set; } = true;
-    /// <summary>N-07 (0.667): what can be gathered on the Island Sanctuary, on its map.</summary>
-    public bool ShowIslandResources { get; set; } = true;
+    /// <summary>N-07 (0.667), 0.684: what can be gathered on the Island Sanctuary, on its map, by the game's five kinds.</summary>
+    public bool ShowIslandPlants { get; set; } = true;
+    public bool ShowIslandWood { get; set; } = true;
+    public bool ShowIslandRocks { get; set; } = true;
+    public bool ShowIslandEarth { get; set; } = true;
+    public bool ShowIslandFishing { get; set; } = true;
+    /// <summary>An item of no known kind stays as long as one kind is shown.</summary>
+    public bool ShowsIslandKind(TenshoAssistant.Maps.IslandResourceKind? kind)=>kind switch
+    {
+        TenshoAssistant.Maps.IslandResourceKind.Plants=>ShowIslandPlants,
+        TenshoAssistant.Maps.IslandResourceKind.Wood=>ShowIslandWood,
+        TenshoAssistant.Maps.IslandResourceKind.Rocks=>ShowIslandRocks,
+        TenshoAssistant.Maps.IslandResourceKind.Earth=>ShowIslandEarth,
+        TenshoAssistant.Maps.IslandResourceKind.Fishing=>ShowIslandFishing,
+        _=>ShowIslandPlants || ShowIslandWood || ShowIslandRocks || ShowIslandEarth || ShowIslandFishing,
+    };
     public bool ShowFateAreas { get; set; } = true;
     public bool ShowGatheringAreas { get; set; } = true;
     public System.Numerics.Vector4 QuestAreaColor { get; set; } = new(0.95f,0.70f,0.25f,0.25f);
