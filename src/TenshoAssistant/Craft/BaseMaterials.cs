@@ -14,6 +14,10 @@ public static class BaseMaterials
     public static bool VendorCounts(bool vendorsOn,IEnumerable<IReadOnlyList<uint>> offersCurrencies,IReadOnlySet<uint> currenciesOn)=>
         vendorsOn && offersCurrencies.Any(currencies=>currencies.Count>0 && currencies.All(currenciesOn.Contains));
 
+    /// <summary>0.702 (user request): the currencies of what vendors sell that is really a material: an ingredient of a recipe or a supply of a workshop project. Encoded currencies (0) stay out.</summary>
+    public static IReadOnlySet<uint> MaterialCurrencies(IEnumerable<(uint Item,IEnumerable<uint> Currencies)> sales,IReadOnlySet<uint> materials)=>
+        sales.Where(sale=>materials.Contains(sale.Item)).SelectMany(sale=>sale.Currencies).Where(id=>id!=0).ToHashSet();
+
     public static ItemOrigin OriginOf(bool gathered,bool sold,bool dropped)=>gathered ? ItemOrigin.Gathering:sold ? ItemOrigin.Vendor:dropped ? ItemOrigin.Monster:ItemOrigin.Other;
 
     /// <summary>

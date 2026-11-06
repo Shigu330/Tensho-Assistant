@@ -50,11 +50,20 @@ internal static class BaseMaterials699Tests
             Check(!BaseMaterials.VendorCounts(false,either,gil),"vendors off");
             Check(!BaseMaterials.VendorCounts(true,free,gil) && !BaseMaterials.VendorCounts(true,encoded,gil),"no cost read, or encoded: it does not count");
         }),
+        ("Vendors: only the currencies of what is really a material",() =>
+        {
+            (uint Item,IEnumerable<uint> Currencies)[] sales=[(10,[1u]),(11,[28u]),(12,[0u]),(13,[40u,41u])];
+            var found=BaseMaterials.MaterialCurrencies(sales,new HashSet<uint>{10,12,13});
+            Check(found.Contains(1u) && found.Contains(40u) && found.Contains(41u),"sellers of materials");
+            Check(!found.Contains(28u),"a shop with no material");
+            Check(!found.Contains(0u),"an encoded currency");
+        }),
         ("Vendors: the list leaves out what has no name, names company credits, and searches",() =>
         {
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ListPanels.cs"));
-            Check(page.Contains(".Distinct().Where(id=>id!=0)") && page.Contains("Where(row=>row.Item2.Length>0)"),"no #0, no nameless row");
-            Check(page.Contains("id!=NpcCost.CompanyCredits"),"company credits");
+            Check(page.Contains("Where(row=>row.Name.Length>0)"),"no nameless row");
+            Check(page.Contains("Task.Run(()=>") && page.Contains("BaseMaterials.MaterialCurrencies("),"worked out off the frame");
+            Check(page.Contains("id==NpcCost.CompanyCredits ? credits"),"company credits");
             Check(page.Contains("ListPanelCurrencySearch"),"search");
         }),
         ("Panels: categories fold, each panel on its own",() =>

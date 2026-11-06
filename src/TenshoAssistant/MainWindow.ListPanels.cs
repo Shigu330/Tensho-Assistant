@@ -91,24 +91,35 @@ internal sealed partial class MainWindow
 
     // 0.701 (user request): the currencies the vendors take, gil first, none ticked at the start, with a search by name. Listed once per catalogue.
     // Left out: 0, a currency the game encodes and nothing resolves, and rows with no name in the game's sheet (8223): offers in them never count.
-    private (object? Catalog,(uint Id,string Name)[] Rows) listPanelCurrencies;
+    // One still ticked stays listed, so that it can be unticked.
+    private (object? Vendors,object? Recipes,Task<(uint Id,string Name)[]>? Rows) listPanelCurrencies;
     private HashSet<uint> listPanelCurrenciesOn=[];
     private string listPanelCurrencySearch="";
     private void DrawListPanelCurrencies()
     {
-        var vendors=npcVendors?.State.Catalog;
-        if(vendors is null)return;
-        if(!ReferenceEquals(listPanelCurrencies.Catalog,vendors))
+        var vendors=npcVendors?.State.Catalog;var recipes=recipeCatalog.State.Catalog;
+        if(vendors is null || recipes is null)return;
+        if(!ReferenceEquals(listPanelCurrencies.Vendors,vendors) || !ReferenceEquals(listPanelCurrencies.Recipes,recipes) || listPanelCurrencies.Rows is null)
         {
-            var items=itemCatalog.State.Catalog;
-            string Name(uint id)
+            var items=itemCatalog.State.Catalog;var load=WorkshopProjectsLoad;
+            var credits=localization.Get("NpcUi.CompanyCredits");
+            credits=credits.Length>0 ? char.ToUpper(credits[0],System.Globalization.CultureInfo.CurrentCulture)+credits[1..]:credits;
+            // 0.702 (user request): only the vendors that really have materials. Every sale against every recipe: off the frame, once per catalogue.
+            listPanelCurrencies=(vendors,recipes,Task.Run(()=>
             {
-                if(id!=NpcCost.CompanyCredits)return items?.Find(id)?.Name ?? "";
-                var credits=localization.Get("NpcUi.CompanyCredits");
-                return credits.Length>0 ? char.ToUpper(credits[0],System.Globalization.CultureInfo.CurrentCulture)+credits[1..]:credits;
-            }
-            listPanelCurrencies=(vendors,vendors.Sales.SelectMany(sale=>sale.Costs).Select(cost=>cost.CurrencyItemId).Distinct().Where(id=>id!=0)
-                .Select(id=>(id,Name(id))).Where(row=>row.Item2.Length>0).OrderBy(row=>row.id==1 ? 0:1).ThenBy(row=>row.Item2,StringComparer.CurrentCulture).ToArray());
+                var materials=recipes.All.SelectMany(recipe=>recipe.Ingredients).Select(ingredient=>ingredient.ItemId).ToHashSet();
+                try{if(load is not null)materials.UnionWith(load().SelectMany(project=>project.Totals()).Select(row=>row.Item));}
+                catch(Exception error){log.Warning(error,"Workshop supplies could not be added to the vendor currencies.");}
+                var found=BaseMaterials.MaterialCurrencies(vendors.Sales.Select(sale=>(sale.ItemId,sale.Costs.Select(cost=>cost.CurrencyItemId))),materials);
+                return found.Select(id=>(Id:id,Name:id==NpcCost.CompanyCredits ? credits:items?.Find(id)?.Name ?? "")).Where(row=>row.Name.Length>0)
+                    .OrderBy(row=>row.Id==1 ? 0:1).ThenBy(row=>row.Name,StringComparer.CurrentCulture).ToArray();
+            }));
+        }
+        if(listPanelCurrencies.Rows is not { IsCompletedSuccessfully:true } ready)
+        {
+            if(listPanelCurrencies.Rows is { IsFaulted:true } failed){log.Warning(failed.Exception,"The vendor currencies could not be listed.");listPanelCurrencies=(vendors,recipes,Task.FromResult<(uint,string)[]>([]));}
+            ImGui.TextDisabled(localization.Get("ListPanels.CurrenciesLoading"));
+            return;
         }
         var on=configuration.ListPanelsCurrenciesOn ?? [];
         ImGui.SetNextItemWidth(280);
@@ -119,7 +130,7 @@ internal sealed partial class MainWindow
                 ImGui.SetNextItemWidth(-1);
                 ImGui.InputTextWithHint("###ListPanelCurrencySearch",localization.Get("ListPanels.CurrencySearch"),ref listPanelCurrencySearch,60);
                 Tip("ListPanels.CurrencySearchTip");
-                var shown=listPanelCurrencies.Rows.Where(row=>listPanelCurrencySearch.Length==0 || row.Name.Contains(listPanelCurrencySearch,StringComparison.CurrentCultureIgnoreCase)).ToArray();
+                var shown=ready.Result.Concat(on.Where(id=>ready.Result.All(row=>row.Id!=id)).Select(id=>(Id:id,Name:itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}"))).Where(row=>listPanelCurrencySearch.Length==0 || row.Name.Contains(listPanelCurrencySearch,StringComparison.CurrentCultureIgnoreCase)).ToArray();
                 if(ImGui.SmallButton(localization.Get("ListPanels.CurrencyNone")))
                 {
                     configuration.ListPanelsCurrenciesOn=[];SaveReminders();on=configuration.ListPanelsCurrenciesOn;

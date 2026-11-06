@@ -6197,8 +6197,9 @@
     "Left": "Non réussi"
   },
   "ListPanels": {
+    "CurrenciesLoading": "Liste des monnaies en cours…",
+    "CurrenciesTip": "Un PNJ ne compte que si vous avez coché toutes les monnaies qu'il demande. Sont listées les monnaies des vendeurs de matériaux, pour les recettes ou les projets d'atelier. Aucune n'est cochée au départ : cochez Gil pour compter ce qui s'achète en gils.",
     "Currencies": "Monnaies des vendeurs ({0} cochées)",
-    "CurrenciesTip": "Un PNJ ne compte que si vous avez coché toutes les monnaies qu'il demande. Aucune n'est cochée au départ : cochez Gil pour compter ce qui s'achète en gils.",
     "CurrencySearch": "Nom de la monnaie…",
     "CurrencySearchTip": "Partie du nom de la monnaie.",
     "CurrencyNone": "Tout décocher",

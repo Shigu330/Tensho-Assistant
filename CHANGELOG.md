@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.702.0
+- Plan global, W-09 : Demande de l'utilisateur : la liste des monnaies ne garde que celles des PNJ qui vendent vraiment des matériaux, c'est-à-dire un ingrédient d'une recette ou une fourniture d'un projet d'atelier. Une monnaie déjà cochée reste listée pour pouvoir être décochée. COMPILED et TESTED, non validé en jeu.
+- Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1248/1248, 0 avertissement, 0 erreur ; DLL 0.702.0.0. Non validé en jeu.
+### English
+- User request: the currency list keeps only those of NPCs really selling materials: a recipe ingredient or a workshop project supply. A currency already ticked stays listed so it can be unticked. COMPILED and TESTED, not validated in game.
+
 ## 0.701.0
 - Plan global, W-09 : Rapport et demande de l'utilisateur : la liste des monnaies montrait des numéros. #0 est une monnaie que le jeu code et que rien ne résout, #8223 une ligne sans nom dans la feuille du jeu : ils sortent de la liste et leurs offres ne comptent pas. #4294905804 est le code interne de Tensho pour les crédits de compagnie, maintenant nommés. La liste part tout décochée, avec une recherche par nom et « Tout décocher » : un PNJ ne compte que si toutes les monnaies qu'il demande sont cochées. COMPILED et TESTED, non validé en jeu.
 - Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1247/1247, 0 avertissement, 0 erreur ; DLL 0.701.0.0. Non validé en jeu.
