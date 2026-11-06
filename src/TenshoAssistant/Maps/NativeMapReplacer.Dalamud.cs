@@ -31,6 +31,8 @@ internal sealed class NativeMapReplacer : IDisposable
     // 0.625: the game closes its map when a talk or an event starts: it comes back at the end.
     private readonly MapResume resume=new();
     private string lastPointed="";
+    private readonly MapClickMemory clicks=new();
+    private bool refocus;
     private ICondition? occupiedFlags;
     private bool Occupied()
     {
@@ -62,6 +64,8 @@ internal sealed class NativeMapReplacer : IDisposable
         try
         {
             var options=settings();
+            // 0.629: the map key and a click ask for the same thing in the agent: only the mouse tells them apart.
+            if(FFXIVClientStructs.FFXIV.Client.UI.UIInputData.Instance() is var input && input!=null && (input->CursorInputs.MouseButtonReleasedFlags & FFXIVClientStructs.FFXIV.Client.System.Input.MouseButtonFlags.LBUTTON)!=0)clicks.Clicked(now);
             var addon=gui.GetAddonByName("AreaMap");
             var unit=addon.IsNull ? null:(AtkUnitBase*)addon.Address;
             var visible=unit!=null && addon.IsVisible;
@@ -98,9 +102,14 @@ internal sealed class NativeMapReplacer : IDisposable
                     hosted=true;
                     var (request,signature)=ReadRequest(true);lastRequest=signature;
                     // 0.627: the same request as last time is what the game kept, not a new one.
+                    // 0.629 (user report): unless the mouse just clicked: the same quest was asked again.
                     if(request.Pointed)
                     {
-                        if(signature==lastPointed)request=request.Plain();
+                        var repeated=signature==lastPointed;
+                        var clicked=refocus || clicks.Take(now);
+                        refocus=false;
+                        if(repeated)log.Information("Same map request again: clicked {0}.",clicked);
+                        if(repeated && !clicked)request=request.Plain();
                         else lastPointed=signature;
                     }
                     open(request);
@@ -111,9 +120,19 @@ internal sealed class NativeMapReplacer : IDisposable
                 if(!visible)
                 {
                     hosted=false;Restore(unit);
-                    resume.GameClosedMap(Occupied(),client.TerritoryType);
-                    log.Information("The game closed its map window: the Tensho map closes with it; occupied: {0}.",Occupied());
-                    closeTensho();
+                    // 0.629 (user report, log): clicking the quest already shown makes the game close its map: the click asked for the quest, so it opens again on it.
+                    if(!Occupied() && lastPointed.Length>0 && lastPointed==lastRequest && clicks.Take(now) && AgentMap.Instance() is var shown && shown!=null)
+                    {
+                        log.Information("The game closed its map on a click on the same quest: it stays open on it.");
+                        refocus=true;
+                        shown->Show();
+                    }
+                    else
+                    {
+                        resume.GameClosedMap(Occupied(),client.TerritoryType);
+                        log.Information("The game closed its map window: the Tensho map closes with it; occupied: {0}.",Occupied());
+                        closeTensho();
+                    }
                 }
                 else if(!tenshoOpen()){hosted=false;Restore(unit);AgentMap.Instance()->Hide();visible=false;}
                 else

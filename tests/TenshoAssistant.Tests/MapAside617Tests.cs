@@ -39,7 +39,7 @@ internal static class MapAside617Tests
             var plain=kept.Plain();
             Check(!plain.Pointed && plain.Selected==12 && plain.Requested==12 && plain.Target is null,"asks for nothing, on the player's map");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));
-            Check(view.Contains("if(signature==lastPointed)request=request.Plain();"),"only when unchanged");
+            Check(view.Contains("if(repeated && !clicked)request=request.Plain();"),"only when unchanged and not clicked");
         }),
         ("Map request (0.628): a quest target asked on the world map opens its territory's own map",() =>
         {
@@ -50,6 +50,19 @@ internal static class MapAside617Tests
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             Check(view.Contains("if(focus.Target is { } target && map.TerritoryId!=0)return"),"never placed on a world or region map");
             Check(view.Contains("focus.TargetIcon!=0 && map.TerritoryId!=0 ?"),"no icon there either");
+        }),
+        ("Map request (0.629): a click just before asks for the quest again, once; the map key does not",() =>
+        {
+            var clicks=new TenshoAssistant.Maps.MapClickMemory();
+            var now=new DateTimeOffset(2026,11,6,1,0,0,TimeSpan.Zero);
+            Check(!clicks.Take(now),"no click");
+            clicks.Clicked(now);
+            Check(!clicks.Take(now+TimeSpan.FromSeconds(1)),"too old: the map key");
+            clicks.Clicked(now);
+            Check(clicks.Take(now+TimeSpan.FromMilliseconds(100)),"just clicked");
+            Check(!clicks.Take(now+TimeSpan.FromMilliseconds(110)),"only once");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));
+            Check(view.Contains("!Occupied() && lastPointed.Length>0 && lastPointed==lastRequest && clicks.Take(now)"),"the map stays open on that click, never during an event");
         }),
         ("Map enlarged: no stepping aside then, the same as before otherwise",() =>
         {

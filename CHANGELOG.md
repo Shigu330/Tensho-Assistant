@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.629.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : cliquer la quête déjà affichée fermait ou rouvrait la carte, sans aller sur la quête, car le jeu ferme alors sa carte et la 0.627 prenait la demande pour la touche de carte. Un clic gauche juste avant, lu dans les entrées du jeu, distingue les deux : la carte reste ouverte et revient sur la quête. La touche de carte l'ouvre toujours sur le joueur. Limite : un clic à la manette ne se voit pas ainsi.
+- Tests : Map request. Verify.ps1 (agent) : 1137/1137, 0 avertissement, 0 erreur ; DLL 0.629.0.0. Non validé en jeu.
+### English
+- Map (user report, log): clicking the quest already shown closed or reopened the map without going to the quest, because the game then closes its map and 0.627 took the request for the map key. A left click just before, read from the game's inputs, tells them apart: the map stays open and returns to the quest. The map key still opens it on the player. Limit: a controller click is not seen this way.
+
 ## 0.628.0
 - Plan global, phase 5 : Carte (rapport et captures de l'utilisateur, journal) : une quête d'une zone sans région, comme la Ville fantôme, fait demander au jeu la carte du monde avec les coordonnées de la zone ; Tensho les plaçait sur le monde, donc en pleine mer. La carte propre à la zone, celle que la feuille TerritoryType du jeu indique, s'ouvre maintenant avec l'icône dessus, et aucune cible n'est plus posée sur une carte du monde ou de région. Différence voulue : le jeu reste sur le monde, à côté de Yok Tural.
 - Tests : Map request. Verify.ps1 (agent) : 1136/1136, 0 avertissement, 0 erreur ; DLL 0.628.0.0. Non validé en jeu.
