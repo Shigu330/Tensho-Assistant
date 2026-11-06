@@ -5475,6 +5475,9 @@
     "ColumnVessel": "Vaisseau"
   },
   "GameGearsets": {
+    "JobsTitle": "Jobs ({0} débloqués sur {1})",
+    "JobsLocked": "Non débloqué",
+    "JobsMax": "Plus d'expérience à gagner",
     "Unavailable": "Les ensembles n'ont pas pu être lus (peut-être après une mise à jour du jeu).",
     "Random": "Job au hasard",
     "RandomTip": "Tire un job au hasard parmi vos ensembles d'équipement (un tirage par job, quel que soit le nombre d'ensembles), pour faire les quotidiens.",

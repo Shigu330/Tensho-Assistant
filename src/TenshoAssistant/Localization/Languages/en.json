@@ -5475,6 +5475,9 @@
     "ColumnVessel": "Vessel"
   },
   "GameGearsets": {
+    "JobsTitle": "Jobs ({0} of {1} unlocked)",
+    "JobsLocked": "Not unlocked",
+    "JobsMax": "No experience to earn",
     "Unavailable": "The gear sets could not be read (perhaps after a game update).",
     "Random": "Random job",
     "RandomTip": "Draws a job at random among your gear sets (one draw per job, whatever its number of sets), for the dailies.",

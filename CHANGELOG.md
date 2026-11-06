@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.646.0
+- Plan global, T21 : Équipement (T21) : une section liste tous les jobs dans l'ordre du jeu, avec leur niveau et une barre d'expérience, et ceux pas encore débloqués. Les niveaux suivent la lecture déjà faite pour les ensembles ; l'expérience du niveau vient de la feuille ParamGrow.
+- Tests : Job progress. Verify.ps1 (agent) : 1147/1147, 0 avertissement, 0 erreur ; DLL 0.646.0.0. Non validé en jeu.
+### English
+- Gear (T21): a section lists all jobs in the game's order, with their level and an experience bar, and those not unlocked yet. Levels follow the read already made for gear sets; a level's experience comes from the ParamGrow sheet.
+
 ## 0.645.0
 - Plan global, P7 : Carte (P7) : une éthérite absente de la liste de téléportation du jeu est grisée, et son survol dit qu'elle n'est pas harmonisée ; une éthérite harmonisée donne son coût au survol. La liste est relue quand la carte affichée ou votre carte change.
 - Tests : Map labels. Verify.ps1 (agent) : 1146/1146, 0 avertissement, 0 erreur ; DLL 0.645.0.0. Non validé en jeu.

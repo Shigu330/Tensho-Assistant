@@ -463,8 +463,11 @@ public sealed class Plugin : IDalamudPlugin
             // R-14 (0.452): a sheet read here that no longer loads threw out of this constructor and Dalamud refused the whole plugin; it now
             // turns its own feature off (logged).
             var expIndex=LoadSheet("ClassJob",()=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Where(row=>row.ExpArrayIndex>=0 && !row.Name.IsEmpty).ToDictionary(row=>row.RowId,row=>(int)row.ExpArrayIndex),[]);
+            // T21 (0.646): the game's order of the jobs and the experience of each level.
+            var jobOrder=LoadSheet("ClassJob",()=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().ToDictionary(row=>row.RowId,row=>(int)row.UIPriority),[]);
+            var expToNext=LoadSheet("ParamGrow",()=>data.GetExcelSheet<Lumina.Excel.Sheets.ParamGrow>().ToDictionary(row=>(int)row.RowId,row=>row.ExpToNext),[]);
             Gear.GameGearsetReader? gameGearsets=null;
-            registrations.Register(()=>gameGearsets=new Gear.GameGearsetReader(framework,client,log,expIndex),()=>gameGearsets?.Dispose());
+            registrations.Register(()=>gameGearsets=new Gear.GameGearsetReader(framework,client,log,expIndex,jobOrder,expToNext),()=>gameGearsets?.Dispose());
             mainWindow.GearsetSource=gameGearsets;
             // g, X-06 (0.391): gatherer GP regeneration tick (on-screen bar, off by default).
             Gathering.RegenTickReader? regenTick=null;

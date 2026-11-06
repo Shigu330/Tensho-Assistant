@@ -179,7 +179,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 |---|---|---|---|
 | T5 | Une séance de relevés en jeu pour ces outils, avant de coder | S |  |
 | T13 | Contenus et quêtes : « Débloqué par » et « Débloque » | M |  |
-| T21 | Personnage : niveaux et expérience de tous les jobs | S |  |
+| ~~T21~~ fait en 0.646 | Personnage : niveaux et expérience de tous les jobs | S |  |
 | T26 | Dirigeables : trajet du dernier voyage reconstitué | S |  |
 | T27 | Actions de compagnie actives : heure de fin et alarme | M |  |
 

@@ -71,6 +71,7 @@ internal sealed partial class MainWindow
         BoolSetting("Gear.AllJobs","Gear.AllJobsTip",()=>configuration.GearAllJobs,value=>configuration.GearAllJobs=value,c=>c.GearAllJobs);
         DrawGearWear(catalog);
         DrawGameGearsets(catalog);
+        DrawJobProgress();
         DrawGearPlanPicker(state.JobId);
         var plans=configuration.GearPlans??=[];
         var plan=plans.GetValueOrDefault(state.JobId) ?? [];

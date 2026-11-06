@@ -934,6 +934,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.645) Survoler une éthérite harmonisée : son coût s'affiche, le même que dans la fenêtre de téléportation. Une éthérite non harmonisée est grisée et le dit au survol.
 
+- [ ] (0.646) Page Équipement, section Jobs : niveaux et expérience identiques à la fenêtre du jeu, classes et jobs sans doublon, jobs non débloqués grisés.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
