@@ -36,6 +36,7 @@ internal sealed class NativeMapReplacer : IDisposable
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern short GetAsyncKeyState(int key);
     private bool refocus;
+    private GameMapRequest? lastPointedRequest;
     private ICondition? occupiedFlags;
     private bool Occupied()
     {
@@ -109,14 +110,16 @@ internal sealed class NativeMapReplacer : IDisposable
                     var (request,signature)=ReadRequest(true);lastRequest=signature;
                     // 0.627: the same request as last time is what the game kept, not a new one.
                     // 0.629 (user report): unless the mouse just clicked: the same quest was asked again.
-                    if(request.Pointed)
+                    // 0.635 (user report, log: « type SharedFate » right after the click): closing its map, the game forgets the quest: the one clicked is opened again.
+                    if(refocus && lastPointedRequest is { } clickedAgain){refocus=false;request=clickedAgain;}
+                    else if(request.Pointed)
                     {
                         var repeated=signature==lastPointed;
                         var clicked=refocus || clicks.Take(now);
                         refocus=false;
                         if(repeated)log.Information("Same map request again: clicked {0}.",clicked);
                         if(repeated && !clicked)request=request.Plain();
-                        else lastPointed=signature;
+                        else{lastPointed=signature;lastPointedRequest=request;}
                     }
                     open(request);
                 }
@@ -146,7 +149,7 @@ internal sealed class NativeMapReplacer : IDisposable
                     // Off screen every frame (the game moves it back when it animates); a new request (journal, link) is relayed.
                     if(unit->RootNode!=null)unit->RootNode->SetPositionFloat(-9000,-9000);
                     var (request,signature)=ReadRequest(false);
-                    if(signature!=lastRequest){lastRequest=signature;if(request.Pointed){lastPointed=signature;open(request);}}
+                    if(signature!=lastRequest){lastRequest=signature;if(request.Pointed){lastPointed=signature;lastPointedRequest=request;open(request);}}
                 }
             }
             if(!visible)keepGameMap=false;

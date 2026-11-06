@@ -93,6 +93,7 @@ internal static class MapAside617Tests
             Check(!clicks.Take(now+TimeSpan.FromMilliseconds(110)),"only once");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));
             Check(view.Contains("!Occupied() && lastPointed.Length>0 && lastPointed==lastRequest && clicks.Take(now)"),"the map stays open on that click, never during an event");
+            Check(view.Contains("if(refocus && lastPointedRequest is { } clickedAgain){refocus=false;request=clickedAgain;}"),"on the quest clicked, which the game forgot (0.635)");
         }),
         ("Map enlarged: no stepping aside then, the same as before otherwise",() =>
         {

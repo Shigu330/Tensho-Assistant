@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.635.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : recliquer une quête déjà affichée ramenait la carte sur le joueur, car le jeu ferme sa carte à ce clic et oublie la demande. La dernière quête demandée est gardée et la carte se rouvre dessus. Les essais 0.629 et 0.633, cochés trop vite d'après un malentendu, sont décochés.
+- Tests : Map request. Verify.ps1 (agent) : 1141/1141, 0 avertissement, 0 erreur ; DLL 0.635.0.0. Non validé en jeu.
+### English
+- Map (user report, log): clicking a quest already shown brought the map back to the player, because the game closes its map on that click and forgets the request. The last quest asked is kept and the map opens again on it. Checks 0.629 and 0.633, ticked too early after a misunderstanding, are unticked.
+
 ## 0.634.0
 - Plan global, phase 5 : Carte (demande de l'utilisateur) : une quête dans un donjon ouvre, depuis l'extérieur, la carte où se trouve son entrée, centrée sur le marqueur du donjon. Le marqueur vient des données du jeu : 102 donjons sur 122 en ont un, les autres gardent la carte demandée par le jeu. À l'intérieur du donjon, sa propre carte. Non vu : la demande du jeu pour une quête de donjon, le journal n'en contient aucune.
 - Tests : Map request. Verify.ps1 (agent) : 1141/1141, 0 avertissement, 0 erreur ; DLL 0.634.0.0. Non validé en jeu.
