@@ -8,6 +8,13 @@ internal static class GatherPointAccess518Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Gather point kinds (0.647): from the sheet's type",() =>
+        {
+            Check(TenshoAssistant.Gathering.GatherPointKinds.Of(2)==TenshoAssistant.Gathering.GatherPointKind.Timed,"type 2: timed");
+            Check(TenshoAssistant.Gathering.GatherPointKinds.Of(4)==TenshoAssistant.Gathering.GatherPointKind.Ephemeral,"type 4: ephemeral");
+            Check(TenshoAssistant.Gathering.GatherPointKinds.Of(5)==TenshoAssistant.Gathering.GatherPointKind.Legendary,"type 5: legendary");
+            foreach(byte type in new byte[]{0,1,3,6,7,8})Check(TenshoAssistant.Gathering.GatherPointKinds.Of(type)==TenshoAssistant.Gathering.GatherPointKind.Normal,"others say nothing");
+        }),
         ("Point access: the tome of the point's own job; unknown says nothing",() =>
         {
             var known=new GatherKnowledge(85,70,new HashSet<int>{1,2},new HashSet<int>{7});

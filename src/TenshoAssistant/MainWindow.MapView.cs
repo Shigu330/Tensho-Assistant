@@ -1551,10 +1551,13 @@ internal sealed partial class MainWindow
     private readonly MapPartySmoother mapPartySmoother=new();
     // 0.518 (user report): « open now » only speaks of the hours. A legendary point also asks for its tome, read by this character.
     internal Func<uint,TenshoAssistant.Gathering.GatherPointAccess?>? GatherAccess { get; set; }
+    internal Func<uint,TenshoAssistant.Gathering.GatherPointKind>? GatherKind { get; set; }
     private Vector4 TimedPointColor(MapLocalGatheringPoint point)=>GatherAccess?.Invoke(point.BaseId)?.TomeMissing is not null ? Muted:point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:new Vector4(0.98f,0.62f,0.20f,1);
     private void DrawPointAvailability(MapLocalGatheringPoint point)
     {
         var access=GatherAccess?.Invoke(point.BaseId);
+        // 0.647 (C27): the kind of the point.
+        if(GatherKind?.Invoke(point.BaseId) is { } kind and not TenshoAssistant.Gathering.GatherPointKind.Normal)ImGui.TextDisabled(localization.Get("MapView.PointKind"+kind));
         if(point.Timed)
         {
             var open=point.ActiveAt(EorzeaMinutes());

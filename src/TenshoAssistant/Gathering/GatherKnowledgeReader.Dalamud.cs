@@ -12,6 +12,7 @@ internal sealed unsafe class GatherKnowledgeReader : IDisposable
 {
     private readonly IFramework framework;private readonly IClientState client;private readonly IPlayerState player;private readonly IPluginLog log;
     private readonly Dictionary<uint,GatherPointNeed> needs=[];
+    private readonly Dictionary<uint,GatherPointKind> kinds=[];
     private readonly ClassJob? miner,botanist;
     private volatile GatherKnowledge? known;
     private DateTimeOffset nextRead;private string? logged;private bool failed;
@@ -32,12 +33,14 @@ internal sealed unsafe class GatherKnowledgeReader : IDisposable
                 var tome=sub.RowId!=0 && sub.IsValid && sub.Value.Item.RowId!=0 ? sub.Value.Item.ValueNullable?.Name.ExtractText():null;
                 var need=string.IsNullOrEmpty(tome) ? new GatherPointNeed(job,null,null):new GatherPointNeed(job,(int)sub.Value.Quest.RowId,tome);
                 if(!needs.TryGetValue(at,out var seen) || seen.TomeBit is null)needs[at]=need;
+                if(GatherPointKinds.Of(point.Type) is var kind and not GatherPointKind.Normal)kinds.TryAdd(at,kind);
             }
         }
-        catch(Exception error){needs.Clear();log.Warning(error,"Gathering point needs unavailable (perhaps after a game update).");}
+        catch(Exception error){needs.Clear();kinds.Clear();log.Warning(error,"Gathering point needs unavailable (perhaps after a game update).");}
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
     }
 
+    public GatherPointKind Kind(uint basePoint)=>kinds.GetValueOrDefault(basePoint);
     public GatherPointAccess? Access(uint basePoint)=>GatherPointAccess.Of(needs.GetValueOrDefault(basePoint),known);
 
     private void Update(IFramework unused)

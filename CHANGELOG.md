@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.647.0
+- Plan global, C27 : Récolte (C27) : le survol d'un point de récolte sur la carte donne sa classe : à horaire, éphémère ou légendaire, déduite du type du point dans les données du jeu. Le tome requis était déjà indiqué depuis la 0.518. Les libellés sont ceux de Tensho, déduits des données.
+- Tests : Gather point kinds. Verify.ps1 (agent) : 1148/1148, 0 avertissement, 0 erreur ; DLL 0.647.0.0. Non validé en jeu.
+### English
+- Gathering (C27): hovering a gathering point on the map gives its kind: timed, ephemeral or legendary, inferred from the point's type in the game's data. The required tome has been shown since 0.518. The labels are Tensho's, inferred from the data.
+
 ## 0.646.0
 - Plan global, T21 : Équipement (T21) : une section liste tous les jobs dans l'ordre du jeu, avec leur niveau et une barre d'expérience, et ceux pas encore débloqués. Les niveaux suivent la lecture déjà faite pour les ensembles ; l'expérience du niveau vient de la feuille ParamGrow.
 - Tests : Job progress. Verify.ps1 (agent) : 1147/1147, 0 avertissement, 0 erreur ; DLL 0.646.0.0. Non validé en jeu.
