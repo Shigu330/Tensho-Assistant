@@ -118,7 +118,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 | Point | Note |
 |---|---|
 | ~~I4, prix Universalis par lots~~ fait en 0.608 | Sonde faite, sans le jeu |
-| N-12, conditions et compteurs des rangs S | Gardé : le principe de Tensho est de tout regrouper. S Rank Assistant (sans licence) en lecture seule, Hunt Helper (MIT) n'a pas les conditions. Conditions relevées dans plusieurs sources, réécrites et créditées ; compteurs à essayer en jeu |
+| ~~N-12, conditions des rangs S~~ fait en 0.670 sans compteurs (à vérifier en jeu ; compteurs : sonde d'abord) ; gardé : le principe de Tensho est de tout regrouper. S Rank Assistant (sans licence) en lecture seule, Hunt Helper (MIT) n'a pas les conditions. Conditions relevées dans plusieurs sources, réécrites et créditées ; compteurs à essayer en jeu |
 | ~~Alerte du plafond hebdomadaire des mémoquartz~~ fait en 0.606 | |
 | ~~« Où est cet objet ? » sur tous les personnages~~ fait en 0.609 | Version compacte sur la fiche objet, sans changer les stocks |
 | ~~Liste des objets annotés, filtre par étiquette~~ fait en 0.607 | |

@@ -701,6 +701,20 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.IslandPoints=LoadSheet("MJIGatheringItem",()=>Maps.IslandResources.Points(data.GetExcelSheet<Lumina.Excel.Sheets.MJIGatheringItem>().Select(row=>(row.Item.RowId,(int)row.X,(int)row.Y,(int)row.Radius))),[]);
             mainWindow.WorkshopProjectsLoad=()=>FreeCompany.WorkshopProjectsLoader.Read(data);
             mainWindow.CompanyActionNames=LoadSheet("Status",()=>data.GetExcelSheet<Lumina.Excel.Sheets.Status>().Where(row=>row.IsFcBuff).ToDictionary(row=>row.RowId,row=>row.Name.ExtractText()),[]);
+            // N-12 (0.670): names of the S rank conditions, in the game's language.
+            mainWindow.SRankMarkName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().GetRowOrDefault(id)?.Singular.ExtractText();
+            mainWindow.SRankZoneName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id)?.PlaceName.ValueNullable?.Name.ExtractText();
+            mainWindow.SRankExpansionName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ExVersion>().GetRowOrDefault((uint)id)?.Name.ExtractText();
+            mainWindow.SRankRefName=item=>item.Kind switch
+            {
+                Hunting.SRankRefKind.Mob=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().GetRowOrDefault(item.Id)?.Singular.ExtractText(),
+                Hunting.SRankRefKind.Item=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(item.Id)?.Name.ExtractText(),
+                Hunting.SRankRefKind.Minion=>data.GetExcelSheet<Lumina.Excel.Sheets.Companion>().GetRowOrDefault(item.Id)?.Singular.ExtractText(),
+                Hunting.SRankRefKind.Fate=>data.GetExcelSheet<Lumina.Excel.Sheets.Fate>().GetRowOrDefault(item.Id)?.Name.ExtractText(),
+                Hunting.SRankRefKind.Weather=>data.GetExcelSheet<Lumina.Excel.Sheets.Weather>().GetRowOrDefault(item.Id)?.Name.ExtractText(),
+                Hunting.SRankRefKind.Action=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(item.Id)?.Name.ExtractText(),
+                _=>null,
+            };
             mainWindow.SquadronMissionName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyExpedition>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.449 (DEC-027): the embedded garden seeds (Lotlab), named in the game's language, read once.
             IReadOnlyList<(Reminders.GardenSeed,string)>? gardenSeeds=null;

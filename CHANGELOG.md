@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.670.0
+- Plan global, N-12 : Chasse (N-12) : Cartes › « Conditions des rangs S » donne, pour les 50 marques, la condition d'apparition, la fenêtre et si la tentative est sûre ou aléatoire. Ces conditions ne sont pas dans les données du jeu : savoir communautaire croisé entre plusieurs sources (wiki, guide, S Rank Assistant en lecture seule), réécrit dans les mots de Tensho, crédité. Noms dans la langue du jeu ; les marques de votre zone en premier. Pas de compteurs.
+- Tests : S rank conditions. Verify.ps1 (agent) : 1166/1166, 0 avertissement, 0 erreur ; DLL 0.670.0.0. Non validé en jeu.
+### English
+- Hunt (N-12): Maps › « S rank conditions » gives, for the 50 marks, the spawn condition, the window and whether an attempt is certain or random. These conditions are not in the game's data: community knowledge crossed between several sources (wiki, guide, S Rank Assistant read only), in Tensho's own words, credited. Names in the game's language; the marks of your zone first. No counters.
+
 ## 0.669.0
 - Plan global, C12, I22 : Artisanat (C12) : dans le simulateur, un curseur par ingrédient pouvant être HQ calcule la qualité initiale selon le niveau d'objet (règle de Craftimizer, MIT), qui peut encore être tapée. À comparer à la qualité du carnet du jeu. Performance (I22) : l'historique du marché filtre et calcule ses statistiques une fois par changement, et le coût de préparation se recalcule au plus une fois par seconde, comme celui de la chaîne ; le gain n'est pas mesuré en jeu.
 - Tests : Collectible. Verify.ps1 (agent) : 1163/1163, 0 avertissement, 0 erreur ; DLL 0.669.0.0. Non validé en jeu.

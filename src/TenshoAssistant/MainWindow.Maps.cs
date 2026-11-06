@@ -36,6 +36,8 @@ internal sealed partial class MainWindow
         DrawChatMapLinks(catalog);
         // N-15 (0.442): hunt train recorder.
         DrawHuntTrain(catalog);
+        // N-12 (0.670): spawn conditions of the S ranks.
+        DrawSRankConditions(catalog);
         // X-09 (0.444): place directory.
         DrawPlaceDirectory();
         // N-05 (0.445): plots for sale (PaissaDB).
