@@ -5,7 +5,8 @@ using TenshoAssistant.Inventory;
 namespace TenshoAssistant;
 
 // C21 (0.592): Crafting › What can I craft?: the recipes the bags and the saved Bank can make now, worked out on a click off the frame
-// (every recipe of the catalogue), filtered by job and level here. Direct ingredients only. Nothing is read again until the next click.
+// (every recipe of the catalogue), filtered by job and level here. Nothing is read again until the next click.
+// 0.696 (user request): with sub-recipes too, on by default: from the ore through every step.
 internal sealed partial class MainWindow
 {
     private CancellationTokenSource? fromStockCancel;
@@ -14,6 +15,7 @@ internal sealed partial class MainWindow
     private BankState? fromStockBank;
     private string fromStockJob="";
     private int fromStockMin=1,fromStockMax=100;
+    private bool fromStockChained=true;
     private (CraftFromStockResult Source,string Job,int Min,int Max,CraftFromStockRow[] Rows)? fromStockView;
 
     private void StartCraftFromStock(RecipeCatalog catalog)
@@ -23,9 +25,13 @@ internal sealed partial class MainWindow
         var character=bankBridge.State.CharacterId;var live=inventory.Current;var saved=bank.State;
         fromStockLive=live;fromStockBank=saved;
         bool Crystal(uint id)=>ClassifyCrystal(id) is not null;
+        var chained=fromStockChained;
+        // Worked out here, on the frame: the worn job and the levels are read once, not from the worker.
+        var preferred=new Dictionary<uint,RecipeDefinition>();
+        if(chained)foreach(var group in catalog.All.GroupBy(recipe=>recipe.ResultItemId))preferred[group.Key]=PreferredRecipe(group.ToArray());
         fromStockTask=Task.Run(()=>
         {
-            try{return (CraftFromStockResult?)CraftFromStock.Find(catalog.All,id=>ItemHoldings.Build(id,character,live,saved.Entries,includeCrystals:true,crystal:Crystal(id)),token);}
+            try{return (CraftFromStockResult?)CraftFromStock.Find(catalog.All,id=>ItemHoldings.Build(id,character,live,saved.Entries,includeCrystals:true,crystal:Crystal(id)),token,chained ? id=>preferred.GetValueOrDefault(id):null);}
             catch(OperationCanceledException){return null;}
             catch(Exception error){log.Warning(error,"The recipes the stocks can make could not be worked out.");return null;}
         },token);
@@ -36,6 +42,9 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(localization.Get("CraftStock.Help"));
         if(recipeCatalog.State.Catalog is not { } catalog){ImGui.TextDisabled(localization.Get("RecipeUi.Loading"));return;}
         if(ImGui.Button(localization.Get("CraftStock.Search")))StartCraftFromStock(catalog);
+        ImGui.SameLine();
+        if(ImGui.Checkbox(localization.Get("CraftStock.Chained"),ref fromStockChained) && fromStockTask is not null)StartCraftFromStock(catalog);
+        Tip("CraftStock.ChainedTip");
         if(fromStockTask is not { } task)return;
         if(!task.IsCompleted){ImGui.SameLine();ImGui.TextDisabled(localization.Get("CraftStock.Searching"));return;}
         if(!task.IsCompletedSuccessfully || task.Result is not { } result){ImGui.TextWrapped(localization.Get("CraftStock.Failed"));return;}
@@ -71,7 +80,8 @@ internal sealed partial class MainWindow
             {
                 DrawChainItem(row.Recipe.ResultItemId);
                 ImGui.SameLine();
-                ImGui.TextDisabled(localization.Format(row.LowerBound ? "CraftStock.RowAtLeast":"CraftStock.Row",row.Count.ToString("N0"),row.Recipe.CraftType,row.Recipe.Level));
+                ImGui.TextDisabled(localization.Format(row.Chained ? "CraftStock.RowChained":row.LowerBound ? "CraftStock.RowAtLeast":"CraftStock.Row",row.Count.ToString("N0"),row.Recipe.CraftType,row.Recipe.Level));
+                if(row.Chained && ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftStock.RowChainedTip"));
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("ChainUi.Simulate")))OpenCraftSimulation(row.Recipe);
                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("ChainUi.SimulateTip"));

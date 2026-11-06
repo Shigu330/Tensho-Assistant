@@ -676,7 +676,11 @@
     "ReferenceSummary": "Clés de référence : {0} · langues : {1}"
   },
   "CraftStock": {
-    "Help": "Les recettes que vos sacs et votre Banque enregistrée peuvent fabriquer maintenant, avec leurs ingrédients directs. Pratique pour écouler des matériaux ou monter un métier. Ce qu'une sous-recette pourrait fabriquer d'abord n'est pas compté.",
+    "Help": "Les recettes que vos sacs et votre Banque enregistrée peuvent fabriquer maintenant. Pratique pour écouler des matériaux ou monter un métier.",
+    "Chained": "Compter les sous-recettes",
+    "ChainedTip": "Compte aussi ce qui se fabrique en faisant d'abord les pièces qui manquent, du minerai à la dernière étape, avec un seul stock. Les restes ne sont pas réutilisés : le nombre réel peut être plus haut.",
+    "RowChained": "au moins {0} fabrication(s), avec sous-recettes · {1} niv. {2}",
+    "RowChainedTip": "Des ingrédients sont à fabriquer d'abord. Sur l'objet, Préparation › Calculer donne les étapes.",
     "Search": "Chercher dans mes stocks",
     "Searching": "Recherche…",
     "Failed": "La recherche n'a pas abouti. Consultez le journal Dalamud pour les détails.",

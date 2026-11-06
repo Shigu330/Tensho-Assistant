@@ -676,7 +676,11 @@
     "ReferenceSummary": "Reference keys: {0} · languages: {1}"
   },
   "CraftStock": {
-    "Help": "The recipes your bags and saved Bank can make now, from their direct ingredients. Useful to use up materials or level a job. What a sub-recipe could make first is not counted.",
+    "Help": "The recipes your bags and your saved Bank can make now. Handy for using up materials or levelling a job.",
+    "Chained": "Count sub-recipes",
+    "ChainedTip": "Also counts what can be made by crafting the missing parts first, from the ore through every step, all from one stock. Leftovers are not reused, so the real count can be higher.",
+    "RowChained": "at least {0} craft(s), with sub-recipes · {1} lv. {2}",
+    "RowChainedTip": "Some ingredients must be crafted first. On the item, Preparation > Calculate lists the steps.",
     "Search": "Search my stocks",
     "Searching": "Searching…",
     "Failed": "The search did not finish. See the Dalamud log for details.",

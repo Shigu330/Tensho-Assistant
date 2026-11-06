@@ -1032,6 +1032,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.695) Rangements › Monnaies : Que faire ? doit ouvrir l'onglet et remplir les prix ; Gils par unité trié du plus rentable ; changer de monnaie dans la liste.
 
+- [ ] (0.696) Que puis-je fabriquer ? : avec des minerais seuls, des objets à plusieurs étapes doivent paraître « avec sous-recettes » ; Préparation › Calculer doit confirmer les étapes ; la recherche ne doit pas figer le jeu.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

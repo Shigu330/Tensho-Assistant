@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.696.0
+- Plan global, W-07 : Demande de l'utilisateur : « Que puis-je fabriquer ? » compte maintenant les sous-recettes, du minerai à la dernière étape, avec un seul stock partagé. Une case permet de revenir aux ingrédients directs. Le nombre est un minimum : les restes d'une sous-fabrication ne sont pas réutilisés et une seule recette par objet est essayée. La profondeur et le nombre sont bornés. COMPILED et TESTED, non validé en jeu.
+- Tests : CraftChained696Tests. Verify.ps1 (agent) : 1237/1237, 0 avertissement, 0 erreur ; DLL 0.696.0.0. Non validé en jeu.
+### English
+- User request: What can I craft? now counts sub-recipes, from the ore through every step, on one shared stock. A box goes back to direct ingredients. The count is a minimum: leftovers are not reused and one recipe per item is tried. Depth and count are bounded. COMPILED and TESTED, not validated in game.
+
 ## 0.695.0
 - Plan global, Monnaies : Rapport et demande de l'utilisateur : « Que faire ? » ne montrait aucun prix du marché, car il fallait un second clic, 32 prix à la fois, et un échec ne s'affichait pas. Choisir une monnaie demande maintenant les prix, par lots de 32 jusqu'au bout, sous l'interrupteur Universalis ; un échec s'affiche avec Réessayer ; un objet sans offre l'indique. La page a son propre onglet, Rangements › Que faire avec ?, avec le choix de la monnaie. COMPILED et TESTED, non validé en jeu.
 - Tests : CurrencyValue695Tests. Verify.ps1 (agent) : 1233/1233, 0 avertissement, 0 erreur ; DLL 0.695.0.0. Non validé en jeu.

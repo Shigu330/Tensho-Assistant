@@ -3,14 +3,58 @@ using TenshoAssistant.Inventory;
 namespace TenshoAssistant.Craft;
 
 /// <summary>0.592 (C21): a recipe the recorded stocks can make now. LowerBound: a storage holding one of its ingredients was not seen, there may be more.</summary>
-public sealed record CraftFromStockRow(RecipeDefinition Recipe,long Count,bool LowerBound);
+public sealed record CraftFromStockRow(RecipeDefinition Recipe,long Count,bool LowerBound,bool Chained=false);
 /// <summary>Undecided: the recipes that nothing rules out but with an ingredient whose stock was never seen; they are not listed.</summary>
 public sealed record CraftFromStockResult(IReadOnlyList<CraftFromStockRow> Rows,int Undecided);
 
 public static class CraftFromStock
 {
-    /// <summary>Direct ingredients only: what a sub-recipe could make first is the chain's work. Highest level first, then the most crafts.</summary>
-    public static CraftFromStockResult Find(IEnumerable<RecipeDefinition> recipes,Func<uint,ItemHoldingsSummary> holdings,CancellationToken cancellation=default)
+    /// <summary>How deep sub-recipes are followed; the recursion below stops here whatever the game's data holds.</summary>
+    public const int MaxDepth=8;
+    public const long MaxChained=9999;
+
+    /// <summary>
+    /// 0.696 (user request): how many crafts the stocks allow when what is missing is made first, ore to ingot to part, all drawing on one shared stock. Each item uses the
+    /// recipe <paramref name="recipeOf"/> gives. A lower count than the game might reach: leftovers of a sub-craft are not reused, and other recipes of an item are not tried.
+    /// </summary>
+    public static long ChainedCount(RecipeDefinition recipe,Func<uint,ItemHoldingsSummary> stock,Func<uint,RecipeDefinition?> recipeOf,long atLeast=0)
+    {
+        bool Can(long crafts)
+        {
+            var used=new Dictionary<uint,long>();
+            var open=new HashSet<uint>{recipe.ResultItemId};
+            bool Need(uint item,long amount,int depth)
+            {
+                var held=stock(item);
+                var free=Math.Max(0,(held.HasObservation ? held.Total:0)-used.GetValueOrDefault(item));
+                var taken=Math.Min(free,amount);
+                used[item]=used.GetValueOrDefault(item)+taken;
+                amount-=taken;
+                if(amount==0)return true;
+                if(depth<=0 || recipeOf(item) is not { Ingredients.Count:>0 } sub || sub.ResultAmount<=0 || !open.Add(item))return false;
+                var runs=(amount+sub.ResultAmount-1)/sub.ResultAmount;
+                var done=sub.Ingredients.All(ingredient=>ingredient.Amount>0 && Need(ingredient.ItemId,ingredient.Amount*runs,depth-1));
+                open.Remove(item);
+                return done;
+            }
+            return recipe.Ingredients.All(ingredient=>ingredient.Amount>0 && Need(ingredient.ItemId,ingredient.Amount*crafts,MaxDepth));
+        }
+        var low=Math.Max(0,atLeast);
+        if(!Can(low+1))return low;
+        var high=low+1;
+        while(high<MaxChained && Can(Math.Min(high*2,MaxChained)))high=Math.Min(high*2,MaxChained);
+        if(high>=MaxChained)return MaxChained;
+        var top=Math.Min(high*2,MaxChained);
+        while(top-high>1)
+        {
+            var middle=high+(top-high)/2;
+            if(Can(middle))high=middle;else top=middle;
+        }
+        return high;
+    }
+
+    /// <summary>Direct ingredients, and sub-recipes when <paramref name="recipeOf"/> is given. Highest level first, then the most crafts.</summary>
+    public static CraftFromStockResult Find(IEnumerable<RecipeDefinition> recipes,Func<uint,ItemHoldingsSummary> holdings,CancellationToken cancellation=default,Func<uint,RecipeDefinition?>? recipeOf=null)
     {
         ArgumentNullException.ThrowIfNull(recipes);
         ArgumentNullException.ThrowIfNull(holdings);
@@ -34,6 +78,16 @@ public static class CraftFromStock
                 possible=Math.Min(possible,stock.Total/ingredient.Amount);
                 lowerBound|=stock.HasUnknown;
                 if(possible==0)break;
+            }
+            var direct=unseen || possible==long.MaxValue ? 0:possible;
+            if(recipeOf is not null && recipe.Ingredients.All(ingredient=>ingredient.Amount>0))
+            {
+                var chained=ChainedCount(recipe,Stock,recipeOf,direct);
+                if(chained>direct)
+                {
+                    rows.Add(new(recipe,chained,lowerBound || recipe.Ingredients.Any(ingredient=>Stock(ingredient.ItemId).HasUnknown),true));
+                    continue;
+                }
             }
             if(possible==0)continue;
             if(unseen){undecided++;continue;}
