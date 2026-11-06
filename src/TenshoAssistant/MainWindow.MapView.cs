@@ -1084,7 +1084,7 @@ internal sealed partial class MainWindow
             icons.Sort((left,right)=>left.Priority!=right.Priority ? left.Priority.CompareTo(right.Priority):left.Layer!=right.Layer ? left.Layer.CompareTo(right.Layer):left.Order.CompareTo(right.Order));
             MapIconDraw? top=null;var hits=new List<MapIconDraw>();
             if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right))mapIconContext=null;
-            var iconNames=new List<(Vector2 At,Vector2 Size,bool MapLink,string Text,float FontSize)>();
+            var iconNames=new List<(Vector2 At,Vector2 Size,bool MapLink,string Text,float FontSize,uint Link)>();
             foreach(var item in icons)
             {
                 if(textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
@@ -1094,7 +1094,7 @@ internal sealed partial class MainWindow
                 {
                     var iconNameSize=Math.Max(6,nameSize*0.55f);
                     var iconNameText=ImGui.CalcTextSize(named.Label)*(iconNameSize/ImGui.GetFontSize());
-                    iconNames.Add((item.At+MapLabels.Offset(named.Orientation,item.Size,iconNameText),iconNameText,named.LinkMapId!=0,named.Label,iconNameSize));
+                    iconNames.Add((item.At+MapLabels.Offset(named.Orientation,item.Size,iconNameText),iconNameText,named.LinkMapId!=0,named.Label,iconNameSize,named.LinkMapId));
                 }
                 // Timed gathering points: a clock badge, green while open now, orange otherwise (0.130).
                 if(item.Point is { Timed:true } timedPoint)
@@ -1119,9 +1119,12 @@ internal sealed partial class MainWindow
             foreach(var index in MapLabels.Fitting(iconNames.Select(name=>(name.At,name.Size,name.MapLink)).ToArray()))
             {
                 var label=iconNames[index];
+                // 0.626 (user report): the name of a map link opens that map, like its icon (handled with it, below).
+                var overLink=hovered && label.Link!=0 && io.MousePos.X>=label.At.X && io.MousePos.X<=label.At.X+label.Size.X && io.MousePos.Y>=label.At.Y && io.MousePos.Y<=label.At.Y+label.Size.Y;
+                if(overLink)linkUnderMouse=label.Link;
                 foreach(var shift in new[]{new Vector2(-1,0),new Vector2(1,0),new Vector2(0,-1),new Vector2(0,1)})
                     draw.AddText(font,label.FontSize,label.At+shift,ImGui.GetColorU32(new Vector4(0.05f,0.05f,0.05f,0.9f)),label.Text);
-                draw.AddText(font,label.FontSize,label.At,ImGui.GetColorU32(label.MapLink ? new Vector4(0.45f,0.9f,0.95f,1):new Vector4(0.97f,0.95f,0.9f,1)),label.Text);
+                draw.AddText(font,label.FontSize,label.At,ImGui.GetColorU32(overLink ? new Vector4(0.8f,1,1,1):label.MapLink ? new Vector4(0.45f,0.9f,0.95f,1):new Vector4(0.97f,0.95f,0.9f,1)),label.Text);
             }
             // Every icon under the cursor (or whose area holds it) is listed in one tooltip, topmost first (0.132, as Mappy does).
             hits.Reverse();

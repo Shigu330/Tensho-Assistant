@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.626.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur) : cliquer sur le nom d'un lien de carte, comme « Limsa Lominsa - L'Entrepont », ouvre cette carte, comme son icône ; le nom s'éclaircit au survol.
+- Tests : Map labels. Verify.ps1 (agent) : 1134/1134, 0 avertissement, 0 erreur ; DLL 0.626.0.0. Non validé en jeu.
+### English
+- Map (user report): clicking the name of a map link, such as « Limsa Lominsa - L'Entrepont », opens that map, like its icon; the name lightens on hover.
+
 ## 0.625.0
 - Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : parler à un PNJ fait fermer sa carte au jeu, et la carte Tensho se fermait pour de bon. Fermée ainsi, elle se rouvre une fois le joueur libre, dans la même zone. Fermée par la touche de carte, elle reste fermée.
 - Tests : Map resume. Verify.ps1 (agent) : 1133/1133, 0 avertissement, 0 erreur ; DLL 0.625.0.0. Non validé en jeu.
