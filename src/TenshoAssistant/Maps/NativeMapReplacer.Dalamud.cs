@@ -47,6 +47,14 @@ internal sealed class NativeMapReplacer : IDisposable
             || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.Occupied38] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.Occupied39]
             || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell];
     }
+    /// <summary>0.658: a teleport closes the game's map too, while casting or between zones, with none of the flags above.</summary>
+    private bool ClosedByEvent()
+    {
+        if(Occupied())return true;
+        if(occupiedFlags is not { } flags)return false;
+        return flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.Casting] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas51];
+    }
+    private bool InDuty()=>occupiedFlags?[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty]==true;
     public NativeMapReplacer(IFramework framework,IGameGui gui,IClientState client,ICondition condition,Func<MapViewSettings> settings,Action<GameMapRequest> open,
         Func<bool> tenshoOpen,Func<bool> canShow,Action closeTensho,IPluginLog log)
     {occupiedFlags=condition;
@@ -59,6 +67,7 @@ internal sealed class NativeMapReplacer : IDisposable
         // DEC-038: the game map is given back during a competitive cut; the next tick after it hides it again if the setting says so.
         if(TenshoAssistant.Competitive.CompetitiveGate.Cut)
         {
+            resume.Cancel();
             if(!hosted)return;
             hosted=false;
             try{if(gui.GetAddonByName("AreaMap") is { IsNull:false } shown)Restore((AtkUnitBase*)shown.Address);}catch(Exception){}
@@ -76,7 +85,7 @@ internal sealed class NativeMapReplacer : IDisposable
             var addon=gui.GetAddonByName("AreaMap");
             var unit=addon.IsNull ? null:(AtkUnitBase*)addon.Address;
             var visible=unit!=null && addon.IsVisible;
-            if(resume.ShouldReopen(Occupied(),visible,client.TerritoryType) && AgentMap.Instance() is var again && again!=null)
+            if(resume.ShouldReopen(ClosedByEvent(),visible,client.TerritoryType,InDuty()) && AgentMap.Instance() is var again && again!=null)
             {
                 log.Information("The event is over: the map opens again.");
                 again->Show();
@@ -148,8 +157,8 @@ internal sealed class NativeMapReplacer : IDisposable
                     }
                     else
                     {
-                        resume.GameClosedMap(Occupied(),client.TerritoryType);
-                        log.Information("The game closed its map window: the Tensho map closes with it; occupied: {0}.",Occupied());
+                        resume.GameClosedMap(ClosedByEvent(),client.TerritoryType);
+                        log.Information("The game closed its map window: the Tensho map closes with it; occupied: {0}, event: {1}.",Occupied(),ClosedByEvent());
                         closeTensho();
                     }
                 }

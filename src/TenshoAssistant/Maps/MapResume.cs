@@ -23,13 +23,18 @@ public sealed class MapResume
     private bool waiting;
     private uint territory;
     public void GameClosedMap(bool occupied,uint inTerritory){waiting=occupied;territory=inTerritory;}
-    /// <summary>True once, when the map should open again. A map opened meanwhile, or another zone reached, cancels it.</summary>
-    public bool ShouldReopen(bool occupied,bool gameMapVisible,uint inTerritory)
+    public void Cancel()=>waiting=false;
+    /// <summary>
+    /// True once, when the map should open again. A map opened meanwhile cancels it.
+    /// 0.658 (user report: after a teleport the map stayed closed, « not every time »: a teleport to another zone, docs/evidence/0.658-map-after-teleport.md): another zone
+    /// reached brings the map back too, unless that zone is a duty. No territory (between characters) keeps waiting.
+    /// </summary>
+    public bool ShouldReopen(bool occupied,bool gameMapVisible,uint inTerritory,bool inDuty=false)
     {
         if(!waiting)return false;
-        if(gameMapVisible || inTerritory!=territory){waiting=false;return false;}
-        if(occupied)return false;
+        if(gameMapVisible){waiting=false;return false;}
+        if(occupied || inTerritory==0)return false;
         waiting=false;
-        return true;
+        return inTerritory==territory || !inDuty;
     }
 }

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.658.0
+- Plan global, 0.658 : Carte : après une téléportation, la carte se rouvre, y compris dans une autre zone. Elle ne revenait que dans la même zone, d'où le « pas tout le temps ». La fermeture pendant un sort ou un changement de zone compte aussi comme un événement. Elle ne revient pas si la nouvelle zone est un contenu en instance, ni après une fermeture par sa touche. Fermer la carte avec sa touche pendant un sort la fera revenir.
+- Tests : Map resume. Verify.ps1 (agent) : 1159/1159, 0 avertissement, 0 erreur ; DLL 0.658.0.0. Non validé en jeu.
+### English
+- Map: after a teleport the map opens again, in another zone too. It only came back in the same zone, hence « not every time ». A close during a cast or a change of zone also counts as an event. It does not come back if the new zone is a duty, nor after being closed with its key. Closing the map with its key during a cast will bring it back.
+
 ## 0.657.0
 - Plan global, 0.657 : Carte : depuis une autre zone, cliquer un mandat dans le journal affiche sa zone verte sur la carte Tensho. Le jeu la donne dans sa demande de carte, avec son rayon, et elle reste jusqu'à ce que le jeu ne liste plus le mandat. Récolte : l'alerte de PR ne sonne plus quand les PR remontent après un changement de zone, qui en retire (809 à 772 au relevé) ; elle sonne de nouveau dès que des PR sont dépensés. Les 15 secondes de la 0.656 sont retirées.
 - Tests : Leve areas. Verify.ps1 (agent) : 1158/1158, 0 avertissement, 0 erreur ; DLL 0.657.0.0. Non validé en jeu.
