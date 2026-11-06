@@ -920,7 +920,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.638) Cliquer une quête de donjon : la carte de l'entrée s'ouvre, centrée sur le marqueur, comme pour la Ville fantôme.
 
-- [ ] (0.639) Sur Yak T'el, cliquer la Vallée des Pampas : sa carte s'ouvre. Sur Tuliyollal, cliquer la Ville fantôme : sa carte s'ouvre.
+- [ ] (0.639) Sur Shaaloani, cliquer la Vallée des Pampas : sa carte s'ouvre. Sur Tuliyollal, cliquer la Ville fantôme : sa carte s'ouvre.
 
 **0.535 : interfaces** — à voir en jouant
 
