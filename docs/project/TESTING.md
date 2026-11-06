@@ -898,6 +898,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.627) Cliquer une quête dans le journal, fermer la carte, la rouvrir avec sa touche : elle s'ouvre sur toi. Cliquer une autre quête : elle s'y centre.
 
+- [ ] (0.628) Cliquer « Un forgeron fantomatique » dans le journal : la carte de la Ville fantôme s'ouvre, l'icône près de Gerolt. Rouvrir la carte avec sa touche : elle s'ouvre sur toi.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

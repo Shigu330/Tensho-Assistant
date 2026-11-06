@@ -55,7 +55,10 @@ internal sealed class MapCatalogLoader : IDisposable
                 var managed = copied.ToArray();
                 copied.Clear(); sheet = null;
                 var token = cancellation.Token;
-                build = Task.Run(() => new MapCatalog(managed, token));
+                var territoryMaps = new Dictionary<uint,uint>();
+                foreach (var territory in data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>())
+                    if (territory.Map.RowId != 0) territoryMaps[territory.RowId] = territory.Map.RowId;
+                build = Task.Run(() => new MapCatalog(managed, token, territoryMaps));
                 // Observe faults even if disposal ends publication before the next callback.
                 _ = build.ContinueWith(task => { _ = task.Exception; }, TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
             }

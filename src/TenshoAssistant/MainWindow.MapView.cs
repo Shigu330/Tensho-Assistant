@@ -71,7 +71,8 @@ internal sealed partial class MainWindow
     private Vector2? FocusPixel(GameMapRequest focus,MapDefinition map,MapLiveState? live)
     {
         // The game's own target (temporary marker) first, like Mappy: it is on the map the game opened.
-        if(focus.Target is { } target)return MapProjection.PixelFromWorld(new Vector3(target.X,0,target.Y),map);
+        // 0.628 (user capture, icon in the sea): the target's coordinates are those of its territory: they mean nothing on a world or region map.
+        if(focus.Target is { } target && map.TerritoryId!=0)return MapProjection.PixelFromWorld(new Vector3(target.X,0,target.Y),map);
         if(focus.QuestId!=0)
         {
             var key=focus.QuestId & 0xFFFF;
@@ -976,7 +977,7 @@ internal sealed partial class MainWindow
             // is retried for 1.5 s; nothing found on this map = whole map. Logged (/xllog) to check the quest links in game.
             if(FocusPixel(focus,map,live) is { } pixel)
             {
-                mapGameTarget=focus.Target is { } world && focus.TargetIcon!=0 ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
+                mapGameTarget=focus.Target is { } world && focus.TargetIcon!=0 && map.TerritoryId!=0 ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
                 mapGameTargetQuests=null;mapGameTargetSince=DateTimeOffset.UtcNow;mapGameTargetRefresh=default;
                 mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,MapFocusZoom));mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
                 log.Information("Map focus found on map {0} for quest {1}, aetheryte {2}, FATE {3}.",map.MapId,focus.QuestId,focus.AetheryteId,focus.FateId);

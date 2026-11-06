@@ -41,6 +41,16 @@ internal static class MapAside617Tests
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));
             Check(view.Contains("if(signature==lastPointed)request=request.Plain();"),"only when unchanged");
         }),
+        ("Map request (0.628): a quest target asked on the world map opens its territory's own map",() =>
+        {
+            var village=new TenshoAssistant.Maps.MapDefinition(1025,1269,"","Phantom Village","",0,400);
+            var request=new TenshoAssistant.Maps.GameMapRequest(919,919,1278,12,QuestLog:true,Target:new System.Numerics.Vector2(29,13));
+            Check(request.Resolve(new TenshoAssistant.Maps.MapCatalog([village],default,new Dictionary<uint,uint>{[1278]=1025}))==1025,"the map the territory names");
+            Check(request.Resolve(new TenshoAssistant.Maps.MapCatalog([village]))==919,"unknown: the map the game asked");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
+            Check(view.Contains("if(focus.Target is { } target && map.TerritoryId!=0)return"),"never placed on a world or region map");
+            Check(view.Contains("focus.TargetIcon!=0 && map.TerritoryId!=0 ?"),"no icon there either");
+        }),
         ("Map enlarged: no stepping aside then, the same as before otherwise",() =>
         {
             var tracker=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.TrackerWindow.cs")).Replace("\r\n","\n");

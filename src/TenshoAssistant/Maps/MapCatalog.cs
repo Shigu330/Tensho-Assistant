@@ -36,8 +36,12 @@ public sealed class MapCatalog
     private readonly FrozenDictionary<uint, MapDefinition> byId;
     private readonly FrozenDictionary<uint, IReadOnlyList<MapDefinition>> byPlace;
     public IReadOnlyList<MapDefinition> Entries { get; }
-    public MapCatalog(IEnumerable<MapDefinition> source, CancellationToken cancellation = default)
+    private readonly IReadOnlyDictionary<uint,uint> territoryMaps;
+    /// <summary>0.628: the map a territory names in the game's TerritoryType sheet (0 if none). It can differ from the Map sheet's way back (docs/evidence/0.628-quest-target-on-world-map.md).</summary>
+    public uint MapOf(uint territory)=>territoryMaps.GetValueOrDefault(territory);
+    public MapCatalog(IEnumerable<MapDefinition> source, CancellationToken cancellation = default, IReadOnlyDictionary<uint,uint>? territoryMaps = null)
     {
+        this.territoryMaps=territoryMaps ?? new Dictionary<uint,uint>();
         ArgumentNullException.ThrowIfNull(source);
         var copied = new Dictionary<uint, MapDefinition>();
         cancellation.ThrowIfCancellationRequested();
@@ -113,6 +117,8 @@ public sealed record GameMapRequest(uint Selected, uint Requested, uint Territor
         if (catalog.Find(Selected) is not null) return Selected == Current ? 0 : Selected;
         if (catalog.Find(Requested) is not null) return Requested;
         if (Territory != 0 && catalog.Entries.Where(map => map.TerritoryId == Territory).OrderBy(map => map.MapIndex).FirstOrDefault() is { } zone) return zone.MapId;
+        // 0.628 (user capture): a request on the world map names the target's territory: open that territory's own map.
+        if (catalog.Find(catalog.MapOf(Territory)) is not null) return catalog.MapOf(Territory);
         return Selected;
     }
 }
