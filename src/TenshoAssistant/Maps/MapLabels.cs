@@ -6,6 +6,16 @@ namespace TenshoAssistant.Maps;
 /// 0.596 (P12): where the name of a map icon goes, as on the game's map. Measured from the MapMarker sheet: 1 left, 2 right, 3 below, 4 above
 /// (docs/evidence/0.596-map-label-orientation.md); the rare other values are not established and go to the right.
 /// </summary>
+/// <summary>P17 (0.652): a leve's marker on the map: the icon read in game, or a tooltip naming a row of the Leve sheet (docs/evidence/0.652-leve-markers.md).</summary>
+public static class MapLeves
+{
+    public const uint AreaIcon=60492;
+    /// <summary>The sheet writes « x : y », the tooltip « x: y » and may start with a glyph: only letters and digits are compared.</summary>
+    public static string Key(string name)=>string.Concat(name.Where(char.IsLetterOrDigit)).ToLowerInvariant();
+    public static bool Is(uint icon,byte markerType,string tooltip,IReadOnlySet<string>? names)
+        =>markerType!=3 && (icon==AreaIcon || tooltip.Length>0 && names?.Contains(Key(tooltip))==true);
+}
+
 public static class MapLabels
 {
     /// <summary>

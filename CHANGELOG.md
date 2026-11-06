@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.652.0
+- Plan global, P17 : Carte (P17) : les mandats forment une catégorie à part. Leurs zones sont en vert comme dans le jeu, avec leur propre réglage et leur couleur, et leurs repères au bord ont leur interrupteur, séparés des autres événements. Un marqueur est reconnu par l'icône relevée en jeu ou par son nom, trouvé dans la feuille des mandats. Le journal écrit aussi le rayon et le texte de chaque type de marqueur. Seul un mandat de mineur a été relevé, et le vert est réglé à l'œil.
+- Tests : Leve markers. Verify.ps1 (agent) : 1153/1153, 0 avertissement, 0 erreur ; DLL 0.652.0.0. Non validé en jeu.
+### English
+- Map (P17): leves are now a category of their own. Their areas are green as in the game, with their own setting and colour, and their edge markers have their own switch, apart from other events. A marker is recognised by the icon read in game or by its name, found in the Leve sheet. The log also writes the radius and text of each marker kind. Only a miner leve was read, and the green is matched by eye.
+
 ## 0.651.0
 - Plan global, T27 : Rappels (T27) : une ligne « Bienfaits de compagnie » nomme ceux actifs sur votre personnage et, une fois l'onglet Bienfaits de la fenêtre de compagnie ouvert, le temps restant de chacun, avec l'heure de la première fin et une cloche. Le nom vient du statut, sans le rang (« Prix d'ami », pas « Prix d'ami II »). Les minuteurs sont associés aux bienfaits dans l'ordre, ce que le relevé n'a pas pu prouver. La capture de relevés ne suit plus les PR ni ces minuteurs.
 - Tests : Company actions. Verify.ps1 (agent) : 1152/1152, 0 avertissement, 0 erreur ; DLL 0.651.0.0. Non validé en jeu.

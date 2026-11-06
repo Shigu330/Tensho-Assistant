@@ -14,7 +14,7 @@ public sealed record MapFlightState(uint TerritoryId,int Total,int Unlocked,bool
 // Game event marker (quest objectives and similar) copied from AgentMap.EventMarkers: world position, optional area radius.
 // ObjectiveId: the game's objective (quest) id of the marker, used to focus a quest opened from the journal.
 // MarkerType/DataId (0.135, /xllog evidence): type 3 = quest with DataId = quest row − 65536 (71021 → data 24, 71151 → data 141).
-public sealed record MapEventMarker(uint MapId,uint Icon,Vector3 Position,float Radius,string Tooltip,uint ObjectiveId=0,byte MarkerType=0,uint DataId=0);
+public sealed record MapEventMarker(uint MapId,uint Icon,Vector3 Position,float Radius,string Tooltip,uint ObjectiveId=0,byte MarkerType=0,uint DataId=0,bool IsLeve=false);
 
 // Nearby game objects shown on the map (coffers, gathering points); Level is the gathering level when known, else 0.
 // N-09 (0.441): HuntMark = a living hunt mark (NotoriousMonster by BNpcBase); Level holds its rank (1 B, 2 A, 3 S).
@@ -80,6 +80,8 @@ internal sealed class MapLiveReader : IDisposable
 
     public MapLiveReader(IFramework framework,IClientState client,IObjectTable objects,IDataManager data,ICondition condition,IFateTable fateTable,IPartyList party,IPluginLog log)
     {placeData=data;
+        try{leveNames=data.GetExcelSheet<Lumina.Excel.Sheets.Leve>().Select(row=>MapLeves.Key(row.Name.ExtractText())).Where(name=>name.Length>0).ToHashSet();leveMarkers.Clear();}
+        catch(Exception error){leveNames=null;log.Warning(error,"The leve names could not be read.");}
         this.framework=framework;this.client=client;this.objects=objects;this.log=log;this.condition=condition;this.fateTable=fateTable;this.party=party;Log=log;
         uint[] currentIds=[],vistaIds=[];
         // 0.491 (R-14): one guard per sheet, so that one sheet does not cost the other.
@@ -285,6 +287,17 @@ internal sealed class MapLiveReader : IDisposable
         return result;
     }
     private static readonly HashSet<uint> loggedEventIcons=[];
+    // P17 (0.652): the names of the Leve sheet, in the game's language, and what was already decided for a tooltip.
+    private static IReadOnlySet<string>? leveNames;
+    private static readonly Dictionary<(uint Icon,string Tooltip),bool> leveMarkers=[];
+    private static bool IsLeve(uint icon,byte type,string tooltip)
+    {
+        if(leveMarkers.TryGetValue((icon,tooltip),out var known))return known;
+        var leve=MapLeves.Is(icon,type,tooltip,leveNames);
+        if(leveMarkers.Count>=512)leveMarkers.Clear();
+        leveMarkers[(icon,tooltip)]=leve;
+        return leve;
+    }
     private static IPluginLog? Log;
     // Quest and event markers of the game map, copied (strings included); at most 256 to bound the work per refresh.
     private static unsafe IReadOnlyList<MapEventMarker> ReadEvents()
@@ -303,9 +316,9 @@ internal sealed class MapLiveReader : IDisposable
             var tooltip=TooltipText(marker.TooltipString);
             // Evidence for the labels (0.134): once per icon, what the game gives (objective, type, readable tooltip).
             if(loggedEventIcons.Count<64 && loggedEventIcons.Add(marker.IconId))
-                Log?.Information("Map event marker icon {0}: objective {1}, type {2}, data {3}, tooltip {4} (length {5}, used {6}, size {7}).",marker.IconId,marker.ObjectiveId,marker.MarkerType,marker.DataId,
-                    tooltip.Length>0 ? "read":"unread",marker.TooltipString==null ? -1:marker.TooltipString->StringLength,marker.TooltipString==null ? -1:marker.TooltipString->BufUsed,marker.TooltipString==null ? -1:marker.TooltipString->BufSize);
-            result.Add(new(marker.MapId,marker.IconId,marker.Position,float.IsFinite(marker.Radius) ? Math.Max(0,marker.Radius):0,tooltip,marker.ObjectiveId,marker.MarkerType,marker.DataId));
+                Log?.Information("Map event marker icon {0}: objective {1}, type {2}, data {3}, tooltip {4} (length {5}, used {6}, size {7}), radius {8}, text \"{9}\".",marker.IconId,marker.ObjectiveId,marker.MarkerType,marker.DataId,
+                    tooltip.Length>0 ? "read":"unread",marker.TooltipString==null ? -1:marker.TooltipString->StringLength,marker.TooltipString==null ? -1:marker.TooltipString->BufUsed,marker.TooltipString==null ? -1:marker.TooltipString->BufSize,marker.Radius,tooltip);
+            result.Add(new(marker.MapId,marker.IconId,marker.Position,float.IsFinite(marker.Radius) ? Math.Max(0,marker.Radius):0,tooltip,marker.ObjectiveId,marker.MarkerType,marker.DataId,IsLeve(marker.IconId,marker.MarkerType,tooltip)));
         }
         return result.AsReadOnly();
     }

@@ -164,7 +164,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | ~~P6~~ fait en 0.644 | Coordonnées du personnage toujours visibles et distances | S | Coordonnées du drapeau sous son icône de bord de carte, pas dans un coin ; avec réglage. |
 | ~~P7~~ fait en 0.645 | Éthérites non harmonisées signalées et coût au survol | S |  |
 | P11 | Parties non découvertes masquées comme sur la carte du jeu | M | Avec réglage. |
-| P17 | Relevé du type de marqueur des mandats et de leurs zones | S |  |
+| ~~P17~~ fait en 0.652 | Relevé du type de marqueur des mandats et de leurs zones | S | Le type ne dit rien : c'est l'icône 60492 ou le nom du mandat. |
 | P22 | Noms des variantes d'icônes de quête (71141 / 71151) | S |  |
 
 ### Objets

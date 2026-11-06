@@ -181,6 +181,8 @@ public sealed class MapViewSettings
     public bool EdgeTarget { get; set; } = true;
     public bool EdgeQuests { get; set; } = true;
     public bool EdgeEvents { get; set; } = true;
+    /// <summary>P17 (0.652): leves apart from the other events.</summary>
+    public bool EdgeLeves { get; set; } = true;
     public bool EdgeFates { get; set; } = true;
     public bool EdgeGathering { get; set; } = true;
     public bool EdgeParty { get; set; } = true;
@@ -241,10 +243,13 @@ public sealed class MapViewSettings
     public HashSet<uint>? RightClickIgnore { get; set; }
     public bool RightClickIgnored(uint icon)=>RightClickIgnore?.Contains(icon)==true;
     public bool ShowEventAreas { get; set; } = true;
+    public bool ShowLeveAreas { get; set; } = true;
     public bool ShowFateAreas { get; set; } = true;
     public bool ShowGatheringAreas { get; set; } = true;
     public System.Numerics.Vector4 QuestAreaColor { get; set; } = new(0.95f,0.70f,0.25f,0.25f);
     public System.Numerics.Vector4 EventAreaColor { get; set; } = new(0.30f,0.75f,1.00f,0.30f);
+    /// <summary>P17 (0.652): the game draws them dark green; matched by eye on a capture.</summary>
+    public System.Numerics.Vector4 LeveAreaColor { get; set; } = new(0.15f,0.55f,0.20f,0.40f);
     public System.Numerics.Vector4 FateAreaColor { get; set; } = new(0.75f,0.45f,0.95f,0.25f);
     public System.Numerics.Vector4 GatheringAreaColor { get; set; } = new(0.55f,0.90f,0.55f,0.20f);
     // 0.111: size of each game icon (key = icon id) on top of IconScale; 0 hides that icon, absent keeps 100 %.

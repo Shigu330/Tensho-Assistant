@@ -230,7 +230,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Relevés en jeu demandés (preuves, pas des réglages)**
 
-- [ ] Mandat accepté, carte ouverte : relever le type de marqueur d'un mandat (repères au bord « Mandats et autres événements », 0.298).
+- [x] Mandat accepté, carte ouverte : relever le type de marqueur d'un mandat (repères au bord « Mandats et autres événements », 0.298).
 - [ ] Icônes de quête 71141 / 71151 : seulement avec un relevé en jeu (STATUS, points décidés avant D17).
 
 **Encore listés « à valider » dans STATUS avant 0.232**
@@ -945,6 +945,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.650) Mode développeur : récolter sans action pendant quelques tics, le journal écrit « Reading gp ». Les relevés suivants sont donnés un par un.
 
 - [x] (0.651) Rappels, ligne Bienfaits de compagnie : les noms s'affichent sans rien ouvrir. Ouvrir l'onglet Bienfaits : le temps restant apparaît, comme dans le jeu. Poser la cloche : l'alarme est à l'heure de fin.
+
+- [ ] (0.652) Lancer un mandat, ouvrir la carte : ses zones sont vertes au même endroit que dans le jeu. Réglages de la carte : « Zones des mandats » et le repère « Mandats » agissent seuls. Essayer si possible un mandat de combat.
 
 **0.535 : interfaces** — à voir en jouant
 

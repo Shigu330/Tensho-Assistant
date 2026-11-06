@@ -594,6 +594,7 @@ internal sealed partial class MainWindow
                     changed|=SettingBox("MapView.EdgeFlagCoordinatesOn",settings.EdgeFlagCoordinates,value=>settings.EdgeFlagCoordinates=value,MapDefaults.EdgeFlagCoordinates);
                     changed|=SettingBox("MapView.EdgeTargetOn",settings.EdgeTarget,value=>settings.EdgeTarget=value,MapDefaults.EdgeTarget);
                     changed|=SettingBox("MapView.EdgeQuestsOn",settings.EdgeQuests,value=>settings.EdgeQuests=value,MapDefaults.EdgeQuests);
+                    changed|=SettingBox("MapView.EdgeLevesOn",settings.EdgeLeves,value=>settings.EdgeLeves=value,MapDefaults.EdgeLeves);
                     changed|=SettingBox("MapView.EdgeEventsOn",settings.EdgeEvents,value=>settings.EdgeEvents=value,MapDefaults.EdgeEvents);
                     changed|=SettingBox("MapView.EdgeFatesOn",settings.EdgeFates,value=>settings.EdgeFates=value,MapDefaults.EdgeFates);
                     changed|=SettingBox("MapView.EdgeGatheringOn",settings.EdgeGathering,value=>settings.EdgeGathering=value,MapDefaults.EdgeGathering);
@@ -672,6 +673,7 @@ internal sealed partial class MainWindow
             if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionAreas")))
             {
                 changed|=AreaSetting("MapView.AreaQuests",settings.ShowQuestAreas,value=>settings.ShowQuestAreas=value,settings.QuestAreaColor,value=>settings.QuestAreaColor=value,MapDefaults.ShowQuestAreas,MapDefaults.QuestAreaColor);
+                changed|=AreaSetting("MapView.AreaLeves",settings.ShowLeveAreas,value=>settings.ShowLeveAreas=value,settings.LeveAreaColor,value=>settings.LeveAreaColor=value,MapDefaults.ShowLeveAreas,MapDefaults.LeveAreaColor);
                 changed|=AreaSetting("MapView.AreaEvents",settings.ShowEventAreas,value=>settings.ShowEventAreas=value,settings.EventAreaColor,value=>settings.EventAreaColor=value,MapDefaults.ShowEventAreas,MapDefaults.EventAreaColor);
                 changed|=AreaSetting("MapView.AreaFates",settings.ShowFateAreas,value=>settings.ShowFateAreas=value,settings.FateAreaColor,value=>settings.FateAreaColor=value,MapDefaults.ShowFateAreas,MapDefaults.FateAreaColor);
                 changed|=AreaSetting("MapView.AreaGathering",settings.ShowGatheringAreas,value=>settings.ShowGatheringAreas=value,settings.GatheringAreaColor,value=>settings.GatheringAreaColor=value,MapDefaults.ShowGatheringAreas,MapDefaults.GatheringAreaColor);
@@ -1084,8 +1086,8 @@ internal sealed partial class MainWindow
             foreach(var marker in events.Where(marker=>marker.Radius>0))
             {
                 var quest=marker.MarkerType==3;
-                if(quest ? !settings.ShowQuestAreas:!settings.ShowEventAreas)continue;
-                DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(marker.Position,map)*mapZoom,marker.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,quest ? settings.QuestAreaColor:settings.EventAreaColor);
+                if(quest ? !settings.ShowQuestAreas:marker.IsLeve ? !settings.ShowLeveAreas:!settings.ShowEventAreas)continue;
+                DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(marker.Position,map)*mapZoom,marker.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,quest ? settings.QuestAreaColor:marker.IsLeve ? settings.LeveAreaColor:settings.EventAreaColor);
             }
             if(settings.ShowGatheringAreas)
                 foreach(var point in gathering)
@@ -1125,7 +1127,7 @@ internal sealed partial class MainWindow
             foreach(var vendor in vendorLayout.Lonely)Add(vendor.Icon,1,vendor.Pixel,vendor.Label,flag:vendor.Flag);
             foreach(var fate in fates.Where(fate=>fate.Icon!=0))Add(fate.Icon,2,MapProjection.PixelFromWorld(fate.Position,map),FateLabel(fate),worldRadius:settings.ShowFateAreas ? fate.Radius:0);
             foreach(var marker in events)Add(marker.Icon,3,MapProjection.PixelFromWorld(marker.Position,map),settings.QuestTooltips ? EventLabel(marker):null,
-                worldRadius:(marker.MarkerType==3 ? settings.ShowQuestAreas:settings.ShowEventAreas) ? marker.Radius:0);
+                worldRadius:(marker.MarkerType==3 ? settings.ShowQuestAreas:marker.IsLeve ? settings.ShowLeveAreas:settings.ShowEventAreas) ? marker.Radius:0);
             ExpireGameTarget();
             if(mapGameTarget is { } gameTarget && gameTarget.MapId==map.MapId)
                 Add(gameTarget.Icon,4,MapProjection.PixelFromWorld(new Vector3(gameTarget.World.X,0,gameTarget.World.Y),map),localization.Get("MapView.GameTarget"));
@@ -1835,7 +1837,7 @@ internal sealed partial class MainWindow
             if(marker.Icon==0 || settings.SizeOf(marker.Icon,map.MapId)<=0)continue;
             var quest=marker.ObjectiveId!=0 ? ActiveQuestByKey(marker.ObjectiveId & 0xFFFF):null;
             if(quest is not null){if(settings.EdgeQuests && shownQuests.Add(quest.Id))targets.Add((MapProjection.PixelFromWorld(marker.Position,map),marker.Icon,quest.Name,false,0));}
-            else if(settings.EdgeEvents)targets.Add((MapProjection.PixelFromWorld(marker.Position,map),marker.Icon,EventLabel(marker) ?? localization.Get("MapView.EdgeEvent"),false,0));
+            else if(marker.IsLeve ? settings.EdgeLeves:settings.EdgeEvents)targets.Add((MapProjection.PixelFromWorld(marker.Position,map),marker.Icon,EventLabel(marker) ?? localization.Get("MapView.EdgeEvent"),false,0));
         }
         if(settings.EdgeFates)
             foreach(var fate in fates.Where(fate=>fate.Icon!=0 && settings.SizeOf(fate.Icon,map.MapId)>0))targets.Add((MapProjection.PixelFromWorld(fate.Position,map),fate.Icon,FateLabel(fate),false,0));

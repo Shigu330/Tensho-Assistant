@@ -83,6 +83,16 @@ internal static class MapLabels596Tests
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(0,costs),"not an aetheryte");
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(9,null) && !TenshoAssistant.Maps.MapLabels.NotAttuned(9,new Dictionary<uint,uint>()),"unknown says nothing");
         }),
+        ("Leve markers (P17): the icon read in game, or a tooltip naming a leve, never a quest",() =>
+        {
+            var names=new HashSet<string>{TenshoAssistant.Maps.MapLeves.Key("Grosse récolte : pierre septentrionale d'ornement")};
+            Check(TenshoAssistant.Maps.MapLeves.Is(60492,0,"",null),"the icon alone");
+            Check(TenshoAssistant.Maps.MapLeves.Is(60000,0,"Grosse récolte: pierre septentrionale d'ornement",names),"the tooltip writes it without the space");
+            Check(TenshoAssistant.Maps.MapLeves.Is(60000,0,"\uE0BB Grosse récolte\u00A0: pierre septentrionale d'ornement",names),"a glyph and another space change nothing");
+            Check(!TenshoAssistant.Maps.MapLeves.Is(60987,0,"Échange d'articles locaux",names),"another event");
+            Check(!TenshoAssistant.Maps.MapLeves.Is(60492,3,"Grosse récolte: pierre septentrionale d'ornement",names),"a quest stays a quest");
+            Check(!TenshoAssistant.Maps.MapLeves.Is(60000,0,"",names),"no text");
+        }),
         ("Map labels: from the sheet, only for a drawn icon, with their setting",() =>
         {
             var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs"));
