@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.676.0
+- Plan global, C22 : Correction, rapport de l'utilisateur : dans Compagnie libre › Atelier, la colonne « En stock » restait sur un tiret alors que l'infobulle de l'objet donnait le bon nombre. Cause : c'était la seule page à lire les stocks sans les rafraîchir, elle ne voyait donc que ce qu'une autre page avait déjà lu. Corrigé, et un test exige désormais le rafraîchissement de toute page qui lit les stocks. COMPILED et TESTED, non validé en jeu.
+- Tests : WorkshopStock676Tests. Verify.ps1 (agent) : 1193/1193, 0 avertissement, 0 erreur ; DLL 0.676.0.0. Non validé en jeu.
+### English
+- Fix from a user report: in Free Company > Workshop, the In stock column stayed on a dash while the item's tooltip gave the right count. Cause: it was the only page reading the stocks without refreshing them. Fixed, and a test now requires the refresh on every page that reads stocks. COMPILED and TESTED, not validated in game.
+
 ## 0.675.0
 - Plan global, W-01 : Commandes spéciales, sujet choisi par l'utilisateur. Nouvelle page Production › Commandes spéciales : pour chaque client, son lieu, son niveau, son rang, ses points et ses livraisons de la semaine, avec le reste de la semaine et le renouvellement. Les clients sans leur quête faite sont marqués non débloqués. Lecture seule, sans requête au serveur. Les objets demandés cette semaine ne sont pas affichés : le jeu ne les donne que dans la fenêtre du client. Le site EorzeaWorld interdit l'usage de ses données dans un plugin : rien n'en vient, c'est noté dans REFERENCES. COMPILED et TESTED, non validé en jeu.
 - Tests : CustomDeliveries675Tests. Verify.ps1 (agent) : 1192/1192, 0 avertissement, 0 erreur ; DLL 0.675.0.0. Non validé en jeu.

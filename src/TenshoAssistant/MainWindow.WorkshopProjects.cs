@@ -30,6 +30,8 @@ internal sealed partial class MainWindow
             return;
         }
         if(itemCatalog.State.Catalog is null){ImGui.TextDisabled(localization.Get("FreeCompany.WorkshopLoading"));return;}
+        // 0.676 (user report): without this the stock column only knew what another page had read, so it showed a dash for everything.
+        RefreshRecipeHoldingsCache();
         var projects=workshopProjects.Result;
         ImGui.SetNextItemWidth(260);
         ImGui.InputTextWithHint("##WorkshopSearch",localization.Get("FreeCompany.WorkshopSearch"),ref workshopSearch,100);
