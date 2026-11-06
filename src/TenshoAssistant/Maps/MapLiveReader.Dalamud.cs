@@ -312,7 +312,7 @@ internal sealed class MapLiveReader : IDisposable
     // Crash 2026-10-31 08:19 (dalamud.crashhandler.log): Utf8String.ToString() on an event marker tooltip read freed memory
     // with an unbounded length. Only a short string (1–256 bytes, within its buffer) is copied, with its own length; anything
     // else gives "". 0.136: the length is BufUsed − 1, as Utf8String.ToString uses it (StringLength reads 0 in game).
-    private static unsafe string TooltipText(FFXIVClientStructs.FFXIV.Client.System.String.Utf8String* text)
+    internal static unsafe string TooltipText(FFXIVClientStructs.FFXIV.Client.System.String.Utf8String* text)
     {
         if(text==null)return "";
         // /xllog 0.135: StringLength stays 0 in map markers; BufUsed = text bytes + terminator (e.g. 24 for 23 bytes).

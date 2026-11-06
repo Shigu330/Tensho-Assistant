@@ -170,7 +170,46 @@ internal sealed class NativeMapReplacer : IDisposable
             quest=agent->CurrentOpenMapInfo.QuestId;aetheryte=agent->CurrentOpenMapInfo.AetheryteId;fate=agent->CurrentOpenMapInfo.FateId;
         }
         if(log)this.log.Information("Game map hosted: type {0}, map {1}, territory {2}, selected {3}, quest {4}, aetheryte {5}, fate {6}, target {7}.",type,requested,territory,selected,quest,aetheryte,fate,target?.ToString() ?? "none");
+        if(log && questLog && agent!=null)LogTargetProbe(agent);
         return (new(selected,requested,territory,client.MapId,quest,aetheryte,fate,questLog,target,targetIcon),$"{type}|{requested}|{territory}|{quest}|{aetheryte}|{fate}|{target}");
+    }
+    // 0.630 (temporary, read only): the game shows a quest beyond a zone-change NPC on that NPC (user capture): where does it keep that place?
+    private unsafe void LogTargetProbe(AgentMap* agent)
+    {
+        var title=MapLiveReader.TooltipText(&agent->CurrentOpenMapInfo.TitleString);
+        log.Information("Map target probe: title {0}, player map {1}, temp markers {2}.",title,client.MapId,agent->TempMapMarkerCount);
+        for(var index=0;index<agent->TempMapMarkerCount && index<agent->TempMapMarkers.Length;index++)
+        {
+            var temp=agent->TempMapMarkers[index];
+            log.Information("Map target probe, temp {0}: raw {1}, {2}, icon {3}, type {4}, style {5}.",index,temp.MapMarker.X,temp.MapMarker.Y,temp.MapMarker.IconId,temp.Type,temp.StyleFlags);
+        }
+        if(title.Length==0)return;
+        var events=agent->EventMarkers.LongCount;
+        if(events is >=0 and <=1024)
+        {
+            var seen=0;
+            foreach(var marker in agent->EventMarkers)
+            {
+                if(++seen>1024)break;
+                if(!MapLiveReader.TooltipText(marker.TooltipString).Contains(title,StringComparison.Ordinal))continue;
+                log.Information("Map target probe, event: map {0}, territory {1}, level {2}, objective {3}, position {4}, icon {5}, type {6}, data {7}.",marker.MapId,marker.TerritoryTypeId,marker.LevelId,marker.ObjectiveId,marker.Position,marker.IconId,marker.MarkerType,marker.DataId);
+            }
+        }
+        var game=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
+        if(game==null)return;
+        var quests=game->QuestMarkers;
+        for(var index=0;index<quests.Length;index++)
+        {
+            fixed(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info=&quests[index])
+            {
+                if(info->ObjectiveId==0 || !MapLiveReader.TooltipText(&info->Label).Contains(title,StringComparison.Ordinal))continue;
+                var markers=info->MarkerData.LongCount;
+                log.Information("Map target probe, quest slot {0}: objective {1}, markers {2}.",index,info->ObjectiveId,markers);
+                if(markers is <0 or >64)continue;
+                foreach(var marker in info->MarkerData)
+                    log.Information("Map target probe, quest marker: map {0}, territory {1}, level {2}, position {3}, icon {4}, type {5}, data {6}.",marker.MapId,marker.TerritoryTypeId,marker.LevelId,marker.Position,marker.IconId,marker.MarkerType,marker.DataId);
+            }
+        }
     }
     public unsafe void Dispose()
     {

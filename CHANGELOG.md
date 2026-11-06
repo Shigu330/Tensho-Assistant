@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.630.0
+- Plan global, phase 5 : Carte (rapport et captures de l'utilisateur) : pour une quête au-delà d'un PNJ de changement de zone, le jeu montre ce PNJ. Sonde temporaire, en lecture seule, dans le journal : à l'ouverture d'une quête, ce que le jeu garde pour la cible (marqueurs temporaires, d'événement et de quête), pour savoir où il range cet endroit. Rien ne change encore à l'écran.
+- Tests : Map request. Verify.ps1 (agent) : 1137/1137, 0 avertissement, 0 erreur ; DLL 0.630.0.0. Non validé en jeu.
+### English
+- Map (user report and captures): for a quest beyond a zone-change NPC, the game shows that NPC. Temporary read-only probe in the log: when a quest opens, what the game keeps for the target (temporary, event and quest markers), to learn where it stores that place. Nothing changes on screen yet.
+
 ## 0.629.0
 - Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : cliquer la quête déjà affichée fermait ou rouvrait la carte, sans aller sur la quête, car le jeu ferme alors sa carte et la 0.627 prenait la demande pour la touche de carte. Un clic gauche juste avant, lu dans les entrées du jeu, distingue les deux : la carte reste ouverte et revient sur la quête. La touche de carte l'ouvre toujours sur le joueur. Limite : un clic à la manette ne se voit pas ainsi.
 - Tests : Map request. Verify.ps1 (agent) : 1137/1137, 0 avertissement, 0 erreur ; DLL 0.629.0.0. Non validé en jeu.
