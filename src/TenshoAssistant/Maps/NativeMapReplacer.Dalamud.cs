@@ -84,7 +84,7 @@ internal sealed class NativeMapReplacer : IDisposable
             }
             if(hosted)
             {
-                if(!visible){hosted=false;Restore(unit);closeTensho();}
+                if(!visible){hosted=false;Restore(unit);log.Information("The game closed its map window: the Tensho map closes with it.");closeTensho();}
                 else if(!tenshoOpen()){hosted=false;Restore(unit);AgentMap.Instance()->Hide();visible=false;}
                 else
                 {

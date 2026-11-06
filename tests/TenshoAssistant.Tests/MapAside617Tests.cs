@@ -35,7 +35,7 @@ internal static class MapAside617Tests
         ("Map enlarged: no stepping aside then, the same as before otherwise",() =>
         {
             var tracker=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.TrackerWindow.cs")).Replace("\r\n","\n");
-            Check(tracker.Contains("if(UI.MapEnlarged.Is(mapRestore is not null,size.X,size.Y,screen.X,screen.Y))return false;\n        return BehindGame(at,size) || Panels?.Over(at,size)==true;"),"checked first");
+            Check(tracker.Contains("if(UI.MapEnlarged.Is(mapRestore is not null,size.X,size.Y,screen.X,screen.Y))return false;\n        var byWindow=BehindGame(at,size);var byPanel=Panels?.Over(at,size)==true;"),"checked first");
         }),
     ];
 }

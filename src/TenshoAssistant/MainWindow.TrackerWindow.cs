@@ -71,8 +71,17 @@ internal sealed partial class MainWindow
         if(!configuration.MapView.HideBehindGame)return false;
         var screen=ImGui.GetMainViewport().WorkSize;
         if(UI.MapEnlarged.Is(mapRestore is not null,size.X,size.Y,screen.X,screen.Y))return false;
-        return BehindGame(at,size) || Panels?.Over(at,size)==true;
+        var byWindow=BehindGame(at,size);var byPanel=Panels?.Over(at,size)==true;
+        var covered=byWindow || byPanel;
+        // What makes the map step aside, on each change, to read a « map never comes back » report in the log.
+        if(covered!=mapWasCovered)
+        {
+            mapWasCovered=covered;
+            log.Information("Map {0}: game window {1}, panel {2}, at {3}, size {4}; windows: {5}.",covered ? "steps aside":"comes back",byWindow,byPanel,at,size,string.Join(", ",GameWindowList.Where(window=>UI.GameWindows.Touch(at.X,at.Y,size.X,size.Y,window.X,window.Y,window.Width,window.Height)).Select(window=>window.Name)));
+        }
+        return covered;
     }
+    private bool mapWasCovered;
     /// <summary>0.539: where a game window is now against where its reader saw it, for the panels that follow it.</summary>
     internal Func<string,float,float,Vector2>? GameWindowFollow { get; set; }
     internal Vector2 WindowMoved(string addon,float x,float y)=>GameWindowFollow is { } follow ? follow(addon,x,y)-new Vector2(x,y):Vector2.Zero;

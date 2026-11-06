@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.624.0
+- Plan global, phase 5 : Carte : le journal dit maintenant pourquoi elle s'efface ou revient (fenêtre du jeu ou panneau, lesquelles), et quand le jeu ferme sa propre carte, pour comprendre le rapport « la carte disparaît à l'ouverture d'un menu et ne revient pas ». Pas de correctif encore.
+- Tests : Map enlarged. Verify.ps1 (agent) : 1130/1130, 0 avertissement, 0 erreur ; DLL 0.624.0.0. Non validé en jeu.
+### English
+- Map: the log now says why it steps aside or comes back (game window or panel, which ones), and when the game closes its own map, to understand the report « the map vanishes when a menu opens and never comes back ». No fix yet.
+
 ## 0.623.0
 - Plan global, phase 5 : Carte (rapport de l'utilisateur, captures du jeu) : les noms à côté des icônes se chevauchaient. Comme sur la carte du jeu, de loin seuls les liens de carte gardent leur nom, les autres reviennent de près ; deux noms ne se superposent plus, et les couleurs suivent le jeu (blanc, liens en bleu-vert). Le zoom exact du jeu n'est pas connu : seuil à ajuster en jeu.
 - Tests : Map labels. Verify.ps1 (agent) : 1130/1130, 0 avertissement, 0 erreur ; DLL 0.623.0.0. Non validé en jeu.
