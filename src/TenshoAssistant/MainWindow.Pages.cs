@@ -30,6 +30,7 @@ internal sealed partial class MainWindow
         new(Page.GatheringGp,"Production",null,DrawGatheringGp,"MainWindow.Gathering*.cs",Page.Gathering),
         new(Page.GatheringCollectables,"Production",null,DrawCollectablesPage,"MainWindow.CollectableTable.cs, Gathering/Collectables.cs",Page.Gathering),
         new(Page.OceanFishing,"Production",PageLabel("Navigation.OceanFishing"),DrawOceanFishing,"MainWindow.OceanFishing.cs"),
+        new(Page.IslandSanctuary,"Production",PageLabel("Navigation.IslandSanctuary"),DrawIslandSanctuary,"MainWindow.IslandSanctuary.cs, Island/"),
         new(Page.MacroChain,"Production",PageLabel("Category.MacroChain"),DrawMacroChain,"MainWindow.MacroChain*.cs, Macros/"),
         new(Page.Maps,"World",PageLabel("Navigation.Map"),DrawMaps,"MainWindow.Maps.cs, MainWindow.MapView.cs"),
         new(Page.Weather,"World",PageLabel("Category.Weather"),DrawWeather,"MainWindow.Weather.cs, Gathering/WeatherForecast.cs"),

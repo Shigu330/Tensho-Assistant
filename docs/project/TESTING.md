@@ -984,6 +984,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.670) Cartes › Conditions des rangs S : les noms sont lisibles dans la langue du jeu (aucun « # »), les marques de la zone viennent en premier, la recherche filtre. À l'occasion, comparer une condition à ce qui se passe en jeu.
 
+- [ ] (0.671) Sur l'île, Production › Île sanctuaire : Lire avant d'ouvrir l'agenda (doit le demander), puis après : rang, ateliers, entrain, popularité et offre doivent correspondre au jeu. Comparer la valeur estimée aux coquillages d'une création terminée.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

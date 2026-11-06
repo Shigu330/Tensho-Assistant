@@ -4,6 +4,8 @@ using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.MJI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
@@ -24,7 +26,7 @@ public sealed unsafe class ReadingCapture : IDisposable
     private readonly Func<bool> enabled;
     private readonly IPluginLog log;
     private readonly Dictionary<string,int> lines=[];
-    private string statuses="",synthesis="",leves="",retainer="",airship="";
+    private string statuses="",synthesis="",leves="",retainer="",airship="",islandState="",islandAgenda="";
     private bool fishing,disposed,warned;
     private long slowAt;
 
@@ -62,6 +64,7 @@ public sealed unsafe class ReadingCapture : IDisposable
             ReadLeves();
             ReadRetainer();
             ReadAirships();
+            ReadIsland();
             warned=false;
         }
         catch(Exception error)
@@ -77,6 +80,39 @@ public sealed unsafe class ReadingCapture : IDisposable
         if(ids==statuses)return;
         statuses=ids;
         Line("statuses",200,string.Join(", ",local.StatusList.Where(status=>status.StatusId!=0).Select(status=>$"{status.StatusId} (param {status.Param}, {status.RemainingTime:F1} s)")));
+    }
+
+    // 0.671 (N-10): what the workshops' model still does not know: when the demand loads, the two grooves, the rest days and the crafts the game calls efficient.
+    private void ReadIsland()
+    {
+        if((nint)MJIManager.StaticAddressPointers.ppInstance==0)return;
+        var manager=MJIManager.Instance();
+        if(manager==null || !manager->IsPlayerInSanctuary)return;
+        var workshops=new StringBuilder();
+        for(var index=0;index<4;index++)
+        {
+            var workshop=manager->IslandState.Workshops[index];
+            workshops.Append($" {workshop.PlaceId}/{workshop.BuildingLevel}/{workshop.UnderConstruction}/{workshop.HoursToCompletion}");
+        }
+        var shifts=manager->SupplyAndDemandShifts;
+        var filled=0;
+        foreach(var shift in shifts)if(shift!=0)filled++;
+        var state=$"rank {manager->IslandState.CurrentRank}, dirty {manager->DemandDirty}, popularity {manager->CurrentPopularity}/{manager->NextPopularity}, cycle {manager->CurrentCycleDay}, groove {manager->CurrentGroove}, rest {string.Join(".",manager->CraftworksRestDays.ToArray())}, shifts {filled}/{shifts.Length} first {shifts[1]:X2} {shifts[2]:X2}, workshops{workshops}";
+        if(state!=islandState){islandState=state;Line("island",200,state);}
+        var agent=AgentMJICraftSchedule.Instance();
+        if(agent==null || agent->Data==null)return;
+        var data=agent->Data;
+        var entries=new StringBuilder();
+        var schedules=data->WorkshopSchedules;
+        for(var index=0;index<schedules.Length;index++)
+        {
+            entries.Append($" w{index}:{schedules[index].NumEfficientCrafts}e");
+            var entryData=schedules[index].EntryData;
+            for(var entry=0;entry<Math.Min((int)schedules[index].NumScheduleEntries,entryData.Length);entry++)
+                entries.Append($" {entryData[entry].CraftObjectId}@{entryData[entry].StartingSlot}+{entryData[entry].Duration}{(entryData[entry].Efficient ? "e":"")}");
+        }
+        var agenda=$"state {data->UpdateState}, groove {data->Groove}, rest {data->RestCycles:X}, shown {data->CycleDisplayed}, cycle {data->CycleInProgress}, hour {data->HourSinceCycleStart}, level {data->IslandLevel},{entries}";
+        if(agenda!=islandAgenda){islandAgenda=agenda;Line("islandAgenda",200,agenda);}
     }
 
     // 0.654: what the game says of the accepted leves, to tell a started, a finished and an abandoned one.

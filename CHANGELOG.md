@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.671.0
+- Plan global, N-10 : Île sanctuaire (N-10), première partie : nouvelle page Production › Île sanctuaire. Une fois l'agenda ouvert dans le jeu, un clic copie le rang, les ateliers, l'entrain, la popularité, l'offre et la demande, et la table donne une valeur estimée par création. Tensho ne demande rien au serveur et ne programme rien. Le rang d'atelier, l'arrondi et les deux lectures de l'entrain restent à vérifier en jeu ; la capture en écrit les valeurs.
+- Tests : Island. Verify.ps1 (agent) : 1172/1172, 0 avertissement, 0 erreur ; DLL 0.671.0.0. Non validé en jeu.
+### English
+- Island sanctuary (N-10), first part: new page Production › Island sanctuary. Once the agenda is open in the game, a click copies the rank, workshops, groove, popularity, supply and demand, and the table gives an estimated value per craft. Tensho asks the server for nothing and schedules nothing. The workshop row, the rounding and the two groove readings remain to check in game; the capture writes their values.
+
 ## 0.670.0
 - Plan global, N-12 : Chasse (N-12) : Cartes › « Conditions des rangs S » donne, pour les 50 marques, la condition d'apparition, la fenêtre et si la tentative est sûre ou aléatoire. Ces conditions ne sont pas dans les données du jeu : savoir communautaire croisé entre plusieurs sources (wiki, guide, S Rank Assistant en lecture seule), réécrit dans les mots de Tensho, crédité. Noms dans la langue du jeu ; les marques de votre zone en premier. Pas de compteurs.
 - Tests : S rank conditions. Verify.ps1 (agent) : 1166/1166, 0 avertissement, 0 erreur ; DLL 0.670.0.0. Non validé en jeu.

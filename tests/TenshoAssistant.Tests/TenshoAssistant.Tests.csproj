@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="../../src/TenshoAssistant/MyTools/*.cs" Exclude="../../src/TenshoAssistant/MyTools/*.Dalamud.cs" Link="MyTools/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Localization/*.cs" Link="Localization/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Island/*.cs" Exclude="../../src/TenshoAssistant/Island/*.Dalamud.cs" Link="Island/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Beastmaster/*.cs" Exclude="../../src/TenshoAssistant/Beastmaster/*.Dalamud.cs" Link="Beastmaster/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Guide/*.cs" Link="Guide/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Help/*.cs" Link="Help/%(Filename)%(Extension)" />

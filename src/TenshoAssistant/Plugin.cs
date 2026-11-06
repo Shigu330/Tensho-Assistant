@@ -701,6 +701,17 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.IslandPoints=LoadSheet("MJIGatheringItem",()=>Maps.IslandResources.Points(data.GetExcelSheet<Lumina.Excel.Sheets.MJIGatheringItem>().Select(row=>(row.Item.RowId,(int)row.X,(int)row.Y,(int)row.Radius))),[]);
             mainWindow.WorkshopProjectsLoad=()=>FreeCompany.WorkshopProjectsLoader.Read(data);
             mainWindow.CompanyActionNames=LoadSheet("Status",()=>data.GetExcelSheet<Lumina.Excel.Sheets.Status>().Where(row=>row.IsFcBuff).ToDictionary(row=>row.RowId,row=>row.Name.ExtractText()),[]);
+            // N-10 (0.671): the island's workshops, read on the player's click.
+            mainWindow.IslandCatalogLoad=()=>
+            {
+                try{return Island.IslandCatalogLoader.Read(data);}
+                catch(Exception error){log.Warning(error,"Island sheets unreadable (game update?).");return null;}
+            };
+            mainWindow.ReadIsland=catalog=>framework.RunOnFrameworkThread(()=>
+            {
+                try{return Island.IslandReader.Read(catalog);}
+                catch(Exception error){log.Warning(error,"Island unreadable (game update?).");throw;}
+            });
             // N-12 (0.670): names of the S rank conditions, in the game's language.
             mainWindow.SRankMarkName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().GetRowOrDefault(id)?.Singular.ExtractText();
             mainWindow.SRankZoneName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id)?.PlaceName.ValueNullable?.Name.ExtractText();
