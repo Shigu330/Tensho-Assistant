@@ -1,0 +1,19 @@
+namespace TenshoAssistant.FreeCompany;
+
+/// <summary>C22 (0.664): a material of a phase: so many items per delivery, so many deliveries (docs/evidence/0.664-workshop-projects.md).</summary>
+public sealed record WorkshopMaterial(uint Item,int PerSet,int Sets)
+{
+    public int Total=>PerSet*Sets;
+}
+public sealed record WorkshopPhase(int Number,IReadOnlyList<WorkshopMaterial> Materials);
+public sealed record WorkshopPart(string Name,IReadOnlyList<WorkshopPhase> Phases);
+public sealed record WorkshopProject(uint Id,uint ResultItem,string Type,IReadOnlyList<WorkshopPart> Parts)
+{
+    /// <summary>Each item once, in the order it first comes, with its whole quantity.</summary>
+    public IReadOnlyList<(uint Item,int Total)> Totals()
+        =>Parts.SelectMany(part=>part.Phases).SelectMany(phase=>phase.Materials).GroupBy(material=>material.Item).Select(group=>(group.Key,group.Sum(material=>material.Total))).ToArray();
+}
+public static class WorkshopStock
+{
+    public static long Missing(long need,long held)=>Math.Max(0,need-Math.Max(0,held));
+}

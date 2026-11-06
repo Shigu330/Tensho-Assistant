@@ -155,7 +155,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 |---|---|---|---|
 | C6 | Recettes à niveau ajusté, à qualité imposée et Exploration cosmique | M-L |  |
 | C13 | Chance HQ d'une qualité finale | S |  |
-| C22 | Projets de l'atelier de compagnie libre : matériaux par pièce et par phase | M |  |
+| ~~C22~~ fait en 0.664 | Projets de l'atelier de compagnie libre : matériaux par pièce et par phase | M | À comparer à la fenêtre de l'atelier. |
 
 ### Carte
 

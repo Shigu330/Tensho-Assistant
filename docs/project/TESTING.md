@@ -970,6 +970,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.663) Pêche : un poisson à proies affiche sa durée d'intuition. Attraper ses proies : le temps restant s'affiche, et sa valeur de départ correspond à la durée annoncée.
 
+- [ ] (0.664) Compagnie libre, onglet Atelier : chercher un projet, comparer ses matériaux et ses quantités à la fenêtre de l'atelier du jeu. Le clic sur un objet ouvre sa fiche.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

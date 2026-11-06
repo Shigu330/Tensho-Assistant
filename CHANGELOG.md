@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.664.0
+- Plan global, C22 : Compagnie libre (C22) : un onglet Atelier liste les projets de l'atelier, avec leurs matériaux pièce par pièce et phase par phase, le total du projet et vos stocks relevés, et un lien vers chaque objet. Ce que l'atelier a déjà reçu n'est pas lu. La quantité requise est lue comme la quantité par livraison multipliée par le nombre de livraisons, d'après le nom des colonnes : à comparer à la fenêtre du jeu.
+- Tests : Workshop projects. Verify.ps1 (agent) : 1161/1161, 0 avertissement, 0 erreur ; DLL 0.664.0.0. Non validé en jeu.
+### English
+- Free Company (C22): a Workshop tab lists the workshop's projects, with their materials part by part and phase by phase, the project's total and your stocks as read, and a link to each item. What the workshop has already received is not read. The need is read as the quantity per delivery times the number of deliveries, from the columns' names: to compare with the game's window.
+
 ## 0.663.0
 - Plan global, C28 : Pêche (C28) : pour un poisson à proies, l'aide à la pêche et la page Récolte donnent la durée de l'intuition selon GatherBuddy ; l'aide affiche aussi le temps restant quand l'intuition est active. Le nombre est lu comme des secondes d'après son nom et ses valeurs : à confirmer sur une vraie intuition. Les données GatherBuddy sont téléchargées une fois de plus.
 - Tests : GatherBuddy. Verify.ps1 (agent) : 1160/1160, 0 avertissement, 0 erreur ; DLL 0.663.0.0. Non validé en jeu.

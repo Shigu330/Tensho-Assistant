@@ -68,6 +68,7 @@
     <Compile Include="../../src/TenshoAssistant/Reminders/WondrousTailsOdds.cs" Link="Reminders/WondrousTailsOdds.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/HuntBills.cs" Link="Reminders/HuntBills.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/Voyages.cs" Link="FreeCompany/Voyages.cs" />
+    <Compile Include="../../src/TenshoAssistant/FreeCompany/WorkshopProjects.cs" Link="FreeCompany/WorkshopProjects.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/VoyageHistory.cs" Link="FreeCompany/VoyageHistory.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/VoyagePlanner.cs" Link="FreeCompany/VoyagePlanner.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/AirshipSectors.cs" Link="FreeCompany/AirshipSectors.cs" />

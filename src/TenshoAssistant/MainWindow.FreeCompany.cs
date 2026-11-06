@@ -30,6 +30,7 @@ internal sealed partial class MainWindow
             if(ImGui.BeginTabItem(localization.Get("FreeCompany.TabRoutes")+"###FcRoutes",Request(1))){try{DrawRoutePlanner();}finally{ImGui.EndTabItem();}}
             if(ImGui.BeginTabItem(localization.Get("FreeCompany.TabBuilds")+"###FcBuilds",Request(2))){try{DrawVesselBuilds();}finally{ImGui.EndTabItem();}}
             if(ImGui.BeginTabItem(localization.Get("FreeCompany.TabAirships")+"###FcAirships",Request(3))){try{DrawAirshipSectors();}finally{ImGui.EndTabItem();}}
+            if(ImGui.BeginTabItem(localization.Get("FreeCompany.TabWorkshop")+"###FcWorkshop")){try{DrawWorkshopProjects();}finally{ImGui.EndTabItem();}}
             // 0.379 (g, M-10): loot history.
             if(ImGui.BeginTabItem(localization.Get("VoyageHistory.Tab")+"###FcHistory")){try{DrawVoyageHistory();}finally{ImGui.EndTabItem();}}
             if(request>=0 && freeCompanyTabRequest==request)freeCompanyTabRequest=-1;
