@@ -92,6 +92,11 @@ public sealed record MapCatalogState(MapCatalog? Catalog, int Copied, int Total,
 public sealed record GameMapRequest(uint Selected, uint Requested, uint Territory, uint Current, uint QuestId = 0, uint AetheryteId = 0, uint FateId = 0, bool QuestLog = false,
     System.Numerics.Vector2? Target = null, uint TargetIcon = 0)
 {
+    /// <summary>
+    /// 0.627 (user report, log: the same « QuestLog » request at each press of the map key): the game keeps its last quest request after the map closes. Read again unchanged,
+    /// it asks for nothing: the map simply opens on the player.
+    /// </summary>
+    public GameMapRequest Plain()=>this with {Selected=Current,Requested=Current,Territory=0,QuestId=0,AetheryteId=0,FateId=0,QuestLog=false,Target=null,TargetIcon=0};
     /// <summary>A quest, aetheryte or FATE was asked: never the M toggle.</summary>
     public bool Pointed => QuestId != 0 || AetheryteId != 0 || FateId != 0 || QuestLog || Target is not null;
     /// <summary>

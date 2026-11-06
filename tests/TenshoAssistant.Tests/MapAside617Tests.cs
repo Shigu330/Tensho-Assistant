@@ -32,6 +32,15 @@ internal static class MapAside617Tests
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs"));
             Check(reader.Contains("try{ReadPlace();Read(\"place\");}catch(Exception error)"),"guarded on the framework thread");
         }),
+        ("Map request (0.627): the same request again is what the game kept: the map opens on the player",() =>
+        {
+            var kept=new TenshoAssistant.Maps.GameMapRequest(919,919,1278,12,QuestLog:true,Target:new System.Numerics.Vector2(29,13));
+            Check(kept.Pointed,"captured in the log: a quest request");
+            var plain=kept.Plain();
+            Check(!plain.Pointed && plain.Selected==12 && plain.Requested==12 && plain.Target is null,"asks for nothing, on the player's map");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));
+            Check(view.Contains("if(signature==lastPointed)request=request.Plain();"),"only when unchanged");
+        }),
         ("Map enlarged: no stepping aside then, the same as before otherwise",() =>
         {
             var tracker=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.TrackerWindow.cs")).Replace("\r\n","\n");

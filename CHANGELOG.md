@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.627.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : après un clic sur une quête, chaque ouverture avec la touche de carte revenait sur cette quête, car le jeu garde sa dernière demande. Une demande identique à la précédente ouvre maintenant la carte sur le joueur. Limite : recliquer la même quête après avoir fermé la carte ne la recentre plus sur elle.
+- Tests : Map request. Verify.ps1 (agent) : 1135/1135, 0 avertissement, 0 erreur ; DLL 0.627.0.0. Non validé en jeu.
+### English
+- Map (user report, log): after clicking a quest, each opening with the map key went back to that quest, because the game keeps its last request. A request identical to the previous one now opens the map on the player. Limit: clicking the same quest again after closing the map no longer centres on it.
+
 ## 0.626.0
 - Plan global, phase 5 : Carte (rapport de l'utilisateur) : cliquer sur le nom d'un lien de carte, comme « Limsa Lominsa - L'Entrepont », ouvre cette carte, comme son icône ; le nom s'éclaircit au survol.
 - Tests : Map labels. Verify.ps1 (agent) : 1134/1134, 0 avertissement, 0 erreur ; DLL 0.626.0.0. Non validé en jeu.

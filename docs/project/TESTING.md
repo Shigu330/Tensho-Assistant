@@ -730,7 +730,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.543) Carte : les quatre réglages des noms et des étiquettes de récolte changent bien l'affichage ; aux valeurs par défaut, rien ne change.
 
-- [ ] (0.544) Carte : clic droit sur un point, puis sur le drapeau : « Éthérite la plus proche » donne le nom et le coût, et demande confirmation.
+- [x] (0.544) Carte : clic droit sur un point, puis sur le drapeau : « Éthérite la plus proche » donne le nom et le coût, et demande confirmation.
 
 - [ ] (0.545) Carte : la molette zoome aussi sur la colonne d'outils et le curseur ; le pas et l'inversion fonctionnent.
 
@@ -895,6 +895,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] (0.625) Carte ouverte, parler à un PNJ de Triple Triade, refermer son menu : la carte revient. Fermer la carte avec sa touche : elle reste fermée.
 
 - [x] (0.626) Cliquer sur « Limsa Lominsa - L'Entrepont » : la carte change. Glisser depuis le nom ne change pas de carte.
+
+- [ ] (0.627) Cliquer une quête dans le journal, fermer la carte, la rouvrir avec sa touche : elle s'ouvre sur toi. Cliquer une autre quête : elle s'y centre.
 
 **0.535 : interfaces** — à voir en jouant
 

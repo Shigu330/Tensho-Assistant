@@ -30,6 +30,7 @@ internal sealed class NativeMapReplacer : IDisposable
     public void OpenGameMap()=>Interlocked.Exchange(ref openRequest,1);
     // 0.625: the game closes its map when a talk or an event starts: it comes back at the end.
     private readonly MapResume resume=new();
+    private string lastPointed="";
     private ICondition? occupiedFlags;
     private bool Occupied()
     {
@@ -96,6 +97,12 @@ internal sealed class NativeMapReplacer : IDisposable
                 {
                     hosted=true;
                     var (request,signature)=ReadRequest(true);lastRequest=signature;
+                    // 0.627: the same request as last time is what the game kept, not a new one.
+                    if(request.Pointed)
+                    {
+                        if(signature==lastPointed)request=request.Plain();
+                        else lastPointed=signature;
+                    }
                     open(request);
                 }
             }
@@ -114,7 +121,7 @@ internal sealed class NativeMapReplacer : IDisposable
                     // Off screen every frame (the game moves it back when it animates); a new request (journal, link) is relayed.
                     if(unit->RootNode!=null)unit->RootNode->SetPositionFloat(-9000,-9000);
                     var (request,signature)=ReadRequest(false);
-                    if(signature!=lastRequest){lastRequest=signature;if(request.Pointed)open(request);}
+                    if(signature!=lastRequest){lastRequest=signature;if(request.Pointed){lastPointed=signature;open(request);}}
                 }
             }
             if(!visible)keepGameMap=false;
