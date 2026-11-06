@@ -14,12 +14,21 @@ internal static class ListPanels691Tests
             Check(Read("MainWindow.WorkshopProjects.cs").Contains("BoolSetting(\"FreeCompany.WorkshopPanel\""),"workshop setting");
             Check(Read("MainWindow.CraftPlan.cs").Contains("BoolSetting(\"PlanUi.Panel\""),"preparation setting");
         }),
+        ("List panels: the crafting list has its own, with its setting on its tab, and the island's board does not hide a panel",() =>
+        {
+            Check(Read("MainWindow.CraftLists.cs").Contains("BoolSetting(\"CraftLists.Panel\""),"setting");
+            Check(Read("MainWindow.TrackerWindow.cs").Contains("new(this,CraftListListPanel)"),"created");
+            Check(!new TenshoAssistant.Configuration().CraftListPanel,"off by default");
+            Check(TenshoAssistant.UI.GameWindows.Ignored("MJIHud"),"the board");
+            Check(TenshoAssistant.UI.GameWindows.Ignored("JobHudRRP0") && TenshoAssistant.UI.GameWindows.Ignored("JobHudRRP1"),"the job gauges, read in the log");
+            Check(!TenshoAssistant.UI.GameWindows.Ignored("MJIAnimalManagement"),"the pasture window stays a window");
+        }),
         ("List panels: hidden in combat, and unread stocks are not shown as zero",() =>
         {
             var page=Read("MainWindow.ListPanels.cs");
-            Check(System.Text.RegularExpressions.Regex.Matches(page,@"InCombat:true").Count==2,"combat");
+            Check(System.Text.RegularExpressions.Regex.Matches(page,@"InCombat:true").Count==3,"combat");
             Check(page.Contains("if(!stock.HasObservation)ImGui.TextDisabled("),"unknown is not zero");
-            Check(System.Text.RegularExpressions.Regex.Matches(page,@"RefreshRecipeHoldingsCache\(\);").Count==2,"stocks refreshed");
+            Check(System.Text.RegularExpressions.Regex.Matches(page,@"RefreshRecipeHoldingsCache\(\);").Count==3,"stocks refreshed");
         }),
     ];
 }

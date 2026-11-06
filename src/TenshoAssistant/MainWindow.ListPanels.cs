@@ -17,6 +17,25 @@ internal sealed partial class MainWindow
     private PanelDefinition PreparationListPanel=>new("PreparationPanel","###TenshoPreparationList",new Vector2(340,420),ListPanelFlags,
         ()=>configuration.PreparationPanel,PreparationPanelVisible,DrawPreparationPanelContents,()=>{if(configuration.PreparationPanel){configuration.PreparationPanel=false;SaveReminders();}},()=>localization.Get("PlanUi.PanelTitle"),0.75f);
 
+    private CraftList? craftListPanelShown;
+    private PanelDefinition CraftListListPanel=>new("CraftListPanel","###TenshoCraftListList",new Vector2(640,420),ListPanelFlags,
+        ()=>configuration.CraftListPanel,CraftListPanelVisible,DrawCraftListPanelContents,()=>{if(configuration.CraftListPanel){configuration.CraftListPanel=false;SaveReminders();}},()=>localization.Get("CraftLists.PanelTitle"),0.75f);
+
+    private bool CraftListPanelVisible()
+    {
+        if(windowDisposed || !configuration.CraftListPanel || mapLive?.State is { InCombat:true } || itemCatalog.State.Catalog is null || CraftListStore is not { Unavailable:false } store)return false;
+        craftListPanelShown=store.Lists.FirstOrDefault(list=>list.Name==configuration.CraftListPanelName);
+        return craftListPanelShown is { Entries.Count:>0 };
+    }
+
+    private void DrawCraftListPanelContents()
+    {
+        if(craftListPanelShown is not { } list)return;
+        RefreshRecipeHoldingsCache();
+        ImGui.TextColored(Accent,list.Name);
+        foreach(var (item,required) in CraftLists.Ingredients(CraftListPlans(list)))DrawListPanelLine(item,required,GetRecipeHoldings(item));
+    }
+
     private bool WorkshopPanelVisible()
     {
         if(windowDisposed || !configuration.WorkshopPanel || mapLive?.State is { InCombat:true } || itemCatalog.State.Catalog is null || WorkshopProjectsLoad is not { } load)return false;

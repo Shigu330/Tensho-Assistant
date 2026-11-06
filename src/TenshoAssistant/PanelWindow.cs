@@ -32,7 +32,7 @@ internal sealed class PanelWindow : Window
 
     public override bool DrawConditions()
     {
-        try { return !broken && panel.Visible() && !(lastPosition is { } at && owner.BarBehindGame(at, lastSize)); }
+        try { return !broken && panel.Visible() && !(lastPosition is { } at && owner.BarBehindGame(at, lastSize, panel.Name)); }
         catch (Exception error) { TurnOff(error); return false; }
     }
 

@@ -8,7 +8,9 @@ public static class GameWindows
 {
     // What the game keeps on screen without being a window in front of anything (log of 2026-11-05, docs/evidence/0.537-game-windows.md): HUD parts start with « _ ». 0.538 (user capture): its tooltips count, like its windows.
     // 0.679 (user report, log of 2026-11-06): MJIPadGuide is up in every mode of the Island Sanctuary with nothing to see, and made the map leave.
-    private static readonly string[] NotWindows=["_","NamePlate","CastBar","ChatLog","ScenarioTree","CursorAddon","AreaMap","MJIPadGuide"];
+    // 0.692 (user report, log of 2026-11-06: « Panel WorkshopPanel steps aside ... windows: JobHudRRP0, JobHudRRP1 »): the job gauges are HUD, always up: a panel over them could never be seen, nor moved away.
+    // MJIHud, the island's management board, is the same kind of thing.
+    private static readonly string[] NotWindows=["_","NamePlate","CastBar","ChatLog","ScenarioTree","CursorAddon","AreaMap","MJIPadGuide","MJIHud","JobHud"];
     public static bool Ignored(string name)=>NotWindows.Any(start=>name.StartsWith(start,StringComparison.Ordinal));
 
     /// <param name="anchors">The game window the interface belongs to, by the start of its name: it and its parts never cover it, and only what is in front of it counts. None: whatever touches it.</param>

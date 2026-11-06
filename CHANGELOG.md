@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.692.0
+- Plan global, W-05 : Rapports de l'utilisateur : la case manquait dans Liste de fabrication, elle y est, avec son panneau à l'écran qui suit la liste choisie. Le panneau d'atelier ne s'affichait pas sur l'île : le journal, qui dit désormais ce qui écarte un panneau, a donné la cause : sa place par défaut chevauche les jauges de métier (JobHudRRP0, JobHudRRP1), comptées comme des fenêtres devant lui. Elles n'en sont plus, ni le tableau de gestion de l'île. COMPILED et TESTED, non validé en jeu.
+- Tests : ListPanels691Tests. Verify.ps1 (agent) : 1228/1228, 0 avertissement, 0 erreur ; DLL 0.692.0.0. Non validé en jeu.
+### English
+- User reports: the box was missing from the Crafting list tab; it is there, with an on-screen panel following the chosen list. The workshop panel did not show on the island: the log, which now says what hides a panel, gave the cause: its default place overlaps the job gauges (JobHudRRP0, JobHudRRP1), counted as windows in front of it. They no longer count, nor does the island's management board. COMPILED and TESTED, not validated in game.
+
 ## 0.691.0
 - Plan global, W-05 : Demande de l'utilisateur : deux petits panneaux à l'écran, juste la liste des matériaux avec le stock sur le requis. Compagnie libre › Atelier : « Afficher ce projet à l'écran », qui suit le projet choisi. Artisanat › Préparation : « Afficher cette préparation à l'écran », qui suit la recette et la quantité. Masqués en combat, retenus entre deux sessions, désactivés par défaut. COMPILED et TESTED, non validé en jeu.
 - Tests : ListPanels691Tests. Verify.ps1 (agent) : 1227/1227, 0 avertissement, 0 erreur ; DLL 0.691.0.0. Non validé en jeu.

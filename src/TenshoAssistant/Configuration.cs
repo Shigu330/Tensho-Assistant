@@ -70,7 +70,7 @@ public static class ConfigurationReset
         // 0.375 (g, M-05): on-screen « to do » panel.
         "TaskPanel",
         // W-05 (0.691): on-screen lists.
-        "WorkshopPanel", "WorkshopPanelProject", "PreparationPanel", "PreparationPanelItem", "PreparationPanelRecipe", "PreparationPanelTarget",
+        "WorkshopPanel", "WorkshopPanelProject", "PreparationPanel", "PreparationPanelItem", "PreparationPanelRecipe", "PreparationPanelTarget", "CraftListPanel", "CraftListPanelName",
         // 0.376 (g, M-06): wear alert, bar and thresholds.
         "GearWear",
         // 0.386 (g, X-10): clocks of other time zones.
@@ -564,6 +564,9 @@ public sealed partial class Configuration
     public uint PreparationPanelItem { get; set; }
     public uint PreparationPanelRecipe { get; set; }
     public int PreparationPanelTarget { get; set; }
+    // 0.692 (user report): and of a crafting list, found by its name.
+    public bool CraftListPanel { get; set; }
+    public string CraftListPanelName { get; set; } = "";
     // 0.448 (N-08, DEC-026): the garden journal (64 beds at most, durations typed by the player) and its chat reminders (on: the player
     // only gets them for beds they noted).
     private List<Reminders.GardenBed>? gardenBeds;

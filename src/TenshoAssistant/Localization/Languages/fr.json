@@ -6029,6 +6029,9 @@
     "Help": "Plus basse annonce × quantité, moins le coût des achats ci-dessus ; taxes et profondeur des offres non comptées."
   },
   "CraftLists": {
+    "Panel": "Afficher cette liste à l'écran",
+    "PanelTip": "Un petit panneau avec les ingrédients directs de cette liste, en stock sur requis, hors combat. Il suit la liste choisie ici.",
+    "PanelTitle": "Liste de fabrication",
     "ColumnIngredient": "Ingrédient",
     "ColumnRequired": "Requis",
     "ColumnHeld": "En stock",

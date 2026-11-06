@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
     }
 
     /// <summary>0.514: the free-standing panels, as Dalamud windows; Plugin adds them to its window system.</summary>
-    internal PanelWindow[] CreatePanelWindows()=>[new(this,TrackerPanel),new(this,TasksPanel),new(this,WearPanel),new(this,RegenTickPanel),new(this,WorkshopListPanel),new(this,PreparationListPanel)];
+    internal PanelWindow[] CreatePanelWindows()=>[new(this,TrackerPanel),new(this,TasksPanel),new(this,WearPanel),new(this,RegenTickPanel),new(this,WorkshopListPanel),new(this,PreparationListPanel),new(this,CraftListListPanel)];
     /// <summary>0.537: the game's windows, for the interfaces that step aside when one comes in front.</summary>
     internal Func<IReadOnlyList<UI.GameWindow>>? GameWindowSource { get; set; }
     internal IReadOnlyList<UI.GameWindow> GameWindowList=>GameWindowSource?.Invoke() ?? [];
@@ -64,7 +64,18 @@ internal sealed partial class MainWindow
         var screen=ImGui.GetMainViewport().Size;
         return UI.GameWindows.Covers(GameWindowList,at.X,at.Y,size.X,size.Y,screen.X,screen.Y);
     }
-    internal bool BarBehindGame(Vector2 at,Vector2 size)=>configuration.HideBarsBehindGame && BehindGame(at,size);
+    internal bool BarBehindGame(Vector2 at,Vector2 size,string? name=null)
+    {
+        var behind=configuration.HideBarsBehindGame && BehindGame(at,size);
+        // 0.692: what hides a panel, on each change, to read a « panel never shows » report in the log.
+        if(name is not null && panelsBehind.GetValueOrDefault(name)!=behind)
+        {
+            panelsBehind[name]=behind;
+            log.Information("Panel {0} {1}: at {2}, size {3}; windows: {4}.",name,behind ? "steps aside":"comes back",at,size,string.Join(", ",GameWindowList.Where(window=>UI.GameWindows.Touch(at.X,at.Y,size.X,size.Y,window.X,window.Y,window.Width,window.Height)).Select(window=>window.Name)));
+        }
+        return behind;
+    }
+    private readonly Dictionary<string,bool> panelsBehind=[];
     // 0.539 (user report): a panel attached to a game window goes with it: it hides the map as the window does.
     internal bool MapBehindGame(Vector2 at,Vector2 size)
     {

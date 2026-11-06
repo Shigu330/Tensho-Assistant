@@ -1024,6 +1024,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.691) Cocher chaque option : le panneau suit le projet ou la recette, le stock change après un ramassage, il disparaît en combat, la croix le coupe.
 
+- [ ] (0.692) Sur l'île, le panneau du projet d'atelier doit apparaître, et se déplacer ; cocher le panneau de Liste de fabrication.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

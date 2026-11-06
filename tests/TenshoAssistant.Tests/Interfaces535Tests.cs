@@ -26,7 +26,7 @@ internal static class Interfaces535Tests
             foreach(var name in new[]{"MonsterNote","InventoryExpansion","Character","RecipeNote","ItemDetail","ActionDetail","Tooltip","ContextMenu"})Check(!GameWindows.Ignored(name),"a window: "+name);
             var host=Read("AttachedPanels.cs");
             Check(host.Contains("[\"TenshoInventorySort\"] = [\"Inventory\"]") && host.Contains("id == HoverPanel || !owner.HidePanelsBehindGame && id != SortButton"),"each panel has its window; the sort button leaves whatever the setting");
-            Check(Read("MapViewWindow.cs").Contains("owner.MapBehindGame(at, lastSize)") && Read("PanelWindow.cs").Contains("owner.BarBehindGame(at, lastSize)"),"map and bars");
+            Check(Read("MapViewWindow.cs").Contains("owner.MapBehindGame(at, lastSize)") && Read("PanelWindow.cs").Contains("owner.BarBehindGame(at, lastSize, panel.Name)"),"map and bars");
             var configuration=new TenshoAssistant.Configuration();
             Check(configuration.HidePanelsBehindGame && configuration.HideBarsBehindGame && !configuration.MapView.HideBehindGame,"panels and bars on, the map off");
         }),

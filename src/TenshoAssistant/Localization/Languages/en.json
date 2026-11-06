@@ -6029,6 +6029,9 @@
     "Help": "Lowest listing × quantity, minus the purchase cost above; taxes and listing depth not counted."
   },
   "CraftLists": {
+    "Panel": "Show this list on screen",
+    "PanelTip": "A small panel with this list's direct ingredients, in stock over needed, out of combat. It follows the list chosen here.",
+    "PanelTitle": "Crafting list",
     "ColumnIngredient": "Ingredient",
     "ColumnRequired": "Required",
     "ColumnHeld": "Held",
