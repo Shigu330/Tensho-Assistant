@@ -180,6 +180,10 @@ public sealed class Plugin : IDalamudPlugin
             var wikiVistas=new Maps.WikiVistaSource(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
             registrations.Register(()=>{},wikiVistas.Dispose);
             mainWindow.ConfigureWikiVistas(wikiVistas);
+            // W-04 (0.685): the island's animals on the wiki, on the player's click only.
+            var islandAnimalBook=new Island.IslandAnimalSource(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
+            registrations.Register(()=>{},islandAnimalBook.Dispose);
+            mainWindow.IslandAnimalBookSource=islandAnimalBook;
             Maps.NativeMapReplacer? mapReplacer=null;
             registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,condition,()=>configuration.MapView,mainWindow.ShowMapFromGame,()=>mainWindow.MapViewOpen,()=>mainWindow.MapViewVisible(),mainWindow.CloseMapFromGame,log),()=>mapReplacer?.Dispose());
             mainWindow.ConfigureGameMapOpener(()=>mapReplacer?.OpenGameMap());
@@ -699,6 +703,33 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.CabinetItems=()=>cabinetItems??=data.GetExcelSheet<Lumina.Excel.Sheets.Cabinet>().Where(row=>row.Item.RowId!=0).Select(row=>row.Item.RowId).ToHashSet();
             mainWindow.RouletteName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentRoulette>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.IslandPoints=LoadSheet("MJIGatheringItem",()=>Maps.IslandResources.Points(data.GetExcelSheet<Lumina.Excel.Sheets.MJIGatheringItem>().Select(row=>(row.Item.RowId,(int)row.X,(int)row.Y,(int)row.Radius))),[]);
+            // W-04 (0.685): the pasture, read when the tab opens and on the player's click.
+            mainWindow.ReadPasture=()=>framework.RunOnFrameworkThread(()=>
+            {
+                try
+                {
+                    var names=data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>();
+                    return Island.PastureReader.Read(id=>names.GetRowOrDefault(id)?.Singular.ExtractText());
+                }
+                catch(Exception error){log.Warning(error,"Pasture unreadable (game update?).");throw;}
+            });
+            // The wiki's English words, in the game's language: each sheet read once in each language, off the framework.
+            mainWindow.LocalizeIslandAnimals=rows=>Task.Run(()=>
+            {
+                static Func<string,string?> Words(IEnumerable<(string English,string Own)> pairs)
+                {
+                    var map=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);
+                    foreach(var (english,own) in pairs)if(english.Length>0 && own.Length>0)map.TryAdd(english,own);
+                    return word=>map.GetValueOrDefault(word);
+                }
+                var npcOwn=data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>();var itemOwn=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();var weatherOwn=data.GetExcelSheet<Lumina.Excel.Sheets.Weather>();
+                var wanted=rows.Select(row=>row.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                var words=rows.SelectMany(row=>new[]{row.Restraint,row.Common,row.Bonus}).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                var npc=Words(data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>(Dalamud.Game.ClientLanguage.English).Where(row=>wanted.Contains(row.Singular.ExtractText())).Select(row=>(row.Singular.ExtractText(),npcOwn.GetRowOrDefault(row.RowId)?.Singular.ExtractText() ?? "")));
+                var item=Words(data.GetExcelSheet<Lumina.Excel.Sheets.Item>(Dalamud.Game.ClientLanguage.English).Where(row=>words.Contains(row.Name.ExtractText())).Select(row=>(row.Name.ExtractText(),itemOwn.GetRowOrDefault(row.RowId)?.Name.ExtractText() ?? "")));
+                var weather=Words(data.GetExcelSheet<Lumina.Excel.Sheets.Weather>(Dalamud.Game.ClientLanguage.English).Select(row=>(row.Name.ExtractText(),weatherOwn.GetRowOrDefault(row.RowId)?.Name.ExtractText() ?? "")));
+                return Island.IslandAnimalBook.Localized(rows,npc,item,weather);
+            });
             // 0.684: what stands on the island, to name the game's markers that come with no text; read once, off the framework, on the island only.
             mainWindow.IslandPlacesLoad=()=>
             {

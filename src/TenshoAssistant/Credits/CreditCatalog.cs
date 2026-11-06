@@ -109,6 +109,8 @@ public static class CreditCatalog
         // 0.670 (N-12): the spawn conditions of the S ranks, crossed and in Tensho's own words.
         new("EliteMarks", CreditKind.Rule, "Elite Marks (FFXIV Console Games Wiki)", "", "GFDL-1.2-or-later", "https://ffxiv.consolegameswiki.com/wiki/Elite_Marks", "https://ffxiv.consolegameswiki.com/wiki/FFXIV_Wiki:About",
             ["Hunting/SRankConditions.cs", "MainWindow.SRankConditions.cs"], [], "", false),
+        new("IslandPastureWiki", CreditKind.Rule, "Island Pasture (FFXIV Console Games Wiki)", "", "GFDL-1.2-or-later", "https://ffxiv.consolegameswiki.com/wiki/Island_Pasture", "https://ffxiv.consolegameswiki.com/wiki/FFXIV_Console_Games_Wiki:Copyrights",
+            ["Island/IslandAnimals.cs", "MainWindow.IslandPasture.cs"], [], "", false),
         new("IslandWorkshopWiki", CreditKind.Rule, "Island Workshop (FFXIV Console Games Wiki)", "", "GFDL-1.2-or-later", "https://ffxiv.consolegameswiki.com/wiki/Island_Workshop", "https://ffxiv.consolegameswiki.com/wiki/FFXIV_Wiki:About",
             ["Island/IslandMaterials.cs", "Island/IslandCatalog.cs"], [], "", false),
         new("SRankGuide", CreditKind.Rule, "Final Fantasy XIV: The Hunt (S rank guide)", "", "none", "https://srankguide.carrd.co", "",

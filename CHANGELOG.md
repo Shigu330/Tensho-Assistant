@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.685.0
+- Plan global, W-04 : Animaux de la Félicité insulaire, à la demande de l'utilisateur. La page passe en deux onglets, Atelier et Pâturage. Pâturage : vos animaux lus dans le jeu (surnom, humeur, satiété, collecte, curation), et sur clic la liste du wiki : lieu avec drapeau, heure d'Éorzéa, météo, taille, capture, ressources. Le jeu ne donne ni lieux ni conditions : ces données sont lues sur le wiki à la demande, marquées comme communautaires, avec noms, objets et météos dans la langue du jeu. Rien n'est collecté ni nourri. COMPILED et TESTED, non validé en jeu.
+- Tests : IslandAnimals685Tests. Verify.ps1 (agent) : 1219/1219, 0 avertissement, 0 erreur ; DLL 0.685.0.0. Non validé en jeu.
+### English
+- Island Sanctuary animals, at the user's request. The page becomes two tabs, Workshop and Pasture. Pasture: your animals read from the game, and on a click the wiki's list: place with a flag, Eorzea time, weather, size, capture, leavings. The game holds neither places nor conditions: those are read from the wiki on request, marked as community data, with names, items and weathers in the game's language. Nothing is collected or fed. COMPILED and TESTED, not validated in game.
+
 ## 0.684.0
 - Plan global, Félicité insulaire, carte : Demandes de l'utilisateur : les ressources de la Félicité insulaire se règlent par type, avec les cinq types du jeu (plantes, bois, roches, terre, pêche), dans le menu Affichage seulement. Deux lieux du même type au même endroit ne font plus qu'une icône. Le « ! » sans texte prend le nom de ce qui se trouve là, un panneau de construction par exemple. Le classement des objets par type est déduit des noms : aucune feuille ne le donne. COMPILED et TESTED, non validé en jeu.
 - Tests : Island679Tests. Verify.ps1 (agent) : 1213/1213, 0 avertissement, 0 erreur ; DLL 0.684.0.0. Non validé en jeu.

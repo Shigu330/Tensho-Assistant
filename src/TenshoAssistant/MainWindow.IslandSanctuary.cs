@@ -22,6 +22,17 @@ internal sealed partial class MainWindow
     private void DrawIslandSanctuary()
     {
         Heading(localization.Get("Island.Title"),localization.Get("Island.Subtitle"));
+        if(!ImGui.BeginTabBar("IslandTabs"))return;
+        try
+        {
+            if(ImGui.BeginTabItem(localization.Get("Island.TabWorkshop")+"###IslandTabWorkshop")){try{DrawIslandWorkshop();}finally{ImGui.EndTabItem();}}
+            if(ImGui.BeginTabItem(localization.Get("Island.TabPasture")+"###IslandTabPasture")){try{DrawIslandPasture();}finally{ImGui.EndTabItem();}}
+        }
+        finally{ImGui.EndTabBar();}
+    }
+
+    private void DrawIslandWorkshop()
+    {
         if(!islandCatalogTried){islandCatalogTried=true;islandCatalog=IslandCatalogLoad?.Invoke();}
         if(islandCatalog is not { Valid:true } catalog){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Island.SheetsUnavailable"));return;}
         ImGui.TextWrapped(localization.Get("Island.Help"));
