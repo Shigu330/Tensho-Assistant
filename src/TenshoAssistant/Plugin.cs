@@ -626,7 +626,9 @@ public sealed class Plugin : IDalamudPlugin
                 .Where(row=>!row.Name.IsEmpty && row.ClassJobLevel>0)
                 .Select(row=>new Leves.LeveDefinition(row.RowId,row.Name.ExtractText(),row.ClassJobLevel,row.LeveAssignmentType.RowId,
                     row.LeveAssignmentType.ValueNullable?.Name.ExtractText() ?? "",(uint)Math.Max(0,row.LeveAssignmentType.ValueNullable?.Icon ?? 0),
-                    row.LeveClient.ValueNullable?.Name.ExtractText() ?? "",row.PlaceNameStartZone.ValueNullable?.Name.ExtractText() ?? "",row.GilReward,row.AllowanceCost))
+                    row.LeveClient.ValueNullable?.Name.ExtractText() ?? "",row.PlaceNameStartZone.ValueNullable?.Name.ExtractText() ?? "",row.GilReward,row.AllowanceCost,
+                    row.LevelLevemete.ValueNullable is { Map.RowId:not 0 } client ? new(client.Map.RowId,client.X,client.Z):null,
+                    row.LevelStart.ValueNullable is { Map.RowId:not 0 } start ? new(start.Map.RowId,start.X,start.Z):null))
                 .OrderBy(leve=>leve.Level).ThenBy(leve=>leve.Name,StringComparer.CurrentCulture).ToArray();
             Leves.LeveProgressReader? leveReader=null;
             registrations.Register(()=>leveReader=new Leves.LeveProgressReader(framework,client,player,unlocks,data,log,LeveList),()=>leveReader?.Dispose());

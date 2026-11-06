@@ -5219,6 +5219,8 @@
     "NotOwned": "missing"
   },
   "Leves": {
+    "AetheryteClient": "Nearest aetheryte to the client",
+    "AetheryteStart": "Nearest aetheryte to the leve",
     "TooltipAllowances": "Allowances: {0}",
     "Title": "Guildleves",
     "Description": "Game data · state read in game for the logged-in character",

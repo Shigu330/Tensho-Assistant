@@ -1,7 +1,9 @@
 namespace TenshoAssistant.Leves;
 
 /// <summary>A guildleve of the game data (Leve sheet): level, assignment type, client, start zone, gil reward and allowance cost.</summary>
-public sealed record LeveDefinition(uint Id,string Name,int Level,uint TypeId,string Type,uint TypeIcon,string Client,string Zone,uint Gil,byte Allowances);
+public sealed record LeveDefinition(uint Id,string Name,int Level,uint TypeId,string Type,uint TypeIcon,string Client,string Zone,uint Gil,byte Allowances,LevePlace? ClientPlace=null,LevePlace? StartPlace=null);
+/// <summary>W-08 (0.698): a Level row of a leve: its map and world position. The client's, and where the leve starts.</summary>
+public sealed record LevePlace(uint MapId,float X,float Z);
 
 /// <summary>What the game says about the character's guildleves: completed (null = not read), accepted ones (id, step), allowances left.</summary>
 public sealed record LeveProgressState(IReadOnlySet<uint>? Completed,IReadOnlyList<uint> Accepted,int? Allowances,DateTimeOffset ReadAt);

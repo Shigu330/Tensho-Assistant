@@ -16,6 +16,13 @@ internal static class ReminderTabs687Tests
                 Check(page.LastIndexOf(section,StringComparison.Ordinal)==first,section+" once");
             }
         }),
+        ("Leves: a right click goes through the aetheryte question, for the client and for the leve",() =>
+        {
+            var page=Read("MainWindow.Leves.cs");
+            Check(page.Contains("DrawLeveMenu(leve);") && page.Contains("BeginPopupContextItem"),"menu");
+            Check(page.Contains("AskNearestAetheryteAt(map,MapProjection.PixelFromWorld(new Vector3(place.X,0,place.Z),map),leve.Name,flag:true)"),"the existing question, no teleport of its own");
+            Check(!page.Contains("Telepo."),"no direct call");
+        }),
         ("Leves: the tooltip says what the columns say, for everyone, and the id stays for developers",() =>
         {
             var page=Read("MainWindow.Leves.cs");

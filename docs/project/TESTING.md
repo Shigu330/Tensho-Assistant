@@ -1036,6 +1036,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.697) Que faire avec ? : décocher la case pendant une recherche doit l'arrêter ; essayer chaque filtre ; dire s'il manque des types de collection.
 
+- [ ] (0.698) Mandats : clic droit, les deux entrées : le drapeau et la question de téléportation doivent viser le bon endroit ; comparer le lieu du mandat avec le jeu.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

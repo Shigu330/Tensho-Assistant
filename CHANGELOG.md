@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.698.0
+- Plan global, W-08 : Demande de l'utilisateur : clic droit sur un mandat : « Éthérite la plus proche du mandateur » ou « du mandat ». Le drapeau se place, la carte Tensho s'ouvre dessus et la question de téléportation habituelle s'affiche. Le lieu vient des feuilles du jeu (LevelLevemete, LevelStart). COMPILED et TESTED, non validé en jeu.
+- Tests : ReminderTabs687Tests. Verify.ps1 (agent) : 1239/1239, 0 avertissement, 0 erreur ; DLL 0.698.0.0. Non validé en jeu.
+### English
+- User request: right click on a leve: nearest aetheryte to the client or to the leve. The flag is placed, the Tensho map opens on it and the usual teleport question shows. The place comes from the game's sheets (LevelLevemete, LevelStart). COMPILED and TESTED, not validated in game.
+
 ## 0.697.0
 - Plan global, Monnaies : Demande de l'utilisateur : l'onglet « Que faire avec ? » a une case « Chercher les prix du marché », qui arrête aussi une recherche en cours, un filtre (Tout, Collection seulement, Collection manquante, Vendable au marché) et une recherche par nom. La collection couvre les montures et les mascottes. COMPILED et TESTED, non validé en jeu.
 - Tests : CurrencyValue695Tests. Verify.ps1 (agent) : 1238/1238, 0 avertissement, 0 erreur ; DLL 0.697.0.0. Non validé en jeu.

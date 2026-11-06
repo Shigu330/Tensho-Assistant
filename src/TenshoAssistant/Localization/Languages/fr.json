@@ -5219,6 +5219,8 @@
     "NotOwned": "manquante"
   },
   "Leves": {
+    "AetheryteClient": "Éthérite la plus proche du mandateur",
+    "AetheryteStart": "Éthérite la plus proche du mandat",
     "TooltipAllowances": "Allocations : {0}",
     "Title": "Mandats",
     "Description": "Données du jeu · état lu dans le jeu pour le personnage connecté",
