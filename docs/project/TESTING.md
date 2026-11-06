@@ -998,6 +998,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.677) Cartes & repères : les 4 onglets et leur contenu ; cliquer un favori dans Repères doit ramener sur Cartes avec ses coordonnées ; Paramètres › Favoris doit ouvrir l'onglet Repères ; rien ne doit avoir disparu.
 
+- [ ] (0.678) Production › Félicité insulaire : les mots de la page doivent être ceux de la fenêtre du jeu ; signaler « création » et « efficace » s'ils diffèrent.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

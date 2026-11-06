@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.678.0
+- Plan global, Félicité insulaire : Correction, rapport de l'utilisateur : le jeu dit « Félicité insulaire », pas « Île sanctuaire ». Le reste de la page a été comparé à la feuille Addon du jeu : « entrain » devient « enthousiasme », « agenda » devient « carnet de fabrication » ou « planification », « offre » devient « disponibilité », « rang de l'île » devient « rang de félicité ». Ces mots étaient des traductions de l'agent. Textes français seulement. COMPILED et TESTED, non validé en jeu.
+- Tests : Languages. Verify.ps1 (agent) : 1195/1195, 0 avertissement, 0 erreur ; DLL 0.678.0.0. Non validé en jeu.
+### English
+- Fix from a user report: the French game says Félicité insulaire, not Île sanctuaire. The rest of the page was compared with the game's Addon sheet and its French words corrected: enthousiasme, carnet de fabrication, planification, disponibilité, rang de félicité. French texts only. COMPILED and TESTED, not validated in game.
+
 ## 0.677.0
 - Plan global, Cartes : Demande de l'utilisateur : la page Cartes & repères était une longue suite de sections, elle passe en onglets. Cartes : recherche, liste des cartes, coordonnées. Repères : favoris, liens du chat, annuaire des lieux. Chasse : train de chasse et conditions des rangs S, ouverts d'office. Terrains en vente : PaissaDB. Le bouton d'ouverture de la carte Tensho reste au-dessus. Choisir un favori, utiliser un point de la carte ou le lieu d'un monstre ramène sur l'onglet Cartes, qui contient les coordonnées. COMPILED et TESTED, non validé en jeu.
 - Tests : MapTabs677Tests. Verify.ps1 (agent) : 1195/1195, 0 avertissement, 0 erreur ; DLL 0.677.0.0. Non validé en jeu.
