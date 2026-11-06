@@ -25,9 +25,12 @@ internal static class IslandReader
             var workshop=manager->IslandState.Workshops[index];
             if(workshop.PlaceId!=0)workshops.Add(new(index,workshop.BuildingLevel+1,workshop.UnderConstruction));
         }
+        var landmarks=0;
+        foreach(var landmark in manager->LandmarkPlacements)
+            if(landmark.LandmarkId!=0 && landmark.UnderConstruction==0)landmarks++;
         uint? groove=null;
         var agent=AgentMJICraftSchedule.Instance();
         if(agent!=null && agent->Data!=null && agent->Data->UpdateState==2)groove=agent->Data->Groove;
-        return new(status,now,rank,workshops,groove,manager->CurrentGroove,manager->CurrentCycleDay,manager->CurrentPopularity,manager->NextPopularity,supplyDemand);
+        return new(status,now,rank,workshops,groove,manager->CurrentGroove,manager->CurrentCycleDay,manager->CurrentPopularity,manager->NextPopularity,supplyDemand,landmarks);
     }
 }

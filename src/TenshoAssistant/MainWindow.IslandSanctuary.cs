@@ -116,6 +116,7 @@ internal sealed partial class MainWindow
             lines.AddRange(chain.Steps.Select(step=>"  "+localization.Format(step.Efficient ? "Island.StepEfficient":"Island.Step",step.Start,step.Craft.Name,step.Craft.Hours,step.Value.ToString("0",culture))));
         }
         lines.Add(localization.Format("Island.AgendaTotal",agenda.Total.ToString("0",culture)));
+        lines.Add(localization.Format("Island.AgendaGroove",agenda.StartGroove,agenda.EndGroove,agenda.GrooveCap));
         return string.Join("\n",lines);
     }
 

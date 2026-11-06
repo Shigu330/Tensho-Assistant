@@ -191,7 +191,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | I-05, suite des ventes des servants | Essayer la 0.508 | |
 | N-04, loterie immobilière | Sonde : structure du jeu à trouver | |
 | N-07, ressources de l'île | Vérifier l'unité des positions | Carte faite en 0.667, liste des matériaux en 0.673 ; vos stocks de l'île ne sont pas lus |
-| N-10, atelier de l'île | Fait sans le jeu en 0.671 et suivantes (lecture, table) ; à vérifier en jeu : `docs/evidence/0.671-island-workshop.md` | Demandé par l'utilisateur le 2026-11-06 ; prévision de la semaine plus tard |
+| N-10, atelier de l'île | Fait sans le jeu en 0.671 et suivantes (lecture, table) ; à vérifier en jeu : `docs/evidence/0.671-island-workshop.md` | Demandé par l'utilisateur le 2026-11-06 ; montée de l'entrain comptée en 0.674 ; prévision de la semaine plus tard |
 | ~~Panneau du Dédale~~ abandonné (DEC-038) ; suite du dresseur | La page reste une liste d'informations, hors du Dédale | |
 
 ## Phase 6 : tests en jeu

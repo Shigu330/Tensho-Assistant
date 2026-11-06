@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.674.0
+- Plan global, N-10 : Île sanctuaire (N-10, entrain) : le total d'un agenda compte maintenant la montée de l'entrain, une création efficace à la fois, jusqu'au plafond lu d'après vos repères, et la page affiche son évolution sur le cycle. Les sources divergent sur le moment de la hausse (début ou fin de la création) : la fin est retenue, le total le plus bas. Le choix des créations ne change pas. Crédit ajouté : page Island Workshop du wiki, qui confirme aussi qu'une création efficace consomme ses matériaux une seule fois.
+- Tests : Island groove. Verify.ps1 (agent) : 1186/1186, 0 avertissement, 0 erreur ; DLL 0.674.0.0. Non validé en jeu.
+### English
+- Island sanctuary (N-10, groove): an agenda's total now counts the groove's rise, one efficient craft at a time, up to the cap from your landmarks, and the page shows how it moves over the cycle. Sources differ on when it rises (start or end of the craft): the end is kept, the lower total. The choice of crafts does not change. Credit added: the wiki's Island Workshop page, which also confirms an efficient craft uses its materials once.
+
 ## 0.673.0
 - Plan global, N-07 : Île sanctuaire (N-07, liste des matériaux) : chaque création affiche ses matériaux, et un agenda proposé donne le total de ses matériaux pour un cycle, à copier. D'après les données du jeu ; une création efficace compte une fois (un guide le dit, à comparer en jeu) ; les stocks de l'île ne sont pas lus. Plan : l'île de Lunule est notée pour plus tard, à la demande de l'utilisateur. Script de version : la ligne de reprise ne garde plus de restes après un numéro de version.
 - Tests : Island materials. Verify.ps1 (agent) : 1182/1182, 0 avertissement, 0 erreur ; DLL 0.673.0.0. Non validé en jeu.

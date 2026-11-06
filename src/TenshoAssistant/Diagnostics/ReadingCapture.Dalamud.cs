@@ -97,7 +97,9 @@ public sealed unsafe class ReadingCapture : IDisposable
         var shifts=manager->SupplyAndDemandShifts;
         var filled=0;
         foreach(var shift in shifts)if(shift!=0)filled++;
-        var state=$"rank {manager->IslandState.CurrentRank}, dirty {manager->DemandDirty}, popularity {manager->CurrentPopularity}/{manager->NextPopularity}, cycle {manager->CurrentCycleDay}, groove {manager->CurrentGroove}, rest {string.Join(".",manager->CraftworksRestDays.ToArray())}, shifts {filled}/{shifts.Length} first {shifts[1]:X2} {shifts[2]:X2}, workshops{workshops}";
+        var landmarks=new StringBuilder();
+        foreach(var landmark in manager->LandmarkPlacements)landmarks.Append($" {landmark.LandmarkId}/{landmark.UnderConstruction}");
+        var state=$"rank {manager->IslandState.CurrentRank}, dirty {manager->DemandDirty}, popularity {manager->CurrentPopularity}/{manager->NextPopularity}, cycle {manager->CurrentCycleDay}, groove {manager->CurrentGroove}, rest {string.Join(".",manager->CraftworksRestDays.ToArray())}, shifts {filled}/{shifts.Length} first {shifts[1]:X2} {shifts[2]:X2}, workshops{workshops}, landmarks{landmarks}";
         if(state!=islandState){islandState=state;Line("island",200,state);}
         var agent=AgentMJICraftSchedule.Instance();
         if(agent==null || agent->Data==null)return;

@@ -2,12 +2,12 @@ namespace TenshoAssistant.Island;
 
 public sealed record IslandStep(IslandCraft Craft,int Start,bool Efficient,double Value);
 public sealed record IslandChain(int Workshop,int Level,IReadOnlyList<IslandStep> Steps);
-public sealed record IslandAgenda(IReadOnlyList<IslandChain> Chains,double Total);
+public sealed record IslandAgenda(IReadOnlyList<IslandChain> Chains,double Total,int StartGroove=0,int EndGroove=0,int GrooveCap=0);
 
 /// <summary>
 /// N-10 (0.672): a proposed agenda for one cycle. The best chain of 24 hours for each workshop in turn, the highest level first, each one seeing the supply the
 /// chains before it have used. An efficient craft (a theme shared with the previous craft of its workshop, and another item) makes 2 units: community rule,
-/// WorkshopOptimizerPlugin (MIT), written again here. Bounded, deterministic, and not the best agenda possible: docs/evidence/0.672-island-agenda.md.
+/// WorkshopOptimizerPlugin (MIT), written again here. The groove rises in the totals, not in the search (0.674, docs/evidence/0.674-island-groove.md). Bounded, deterministic, and not the best agenda possible: docs/evidence/0.672-island-agenda.md.
 /// </summary>
 public static class IslandPlanner
 {
@@ -68,7 +68,10 @@ public static class IslandPlanner
 
     private static int Units(IReadOnlyList<IslandCraft> chain,int index)=>index>0 && Efficient(chain[index-1],chain[index]) ? 2:1;
 
-    /// <summary>The worth of the chains as they finish, in hour order: what is made first lowers the supply of what follows. The groove stays as read.</summary>
+    /// <summary>
+    /// The worth of the chains as they finish, in hour order: what finishes earlier lowers the supply and, when efficient, raises the groove of what follows.
+    /// Crafts finishing in the same hour do not see each other.
+    /// </summary>
     private static IslandAgenda Timeline(IslandCatalog catalog,IslandSnapshot island,List<(IslandWorkshop Workshop,IReadOnlyList<IslandCraft> Crafts)> chosen)
     {
         var events=new List<(int End,int Chain,int Step,int Start)>();
@@ -84,16 +87,25 @@ public static class IslandPlanner
         var produced=new Dictionary<uint,int>();
         var steps=chosen.Select(item=>new IslandStep[item.Crafts.Count]).ToArray();
         var total=0d;
-        foreach(var item in events.OrderBy(item=>item.End).ThenBy(item=>item.Chain))
+        var cap=IslandValue.GrooveCap(catalog,island);
+        var start=(int)Math.Min(island.Groove,(uint)cap);
+        var groove=start;
+        foreach(var hour in events.GroupBy(item=>item.End).OrderBy(group=>group.Key))
         {
-            var crafts=chosen[item.Chain].Crafts;
-            var craft=crafts[item.Step];
-            var units=Units(crafts,item.Step);
-            var worth=units*(IslandValue.Unit(craft,catalog,island,chosen[item.Chain].Workshop.Level,produced.GetValueOrDefault(craft.Id)) ?? 0);
-            produced[craft.Id]=produced.GetValueOrDefault(craft.Id)+units;
-            steps[item.Chain][item.Step]=new(craft,item.Start,units==2,worth);
-            total+=worth;
+            var seenProduced=new Dictionary<uint,int>(produced);
+            var seenGroove=(uint)groove;
+            foreach(var item in hour.OrderBy(item=>item.Chain))
+            {
+                var crafts=chosen[item.Chain].Crafts;
+                var craft=crafts[item.Step];
+                var units=Units(crafts,item.Step);
+                var worth=units*(IslandValue.Unit(craft,catalog,island,chosen[item.Chain].Workshop.Level,seenProduced.GetValueOrDefault(craft.Id),seenGroove) ?? 0);
+                produced[craft.Id]=produced.GetValueOrDefault(craft.Id)+units;
+                if(units==2)groove=Math.Min(groove+1,cap);
+                steps[item.Chain][item.Step]=new(craft,item.Start,units==2,worth);
+                total+=worth;
+            }
         }
-        return new(chosen.Select((item,index)=>new IslandChain(item.Workshop.Index,item.Workshop.Level,steps[index])).ToArray(),total);
+        return new(chosen.Select((item,index)=>new IslandChain(item.Workshop.Index,item.Workshop.Level,steps[index])).ToArray(),total,start,groove,cap);
     }
 }

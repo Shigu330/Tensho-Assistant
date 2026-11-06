@@ -27,6 +27,7 @@ internal static class IslandCatalogLoader
             data.GetExcelSheet<MJICraftworksPopularityType>().OrderBy(row=>row.RowId).Select(row=>(int)row.Ratio).ToArray(),
             data.GetExcelSheet<MJICraftworksSupplyDefine>().OrderBy(row=>row.RowId).Select(row=>(int)row.Ratio).ToArray(),
             data.GetExcelSheet<MJICraftworksRankRatio>().OrderBy(row=>row.RowId).Select(row=>(int)row.Ratio).ToArray(),
-            data.GetExcelSheet<MJICraftworksObjectTheme>().Where(row=>!row.Name.IsEmpty).ToDictionary(row=>row.RowId,row=>row.Name.ExtractText()));
+            data.GetExcelSheet<MJICraftworksObjectTheme>().Where(row=>!row.Name.IsEmpty).ToDictionary(row=>row.RowId,row=>row.Name.ExtractText()),
+            data.GetExcelSheet<MJICraftworksTension>().OrderBy(row=>row.RowId).Select(row=>(int)row.Unknown0).ToArray());
     }
 }

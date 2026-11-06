@@ -7,7 +7,7 @@ public sealed record IslandMaterial(uint ItemId,string Name,int Amount,string Ca
 public sealed record IslandCraft(uint Id,uint ItemId,string Name,int Hours,int Value,int LevelRequired,IReadOnlyList<uint> Themes,IReadOnlyList<IslandMaterial>? Materials=null);
 
 /// <summary>The workshops' sheets. Popularity: one row per MJICraftworksPopularity, one type per craft row. The ratios are percents, indexed by the row of their sheet.</summary>
-public sealed record IslandCatalog(int Rows,IReadOnlyList<IslandCraft> Crafts,IReadOnlyList<byte[]> Popularity,int[] PopularityRatio,int[] SupplyRatio,int[] RankRatio,IReadOnlyDictionary<uint,string> ThemeNames)
+public sealed record IslandCatalog(int Rows,IReadOnlyList<IslandCraft> Crafts,IReadOnlyList<byte[]> Popularity,int[] PopularityRatio,int[] SupplyRatio,int[] RankRatio,IReadOnlyDictionary<uint,string> ThemeNames,int[]? GrooveCaps=null)
 {
     /// <summary>False after a game update that changed the sheets' shape: nothing is computed from them then.</summary>
     public bool Valid=>Rows>0 && Crafts.Count>0 && Popularity.Count>0 && Popularity.All(row=>row.Length==Rows)
@@ -18,7 +18,7 @@ public enum IslandReadStatus { Unavailable, NotOnIsland, NotLoaded, Loaded }
 /// <summary>A built workshop. Level: 1 for Workshop I (the game's BuildingLevel plus one).</summary>
 public sealed record IslandWorkshop(int Index,int Level,bool UnderConstruction);
 /// <summary>A copy of what the game holds, read once on a click. The groove has two readings: the agenda's, then the manager's, which FFXIVClientStructs marks unverified.</summary>
-public sealed record IslandSnapshot(IslandReadStatus Status,DateTimeOffset ReadAt,int Rank,IReadOnlyList<IslandWorkshop> Workshops,uint? GrooveAgenda,uint? GrooveManager,int CycleDay,int PopularityRow,int NextPopularityRow,byte[] SupplyDemand)
+public sealed record IslandSnapshot(IslandReadStatus Status,DateTimeOffset ReadAt,int Rank,IReadOnlyList<IslandWorkshop> Workshops,uint? GrooveAgenda,uint? GrooveManager,int CycleDay,int PopularityRow,int NextPopularityRow,byte[] SupplyDemand,int? Landmarks=null)
 {
     public static IslandSnapshot Of(IslandReadStatus status,DateTimeOffset at)=>new(status,at,0,[],null,null,0,0,0,[]);
     public uint Groove=>GrooveAgenda ?? GrooveManager ?? 0;
@@ -34,6 +34,19 @@ public sealed record IslandRow(IslandCraft Craft,int? Popularity,int? Supply,int
 public static class IslandValue
 {
     public const int UnitsPerSupplyBand=8;
+    /// <summary>The cap when the sheet is missing: its highest row, and WorkshopOptimizerPlugin's constant.</summary>
+    public const int DefaultGrooveCap=45;
+
+    /// <summary>
+    /// The groove's cap, from MJICraftworksTension by finished landmarks: the row is inferred, the wiki gives the same caps for 1 to 5 landmarks. An unknown count
+    /// takes the highest cap, and the cap is never under the groove the game gives.
+    /// </summary>
+    public static int GrooveCap(IslandCatalog catalog,IslandSnapshot island)
+    {
+        var caps=catalog.GrooveCaps;
+        var cap=caps is not { Length:>0 } ? DefaultGrooveCap:island.Landmarks is { } count && count>=0 && count<caps.Length ? caps[count]:caps.Max();
+        return Math.Max(cap,(int)Math.Min(island.Groove,int.MaxValue));
+    }
     public static int? Supply(byte value)=>value>>4 is var supply && supply<=4 ? supply:null;
     public static int? Demand(byte value)=>(value&0x0F) is var demand && demand<=4 ? demand:null;
 
@@ -62,13 +75,13 @@ public static class IslandValue
         return catalog.SupplyRatio[lower]+(catalog.SupplyRatio[upper]-catalog.SupplyRatio[lower])*(position-lower);
     }
 
-    /// <summary>The estimated worth of one unit, or null when a multiplier is missing.</summary>
-    public static double? Unit(IslandCraft craft,IslandCatalog catalog,IslandSnapshot island,int workshopLevel,int produced=0)
+    /// <summary>The estimated worth of one unit, or null when a multiplier is missing. Groove: the one at that moment of the cycle, or the one read.</summary>
+    public static double? Unit(IslandCraft craft,IslandCatalog catalog,IslandSnapshot island,int workshopLevel,int produced=0,uint? groove=null)
     {
         if(craft.Id>=island.SupplyDemand.Length || Supply(island.SupplyDemand[craft.Id]) is not { } supply)return null;
         if(PopularityType(craft,catalog,island.PopularityRow) is not { } type || type>=catalog.PopularityRatio.Length || catalog.PopularityRatio[type]==0)return null;
         if(workshopLevel<=0 || workshopLevel>=catalog.RankRatio.Length)return null;
-        return craft.Value*(catalog.RankRatio[workshopLevel]/100d)*(1+island.Groove/100d)*(catalog.PopularityRatio[type]/100d)*(SupplyPercent(catalog,supply,produced)/100d);
+        return craft.Value*(catalog.RankRatio[workshopLevel]/100d)*(1+(groove ?? island.Groove)/100d)*(catalog.PopularityRatio[type]/100d)*(SupplyPercent(catalog,supply,produced)/100d);
     }
 
     public static int BestLevel(IslandSnapshot island)=>island.Workshops.Where(item=>!item.UnderConstruction).Select(item=>item.Level).DefaultIfEmpty(1).Max();
