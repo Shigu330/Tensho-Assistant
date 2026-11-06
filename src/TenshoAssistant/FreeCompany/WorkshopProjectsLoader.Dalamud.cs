@@ -31,7 +31,7 @@ public static class WorkshopProjectsLoader
                 }
                 if(phases.Count>0)parts.Add(new(part.CompanyCraftType.ValueNullable?.Name.ExtractText() ?? "",phases));
             }
-            if(parts.Count>0)projects.Add(new(sequence.RowId,sequence.ResultItem.RowId,sequence.CompanyCraftType.ValueNullable?.Name.ExtractText() ?? "",parts));
+            if(parts.Count>0)projects.Add(new(sequence.RowId,sequence.ResultItem.RowId,sequence.CompanyCraftType.ValueNullable?.Name.ExtractText() ?? "",parts,sequence.CompanyCraftDraft.RowId,sequence.Order));
         }
         return projects;
     }

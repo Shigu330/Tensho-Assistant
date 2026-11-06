@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.694.0
+- Plan global, W-05 : Demande de l'utilisateur : dans Compagnie libre › Atelier, « Suivre ce projet » et « Suivre toutes ses parties » ajoutent des projets à une liste de projets suivis. Leurs matériaux s'additionnent, sur la page et dans le panneau à l'écran. Les parties sont reliées par le prototype et l'ordre du jeu, relevés pour les sous-marins. COMPILED et TESTED, non validé en jeu.
+- Tests : WorkshopSets694Tests. Verify.ps1 (agent) : 1231/1231, 0 avertissement, 0 erreur ; DLL 0.694.0.0. Non validé en jeu.
+### English
+- User request: in Free Company > Workshop, Follow this project and Follow all its parts add projects to a followed list. Their materials add up, on the page and in the on-screen panel. Parts are linked by the game's draft and order, read for submarines. COMPILED and TESTED, not validated in game.
+
 ## 0.693.0
 - Plan global, W-05 : Demande de l'utilisateur : les panneaux de projet d'atelier, de préparation et de liste de fabrication restent affichés, en combat et derrière les fenêtres du jeu, tant qu'on ne les coupe pas. Deux cases, désactivées par défaut, permettent de les cacher en combat ou derrière les fenêtres. Restent la coupure en JcJ et en contenu classé, et le masquage de toute l'interface par le jeu. COMPILED et TESTED, non validé en jeu.
 - Tests : ListPanels691Tests. Verify.ps1 (agent) : 1228/1228, 0 avertissement, 0 erreur ; DLL 0.693.0.0. Non validé en jeu.

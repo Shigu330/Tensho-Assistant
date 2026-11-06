@@ -1028,6 +1028,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.693) Panneau affiché : entrer en combat et ouvrir une fenêtre du jeu par-dessus, il doit rester ; cocher chaque option, il doit se cacher ; la croix le coupe.
 
+- [ ] (0.694) Atelier : Suivre toutes ses parties sur une coque doit ajouter les 4 pièces et additionner leurs matériaux, aussi dans le panneau ; essayer un aéronef et un logement ; la croix retire un projet.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

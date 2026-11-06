@@ -4750,6 +4750,11 @@
     "SquadronDone": "Finished: {0} (collect it at the barracks)"
   },
   "FreeCompany": {
+    "WorkshopFollow": "Follow this project",
+    "WorkshopFollowTip": "Adds it to the followed projects: their materials add up, here and in the on-screen panel.",
+    "WorkshopFollowSet": "Follow all its parts ({0})",
+    "WorkshopFollowed": "Followed projects ({0})",
+    "WorkshopUnfollowTip": "Stops following this project.",
     "WorkshopPanel": "Show this project on screen",
     "WorkshopPanelTip": "A small panel with the chosen project's materials, in stock over needed. It follows the project chosen here.",
     "WorkshopPanelTitle": "Project materials",

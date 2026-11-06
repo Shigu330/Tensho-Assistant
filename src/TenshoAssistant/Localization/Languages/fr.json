@@ -4750,6 +4750,11 @@
     "SquadronDone": "Terminé : {0} (à récupérer à la caserne)"
   },
   "FreeCompany": {
+    "WorkshopFollow": "Suivre ce projet",
+    "WorkshopFollowTip": "L'ajoute aux projets suivis : leurs matériaux s'additionnent, ici et dans le panneau à l'écran.",
+    "WorkshopFollowSet": "Suivre toutes ses parties ({0})",
+    "WorkshopFollowed": "Projets suivis ({0})",
+    "WorkshopUnfollowTip": "Ne plus suivre ce projet.",
     "WorkshopPanel": "Afficher ce projet à l'écran",
     "WorkshopPanelTip": "Un petit panneau avec les matériaux du projet choisi, en stock sur requis. Il suit le projet choisi ici.",
     "WorkshopPanelTitle": "Matériaux du projet",

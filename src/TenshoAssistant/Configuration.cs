@@ -70,7 +70,7 @@ public static class ConfigurationReset
         // 0.375 (g, M-05): on-screen « to do » panel.
         "TaskPanel",
         // W-05 (0.691): on-screen lists.
-        "WorkshopPanel", "WorkshopPanelProject", "PreparationPanel", "PreparationPanelItem", "PreparationPanelRecipe", "PreparationPanelTarget", "CraftListPanel", "CraftListPanelName", "ListPanelsHideInCombat", "ListPanelsHideBehindGame",
+        "WorkshopPanel", "WorkshopPanelProject", "WorkshopFollowed", "PreparationPanel", "PreparationPanelItem", "PreparationPanelRecipe", "PreparationPanelTarget", "CraftListPanel", "CraftListPanelName", "ListPanelsHideInCombat", "ListPanelsHideBehindGame",
         // 0.376 (g, M-06): wear alert, bar and thresholds.
         "GearWear",
         // 0.386 (g, X-10): clocks of other time zones.
@@ -560,6 +560,8 @@ public sealed partial class Configuration
     // W-05 (0.691): the on-screen lists of a workshop project and of a crafting preparation, and what they show.
     public bool WorkshopPanel { get; set; }
     public uint WorkshopPanelProject { get; set; }
+    // 0.694 (user request): the projects followed together, by their row; none: the panel follows the chosen one.
+    public List<uint>? WorkshopFollowed { get; set; }
     public bool PreparationPanel { get; set; }
     public uint PreparationPanelItem { get; set; }
     public uint PreparationPanelRecipe { get; set; }

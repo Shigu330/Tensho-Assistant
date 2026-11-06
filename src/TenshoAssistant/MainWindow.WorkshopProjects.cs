@@ -52,6 +52,7 @@ internal sealed partial class MainWindow
         if(configuration.WorkshopPanelProject!=selected.Id){configuration.WorkshopPanelProject=selected.Id;SaveReminders();}
         BoolSetting("FreeCompany.WorkshopPanel","FreeCompany.WorkshopPanelTip",()=>configuration.WorkshopPanel,value=>configuration.WorkshopPanel=value,c=>c.WorkshopPanel);
         if(configuration.WorkshopPanel)DrawListPanelOptions();
+        DrawWorkshopFollowed(projects,selected);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("FreeCompany.WorkshopAll")+"###WorkshopAll"))
             DrawWorkshopMaterials("WorkshopTotals",selected.Totals().Select(total=>(total.Item,(string?)null,total.Total)));
         var partNumber=0;
@@ -65,6 +66,42 @@ internal sealed partial class MainWindow
                 DrawWorkshopMaterials($"WorkshopPhase{partNumber}_{phase.Number}",phase.Materials.Select(material=>(material.Item,(string?)localization.Format("FreeCompany.WorkshopSets",material.PerSet,material.Sets),material.Total)));
             }
         }
+    }
+
+    // 0.694 (user request): several projects as one list, a whole vessel with one click.
+    private void DrawWorkshopFollowed(IReadOnlyList<WorkshopProject> projects,WorkshopProject selected)
+    {
+        var followed=configuration.WorkshopFollowed ?? [];
+        void Follow(IEnumerable<WorkshopProject> added)
+        {
+            var list=(configuration.WorkshopFollowed ?? []).Concat(added.Select(project=>project.Id)).Distinct().ToList();
+            configuration.WorkshopFollowed=list;SaveReminders();
+        }
+        ImGui.BeginDisabled(followed.Contains(selected.Id));
+        try{if(ImGui.SmallButton(localization.Get("FreeCompany.WorkshopFollow")))Follow([selected]);}
+        finally{ImGui.EndDisabled();}
+        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("FreeCompany.WorkshopFollowTip"));
+        var set=WorkshopStock.SameSet(projects,selected);
+        if(set.Count>1)
+        {
+            ImGui.SameLine();
+            ImGui.BeginDisabled(set.All(project=>followed.Contains(project.Id)));
+            try{if(ImGui.SmallButton(localization.Format("FreeCompany.WorkshopFollowSet",set.Count)))Follow(set);}
+            finally{ImGui.EndDisabled();}
+            if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(string.Join("\n",set.Select(WorkshopName)));
+        }
+        var shown=followed.Select(id=>projects.FirstOrDefault(project=>project.Id==id)).OfType<WorkshopProject>().ToArray();
+        if(shown.Length==0)return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("FreeCompany.WorkshopFollowed",shown.Length)+"###WorkshopFollowed",ImGuiTreeNodeFlags.DefaultOpen))return;
+        uint? removed=null;
+        foreach(var project in shown)
+        {
+            if(ImGui.SmallButton($"×##WorkshopUnfollow{project.Id}"))removed=project.Id;
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FreeCompany.WorkshopUnfollowTip"));
+            ImGui.SameLine();ImGui.TextUnformatted(WorkshopName(project));
+        }
+        if(removed is { } gone){configuration.WorkshopFollowed=followed.Where(id=>id!=gone).ToList();SaveReminders();}
+        DrawWorkshopMaterials("WorkshopFollowedTotals",WorkshopStock.Totals(shown).Select(total=>(total.Item,(string?)null,total.Total)));
     }
 
     private void DrawWorkshopMaterials(string id,IEnumerable<(uint Item,string? Sets,int Total)> materials)

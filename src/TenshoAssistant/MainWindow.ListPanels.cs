@@ -16,7 +16,7 @@ internal sealed partial class MainWindow
         BoolSetting("ListPanels.HideInCombat","ListPanels.HideInCombatTip",()=>configuration.ListPanelsHideInCombat,value=>configuration.ListPanelsHideInCombat=value,c=>c.ListPanelsHideInCombat);
         BoolSetting("ListPanels.HideBehindGame","ListPanels.HideBehindGameTip",()=>configuration.ListPanelsHideBehindGame,value=>configuration.ListPanelsHideBehindGame=value,c=>c.ListPanelsHideBehindGame);
     }
-    private WorkshopProject? workshopPanelShown;
+    private IReadOnlyList<WorkshopProject> workshopPanelShown=[];
     private RecipeDefinition? preparationPanelShown;
 
     private PanelDefinition WorkshopListPanel=>new("WorkshopPanel","###TenshoWorkshopList",new Vector2(40,420),ListPanelFlags,
@@ -47,16 +47,19 @@ internal sealed partial class MainWindow
     {
         if(windowDisposed || !configuration.WorkshopPanel || ListPanelsHiddenInCombat || itemCatalog.State.Catalog is null || WorkshopProjectsLoad is not { } load)return false;
         workshopProjects??=Task.Run(load);
-        workshopPanelShown=workshopProjects.IsCompletedSuccessfully ? workshopProjects.Result.FirstOrDefault(project=>project.Id==configuration.WorkshopPanelProject):null;
-        return workshopPanelShown is not null;
+        if(!workshopProjects.IsCompletedSuccessfully){workshopPanelShown=[];return false;}
+        // The followed projects together, or else the one chosen on the page.
+        var projects=workshopProjects.Result;
+        var followed=(configuration.WorkshopFollowed ?? []).Select(id=>projects.FirstOrDefault(project=>project.Id==id)).OfType<WorkshopProject>().ToArray();
+        workshopPanelShown=followed.Length>0 ? followed:projects.Where(project=>project.Id==configuration.WorkshopPanelProject).ToArray();
+        return workshopPanelShown.Count>0;
     }
 
     private void DrawWorkshopPanelContents()
     {
-        if(workshopPanelShown is not { } project)return;
         RefreshRecipeHoldingsCache();
-        ImGui.TextColored(Accent,WorkshopName(project));
-        foreach(var (item,total) in project.Totals())DrawListPanelLine(item,total,GetRecipeHoldings(item));
+        foreach(var project in workshopPanelShown)ImGui.TextColored(Accent,WorkshopName(project));
+        foreach(var (item,total) in WorkshopStock.Totals(workshopPanelShown))DrawListPanelLine(item,total,GetRecipeHoldings(item));
     }
 
     private bool PreparationPanelVisible()
