@@ -71,6 +71,7 @@ internal sealed partial class MainWindow
     private Vector2? FocusPixel(GameMapRequest focus,MapDefinition map,MapLiveState? live)
     {
         // The game's own target (temporary marker) first, like Mappy: it is on the map the game opened.
+        if(focus.UsesRoute(map) && focus.Route is { } route)return MapProjection.PixelFromWorld(new Vector3(route.X,0,route.Y),map);
         // 0.628 (user capture, icon in the sea): the target's coordinates are those of its territory: they mean nothing on a world or region map.
         if(focus.Target is { } target && map.TerritoryId!=0)return MapProjection.PixelFromWorld(new Vector3(target.X,0,target.Y),map);
         if(focus.QuestId!=0)
@@ -219,10 +220,10 @@ internal sealed partial class MainWindow
         else if(isZone && map.Subzone.Length>0)widths.Add(indent+ImGui.CalcTextSize("> "+map.Subzone).X);
         widths.AddRange(placeLines.Select(place=>indent+ImGui.CalcTextSize(place).X));
         var headerHeight=widths.Count*line+pad*2;
-        var listCount=mapHeaderList switch{1=>regions.Length+1,2=>zones.Count+1,3=>floors.Count,_=>0};
+        var listCount=mapHeaderList switch{1=>regions.Length+1,2=>worldChoices.Count>0 ? worldChoices.Count:zones.Count+1,3=>floors.Count,_=>0};
         var at=start+new Vector2(toolsWidth+4,0);var room=area-(at-start);
         HeaderBand("MapOverlayBand",at,new Vector2(Math.Min(widths.Max()+pad*2+4,room.X),headerHeight),fade,room);
-        var listWidth=regions.Select(MapName).Append(world).Concat(zones.Select(entry=>MapName(entry[0]))).Concat(floors.Select(FloorName))
+        var listWidth=regions.Select(MapName).Append(world).Concat(zones.Select(entry=>MapName(entry[0]))).Concat(floors.Select(FloorName)).Concat(worldChoices.Select(MapName))
             .Select(name=>ImGui.CalcTextSize("> "+name).X).DefaultIfEmpty(80).Max()+indent+28;
         var width=Math.Min(Math.Max(widths.Max(),mapHeaderList==0 ? 0:listWidth)+pad*2+4,room.X);
         var height=Math.Min(headerHeight+listCount*line,room.Y);
@@ -986,7 +987,7 @@ internal sealed partial class MainWindow
             // is retried for 1.5 s; nothing found on this map = whole map. Logged (/xllog) to check the quest links in game.
             if(FocusPixel(focus,map,live) is { } pixel)
             {
-                mapGameTarget=focus.Target is { } world && focus.TargetIcon!=0 && map.TerritoryId!=0 ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
+                mapGameTarget=focus.Target is { } world && focus.TargetIcon!=0 && map.TerritoryId!=0 && !focus.UsesRoute(map) ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
                 mapGameTargetQuests=null;mapGameTargetSince=DateTimeOffset.UtcNow;mapGameTargetRefresh=default;
                 mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,MapFocusZoom));mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
                 log.Information("Map focus found on map {0} for quest {1}, aetheryte {2}, FATE {3}.",map.MapId,focus.QuestId,focus.AetheryteId,focus.FateId);

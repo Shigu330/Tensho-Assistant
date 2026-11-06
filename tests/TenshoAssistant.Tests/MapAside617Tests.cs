@@ -41,6 +41,20 @@ internal static class MapAside617Tests
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));
             Check(view.Contains("if(repeated && !clicked)request=request.Plain();"),"only when unchanged and not clicked");
         }),
+        ("Map request (0.633): away from a quest's zone, the map of the NPC that leads there",() =>
+        {
+            var village=new TenshoAssistant.Maps.MapDefinition(1025,1269,"","Phantom Village","",0,400);
+            var city=new TenshoAssistant.Maps.MapDefinition(855,1185,"","Tuliyollal","",0,180);
+            var catalog=new TenshoAssistant.Maps.MapCatalog([village,city],default,new Dictionary<uint,uint>{[1278]=1025});
+            var npc=new System.Numerics.Vector2(206,63);
+            var away=new TenshoAssistant.Maps.GameMapRequest(919,919,1278,4,QuestLog:true,Target:new System.Numerics.Vector2(29,13),RouteMap:855,Route:npc);
+            Check(away.Resolve(catalog)==855,"the way there");
+            Check(away.UsesRoute(city) && !away.UsesRoute(village),"focused on the NPC only on that map");
+            Check((away with {Current=1025}).Resolve(catalog)==1025,"already in the zone: its own map");
+            Check(!away.Plain().Pointed && away.Plain().RouteMap==0,"the map key forgets it");
+            var ordinary=new TenshoAssistant.Maps.GameMapRequest(855,855,1185,4,QuestLog:true,Target:npc,RouteMap:855,Route:npc);
+            Check(!ordinary.UsesRoute(city),"a quest in that zone keeps its own target");
+        }),
         ("Map request (0.628): a quest target asked on the world map opens its territory's own map",() =>
         {
             var village=new TenshoAssistant.Maps.MapDefinition(1025,1269,"","Phantom Village","",0,400);
@@ -49,7 +63,7 @@ internal static class MapAside617Tests
             Check(request.Resolve(new TenshoAssistant.Maps.MapCatalog([village]))==919,"unknown: the map the game asked");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             Check(view.Contains("if(focus.Target is { } target && map.TerritoryId!=0)return"),"never placed on a world or region map");
-            Check(view.Contains("focus.TargetIcon!=0 && map.TerritoryId!=0 ?"),"no icon there either");
+            Check(view.Contains("focus.TargetIcon!=0 && map.TerritoryId!=0 && !focus.UsesRoute(map) ?"),"no icon there either");
         }),
         ("Map request (0.629): a click just before asks for the quest again, once; the map key does not",() =>
         {

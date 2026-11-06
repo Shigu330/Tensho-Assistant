@@ -94,13 +94,15 @@ public sealed record MapCatalogState(MapCatalog? Catalog, int Copied, int Total,
 // Target: world X/Z of the game's first temporary marker (AgentMap.TempMapMarkers[0], X/Y = world × 16), where the game itself
 // centres a quest or gathering link; read the way Mappy does (reference only, AGPL, not copied).
 public sealed record GameMapRequest(uint Selected, uint Requested, uint Territory, uint Current, uint QuestId = 0, uint AetheryteId = 0, uint FateId = 0, bool QuestLog = false,
-    System.Numerics.Vector2? Target = null, uint TargetIcon = 0)
+    System.Numerics.Vector2? Target = null, uint TargetIcon = 0, uint RouteMap = 0, System.Numerics.Vector2? Route = null)
 {
     /// <summary>
     /// 0.627 (user report, log: the same « QuestLog » request at each press of the map key): the game keeps its last quest request after the map closes. Read again unchanged,
     /// it asks for nothing: the map simply opens on the player.
     /// </summary>
-    public GameMapRequest Plain()=>this with {Selected=Current,Requested=Current,Territory=0,QuestId=0,AetheryteId=0,FateId=0,QuestLog=false,Target=null,TargetIcon=0};
+    public GameMapRequest Plain()=>this with {Selected=Current,Requested=Current,Territory=0,QuestId=0,AetheryteId=0,FateId=0,QuestLog=false,Target=null,TargetIcon=0,RouteMap=0,Route=null};
+    /// <summary>0.633: this map shows the way (the zone-change NPC), not the target's own territory.</summary>
+    public bool UsesRoute(MapDefinition map)=>Route is not null && RouteMap==map.MapId && Territory!=map.TerritoryId;
     /// <summary>A quest, aetheryte or FATE was asked: never the M toggle.</summary>
     public bool Pointed => QuestId != 0 || AetheryteId != 0 || FateId != 0 || QuestLog || Target is not null;
     /// <summary>
@@ -118,7 +120,10 @@ public sealed record GameMapRequest(uint Selected, uint Requested, uint Territor
         if (catalog.Find(Requested) is not null) return Requested;
         if (Territory != 0 && catalog.Entries.Where(map => map.TerritoryId == Territory).OrderBy(map => map.MapIndex).FirstOrDefault() is { } zone) return zone.MapId;
         // 0.628 (user capture): a request on the world map names the target's territory: open that territory's own map.
-        if (catalog.Find(catalog.MapOf(Territory)) is not null) return catalog.MapOf(Territory);
+        // 0.633 (user capture): away from it, the game shows the zone-change NPC that leads there.
+        var own = catalog.MapOf(Territory);
+        if (RouteMap != 0 && own != Current && catalog.Find(RouteMap) is not null) return RouteMap;
+        if (catalog.Find(own) is not null) return own;
         return Selected;
     }
 }

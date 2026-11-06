@@ -32,6 +32,9 @@ internal sealed class NativeMapReplacer : IDisposable
     private readonly MapResume resume=new();
     private string lastPointed="";
     private readonly MapClickMemory clicks=new();
+    private bool mouseWasDown;
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern short GetAsyncKeyState(int key);
     private bool refocus;
     private ICondition? occupiedFlags;
     private bool Occupied()
@@ -65,7 +68,10 @@ internal sealed class NativeMapReplacer : IDisposable
         {
             var options=settings();
             // 0.629: the map key and a click ask for the same thing in the agent: only the mouse tells them apart.
-            if(FFXIVClientStructs.FFXIV.Client.UI.UIInputData.Instance() is var input && input!=null && (input->CursorInputs.MouseButtonReleasedFlags & FFXIVClientStructs.FFXIV.Client.System.Input.MouseButtonFlags.LBUTTON)!=0)clicks.Clicked(now);
+            // 0.633: the button's own state: the game's one-frame release flag read false on every request of the log.
+            var mouseDown=(GetAsyncKeyState(0x01)&0x8000)!=0;
+            if(mouseWasDown && !mouseDown)clicks.Clicked(now);
+            mouseWasDown=mouseDown;
             var addon=gui.GetAddonByName("AreaMap");
             var unit=addon.IsNull ? null:(AtkUnitBase*)addon.Address;
             var visible=unit!=null && addon.IsVisible;
@@ -170,46 +176,25 @@ internal sealed class NativeMapReplacer : IDisposable
             quest=agent->CurrentOpenMapInfo.QuestId;aetheryte=agent->CurrentOpenMapInfo.AetheryteId;fate=agent->CurrentOpenMapInfo.FateId;
         }
         if(log)this.log.Information("Game map hosted: type {0}, map {1}, territory {2}, selected {3}, quest {4}, aetheryte {5}, fate {6}, target {7}.",type,requested,territory,selected,quest,aetheryte,fate,target?.ToString() ?? "none");
-        if(log && questLog && agent!=null)LogTargetProbe(agent);
-        return (new(selected,requested,territory,client.MapId,quest,aetheryte,fate,questLog,target,targetIcon),$"{type}|{requested}|{territory}|{quest}|{aetheryte}|{fate}|{target}");
+        var route=questLog && agent!=null ? FindRoute(agent):(0u,null);
+        if(log && route.MapId!=0)this.log.Information("Game map route: event marker on map {0} at {1}.",route.MapId,route.Position?.ToString() ?? "none");
+        return (new(selected,requested,territory,client.MapId,quest,aetheryte,fate,questLog,target,targetIcon,route.MapId,route.Position),$"{type}|{requested}|{territory}|{quest}|{aetheryte}|{fate}|{target}");
     }
-    // 0.630 (temporary, read only): the game shows a quest beyond a zone-change NPC on that NPC (user capture): where does it keep that place?
-    private unsafe void LogTargetProbe(AgentMap* agent)
+    // 0.633 (log, docs/evidence/0.633-quest-route.md): a quest beyond a zone-change NPC has its event marker on that NPC, under the quest's name.
+    private static unsafe (uint MapId,System.Numerics.Vector2? Position) FindRoute(AgentMap* agent)
     {
         var title=MapLiveReader.TooltipText(&agent->CurrentOpenMapInfo.TitleString);
-        log.Information("Map target probe: title {0}, player map {1}, temp markers {2}.",title,client.MapId,agent->TempMapMarkerCount);
-        for(var index=0;index<agent->TempMapMarkerCount && index<agent->TempMapMarkers.Length;index++)
+        var count=agent->EventMarkers.LongCount;
+        if(title.Length==0 || count is <0 or >1024)return (0,null);
+        var seen=0;
+        foreach(var marker in agent->EventMarkers)
         {
-            var temp=agent->TempMapMarkers[index];
-            log.Information("Map target probe, temp {0}: raw {1}, {2}, icon {3}, type {4}, style {5}.",index,temp.MapMarker.X,temp.MapMarker.Y,temp.MapMarker.IconId,temp.Type,temp.StyleFlags);
+            if(++seen>1024)break;
+            if(marker.MapId==0 || !float.IsFinite(marker.Position.X) || !float.IsFinite(marker.Position.Z))continue;
+            if(MapLiveReader.TooltipText(marker.TooltipString).Contains(title,StringComparison.Ordinal))
+                return (marker.MapId,new System.Numerics.Vector2(marker.Position.X,marker.Position.Z));
         }
-        if(title.Length==0)return;
-        var events=agent->EventMarkers.LongCount;
-        if(events is >=0 and <=1024)
-        {
-            var seen=0;
-            foreach(var marker in agent->EventMarkers)
-            {
-                if(++seen>1024)break;
-                if(!MapLiveReader.TooltipText(marker.TooltipString).Contains(title,StringComparison.Ordinal))continue;
-                log.Information("Map target probe, event: map {0}, territory {1}, level {2}, objective {3}, position {4}, icon {5}, type {6}, data {7}.",marker.MapId,marker.TerritoryTypeId,marker.LevelId,marker.ObjectiveId,marker.Position,marker.IconId,marker.MarkerType,marker.DataId);
-            }
-        }
-        var game=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
-        if(game==null)return;
-        var quests=game->QuestMarkers;
-        for(var index=0;index<quests.Length;index++)
-        {
-            fixed(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info=&quests[index])
-            {
-                if(info->ObjectiveId==0 || !MapLiveReader.TooltipText(&info->Label).Contains(title,StringComparison.Ordinal))continue;
-                var markers=info->MarkerData.LongCount;
-                log.Information("Map target probe, quest slot {0}: objective {1}, markers {2}.",index,info->ObjectiveId,markers);
-                if(markers is <0 or >64)continue;
-                foreach(var marker in info->MarkerData)
-                    log.Information("Map target probe, quest marker: map {0}, territory {1}, level {2}, position {3}, icon {4}, type {5}, data {6}.",marker.MapId,marker.TerritoryTypeId,marker.LevelId,marker.Position,marker.IconId,marker.MarkerType,marker.DataId);
-            }
-        }
+        return (0,null);
     }
     public unsafe void Dispose()
     {

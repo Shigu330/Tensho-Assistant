@@ -908,6 +908,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.632) Comparer La Noscea et Yok Tural avec le jeu : zones, ton, cristaux. Ouvrir le monde : Tural est là, et le second menu propose Hydaelyn et Premier reflet.
 
+- [ ] (0.633) Loin de la Ville fantôme, cliquer « Un forgeron fantomatique » : Tuliyollal s'ouvre, centrée sur le marqueur. Recliquer : la carte reste sur la quête. Touche de carte : fermée puis rouverte sur toi.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

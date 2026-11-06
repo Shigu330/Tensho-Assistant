@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.633.0
+- Plan global, phase 5 : Carte (rapport et captures de l'utilisateur, sonde du journal). Une quête au-delà d'un changement de zone ouvre la carte où se trouve ce passage, comme le montre le jeu : Tuliyollal pour la Ville fantôme, centrée sur son marqueur. Déjà dans la zone, la carte de la zone. Le clic sur une même quête suit maintenant l'état du bouton de la souris, car l'indicateur du jeu restait faux dans le journal. Sous « Monde », le menu ne défile plus. La sonde temporaire de la 0.630 est retirée.
+- Tests : Map request. Verify.ps1 (agent) : 1140/1140, 0 avertissement, 0 erreur ; DLL 0.633.0.0. Non validé en jeu.
+### English
+- Map (user report and captures, log probe). A quest beyond a zone change opens the map holding that passage, as the game shows it: Tuliyollal for Phantom Village, centred on its marker. Already in the zone, the zone's map. A click on the same quest now follows the mouse button's state, because the game's flag stayed false in the log. Under « World », the menu no longer scrolls. The temporary probe of 0.630 is removed.
+
 ## 0.632.0
 - Plan global, phase 5 : Carte (captures de l'utilisateur, jeu à côté de Tensho). Cartes de région : les zones sont à la bonne échelle (la 0.631 les dessinait trop grandes), dans un ton de parchemin, avec les cristaux de leurs zones, cliquables pour la téléportation. Carte du monde : celle du jeu avec Tural et non plus l'ancienne, et sous « Monde » le choix Hydaelyn / Premier reflet, comme les étages d'une zone, au lieu de « -- ». Le ton est réglé à l'œil : ImGui ne sait pas assombrir comme le jeu.
 - Tests : Map labels. Verify.ps1 (agent) : 1139/1139, 0 avertissement, 0 erreur ; DLL 0.632.0.0. Non validé en jeu.
