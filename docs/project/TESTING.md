@@ -928,7 +928,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.642) Cliquer une quête, remonter à la région puis au monde : la cible reste. Dézoomer une ville : les noms en noir rétrécissent avec la carte.
 
-- [ ] (0.643) Cliquer une quête, remonter au monde, cliquer la cible : la région s'ouvre ; la recliquer : la carte de la cible s'ouvre.
+- [x] (0.643) Cliquer une quête, remonter au monde, cliquer la cible : la région s'ouvre ; la recliquer : la carte de la cible s'ouvre.
 
 **0.535 : interfaces** — à voir en jouant
 
