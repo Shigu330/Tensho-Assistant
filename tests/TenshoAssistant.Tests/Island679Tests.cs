@@ -31,6 +31,14 @@ internal static class Island679Tests
             Check(view.Contains("liveEvents.Where(marker=>eventMaps.Contains(marker.MapId))"),"events");
             Check(!view.Contains("liveEvents.Where(marker=>marker.MapId==map.MapId)"),"not one map");
         }),
+        ("Island map: its resources are in the map's display menu, and All and None count them",() =>
+        {
+            var view=Read("MainWindow.MapView.cs");
+            var popup=view.IndexOf("BeginPopup(\"MapViewLayers\")",StringComparison.Ordinal);
+            var box=view.IndexOf("SettingBox(\"MapView.ShowIslandResources\"",StringComparison.Ordinal);
+            Check(popup>=0 && box>popup && box<popup+3000,"in the display menu");
+            Check(view.Contains("settings.ShowIconNames=settings.ShowIslandResources=shown;"),"All and None");
+        }),
         ("Island modes: the pad guide is not a window in front of the map, and a real island window still is",() =>
         {
             Check(TenshoAssistant.UI.GameWindows.Ignored("MJIPadGuide"),"pad guide");

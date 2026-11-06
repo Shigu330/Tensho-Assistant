@@ -1006,6 +1006,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.681) Félicité insulaire : les 5 PNJ sur la carte ; au survol de Marchandréa, comparer les boutiques à sa fenêtre dans le jeu ; un objet payé en assignats doit indiquer Marchandréa comme source ; dire si Chamoiselle change de place.
 
+- [ ] (0.682) Carte Tensho › Affichage : décocher Ressources de la Félicité insulaire doit retirer les icônes et leurs zones ; Aucun aussi, Tout les remet.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

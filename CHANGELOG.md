@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.682.0
+- Plan global, Félicité insulaire, carte : Correction, rapport de l'utilisateur : les ressources de la Félicité insulaire ne se désactivaient pas depuis le menu Affichage de la carte, et « Aucun » les laissait. La case y est ajoutée, Tout et Aucun les comptent, et dans les réglages elle passe de la section des quêtes à celle des récoltes. COMPILED et TESTED, non validé en jeu.
+- Tests : Island679Tests. Verify.ps1 (agent) : 1203/1203, 0 avertissement, 0 erreur ; DLL 0.682.0.0. Non validé en jeu.
+### English
+- Fix from a user report: the Island Sanctuary's resources could not be turned off from the map's display menu, and None left them on. The box is added there, All and None count them, and in the settings it moves from the quest section to the gathering one. COMPILED and TESTED, not validated in game.
+
 ## 0.681.0
 - Plan global, Félicité insulaire, carte : Demande de l'utilisateur : Rodolfermier (Champs), Béberger (Pâturage) et Chamoiselle (Guide) paraissent sur la carte Tensho. Marchandréa est reliée aux 8 boutiques payées en assignats insulaires azur et émeraude : ses articles entrent dans les sources d'objets. Ce lien est déduit, aucune feuille ne le donne. COMPILED et TESTED, non validé en jeu.
 - Tests : Island679Tests. Verify.ps1 (agent) : 1202/1202, 0 avertissement, 0 erreur ; DLL 0.681.0.0. Non validé en jeu.

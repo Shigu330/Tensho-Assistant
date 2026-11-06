@@ -492,7 +492,7 @@ internal sealed partial class MainWindow
             void All(bool shown)
             {
                 settings.ShowQuests=settings.ShowFates=settings.ShowGathering=settings.ShowVendors=settings.ShowSightseeing=settings.ShowAetherCurrents=shown;
-                settings.ShowParty=settings.ShowBookmarks=settings.ShowHuntMarks=settings.ShowTreasure=settings.ShowFixedIcons=settings.ShowPlaceNames=settings.ShowIconNames=shown;
+                settings.ShowParty=settings.ShowBookmarks=settings.ShowHuntMarks=settings.ShowTreasure=settings.ShowFixedIcons=settings.ShowPlaceNames=settings.ShowIconNames=settings.ShowIslandResources=shown;
                 changed=true;
             }
             if(ImGui.SmallButton(localization.Get("MapView.LayersAll")))All(true);
@@ -507,6 +507,8 @@ internal sealed partial class MainWindow
             changed|=SettingBox("MapView.ShowQuests",settings.ShowQuests,value=>settings.ShowQuests=value);
             changed|=SettingBox("MapView.ShowFates",settings.ShowFates,value=>settings.ShowFates=value);
             changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value);
+            // 0.682 (user report): the island's resources could only be turned off from a section where nobody would look for them.
+            changed|=SettingBox("MapView.ShowIslandResources",settings.ShowIslandResources,value=>settings.ShowIslandResources=value);
             changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value);
             changed|=SettingBox("MapView.ShowSightseeing",settings.ShowSightseeing,value=>settings.ShowSightseeing=value);
             changed|=SettingBox("MapView.ShowAetherCurrents",settings.ShowAetherCurrents,value=>settings.ShowAetherCurrents=value);
@@ -556,7 +558,6 @@ internal sealed partial class MainWindow
             if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionQuests"),ImGuiTreeNodeFlags.DefaultOpen))
             {
                 changed|=SettingBox("MapView.ShowQuests",settings.ShowQuests,value=>settings.ShowQuests=value,MapDefaults.ShowQuests);
-                changed|=SettingBox("MapView.ShowIslandResources",settings.ShowIslandResources,value=>settings.ShowIslandResources=value,MapDefaults.ShowIslandResources);
                 changed|=SettingBox("MapView.ShowQuestAreas",settings.ShowQuestAreas,value=>settings.ShowQuestAreas=value,MapDefaults.ShowQuestAreas);
                 changed|=SettingBox("MapView.QuestTooltips",settings.QuestTooltips,value=>settings.QuestTooltips=value,MapDefaults.QuestTooltips);
                 changed|=SettingBox("MapView.ShowFates",settings.ShowFates,value=>settings.ShowFates=value,MapDefaults.ShowFates);
@@ -569,6 +570,7 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value,MapDefaults.ShowTreasure);
                 changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value,MapDefaults.ShowVendors);
                 changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value,MapDefaults.ShowGathering);
+                changed|=SettingBox("MapView.ShowIslandResources",settings.ShowIslandResources,value=>settings.ShowIslandResources=value,MapDefaults.ShowIslandResources);
                 changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value,MapDefaults.ShowHuntMarks);
                 changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
                 var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
