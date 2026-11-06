@@ -3094,6 +3094,8 @@
     "IconCategoryShow": "Tout afficher",
     "IconCategoryHide": "Tout masquer",
     "QuestIcon": "{0} (type {1}) · {2} · variante {3}",
+    "QuestIconNamed": "{0} (type {1}) · {2}",
+    "QuestStep": "étape en cours",
     "QuestKind0": "Quête",
     "QuestKind1": "Quête annexe",
     "QuestKind3": "Quête de l'épopée",

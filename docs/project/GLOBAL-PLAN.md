@@ -165,7 +165,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | ~~P7~~ fait en 0.645 | Éthérites non harmonisées signalées et coût au survol | S |  |
 | P11 | Parties non découvertes masquées comme sur la carte du jeu | M | Avec réglage. |
 | ~~P17~~ fait en 0.652 | Relevé du type de marqueur des mandats et de leurs zones | S | Le type ne dit rien : c'est l'icône 60492 ou le nom du mandat. |
-| P22 | Noms des variantes d'icônes de quête (71141 / 71151) | S |  |
+| ~~P22~~ fait en 0.665 pour les variantes 1 et 5 | Noms des variantes d'icônes de quête (71141 / 71151) | S | Les autres gardent leur numéro ; à confirmer en jeu. |
 
 ### Objets
 

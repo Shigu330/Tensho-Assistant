@@ -87,6 +87,13 @@ internal static class MapLabels596Tests
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(0,costs),"not an aetheryte");
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(9,null) && !TenshoAssistant.Maps.MapLabels.NotAttuned(9,new Dictionary<uint,uint>()),"unknown says nothing");
         }),
+        ("Quest icons (P22): only the variants read get a name",() =>
+        {
+            Check(TenshoAssistant.Maps.MapQuestIcons.NamesItsVariant(false,1) && TenshoAssistant.Maps.MapQuestIcons.NamesItsVariant(true,1),"on offer, available or not");
+            Check(TenshoAssistant.Maps.MapQuestIcons.IsStep(true,5) && TenshoAssistant.Maps.MapQuestIcons.NamesItsVariant(true,5),"71155: a step under way");
+            Check(!TenshoAssistant.Maps.MapQuestIcons.IsStep(false,5) && !TenshoAssistant.Maps.MapQuestIcons.NamesItsVariant(false,5),"never seen: its number");
+            Check(!TenshoAssistant.Maps.MapQuestIcons.NamesItsVariant(false,2) && !TenshoAssistant.Maps.MapQuestIcons.NamesItsVariant(true,3),"the others: their number");
+        }),
         ("Leve areas (0.657): the journal gives one for a map with none known",() =>
         {
             var memory=new TenshoAssistant.Maps.LeveAreaMemory<string>();

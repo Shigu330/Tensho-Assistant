@@ -7,6 +7,13 @@ namespace TenshoAssistant.Maps;
 /// (docs/evidence/0.596-map-label-orientation.md); the rare other values are not established and go to the right.
 /// </summary>
 /// <summary>P17 (0.652): a leve's marker on the map: the icon read in game, or a tooltip naming a row of the Leve sheet (docs/evidence/0.652-leve-markers.md).</summary>
+/// <summary>P22 (0.665): what a quest icon's variant is known to mean (docs/evidence/0.665-quest-icon-variants.md). Variant 1 is the quest on offer; a locked variant 5 marks a step of a quest under way. The others say their number.</summary>
+public static class MapQuestIcons
+{
+    public static bool NamesItsVariant(bool locked,int variant)=>variant==1 || IsStep(locked,variant);
+    public static bool IsStep(bool locked,int variant)=>locked && variant==5;
+}
+
 public static class MapLeves
 {
     public const uint AreaIcon=60492;

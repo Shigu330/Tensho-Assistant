@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.665.0
+- Plan global, P22 : Carte (P22) : les réglages d'icônes nomment les variantes de quête relevées : la variante 1 est une quête proposée, disponible ou non, et l'icône 71155 une étape en cours. Les autres gardent leur numéro, car rien ne dit leur sens. D'après les journaux et les données, à confirmer en jeu.
+- Tests : Quest icons. Verify.ps1 (agent) : 1162/1162, 0 avertissement, 0 erreur ; DLL 0.665.0.0. Non validé en jeu.
+### English
+- Map (P22): the icon settings name the quest variants read: variant 1 is a quest on offer, available or not, and icon 71155 a step under way. The others keep their number, as nothing tells their meaning. From the logs and the data, to confirm in game.
+
 ## 0.664.0
 - Plan global, C22 : Compagnie libre (C22) : un onglet Atelier liste les projets de l'atelier, avec leurs matériaux pièce par pièce et phase par phase, le total du projet et vos stocks relevés, et un lien vers chaque objet. Ce que l'atelier a déjà reçu n'est pas lu. La quantité requise est lue comme la quantité par livraison multipliée par le nombre de livraisons, d'après le nom des colonnes : à comparer à la fenêtre du jeu.
 - Tests : Workshop projects. Verify.ps1 (agent) : 1161/1161, 0 avertissement, 0 erreur ; DLL 0.664.0.0. Non validé en jeu.

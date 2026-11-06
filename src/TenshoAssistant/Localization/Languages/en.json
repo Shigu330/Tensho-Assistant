@@ -3094,6 +3094,8 @@
     "IconCategoryShow": "Show all",
     "IconCategoryHide": "Hide all",
     "QuestIcon": "{0} (type {1}) · {2} · variant {3}",
+    "QuestIconNamed": "{0} (type {1}) · {2}",
+    "QuestStep": "step under way",
     "QuestKind0": "Quest",
     "QuestKind1": "Side quest",
     "QuestKind3": "Main scenario quest",

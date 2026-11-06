@@ -1610,9 +1610,9 @@ internal sealed partial class MainWindow
         GlyphBookmark=>localization.Get("MapView.ShowBookmarks"),
         GlyphTreasureMap=>localization.Get("MapView.TreasureMapIcon"),
         _ when mapMarkers?.SymbolName(icon) is { Length:>0 } known=>known,
-        _ when mapMarkers?.QuestIcons.TryGetValue(icon,out var quest)==true=>localization.Format("MapView.QuestIcon",
+        _ when mapMarkers?.QuestIcons.TryGetValue(icon,out var quest)==true=>localization.Format(MapQuestIcons.NamesItsVariant(quest.Locked,quest.Variant) ? "MapView.QuestIconNamed":"MapView.QuestIcon",
             localization.Get("MapView.QuestKind"+(quest.Row is 1 or 3 or 8 or 10 ? quest.Row:0u)),quest.Row,
-            localization.Get(quest.Locked ? "MapView.QuestLocked":"MapView.QuestAvailable"),quest.Variant),
+            localization.Get(MapQuestIcons.IsStep(quest.Locked,quest.Variant) ? "MapView.QuestStep":quest.Locked ? "MapView.QuestLocked":"MapView.QuestAvailable"),quest.Variant),
         _=>localization.Format("MapView.IconUnnamed",icon),
     };
 
