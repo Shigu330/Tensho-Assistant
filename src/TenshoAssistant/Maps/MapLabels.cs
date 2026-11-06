@@ -29,6 +29,8 @@ public static class MapLabels
     /// <summary>0.642 (user capture, too large once zoomed out): a place name's height on the map, read on the game's own map (about 18 px at zoom 0.39): it never exceeds this.</summary>
     public const float PlaceNameMapHeight=46f;
     public static float PlaceNameSize(float size,float zoom,float scale)=>Math.Max(6,Math.Min(size,PlaceNameMapHeight*zoom*scale));
+    /// <summary>0.645 (P7): an aetheryte missing from the game's teleport list. Unknown (list not read, or empty) says nothing.</summary>
+    public static bool NotAttuned(uint aetheryte,IReadOnlyDictionary<uint,uint>? costs)=>aetheryte!=0 && costs is { Count:>0 } && !costs.ContainsKey(aetheryte);
     public static bool Shown(bool mapLink,float zoom)=>mapLink || zoom>=DetailZoom;
 
     /// <summary>The names that fit, map links first, then in the order given: a name that would touch one already kept is left out.</summary>

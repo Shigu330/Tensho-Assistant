@@ -75,6 +75,14 @@ internal static class MapLabels596Tests
             Check(view.Contains("GameTargetAbove(map,markers,upperTarget.MapId,upperTarget.World)"),"on the region and the world");
             Check(view.Contains("new MapIconMarker(upper.Pixel.X,upper.Pixel.Y,upperTarget.Icon,\"\",upper.Link)"),"and a click goes down one step (0.643)");
         }),
+        ("Map labels (0.645): an aetheryte is said not attuned only when the game's list is known",() =>
+        {
+            var costs=new Dictionary<uint,uint>{[8]=100};
+            Check(TenshoAssistant.Maps.MapLabels.NotAttuned(9,costs),"missing from the list");
+            Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(8,costs),"in the list");
+            Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(0,costs),"not an aetheryte");
+            Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(9,null) && !TenshoAssistant.Maps.MapLabels.NotAttuned(9,new Dictionary<uint,uint>()),"unknown says nothing");
+        }),
         ("Map labels: from the sheet, only for a drawn icon, with their setting",() =>
         {
             var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs"));

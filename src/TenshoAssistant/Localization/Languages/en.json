@@ -3190,6 +3190,7 @@
     "TeleportAsk": "Teleport to {0}?",
     "TeleportCost": "Cost: {0}",
     "TeleportCostReading": "Reading the cost…",
+    "AetheryteNotAttuned": "Not attuned",
     "TeleportCostUnknown": "Unknown cost: aetheryte missing from the game's teleport list (not attuned?)",
     "SectionIcons": "Icons on this map",
     "IconsReset": "Restore the default values",

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.645.0
+- Plan global, P7 : Carte (P7) : une éthérite absente de la liste de téléportation du jeu est grisée, et son survol dit qu'elle n'est pas harmonisée ; une éthérite harmonisée donne son coût au survol. La liste est relue quand la carte affichée ou votre carte change.
+- Tests : Map labels. Verify.ps1 (agent) : 1146/1146, 0 avertissement, 0 erreur ; DLL 0.645.0.0. Non validé en jeu.
+### English
+- Map (P7): an aetheryte missing from the game's teleport list is greyed, and its tooltip says it is not attuned; an attuned aetheryte gives its cost on hover. The list is read again when the shown map or your map changes.
+
 ## 0.644.0
 - Plan global, P6 : Carte (P6) : vos coordonnées restent affichées en bas à gauche, le curseur donne aussi sa distance en yalms par rapport à vous, et le repère de bord du drapeau montre dessous ses coordonnées et sa distance. Deux réglages, activés par défaut.
 - Tests : Map. Verify.ps1 (agent) : 1145/1145, 0 avertissement, 0 erreur ; DLL 0.644.0.0. Non validé en jeu.

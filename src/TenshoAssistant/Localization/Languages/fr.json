@@ -3190,6 +3190,7 @@
     "TeleportAsk": "Se téléporter à {0} ?",
     "TeleportCost": "Coût : {0}",
     "TeleportCostReading": "Lecture du coût…",
+    "AetheryteNotAttuned": "Éthérite non harmonisée",
     "TeleportCostUnknown": "Coût inconnu : éthérite absente de la liste de téléportation du jeu (non harmonisée ?)",
     "SectionIcons": "Icônes de cette carte",
     "IconsReset": "Rétablir les valeurs par défaut",

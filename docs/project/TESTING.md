@@ -932,6 +932,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.644) Carte : vos coordonnées restent en bas à gauche et le curseur donne sa distance. Poser un drapeau hors de la vue : ses coordonnées et sa distance s'affichent sous son repère de bord. Comparer une distance avec le jeu.
 
+- [ ] (0.645) Survoler une éthérite harmonisée : son coût s'affiche, le même que dans la fenêtre de téléportation. Une éthérite non harmonisée est grisée et le dit au survol.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

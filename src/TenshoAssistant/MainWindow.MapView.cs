@@ -980,8 +980,11 @@ internal sealed partial class MainWindow
     }
     private void NavigateMap(uint mapId){if(mapId==0)return;mapViewMapId=mapId;mapViewFollow=false;mapFitRequested=true;}
 
+    private (uint Shown,uint Standing) mapCostsReadFor;
     private void DrawMapCanvas(MapDefinition map,MapLiveState? live)
     {
+        // 0.645 (P7): the game's teleport list, read when the shown map or the player's map changes: costs depend on where the player stands.
+        if(mapCostsReadFor!=(map.MapId,live?.MapId ?? 0)){mapCostsReadFor=(map.MapId,live?.MapId ?? 0);mapLive?.RefreshTeleportCosts();}
         var origin=ImGui.GetCursorScreenPos();var size=Vector2.Max(ImGui.GetContentRegionAvail(),new Vector2(64));mapCanvasSize=size;
         ImGui.InvisibleButton("MapCanvas",size,ImGuiButtonFlags.MouseButtonLeft | ImGuiButtonFlags.MouseButtonRight);
         var hovered=ImGui.IsItemHovered() && !mapOverlayHovered;var io=ImGui.GetIO();
@@ -1136,7 +1139,9 @@ internal sealed partial class MainWindow
             foreach(var item in icons)
             {
                 if(textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null && !MapLabels.IsZoneImage(item.Fixed?.LinkMapId ?? 0,image.Width))
-                    draw.AddImage(image.Handle,item.At-new Vector2(item.Size/2),item.At+new Vector2(item.Size/2));
+                    // 0.645 (P7): an aetheryte not attuned is greyed.
+                    draw.AddImage(image.Handle,item.At-new Vector2(item.Size/2),item.At+new Vector2(item.Size/2),Vector2.Zero,Vector2.One,
+                        MapLabels.NotAttuned(item.Fixed?.AetheryteId ?? 0,mapLive?.TeleportCosts) ? ImGui.GetColorU32(new Vector4(0.45f,0.45f,0.45f,0.8f)):ImGui.GetColorU32(Vector4.One));
                 // 0.596 (P12): the name the game writes beside this icon, on the side it uses; drawn after the icons (0.623).
                 if(settings.ShowIconNames && settings.NamesShown(mapZoom) && item.Fixed is {Label.Length:>0} named && MapLabels.Shown(named.LinkMapId!=0,mapZoom))
                 {
@@ -1495,6 +1500,12 @@ internal sealed partial class MainWindow
                     var lines=(hit.Label ?? (mapMarkers?.SymbolName(hit.Icon) is { Length:>0 } symbol ? symbol:localization.Format("MapView.IconUnnamed",hit.Icon))).Split('\n');
                     ImGui.TextColored(Accent,lines[0]);
                     foreach(var line in lines.Skip(hit.Point is null ? 1:2))ImGui.TextDisabled(line);
+                    // 0.645 (P7): the cost on hover, or that it is not attuned.
+                    if(hit.Fixed is { AetheryteId:not 0 } crystal && mapLive?.TeleportCostsFailed!=true && mapLive?.TeleportCosts is { Count:>0 } teleportCosts)
+                    {
+                        if(teleportCosts.TryGetValue(crystal.AetheryteId,out var gilCost))ImGui.TextDisabled(localization.Format("MapView.TeleportCost",gilCost.ToString("N0")));
+                        else ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("MapView.AetheryteNotAttuned"));
+                    }
                     if(hit.Point is { } point)
                     {
                         DrawPointAvailability(point);
