@@ -64,7 +64,7 @@ internal sealed class NpcVendorLoader : IDisposable
                 {
                     dataVersion=string.Join(";",data.GameData.Repositories.Values.OrderBy(r=>r.Name).Select(r=>$"{r.Name}={r.Version}"));
                     cacheScope=data.Language.ToString();
-                    cacheVersion=NpcVendorCache.Version($"{dataVersion};schema={typeof(GilShop).Assembly.GetName().Version};fcc-295;req-352;service-679");
+                    cacheVersion=NpcVendorCache.Version($"{dataVersion};schema={typeof(GilShop).Assembly.GetName().Version};fcc-295;req-352;service-680");
                 }
                 if(!cacheChecked && cache is not null)
                 {
@@ -263,6 +263,12 @@ internal sealed class NpcVendorLoader : IDisposable
                 }
                 yield return ++count;
             }
+        foreach(var place in NpcShopLinks.ObservedPlaces)
+        {
+            if(locations.ContainsKey(place.Npc) || !vendorShops.ContainsKey(place.Npc) || !data.GetExcelSheet<Map>().TryGetRow(place.Map,out var map))continue;
+            locations[place.Npc]=[new(place.Territory,place.Map,map.PlaceName.RowId!=0 ? map.PlaceName.Value.Name.ExtractText():"",
+                NpcShopLinks.MapCoordinate(place.X,map.OffsetX,map.SizeFactor),NpcShopLinks.MapCoordinate(place.Z,map.OffsetY,map.SizeFactor),place.X,place.Y,place.Z)];
+        }
         var residents=data.GetExcelSheet<ENpcResident>();
         foreach(var id in vendorShops.Keys.ToArray())
         {names[id]=residents.TryGetRow(id,out var resident) ? VendorName(id,resident):"";yield return ++count;}

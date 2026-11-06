@@ -65,7 +65,6 @@ public sealed unsafe class ReadingCapture : IDisposable
             ReadRetainer();
             ReadAirships();
             ReadIsland();
-            ReadIslandNpcs();
             warned=false;
         }
         catch(Exception error)
@@ -84,17 +83,6 @@ public sealed unsafe class ReadingCapture : IDisposable
     }
 
     // 0.671 (N-10): what the workshops' model still does not know: when the demand loads, the two grooves, the rest days and the crafts the game calls efficient.
-    // 0.679: where the island's NPCs stand, for those no sheet and no layout places (Laracheteuse).
-    private readonly HashSet<uint> islandNpcs=[];
-    private void ReadIslandNpcs()
-    {
-        var manager=MJIManager.Instance();
-        if(manager==null || !manager->IsPlayerInSanctuary)return;
-        foreach(var item in objects)
-            if(item.ObjectKind==Dalamud.Game.ClientState.Objects.Enums.ObjectKind.EventNpc && islandNpcs.Add(item.BaseId))
-                Line("islandNpc",120,$"{item.BaseId} {item.Name} at {item.Position.X:0.###};{item.Position.Y:0.###};{item.Position.Z:0.###}");
-    }
-
     private void ReadIsland()
     {
         if((nint)MJIManager.StaticAddressPointers.ppInstance==0)return;

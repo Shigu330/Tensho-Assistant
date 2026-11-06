@@ -53,6 +53,9 @@ public static class NpcShopLinks
     /// </summary>
     public static readonly IReadOnlyList<uint> ServiceNpcs=[1043463,1043464];
 
+    /// <summary>0.680: where the game placed an NPC that no sheet and no layout places, read in the game (docs/evidence/0.679-island-map.md). Id, territory, map, world position.</summary>
+    public static readonly IReadOnlyList<(uint Npc,uint Territory,uint Map,float X,float Y,float Z)> ObservedPlaces=[(1043464,1055,773,-266.316f,41.001f,207.874f)];
+
     public static readonly IReadOnlyDictionary<uint,IReadOnlyList<uint>> ObservedTalkShops=new Dictionary<uint,IReadOnlyList<uint>>
     {
         [721280]=[1769743,1770537,1769744],

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.680.0
+- Plan global, Félicité insulaire, carte : Laracheteuse (Exportations) paraît sur la carte Tensho, à la position lue dans le jeu : aucun fichier du jeu ne la donne. La même lecture montre des repères sur deux versions de la carte à la fois (773 et 775), ce qui explique le « ! » manquant. La capture temporaire est retirée. COMPILED et TESTED, non validé en jeu.
+- Tests : Island679Tests. Verify.ps1 (agent) : 1201/1201, 0 avertissement, 0 erreur ; DLL 0.680.0.0. Non validé en jeu.
+### English
+- Laracheteuse (Exportations) appears on the Tensho map, at the position read in the game: no game file gives it. The same reading shows markers on two versions of the map at once (773 and 775), which explains the missing marker. The temporary capture is removed. COMPILED and TESTED, not validated in game.
+
 ## 0.679.0
 - Plan global, Félicité insulaire, carte : Corrections, rapports de l'utilisateur. Le marqueur « ! » de l'objectif de développement manquait : l'île a plusieurs versions de sa carte dans le jeu et Tensho ne gardait que les repères de la version affichée. La carte Tensho disparaissait dans tous les modes : MJIPadGuide, invisible, comptait comme une fenêtre devant elle. Marchandréa (Divers) et Laracheteuse (Exportations) sont ajoutées comme PNJ de service, sans vente inventée : Marchandréa est placée d'après la feuille Level ; Laracheteuse n'a de position dans aucun fichier du jeu, une capture en mode développeur relève sa place. COMPILED et TESTED, non validé en jeu.
 - Tests : Island679Tests. Verify.ps1 (agent) : 1200/1200, 0 avertissement, 0 erreur ; DLL 0.679.0.0. Non validé en jeu.

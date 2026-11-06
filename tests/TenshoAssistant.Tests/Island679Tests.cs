@@ -12,9 +12,9 @@ internal static class Island679Tests
         ("Island map: a marker on another version of the land counts, not one on another floor or zone",() =>
         {
             var shown=Map(774,533);
-            var catalog=new MapCatalog([Map(772,533),Map(773,533),shown,Map(780,533),Map(794,556),Map(800,533,territory:1),Map(801,533,offset:0)]);
+            var catalog=new MapCatalog([Map(772,533),Map(773,533),shown,Map(775,533),Map(780,533),Map(794,556),Map(800,533,territory:1),Map(801,533,offset:0)]);
             var same=catalog.SameLand(shown);
-            foreach(var id in new uint[]{772,773,774,780})Check(same.Contains(id),"version "+id);
+            foreach(var id in new uint[]{772,773,774,775,780})Check(same.Contains(id),"version "+id);
             Check(!same.Contains(794u),"the caverns have their own marker range");
             Check(!same.Contains(800u),"another territory");
             Check(!same.Contains(801u),"another frame");
@@ -35,6 +35,13 @@ internal static class Island679Tests
         {
             Check(TenshoAssistant.UI.GameWindows.Ignored("MJIPadGuide"),"pad guide");
             Check(!TenshoAssistant.UI.GameWindows.Ignored("MJICraftSchedule"),"the agenda stays a window");
+        }),
+        ("Island NPCs: Laracheteuse stands where the game was read, on a map the catalogue knows",() =>
+        {
+            var place=TenshoAssistant.Npcs.NpcShopLinks.ObservedPlaces.Single(item=>item.Npc==1043464);
+            Check(place.Territory==1055 && place.Map==773,"the island");
+            Check(Math.Abs(place.X+266.316f)<0.01f && Math.Abs(place.Z-207.874f)<0.01f,"the position read");
+            Check(Read("Npcs/NpcVendorLoader.Dalamud.cs").Contains("if(locations.ContainsKey(place.Npc)"),"a position from the game files would win");
         }),
         ("Island NPCs: the two service NPCs are placed with their own name, and no sale is made up",() =>
         {
