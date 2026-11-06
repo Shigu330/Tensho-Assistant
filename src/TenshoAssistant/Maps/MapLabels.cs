@@ -83,6 +83,9 @@ public static class MapLabels
     /// <summary>0.645 (P7): an aetheryte missing from the game's teleport list. Unknown (list not read, or empty) says nothing.</summary>
     public static bool NotAttuned(uint aetheryte,IReadOnlyDictionary<uint,uint>? costs)=>aetheryte!=0 && costs is { Count:>0 } && !costs.ContainsKey(aetheryte);
     public static bool Shown(bool mapLink,float zoom)=>mapLink || zoom>=DetailZoom;
+    /// <summary>0.661 (user capture): far out, the game drops the place names of a zone too, and keeps those of region and world maps. Between about 0.39 (gone) and 0.94 (shown): by eye.</summary>
+    public const float PlaceNameZoom=0.6f;
+    public static bool PlaceNameShown(bool zoneMap,float zoom)=>!zoneMap || zoom>=PlaceNameZoom;
 
     /// <summary>The names that fit, map links first, then in the order given: a name that would touch one already kept is left out.</summary>
     public static int[] Fitting(IReadOnlyList<(Vector2 At,Vector2 Size,bool MapLink)> names)

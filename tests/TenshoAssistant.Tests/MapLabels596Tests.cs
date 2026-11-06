@@ -72,6 +72,8 @@ internal static class MapLabels596Tests
             Check(Math.Abs(TenshoAssistant.Maps.MapLabels.PlaceNameSize(20,2f,1)-13)<0.01f,"zoomed in: its share of the setting");
             Check(Math.Abs(TenshoAssistant.Maps.MapLabels.IconNameSize(40)-16.4f)<0.01f && TenshoAssistant.Maps.MapLabels.IconNameSize(1)==6,"names beside icons: their share, still drawable");
             Check(TenshoAssistant.Maps.MapLabels.Shown(false,0.75f) && !TenshoAssistant.Maps.MapLabels.Shown(false,0.74f),"sooner than at 100 %");
+            Check(TenshoAssistant.Maps.MapLabels.PlaceNameShown(true,0.6f) && !TenshoAssistant.Maps.MapLabels.PlaceNameShown(true,0.39f),"a zone's place names go far out");
+            Check(TenshoAssistant.Maps.MapLabels.PlaceNameShown(false,0.1f),"not those of region and world maps");
             Check(TenshoAssistant.Maps.MapLabels.PlaceNameSize(20,0.01f,1)==6,"still drawable");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             Check(view.Contains("GameTargetAbove(map,markers,upperTarget.MapId,upperTarget.World)"),"on the region and the world");

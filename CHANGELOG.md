@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.661.0
+- Plan global, 0.661 : Carte : fermer la carte avec sa touche pendant une incantation la laisse fermée, et elle ne revient plus juste avant le chargement : le joueur doit rester libre 1,5 seconde avant qu'elle revienne. Très dézoomée, une zone ne garde que ses noms de liens, comme le jeu : les noms de lieux partent sous 60 %, valeur choisie à l'œil. Les cartes de région et du monde gardent les leurs.
+- Tests : Map resume. Verify.ps1 (agent) : 1159/1159, 0 avertissement, 0 erreur ; DLL 0.661.0.0. Non validé en jeu.
+### English
+- Map: closing the map with its key during a cast leaves it closed, and it no longer comes back just before the loading screen: the player must stay free for 1.5 seconds first. Far out, a zone keeps only its link names, like the game: place names go below 60 %, a value chosen by eye. Region and world maps keep theirs.
+
 ## 0.660.0
 - Plan global, 0.660 : Carte : les noms sont plus petits et plus proches de ceux du jeu : noms de lieux à 0,65 du réglage, noms à côté des icônes à 0,41, mesurés sur tes captures. Les noms à côté des icônes apparaissent dès 75 % de zoom au lieu de 100 %, valeur choisie à l'œil.
 - Tests : Map labels. Verify.ps1 (agent) : 1159/1159, 0 avertissement, 0 erreur ; DLL 0.660.0.0. Non validé en jeu.

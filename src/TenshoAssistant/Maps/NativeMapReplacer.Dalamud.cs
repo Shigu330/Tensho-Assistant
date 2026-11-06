@@ -47,12 +47,12 @@ internal sealed class NativeMapReplacer : IDisposable
             || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.Occupied38] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.Occupied39]
             || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell];
     }
-    /// <summary>0.658: a teleport closes the game's map too, while casting or between zones, with none of the flags above.</summary>
+    /// <summary>0.658: a teleport closes the game's map too, between zones, with none of the flags above. 0.661 (user test): not a cast: the map key closes the map then, and it stays closed.</summary>
     private bool ClosedByEvent()
     {
         if(Occupied())return true;
         if(occupiedFlags is not { } flags)return false;
-        return flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.Casting] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas51];
+        return flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas51];
     }
     public NativeMapReplacer(IFramework framework,IGameGui gui,IClientState client,ICondition condition,Func<MapViewSettings> settings,Action<GameMapRequest> open,
         Func<bool> tenshoOpen,Func<bool> canShow,Action closeTensho,IPluginLog log)
@@ -84,7 +84,7 @@ internal sealed class NativeMapReplacer : IDisposable
             var addon=gui.GetAddonByName("AreaMap");
             var unit=addon.IsNull ? null:(AtkUnitBase*)addon.Address;
             var visible=unit!=null && addon.IsVisible;
-            if(resume.ShouldReopen(ClosedByEvent(),visible,client.TerritoryType) && AgentMap.Instance() is var again && again!=null)
+            if(resume.ShouldReopen(ClosedByEvent(),visible,client.TerritoryType,now) && AgentMap.Instance() is var again && again!=null)
             {
                 log.Information("The event is over: the map opens again.");
                 again->Show();

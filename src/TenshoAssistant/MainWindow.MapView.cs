@@ -1063,7 +1063,7 @@ internal sealed partial class MainWindow
             // 0.152 (user choice « follow the zoom »): names scale with the map like the icons; only a 6 px floor keeps them drawable.
             var nameSize=Math.Max(6,ImGui.GetFontSize()*2.4f*settings.NameFactor(mapZoom)*nameScale);
             var placeNameSize=MapLabels.PlaceNameSize(nameSize,mapZoom,nameScale);
-            foreach(var marker in settings.ShowPlaceNames && settings.NamesShown(mapZoom) ? markers.Where(marker=>marker.Icon==0):[])
+            foreach(var marker in settings.ShowPlaceNames && settings.NamesShown(mapZoom) && MapLabels.PlaceNameShown(map.TerritoryId!=0,mapZoom) ? markers.Where(marker=>marker.Icon==0):[])
             {
                 var centre=origin+mapPan+new Vector2(marker.X,marker.Y)*mapZoom;
                 var text=ImGui.CalcTextSize(marker.Label)*(placeNameSize/ImGui.GetFontSize());var corner=centre-text/2;
