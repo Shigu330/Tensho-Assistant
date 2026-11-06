@@ -80,6 +80,7 @@ internal sealed partial class MainWindow
             ImGui.TextUnformatted(NpcPlace(location));
             if(maps.State.Catalog?.Find(location.MapId) is { } map)
             {
+                PlaceMenu($"VendorPlace{location.MapId}/{location.X}/{location.Y}",map,new(location.X,location.Y),NpcName(vendor));
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("MapView.ShowOnMap")+$"##VendorMap{location.MapId}/{location.X}/{location.Y}"))ShowOnTenshoMap(map,new Vector3(location.WorldX,0,location.WorldZ));
             }

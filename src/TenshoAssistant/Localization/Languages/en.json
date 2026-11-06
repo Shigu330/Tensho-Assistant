@@ -4638,6 +4638,7 @@
     "Help": "Raw parameters retained; the Effects panel interprets known IDs. RemainingTime is not converted to turns."
   },
   "EntityMenu": {
+    "RightClickPlace": "Right click: nearest aetheryte, flag, map.",
     "OpenQuest": "Open the quest",
     "QuestStart": "Quest start",
     "OpenVendor": "Open the NPC's shop",

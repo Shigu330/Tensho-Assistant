@@ -44,8 +44,17 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(document.Url);
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,document.FetchedAt);
         if(document.Monsters.Count==0)ImGui.TextWrapped(localization.Get("WikiMonsters.Empty"));
+        var wikiRow=0;
         foreach(var row in document.Monsters)
-        {ImGui.TextWrapped($"{CommunityMonster(row.Name)} · {row.Level} · {CommunityPlace(row.Location)}");}
+        {
+            wikiRow++;
+            ImGui.TextWrapped($"{CommunityMonster(row.Name)} · {row.Level} · {CommunityPlace(row.Location)}");
+            // 0.704 (user report): the wiki gives a place: right click, the nearest aetheryte.
+            var place=BlueSpellSources.Parse(row.Location);
+            if(place.X is not { } x || place.Y is not { } y || EnglishPlaceId?.Invoke(place.Place) is not (> 0 and var placeId) || maps.State.Catalog?.ForPlace(placeId).FirstOrDefault() is not { } map)continue;
+            PlaceMenu($"WikiMonsterPlace{wikiRow}",map,new(x,y),CommunityMonster(row.Name));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("EntityMenu.RightClickPlace"));
+        }
     }
     private void DrawMonsterLoot()
     {
@@ -193,6 +202,7 @@ internal sealed partial class MainWindow
                 selectedBookmark=Guid.Empty; bookmarkName=""; bookmarkSaved=false; mapOpenError=null; page=Page.Maps;
             }
         }
+        if (chosen is not null && monster.X is { } menuX && monster.Y is { } menuY) PlaceMenu("MonsterPlace",chosen,new(menuX,menuY),monster.Name);
         ImGui.TextDisabled(localization.Get("MonsterUi.MapHelp"));
     }
 }

@@ -47,6 +47,7 @@ internal sealed partial class MainWindow
                 {
                     ImGui.SameLine();
                     if(ImGui.SmallButton(localization.Get("Tracker.Map")))OpenMapPointFromPage(map,place.X,place.Y);
+                    PlaceMenu("TrackerPlace",map,new(place.X,place.Y),map.Zone);
                 }
             }
             finally{ImGui.PopID();}

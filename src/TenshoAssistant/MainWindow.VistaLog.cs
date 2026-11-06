@@ -78,7 +78,11 @@ internal sealed partial class MainWindow
             var territory=maps.State.Catalog?.Find(vista.MapId)?.TerritoryId ?? 0;
             if(territory!=0 && ImGui.BeginPopupContextItem($"VistaLogAlarm{vista.Id}"))
             {
-                try{DrawVistaAlarmEntry(vista,territory);}
+                try
+                {
+                    DrawVistaAlarmEntry(vista,territory);
+                    if(maps.State.Catalog?.Find(vista.MapId) is { } vistaMap){ImGui.Separator();PlaceEntries(vistaMap,CoordinateOf(vistaMap,new Vector3(vista.X,0,vista.Z)),"EntityMenu.Here");}
+                }
                 finally{ImGui.EndPopup();}
             }
             if(ImGui.IsItemHovered())DrawSightseeingTooltip(vista,done);

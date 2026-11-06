@@ -116,6 +116,7 @@ internal sealed partial class MainWindow
                 OpenMapPointFromPage(selected, mapX, mapY);
         }
         finally { ImGui.EndDisabled(); }
+        if (valid) PlaceMenu("MapsOpenPlace", selected, new(mapX, mapY), selected.Zone);
         if (!valid) ImGui.TextWrapped(localization.Get("MapsUi.InvalidCoordinates"));
         if (mapOpenError is { } errorText) ImGui.TextWrapped(errorText);
         DrawBookmarkEditor(selected);

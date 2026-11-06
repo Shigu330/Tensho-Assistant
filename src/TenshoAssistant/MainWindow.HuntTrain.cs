@@ -107,6 +107,7 @@ internal sealed partial class MainWindow
                 var rank=stop.Rank switch{3=>"S",2=>"A",_=>"B"};
                 ImGui.TextColored(stop.Visited ? Muted:Accent,localization.Format("HuntTrain.Stop",index+1,stop.Name,rank,stop.Zone,stop.X.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),
                     stop.Y.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),stop.SeenAt.ToLocalTime().ToString("t")));
+                if(catalog.Find(stop.MapId) is { } stopMap)PlaceMenu("TrainPlace",stopMap,new(stop.X,stop.Y),stop.Name);
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("HuntTrain.Flag")) && catalog.Find(stop.MapId) is { } map)
                 {OpenMapPointFromPage(map,stop.X,stop.Y);huntTrain=HuntTrain.MarkVisited(huntTrain,index);huntTrainCalled=index;}

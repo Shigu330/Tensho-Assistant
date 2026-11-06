@@ -121,6 +121,7 @@ internal sealed partial class MainWindow
                 ImGui.BeginDisabled(map is null);
                 try{if(ImGui.SmallButton($"X {animal.X:0.#} Y {animal.Y:0.#}##IslandAnimal{index}") && map is not null)OpenMapPointFromPage(map,animal.X,animal.Y);}
                 finally{ImGui.EndDisabled();}
+                if(map is not null)PlaceMenu($"IslandAnimalPlace{index}",map,new(animal.X,animal.Y),animal.Name);
                 if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Island.AnimalPlaceTip"));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(animal.Time.Length>0 ? animal.Time:localization.Get("Island.AnyTime"));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(animal.Weather.Length>0 ? animal.Weather:localization.Get("Island.AnyWeather"));

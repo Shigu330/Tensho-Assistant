@@ -94,6 +94,7 @@ internal sealed partial class MainWindow
                     OpenMapView(hit.MapId);
                     mapFitRequested=false;mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,MapFocusZoom));mapCenterRequest=hit.Pixel;
                 }
+                if(maps.State.Catalog?.Find(hit.MapId) is { } hitMap)PlaceMenu("HitPlace",hitMap,MapProjection.CoordinateFromPixel(hit.Pixel,hitMap),hit.Name);
                 ImGui.SameLine();
                 ImGui.TextDisabled(localization.Get("MapsUi.Find"+hit.Kind)+" · "+hit.Zone);
             }

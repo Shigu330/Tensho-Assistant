@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.704.0
+- Plan global, Éthérites : Demande de l'utilisateur : partout où des coordonnées s'affichent, le clic droit propose l'éthérite la plus proche, avec drapeau et question de téléportation habituelle. Ajouté aux lieux de monstres du wiki et de Garland, sources de magie bleue, liens du chat, train de chasse, animaux de l'île, favoris, listes de la carte Tensho, recherche sur les cartes, page Cartes, fiches de vendeurs, sources d'objets, suivi, carnet d'exploration et récolte. Un test exige ce menu sur toute page qui place un drapeau. COMPILED et TESTED, non validé en jeu.
+- Tests : PlaceMenus704Tests. Verify.ps1 (agent) : 1252/1252, 0 avertissement, 0 erreur ; DLL 0.704.0.0. Non validé en jeu.
+### English
+- User request: wherever coordinates show, a right click offers the nearest aetheryte, with the flag and the usual teleport question. Added to wiki and Garland monster places, blue magic sources, chat links, hunt train, island animals, bookmarks, the Tensho map's lists, map search, the Maps page, vendor sheets, item sources, tracker, sightseeing log and gathering. A test requires this menu on any page placing a flag. COMPILED and TESTED, not validated in game.
+
 ## 0.703.0
 - Plan global, W-09 : Demande de l'utilisateur : option « Exclure les PNJ aux prérequis non remplis » dans les panneaux : un article dont la quête n'est pas faite ne compte plus. Un prérequis non lu compte comme rempli : les hauts faits ne sont retenus que s'ils sont confirmés, et le rang de compagnie n'est pas vérifié. Désactivée par défaut. COMPILED et TESTED, non validé en jeu.
 - Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1249/1249, 0 avertissement, 0 erreur ; DLL 0.703.0.0. Non validé en jeu.

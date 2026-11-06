@@ -1048,6 +1048,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.703) Cocher l'option : un objet vendu par un PNJ dont la quête n'est pas faite doit changer de catégorie ; comparer avec Vendeurs PNJ.
 
+- [ ] (0.704) Butin des monstres : clic droit sur une ligne du wiki avec coordonnées ; essayer aussi un vendeur, un favori, le train de chasse, un animal de l'île ; le bon endroit doit être visé.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

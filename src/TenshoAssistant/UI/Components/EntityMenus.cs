@@ -77,6 +77,9 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(map.TerritoryId==0);
         try{if(ImGui.Selectable(localization.Get("MapView.Flag")+"##EntityFlag"))PlaceFlagFromMapView(map,coordinate.X,coordinate.Y);}
         finally{ImGui.EndDisabled();}
+        // 0.704 (user request): wherever coordinates are shown, the nearest aetheryte: the flag, the Tensho map on the point, the usual teleport question.
+        if(map.TerritoryId!=0 && ImGui.Selectable(localization.Get("MapView.NearestAetheryte")+"##EntityAetheryte"))
+            AskNearestAetheryteAt(map,MapProjection.PixelFromCoordinate(coordinate,map),place ?? map.Zone,flag:true,direct:configuration.GoThereTeleport);
         // 0.299: remove the flag from here too (when one is placed).
         if(mapLive?.State?.Flag is not null && ImGui.Selectable(localization.Get("MapView.RemoveFlag")+"##EntityRemoveFlag"))mapLive.RemoveFlag();
         if(ImGui.Selectable(localization.Get("EntityMenu.ShowMap")+"##EntityMap"))

@@ -4638,6 +4638,7 @@
     "Help": "Paramètres bruts conservés ; le panneau Effets interprète les IDs connus. RemainingTime n’est pas converti en tours."
   },
   "EntityMenu": {
+    "RightClickPlace": "Clic droit : éthérite la plus proche, drapeau, carte.",
     "OpenQuest": "Ouvrir la quête",
     "QuestStart": "Début de la quête",
     "OpenVendor": "Ouvrir les ventes du PNJ",
