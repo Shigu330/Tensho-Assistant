@@ -16,6 +16,8 @@ internal sealed partial class MainWindow
     private IslandRow[] islandRows=[];
     private Task<IslandAgenda>? islandPlanning;
     private IslandAgenda? islandAgenda;
+    private IReadOnlyList<IslandMaterialTotal> islandMaterialTotals=[];
+    private string[] islandMaterialTexts=[];
 
     private void DrawIslandSanctuary()
     {
@@ -29,6 +31,7 @@ internal sealed partial class MainWindow
             islandReadFailed=!read.IsCompletedSuccessfully;
             island=read.IsCompletedSuccessfully ? read.Result:null;
             islandRows=island is { Status:IslandReadStatus.Loaded } ? IslandValue.Rows(catalog,island):[];
+            islandMaterialTexts=islandRows.Select(row=>string.Join(", ",(row.Craft.Materials ?? []).Select(item=>localization.Format("Island.MaterialAmount",item.Name,item.Amount)))).ToArray();
             islandAgenda=null;
         }
         ImGui.BeginDisabled(ReadIsland is null || islandRead is not null);
@@ -61,6 +64,7 @@ internal sealed partial class MainWindow
         {
             islandPlanning=null;
             islandAgenda=planning.IsCompletedSuccessfully ? planning.Result:null;
+            islandMaterialTotals=islandAgenda is { } planned ? IslandMaterials.Totals(planned):[];
         }
         ImGui.BeginDisabled(islandPlanning is not null);
         try{if(ImGui.Button(localization.Get("Island.Propose")))islandPlanning=Task.Run(()=>IslandPlanner.Propose(catalog,current));}
@@ -73,6 +77,33 @@ internal sealed partial class MainWindow
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Island.CopyTip"));
         foreach(var line in IslandAgendaText(agenda).Split('\n'))ImGui.TextUnformatted(line);
         ImGui.TextDisabled(localization.Get("Island.AgendaLimits"));
+        DrawIslandMaterials(agenda);
+    }
+
+    // N-07 (0.673): what this agenda uses, from the game's sheets; the island's stocks are not read.
+    private void DrawIslandMaterials(IslandAgenda agenda)
+    {
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("Island.Materials",islandMaterialTotals.Count)+"###IslandMaterials",ImGuiTreeNodeFlags.None))return;
+        if(!IslandMaterials.Complete(agenda))ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Island.MaterialsIncomplete"));
+        ImGui.TextDisabled(localization.Get("Island.MaterialsLimits"));
+        if(islandMaterialTotals.Count==0)return;
+        if(ImGui.Button(localization.Get("Island.MaterialsCopy")))ImGui.SetClipboardText(string.Join("\n",islandMaterialTotals.Select(item=>localization.Format("Island.MaterialAmount",item.Name,item.Amount))));
+        if(!ImGui.BeginTable("###IslandMaterialsTable",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV))return;
+        try
+        {
+            ImGui.TableSetupColumn(localization.Get("Island.ColumnMaterial"));
+            ImGui.TableSetupColumn(localization.Get("Island.ColumnCategory"));
+            ImGui.TableSetupColumn(localization.Get("Island.ColumnAmount"));
+            ImGui.TableHeadersRow();
+            foreach(var item in islandMaterialTotals)
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();ImGui.TextUnformatted(item.Name);
+                ImGui.TableNextColumn();ImGui.TextUnformatted(item.Category);
+                ImGui.TableNextColumn();ImGui.TextUnformatted(item.Amount.ToString(System.Globalization.CultureInfo.CurrentCulture));
+            }
+        }
+        finally{ImGui.EndTable();}
     }
 
     private string IslandAgendaText(IslandAgenda agenda)
@@ -91,11 +122,11 @@ internal sealed partial class MainWindow
     private void DrawIslandTable(IslandCatalog catalog)
     {
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("Island.Crafts",islandRows.Length)+"###IslandCrafts",ImGuiTreeNodeFlags.DefaultOpen))return;
-        if(!ImGui.BeginTable("###IslandTable",6,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.ScrollY|ImGuiTableFlags.Resizable,new Vector2(0,Math.Max(ImGui.GetContentRegionAvail().Y,240))))return;
+        if(!ImGui.BeginTable("###IslandTable",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.ScrollY|ImGuiTableFlags.Resizable,new Vector2(0,Math.Max(ImGui.GetContentRegionAvail().Y,240))))return;
         try
         {
             ImGui.TableSetupScrollFreeze(0,1);
-            foreach(var key in new[]{"Island.ColumnCraft","Island.ColumnHours","Island.ColumnThemes","Island.ColumnPopularity","Island.ColumnSupply","Island.ColumnValue"})
+            foreach(var key in new[]{"Island.ColumnCraft","Island.ColumnHours","Island.ColumnThemes","Island.ColumnPopularity","Island.ColumnSupply","Island.ColumnValue","Island.ColumnMaterials"})
                 ImGui.TableSetupColumn(localization.Get(key));
             ImGui.TableHeadersRow();
             var clipper=ImGui.ImGuiListClipper();
@@ -113,6 +144,7 @@ internal sealed partial class MainWindow
                         ImGui.TableNextColumn();ImGui.TextUnformatted(row.Popularity is { } popularity ? localization.Get("Island.Popularity"+popularity):"—");
                         ImGui.TableNextColumn();ImGui.TextUnformatted((row.Supply is { } supply ? localization.Get("Island.Supply"+supply):"—")+(row.Demand is { } demand ? " · "+localization.Get("Island.Demand"+demand):""));
                         ImGui.TableNextColumn();ImGui.TextUnformatted(row.Value is { } value ? "~"+value.ToString("0",System.Globalization.CultureInfo.CurrentCulture):"—");
+                        ImGui.TableNextColumn();ImGui.TextUnformatted(index<islandMaterialTexts.Length ? islandMaterialTexts[index]:"");
                     }
                 clipper.End();
             }

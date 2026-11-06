@@ -190,7 +190,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | Gils des servants dans la vue des personnages | Sonde à la cloche | |
 | I-05, suite des ventes des servants | Essayer la 0.508 | |
 | N-04, loterie immobilière | Sonde : structure du jeu à trouver | |
-| N-07, ressources de l'île | Vérifier l'unité des positions | |
+| N-07, ressources de l'île | Vérifier l'unité des positions | Carte faite en 0.667, liste des matériaux en 0.673 ; vos stocks de l'île ne sont pas lus |
 | N-10, atelier de l'île | Fait sans le jeu en 0.671 et suivantes (lecture, table) ; à vérifier en jeu : `docs/evidence/0.671-island-workshop.md` | Demandé par l'utilisateur le 2026-11-06 ; prévision de la semaine plus tard |
 | ~~Panneau du Dédale~~ abandonné (DEC-038) ; suite du dresseur | La page reste une liste d'informations, hors du Dédale | |
 
@@ -211,6 +211,14 @@ Demande de l'utilisateur (2026-11-05) : tout remettre à jour une fois le plan c
 3. L'aide et la prise en main du plugin : elles décrivent les outils.
 4. Tous les fichiers `.md` du dépôt, à jour puis en français et en anglais : l'anglais toujours en premier, avec une mention en français disant que la traduction est en bas.
 5. Sur Git, tout en anglais si possible : messages de commit, issues, releases et ce que GitHub affiche.
+
+## Retenu pour plus tard
+
+Demande de l'utilisateur (2026-11-06) : à garder, sans y travailler pour l'instant ; ne pas le commencer sans sa demande.
+
+| Point | État relevé le 2026-11-06 |
+|---|---|
+| Île de Lunule (Croissant occulte) | Dans Tensho : les archives occultes dans les Collections (`CollectionKind.OccultLore`, feuille `MKDLore`) et un libellé pour la carte, rien d'autre. Données du jeu à étudier : feuilles `MKDSupportJob`, `MKDGrowData`, `MKDGrowDataSJob`, `MKDBNpcData`, `MKDChain`, `MKDData`, `MKDTrait`, structures `OccultCrescentMKDData`, `AgentMKDInfo`, `AgentMKDSupportJob`. Occult Crescent Helper et Phantom Job Switcher sont sous AGPL : lecture seule, jamais copiés. |
 
 ## Écartés à la revue
 

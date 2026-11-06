@@ -988,6 +988,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.672) Sur l'île, après lecture : Proposer un agenda. Saisir un cycle proposé dans l'agenda du jeu : mêmes créations efficaces que le jeu, pas de dépassement de 24 h. Comparer le total aux coquillages reçus.
 
+- [ ] (0.673) Île sanctuaire, matériaux : comparer les matériaux d'une création à l'agenda du jeu (colonne Matériaux). Proposer un agenda, ouvrir « Matériaux de cet agenda » et vérifier le total. Saisir une création efficace : regarder si les matériaux retirés comptent une fois ou deux.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.673.0
+- Plan global, N-07 : Île sanctuaire (N-07, liste des matériaux) : chaque création affiche ses matériaux, et un agenda proposé donne le total de ses matériaux pour un cycle, à copier. D'après les données du jeu ; une création efficace compte une fois (un guide le dit, à comparer en jeu) ; les stocks de l'île ne sont pas lus. Plan : l'île de Lunule est notée pour plus tard, à la demande de l'utilisateur. Script de version : la ligne de reprise ne garde plus de restes après un numéro de version.
+- Tests : Island materials. Verify.ps1 (agent) : 1182/1182, 0 avertissement, 0 erreur ; DLL 0.673.0.0. Non validé en jeu.
+### English
+- Island sanctuary (N-07, materials list): each craft shows its materials, and a proposed agenda gives its total materials for one cycle, to copy. From the game's data; an efficient craft counts once (a guide says so, to compare in game); the island's stocks are not read. Plan: Occult Crescent is noted for later, as the user asked. Version script: the resume line no longer leaves remains after a version number.
+
 ## 0.672.0
 - Plan global, N-10 : Île sanctuaire (N-10), deuxième partie : « Proposer un agenda » calcule un cycle pour vos ateliers construits, atelier par atelier, en tenant compte de l'offre déjà utilisée, et se copie en texte. Vous le saisissez vous-même : Tensho ne programme rien. Un bon agenda plutôt que le meilleur : l'entrain ne monte pas pendant le calcul, et les matériaux ne sont pas vérifiés. Règle des créations efficaces réécrite d'après Workshop Optimizer Plugin (MIT). La prévision de la semaine reste à faire.
 - Tests : Island agenda. Verify.ps1 (agent) : 1178/1178, 0 avertissement, 0 erreur ; DLL 0.672.0.0. Non validé en jeu.

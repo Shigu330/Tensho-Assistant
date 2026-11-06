@@ -1,7 +1,10 @@
 namespace TenshoAssistant.Island;
 
+/// <summary>N-07 (0.673): what one craft uses, from MJICraftworksObject and MJIItemPouch. Category: the game's name for it.</summary>
+public sealed record IslandMaterial(uint ItemId,string Name,int Amount,string Category);
+
 /// <summary>N-10 (0.671): a craft of the island's workshops, from MJICraftworksObject. Id is the row, which indexes popularity and supply.</summary>
-public sealed record IslandCraft(uint Id,uint ItemId,string Name,int Hours,int Value,int LevelRequired,IReadOnlyList<uint> Themes);
+public sealed record IslandCraft(uint Id,uint ItemId,string Name,int Hours,int Value,int LevelRequired,IReadOnlyList<uint> Themes,IReadOnlyList<IslandMaterial>? Materials=null);
 
 /// <summary>The workshops' sheets. Popularity: one row per MJICraftworksPopularity, one type per craft row. The ratios are percents, indexed by the row of their sheet.</summary>
 public sealed record IslandCatalog(int Rows,IReadOnlyList<IslandCraft> Crafts,IReadOnlyList<byte[]> Popularity,int[] PopularityRatio,int[] SupplyRatio,int[] RankRatio,IReadOnlyDictionary<uint,string> ThemeNames)

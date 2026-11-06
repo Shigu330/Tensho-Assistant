@@ -12,7 +12,7 @@ store(path,text.replace(found.group(0),f'<Version>0.{new}.0</Version>',1),crlf)
 path='docs/ai/STATUS.md';text,crlf=load(path)
 assert f'VERSION: 0.{old}.0.0' in text
 text=text.replace(f'VERSION: 0.{old}.0.0',f'VERSION: 0.{new}.0.0',1)
-text,count=re.subn(r'Reprise : [^.\n]*\.',f"Reprise : {entry['next']}.",text,count=1);assert count==1
+text,count=re.subn(r'Reprise : (?:[^.\n]|\.(?=\S))*\.',f"Reprise : {entry['next']}.",text,count=1);assert count==1
 store(path,text,crlf)
 path='CHANGELOG.md';text,crlf=load(path);head=f'## 0.{old}.0\n';assert head in text
 store(path,text.replace(head,f"## 0.{new}.0\n- Plan global, {entry['id']} : {entry['fr']}\n- Tests : {entry['tests']}. Verify.ps1 (agent) : VERIFYCOUNT, 0 avertissement, 0 erreur ; DLL 0.{new}.0.0. Non validé en jeu.\n### English\n- {entry['en']}\n\n"+head,1),crlf)
