@@ -22,10 +22,10 @@ public static class MapLabels
     public const float ZoneScale=0.42f;
     public static Vector2 ZonePixel(Vector2 linkMarker,Vector2 zonePixel)=>linkMarker+(zonePixel-new Vector2(1024))*ZoneScale;
     /// <summary>
-    /// 0.639 (user request): a marker with no link of its own that still opens the map it names: a dungeon's entrance (60414, not clickable in the game) or a door like Ville fantôme (60441, clickable in the game).
-    /// See docs/evidence/0.639-instance-markers.md.
+    /// 0.639 (user request): a marker with no link of its own that still opens the map it names, like a dungeon's entrance or Ville fantôme. 0.640 (user captures): every kind of door has its
+    /// own icon, so the name decides: an icon named like a map (services have no name). Not plain place names (icon 0). See docs/evidence/0.639-instance-markers.md.
     /// </summary>
-    public static bool OpensNamedMap(uint icon,uint dataType)=>dataType==0 && icon is 60414 or 60441;
+    public static bool OpensNamedMap(uint icon,uint dataType)=>dataType==0 && icon!=0;
     public static bool Shown(bool mapLink,float zoom)=>mapLink || zoom>=DetailZoom;
 
     /// <summary>The names that fit, map links first, then in the order given: a name that would touch one already kept is left out.</summary>

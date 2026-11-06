@@ -55,10 +55,15 @@ internal static class MapLabels596Tests
         {
             Check(TenshoAssistant.Maps.MapLabels.OpensNamedMap(60414,0),"dungeon entrance");
             Check(TenshoAssistant.Maps.MapLabels.OpensNamedMap(60441,0),"Ville fantôme");
-            Check(!TenshoAssistant.Maps.MapLabels.OpensNamedMap(60412,0),"a shop stays a shop");
+            Check(TenshoAssistant.Maps.MapLabels.OpensNamedMap(60467,0) && TenshoAssistant.Maps.MapLabels.OpensNamedMap(60442,0),"Locaux de la Société de l'Arcadion, Le Paddock (0.640)");
+            Check(!TenshoAssistant.Maps.MapLabels.OpensNamedMap(0,0),"a plain place name");
             Check(!TenshoAssistant.Maps.MapLabels.OpensNamedMap(60414,3),"another kind of marker");
             var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs"));
             Check(source.Contains("row.DataType==1 ? row.DataKey.RowId:NamedMap("),"as a link, for the icon and its name");
+            Check(source.Contains("if(label.Length==0 || !MapLabels.OpensNamedMap(icon,dataType))return 0;"),"services have no name: they stay as they are");
+            Check(source.Contains("&& found.Range!=range ? found.Map:0;"),"not a marker named like its own map");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
+            Check(view.Contains("if(hit.Fixed is { LinkMapId:not 0 } door)linkUnderMouse=door.LinkMapId;"),"under a quest icon too");
         }),
         ("Map labels: from the sheet, only for a drawn icon, with their setting",() =>
         {

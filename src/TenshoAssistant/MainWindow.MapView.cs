@@ -1299,6 +1299,10 @@ internal sealed partial class MainWindow
             else if(sightseeingTip is { } vistaTip)DrawSightseeingTooltip(vistaTip.Vista,vistaTip.Done);
             else if(tooltip is not null)WrappedTooltip(tooltip);
             else if(hits.Count>0)DrawIconListTooltip(hits,top,settings);
+            // 0.640 (user capture): a quest icon on top of a door hid its link.
+            if(linkUnderMouse is null && edgeLabel is null && top is not { Flag:not null } && top is not { Point:not null } && top is not { Fixed:{ AetheryteId:not 0 } })
+                foreach(var hit in hits)
+                    if(hit.Fixed is { LinkMapId:not 0 } door)linkUnderMouse=door.LinkMapId;
             // Region and world maps: a click (not a drag) on a linked icon opens that map, like the game.
             if(linkUnderMouse is { } link && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)NavigateMap(link);
             if(settings.FlagOnClick && hovered && top is null && linkUnderMouse is null && hoveredBookmark is null && tooltipPoint is null && sightseeingTip is null && map.TerritoryId!=0 && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)

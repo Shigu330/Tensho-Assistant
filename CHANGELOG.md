@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.640.0
+- Plan global, phase 5 : Carte (captures de l'utilisateur) : les Locaux de la Société de l'Arcadion et le Paddock ne menaient nulle part, car seuls deux types d'icônes étaient pris en compte, et une icône de quête par-dessus cachait aussi le lien. Toute icône nommée comme une carte l'ouvre maintenant, même sous une icône de quête. Les services n'ont pas de nom et ne changent pas.
+- Tests : Map labels. Verify.ps1 (agent) : 1144/1144, 0 avertissement, 0 erreur ; DLL 0.640.0.0. Non validé en jeu.
+### English
+- Map (user captures): Locaux de la Société de l'Arcadion and Le Paddock led nowhere, because only two kinds of icons were covered, and a quest icon on top also hid the link. Any icon named like a map now opens it, even under a quest icon. Services have no name and do not change.
+
 ## 0.639.0
 - Plan global, phase 5 : Carte (demande de l'utilisateur) : cliquer l'icône d'un donjon, ou celle d'une porte comme la Ville fantôme, ou leur nom, ouvre la carte nommée. Le jeu le fait pour la Ville fantôme ; pour les donjons, c'est un ajout de Tensho, demandé. Leur nom s'affiche donc comme celui d'un lien, aussi en vue éloignée.
 - Tests : Map labels. Verify.ps1 (agent) : 1144/1144, 0 avertissement, 0 erreur ; DLL 0.639.0.0. Non validé en jeu.

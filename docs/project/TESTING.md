@@ -922,6 +922,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.639) Sur Shaaloani, cliquer la Vallée des Pampas : sa carte s'ouvre. Sur Tuliyollal, cliquer la Ville fantôme : sa carte s'ouvre.
 
+- [ ] (0.640) Sur Solution Neuf, cliquer les Locaux de la Société de l'Arcadion : leur carte s'ouvre. Sur l'Écume des cieux d'Abalathia, cliquer le Paddock : sa carte s'ouvre, même avec l'icône de quête dessus.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

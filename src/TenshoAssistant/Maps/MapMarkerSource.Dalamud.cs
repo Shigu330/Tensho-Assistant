@@ -41,26 +41,27 @@ internal sealed class MapMarkerSource
         try{return range==0 ? []:Copy(range).Where(marker=>marker.Label.Length>0).ToArray();}
         catch(Exception error){log.Warning(error,"Map markers unavailable for range {0}.",range);return [];}
     }
-    private (Dictionary<uint,uint> ByPlace,Dictionary<string,uint> ByName)? namedMaps;
+    private (Dictionary<uint,(uint Map,uint Range)> ByPlace,Dictionary<string,(uint Map,uint Range)> ByName)? namedMaps;
     private readonly object namedMapsLock=new();
     // 0.639: the map such a marker names: by its place's row, then by the same text (Vallée des Pampas: rows 4918 and 4926). Also read off the frame: Read.
-    private uint NamedMap(uint icon,uint dataType,uint place,string label)
+    private uint NamedMap(uint icon,uint dataType,uint place,string label,uint range)
     {
         if(label.Length==0 || !MapLabels.OpensNamedMap(icon,dataType))return 0;
         lock(namedMapsLock)
         {
             if(namedMaps is null)
             {
-                var byPlace=new Dictionary<uint,uint>();var byName=new Dictionary<string,uint>(StringComparer.OrdinalIgnoreCase);
+                var byPlace=new Dictionary<uint,(uint Map,uint Range)>();var byName=new Dictionary<string,(uint Map,uint Range)>(StringComparer.OrdinalIgnoreCase);
                 foreach(var row in data.GetExcelSheet<Map>())
                 {
                     if(row.TerritoryType.RowId==0 || row.SizeFactor==0 || row.PlaceName.RowId==0)continue;
-                    byPlace.TryAdd(row.PlaceName.RowId,row.RowId);
-                    byName.TryAdd(row.PlaceName.Value.Name.ExtractText(),row.RowId);
+                    byPlace.TryAdd(row.PlaceName.RowId,(row.RowId,row.MapMarkerRange));
+                    byName.TryAdd(row.PlaceName.Value.Name.ExtractText(),(row.RowId,row.MapMarkerRange));
                 }
                 namedMaps=(byPlace,byName);
             }
-            return namedMaps.Value.ByPlace.TryGetValue(place,out var found) || namedMaps.Value.ByName.TryGetValue(label,out found) ? found:0;
+            // A marker named like its own map leads nowhere.
+            return (namedMaps.Value.ByPlace.TryGetValue(place,out var found) || namedMaps.Value.ByName.TryGetValue(label,out found)) && found.Range!=range ? found.Map:0;
         }
     }
     private IReadOnlyList<MapIconMarker> Copy(uint range)
@@ -70,7 +71,7 @@ internal sealed class MapMarkerSource
             foreach(var row in rows)
             {
                 var label=row.PlaceNameSubtext.RowId!=0 ? row.PlaceNameSubtext.Value.Name.ExtractText():"";
-                if(row.Icon!=0 || label.Length>0)markers.Add(new(row.X,row.Y,row.Icon,label,row.DataType==1 ? row.DataKey.RowId:NamedMap(row.Icon,row.DataType,row.PlaceNameSubtext.RowId,label),row.DataType==3 ? row.DataKey.RowId:0,row.SubtextOrientation));
+                if(row.Icon!=0 || label.Length>0)markers.Add(new(row.X,row.Y,row.Icon,label,row.DataType==1 ? row.DataKey.RowId:NamedMap(row.Icon,row.DataType,row.PlaceNameSubtext.RowId,label,range),row.DataType==3 ? row.DataKey.RowId:0,row.SubtextOrientation));
             }
         return markers.AsReadOnly();
     }
