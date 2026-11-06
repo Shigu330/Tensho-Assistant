@@ -36,6 +36,17 @@ internal static class MapResume625Tests
             Check(new TenshoAssistant.Gear.JobProgressRow(19,100,0,0).Fraction==1,"nothing to earn");
             Check(new TenshoAssistant.Gear.JobProgressRow(19,90,500,200).Fraction==1,"never past the bar");
         }),
+        ("Duty unlocks (T13): the finder row first, then the quest's own column; unknown stays 0",() =>
+        {
+            Check(TenshoAssistant.Duties.DutyUnlocks.FromFinder(1,67092,0,0)==67092,"le Palais des morts");
+            Check(TenshoAssistant.Duties.DutyUnlocks.FromFinder(0,0,1,69408)==69408,"second pair");
+            Check(TenshoAssistant.Duties.DutyUnlocks.FromFinder(2,20045,1,69501)==69501,"another duty first, then the quest");
+            Check(TenshoAssistant.Duties.DutyUnlocks.FromFinder(4,594,0,0)==0,"not a quest");
+            var duties=TenshoAssistant.Duties.DutyUnlocks.Apply([new TenshoAssistant.Duties.DutyDefinition(1,10,100,"A","Dungeon",15),new TenshoAssistant.Duties.DutyDefinition(2,20,200,"B","Dungeon",16,0,77),new TenshoAssistant.Duties.DutyDefinition(3,30,300,"C","Dungeon",17)],new Dictionary<uint,uint>{[10]=65579,[20]=99});
+            Check(duties[0].UnlockQuest==65579 && duties[1].UnlockQuest==77 && duties[2].UnlockQuest==0,"filled only where unknown");
+            var catalog=new TenshoAssistant.Duties.DutyCatalog(duties);
+            Check(catalog.UnlockedBy(65579).Single().DutyId==1 && !catalog.UnlockedBy(0).Any(),"and the other way round");
+        }),
         ("Map resume: wired where the game closes its map",() =>
         {
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));

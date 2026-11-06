@@ -61,6 +61,7 @@ internal sealed partial class MainWindow
         ImGui.BeginGroup();
         ImGui.TextColored(Accent,duty.Name);
         ImGui.TextDisabled(localization.Format("DutyCounts.Level",duty.Category,duty.Level));
+        DrawDutyUnlock(duty);
         ImGui.EndGroup();
         // Source, freshness and refresh on one line; the long explanations go into the (i) tooltip.
         if(state.Loading)ImGui.TextDisabled(localization.Get("DutyUi.Loading"));

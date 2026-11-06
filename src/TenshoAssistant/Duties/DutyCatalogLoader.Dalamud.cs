@@ -52,7 +52,7 @@ internal sealed class DutyCatalogLoader : IDisposable
                         if (finder.ContentLinkType == 1 && finder.Content.RowId == row.RowId
                             && finder.TerritoryType.RowId != 0 && !string.IsNullOrWhiteSpace(name))
                             copied.Add(new(finder.RowId,row.RowId,finder.TerritoryType.RowId,name,
-                                finder.ContentType.ValueNullable?.Name.ExtractText() ?? "",finder.ClassJobLevelRequired,finder.ContentType.ValueNullable?.Icon ?? 0));
+                                finder.ContentType.ValueNullable?.Name.ExtractText() ?? "",finder.ClassJobLevelRequired,finder.ContentType.ValueNullable?.Icon ?? 0,DutyUnlocks.FromFinder(finder.UnlockType,finder.UnlockCriteria.RowId,finder.UnlockType2,finder.UnlockCriteria2.RowId)));
                     }
                     if (Stopwatch.GetElapsedTime(start) >= TimeSpan.FromMilliseconds(2)) break;
                 }
@@ -62,7 +62,18 @@ internal sealed class DutyCatalogLoader : IDisposable
                 if (copied.Count == 0) throw new InvalidDataException("InstanceContent sheet gave no duty.");
                 var managed = copied.ToArray(); copied.Clear(); sheet = null;
                 var token = cancellation.Token;
-                build = Task.Run(() => new DutyCatalog(managed,token));
+                build = Task.Run(() =>
+                {
+                    // T13 (0.648): off the frame. Without the quests, the duties simply say nothing about them.
+                    var questByInstance=new Dictionary<uint,uint>();
+                    try
+                    {
+                        foreach(var quest in data.GetExcelSheet<Quest>())
+                            if(quest.InstanceContentUnlock.RowId!=0)questByInstance.TryAdd(quest.InstanceContentUnlock.RowId,quest.RowId);
+                    }
+                    catch(Exception error){questByInstance.Clear();log.Warning(error,"The quests unlocking duties could not be read.");}
+                    return new DutyCatalog(DutyUnlocks.Apply(managed,questByInstance),token);
+                });
                 _ = build.ContinueWith(task => { _ = task.Exception; }, TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
             }
             catch (Exception error) { service.Fail(error); log.Warning(error,"Tensho duty catalog unavailable."); Stop(); }

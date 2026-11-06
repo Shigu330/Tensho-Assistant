@@ -2808,6 +2808,8 @@
     "Durability": "Durability: {0} / {1}"
   },
   "DutyUi": {
+    "UnlockedBy": "Unlocked by:",
+    "Unlocks": "Unlocks: {0}",
     "Title": "Duty loot",
     "Description": "Game catalogue · loot data requested manually from Garland Tools",
     "Back": "Back to duties",

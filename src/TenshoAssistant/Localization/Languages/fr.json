@@ -2808,6 +2808,8 @@
     "Durability": "Solidité : {0} / {1}"
   },
   "DutyUi": {
+    "UnlockedBy": "Débloqué par :",
+    "Unlocks": "Débloque : {0}",
     "Title": "Butin des contenus",
     "Description": "Catalogue du jeu · données de butin consultées manuellement auprès de Garland Tools",
     "Back": "Retour aux contenus",

@@ -246,6 +246,8 @@ internal sealed partial class MainWindow
         if(entry.IsRepeatable)ImGui.TextDisabled(localization.Get("QuestDetails.Repeatable"));
         if(developerMode)ImGui.TextDisabled($"ID {entry.Id}");
         ImGui.TextUnformatted(QuestProgressLabel(entry));
+        // T13 (0.648): what this quest unlocks.
+        foreach(var unlocked in duties.State.Catalog?.UnlockedBy(entry.Id) ?? [])ImGui.TextDisabled(localization.Format("DutyUi.Unlocks",unlocked.Name));
         DrawQuestRewards(entry);
         if (entry.Level != 0)
             ImGui.TextUnformatted(localization.Format("QuestDetails.Level",entry.Level));

@@ -2,10 +2,23 @@ using System.Collections.Frozen;
 
 namespace TenshoAssistant.Duties;
 
-public sealed record DutyDefinition(uint DutyId, uint InstanceId, uint TerritoryId, string Name, string Category, uint Level, uint Icon = 0);
+public sealed record DutyDefinition(uint DutyId, uint InstanceId, uint TerritoryId, string Name, string Category, uint Level, uint Icon = 0, uint UnlockQuest = 0);
+
+/// <summary>T13 (0.648): the quest that unlocks a duty, where the game's sheets name one (docs/evidence/0.648-duty-unlocks.md). 0: not known, which does not mean none.</summary>
+public static class DutyUnlocks
+{
+    /// <summary>ContentFinderCondition: UnlockType 1 means UnlockCriteria is a Quest row; same for the second pair.</summary>
+    public static uint FromFinder(byte type,uint criteria,byte type2,uint criteria2)=>type==1 ? criteria:type2==1 ? criteria2:0;
+    /// <summary>Quest.InstanceContentUnlock, the other way round, for a duty the finder row says nothing about.</summary>
+    public static DutyDefinition[] Apply(IEnumerable<DutyDefinition> duties,IReadOnlyDictionary<uint,uint> questByInstance)
+        =>duties.Select(duty=>duty.UnlockQuest==0 && questByInstance.TryGetValue(duty.InstanceId,out var quest) ? duty with {UnlockQuest=quest}:duty).ToArray();
+}
 
 public sealed class DutyCatalog
 {
+    private ILookup<uint,DutyDefinition>? unlocks;
+    /// <summary>T13 (0.648): the duties this quest unlocks.</summary>
+    public IEnumerable<DutyDefinition> UnlockedBy(uint quest)=>quest==0 ? []:(unlocks ??= Entries.ToLookup(duty=>duty.UnlockQuest))[quest];
     private readonly FrozenDictionary<uint, DutyDefinition> byDuty;
     public IReadOnlyList<DutyDefinition> Entries { get; }
     public DutyCatalog(IEnumerable<DutyDefinition> source, CancellationToken cancellation = default)

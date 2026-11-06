@@ -132,6 +132,14 @@ internal sealed partial class MainWindow
         finally { ImGui.EndTable(); }
     }
 
+    // T13 (0.648): the quest that unlocks the duty, where the game says so.
+    private void DrawDutyUnlock(DutyDefinition duty)
+    {
+        if(duty.UnlockQuest==0 || QuestOf(duty.UnlockQuest) is not { Name.Length:>0 } quest)return;
+        ImGui.AlignTextToFramePadding();ImGui.TextDisabled(localization.Get("DutyUi.UnlockedBy"));ImGui.SameLine();
+        if(ImGui.SmallButton($"{quest.Name}##DutyUnlock{duty.DutyId}")){SelectQuest(quest.Id);page=Page.Quests;}
+        ImGui.SameLine();ImGui.TextDisabled(QuestProgressLabel(quest));
+    }
     private void DrawDutyLootDetails()
     {
         var state = dutyLoot.State;
@@ -140,6 +148,7 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,duty.Name);
         ImGui.TextDisabled(localization.Format("DutyCounts.Level",duty.Category,duty.Level));
         ImGui.SameLine(); DrawDutyStatus(DutyProgressSource?.Invoke()?.Of(duty.InstanceId));
+        DrawDutyUnlock(duty);
         if(developerMode)ImGui.TextDisabled(localization.Format("DevMode.DutyInstance",duty.DutyId,duty.InstanceId));
         if (state.Loading)
         { if (ImGui.Button(localization.Get("DutyUi.Cancel"))) dutyLoot.Cancel(); ImGui.SameLine(); ImGui.TextDisabled(localization.Get("DutyUi.Loading")); }

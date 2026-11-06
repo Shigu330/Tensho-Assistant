@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.648.0
+- Plan global, T13 : Contenus et quêtes (T13) : la page Butin des contenus et le panneau de la Recherche de mission disent quelle quête débloque un contenu, avec son état et un lien ; la fiche d'une quête dit ce qu'elle débloque. Seuls environ 130 contenus sur plus de 700 nomment leur quête dans les données du jeu ; pour les autres, rien n'est affiché, et rien n'est deviné.
+- Tests : Duty unlocks. Verify.ps1 (agent) : 1149/1149, 0 avertissement, 0 erreur ; DLL 0.648.0.0. Non validé en jeu.
+### English
+- Duties and quests (T13): the Duty loot page and the Duty Finder panel say which quest unlocks a duty, with its state and a link; a quest's sheet says what it unlocks. Only about 130 duties out of more than 700 name their quest in the game's data; for the others nothing is shown, and nothing is guessed.
+
 ## 0.647.0
 - Plan global, C27 : Récolte (C27) : le survol d'un point de récolte sur la carte donne sa classe : à horaire, éphémère ou légendaire, déduite du type du point dans les données du jeu. Le tome requis était déjà indiqué depuis la 0.518. Les libellés sont ceux de Tensho, déduits des données.
 - Tests : Gather point kinds. Verify.ps1 (agent) : 1148/1148, 0 avertissement, 0 erreur ; DLL 0.647.0.0. Non validé en jeu.

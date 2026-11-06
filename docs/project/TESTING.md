@@ -938,6 +938,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.647) Survoler un point légendaire, un éphémère et un à horaire sur la carte : la classe dite correspond au jeu.
 
+- [ ] (0.648) Page Butin des contenus, le Palais des morts : « Débloqué par » donne la quête, son état et son lien. La fiche de cette quête dit « Débloque ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
