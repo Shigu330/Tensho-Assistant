@@ -964,6 +964,18 @@ internal sealed partial class MainWindow
     }
     // Same, without a known position: the whole map.
     private void ShowMapOnTenshoMap(uint mapId){if(mapId==0)return;mapViewOpen=true;NavigateMap(mapId);}
+    // 0.642 (user captures): the target stays when going up, as on the game's map: inside its zone's picture on the region, on the region's link on the world.
+    private Vector2? GameTargetAbove(MapDefinition map,IReadOnlyList<MapIconMarker> markers,uint targetMap,Vector2 world)
+    {
+        if(map.TerritoryId!=0 || mapMarkers is null || maps.State.Catalog is not { } catalog || catalog.Find(targetMap) is not { } zone)return null;
+        foreach(var link in markers)
+            if(link.LinkMapId!=0 && (link.LinkMapId==targetMap || catalog.Find(link.LinkMapId)?.TerritoryId==zone.TerritoryId))
+                return MapLabels.ZonePixel(new Vector2(link.X,link.Y),MapProjection.PixelFromWorld(new Vector3(world.X,0,world.Y),zone));
+        var region=mapMarkers.RegionOf(zone);
+        foreach(var link in markers)
+            if(region!=0 && link.LinkMapId==region)return new Vector2(link.X,link.Y);
+        return null;
+    }
     private void NavigateMap(uint mapId){if(mapId==0)return;mapViewMapId=mapId;mapViewFollow=false;mapFitRequested=true;}
 
     private void DrawMapCanvas(MapDefinition map,MapLiveState? live)
@@ -1037,14 +1049,15 @@ internal sealed partial class MainWindow
             var font=ImGui.GetFont();var nameScale=Math.Clamp(float.IsFinite(settings.PlaceNameScale) ? settings.PlaceNameScale:1,0.5f,1.5f);
             // 0.152 (user choice « follow the zoom »): names scale with the map like the icons; only a 6 px floor keeps them drawable.
             var nameSize=Math.Max(6,ImGui.GetFontSize()*2.4f*settings.NameFactor(mapZoom)*nameScale);
+            var placeNameSize=MapLabels.PlaceNameSize(nameSize,mapZoom,nameScale);
             foreach(var marker in settings.ShowPlaceNames && settings.NamesShown(mapZoom) ? markers.Where(marker=>marker.Icon==0):[])
             {
                 var centre=origin+mapPan+new Vector2(marker.X,marker.Y)*mapZoom;
-                var text=ImGui.CalcTextSize(marker.Label)*(nameSize/ImGui.GetFontSize());var corner=centre-text/2;
+                var text=ImGui.CalcTextSize(marker.Label)*(placeNameSize/ImGui.GetFontSize());var corner=centre-text/2;
                 var outline=ImGui.GetColorU32(new Vector4(0.96f,0.93f,0.84f,0.9f));
                 foreach(var shift in new[]{new Vector2(-1,0),new Vector2(1,0),new Vector2(0,-1),new Vector2(0,1)})
-                    draw.AddText(font,nameSize,corner+shift,outline,marker.Label);
-                draw.AddText(font,nameSize,corner,ImGui.GetColorU32(new Vector4(0.30f,0.22f,0.12f,1)),marker.Label);
+                    draw.AddText(font,placeNameSize,corner+shift,outline,marker.Label);
+                draw.AddText(font,placeNameSize,corner,ImGui.GetColorU32(new Vector4(0.30f,0.22f,0.12f,1)),marker.Label);
             }
             // 0.631: the zones of a region map, under everything else, like the game.
             foreach(var marker in settings.ShowFixedIcons ? markers.Where(marker=>marker.Icon!=0 && marker.LinkMapId!=0 && settings.SizeOf(marker.Icon,map.MapId)>0):[])
@@ -1111,6 +1124,8 @@ internal sealed partial class MainWindow
             ExpireGameTarget();
             if(mapGameTarget is { } gameTarget && gameTarget.MapId==map.MapId)
                 Add(gameTarget.Icon,4,MapProjection.PixelFromWorld(new Vector3(gameTarget.World.X,0,gameTarget.World.Y),map),localization.Get("MapView.GameTarget"));
+            else if(mapGameTarget is { } upperTarget && GameTargetAbove(map,markers,upperTarget.MapId,upperTarget.World) is { } upperPixel)
+                Add(upperTarget.Icon,4,upperPixel,localization.Get("MapView.GameTarget"));
             icons.Sort((left,right)=>left.Priority!=right.Priority ? left.Priority.CompareTo(right.Priority):left.Layer!=right.Layer ? left.Layer.CompareTo(right.Layer):left.Order.CompareTo(right.Order));
             MapIconDraw? top=null;var hits=new List<MapIconDraw>();
             if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right))mapIconContext=null;

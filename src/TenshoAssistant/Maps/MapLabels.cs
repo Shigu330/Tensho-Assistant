@@ -26,6 +26,9 @@ public static class MapLabels
     /// own icon, so the name decides: an icon named like a map (services have no name). Not plain place names (icon 0). See docs/evidence/0.639-instance-markers.md.
     /// </summary>
     public static bool OpensNamedMap(uint icon,uint dataType)=>dataType==0 && icon!=0;
+    /// <summary>0.642 (user capture, too large once zoomed out): a place name's height on the map, read on the game's own map (about 18 px at zoom 0.39): it never exceeds this.</summary>
+    public const float PlaceNameMapHeight=46f;
+    public static float PlaceNameSize(float size,float zoom,float scale)=>Math.Max(6,Math.Min(size,PlaceNameMapHeight*zoom*scale));
     public static bool Shown(bool mapLink,float zoom)=>mapLink || zoom>=DetailZoom;
 
     /// <summary>The names that fit, map links first, then in the order given: a name that would touch one already kept is left out.</summary>

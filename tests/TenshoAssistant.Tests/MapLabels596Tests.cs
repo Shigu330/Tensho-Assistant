@@ -65,6 +65,15 @@ internal static class MapLabels596Tests
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             Check(view.Contains("if(hit.Fixed is { LinkMapId:not 0 } door)linkUnderMouse=door.LinkMapId;"),"under a quest icon too");
         }),
+        ("Map labels (0.642): place names follow the map when zoomed out; the target stays when going up",() =>
+        {
+            Check(TenshoAssistant.Maps.MapLabels.PlaceNameSize(40,0.39f,1)<18.5f,"as on the game's map");
+            Check(TenshoAssistant.Maps.MapLabels.PlaceNameSize(20,0.17f,1)<8,"zoomed out");
+            Check(TenshoAssistant.Maps.MapLabels.PlaceNameSize(20,2f,1)==20,"zoomed in: the setting");
+            Check(TenshoAssistant.Maps.MapLabels.PlaceNameSize(20,0.01f,1)==6,"still drawable");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
+            Check(view.Contains("GameTargetAbove(map,markers,upperTarget.MapId,upperTarget.World)"),"on the region and the world");
+        }),
         ("Map labels: from the sheet, only for a drawn icon, with their setting",() =>
         {
             var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs"));

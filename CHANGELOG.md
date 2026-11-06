@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.642.0
+- Plan global, phase 5 : Carte (captures de l'utilisateur, jeu à côté de Tensho) : la cible d'une quête reste en remontant, dans l'image de sa zone sur la carte de région et sur le lien de la région sur le monde, comme le jeu. Les noms de lieux en noir suivent maintenant la carte en vue éloignée, et ne sont plus trop grands. Différence gardée : au clic, Tensho ouvre directement la zone, là où le jeu passe par le monde.
+- Tests : Map labels. Verify.ps1 (agent) : 1145/1145, 0 avertissement, 0 erreur ; DLL 0.642.0.0. Non validé en jeu.
+### English
+- Map (user captures, game beside Tensho): a quest's target stays when going up, inside its zone's picture on the region map and on the region's link on the world, like the game. Black place names now follow the map when zoomed out and are no longer too large. Difference kept: on a click, Tensho opens the zone directly, where the game goes through the world.
+
 ## 0.641.0
 - Plan global, phase 5 : Carte (capture de l'utilisateur, jeu à côté de Tensho) : le menu des zones du jeu ajoute des cartes sans catégorie, vu pour la carte affichée et celle de la quête, comme les Locaux de la Société de l'Arcadion et le Ring des Griffes félines. Tensho les ajoute à la fin de sa liste. La règle exacte du jeu reste inconnue : sa liste défile et peut en contenir d'autres.
 - Tests : Map. Verify.ps1 (agent) : 1144/1144, 0 avertissement, 0 erreur ; DLL 0.641.0.0. Non validé en jeu.
