@@ -20,7 +20,7 @@ internal sealed partial class MainWindow
 
     private void DrawSquadronPlanner()
     {
-        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("Squadron.Title")+"###SquadronPlanner"))return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("Squadron.Title")+"###SquadronPlanner",ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextDisabled(localization.Get("Squadron.Help"));
         if(squadronRead is { IsCompleted:true } read)
         {

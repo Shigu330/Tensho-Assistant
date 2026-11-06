@@ -17,7 +17,7 @@ internal sealed partial class MainWindow
     {
         if(CharacterStatusSource is not { } source)return;
         var all=source.All;
-        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("CharacterStatus.Title",all.Count)+"###CharacterStatuses"))return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("CharacterStatus.Title",all.Count)+"###CharacterStatuses",ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextDisabled(localization.Get("CharacterStatus.Help"));
         if(all.Count==0){ImGui.TextDisabled(localization.Get("CharacterStatus.Empty"));return;}
         var now=DateTimeOffset.UtcNow;var lastDaily=ResetSchedule.PreviousDaily(now,ResetSchedule.DailyHour);var current=source.Current;

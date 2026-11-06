@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.687.0
+- Plan global, Rappels : Demande de l'utilisateur : la page Rappels passe en 5 onglets : Minuteurs, Mes tâches, Roulettes, Escadron, État du personnage. Rien n'est retiré. COMPILED et TESTED, non validé en jeu.
+- Tests : ReminderTabs687Tests. Verify.ps1 (agent) : 1222/1222, 0 avertissement, 0 erreur ; DLL 0.687.0.0. Non validé en jeu.
+### English
+- User request: the Reminders page becomes 5 tabs: Timers, My tasks, Roulettes, Squadron, Character status. Nothing is removed. COMPILED and TESTED, not validated in game.
+
 ## 0.686.0
 - Plan global, Félicité insulaire : Corrections, captures de l'utilisateur : Tensho lisait quatre fabriques alors qu'une seule est prête, et préparait une planification pour les quatre ; seules les fabriques construites comptent maintenant, d'après un octet observé sur un seul joueur. Les mots de la disponibilité et de l'évolution sont ceux du jeu (Introuvable, En surplus, Forte augmentation, Constante…), et « fabrique » remplace « atelier » sur la page. COMPILED et TESTED, non validé en jeu.
 - Tests : IslandWorkshops686Tests. Verify.ps1 (agent) : 1221/1221, 0 avertissement, 0 erreur ; DLL 0.686.0.0. Non validé en jeu.

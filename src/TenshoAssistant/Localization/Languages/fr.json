@@ -4638,6 +4638,11 @@
     "Here": "Position"
   },
   "Reminders": {
+    "TabTimers": "Minuteurs",
+    "TabTasks": "Mes tâches",
+    "TabRoulettes": "Roulettes",
+    "TabSquadron": "Escadron",
+    "TabStatus": "État du personnage",
     "CompanyActions": "Bienfaits de compagnie",
     "CompanyActionsHelp": "Les bienfaits de compagnie actifs sur votre personnage. Leur fin est connue une fois l'onglet Bienfaits de la fenêtre de compagnie ouvert.",
     "CompanyActionsUnknown": "Non lu",

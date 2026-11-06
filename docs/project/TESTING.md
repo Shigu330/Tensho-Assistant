@@ -1016,6 +1016,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.686) Félicité insulaire : une seule fabrique lue et planifiée ; comparer disponibilité et évolution de 3 ou 4 créations à « Besoins en biens insulaires ».
 
+- [ ] (0.687) Rappels : les 5 onglets et leur contenu ; rien ne doit avoir disparu.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

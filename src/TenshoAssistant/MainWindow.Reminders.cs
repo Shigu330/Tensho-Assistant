@@ -19,6 +19,8 @@ internal sealed partial class MainWindow
     private DateTimeOffset reminderTimersTriedAt;
     private string? reminderTimersError;
 
+    // 0.687 (user request): the page in tabs.
+    private string? reminderTabFocus;
     private void DrawReminders()
     {
         Heading(localization.Get("Reminders.Title"),localization.Get("Reminders.Description"));
@@ -35,6 +37,18 @@ internal sealed partial class MainWindow
             }
         }
         var timers=reminderTimers;
+        DetailTabs("ReminderTabs",
+        [
+            ("Timers",localization.Get("Reminders.TabTimers"),()=>DrawReminderTimers(timers,now)),
+            ("Tasks",localization.Get("Reminders.TabTasks"),()=>DrawPersonalTasks()),
+            ("Roulettes",localization.Get("Reminders.TabRoulettes"),()=>DrawDailyRoulettes(timers)),
+            ("Squadron",localization.Get("Reminders.TabSquadron"),()=>DrawSquadronPlanner()),
+            ("Status",localization.Get("Reminders.TabStatus"),()=>DrawCharacterStatuses()),
+        ],ref reminderTabFocus);
+    }
+
+    private void DrawReminderTimers(GameTimerSnapshot? timers,DateTimeOffset now)
+    {
         if(!ImGui.BeginTable("Reminders",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
         try
         {
@@ -138,10 +152,6 @@ internal sealed partial class MainWindow
         var fromGame=configuration.RemindersFromGame;
         if(ImGui.Checkbox(localization.Get("Reminders.FromGame"),ref fromGame)){configuration.RemindersFromGame=fromGame;SaveReminders();}
         Tip("Reminders.FromGameTip");
-        DrawPersonalTasks();
-        DrawSquadronPlanner();
-        DrawDailyRoulettes(timers);
-        DrawCharacterStatuses();
 
         void SquadronRow(string key,FontAwesomeIcon icon,SquadronTimer? timer,Func<ushort,string?>? nameOf)
         {

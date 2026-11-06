@@ -4638,6 +4638,11 @@
     "Here": "Position"
   },
   "Reminders": {
+    "TabTimers": "Timers",
+    "TabTasks": "My tasks",
+    "TabRoulettes": "Roulettes",
+    "TabSquadron": "Squadron",
+    "TabStatus": "Character status",
     "CompanyActions": "Company actions",
     "CompanyActionsHelp": "The company actions active on your character. Their end is known once the Actions tab of the Free Company window was opened.",
     "CompanyActionsUnknown": "Not read",
