@@ -53,6 +53,15 @@ internal static class MapResume625Tests
             Check(loader.Contains("reference.RowType == typeof(SpearfishingItem)"),"read before the gathering items are filtered");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/GatheringCatalogCache.cs")).Contains("CopyRules=2"),"an old cache without them is rebuilt");
         }),
+        ("Reading capture: developer mode only, stopped by the competitive cut, limited",() =>
+        {
+            var code=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs"));
+            Check(code.Contains("CompetitiveGate.Add(framework,OnUpdate)") && code.Contains("CompetitiveGate.Remove(framework,OnUpdate)"),"the frame goes through the gate");
+            Check(code.Contains("CompetitiveGate.Cut") && code.Contains("ChatMessageUnhandled-=OnMessage"),"the chat too, with its cleanup");
+            Check(code.Contains("if(disposed || !enabled())return;"),"nothing outside developer mode");
+            Check(code.Contains("if(count>=limit)return;"),"a limit on the lines");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("()=>configuration.DeveloperMode,log)"),"wired to the setting");
+        }),
         ("Map resume: wired where the game closes its map",() =>
         {
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));

@@ -914,19 +914,19 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.635) Cliquer une quête, puis la recliquer plusieurs fois : la carte reste sur elle. Fermer et rouvrir avec la touche de carte (M par défaut) : elle s'ouvre sur toi.
 
-- [ ] (0.636) Cliquer une quête, la recliquer plusieurs fois : pas de clignotement, l'icône reste. Puis touche de carte : la carte se ferme ; encore la touche : elle s'ouvre sur toi.
+- [x] (0.636) Cliquer une quête, la recliquer plusieurs fois : pas de clignotement, l'icône reste. Puis touche de carte : la carte se ferme ; encore la touche : elle s'ouvre sur toi.
 
-- [ ] (0.637) Cliquer plusieurs quêtes de zones différentes, dont une de donjon, depuis le journal et la liste des quêtes actives : la carte se centre à chaque fois, sans changer de zoom.
+- [x] (0.637) Cliquer plusieurs quêtes de zones différentes, dont une de donjon, depuis le journal et la liste des quêtes actives : la carte se centre à chaque fois, sans changer de zoom.
 
-- [ ] (0.638) Cliquer une quête de donjon : la carte de l'entrée s'ouvre, centrée sur le marqueur, comme pour la Ville fantôme.
+- [x] (0.638) Cliquer une quête de donjon : la carte de l'entrée s'ouvre, centrée sur le marqueur, comme pour la Ville fantôme.
 
-- [ ] (0.639) Sur Shaaloani, cliquer la Vallée des Pampas : sa carte s'ouvre. Sur Tuliyollal, cliquer la Ville fantôme : sa carte s'ouvre.
+- [x] (0.639) Sur Shaaloani, cliquer la Vallée des Pampas : sa carte s'ouvre. Sur Tuliyollal, cliquer la Ville fantôme : sa carte s'ouvre.
 
-- [ ] (0.640) Sur Solution Neuf, cliquer les Locaux de la Société de l'Arcadion : leur carte s'ouvre. Sur l'Écume des cieux d'Abalathia, cliquer le Paddock : sa carte s'ouvre, même avec l'icône de quête dessus.
+- [x] (0.640) Sur Solution Neuf, cliquer les Locaux de la Société de l'Arcadion : leur carte s'ouvre. Sur l'Écume des cieux d'Abalathia, cliquer le Paddock : sa carte s'ouvre, même avec l'icône de quête dessus.
 
-- [ ] (0.641) Cliquer « La combattante féline aux griffes acérées », ouvrir les Locaux de la Société de l'Arcadion : le menu des zones finit par ces locaux et le Ring des Griffes félines, comme le jeu.
+- [x] (0.641) Cliquer « La combattante féline aux griffes acérées », ouvrir les Locaux de la Société de l'Arcadion : le menu des zones finit par ces locaux et le Ring des Griffes félines, comme le jeu.
 
-- [ ] (0.642) Cliquer une quête, remonter à la région puis au monde : la cible reste. Dézoomer une ville : les noms en noir rétrécissent avec la carte.
+- [x] (0.642) Cliquer une quête, remonter à la région puis au monde : la cible reste. Dézoomer une ville : les noms en noir rétrécissent avec la carte.
 
 - [x] (0.643) Cliquer une quête, remonter au monde, cliquer la cible : la région s'ouvre ; la recliquer : la carte de la cible s'ouvre.
 
@@ -941,6 +941,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.648) Page Butin des contenus, le Palais des morts : « Débloqué par » donne la quête, son état et son lien. La fiche de cette quête dit « Débloque ».
 
 - [ ] (0.649) Page Récolte : chercher un poisson au harpon, son lieu s'affiche. Comparer avec le carnet du jeu. Ses alarmes et sa carte fonctionnent comme les autres.
+
+- [ ] (0.650) Mode développeur : récolter sans action pendant quelques tics, le journal écrit « Reading gp ». Les relevés suivants sont donnés un par un.
 
 **0.535 : interfaces** — à voir en jouant
 

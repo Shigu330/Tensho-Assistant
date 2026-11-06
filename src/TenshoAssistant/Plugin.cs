@@ -469,6 +469,9 @@ public sealed class Plugin : IDalamudPlugin
             Gear.GameGearsetReader? gameGearsets=null;
             registrations.Register(()=>gameGearsets=new Gear.GameGearsetReader(framework,client,log,expIndex,jobOrder,expToNext),()=>gameGearsets?.Dispose());
             mainWindow.GearsetSource=gameGearsets;
+            // 0.650 (phase 5): the in-game readings, in developer mode only. Temporary.
+            Diagnostics.ReadingCapture? readingCapture=null;
+            registrations.Register(()=>readingCapture=new Diagnostics.ReadingCapture(framework,objects,condition,gameGui,chat,()=>configuration.DeveloperMode,log),()=>readingCapture?.Dispose());
             // g, X-06 (0.391): gatherer GP regeneration tick (on-screen bar, off by default).
             Gathering.RegenTickReader? regenTick=null;
             // g, R-08 (0.403): GP alert at the threshold (chat line and sound with the alarm options), once per rise.

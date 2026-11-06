@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.650.0
+- Plan global, C33 : Relevés en jeu (phase 5, C33 et T5) : en mode développeur seulement, une capture temporaire écrit dans le journal ce que les points suivants attendent : PR pendant une récolte, statuts d'un récolteur dont l'intuition, chance HQ à côté de la qualité, lignes de chat d'une prise, minuteurs des actions de compagnie, cristaux et gils des servants, journaux de voyage des dirigeables. Rien n'est changé dans le jeu, et chaque partie a une limite de lignes. Coupée en JcJ et en contenu classé comme le reste.
+- Tests : Reading capture. Verify.ps1 (agent) : 1151/1151, 0 avertissement, 0 erreur ; DLL 0.650.0.0. Non validé en jeu.
+### English
+- In-game readings (phase 5, C33 and T5): in developer mode only, a temporary capture writes to the log what the next points need: GP while gathering, a gatherer's statuses including intuition, the HQ chance beside the quality, the chat lines of a catch, company action timers, retainers' crystals and gil, airship voyage logs. Nothing changes in the game, and each part has a line limit. Cut in PvP and ranked content like everything else.
+
 ## 0.649.0
 - Plan global, C29 : Récolte (C29) : les poissons au harpon apparaissent dans la recherche de la page Récolte avec leur lieu, comme les autres ressources. Le catalogue est reconstruit une fois.
 - Tests : Gathering sources. Verify.ps1 (agent) : 1150/1150, 0 avertissement, 0 erreur ; DLL 0.649.0.0. Non validé en jeu.
