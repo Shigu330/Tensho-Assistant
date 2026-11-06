@@ -10,38 +10,36 @@ internal static class MapResume625Tests
         ("Map resume: closed during an event, back once free, once",() =>
         {
             var resume=new MapResume();
-            resume.GameClosedMap(true,100);
+            resume.GameClosedMap(true);
             Check(!resume.ShouldReopen(true,false,100),"still talking");
             Check(resume.ShouldReopen(false,false,100),"free again");
             Check(!resume.ShouldReopen(false,false,100),"only once");
         }),
-        ("Map resume: closed by the player, a duty reached, or opened meanwhile: nothing",() =>
+        ("Map resume: closed by the player or opened meanwhile: nothing",() =>
         {
             var resume=new MapResume();
-            resume.GameClosedMap(false,100);
+            resume.GameClosedMap(false);
             Check(!resume.ShouldReopen(false,false,100),"the map key: it stays closed");
-            resume.GameClosedMap(false,100);
+            resume.GameClosedMap(false);
             Check(!resume.ShouldReopen(false,false,200),"the map key, then another zone: it stays closed");
-            resume.GameClosedMap(true,100);
-            Check(!resume.ShouldReopen(false,false,200,true),"a duty reached");
-            Check(!resume.ShouldReopen(false,false,100),"and it does not come back later");
-            resume.GameClosedMap(true,100);
+            resume.GameClosedMap(true);
             Check(!resume.ShouldReopen(true,true,100) && !resume.ShouldReopen(false,false,100),"already open again");
-            resume.GameClosedMap(true,100);
+            resume.GameClosedMap(true);
             resume.Cancel();
             Check(!resume.ShouldReopen(false,false,100),"cancelled");
         }),
-        ("Map resume (0.658): a teleport brings the map back, in another zone too",() =>
+        ("Map resume (0.658, 0.659): a teleport or a duty brings the map back, in another zone too",() =>
         {
             var resume=new MapResume();
-            resume.GameClosedMap(true,958);
+            resume.GameClosedMap(true);
             Check(!resume.ShouldReopen(true,false,958),"casting");
             Check(!resume.ShouldReopen(true,false,0),"between zones");
             Check(!resume.ShouldReopen(false,false,0),"no territory yet");
             Check(resume.ShouldReopen(false,false,130),"arrived in another zone");
             Check(!resume.ShouldReopen(false,false,130),"once");
-            resume.GameClosedMap(true,958);
-            Check(resume.ShouldReopen(false,false,958,true),"the same zone, already a duty: as before");
+            resume.GameClosedMap(true);
+            Check(!resume.ShouldReopen(true,false,1000),"a duty's opening scene");
+            Check(resume.ShouldReopen(false,false,1000),"free in the duty: back too");
         }),
         ("Job progress (T21): one row per experience slot, the job standing for its class, in the game's order",() =>
         {
@@ -94,8 +92,8 @@ internal static class MapResume625Tests
         ("Map resume: wired where the game closes its map",() =>
         {
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));
-            Check(view.Contains("resume.GameClosedMap(ClosedByEvent(),client.TerritoryType);"),"noted on closing");
-            Check(view.Contains("if(resume.ShouldReopen(ClosedByEvent(),visible,client.TerritoryType,InDuty())"),"asked at each tick");
+            Check(view.Contains("resume.GameClosedMap(ClosedByEvent());"),"noted on closing");
+            Check(view.Contains("if(resume.ShouldReopen(ClosedByEvent(),visible,client.TerritoryType)"),"asked at each tick");
             Check(view.Contains("resume.Cancel();"),"not after the competitive cut");
         }),
     ];

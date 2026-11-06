@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.659.0
+- Plan global, 0.659 : Carte : une carte ouverte revient aussi à l'entrée dans un contenu en instance, une fois le joueur libre. Le JcJ et le contenu classé restent à part : la coupure compétitive annule l'attente.
+- Tests : Map resume. Verify.ps1 (agent) : 1159/1159, 0 avertissement, 0 erreur ; DLL 0.659.0.0. Non validé en jeu.
+### English
+- Map: an open map also comes back on entering a duty, once the player is free. PvP and ranked content stay apart: the competitive cut cancels the wait.
+
 ## 0.658.0
 - Plan global, 0.658 : Carte : après une téléportation, la carte se rouvre, y compris dans une autre zone. Elle ne revenait que dans la même zone, d'où le « pas tout le temps ». La fermeture pendant un sort ou un changement de zone compte aussi comme un événement. Elle ne revient pas si la nouvelle zone est un contenu en instance, ni après une fermeture par sa touche. Fermer la carte avec sa touche pendant un sort la fera revenir.
 - Tests : Map resume. Verify.ps1 (agent) : 1159/1159, 0 avertissement, 0 erreur ; DLL 0.658.0.0. Non validé en jeu.

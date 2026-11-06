@@ -950,15 +950,17 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.653) Mandat lancé, carte ouverte, zone verte visible : cliquer le mandat dans le journal, puis recliquer. La zone et les autres marqueurs restent. Terminer le mandat : la zone disparaît une fois la carte refermée.
 
-- [ ] (0.654) Mandat lancé, zone vue une fois : s'éloigner, changer de zone, ouvrir la carte de la zone du mandat, la zone verte reste. Cliquer le mandat dans le journal : elle reste. Abandonner le mandat : elle disparaît.
+- [x] (0.654) Mandat lancé, zone vue une fois : s'éloigner, changer de zone, ouvrir la carte de la zone du mandat, la zone verte reste. Cliquer le mandat dans le journal : elle reste. Abandonner le mandat : elle disparaît.
 
-- [ ] (0.655) Accepter un mandat, le cliquer dans le journal : la cible et son repère au bord apparaissent. L'abandonner : ils disparaissent en moins d'une seconde.
+- [x] (0.655) Accepter un mandat, le cliquer dans le journal : la cible et son repère au bord apparaissent. L'abandonner : ils disparaissent en moins d'une seconde.
 
-- [ ] (0.656) Alerte de PR activée, PR pleins : se téléporter, attendre une minute, aucune alarme. Dépenser des PR, se téléporter, attendre la remontée : une seule alarme.
+- [x] (0.656) Alerte de PR activée, PR pleins : se téléporter, attendre une minute, aucune alarme. Dépenser des PR, se téléporter, attendre la remontée : une seule alarme.
 
-- [ ] (0.657) Depuis une autre zone, cliquer le mandat dans le journal : la zone verte s'affiche et reste. Abandonner : la zone et le repère noir partent. PR pleins, se téléporter : aucune alarme, puis dépenser des PR : une alarme à la remontée.
+- [x] (0.657) Depuis une autre zone, cliquer le mandat dans le journal : la zone verte s'affiche et reste. Abandonner : la zone et le repère noir partent. PR pleins, se téléporter : aucune alarme, puis dépenser des PR : une alarme à la remontée.
 
-- [ ] (0.658) Carte ouverte, se téléporter vers une autre zone : la carte se rouvre à l'arrivée. Vers la même zone aussi. Fermer la carte avec sa touche puis se téléporter : elle reste fermée. Entrer dans un contenu carte ouverte : elle reste fermée.
+- [x] (0.658) Carte ouverte, se téléporter vers une autre zone : la carte se rouvre à l'arrivée. Vers la même zone aussi. Fermer la carte avec sa touche puis se téléporter : elle reste fermée. Entrer dans un contenu carte ouverte : elle reste fermée.
+
+- [ ] (0.659) Carte ouverte, entrer dans un contenu : elle se rouvre une fois la scène d'ouverture finie. Fermée avec sa touche avant d'entrer : elle reste fermée.
 
 **0.535 : interfaces** — à voir en jouant
 

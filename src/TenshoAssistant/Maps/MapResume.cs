@@ -21,20 +21,19 @@ public sealed class MapClickMemory
 public sealed class MapResume
 {
     private bool waiting;
-    private uint territory;
-    public void GameClosedMap(bool occupied,uint inTerritory){waiting=occupied;territory=inTerritory;}
+    public void GameClosedMap(bool occupied)=>waiting=occupied;
     public void Cancel()=>waiting=false;
     /// <summary>
     /// True once, when the map should open again. A map opened meanwhile cancels it.
     /// 0.658 (user report: after a teleport the map stayed closed, « not every time »: a teleport to another zone, docs/evidence/0.658-map-after-teleport.md): another zone
-    /// reached brings the map back too, unless that zone is a duty. No territory (between characters) keeps waiting.
+    /// reached brings the map back too; 0.659 (user request): a duty as well. No territory (between characters) keeps waiting.
     /// </summary>
-    public bool ShouldReopen(bool occupied,bool gameMapVisible,uint inTerritory,bool inDuty=false)
+    public bool ShouldReopen(bool occupied,bool gameMapVisible,uint inTerritory)
     {
         if(!waiting)return false;
         if(gameMapVisible){waiting=false;return false;}
         if(occupied || inTerritory==0)return false;
         waiting=false;
-        return inTerritory==territory || !inDuty;
+        return true;
     }
 }

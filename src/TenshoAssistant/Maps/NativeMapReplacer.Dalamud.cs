@@ -54,7 +54,6 @@ internal sealed class NativeMapReplacer : IDisposable
         if(occupiedFlags is not { } flags)return false;
         return flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.Casting] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas51];
     }
-    private bool InDuty()=>occupiedFlags?[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty]==true;
     public NativeMapReplacer(IFramework framework,IGameGui gui,IClientState client,ICondition condition,Func<MapViewSettings> settings,Action<GameMapRequest> open,
         Func<bool> tenshoOpen,Func<bool> canShow,Action closeTensho,IPluginLog log)
     {occupiedFlags=condition;
@@ -85,7 +84,7 @@ internal sealed class NativeMapReplacer : IDisposable
             var addon=gui.GetAddonByName("AreaMap");
             var unit=addon.IsNull ? null:(AtkUnitBase*)addon.Address;
             var visible=unit!=null && addon.IsVisible;
-            if(resume.ShouldReopen(ClosedByEvent(),visible,client.TerritoryType,InDuty()) && AgentMap.Instance() is var again && again!=null)
+            if(resume.ShouldReopen(ClosedByEvent(),visible,client.TerritoryType) && AgentMap.Instance() is var again && again!=null)
             {
                 log.Information("The event is over: the map opens again.");
                 again->Show();
@@ -157,7 +156,7 @@ internal sealed class NativeMapReplacer : IDisposable
                     }
                     else
                     {
-                        resume.GameClosedMap(ClosedByEvent(),client.TerritoryType);
+                        resume.GameClosedMap(ClosedByEvent());
                         log.Information("The game closed its map window: the Tensho map closes with it; occupied: {0}, event: {1}.",Occupied(),ClosedByEvent());
                         closeTensho();
                     }
