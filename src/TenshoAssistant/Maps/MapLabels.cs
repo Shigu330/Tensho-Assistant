@@ -16,6 +16,15 @@ public static class MapLeves
         =>markerType!=3 && (icon==AreaIcon || tooltip.Length>0 && names?.Contains(Key(tooltip))==true);
 }
 
+/// <summary>
+/// 0.653 (user report): while the journal has the game's map on a leve, the game empties its event markers, every one of them, and fills them again once that request ends
+/// (docs/evidence/0.653-markers-during-journal-request.md). Those read just before stay until then, on the same map.
+/// </summary>
+public static class MapEventHold
+{
+    public static bool Holds(int read,bool journalRequest,uint currentMap,uint keptMap)=>read==0 && journalRequest && currentMap!=0 && currentMap==keptMap;
+}
+
 public static class MapLabels
 {
     /// <summary>

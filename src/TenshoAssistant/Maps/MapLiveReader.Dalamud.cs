@@ -320,8 +320,13 @@ internal sealed class MapLiveReader : IDisposable
                     tooltip.Length>0 ? "read":"unread",marker.TooltipString==null ? -1:marker.TooltipString->StringLength,marker.TooltipString==null ? -1:marker.TooltipString->BufUsed,marker.TooltipString==null ? -1:marker.TooltipString->BufSize,marker.Radius,tooltip);
             result.Add(new(marker.MapId,marker.IconId,marker.Position,float.IsFinite(marker.Radius) ? Math.Max(0,marker.Radius):0,tooltip,marker.ObjectiveId,marker.MarkerType,marker.DataId,IsLeve(marker.IconId,marker.MarkerType,tooltip)));
         }
-        return result.AsReadOnly();
+        // 0.653: the game empties this list during a journal request; what was read just before stays.
+        var journalRequest=agent->CurrentOpenMapInfo.Type is FFXIVClientStructs.FFXIV.Client.UI.Agent.MapType.QuestLog or FFXIVClientStructs.FFXIV.Client.UI.Agent.MapType.GatheringLog;
+        if(MapEventHold.Holds(result.Count,journalRequest,agent->CurrentMapId,lastEventsMap))return lastEvents;
+        lastEvents=result.AsReadOnly();lastEventsMap=agent->CurrentMapId;
+        return lastEvents;
     }
+    private static IReadOnlyList<MapEventMarker> lastEvents=[];private static uint lastEventsMap;
     // Crash 2026-10-31 08:19 (dalamud.crashhandler.log): Utf8String.ToString() on an event marker tooltip read freed memory
     // with an unbounded length. Only a short string (1–256 bytes, within its buffer) is copied, with its own length; anything
     // else gives "". 0.136: the length is BufUsed − 1, as Utf8String.ToString uses it (StringLength reads 0 in game).

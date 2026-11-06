@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.653.0
+- Plan global, 0.653 : Carte : cliquer un mandat lancé dans le journal ne retire plus sa zone. Pendant cette demande, le jeu vide toute sa liste de marqueurs, les 12 et pas seulement celui du mandat, puis la remplit de nouveau. Tensho garde ce qu'il a lu juste avant, tant que dure la demande et sur la même carte.
+- Tests : Event markers. Verify.ps1 (agent) : 1154/1154, 0 avertissement, 0 erreur ; DLL 0.653.0.0. Non validé en jeu.
+### English
+- Map: clicking a started leve in the journal no longer removes its area. During this request the game empties its whole marker list, all 12 and not only the leve's, then fills it again. Tensho keeps what it read just before, while the request lasts and on the same map.
+
 ## 0.652.0
 - Plan global, P17 : Carte (P17) : les mandats forment une catégorie à part. Leurs zones sont en vert comme dans le jeu, avec leur propre réglage et leur couleur, et leurs repères au bord ont leur interrupteur, séparés des autres événements. Un marqueur est reconnu par l'icône relevée en jeu ou par son nom, trouvé dans la feuille des mandats. Le journal écrit aussi le rayon et le texte de chaque type de marqueur. Seul un mandat de mineur a été relevé, et le vert est réglé à l'œil.
 - Tests : Leve markers. Verify.ps1 (agent) : 1153/1153, 0 avertissement, 0 erreur ; DLL 0.652.0.0. Non validé en jeu.

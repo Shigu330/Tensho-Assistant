@@ -83,6 +83,16 @@ internal static class MapLabels596Tests
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(0,costs),"not an aetheryte");
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(9,null) && !TenshoAssistant.Maps.MapLabels.NotAttuned(9,new Dictionary<uint,uint>()),"unknown says nothing");
         }),
+        ("Event markers (0.653): kept while a journal request empties them, on the same map only",() =>
+        {
+            Check(TenshoAssistant.Maps.MapEventHold.Holds(0,true,697,697),"the leve's click: 0 markers, type QuestLog, same map");
+            Check(!TenshoAssistant.Maps.MapEventHold.Holds(12,true,697,697),"markers read: they win");
+            Check(!TenshoAssistant.Maps.MapEventHold.Holds(0,false,697,697),"no request: really none");
+            Check(!TenshoAssistant.Maps.MapEventHold.Holds(0,true,698,697),"another map: nothing kept");
+            Check(!TenshoAssistant.Maps.MapEventHold.Holds(0,true,0,0),"no map yet");
+            var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs"));
+            Check(reader.Contains("if(MapEventHold.Holds(result.Count,journalRequest,agent->CurrentMapId,lastEventsMap))return lastEvents;"),"wired in the reader");
+        }),
         ("Leve markers (P17): the icon read in game, or a tooltip naming a leve, never a quest",() =>
         {
             var names=new HashSet<string>{TenshoAssistant.Maps.MapLeves.Key("Grosse récolte : pierre septentrionale d'ornement")};
