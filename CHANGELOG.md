@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.683.0
+- Plan global, W-02 : La Grande Mascarade, sujet choisi par l'utilisateur. Nouvelle page Progression › La Grande Mascarade : les 32 niveaux, réussis ou non, avec leurs ennemis, le temps standard et le temps idéal, et un filtre « Non réussis seulement ». Aucun conseil de combat : les faiblesses de la feuille ne sont pas reprises. Lecture seule, sans requête au serveur. COMPILED et TESTED, non validé en jeu.
+- Tests : MaskedCarnivale683Tests. Verify.ps1 (agent) : 1209/1209, 0 avertissement, 0 erreur ; DLL 0.683.0.0. Non validé en jeu.
+### English
+- Masked Carnivale, a topic chosen by the user. New page Progression > Masked Carnivale: the 32 stages, cleared or not, with their enemies, standard and ideal times, and an « only those left » filter. No fight advice: the sheet's weaknesses are left out. Read only, no server request. COMPILED and TESTED, not validated in game.
+
 ## 0.682.0
 - Plan global, Félicité insulaire, carte : Correction, rapport de l'utilisateur : les ressources de la Félicité insulaire ne se désactivaient pas depuis le menu Affichage de la carte, et « Aucun » les laissait. La case y est ajoutée, Tout et Aucun les comptent, et dans les réglages elle passe de la section des quêtes à celle des récoltes. COMPILED et TESTED, non validé en jeu.
 - Tests : Island679Tests. Verify.ps1 (agent) : 1203/1203, 0 avertissement, 0 erreur ; DLL 0.682.0.0. Non validé en jeu.

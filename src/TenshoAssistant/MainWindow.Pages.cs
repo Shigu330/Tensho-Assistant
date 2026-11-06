@@ -47,6 +47,7 @@ internal sealed partial class MainWindow
         new(Page.Events,"Progression",PageLabel("Navigation.Events"),DrawEventsPage,"MainWindow.Events.cs, Events/"),
         new(Page.Collections,"Progression",PageLabel("Navigation.Collection"),()=>DrawCollections(),"MainWindow.Collections.cs, Collections/"),
         new(Page.BlueMagic,"Progression",null,()=>DrawCollections(true),"MainWindow.Collections.cs, Collections/",Page.Collections),
+        new(Page.MaskedCarnivale,"Progression",PageLabel("Navigation.MaskedCarnivale"),DrawMaskedCarnivale,"MainWindow.MaskedCarnivale.cs, Carnivale/"),
         new(Page.Gear,"Progression",PageLabel("Navigation.Gear"),DrawGearPlanner,"MainWindow.Gear.cs, Gear/"),
         new(Page.Chocobo,"Progression",PageLabel("Navigation.Chocobo"),DrawChocoboPage,"MainWindow.ChocoboBarding.cs, Gear/ChocoboBarding.cs, Gear/ChocoboReader.Dalamud.cs"),
         new(Page.Leves,"Progression",PageLabel("Navigation.Leves"),DrawLeves,"MainWindow.Leves.cs"),

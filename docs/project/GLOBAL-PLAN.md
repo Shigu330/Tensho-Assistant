@@ -219,7 +219,7 @@ Choisis par l'utilisateur à partir de la liste de rubriques d'un site français
 | Point | Sujet | État |
 |---|---|---|
 | W-01 | Page Commandes spéciales : clients, rang, points, semaine | Fait sans le jeu en 0.675 ; à comparer en jeu : `docs/evidence/0.675-custom-deliveries.md`. Récompenses par rang à ajouter |
-| W-02 | Grande Mascarade : épreuves faites et restantes, sans conseil de combat | Sondé : feuilles `AozContent`, `AozArrangement` ; à coder |
+| W-02 | Grande Mascarade : épreuves faites et restantes, sans conseil de combat | Fait sans le jeu en 0.683 ; à comparer en jeu : `docs/evidence/0.683-masked-carnivale.md`. Défis hebdomadaires et récompenses plus tard |
 | W-03 | Armes reliques : progression par extension | Sondé : `RelicNote` et ses feuilles pour le livre des reliques ; à coder |
 
 ## Retenu pour plus tard

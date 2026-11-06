@@ -255,6 +255,10 @@
     "CustomDeliveriesPurpose": "Vos clients des commandes spéciales : rang, points et ce que chacun prend encore cette semaine.",
     "CustomDeliveriesStart": "Ouvrez la page : Tensho copie ce que le jeu détient déjà. Lisez de nouveau après une livraison.",
     "CustomDeliveriesEmpty": "Rien ne s'affiche tant que votre personnage n'est pas chargé.",
+    "MaskedCarnivaleTitle": "La Grande Mascarade",
+    "MaskedCarnivalePurpose": "Les niveaux de la Grande Mascarade, réussis ou non, avec leurs ennemis et leurs temps.",
+    "MaskedCarnivaleStart": "Ouvrez la page : Tensho copie ce que le jeu détient déjà. Lisez de nouveau après un niveau.",
+    "MaskedCarnivaleEmpty": "Rien ne s'affiche tant que votre personnage n'est pas chargé.",
     "OceanFishingTitle": "Pêche en mer",
     "OceanFishingPurpose": "Les prochains départs de Limsa Lominsa et de Kugane, avec leurs escales et le moment de la journée.",
     "OceanFishingStart": "Lisez le prochain départ et son trajet. Pendant une traversée, l'aide à la pêche donne l'escale et ses poissons.",
@@ -530,6 +534,7 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "Navigation": {
+    "MaskedCarnivale": "La Grande Mascarade",
     "CustomDeliveries": "Commandes spéciales",
     "IslandSanctuary": "Félicité insulaire",
     "Help": "Aide",
@@ -6114,6 +6119,26 @@
     "Locked": "Non débloqué",
     "PointsOf": "{0} / {1}",
     "WeekOf": "{0} / {1}"
+  },
+  "MaskedCarnivale": {
+    "Title": "La Grande Mascarade",
+    "Subtitle": "Vos niveaux, à partir de ce que le jeu détient.",
+    "Help": "Ce que le jeu détient pour votre personnage, avec les noms et les temps de ses feuilles. Tensho ne donne aucun conseil sur les combats, ne demande rien au serveur et n'agit pas dans le jeu.",
+    "Read": "Lire de nouveau",
+    "ReadTip": "Copie une fois ce que le jeu détient. Aucune requête et aucune action dans le jeu.",
+    "SheetsUnavailable": "Les feuilles des niveaux n'ont pas pu être lues, peut-être après une mise à jour du jeu.",
+    "Unavailable": "Les niveaux n'ont pas pu être lus, peut-être après une mise à jour du jeu.",
+    "NotLoaded": "Votre personnage n'est pas encore chargé : lisez de nouveau dans un instant.",
+    "Count": "Niveaux réussis : {0} / {1}",
+    "OnlyLeft": "Non réussis seulement",
+    "OnlyLeftTip": "Masque les niveaux déjà réussis.",
+    "ColumnStage": "Niveau",
+    "ColumnEnemies": "Ennemis",
+    "ColumnStandard": "Temps standard",
+    "ColumnIdeal": "Temps idéal",
+    "ColumnState": "État",
+    "Done": "Réussi",
+    "Left": "Non réussi"
   },
   "Island": {
     "Propose": "Proposer une planification",

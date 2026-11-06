@@ -255,6 +255,10 @@
     "CustomDeliveriesPurpose": "Your custom delivery clients: rank, points and what each one still takes this week.",
     "CustomDeliveriesStart": "Open the page: Tensho copies what the game already holds. Read again after a delivery.",
     "CustomDeliveriesEmpty": "Nothing shows until your character is loaded.",
+    "MaskedCarnivaleTitle": "Masked Carnivale",
+    "MaskedCarnivalePurpose": "The stages of the Masked Carnivale, done or left, with their enemies and times.",
+    "MaskedCarnivaleStart": "Open the page: Tensho copies what the game already holds. Read again after a stage.",
+    "MaskedCarnivaleEmpty": "Nothing shows until your character is loaded.",
     "OceanFishingTitle": "Ocean fishing",
     "OceanFishingPurpose": "The next departures from Limsa Lominsa and Kugane, with their stops and the time of day.",
     "OceanFishingStart": "Read the next departure and its route. During a voyage, the fishing help shows the stop and its fish.",
@@ -530,6 +534,7 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "Navigation": {
+    "MaskedCarnivale": "Masked Carnivale",
     "CustomDeliveries": "Custom deliveries",
     "IslandSanctuary": "Island sanctuary",
     "Help": "Help",
@@ -6114,6 +6119,26 @@
     "Locked": "Not unlocked",
     "PointsOf": "{0} / {1}",
     "WeekOf": "{0} / {1}"
+  },
+  "MaskedCarnivale": {
+    "Title": "Masked Carnivale",
+    "Subtitle": "Your stages, from what the game holds.",
+    "Help": "What the game holds for your character, and the names and times of its sheets. Tensho gives no advice on the fights, asks the server for nothing and does nothing in the game.",
+    "Read": "Read again",
+    "ReadTip": "Copies what the game holds, once. No request and no action in the game.",
+    "SheetsUnavailable": "The stages' sheets could not be read, perhaps after a game update.",
+    "Unavailable": "The stages could not be read, perhaps after a game update.",
+    "NotLoaded": "Your character is not loaded yet: read again in a moment.",
+    "Count": "Stages cleared: {0} / {1}",
+    "OnlyLeft": "Only those left",
+    "OnlyLeftTip": "Hides the stages already cleared.",
+    "ColumnStage": "Stage",
+    "ColumnEnemies": "Enemies",
+    "ColumnStandard": "Standard time",
+    "ColumnIdeal": "Ideal time",
+    "ColumnState": "State",
+    "Done": "Cleared",
+    "Left": "Not cleared"
   },
   "Island": {
     "Propose": "Propose an agenda",

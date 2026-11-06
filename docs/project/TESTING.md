@@ -1008,6 +1008,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.682) Carte Tensho › Affichage : décocher Ressources de la Félicité insulaire doit retirer les icônes et leurs zones ; Aucun aussi, Tout les remet.
 
+- [ ] (0.683) Progression › La Grande Mascarade : comparer les niveaux réussis, les ennemis et les temps à la fenêtre du jeu ; le niveau 1 et le niveau 32 surtout.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

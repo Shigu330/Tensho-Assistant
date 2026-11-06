@@ -727,6 +727,17 @@ public sealed class Plugin : IDalamudPlugin
                 }
                 catch(Exception error){log.Warning(error,"Custom deliveries unreadable (game update?).");throw;}
             });
+            // W-02 (0.683): the stages of the Masked Carnivale, read when the page opens and on the player's click.
+            mainWindow.CarnivaleStagesLoad=()=>
+            {
+                try{return Carnivale.CarnivaleStageLoader.Read(data);}
+                catch(Exception error){log.Warning(error,"Masked Carnivale sheets unreadable (game update?).");return null;}
+            };
+            mainWindow.ReadCarnivale=stages=>framework.RunOnFrameworkThread(()=>
+            {
+                try{return Carnivale.CarnivaleReader.Read(stages);}
+                catch(Exception error){log.Warning(error,"Masked Carnivale unreadable (game update?).");throw;}
+            });
             // N-12 (0.670): names of the S rank conditions, in the game's language.
             mainWindow.SRankMarkName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().GetRowOrDefault(id)?.Singular.ExtractText();
             mainWindow.SRankZoneName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id)?.PlaceName.ValueNullable?.Name.ExtractText();
