@@ -1084,18 +1084,17 @@ internal sealed partial class MainWindow
             icons.Sort((left,right)=>left.Priority!=right.Priority ? left.Priority.CompareTo(right.Priority):left.Layer!=right.Layer ? left.Layer.CompareTo(right.Layer):left.Order.CompareTo(right.Order));
             MapIconDraw? top=null;var hits=new List<MapIconDraw>();
             if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right))mapIconContext=null;
+            var iconNames=new List<(Vector2 At,Vector2 Size,bool MapLink,string Text,float FontSize)>();
             foreach(var item in icons)
             {
                 if(textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
                     draw.AddImage(image.Handle,item.At-new Vector2(item.Size/2),item.At+new Vector2(item.Size/2));
-                // 0.596 (P12): the name the game writes beside this icon, on the side it uses. Smaller than the place names.
-                if(settings.ShowIconNames && settings.NamesShown(mapZoom) && item.Fixed is {Label.Length:>0} named)
+                // 0.596 (P12): the name the game writes beside this icon, on the side it uses; drawn after the icons (0.623).
+                if(settings.ShowIconNames && settings.NamesShown(mapZoom) && item.Fixed is {Label.Length:>0} named && MapLabels.Shown(named.LinkMapId!=0,mapZoom))
                 {
                     var iconNameSize=Math.Max(6,nameSize*0.55f);
-                    var iconNameAt=item.At+MapLabels.Offset(named.Orientation,item.Size,ImGui.CalcTextSize(named.Label)*(iconNameSize/ImGui.GetFontSize()));
-                    foreach(var shift in new[]{new Vector2(-1,0),new Vector2(1,0),new Vector2(0,-1),new Vector2(0,1)})
-                        draw.AddText(font,iconNameSize,iconNameAt+shift,ImGui.GetColorU32(new Vector4(0.96f,0.93f,0.84f,0.9f)),named.Label);
-                    draw.AddText(font,iconNameSize,iconNameAt,ImGui.GetColorU32(new Vector4(0.30f,0.22f,0.12f,1)),named.Label);
+                    var iconNameText=ImGui.CalcTextSize(named.Label)*(iconNameSize/ImGui.GetFontSize());
+                    iconNames.Add((item.At+MapLabels.Offset(named.Orientation,item.Size,iconNameText),iconNameText,named.LinkMapId!=0,named.Label,iconNameSize));
                 }
                 // Timed gathering points: a clock badge, green while open now, orange otherwise (0.130).
                 if(item.Point is { Timed:true } timedPoint)
@@ -1115,6 +1114,14 @@ internal sealed partial class MainWindow
                     if(distance<=item.Size/2)top=item;
                     if(distance<=Math.Max(item.Size/2,item.Area))hits.Add(item);
                 }
+            }
+            // 0.623: as on the game's map: white with a dark edge, map links in blue-green, and none on top of another.
+            foreach(var index in MapLabels.Fitting(iconNames.Select(name=>(name.At,name.Size,name.MapLink)).ToArray()))
+            {
+                var label=iconNames[index];
+                foreach(var shift in new[]{new Vector2(-1,0),new Vector2(1,0),new Vector2(0,-1),new Vector2(0,1)})
+                    draw.AddText(font,label.FontSize,label.At+shift,ImGui.GetColorU32(new Vector4(0.05f,0.05f,0.05f,0.9f)),label.Text);
+                draw.AddText(font,label.FontSize,label.At,ImGui.GetColorU32(label.MapLink ? new Vector4(0.45f,0.9f,0.95f,1):new Vector4(0.97f,0.95f,0.9f,1)),label.Text);
             }
             // Every icon under the cursor (or whose area holds it) is listed in one tooltip, topmost first (0.132, as Mappy does).
             hits.Reverse();

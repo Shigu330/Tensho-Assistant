@@ -20,12 +20,19 @@ internal static class MapLabels596Tests
         {
             foreach(var value in new byte[]{0,5,8,11})Check(MapLabels.Offset(value,20,new(60,10))==MapLabels.Offset(2,20,new(60,10)),$"value {value}");
         }),
+        ("Map labels (0.623): zoomed out, only the map links; none on top of another, links first",() =>
+        {
+            Check(MapLabels.Shown(true,0.3f) && !MapLabels.Shown(false,0.3f) && MapLabels.Shown(false,MapLabels.DetailZoom),"by zoom");
+            (Vector2,Vector2,bool)[] names=[(new(0,0),new(50,10),false),(new(10,0),new(50,10),true),(new(100,0),new(50,10),false),(new(0,10),new(50,10),false)];
+            Check(MapLabels.Fitting(names).Order().SequenceEqual([1,2,3]),"the link wins over the name it touches; touching edges do not count");
+            Check(MapLabels.Fitting([]).Length==0,"none");
+        }),
         ("Map labels: from the sheet, only for a drawn icon, with their setting",() =>
         {
             var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs"));
             Check(source.Contains("row.SubtextOrientation"),"the game's value");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs")).Replace("\r\n","\n");
-            Check(view.Contains("settings.ShowIconNames && settings.NamesShown(mapZoom) && item.Fixed is {Label.Length:>0}"),"after the icon, on its setting and the names' zoom");
+            Check(view.Contains("settings.ShowIconNames && settings.NamesShown(mapZoom) && item.Fixed is {Label.Length:>0} named && MapLabels.Shown(named.LinkMapId!=0,mapZoom)"),"on its setting and the zoom");
             Check(new TenshoAssistant.MapViewSettings().ShowIconNames,"on by default");
             Check(File.Exists(Path.GetFullPath("docs/evidence/0.596-map-label-orientation.md")),"the evidence");
         }),

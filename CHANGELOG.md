@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.623.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur, captures du jeu) : les noms à côté des icônes se chevauchaient. Comme sur la carte du jeu, de loin seuls les liens de carte gardent leur nom, les autres reviennent de près ; deux noms ne se superposent plus, et les couleurs suivent le jeu (blanc, liens en bleu-vert). Le zoom exact du jeu n'est pas connu : seuil à ajuster en jeu.
+- Tests : Map labels. Verify.ps1 (agent) : 1130/1130, 0 avertissement, 0 erreur ; DLL 0.623.0.0. Non validé en jeu.
+### English
+- Map (user report, with captures of the game): the names beside icons overlapped. As on the game's map, zoomed out only map links keep their name, the others come back close up; two names no longer overlap, and colours follow the game (white, links in blue-green). The game's exact zoom is unknown: threshold to adjust in game.
+
 ## 0.622.0
 - Plan global, phase 5 : Carte (demande de l'utilisateur) : le sous-lieu ne s'écrit que s'il existe, sans le « -- » de la carte du jeu.
 - Tests : Map place. Verify.ps1 (agent) : 1129/1129, 0 avertissement, 0 erreur ; DLL 0.622.0.0. Non validé en jeu.
