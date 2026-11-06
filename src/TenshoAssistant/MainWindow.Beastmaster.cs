@@ -59,11 +59,12 @@ internal sealed partial class MainWindow
         var key = ((object?)catalog, (object?)obtained, beastQuery, beastFamily, beastOnlyObtained, beastRank, beastSort.Sort, beastSort.Descending);
         if (key != beastViewKey) { beastViewKey = key; beastView = catalog.View(beastQuery, beastFamily, beastOnlyObtained, obtained, beastRank, beastSort.Sort, beastSort.Descending); }
         var flags = ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable | ImGuiTableFlags.SizingStretchProp;
-        if (!ImGui.BeginTable("BeastTable", 8, flags, new Vector2(0, Math.Max(200, ImGui.GetContentRegionAvail().Y)))) return;
+        if (!ImGui.BeginTable("BeastTable", 9, flags, new Vector2(0, Math.Max(200, ImGui.GetContentRegionAvail().Y)))) return;
         try
         {
             foreach (var title in new[] { "BeastUi.Name", "BeastUi.Family", "BeastUi.Auto", "BeastUi.Strength", "BeastUi.Intelligence", "BeastUi.PhysicalResistance", "BeastUi.MagicalResistance", "BeastUi.Vitality" })
                 ImGui.TableSetupColumn(localization.Get(title), title == "BeastUi.Name" ? ImGuiTableColumnFlags.DefaultSort | ImGuiTableColumnFlags.WidthStretch : ImGuiTableColumnFlags.None);
+            ImGui.TableSetupColumn(localization.Get("BeastUi.CatchPlace"), ImGuiTableColumnFlags.NoSort);
             ImGui.TableSetupScrollFreeze(0, 1);
             ImGui.TableHeadersRow();
             var specs = ImGui.TableGetSortSpecs();
@@ -84,6 +85,7 @@ internal sealed partial class MainWindow
                 var stats = beast.At(beastRank);
                 foreach (var value in new[] { stats?.Strength, stats?.Intelligence, stats?.PhysicalResistance, stats?.MagicalResistance, stats?.Vitality })
                 { ImGui.TableNextColumn(); ImGui.TextUnformatted(value?.ToString() ?? "?"); }
+                ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.CatchPlace);
             }
         }
         finally { ImGui.EndTable(); }

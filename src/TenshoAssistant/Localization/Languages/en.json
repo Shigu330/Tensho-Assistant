@@ -166,6 +166,7 @@
     "Full": "This tool could not be installed: the list is full or unavailable."
   },
   "BeastUi": {
+    "CatchPlace": "Caught at",
     "Title": "Beastmaster",
     "Help": "Your beasts and the boards of the labyrinth, read from the game. No team advice yet.",
     "Loading": "Reading the game's data…",

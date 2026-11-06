@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.690.0
+- Plan global, Dresseur : Rapport de l'utilisateur : la page Dresseur ne disait pas où capturer les bêtes. Nouvelle colonne Capture : la zone ou le contenu, lus dans les feuilles du jeu, dans la langue du jeu, et la recherche les trouve. L'ennemi à capturer et ses coordonnées ne sont pas dans ces colonnes. Sens des colonnes déduit, à comparer au bestiaire du jeu. Île : la comparaison de l'utilisateur confirme la popularité, la disponibilité et l'évolution sur 14 créations, et les cycles de repos. COMPILED et TESTED, non validé en jeu pour la capture.
+- Tests : BeastPlaces688Tests. Verify.ps1 (agent) : 1225/1225, 0 avertissement, 0 erreur ; DLL 0.690.0.0. Non validé en jeu.
+### English
+- User report: the Beastmaster page did not say where to catch beasts. New Caught at column: the zone or duty, from the game's sheets, in its language, and search finds them. The enemy to catch and its coordinates are not in these columns. The columns' meaning is inferred, to compare with the game's bestiary. Island: the user's comparison confirms popularity, supply and demand shift on 14 crafts, and the rest cycles. COMPILED and TESTED, capture not validated in game.
+
 ## 0.689.0
 - Plan global, Mandats : Rapport de l'utilisateur : l'infobulle d'un mandat ne donnait que son identifiant, en mode développeur. Elle donne maintenant le niveau, le type, le mandateur, la zone, les gils et les allocations, pour tout le monde ; l'identifiant reste en mode développeur. COMPILED et TESTED, non validé en jeu.
 - Tests : ReminderTabs687Tests. Verify.ps1 (agent) : 1223/1223, 0 avertissement, 0 erreur ; DLL 0.689.0.0. Non validé en jeu.
@@ -10,10 +16,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 - User report: a leve's tooltip gave only its id, in developer mode. It now gives level, type, client, zone, gil and allowances, for everyone; the id stays in developer mode. COMPILED and TESTED, not validated in game.
 
 ## 0.688.0
-- Plan global, Rappels : Demande de l'utilisateur : la page Rappels passe en 5 onglets : Minuteurs, Mes tâches, Roulettes, Escadron, État du personnage. Rien n'est retiré. COMPILED et TESTED, non validé en jeu.
-- Tests : ReminderTabs687Tests. Verify.ps1 (agent) : 1222/1222, 0 avertissement, 0 erreur ; DLL 0.688.0.0. Non validé en jeu.
+- Version sans changement de code : une erreur de l'agent a publié le numéro alors que le correctif n'avait pas été appliqué, avec le texte de la 0.687. La colonne Capture du Dresseur est en 0.690.
+- Tests : 1222/1222.
+
 ### English
-- User request: the Reminders page becomes 5 tabs: Timers, My tasks, Roulettes, Squadron, Character status. Nothing is removed. COMPILED and TESTED, not validated in game.
+
+No code change: an agent error published this number with the fix not applied and the text of 0.687. The Beastmaster column is in 0.690.
 
 ## 0.687.0
 - Plan global, Rappels : Demande de l'utilisateur : la page Rappels passe en 5 onglets : Minuteurs, Mes tâches, Roulettes, Escadron, État du personnage. Rien n'est retiré. COMPILED et TESTED, non validé en jeu.

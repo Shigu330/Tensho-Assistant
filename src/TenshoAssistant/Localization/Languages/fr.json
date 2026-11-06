@@ -166,6 +166,7 @@
     "Full": "Cet outil n'a pas pu être installé : la liste est pleine ou indisponible."
   },
   "BeastUi": {
+    "CatchPlace": "Capture",
     "Title": "Dresseur",
     "Help": "Vos bêtes et les plateaux du Dédale, lus dans le jeu. Pas encore de conseil d'équipe.",
     "Loading": "Lecture des données du jeu…",

@@ -13,7 +13,7 @@ public sealed record XbmRow(uint Row, ushort Sub, object?[] Cells)
 }
 public sealed record BeastStats(int Strength, int Intelligence, int PhysicalResistance, int MagicalResistance, int Vitality);
 /// <summary>AutoAttack: the element's name for a physical one; empty for a magical one. Ranks[0] = rank 1.</summary>
-public sealed record Beast(uint Id, string Name, uint Icon, string Family, string AutoAttack, string Assault, string Volley, IReadOnlyList<BeastStats> Ranks)
+public sealed record Beast(uint Id, string Name, uint Icon, string Family, string AutoAttack, string Assault, string Volley, IReadOnlyList<BeastStats> Ranks, string CatchPlace = "")
 {
     /// <summary>Attributes at this rank; a rank outside the table is the nearest known one. Null when the table is empty.</summary>
     public BeastStats? At(int rank) => Ranks.Count == 0 ? null : Ranks[Math.Clamp(rank - 1, 0, Ranks.Count - 1)];
@@ -36,7 +36,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
     private const int FirstBonusColumn = 4;
 
     public static BeastCatalog Build(IReadOnlyDictionary<string, IReadOnlyList<XbmRow>> sheets, Func<uint, string> petName, Func<int, string> familyName,
-        Func<uint, int> attackType, Func<uint, string> enemyName, Func<uint, string> actionName, Func<uint, (string Name, int Level, int ItemLevel)> content)
+        Func<uint, int> attackType, Func<uint, string> enemyName, Func<uint, string> actionName, Func<uint, (string Name, int Level, int ItemLevel)> content, Func<int, uint, string>? catchPlace = null)
     {
         foreach (var (sheet, columns) in Columns)
         {
@@ -50,7 +50,9 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         var grow = sheets["XBMPetParamGrow"].GroupBy(row => row.Row).ToDictionary(group => group.Key, group => group.OrderBy(row => row.Sub)
             .Select(row => new BeastStats(row.Int(0), row.Int(1), row.Int(2), row.Int(3), row.Int(4))).ToArray());
         var beasts = sheets["XBMPet"].Where(row => row.Row != 0 && row.UInt(4) != 0).Select(row => new Beast(row.Row, Capitalize(petName(row.UInt(0))), row.UInt(4),
-            familyName(row.Int(1)), Auto(row.UInt(5)), row.Text(9), row.Text(10), Array.AsReadOnly(grow.GetValueOrDefault(row.UInt(2)) ?? []))).ToArray();
+            familyName(row.Int(1)), Auto(row.UInt(5)), row.Text(9), row.Text(10), Array.AsReadOnly(grow.GetValueOrDefault(row.UInt(2)) ?? []),
+            // 0.688 (user report): columns 6 and 7, where the beast is caught: docs/evidence/0.688-beast-places.md.
+            catchPlace?.Invoke(row.Int(6), row.UInt(7)) ?? "")).ToArray();
 
         var shapes = sheets["XBMActionEffectType"].ToDictionary(row => row.Row, row => row.Text(0));
         var targets = sheets["XBMActionTarget"].ToDictionary(row => row.Row, row => row.Text(0));
@@ -78,7 +80,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
     public IReadOnlyList<Beast> View(string query, string? family, bool onlyObtained, IReadOnlySet<uint>? obtained, int rank, BeastSort sort, bool descending)
     {
         IEnumerable<Beast> rows = Beasts;
-        if (query.Length > 0) rows = rows.Where(beast => beast.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase) || beast.Assault.Contains(query, StringComparison.CurrentCultureIgnoreCase) || beast.Volley.Contains(query, StringComparison.CurrentCultureIgnoreCase));
+        if (query.Length > 0) rows = rows.Where(beast => beast.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase) || beast.CatchPlace.Contains(query, StringComparison.CurrentCultureIgnoreCase) || beast.Assault.Contains(query, StringComparison.CurrentCultureIgnoreCase) || beast.Volley.Contains(query, StringComparison.CurrentCultureIgnoreCase));
         if (family is not null) rows = rows.Where(beast => beast.Family == family);
         if (onlyObtained && obtained is not null) rows = rows.Where(beast => obtained.Contains(beast.Id));
         int Stat(Beast beast, Func<BeastStats, int> read) => beast.At(rank) is { } stats ? read(stats) : -1;
