@@ -11,7 +11,7 @@ public static class GatheringCatalogCache
     public const string Family="catalog-gathering";
     public const int MaximumRows=500_000;
     // Bump when the Lumina → GatheringSource/FishingNotebookEntry copy rules change without a change of record shape.
-    private const int CopyRules=1;
+    private const int CopyRules=2;
     public static readonly string Shape=CatalogCacheKeys.Shape(typeof(GatheringSource),typeof(GatheringSchedule),typeof(GatheringWindow),
         typeof(GatheringScheduleKind),typeof(FishingNotebookEntry));
     public static string Version(string dataVersion)=>CatalogCacheKeys.Version(dataVersion,CopyRules,Shape);

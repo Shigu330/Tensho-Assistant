@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.649.0
+- Plan global, C29 : Récolte (C29) : les poissons au harpon apparaissent dans la recherche de la page Récolte avec leur lieu, comme les autres ressources. Le catalogue est reconstruit une fois.
+- Tests : Gathering sources. Verify.ps1 (agent) : 1150/1150, 0 avertissement, 0 erreur ; DLL 0.649.0.0. Non validé en jeu.
+### English
+- Gathering (C29): spearfishing fish appear in the Gathering page's search with their place, like other resources. The catalogue is rebuilt once.
+
 ## 0.648.0
 - Plan global, T13 : Contenus et quêtes (T13) : la page Butin des contenus et le panneau de la Recherche de mission disent quelle quête débloque un contenu, avec son état et un lien ; la fiche d'une quête dit ce qu'elle débloque. Seuls environ 130 contenus sur plus de 700 nomment leur quête dans les données du jeu ; pour les autres, rien n'est affiché, et rien n'est deviné.
 - Tests : Duty unlocks. Verify.ps1 (agent) : 1149/1149, 0 avertissement, 0 erreur ; DLL 0.648.0.0. Non validé en jeu.

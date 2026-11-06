@@ -47,6 +47,12 @@ internal static class MapResume625Tests
             var catalog=new TenshoAssistant.Duties.DutyCatalog(duties);
             Check(catalog.UnlockedBy(65579).Single().DutyId==1 && !catalog.UnlockedBy(0).Any(),"and the other way round");
         }),
+        ("Gathering sources (C29): spearfishing points name their fish, and the cache follows",() =>
+        {
+            var loader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/GatheringCatalogLoader.Dalamud.cs"));
+            Check(loader.Contains("reference.RowType == typeof(SpearfishingItem)"),"read before the gathering items are filtered");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/GatheringCatalogCache.cs")).Contains("CopyRules=2"),"an old cache without them is rebuilt");
+        }),
         ("Map resume: wired where the game closes its map",() =>
         {
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));
