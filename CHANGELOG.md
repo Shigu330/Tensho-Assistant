@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.705.0
+- Plan global, Infobulles : Demande de l'utilisateur : les vendeurs PNJ des infobulles ont leurs réglages, sous Comment l'obtenir : les afficher ou non, exclure les prérequis non remplis, ne garder que certaines monnaies. Par défaut, tout reste affiché comme avant. La fiche de l'objet et l'outil des vendeurs ne changent pas. COMPILED et TESTED, non validé en jeu.
+- Tests : PlaceMenus704Tests. Verify.ps1 (agent) : 1253/1253, 0 avertissement, 0 erreur ; DLL 0.705.0.0. Non validé en jeu.
+### English
+- User request: the NPC vendors of tooltips have their settings, under How to get it: show them or not, leave out unmet requirements, keep only some currencies. By default everything shows as before. The item sheet and vendor tool do not change. COMPILED and TESTED, not validated in game.
+
 ## 0.704.0
 - Plan global, Éthérites : Demande de l'utilisateur : partout où des coordonnées s'affichent, le clic droit propose l'éthérite la plus proche, avec drapeau et question de téléportation habituelle. Ajouté aux lieux de monstres du wiki et de Garland, sources de magie bleue, liens du chat, train de chasse, animaux de l'île, favoris, listes de la carte Tensho, recherche sur les cartes, page Cartes, fiches de vendeurs, sources d'objets, suivi, carnet d'exploration et récolte. Un test exige ce menu sur toute page qui place un drapeau. COMPILED et TESTED, non validé en jeu.
 - Tests : PlaceMenus704Tests. Verify.ps1 (agent) : 1252/1252, 0 avertissement, 0 erreur ; DLL 0.704.0.0. Non validé en jeu.

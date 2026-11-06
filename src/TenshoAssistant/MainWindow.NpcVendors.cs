@@ -151,10 +151,10 @@ internal sealed partial class MainWindow
     }
 
     // Compact hover rows: first vendors with place and cost icons, then an explicit "+N" pointing at the tool.
-    private int HoveredNpcCount(uint id)=>npcVendors?.State.Catalog?.ForItem(id).Count ?? 0;
+    private int HoveredNpcCount(uint id)=>HoverOffers(id).Count;
     private void DrawHoveredNpcs(uint id)
     {
-        if(npcVendors?.State.Catalog?.ForItem(id) is not { Count:>0 } offers)return;
+        if(HoverOffers(id) is not { Count:>0 } offers)return;
         // Short cost first (amount + icon), then the wrapped name and place: wrapping text never pushes the icons off the panel.
         foreach(var offer in offers.Take(HoverNpcLines))
         {

@@ -113,6 +113,16 @@ internal sealed partial class MainWindow
             BoolSetting("Settings.HoverStock","Settings.HoverStockTip",()=>configuration.HoverShowStock,value=>configuration.HoverShowStock=value,c=>c.HoverShowStock);
             BoolSetting("Settings.HoverUsages","Settings.HoverUsagesTip",()=>configuration.HoverShowUsages,value=>configuration.HoverShowUsages=value,c=>c.HoverShowUsages);
             BoolSetting("Settings.HoverSources","Settings.HoverSourcesTip",()=>configuration.HoverShowSources,value=>configuration.HoverShowSources=value,c=>c.HoverShowSources);
+            // 0.705 (user request): its NPC vendors, set as the list panels are.
+            ImGui.Indent();
+            BoolSetting("Settings.HoverVendors","Settings.HoverVendorsTip",()=>configuration.HoverVendors,value=>configuration.HoverVendors=value,c=>c.HoverVendors);
+            if(configuration.HoverVendors)
+            {
+                BoolSetting("Settings.HoverVendorsMetOnly","Settings.HoverVendorsMetOnlyTip",()=>configuration.HoverVendorsMetOnly,value=>configuration.HoverVendorsMetOnly=value,c=>c.HoverVendorsMetOnly);
+                BoolSetting("Settings.HoverVendorsByCurrency","Settings.HoverVendorsByCurrencyTip",()=>configuration.HoverVendorsByCurrency,value=>configuration.HoverVendorsByCurrency=value,c=>c.HoverVendorsByCurrency);
+                if(configuration.HoverVendorsByCurrency)DrawCurrencyTicks("HoverVendor",()=>configuration.HoverVendorCurrenciesOn,value=>configuration.HoverVendorCurrenciesOn=value);
+            }
+            ImGui.Unindent();
             // 0.377 (g, M-07): comparison with the worn piece.
             BoolSetting("Settings.HoverCompare","Settings.HoverCompareTip",()=>configuration.HoverShowCompare,value=>configuration.HoverShowCompare=value,c=>c.HoverShowCompare);
         }

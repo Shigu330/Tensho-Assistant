@@ -26,6 +26,14 @@ internal static class PlaceMenus704Tests
                 Check(Regex.IsMatch(text,@"PlaceMenu\(|NpcMenu\(|PlaceEntries\(|AskNearestAetheryteAt\("),name+" places a flag with no way to the nearest aetheryte");
             }
         }),
+        ("Hover vendors: every vendor by default, and each tooltip goes through the settings",() =>
+        {
+            var settings=new TenshoAssistant.Configuration();
+            Check(settings.HoverVendors && !settings.HoverVendorsMetOnly && !settings.HoverVendorsByCurrency,"as before by default");
+            Check(Read("MainWindow.NpcVendors.cs").Contains("private int HoveredNpcCount(uint id)=>HoverOffers(id).Count;") && Read("MainWindow.NpcVendors.cs").Contains("HoverOffers(id) is not { Count:>0 } offers"),"vendor lines");
+            var hover=Read("MainWindow.MarketHover.cs");
+            Check(hover.Contains("HoverOffers(item.Id) is { Count:>0 } offers") && hover.Contains("HoverOffers(id) is { Count:>0 } offers"),"sources");
+        }),
         ("Place menus: monster loot from the wiki reads its place",() =>
         {
             Check(Read("MainWindow.Monsters.cs").Contains("PlaceMenu($\"WikiMonsterPlace{wikiRow}\""),"wiki rows");

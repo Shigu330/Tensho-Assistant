@@ -70,7 +70,7 @@ public static class ConfigurationReset
         // 0.375 (g, M-05): on-screen « to do » panel.
         "TaskPanel",
         // W-05 (0.691): on-screen lists.
-        "WorkshopPanel", "WorkshopPanelProject", "WorkshopFollowed", "PreparationPanel", "PreparationPanelItem", "PreparationPanelRecipe", "PreparationPanelTarget", "CraftListPanel", "CraftListPanelName", "ListPanelsHideInCombat", "ListPanelsHideBehindGame", "CurrencyValueMarket", "ListPanelsBase", "ListPanelsGathering", "ListPanelsVendor", "ListPanelsMonster", "ListPanelsOther", "ListPanelsCrystal", "ListPanelsCurrenciesOn", "ListPanelsMetOnly",
+        "WorkshopPanel", "WorkshopPanelProject", "WorkshopFollowed", "PreparationPanel", "PreparationPanelItem", "PreparationPanelRecipe", "PreparationPanelTarget", "CraftListPanel", "CraftListPanelName", "ListPanelsHideInCombat", "ListPanelsHideBehindGame", "CurrencyValueMarket", "ListPanelsBase", "ListPanelsGathering", "ListPanelsVendor", "ListPanelsMonster", "ListPanelsOther", "ListPanelsCrystal", "ListPanelsCurrenciesOn", "ListPanelsMetOnly", "HoverVendors", "HoverVendorsMetOnly", "HoverVendorsByCurrency", "HoverVendorCurrenciesOn",
         // 0.376 (g, M-06): wear alert, bar and thresholds.
         "GearWear",
         // 0.386 (g, X-10): clocks of other time zones.
@@ -585,6 +585,11 @@ public sealed partial class Configuration
     public List<uint>? ListPanelsCurrenciesOn { get; set; }
     // 0.703 (user request): leave out the offers whose quest is known not to be done.
     public bool ListPanelsMetOnly { get; set; }
+    // 0.705 (user request): the NPC vendors of item tooltips, set as the list panels are. By default, every vendor as before.
+    public bool HoverVendors { get; set; } = true;
+    public bool HoverVendorsMetOnly { get; set; }
+    public bool HoverVendorsByCurrency { get; set; }
+    public List<uint>? HoverVendorCurrenciesOn { get; set; }
     // 0.448 (N-08, DEC-026): the garden journal (64 beds at most, durations typed by the player) and its chat reminders (on: the player
     // only gets them for beds they noted).
     private List<Reminders.GardenBed>? gardenBeds;

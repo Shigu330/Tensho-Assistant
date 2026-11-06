@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
         BoolSetting("ListPanels.Vendor","ListPanels.VendorTip",()=>configuration.ListPanelsVendor,value=>configuration.ListPanelsVendor=value,c=>c.ListPanelsVendor);
         if(configuration.ListPanelsVendor)
         {
-            DrawListPanelCurrencies();
+            DrawCurrencyTicks("ListPanel",()=>configuration.ListPanelsCurrenciesOn,value=>configuration.ListPanelsCurrenciesOn=value);
             BoolSetting("ListPanels.MetOnly","ListPanels.MetOnlyTip",()=>configuration.ListPanelsMetOnly,value=>configuration.ListPanelsMetOnly=value,c=>c.ListPanelsMetOnly);
         }
         BoolSetting("ListPanels.Monster","ListPanels.OriginTip",()=>configuration.ListPanelsMonster,value=>configuration.ListPanelsMonster=value,c=>c.ListPanelsMonster);
@@ -99,7 +99,7 @@ internal sealed partial class MainWindow
     private (object? Vendors,object? Recipes,Task<(uint Id,string Name)[]>? Rows) listPanelCurrencies;
     private HashSet<uint> listPanelCurrenciesOn=[];
     private string listPanelCurrencySearch="";
-    private void DrawListPanelCurrencies()
+    private void DrawCurrencyTicks(string menu,Func<List<uint>?> read,Action<List<uint>> write)
     {
         var vendors=npcVendors?.State.Catalog;var recipes=recipeCatalog.State.Catalog;
         if(vendors is null || recipes is null)return;
@@ -125,9 +125,9 @@ internal sealed partial class MainWindow
             ImGui.TextDisabled(localization.Get("ListPanels.CurrenciesLoading"));
             return;
         }
-        var on=configuration.ListPanelsCurrenciesOn ?? [];
+        var on=read() ?? [];
         ImGui.SetNextItemWidth(280);
-        if(ImGui.BeginCombo("###ListPanelCurrencies",localization.Format("ListPanels.Currencies",on.Count)))
+        if(ImGui.BeginCombo($"###{menu}Currencies",localization.Format("ListPanels.Currencies",on.Count)))
         {
             try
             {
@@ -137,7 +137,7 @@ internal sealed partial class MainWindow
                 var shown=ready.Result.Concat(on.Where(id=>ready.Result.All(row=>row.Id!=id)).Select(id=>(Id:id,Name:itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}"))).Where(row=>listPanelCurrencySearch.Length==0 || row.Name.Contains(listPanelCurrencySearch,StringComparison.CurrentCultureIgnoreCase)).ToArray();
                 if(ImGui.SmallButton(localization.Get("ListPanels.CurrencyNone")))
                 {
-                    configuration.ListPanelsCurrenciesOn=[];SaveReminders();on=configuration.ListPanelsCurrenciesOn;
+                    on=[];write(on);SaveReminders();
                 }
                 Tip("ListPanels.CurrencyNoneTip");
                 foreach(var (id,name) in shown)
@@ -145,9 +145,9 @@ internal sealed partial class MainWindow
                     var ticked=on.Contains(id);
                     if(ImGui.Checkbox($"{name}###ListPanelCurrency{id}",ref ticked))
                     {
-                        configuration.ListPanelsCurrenciesOn=ticked ? [..on,id]:on.Where(other=>other!=id).ToList();
+                        on=ticked ? [..on,id]:on.Where(other=>other!=id).ToList();
+                        write(on);
                         SaveReminders();
-                        on=configuration.ListPanelsCurrenciesOn;
                     }
                     Tip("ListPanels.CurrenciesTip");
                 }
@@ -197,6 +197,21 @@ internal sealed partial class MainWindow
         if(!configuration.ListPanelsMetOnly)return true;
         var (quest,achievement)=SaleRequirementState(offer.Sale);
         return !BaseMaterials.RequirementBlocks(quest,achievement);
+    }
+    // 0.705 (user request): the vendors an item tooltip shows, under their own settings.
+    private IReadOnlyList<NpcVendorOffer> HoverOffers(uint item)
+    {
+        if(!configuration.HoverVendors || npcVendors?.State.Catalog?.ForItem(item) is not { Count:>0 } offers)return [];
+        if(!configuration.HoverVendorsMetOnly && !configuration.HoverVendorsByCurrency)return offers;
+        if(configuration.HoverVendorsMetOnly && quests.State.Entries.Count==0 && Environment.TickCount64-listPanelQuestsAsked>60000){listPanelQuestsAsked=Environment.TickCount64;quests.RequestRefresh();}
+        var on=(configuration.HoverVendorCurrenciesOn ?? []).ToHashSet();
+        return offers.Where(offer=>
+        {
+            if(configuration.HoverVendorsByCurrency && !BaseMaterials.VendorCounts(true,[offer.Sale.Costs.Select(cost=>cost.CurrencyItemId).ToArray()],on))return false;
+            if(!configuration.HoverVendorsMetOnly)return true;
+            var (quest,achievement)=SaleRequirementState(offer.Sale);
+            return !BaseMaterials.RequirementBlocks(quest,achievement);
+        }).ToArray();
     }
     private bool ListPanelFetched(uint item)=>ListPanelGathered(item) || ListPanelSold(item);
     private ItemOrigin ListPanelOrigin(uint item)=>ClassifyCrystal(item) is not null ? ItemOrigin.Crystal:BaseMaterials.OriginOf(ListPanelGathered(item),ListPanelSold(item),lumina?.State.Data?.MonstersOf(item) is { Count:>0 });
