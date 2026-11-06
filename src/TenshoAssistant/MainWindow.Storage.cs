@@ -18,6 +18,9 @@ internal sealed partial class MainWindow
             // 0.344 (g, I-02): currencies, caps and threshold alerts.
             var currencyFlags = focusCurrencyTab ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None; focusCurrencyTab = false;
             if (ImGui.BeginTabItem(localization.Get("Currencies.Tab")+"###CurrenciesTab", currencyFlags)) { try { DrawCurrenciesTab(); } finally { ImGui.EndTabItem(); } }
+            // 0.695 (user request): what a currency buys, in its own tab.
+            var valueFlags = focusCurrencyValueTab ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None; focusCurrencyValueTab = false;
+            if (ImGui.BeginTabItem(localization.Get("CurrencyValue.Tab")+"###CurrencyValueTab", valueFlags)) { try { DrawCurrencyValueTab(); } finally { ImGui.EndTabItem(); } }
             if (ImGui.BeginTabItem(localization.Get("ItemsUi.Imports"))) { try { DrawImportManager(); } finally { ImGui.EndTabItem(); } }
             // 0.345 (g, I-03): every character seen, with « See its storages » and « Erase this character ».
             if (ImGui.BeginTabItem(localization.Get("CharactersUi.Tab")+"###CharactersTab")) { try { DrawCharactersTab(); } finally { ImGui.EndTabItem(); } }

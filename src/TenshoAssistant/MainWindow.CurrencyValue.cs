@@ -7,7 +7,9 @@ namespace TenshoAssistant;
 
 // g, I-13 (0.354): under Storage › Currencies, « What to do with it » for one currency: what it buys (vendor directory), its price in
 // that currency, the market price (Universalis lowest of the current world, fresh only) and the gil each unit is worth, collection items
-// marked owned or missing. Market prices fetched on a click, 32 items at most, Universalis switch honoured. Rows rebuilt on change only.
+// marked owned or missing. Market prices fetched on a click, 32 items at a time, Universalis switch honoured. Rows rebuilt on change only.
+// 0.695 (user report « no market price »): the page asked for a second click and never said a request had failed. Choosing a currency is the click now,
+// the batches follow one another, a failure shows, and the page has its own tab.
 internal sealed partial class MainWindow
 {
     private uint currencyValueItem;
@@ -17,21 +19,51 @@ internal sealed partial class MainWindow
     // Mount or minion items among the rows: owned (true) or not confirmed (false); computed with the rows, not per frame.
     private Dictionary<uint,bool> currencyValueOwned=[];
 
+    private bool focusCurrencyValueTab,currencyPricesWanted;
+    private readonly HashSet<uint> currencyPricesAsked=[];
+    private void ChooseCurrencyValue(uint currency)
+    {
+        currencyValueItem=currency;
+        currencyPricesAsked.Clear();
+        currencyPricesWanted=true;
+    }
+
     private void DrawCurrencyValueButton(uint currency)
     {
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get(currencyValueItem==currency ? "CurrencyValue.Close":"CurrencyValue.Open")+$"##Value{currency}"))
-            currencyValueItem=currencyValueItem==currency ? 0:currency;
+        if(ImGui.SmallButton(localization.Get("CurrencyValue.Open")+$"##Value{currency}")){ChooseCurrencyValue(currency);focusCurrencyValueTab=true;}
         Tip("CurrencyValue.OpenTip");
+    }
+
+    // The tab: the currency to look at, then what it buys.
+    private void DrawCurrencyValueTab()
+    {
+        var watcher=Currencies?.Invoke();
+        watcher?.Want();
+        var balances=watcher?.State?.Reading?.Balances;
+        ImGui.SetNextItemWidth(280);
+        var items=itemCatalog.State.Catalog;
+        string Name(uint id)=>items?.Find(id)?.Name ?? $"#{id}";
+        if(ImGui.BeginCombo("###CurrencyValuePick",currencyValueItem==0 ? localization.Get("CurrencyValue.Pick"):Name(currencyValueItem)))
+        {
+            try
+            {
+                foreach(var balance in balances ?? [])
+                    if(ImGui.Selectable($"{balance.Currency.Name}##ValuePick{balance.Currency.ItemId}",balance.Currency.ItemId==currencyValueItem))ChooseCurrencyValue(balance.Currency.ItemId);
+            }
+            finally{ImGui.EndCombo();}
+        }
+        Tip("CurrencyValue.PickTip");
+        if(currencyValueItem==0){ImGui.TextDisabled(localization.Get("CurrencyValue.PickFirst"));return;}
+        DrawCurrencyValue();
     }
 
     private void DrawCurrencyValue()
     {
-        if(currencyValueItem==0)return;
         var vendors=npcVendors?.State.Catalog;
         var items=itemCatalog.State.Catalog;
         var currencyName=items?.Find(currencyValueItem)?.Name ?? $"#{currencyValueItem}";
-        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("CurrencyValue.Title",currencyName)+"###CurrencyValue",ImGuiTreeNodeFlags.DefaultOpen))return;
+        ImGui.TextColored(Accent,localization.Format("CurrencyValue.Title",currencyName));
         if(vendors is null){ImGui.TextDisabled(localization.Get("Events.ShopsLoading"));return;}
         var world=market.State;var prices=currencyPrices.State;var collected=collections.State.Entries;
         var key=(currencyValueItem,(object?)vendors,world.WorldId,prices.Completed,prices.Loading,collected);
@@ -52,25 +84,43 @@ internal sealed partial class MainWindow
             currencyValueKey=key;
         }
         ImGui.TextWrapped(localization.Get("CurrencyValue.Help"));
-        // Missing market prices of marketable items, the cheapest in currency first; 32 per click.
-        var missing=currencyValueRows.Where(row=>row.MarketPrice is null && items?.Find(row.ItemId) is { IsMarketable:true }).Select(row=>row.ItemId).Distinct().ToArray();
-        if(prices.Loading)ImGui.TextDisabled(localization.Format("RoutePlanner.FetchingPrices",prices.Completed,prices.Items.Count));
+        // Missing market prices of marketable items, 32 at a time. An item Universalis gave no price for is not asked for again.
+        var missing=currencyValueRows.Where(row=>row.MarketPrice is null && items?.Find(row.ItemId) is { IsMarketable:true } && !currencyPricesAsked.Contains(row.ItemId)).Select(row=>row.ItemId).Distinct().ToArray();
+        var character=bankBridge.State.CharacterId;
+        if(prices.Loading)ImGui.TextDisabled(localization.Format("CurrencyValue.Fetching",currencyPricesAsked.Count,currencyPricesAsked.Count+missing.Length));
         else
         {
-            var character=bankBridge.State.CharacterId;
-            ImGui.BeginDisabled(world.WorldId==0 || character==0 || missing.Length==0);
-            try
+            if(prices.Error is { } failed)
             {
-                if(SourceButton(localization.Format("RoutePlanner.FetchPrices",Math.Min(32,missing.Length),missing.Length),configuration.CommunityUniversalis,true))
-                    try{_=currencyPrices.StartListAsync(market,character,world.WorldId,missing.Take(32));}
-                    catch(Exception error){log.Warning(error,"Currency value prices could not be started.");}
+                currencyPricesWanted=false;
+                ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("CurrencyValue.FetchFailed"));
+                if(developerMode)ImGui.TextDisabled(failed);
+                ImGui.SameLine();
+                if(ImGui.SmallButton(localization.Get("CurrencyValue.Retry"))){currencyPricesAsked.Clear();currencyPricesWanted=true;}
+                Tip("CurrencyValue.FetchTip");
             }
-            finally{ImGui.EndDisabled();}
-            Tip("CurrencyValue.FetchTip");
+            var refresh=false;
+            if(world.WorldId==0 || character==0)ImGui.TextDisabled(localization.Get("CurrencyValue.NoWorld"));
+            else if(!configuration.CommunityUniversalis)ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
+            else if(missing.Length>0 && !currencyPricesWanted && prices.Error is null)
+            {
+                refresh=ImGui.SmallButton(localization.Format("CurrencyValue.Fetch",missing.Length));
+                Tip("CurrencyValue.FetchTip");
+            }
+            if(refresh)currencyPricesWanted=true;
+            if(currencyPricesWanted && missing.Length>0 && (prices.Error is null || refresh) && world.WorldId!=0 && character!=0 && configuration.CommunityUniversalis)
+                try
+                {
+                    var batch=missing.Take(32).ToArray();
+                    currencyPricesAsked.UnionWith(batch);
+                    _=currencyPrices.StartListAsync(market,character,world.WorldId,batch);
+                }
+                catch(Exception error){currencyPricesWanted=false;log.Warning(error,"Currency value prices could not be started.");}
+            else if(missing.Length==0)currencyPricesWanted=false;
         }
         if(currencyValueRows.Count==0){ImGui.TextDisabled(localization.Get("CurrencyValue.None"));return;}
         if(!ImGui.BeginTable("CurrencyValue",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.ScrollY,
-            new Vector2(0,Math.Min(ImGui.GetTextLineHeightWithSpacing()*16,ImGui.GetTextLineHeightWithSpacing()*(currencyValueRows.Count+2)))))return;
+            new Vector2(0,Math.Max(120,ImGui.GetContentRegionAvail().Y))))return;
         try
         {
             ImGui.TableSetupScrollFreeze(0,1);
@@ -86,7 +136,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted(row.Cost.ToString("N0"));
                 ImGui.TableNextColumn();
                 if(row.MarketPrice is { } price)ImGui.TextUnformatted(price.ToString("N0"));
-                else ImGui.TextDisabled(definition is { IsMarketable:false } ? localization.Get("CurrencyValue.NotSold"):"—");
+                else ImGui.TextDisabled(definition is { IsMarketable:false } ? localization.Get("CurrencyValue.NotSold"):currencyPricesAsked.Contains(row.ItemId) && !prices.Loading && prices.Error is null ? localization.Get("CurrencyValue.NoOffer"):"—");
                 ImGui.TableNextColumn();
                 if(row.GilPerUnit is { } perUnit)ImGui.TextColored(Success,perUnit.ToString("N1"));else ImGui.TextDisabled("—");
                 ImGui.TableNextColumn();

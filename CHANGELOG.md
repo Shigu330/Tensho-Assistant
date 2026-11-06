@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.695.0
+- Plan global, Monnaies : Rapport et demande de l'utilisateur : « Que faire ? » ne montrait aucun prix du marché, car il fallait un second clic, 32 prix à la fois, et un échec ne s'affichait pas. Choisir une monnaie demande maintenant les prix, par lots de 32 jusqu'au bout, sous l'interrupteur Universalis ; un échec s'affiche avec Réessayer ; un objet sans offre l'indique. La page a son propre onglet, Rangements › Que faire avec ?, avec le choix de la monnaie. COMPILED et TESTED, non validé en jeu.
+- Tests : CurrencyValue695Tests. Verify.ps1 (agent) : 1233/1233, 0 avertissement, 0 erreur ; DLL 0.695.0.0. Non validé en jeu.
+### English
+- User report and request: What to do with it? showed no market price: it took a second click, 32 prices at a time, and a failure did not show. Choosing a currency now asks for the prices, in batches of 32 to the end, under the Universalis switch; a failure shows with Try again; an item with no offer says so. The page has its own tab, Storage > What to do with it?, with the currency picker. COMPILED and TESTED, not validated in game.
+
 ## 0.694.0
 - Plan global, W-05 : Demande de l'utilisateur : dans Compagnie libre › Atelier, « Suivre ce projet » et « Suivre toutes ses parties » ajoutent des projets à une liste de projets suivis. Leurs matériaux s'additionnent, sur la page et dans le panneau à l'écran. Les parties sont reliées par le prototype et l'ordre du jeu, relevés pour les sous-marins. COMPILED et TESTED, non validé en jeu.
 - Tests : WorkshopSets694Tests. Verify.ps1 (agent) : 1231/1231, 0 avertissement, 0 erreur ; DLL 0.694.0.0. Non validé en jeu.

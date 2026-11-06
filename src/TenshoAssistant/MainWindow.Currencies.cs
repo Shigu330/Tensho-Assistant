@@ -73,7 +73,6 @@ internal sealed partial class MainWindow
             }
         }
         finally{ImGui.EndTable();}
-        DrawCurrencyValue();
     }
 
     // Copy on write: the framework thread reads the dictionary without a lock (Configuration.CurrencyThresholds); saved like a setting

@@ -1030,6 +1030,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.694) Atelier : Suivre toutes ses parties sur une coque doit ajouter les 4 pièces et additionner leurs matériaux, aussi dans le panneau ; essayer un aéronef et un logement ; la croix retire un projet.
 
+- [ ] (0.695) Rangements › Monnaies : Que faire ? doit ouvrir l'onglet et remplir les prix ; Gils par unité trié du plus rentable ; changer de monnaie dans la liste.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
