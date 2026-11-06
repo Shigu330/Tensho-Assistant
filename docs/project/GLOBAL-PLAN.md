@@ -145,7 +145,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 |---|---|---|---|
 | C33 | Une seule séance de relevés en jeu pour l'artisanat et la récolte, avant de coder | S-M |  |
 | ~~C27~~ fait en 0.647 | Classe du point (normal, éphémère, légendaire…) et livre de folklore requis | S |  |
-| C28 | Durée de l'intuition et compte à rebours | S |  |
+| ~~C28~~ fait en 0.663 | Durée de l'intuition et compte à rebours | S | Unité à confirmer sur une vraie intuition. |
 | ~~C29~~ fait en 0.649 | R-15, partie anticipée : poissons au harpon dans la page Récolte | S-M |  |
 | C30 | Relevé local de vos prises et temps de touche personnels | M |  |
 

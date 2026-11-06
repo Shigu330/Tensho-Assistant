@@ -1112,6 +1112,8 @@
     "Snag": "accrochage requis",
     "Previous": "Météo précédente : {0}",
     "Predators": "Attraper d'abord : {0}",
+    "Intuition": "Intuition : {0} s (GatherBuddy)",
+    "IntuitionLeft": "Intuition : {0}:{1:00} restantes",
     "FooterGatherBuddy": "Lieu le plus proche ; appâts, touches et conditions : GatherBuddy (Ottermandias, Apache-2.0), Garland en secours. Clic = objet en contexte.",
     "GatherBuddyLoading": "Données GatherBuddy : téléchargement…",
     "Title": "Aide à la pêche · {0}",

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.663.0
+- Plan global, C28 : Pêche (C28) : pour un poisson à proies, l'aide à la pêche et la page Récolte donnent la durée de l'intuition selon GatherBuddy ; l'aide affiche aussi le temps restant quand l'intuition est active. Le nombre est lu comme des secondes d'après son nom et ses valeurs : à confirmer sur une vraie intuition. Les données GatherBuddy sont téléchargées une fois de plus.
+- Tests : GatherBuddy. Verify.ps1 (agent) : 1160/1160, 0 avertissement, 0 erreur ; DLL 0.663.0.0. Non validé en jeu.
+### English
+- Fishing (C28): for a fish with predators, the fishing help and the Gathering page give the intuition's length according to GatherBuddy; the help also shows the time left when intuition is on. The number is read as seconds from its name and values: to confirm on a real intuition. GatherBuddy data are downloaded once more.
+
 ## 0.662.0
 - Plan global, 0.662 : Plantage du jeu corrigé : Tensho appelait une fonction du jeu (la liste de téléportation) pendant un changement de zone, sans joueur chargé. Ce risque existait depuis la 0.645, quand le survol des éthérites a demandé cette liste à chaque changement de carte. La fonction n'est plus appelée qu'une fois le joueur présent depuis 3 secondes. Les coûts au survol arrivent donc un instant après l'arrivée.
 - Tests : Teleport list. Verify.ps1 (agent) : 1160/1160, 0 avertissement, 0 erreur ; DLL 0.662.0.0. Non validé en jeu.

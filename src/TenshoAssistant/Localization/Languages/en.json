@@ -1112,6 +1112,8 @@
     "Snag": "snagging required",
     "Previous": "Previous weather: {0}",
     "Predators": "Catch first: {0}",
+    "Intuition": "Intuition: {0} s (GatherBuddy)",
+    "IntuitionLeft": "Intuition: {0}:{1:00} left",
     "FooterGatherBuddy": "Nearest spot; bait, bites and conditions: GatherBuddy (Ottermandias, Apache-2.0), Garland as fallback. Click = context item.",
     "GatherBuddyLoading": "GatherBuddy data: downloading…",
     "Title": "Fishing help · {0}",

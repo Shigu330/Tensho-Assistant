@@ -25,6 +25,7 @@ internal sealed partial class MainWindow
     private bool fishingPanelManual;
     // 0.398 (g, R-04): the bait in hand, copied on the framework thread (Gathering/FishingBaitReader); null = not a fisher or not read.
     internal Func<uint?>? FishingBait { get; set; }
+    internal Func<double?>? FishingIntuitionLeft { get; set; }
     internal void ToggleFishingPanel()=>fishingPanelManual=!fishingPanelManual;
     private Func<uint,float,float,(uint Id,string Name,float X,float Z,uint[] Fish)?>? fishingSpotAt;
     internal void ConfigureFishingHelp(Func<(uint Job,uint Territory,float X,float Z,bool Fishing)?> now,Func<uint,float,float,(uint Id,string Name,float X,float Z,uint[] Fish)?> spotAt)
@@ -71,6 +72,9 @@ internal sealed partial class MainWindow
                 if(ImGui.SmallButton(localization.Get("FishingPanel.Restart")))fishingSince=DateTimeOffset.UtcNow;
                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FishingPanel.RestartHelp"));
             }
+            // C28 (0.663): the time left of the intuition, from the character's status.
+            if(FishingIntuitionLeft?.Invoke() is { } intuitionLeft)
+                ImGui.TextColored(Accent,localization.Format("FishingPanel.IntuitionLeft",(int)intuitionLeft/60,(int)intuitionLeft%60));
             var bites=biteTimes?.Get(here.Id);
             var items=itemCatalog.State.Catalog;
             RefreshRecipeHoldingsCache();
@@ -183,6 +187,7 @@ internal sealed partial class MainWindow
             {
                 parts.Add(localization.Format("FishingPanel.PredatorsShort",known.Predators.Count));
                 detail.Add(localization.Format("FishingPanel.Predators",string.Join(", ",known.Predators.Select(pair=>$"{items?.Find(pair.Fish)?.Name ?? pair.Fish.ToString()} ×{pair.Count}"))));
+                if(known.Intuition is { } intuition)detail.Add(localization.Format("FishingPanel.Intuition",intuition));
             }
             return (fishId,data.Route(fishId),known.Bite,known.HookSet,string.Join(" · ",parts),string.Join("\n",detail));
         }

@@ -261,6 +261,7 @@ public sealed class Plugin : IDalamudPlugin
             Gathering.FishingBaitReader? baitReader=null;
             registrations.Register(()=>baitReader=new Gathering.FishingBaitReader(framework,objects,log),()=>baitReader?.Dispose());
             mainWindow.FishingBait=()=>baitReader?.Bait;
+            mainWindow.FishingIntuitionLeft=()=>baitReader?.IntuitionLeft;
             // 0.604 (C35): the player copied on the framework thread, again only when it changed; the two tables built off the frame on first use, nothing
             // shown until they are ready, a failure logged once.
             System.Runtime.CompilerServices.StrongBox<(uint Job,uint Territory,float X,float Z,bool Fishing)?> fishingNowCopy=new(null);
