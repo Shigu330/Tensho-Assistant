@@ -200,7 +200,7 @@ internal sealed partial class MainWindow
         // C6 (0.666): what these recipes ask, as the data gives it.
         if(p.LevelScaled)ImGui.TextColored(Accent,localization.Get("CraftSimulation.LevelScaled"));
         if(p.RequiredQuality>0)ImGui.TextColored(Accent,localization.Format("CraftSimulation.RequiredQuality",p.RequiredQuality.ToString("N0")));
-        if(p.MissionHigh>0)ImGui.TextColored(Accent,localization.Format("CraftSimulation.Mission",p.MissionLow.ToString("N0"),p.MissionMid.ToString("N0"),p.MissionHigh.ToString("N0")));
+        if(p.MissionHigh>0)ImGui.TextColored(Accent,localization.Format("CraftSimulation.Mission",string.Join(" / ",new[]{p.MissionLow,p.MissionMid,p.MissionHigh}.Where(threshold=>threshold>0).Select(threshold=>threshold.ToString("N0")))));
         ImGui.TextDisabled(localization.Format("SimulationHelp.Parameters",p.Progress,p.Quality,p.Durability,p.RequiredCraftsmanship,p.RequiredControl));
         ImGui.TextWrapped(localization.Get("SimulationHelp.Model"));
         var stats=characterStats.State;

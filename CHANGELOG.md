@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.667.0
+- Plan global, N-07 : Carte (N-07, partie carte) : sur l'île sanctuaire, les ressources à récolter s'affichent avec leur zone et leur nom, d'après les données du jeu, avec un réglage. Leur place reste à comparer sur l'île : l'unité des positions n'est pas prouvée. Artisanat (C6) : correction de la 0.666, les seuils de mission sont des pourcentages de la qualité maximale, relus dans les fichiers du jeu.
+- Tests : Island resources. Verify.ps1 (agent) : 1163/1163, 0 avertissement, 0 erreur ; DLL 0.667.0.0. Non validé en jeu.
+### English
+- Map (N-07, the map part): on the Island Sanctuary, resources show with their area and name, from the game's data, with a setting. Their place remains to compare on the island: the unit of the positions is not proven. Crafting (C6): correction to 0.666, mission thresholds are percents of the maximum quality, read in the game's files.
+
 ## 0.666.0
 - Plan global, C6 : Artisanat (C6) : le simulateur, le carnet et la synthèse en direct acceptent les recettes à niveau ajusté et à qualité imposée, dont l'Exploration cosmique. La page dit ce que demande la recette : niveau 100, qualité requise et seuils de mission. Règles lues dans Craftimizer (MIT) et réécrites. Les seuils sont affichés mais pas encore visés par la recherche, et rien n'est comparé en jeu. Le catalogue de recettes se reconstruit une fois.
 - Tests : Craft. Verify.ps1 (agent) : 1162/1162, 0 avertissement, 0 erreur ; DLL 0.666.0.0. Non validé en jeu.

@@ -87,6 +87,15 @@ internal static class MapLabels596Tests
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(0,costs),"not an aetheryte");
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(9,null) && !TenshoAssistant.Maps.MapLabels.NotAttuned(9,new Dictionary<uint,uint>()),"unknown says nothing");
         }),
+        ("Island resources (N-07): one point per place, none without an item or a place",() =>
+        {
+            var points=TenshoAssistant.Maps.IslandResources.Points([(0u,0,0,0),(37551u,20,0,100),(37562u,194,72,100),(37552u,194,72,100),(37555u,-58,-694,150),(37556u,0,0,100)]);
+            Check(points.Count==3,"the sheet's empty row and a row without a place are out");
+            Check(points[1] is { X:194,Y:72,Radius:100 } && points[1].Items.SequenceEqual([37562u,37552u]),"two items at one place");
+            Check(points[2] is { X:-58,Y:-694,Radius:150 },"negative coordinates");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
+            Check(view.Contains("map.TerritoryId==IslandResources.Territory"),"on that map only");
+        }),
         ("Quest icons (P22): only the variants read get a name",() =>
         {
             Check(TenshoAssistant.Maps.MapQuestIcons.NamesItsVariant(false,1) && TenshoAssistant.Maps.MapQuestIcons.NamesItsVariant(true,1),"on offer, available or not");

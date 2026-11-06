@@ -39,6 +39,7 @@
     <Compile Include="../../src/TenshoAssistant/Maps/MapZoomMemory.cs" Link="Maps/MapZoomMemory.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapLabels.cs" Link="Maps/MapLabels.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapResume.cs" Link="Maps/MapResume.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/IslandResources.cs" Link="Maps/IslandResources.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/JobProgress.cs" Link="Gear/JobProgress.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapSearch.cs" Link="Maps/MapSearch.cs" />
     <Compile Include="../../src/TenshoAssistant/Competitive/CompetitiveZones.cs" Link="Competitive/CompetitiveZones.cs" />

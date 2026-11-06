@@ -698,6 +698,7 @@ public sealed class Plugin : IDalamudPlugin
                 ? new Inventory.ItemLook(look.ModelMain,look.ModelSub,look.EquipSlotCategory.RowId,look.DyeCount):null;
             mainWindow.CabinetItems=()=>cabinetItems??=data.GetExcelSheet<Lumina.Excel.Sheets.Cabinet>().Where(row=>row.Item.RowId!=0).Select(row=>row.Item.RowId).ToHashSet();
             mainWindow.RouletteName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentRoulette>().GetRowOrDefault(id)?.Name.ExtractText();
+            mainWindow.IslandPoints=LoadSheet("MJIGatheringItem",()=>Maps.IslandResources.Points(data.GetExcelSheet<Lumina.Excel.Sheets.MJIGatheringItem>().Select(row=>(row.Item.RowId,(int)row.X,(int)row.Y,(int)row.Radius))),[]);
             mainWindow.WorkshopProjectsLoad=()=>FreeCompany.WorkshopProjectsLoader.Read(data);
             mainWindow.CompanyActionNames=LoadSheet("Status",()=>data.GetExcelSheet<Lumina.Excel.Sheets.Status>().Where(row=>row.IsFcBuff).ToDictionary(row=>row.RowId,row=>row.Name.ExtractText()),[]);
             mainWindow.SquadronMissionName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyExpedition>().GetRowOrDefault(id)?.Name.ExtractText();

@@ -556,6 +556,7 @@ internal sealed partial class MainWindow
             if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionQuests"),ImGuiTreeNodeFlags.DefaultOpen))
             {
                 changed|=SettingBox("MapView.ShowQuests",settings.ShowQuests,value=>settings.ShowQuests=value,MapDefaults.ShowQuests);
+                changed|=SettingBox("MapView.ShowIslandResources",settings.ShowIslandResources,value=>settings.ShowIslandResources=value,MapDefaults.ShowIslandResources);
                 changed|=SettingBox("MapView.ShowQuestAreas",settings.ShowQuestAreas,value=>settings.ShowQuestAreas=value,MapDefaults.ShowQuestAreas);
                 changed|=SettingBox("MapView.QuestTooltips",settings.QuestTooltips,value=>settings.QuestTooltips=value,MapDefaults.QuestTooltips);
                 changed|=SettingBox("MapView.ShowFates",settings.ShowFates,value=>settings.ShowFates=value,MapDefaults.ShowFates);
@@ -917,6 +918,7 @@ internal sealed partial class MainWindow
     // next game request, since closing the game map would otherwise lose it.
     private (uint MapId,Vector2 World,uint Icon,uint QuestId)? mapGameTarget;
     private Quests.QuestState? mapGameTargetQuests;
+    internal IReadOnlyList<IslandPoint>? IslandPoints { get; set; }
     private string? mapGameTargetLeve;
     private DateTimeOffset mapGameTargetSince,mapGameTargetRefresh;
 
@@ -1099,6 +1101,11 @@ internal sealed partial class MainWindow
                 foreach(var point in gathering)
                     if(point.Position is { Radius:>0 } area)
                         DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(area.X,0,area.Z),map)*mapZoom,area.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,settings.GatheringAreaColor);
+            // N-07 (0.667): the Island Sanctuary's resources; world coordinates, to compare with the game's map.
+            var islandPoints=settings.ShowIslandResources && map.TerritoryId==IslandResources.Territory ? IslandPoints ?? []:[];
+            if(settings.ShowGatheringAreas)
+                foreach(var point in islandPoints.Where(point=>point.Radius>0))
+                    DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(point.X,0,point.Y),map)*mapZoom,point.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,settings.GatheringAreaColor);
             // Every game icon in one list sorted by priority (0.124: quests used to be drawn above everything whatever the
             // setting). Equal priorities keep the game's layer order: fixed icons, gathering, FATEs, quests, game target.
             var icons=new List<MapIconDraw>();
@@ -1117,6 +1124,13 @@ internal sealed partial class MainWindow
                 var label=marker.Label.Length>0 ? marker.Label:null;Vector2? vendorFlag=null;
                 if(vendorLayout.Merged.TryGetValue(marker,out var vendors)){label=vendors.Label;vendorFlag=vendors.Flag;}
                 Add(marker.Icon,0,new Vector2(marker.X,marker.Y),label,marker,flag:vendorFlag);
+            }
+            foreach(var point in islandPoints)
+            {
+                var islandItems=itemCatalog.State.Catalog;
+                var firstItem=islandItems?.Find(point.Items[0]);
+                if(firstItem is { IconId:not 0 })
+                    Add(firstItem.IconId,1,MapProjection.PixelFromWorld(new Vector3(point.X,0,point.Y),map),string.Join("\n",point.Items.Select(item=>islandItems?.Find(item)?.Name ?? item.ToString())),worldRadius:settings.ShowGatheringAreas ? point.Radius:0);
             }
             // 0.632 (user captures): a region map also shows the aetherytes of its zones; a click asks for the teleport, as on the zone's map.
             if(settings.ShowFixedIcons && map.TerritoryId==0 && mapMarkers is not null && maps.State.Catalog is { } zoneCatalog)

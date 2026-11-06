@@ -244,6 +244,8 @@ public sealed class MapViewSettings
     public bool RightClickIgnored(uint icon)=>RightClickIgnore?.Contains(icon)==true;
     public bool ShowEventAreas { get; set; } = true;
     public bool ShowLeveAreas { get; set; } = true;
+    /// <summary>N-07 (0.667): what can be gathered on the Island Sanctuary, on its map.</summary>
+    public bool ShowIslandResources { get; set; } = true;
     public bool ShowFateAreas { get; set; } = true;
     public bool ShowGatheringAreas { get; set; } = true;
     public System.Numerics.Vector4 QuestAreaColor { get; set; } = new(0.95f,0.70f,0.25f,0.25f);

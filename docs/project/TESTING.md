@@ -976,6 +976,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.666) Exploration cosmique : ouvrir une recette dans le carnet. Tensho ne la refuse plus, et progrès, qualité et solidité sont ceux de la fenêtre du jeu. Lancer une séquence : les gains correspondent à la synthèse. Les seuils affichés correspondent à la mission.
 
+- [ ] (0.667) Île sanctuaire, carte Tensho : les ressources tombent aux bons endroits, le survol les nomme. Réglage « Ressources de l'île sanctuaire » : il les retire. Exploration cosmique : les seuils affichés correspondent à ceux de la mission.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

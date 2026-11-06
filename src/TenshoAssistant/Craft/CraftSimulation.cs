@@ -13,8 +13,8 @@ public static class CraftRecipeQuality
 {
     /// <summary>C6 (0.666, rule read in Craftimizer, MIT; docs/evidence/0.666-adjusted-recipes.md): an adjusted recipe's durability starts from 80, not from its level table.</summary>
     public static int Durability(bool levelScaled,int tableDurability,int factor)=>(levelScaled ? 80:tableDurability)*factor/100;
-    /// <summary>C6 (0.666, same source): a mission's thresholds are thousandths of the maximum quality.</summary>
-    public static int MissionThreshold(int maximum,int thousandths)=>checked((int)((long)maximum*thousandths/1000));
+    /// <summary>C6 (0.667, read in the game's files): a mission's thresholds are percents of the maximum quality (20, 40, 70).</summary>
+    public static int MissionThreshold(int maximum,int percent)=>checked((int)((long)maximum*percent/100));
     public static int Maximum(bool canHq,bool collectable,int requiredQuality,int baseQuality,int factor)
     {
         if(requiredQuality<0 || baseQuality<0 || factor<0)throw new ArgumentOutOfRangeException(nameof(baseQuality));

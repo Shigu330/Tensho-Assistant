@@ -54,7 +54,7 @@ internal static class CraftCollectableTests
             // C6 (0.666): adjusted and fixed-quality recipes are simulated.
             Check(CraftSimulation.Unsupported(recipe with {Simulation=p with {LevelScaled=true}}) is null && CraftSimulation.Unsupported(recipe with {Simulation=p with {RequiredQuality=10}}) is null,"accepted now");
             Check(CraftRecipeQuality.Durability(true,35,50)==40 && CraftRecipeQuality.Durability(false,35,200)==70,"80 for an adjusted recipe, its table otherwise");
-            Check(CraftRecipeQuality.MissionThreshold(10000,550)==5500 && CraftRecipeQuality.MissionThreshold(10000,0)==0,"thousandths of the maximum");
+            Check(CraftRecipeQuality.MissionThreshold(10000,20)==2000 && CraftRecipeQuality.MissionThreshold(10000,70)==7000 && CraftRecipeQuality.MissionThreshold(10000,0)==0,"percents of the maximum");
         }),
         ("Inner Quiet gains single double combo and capped stacks before a maximum potency Byregot",()=>
         {
