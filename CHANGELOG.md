@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.703.0
+- Plan global, W-09 : Demande de l'utilisateur : option « Exclure les PNJ aux prérequis non remplis » dans les panneaux : un article dont la quête n'est pas faite ne compte plus. Un prérequis non lu compte comme rempli : les hauts faits ne sont retenus que s'ils sont confirmés, et le rang de compagnie n'est pas vérifié. Désactivée par défaut. COMPILED et TESTED, non validé en jeu.
+- Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1249/1249, 0 avertissement, 0 erreur ; DLL 0.703.0.0. Non validé en jeu.
+### English
+- User request: Leave out NPCs with unmet requirements, in the panels: an article whose quest is not done no longer counts. A requirement not read counts as met: achievements only when confirmed, and company rank is not checked. Off by default. COMPILED and TESTED, not validated in game.
+
 ## 0.702.0
 - Plan global, W-09 : Demande de l'utilisateur : la liste des monnaies ne garde que celles des PNJ qui vendent vraiment des matériaux, c'est-à-dire un ingrédient d'une recette ou une fourniture d'un projet d'atelier. Une monnaie déjà cochée reste listée pour pouvoir être décochée. COMPILED et TESTED, non validé en jeu.
 - Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1248/1248, 0 avertissement, 0 erreur ; DLL 0.702.0.0. Non validé en jeu.

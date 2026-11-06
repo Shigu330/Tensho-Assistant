@@ -6197,6 +6197,8 @@
     "Left": "Non réussi"
   },
   "ListPanels": {
+    "MetOnly": "Exclure les PNJ aux prérequis non remplis",
+    "MetOnlyTip": "Un article dont la quête n'est pas faite ne compte plus. Un prérequis non lu compte comme rempli : un haut fait que Tensho n'a pas lu, ou un rang de compagnie, laisse le PNJ dans la liste.",
     "CurrenciesLoading": "Liste des monnaies en cours…",
     "CurrenciesTip": "Un PNJ ne compte que si vous avez coché toutes les monnaies qu'il demande. Sont listées les monnaies des vendeurs de matériaux, pour les recettes ou les projets d'atelier. Aucune n'est cochée au départ : cochez Gil pour compter ce qui s'achète en gils.",
     "Currencies": "Monnaies des vendeurs ({0} cochées)",

@@ -50,6 +50,12 @@ internal static class BaseMaterials699Tests
             Check(!BaseMaterials.VendorCounts(false,either,gil),"vendors off");
             Check(!BaseMaterials.VendorCounts(true,free,gil) && !BaseMaterials.VendorCounts(true,encoded,gil),"no cost read, or encoded: it does not count");
         }),
+        ("Vendors: a requirement blocks only when it is known not to be met, and the option starts off",() =>
+        {
+            Check(BaseMaterials.RequirementBlocks(false,null) && BaseMaterials.RequirementBlocks(null,false),"not met");
+            Check(!BaseMaterials.RequirementBlocks(true,true) && !BaseMaterials.RequirementBlocks(null,null),"met, or not read");
+            Check(!new TenshoAssistant.Configuration().ListPanelsMetOnly,"off by default");
+        }),
         ("Vendors: only the currencies of what is really a material",() =>
         {
             (uint Item,IEnumerable<uint> Currencies)[] sales=[(10,[1u]),(11,[28u]),(12,[0u]),(13,[40u,41u])];

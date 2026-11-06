@@ -18,6 +18,9 @@ public static class BaseMaterials
     public static IReadOnlySet<uint> MaterialCurrencies(IEnumerable<(uint Item,IEnumerable<uint> Currencies)> sales,IReadOnlySet<uint> materials)=>
         sales.Where(sale=>materials.Contains(sale.Item)).SelectMany(sale=>sale.Currencies).Where(id=>id!=0).ToHashSet();
 
+    /// <summary>0.703 (user request): a requirement blocks an offer only when it is known not to be met: not read is not « not met ».</summary>
+    public static bool RequirementBlocks(bool? quest,bool? achievement)=>quest==false || achievement==false;
+
     public static ItemOrigin OriginOf(bool gathered,bool sold,bool dropped)=>gathered ? ItemOrigin.Gathering:sold ? ItemOrigin.Vendor:dropped ? ItemOrigin.Monster:ItemOrigin.Other;
 
     /// <summary>

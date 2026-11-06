@@ -6197,6 +6197,8 @@
     "Left": "Not cleared"
   },
   "ListPanels": {
+    "MetOnly": "Leave out NPCs with unmet requirements",
+    "MetOnlyTip": "An article whose quest is not done no longer counts. A requirement that is not read counts as met: an achievement Tensho has not read, or a company rank, leaves the NPC in.",
     "CurrenciesLoading": "Listing the currencies…",
     "CurrenciesTip": "An NPC counts only if you ticked every currency it asks for. Listed: currencies of vendors selling materials for recipes or workshop projects. None is ticked at the start: tick Gil to count what is bought with gil.",
     "Currencies": "Vendor currencies ({0} ticked)",

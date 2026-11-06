@@ -1046,6 +1046,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.702) Monnaies des vendeurs : la liste doit être nettement plus courte ; dire s'il reste des monnaies sans intérêt ou s'il en manque.
 
+- [ ] (0.703) Cocher l'option : un objet vendu par un PNJ dont la quête n'est pas faite doit changer de catégorie ; comparer avec Vendeurs PNJ.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

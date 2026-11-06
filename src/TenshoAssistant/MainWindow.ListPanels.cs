@@ -21,7 +21,11 @@ internal sealed partial class MainWindow
         ImGui.Indent();
         BoolSetting("ListPanels.Gathering","ListPanels.OriginTip",()=>configuration.ListPanelsGathering,value=>configuration.ListPanelsGathering=value,c=>c.ListPanelsGathering);
         BoolSetting("ListPanels.Vendor","ListPanels.VendorTip",()=>configuration.ListPanelsVendor,value=>configuration.ListPanelsVendor=value,c=>c.ListPanelsVendor);
-        if(configuration.ListPanelsVendor)DrawListPanelCurrencies();
+        if(configuration.ListPanelsVendor)
+        {
+            DrawListPanelCurrencies();
+            BoolSetting("ListPanels.MetOnly","ListPanels.MetOnlyTip",()=>configuration.ListPanelsMetOnly,value=>configuration.ListPanelsMetOnly=value,c=>c.ListPanelsMetOnly);
+        }
         BoolSetting("ListPanels.Monster","ListPanels.OriginTip",()=>configuration.ListPanelsMonster,value=>configuration.ListPanelsMonster=value,c=>c.ListPanelsMonster);
         BoolSetting("ListPanels.Other","ListPanels.OriginTip",()=>configuration.ListPanelsOther,value=>configuration.ListPanelsOther=value,c=>c.ListPanelsOther);
         BoolSetting("ListPanels.Crystal","ListPanels.OriginTip",()=>configuration.ListPanelsCrystal,value=>configuration.ListPanelsCrystal=value,c=>c.ListPanelsCrystal);
@@ -155,6 +159,7 @@ internal sealed partial class MainWindow
 
     // W-09 (0.699): worked out at most once a second per panel, not on every frame.
     private readonly Dictionary<string,(long At,(uint Item,long Needed)[] Lines)> listPanelLines=[];
+    private long listPanelQuestsAsked=-60001;
     private void DrawListPanelEntries(string key,Func<(uint Item,long Needed)[]> entries)
     {
         var now=Environment.TickCount64;
@@ -162,6 +167,8 @@ internal sealed partial class MainWindow
         {
             var wanted=entries();
             listPanelCurrenciesOn=(configuration.ListPanelsCurrenciesOn ?? []).ToHashSet();
+            // The quest journal is read when something asks for it: ask, at most once a minute, while it is empty.
+            if(configuration.ListPanelsBase && configuration.ListPanelsMetOnly && quests.State.Entries.Count==0 && now-listPanelQuestsAsked>60000){listPanelQuestsAsked=now;quests.RequestRefresh();}
             listPanelLines[key]=known=(now,configuration.ListPanelsBase ? BaseMaterials.Expand(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched).ToArray():wanted);
         }
         if(!configuration.ListPanelsBase)
@@ -184,7 +191,13 @@ internal sealed partial class MainWindow
     private RecipeDefinition? ListPanelRecipe(uint item)=>recipeCatalog.State.Catalog?.ForResult(item) is { Count:>0 } recipes ? PreferredRecipe(recipes):null;
     private bool ListPanelGathered(uint item)=>gatheringCatalog.State.Catalog?.ForItem(item) is { Count:>0 };
     private bool ListPanelSold(uint item)=>npcVendors?.State.Catalog?.ForItem(item) is { Count:>0 } offers
-        && BaseMaterials.VendorCounts(configuration.ListPanelsVendor,offers.Select(offer=>(IReadOnlyList<uint>)offer.Sale.Costs.Select(cost=>cost.CurrencyItemId).ToArray()),listPanelCurrenciesOn);
+        && BaseMaterials.VendorCounts(configuration.ListPanelsVendor,offers.Where(ListPanelOfferOpen).Select(offer=>(IReadOnlyList<uint>)offer.Sale.Costs.Select(cost=>cost.CurrencyItemId).ToArray()),listPanelCurrenciesOn);
+    private bool ListPanelOfferOpen(NpcVendorOffer offer)
+    {
+        if(!configuration.ListPanelsMetOnly)return true;
+        var (quest,achievement)=SaleRequirementState(offer.Sale);
+        return !BaseMaterials.RequirementBlocks(quest,achievement);
+    }
     private bool ListPanelFetched(uint item)=>ListPanelGathered(item) || ListPanelSold(item);
     private ItemOrigin ListPanelOrigin(uint item)=>ClassifyCrystal(item) is not null ? ItemOrigin.Crystal:BaseMaterials.OriginOf(ListPanelGathered(item),ListPanelSold(item),lumina?.State.Data?.MonstersOf(item) is { Count:>0 });
     private bool ListPanelOriginShown(ItemOrigin origin)=>origin switch
