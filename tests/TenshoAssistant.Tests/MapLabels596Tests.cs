@@ -83,6 +83,18 @@ internal static class MapLabels596Tests
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(0,costs),"not an aetheryte");
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(9,null) && !TenshoAssistant.Maps.MapLabels.NotAttuned(9,new Dictionary<uint,uint>()),"unknown says nothing");
         }),
+        ("Leve areas (0.654): remembered while the leve is accepted, replaced by a new read, gone with the leve",() =>
+        {
+            var memory=new TenshoAssistant.Maps.LeveAreaMemory<string>();
+            var accepted=new HashSet<string>{"a"};
+            Check(memory.Update([(697,"a","circle 1"),(697,"a","circle 2")],accepted).Count==0,"given by the read: nothing to add");
+            Check(string.Join(",",memory.Update([],accepted))=="circle 1,circle 2","missing from the next read: remembered");
+            Check(memory.Update([(697,"a","circle 2")],accepted).Count==0,"read again: replaced");
+            Check(string.Join(",",memory.Update([],accepted))=="circle 2","only the new one stays");
+            Check(memory.Update([(697,"b","other")],accepted).Count==1,"a leve not accepted is not remembered");
+            Check(memory.Update([],new HashSet<string>()).Count==0,"abandoned or finished: forgotten");
+            Check(memory.Update([],accepted).Count==0,"and it does not come back");
+        }),
         ("Event markers (0.653): kept while a journal request empties them, on the same map only",() =>
         {
             Check(TenshoAssistant.Maps.MapEventHold.Holds(0,true,697,697),"the leve's click: 0 markers, type QuestLog, same map");
@@ -91,7 +103,7 @@ internal static class MapLabels596Tests
             Check(!TenshoAssistant.Maps.MapEventHold.Holds(0,true,698,697),"another map: nothing kept");
             Check(!TenshoAssistant.Maps.MapEventHold.Holds(0,true,0,0),"no map yet");
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs"));
-            Check(reader.Contains("if(MapEventHold.Holds(result.Count,journalRequest,agent->CurrentMapId,lastEventsMap))return lastEvents;"),"wired in the reader");
+            Check(reader.Contains("if(!MapEventHold.Holds(result.Count,journalRequest,agent->CurrentMapId,lastEventsMap)){lastEvents=result.AsReadOnly();"),"wired in the reader");
         }),
         ("Leve markers (P17): the icon read in game, or a tooltip naming a leve, never a quest",() =>
         {

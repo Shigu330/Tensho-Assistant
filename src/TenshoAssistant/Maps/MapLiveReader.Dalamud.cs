@@ -80,8 +80,12 @@ internal sealed class MapLiveReader : IDisposable
 
     public MapLiveReader(IFramework framework,IClientState client,IObjectTable objects,IDataManager data,ICondition condition,IFateTable fateTable,IPartyList party,IPluginLog log)
     {placeData=data;
-        try{leveNames=data.GetExcelSheet<Lumina.Excel.Sheets.Leve>().Select(row=>MapLeves.Key(row.Name.ExtractText())).Where(name=>name.Length>0).ToHashSet();leveMarkers.Clear();}
-        catch(Exception error){leveNames=null;log.Warning(error,"The leve names could not be read.");}
+        try
+        {
+            var keys=data.GetExcelSheet<Lumina.Excel.Sheets.Leve>().Select(row=>(row.RowId,Key:MapLeves.Key(row.Name.ExtractText()))).Where(row=>row.Key.Length>0).ToDictionary(row=>row.RowId,row=>row.Key);
+            leveKeys=keys;leveNames=keys.Values.ToHashSet();leveMarkers.Clear();
+        }
+        catch(Exception error){leveKeys=null;leveNames=null;log.Warning(error,"The leve names could not be read.");}
         this.framework=framework;this.client=client;this.objects=objects;this.log=log;this.condition=condition;this.fateTable=fateTable;this.party=party;Log=log;
         uint[] currentIds=[],vistaIds=[];
         // 0.491 (R-14): one guard per sheet, so that one sheet does not cost the other.
@@ -289,6 +293,20 @@ internal sealed class MapLiveReader : IDisposable
     private static readonly HashSet<uint> loggedEventIcons=[];
     // P17 (0.652): the names of the Leve sheet, in the game's language, and what was already decided for a tooltip.
     private static IReadOnlySet<string>? leveNames;
+    private static IReadOnlyDictionary<uint,string>? leveKeys;
+    private static readonly LeveAreaMemory<MapEventMarker> leveAreas=new();
+    /// <summary>0.654: the areas of the leves still accepted, remembered; those of a leve no longer accepted go. Unknown (no reader): the markers as read.</summary>
+    private static unsafe IReadOnlyList<MapEventMarker> WithLeveAreas(IReadOnlyList<MapEventMarker> markers)
+    {
+        var quests=FFXIVClientStructs.FFXIV.Client.Game.QuestManager.Instance();
+        if(quests==null || leveKeys is null || leveNames is null)return markers;
+        var accepted=new HashSet<string>();
+        foreach(ref var leve in quests->LeveQuests)if(leve.LeveId!=0 && leveKeys.TryGetValue(leve.LeveId,out var name))accepted.Add(name);
+        var named=markers.Where(marker=>marker.IsLeve).Select(marker=>(Marker:marker,Key:MapLeves.Key(marker.Tooltip))).Where(entry=>leveNames.Contains(entry.Key)).ToArray();
+        var extras=leveAreas.Update(named.Select(entry=>(entry.Marker.MapId,entry.Key,entry.Marker)),accepted);
+        var gone=named.Where(entry=>!accepted.Contains(entry.Key)).Select(entry=>entry.Marker).ToHashSet();
+        return extras.Count==0 && gone.Count==0 ? markers:[..markers.Where(marker=>!gone.Contains(marker)),..extras];
+    }
     private static readonly Dictionary<(uint Icon,string Tooltip),bool> leveMarkers=[];
     private static bool IsLeve(uint icon,byte type,string tooltip)
     {
@@ -322,9 +340,8 @@ internal sealed class MapLiveReader : IDisposable
         }
         // 0.653: the game empties this list during a journal request; what was read just before stays.
         var journalRequest=agent->CurrentOpenMapInfo.Type is FFXIVClientStructs.FFXIV.Client.UI.Agent.MapType.QuestLog or FFXIVClientStructs.FFXIV.Client.UI.Agent.MapType.GatheringLog;
-        if(MapEventHold.Holds(result.Count,journalRequest,agent->CurrentMapId,lastEventsMap))return lastEvents;
-        lastEvents=result.AsReadOnly();lastEventsMap=agent->CurrentMapId;
-        return lastEvents;
+        if(!MapEventHold.Holds(result.Count,journalRequest,agent->CurrentMapId,lastEventsMap)){lastEvents=result.AsReadOnly();lastEventsMap=agent->CurrentMapId;}
+        return WithLeveAreas(lastEvents);
     }
     private static IReadOnlyList<MapEventMarker> lastEvents=[];private static uint lastEventsMap;
     // Crash 2026-10-31 08:19 (dalamud.crashhandler.log): Utf8String.ToString() on an event marker tooltip read freed memory

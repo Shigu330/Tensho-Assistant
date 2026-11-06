@@ -24,7 +24,7 @@ public sealed unsafe class ReadingCapture : IDisposable
     private readonly Func<bool> enabled;
     private readonly IPluginLog log;
     private readonly Dictionary<string,int> lines=[];
-    private string statuses="",synthesis="",retainer="",airship="";
+    private string statuses="",synthesis="",leves="",retainer="",airship="";
     private bool fishing,disposed,warned;
     private long slowAt;
 
@@ -59,6 +59,7 @@ public sealed unsafe class ReadingCapture : IDisposable
             if(now-slowAt<SlowPartEvery)return;
             slowAt=now;
             ReadSynthesis();
+            ReadLeves();
             ReadRetainer();
             ReadAirships();
             warned=false;
@@ -76,6 +77,19 @@ public sealed unsafe class ReadingCapture : IDisposable
         if(ids==statuses)return;
         statuses=ids;
         Line("statuses",200,string.Join(", ",local.StatusList.Where(status=>status.StatusId!=0).Select(status=>$"{status.StatusId} (param {status.Param}, {status.RemainingTime:F1} s)")));
+    }
+
+    // 0.654: what the game says of the accepted leves, to tell a started, a finished and an abandoned one.
+    private void ReadLeves()
+    {
+        var quests=QuestManager.Instance();
+        if(quests==null)return;
+        var text=new StringBuilder();
+        foreach(ref var leve in quests->LeveQuests)if(leve.LeveId!=0)text.Append($" {leve.LeveId} (sequence {leve.Sequence}, flags {leve.Flags}, hidden {leve.IsHidden}, priority {leve.IsPriority})");
+        var all=$"{quests->NumAcceptedLeveQuests} accepted:{text}";
+        if(all==leves)return;
+        leves=all;
+        Line("leves",60,all);
     }
 
     // C13: the HQ chance beside the quality, and every number of the window.

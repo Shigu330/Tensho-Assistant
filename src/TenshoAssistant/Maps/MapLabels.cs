@@ -25,6 +25,28 @@ public static class MapEventHold
     public static bool Holds(int read,bool journalRequest,uint currentMap,uint keptMap)=>read==0 && journalRequest && currentMap!=0 && currentMap==keptMap;
 }
 
+/// <summary>
+/// 0.654 (user report): the game gives a leve's areas only for some reads of its map. Those seen stay remembered, map by map, as long as the game lists the leve as accepted.
+/// A new read of the same leve on the same map replaces them. An absence says nothing: the list is often missing them while the leve runs.
+/// </summary>
+public sealed class LeveAreaMemory<T>
+{
+    private const int MaxAreas=64;
+    private readonly Dictionary<(uint Map,string Leve),List<T>> areas=[];
+    /// <summary>Returns what to add to the markers read: the areas remembered that this read does not give.</summary>
+    public IReadOnlyList<T> Update(IEnumerable<(uint Map,string Leve,T Area)> seen,IReadOnlySet<string> accepted)
+    {
+        foreach(var key in areas.Keys.Where(key=>!accepted.Contains(key.Leve)).ToArray())areas.Remove(key);
+        var given=new HashSet<(uint Map,string Leve)>();
+        foreach(var group in seen.Where(area=>accepted.Contains(area.Leve)).GroupBy(area=>(area.Map,area.Leve)))
+        {
+            given.Add(group.Key);
+            if(areas.ContainsKey(group.Key) || areas.Sum(pair=>pair.Value.Count)<MaxAreas)areas[group.Key]=group.Select(area=>area.Area).Take(MaxAreas).ToList();
+        }
+        return areas.Where(pair=>!given.Contains(pair.Key)).SelectMany(pair=>pair.Value).ToArray();
+    }
+}
+
 public static class MapLabels
 {
     /// <summary>

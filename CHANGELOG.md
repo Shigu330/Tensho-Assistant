@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.654.0
+- Plan global, 0.654 : Carte : la zone d'un mandat reste affichée quand vous n'y êtes pas, y compris depuis une autre zone, une fois que le jeu l'a donnée. Tensho la garde, carte par carte, tant que le jeu liste le mandat comme accepté, et l'oublie dès qu'il ne l'est plus, par exemple s'il est abandonné. Une zone jamais vue depuis le dernier chargement ne peut pas s'afficher : rien n'est sauvegardé. La capture écrit aussi l'état des mandats acceptés.
+- Tests : Leve areas. Verify.ps1 (agent) : 1155/1155, 0 avertissement, 0 erreur ; DLL 0.654.0.0. Non validé en jeu.
+### English
+- Map: a leve's area stays shown when you are not on it, even from another zone, once the game has given it. Tensho keeps it, map by map, as long as the game lists the leve as accepted, and forgets it as soon as it is not, for instance when abandoned. An area not seen since the last load cannot be shown: nothing is saved. The capture also writes the state of accepted leves.
+
 ## 0.653.0
 - Plan global, 0.653 : Carte : cliquer un mandat lancé dans le journal ne retire plus sa zone. Pendant cette demande, le jeu vide toute sa liste de marqueurs, les 12 et pas seulement celui du mandat, puis la remplit de nouveau. Tensho garde ce qu'il a lu juste avant, tant que dure la demande et sur la même carte.
 - Tests : Event markers. Verify.ps1 (agent) : 1154/1154, 0 avertissement, 0 erreur ; DLL 0.653.0.0. Non validé en jeu.

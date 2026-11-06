@@ -950,6 +950,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.653) Mandat lancé, carte ouverte, zone verte visible : cliquer le mandat dans le journal, puis recliquer. La zone et les autres marqueurs restent. Terminer le mandat : la zone disparaît une fois la carte refermée.
 
+- [ ] (0.654) Mandat lancé, zone vue une fois : s'éloigner, changer de zone, ouvrir la carte de la zone du mandat, la zone verte reste. Cliquer le mandat dans le journal : elle reste. Abandonner le mandat : elle disparaît.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
