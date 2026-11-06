@@ -28,9 +28,21 @@ internal sealed class NativeMapReplacer : IDisposable
     private readonly DateTimeOffset startingUntil=DateTimeOffset.UtcNow.AddSeconds(15);
     /// <summary>Opens the game map without replacing it (tool button); done on the next framework tick.</summary>
     public void OpenGameMap()=>Interlocked.Exchange(ref openRequest,1);
-    public NativeMapReplacer(IFramework framework,IGameGui gui,IClientState client,Func<MapViewSettings> settings,Action<GameMapRequest> open,
-        Func<bool> tenshoOpen,Func<bool> canShow,Action closeTensho,IPluginLog log)
+    // 0.625: the game closes its map when a talk or an event starts: it comes back at the end.
+    private readonly MapResume resume=new();
+    private ICondition? occupiedFlags;
+    private bool Occupied()
     {
+        if(occupiedFlags is not { } flags)return false;
+        return flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.Occupied] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedInEvent]
+            || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedInQuestEvent] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedInCutSceneEvent]
+            || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.Occupied30] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.Occupied33]
+            || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.Occupied38] || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.Occupied39]
+            || flags[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell];
+    }
+    public NativeMapReplacer(IFramework framework,IGameGui gui,IClientState client,ICondition condition,Func<MapViewSettings> settings,Action<GameMapRequest> open,
+        Func<bool> tenshoOpen,Func<bool> canShow,Action closeTensho,IPluginLog log)
+    {occupiedFlags=condition;
         this.framework=framework;this.gui=gui;this.client=client;this.settings=settings;this.open=open;this.tenshoOpen=tenshoOpen;this.canShow=canShow;this.closeTensho=closeTensho;this.log=log;
         TenshoAssistant.Competitive.CompetitiveGate.AddAlways(framework,Update);
     }
@@ -52,6 +64,11 @@ internal sealed class NativeMapReplacer : IDisposable
             var addon=gui.GetAddonByName("AreaMap");
             var unit=addon.IsNull ? null:(AtkUnitBase*)addon.Address;
             var visible=unit!=null && addon.IsVisible;
+            if(resume.ShouldReopen(Occupied(),visible,client.TerritoryType) && AgentMap.Instance() is var again && again!=null)
+            {
+                log.Information("The event is over: the map opens again.");
+                again->Show();
+            }
             // 0.328: handled once the addon is read. A hosted game map is brought back on screen and no longer hosted (Show did
             // nothing on a map already open, and bypass is only read when the map appears); the Tensho map stays open.
             if(Interlocked.Exchange(ref openRequest,0)==1)
@@ -84,7 +101,13 @@ internal sealed class NativeMapReplacer : IDisposable
             }
             if(hosted)
             {
-                if(!visible){hosted=false;Restore(unit);log.Information("The game closed its map window: the Tensho map closes with it.");closeTensho();}
+                if(!visible)
+                {
+                    hosted=false;Restore(unit);
+                    resume.GameClosedMap(Occupied(),client.TerritoryType);
+                    log.Information("The game closed its map window: the Tensho map closes with it; occupied: {0}.",Occupied());
+                    closeTensho();
+                }
                 else if(!tenshoOpen()){hosted=false;Restore(unit);AgentMap.Instance()->Hide();visible=false;}
                 else
                 {

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.625.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : parler à un PNJ fait fermer sa carte au jeu, et la carte Tensho se fermait pour de bon. Fermée ainsi, elle se rouvre une fois le joueur libre, dans la même zone. Fermée par la touche de carte, elle reste fermée.
+- Tests : Map resume. Verify.ps1 (agent) : 1133/1133, 0 avertissement, 0 erreur ; DLL 0.625.0.0. Non validé en jeu.
+### English
+- Map (user report, log): talking to an NPC makes the game close its map, and the Tensho map closed for good. Closed that way, it opens again once the player is free, in the same zone. Closed with the map key, it stays closed.
+
 ## 0.624.0
 - Plan global, phase 5 : Carte : le journal dit maintenant pourquoi elle s'efface ou revient (fenêtre du jeu ou panneau, lesquelles), et quand le jeu ferme sa propre carte, pour comprendre le rapport « la carte disparaît à l'ouverture d'un menu et ne revient pas ». Pas de correctif encore.
 - Tests : Map enlarged. Verify.ps1 (agent) : 1130/1130, 0 avertissement, 0 erreur ; DLL 0.624.0.0. Non validé en jeu.

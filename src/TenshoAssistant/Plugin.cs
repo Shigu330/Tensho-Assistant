@@ -181,7 +181,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>{},wikiVistas.Dispose);
             mainWindow.ConfigureWikiVistas(wikiVistas);
             Maps.NativeMapReplacer? mapReplacer=null;
-            registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,()=>configuration.MapView,mainWindow.ShowMapFromGame,()=>mainWindow.MapViewOpen,()=>mainWindow.MapViewVisible(),mainWindow.CloseMapFromGame,log),()=>mapReplacer?.Dispose());
+            registrations.Register(()=>mapReplacer=new Maps.NativeMapReplacer(framework,gameGui,client,condition,()=>configuration.MapView,mainWindow.ShowMapFromGame,()=>mainWindow.MapViewOpen,()=>mainWindow.MapViewVisible(),mainWindow.CloseMapFromGame,log),()=>mapReplacer?.Dispose());
             mainWindow.ConfigureGameMapOpener(()=>mapReplacer?.OpenGameMap());
             Macros.MacroWriter? macroWriter=null;
             registrations.Register(()=>macroWriter=new Macros.MacroWriter(framework,log,outcome=>

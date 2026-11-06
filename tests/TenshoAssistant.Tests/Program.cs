@@ -1017,6 +1017,7 @@ tests = tests.Concat(OtherStocks609Tests.Cases).ToArray();
 tests = tests.Concat(CompetitiveCut610Tests.Cases).ToArray();
 tests = tests.Concat(GardenCare616Tests.Cases).ToArray();
 tests = tests.Concat(MapAside617Tests.Cases).ToArray();
+tests = tests.Concat(MapResume625Tests.Cases).ToArray();
 tests = tests.Concat(SelfCheckTests.Cases).ToArray();
 tests = tests.Concat(HelpTests.Cases).ToArray();
 tests = tests.Concat(RetainerSalesTests.Cases).ToArray();
