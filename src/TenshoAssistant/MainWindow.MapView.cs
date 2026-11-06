@@ -62,6 +62,7 @@ internal sealed partial class MainWindow
         var mapId=maps.State.Catalog is { } catalog ? request.Resolve(catalog):request.Selected==request.Current ? 0:request.Selected;
         // A quest, aetheryte or FATE was asked (journal, link): never the M toggle, the map opens focused on it.
         var pointed=request.Pointed;
+        if(pointed && request.Territory!=0 && maps.State.Catalog?.MapOf(request.Territory) is { } questMap and not 0)mapQuestMap=questMap;
         if(pointed && mapId==0)mapId=request.Current;
         if(!pointed && mapViewOpen && mapId==0 && mapViewFollow)mapViewOpen=false;
         // A pointed request keeps its own zoom: the focus centres it, or fits the map once it is not found.
@@ -206,7 +207,7 @@ internal sealed partial class MainWindow
         var toolsWidth=DrawMapTools(map,viewport,window,true,area.Y-ImGui.GetTextLineHeight()-16);
         var regionId=markers.RegionOf(map);var region=ResolveMap(catalog,regionId);
         var regions=markers.Regions.Select(id=>ResolveMap(catalog,id)).OfType<MapDefinition>().ToArray();
-        var zones=MapMenus.Zones(catalog.Entries,region);
+        var zones=MapMenus.WithExtras(MapMenus.Zones(catalog.Entries,region),region,map,catalog.Find(mapQuestMap));
         var floors=zones.FirstOrDefault(entry=>entry.Any(floor=>floor.MapId==map.MapId)) ?? [];
         var isZone=map.TerritoryId!=0;var world=localization.Get("MapView.World");
         static string FloorName(MapDefinition floor)=>MapMenus.FloorLabel(floor);
@@ -354,7 +355,7 @@ internal sealed partial class MainWindow
         Tip("MapView.RegionTip");
         ImGui.SameLine();
         var isZone=map.TerritoryId!=0;
-        var zones=MapMenus.Zones(catalog.Entries,ResolveMap(catalog,regionId));
+        var zones=MapMenus.WithExtras(MapMenus.Zones(catalog.Entries,ResolveMap(catalog,regionId)),ResolveMap(catalog,regionId),map,catalog.Find(mapQuestMap));
         var floors=zones.FirstOrDefault(entry=>entry.Any(floor=>floor.MapId==map.MapId)) ?? [];
         var worldChoices=mapMarkers.WorldChoices(map.MapId);
         var zoneShown=isZone || worldChoices.Count>0 ? MapName(map):"--";
@@ -906,6 +907,7 @@ internal sealed partial class MainWindow
     // Enlarge/restore: the new window size only exists two frames later, so the fit waits for it (0.118, user report).
     private int mapFitDelay;
     // Quest, aetheryte or FATE the game asked to show (journal click), focused once the target map is drawn (0.118).
+    private uint mapQuestMap;
     private GameMapRequest? mapFocusRequest;private DateTimeOffset mapFocusUntil;
     // The game's temporary marker (quest or gathering target) is not an event marker: it is kept and drawn here (0.122) until the
     // next game request, since closing the game map would otherwise lose it.

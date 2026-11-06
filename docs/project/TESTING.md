@@ -924,6 +924,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.640) Sur Solution Neuf, cliquer les Locaux de la Société de l'Arcadion : leur carte s'ouvre. Sur l'Écume des cieux d'Abalathia, cliquer le Paddock : sa carte s'ouvre, même avec l'icône de quête dessus.
 
+- [ ] (0.641) Cliquer « La combattante féline aux griffes acérées », ouvrir les Locaux de la Société de l'Arcadion : le menu des zones finit par ces locaux et le Ring des Griffes félines, comme le jeu.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

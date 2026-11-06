@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.641.0
+- Plan global, phase 5 : Carte (capture de l'utilisateur, jeu à côté de Tensho) : le menu des zones du jeu ajoute des cartes sans catégorie, vu pour la carte affichée et celle de la quête, comme les Locaux de la Société de l'Arcadion et le Ring des Griffes félines. Tensho les ajoute à la fin de sa liste. La règle exacte du jeu reste inconnue : sa liste défile et peut en contenir d'autres.
+- Tests : Map. Verify.ps1 (agent) : 1144/1144, 0 avertissement, 0 erreur ; DLL 0.641.0.0. Non validé en jeu.
+### English
+- Map (user capture, game beside Tensho): the game's zone menu adds maps with no category, seen for the shown map and the quest's map, such as Locaux de la Société de l'Arcadion and Ring des Griffes félines. Tensho adds them at the end of its list. The game's exact rule remains unknown: its list scrolls and may hold others.
+
 ## 0.640.0
 - Plan global, phase 5 : Carte (captures de l'utilisateur) : les Locaux de la Société de l'Arcadion et le Paddock ne menaient nulle part, car seuls deux types d'icônes étaient pris en compte, et une icône de quête par-dessus cachait aussi le lien. Toute icône nommée comme une carte l'ouvre maintenant, même sous une icône de quête. Les services n'ont pas de nom et ne changent pas.
 - Tests : Map labels. Verify.ps1 (agent) : 1144/1144, 0 avertissement, 0 erreur ; DLL 0.640.0.0. Non validé en jeu.

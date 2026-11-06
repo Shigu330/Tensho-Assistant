@@ -24,6 +24,17 @@ public static class MapMenus
     public static IReadOnlyList<string> PlaceLines(uint playerMap,uint shownMap,string? area,string? subArea)
         =>playerMap==0 || playerMap!=shownMap || string.IsNullOrEmpty(area) ? []:string.IsNullOrEmpty(subArea) ? ["> "+area]:["> "+area,"> "+subArea];
 
+    /// <summary>
+    /// 0.641 (user capture, docs/evidence/0.641-zone-menu.md): the game's zone list also holds maps with no menu category, seen for the shown map and the quest's map: added after the others, once, in the same region.
+    /// </summary>
+    public static IReadOnlyList<IReadOnlyList<MapDefinition>> WithExtras(IReadOnlyList<IReadOnlyList<MapDefinition>> zones,MapDefinition? region,params MapDefinition?[] extras)
+    {
+        if(region is null || region.RegionPlaceId==0)return zones;
+        var result=zones.ToList();
+        foreach(var extra in extras)
+            if(extra is { TerritoryId:not 0,MenuCategory:0 } && extra.RegionPlaceId==region.RegionPlaceId && !result.Any(entry=>entry.Contains(extra)))result.Add([extra]);
+        return result;
+    }
     public static string FloorLabel(MapDefinition map)=>map.Subzone.Length>0 ? map.Subzone:map.MapIndex>0 ? map.MapIndex.ToString():map.Zone;
     public static IReadOnlyList<IReadOnlyList<MapDefinition>> Zones(IEnumerable<MapDefinition> maps,MapDefinition? region)
         =>region is not { MenuCategory:>0 } ? []:maps.Where(map=>map.MenuCategory==region.MenuCategory && map.MenuPriority>region.MenuPriority && map.TerritoryId!=0)
