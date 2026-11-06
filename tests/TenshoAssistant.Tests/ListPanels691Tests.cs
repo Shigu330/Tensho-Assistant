@@ -23,10 +23,14 @@ internal static class ListPanels691Tests
             Check(TenshoAssistant.UI.GameWindows.Ignored("JobHudRRP0") && TenshoAssistant.UI.GameWindows.Ignored("JobHudRRP1"),"the job gauges, read in the log");
             Check(!TenshoAssistant.UI.GameWindows.Ignored("MJIAnimalManagement"),"the pasture window stays a window");
         }),
-        ("List panels: hidden in combat, and unread stocks are not shown as zero",() =>
+        ("List panels: shown means shown unless the player chooses, and unread stocks are not shown as zero",() =>
         {
             var page=Read("MainWindow.ListPanels.cs");
-            Check(System.Text.RegularExpressions.Regex.Matches(page,@"InCombat:true").Count==3,"combat");
+            Check(System.Text.RegularExpressions.Regex.Matches(page,@"ListPanelsHiddenInCombat").Count==4,"combat, by choice");
+            var settings=new TenshoAssistant.Configuration();
+            Check(!settings.ListPanelsHideInCombat && !settings.ListPanelsHideBehindGame,"never hidden by default");
+            Check(System.Text.RegularExpressions.Regex.Matches(page,@"\(\)=>configuration\.ListPanelsHideBehindGame\);").Count==3,"behind the game, by choice");
+            Check(Read("PanelWindow.cs").Contains("panel.StepsAside?.Invoke() != false && lastPosition"),"the window honours it");
             Check(page.Contains("if(!stock.HasObservation)ImGui.TextDisabled("),"unknown is not zero");
             Check(System.Text.RegularExpressions.Regex.Matches(page,@"RefreshRecipeHoldingsCache\(\);").Count==3,"stocks refreshed");
         }),

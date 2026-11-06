@@ -51,6 +51,7 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,WorkshopName(selected));
         if(configuration.WorkshopPanelProject!=selected.Id){configuration.WorkshopPanelProject=selected.Id;SaveReminders();}
         BoolSetting("FreeCompany.WorkshopPanel","FreeCompany.WorkshopPanelTip",()=>configuration.WorkshopPanel,value=>configuration.WorkshopPanel=value,c=>c.WorkshopPanel);
+        if(configuration.WorkshopPanel)DrawListPanelOptions();
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("FreeCompany.WorkshopAll")+"###WorkshopAll"))
             DrawWorkshopMaterials("WorkshopTotals",selected.Totals().Select(total=>(total.Item,(string?)null,total.Total)));
         var partNumber=0;

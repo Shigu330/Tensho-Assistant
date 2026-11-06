@@ -50,6 +50,7 @@ internal sealed partial class MainWindow
         var list=lists[Math.Clamp(craftListIndex,0,lists.Count-1)];
         // 0.692 (user report): the list on screen; the panel follows the list chosen here.
         BoolSetting("CraftLists.Panel","CraftLists.PanelTip",()=>configuration.CraftListPanel,value=>configuration.CraftListPanel=value,c=>c.CraftListPanel);
+        if(configuration.CraftListPanel)DrawListPanelOptions();
         if(configuration.CraftListPanelName!=list.Name){configuration.CraftListPanelName=list.Name;SaveReminders();}
         if(list.Entries.Count==0){ImGui.TextDisabled(localization.Get("CraftLists.Empty"));return;}
         var items=itemCatalog.State.Catalog;var recipes=recipeCatalog.State.Catalog;

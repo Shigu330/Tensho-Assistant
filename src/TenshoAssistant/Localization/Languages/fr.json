@@ -4221,7 +4221,7 @@
   },
   "PlanUi": {
     "Panel": "Afficher cette préparation à l'écran",
-    "PanelTip": "Un petit panneau avec les matériaux de cette recette pour la quantité voulue, en stock sur requis, hors combat. Il suit la recette et la quantité affichées ici.",
+    "PanelTip": "Un petit panneau avec les matériaux de cette recette pour la quantité voulue, en stock sur requis. Il suit la recette et la quantité affichées ici.",
     "PanelTitle": "Préparation",
     "Stored": "{0} : {1}",
     "StoredCached": "{0} : {1} (relevé du {2})",
@@ -4751,7 +4751,7 @@
   },
   "FreeCompany": {
     "WorkshopPanel": "Afficher ce projet à l'écran",
-    "WorkshopPanelTip": "Un petit panneau avec les matériaux du projet choisi, en stock sur requis, hors combat. Il suit le projet choisi ici.",
+    "WorkshopPanelTip": "Un petit panneau avec les matériaux du projet choisi, en stock sur requis. Il suit le projet choisi ici.",
     "WorkshopPanelTitle": "Matériaux du projet",
     "TabWorkshop": "Atelier",
     "WorkshopHelp": "Les matériaux de chaque projet de l'atelier, pièce par pièce et phase par phase, face à vos stocks relevés. Ce que l'atelier a déjà reçu n'est pas lu.",
@@ -6030,7 +6030,7 @@
   },
   "CraftLists": {
     "Panel": "Afficher cette liste à l'écran",
-    "PanelTip": "Un petit panneau avec les ingrédients directs de cette liste, en stock sur requis, hors combat. Il suit la liste choisie ici.",
+    "PanelTip": "Un petit panneau avec les ingrédients directs de cette liste, en stock sur requis. Il suit la liste choisie ici.",
     "PanelTitle": "Liste de fabrication",
     "ColumnIngredient": "Ingrédient",
     "ColumnRequired": "Requis",
@@ -6164,6 +6164,12 @@
     "ColumnState": "État",
     "Done": "Réussi",
     "Left": "Non réussi"
+  },
+  "ListPanels": {
+    "HideInCombat": "Cacher ces panneaux en combat",
+    "HideInCombatTip": "Désactivé par défaut : un panneau de liste reste affiché tant que vous ne le coupez pas.",
+    "HideBehindGame": "Cacher ces panneaux derrière les fenêtres du jeu",
+    "HideBehindGameTip": "Désactivé par défaut. Activé : un panneau s'écarte quand une fenêtre du jeu le touche, puis revient."
   },
   "Island": {
     "TabWorkshop": "Atelier",

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.693.0
+- Plan global, W-05 : Demande de l'utilisateur : les panneaux de projet d'atelier, de préparation et de liste de fabrication restent affichés, en combat et derrière les fenêtres du jeu, tant qu'on ne les coupe pas. Deux cases, désactivées par défaut, permettent de les cacher en combat ou derrière les fenêtres. Restent la coupure en JcJ et en contenu classé, et le masquage de toute l'interface par le jeu. COMPILED et TESTED, non validé en jeu.
+- Tests : ListPanels691Tests. Verify.ps1 (agent) : 1228/1228, 0 avertissement, 0 erreur ; DLL 0.693.0.0. Non validé en jeu.
+### English
+- User request: the workshop, preparation and crafting list panels stay up, in combat and behind game windows, until turned off. Two boxes, off by default, hide them in combat or behind game windows. The cut in PvP and ranked content, and the game hiding its whole interface, still apply. COMPILED and TESTED, not validated in game.
+
 ## 0.692.0
 - Plan global, W-05 : Rapports de l'utilisateur : la case manquait dans Liste de fabrication, elle y est, avec son panneau à l'écran qui suit la liste choisie. Le panneau d'atelier ne s'affichait pas sur l'île : le journal, qui dit désormais ce qui écarte un panneau, a donné la cause : sa place par défaut chevauche les jauges de métier (JobHudRRP0, JobHudRRP1), comptées comme des fenêtres devant lui. Elles n'en sont plus, ni le tableau de gestion de l'île. COMPILED et TESTED, non validé en jeu.
 - Tests : ListPanels691Tests. Verify.ps1 (agent) : 1228/1228, 0 avertissement, 0 erreur ; DLL 0.692.0.0. Non validé en jeu.

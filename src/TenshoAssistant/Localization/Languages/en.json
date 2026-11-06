@@ -4221,7 +4221,7 @@
   },
   "PlanUi": {
     "Panel": "Show this preparation on screen",
-    "PanelTip": "A small panel with this recipe's materials for the target, in stock over needed, out of combat. It follows the recipe and target shown here.",
+    "PanelTip": "A small panel with this recipe's materials for the target, in stock over needed. It follows the recipe and target shown here.",
     "PanelTitle": "Preparation",
     "Stored": "{0}: {1}",
     "StoredCached": "{0}: {1} (read on {2})",
@@ -4751,7 +4751,7 @@
   },
   "FreeCompany": {
     "WorkshopPanel": "Show this project on screen",
-    "WorkshopPanelTip": "A small panel with the chosen project's materials, in stock over needed, out of combat. It follows the project chosen here.",
+    "WorkshopPanelTip": "A small panel with the chosen project's materials, in stock over needed. It follows the project chosen here.",
     "WorkshopPanelTitle": "Project materials",
     "TabWorkshop": "Workshop",
     "WorkshopHelp": "The materials of each workshop project, part by part and phase by phase, against your stocks as read. What the workshop has already received is not read.",
@@ -6030,7 +6030,7 @@
   },
   "CraftLists": {
     "Panel": "Show this list on screen",
-    "PanelTip": "A small panel with this list's direct ingredients, in stock over needed, out of combat. It follows the list chosen here.",
+    "PanelTip": "A small panel with this list's direct ingredients, in stock over needed. It follows the list chosen here.",
     "PanelTitle": "Crafting list",
     "ColumnIngredient": "Ingredient",
     "ColumnRequired": "Required",
@@ -6164,6 +6164,12 @@
     "ColumnState": "State",
     "Done": "Cleared",
     "Left": "Not cleared"
+  },
+  "ListPanels": {
+    "HideInCombat": "Hide these panels in combat",
+    "HideInCombatTip": "Off by default: a list panel stays up until you turn it off.",
+    "HideBehindGame": "Hide these panels behind game windows",
+    "HideBehindGameTip": "Off by default. On: a panel leaves while a game window touches it, and comes back after."
   },
   "Island": {
     "TabWorkshop": "Workshop",

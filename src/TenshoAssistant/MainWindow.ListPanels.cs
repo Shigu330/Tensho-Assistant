@@ -5,25 +5,32 @@ using TenshoAssistant.FreeCompany;
 
 namespace TenshoAssistant;
 
-// W-05 (0.691, user request): just the list, on screen: the materials of the workshop project and of the crafting preparation, each with its setting on its page. Out of combat, as the tasks panel.
+// W-05 (0.691, user request): just the list, on screen: the materials of the workshop project and of the crafting preparation, each with its setting on its page. 0.693 (user request): shown means shown, unless the player chooses otherwise.
 internal sealed partial class MainWindow
 {
     private const ImGuiWindowFlags ListPanelFlags=ImGuiWindowFlags.AlwaysAutoResize|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav;
+    private bool ListPanelsHiddenInCombat=>configuration.ListPanelsHideInCombat && mapLive?.State is { InCombat:true };
+    // The same two choices for every list panel, under the box of the one that is on.
+    private void DrawListPanelOptions()
+    {
+        BoolSetting("ListPanels.HideInCombat","ListPanels.HideInCombatTip",()=>configuration.ListPanelsHideInCombat,value=>configuration.ListPanelsHideInCombat=value,c=>c.ListPanelsHideInCombat);
+        BoolSetting("ListPanels.HideBehindGame","ListPanels.HideBehindGameTip",()=>configuration.ListPanelsHideBehindGame,value=>configuration.ListPanelsHideBehindGame=value,c=>c.ListPanelsHideBehindGame);
+    }
     private WorkshopProject? workshopPanelShown;
     private RecipeDefinition? preparationPanelShown;
 
     private PanelDefinition WorkshopListPanel=>new("WorkshopPanel","###TenshoWorkshopList",new Vector2(40,420),ListPanelFlags,
-        ()=>configuration.WorkshopPanel,WorkshopPanelVisible,DrawWorkshopPanelContents,()=>{if(configuration.WorkshopPanel){configuration.WorkshopPanel=false;SaveReminders();}},()=>localization.Get("FreeCompany.WorkshopPanelTitle"),0.75f);
+        ()=>configuration.WorkshopPanel,WorkshopPanelVisible,DrawWorkshopPanelContents,()=>{if(configuration.WorkshopPanel){configuration.WorkshopPanel=false;SaveReminders();}},()=>localization.Get("FreeCompany.WorkshopPanelTitle"),0.75f,()=>configuration.ListPanelsHideBehindGame);
     private PanelDefinition PreparationListPanel=>new("PreparationPanel","###TenshoPreparationList",new Vector2(340,420),ListPanelFlags,
-        ()=>configuration.PreparationPanel,PreparationPanelVisible,DrawPreparationPanelContents,()=>{if(configuration.PreparationPanel){configuration.PreparationPanel=false;SaveReminders();}},()=>localization.Get("PlanUi.PanelTitle"),0.75f);
+        ()=>configuration.PreparationPanel,PreparationPanelVisible,DrawPreparationPanelContents,()=>{if(configuration.PreparationPanel){configuration.PreparationPanel=false;SaveReminders();}},()=>localization.Get("PlanUi.PanelTitle"),0.75f,()=>configuration.ListPanelsHideBehindGame);
 
     private CraftList? craftListPanelShown;
     private PanelDefinition CraftListListPanel=>new("CraftListPanel","###TenshoCraftListList",new Vector2(640,420),ListPanelFlags,
-        ()=>configuration.CraftListPanel,CraftListPanelVisible,DrawCraftListPanelContents,()=>{if(configuration.CraftListPanel){configuration.CraftListPanel=false;SaveReminders();}},()=>localization.Get("CraftLists.PanelTitle"),0.75f);
+        ()=>configuration.CraftListPanel,CraftListPanelVisible,DrawCraftListPanelContents,()=>{if(configuration.CraftListPanel){configuration.CraftListPanel=false;SaveReminders();}},()=>localization.Get("CraftLists.PanelTitle"),0.75f,()=>configuration.ListPanelsHideBehindGame);
 
     private bool CraftListPanelVisible()
     {
-        if(windowDisposed || !configuration.CraftListPanel || mapLive?.State is { InCombat:true } || itemCatalog.State.Catalog is null || CraftListStore is not { Unavailable:false } store)return false;
+        if(windowDisposed || !configuration.CraftListPanel || ListPanelsHiddenInCombat || itemCatalog.State.Catalog is null || CraftListStore is not { Unavailable:false } store)return false;
         craftListPanelShown=store.Lists.FirstOrDefault(list=>list.Name==configuration.CraftListPanelName);
         return craftListPanelShown is { Entries.Count:>0 };
     }
@@ -38,7 +45,7 @@ internal sealed partial class MainWindow
 
     private bool WorkshopPanelVisible()
     {
-        if(windowDisposed || !configuration.WorkshopPanel || mapLive?.State is { InCombat:true } || itemCatalog.State.Catalog is null || WorkshopProjectsLoad is not { } load)return false;
+        if(windowDisposed || !configuration.WorkshopPanel || ListPanelsHiddenInCombat || itemCatalog.State.Catalog is null || WorkshopProjectsLoad is not { } load)return false;
         workshopProjects??=Task.Run(load);
         workshopPanelShown=workshopProjects.IsCompletedSuccessfully ? workshopProjects.Result.FirstOrDefault(project=>project.Id==configuration.WorkshopPanelProject):null;
         return workshopPanelShown is not null;
@@ -54,7 +61,7 @@ internal sealed partial class MainWindow
 
     private bool PreparationPanelVisible()
     {
-        if(windowDisposed || !configuration.PreparationPanel || mapLive?.State is { InCombat:true } || configuration.PreparationPanelTarget<=0 || itemCatalog.State.Catalog is null)return false;
+        if(windowDisposed || !configuration.PreparationPanel || ListPanelsHiddenInCombat || configuration.PreparationPanelTarget<=0 || itemCatalog.State.Catalog is null)return false;
         preparationPanelShown=recipeCatalog.State.Catalog?.ForResult(configuration.PreparationPanelItem).FirstOrDefault(recipe=>recipe.RecipeId==configuration.PreparationPanelRecipe);
         return preparationPanelShown is not null;
     }

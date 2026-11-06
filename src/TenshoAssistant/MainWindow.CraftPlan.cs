@@ -62,6 +62,7 @@ internal sealed partial class MainWindow
         var plan = CraftPlan.Build(recipe, craftPlanTarget, GetRecipeHoldings);
         // W-05 (0.691): the on-screen list follows the recipe and the target shown here.
         BoolSetting("PlanUi.Panel", "PlanUi.PanelTip", () => configuration.PreparationPanel, value => configuration.PreparationPanel = value, c => c.PreparationPanel);
+        if (configuration.PreparationPanel) DrawListPanelOptions();
         if (configuration.PreparationPanel && (configuration.PreparationPanelRecipe != recipe.RecipeId || configuration.PreparationPanelTarget != craftPlanTarget))
         {
             configuration.PreparationPanelItem = recipe.ResultItemId; configuration.PreparationPanelRecipe = recipe.RecipeId; configuration.PreparationPanelTarget = craftPlanTarget;
