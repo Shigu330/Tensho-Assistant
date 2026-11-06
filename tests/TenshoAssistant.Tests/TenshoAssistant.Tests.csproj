@@ -127,6 +127,7 @@
     <Compile Include="../../src/TenshoAssistant/Craft/CraftFollow.cs" Link="Craft/CraftFollow.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/RecipeFacts.cs" Link="Craft/RecipeFacts.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftFromStock.cs" Link="Craft/CraftFromStock.cs" />
+    <Compile Include="../../src/TenshoAssistant/Craft/BaseMaterials.cs" Link="Craft/BaseMaterials.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftSimulation.cs" Link="Craft/CraftSimulation.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/CraftConsumables.cs" Link="Craft/CraftConsumables.cs" />
     <Compile Include="../../src/TenshoAssistant/Craft/TeamcraftExport.cs" Link="Craft/TeamcraftExport.cs" />

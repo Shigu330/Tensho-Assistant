@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.699.0
+- Plan global, W-09 : Demande de l'utilisateur : les panneaux à l'écran (atelier, préparation, liste de fabrication) ont une option « Seulement ce qui reste à récupérer, par provenance » : ce qui se fabrique est remplacé par ses ingrédients, jusqu'à ce qui se récolte, s'achète à un PNJ, tombe d'un monstre ou s'obtient autrement, avec une case par provenance. Un objet fabriqué qui s'achète ou se récolte reste tel quel. Les monstres viennent de LuminaSupplemental, donc de la source communautaire. COMPILED et TESTED, non validé en jeu.
+- Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1244/1244, 0 avertissement, 0 erreur ; DLL 0.699.0.0. Non validé en jeu.
+### English
+- User request: the on-screen panels (workshop, preparation, crafting list) have an option showing only what is left to fetch, by origin: crafted items are replaced by their ingredients, down to what is gathered, bought from an NPC, dropped by a monster or found otherwise, with a box per origin. A crafted item that can be bought or gathered stays as it is. Monsters come from LuminaSupplemental, the community source. COMPILED and TESTED, not validated in game.
+
 ## 0.698.0
 - Plan global, W-08 : Demande de l'utilisateur : clic droit sur un mandat : « Éthérite la plus proche du mandateur » ou « du mandat ». Le drapeau se place, la carte Tensho s'ouvre dessus et la question de téléportation habituelle s'affiche. Le lieu vient des feuilles du jeu (LevelLevemete, LevelStart). COMPILED et TESTED, non validé en jeu.
 - Tests : ReminderTabs687Tests. Verify.ps1 (agent) : 1239/1239, 0 avertissement, 0 erreur ; DLL 0.698.0.0. Non validé en jeu.

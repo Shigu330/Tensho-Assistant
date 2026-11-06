@@ -6197,6 +6197,13 @@
     "Left": "Not cleared"
   },
   "ListPanels": {
+    "Base": "Only what is left to fetch, by origin",
+    "BaseTip": "Replaces what is crafted by its ingredients, down to what is gathered, bought from an NPC, dropped by a monster or found otherwise. Crafted items in stock are used first.",
+    "Gathering": "Gathering",
+    "Vendor": "NPC vendors",
+    "Monster": "Monsters",
+    "Other": "Other",
+    "OriginTip": "Shows this origin in the panels. An item with several origins goes under the first in this list.",
     "HideInCombat": "Hide these panels in combat",
     "HideInCombatTip": "Off by default: a list panel stays up until you turn it off.",
     "HideBehindGame": "Hide these panels behind game windows",

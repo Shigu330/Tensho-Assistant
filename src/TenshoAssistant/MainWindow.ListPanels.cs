@@ -15,6 +15,14 @@ internal sealed partial class MainWindow
     {
         BoolSetting("ListPanels.HideInCombat","ListPanels.HideInCombatTip",()=>configuration.ListPanelsHideInCombat,value=>configuration.ListPanelsHideInCombat=value,c=>c.ListPanelsHideInCombat);
         BoolSetting("ListPanels.HideBehindGame","ListPanels.HideBehindGameTip",()=>configuration.ListPanelsHideBehindGame,value=>configuration.ListPanelsHideBehindGame=value,c=>c.ListPanelsHideBehindGame);
+        BoolSetting("ListPanels.Base","ListPanels.BaseTip",()=>configuration.ListPanelsBase,value=>configuration.ListPanelsBase=value,c=>c.ListPanelsBase);
+        if(!configuration.ListPanelsBase)return;
+        ImGui.Indent();
+        BoolSetting("ListPanels.Gathering","ListPanels.OriginTip",()=>configuration.ListPanelsGathering,value=>configuration.ListPanelsGathering=value,c=>c.ListPanelsGathering);
+        BoolSetting("ListPanels.Vendor","ListPanels.OriginTip",()=>configuration.ListPanelsVendor,value=>configuration.ListPanelsVendor=value,c=>c.ListPanelsVendor);
+        BoolSetting("ListPanels.Monster","ListPanels.OriginTip",()=>configuration.ListPanelsMonster,value=>configuration.ListPanelsMonster=value,c=>c.ListPanelsMonster);
+        BoolSetting("ListPanels.Other","ListPanels.OriginTip",()=>configuration.ListPanelsOther,value=>configuration.ListPanelsOther=value,c=>c.ListPanelsOther);
+        ImGui.Unindent();
     }
     private IReadOnlyList<WorkshopProject> workshopPanelShown=[];
     private RecipeDefinition? preparationPanelShown;
@@ -40,7 +48,7 @@ internal sealed partial class MainWindow
         if(craftListPanelShown is not { } list)return;
         RefreshRecipeHoldingsCache();
         ImGui.TextColored(Accent,list.Name);
-        foreach(var (item,required) in CraftLists.Ingredients(CraftListPlans(list)))DrawListPanelLine(item,required,GetRecipeHoldings(item));
+        DrawListPanelEntries("CraftList",()=>CraftLists.Ingredients(CraftListPlans(list)).Select(row=>(row.Item1,(long)row.Item2)).ToArray());
     }
 
     private bool WorkshopPanelVisible()
@@ -59,7 +67,7 @@ internal sealed partial class MainWindow
     {
         RefreshRecipeHoldingsCache();
         foreach(var project in workshopPanelShown)ImGui.TextColored(Accent,WorkshopName(project));
-        foreach(var (item,total) in WorkshopStock.Totals(workshopPanelShown))DrawListPanelLine(item,total,GetRecipeHoldings(item));
+        DrawListPanelEntries("Workshop",()=>WorkshopStock.Totals(workshopPanelShown).Select(row=>(row.Item,(long)row.Total)).ToArray());
     }
 
     private bool PreparationPanelVisible()
@@ -75,8 +83,46 @@ internal sealed partial class MainWindow
         RefreshRecipeHoldingsCache();
         var name=itemCatalog.State.Catalog?.Find(recipe.ResultItemId)?.Name ?? recipe.ResultItemId.ToString();
         ImGui.TextColored(Accent,$"{name} ×{configuration.PreparationPanelTarget:N0}");
-        foreach(var material in CraftPlan.Build(recipe,configuration.PreparationPanelTarget,GetRecipeHoldings).Materials)DrawListPanelLine(material.ItemId,material.Required,material.Holdings);
+        DrawListPanelEntries("Preparation",()=>CraftPlan.Build(recipe,configuration.PreparationPanelTarget,GetRecipeHoldings).Materials.Select(material=>(material.ItemId,material.Required)).ToArray());
     }
+
+    // W-09 (0.699): worked out at most once a second per panel, not on every frame.
+    private readonly Dictionary<string,(long At,(uint Item,long Needed)[] Lines)> listPanelLines=[];
+    private void DrawListPanelEntries(string key,Func<(uint Item,long Needed)[]> entries)
+    {
+        var now=Environment.TickCount64;
+        if(!listPanelLines.TryGetValue(key,out var known) || now-known.At>1000)
+        {
+            var wanted=entries();
+            listPanelLines[key]=known=(now,configuration.ListPanelsBase ? BaseMaterials.Expand(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched).ToArray():wanted);
+        }
+        if(!configuration.ListPanelsBase)
+        {
+            foreach(var (item,needed) in known.Lines)DrawListPanelLine(item,needed,GetRecipeHoldings(item));
+            return;
+        }
+        foreach(var origin in Enum.GetValues<ItemOrigin>())
+        {
+            if(!ListPanelOriginShown(origin))continue;
+            var lines=known.Lines.Where(line=>ListPanelOrigin(line.Item)==origin).ToArray();
+            if(lines.Length==0)continue;
+            ImGui.TextDisabled(localization.Get("ListPanels."+origin));
+            foreach(var (item,needed) in lines)DrawListPanelLine(item,needed,GetRecipeHoldings(item));
+        }
+    }
+    private long ListPanelStock(uint item){var held=GetRecipeHoldings(item);return held.HasObservation ? held.Total:0;}
+    private RecipeDefinition? ListPanelRecipe(uint item)=>recipeCatalog.State.Catalog?.ForResult(item) is { Count:>0 } recipes ? PreferredRecipe(recipes):null;
+    private bool ListPanelGathered(uint item)=>gatheringCatalog.State.Catalog?.ForItem(item) is { Count:>0 };
+    private bool ListPanelSold(uint item)=>npcVendors?.State.Catalog?.ForItem(item) is { Count:>0 };
+    private bool ListPanelFetched(uint item)=>ListPanelGathered(item) || ListPanelSold(item);
+    private ItemOrigin ListPanelOrigin(uint item)=>BaseMaterials.OriginOf(ListPanelGathered(item),ListPanelSold(item),lumina?.State.Data?.MonstersOf(item) is { Count:>0 });
+    private bool ListPanelOriginShown(ItemOrigin origin)=>origin switch
+    {
+        ItemOrigin.Gathering=>configuration.ListPanelsGathering,
+        ItemOrigin.Vendor=>configuration.ListPanelsVendor,
+        ItemOrigin.Monster=>configuration.ListPanelsMonster,
+        _=>configuration.ListPanelsOther,
+    };
 
     // Stock over what is needed; a dash when the stocks have not been read: unknown is not zero.
     private void DrawListPanelLine(uint itemId,long required,Inventory.ItemHoldingsSummary stock)
