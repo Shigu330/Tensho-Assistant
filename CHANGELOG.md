@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.644.0
+- Plan global, P6 : Carte (P6) : vos coordonnées restent affichées en bas à gauche, le curseur donne aussi sa distance en yalms par rapport à vous, et le repère de bord du drapeau montre dessous ses coordonnées et sa distance. Deux réglages, activés par défaut.
+- Tests : Map. Verify.ps1 (agent) : 1145/1145, 0 avertissement, 0 erreur ; DLL 0.644.0.0. Non validé en jeu.
+### English
+- Map (P6): your coordinates stay at the bottom left, the cursor also gives its distance in yalms from you, and the flag's edge marker shows its coordinates and distance underneath. Two settings, on by default.
+
 ## 0.643.0
 - Plan global, phase 5 : Carte (capture de l'utilisateur) : sur la carte de région ou du monde, la cible de la quête ne se cliquait pas. Un clic descend maintenant d'une étape : du monde à la région, de la région à la carte de la cible.
 - Tests : Map labels. Verify.ps1 (agent) : 1145/1145, 0 avertissement, 0 erreur ; DLL 0.643.0.0. Non validé en jeu.

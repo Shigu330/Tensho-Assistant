@@ -161,7 +161,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
-| P6 | Coordonnées du personnage toujours visibles et distances | S | Coordonnées du drapeau sous son icône de bord de carte, pas dans un coin ; avec réglage. |
+| ~~P6~~ fait en 0.644 | Coordonnées du personnage toujours visibles et distances | S | Coordonnées du drapeau sous son icône de bord de carte, pas dans un coin ; avec réglage. |
 | P7 | Éthérites non harmonisées signalées et coût au survol | S |  |
 | P11 | Parties non découvertes masquées comme sur la carte du jeu | M | Avec réglage. |
 | P17 | Relevé du type de marqueur des mandats et de leurs zones | S |  |

@@ -16,6 +16,8 @@ public static class MapProjection
         return $"ui/map/{id}/{id.Replace("/","",StringComparison.Ordinal)}_m.tex";
     }
     private static float Scale(int sizeFactor)=>Math.Max(1,sizeFactor)/100f;
+    /// <summary>0.644 (P6): distance between two pixels of a map, in world units (yalms).</summary>
+    public static float Yalms(Vector2 from,Vector2 to,MapDefinition map)=>Vector2.Distance(from,to)/Scale(map.SizeFactor);
     public static Vector2 PixelFromWorld(Vector3 world,MapDefinition map)
     {var scale=Scale(map.SizeFactor);return new((world.X+map.OffsetX)*scale+1024,(world.Z+map.OffsetY)*scale+1024);}
     public static Vector2 CoordinateFromPixel(Vector2 pixel,MapDefinition map)

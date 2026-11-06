@@ -550,6 +550,7 @@ internal sealed partial class MainWindow
                 if(DefaultButton("NameMinZoom",settings.NameMinZoom!=MapDefaults.NameMinZoom)){settings.NameMinZoom=MapDefaults.NameMinZoom;changed=true;}
                 changed|=SettingBox("MapView.FlagOnClick",settings.FlagOnClick,value=>settings.FlagOnClick=value,MapDefaults.FlagOnClick);
                 changed|=SettingBox("MapView.ShowFlag",settings.ShowFlag,value=>settings.ShowFlag=value,MapDefaults.ShowFlag);
+                changed|=SettingBox("MapView.ShowPlayerCoordinates",settings.ShowPlayerCoordinates,value=>settings.ShowPlayerCoordinates=value,MapDefaults.ShowPlayerCoordinates);
                 changed|=SettingBox("MapView.ShowBookmarks",settings.ShowBookmarks,value=>settings.ShowBookmarks=value,MapDefaults.ShowBookmarks);
             }
             if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionQuests"),ImGuiTreeNodeFlags.DefaultOpen))
@@ -590,6 +591,7 @@ internal sealed partial class MainWindow
                     ImGui.Indent();
                     changed|=SettingBox("MapView.EdgePlayerOn",settings.EdgePlayer,value=>settings.EdgePlayer=value,MapDefaults.EdgePlayer);
                     changed|=SettingBox("MapView.EdgeFlagOn",settings.EdgeFlag,value=>settings.EdgeFlag=value,MapDefaults.EdgeFlag);
+                    changed|=SettingBox("MapView.EdgeFlagCoordinatesOn",settings.EdgeFlagCoordinates,value=>settings.EdgeFlagCoordinates=value,MapDefaults.EdgeFlagCoordinates);
                     changed|=SettingBox("MapView.EdgeTargetOn",settings.EdgeTarget,value=>settings.EdgeTarget=value,MapDefaults.EdgeTarget);
                     changed|=SettingBox("MapView.EdgeQuestsOn",settings.EdgeQuests,value=>settings.EdgeQuests=value,MapDefaults.EdgeQuests);
                     changed|=SettingBox("MapView.EdgeEventsOn",settings.EdgeEvents,value=>settings.EdgeEvents=value,MapDefaults.EdgeEvents);
@@ -1302,10 +1304,21 @@ internal sealed partial class MainWindow
                 if(ImGui.IsMouseClicked(ImGuiMouseButton.Right) && !settings.RightClickIgnored(chosen.Icon) && sightseeingTip is null)
                     mapIconContext=(chosen,(chosen.At-origin-mapPan)/mapZoom);
             }
+            // 0.644 (P6): where the player stands, always; above the cursor's line.
+            if(settings.ShowPlayerCoordinates && player is { } standing)
+            {
+                var own=MapProjection.CoordinateFromPixel(standing,map);
+                var ownLabel=localization.Format("MapView.PlayerCoordinates",own.X.ToString("0.0"),own.Y.ToString("0.0"));
+                var ownBox=ImGui.CalcTextSize(ownLabel)+new Vector2(10,6);
+                var ownTop=size.Y-ownBox.Y*2-10;
+                draw.AddRectFilled(origin+new Vector2(6,ownTop),origin+new Vector2(6+ownBox.X,ownTop+ownBox.Y),ImGui.GetColorU32(UI.FfxivTheme.Panel),3);
+                draw.AddText(origin+new Vector2(11,ownTop+3),ImGui.GetColorU32(UI.FfxivTheme.Text),ownLabel);
+            }
             if(hovered)
             {
                 var coordinate=MapProjection.CoordinateFromPixel((io.MousePos-origin-mapPan)/mapZoom,map);
                 var label=localization.Format("MapView.Cursor",coordinate.X.ToString("0.0"),coordinate.Y.ToString("0.0"));
+                if(player is { } measured)label=localization.Format("MapView.CursorDistance",label,MapProjection.Yalms(measured,(io.MousePos-origin-mapPan)/mapZoom,map).ToString("0"));
                 var box=ImGui.CalcTextSize(label)+new Vector2(10,6);
                 draw.AddRectFilled(origin+new Vector2(6,size.Y-box.Y-6),origin+new Vector2(6+box.X,size.Y-6),ImGui.GetColorU32(UI.FfxivTheme.Panel),3);
                 draw.AddText(origin+new Vector2(11,size.Y-box.Y-3),ImGui.GetColorU32(UI.FfxivTheme.Text),label);
@@ -1840,6 +1853,19 @@ internal sealed partial class MainWindow
             if(isPlayer)DrawPlayerArrow(draw,edge,live!.Rotation,false,0.8f);
             else if(textures.TryGetFromGameIcon(new GameIconLookup(image),out var shared) && shared.TryGetWrap(out var wrap,out _) && wrap is not null)
                 draw.AddImage(wrap.Handle,edge-new Vector2(badge/2),edge+new Vector2(badge/2));
+            // 0.644 (P6, user's precision): the flag's coordinates under its edge icon, not in a corner; above it near the bottom of the map.
+            if(icon==FlagIcon && settings.EdgeFlagCoordinates)
+            {
+                var spot=MapProjection.CoordinateFromPixel(pixel,map);
+                var text=localization.Format("MapView.Cursor",spot.X.ToString("0.0"),spot.Y.ToString("0.0"));
+                if(player is { } standing)text=localization.Format("MapView.CursorDistance",text,MapProjection.Yalms(standing,pixel,map).ToString("0"));
+                var measure=ImGui.CalcTextSize(text);
+                var left=Math.Clamp(edge.X-measure.X/2,origin.X+2,Math.Max(origin.X+2,origin.X+size.X-measure.X-2));
+                var below=edge.Y+badge*0.75f;
+                var top=below+measure.Y>origin.Y+size.Y ? edge.Y-badge*0.75f-measure.Y:below;
+                draw.AddRectFilled(new Vector2(left-3,top-1),new Vector2(left+measure.X+3,top+measure.Y+1),ImGui.GetColorU32(new Vector4(0,0,0,0.6f)),3);
+                draw.AddText(new Vector2(left,top),ImGui.GetColorU32(UI.FfxivTheme.Text),text);
+            }
             if(!hovered || Vector2.Distance(mouse,edge)>badge*0.62f)continue;
             label=$"{name}\n{localization.Get("MapView.EdgeClick")}";
             if(ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged){mapCenterRequest=pixel;mapViewFollow=isPlayer;}

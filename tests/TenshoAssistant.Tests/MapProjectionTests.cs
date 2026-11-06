@@ -102,6 +102,7 @@ internal static class MapProjectionTests
             var zones=MapMenus.Zones(maps,region);
             Check(zones.Select(entry=>entry[0].Zone).SequenceEqual(new[]{"Radz-at-Han","Thavnair","Garlemald","Tour de Zott"}),"order and one entry per priority");
             Check(zones[3].Select(floor=>floor.MapId).SequenceEqual(new uint[]{701,702,703}),"floors ordered by map index");
+            Check(Math.Abs(MapProjection.Yalms(new System.Numerics.Vector2(0,0),new System.Numerics.Vector2(30,40),new MapDefinition(1,1,"","","",0,200))-25)<0.01f,"P6: pixels to yalms, by the map's scale");
             var hall=new MapDefinition(938,1224,"","Hall","",0,400,RegionPlaceId:4501);
             var ring=new MapDefinition(927,1225,"","Ring","",0,400,RegionPlaceId:4501);
             var foreign=new MapDefinition(5,6,"","Other","",0,100,RegionPlaceId:7);

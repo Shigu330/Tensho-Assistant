@@ -176,6 +176,8 @@ public sealed class MapViewSettings
     // Kinds shown on the edge (each its own switch).
     public bool EdgePlayer { get; set; } = true;
     public bool EdgeFlag { get; set; } = true;
+    public bool EdgeFlagCoordinates { get; set; } = true;
+    public bool ShowPlayerCoordinates { get; set; } = true;
     public bool EdgeTarget { get; set; } = true;
     public bool EdgeQuests { get; set; } = true;
     public bool EdgeEvents { get; set; } = true;
