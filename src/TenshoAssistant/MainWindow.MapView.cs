@@ -209,6 +209,9 @@ internal sealed partial class MainWindow
         var isZone=map.TerritoryId!=0;var world=localization.Get("MapView.World");
         static string FloorName(MapDefinition floor)=>MapMenus.FloorLabel(floor);
         var regionName=region is not null ? MapName(region):world;var zoneName=isZone ? MapName(map):"--";
+        // 0.632 (user captures: only « -- » under the world): the world's own floors, Hydaelyn and The First.
+        var worldChoices=markers.WorldChoices(map.MapId);
+        if(worldChoices.Count>0){regionName=world;zoneName=MapName(map);zones=[];}
         var arrow=ImGui.GetTextLineHeight();
         var widths=new List<float>{ImGui.CalcTextSize(regionName).X+arrow,ImGui.CalcTextSize(zoneName).X+arrow+(isZone ? 28:0)};
         var placeLines=MapMenus.PlaceLines(live?.MapId ?? 0,map.MapId,live?.Area,live?.SubArea);
@@ -241,8 +244,10 @@ internal sealed partial class MainWindow
             if(isZone)DrawFlightWing(map,live,false);
             if(mapHeaderList==2)
             {
-                ListBackdrop(zones.Count+1);
-                if(HeaderEntry("ZoneRegion","> --",ListColour(!isZone),indent,null)){if(regionId!=0)NavigateMap(regionId);mapHeaderList=0;}
+                ListBackdrop(worldChoices.Count>0 ? worldChoices.Count:zones.Count+1);
+                foreach(var choice in worldChoices)
+                    if(HeaderEntry($"ZoneWorld{choice.MapId}","> "+MapName(choice),ListColour(choice.MapId==map.MapId),indent,null)){NavigateMap(choice.MapId);mapHeaderList=0;}
+                if(worldChoices.Count==0 && HeaderEntry("ZoneRegion","> --",ListColour(!isZone),indent,null)){if(regionId!=0)NavigateMap(regionId);mapHeaderList=0;}
                 foreach(var entry in zones)
                 {
                     var zone=entry[0];
@@ -349,13 +354,17 @@ internal sealed partial class MainWindow
         var isZone=map.TerritoryId!=0;
         var zones=MapMenus.Zones(catalog.Entries,ResolveMap(catalog,regionId));
         var floors=zones.FirstOrDefault(entry=>entry.Any(floor=>floor.MapId==map.MapId)) ?? [];
-        ImGui.SetNextItemWidth(MenuWidth(zones.Select(entry=>MapName(entry[0])).Append(isZone ? MapName(map):"--"),true));
-        var zoneMenu=ImGui.BeginCombo("##MapZone",isZone ? MapName(map):"--");Tip("MapView.ZoneTip");
+        var worldChoices=mapMarkers.WorldChoices(map.MapId);
+        var zoneShown=isZone || worldChoices.Count>0 ? MapName(map):"--";
+        ImGui.SetNextItemWidth(MenuWidth(zones.Select(entry=>MapName(entry[0])).Concat(worldChoices.Select(MapName)).Append(zoneShown),true));
+        var zoneMenu=ImGui.BeginCombo("##MapZone",zoneShown);Tip("MapView.ZoneTip");
         if(zoneMenu)
         {
             try
             {
-                if(ImGui.Selectable("--##ZoneRegion",!isZone) && regionId!=0)NavigateMap(regionId);
+                foreach(var choice in worldChoices)
+                    if(ImGui.Selectable($"{MapName(choice)}##ZoneWorld{choice.MapId}",choice.MapId==map.MapId))NavigateMap(choice.MapId);
+                if(worldChoices.Count==0 && ImGui.Selectable("--##ZoneRegion",!isZone) && regionId!=0)NavigateMap(regionId);
                 foreach(var entry in zones)
                 {
                     var zone=entry[0];
@@ -1035,8 +1044,9 @@ internal sealed partial class MainWindow
             foreach(var marker in settings.ShowFixedIcons ? markers.Where(marker=>marker.Icon!=0 && marker.LinkMapId!=0 && settings.SizeOf(marker.Icon,map.MapId)>0):[])
                 if(textures.TryGetFromGameIcon(new GameIconLookup(marker.Icon),out var zoneShared) && zoneShared.TryGetWrap(out var zoneImage,out _) && zoneImage is not null && MapLabels.IsZoneImage(marker.LinkMapId,zoneImage.Width))
                 {
-                    var zoneAt=origin+mapPan+new Vector2(marker.X,marker.Y)*mapZoom;var zoneHalf=new Vector2(zoneImage.Width,zoneImage.Height)*mapZoom/2;
-                    draw.AddImage(zoneImage.Handle,zoneAt-zoneHalf,zoneAt+zoneHalf,Vector2.Zero,Vector2.One,ImGui.GetColorU32(new Vector4(1,1,1,opacity)));
+                    var zoneAt=origin+mapPan+new Vector2(marker.X,marker.Y)*mapZoom;var zoneHalf=new Vector2(zoneImage.Width,zoneImage.Height)*MapLabels.ZoneScale*mapZoom;
+                    // The game darkens the parchment with this picture; ImGui only paints over it: a parchment tint comes close (by eye, on the captures).
+                    draw.AddImage(zoneImage.Handle,zoneAt-zoneHalf,zoneAt+zoneHalf,Vector2.Zero,Vector2.One,ImGui.GetColorU32(new Vector4(0.74f,0.70f,0.55f,opacity)));
                 }
             uint? linkUnderMouse=null;
             // Areas first, under every icon: running FATEs, quest areas, gathering points of this map.
@@ -1076,6 +1086,12 @@ internal sealed partial class MainWindow
                 if(vendorLayout.Merged.TryGetValue(marker,out var vendors)){label=vendors.Label;vendorFlag=vendors.Flag;}
                 Add(marker.Icon,0,new Vector2(marker.X,marker.Y),label,marker,flag:vendorFlag);
             }
+            // 0.632 (user captures): a region map also shows the aetherytes of its zones; a click asks for the teleport, as on the zone's map.
+            if(settings.ShowFixedIcons && map.TerritoryId==0 && mapMarkers is not null && maps.State.Catalog is { } zoneCatalog)
+                foreach(var zoneLink in markers.Where(marker=>marker.Icon!=0 && marker.LinkMapId!=0))
+                    if(zoneCatalog.Find(zoneLink.LinkMapId) is { } linkedZone)
+                        foreach(var crystal in mapMarkers.For(linkedZone.MarkerRange).Where(marker=>marker.AetheryteId!=0))
+                            Add(crystal.Icon,0,MapLabels.ZonePixel(new Vector2(zoneLink.X,zoneLink.Y),new Vector2(crystal.X,crystal.Y)),crystal.Label.Length>0 ? crystal.Label:MapName(linkedZone),crystal);
             // 0.328 (map audit #7): hovering inside an area lists its icon only while that kind of area is drawn.
             foreach(var point in gathering)
                 if(point.Position is { } spot && point.Icon!=0)Add(point.Icon,1,MapProjection.PixelFromWorld(new Vector3(spot.X,0,spot.Z),map),GatheringLabelOf(point),point:point,

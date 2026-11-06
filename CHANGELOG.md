@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.632.0
+- Plan global, phase 5 : Carte (captures de l'utilisateur, jeu à côté de Tensho). Cartes de région : les zones sont à la bonne échelle (la 0.631 les dessinait trop grandes), dans un ton de parchemin, avec les cristaux de leurs zones, cliquables pour la téléportation. Carte du monde : celle du jeu avec Tural et non plus l'ancienne, et sous « Monde » le choix Hydaelyn / Premier reflet, comme les étages d'une zone, au lieu de « -- ». Le ton est réglé à l'œil : ImGui ne sait pas assombrir comme le jeu.
+- Tests : Map labels. Verify.ps1 (agent) : 1139/1139, 0 avertissement, 0 erreur ; DLL 0.632.0.0. Non validé en jeu.
+### English
+- Map (user captures, game beside Tensho). Region maps: zones at the right scale (0.631 drew them too large), in a parchment tone, with the crystals of their zones, clickable to teleport. World map: the game's one with Tural instead of the old one, and under « World » the choice Hydaelyn / The First, like a zone's floors, instead of « -- ». The tone is set by eye: ImGui cannot darken like the game.
+
 ## 0.631.0
 - Plan global, phase 5 : Carte (rapport et capture de l'utilisateur) : sur une carte de région, l'icône d'un lien est l'image de toute la zone. Tensho la réduisait à la taille d'une icône, d'où des taches blanches. Elle est maintenant dessinée à sa taille, sous les icônes, comme le jeu. Pas encore fait : les cristaux que le jeu ajoute sur ces cartes, et le clic sur toute la forme d'une zone.
 - Tests : Map labels. Verify.ps1 (agent) : 1138/1138, 0 avertissement, 0 erreur ; DLL 0.631.0.0. Non validé en jeu.

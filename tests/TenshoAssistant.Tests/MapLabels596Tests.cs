@@ -41,6 +41,16 @@ internal static class MapLabels596Tests
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             Check(view.IndexOf("0.631: the zones of a region map")<view.IndexOf("var icons=new List<MapIconDraw>();"),"under every icon");
         }),
+        ("Map labels (0.632): zones and crystals on a region map, the world's own choice",() =>
+        {
+            // Wachunpelo on Urqopacha: pixel 1356, 607, link at 479, 799; the game's crystal is at about 618, 624 of Yok Tural.
+            var crystal=TenshoAssistant.Maps.MapLabels.ZonePixel(new System.Numerics.Vector2(479,799),new System.Numerics.Vector2(1356,607));
+            Check(Math.Abs(crystal.X-618)<4 && Math.Abs(crystal.Y-624)<4,"measured on the capture");
+            var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs"));
+            Check(source.Contains("if(worldMap==0 || row.PlaceName.RowId==20)worldMap=row.RowId;"),"the latest Hydaelyn");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
+            Check(view.Contains("HeaderEntry($\"ZoneWorld{choice.MapId}\"") && view.Contains("##ZoneWorld{choice.MapId}"),"in both menus");
+        }),
         ("Map labels: from the sheet, only for a drawn icon, with their setting",() =>
         {
             var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs"));

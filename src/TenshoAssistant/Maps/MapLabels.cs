@@ -18,6 +18,9 @@ public static class MapLabels
     /// Normal map icons are far smaller.
     /// </summary>
     public static bool IsZoneImage(uint linkMap,int width)=>linkMap!=0 && width>=256;
+    /// <summary>0.632: map pixels per zone pixel on a region map, measured on the game's crystals (docs/evidence/0.631-region-zone-images.md). The zone's picture covers its 2048 pixels.</summary>
+    public const float ZoneScale=0.42f;
+    public static Vector2 ZonePixel(Vector2 linkMarker,Vector2 zonePixel)=>linkMarker+(zonePixel-new Vector2(1024))*ZoneScale;
     public static bool Shown(bool mapLink,float zoom)=>mapLink || zoom>=DetailZoom;
 
     /// <summary>The names that fit, map links first, then in the order given: a name that would touch one already kept is left out.</summary>
