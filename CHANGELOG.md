@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.697.0
+- Plan global, Monnaies : Demande de l'utilisateur : l'onglet « Que faire avec ? » a une case « Chercher les prix du marché », qui arrête aussi une recherche en cours, un filtre (Tout, Collection seulement, Collection manquante, Vendable au marché) et une recherche par nom. La collection couvre les montures et les mascottes. COMPILED et TESTED, non validé en jeu.
+- Tests : CurrencyValue695Tests. Verify.ps1 (agent) : 1238/1238, 0 avertissement, 0 erreur ; DLL 0.697.0.0. Non validé en jeu.
+### English
+- User request: the What to do with it? tab has a Look up market prices box, which also stops a running search, a filter (Everything, Collection only, Collection still missing, Sold on the market) and a name search. Collection covers mounts and minions. COMPILED and TESTED, not validated in game.
+
 ## 0.696.0
 - Plan global, W-07 : Demande de l'utilisateur : « Que puis-je fabriquer ? » compte maintenant les sous-recettes, du minerai à la dernière étape, avec un seul stock partagé. Une case permet de revenir aux ingrédients directs. Le nombre est un minimum : les restes d'une sous-fabrication ne sont pas réutilisés et une seule recette par objet est essayée. La profondeur et le nombre sont bornés. COMPILED et TESTED, non validé en jeu.
 - Tests : CraftChained696Tests. Verify.ps1 (agent) : 1237/1237, 0 avertissement, 0 erreur ; DLL 0.696.0.0. Non validé en jeu.

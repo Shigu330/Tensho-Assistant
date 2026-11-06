@@ -20,6 +20,9 @@ internal sealed partial class MainWindow
     private Dictionary<uint,bool> currencyValueOwned=[];
 
     private bool focusCurrencyValueTab,currencyPricesWanted;
+    // 0.697 (user request): 0 everything, 1 collection, 2 collection still missing, 3 sold on the market.
+    private int currencyValueFilter;
+    private string currencyValueSearch="";
     private readonly HashSet<uint> currencyPricesAsked=[];
     private void ChooseCurrencyValue(uint currency)
     {
@@ -84,11 +87,17 @@ internal sealed partial class MainWindow
             currencyValueKey=key;
         }
         ImGui.TextWrapped(localization.Get("CurrencyValue.Help"));
+        BoolSetting("CurrencyValue.Market","CurrencyValue.MarketTip",()=>configuration.CurrencyValueMarket,value=>
+        {
+            configuration.CurrencyValueMarket=value;
+            if(value)currencyPricesWanted=true;
+            else{currencyPricesWanted=false;currencyPrices.Cancel();}
+        },c=>c.CurrencyValueMarket);
         // Missing market prices of marketable items, 32 at a time. An item Universalis gave no price for is not asked for again.
         var missing=currencyValueRows.Where(row=>row.MarketPrice is null && items?.Find(row.ItemId) is { IsMarketable:true } && !currencyPricesAsked.Contains(row.ItemId)).Select(row=>row.ItemId).Distinct().ToArray();
         var character=bankBridge.State.CharacterId;
         if(prices.Loading)ImGui.TextDisabled(localization.Format("CurrencyValue.Fetching",currencyPricesAsked.Count,currencyPricesAsked.Count+missing.Length));
-        else
+        else if(configuration.CurrencyValueMarket)
         {
             if(prices.Error is { } failed)
             {
@@ -119,6 +128,28 @@ internal sealed partial class MainWindow
             else if(missing.Length==0)currencyPricesWanted=false;
         }
         if(currencyValueRows.Count==0){ImGui.TextDisabled(localization.Get("CurrencyValue.None"));return;}
+        ImGui.SetNextItemWidth(220);
+        string[] filters=[localization.Get("CurrencyValue.FilterAll"),localization.Get("CurrencyValue.FilterCollection"),localization.Get("CurrencyValue.FilterMissing"),localization.Get("CurrencyValue.FilterMarket")];
+        ImGui.Combo("###CurrencyValueFilter",ref currencyValueFilter,filters,filters.Length);
+        Tip("CurrencyValue.FilterTip");
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(220);
+        ImGui.InputTextWithHint("###CurrencyValueSearch",localization.Get("CurrencyValue.Search"),ref currencyValueSearch,100);
+        Tip("CurrencyValue.SearchTip");
+        var shownRows=currencyValueRows.Where(row=>
+        {
+            var definition=items?.Find(row.ItemId);
+            if(currencyValueSearch.Length>0 && definition?.Name.Contains(currencyValueSearch,StringComparison.CurrentCultureIgnoreCase)!=true)return false;
+            return currencyValueFilter switch
+            {
+                1=>currencyValueOwned.ContainsKey(row.ItemId),
+                2=>currencyValueOwned.TryGetValue(row.ItemId,out var owned) && !owned,
+                3=>definition is { IsMarketable:true },
+                _=>true,
+            };
+        }).ToArray();
+        ImGui.TextDisabled(localization.Format("CurrencyValue.Count",shownRows.Length,currencyValueRows.Count));
+        if(shownRows.Length==0)return;
         if(!ImGui.BeginTable("CurrencyValue",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.ScrollY,
             new Vector2(0,Math.Max(120,ImGui.GetContentRegionAvail().Y))))return;
         try
@@ -127,7 +158,7 @@ internal sealed partial class MainWindow
             foreach(var column in new[]{"Item","Cost","Market","PerUnit","Collection"})ImGui.TableSetupColumn(localization.Get("CurrencyValue.Column"+column));
             ImGui.TableHeadersRow();
             var size=new Vector2(ImGui.GetTextLineHeight());
-            foreach(var row in currencyValueRows.Take(200))
+            foreach(var row in shownRows.Take(200))
             {
                 var definition=items?.Find(row.ItemId);
                 ImGui.TableNextRow();

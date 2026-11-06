@@ -70,7 +70,7 @@ public static class ConfigurationReset
         // 0.375 (g, M-05): on-screen « to do » panel.
         "TaskPanel",
         // W-05 (0.691): on-screen lists.
-        "WorkshopPanel", "WorkshopPanelProject", "WorkshopFollowed", "PreparationPanel", "PreparationPanelItem", "PreparationPanelRecipe", "PreparationPanelTarget", "CraftListPanel", "CraftListPanelName", "ListPanelsHideInCombat", "ListPanelsHideBehindGame",
+        "WorkshopPanel", "WorkshopPanelProject", "WorkshopFollowed", "PreparationPanel", "PreparationPanelItem", "PreparationPanelRecipe", "PreparationPanelTarget", "CraftListPanel", "CraftListPanelName", "ListPanelsHideInCombat", "ListPanelsHideBehindGame", "CurrencyValueMarket",
         // 0.376 (g, M-06): wear alert, bar and thresholds.
         "GearWear",
         // 0.386 (g, X-10): clocks of other time zones.
@@ -571,6 +571,8 @@ public sealed partial class Configuration
     public string CraftListPanelName { get; set; } = "";
     // 0.693 (user request): shown means shown; hiding them is a choice, off by default.
     public bool ListPanelsHideInCombat { get; set; }
+    // 0.697 (user request): « What to do with it? » may leave the market alone.
+    public bool CurrencyValueMarket { get; set; } = true;
     public bool ListPanelsHideBehindGame { get; set; }
     // 0.448 (N-08, DEC-026): the garden journal (64 beds at most, durations typed by the player) and its chat reminders (on: the player
     // only gets them for beds they noted).

@@ -5086,6 +5086,16 @@
     "KeyItemsNone": "Aucun objet clé ne correspond."
   },
   "CurrencyValue": {
+    "Market": "Chercher les prix du marché",
+    "MarketTip": "Activé : choisir une monnaie demande à Universalis les prix de ce qu'elle achète. Désactivé : rien n'est demandé, et une recherche en cours s'arrête.",
+    "FilterAll": "Tout",
+    "FilterCollection": "Collection seulement",
+    "FilterMissing": "Collection manquante",
+    "FilterMarket": "Vendable au marché",
+    "FilterTip": "Ce qui est listé. La collection couvre les montures et les mascottes.",
+    "Search": "Nom de l'objet…",
+    "SearchTip": "Partie du nom de l'objet.",
+    "Count": "{0} affichés sur {1}",
     "Tab": "Que faire avec ?",
     "Pick": "Choisissez une monnaie",
     "PickTip": "La monnaie à regarder. La choisir demande à Universalis les prix du marché de ce qu'elle achète, sauf si la source est coupée dans les réglages.",

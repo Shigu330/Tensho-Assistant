@@ -20,5 +20,13 @@ internal static class CurrencyValue695Tests
             Check(page.Contains("missing.Take(32)"),"bounded batches");
             Check(page.Contains("CurrencyValue.FetchFailed"),"failure shown");
         }),
+        ("Currency value: the market can be left alone, a running search stops, and the list filters",() =>
+        {
+            var page=Read("MainWindow.CurrencyValue.cs");
+            Check(new TenshoAssistant.Configuration().CurrencyValueMarket,"on by default");
+            Check(page.Contains("else{currencyPricesWanted=false;currencyPrices.Cancel();}"),"stops");
+            Check(page.Contains("else if(configuration.CurrencyValueMarket)"),"asks nothing when off");
+            Check(page.Contains("foreach(var row in shownRows.Take(200))") && page.Contains("1=>currencyValueOwned.ContainsKey(row.ItemId)"),"filters");
+        }),
     ];
 }

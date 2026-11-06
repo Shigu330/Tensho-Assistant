@@ -1034,6 +1034,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.696) Que puis-je fabriquer ? : avec des minerais seuls, des objets à plusieurs étapes doivent paraître « avec sous-recettes » ; Préparation › Calculer doit confirmer les étapes ; la recherche ne doit pas figer le jeu.
 
+- [ ] (0.697) Que faire avec ? : décocher la case pendant une recherche doit l'arrêter ; essayer chaque filtre ; dire s'il manque des types de collection.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

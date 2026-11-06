@@ -5086,6 +5086,16 @@
     "KeyItemsNone": "No key item matches."
   },
   "CurrencyValue": {
+    "Market": "Look up market prices",
+    "MarketTip": "On: choosing a currency asks Universalis for the prices of what it buys. Off: nothing is asked, and a search under way stops.",
+    "FilterAll": "Everything",
+    "FilterCollection": "Collection only",
+    "FilterMissing": "Collection still missing",
+    "FilterMarket": "Sold on the market",
+    "FilterTip": "What to list. Collection covers mounts and minions.",
+    "Search": "Item name…",
+    "SearchTip": "Part of the item name.",
+    "Count": "{0} shown out of {1}",
     "Tab": "What to do with it?",
     "Pick": "Choose a currency",
     "PickTip": "The currency to look at. Choosing one asks Universalis for the market prices of what it buys, unless the source is off in the settings.",
