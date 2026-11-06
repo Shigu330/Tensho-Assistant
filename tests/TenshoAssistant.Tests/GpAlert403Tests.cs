@@ -7,6 +7,22 @@ internal static class GpAlert403Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("GP alert (0.656): a change of zone says nothing, and what was known stays",() =>
+        {
+            var start=new DateTimeOffset(2026,11,6,12,0,0,TimeSpan.Zero);
+            var tracker=new GpAlertTracker();
+            Check(!tracker.Evaluate(823,823,0,start),"full before the teleport");
+            tracker.Away(start.AddSeconds(1));
+            Check(!tracker.Evaluate(400,400,0,start.AddSeconds(2)),"a low read just after: ignored");
+            Check(!tracker.Evaluate(823,823,0,start.AddSeconds(5)),"back to full: no alert");
+            Check(!tracker.Evaluate(823,823,0,start.AddSeconds(20)),"still full once settled: no alert");
+            var low=new GpAlertTracker();
+            Check(!low.Evaluate(100,823,0,start),"low before the teleport");
+            low.Away(start.AddSeconds(1));
+            Check(!low.Evaluate(823,823,0,start.AddSeconds(5)),"not while settling");
+            Check(low.Evaluate(823,823,0,start.AddSeconds(20)),"a rise during the teleport still rings once settled");
+            Check(!low.Evaluate(823,823,0,start.AddSeconds(21)),"once");
+        }),
         ("GP alert: once per rise to the threshold, full when 0, not at the first read, off by default",() =>
         {
             var tracker = new GpAlertTracker();

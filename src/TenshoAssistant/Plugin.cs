@@ -480,6 +480,7 @@ public sealed class Plugin : IDalamudPlugin
                 Alert=()=>configuration.GpAlert ? configuration.GpAlertThreshold:null,
                 Reached=(gp,max)=>
                 {
+                    log.Information("GP alert: {0} / {1}.",gp,max);
                     var options=configuration.AlarmOptions ?? new();
                     var inDuty=options.MuteInDuties && condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
                     if(options.ChatAllowed(inDuty))chat.Print("[Tensho] "+localization.Format("GpTick.Alert",gp,max));

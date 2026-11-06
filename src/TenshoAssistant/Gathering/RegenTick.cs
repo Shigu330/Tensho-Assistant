@@ -31,11 +31,17 @@ public static class GpRegen
 /// </summary>
 public sealed class GpAlertTracker
 {
+    /// <summary>0.656 (user report: the alert rang some time after a teleport, GP already full): how long after a change of zone GP says nothing.</summary>
+    public static readonly TimeSpan SettleAfterZone=TimeSpan.FromSeconds(15);
     private uint? last;
+    private DateTimeOffset settleUntil;
     public void Reset()=>last=null;
+    /// <summary>The character is between zones: what was known before stays, and the reads start again only once settled.</summary>
+    public void Away(DateTimeOffset now)=>settleUntil=now+SettleAfterZone;
     public static uint Target(uint maxGp,int threshold)=>threshold<=0 ? maxGp:Math.Min((uint)threshold,maxGp);
-    public bool Evaluate(uint gp,uint maxGp,int threshold)
+    public bool Evaluate(uint gp,uint maxGp,int threshold,DateTimeOffset now=default)
     {
+        if(now<settleUntil)return false;
         var target=Target(maxGp,threshold);
         var reached=last is { } before && before<target && gp>=target && maxGp>0;
         last=gp;

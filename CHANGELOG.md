@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.656.0
+- Plan global, 0.656 : Récolte : l'alerte de PR ne sonne plus après une téléportation quand les PR étaient déjà pleins. Elle garde ce qu'elle savait pendant le changement de zone et ne lit rien pendant 15 secondes après. Des PR réellement remontés pendant la téléportation la font encore sonner, une fois. La cause exacte est déduite du code : le journal écrit maintenant les PR autour d'un changement de zone pour le vérifier.
+- Tests : GP alert. Verify.ps1 (agent) : 1157/1157, 0 avertissement, 0 erreur ; DLL 0.656.0.0. Non validé en jeu.
+### English
+- Gathering: the GP alert no longer rings after a teleport when GP was already full. It keeps what it knew across the change of zone and reads nothing for 15 seconds after it. GP that truly rose during the teleport still rings it, once. The exact cause is inferred from the code: the log now writes GP around a change of zone to check it.
+
 ## 0.655.0
 - Plan global, 0.655 : Carte : le repère noir au bord, la cible du journal sur un mandat, part quand le jeu ne liste plus le mandat. Il reste sinon jusqu'à ce qu'on le retire à la main, comme avant. Le lien passe par le titre de la demande de carte du jeu, écrit maintenant au journal : qu'il soit bien le nom du mandat reste à voir en jeu.
 - Tests : Leve target. Verify.ps1 (agent) : 1156/1156, 0 avertissement, 0 erreur ; DLL 0.655.0.0. Non validé en jeu.
