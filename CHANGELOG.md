@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.677.0
+- Plan global, Cartes : Demande de l'utilisateur : la page Cartes & repères était une longue suite de sections, elle passe en onglets. Cartes : recherche, liste des cartes, coordonnées. Repères : favoris, liens du chat, annuaire des lieux. Chasse : train de chasse et conditions des rangs S, ouverts d'office. Terrains en vente : PaissaDB. Le bouton d'ouverture de la carte Tensho reste au-dessus. Choisir un favori, utiliser un point de la carte ou le lieu d'un monstre ramène sur l'onglet Cartes, qui contient les coordonnées. COMPILED et TESTED, non validé en jeu.
+- Tests : MapTabs677Tests. Verify.ps1 (agent) : 1195/1195, 0 avertissement, 0 erreur ; DLL 0.677.0.0. Non validé en jeu.
+### English
+- User request: the Maps page was one long run of sections and is now in tabs. Maps: search, map list, coordinates. Markers: bookmarks, chat links, place directory. Hunt: hunt train and S rank conditions, open by default. Plots for sale: PaissaDB. The button that opens the Tensho map stays above them. Choosing a bookmark, a point from the map or a monster's place brings the Maps tab forward, since it holds the coordinates. COMPILED and TESTED, not validated in game.
+
 ## 0.676.0
 - Plan global, C22 : Correction, rapport de l'utilisateur : dans Compagnie libre › Atelier, la colonne « En stock » restait sur un tiret alors que l'infobulle de l'objet donnait le bon nombre. Cause : c'était la seule page à lire les stocks sans les rafraîchir, elle ne voyait donc que ce qu'une autre page avait déjà lu. Corrigé, et un test exige désormais le rafraîchissement de toute page qui lit les stocks. COMPILED et TESTED, non validé en jeu.
 - Tests : WorkshopStock676Tests. Verify.ps1 (agent) : 1193/1193, 0 avertissement, 0 erreur ; DLL 0.676.0.0. Non validé en jeu.

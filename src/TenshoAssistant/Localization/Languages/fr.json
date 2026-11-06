@@ -1876,6 +1876,9 @@
     "Progress": "Même relevé : {0:N0} en cours · {1:N0} terminées · {2:N0} non confirmées"
   },
   "MapsUi": {
+    "TabMaps": "Cartes",
+    "TabMarkers": "Repères",
+    "TabHunt": "Chasse",
     "FindHint": "Chercher sur les cartes : lieu, éthérite, PNJ, quête, ressource…",
     "FindTip": "Cherche sur toutes les cartes, à partir de deux lettres. Un clic ouvre la carte Tensho centrée sur le résultat. Les donneurs de quête sont ceux de votre liste de quêtes.",
     "FindLoading": "Préparation de la recherche…",

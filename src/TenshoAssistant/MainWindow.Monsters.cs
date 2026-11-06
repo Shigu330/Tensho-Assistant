@@ -189,7 +189,7 @@ internal sealed partial class MainWindow
             }
             else
             {
-                selectedMapId=chosen.MapId; mapQuery=""; mapX=20.5f; mapY=20.5f;
+                selectedMapId=chosen.MapId; mapsTabRequest=0; mapQuery=""; mapX=20.5f; mapY=20.5f;
                 selectedBookmark=Guid.Empty; bookmarkName=""; bookmarkSaved=false; mapOpenError=null; page=Page.Maps;
             }
         }

@@ -1876,6 +1876,9 @@
     "Progress": "Same snapshot: {0:N0} in progress · {1:N0} completed · {2:N0} unconfirmed"
   },
   "MapsUi": {
+    "TabMaps": "Maps",
+    "TabMarkers": "Markers",
+    "TabHunt": "Hunt",
     "FindHint": "Find on the maps: place, aetheryte, NPC, quest, resource…",
     "FindTip": "Searches every map, from two letters. A click opens the Tensho map centred on the result. Quest givers are those of your journal list.",
     "FindLoading": "Preparing the search…",

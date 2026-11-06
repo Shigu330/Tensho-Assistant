@@ -18,6 +18,8 @@ internal sealed partial class MainWindow
     private float mapX = 20.5f;
     private float mapY = 20.5f;
     private string? mapOpenError;
+    // 0.677 (user request): one tab to select once, when a click elsewhere fills another tab's fields. 0 maps, 1 markers.
+    private int mapsTabRequest=-1;
 
     private void DrawMaps()
     {
@@ -30,18 +32,45 @@ internal sealed partial class MainWindow
             return;
         }
         if (ImGui.Button(localization.Get("MapView.OpenCurrent"))) OpenMapView(0);
+        if(!ImGui.BeginTabBar("MapsTabs"))return;
+        try
+        {
+            ImGuiTabItemFlags Request(int tab)=>mapsTabRequest==tab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None;
+            var request=mapsTabRequest;
+            if(ImGui.BeginTabItem(localization.Get("MapsUi.TabMaps")+"###MapsTabMaps",Request(0))){try{DrawMapsPicker(catalog);}finally{ImGui.EndTabItem();}}
+            if(ImGui.BeginTabItem(localization.Get("MapsUi.TabMarkers")+"###MapsTabMarkers",Request(1)))
+            {
+                try
+                {
+                    DrawMapBookmarks(catalog);
+                    DrawChatMapLinks(catalog);
+                    // X-09 (0.444): place directory.
+                    DrawPlaceDirectory();
+                }
+                finally{ImGui.EndTabItem();}
+            }
+            if(ImGui.BeginTabItem(localization.Get("MapsUi.TabHunt")+"###MapsTabHunt"))
+            {
+                try
+                {
+                    // N-15 (0.442): hunt train recorder.
+                    DrawHuntTrain(catalog);
+                    // N-12 (0.670): spawn conditions of the S ranks.
+                    DrawSRankConditions(catalog);
+                }
+                finally{ImGui.EndTabItem();}
+            }
+            // N-05 (0.445): plots for sale (PaissaDB).
+            if(Paissa is not null && ImGui.BeginTabItem(localization.Get("Plots.Title")+"###MapsTabPlots")){try{DrawPlots();}finally{ImGui.EndTabItem();}}
+            if(request>=0 && mapsTabRequest==request)mapsTabRequest=-1;
+        }
+        finally{ImGui.EndTabBar();}
+    }
+
+    private void DrawMapsPicker(MapCatalog catalog)
+    {
         // P10 (0.597): search everything on every map, from here rather than from the map.
         DrawMapFind(catalog);
-        DrawMapBookmarks(catalog);
-        DrawChatMapLinks(catalog);
-        // N-15 (0.442): hunt train recorder.
-        DrawHuntTrain(catalog);
-        // N-12 (0.670): spawn conditions of the S ranks.
-        DrawSRankConditions(catalog);
-        // X-09 (0.444): place directory.
-        DrawPlaceDirectory();
-        // N-05 (0.445): plots for sale (PaissaDB).
-        DrawPlots();
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##MapSearch", localization.Get("MapsUi.Search"), ref mapQuery, 128);
         Tip("MapsUi.SearchTip");

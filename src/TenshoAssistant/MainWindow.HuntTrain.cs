@@ -51,7 +51,7 @@ internal sealed partial class MainWindow
 
     private void DrawHuntTrain(MapCatalog catalog)
     {
-        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("HuntTrain.Title",huntTrain.Count)+"###HuntTrain"))return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("HuntTrain.Title",huntTrain.Count)+"###HuntTrain",ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextWrapped(localization.Get("HuntTrain.Help"));
         ImGui.Checkbox(localization.Get("HuntTrain.Record")+"###HuntTrainRecord",ref huntTrainRecording);
         Tip("HuntTrain.RecordTip");

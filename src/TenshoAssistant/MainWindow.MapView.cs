@@ -1410,7 +1410,7 @@ internal sealed partial class MainWindow
                 // 0.242 (R-01, first part): the journal target icon could not be removed; right click › remove it.
                 if(mapGameTarget is not null && ImGui.Selectable(localization.Get("MapView.RemoveGameTarget")))mapGameTarget=null;
                 ImGui.BeginDisabled(map.TerritoryId==0);
-                try{if(ImGui.Selectable(localization.Get("MapView.UseInTool"))){selectedMapId=map.MapId;mapX=coordinate.X;mapY=coordinate.Y;bookmarkSaved=false;page=Page.Maps;IsOpen=true;}}
+                try{if(ImGui.Selectable(localization.Get("MapView.UseInTool"))){selectedMapId=map.MapId;mapsTabRequest=0;mapX=coordinate.X;mapY=coordinate.Y;bookmarkSaved=false;page=Page.Maps;IsOpen=true;}}
                 finally{ImGui.EndDisabled();}
                 // 0.378 (g, M-08): add a bookmark at the clicked point, named here.
                 if(map.TerritoryId!=0)

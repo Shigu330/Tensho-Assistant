@@ -17,7 +17,7 @@ internal sealed partial class MainWindow
 
     private void DrawSRankConditions(MapCatalog catalog)
     {
-        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("SRank.Title")+"###SRankConditions"))return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("SRank.Title")+"###SRankConditions",ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextWrapped(localization.Get("SRank.Help"));
         ImGui.SetNextItemWidth(-1);
         ImGui.InputTextWithHint("##SRankQuery",localization.Get("SRank.Search"),ref srankQuery,64);
