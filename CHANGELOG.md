@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.686.0
+- Plan global, Félicité insulaire : Corrections, captures de l'utilisateur : Tensho lisait quatre fabriques alors qu'une seule est prête, et préparait une planification pour les quatre ; seules les fabriques construites comptent maintenant, d'après un octet observé sur un seul joueur. Les mots de la disponibilité et de l'évolution sont ceux du jeu (Introuvable, En surplus, Forte augmentation, Constante…), et « fabrique » remplace « atelier » sur la page. COMPILED et TESTED, non validé en jeu.
+- Tests : IslandWorkshops686Tests. Verify.ps1 (agent) : 1221/1221, 0 avertissement, 0 erreur ; DLL 0.686.0.0. Non validé en jeu.
+### English
+- Fixes from user screenshots: Tensho read four workshops with only one ready, and planned for four; only built ones now count, from a byte observed on one player. Supply and demand shift use the game's French words, and fabrique replaces atelier on the page. COMPILED and TESTED, not validated in game.
+
 ## 0.685.0
 - Plan global, W-04 : Animaux de la Félicité insulaire, à la demande de l'utilisateur. La page passe en deux onglets, Atelier et Pâturage. Pâturage : vos animaux lus dans le jeu (surnom, humeur, satiété, collecte, curation), et sur clic la liste du wiki : lieu avec drapeau, heure d'Éorzéa, météo, taille, capture, ressources. Le jeu ne donne ni lieux ni conditions : ces données sont lues sur le wiki à la demande, marquées comme communautaires, avec noms, objets et météos dans la langue du jeu. Rien n'est collecté ni nourri. COMPILED et TESTED, non validé en jeu.
 - Tests : IslandAnimals685Tests. Verify.ps1 (agent) : 1219/1219, 0 avertissement, 0 erreur ; DLL 0.685.0.0. Non validé en jeu.

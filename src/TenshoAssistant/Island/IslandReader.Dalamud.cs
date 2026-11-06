@@ -19,12 +19,13 @@ internal static class IslandReader
         var rank=(int)manager->IslandState.CurrentRank;
         var supplyDemand=manager->SupplyAndDemandShifts.ToArray();
         var status=IslandValue.Check(catalog,rank,manager->CurrentPopularity,manager->NextPopularity,manager->DemandDirty,supplyDemand);
-        var workshops=new List<IslandWorkshop>(4);
+        var slots=new (int Index,int Level,bool Building,int Place,int Marker)[4];
         for(var index=0;index<4;index++)
         {
             var workshop=manager->IslandState.Workshops[index];
-            if(workshop.PlaceId!=0)workshops.Add(new(index,workshop.BuildingLevel+1,workshop.UnderConstruction));
+            slots[index]=(index,workshop.BuildingLevel+1,workshop.UnderConstruction,workshop.PlaceId,workshop.HoursToCompletion);
         }
+        var workshops=IslandValue.BuiltWorkshops(slots);
         var landmarks=0;
         foreach(var landmark in manager->LandmarkPlacements)
             if(landmark.LandmarkId!=0 && landmark.UnderConstruction==0)landmarks++;

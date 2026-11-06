@@ -1014,6 +1014,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.685) Production › Félicité insulaire › Pâturage : comparer vos animaux à la fenêtre du jeu et noter les nombres d'humeur et de satiété ; Lire la liste sur le wiki : les noms en français, le drapeau sur le bon endroit.
 
+- [ ] (0.686) Félicité insulaire : une seule fabrique lue et planifiée ; comparer disponibilité et évolution de 3 ou 4 créations à « Besoins en biens insulaires ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

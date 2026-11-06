@@ -33,6 +33,16 @@ public sealed record IslandRow(IslandCraft Craft,int? Popularity,int? Supply,int
 /// </summary>
 public static class IslandValue
 {
+    /// <summary>
+    /// 0.686 (user report): every slot has a place, built or not: a player with only Fabrique I read as four. In that game the only byte telling them apart is the one
+    /// FFXIVClientStructs names HoursToCompletion, 1 for the built one and 0 for the others (docs/evidence/0.686-island-workshops.md). If no slot has it, the place alone decides, as before.
+    /// </summary>
+    public static IReadOnlyList<IslandWorkshop> BuiltWorkshops(IReadOnlyList<(int Index,int Level,bool Building,int Place,int Marker)> slots)
+    {
+        var marked=slots.Any(slot=>slot.Marker!=0);
+        return slots.Where(slot=>slot.Building || (marked ? slot.Marker!=0:slot.Place!=0)).Select(slot=>new IslandWorkshop(slot.Index,slot.Level,slot.Building)).ToArray();
+    }
+
     public const int UnitsPerSupplyBand=8;
     /// <summary>The cap when the sheet is missing: its highest row, and WorkshopOptimizerPlugin's constant.</summary>
     public const int DefaultGrooveCap=45;
