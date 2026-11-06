@@ -8,7 +8,7 @@ public static class RecipeCatalogCache
     public const string Family="catalog-recipes";
     public const int MaximumRecipes=100_000;
     // Bump when the Lumina → RecipeDefinition copy rules change without a change of record shape.
-    private const int CopyRules=1;
+    private const int CopyRules=2;
     public static readonly string Shape=CatalogCacheKeys.Shape(typeof(RecipeDefinition),typeof(RecipeIngredient),typeof(CraftRecipeParameters));
     public static string Version(string dataVersion)=>CatalogCacheKeys.Version(dataVersion,CopyRules,Shape);
     public static CatalogCacheData<RecipeDefinition> Snapshot(string dataVersion,IEnumerable<RecipeDefinition> recipes)

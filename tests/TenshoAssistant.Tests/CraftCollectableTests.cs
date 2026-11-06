@@ -49,8 +49,12 @@ internal static class CraftCollectableTests
             Check(CraftSimulation.Unsupported(recipe with {Simulation=p with {Specialist=true}}) is null,"specialist recipe accepted");
             // 0.435 (A-07): expert recipes are simulated (normal condition at every step).
             Check(CraftSimulation.Unsupported(recipe with {Simulation=p with {Expert=true}}) is null,"expert recipe accepted");
-            foreach(var excluded in new[]{p with {LevelScaled=true},p with {RequiredQuality=10},p with {Quality=0}})
+            foreach(var excluded in new[]{p with {Quality=0}})
                 Check(CraftSimulation.Unsupported(recipe with {Simulation=excluded}) is not null,"special case remains explicitly unsupported");
+            // C6 (0.666): adjusted and fixed-quality recipes are simulated.
+            Check(CraftSimulation.Unsupported(recipe with {Simulation=p with {LevelScaled=true}}) is null && CraftSimulation.Unsupported(recipe with {Simulation=p with {RequiredQuality=10}}) is null,"accepted now");
+            Check(CraftRecipeQuality.Durability(true,35,50)==40 && CraftRecipeQuality.Durability(false,35,200)==70,"80 for an adjusted recipe, its table otherwise");
+            Check(CraftRecipeQuality.MissionThreshold(10000,550)==5500 && CraftRecipeQuality.MissionThreshold(10000,0)==0,"thousandths of the maximum");
         }),
         ("Inner Quiet gains single double combo and capped stacks before a maximum potency Byregot",()=>
         {

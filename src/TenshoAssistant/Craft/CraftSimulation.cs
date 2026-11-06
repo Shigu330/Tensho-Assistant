@@ -4,11 +4,17 @@ public sealed record CraftRecipeParameters(int Durability,int Progress,int Quali
     int ProgressModifier,int QualityModifier,int RequiredCraftsmanship,int RequiredControl,int MaxStartingQuality,
     bool Expert=false,bool LevelScaled=false,bool Specialist=false,bool Collectable=false,int RequiredQuality=0,
     // 0.600 (C14): shown on the recipe (Craft/RecipeFacts.cs), not used by the simulation.
-    bool CanHq=false,bool QuickSynth=false,int QuickSynthCraftsmanship=0,int QuickSynthControl=0,string MasterBook="",uint RequiredItem=0,string RequiredStatus="");
+    bool CanHq=false,bool QuickSynth=false,int QuickSynthCraftsmanship=0,int QuickSynthControl=0,string MasterBook="",uint RequiredItem=0,string RequiredStatus="",
+    // C6 (0.666): the quality thresholds of a Cosmic Exploration mission (0 = none).
+    int MissionLow=0,int MissionMid=0,int MissionHigh=0);
 // A-13 (0.434): Specialist = the job is a specialist (Careful Observation, Heart and Soul, Quick Innovation, specialist recipes).
 public sealed record CraftStats(int Level,int Craftsmanship,int Control,int Cp,bool ManipulationAllowed=false,bool Specialist=false);
 public static class CraftRecipeQuality
 {
+    /// <summary>C6 (0.666, rule read in Craftimizer, MIT; docs/evidence/0.666-adjusted-recipes.md): an adjusted recipe's durability starts from 80, not from its level table.</summary>
+    public static int Durability(bool levelScaled,int tableDurability,int factor)=>(levelScaled ? 80:tableDurability)*factor/100;
+    /// <summary>C6 (0.666, same source): a mission's thresholds are thousandths of the maximum quality.</summary>
+    public static int MissionThreshold(int maximum,int thousandths)=>checked((int)((long)maximum*thousandths/1000));
     public static int Maximum(bool canHq,bool collectable,int requiredQuality,int baseQuality,int factor)
     {
         if(requiredQuality<0 || baseQuality<0 || factor<0)throw new ArgumentOutOfRangeException(nameof(baseQuality));
@@ -42,8 +48,6 @@ public static class CraftSimulation
     {
         var p=recipe.Simulation;
         if(p is null) return "Simulation parameters missing for this recipe.";
-        if(p.LevelScaled || p.RequiredQuality>0)
-            return "Adjusted or fixed-quality recipe outside this simulation's scope.";
         if(p.Collectable && p.Quality<=0)return "Collectable maximum quality missing or incompatible.";
         if(p.Durability<=0 || p.Progress<=0 || p.Quality<0 || p.ProgressDivider<=0 || p.ProgressModifier<=0
             || p.Quality>0 && (p.QualityDivider<=0 || p.QualityModifier<=0) || p.MaxStartingQuality<0 || p.MaxStartingQuality>p.Quality)

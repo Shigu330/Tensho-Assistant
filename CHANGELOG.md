@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.666.0
+- Plan global, C6 : Artisanat (C6) : le simulateur, le carnet et la synthèse en direct acceptent les recettes à niveau ajusté et à qualité imposée, dont l'Exploration cosmique. La page dit ce que demande la recette : niveau 100, qualité requise et seuils de mission. Règles lues dans Craftimizer (MIT) et réécrites. Les seuils sont affichés mais pas encore visés par la recherche, et rien n'est comparé en jeu. Le catalogue de recettes se reconstruit une fois.
+- Tests : Craft. Verify.ps1 (agent) : 1162/1162, 0 avertissement, 0 erreur ; DLL 0.666.0.0. Non validé en jeu.
+### English
+- Crafting (C6): the simulator, the log panel and live synthesis accept adjusted and fixed-quality recipes, Cosmic Exploration included. The page says what the recipe asks: level 100, required quality and mission thresholds. Rules read in Craftimizer (MIT) and rewritten. Thresholds are shown but not yet aimed at by the search, and nothing is compared in game. The recipe catalogue is rebuilt once.
+
 ## 0.665.0
 - Plan global, P22 : Carte (P22) : les réglages d'icônes nomment les variantes de quête relevées : la variante 1 est une quête proposée, disponible ou non, et l'icône 71155 une étape en cours. Les autres gardent leur numéro, car rien ne dit leur sens. D'après les journaux et les données, à confirmer en jeu.
 - Tests : Quest icons. Verify.ps1 (agent) : 1162/1162, 0 avertissement, 0 erreur ; DLL 0.665.0.0. Non validé en jeu.

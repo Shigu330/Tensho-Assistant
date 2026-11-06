@@ -197,6 +197,10 @@ internal sealed partial class MainWindow
         if(p.Collectable)ImGui.TextColored(Accent,localization.Get("SimulationHelp.Collectable"));
         // A-07 (0.435): expert recipes simulated in the normal condition, said so.
         if(p.Expert)ImGui.TextColored(Accent,localization.Get("CraftSimulation.ExpertNormal"));
+        // C6 (0.666): what these recipes ask, as the data gives it.
+        if(p.LevelScaled)ImGui.TextColored(Accent,localization.Get("CraftSimulation.LevelScaled"));
+        if(p.RequiredQuality>0)ImGui.TextColored(Accent,localization.Format("CraftSimulation.RequiredQuality",p.RequiredQuality.ToString("N0")));
+        if(p.MissionHigh>0)ImGui.TextColored(Accent,localization.Format("CraftSimulation.Mission",p.MissionLow.ToString("N0"),p.MissionMid.ToString("N0"),p.MissionHigh.ToString("N0")));
         ImGui.TextDisabled(localization.Format("SimulationHelp.Parameters",p.Progress,p.Quality,p.Durability,p.RequiredCraftsmanship,p.RequiredControl));
         ImGui.TextWrapped(localization.Get("SimulationHelp.Model"));
         var stats=characterStats.State;
