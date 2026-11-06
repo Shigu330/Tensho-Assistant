@@ -35,7 +35,7 @@ internal sealed class NativeMapReplacer : IDisposable
     private bool mouseWasDown;
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern short GetAsyncKeyState(int key);
-    private bool refocus;
+    private bool detached;
     private GameMapRequest? lastPointedRequest;
     private ICondition? occupiedFlags;
     private bool Occupied()
@@ -93,6 +93,7 @@ internal sealed class NativeMapReplacer : IDisposable
                 }
             }
             if(bypass && now>bypassUntil)bypass=false;
+            if(detached && !tenshoOpen())detached=false;
             var waiting=visible && !wasVisible && now<startingUntil && options.ReplaceGameMap && !bypass && !canShow();
             if(visible && !wasVisible && !waiting)
             {
@@ -108,20 +109,28 @@ internal sealed class NativeMapReplacer : IDisposable
                 {
                     hosted=true;
                     var (request,signature)=ReadRequest(true);lastRequest=signature;
-                    // 0.627: the same request as last time is what the game kept, not a new one.
-                    // 0.629 (user report): unless the mouse just clicked: the same quest was asked again.
-                    // 0.635 (user report, log: « type SharedFate » right after the click): closing its map, the game forgets the quest: the one clicked is opened again.
-                    if(refocus && lastPointedRequest is { } clickedAgain){refocus=false;request=clickedAgain;}
-                    else if(request.Pointed)
+                    var clicked=clicks.Take(now);
+                    // 0.636: the Tensho map stayed open after a click closed the game's: the map key now closes it, as if the game's were open.
+                    if(detached && !clicked && tenshoOpen())
                     {
-                        var repeated=signature==lastPointed;
-                        var clicked=refocus || clicks.Take(now);
-                        refocus=false;
-                        if(repeated)log.Information("Same map request again: clicked {0}.",clicked);
-                        if(repeated && !clicked)request=request.Plain();
-                        else{lastPointed=signature;lastPointedRequest=request;}
+                        detached=false;hosted=false;Restore(unit);AgentMap.Instance()->Hide();visible=false;
+                        log.Information("The map key closes the Tensho map left open.");
+                        closeTensho();
                     }
-                    open(request);
+                    else
+                    {
+                        detached=false;
+                        // 0.627: the same request as last time is what the game kept, not a new one.
+                        // 0.629 (user report): unless the mouse just clicked: the same quest was asked again.
+                        if(request.Pointed)
+                        {
+                            var repeated=signature==lastPointed;
+                            if(repeated)log.Information("Same map request again: clicked {0}.",clicked);
+                            if(repeated && !clicked)request=request.Plain();
+                            else{lastPointed=signature;lastPointedRequest=request;}
+                        }
+                        open(request);
+                    }
                 }
             }
             if(hosted)
@@ -130,11 +139,12 @@ internal sealed class NativeMapReplacer : IDisposable
                 {
                     hosted=false;Restore(unit);
                     // 0.629 (user report, log): clicking the quest already shown makes the game close its map: the click asked for the quest, so it opens again on it.
-                    if(!Occupied() && lastPointed.Length>0 && lastPointed==lastRequest && clicks.Take(now) && AgentMap.Instance() is var shown && shown!=null)
+                    // 0.636 (user report): reopening the game's map made it blink: it stays closed, the Tensho map alone stays open on the quest, which the game forgot (log: « type SharedFate »).
+                    if(!Occupied() && lastPointed.Length>0 && lastPointed==lastRequest && clicks.Take(now) && lastPointedRequest is { } clickedAgain)
                     {
-                        log.Information("The game closed its map on a click on the same quest: it stays open on it.");
-                        refocus=true;
-                        shown->Show();
+                        log.Information("The game closed its map on a click on the same quest: the Tensho map stays open on it.");
+                        detached=true;
+                        open(clickedAgain);
                     }
                     else
                     {
@@ -179,25 +189,25 @@ internal sealed class NativeMapReplacer : IDisposable
             quest=agent->CurrentOpenMapInfo.QuestId;aetheryte=agent->CurrentOpenMapInfo.AetheryteId;fate=agent->CurrentOpenMapInfo.FateId;
         }
         if(log)this.log.Information("Game map hosted: type {0}, map {1}, territory {2}, selected {3}, quest {4}, aetheryte {5}, fate {6}, target {7}.",type,requested,territory,selected,quest,aetheryte,fate,target?.ToString() ?? "none");
-        var route=questLog && agent!=null ? FindRoute(agent):(0u,null);
+        var route=questLog && agent!=null ? FindRoute(agent):(0u,null,0u);
         if(log && route.MapId!=0)this.log.Information("Game map route: event marker on map {0} at {1}.",route.MapId,route.Position?.ToString() ?? "none");
-        return (new(selected,requested,territory,client.MapId,quest,aetheryte,fate,questLog,target,targetIcon,route.MapId,route.Position),$"{type}|{requested}|{territory}|{quest}|{aetheryte}|{fate}|{target}");
+        return (new(selected,requested,territory,client.MapId,quest,aetheryte,fate,questLog,target,targetIcon,route.MapId,route.Position,route.Icon),$"{type}|{requested}|{territory}|{quest}|{aetheryte}|{fate}|{target}");
     }
     // 0.633 (log, docs/evidence/0.633-quest-route.md): a quest beyond a zone-change NPC has its event marker on that NPC, under the quest's name.
-    private static unsafe (uint MapId,System.Numerics.Vector2? Position) FindRoute(AgentMap* agent)
+    private static unsafe (uint MapId,System.Numerics.Vector2? Position,uint Icon) FindRoute(AgentMap* agent)
     {
         var title=MapLiveReader.TooltipText(&agent->CurrentOpenMapInfo.TitleString);
         var count=agent->EventMarkers.LongCount;
-        if(title.Length==0 || count is <0 or >1024)return (0,null);
+        if(title.Length==0 || count is <0 or >1024)return (0,null,0);
         var seen=0;
         foreach(var marker in agent->EventMarkers)
         {
             if(++seen>1024)break;
             if(marker.MapId==0 || !float.IsFinite(marker.Position.X) || !float.IsFinite(marker.Position.Z))continue;
             if(MapLiveReader.TooltipText(marker.TooltipString).Contains(title,StringComparison.Ordinal))
-                return (marker.MapId,new System.Numerics.Vector2(marker.Position.X,marker.Position.Z));
+                return (marker.MapId,new System.Numerics.Vector2(marker.Position.X,marker.Position.Z),marker.IconId);
         }
-        return (0,null);
+        return (0,null,0);
     }
     public unsafe void Dispose()
     {

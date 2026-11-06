@@ -988,7 +988,8 @@ internal sealed partial class MainWindow
             // is retried for 1.5 s; nothing found on this map = whole map. Logged (/xllog) to check the quest links in game.
             if(FocusPixel(focus,map,live) is { } pixel)
             {
-                mapGameTarget=focus.Target is { } world && focus.TargetIcon!=0 && map.TerritoryId!=0 && !focus.UsesRoute(map) && (maps.State.Catalog is not { } shownCatalog || focus.EntranceTarget(shownCatalog) is null) ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
+                // 0.636 (user report): the icon stays on the way there, even once the game has forgotten its marker.
+                mapGameTarget=focus.UsesRoute(map) && focus.Route is { } way && focus.RouteIcon!=0 ? (map.MapId,way,focus.RouteIcon,focus.QuestId):focus.Target is { } world && focus.TargetIcon!=0 && map.TerritoryId!=0 && !focus.UsesRoute(map) && (maps.State.Catalog is not { } shownCatalog || focus.EntranceTarget(shownCatalog) is null) ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
                 mapGameTargetQuests=null;mapGameTargetSince=DateTimeOffset.UtcNow;mapGameTargetRefresh=default;
                 mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,MapFocusZoom));mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
                 log.Information("Map focus found on map {0} for quest {1}, aetheryte {2}, FATE {3}.",map.MapId,focus.QuestId,focus.AetheryteId,focus.FateId);

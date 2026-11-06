@@ -68,6 +68,7 @@ internal static class MapAside617Tests
             Check(away.UsesRoute(city) && !away.UsesRoute(village),"focused on the NPC only on that map");
             Check((away with {Current=1025}).Resolve(catalog)==1025,"already in the zone: its own map");
             Check(!away.Plain().Pointed && away.Plain().RouteMap==0,"the map key forgets it");
+            Check((away with {RouteIcon=70975}).Plain().RouteIcon==0,"and its icon");
             var ordinary=new TenshoAssistant.Maps.GameMapRequest(855,855,1185,4,QuestLog:true,Target:npc,RouteMap:855,Route:npc);
             Check(!ordinary.UsesRoute(city),"a quest in that zone keeps its own target");
         }),
@@ -93,7 +94,8 @@ internal static class MapAside617Tests
             Check(!clicks.Take(now+TimeSpan.FromMilliseconds(110)),"only once");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));
             Check(view.Contains("!Occupied() && lastPointed.Length>0 && lastPointed==lastRequest && clicks.Take(now)"),"the map stays open on that click, never during an event");
-            Check(view.Contains("if(refocus && lastPointedRequest is { } clickedAgain){refocus=false;request=clickedAgain;}"),"on the quest clicked, which the game forgot (0.635)");
+            Check(view.Contains("open(clickedAgain);") && !view.Contains("shown->Show();"),"on the quest clicked, which the game forgot, without showing its map again (0.636)");
+            Check(view.Contains("if(detached && !clicked && tenshoOpen())"),"the map key still closes it");
         }),
         ("Map enlarged: no stepping aside then, the same as before otherwise",() =>
         {

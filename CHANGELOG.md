@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.636.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur) : recliquer une quête faisait clignoter la carte du jeu, que Tensho rouvrait, et effaçait l'icône, car le jeu oublie alors son marqueur. La carte du jeu reste fermée et seule celle de Tensho reste ouverte sur la quête, avec son icône gardée. La touche de carte la ferme toujours.
+- Tests : Map request. Verify.ps1 (agent) : 1141/1141, 0 avertissement, 0 erreur ; DLL 0.636.0.0. Non validé en jeu.
+### English
+- Map (user report): clicking a quest again made the game's map blink, as Tensho reopened it, and erased the icon, as the game then forgets its marker. The game's map stays closed and only the Tensho map stays open on the quest, with its icon kept. The map key still closes it.
+
 ## 0.635.0
 - Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : recliquer une quête déjà affichée ramenait la carte sur le joueur, car le jeu ferme sa carte à ce clic et oublie la demande. La dernière quête demandée est gardée et la carte se rouvre dessus. Les essais 0.629 et 0.633, cochés trop vite d'après un malentendu, sont décochés.
 - Tests : Map request. Verify.ps1 (agent) : 1141/1141, 0 avertissement, 0 erreur ; DLL 0.635.0.0. Non validé en jeu.

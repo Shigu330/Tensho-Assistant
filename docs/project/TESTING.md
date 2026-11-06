@@ -914,6 +914,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.635) Cliquer une quête, puis la recliquer plusieurs fois : la carte reste sur elle. Fermer et rouvrir avec la touche de carte (M par défaut) : elle s'ouvre sur toi.
 
+- [ ] (0.636) Cliquer une quête, la recliquer plusieurs fois : pas de clignotement, l'icône reste. Puis touche de carte : la carte se ferme ; encore la touche : elle s'ouvre sur toi.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
