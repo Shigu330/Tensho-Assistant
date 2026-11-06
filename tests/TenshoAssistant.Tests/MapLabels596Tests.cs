@@ -73,6 +73,7 @@ internal static class MapLabels596Tests
             Check(TenshoAssistant.Maps.MapLabels.PlaceNameSize(20,0.01f,1)==6,"still drawable");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             Check(view.Contains("GameTargetAbove(map,markers,upperTarget.MapId,upperTarget.World)"),"on the region and the world");
+            Check(view.Contains("new MapIconMarker(upper.Pixel.X,upper.Pixel.Y,upperTarget.Icon,\"\",upper.Link)"),"and a click goes down one step (0.643)");
         }),
         ("Map labels: from the sheet, only for a drawn icon, with their setting",() =>
         {

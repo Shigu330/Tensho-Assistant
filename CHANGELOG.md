@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.643.0
+- Plan global, phase 5 : Carte (capture de l'utilisateur) : sur la carte de région ou du monde, la cible de la quête ne se cliquait pas. Un clic descend maintenant d'une étape : du monde à la région, de la région à la carte de la cible.
+- Tests : Map labels. Verify.ps1 (agent) : 1145/1145, 0 avertissement, 0 erreur ; DLL 0.643.0.0. Non validé en jeu.
+### English
+- Map (user capture): on the region or world map, the quest's target could not be clicked. A click now goes down one step: from the world to the region, from the region to the target's map.
+
 ## 0.642.0
 - Plan global, phase 5 : Carte (captures de l'utilisateur, jeu à côté de Tensho) : la cible d'une quête reste en remontant, dans l'image de sa zone sur la carte de région et sur le lien de la région sur le monde, comme le jeu. Les noms de lieux en noir suivent maintenant la carte en vue éloignée, et ne sont plus trop grands. Différence gardée : au clic, Tensho ouvre directement la zone, là où le jeu passe par le monde.
 - Tests : Map labels. Verify.ps1 (agent) : 1145/1145, 0 avertissement, 0 erreur ; DLL 0.642.0.0. Non validé en jeu.

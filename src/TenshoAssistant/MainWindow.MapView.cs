@@ -965,15 +965,15 @@ internal sealed partial class MainWindow
     // Same, without a known position: the whole map.
     private void ShowMapOnTenshoMap(uint mapId){if(mapId==0)return;mapViewOpen=true;NavigateMap(mapId);}
     // 0.642 (user captures): the target stays when going up, as on the game's map: inside its zone's picture on the region, on the region's link on the world.
-    private Vector2? GameTargetAbove(MapDefinition map,IReadOnlyList<MapIconMarker> markers,uint targetMap,Vector2 world)
+    private (Vector2 Pixel,uint Link)? GameTargetAbove(MapDefinition map,IReadOnlyList<MapIconMarker> markers,uint targetMap,Vector2 world)
     {
         if(map.TerritoryId!=0 || mapMarkers is null || maps.State.Catalog is not { } catalog || catalog.Find(targetMap) is not { } zone)return null;
         foreach(var link in markers)
             if(link.LinkMapId!=0 && (link.LinkMapId==targetMap || catalog.Find(link.LinkMapId)?.TerritoryId==zone.TerritoryId))
-                return MapLabels.ZonePixel(new Vector2(link.X,link.Y),MapProjection.PixelFromWorld(new Vector3(world.X,0,world.Y),zone));
+                return (MapLabels.ZonePixel(new Vector2(link.X,link.Y),MapProjection.PixelFromWorld(new Vector3(world.X,0,world.Y),zone)),targetMap);
         var region=mapMarkers.RegionOf(zone);
         foreach(var link in markers)
-            if(region!=0 && link.LinkMapId==region)return new Vector2(link.X,link.Y);
+            if(region!=0 && link.LinkMapId==region)return (new Vector2(link.X,link.Y),region);
         return null;
     }
     private void NavigateMap(uint mapId){if(mapId==0)return;mapViewMapId=mapId;mapViewFollow=false;mapFitRequested=true;}
@@ -1124,8 +1124,9 @@ internal sealed partial class MainWindow
             ExpireGameTarget();
             if(mapGameTarget is { } gameTarget && gameTarget.MapId==map.MapId)
                 Add(gameTarget.Icon,4,MapProjection.PixelFromWorld(new Vector3(gameTarget.World.X,0,gameTarget.World.Y),map),localization.Get("MapView.GameTarget"));
-            else if(mapGameTarget is { } upperTarget && GameTargetAbove(map,markers,upperTarget.MapId,upperTarget.World) is { } upperPixel)
-                Add(upperTarget.Icon,4,upperPixel,localization.Get("MapView.GameTarget"));
+            // 0.643 (user capture): a click on it goes down one step, like the links.
+            else if(mapGameTarget is { } upperTarget && GameTargetAbove(map,markers,upperTarget.MapId,upperTarget.World) is { } upper)
+                Add(upperTarget.Icon,4,upper.Pixel,localization.Get("MapView.GameTarget"),new MapIconMarker(upper.Pixel.X,upper.Pixel.Y,upperTarget.Icon,"",upper.Link));
             icons.Sort((left,right)=>left.Priority!=right.Priority ? left.Priority.CompareTo(right.Priority):left.Layer!=right.Layer ? left.Layer.CompareTo(right.Layer):left.Order.CompareTo(right.Order));
             MapIconDraw? top=null;var hits=new List<MapIconDraw>();
             if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right))mapIconContext=null;
