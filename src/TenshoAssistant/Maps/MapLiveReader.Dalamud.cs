@@ -295,6 +295,8 @@ internal sealed class MapLiveReader : IDisposable
     private static IReadOnlySet<string>? leveNames;
     private static IReadOnlyDictionary<uint,string>? leveKeys;
     private static readonly LeveAreaMemory<MapEventMarker> leveAreas=new();
+    /// <summary>0.657 (user report): the journal's click gives the leve's area, from anywhere (docs/evidence/0.657-leve-area-from-journal.md).</summary>
+    internal static void SeedLeveArea(uint map,string leve,string title,Vector2 at,int radius,uint icon)=>leveAreas.Seed(map,leve,new MapEventMarker(map,icon,new Vector3(at.X,0,at.Y),radius,title,IsLeve:true));
     /// <summary>0.655: the accepted leves, as read with the markers (null = not read).</summary>
     internal static IReadOnlySet<string>? AcceptedLeves { get; private set; }
     /// <summary>0.655: the key of a leve's name, or null when this text names none.</summary>

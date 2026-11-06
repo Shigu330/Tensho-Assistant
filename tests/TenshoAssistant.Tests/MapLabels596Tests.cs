@@ -83,6 +83,20 @@ internal static class MapLabels596Tests
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(0,costs),"not an aetheryte");
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(9,null) && !TenshoAssistant.Maps.MapLabels.NotAttuned(9,new Dictionary<uint,uint>()),"unknown says nothing");
         }),
+        ("Leve areas (0.657): the journal gives one for a map with none known",() =>
+        {
+            var memory=new TenshoAssistant.Maps.LeveAreaMemory<string>();
+            var accepted=new HashSet<string>{"a"};
+            memory.Seed(697,"a","from the journal");
+            Check(string.Join(",",memory.Update([],accepted))=="from the journal","shown from another zone");
+            Check(memory.Update([(697,"a","near 1"),(697,"a","near 2")],accepted).Count==0,"the game's list replaces it");
+            memory.Seed(697,"a","from the journal");
+            Check(string.Join(",",memory.Update([],accepted))=="near 1,near 2","and a new click does not undo that");
+            memory.Seed(697,"b","other");
+            Check(memory.Update([],accepted).Count==2,"not accepted: gone at the next read");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
+            Check(view.Contains("MapLiveReader.SeedLeveArea(map.MapId,clickedLeve,focus.Title,leveArea,focus.TargetScale,focus.TargetIcon)"),"wired to the journal's request");
+        }),
         ("Leve target (0.655): goes with the leve, stays when nothing is known",() =>
         {
             var key=TenshoAssistant.Maps.MapLeves.Key("Grosse récolte : pierre");

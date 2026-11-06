@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.657.0
+- Plan global, 0.657 : Carte : depuis une autre zone, cliquer un mandat dans le journal affiche sa zone verte sur la carte Tensho. Le jeu la donne dans sa demande de carte, avec son rayon, et elle reste jusqu'à ce que le jeu ne liste plus le mandat. Récolte : l'alerte de PR ne sonne plus quand les PR remontent après un changement de zone, qui en retire (809 à 772 au relevé) ; elle sonne de nouveau dès que des PR sont dépensés. Les 15 secondes de la 0.656 sont retirées.
+- Tests : Leve areas. Verify.ps1 (agent) : 1158/1158, 0 avertissement, 0 erreur ; DLL 0.657.0.0. Non validé en jeu.
+### English
+- Map: from another zone, clicking a leve in the journal shows its green area on the Tensho map. The game gives it in its map request, with its radius, and it stays until the game no longer lists the leve. Gathering: the GP alert no longer rings when GP climbs back after a change of zone, which takes some (809 to 772 in the reading); it rings again once GP is spent. The 15 seconds of 0.656 are gone.
+
 ## 0.656.0
 - Plan global, 0.656 : Récolte : l'alerte de PR ne sonne plus après une téléportation quand les PR étaient déjà pleins. Elle garde ce qu'elle savait pendant le changement de zone et ne lit rien pendant 15 secondes après. Des PR réellement remontés pendant la téléportation la font encore sonner, une fois. La cause exacte est déduite du code : le journal écrit maintenant les PR autour d'un changement de zone pour le vérifier.
 - Tests : GP alert. Verify.ps1 (agent) : 1157/1157, 0 avertissement, 0 erreur ; DLL 0.656.0.0. Non validé en jeu.

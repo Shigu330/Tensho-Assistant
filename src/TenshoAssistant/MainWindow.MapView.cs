@@ -1016,6 +1016,8 @@ internal sealed partial class MainWindow
                 mapGameTarget=focus.UsesRoute(map) && focus.Route is { } way && focus.RouteIcon!=0 ? (map.MapId,way,focus.RouteIcon,focus.QuestId):focus.Target is { } world && focus.TargetIcon!=0 && map.TerritoryId!=0 && !focus.UsesRoute(map) && (maps.State.Catalog is not { } shownCatalog || focus.EntranceTarget(shownCatalog) is null) ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
                 mapGameTargetQuests=null;mapGameTargetSince=DateTimeOffset.UtcNow;mapGameTargetRefresh=default;
                 mapGameTargetLeve=focus.QuestId==0 ? TenshoAssistant.Maps.MapLiveReader.LeveKeyOf(focus.Title):null;
+                if(mapGameTargetLeve is { } clickedLeve && focus.Target is { } leveArea && focus.TargetScale>0 && map.TerritoryId!=0)
+                    TenshoAssistant.Maps.MapLiveReader.SeedLeveArea(map.MapId,clickedLeve,focus.Title,leveArea,focus.TargetScale,focus.TargetIcon);
                 mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(mapZoom);mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
                 log.Information("Map focus found on map {0} for quest {1}, aetheryte {2}, FATE {3}.",map.MapId,focus.QuestId,focus.AetheryteId,focus.FateId);
             }

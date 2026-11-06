@@ -946,15 +946,17 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.651) Rappels, ligne Bienfaits de compagnie : les noms s'affichent sans rien ouvrir. Ouvrir l'onglet Bienfaits : le temps restant apparaît, comme dans le jeu. Poser la cloche : l'alarme est à l'heure de fin.
 
-- [ ] (0.652) Lancer un mandat, ouvrir la carte : ses zones sont vertes au même endroit que dans le jeu. Réglages de la carte : « Zones des mandats » et le repère « Mandats » agissent seuls. Essayer si possible un mandat de combat.
+- [x] (0.652) Lancer un mandat, ouvrir la carte : ses zones sont vertes au même endroit que dans le jeu. Réglages de la carte : « Zones des mandats » et le repère « Mandats » agissent seuls. Essayer si possible un mandat de combat.
 
-- [ ] (0.653) Mandat lancé, carte ouverte, zone verte visible : cliquer le mandat dans le journal, puis recliquer. La zone et les autres marqueurs restent. Terminer le mandat : la zone disparaît une fois la carte refermée.
+- [x] (0.653) Mandat lancé, carte ouverte, zone verte visible : cliquer le mandat dans le journal, puis recliquer. La zone et les autres marqueurs restent. Terminer le mandat : la zone disparaît une fois la carte refermée.
 
 - [ ] (0.654) Mandat lancé, zone vue une fois : s'éloigner, changer de zone, ouvrir la carte de la zone du mandat, la zone verte reste. Cliquer le mandat dans le journal : elle reste. Abandonner le mandat : elle disparaît.
 
 - [ ] (0.655) Accepter un mandat, le cliquer dans le journal : la cible et son repère au bord apparaissent. L'abandonner : ils disparaissent en moins d'une seconde.
 
 - [ ] (0.656) Alerte de PR activée, PR pleins : se téléporter, attendre une minute, aucune alarme. Dépenser des PR, se téléporter, attendre la remontée : une seule alarme.
+
+- [ ] (0.657) Depuis une autre zone, cliquer le mandat dans le journal : la zone verte s'affiche et reste. Abandonner : la zone et le repère noir partent. PR pleins, se téléporter : aucune alarme, puis dépenser des PR : une alarme à la remontée.
 
 **0.535 : interfaces** — à voir en jouant
 

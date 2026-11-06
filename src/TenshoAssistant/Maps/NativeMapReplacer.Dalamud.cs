@@ -176,7 +176,7 @@ internal sealed class NativeMapReplacer : IDisposable
     private unsafe (GameMapRequest Request,string Signature) ReadRequest(bool log)
     {
         var agent=AgentMap.Instance();
-        uint requested=0,territory=0,selected=0,quest=0,aetheryte=0,fate=0;var type="";var questLog=false;System.Numerics.Vector2? target=null;uint targetIcon=0;
+        uint requested=0,territory=0,selected=0,quest=0,aetheryte=0,fate=0;var type="";var questLog=false;System.Numerics.Vector2? target=null;uint targetIcon=0;var targetScale=0;
         if(agent!=null)
         {
             requested=agent->CurrentOpenMapInfo.MapId;territory=agent->CurrentOpenMapInfo.TerritoryId;
@@ -184,7 +184,7 @@ internal sealed class NativeMapReplacer : IDisposable
             if(questLog && agent->TempMapMarkerCount>0)
             {
                 var marker=agent->TempMapMarkers[0].MapMarker;
-                target=new System.Numerics.Vector2(marker.X/16f,marker.Y/16f);targetIcon=marker.IconId;
+                target=new System.Numerics.Vector2(marker.X/16f,marker.Y/16f);targetIcon=marker.IconId;targetScale=marker.Scale;
             }
             quest=agent->CurrentOpenMapInfo.QuestId;aetheryte=agent->CurrentOpenMapInfo.AetheryteId;fate=agent->CurrentOpenMapInfo.FateId;
         }
@@ -192,7 +192,7 @@ internal sealed class NativeMapReplacer : IDisposable
         if(log)this.log.Information("Game map hosted: type {0}, map {1}, territory {2}, selected {3}, quest {4}, aetheryte {5}, fate {6}, target {7}, title \"{8}\".",type,requested,territory,selected,quest,aetheryte,fate,target?.ToString() ?? "none",title);
         var route=questLog && agent!=null ? FindRoute(agent):(0u,null,0u);
         if(log && route.MapId!=0)this.log.Information("Game map route: event marker on map {0} at {1}.",route.MapId,route.Position?.ToString() ?? "none");
-        return (new(selected,requested,territory,client.MapId,quest,aetheryte,fate,questLog,target,targetIcon,route.MapId,route.Position,route.Icon,title),$"{type}|{requested}|{territory}|{quest}|{aetheryte}|{fate}|{target}");
+        return (new(selected,requested,territory,client.MapId,quest,aetheryte,fate,questLog,target,targetIcon,route.MapId,route.Position,route.Icon,title,targetScale),$"{type}|{requested}|{territory}|{quest}|{aetheryte}|{fate}|{target}");
     }
     // 0.633 (log, docs/evidence/0.633-quest-route.md): a quest beyond a zone-change NPC has its event marker on that NPC, under the quest's name.
     private static unsafe (uint MapId,System.Numerics.Vector2? Position,uint Icon) FindRoute(AgentMap* agent)

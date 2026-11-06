@@ -39,10 +39,10 @@ public sealed class RegenTickReader : IDisposable
             var threshold=Alert?.Invoke();
             // 0.656: a change of zone is not a fall of GP: the alert keeps what it knew (docs/evidence/0.656-gp-alert-teleport.md).
             if(local is null || condition[ConditionFlag.BetweenAreas] || condition[ConditionFlag.BetweenAreas51])
-            {tracker.Reset();alert.Away(DateTimeOffset.UtcNow);Volatile.Write(ref state,null);return;}
+            {tracker.Reset();alert.Away();Volatile.Write(ref state,null);return;}
             if(!enabled() && threshold is null || local is null || local.ClassJob.RowId is not (16 or 17 or 18) || condition[ConditionFlag.InCombat])
             {tracker.Reset();alert.Reset();Volatile.Write(ref state,null);return;}
-            if(threshold is { } target && alert.Evaluate(local.CurrentGp,local.MaxGp,target,DateTimeOffset.UtcNow))Reached?.Invoke(local.CurrentGp,local.MaxGp);
+            if(threshold is { } target && alert.Evaluate(local.CurrentGp,local.MaxGp,target))Reached?.Invoke(local.CurrentGp,local.MaxGp);
             else if(threshold is null)alert.Reset();
             Volatile.Write(ref state,enabled() ? tracker.Observe(local.CurrentGp,local.MaxGp,DateTimeOffset.UtcNow) with {JobId=local.ClassJob.RowId}:null);
             warned=false;

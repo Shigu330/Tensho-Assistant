@@ -7,21 +7,31 @@ internal static class GpAlert403Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("GP alert (0.656): a change of zone says nothing, and what was known stays",() =>
+        ("GP alert (0.657): the fall at a change of zone does not ring when GP climbs back, a real spending does",() =>
         {
-            var start=new DateTimeOffset(2026,11,6,12,0,0,TimeSpan.Zero);
             var tracker=new GpAlertTracker();
-            Check(!tracker.Evaluate(823,823,0,start),"full before the teleport");
-            tracker.Away(start.AddSeconds(1));
-            Check(!tracker.Evaluate(400,400,0,start.AddSeconds(2)),"a low read just after: ignored");
-            Check(!tracker.Evaluate(823,823,0,start.AddSeconds(5)),"back to full: no alert");
-            Check(!tracker.Evaluate(823,823,0,start.AddSeconds(20)),"still full once settled: no alert");
+            Check(!tracker.Evaluate(809,809,0),"full before the teleport");
+            tracker.Away();
+            Check(!tracker.Evaluate(772,809,0),"the reading: 772 after it");
+            Check(!tracker.Evaluate(780,809,0) && !tracker.Evaluate(804,809,0),"climbing back");
+            Check(!tracker.Evaluate(809,809,0),"full again: nothing");
+            Check(!tracker.Evaluate(400,809,0) && tracker.Evaluate(809,809,0),"then spent: it rings as usual");
+            var spent=new GpAlertTracker();
+            Check(!spent.Evaluate(809,809,0),"full");
+            spent.Away();
+            Check(!spent.Evaluate(772,809,0) && !spent.Evaluate(780,809,0),"climbing back");
+            Check(!spent.Evaluate(300,809,0),"spent during the climb");
+            Check(!spent.Evaluate(500,809,0) && spent.Evaluate(809,809,0),"this rise rings");
             var low=new GpAlertTracker();
-            Check(!low.Evaluate(100,823,0,start),"low before the teleport");
-            low.Away(start.AddSeconds(1));
-            Check(!low.Evaluate(823,823,0,start.AddSeconds(5)),"not while settling");
-            Check(low.Evaluate(823,823,0,start.AddSeconds(20)),"a rise during the teleport still rings once settled");
-            Check(!low.Evaluate(823,823,0,start.AddSeconds(21)),"once");
+            Check(!low.Evaluate(100,809,0),"low before the teleport");
+            low.Away();
+            Check(!low.Evaluate(772,809,0),"still below");
+            Check(low.Evaluate(809,809,0),"a rise from low rings");
+            var threshold=new GpAlertTracker();
+            Check(!threshold.Evaluate(809,809,600),"above a threshold");
+            threshold.Away();
+            Check(!threshold.Evaluate(772,809,600),"the fall stays above it");
+            Check(!threshold.Evaluate(500,809,600) && threshold.Evaluate(600,809,600),"a threshold works as usual");
         }),
         ("GP alert: once per rise to the threshold, full when 0, not at the first read, off by default",() =>
         {

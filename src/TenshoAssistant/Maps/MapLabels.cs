@@ -35,6 +35,11 @@ public sealed class LeveAreaMemory<T>
 {
     private const int MaxAreas=64;
     private readonly Dictionary<(uint Map,string Leve),List<T>> areas=[];
+    /// <summary>0.657: an area from the journal's request, for a leve and a map with none known: what the game's list gave stays the better source.</summary>
+    public void Seed(uint map,string leve,T area)
+    {
+        if(!areas.ContainsKey((map,leve)) && areas.Sum(pair=>pair.Value.Count)<MaxAreas)areas[(map,leve)]=[area];
+    }
     /// <summary>Returns what to add to the markers read: the areas remembered that this read does not give.</summary>
     public IReadOnlyList<T> Update(IEnumerable<(uint Map,string Leve,T Area)> seen,IReadOnlySet<string> accepted)
     {

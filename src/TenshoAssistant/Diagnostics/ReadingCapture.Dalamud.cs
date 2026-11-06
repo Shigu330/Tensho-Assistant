@@ -25,8 +25,7 @@ public sealed unsafe class ReadingCapture : IDisposable
     private readonly IPluginLog log;
     private readonly Dictionary<string,int> lines=[];
     private string statuses="",synthesis="",leves="",retainer="",airship="";
-    private bool fishing,disposed,warned,away;
-    private uint lastGp,lastMaxGp;
+    private bool fishing,disposed,warned;
     private long slowAt;
 
     public ReadingCapture(IFramework framework,IObjectTable objects,ICondition condition,IGameGui gui,IChatGui chat,Func<bool> enabled,IPluginLog log)
@@ -51,14 +50,9 @@ public sealed unsafe class ReadingCapture : IDisposable
         try
         {
             var local=objects.LocalPlayer;
-            if(local is null){if(!away){away=true;Line("gp",150,"no player");}return;}
-            if(away){away=false;Line("gp",150,$"player back: {local.CurrentGp} / {local.MaxGp}");}
+            if(local is null)return;
             var job=local.ClassJob.RowId;
-            if(job is 16 or 17 or 18)
-            {
-                ReadStatuses(local);
-                ReadGp(local.CurrentGp,local.MaxGp);
-            }
+            if(job is 16 or 17 or 18)ReadStatuses(local);
             var flag=condition[ConditionFlag.Fishing];
             if(flag!=fishing){fishing=flag;Line("fishing",200,$"fishing flag {flag}");}
             var now=DateTime.UtcNow.Ticks;
@@ -83,15 +77,6 @@ public sealed unsafe class ReadingCapture : IDisposable
         if(ids==statuses)return;
         statuses=ids;
         Line("statuses",200,string.Join(", ",local.StatusList.Where(status=>status.StatusId!=0).Select(status=>$"{status.StatusId} (param {status.Param}, {status.RemainingTime:F1} s)")));
-    }
-
-    // 0.656: GP around a change of zone, without the ordinary ticks.
-    private void ReadGp(uint gp,uint max)
-    {
-        if(gp==lastGp && max==lastMaxGp)return;
-        var tick=max==lastMaxGp && gp>lastGp && gp-lastGp<=20;
-        if(!tick)Line("gp",150,$"{lastGp} / {lastMaxGp} -> {gp} / {max}, between areas {condition[ConditionFlag.BetweenAreas]}");
-        lastGp=gp;lastMaxGp=max;
     }
 
     // 0.654: what the game says of the accepted leves, to tell a started, a finished and an abandoned one.

@@ -133,13 +133,13 @@ public sealed record MapCatalogState(MapCatalog? Catalog, int Copied, int Total,
 // Target: world X/Z of the game's first temporary marker (AgentMap.TempMapMarkers[0], X/Y = world × 16), where the game itself
 // centres a quest or gathering link; read the way Mappy does (reference only, AGPL, not copied).
 public sealed record GameMapRequest(uint Selected, uint Requested, uint Territory, uint Current, uint QuestId = 0, uint AetheryteId = 0, uint FateId = 0, bool QuestLog = false,
-    System.Numerics.Vector2? Target = null, uint TargetIcon = 0, uint RouteMap = 0, System.Numerics.Vector2? Route = null, uint RouteIcon = 0, string Title = "")
+    System.Numerics.Vector2? Target = null, uint TargetIcon = 0, uint RouteMap = 0, System.Numerics.Vector2? Route = null, uint RouteIcon = 0, string Title = "", int TargetScale = 0)
 {
     /// <summary>
     /// 0.627 (user report, log: the same « QuestLog » request at each press of the map key): the game keeps its last quest request after the map closes. Read again unchanged,
     /// it asks for nothing: the map simply opens on the player.
     /// </summary>
-    public GameMapRequest Plain()=>this with {Selected=Current,Requested=Current,Territory=0,QuestId=0,AetheryteId=0,FateId=0,QuestLog=false,Target=null,TargetIcon=0,RouteMap=0,Route=null,RouteIcon=0,Title=""};
+    public GameMapRequest Plain()=>this with {Selected=Current,Requested=Current,Territory=0,QuestId=0,AetheryteId=0,FateId=0,QuestLog=false,Target=null,TargetIcon=0,RouteMap=0,Route=null,RouteIcon=0,Title="",TargetScale=0};
     /// <summary>0.633: this map shows the way (the zone-change NPC), not the target's own territory.</summary>
     public bool UsesRoute(MapDefinition map)=>Route is not null && RouteMap==map.MapId && Territory!=map.TerritoryId;
     /// <summary>

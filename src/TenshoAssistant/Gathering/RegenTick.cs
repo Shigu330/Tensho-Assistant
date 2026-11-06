@@ -31,18 +31,32 @@ public static class GpRegen
 /// </summary>
 public sealed class GpAlertTracker
 {
-    /// <summary>0.656 (user report: the alert rang some time after a teleport, GP already full): how long after a change of zone GP says nothing.</summary>
-    public static readonly TimeSpan SettleAfterZone=TimeSpan.FromSeconds(15);
     private uint? last;
-    private DateTimeOffset settleUntil;
-    public void Reset()=>last=null;
-    /// <summary>The character is between zones: what was known before stays, and the reads start again only once settled.</summary>
-    public void Away(DateTimeOffset now)=>settleUntil=now+SettleAfterZone;
+    private bool away;
+    private uint? fellTo;
+    public void Reset(){last=null;away=false;fellTo=null;}
+    /// <summary>
+    /// 0.657 (docs/evidence/0.656-gp-alert-teleport.md): the game takes GP at a change of zone, 809 to 772 in the reading. GP at the target before it does not ring when it climbs back.
+    /// A further fall means GP was spent: the alert follows as usual.
+    /// </summary>
+    public void Away()=>away=true;
     public static uint Target(uint maxGp,int threshold)=>threshold<=0 ? maxGp:Math.Min((uint)threshold,maxGp);
-    public bool Evaluate(uint gp,uint maxGp,int threshold,DateTimeOffset now=default)
+    public bool Evaluate(uint gp,uint maxGp,int threshold)
     {
-        if(now<settleUntil)return false;
         var target=Target(maxGp,threshold);
+        if(away)
+        {
+            away=false;
+            if(last is { } known && known>=target && gp<target)fellTo=gp;
+        }
+        if(fellTo is { } fell)
+        {
+            if(gp>=target)fellTo=null;
+            else if(gp>=fell){fellTo=gp;return false;}
+            else fellTo=null;
+            last=gp;
+            return false;
+        }
         var reached=last is { } before && before<target && gp>=target && maxGp>0;
         last=gp;
         return reached;
