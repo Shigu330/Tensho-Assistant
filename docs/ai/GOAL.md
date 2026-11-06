@@ -14,6 +14,6 @@ RESTE, liste complète et ordre dans [PUBLISHING](../project/PUBLISHING.md) « C
 
 VALIDATION : Verify.ps1 vert, job CI « Build like the Dalamud repository » vert ; rapports de l'utilisateur en jeu ; la PR elle-même pour la compilation réseau coupé.
 
-Hors de ce GOAL (mis de côté, [G-PROPOSALS](../project/G-PROPOSALS.md)) : dresseur, suite ; N-10 ; I-15 et suite de I-05 avec une séance en jeu.
+Hors de ce GOAL (mis de côté, [G-PROPOSALS](../project/G-PROPOSALS.md)) : dresseur, suite ; I-15 et suite de I-05 avec une séance en jeu.
 
 Anciens GOAL : FIN-DE-FILE (file a) à h), terminé le 2026-11-04) ; R-11 ([R-11](../goals/R-11.md), 0.310–0.315, 0.340) ; R-06 ([R-06](../goals/R-06.md), 0.247–0.294 ; le cadre du jeu de 0.332 est retiré en 0.510) ; TRIAD-003 (validé en jeu 2026-10-31 et 2026-11-01).

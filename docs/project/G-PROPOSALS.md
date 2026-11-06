@@ -130,6 +130,6 @@ La liste complète de ce qui reste pour la 1.0.0 : [PUBLISHING](PUBLISHING.md) �
 | Point | Pourquoi pas en autonomie | Ce qu'il faudrait |
 |---|---|---|
 | I-15, recherche dans les fenêtres d'inventaire | Passe sur des pointeurs natifs à chaque image, 15 inconnues (numéros d'onglets, noms des grilles de servants, ordre des cases). Coder à l'aveugle peut faire planter le jeu | D'abord une sonde en lecture seule, avec l'utilisateur devant les fenêtres |
-| N-10, atelier de l'île | 16 inconnues (popularité, offre et demande, lecture après ouverture du carnet), conception jamais relue | Une relecture, puis une sonde devant l'agenda de l'île |
+| N-10, atelier de l'île | Fait sans le jeu en 0.671 et 0.672, inconnues listées dans `docs/evidence/0.671-island-workshop.md` | Essais et capture devant l'agenda de l'île ; prévision de la semaine plus tard |
 | I-05, suite | Relevé des offres du jeu, vue de tous les servants | Après un essai de la 0.508 |
 | Dresseur, suite | Mis de côté par l'utilisateur | Sonde déjà en place (0.501) |

@@ -6087,6 +6087,15 @@
     "Cliffs": "Fall from cliffs down to 1 HP."
   },
   "Island": {
+    "Propose": "Propose an agenda",
+    "ProposeTip": "Computes one cycle for your built workshops. Nothing goes to the game: you enter it yourself in the agenda.",
+    "NoAgenda": "No workshop is ready, so there is nothing to propose.",
+    "Copy": "Copy",
+    "CopyTip": "Copies this agenda as text.",
+    "Step": "{0} h: {1} ({2} h) ~{3}",
+    "StepEfficient": "{0} h: {1} ({2} h, efficient) ~{3}",
+    "AgendaTotal": "Total for the cycle: ~{0}",
+    "AgendaLimits": "A good agenda rather than the best one: workshops are filled one after the other, the groove does not rise during the cycle, and materials are not checked.",
     "Title": "Island sanctuary",
     "Subtitle": "Your workshops' crafts, from what the game loaded.",
     "Help": "In the game, on your island, open the workshops' agenda once, then read here. Tensho asks the server for nothing and schedules nothing.",

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.672.0
+- Plan global, N-10 : Île sanctuaire (N-10), deuxième partie : « Proposer un agenda » calcule un cycle pour vos ateliers construits, atelier par atelier, en tenant compte de l'offre déjà utilisée, et se copie en texte. Vous le saisissez vous-même : Tensho ne programme rien. Un bon agenda plutôt que le meilleur : l'entrain ne monte pas pendant le calcul, et les matériaux ne sont pas vérifiés. Règle des créations efficaces réécrite d'après Workshop Optimizer Plugin (MIT). La prévision de la semaine reste à faire.
+- Tests : Island agenda. Verify.ps1 (agent) : 1178/1178, 0 avertissement, 0 erreur ; DLL 0.672.0.0. Non validé en jeu.
+### English
+- Island sanctuary (N-10), second part: « Propose an agenda » computes one cycle for your built workshops, one workshop at a time, taking the supply already used into account, and copies as text. You enter it yourself: Tensho schedules nothing. A good agenda rather than the best: groove does not rise in the computation, and materials are not checked. Efficient-craft rule rewritten from Workshop Optimizer Plugin (MIT). The week's forecast remains to do.
+
 ## 0.671.0
 - Plan global, N-10 : Île sanctuaire (N-10), première partie : nouvelle page Production › Île sanctuaire. Une fois l'agenda ouvert dans le jeu, un clic copie le rang, les ateliers, l'entrain, la popularité, l'offre et la demande, et la table donne une valeur estimée par création. Tensho ne demande rien au serveur et ne programme rien. Le rang d'atelier, l'arrondi et les deux lectures de l'entrain restent à vérifier en jeu ; la capture en écrit les valeurs.
 - Tests : Island. Verify.ps1 (agent) : 1172/1172, 0 avertissement, 0 erreur ; DLL 0.671.0.0. Non validé en jeu.

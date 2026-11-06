@@ -14,6 +14,8 @@ internal sealed partial class MainWindow
     private Task<IslandSnapshot>? islandRead;
     private IslandSnapshot? island;
     private IslandRow[] islandRows=[];
+    private Task<IslandAgenda>? islandPlanning;
+    private IslandAgenda? islandAgenda;
 
     private void DrawIslandSanctuary()
     {
@@ -27,6 +29,7 @@ internal sealed partial class MainWindow
             islandReadFailed=!read.IsCompletedSuccessfully;
             island=read.IsCompletedSuccessfully ? read.Result:null;
             islandRows=island is { Status:IslandReadStatus.Loaded } ? IslandValue.Rows(catalog,island):[];
+            islandAgenda=null;
         }
         ImGui.BeginDisabled(ReadIsland is null || islandRead is not null);
         try{if(ImGui.Button(localization.Get("Island.Read")))islandRead=ReadIsland!(catalog);}
@@ -47,7 +50,42 @@ internal sealed partial class MainWindow
         ImGui.TextUnformatted(localization.Format("Island.Workshops",current.Workshops.Count==0 ? localization.Get("Island.NoWorkshop")
             :string.Join(", ",current.Workshops.Select(item=>localization.Format(item.UnderConstruction ? "Island.WorkshopBuilding":"Island.Workshop",item.Index+1,item.Level)))));
         ImGui.TextDisabled(localization.Get("Island.Estimate"));
+        DrawIslandAgenda(catalog,current);
         DrawIslandTable(catalog);
+    }
+
+    // N-10 (0.672): a proposal to copy into the game's agenda by hand; off the framework and off Draw.
+    private void DrawIslandAgenda(IslandCatalog catalog,IslandSnapshot current)
+    {
+        if(islandPlanning is { IsCompleted:true } planning)
+        {
+            islandPlanning=null;
+            islandAgenda=planning.IsCompletedSuccessfully ? planning.Result:null;
+        }
+        ImGui.BeginDisabled(islandPlanning is not null);
+        try{if(ImGui.Button(localization.Get("Island.Propose")))islandPlanning=Task.Run(()=>IslandPlanner.Propose(catalog,current));}
+        finally{ImGui.EndDisabled();}
+        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Island.ProposeTip"));
+        if(islandAgenda is not { } agenda)return;
+        if(agenda.Chains.Count==0){ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Island.NoAgenda"));return;}
+        ImGui.SameLine();
+        if(ImGui.Button(localization.Get("Island.Copy")))ImGui.SetClipboardText(IslandAgendaText(agenda));
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Island.CopyTip"));
+        foreach(var line in IslandAgendaText(agenda).Split('\n'))ImGui.TextUnformatted(line);
+        ImGui.TextDisabled(localization.Get("Island.AgendaLimits"));
+    }
+
+    private string IslandAgendaText(IslandAgenda agenda)
+    {
+        var culture=System.Globalization.CultureInfo.CurrentCulture;
+        var lines=new List<string>();
+        foreach(var chain in agenda.Chains)
+        {
+            lines.Add(localization.Format("Island.Workshop",chain.Workshop+1,chain.Level));
+            lines.AddRange(chain.Steps.Select(step=>"  "+localization.Format(step.Efficient ? "Island.StepEfficient":"Island.Step",step.Start,step.Craft.Name,step.Craft.Hours,step.Value.ToString("0",culture))));
+        }
+        lines.Add(localization.Format("Island.AgendaTotal",agenda.Total.ToString("0",culture)));
+        return string.Join("\n",lines);
     }
 
     private void DrawIslandTable(IslandCatalog catalog)

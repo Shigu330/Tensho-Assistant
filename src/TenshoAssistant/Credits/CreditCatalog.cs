@@ -105,7 +105,7 @@ public static class CreditCatalog
         // 0.456: the planting rules of crossbreeding (facts, in our own words): docs/evidence/0.456-garden-grid.md.
         // 0.671 (N-10): how a craft's value moves on the island, in Tensho's own code; the game's sheets give the ratios.
         new("WorkshopOptimizer", CreditKind.Rule, "Workshop Optimizer Plugin", "belzaru17", "MIT", "https://github.com/belzaru17/WorkshopOptimizerPlugin", "https://github.com/belzaru17/WorkshopOptimizerPlugin/blob/main/LICENSE",
-            ["Island/IslandCatalog.cs", "MainWindow.IslandSanctuary.cs"], [], "", false),
+            ["Island/IslandCatalog.cs", "Island/IslandPlanner.cs", "MainWindow.IslandSanctuary.cs"], [], "", false),
         // 0.670 (N-12): the spawn conditions of the S ranks, crossed and in Tensho's own words.
         new("EliteMarks", CreditKind.Rule, "Elite Marks (FFXIV Console Games Wiki)", "", "GFDL-1.2-or-later", "https://ffxiv.consolegameswiki.com/wiki/Elite_Marks", "https://ffxiv.consolegameswiki.com/wiki/FFXIV_Wiki:About",
             ["Hunting/SRankConditions.cs", "MainWindow.SRankConditions.cs"], [], "", false),

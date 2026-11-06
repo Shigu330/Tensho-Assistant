@@ -6087,6 +6087,15 @@
     "Cliffs": "Tombez de falaises jusqu'à 1 PV."
   },
   "Island": {
+    "Propose": "Proposer un agenda",
+    "ProposeTip": "Calcule un cycle pour vos ateliers construits. Rien ne va au jeu : vous le saisissez vous-même dans l'agenda.",
+    "NoAgenda": "Aucun atelier n'est prêt : rien à proposer.",
+    "Copy": "Copier",
+    "CopyTip": "Copie cet agenda en texte.",
+    "Step": "{0} h : {1} ({2} h) ~{3}",
+    "StepEfficient": "{0} h : {1} ({2} h, efficace) ~{3}",
+    "AgendaTotal": "Total du cycle : ~{0}",
+    "AgendaLimits": "Un bon agenda plutôt que le meilleur : les ateliers sont remplis l'un après l'autre, l'entrain ne monte pas pendant le cycle, et les matériaux ne sont pas vérifiés.",
     "Title": "Île sanctuaire",
     "Subtitle": "Les créations de vos ateliers, à partir de ce que le jeu a chargé.",
     "Help": "Dans le jeu, sur votre île, ouvrez une fois l'agenda des ateliers, puis lisez ici. Tensho ne demande rien au serveur et ne programme rien.",

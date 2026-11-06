@@ -986,6 +986,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.671) Sur l'île, Production › Île sanctuaire : Lire avant d'ouvrir l'agenda (doit le demander), puis après : rang, ateliers, entrain, popularité et offre doivent correspondre au jeu. Comparer la valeur estimée aux coquillages d'une création terminée.
 
+- [ ] (0.672) Sur l'île, après lecture : Proposer un agenda. Saisir un cycle proposé dans l'agenda du jeu : mêmes créations efficaces que le jeu, pas de dépassement de 24 h. Comparer le total aux coquillages reçus.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

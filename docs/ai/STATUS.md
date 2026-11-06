@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-04)
 
-VERSION: 0.671.0.0 (dernière release : Stable-0.539.0, 2026-11-05) — Verify.ps1 (agent) 1172/1172, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.672.0.0 (dernière release : Stable-0.539.0, 2026-11-05) — Verify.ps1 (agent) 1178/1178, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: finir le plan global, sur le dépôt personnalisé, sans soumission (DEC-039) ; voir [GOAL](GOAL.md) et [PUBLISHING](../project/PUBLISHING.md).
 QUOTA: plus de réserve (utilisateur, 2026-11-05) : coder tant que possible, reprise tenue à jour ici. L'agent ne voit pas le compteur. Dernier relevé de l'utilisateur (2026-11-05) : 5 h 0 %, réinitialisation à 9:50 ; semaine 95 %, réinitialisation à 23:00 (une vingtaine de versions ≈ 1 % de la semaine).
 
@@ -9,7 +9,7 @@ Historique (rapports de validation un par un, anciennes reprises, couverture des
 ## Où en est le projet
 - Fait : files a) à g) de la [ROADMAP](../project/ROADMAP.md) (0.315–0.446), R-14 résistance aux mises à jour (0.452–0.454, 0.491–0.492, 0.507), solveur Raphael A-03 et A-04 (0.465, 0.509), modèles communautaires (0.476), auto-contrôle au rechargement (0.494–0.496), page dresseur (0.500), prise en main ONBOARD-001 (0.502–0.506), ventes des servants I-05 première version (0.508), cadre du jeu retiré et conseils en JcE seulement (0.510), panneaux libres et panneaux accrochés au jeu en fenêtres Dalamud (0.514, 0.516), aide à la récolte par nœud avec les effets du lieu (0.515).
 - Abandonné : chat personnalisable ([DEC-030](../project/DECISIONS.md)).
-- Mis de côté par l'utilisateur : dresseur, suite (sonde 0.501, rangs, panneau du Dédale ; [DEC-032](../project/DECISIONS.md)) ; N-10 atelier de l'île ; I-14 et X-05.
+- Mis de côté par l'utilisateur : dresseur, suite (sonde 0.501, rangs, panneau du Dédale ; [DEC-032](../project/DECISIONS.md)) ; I-14 et X-05.
 - À faire avec une séance en jeu : I-15, suite de I-05, sondes de l'issue #23 ([G-PROPOSALS](../project/G-PROPOSALS.md) « Écarts laissés »).
 
 ## Validé en jeu
@@ -30,7 +30,7 @@ Liste complète : [TESTING](../project/TESTING.md), 284 cases ouvertes, aucune d
 Dépôt personnel : installation et mise à jour fonctionnent (rapport de l'utilisateur, 2026-11-05, 0.539.0). Possible depuis cette release : galerie de Mes outils (0.476) et liste de vidéos (0.506), qui lisent la branche `main`.
 
 ## Prochaine action
-0) [Plan global](../project/GLOBAL-PLAN.md) : phases 1 à 4 sans jouer, puis le jeu en dernier, un point à la fois ; la 1.0.0 après tout le plan (DEC-037). Feu vert donné le 2026-11-05 : enchaîner les phases 1 à 4 sans demander. Phase 1 finie. Reprise : N-10 agenda proposé, puis relevés en jeu : C30, I10, T26, P11, N-04, gils des servants, récolte du jardin, essais ; JcJ tout à la fin.657 et 0.658, puis P22 ; JcJ tout à la fin ; N-12 attend un accord.657, puis P22 ; JcJ tout à la fin ; N-12 attend un accord.650 : PR pendant la récolte faits (#37, rien à coder) ; suivant : actions de compagnie (T27), puis mandats (P17), P22 ; JcJ tout à la fin ; N-12 attend un accord. N-12 (conditions sans compteurs) attend l'accord de l'utilisateur. Pas de soumission au dépôt officiel (DEC-039).
+0) [Plan global](../project/GLOBAL-PLAN.md) : phases 1 à 4 sans jouer, puis le jeu en dernier, un point à la fois ; la 1.0.0 après tout le plan (DEC-037). Feu vert donné le 2026-11-05 : enchaîner les phases 1 à 4 sans demander. Phase 1 finie. Reprise : relevés en jeu : C30, I10, T26, P11, N-04, N-10 devant l'agenda, gils des servants, récolte du jardin, essais ; JcJ tout à la fin.657 et 0.658, puis P22 ; JcJ tout à la fin ; N-12 attend un accord.657, puis P22 ; JcJ tout à la fin ; N-12 attend un accord.650 : PR pendant la récolte faits (#37, rien à coder) ; suivant : actions de compagnie (T27), puis mandats (P17), P22 ; JcJ tout à la fin ; N-12 attend un accord. N-12 (conditions sans compteurs) attend l'accord de l'utilisateur. Pas de soumission au dépôt officiel (DEC-039).
 1) Décisions de l'auteur sur les points Dalamud ([PUBLISHING](../project/PUBLISHING.md) « Ce qui reste », points 4 à 7 ; titre selon le job décidé, DEC-035), avec son accord à chaque règle.
 2) Fait le 2026-11-05 : release Stable-0.539.0, sur demande de l'utilisateur. La prochaine : une séance de jeu sur la dernière version d'abord (DEC-033).
 3) Vérifier en jeu les fenêtres converties (issue #38).
