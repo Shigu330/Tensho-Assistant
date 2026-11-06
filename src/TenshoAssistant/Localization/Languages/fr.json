@@ -6197,6 +6197,10 @@
     "Left": "Non réussi"
   },
   "ListPanels": {
+    "Crystal": "Cristaux",
+    "VendorTip": "Compte ce que vendent les PNJ. Désactivé : ils ne sont plus pris en compte du tout : ce qu'ils vendent descend à ses ingrédients, ou passe sous une autre provenance.",
+    "Currencies": "Monnaies des vendeurs ({0} exclues)",
+    "CurrenciesTip": "Un clic exclut une monnaie ou la remet : un PNJ qui ne prend que des monnaies exclues ne compte plus.",
     "Base": "Seulement ce qui reste à récupérer, par provenance",
     "BaseTip": "Remplace ce qui se fabrique par ses ingrédients, jusqu'à ce qui se récolte, s'achète à un PNJ, tombe d'un monstre ou s'obtient autrement. Les objets fabriqués en stock comptent d'abord.",
     "Gathering": "Récolte",

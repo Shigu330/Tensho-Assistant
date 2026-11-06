@@ -38,5 +38,21 @@ internal static class BaseMaterials699Tests
             Check(BaseMaterials.OriginOf(true,true,true)==ItemOrigin.Gathering && BaseMaterials.OriginOf(false,true,true)==ItemOrigin.Vendor,"order");
             Check(BaseMaterials.OriginOf(false,false,true)==ItemOrigin.Monster && BaseMaterials.OriginOf(false,false,false)==ItemOrigin.Other,"rest");
         }),
+        ("Vendors: off altogether, or by currency: an offer in a currency still on keeps the item",() =>
+        {
+            IReadOnlyList<uint>[] tomes=[[28u]];IReadOnlyList<uint>[] both=[[28u],[1u]];IReadOnlyList<uint>[] free=[[]];
+            var off=new HashSet<uint>{28};
+            Check(BaseMaterials.VendorCounts(true,tomes,new HashSet<uint>()),"on");
+            Check(!BaseMaterials.VendorCounts(false,tomes,new HashSet<uint>()),"vendors off");
+            Check(!BaseMaterials.VendorCounts(true,tomes,off),"its only currency left out");
+            Check(BaseMaterials.VendorCounts(true,both,off),"gil still takes it");
+            Check(BaseMaterials.VendorCounts(true,free,off),"no cost read: it counts");
+        }),
+        ("Panels: categories fold, each panel on its own",() =>
+        {
+            var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ListPanels.cs"));
+            Check(page.Contains("###ListPanel{key}{origin}") && page.Contains("ImGuiTreeNodeFlags.DefaultOpen"),"folding header");
+            Check(page.Contains("ClassifyCrystal(item) is not null ? ItemOrigin.Crystal"),"crystals apart");
+        }),
     ];
 }

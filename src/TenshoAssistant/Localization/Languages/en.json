@@ -6197,6 +6197,10 @@
     "Left": "Not cleared"
   },
   "ListPanels": {
+    "Crystal": "Crystals",
+    "VendorTip": "Counts what NPCs sell. Off: vendors are ignored altogether: what they sell goes down to its ingredients, or under another origin.",
+    "Currencies": "Vendor currencies ({0} left out)",
+    "CurrenciesTip": "A click leaves a currency out or brings it back: an NPC asking only for currencies left out no longer counts.",
     "Base": "Only what is left to fetch, by origin",
     "BaseTip": "Replaces what is crafted by its ingredients, down to what is gathered, bought from an NPC, dropped by a monster or found otherwise. Crafted items in stock are used first.",
     "Gathering": "Gathering",

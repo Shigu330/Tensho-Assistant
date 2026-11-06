@@ -19,9 +19,11 @@ internal sealed partial class MainWindow
         if(!configuration.ListPanelsBase)return;
         ImGui.Indent();
         BoolSetting("ListPanels.Gathering","ListPanels.OriginTip",()=>configuration.ListPanelsGathering,value=>configuration.ListPanelsGathering=value,c=>c.ListPanelsGathering);
-        BoolSetting("ListPanels.Vendor","ListPanels.OriginTip",()=>configuration.ListPanelsVendor,value=>configuration.ListPanelsVendor=value,c=>c.ListPanelsVendor);
+        BoolSetting("ListPanels.Vendor","ListPanels.VendorTip",()=>configuration.ListPanelsVendor,value=>configuration.ListPanelsVendor=value,c=>c.ListPanelsVendor);
+        if(configuration.ListPanelsVendor)DrawListPanelCurrencies();
         BoolSetting("ListPanels.Monster","ListPanels.OriginTip",()=>configuration.ListPanelsMonster,value=>configuration.ListPanelsMonster=value,c=>c.ListPanelsMonster);
         BoolSetting("ListPanels.Other","ListPanels.OriginTip",()=>configuration.ListPanelsOther,value=>configuration.ListPanelsOther=value,c=>c.ListPanelsOther);
+        BoolSetting("ListPanels.Crystal","ListPanels.OriginTip",()=>configuration.ListPanelsCrystal,value=>configuration.ListPanelsCrystal=value,c=>c.ListPanelsCrystal);
         ImGui.Unindent();
     }
     private IReadOnlyList<WorkshopProject> workshopPanelShown=[];
@@ -86,6 +88,39 @@ internal sealed partial class MainWindow
         DrawListPanelEntries("Preparation",()=>CraftPlan.Build(recipe,configuration.PreparationPanelTarget,GetRecipeHoldings).Materials.Select(material=>(material.ItemId,material.Required)).ToArray());
     }
 
+    // 0.700 (user request): the currencies the vendors take, gil first; a click leaves one out or brings it back. Listed once per catalogue.
+    private (object? Catalog,(uint Id,string Name)[] Rows) listPanelCurrencies;
+    private HashSet<uint> listPanelCurrenciesOff=[];
+    private void DrawListPanelCurrencies()
+    {
+        var vendors=npcVendors?.State.Catalog;
+        if(vendors is null)return;
+        if(!ReferenceEquals(listPanelCurrencies.Catalog,vendors))
+        {
+            var items=itemCatalog.State.Catalog;
+            listPanelCurrencies=(vendors,vendors.Sales.SelectMany(sale=>sale.Costs).Select(cost=>cost.CurrencyItemId).Distinct()
+                .Select(id=>(id,items?.Find(id)?.Name ?? $"#{id}")).OrderBy(row=>row.id==1 ? 0:1).ThenBy(row=>row.Item2,StringComparer.CurrentCulture).ToArray());
+        }
+        var off=configuration.ListPanelsCurrenciesOff ?? [];
+        ImGui.SetNextItemWidth(280);
+        if(ImGui.BeginCombo("###ListPanelCurrencies",localization.Format("ListPanels.Currencies",off.Count)))
+        {
+            try
+            {
+                foreach(var (id,name) in listPanelCurrencies.Rows)
+                {
+                    var excluded=off.Contains(id);
+                    if(!ImGui.Selectable($"{(excluded ? "✗":"✓")} {name}##ListPanelCurrency{id}",false,ImGuiSelectableFlags.DontClosePopups))continue;
+                    configuration.ListPanelsCurrenciesOff=excluded ? off.Where(other=>other!=id).ToList():[..off,id];
+                    SaveReminders();
+                    off=configuration.ListPanelsCurrenciesOff;
+                }
+            }
+            finally{ImGui.EndCombo();}
+        }
+        Tip("ListPanels.CurrenciesTip");
+    }
+
     // W-09 (0.699): worked out at most once a second per panel, not on every frame.
     private readonly Dictionary<string,(long At,(uint Item,long Needed)[] Lines)> listPanelLines=[];
     private void DrawListPanelEntries(string key,Func<(uint Item,long Needed)[]> entries)
@@ -94,6 +129,7 @@ internal sealed partial class MainWindow
         if(!listPanelLines.TryGetValue(key,out var known) || now-known.At>1000)
         {
             var wanted=entries();
+            listPanelCurrenciesOff=(configuration.ListPanelsCurrenciesOff ?? []).ToHashSet();
             listPanelLines[key]=known=(now,configuration.ListPanelsBase ? BaseMaterials.Expand(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched).ToArray():wanted);
         }
         if(!configuration.ListPanelsBase)
@@ -106,21 +142,25 @@ internal sealed partial class MainWindow
             if(!ListPanelOriginShown(origin))continue;
             var lines=known.Lines.Where(line=>ListPanelOrigin(line.Item)==origin).ToArray();
             if(lines.Length==0)continue;
-            ImGui.TextDisabled(localization.Get("ListPanels."+origin));
+            // 0.700 (user request): a long list folds by category; each panel remembers its own.
+            var done=lines.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
+            if(!ImGui.CollapsingHeader($"{localization.Get("ListPanels."+origin)} ({done}/{lines.Length})###ListPanel{key}{origin}",ImGuiTreeNodeFlags.DefaultOpen))continue;
             foreach(var (item,needed) in lines)DrawListPanelLine(item,needed,GetRecipeHoldings(item));
         }
     }
     private long ListPanelStock(uint item){var held=GetRecipeHoldings(item);return held.HasObservation ? held.Total:0;}
     private RecipeDefinition? ListPanelRecipe(uint item)=>recipeCatalog.State.Catalog?.ForResult(item) is { Count:>0 } recipes ? PreferredRecipe(recipes):null;
     private bool ListPanelGathered(uint item)=>gatheringCatalog.State.Catalog?.ForItem(item) is { Count:>0 };
-    private bool ListPanelSold(uint item)=>npcVendors?.State.Catalog?.ForItem(item) is { Count:>0 };
+    private bool ListPanelSold(uint item)=>npcVendors?.State.Catalog?.ForItem(item) is { Count:>0 } offers
+        && BaseMaterials.VendorCounts(configuration.ListPanelsVendor,offers.Select(offer=>(IReadOnlyList<uint>)offer.Sale.Costs.Select(cost=>cost.CurrencyItemId).ToArray()),listPanelCurrenciesOff);
     private bool ListPanelFetched(uint item)=>ListPanelGathered(item) || ListPanelSold(item);
-    private ItemOrigin ListPanelOrigin(uint item)=>BaseMaterials.OriginOf(ListPanelGathered(item),ListPanelSold(item),lumina?.State.Data?.MonstersOf(item) is { Count:>0 });
+    private ItemOrigin ListPanelOrigin(uint item)=>ClassifyCrystal(item) is not null ? ItemOrigin.Crystal:BaseMaterials.OriginOf(ListPanelGathered(item),ListPanelSold(item),lumina?.State.Data?.MonstersOf(item) is { Count:>0 });
     private bool ListPanelOriginShown(ItemOrigin origin)=>origin switch
     {
         ItemOrigin.Gathering=>configuration.ListPanelsGathering,
         ItemOrigin.Vendor=>configuration.ListPanelsVendor,
         ItemOrigin.Monster=>configuration.ListPanelsMonster,
+        ItemOrigin.Crystal=>configuration.ListPanelsCrystal,
         _=>configuration.ListPanelsOther,
     };
 

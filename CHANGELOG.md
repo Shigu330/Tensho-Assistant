@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.700.0
+- Plan global, W-09 : Demandes de l'utilisateur : dans les panneaux, chaque provenance se replie, avec le nombre d'objets complets, et les cristaux ont leur propre catégorie. La case Vendeurs PNJ coupe les PNJ du calcul : ce qu'ils vendent descend à ses ingrédients ou passe sous une autre provenance. Une liste exclut des monnaies : un PNJ qui ne prend que celles-là ne compte plus. COMPILED et TESTED, non validé en jeu.
+- Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1246/1246, 0 avertissement, 0 erreur ; DLL 0.700.0.0. Non validé en jeu.
+### English
+- User requests: in the panels, each origin folds, with the count of complete items, and crystals have their own category. The NPC vendors box removes vendors from the calculation: what they sell goes down to its ingredients or under another origin. A list leaves currencies out: an NPC taking only those no longer counts. COMPILED and TESTED, not validated in game.
+
 ## 0.699.0
 - Plan global, W-09 : Demande de l'utilisateur : les panneaux à l'écran (atelier, préparation, liste de fabrication) ont une option « Seulement ce qui reste à récupérer, par provenance » : ce qui se fabrique est remplacé par ses ingrédients, jusqu'à ce qui se récolte, s'achète à un PNJ, tombe d'un monstre ou s'obtient autrement, avec une case par provenance. Un objet fabriqué qui s'achète ou se récolte reste tel quel. Les monstres viennent de LuminaSupplemental, donc de la source communautaire. COMPILED et TESTED, non validé en jeu.
 - Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1244/1244, 0 avertissement, 0 erreur ; DLL 0.699.0.0. Non validé en jeu.
