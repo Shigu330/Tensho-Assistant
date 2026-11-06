@@ -57,6 +57,16 @@ internal static class MapAside617Tests
             Check((quest with {RouteMap=695}).EntranceTarget(catalog) is null,"the game's own way first");
             Check((quest with {QuestLog=false,Target=null}).EntranceTarget(catalog) is null,"not for a plain opening");
         }),
+        ("Map request (0.638): a dungeon asked from the world map opens the way in, not its own map",() =>
+        {
+            var dungeon=new TenshoAssistant.Maps.MapDefinition(946,1248,"","Dungeon","",0,200);
+            var zone=new TenshoAssistant.Maps.MapDefinition(859,1189,"","Yak T'el","",0,100);
+            var catalog=new TenshoAssistant.Maps.MapCatalog([dungeon,zone]);
+            var request=new TenshoAssistant.Maps.GameMapRequest(919,919,1248,4,QuestLog:true,Target:new System.Numerics.Vector2(150,800),RouteMap:859,Route:new System.Numerics.Vector2(-528,671));
+            Check(request.Resolve(catalog)==859,"the game's way in, captured in the log");
+            Check(request.UsesRoute(zone),"centred on it");
+            Check((request with {Current=946}).Resolve(catalog)==946,"inside the dungeon: its own map");
+        }),
         ("Map request (0.637): a quest always adjusts the map and keeps the zoom",() =>
         {
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));

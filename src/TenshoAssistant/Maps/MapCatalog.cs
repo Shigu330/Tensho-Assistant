@@ -158,11 +158,11 @@ public sealed record GameMapRequest(uint Selected, uint Requested, uint Territor
         if (Target is not null && Requested != 0 && catalog.Find(Requested) is not null) return Requested;
         if (catalog.Find(Selected) is not null) return Selected == Current ? 0 : Selected;
         if (catalog.Find(Requested) is not null) return Requested;
+        // 0.633 (user capture): away from it, the game shows the way in. 0.638 (log, a dungeon's own map opened instead): before looking for a map of that territory.
+        var own = catalog.MapOf(Territory);
+        if (RouteMap != 0 && own != Current && catalog.Find(Current)?.TerritoryId != Territory && catalog.Find(RouteMap) is not null) return RouteMap;
         if (Territory != 0 && catalog.Entries.Where(map => map.TerritoryId == Territory).OrderBy(map => map.MapIndex).FirstOrDefault() is { } zone) return zone.MapId;
         // 0.628 (user capture): a request on the world map names the target's territory: open that territory's own map.
-        // 0.633 (user capture): away from it, the game shows the zone-change NPC that leads there.
-        var own = catalog.MapOf(Territory);
-        if (RouteMap != 0 && own != Current && catalog.Find(RouteMap) is not null) return RouteMap;
         if (catalog.Find(own) is not null) return own;
         return Selected;
     }

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.638.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : une quête de donjon ouvrait encore la carte du donjon, car une carte de ce territoire était trouvée avant le chemin donné par le jeu. Elle ouvre maintenant la carte de l'entrée, centrée sur le marqueur du jeu, comme les autres quêtes au-delà d'un changement de zone. À l'intérieur du donjon, sa propre carte.
+- Tests : Map request. Verify.ps1 (agent) : 1143/1143, 0 avertissement, 0 erreur ; DLL 0.638.0.0. Non validé en jeu.
+### English
+- Map (user report, log): a dungeon quest still opened the dungeon's map, because a map of that territory was found before the way given by the game. It now opens the entrance's map, centred on the game's marker, like other quests beyond a zone change. Inside the dungeon, its own map.
+
 ## 0.637.0
 - Plan global, phase 5 : Carte (demande de l'utilisateur) : depuis le journal de quêtes ou une quête active, la carte est ajustée à chaque fois et le zoom ne change plus. Elle se centre sur la quête, ou sur le milieu de la carte tant que rien n'est trouvé, au lieu de garder l'ancienne position puis d'afficher la carte entière. Les autres ouvertures, comme les liens du chat ou la recherche, gardent le réglage de zoom.
 - Tests : Map request. Verify.ps1 (agent) : 1142/1142, 0 avertissement, 0 erreur ; DLL 0.637.0.0. Non validé en jeu.

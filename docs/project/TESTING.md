@@ -918,6 +918,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.637) Cliquer plusieurs quêtes de zones différentes, dont une de donjon, depuis le journal et la liste des quêtes actives : la carte se centre à chaque fois, sans changer de zoom.
 
+- [ ] (0.638) Cliquer une quête de donjon : la carte de l'entrée s'ouvre, centrée sur le marqueur, comme pour la Ville fantôme.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
