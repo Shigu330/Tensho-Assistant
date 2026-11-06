@@ -222,6 +222,8 @@ Choisis par l'utilisateur à partir de la liste de rubriques d'un site français
 | W-02 | Grande Mascarade : épreuves faites et restantes, sans conseil de combat | Fait sans le jeu en 0.683 ; à comparer en jeu : `docs/evidence/0.683-masked-carnivale.md`. Défis hebdomadaires et récompenses plus tard |
 | W-03 | Armes reliques : progression par extension | Sondé : `RelicNote` et ses feuilles pour le livre des reliques ; à coder |
 | W-04 | Animaux de la Félicité insulaire | Demandé par l'utilisateur le 2026-11-06. Fait sans le jeu en 0.685 : onglet Pâturage, liste du wiki sur clic ; à comparer en jeu : `docs/evidence/0.685-island-animals.md`. Animaux présents maintenant et sur la carte plus tard |
+| W-05 | Panneaux à l'écran : matériaux du projet d'atelier et liste de préparation, réglables | Fait sans le jeu en 0.691 |
+| W-06 | « Que puis-je fabriquer ? » : trier par le plus rentable en gils, assignats ou autre | Demandé par l'utilisateur le 2026-11-06 ; à coder |
 
 ## Retenu pour plus tard
 

@@ -4220,6 +4220,9 @@
     "QueryTip": "Keeps the recipes whose crafted item name contains this text; case is ignored."
   },
   "PlanUi": {
+    "Panel": "Show this preparation on screen",
+    "PanelTip": "A small panel with this recipe's materials for the target, in stock over needed, out of combat. It follows the recipe and target shown here.",
+    "PanelTitle": "Preparation",
     "Stored": "{0}: {1}",
     "StoredCached": "{0}: {1} (read on {2})",
     "StoredNone": "Nothing found in your known storages.",
@@ -4747,6 +4750,9 @@
     "SquadronDone": "Finished: {0} (collect it at the barracks)"
   },
   "FreeCompany": {
+    "WorkshopPanel": "Show this project on screen",
+    "WorkshopPanelTip": "A small panel with the chosen project's materials, in stock over needed, out of combat. It follows the project chosen here.",
+    "WorkshopPanelTitle": "Project materials",
     "TabWorkshop": "Workshop",
     "WorkshopHelp": "The materials of each workshop project, part by part and phase by phase, against your stocks as read. What the workshop has already received is not read.",
     "WorkshopLoading": "Reading the projects…",

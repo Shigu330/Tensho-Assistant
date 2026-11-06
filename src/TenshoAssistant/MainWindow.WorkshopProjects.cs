@@ -33,6 +33,7 @@ internal sealed partial class MainWindow
         // 0.676 (user report): without this the stock column only knew what another page had read, so it showed a dash for everything.
         RefreshRecipeHoldingsCache();
         var projects=workshopProjects.Result;
+        if(workshopSelected==0)workshopSelected=configuration.WorkshopPanelProject;
         ImGui.SetNextItemWidth(260);
         ImGui.InputTextWithHint("##WorkshopSearch",localization.Get("FreeCompany.WorkshopSearch"),ref workshopSearch,100);
         Tip("FreeCompany.WorkshopSearchTip");
@@ -48,6 +49,8 @@ internal sealed partial class MainWindow
         ImGui.EndChild();
         if(projects.FirstOrDefault(project=>project.Id==workshopSelected) is not { } selected){ImGui.TextDisabled(localization.Get("FreeCompany.WorkshopPick"));return;}
         ImGui.TextColored(Accent,WorkshopName(selected));
+        if(configuration.WorkshopPanelProject!=selected.Id){configuration.WorkshopPanelProject=selected.Id;SaveReminders();}
+        BoolSetting("FreeCompany.WorkshopPanel","FreeCompany.WorkshopPanelTip",()=>configuration.WorkshopPanel,value=>configuration.WorkshopPanel=value,c=>c.WorkshopPanel);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("FreeCompany.WorkshopAll")+"###WorkshopAll"))
             DrawWorkshopMaterials("WorkshopTotals",selected.Totals().Select(total=>(total.Item,(string?)null,total.Total)));
         var partNumber=0;

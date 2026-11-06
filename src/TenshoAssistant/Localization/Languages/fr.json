@@ -4220,6 +4220,9 @@
     "QueryTip": "Garde les recettes dont le nom de l'objet fabriqué contient ce texte ; majuscules ignorées."
   },
   "PlanUi": {
+    "Panel": "Afficher cette préparation à l'écran",
+    "PanelTip": "Un petit panneau avec les matériaux de cette recette pour la quantité voulue, en stock sur requis, hors combat. Il suit la recette et la quantité affichées ici.",
+    "PanelTitle": "Préparation",
     "Stored": "{0} : {1}",
     "StoredCached": "{0} : {1} (relevé du {2})",
     "StoredNone": "Rien trouvé dans vos rangements connus.",
@@ -4747,6 +4750,9 @@
     "SquadronDone": "Terminé : {0} (à récupérer à la caserne)"
   },
   "FreeCompany": {
+    "WorkshopPanel": "Afficher ce projet à l'écran",
+    "WorkshopPanelTip": "Un petit panneau avec les matériaux du projet choisi, en stock sur requis, hors combat. Il suit le projet choisi ici.",
+    "WorkshopPanelTitle": "Matériaux du projet",
     "TabWorkshop": "Atelier",
     "WorkshopHelp": "Les matériaux de chaque projet de l'atelier, pièce par pièce et phase par phase, face à vos stocks relevés. Ce que l'atelier a déjà reçu n'est pas lu.",
     "WorkshopLoading": "Lecture des projets…",

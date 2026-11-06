@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.691.0
+- Plan global, W-05 : Demande de l'utilisateur : deux petits panneaux à l'écran, juste la liste des matériaux avec le stock sur le requis. Compagnie libre › Atelier : « Afficher ce projet à l'écran », qui suit le projet choisi. Artisanat › Préparation : « Afficher cette préparation à l'écran », qui suit la recette et la quantité. Masqués en combat, retenus entre deux sessions, désactivés par défaut. COMPILED et TESTED, non validé en jeu.
+- Tests : ListPanels691Tests. Verify.ps1 (agent) : 1227/1227, 0 avertissement, 0 erreur ; DLL 0.691.0.0. Non validé en jeu.
+### English
+- User request: two small on-screen panels, just the list of materials with stock over needed. Free Company > Workshop: show this project, following the chosen project. Crafting > Preparation: show this preparation, following recipe and target. Hidden in combat, kept between sessions, off by default. COMPILED and TESTED, not validated in game.
+
 ## 0.690.0
 - Plan global, Dresseur : Rapport de l'utilisateur : la page Dresseur ne disait pas où capturer les bêtes. Nouvelle colonne Capture : la zone ou le contenu, lus dans les feuilles du jeu, dans la langue du jeu, et la recherche les trouve. L'ennemi à capturer et ses coordonnées ne sont pas dans ces colonnes. Sens des colonnes déduit, à comparer au bestiaire du jeu. Île : la comparaison de l'utilisateur confirme la popularité, la disponibilité et l'évolution sur 14 créations, et les cycles de repos. COMPILED et TESTED, non validé en jeu pour la capture.
 - Tests : BeastPlaces688Tests. Verify.ps1 (agent) : 1225/1225, 0 avertissement, 0 erreur ; DLL 0.690.0.0. Non validé en jeu.

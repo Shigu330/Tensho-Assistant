@@ -60,6 +60,13 @@ internal sealed partial class MainWindow
         Tip("PlanUi.TargetTip");
         craftPlanTarget = Math.Clamp(craftPlanTarget, 1, 999999);
         var plan = CraftPlan.Build(recipe, craftPlanTarget, GetRecipeHoldings);
+        // W-05 (0.691): the on-screen list follows the recipe and the target shown here.
+        BoolSetting("PlanUi.Panel", "PlanUi.PanelTip", () => configuration.PreparationPanel, value => configuration.PreparationPanel = value, c => c.PreparationPanel);
+        if (configuration.PreparationPanel && (configuration.PreparationPanelRecipe != recipe.RecipeId || configuration.PreparationPanelTarget != craftPlanTarget))
+        {
+            configuration.PreparationPanelItem = recipe.ResultItemId; configuration.PreparationPanelRecipe = recipe.RecipeId; configuration.PreparationPanelTarget = craftPlanTarget;
+            SaveReminders();
+        }
         ImGui.TextColored(Accent, localization.Format("PlanUi.Summary",plan.Crafts.ToString("N0"),plan.Produced.ToString("N0")));
         if (plan.Produced > plan.Requested) ImGui.TextDisabled(localization.Format("PlanUi.Surplus",(plan.Produced-plan.Requested).ToString("N0")));
         if (plan.Materials.Count == 0)

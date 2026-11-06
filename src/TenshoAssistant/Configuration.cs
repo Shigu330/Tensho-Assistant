@@ -69,6 +69,8 @@ public static class ConfigurationReset
         "ItemSearchLimit",
         // 0.375 (g, M-05): on-screen « to do » panel.
         "TaskPanel",
+        // W-05 (0.691): on-screen lists.
+        "WorkshopPanel", "WorkshopPanelProject", "PreparationPanel", "PreparationPanelItem", "PreparationPanelRecipe", "PreparationPanelTarget",
         // 0.376 (g, M-06): wear alert, bar and thresholds.
         "GearWear",
         // 0.386 (g, X-10): clocks of other time zones.
@@ -555,6 +557,13 @@ public sealed partial class Configuration
     private List<Reminders.PersonalTask>? personalTasks;
     public List<Reminders.PersonalTask>? PersonalTasks { get=>Volatile.Read(ref personalTasks); set=>Volatile.Write(ref personalTasks,value); }
     public bool TaskPanel { get; set; }
+    // W-05 (0.691): the on-screen lists of a workshop project and of a crafting preparation, and what they show.
+    public bool WorkshopPanel { get; set; }
+    public uint WorkshopPanelProject { get; set; }
+    public bool PreparationPanel { get; set; }
+    public uint PreparationPanelItem { get; set; }
+    public uint PreparationPanelRecipe { get; set; }
+    public int PreparationPanelTarget { get; set; }
     // 0.448 (N-08, DEC-026): the garden journal (64 beds at most, durations typed by the player) and its chat reminders (on: the player
     // only gets them for beds they noted).
     private List<Reminders.GardenBed>? gardenBeds;
