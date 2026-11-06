@@ -212,6 +212,16 @@ Demande de l'utilisateur (2026-11-05) : tout remettre à jour une fois le plan c
 4. Tous les fichiers `.md` du dépôt, à jour puis en français et en anglais : l'anglais toujours en premier, avec une mention en français disant que la traduction est en bas.
 5. Sur Git, tout en anglais si possible : messages de commit, issues, releases et ce que GitHub affiche.
 
+## Sujets ajoutés le 2026-11-06
+
+Choisis par l'utilisateur à partir de la liste de rubriques d'un site français. Aucune donnée de ce site : voir [REFERENCES](REFERENCES.md). Tout vient des feuilles et des structures du jeu.
+
+| Point | Sujet | État |
+|---|---|---|
+| W-01 | Page Commandes spéciales : clients, rang, points, semaine | Fait sans le jeu en 0.675 ; à comparer en jeu : `docs/evidence/0.675-custom-deliveries.md`. Récompenses par rang à ajouter |
+| W-02 | Grande Mascarade : épreuves faites et restantes, sans conseil de combat | Sondé : feuilles `AozContent`, `AozArrangement` ; à coder |
+| W-03 | Armes reliques : progression par extension | Sondé : `RelicNote` et ses feuilles pour le livre des reliques ; à coder |
+
 ## Retenu pour plus tard
 
 Demande de l'utilisateur (2026-11-06) : à garder, sans y travailler pour l'instant ; ne pas le commencer sans sa demande.

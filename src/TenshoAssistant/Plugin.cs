@@ -712,6 +712,21 @@ public sealed class Plugin : IDalamudPlugin
                 try{return Island.IslandReader.Read(catalog);}
                 catch(Exception error){log.Warning(error,"Island unreadable (game update?).");throw;}
             });
+            // W-01 (0.675): the custom delivery clients, read when the page opens and on the player's click.
+            mainWindow.DeliveryClientsLoad=()=>
+            {
+                try{return Deliveries.DeliveryClientLoader.Read(data);}
+                catch(Exception error){log.Warning(error,"Custom delivery sheets unreadable (game update?).");return null;}
+            };
+            mainWindow.ReadDeliveries=clients=>framework.RunOnFrameworkThread(()=>
+            {
+                try
+                {
+                    var quests=data.GetExcelSheet<Lumina.Excel.Sheets.Quest>();
+                    return Deliveries.DeliveryReader.Read(clients,id=>quests.TryGetRow(id,out var quest) && unlocks.IsQuestCompleted(quest));
+                }
+                catch(Exception error){log.Warning(error,"Custom deliveries unreadable (game update?).");throw;}
+            });
             // N-12 (0.670): names of the S rank conditions, in the game's language.
             mainWindow.SRankMarkName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().GetRowOrDefault(id)?.Singular.ExtractText();
             mainWindow.SRankZoneName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id)?.PlaceName.ValueNullable?.Name.ExtractText();

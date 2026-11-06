@@ -251,6 +251,10 @@
     "IslandSanctuaryPurpose": "Your workshops' crafts with their estimated value, from what the game has loaded on your island.",
     "IslandSanctuaryStart": "On your island, open the workshops' agenda in the game, then press Read the island.",
     "IslandSanctuaryEmpty": "Nothing is read until you press the button: Tensho asks the server for nothing and schedules nothing.",
+    "CustomDeliveriesTitle": "Custom deliveries",
+    "CustomDeliveriesPurpose": "Your custom delivery clients: rank, points and what each one still takes this week.",
+    "CustomDeliveriesStart": "Open the page: Tensho copies what the game already holds. Read again after a delivery.",
+    "CustomDeliveriesEmpty": "Nothing shows until your character is loaded.",
     "OceanFishingTitle": "Ocean fishing",
     "OceanFishingPurpose": "The next departures from Limsa Lominsa and Kugane, with their stops and the time of day.",
     "OceanFishingStart": "Read the next departure and its route. During a voyage, the fishing help shows the stop and its fish.",
@@ -526,6 +530,7 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "Navigation": {
+    "CustomDeliveries": "Custom deliveries",
     "IslandSanctuary": "Island sanctuary",
     "Help": "Help",
     "Beastmaster": "Beastmaster",
@@ -6086,6 +6091,26 @@
     "Leves": "Start battlecraft leves.",
     "SecondWeather": "Appears 6 minutes into the second window of {0} in a row.",
     "Cliffs": "Fall from cliffs down to 1 HP."
+  },
+  "CustomDeliveries": {
+    "Title": "Custom deliveries",
+    "Subtitle": "Your clients, from what the game holds.",
+    "Help": "What the game holds for your character. Tensho asks the server for nothing and hands nothing in. This week's requested items are not shown: the game only gives them in the client's own window.",
+    "Read": "Read again",
+    "ReadTip": "Copies what the game holds, once. No request and no action in the game.",
+    "SheetsUnavailable": "The clients' sheets could not be read, perhaps after a game update.",
+    "Unavailable": "The deliveries could not be read, perhaps after a game update.",
+    "NotLoaded": "Your character is not loaded yet: read again in a moment.",
+    "Week": "Deliveries left this week: {0}. Renewed on {1}.",
+    "ColumnClient": "Client",
+    "ColumnPlace": "Place",
+    "ColumnLevel": "Level",
+    "ColumnRank": "Rank",
+    "ColumnPoints": "Points",
+    "ColumnWeek": "This week",
+    "Locked": "Not unlocked",
+    "PointsOf": "{0} / {1}",
+    "WeekOf": "{0} / {1}"
   },
   "Island": {
     "Propose": "Propose an agenda",

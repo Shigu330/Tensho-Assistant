@@ -251,6 +251,10 @@
     "IslandSanctuaryPurpose": "Les créations de vos ateliers avec leur valeur estimée, à partir de ce que le jeu a chargé sur votre île.",
     "IslandSanctuaryStart": "Sur votre île, ouvrez l'agenda des ateliers dans le jeu, puis appuyez sur Lire l'île.",
     "IslandSanctuaryEmpty": "Rien n'est lu avant d'appuyer sur le bouton : Tensho ne demande rien au serveur et ne programme rien.",
+    "CustomDeliveriesTitle": "Commandes spéciales",
+    "CustomDeliveriesPurpose": "Vos clients des commandes spéciales : rang, points et ce que chacun prend encore cette semaine.",
+    "CustomDeliveriesStart": "Ouvrez la page : Tensho copie ce que le jeu détient déjà. Lisez de nouveau après une livraison.",
+    "CustomDeliveriesEmpty": "Rien ne s'affiche tant que votre personnage n'est pas chargé.",
     "OceanFishingTitle": "Pêche en mer",
     "OceanFishingPurpose": "Les prochains départs de Limsa Lominsa et de Kugane, avec leurs escales et le moment de la journée.",
     "OceanFishingStart": "Lisez le prochain départ et son trajet. Pendant une traversée, l'aide à la pêche donne l'escale et ses poissons.",
@@ -526,6 +530,7 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "Navigation": {
+    "CustomDeliveries": "Commandes spéciales",
     "IslandSanctuary": "Île sanctuaire",
     "Help": "Aide",
     "Beastmaster": "Dresseur",
@@ -6086,6 +6091,26 @@
     "Leves": "Lancez des mandats de combat.",
     "SecondWeather": "Apparaît 6 minutes après le début de la deuxième période de {0} de suite.",
     "Cliffs": "Tombez de falaises jusqu'à 1 PV."
+  },
+  "CustomDeliveries": {
+    "Title": "Commandes spéciales",
+    "Subtitle": "Vos clients, à partir de ce que le jeu détient.",
+    "Help": "Ce que le jeu détient pour votre personnage. Tensho ne demande rien au serveur et ne livre rien. Les objets demandés cette semaine ne sont pas affichés : le jeu ne les donne que dans la fenêtre du client.",
+    "Read": "Lire de nouveau",
+    "ReadTip": "Copie une fois ce que le jeu détient. Aucune requête et aucune action dans le jeu.",
+    "SheetsUnavailable": "Les feuilles des clients n'ont pas pu être lues, peut-être après une mise à jour du jeu.",
+    "Unavailable": "Les commandes n'ont pas pu être lues, peut-être après une mise à jour du jeu.",
+    "NotLoaded": "Votre personnage n'est pas encore chargé : lisez de nouveau dans un instant.",
+    "Week": "Livraisons restantes cette semaine : {0}. Renouvellement le {1}.",
+    "ColumnClient": "Client",
+    "ColumnPlace": "Lieu",
+    "ColumnLevel": "Niveau",
+    "ColumnRank": "Rang",
+    "ColumnPoints": "Points",
+    "ColumnWeek": "Cette semaine",
+    "Locked": "Non débloqué",
+    "PointsOf": "{0} / {1}",
+    "WeekOf": "{0} / {1}"
   },
   "Island": {
     "Propose": "Proposer un agenda",
