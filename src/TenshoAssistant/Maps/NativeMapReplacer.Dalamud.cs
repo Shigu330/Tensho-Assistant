@@ -188,10 +188,11 @@ internal sealed class NativeMapReplacer : IDisposable
             }
             quest=agent->CurrentOpenMapInfo.QuestId;aetheryte=agent->CurrentOpenMapInfo.AetheryteId;fate=agent->CurrentOpenMapInfo.FateId;
         }
-        if(log)this.log.Information("Game map hosted: type {0}, map {1}, territory {2}, selected {3}, quest {4}, aetheryte {5}, fate {6}, target {7}.",type,requested,territory,selected,quest,aetheryte,fate,target?.ToString() ?? "none");
+        var title=questLog && agent!=null ? MapLiveReader.TooltipText(&agent->CurrentOpenMapInfo.TitleString):"";
+        if(log)this.log.Information("Game map hosted: type {0}, map {1}, territory {2}, selected {3}, quest {4}, aetheryte {5}, fate {6}, target {7}, title \"{8}\".",type,requested,territory,selected,quest,aetheryte,fate,target?.ToString() ?? "none",title);
         var route=questLog && agent!=null ? FindRoute(agent):(0u,null,0u);
         if(log && route.MapId!=0)this.log.Information("Game map route: event marker on map {0} at {1}.",route.MapId,route.Position?.ToString() ?? "none");
-        return (new(selected,requested,territory,client.MapId,quest,aetheryte,fate,questLog,target,targetIcon,route.MapId,route.Position,route.Icon),$"{type}|{requested}|{territory}|{quest}|{aetheryte}|{fate}|{target}");
+        return (new(selected,requested,territory,client.MapId,quest,aetheryte,fate,questLog,target,targetIcon,route.MapId,route.Position,route.Icon,title),$"{type}|{requested}|{territory}|{quest}|{aetheryte}|{fate}|{target}");
     }
     // 0.633 (log, docs/evidence/0.633-quest-route.md): a quest beyond a zone-change NPC has its event marker on that NPC, under the quest's name.
     private static unsafe (uint MapId,System.Numerics.Vector2? Position,uint Icon) FindRoute(AgentMap* agent)

@@ -12,6 +12,8 @@ public static class MapLeves
     public const uint AreaIcon=60492;
     /// <summary>The sheet writes « x : y », the tooltip « x: y » and may start with a glyph: only letters and digits are compared.</summary>
     public static string Key(string name)=>string.Concat(name.Where(char.IsLetterOrDigit)).ToLowerInvariant();
+    /// <summary>0.655 (user report): a journal target on a leve goes with the leve. Not known (no list read, or not a leve): it stays.</summary>
+    public static bool TargetGone(string? leve,IReadOnlySet<string>? accepted)=>leve is { Length:>0 } && accepted is not null && !accepted.Contains(leve);
     public static bool Is(uint icon,byte markerType,string tooltip,IReadOnlySet<string>? names)
         =>markerType!=3 && (icon==AreaIcon || tooltip.Length>0 && names?.Contains(Key(tooltip))==true);
 }

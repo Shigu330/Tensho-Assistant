@@ -83,6 +83,18 @@ internal static class MapLabels596Tests
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(0,costs),"not an aetheryte");
             Check(!TenshoAssistant.Maps.MapLabels.NotAttuned(9,null) && !TenshoAssistant.Maps.MapLabels.NotAttuned(9,new Dictionary<uint,uint>()),"unknown says nothing");
         }),
+        ("Leve target (0.655): goes with the leve, stays when nothing is known",() =>
+        {
+            var key=TenshoAssistant.Maps.MapLeves.Key("Grosse récolte : pierre");
+            Check(TenshoAssistant.Maps.MapLeves.TargetGone(key,new HashSet<string>()),"no longer accepted");
+            Check(!TenshoAssistant.Maps.MapLeves.TargetGone(key,new HashSet<string>{key}),"still accepted");
+            Check(!TenshoAssistant.Maps.MapLeves.TargetGone(key,null),"list not read");
+            Check(!TenshoAssistant.Maps.MapLeves.TargetGone(null,new HashSet<string>()),"not a leve's target");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
+            Check(view.Contains("MapLeves.TargetGone(mapGameTargetLeve,") && view.Contains("LeveKeyOf(focus.Title)"),"wired");
+            var plain=new TenshoAssistant.Maps.GameMapRequest(1,2,3,4,Title:"x").Plain();
+            Check(plain.Title.Length==0,"a plain request has no title");
+        }),
         ("Leve areas (0.654): remembered while the leve is accepted, replaced by a new read, gone with the leve",() =>
         {
             var memory=new TenshoAssistant.Maps.LeveAreaMemory<string>();

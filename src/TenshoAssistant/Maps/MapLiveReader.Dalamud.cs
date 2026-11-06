@@ -295,6 +295,10 @@ internal sealed class MapLiveReader : IDisposable
     private static IReadOnlySet<string>? leveNames;
     private static IReadOnlyDictionary<uint,string>? leveKeys;
     private static readonly LeveAreaMemory<MapEventMarker> leveAreas=new();
+    /// <summary>0.655: the accepted leves, as read with the markers (null = not read).</summary>
+    internal static IReadOnlySet<string>? AcceptedLeves { get; private set; }
+    /// <summary>0.655: the key of a leve's name, or null when this text names none.</summary>
+    internal static string? LeveKeyOf(string title)=>MapLeves.Key(title) is var key && leveNames?.Contains(key)==true ? key:null;
     /// <summary>0.654: the areas of the leves still accepted, remembered; those of a leve no longer accepted go. Unknown (no reader): the markers as read.</summary>
     private static unsafe IReadOnlyList<MapEventMarker> WithLeveAreas(IReadOnlyList<MapEventMarker> markers)
     {
@@ -302,6 +306,7 @@ internal sealed class MapLiveReader : IDisposable
         if(quests==null || leveKeys is null || leveNames is null)return markers;
         var accepted=new HashSet<string>();
         foreach(ref var leve in quests->LeveQuests)if(leve.LeveId!=0 && leveKeys.TryGetValue(leve.LeveId,out var name))accepted.Add(name);
+        AcceptedLeves=accepted;
         var named=markers.Where(marker=>marker.IsLeve).Select(marker=>(Marker:marker,Key:MapLeves.Key(marker.Tooltip))).Where(entry=>leveNames.Contains(entry.Key)).ToArray();
         var extras=leveAreas.Update(named.Select(entry=>(entry.Marker.MapId,entry.Key,entry.Marker)),accepted);
         var gone=named.Where(entry=>!accepted.Contains(entry.Key)).Select(entry=>entry.Marker).ToHashSet();

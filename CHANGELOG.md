@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.655.0
+- Plan global, 0.655 : Carte : le repère noir au bord, la cible du journal sur un mandat, part quand le jeu ne liste plus le mandat. Il reste sinon jusqu'à ce qu'on le retire à la main, comme avant. Le lien passe par le titre de la demande de carte du jeu, écrit maintenant au journal : qu'il soit bien le nom du mandat reste à voir en jeu.
+- Tests : Leve target. Verify.ps1 (agent) : 1156/1156, 0 avertissement, 0 erreur ; DLL 0.655.0.0. Non validé en jeu.
+### English
+- Map: the dark edge badge, the journal's target on a leve, goes when the game no longer lists the leve. Otherwise it stays until removed by hand, as before. The link goes through the title of the game's map request, now written to the log: that it is the leve's name remains to be seen in game.
+
 ## 0.654.0
 - Plan global, 0.654 : Carte : la zone d'un mandat reste affichée quand vous n'y êtes pas, y compris depuis une autre zone, une fois que le jeu l'a donnée. Tensho la garde, carte par carte, tant que le jeu liste le mandat comme accepté, et l'oublie dès qu'il ne l'est plus, par exemple s'il est abandonné. Une zone jamais vue depuis le dernier chargement ne peut pas s'afficher : rien n'est sauvegardé. La capture écrit aussi l'état des mandats acceptés.
 - Tests : Leve areas. Verify.ps1 (agent) : 1155/1155, 0 avertissement, 0 erreur ; DLL 0.654.0.0. Non validé en jeu.

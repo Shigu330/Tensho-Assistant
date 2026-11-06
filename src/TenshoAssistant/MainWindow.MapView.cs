@@ -917,6 +917,7 @@ internal sealed partial class MainWindow
     // next game request, since closing the game map would otherwise lose it.
     private (uint MapId,Vector2 World,uint Icon,uint QuestId)? mapGameTarget;
     private Quests.QuestState? mapGameTargetQuests;
+    private string? mapGameTargetLeve;
     private DateTimeOffset mapGameTargetSince,mapGameTargetRefresh;
 
     // 0.243 (R-01): a journal target belongs to its quest; once that quest is no longer active (completed or abandoned), the
@@ -924,6 +925,8 @@ internal sealed partial class MainWindow
     // is shown; only a list observed after the target was set (not the disk cache) may remove it. Nothing is scanned per frame.
     private void ExpireGameTarget()
     {
+        // 0.655 (user report): a leve's target has no quest; it goes when the game no longer lists the leve.
+        if(mapGameTarget is not null && TenshoAssistant.Maps.MapLeves.TargetGone(mapGameTargetLeve,TenshoAssistant.Maps.MapLiveReader.AcceptedLeves)){mapGameTarget=null;mapGameTargetLeve=null;return;}
         if(mapGameTarget is not { QuestId: not 0 } target)return;
         var now=DateTimeOffset.UtcNow;
         if(now>=mapGameTargetRefresh){mapGameTargetRefresh=now.AddMinutes(1);quests.RequestRefresh();}
@@ -1012,6 +1015,7 @@ internal sealed partial class MainWindow
                 // 0.636 (user report): the icon stays on the way there, even once the game has forgotten its marker.
                 mapGameTarget=focus.UsesRoute(map) && focus.Route is { } way && focus.RouteIcon!=0 ? (map.MapId,way,focus.RouteIcon,focus.QuestId):focus.Target is { } world && focus.TargetIcon!=0 && map.TerritoryId!=0 && !focus.UsesRoute(map) && (maps.State.Catalog is not { } shownCatalog || focus.EntranceTarget(shownCatalog) is null) ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
                 mapGameTargetQuests=null;mapGameTargetSince=DateTimeOffset.UtcNow;mapGameTargetRefresh=default;
+                mapGameTargetLeve=focus.QuestId==0 ? TenshoAssistant.Maps.MapLiveReader.LeveKeyOf(focus.Title):null;
                 mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(mapZoom);mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
                 log.Information("Map focus found on map {0} for quest {1}, aetheryte {2}, FATE {3}.",map.MapId,focus.QuestId,focus.AetheryteId,focus.FateId);
             }
