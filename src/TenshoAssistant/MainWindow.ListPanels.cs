@@ -2,6 +2,7 @@ using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Craft;
 using TenshoAssistant.FreeCompany;
+using TenshoAssistant.Npcs;
 
 namespace TenshoAssistant;
 
@@ -88,9 +89,11 @@ internal sealed partial class MainWindow
         DrawListPanelEntries("Preparation",()=>CraftPlan.Build(recipe,configuration.PreparationPanelTarget,GetRecipeHoldings).Materials.Select(material=>(material.ItemId,material.Required)).ToArray());
     }
 
-    // 0.700 (user request): the currencies the vendors take, gil first; a click leaves one out or brings it back. Listed once per catalogue.
+    // 0.701 (user request): the currencies the vendors take, gil first, none ticked at the start, with a search by name. Listed once per catalogue.
+    // Left out: 0, a currency the game encodes and nothing resolves, and rows with no name in the game's sheet (8223): offers in them never count.
     private (object? Catalog,(uint Id,string Name)[] Rows) listPanelCurrencies;
-    private HashSet<uint> listPanelCurrenciesOff=[];
+    private HashSet<uint> listPanelCurrenciesOn=[];
+    private string listPanelCurrencySearch="";
     private void DrawListPanelCurrencies()
     {
         var vendors=npcVendors?.State.Catalog;
@@ -98,22 +101,40 @@ internal sealed partial class MainWindow
         if(!ReferenceEquals(listPanelCurrencies.Catalog,vendors))
         {
             var items=itemCatalog.State.Catalog;
-            listPanelCurrencies=(vendors,vendors.Sales.SelectMany(sale=>sale.Costs).Select(cost=>cost.CurrencyItemId).Distinct()
-                .Select(id=>(id,items?.Find(id)?.Name ?? $"#{id}")).OrderBy(row=>row.id==1 ? 0:1).ThenBy(row=>row.Item2,StringComparer.CurrentCulture).ToArray());
+            string Name(uint id)
+            {
+                if(id!=NpcCost.CompanyCredits)return items?.Find(id)?.Name ?? "";
+                var credits=localization.Get("NpcUi.CompanyCredits");
+                return credits.Length>0 ? char.ToUpper(credits[0],System.Globalization.CultureInfo.CurrentCulture)+credits[1..]:credits;
+            }
+            listPanelCurrencies=(vendors,vendors.Sales.SelectMany(sale=>sale.Costs).Select(cost=>cost.CurrencyItemId).Distinct().Where(id=>id!=0)
+                .Select(id=>(id,Name(id))).Where(row=>row.Item2.Length>0).OrderBy(row=>row.id==1 ? 0:1).ThenBy(row=>row.Item2,StringComparer.CurrentCulture).ToArray());
         }
-        var off=configuration.ListPanelsCurrenciesOff ?? [];
+        var on=configuration.ListPanelsCurrenciesOn ?? [];
         ImGui.SetNextItemWidth(280);
-        if(ImGui.BeginCombo("###ListPanelCurrencies",localization.Format("ListPanels.Currencies",off.Count)))
+        if(ImGui.BeginCombo("###ListPanelCurrencies",localization.Format("ListPanels.Currencies",on.Count)))
         {
             try
             {
-                foreach(var (id,name) in listPanelCurrencies.Rows)
+                ImGui.SetNextItemWidth(-1);
+                ImGui.InputTextWithHint("###ListPanelCurrencySearch",localization.Get("ListPanels.CurrencySearch"),ref listPanelCurrencySearch,60);
+                Tip("ListPanels.CurrencySearchTip");
+                var shown=listPanelCurrencies.Rows.Where(row=>listPanelCurrencySearch.Length==0 || row.Name.Contains(listPanelCurrencySearch,StringComparison.CurrentCultureIgnoreCase)).ToArray();
+                if(ImGui.SmallButton(localization.Get("ListPanels.CurrencyNone")))
                 {
-                    var excluded=off.Contains(id);
-                    if(!ImGui.Selectable($"{(excluded ? "✗":"✓")} {name}##ListPanelCurrency{id}",false,ImGuiSelectableFlags.DontClosePopups))continue;
-                    configuration.ListPanelsCurrenciesOff=excluded ? off.Where(other=>other!=id).ToList():[..off,id];
-                    SaveReminders();
-                    off=configuration.ListPanelsCurrenciesOff;
+                    configuration.ListPanelsCurrenciesOn=[];SaveReminders();on=configuration.ListPanelsCurrenciesOn;
+                }
+                Tip("ListPanels.CurrencyNoneTip");
+                foreach(var (id,name) in shown)
+                {
+                    var ticked=on.Contains(id);
+                    if(ImGui.Checkbox($"{name}###ListPanelCurrency{id}",ref ticked))
+                    {
+                        configuration.ListPanelsCurrenciesOn=ticked ? [..on,id]:on.Where(other=>other!=id).ToList();
+                        SaveReminders();
+                        on=configuration.ListPanelsCurrenciesOn;
+                    }
+                    Tip("ListPanels.CurrenciesTip");
                 }
             }
             finally{ImGui.EndCombo();}
@@ -129,7 +150,7 @@ internal sealed partial class MainWindow
         if(!listPanelLines.TryGetValue(key,out var known) || now-known.At>1000)
         {
             var wanted=entries();
-            listPanelCurrenciesOff=(configuration.ListPanelsCurrenciesOff ?? []).ToHashSet();
+            listPanelCurrenciesOn=(configuration.ListPanelsCurrenciesOn ?? []).ToHashSet();
             listPanelLines[key]=known=(now,configuration.ListPanelsBase ? BaseMaterials.Expand(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched).ToArray():wanted);
         }
         if(!configuration.ListPanelsBase)
@@ -152,7 +173,7 @@ internal sealed partial class MainWindow
     private RecipeDefinition? ListPanelRecipe(uint item)=>recipeCatalog.State.Catalog?.ForResult(item) is { Count:>0 } recipes ? PreferredRecipe(recipes):null;
     private bool ListPanelGathered(uint item)=>gatheringCatalog.State.Catalog?.ForItem(item) is { Count:>0 };
     private bool ListPanelSold(uint item)=>npcVendors?.State.Catalog?.ForItem(item) is { Count:>0 } offers
-        && BaseMaterials.VendorCounts(configuration.ListPanelsVendor,offers.Select(offer=>(IReadOnlyList<uint>)offer.Sale.Costs.Select(cost=>cost.CurrencyItemId).ToArray()),listPanelCurrenciesOff);
+        && BaseMaterials.VendorCounts(configuration.ListPanelsVendor,offers.Select(offer=>(IReadOnlyList<uint>)offer.Sale.Costs.Select(cost=>cost.CurrencyItemId).ToArray()),listPanelCurrenciesOn);
     private bool ListPanelFetched(uint item)=>ListPanelGathered(item) || ListPanelSold(item);
     private ItemOrigin ListPanelOrigin(uint item)=>ClassifyCrystal(item) is not null ? ItemOrigin.Crystal:BaseMaterials.OriginOf(ListPanelGathered(item),ListPanelSold(item),lumina?.State.Data?.MonstersOf(item) is { Count:>0 });
     private bool ListPanelOriginShown(ItemOrigin origin)=>origin switch

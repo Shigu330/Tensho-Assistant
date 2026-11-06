@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.701.0
+- Plan global, W-09 : Rapport et demande de l'utilisateur : la liste des monnaies montrait des numéros. #0 est une monnaie que le jeu code et que rien ne résout, #8223 une ligne sans nom dans la feuille du jeu : ils sortent de la liste et leurs offres ne comptent pas. #4294905804 est le code interne de Tensho pour les crédits de compagnie, maintenant nommés. La liste part tout décochée, avec une recherche par nom et « Tout décocher » : un PNJ ne compte que si toutes les monnaies qu'il demande sont cochées. COMPILED et TESTED, non validé en jeu.
+- Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1247/1247, 0 avertissement, 0 erreur ; DLL 0.701.0.0. Non validé en jeu.
+### English
+- User report and request: the currency list showed numbers. #0 is a currency the game encodes and nothing resolves, #8223 a row with no name in the game's sheet: they leave the list and their offers do not count. #4294905804 is Tensho's own code for company credits, now named. The list starts all unticked, with a name search and Untick all: an NPC counts only if every currency it asks for is ticked. COMPILED and TESTED, not validated in game.
+
 ## 0.700.0
 - Plan global, W-09 : Demandes de l'utilisateur : dans les panneaux, chaque provenance se replie, avec le nombre d'objets complets, et les cristaux ont leur propre catégorie. La case Vendeurs PNJ coupe les PNJ du calcul : ce qu'ils vendent descend à ses ingrédients ou passe sous une autre provenance. Une liste exclut des monnaies : un PNJ qui ne prend que celles-là ne compte plus. COMPILED et TESTED, non validé en jeu.
 - Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1246/1246, 0 avertissement, 0 erreur ; DLL 0.700.0.0. Non validé en jeu.

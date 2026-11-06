@@ -10,9 +10,9 @@ public static class BaseMaterials
     /// <summary>How deep recipes are followed; the recursion stops here whatever the game's data holds.</summary>
     public const int MaxDepth=8;
 
-    /// <summary>0.700 (user request): an offer counts unless it costs a currency the player left out, or the vendors are off altogether. No cost read: it counts.</summary>
-    public static bool VendorCounts(bool vendorsOn,IEnumerable<IReadOnlyList<uint>> offersCurrencies,IReadOnlySet<uint> currenciesOff)=>
-        vendorsOn && offersCurrencies.Any(currencies=>!currencies.Any(currenciesOff.Contains));
+    /// <summary>0.701 (user request): an offer counts when the player ticked every currency it costs. None ticked at the start; an offer with no cost read, or a currency the game encodes (0), does not count.</summary>
+    public static bool VendorCounts(bool vendorsOn,IEnumerable<IReadOnlyList<uint>> offersCurrencies,IReadOnlySet<uint> currenciesOn)=>
+        vendorsOn && offersCurrencies.Any(currencies=>currencies.Count>0 && currencies.All(currenciesOn.Contains));
 
     public static ItemOrigin OriginOf(bool gathered,bool sold,bool dropped)=>gathered ? ItemOrigin.Gathering:sold ? ItemOrigin.Vendor:dropped ? ItemOrigin.Monster:ItemOrigin.Other;
 

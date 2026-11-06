@@ -6197,10 +6197,14 @@
     "Left": "Not cleared"
   },
   "ListPanels": {
+    "Currencies": "Vendor currencies ({0} ticked)",
+    "CurrenciesTip": "An NPC counts only if you ticked every currency it asks for. None is ticked at the start: tick Gil to count what is bought with gil.",
+    "CurrencySearch": "Currency name…",
+    "CurrencySearchTip": "Part of the currency name.",
+    "CurrencyNone": "Untick all",
+    "CurrencyNoneTip": "Unticks every currency.",
+    "VendorTip": "Counts what NPCs sell, for the currencies ticked below. Off: vendors are ignored altogether.",
     "Crystal": "Crystals",
-    "VendorTip": "Counts what NPCs sell. Off: vendors are ignored altogether: what they sell goes down to its ingredients, or under another origin.",
-    "Currencies": "Vendor currencies ({0} left out)",
-    "CurrenciesTip": "A click leaves a currency out or brings it back: an NPC asking only for currencies left out no longer counts.",
     "Base": "Only what is left to fetch, by origin",
     "BaseTip": "Replaces what is crafted by its ingredients, down to what is gathered, bought from an NPC, dropped by a monster or found otherwise. Crafted items in stock are used first.",
     "Gathering": "Gathering",

@@ -1042,6 +1042,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.700) Panneau en mode provenance : replier une catégorie ; décocher Vendeurs PNJ : les lignes doivent changer ; exclure une monnaie : seuls les objets qu'elle seule achète changent.
 
+- [ ] (0.701) Monnaies des vendeurs : plus de numéros, tout décoché au départ, la recherche filtre ; cocher Gil doit remplir Vendeurs PNJ ; rien de coché : plus aucun PNJ.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

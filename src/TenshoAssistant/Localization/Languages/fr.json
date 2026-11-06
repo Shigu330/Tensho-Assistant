@@ -6197,10 +6197,14 @@
     "Left": "Non réussi"
   },
   "ListPanels": {
+    "Currencies": "Monnaies des vendeurs ({0} cochées)",
+    "CurrenciesTip": "Un PNJ ne compte que si vous avez coché toutes les monnaies qu'il demande. Aucune n'est cochée au départ : cochez Gil pour compter ce qui s'achète en gils.",
+    "CurrencySearch": "Nom de la monnaie…",
+    "CurrencySearchTip": "Partie du nom de la monnaie.",
+    "CurrencyNone": "Tout décocher",
+    "CurrencyNoneTip": "Décoche toutes les monnaies.",
+    "VendorTip": "Compte ce que vendent les PNJ, pour les monnaies cochées ci-dessous. Désactivé : ils ne sont plus pris en compte du tout.",
     "Crystal": "Cristaux",
-    "VendorTip": "Compte ce que vendent les PNJ. Désactivé : ils ne sont plus pris en compte du tout : ce qu'ils vendent descend à ses ingrédients, ou passe sous une autre provenance.",
-    "Currencies": "Monnaies des vendeurs ({0} exclues)",
-    "CurrenciesTip": "Un clic exclut une monnaie ou la remet : un PNJ qui ne prend que des monnaies exclues ne compte plus.",
     "Base": "Seulement ce qui reste à récupérer, par provenance",
     "BaseTip": "Remplace ce qui se fabrique par ses ingrédients, jusqu'à ce qui se récolte, s'achète à un PNJ, tombe d'un monstre ou s'obtient autrement. Les objets fabriqués en stock comptent d'abord.",
     "Gathering": "Récolte",

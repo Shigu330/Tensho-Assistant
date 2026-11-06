@@ -38,15 +38,24 @@ internal static class BaseMaterials699Tests
             Check(BaseMaterials.OriginOf(true,true,true)==ItemOrigin.Gathering && BaseMaterials.OriginOf(false,true,true)==ItemOrigin.Vendor,"order");
             Check(BaseMaterials.OriginOf(false,false,true)==ItemOrigin.Monster && BaseMaterials.OriginOf(false,false,false)==ItemOrigin.Other,"rest");
         }),
-        ("Vendors: off altogether, or by currency: an offer in a currency still on keeps the item",() =>
+        ("Vendors: nothing ticked at the start, an offer counts when every currency it costs is ticked",() =>
         {
-            IReadOnlyList<uint>[] tomes=[[28u]];IReadOnlyList<uint>[] both=[[28u],[1u]];IReadOnlyList<uint>[] free=[[]];
-            var off=new HashSet<uint>{28};
-            Check(BaseMaterials.VendorCounts(true,tomes,new HashSet<uint>()),"on");
-            Check(!BaseMaterials.VendorCounts(false,tomes,new HashSet<uint>()),"vendors off");
-            Check(!BaseMaterials.VendorCounts(true,tomes,off),"its only currency left out");
-            Check(BaseMaterials.VendorCounts(true,both,off),"gil still takes it");
-            Check(BaseMaterials.VendorCounts(true,free,off),"no cost read: it counts");
+            IReadOnlyList<uint>[] tomes=[[28u]];IReadOnlyList<uint>[] either=[[28u],[1u]];IReadOnlyList<uint>[] two=[[28u,1u]];IReadOnlyList<uint>[] free=[[]];IReadOnlyList<uint>[] encoded=[[0u]];
+            var gil=new HashSet<uint>{1};
+            Check(!BaseMaterials.VendorCounts(true,either,new HashSet<uint>()),"nothing ticked: nothing counts");
+            Check(new TenshoAssistant.Configuration().ListPanelsCurrenciesOn is null,"none at the start");
+            Check(!BaseMaterials.VendorCounts(true,tomes,gil),"another currency");
+            Check(BaseMaterials.VendorCounts(true,either,gil),"one offer in gil is enough");
+            Check(!BaseMaterials.VendorCounts(true,two,gil),"an offer costing two needs both");
+            Check(!BaseMaterials.VendorCounts(false,either,gil),"vendors off");
+            Check(!BaseMaterials.VendorCounts(true,free,gil) && !BaseMaterials.VendorCounts(true,encoded,gil),"no cost read, or encoded: it does not count");
+        }),
+        ("Vendors: the list leaves out what has no name, names company credits, and searches",() =>
+        {
+            var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ListPanels.cs"));
+            Check(page.Contains(".Distinct().Where(id=>id!=0)") && page.Contains("Where(row=>row.Item2.Length>0)"),"no #0, no nameless row");
+            Check(page.Contains("id!=NpcCost.CompanyCredits"),"company credits");
+            Check(page.Contains("ListPanelCurrencySearch"),"search");
         }),
         ("Panels: categories fold, each panel on its own",() =>
         {
