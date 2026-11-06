@@ -984,22 +984,23 @@ internal sealed partial class MainWindow
         if(mapFitDelay>0 && --mapFitDelay==0)mapFitRequested=true;
         if(mapFocusRequest is { } focus)
         {
-            // Like the game: the map zooms on what was asked. Markers can arrive a moment after the map opens, so the search
-            // is retried for 1.5 s; nothing found on this map = whole map. Logged (/xllog) to check the quest links in game.
+            // Markers can arrive a moment after the map opens, so the search is retried for 1.5 s. Logged (/xllog) to check the quest links in game.
+            // 0.637 (user request): from the quest journal or an active quest, the map is always adjusted and the zoom stays: centred on what was asked, or on the map until then.
             if(FocusPixel(focus,map,live) is { } pixel)
             {
                 // 0.636 (user report): the icon stays on the way there, even once the game has forgotten its marker.
                 mapGameTarget=focus.UsesRoute(map) && focus.Route is { } way && focus.RouteIcon!=0 ? (map.MapId,way,focus.RouteIcon,focus.QuestId):focus.Target is { } world && focus.TargetIcon!=0 && map.TerritoryId!=0 && !focus.UsesRoute(map) && (maps.State.Catalog is not { } shownCatalog || focus.EntranceTarget(shownCatalog) is null) ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
                 mapGameTargetQuests=null;mapGameTargetSince=DateTimeOffset.UtcNow;mapGameTargetRefresh=default;
-                mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,MapFocusZoom));mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
+                mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(mapZoom);mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
                 log.Information("Map focus found on map {0} for quest {1}, aetheryte {2}, FATE {3}.",map.MapId,focus.QuestId,focus.AetheryteId,focus.FateId);
             }
             else if(DateTimeOffset.UtcNow>=mapFocusUntil)
             {
-                mapFocusRequest=null;mapFitRequested=true;
+                mapFocusRequest=null;mapCenterRequest=new Vector2(MapProjection.TextureSize/2f);mapFitRequested=false;
                 var seen=string.Join(" | ",(live?.Events ?? []).Where(marker=>marker.MapId==map.MapId).Take(12).Select(marker=>$"{marker.ObjectiveId}:{marker.Icon}:{marker.Tooltip}"));
                 log.Information("Map focus not found on map {0} for quest {1} (journal {2}); markers: {3}",map.MapId,focus.QuestId,focus.QuestLog,seen);
             }
+            else mapCenterRequest=new Vector2(MapProjection.TextureSize/2f);
         }
         if(mapFitRequested)
         {

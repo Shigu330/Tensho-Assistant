@@ -57,6 +57,12 @@ internal static class MapAside617Tests
             Check((quest with {RouteMap=695}).EntranceTarget(catalog) is null,"the game's own way first");
             Check((quest with {QuestLog=false,Target=null}).EntranceTarget(catalog) is null,"not for a plain opening");
         }),
+        ("Map request (0.637): a quest always adjusts the map and keeps the zoom",() =>
+        {
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
+            Check(view.Contains("mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(mapZoom);mapCenterRequest=pixel;"),"centred on it, same zoom");
+            Check(view.Contains("mapFocusRequest=null;mapCenterRequest=new Vector2(MapProjection.TextureSize/2f);mapFitRequested=false;"),"not found: the map's centre, same zoom");
+        }),
         ("Map request (0.633): away from a quest's zone, the map of the NPC that leads there",() =>
         {
             var village=new TenshoAssistant.Maps.MapDefinition(1025,1269,"","Phantom Village","",0,400);
