@@ -392,5 +392,5 @@ Evidence: Échange noté dans docs/project/PUBLISHING.md. Décision de l'utilisa
 Options: Découper en petits plugins ; se passer de Dalamud ; continuer sur le dépôt personnalisé.
 Decision: Pas de soumission au dépôt officiel. Tensho continue sur le dépôt personnalisé, et le plan continue. Les règles et consignes de Dalamud restent appliquées comme si le plugin était soumis. Remplace la partie soumission de DEC-023 et DEC-037.
 Reason: Décision de l'utilisateur.
-Consequences: La 1.0.0 marque la fin du plan global sur le dépôt personnalisé, sans PR D17 ; c'est toujours l'utilisateur qui la décide. docs/project/PUBLISHING.md reste la liste des règles à tenir, les étapes de soumission ne sont plus à faire. Un petit plugin séparé reste possible un jour, sur sa demande.
+Consequences: La 1.0.0 marque la fin du plan global sur le dépôt personnalisé, sans PR D17 ; c'est toujours l'utilisateur qui la décide. docs/project/PUBLISHING.md reste la liste des règles à tenir, les étapes de soumission ne sont plus à faire. Un petit plugin séparé reste possible un jour, sur sa demande. Découper Tensho en plusieurs plugins : étudié en brouillon le 2026-11-06 et abandonné par l'utilisateur (« on va pas le faire »), branche retirée.
 References: DEC-023, DEC-037, docs/project/PUBLISHING.md
