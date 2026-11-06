@@ -64,7 +64,7 @@ internal sealed class NpcVendorLoader : IDisposable
                 {
                     dataVersion=string.Join(";",data.GameData.Repositories.Values.OrderBy(r=>r.Name).Select(r=>$"{r.Name}={r.Version}"));
                     cacheScope=data.Language.ToString();
-                    cacheVersion=NpcVendorCache.Version($"{dataVersion};schema={typeof(GilShop).Assembly.GetName().Version};fcc-295;req-352;service-680");
+                    cacheVersion=NpcVendorCache.Version($"{dataVersion};schema={typeof(GilShop).Assembly.GetName().Version};fcc-295;req-352;service-681");
                 }
                 if(!cacheChecked && cache is not null)
                 {

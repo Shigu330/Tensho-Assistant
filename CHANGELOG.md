@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.681.0
+- Plan global, Félicité insulaire, carte : Demande de l'utilisateur : Rodolfermier (Champs), Béberger (Pâturage) et Chamoiselle (Guide) paraissent sur la carte Tensho. Marchandréa est reliée aux 8 boutiques payées en assignats insulaires azur et émeraude : ses articles entrent dans les sources d'objets. Ce lien est déduit, aucune feuille ne le donne. COMPILED et TESTED, non validé en jeu.
+- Tests : Island679Tests. Verify.ps1 (agent) : 1202/1202, 0 avertissement, 0 erreur ; DLL 0.681.0.0. Non validé en jeu.
+### English
+- User request: Rodolfermier, Béberger and Chamoiselle appear on the Tensho map. Marchandréa is linked to the 8 shops priced in Seafarer's and Islander's Cowries, so their goods join the item sources. That link is inferred: no sheet gives it. COMPILED and TESTED, not validated in game.
+
 ## 0.680.0
 - Plan global, Félicité insulaire, carte : Laracheteuse (Exportations) paraît sur la carte Tensho, à la position lue dans le jeu : aucun fichier du jeu ne la donne. La même lecture montre des repères sur deux versions de la carte à la fois (773 et 775), ce qui explique le « ! » manquant. La capture temporaire est retirée. COMPILED et TESTED, non validé en jeu.
 - Tests : Island679Tests. Verify.ps1 (agent) : 1201/1201, 0 avertissement, 0 erreur ; DLL 0.680.0.0. Non validé en jeu.

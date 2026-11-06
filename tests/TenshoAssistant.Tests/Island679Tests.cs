@@ -43,6 +43,11 @@ internal static class Island679Tests
             Check(Math.Abs(place.X+266.316f)<0.01f && Math.Abs(place.Z-207.874f)<0.01f,"the position read");
             Check(Read("Npcs/NpcVendorLoader.Dalamud.cs").Contains("if(locations.ContainsKey(place.Npc)"),"a position from the game files would win");
         }),
+        ("Island NPCs: the fields, the pasture and the guide are placed too, and the exchange opens the shops priced in island currencies",() =>
+        {
+            foreach(var id in new uint[]{1043465,1043466,1043080})Check(TenshoAssistant.Npcs.NpcShopLinks.ServiceNpcs.Contains(id),"npc "+id);
+            Check(TenshoAssistant.Npcs.NpcShopLinks.ObservedTalkShops[721685].Count==8,"the exchange's shops");
+        }),
         ("Island NPCs: the two service NPCs are placed with their own name, and no sale is made up",() =>
         {
             Check(TenshoAssistant.Npcs.NpcShopLinks.ServiceNpcs.Contains(1043463u) && TenshoAssistant.Npcs.NpcShopLinks.ServiceNpcs.Contains(1043464u),"both");

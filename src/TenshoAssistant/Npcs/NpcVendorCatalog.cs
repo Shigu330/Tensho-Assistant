@@ -49,9 +49,9 @@ public static class NpcShopLinks
     /// </summary>
     /// <summary>
     /// 0.679 (user report): NPCs of a service whose shop is opened by script code, with no sheet to give it. They are placed on the map by name and title, with no sales.
-    /// Marchandréa, « Divers », and Laracheteuse, « Exportations », on the Island Sanctuary: docs/evidence/0.679-island-map.md.
+    /// On the Island Sanctuary: Marchandréa « Divers », Laracheteuse « Exportations », Rodolfermier « Champs », Béberger « Pâturage », Chamoiselle « Guide »: docs/evidence/0.679-island-map.md.
     /// </summary>
-    public static readonly IReadOnlyList<uint> ServiceNpcs=[1043463,1043464];
+    public static readonly IReadOnlyList<uint> ServiceNpcs=[1043463,1043464,1043465,1043466,1043080];
 
     /// <summary>0.680: where the game placed an NPC that no sheet and no layout places, read in the game (docs/evidence/0.679-island-map.md). Id, territory, map, world position.</summary>
     public static readonly IReadOnlyList<(uint Npc,uint Territory,uint Map,float X,float Y,float Z)> ObservedPlaces=[(1043464,1055,773,-266.316f,41.001f,207.874f)];
@@ -59,6 +59,9 @@ public static class NpcShopLinks
     public static readonly IReadOnlyDictionary<uint,IReadOnlyList<uint>> ObservedTalkShops=new Dictionary<uint,IReadOnlyList<uint>>
     {
         [721280]=[1769743,1770537,1769744],
+        // Marchandréa, Island Sanctuary, talk CtsMjiSpecialShop_00789 with no script argument: the user reports the exchange of both island currencies there (2026-11-06);
+        // these are the only special shops priced in them (37549, 37550). Which of them this NPC opens is inferred: docs/evidence/0.679-island-map.md.
+        [721685]=[1770601,1770602,1770604,1770643,1770659,1770660,1770662,1770709],
         // « Officier de gestion du Maelstrom », Wolves' Den « Échange de cristaux-insignes » (in-game capture 2026-10-31):
         // talk RegSeaPvpCommendationCrystalShop, the only shop costing commendation crystals (40479), the only NPC using it.
         [721735]=[1770684],
