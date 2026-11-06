@@ -84,7 +84,7 @@ internal sealed class NativeMapReplacer : IDisposable
             var addon=gui.GetAddonByName("AreaMap");
             var unit=addon.IsNull ? null:(AtkUnitBase*)addon.Address;
             var visible=unit!=null && addon.IsVisible;
-            if(resume.ShouldReopen(ClosedByEvent(),visible,client.TerritoryType,now) && AgentMap.Instance() is var again && again!=null)
+            if(client.IsLoggedIn && resume.ShouldReopen(ClosedByEvent(),visible,client.TerritoryType,now) && AgentMap.Instance() is var again && again!=null)
             {
                 log.Information("The event is over: the map opens again.");
                 again->Show();

@@ -306,6 +306,9 @@ internal sealed partial class MainWindow
         {
             var state=result.Final;
             ImGui.TextColored(state.Finish==CraftFinish.Completed ? Success:Accent,localization.Format("CraftSequence.Result",localization.Get(state.Finish switch {CraftFinish.Completed=>"CraftSequence.Completed",CraftFinish.Broken=>"CraftSequence.Broken",_=>"CraftSequence.Incomplete"}),state.Progress,p.Progress,state.Quality,p.Quality,state.Durability,state.Cp));
+            // C13 (0.668): the chance the game would give this quality.
+            if(state.Finish==CraftFinish.Completed && recipe.Simulation is { CanHq:true,Collectable:false,Quality:>0 } hqRecipe)
+                ImGui.TextDisabled(localization.Format("CraftSequence.HqChance",CraftHqChance.Percent(state.Quality,hqRecipe.Quality)));
             if(result.InvalidAction is { } invalid) ImGui.TextWrapped(localization.Format("SimulationHelp.Invalid",invalid+1,CraftMessage(result.Error ?? "—")));
             // A-13 (0.434): success assumed for the actions left to chance.
             if(result.Steps.Any(step=>CraftSimulation.Random(step.Action))) ImGui.TextColored(Accent,localization.Get("CraftSimulation.RandomAssumed"));

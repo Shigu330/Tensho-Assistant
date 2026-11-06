@@ -51,6 +51,8 @@ internal static class CraftCollectableTests
             Check(CraftSimulation.Unsupported(recipe with {Simulation=p with {Expert=true}}) is null,"expert recipe accepted");
             foreach(var excluded in new[]{p with {Quality=0}})
                 Check(CraftSimulation.Unsupported(recipe with {Simulation=excluded}) is not null,"special case remains explicitly unsupported");
+            Check(CraftHqChance.Percent(0,10000)==1 && CraftHqChance.Percent(10000,10000)==100 && CraftHqChance.Percent(5000,10000)==15 && CraftHqChance.Percent(9900,10000)==98,"the table's ends and middle");
+            Check(CraftHqChance.Percent(7999,10000)==68 && CraftHqChance.Percent(20000,10000)==100 && CraftHqChance.Percent(-5,10000)==1 && CraftHqChance.Percent(5,0)==0,"whole percents, bounded");
             // C6 (0.666): adjusted and fixed-quality recipes are simulated.
             Check(CraftSimulation.Unsupported(recipe with {Simulation=p with {LevelScaled=true}}) is null && CraftSimulation.Unsupported(recipe with {Simulation=p with {RequiredQuality=10}}) is null,"accepted now");
             Check(CraftRecipeQuality.Durability(true,35,50)==40 && CraftRecipeQuality.Durability(false,35,200)==70,"80 for an adjusted recipe, its table otherwise");

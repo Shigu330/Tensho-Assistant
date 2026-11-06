@@ -777,6 +777,7 @@
     "ManipulationTip": "Unticked: Manipulation is greyed out in « Add an action » and the sequence search does not use it."
   },
   "CraftSequence": {
+    "HqChance": "HQ chance: {0} % (Craftimizer table).",
     "Count": "Sequence: {0}/100 actions",
     "Clear": "Clear sequence",
     "Simulate": "Simulate",

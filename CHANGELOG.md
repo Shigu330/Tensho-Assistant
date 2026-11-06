@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.668.0
+- Plan global, C13 : Artisanat (C13) : le simulateur donne la chance HQ d'une qualité finale, d'après la table de Craftimizer (MIT), pour une recette qui peut être HQ. La table reste à comparer à la synthèse du jeu : la capture écrit les valeurs du jeu.
+- Tests : Craft. Verify.ps1 (agent) : 1163/1163, 0 avertissement, 0 erreur ; DLL 0.668.0.0. Non validé en jeu.
+### English
+- Crafting (C13): the simulator gives the HQ chance of a final quality, from Craftimizer's table (MIT), for a recipe that can be HQ. The table remains to compare with the game's synthesis: the capture writes the game's values.
+
 ## 0.667.0
 - Plan global, N-07 : Carte (N-07, partie carte) : sur l'île sanctuaire, les ressources à récolter s'affichent avec leur zone et leur nom, d'après les données du jeu, avec un réglage. Leur place reste à comparer sur l'île : l'unité des positions n'est pas prouvée. Artisanat (C6) : correction de la 0.666, les seuils de mission sont des pourcentages de la qualité maximale, relus dans les fichiers du jeu.
 - Tests : Island resources. Verify.ps1 (agent) : 1163/1163, 0 avertissement, 0 erreur ; DLL 0.667.0.0. Non validé en jeu.

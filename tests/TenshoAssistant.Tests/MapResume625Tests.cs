@@ -125,7 +125,7 @@ internal static class MapResume625Tests
         {
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));
             Check(view.Contains("resume.GameClosedMap(ClosedByEvent());"),"noted on closing");
-            Check(view.Contains("if(resume.ShouldReopen(ClosedByEvent(),visible,client.TerritoryType,now)"),"asked at each tick");
+            Check(view.Contains("resume.ShouldReopen(ClosedByEvent(),visible,client.TerritoryType,now)"),"asked at each tick");
             Check(view.Contains("resume.Cancel();"),"not after the competitive cut");
         }),
     ];

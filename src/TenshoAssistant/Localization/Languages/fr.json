@@ -777,6 +777,7 @@
     "ManipulationTip": "Décochée : Manipulation est grisée dans « Ajouter une action » et la recherche de séquence ne l'utilise pas."
   },
   "CraftSequence": {
+    "HqChance": "Chance HQ : {0} % (table de Craftimizer).",
     "Count": "Séquence : {0}/100 actions",
     "Clear": "Vider la séquence",
     "Simulate": "Simuler",

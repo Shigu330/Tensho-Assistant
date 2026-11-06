@@ -9,6 +9,16 @@ public sealed record CraftRecipeParameters(int Durability,int Progress,int Quali
     int MissionLow=0,int MissionMid=0,int MissionHigh=0);
 // A-13 (0.434): Specialist = the job is a specialist (Careful Observation, Heart and Soul, Quick Innovation, specialist recipes).
 public sealed record CraftStats(int Level,int Craftsmanship,int Control,int Cp,bool ManipulationAllowed=false,bool Specialist=false);
+/// <summary>C13 (0.668): the HQ chance of a final quality, by whole percent of the maximum (table from Craftimizer, MIT; docs/evidence/0.668-hq-chance.md).</summary>
+public static class CraftHqChance
+{
+    private static readonly int[] Table=[
+        1,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,
+        9,9,9,10,10,10,11,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,17,17,
+        17,18,18,18,19,19,20,20,21,22,23,24,26,28,31,34,38,42,47,52,58,64,68,71,
+        74,76,78,80,81,82,83,84,85,86,87,88,89,90,91,92,94,96,98,100];
+    public static int Percent(int quality,int maximum)=>maximum<=0 ? 0:Table[(int)Math.Clamp((long)Math.Max(quality,0)*100/maximum,0,100)];
+}
 public static class CraftRecipeQuality
 {
     /// <summary>C6 (0.666, rule read in Craftimizer, MIT; docs/evidence/0.666-adjusted-recipes.md): an adjusted recipe's durability starts from 80, not from its level table.</summary>

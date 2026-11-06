@@ -154,7 +154,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
 | ~~C6~~ fait en 0.666 pour la simulation | Recettes à niveau ajusté, à qualité imposée et Exploration cosmique | M-L | À comparer en jeu ; seuils de mission affichés, pas encore cibles de la recherche. |
-| C13 | Chance HQ d'une qualité finale | S |  |
+| ~~C13~~ fait en 0.668 | Chance HQ d'une qualité finale | S | Table à comparer à la synthèse. |
 | ~~C22~~ fait en 0.664 | Projets de l'atelier de compagnie libre : matériaux par pièce et par phase | M | À comparer à la fenêtre de l'atelier. |
 
 ### Carte
