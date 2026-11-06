@@ -119,7 +119,7 @@ Tout ce qui reste à revoir pour le plan global, d'un seul coup. La colonne « R
 | Jardin | Messages d'entretien et de récolte non reconnus, puis lignes de journal de capture à retirer | [#36](https://github.com/Shigu330/Tensho-Assistant/issues/36) |
 | Jardin | Les Bleuets manquent dans la liste de graines | [#36](https://github.com/Shigu330/Tensho-Assistant/issues/36) |
 | Escouade | Pas de bouton d'alarme pour une mission déjà en cours | [#37](https://github.com/Shigu330/Tensho-Assistant/issues/37) |
-| Récolte | Régénération de PR pendant la récolte (+1) non mesurée | [#37](https://github.com/Shigu330/Tensho-Assistant/issues/37) |
+| Récolte | ~~Régénération de PR pendant la récolte (+1) non mesurée~~ mesurée le 2026-11-06, rien à coder | [#37](https://github.com/Shigu330/Tensho-Assistant/issues/37) |
 | Objets | Blocs d'objets sans prix | [#37](https://github.com/Shigu330/Tensho-Assistant/issues/37) |
 
 ### Carte

@@ -137,7 +137,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | Où | Ce qu'il faut relever | Issue |
 |---|---|---|
 | Jardin | Un entretien et une récolte, pour reconnaître leurs messages ; puis retirer les lignes de journal de capture | #36 |
-| Récolte | La régénération de PR pendant une récolte | #37 |
+| Récolte | ~~La régénération de PR pendant une récolte~~ relevée le 2026-11-06 : aucune hausse dans la fenêtre, +8 toutes les 3 s dehors, rien à coder ([preuve](../evidence/0.650-gp-while-gathering.md)) | #37 |
 
 ### Récolte et pêche
 
