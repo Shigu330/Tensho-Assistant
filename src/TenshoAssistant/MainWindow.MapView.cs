@@ -949,7 +949,7 @@ internal sealed partial class MainWindow
     // 0.544 (P3): from any point or the flag, the question of 0.373: nearest aetheryte of this map, its real cost, teleport only if confirmed.
     private void DrawNearestAetheryteEntry(MapDefinition map)
     {
-        if(map.TerritoryId==0)return;
+        if(!MapHasAetheryte(map))return;
         if(ImGui.Selectable(localization.Get("MapView.NearestAetheryte")+"##NearestAetheryte"))AskNearestAetheryteAt(map,mapContextPixel,map.Zone);
         Tip("MapView.NearestAetheryteTip");
     }

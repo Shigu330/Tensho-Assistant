@@ -34,7 +34,7 @@ internal sealed partial class MainWindow
             void Entry(string key,LevePlace? place)
             {
                 var map=place is null ? null:maps.State.Catalog?.Find(place.MapId);
-                ImGui.BeginDisabled(map is null);
+                ImGui.BeginDisabled(map is null || !MapHasAetheryte(map));
                 try
                 {
                     if(ImGui.Selectable(localization.Get(key)) && map is not null && place is not null)

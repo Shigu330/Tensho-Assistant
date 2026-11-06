@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.706.0
+- Plan global, Éthérites : Rapport de l'utilisateur : la Félicité insulaire n'a pas de téléportation. L'entrée « Éthérite la plus proche » disparaît sur cette carte et sur toute carte sans éthérite, dans les menus et sur la carte Tensho. COMPILED et TESTED, non validé en jeu.
+- Tests : PlaceMenus704Tests. Verify.ps1 (agent) : 1254/1254, 0 avertissement, 0 erreur ; DLL 0.706.0.0. Non validé en jeu.
+### English
+- User report: the Island Sanctuary has no teleport. The nearest aetheryte entry goes away on that map and on any map with no aetheryte, in menus and on the Tensho map. COMPILED and TESTED, not validated in game.
+
 ## 0.705.0
 - Plan global, Infobulles : Demande de l'utilisateur : les vendeurs PNJ des infobulles ont leurs réglages, sous Comment l'obtenir : les afficher ou non, exclure les prérequis non remplis, ne garder que certaines monnaies. Par défaut, tout reste affiché comme avant. La fiche de l'objet et l'outil des vendeurs ne changent pas. COMPILED et TESTED, non validé en jeu.
 - Tests : PlaceMenus704Tests. Verify.ps1 (agent) : 1253/1253, 0 avertissement, 0 erreur ; DLL 0.705.0.0. Non validé en jeu.

@@ -26,6 +26,13 @@ internal static class PlaceMenus704Tests
                 Check(Regex.IsMatch(text,@"PlaceMenu\(|NpcMenu\(|PlaceEntries\(|AskNearestAetheryteAt\("),name+" places a flag with no way to the nearest aetheryte");
             }
         }),
+        ("Place menus: no aetheryte entry on a map that has none, the island first",() =>
+        {
+            var menus=Read("UI/Components/EntityMenus.cs");
+            Check(menus.Contains("map.TerritoryId!=IslandResources.Territory") && menus.Contains("marker.AetheryteId!=0"),"the check");
+            Check(menus.Contains("if(MapHasAetheryte(map) && ImGui.Selectable(localization.Get(\"MapView.NearestAetheryte\")"),"the menus");
+            Check(Read("MainWindow.MapView.cs").Contains("if(!MapHasAetheryte(map))return;"),"the map");
+        }),
         ("Hover vendors: every vendor by default, and each tooltip goes through the settings",() =>
         {
             var settings=new TenshoAssistant.Configuration();
