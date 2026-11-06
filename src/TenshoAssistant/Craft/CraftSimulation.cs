@@ -19,6 +19,20 @@ public static class CraftHqChance
         74,76,78,80,81,82,83,84,85,86,87,88,89,90,91,92,94,96,98,100];
     public static int Percent(int quality,int maximum)=>maximum<=0 ? 0:Table[(int)Math.Clamp((long)Math.Max(quality,0)*100/maximum,0,100)];
 }
+/// <summary>C12 (0.669, rule read in Craftimizer, MIT; docs/evidence/0.669-starting-quality.md): the starting quality given by the HQ ingredients chosen, weighted by item level.</summary>
+public static class CraftStartingQuality
+{
+    public static int FromHq(IEnumerable<(uint ItemLevel,int Amount,int Hq)> ingredients,int maximum)
+    {
+        long total=0,chosen=0;
+        foreach(var (level,amount,hq) in ingredients)
+        {
+            total+=(long)level*Math.Max(amount,0);
+            chosen+=(long)level*Math.Clamp(hq,0,Math.Max(amount,0));
+        }
+        return total<=0 ? 0:(int)Math.Floor((float)chosen/total*maximum);
+    }
+}
 public static class CraftRecipeQuality
 {
     /// <summary>C6 (0.666, rule read in Craftimizer, MIT; docs/evidence/0.666-adjusted-recipes.md): an adjusted recipe's durability starts from 80, not from its level table.</summary>

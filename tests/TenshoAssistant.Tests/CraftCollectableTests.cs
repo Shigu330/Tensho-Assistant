@@ -53,6 +53,13 @@ internal static class CraftCollectableTests
                 Check(CraftSimulation.Unsupported(recipe with {Simulation=excluded}) is not null,"special case remains explicitly unsupported");
             Check(CraftHqChance.Percent(0,10000)==1 && CraftHqChance.Percent(10000,10000)==100 && CraftHqChance.Percent(5000,10000)==15 && CraftHqChance.Percent(9900,10000)==98,"the table's ends and middle");
             Check(CraftHqChance.Percent(7999,10000)==68 && CraftHqChance.Percent(20000,10000)==100 && CraftHqChance.Percent(-5,10000)==1 && CraftHqChance.Percent(5,0)==0,"whole percents, bounded");
+            Check(CraftStartingQuality.FromHq([(100u,2,2),(100u,2,0)],1000)==500,"half by item level");
+            Check(CraftStartingQuality.FromHq([(300u,1,1),(100u,1,0)],1000)==750,"weighted by item level");
+            Check(CraftStartingQuality.FromHq([(100u,2,9)],1000)==1000 && CraftStartingQuality.FromHq([(100u,2,-1)],1000)==0,"bounded by the amount");
+            Check(CraftStartingQuality.FromHq([],1000)==0 && CraftStartingQuality.FromHq([(0u,2,2)],1000)==0,"nothing to weigh");
+            var board=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MarketBoard.cs"));
+            Check(!board.Contains("if(MarketBoardMath.Stats(sales)") && board.Contains("marketSalesStats=MarketBoardMath.Stats(marketSalesFiltered);"),"I22: statistics once per change");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.PreparationCost.cs")).Contains("if(planCostKey!=costKey || planCostView is null)"),"I22: the plan's cost at most once a second");
             // C6 (0.666): adjusted and fixed-quality recipes are simulated.
             Check(CraftSimulation.Unsupported(recipe with {Simulation=p with {LevelScaled=true}}) is null && CraftSimulation.Unsupported(recipe with {Simulation=p with {RequiredQuality=10}}) is null,"accepted now");
             Check(CraftRecipeQuality.Durability(true,35,50)==40 && CraftRecipeQuality.Durability(false,35,200)==70,"80 for an adjusted recipe, its table otherwise");

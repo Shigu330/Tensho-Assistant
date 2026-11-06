@@ -774,6 +774,8 @@
     "ControlTip": "Contrôle du scénario, de 0 à 100 000 ; au moins le minimum de la recette indiqué plus haut.",
     "CpTip": "PS disponibles au début du craft, de 0 à 10 000.",
     "StartingQualityTip": "Qualité déjà acquise au début du craft, de 0 au maximum indiqué pour cette recette.",
+    "HqIngredients": "Ingrédients HQ",
+    "HqIngredientsTip": "Combien de cet ingrédient sont HQ. La qualité initiale en est déduite, selon leur niveau d'objet (règle de Craftimizer), et peut encore être tapée.",
     "ManipulationTip": "Décochée : Manipulation est grisée dans « Ajouter une action » et la recherche de séquence ne l'utilise pas."
   },
   "CraftSequence": {

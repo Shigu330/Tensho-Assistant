@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.669.0
+- Plan global, C12, I22 : Artisanat (C12) : dans le simulateur, un curseur par ingrédient pouvant être HQ calcule la qualité initiale selon le niveau d'objet (règle de Craftimizer, MIT), qui peut encore être tapée. À comparer à la qualité du carnet du jeu. Performance (I22) : l'historique du marché filtre et calcule ses statistiques une fois par changement, et le coût de préparation se recalcule au plus une fois par seconde, comme celui de la chaîne ; le gain n'est pas mesuré en jeu.
+- Tests : Collectible. Verify.ps1 (agent) : 1163/1163, 0 avertissement, 0 erreur ; DLL 0.669.0.0. Non validé en jeu.
+### English
+- Crafting (C12): in the simulator, a slider per ingredient that can be HQ computes the starting quality by item level (rule from Craftimizer, MIT), which can still be typed. To compare with the game's crafting log. Performance (I22): the market history filters and computes its statistics once per change, and the preparation cost is rebuilt at most once a second, like the chain's; the gain is not measured in game.
+
 ## 0.668.0
 - Plan global, C13 : Artisanat (C13) : le simulateur donne la chance HQ d'une qualité finale, d'après la table de Craftimizer (MIT), pour une recette qui peut être HQ. La table reste à comparer à la synthèse du jeu : la capture écrit les valeurs du jeu.
 - Tests : Craft. Verify.ps1 (agent) : 1163/1163, 0 avertissement, 0 erreur ; DLL 0.668.0.0. Non validé en jeu.

@@ -129,11 +129,12 @@ internal sealed partial class MainWindow
             if(ImGui.Selectable($"{itemCatalog.State.Catalog?.Find(hit.ResultItemId)?.Name ?? hit.ResultItemId.ToString()} · {hit.CraftType}##SimulationRecipe{hit.RecipeId}",hit.RecipeId==simulationRecipe?.RecipeId))
             {OpenCraftSimulation(hit);simulationRecipeQuery="";simulationRecipeShown="";simulationRecipeHits=[];}
     }
+    private readonly Dictionary<uint,int> simulationHq=[];
     private void OpenCraftSimulation(RecipeDefinition recipe)
     {
         if(simulationRecipe?.RecipeId!=recipe.RecipeId)
         {
-            simulationActions.Clear(); simulationResult=null; simulationError=null; simulationQuality=0;
+            simulationActions.Clear(); simulationResult=null; simulationError=null; simulationQuality=0; simulationHq.Clear();
             simulationCopiedAt=null; simulationCopiedOwner=0; simulationCs=simulationControl=simulationCp=0;
             simulationLevel=100; simulationManipulation=false;
             craftSolveTarget=recipe.Simulation?.Quality ?? 0;
@@ -239,6 +240,27 @@ internal sealed partial class MainWindow
             changed|=CraftInput(localization.Get("CraftSimulation.Control")+"###SimControl",ref simulationControl,p.RequiredControl>0 ? simulationControl>=p.RequiredControl:null,"CraftSimulation.ControlTip");
             ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Cp")+"###SimCp",ref simulationCp,0); Tip("CraftSimulation.CpTip");
             ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Format("CraftSimulation.StartingQuality",p.MaxStartingQuality)+"###SimQuality",ref simulationQuality,0); Tip("CraftSimulation.StartingQualityTip");
+            // C12 (0.669): from the HQ ingredients chosen.
+            var hqIngredients=recipe.Ingredients.Select(ingredient=>(Ingredient:ingredient,Item:itemCatalog.State.Catalog?.Find(ingredient.ItemId))).Where(entry=>entry.Item is { CanBeHq:true }).ToArray();
+            if(hqIngredients.Length>0 && p.MaxStartingQuality>0 && ImGui.TreeNode(localization.Get("CraftSimulation.HqIngredients")+"###SimHq"))
+            {
+                try
+                {
+                    foreach(var (ingredient,item) in hqIngredients)
+                    {
+                        var hq=simulationHq.GetValueOrDefault(ingredient.ItemId);
+                        ImGui.SetNextItemWidth(110);
+                        if(ImGui.SliderInt($"{item!.Name}###SimHq{ingredient.ItemId}",ref hq,0,ingredient.Amount))
+                        {
+                            simulationHq[ingredient.ItemId]=hq;
+                            simulationQuality=CraftStartingQuality.FromHq(hqIngredients.Select(entry=>(entry.Item!.ItemLevel,entry.Ingredient.Amount,simulationHq.GetValueOrDefault(entry.Ingredient.ItemId))),p.MaxStartingQuality);
+                            changed=true;
+                        }
+                        Tip("CraftSimulation.HqIngredientsTip");
+                    }
+                }
+                finally{ImGui.TreePop();}
+            }
             changed|=ImGui.Checkbox(localization.Get("CraftSimulation.Manipulation")+"###SimManipulation",ref simulationManipulation); Tip("CraftSimulation.ManipulationTip");
             // A-13 (0.434): specialist job.
             changed|=ImGui.Checkbox(localization.Get("CraftSimulation.Specialist")+"###SimSpecialist",ref simulationSpecialist); Tip("CraftSimulation.SpecialistTip");

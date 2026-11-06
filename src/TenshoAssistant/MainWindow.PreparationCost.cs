@@ -19,6 +19,10 @@ internal sealed partial class MainWindow
     private string? preparationCostError;
     private Func<uint,decimal?>? CostVendorPrice=>configuration.CostUseVendors && npcVendors?.State.Catalog is { } shops ? id=>shops.GilPrice(id) is { } price ? price:null:null;
     private readonly record struct ChainCostViewKey(CraftChainResult Result,ItemCatalog? Items,uint World,int Quality,long Second,TimeSpan Lifetime,bool DataCenter,bool Vendors);
+    // I22 (0.669): as for the chain, at most once a second, and on any change of what it depends on.
+    private readonly record struct PlanCostKey(CraftPlan Plan,ItemCatalog? Items,uint World,int Basis,int Quality,long Second,TimeSpan Lifetime,bool DataCenter,bool Vendors);
+    private PlanCostKey? planCostKey;
+    private PreparationCostEstimate? planCostView;
     private ChainCostViewKey? chainCostViewKey;
     private PreparationCostEstimate? chainCostView;
     private PreparationCostEstimate? preparationListSource;
@@ -44,8 +48,16 @@ internal sealed partial class MainWindow
         PreparationCostEstimate estimate;
         try
         {
-            estimate=PreparationCost.Build(plan,world.WorldId,(PreparationCostBasis)costBasisIndex,(PreparationPriceQuality)costQualityIndex,
-                id=>itemCatalog.State.Catalog?.Find(id),id=>market.GetCached(world.WorldId,id),DateTimeOffset.UtcNow,market.CacheLifetime,configuration.CostDataCenter,CostVendorPrice);
+            var costNow=DateTimeOffset.UtcNow;
+            var costKey=new PlanCostKey(plan,itemCatalog.State.Catalog,world.WorldId,costBasisIndex,costQualityIndex,costNow.ToUnixTimeSeconds(),market.CacheLifetime,configuration.CostDataCenter,configuration.CostUseVendors);
+            if(planCostKey!=costKey || planCostView is null)
+            {
+                planCostKey=null;
+                planCostView=PreparationCost.Build(plan,world.WorldId,(PreparationCostBasis)costBasisIndex,(PreparationPriceQuality)costQualityIndex,
+                    id=>itemCatalog.State.Catalog?.Find(id),id=>market.GetCached(world.WorldId,id),costNow,market.CacheLifetime,configuration.CostDataCenter,CostVendorPrice);
+                planCostKey=costKey;
+            }
+            estimate=planCostView;
         }
         catch(Exception error) {ImGui.TextWrapped(localization.Get("CostUi.EstimateError")); if(developerMode)ImGui.TextWrapped(RawMessage(error.Message)); return;}
         DrawPreparationCostDetails(recipe,plan.Requested,estimate);

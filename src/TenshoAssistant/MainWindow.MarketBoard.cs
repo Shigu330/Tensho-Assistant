@@ -33,6 +33,9 @@ internal sealed partial class MainWindow
     private (int Column,bool Descending) marketOfferSort=(0,false),marketSaleSort=(0,true);
     private (MarketBoard? Board,MarketFilter Filter,(int,bool) Sort) marketSalesKey;
     private MarketSale[] marketSalesShown=[];
+    // I22 (0.669): the filtered sales and their statistics, once per change, not at each frame.
+    private MarketSale[] marketSalesFiltered=[];
+    private TenshoAssistant.Market.MarketSaleStats? marketSalesStats;
 
     private static bool ReadSort(ref (int Column,bool Descending) sort)
     {
@@ -228,13 +231,17 @@ internal sealed partial class MainWindow
         if(DrawMarketBoardHeader() is not { } board)return;
         DrawMarketFilters(board,false);
         var filter=CurrentMarketFilter();
-        var sales=board.Sales.Where(filter.Accepts).ToArray();
         if(!ReferenceEquals(marketSalesKey.Board,board) || marketSalesKey.Filter!=filter || marketSalesKey.Sort!=marketSaleSort)
-        {marketSalesKey=(board,filter,marketSaleSort);marketSalesShown=SortSales(sales);}
+        {
+            marketSalesKey=(board,filter,marketSaleSort);
+            marketSalesFiltered=board.Sales.Where(filter.Accepts).ToArray();
+            marketSalesStats=MarketBoardMath.Stats(marketSalesFiltered);
+            marketSalesShown=SortSales(marketSalesFiltered);
+        }
         var velocity=filter.Hq switch{true=>board.HqUnitsPerDay,false=>board.NqUnitsPerDay,_=>board.UnitsPerDay};
         ImGui.TextUnformatted(velocity is { } perDay ? localization.Format("MarketBoard.Velocity",perDay.ToString("0.#")):localization.Get("MarketBoard.VelocityUnknown"));
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MarketBoard.VelocityHelp"));
-        if(MarketBoardMath.Stats(sales) is { } stats)
+        if(marketSalesStats is { } stats)
             ImGui.TextColored(Accent,localization.Format("MarketBoard.Stats",stats.Minimum.ToString("N0"),stats.Average.ToString("N0"),stats.Maximum.ToString("N0"),stats.Sales,stats.Units.ToString("N0")));
         else{ImGui.TextDisabled(localization.Get("MarketBoard.NoSales"));return;}
         ImGui.TextDisabled(localization.Get("MarketBoard.SortHelp"));
