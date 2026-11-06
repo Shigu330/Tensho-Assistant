@@ -870,7 +870,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.613) Match de l'arène contre un joueur : Tensho se coupe-t-il ? Le journal dit « PvP instance ».
 
-- [ ] (0.614) Hall de l'Arène, duel contre un PNJ : le panneau Triple Triade s'affiche.
+- [x] (0.614) Hall de l'Arène, duel contre un PNJ : le panneau Triple Triade s'affiche.
 
 - [ ] (0.615) Avec un lien de carte dans le chat pendant une coupure : il n'apparaît pas dans la liste des liens.
 
@@ -888,11 +888,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.622) Là où il n'y a pas de sous-lieu : une seule ligne, sans « -- ».
 
-- [ ] (0.623) Dézoomer et zoomer sur Limsa à côté de la carte du jeu : comparer quels noms apparaissent et quand.
+- [x] (0.623) Dézoomer et zoomer sur Limsa à côté de la carte du jeu : comparer quels noms apparaissent et quand.
 
 - [ ] (0.624) Ouvrir la carte, ouvrir le menu qui la fait disparaître, le refermer, attendre deux secondes.
 
-- [ ] (0.625) Carte ouverte, parler à un PNJ de Triple Triade, refermer son menu : la carte revient. Fermer la carte avec sa touche : elle reste fermée.
+- [x] (0.625) Carte ouverte, parler à un PNJ de Triple Triade, refermer son menu : la carte revient. Fermer la carte avec sa touche : elle reste fermée.
 
 - [ ] (0.626) Cliquer sur « Limsa Lominsa - L'Entrepont » : la carte change. Glisser depuis le nom ne change pas de carte.
 
