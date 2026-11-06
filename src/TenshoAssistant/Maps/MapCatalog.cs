@@ -31,6 +31,31 @@ public static class MapMenus
             .Select(group=>(IReadOnlyList<MapDefinition>)group.OrderBy(map=>map.MapIndex).ThenBy(map=>map.MapId).ToArray()).ToArray();
 }
 
+/// <summary>0.634: where a dungeon is entered, in map pixels (docs/evidence/0.634-dungeon-entrances.md).</summary>
+public sealed record MapEntrance(uint MapId,float X,float Y);
+public static class MapEntrances
+{
+    /// <summary>The game's dungeon entrance icon on a map (MapMarker.Icon); its name is the dungeon's.</summary>
+    public const uint Icon=60414;
+    /// <summary>Each dungeon's marker, by its place name's row, then by the same text. A dungeon without one is simply absent.</summary>
+    public static Dictionary<uint,MapEntrance> Build(IEnumerable<(uint Territory,uint Place,string Name)> dungeons,IEnumerable<(uint Range,uint Place,string Name,float X,float Y)> markers,IEnumerable<MapDefinition> maps)
+    {
+        var mapOfRange=new Dictionary<uint,uint>();
+        foreach(var map in maps.Where(map=>map.MarkerRange!=0 && map.TerritoryId!=0).OrderBy(map=>map.MapIndex).ThenBy(map=>map.MapId))mapOfRange.TryAdd(map.MarkerRange,map.MapId);
+        var byPlace=new Dictionary<uint,MapEntrance>();var byName=new Dictionary<string,MapEntrance>(StringComparer.OrdinalIgnoreCase);
+        foreach(var marker in markers)
+            if(mapOfRange.TryGetValue(marker.Range,out var mapId))
+            {
+                var entrance=new MapEntrance(mapId,marker.X,marker.Y);
+                byPlace.TryAdd(marker.Place,entrance);
+                if(marker.Name.Length>0)byName.TryAdd(marker.Name,entrance);
+            }
+        var result=new Dictionary<uint,MapEntrance>();
+        foreach(var dungeon in dungeons)
+            if(byPlace.TryGetValue(dungeon.Place,out var found) || (dungeon.Name.Length>0 && byName.TryGetValue(dungeon.Name,out found)))result[dungeon.Territory]=found;
+        return result;
+    }
+}
 public sealed class MapCatalog
 {
     private readonly FrozenDictionary<uint, MapDefinition> byId;
@@ -39,8 +64,11 @@ public sealed class MapCatalog
     private readonly IReadOnlyDictionary<uint,uint> territoryMaps;
     /// <summary>0.628: the map a territory names in the game's TerritoryType sheet (0 if none). It can differ from the Map sheet's way back (docs/evidence/0.628-quest-target-on-world-map.md).</summary>
     public uint MapOf(uint territory)=>territoryMaps.GetValueOrDefault(territory);
-    public MapCatalog(IEnumerable<MapDefinition> source, CancellationToken cancellation = default, IReadOnlyDictionary<uint,uint>? territoryMaps = null)
+    private readonly IReadOnlyDictionary<uint,MapEntrance> entrances;
+    public MapEntrance? EntranceOf(uint territory)=>entrances.GetValueOrDefault(territory);
+    public MapCatalog(IEnumerable<MapDefinition> source, CancellationToken cancellation = default, IReadOnlyDictionary<uint,uint>? territoryMaps = null, IReadOnlyDictionary<uint,MapEntrance>? entrances = null)
     {
+        this.entrances=entrances ?? new Dictionary<uint,MapEntrance>();
         this.territoryMaps=territoryMaps ?? new Dictionary<uint,uint>();
         ArgumentNullException.ThrowIfNull(source);
         var copied = new Dictionary<uint, MapDefinition>();
@@ -103,6 +131,17 @@ public sealed record GameMapRequest(uint Selected, uint Requested, uint Territor
     public GameMapRequest Plain()=>this with {Selected=Current,Requested=Current,Territory=0,QuestId=0,AetheryteId=0,FateId=0,QuestLog=false,Target=null,TargetIcon=0,RouteMap=0,Route=null};
     /// <summary>0.633: this map shows the way (the zone-change NPC), not the target's own territory.</summary>
     public bool UsesRoute(MapDefinition map)=>Route is not null && RouteMap==map.MapId && Territory!=map.TerritoryId;
+    /// <summary>
+    /// 0.634 (user request): a quest in a dungeon shows where it is entered, from outside it. The game's own way (a route marker) comes first; inside the dungeon, its own map.
+    /// </summary>
+    public MapEntrance? EntranceTarget(MapCatalog catalog)
+    {
+        ArgumentNullException.ThrowIfNull(catalog);
+        if(!QuestLog && QuestId==0 || RouteMap!=0)return null;
+        var place=Territory!=0 ? Territory:catalog.Find(Selected)?.TerritoryId ?? 0;
+        if(place==0 || catalog.Find(Current)?.TerritoryId==place)return null;
+        return catalog.EntranceOf(place) is { } entrance && catalog.Find(entrance.MapId) is not null ? entrance:null;
+    }
     /// <summary>A quest, aetheryte or FATE was asked: never the M toggle.</summary>
     public bool Pointed => QuestId != 0 || AetheryteId != 0 || FateId != 0 || QuestLog || Target is not null;
     /// <summary>
@@ -113,6 +152,7 @@ public sealed record GameMapRequest(uint Selected, uint Requested, uint Territor
     public uint Resolve(MapCatalog catalog)
     {
         ArgumentNullException.ThrowIfNull(catalog);
+        if (EntranceTarget(catalog) is { } entrance) return entrance.MapId;
         // 0.151: a game target (journal) lives on the requested map, which may differ from the selected zone when the quest
         // is behind a zone-change NPC (Solution Nine → Nine Sentinel, user capture).
         if (Target is not null && Requested != 0 && catalog.Find(Requested) is not null) return Requested;

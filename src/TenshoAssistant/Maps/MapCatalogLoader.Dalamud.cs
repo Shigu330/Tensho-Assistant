@@ -58,7 +58,7 @@ internal sealed class MapCatalogLoader : IDisposable
                 var territoryMaps = new Dictionary<uint,uint>();
                 foreach (var territory in data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>())
                     if (territory.Map.RowId != 0) territoryMaps[territory.RowId] = territory.Map.RowId;
-                build = Task.Run(() => new MapCatalog(managed, token, territoryMaps));
+                build = Task.Run(() => new MapCatalog(managed, token, territoryMaps, ReadEntrances(managed)));
                 // Observe faults even if disposal ends publication before the next callback.
                 _ = build.ContinueWith(task => { _ = task.Exception; }, TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
             }
@@ -72,6 +72,23 @@ internal sealed class MapCatalogLoader : IDisposable
     {
         stopped = true; TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update); copied.Clear(); sheet = null;
     }
+    // 0.634 (docs/evidence/0.634-dungeon-entrances.md): off the frame, once. All or nothing: without them a quest opens the map the game asks.
+    private IReadOnlyDictionary<uint,MapEntrance> ReadEntrances(IReadOnlyList<MapDefinition> maps)
+    {
+        try
+        {
+            var dungeons=new List<(uint,uint,string)>();
+            foreach(var territory in data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>())
+                if(territory.TerritoryIntendedUse.RowId==3 && territory.PlaceName.RowId!=0)dungeons.Add((territory.RowId,territory.PlaceName.RowId,territory.PlaceName.Value.Name.ExtractText()));
+            var markers=new List<(uint,uint,string,float,float)>();
+            foreach(var rows in data.GetSubrowExcelSheet<Lumina.Excel.Sheets.MapMarker>())
+                foreach(var row in rows)
+                    if(row.Icon==MapEntrances.Icon && row.PlaceNameSubtext.RowId!=0)markers.Add((row.RowId,row.PlaceNameSubtext.RowId,row.PlaceNameSubtext.Value.Name.ExtractText(),row.X,row.Y));
+            return MapEntrances.Build(dungeons,markers,maps);
+        }
+        catch(Exception error){log.Warning(error,"Dungeon entrances unavailable.");return new Dictionary<uint,MapEntrance>();}
+    }
+
     public void Dispose()
     {
         lock (gate)

@@ -41,6 +41,22 @@ internal static class MapAside617Tests
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs"));
             Check(view.Contains("if(repeated && !clicked)request=request.Plain();"),"only when unchanged and not clicked");
         }),
+        ("Map request (0.634): a dungeon quest shows the entrance, from outside the dungeon",() =>
+        {
+            var inside=new TenshoAssistant.Maps.MapDefinition(752,1050,"","Alzadaal","",1,200,MarkerRange:900);
+            var outside=new TenshoAssistant.Maps.MapDefinition(695,958,"","Thavnair","",0,100,MarkerRange:478);
+            var entrances=TenshoAssistant.Maps.MapEntrances.Build([(1050u,4154u,"Legs"),(1037u,48u,"Mines"),(1u,5u,"Absent")],[(478u,4154u,"Legs",754f,1634f),(478u,77u,"MINES",10f,20f),(999u,5u,"Absent",1f,1f)],[inside,outside]);
+            Check(entrances[1050]==new TenshoAssistant.Maps.MapEntrance(695,754,1634),"by its place's row");
+            Check(entrances[1037].X==10f,"or by the same name");
+            Check(!entrances.ContainsKey(1),"a marker on no known map is left out");
+            var catalog=new TenshoAssistant.Maps.MapCatalog([inside,outside],default,null,entrances);
+            var quest=new TenshoAssistant.Maps.GameMapRequest(752,752,1050,12,QuestLog:true,Target:new System.Numerics.Vector2(5,5));
+            Check(quest.Resolve(catalog)==695,"the entrance's map");
+            Check((quest with {Current=752}).Resolve(catalog)==752 || (quest with {Current=752}).Resolve(catalog)==0,"inside: the dungeon's map");
+            Check(quest.EntranceTarget(catalog)!.X==754,"focused there");
+            Check((quest with {RouteMap=695}).EntranceTarget(catalog) is null,"the game's own way first");
+            Check((quest with {QuestLog=false,Target=null}).EntranceTarget(catalog) is null,"not for a plain opening");
+        }),
         ("Map request (0.633): away from a quest's zone, the map of the NPC that leads there",() =>
         {
             var village=new TenshoAssistant.Maps.MapDefinition(1025,1269,"","Phantom Village","",0,400);
@@ -63,7 +79,7 @@ internal static class MapAside617Tests
             Check(request.Resolve(new TenshoAssistant.Maps.MapCatalog([village]))==919,"unknown: the map the game asked");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             Check(view.Contains("if(focus.Target is { } target && map.TerritoryId!=0)return"),"never placed on a world or region map");
-            Check(view.Contains("focus.TargetIcon!=0 && map.TerritoryId!=0 && !focus.UsesRoute(map) ?"),"no icon there either");
+            Check(view.Contains("focus.TargetIcon!=0 && map.TerritoryId!=0 && !focus.UsesRoute(map) &&"),"no icon there either");
         }),
         ("Map request (0.629): a click just before asks for the quest again, once; the map key does not",() =>
         {

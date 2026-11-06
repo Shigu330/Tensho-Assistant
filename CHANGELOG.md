@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.634.0
+- Plan global, phase 5 : Carte (demande de l'utilisateur) : une quête dans un donjon ouvre, depuis l'extérieur, la carte où se trouve son entrée, centrée sur le marqueur du donjon. Le marqueur vient des données du jeu : 102 donjons sur 122 en ont un, les autres gardent la carte demandée par le jeu. À l'intérieur du donjon, sa propre carte. Non vu : la demande du jeu pour une quête de donjon, le journal n'en contient aucune.
+- Tests : Map request. Verify.ps1 (agent) : 1141/1141, 0 avertissement, 0 erreur ; DLL 0.634.0.0. Non validé en jeu.
+### English
+- Map (user request): a quest in a dungeon opens, from outside, the map holding its entrance, centred on the dungeon's marker. The marker comes from the game's data: 102 dungeons out of 122 have one, the others keep the map the game asks. Inside the dungeon, its own map. Not seen: the game's request for a dungeon quest, none is in the log.
+
 ## 0.633.0
 - Plan global, phase 5 : Carte (rapport et captures de l'utilisateur, sonde du journal). Une quête au-delà d'un changement de zone ouvre la carte où se trouve ce passage, comme le montre le jeu : Tuliyollal pour la Ville fantôme, centrée sur son marqueur. Déjà dans la zone, la carte de la zone. Le clic sur une même quête suit maintenant l'état du bouton de la souris, car l'indicateur du jeu restait faux dans le journal. Sous « Monde », le menu ne défile plus. La sonde temporaire de la 0.630 est retirée.
 - Tests : Map request. Verify.ps1 (agent) : 1140/1140, 0 avertissement, 0 erreur ; DLL 0.633.0.0. Non validé en jeu.

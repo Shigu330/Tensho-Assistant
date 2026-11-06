@@ -898,17 +898,19 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.627) Cliquer une quête dans le journal, fermer la carte, la rouvrir avec sa touche : elle s'ouvre sur toi. Cliquer une autre quête : elle s'y centre.
 
-- [ ] (0.628) Cliquer « Un forgeron fantomatique » dans le journal : la carte de la Ville fantôme s'ouvre, l'icône près de Gerolt. Rouvrir la carte avec sa touche : elle s'ouvre sur toi.
+- [x] (0.628) Cliquer « Un forgeron fantomatique » dans le journal : la carte de la Ville fantôme s'ouvre, l'icône près de Gerolt. Rouvrir la carte avec sa touche : elle s'ouvre sur toi.
 
-- [ ] (0.629) Cliquer plusieurs fois la même quête dans le journal : la carte reste ouverte sur elle. Fermer avec la touche de carte, rouvrir : elle s'ouvre sur toi.
+- [x] (0.629) Cliquer plusieurs fois la même quête dans le journal : la carte reste ouverte sur elle. Fermer avec la touche de carte, rouvrir : elle s'ouvre sur toi.
 
-- [ ] (0.630) Cliquer une fois « Un forgeron fantomatique » dans le journal, loin de la Ville fantôme.
+- [x] (0.630) Cliquer une fois « Un forgeron fantomatique » dans le journal, loin de la Ville fantôme.
 
-- [ ] (0.631) Ouvrir la carte de Yok Tural : les zones apparaissent sur le parchemin, comme dans le jeu, sans taches blanches. Comparer aussi une région d'Éorzéa.
+- [x] (0.631) Ouvrir la carte de Yok Tural : les zones apparaissent sur le parchemin, comme dans le jeu, sans taches blanches. Comparer aussi une région d'Éorzéa.
 
-- [ ] (0.632) Comparer La Noscea et Yok Tural avec le jeu : zones, ton, cristaux. Ouvrir le monde : Tural est là, et le second menu propose Hydaelyn et Premier reflet.
+- [x] (0.632) Comparer La Noscea et Yok Tural avec le jeu : zones, ton, cristaux. Ouvrir le monde : Tural est là, et le second menu propose Hydaelyn et Premier reflet.
 
-- [ ] (0.633) Loin de la Ville fantôme, cliquer « Un forgeron fantomatique » : Tuliyollal s'ouvre, centrée sur le marqueur. Recliquer : la carte reste sur la quête. Touche de carte : fermée puis rouverte sur toi.
+- [x] (0.633) Loin de la Ville fantôme, cliquer « Un forgeron fantomatique » : Tuliyollal s'ouvre, centrée sur le marqueur. Recliquer : la carte reste sur la quête. Touche de carte : fermée puis rouverte sur toi.
+
+- [ ] (0.634) Cliquer une quête qui demande d'accomplir un donjon : la carte de l'entrée s'ouvre, centrée sur le marqueur du donjon.
 
 **0.535 : interfaces** — à voir en jouant
 
