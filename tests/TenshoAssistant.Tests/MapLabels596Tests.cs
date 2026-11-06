@@ -51,6 +51,15 @@ internal static class MapLabels596Tests
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             Check(view.Contains("HeaderEntry($\"ZoneWorld{choice.MapId}\"") && view.Contains("##ZoneWorld{choice.MapId}"),"in both menus");
         }),
+        ("Map labels (0.639): a dungeon's icon and a door like Ville fantôme open the map they name",() =>
+        {
+            Check(TenshoAssistant.Maps.MapLabels.OpensNamedMap(60414,0),"dungeon entrance");
+            Check(TenshoAssistant.Maps.MapLabels.OpensNamedMap(60441,0),"Ville fantôme");
+            Check(!TenshoAssistant.Maps.MapLabels.OpensNamedMap(60412,0),"a shop stays a shop");
+            Check(!TenshoAssistant.Maps.MapLabels.OpensNamedMap(60414,3),"another kind of marker");
+            var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs"));
+            Check(source.Contains("row.DataType==1 ? row.DataKey.RowId:NamedMap("),"as a link, for the icon and its name");
+        }),
         ("Map labels: from the sheet, only for a drawn icon, with their setting",() =>
         {
             var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs"));

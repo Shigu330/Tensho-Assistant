@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.639.0
+- Plan global, phase 5 : Carte (demande de l'utilisateur) : cliquer l'icône d'un donjon, ou celle d'une porte comme la Ville fantôme, ou leur nom, ouvre la carte nommée. Le jeu le fait pour la Ville fantôme ; pour les donjons, c'est un ajout de Tensho, demandé. Leur nom s'affiche donc comme celui d'un lien, aussi en vue éloignée.
+- Tests : Map labels. Verify.ps1 (agent) : 1144/1144, 0 avertissement, 0 erreur ; DLL 0.639.0.0. Non validé en jeu.
+### English
+- Map (user request): clicking a dungeon's icon, or a door's like Phantom Village, or their name, opens the map it names. The game does it for Phantom Village; for dungeons it is a Tensho addition, as requested. Their names therefore show like a link's, also when zoomed out.
+
 ## 0.638.0
 - Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : une quête de donjon ouvrait encore la carte du donjon, car une carte de ce territoire était trouvée avant le chemin donné par le jeu. Elle ouvre maintenant la carte de l'entrée, centrée sur le marqueur du jeu, comme les autres quêtes au-delà d'un changement de zone. À l'intérieur du donjon, sa propre carte.
 - Tests : Map request. Verify.ps1 (agent) : 1143/1143, 0 avertissement, 0 erreur ; DLL 0.638.0.0. Non validé en jeu.

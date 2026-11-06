@@ -21,6 +21,11 @@ public static class MapLabels
     /// <summary>0.632: map pixels per zone pixel on a region map, measured on the game's crystals (docs/evidence/0.631-region-zone-images.md). The zone's picture covers its 2048 pixels.</summary>
     public const float ZoneScale=0.42f;
     public static Vector2 ZonePixel(Vector2 linkMarker,Vector2 zonePixel)=>linkMarker+(zonePixel-new Vector2(1024))*ZoneScale;
+    /// <summary>
+    /// 0.639 (user request): a marker with no link of its own that still opens the map it names: a dungeon's entrance (60414, not clickable in the game) or a door like Ville fantôme (60441, clickable in the game).
+    /// See docs/evidence/0.639-instance-markers.md.
+    /// </summary>
+    public static bool OpensNamedMap(uint icon,uint dataType)=>dataType==0 && icon is 60414 or 60441;
     public static bool Shown(bool mapLink,float zoom)=>mapLink || zoom>=DetailZoom;
 
     /// <summary>The names that fit, map links first, then in the order given: a name that would touch one already kept is left out.</summary>
