@@ -24,6 +24,22 @@ internal sealed partial class MainWindow
     private object? leveListsFor;
     private (int Completed,int Known,int Total) leveCount;
 
+    // 0.689 (user report): the tooltip gave only the row's id, in developer mode. It now says what the columns say, which a narrow window hides.
+    private string LeveTooltip(LeveDefinition leve)
+    {
+        var lines=new List<string>
+        {
+            leve.Name,
+            $"{localization.Get("Leves.ColumnLevel")} {leve.Level} · {leve.Type}",
+            $"{localization.Get("Leves.ColumnClient")} : {leve.Client}",
+            $"{localization.Get("Leves.ColumnZone")} : {leve.Zone}",
+            $"{localization.Get("Leves.ColumnGil")} : {leve.Gil:N0}",
+            localization.Format("Leves.TooltipAllowances",leve.Allowances),
+        };
+        if(developerMode)lines.Add($"Leve {leve.Id}");
+        return string.Join("\n",lines);
+    }
+
     private void DrawLeves()
     {
         Heading(localization.Get("Leves.Title"),localization.Get("Leves.Description"));
@@ -111,7 +127,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     DrawItemIcon(new ItemDefinition(0,leve.Name,false,leve.TypeIcon),size);ImGui.SameLine();
                     ImGui.TextUnformatted(leve.Name);
-                    if(developerMode && ImGui.IsItemHovered())WrappedTooltip($"Leve {leve.Id}");
+                    if(ImGui.IsItemHovered())WrappedTooltip(LeveTooltip(leve));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Level.ToString());
                     ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Type);
                     ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Client);

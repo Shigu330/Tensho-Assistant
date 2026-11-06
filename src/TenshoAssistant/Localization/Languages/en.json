@@ -5183,6 +5183,7 @@
     "NotOwned": "missing"
   },
   "Leves": {
+    "TooltipAllowances": "Allowances: {0}",
     "Title": "Guildleves",
     "Description": "Game data · state read in game for the logged-in character",
     "Unknown": "Guildleve state not read: log in.",

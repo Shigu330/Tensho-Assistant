@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.689.0
+- Plan global, Mandats : Rapport de l'utilisateur : l'infobulle d'un mandat ne donnait que son identifiant, en mode développeur. Elle donne maintenant le niveau, le type, le mandateur, la zone, les gils et les allocations, pour tout le monde ; l'identifiant reste en mode développeur. COMPILED et TESTED, non validé en jeu.
+- Tests : ReminderTabs687Tests. Verify.ps1 (agent) : 1223/1223, 0 avertissement, 0 erreur ; DLL 0.689.0.0. Non validé en jeu.
+### English
+- User report: a leve's tooltip gave only its id, in developer mode. It now gives level, type, client, zone, gil and allowances, for everyone; the id stays in developer mode. COMPILED and TESTED, not validated in game.
+
 ## 0.688.0
 - Plan global, Rappels : Demande de l'utilisateur : la page Rappels passe en 5 onglets : Minuteurs, Mes tâches, Roulettes, Escadron, État du personnage. Rien n'est retiré. COMPILED et TESTED, non validé en jeu.
 - Tests : ReminderTabs687Tests. Verify.ps1 (agent) : 1222/1222, 0 avertissement, 0 erreur ; DLL 0.688.0.0. Non validé en jeu.

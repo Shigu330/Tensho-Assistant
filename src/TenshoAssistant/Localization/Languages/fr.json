@@ -5183,6 +5183,7 @@
     "NotOwned": "manquante"
   },
   "Leves": {
+    "TooltipAllowances": "Allocations : {0}",
     "Title": "Mandats",
     "Description": "Données du jeu · état lu dans le jeu pour le personnage connecté",
     "Unknown": "État des mandats non lu : connectez-vous.",
