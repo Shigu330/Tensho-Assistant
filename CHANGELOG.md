@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.838.0
+- Plan global, Verify : Signalement (X-65) : dans la liste de suivi des Marrons glacés, le sirop de bouleau (157 pour 1 demandé) n'apparaissait pas, et rien ne disait qu'il était chez un servant. Cause : un ingrédient qui se fabrique et qu'on détient déjà était retiré du calcul sans être inscrit dans un groupe ; il n'avait donc ni ligne, ni l'icône d'entrepôt qui signale un objet gardé ailleurs (0.822). Il reste maintenant une ligne, pour la quantité prise dans le stock, avec cette icône quand l'objet n'est pas sur vous. Les objets de la liste eux-mêmes ne changent pas. Non validé en jeu.
+- Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1424/1424, 0 avertissement, 0 erreur ; DLL 0.838.0.0. Non validé en jeu.
+### English
+- Report (X-65): in the Marrons glacés tracking list, the birch syrup (157 for 1 needed) did not appear, and nothing said a retainer held it. Cause: a crafted ingredient already held was taken out of the count without being put in any group, so it had no line and no warehouse icon marking an item kept elsewhere (0.822). It now stays a line, for the quantity taken from the stock, with that icon when it is not on you. The list's own items are unchanged. Not validated in game.
+
 ## 0.837.0
 - Plan global, Verify : Signalement (X-03), résolu par l'essai « /tensho linktest » : sur le lien d'objet du chat, le jeu ouvre bien son menu et le donne à Tensho (journal de 23:35, objet survolé 12898), mais Tensho le prenait pour un menu de personnage, parce qu'un nom y figure. Le menu du chat reçoit maintenant l'entrée Tensho quand l'objet du lien, tel que le jeu le garde, est l'objet survolé ; un clic droit sur le nom d'un joueur n'en reçoit toujours pas. Vaut pour l'alarme et pour tout lien d'objet du chat. Non validé en jeu.
 - Tests : ChatItemMenu837Tests. Verify.ps1 (agent) : 1423/1423, 0 avertissement, 0 erreur ; DLL 0.837.0.0. Non validé en jeu.

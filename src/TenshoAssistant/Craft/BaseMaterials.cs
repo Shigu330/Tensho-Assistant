@@ -106,6 +106,9 @@ public static class BaseMaterials
             var free=Math.Max(0,stock(item)-used.GetValueOrDefault(item));
             var taken=Math.Min(free,amount);
             used[item]=used.GetValueOrDefault(item)+taken;
+            // 0.838 (X-65, user report: the birch syrup held, 157/1, was in no group, so neither seen nor marked as kept by a retainer): an ingredient that is
+            // crafted but taken from the stock stays a line, for the part taken; the list's own items are left as before.
+            if(taken>0 && depth<MaxDepth)Base(item,taken);
             amount-=taken;
             if(amount==0)return;
             var runs=(amount+recipe.ResultAmount-1)/recipe.ResultAmount;
