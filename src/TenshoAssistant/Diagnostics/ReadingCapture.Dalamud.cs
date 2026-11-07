@@ -26,6 +26,7 @@ public sealed unsafe class ReadingCapture : IDisposable
     private readonly Func<bool> enabled;
     private readonly IPluginLog log;
     private readonly Dictionary<string,int> lines=[];
+    private readonly Dictionary<int,int> messageKinds=[];
     private string statuses="",synthesis="",workshop="",questMarkers="",monsterEvents="",leves="",retainer="",airship="",islandState="",islandAgenda="";
     private bool fishing,disposed,warned;
     private long slowAt;
@@ -304,8 +305,23 @@ public sealed unsafe class ReadingCapture : IDisposable
         if(disposed || !enabled())return;
         try
         {
-            if(objects.LocalPlayer?.ClassJob.RowId!=18 || message.Sender.TextValue.Trim().Length!=0)return;
-            Line("fishing",200,$"chat [{(int)message.LogKind}] {message.Message.TextValue}");
+            if(message.Sender.TextValue.Trim().Length!=0)return;
+            if(objects.LocalPlayer?.ClassJob.RowId==18)Line("fishing",200,$"chat [{(int)message.LogKind}] {message.Message.TextValue}");
+            // 0.809 (X-43, step 3): which game messages tell a defeat, a drop, a blue spell learned, a beast caught. The first five of each message kind,
+            // sender empty (the game speaking), player names masked, item rows written out.
+            var kind=(int)message.LogKind;
+            var seen=messageKinds.GetValueOrDefault(kind);
+            if(seen>=5 || messageKinds.Count>=80 && seen==0)return;
+            messageKinds[kind]=seen+1;
+            var text=new StringBuilder();
+            foreach(var payload in message.Message.Payloads)
+                switch(payload)
+                {
+                    case Dalamud.Game.Text.SeStringHandling.Payloads.PlayerPayload:text.Append("<player>");break;
+                    case Dalamud.Game.Text.SeStringHandling.Payloads.ItemPayload item:text.Append($"[item {item.ItemId}]");break;
+                    case Dalamud.Game.Text.SeStringHandling.Payloads.TextPayload words:text.Append(words.Text);break;
+                }
+            Line("messages",400,$"kind {kind}: {text}");
         }
         catch(Exception error)
         {

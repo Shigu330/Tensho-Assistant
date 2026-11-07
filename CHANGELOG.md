@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.809.0
+- Plan global, Verify : Base de découvertes (X-43), étape 3, préparation : pour noter le butin des monstres, les sorts bleus appris et les bêtes capturées, il faut connaître les messages du jeu. En mode développeur, les messages que le jeu écrit lui-même (sans expéditeur) sont notés au journal : les cinq premiers de chaque type, quatre-vingts types au plus, les noms de joueurs masqués, les objets écrits par leur numéro ; coupé en JcJ. Aucun changement visible. Non validé en jeu.
+- Tests : MessageCapture809Tests. Verify.ps1 (agent) : 1395/1395, 0 avertissement, 0 erreur ; DLL 0.809.0.0. Non validé en jeu.
+### English
+- Discoveries base (X-43), step 3, preparation: noting monster drops, blue spells learned and beasts caught needs the game's messages. In developer mode, the messages the game writes itself (no sender) are written to the log: the first five of each kind, eighty kinds at most, player names masked, items by their number; cut in PvP. No visible change. Not validated in game.
+
 ## 0.808.0
 - Plan global, Verify : Signalement (X-44) : au clic droit dans le carnet d'artisanat, sur une recette ou sur un matériau, le menu n'avait pas d'entrée Tensho. Le journal montrait un menu « par défaut » du carnet avec l'objet survolé, écarté par la règle qui protège les menus visant un personnage. Les fenêtres d'objets du carnet (carnet, liste des matériaux, arbre de fabrication) ont maintenant l'entrée Tensho ; les autres menus gardent la règle. En mode développeur, la ligne du journal dit aussi ce que la cible du menu contient. Non validé en jeu.
 - Tests : RecipeMenu808Tests. Verify.ps1 (agent) : 1394/1394, 0 avertissement, 0 erreur ; DLL 0.808.0.0. Non validé en jeu.
