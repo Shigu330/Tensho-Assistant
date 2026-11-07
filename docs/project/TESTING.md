@@ -1204,6 +1204,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.781) À la prochaine alarme : clic droit sur la ligne de l'objet ; je relis « Context menu opened ».
 
+- [ ] (0.782) Rouvrez le carnet d'artisan sur la recette 5623 en cuisinier : plus de gel.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

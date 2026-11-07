@@ -6,6 +6,22 @@ namespace TenshoAssistant.Craft;
 /// </summary>
 public static class RaphaelActions
 {
+    /// <summary>
+    /// 0.782 (X-25, the game froze on 2026-11-07 15:18:45): Raphael's native code divides by the base quality gain (quality_upper_bound_solver/state.rs:59,
+    /// « attempt to divide by zero ») and by the others; a panic there cannot be caught and stops the game. Any value it cannot take is refused here, before the
+    /// call: zero gains (a recipe without quality, a stat read as 0), no durability or progress, or a number past what its 16-bit fields hold. Null: safe to call.
+    /// </summary>
+    public static string? InputRefusal(int baseProgress,int baseQuality,int durability,int progress,int cp,int quality)
+    {
+        if(baseProgress<=0)return "base progress gain is 0";
+        if(baseQuality<=0)return "base quality gain is 0";
+        if(durability<5)return "durability below 5";
+        if(progress<=0)return "progress is 0";
+        if(cp<0 || quality<0)return "negative CP or quality";
+        if(new[]{baseProgress,baseQuality,durability,progress,cp,quality}.Any(value=>value>ushort.MaxValue))return "a value past 65535";
+        return null;
+    }
+
     private static readonly IReadOnlyDictionary<CraftActionKind,int> Numbers=new Dictionary<CraftActionKind,int>
     {
         [CraftActionKind.BasicSynthesis]=0,[CraftActionKind.BasicTouch]=1,[CraftActionKind.MastersMend]=2,[CraftActionKind.Observe]=3,[CraftActionKind.WasteNot]=5,

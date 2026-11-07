@@ -266,6 +266,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-22 | Butin des monstres, lignes du wiki « Monstre · niveau · Zone (x,y) » : pas de clic droit vers l'éthérite la plus proche | Fait en 0.777 : tous les numéros de lieu d'un nom essayés (« Mor Dhona » en a 3) ; un lieu sans carte est noté au journal en mode développeur |
 | X-23 | Alarmes : l'envoi sur Discord désactivé par défaut | Fait en 0.778 : une nouvelle alarme n'envoie rien sur Discord ; une alarme enregistrée garde son choix |
 | X-24 | Après un chargement du plugin, les objets de monstres passent un moment en « Autres » : la source des monstres n'est relue du disque que plus tard | Fait en 0.779 : les listes demandent elles-mêmes la source des monstres, relue de la copie sur disque |
+| X-25 | **Gel du jeu, 15:18:45** : le solveur Raphael (natif) panique sur une division par zéro (quality_upper_bound_solver/state.rs:59) en ouvrant le carnet d'artisan, cuisinier, recette 5623 ; la panique arrête le jeu | Fait en 0.782 : toute valeur nulle ou trop grande refusée avant l'appel ; `docs/evidence/0.782-raphael-freeze.md` |
 
 ## Retenu pour plus tard
 

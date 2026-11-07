@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.782.0
+- Plan global, Verify : Gel du jeu (X-25), causé par Tensho : en ouvrant le carnet d'artisan (cuisinier, recette 5623), le solveur Raphael, code natif, a divisé par un gain de qualité de 0 ; une telle erreur arrête le jeu sans pouvoir être rattrapée. Tensho vérifie maintenant chaque valeur avant l'appel (gains nuls, durabilité ou progression nulles, valeurs trop grandes) et, dans ces cas, ne demande rien à Raphael ; sa propre recherche reste. Non validé en jeu.
+- Tests : RaphaelGuard782Tests. Verify.ps1 (agent) : 1350/1350, 0 avertissement, 0 erreur ; DLL 0.782.0.0. Non validé en jeu.
+### English
+- Game freeze (X-25), caused by Tensho: opening the crafting log (culinarian, recipe 5623), the Raphael solver, native code, divided by a quality gain of 0; such an error stops the game and cannot be caught. Tensho now checks every value before the call (zero gains, zero durability or progress, values too large) and, in those cases, asks Raphael nothing; its own search remains. Not validated in game.
+
 ## 0.781.0
 - Plan global, Verify : Lien d'alarme (X-03) : le clic droit faisait défiler le chat sans ouvrir de menu. En mode développeur, chaque menu contextuel ouvert est maintenant noté au journal (type, fenêtre, cible, objet survolé), pour voir ce que le jeu ouvre. Aucun changement visible. Non validé en jeu.
 - Tests : MenuLog781Tests. Verify.ps1 (agent) : 1348/1348, 0 avertissement, 0 erreur ; DLL 0.781.0.0. Non validé en jeu.

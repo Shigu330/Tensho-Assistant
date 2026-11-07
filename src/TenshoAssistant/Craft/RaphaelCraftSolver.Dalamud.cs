@@ -14,10 +14,14 @@ internal static class RaphaelCraftSolver
         var parameters=recipe.Simulation ?? throw new ArgumentException("Recipe without simulation data.",nameof(recipe));
         var start=CraftSimulation.Run(recipe,stats,startingQuality,[],cancellation);
         var pool=RaphaelActions.Pool(stats,options.Forbidden,recipe.Level).Select(kind=>(Raphael.Action)(byte)RaphaelActions.Number(kind)!.Value).ToArray();
+        var target=Math.Max(0,options.TargetQuality-startingQuality);
+        // 0.782 (X-25): never hand the native solver a value it divides by while 0; ArgumentException is the « no Raphael answer » the cache already expects.
+        if(RaphaelActions.InputRefusal(start.BaseProgress,start.BaseQuality,parameters.Durability,parameters.Progress,stats.Cp,target) is { } refusal)
+            throw new ArgumentException("Raphael not called: "+refusal+".",nameof(recipe));
         var config=new SolverConfig{AllowNonMaxQualitySolutions=true,ThreadCount=(ushort)Math.Clamp(Environment.ProcessorCount-2,1,ushort.MaxValue)};
         var input=new SolverInput
         {
-            CP=(ushort)stats.Cp,Durability=(ushort)parameters.Durability,Progress=(ushort)parameters.Progress,Quality=(ushort)Math.Max(0,options.TargetQuality-startingQuality),
+            CP=(ushort)stats.Cp,Durability=(ushort)parameters.Durability,Progress=(ushort)parameters.Progress,Quality=(ushort)target,
             BaseProgressGain=(ushort)start.BaseProgress,BaseQualityGain=(ushort)start.BaseQuality,JobLevel=(byte)stats.Level,
         };
         Raphael.Action[]? found=null;
