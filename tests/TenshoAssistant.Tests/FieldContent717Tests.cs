@@ -19,6 +19,18 @@ internal static class FieldContent717Tests
             Check(placed[2].Level is null,"no level stays unknown");
             Check(FieldBoard.Place(entries,[new(FieldEventKind.Fate,5,10,"","",1,0)]).Count==0,"a row with no name");
         }),
+        ("FATEs: a search looks everywhere, a zone lists its own, and the zone you are in is found",() =>
+        {
+            FieldEvent One(uint id,string name)=>new(FieldEventKind.Fate,id,name,"",1,0,0,0);
+            FieldZone[] zones=[new(134,15,"Noscea",[One(1,"Pomme"),One(2,"Poire")]),new(135,16,"Basse",[One(3,"Pomme verte")])];
+            Check(FieldBoard.Find(zones,0,"").Select(row=>row.Row.Id).SequenceEqual([1u,2u]),"the zone");
+            var found=FieldBoard.Find(zones,0,"pomme");
+            Check(found.Select(row=>row.Row.Id).SequenceEqual([1u,3u]) && found[1].Zone.Territory==135,"every zone");
+            Check(FieldBoard.Find(zones,0,"p").Count==2,"one letter stays on the zone");
+            Check(FieldBoard.Find(zones,9,"").Count==0,"no such zone");
+            Check(FieldBoard.ZoneOf(zones,135)==1 && FieldBoard.ZoneOf(zones,999)==0,"current zone, else the first");
+            Check(Read("MainWindow.Fates.cs").Contains("fatesTask=Task.Run(load)") && Read("MainWindow.Fates.cs").Contains("PlaceMenu($\"FatePlace"),"off the frame, right click");
+        }),
         ("Eureka and Bozja: the six zones, and the search on name or text",() =>
         {
             Check(FieldBoard.Territories.SequenceEqual([732u,763u,795u,827u,920u,975u]),"zones");

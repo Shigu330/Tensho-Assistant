@@ -155,6 +155,12 @@ internal sealed partial class MainWindow
             {
                 var text=$"{targets[index].Name}{(targets[index].Place.Length>0 ? " · "+targets[index].Place:"")}  {state(index)}";
                 if(finished(index))ImGui.TextColored(Success,text);else ImGui.TextUnformatted(text);
+                if(key=="Relics.Fates")
+                {
+                    ImGui.SameLine();
+                    if(ImGui.SmallButton(localization.Get("Relics.FindFate")+$"##RelicFate{index}"))OpenFate(targets[index].Name);
+                    Tip("Relics.FindFateTip");
+                }
             }
         }
         string Tick(bool value)=>localization.Get(value ? "Relics.Done":"Relics.Left");

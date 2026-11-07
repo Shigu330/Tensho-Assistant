@@ -27,5 +27,22 @@ public static class FieldBoard
             .OrderBy(row=>row.Kind).ThenBy(row=>row.Level ?? int.MaxValue).ThenBy(row=>row.Id).ToArray();
     }
 
+    /// <summary>TerritoryIntendedUse 1: the open zones. Other uses repeat their layouts for quests and instances. docs/evidence/0.721-fates.md.</summary>
+    public const uint OpenZoneUse=1;
+
+    /// <summary>A place found by search, wherever it is, or a zone's own list.</summary>
+    public static IReadOnlyList<(FieldZone Zone,FieldEvent Row)> Find(IReadOnlyList<FieldZone> zones,int zone,string query)
+    {
+        if(query.Trim().Length>=2)
+            return zones.SelectMany(place=>place.Events.Where(row=>Matches(query.Trim(),row.Name,row.Description)).Select(row=>(place,row))).ToArray();
+        return zone>=0 && zone<zones.Count ? zones[zone].Events.Select(row=>(zones[zone],row)).ToArray():[];
+    }
+
+    public static int ZoneOf(IReadOnlyList<FieldZone> zones,uint territory)
+    {
+        for(var index=0;index<zones.Count;index++)if(zones[index].Territory==territory)return index;
+        return 0;
+    }
+
     public static bool Matches(string query,params string[] texts)=>query.Length==0 || texts.Any(text=>text.Contains(query,StringComparison.CurrentCultureIgnoreCase));
 }

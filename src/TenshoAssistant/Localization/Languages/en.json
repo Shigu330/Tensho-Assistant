@@ -288,6 +288,10 @@
     "LexiconPurpose": "Find a word of the game in French and in English: items, actions, places, monsters, quests and the interface's own words.",
     "LexiconStart": "Type a word in either language; click a word to copy it.",
     "LexiconEmpty": "Nothing shows until two letters have been typed.",
+    "FatesTitle": "FATEs",
+    "FatesPurpose": "Where each FATE of the open zones takes place, with its level, from the game files.",
+    "FatesStart": "Choose a zone or search a name; click for the map, right click for the flag and the nearest aetheryte.",
+    "FatesEmpty": "Nothing shows until the game files have been read.",
     "OceanFishingTitle": "Ocean fishing",
     "OceanFishingPurpose": "The next departures from Limsa Lominsa and Kugane, with their stops and the time of day.",
     "OceanFishingStart": "Read the next departure and its route. During a voyage, the fishing help shows the stop and its fish.",
@@ -563,6 +567,7 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "Navigation": {
+    "Fates": "FATEs",
     "Lexicon": "Lexicon",
     "DeepDungeons": "Deep dungeons",
     "FieldContent": "Eureka and Bozja",
@@ -6304,6 +6309,8 @@
     "Reached": "Furthest stage in your stocks: {0} of {1}, {2}.",
     "ColumnStage": "Stage",
     "ColumnWeapon": "Weapon",
+    "FindFate": "Where?",
+    "FindFateTip": "Opens the FATE page on this FATE, with its place.",
     "PartWeapons": "Weapons",
     "PartArmour": "Armour",
     "ArmourSet": "For",
@@ -6476,6 +6483,21 @@
     "KindAchievement": "Achievements",
     "KindEmote": "Emotes",
     "KindInterface": "Interface"
+  },
+  "Fates": {
+    "Title": "FATEs",
+    "Subtitle": "Every FATE the game's files place in the open zones, whether it is running or not.",
+    "Loading": "Reading the zone files…",
+    "Unavailable": "The zone files could not be read (game update?).",
+    "ZoneTip": "The zone to list. Starts on the one you are in.",
+    "Search": "Search a name, in every zone",
+    "SearchTip": "Two letters at least: looks in every zone, on the name and on the game's text.",
+    "Hint": "Click: show on the map. Right click: flag and nearest aetheryte. Those running now are on the map.",
+    "None": "No FATE found.",
+    "ColumnName": "Name",
+    "ColumnLevel": "Level",
+    "ColumnZone": "Zone",
+    "ColumnPlace": "Place"
   },
   "Island": {
     "TabWorkshop": "Workshop",

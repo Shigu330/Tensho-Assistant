@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.721.0
+- Plan global, W-14b : Trouvé en faisant Eureka et Bozja : les fichiers de zone du jeu donnent le lieu de chaque ALEA. Nouvelle page Monde › ALEA : 47 zones ouvertes et 1 127 ALEA avec niveau et position, recherche par nom dans toutes les zones, clic pour la carte, clic droit pour le drapeau et l'éthérite. Le livre du zodiaque a un bouton « Où ? » sur ses ALEA. COMPILED et TESTED, non validé en jeu.
+- Tests : FieldContent717Tests. Verify.ps1 (agent) : 1291/1291, 0 avertissement, 0 erreur ; DLL 0.721.0.0. Non validé en jeu.
+### English
+- Found while doing Eureka and Bozja: the game's zone files give each FATE's place. New page World > FATEs: 47 open zones and 1,127 FATEs with level and position, search by name in every zone, click for the map, right click for the flag and aetheryte. The Zodiac book has a Where? button on its FATEs. COMPILED and TESTED, not validated in game.
+
 ## 0.720.0
 - Plan global, W-13 : Fin des reliques suivantes, sujet choisi par l'utilisateur. La page s'appelle maintenant Reliques ; Eurêka, Résistance et fantômes ont deux onglets, Armes et Armures : pour le groupe de jobs choisi, chaque étape avec ses pièces au survol et le nombre en stock. COMPILED et TESTED, non validé en jeu.
 - Tests : RelicWeapons708Tests. Verify.ps1 (agent) : 1290/1290, 0 avertissement, 0 erreur ; DLL 0.720.0.0. Non validé en jeu.

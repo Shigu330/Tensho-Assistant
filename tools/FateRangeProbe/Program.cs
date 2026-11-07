@@ -15,13 +15,14 @@ var eventRanges=events.Where(row=>row.LGBMapRange!=0).ToDictionary(row=>row.LGBM
 var eventObjects=events.Where(row=>row.LGBEventObject!=0).ToDictionary(row=>row.LGBEventObject,row=>row);
 var byLocation=fates.Where(row=>row.Location!=0).GroupBy(row=>row.Location).ToDictionary(group=>group.Key,group=>group.ToArray());
 Console.WriteLine($"Fate rows {fates.Count}, with a location {byLocation.Sum(pair=>pair.Value.Length)}, flagged Eureka {fates.Count(row=>row.EurekaFate!=0)}");
-foreach(var territoryId in args[2..].Select(uint.Parse))
+var territoryIds=args.Length>2 && args[2]=="all" ? game.GetExcelSheet<TerritoryType>(language)!.Where(row=>row.RowId!=0 && !row.Bg.IsEmpty).Select(row=>row.RowId).ToArray():args[2..].Select(uint.Parse).ToArray();
+foreach(var territoryId in territoryIds)
 {
     var territory=game.GetExcelSheet<TerritoryType>(language)!.GetRow(territoryId);
     var bg=territory.Bg.ExtractText();var cut=bg.IndexOf("/level/",StringComparison.Ordinal);
-    Console.WriteLine($"TERRITORY {territoryId} {territory.PlaceName.Value.Name.ExtractText()} map {territory.Map.RowId} bg {bg}");
+    Console.WriteLine($"TERRITORY {territoryId} use {territory.TerritoryIntendedUse.RowId} {territory.PlaceName.Value.Name.ExtractText()} map {territory.Map.RowId} bg {bg}");
     if(cut<0)continue;
-    foreach(var kind in new[]{"planevent","planlive","planmap","planner","bg"})
+    foreach(var kind in new[]{"planevent","planmap"})
     {
         var path=$"bg/{bg[..(cut+1)]}level/{kind}.lgb";
         if(!game.FileExists(path)){Console.WriteLine($"  {kind}: no file");continue;}

@@ -288,6 +288,10 @@
     "LexiconPurpose": "Trouver un mot du jeu en français et en anglais : objets, actions, lieux, monstres, quêtes et les mots de l'interface.",
     "LexiconStart": "Tapez un mot dans l'une des deux langues ; cliquez sur un mot pour le copier.",
     "LexiconEmpty": "Rien ne s'affiche avant d'avoir tapé deux lettres.",
+    "FatesTitle": "ALEA",
+    "FatesPurpose": "Où se tient chaque ALEA des zones ouvertes, avec son niveau, d'après les fichiers du jeu.",
+    "FatesStart": "Choisissez une zone ou cherchez un nom ; clic pour la carte, clic droit pour le drapeau et l'éthérite la plus proche.",
+    "FatesEmpty": "Rien ne s'affiche tant que les fichiers du jeu ne sont pas lus.",
     "OceanFishingTitle": "Pêche en mer",
     "OceanFishingPurpose": "Les prochains départs de Limsa Lominsa et de Kugane, avec leurs escales et le moment de la journée.",
     "OceanFishingStart": "Lisez le prochain départ et son trajet. Pendant une traversée, l'aide à la pêche donne l'escale et ses poissons.",
@@ -563,6 +567,7 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "Navigation": {
+    "Fates": "ALEA",
     "Lexicon": "Lexique",
     "DeepDungeons": "Donjons profonds",
     "FieldContent": "Eureka et Bozja",
@@ -6304,6 +6309,8 @@
     "Reached": "Étape la plus avancée dans vos stocks : {0} sur {1}, {2}.",
     "ColumnStage": "Étape",
     "ColumnWeapon": "Arme",
+    "FindFate": "Où ?",
+    "FindFateTip": "Ouvre la page ALEA sur cet ALEA, avec son lieu.",
     "PartWeapons": "Armes",
     "PartArmour": "Armures",
     "ArmourSet": "Pour",
@@ -6476,6 +6483,21 @@
     "KindAchievement": "Hauts faits",
     "KindEmote": "Emotes",
     "KindInterface": "Interface"
+  },
+  "Fates": {
+    "Title": "ALEA",
+    "Subtitle": "Tous les ALEA que les fichiers du jeu placent dans les zones ouvertes, en cours ou non.",
+    "Loading": "Lecture des fichiers de zone…",
+    "Unavailable": "Les fichiers de zone sont illisibles (mise à jour du jeu ?).",
+    "ZoneTip": "La zone à lister. Commence sur celle où vous êtes.",
+    "Search": "Chercher un nom, dans toutes les zones",
+    "SearchTip": "Deux lettres au moins : cherche dans toutes les zones, sur le nom et le texte du jeu.",
+    "Hint": "Clic : voir sur la carte. Clic droit : drapeau et éthérite la plus proche. Ceux en cours sont sur la carte.",
+    "None": "Aucun ALEA trouvé.",
+    "ColumnName": "Nom",
+    "ColumnLevel": "Niveau",
+    "ColumnZone": "Zone",
+    "ColumnPlace": "Lieu"
   },
   "Island": {
     "TabWorkshop": "Atelier",

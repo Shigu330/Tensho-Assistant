@@ -8,11 +8,31 @@ internal static class FieldCatalogLoader
 {
     private static readonly string[] Layouts=["planevent","planmap"];
 
-    public static FieldCatalog Read(IDataManager data,IPluginLog log)
+    /// <summary>W-14b (0.721): every open zone's FATEs, in the game's order of zones.</summary>
+    public static IReadOnlyList<FieldZone> ReadOpenZones(IDataManager data,IPluginLog log)
+    {
+        var rows=FateRows(data);
+        var zones=new List<FieldZone>();
+        foreach(var territory in data.GetExcelSheet<TerritoryType>())
+        {
+            if(territory.RowId==0 || territory.TerritoryIntendedUse.RowId!=FieldBoard.OpenZoneUse || territory.PlaceName.ValueNullable?.Name.ExtractText() is not { Length:>0 } name)continue;
+            var events=FieldBoard.Place(Entries(data,log,territory),rows);
+            if(events.Count>0)zones.Add(new(territory.RowId,territory.Map.RowId,name,events));
+        }
+        return zones;
+    }
+
+    private static List<FieldEventRow> FateRows(IDataManager data)
     {
         var rows=new List<FieldEventRow>();
         foreach(var row in data.GetExcelSheet<Fate>())
             if(row.Location!=0)rows.Add(new(FieldEventKind.Fate,row.RowId,row.Location,row.Name.ExtractText(),row.Description.ExtractText(),row.ClassJobLevel,0));
+        return rows;
+    }
+
+    public static FieldCatalog Read(IDataManager data,IPluginLog log)
+    {
+        var rows=FateRows(data);
         foreach(var row in data.GetExcelSheet<DynamicEvent>())
             if(row.LGBMapRange!=0)rows.Add(new(FieldEventKind.Engagement,row.RowId,row.LGBMapRange,row.Name.ExtractText(),row.Description.ExtractText(),null,row.MaxParticipants));
         var zones=new List<FieldZone>();

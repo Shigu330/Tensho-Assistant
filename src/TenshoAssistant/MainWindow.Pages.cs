@@ -36,6 +36,7 @@ internal sealed partial class MainWindow
         new(Page.MacroChain,"Production",PageLabel("Category.MacroChain"),DrawMacroChain,"MainWindow.MacroChain*.cs, Macros/"),
         new(Page.Maps,"World",PageLabel("Navigation.Map"),DrawMaps,"MainWindow.Maps.cs, MainWindow.MapView.cs"),
         new(Page.Weather,"World",PageLabel("Category.Weather"),DrawWeather,"MainWindow.Weather.cs, Gathering/WeatherForecast.cs"),
+        new(Page.Fates,"World",PageLabel("Navigation.Fates"),DrawFates,"MainWindow.Fates.cs, Fields/"),
         new(Page.Alarms,"World",()=>localization.Format("Navigation.Alarms",configuration.Alarms?.Count ?? 0),DrawAlarmsPage,"MainWindow.Alarms.cs, Alarms/"),
         new(Page.Reminders,"World",PageLabel("Navigation.Reminders"),DrawReminders,"MainWindow.Reminders.cs, Reminders/"),
         new(Page.Garden,"World",PageLabel("Navigation.Garden"),DrawGardenPage,"MainWindow.Garden.cs, MainWindow.GardenCrosses.cs"),

@@ -767,6 +767,13 @@ public sealed class Plugin : IDalamudPlugin
                 }
                 catch(Exception error){log.Warning(error,"Custom deliveries unreadable (game update?).");throw;}
             });
+            // W-14b (0.721): every FATE's place, from the game's zone layouts, off the frame.
+            mainWindow.FatesLoad=()=>
+            {
+                try{return Fields.FieldCatalogLoader.ReadOpenZones(data,log);}
+                catch(Exception error){log.Warning(error,"FATE places unreadable (game update?).");return null;}
+            };
+            mainWindow.CurrentTerritory=()=>client.TerritoryType;
             // W-16 (0.719): the lexicon, from the sheets, off the frame.
             mainWindow.LexiconLoad=()=>
             {
