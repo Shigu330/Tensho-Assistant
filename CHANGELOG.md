@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.825.0
+- Plan global, Verify : Signalement (X-57) : une quête de cuisinier à Limsa était dessinée hors du Tillac, sa cible au bon endroit. Le journal montre deux marqueurs du jeu pour cette quête (« Le pari ») sur la carte du Tillac, d'icônes et d'objectifs différents, alors que la liste propre du jeu la place dans le Tillac. En mode développeur, chaque marqueur de la carte du jeu est maintenant noté avec sa position et son type, pour savoir lequel est mal placé avant de corriger. Aucun changement visible. Non validé en jeu.
+- Tests : EventMarkers825Tests. Verify.ps1 (agent) : 1411/1411, 0 avertissement, 0 erreur ; DLL 0.825.0.0. Non validé en jeu.
+### English
+- Report (X-57): a culinarian quest in Limsa was drawn outside the Upper Decks, its target right. The log shows two game markers for that quest (« Le pari ») on the Upper Decks map, with different icons and objectives, while the game's own list places it in the Upper Decks. In developer mode, each marker of the game map is now written with its place and kind, to know which one is misplaced before fixing. No visible change. Not validated in game.
+
 ## 0.824.0
 - Plan global, Verify : Demande (X-56) : dans les listes de suivi, le coût de téléportation d'une zone s'affiche avec l'icône de la compétence Téléportation (ligne 5 de la feuille Action, icône 111), l'icône des gils et le montant, sans texte ; le texte reste au survol de l'icône. Non validé en jeu.
 - Tests : ZoneCostIcons824Tests. Verify.ps1 (agent) : 1410/1410, 0 avertissement, 0 erreur ; DLL 0.824.0.0. Non validé en jeu.

@@ -27,7 +27,7 @@ public sealed unsafe class ReadingCapture : IDisposable
     private readonly IPluginLog log;
     private readonly Dictionary<string,int> lines=[];
     private readonly Dictionary<int,int> messageKinds=[];
-    private string statuses="",synthesis="",workshop="",questMarkers="",monsterEvents="",leves="",retainer="",airship="",islandState="",islandAgenda="";
+    private string statuses="",synthesis="",workshop="",questMarkers="",monsterEvents="",eventMarkers="",leves="",retainer="",airship="",islandState="",islandAgenda="";
     private bool fishing,disposed,warned;
     private long slowAt;
 
@@ -65,6 +65,7 @@ public sealed unsafe class ReadingCapture : IDisposable
             ReadWorkshop();
             ReadQuestMarkers();
             ReadMonsterEvents();
+            ReadEventMarkers();
             ReadLeves();
             ReadRetainer();
             ReadAirships();
@@ -169,6 +170,23 @@ public sealed unsafe class ReadingCapture : IDisposable
     // was opened in range (docs/evidence/0.654-leve-area-memory.md). The game's own Map (UIState) also holds quest and leve markers: written here, with
     // whether the game map is open, to see if they are there while it is closed.
     // 0.797 (X-37): which event a nearby enemy belongs to (FATE, leve…), to tell a leve's targets; written when it changes, enemies with an event or a FATE only.
+    // 0.825 (X-57, user report: a culinarian quest drawn out of the Upper Decks, its target right): every marker of the game map's list with its place and kind,
+    // written when it changes (two markers for quest 2046 on map 11: icons 71141 and 71143).
+    private void ReadEventMarkers()
+    {
+        var agent=AgentMap.Instance();
+        if(agent==null)return;
+        var count=agent->EventMarkers.LongCount;
+        if(count is <0 or >256)return;
+        var text=new StringBuilder($"open map {agent->CurrentMapId}, selected {agent->SelectedMapId}:");
+        foreach(var marker in agent->EventMarkers)
+            text.Append($" [{marker.IconId} map {marker.MapId} objective {marker.ObjectiveId} data {marker.DataId} type {marker.MarkerType} level {marker.LevelId} at {marker.Position.X:F1},{marker.Position.Z:F1} territory {marker.TerritoryTypeId}]");
+        var now=text.ToString();
+        if(now==eventMarkers)return;
+        eventMarkers=now;
+        Line("eventMarkers",60,now);
+    }
+
     private void ReadMonsterEvents()
     {
         var text=new StringBuilder();var count=0;
