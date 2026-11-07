@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.787.0
+- Plan global, Verify : Demande (X-28) : l'atelier de compagnie tient compte de ce qui est déjà livré. La capture de la fenêtre de livraison (0.786, livraison de rivets en bronze) a donné sa disposition : phase en cours, lots livrés et requis de chaque objet. Tensho la lit chaque seconde quand elle est ouverte, la garde, retire les phases déjà validées et déduit les lots livrés de la phase en cours, dans le panneau et la page Atelier ; la page dit la phase et l'heure du relevé. Utilisé seulement si cela correspond au projet. Non validé en jeu.
+- Tests : WorkshopDelivered787Tests. Verify.ps1 (agent) : 1357/1357, 0 avertissement, 0 erreur ; DLL 0.787.0.0. Non validé en jeu.
+### English
+- Request (X-28): the company workshop counts what it already received. The capture of the delivery window (0.786, bronze rivets delivered) gave its layout: phase in progress, sets delivered and required per item. Tensho reads it every second while it is open, keeps it, leaves out the phases already validated and takes the delivered sets off the phase in progress, in the panel and the Workshop page; the page gives the phase and when it was seen. Used only when it fits the project. Not validated in game.
+
 ## 0.786.0
 - Plan global, Verify : Demande (X-28) : tenir compte de ce qui est déjà livré à l'atelier de compagnie. Le jeu ne le garde dans aucune structure connue de Tensho (l'agent de la liste des matériaux ne donne que les objets et le résultat) : seule la fenêtre de livraison le montre. Première étape : en mode développeur, cette fenêtre et la liste des matériaux sont notées au journal quand elles s'ouvrent ou changent, pour lire leur disposition avant de compter. Aucun changement visible. Non validé en jeu.
 - Tests : WorkshopCapture786Tests. Verify.ps1 (agent) : 1353/1353, 0 avertissement, 0 erreur ; DLL 0.786.0.0. Non validé en jeu.

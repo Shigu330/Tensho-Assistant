@@ -17,6 +17,19 @@ internal sealed partial class MainWindow
 
     private string WorkshopName(WorkshopProject project)=>itemCatalog.State.Catalog?.Find(project.ResultItem)?.Name ?? localization.Format("BankUi.Item",project.ResultItem);
 
+    // 0.787 (X-28, user request): what the workshop already received, from its delivery window; kept until the window says otherwise.
+    internal void WorkshopDeliverySeen(uint result,WorkshopDelivery delivery)
+    {
+        var all=configuration.WorkshopDelivered ??= [];
+        if(all.TryGetValue(result,out var known) && known.SameAs(delivery))return;
+        all[result]=delivery;SaveReminders();
+        listPanelLines.Remove("Workshop");
+        if(developerMode)log.Information("Workshop delivery seen: item {0}, phase {1}/{2}, {3}.",result,delivery.Phase+1,delivery.Phases,string.Join(", ",delivery.Items.Select(item=>$"{item.Item} {item.Sets}/{item.Required}x{item.PerSet}")));
+    }
+    private WorkshopDelivery? WorkshopDelivered(uint result)=>configuration.WorkshopDelivered?.GetValueOrDefault(result);
+    private string? WorkshopDeliveredNote(WorkshopProject project)=>WorkshopDelivered(project.ResultItem) is { } delivery && WorkshopStock.Applies(project,delivery)
+        ? localization.Format("FreeCompany.WorkshopDelivered",delivery.Phase+1,delivery.Phases,delivery.SeenAt.ToLocalTime().ToString("g")):null;
+
     private void DrawWorkshopProjects()
     {
         ImGui.TextWrapped(localization.Get("FreeCompany.WorkshopHelp"));
@@ -49,12 +62,16 @@ internal sealed partial class MainWindow
         ImGui.EndChild();
         if(projects.FirstOrDefault(project=>project.Id==workshopSelected) is not { } selected){ImGui.TextDisabled(localization.Get("FreeCompany.WorkshopPick"));return;}
         ImGui.TextColored(Accent,WorkshopName(selected));
+        var delivered=WorkshopDelivered(selected.ResultItem);
+        var applies=WorkshopStock.Applies(selected,delivered);
+        if(WorkshopDeliveredNote(selected) is { } note)ImGui.TextDisabled(note);
+        else ImGui.TextDisabled(localization.Get("FreeCompany.WorkshopDeliveredNone"));
         if(configuration.WorkshopPanelProject!=selected.Id){configuration.WorkshopPanelProject=selected.Id;SaveReminders();}
         BoolSetting("FreeCompany.WorkshopPanel","FreeCompany.WorkshopPanelTip",()=>configuration.WorkshopPanel,value=>configuration.WorkshopPanel=value,c=>c.WorkshopPanel);
         if(configuration.WorkshopPanel)DrawListPanelOptions();
         DrawWorkshopFollowed(projects,selected);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("FreeCompany.WorkshopAll")+"###WorkshopAll"))
-            DrawWorkshopMaterials("WorkshopTotals",selected.Totals().Select(total=>(total.Item,(string?)null,total.Total)));
+            DrawWorkshopMaterials("WorkshopTotals",WorkshopStock.Remaining(selected,delivered).Select(total=>(total.Item,(string?)null,total.Total)));
         var partNumber=0;
         foreach(var part in selected.Parts)
         {
@@ -63,6 +80,7 @@ internal sealed partial class MainWindow
             foreach(var phase in part.Phases)
             {
                 ImGui.TextDisabled(localization.Format("FreeCompany.WorkshopPhase",phase.Number));
+                if(applies && phase.Number-1<delivered!.Phase){ImGui.SameLine();ImGui.TextColored(Success,localization.Get("FreeCompany.WorkshopPhaseDone"));}
                 DrawWorkshopMaterials($"WorkshopPhase{partNumber}_{phase.Number}",phase.Materials.Select(material=>(material.Item,(string?)localization.Format("FreeCompany.WorkshopSets",material.PerSet,material.Sets),material.Total)));
             }
         }
@@ -101,7 +119,7 @@ internal sealed partial class MainWindow
             ImGui.SameLine();ImGui.TextUnformatted(WorkshopName(project));
         }
         if(removed is { } gone){configuration.WorkshopFollowed=followed.Where(id=>id!=gone).ToList();SaveReminders();}
-        DrawWorkshopMaterials("WorkshopFollowedTotals",WorkshopStock.Totals(shown).Select(total=>(total.Item,(string?)null,total.Total)));
+        DrawWorkshopMaterials("WorkshopFollowedTotals",WorkshopStock.Totals(shown,WorkshopDelivered).Select(total=>(total.Item,(string?)null,total.Total)));
     }
 
     private void DrawWorkshopMaterials(string id,IEnumerable<(uint Item,string? Sets,int Total)> materials)

@@ -1139,6 +1139,9 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>usageLoader=new ItemUseCatalogLoader(itemUses,data,framework,log),()=>usageLoader?.Dispose());
             // 0.469 (user request, in-game campaign): today's Grand Company request, read from the game's supply missions window.
             mainWindow.GcSupply.Restore(configuration.GcSupplySeen);
+            // 0.787 (X-28): what the workshop already received, from its delivery window.
+            FreeCompany.WorkshopDeliveryReader? workshopDeliveryReader=null;
+            registrations.Register(()=>workshopDeliveryReader=new FreeCompany.WorkshopDeliveryReader(framework,gameGui,log,mainWindow.WorkshopDeliverySeen),()=>workshopDeliveryReader?.Dispose());
             Items.GcSupplyReader? gcSupplyReader=null;
             registrations.Register(()=>gcSupplyReader=new Items.GcSupplyReader(framework,gameGui,client,player,data,log,()=>itemUses.State.Catalog,mainWindow.GcSupply,seen=>
             {

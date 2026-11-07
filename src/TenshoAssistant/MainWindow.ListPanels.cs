@@ -80,13 +80,17 @@ internal sealed partial class MainWindow
         return workshopPanelShown.Count>0;
     }
 
-    private (uint Item,long Needed)[] WorkshopLines()=>WorkshopStock.Totals(workshopPanelShown).Select(row=>(row.Item,(long)row.Total)).ToArray();
+    private (uint Item,long Needed)[] WorkshopLines()=>WorkshopStock.Totals(workshopPanelShown,WorkshopDelivered).Select(row=>(row.Item,(long)row.Total)).ToArray();
     private (uint Item,long Needed)[] CraftListLines()=>craftListPanelShown is { } list ? CraftLists.Ingredients(CraftListPlans(list)).Select(row=>(row.Item1,(long)row.Item2)).ToArray():[];
     private (uint Item,long Needed)[] PreparationLines()=>preparationPanelShown is { } recipe ? CraftPlan.Build(recipe,configuration.PreparationPanelTarget,GetRecipeHoldings).Materials.Select(material=>(material.ItemId,material.Required)).ToArray():[];
     private void DrawWorkshopPanelContents()
     {
         RefreshRecipeHoldingsCache();
-        foreach(var project in workshopPanelShown)ImGui.TextColored(Accent,WorkshopName(project));
+        foreach(var project in workshopPanelShown)
+        {
+            ImGui.TextColored(Accent,WorkshopName(project));
+            if(WorkshopDeliveredNote(project) is { } note){ImGui.SameLine();ImGui.TextDisabled(note);}
+        }
         DrawListPanelEntries("Workshop",WorkshopLines);
     }
 

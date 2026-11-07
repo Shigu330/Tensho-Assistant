@@ -269,7 +269,8 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-25 | **Gel du jeu, 15:18:45** : le solveur Raphael (natif) panique sur une division par zéro (quality_upper_bound_solver/state.rs:59) en ouvrant le carnet d'artisan, cuisinier, recette 5623 ; la panique arrête le jeu | Fait en 0.782 : toute valeur nulle ou trop grande refusée avant l'appel ; `docs/evidence/0.782-raphael-freeze.md` ; vérifié en jeu le 2026-11-07 15:25 sur capture : plus de gel sur cette recette ; 0.783 : « Raphael non utilisé » au lieu de « a échoué » |
 | X-26 | « Comparer les prochains coups » sur une recette en haute qualité impossible : « valeurs non concordantes », aucun coup projeté (le jeu montre une qualité sur 2500, Tensho 0) | Fait en 0.784 : cet écart accepté pour une recette sans qualité à chercher |
 | X-27 | Les listes de suivi doivent pouvoir n'afficher que les objets finis (les objets à fabriquer, sans leurs matériaux) ; « oublie pas atelier et artisanat » | Fait en 0.785 : réglage « Objets finis seulement » pour les listes d'artisanat, d'atelier et de préparation |
-| X-28 | Atelier de compagnie : tenir compte de ce qui est déjà livré au projet | En cours : le jeu ne le garde dans aucune structure connue (AgentCompanyCraftMaterial : objets et résultat seulement) ; 0.786 capture la fenêtre de livraison en mode développeur, puis le compte |
+| X-28 | Atelier de compagnie : tenir compte de ce qui est déjà livré au projet ; « oublie pas de verifie si on a valide des etapes aussi » | Fait en 0.787 : lu dans la fenêtre de livraison (capture 0.786), phases validées retirées, lots livrés déduits ; `docs/evidence/0.787-workshop-delivered.md` |
+| X-29 | Carnet de synthèse : en Menuisier sur une recette de Métallurgie (Lingot de mithril), Tensho ne signale pas qu'on n'est pas le bon métier et propose sa macro | À faire |
 
 ## Retenu pour plus tard
 
