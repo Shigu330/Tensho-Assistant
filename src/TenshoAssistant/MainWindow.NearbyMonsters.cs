@@ -13,7 +13,8 @@ internal sealed partial class MainWindow
 {
     private static readonly IReadOnlyDictionary<uint,IReadOnlyList<MonsterNote>> NoMonsterNotes=new Dictionary<uint,IReadOnlyList<MonsterNote>>();
     private static readonly IReadOnlyDictionary<uint,IReadOnlyList<string>> NoDroppedItems=new Dictionary<uint,IReadOnlyList<string>>();
-    private long nearbyMonstersAt=long.MinValue;
+    // 0.828: not long.MinValue: now minus it overflows to a negative number, and the refresh never ran (X-53).
+    private long nearbyMonstersAt=-100_000;
     private IReadOnlyDictionary<uint,IReadOnlyList<MonsterNote>> nearbyMonsterNotes=NoMonsterNotes;
     private IReadOnlyDictionary<uint,IReadOnlyList<string>> nearbyDroppedItems=NoDroppedItems;
     private void RefreshNearbyMonsters()

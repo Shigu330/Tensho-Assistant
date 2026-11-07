@@ -190,7 +190,7 @@ public static class NpcVendorCache
     public const int MaximumRows=500_000;
     // Bump when the sheet-to-record copy rules change without a change of record shape.
     // 2: FateShop links (gemstone traders). 3: InclusionShop links (scrip exchanges), encoded currencies no longer mapped (2026-10-30).
-    private const int CopyRules=13; // 13: Level positions take their layer's condition. // 12: layer conditions (festival, quest, opening). 11: Kaede's archaeology talk (Auxesia). 8: observed talk links; 9: planevent.lgb; 10: planner.lgb + header check + crystal exchange. // 4: purple scrips; 5: (type, id) table; 6: currencies keyed by CostType (tomestones vs scrips).
+    private const int CopyRules=14; // 14: Level positions take a festival's condition only. // 13: Level positions take their layer's condition. // 12: layer conditions (festival, quest, opening). 11: Kaede's archaeology talk (Auxesia). 8: observed talk links; 9: planevent.lgb; 10: planner.lgb + header check + crystal exchange. // 4: purple scrips; 5: (type, id) table; 6: currencies keyed by CostType (tomestones vs scrips).
     public static readonly string Shape=CatalogCacheKeys.Shape(typeof(NpcVendor),typeof(NpcLocation),typeof(NpcShopSale),typeof(NpcCost),typeof(NpcShopKind));
     public static string Version(string dataVersion)=>CatalogCacheKeys.Version(dataVersion,CopyRules,Shape);
     public static bool Valid(NpcVendorCacheData? data,string dataVersion)

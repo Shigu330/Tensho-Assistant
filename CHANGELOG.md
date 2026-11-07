@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.828.0
+- Plan global, Verify : Signalements (X-53, X-45). Monstres de vos listes jamais signalés : la cause était dans Tensho. Trois calculs « une fois par seconde » partaient d'une valeur qui faisait déborder la soustraction, si bien qu'ils ne s'exécutaient jamais : les monstres proches pour les listes (depuis 0.795), la base de découvertes (aucun relevé, aucun fichier) et l'encadré des rangements (0.820). Corrigé, avec un test qui interdit ce départ. Marchands : la 0.823 écartait des marchands permanents (13 sur 14 sur une carte de Limsa), parce qu'une couche de quête les place aussi ; une position de la feuille Level ne prend plus que la condition d'événement. Non validé en jeu.
+- Tests : Timers828Tests. Verify.ps1 (agent) : 1415/1415, 0 avertissement, 0 erreur ; DLL 0.828.0.0. Non validé en jeu.
+### English
+- Reports (X-53, X-45). Monsters of your lists never marked: the cause was in Tensho. Three « once a second » computations started from a value that made the subtraction overflow, so they never ran: the nearby monsters for the lists (since 0.795), the discoveries base (no reading, no file) and the storage frame (0.820). Fixed, with a test forbidding that start. Vendors: 0.823 left out permanent vendors (13 of 14 on a Limsa map), because a quest layer places them too; a Level position now takes a festival's condition only. Not validated in game.
+
 ## 0.827.0
 - Plan global, Verify : Demande (X-59) : dans les listes de suivi, les points à horaire n'affichent plus « ouvert » ni « fermé » : le minuteur seul, en vert quand le point est ouvert, en rouge quand il est fermé ; le sens reste au survol. Non validé en jeu.
 - Tests : TimedColours827Tests. Verify.ps1 (agent) : 1413/1413, 0 avertissement, 0 erreur ; DLL 0.827.0.0. Non validé en jeu.

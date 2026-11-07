@@ -273,10 +273,11 @@ internal sealed class NpcVendorLoader : IDisposable
                 }
                 yield return ++count;
             }
-        // 0.823 (X-45): a Level position takes the condition of the NPC's layers in that territory (none: always there).
+        // 0.823 (X-45): a Level position takes the condition of the NPC's layers in that territory (none: always there). 0.828: a festival's only; a quest's or
+        // the opening's layer often places a permanent NPC too (0.823 left out 13 of map 12's 14 vendors).
         foreach(var (npcId,list) in locations)
             for(var index=0;index<list.Count;index++)
-                if(list[index].Condition==NpcShopLinks.Always && conditions.TryGetValue((npcId,list[index].TerritoryId),out var placed) && placed.Condition!=NpcShopLinks.Always)
+                if(list[index].Condition==NpcShopLinks.Always && conditions.TryGetValue((npcId,list[index].TerritoryId),out var placed) && placed.Condition==NpcShopLinks.DuringFestival)
                     list[index]=list[index] with {Condition=placed.Condition,Festival=placed.Festival};
         foreach(var place in NpcShopLinks.ObservedPlaces)
         {

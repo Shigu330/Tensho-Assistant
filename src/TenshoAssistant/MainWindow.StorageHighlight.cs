@@ -7,7 +7,7 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal Inventory.StorageHighlightReader? StorageHighlight { get; set; }
-    private long storageIconsAt=long.MinValue;private IReadOnlySet<uint> storageIcons=new HashSet<uint>();
+    private long storageIconsAt=-100_000;private IReadOnlySet<uint> storageIcons=new HashSet<uint>();
 
     /// <summary>Every frame (overlay pass): the wanted icons refreshed once a second from the lists, the frames drawn from the last read.</summary>
     internal void DrawStorageHighlight()

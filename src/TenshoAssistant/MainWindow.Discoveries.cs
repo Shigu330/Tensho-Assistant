@@ -15,7 +15,7 @@ internal sealed partial class MainWindow
     internal Market.SeenPriceStore? SeenPrices { get; set; }
     /// <summary>Set once the saved base is read (or found missing): nothing is written before, so that a slow read never loses it.</summary>
     internal volatile bool DiscoveriesLoaded;
-    private long discoveriesAt=long.MinValue,discoveriesSavedAt;private int discoverySaving,discoveryBusy;
+    private long discoveriesAt=-100_000,discoveriesSavedAt;private int discoverySaving,discoveryBusy;
     private string discoverySearch="",discoverySearched="\u0001";private int discoveryShownRevision=-1;
     private IReadOnlyList<DiscoveryFact> discoveryRows=[];private string? discoveryMessage;private bool discoveryClearAsked;
     private readonly Dictionary<uint,string> discoveryNames=[];
