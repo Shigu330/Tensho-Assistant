@@ -1089,6 +1089,7 @@ public sealed class Plugin : IDalamudPlugin
             TriadObservationReader? triadReader = null;
             MiniCactpotObservationReader? cactpotReader=null;
             GatheringObservationReader? gatheringReader=null;
+            mainWindow.GatheringSlotRects=()=>gatheringReader?.SlotRects ?? [];
             registrations.Register(()=>gatheringReader=new GatheringObservationReader(gatheringObservation,framework,player,client,gameGui,objects,log),()=>gatheringReader?.Dispose());
             CollectableReader? collectableReader=null;
             SpearfishingReader? spearfishingReader=null;

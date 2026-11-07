@@ -37,6 +37,32 @@ internal sealed partial class MainWindow
         DrawGatheringPanelCore(gatheringObservation.State);
     }
 
+    /// <summary>0.751 (X-04): the rows of the game's gathering window, from the reader.</summary>
+    internal Func<IReadOnlyList<ActionBarRect?>>? GatheringSlotRects { get; set; }
+    private static void DrawGatheringSlotFrame(ActionBarRect rect)
+    {
+        var draw=ImGui.GetForegroundDrawList();
+        var min=new Vector2(rect.X,rect.Y);var max=min+new Vector2(rect.Width,rect.Height);
+        draw.AddRect(min,max,ImGui.GetColorU32(UI.FfxivTheme.Success),6,ImDrawFlags.None,3);
+    }
+    /// <summary>
+    /// 0.751 (X-04, user request): what the tracking lists still need of an item: the crafting list chosen for the gathering plan, and the lists shown on screen (crafting list,
+    /// workshop, preparation) as they were last worked out, within five seconds. The crafting list is counted once, the larger of its two readings.
+    /// </summary>
+    private long TrackedNeed(uint item)
+    {
+        var now=Environment.TickCount64;
+        long Panel(string key)
+        {
+            if(!listPanelLines.TryGetValue(key,out var known) || now-known.At>5000)return 0;
+            var needed=known.Lines.Where(line=>line.Item==item).Sum(line=>line.Needed);
+            if(needed<=0)return 0;
+            var held=GetRecipeHoldings(item);
+            return Math.Max(0,needed-(held.HasObservation ? held.Total:0));
+        }
+        return Math.Max(GatherListNeed(item),Panel("CraftList"))+Panel("Workshop")+Panel("Preparation");
+    }
+
     // 0.728 (user request): a frame over the slot of the next action, as on the Mini Cactpot board. Drawn only: the player uses the action.
     internal Gathering.ActionBarLocator? BarLocator { get; set; }
     private (GpPlan Plan,int Gp,int? Attempts,int? Boon,GpNextStep Step)? gatheringNextCache;
@@ -144,6 +170,13 @@ internal sealed partial class MainWindow
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(slot.ItemId);
                     ItemLinksMenu($"GatheringSlot{slot.ItemId}",item);
                     if(needed is { } need)ImGui.TextColored(Accent,need);
+                    // 0.751 (X-04, user request): what the tracking lists (crafting list, workshop, preparation) still need of this item; framed on the game's window too.
+                    if(TrackedNeed(slot.ItemId) is > 0 and var tracked)
+                    {
+                        ImGui.TextColored(Accent,localization.Format("GatheringPanel.TrackedNeed",tracked.ToString("N0")));
+                        if(configuration.GatheringListHighlight && GatheringSlotRects?.Invoke() is { } rects && slot.Index<rects.Count && rects[slot.Index] is { } rect)
+                            DrawGatheringSlotFrame(rect);
+                    }
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(slot.ItemId);
                     ImGui.TextDisabled(rates);
                     if(scripRules.FirstOrDefault(rule=>rule.ItemId==slot.ItemId) is { } paid)

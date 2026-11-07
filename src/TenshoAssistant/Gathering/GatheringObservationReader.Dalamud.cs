@@ -33,6 +33,22 @@ internal sealed class GatheringObservationReader : IDisposable
         var text=(AtkTextNode*)node;if(text->NodeText.Length>64)return null;
         return Dalamud.Game.Text.SeStringHandling.SeString.Parse(text->NodeText.AsSpan()).TextValue;
     }
+    private volatile ActionBarRect?[] slotRects=new ActionBarRect?[8];
+    /// <summary>0.751 (X-04): where each row of the game's gathering window is on the screen, by slot index; null when hidden.</summary>
+    public IReadOnlyList<ActionBarRect?> SlotRects=>slotRects;
+    private static unsafe ActionBarRect?[] Rects(AddonGathering* addon)
+    {
+        var rects=new ActionBarRect?[8];
+        for(var index=0;index<8 && index<addon->GatheredItemComponentCheckbox.Length;index++)
+        {
+            AtkComponentCheckBox* component=addon->GatheredItemComponentCheckbox[index];
+            if(component==null || component->OwnerNode==null || !Visible(&component->OwnerNode->AtkResNode))continue;
+            var node=&component->OwnerNode->AtkResNode;var scale=addon->AtkUnitBase.Scale;
+            var rect=new ActionBarRect(node->ScreenX,node->ScreenY,node->Width*node->ScaleX*scale,node->Height*node->ScaleY*scale);
+            if(rect.Valid)rects[index]=rect;
+        }
+        return rects;
+    }
     private static unsafe GatheringRawSlot[] Copy(AddonGathering* addon)
     {
         if(addon->ItemIds.Length!=8 || addon->ItemFlags.Length!=8 || addon->GatheredItemComponentCheckbox.Length!=8)
@@ -88,6 +104,7 @@ internal sealed class GatheringObservationReader : IDisposable
                 var target=local.TargetObject;
                 var node=target?.ObjectKind==Dalamud.Game.ClientState.Objects.Enums.ObjectKind.GatheringPoint ? target.BaseId:0;
                 service.Publish(ticket,current,job,level,gp,maxGp,status,attempts,total,slots,node);
+                slotRects=Rects(addon);
             }
             catch(Exception error){service.Fail(ticket,current,error);nextRead=now+Stopwatch.Frequency*5;log.Warning(error,"Gathering observation unavailable; retry in five seconds.");}
         }

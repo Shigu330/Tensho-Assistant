@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.751.0
+- Plan global, Verify : Demande (X-04) : au point de récolte, l'aide dit « Vos listes en demandent encore N » pour chaque objet dont la liste d'artisanat, l'atelier ou la préparation affichés ont besoin, et un cadre vert entoure sa ligne dans la fenêtre de récolte du jeu (réglable). Dessin seulement. Non validé en jeu.
+- Tests : TrackedNeed751Tests. Verify.ps1 (agent) : 1324/1324, 0 avertissement, 0 erreur ; DLL 0.751.0.0. Non validé en jeu.
+### English
+- Request (X-04): at a node, the help says « Your lists still need N » for each item the crafting list, the workshop or the preparation shown need, and a green frame surrounds its row in the game's gathering window (optional). Drawn only. Not validated in game.
+
 ## 0.750.0
 - Plan global, Verify : Cache (X-02) : durées par défaut plus longues, appliquées une fois aux réglages existants s'ils avaient gardé les anciennes : quêtes 5 min → 1 h, collections 24 h → 7 jours, sources communautaires 7 jours → seulement si absentes, calculs d'artisanat 24 h → 7 jours. Prix et Revue de mode inchangés. « Jamais » devient « Seulement si absent, ou sur Actualiser ». Un choix fait par vous reste. Non validé en jeu.
 - Tests : CacheDefaults750Tests. Verify.ps1 (agent) : 1323/1323, 0 avertissement, 0 erreur ; DLL 0.750.0.0. Non validé en jeu.
