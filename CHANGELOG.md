@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.846.0
+- Plan global, Verify : Correction de l'utilisateur (X-68) : il ne faut pas zoomer, seulement centrer sur la quête, l'objectif, la ressource ou autre. La 0.846 retire le zoom sur la zone de quête de la 0.845 : depuis le journal, la carte centre sur ce qui est demandé et garde le zoom, comme avant. Non validé en jeu.
+- Tests : MapAside617Tests. Verify.ps1 (agent) : 1428/1428, 0 avertissement, 0 erreur ; DLL 0.846.0.0. Non validé en jeu.
+### English
+- User correction (X-68): no zoom, only centre on the quest, objective, resource or other. 0.846 removes 0.845's zoom on the quest area: from the journal, the map centres on what is asked and keeps the zoom, as before. Not validated in game.
+
 ## 0.845.0
 - Plan global, Verify : Demande (X-68), précisée : depuis le journal, la carte de Tensho doit zoomer sur la zone de la quête. Jusqu'ici elle la centrait en gardant le zoom (demande de la 0.637). Maintenant, une quête qui a une zone est zoomée pour la montrer entière, sur 60 % de la vue ; une quête sans zone garde le zoom, comme avant. Non validé en jeu.
 - Tests : QuestAreaZoom845Tests. Verify.ps1 (agent) : 1429/1429, 0 avertissement, 0 erreur ; DLL 0.845.0.0. Non validé en jeu.

@@ -68,15 +68,6 @@ internal sealed partial class MainWindow
         // A pointed request keeps its own zoom: the focus centres it, or fits the map once it is not found.
         else{OpenMapView(mapId);if(pointed){mapFitRequested=false;mapGameTarget=null;mapFocusRequest=request;mapFocusUntil=DateTimeOffset.UtcNow.AddSeconds(1.5);}}
     }
-    /// <summary>0.845 (X-68): the asked quest's event marker on the shown map, by its objective, then by its name, as FocusPixel finds it.</summary>
-    private MapEventMarker? FocusQuestMarker(GameMapRequest focus,MapDefinition map,MapLiveState? live)
-    {
-        if(focus.QuestId==0)return null;
-        var key=focus.QuestId & 0xFFFF;
-        var questId=focus.QuestId<0x10000 ? focus.QuestId+0x10000:focus.QuestId;
-        return live?.Events?.FirstOrDefault(marker=>marker.MapId==map.MapId && marker.ObjectiveId!=0 && (marker.ObjectiveId & 0xFFFF)==key)
-            ?? (QuestOf(questId) is { Name.Length:>0 } quest ? live?.Events?.FirstOrDefault(marker=>marker.MapId==map.MapId && marker.Tooltip.Contains(quest.Name,StringComparison.CurrentCultureIgnoreCase)):null);
-    }
     // Texture pixel of the asked target on the shown map: its event marker (ObjectiveId), the quest giver, the aetheryte, the FATE.
     private Vector2? FocusPixel(GameMapRequest focus,MapDefinition map,MapLiveState? live)
     {
@@ -1122,9 +1113,8 @@ internal sealed partial class MainWindow
                 mapGameTargetLeve=focus.QuestId==0 ? TenshoAssistant.Maps.MapLiveReader.LeveKeyOf(focus.Title):null;
                 if(mapGameTargetLeve is { } clickedLeve && focus.Target is { } leveArea && focus.TargetScale>0 && map.TerritoryId!=0)
                     TenshoAssistant.Maps.MapLiveReader.SeedLeveArea(map.MapId,clickedLeve,focus.Title,leveArea,focus.TargetScale,focus.TargetIcon);
-                // 0.845 (X-68, user request: « from the journal », zoom on the quest's area): a quest with an area is zoomed to show it whole; without one the zoom stays (0.637).
-                var areaZoom=FocusQuestMarker(focus,map,live) is { Radius:>0 } area ? MapProjection.AreaZoom(Math.Min(size.X,size.Y),area.Radius*Math.Max(1,map.SizeFactor)/100f):0;
-                mapFocusRequest=null;mapZoom=areaZoom>0 ? areaZoom:MapProjection.ClampZoom(mapZoom);mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
+                // 0.846 (X-68, user correction: « do not zoom, centre on the quest, objective, resource or other »): centred, the zoom stays (0.637).
+                mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(mapZoom);mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
                 log.Information("Map focus found on map {0} for quest {1}, aetheryte {2}, FATE {3}.",map.MapId,focus.QuestId,focus.AetheryteId,focus.FateId);
             }
             else if(DateTimeOffset.UtcNow>=mapFocusUntil)
