@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.848.0
+- Plan global, Verify : Signalement (X-70) : la zone de la nouvelle étape d'une quête (« L'art du sushi », Mer de Rubis) manquait sur la carte de Tensho tant que la carte du jeu n'avait pas été rouverte, ou qu'on n'y entrait pas. Cause, lue dans le journal : Tensho prenait les marqueurs de quête dans la liste de la fenêtre carte du jeu, qui n'est refaite qu'à son ouverture ; la liste de quêtes que le jeu garde lui-même suit chaque étape aussitôt. Les quêtes de cette liste remplacent maintenant celles de la fenêtre, sans rouvrir la carte. Non validé en jeu.
+- Tests : QuestEvents848Tests. Verify.ps1 (agent) : 1430/1430, 0 avertissement, 0 erreur ; DLL 0.848.0.0. Non validé en jeu.
+### English
+- Report (X-70): a quest's new step area (« L'art du sushi », The Ruby Sea) was missing on Tensho's map until the game map was opened again, or the player went in. Cause, read in the log: Tensho took quest markers from the game map window's list, rebuilt only when it opens; the quest list the game keeps itself follows each step at once. Its quests now replace the window's, with no reopening. Not validated in game.
+
 ## 0.847.0
 - Plan global, Verify : Signalement (X-69) : la carte ne se rafraîchissait pas assez : la quête était passée à « Parler à Raulf », mais la cible indiquée par le jeu (journal) restait. Elle ne partait que quand la quête n'était plus active, et le journal n'est relu qu'une fois par minute. Elle suit maintenant le point de quête où elle était posée, comme déjà la cible sans quête : l'étape faite, ce point change de place et la cible disparaît. Non validé en jeu.
 - Tests : QuestStep847Tests. Verify.ps1 (agent) : 1429/1429, 0 avertissement, 0 erreur ; DLL 0.847.0.0. Non validé en jeu.

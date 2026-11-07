@@ -49,6 +49,21 @@ public static class MapQuestTarget
         =>quest!=0 && !points.Any(point=>point.Quest==quest && point.Map==map && Vector2.Distance(new(point.X,point.Z),world)<=Near);
 }
 
+/// <summary>
+/// 0.848 (X-70, user report: a quest's new area missing until the game map is closed and opened again). The game map window's list (AgentMap.EventMarkers) is
+/// rebuilt only when that window opens; the game's own quest list (Map.QuestMarkers) follows each step at once (log 2026-11-08 00:36:56: quest 2607 on map 371,
+/// radius 35, with the window's list empty). The quests that list renders replace the window's markers of the same quests; other markers stay.
+/// </summary>
+public static class MapQuestEvents
+{
+    public static IReadOnlyList<T> Merge<T>(IReadOnlyList<T> window,IReadOnlyList<T> quests,Func<T,(bool Quest,uint Key)> key)
+    {
+        if(quests.Count==0)return window;
+        var fresh=quests.Select(marker=>key(marker).Key).ToHashSet();
+        return [..window.Where(marker=>key(marker) is not { Quest:true } known || !fresh.Contains(known.Key)),..quests];
+    }
+}
+
 public static class MapGameLeves
 {
     public static IReadOnlyList<T> Merge<T>(IReadOnlyList<T> read,IReadOnlyList<T> game,Func<T,(uint Map,uint Icon,float X,float Z)> key)

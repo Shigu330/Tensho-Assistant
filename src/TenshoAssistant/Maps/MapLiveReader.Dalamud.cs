@@ -412,7 +412,34 @@ internal sealed class MapLiveReader : IDisposable
         // 0.653: the game empties this list during a journal request; what was read just before stays.
         var journalRequest=agent->CurrentOpenMapInfo.Type is FFXIVClientStructs.FFXIV.Client.UI.Agent.MapType.QuestLog or FFXIVClientStructs.FFXIV.Client.UI.Agent.MapType.GatheringLog;
         if(!MapEventHold.Holds(result.Count,journalRequest,agent->CurrentMapId,lastEventsMap)){lastEvents=result.AsReadOnly();lastEventsMap=agent->CurrentMapId;}
-        return WithLeveAreas(MapGameLeves.Merge(lastEvents,ReadGameLeves(),marker=>(marker.MapId,marker.Icon,marker.Position.X,marker.Position.Z)));
+        // 0.848 (X-70): the game's quest list, current at each step, replaces the window's markers of the same quests.
+        var current=MapQuestEvents.Merge(lastEvents,ReadGameQuests(),marker=>(marker.MarkerType==3,marker.ObjectiveId & 0xFFFF));
+        return WithLeveAreas(MapGameLeves.Merge(current,ReadGameLeves(),marker=>(marker.MapId,marker.Icon,marker.Position.X,marker.Position.Z)));
+    }
+    /// <summary>0.848 (X-70): the markers of the quests the game renders, from its own Map (kept current with or without its map window); bounded.</summary>
+    private static unsafe IReadOnlyList<MapEventMarker> ReadGameQuests()
+    {
+        var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
+        if(map==null)return [];
+        var result=new List<MapEventMarker>();
+        var quests=map->QuestMarkers;
+        for(var index=0;index<quests.Length && result.Count<128;index++)
+        {
+            fixed(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info=&quests[index])
+            {
+                if(info->ObjectiveId==0 || !info->ShouldRender)continue;
+                var count=info->MarkerData.LongCount;
+                if(count is <=0 or >32)continue;
+                var label=TooltipText(&info->Label);
+                foreach(var data in info->MarkerData)
+                {
+                    if(data.IconId==0 || data.MapId==0 || !float.IsFinite(data.Position.X) || !float.IsFinite(data.Position.Z) || result.Count>=128)continue;
+                    var text=label.Length>0 ? label:TooltipText(data.TooltipString);
+                    result.Add(new(data.MapId,data.IconId,data.Position,float.IsFinite(data.Radius) ? Math.Max(0,data.Radius):0,text,info->ObjectiveId,3,data.DataId,false));
+                }
+            }
+        }
+        return result;
     }
     // 0.813 (X-49): the points of the accepted quests, from the game's Map (docs/evidence/0.793-game-leve-markers.md shows its quest list); bounded.
     private static unsafe IReadOnlyList<MapQuestPoint>? ReadQuestPoints()
