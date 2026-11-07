@@ -53,6 +53,7 @@ internal sealed partial class MainWindow
     {
         if(windowDisposed || !configuration.CraftListPanel || ListPanelsHiddenInCombat || itemCatalog.State.Catalog is null || CraftListStore is not { Unavailable:false } store)return false;
         craftListPanelShown=store.Lists.FirstOrDefault(list=>list.Name==configuration.CraftListPanelName);
+        listPanelSources.TryAdd("CraftList",CraftListLines);
         return craftListPanelShown is { Entries.Count:>0 };
     }
 
@@ -61,7 +62,7 @@ internal sealed partial class MainWindow
         if(craftListPanelShown is not { } list)return;
         RefreshRecipeHoldingsCache();
         ImGui.TextColored(Accent,list.Name);
-        DrawListPanelEntries("CraftList",()=>CraftLists.Ingredients(CraftListPlans(list)).Select(row=>(row.Item1,(long)row.Item2)).ToArray());
+        DrawListPanelEntries("CraftList",CraftListLines);
     }
 
     private bool WorkshopPanelVisible()
@@ -73,20 +74,26 @@ internal sealed partial class MainWindow
         var projects=workshopProjects.Result;
         var followed=(configuration.WorkshopFollowed ?? []).Select(id=>projects.FirstOrDefault(project=>project.Id==id)).OfType<WorkshopProject>().ToArray();
         workshopPanelShown=followed.Length>0 ? followed:projects.Where(project=>project.Id==configuration.WorkshopPanelProject).ToArray();
+        // 0.765 (X-17): known even if the panel was folded since the plugin loaded and never drew.
+        listPanelSources.TryAdd("Workshop",WorkshopLines);
         return workshopPanelShown.Count>0;
     }
 
+    private (uint Item,long Needed)[] WorkshopLines()=>WorkshopStock.Totals(workshopPanelShown).Select(row=>(row.Item,(long)row.Total)).ToArray();
+    private (uint Item,long Needed)[] CraftListLines()=>craftListPanelShown is { } list ? CraftLists.Ingredients(CraftListPlans(list)).Select(row=>(row.Item1,(long)row.Item2)).ToArray():[];
+    private (uint Item,long Needed)[] PreparationLines()=>preparationPanelShown is { } recipe ? CraftPlan.Build(recipe,configuration.PreparationPanelTarget,GetRecipeHoldings).Materials.Select(material=>(material.ItemId,material.Required)).ToArray():[];
     private void DrawWorkshopPanelContents()
     {
         RefreshRecipeHoldingsCache();
         foreach(var project in workshopPanelShown)ImGui.TextColored(Accent,WorkshopName(project));
-        DrawListPanelEntries("Workshop",()=>WorkshopStock.Totals(workshopPanelShown).Select(row=>(row.Item,(long)row.Total)).ToArray());
+        DrawListPanelEntries("Workshop",WorkshopLines);
     }
 
     private bool PreparationPanelVisible()
     {
         if(windowDisposed || !configuration.PreparationPanel || ListPanelsHiddenInCombat || configuration.PreparationPanelTarget<=0 || itemCatalog.State.Catalog is null)return false;
         preparationPanelShown=recipeCatalog.State.Catalog?.ForResult(configuration.PreparationPanelItem).FirstOrDefault(recipe=>recipe.RecipeId==configuration.PreparationPanelRecipe);
+        listPanelSources.TryAdd("Preparation",PreparationLines);
         return preparationPanelShown is not null;
     }
 
@@ -96,7 +103,7 @@ internal sealed partial class MainWindow
         RefreshRecipeHoldingsCache();
         var name=itemCatalog.State.Catalog?.Find(recipe.ResultItemId)?.Name ?? recipe.ResultItemId.ToString();
         ImGui.TextColored(Accent,$"{name} ×{configuration.PreparationPanelTarget:N0}");
-        DrawListPanelEntries("Preparation",()=>CraftPlan.Build(recipe,configuration.PreparationPanelTarget,GetRecipeHoldings).Materials.Select(material=>(material.ItemId,material.Required)).ToArray());
+        DrawListPanelEntries("Preparation",PreparationLines);
     }
 
     // 0.701 (user request): the currencies the vendors take, gil first, none ticked at the start, with a search by name. Listed once per catalogue.

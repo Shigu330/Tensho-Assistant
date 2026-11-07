@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.765.0
+- Plan global, Verify : Suite de X-17 : un panneau de suivi réduit depuis le chargement du plugin, jamais dessiné, comptait encore pour rien ; sa source est maintenant connue dès qu'il est actif. Non validé en jeu.
+- Tests : TrackedNeed751Tests. Verify.ps1 (agent) : 1337/1337, 0 avertissement, 0 erreur ; DLL 0.765.0.0. Non validé en jeu.
+### English
+- X-17, continued: a tracking panel folded since the plugin loaded, never drawn, still counted for nothing; its source is now known as soon as it is on. Not validated in game.
+
 ## 0.764.0
 - Plan global, Verify : Signalements (X-17) : panneau de suivi réduit, l'aide perdait « Vos listes en demandent encore » et le cadre ; et les cadres passaient au-dessus des autres fenêtres. Corrections : les lignes d'un panneau réduit sont recalculées (un panneau fermé ne compte pas) ; les cadres de la fenêtre de récolte et des barres sont dessinés sous les fenêtres de Tensho, au-dessus du jeu. Non validé en jeu.
 - Tests : TrackedNeed751Tests. Verify.ps1 (agent) : 1337/1337, 0 avertissement, 0 erreur ; DLL 0.764.0.0. Non validé en jeu.
