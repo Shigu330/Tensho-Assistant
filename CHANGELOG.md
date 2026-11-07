@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.785.0
+- Plan global, Verify : Demande (X-27) : les listes de suivi peuvent n'afficher que les objets finis. Nouveau réglage « Objets finis seulement », éteint au départ, sous les options des listes : liste d'artisanat (ses objets), atelier de compagnie (les livraisons), préparation (l'objet préparé), sans leurs matériaux. L'aide de récolte suit toujours les matériaux. Non validé en jeu.
+- Tests : FinishedOnly785Tests. Verify.ps1 (agent) : 1352/1352, 0 avertissement, 0 erreur ; DLL 0.785.0.0. Non validé en jeu.
+### English
+- Request (X-27): the tracking lists can show only the finished items. New setting « Finished items only », off at first, under the list options: crafting list (its items), company workshop (the deliveries), preparation (the prepared item), without their materials. The gathering help still follows the materials. Not validated in game.
+
 ## 0.784.0
 - Plan global, Verify : Signalement (X-26) : « Comparer les prochains coups » ne projetait rien sur une recette en haute qualité impossible (Kit de réparation d'appareil) : le jeu y montre une barre de qualité sur 2500, Tensho garde 0 exprès, et la vérification refusait cet écart. Il est maintenant accepté pour une recette sans qualité à chercher ; les autres vérifications restent. Non validé en jeu.
 - Tests : NoHqLive784Tests. Verify.ps1 (agent) : 1351/1351, 0 avertissement, 0 erreur ; DLL 0.784.0.0. Non validé en jeu.

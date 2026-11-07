@@ -16,6 +16,7 @@ internal sealed partial class MainWindow
     {
         BoolSetting("ListPanels.HideInCombat","ListPanels.HideInCombatTip",()=>configuration.ListPanelsHideInCombat,value=>configuration.ListPanelsHideInCombat=value,c=>c.ListPanelsHideInCombat);
         BoolSetting("ListPanels.HideBehindGame","ListPanels.HideBehindGameTip",()=>configuration.ListPanelsHideBehindGame,value=>configuration.ListPanelsHideBehindGame=value,c=>c.ListPanelsHideBehindGame);
+        BoolSetting("ListPanels.FinishedOnly","ListPanels.FinishedOnlyTip",()=>configuration.ListPanelsFinishedOnly,value=>configuration.ListPanelsFinishedOnly=value,c=>c.ListPanelsFinishedOnly);
         BoolSetting("ListPanels.Base","ListPanels.BaseTip",()=>configuration.ListPanelsBase,value=>configuration.ListPanelsBase=value,c=>c.ListPanelsBase);
         if(!configuration.ListPanelsBase)return;
         ImGui.Indent();
@@ -184,9 +185,23 @@ internal sealed partial class MainWindow
     private void DrawListPanelEntries(string key,Func<(uint Item,long Needed)[]> entries)
     {
         listPanelSources[key]=entries;
+        // 0.785 (X-27, user request): only the finished items: the crafting list's entries, the workshop's deliveries, the prepared recipe's result.
+        // The gathering help keeps the materials (listPanelSources above).
+        if(configuration.ListPanelsFinishedOnly && ListPanelFinished(key) is { } finished)
+        {
+            foreach(var (item,needed) in finished)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
+            return;
+        }
         var known=ListPanelLinesOf(key,entries);
         DrawListPanelEntriesFrom(key,known);
     }
+    private (uint Item,long Needed)[]? ListPanelFinished(string key)=>key switch
+    {
+        "CraftList"=>craftListPanelShown?.Entries.Select(entry=>(entry.ItemId,entry.Quantity)).ToArray(),
+        "Workshop"=>WorkshopLines(),
+        "Preparation"=>preparationPanelShown is { } recipe ? new[]{(recipe.ResultItemId,(long)configuration.PreparationPanelTarget)}:null,
+        _=>null,
+    };
     private (long At,(uint Item,long Needed)[] Lines) ListPanelLinesOf(string key,Func<(uint Item,long Needed)[]> entries)
     {
         var now=Environment.TickCount64;
