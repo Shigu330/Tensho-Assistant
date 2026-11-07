@@ -20,7 +20,25 @@ public sealed class InventoryService
     {
         ArgumentNullException.ThrowIfNull(snapshot);
         Interlocked.Exchange(ref current, snapshot);
-        Interlocked.Exchange(ref shown, snapshot);
+        Interlocked.Exchange(ref shown, ForDisplay(Volatile.Read(ref shown), snapshot));
+    }
+
+    /// <summary>
+    /// 0.742 (user report: the blink came back in 0.741): a reading made while the bags change can find a bag unreadable, and an unreadable bag counts nothing.
+    /// For display, such a bag keeps its last complete reading from the same character; the next complete one replaces it. <see cref="Current"/> keeps what was read.
+    /// </summary>
+    public static InventorySnapshot ForDisplay(InventorySnapshot? before, InventorySnapshot next)
+    {
+        if (before is null || next.Containers.Values.All(container => container.Coverage == InventoryCoverage.Complete)) return next;
+        var kept = false;
+        var containers = next.Containers.Values.Select(container =>
+        {
+            if (container.Coverage == InventoryCoverage.Complete
+                || !before.Containers.TryGetValue(container.Location, out var known) || known.Coverage != InventoryCoverage.Complete) return container;
+            kept = true;
+            return known;
+        }).ToArray();
+        return kept ? new InventorySnapshot(next.ObservedAt, next.Source, containers) : next;
     }
 
     /// <summary>The bags changed: unknown until read again, but the last reading stays for display.</summary>

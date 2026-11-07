@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.742.0
+- Plan global, Verify : Suite du clignotement : il revenait en 0.741. Le journal montre qu'une lecture faite pendant le changement trouvait les sacs illisibles et était affichée. Correction : à l'écran, un sac illisible garde sa dernière lecture complète du même personnage ; le tri voit toujours ce qui a été lu. Non validé en jeu.
+- Tests : ListBlink742Tests. Verify.ps1 (agent) : 1318/1318, 0 avertissement, 0 erreur ; DLL 0.742.0.0. Non validé en jeu.
+### English
+- Blink, continued: it came back in 0.741. The log shows that a reading taken during the change found the bags unreadable and was shown. Fix: on screen, an unreadable bag keeps its last complete reading of the same character; the sort still sees what was read. Not validated in game.
+
 ## 0.741.0
 - Plan global, Verify : Signalement : la liste de suivi clignotait pendant la récolte. Cause, relevée dans le journal : à chaque objet récolté, la lecture des sacs était effacée jusqu'à la suivante (jusqu'à 250 ms), et tous les stocks tombaient à 0. Correction : les stocks affichés gardent la dernière lecture du même personnage ; le tri des sacs, qui agit, attend toujours une lecture sûre. Non validé en jeu.
 - Tests : ListBlink741Tests. Verify.ps1 (agent) : 1316/1316, 0 avertissement, 0 erreur ; DLL 0.741.0.0. Non validé en jeu.
