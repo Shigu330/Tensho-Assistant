@@ -8,8 +8,9 @@ using TenshoAssistant.Competitive;
 namespace TenshoAssistant.Diagnostics;
 
 /// <summary>
-/// 0.724: developer mode only, once per load, after the self-check. Draws every page in a window far outside the screen that takes no input, so that nothing can
-/// be seen or clicked, and writes what each one cost and any error to the log: docs/evidence/0.724-page-sweep.md. It waits while the player is busy.
+/// 0.724: developer mode only, once per load, after the self-check. Draws every page and writes what each one cost and any error to the log: docs/evidence/0.724-page-sweep.md. It waits while
+/// the player is busy. 0.726: outside the screen ImGui skipped the content of child windows, so the window is now on the screen and marked hidden, as ImGui does for a new window's first frame:
+/// its items run, it is not rendered and cannot be hovered. Should it not be hidden, the sweep stops at once.
 /// </summary>
 internal sealed class PageSweepWindow : Window
 {
@@ -21,9 +22,13 @@ internal sealed class PageSweepWindow : Window
     private IReadOnlyList<(string Name,Action Draw)> pages=[];
     private PageSweep? sweep;
     private IReadOnlyDictionary<string,int> sentBefore=new Dictionary<string,int>();
+    private const string Name="###TenshoPageSweep";
+    private const int MaximumSilentFrames=600;
+    private bool created;
+    private int silentFrames;
 
     public PageSweepWindow(bool developerMode,Func<bool> ready,Func<bool> busy,Func<IReadOnlyList<(string Name,Action Draw)>> entries,int skipped,IPluginLog log)
-        :base("###TenshoPageSweep",ImGuiWindowFlags.NoTitleBar|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoInputs|ImGuiWindowFlags.NoFocusOnAppearing
+        :base(Name,ImGuiWindowFlags.NoTitleBar|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoInputs|ImGuiWindowFlags.NoFocusOnAppearing
             |ImGuiWindowFlags.NoBringToFrontOnFocus|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoDocking|ImGuiWindowFlags.NoCollapse,true)
     {
         this.ready=ready;this.busy=busy;this.entries=entries;this.skipped=skipped;this.log=log;
@@ -43,11 +48,38 @@ internal sealed class PageSweepWindow : Window
             sentBefore=BoundedHttp.Sent;
             sweep=new PageSweep(pages.Select(page=>page.Name).ToArray());
         }
+        if(++silentFrames>MaximumSilentFrames)
+        {
+            IsOpen=false;
+            log.Warning("Page sweep stopped: the window never drew.");
+            return false;
+        }
         return sweep.Due();
+    }
+
+    public override void PreDraw()
+    {
+        // Two: ImGui counts one down at Begin, and child windows hide while their parent's count is above zero.
+        var window=ImGuiP.FindWindowByName(Name);
+        if(!window.IsNull)window.HiddenFramesCannotSkipItems=2;
     }
 
     public override void Draw()
     {
+        silentFrames=0;
+        if(!created)
+        {
+            // Its first frame only makes it exist, out of sight.
+            created=true;
+            Position=ImGui.GetMainViewport().Pos;
+            return;
+        }
+        if(!ImGuiP.GetCurrentWindow().Hidden)
+        {
+            IsOpen=false;
+            log.Warning("Page sweep stopped: the window was not hidden.");
+            return;
+        }
         if(sweep?.Current is not { } current)return;
         var started=System.Diagnostics.Stopwatch.GetTimestamp();
         string? failure=null;

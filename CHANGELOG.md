@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.726.0
+- Plan global, Verify : Correction de 0.724 : hors de l'écran, ImGui sautait le contenu des sous-fenêtres, donc le résultat « 49 pages sans erreur » prouvait peu. Le passage dessine maintenant dans une fenêtre masquée, à l'écran : le contenu s'exécute, rien n'est affiché, et il s'arrête si elle n'est pas masquée.
+- Tests : PageSweep724Tests. Verify.ps1 (agent) : 1300/1300, 0 avertissement, 0 erreur ; DLL 0.726.0.0. Non validé en jeu.
+### English
+- Fix of 0.724: outside the screen, ImGui skipped the content of child windows, so « 49 pages with no error » proved little. The sweep now draws in a hidden window on the screen: the content runs, nothing shows, and it stops if the window is not hidden.
+
 ## 0.725.0
 - Plan global, Verify : Signalement : « ventes par jour » restait à « ? ». Cause : la réponse agrégée d'Universalis n'en donne pas sans vente récente. Correction : la vitesse sur sept jours vient de la réponse de l'objet. Demande : le tri par marché de « Que puis-je fabriquer ? » ne compte plus que ce qui peut se vendre dans les jours choisis (7 par défaut, réglable) ; une vieille vente HQ isolée ne fixe plus le prix quand seul le NQ se vend. Prouvé contre les réponses réelles d'Universalis ; non validé en jeu.
 - Tests : SalesSpeed725Tests. Verify.ps1 (agent) : 1300/1300, 0 avertissement, 0 erreur ; DLL 0.725.0.0. Non validé en jeu.

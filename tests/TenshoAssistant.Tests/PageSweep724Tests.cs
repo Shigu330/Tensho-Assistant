@@ -42,13 +42,15 @@ internal static class PageSweep724Tests
         ("Page sweep: out of sight, no input, developer mode only, never while busy or cut, the market left out, the page kept",() =>
         {
             var window=Read("Diagnostics/PageSweepWindow.Dalamud.cs");
-            foreach(var part in new[]{"ImGuiWindowFlags.NoInputs","new Vector2(-30000,-30000)","ImGuiCond.Always","IsOpen=developerMode","RespectCloseHotkey=false","DisableWindowSounds=true","CompetitiveGate.Cut || busy()",",true)"})
+            foreach(var part in new[]{"ImGuiWindowFlags.NoInputs","HiddenFramesCannotSkipItems=2","ImGuiP.GetCurrentWindow().Hidden","Position=ImGui.GetMainViewport().Pos","MaximumSilentFrames","ImGuiCond.Always","IsOpen=developerMode","RespectCloseHotkey=false","DisableWindowSounds=true","CompetitiveGate.Cut || busy()",",true)"})
                 Check(window.Contains(part),part);
             var plugin=Read("Plugin.cs");
             var wired=plugin[plugin.IndexOf("new Diagnostics.PageSweepWindow(")..];
             wired=wired[..wired.IndexOf("windows.RemoveWindow(pageSweep)")];
             foreach(var flag in new[]{"InCombat","BoundByDuty","Crafting","Gathering","Fishing","BetweenAreas","WatchingCutscene"})Check(wired.Contains("ConditionFlag."+flag),flag);
             Check(wired.Contains("configuration.DeveloperMode") && wired.Contains("selfCheck?.LastLines.Count>0"),"after the self-check");
+            // A hidden window is never hovered: only a raw test of the mouse could react to a click, and the pages have none.
+            foreach(var file in Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant"),"MainWindow*.cs"))Check(!File.ReadAllText(file).Contains("IsMouseHoveringRect"),file);
             var pages=Read("MainWindow.PageSweep.cs");
             Check(pages.Contains("entry.Page!=Page.Market") && pages.Contains("page=kept"),"market and page");
             Check(Read("MainWindow.cs").Contains("        OpenGuideOnce();\n        ValidateDrawContext();") || Read("MainWindow.cs").Contains("        OpenGuideOnce();\r\n        ValidateDrawContext();"),"same preparation as the window");
