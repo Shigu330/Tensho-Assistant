@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.778.0
+- Plan global, Verify : Demande (X-23) : une nouvelle alarme n'est plus envoyée sur Discord par défaut ; une alarme qui rejoint un groupe prend le réglage du groupe ; vos alarmes déjà enregistrées gardent le leur. Non validé en jeu.
+- Tests : DiscordOff778Tests. Verify.ps1 (agent) : 1347/1347, 0 avertissement, 0 erreur ; DLL 0.778.0.0. Non validé en jeu.
+### English
+- Request (X-23): a new alarm is no longer sent to Discord by default; one joining a group takes the group's setting; your saved alarms keep theirs. Not validated in game.
+
 ## 0.777.0
 - Plan global, Verify : Signalement (X-22) : certaines coordonnées du wiki (Butin des monstres, Magie bleue) n'avaient pas le clic droit vers l'éthérite la plus proche. Cause : le nom anglais du lieu n'était traduit qu'en un seul numéro, alors que le jeu en a parfois plusieurs (« Mor Dhona » : 26, 67, 509) ; si le premier n'avait pas de carte, le menu disparaissait. Tous les numéros sont essayés ; un lieu toujours introuvable est noté au journal en mode développeur. Non validé en jeu.
 - Tests : WikiPlaces777Tests. Verify.ps1 (agent) : 1346/1346, 0 avertissement, 0 erreur ; DLL 0.777.0.0. Non validé en jeu.

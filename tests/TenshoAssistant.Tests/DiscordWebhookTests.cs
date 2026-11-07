@@ -85,8 +85,8 @@ internal static class DiscordWebhookTests
             Check(DiscordWebhook.SourceOf(new TenshoAlarm { JobId = 16 }) == AlarmSource.Gathering && DiscordWebhook.SourceOf(new TenshoAlarm { JobId = 17 }) == AlarmSource.Gathering,"miner and botanist");
             Check(DiscordWebhook.SourceOf(new TenshoAlarm { JobId = 18 }) == AlarmSource.Fishing && DiscordWebhook.SourceOf(new TenshoAlarm()) == AlarmSource.Other,"fisher, no job");
             Check(DiscordWebhook.SourceOf(new TenshoAlarm { JobId = 18, Source = AlarmSource.Reminder }) == AlarmSource.Reminder,"stored source wins");
-            var fish = new TenshoAlarm { JobId = 18 };
-            Check(DiscordWebhook.ShouldSend(settings,fish),"sent by default once on with an address");
+            var fish = new TenshoAlarm { JobId = 18, Discord = true }; // 0.778 (X-23): off by default, turned on here
+            Check(DiscordWebhook.ShouldSend(settings,fish),"sent once the alarm and the channel are on, with an address");
             settings.Fishing = false; Check(!DiscordWebhook.ShouldSend(settings,fish),"category off"); settings.Fishing = true;
             fish.Discord = false; Check(!DiscordWebhook.ShouldSend(settings,fish),"alarm left out"); fish.Discord = true;
             Check(!DiscordWebhook.ShouldSend(new DiscordSettings { WebhookUrl = Url },fish),"off by default");

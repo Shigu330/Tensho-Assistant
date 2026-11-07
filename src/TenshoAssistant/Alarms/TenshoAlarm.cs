@@ -41,7 +41,8 @@ public sealed class TenshoAlarm
     public string AutoKey { get; set; } = "";
     // 0.578 (user request): the row of the Reminders page this alarm comes from, for its Discord box.
     public string ReminderRow { get; set; } = "";
-    public bool Discord { get; set; } = true;
+    /// <summary>0.778 (X-23, user request): off for a new alarm; one joining a group takes the group's (MainWindow.AddAlarms). A saved alarm keeps its own.</summary>
+    public bool Discord { get; set; }
     public string DiscordMessage { get; set; } = "";
 }
 
