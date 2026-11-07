@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.723.0
+- Plan global, Verify : Preuves corrigées d'après la première lecture dans le jeu : 50 rapports du front et non 55, 1 123 ALEA nommés, 47 et 41 lieux sur les fronts de Bozja. Aucun changement de code du plugin. COMPILED et TESTED ; lectures de 0.722 exécutées dans le jeu, affichage non validé.
+- Tests : FieldContent717Tests. Verify.ps1 (agent) : 1292/1292, 0 avertissement, 0 erreur ; DLL 0.723.0.0. Non validé en jeu.
+### English
+- Evidence corrected from the first read inside the game: 50 field records rather than 55, 1,123 named FATEs, 47 and 41 places on the Bozjan fronts. No change to the plugin's code. COMPILED and TESTED; the reads of 0.722 ran in the game, display not validated.
+
 ## 0.722.0
 - Plan global, Verify : Auto-contrôle : les pages codées sans le jeu sont maintenant lues dans le jeu au rechargement (mode développeur ou sur demande) et leurs comptes vont au journal.
 - Tests : FieldContent717Tests. Verify.ps1 (agent) : 1292/1292, 0 avertissement, 0 erreur ; DLL 0.722.0.0. Non validé en jeu.

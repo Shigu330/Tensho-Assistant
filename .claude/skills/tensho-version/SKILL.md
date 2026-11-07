@@ -7,6 +7,10 @@ description: Procédure d'une version de Tensho Assistant et pièges du code. À
 
 Règles de fond : `CLAUDE.md` et `docs/ai/RULES.md`. Où reprendre : la ligne « Reprise » de `docs/ai/STATUS.md` et `docs/project/GLOBAL-PLAN.md`. Ici : le déroulé et ce qui fait perdre du temps.
 
+## Page codée sans le jeu
+
+Ajouter sa lecture à `src/TenshoAssistant/MainWindow.SelfCheckPages.cs` : le plugin se recharge dans le jeu à chaque compilation et l'auto-contrôle écrit ses comptes dans `dalamud.log`. Cela prouve que la lecture tourne et ce qu'elle compte, pas que la page s'affiche bien ni qu'elle dit vrai : `docs/project/TESTING.md` reste nécessaire.
+
 ## Déroulé
 
 1. **Vérifier que ça n'existe pas déjà** (consigne de l'utilisateur) : chercher dans le code et dans `Localization/Languages/en.json`. Si ça existe : le noter, ne pas coder de doublon.
