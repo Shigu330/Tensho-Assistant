@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.792.0
+- Plan global, Verify : Demande (X-32) : une solution au blocage qu'on contournait en ouvrant puis fermant la carte du jeu (zone d'un mandat absente tant que la carte du jeu n'avait pas été ouverte à portée). Piste, sans rien ouvrir ni appeler dans le jeu : le jeu garde aussi ses marqueurs de quêtes et de mandats dans sa propre liste (Map), à part de celle de la fenêtre carte que Tensho lit. En mode développeur, cette liste est notée au journal avec l'état de la carte du jeu, pour vérifier qu'elle contient les zones carte fermée. Aucun changement visible. Non validé en jeu.
+- Tests : QuestMarkers792Tests. Verify.ps1 (agent) : 1364/1364, 0 avertissement, 0 erreur ; DLL 0.792.0.0. Non validé en jeu.
+### English
+- Request (X-32): a fix for what opening and closing the game map worked around (a leve's area missing until the game map had been opened in range). Lead, without opening or calling anything in the game: the game also keeps its quest and leve markers in its own list (Map), apart from the map window's list Tensho reads. In developer mode that list is written to the log with the game map's state, to check it holds the areas while the map is closed. No visible change. Not validated in game.
+
 ## 0.791.0
 - Plan global, Verify : Lourdeur (X-01) : le journal du 2026-11-07 montre la carte à 110–160 ms plusieurs fois par heure (« map overlay layout »), pas seulement à l'ouverture. Cette mesure englobait tout le dessin de la carte : en mode développeur, elle est maintenant découpée (commandes, puis dans la carte : texture et noms, points de récolte, zones, icônes, signets et joueur, bords et info-bulles), pour trouver le morceau lent. Aucun changement visible. Non validé en jeu.
 - Tests : MapMarks791Tests. Verify.ps1 (agent) : 1363/1363, 0 avertissement, 0 erreur ; DLL 0.791.0.0. Non validé en jeu.

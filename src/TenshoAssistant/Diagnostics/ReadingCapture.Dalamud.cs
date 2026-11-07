@@ -26,7 +26,7 @@ public sealed unsafe class ReadingCapture : IDisposable
     private readonly Func<bool> enabled;
     private readonly IPluginLog log;
     private readonly Dictionary<string,int> lines=[];
-    private string statuses="",synthesis="",workshop="",leves="",retainer="",airship="",islandState="",islandAgenda="";
+    private string statuses="",synthesis="",workshop="",questMarkers="",leves="",retainer="",airship="",islandState="",islandAgenda="";
     private bool fishing,disposed,warned;
     private long slowAt;
 
@@ -62,6 +62,7 @@ public sealed unsafe class ReadingCapture : IDisposable
             slowAt=now;
             ReadSynthesis();
             ReadWorkshop();
+            ReadQuestMarkers();
             ReadLeves();
             ReadRetainer();
             ReadAirships();
@@ -160,6 +161,38 @@ public sealed unsafe class ReadingCapture : IDisposable
         if(now==workshop)return;
         workshop=now;
         if(now.Length>0)Line("workshop",60,now);
+    }
+
+    // 0.792 (X-32, user request: what opening and closing the game map unblocked): a leve's area was missing from AgentMap.EventMarkers until the game map
+    // was opened in range (docs/evidence/0.654-leve-area-memory.md). The game's own Map (UIState) also holds quest and leve markers: written here, with
+    // whether the game map is open, to see if they are there while it is closed.
+    private void ReadQuestMarkers()
+    {
+        var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
+        if(map==null)return;
+        var text=new StringBuilder();
+        void Marker(string kind,FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info)
+        {
+            var count=info->MarkerData.LongCount;
+            if(info->ObjectiveId==0 && count==0)return;
+            text.Append($" [{kind} {info->ObjectiveId} render {info->ShouldRender}, {count} data");
+            if(count is <0 or >32){text.Append(" out of range]");return;}
+            foreach(var data in info->MarkerData)
+                text.Append($"; map {data.MapId} icon {data.IconId} level {data.LevelId} at {data.Position.X:F1},{data.Position.Z:F1} radius {data.Radius:F1} type {data.MarkerType}");
+            text.Append(']');
+        }
+        var leves=map->LevequestMarkers;
+        for(var index=0;index<leves.Length;index++)fixed(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info=&leves[index])Marker("leve",info);
+        Marker("active leve",&map->ActiveLevequestMarker);
+        var quests=map->QuestMarkers;
+        for(var index=0;index<quests.Length;index++)fixed(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info=&quests[index])Marker("quest",info);
+        if(text.Length==0)return;
+        var agent=AgentMap.Instance();
+        var events=agent==null ? -1:agent->EventMarkers.LongCount;
+        var now=$"game map {(agent!=null && agent->IsAgentActive() ? "open":"closed")}, event markers {events};{text}";
+        if(now==questMarkers)return;
+        questMarkers=now;
+        Line("questMarkers",80,now);
     }
 
     private void ReadSynthesis()
