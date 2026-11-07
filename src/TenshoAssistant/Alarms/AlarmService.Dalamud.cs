@@ -31,6 +31,8 @@ internal sealed class AlarmService : IDisposable
     private readonly Func<TenshoAlarm, bool>? wantsDiscord;
     private readonly Action<TenshoAlarm, int, DateTimeOffset>? toDiscord;
     private readonly object gate = new();
+    /// <summary>0.832 (X-62): whether a list alarm's item is already held as needed (framework thread); such an alarm does not ring.</summary>
+    public Func<TenshoAlarm, bool>? Gathered { get; set; }
     private IReadOnlyList<GameAlarm>? gameAlarms;
     private long nextCheck;
     private bool openGameWindow;
@@ -179,7 +181,8 @@ internal sealed class AlarmService : IDisposable
             if (inGame && !discord) continue;
             // 0.331: a weather condition is not checked before the weather catalogue is known; the occurrence is left for later, not skipped.
             if (catalog is null && alarm.Weathers.Count + alarm.PreviousWeathers.Count > 0) continue;
-            if (settings.RingOnTime && !inGame && AlarmSchedule.OnTimeDue(alarm, now) is { } exact)
+            var gathered = alarm.Needed > 0 && (Gathered?.Invoke(alarm) ?? false);
+            if (!gathered && settings.RingOnTime && !inGame && AlarmSchedule.OnTimeDue(alarm, now) is { } exact)
             {
                 alarm.LastOnTime = exact; changed = true;
                 var dutyNow = settings.MuteInDuties && condition[ConditionFlag.BoundByDuty];
@@ -191,7 +194,8 @@ internal sealed class AlarmService : IDisposable
             var (check, occurrence) = AlarmSchedule.Check(alarm, now, time => WeatherAt(catalog, alarm.TerritoryId, time));
             if (check == AlarmCheck.None) continue;
             alarm.LastOccurrence = occurrence; changed = true;
-            if (check != AlarmCheck.Fire) continue;
+            // 0.832 (X-62): the occurrence is marked handled, but an item already gathered rings nothing.
+            if (check != AlarmCheck.Fire || gathered) continue;
             alarm.LastRung = occurrence;
             var minutes = Math.Max(0, (int)Math.Ceiling((occurrence - now).TotalMinutes));
             if (!inGame)

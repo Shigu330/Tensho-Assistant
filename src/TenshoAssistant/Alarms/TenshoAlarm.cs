@@ -26,6 +26,8 @@ public sealed class TenshoAlarm
     public int LeadMinutes { get; set; } = 5;
     public uint TerritoryId { get; set; }
     public uint ItemId { get; set; }
+    // 0.832 (X-62): the quantity a tracking list needed when the alarm was added from it; 0 for every other alarm.
+    public long Needed { get; set; }
     public List<uint> Weathers { get; set; } = [];
     public List<uint> PreviousWeathers { get; set; } = [];
     public bool Enabled { get; set; } = true;
@@ -80,6 +82,9 @@ public sealed class AlarmSettings
 
 public static class AlarmSchedule
 {
+    /// <summary>0.832 (X-62, user report): an alarm added from a tracking list stays silent once the item is held in the quantity the list needed.</summary>
+    public static bool Gathered(TenshoAlarm alarm, long held) => alarm.ItemId != 0 && alarm.Needed > 0 && held >= alarm.Needed;
+
     public const int Maximum = 60;
     // Real seconds of one ET day (24 ET hours × 175 s) and of one ET minute (175 / 60 s).
     public const double EtDaySeconds = 4200, EtMinuteSeconds = 175.0 / 60;

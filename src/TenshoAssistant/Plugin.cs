@@ -285,6 +285,7 @@ public sealed class Plugin : IDalamudPlugin
                     discord.Enqueue(new(Alarms.DiscordWebhook.UrlFor(settings,Alarms.DiscordWebhook.SourceOf(alarm)),Alarms.DiscordWebhook.Payload(settings,content)));
                 }),()=>alarms?.Dispose());
             mainWindow.ConfigureAlarms(alarms!);
+            if(alarms is not null)alarms.Gathered=mainWindow.AlarmGathered;
             var gatherBuddyFish=new Community.GatherBuddyFishService(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityGatherBuddy};
             registrations.Register(()=>{},gatherBuddyFish.Dispose);
             mainWindow.ConfigureGatherBuddyFish(gatherBuddyFish);

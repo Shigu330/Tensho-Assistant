@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.832.0
+- Plan global, Verify : Signalement (X-62) : les alarmes ajoutées depuis une liste de suivi sonnaient encore avec la ressource réunie (Sel gemme d'Abalathia 24/2). Une alarme ajoutée depuis une liste garde maintenant la quantité que la liste demandait ; quand l'objet est détenu dans cette quantité, elle ne sonne plus (ni ligne de chat, ni son, ni Discord), et la page Alarmes l'indique (« objet réuni : muette »). Les autres alarmes ne changent pas. Les alarmes ajoutées avant cette version ne connaissent pas la quantité : il faut les retirer puis les ajouter de nouveau depuis la liste. Les alarmes copiées dans le jeu sonnent dans le jeu, hors de portée de Tensho. Non validé en jeu.
+- Tests : ListAlarms832Tests. Verify.ps1 (agent) : 1418/1418, 0 avertissement, 0 erreur ; DLL 0.832.0.0. Non validé en jeu.
+### English
+- Report (X-62): alarms added from a tracking list still rang with the resource gathered (Abalathian rock salt 24/2). An alarm added from a list now keeps the quantity the list needed; when the item is held in that quantity it no longer rings (no chat line, sound or Discord), and the Alarms page says so (« item gathered: silent »). Other alarms are unchanged. Alarms added before this version do not know the quantity: remove them and add them again from the list. Alarms copied into the game ring in the game, out of Tensho's reach. Not validated in game.
+
 ## 0.831.0
 - Plan global, Verify : Signalement (X-61) : l'aide à la récolte ne proposait pas de plan (« lu après une dépense de PR sur ce point ») alors que les essais étaient à 4/4. Cause : le point suivant du même genre a les mêmes objets, et sa fenêtre peut s'ouvrir avant que Tensho ait lu la fermeture de la précédente ; Tensho le prenait pour le même point, avec les PR déjà dépensés. Maintenant, un autre point (ligne du jeu) ou des essais qui remontent sont un nouveau point. Non validé en jeu.
 - Tests : GatheringNode831Tests. Verify.ps1 (agent) : 1417/1417, 0 avertissement, 0 erreur ; DLL 0.831.0.0. Non validé en jeu.

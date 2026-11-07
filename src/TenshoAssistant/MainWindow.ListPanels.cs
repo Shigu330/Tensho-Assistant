@@ -374,7 +374,7 @@ internal sealed partial class MainWindow
                 var job=TenshoAssistant.Alarms.AlarmSchedule.JobOf(source.TypeId,source.IsFishing);
                 foreach(var alarm in TenshoAssistant.Alarms.AlarmSchedule.ForWindows($"{name} · {place}",timing.OpeningMinutes,DefaultAlarmLead,source.TerritoryId,item))
                 {
-                    alarm.JobId=job;
+                    alarm.JobId=job;alarm.Needed=needed;
                     if(existing.Any(known=>known.Label==alarm.Label && known.Repeat==alarm.Repeat && known.EtMinute==alarm.EtMinute)
                         || created.Any(known=>known.Label==alarm.Label && known.EtMinute==alarm.EtMinute))continue;
                     created.Add(alarm);

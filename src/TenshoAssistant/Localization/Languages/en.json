@@ -1304,6 +1304,7 @@
     "Source": "GatherBuddy data (Ottermandias, Apache-2.0); game log and Garland further down."
   },
   "Alarms": {
+    "GatheredSilent": "item gathered: silent",
     "RealDaily": "Every day at {0}",
     "RealWeekly": "Every week, {0}",
     "AtDailyReset": "At each daily reset",

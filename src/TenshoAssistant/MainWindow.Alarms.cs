@@ -62,6 +62,13 @@ internal sealed partial class MainWindow
         if(alarm.GameName.Length>0)ImGui.TextColored(Accent,localization.Get("Alarms.EditInGame"));
         ImGui.Unindent();
     }
+    /// <summary>0.832 (X-62): a list alarm whose item is held in the quantity the list needed.</summary>
+    internal bool AlarmGathered(TenshoAlarm alarm)
+    {
+        if(alarm.Needed<=0)return false;
+        RefreshRecipeHoldingsCache();
+        return GetRecipeHoldings(alarm.ItemId) is { HasObservation:true } held && AlarmSchedule.Gathered(alarm,held.Total);
+    }
     private void AddAlarms(IReadOnlyList<TenshoAlarm> added)
     {
         configuration.Alarms??=[];
@@ -278,7 +285,8 @@ internal sealed partial class MainWindow
                         ImGui.TextColored(members.Any(alarm=>alarm.Enabled) ? Accent:Muted,title);
                         ImGui.TextDisabled(localization.Format("Alarms.GroupLine",members.Length)
                             +(next!=default ? " · "+localization.Format("Alarms.Next",next.ToLocalTime().ToString("t"),Math.Max(0,(int)(next-now).TotalMinutes)):"")
-                            +(members.Any(alarm=>alarm.Weathers.Count+alarm.PreviousWeathers.Count>0) ? " · "+localization.Get("Alarms.WeatherCondition"):""));
+                            +(members.Any(alarm=>alarm.Weathers.Count+alarm.PreviousWeathers.Count>0) ? " · "+localization.Get("Alarms.WeatherCondition"):"")
+                            +(members.Any(AlarmGathered) ? " · "+localization.Get("Alarms.GatheredSilent"):""));
                         var all=members.All(alarm=>alarm.Enabled);
                         if(ImGui.Checkbox(localization.Get("Alarms.GroupOn")+"##GroupOn",ref all)){foreach(var alarm in members)alarm.Enabled=all;changed=true;NoteGameCopy(members);}
                         Tip("SettingTips.AlarmGroupOn");

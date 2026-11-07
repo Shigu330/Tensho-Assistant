@@ -1304,6 +1304,7 @@
     "Source": "Données GatherBuddy (Ottermandias, Apache-2.0) ; carnet du jeu et Garland plus bas."
   },
   "Alarms": {
+    "GatheredSilent": "objet réuni : muette",
     "RealDaily": "Chaque jour à {0}",
     "RealWeekly": "Chaque semaine, {0}",
     "AtDailyReset": "À chaque remise à zéro du jour",
