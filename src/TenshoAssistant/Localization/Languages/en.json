@@ -2245,7 +2245,7 @@
     "OneHour": "1 hour",
     "OneDay": "24 hours",
     "SevenDays": "7 days",
-    "Never": "Never (on request only)"
+    "Never": "Only when missing, or on Refresh"
   },
   "MacroUi": {
     "Title": "Macro sequences",

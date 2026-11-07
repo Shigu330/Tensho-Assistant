@@ -55,7 +55,7 @@ public static class ConfigurationReset
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
         "CurrencyAlerts", "CurrencyServerBar", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
-        "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringNextHighlight", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
+        "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringNextHighlight", "CacheLongerDefaults", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
         "Discord", "ThemeMode", "ThemeModeBeforeTool", "CraftLogTryAllPresets", "GatherPlanFromList", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
@@ -317,6 +317,8 @@ public sealed class MapViewSettings
 public sealed partial class Configuration
 {
     public int Version { get; set; } = 1;
+    /// <summary>0.750 (X-02): the longer cache defaults have been applied to these settings.</summary>
+    public bool CacheLongerDefaults { get; set; }
     private Caching.CachePreferences cache=new();
     public Caching.CachePreferences Cache {get=>Volatile.Read(ref cache);set=>Volatile.Write(ref cache,value ?? new());}
     public List<TenshoAssistant.Macros.MacroSlot> MacroChainPlan { get; set; } = [];

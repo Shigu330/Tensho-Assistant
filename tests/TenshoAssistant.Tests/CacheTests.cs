@@ -47,9 +47,9 @@ internal static class CacheTests
         ("Cache policy defaults persistence independent choices and malformed configuration fallback",()=>
         {
             var config=JsonSerializer.Deserialize<Configuration>("{\"Version\":1}")!;
-            Check(config.Cache.Duration(CacheArea.Prices)==TimeSpan.FromDays(1) && config.Cache.Duration(CacheArea.Quests)==TimeSpan.FromMinutes(5),"requested price and quest defaults");
+            Check(config.Cache.Duration(CacheArea.Prices)==TimeSpan.FromDays(1) && config.Cache.Duration(CacheArea.Quests)==TimeSpan.FromHours(1),"requested price and quest defaults (0.750: quests one hour)");
             var previous=config.Cache;config.Cache=previous.With(CacheArea.Prices,CacheRetention.SevenDays);
-            Check(previous.Prices==CacheRetention.OneDay && config.Cache.Quests==CacheRetention.FiveMinutes,"edit does not mutate previous policy or another tool");
+            Check(previous.Prices==CacheRetention.OneDay && config.Cache.Quests==CacheRetention.OneHour,"edit does not mutate previous policy or another tool");
             var restored=JsonSerializer.Deserialize<Configuration>(JsonSerializer.Serialize(config))!;
             Check(restored.Cache.Prices==CacheRetention.SevenDays && !restored.MarketPricesOnHover,"policy persists without enabling HTTP hover");
             restored.Cache.Sources=(CacheRetention)999;Check(restored.Cache.Duration(CacheArea.Sources)==TimeSpan.FromDays(7),"corrupt selection falls back to area default");

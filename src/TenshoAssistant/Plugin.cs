@@ -110,6 +110,8 @@ public sealed class Plugin : IDalamudPlugin
             fontSettings = () => configuration.Fonts;
             if (configuration.Version != 1)
                 throw new NotSupportedException($"Unsupported configuration version: {configuration.Version}");
+            // 0.750 (X-02): once, the longer cache defaults; saved with the other settings at their next save.
+            if (!configuration.CacheLongerDefaults) { configuration.Cache.LongerDefaults(); configuration.CacheLongerDefaults = true; }
             dataCache=new DataCache(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"DataCache-v1"));
             market.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Prices),dataCache);
             marketBoard.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Prices),dataCache);

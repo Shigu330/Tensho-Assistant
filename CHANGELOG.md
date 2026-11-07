@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.750.0
+- Plan global, Verify : Cache (X-02) : durées par défaut plus longues, appliquées une fois aux réglages existants s'ils avaient gardé les anciennes : quêtes 5 min → 1 h, collections 24 h → 7 jours, sources communautaires 7 jours → seulement si absentes, calculs d'artisanat 24 h → 7 jours. Prix et Revue de mode inchangés. « Jamais » devient « Seulement si absent, ou sur Actualiser ». Un choix fait par vous reste. Non validé en jeu.
+- Tests : CacheDefaults750Tests. Verify.ps1 (agent) : 1323/1323, 0 avertissement, 0 erreur ; DLL 0.750.0.0. Non validé en jeu.
+### English
+- Cache (X-02): longer default durations, applied once to existing settings that kept the old ones: quests 5 min → 1 h, collections 24 h → 7 days, community sources 7 days → only when missing, crafting calculations 24 h → 7 days. Prices and the Fashion Report unchanged. « Never » becomes « Only when missing, or on Refresh ». A choice you made stays. Not validated in game.
+
 ## 0.749.0
 - Plan global, Verify : Lourdeur (X-01) : en mode développeur, le relevé des images lentes détaille la carte (menus, outils, carte elle-même), qui coûtait 195 ms à l'ouverture. Aucun changement visible. Non validé en jeu.
 - Tests : SlowFrame745Tests. Verify.ps1 (agent) : 1321/1321, 0 avertissement, 0 erreur ; DLL 0.749.0.0. Non validé en jeu.

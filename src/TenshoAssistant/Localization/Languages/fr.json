@@ -2245,7 +2245,7 @@
     "OneHour": "1 heure",
     "OneDay": "24 heures",
     "SevenDays": "7 jours",
-    "Never": "Jamais (seulement sur demande)"
+    "Never": "Seulement si absent, ou sur Actualiser"
   },
   "MacroUi": {
     "Title": "Enchaînement de macros",
