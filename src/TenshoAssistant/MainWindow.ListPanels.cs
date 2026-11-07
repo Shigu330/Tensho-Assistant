@@ -288,7 +288,9 @@ internal sealed partial class MainWindow
             foreach(var group in layout.Zones)
             {
                 var zoneDone=group.Lines.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
-                if(!ImGui.TreeNodeEx($"{group.Label} ({zoneDone}/{group.Lines.Length}){group.Note}###ListZone{key}{group.Id}",ImGuiTreeNodeFlags.DefaultOpen))continue;
+                var zoneOpen=ImGui.TreeNodeEx($"{group.Label} ({zoneDone}/{group.Lines.Length}){group.Note}###ListZone{key}{group.Id}",ImGuiTreeNodeFlags.DefaultOpen);
+                if(group.Cost is { } gil)DrawListZoneCost(gil);
+                if(!zoneOpen)continue;
                 try
                 {
                     foreach(var (item,needed) in group.Lines)
@@ -303,7 +305,17 @@ internal sealed partial class MainWindow
             }
         }
     }
-    private sealed record ListZoneGroup(string Id,string Label,string Note,bool Timed,(uint Item,long Needed)[] Lines);
+    private sealed record ListZoneGroup(string Id,string Label,string Note,bool Timed,(uint Item,long Needed)[] Lines,uint? Cost=null);
+    // 0.824 (X-56, user request: icons, no words): the Teleport action's icon (Action row 5 « Téléportation », icon 111, tools/XbmProbe) and the gil's (item 1).
+    private const uint TeleportIcon=111;
+    private void DrawListZoneCost(uint gil)
+    {
+        var size=new Vector2(ImGui.GetTextLineHeight());
+        ImGui.SameLine();DrawItemIcon(new Items.ItemDefinition(0,"",false,TeleportIcon),size);
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.ZoneCost",gil.ToString("N0")));
+        ImGui.SameLine();DrawItemIcon(itemCatalog.State.Catalog?.Find(1) ?? new Items.ItemDefinition(1,"",false,65002),size);
+        ImGui.SameLine();ImGui.TextUnformatted(gil.ToString("N0"));
+    }
     private sealed record ListLayout(long At,string? Here,(ItemOrigin Origin,(uint Item,long Needed)[] Lines)[] Origins,ListZoneGroup[]? Zones);
     private readonly Dictionary<string,ListLayout> listPanelLayouts=[];
     private ListLayout ListLayoutOf(long at,(uint Item,long Needed)[] all,string? here)
@@ -319,8 +331,9 @@ internal sealed partial class MainWindow
         uint? Cost(string zone){if(!costs.TryGetValue(zone,out var known))costs[zone]=known=ListPanelZoneCost(zone);return known;}
         foreach(var (zone,inZone) in BaseMaterials.OrderZones(BaseMaterials.ByZone(rest,line=>ListPanelZones(line.Item)),here,Cost))
         {
-            var note=zone==here && zone.Length>0 ? " · "+localization.Get("ListPanels.ZoneHere"):Cost(zone) is { } gil ? " · "+localization.Format("ListPanels.ZoneCost",gil.ToString("N0")):"";
-            zones.Add(new(zone,zone.Length>0 ? zone:localization.Get("ListPanels.ZoneUnknown"),note,false,inZone.ToArray()));
+            var cost=zone==here && zone.Length>0 ? null:Cost(zone);
+            var note=zone==here && zone.Length>0 ? " · "+localization.Get("ListPanels.ZoneHere"):"";
+            zones.Add(new(zone,zone.Length>0 ? zone:localization.Get("ListPanels.ZoneUnknown"),note,false,inZone.ToArray(),cost));
         }
         return new(at,here,origins,zones.ToArray());
     }
