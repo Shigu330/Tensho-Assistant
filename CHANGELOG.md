@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.763.0
+- Plan global, Verify : Demande (X-16) : quand deux plans de PR donnent le même rendement, l'aide choisit celui qui demande le moins de clics (une action qui dure toute la récolte plutôt qu'une par récolte), puis le moins cher. Un meilleur rendement reste prioritaire. Non validé en jeu.
+- Tests : FewerClicks763Tests. Verify.ps1 (agent) : 1337/1337, 0 avertissement, 0 erreur ; DLL 0.763.0.0. Non validé en jeu.
+### English
+- Request (X-16): when two GP plans give the same yield, the help picks the one with the fewest clicks (an action lasting the whole node rather than one per gather), then the cheapest. A better yield still comes first. Not validated in game.
+
 ## 0.762.0
 - Plan global, Verify : Demande (X-15) : le menu du clic droit d'un objet récolté propose « Y aller », comme la page Récolte : drapeau, carte de Tensho et téléportation vers l'éthérite la plus proche (question, sauf réglage). Le point choisi est un point ouvert d'abord, puis dans votre zone, puis la téléportation la moins chère. Non validé en jeu.
 - Tests : GoThereMenu762Tests. Verify.ps1 (agent) : 1335/1335, 0 avertissement, 0 erreur ; DLL 0.762.0.0. Non validé en jeu.
