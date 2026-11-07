@@ -4,7 +4,12 @@ namespace TenshoAssistant.Relics;
 public sealed record RelicTarget(string Name,string Place,int Needed=0);
 public sealed record RelicBook(uint Row,string Name,IReadOnlyList<RelicTarget> Monsters,IReadOnlyList<RelicTarget> Dungeons,IReadOnlyList<RelicTarget> Fates,IReadOnlyList<RelicTarget> Leves);
 /// <summary>The weapons, one list per class, an item per stage in the game's order; and the books by their row. Families: the later relics, key then lines, in that order.</summary>
-public sealed record RelicCatalog(IReadOnlyList<IReadOnlyList<uint>> Lines,IReadOnlyDictionary<uint,RelicBook> Books,IReadOnlyList<(string Key,IReadOnlyList<IReadOnlyList<uint>> Lines)>? Families=null);
+public sealed record RelicCatalog(IReadOnlyList<IReadOnlyList<uint>> Lines,IReadOnlyDictionary<uint,RelicBook> Books,IReadOnlyList<(string Key,IReadOnlyList<IReadOnlyList<uint>> Lines)>? Families=null,IReadOnlyDictionary<string,IReadOnlyList<RelicArmourSet>>? Armours=null);
+
+/// <summary>W-13 (0.720): a stage of armour, as the English name says it. Prefix: how the name starts. Plus: the name ends with « +n », 0 for none. BaseOf: the name, without its « +n », follows this word on a row of the sheet: « Antiquated Chivalrous Circlet » makes « Chivalrous Circlet » a stage. docs/evidence/0.720-relic-armour.md.</summary>
+public sealed record RelicArmourStage(int Level,string Prefix="",int Plus=0,string? BaseOf=null);
+/// <summary>One job or role's armour, its pieces stage by stage. Name: the game's words for those jobs.</summary>
+public sealed record RelicArmourSet(uint Category,string Name,IReadOnlyList<IReadOnlyList<uint>> Stages);
 
 /// <summary>W-13 (0.716): a weapon as the sheet has it. Name: English, whatever the game's language, because stages are recognised by it. Category: its jobs, which stay the same from stage to stage.</summary>
 public readonly record struct RelicItemRow(uint Id,string Name,int Level,int Rarity,uint Category);
@@ -29,6 +34,46 @@ public static class RelicBoard
         ("Manderville",[new(615,"Manderville"),new(630,"Amazing Manderville"),new(645,"Majestic Manderville"),new(665,"Mandervillous")]),
         ("Phantom",[new(745,"Penumbrae"),new(760,"Umbrae"),new(775,"Obscurum"),new(790,"Eclipticum"),new(795,"Occultum")]),
     ];
+
+    public static readonly IReadOnlyList<(string Key,IReadOnlyList<RelicArmourStage> Stages)> ArmourRules=
+    [
+        ("Eureka",[new(290,"Antiquated "),new(335,"",0,"Antiquated "),new(340,"",1,"Antiquated "),new(345,"",2,"Antiquated "),new(350,"Anemos "),new(380,"Elemental "),new(390,"Elemental ",1),new(390,"Elemental ",2)]),
+        ("Resistance",[new(495,"Bozjan "),new(495,"Augmented Bozjan "),new(510,"Law's Order "),new(510,"Augmented Law's Order "),new(525,"Blade's ")]),
+        ("Phantom",[new(745,"Arcanaut's "),new(745,"Arcanaut's ",1),new(745,"Arcanaut's ",2),new(780,"Phantom Vision "),new(780,"Phantom Vision ",1),new(780,"Phantom Vision ",2),new(780,"Phantom Vision ",3)]),
+    ];
+    public static IReadOnlySet<int> ArmourLevels()=>ArmourRules.SelectMany(family=>family.Stages).Select(stage=>stage.Level).ToHashSet();
+
+    private static (string Bare,int Plus) WithoutPlus(string name)
+    {
+        var cut=name.LastIndexOf(" +",StringComparison.Ordinal);
+        return cut>0 && int.TryParse(name.AsSpan(cut+2),out var plus) ? (name[..cut],plus):(name,0);
+    }
+
+    /// <summary>The rows of a stage. Names: every name of the armour rows, for BaseOf.</summary>
+    public static IEnumerable<RelicItemRow> ArmourStage(IReadOnlyList<RelicItemRow> rows,RelicArmourStage stage,IReadOnlySet<string> names)=>rows.Where(row=>
+    {
+        if(row.Level!=stage.Level || !row.Name.StartsWith(stage.Prefix,StringComparison.Ordinal))return false;
+        var (bare,plus)=WithoutPlus(row.Name);
+        return plus==stage.Plus && (stage.BaseOf is null || names.Contains(stage.BaseOf+bare));
+    });
+
+    /// <summary>One set per job or role, a list of pieces per stage in the rules' order. A stage the set does not have stays empty: the Eureka armour and its Elemental armour have different owners.</summary>
+    public static IReadOnlyList<RelicArmourSet> ArmourSets(IReadOnlyList<RelicItemRow> rows,IReadOnlyList<RelicArmourStage> stages,Func<uint,string> categoryName)
+    {
+        var names=rows.Select(row=>row.Name).ToHashSet(StringComparer.Ordinal);
+        var sets=new Dictionary<uint,List<uint>[]>();var order=new List<uint>();
+        for(var index=0;index<stages.Count;index++)
+            foreach(var row in ArmourStage(rows,stages[index],names).OrderBy(row=>row.Id))
+            {
+                if(!sets.TryGetValue(row.Category,out var set))
+                {
+                    sets[row.Category]=set=Enumerable.Range(0,stages.Count).Select(_=>new List<uint>()).ToArray();
+                    order.Add(row.Category);
+                }
+                set[index].Add(row.Id);
+            }
+        return order.Select(category=>new RelicArmourSet(category,categoryName(category),sets[category].Select(stage=>(IReadOnlyList<uint>)stage).ToArray())).ToArray();
+    }
 
     /// <summary>The levels to read from the sheet, so that the rest of it is left alone.</summary>
     public static IReadOnlySet<int> Levels()=>Rules.SelectMany(family=>family.Stages).Select(stage=>stage.Level).ToHashSet();
@@ -74,6 +119,13 @@ public static class RelicBoard
                 case >0:reached=index;break;
             }
         return reached<0 && unknown ? null:reached;
+    }
+
+    /// <summary>Pieces seen in the stocks, and pieces whose stocks are known: unknown is not « none ».</summary>
+    public static (int Held,int Known) PiecesHeld(IReadOnlyList<uint> pieces,Func<uint,long?> held)
+    {
+        var counts=pieces.Select(held).ToArray();
+        return (counts.Count(count=>count>0),counts.Count(count=>count is not null));
     }
 
     /// <summary>How much of a book is done, target by target. A list shorter than the book counts the rest as not done.</summary>

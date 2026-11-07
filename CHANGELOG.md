@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.720.0
+- Plan global, W-13 : Fin des reliques suivantes, sujet choisi par l'utilisateur. La page s'appelle maintenant Reliques ; Eurêka, Résistance et fantômes ont deux onglets, Armes et Armures : pour le groupe de jobs choisi, chaque étape avec ses pièces au survol et le nombre en stock. COMPILED et TESTED, non validé en jeu.
+- Tests : RelicWeapons708Tests. Verify.ps1 (agent) : 1290/1290, 0 avertissement, 0 erreur ; DLL 0.720.0.0. Non validé en jeu.
+### English
+- End of the later relics, a topic chosen by the user. The page is now called Relics; Eureka, Resistance and Phantom have two tabs, Weapons and Armour: for the chosen job group, each stage with its pieces on hover and how many are in stock. COMPILED and TESTED, not validated in game.
+
 ## 0.719.0
 - Plan global, W-16 : Lexique, sujet choisi par l'utilisateur. Nouvelle page Objets › Lexique : chercher un mot du jeu en français ou en anglais, sans tenir compte des accents, dans seize types de feuilles (objets, actions, lieux, monstres, PNJ, quêtes, interface…), résultats par pages, clic pour copier. Chargement et recherche hors de l'image. COMPILED et TESTED, non validé en jeu.
 - Tests : Lexicon719Tests. Verify.ps1 (agent) : 1288/1288, 0 avertissement, 0 erreur ; DLL 0.719.0.0. Non validé en jeu.

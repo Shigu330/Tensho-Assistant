@@ -44,8 +44,53 @@ internal sealed partial class MainWindow
         if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Relics.ReadTip"));
         RefreshRecipeHoldingsCache();
         var tabs=new List<(string Key,string Label,Action Draw)>{("Zodiac",localization.Get("Relics.FamilyZodiac"),()=>{DrawRelicFamily("Zodiac",catalog.Lines);DrawRelicBook(catalog);})};
-        foreach(var (key,lines) in catalog.Families ?? [])tabs.Add((key,localization.Get("Relics.Family"+key),()=>DrawRelicFamily(key,lines)));
+        foreach(var (key,lines) in catalog.Families ?? [])
+            tabs.Add((key,localization.Get("Relics.Family"+key),catalog.Armours?.GetValueOrDefault(key) is { Count:>0 } sets
+                ? ()=>DetailTabs($"RelicParts{key}",[("Weapons",localization.Get("Relics.PartWeapons"),()=>DrawRelicFamily(key,lines)),("Armour",localization.Get("Relics.PartArmour"),()=>DrawRelicArmour(key,sets))],ref relicPartFocus)
+                :()=>DrawRelicFamily(key,lines)));
         DetailTabs("RelicTabs",tabs,ref relicTabFocus);
+    }
+
+    private string? relicPartFocus;
+    private readonly Dictionary<string,int> relicArmourSets=[];
+
+    // W-13 (0.720): the later relics' armour, a line per stage, its pieces in the tooltip. docs/evidence/0.720-relic-armour.md.
+    private void DrawRelicArmour(string family,IReadOnlyList<RelicArmourSet> sets)
+    {
+        var items=itemCatalog.State.Catalog;
+        string Name(uint id)=>items?.Find(id)?.Name ?? $"#{id}";
+        var chosen=Math.Clamp(relicArmourSets.GetValueOrDefault(family),0,sets.Count-1);
+        ImGui.SetNextItemWidth(320);
+        if(ImGui.BeginCombo(localization.Get("Relics.ArmourSet")+$"###RelicArmourSet{family}",sets[chosen].Name))
+        {
+            try{for(var index=0;index<sets.Count;index++)if(ImGui.Selectable($"{sets[index].Name}##RelicArmourSet{family}{index}",index==chosen))relicArmourSets[family]=index;}
+            finally{ImGui.EndCombo();}
+        }
+        Tip("Relics.ArmourSetTip");
+        long? Held(uint id){var stock=GetRecipeHoldings(id);return stock.HasObservation ? stock.Total:null;}
+        if(!ImGui.BeginTable($"###RelicArmour{family}",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV))return;
+        try
+        {
+            ImGui.TableSetupColumn(localization.Get("Relics.ColumnStage"));
+            ImGui.TableSetupColumn(localization.Get("Relics.ColumnArmour"));
+            ImGui.TableSetupColumn(localization.Get("Relics.ColumnPieces"));
+            ImGui.TableHeadersRow();
+            var stages=sets[chosen].Stages.Where(stage=>stage.Count>0).ToArray();
+            for(var index=0;index<stages.Length;index++)
+            {
+                var pieces=stages[index];
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();ImGui.TextUnformatted((index+1).ToString());
+                ImGui.TableNextColumn();ImGui.TextUnformatted(Name(pieces[0]));
+                if(ImGui.IsItemHovered())WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0") ?? "?"))));
+                ImGui.TableNextColumn();
+                var (held,known)=RelicBoard.PiecesHeld(pieces,Held);
+                if(known==0)ImGui.TextDisabled("?");
+                else if(held==pieces.Count)ImGui.TextColored(Success,$"{held}/{pieces.Count}");
+                else ImGui.TextUnformatted(known<pieces.Count ? $"{held}/{pieces.Count} ?":$"{held}/{pieces.Count}");
+            }
+        }
+        finally{ImGui.EndTable();}
     }
 
     private void DrawRelicFamily(string family,IReadOnlyList<IReadOnlyList<uint>> lines)

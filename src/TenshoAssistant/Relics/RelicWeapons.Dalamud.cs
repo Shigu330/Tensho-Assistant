@@ -34,7 +34,13 @@ internal static class RelicCatalogLoader
         var rows=english.Where(row=>row.EquipSlotCategory.RowId is 1 or 13 && levels.Contains((int)row.LevelItem.RowId))
             .Select(row=>new RelicItemRow(row.RowId,row.Name.ExtractText(),(int)row.LevelItem.RowId,row.Rarity,row.ClassJobCategory.RowId)).ToArray();
         var families=RelicBoard.Rules.Select(family=>(family.Key,RelicBoard.FamilyLines(rows,family.Stages))).Where(family=>family.Item2.Count>0).ToArray();
-        return new(RelicBoard.Lines(stages),books,families);
+        // W-13 (0.720): their armour, the same way: head, body, hands, legs, feet.
+        var armourLevels=RelicBoard.ArmourLevels();
+        var armourRows=english.Where(row=>row.EquipSlotCategory.RowId is 3 or 4 or 5 or 7 or 8 && armourLevels.Contains((int)row.LevelItem.RowId))
+            .Select(row=>new RelicItemRow(row.RowId,row.Name.ExtractText(),(int)row.LevelItem.RowId,row.Rarity,row.ClassJobCategory.RowId)).ToArray();
+        var categories=data.GetExcelSheet<ClassJobCategory>();
+        var armours=RelicBoard.ArmourRules.ToDictionary(family=>family.Key,family=>RelicBoard.ArmourSets(armourRows,family.Stages,category=>categories.GetRowOrDefault(category)?.Name.ExtractText() ?? category.ToString()));
+        return new(RelicBoard.Lines(stages),books,families,armours);
     }
 }
 

@@ -48,6 +48,28 @@ internal static class RelicWeapons708Tests
             var rule=RelicBoard.Rules.Single(family=>family.Key=="Resistance").Stages[1];
             Check(RelicBoard.Stage(augmented,rule).Single().Id==1,"the relic only");
         }),
+        ("Relic armour: stages by name, level and « +n », as the sheet writes them, and a line per job",() =>
+        {
+            RelicItemRow[] rows=
+            [
+                new(1,"Antiquated Chivalrous Circlet",290,3,20),new(2,"Chivalrous Circlet",335,3,20),new(3,"Chivalrous Circlet +1",340,3,20),new(4,"Chivalrous Circlet +2",345,3,20),new(5,"Anemos Chivalrous Circlet",350,3,20),
+                new(6,"Pacifist's Circlet",335,3,21),new(7,"Antiquated Pacifist's Circlet",290,3,21),
+                new(8,"Carborundum Circlet of Fending",350,2,59),new(9,"Crafted Circlet",335,2,20),
+                new(10,"Elemental Helm of Fending",380,3,59),new(11,"Elemental Helm of Fending +1",390,3,59),new(12,"Elemental Helm of Fending +2",390,3,59),
+            ];
+            var sets=RelicBoard.ArmourSets(rows,RelicBoard.ArmourRules.Single(family=>family.Key=="Eureka").Stages,category=>"c"+category);
+            var paladin=sets.Single(set=>set.Category==20);
+            Check(paladin.Name=="c20" && paladin.Stages.Take(5).Select(stage=>stage.Single()).SequenceEqual([1u,2u,3u,4u,5u]),"the five stages of a job");
+            Check(paladin.Stages[5].Count==0,"not its Elemental armour");
+            Check(sets.Single(set=>set.Category==21).Stages[1].Single()==6,"another job");
+            var role=sets.Single(set=>set.Category==59);
+            Check(role.Stages[4].Count==0 && role.Stages[5].Single()==10 && role.Stages[6].Single()==11 && role.Stages[7].Single()==12,"a crafted set stays out, the role's own set is there");
+        }),
+        ("Relic armour: pieces held, unknown stays unknown",() =>
+        {
+            Check(RelicBoard.PiecesHeld([1,2,3],id=>id==1 ? 2:id==2 ? 0:null)==(1,2),"mixed");
+            Check(RelicBoard.PiecesHeld([1],_=>null)==(0,0),"unknown");
+        }),
         ("Relics: the page only reads, on the framework thread, once the character is loaded",() =>
         {
             var reader=Read("Relics/RelicWeapons.Dalamud.cs");
