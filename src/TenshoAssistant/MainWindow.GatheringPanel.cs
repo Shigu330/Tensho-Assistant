@@ -71,6 +71,15 @@ internal sealed partial class MainWindow
     // 0.728 (user request): a frame over the slot of the next action, as on the Mini Cactpot board. Drawn only: the player uses the action.
     internal Gathering.ActionBarLocator? BarLocator { get; set; }
     private (GpPlan Plan,int Gp,int? Attempts,int? Boon,GpNextStep Step)? gatheringNextCache;
+    // 0.816: one golden frame over a part of a game window, under Tensho's windows.
+    private static void DrawGameFrame(float x,float y,float width,float height)
+    {
+        var draw=ImGui.GetBackgroundDrawList();
+        var pulse=0.65f+0.35f*MathF.Sin((float)(DateTime.UtcNow.TimeOfDay.TotalSeconds*5));
+        var min=new Vector2(x,y);var max=min+new Vector2(width,height);
+        draw.AddRectFilled(min,max,ImGui.GetColorU32(UI.FfxivTheme.Gold with {W=0.18f*pulse}),6);
+        draw.AddRect(min,max,ImGui.GetColorU32(UI.FfxivTheme.Gold with {W=pulse}),6,ImDrawFlags.None,3);
+    }
     private static void DrawGatheringBarHighlight(Gathering.ActionBarLocator located)
     {
         if(located.Rects is not { Count:>0 } rects)return;

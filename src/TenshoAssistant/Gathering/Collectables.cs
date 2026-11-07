@@ -59,6 +59,8 @@ public sealed class CollectableCatalog
 }
 
 /// <summary>What Tensho read in the game's Collectable window (AddonGatheringMasterpiece): texts as shown, numbers when they parse.</summary>
+/// <summary>0.816 (X-51): where the window shows an icon (screen pixels); a zero size: the window does not show it.</summary>
+public sealed record CollectableIconRect(uint Icon,float X,float Y,float Width,float Height);
 public sealed record CollectableWindowFrame(string ItemName,string? Chance,int? Gp,int? MaxGp,int? Integrity,int? MaxIntegrity,
     IReadOnlyList<string> RawValues,float X,float Y,float Width,DateTimeOffset ObservedAt);
 

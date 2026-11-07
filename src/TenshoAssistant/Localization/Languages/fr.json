@@ -6101,6 +6101,7 @@
     "IssuerId": "Donneur de quête n° {0}"
   },
   "CollectablePanel": {
+    "NextNotInWindow": "Le bouton de cette action n'a pas été trouvé dans la fenêtre du jeu.",
     "RestoreWait": "+1 tentative, {0} PR : attendez un instant, le jeu n'est pas prêt",
     "Working": "Calcul du plan…",
     "Risk": "Risque accepté",

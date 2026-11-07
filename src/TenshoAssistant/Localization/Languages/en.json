@@ -6101,6 +6101,7 @@
     "IssuerId": "Issuer ID: {0}"
   },
   "CollectablePanel": {
+    "NextNotInWindow": "This move's button was not found in the game's window.",
     "RestoreWait": "+1 attempt, {0} GP: wait a moment, the game is not ready",
     "Working": "Working out the plan…",
     "Risk": "Risk accepted",

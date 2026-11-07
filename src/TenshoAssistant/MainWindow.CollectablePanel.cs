@@ -189,14 +189,15 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         // 0.528 (user capture): this line was cut at the panel's width.
         ImGui.TextWrapped(gain.Length>0 ? $"{info?.Name ?? advice.Move.ToString()} ({gain})":info?.Name ?? advice.Move.ToString());
-        // 0.815 (X-51, user request): the move the plan asks for, framed on the hotbars, as the gathering help does (same setting, same frame).
-        if(!advice.Impossible && action!=0 && configuration.GatheringNextHighlight && BarLocator is { } located)
+        // 0.815, 0.816 (X-51, user request): the move the plan asks for, framed on the game's collectable window itself (its button with that action's icon),
+        // with the gathering help's setting and frame.
+        if(!advice.Impossible && info is { Icon:not 0 } wanted && configuration.GatheringNextHighlight && Collectables is { } reader)
         {
-            located.Want(action);
-            if(located.ReadFor==action)
+            reader.WantIcon(wanted.Icon);
+            if(reader.IconRect is { } rect && rect.Icon==wanted.Icon)
             {
-                if(located.Rects.Count==0)ImGui.TextDisabled(localization.Get("GatheringPanel.NextNotOnBars"));
-                else DrawGatheringBarHighlight(located);
+                if(rect.Width<=0)ImGui.TextDisabled(localization.Get("CollectablePanel.NextNotInWindow"));
+                else DrawGameFrame(rect.X,rect.Y,rect.Width,rect.Height);
             }
         }
         ImGui.PushTextWrapPos(0);

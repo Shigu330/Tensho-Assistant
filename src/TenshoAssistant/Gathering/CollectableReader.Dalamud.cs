@@ -20,6 +20,10 @@ internal sealed class CollectableReader : IDisposable
     private bool disposed;private long nextRead;private int warned;private int loading;
     private CollectableWindowFrame? frame;private CollectableCatalog? catalog;
     public CollectableWindowFrame? Frame=>Volatile.Read(ref frame);
+    // 0.816 (X-51, user request: the frame on the game's collectable window, not on the hotbars): the window's button showing a wanted icon, in screen pixels.
+    private int iconWanted;private CollectableIconRect? iconRect;
+    public void WantIcon(uint icon)=>Volatile.Write(ref iconWanted,(int)icon);
+    public CollectableIconRect? IconRect=>Volatile.Read(ref iconRect);
     // A-15 (0.432): the collectables in the bags (Inventory1-4), read every 5 s while a view asks (WantHoldings, 5 s window).
     private IReadOnlyList<HeldCollectable>? holdings;private long holdingsWanted;private long nextHoldings;
     public IReadOnlyList<HeldCollectable>? Holdings=>Volatile.Read(ref holdings);
@@ -100,6 +104,18 @@ internal sealed class CollectableReader : IDisposable
                         var shown=((AtkTextNode*)node)->NodeText;
                         if(shown.Length is >0 and <=64 && shown.ToString().Contains('%'))values.Add($"node{node->NodeId}:{Short(shown.ToString())}");
                     }
+                // 0.816 (X-51): the icon components of the window (its action buttons), bounded; their icons listed for the developer view.
+                var icons=new List<(uint Icon,nint Node)>();
+                FindIcons(&unit->UldManager,0,icons);
+                foreach(var (shownIcon,_) in icons)values.Add($"icon:{shownIcon}");
+                var wanted=(uint)Volatile.Read(ref iconWanted);
+                var hit=wanted==0 ? default:icons.FirstOrDefault(entry=>entry.Icon%1_000_000==wanted%1_000_000);
+                if(hit.Node!=0)
+                {
+                    var node=(AtkResNode*)hit.Node;var scale=unit->Scale;
+                    Volatile.Write(ref iconRect,new CollectableIconRect(wanted,node->ScreenX,node->ScreenY,node->Width*scale,node->Height*scale));
+                }
+                else Volatile.Write(ref iconRect,wanted==0 ? null:new CollectableIconRect(wanted,0,0,0,0));
                 var name=Text(addon->ItemName);
                 if(name is null){Volatile.Write(ref frame,null);return;}
                 Volatile.Write(ref frame,new CollectableWindowFrame(name,Text(addon->ObtainChance),Collectables.Number(Text(addon->GPLeftover)),Collectables.Number(Text(addon->GPTotal)),
@@ -111,6 +127,20 @@ internal sealed class CollectableReader : IDisposable
                 Volatile.Write(ref frame,null);nextRead=now+Stopwatch.Frequency*5;
                 if(Interlocked.Exchange(ref warned,1)==0)log.Warning(error,"Collectable window unavailable; retry in five seconds.");
             }
+        }
+    }
+
+    private static unsafe void FindIcons(AtkUldManager* manager,int depth,List<(uint Icon,nint Node)> found)
+    {
+        if(manager==null || depth>3 || manager->NodeList==null || manager->NodeListCount>512 || found.Count>=40)return;
+        for(var index=0;index<manager->NodeListCount;index++)
+        {
+            var node=manager->NodeList[index];
+            if(node==null || (ushort)node->Type<1000 || !node->IsVisible())continue;
+            var component=((AtkComponentNode*)node)->Component;
+            if(component==null)continue;
+            if(component->GetComponentType()==ComponentType.Icon && ((AtkComponentIcon*)component)->IconId is var icon and not 0)found.Add(((uint)icon,(nint)node));
+            FindIcons(&component->UldManager,depth+1,found);
         }
     }
 

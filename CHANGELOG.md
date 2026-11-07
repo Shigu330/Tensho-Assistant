@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.816.0
+- Plan global, Verify : Correction de X-51, à la demande de l'utilisateur : l'action que demande le plan des collectionnables n'est plus encadrée sur les barres de raccourcis mais sur la fenêtre des collectionnables du jeu, sur le bouton qui porte l'icône de cette action (recherche bornée parmi les composants d'icône de la fenêtre). Si le bouton n'est pas trouvé, le panneau le dit ; en mode développeur, les icônes trouvées s'ajoutent aux valeurs brutes de la fenêtre, pour vérifier. Non validé en jeu.
+- Tests : CollectableHighlight815Tests. Verify.ps1 (agent) : 1401/1401, 0 avertissement, 0 erreur ; DLL 0.816.0.0. Non validé en jeu.
+### English
+- Fix of X-51, at the user's request: the move the collectables plan asks for is no longer framed on the hotbars but on the game's collectable window, on the button showing that action's icon (a bounded search among the window's icon components). If the button is not found, the panel says so; in developer mode, the icons found join the window's raw values, to check. Not validated in game.
+
 ## 0.815.0
 - Plan global, Verify : Demande (X-51) : dans le panneau des collectionnables, la compétence que le plan demande est maintenant encadrée sur les barres de raccourcis, comme dans l'aide à la récolte (même cadre doré, même réglage « surligner la prochaine action ») ; si elle n'est sur aucune barre, le panneau le dit. Sans plan (objet sans seuil de remise connu, comme l'Œil-de-verre de la capture), rien n'est encadré. Non validé en jeu.
 - Tests : CollectableHighlight815Tests. Verify.ps1 (agent) : 1401/1401, 0 avertissement, 0 erreur ; DLL 0.815.0.0. Non validé en jeu.
