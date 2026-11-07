@@ -1066,6 +1066,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.712) Que puis-je fabriquer ? › assignats : les objets collectionnables doivent afficher leurs assignats au palier haut et venir en tête ; comparer un montant au jeu.
 
+- [ ] (0.713) Progression › Peuples alliés : comparer rangs et réputation à la fenêtre de réputation du jeu ; si chaque ligne montre le rang du voisin, le dire.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

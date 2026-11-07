@@ -264,6 +264,10 @@
     "RelicWeaponsPurpose": "The Zodiac weapons, the stages you hold and the book in progress.",
     "RelicWeaponsStart": "Open the page and choose a weapon. Read again after a book target.",
     "RelicWeaponsEmpty": "Nothing shows until your character is loaded.",
+    "AlliedSocietiesTitle": "Allied societies",
+    "AlliedSocietiesPurpose": "Each allied society: your rank and reputation, its place and its currency.",
+    "AlliedSocietiesStart": "Open the page: Tensho copies what the game already holds. Read again after your quests.",
+    "AlliedSocietiesEmpty": "Nothing shows until your character is loaded.",
     "OceanFishingTitle": "Ocean fishing",
     "OceanFishingPurpose": "The next departures from Limsa Lominsa and Kugane, with their stops and the time of day.",
     "OceanFishingStart": "Read the next departure and its route. During a voyage, the fishing help shows the stop and its fish.",
@@ -539,6 +543,7 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "Navigation": {
+    "AlliedSocieties": "Allied societies",
     "RelicWeapons": "Relic weapons",
     "MaskedCarnivale": "Masked Carnivale",
     "CustomDeliveries": "Custom deliveries",
@@ -6279,6 +6284,23 @@
     "Leves": "Leves",
     "Done": "done",
     "Left": "to do"
+  },
+  "Allied": {
+    "Title": "Allied societies",
+    "Subtitle": "Your ranks, from what the game holds.",
+    "Read": "Read again",
+    "ReadTip": "Copies what the game holds, once. No request and no action in the game.",
+    "SheetsUnavailable": "The societies' sheets could not be read, perhaps after a game update.",
+    "Unavailable": "The societies could not be read, perhaps after a game update.",
+    "NotLoaded": "Your character is not loaded yet: read again in a moment.",
+    "Allowances": "Allied society quests left today: {0}",
+    "ColumnSociety": "Society",
+    "ColumnExpansion": "Expansion",
+    "ColumnPlace": "Place",
+    "ColumnRank": "Rank",
+    "ColumnReputation": "Reputation",
+    "ColumnCurrency": "Currency",
+    "NoRank": "No rank yet"
   },
   "Island": {
     "TabWorkshop": "Workshop",

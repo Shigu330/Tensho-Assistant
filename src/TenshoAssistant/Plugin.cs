@@ -767,6 +767,17 @@ public sealed class Plugin : IDalamudPlugin
                 }
                 catch(Exception error){log.Warning(error,"Custom deliveries unreadable (game update?).");throw;}
             });
+            // W-10 (0.713): the allied societies, read when the page opens and on the player's click.
+            mainWindow.AlliedCatalogLoad=()=>
+            {
+                try{return Societies.AlliedCatalogLoader.Read(data);}
+                catch(Exception error){log.Warning(error,"Allied society sheets unreadable (game update?).");return null;}
+            };
+            mainWindow.ReadAllied=catalog=>framework.RunOnFrameworkThread(()=>
+            {
+                try{return Societies.AlliedReader.Read(catalog);}
+                catch(Exception error){log.Warning(error,"Allied societies unreadable (game update?).");throw;}
+            });
             // W-03 (0.708): the Zodiac weapons, read when the page opens and on the player's click.
             mainWindow.RelicCatalogLoad=()=>
             {

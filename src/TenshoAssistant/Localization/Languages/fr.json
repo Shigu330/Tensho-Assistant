@@ -264,6 +264,10 @@
     "RelicWeaponsPurpose": "Les armes du zodiaque, les étapes que vous détenez et le livre en cours.",
     "RelicWeaponsStart": "Ouvrez la page et choisissez une arme. Lisez de nouveau après un objectif du livre.",
     "RelicWeaponsEmpty": "Rien ne s'affiche tant que votre personnage n'est pas chargé.",
+    "AlliedSocietiesTitle": "Peuples alliés",
+    "AlliedSocietiesPurpose": "Chaque peuple allié : votre rang et votre réputation, son lieu et sa monnaie.",
+    "AlliedSocietiesStart": "Ouvrez la page : Tensho copie ce que le jeu détient déjà. Lisez de nouveau après vos quêtes.",
+    "AlliedSocietiesEmpty": "Rien ne s'affiche tant que votre personnage n'est pas chargé.",
     "OceanFishingTitle": "Pêche en mer",
     "OceanFishingPurpose": "Les prochains départs de Limsa Lominsa et de Kugane, avec leurs escales et le moment de la journée.",
     "OceanFishingStart": "Lisez le prochain départ et son trajet. Pendant une traversée, l'aide à la pêche donne l'escale et ses poissons.",
@@ -539,6 +543,7 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "Navigation": {
+    "AlliedSocieties": "Peuples alliés",
     "RelicWeapons": "Armes reliques",
     "MaskedCarnivale": "La Grande Mascarade",
     "CustomDeliveries": "Commandes spéciales",
@@ -6279,6 +6284,23 @@
     "Leves": "Mandats",
     "Done": "fait",
     "Left": "à faire"
+  },
+  "Allied": {
+    "Title": "Peuples alliés",
+    "Subtitle": "Vos rangs, à partir de ce que le jeu détient.",
+    "Read": "Lire de nouveau",
+    "ReadTip": "Copie une fois ce que le jeu détient. Aucune requête et aucune action dans le jeu.",
+    "SheetsUnavailable": "Les feuilles des peuples n'ont pas pu être lues, peut-être après une mise à jour du jeu.",
+    "Unavailable": "Les peuples n'ont pas pu être lus, peut-être après une mise à jour du jeu.",
+    "NotLoaded": "Votre personnage n'est pas encore chargé : lisez de nouveau dans un instant.",
+    "Allowances": "Quêtes de peuples alliés restantes aujourd'hui : {0}",
+    "ColumnSociety": "Peuple",
+    "ColumnExpansion": "Extension",
+    "ColumnPlace": "Lieu",
+    "ColumnRank": "Rang",
+    "ColumnReputation": "Réputation",
+    "ColumnCurrency": "Monnaie",
+    "NoRank": "Pas encore de rang"
   },
   "Island": {
     "TabWorkshop": "Atelier",

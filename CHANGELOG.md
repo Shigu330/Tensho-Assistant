@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.713.0
+- Plan global, W-10 : Peuples alliés, sujet choisi par l'utilisateur. Nouvelle page Progression › Peuples alliés : pour chaque peuple, son extension, son lieu (clic droit vers l'éthérite), votre rang, votre réputation et la monnaie détenue, avec les quêtes restantes du jour. Lecture seule, sans requête au serveur. Le sujet rejoint le plan avec six autres (W-11 à W-16). COMPILED et TESTED, non validé en jeu.
+- Tests : AlliedSocieties713Tests. Verify.ps1 (agent) : 1271/1271, 0 avertissement, 0 erreur ; DLL 0.713.0.0. Non validé en jeu.
+### English
+- Allied societies, a topic chosen by the user. New page Progression > Allied societies: each society's expansion, place (right click to the aetheryte), your rank, reputation and currency held, with today's quests left. Read only, no server request. It joins the plan with six others (W-11 to W-16). COMPILED and TESTED, not validated in game.
+
 ## 0.712.0
 - Plan global, W-06 : Rapport de l'utilisateur : le tri par assignats n'affichait aucun assignat. Les récompenses se chargent à la première demande, et la liste n'était pas recalculée à leur arrivée. Elle l'est maintenant, et la page dit quand elles se chargent. COMPILED et TESTED, non validé en jeu.
 - Tests : MarketPace710Tests. Verify.ps1 (agent) : 1268/1268, 0 avertissement, 0 erreur ; DLL 0.712.0.0. Non validé en jeu.
