@@ -1200,6 +1200,8 @@ internal sealed partial class MainWindow
             // NPC vendors (0.140): a vendor standing by the game's icon for it (shop or service icon, MapVendorIcons, MAP-017) adds its
             // shops to that icon's tooltip instead of a second icon; others get the game icon of their kind (cached, VendorLayout).
             var vendorLayout=settings.ShowVendors ? VendorLayout(map,markers,settings.ShowFixedIcons):MapVendorLayout.None;
+            // 0.805 (X-01: « canvas icons » 34 to 71 ms every 5 to 10 minutes): finer checkpoints inside it.
+            MapMark("canvas vendors");
             foreach(var marker in settings.ShowFixedIcons ? markers.Where(marker=>marker.Icon!=0):[])
             {
                 var label=marker.Label.Length>0 ? marker.Label:null;Vector2? vendorFlag=null;
@@ -1235,6 +1237,7 @@ internal sealed partial class MainWindow
             // 0.643 (user capture): a click on it goes down one step, like the links.
             else if(mapGameTarget is { } upperTarget && GameTargetAbove(map,markers,upperTarget.MapId,upperTarget.World) is { } upper)
                 Add(upperTarget.Icon,4,upper.Pixel,localization.Get("MapView.GameTarget"),new MapIconMarker(upper.Pixel.X,upper.Pixel.Y,upperTarget.Icon,"",upper.Link));
+            MapMark("canvas icon list");
             icons.Sort((left,right)=>left.Priority!=right.Priority ? left.Priority.CompareTo(right.Priority):left.Layer!=right.Layer ? left.Layer.CompareTo(right.Layer):left.Order.CompareTo(right.Order));
             MapIconDraw? top=null;var hits=new List<MapIconDraw>();
             if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right))mapIconContext=null;
@@ -1286,6 +1289,7 @@ internal sealed partial class MainWindow
             hits.Reverse();
             // Nearby coffers with the game's « Coffre au trésor » map icon (0.210), and gathering points the game streams for your current job
             // (icon-font symbol); both sized and hidden from the icon settings like the game's icons.
+            MapMark("canvas icons drawn");
             if(live?.Objects is { } nearby && live.MapId==map.MapId)
                 foreach(var item in nearby)
                 {
@@ -1314,6 +1318,7 @@ internal sealed partial class MainWindow
                         :item.Kind==MapObjectKind.HuntMark ? localization.Format("MapView.HuntMarkLabel",item.Name,item.Level switch{3=>"S",2=>"A",_=>"B"}):item.Name;
                     if(hovered && Vector2.Distance(io.MousePos,at)<=glyph){tooltip=label;tooltipPoint=null;}
                 }
+            MapMark("canvas nearby objects");
             // 0.795 (X-35, user request): nearby monsters that drop an item the tracking lists still need.
             // 0.796 (X-36): one layer for every reason; one icon per monster, the first reason's, and every reason on hover.
             if((settings.ShowListMonsters || settings.ShowHuntLogMonsters || settings.ShowFateMonsters || settings.ShowBlueMageMonsters || settings.ShowCollectionMonsters || settings.ShowBeastMonsters) && live?.Monsters is { Count:>0 } monsters && live.MapId==map.MapId)
@@ -1338,6 +1343,7 @@ internal sealed partial class MainWindow
                     }
                 }
             }
+            MapMark("canvas monsters");
             if(settings.ShowFlag && settings.SizeOf(FlagIcon,map.MapId)>0 && live is { Flag:{ } flag } && live.FlagMapId==map.MapId)
             {
                 var flagPixel=MapProjection.PixelFromWorld(new Vector3(flag.X,0,flag.Y),map);var at=origin+mapPan+flagPixel*mapZoom;var iconSize=Math.Max(4,baseIcon*settings.SizeOf(FlagIcon,map.MapId));
@@ -1541,11 +1547,14 @@ internal sealed partial class MainWindow
             finally{ImGui.EndPopup();}
         }
         // 0.373 (M-03): nearest aetheryte asked from a chat map link, once this map is shown.
+        MapMark("canvas menus");
         ResolveNearestAetheryte(map);
+        MapMark("canvas nearest aetheryte");
         // Aetheryte chosen in the local lists: the teleport question opens once the context menu is closed.
         if(mapTeleportRequested){mapTeleportRequested=false;ImGui.OpenPopup("MapTeleport");}
         if(!ReferenceEquals(mapOpenError,mapErrorSeen)){mapErrorSeen=mapOpenError;if(mapOpenError is not null)mapErrorUntil=DateTimeOffset.UtcNow.AddSeconds(5);}
         if(hovered && mapOpenError is { } error && DateTimeOffset.UtcNow<mapErrorUntil)WrappedTooltip(error);
+        MapMark("canvas end");
     }
 
     // One game icon to draw on the canvas, sorted by priority then layer then insertion.

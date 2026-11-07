@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.805.0
+- Plan global, Verify : Lourdeur (X-01) : les relevés de 18:50 à 20:01 montrent le dessin de la carte à 102–169 ms toutes les 5 à 10 minutes, dont « canvas icons » 34 à 71 ms et 40 à 60 ms hors des points de mesure. En mode développeur, de nouveaux points découpent cette partie (boutiques, liste des icônes, dessin des icônes, objets proches, monstres) et la fin du dessin (menus, éthérite la plus proche), pour trouver le morceau à sortir de l'image. Le clic droit sur une alarme (X-03) est validé en jeu. Aucun changement visible. Non validé en jeu.
+- Tests : MapMarks791Tests. Verify.ps1 (agent) : 1389/1389, 0 avertissement, 0 erreur ; DLL 0.805.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01): the readings from 18:50 to 20:01 show the map drawing at 102-169 ms every 5 to 10 minutes, of which « canvas icons » 34 to 71 ms and 40 to 60 ms outside the checkpoints. In developer mode, new checkpoints split that part (vendors, icon list, icon drawing, nearby objects, monsters) and the end of the drawing (menus, nearest aetheryte), to find the piece to move out of the frame. The right click on an alarm (X-03) is validated in game. No visible change. Not validated in game.
+
 ## 0.804.0
 - Plan global, Verify : Demande (X-39) : les monstres proches dont se dresse une bête que vous n'avez pas. Le jeu dit seulement la zone de capture ; le bestiaire du wiki (une page) donne le monstre de chaque bête, son numéro étant la ligne de la bête dans le jeu (vérifié sur les cinq premières). La page Dresseur a un bouton qui le lit (une requête, gardée sur le disque, rien sans ce clic). Sur la carte, un dragon et les bêtes au survol ; au-dessus de la tête, l'icône du dresseur. Seulement en dresseur, sauf « Même hors dresseur ». Réglages dans la carte et sur la page Dresseur. Non validé en jeu.
 - Tests : BeastNearby804Tests. Verify.ps1 (agent) : 1389/1389, 0 avertissement, 0 erreur ; DLL 0.804.0.0. Non validé en jeu.
