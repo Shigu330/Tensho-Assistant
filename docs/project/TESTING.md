@@ -1076,6 +1076,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.717) Progression › Eureka et Bozja : comparer deux ou trois positions à la carte du jeu quand vous y passerez ; Progression › Armes reliques : l'onglet Résistance ne doit plus montrer d'armes Crystarium.
 
+- [ ] (0.718) Progression › Donjons profonds : lire deux textes de poteries et comparer l'état d'un groupe d'étages à la fenêtre du jeu.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

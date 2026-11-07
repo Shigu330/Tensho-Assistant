@@ -53,6 +53,7 @@ internal sealed partial class MainWindow
         new(Page.GrandCompanies,"Progression",PageLabel("Navigation.GrandCompanies"),DrawGrandCompanies,"MainWindow.GrandCompanies.cs, GrandCompanies/"),
         new(Page.SpecialDeliveries,"Progression",PageLabel("Navigation.SpecialDeliveries"),DrawSpecialDeliveries,"MainWindow.SpecialDeliveries.cs, Deliveries/SpecialDeliveries.cs"),
         new(Page.FieldContent,"Progression",PageLabel("Navigation.FieldContent"),DrawFieldContent,"MainWindow.FieldContent.cs, Fields/"),
+        new(Page.DeepDungeons,"Progression",PageLabel("Navigation.DeepDungeons"),DrawDeepDungeons,"MainWindow.DeepDungeons.cs, DeepDungeons/"),
         new(Page.Gear,"Progression",PageLabel("Navigation.Gear"),DrawGearPlanner,"MainWindow.Gear.cs, Gear/"),
         new(Page.Chocobo,"Progression",PageLabel("Navigation.Chocobo"),DrawChocoboPage,"MainWindow.ChocoboBarding.cs, Gear/ChocoboBarding.cs, Gear/ChocoboReader.Dalamud.cs"),
         new(Page.Leves,"Progression",PageLabel("Navigation.Leves"),DrawLeves,"MainWindow.Leves.cs"),

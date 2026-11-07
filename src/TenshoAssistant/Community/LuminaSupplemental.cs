@@ -26,6 +26,10 @@ public sealed class LuminaSupplementalData
     public IReadOnlyList<(int Kind, int Count, IReadOnlyList<uint> Items)> GivesOf(uint sourceItemId) =>
         gives.TryGetValue(sourceItemId, out var kinds)
             ? kinds.OrderBy(pair => pair.Key).Select(pair => (pair.Key, pair.Value.Count, (IReadOnlyList<uint>)pair.Value.Items)).ToArray() : [];
+    /// <summary>W-15 (0.718): every item of one kind of source, with what it gives. The list stops at 24 like the rest: Count is the whole.</summary>
+    public IReadOnlyList<(uint Source, int Count, IReadOnlyList<uint> Items)> SourcesOf(int kind) =>
+        gives.Where(pair => pair.Value.ContainsKey(kind)).OrderBy(pair => pair.Key)
+            .Select(pair => (pair.Key, pair.Value[kind].Count, (IReadOnlyList<uint>)pair.Value[kind].Items)).ToArray();
     public IReadOnlyList<(uint QuestId, string Name, uint Quantity, bool Hq)> QuestsRequiring(uint itemId) =>
         questsRequiring.TryGetValue(itemId, out var list) ? list : [];
     // Shops the game sheets do not link to an NPC (0.199): ENpcShop (ENpcResidentId, ShopId) and NPC positions ENpcPlace (ENpcResidentId,

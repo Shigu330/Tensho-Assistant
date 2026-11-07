@@ -767,6 +767,12 @@ public sealed class Plugin : IDalamudPlugin
                 }
                 catch(Exception error){log.Warning(error,"Custom deliveries unreadable (game update?).");throw;}
             });
+            // W-15 (0.718): the deep dungeons, from the sheets, off the frame.
+            mainWindow.DeepDungeonLoad=()=>
+            {
+                try{return DeepDungeons.DeepDungeonLoader.Read(data);}
+                catch(Exception error){log.Warning(error,"Deep dungeon sheets unreadable (game update?).");return null;}
+            };
             // W-14 (0.717): Eureka and Bozja, from the game's files, off the frame.
             mainWindow.FieldCatalogLoad=()=>
             {

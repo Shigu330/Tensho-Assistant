@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.718.0
+- Plan global, W-15 : Donjons profonds, sujet choisi par l'utilisateur. Nouvelle page Progression › Donjons profonds, un onglet par donjon : étages avec niveau, état et quête de déblocage ; poteries, pierres et objets particuliers avec le texte du jeu, le mot « sous-sol », « étage » ou « zone » rempli selon le donjon ; coffres d'après LuminaSupplemental, sous son réglage. Pas de conseil de combat, et Tensho reste en pause à l'intérieur. Corrigé aussi : deux noms de la liste des sources suivent maintenant le jeu (Eurêka Orthos, Sanctuaire des pèlerins). COMPILED et TESTED, non validé en jeu.
+- Tests : DeepDungeons718Tests. Verify.ps1 (agent) : 1285/1285, 0 avertissement, 0 erreur ; DLL 0.718.0.0. Non validé en jeu.
+### English
+- Deep dungeons, a topic chosen by the user. New page Progression > Deep dungeons, a tab per dungeon: floors with level, state and unlock quest; pomanders, stones and special items with the game's text, its floor word filled in per dungeon; coffers from LuminaSupplemental, under its switch. No fight advice, and Tensho still pauses inside. Also fixed: two source names now follow the game. COMPILED and TESTED, not validated in game.
+
 ## 0.717.0
 - Plan global, W-14 : Eureka et Bozja, sujet choisi par l'utilisateur. Nouvelle page Progression › Eureka et Bozja : par zone, les ALEA, escarmouches et affrontements cruciaux avec leur niveau et leur position, lues dans les fichiers de zone du jeu ; clic pour la carte, clic droit pour le drapeau et l'éthérite quand il y en a une ; rapports du front bozjien et actions oubliées avec les textes du jeu. Corrigé aussi : l'étape « Augmented » des armes de la Résistance prenait des armes fabriquées (Augmented Crystarium). Ce que le personnage possède n'est pas lu. COMPILED et TESTED, non validé en jeu.
 - Tests : FieldContent717Tests. Verify.ps1 (agent) : 1281/1281, 0 avertissement, 0 erreur ; DLL 0.717.0.0. Non validé en jeu.
