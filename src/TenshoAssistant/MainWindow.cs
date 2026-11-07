@@ -101,8 +101,10 @@ internal sealed partial class MainWindow : Window, IDisposable
     // first icon load), a moving average mixed both and kept the spike of a page left just after opening it.
     private readonly Dictionary<Page, (double[] Samples, int Next, int Count)> pageDrawMs = [];
     private readonly Dictionary<string, (double[] Samples, int Next, int Count)> overlayDrawMs = [];
+    internal readonly Diagnostics.SlowFrame SlowFrames = new();
     internal void RecordOverlayDraw(string name, double milliseconds)
     {
+        SlowFrames.Add(ImGui.GetFrameCount(), name, milliseconds);
         // 0.487 (user report: times appeared then went): a panel whose window is closed costs next to nothing, and its zeros pushed its real times out within 2 seconds. Only frames it really drew count.
         if (milliseconds < 0.02) return;
         var ring = overlayDrawMs.TryGetValue(name, out var known) ? known : (Samples: new double[120], Next: 0, Count: 0);
@@ -273,6 +275,7 @@ internal sealed partial class MainWindow : Window, IDisposable
                         var drawnPage = page;
                         PageEntryFor(page)?.Draw();
                         var drawMs = System.Diagnostics.Stopwatch.GetElapsedTime(drawStarted).TotalMilliseconds;
+                        if (DeveloperMode) SlowFrames.Add(ImGui.GetFrameCount(), "page " + drawnPage, drawMs);
                         var ring = pageDrawMs.TryGetValue(drawnPage, out var known) ? known : (Samples: new double[120], Next: 0, Count: 0);
                         ring.Samples[ring.Next] = drawMs;
                         pageDrawMs[drawnPage] = (ring.Samples, (ring.Next + 1) % ring.Samples.Length, Math.Min(ring.Count + 1, ring.Samples.Length));

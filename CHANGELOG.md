@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.745.0
+- Plan global, Verify : Signalement : Tensho paraît lourd. Le journal montre des images de 120 à 230 ms toutes les quelques minutes, et une de 2,6 s, sans dire quelle partie. En mode développeur, chaque image de plus de 100 ms est maintenant écrite au journal avec ses parties les plus coûteuses (panneau, page) et les pauses du moteur .NET. Aucun changement visible. Non validé en jeu.
+- Tests : SlowFrame745Tests. Verify.ps1 (agent) : 1320/1320, 0 avertissement, 0 erreur ; DLL 0.745.0.0. Non validé en jeu.
+### English
+- Report: Tensho feels heavy. The log shows frames of 120 to 230 ms every few minutes, and one of 2.6 s, without saying which part. In developer mode, every frame above 100 ms is now written to the log with its costliest parts (panel, page) and the .NET runtime's pauses. No visible change. Not validated in game.
+
 ## 0.744.0
 - Plan global, Verify : Clignotement de la liste de suivi, cause trouvée par le relevé de 0.743 : la lecture affichée des sacs était bonne, mais le calcul des stocks des listes lisait encore la lecture stricte, vide pendant 250 ms. La correction de 0.741 était tombée dans une autre fonction qui commençait par la même ligne. Corrigé, et le test vérifie cette fonction précise. Non validé en jeu.
 - Tests : ListBlink741Tests. Verify.ps1 (agent) : 1318/1318, 0 avertissement, 0 erreur ; DLL 0.744.0.0. Non validé en jeu.

@@ -1251,6 +1251,18 @@ public sealed class Plugin : IDalamudPlugin
     private void Draw()
     {
         if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
+        // 0.745: in developer mode, a slow frame is written to the log with its costliest parts.
+        if(!mainWindow.DeveloperMode){DrawFrame();return;}
+        var started=System.Diagnostics.Stopwatch.GetTimestamp();var paused=GC.GetTotalPauseDuration();
+        try{DrawFrame();}
+        finally
+        {
+            if(mainWindow.SlowFrames.Report(Dalamud.Bindings.ImGui.ImGui.GetFrameCount(),System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds,(GC.GetTotalPauseDuration()-paused).TotalMilliseconds) is { } slow)
+                log.Information(slow);
+        }
+    }
+    private void DrawFrame()
+    {
         fonts?.Apply(fontSettings() ?? new());
         if(commandInfo is not null && commandLocalizationRevision!=localization.Revision)
         {commandInfo.HelpMessage=localization.Get("Plugin.CommandHelp");commandLocalizationRevision=localization.Revision;}
