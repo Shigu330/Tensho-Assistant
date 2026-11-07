@@ -473,6 +473,14 @@ internal sealed partial class MainWindow
 
     // Stock over what is needed; a dash when the stocks have not been read: unknown is not zero.
     private readonly Diagnostics.BlinkWatch listPanelBlinks=new();
+    /// <summary>0.822 (X-55): the storages holding the item away from the character, when the bags do not cover the need; null otherwise.</summary>
+    private string? ListPanelElsewhere(Inventory.ItemHoldingsSummary stock,long required)
+    {
+        var onMe=stock.Rows.Where(row=>row.Category==Inventory.StorageCategory.PlayerBags).Sum(row=>row.Nq+row.Hq);
+        if(onMe>=required)return null;
+        var away=stock.Rows.Where(row=>row.Category!=Inventory.StorageCategory.PlayerBags && row.Nq+row.Hq>0).ToArray();
+        return away.Length==0 ? null:string.Join(", ",away.Select(row=>$"{StorageRowName(row)} {(row.Nq+row.Hq):N0}"));
+    }
     private void DrawListPanelLine(string list,uint itemId,long required,Inventory.ItemHoldingsSummary stock)
     {
         // 0.740: developer mode, to find the line that goes back and forth while gathering (docs/evidence/0.740-list-blink.md).
@@ -499,6 +507,15 @@ internal sealed partial class MainWindow
         if(!stock.HasObservation)ImGui.TextDisabled($"— / {required:N0}");
         else if(stock.Total<required)ImGui.TextColored(UI.FfxivTheme.Warning,$"{stock.Total:N0} / {required:N0}");
         else ImGui.TextColored(Success,$"{stock.Total:N0} / {required:N0}");
+        // 0.822 (X-55, user request): part of the count is not on the character (a retainer, the saddlebag, the company chest…) and the bags alone do not cover the need.
+        if(stock.HasObservation && ListPanelElsewhere(stock,required) is { } elsewhere)
+        {
+            ImGui.SameLine();
+            ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
+            try{ImGui.TextColored(UI.FfxivTheme.Warning,Dalamud.Interface.FontAwesomeIcon.Warehouse.ToIconString());}
+            finally{ImGui.PopFont();}
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.Elsewhere",elsewhere));
+        }
         // 0.795 (X-35, user request): a monster nearby drops it.
         if(nearbyDroppedItems.TryGetValue(itemId,out var droppers))
         {

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.822.0
+- Plan global, Verify : Demande (X-55) : dans les listes de suivi, une icône d'entrepôt à côté du compte dit qu'une partie de l'objet n'est pas sur vous, quand vos sacs seuls ne couvrent pas le besoin ; au survol, les rangements et leurs quantités (« Pas sur vous : servant Shirune 3, sacoche 2 »). Non validé en jeu.
+- Tests : Elsewhere822Tests. Verify.ps1 (agent) : 1409/1409, 0 avertissement, 0 erreur ; DLL 0.822.0.0. Non validé en jeu.
+### English
+- Request (X-55): in the tracking lists, a warehouse icon beside the count says part of the item is not on you, when your bags alone do not cover the need; on hover, the storages and their quantities (« Not on you: retainer Shirune 3, saddlebag 2 »). Not validated in game.
+
 ## 0.821.0
 - Plan global, Verify : Signalement (X-52), suite : le prix vu au tableau des ventes effaçait ce qu'Universalis ajoute (le moins cher sur les autres mondes et dans la région). Sur un objet dont Tensho n'avait pas encore de copie d'Universalis, le prix vu passait pour complet, et Universalis n'était plus interrogé. Maintenant, sans copie d'Universalis, le prix vu attend sa réponse ; ensuite les deux sont réunis : votre monde depuis le tableau des ventes s'il est plus récent, les autres mondes et la région depuis Universalis. Source Universalis coupée : le prix vu seul. Non validé en jeu.
 - Tests : SeenPrices817Tests. Verify.ps1 (agent) : 1408/1408, 0 avertissement, 0 erreur ; DLL 0.821.0.0. Non validé en jeu.
