@@ -330,7 +330,7 @@ internal sealed partial class MainWindow
         {
             DrawSmallGameIcon(marker.Icon);
             if(ImGui.Selectable($"{marker.Label}##Aetheryte{marker.AetheryteId}"))
-            {mapTeleportTarget=(marker.AetheryteId,marker.Label);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;ImGui.CloseCurrentPopup();}
+            {mapTeleportNote=null;mapTeleportTarget=(marker.AetheryteId,marker.Label);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;ImGui.CloseCurrentPopup();}
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.TeleportHint"));
         }
     }

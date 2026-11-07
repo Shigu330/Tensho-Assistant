@@ -95,6 +95,8 @@ internal sealed partial class MainWindow
         return null;
     }
     private (uint Id,string Name)? mapTeleportTarget;
+    // 0.833 (X-63): the way into a zone with no aetheryte, shown in the teleport question for that aetheryte (Warn: its town has no aethernet).
+    private (uint Id,string Text,bool Warn)? mapTeleportNote;
     private string mapContextBookmarkName="";
     private Action? openGameMap;
     internal void ConfigureGameMapOpener(Action opener)=>openGameMap=opener;
@@ -1453,7 +1455,7 @@ internal sealed partial class MainWindow
                     // Aetherytes: a click asks for the teleport, like the game map (normal teleport cost).
                     if(marker.AetheryteId!=0 && settings.TeleportOnClick)
                     {
-                        if(released){mapTeleportTarget=(marker.AetheryteId,marker.Label);mapLive?.RefreshTeleportCosts();ImGui.OpenPopup("MapTeleport");}
+                        if(released){mapTeleportNote=null;mapTeleportTarget=(marker.AetheryteId,marker.Label);mapLive?.RefreshTeleportCosts();ImGui.OpenPopup("MapTeleport");}
                     }
                 }
                 if(chosen.Flag is { } vendorSpot && released)FlagFromMap(map,vendorSpot.X,vendorSpot.Y);
@@ -1515,14 +1517,20 @@ internal sealed partial class MainWindow
                 if(mapTeleportTarget is { } target)
                 {
                     ImGui.TextUnformatted(localization.Format("MapView.TeleportAsk",target.Name));
+                    if(mapTeleportNote is { } note && note.Id==target.Id)
+                    {
+                        ImGui.PushTextWrapPos(ImGui.GetCursorPosX()+360);
+                        try{if(note.Warn)ImGui.TextColored(UI.FfxivTheme.Error,note.Text);else ImGui.TextUnformatted(note.Text);}
+                        finally{ImGui.PopTextWrapPos();}
+                    }
                     // Price from the game's teleport list; unknown (not attuned or not read yet) is said, never shown as 0.
                     if(mapLive?.TeleportCostsFailed==true)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("MapView.TeleportCostFailed"));
                     else if(mapLive?.TeleportCosts is not { } costs)ImGui.TextDisabled(localization.Get("MapView.TeleportCostReading"));
                     else if(costs.TryGetValue(target.Id,out var cost)){ImGui.TextUnformatted(localization.Format("MapView.TeleportCost",cost.ToString("N0")));DrawGilIcon();}
                     else ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("MapView.TeleportCostUnknown"));
-                    if(ImGui.Button(localization.Get("MapView.TeleportYes"))){mapLive?.Teleport(target.Id);mapTeleportTarget=null;ImGui.CloseCurrentPopup();}
+                    if(ImGui.Button(localization.Get("MapView.TeleportYes"))){mapLive?.Teleport(target.Id);mapTeleportTarget=null;mapTeleportNote=null;ImGui.CloseCurrentPopup();}
                     ImGui.SameLine();
-                    if(ImGui.Button(localization.Get("MapView.TeleportNo"))){mapTeleportTarget=null;ImGui.CloseCurrentPopup();}
+                    if(ImGui.Button(localization.Get("MapView.TeleportNo"))){mapTeleportTarget=null;mapTeleportNote=null;ImGui.CloseCurrentPopup();}
                 }
                 else ImGui.CloseCurrentPopup();
             }
@@ -1603,7 +1611,7 @@ internal sealed partial class MainWindow
             if(live?.Flag is not null && ImGui.Selectable(localization.Get("MapView.RemoveFlag")+"##IconRemoveFlag"))mapLive?.RemoveFlag();
             DrawNearestAetheryteEntry(map);
             if(item.Fixed is { AetheryteId:not 0 } aetheryte && ImGui.Selectable(localization.Get("MapView.IconTeleport")))
-                {mapTeleportTarget=(aetheryte.AetheryteId,aetheryte.Label);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;}
+                {mapTeleportNote=null;mapTeleportTarget=(aetheryte.AetheryteId,aetheryte.Label);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;}
             if(item.Fixed is { LinkMapId:not 0 } linked && ImGui.Selectable(localization.Get("MapView.IconOpenMap")))NavigateMap(linked.LinkMapId);
             if(item.Point is { } point && point.Items.Count>0)
             {

@@ -1306,6 +1306,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.832) Retirer les alarmes du sel gemme, les ajouter de nouveau depuis la liste : page Alarmes, « objet réuni : muette », et plus de sonnerie.
 
+- [ ] (0.833) Liste de suivi, « Y aller » sur un objet de l'Arrière-pays dravanien : question « Se téléporter à Idyllée ? », puis « par l'éthernet : Porte du Prologue / de l'Épilogue ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

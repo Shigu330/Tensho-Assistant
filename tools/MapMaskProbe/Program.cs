@@ -5,6 +5,24 @@ using Lumina.Excel.Sheets;
 // Read-only: which texture files exist for a map, and its discovery columns. Arguments: the sqpack directory, then map rows or a place name.
 using var game=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.English,CacheFileResources=false});
 var maps=game.GetExcelSheet<Map>()!;
+// 0.833 (X-63): « --markers <place> »: a zone map's fixed markers (DataType 1 = link to a map, 3 = aetheryte, 4 = aethernet shard) and the territory's Aetheryte rows.
+if(args.Length>2 && args[1]=="--markers")
+{
+    var markerRows=game.GetSubrowExcelSheet<MapMarker>()!;
+    foreach(var map in maps)
+    {
+        var place=map.PlaceName.ValueNullable?.Name.ExtractText() ?? "";
+        if(map.TerritoryType.RowId==0 || !place.Contains(args[2],StringComparison.OrdinalIgnoreCase))continue;
+        Console.WriteLine($"MAP {map.RowId} {place} territory {map.TerritoryType.RowId} range {map.MapMarkerRange} scale {map.SizeFactor}");
+        if(markerRows.TryGetRow(map.MapMarkerRange,out var rows))
+            foreach(var row in rows)
+                Console.WriteLine($"  type {row.DataType} key {row.DataKey.RowId} icon {row.Icon} at {row.X},{row.Y} label {(row.PlaceNameSubtext.ValueNullable?.Name.ExtractText() ?? "")}");
+        foreach(var aetheryte in game.GetExcelSheet<Aetheryte>()!)
+            if(aetheryte.Territory.RowId==map.TerritoryType.RowId)
+                Console.WriteLine($"  AETHERYTE {aetheryte.RowId} isAetheryte {aetheryte.IsAetheryte} group {aetheryte.AethernetGroup} place {(aetheryte.PlaceName.ValueNullable?.Name.ExtractText() ?? "")} aethernet {(aetheryte.AethernetName.ValueNullable?.Name.ExtractText() ?? "")} level {aetheryte.Level[0].RowId}");
+    }
+    return;
+}
 var wanted=args.Skip(1).ToArray();
 foreach(var map in maps)
 {

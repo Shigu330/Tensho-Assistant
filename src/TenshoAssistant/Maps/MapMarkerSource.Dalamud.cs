@@ -119,6 +119,23 @@ internal sealed class MapMarkerSource
         return regionMaps!.GetValueOrDefault(map.RegionPlaceId);
     }
     public MapDefinition? Overview(uint mapId){LoadOverviews();return overviews!.GetValueOrDefault(mapId);}
+    private IReadOnlyList<AetheryteRow>? aetherytes;
+    /// <summary>0.833 (X-63): every Aetheryte row, main or aethernet shard, with its Level position; copied once, empty when the read fails.</summary>
+    public IReadOnlyList<AetheryteRow> Aetherytes
+    {
+        get
+        {
+            if(aetherytes is not null)return aetherytes;
+            try
+            {
+                aetherytes=data.GetExcelSheet<Aetheryte>().Where(row=>row.Territory.RowId!=0).Select(row=>new AetheryteRow(row.RowId,row.IsAetheryte,row.AethernetGroup,row.Territory.RowId,
+                    (row.IsAetheryte ? row.PlaceName.ValueNullable?.Name.ExtractText():row.AethernetName.ValueNullable?.Name.ExtractText()) ?? "",
+                    row.Level[0].ValueNullable is { } level ? new System.Numerics.Vector3(level.X,level.Y,level.Z):null)).ToArray();
+            }
+            catch(Exception error){log.Warning(error,"Aetheryte rows unavailable.");aetherytes=[];}
+            return aetherytes;
+        }
+    }
     /// <summary>One level up: zone → its region map, region → world map, world → none.</summary>
     public uint Parent(MapDefinition map)
     {
