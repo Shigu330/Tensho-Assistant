@@ -17,3 +17,10 @@ checkpoints/
 Thumbs.db
 desktop.ini
 __pycache__/
+
+# 0.802 (user request, 2026-11-07): the agent's working files stay on the author's disk, not in the repository.
+CLAUDE.md
+.claude/
+docs/ai/
+docs/goals/
+scripts/agent/

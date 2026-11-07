@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(git grep -n -I -E \"discord(app)?\\.com/api/webhooks/[0-9]+/\" -- . \":!tests\")",
-      "Bash(gh search *)"
-    ]
-  }
-}
