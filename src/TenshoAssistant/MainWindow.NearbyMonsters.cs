@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
         nearbyMonstersAt=now;
         nearbyDroppedItems=NoDroppedItems;nearbyMonsterNotes=NoMonsterNotes;
         var monsters=mapLive?.State?.Monsters ?? [];
-        if(monsters.Count==0)return;
+        if(monsters.Count==0){NearbyMonstersLog($"no monster read (map state {(mapLive?.State is null ? "none":"read")})");return;}
         var ids=monsters.Select(monster=>monster.NameId).Distinct().ToArray();
         var notes=new Dictionary<uint,List<MonsterNote>>();
         void Note(uint id,MonsterNoteKind kind,string text){if(!notes.TryGetValue(id,out var list))notes[id]=list=[];list.Add(new(kind,text));}
@@ -40,7 +40,12 @@ internal sealed partial class MainWindow
                 if(NearbyMonsters.ListDrops(id,data.ItemsDroppedBy,needed) is { Count:>0 } drops)
                     Note(id,MonsterNoteKind.List,localization.Format("MapView.MonsterDrops",string.Join(", ",drops.Select(item=>itemCatalog.State.Catalog?.Find(item)?.Name ?? item.ToString()))));
             if(configuration.ListPanelsNearbyMonsters)nearbyDroppedItems=NearbyMonsters.DroppedNearby(monsters.Select(monster=>(monster.NameId,monster.Name)),data.ItemsDroppedBy,needed);
+            // 0.818 (X-53, user report: the woolly yak, the loaghtan not marked): what the chain sees, in developer mode, when it changes.
+            NearbyMonstersLog($"{monsters.Count} monsters ({string.Join(", ",monsters.Select(monster=>$"{monster.Name} {monster.NameId}").Distinct().Take(8))}); list needs {needed.Count} items; "
+                +$"drops matched for {notes.Count(pair=>pair.Value.Any(note=>note.Kind==MonsterNoteKind.List))} monsters ({string.Join(", ",ids.Take(8).Select(id=>$"{id}:{data.ItemsDroppedBy(id).Count}"))}); "
+                +$"panel {configuration.ListPanelsNearbyMonsters}, map {configuration.MapView.ShowListMonsters}, above {configuration.MapView.AboveList}");
         }
+        else NearbyMonstersLog($"{monsters.Count} monsters; drop data {(lumina?.State.Data is null ? "not loaded":"loaded")}, panel {configuration.ListPanelsNearbyMonsters}, map {configuration.MapView.ShowListMonsters}");
         // X-36: what the hunting log still asks for, in each log's current rank.
         if(configuration.MapView.ShowHuntLogMonsters && HuntEntries?.Invoke() is { Count:>0 } entries && HuntSlots?.Invoke() is { } slots)
         {
@@ -91,6 +96,13 @@ internal sealed partial class MainWindow
     internal Func<string,IReadOnlyList<uint>>? EnglishMonsterIds { get; set; }
     private (int Revision,object? Names) beastMonstersFor;private IReadOnlyDictionary<uint,IReadOnlyList<uint>> beastMonsters=new Dictionary<uint,IReadOnlyList<uint>>();
     internal BlueSpellMonsterIndex? BlueSpellNearby { get; set; }
+    private string nearbyMonstersLogged="";
+    private void NearbyMonstersLog(string line)
+    {
+        if(!developerMode || line==nearbyMonstersLogged)return;
+        nearbyMonstersLogged=line;
+        log.Information("Nearby monsters: {0}",line);
+    }
     private IReadOnlyList<MonsterNote> MonsterNotes(MapMonster monster,IReadOnlyList<MapFateMarker>? fates)
     {
         var byName=nearbyMonsterNotes.TryGetValue(monster.NameId,out var notes) ? notes:[];

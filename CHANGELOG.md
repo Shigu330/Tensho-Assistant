@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.818.0
+- Plan global, Verify : Signalement (X-53) : le yak laineux et le loaghtan, qui lâchent des objets de votre liste de suivi, n'étaient signalés ni sur la carte ni au-dessus d'eux. Les données de butin sont bonnes (la bouteille de lait de yak est bien reliée aux deux yaks laineux du jeu). En mode développeur, une ligne du journal dit maintenant, à chaque changement, ce que voit chaque étape : monstres lus, objets demandés par la liste, butins reliés, réglages ; pour trouver l'étape qui manque. L'icône au-dessus de la tête des monstres de liste est désactivée au départ (réglage de la carte « Butin pour vos listes »). Aucun changement visible. Non validé en jeu.
+- Tests : NearbyLog818Tests. Verify.ps1 (agent) : 1405/1405, 0 avertissement, 0 erreur ; DLL 0.818.0.0. Non validé en jeu.
+### English
+- Report (X-53): the woolly yak and the loaghtan, which drop items of your tracking list, were marked neither on the map nor above them. The drop data are right (the bottle of yak milk is linked to both of the game's woolly yaks). In developer mode, a log line now says, at each change, what each step sees: monsters read, items the list needs, drops matched, settings; to find the missing step. The icon above the head of list monsters is off at first (map setting « Drops for your lists »). No visible change. Not validated in game.
+
 ## 0.817.0
 - Plan global, Verify : Demande (X-52) : les prix vus au tableau des ventes remplacent ceux d'Universalis. Vérification : pour votre monde, le jeu donne autant qu'Universalis (toutes les offres, les 20 dernières ventes, donc le prix le plus bas, la dernière vente, la moyenne et les ventes par jour), mais ni les autres mondes ni les objets jamais ouverts. Quand vous ouvrez un objet au tableau des ventes, ses offres et ses ventes sont gardées (jamais un nom de vendeur ou d'acheteur) ; tous les outils qui lisent un prix prennent alors celui-ci à la place d'Universalis s'il est plus récent, et gardent d'Universalis le moins cher des autres mondes. Réglage « Prix vus au tableau des ventes » (Découvertes), activé. Non validé en jeu.
 - Tests : SeenPrices817Tests. Verify.ps1 (agent) : 1404/1404, 0 avertissement, 0 erreur ; DLL 0.817.0.0. Non validé en jeu.
