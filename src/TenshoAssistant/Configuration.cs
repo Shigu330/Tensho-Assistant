@@ -164,6 +164,8 @@ public sealed class MapViewSettings
     public bool ShowListMonsters { get; set; } = true;
     /// <summary>0.796 (X-36): nearby monsters the hunting log still asks for.</summary>
     public bool ShowHuntLogMonsters { get; set; } = true;
+    /// <summary>0.797 (X-37): nearby monsters of a running FATE.</summary>
+    public bool ShowFateMonsters { get; set; } = true;
     public bool GatheringLabels { get; set; } = true;
     // 0.535 (user request): the map without its title bar; off by default.
     public bool HideTitleBar { get; set; }

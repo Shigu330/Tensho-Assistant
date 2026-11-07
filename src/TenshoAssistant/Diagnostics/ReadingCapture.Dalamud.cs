@@ -26,7 +26,7 @@ public sealed unsafe class ReadingCapture : IDisposable
     private readonly Func<bool> enabled;
     private readonly IPluginLog log;
     private readonly Dictionary<string,int> lines=[];
-    private string statuses="",synthesis="",workshop="",questMarkers="",leves="",retainer="",airship="",islandState="",islandAgenda="";
+    private string statuses="",synthesis="",workshop="",questMarkers="",monsterEvents="",leves="",retainer="",airship="",islandState="",islandAgenda="";
     private bool fishing,disposed,warned;
     private long slowAt;
 
@@ -63,6 +63,7 @@ public sealed unsafe class ReadingCapture : IDisposable
             ReadSynthesis();
             ReadWorkshop();
             ReadQuestMarkers();
+            ReadMonsterEvents();
             ReadLeves();
             ReadRetainer();
             ReadAirships();
@@ -166,6 +167,25 @@ public sealed unsafe class ReadingCapture : IDisposable
     // 0.792 (X-32, user request: what opening and closing the game map unblocked): a leve's area was missing from AgentMap.EventMarkers until the game map
     // was opened in range (docs/evidence/0.654-leve-area-memory.md). The game's own Map (UIState) also holds quest and leve markers: written here, with
     // whether the game map is open, to see if they are there while it is closed.
+    // 0.797 (X-37): which event a nearby enemy belongs to (FATE, leve…), to tell a leve's targets; written when it changes, enemies with an event or a FATE only.
+    private void ReadMonsterEvents()
+    {
+        var text=new StringBuilder();var count=0;
+        foreach(var item in objects)
+        {
+            if(count>=30)break;
+            if(item is not Dalamud.Game.ClientState.Objects.Types.IBattleNpc { CurrentHp:>0 } npc || npc.BattleNpcKind!=Dalamud.Game.ClientState.Objects.Enums.BattleNpcSubKind.Combatant)continue;
+            var native=(FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)npc.Address;
+            if(native==null || native->FateId==0 && native->EventId.Id==0)continue;
+            count++;
+            text.Append($" [{npc.Name.TextValue} name {npc.NameId} base {npc.BaseId}: fate {native->FateId}, event {native->EventId.Id:X8} content {native->EventId.ContentId} entry {native->EventId.EntryId}]");
+        }
+        var now=text.ToString();
+        if(now==monsterEvents)return;
+        monsterEvents=now;
+        if(now.Length>0)Line("monsterEvents",60,now);
+    }
+
     private void ReadQuestMarkers()
     {
         var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();

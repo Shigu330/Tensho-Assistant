@@ -21,7 +21,7 @@ public sealed record MapEventMarker(uint MapId,uint Icon,Vector3 Position,float 
 public enum MapObjectKind { Treasure, Gathering, HuntMark }
 public sealed record MapObjectMarker(MapObjectKind Kind,string Name,Vector3 Position,int Level);
 /// <summary>0.795 (X-34): a living enemy the game streams around the player: its name row, base row, name, place and level. Information only.</summary>
-public sealed record MapMonster(uint NameId,uint BaseId,string Name,Vector3 Position,int Level);
+public sealed record MapMonster(uint NameId,uint BaseId,string Name,Vector3 Position,int Level,uint FateId=0,uint EventId=0);
 
 // FATE running in the current zone (IFateTable): FATEs have no static map position in the game data (0.114 probe), only live ones.
 public sealed record MapFateMarker(uint Id,string Name,int Level,uint Icon,Vector3 Position,float Radius,int Progress,long SecondsLeft,string State,bool HasBonus=false);
@@ -207,14 +207,16 @@ internal sealed class MapLiveReader : IDisposable
     // Targetable coffers and gathering points in the object table (what the game currently streams around the player).
     // 0.795 (X-34, user request): the living enemies streamed around the player, for information layers only (what drops, what is missing, what teaches):
     // name, place and level, nothing about the fight. At most 100.
-    private IReadOnlyList<MapMonster> ReadMonsters()
+    // 0.797 (X-37): with the FATE it belongs to and its event, read from the game object (FFXIVClientStructs GameObject.FateId, EventId.Id).
+    private unsafe IReadOnlyList<MapMonster> ReadMonsters()
     {
         var result=new List<MapMonster>();
         foreach(var item in objects)
         {
             if(result.Count>=100)break;
             if(item is not Dalamud.Game.ClientState.Objects.Types.IBattleNpc { CurrentHp:>0, NameId:not 0 } npc || npc.BattleNpcKind!=Dalamud.Game.ClientState.Objects.Enums.BattleNpcSubKind.Combatant || !npc.IsTargetable)continue;
-            result.Add(new(npc.NameId,npc.BaseId,npc.Name.TextValue,npc.Position,npc.Level));
+            var native=(FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)npc.Address;
+            result.Add(new(npc.NameId,npc.BaseId,npc.Name.TextValue,npc.Position,npc.Level,native==null ? 0u:native->FateId,native==null ? 0u:native->EventId.Id));
         }
         return result.AsReadOnly();
     }

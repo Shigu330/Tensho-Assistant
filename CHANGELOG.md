@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.797.0
+- Plan global, Verify : Demande (X-37) : les monstres proches qui font partie d'un ALÉA en cours sont marqués d'une étoile sur la carte, avec le nom de l'ALÉA au survol (réglage « Monstres des ALÉA » dans la carte) ; un monstre du même nom hors de l'ALÉA n'est pas marqué. Pour les mandats, le lien entre un monstre et le mandat n'est pas encore connu : en mode développeur, l'événement de chaque monstre proche est noté au journal, à relever pendant un mandat de combat. Non validé en jeu.
+- Tests : FateMonsters797Tests. Verify.ps1 (agent) : 1376/1376, 0 avertissement, 0 erreur ; DLL 0.797.0.0. Non validé en jeu.
+### English
+- Request (X-37): nearby monsters that belong to a running FATE are marked with a star on the map, with the FATE's name on hover (map setting « Monsters of FATEs »); a monster of the same name outside the FATE is not marked. For leves, the link between a monster and the leve is not known yet: in developer mode, each nearby monster's event is written to the log, to read during a battle leve. Not validated in game.
+
 ## 0.796.0
 - Plan global, Verify : Demande (X-36) : les monstres proches que le bestiaire demande encore. Sur la carte, un livre marque un monstre encore à vaincre au rang actuel d'un bestiaire (le seul que le jeu compte) ; au survol, l'entrée et les victoires (« Gladiateur 01, 1/2 »). Réglage « Monstres de votre bestiaire » dans la carte, et le même sur la page Bestiaire. Les monstres proches sont maintenant une seule couche : une icône par monstre, toutes ses raisons au survol (butin pour vos listes, bestiaire). Non validé en jeu.
 - Tests : HuntNearby796Tests. Verify.ps1 (agent) : 1374/1374, 0 avertissement, 0 erreur ; DLL 0.796.0.0. Non validé en jeu.

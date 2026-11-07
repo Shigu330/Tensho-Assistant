@@ -5,7 +5,7 @@ using TenshoAssistant.Monsters;
 namespace TenshoAssistant;
 
 /// <summary>0.796: why a nearby monster is shown; the first note picks its map icon.</summary>
-internal enum MonsterNoteKind { List, HuntLog }
+internal enum MonsterNoteKind { List, HuntLog, Fate }
 internal sealed record MonsterNote(MonsterNoteKind Kind,string Text);
 
 // 0.795 (X-34, X-35), 0.796 (X-36), user requests: what each nearby monster means for the player, worked out once a second, drawn every frame.
@@ -51,5 +51,12 @@ internal sealed partial class MainWindow
         }
         nearbyMonsterNotes=notes.ToDictionary(pair=>pair.Key,pair=>(IReadOnlyList<MonsterNote>)pair.Value);
     }
-    private IReadOnlyList<MonsterNote> MonsterNotes(MapMonster monster)=>nearbyMonsterNotes.TryGetValue(monster.NameId,out var notes) ? notes:[];
+    // 0.797 (X-37): a FATE's monster is told per monster, not per name: the same monster outside the FATE is not part of it.
+    private IReadOnlyList<MonsterNote> MonsterNotes(MapMonster monster,IReadOnlyList<MapFateMarker>? fates)
+    {
+        var byName=nearbyMonsterNotes.TryGetValue(monster.NameId,out var notes) ? notes:[];
+        if(monster.FateId==0 || !configuration.MapView.ShowFateMonsters)return byName;
+        var fate=fates?.FirstOrDefault(running=>running.Id==monster.FateId)?.Name;
+        return [new MonsterNote(MonsterNoteKind.Fate,localization.Format("MapView.MonsterFate",fate ?? monster.FateId.ToString())),..byName];
+    }
 }
