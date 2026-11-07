@@ -51,6 +51,7 @@ internal sealed partial class MainWindow
         new(Page.RelicWeapons,"Progression",PageLabel("Navigation.RelicWeapons"),DrawRelicWeapons,"MainWindow.RelicWeapons.cs, Relics/"),
         new(Page.AlliedSocieties,"Progression",PageLabel("Navigation.AlliedSocieties"),DrawAlliedSocieties,"MainWindow.AlliedSocieties.cs, Societies/"),
         new(Page.GrandCompanies,"Progression",PageLabel("Navigation.GrandCompanies"),DrawGrandCompanies,"MainWindow.GrandCompanies.cs, GrandCompanies/"),
+        new(Page.SpecialDeliveries,"Progression",PageLabel("Navigation.SpecialDeliveries"),DrawSpecialDeliveries,"MainWindow.SpecialDeliveries.cs, Deliveries/SpecialDeliveries.cs"),
         new(Page.Gear,"Progression",PageLabel("Navigation.Gear"),DrawGearPlanner,"MainWindow.Gear.cs, Gear/"),
         new(Page.Chocobo,"Progression",PageLabel("Navigation.Chocobo"),DrawChocoboPage,"MainWindow.ChocoboBarding.cs, Gear/ChocoboBarding.cs, Gear/ChocoboReader.Dalamud.cs"),
         new(Page.Leves,"Progression",PageLabel("Navigation.Leves"),DrawLeves,"MainWindow.Leves.cs"),

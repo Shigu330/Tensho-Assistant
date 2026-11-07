@@ -272,6 +272,10 @@
     "GrandCompaniesPurpose": "Your grade and seals in each Grand Company, the next promotion, and what seals buy.",
     "GrandCompaniesStart": "Open the page: Tensho copies what the game already holds.",
     "GrandCompaniesEmpty": "Nothing shows until your character is loaded.",
+    "SpecialDeliveriesTitle": "Special deliveries",
+    "SpecialDeliveriesPurpose": "The delivery quest lines of crafters and gatherers: Crystarium, Studium and Wachumeqimeqi, done or left.",
+    "SpecialDeliveriesStart": "Open the page: the list comes from the quest journal.",
+    "SpecialDeliveriesEmpty": "Nothing shows until the quest journal has been read.",
     "OceanFishingTitle": "Ocean fishing",
     "OceanFishingPurpose": "The next departures from Limsa Lominsa and Kugane, with their stops and the time of day.",
     "OceanFishingStart": "Read the next departure and its route. During a voyage, the fishing help shows the stop and its fish.",
@@ -547,6 +551,7 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "Navigation": {
+    "SpecialDeliveries": "Special deliveries",
     "GrandCompanies": "Grand Companies",
     "AlliedSocieties": "Allied societies",
     "RelicWeapons": "Relic weapons",
@@ -6335,6 +6340,22 @@
     "ShopCount": "{0} items · your seals here: {1}",
     "ColumnItem": "Item",
     "ColumnCost": "Seals"
+  },
+  "SpecialDeliveries": {
+    "Title": "Special deliveries",
+    "Subtitle": "The delivery quest lines of crafters and gatherers, from the game.",
+    "Loading": "Reading the quest journal…",
+    "OnlyLeft": "Only what is left",
+    "OnlyLeftTip": "Hides the quests already done.",
+    "None": "The game has no such quests in the journal read.",
+    "AllDone": "All done here.",
+    "ColumnQuest": "Quest",
+    "ColumnLevel": "Level",
+    "ColumnPlace": "Place",
+    "ColumnState": "State",
+    "Done": "Done",
+    "Active": "In progress",
+    "Left": "To do"
   },
   "Island": {
     "TabWorkshop": "Workshop",

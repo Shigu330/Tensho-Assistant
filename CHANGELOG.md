@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.715.0
+- Plan global, W-12 : Livraisons spéciales, sujet choisi par l'utilisateur. Nouvelle page Progression › Livraisons spéciales : les quêtes de livraison des artisans et récolteurs (Cristarium, académie de Sharlayan, bazar aux Mille Perles), faites ou à faire, avec niveau, lieu et clic droit vers le départ et l'éthérite. COMPILED et TESTED, non validé en jeu.
+- Tests : SpecialDeliveries715Tests. Verify.ps1 (agent) : 1276/1276, 0 avertissement, 0 erreur ; DLL 0.715.0.0. Non validé en jeu.
+### English
+- Special deliveries, a topic chosen by the user. New page Progression > Special deliveries: the delivery quest lines of crafters and gatherers (Crystarium, Studium, Wachumeqimeqi), done or left, with level, place and a right click to the start and the aetheryte. COMPILED and TESTED, not validated in game.
+
 ## 0.714.0
 - Plan global, W-11 : Grandes compagnies, sujet choisi par l'utilisateur. Nouvelle page Progression › Grandes compagnies : grade et sceaux dans chacune, prochaine promotion avec sa quête, et un onglet de ce que les sceaux achètent, avec filtre par grade et recherche. Les missions du jour ne sont pas lues : le jeu ne les donne que dans sa fenêtre. COMPILED et TESTED, non validé en jeu.
 - Tests : GrandCompanies714Tests. Verify.ps1 (agent) : 1275/1275, 0 avertissement, 0 erreur ; DLL 0.714.0.0. Non validé en jeu.

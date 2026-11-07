@@ -1070,6 +1070,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.714) Progression › Grandes compagnies : comparer grade, sceaux et prix de la promotion au jeu ; vérifier le genre du nom de grade ; comparer quelques articles à la boutique du jeu.
 
+- [ ] (0.715) Progression › Livraisons spéciales : comparer les quêtes faites au journal ; dire si l'onglet du Cristarium contient bien ce qu'il faut.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

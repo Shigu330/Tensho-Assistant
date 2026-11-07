@@ -272,6 +272,10 @@
     "GrandCompaniesPurpose": "Votre grade et vos sceaux dans chaque grande compagnie, la prochaine promotion et ce que les sceaux achètent.",
     "GrandCompaniesStart": "Ouvrez la page : Tensho copie ce que le jeu détient déjà.",
     "GrandCompaniesEmpty": "Rien ne s'affiche tant que votre personnage n'est pas chargé.",
+    "SpecialDeliveriesTitle": "Livraisons spéciales",
+    "SpecialDeliveriesPurpose": "Les quêtes de livraison des artisans et récolteurs : Cristarium, académie de Sharlayan et bazar aux Mille Perles, faites ou à faire.",
+    "SpecialDeliveriesStart": "Ouvrez la page : la liste vient du journal de quêtes.",
+    "SpecialDeliveriesEmpty": "Rien ne s'affiche tant que le journal de quêtes n'est pas lu.",
     "OceanFishingTitle": "Pêche en mer",
     "OceanFishingPurpose": "Les prochains départs de Limsa Lominsa et de Kugane, avec leurs escales et le moment de la journée.",
     "OceanFishingStart": "Lisez le prochain départ et son trajet. Pendant une traversée, l'aide à la pêche donne l'escale et ses poissons.",
@@ -547,6 +551,7 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "Navigation": {
+    "SpecialDeliveries": "Livraisons spéciales",
     "GrandCompanies": "Grandes compagnies",
     "AlliedSocieties": "Peuples alliés",
     "RelicWeapons": "Armes reliques",
@@ -6335,6 +6340,22 @@
     "ShopCount": "{0} objets · vos sceaux ici : {1}",
     "ColumnItem": "Objet",
     "ColumnCost": "Sceaux"
+  },
+  "SpecialDeliveries": {
+    "Title": "Livraisons spéciales",
+    "Subtitle": "Les quêtes de livraison des artisans et récolteurs, d'après le jeu.",
+    "Loading": "Lecture du journal de quêtes…",
+    "OnlyLeft": "Seulement ce qui reste",
+    "OnlyLeftTip": "Masque les quêtes déjà faites.",
+    "None": "Le journal lu ne contient pas ces quêtes.",
+    "AllDone": "Tout est fait ici.",
+    "ColumnQuest": "Quête",
+    "ColumnLevel": "Niveau",
+    "ColumnPlace": "Lieu",
+    "ColumnState": "État",
+    "Done": "Faite",
+    "Active": "En cours",
+    "Left": "À faire"
   },
   "Island": {
     "TabWorkshop": "Atelier",
