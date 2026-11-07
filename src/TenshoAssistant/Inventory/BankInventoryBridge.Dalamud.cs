@@ -27,6 +27,7 @@ internal sealed class BankInventoryBridge : IDisposable
     private TimeSpan nextPoll;
     private TimeSpan retainerSince;
     private BankKey? lastRetainer;
+    internal static readonly TimeSpan OpenStorageRefresh = TimeSpan.FromSeconds(2);
     private BankKey? requested;
     private Task<BankImportResult>? importing;
     // Automatic capture (0.167): each storage is copied once per opening, then again every 30 s while it stays open.
@@ -164,8 +165,10 @@ internal sealed class BankInventoryBridge : IDisposable
                     foreach (var openKey in open)
                     {
                         var always = openKey.Kind is BankStorageKind.Armoury or BankStorageKind.GlamourDresser or BankStorageKind.Armoire || BankStorageScope.IsCharacterOwn(openKey.Kind);
+                        // 0.770 (X-20, user report: an item put in a retainer, the saddlebag or the company chest showed only after reopening it):
+                        // an open storage is read again every 2 seconds; the bank file is written only when the copy changed (0.605).
                         if ((auto || always) && (!autoCaptured.TryGetValue(openKey, out var last)
-                            || now - last >= (always ? TimeSpan.FromMinutes(2) : TimeSpan.FromSeconds(30))))
+                            || now - last >= (always ? TimeSpan.FromMinutes(2) : OpenStorageRefresh)))
                         { autoCaptured[openKey] = now; requested = openKey; break; }
                     }
                 if (requested is not { } key) return;

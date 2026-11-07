@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.770.0
+- Plan global, Verify : Signalement (X-20) : un objet déposé chez un servant, dans les sacoches ou au coffre de compagnie n'apparaissait qu'en rouvrant. Le rangement ouvert est maintenant relu toutes les 2 secondes au lieu de 30 ; le fichier n'est écrit que si la copie change. Non validé en jeu.
+- Tests : OpenStorage770Tests. Verify.ps1 (agent) : 1343/1343, 0 avertissement, 0 erreur ; DLL 0.770.0.0. Non validé en jeu.
+### English
+- Report (X-20): an item put in a retainer, the saddlebag or the company chest showed only after reopening it. The open storage is now read again every 2 seconds instead of 30; the file is written only when the copy changes. Not validated in game.
+
 ## 0.769.0
 - Plan global, Verify : Signalement (X-19) : un dépôt chez un servant comptait comme une dépense du personnage et un gain des servants, et le total des servants ne suivait qu'en rouvrant. Corrections : les échanges avec les servants et le coffre de compagnie sont des transferts, affichés à part et hors du net ; une hausse des servants au-delà de vos dépôts compte comme leurs ventes au marché ; le servant ouvert est lu en direct. Les anciennes lignes « Servants » deviennent « Échanges avec les servants ». Non validé en jeu.
 - Tests : GilTransfer769Tests. Verify.ps1 (agent) : 1342/1342, 0 avertissement, 0 erreur ; DLL 0.769.0.0. Non validé en jeu.

@@ -261,7 +261,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-17 | Panneau de suivi réduit : l'aide perd « Vos listes en demandent encore » et le cadre ; les cadres passent au-dessus des autres fenêtres | Fait en 0.764 : lignes recalculées panneau réduit, cadres dessinés sous les fenêtres de Tensho ; 0.765 : vaut aussi pour un panneau réduit depuis le chargement |
 | X-18 | Journal des gils : icônes (gils, catégories) et moins de « Autre » : trouver d'autres catégories d'après le jeu | Icônes et couleurs en 0.768 ; « Autre » : relevé au journal (« Gil other ») en mode développeur, catégories à ajouter d'après lui |
 | X-19 | Journal des gils : un dépôt chez un servant compté comme dépense ; le total des servants ne suit qu'en rouvrant | Fait en 0.769 : échanges avec servants et coffre en transferts hors net ; hausse des servants au-delà des dépôts = ventes ; servant ouvert lu en direct |
-| X-20 | Objets déposés chez un servant, dans les sacoches ou au coffre de compagnie : la copie doit suivre pendant que la fenêtre est ouverte, sans la rouvrir | À faire |
+| X-20 | Objets déposés chez un servant, dans les sacoches ou au coffre de compagnie : la copie doit suivre pendant que la fenêtre est ouverte, sans la rouvrir | Fait en 0.770 : rangement ouvert relu toutes les 2 s (au lieu de 30 s) ; fichier écrit seulement s'il change |
 
 ## Retenu pour plus tard
 
