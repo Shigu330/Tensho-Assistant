@@ -210,9 +210,6 @@ public sealed class Plugin : IDalamudPlugin
             if(migrated)try{pluginInterface.SavePluginConfig(configuration);}catch(Exception error){log.Warning(error,"Alarm sources could not be saved.");}
             Alarms.AlarmService? alarms=null;
             registrations.Register(()=>{},()=>{chat.RemoveChatLinkHandler();alarmLinks.Clear();});
-            // 0.759 (X-03): the links of the rings already in the chat work again after a reload.
-            foreach(var item in (configuration.Alarms ?? []).Select(alarm=>alarm.ItemId).Where(id=>id is > 0 and < uint.MaxValue).Distinct().Take(200))
-                try{RegisterAlarmLink(item);}catch(ArgumentException){}
             registrations.Register(()=>alarms=new Alarms.AlarmService(framework,condition,log,configuration,()=>pluginInterface.SavePluginConfig(configuration),
                 ()=>weather.State.Catalog,(alarm,line)=>
                 {
@@ -224,26 +221,10 @@ public sealed class Plugin : IDalamudPlugin
                         .AddText("[Tensho] "+localization.Format("Alarms.Ring",string.Join('|',parts[..^2]),parts[^2],parts[^1]));
                     if(mainWindow.AlarmPlace(alarm) is { } place)
                         message.AddText(" ").AddMapLink(place.TerritoryId,place.MapId,place.X,place.Y,0.05f);
+                    // 0.774 (X-03, user report and Dalamud's console in verbose): the game never handed the « Open in Tensho » link to Dalamud; it took it for an
+                    // item tooltip. The ring now carries the game's own item link: hovering shows the item, a right click opens its menu, where Tensho's entry is.
                     if(alarm.ItemId is > 0 and < uint.MaxValue)
-                    {
-                        // 0.452: Dalamud refuses a second handler for the same id (Dictionary.Add): from an item's second ring the chat line, the
-                        // sound and Discord were lost. One link per item, kept.
-                        if(!alarmLinks.TryGetValue(alarm.ItemId,out var link))
-                        {
-                            if(alarmLinks.Count>=256){chat.RemoveChatLinkHandler();alarmLinks.Clear();}
-                            link=RegisterAlarmLink(alarm.ItemId);
-                        }
-                        // 0.771 (X-03, user report: still no click with no other plugin on): the colour around the link, not inside it, as Dalamud's own links do;
-                        // inside, the colour codes stood between the link and its text.
-                        // 0.773 (X-03): developer mode, what Dalamud knows of this link when the ring is printed.
-                        if(mainWindow.DeveloperMode)
-                        {
-                            var known=chat.RegisteredLinkHandlers.Keys.Where(key=>key.PluginName==link.Plugin).Select(key=>key.CommandId).ToArray();
-                            log.Information("Alarm link printed: plugin {0}, id {1}, registered {2}; {3} links of this plugin registered.",link.Plugin,link.CommandId,known.Contains(link.CommandId),known.Length);
-                        }
-                        message.AddText(" ").AddUiForeground(500).Add(link).AddText(localization.Get("Alarms.OpenInTensho"))
-                            .Add(Dalamud.Game.Text.SeStringHandling.Payloads.RawPayload.LinkTerminator).AddUiForegroundOff();
-                    }
+                        message.AddText(" ").AddItemLink(alarm.ItemId,false).AddUiForeground(" "+localization.Get("Alarms.RightClickTensho"),3);
                     chat.Print(message.Build());
                 },alarm=>
                 {
@@ -1351,14 +1332,6 @@ public sealed class Plugin : IDalamudPlugin
         attachedPanels?.EndFrame();
     }
     private (string Name,Action Draw)[]? overlays;
-    // 0.759 (X-03, user report: « Open in Tensho » opened nothing): Dalamud finds a clicked link by plugin and id, and does nothing, with a debug line only, when no
-    // handler has that id. A reload of the plugin removes them all, so a ring printed before it led nowhere. The links of every alarm are registered again at load.
-    private Dalamud.Game.Text.SeStringHandling.Payloads.DalamudLinkPayload RegisterAlarmLink(uint itemId)
-    {
-        var link=chatGui.AddChatLinkHandler(itemId,(item,_)=>{log.Information("Alarm link clicked: item {0}.",item);mainWindow.OpenAlarmItem(item);mainWindow.IsOpen=true;});
-        alarmLinks[itemId]=link;
-        return link;
-    }
     private T LoadSheet<T>(string name,Func<T> read,T unavailable)
     {
         try{return read();}

@@ -1,4 +1,4 @@
-// 0.759 (X-03, user report): « Open in Tensho » on an alarm's ring.
+// 0.759 (X-03): links registered again at load; 0.774: replaced by the game's item link.
 internal static class AlarmLinks759Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -6,11 +6,11 @@ internal static class AlarmLinks759Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Alarm links: registered again at load for every alarm, once each, so rings printed before a reload still open",() =>
+        ("Alarm links: nothing left to register at load, the ring holds the game's item link",() =>
         {
             var plugin=Read("Plugin.cs");
-            Check(plugin.Contains("foreach(var item in (configuration.Alarms ?? []).Select(alarm=>alarm.ItemId)") && plugin.Contains("try{RegisterAlarmLink(item);}catch(ArgumentException){}"),"at load");
-            Check(plugin.Contains("if(!alarmLinks.TryGetValue(alarm.ItemId,out var link))") && plugin.Contains("link=RegisterAlarmLink(alarm.ItemId);"),"once per item at ring");
+            Check(!plugin.Contains("foreach(var item in (configuration.Alarms ?? []).Select(alarm=>alarm.ItemId)"),"no load-time registration");
+            Check(plugin.Contains(".AddItemLink(alarm.ItemId,false)"),"item link");
         }),
     ];
 }

@@ -1,4 +1,4 @@
-// 0.771 (X-03, user report): the alarm's link, coloured around it.
+// 0.771–0.773 (X-03): the Dalamud link's shape and log; 0.774: the game's item link, whose right-click menu holds Tensho's entry.
 internal static class AlarmLinkShape771Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -6,12 +6,11 @@ internal static class AlarmLinkShape771Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Alarm link: the link holds only its text; the colour starts before it and ends after its terminator",() =>
+        ("Alarm link: the game's item link, then the hint for the right click; the item menu has Tensho's entry",() =>
         {
             var plugin=Read("Plugin.cs");
-            Check(plugin.Contains(".AddUiForeground(500).Add(link).AddText(localization.Get(\"Alarms.OpenInTensho\"))") && plugin.Contains("RawPayload.LinkTerminator).AddUiForegroundOff();"),"shape");
-            Check(!plugin.Contains(".Add(link).AddUiForeground("),"no colour inside the link");
-            Check(plugin.Contains("\"Alarm link printed: plugin {0}, id {1}, registered {2};"),"0.773: what Dalamud knows of it");
+            Check(plugin.Contains("message.AddText(\" \").AddItemLink(alarm.ItemId,false).AddUiForeground(\" \"+localization.Get(\"Alarms.RightClickTensho\"),3);"),"ring");
+            Check(Read("Items/ItemContextMenuBridge.Dalamud.cs").Contains("raw=gui.HoveredItem;"),"a right click on an item link reaches Tensho's menu through the hovered item");
         }),
     ];
 }

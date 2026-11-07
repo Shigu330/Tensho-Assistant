@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.774.0
+- Plan global, Verify : Lien d'alarme (X-03) : la console de Dalamud en mode détaillé montre que le lien « Ouvrir dans Tensho » était bien enregistré, mais que le jeu ne le transmettait jamais à Dalamud ; il ouvrait une bulle d'objet. L'alarme porte maintenant le vrai lien d'objet du jeu, suivi de « (clic droit : Tensho) » : le survol montre l'objet, le clic droit ouvre son menu, avec l'entrée Tensho. Non validé en jeu.
+- Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1344/1344, 0 avertissement, 0 erreur ; DLL 0.774.0.0. Non validé en jeu.
+### English
+- Alarm link (X-03): Dalamud's console in verbose mode shows that the « Open in Tensho » link was registered, but the game never handed it to Dalamud; it opened an item tooltip. The ring now carries the game's own item link, followed by « (right click: Tensho) »: hovering shows the item, a right click opens its menu, with Tensho's entry. Not validated in game.
+
 ## 0.773.0
 - Plan global, Verify : Lien d'alarme (X-03), toujours aucun clic après 0.771 : en mode développeur, chaque alarme écrit au journal l'identité du lien imprimé et si Dalamud l'a bien enregistré, pour savoir si le défaut est dans l'enregistrement ou dans le clic. Aucun changement visible. Non validé en jeu.
 - Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1344/1344, 0 avertissement, 0 erreur ; DLL 0.773.0.0. Non validé en jeu.

@@ -1351,6 +1351,7 @@
     "PeriodTooltip": "Single alarm: {0} at the start of the period ({1}).",
     "WeatherDailyTooltip": "Alarm at every 8-hour ET period (00, 08, 16) if the weather is « {0} ».",
     "Ring": "Alarm: {0} — in {1} min ({2}).",
+    "RightClickTensho": "(right click: Tensho)",
     "OpenInTensho": "Open in Tensho",
     "DeleteGroupTip": "Deletes every alarm of this group; a second click confirms.",
     "DeleteGroupConfirm": "Confirm: delete {0} alarm(s)",
