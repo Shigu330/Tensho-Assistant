@@ -299,8 +299,9 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-55 | Listes de suivi d'artisanat et d'atelier : préciser quand l'objet n'est pas sur soi (chez un servant, dans la sacoche, le coffre de compagnie…) | Fait en 0.822 : icône d'entrepôt à côté du compte quand les sacs ne couvrent pas le besoin ; les rangements et leurs quantités au survol |
 | X-56 | Listes de suivi d'artisanat et d'atelier : à la place de « téléportation 219 gils », l'icône de la compétence Téléportation puis l'icône des gils et le montant, sans texte | Fait en 0.824 : icône 111 (Action 5, Téléportation), icône du gil, montant ; le texte au survol |
 | X-57 | Carte, quête de cuisinier à Limsa : la cible (au bon endroit) et l'icône de quête ne sont pas au même endroit, la quête affichée tombe hors de la zone, et elle n'apparaît pas sur la carte du Tillac (captures du 2026-11-07, la carte du jeu montre le lien vers le Tillac) | À faire, après X-56 ; en cours : le jeu donne deux marqueurs pour la quête 2046 « Le pari » sur la carte 11 (icônes 71141 et 71143, objectifs 2046 et 520), sa liste propre la place à X 10,7 Y 9,7 ; 0.825 capture chaque marqueur avec sa position |
-| X-58 | Menu Tensho du clic droit sur un objet : ajouter sa recette à une liste d'artisanat déjà créée | À faire, après X-57 |
+| X-58 | Menu Tensho du clic droit sur un objet : ajouter sa recette à une liste d'artisanat déjà créée | Fait en 0.826 : « Ajouter à une liste d'artisanat » dans le menu de Tensho, et « Ajouter à « liste » » dans le sous-menu Tensho du jeu, pour un objet qui a une recette |
 | X-59 | Listes de suivi, points à horaire : retirer « ouvert » / « fermé », garder le minuteur seul, en vert quand le point est ouvert, en rouge quand il est fermé | À faire, après X-58 |
+| X-60 | Listes de suivi, clic droit sur un objet : « Placer le drapeau » absent quand on est sur la carte du lieu, et « Y aller » absent pour certains (Échalion cyclope, Avant-pays dravanien) | À faire, après X-59 |
 
 ## Rappels de relevés en jeu, par moment
 

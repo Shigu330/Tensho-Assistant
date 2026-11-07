@@ -976,7 +976,9 @@ public sealed class Plugin : IDalamudPlugin
             Npcs.NpcVendorLoader? npcLoader=null;
             registrations.Register(()=>npcLoader=new Npcs.NpcVendorLoader(npcVendors,data,framework,log,dataCache),()=>npcLoader?.Dispose());
             mainWindow.ConfigureNpcVendors(npcVendors);
-            itemContextMenu=new ItemContextMenuBridge(configuration,contextMenus,player,client,itemCatalog,log,localization,gameGui){Relevant=mainWindow.RelevantRoutes,Title=mainWindow.RouteTitle,Sources=mainWindow.SourceMenu,Links=mainWindow.ExternalLinksFor};
+            itemContextMenu=new ItemContextMenuBridge(configuration,contextMenus,player,client,itemCatalog,log,localization,gameGui){Relevant=mainWindow.RelevantRoutes,Title=mainWindow.RouteTitle,Sources=mainWindow.SourceMenu,
+                // 0.826 (X-58): the crafting lists first, then the item's pages.
+                Links=id=>[..mainWindow.CraftListAdds(id),..(mainWindow.ExternalLinksFor(id) ?? [])]};
             registrations.Register(()=>{ },itemContextMenu.Dispose);
             InventoryVisualSortBridge? sortBridge=null;
             registrations.Register(()=>sortBridge=new InventoryVisualSortBridge(visualSort,inventory,player,client,framework,log,bankBridge),()=>sortBridge?.Dispose());

@@ -178,6 +178,12 @@ internal sealed partial class MainWindow
                 && ImGui.Selectable(localization.Get("ItemMenu.TryOn")+$"##TryOn{item.Id}"))TryOnItem(item.Id);
             // 0.360 (g, C-09): add to or remove from the wishlist.
             DrawWishlistToggle(item);
+            // 0.826 (X-58): add its recipe to one of the crafting lists.
+            if(CraftListAdds(item.Id) is { Count:>0 } adds && ImGui.BeginMenu(localization.Get("ItemMenu.AddToLists")+$"##AddToLists{item.Id}"))
+            {
+                try{foreach(var (label,open) in adds)if(ImGui.MenuItem(label))open();}
+                finally{ImGui.EndMenu();}
+            }
             // 0.762 (X-15, user request): « Go there » for an item that is gathered, as on the Gathering page: flag, Tensho map and the nearest aetheryte's teleport.
             if(GoThereSource(item.Id) is { } go && ImGui.Selectable(localization.Get("GatheringDetails.GoThere")+$"##GoThere{item.Id}"))
             {

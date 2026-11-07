@@ -1292,6 +1292,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.825) Avec la quête « Le pari » : carte Tensho sur le Tillac puis l'Entrepont ; je relis « Reading eventMarkers ».
 
+- [ ] (0.826) Clic droit sur un objet fabricable : « Ajouter à « Liste 1 » » ; il apparaît dans la liste.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

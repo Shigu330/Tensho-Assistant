@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.826.0
+- Plan global, Verify : Demande (X-58) : depuis le clic droit, on peut ajouter un objet qui se fabrique à une liste d'artisanat déjà créée : « Ajouter à une liste d'artisanat » dans le menu de Tensho (un choix par liste), et une entrée par liste dans le sous-menu Tensho du menu du jeu. L'objet est ajouté avec une unité, ou une de plus s'il y est déjà. Non validé en jeu.
+- Tests : AddToList826Tests. Verify.ps1 (agent) : 1412/1412, 0 avertissement, 0 erreur ; DLL 0.826.0.0. Non validé en jeu.
+### English
+- Request (X-58): from the right click, an item that can be crafted can be added to a crafting list already made: « Add to a crafting list » in Tensho's menu (one choice per list), and one entry per list in the game menu's Tensho sub-menu. The item is added with one, or one more if already there. Not validated in game.
+
 ## 0.825.0
 - Plan global, Verify : Signalement (X-57) : une quête de cuisinier à Limsa était dessinée hors du Tillac, sa cible au bon endroit. Le journal montre deux marqueurs du jeu pour cette quête (« Le pari ») sur la carte du Tillac, d'icônes et d'objectifs différents, alors que la liste propre du jeu la place dans le Tillac. En mode développeur, chaque marqueur de la carte du jeu est maintenant noté avec sa position et son type, pour savoir lequel est mal placé avant de corriger. Aucun changement visible. Non validé en jeu.
 - Tests : EventMarkers825Tests. Verify.ps1 (agent) : 1411/1411, 0 avertissement, 0 erreur ; DLL 0.825.0.0. Non validé en jeu.
