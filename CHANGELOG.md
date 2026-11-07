@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.773.0
+- Plan global, Verify : Lien d'alarme (X-03), toujours aucun clic après 0.771 : en mode développeur, chaque alarme écrit au journal l'identité du lien imprimé et si Dalamud l'a bien enregistré, pour savoir si le défaut est dans l'enregistrement ou dans le clic. Aucun changement visible. Non validé en jeu.
+- Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1344/1344, 0 avertissement, 0 erreur ; DLL 0.773.0.0. Non validé en jeu.
+### English
+- Alarm link (X-03), still no click after 0.771: in developer mode, each ring writes to the log the printed link's identity and whether Dalamud has it registered, to tell whether the fault is in the registration or in the click. No visible change. Not validated in game.
+
 ## 0.772.0
 - Plan global, Verify : Signalement (X-21) : « Ajouter les alarmes » proposait 19 alarmes alors qu'un seul objet en avait besoin. Cause : il comptait aussi les objets qu'on trouve sans horaire (cristaux et éclats, présents aussi sur des points ordinaires). Correction : seuls les objets qui manquent encore et ne poussent qu'à des points à horaire, comme le groupe « Points à horaire ». Non validé en jeu.
 - Tests : ListAlarms755Tests. Verify.ps1 (agent) : 1344/1344, 0 avertissement, 0 erreur ; DLL 0.772.0.0. Non validé en jeu.

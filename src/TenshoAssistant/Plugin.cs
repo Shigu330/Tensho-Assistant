@@ -235,6 +235,12 @@ public sealed class Plugin : IDalamudPlugin
                         }
                         // 0.771 (X-03, user report: still no click with no other plugin on): the colour around the link, not inside it, as Dalamud's own links do;
                         // inside, the colour codes stood between the link and its text.
+                        // 0.773 (X-03): developer mode, what Dalamud knows of this link when the ring is printed.
+                        if(mainWindow.DeveloperMode)
+                        {
+                            var known=chat.RegisteredLinkHandlers.Keys.Where(key=>key.PluginName==link.Plugin).Select(key=>key.CommandId).ToArray();
+                            log.Information("Alarm link printed: plugin {0}, id {1}, registered {2}; {3} links of this plugin registered.",link.Plugin,link.CommandId,known.Contains(link.CommandId),known.Length);
+                        }
                         message.AddText(" ").AddUiForeground(500).Add(link).AddText(localization.Get("Alarms.OpenInTensho"))
                             .Add(Dalamud.Game.Text.SeStringHandling.Payloads.RawPayload.LinkTerminator).AddUiForegroundOff();
                     }

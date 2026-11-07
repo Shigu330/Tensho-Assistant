@@ -11,6 +11,7 @@ internal static class AlarmLinkShape771Tests
             var plugin=Read("Plugin.cs");
             Check(plugin.Contains(".AddUiForeground(500).Add(link).AddText(localization.Get(\"Alarms.OpenInTensho\"))") && plugin.Contains("RawPayload.LinkTerminator).AddUiForegroundOff();"),"shape");
             Check(!plugin.Contains(".Add(link).AddUiForeground("),"no colour inside the link");
+            Check(plugin.Contains("\"Alarm link printed: plugin {0}, id {1}, registered {2};"),"0.773: what Dalamud knows of it");
         }),
     ];
 }
