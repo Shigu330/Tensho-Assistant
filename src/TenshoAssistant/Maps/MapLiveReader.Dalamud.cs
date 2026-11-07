@@ -351,7 +351,32 @@ internal sealed class MapLiveReader : IDisposable
         // 0.653: the game empties this list during a journal request; what was read just before stays.
         var journalRequest=agent->CurrentOpenMapInfo.Type is FFXIVClientStructs.FFXIV.Client.UI.Agent.MapType.QuestLog or FFXIVClientStructs.FFXIV.Client.UI.Agent.MapType.GatheringLog;
         if(!MapEventHold.Holds(result.Count,journalRequest,agent->CurrentMapId,lastEventsMap)){lastEvents=result.AsReadOnly();lastEventsMap=agent->CurrentMapId;}
-        return WithLeveAreas(lastEvents);
+        return WithLeveAreas(MapGameLeves.Merge(lastEvents,ReadGameLeves(),marker=>(marker.MapId,marker.Icon,marker.Position.X,marker.Position.Z)));
+    }
+    // 0.793 (X-32): the leve areas the game keeps itself, with or without its map open: each accepted leve's area, and the points of the one started.
+    private static unsafe IReadOnlyList<MapEventMarker> ReadGameLeves()
+    {
+        var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
+        if(map==null)return [];
+        var result=new List<MapEventMarker>();
+        void From(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info)
+        {
+            // Length checked before the walk, as for the map window's list (R-14).
+            var count=info->MarkerData.LongCount;
+            if(count is <=0 or >32)return;
+            var label=TooltipText(&info->Label);
+            foreach(var data in info->MarkerData)
+            {
+                if(result.Count>=64)return;
+                if(data.IconId==0 || data.MapId==0 || !float.IsFinite(data.Position.X) || !float.IsFinite(data.Position.Z))continue;
+                var text=label.Length>0 ? label:TooltipText(data.TooltipString);
+                result.Add(new(data.MapId,data.IconId,data.Position,float.IsFinite(data.Radius) ? Math.Max(0,data.Radius):0,text,data.ObjectiveId,data.MarkerType,data.DataId,true));
+            }
+        }
+        var leves=map->LevequestMarkers;
+        for(var index=0;index<leves.Length;index++)fixed(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info=&leves[index])From(info);
+        From(&map->ActiveLevequestMarker);
+        return result;
     }
     private static IReadOnlyList<MapEventMarker> lastEvents=[];private static uint lastEventsMap;
     // Crash 2026-10-31 08:19 (dalamud.crashhandler.log): Utf8String.ToString() on an event marker tooltip read freed memory

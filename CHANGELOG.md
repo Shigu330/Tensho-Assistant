@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.793.0
+- Plan global, Verify : Demande (X-32) : plus besoin d'ouvrir et fermer la carte du jeu pour voir la zone d'un mandat. La capture de 0.792 (mandat 1670) montre que le jeu tient la zone dans sa propre liste dès l'acceptation, alors que la liste de la fenêtre carte, la seule que Tensho lisait, est vide ; une fois le mandat commencé, elle tient aussi ses points, un de moins à chaque récolte. Tensho lit maintenant cette liste (lecture seule, sans rien ouvrir ni appeler) et ajoute ce qui manque, sans doublon. Non validé en jeu.
+- Tests : GameLeves793Tests. Verify.ps1 (agent) : 1366/1366, 0 avertissement, 0 erreur ; DLL 0.793.0.0. Non validé en jeu.
+### English
+- Request (X-32): no more opening and closing the game map to see a leve's area. The 0.792 capture (leve 1670) shows the game keeps the area in its own list from acceptance, while the map window's list, the only one Tensho read, is empty; once the leve is started it also holds its points, one fewer per gathering. Tensho now reads that list (read only, nothing opened or called) and adds what is missing, without doubles. Not validated in game.
+
 ## 0.792.0
 - Plan global, Verify : Demande (X-32) : une solution au blocage qu'on contournait en ouvrant puis fermant la carte du jeu (zone d'un mandat absente tant que la carte du jeu n'avait pas été ouverte à portée). Piste, sans rien ouvrir ni appeler dans le jeu : le jeu garde aussi ses marqueurs de quêtes et de mandats dans sa propre liste (Map), à part de celle de la fenêtre carte que Tensho lit. En mode développeur, cette liste est notée au journal avec l'état de la carte du jeu, pour vérifier qu'elle contient les zones carte fermée. Aucun changement visible. Non validé en jeu.
 - Tests : QuestMarkers792Tests. Verify.ps1 (agent) : 1364/1364, 0 avertissement, 0 erreur ; DLL 0.792.0.0. Non validé en jeu.

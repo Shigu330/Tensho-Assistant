@@ -29,6 +29,28 @@ public static class MapLeves
 /// 0.653 (user report): while the journal has the game's map on a leve, the game empties its event markers, every one of them, and fills them again once that request ends
 /// (docs/evidence/0.653-markers-during-journal-request.md). Those read just before stay until then, on the same map.
 /// </summary>
+/// <summary>
+/// 0.793 (X-32, user request: what opening and closing the game map unblocked): the game's own leve markers (UIState Map) hold a leve's area while the map
+/// window's list is still empty (docs/evidence/0.793-game-leve-markers.md). They are added to what the map window gives, each once: the same map, icon and
+/// place within a yalm is the same marker.
+/// </summary>
+public static class MapGameLeves
+{
+    public static IReadOnlyList<T> Merge<T>(IReadOnlyList<T> read,IReadOnlyList<T> game,Func<T,(uint Map,uint Icon,float X,float Z)> key)
+    {
+        if(game.Count==0)return read;
+        var known=read.Select(key).ToList();
+        var added=new List<T>();
+        foreach(var marker in game)
+        {
+            var place=key(marker);
+            if(known.Any(other=>other.Map==place.Map && other.Icon==place.Icon && Math.Abs(other.X-place.X)<=1 && Math.Abs(other.Z-place.Z)<=1))continue;
+            known.Add(place);added.Add(marker);
+        }
+        return added.Count==0 ? read:[..read,..added];
+    }
+}
+
 public static class MapEventHold
 {
     public static bool Holds(int read,bool journalRequest,uint currentMap,uint keptMap)=>read==0 && journalRequest && currentMap!=0 && currentMap==keptMap;
