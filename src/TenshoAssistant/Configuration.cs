@@ -174,6 +174,10 @@ public sealed class MapViewSettings
     /// <summary>0.800 (X-41): nearby monsters that drop a mount, minion or orchestrion roll not owned.</summary>
     public bool ShowCollectionMonsters { get; set; } = true;
     public bool AboveCollection { get; set; }
+    /// <summary>0.804 (X-39): nearby monsters a beast not tamed yet is tamed from (wiki); as Beastmaster only, unless BeastMonstersAlways; the job icon above their head.</summary>
+    public bool ShowBeastMonsters { get; set; } = true;
+    public bool BeastMonstersAlways { get; set; }
+    public bool AboveBeast { get; set; } = true;
     /// <summary>0.799 (X-38): icons above the heads of nearby monsters that matter, in the game's view; which reasons, their size, how far, and in combat.</summary>
     public bool MonsterIconsAbove { get; set; } = true;
     public bool AboveBlueSpell { get; set; } = true;

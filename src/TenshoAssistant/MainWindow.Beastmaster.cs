@@ -33,8 +33,35 @@ internal sealed partial class MainWindow
         ], ref beastTabFocus);
     }
 
+    // 0.804 (X-39, user request): where to tame what is missing, nearby; the wiki's bestiary read on a click only.
+    private void DrawBeastNearby()
+    {
+        if (BeastWiki is not { } wiki) return;
+        wiki.LoadCached();
+        BoolSetting("MapView.ShowBeastMonsters", "BeastUi.NearbyTip", () => configuration.MapView.ShowBeastMonsters, value => configuration.MapView.ShowBeastMonsters = value, c => c.MapView.ShowBeastMonsters);
+        if (!configuration.MapView.ShowBeastMonsters) return;
+        ImGui.Indent();
+        try
+        {
+            BoolSetting("MapView.AboveBeast", "BeastUi.AboveTip", () => configuration.MapView.AboveBeast, value => configuration.MapView.AboveBeast = value, c => c.MapView.AboveBeast);
+            BoolSetting("MapView.BeastMonstersAlways", "BeastUi.AlwaysTip", () => configuration.MapView.BeastMonstersAlways, value => configuration.MapView.BeastMonstersAlways = value, c => c.MapView.BeastMonstersAlways);
+            if (wiki.Running) ImGui.TextDisabled(localization.Get("BeastUi.WikiReading"));
+            else
+            {
+                ImGui.TextDisabled(wiki.Book is { } book ? localization.Format("BeastUi.WikiKnown", book.Rows.Count, book.FetchedAt.ToLocalTime().ToString("g")) : localization.Get("BeastUi.WikiNone"));
+                ImGui.SameLine();
+                if (SourceButton(localization.Get(wiki.Book is null ? "BeastUi.WikiFetch" : "BeastUi.WikiRefresh"), configuration.CommunityWiki, true)) wiki.Fetch();
+                Tip("BeastUi.WikiFetchTip");
+                if (wiki.Error == "disabled") ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
+                else if (wiki.Error is not null) ImGui.TextColored(UI.FfxivTheme.Warning, localization.Get("BeastUi.WikiFailed"));
+            }
+        }
+        finally { ImGui.Unindent(); }
+    }
+
     private void DrawBeastList(BeastState state, BeastCatalog catalog)
     {
+        DrawBeastNearby();
         var obtained = state.Obtained;
         if (obtained is null) ImGui.TextDisabled(localization.Get(state.ObtainedUnavailable ? "BeastUi.ObtainedFailed" : "BeastUi.ObtainedUnknown"));
         else ImGui.TextDisabled(localization.Format("BeastUi.ObtainedCount", obtained.Count, catalog.Beasts.Count));

@@ -1,5 +1,6 @@
 import sys,struct,zlib
-P='C:/Users/PC/AppData/Local/Temp/claude/1d5348fd6631f675/79effd41-8318-4047-87d8-d463d53d7b0d/scratchpad/p11/'
+# Usage: python cells.py <folder with the .bgra files written by MapMaskProbe --pixels>
+P=sys.argv[1].rstrip('/\')+'/'
 def load(name):
     b=open(P+name,'rb').read();return b
 def png(path,w,h,rgb):

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.804.0
+- Plan global, Verify : Demande (X-39) : les monstres proches dont se dresse une bête que vous n'avez pas. Le jeu dit seulement la zone de capture ; le bestiaire du wiki (une page) donne le monstre de chaque bête, son numéro étant la ligne de la bête dans le jeu (vérifié sur les cinq premières). La page Dresseur a un bouton qui le lit (une requête, gardée sur le disque, rien sans ce clic). Sur la carte, un dragon et les bêtes au survol ; au-dessus de la tête, l'icône du dresseur. Seulement en dresseur, sauf « Même hors dresseur ». Réglages dans la carte et sur la page Dresseur. Non validé en jeu.
+- Tests : BeastNearby804Tests. Verify.ps1 (agent) : 1389/1389, 0 avertissement, 0 erreur ; DLL 0.804.0.0. Non validé en jeu.
+### English
+- Request (X-39): nearby monsters a beast you lack is tamed from. The game gives only the catch zone; the wiki's bestiary (one page) gives each beast's enemy, its number being the beast's row in the game (checked on the first five). The Beastmaster page has a button that reads it (one request, kept on disk, nothing without that click). On the map, a dragon and the beasts on hover; above the head, the Beastmaster icon. As Beastmaster only, unless « Even when not Beastmaster ». Settings on the map and on the Beastmaster page. Not validated in game.
+
 ## 0.803.0
 - Plan global, Verify : P11 (demande) : les parties d'une carte pas encore découvertes sont dessinées en parchemin vierge, comme sur la carte du jeu. La pièce qui manquait était dans le fichier du jeu lui-même : sa texture de découverte est une grille de 4×3 cases, chacune la carte entière au 1/16, une région par canal de couleur ; vérifié en comptant (l'Héritage retrouvé : 30 régions couvrent 97 % de la zone sans chevauchement). L'état de chaque région est lu dans les tables du jeu, sans appeler de fonction ; l'image est construite hors du dessin. Réglage « Parties non découvertes vierges », activé. Non validé en jeu.
 - Tests : MapDiscovery803Tests. Verify.ps1 (agent) : 1387/1387, 0 avertissement, 0 erreur ; DLL 0.803.0.0. Non validé en jeu.

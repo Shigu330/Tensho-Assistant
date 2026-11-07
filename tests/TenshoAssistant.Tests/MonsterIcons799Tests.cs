@@ -10,7 +10,7 @@ internal static class MonsterIcons799Tests
             var icons=Read("MainWindow.MonsterIcons.cs");
             Check(icons.Contains("gameGui.WorldToScreen(monster.Position+new Vector3(0,monster.Height+0.6f,0),out var screen)") && icons.Contains("ImGui.GetBackgroundDrawList()"),"placed, behind");
             Check(icons.Contains("if(Vector3.Distance(monster.Position,live.Position)>distance)continue;") && icons.Contains("if(settings.MonsterIconsHideInCombat && live.InCombat)return;"),"distance, combat");
-            Check(icons.Contains("private const uint BlueMageIcon=62100+BlueMageJob;"),"Blue Mage job icon");
+            Check(icons.Contains("BlueMageIcon=62100+BlueMageJob"),"Blue Mage job icon");
             var settings=new TenshoAssistant.MapViewSettings();
             Check(settings.MonsterIconsAbove && settings.AboveBlueSpell && !settings.AboveList && !settings.AboveHuntLog && !settings.AboveFate && !settings.MonsterIconsHideInCombat,"defaults");
             Check(Read("Plugin.cs").Contains("(\"MonsterIcons\",mainWindow.DrawMonsterOverheadIcons),"),"drawn each frame");

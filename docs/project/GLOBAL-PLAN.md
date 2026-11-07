@@ -280,7 +280,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-36 | Monstres proches : ceux qui manquent au carnet de chasse | Fait en 0.796 : livre sur la carte (rang actuel de chaque carnet, victoires au survol) ; réglage dans la carte et sur la page Carnet de chasse ; une seule couche « monstres proches », toutes les raisons au survol |
 | X-37 | Monstres proches : cibles des mandats acceptés et des ALÉA en cours | ALÉA fait en 0.797 (étoile, nom de l'ALÉA au survol, `GameObject.FateId`) ; mandats : 0.797 capture l'événement des monstres en mode développeur, à relever pendant un mandat de combat |
 | X-38 | Mage bleu : monstres proches qui apprennent une compétence pas encore apprise, icône mage bleu au-dessus de leur tête ; réglage pour l'avoir tout le temps, même hors mage bleu | Fait en 0.798 (carte, réglages, données du wiki lues au clic) et 0.799 (icône du mage bleu au-dessus de la tête, dans la vue du jeu ; aussi au choix pour listes, bestiaire, ALÉA ; taille, distance, combat) |
-| X-39 | Dresseur : monstres proches du bestiaire du dresseur, même affichage et mêmes réglages | Après X-34 ; données d'abord |
+| X-39 | Dresseur : monstres proches du bestiaire du dresseur, même affichage et mêmes réglages | Fait en 0.804 : bestiaire du wiki (une page, lue au clic), icône du dresseur au-dessus de la tête, dragon sur la carte, réglages (carte, page Dresseur) ; `docs/evidence/0.804-beast-wiki.md` |
 | X-40 | Monstres proches : autres usages à proposer, et des réglages cohérents à l'endroit approprié (carte, page concernée) pour chaque usage | Après X-34 |
 | X-41 | Monstres proches : ceux qui lâchent un objet de collection qui manque (monture, mascotte, orchestrion), si les données de butin le disent | Fait en 0.800 : gemme sur la carte, au choix au-dessus de la tête ; réglages dans la carte et sur la page Collections (montures, mascottes, orchestrion) ; MobDrop de LuminaSupplemental |
 
@@ -304,6 +304,7 @@ Consigne de l'utilisateur (2026-11-07) : les relevés se font en jouant ; au mom
 | Rang S | Être dans sa zone | conditions des rangs S | N-12 |
 | JcJ ou contenu classé, en tout dernier | Entrer : Tensho doit se couper | coupure compétitive | #39 |
 | Monstres proches (0.795–0.800) | Près de monstres de vos listes, du bestiaire, d'un ALÉA ; en mage bleu après « Lire les sorts manquants » | carte et icônes | X-35 à X-41 |
+| Zone pas entièrement découverte (une zone récente, ou un autre personnage) | Ouvrir la carte du jeu et la carte Tensho côte à côte | les mêmes parties vierges ; sinon une capture des deux | P11 |
 
 ## Retenu pour plus tard
 

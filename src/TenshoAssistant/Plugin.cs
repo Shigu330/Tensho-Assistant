@@ -165,6 +165,11 @@ public sealed class Plugin : IDalamudPlugin
             var blueNearby=new Monsters.BlueSpellMonsterIndex(blueWiki,name=>englishMonsters.Value.TryGetValue(name,out var ids) ? ids:[],()=>configuration.CommunityWiki);
             registrations.Register(()=>{},blueNearby.Dispose);
             mainWindow.BlueSpellNearby=blueNearby;
+            // 0.804 (X-39): the same English names for the Beastmaster's wiki bestiary.
+            mainWindow.EnglishMonsterIds=name=>englishMonsters.Value.TryGetValue(name,out var ids) ? ids:[];
+            var beastWiki=new Monsters.BeastWikiIndex(dataCache,()=>configuration.CommunityWiki);
+            registrations.Register(()=>{},beastWiki.Dispose);
+            mainWindow.BeastWiki=beastWiki;
             // 0.395 (user request): the wiki's spellbook table (one page for every spell) read when the Blue magic page opens, copy first.
             var blueIndex=new BlueSpellWikiIndex(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,()=>configuration.CommunityWiki);
             registrations.Register(()=>{},blueIndex.Dispose);

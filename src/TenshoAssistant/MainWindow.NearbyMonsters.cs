@@ -5,7 +5,7 @@ using TenshoAssistant.Monsters;
 namespace TenshoAssistant;
 
 /// <summary>0.796: why a nearby monster is shown; the first note picks its map icon.</summary>
-internal enum MonsterNoteKind { List, HuntLog, Fate, BlueSpell, Collection }
+internal enum MonsterNoteKind { List, HuntLog, Fate, BlueSpell, Collection, Beast }
 internal sealed record MonsterNote(MonsterNoteKind Kind,string Text);
 
 // 0.795 (X-34, X-35), 0.796 (X-36), user requests: what each nearby monster means for the player, worked out once a second, drawn every frame.
@@ -59,6 +59,16 @@ internal sealed partial class MainWindow
                 if(blue.SpellsOf(id).Where(notLearned.ContainsKey).Select(spell=>notLearned[spell]).ToArray() is { Length:>0 } taught)
                     Note(id,MonsterNoteKind.BlueSpell,localization.Format("MapView.MonsterBlueSpell",string.Join(", ",taught)));
         }
+        // X-39: beasts not tamed yet, by the wiki's « tamed from » enemy; as Beastmaster, or always when chosen.
+        if(configuration.MapView.ShowBeastMonsters && (configuration.MapView.BeastMonstersAlways || characterStats.State.JobId==BeastmasterJob)
+            && BeastWiki?.Book is { } bestiary && Beasts?.State is { Catalog:{ } beastCatalog, Obtained:{ } tamed } && EnglishMonsterIds is { } english)
+        {
+            if(beastMonstersFor!=(BeastWiki.Revision,english)){beastMonstersFor=(BeastWiki.Revision,english);beastMonsters=BeastWikiParser.Map(bestiary.Rows,english);}
+            var names=beastCatalog.Beasts.ToDictionary(beast=>beast.Id,beast=>beast.Name);
+            foreach(var id in ids)
+                if(beastMonsters.TryGetValue(id,out var beasts) && beasts.Where(beast=>!tamed.Contains(beast) && names.ContainsKey(beast)).Select(beast=>names[beast]).ToArray() is { Length:>0 } wild)
+                    Note(id,MonsterNoteKind.Beast,localization.Format("MapView.MonsterBeast",string.Join(", ",wild)));
+        }
         // X-41: drops that unlock a mount, a minion or an orchestrion roll not owned (read in game; not read: nothing said).
         if(configuration.MapView.ShowCollectionMonsters && lumina?.State.Data is { } loot && itemCatalog.State.Catalog is { } catalog && collections.State.Entries is { Count:>0 } collected)
         {
@@ -75,6 +85,11 @@ internal sealed partial class MainWindow
     }
     // 0.797 (X-37): a FATE's monster is told per monster, not per name: the same monster outside the FATE is not part of it.
     internal const uint BlueMageJob=36;
+    // 0.804: ClassJob row 43 is « beastmaster » (tools/XbmProbe, English).
+    internal const uint BeastmasterJob=43;
+    internal BeastWikiIndex? BeastWiki { get; set; }
+    internal Func<string,IReadOnlyList<uint>>? EnglishMonsterIds { get; set; }
+    private (int Revision,object? Names) beastMonstersFor;private IReadOnlyDictionary<uint,IReadOnlyList<uint>> beastMonsters=new Dictionary<uint,IReadOnlyList<uint>>();
     internal BlueSpellMonsterIndex? BlueSpellNearby { get; set; }
     private IReadOnlyList<MonsterNote> MonsterNotes(MapMonster monster,IReadOnlyList<MapFateMarker>? fates)
     {

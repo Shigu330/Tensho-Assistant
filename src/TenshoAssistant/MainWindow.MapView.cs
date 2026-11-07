@@ -171,6 +171,7 @@ internal sealed partial class MainWindow
         MonsterNoteKind.Fate=>settings.ShowFateMonsters,
         MonsterNoteKind.BlueSpell=>settings.ShowBlueMageMonsters,
         MonsterNoteKind.Collection=>settings.ShowCollectionMonsters,
+        MonsterNoteKind.Beast=>settings.ShowBeastMonsters,
         _=>true,
     };
     private void MeasureMap(string part,Action draw)
@@ -553,6 +554,7 @@ internal sealed partial class MainWindow
             changed|=SettingBox("MapView.ShowFateMonsters",settings.ShowFateMonsters,value=>settings.ShowFateMonsters=value);
             changed|=SettingBox("MapView.ShowBlueMageMonsters",settings.ShowBlueMageMonsters,value=>settings.ShowBlueMageMonsters=value);
             changed|=SettingBox("MapView.ShowCollectionMonsters",settings.ShowCollectionMonsters,value=>settings.ShowCollectionMonsters=value);
+            changed|=SettingBox("MapView.ShowBeastMonsters",settings.ShowBeastMonsters,value=>settings.ShowBeastMonsters=value);
             changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value);
             if(changed)
             {
@@ -615,6 +617,8 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.ShowFateMonsters",settings.ShowFateMonsters,value=>settings.ShowFateMonsters=value,MapDefaults.ShowFateMonsters);
                 changed|=SettingBox("MapView.ShowBlueMageMonsters",settings.ShowBlueMageMonsters,value=>settings.ShowBlueMageMonsters=value,MapDefaults.ShowBlueMageMonsters);
                 changed|=SettingBox("MapView.ShowCollectionMonsters",settings.ShowCollectionMonsters,value=>settings.ShowCollectionMonsters=value,MapDefaults.ShowCollectionMonsters);
+                changed|=SettingBox("MapView.ShowBeastMonsters",settings.ShowBeastMonsters,value=>settings.ShowBeastMonsters=value,MapDefaults.ShowBeastMonsters);
+                changed|=SettingBox("MapView.BeastMonstersAlways",settings.BeastMonstersAlways,value=>settings.BeastMonstersAlways=value,MapDefaults.BeastMonstersAlways);
                 changed|=SettingBox("MapView.BlueMageMonstersAlways",settings.BlueMageMonstersAlways,value=>settings.BlueMageMonstersAlways=value,MapDefaults.BlueMageMonstersAlways);
                 // 0.799 (X-38): icons above the monsters' heads, in the game's view.
                 changed|=SettingBox("MapView.MonsterIconsAbove",settings.MonsterIconsAbove,value=>settings.MonsterIconsAbove=value,MapDefaults.MonsterIconsAbove);
@@ -626,6 +630,7 @@ internal sealed partial class MainWindow
                     changed|=SettingBox("MapView.AboveHuntLog",settings.AboveHuntLog,value=>settings.AboveHuntLog=value,MapDefaults.AboveHuntLog);
                     changed|=SettingBox("MapView.AboveFate",settings.AboveFate,value=>settings.AboveFate=value,MapDefaults.AboveFate);
                     changed|=SettingBox("MapView.AboveCollection",settings.AboveCollection,value=>settings.AboveCollection=value,MapDefaults.AboveCollection);
+                    changed|=SettingBox("MapView.AboveBeast",settings.AboveBeast,value=>settings.AboveBeast=value,MapDefaults.AboveBeast);
                     changed|=SettingBox("MapView.MonsterIconsHideInCombat",settings.MonsterIconsHideInCombat,value=>settings.MonsterIconsHideInCombat=value,MapDefaults.MonsterIconsHideInCombat);
                     var iconSize=Math.Clamp(settings.MonsterIconSize,16,96);ImGui.SetNextItemWidth(160);
                     if(ImGui.SliderInt(localization.Get("MapView.MonsterIconSize"),ref iconSize,16,96)){settings.MonsterIconSize=iconSize;changed=true;}
@@ -1311,7 +1316,7 @@ internal sealed partial class MainWindow
                 }
             // 0.795 (X-35, user request): nearby monsters that drop an item the tracking lists still need.
             // 0.796 (X-36): one layer for every reason; one icon per monster, the first reason's, and every reason on hover.
-            if((settings.ShowListMonsters || settings.ShowHuntLogMonsters || settings.ShowFateMonsters || settings.ShowBlueMageMonsters || settings.ShowCollectionMonsters) && live?.Monsters is { Count:>0 } monsters && live.MapId==map.MapId)
+            if((settings.ShowListMonsters || settings.ShowHuntLogMonsters || settings.ShowFateMonsters || settings.ShowBlueMageMonsters || settings.ShowCollectionMonsters || settings.ShowBeastMonsters) && live?.Monsters is { Count:>0 } monsters && live.MapId==map.MapId)
             {
                 RefreshNearbyMonsters();
                 foreach(var monster in monsters)
