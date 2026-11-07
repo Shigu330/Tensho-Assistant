@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.725.0
+- Plan global, Verify : Signalement : « ventes par jour » restait à « ? ». Cause : la réponse agrégée d'Universalis n'en donne pas sans vente récente. Correction : la vitesse sur sept jours vient de la réponse de l'objet. Demande : le tri par marché de « Que puis-je fabriquer ? » ne compte plus que ce qui peut se vendre dans les jours choisis (7 par défaut, réglable) ; une vieille vente HQ isolée ne fixe plus le prix quand seul le NQ se vend. Prouvé contre les réponses réelles d'Universalis ; non validé en jeu.
+- Tests : SalesSpeed725Tests. Verify.ps1 (agent) : 1300/1300, 0 avertissement, 0 erreur ; DLL 0.725.0.0. Non validé en jeu.
+### English
+- Report: « sales a day » stayed at « ? ». Cause: Universalis's aggregated answer leaves it out without a recent sale. Fix: the seven-day speed comes from the item's own answer. Request: the market sort of « What can I craft? » now counts only what can sell in the chosen days (7 by default, adjustable); one old HQ sale no longer sets the price when only NQ sells. Checked against real Universalis answers; not validated in game.
+
 ## 0.724.0
 - Plan global, Verify : Auto-contrôle : en mode développeur, après l'auto-contrôle, chaque page est dessinée hors de l'écran, sans clic possible, et le journal donne son coût et ses erreurs. Il attend pendant les combats, contenus, synthèses, récoltes, pêche et cinématiques. La page Marché reste à part : elle interroge Universalis.
 - Tests : PageSweep724Tests. Verify.ps1 (agent) : 1295/1295, 0 avertissement, 0 erreur ; DLL 0.724.0.0. Non validé en jeu.

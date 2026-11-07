@@ -96,11 +96,12 @@ public sealed class MarketService : IDisposable
             response.EnsureSuccessStatusCode();
             var json=await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
             var at=DateTimeOffset.UtcNow;
+            var speed=await SpeedAsync(world,missing,token).ConfigureAwait(false);
             // Read off the lock: a page reads the cache on every frame.
             var quotes=new List<MarketQuote>(missing.Length);
             foreach(var id in missing)
             {
-                try{quotes.Add(MarketQuote.Parse(json,world,id,at));}
+                try{quotes.Add(MarketQuote.Parse(json,world,id,at).WithSpeed(speed));}
                 catch(InvalidDataException){}
             }
             lock(gate)
@@ -111,13 +112,30 @@ public sealed class MarketService : IDisposable
                     var id=quote.ItemId;
                     if(!cache.ContainsKey((world,id)) && cache.Count>=CacheCapacity)cache.Remove(cache.MinBy(pair=>pair.Value.FetchedAt).Key);
                     cache[(world,id)]=quote;
-                    if(disk is { } diskStore)_=diskStore.WriteAsync("market",$"{world}:{id}","universalis-aggregated-v3",quote,quote.FetchedAt);
+                    if(disk is { } diskStore)_=diskStore.WriteAsync("market",$"{world}:{id}","universalis-aggregated-v4",quote,quote.FetchedAt);
                 }
                 lastRequest=Stopwatch.GetTimestamp();
             }
             return null;
         }
         catch(Exception error) when(error is HttpRequestException or System.Text.Json.JsonException or InvalidDataException){return $"Prices could not be read: {error.Message}";}
+    }
+
+    // 0.725: the second answer of a price request. Refused or failed: the prices stay, the speed stays unknown, and a server asking for room gets it.
+    private async Task<string?> SpeedAsync(uint world,IReadOnlyCollection<uint> ids,CancellationToken token)
+    {
+        try
+        {
+            using var response=await client.GetAsync(MarketQuote.SpeedUrl(world,ids),token).ConfigureAwait(false);
+            if(ServerPause((int)response.StatusCode,response.Headers.RetryAfter?.Delta) is { } room)
+            {
+                lock(gate)serverPauseUntil=Stopwatch.GetTimestamp()+(long)(room.TotalSeconds*Stopwatch.Frequency);
+                return null;
+            }
+            return response.IsSuccessStatusCode ? await response.Content.ReadAsStringAsync(token).ConfigureAwait(false):null;
+        }
+        catch(HttpRequestException){return null;}
+        catch(TaskCanceledException) when(!token.IsCancellationRequested){return null;}
     }
 
     public bool IsFresh(MarketQuote quote,DateTimeOffset now)=>CacheAge.Fresh(quote.FetchedAt,now,CacheLifetime);
@@ -175,8 +193,8 @@ public sealed class MarketService : IDisposable
         expectedWorld ??= savedWorld;expectedOwner ??= savedOwner;
         if(!force && savedWorld!=0 && itemId!=0 && disk is { } store && GetCached(savedWorld,itemId) is null)
         {
-            // 0.343 (I-01): v3 adds velocity, average and region; v2 copies lack them and are fetched again.
-            var saved=await store.ReadAsync<MarketQuote>("market",$"{savedWorld}:{itemId}","universalis-aggregated-v3",externalCancellation).ConfigureAwait(false);
+            // 0.343 (I-01): v3 adds velocity, average and region; 0.725: v4, the seven-day speed. Older copies lack them and are fetched again.
+            var saved=await store.ReadAsync<MarketQuote>("market",$"{savedWorld}:{itemId}","universalis-aggregated-v4",externalCancellation).ConfigureAwait(false);
             lock(gate)if(!disposed && owner==savedOwner && state.WorldId==savedWorld && saved?.Value is { } value
                 && value.WorldId==savedWorld && value.ItemId==itemId && value.FetchedAt==saved.RecordedAt && value.Nq is not null && value.Hq is not null)
             {
@@ -239,14 +257,14 @@ public sealed class MarketService : IDisposable
         try
         {
             var json = await client.GetStringAsync($"https://universalis.app/api/v2/aggregated/{world}/{itemId}", token).ConfigureAwait(false);
-            var quote = MarketQuote.Parse(json, world, itemId, DateTimeOffset.UtcNow);
+            var quote = MarketQuote.Parse(json, world, itemId, DateTimeOffset.UtcNow).WithSpeed(await SpeedAsync(world,[itemId],token).ConfigureAwait(false));
             lock (gate)
             {
                 if (disposed || ticket != generation) return Interrupted();
                 if (externalCancellation.IsCancellationRequested) { requestActive = false; return new(MarketFetchStatus.Cancelled); }
                 if (!cache.ContainsKey((world,itemId)) && cache.Count >= CacheCapacity) cache.Remove(cache.MinBy(pair => pair.Value.FetchedAt).Key);
                 cache[(world, itemId)] = quote;
-                if(disk is { } diskStore)_=diskStore.WriteAsync("market",$"{world}:{itemId}","universalis-aggregated-v3",quote,quote.FetchedAt);
+                if(disk is { } diskStore)_=diskStore.WriteAsync("market",$"{world}:{itemId}","universalis-aggregated-v4",quote,quote.FetchedAt);
                 requestActive = false;
                 if (purpose == Purpose.Hover) backgroundState = new(world, itemId, false, null);
                 else if (purpose == Purpose.Manual) state = state with { Quote = quote, Loading = false, Error = null };

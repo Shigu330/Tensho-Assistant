@@ -55,7 +55,7 @@ public static class ConfigurationReset
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
         "CurrencyAlerts", "CurrencyServerBar", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
-        "GearOwnedOnly", "ShowHeaderClock", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
+        "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
         "Discord", "ThemeMode", "ThemeModeBeforeTool", "CraftLogTryAllPresets", "GatherPlanFromList", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
@@ -416,6 +416,8 @@ public sealed partial class Configuration
     public Dictionary<uint,Dictionary<TenshoAssistant.Gear.GearSlot,List<uint>>>? GearMateria { get; set; }
     // Header and advanced settings (0.206).
     public bool ShowHeaderClock { get; set; } = true;
+    /// <summary>0.725: « What can I craft? », market sort: the days of sales counted, 1 to 30.</summary>
+    public int CraftStockSaleDays { get; set; } = 7;
     // In-game gathering help beside the game's gathering window (0.225); turns the gathering window reading on.
     public bool GatheringPanel { get; set; } = true;
     // In-game fishing help while fishing (0.226): fish of the current spot with their bait routes.

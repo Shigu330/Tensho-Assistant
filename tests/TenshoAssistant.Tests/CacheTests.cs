@@ -124,17 +124,17 @@ internal static class CacheTests
         }),
         ("Market reload uses persisted prices until policy expiry and manual force bypasses freshness",()=>
         {
-            using var folder=new Folder();var date=DateTimeOffset.UtcNow.AddHours(-2);Wait(folder.Cache.WriteAsync("market","71:42","universalis-aggregated-v3",Quote(date),date));
+            using var folder=new Folder();var date=DateTimeOffset.UtcNow.AddHours(-2);Wait(folder.Cache.WriteAsync("market","71:42","universalis-aggregated-v4",Quote(date),date));
             using var handler=new Handler(_=>PriceJson);using var client=new HttpClient(handler);using var market=new MarketService(client);
             var ttl=TimeSpan.FromDays(1);market.ConfigureCache(()=>ttl,folder.Cache);market.SetWorld(1,71,"World");Wait(market.RequestAsync(42));
             Check(handler.Calls==0 && market.State.Quote?.FetchedAt==date,"fresh persisted quote reuses original date with no HTTP");
-            ttl=TimeSpan.FromMinutes(5);Wait(market.RequestAsync(42));Check(handler.Calls==1 && market.State.Quote?.FetchedAt>date,"shortening policy expires an already loaded quote");
+            ttl=TimeSpan.FromMinutes(5);Wait(market.RequestAsync(42));Check(handler.Calls==2 && market.State.Quote?.FetchedAt>date,"shortening policy expires an already loaded quote");
             using var forceHandler=new Handler(_=>PriceJson);using var forceClient=new HttpClient(forceHandler);using var forced=new MarketService(forceClient);
             forced.ConfigureCache(()=>TimeSpan.FromDays(7),folder.Cache);forced.SetWorld(1,71,"World");Wait(forced.RequestAsync(42,true));
-            Check(forceHandler.Calls==1,"explicit refresh bypasses disk even when long lifetime would accept it");
+            Check(forceHandler.Calls==2,"explicit refresh bypasses disk even when long lifetime would accept it");
             using var otherHandler=new Handler(_=>PriceJson);using var otherClient=new HttpClient(otherHandler);using var other=new MarketService(otherClient);
             other.ConfigureCache(()=>TimeSpan.FromDays(7),folder.Cache);other.SetWorld(1,72,"Other");Wait(other.RequestAsync(42));
-            Check(otherHandler.Calls==1 && other.State.Quote?.WorldId==72,"prices are never restored for another world");
+            Check(otherHandler.Calls==2 && other.State.Quote?.WorldId==72,"prices are never restored for another world");
         }),
         ("Shared source cache keeps retrieval dates and force does not spend cadence on cache hits",()=>
         {

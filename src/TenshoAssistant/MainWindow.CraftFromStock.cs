@@ -35,11 +35,22 @@ internal sealed partial class MainWindow
         if(world==0 || market.GetCached(world,row.Recipe.ResultItemId) is not { } quote || !market.IsFresh(quote,now))return null;
         return quote.Sold(itemCatalog.State.Catalog?.Find(row.Recipe.ResultItemId)?.CanBeHq==true)?.Price;
     }
-    private string FromStockPerDay(CraftFromStockRow row)
+    private decimal? FromStockPerDay(CraftFromStockRow row)
     {
         var world=market.State.WorldId;
-        var perDay=world==0 ? null:market.GetCached(world,row.Recipe.ResultItemId)?.Sold(itemCatalog.State.Catalog?.Find(row.Recipe.ResultItemId)?.CanBeHq==true)?.PerDay;
-        return perDay is { } speed ? speed.ToString("0.#",System.Globalization.CultureInfo.CurrentCulture):"?";
+        return world==0 ? null:market.GetCached(world,row.Recipe.ResultItemId)?.Sold(itemCatalog.State.Catalog?.Find(row.Recipe.ResultItemId)?.CanBeHq==true)?.PerDay;
+    }
+    private int FromStockDays=>Math.Clamp(configuration.CraftStockSaleDays,1,30);
+    // 0.725 (user request): the market sort counts what can sell in the chosen days, not all that could be made.
+    private decimal? FromStockSaleValue(CraftFromStockRow row,DateTimeOffset now)=>
+        FromStockMarketUnit(row,now) is { } unit && CraftFromStock.Sellable(row,FromStockPerDay(row),FromStockDays) is { } pieces ? pieces*unit:null;
+    private string FromStockMarketText(CraftFromStockRow row,decimal unit,Func<decimal,string> gil)
+    {
+        var pieces=row.Count*Math.Max(1,row.Recipe.ResultAmount);
+        if(FromStockPerDay(row) is not { } perDay)return localization.Format("CraftStock.ValueMarketUnknown",gil(unit));
+        if(perDay==0)return localization.Format("CraftStock.ValueMarketNone",pieces,gil(unit));
+        var sold=CraftFromStock.Sellable(row,perDay,FromStockDays) ?? 0;
+        return localization.Format("CraftStock.ValueMarket",gil(sold*unit),FromStockDays,sold,pieces,gil(unit),perDay.ToString("0.##",System.Globalization.CultureInfo.CurrentCulture));
     }
 
     // Scrips at the high tier; only rows of one kind of scrip compare, so each kind stays together, by its group's name.
@@ -56,12 +67,12 @@ internal sealed partial class MainWindow
             case 1:
                 foreach(var row in rows)
                 {
-                    if(FromStockMarketUnit(row,now) is { } unit)fromStockValues[row.Recipe.RecipeId]=localization.Format("CraftStock.ValueMarket",Gil(CraftFromStock.Worth(row,unit)),Gil(unit),FromStockPerDay(row));
+                    if(FromStockMarketUnit(row,now) is { } unit)fromStockValues[row.Recipe.RecipeId]=FromStockMarketText(row,unit,Gil);
                     else if(items?.Find(row.Recipe.ResultItemId) is { IsMarketable:false })fromStockValues[row.Recipe.RecipeId]=localization.Get("CraftStock.NotMarket");
                     else if(fromStockAsked.Contains(row.Recipe.ResultItemId))fromStockValues[row.Recipe.RecipeId]=localization.Get("CurrencyValue.NoOffer");
                 }
                 fromStockMarketComplete=rows.All(row=>FromStockMarketUnit(row,now) is not null || items?.Find(row.Recipe.ResultItemId) is not { IsMarketable:true } || fromStockAsked.Contains(row.Recipe.ResultItemId));
-                return fromStockMarketComplete ? CraftFromStock.Ranked(rows,row=>FromStockMarketUnit(row,now) is { } unit ? CraftFromStock.Worth(row,unit):null):rows;
+                return fromStockMarketComplete ? CraftFromStock.Ranked(rows,row=>FromStockSaleValue(row,now)):rows;
             case 2:
                 foreach(var row in rows)
                     if(items?.Find(row.Recipe.ResultItemId) is { SellPrice:>0 } sold)fromStockValues[row.Recipe.RecipeId]=localization.Format("CraftStock.ValueNpc",Gil(CraftFromStock.Worth(row,sold.SellPrice)),Gil(sold.SellPrice));
@@ -81,6 +92,16 @@ internal sealed partial class MainWindow
         if(fromStockSort!=1)return;
         ImGui.Checkbox(localization.Get("CurrencyValue.Market")+"###FromStockMarket",ref fromStockPricesOn);
         Tip("CraftStock.MarketTip");
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(70*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+        var saleDays=FromStockDays;
+        if(ImGui.InputInt(localization.Get("CraftStock.SaleDays")+"###FromStockDays",ref saleDays,0))
+        {
+            configuration.CraftStockSaleDays=Math.Clamp(saleDays,1,30);
+            fromStockView=null;
+            try{save();}catch(Exception error){log.Warning(error,"Sale days could not be saved.");}
+        }
+        Tip("CraftStock.SaleDaysTip");
         if(!fromStockPricesOn){if(fromStockPrices.State.Loading)fromStockPrices.Cancel();return;}
         var prices=fromStockPrices.State;var world=market.State.WorldId;var character=bankBridge.State.CharacterId;var now=DateTimeOffset.UtcNow;var items=itemCatalog.State.Catalog;
         var marketable=all.Where(row=>items?.Find(row.Recipe.ResultItemId) is { IsMarketable:true }).Select(row=>row.Recipe.ResultItemId).Distinct().Count();
@@ -183,7 +204,7 @@ internal sealed partial class MainWindow
             if(fromStockSort==1 && !fromStockMarketComplete)
             {
                 var now=DateTimeOffset.UtcNow;
-                shownRows=CraftFromStock.Ranked(shownRows,row=>FromStockMarketUnit(row,now) is { } unit ? CraftFromStock.Worth(row,unit):null);
+                shownRows=CraftFromStock.Ranked(shownRows,row=>FromStockSaleValue(row,now));
             }
             fromStockView=known=(result,fromStockJob,fromStockMin,fromStockMax,fromStockSort,priceState.Completed,priceState.Loading,fromStockQuery,fromStockPage,scripCatalog,ranked,shownRows,pages);
         }

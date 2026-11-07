@@ -108,6 +108,18 @@ public static class CraftFromStock
     public static CraftFromStockRow[] Ranked(IEnumerable<CraftFromStockRow> rows,Func<CraftFromStockRow,decimal?> value)
         =>rows.Select((row,index)=>(row,index,worth:value(row))).OrderBy(entry=>entry.worth is null ? 1:0).ThenByDescending(entry=>entry.worth ?? 0).ThenBy(entry=>entry.index).Select(entry=>entry.row).ToArray();
 
+    /// <summary>
+    /// 0.725 (user request): how many of the row's pieces can sell in that many days, at the speed of the market: a stock nobody buys is worth nothing soon. Null: speed unknown, which is not zero.
+    /// The best case: other sellers share these sales, and the speed is that of the past seven days.
+    /// </summary>
+    public static long? Sellable(CraftFromStockRow row,decimal? perDay,int days)
+    {
+        if(perDay is not { } speed)return null;
+        var pieces=row.Count*Math.Max(1,row.Recipe.ResultAmount);
+        // Rounded first: one sale in seven days comes back as 0.14285715 a day, and 7 days of it are one piece.
+        return Math.Min(pieces,(long)Math.Floor(Math.Round(Math.Max(0,speed)*Math.Max(1,days),2)));
+    }
+
     /// <summary>What the crafts of a row bring at a unit price: crafts × items per craft × price.</summary>
     public static decimal Worth(CraftFromStockRow row,decimal unit)=>row.Count*Math.Max(1,row.Recipe.ResultAmount)*unit;
 
