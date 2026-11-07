@@ -10,7 +10,7 @@ public sealed record RelicCatalog(IReadOnlyList<IReadOnlyList<uint>> Lines,IRead
 public readonly record struct RelicItemRow(uint Id,string Name,int Level,int Rarity,uint Category);
 
 /// <summary>A stage: its item level, a word in the English name if the level is not enough, and the lowest rarity. docs/evidence/0.716-relic-families.md.</summary>
-public sealed record RelicStageRule(int Level,string? Word=null,int Rarity=3,string? Excluding=null,string? AlsoNamed=null);
+public sealed record RelicStageRule(int Level,string? Word=null,int Rarity=3,string? Prefix=null,string? AlsoNamed=null);
 
 public enum RelicReadStatus { Loaded,NotLoaded,Unavailable }
 /// <summary>What the game holds of the book in progress, copied on the framework thread. Note 0: no book.</summary>
@@ -25,7 +25,7 @@ public static class RelicBoard
     [
         ("Anima",[new(170,"Animated"),new(200,"Awoken"),new(210,null,4),new(230,"Hyperconductive"),new(240,null,4),new(260,"Sharpened"),new(270,null,4),new(275,"Lux")]),
         ("Eureka",[new(290,"Antiquated"),new(355,"Anemos"),new(370,"Elemental"),new(375,"Elemental"),new(380,"Elemental"),new(385,"Pyros"),new(405,"Eureka"),new(405,"Physeos")]),
-        ("Resistance",[new(485,null,4,null," Recollection"),new(500,"Augmented"),new(500,"Recollection"),new(510,"Law's Order"),new(515,"Law's Order"),new(535,"Blade's")]),
+        ("Resistance",[new(485,null,4,null," Recollection"),new(500,null,3,"Augmented "," Recollection"),new(500,"Recollection"),new(510,"Law's Order"),new(515,"Law's Order"),new(535,"Blade's")]),
         ("Manderville",[new(615,"Manderville"),new(630,"Amazing Manderville"),new(645,"Majestic Manderville"),new(665,"Mandervillous")]),
         ("Phantom",[new(745,"Penumbrae"),new(760,"Umbrae"),new(775,"Obscurum"),new(790,"Eclipticum"),new(795,"Occultum")]),
     ];
@@ -33,13 +33,14 @@ public static class RelicBoard
     /// <summary>The levels to read from the sheet, so that the rest of it is left alone.</summary>
     public static IReadOnlySet<int> Levels()=>Rules.SelectMany(family=>family.Stages).Select(stage=>stage.Level).ToHashSet();
 
-    /// <summary>Which rows a stage holds. AlsoNamed: a row whose name, with these words after it, is a weapon too: the base of a line with no word of its own.</summary>
+    /// <summary>Which rows a stage holds. AlsoNamed: a row whose name, with these words after it, is a weapon too: the base of a line with no word of its own. Prefix: the name must start with it, and is compared without it: « Augmented Honorbound » has its « Honorbound Recollection », a crafted « Augmented Crystarium Rod » has none.</summary>
     public static IEnumerable<RelicItemRow> Stage(IReadOnlyList<RelicItemRow> rows,RelicStageRule rule)
     {
         var names=rule.AlsoNamed is null ? null:rows.Select(row=>row.Name).ToHashSet(StringComparer.Ordinal);
         return rows.Where(row=>row.Level==rule.Level && row.Rarity>=rule.Rarity
             && (rule.Word is null || row.Name.Contains(rule.Word,StringComparison.Ordinal))
-            && (rule.AlsoNamed is null || names!.Contains(row.Name+rule.AlsoNamed)));
+            && (rule.Prefix is null || row.Name.StartsWith(rule.Prefix,StringComparison.Ordinal))
+            && (rule.AlsoNamed is null || names!.Contains((rule.Prefix is null ? row.Name:row.Name[rule.Prefix.Length..])+rule.AlsoNamed)));
     }
 
     /// <summary>One line per set of jobs, an item per stage in the rules' order; a line missing a stage keeps the others.</summary>

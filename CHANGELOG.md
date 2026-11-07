@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.717.0
+- Plan global, W-14 : Eureka et Bozja, sujet choisi par l'utilisateur. Nouvelle page Progression › Eureka et Bozja : par zone, les ALEA, escarmouches et affrontements cruciaux avec leur niveau et leur position, lues dans les fichiers de zone du jeu ; clic pour la carte, clic droit pour le drapeau et l'éthérite quand il y en a une ; rapports du front bozjien et actions oubliées avec les textes du jeu. Corrigé aussi : l'étape « Augmented » des armes de la Résistance prenait des armes fabriquées (Augmented Crystarium). Ce que le personnage possède n'est pas lu. COMPILED et TESTED, non validé en jeu.
+- Tests : FieldContent717Tests. Verify.ps1 (agent) : 1281/1281, 0 avertissement, 0 erreur ; DLL 0.717.0.0. Non validé en jeu.
+### English
+- Eureka and Bozja, a topic chosen by the user. New page Progression > Eureka and Bozja: for each zone, FATEs, skirmishes and critical engagements with level and position, read from the game's zone layouts; click for the map, right click for the flag and the aetheryte where there is one; field records and lost actions with the game's texts. Also fixed: the Resistance weapons' Augmented stage took crafted weapons (Augmented Crystarium). What the character holds is not read. COMPILED and TESTED, not validated in game.
+
 ## 0.716.0
 - Plan global, W-13 : Reliques suivantes, sujet choisi par l'utilisateur. La page Armes reliques a maintenant un onglet par lignée : Zodiaque, Anima, Eurêka, Résistance, Manderville, Fantômes, avec les étapes par arme et ce que vos stocks détiennent. Les objets viennent des feuilles du jeu ; seuls les noms d'étapes et leurs niveaux ont été relevés sur le wiki, puis comptés dans le jeu. Les armures ne sont pas encore listées. COMPILED et TESTED, non validé en jeu.
 - Tests : RelicWeapons708Tests. Verify.ps1 (agent) : 1278/1278, 0 avertissement, 0 erreur ; DLL 0.716.0.0. Non validé en jeu.

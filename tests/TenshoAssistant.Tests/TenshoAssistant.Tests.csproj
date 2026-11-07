@@ -12,6 +12,7 @@
     <Compile Include="../../src/TenshoAssistant/Carnivale/*.cs" Exclude="../../src/TenshoAssistant/Carnivale/*.Dalamud.cs" Link="Carnivale/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Societies/*.cs" Exclude="../../src/TenshoAssistant/Societies/*.Dalamud.cs" Link="Societies/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/GrandCompanies/*.cs" Exclude="../../src/TenshoAssistant/GrandCompanies/*.Dalamud.cs" Link="GrandCompanies/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Fields/*.cs" Exclude="../../src/TenshoAssistant/Fields/*.Dalamud.cs" Link="Fields/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Relics/*.cs" Exclude="../../src/TenshoAssistant/Relics/*.Dalamud.cs" Link="Relics/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Deliveries/*.cs" Exclude="../../src/TenshoAssistant/Deliveries/*.Dalamud.cs" Link="Deliveries/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Island/*.cs" Exclude="../../src/TenshoAssistant/Island/*.Dalamud.cs" Link="Island/%(Filename)%(Extension)" />

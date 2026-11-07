@@ -1074,6 +1074,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.716) Armes reliques : pour une arme de chaque lignée, comparer les étapes au jeu ; dire si une lignée se coupe en deux ou s'il manque une étape, surtout Augmented à la Résistance.
 
+- [ ] (0.717) Progression › Eureka et Bozja : comparer deux ou trois positions à la carte du jeu quand vous y passerez ; Progression › Armes reliques : l'onglet Résistance ne doit plus montrer d'armes Crystarium.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

@@ -43,6 +43,10 @@ internal static class RelicWeapons708Tests
             Check(RelicBoard.Levels().Contains(795) && RelicBoard.Levels().Contains(170),"levels");
             RelicItemRow[] rows=[new(1,"Almace",210,4,1),new(2,"Crafted Blade",210,2,1)];
             Check(RelicBoard.Stage(rows,new(210,null,4)).Single().Id==1,"rarity");
+            // 0.717: 29 weapons say « Augmented » at 500, among them the crafted Crystarium ones.
+            RelicItemRow[] augmented=[new(1,"Augmented Honorbound",500,4,1),new(2,"Augmented Crystarium Rod",500,3,2),new(3,"Honorbound Recollection",500,4,1)];
+            var rule=RelicBoard.Rules.Single(family=>family.Key=="Resistance").Stages[1];
+            Check(RelicBoard.Stage(augmented,rule).Single().Id==1,"the relic only");
         }),
         ("Relics: the page only reads, on the framework thread, once the character is loaded",() =>
         {

@@ -767,6 +767,12 @@ public sealed class Plugin : IDalamudPlugin
                 }
                 catch(Exception error){log.Warning(error,"Custom deliveries unreadable (game update?).");throw;}
             });
+            // W-14 (0.717): Eureka and Bozja, from the game's files, off the frame.
+            mainWindow.FieldCatalogLoad=()=>
+            {
+                try{return Fields.FieldCatalogLoader.Read(data,log);}
+                catch(Exception error){log.Warning(error,"Eureka and Bozja sheets unreadable (game update?).");return null;}
+            };
             // W-11 (0.714): the Grand Companies, read when the page opens and on the player's click.
             mainWindow.GcFeminine=()=>framework.RunOnFrameworkThread(GrandCompanies.GcReader.Feminine);
             mainWindow.GcCatalogLoad=feminine=>
