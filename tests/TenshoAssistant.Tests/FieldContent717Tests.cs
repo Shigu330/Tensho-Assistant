@@ -31,6 +31,15 @@ internal static class FieldContent717Tests
             Check(FieldBoard.ZoneOf(zones,135)==1 && FieldBoard.ZoneOf(zones,999)==0,"current zone, else the first");
             Check(Read("MainWindow.Fates.cs").Contains("fatesTask=Task.Run(load)") && Read("MainWindow.Fates.cs").Contains("PlaceMenu($\"FatePlace"),"off the frame, right click");
         }),
+        ("Self-check: the pages coded without the game are read there, off the frame, and it waits for them",() =>
+        {
+            var pages=Read("MainWindow.SelfCheckPages.cs");
+            foreach(var load in new[]{"FieldCatalogLoad","FatesLoad","DeepDungeonLoad","LexiconLoad","RelicCatalogLoad","AlliedCatalogLoad","GcCatalogLoad","DeliveryClientsLoad","CarnivaleStagesLoad"})
+                Check(pages.Contains(load+"?.Invoke"),load);
+            Check(pages.Contains("Task.Run(read)"),"off the frame");
+            var check=Read("MainWindow.SelfCheck.cs");
+            Check(check.Contains("selfCheckPages!.All(page => page.Read.IsCompleted)") && check.Contains(".. SelfCheckPageProbes()"),"waited for, then reported");
+        }),
         ("Eureka and Bozja: the six zones, and the search on name or text",() =>
         {
             Check(FieldBoard.Territories.SequenceEqual([732u,763u,795u,827u,920u,975u]),"zones");

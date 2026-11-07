@@ -1084,6 +1084,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.721) Monde › ALEA : comparer le lieu de deux ALEA en cours à la carte du jeu.
 
+- [ ] (0.722) Rien à faire : la lecture est relevée dans dalamud.log.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
