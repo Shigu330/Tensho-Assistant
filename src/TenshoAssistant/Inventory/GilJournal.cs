@@ -29,7 +29,13 @@ public static class GilJournal
         ("Shop",GilCategory.NpcShop),("InclusionShop",GilCategory.NpcShop),("ShopExchangeItem",GilCategory.NpcShop),
         ("Bank",GilCategory.Retainer),("RetainerList",GilCategory.Retainer),("SelectString",GilCategory.Other),
         ("FreeCompanyChest",GilCategory.Company),
+        // 0.775 (X-18): the game takes the teleport's price on arrival, after its window closed: the log showed « Gil other: -1,240, windows seen in the last
+        // 15 s: NowLoading » with the chat line « Vous avez dépensé 1240 gils pour vous téléporter ». Only a spending counts (see GilWatcher).
+        ("NowLoading",GilCategory.Teleport),
     ];
+
+    /// <summary>0.775: a gain is never a teleport, even right after a loading screen.</summary>
+    public static GilCategory ForDelta(GilCategory category,long delta)=>category==GilCategory.Teleport && delta>0 ? GilCategory.Other:category;
 
     /// <summary>0.769 (X-19, user report): gil moved between the character and their retainers or the company chest is neither earned nor spent: shown apart, out of the net.</summary>
     public static bool IsTransfer(GilCategory category)=>category is GilCategory.Retainer or GilCategory.Company;

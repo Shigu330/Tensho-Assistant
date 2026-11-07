@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.775.0
+- Plan global, Verify : Journal des gils (X-18) : le relevé montrait des téléportations rangées en « Autre », le jeu prélevant le prix à l'arrivée, après la fermeture de la fenêtre Téléportation. Une dépense qui suit un écran de chargement compte maintenant comme téléportation, jamais un gain. Les anciennes lignes restent comme elles étaient. Non validé en jeu.
+- Tests : GilTeleport775Tests. Verify.ps1 (agent) : 1345/1345, 0 avertissement, 0 erreur ; DLL 0.775.0.0. Non validé en jeu.
+### English
+- Gil journal (X-18): the log showed teleports filed as « Other », the game taking the price on arrival, after the Teleport window closed. A spending right after a loading screen now counts as a teleport, never a gain. Older lines stay as they were. Not validated in game.
+
 ## 0.774.0
 - Plan global, Verify : Lien d'alarme (X-03) : la console de Dalamud en mode détaillé montre que le lien « Ouvrir dans Tensho » était bien enregistré, mais que le jeu ne le transmettait jamais à Dalamud ; il ouvrait une bulle d'objet. L'alarme porte maintenant le vrai lien d'objet du jeu, suivi de « (clic droit : Tensho) » : le survol montre l'objet, le clic droit ouvre son menu, avec l'entrée Tensho. Non validé en jeu.
 - Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1344/1344, 0 avertissement, 0 erreur ; DLL 0.774.0.0. Non validé en jeu.

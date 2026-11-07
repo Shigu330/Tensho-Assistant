@@ -111,8 +111,8 @@ public sealed unsafe class GilWatcher : IDisposable
         if(now is not { } value || last==value)return false;
         if(last is { } before && before!=value)
         {
-            var category=source switch{GilSource.Retainers=>GilCategory.Retainer,GilSource.Company=>GilCategory.Company,_=>GilJournal.Classify(seen,at)};
             var delta=value-before;
+            var category=source switch{GilSource.Retainers=>GilCategory.Retainer,GilSource.Company=>GilCategory.Company,_=>GilJournal.ForDelta(GilJournal.Classify(seen,at),delta)};
             // 0.769 (X-19): a deposit to the retainers waits for their rise; a rise beyond the deposits is their market sales.
             if(source==GilSource.Character && category==GilCategory.Retainer && delta<0)retainerDeposits+=-delta;
             if(source==GilSource.Retainers && delta>0)
