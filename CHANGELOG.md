@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.786.0
+- Plan global, Verify : Demande (X-28) : tenir compte de ce qui est déjà livré à l'atelier de compagnie. Le jeu ne le garde dans aucune structure connue de Tensho (l'agent de la liste des matériaux ne donne que les objets et le résultat) : seule la fenêtre de livraison le montre. Première étape : en mode développeur, cette fenêtre et la liste des matériaux sont notées au journal quand elles s'ouvrent ou changent, pour lire leur disposition avant de compter. Aucun changement visible. Non validé en jeu.
+- Tests : WorkshopCapture786Tests. Verify.ps1 (agent) : 1353/1353, 0 avertissement, 0 erreur ; DLL 0.786.0.0. Non validé en jeu.
+### English
+- Request (X-28): count what the company workshop already received. The game keeps it in no structure Tensho knows (the material list's agent gives only the items and the result): only the delivery window shows it. First step: in developer mode, that window and the material list are written to the log when they open or change, to read their layout before counting. No visible change. Not validated in game.
+
 ## 0.785.0
 - Plan global, Verify : Demande (X-27) : les listes de suivi peuvent n'afficher que les objets finis. Nouveau réglage « Objets finis seulement », éteint au départ, sous les options des listes : liste d'artisanat (ses objets), atelier de compagnie (les livraisons), préparation (l'objet préparé), sans leurs matériaux. L'aide de récolte suit toujours les matériaux. Non validé en jeu.
 - Tests : FinishedOnly785Tests. Verify.ps1 (agent) : 1352/1352, 0 avertissement, 0 erreur ; DLL 0.785.0.0. Non validé en jeu.

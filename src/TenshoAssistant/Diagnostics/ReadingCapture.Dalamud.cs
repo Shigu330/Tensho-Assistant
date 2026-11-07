@@ -26,7 +26,7 @@ public sealed unsafe class ReadingCapture : IDisposable
     private readonly Func<bool> enabled;
     private readonly IPluginLog log;
     private readonly Dictionary<string,int> lines=[];
-    private string statuses="",synthesis="",leves="",retainer="",airship="",islandState="",islandAgenda="";
+    private string statuses="",synthesis="",workshop="",leves="",retainer="",airship="",islandState="",islandAgenda="";
     private bool fishing,disposed,warned;
     private long slowAt;
 
@@ -61,6 +61,7 @@ public sealed unsafe class ReadingCapture : IDisposable
             if(now-slowAt<SlowPartEvery)return;
             slowAt=now;
             ReadSynthesis();
+            ReadWorkshop();
             ReadLeves();
             ReadRetainer();
             ReadAirships();
@@ -131,6 +132,36 @@ public sealed unsafe class ReadingCapture : IDisposable
     }
 
     // C13: the HQ chance beside the quality, and every number of the window.
+    // 0.786 (X-28, user request: count what the workshop already received): the game keeps it nowhere Tensho knows; the delivery window and the
+    // material list are dumped whole, to learn their layout before anything is counted.
+    private void ReadWorkshop()
+    {
+        var text=new StringBuilder();
+        foreach(var name in new[]{"SubmarinePartsMenu","CompanyCraftMaterial","CompanyCraftRecipeNoteBook"})
+        {
+            var handle=gui.GetAddonByName(name);
+            if(handle.IsNull || !handle.IsVisible)continue;
+            var addon=(AtkUnitBase*)handle.Address;
+            text.Append($" [{name}: {addon->AtkValuesCount} values");
+            for(var index=0;index<Math.Min((int)addon->AtkValuesCount,400) && addon->AtkValues!=null;index++)
+            {
+                var value=addon->AtkValues[index];
+                if(value.Type==AtkValueType.UInt)text.Append($" {index}={value.UInt}");
+                else if(value.Type==AtkValueType.Int)text.Append($" {index}={value.Int}");
+                else if(value.Type==AtkValueType.Bool)text.Append($" {index}={value.Bool}");
+                else if(value.Type is AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString)text.Append($" {index}=\"{value.GetValueAsString()}\"");
+            }
+            text.Append(']');
+        }
+        var agent=AgentCompanyCraftMaterial.Instance();
+        if(agent!=null && agent->IsAgentActive())
+            text.Append($" [material agent: result {agent->ResultItem}, supply {string.Join(",",agent->SupplyItems.ToArray())}, selected {agent->SelectedSupplyItemIndex}]");
+        var now=text.ToString();
+        if(now==workshop)return;
+        workshop=now;
+        if(now.Length>0)Line("workshop",60,now);
+    }
+
     private void ReadSynthesis()
     {
         var handle=gui.GetAddonByName("Synthesis");
