@@ -23,7 +23,7 @@ internal static class Resilience452Tests
         ("Alarm chat link: one handler per item, kept; a chat failure leaves the sound and Discord",() =>
         {
             var plugin=Read("Plugin.cs");
-            Check(plugin.Contains("if(!alarmLinks.TryGetValue(alarm.ItemId,out var link))") && plugin.Contains("alarmLinks[alarm.ItemId]=link;"),"one link per item");
+            Check(plugin.Contains("if(!alarmLinks.TryGetValue(alarm.ItemId,out var link))") && plugin.Contains("alarmLinks[itemId]=link;"),"one link per item");
             Check(Read("Alarms/AlarmService.Dalamud.cs").Contains("catch (Exception error) { log.Warning(error, \"Alarm chat line could not be written.\"); }"),"chat guarded");
         }),
         ("Hooks (A-14): the game's function always runs, nothing is thrown back, the game's 1-byte bool is kept",() =>

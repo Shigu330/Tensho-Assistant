@@ -210,6 +210,9 @@ public sealed class Plugin : IDalamudPlugin
             if(migrated)try{pluginInterface.SavePluginConfig(configuration);}catch(Exception error){log.Warning(error,"Alarm sources could not be saved.");}
             Alarms.AlarmService? alarms=null;
             registrations.Register(()=>{},()=>{chat.RemoveChatLinkHandler();alarmLinks.Clear();});
+            // 0.759 (X-03): the links of the rings already in the chat work again after a reload.
+            foreach(var item in (configuration.Alarms ?? []).Select(alarm=>alarm.ItemId).Where(id=>id is > 0 and < uint.MaxValue).Distinct().Take(200))
+                try{RegisterAlarmLink(item);}catch(ArgumentException){}
             registrations.Register(()=>alarms=new Alarms.AlarmService(framework,condition,log,configuration,()=>pluginInterface.SavePluginConfig(configuration),
                 ()=>weather.State.Catalog,(alarm,line)=>
                 {
@@ -228,9 +231,7 @@ public sealed class Plugin : IDalamudPlugin
                         if(!alarmLinks.TryGetValue(alarm.ItemId,out var link))
                         {
                             if(alarmLinks.Count>=256){chat.RemoveChatLinkHandler();alarmLinks.Clear();}
-                            // 0.743 (user report: « Open in Tensho » opens nothing): the click is logged, to see whether it arrives.
-                            link=chat.AddChatLinkHandler(alarm.ItemId,(item,_)=>{log.Information("Alarm link clicked: item {0}.",item);mainWindow.OpenAlarmItem(item);mainWindow.IsOpen=true;});
-                            alarmLinks[alarm.ItemId]=link;
+                            link=RegisterAlarmLink(alarm.ItemId);
                         }
                         message.AddText(" ").Add(link).AddUiForeground(localization.Get("Alarms.OpenInTensho"),500)
                             .Add(Dalamud.Game.Text.SeStringHandling.Payloads.RawPayload.LinkTerminator);
@@ -1341,6 +1342,14 @@ public sealed class Plugin : IDalamudPlugin
         attachedPanels?.EndFrame();
     }
     private (string Name,Action Draw)[]? overlays;
+    // 0.759 (X-03, user report: « Open in Tensho » opened nothing): Dalamud finds a clicked link by plugin and id, and does nothing, with a debug line only, when no
+    // handler has that id. A reload of the plugin removes them all, so a ring printed before it led nowhere. The links of every alarm are registered again at load.
+    private Dalamud.Game.Text.SeStringHandling.Payloads.DalamudLinkPayload RegisterAlarmLink(uint itemId)
+    {
+        var link=chatGui.AddChatLinkHandler(itemId,(item,_)=>{log.Information("Alarm link clicked: item {0}.",item);mainWindow.OpenAlarmItem(item);mainWindow.IsOpen=true;});
+        alarmLinks[itemId]=link;
+        return link;
+    }
     private T LoadSheet<T>(string name,Func<T> read,T unavailable)
     {
         try{return read();}

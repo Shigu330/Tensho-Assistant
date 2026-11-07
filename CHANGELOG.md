@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.759.0
+- Plan global, Verify : Signalement (X-03) : « Ouvrir dans Tensho » sur une alarme n'ouvrait rien. Le journal de 0.743 montre qu'aucun clic n'arrivait. Cause, dans le code de Dalamud : un lien sans gestionnaire ne fait rien, et chaque rechargement du plugin effaçait ses gestionnaires ; les messages d'alarme déjà affichés ne menaient donc plus nulle part. Correction : au chargement, les liens de toutes vos alarmes sont réenregistrés. Non validé en jeu.
+- Tests : AlarmLinks759Tests. Verify.ps1 (agent) : 1334/1334, 0 avertissement, 0 erreur ; DLL 0.759.0.0. Non validé en jeu.
+### English
+- Report (X-03): « Open in Tensho » on an alarm opened nothing. The 0.743 log shows that no click arrived. Cause, in Dalamud's code: a link with no handler does nothing, and each reload of the plugin removed its handlers; rings already printed led nowhere. Fix: at load, the links of all your alarms are registered again. Not validated in game.
+
 ## 0.758.0
 - Plan global, Verify : Demande (X-13) : dans les listes de suivi, les objets qui ne poussent qu'à des points à horaire forment leur propre groupe, « Points à horaire », en tête et repliable ; leur zone s'affiche au survol. Les autres restent par zone. Non validé en jeu.
 - Tests : ZoneOrder757Tests. Verify.ps1 (agent) : 1333/1333, 0 avertissement, 0 erreur ; DLL 0.758.0.0. Non validé en jeu.
