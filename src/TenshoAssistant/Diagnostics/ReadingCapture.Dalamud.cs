@@ -27,6 +27,7 @@ public sealed unsafe class ReadingCapture : IDisposable
     private readonly IPluginLog log;
     private readonly Dictionary<string,int> lines=[];
     private readonly Dictionary<int,int> messageKinds=[];
+    private string mapMarkers="";
     private string statuses="",synthesis="",workshop="",questMarkers="",monsterEvents="",eventMarkers="",leves="",retainer="",airship="",islandState="",islandAgenda="";
     private bool fishing,disposed,warned;
     private long slowAt;
@@ -66,6 +67,7 @@ public sealed unsafe class ReadingCapture : IDisposable
             ReadQuestMarkers();
             ReadMonsterEvents();
             ReadEventMarkers();
+            ReadMapMarkers();
             ReadLeves();
             ReadRetainer();
             ReadAirships();
@@ -180,11 +182,34 @@ public sealed unsafe class ReadingCapture : IDisposable
         if(count is <0 or >256)return;
         var text=new StringBuilder($"open map {agent->CurrentMapId}, selected {agent->SelectedMapId}:");
         foreach(var marker in agent->EventMarkers)
-            text.Append($" [{marker.IconId} map {marker.MapId} objective {marker.ObjectiveId} data {marker.DataId} type {marker.MarkerType} level {marker.LevelId} at {marker.Position.X:F1},{marker.Position.Z:F1} territory {marker.TerritoryTypeId}]");
+            text.Append($" [{marker.IconId} map {marker.MapId} objective {marker.ObjectiveId} data {marker.DataId} type {marker.MarkerType} level {marker.LevelId} at {marker.Position.X:F1},{marker.Position.Z:F1} height {marker.Position.Y:F1} territory {marker.TerritoryTypeId}]");
         var now=text.ToString();
         if(now==eventMarkers)return;
         eventMarkers=now;
         Line("eventMarkers",60,now);
+    }
+
+    // 0.842 (X-67, user request: the game map's up and down arrows on an icon above or below): the game map window's own markers (AgentMap.MapMarkers, built while it is
+    // open) with their flags and second icon, the player's height beside, written when it changes, to find which field carries the arrow. Markers with flags or a
+    // second icon only, at most 60.
+    private void ReadMapMarkers()
+    {
+        var agent=AgentMap.Instance();
+        if(agent==null || agent->MapMarkerCount==0)return;
+        var count=Math.Min((int)agent->MapMarkerCount,agent->MapMarkers.Length);
+        var text=new StringBuilder($"map {agent->CurrentMapId}, {count} markers, player height {(objects.LocalPlayer?.Position.Y ?? float.NaN):F1}:");
+        var shown=0;
+        for(var index=0;index<count && shown<60;index++)
+        {
+            var marker=agent->MapMarkers[index].MapMarker;
+            if(marker.IconFlags==0 && marker.SecondaryIconId==0)continue;
+            shown++;
+            text.Append($" [icon {marker.IconId} second {marker.SecondaryIconId} flags {marker.IconFlags:X4} at {marker.X},{marker.Y} type {agent->MapMarkers[index].DataType} key {agent->MapMarkers[index].DataKey}]");
+        }
+        var now=text.ToString();
+        if(now==mapMarkers)return;
+        mapMarkers=now;
+        Line("mapMarkers",60,now);
     }
 
     private void ReadMonsterEvents()

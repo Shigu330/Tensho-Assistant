@@ -1324,6 +1324,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.841) Liste 1 : sirop de bouleau 157/1 dans « Autres », icône d'entrepôt s'il est chez le servant.
 
+- [ ] (0.842) Carte du jeu ouverte devant une icône avec flèche (Mor Dhona) : je lis « Reading mapMarkers ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

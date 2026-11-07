@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.842.0
+- Plan global, Verify : Demande (X-67) : sur la carte de Tensho, signaler qu'une cible est plus haut ou plus bas, comme la carte du jeu. Tensho ne connaît pas encore la règle du jeu (à partir de quelle différence de hauteur, et où le jeu la note) ; plutôt que d'inventer un seuil, le mode développeur relève les marqueurs de la carte du jeu ouverte, avec leurs drapeaux, leur icône secondaire et la hauteur du joueur, et la hauteur des marqueurs d'événement. La flèche viendra de ce relevé. Non validé en jeu.
+- Tests : MapMarkers842Tests. Verify.ps1 (agent) : 1427/1427, 0 avertissement, 0 erreur ; DLL 0.842.0.0. Non validé en jeu.
+### English
+- Request (X-67): on Tensho's map, show that a target is above or below, as the game map does. Tensho does not know the game's rule yet (from which height difference, and where the game keeps it); rather than invent a threshold, developer mode records the open game map's markers, with their flags, second icon and the player's height, and the event markers' height. The arrow will come from this reading. Not validated in game.
+
 ## 0.841.0
 - Plan global, Verify : Signalement (X-65), suite : le journal de la 0.840 montre que le panneau de la liste d'artisanat reçoit les ingrédients directs de la liste (marron sombre, sirop de bouleau, vin, cristaux), pas les marrons glacés eux-mêmes. Le sirop était donc au premier niveau, que la 0.838 laissait de côté. Un objet qui se fabrique et qu'on détient reste maintenant une ligne à tous les niveaux, pour la quantité prise dans le stock, avec l'icône d'entrepôt s'il est chez un servant. Non validé en jeu.
 - Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1426/1426, 0 avertissement, 0 erreur ; DLL 0.841.0.0. Non validé en jeu.
