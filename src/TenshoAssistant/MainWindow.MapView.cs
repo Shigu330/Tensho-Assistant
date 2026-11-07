@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Interface.Textures;
@@ -1889,7 +1890,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndTooltip();}
     }
     // Vendors standing on a map, with the shop names of each, rebuilt only when the map or the catalogue changes.
-    private (uint MapId,object? Catalog,IReadOnlyList<(Npcs.NpcVendor Vendor,Npcs.NpcLocation Spot)> Rows,IReadOnlyDictionary<uint,(string Name,Npcs.NpcShopKind Kind,int Items)> Shops) mapVendorCache=(0,null,[],new Dictionary<uint,(string,Npcs.NpcShopKind,int)>());
+    private (uint MapId,object? Catalog,IReadOnlyList<(Npcs.NpcVendor Vendor,Npcs.NpcLocation Spot)> Rows,IReadOnlyDictionary<uint,(string Name,Npcs.NpcShopKind Kind,int Items)> Shops,string Festivals) mapVendorCache=(0,null,[],new Dictionary<uint,(string,Npcs.NpcShopKind,int)>(),"");
     // 0.679: worked out once per map, not on every frame.
     private (uint MapId,MapCatalog? Catalog,HashSet<uint> Maps) mapSameLand=(0,null,[]);
     private HashSet<uint> SameLandMaps(MapDefinition map)
@@ -1903,13 +1904,22 @@ internal sealed partial class MainWindow
     private IReadOnlyList<(Npcs.NpcVendor Vendor,Npcs.NpcLocation Spot)> MapVendors(MapDefinition map)
     {
         if(npcVendors?.State.Catalog is not { } catalog)return [];
-        if(mapVendorCache.MapId!=map.MapId || !ReferenceEquals(mapVendorCache.Catalog,catalog))
+        // 0.810 (X-45): a festival's NPCs only while it runs (the game places them in planevent.lgb layers with a FestivalID).
+        var festivals=Festivals?.Invoke();festivals?.Want();
+        var layouts=festivals?.Layouts;var running=festivals?.State?.Active.Select(festival=>festival.Id).ToHashSet() ?? [];
+        var festivalKey=layouts is null ? "":RuntimeHelpers.GetHashCode(layouts)+":"+string.Join(',',running.Order());
+        if(mapVendorCache.MapId!=map.MapId || !ReferenceEquals(mapVendorCache.Catalog,catalog) || mapVendorCache.Festivals!=festivalKey)
         {
             var shops=ReferenceEquals(mapVendorCache.Catalog,catalog) ? mapVendorCache.Shops
 :catalog.Sales.GroupBy(sale=>sale.ShopId).ToDictionary(group=>group.Key,group=>(group.First().ShopName,group.First().Kind,group.Select(sale=>sale.ItemId).Distinct().Count()));
             var same=(maps.State.Catalog?.Equivalent(map) ?? [map.MapId]).ToHashSet();
             var rows=catalog.Vendors.SelectMany(vendor=>vendor.Locations.Where(spot=>same.Contains(spot.MapId)).Take(1).Select(spot=>(vendor,spot))).ToArray();
-            mapVendorCache=(map.MapId,catalog,rows,shops);
+            if(layouts is not null)
+            {
+                var absent=TenshoAssistant.Events.Festivals.Absent(layouts,running);
+                rows=rows.Where(row=>!absent.Contains((row.vendor.NpcId,row.spot.TerritoryId))).ToArray();
+            }
+            mapVendorCache=(map.MapId,catalog,rows,shops,festivalKey);
         }
         return mapVendorCache.Rows;
     }

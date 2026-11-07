@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.810.0
+- Plan global, Verify : Signalement (X-45) : des marchands d'événement saisonnier étaient sur la carte (Limsa, la Dunette) alors qu'ils ne sont pas là en jeu. Tensho sait déjà quels PNJ chaque événement place et quels événements sont en cours : sur la carte, un PNJ d'événement n'est plus montré que pendant son événement. Non validé en jeu.
+- Tests : FestivalVendors810Tests. Verify.ps1 (agent) : 1397/1397, 0 avertissement, 0 erreur ; DLL 0.810.0.0. Non validé en jeu.
+### English
+- Report (X-45): seasonal event vendors were on the map (Limsa, the Aftcastle) while absent in game. Tensho already knows which NPCs each event places and which events run: on the map, an event NPC is shown only while its event runs. Not validated in game.
+
 ## 0.809.0
 - Plan global, Verify : Base de découvertes (X-43), étape 3, préparation : pour noter le butin des monstres, les sorts bleus appris et les bêtes capturées, il faut connaître les messages du jeu. En mode développeur, les messages que le jeu écrit lui-même (sans expéditeur) sont notés au journal : les cinq premiers de chaque type, quatre-vingts types au plus, les noms de joueurs masqués, les objets écrits par leur numéro ; coupé en JcJ. Aucun changement visible. Non validé en jeu.
 - Tests : MessageCapture809Tests. Verify.ps1 (agent) : 1395/1395, 0 avertissement, 0 erreur ; DLL 0.809.0.0. Non validé en jeu.
