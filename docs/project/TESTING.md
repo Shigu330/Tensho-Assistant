@@ -1094,6 +1094,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.726) Rien à faire : dites seulement si quelque chose clignote à l'écran après un rechargement.
 
+- [ ] (0.727) Atelier › Coque de type Bronco : le bouton doit dire 4 parties ; retirez la base de tours et le mur avec leur croix.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

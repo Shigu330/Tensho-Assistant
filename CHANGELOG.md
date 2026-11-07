@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.727.0
+- Plan global, Verify : Signalement : « Suivre toutes ses parties » sur la coque Bronco ajoutait aussi une base de tours et un mur de maisonnette. Cause : tout ce qui n'a pas de prototype et l'ordre 1 formait un même groupe. Correction : la catégorie compte aussi. Les aéronefs de type II, oubliés, ont maintenant leurs quatre parties. Les deux projets déjà ajoutés restent à retirer avec leur croix. Non validé en jeu.
+- Tests : WorkshopSets694Tests. Verify.ps1 (agent) : 1301/1301, 0 avertissement, 0 erreur ; DLL 0.727.0.0. Non validé en jeu.
+### English
+- Report: « Follow all its parts » on the Bronco hull also added a tower base and a housing wall. Cause: everything with no prototype and order 1 formed one group. Fix: the category counts too. The second airship class, left out, now gets its four parts. The two projects already added stay until removed with their cross. Not validated in game.
+
 ## 0.726.0
 - Plan global, Verify : Correction de 0.724 : hors de l'écran, ImGui sautait le contenu des sous-fenêtres, donc le résultat « 49 pages sans erreur » prouvait peu. Le passage dessine maintenant dans une fenêtre masquée, à l'écran : le contenu s'exécute, rien n'est affiché, et il s'arrête si elle n'est pas masquée.
 - Tests : PageSweep724Tests. Verify.ps1 (agent) : 1300/1300, 0 avertissement, 0 erreur ; DLL 0.726.0.0. Non validé en jeu.
