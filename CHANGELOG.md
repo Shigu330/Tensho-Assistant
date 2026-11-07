@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.772.0
+- Plan global, Verify : Signalement (X-21) : « Ajouter les alarmes » proposait 19 alarmes alors qu'un seul objet en avait besoin. Cause : il comptait aussi les objets qu'on trouve sans horaire (cristaux et éclats, présents aussi sur des points ordinaires). Correction : seuls les objets qui manquent encore et ne poussent qu'à des points à horaire, comme le groupe « Points à horaire ». Non validé en jeu.
+- Tests : ListAlarms755Tests. Verify.ps1 (agent) : 1344/1344, 0 avertissement, 0 erreur ; DLL 0.772.0.0. Non validé en jeu.
+### English
+- Report (X-21): « Add the alarms » offered 19 alarms when one item needed them. Cause: it also counted items found without hours (crystals and shards, also at ordinary points). Fix: only items still missing that grow nowhere but at timed points, as the « Timed points » group. Not validated in game.
+
 ## 0.771.0
 - Plan global, Verify : Signalement (X-03) : « Ouvrir dans Tensho » ne marche toujours pas, même avec Tensho seul ; aucun clic n'arrive. Le code de couleur était placé à l'intérieur du lien, entre son début et son texte ; il est maintenant autour, comme pour les liens de Dalamud. Le journal note toujours chaque clic. Non validé en jeu.
 - Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1344/1344, 0 avertissement, 0 erreur ; DLL 0.771.0.0. Non validé en jeu.

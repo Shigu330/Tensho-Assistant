@@ -10,6 +10,7 @@ internal static class ListAlarms755Tests
         {
             var page=Read("MainWindow.ListPanels.cs");
             Check(page.Contains("held.Total>=needed)continue;"),"only what is still needed");
+            Check(page.Contains("if(!ListPanelTimedOnly(item))continue;"),"0.772: only what grows nowhere else");
             Check(page.Contains("timing.Kind!=Gathering.GatheringScheduleKind.Limited"),"timed only");
             Check(page.Contains("$\"{name} · {place}\"") && Read("MainWindow.Alarms.cs").Contains("var label=$\"{SelectedItem?.Name ?? itemId.ToString()} · {place}\";"),"same name as the Gathering page");
             Check(page.Contains("known.Label==alarm.Label && known.Repeat==alarm.Repeat && known.EtMinute==alarm.EtMinute"),"existing left out");

@@ -283,6 +283,9 @@ internal sealed partial class MainWindow
         foreach(var (item,needed) in lines)
         {
             if(GetRecipeHoldings(item) is { HasObservation:true } held && held.Total>=needed)continue;
+            // 0.772 (X-21, user report: 19 alarms offered for one item missing): only what grows nowhere but at timed points, as the « Timed points » group; a crystal
+            // also found at ordinary points needs no alarm.
+            if(!ListPanelTimedOnly(item))continue;
             var name=itemCatalog.State.Catalog?.Find(item)?.Name ?? item.ToString();
             foreach(var source in catalog.ForItem(item))
             {
