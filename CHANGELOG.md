@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.739.0
+- Plan global, Verify : Demande : « Que puis-je fabriquer ? » montre une ligne par objet, avec une icône par métier qui peut le fabriquer ; le nom du métier, son niveau et les fabrications en infobulle, un clic simule cette recette. Les ventes d'un objet ne sont plus comptées deux fois. Non validé en jeu.
+- Tests : CraftLines739Tests. Verify.ps1 (agent) : 1314/1314, 0 avertissement, 0 erreur ; DLL 0.739.0.0. Non validé en jeu.
+### English
+- Request: « What can I craft? » shows one line per item, with an icon per job that can make it; the job's name, level and crafts on hover, a click simulates that recipe. An item's sales are no longer counted twice. Not validated in game.
+
 ## 0.738.0
 - Plan global, Verify : Décision DEC-040 : le passage des pages reste automatique, en mode développeur seulement, avec les requêtes que les pages font à leur ouverture (choix de l'utilisateur). Aucun changement du plugin.
 - Tests : PageSweep724Tests. Verify.ps1 (agent) : 1312/1312, 0 avertissement, 0 erreur ; DLL 0.738.0.0. Non validé en jeu.

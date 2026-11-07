@@ -6,6 +6,8 @@ namespace TenshoAssistant.Craft;
 public sealed record CraftFromStockRow(RecipeDefinition Recipe,long Count,bool LowerBound,bool Chained=false);
 /// <summary>Undecided: the recipes that nothing rules out but with an ingredient whose stock was never seen; they are not listed.</summary>
 public sealed record CraftFromStockResult(IReadOnlyList<CraftFromStockRow> Rows,int Undecided);
+/// <summary>0.739 (user request): one line by item; Lead is its best-ranked recipe, All every recipe of the list that makes it, Lead first.</summary>
+public sealed record CraftFromStockLine(CraftFromStockRow Lead,IReadOnlyList<CraftFromStockRow> All);
 
 public static class CraftFromStock
 {
@@ -122,6 +124,10 @@ public static class CraftFromStock
 
     /// <summary>What the crafts of a row bring at a unit price: crafts × items per craft × price.</summary>
     public static decimal Worth(CraftFromStockRow row,decimal unit)=>row.Count*Math.Max(1,row.Recipe.ResultAmount)*unit;
+
+    /// <summary>0.739 (user request): the recipes of one item on one line, in the order of the list: its sales are counted once, not once per job.</summary>
+    public static CraftFromStockLine[] Lines(IEnumerable<CraftFromStockRow> ranked)=>
+        ranked.GroupBy(row=>row.Recipe.ResultItemId).Select(group=>new CraftFromStockLine(group.First(),group.ToArray())).ToArray();
 
     public static CraftFromStockRow[] Filter(IEnumerable<CraftFromStockRow> rows,string? job,int minLevel,int maxLevel)
         =>rows.Where(row=>(string.IsNullOrEmpty(job) || row.Recipe.CraftType==job) && row.Recipe.Level>=minLevel && row.Recipe.Level<=maxLevel).ToArray();

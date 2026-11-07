@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-04)
 
-VERSION: 0.738.0.0 (dernière release : Stable-0.539.0, 2026-11-05) — Verify.ps1 (agent) 1312/1312, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.739.0.0 (dernière release : Stable-0.539.0, 2026-11-05) — Verify.ps1 (agent) 1314/1314, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: finir le plan global, sur le dépôt personnalisé, sans soumission (DEC-039) ; voir [GOAL](GOAL.md) et [PUBLISHING](../project/PUBLISHING.md).
 QUOTA: plus de réserve (utilisateur, 2026-11-05) : coder tant que possible, reprise tenue à jour ici. L'agent ne voit pas le compteur. Dernier relevé de l'utilisateur (2026-11-05) : 5 h 0 %, réinitialisation à 9:50 ; semaine 95 %, réinitialisation à 23:00 (une vingtaine de versions ≈ 1 % de la semaine).
 
@@ -16,6 +16,8 @@ Historique (rapports de validation un par un, anciennes reprises, couverture des
 Sur rapports de l'utilisateur, détail dans [STATUS-ARCHIVE](STATUS-ARCHIVE.md) et les cases de [TESTING](../project/TESTING.md) :
 - jusqu'à 0.223 : tout ce qui était à valider au 2026-11-01 ; 0.265–0.271, 0.276–0.279, 0.283–0.299 ; 0.303–0.306, 0.310–0.314 ;
 - campagne guidée du 2026-11-04 : lots 1 à 9 (sur place, alarmes, ville, caserne, atelier, récolte et pêche, carte, Triple Triade, Mini Cactpot, revue de mode, collections, quêtes, contenus, compagnie). Lot 10 clos à la demande de l'utilisateur (« J'ai casiment tous essaie, les dernières erreurs on verra en jeu »). La chasse et le train de chasse (lot 7, points 12 à 16) restent à tester quand il en fera.
+- 2026-11-07, sur rapport de l'utilisateur (« récolte ok pour ce que j'ai pu voir ») : aide à la récolte 0.728–0.734, ligne « Ensuite », cadre sur la barre, ordre des étapes ; les cas non vus (Sagesse du fermier après la première récolte, PR restants en fin de nœud) restent à revoir s'ils se présentent.
+- 2026-11-07, sur capture de l'utilisateur (« c'est ok ») : ventes par jour et tri par marché de « Que puis-je fabriquer ? » (0.725), « ~X gils en 7 jours », toute la liste classée.
 - Auto-contrôle, dernier passage relu dans dalamud.log : 27 ok, 4 vus avant, 0 non lu, 0 suspect, 0 échec.
 
 ## À valider en jeu

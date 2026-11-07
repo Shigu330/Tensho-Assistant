@@ -16,7 +16,7 @@ internal sealed partial class MainWindow
     private string fromStockJob="";
     private int fromStockMin=1,fromStockMax=100;
     private bool fromStockChained=true;
-    private (CraftFromStockResult Source,string Job,int Min,int Max,int Sort,int Prices,bool Loading,string Query,int Page,object? Scrips,CraftFromStockRow[] Rows,CraftFromStockRow[] Shown,int Pages)? fromStockView;
+    private (CraftFromStockResult Source,string Job,int Min,int Max,int Sort,int Prices,bool Loading,string Query,int Page,object? Scrips,CraftFromStockRow[] Rows,CraftFromStockLine[] Shown,int Pages)? fromStockView;
     // 0.709 (user request): a list by pages. On the market sort, prices come page by page, or all on a click; the whole list is ranked once they are all there.
     private const int FromStockPageSize=25;
     private int fromStockPage;
@@ -34,6 +34,22 @@ internal sealed partial class MainWindow
         var world=market.State.WorldId;
         if(world==0 || market.GetCached(world,row.Recipe.ResultItemId) is not { } quote || !market.IsFresh(quote,now))return null;
         return quote.Sold(itemCatalog.State.Catalog?.Find(row.Recipe.ResultItemId)?.CanBeHq==true)?.Price;
+    }
+    private string FromStockRowText(CraftFromStockRow row)=>
+        localization.Format(row.Chained ? "CraftStock.RowChained":row.LowerBound ? "CraftStock.RowAtLeast":"CraftStock.Row",row.Count.ToString("N0"),row.Recipe.Level);
+    private void DrawFromStockJob(CraftFromStockRow row)
+    {
+        var recipe=row.Recipe;
+        ImGui.PushID((int)recipe.RecipeId);
+        try
+        {
+            // CraftType 0 to 7 are the crafters in ClassJob order, 8 to 15; their icons are 62100 + job, as the gathering panel uses.
+            if(recipe.CraftTypeId<8)DrawItemIcon(new Items.ItemDefinition(0,recipe.CraftType,false,62108+recipe.CraftTypeId),new System.Numerics.Vector2(ImGui.GetTextLineHeight()+4),false);
+            else ImGui.TextUnformatted(recipe.CraftType);
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("CraftStock.JobIconTip",recipe.CraftType,FromStockRowText(row)));
+            if(ImGui.IsItemClicked())OpenCraftSimulation(recipe);
+        }
+        finally{ImGui.PopID();}
     }
     private decimal? FromStockPerDay(CraftFromStockRow row)
     {
@@ -175,7 +191,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.EndCombo();}
         }
-        Tip("CraftStock.JobTip");
+        Tip("CraftStock.JobIconTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(90);
         ImGui.InputInt(localization.Get("CraftStock.MinLevel")+"###CraftStockMin",ref fromStockMin,0);Tip("CraftStock.LevelTip");
         ImGui.SameLine();ImGui.SetNextItemWidth(90);
@@ -198,18 +214,18 @@ internal sealed partial class MainWindow
             var names=itemCatalog.State.Catalog;
             var filtered=CraftFromStock.Filter(result.Rows,fromStockJob,fromStockMin,fromStockMax).Where(row=>fromStockQuery.Length==0 || names?.Find(row.Recipe.ResultItemId)?.Name.Contains(fromStockQuery,StringComparison.CurrentCultureIgnoreCase)==true).ToArray();
             var ranked=FromStockRanked(filtered);
-            var (shownRows,shownPage,pages)=CraftFromStock.Paged(ranked,fromStockPage,FromStockPageSize);
+            var (shownRows,shownPage,pages)=CraftFromStock.Paged(CraftFromStock.Lines(ranked),fromStockPage,FromStockPageSize);
             fromStockPage=shownPage;
             // Until every price is there, only the page can be ranked: the whole list would move under the reader.
             if(fromStockSort==1 && !fromStockMarketComplete)
             {
                 var now=DateTimeOffset.UtcNow;
-                shownRows=CraftFromStock.Ranked(shownRows,row=>FromStockSaleValue(row,now));
+                shownRows=CraftFromStock.Lines(CraftFromStock.Ranked(shownRows.SelectMany(line=>line.All),row=>FromStockSaleValue(row,now)));
             }
             fromStockView=known=(result,fromStockJob,fromStockMin,fromStockMax,fromStockSort,priceState.Completed,priceState.Loading,fromStockQuery,fromStockPage,scripCatalog,ranked,shownRows,pages);
         }
         var rows=known.Shown;
-        DrawFromStockPrices(known.Rows,rows);
+        DrawFromStockPrices(known.Rows,rows.SelectMany(line=>line.All).ToArray());
         if(fromStockSort!=0)ImGui.TextDisabled(localization.Get("CraftStock.ValueHelp"));
         ImGui.TextColored(Accent,localization.Format("CraftStock.Count",known.Rows.Length.ToString("N0"),result.Rows.Count.ToString("N0")));
         ImGui.SameLine();
@@ -227,13 +243,16 @@ internal sealed partial class MainWindow
         if(rows.Length==0){ImGui.TextDisabled(localization.Get("CraftStock.Empty"));return;}
         DrawChainList("CraftStockList",rows.Length,index=>
         {
-            var row=rows[index];
+            var line=rows[index];
+            var row=line.Lead;
             ImGui.PushID((int)row.Recipe.RecipeId);
             try
             {
                 DrawChainItem(row.Recipe.ResultItemId);
+                // 0.739 (user request): one icon per job that can make it, its name, level and crafts on hover; a click simulates that recipe.
+                foreach(var recipe in line.All){ImGui.SameLine();DrawFromStockJob(recipe);}
                 ImGui.SameLine();
-                ImGui.TextDisabled(localization.Format(row.Chained ? "CraftStock.RowChained":row.LowerBound ? "CraftStock.RowAtLeast":"CraftStock.Row",row.Count.ToString("N0"),row.Recipe.CraftType,row.Recipe.Level));
+                ImGui.TextDisabled(FromStockRowText(row));
                 if(row.Chained && ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftStock.RowChainedTip"));
                 if(fromStockValues.TryGetValue(row.Recipe.RecipeId,out var worth)){ImGui.SameLine();ImGui.TextColored(Success,worth);}
                 ImGui.SameLine();

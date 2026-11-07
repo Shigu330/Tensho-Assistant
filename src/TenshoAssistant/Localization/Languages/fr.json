@@ -751,7 +751,8 @@
     "Help": "Les recettes que vos sacs et votre Banque enregistrée peuvent fabriquer maintenant. Pratique pour écouler des matériaux ou monter un métier.",
     "Chained": "Compter les sous-recettes",
     "ChainedTip": "Compte aussi ce qui se fabrique en faisant d'abord les pièces qui manquent, du minerai à la dernière étape, avec un seul stock. Les restes ne sont pas réutilisés : le nombre réel peut être plus haut.",
-    "RowChained": "au moins {0} fabrication(s), avec sous-recettes · {1} niv. {2}",
+    "RowChained": "au moins {0} fabrication(s), avec sous-recettes · niv. {1}",
+    "JobIconTip": "{0} · {1}. Clic : simuler cette recette.",
     "RowChainedTip": "Des ingrédients sont à fabriquer d'abord. Sur l'objet, Préparation › Calculer donne les étapes.",
     "Search": "Chercher dans mes stocks",
     "Searching": "Recherche…",
@@ -765,8 +766,8 @@
     "Count": "{0} recettes affichées, sur {1}",
     "Undecided": "{0} autres recettes demandent un matériau dont le stock n'a jamais été vu : non listées.",
     "Empty": "Aucune recette avec ces filtres.",
-    "Row": "{0} fabrication(s) · {1} niv. {2}",
-    "RowAtLeast": "au moins {0} fabrication(s) · {1} niv. {2}"
+    "Row": "{0} fabrication(s) · niv. {1}",
+    "RowAtLeast": "au moins {0} fabrication(s) · niv. {1}"
   },
   "CraftPresets": {
     "Search": "Nom, objet ou métier…",
