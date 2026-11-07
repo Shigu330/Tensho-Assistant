@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.767.0
+- Plan global, Verify : Relevé en jeu (I10), confirmé par l'utilisateur : en enregistrant un servant, Tensho garde aussi ses gils et ses cristaux. Ses cristaux comptent dans les stocks, comptés exactement et non plus comme un minimum ; la page Personnages ajoute « (+N chez les servants) ». Un servant enregistré avant reste valable. Vente des servants (I-05) validée en jeu sur capture. Non validé en jeu pour I10.
+- Tests : RetainerExtras767Tests. Verify.ps1 (agent) : 1339/1339, 0 avertissement, 0 erreur ; DLL 0.767.0.0. Non validé en jeu.
+### English
+- In-game reading (I10), confirmed by the user: when a retainer is recorded, Tensho also keeps its gil and crystals. Its crystals count in the stocks, exactly rather than as a lower bound; the Characters page adds « (+N with retainers) ». A retainer recorded before stays valid. Retainer sales (I-05) validated in game on screenshot. I10 not validated in game.
+
 ## 0.766.0
 - Plan global, Verify : Carte, parties non découvertes (P11) : première sonde des données du jeu. Trouvés : la fonction qui dit si une région est découverte, et l'atlas des régions de chaque carte. Manque : où chaque morceau se place sur la carte ; rien n'est deviné, P11 attend. Nouvelle sonde tools/MapMaskProbe. Aucun changement du plugin.
 - Tests : FewerClicks763Tests. Verify.ps1 (agent) : 1337/1337, 0 avertissement, 0 erreur ; DLL 0.766.0.0. Non validé en jeu.

@@ -171,7 +171,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
-| I10 | Cristaux et gils des servants dans le relevé du servant | M |  |
+| I10 | Cristaux et gils des servants dans le relevé du servant | M | Fait en 0.767 : relevé du 2026-11-07 confirmé par l'utilisateur (0 gil, 0 cristal) ; `docs/evidence/0.767-retainer-gil-crystals.md` |
 
 ### Outils
 
@@ -187,8 +187,8 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 
 | Point | D'abord | Précision |
 |---|---|---|
-| Gils des servants dans la vue des personnages | Sonde à la cloche | |
-| I-05, suite des ventes des servants | Essayer la 0.508 | |
+| Gils des servants dans la vue des personnages | Sonde à la cloche | Fait en 0.767 avec I10 : « (+N chez les servants) » dans Personnages |
+| I-05, suite des ventes des servants | Essayer la 0.508 | Validé en jeu le 2026-11-07 sur capture de l'utilisateur : 4 ventes, prix, quantités et comparaison justes |
 | N-04, loterie immobilière | Sonde : structure du jeu à trouver | |
 | N-07, ressources de l'île | Vérifier l'unité des positions | Carte faite en 0.667, liste des matériaux en 0.673 ; vos stocks de l'île ne sont pas lus |
 | N-10, atelier de l'île | Fait sans le jeu en 0.671 et suivantes (lecture, table) ; à vérifier en jeu : `docs/evidence/0.671-island-workshop.md` | Demandé par l'utilisateur le 2026-11-06 ; montée de l'entrain comptée en 0.674 ; prévision de la semaine plus tard |

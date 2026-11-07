@@ -26,6 +26,14 @@ public static class BankStorageScope
     /// <summary>0.345: storages the sort preview can arrange (the game sorts these; a list of what may be sorted, not of what may not).</summary>
     public static bool Sortable(BankStorageKind kind) => kind is BankStorageKind.Retainer or BankStorageKind.Saddlebag or BankStorageKind.PremiumSaddlebag;
 
+    /// <summary>
+    /// 0.767 (I10): a retainer's gil (12000) and crystals (12001), recorded with its pages when the game has them loaded; a copy saved before has none, and stays valid.
+    /// Read on 2026-11-07 with the retainer window open: both loaded, 11 and 18 slots (docs/evidence/0.767-retainer-gil-crystals.md).
+    /// </summary>
+    public static IReadOnlyList<int> OptionalContainerIds(BankStorageKind kind) => kind == BankStorageKind.Retainer ? RetainerExtras : [];
+    private static readonly IReadOnlyList<int> RetainerExtras = Array.AsReadOnly(new[] { 12000, 12001 });
+    public const int RetainerGil = 12000, RetainerCrystals = 12001;
+
     public static IReadOnlyList<int> ContainerIds(BankStorageKind kind) => kind switch
     {
         BankStorageKind.Retainer => Retainer,
@@ -56,9 +64,11 @@ public static class BankEntryValidator
             throw new ArgumentException("A bank name and snapshot with bounded metadata are required.", nameof(entry));
 
         var expected = BankStorageScope.ContainerIds(entry.Key.Kind);
+        var optional = BankStorageScope.OptionalContainerIds(entry.Key.Kind);
         var owner = entry.Key.Kind == BankStorageKind.Retainer ? entry.Key.StorageId : entry.Key.CharacterId;
-        if (entry.Snapshot.Containers.Count != expected.Count || entry.Snapshot.Containers.Values.Any(c =>
-            c.Location.Owner.Value != owner || !expected.Contains(c.Location.Container.Value)
+        var present = entry.Snapshot.Containers.Values.Select(c => c.Location.Container.Value).ToHashSet();
+        if (!expected.All(present.Contains) || entry.Snapshot.Containers.Values.Any(c =>
+            c.Location.Owner.Value != owner || !expected.Contains(c.Location.Container.Value) && !optional.Contains(c.Location.Container.Value)
             || c.Coverage != InventoryCoverage.Complete))
             throw new ArgumentException("Bank imports require exactly the complete containers of the selected storage group.", nameof(entry));
         // Native acquisition permits at most 1000 slots, each with an Int32 quantity.

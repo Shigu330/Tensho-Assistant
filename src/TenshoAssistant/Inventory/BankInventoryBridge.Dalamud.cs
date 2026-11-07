@@ -182,6 +182,13 @@ internal sealed class BankInventoryBridge : IDisposable
                     BankStorageKind.Armoire => ArmoireSnapshot(owner),
                     _ => InventoryNativeReader.Capture(inventory, owner, types, $"Dalamud/manual-bank/{key.Kind}"),
                 };
+                // 0.767 (I10): the retainer's gil and crystals, kept only when read whole; otherwise the pages are recorded as before.
+                if (BankStorageScope.OptionalContainerIds(key.Kind) is { Count: > 0 } extras)
+                {
+                    var more = InventoryNativeReader.Capture(inventory, owner, extras.Select(id => (GameInventoryType)id).ToArray(), $"Dalamud/manual-bank/{key.Kind}/extras");
+                    var whole = more.Containers.Values.Where(c => c.Coverage == InventoryCoverage.Complete).ToArray();
+                    if (whole.Length > 0) snapshot = new InventorySnapshot(snapshot.ObservedAt, snapshot.Source, snapshot.Containers.Values.Concat(whole));
+                }
                 var after = key.Kind == BankStorageKind.Retainer ? GetRetainer(CharacterId)
                     : key.Kind == BankStorageKind.Armoury || BankStorageScope.IsCharacterOwn(key.Kind) ? (IsLoaded(key.Kind) ? context : null)
                     : key.Kind is BankStorageKind.GlamourDresser or BankStorageKind.Armoire ? context

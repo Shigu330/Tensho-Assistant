@@ -5017,6 +5017,7 @@
     "LootLineNoListing": "{0}: {1} on average, ~{2} gil (NPC {3} each, no NQ listing on the market)"
   },
   "CharactersUi": {
+    "RetainerGil": "(+{0} with retainers)",
     "Tab": "Characters",
     "Help": "Every character Tensho has seen on this PC, one file each: bags, crystals, currencies and armoury recorded at each login, retainers and saddlebags when you opened them. « See » opens the Bank tab on that character.",
     "None": "No character recorded yet: log in once with each.",

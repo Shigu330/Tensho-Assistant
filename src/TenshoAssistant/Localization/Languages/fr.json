@@ -5017,6 +5017,7 @@
     "LootLineNoListing": "{0} : {1} en moyenne, ~{2} gils (PNJ {3} l'unité, aucune offre NQ sur le marché)"
   },
   "CharactersUi": {
+    "RetainerGil": "(+{0} chez les servants)",
     "Tab": "Personnages",
     "Help": "Tous les personnages que Tensho a vus sur ce PC, un fichier chacun : sacs, cristaux, monnaies et arsenal enregistrés à chaque connexion, servants et sacoches quand vous les avez ouverts. « Voir » ouvre l'onglet Banque sur ce personnage.",
     "None": "Aucun personnage enregistré pour l'instant : connectez-vous une fois avec chacun.",

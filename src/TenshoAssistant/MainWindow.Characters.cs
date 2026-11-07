@@ -8,7 +8,7 @@ namespace TenshoAssistant;
 // (two clicks) deletes its file. Built from the saved bank only when it changes; the id shown is the local character id, never an Account ID.
 internal sealed partial class MainWindow
 {
-    private sealed record CharacterSummary(ulong Id,string Name,DateTimeOffset LastSeen,long? Gil,long Items,long Crystals,int Retainers,int Storages);
+    private sealed record CharacterSummary(ulong Id,string Name,DateTimeOffset LastSeen,long? Gil,long Items,long Crystals,int Retainers,int Storages,long? RetainerGil=null);
     private BankState? characterSummarySource;
     private CharacterSummary[] characterSummaries=[];
     private ulong characterEraseArmed;
@@ -48,8 +48,12 @@ internal sealed partial class MainWindow
                 long Sum(BankStorageKind kind)=>entries.Where(entry=>entry.Key.Kind==kind).SelectMany(entry=>entry.Snapshot.Containers.Values).SelectMany(container=>container.Quantities.Values).Sum();
                 var currency=entries.FirstOrDefault(entry=>entry.Key.Kind==BankStorageKind.Currency);
                 long? gil=currency is null ? null:currency.Snapshot.Containers.Values.SelectMany(container=>container.Quantities).Where(pair=>pair.Key.Id.Value==1).Sum(pair=>pair.Value);
+                // 0.767 (I10): the gil the retainers hold, from the copies that recorded it.
+                var retainerGil=entries.Where(entry=>entry.Key.Kind==BankStorageKind.Retainer).SelectMany(entry=>entry.Snapshot.Containers.Values)
+                    .Where(container=>container.Location.Container.Value==BankStorageScope.RetainerGil).ToArray();
                 return new CharacterSummary(group.Key,CharacterName(entries,group.Key),entries.Max(entry=>entry.Snapshot.ObservedAt),gil,Sum(BankStorageKind.Bags),Sum(BankStorageKind.Crystals),
-                    entries.Count(entry=>entry.Key.Kind==BankStorageKind.Retainer),entries.Length);
+                    entries.Count(entry=>entry.Key.Kind==BankStorageKind.Retainer),entries.Length,
+                    retainerGil.Length==0 ? null:retainerGil.SelectMany(container=>container.Quantities).Where(pair=>pair.Key.Id.Value==1).Sum(pair=>pair.Value));
             }).OrderByDescending(summary=>summary.LastSeen).ToArray();
             characterSummarySource=state;
         }
@@ -72,6 +76,7 @@ internal sealed partial class MainWindow
                     if(summary.Id==current)ImGui.TextColored(Success,localization.Format("CharactersUi.Current",summary.Name));else ImGui.TextUnformatted(summary.Name);
                     ImGui.TableNextColumn();ImGui.TextUnformatted(summary.LastSeen.ToLocalTime().ToString("g"));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Gil is { } gil ? gil.ToString("N0"):"—");
+                    if(summary.RetainerGil is { } held){ImGui.SameLine();ImGui.TextDisabled(localization.Format("CharactersUi.RetainerGil",held.ToString("N0")));}
                     ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Items.ToString("N0"));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Crystals.ToString("N0"));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Retainers.ToString());
