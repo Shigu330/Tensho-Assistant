@@ -1095,6 +1095,8 @@ public sealed class Plugin : IDalamudPlugin
             // 0.480: status 757, Scrutiny (Status sheet, docs/evidence/0.479-collectable-window-values.md).
             mainWindow.CollectableActionStatus=id=>Gathering.CollectableActionState.Status(id);
             mainWindow.GatheringRecastLeft=id=>Gathering.CollectableActionState.RecastLeft(id);
+            Gathering.ActionBarLocator? barLocator=null;
+            registrations.Register(()=>mainWindow.BarLocator=barLocator=new Gathering.ActionBarLocator(framework,gameGui,log),()=>{mainWindow.BarLocator=null;barLocator?.Dispose();});
             // 0.517 (user report): IsActionUnlocked is false for a row without an unlock link, and 22 of the 24 gathering actions have none: they come with the level, which the plan checks (docs/evidence/0.517-gp-action-unlocks.md).
             var gatheringActionRows=new Dictionary<uint,(string,uint,string)?>();
             mainWindow.GatheringActionRow=id=>

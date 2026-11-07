@@ -35,6 +35,66 @@ internal sealed partial class MainWindow
     internal void DrawGatheringPanel()
     {
         var observed=gatheringObservation.State;
+        // 0.728: set again below while a plan has a next action; otherwise nothing is looked for.
+        var located=BarLocator;
+        var wantedBefore=located?.Wanted ?? 0;
+        if(located is not null)located.Wanted=0;
+        gatheringBarWanted=0;
+        try{DrawGatheringPanelCore(observed);}
+        finally
+        {
+            if(located is not null)
+            {
+                located.Wanted=gatheringBarWanted;
+                if(gatheringBarWanted!=0 && gatheringBarWanted==wantedBefore)DrawGatheringBarHighlight(located);
+            }
+        }
+    }
+
+    // 0.728 (user request): a frame over the slot of the next action, as on the Mini Cactpot board. Drawn only: the player uses the action.
+    internal Gathering.ActionBarLocator? BarLocator { get; set; }
+    private uint gatheringBarWanted;
+    private (GpPlan Plan,int Gp,int? Attempts,GpNextStep Step)? gatheringNextCache;
+    private static void DrawGatheringBarHighlight(Gathering.ActionBarLocator located)
+    {
+        if(located.Rects is not { Count:>0 } rects)return;
+        var draw=ImGui.GetForegroundDrawList();
+        var pulse=0.65f+0.35f*MathF.Sin((float)(DateTime.UtcNow.TimeOfDay.TotalSeconds*5));
+        var border=ImGui.GetColorU32(UI.FfxivTheme.Gold with {W=pulse});
+        var fill=ImGui.GetColorU32(UI.FfxivTheme.Gold with {W=0.18f*pulse});
+        foreach(var rect in rects)
+        {
+            var min=new Vector2(rect.X,rect.Y);var max=min+new Vector2(rect.Width,rect.Height);
+            draw.AddRectFilled(min,max,fill,6);draw.AddRect(min,max,border,6,ImDrawFlags.None,3);
+        }
+    }
+
+    private void DrawGatheringNext(GpPlan plan,GatheringNodeStart start,GatheringObservedFrame frame,string itemName,out GpNextStep? step)
+    {
+        step=null;
+        if(start.Attempts is not { } startAttempts || frame.Attempts is not { } attempts)return;
+        if(gatheringNextCache is not { } known || !ReferenceEquals(known.Plan,plan) || known.Gp!=(int)frame.Gp || known.Attempts!=attempts)
+            gatheringNextCache=known=(plan,(int)frame.Gp,attempts,GpNextAction.Next(plan,(int)start.Gp,(int)frame.Gp,startAttempts,attempts));
+        step=known.Step;
+        switch(step.Kind)
+        {
+            case GpNextKind.Action when step.Action is { } action:
+                DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(28));ImGui.SameLine();
+                ImGui.TextColored(Accent,localization.Format("GatheringPanel.NextAction",action.Name));
+                if(ImGui.IsItemHovered())WrappedTooltip(action.Description);
+                if(configuration.GatheringNextHighlight)
+                {
+                    gatheringBarWanted=action.Spec.Id;
+                    if(BarLocator is { Read:true,Rects.Count:0 })ImGui.TextDisabled(localization.Get("GatheringPanel.NextNotOnBars"));
+                }
+                break;
+            case GpNextKind.Gather:ImGui.TextColored(Accent,localization.Format("GatheringPanel.NextGather",itemName));break;
+            case GpNextKind.OffPlan:ImGui.TextDisabled(localization.Get("GatheringPanel.NextOffPlan"));break;
+        }
+    }
+
+    private void DrawGatheringPanelCore(GatheringObservationState observed)
+    {
         if(!windowDisposed && configuration.GatheringPanel && observed.Status==GatheringObservationStatus.Error)DrawReadFailedPanel("TenshoGatheringFailed","Gathering","Gathering");
         // 0.330: the node's opening values are forgotten when its window closes; a gather or an action only makes the reading « not ready ».
         if(windowDisposed || !configuration.GatheringPanel || observed.Status is not (GatheringObservationStatus.Observed or GatheringObservationStatus.NotReady))gatheringPanelStart=null;
@@ -185,11 +245,17 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Format("GatheringPanel.Expected",shown.ExpectedYield.ToString("0.0"),plan.Baseline.ToString("0.0"),shown.Cost));
         if(start.Frozen)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanAtStart",plan.Scenario.Budget));
         if(gatheringPanelBountifulFloor)ImGui.TextDisabled(localization.Get("GatheringPanel.BountifulFloor"));
+        DrawGatheringNext(shown,start,frame,items?.Find(gatheringPanelItem)?.Name ?? gatheringPanelItem.ToString(),out var next);
         if(shown.Actions.Count==0)ImGui.TextUnformatted(localization.Get("GpUi.Keep"));
         foreach(var use in shown.Actions)
         {
             DrawItemIcon(new ItemDefinition(0,use.Action.Name,false,use.Action.Icon),new Vector2(22));ImGui.SameLine();
-            ImGui.TextUnformatted(use.Count>1 ? $"{use.Action.Name} ×{use.Count}":use.Action.Name);
+            var spent=next?.Used.GetValueOrDefault(use.Action.Spec.Id) ?? 0;
+            var label=use.Count>1 ? $"{use.Action.Name} ×{use.Count}":use.Action.Name;
+            if(spent>0 && use.Count>1 && spent<use.Count)label+=$" ({spent}/{use.Count})";
+            if(spent>=use.Count)ImGui.TextDisabled(label);
+            else if(next?.Action?.Spec.Id==use.Action.Spec.Id)ImGui.TextColored(Accent,label);
+            else ImGui.TextUnformatted(label);
             if(ImGui.IsItemHovered())WrappedTooltip(use.Action.Description);
         }
         if(shown.Actions.Any(use=>use.Action.Spec.Effect==GpEffect.Attempt) && plan.Scenario.Level>=GpScenario.EurekaLevel)

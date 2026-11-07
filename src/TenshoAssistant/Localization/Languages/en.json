@@ -1169,6 +1169,12 @@
     "MissingSuccess": "success rate",
     "MissingBoon": "boon chance",
     "AfterStart": "Plan not computed: this item was first read after GP was spent at this node, so its rates may already include the bonuses bought.",
+    "NextAction": "Next: {0}",
+    "NextGather": "Next: gather {0}",
+    "NextOffPlan": "Your GP no longer follows this plan: the next step is yours to choose.",
+    "NextNotOnBars": "This action is not on your hotbars.",
+    "NextHighlight": "Mark the next action on my hotbars",
+    "NextHighlightTip": "At a node, a frame drawn over the slot of the plan's next action. Tensho uses nothing: the action stays yours. Cross hotbars are not covered.",
     "PlanAtStart": "Plan made when the node opened ({0} GP): the actions already used are part of it.",
     "BountifulFloor": "Bountiful bonus unknown (gathering rating or item base not read): the plan counts +1, the rule's minimum."
   },

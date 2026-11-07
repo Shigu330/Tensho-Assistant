@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.728.0
+- Plan global, Verify : Aide à la récolte : la ligne « Ensuite » donne la prochaine action du plan ou dit de récolter, d'après les PR dépensés et les essais restants ; le plan montre ce qui est fait. Un cadre repère l'action sur vos barres (réglable, barres croisées non prises en charge). Tensho n'exécute rien, aucun hook. Non validé en jeu.
+- Tests : GatherNext728Tests. Verify.ps1 (agent) : 1306/1306, 0 avertissement, 0 erreur ; DLL 0.728.0.0. Non validé en jeu.
+### English
+- Gathering help: the « Next » line gives the plan's next action or says to gather, from the GP spent and the attempts left; the plan shows what is done. A frame marks the action on your hotbars (optional, cross hotbars not covered). Tensho uses nothing, no hook. Not validated in game.
+
 ## 0.727.0
 - Plan global, Verify : Signalement : « Suivre toutes ses parties » sur la coque Bronco ajoutait aussi une base de tours et un mur de maisonnette. Cause : tout ce qui n'a pas de prototype et l'ordre 1 formait un même groupe. Correction : la catégorie compte aussi. Les aéronefs de type II, oubliés, ont maintenant leurs quatre parties. Les deux projets déjà ajoutés restent à retirer avec leur croix. Non validé en jeu.
 - Tests : WorkshopSets694Tests. Verify.ps1 (agent) : 1301/1301, 0 avertissement, 0 erreur ; DLL 0.727.0.0. Non validé en jeu.

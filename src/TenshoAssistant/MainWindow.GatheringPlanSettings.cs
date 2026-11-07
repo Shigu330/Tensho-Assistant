@@ -87,6 +87,14 @@ internal sealed partial class MainWindow
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("GpUi.ForbiddenTitle",forbidden.Count)+"###GpForbiddenActions"))return;
         ImGui.TextWrapped(localization.Get("GpUi.ForbiddenHelp"));
         if(gpActions.State.Catalog is not { } catalog){ImGui.TextDisabled(localization.Get("GatheringPanel.NoPlan"));return;}
+        // 0.728 (user request).
+        var highlight=configuration.GatheringNextHighlight;
+        if(ImGui.Checkbox(localization.Get("GatheringPanel.NextHighlight")+"###GatheringNextHighlight",ref highlight))
+        {
+            configuration.GatheringNextHighlight=highlight;
+            try{save();}catch(Exception error){log.Warning(error,"The hotbar highlight setting could not be saved.");}
+        }
+        Tip("GatheringPanel.NextHighlightTip");
         var changed=false;
         foreach(var (key,miner,botanist) in GpActionRules.Groups(catalog))
         {

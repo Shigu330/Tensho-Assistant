@@ -117,6 +117,7 @@
     <Compile Include="../../src/TenshoAssistant/Gathering/BountifulEstimate.cs" Link="Gathering/BountifulEstimate.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GatheringTimeline.cs" Link="Gathering/GatheringTimeline.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GpActions.cs" Link="Gathering/GpActions.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/GpNextAction.cs" Link="Gathering/GpNextAction.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GpOptimizer.cs" Link="Gathering/GpOptimizer.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GatheringObservation.cs" Link="Gathering/GatheringObservation.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/Collectables.cs" Link="Gathering/Collectables.cs" />

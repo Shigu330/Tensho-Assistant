@@ -1169,6 +1169,12 @@
     "MissingSuccess": "taux de réussite",
     "MissingBoon": "taux de récolte supplémentaire",
     "AfterStart": "Plan non calculé : cet objet a été lu après une dépense de PR sur ce point, ses taux peuvent déjà inclure les bonus achetés.",
+    "NextAction": "Ensuite : {0}",
+    "NextGather": "Ensuite : récoltez {0}",
+    "NextOffPlan": "Vos PR ne suivent plus ce plan : la suite est à votre choix.",
+    "NextNotOnBars": "Cette action n'est pas sur vos barres.",
+    "NextHighlight": "Repérer la prochaine action sur mes barres",
+    "NextHighlightTip": "Au point de récolte, un cadre dessiné sur la case de la prochaine action du plan. Tensho n'utilise rien : l'action reste la vôtre. Les barres croisées ne sont pas prises en charge.",
     "PlanAtStart": "Plan établi à l'ouverture du point ({0} PR) : les actions déjà utilisées en font partie.",
     "BountifulFloor": "Bonus d'Abondance inconnu (valeur de récolte ou base de l'objet non lue) : le plan compte +1, le minimum de la règle."
   },
