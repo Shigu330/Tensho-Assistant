@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.779.0
+- Plan global, Verify : Signalement (X-24) : après un chargement du plugin, les peaux et la corne passaient en « Autres », puis en « Monstres » plus tard. Cause : la source des monstres (LuminaSupplemental) ne se chargeait que quand une autre page la demandait. Les listes de suivi la demandent maintenant elles-mêmes ; elle se relit de sa copie sur disque, sans réseau tant que la copie existe. Non validé en jeu.
+- Tests : ListZones752Tests. Verify.ps1 (agent) : 1347/1347, 0 avertissement, 0 erreur ; DLL 0.779.0.0. Non validé en jeu.
+### English
+- Report (X-24): after a plugin reload, hides and the horn sat in « Others », then moved to « Monsters » later. Cause: the monster source (LuminaSupplemental) loaded only when another page asked for it. The tracking lists now ask for it themselves; it is read from its copy on disk, with no network while the copy exists. Not validated in game.
+
 ## 0.778.0
 - Plan global, Verify : Demande (X-23) : une nouvelle alarme n'est plus envoyée sur Discord par défaut ; une alarme qui rejoint un groupe prend le réglage du groupe ; vos alarmes déjà enregistrées gardent le leur. Non validé en jeu.
 - Tests : DiscordOff778Tests. Verify.ps1 (agent) : 1347/1347, 0 avertissement, 0 erreur ; DLL 0.778.0.0. Non validé en jeu.

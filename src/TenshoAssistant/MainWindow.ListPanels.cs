@@ -197,6 +197,9 @@ internal sealed partial class MainWindow
             // The quest journal is read when something asks for it: ask, at most once a minute, while it is empty.
             if(configuration.ListPanelsBase && configuration.ListPanelsMetOnly && quests.State.Entries.Count==0 && now-listPanelQuestsAsked>60000){listPanelQuestsAsked=now;quests.RequestRefresh();}
             listPanelLines[key]=known=(now,configuration.ListPanelsBase ? BaseMaterials.Expand(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched).ToArray():wanted);
+            // 0.779 (X-24, user report: after a reload, monster items sat in « Others » for a while): the monster source is asked by the lists themselves; it is read
+            // from its copy on disk (the network only when there is none or it is out of date, under the source's setting).
+            if(configuration.ListPanelsBase)lumina?.Request();
         }
         return known;
     }

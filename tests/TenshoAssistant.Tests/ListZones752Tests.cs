@@ -22,6 +22,7 @@ internal static class ListZones752Tests
         {
             var page=Read("MainWindow.ListPanels.cs");
             Check(page.Contains("if(!configuration.ListPanelsByZone || origins.FirstOrDefault(group=>group.Origin==ItemOrigin.Gathering)"),"gathered only, behind its setting");
+            Check(page.Contains("if(configuration.ListPanelsBase)lumina?.Request();"),"0.779: the lists ask for the monster source themselves");
         }),
     ];
 }
