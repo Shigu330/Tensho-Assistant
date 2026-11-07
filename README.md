@@ -6,7 +6,7 @@ and reminders, free company voyages, quests, collections, character stats, a gea
 diagnostics.
 
 The current version is the `<Version>` of `src/TenshoAssistant/TenshoAssistant.csproj`. What changed in each version is in
-[CHANGELOG.md](CHANGELOG.md); what is validated in game, and what is not yet, is in [docs/ai/STATUS.md](docs/ai/STATUS.md). Map of all
+[CHANGELOG.md](CHANGELOG.md); what is validated in game, and what is not yet, is in [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md). Map of all
 documents: [docs/README.md](docs/README.md).
 
 ## Overview
@@ -44,7 +44,7 @@ Settings page.
 
 ## Main feature domains
 
-What the code does today. In-game validation of each part is tracked in [docs/ai/STATUS.md](docs/ai/STATUS.md).
+What the code does today. In-game validation of each part is tracked in [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md).
 
 ### Items, storage and market
 
@@ -183,10 +183,9 @@ What the code does today. In-game validation of each part is tracked in [docs/ai
 ├── docs/                     documentation map: docs/README.md
 │   ├── ai/                   agent steering (rules, status, goal)
 │   ├── project/              scope, roadmap, architecture, testing, references, decisions, publishing
-│   ├── goals/                one document per goal
 │   └── evidence/             probe outputs cited by the code
 ├── Localization/README.md    translation guide
-├── README.md · CONTRIBUTING.md · SECURITY.md · CHANGELOG.md · CLAUDE.md · LICENSE
+├── README.md · CONTRIBUTING.md · SECURITY.md · CHANGELOG.md · LICENSE
 └── global.json · TenshoAssistant.sln
 ```
 
@@ -236,7 +235,7 @@ Rules: [Localization/README.md](Localization/README.md). In short:
 - [docs/README.md](docs/README.md) — map of all documents
 - [CONTRIBUTING.md](CONTRIBUTING.md) — build, tests, project rules, Dalamud publishing rules
 - [CHANGELOG.md](CHANGELOG.md) — what changed in each version
-- [docs/ai/STATUS.md](docs/ai/STATUS.md) — current status, what is validated in game, next action
+- [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md) — the plan, what is done and what is validated in game
 - [docs/project/ROADMAP.md](docs/project/ROADMAP.md) · [ARCHITECTURE.md](docs/project/ARCHITECTURE.md) · [TESTING.md](docs/project/TESTING.md) · [REFERENCES.md](docs/project/REFERENCES.md)
 - [Localization/README.md](Localization/README.md) — localization workflow
 - [SECURITY.md](SECURITY.md) — reporting a vulnerability
@@ -313,7 +312,7 @@ météo, alarmes et rappels, expéditions de la compagnie libre, quêtes, collec
 d'équipement, aides du Gold Saucer, enchaînement de macros et diagnostics.
 
 La version courante est le `<Version>` de `src/TenshoAssistant/TenshoAssistant.csproj`. Les changements de chaque version sont dans
-[CHANGELOG.md](CHANGELOG.md) ; ce qui est validé en jeu, et ce qui ne l'est pas encore, dans [docs/ai/STATUS.md](docs/ai/STATUS.md).
+[CHANGELOG.md](CHANGELOG.md) ; ce qui est validé en jeu, et ce qui ne l'est pas encore, dans [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md).
 Carte des documents : [docs/README.md](docs/README.md).
 
 ## Vue d’ensemble
@@ -348,7 +347,7 @@ l'objet dans le navigateur ; `/tenshonext` est le marqueur de fin de page de l'e
 
 ## Domaines fonctionnels présents
 
-Ce que fait le code aujourd'hui. La validation en jeu de chaque partie est suivie dans [docs/ai/STATUS.md](docs/ai/STATUS.md).
+Ce que fait le code aujourd'hui. La validation en jeu de chaque partie est suivie dans [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md).
 
 ### Objets, rangements et marché
 
@@ -525,7 +524,7 @@ Règles : [Localization/README.md](Localization/README.md). En bref :
 - [docs/README.md](docs/README.md) : carte de tous les documents
 - [CONTRIBUTING.md](CONTRIBUTING.md) : compiler, tester, règles du projet, publication Dalamud
 - [CHANGELOG.md](CHANGELOG.md) : changements par version
-- [docs/ai/STATUS.md](docs/ai/STATUS.md) : état, validé en jeu, prochaine action
+- [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md) : le plan, ce qui est fait et validé en jeu
 - [Localization/README.md](Localization/README.md) : contribution à la localisation
 - [SECURITY.md](SECURITY.md) : signaler une vulnérabilité
 

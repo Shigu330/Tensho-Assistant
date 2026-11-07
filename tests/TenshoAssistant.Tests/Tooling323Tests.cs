@@ -21,7 +21,7 @@ internal static class Tooling323Tests
         ("Git ignores per-user and generated files; GitHub drafts stay inactive outside .github",()=>
         {
             var ignore = File.ReadAllLines(Path.Combine(Root,".gitignore")).Select(line => line.Trim()).ToHashSet();
-            foreach (var entry in new[] { "**/bin/","**/obj/","checkpoints/","artifacts/",".claude/settings.local.json","Thumbs.db","desktop.ini","__pycache__/" })
+            foreach (var entry in new[] { "**/bin/","**/obj/","checkpoints/","artifacts/",".claude/","Thumbs.db","desktop.ini","__pycache__/","CLAUDE.md","docs/ai/","docs/goals/","scripts/agent/" })
                 Check(ignore.Contains(entry),".gitignore lists " + entry);
             foreach (var draft in new[] { "workflows/CodeQL.yml","workflows/build.yml","dependabot.yml","README.md" })
                 Check(File.Exists(Path.Combine(Root,"publish","github",draft)),"draft kept in publish/github: " + draft);

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.802.0
+- Plan global, Verify : Demande : retirer du dépôt le contenu fait pour l'agent IA. CLAUDE.md, .claude/ (réglages, procédure), docs/ai/ (règles, état, objectif), docs/goals/ (fiches d'objectifs) et scripts/agent/ ne sont plus suivis par git et sont ignorés ; ils restent sur le disque de l'auteur. Le README et l'index des documents renvoient au plan global pour l'état et la validation en jeu. L'historique git n'est pas réécrit. Aucun changement du plugin.
+- Tests : NoAgentFiles802Tests. Verify.ps1 (agent) : 1383/1383, 0 avertissement, 0 erreur ; DLL 0.802.0.0. Non validé en jeu.
+### English
+- Request: remove the content made for the AI agent from the repository. CLAUDE.md, .claude/ (settings, procedure), docs/ai/ (rules, status, goal), docs/goals/ (goal sheets) and scripts/agent/ are no longer tracked and are ignored; they stay on the author's disk. The README and the documents' index point to the global plan for status and in-game validation. Git history is not rewritten. No change to the plugin.
+
 ## 0.801.0
 - Plan global, Verify : Lourdeur (X-01) : le journal montre encore la carte à 165–195 ms et le panneau d'atelier à 93–97 ms, environ toutes les cinq minutes, mais la ligne « Slow frame » ne gardait que les quatre plus gros morceaux, qui étaient les enveloppes (toutes les fenêtres, carte, mise en page, canevas) : les points de mesure de 0.791 n'apparaissaient jamais. Elle en garde maintenant dix. Mode développeur seulement, aucun changement visible. Non validé en jeu.
 - Tests : SlowParts801Tests. Verify.ps1 (agent) : 1382/1382, 0 avertissement, 0 erreur ; DLL 0.801.0.0. Non validé en jeu.
