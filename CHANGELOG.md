@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.744.0
+- Plan global, Verify : Clignotement de la liste de suivi, cause trouvée par le relevé de 0.743 : la lecture affichée des sacs était bonne, mais le calcul des stocks des listes lisait encore la lecture stricte, vide pendant 250 ms. La correction de 0.741 était tombée dans une autre fonction qui commençait par la même ligne. Corrigé, et le test vérifie cette fonction précise. Non validé en jeu.
+- Tests : ListBlink741Tests. Verify.ps1 (agent) : 1318/1318, 0 avertissement, 0 erreur ; DLL 0.744.0.0. Non validé en jeu.
+### English
+- Tracking list blink, cause found by the 0.743 logging: the shown bag reading was fine, but the stock counts of the lists still read the strict one, empty for 250 ms. The 0.741 fix had landed on another function beginning with the same line. Fixed, and the test checks that very function. Not validated in game.
+
 ## 0.743.0
 - Plan global, Verify : Le clignotement revient en 0.742 : la cause visée n'était pas la bonne. En mode développeur, le journal écrit maintenant ce que chaque rangement donnait au moment où un stock tombe à 0. Il note aussi les clics sur « Ouvrir dans Tensho » d'une alarme, signalé comme n'ouvrant rien. Aucun changement visible. Non validé en jeu.
 - Tests : ListBlink740Tests. Verify.ps1 (agent) : 1318/1318, 0 avertissement, 0 erreur ; DLL 0.743.0.0. Non validé en jeu.

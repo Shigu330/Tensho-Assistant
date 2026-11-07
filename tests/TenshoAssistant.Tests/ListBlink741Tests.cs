@@ -8,7 +8,11 @@ internal static class ListBlink741Tests
     [
         ("List blink: stock counts read the last reading; the bag sort still reads only a sure one",() =>
         {
-            Check(Read("MainWindow.Items.cs").Contains("var live = inventory.Shown;"),"counts");
+            var items=Read("MainWindow.Items.cs");
+            var refresh=items[items.IndexOf("private void RefreshRecipeHoldingsCache()")..];
+            refresh=refresh[..refresh.IndexOf("recipeHoldingsLive = live;")];
+            // 0.744: the first fix landed on another function that began with the same line; this one feeds the lists and panels.
+            Check(refresh.Contains("var live = inventory.Shown;") && !refresh.Contains("inventory.Current"),"lists and panels");
             foreach(var file in new[]{"MainWindow.SortPreview.cs","MainWindow.InventorySortButton.cs"})
                 Check(!Read(file).Contains("inventory.Shown"),file+": what acts never reads the display copy");
         }),

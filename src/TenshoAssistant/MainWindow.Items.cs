@@ -631,7 +631,8 @@ internal sealed partial class MainWindow
 
     private void RefreshRecipeHoldingsCache()
     {
-        var live = inventory.Current;
+        // 0.744 (user report, found by the « List zero » line of 0.743): the counts of lists and panels; 0.741 had put this on the item sheet's stock view instead.
+        var live = inventory.Shown;
         var bankState = bank.State;
         var character = bankBridge.State.CharacterId;
         if (ReferenceEquals(recipeHoldingsLive, live) && ReferenceEquals(recipeHoldingsBank, bankState)
