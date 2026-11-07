@@ -1330,6 +1330,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.844) Mor Dhona, quête de cuisinier : flèche vers le bas sur l'icône et la zone plus basse ; Carte › Alentours : le réglage.
 
+- [ ] (0.845) Journal, quête de cuisinier à Mor Dhona, « Carte » : la zone orange remplit la vue.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

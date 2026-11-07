@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.845.0
+- Plan global, Verify : Demande (X-68), précisée : depuis le journal, la carte de Tensho doit zoomer sur la zone de la quête. Jusqu'ici elle la centrait en gardant le zoom (demande de la 0.637). Maintenant, une quête qui a une zone est zoomée pour la montrer entière, sur 60 % de la vue ; une quête sans zone garde le zoom, comme avant. Non validé en jeu.
+- Tests : QuestAreaZoom845Tests. Verify.ps1 (agent) : 1429/1429, 0 avertissement, 0 erreur ; DLL 0.845.0.0. Non validé en jeu.
+### English
+- Request (X-68), clarified: from the journal, Tensho's map must zoom on the quest's area. Until now it centred it and kept the zoom (0.637 request). A quest with an area is now zoomed to show it whole, over 60 % of the view; a quest without one keeps the zoom, as before. Not validated in game.
+
 ## 0.844.0
 - Plan global, Verify : Demande (X-67) : sur la carte de Tensho, une flèche dit qu'une cible est plus haut ou plus bas, comme sur la carte du jeu. La capture montre que le jeu ne garde pas cette flèche dans ses marqueurs (même drapeau à la hauteur du joueur et 38 yalms plus bas) : sa carte compare les hauteurs au dessin. Tensho fait de même : une flèche orange en bas à droite des icônes de quête, d'événement et d'ALÉA plus hautes ou plus basses que vous. Le seuil est un réglage de Tensho (10 yalms par défaut, de 2 à 50), pas un chiffre du jeu, qui n'est pas connu. La capture de développeur n'écrit plus une ligne toutes les demi-secondes. Non validé en jeu.
 - Tests : HeightArrows844Tests. Verify.ps1 (agent) : 1428/1428, 0 avertissement, 0 erreur ; DLL 0.844.0.0. Non validé en jeu.

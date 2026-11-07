@@ -26,5 +26,7 @@ public static class MapProjection
     {var scale=Scale(map.SizeFactor);return new((coordinate.X-1)*TextureSize*scale/41f,(coordinate.Y-1)*TextureSize*scale/41f);}
     public static bool OnMap(Vector2 pixel)=>pixel.X>=0 && pixel.Y>=0 && pixel.X<=TextureSize && pixel.Y<=TextureSize;
     /// <summary>Zoom kept between 0.15× and 4× of the 2048-pixel texture.</summary>
+    /// <summary>0.845 (X-68): the zoom at which an area of this radius (texture pixels) fills 60 % of the canvas's smaller side; 0 when there is no area.</summary>
+    public static float AreaZoom(float canvas,float radiusPixels)=>radiusPixels<=0 || canvas<=0 ? 0:ClampZoom(canvas*0.6f/(2*radiusPixels));
     public static float ClampZoom(float zoom)=>Math.Clamp(float.IsFinite(zoom) ? zoom:1,0.15f,4f);
 }
