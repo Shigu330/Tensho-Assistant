@@ -1283,7 +1283,8 @@ internal sealed partial class MainWindow
                 if(MapHeight.Arrow(item.Height,playerHeight,settings.HeightArrowYalms) is var arrow and not 0
                    && textures.GetFromGame(MapHeight.ChevronTexture).TryGetWrap(out var chevron,out _) && chevron is not null)
                 {
-                    var side=Math.Max(10,item.Size*0.75f);var centre=item.At+new Vector2(0,item.Size*0.3f);
+                    // 0.851 (X-71, user capture: « a little smaller »): 55 % of the icon, under its middle.
+                    var side=Math.Max(8,item.Size*0.55f);var centre=item.At+new Vector2(0,item.Size*0.35f);
                     var (from,to)=MapHeight.ChevronUv(arrow);
                     draw.AddImage(chevron.Handle,centre-new Vector2(side/2),centre+new Vector2(side/2),from,to);
                 }
