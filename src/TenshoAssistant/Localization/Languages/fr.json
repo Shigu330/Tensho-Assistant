@@ -3200,6 +3200,8 @@
     "PlayerIconScale": "Taille de ma position",
     "ViewConeScale": "Longueur du cône de vision",
     "ViewConeOpacity": "Opacité du cône de vision",
+    "HideUndiscovered": "Parties non découvertes vierges",
+    "HideUndiscoveredHelp": "Les parties d'une carte que vous n'avez pas encore découvertes sont dessinées en parchemin vierge, comme sur la carte du jeu (lu dans le jeu).\nPar défaut : activé.",
     "ShowFixedIconsHelp": "Affiche les icônes fixes de la carte du jeu : éthérites, boutiques, guildes, portes de zone…\nPar défaut : activé.",
     "TeleportOnClickHelp": "Un clic sur une éthérite propose de s'y téléporter, avec le coût lu dans la liste de téléportation du jeu.\nPar défaut : activé.",
     "ShowPlaceNamesHelp": "Affiche les noms des lieux de la zone, comme sur la carte du jeu.\nPar défaut : activé.",

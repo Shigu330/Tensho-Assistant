@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.803.0
+- Plan global, Verify : P11 (demande) : les parties d'une carte pas encore découvertes sont dessinées en parchemin vierge, comme sur la carte du jeu. La pièce qui manquait était dans le fichier du jeu lui-même : sa texture de découverte est une grille de 4×3 cases, chacune la carte entière au 1/16, une région par canal de couleur ; vérifié en comptant (l'Héritage retrouvé : 30 régions couvrent 97 % de la zone sans chevauchement). L'état de chaque région est lu dans les tables du jeu, sans appeler de fonction ; l'image est construite hors du dessin. Réglage « Parties non découvertes vierges », activé. Non validé en jeu.
+- Tests : MapDiscovery803Tests. Verify.ps1 (agent) : 1387/1387, 0 avertissement, 0 erreur ; DLL 0.803.0.0. Non validé en jeu.
+### English
+- P11 (request): the parts of a map not discovered yet are drawn as blank parchment, like the game's map. The missing piece was in the game's file itself: its discovery texture is a grid of 4×3 cells, each the whole map at 1/16, one region per colour channel; checked by counting (Heritage Found: 30 regions cover 97% of the zone without overlap). Each region's state is read from the game's tables, no function called; the image is built off the frame. Setting « Undiscovered parts blank », on. Not validated in game.
+
 ## 0.802.0
 - Plan global, Verify : Demande : retirer du dépôt le contenu fait pour l'agent IA. CLAUDE.md, .claude/ (réglages, procédure), docs/ai/ (règles, état, objectif), docs/goals/ (fiches d'objectifs) et scripts/agent/ ne sont plus suivis par git et sont ignorés ; ils restent sur le disque de l'auteur. Le README et l'index des documents renvoient au plan global pour l'état et la validation en jeu. L'historique git n'est pas réécrit. Aucun changement du plugin.
 - Tests : NoAgentFiles802Tests. Verify.ps1 (agent) : 1383/1383, 0 avertissement, 0 erreur ; DLL 0.802.0.0. Non validé en jeu.

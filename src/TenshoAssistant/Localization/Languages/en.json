@@ -3200,6 +3200,8 @@
     "PlayerIconScale": "My position size",
     "ViewConeScale": "View cone length",
     "ViewConeOpacity": "View cone opacity",
+    "HideUndiscovered": "Undiscovered parts blank",
+    "HideUndiscoveredHelp": "The parts of a map you have not discovered yet are drawn as blank parchment, like the game's map (read from the game).\nDefault: on.",
     "ShowFixedIconsHelp": "Shows the game map's fixed icons: aetherytes, shops, guilds, zone exits…\nDefault: on.",
     "TeleportOnClickHelp": "Clicking an aetheryte offers to teleport there, with the cost read from the game's teleport list.\nDefault: on.",
     "ShowPlaceNamesHelp": "Shows the zone's place names, as on the game map.\nDefault: on.",

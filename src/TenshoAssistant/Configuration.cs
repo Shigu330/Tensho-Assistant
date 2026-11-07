@@ -143,6 +143,8 @@ public sealed class QuestListSettings
 public sealed class MapViewSettings
 {
     public bool ShowFixedIcons { get; set; } = true;
+    /// <summary>P11 (0.803): the parts of the map not discovered yet drawn as blank parchment, like the game's map.</summary>
+    public bool HideUndiscovered { get; set; } = true;
     public bool ShowPlaceNames { get; set; } = true;
     // 0.596 (P12): the names the game writes beside some icons.
     public bool ShowIconNames { get; set; } = true;

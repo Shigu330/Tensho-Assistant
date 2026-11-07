@@ -32,7 +32,7 @@ public sealed record MapLiveState(uint TerritoryId,uint MapId,Vector3 Position,f
     IReadOnlyDictionary<uint,MapFlightState>? Flights=null,IReadOnlyList<MapEventMarker>? Events=null,bool InCombat=false,bool InDuty=false,
     IReadOnlyList<MapObjectMarker>? Objects=null,IReadOnlyList<MapFateMarker>? Fates=null,IReadOnlyList<MapPartyMarker>? Party=null,
     IReadOnlySet<uint>? UnlockedCurrents=null,IReadOnlySet<uint>? Sightseen=null,int SightseeingUnlock=-1,int SightseeingUnlockEx=-1,string Area="",string SubArea="",
-    IReadOnlyList<MapMonster>? Monsters=null);
+    IReadOnlyList<MapMonster>? Monsters=null,uint DiscoveryMapId=0,IReadOnlyList<int>? Undiscovered=null);
 
 // Party member in the same territory as the player (not the player): job icon = 62100 + ClassJob row.
 public sealed record MapPartyMarker(string Name,uint Job,int Level,Vector3 Position);
@@ -46,6 +46,40 @@ internal sealed class MapLiveReader : IDisposable
     private IReadOnlyDictionary<uint,MapFlightState>? flights;private int removeFlag;
     private IReadOnlyList<MapEventMarker> events=[];private DateTimeOffset eventsAt;
     private IReadOnlyList<MapObjectMarker> nearby=[];private IReadOnlyList<MapMonster> monsters=[];
+    // P11 (0.803): the map whose discovery the window wants, and what was read for it.
+    private int discoveryWanted;private uint discoveryMap;private IReadOnlyList<int>? undiscovered;
+    private Dictionary<uint,(uint Flag,int Index,bool Small)>? discoveryRows;
+    public void WantDiscovery(uint mapId)=>Volatile.Write(ref discoveryWanted,(int)mapId);
+    /// <summary>A game texture's pixels (BGRA), read off the frame; null when missing or unreadable.</summary>
+    public (byte[] Bgra,int Width,int Height)? ReadTexture(string path)
+    {
+        try{return placeData.GetFile<Lumina.Data.Files.TexFile>(path) is { } tex ? (tex.ImageData,tex.Header.Width,tex.Header.Height):null;}
+        catch(Exception error){log.Warning(error,"Map texture {0} unreadable.",path);return null;}
+    }
+    // P11 (0.803): the game keeps each region's state in two tables (16 or 32 regions a map); the Map sheet gives the table (DiscoveryArrayByte: the
+    // 16 one, inferred from Central Shroud 13 regions / Heritage Found 30) and the row (DiscoveryIndex). Fields read, no function called.
+    private unsafe IReadOnlyList<int>? ReadUndiscovered(uint mapId)
+    {
+        discoveryRows??=placeData.GetExcelSheet<Lumina.Excel.Sheets.Map>().Where(row=>row.DiscoveryFlag!=0)
+            .ToDictionary(row=>row.RowId,row=>(row.DiscoveryFlag,(int)row.DiscoveryIndex,row.DiscoveryArrayByte));
+        if(!discoveryRows.TryGetValue(mapId,out var row))return null;
+        var manager=FFXIVClientStructs.FFXIV.Client.Game.MapDiscoveryManager.Instance();
+        if(manager==null)return null;
+        var found=new bool[32];var size=0;
+        if(row.Small)
+        {
+            var tables=manager->MapsWithUpTo16Regions;
+            if(row.Index<0 || row.Index>=tables.Length)return null;
+            var table=tables[row.Index].Discoveries;size=table.Length;for(var region=0;region<size && region<32;region++)found[region]=table[region];
+        }
+        else
+        {
+            var tables=manager->MapsWithUpTo32Regions;
+            if(row.Index<0 || row.Index>=tables.Length)return null;
+            var table=tables[row.Index].Discoveries;size=table.Length;for(var region=0;region<size && region<32;region++)found[region]=table[region];
+        }
+        return MapDiscovery.Undiscovered(row.Flag,region=>region<size ? found[region]:null);
+    }
     private readonly ICondition condition;private readonly IFateTable fateTable;private readonly IPartyList party;
     private IReadOnlyList<MapPartyMarker> partyMarkers=[];private IReadOnlySet<uint>? unlockedCurrents;private IReadOnlySet<uint>? sightseen;
     private readonly uint[] allCurrents;private readonly uint[] adventureRows;private int loggedVistas=-1,loggedNative=-1;private int logUnlock=-1,logUnlockEx=-1;
@@ -157,6 +191,8 @@ internal sealed class MapLiveReader : IDisposable
             {
                 try{flights=ReadFlights();Read("flights");}catch(Exception error){Failed("flights",error);}
                 try{(unlockedCurrents,sightseen)=ReadCollected();Read("collected");}catch(Exception error){Failed("collected",error);}
+                try{var wanted=(uint)Volatile.Read(ref discoveryWanted);undiscovered=wanted==0 ? null:ReadUndiscovered(wanted);discoveryMap=wanted;Read("discovery");}
+                catch(Exception error){undiscovered=null;Failed("discovery",error);}
                 flightAt=now.AddSeconds(2);
             }
             if(now>=eventsAt)
@@ -178,7 +214,7 @@ internal sealed class MapLiveReader : IDisposable
             try{ReadPlace();Read("place");}catch(Exception error){areaName=subAreaName="";Failed("place",error);}
             var inCombat=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             var inDuty=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty56];
-            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName,monsters));
+            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName,monsters,discoveryMap,undiscovered));
         }
         catch(Exception error){Volatile.Write(ref state,null);retryAt=now.AddSeconds(5);log.Warning(error,"Map position unavailable; retry in five seconds.");}
     }

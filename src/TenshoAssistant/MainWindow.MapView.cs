@@ -572,6 +572,7 @@ internal sealed partial class MainWindow
             if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionGame"),ImGuiTreeNodeFlags.DefaultOpen))
             {
                 changed|=SettingBox("MapView.ShowFixedIcons",settings.ShowFixedIcons,value=>settings.ShowFixedIcons=value,MapDefaults.ShowFixedIcons);
+                changed|=SettingBox("MapView.HideUndiscovered",settings.HideUndiscovered,value=>settings.HideUndiscovered=value,MapDefaults.HideUndiscovered);
                 changed|=SettingBox("MapView.TeleportOnClick",settings.TeleportOnClick,value=>settings.TeleportOnClick=value,MapDefaults.TeleportOnClick);
                 changed|=SettingBox("MapView.ChatLinks",settings.ChatLinks,value=>settings.ChatLinks=value,MapDefaults.ChatLinks);
                 changed|=SettingBox("MapView.ShowPlaceNames",settings.ShowPlaceNames,value=>settings.ShowPlaceNames=value,MapDefaults.ShowPlaceNames);
@@ -1113,7 +1114,12 @@ internal sealed partial class MainWindow
             draw.AddRectFilled(origin,origin+size,ImGui.GetColorU32(UI.FfxivTheme.Background with{W=opacity}));
             // 0.328 (map audit #25, R-14): a texture that failed to load says so instead of « Loading map… » forever.
             if(textures.GetFromGame(map.TexturePath).TryGetWrap(out var texture,out var textureFailure) && texture is not null)
+            {
                 draw.AddImage(texture.Handle,origin+mapPan,origin+mapPan+new Vector2(MapProjection.TextureSize*mapZoom),Vector2.Zero,Vector2.One,ImGui.GetColorU32(new Vector4(1,1,1,opacity)));
+                // P11 (0.803): the parts not discovered yet, blank like the game's map.
+                if(MapDiscoveryImage(map,live) is { } hidden)
+                    draw.AddImage(hidden.Handle,origin+mapPan,origin+mapPan+new Vector2(MapProjection.TextureSize*mapZoom),Vector2.Zero,Vector2.One,ImGui.GetColorU32(new Vector4(1,1,1,opacity)));
+            }
             else draw.AddText(origin+new Vector2(8),ImGui.GetColorU32(UI.FfxivTheme.TextMuted),localization.Get(textureFailure is not null ? "MapView.Unavailable":"MapView.Loading"));
             string? tooltip=null;MapLocalGatheringPoint? tooltipPoint=null;(MapLocalPosition Vista,bool? Done)? sightseeingTip=null;
             // Icons follow the map zoom exactly (32 px at 100 %, 0.113 at the user's request); 4 px floor only so they never vanish.

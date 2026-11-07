@@ -42,3 +42,47 @@ foreach(var map in maps)
     }
     break;
 }
+
+// Third pass (P11, 2026-11-07): PNG copies to look at: d.tex as is, the map and the parchment scaled to 512.
+if(args.Length>3 && args[2]=="--png")
+foreach(var map in maps)
+{
+    var name=map.PlaceName.ValueNullable?.Name.ExtractText() ?? "";
+    if(!name.Contains(args[1],StringComparison.OrdinalIgnoreCase))continue;
+    var id=map.Id.ExtractText();var flat=id.Replace("/","");
+    foreach(var (suffix,scale) in new[]{("d",1),("_m",4),("m_m",4)})
+    {
+        var path=$"ui/map/{id}/{flat}{suffix}.tex";
+        if(!game.FileExists(path))continue;
+        var tex=game.GetFile<Lumina.Data.Files.TexFile>(path)!;
+        var data=tex.ImageData;int w=tex.Header.Width,h=tex.Header.Height;int ow=w/scale,oh=h/scale;
+        var rgb=new byte[ow*oh*3];
+        for(var y=0;y<oh;y++)for(var x=0;x<ow;x++){var i=((y*scale)*w+x*scale)*4;var o=(y*ow+x)*3;rgb[o]=data[i+2];rgb[o+1]=data[i+1];rgb[o+2]=data[i];}
+        Png.Write(Path.Combine(args[3],$"{flat}{suffix}.png"),ow,oh,rgb);
+        Console.WriteLine($"PNG {flat}{suffix} {ow}x{oh}");
+    }
+    break;
+}
+
+static class Png
+{
+    public static void Write(string path,int w,int h,byte[] rgb)
+    {
+        using var file=File.Create(path);
+        file.Write([137,80,78,71,13,10,26,10]);
+        void Chunk(string type,byte[] body)
+        {
+            var len=BitConverter.GetBytes(body.Length);if(BitConverter.IsLittleEndian)Array.Reverse(len);file.Write(len);
+            var t=System.Text.Encoding.ASCII.GetBytes(type);file.Write(t);file.Write(body);
+            var crc=Crc(t.Concat(body).ToArray());var c=BitConverter.GetBytes(crc);if(BitConverter.IsLittleEndian)Array.Reverse(c);file.Write(c);
+        }
+        var head=new byte[13];void Be(int at,int v){head[at]=(byte)(v>>24);head[at+1]=(byte)(v>>16);head[at+2]=(byte)(v>>8);head[at+3]=(byte)v;}
+        Be(0,w);Be(4,h);head[8]=8;head[9]=2;
+        Chunk("IHDR",head);
+        var raw=new MemoryStream();
+        using(var z=new System.IO.Compression.ZLibStream(raw,System.IO.Compression.CompressionLevel.Fastest,true))
+            for(var y=0;y<h;y++){z.WriteByte(0);z.Write(rgb,y*w*3,w*3);}
+        Chunk("IDAT",raw.ToArray());Chunk("IEND",[]);
+    }
+    static uint Crc(byte[] bytes){uint c=0xFFFFFFFF;foreach(var b in bytes){c^=b;for(var k=0;k<8;k++)c=(c&1)!=0 ? 0xEDB88320^(c>>1):c>>1;}return ~c;}
+}

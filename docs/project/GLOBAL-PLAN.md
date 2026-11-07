@@ -163,7 +163,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 |---|---|---|---|
 | ~~P6~~ fait en 0.644 | Coordonnées du personnage toujours visibles et distances | S | Coordonnées du drapeau sous son icône de bord de carte, pas dans un coin ; avec réglage. |
 | ~~P7~~ fait en 0.645 | Éthérites non harmonisées signalées et coût au survol | S |  |
-| P11 | Parties non découvertes masquées comme sur la carte du jeu | M | Avec réglage. Sonde du 2026-11-07 : fonction du jeu et atlas des régions trouvés ; il manque le placement des morceaux sur la carte : `docs/evidence/0.766-map-discovery.md` |
+| P11 | Parties non découvertes masquées comme sur la carte du jeu | M | Fait en 0.803 : `d.tex` est une grille de 4×3 cases, chacune la carte entière au 1/16, une région par canal ; parchemin sur les régions non découvertes, réglage « Parties non découvertes vierges » ; `docs/evidence/0.803-map-discovery-layout.md`. Avant : `docs/evidence/0.766-map-discovery.md` |
 | ~~P17~~ fait en 0.652 | Relevé du type de marqueur des mandats et de leurs zones | S | Le type ne dit rien : c'est l'icône 60492 ou le nom du mandat. |
 | ~~P22~~ fait en 0.665 pour les variantes 1 et 5 | Noms des variantes d'icônes de quête (71141 / 71151) | S | Les autres gardent leur numéro ; à confirmer en jeu. |
 
@@ -283,6 +283,27 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-39 | Dresseur : monstres proches du bestiaire du dresseur, même affichage et mêmes réglages | Après X-34 ; données d'abord |
 | X-40 | Monstres proches : autres usages à proposer, et des réglages cohérents à l'endroit approprié (carte, page concernée) pour chaque usage | Après X-34 |
 | X-41 | Monstres proches : ceux qui lâchent un objet de collection qui manque (monture, mascotte, orchestrion), si les données de butin le disent | Fait en 0.800 : gemme sur la carte, au choix au-dessus de la tête ; réglages dans la carte et sur la page Collections (montures, mascottes, orchestrion) ; MobDrop de LuminaSupplemental |
+
+## Rappels de relevés en jeu, par moment
+
+Consigne de l'utilisateur (2026-11-07) : les relevés se font en jouant ; au moment venu, il demande « rappelle-moi » et l'agent donne les étapes de ce moment-là. Mode développeur activé pour tous (le journal porte les lignes « Reading … »).
+
+| Quand | Quoi faire | Ligne lue au journal | Point |
+|---|---|---|---|
+| Carte Tensho ouverte, en jouant | Rien de plus, laisser tourner quelques minutes | « Slow frame » (10 morceaux) | X-01 |
+| Une alarme sonne dans le chat | Clic droit sur la ligne de l'objet | « Context menu opened » | X-03 |
+| Mandat de combat | L'accepter, le commencer, aller vers ses cibles | « Reading monsterEvents » | X-37 |
+| Quête « vaincre X » | Aller vers les monstres de la quête | « Reading monsterEvents » | X-40 |
+| Dresseur, près d'un monstre capturable | Le cibler, sans rien faire d'autre | « Reading monsterEvents » (et capture d'écran du bestiaire) | X-39 |
+| Un gain de gils sans fenêtre (« +1 000 ») | Noter l'heure | « Gil other » | X-18 |
+| Jardin, timer fini | Récolter | messages du jardin | #36 |
+| L'aéronef revient | Ouvrir le panneau de voyage | relevé du voyage | T26 |
+| Loterie immobilière | Ouvrir la fenêtre de la loterie | relevé de la loterie | N-04 |
+| Île sanctuaire | Ressources et atelier de l'île | « Reading island », « Reading islandAgenda » | N-07, N-10 |
+| Pêche | Quelques prises | relevé de pêche | C30 |
+| Rang S | Être dans sa zone | conditions des rangs S | N-12 |
+| JcJ ou contenu classé, en tout dernier | Entrer : Tensho doit se couper | coupure compétitive | #39 |
+| Monstres proches (0.795–0.800) | Près de monstres de vos listes, du bestiaire, d'un ALÉA ; en mage bleu après « Lire les sorts manquants » | carte et icônes | X-35 à X-41 |
 
 ## Retenu pour plus tard
 
