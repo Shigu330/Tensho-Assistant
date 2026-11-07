@@ -166,6 +166,9 @@ public sealed class MapViewSettings
     public bool ShowHuntLogMonsters { get; set; } = true;
     /// <summary>0.797 (X-37): nearby monsters of a running FATE.</summary>
     public bool ShowFateMonsters { get; set; } = true;
+    /// <summary>0.798 (X-38): nearby monsters that teach a blue magic spell not learned yet; as Blue Mage only, unless BlueMageMonstersAlways.</summary>
+    public bool ShowBlueMageMonsters { get; set; } = true;
+    public bool BlueMageMonstersAlways { get; set; }
     public bool GatheringLabels { get; set; } = true;
     // 0.535 (user request): the map without its title bar; off by default.
     public bool HideTitleBar { get; set; }

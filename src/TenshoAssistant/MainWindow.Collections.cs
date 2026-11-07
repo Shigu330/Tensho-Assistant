@@ -112,7 +112,7 @@ internal sealed partial class MainWindow
         }
         DrawCollectionSourceFilter(kind);
         // 0.395 (user request): the blue magic list sorted by the lowest level of the monsters that teach each spell (wiki, read on opening).
-        if(blueMagic)DrawBlueSpellOrder();
+        if(blueMagic){DrawBlueSpellOrder();DrawBlueSpellNearby();}
         var blueOrder=blueMagic ? blueSpellOrder:0;var blueRevision=blueMagic && blueSpellOrder!=0 ? BlueSpellIndex?.Revision ?? 0:0;
         var sourceFilter=HasSourceFilter(kind) ? collectionSourceFilter:-1;
         var musicCategory=kind==CollectionKind.Orchestrion ? orchestrionCategoryFilter:null;

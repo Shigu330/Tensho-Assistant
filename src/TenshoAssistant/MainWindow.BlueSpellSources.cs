@@ -13,6 +13,39 @@ internal sealed partial class MainWindow
     private int blueSpellOrder;
     private int? BlueSpellLevel(int number)=>BlueSpellIndex?.Get(number)?.MonsterLevel;
 
+    // 0.798 (X-38, user request): the monsters of every spell, for the nearby monsters (map now, icons above their heads next); read on a click only.
+    private void DrawBlueSpellNearby()
+    {
+        if(BlueSpellNearby is not { } index)return;
+        var spells=collections.State.Entries.Where(entry=>entry.Kind==TenshoAssistant.Collections.CollectionKind.BlueMagic).Select(entry=>entry.Id).ToArray();
+        index.LoadCached(spells);
+        BoolSetting("MapView.ShowBlueMageMonsters","BlueSpellSources.NearbyTip",()=>configuration.MapView.ShowBlueMageMonsters,value=>configuration.MapView.ShowBlueMageMonsters=value,c=>c.MapView.ShowBlueMageMonsters);
+        if(!configuration.MapView.ShowBlueMageMonsters)return;
+        ImGui.Indent();
+        try
+        {
+            BoolSetting("MapView.BlueMageMonstersAlways","BlueSpellSources.AlwaysTip",()=>configuration.MapView.BlueMageMonstersAlways,value=>configuration.MapView.BlueMageMonstersAlways=value,c=>c.MapView.BlueMageMonstersAlways);
+            var missing=spells.Length-index.Known;
+            if(index.Running)
+            {
+                var (done,asked,failed)=index.Progress;
+                ImGui.TextDisabled(localization.Format("BlueSpellSources.NearbyReading",done,asked,failed));
+            }
+            else
+            {
+                ImGui.TextDisabled(localization.Format("BlueSpellSources.NearbyKnown",index.Known,spells.Length));
+                if(missing>0)
+                {
+                    ImGui.SameLine();
+                    if(SourceButton(localization.Format("BlueSpellSources.NearbyFetch",missing),configuration.CommunityWiki,true))index.FetchMissing(spells);
+                    Tip("BlueSpellSources.NearbyFetchTip");
+                }
+                if(index.Error=="disabled")ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
+            }
+        }
+        finally{ImGui.Unindent();}
+    }
+
     // Above the spell list: the order (number, or the lowest teaching monster's level) and how far the wiki reading is.
     private void DrawBlueSpellOrder()
     {

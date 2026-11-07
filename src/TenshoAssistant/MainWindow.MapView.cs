@@ -169,6 +169,7 @@ internal sealed partial class MainWindow
         MonsterNoteKind.List=>settings.ShowListMonsters,
         MonsterNoteKind.HuntLog=>settings.ShowHuntLogMonsters,
         MonsterNoteKind.Fate=>settings.ShowFateMonsters,
+        MonsterNoteKind.BlueSpell=>settings.ShowBlueMageMonsters,
         _=>true,
     };
     private void MeasureMap(string part,Action draw)
@@ -549,6 +550,7 @@ internal sealed partial class MainWindow
             changed|=SettingBox("MapView.ShowListMonsters",settings.ShowListMonsters,value=>settings.ShowListMonsters=value);
             changed|=SettingBox("MapView.ShowHuntLogMonsters",settings.ShowHuntLogMonsters,value=>settings.ShowHuntLogMonsters=value);
             changed|=SettingBox("MapView.ShowFateMonsters",settings.ShowFateMonsters,value=>settings.ShowFateMonsters=value);
+            changed|=SettingBox("MapView.ShowBlueMageMonsters",settings.ShowBlueMageMonsters,value=>settings.ShowBlueMageMonsters=value);
             changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value);
             if(changed)
             {
@@ -608,6 +610,8 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.ShowListMonsters",settings.ShowListMonsters,value=>settings.ShowListMonsters=value,MapDefaults.ShowListMonsters);
                 changed|=SettingBox("MapView.ShowHuntLogMonsters",settings.ShowHuntLogMonsters,value=>settings.ShowHuntLogMonsters=value,MapDefaults.ShowHuntLogMonsters);
                 changed|=SettingBox("MapView.ShowFateMonsters",settings.ShowFateMonsters,value=>settings.ShowFateMonsters=value,MapDefaults.ShowFateMonsters);
+                changed|=SettingBox("MapView.ShowBlueMageMonsters",settings.ShowBlueMageMonsters,value=>settings.ShowBlueMageMonsters=value,MapDefaults.ShowBlueMageMonsters);
+                changed|=SettingBox("MapView.BlueMageMonstersAlways",settings.BlueMageMonstersAlways,value=>settings.BlueMageMonstersAlways=value,MapDefaults.BlueMageMonstersAlways);
                 changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
                 var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelMinZoom"),ref labelMinimum,0,200,"%.0f %%")){settings.GatheringLabelMinZoom=labelMinimum/100;changed=true;}
@@ -1279,7 +1283,7 @@ internal sealed partial class MainWindow
                 }
             // 0.795 (X-35, user request): nearby monsters that drop an item the tracking lists still need.
             // 0.796 (X-36): one layer for every reason; one icon per monster, the first reason's, and every reason on hover.
-            if((settings.ShowListMonsters || settings.ShowHuntLogMonsters || settings.ShowFateMonsters) && live?.Monsters is { Count:>0 } monsters && live.MapId==map.MapId)
+            if((settings.ShowListMonsters || settings.ShowHuntLogMonsters || settings.ShowFateMonsters || settings.ShowBlueMageMonsters) && live?.Monsters is { Count:>0 } monsters && live.MapId==map.MapId)
             {
                 RefreshNearbyMonsters();
                 foreach(var monster in monsters)
@@ -1295,6 +1299,7 @@ internal sealed partial class MainWindow
                     {
                         MonsterNoteKind.HuntLog=>(FontAwesomeIcon.BookOpen,new Vector4(0.55f,0.80f,0.98f,1)),
                         MonsterNoteKind.Fate=>(FontAwesomeIcon.Star,new Vector4(0.95f,0.85f,0.40f,1)),
+                        MonsterNoteKind.BlueSpell=>(FontAwesomeIcon.HatWizard,new Vector4(0.40f,0.60f,1f,1)),
                         _=>(FontAwesomeIcon.Paw,new Vector4(0.98f,0.55f,0.35f,1)),
                     };
                     draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);

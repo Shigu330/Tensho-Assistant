@@ -5,7 +5,7 @@ using TenshoAssistant.Monsters;
 namespace TenshoAssistant;
 
 /// <summary>0.796: why a nearby monster is shown; the first note picks its map icon.</summary>
-internal enum MonsterNoteKind { List, HuntLog, Fate }
+internal enum MonsterNoteKind { List, HuntLog, Fate, BlueSpell }
 internal sealed record MonsterNote(MonsterNoteKind Kind,string Text);
 
 // 0.795 (X-34, X-35), 0.796 (X-36), user requests: what each nearby monster means for the player, worked out once a second, drawn every frame.
@@ -49,9 +49,21 @@ internal sealed partial class MainWindow
                 if(missing.TryGetValue(id,out var rows))
                     foreach(var (entry,killed,neededKills) in rows)Note(id,MonsterNoteKind.HuntLog,localization.Format("MapView.MonsterHuntLog",entry,killed,neededKills));
         }
+        // X-38: the spells a monster teaches that are not learned yet; as Blue Mage, or always when chosen.
+        if(configuration.MapView.ShowBlueMageMonsters && (configuration.MapView.BlueMageMonstersAlways || characterStats.State.JobId==BlueMageJob) && BlueSpellNearby is { } blue)
+        {
+            var spells=collections.State.Entries.Where(entry=>entry.Kind==TenshoAssistant.Collections.CollectionKind.BlueMagic).ToArray();
+            blue.LoadCached(spells.Select(entry=>entry.Id).ToArray());
+            var notLearned=spells.Where(entry=>!entry.ConfirmedUnlocked).ToDictionary(entry=>entry.Id,entry=>entry.Name);
+            foreach(var id in ids)
+                if(blue.SpellsOf(id).Where(notLearned.ContainsKey).Select(spell=>notLearned[spell]).ToArray() is { Length:>0 } taught)
+                    Note(id,MonsterNoteKind.BlueSpell,localization.Format("MapView.MonsterBlueSpell",string.Join(", ",taught)));
+        }
         nearbyMonsterNotes=notes.ToDictionary(pair=>pair.Key,pair=>(IReadOnlyList<MonsterNote>)pair.Value);
     }
     // 0.797 (X-37): a FATE's monster is told per monster, not per name: the same monster outside the FATE is not part of it.
+    internal const uint BlueMageJob=36;
+    internal BlueSpellMonsterIndex? BlueSpellNearby { get; set; }
     private IReadOnlyList<MonsterNote> MonsterNotes(MapMonster monster,IReadOnlyList<MapFateMarker>? fates)
     {
         var byName=nearbyMonsterNotes.TryGetValue(monster.NameId,out var notes) ? notes:[];

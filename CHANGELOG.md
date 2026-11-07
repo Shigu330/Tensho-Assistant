@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.798.0
+- Plan global, Verify : Demande (X-38), première partie : les monstres proches qui apprennent une magie bleue que vous n'avez pas sont marqués d'un chapeau de magicien sur la carte, les sorts au survol. Le jeu ne relie aucun sort à un monstre : la source est le wiki, déjà lu sort par sort ; la page Magie bleue a maintenant un bouton qui lit les sorts manquants, une page toutes les trois secondes, gardées sur le disque, rien sans ce clic. Les noms anglais du wiki sont reliés aux monstres du jeu par leur nom. Réglages : « Monstres pour le mage bleu » (carte et page Magie bleue) et « Même hors mage bleu », désactivé au départ. L'icône au-dessus de la tête vient ensuite. Non validé en jeu.
+- Tests : BlueNearby798Tests. Verify.ps1 (agent) : 1378/1378, 0 avertissement, 0 erreur ; DLL 0.798.0.0. Non validé en jeu.
+### English
+- Request (X-38), first part: nearby monsters that teach a blue magic spell you lack are marked with a wizard's hat on the map, the spells on hover. The game links no spell to a monster: the source is the wiki, already read spell by spell; the Blue magic page now has a button that reads the missing spells, one page every three seconds, kept on disk, nothing without that click. The wiki's English names are matched to the game's monsters by name. Settings: « Monsters for Blue Mage » (map and Blue magic page) and « Even when not Blue Mage », off at first. The icon above the head comes next. Not validated in game.
+
 ## 0.797.0
 - Plan global, Verify : Demande (X-37) : les monstres proches qui font partie d'un ALÉA en cours sont marqués d'une étoile sur la carte, avec le nom de l'ALÉA au survol (réglage « Monstres des ALÉA » dans la carte) ; un monstre du même nom hors de l'ALÉA n'est pas marqué. Pour les mandats, le lien entre un monstre et le mandat n'est pas encore connu : en mode développeur, l'événement de chaque monstre proche est noté au journal, à relever pendant un mandat de combat. Non validé en jeu.
 - Tests : FateMonsters797Tests. Verify.ps1 (agent) : 1376/1376, 0 avertissement, 0 erreur ; DLL 0.797.0.0. Non validé en jeu.

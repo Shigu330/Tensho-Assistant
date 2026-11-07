@@ -158,6 +158,13 @@ public sealed class Plugin : IDalamudPlugin
                 ()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,family:"wiki-blue-spells-2"){Enabled=()=>configuration.CommunityWiki};
             registrations.Register(()=>{},blueWiki.Dispose);
             mainWindow.BlueSpellWiki=blueWiki;
+            // 0.798 (X-38): the monsters that teach each spell, for the nearby monsters; English monster names matched to BNpcName rows once, off the frame.
+            var englishMonsters=new Lazy<IReadOnlyDictionary<string,uint[]>>(()=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>(Dalamud.Game.ClientLanguage.English)
+                .Select(row=>(Name:row.Singular.ExtractText().Trim(),Id:row.RowId)).Where(row=>row.Name.Length>0)
+                .GroupBy(row=>row.Name,StringComparer.OrdinalIgnoreCase).ToDictionary(group=>group.Key,group=>group.Select(row=>row.Id).ToArray(),StringComparer.OrdinalIgnoreCase));
+            var blueNearby=new Monsters.BlueSpellMonsterIndex(blueWiki,name=>englishMonsters.Value.TryGetValue(name,out var ids) ? ids:[],()=>configuration.CommunityWiki);
+            registrations.Register(()=>{},blueNearby.Dispose);
+            mainWindow.BlueSpellNearby=blueNearby;
             // 0.395 (user request): the wiki's spellbook table (one page for every spell) read when the Blue magic page opens, copy first.
             var blueIndex=new BlueSpellWikiIndex(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,()=>configuration.CommunityWiki);
             registrations.Register(()=>{},blueIndex.Dispose);
