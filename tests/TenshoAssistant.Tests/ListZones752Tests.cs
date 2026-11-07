@@ -21,7 +21,7 @@ internal static class ListZones752Tests
         ("By zone: only for what is gathered, behind a setting",() =>
         {
             var page=Read("MainWindow.ListPanels.cs");
-            Check(page.Contains("origin==ItemOrigin.Gathering && configuration.ListPanelsByZone"),"gathered only");
+            Check(page.Contains("if(!configuration.ListPanelsByZone || origins.FirstOrDefault(group=>group.Origin==ItemOrigin.Gathering)"),"gathered only, behind its setting");
         }),
     ];
 }

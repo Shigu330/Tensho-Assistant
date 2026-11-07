@@ -19,11 +19,13 @@ internal static class ZoneOrder757Tests
         ("Zone order: zones fold, priced from the game's teleport list, asked once a minute",() =>
         {
             var page=Read("MainWindow.ListPanels.cs");
-            Check(page.Contains("ImGui.TreeNodeEx($\"{name} ({zoneDone}/{inZone.Count}){price}###ListZone{key}{zone}\",ImGuiTreeNodeFlags.DefaultOpen)") && page.Contains("ImGui.TreePop();"),"folds");
+            Check(page.Contains("ImGui.TreeNodeEx($\"{group.Label} ({zoneDone}/{group.Lines.Length}){group.Note}###ListZone{key}{group.Id}\",ImGuiTreeNodeFlags.DefaultOpen)") && page.Contains("ImGui.TreePop();"),"folds");
             Check(page.Contains("now-listTeleportAsked<60000") && page.Contains("mapLive?.RefreshTeleportCosts();"),"priced");
             // 0.758 (X-13): timed points apart, first, folding, and only items that grow nowhere else.
-            Check(page.Contains("###ListZone{key}Timed\",ImGuiTreeNodeFlags.DefaultOpen)") && page.Contains("lines=lines.Except(timed).ToArray();"),"timed group");
+            Check(page.Contains("zones.Add(new(\"Timed\",localization.Get(\"ListPanels.TimedGroup\"),\"\",true,timed));") && page.Contains("var rest=gathered.Except(timed).ToArray();"),"timed group");
             Check(page.Contains("sources.All(source=>source.Timing.Kind==Gathering.GatheringScheduleKind.Limited)"),"timed only");
+            // 0.760 (X-01): worked out with the lines, never per frame; zones indexed once per catalogue.
+            Check(page.Contains("layout.At!=known.At || layout.Here!=here") && !page.Contains("catalog.Sources.Where(source=>source.Zone==zone)"),"not per frame");
         }),
     ];
 }

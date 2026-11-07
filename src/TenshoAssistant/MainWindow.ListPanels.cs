@@ -183,52 +183,58 @@ internal sealed partial class MainWindow
             foreach(var (item,needed) in known.Lines)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
             return;
         }
-        foreach(var origin in Enum.GetValues<ItemOrigin>())
+        // 0.760 (X-01, the slow-frame log: this panel held frames of 1.7 to 7.6 s, mostly the runtime collecting): the grouping is worked out with the lines,
+        // once a second, or when the zone changes; a frame only draws it.
+        var here=ListPanelZoneHere();
+        if(!listPanelLayouts.TryGetValue(key,out var layout) || layout.At!=known.At || layout.Here!=here)listPanelLayouts[key]=layout=ListLayoutOf(known.At,known.Lines,here);
+        foreach(var (origin,lines) in layout.Origins)
         {
-            if(!ListPanelOriginShown(origin))continue;
-            var lines=known.Lines.Where(line=>ListPanelOrigin(line.Item)==origin).ToArray();
-            if(lines.Length==0)continue;
             // 0.700 (user request): a long list folds by category; each panel remembers its own.
             var done=lines.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
             if(!ImGui.CollapsingHeader($"{localization.Get("ListPanels."+origin)} ({done}/{lines.Length})###ListPanel{key}{origin}",ImGuiTreeNodeFlags.DefaultOpen))continue;
-            // 0.752 (X-05, user request): what is gathered, by zone, the zone with the most first.
-            if(origin==ItemOrigin.Gathering && configuration.ListPanelsByZone)
+            if(origin!=ItemOrigin.Gathering || layout.Zones is null)
             {
-                // 0.757 (X-11, X-12, user request): each zone folds; the zone you stand in first, then the cheapest teleport.
-                RequestListTeleportCosts();
-                var here=ListPanelZoneHere();
-                // 0.758 (X-13, user request): what grows only at timed points has its own group, first, that folds too; each line keeps its zone in the tooltip.
-                var timed=lines.Where(line=>ListPanelTimedOnly(line.Item)).ToArray();
-                if(timed.Length>0)
-                {
-                    var timedDone=timed.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
-                    if(ImGui.TreeNodeEx($"{localization.Get("ListPanels.TimedGroup")} ({timedDone}/{timed.Length})###ListZone{key}Timed",ImGuiTreeNodeFlags.DefaultOpen))
-                    {
-                        try
-                        {
-                            foreach(var (item,needed) in timed)
-                            {
-                                DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
-                                if(ImGui.IsItemHovered())WrappedTooltip(string.Join(", ",ListPanelZones(item)));
-                            }
-                        }
-                        finally{ImGui.TreePop();}
-                    }
-                    lines=lines.Except(timed).ToArray();
-                }
-                foreach(var (zone,inZone) in BaseMaterials.OrderZones(BaseMaterials.ByZone(lines,line=>ListPanelZones(line.Item)),here,ListPanelZoneCost))
-                {
-                    var zoneDone=inZone.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
-                    var name=zone.Length>0 ? zone:localization.Get("ListPanels.ZoneUnknown");
-                    var price=zone==here && zone.Length>0 ? " · "+localization.Get("ListPanels.ZoneHere"):ListPanelZoneCost(zone) is { } gil ? " · "+localization.Format("ListPanels.ZoneCost",gil.ToString("N0")):"";
-                    if(!ImGui.TreeNodeEx($"{name} ({zoneDone}/{inZone.Count}){price}###ListZone{key}{zone}",ImGuiTreeNodeFlags.DefaultOpen))continue;
-                    try{foreach(var (item,needed) in inZone)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));}
-                    finally{ImGui.TreePop();}
-                }
+                foreach(var (item,needed) in lines)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
                 continue;
             }
-            foreach(var (item,needed) in lines)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
+            // 0.752 (X-05), 0.757 (X-11, X-12), 0.758 (X-13), user requests: timed points apart, then by zone, here first, then the cheapest teleport; each folds.
+            RequestListTeleportCosts();
+            foreach(var group in layout.Zones)
+            {
+                var zoneDone=group.Lines.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
+                if(!ImGui.TreeNodeEx($"{group.Label} ({zoneDone}/{group.Lines.Length}){group.Note}###ListZone{key}{group.Id}",ImGuiTreeNodeFlags.DefaultOpen))continue;
+                try
+                {
+                    foreach(var (item,needed) in group.Lines)
+                    {
+                        DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
+                        if(group.Timed && ImGui.IsItemHovered())WrappedTooltip(string.Join(", ",ListPanelZones(item)));
+                    }
+                }
+                finally{ImGui.TreePop();}
+            }
         }
+    }
+    private sealed record ListZoneGroup(string Id,string Label,string Note,bool Timed,(uint Item,long Needed)[] Lines);
+    private sealed record ListLayout(long At,string? Here,(ItemOrigin Origin,(uint Item,long Needed)[] Lines)[] Origins,ListZoneGroup[]? Zones);
+    private readonly Dictionary<string,ListLayout> listPanelLayouts=[];
+    private ListLayout ListLayoutOf(long at,(uint Item,long Needed)[] all,string? here)
+    {
+        var origins=Enum.GetValues<ItemOrigin>().Where(ListPanelOriginShown).Select(origin=>(Origin:origin,Lines:all.Where(line=>ListPanelOrigin(line.Item)==origin).ToArray()))
+            .Where(group=>group.Lines.Length>0).ToArray();
+        if(!configuration.ListPanelsByZone || origins.FirstOrDefault(group=>group.Origin==ItemOrigin.Gathering) is not { Lines:{ } gathered })return new(at,here,origins,null);
+        var zones=new List<ListZoneGroup>();
+        var timed=gathered.Where(line=>ListPanelTimedOnly(line.Item)).ToArray();
+        if(timed.Length>0)zones.Add(new("Timed",localization.Get("ListPanels.TimedGroup"),"",true,timed));
+        var rest=gathered.Except(timed).ToArray();
+        var costs=new Dictionary<string,uint?>();
+        uint? Cost(string zone){if(!costs.TryGetValue(zone,out var known))costs[zone]=known=ListPanelZoneCost(zone);return known;}
+        foreach(var (zone,inZone) in BaseMaterials.OrderZones(BaseMaterials.ByZone(rest,line=>ListPanelZones(line.Item)),here,Cost))
+        {
+            var note=zone==here && zone.Length>0 ? " · "+localization.Get("ListPanels.ZoneHere"):Cost(zone) is { } gil ? " · "+localization.Format("ListPanels.ZoneCost",gil.ToString("N0")):"";
+            zones.Add(new(zone,zone.Length>0 ? zone:localization.Get("ListPanels.ZoneUnknown"),note,false,inZone.ToArray()));
+        }
+        return new(at,here,origins,zones.ToArray());
     }
     // 0.755 (X-09, user request): the alarms of every timed point of what the list still needs, those already there left out (same label and time, as the
     // Gathering page names them). Worked out with the list, once a second at most.
@@ -236,7 +242,7 @@ internal sealed partial class MainWindow
     private void DrawListPanelAlarms(string key,(uint Item,long Needed)[] lines)
     {
         var now=Environment.TickCount64;
-        if(!listPanelAlarms.TryGetValue(key,out var known) || now-known.At>1000)listPanelAlarms[key]=known=(now,ListAlarms(lines));
+        if(!listPanelAlarms.TryGetValue(key,out var known) || now-known.At>5000)listPanelAlarms[key]=known=(now,ListAlarms(lines));
         ImGui.BeginDisabled(known.Alarms.Length==0);
         try{if(ImGui.SmallButton(localization.Format("ListPanels.AddAlarms",known.Alarms.Length)+$"###ListAlarms{key}")){AddAlarms(known.Alarms);listPanelAlarms.Remove(key);}}
         finally{ImGui.EndDisabled();}
@@ -280,17 +286,32 @@ internal sealed partial class MainWindow
     }
     private bool ListPanelTimedOnly(uint item)=>gatheringCatalog.State.Catalog?.ForItem(item) is { Count:>0 } sources
         && sources.All(source=>source.Timing.Kind==Gathering.GatheringScheduleKind.Limited);
+    // 0.760: zones and territories of the gathering catalogue, indexed once per catalogue (the panel used to scan every source for each zone, each frame).
+    private (object? Catalog,Dictionary<uint,string> ZoneOf,Dictionary<string,uint[]> Territories) listZoneIndex=(null,[],[]);
+    private (Dictionary<uint,string> ZoneOf,Dictionary<string,uint[]> Territories) ListZoneIndex()
+    {
+        var catalog=gatheringCatalog.State.Catalog;
+        if(!ReferenceEquals(listZoneIndex.Catalog,catalog))
+        {
+            var sources=catalog?.Sources.Where(source=>source.Zone.Length>0 && source.TerritoryId!=0).ToArray() ?? [];
+            listZoneIndex=(catalog,sources.GroupBy(source=>source.TerritoryId).ToDictionary(group=>group.Key,group=>group.First().Zone),
+                sources.GroupBy(source=>source.Zone).ToDictionary(group=>group.Key,group=>group.Select(source=>source.TerritoryId).Distinct().ToArray()));
+        }
+        return (listZoneIndex.ZoneOf,listZoneIndex.Territories);
+    }
     private string? ListPanelZoneHere()
     {
         var territory=CurrentTerritory?.Invoke() ?? 0;
-        return territory==0 ? null:gatheringCatalog.State.Catalog?.Sources.FirstOrDefault(source=>source.TerritoryId==territory)?.Zone;
+        return territory==0 ? null:ListZoneIndex().ZoneOf.GetValueOrDefault(territory);
     }
     private uint? ListPanelZoneCost(string zone)
     {
-        if(zone.Length==0 || mapLive?.TeleportCosts is not { } costs || TerritoryAetherytes is not { } aetherytes || gatheringCatalog.State.Catalog is not { } catalog)return null;
-        var territories=catalog.Sources.Where(source=>source.Zone==zone).Select(source=>source.TerritoryId).Distinct();
-        var prices=territories.SelectMany(territory=>aetherytes.GetValueOrDefault(territory) ?? []).Where(costs.ContainsKey).Select(id=>costs[id]).ToArray();
-        return prices.Length==0 ? null:prices.Min();
+        if(zone.Length==0 || mapLive?.TeleportCosts is not { } costs || TerritoryAetherytes is not { } aetherytes || !ListZoneIndex().Territories.TryGetValue(zone,out var territories))return null;
+        uint? best=null;
+        foreach(var territory in territories)
+            foreach(var id in aetherytes.GetValueOrDefault(territory) ?? [])
+                if(costs.TryGetValue(id,out var gil) && (best is null || gil<best))best=gil;
+        return best;
     }
 
     // 0.752: the zones where an item is gathered, from the gathering catalogue, kept per catalogue.

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.760.0
+- Plan global, Verify : Lourdeur (X-01), régression de 0.757–0.758 : le journal montre le panneau des matériaux de l'atelier bloquant le jeu de 1,7 à 7,6 s, surtout du nettoyage mémoire. Le regroupement par zone et les prix de téléportation étaient recalculés à chaque image, en parcourant toutes les sources de récolte pour chaque zone. Ils sont maintenant calculés une fois par seconde, ou au changement de zone, avec des index préparés une fois. Non validé en jeu.
+- Tests : ZoneOrder757Tests. Verify.ps1 (agent) : 1334/1334, 0 avertissement, 0 erreur ; DLL 0.760.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01), regression of 0.757–0.758: the log shows the workshop materials panel holding the game for 1.7 to 7.6 s, mostly memory collection. The zone grouping and teleport prices were worked out at every frame, scanning every gathering source for each zone. They are now worked out once a second, or when the zone changes, with indexes built once. Not validated in game.
+
 ## 0.759.0
 - Plan global, Verify : Signalement (X-03) : « Ouvrir dans Tensho » sur une alarme n'ouvrait rien. Le journal de 0.743 montre qu'aucun clic n'arrivait. Cause, dans le code de Dalamud : un lien sans gestionnaire ne fait rien, et chaque rechargement du plugin effaçait ses gestionnaires ; les messages d'alarme déjà affichés ne menaient donc plus nulle part. Correction : au chargement, les liens de toutes vos alarmes sont réenregistrés. Non validé en jeu.
 - Tests : AlarmLinks759Tests. Verify.ps1 (agent) : 1334/1334, 0 avertissement, 0 erreur ; DLL 0.759.0.0. Non validé en jeu.
