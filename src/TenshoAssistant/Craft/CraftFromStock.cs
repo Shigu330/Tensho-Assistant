@@ -96,6 +96,13 @@ public static class CraftFromStock
         return new(rows.OrderByDescending(row=>row.Recipe.Level).ThenByDescending(row=>row.Count).ThenBy(row=>row.Recipe.RecipeId).ToArray(),undecided);
     }
 
+    /// <summary>W-06 (0.707): most valuable first, unknown values last in their order. A value is what the crafts would bring, without the materials, which are already in stock.</summary>
+    public static CraftFromStockRow[] Ranked(IEnumerable<CraftFromStockRow> rows,Func<CraftFromStockRow,decimal?> value)
+        =>rows.Select((row,index)=>(row,index,worth:value(row))).OrderBy(entry=>entry.worth is null ? 1:0).ThenByDescending(entry=>entry.worth ?? 0).ThenBy(entry=>entry.index).Select(entry=>entry.row).ToArray();
+
+    /// <summary>What the crafts of a row bring at a unit price: crafts × items per craft × price.</summary>
+    public static decimal Worth(CraftFromStockRow row,decimal unit)=>row.Count*Math.Max(1,row.Recipe.ResultAmount)*unit;
+
     public static CraftFromStockRow[] Filter(IEnumerable<CraftFromStockRow> rows,string? job,int minLevel,int maxLevel)
         =>rows.Where(row=>(string.IsNullOrEmpty(job) || row.Recipe.CraftType==job) && row.Recipe.Level>=minLevel && row.Recipe.Level<=maxLevel).ToArray();
 }

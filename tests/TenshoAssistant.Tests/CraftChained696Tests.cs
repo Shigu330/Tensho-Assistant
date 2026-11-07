@@ -13,6 +13,16 @@ internal static class CraftChained696Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Most profitable: value first, unknown last, the yield and the crafts counted",() =>
+        {
+            CraftFromStockRow Row(uint id,long count,int yield)=>new(new(id,id,yield,"Job",1,[new(Ore,1)]),count,false);
+            var one=Row(1,1,1);var many=Row(2,3,3);var none=Row(3,9,1);
+            Check(CraftFromStock.Worth(many,10)==90,"3 crafts of 3 at 10");
+            var ranked=CraftFromStock.Ranked([none,one,many],row=>row==none ? null:CraftFromStock.Worth(row,10));
+            Check(ranked[0]==many && ranked[1]==one && ranked[2]==none,"most valuable first, unknown last");
+            var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CraftFromStock.cs"));
+            Check(page.Contains("missing.Take(32)") && page.Contains("configuration.CommunityUniversalis"),"bounded, under the source switch");
+        }),
         ("Chained crafts: from the ore alone, through every step, on one stock",() =>
         {
             // One part: 1 ingot and 1 rivet. Two parts: 2 ingots and one run of 2 rivets, so 3 ingots, 6 ore; three parts would need 10.

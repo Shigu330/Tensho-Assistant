@@ -24,6 +24,7 @@ internal sealed partial class MainWindow
         toolPrices.Dispose();
         routePrices.Dispose();
         currencyPrices.Dispose();
+        fromStockPrices.Dispose();
         cactpotSolve.Dispose();
         // 0.315: the route and build searches stop with the window.
         plannerCancel?.Cancel();plannerCancel?.Dispose();plannerCancel=null;

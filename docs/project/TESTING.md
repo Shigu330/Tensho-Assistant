@@ -1052,7 +1052,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.705) Réglages › infobulles : couper les vendeurs, exclure les prérequis, cocher Gil seulement : comparer sur un objet vendu en plusieurs monnaies.
 
-- [ ] (0.706) Sur l'île : clic droit sur un animal ou sur la carte Tensho, plus d'entrée éthérite, le drapeau reste ; ailleurs, l'entrée reste.
+- [x] (0.706) Sur l'île : clic droit sur un animal ou sur la carte Tensho, plus d'entrée éthérite, le drapeau reste ; ailleurs, l'entrée reste. VALIDATED_IN_GAME (rapport de l'utilisateur, 2026-11-07). Étages sans éthérite : à voir quand le cas se présentera.
+
+- [ ] (0.707) Que puis-je fabriquer ? : essayer les 3 tris de rentabilité ; comparer un prix au tableau du marché ; dire si un objet collectionnable doit être rangé autrement ; décocher la case arrête la recherche.
 
 **0.535 : interfaces** — à voir en jouant
 

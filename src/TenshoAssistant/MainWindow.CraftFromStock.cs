@@ -16,7 +16,81 @@ internal sealed partial class MainWindow
     private string fromStockJob="";
     private int fromStockMin=1,fromStockMax=100;
     private bool fromStockChained=true;
-    private (CraftFromStockResult Source,string Job,int Min,int Max,CraftFromStockRow[] Rows)? fromStockView;
+    private (CraftFromStockResult Source,string Job,int Min,int Max,int Sort,int Prices,bool Loading,CraftFromStockRow[] Rows)? fromStockView;
+    // W-06 (0.707, user request): 0 level, 1 market, 2 NPC sale, 3 scrips.
+    private int fromStockSort;
+    private bool fromStockPricesOn=true;
+    private readonly TenshoAssistant.Market.PreparationPriceSession fromStockPrices=new();
+    private readonly HashSet<uint> fromStockAsked=[];
+    private Dictionary<uint,string> fromStockValues=[];
+
+    private decimal? FromStockMarketUnit(CraftFromStockRow row,DateTimeOffset now)
+    {
+        var world=market.State.WorldId;
+        if(world==0 || market.GetCached(world,row.Recipe.ResultItemId) is not { } quote || !market.IsFresh(quote,now))return null;
+        var canHq=itemCatalog.State.Catalog?.Find(row.Recipe.ResultItemId)?.CanBeHq==true;
+        return canHq ? quote.Hq.Minimum ?? quote.Nq.Minimum:quote.Nq.Minimum;
+    }
+
+    // Scrips at the high tier; only rows of one kind of scrip compare, so each kind stays together, by its group's name.
+    private TenshoAssistant.Gathering.CollectableRule? FromStockScrips(CraftFromStockRow row)=>
+        Collectables?.Catalog?.For(row.Recipe.ResultItemId).Where(rule=>rule.Scrips && rule.RewardHigh>0).OrderByDescending(rule=>rule.RewardHigh).FirstOrDefault();
+
+    private CraftFromStockRow[] FromStockRanked(CraftFromStockRow[] rows)
+    {
+        var now=DateTimeOffset.UtcNow;var items=itemCatalog.State.Catalog;var culture=System.Globalization.CultureInfo.CurrentCulture;
+        fromStockValues=[];
+        string Gil(decimal value)=>value.ToString("N0",culture);
+        switch(fromStockSort)
+        {
+            case 1:
+                foreach(var row in rows)
+                {
+                    if(FromStockMarketUnit(row,now) is { } unit)fromStockValues[row.Recipe.RecipeId]=localization.Format("CraftStock.ValueMarket",Gil(CraftFromStock.Worth(row,unit)),Gil(unit));
+                    else if(items?.Find(row.Recipe.ResultItemId) is { IsMarketable:false })fromStockValues[row.Recipe.RecipeId]=localization.Get("CraftStock.NotMarket");
+                    else if(fromStockAsked.Contains(row.Recipe.ResultItemId))fromStockValues[row.Recipe.RecipeId]=localization.Get("CurrencyValue.NoOffer");
+                }
+                return CraftFromStock.Ranked(rows,row=>FromStockMarketUnit(row,now) is { } unit ? CraftFromStock.Worth(row,unit):null);
+            case 2:
+                foreach(var row in rows)
+                    if(items?.Find(row.Recipe.ResultItemId) is { SellPrice:>0 } sold)fromStockValues[row.Recipe.RecipeId]=localization.Format("CraftStock.ValueNpc",Gil(CraftFromStock.Worth(row,sold.SellPrice)),Gil(sold.SellPrice));
+                return CraftFromStock.Ranked(rows,row=>items?.Find(row.Recipe.ResultItemId) is { SellPrice:>0 } sold ? CraftFromStock.Worth(row,sold.SellPrice):null);
+            case 3:
+                foreach(var row in rows)
+                    if(FromStockScrips(row) is { } rule)fromStockValues[row.Recipe.RecipeId]=localization.Format("CraftStock.ValueScrips",Gil(CraftFromStock.Worth(row,rule.RewardHigh)),rule.Group);
+                return CraftFromStock.Ranked(rows.OrderBy(row=>FromStockScrips(row)?.ScripKind ?? int.MaxValue),row=>null).GroupBy(row=>FromStockScrips(row)?.ScripKind ?? int.MaxValue)
+                    .SelectMany(kind=>CraftFromStock.Ranked(kind,row=>FromStockScrips(row) is { } rule ? CraftFromStock.Worth(row,rule.RewardHigh):null)).ToArray();
+            default:return rows;
+        }
+    }
+
+    // Market prices of what is listed, 32 at a time, from the choice of this sort on; the box stops them.
+    private void DrawFromStockPrices(CraftFromStockRow[] rows)
+    {
+        if(fromStockSort!=1)return;
+        ImGui.Checkbox(localization.Get("CurrencyValue.Market")+"###FromStockMarket",ref fromStockPricesOn);
+        Tip("CraftStock.MarketTip");
+        if(!fromStockPricesOn){if(fromStockPrices.State.Loading)fromStockPrices.Cancel();return;}
+        var prices=fromStockPrices.State;var world=market.State.WorldId;var character=bankBridge.State.CharacterId;var now=DateTimeOffset.UtcNow;var items=itemCatalog.State.Catalog;
+        var missing=rows.Where(row=>FromStockMarketUnit(row,now) is null && items?.Find(row.Recipe.ResultItemId) is { IsMarketable:true } && !fromStockAsked.Contains(row.Recipe.ResultItemId)).Select(row=>row.Recipe.ResultItemId).Distinct().ToArray();
+        if(prices.Loading){ImGui.SameLine();ImGui.TextDisabled(localization.Format("CurrencyValue.Fetching",fromStockAsked.Count,fromStockAsked.Count+missing.Length));return;}
+        if(prices.Error is { } failed)
+        {
+            ImGui.SameLine();ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("CurrencyValue.FetchFailed"));
+            if(developerMode)ImGui.TextDisabled(failed);
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("CurrencyValue.Retry")+"###FromStockRetry")){fromStockAsked.Clear();fromStockPrices.Cancel();}
+            Tip("CurrencyValue.FetchTip");
+            return;
+        }
+        if(world==0 || character==0){ImGui.SameLine();ImGui.TextDisabled(localization.Get("CurrencyValue.NoWorld"));return;}
+        if(!configuration.CommunityUniversalis){ImGui.SameLine();ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));return;}
+        if(missing.Length==0)return;
+        var batch=missing.Take(32).ToArray();
+        fromStockAsked.UnionWith(batch);
+        try{_=fromStockPrices.StartListAsync(market,character,world,batch);}
+        catch(Exception error){fromStockPricesOn=false;log.Warning(error,"Craftable prices could not be started.");}
+    }
 
     private void StartCraftFromStock(RecipeCatalog catalog)
     {
@@ -66,9 +140,16 @@ internal sealed partial class MainWindow
         ImGui.SameLine();ImGui.SetNextItemWidth(90);
         ImGui.InputInt(localization.Get("CraftStock.MaxLevel")+"###CraftStockMax",ref fromStockMax,0);Tip("CraftStock.LevelTip");
         fromStockMin=Math.Clamp(fromStockMin,1,200);fromStockMax=Math.Clamp(fromStockMax,1,200);
-        if(fromStockView is not { } known || !ReferenceEquals(known.Source,result) || known.Job!=fromStockJob || known.Min!=fromStockMin || known.Max!=fromStockMax)
-            fromStockView=known=(result,fromStockJob,fromStockMin,fromStockMax,CraftFromStock.Filter(result.Rows,fromStockJob,fromStockMin,fromStockMax));
+        ImGui.SetNextItemWidth(230);
+        string[] sorts=[localization.Get("CraftStock.SortLevel"),localization.Get("CraftStock.SortMarket"),localization.Get("CraftStock.SortNpc"),localization.Get("CraftStock.SortScrips")];
+        ImGui.Combo(localization.Get("CraftStock.Sort")+"###CraftStockSort",ref fromStockSort,sorts,sorts.Length);
+        Tip("CraftStock.SortTip");
+        var priceState=fromStockPrices.State;
+        if(fromStockView is not { } known || !ReferenceEquals(known.Source,result) || known.Job!=fromStockJob || known.Min!=fromStockMin || known.Max!=fromStockMax || known.Sort!=fromStockSort || known.Prices!=priceState.Completed || known.Loading!=priceState.Loading)
+            fromStockView=known=(result,fromStockJob,fromStockMin,fromStockMax,fromStockSort,priceState.Completed,priceState.Loading,FromStockRanked(CraftFromStock.Filter(result.Rows,fromStockJob,fromStockMin,fromStockMax)));
         var rows=known.Rows;
+        DrawFromStockPrices(rows);
+        if(fromStockSort!=0)ImGui.TextDisabled(localization.Get("CraftStock.ValueHelp"));
         ImGui.TextColored(Accent,localization.Format("CraftStock.Count",rows.Length.ToString("N0"),result.Rows.Count.ToString("N0")));
         if(result.Undecided>0)ImGui.TextDisabled(localization.Format("CraftStock.Undecided",result.Undecided.ToString("N0")));
         if(rows.Length==0){ImGui.TextDisabled(localization.Get("CraftStock.Empty"));return;}
@@ -82,6 +163,7 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();
                 ImGui.TextDisabled(localization.Format(row.Chained ? "CraftStock.RowChained":row.LowerBound ? "CraftStock.RowAtLeast":"CraftStock.Row",row.Count.ToString("N0"),row.Recipe.CraftType,row.Recipe.Level));
                 if(row.Chained && ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftStock.RowChainedTip"));
+                if(fromStockValues.TryGetValue(row.Recipe.RecipeId,out var worth)){ImGui.SameLine();ImGui.TextColored(Success,worth);}
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("ChainUi.Simulate")))OpenCraftSimulation(row.Recipe);
                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("ChainUi.SimulateTip"));

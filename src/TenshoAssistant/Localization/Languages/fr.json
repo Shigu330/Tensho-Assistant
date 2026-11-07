@@ -682,6 +682,18 @@
     "ReferenceSummary": "Clés de référence : {0} · langues : {1}"
   },
   "CraftStock": {
+    "Sort": "Tri",
+    "SortLevel": "Par niveau",
+    "SortMarket": "Le plus rentable : gils au marché",
+    "SortNpc": "Le plus rentable : vente à un PNJ",
+    "SortScrips": "Le plus rentable : assignats",
+    "SortTip": "Marché : demande à Universalis les prix de ce qui est listé, sauf si la source est coupée. Vente à un PNJ : données du jeu. Assignats : palier haut, chaque sorte d'assignat à part.",
+    "MarketTip": "Désactivé : rien n'est demandé, et une recherche en cours s'arrête.",
+    "ValueHelp": "Ce que rapporteraient les fabrications. Les matériaux ne sont pas déduits : ils sont déjà dans vos stocks.",
+    "ValueMarket": "~{0} gils ({1} pièce)",
+    "ValueNpc": "{0} gils ({1} pièce)",
+    "ValueScrips": "{0} assignats au palier haut · {1}",
+    "NotMarket": "pas au marché",
     "Help": "Les recettes que vos sacs et votre Banque enregistrée peuvent fabriquer maintenant. Pratique pour écouler des matériaux ou monter un métier.",
     "Chained": "Compter les sous-recettes",
     "ChainedTip": "Compte aussi ce qui se fabrique en faisant d'abord les pièces qui manquent, du minerai à la dernière étape, avec un seul stock. Les restes ne sont pas réutilisés : le nombre réel peut être plus haut.",

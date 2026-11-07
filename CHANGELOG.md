@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.707.0
+- Plan global, W-06 : Demande de l'utilisateur : « Que puis-je fabriquer ? » se trie par niveau, gils au marché, vente à un PNJ ou assignats, avec la valeur sur chaque ligne. Marché : prix minimum de votre monde (Universalis), HQ si l'objet peut l'être, demandés au choix de ce tri, avec une case pour arrêter. Assignats : palier haut, chaque sorte à part. Les matériaux ne sont pas déduits, ils sont déjà en stock. COMPILED et TESTED, non validé en jeu.
+- Tests : CraftChained696Tests. Verify.ps1 (agent) : 1255/1255, 0 avertissement, 0 erreur ; DLL 0.707.0.0. Non validé en jeu.
+### English
+- User request: What can I craft? sorts by level, market gil, NPC sale or scrips, with the value on each line. Market: your world's lowest price (Universalis), HQ when the item can be, asked when this sort is chosen, with a box to stop. Scrips: high tier, each kind apart. Materials are not deducted, as they are already in stock. COMPILED and TESTED, not validated in game.
+
 ## 0.706.0
 - Plan global, Éthérites : Rapport de l'utilisateur : la Félicité insulaire n'a pas de téléportation. L'entrée « Éthérite la plus proche » disparaît sur cette carte et sur toute carte sans éthérite, dans les menus et sur la carte Tensho. COMPILED et TESTED, non validé en jeu.
 - Tests : PlaceMenus704Tests. Verify.ps1 (agent) : 1254/1254, 0 avertissement, 0 erreur ; DLL 0.706.0.0. Non validé en jeu.

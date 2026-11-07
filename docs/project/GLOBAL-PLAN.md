@@ -223,7 +223,7 @@ Choisis par l'utilisateur à partir de la liste de rubriques d'un site français
 | W-03 | Armes reliques : progression par extension | Sondé : `RelicNote` et ses feuilles pour le livre des reliques ; à coder |
 | W-04 | Animaux de la Félicité insulaire | Demandé par l'utilisateur le 2026-11-06. Fait sans le jeu en 0.685 : onglet Pâturage, liste du wiki sur clic ; à comparer en jeu : `docs/evidence/0.685-island-animals.md`. Animaux présents maintenant et sur la carte plus tard |
 | W-05 | Panneaux à l'écran : matériaux du projet d'atelier et liste de préparation, réglables | Fait sans le jeu en 0.691 |
-| W-06 | « Que puis-je fabriquer ? » : trier par le plus rentable en gils, assignats ou autre | Demandé par l'utilisateur le 2026-11-06 ; à coder |
+| W-06 | « Que puis-je fabriquer ? » : trier par le plus rentable en gils, assignats ou autre | Fait sans le jeu en 0.707 |
 | W-07 | « Que puis-je fabriquer ? » : compter les sous-recettes | Fait sans le jeu en 0.696 |
 | W-08 | Mandats : clic droit vers l'éthérite la plus proche | Fait sans le jeu en 0.698 |
 | W-09 | Liste de suivi par provenance (récolte, PNJ, monstre, autre), atelier et artisanat | Fait sans le jeu en 0.699 |

@@ -682,6 +682,18 @@
     "ReferenceSummary": "Reference keys: {0} · languages: {1}"
   },
   "CraftStock": {
+    "Sort": "Sort",
+    "SortLevel": "By level",
+    "SortMarket": "Most profitable: market gil",
+    "SortNpc": "Most profitable: NPC sale",
+    "SortScrips": "Most profitable: scrips",
+    "SortTip": "Market: asks Universalis for the prices of what is listed, unless the source is off. NPC sale comes from the game. Scrips: the high tier, each kind of scrip apart.",
+    "MarketTip": "Off: nothing is asked, and a search under way stops.",
+    "ValueHelp": "What the crafts would bring. The materials are not deducted: they are already in your stocks.",
+    "ValueMarket": "~{0} gil ({1} each)",
+    "ValueNpc": "{0} gil ({1} each)",
+    "ValueScrips": "{0} scrips at the high tier · {1}",
+    "NotMarket": "not on the market",
     "Help": "The recipes your bags and your saved Bank can make now. Handy for using up materials or levelling a job.",
     "Chained": "Count sub-recipes",
     "ChainedTip": "Also counts what can be made by crafting the missing parts first, from the ore through every step, all from one stock. Leftovers are not reused, so the real count can be higher.",
