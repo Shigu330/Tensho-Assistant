@@ -29,6 +29,8 @@ internal sealed class ItemContextMenuBridge : IDisposable
     }
 
     private void OnLogout(int type,int code)=>session.Clear();
+    /// <summary>0.808 (X-44): windows that list items only (crafting log, its material list and tree): their menu is about the hovered item.</summary>
+    internal static readonly IReadOnlySet<string> ItemWindows=new HashSet<string>(StringComparer.Ordinal){"RecipeNote","RecipeMaterialList","RecipeTree","RecipeProductList"};
     private bool Current(ItemMenuToken token)=>!disposed && session.IsCurrent(token,configuration.ItemContextMenuEnabled,Owner,catalog.State.Catalog,DateTimeOffset.UtcNow);
 
     private void OnMenuOpened(IMenuOpenedArgs args)
@@ -39,7 +41,8 @@ internal sealed class ItemContextMenuBridge : IDisposable
             session.Clear();
             // 0.781 (X-03, user report: a right click on the ring's item scrolled the chat and opened nothing): developer mode, what the game opened.
             if(configuration.DeveloperMode)
-                log.Information("Context menu opened: type {0}, addon \"{1}\", target {2}, hovered item {3}.",args.MenuType,args.AddonName ?? "",args.Target?.GetType().Name ?? "none",gui.HoveredItem);
+                log.Information("Context menu opened: type {0}, addon \"{1}\", target {2}, hovered item {3}{4}.",args.MenuType,args.AddonName ?? "",args.Target?.GetType().Name ?? "none",gui.HoveredItem,
+                    args.Target is MenuTargetDefault aimed ? $"; content {(aimed.TargetContentId!=0 ? "set":"0")}, object {(aimed.TargetObject is null ? "none":"set")}, name {(string.IsNullOrEmpty(aimed.TargetName) ? "empty":"set")}":"");
             if(disposed || !configuration.ItemContextMenuEnabled || Owner==0)return;
             var owner=Owner;
             ulong raw;
@@ -53,8 +56,10 @@ internal sealed class ItemContextMenuBridge : IDisposable
             {
                 // Shops, exchanges and item lists open a default menu without an item target: the item hovered when the
                 // menu opened is used. Menus aimed at a character (player, NPC, party member) never get the Tensho entry.
+                // 0.808 (X-44, user report: no Tensho entry in the crafting log): the game's item windows aim no character, whatever their target holds.
+                var itemWindow=ItemWindows.Contains(args.AddonName ?? "");
                 if(args.MenuType!=ContextMenuType.Default || args.Target is not MenuTargetDefault target
-                   || target.TargetContentId!=0 || target.TargetObject is not null || !string.IsNullOrEmpty(target.TargetName))return;
+                   || !itemWindow && (target.TargetContentId!=0 || target.TargetObject is not null || !string.IsNullOrEmpty(target.TargetName)))return;
                 raw=gui.HoveredItem;
                 if(raw==0)return;
             }

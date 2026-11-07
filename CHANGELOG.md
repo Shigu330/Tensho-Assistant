@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.808.0
+- Plan global, Verify : Signalement (X-44) : au clic droit dans le carnet d'artisanat, sur une recette ou sur un matériau, le menu n'avait pas d'entrée Tensho. Le journal montrait un menu « par défaut » du carnet avec l'objet survolé, écarté par la règle qui protège les menus visant un personnage. Les fenêtres d'objets du carnet (carnet, liste des matériaux, arbre de fabrication) ont maintenant l'entrée Tensho ; les autres menus gardent la règle. En mode développeur, la ligne du journal dit aussi ce que la cible du menu contient. Non validé en jeu.
+- Tests : RecipeMenu808Tests. Verify.ps1 (agent) : 1394/1394, 0 avertissement, 0 erreur ; DLL 0.808.0.0. Non validé en jeu.
+### English
+- Report (X-44): a right click in the crafting log, on a recipe or a material, had no Tensho entry. The log showed the log's « default » menu with the hovered item, set aside by the rule that protects menus aimed at a character. The log's item windows (log, material list, crafting tree) now get the Tensho entry; other menus keep the rule. In developer mode the log line also says what the menu's target holds. Not validated in game.
+
 ## 0.807.0
 - Plan global, Verify : Demande (X-43), première étape : une base locale de découvertes. Nouvelle page Monde › Découvertes. Tensho note où vit chaque monstre près duquel vous passez (lieu à 10 yalms près, zone, niveau), dans un fichier de son dossier de réglages ; chaque entrée garde sa provenance (vue par vous, combien de fois, ou importée). Exporter écrit une copie datée à partager ; Importer joint les fichiers déposés dans « Import » sans jamais retirer vos entrées, chaque fichier une fois, les entrées fausses refusées. Recherche par nom de monstre, lieux avec clic droit vers l'éthérite la plus proche. Débogage en mode développeur (journal de chaque entrée, vider la base). Activé, hors débogage aussi ; aucun autre joueur noté, rien d'envoyé. Non validé en jeu.
 - Tests : DiscoveriesTests. Verify.ps1 (agent) : 1393/1393, 0 avertissement, 0 erreur ; DLL 0.807.0.0. Non validé en jeu.

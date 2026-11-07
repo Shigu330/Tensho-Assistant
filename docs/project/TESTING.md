@@ -1256,6 +1256,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.807) Promenez-vous parmi des monstres, puis Monde › Découvertes : cherchez un nom, ses lieux s'affichent ; Exporter, puis déposez le fichier dans Import et Importer.
 
+- [ ] (0.808) Carnet d'artisanat : clic droit sur une recette puis sur un matériau : entrée « Tensho ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
