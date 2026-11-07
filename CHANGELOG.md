@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.814.0
+- Plan global, Verify : Signalement (X-50) : les icônes de bord de la carte (cibles hors de la vue) passaient sous le bandeau des noms de zone et sous les outils. Elles sont maintenant dessinées dans une couche à part, créée après le bandeau et les outils, donc au-dessus d'eux ; cette couche ne prend aucun clic, la carte garde le sien. Non validé en jeu.
+- Tests : EdgeLayer814Tests. Verify.ps1 (agent) : 1400/1400, 0 avertissement, 0 erreur ; DLL 0.814.0.0. Non validé en jeu.
+### English
+- Report (X-50): the map's edge icons (targets out of view) went under the zone names' band and the tools. They are now drawn in a layer of their own, created after the band and the tools, so above them; the layer takes no click, the map keeps its own. Not validated in game.
+
 ## 0.813.0
 - Plan global, Verify : Signalement (X-49) : la cible de quête restait sur la carte après validation. Le journal montre que la demande de carte du jeu ne dit pas de quelle quête il s'agit (« quest 0 »), donc la règle qui retirait la cible à la fin de sa quête ne pouvait jamais s'appliquer. La cible est maintenant reliée au point de la quête acceptée qui se trouve au même endroit, lu dans la liste propre du jeu ; elle disparaît quand cette quête n'a plus de point là (étape validée, quête terminée ou abandonnée). Non validé en jeu.
 - Tests : QuestTarget813Tests. Verify.ps1 (agent) : 1399/1399, 0 avertissement, 0 erreur ; DLL 0.813.0.0. Non validé en jeu.

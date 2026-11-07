@@ -1268,6 +1268,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.813) Cliquez une quête dans le journal, validez l'étape : la cible quitte la carte Tensho.
 
+- [ ] (0.814) Une cible hors de la vue, en haut à gauche : son icône de bord passe au-dessus du bandeau des noms.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

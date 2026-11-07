@@ -1428,7 +1428,18 @@ internal sealed partial class MainWindow
                 MapViewSettings.ClampMarker(settings.ViewConeScale),MapViewSettings.ClampConeOpacity(settings.ViewConeOpacity),settings.ViewConeColor);
             // 0.297 (user request): targets outside the view keep their icon on the map's edge, compass style.
             MapMark("canvas bookmarks, treasure, player");
-            var edgeLabel=settings.ShowEdgeMarkers ? DrawEdgeMarkers(draw,origin,size,map,live,settings,player,events,fates,gathering,hovered,io.MousePos):null;
+            // 0.814 (X-50, user report: edge icons hidden under the zone names' band): they are drawn in a layer of their own, a child window created after the
+            // band and the tools (children too), so above them; it takes no input, the canvas keeps every click.
+            string? edgeLabel=null;
+            if(settings.ShowEdgeMarkers)
+            {
+                var cursor=ImGui.GetCursorScreenPos();
+                ImGui.SetCursorScreenPos(origin);
+                if(ImGui.BeginChild("MapEdgeLayer",size,false,ImGuiWindowFlags.NoInputs|ImGuiWindowFlags.NoBackground|ImGuiWindowFlags.NoScrollbar|ImGuiWindowFlags.NoScrollWithMouse|ImGuiWindowFlags.NoSavedSettings))
+                    edgeLabel=DrawEdgeMarkers(ImGui.GetWindowDrawList(),origin,size,map,live,settings,player,events,fates,gathering,hovered,io.MousePos);
+                ImGui.EndChild();
+                ImGui.SetCursorScreenPos(cursor);
+            }
             if(edgeLabel is not null){tooltip=edgeLabel;sightseeingTip=null;tooltipPoint=null;}
             // Only the topmost icon under the cursor answers: tooltip, map link, teleport or flag.
             // 0.328 (map audit #5): not while an edge marker is under the mouse — that click centres the map; the icon below moved the
