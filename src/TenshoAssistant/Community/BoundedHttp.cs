@@ -9,6 +9,10 @@ namespace TenshoAssistant.Community;
 /// </summary>
 public static class BoundedHttp
 {
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string,int> SentByHost=new();
+    /// <summary>Requests sent so far, by host: the page sweep of the self-check says how many it caused (0.724).</summary>
+    public static IReadOnlyDictionary<string,int> Sent=>new Dictionary<string,int>(SentByHost);
+
     public static Task<string> ReadAsync(HttpClient client,Uri uri,int maximumBytes,CancellationToken cancellation)=>
         SendAsync(client,new HttpRequestMessage(HttpMethod.Get,uri),maximumBytes,cancellation);
 
@@ -17,6 +21,7 @@ public static class BoundedHttp
     {
         using var message=request;
         if(maximumBytes<=0) throw new ArgumentOutOfRangeException(nameof(maximumBytes));
+        SentByHost.AddOrUpdate(message.RequestUri?.Host ?? "?",1,(_,count)=>count+1);
         message.Headers.UserAgent.ParseAdd($"TenshoAssistant/{typeof(BoundedHttp).Assembly.GetName().Version?.ToString(3) ?? "1.0.0"}");
         using var response=await client.SendAsync(message,HttpCompletionOption.ResponseHeadersRead,cancellation).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();

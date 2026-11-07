@@ -233,13 +233,7 @@ internal sealed partial class MainWindow : Window, IDisposable
     {
         RememberPage();
         OpenGuideOnce();
-        monsterLoot.SelectItem((uint)Math.Max(0,itemId));
-        ValidateGpCopy();
-        ValidateCraftCopy();
-        ValidateCraftSearch();
-        craftChain.ValidateContext(bankBridge.State.CharacterId, (uint)Math.Max(0, itemId), craftPlanTarget, recipeCatalog.State.Catalog);
-        triadSolve.ValidateContext(bankBridge.State.CharacterId, triadRevision);
-        preparationPrices.ValidateContext(bankBridge.State.CharacterId,market.State.WorldId,(uint)Math.Max(0,itemId),craftPlanTarget,costBasisIndex,costQualityIndex,craftChainChoiceRevision);
+        ValidateDrawContext();
         ImGui.TextColored(Accent, localization.Get("Plugin.Title").ToUpperInvariant());
         ImGui.SameLine();
         ImGui.TextDisabled($"v{BuildVersion}");
@@ -292,6 +286,17 @@ internal sealed partial class MainWindow : Window, IDisposable
         ImGui.TextDisabled("/tensho");
         ImGui.SameLine();
         ImGui.TextDisabled(localization.Get("UiFragments.Footer"));
+    }
+
+    private void ValidateDrawContext()
+    {
+        monsterLoot.SelectItem((uint)Math.Max(0,itemId));
+        ValidateGpCopy();
+        ValidateCraftCopy();
+        ValidateCraftSearch();
+        craftChain.ValidateContext(bankBridge.State.CharacterId, (uint)Math.Max(0, itemId), craftPlanTarget, recipeCatalog.State.Catalog);
+        triadSolve.ValidateContext(bankBridge.State.CharacterId, triadRevision);
+        preparationPrices.ValidateContext(bankBridge.State.CharacterId,market.State.WorldId,(uint)Math.Max(0,itemId),craftPlanTarget,costBasisIndex,costQualityIndex,craftChainChoiceRevision);
     }
 
     private void DrawNavigation()

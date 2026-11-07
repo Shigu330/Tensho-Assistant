@@ -1159,6 +1159,17 @@ public sealed class Plugin : IDalamudPlugin
             triadObservation.SetEnabled(configuration.Observations?.GetValueOrDefault("Triad") == true);
             macroObservations.SetEnabled(configuration.Observations?.GetValueOrDefault("Macros") == true);
             registrations.Register(() => windows.AddWindow(mainWindow), () => windows.RemoveWindow(mainWindow));
+            // 0.724: developer mode only, once per load, after the self-check: every page drawn out of sight, what it cost and any error in the log.
+            Diagnostics.PageSweepWindow? pageSweep=null;
+            registrations.Register(() => windows.AddWindow(pageSweep = new Diagnostics.PageSweepWindow(configuration.DeveloperMode,
+                () => client.IsLoggedIn && player.IsLoaded && selfCheck?.LastLines.Count>0,
+                () => !client.IsLoggedIn || !player.IsLoaded || new[]
+                {
+                    Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat,Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty,Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty56,
+                    Dalamud.Game.ClientState.Conditions.ConditionFlag.Crafting,Dalamud.Game.ClientState.Conditions.ConditionFlag.Gathering,Dalamud.Game.ClientState.Conditions.ConditionFlag.Fishing,
+                    Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas,Dalamud.Game.ClientState.Conditions.ConditionFlag.WatchingCutscene,Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedInCutSceneEvent,
+                }.Any(flag => condition[flag]),
+                mainWindow.PageSweepEntries,MainWindow.PageSweepSkipped,log)), () => { if (pageSweep is not null) windows.RemoveWindow(pageSweep); });
             registrations.Register(() => windows.AddWindow(guideWindow = new GuideWindow(mainWindow)), () => { if (guideWindow is not null) windows.RemoveWindow(guideWindow); guideWindow = null; });
             registrations.Register(() => windows.AddWindow(mapWindow = new MapViewWindow(mainWindow)), () => { if (mapWindow is not null) windows.RemoveWindow(mapWindow); });
             registrations.Register(() => { attachedPanels = new AttachedPanels(windows, mainWindow); mainWindow.Panels = attachedPanels; bankOverlay.Panels = attachedPanels; }, () => { mainWindow.Panels = null; bankOverlay.Panels = null; attachedPanels?.Dispose(); attachedPanels = null; });

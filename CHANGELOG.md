@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.724.0
+- Plan global, Verify : Auto-contrôle : en mode développeur, après l'auto-contrôle, chaque page est dessinée hors de l'écran, sans clic possible, et le journal donne son coût et ses erreurs. Il attend pendant les combats, contenus, synthèses, récoltes, pêche et cinématiques. La page Marché reste à part : elle interroge Universalis.
+- Tests : PageSweep724Tests. Verify.ps1 (agent) : 1295/1295, 0 avertissement, 0 erreur ; DLL 0.724.0.0. Non validé en jeu.
+### English
+- Self-check: in developer mode, after the self-check, every page is drawn off-screen with no input possible, and the log gives its cost and any error. It waits during combat, duties, crafting, gathering, fishing and cutscenes. The market page is left out: it asks Universalis.
+
 ## 0.723.0
 - Plan global, Verify : Preuves corrigées d'après la première lecture dans le jeu : 50 rapports du front et non 55, 1 123 ALEA nommés, 47 et 41 lieux sur les fronts de Bozja. Aucun changement de code du plugin. COMPILED et TESTED ; lectures de 0.722 exécutées dans le jeu, affichage non validé.
 - Tests : FieldContent717Tests. Verify.ps1 (agent) : 1292/1292, 0 avertissement, 0 erreur ; DLL 0.723.0.0. Non validé en jeu.
