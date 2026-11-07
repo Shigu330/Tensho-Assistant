@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.776.0
+- Plan global, Verify : Validé en jeu sur capture de l'utilisateur : l'alarme porte le lien d'objet du jeu, et le clic droit dessus ouvre le menu « Tensho — objet » complet (X-03). Ventes des servants (I-05) notées validées. Aucun changement du plugin.
+- Tests : GilTeleport775Tests. Verify.ps1 (agent) : 1345/1345, 0 avertissement, 0 erreur ; DLL 0.776.0.0. Non validé en jeu.
+### English
+- Validated in game on the user's screenshot: the ring carries the game's item link, and a right click on it opens the full « Tensho — item » menu (X-03). Retainer sales (I-05) recorded as validated. No change to the plugin.
+
 ## 0.775.0
 - Plan global, Verify : Journal des gils (X-18) : le relevé montrait des téléportations rangées en « Autre », le jeu prélevant le prix à l'arrivée, après la fermeture de la fenêtre Téléportation. Une dépense qui suit un écran de chargement compte maintenant comme téléportation, jamais un gain. Les anciennes lignes restent comme elles étaient. Non validé en jeu.
 - Tests : GilTeleport775Tests. Verify.ps1 (agent) : 1345/1345, 0 avertissement, 0 erreur ; DLL 0.775.0.0. Non validé en jeu.
