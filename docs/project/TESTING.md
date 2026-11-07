@@ -1164,6 +1164,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.761) Liste de l'atelier, groupe Points à horaire : chaque ligne dit ouvert ou fermé, avec le temps.
 
+- [ ] (0.762) Clic droit sur un matériau de la liste de l'atelier : « Y aller » doit placer le drapeau et proposer la téléportation.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.762.0
+- Plan global, Verify : Demande (X-15) : le menu du clic droit d'un objet récolté propose « Y aller », comme la page Récolte : drapeau, carte de Tensho et téléportation vers l'éthérite la plus proche (question, sauf réglage). Le point choisi est un point ouvert d'abord, puis dans votre zone, puis la téléportation la moins chère. Non validé en jeu.
+- Tests : GoThereMenu762Tests. Verify.ps1 (agent) : 1335/1335, 0 avertissement, 0 erreur ; DLL 0.762.0.0. Non validé en jeu.
+### English
+- Request (X-15): the right-click menu of a gathered item offers « Go there », as the Gathering page does: flag, Tensho map and teleport to the nearest aetheryte (a question, unless set otherwise). The point chosen is an open one first, then one in your zone, then the cheapest teleport. Not validated in game.
+
 ## 0.761.0
 - Plan global, Verify : Demande (X-14) : dans le groupe « Points à horaire » des listes de suivi, chaque objet dit « ouvert · encore h:mm:ss » ou « fermé · ouvre dans h:mm:ss », d'après le plus proche de ses points. Non validé en jeu.
 - Tests : ZoneOrder757Tests. Verify.ps1 (agent) : 1334/1334, 0 avertissement, 0 erreur ; DLL 0.761.0.0. Non validé en jeu.
