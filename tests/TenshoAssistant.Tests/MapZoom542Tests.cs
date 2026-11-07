@@ -90,7 +90,8 @@ internal static class MapZoom542Tests
             Check(memory.Tick(1.2f,0.5f,TimeSpan.FromSeconds(13.5))==1.2f,"saved once at rest");
             Check(memory.Tick(1.2f,1.2f,TimeSpan.FromSeconds(20)) is null,"once");
             var view=Read("MainWindow.MapView.cs");
-            Check(view.Contains("if(mapId==0)ApplyOpenZoom();") && view.Contains("mapFitRequested=mapId!=0;"),"a chosen map still opens whole");
+            // 0.850 (X-46, user report): every opening takes the zoom setting; another map is centred.
+            Check(view.Contains("mapFitRequested=false;ApplyOpenZoom();CentreOtherMap(mapId);mapViewOpen=true;") && view.Contains("mapViewFollow=false;mapFitRequested=false;ApplyOpenZoom();CentreOtherMap(mapId);}"),"the zoom setting everywhere");
             Check(!view.Contains("Math.Max(mapZoom,1f)") && !Read("MainWindow.ChatMapLinks.cs").Contains("Math.Max(mapZoom,1f)"),"the zoom on a point is the setting");
             Check(Read("Plugin.cs").Contains("mainWindow.KeepMapZoom();"),"kept also when the map has just closed");
             foreach(var key in new[]{"OpenZoom","OpenZoomLast","OpenZoomFixed","OpenZoomWhole","OpenZoomHelp","OpenZoomValue","FocusZoom","FocusZoomHelp"})

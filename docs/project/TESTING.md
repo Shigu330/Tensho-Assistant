@@ -1340,6 +1340,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.849) Mer de Rubis ou Mor Dhona : chevron orange du jeu sur les icônes plus hautes ou plus basses.
 
+- [ ] (0.850) Changer de zone, M : la carte s'ouvre au zoom réglé ; choisir une autre carte dans le menu : même zoom.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

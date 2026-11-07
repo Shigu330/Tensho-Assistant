@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.850.0
+- Plan global, Verify : Signalement (X-46) : le zoom de la carte ne restait pas toujours celui réglé. Une carte autre que celle où vous êtes s'ouvrait toujours entière, quel que soit le réglage d'ouverture ; or le jeu garde la carte vue en dernier, si bien que la touche M en demandait souvent une autre. Pareil pour une carte choisie dans les menus. Toutes les ouvertures suivent maintenant le réglage (zoom fixe, dernier zoom, ou carte entière si c'est le choix), centrées ; le bouton « Ajuster » montre toujours la carte entière. Non validé en jeu.
+- Tests : MapZoom542Tests. Verify.ps1 (agent) : 1430/1430, 0 avertissement, 0 erreur ; DLL 0.850.0.0. Non validé en jeu.
+### English
+- Report (X-46): the map zoom did not always stay the one set. A map other than yours always opened whole, whatever the opening setting; and the game keeps the map last viewed, so the M key often asked another one. Same for a map chosen from the menus. Every opening now follows the setting (fixed zoom, last zoom, or whole map if chosen), centred; the « Fit » button still shows the whole map. Not validated in game.
+
 ## 0.849.0
 - Plan global, Verify : Demande (X-71) : reprendre les flèches haut et bas de la carte du jeu, partout. La sonde des interfaces du jeu montre que sa carte prend ses chevrons dans la texture ui/uld/NaviMap.tex : le chevron orange (24 × 24) est la forme vue à Mor Dhona et dans la Mer de Rubis. La carte de Tensho dessine maintenant ce chevron du jeu, pointe en haut pour plus haut, retourné pour plus bas, sur toutes les icônes de quête, d'événement et d'ALÉA, à la place de la flèche de la 0.844. Le seuil de hauteur reste le réglage de Tensho. Non validé en jeu.
 - Tests : HeightArrows844Tests. Verify.ps1 (agent) : 1430/1430, 0 avertissement, 0 erreur ; DLL 0.849.0.0. Non validé en jeu.

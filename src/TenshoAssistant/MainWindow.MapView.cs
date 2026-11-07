@@ -51,7 +51,10 @@ internal sealed partial class MainWindow
     // 0.328 (map audit #13): a chosen map opens whole, like NavigateMap; the old zoom and pan belonged to another map.
     // 0.499 (user report): a link to the map brings it above the Tensho window instead of opening behind it.
     private bool mapViewToFront;
-    private void OpenMapView(uint mapId){mapViewMapId=mapId;mapViewFollow=mapId==0;mapFitRequested=mapId!=0;if(mapId==0)ApplyOpenZoom();mapViewOpen=true;mapViewToFront=true;}
+    // 0.850 (X-46, user report: the zoom does not always stay the one we set): another map opened whole whatever the opening setting (the game keeps the map last
+    // viewed, so M often asked another map); it now takes the setting too (fixed, last, whole) and is centred, its old pan belonging to another map.
+    private void OpenMapView(uint mapId){mapViewMapId=mapId;mapViewFollow=mapId==0;mapFitRequested=false;ApplyOpenZoom();CentreOtherMap(mapId);mapViewOpen=true;mapViewToFront=true;}
+    private void CentreOtherMap(uint mapId){if(mapId!=0 && configuration.MapView.OpenZoom!=MapOpenZoom.Whole)mapCenterRequest=new Vector2(MapProjection.TextureSize/2f);}
     // Called when the game map is replaced: the same key (M) that opens the game map toggles the Tensho map.
     // Hosted game map (0.151): the replacer asks whether the Tensho map is still open, and closes it with the game map.
     internal bool MapViewOpen=>Volatile.Read(ref mapViewOpen);
@@ -1078,7 +1081,8 @@ internal sealed partial class MainWindow
             if(region!=0 && link.LinkMapId==region)return (new Vector2(link.X,link.Y),region);
         return null;
     }
-    private void NavigateMap(uint mapId){if(mapId==0)return;mapViewMapId=mapId;mapViewFollow=false;mapFitRequested=true;}
+    // 0.850 (X-46): a map chosen from the menus keeps the zoom setting too, centred.
+    private void NavigateMap(uint mapId){if(mapId==0)return;mapViewMapId=mapId;mapViewFollow=false;mapFitRequested=false;ApplyOpenZoom();CentreOtherMap(mapId);}
 
     private (uint Shown,uint Standing) mapCostsReadFor;
     private void DrawMapCanvas(MapDefinition map,MapLiveState? live)
