@@ -679,7 +679,7 @@ public sealed class Plugin : IDalamudPlugin
                 .Select(row=>new Hunting.HuntEntry(row.RowId,row.Name.ExtractText(),row.MonsterNoteTarget.Select((target,index)=>(target,index))
                     .Where(pair=>pair.target.RowId!=0 && pair.index<row.Count.Count && row.Count[pair.index]>0 && pair.target.ValueNullable is not null)
                     .Select(pair=>new Hunting.HuntTarget(pair.target.Value.BNpcName.ValueNullable?.Singular.ExtractText() ?? "",row.Count[pair.index],
-                        string.Join(" / ",pair.target.Value.PlaceNameZone.Where(zone=>zone.RowId!=0).Select(zone=>zone.ValueNullable?.Name.ExtractText() ?? "").Where(name=>name.Length>0))))
+                        string.Join(" / ",pair.target.Value.PlaceNameZone.Where(zone=>zone.RowId!=0).Select(zone=>zone.ValueNullable?.Name.ExtractText() ?? "").Where(name=>name.Length>0)),pair.target.Value.BNpcName.RowId))
                     .ToArray()))
                 .Where(entry=>entry.Targets.Count>0).ToArray();
             Hunting.HuntingLogReader? huntReader=null;

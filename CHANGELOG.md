@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.796.0
+- Plan global, Verify : Demande (X-36) : les monstres proches que le bestiaire demande encore. Sur la carte, un livre marque un monstre encore à vaincre au rang actuel d'un bestiaire (le seul que le jeu compte) ; au survol, l'entrée et les victoires (« Gladiateur 01, 1/2 »). Réglage « Monstres de votre bestiaire » dans la carte, et le même sur la page Bestiaire. Les monstres proches sont maintenant une seule couche : une icône par monstre, toutes ses raisons au survol (butin pour vos listes, bestiaire). Non validé en jeu.
+- Tests : HuntNearby796Tests. Verify.ps1 (agent) : 1374/1374, 0 avertissement, 0 erreur ; DLL 0.796.0.0. Non validé en jeu.
+### English
+- Request (X-36): nearby monsters the hunting log still asks for. On the map, a book marks a monster still to defeat in a log's current rank (the only one the game counts); on hover, the entry and the kills (« Gladiator 01, 1/2 »). Setting « Monsters for your hunting log » on the map, and the same on the Hunting log page. Nearby monsters are now one layer: one icon per monster, every reason on hover (drops for your lists, hunting log). Not validated in game.
+
 ## 0.795.0
 - Plan global, Verify : Demande (X-34, X-35) : les monstres proches, en information seulement. Tensho lit les ennemis vivants que le jeu charge autour du personnage (nom, lieu, niveau ; 100 au plus ; coupé en JcJ). Premier usage : un monstre proche qui lâche un objet que vos listes de suivi demandent encore apparaît sur la carte avec une patte (son nom, son niveau et ce qu'il lâche au survol), et la ligne de l'objet dans la liste porte la même patte. Réglages : « Monstres de vos listes » dans la carte, « Monstres proches qui le lâchent » sous « Monstre » dans les options des listes. Données de butin : LuminaSupplemental. Non validé en jeu.
 - Tests : NearbyMonsters795Tests. Verify.ps1 (agent) : 1372/1372, 0 avertissement, 0 erreur ; DLL 0.795.0.0. Non validé en jeu.

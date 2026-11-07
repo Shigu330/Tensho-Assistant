@@ -162,6 +162,8 @@ public sealed class MapViewSettings
     public bool ShowHuntMarks { get; set; } = true;
     /// <summary>0.795 (X-35): nearby monsters that drop an item the tracking lists still need.</summary>
     public bool ShowListMonsters { get; set; } = true;
+    /// <summary>0.796 (X-36): nearby monsters the hunting log still asks for.</summary>
+    public bool ShowHuntLogMonsters { get; set; } = true;
     public bool GatheringLabels { get; set; } = true;
     // 0.535 (user request): the map without its title bar; off by default.
     public bool HideTitleBar { get; set; }

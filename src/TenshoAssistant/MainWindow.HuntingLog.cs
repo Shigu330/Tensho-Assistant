@@ -60,6 +60,8 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         ImGui.Checkbox(localization.Get("HuntingLog.MissingOnly")+"##HuntMissing",ref huntMissingOnly);
         Tip("HuntingLog.MissingOnlyTip");
+        // 0.796 (X-36): the map layer of these monsters, set from here too.
+        BoolSetting("HuntingLog.NearbyOnMap","HuntingLog.NearbyOnMapTip",()=>configuration.MapView.ShowHuntLogMonsters,value=>configuration.MapView.ShowHuntLogMonsters=value,c=>c.MapView.ShowHuntLogMonsters);
         var shown=logEntries.Where(entry=>entry.Rank==huntRank && (!huntMissingOnly || HuntingLog.Done(entry,slot)!=true)).OrderBy(entry=>entry.RowId).ToArray();
         var rankEntries=logEntries.Where(entry=>entry.Rank==huntRank).ToArray();
         if(slot is not null)ImGui.TextDisabled(localization.Format("HuntingLog.Count",rankEntries.Count(entry=>HuntingLog.Done(entry,slot)==true),rankEntries.Length));

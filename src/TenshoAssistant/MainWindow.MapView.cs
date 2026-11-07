@@ -540,6 +540,7 @@ internal sealed partial class MainWindow
             changed|=SettingBox("MapView.ShowBookmarks",settings.ShowBookmarks,value=>settings.ShowBookmarks=value);
             changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value);
             changed|=SettingBox("MapView.ShowListMonsters",settings.ShowListMonsters,value=>settings.ShowListMonsters=value);
+            changed|=SettingBox("MapView.ShowHuntLogMonsters",settings.ShowHuntLogMonsters,value=>settings.ShowHuntLogMonsters=value);
             changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value);
             if(changed)
             {
@@ -597,6 +598,7 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value,MapDefaults.ShowGathering);
                 changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value,MapDefaults.ShowHuntMarks);
                 changed|=SettingBox("MapView.ShowListMonsters",settings.ShowListMonsters,value=>settings.ShowListMonsters=value,MapDefaults.ShowListMonsters);
+                changed|=SettingBox("MapView.ShowHuntLogMonsters",settings.ShowHuntLogMonsters,value=>settings.ShowHuntLogMonsters=value,MapDefaults.ShowHuntLogMonsters);
                 changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
                 var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelMinZoom"),ref labelMinimum,0,200,"%.0f %%")){settings.GatheringLabelMinZoom=labelMinimum/100;changed=true;}
@@ -1267,20 +1269,29 @@ internal sealed partial class MainWindow
                     if(hovered && Vector2.Distance(io.MousePos,at)<=glyph){tooltip=label;tooltipPoint=null;}
                 }
             // 0.795 (X-35, user request): nearby monsters that drop an item the tracking lists still need.
-            if(settings.ShowListMonsters && live?.Monsters is { Count:>0 } monsters && live.MapId==map.MapId)
+            // 0.796 (X-36): one layer for every reason; one icon per monster, the first reason's, and every reason on hover.
+            if((settings.ShowListMonsters || settings.ShowHuntLogMonsters) && live?.Monsters is { Count:>0 } monsters && live.MapId==map.MapId)
             {
                 RefreshNearbyMonsters();
                 foreach(var monster in monsters)
                 {
-                    var drops=MonsterListDrops(monster);
-                    if(drops.Count==0)continue;
+                    var notes=MonsterNotes(monster);
+                    if(notes.Count==0)continue;
+                    MonsterNote? first=null;
+                    foreach(var note in notes)if(note.Kind switch{MonsterNoteKind.List=>settings.ShowListMonsters,MonsterNoteKind.HuntLog=>settings.ShowHuntLogMonsters,_=>true}){first=note;break;}
+                    if(first is null)continue;
                     var at=origin+mapPan+MapProjection.PixelFromWorld(monster.Position,map)*mapZoom;
                     var glyph=Math.Max(4,baseIcon*0.6f);
+                    var (symbol,colour)=first.Kind switch
+                    {
+                        MonsterNoteKind.HuntLog=>(FontAwesomeIcon.BookOpen,new Vector4(0.55f,0.80f,0.98f,1)),
+                        _=>(FontAwesomeIcon.Paw,new Vector4(0.98f,0.55f,0.35f,1)),
+                    };
                     draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
-                    draw.AddText(UiBuilder.IconFont,glyph,at-new Vector2(glyph/2),ImGui.GetColorU32(new Vector4(0.98f,0.55f,0.35f,1)),FontAwesomeIcon.Paw.ToIconString());
+                    draw.AddText(UiBuilder.IconFont,glyph,at-new Vector2(glyph/2),ImGui.GetColorU32(colour),symbol.ToIconString());
                     if(hovered && Vector2.Distance(io.MousePos,at)<=glyph)
                     {
-                        tooltip=localization.Format("MapView.MonsterListLabel",monster.Name,monster.Level,string.Join(", ",drops.Select(item=>itemCatalog.State.Catalog?.Find(item)?.Name ?? item.ToString())));
+                        tooltip=localization.Format("MapView.MonsterLabel",monster.Name,monster.Level)+"\n"+string.Join("\n",notes.Where(note=>note.Kind switch{MonsterNoteKind.List=>settings.ShowListMonsters,MonsterNoteKind.HuntLog=>settings.ShowHuntLogMonsters,_=>true}).Select(note=>note.Text));
                         tooltipPoint=null;
                     }
                 }
