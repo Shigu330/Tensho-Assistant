@@ -1,4 +1,5 @@
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -53,6 +54,7 @@ internal sealed class ActionBarLocator : IDisposable
         {
             var found=new List<ActionBarRect>();
             var module=RaptureHotbarModule.Instance();
+            var actions=ActionManager.Instance();
             foreach(var name in Bars)
             {
                 var handle=gui.GetAddonByName(name);
@@ -63,10 +65,17 @@ internal sealed class ActionBarLocator : IDisposable
                 var scale=addon->AtkUnitBase.Scale;
                 for(var index=0;index<slots.Length && index<MaximumSlots;index++)
                 {
-                    if(slots[index].ActionId!=(int)wanted || slots[index].Icon==null)continue;
-                    // An item or a macro can carry the same number: only an action counts.
-                    if(module!=null && addon->RaptureHotbarId<module->Hotbars.Length
-                        && module->Hotbars[addon->RaptureHotbarId].Slots[index].ApparentSlotType!=RaptureHotbarModule.HotbarSlotType.Action)continue;
+                    if(slots[index].Icon==null)continue;
+                    // 0.734 (user report): the game turns some actions into their next rank on the bar (Bountiful Harvest shows as II): the slot keeps the first one, so what it shows counts.
+                    var matched=slots[index].ActionId==(int)wanted;
+                    if(module!=null && addon->RaptureHotbarId<module->Hotbars.Length)
+                    {
+                        ref var saved=ref module->Hotbars[addon->RaptureHotbarId].Slots[index];
+                        // An item or a macro can carry the same number: only an action counts.
+                        if(saved.ApparentSlotType!=RaptureHotbarModule.HotbarSlotType.Action)continue;
+                        matched|=saved.ApparentActionId==wanted || actions!=null && saved.CommandId!=0 && actions->GetAdjustedActionId(saved.CommandId)==wanted;
+                    }
+                    if(!matched)continue;
                     var node=&slots[index].Icon->AtkResNode;
                     if(!Visible(node))continue;
                     var rect=new ActionBarRect(node->ScreenX,node->ScreenY,node->Width*node->ScaleX*scale,node->Height*node->ScaleY*scale);

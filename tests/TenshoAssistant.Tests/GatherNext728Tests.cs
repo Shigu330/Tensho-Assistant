@@ -75,6 +75,7 @@ internal static class GatherNext728Tests
             Check(locator.Contains("CompetitiveGate.Add(framework,OnUpdate)") && locator.Contains("CompetitiveGate.Remove(framework,OnUpdate)"),"owned and cut");
             Check(!locator.Contains("PulseActionBarSlot") && !locator.Contains("UseAction") && !locator.Contains("Hook"),"nothing called or hooked");
             Check(locator.Contains("HotbarSlotType.Action"),"only an action");
+            Check(locator.Contains("saved.ApparentActionId==wanted") && locator.Contains("GetAdjustedActionId(saved.CommandId)==wanted"),"0.734: an action the game shows at its next rank");
             var panel=Read("MainWindow.GatheringPanel.cs");
             Check(panel.Contains("configuration.GatheringNextHighlight && BarLocator is { } located") && panel.Contains("located.Want(action.Spec.Id)") && panel.Contains("DrawGatheringBarHighlight(located)"),"setting, asked and drawn inside the panel");
             Check(!panel.Contains("located.Wanted=0"),"0.733: nothing clears the request after the panel asked");
