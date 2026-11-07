@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.749.0
+- Plan global, Verify : Lourdeur (X-01) : en mode développeur, le relevé des images lentes détaille la carte (menus, outils, carte elle-même), qui coûtait 195 ms à l'ouverture. Aucun changement visible. Non validé en jeu.
+- Tests : SlowFrame745Tests. Verify.ps1 (agent) : 1321/1321, 0 avertissement, 0 erreur ; DLL 0.749.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01): in developer mode, the slow-frame log details the map (menus, tools, the map itself), which cost 195 ms when it opened. No visible change. Not validated in game.
+
 ## 0.748.0
 - Plan global, Verify : Lourdeur (X-01) : en mode développeur, le passage des pages repassait à chaque rechargement et donnait des images de 110 à 160 ms ; il passe au plus une fois toutes les deux heures, et sa part apparaît dans le relevé des images lentes. Inscrit au plan : X-08, compte à rebours d'un point à horaire fermé. Non validé en jeu.
 - Tests : PageSweep724Tests. Verify.ps1 (agent) : 1321/1321, 0 avertissement, 0 erreur ; DLL 0.748.0.0. Non validé en jeu.

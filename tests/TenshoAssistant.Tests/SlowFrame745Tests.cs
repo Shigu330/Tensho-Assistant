@@ -28,6 +28,7 @@ internal static class SlowFrame745Tests
             var panel=Read("MainWindow.GatheringPanel.cs");
             Check(panel.Contains("gatheringPanelSolve=(key,Task.Run(()=>") && !panel.Contains("gatheringPanelPlan=GpOptimizer.Solve(scenario,catalog);"),"0.747: the node's plan off the frame");
             Check(panel.Contains("gatheringLeftoverSolve=(known,Task.Run(()=>GpNextAction.Leftover("),"0.747: the end-of-node replan too");
+            Check(Read("MainWindow.MapView.cs").Contains("MeasureMap(\"map canvas\",()=>DrawMapCanvas(map,live));"),"0.749: the map's parts");
         }),
     ];
 }

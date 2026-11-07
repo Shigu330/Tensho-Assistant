@@ -137,12 +137,12 @@ internal sealed partial class MainWindow
         mapOverlayHovered=false;
         if(settings.OverlayControls && map is not null && map.TexturePath.Length>0)
         {
-            DrawMapOverlayLayout(catalog,map,live,viewport,window);
+            MeasureMap("map overlay layout",()=>DrawMapOverlayLayout(catalog,map,live,viewport,window));
             return;
         }
         // Layout of the game map: region and zone menus on top, tool column on the left, the map on the right.
-        DrawMapMenus(catalog,map,live);
-        DrawMapTools(map,viewport,window);
+        MeasureMap("map menus",()=>DrawMapMenus(catalog,map,live));
+        MeasureMap("map tools",()=>DrawMapTools(map,viewport,window));
         ImGui.SameLine();
         if(map is null || map.TexturePath.Length==0)
         {
@@ -150,7 +150,16 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped(localization.Get(map is null && live is null && mapViewFollow ? "MapView.PositionUnknown":"MapView.Unavailable"));
             return;
         }
-        DrawMapCanvas(map,live);
+        MeasureMap("map canvas",()=>DrawMapCanvas(map,live));
+    }
+
+    // 0.749 (X-01): the map's frame was 195 ms when it opened; its parts in the slow-frame log, developer mode only.
+    private void MeasureMap(string part,Action draw)
+    {
+        if(!DeveloperMode){draw();return;}
+        var started=System.Diagnostics.Stopwatch.GetTimestamp();
+        try{draw();}
+        finally{SlowFrames.Add(ImGui.GetFrameCount(),part,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);}
     }
 
     // 0.303 (user request): the map takes the whole window; the region / zone menus (on a dark-to-clear band with the menu
