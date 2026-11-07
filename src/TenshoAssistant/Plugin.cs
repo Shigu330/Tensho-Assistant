@@ -233,8 +233,10 @@ public sealed class Plugin : IDalamudPlugin
                             if(alarmLinks.Count>=256){chat.RemoveChatLinkHandler();alarmLinks.Clear();}
                             link=RegisterAlarmLink(alarm.ItemId);
                         }
-                        message.AddText(" ").Add(link).AddUiForeground(localization.Get("Alarms.OpenInTensho"),500)
-                            .Add(Dalamud.Game.Text.SeStringHandling.Payloads.RawPayload.LinkTerminator);
+                        // 0.771 (X-03, user report: still no click with no other plugin on): the colour around the link, not inside it, as Dalamud's own links do;
+                        // inside, the colour codes stood between the link and its text.
+                        message.AddText(" ").AddUiForeground(500).Add(link).AddText(localization.Get("Alarms.OpenInTensho"))
+                            .Add(Dalamud.Game.Text.SeStringHandling.Payloads.RawPayload.LinkTerminator).AddUiForegroundOff();
                     }
                     chat.Print(message.Build());
                 },alarm=>

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.771.0
+- Plan global, Verify : Signalement (X-03) : « Ouvrir dans Tensho » ne marche toujours pas, même avec Tensho seul ; aucun clic n'arrive. Le code de couleur était placé à l'intérieur du lien, entre son début et son texte ; il est maintenant autour, comme pour les liens de Dalamud. Le journal note toujours chaque clic. Non validé en jeu.
+- Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1344/1344, 0 avertissement, 0 erreur ; DLL 0.771.0.0. Non validé en jeu.
+### English
+- Report (X-03): « Open in Tensho » still does not work, even with Tensho alone; no click arrives. The colour code sat inside the link, between its start and its text; it now surrounds it, as Dalamud's own links do. The log still notes each click. Not validated in game.
+
 ## 0.770.0
 - Plan global, Verify : Signalement (X-20) : un objet déposé chez un servant, dans les sacoches ou au coffre de compagnie n'apparaissait qu'en rouvrant. Le rangement ouvert est maintenant relu toutes les 2 secondes au lieu de 30 ; le fichier n'est écrit que si la copie change. Non validé en jeu.
 - Tests : OpenStorage770Tests. Verify.ps1 (agent) : 1343/1343, 0 avertissement, 0 erreur ; DLL 0.770.0.0. Non validé en jeu.
