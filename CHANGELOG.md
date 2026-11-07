@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.799.0
+- Plan global, Verify : Demande (X-38), suite : l'icône du mage bleu au-dessus de la tête d'un monstre proche qui apprend un sort que vous n'avez pas, dans la vue du jeu, dessinée derrière les fenêtres de Tensho, les sorts au survol. Au choix aussi pour les monstres de vos listes (patte), du bestiaire (livre) et des ALÉA (étoile), désactivés au départ. Réglages dans la carte (« Icônes au-dessus des monstres proches » : raisons, taille, distance jusqu'à 150 yalms, masquer en combat) et sur la page Magie bleue. Les monstres sont relus tous les dixièmes de seconde pour suivre leurs déplacements. Non validé en jeu.
+- Tests : MonsterIcons799Tests. Verify.ps1 (agent) : 1379/1379, 0 avertissement, 0 erreur ; DLL 0.799.0.0. Non validé en jeu.
+### English
+- Request (X-38), continued: the Blue Mage icon above the head of a nearby monster that teaches a spell you lack, in the game's view, drawn behind Tensho's windows, the spells on hover. Also, when chosen, for monsters of your lists (paw), hunting log (book) and FATEs (star), off at first. Settings on the map (« Icons above nearby monsters »: reasons, size, distance up to 150 yalms, hide in combat) and on the Blue magic page. Monsters are read every tenth of a second to follow their moves. Not validated in game.
+
 ## 0.798.0
 - Plan global, Verify : Demande (X-38), première partie : les monstres proches qui apprennent une magie bleue que vous n'avez pas sont marqués d'un chapeau de magicien sur la carte, les sorts au survol. Le jeu ne relie aucun sort à un monstre : la source est le wiki, déjà lu sort par sort ; la page Magie bleue a maintenant un bouton qui lit les sorts manquants, une page toutes les trois secondes, gardées sur le disque, rien sans ce clic. Les noms anglais du wiki sont reliés aux monstres du jeu par leur nom. Réglages : « Monstres pour le mage bleu » (carte et page Magie bleue) et « Même hors mage bleu », désactivé au départ. L'icône au-dessus de la tête vient ensuite. Non validé en jeu.
 - Tests : BlueNearby798Tests. Verify.ps1 (agent) : 1378/1378, 0 avertissement, 0 erreur ; DLL 0.798.0.0. Non validé en jeu.

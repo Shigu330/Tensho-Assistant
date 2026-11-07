@@ -169,6 +169,15 @@ public sealed class MapViewSettings
     /// <summary>0.798 (X-38): nearby monsters that teach a blue magic spell not learned yet; as Blue Mage only, unless BlueMageMonstersAlways.</summary>
     public bool ShowBlueMageMonsters { get; set; } = true;
     public bool BlueMageMonstersAlways { get; set; }
+    /// <summary>0.799 (X-38): icons above the heads of nearby monsters that matter, in the game's view; which reasons, their size, how far, and in combat.</summary>
+    public bool MonsterIconsAbove { get; set; } = true;
+    public bool AboveBlueSpell { get; set; } = true;
+    public bool AboveList { get; set; }
+    public bool AboveHuntLog { get; set; }
+    public bool AboveFate { get; set; }
+    public bool MonsterIconsHideInCombat { get; set; }
+    public int MonsterIconSize { get; set; } = 32;
+    public float MonsterIconDistance { get; set; } = 50;
     public bool GatheringLabels { get; set; } = true;
     // 0.535 (user request): the map without its title bar; off by default.
     public bool HideTitleBar { get; set; }

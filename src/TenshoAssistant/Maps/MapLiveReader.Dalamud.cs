@@ -21,7 +21,7 @@ public sealed record MapEventMarker(uint MapId,uint Icon,Vector3 Position,float 
 public enum MapObjectKind { Treasure, Gathering, HuntMark }
 public sealed record MapObjectMarker(MapObjectKind Kind,string Name,Vector3 Position,int Level);
 /// <summary>0.795 (X-34): a living enemy the game streams around the player: its name row, base row, name, place and level. Information only.</summary>
-public sealed record MapMonster(uint NameId,uint BaseId,string Name,Vector3 Position,int Level,uint FateId=0,uint EventId=0);
+public sealed record MapMonster(uint NameId,uint BaseId,string Name,Vector3 Position,int Level,uint FateId=0,uint EventId=0,float Height=0);
 
 // FATE running in the current zone (IFateTable): FATEs have no static map position in the game data (0.114 probe), only live ones.
 public sealed record MapFateMarker(uint Id,string Name,int Level,uint Icon,Vector3 Position,float Radius,int Progress,long SecondsLeft,string State,bool HasBonus=false);
@@ -164,7 +164,6 @@ internal sealed class MapLiveReader : IDisposable
                 try{events=ReadEvents();Read("events");}catch(Exception error){Failed("events",error);}
                 // Objects, FATEs and party carry no map id: on a failure they are emptied, never kept from another zone.
                 try{nearby=ReadObjects();Read("objects");}catch(Exception error){nearby=[];Failed("objects",error);}
-                try{monsters=ReadMonsters();Read("monsters");}catch(Exception error){monsters=[];Failed("monsters",error);}
                 try{fates=ReadFates();Read("FATEs");}catch(Exception error){fates=[];Failed("FATEs",error);}
                 eventsAt=now.AddMilliseconds(500);
             }
@@ -172,6 +171,8 @@ internal sealed class MapLiveReader : IDisposable
             if(now>=partyAt)
             {
                 try{partyMarkers=ReadParty();Read("party");}catch(Exception error){partyMarkers=[];Failed("party",error);}
+                // 0.799 (X-38): monsters move; their icons above the head follow at this pace.
+                try{monsters=ReadMonsters();Read("monsters");}catch(Exception error){monsters=[];Failed("monsters",error);}
                 partyAt=now.AddMilliseconds(100);
             }
             try{ReadPlace();Read("place");}catch(Exception error){areaName=subAreaName="";Failed("place",error);}
@@ -216,7 +217,9 @@ internal sealed class MapLiveReader : IDisposable
             if(result.Count>=100)break;
             if(item is not Dalamud.Game.ClientState.Objects.Types.IBattleNpc { CurrentHp:>0, NameId:not 0 } npc || npc.BattleNpcKind!=Dalamud.Game.ClientState.Objects.Enums.BattleNpcSubKind.Combatant || !npc.IsTargetable)continue;
             var native=(FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)npc.Address;
-            result.Add(new(npc.NameId,npc.BaseId,npc.Name.TextValue,npc.Position,npc.Level,native==null ? 0u:native->FateId,native==null ? 0u:native->EventId.Id));
+            // 0.799 (X-38): its height, for an icon above its head (a field, no game function called).
+            var height=native==null || !float.IsFinite(native->Height) ? 0:Math.Clamp(native->Height,0,50);
+            result.Add(new(npc.NameId,npc.BaseId,npc.Name.TextValue,npc.Position,npc.Level,native==null ? 0u:native->FateId,native==null ? 0u:native->EventId.Id,height));
         }
         return result.AsReadOnly();
     }

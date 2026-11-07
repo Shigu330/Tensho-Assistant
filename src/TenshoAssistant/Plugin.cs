@@ -1299,6 +1299,7 @@ public sealed class Plugin : IDalamudPlugin
         [
             ("Bank",()=>{if(!autoBankCapture())bankOverlay.Draw();}),
             ("CraftLog",mainWindow.DrawCraftLogHelper),
+            ("MonsterIcons",mainWindow.DrawMonsterOverheadIcons),
             ("ItemHover",mainWindow.DrawItemHover),
             ("UndercutClipboard",()=>undercut?.FlushClipboard()),
             ("Cactpot",mainWindow.DrawCactpotOverlay),

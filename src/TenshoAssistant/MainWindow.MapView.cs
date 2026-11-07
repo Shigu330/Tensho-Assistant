@@ -612,6 +612,24 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.ShowFateMonsters",settings.ShowFateMonsters,value=>settings.ShowFateMonsters=value,MapDefaults.ShowFateMonsters);
                 changed|=SettingBox("MapView.ShowBlueMageMonsters",settings.ShowBlueMageMonsters,value=>settings.ShowBlueMageMonsters=value,MapDefaults.ShowBlueMageMonsters);
                 changed|=SettingBox("MapView.BlueMageMonstersAlways",settings.BlueMageMonstersAlways,value=>settings.BlueMageMonstersAlways=value,MapDefaults.BlueMageMonstersAlways);
+                // 0.799 (X-38): icons above the monsters' heads, in the game's view.
+                changed|=SettingBox("MapView.MonsterIconsAbove",settings.MonsterIconsAbove,value=>settings.MonsterIconsAbove=value,MapDefaults.MonsterIconsAbove);
+                if(settings.MonsterIconsAbove)
+                {
+                    ImGui.Indent();
+                    changed|=SettingBox("MapView.AboveBlueSpell",settings.AboveBlueSpell,value=>settings.AboveBlueSpell=value,MapDefaults.AboveBlueSpell);
+                    changed|=SettingBox("MapView.AboveList",settings.AboveList,value=>settings.AboveList=value,MapDefaults.AboveList);
+                    changed|=SettingBox("MapView.AboveHuntLog",settings.AboveHuntLog,value=>settings.AboveHuntLog=value,MapDefaults.AboveHuntLog);
+                    changed|=SettingBox("MapView.AboveFate",settings.AboveFate,value=>settings.AboveFate=value,MapDefaults.AboveFate);
+                    changed|=SettingBox("MapView.MonsterIconsHideInCombat",settings.MonsterIconsHideInCombat,value=>settings.MonsterIconsHideInCombat=value,MapDefaults.MonsterIconsHideInCombat);
+                    var iconSize=Math.Clamp(settings.MonsterIconSize,16,96);ImGui.SetNextItemWidth(160);
+                    if(ImGui.SliderInt(localization.Get("MapView.MonsterIconSize"),ref iconSize,16,96)){settings.MonsterIconSize=iconSize;changed=true;}
+                    Tip("MapView.MonsterIconSizeTip");
+                    var iconDistance=Math.Clamp(settings.MonsterIconDistance,5,150);ImGui.SetNextItemWidth(160);
+                    if(ImGui.SliderFloat(localization.Get("MapView.MonsterIconDistance"),ref iconDistance,5,150,"%.0f")){settings.MonsterIconDistance=iconDistance;changed=true;}
+                    Tip("MapView.MonsterIconDistanceTip");
+                    ImGui.Unindent();
+                }
                 changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
                 var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelMinZoom"),ref labelMinimum,0,200,"%.0f %%")){settings.GatheringLabelMinZoom=labelMinimum/100;changed=true;}
@@ -1295,13 +1313,7 @@ internal sealed partial class MainWindow
                     if(first is null)continue;
                     var at=origin+mapPan+MapProjection.PixelFromWorld(monster.Position,map)*mapZoom;
                     var glyph=Math.Max(4,baseIcon*0.6f);
-                    var (symbol,colour)=first.Kind switch
-                    {
-                        MonsterNoteKind.HuntLog=>(FontAwesomeIcon.BookOpen,new Vector4(0.55f,0.80f,0.98f,1)),
-                        MonsterNoteKind.Fate=>(FontAwesomeIcon.Star,new Vector4(0.95f,0.85f,0.40f,1)),
-                        MonsterNoteKind.BlueSpell=>(FontAwesomeIcon.HatWizard,new Vector4(0.40f,0.60f,1f,1)),
-                        _=>(FontAwesomeIcon.Paw,new Vector4(0.98f,0.55f,0.35f,1)),
-                    };
+                    var (symbol,colour)=MonsterGlyph(first.Kind);
                     draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
                     draw.AddText(UiBuilder.IconFont,glyph,at-new Vector2(glyph/2),ImGui.GetColorU32(colour),symbol.ToIconString());
                     if(hovered && Vector2.Distance(io.MousePos,at)<=glyph)
