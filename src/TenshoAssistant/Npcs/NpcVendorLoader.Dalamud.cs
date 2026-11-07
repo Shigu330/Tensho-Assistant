@@ -239,8 +239,10 @@ internal sealed class NpcVendorLoader : IDisposable
         // Most vendors are placed by territory layouts, not the Level sheet: read planevent.lgb, one territory per step,
         // only for vendors still without a position (probe: docs/evidence/0.98.0-lgb-probe.log).
         var missing=vendorShops.Keys.Where(id=>!locations.ContainsKey(id)).ToHashSet();
-        if(missing.Count>0)
-            foreach(var territory in data.GetExcelSheet<TerritoryType>())
+        // 0.823 (X-45, reopened: event NPCs still on the Aftcastle): every vendor's layers are read, not only the vendors without a position, so that a Level
+        // position also gets its layer's condition (an NPC on an always-there layer stays; one only on festival, quest or opening layers does not).
+        var conditions=new Dictionary<(uint Npc,uint Territory),(int Condition,uint Festival)>();
+        foreach(var territory in data.GetExcelSheet<TerritoryType>())
             foreach(var kind in LayoutKinds)
             {
                 if(territory.Map.RowId!=0 && territory.Map.IsValid && Layout(territory,kind) is { } file)
@@ -252,7 +254,13 @@ internal sealed class NpcVendorLoader : IDisposable
                     {
                         if(instance.AssetType!=Lumina.Data.Parsing.Layer.LayerEntryType.EventNPC
                            || instance.Object is not Lumina.Data.Parsing.Layer.LayerCommon.ENPCInstanceObject npc
-                           || !missing.Contains(npc.ParentData.ParentData.BaseId))continue;
+                           || !vendorShops.ContainsKey(npc.ParentData.ParentData.BaseId))continue;
+                        {
+                            var layerCondition=NpcShopLinks.LayerCondition(layer.Name,layer.FestivalID);
+                            var key=(npc.ParentData.ParentData.BaseId,territory.RowId);
+                            conditions[key]=conditions.TryGetValue(key,out var known) ? NpcShopLinks.MorePresent(known,layerCondition):layerCondition;
+                        }
+                        if(!missing.Contains(npc.ParentData.ParentData.BaseId))continue;
                         var id=npc.ParentData.ParentData.BaseId;var position=instance.Transform.Translation;
                         var x=NpcShopLinks.MapCoordinate(position.X,map.OffsetX,map.SizeFactor);var y=NpcShopLinks.MapCoordinate(position.Z,map.OffsetY,map.SizeFactor);
                         if(!locations.TryGetValue(id,out var list))locations[id]=list=[];
@@ -265,6 +273,11 @@ internal sealed class NpcVendorLoader : IDisposable
                 }
                 yield return ++count;
             }
+        // 0.823 (X-45): a Level position takes the condition of the NPC's layers in that territory (none: always there).
+        foreach(var (npcId,list) in locations)
+            for(var index=0;index<list.Count;index++)
+                if(list[index].Condition==NpcShopLinks.Always && conditions.TryGetValue((npcId,list[index].TerritoryId),out var placed) && placed.Condition!=NpcShopLinks.Always)
+                    list[index]=list[index] with {Condition=placed.Condition,Festival=placed.Festival};
         foreach(var place in NpcShopLinks.ObservedPlaces)
         {
             if(locations.ContainsKey(place.Npc) || !vendorShops.ContainsKey(place.Npc) || !data.GetExcelSheet<Map>().TryGetRow(place.Map,out var map))continue;

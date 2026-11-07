@@ -1286,6 +1286,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.822) Un objet de la liste gardé chez un servant : icône d'entrepôt et son nom au survol.
 
+- [ ] (0.823) Limsa, la Dunette : seuls les marchands présents en jeu restent ; je relis « Map vendors on map ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

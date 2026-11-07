@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.823.0
+- Plan global, Verify : Signalement (X-45), à nouveau : des PNJ d'événement restaient sur la carte de la Dunette. La 0.811 ne donnait la condition de leur couche qu'aux positions lues dans les fichiers de disposition ; un PNJ qui a aussi une ligne dans la feuille Level gardait une position « toujours là ». Les couches de tous les marchands sont maintenant lues, et une position de la feuille Level prend la condition de ses couches dans ce territoire : toujours là si une seule couche le garde, sinon pendant son événement, jamais pour une quête ou l'ouverture. La copie du catalogue des marchands est reconstruite une fois. En mode développeur, le journal liste les marchands montrés sur la carte et ceux laissés de côté. Non validé en jeu.
+- Tests : FestivalVendors810Tests. Verify.ps1 (agent) : 1409/1409, 0 avertissement, 0 erreur ; DLL 0.823.0.0. Non validé en jeu.
+### English
+- Report (X-45), again: event NPCs stayed on the Aftcastle's map. 0.811 gave the layer's condition only to positions read from the layout files; an NPC that also has a Level row kept an « always there » position. Every vendor's layers are now read, and a Level position takes its layers' condition in that territory: always there if one layer keeps it, else during its event, never for a quest or the opening. The vendors catalogue copy is rebuilt once. In developer mode the log lists the vendors shown on the map and those left out. Not validated in game.
+
 ## 0.822.0
 - Plan global, Verify : Demande (X-55) : dans les listes de suivi, une icône d'entrepôt à côté du compte dit qu'une partie de l'objet n'est pas sur vous, quand vos sacs seuls ne couvrent pas le besoin ; au survol, les rangements et leurs quantités (« Pas sur vous : servant Shirune 3, sacoche 2 »). Non validé en jeu.
 - Tests : Elsewhere822Tests. Verify.ps1 (agent) : 1409/1409, 0 avertissement, 0 erreur ; DLL 0.822.0.0. Non validé en jeu.

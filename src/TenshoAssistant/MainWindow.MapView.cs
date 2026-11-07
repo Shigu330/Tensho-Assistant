@@ -1935,6 +1935,13 @@ internal sealed partial class MainWindow
             var same=(maps.State.Catalog?.Equivalent(map) ?? [map.MapId]).ToHashSet();
             var rows=catalog.Vendors.SelectMany(vendor=>vendor.Locations.Where(spot=>same.Contains(spot.MapId) && Npcs.NpcShopLinks.Present(spot,running)).Take(1).Select(spot=>(vendor,spot))).ToArray();
             mapVendorCache=(map.MapId,catalog,rows,shops,festivalKey);
+            // 0.823 (X-45): developer mode, the vendors drawn on this map with their place's condition, and those left out.
+            if(developerMode)
+            {
+                var hidden=catalog.Vendors.SelectMany(vendor=>vendor.Locations.Where(spot=>same.Contains(spot.MapId) && !Npcs.NpcShopLinks.Present(spot,running)).Take(1)).Count();
+                log.Information("Map vendors on map {0}: {1} shown, {2} left out (festivals running: {3}); shown: {4}.",map.MapId,rows.Length,hidden,festivalKey,
+                    string.Join(", ",rows.Take(30).Select(row=>$"{row.vendor.NpcId} {row.vendor.Name} c{row.spot.Condition}")));
+            }
         }
         return mapVendorCache.Rows;
     }
