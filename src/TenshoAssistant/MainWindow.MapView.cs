@@ -154,6 +154,16 @@ internal sealed partial class MainWindow
     }
 
     // 0.749 (X-01): the map's frame was 195 ms when it opened; its parts in the slow-frame log, developer mode only.
+    // 0.791 (X-01: « map overlay layout » 110 to 160 ms several times an hour on 2026-11-07, not only at opening): checkpoints inside the canvas, developer mode.
+    private long mapMarkAt;
+    private void MapMarkStart(){if(DeveloperMode)mapMarkAt=System.Diagnostics.Stopwatch.GetTimestamp();}
+    private void MapMark(string part)
+    {
+        if(!DeveloperMode)return;
+        var now=System.Diagnostics.Stopwatch.GetTimestamp();
+        SlowFrames.Add(ImGui.GetFrameCount(),part,System.Diagnostics.Stopwatch.GetElapsedTime(mapMarkAt,now).TotalMilliseconds);
+        mapMarkAt=now;
+    }
     private void MeasureMap(string part,Action draw)
     {
         if(!DeveloperMode){draw();return;}
@@ -178,7 +188,7 @@ internal sealed partial class MainWindow
         // 0.305 (user feedback: no button answered): the overlays are submitted BEFORE the map, so their buttons take the click
         // first; the map then ignores the mouse while it is over one of them. They are still drawn above it (child windows).
         mapOverlayHovered=false;
-        if(shown)DrawMapOverlayControls(catalog,map,live,viewport,window,start,area,line,pad,indent,fade,grey);
+        if(shown)MeasureMap("map overlay controls",()=>DrawMapOverlayControls(catalog,map,live,viewport,window,start,area,line,pad,indent,fade,grey));
         else
         {
             mapHeaderList=0;
@@ -202,7 +212,7 @@ internal sealed partial class MainWindow
             }
         }
         ImGui.SetCursorPos(start);
-        DrawMapCanvas(map,live);
+        MeasureMap("map canvas",()=>DrawMapCanvas(map,live));
     }
 
     // Region, zone and floor names (the game map's header: stacked, outlined, each unrolling its list downward) to the right of the
@@ -1006,6 +1016,7 @@ internal sealed partial class MainWindow
     private (uint Shown,uint Standing) mapCostsReadFor;
     private void DrawMapCanvas(MapDefinition map,MapLiveState? live)
     {
+        MapMarkStart();
         // 0.645 (P7): the game's teleport list, read when the shown map or the player's map changes: costs depend on where the player stands.
         if(mapCostsReadFor!=(map.MapId,live?.MapId ?? 0)){mapCostsReadFor=(map.MapId,live?.MapId ?? 0);mapLive?.RefreshTeleportCosts();}
         var origin=ImGui.GetCursorScreenPos();var size=Vector2.Max(ImGui.GetContentRegionAvail(),new Vector2(64));mapCanvasSize=size;
@@ -1103,7 +1114,9 @@ internal sealed partial class MainWindow
             var fates=settings.ShowFates && live?.Fates is { } running && live.MapId==map.MapId ? running:[];
             var eventMaps=SameLandMaps(map);
             var events=settings.ShowQuests && live?.Events is { } liveEvents ? liveEvents.Where(marker=>eventMaps.Contains(marker.MapId)).ToArray():[];
+            MapMark("canvas texture, names, zones");
             var gathering=settings.ShowGathering ? MapGatheringPoints(map):[];
+            MapMark("canvas gathering points");
             // Areas per kind (0.151): quests (marker type 3), leves and other events, FATEs, gathering points; own switch and colour.
             if(settings.ShowFateAreas)
                 foreach(var fate in fates.Where(fate=>fate.Radius>0))
@@ -1125,6 +1138,7 @@ internal sealed partial class MainWindow
                     DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(point.X,0,point.Y),map)*mapZoom,point.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,settings.GatheringAreaColor);
             // Every game icon in one list sorted by priority (0.124: quests used to be drawn above everything whatever the
             // setting). Equal priorities keep the game's layer order: fixed icons, gathering, FATEs, quests, game target.
+            MapMark("canvas areas");
             var icons=new List<MapIconDraw>();
             // worldRadius: area of a quest, FATE or gathering point; hovering inside it lists the icon too (like Mappy).
             void Add(uint icon,int layer,Vector2 pixel,string? label,MapIconMarker? fixedMarker=null,MapLocalGatheringPoint? point=null,float worldRadius=0,Vector2? flag=null)
@@ -1297,6 +1311,7 @@ internal sealed partial class MainWindow
                 }
             // 0.378 (g, M-08): the player's bookmarks of this map (star); a click on one places the flag there.
             MapBookmark? hoveredBookmark=null;
+            MapMark("canvas icons");
             if(settings.ShowBookmarks && settings.SizeOf(GlyphBookmark,map.MapId) is var bookmarkSize and >0)
                 foreach(var mark in configuration.MapBookmarks ?? [])
                 {
@@ -1322,6 +1337,7 @@ internal sealed partial class MainWindow
             if(settings.ShowPlayer && player is { } here)DrawPlayerArrow(draw,origin+mapPan+here*mapZoom,live!.Rotation,settings.ShowViewCone,MapViewSettings.ClampMarker(settings.PlayerIconScale),
                 MapViewSettings.ClampMarker(settings.ViewConeScale),MapViewSettings.ClampConeOpacity(settings.ViewConeOpacity),settings.ViewConeColor);
             // 0.297 (user request): targets outside the view keep their icon on the map's edge, compass style.
+            MapMark("canvas bookmarks, treasure, player");
             var edgeLabel=settings.ShowEdgeMarkers ? DrawEdgeMarkers(draw,origin,size,map,live,settings,player,events,fates,gathering,hovered,io.MousePos):null;
             if(edgeLabel is not null){tooltip=edgeLabel;sightseeingTip=null;tooltipPoint=null;}
             // Only the topmost icon under the cursor answers: tooltip, map link, teleport or flag.
@@ -1383,7 +1399,7 @@ internal sealed partial class MainWindow
             if(settings.FlagOnClick && hovered && top is null && linkUnderMouse is null && hoveredBookmark is null && tooltipPoint is null && sightseeingTip is null && map.TerritoryId!=0 && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)
             {var spotClicked=MapProjection.CoordinateFromPixel((io.MousePos-origin-mapPan)/mapZoom,map);FlagFromMap(map,spotClicked.X,spotClicked.Y);}
         }
-        finally{draw.PopClipRect();}
+        finally{MapMark("canvas edges and tooltips");draw.PopClipRect();}
         if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right))
         {
             mapContextPixel=(io.MousePos-origin-mapPan)/mapZoom;mapContextVista=mapHoveredVista;

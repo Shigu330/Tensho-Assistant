@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.791.0
+- Plan global, Verify : Lourdeur (X-01) : le journal du 2026-11-07 montre la carte à 110–160 ms plusieurs fois par heure (« map overlay layout »), pas seulement à l'ouverture. Cette mesure englobait tout le dessin de la carte : en mode développeur, elle est maintenant découpée (commandes, puis dans la carte : texture et noms, points de récolte, zones, icônes, signets et joueur, bords et info-bulles), pour trouver le morceau lent. Aucun changement visible. Non validé en jeu.
+- Tests : MapMarks791Tests. Verify.ps1 (agent) : 1363/1363, 0 avertissement, 0 erreur ; DLL 0.791.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01): the 2026-11-07 log shows the map at 110-160 ms several times an hour (« map overlay layout »), not only at opening. That measure covered the whole map drawing: in developer mode it is now split (controls, then inside the map: texture and names, gathering points, areas, icons, bookmarks and player, edges and tooltips), to find the slow part. No visible change. Not validated in game.
+
 ## 0.790.0
 - Plan global, Verify : Demande (X-31) : dans « Fabrications restantes », chaque étape se déplie et se replie, jusqu'à l'étape finale, avec son compte (faits / total). Les lignes sont écrites comme les autres, « possédés / demandés » avec les mêmes couleurs ; le métier et le nombre de fabrications restantes passent au survol de l'icône du métier. Non validé en jeu.
 - Tests : CraftStepsFold790Tests. Verify.ps1 (agent) : 1362/1362, 0 avertissement, 0 erreur ; DLL 0.790.0.0. Non validé en jeu.
