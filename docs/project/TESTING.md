@@ -1274,6 +1274,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.816) Récolte d'un collectionnable avec seuils : le bouton de l'action du plan encadré dans la fenêtre du jeu.
 
+- [ ] (0.817) Ouvrez un objet au tableau des ventes, puis regardez son prix dans Tensho (survol, Que faire avec ?) : celui que vous venez de voir.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

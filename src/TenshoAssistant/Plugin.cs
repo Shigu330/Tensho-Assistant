@@ -175,8 +175,16 @@ public sealed class Plugin : IDalamudPlugin
             var discoveries=new Discoveries.DiscoveryStore();
             mainWindow.DiscoveryStore=discoveries;mainWindow.DiscoveryFolder=discoveryFolder;
             mainWindow.MonsterName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().GetRowOrDefault(id)?.Singular.ExtractText() ?? "";
+            // X-52 (0.817): the prices seen at the market board, in place of Universalis' when newer.
+            var seenPrices=new Market.SeenPriceStore();
+            mainWindow.SeenPrices=seenPrices;
+            market.Seen=(world,item,universalis)=>configuration.Discovery.Enabled && configuration.Discovery.MarketPrices ? seenPrices.Prefer(world,item,universalis,DateTimeOffset.UtcNow):null;
+            Market.SeenPriceReader? seenReader=null;
+            registrations.Register(()=>seenReader=new Market.SeenPriceReader(marketBoardEvents,seenPrices,()=>market.State.WorldId,()=>configuration.Discovery.Enabled && configuration.Discovery.MarketPrices,log),()=>seenReader?.Dispose());
             _=Task.Run(()=>
             {
+                try{if(Market.SeenPriceStore.Read(Path.Combine(discoveryFolder,"MarketSeen.json")) is { } prices)seenPrices.Load(prices);}
+                catch(Exception error){log.Warning(error,"The market prices seen could not be read; the file is kept as .broken.");try{File.Move(Path.Combine(discoveryFolder,"MarketSeen.json"),Path.Combine(discoveryFolder,"MarketSeen.json.broken"),true);}catch(Exception){}}
                 var saved=Path.Combine(discoveryFolder,"Discoveries.json");
                 try{if(Discoveries.DiscoveryFiles.Read(saved) is { } file)discoveries.Load(file);}
                 catch(Exception error)

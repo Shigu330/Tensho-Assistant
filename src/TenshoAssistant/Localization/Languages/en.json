@@ -581,6 +581,9 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
+    "MarketPrices": "Prices seen at the market board",
+    "MarketPricesTip": "When you open an item at the market board, its offers and last sales are kept (never a seller's or buyer's name). For your world, Tensho then uses them in place of Universalis' when they are newer; other worlds and items you never opened stay with Universalis.\nDefault: on.",
+    "SummaryPrices": "Market prices seen: {0} items",
     "Title": "Discoveries",
     "Help": "What you discover in range, kept on your disk only (folder « Discoveries » of Tensho's settings). Each entry says whether you saw it or imported it. No other player is ever noted, nothing is sent.",
     "Loading": "Reading the discoveries…",

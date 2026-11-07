@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.817.0
+- Plan global, Verify : Demande (X-52) : les prix vus au tableau des ventes remplacent ceux d'Universalis. Vérification : pour votre monde, le jeu donne autant qu'Universalis (toutes les offres, les 20 dernières ventes, donc le prix le plus bas, la dernière vente, la moyenne et les ventes par jour), mais ni les autres mondes ni les objets jamais ouverts. Quand vous ouvrez un objet au tableau des ventes, ses offres et ses ventes sont gardées (jamais un nom de vendeur ou d'acheteur) ; tous les outils qui lisent un prix prennent alors celui-ci à la place d'Universalis s'il est plus récent, et gardent d'Universalis le moins cher des autres mondes. Réglage « Prix vus au tableau des ventes » (Découvertes), activé. Non validé en jeu.
+- Tests : SeenPrices817Tests. Verify.ps1 (agent) : 1404/1404, 0 avertissement, 0 erreur ; DLL 0.817.0.0. Non validé en jeu.
+### English
+- Request (X-52): the prices seen at the market board replace Universalis'. Check: for your world the game gives as much as Universalis (every offer, the last 20 sales, so the lowest offer, last sale, average and sales a day), but neither other worlds nor items never opened. When you open an item at the market board, its offers and sales are kept (never a seller's or buyer's name); every tool reading a price then takes this one in place of Universalis' when newer, keeping Universalis' cheapest of other worlds. Setting « Prices seen at the market board » (Discoveries), on. Not validated in game.
+
 ## 0.816.0
 - Plan global, Verify : Correction de X-51, à la demande de l'utilisateur : l'action que demande le plan des collectionnables n'est plus encadrée sur les barres de raccourcis mais sur la fenêtre des collectionnables du jeu, sur le bouton qui porte l'icône de cette action (recherche bornée parmi les composants d'icône de la fenêtre). Si le bouton n'est pas trouvé, le panneau le dit ; en mode développeur, les icônes trouvées s'ajoutent aux valeurs brutes de la fenêtre, pour vérifier. Non validé en jeu.
 - Tests : CollectableHighlight815Tests. Verify.ps1 (agent) : 1401/1401, 0 avertissement, 0 erreur ; DLL 0.816.0.0. Non validé en jeu.

@@ -5,5 +5,7 @@ public sealed class DiscoverySettings
 {
     public bool Enabled { get; set; }=true;
     public bool MonsterPlaces { get; set; }=true;
+    /// <summary>X-52 (0.817): the prices seen at the market board, in place of Universalis' for the player's world when newer.</summary>
+    public bool MarketPrices { get; set; }=true;
     public bool DebugLog { get; set; }
 }

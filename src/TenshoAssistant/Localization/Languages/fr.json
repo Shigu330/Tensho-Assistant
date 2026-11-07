@@ -581,6 +581,9 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "MarketPrices": "Prix vus au tableau des ventes",
+    "MarketPricesTip": "Quand vous ouvrez un objet au tableau des ventes, ses offres et ses dernières ventes sont gardées (jamais le nom d'un vendeur ni d'un acheteur). Pour votre monde, Tensho les utilise alors à la place de ceux d'Universalis quand elles sont plus récentes ; les autres mondes et les objets jamais ouverts restent sur Universalis.\nPar défaut : activé.",
+    "SummaryPrices": "Prix vus au marché : {0} objets",
     "Title": "Découvertes",
     "Help": "Ce que vous découvrez à portée, gardé sur votre disque seulement (dossier « Discoveries » des réglages de Tensho). Chaque entrée dit si vous l'avez vue ou importée. Aucun autre joueur n'est jamais noté, rien n'est envoyé.",
     "Loading": "Lecture des découvertes…",

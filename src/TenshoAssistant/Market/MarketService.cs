@@ -165,8 +165,14 @@ public sealed class MarketService : IDisposable
                 : new(worldId, worldName, 0, null, false, null, dataCenterName, worldNames is null ? null : new Dictionary<uint, string>(worldNames));
         }
     }
+    // X-52 (0.817, user request): the prices seen at the game's market board, used in place of Universalis' when newer (set by the plugin).
+    public Func<uint,uint,MarketQuote?,MarketQuote?>? Seen { get; set; }
     public MarketQuote? GetCached(uint worldId, uint itemId)
-    { lock (gate) { return disposed ? null : cache.GetValueOrDefault((worldId, itemId)); } }
+    {
+        MarketQuote? cached;
+        lock (gate) { if (disposed) return null; cached = cache.GetValueOrDefault((worldId, itemId)); }
+        return Seen?.Invoke(worldId, itemId, cached) ?? cached;
+    }
     public void CancelBackground()
     {
         lock (gate)

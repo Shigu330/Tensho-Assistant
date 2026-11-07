@@ -13,7 +13,7 @@ internal sealed partial class MainWindow
         craftChain.Dispose();
         DisposeMapDiscovery();
         // X-43: the discoveries written once more when the plugin unloads.
-        if(DiscoveryStore?.Dirty==true)SaveDiscoveries(true);
+        if(DiscoveryStore?.Dirty==true || SeenPrices?.Dirty==true)SaveDiscoveries(true);
         mapFindCancel?.Cancel();mapFindCancel?.Dispose();mapFindCancel=null;
         fromStockCancel?.Cancel();fromStockCancel?.Dispose();fromStockCancel=null;
         craftSolve.Dispose();

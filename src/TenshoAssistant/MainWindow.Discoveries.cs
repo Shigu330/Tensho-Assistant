@@ -12,6 +12,7 @@ internal sealed partial class MainWindow
     internal DiscoveryStore? DiscoveryStore { get; set; }
     internal string? DiscoveryFolder { get; set; }
     internal Func<uint,string>? MonsterName { get; set; }
+    internal Market.SeenPriceStore? SeenPrices { get; set; }
     /// <summary>Set once the saved base is read (or found missing): nothing is written before, so that a slow read never loses it.</summary>
     internal volatile bool DiscoveriesLoaded;
     private long discoveriesAt=long.MinValue,discoveriesSavedAt;private int discoverySaving,discoveryBusy;
@@ -34,7 +35,7 @@ internal sealed partial class MainWindow
                 if(store.SeeMonster(monster.NameId,monster.BaseId,live.TerritoryId,live.MapId,monster.Position,monster.Level,at) && developerMode && settings.DebugLog)
                     log.Information("Discovery: monster {0} (name {1}, base {2}) on map {3} at {4:F1}, {5:F1}, level {6}.",monster.Name,monster.NameId,monster.BaseId,live.MapId,monster.Position.X,monster.Position.Z,monster.Level);
         }
-        if(store.Dirty && now-discoveriesSavedAt>60_000)SaveDiscoveries(false);
+        if((store.Dirty || SeenPrices?.Dirty==true) && now-discoveriesSavedAt>60_000)SaveDiscoveries(false);
     }
 
     /// <summary>The base written off the frame (on unload: at once).</summary>
@@ -43,9 +44,10 @@ internal sealed partial class MainWindow
         if(DiscoveryStore is not { } store || DiscoveryFolder is null || !DiscoveriesLoaded || Interlocked.Exchange(ref discoverySaving,1)==1)return;
         discoveriesSavedAt=Environment.TickCount64;
         var file=store.Snapshot(DateTimeOffset.UtcNow);var path=DiscoveryBase;
+        var prices=SeenPrices is { Dirty:true } seen ? seen.Snapshot():null;var pricesPath=Path.Combine(DiscoveryFolder,"MarketSeen.json");
         void Write()
         {
-            try{DiscoveryFiles.Write(path,file);}
+            try{DiscoveryFiles.Write(path,file);if(prices is not null)Market.SeenPriceStore.Write(pricesPath,prices);}
             catch(Exception error){log.Warning(error,"The discoveries could not be saved.");}
             finally{Volatile.Write(ref discoverySaving,0);}
         }
@@ -71,10 +73,12 @@ internal sealed partial class MainWindow
         {
             ImGui.Indent();
             BoolSetting("DiscoveriesUi.MonsterPlaces","DiscoveriesUi.MonsterPlacesTip",()=>configuration.Discovery.MonsterPlaces,value=>configuration.Discovery.MonsterPlaces=value,c=>c.Discovery.MonsterPlaces);
+            BoolSetting("DiscoveriesUi.MarketPrices","DiscoveriesUi.MarketPricesTip",()=>configuration.Discovery.MarketPrices,value=>configuration.Discovery.MarketPrices=value,c=>c.Discovery.MarketPrices);
             ImGui.Unindent();
         }
         var summary=store.Summary();
         if(summary.Count==0)ImGui.TextDisabled(localization.Get("DiscoveriesUi.Empty"));
+        if(SeenPrices is { Count:>0 } prices)ImGui.TextUnformatted(localization.Format("DiscoveriesUi.SummaryPrices",prices.Count.ToString("N0")));
         foreach(var (kind,total,seen,importedOnly) in summary)ImGui.TextUnformatted(localization.Format("DiscoveriesUi.Summary"+kind,total.ToString("N0"),seen.ToString("N0"),importedOnly.ToString("N0")));
         DrawDiscoveryFiles(store,folder);
         DrawDiscoveryPlaces(store);
