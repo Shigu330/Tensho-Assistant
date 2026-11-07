@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.830.0
+- Plan global, Verify : Demande (X-60) : le menu d'un objet récolté propose maintenant « Placer le drapeau » : le drapeau sur le même point que « Y aller », sans téléportation, pour quand on est déjà dans la zone. « Y aller » manque quand Tensho ne connaît pas la position du point (Échalion cyclope) : en mode développeur, le journal dit pourquoi, une fois par objet (sources, carte, index des lieux chargé ou non), pour corriger ensuite. Non validé en jeu.
+- Tests : PlaceFlag830Tests. Verify.ps1 (agent) : 1416/1416, 0 avertissement, 0 erreur ; DLL 0.830.0.0. Non validé en jeu.
+### English
+- Request (X-60): a gathered item's menu now offers « Place the flag »: the flag on the same point as « Go there », without a teleport, for when one is already in the zone. « Go there » is missing when Tensho does not know the point's place (Cyclops onion): in developer mode the log says why, once per item (sources, map, places index loaded or not), to fix next. Not validated in game.
+
 ## 0.829.0
 - Plan global, Verify : Signalement (X-45), quatrième étape, sur capture de la Dunette : le jeu n'y montre aucun marchand, Tensho en montrait 16. La sonde des fichiers du jeu, sans limite cette fois, montre deux choses. Les marchands permanents du Tillac sont dans des couches « QST_ENPC01 » à « QST_ENPC14 » : la 0.811 prenait tout « QST_ » pour une quête et cachait donc de vrais marchands ; ces couches sont maintenant permanentes. Les neuf autres (vendeur sinistre, princesse des demoiselles, soubrettes des Valention, Rêveuse, pantins…) ne sont placés par aucune couche nulle part, seulement par la feuille Level : ce sont des PNJ d'événement, ils ne sont plus dessinés sur la carte et restent cités comme sources. Non validé en jeu.
 - Tests : FestivalVendors810Tests. Verify.ps1 (agent) : 1415/1415, 0 avertissement, 0 erreur ; DLL 0.829.0.0. Non validé en jeu.

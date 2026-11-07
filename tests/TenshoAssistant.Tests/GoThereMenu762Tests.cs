@@ -9,8 +9,8 @@ internal static class GoThereMenu762Tests
         ("Go there from the menu: the same steps as the Gathering page, an open and near point first, only when placed",() =>
         {
             var links=Read("MainWindow.DutyFinder.cs");
-            Check(links.Contains("if(GoThereSource(item.Id) is { } go && ImGui.Selectable(localization.Get(\"GatheringDetails.GoThere\")"),"in the menu");
-            Check(links.Contains("AskNearestAetheryteAt(go.Target.Map,go.Target.Pixel,") && links.Contains("direct:configuration.GoThereTeleport"),"the same steps: a question unless the setting says otherwise");
+            Check(links.Contains("var go=GoThereSource(item.Id);") && links.Contains("if(go is { } there && ImGui.Selectable(localization.Get(\"GatheringDetails.GoThere\")"),"in the menu");
+            Check(links.Contains("AskNearestAetheryteAt(there.Target.Map,there.Target.Pixel,") && links.Contains("direct:configuration.GoThereTeleport"),"the same steps: a question unless the setting says otherwise");
             Check(links.Contains(".ThenBy(pair=>pair.Source.Zone==here ? 0:1).ThenBy(pair=>ListPanelZoneCost(pair.Source.Zone) ?? uint.MaxValue)"),"near first");
         }),
     ];

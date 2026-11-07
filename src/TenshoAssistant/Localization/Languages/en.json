@@ -3031,6 +3031,7 @@
     "Level": "{0} · level {1}"
   },
   "ItemMenu": {
+    "PlaceFlag": "Place the flag there",
     "AddToLists": "Add to a crafting list",
     "AddToList": "Add to « {0} »",
     "CopyName": "Copy the name",

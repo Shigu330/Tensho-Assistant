@@ -165,6 +165,7 @@ internal sealed partial class MainWindow
             .Cast<(Gathering.GatheringSource,(Maps.MapDefinition,Vector2))?>().FirstOrDefault();
     }
 
+    private readonly HashSet<uint> goThereLogged=[];
     private void ItemLinksMenu(string id,ItemDefinition? item)
     {
         if(item is null || !ImGui.BeginPopupContextItem(id))return;
@@ -185,11 +186,22 @@ internal sealed partial class MainWindow
                 finally{ImGui.EndMenu();}
             }
             // 0.762 (X-15, user request): « Go there » for an item that is gathered, as on the Gathering page: flag, Tensho map and the nearest aetheryte's teleport.
-            if(GoThereSource(item.Id) is { } go && ImGui.Selectable(localization.Get("GatheringDetails.GoThere")+$"##GoThere{item.Id}"))
+            var go=GoThereSource(item.Id);
+            if(go is { } there && ImGui.Selectable(localization.Get("GatheringDetails.GoThere")+$"##GoThere{item.Id}"))
             {
-                if(configuration.GoThereEquip)EquipGatheringGearset(go.Source);
-                AskNearestAetheryteAt(go.Target.Map,go.Target.Pixel,string.IsNullOrWhiteSpace(go.Source.Place) ? go.Source.Zone:go.Source.Place,flag:true,direct:configuration.GoThereTeleport);
+                if(configuration.GoThereEquip)EquipGatheringGearset(there.Source);
+                AskNearestAetheryteAt(there.Target.Map,there.Target.Pixel,string.IsNullOrWhiteSpace(there.Source.Place) ? there.Source.Zone:there.Source.Place,flag:true,direct:configuration.GoThereTeleport);
             }
+            // 0.830 (X-60, user request): the flag alone on that point, without a teleport (for when one is already in the zone).
+            if(go is { } point && ImGui.Selectable(localization.Get("ItemMenu.PlaceFlag")+$"##PlaceFlag{item.Id}"))
+            {
+                var place=Maps.MapProjection.CoordinateFromPixel(point.Target.Pixel,point.Target.Map);
+                FlagFromMap(point.Target.Map,place.X,place.Y);
+            }
+            // 0.830 (X-60): developer mode, why « Go there » is missing for a gathered item, once per item.
+            if(go is null && developerMode && gatheringCatalog.State.Catalog?.ForItem(item.Id) is { Count:>0 } sources && goThereLogged.Add(item.Id))
+                log.Information("Go there missing for item {0}: {1} sources, {2} with a map, local index {3}, points: {4}.",item.Id,sources.Count,sources.Count(source=>source.MapId!=0),
+                    mapLocal?.State.Index is null ? "not loaded":"loaded",string.Join(", ",sources.Take(6).Select(source=>$"base {source.BaseId} map {source.MapId}{(source.IsHidden ? " hidden":"")}")));
             // 0.561 (I8, I9): the item's name, a link in your own chat, and its pages on the web; nothing is sent to the game's server.
             if(ImGui.Selectable(localization.Get("ItemMenu.CopyName")+$"##CopyName{item.Id}"))ImGui.SetClipboardText(item.Name);
             if(ItemLinkToChat is not null && ImGui.Selectable(localization.Get("ItemMenu.LinkChat")+$"##LinkChat{item.Id}"))ItemLinkToChat(item.Id);

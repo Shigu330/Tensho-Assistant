@@ -3031,6 +3031,7 @@
     "Level": "{0} · niveau {1}"
   },
   "ItemMenu": {
+    "PlaceFlag": "Placer le drapeau",
     "AddToLists": "Ajouter à une liste d'artisanat",
     "AddToList": "Ajouter à « {0} »",
     "CopyName": "Copier le nom",
