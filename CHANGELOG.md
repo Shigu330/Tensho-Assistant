@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.708.0
+- Plan global, W-03 : Armes reliques, première partie. Nouvelle page Progression › Armes reliques : les armes du zodiaque par étape, ce que vos stocks en détiennent, et le livre en cours avec ses monstres, donjons, aléas et mandats. Lecture seule, sans requête au serveur. Les extensions suivantes ne sont pas encore couvertes. COMPILED et TESTED, non validé en jeu.
+- Tests : RelicWeapons708Tests. Verify.ps1 (agent) : 1259/1259, 0 avertissement, 0 erreur ; DLL 0.708.0.0. Non validé en jeu.
+### English
+- Relic weapons, first part. New page Progression > Relic weapons: Zodiac weapons by stage, what your stocks hold, and the book in progress with its monsters, dungeons, FATEs and leves. Read only, no server request. Later expansions are not covered yet. COMPILED and TESTED, not validated in game.
+
 ## 0.707.0
 - Plan global, W-06 : Demande de l'utilisateur : « Que puis-je fabriquer ? » se trie par niveau, gils au marché, vente à un PNJ ou assignats, avec la valeur sur chaque ligne. Marché : prix minimum de votre monde (Universalis), HQ si l'objet peut l'être, demandés au choix de ce tri, avec une case pour arrêter. Assignats : palier haut, chaque sorte à part. Les matériaux ne sont pas déduits, ils sont déjà en stock. COMPILED et TESTED, non validé en jeu.
 - Tests : CraftChained696Tests. Verify.ps1 (agent) : 1255/1255, 0 avertissement, 0 erreur ; DLL 0.707.0.0. Non validé en jeu.

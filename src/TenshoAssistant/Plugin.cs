@@ -767,6 +767,17 @@ public sealed class Plugin : IDalamudPlugin
                 }
                 catch(Exception error){log.Warning(error,"Custom deliveries unreadable (game update?).");throw;}
             });
+            // W-03 (0.708): the Zodiac weapons, read when the page opens and on the player's click.
+            mainWindow.RelicCatalogLoad=()=>
+            {
+                try{return Relics.RelicCatalogLoader.Read(data);}
+                catch(Exception error){log.Warning(error,"Relic sheets unreadable (game update?).");return null;}
+            };
+            mainWindow.ReadRelics=()=>framework.RunOnFrameworkThread(()=>
+            {
+                try{return Relics.RelicReader.Read();}
+                catch(Exception error){log.Warning(error,"Relic book unreadable (game update?).");throw;}
+            });
             // W-02 (0.683): the stages of the Masked Carnivale, read when the page opens and on the player's click.
             mainWindow.CarnivaleStagesLoad=()=>
             {
