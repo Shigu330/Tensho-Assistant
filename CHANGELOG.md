@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.769.0
+- Plan global, Verify : Signalement (X-19) : un dépôt chez un servant comptait comme une dépense du personnage et un gain des servants, et le total des servants ne suivait qu'en rouvrant. Corrections : les échanges avec les servants et le coffre de compagnie sont des transferts, affichés à part et hors du net ; une hausse des servants au-delà de vos dépôts compte comme leurs ventes au marché ; le servant ouvert est lu en direct. Les anciennes lignes « Servants » deviennent « Échanges avec les servants ». Non validé en jeu.
+- Tests : GilTransfer769Tests. Verify.ps1 (agent) : 1342/1342, 0 avertissement, 0 erreur ; DLL 0.769.0.0. Non validé en jeu.
+### English
+- Report (X-19): a deposit with a retainer counted as the character's spending and the retainers' gain, and the retainers' total followed only after reopening. Fixes: exchanges with retainers and the company chest are transfers, shown apart and out of the net; a rise of the retainers beyond your deposits counts as their market sales; the open retainer is read live. Older « Retainers » lines become « Exchanges with retainers ». Not validated in game.
+
 ## 0.768.0
 - Plan global, Verify : Demande (X-18) : le journal des gils montre l'icône des gils du jeu, une icône par catégorie, les gains en vert et les dépenses en rouge. Pour réduire « Autre » sans deviner : en mode développeur, chaque mouvement « Autre » écrit au journal les fenêtres du jeu ouvertes dans les 15 secondes d'avant. Non validé en jeu.
 - Tests : GilJournal768Tests. Verify.ps1 (agent) : 1340/1340, 0 avertissement, 0 erreur ; DLL 0.768.0.0. Non validé en jeu.

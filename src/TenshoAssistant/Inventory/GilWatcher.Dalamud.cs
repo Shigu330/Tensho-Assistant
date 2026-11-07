@@ -34,6 +34,7 @@ public sealed unsafe class GilWatcher : IDisposable
     private readonly Func<IReadOnlyList<string>>? windowsOpen;
     private readonly Func<bool> developerMode;
     private readonly Dictionary<string,DateTimeOffset> seenAny=[];
+    private long retainerDeposits;
     public GilWatcher(IFramework framework,IPlayerState player,IGameGui gui,string folder,IPluginLog log,Func<IReadOnlyList<string>>? windowsOpen=null,Func<bool>? developerMode=null)
     {
         this.framework=framework;this.player=player;this.gui=gui;this.folder=folder;this.log=log;this.windowsOpen=windowsOpen;this.developerMode=developerMode ?? (()=>false);
@@ -77,7 +78,18 @@ public sealed unsafe class GilWatcher : IDisposable
             if(manager!=null && manager->IsReady)
             {
                 long sum=0;
-                foreach(ref var retainer in manager->Retainers)if(retainer.RetainerId!=0)sum+=retainer.Gil;
+                // 0.769 (X-19, user report: the retainers' total followed a deposit only after reopening): the open retainer's gil from its own container,
+                // which the game updates at once; the list keeps the others'.
+                var active=manager->GetActiveRetainer();
+                long? live=null;
+                if(active!=null && active->RetainerId!=0 && canOpen && inventory->GetInventoryContainer(InventoryType.RetainerGil) is var purse && purse!=null && purse->IsLoaded)
+                {
+                    long held=0;
+                    for(var slot=0;slot<purse->Size;slot++)if(purse->GetInventorySlot(slot) is var item && item!=null && item->ItemId==1)held+=item->Quantity;
+                    live=held;
+                }
+                foreach(ref var retainer in manager->Retainers)
+                    if(retainer.RetainerId!=0)sum+=live is { } heldNow && active!=null && retainer.RetainerId==active->RetainerId ? heldNow:retainer.Gil;
                 newRetainers=sum;
             }
             var changed=Record(ref gil,newGil,GilSource.Character,now) | Record(ref retainers,newRetainers,GilSource.Retainers,now)
@@ -100,7 +112,17 @@ public sealed unsafe class GilWatcher : IDisposable
         if(last is { } before && before!=value)
         {
             var category=source switch{GilSource.Retainers=>GilCategory.Retainer,GilSource.Company=>GilCategory.Company,_=>GilJournal.Classify(seen,at)};
-            entries.Add(new GilEntry(at,value-before,value,source,category));
+            var delta=value-before;
+            // 0.769 (X-19): a deposit to the retainers waits for their rise; a rise beyond the deposits is their market sales.
+            if(source==GilSource.Character && category==GilCategory.Retainer && delta<0)retainerDeposits+=-delta;
+            if(source==GilSource.Retainers && delta>0)
+            {
+                var (transfer,sales,left)=GilJournal.SplitRetainerRise(delta,retainerDeposits);
+                retainerDeposits=left;
+                if(sales>0)entries.Add(new GilEntry(at,sales,value-transfer,source,GilCategory.Market));
+                delta=transfer;
+            }
+            if(delta!=0)entries.Add(new GilEntry(at,delta,value,source,category));
             if(category==GilCategory.Other && developerMode())
                 log.Information("Gil other: {0:+#,0;-#,0}, windows seen in the last 15 s: {1}",value-before,
                     string.Join(", ",seenAny.Where(pair=>at-pair.Value<=GilJournal.ContextWindow).OrderByDescending(pair=>pair.Value).Select(pair=>pair.Key)));

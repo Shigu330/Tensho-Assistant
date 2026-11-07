@@ -5129,8 +5129,10 @@
     "CategoryMarket": "Marché",
     "CategoryRepair": "Réparation",
     "CategoryTeleport": "Téléportation",
-    "CategoryRetainer": "Servants",
-    "CategoryCompany": "Compagnie"
+    "Transfer": "transfert, hors net",
+    "TransferTip": "Gils passés entre votre personnage et vos servants ou le coffre de compagnie : ni gagnés ni dépensés. Une hausse des servants au-delà de vos dépôts compte comme leurs ventes au marché.",
+    "CategoryRetainer": "Échanges avec les servants",
+    "CategoryCompany": "Échanges avec le coffre de compagnie"
   },
   "ShopRequirement": {
     "Quest": "Après la quête « {0} »",

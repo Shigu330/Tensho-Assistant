@@ -55,7 +55,8 @@ internal sealed partial class MainWindow
         {
             var totals=gilTotals[(int)source];
             if(totals.Count==0)continue;
-            ImGui.TextColored(Accent,localization.Format("GilJournal.Source"+source,totals.Sum(total=>total.Gained-total.Spent).ToString("+#,0;-#,0;0")));
+            // 0.769 (X-19): transfers with the retainers or the company chest stay out of the net.
+            ImGui.TextColored(Accent,localization.Format("GilJournal.Source"+source,totals.Where(total=>!GilJournal.IsTransfer(total.Category)).Sum(total=>total.Gained-total.Spent).ToString("+#,0;-#,0;0")));
             if(!ImGui.BeginTable("GilTotals"+source,4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))continue;
             try
             {
@@ -70,6 +71,14 @@ internal sealed partial class MainWindow
                     try{ImGui.TextColored(Muted,GilCategoryIcon(category).ToIconString());}
                     finally{ImGui.PopFont();}
                     ImGui.SameLine();ImGui.TextUnformatted(localization.Get("GilJournal.Category"+category));
+                    if(GilJournal.IsTransfer(category))
+                    {
+                        ImGui.TableNextColumn();ImGui.TextDisabled(Part(gained));
+                        ImGui.TableNextColumn();ImGui.TextDisabled(Part(spent));
+                        ImGui.TableNextColumn();ImGui.TextDisabled(localization.Get("GilJournal.Transfer"));
+                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GilJournal.TransferTip"));
+                        continue;
+                    }
                     ImGui.TableNextColumn();if(gained>0)ImGui.TextColored(Success,Part(gained));else ImGui.TextDisabled(Part(gained));
                     ImGui.TableNextColumn();if(spent>0)ImGui.TextColored(UI.FfxivTheme.Warning,Part(spent));else ImGui.TextDisabled(Part(spent));
                     ImGui.TableNextColumn();ImGui.TextColored(gained>=spent ? Success:UI.FfxivTheme.Warning,(gained-spent).ToString("+#,0;-#,0;0"));

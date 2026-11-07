@@ -5129,8 +5129,10 @@
     "CategoryMarket": "Market",
     "CategoryRepair": "Repair",
     "CategoryTeleport": "Teleport",
-    "CategoryRetainer": "Retainers",
-    "CategoryCompany": "Company"
+    "Transfer": "transfer, out of the net",
+    "TransferTip": "Gil moved between your character and your retainers or the company chest: neither earned nor spent. A rise of the retainers beyond your deposits counts as their market sales.",
+    "CategoryRetainer": "Exchanges with retainers",
+    "CategoryCompany": "Exchanges with the company chest"
   },
   "ShopRequirement": {
     "Quest": "After the quest « {0} »",

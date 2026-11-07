@@ -31,6 +31,20 @@ public static class GilJournal
         ("FreeCompanyChest",GilCategory.Company),
     ];
 
+    /// <summary>0.769 (X-19, user report): gil moved between the character and their retainers or the company chest is neither earned nor spent: shown apart, out of the net.</summary>
+    public static bool IsTransfer(GilCategory category)=>category is GilCategory.Retainer or GilCategory.Company;
+
+    /// <summary>
+    /// 0.769 (X-19): a rise of the retainers' gil is a deposit as far as the character's deposits since then cover it, the rest their market sales; a fall is a withdrawal.
+    /// Returns the parts, and what is left of the deposits.
+    /// </summary>
+    public static (long Transfer,long Sales,long DepositsLeft) SplitRetainerRise(long rise,long deposits)
+    {
+        if(rise<=0)return (rise,0,deposits);
+        var transfer=Math.Min(rise,Math.Max(0,deposits));
+        return (transfer,rise-transfer,Math.Max(0,deposits)-transfer);
+    }
+
     /// <summary>The category of a change at <paramref name="now"/>, from when each window was last seen open.</summary>
     public static GilCategory Classify(IReadOnlyDictionary<string,DateTimeOffset> lastSeen,DateTimeOffset now)
     {
