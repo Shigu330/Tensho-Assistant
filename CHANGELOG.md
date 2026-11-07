@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.777.0
+- Plan global, Verify : Signalement (X-22) : certaines coordonnées du wiki (Butin des monstres, Magie bleue) n'avaient pas le clic droit vers l'éthérite la plus proche. Cause : le nom anglais du lieu n'était traduit qu'en un seul numéro, alors que le jeu en a parfois plusieurs (« Mor Dhona » : 26, 67, 509) ; si le premier n'avait pas de carte, le menu disparaissait. Tous les numéros sont essayés ; un lieu toujours introuvable est noté au journal en mode développeur. Non validé en jeu.
+- Tests : WikiPlaces777Tests. Verify.ps1 (agent) : 1346/1346, 0 avertissement, 0 erreur ; DLL 0.777.0.0. Non validé en jeu.
+### English
+- Report (X-22): some wiki coordinates (Monster loot, Blue magic) had no right click to the nearest aetheryte. Cause: the place's English name was turned into one place row only, while the game sometimes has several (« Mor Dhona »: 26, 67, 509); if the first had no map, the menu was gone. Every row is tried; a place still not found is noted in the log in developer mode. Not validated in game.
+
 ## 0.776.0
 - Plan global, Verify : Validé en jeu sur capture de l'utilisateur : l'alarme porte le lien d'objet du jeu, et le clic droit dessus ouvre le menu « Tensho — objet » complet (X-03). Ventes des servants (I-05) notées validées. Aucun changement du plugin.
 - Tests : GilTeleport775Tests. Verify.ps1 (agent) : 1345/1345, 0 avertissement, 0 erreur ; DLL 0.776.0.0. Non validé en jeu.

@@ -163,10 +163,10 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>{},blueIndex.Dispose);
             mainWindow.BlueSpellIndex=blueIndex;
             mainWindow.GameNames=new Items.GameNames(data,log);
-            Dictionary<string,uint>? englishPlaces=null;
-            mainWindow.EnglishPlaceId=name=>(englishPlaces??=data.GetExcelSheet<Lumina.Excel.Sheets.PlaceName>(Dalamud.Game.ClientLanguage.English)
+            Dictionary<string,IReadOnlyList<uint>>? englishPlaces=null;
+            mainWindow.EnglishPlaceIds=name=>(englishPlaces??=data.GetExcelSheet<Lumina.Excel.Sheets.PlaceName>(Dalamud.Game.ClientLanguage.English)
                 .Where(row=>!row.Name.IsEmpty).GroupBy(row=>row.Name.ExtractText(),StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(group=>group.Key,group=>group.First().RowId,StringComparer.OrdinalIgnoreCase)).GetValueOrDefault(name.Trim());
+                .ToDictionary(group=>group.Key,group=>(IReadOnlyList<uint>)group.Select(row=>row.RowId).ToArray(),StringComparer.OrdinalIgnoreCase)).GetValueOrDefault(name.Trim()) ?? [];
             Maps.MapLiveReader? mapLive=null;
             registrations.Register(()=>mapLive=new Maps.MapLiveReader(framework,client,objects,data,condition,fateTable,partyList,log),()=>mapLive?.Dispose());
             var mapLocal=new Maps.MapLocalIndexService();

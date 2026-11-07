@@ -51,7 +51,7 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped($"{CommunityMonster(row.Name)} · {row.Level} · {CommunityPlace(row.Location)}");
             // 0.704 (user report): the wiki gives a place: right click, the nearest aetheryte.
             var place=BlueSpellSources.Parse(row.Location);
-            if(place.X is not { } x || place.Y is not { } y || EnglishPlaceId?.Invoke(place.Place) is not (> 0 and var placeId) || maps.State.Catalog?.ForPlace(placeId).FirstOrDefault() is not { } map)continue;
+            if(place.X is not { } x || place.Y is not { } y || MapOfEnglishPlace(place.Place) is not { } map)continue;
             PlaceMenu($"WikiMonsterPlace{wikiRow}",map,new(x,y),CommunityMonster(row.Name));
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("EntityMenu.RightClickPlace"));
         }

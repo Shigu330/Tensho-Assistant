@@ -35,7 +35,17 @@ internal sealed partial class MainWindow
         else if(!configuration.CommunityWiki || index.Error=="disabled")ImGui.TextDisabled(localization.Get("BlueSpellSources.IndexOff"));
         else if(index.Error is not null)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("BlueSpellSources.IndexFailed"));
     }
-    internal Func<string,uint>? EnglishPlaceId { get; set; }
+    /// <summary>0.777 (X-22, user report): every place row with this English name; the game has several for some (« Mor Dhona »: 26, 67, 509).</summary>
+    internal Func<string,IReadOnlyList<uint>>? EnglishPlaceIds { get; set; }
+    private readonly HashSet<string> wikiPlacesNotFound=new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>The map of a wiki place: the first of its place rows that has one; null, and noted once in developer mode, when none has.</summary>
+    private Maps.MapDefinition? MapOfEnglishPlace(string place)
+    {
+        foreach(var id in EnglishPlaceIds?.Invoke(place) ?? [])
+            if(maps.State.Catalog?.ForPlace(id).FirstOrDefault() is { } map)return map;
+        if(developerMode && maps.State.Catalog is not null && wikiPlacesNotFound.Add(place))log.Information("Wiki place without a map: \"{0}\".",place);
+        return null;
+    }
     // 0.390 (user request « sort by the monster's level »): 0 = wiki order, 1 = lowest level first, 2 = highest first (session only).
     private int blueMonsterOrder=1;
     private static readonly string[] BlueMonsterOrders=["OrderWiki","OrderLevelUp","OrderLevelDown"];
@@ -77,8 +87,7 @@ internal sealed partial class MainWindow
             index++;
             ImGui.TextWrapped($"{CommunityMonster(row.Name)} · {row.Level} · {CommunityPlace(row.Location)}");
             var place=BlueSpellSources.Parse(row.Location);
-            if(place.X is not { } x || place.Y is not { } y || EnglishPlaceId?.Invoke(place.Place) is not (> 0 and var placeId)
-               || maps.State.Catalog?.ForPlace(placeId).FirstOrDefault() is not { } map)continue;
+            if(place.X is not { } x || place.Y is not { } y || MapOfEnglishPlace(place.Place) is not { } map)continue;
             PlaceMenu($"BluePlace{index}",map,new(x,y),CommunityMonster(row.Name));
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("EntityMenu.RightClickPlace"));
             ImGui.SameLine();
