@@ -1230,6 +1230,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.794) Rangements, Que faire avec ?, Sceau de compagnie : la Matière sombre ne doit plus être en tête ; colonnes Ventes / jour et Gils en 7 jours.
 
+- [ ] (0.795) Avec un objet de monstre dans une liste, approchez de ce monstre : patte sur la carte et dans la liste.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

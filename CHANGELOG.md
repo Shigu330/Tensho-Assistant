@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.795.0
+- Plan global, Verify : Demande (X-34, X-35) : les monstres proches, en information seulement. Tensho lit les ennemis vivants que le jeu charge autour du personnage (nom, lieu, niveau ; 100 au plus ; coupé en JcJ). Premier usage : un monstre proche qui lâche un objet que vos listes de suivi demandent encore apparaît sur la carte avec une patte (son nom, son niveau et ce qu'il lâche au survol), et la ligne de l'objet dans la liste porte la même patte. Réglages : « Monstres de vos listes » dans la carte, « Monstres proches qui le lâchent » sous « Monstre » dans les options des listes. Données de butin : LuminaSupplemental. Non validé en jeu.
+- Tests : NearbyMonsters795Tests. Verify.ps1 (agent) : 1372/1372, 0 avertissement, 0 erreur ; DLL 0.795.0.0. Non validé en jeu.
+### English
+- Request (X-34, X-35): nearby monsters, as information only. Tensho reads the living enemies the game streams around the character (name, place, level; 100 at most; cut in PvP). First use: a nearby monster that drops an item your tracking lists still need shows on the map with a paw (name, level and drops on hover), and the item's line in the list carries the same paw. Settings: « Monsters for your lists » on the map, « Nearby monsters that drop it » under « Monster » in the list options. Drop data: LuminaSupplemental. Not validated in game.
+
 ## 0.794.0
 - Plan global, Verify : Demande (X-33) : « Que faire avec ? » tient compte des ventes par jour, comme « Que puis-je fabriquer ? ». Une vente isolée (Matière sombre grade I « vendue » 350 000) mettait l'objet en tête. Nouvelles colonnes « Ventes / jour » et « Gils en N jours » : ce qui se vend en ce nombre de jours au rythme du marché, sans dépasser ce que votre solde achète ; le classement suit ces gils, la vitesse inconnue en dernier. Le nombre de jours est celui de « Que puis-je fabriquer ? », réglable sur la page. Non validé en jeu.
 - Tests : CurrencySales794Tests. Verify.ps1 (agent) : 1369/1369, 0 avertissement, 0 erreur ; DLL 0.794.0.0. Non validé en jeu.

@@ -20,6 +20,8 @@ public sealed record MapEventMarker(uint MapId,uint Icon,Vector3 Position,float 
 // N-09 (0.441): HuntMark = a living hunt mark (NotoriousMonster by BNpcBase); Level holds its rank (1 B, 2 A, 3 S).
 public enum MapObjectKind { Treasure, Gathering, HuntMark }
 public sealed record MapObjectMarker(MapObjectKind Kind,string Name,Vector3 Position,int Level);
+/// <summary>0.795 (X-34): a living enemy the game streams around the player: its name row, base row, name, place and level. Information only.</summary>
+public sealed record MapMonster(uint NameId,uint BaseId,string Name,Vector3 Position,int Level);
 
 // FATE running in the current zone (IFateTable): FATEs have no static map position in the game data (0.114 probe), only live ones.
 public sealed record MapFateMarker(uint Id,string Name,int Level,uint Icon,Vector3 Position,float Radius,int Progress,long SecondsLeft,string State,bool HasBonus=false);
@@ -29,7 +31,8 @@ public sealed record MapFateMarker(uint Id,string Name,int Level,uint Icon,Vecto
 public sealed record MapLiveState(uint TerritoryId,uint MapId,Vector3 Position,float Rotation,DateTimeOffset ObservedAt,uint FlagMapId=0,Vector2? Flag=null,
     IReadOnlyDictionary<uint,MapFlightState>? Flights=null,IReadOnlyList<MapEventMarker>? Events=null,bool InCombat=false,bool InDuty=false,
     IReadOnlyList<MapObjectMarker>? Objects=null,IReadOnlyList<MapFateMarker>? Fates=null,IReadOnlyList<MapPartyMarker>? Party=null,
-    IReadOnlySet<uint>? UnlockedCurrents=null,IReadOnlySet<uint>? Sightseen=null,int SightseeingUnlock=-1,int SightseeingUnlockEx=-1,string Area="",string SubArea="");
+    IReadOnlySet<uint>? UnlockedCurrents=null,IReadOnlySet<uint>? Sightseen=null,int SightseeingUnlock=-1,int SightseeingUnlockEx=-1,string Area="",string SubArea="",
+    IReadOnlyList<MapMonster>? Monsters=null);
 
 // Party member in the same territory as the player (not the player): job icon = 62100 + ClassJob row.
 public sealed record MapPartyMarker(string Name,uint Job,int Level,Vector3 Position);
@@ -42,7 +45,7 @@ internal sealed class MapLiveReader : IDisposable
     private MapLiveState? state;private bool disposed;private DateTimeOffset retryAt;private DateTimeOffset flightAt;
     private IReadOnlyDictionary<uint,MapFlightState>? flights;private int removeFlag;
     private IReadOnlyList<MapEventMarker> events=[];private DateTimeOffset eventsAt;
-    private IReadOnlyList<MapObjectMarker> nearby=[];
+    private IReadOnlyList<MapObjectMarker> nearby=[];private IReadOnlyList<MapMonster> monsters=[];
     private readonly ICondition condition;private readonly IFateTable fateTable;private readonly IPartyList party;
     private IReadOnlyList<MapPartyMarker> partyMarkers=[];private IReadOnlySet<uint>? unlockedCurrents;private IReadOnlySet<uint>? sightseen;
     private readonly uint[] allCurrents;private readonly uint[] adventureRows;private int loggedVistas=-1,loggedNative=-1;private int logUnlock=-1,logUnlockEx=-1;
@@ -161,6 +164,7 @@ internal sealed class MapLiveReader : IDisposable
                 try{events=ReadEvents();Read("events");}catch(Exception error){Failed("events",error);}
                 // Objects, FATEs and party carry no map id: on a failure they are emptied, never kept from another zone.
                 try{nearby=ReadObjects();Read("objects");}catch(Exception error){nearby=[];Failed("objects",error);}
+                try{monsters=ReadMonsters();Read("monsters");}catch(Exception error){monsters=[];Failed("monsters",error);}
                 try{fates=ReadFates();Read("FATEs");}catch(Exception error){fates=[];Failed("FATEs",error);}
                 eventsAt=now.AddMilliseconds(500);
             }
@@ -173,7 +177,7 @@ internal sealed class MapLiveReader : IDisposable
             try{ReadPlace();Read("place");}catch(Exception error){areaName=subAreaName="";Failed("place",error);}
             var inCombat=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             var inDuty=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty56];
-            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName));
+            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName,monsters));
         }
         catch(Exception error){Volatile.Write(ref state,null);retryAt=now.AddSeconds(5);log.Warning(error,"Map position unavailable; retry in five seconds.");}
     }
@@ -201,6 +205,19 @@ internal sealed class MapLiveReader : IDisposable
         return result;
     }
     // Targetable coffers and gathering points in the object table (what the game currently streams around the player).
+    // 0.795 (X-34, user request): the living enemies streamed around the player, for information layers only (what drops, what is missing, what teaches):
+    // name, place and level, nothing about the fight. At most 100.
+    private IReadOnlyList<MapMonster> ReadMonsters()
+    {
+        var result=new List<MapMonster>();
+        foreach(var item in objects)
+        {
+            if(result.Count>=100)break;
+            if(item is not Dalamud.Game.ClientState.Objects.Types.IBattleNpc { CurrentHp:>0, NameId:not 0 } npc || npc.BattleNpcKind!=Dalamud.Game.ClientState.Objects.Enums.BattleNpcSubKind.Combatant || !npc.IsTargetable)continue;
+            result.Add(new(npc.NameId,npc.BaseId,npc.Name.TextValue,npc.Position,npc.Level));
+        }
+        return result.AsReadOnly();
+    }
     private IReadOnlyList<MapObjectMarker> ReadObjects()
     {
         var result=new List<MapObjectMarker>();

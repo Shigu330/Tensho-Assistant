@@ -539,6 +539,7 @@ internal sealed partial class MainWindow
             changed|=SettingBox("MapView.ShowParty",settings.ShowParty,value=>settings.ShowParty=value);
             changed|=SettingBox("MapView.ShowBookmarks",settings.ShowBookmarks,value=>settings.ShowBookmarks=value);
             changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value);
+            changed|=SettingBox("MapView.ShowListMonsters",settings.ShowListMonsters,value=>settings.ShowListMonsters=value);
             changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value);
             if(changed)
             {
@@ -595,6 +596,7 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value,MapDefaults.ShowVendors);
                 changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value,MapDefaults.ShowGathering);
                 changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value,MapDefaults.ShowHuntMarks);
+                changed|=SettingBox("MapView.ShowListMonsters",settings.ShowListMonsters,value=>settings.ShowListMonsters=value,MapDefaults.ShowListMonsters);
                 changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
                 var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelMinZoom"),ref labelMinimum,0,200,"%.0f %%")){settings.GatheringLabelMinZoom=labelMinimum/100;changed=true;}
@@ -1264,6 +1266,25 @@ internal sealed partial class MainWindow
                         :item.Kind==MapObjectKind.HuntMark ? localization.Format("MapView.HuntMarkLabel",item.Name,item.Level switch{3=>"S",2=>"A",_=>"B"}):item.Name;
                     if(hovered && Vector2.Distance(io.MousePos,at)<=glyph){tooltip=label;tooltipPoint=null;}
                 }
+            // 0.795 (X-35, user request): nearby monsters that drop an item the tracking lists still need.
+            if(settings.ShowListMonsters && live?.Monsters is { Count:>0 } monsters && live.MapId==map.MapId)
+            {
+                RefreshNearbyMonsters();
+                foreach(var monster in monsters)
+                {
+                    var drops=MonsterListDrops(monster);
+                    if(drops.Count==0)continue;
+                    var at=origin+mapPan+MapProjection.PixelFromWorld(monster.Position,map)*mapZoom;
+                    var glyph=Math.Max(4,baseIcon*0.6f);
+                    draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
+                    draw.AddText(UiBuilder.IconFont,glyph,at-new Vector2(glyph/2),ImGui.GetColorU32(new Vector4(0.98f,0.55f,0.35f,1)),FontAwesomeIcon.Paw.ToIconString());
+                    if(hovered && Vector2.Distance(io.MousePos,at)<=glyph)
+                    {
+                        tooltip=localization.Format("MapView.MonsterListLabel",monster.Name,monster.Level,string.Join(", ",drops.Select(item=>itemCatalog.State.Catalog?.Find(item)?.Name ?? item.ToString())));
+                        tooltipPoint=null;
+                    }
+                }
+            }
             if(settings.ShowFlag && settings.SizeOf(FlagIcon,map.MapId)>0 && live is { Flag:{ } flag } && live.FlagMapId==map.MapId)
             {
                 var flagPixel=MapProjection.PixelFromWorld(new Vector3(flag.X,0,flag.Y),map);var at=origin+mapPan+flagPixel*mapZoom;var iconSize=Math.Max(4,baseIcon*settings.SizeOf(FlagIcon,map.MapId));

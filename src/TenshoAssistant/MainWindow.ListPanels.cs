@@ -1,4 +1,5 @@
 using System.Numerics;
+using Dalamud.Interface;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Craft;
 using TenshoAssistant.FreeCompany;
@@ -34,6 +35,12 @@ internal sealed partial class MainWindow
             BoolSetting("ListPanels.MetOnly","ListPanels.MetOnlyTip",()=>configuration.ListPanelsMetOnly,value=>configuration.ListPanelsMetOnly=value,c=>c.ListPanelsMetOnly);
         }
         BoolSetting("ListPanels.Monster","ListPanels.OriginTip",()=>configuration.ListPanelsMonster,value=>configuration.ListPanelsMonster=value,c=>c.ListPanelsMonster);
+        if(configuration.ListPanelsMonster)
+        {
+            ImGui.Indent();
+            BoolSetting("ListPanels.NearbyMonsters","ListPanels.NearbyMonstersTip",()=>configuration.ListPanelsNearbyMonsters,value=>configuration.ListPanelsNearbyMonsters=value,c=>c.ListPanelsNearbyMonsters);
+            ImGui.Unindent();
+        }
         BoolSetting("ListPanels.Other","ListPanels.OriginTip",()=>configuration.ListPanelsOther,value=>configuration.ListPanelsOther=value,c=>c.ListPanelsOther);
         BoolSetting("ListPanels.Crystal","ListPanels.OriginTip",()=>configuration.ListPanelsCrystal,value=>configuration.ListPanelsCrystal=value,c=>c.ListPanelsCrystal);
         ImGui.Unindent();
@@ -188,6 +195,7 @@ internal sealed partial class MainWindow
     }
     private void DrawListPanelEntries(string key,Func<(uint Item,long Needed)[]> entries)
     {
+        RefreshNearbyMonsters();
         listPanelSources[key]=entries;
         var known=ListPanelLinesOf(key,entries);
         DrawListPanelCrafts(key);
@@ -490,5 +498,14 @@ internal sealed partial class MainWindow
         if(!stock.HasObservation)ImGui.TextDisabled($"— / {required:N0}");
         else if(stock.Total<required)ImGui.TextColored(UI.FfxivTheme.Warning,$"{stock.Total:N0} / {required:N0}");
         else ImGui.TextColored(Success,$"{stock.Total:N0} / {required:N0}");
+        // 0.795 (X-35, user request): a monster nearby drops it.
+        if(nearbyDroppedItems.TryGetValue(itemId,out var droppers))
+        {
+            ImGui.SameLine();
+            ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
+            try{ImGui.TextColored(new Vector4(0.98f,0.55f,0.35f,1),Dalamud.Interface.FontAwesomeIcon.Paw.ToIconString());}
+            finally{ImGui.PopFont();}
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.MonsterNearby",string.Join(", ",droppers)));
+        }
     }
 }
