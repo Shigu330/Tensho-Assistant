@@ -9,6 +9,19 @@ public sealed class BlinkWatch
     public static readonly TimeSpan Window=TimeSpan.FromSeconds(3),Quiet=TimeSpan.FromSeconds(30);
     private sealed class Seen { public (long Held,long Needed) Last,Before; public DateTimeOffset ChangedAt,ReportedAt=DateTimeOffset.MinValue; public bool HasBefore; }
     private readonly Dictionary<(string,uint),Seen> lines=[];
+    private readonly Dictionary<(string,uint),long> held=[];
+    private readonly Dictionary<string,DateTimeOffset> dropReported=[];
+
+    /// <summary>0.743: true the first time in thirty seconds, per list, that a stock above 0 reads 0: the moment to write what each storage said.</summary>
+    public bool FellToZero(string list,uint item,long now,DateTimeOffset at)
+    {
+        var before=held.GetValueOrDefault((list,item));
+        held[(list,item)]=now;
+        if(before<=0 || now!=0)return false;
+        if(dropReported.TryGetValue(list,out var last) && at-last<Quiet)return false;
+        dropReported[list]=at;
+        return true;
+    }
 
     /// <summary>A text for the log when this line just went back to its value before last; else null.</summary>
     public string? Observe(string list,uint item,long held,long needed,DateTimeOffset now)

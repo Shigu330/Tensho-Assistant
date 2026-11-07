@@ -226,7 +226,8 @@ public sealed class Plugin : IDalamudPlugin
                         if(!alarmLinks.TryGetValue(alarm.ItemId,out var link))
                         {
                             if(alarmLinks.Count>=256){chat.RemoveChatLinkHandler();alarmLinks.Clear();}
-                            link=chat.AddChatLinkHandler(alarm.ItemId,(item,_)=>{mainWindow.OpenAlarmItem(item);mainWindow.IsOpen=true;});
+                            // 0.743 (user report: « Open in Tensho » opens nothing): the click is logged, to see whether it arrives.
+                            link=chat.AddChatLinkHandler(alarm.ItemId,(item,_)=>{log.Information("Alarm link clicked: item {0}.",item);mainWindow.OpenAlarmItem(item);mainWindow.IsOpen=true;});
                             alarmLinks[alarm.ItemId]=link;
                         }
                         message.AddText(" ").Add(link).AddUiForeground(localization.Get("Alarms.OpenInTensho"),500)

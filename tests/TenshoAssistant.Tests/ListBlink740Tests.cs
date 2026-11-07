@@ -24,6 +24,11 @@ internal static class ListBlink740Tests
             var lists=new BlinkWatch();
             lists.Observe("A",9,1,5,At);lists.Observe("B",9,2,5,At);
             Check(lists.Observe("A",9,1,5,At) is null,"each list apart");
+            var zero=new BlinkWatch();
+            Check(!zero.FellToZero("W",1,0,At) && !zero.FellToZero("W",1,5,At),"from nothing, or a rise");
+            Check(zero.FellToZero("W",1,0,At.AddSeconds(1)),"5 to 0");
+            zero.FellToZero("W",2,4,At);
+            Check(!zero.FellToZero("W",2,0,At.AddSeconds(2)),"once in thirty seconds per list");
         }),
     ];
 }

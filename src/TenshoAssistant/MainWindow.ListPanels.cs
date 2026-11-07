@@ -229,7 +229,20 @@ internal sealed partial class MainWindow
     private void DrawListPanelLine(string list,uint itemId,long required,Inventory.ItemHoldingsSummary stock)
     {
         // 0.740: developer mode, to find the line that goes back and forth while gathering (docs/evidence/0.740-list-blink.md).
-        if(developerMode && listPanelBlinks.Observe(list,itemId,stock.HasObservation ? stock.Total:-1,required,DateTimeOffset.UtcNow) is { } blink)log.Information(blink);
+        if(developerMode)
+        {
+            var at=DateTimeOffset.UtcNow;var heldNow=stock.HasObservation ? stock.Total:-1;
+            if(listPanelBlinks.Observe(list,itemId,heldNow,required,at) is { } blink)log.Information(blink);
+            // 0.743 (the blink came back in 0.742): what each storage said at the moment the stock read 0, and what the bags reading was.
+            if(listPanelBlinks.FellToZero(list,itemId,heldNow,at))
+            {
+                var shown=inventory.Shown;var current=inventory.Current;
+                log.Information("List zero: {0}, item {1}: character {2}; rows {3}; shown {4}; current {5}",list,itemId,bankBridge.State.CharacterId!=0 ? "known":"0",
+                    string.Join(", ",stock.Rows.Select(row=>$"{row.Label} {row.Coverage} {(row.IsCached ? "cached ":"")}{row.Nq + row.Hq}")),
+                    shown is null ? "none":$"{(at-shown.ObservedAt).TotalMilliseconds:0} ms old, "+string.Join(" ",shown.Containers.Values.Select(container=>$"{container.Location.Container.Value}:{container.Coverage}:{container.Stacks.Count}")),
+                    current is null ? "none":ReferenceEquals(current,shown) ? "same":"other");
+            }
+        }
         var item=itemCatalog.State.Catalog?.Find(itemId);
         DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));
         if(ImGui.IsItemHovered())DrawItemInfoTooltip(itemId);

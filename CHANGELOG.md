@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.743.0
+- Plan global, Verify : Le clignotement revient en 0.742 : la cause visée n'était pas la bonne. En mode développeur, le journal écrit maintenant ce que chaque rangement donnait au moment où un stock tombe à 0. Il note aussi les clics sur « Ouvrir dans Tensho » d'une alarme, signalé comme n'ouvrant rien. Aucun changement visible. Non validé en jeu.
+- Tests : ListBlink740Tests. Verify.ps1 (agent) : 1318/1318, 0 avertissement, 0 erreur ; DLL 0.743.0.0. Non validé en jeu.
+### English
+- The blink is back in 0.742: the cause aimed at was not the right one. In developer mode, the log now writes what each storage said when a stock falls to 0. It also logs clicks on an alarm's « Open in Tensho », reported as opening nothing. No visible change. Not validated in game.
+
 ## 0.742.0
 - Plan global, Verify : Suite du clignotement : il revenait en 0.741. Le journal montre qu'une lecture faite pendant le changement trouvait les sacs illisibles et était affichée. Correction : à l'écran, un sac illisible garde sa dernière lecture complète du même personnage ; le tri voit toujours ce qui a été lu. Non validé en jeu.
 - Tests : ListBlink742Tests. Verify.ps1 (agent) : 1318/1318, 0 avertissement, 0 erreur ; DLL 0.742.0.0. Non validé en jeu.
