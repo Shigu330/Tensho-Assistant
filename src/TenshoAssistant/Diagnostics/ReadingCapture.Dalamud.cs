@@ -182,7 +182,7 @@ public sealed unsafe class ReadingCapture : IDisposable
         if(count is <0 or >256)return;
         var text=new StringBuilder($"open map {agent->CurrentMapId}, selected {agent->SelectedMapId}:");
         foreach(var marker in agent->EventMarkers)
-            text.Append($" [{marker.IconId} map {marker.MapId} objective {marker.ObjectiveId} data {marker.DataId} type {marker.MarkerType} level {marker.LevelId} at {marker.Position.X:F1},{marker.Position.Z:F1} height {marker.Position.Y:F1} territory {marker.TerritoryTypeId}]");
+            text.Append($" [{marker.IconId} map {marker.MapId} objective {marker.ObjectiveId} data {marker.DataId} type {marker.MarkerType} level {marker.LevelId} at {marker.Position.X:F1},{marker.Position.Z:F1} height {marker.Position.Y:F1} flags {marker.Flags:X2} state {marker.EventState} territory {marker.TerritoryTypeId}]");
         var now=text.ToString();
         if(now==eventMarkers)return;
         eventMarkers=now;
@@ -202,7 +202,8 @@ public sealed unsafe class ReadingCapture : IDisposable
         for(var index=0;index<count && shown<60;index++)
         {
             var marker=agent->MapMarkers[index].MapMarker;
-            if(marker.IconFlags==0 && marker.SecondaryIconId==0)continue;
+            // Fixed icons (flags 0002, area links 0052) left out: quest and event icons (70000 and up), other flags, a second icon.
+            if(marker.IconId<70000 && marker.IconFlags is 0 or 0x0002 or 0x0052 && marker.SecondaryIconId==0)continue;
             shown++;
             text.Append($" [icon {marker.IconId} second {marker.SecondaryIconId} flags {marker.IconFlags:X4} at {marker.X},{marker.Y} type {agent->MapMarkers[index].DataType} key {agent->MapMarkers[index].DataKey}]");
         }

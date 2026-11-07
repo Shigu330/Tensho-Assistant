@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.843.0
+- Plan global, Verify : Demande (X-67), relevé affiné : le premier relevé ne contenait que les icônes fixes de la carte. La capture garde maintenant les icônes de quête et d'événement, les marqueurs aux drapeaux inhabituels ou à icône secondaire, et ajoute aux marqueurs d'événement leurs drapeaux et leur état, pour trouver où le jeu note la flèche haut ou bas. Non validé en jeu.
+- Tests : MapMarkers842Tests. Verify.ps1 (agent) : 1427/1427, 0 avertissement, 0 erreur ; DLL 0.843.0.0. Non validé en jeu.
+### English
+- Request (X-67), reading refined: the first reading held only the map's fixed icons. The capture now keeps quest and event icons, markers with unusual flags or a second icon, and adds the event markers' flags and state, to find where the game keeps the up or down arrow. Not validated in game.
+
 ## 0.842.0
 - Plan global, Verify : Demande (X-67) : sur la carte de Tensho, signaler qu'une cible est plus haut ou plus bas, comme la carte du jeu. Tensho ne connaît pas encore la règle du jeu (à partir de quelle différence de hauteur, et où le jeu la note) ; plutôt que d'inventer un seuil, le mode développeur relève les marqueurs de la carte du jeu ouverte, avec leurs drapeaux, leur icône secondaire et la hauteur du joueur, et la hauteur des marqueurs d'événement. La flèche viendra de ce relevé. Non validé en jeu.
 - Tests : MapMarkers842Tests. Verify.ps1 (agent) : 1427/1427, 0 avertissement, 0 erreur ; DLL 0.842.0.0. Non validé en jeu.
