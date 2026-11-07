@@ -47,6 +47,15 @@ public static class BaseMaterials
         return groups;
     }
 
+    /// <summary>
+    /// 0.757 (X-12, user request): the zones of a list in the order to go: the one the character stands in first, then the cheapest to teleport to, then those whose
+    /// price is unknown; within each, the one with the most lines first, then by name.
+    /// </summary>
+    public static IReadOnlyList<(string Zone,IReadOnlyList<T> Lines)> OrderZones<T>(IReadOnlyList<(string Zone,IReadOnlyList<T> Lines)> groups,string? here,Func<string,uint?> cost)=>
+        groups.OrderBy(group=>here is { Length:>0 } && group.Zone==here ? 0:1)
+            .ThenBy(group=>cost(group.Zone) is null ? 1:0).ThenBy(group=>cost(group.Zone) ?? 0)
+            .ThenByDescending(group=>group.Lines.Count).ThenBy(group=>group.Zone,StringComparer.CurrentCulture).ToArray();
+
     public static IReadOnlyList<(uint Item,long Needed)> Expand(IEnumerable<(uint Item,long Amount)> wanted,Func<uint,long> stock,Func<uint,RecipeDefinition?> recipeOf,Func<uint,bool> fetched)
     {
         var needed=new Dictionary<uint,long>();var order=new List<uint>();var used=new Dictionary<uint,long>();var open=new HashSet<uint>();

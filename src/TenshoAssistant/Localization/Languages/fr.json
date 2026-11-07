@@ -6300,6 +6300,8 @@
     "Left": "Non réussi"
   },
   "ListPanels": {
+    "ZoneHere": "vous y êtes",
+    "ZoneCost": "téléportation {0} gils",
     "AddAlarms": "Ajouter les alarmes ({0})",
     "AddAlarmsTip": "Une alarme pour chaque ouverture des points à horaire de ce dont la liste a encore besoin. Une alarme déjà présente, même nom et même heure, n'est pas ajoutée une seconde fois.",
     "AddAlarmsNone": "Aucun point à horaire de ce dont la liste a encore besoin ne manque d'alarme.",

@@ -194,13 +194,17 @@ internal sealed partial class MainWindow
             // 0.752 (X-05, user request): what is gathered, by zone, the zone with the most first.
             if(origin==ItemOrigin.Gathering && configuration.ListPanelsByZone)
             {
-                foreach(var (zone,inZone) in BaseMaterials.ByZone(lines,line=>ListPanelZones(line.Item)))
+                // 0.757 (X-11, X-12, user request): each zone folds; the zone you stand in first, then the cheapest teleport.
+                RequestListTeleportCosts();
+                var here=ListPanelZoneHere();
+                foreach(var (zone,inZone) in BaseMaterials.OrderZones(BaseMaterials.ByZone(lines,line=>ListPanelZones(line.Item)),here,ListPanelZoneCost))
                 {
                     var zoneDone=inZone.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
-                    ImGui.TextColored(Accent,$"{(zone.Length>0 ? zone:localization.Get("ListPanels.ZoneUnknown"))} ({zoneDone}/{inZone.Count})");
-                    ImGui.Indent();
+                    var name=zone.Length>0 ? zone:localization.Get("ListPanels.ZoneUnknown");
+                    var price=zone==here && zone.Length>0 ? " · "+localization.Get("ListPanels.ZoneHere"):ListPanelZoneCost(zone) is { } gil ? " · "+localization.Format("ListPanels.ZoneCost",gil.ToString("N0")):"";
+                    if(!ImGui.TreeNodeEx($"{name} ({zoneDone}/{inZone.Count}){price}###ListZone{key}{zone}",ImGuiTreeNodeFlags.DefaultOpen))continue;
                     try{foreach(var (item,needed) in inZone)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));}
-                    finally{ImGui.Unindent();}
+                    finally{ImGui.TreePop();}
                 }
                 continue;
             }
@@ -244,6 +248,28 @@ internal sealed partial class MainWindow
             }
         }
         return created.ToArray();
+    }
+
+    // 0.757 (X-12): the zone's cheapest teleport, as the game prices it from where the character is (asked again once a minute while a list shows zones).
+    internal IReadOnlyDictionary<uint,uint[]>? TerritoryAetherytes { get; set; }
+    private long listTeleportAsked;
+    private void RequestListTeleportCosts()
+    {
+        var now=Environment.TickCount64;
+        if(now-listTeleportAsked<60000)return;
+        listTeleportAsked=now;mapLive?.RefreshTeleportCosts();
+    }
+    private string? ListPanelZoneHere()
+    {
+        var territory=CurrentTerritory?.Invoke() ?? 0;
+        return territory==0 ? null:gatheringCatalog.State.Catalog?.Sources.FirstOrDefault(source=>source.TerritoryId==territory)?.Zone;
+    }
+    private uint? ListPanelZoneCost(string zone)
+    {
+        if(zone.Length==0 || mapLive?.TeleportCosts is not { } costs || TerritoryAetherytes is not { } aetherytes || gatheringCatalog.State.Catalog is not { } catalog)return null;
+        var territories=catalog.Sources.Where(source=>source.Zone==zone).Select(source=>source.TerritoryId).Distinct();
+        var prices=territories.SelectMany(territory=>aetherytes.GetValueOrDefault(territory) ?? []).Where(costs.ContainsKey).Select(id=>costs[id]).ToArray();
+        return prices.Length==0 ? null:prices.Min();
     }
 
     // 0.752: the zones where an item is gathered, from the gathering catalogue, kept per catalogue.

@@ -777,6 +777,9 @@ public sealed class Plugin : IDalamudPlugin
                 catch(Exception error){log.Warning(error,"FATE places unreadable (game update?).");return null;}
             };
             mainWindow.CurrentTerritory=()=>client.TerritoryType;
+            // 0.757 (X-12): the aetherytes of each territory, from the game's sheet, for the teleport price of a zone.
+            mainWindow.TerritoryAetherytes=LoadSheet("Aetheryte",()=>data.GetExcelSheet<Lumina.Excel.Sheets.Aetheryte>().Where(row=>row.IsAetheryte && row.Territory.RowId!=0)
+                .GroupBy(row=>row.Territory.RowId).ToDictionary(group=>group.Key,group=>group.Select(row=>row.RowId).ToArray()),new Dictionary<uint,uint[]>());
             // W-16 (0.719): the lexicon, from the sheets, off the frame.
             mainWindow.LexiconLoad=()=>
             {

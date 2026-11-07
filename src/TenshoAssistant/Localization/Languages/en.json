@@ -6300,6 +6300,8 @@
     "Left": "Not cleared"
   },
   "ListPanels": {
+    "ZoneHere": "you are here",
+    "ZoneCost": "teleport {0} gil",
     "AddAlarms": "Add the alarms ({0})",
     "AddAlarmsTip": "An alarm for each opening of the timed points of what the list still needs. An alarm already there with the same name and time is not added again.",
     "AddAlarmsNone": "No timed point is missing an alarm for what the list still needs.",
