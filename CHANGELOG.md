@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.719.0
+- Plan global, W-16 : Lexique, sujet choisi par l'utilisateur. Nouvelle page Objets › Lexique : chercher un mot du jeu en français ou en anglais, sans tenir compte des accents, dans seize types de feuilles (objets, actions, lieux, monstres, PNJ, quêtes, interface…), résultats par pages, clic pour copier. Chargement et recherche hors de l'image. COMPILED et TESTED, non validé en jeu.
+- Tests : Lexicon719Tests. Verify.ps1 (agent) : 1288/1288, 0 avertissement, 0 erreur ; DLL 0.719.0.0. Non validé en jeu.
+### English
+- Lexicon, a topic chosen by the user. New page Objects > Lexicon: search a word of the game in French or English, ignoring accents, across sixteen kinds of sheets (items, actions, places, monsters, NPCs, quests, interface…), results in pages, click to copy. Loaded and searched off the frame. COMPILED and TESTED, not validated in game.
+
 ## 0.718.0
 - Plan global, W-15 : Donjons profonds, sujet choisi par l'utilisateur. Nouvelle page Progression › Donjons profonds, un onglet par donjon : étages avec niveau, état et quête de déblocage ; poteries, pierres et objets particuliers avec le texte du jeu, le mot « sous-sol », « étage » ou « zone » rempli selon le donjon ; coffres d'après LuminaSupplemental, sous son réglage. Pas de conseil de combat, et Tensho reste en pause à l'intérieur. Corrigé aussi : deux noms de la liste des sources suivent maintenant le jeu (Eurêka Orthos, Sanctuaire des pèlerins). COMPILED et TESTED, non validé en jeu.
 - Tests : DeepDungeons718Tests. Verify.ps1 (agent) : 1285/1285, 0 avertissement, 0 erreur ; DLL 0.718.0.0. Non validé en jeu.

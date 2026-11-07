@@ -27,7 +27,7 @@ namespace TenshoAssistant;
 // Diagnostics (0.290–0.292). Each page or tool is a partial file MainWindow.<Tool>.cs; services are created in Plugin.cs.
 internal sealed partial class MainWindow : Window, IDisposable
 {
-    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Chocobo, Events, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms, Storage, Reminders, FreeCompany, Gear, Credits, Leves, HuntingLog, OceanFishing, Garden, MyTools, GatheringCollectables, Beastmaster, Help, IslandSanctuary, CustomDeliveries, MaskedCarnivale, RelicWeapons, AlliedSocieties, GrandCompanies, SpecialDeliveries, FieldContent, DeepDungeons }
+    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Chocobo, Events, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms, Storage, Reminders, FreeCompany, Gear, Credits, Leves, HuntingLog, OceanFishing, Garden, MyTools, GatheringCollectables, Beastmaster, Help, IslandSanctuary, CustomDeliveries, MaskedCarnivale, RelicWeapons, AlliedSocieties, GrandCompanies, SpecialDeliveries, FieldContent, DeepDungeons, Lexicon }
     // Read from the active theme each time: the game theme can change while the plugin runs.
     private static Vector4 Accent => FfxivTheme.Gold;
     private static Vector4 Success => FfxivTheme.Success;

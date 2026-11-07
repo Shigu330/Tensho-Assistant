@@ -767,6 +767,12 @@ public sealed class Plugin : IDalamudPlugin
                 }
                 catch(Exception error){log.Warning(error,"Custom deliveries unreadable (game update?).");throw;}
             });
+            // W-16 (0.719): the lexicon, from the sheets, off the frame.
+            mainWindow.LexiconLoad=()=>
+            {
+                try{return Lexicon.LexiconLoader.Read(data);}
+                catch(Exception error){log.Warning(error,"Lexicon sheets unreadable (game update?).");return null;}
+            };
             // W-15 (0.718): the deep dungeons, from the sheets, off the frame.
             mainWindow.DeepDungeonLoad=()=>
             {
