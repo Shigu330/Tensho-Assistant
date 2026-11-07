@@ -20,6 +20,12 @@ internal sealed partial class MainWindow
         if(!configuration.ListPanelsBase)return;
         ImGui.Indent();
         BoolSetting("ListPanels.Gathering","ListPanels.OriginTip",()=>configuration.ListPanelsGathering,value=>configuration.ListPanelsGathering=value,c=>c.ListPanelsGathering);
+        if(configuration.ListPanelsGathering)
+        {
+            ImGui.Indent();
+            BoolSetting("ListPanels.ByZone","ListPanels.ByZoneTip",()=>configuration.ListPanelsByZone,value=>configuration.ListPanelsByZone=value,c=>c.ListPanelsByZone);
+            ImGui.Unindent();
+        }
         BoolSetting("ListPanels.Vendor","ListPanels.VendorTip",()=>configuration.ListPanelsVendor,value=>configuration.ListPanelsVendor=value,c=>c.ListPanelsVendor);
         if(configuration.ListPanelsVendor)
         {
@@ -184,8 +190,32 @@ internal sealed partial class MainWindow
             // 0.700 (user request): a long list folds by category; each panel remembers its own.
             var done=lines.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
             if(!ImGui.CollapsingHeader($"{localization.Get("ListPanels."+origin)} ({done}/{lines.Length})###ListPanel{key}{origin}",ImGuiTreeNodeFlags.DefaultOpen))continue;
+            // 0.752 (X-05, user request): what is gathered, by zone, the zone with the most first.
+            if(origin==ItemOrigin.Gathering && configuration.ListPanelsByZone)
+            {
+                foreach(var (zone,inZone) in BaseMaterials.ByZone(lines,line=>ListPanelZones(line.Item)))
+                {
+                    var zoneDone=inZone.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
+                    ImGui.TextColored(Accent,$"{(zone.Length>0 ? zone:localization.Get("ListPanels.ZoneUnknown"))} ({zoneDone}/{inZone.Count})");
+                    ImGui.Indent();
+                    try{foreach(var (item,needed) in inZone)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));}
+                    finally{ImGui.Unindent();}
+                }
+                continue;
+            }
             foreach(var (item,needed) in lines)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
         }
+    }
+    // 0.752: the zones where an item is gathered, from the gathering catalogue, kept per catalogue.
+    private (object? Catalog,Dictionary<uint,string[]> Zones) listPanelZones=(null,[]);
+    private IReadOnlyCollection<string> ListPanelZones(uint item)
+    {
+        var catalog=gatheringCatalog.State.Catalog;
+        if(!ReferenceEquals(listPanelZones.Catalog,catalog))listPanelZones=(catalog,[]);
+        if(listPanelZones.Zones.TryGetValue(item,out var known))return known;
+        var zones=catalog?.ForItem(item).Select(source=>source.Zone).Where(zone=>zone.Length>0).Distinct().ToArray() ?? [];
+        listPanelZones.Zones[item]=zones;
+        return zones;
     }
     private long ListPanelStock(uint item){var held=GetRecipeHoldings(item);return held.HasObservation ? held.Total:0;}
     private RecipeDefinition? ListPanelRecipe(uint item)=>recipeCatalog.State.Catalog?.ForResult(item) is { Count:>0 } recipes ? PreferredRecipe(recipes):null;

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.752.0
+- Plan global, Verify : Demande (X-05) : dans les listes de suivi, les objets à récolter sont rassemblés par zone, celle qui en a le plus d'abord ; un objet présent dans plusieurs zones va avec celle qui en regroupe le plus, pour moins de trajets. Réglable sous « Récolte ». Non validé en jeu.
+- Tests : ListZones752Tests. Verify.ps1 (agent) : 1326/1326, 0 avertissement, 0 erreur ; DLL 0.752.0.0. Non validé en jeu.
+### English
+- Request (X-05): in the tracking lists, items to gather are grouped by zone, the zone holding the most first; an item found in several zones goes with the one that holds most, for fewer trips. Optional, under « Gathering ». Not validated in game.
+
 ## 0.751.0
 - Plan global, Verify : Demande (X-04) : au point de récolte, l'aide dit « Vos listes en demandent encore N » pour chaque objet dont la liste d'artisanat, l'atelier ou la préparation affichés ont besoin, et un cadre vert entoure sa ligne dans la fenêtre de récolte du jeu (réglable). Dessin seulement. Non validé en jeu.
 - Tests : TrackedNeed751Tests. Verify.ps1 (agent) : 1324/1324, 0 avertissement, 0 erreur ; DLL 0.751.0.0. Non validé en jeu.

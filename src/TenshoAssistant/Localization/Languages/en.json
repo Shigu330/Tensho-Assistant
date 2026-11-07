@@ -6299,6 +6299,9 @@
     "Left": "Not cleared"
   },
   "ListPanels": {
+    "ByZone": "By gathering zone",
+    "ByZoneTip": "Gathered items grouped by zone, the zone holding the most of them first, for fewer trips. An item found in several zones goes with the one that holds most.",
+    "ZoneUnknown": "Zone unknown",
     "MetOnly": "Leave out NPCs with unmet requirements",
     "MetOnlyTip": "An article whose quest is not done no longer counts. A requirement that is not read counts as met: an achievement Tensho has not read, or a company rank, leaves the NPC in.",
     "CurrenciesLoading": "Listing the currencies…",

@@ -6299,6 +6299,9 @@
     "Left": "Non réussi"
   },
   "ListPanels": {
+    "ByZone": "Par zone de récolte",
+    "ByZoneTip": "Les objets à récolter rassemblés par zone, celle qui en a le plus d'abord, pour moins de trajets. Un objet présent dans plusieurs zones va avec celle qui en regroupe le plus.",
+    "ZoneUnknown": "Zone inconnue",
     "MetOnly": "Exclure les PNJ aux prérequis non remplis",
     "MetOnlyTip": "Un article dont la quête n'est pas faite ne compte plus. Un prérequis non lu compte comme rempli : un haut fait que Tensho n'a pas lu, ou un rang de compagnie, laisse le PNJ dans la liste.",
     "CurrenciesLoading": "Liste des monnaies en cours…",

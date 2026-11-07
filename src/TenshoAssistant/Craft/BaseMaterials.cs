@@ -27,6 +27,26 @@ public static class BaseMaterials
     /// What has to be fetched for a list: a crafted item not in stock is replaced by its ingredients, unless it can be gathered or bought (<paramref name="fetched"/>). Crafted items in stock
     /// are used first, all from one stock. Base items keep their whole need, so that the list shows their stock against it. Each once, in the order it first comes.
     /// </summary>
+    /// <summary>
+    /// 0.752 (X-05, user request): the gathered lines of a list, by zone, for fewer trips: the zone where the most remaining items grow comes first and takes them,
+    /// then the next among what is left. An item with no zone goes last, under an empty name. Zones of equal weight keep their name order.
+    /// </summary>
+    public static IReadOnlyList<(string Zone,IReadOnlyList<T> Lines)> ByZone<T>(IReadOnlyList<T> lines,Func<T,IReadOnlyCollection<string>> zonesOf)
+    {
+        var left=lines.Select((line,index)=>(Line:line,Index:index,Zones:zonesOf(line))).ToList();
+        var groups=new List<(string,IReadOnlyList<T>)>();
+        while(left.Any(entry=>entry.Zones.Count>0))
+        {
+            var best=left.SelectMany(entry=>entry.Zones.Distinct()).GroupBy(zone=>zone)
+                .OrderByDescending(group=>group.Count()).ThenBy(group=>group.Key,StringComparer.CurrentCulture).First().Key;
+            var taken=left.Where(entry=>entry.Zones.Contains(best)).ToArray();
+            groups.Add((best,taken.OrderBy(entry=>entry.Index).Select(entry=>entry.Line).ToArray()));
+            left.RemoveAll(entry=>entry.Zones.Contains(best));
+        }
+        if(left.Count>0)groups.Add(("",left.Select(entry=>entry.Line).ToArray()));
+        return groups;
+    }
+
     public static IReadOnlyList<(uint Item,long Needed)> Expand(IEnumerable<(uint Item,long Amount)> wanted,Func<uint,long> stock,Func<uint,RecipeDefinition?> recipeOf,Func<uint,bool> fetched)
     {
         var needed=new Dictionary<uint,long>();var order=new List<uint>();var used=new Dictionary<uint,long>();var open=new HashSet<uint>();
