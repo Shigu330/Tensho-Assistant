@@ -16,7 +16,7 @@ internal sealed partial class MainWindow
     private string fromStockJob="";
     private int fromStockMin=1,fromStockMax=100;
     private bool fromStockChained=true;
-    private (CraftFromStockResult Source,string Job,int Min,int Max,int Sort,int Prices,bool Loading,string Query,int Page,CraftFromStockRow[] Rows,CraftFromStockRow[] Shown,int Pages)? fromStockView;
+    private (CraftFromStockResult Source,string Job,int Min,int Max,int Sort,int Prices,bool Loading,string Query,int Page,object? Scrips,CraftFromStockRow[] Rows,CraftFromStockRow[] Shown,int Pages)? fromStockView;
     // 0.709 (user request): a list by pages. On the market sort, prices come page by page, or all on a click; the whole list is ranked once they are all there.
     private const int FromStockPageSize=25;
     private int fromStockPage;
@@ -168,7 +168,10 @@ internal sealed partial class MainWindow
         ImGui.InputTextWithHint("###CraftStockName",localization.Get("CraftStock.NameSearch"),ref fromStockQuery,100);
         Tip("CraftStock.NameSearchTip");
         var priceState=fromStockPrices.State;
-        if(fromStockView is not { } known || !ReferenceEquals(known.Source,result) || known.Job!=fromStockJob || known.Min!=fromStockMin || known.Max!=fromStockMax || known.Sort!=fromStockSort || known.Prices!=priceState.Completed || known.Loading!=priceState.Loading || known.Query!=fromStockQuery || known.Page!=fromStockPage)
+        // 0.712 (user report): the collectables' sheets load on first asking: the list is worked out again when they arrive, or no scrip would ever show.
+        var scripCatalog=fromStockSort==3 ? Collectables?.Catalog:null;
+        if(fromStockSort==3 && scripCatalog is null)ImGui.TextDisabled(localization.Get(Collectables?.CatalogFailed==true ? "CraftStock.ScripsFailed":"CraftStock.ScripsLoading"));
+        if(fromStockView is not { } known || !ReferenceEquals(known.Source,result) || known.Job!=fromStockJob || known.Min!=fromStockMin || known.Max!=fromStockMax || known.Sort!=fromStockSort || known.Prices!=priceState.Completed || known.Loading!=priceState.Loading || known.Query!=fromStockQuery || known.Page!=fromStockPage || !ReferenceEquals(known.Scrips,scripCatalog))
         {
             if(fromStockView is { } before && (before.Job!=fromStockJob || before.Min!=fromStockMin || before.Max!=fromStockMax || before.Sort!=fromStockSort || before.Query!=fromStockQuery || !ReferenceEquals(before.Source,result)))fromStockPage=0;
             var names=itemCatalog.State.Catalog;
@@ -182,7 +185,7 @@ internal sealed partial class MainWindow
                 var now=DateTimeOffset.UtcNow;
                 shownRows=CraftFromStock.Ranked(shownRows,row=>FromStockMarketUnit(row,now) is { } unit ? CraftFromStock.Worth(row,unit):null);
             }
-            fromStockView=known=(result,fromStockJob,fromStockMin,fromStockMax,fromStockSort,priceState.Completed,priceState.Loading,fromStockQuery,fromStockPage,ranked,shownRows,pages);
+            fromStockView=known=(result,fromStockJob,fromStockMin,fromStockMax,fromStockSort,priceState.Completed,priceState.Loading,fromStockQuery,fromStockPage,scripCatalog,ranked,shownRows,pages);
         }
         var rows=known.Shown;
         DrawFromStockPrices(known.Rows,rows);

@@ -35,6 +35,12 @@ internal static class MarketPace710Tests
             Check(Quote(nq,asked).Sold(true) is { Price:100m },"no HQ sale: NQ");
             Check(Quote(new(null,70m,null),asked).Sold(false) is { Price:70m,PerDay:null },"only the last sale");
         }),
+        ("Scrip sort: the list is worked out again when the collectables' sheets arrive",() =>
+        {
+            var page=Read("MainWindow.CraftFromStock.cs");
+            Check(page.Contains("!ReferenceEquals(known.Scrips,scripCatalog)"),"key");
+            Check(page.Contains("CraftStock.ScripsLoading"),"says so while loading");
+        }),
         ("Sold price: both long lists use it",() =>
         {
             Check(Read("MainWindow.CraftFromStock.cs").Contains("quote.Sold(") && !Read("MainWindow.CraftFromStock.cs").Contains("quote.Hq.Minimum"),"what can I craft");

@@ -1064,6 +1064,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.711) Que puis-je fabriquer ? : le haut de liste doit devenir réaliste (les Gourmettes à 2 000 000 doivent descendre si elles ne se vendent pas à ce prix) ; comparer une ligne à l'historique de ventes du marché.
 
+- [ ] (0.712) Que puis-je fabriquer ? › assignats : les objets collectionnables doivent afficher leurs assignats au palier haut et venir en tête ; comparer un montant au jeu.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

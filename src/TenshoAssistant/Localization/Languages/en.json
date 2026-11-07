@@ -687,6 +687,8 @@
     "ReferenceSummary": "Reference keys: {0} · languages: {1}"
   },
   "CraftStock": {
+    "ScripsLoading": "Reading the scrip rewards…",
+    "ScripsFailed": "The scrip rewards could not be read, perhaps after a game update.",
     "NameSearch": "Item name…",
     "NameSearchTip": "Part of the name of what is crafted, across the whole list.",
     "Page": "Page {0} / {1}",

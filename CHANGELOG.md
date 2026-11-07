@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.712.0
+- Plan global, W-06 : Rapport de l'utilisateur : le tri par assignats n'affichait aucun assignat. Les récompenses se chargent à la première demande, et la liste n'était pas recalculée à leur arrivée. Elle l'est maintenant, et la page dit quand elles se chargent. COMPILED et TESTED, non validé en jeu.
+- Tests : MarketPace710Tests. Verify.ps1 (agent) : 1268/1268, 0 avertissement, 0 erreur ; DLL 0.712.0.0. Non validé en jeu.
+### English
+- User report: the scrip sort showed no scrips. The rewards load on first asking and the list was not worked out again when they arrived. It now is, and the page says when they are loading. COMPILED and TESTED, not validated in game.
+
 ## 0.711.0
 - Plan global, Marché : Rapport de l'utilisateur : la rentabilité comptait le prix demandé, or un objet affiché à 2 000 000 de gils ne se vend pas forcément. « Que puis-je fabriquer ? » et « Que faire avec ? » utilisent maintenant ce qui s'est réellement vendu sur votre monde : le plus bas entre la dernière vente et la vente moyenne, avec le nombre de ventes par jour. Sans vente connue, l'objet passe en fin de liste. COMPILED et TESTED, non validé en jeu.
 - Tests : MarketPace710Tests. Verify.ps1 (agent) : 1267/1267, 0 avertissement, 0 erreur ; DLL 0.711.0.0. Non validé en jeu.

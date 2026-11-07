@@ -687,6 +687,8 @@
     "ReferenceSummary": "Clés de référence : {0} · langues : {1}"
   },
   "CraftStock": {
+    "ScripsLoading": "Lecture des récompenses en assignats…",
+    "ScripsFailed": "Les récompenses en assignats n'ont pas pu être lues, peut-être après une mise à jour du jeu.",
     "NameSearch": "Nom de l'objet…",
     "NameSearchTip": "Partie du nom de ce qui se fabrique, dans toute la liste.",
     "Page": "Page {0} / {1}",
