@@ -206,21 +206,25 @@ internal sealed partial class MainWindow
     {
         if(!listPanelCrafts.TryGetValue(key,out var steps) || steps.Count==0)return;
         if(!ImGui.CollapsingHeader($"{localization.Format("ListPanels.Crafts",steps.Count)}###ListPanelCrafts{key}"))return;
-        var step=0;
-        foreach(var craft in steps)
+        // 0.790 (X-31, user request): each step folds, down to the last one; the figures as on every other line, « held / needed ».
+        foreach(var group in steps.GroupBy(craft=>craft.Step))
         {
-            if(craft.Step!=step){step=craft.Step;ImGui.TextDisabled(localization.Format("ListPanels.CraftStep",step));}
-            if(craft.Recipe.CraftTypeId<8)
+            var done=group.Count(craft=>GetRecipeHoldings(craft.Item) is { HasObservation:true } held && held.Total>=craft.Needed);
+            if(!ImGui.TreeNodeEx($"{localization.Format("ListPanels.CraftStep",group.Key)} ({done}/{group.Count()})###ListCraftStep{key}{group.Key}",ImGuiTreeNodeFlags.DefaultOpen))continue;
+            try
             {
-                DrawItemIcon(new Items.ItemDefinition(0,craft.Recipe.CraftType,false,62108+craft.Recipe.CraftTypeId),new Vector2(ImGui.GetTextLineHeight()),false);
-                if(ImGui.IsItemHovered())WrappedTooltip(craft.Recipe.CraftType);
-                ImGui.SameLine();
+                foreach(var craft in group)
+                {
+                    if(craft.Recipe.CraftTypeId<8)
+                    {
+                        DrawItemIcon(new Items.ItemDefinition(0,craft.Recipe.CraftType,false,62108+craft.Recipe.CraftTypeId),new Vector2(ImGui.GetTextLineHeight()),false);
+                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.CraftRuns",craft.Recipe.CraftType,craft.Runs.ToString("N0")));
+                        ImGui.SameLine();
+                    }
+                    DrawListPanelLine(key+"Crafts",craft.Item,craft.Needed,GetRecipeHoldings(craft.Item));
+                }
             }
-            var item=itemCatalog.State.Catalog?.Find(craft.Item);
-            DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));
-            if(ImGui.IsItemHovered())DrawItemInfoTooltip(craft.Item);
-            ImGui.SameLine();ImGui.TextUnformatted(item?.Name ?? craft.Item.ToString());
-            ImGui.SameLine();ImGui.TextDisabled(localization.Format("ListPanels.CraftRuns",craft.Runs.ToString("N0"),(craft.Runs*craft.Recipe.ResultAmount).ToString("N0")));
+            finally{ImGui.TreePop();}
         }
     }
     private (uint Item,long Needed)[]? ListPanelFinished(string key)=>key switch

@@ -1220,6 +1220,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.789) Dépliez « Fabrications restantes » dans la liste d'atelier : les lingots puis les plaques, puis les livraisons.
 
+- [ ] (0.790) Dépliez « Fabrications restantes » : Étape 1, Étape 2… chacune repliable ; lignes « 0 / 36 ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

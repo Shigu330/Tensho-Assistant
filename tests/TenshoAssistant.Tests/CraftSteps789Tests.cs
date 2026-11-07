@@ -18,6 +18,7 @@ internal static class CraftSteps789Tests
             var by=steps.ToDictionary(step=>step.Item);
             Check(!by.ContainsKey(3),"gathered: not a craft");
             Check(by[4].Runs==2 && by[1].Runs==2 && by[2].Runs==5,"D twice (2 each), A twice, B 2+4-1 held");
+            Check(by[4].Needed==4 && by[1].Needed==2 && by[2].Needed==6,"0.790: asked in all, the held one included");
             Check(by[2].Step<by[1].Step && by[1].Step<by[4].Step && by[2].Step==1,"B, then A, then D");
             Check(steps.Select(step=>step.Step).SequenceEqual(steps.Select(step=>step.Step).Order()),"first step first");
         }),

@@ -272,6 +272,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-28 | Atelier de compagnie : tenir compte de ce qui est déjà livré au projet ; « oublie pas de verifie si on a valide des etapes aussi » | Fait en 0.787 : lu dans la fenêtre de livraison (capture 0.786), phases validées retirées, lots livrés déduits ; `docs/evidence/0.787-workshop-delivered.md` |
 | X-29 | Carnet de synthèse : en Menuisier sur une recette de Métallurgie (Lingot de mithril), Tensho ne signale pas qu'on n'est pas le bon métier et propose sa macro | Fait en 0.788 : c'était détecté (calcul avec les attributs relevés du bon métier), mais dit en couleur d'information et coupé ; maintenant « Mauvais métier : vous êtes Menuisier, cette recette est de Métallurgie », en avertissement, avec le bouton pour porter le métier |
 | X-30 | Voir les étapes de fabrication qui restent (objets intermédiaires à fabriquer) pour les listes d'atelier et d'artisanat | Fait en 0.789 : section « Fabrications restantes » repliable dans chaque liste, par étape, stock déduit, métier et nombre de fabrications |
+| X-31 | « Fabrications restantes » : chaque étape doit pouvoir se déplier jusqu'à l'étape finale ; un seul format de chiffres, comme les autres lignes (« possédés / demandés ») | Fait en 0.790 : une branche dépliable par étape avec son compte ; lignes « possédés / demandés » ; métier et fabrications restantes au survol de l'icône |
 
 ## Retenu pour plus tard
 
