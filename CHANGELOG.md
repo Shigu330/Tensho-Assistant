@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.801.0
+- Plan global, Verify : Lourdeur (X-01) : le journal montre encore la carte à 165–195 ms et le panneau d'atelier à 93–97 ms, environ toutes les cinq minutes, mais la ligne « Slow frame » ne gardait que les quatre plus gros morceaux, qui étaient les enveloppes (toutes les fenêtres, carte, mise en page, canevas) : les points de mesure de 0.791 n'apparaissaient jamais. Elle en garde maintenant dix. Mode développeur seulement, aucun changement visible. Non validé en jeu.
+- Tests : SlowParts801Tests. Verify.ps1 (agent) : 1382/1382, 0 avertissement, 0 erreur ; DLL 0.801.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01): the log still shows the map at 165-195 ms and the workshop panel at 93-97 ms, about every five minutes, but the « Slow frame » line kept only the four largest parts, which were the wholes (all windows, map, layout, canvas): the 0.791 checkpoints never showed. It now keeps ten. Developer mode only, no visible change. Not validated in game.
+
 ## 0.800.0
 - Plan global, Verify : Demande (X-41) : les monstres proches qui lâchent une monture, une mascotte ou un rouleau d'orchestrion que vous n'avez pas sont marqués d'une gemme sur la carte, les objets au survol ; au choix aussi au-dessus de leur tête (désactivé au départ). Ce qui vous manque est lu en jeu ; non lu, rien n'est dit. Réglages dans la carte et sur la page Collections (montures, mascottes, orchestrion). Données de butin : LuminaSupplemental. Non validé en jeu.
 - Tests : CollectionMonsters800Tests. Verify.ps1 (agent) : 1381/1381, 0 avertissement, 0 erreur ; DLL 0.800.0.0. Non validé en jeu.
