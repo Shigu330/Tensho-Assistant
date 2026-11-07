@@ -1611,6 +1611,14 @@ internal sealed partial class MainWindow
         {
             var open=point.ActiveAt(EorzeaMinutes());
             ImGui.TextColored(TimedPointColor(point),localization.Format(!open ? "MapView.TimedClosed":access?.TomeMissing is not null ? "MapView.TimedOpenNoTome":"MapView.TimedOpen",point.Schedule!.Label));
+            // 0.754 (X-08, user report: « closed now » without a timer): how long until it opens, or closes, as on the Gathering page.
+            var now=DateTimeOffset.UtcNow;
+            if(TenshoAssistant.Gathering.GatheringTime.Next(point.Schedule,now,1).Openings.FirstOrDefault() is { } next)
+            {
+                var current=next.StartsAt<=now && now<next.EndsAt;
+                var remaining=(current ? next.EndsAt:next.StartsAt)-now;
+                ImGui.TextDisabled(localization.Format(current ? "LocalClock.CountdownClose":"LocalClock.CountdownOpen",Math.Max(0,(int)remaining.TotalHours),remaining.Minutes,remaining.Seconds));
+            }
         }
         if(access is null)return;
         if(access.TomeMissing is { } tome)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MapView.TomeMissing",tome));

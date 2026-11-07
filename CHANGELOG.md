@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.754.0
+- Plan global, Verify : Signalement (X-08) : l'infobulle d'un point à horaire sur la carte disait « fermé maintenant » sans compte à rebours. Elle dit maintenant dans combien de temps il ouvre, ou ferme s'il est ouvert, comme la page Récolte. Non validé en jeu.
+- Tests : TimedCountdown754Tests. Verify.ps1 (agent) : 1329/1329, 0 avertissement, 0 erreur ; DLL 0.754.0.0. Non validé en jeu.
+### English
+- Report (X-08): the map tooltip of a timed point said « closed now » with no countdown. It now says how long until it opens, or closes when open, as the Gathering page does. Not validated in game.
+
 ## 0.753.0
 - Plan global, Verify : Demande (X-06) : quand « Récolter automatiquement l'objet sélectionné » est coché dans la fenêtre du jeu, le plan de PR ne garde que ce qui s'utilise avant la première récolte : les effets durables, une action « pour une récolte » une fois au plus, aucun essai rendu ; l'aide le dit. Non validé en jeu.
 - Tests : AutoGather753Tests. Verify.ps1 (agent) : 1328/1328, 0 avertissement, 0 erreur ; DLL 0.753.0.0. Non validé en jeu.
