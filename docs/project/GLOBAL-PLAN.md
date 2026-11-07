@@ -236,6 +236,20 @@ Choisis par l'utilisateur à partir de la liste de rubriques d'un site français
 | W-16 | Lexique des mots du jeu, français et anglais, à partir de ses feuilles | Fait sans le jeu en 0.719 : `docs/evidence/0.719-lexicon.md` |
 | W-14b | ALEA de toutes les zones ouvertes, lieu et niveau, d'après les fichiers de zone | Trouvé en faisant W-14 ; fait sans le jeu en 0.721 : `docs/evidence/0.721-fates.md` |
 
+## Demandes du 2026-11-07, en jouant
+
+Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche en cours, une version à la fois, sans en oublier. Une ligne passe à « fait » avec sa version.
+
+| Point | Demande | État |
+|---|---|---|
+| X-01 | Lourdeur : trouver ce qui bloque une image de Tensho (120 à 230 ms toutes les quelques minutes, 2,6 s une fois) et le sortir du dessin | En cours : relevé « Slow frame » en 0.745 ; premières causes vues : aide à la récolte 97 ms (plan calculé dans le dessin), carte 192 ms, une part encore non mesurée |
+| X-02 | Données gardées plus longtemps, relues seulement si absentes ; réglages qui complètent « Cache & péremption » | Accord donné. Relu : quêtes et collections ont déjà une copie par personnage sur disque ; les carnets, recettes et équipement se relisent légèrement, page ouverte. À faire : durées par défaut plus longues, « Jamais » renommé « seulement si absent ou sur Actualiser », et ce que X-01 trouvera de lourd |
+| X-03 | Lien « Ouvrir dans Tensho » d'une alarme : n'ouvre rien | Clic noté au journal depuis 0.743 ; à relire au prochain clic |
+| X-04 | Au point de récolte, mettre en évidence les objets dont les listes de suivi (artisanat et atelier de compagnie) ont besoin | À faire |
+| X-05 | Listes de suivi d'artisanat et d'atelier rassemblées par zone de récolte | À faire |
+| X-06 | « Récolter automatiquement » coché dans la fenêtre du jeu : le plan ne garde que les actions faites avant la première récolte, puis plus rien, et maximise la récolte restante | À faire |
+| X-07 | « Que puis-je fabriquer ? » : un objet faisable par deux métiers compté une fois | Fait en 0.739 |
+
 ## Retenu pour plus tard
 
 Demande de l'utilisateur (2026-11-06) : à garder, sans y travailler pour l'instant ; ne pas le commencer sans sa demande.

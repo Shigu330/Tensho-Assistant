@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.746.0
+- Plan global, Verify : Plan : les demandes faites en jouant le 2026-11-07 sont inscrites dans le plan global (X-01 à X-07), avec leur état, pour n'en oublier aucune. Aucun changement du plugin.
+- Tests : SlowFrame745Tests. Verify.ps1 (agent) : 1320/1320, 0 avertissement, 0 erreur ; DLL 0.746.0.0. Non validé en jeu.
+### English
+- Plan: the requests made while playing on 2026-11-07 are written in the global plan (X-01 to X-07), with their state, so that none is forgotten. No change to the plugin.
+
 ## 0.745.0
 - Plan global, Verify : Signalement : Tensho paraît lourd. Le journal montre des images de 120 à 230 ms toutes les quelques minutes, et une de 2,6 s, sans dire quelle partie. En mode développeur, chaque image de plus de 100 ms est maintenant écrite au journal avec ses parties les plus coûteuses (panneau, page) et les pauses du moteur .NET. Aucun changement visible. Non validé en jeu.
 - Tests : SlowFrame745Tests. Verify.ps1 (agent) : 1320/1320, 0 avertissement, 0 erreur ; DLL 0.745.0.0. Non validé en jeu.
