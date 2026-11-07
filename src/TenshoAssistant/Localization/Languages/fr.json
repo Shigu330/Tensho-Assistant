@@ -3785,6 +3785,7 @@
     "BestName": "Meilleure séquence, qualité {0}",
     "SavedIsEnough": "La séquence enregistrée atteint la cible : rien n'a été calculé. « Recalculer » lance quand même la recherche.",
     "ByRaphael": "Solveur : Raphael",
+    "RaphaelNotNeeded": "Raphael non utilisé : cette recette n'a pas de qualité à chercher ; la recherche de Tensho suffit.",
     "RaphaelFailed": "Raphael a échoué ; cette proposition vient de la recherche Tensho (détail dans le journal de Dalamud).",
     "Title": "Tensho · Carnet de synthèse",
     "Login": "Connectez un personnage avant d’ouvrir le carnet.",

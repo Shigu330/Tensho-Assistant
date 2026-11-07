@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.783.0
+- Plan global, Verify : Suite de X-25, vérifiée en jeu sur capture : la recette qui faisait geler le jeu s'ouvre, Tensho propose sa séquence. Le message « Raphael a échoué » était trompeur, Raphael n'étant pas appelé exprès (recette en haute qualité impossible, sans qualité à chercher) : il dit maintenant « Raphael non utilisé », sans avertissement au journal. Non validé en jeu pour le message.
+- Tests : RaphaelGuard782Tests. Verify.ps1 (agent) : 1350/1350, 0 avertissement, 0 erreur ; DLL 0.783.0.0. Non validé en jeu.
+### English
+- X-25, continued, checked in game on screenshot: the recipe that froze the game opens, Tensho offers its sequence. « Raphael failed » was misleading, Raphael being left out on purpose (HQ impossible, no quality to seek): it now says « Raphael not used », with no warning in the log. The message is not validated in game.
+
 ## 0.782.0
 - Plan global, Verify : Gel du jeu (X-25), causé par Tensho : en ouvrant le carnet d'artisan (cuisinier, recette 5623), le solveur Raphael, code natif, a divisé par un gain de qualité de 0 ; une telle erreur arrête le jeu sans pouvoir être rattrapée. Tensho vérifie maintenant chaque valeur avant l'appel (gains nuls, durabilité ou progression nulles, valeurs trop grandes) et, dans ces cas, ne demande rien à Raphael ; sa propre recherche reste. Non validé en jeu.
 - Tests : RaphaelGuard782Tests. Verify.ps1 (agent) : 1350/1350, 0 avertissement, 0 erreur ; DLL 0.782.0.0. Non validé en jeu.

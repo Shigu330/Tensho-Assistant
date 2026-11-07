@@ -3785,6 +3785,7 @@
     "BestName": "Best sequence, quality {0}",
     "SavedIsEnough": "The saved sequence reaches the target: nothing was calculated. « Recalculate » searches anyway.",
     "ByRaphael": "Solver: Raphael",
+    "RaphaelNotNeeded": "Raphael not used: this recipe has no quality to seek; Tensho's search is enough.",
     "RaphaelFailed": "Raphael failed; this suggestion comes from Tensho's search (details in the Dalamud log).",
     "Title": "Tensho · Crafting log",
     "Login": "Log in with a character before opening the crafting log.",

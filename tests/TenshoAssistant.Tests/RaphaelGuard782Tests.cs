@@ -21,6 +21,7 @@ internal static class RaphaelGuard782Tests
             var solver=Read("Craft/RaphaelCraftSolver.Dalamud.cs");
             Check(solver.IndexOf("RaphaelActions.InputRefusal(")<solver.IndexOf("new Solver(config,input,pool)"),"before");
             Check(solver.Contains("throw new ArgumentException(\"Raphael not called: \"") && Read("Craft/RaphaelSequenceCache.cs").Contains("catch(ArgumentException){return null;}"),"handled");
+            Check(Read("MainWindow.CraftLog.cs").Contains("internal const string RaphaelNotCalled=\"Raphael not called:\";") && Read("MainWindow.CraftLog.cs").Contains("\"CraftLogUi.RaphaelNotNeeded\""),"0.783: said as such, not a failure");
         }),
     ];
 }

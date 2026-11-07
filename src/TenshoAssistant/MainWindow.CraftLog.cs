@@ -19,6 +19,7 @@ internal sealed partial class MainWindow
     private static readonly RaphaelSequenceCache RaphaelSequences=new(RaphaelCraftSolver.Solve);
     private readonly CraftLogSession craftLogSession=new((input,token)=>CraftLogSession.Build(input,token,RaphaelSequences.Solve));
     private string? loggedCraftLogRaphaelError;
+    internal const string RaphaelNotCalled="Raphael not called:";
     private CraftLogInput? craftLogInput;
     private DateTimeOffset craftLogStableSince;
     private bool craftLogStarted;
@@ -114,7 +115,10 @@ internal sealed partial class MainWindow
             var state=craftLogSession.State;
             if(state.Result is { } solved)
             {
-                if(solved.RaphaelError is { } raphaelError)
+                // 0.783 (X-25): Raphael not called on purpose (nothing it can take, such as a recipe with no quality to seek) is not a failure.
+                if(solved.RaphaelError is { } skipped && skipped.StartsWith(RaphaelNotCalled,StringComparison.Ordinal))
+                    ImGui.TextDisabled(localization.Get("CraftLogUi.RaphaelNotNeeded"));
+                else if(solved.RaphaelError is { } raphaelError)
                 {
                     if(loggedCraftLogRaphaelError!=raphaelError){loggedCraftLogRaphaelError=raphaelError;log.Warning("Raphael failed for the crafting log, Tensho's search was used: {Reason}",raphaelError);}
                     ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("CraftLogUi.RaphaelFailed"));
