@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.766.0
+- Plan global, Verify : Carte, parties non découvertes (P11) : première sonde des données du jeu. Trouvés : la fonction qui dit si une région est découverte, et l'atlas des régions de chaque carte. Manque : où chaque morceau se place sur la carte ; rien n'est deviné, P11 attend. Nouvelle sonde tools/MapMaskProbe. Aucun changement du plugin.
+- Tests : FewerClicks763Tests. Verify.ps1 (agent) : 1337/1337, 0 avertissement, 0 erreur ; DLL 0.766.0.0. Non validé en jeu.
+### English
+- Map, undiscovered parts (P11): first probe of the game's data. Found: the function that says whether a region is discovered, and the region atlas of each map. Missing: where each piece goes on the map; nothing is guessed, P11 waits. New probe tools/MapMaskProbe. No change to the plugin.
+
 ## 0.765.0
 - Plan global, Verify : Suite de X-17 : un panneau de suivi réduit depuis le chargement du plugin, jamais dessiné, comptait encore pour rien ; sa source est maintenant connue dès qu'il est actif. Non validé en jeu.
 - Tests : TrackedNeed751Tests. Verify.ps1 (agent) : 1337/1337, 0 avertissement, 0 erreur ; DLL 0.765.0.0. Non validé en jeu.

@@ -163,7 +163,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 |---|---|---|---|
 | ~~P6~~ fait en 0.644 | Coordonnées du personnage toujours visibles et distances | S | Coordonnées du drapeau sous son icône de bord de carte, pas dans un coin ; avec réglage. |
 | ~~P7~~ fait en 0.645 | Éthérites non harmonisées signalées et coût au survol | S |  |
-| P11 | Parties non découvertes masquées comme sur la carte du jeu | M | Avec réglage. |
+| P11 | Parties non découvertes masquées comme sur la carte du jeu | M | Avec réglage. Sonde du 2026-11-07 : fonction du jeu et atlas des régions trouvés ; il manque le placement des morceaux sur la carte : `docs/evidence/0.766-map-discovery.md` |
 | ~~P17~~ fait en 0.652 | Relevé du type de marqueur des mandats et de leurs zones | S | Le type ne dit rien : c'est l'icône 60492 ou le nom du mandat. |
 | ~~P22~~ fait en 0.665 pour les variantes 1 et 5 | Noms des variantes d'icônes de quête (71141 / 71151) | S | Les autres gardent leur numéro ; à confirmer en jeu. |
 
@@ -180,7 +180,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | T5 | Une séance de relevés en jeu pour ces outils, avant de coder | S |  |
 | ~~T13~~ fait en 0.648 pour les contenus que les données nomment | Contenus et quêtes : « Débloqué par » et « Débloque » | M | Environ 130 contenus sur plus de 700 ; à compléter si une source sûre est trouvée. |
 | ~~T21~~ fait en 0.646 | Personnage : niveaux et expérience de tous les jobs | S |  |
-| T26 | Dirigeables : trajet du dernier voyage reconstitué | S |  |
+| T26 | Dirigeables : trajet du dernier voyage reconstitué | S | 2026-11-07 : l'aéronef de l'utilisateur est en construction, à relever à son premier retour |
 | ~~T27~~ fait en 0.651 | Actions de compagnie actives : heure de fin et alarme | M |  |
 
 ### Gros chantiers et idée

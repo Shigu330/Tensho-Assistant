@@ -29,6 +29,7 @@ dotnet run --project tools/ShopCurrencyProbe -- "C:\Program Files (x86)\SquareEn
 | `ToolBonusProbe` | Bonuses of gathering and crafting tools. |
 | `UldProbe` | Interface layouts (`.uld`) of the game: which exist, the textures they use (`--tex` sizes, `--parts` the cut the game declares). Proves the game frame textures (docs/evidence/0.332-uld-window-frame.md). |
 | `FateRangeProbe` | Which layout file of a territory holds the range named by `Fate.Location` and `DynamicEvent.LGBMapRange`, with its position. |
+| `MapMaskProbe` | A map's texture files and discovery columns; with `--pixels <folder>`, the colours of its masks and a raw copy (P11, `docs/evidence/0.766-map-discovery.md`). |
 | `WeatherProbe` | Weather rates per territory and the forecast formula, unknown kept unknown. |
 | `submarine-loot.py` | Not a probe: rebuilds `src/TenshoAssistant/FreeCompany/Data/submarine-loot.json` from FFXIVGachaSpreadsheet's `Submarines.json` (MIT, notice written into the file). |
 
