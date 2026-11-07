@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.740.0
+- Plan global, Verify : Signalement : la liste de suivi clignote entre deux valeurs pendant la récolte. Cause non trouvée en lisant le code : en mode développeur, le journal note maintenant la ligne qui revient à sa valeur d'avant, et si c'est le stock ou le besoin. Aucun changement visible. Non validé en jeu.
+- Tests : ListBlink740Tests. Verify.ps1 (agent) : 1315/1315, 0 avertissement, 0 erreur ; DLL 0.740.0.0. Non validé en jeu.
+### English
+- Report: the tracking list blinks between two values while gathering. Cause not found by reading the code: in developer mode, the log now notes the line that goes back to its previous value, and whether the stock or the need moved. No visible change. Not validated in game.
+
 ## 0.739.0
 - Plan global, Verify : Demande : « Que puis-je fabriquer ? » montre une ligne par objet, avec une icône par métier qui peut le fabriquer ; le nom du métier, son niveau et les fabrications en infobulle, un clic simule cette recette. Les ventes d'un objet ne sont plus comptées deux fois. Non validé en jeu.
 - Tests : CraftLines739Tests. Verify.ps1 (agent) : 1314/1314, 0 avertissement, 0 erreur ; DLL 0.739.0.0. Non validé en jeu.

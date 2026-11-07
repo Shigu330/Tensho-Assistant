@@ -173,7 +173,7 @@ internal sealed partial class MainWindow
         }
         if(!configuration.ListPanelsBase)
         {
-            foreach(var (item,needed) in known.Lines)DrawListPanelLine(item,needed,GetRecipeHoldings(item));
+            foreach(var (item,needed) in known.Lines)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
             return;
         }
         foreach(var origin in Enum.GetValues<ItemOrigin>())
@@ -184,7 +184,7 @@ internal sealed partial class MainWindow
             // 0.700 (user request): a long list folds by category; each panel remembers its own.
             var done=lines.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
             if(!ImGui.CollapsingHeader($"{localization.Get("ListPanels."+origin)} ({done}/{lines.Length})###ListPanel{key}{origin}",ImGuiTreeNodeFlags.DefaultOpen))continue;
-            foreach(var (item,needed) in lines)DrawListPanelLine(item,needed,GetRecipeHoldings(item));
+            foreach(var (item,needed) in lines)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
         }
     }
     private long ListPanelStock(uint item){var held=GetRecipeHoldings(item);return held.HasObservation ? held.Total:0;}
@@ -225,8 +225,11 @@ internal sealed partial class MainWindow
     };
 
     // Stock over what is needed; a dash when the stocks have not been read: unknown is not zero.
-    private void DrawListPanelLine(uint itemId,long required,Inventory.ItemHoldingsSummary stock)
+    private readonly Diagnostics.BlinkWatch listPanelBlinks=new();
+    private void DrawListPanelLine(string list,uint itemId,long required,Inventory.ItemHoldingsSummary stock)
     {
+        // 0.740: developer mode, to find the line that goes back and forth while gathering (docs/evidence/0.740-list-blink.md).
+        if(developerMode && listPanelBlinks.Observe(list,itemId,stock.HasObservation ? stock.Total:-1,required,DateTimeOffset.UtcNow) is { } blink)log.Information(blink);
         var item=itemCatalog.State.Catalog?.Find(itemId);
         DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));
         if(ImGui.IsItemHovered())DrawItemInfoTooltip(itemId);
