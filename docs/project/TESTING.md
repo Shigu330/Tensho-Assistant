@@ -1228,6 +1228,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.793) Prenez un mandat sans ouvrir la carte du jeu : sa zone est sur la carte de Tensho ; commencé, ses points aussi.
 
+- [ ] (0.794) Rangements, Que faire avec ?, Sceau de compagnie : la Matière sombre ne doit plus être en tête ; colonnes Ventes / jour et Gils en 7 jours.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

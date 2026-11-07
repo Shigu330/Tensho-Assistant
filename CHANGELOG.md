@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.794.0
+- Plan global, Verify : Demande (X-33) : « Que faire avec ? » tient compte des ventes par jour, comme « Que puis-je fabriquer ? ». Une vente isolée (Matière sombre grade I « vendue » 350 000) mettait l'objet en tête. Nouvelles colonnes « Ventes / jour » et « Gils en N jours » : ce qui se vend en ce nombre de jours au rythme du marché, sans dépasser ce que votre solde achète ; le classement suit ces gils, la vitesse inconnue en dernier. Le nombre de jours est celui de « Que puis-je fabriquer ? », réglable sur la page. Non validé en jeu.
+- Tests : CurrencySales794Tests. Verify.ps1 (agent) : 1369/1369, 0 avertissement, 0 erreur ; DLL 0.794.0.0. Non validé en jeu.
+### English
+- Request (X-33): « What to do with? » counts the sales per day, like « What can I craft? ». One odd sale (Dark Matter grade I « sold » for 350,000) put the item first. New columns « Sold a day » and « Gil in N days »: what sells in that many days at the market's speed, no more than your balance buys; the ranking follows that gil, unknown speed last. The days are those of « What can I craft? », set on the page too. Not validated in game.
+
 ## 0.793.0
 - Plan global, Verify : Demande (X-32) : plus besoin d'ouvrir et fermer la carte du jeu pour voir la zone d'un mandat. La capture de 0.792 (mandat 1670) montre que le jeu tient la zone dans sa propre liste dès l'acceptation, alors que la liste de la fenêtre carte, la seule que Tensho lisait, est vide ; une fois le mandat commencé, elle tient aussi ses points, un de moins à chaque récolte. Tensho lit maintenant cette liste (lecture seule, sans rien ouvrir ni appeler) et ajoute ce qui manque, sans doublon. Non validé en jeu.
 - Tests : GameLeves793Tests. Verify.ps1 (agent) : 1366/1366, 0 avertissement, 0 erreur ; DLL 0.793.0.0. Non validé en jeu.
