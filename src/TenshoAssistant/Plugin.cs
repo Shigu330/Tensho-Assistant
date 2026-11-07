@@ -1280,6 +1280,9 @@ public sealed class Plugin : IDalamudPlugin
             chatGui.Print("[Tensho] " + localization.Get("DiagnosticsUi.SelfCheckStarted"));
             return;
         }
+        // 0.836 (X-03, dalamud.log 23:06: the ring printed, then no menu event at all): developer mode, « /tensho linktest » prints the link in four forms, for a
+        // right click (item link) or a left click (Tensho's link) on each; the log then says which ones the game handed over.
+        if (arguments.Trim().ToLowerInvariant() is "linktest" && mainWindow.DeveloperMode) { PrintLinkTest(); return; }
         // 0.381 (g, X-01): « /tensho todo <task> » adds a free task to Reminders › Your tasks.
         if (parts.Length >= 1 && parts[0].ToLowerInvariant() is "todo" or "tache" or "tâche")
         {
@@ -1298,6 +1301,20 @@ public sealed class Plugin : IDalamudPlugin
             return;
         }
         Open();
+    }
+    private Dalamud.Game.Text.SeStringHandling.Payloads.DalamudLinkPayload? linkTestPayload;
+    private void PrintLinkTest()
+    {
+        const uint item=12898; // Morel (Morille), the item of the 23:06 report.
+        linkTestPayload??=chatGui.AddChatLinkHandler(uint.MaxValue-7,(_,text)=>log.Information("Link test clicked: Tensho link, line {0}.",text.TextValue));
+        Dalamud.Game.Text.SeStringHandling.SeString Item(string name)=>new Dalamud.Game.Text.SeStringHandling.SeStringBuilder().AddText($"[Tensho] Test {name} : ").AddItemLink(item,false).Build();
+        Dalamud.Game.Text.SeStringHandling.SeString Own(string name)=>new Dalamud.Game.Text.SeStringHandling.SeStringBuilder().AddText($"[Tensho] Test {name} : ").AddUiForeground(500)
+            .Add(linkTestPayload).AddText("[Tensho]").Add(Dalamud.Game.Text.SeStringHandling.Payloads.RawPayload.LinkTerminator).AddUiForegroundOff().Build();
+        chatGui.Print(Item("A"));
+        chatGui.Print(new Dalamud.Game.Text.XivChatEntry{Type=Dalamud.Game.Text.XivChatType.Echo,Message=Item("B")});
+        chatGui.Print(Own("C"));
+        chatGui.Print(new Dalamud.Game.Text.XivChatEntry{Type=Dalamud.Game.Text.XivChatType.Echo,Message=Own("D")});
+        log.Information("Link test printed: A item link (default type), B item link (Echo), C Tensho link (default type), D Tensho link (Echo).");
     }
     private void Open(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;mainWindow.IsOpen = true;}
     private void OpenConfig(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;mainWindow.OpenSettings();}

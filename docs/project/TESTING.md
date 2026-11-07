@@ -1312,6 +1312,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.835) Un objet d'un point à livre de folklore non lu : « Y aller » mène à un autre point, ou n'apparaît pas.
 
+- [ ] (0.836) Mode développeur : /tensho linktest, puis clic droit sur A et B, clic gauche sur C et D ; je lis le journal.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

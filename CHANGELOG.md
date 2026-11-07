@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.836.0
+- Plan global, Verify : Signalement (X-03) : toujours aucun menu au clic droit sur l'objet de l'alarme (morille, 23:06). Le journal de Dalamud montre que la ligne s'imprime, puis qu'aucun menu ne s'ouvre : l'événement n'arrive pas du tout à Tensho, le jeu n'ouvre rien. Pour trouver la forme qui marche, une commande de développeur, « /tensho linktest », imprime quatre lignes : A et B avec le lien d'objet du jeu (clic droit), C et D avec un lien Tensho (clic gauche), chacune en type par défaut puis en Écho. Chaque menu ouvert et chaque clic sont notés au journal. Non validé en jeu.
+- Tests : LinkTest836Tests. Verify.ps1 (agent) : 1422/1422, 0 avertissement, 0 erreur ; DLL 0.836.0.0. Non validé en jeu.
+### English
+- Report (X-03): still no menu on a right click on the alarm's item (morel, 23:06). Dalamud's log shows the line printed, then no menu at all: the event never reaches Tensho, the game opens nothing. To find the form that works, a developer command, « /tensho linktest », prints four lines: A and B with the game's item link (right click), C and D with a Tensho link (left click), each in the default type then as Echo. Every menu opened and every click is logged. Not validated in game.
+
 ## 0.835.0
 - Plan global, Verify : Règle de l'utilisateur (X-64) : « Y aller » n'écarte une source que si elle est indisponible. Un point que le personnage ne peut pas encore récolter (livre de folklore non lu, niveau du métier trop bas) n'est plus proposé ; les sources cachées restent proposées, après les autres. Quand Tensho ne sait pas encore ce que le personnage a lu ou son niveau, rien n'est écarté. Non validé en jeu.
 - Tests : HiddenGoThere834Tests. Verify.ps1 (agent) : 1421/1421, 0 avertissement, 0 erreur ; DLL 0.835.0.0. Non validé en jeu.
