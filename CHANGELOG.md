@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.812.0
+- Plan global, Verify : Signalement (X-03), suite : le clic droit sur la ligne d'une alarme ne fonctionnait toujours pas. Le journal de 21:01 montre qu'aucun menu ne s'ouvrait : depuis 0.780, le lien portait le texte « nom (clic droit : Tensho) », et le jeu ne le prenait plus pour un objet. Retour au lien d'objet du jeu de 0.774, validé à 14:29 : le nom de l'objet seul, et l'indication à côté, qui dit maintenant « (clic droit sur le nom : Tensho) ». Non validé en jeu.
+- Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1397/1397, 0 avertissement, 0 erreur ; DLL 0.812.0.0. Non validé en jeu.
+### English
+- Report (X-03), continued: a right click on an alarm line still did nothing. The 21:01 log shows no menu opened: since 0.780 the link carried the text « name (right click: Tensho) », and the game no longer took it as an item. Back to 0.774's game item link, validated at 14:29: the item's name alone, and the hint beside it, now « (right click on the name: Tensho) ». Not validated in game.
+
 ## 0.811.0
 - Plan global, Verify : Signalement (X-45), suite : des PNJ restaient sur la carte de Limsa alors qu'ils ne sont pas là en jeu. Les fichiers du jeu le disent : dans Limsa, à côté des 136 couches d'événements saisonniers, des dizaines de couches ne placent des PNJ que pendant une quête ou l'ouverture du jeu (« QST_… », « QB_… », « EVT_OP_ONLY_ENPC »). Chaque position de marchand garde maintenant la condition de sa couche : toujours là, pendant un événement (montrée seulement pendant cet événement), ou pendant une quête ou l'ouverture (jamais montrée sur la carte). La copie du catalogue des marchands est reconstruite une fois. Non validé en jeu.
 - Tests : FestivalVendors810Tests. Verify.ps1 (agent) : 1397/1397, 0 avertissement, 0 erreur ; DLL 0.811.0.0. Non validé en jeu.

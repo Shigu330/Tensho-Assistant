@@ -255,7 +255,9 @@ public sealed class Plugin : IDalamudPlugin
                     if(alarm.ItemId is > 0 and < uint.MaxValue)
                         // 0.780 (X-03, user report: the right click did nothing on the grey hint, which was not part of the link): the hint is inside the link, so the
                         // whole line opens the item's menu.
-                        message.AddText(" ").AddItemLink(alarm.ItemId,false,(mainWindow.AlarmItemName(alarm.ItemId) is { Length:>0 } name ? name+" ":"")+localization.Get("Alarms.RightClickTensho"));
+                        // 0.812 (X-03, user report 21:01: no menu at all): the game's own item link, its own name, as in 0.774 (validated at 14:29). The 0.780 link
+                        // with another text was no longer taken by the game as an item (no menu opened: docs/evidence/0.812-alarm-link.md). The hint stays beside it.
+                        message.AddText(" ").AddItemLink(alarm.ItemId,false).AddUiForeground(" "+localization.Get("Alarms.RightClickTensho"),3);
                     chat.Print(message.Build());
                 },alarm=>
                 {

@@ -1407,7 +1407,7 @@
     "PeriodTooltip": "Alarme unique : {0} au début de la période ({1}).",
     "WeatherDailyTooltip": "Alarme à chaque période de 8 h ET (00, 08, 16) si la météo est « {0} ».",
     "Ring": "Alarme : {0} — dans {1} min ({2}).",
-    "RightClickTensho": "(clic droit : Tensho)",
+    "RightClickTensho": "(clic droit sur le nom : Tensho)",
     "OpenInTensho": "Ouvrir dans Tensho",
     "DeleteGroupTip": "Supprime toutes les alarmes de ce groupe ; un second clic le confirme.",
     "DeleteGroupConfirm": "Confirmer : supprimer {0} alarme(s)",
