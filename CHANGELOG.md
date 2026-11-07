@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.789.0
+- Plan global, Verify : Demande (X-30) : voir les étapes de fabrication qui restent pour les listes d'atelier et d'artisanat. Chaque liste de suivi a une section repliable « Fabrications restantes », par étape (l'étape 1 se fabrique d'abord, chaque objet après ce qui le compose) : icône du métier, objet, nombre de fabrications et quantité obtenue. Le stock est déduit, les objets récoltés ou achetés ne sont pas fabriqués, comme pour les matériaux. Non validé en jeu.
+- Tests : CraftSteps789Tests. Verify.ps1 (agent) : 1361/1361, 0 avertissement, 0 erreur ; DLL 0.789.0.0. Non validé en jeu.
+### English
+- Request (X-30): see the crafting steps left for the workshop and crafting lists. Each tracking list has a folding « Crafts left » section, by step (step 1 is made first, each item after what it is made of): job icon, item, number of crafts and quantity made. The stock is taken off, gathered or bought items are not crafted, as for the materials. Not validated in game.
+
 ## 0.788.0
 - Plan global, Verify : Signalement (X-29) : en Menuisier sur une recette de Métallurgie, le panneau du carnet ne semblait pas voir le mauvais métier. Il le voyait (le calcul utilise les attributs relevés du bon métier), mais la note était en couleur d'information et coupée. Elle dit maintenant « Mauvais métier : vous êtes Menuisier, cette recette est de Métallurgie », en couleur d'avertissement, sur plusieurs lignes, avec le bouton pour porter le métier de la recette. Non validé en jeu.
 - Tests : WrongJob788Tests. Verify.ps1 (agent) : 1358/1358, 0 avertissement, 0 erreur ; DLL 0.788.0.0. Non validé en jeu.

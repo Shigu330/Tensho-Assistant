@@ -189,6 +189,8 @@ internal sealed partial class MainWindow
     private void DrawListPanelEntries(string key,Func<(uint Item,long Needed)[]> entries)
     {
         listPanelSources[key]=entries;
+        var known=ListPanelLinesOf(key,entries);
+        DrawListPanelCrafts(key);
         // 0.785 (X-27, user request): only the finished items: the crafting list's entries, the workshop's deliveries, the prepared recipe's result.
         // The gathering help keeps the materials (listPanelSources above).
         if(configuration.ListPanelsFinishedOnly && ListPanelFinished(key) is { } finished)
@@ -196,8 +198,30 @@ internal sealed partial class MainWindow
             foreach(var (item,needed) in finished)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
             return;
         }
-        var known=ListPanelLinesOf(key,entries);
         DrawListPanelEntriesFrom(key,known);
+    }
+    // 0.789 (X-30, user request): the crafting steps left, folded at first, the first step on top; each line: job, item, crafts and items made.
+    private readonly Dictionary<string,IReadOnlyList<BaseMaterials.CraftStep>> listPanelCrafts=[];
+    private void DrawListPanelCrafts(string key)
+    {
+        if(!listPanelCrafts.TryGetValue(key,out var steps) || steps.Count==0)return;
+        if(!ImGui.CollapsingHeader($"{localization.Format("ListPanels.Crafts",steps.Count)}###ListPanelCrafts{key}"))return;
+        var step=0;
+        foreach(var craft in steps)
+        {
+            if(craft.Step!=step){step=craft.Step;ImGui.TextDisabled(localization.Format("ListPanels.CraftStep",step));}
+            if(craft.Recipe.CraftTypeId<8)
+            {
+                DrawItemIcon(new Items.ItemDefinition(0,craft.Recipe.CraftType,false,62108+craft.Recipe.CraftTypeId),new Vector2(ImGui.GetTextLineHeight()),false);
+                if(ImGui.IsItemHovered())WrappedTooltip(craft.Recipe.CraftType);
+                ImGui.SameLine();
+            }
+            var item=itemCatalog.State.Catalog?.Find(craft.Item);
+            DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));
+            if(ImGui.IsItemHovered())DrawItemInfoTooltip(craft.Item);
+            ImGui.SameLine();ImGui.TextUnformatted(item?.Name ?? craft.Item.ToString());
+            ImGui.SameLine();ImGui.TextDisabled(localization.Format("ListPanels.CraftRuns",craft.Runs.ToString("N0"),(craft.Runs*craft.Recipe.ResultAmount).ToString("N0")));
+        }
     }
     private (uint Item,long Needed)[]? ListPanelFinished(string key)=>key switch
     {
@@ -215,6 +239,8 @@ internal sealed partial class MainWindow
             listPanelCurrenciesOn=(configuration.ListPanelsCurrenciesOn ?? []).ToHashSet();
             // The quest journal is read when something asks for it: ask, at most once a minute, while it is empty.
             if(configuration.ListPanelsBase && configuration.ListPanelsMetOnly && quests.State.Entries.Count==0 && now-listPanelQuestsAsked>60000){listPanelQuestsAsked=now;quests.RequestRefresh();}
+            // 0.789 (X-30): the crafts left, worked out with the lines.
+            listPanelCrafts[key]=BaseMaterials.Crafts(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched);
             listPanelLines[key]=known=(now,configuration.ListPanelsBase ? BaseMaterials.Expand(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched).ToArray():wanted);
             // 0.779 (X-24, user report: after a reload, monster items sat in « Others » for a while): the monster source is asked by the lists themselves; it is read
             // from its copy on disk (the network only when there is none or it is out of date, under the source's setting).

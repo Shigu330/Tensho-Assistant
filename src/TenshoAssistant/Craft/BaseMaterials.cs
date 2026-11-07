@@ -56,6 +56,36 @@ public static class BaseMaterials
             .ThenBy(group=>cost(group.Zone) is null ? 1:0).ThenBy(group=>cost(group.Zone) ?? 0)
             .ThenByDescending(group=>group.Lines.Count).ThenBy(group=>group.Zone,StringComparer.CurrentCulture).ToArray();
 
+    /// <summary>0.789 (X-30): one craft still to do: the item, its recipe, how many times, and its step (1 first: made before what uses it).</summary>
+    public sealed record CraftStep(uint Item,RecipeDefinition Recipe,long Runs,int Step);
+
+    /// <summary>
+    /// 0.789 (X-30, user request: see the crafting steps left for the workshop and crafting lists): the crafts Expand goes through, same rules (stock taken first,
+    /// gathered or sold items not crafted), counted per item. An item's step comes after every ingredient it is crafted from.
+    /// </summary>
+    public static IReadOnlyList<CraftStep> Crafts(IEnumerable<(uint Item,long Amount)> wanted,Func<uint,long> stock,Func<uint,RecipeDefinition?> recipeOf,Func<uint,bool> fetched)
+    {
+        var runs=new Dictionary<uint,long>();var level=new Dictionary<uint,int>();var recipes=new Dictionary<uint,RecipeDefinition>();var used=new Dictionary<uint,long>();var open=new HashSet<uint>();
+        void Add(uint item,long amount,int depth)
+        {
+            if(amount<=0 || fetched(item) || depth<=0 || recipeOf(item) is not { Ingredients.Count:>0 } recipe || recipe.ResultAmount<=0 || open.Contains(item))return;
+            var free=Math.Max(0,stock(item)-used.GetValueOrDefault(item));
+            var taken=Math.Min(free,amount);
+            used[item]=used.GetValueOrDefault(item)+taken;
+            amount-=taken;
+            if(amount==0)return;
+            var count=(amount+recipe.ResultAmount-1)/recipe.ResultAmount;
+            runs[item]=runs.GetValueOrDefault(item)+count;recipes[item]=recipe;
+            level[item]=Math.Max(level.GetValueOrDefault(item),MaxDepth-depth);
+            open.Add(item);
+            foreach(var ingredient in recipe.Ingredients)Add(ingredient.ItemId,ingredient.Amount*count,depth-1);
+            open.Remove(item);
+        }
+        foreach(var (item,amount) in wanted)Add(item,amount,MaxDepth);
+        var deepest=level.Values.DefaultIfEmpty(0).Max();
+        return runs.Select(pair=>new CraftStep(pair.Key,recipes[pair.Key],pair.Value,deepest-level[pair.Key]+1)).OrderBy(step=>step.Step).ToArray();
+    }
+
     public static IReadOnlyList<(uint Item,long Needed)> Expand(IEnumerable<(uint Item,long Amount)> wanted,Func<uint,long> stock,Func<uint,RecipeDefinition?> recipeOf,Func<uint,bool> fetched)
     {
         var needed=new Dictionary<uint,long>();var order=new List<uint>();var used=new Dictionary<uint,long>();var open=new HashSet<uint>();
