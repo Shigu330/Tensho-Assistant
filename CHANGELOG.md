@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.840.0
+- Plan global, Verify : Signalement (X-65) : après la 0.838, le sirop de bouleau n'apparaît toujours pas dans le panneau de la liste. Le calcul le garde pourtant dans les tests ; pour voir où il se perd en jeu, le mode développeur note au journal, à chaque changement, ce que le panneau demande et chaque ligne obtenue, avec son stock, sa recette et son groupe. Non validé en jeu.
+- Tests : ListPanelLog840Tests. Verify.ps1 (agent) : 1426/1426, 0 avertissement, 0 erreur ; DLL 0.840.0.0. Non validé en jeu.
+### English
+- Report (X-65): after 0.838 the birch syrup still does not appear in the list panel. The count keeps it in the tests; to see where it gets lost in game, developer mode logs, on each change, what the panel asks and each line it gets, with its stock, recipe and group. Not validated in game.
+
 ## 0.839.0
 - Plan global, Verify : Signalement (X-66) : chez le servant, l'encadré marquait le vin de cuisine au lieu du vin de cuisine de qualité, et il restait en changeant d'onglet de sac. Causes : les cases étaient reconnues par leur icône seule, et les deux vins ont la même ; une case vide garde son ancienne icône (image cachée), et l'onglet caché masque un parent de la case, pas la case. Maintenant, Tensho lit les piles du rangement ouvert et compare l'icône et la quantité affichée de chaque case : une case n'est encadrée que si toutes les piles qui lui ressemblent sont demandées par une liste (deux objets pareils en tout : pas d'encadré plutôt qu'un faux). La case, son image et tous ses parents doivent être visibles. Non validé en jeu.
 - Tests : StorageHighlight820Tests. Verify.ps1 (agent) : 1425/1425, 0 avertissement, 0 erreur ; DLL 0.839.0.0. Non validé en jeu.

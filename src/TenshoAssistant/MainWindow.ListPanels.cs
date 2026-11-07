@@ -243,6 +243,7 @@ internal sealed partial class MainWindow
         "Preparation"=>preparationPanelShown is { } recipe ? new[]{(recipe.ResultItemId,(long)configuration.PreparationPanelTarget)}:null,
         _=>null,
     };
+    private readonly Dictionary<string,string> listPanelLogged=[];
     private (long At,(uint Item,long Needed)[] Lines) ListPanelLinesOf(string key,Func<(uint Item,long Needed)[]> entries)
     {
         var now=Environment.TickCount64;
@@ -255,6 +256,13 @@ internal sealed partial class MainWindow
             // 0.789 (X-30): the crafts left, worked out with the lines.
             listPanelCrafts[key]=BaseMaterials.Crafts(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched);
             listPanelLines[key]=known=(now,configuration.ListPanelsBase ? BaseMaterials.Expand(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched).ToArray():wanted);
+            // 0.840 (X-65, user report: still no birch syrup after 0.838): developer mode, what the panel asked and got, each line with its stock and group, on change.
+            if(developerMode)
+            {
+                var line=string.Join(", ",wanted.Select(entry=>$"{entry.Item}x{entry.Needed}"))+" -> "+string.Join(", ",known.Lines.Select(entry=>
+                    $"{entry.Item}x{entry.Needed} stock {ListPanelStock(entry.Item)} recipe {(ListPanelRecipe(entry.Item) is { } recipe ? recipe.RecipeId:0)} fetched {ListPanelFetched(entry.Item)} {ListPanelOrigin(entry.Item)}"));
+                if(listPanelLogged.GetValueOrDefault(key)!=line){listPanelLogged[key]=line;log.Information("List panel {0}: {1}.",key,line);}
+            }
             // 0.779 (X-24, user report: after a reload, monster items sat in « Others » for a while): the monster source is asked by the lists themselves; it is read
             // from its copy on disk (the network only when there is none or it is out of date, under the source's setting).
             if(configuration.ListPanelsBase)lumina?.Request();
