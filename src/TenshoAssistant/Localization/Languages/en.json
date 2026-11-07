@@ -6300,6 +6300,7 @@
     "Left": "Not cleared"
   },
   "ListPanels": {
+    "TimedGroup": "Timed points",
     "ZoneHere": "you are here",
     "ZoneCost": "teleport {0} gil",
     "AddAlarms": "Add the alarms ({0})",

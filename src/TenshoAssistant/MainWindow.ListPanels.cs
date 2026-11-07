@@ -197,6 +197,25 @@ internal sealed partial class MainWindow
                 // 0.757 (X-11, X-12, user request): each zone folds; the zone you stand in first, then the cheapest teleport.
                 RequestListTeleportCosts();
                 var here=ListPanelZoneHere();
+                // 0.758 (X-13, user request): what grows only at timed points has its own group, first, that folds too; each line keeps its zone in the tooltip.
+                var timed=lines.Where(line=>ListPanelTimedOnly(line.Item)).ToArray();
+                if(timed.Length>0)
+                {
+                    var timedDone=timed.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
+                    if(ImGui.TreeNodeEx($"{localization.Get("ListPanels.TimedGroup")} ({timedDone}/{timed.Length})###ListZone{key}Timed",ImGuiTreeNodeFlags.DefaultOpen))
+                    {
+                        try
+                        {
+                            foreach(var (item,needed) in timed)
+                            {
+                                DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
+                                if(ImGui.IsItemHovered())WrappedTooltip(string.Join(", ",ListPanelZones(item)));
+                            }
+                        }
+                        finally{ImGui.TreePop();}
+                    }
+                    lines=lines.Except(timed).ToArray();
+                }
                 foreach(var (zone,inZone) in BaseMaterials.OrderZones(BaseMaterials.ByZone(lines,line=>ListPanelZones(line.Item)),here,ListPanelZoneCost))
                 {
                     var zoneDone=inZone.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
@@ -259,6 +278,8 @@ internal sealed partial class MainWindow
         if(now-listTeleportAsked<60000)return;
         listTeleportAsked=now;mapLive?.RefreshTeleportCosts();
     }
+    private bool ListPanelTimedOnly(uint item)=>gatheringCatalog.State.Catalog?.ForItem(item) is { Count:>0 } sources
+        && sources.All(source=>source.Timing.Kind==Gathering.GatheringScheduleKind.Limited);
     private string? ListPanelZoneHere()
     {
         var territory=CurrentTerritory?.Invoke() ?? 0;

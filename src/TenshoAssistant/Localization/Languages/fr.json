@@ -6300,6 +6300,7 @@
     "Left": "Non réussi"
   },
   "ListPanels": {
+    "TimedGroup": "Points à horaire",
     "ZoneHere": "vous y êtes",
     "ZoneCost": "téléportation {0} gils",
     "AddAlarms": "Ajouter les alarmes ({0})",

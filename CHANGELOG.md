@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.758.0
+- Plan global, Verify : Demande (X-13) : dans les listes de suivi, les objets qui ne poussent qu'à des points à horaire forment leur propre groupe, « Points à horaire », en tête et repliable ; leur zone s'affiche au survol. Les autres restent par zone. Non validé en jeu.
+- Tests : ZoneOrder757Tests. Verify.ps1 (agent) : 1333/1333, 0 avertissement, 0 erreur ; DLL 0.758.0.0. Non validé en jeu.
+### English
+- Request (X-13): in the tracking lists, items that grow only at timed points form their own group, « Timed points », first and folding; their zone shows on hover. The others stay by zone. Not validated in game.
+
 ## 0.757.0
 - Plan global, Verify : Demandes (X-11, X-12) : dans les listes de suivi, chaque zone de récolte se replie ; la zone où vous êtes vient d'abord (« vous y êtes »), puis les autres de la téléportation la moins chère à la plus chère, avec son prix lu dans le jeu depuis votre position ; un prix inconnu passe après. Non validé en jeu.
 - Tests : ZoneOrder757Tests. Verify.ps1 (agent) : 1333/1333, 0 avertissement, 0 erreur ; DLL 0.757.0.0. Non validé en jeu.

@@ -21,6 +21,9 @@ internal static class ZoneOrder757Tests
             var page=Read("MainWindow.ListPanels.cs");
             Check(page.Contains("ImGui.TreeNodeEx($\"{name} ({zoneDone}/{inZone.Count}){price}###ListZone{key}{zone}\",ImGuiTreeNodeFlags.DefaultOpen)") && page.Contains("ImGui.TreePop();"),"folds");
             Check(page.Contains("now-listTeleportAsked<60000") && page.Contains("mapLive?.RefreshTeleportCosts();"),"priced");
+            // 0.758 (X-13): timed points apart, first, folding, and only items that grow nowhere else.
+            Check(page.Contains("###ListZone{key}Timed\",ImGuiTreeNodeFlags.DefaultOpen)") && page.Contains("lines=lines.Except(timed).ToArray();"),"timed group");
+            Check(page.Contains("sources.All(source=>source.Timing.Kind==Gathering.GatheringScheduleKind.Limited)"),"timed only");
         }),
     ];
 }
