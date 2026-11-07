@@ -20,7 +20,7 @@ internal static class QuestTarget813Tests
         ("Quest target: read from the game's Map, used only for journal targets without a quest, reset with each new target",() =>
         {
             var map=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
-            Check(map.Contains("if(mapGameTarget is { QuestId:0 } bare && mapLive?.State?.QuestPoints is { } points)") && map.Replace("\r\n","\n").Contains("mapGameTargetObjective=0;\n                mapGameTarget=focus.UsesRoute(map)") ,"used, reset");
+            Check(map.Contains("if(mapGameTarget is { } bare && mapLive?.State?.QuestPoints is { } points)") && map.Replace("\r\n","\n").Contains("mapGameTargetObjective=0;\n                mapGameTarget=focus.UsesRoute(map)") ,"used, reset");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs")).Contains("if(count is <=0 or >32)continue;"),"bounded");
         }),
     ];

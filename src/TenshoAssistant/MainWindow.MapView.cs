@@ -1014,7 +1014,9 @@ internal sealed partial class MainWindow
         // 0.655 (user report): a leve's target has no quest; it goes when the game no longer lists the leve.
         if(mapGameTarget is not null && TenshoAssistant.Maps.MapLeves.TargetGone(mapGameTargetLeve,TenshoAssistant.Maps.MapLiveReader.AcceptedLeves)){mapGameTarget=null;mapGameTargetLeve=null;return;}
         // 0.813 (X-49): a journal target without a quest follows the quest point it stood on.
-        if(mapGameTarget is { QuestId:0 } bare && mapLive?.State?.QuestPoints is { } points)
+        // 0.847 (X-69, user report: the quest went on to « talk to Raulf », the journal's target stayed): a target with a quest too; the journal check below, once a
+        // minute, saw only a quest ended, never a step done.
+        if(mapGameTarget is { } bare && mapLive?.State?.QuestPoints is { } points)
         {
             var list=points.Select(point=>(point.Quest,point.MapId,point.X,point.Z)).ToArray();
             if(mapGameTargetObjective==0)mapGameTargetObjective=TenshoAssistant.Maps.MapQuestTarget.QuestAt(list,bare.MapId,bare.World);

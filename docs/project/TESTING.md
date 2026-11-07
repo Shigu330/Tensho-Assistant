@@ -1334,6 +1334,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.846) Journal, « Carte » sur une quête : la carte centre dessus sans changer le zoom.
 
+- [ ] (0.847) Journal, « Carte » sur une quête, faire l'étape : la cible du journal disparaît dans la seconde.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.847.0
+- Plan global, Verify : Signalement (X-69) : la carte ne se rafraîchissait pas assez : la quête était passée à « Parler à Raulf », mais la cible indiquée par le jeu (journal) restait. Elle ne partait que quand la quête n'était plus active, et le journal n'est relu qu'une fois par minute. Elle suit maintenant le point de quête où elle était posée, comme déjà la cible sans quête : l'étape faite, ce point change de place et la cible disparaît. Non validé en jeu.
+- Tests : QuestStep847Tests. Verify.ps1 (agent) : 1429/1429, 0 avertissement, 0 erreur ; DLL 0.847.0.0. Non validé en jeu.
+### English
+- Report (X-69): the map did not refresh enough: the quest had gone on to « Talk to Raulf », but the target the game gave (journal) stayed. It went only when the quest was no longer active, and the journal is read once a minute. It now follows the quest point it stood on, as the target without a quest already did: once the step is done, that point moves and the target goes. Not validated in game.
+
 ## 0.846.0
 - Plan global, Verify : Correction de l'utilisateur (X-68) : il ne faut pas zoomer, seulement centrer sur la quête, l'objectif, la ressource ou autre. La 0.846 retire le zoom sur la zone de quête de la 0.845 : depuis le journal, la carte centre sur ce qui est demandé et garde le zoom, comme avant. Non validé en jeu.
 - Tests : MapAside617Tests. Verify.ps1 (agent) : 1428/1428, 0 avertissement, 0 erreur ; DLL 0.846.0.0. Non validé en jeu.
