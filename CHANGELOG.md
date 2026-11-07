@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.714.0
+- Plan global, W-11 : Grandes compagnies, sujet choisi par l'utilisateur. Nouvelle page Progression › Grandes compagnies : grade et sceaux dans chacune, prochaine promotion avec sa quête, et un onglet de ce que les sceaux achètent, avec filtre par grade et recherche. Les missions du jour ne sont pas lues : le jeu ne les donne que dans sa fenêtre. COMPILED et TESTED, non validé en jeu.
+- Tests : GrandCompanies714Tests. Verify.ps1 (agent) : 1275/1275, 0 avertissement, 0 erreur ; DLL 0.714.0.0. Non validé en jeu.
+### English
+- Grand Companies, a topic chosen by the user. New page Progression > Grand Companies: grade and seals in each, next promotion with its quest, and a tab of what seals buy, with a grade filter and search. Today's supply missions are not read: the game gives them only in its window. COMPILED and TESTED, not validated in game.
+
 ## 0.713.0
 - Plan global, W-10 : Peuples alliés, sujet choisi par l'utilisateur. Nouvelle page Progression › Peuples alliés : pour chaque peuple, son extension, son lieu (clic droit vers l'éthérite), votre rang, votre réputation et la monnaie détenue, avec les quêtes restantes du jour. Lecture seule, sans requête au serveur. Le sujet rejoint le plan avec six autres (W-11 à W-16). COMPILED et TESTED, non validé en jeu.
 - Tests : AlliedSocieties713Tests. Verify.ps1 (agent) : 1271/1271, 0 avertissement, 0 erreur ; DLL 0.713.0.0. Non validé en jeu.

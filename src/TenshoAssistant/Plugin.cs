@@ -767,6 +767,18 @@ public sealed class Plugin : IDalamudPlugin
                 }
                 catch(Exception error){log.Warning(error,"Custom deliveries unreadable (game update?).");throw;}
             });
+            // W-11 (0.714): the Grand Companies, read when the page opens and on the player's click.
+            mainWindow.GcFeminine=()=>framework.RunOnFrameworkThread(GrandCompanies.GcReader.Feminine);
+            mainWindow.GcCatalogLoad=feminine=>
+            {
+                try{return GrandCompanies.GcCatalogLoader.Read(data,feminine);}
+                catch(Exception error){log.Warning(error,"Grand Company sheets unreadable (game update?).");return null;}
+            };
+            mainWindow.ReadGc=rows=>framework.RunOnFrameworkThread(()=>
+            {
+                try{return GrandCompanies.GcReader.Read(rows);}
+                catch(Exception error){log.Warning(error,"Grand Companies unreadable (game update?).");throw;}
+            });
             // W-10 (0.713): the allied societies, read when the page opens and on the player's click.
             mainWindow.AlliedCatalogLoad=()=>
             {
