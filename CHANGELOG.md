@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.784.0
+- Plan global, Verify : Signalement (X-26) : « Comparer les prochains coups » ne projetait rien sur une recette en haute qualité impossible (Kit de réparation d'appareil) : le jeu y montre une barre de qualité sur 2500, Tensho garde 0 exprès, et la vérification refusait cet écart. Il est maintenant accepté pour une recette sans qualité à chercher ; les autres vérifications restent. Non validé en jeu.
+- Tests : NoHqLive784Tests. Verify.ps1 (agent) : 1351/1351, 0 avertissement, 0 erreur ; DLL 0.784.0.0. Non validé en jeu.
+### English
+- Report (X-26): « Compare the next moves » projected nothing on a recipe where HQ is impossible (Device repair kit): the game shows a quality bar of 2,500 there, Tensho keeps 0 on purpose, and the check refused that gap. It is now accepted for a recipe with no quality to seek; the other checks stay. Not validated in game.
+
 ## 0.783.0
 - Plan global, Verify : Suite de X-25, vérifiée en jeu sur capture : la recette qui faisait geler le jeu s'ouvre, Tensho propose sa séquence. Le message « Raphael a échoué » était trompeur, Raphael n'étant pas appelé exprès (recette en haute qualité impossible, sans qualité à chercher) : il dit maintenant « Raphael non utilisé », sans avertissement au journal. Non validé en jeu pour le message.
 - Tests : RaphaelGuard782Tests. Verify.ps1 (agent) : 1350/1350, 0 avertissement, 0 erreur ; DLL 0.783.0.0. Non validé en jeu.
