@@ -18,6 +18,7 @@ internal sealed partial class MainWindow
         BoolSetting("ListPanels.HideInCombat","ListPanels.HideInCombatTip",()=>configuration.ListPanelsHideInCombat,value=>configuration.ListPanelsHideInCombat=value,c=>c.ListPanelsHideInCombat);
         BoolSetting("ListPanels.HideBehindGame","ListPanels.HideBehindGameTip",()=>configuration.ListPanelsHideBehindGame,value=>configuration.ListPanelsHideBehindGame=value,c=>c.ListPanelsHideBehindGame);
         BoolSetting("ListPanels.FinishedOnly","ListPanels.FinishedOnlyTip",()=>configuration.ListPanelsFinishedOnly,value=>configuration.ListPanelsFinishedOnly=value,c=>c.ListPanelsFinishedOnly);
+        BoolSetting("ListPanels.StorageHighlight","ListPanels.StorageHighlightTip",()=>configuration.ListPanelsStorageHighlight,value=>configuration.ListPanelsStorageHighlight=value,c=>c.ListPanelsStorageHighlight);
         BoolSetting("ListPanels.Base","ListPanels.BaseTip",()=>configuration.ListPanelsBase,value=>configuration.ListPanelsBase=value,c=>c.ListPanelsBase);
         if(!configuration.ListPanelsBase)return;
         ImGui.Indent();

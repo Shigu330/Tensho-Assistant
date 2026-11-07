@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.820.0
+- Plan global, Verify : Demande (X-54) : quand l'inventaire d'un servant, la sacoche du chocobo ou le coffre de compagnie est ouvert, les cases qui contiennent un objet de vos listes de suivi d'artisanat ou d'atelier sont encadrées (le même cadre doré que l'aide à la récolte). Les cases sont repérées par l'icône de l'objet (NQ et HQ) : un objet qui partage cette icône est encadré aussi. Réglage dans les options des listes, activé. En mode développeur, le journal dit quelles fenêtres sont lues et combien de cases sont encadrées. Non validé en jeu.
+- Tests : StorageHighlight820Tests. Verify.ps1 (agent) : 1408/1408, 0 avertissement, 0 erreur ; DLL 0.820.0.0. Non validé en jeu.
+### English
+- Request (X-54): when a retainer's inventory, the chocobo saddlebag or the company chest is open, the cells holding an item of your crafting or workshop tracking lists are framed (the gathering help's golden frame). Cells are found by the item's icon (NQ and HQ): an item sharing that icon is framed too. Setting in the list options, on. In developer mode the log says which windows are read and how many cells are framed. Not validated in game.
+
 ## 0.819.0
 - Plan global, Verify : Signalement (X-53), suite : le yak laineux et le loaghtan n'étaient pas signalés. Le jeu a souvent plusieurs numéros pour un même monstre (deux « yak laineux »), et les données de butin n'en citent parfois qu'un. Un monstre proche est maintenant relié à son butin par son numéro, par son nom (les autres numéros du même nom) et par les pages du wiki déjà copiées sur votre disque pour les objets que la liste demande (comme la page « Butin des monstres » les montre) ; aucune requête n'est faite. La ligne du journal de 0.818 reste, pour vérifier. Non validé en jeu.
 - Tests : DropsByName819Tests. Verify.ps1 (agent) : 1407/1407, 0 avertissement, 0 erreur ; DLL 0.819.0.0. Non validé en jeu.

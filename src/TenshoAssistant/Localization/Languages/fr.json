@@ -6445,6 +6445,8 @@
     "NearbyMonsters": "Monstres proches qui le lâchent",
     "NearbyMonstersTip": "Une patte à côté d'un objet : un monstre autour de vous le lâche (données : LuminaSupplemental). La carte le montre aussi (réglage de la carte « Monstres de vos listes »). Information seulement.",
     "MonsterNearby": "Lâché par un monstre proche : {0}",
+    "StorageHighlight": "Encadrer les objets des listes dans les autres rangements",
+    "StorageHighlightTip": "Quand l'inventaire d'un servant, la sacoche du chocobo ou le coffre de compagnie est ouvert, ses cases qui contiennent un objet de vos listes d'artisanat ou d'atelier sont encadrées. Repérées par l'icône de l'objet : un objet qui partage cette icône est encadré aussi.\nPar défaut : activé.",
     "ByZone": "Par zone de récolte",
     "ByZoneTip": "Les objets à récolter rassemblés par zone, celle qui en a le plus d'abord, pour moins de trajets. Un objet présent dans plusieurs zones va avec celle qui en regroupe le plus.",
     "ZoneUnknown": "Zone inconnue",

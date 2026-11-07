@@ -170,6 +170,9 @@ public sealed class Plugin : IDalamudPlugin
             var beastWiki=new Monsters.BeastWikiIndex(dataCache,()=>configuration.CommunityWiki);
             registrations.Register(()=>{},beastWiki.Dispose);
             mainWindow.BeastWiki=beastWiki;
+            // X-54 (0.820): the storage windows' cells holding what the lists need.
+            Inventory.StorageHighlightReader? storageHighlight=null;
+            registrations.Register(()=>mainWindow.StorageHighlight=storageHighlight=new Inventory.StorageHighlightReader(framework,gameGui,log,()=>configuration.DeveloperMode),()=>storageHighlight?.Dispose());
             // X-43 (0.807): the local base of discoveries, read off the frame; nothing is written before it is read.
             var discoveryFolder=Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Discoveries");
             var discoveries=new Discoveries.DiscoveryStore();
@@ -1333,6 +1336,7 @@ public sealed class Plugin : IDalamudPlugin
             ("CraftLog",mainWindow.DrawCraftLogHelper),
             ("MonsterIcons",mainWindow.DrawMonsterOverheadIcons),
             ("Discoveries",mainWindow.CollectDiscoveries),
+            ("StorageHighlight",mainWindow.DrawStorageHighlight),
             ("ItemHover",mainWindow.DrawItemHover),
             ("UndercutClipboard",()=>undercut?.FlushClipboard()),
             ("Cactpot",mainWindow.DrawCactpotOverlay),

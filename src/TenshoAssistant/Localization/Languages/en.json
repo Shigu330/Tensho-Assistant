@@ -6445,6 +6445,8 @@
     "NearbyMonsters": "Nearby monsters that drop it",
     "NearbyMonstersTip": "A paw beside an item: a monster around you drops it (data: LuminaSupplemental). The map shows it too (map setting « Monsters for your lists »). Information only.",
     "MonsterNearby": "Dropped by a monster nearby: {0}",
+    "StorageHighlight": "Frame list items in other storages",
+    "StorageHighlightTip": "When a retainer's inventory, the chocobo saddlebag or the company chest is open, its cells holding an item of your crafting or workshop list are framed. Found by the item's icon: an item sharing that icon is framed too.\nDefault: on.",
     "ByZone": "By gathering zone",
     "ByZoneTip": "Gathered items grouped by zone, the zone holding the most of them first, for fewer trips. An item found in several zones goes with the one that holds most.",
     "ZoneUnknown": "Zone unknown",
