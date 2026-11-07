@@ -259,6 +259,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-15 | Menu du clic droit d'un objet : « Y aller » directement (point de récolte, éthérite la plus proche) | Fait en 0.762 : point ouvert d'abord, puis zone actuelle, puis téléportation la moins chère |
 | X-16 | Plan de PR : à rendement égal, préférer les actions qui durent toute la récolte, pour moins de clics | Fait en 0.763 : à rendement égal, le moins de clics, puis le moins cher |
 | X-17 | Panneau de suivi réduit : l'aide perd « Vos listes en demandent encore » et le cadre ; les cadres passent au-dessus des autres fenêtres | Fait en 0.764 : lignes recalculées panneau réduit, cadres dessinés sous les fenêtres de Tensho ; 0.765 : vaut aussi pour un panneau réduit depuis le chargement |
+| X-18 | Journal des gils : icônes (gils, catégories) et moins de « Autre » : trouver d'autres catégories d'après le jeu | Icônes et couleurs en 0.768 ; « Autre » : relevé au journal (« Gil other ») en mode développeur, catégories à ajouter d'après lui |
 
 ## Retenu pour plus tard
 

@@ -581,7 +581,8 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.AchievementNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Achievement>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.351 (g, I-04): gil journal, one file per character (GilJournal/<id>.json), kept 90 days.
             Inventory.GilWatcher? gilWatcher=null;
-            registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),log),()=>gilWatcher?.Dispose());
+            registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),log,
+                ()=>mainWindow.GameWindowSource?.Invoke().Select(window=>window.Name).ToArray() ?? [],()=>mainWindow.DeveloperMode),()=>gilWatcher?.Dispose());
             mainWindow.GilJournalState=()=>gilWatcher?.State;
             mainWindow.StackSizeOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id)?.StackSize ?? 0;
             // 0.347 (g, I-08): at an NPC shop, the bags' items labelled « to sell » and « important » (chat; sound if turned on).

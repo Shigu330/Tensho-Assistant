@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.768.0
+- Plan global, Verify : Demande (X-18) : le journal des gils montre l'icône des gils du jeu, une icône par catégorie, les gains en vert et les dépenses en rouge. Pour réduire « Autre » sans deviner : en mode développeur, chaque mouvement « Autre » écrit au journal les fenêtres du jeu ouvertes dans les 15 secondes d'avant. Non validé en jeu.
+- Tests : GilJournal768Tests. Verify.ps1 (agent) : 1340/1340, 0 avertissement, 0 erreur ; DLL 0.768.0.0. Non validé en jeu.
+### English
+- Request (X-18): the gil journal shows the game's gil icon, an icon per category, gains in green and spendings in red. To shrink « Other » without guessing: in developer mode, each « Other » change writes to the log the game windows open in the 15 seconds before. Not validated in game.
+
 ## 0.767.0
 - Plan global, Verify : Relevé en jeu (I10), confirmé par l'utilisateur : en enregistrant un servant, Tensho garde aussi ses gils et ses cristaux. Ses cristaux comptent dans les stocks, comptés exactement et non plus comme un minimum ; la page Personnages ajoute « (+N chez les servants) ». Un servant enregistré avant reste valable. Vente des servants (I-05) validée en jeu sur capture. Non validé en jeu pour I10.
 - Tests : RetainerExtras767Tests. Verify.ps1 (agent) : 1339/1339, 0 avertissement, 0 erreur ; DLL 0.767.0.0. Non validé en jeu.

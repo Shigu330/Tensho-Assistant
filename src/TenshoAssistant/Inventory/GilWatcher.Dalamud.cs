@@ -30,9 +30,13 @@ public sealed unsafe class GilWatcher : IDisposable
 
     public GilJournalState? State=>Volatile.Read(ref state);
 
-    public GilWatcher(IFramework framework,IPlayerState player,IGameGui gui,string folder,IPluginLog log)
+    // 0.768 (X-18, user request: fewer « Other »): in developer mode, every game window seen open lately, to tell what an « Other » change was.
+    private readonly Func<IReadOnlyList<string>>? windowsOpen;
+    private readonly Func<bool> developerMode;
+    private readonly Dictionary<string,DateTimeOffset> seenAny=[];
+    public GilWatcher(IFramework framework,IPlayerState player,IGameGui gui,string folder,IPluginLog log,Func<IReadOnlyList<string>>? windowsOpen=null,Func<bool>? developerMode=null)
     {
-        this.framework=framework;this.player=player;this.gui=gui;this.folder=folder;this.log=log;
+        this.framework=framework;this.player=player;this.gui=gui;this.folder=folder;this.log=log;this.windowsOpen=windowsOpen;this.developerMode=developerMode ?? (()=>false);
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
@@ -45,6 +49,11 @@ public sealed unsafe class GilWatcher : IDisposable
         nextRead=now.AddSeconds(1);
         try
         {
+            if(developerMode() && windowsOpen?.Invoke() is { } open)
+            {
+                foreach(var name in open)seenAny[name]=now;
+                if(seenAny.Count>200)foreach(var old in seenAny.Where(pair=>now-pair.Value>GilJournal.ContextWindow).Select(pair=>pair.Key).ToArray())seenAny.Remove(old);
+            }
             foreach(var (addon,_) in GilJournal.Windows)
             {
                 var found=gui.GetAddonByName(addon);
@@ -92,6 +101,9 @@ public sealed unsafe class GilWatcher : IDisposable
         {
             var category=source switch{GilSource.Retainers=>GilCategory.Retainer,GilSource.Company=>GilCategory.Company,_=>GilJournal.Classify(seen,at)};
             entries.Add(new GilEntry(at,value-before,value,source,category));
+            if(category==GilCategory.Other && developerMode())
+                log.Information("Gil other: {0:+#,0;-#,0}, windows seen in the last 15 s: {1}",value-before,
+                    string.Join(", ",seenAny.Where(pair=>at-pair.Value<=GilJournal.ContextWindow).OrderByDescending(pair=>pair.Value).Select(pair=>pair.Key)));
             if(entries.Count>GilJournal.MaximumEntries+500)entries=GilJournal.Prune(entries,at);
             dirty=true;
         }
