@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.831.0
+- Plan global, Verify : Signalement (X-61) : l'aide à la récolte ne proposait pas de plan (« lu après une dépense de PR sur ce point ») alors que les essais étaient à 4/4. Cause : le point suivant du même genre a les mêmes objets, et sa fenêtre peut s'ouvrir avant que Tensho ait lu la fermeture de la précédente ; Tensho le prenait pour le même point, avec les PR déjà dépensés. Maintenant, un autre point (ligne du jeu) ou des essais qui remontent sont un nouveau point. Non validé en jeu.
+- Tests : GatheringNode831Tests. Verify.ps1 (agent) : 1417/1417, 0 avertissement, 0 erreur ; DLL 0.831.0.0. Non validé en jeu.
+### English
+- Report (X-61): the gathering help offered no plan (« read after GP was spent at this point ») with 4/4 attempts. Cause: the next node of the same kind has the same items, and its window can open before Tensho reads the last one closing; Tensho took it for the same node, with GP already spent. Now another node (the game's row) or attempts going up again is a new node. Not validated in game.
+
 ## 0.830.0
 - Plan global, Verify : Demande (X-60) : le menu d'un objet récolté propose maintenant « Placer le drapeau » : le drapeau sur le même point que « Y aller », sans téléportation, pour quand on est déjà dans la zone. « Y aller » manque quand Tensho ne connaît pas la position du point (Échalion cyclope) : en mode développeur, le journal dit pourquoi, une fois par objet (sources, carte, index des lieux chargé ou non), pour corriger ensuite. Non validé en jeu.
 - Tests : PlaceFlag830Tests. Verify.ps1 (agent) : 1416/1416, 0 avertissement, 0 erreur ; DLL 0.830.0.0. Non validé en jeu.

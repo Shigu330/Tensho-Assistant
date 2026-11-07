@@ -21,6 +21,9 @@ internal sealed partial class MainWindow
     private sealed class GatheringNodeStart(ulong owner,GatheringObservedFrame frame)
     {
         public ulong Owner {get;}=owner;public uint JobId {get;}=frame.JobId;public int Level {get;}=frame.Level;public int? TotalAttempts {get;}=frame.TotalAttempts;
+        public uint NodeId {get;}=frame.NodeId;
+        // 0.831 (X-61): the attempts last read, to see a new node of the same kind open (they go up again).
+        public int? LastAttempts {get;set;}=frame.Attempts;
         public uint Gp {get;set;}=frame.Gp;public int? Attempts {get;set;}=frame.Attempts;public bool Frozen {get;set;}
         // Success and boon of each slot (index, raw item) as first read; Late: first read after GP was spent at the node.
         public Dictionary<(int Index,uint RawItemId),(int? Success,int? Boon,bool Late,int? Quantity)> Slots {get;}=[];
@@ -230,11 +233,15 @@ internal sealed partial class MainWindow
     private void TrackGatheringNode(ulong owner,GatheringObservedFrame frame)
     {
         if(gatheringPanelStart is not { } start || start.Owner!=owner || start.JobId!=frame.JobId || start.TotalAttempts!=frame.TotalAttempts
-           || frame.Slots.Count>0 && !frame.Slots.Any(slot=>start.Slots.ContainsKey((slot.Index,slot.RawItemId))))
+           || frame.Slots.Count>0 && !frame.Slots.Any(slot=>start.Slots.ContainsKey((slot.Index,slot.RawItemId)))
+           // 0.831 (X-61, user report: « read after GP was spent » with 4/4 attempts): the next node of the same kind shares its slots, and its window can open
+           // before a closed one is read; another node row, or attempts going up again, is a new node, and nothing spent at the last one freezes it.
+           || GatheringNodes.IsNew(start.NodeId,start.LastAttempts,frame.NodeId,frame.Attempts))
         {
             gatheringPanelStart=start=new(owner,frame);
             gatheringTrackedPicked=false;
         }
+        start.LastAttempts=frame.Attempts ?? start.LastAttempts;
         start.Frozen|=frame.Gp<start.Gp || frame.Attempts<start.Attempts;
         if(!start.Frozen){start.Gp=frame.Gp;start.Attempts??=frame.Attempts;}
         foreach(var slot in frame.Slots)

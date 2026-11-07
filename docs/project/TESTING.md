@@ -1302,6 +1302,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.830) Clic droit sur un objet récolté de la liste : « Placer le drapeau » ; sur l'Échalion cyclope, je relis « Go there missing ».
 
+- [ ] (0.831) Enchaîner deux points du même genre en dépensant des PR au premier : le second propose un plan.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
