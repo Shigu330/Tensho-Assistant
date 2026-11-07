@@ -26,6 +26,8 @@ internal static class ZoneOrder757Tests
             Check(page.Contains("sources.All(source=>source.Timing.Kind==Gathering.GatheringScheduleKind.Limited)"),"timed only");
             // 0.760 (X-01): worked out with the lines, never per frame; zones indexed once per catalogue.
             Check(page.Contains("layout.At!=known.At || layout.Here!=here") && !page.Contains("catalog.Sources.Where(source=>source.Zone==zone)"),"not per frame");
+            // 0.761 (X-14): open or closed, once a second, the open point first.
+            Check(page.Contains("if(group.Timed && ListPanelTimedState(item) is { } state)") && page.Contains("if(second!=listTimedStates.Second)"),"open or closed");
         }),
     ];
 }

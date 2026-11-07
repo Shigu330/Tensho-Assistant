@@ -209,6 +209,8 @@ internal sealed partial class MainWindow
                     {
                         DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
                         if(group.Timed && ImGui.IsItemHovered())WrappedTooltip(string.Join(", ",ListPanelZones(item)));
+                        // 0.761 (X-14, user request): open or closed now, and for how long.
+                        if(group.Timed && ListPanelTimedState(item) is { } state){ImGui.SameLine();ImGui.TextColored(state.Open ? Success:Muted,state.Text);}
                     }
                 }
                 finally{ImGui.TreePop();}
@@ -283,6 +285,24 @@ internal sealed partial class MainWindow
         var now=Environment.TickCount64;
         if(now-listTeleportAsked<60000)return;
         listTeleportAsked=now;mapLive?.RefreshTeleportCosts();
+    }
+    private (long Second,Dictionary<uint,(bool Open,string Text)?> States) listTimedStates=(-1,[]);
+    /// <summary>0.761 (X-14): open if one of the item's timed points is open now, with the time left; else closed, with the time until the next opening. Once a second.</summary>
+    private (bool Open,string Text)? ListPanelTimedState(uint item)
+    {
+        var now=DateTimeOffset.UtcNow;var second=now.ToUnixTimeSeconds();
+        if(second!=listTimedStates.Second)listTimedStates=(second,[]);
+        if(listTimedStates.States.TryGetValue(item,out var known))return known;
+        (bool Open,TimeSpan Left)? best=null;
+        foreach(var source in gatheringCatalog.State.Catalog?.ForItem(item) ?? [])
+        {
+            if(source.Timing.Kind!=Gathering.GatheringScheduleKind.Limited || Gathering.GatheringTime.Next(source.Timing,now,1).Openings.FirstOrDefault() is not { } next)continue;
+            var open=next.StartsAt<=now && now<next.EndsAt;var left=(open ? next.EndsAt:next.StartsAt)-now;
+            if(best is null || open && !best.Value.Open || open==best.Value.Open && left<best.Value.Left)best=(open,left);
+        }
+        (bool,string)? state=best is { } found ? (found.Open,localization.Format(found.Open ? "ListPanels.TimedOpen":"ListPanels.TimedClosed",Math.Max(0,(int)found.Left.TotalHours),found.Left.Minutes,found.Left.Seconds)):null;
+        listTimedStates.States[item]=state;
+        return state;
     }
     private bool ListPanelTimedOnly(uint item)=>gatheringCatalog.State.Catalog?.ForItem(item) is { Count:>0 } sources
         && sources.All(source=>source.Timing.Kind==Gathering.GatheringScheduleKind.Limited);

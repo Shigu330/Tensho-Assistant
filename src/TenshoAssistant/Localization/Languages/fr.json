@@ -6300,6 +6300,8 @@
     "Left": "Non réussi"
   },
   "ListPanels": {
+    "TimedOpen": "ouvert · encore {0}:{1:00}:{2:00}",
+    "TimedClosed": "fermé · ouvre dans {0}:{1:00}:{2:00}",
     "TimedGroup": "Points à horaire",
     "ZoneHere": "vous y êtes",
     "ZoneCost": "téléportation {0} gils",
