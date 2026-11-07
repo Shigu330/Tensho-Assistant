@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.835.0
+- Plan global, Verify : Règle de l'utilisateur (X-64) : « Y aller » n'écarte une source que si elle est indisponible. Un point que le personnage ne peut pas encore récolter (livre de folklore non lu, niveau du métier trop bas) n'est plus proposé ; les sources cachées restent proposées, après les autres. Quand Tensho ne sait pas encore ce que le personnage a lu ou son niveau, rien n'est écarté. Non validé en jeu.
+- Tests : HiddenGoThere834Tests. Verify.ps1 (agent) : 1421/1421, 0 avertissement, 0 erreur ; DLL 0.835.0.0. Non validé en jeu.
+### English
+- User rule (X-64): « Go there » leaves out a source only when it is unavailable. A point the character cannot gather yet (folklore tome not read, job level too low) is no longer offered; hidden sources are still offered, after the others. When Tensho does not know yet what the character has read or their level, nothing is left out. Not validated in game.
+
 ## 0.834.0
 - Plan global, Verify : Signalement (X-64, suite de X-60) : ni « Y aller » ni « Placer le drapeau » pour les Haricots émeraude, ni pour l'Échalion cyclope. Cause, lue dans les données du jeu : ces objets ne poussent que comme objets cachés de leur point (Colonie du Propriétaire dans L'Écume des cieux de Dravania, Forêt des Chocobos dans l'Avant-pays dravanien), et « Y aller » écartait toute source cachée, alors que le point et sa carte sont connus. Une source cachée passe maintenant après les autres, au lieu d'être écartée. Non validé en jeu.
 - Tests : HiddenGoThere834Tests. Verify.ps1 (agent) : 1421/1421, 0 avertissement, 0 erreur ; DLL 0.834.0.0. Non validé en jeu.

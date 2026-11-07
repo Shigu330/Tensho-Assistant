@@ -159,7 +159,9 @@ internal sealed partial class MainWindow
         var here=ListPanelZoneHere();var now=DateTimeOffset.UtcNow;
         // 0.834 (X-64, user report: no « Go there » for Emerald beans, Cyclops onion): both are hidden items of their point (GatheringItem.IsHidden), whose
         // point and map are known (tools/MapMaskProbe --item, docs/evidence/0.834-hidden-gathering-items.md); a hidden source now comes after the others, no longer left out.
-        return sources.Select(source=>(Source:source,Target:GatheringPointPixel(source))).Where(pair=>pair.Target is not null)
+        // 0.835 (X-64, user rule: « left out only when unavailable »): a point the character cannot gather yet (tome not read, level too low) is left out.
+        return sources.Where(source=>GatherAccess?.Invoke(source.BaseId)?.Blocks(source.Level)!=true)
+            .Select(source=>(Source:source,Target:GatheringPointPixel(source))).Where(pair=>pair.Target is not null)
             .Select(pair=>(pair.Source,Target:pair.Target!.Value))
             .OrderBy(pair=>pair.Source.IsHidden ? 1:0)
             .ThenBy(pair=>pair.Source.Timing.Kind!=Gathering.GatheringScheduleKind.Limited

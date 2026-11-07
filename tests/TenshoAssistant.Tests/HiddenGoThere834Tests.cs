@@ -9,6 +9,10 @@ internal static class HiddenGoThere834Tests
             var menu=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.DutyFinder.cs"));
             Check(!menu.Contains("sources.Where(source=>!source.IsHidden)"),"not left out");
             Check(menu.Contains(".OrderBy(pair=>pair.Source.IsHidden ? 1:0)"),"ranked last");
+            Check(menu.Contains("GatherAccess?.Invoke(source.BaseId)?.Blocks(source.Level)!=true"),"0.835: unavailable left out");
+            var access=new TenshoAssistant.Gathering.GatherPointAccess(null,17,60);
+            Check(!access.Blocks(60) && access.Blocks(61),"level");
+            Check(new TenshoAssistant.Gathering.GatherPointAccess("Tome",17,90).Blocks(10),"tome");
         }),
     ];
 }

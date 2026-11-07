@@ -40,4 +40,7 @@ public sealed record GatherPointAccess(string? TomeMissing,uint JobId,int? JobLe
         var level=need.JobId==Miner ? known.MinerLevel:known.BotanistLevel;
         return new(missing,need.JobId,level>0 ? level:null);
     }
+
+    /// <summary>0.835 (X-64, user rule: « left out only when unavailable »): a folklore tome not read, or the job under the point's level.</summary>
+    public bool Blocks(int pointLevel)=>TomeMissing is not null || JobLevel is { } level && level<pointLevel;
 }
