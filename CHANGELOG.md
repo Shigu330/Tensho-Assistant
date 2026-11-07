@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.730.0
+- Plan global, Verify : Commandes spéciales : onglet Récompenses, par client : points, gils et assignats à chaque rang et palier, bonus de la semaine, objets liés à chaque rang. Codes des monnaies reliés aux assignats, montants comparés au wiki. Non validé en jeu.
+- Tests : DeliveryRewards730Tests. Verify.ps1 (agent) : 1309/1309, 0 avertissement, 0 erreur ; DLL 0.730.0.0. Non validé en jeu.
+### English
+- Custom deliveries: Rewards tab, per client: points, gil and scrips at each rank and tier, weekly bonus, objects attached to each rank. Currency codes tied to the scrips, amounts compared with the wiki. Not validated in game.
+
 ## 0.729.0
 - Plan global, Verify : Aide à la récolte : une ligne sépare la prochaine action du plan, à la demande de l'utilisateur. Non validé en jeu.
 - Tests : GatherNext728Tests. Verify.ps1 (agent) : 1306/1306, 0 avertissement, 0 erreur ; DLL 0.729.0.0. Non validé en jeu.

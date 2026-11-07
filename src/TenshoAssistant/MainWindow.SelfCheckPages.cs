@@ -58,7 +58,7 @@ internal sealed partial class MainWindow
             {
                 if(DeliveryClientsLoad?.Invoke() is not { Count:>0 } clients)return Diagnostics.SelfCheck.Failed("custom deliveries","sheets unreadable");
                 var read=ReadDeliveries is null ? null:await ReadDeliveries(clients);
-                return read?.Status==DeliveryReadStatus.Loaded ? Diagnostics.SelfCheck.Ok("custom deliveries",$"{clients.Count} clients, {read.Remaining} left"):Diagnostics.SelfCheck.NotRead("custom deliveries",read?.Status.ToString() ?? "no reader");
+                return read?.Status==DeliveryReadStatus.Loaded ? Diagnostics.SelfCheck.Ok("custom deliveries",$"{clients.Count} clients, {read.Remaining} left, {clients.Sum(client=>client.Rewards?.Count ?? 0)} reward lines, {clients.Sum(client=>client.Gifts?.Count ?? 0)} gifts"):Diagnostics.SelfCheck.NotRead("custom deliveries",read?.Status.ToString() ?? "no reader");
             }),
             Page("masked carnivale",async ()=>
             {

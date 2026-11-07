@@ -26,6 +26,65 @@ internal sealed partial class MainWindow
             if(deliveryClients is { Count:>0 } && ReadDeliveries is not null)deliveryRead=ReadDeliveries(deliveryClients);
         }
         if(deliveryClients is not { Count:>0 } clients){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("CustomDeliveries.SheetsUnavailable"));return;}
+        if(!ImGui.BeginTabBar("###CustomDeliveriesTabs"))return;
+        try
+        {
+            if(ImGui.BeginTabItem(localization.Get("CustomDeliveries.TabClients")+"###DeliveryClients"))
+            {
+                try{DrawDeliveryStatus(clients);}
+                finally{ImGui.EndTabItem();}
+            }
+            if(ImGui.BeginTabItem(localization.Get("CustomDeliveries.TabRewards")+"###DeliveryRewards"))
+            {
+                try{DrawDeliveryRewards(clients);}
+                finally{ImGui.EndTabItem();}
+            }
+        }
+        finally{ImGui.EndTabBar();}
+    }
+
+    // W-01 (0.730): what a client gives, from the sheets alone: docs/evidence/0.730-delivery-rewards.md.
+    private int deliveryRewardClient;
+    private void DrawDeliveryRewards(IReadOnlyList<DeliveryClient> clients)
+    {
+        ImGui.TextWrapped(localization.Get("CustomDeliveries.RewardsHelp"));
+        deliveryRewardClient=Math.Clamp(deliveryRewardClient,0,clients.Count-1);
+        ImGui.SetNextItemWidth(260*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+        var names=clients.Select(row=>row.Name).ToArray();
+        ImGui.Combo(localization.Get("CustomDeliveries.ColumnClient")+"###DeliveryRewardClient",ref deliveryRewardClient,names,names.Length);
+        Tip("CustomDeliveries.RewardClientTip");
+        var client=clients[deliveryRewardClient];
+        if(client.Rewards is not { Count:>0 } rewards){ImGui.TextDisabled(localization.Get("CustomDeliveries.RewardsNone"));return;}
+        static string Tiers(DeliveryTiers tiers)=>$"{tiers.Low:N0} / {tiers.Mid:N0} / {tiers.High:N0}";
+        if(ImGui.BeginTable("###DeliveryRewardsTable",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))
+        {
+            try
+            {
+                foreach(var column in new[]{"ColumnRank","ColumnKind","ColumnPoints","ColumnGil","ColumnScrips"})ImGui.TableSetupColumn(localization.Get("CustomDeliveries."+column));
+                ImGui.TableHeadersRow();
+                foreach(var reward in rewards)
+                {
+                    ImGui.TableNextRow();
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(reward.Bonus ? localization.Format("CustomDeliveries.RankBonus",reward.Rank,reward.Percent):reward.Rank.ToString());
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get(reward.Crafting ? "CustomDeliveries.KindCraft":"CustomDeliveries.KindGather"));
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(Tiers(reward.Points));
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(Tiers(reward.Gil));
+                    ImGui.TableNextColumn();
+                    foreach(var currency in reward.Currencies)ImGui.TextUnformatted($"{Tiers(currency.Amount)}  {itemCatalog.State.Catalog?.Find(currency.ItemId)?.Name ?? localization.Format("BankUi.Item",currency.ItemId)}");
+                }
+            }
+            finally{ImGui.EndTable();}
+        }
+        if(client.Gifts is not { Count:>0 } gifts)return;
+        ImGui.Spacing();
+        ImGui.TextUnformatted(localization.Get("CustomDeliveries.GiftsTitle"));
+        Tip("CustomDeliveries.GiftsTip");
+        foreach(var rank in gifts.GroupBy(gift=>gift.Rank).OrderBy(group=>group.Key))
+            ImGui.TextWrapped(localization.Format("CustomDeliveries.GiftsRank",rank.Key,string.Join(", ",rank.Select(gift=>localization.Format(gift.Hq ? "CustomDeliveries.GiftHq":"CustomDeliveries.Gift",gift.Count,gift.Name)))));
+    }
+
+    private void DrawDeliveryStatus(IReadOnlyList<DeliveryClient> clients)
+    {
         ImGui.TextWrapped(localization.Get("CustomDeliveries.Help"));
         if(deliveryRead is { IsCompleted:true } read)
         {
