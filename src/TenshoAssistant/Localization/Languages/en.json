@@ -6300,6 +6300,9 @@
     "Left": "Not cleared"
   },
   "ListPanels": {
+    "AddAlarms": "Add the alarms ({0})",
+    "AddAlarmsTip": "An alarm for each opening of the timed points of what the list still needs. An alarm already there with the same name and time is not added again.",
+    "AddAlarmsNone": "No timed point is missing an alarm for what the list still needs.",
     "ByZone": "By gathering zone",
     "ByZoneTip": "Gathered items grouped by zone, the zone holding the most of them first, for fewer trips. An item found in several zones goes with the one that holds most.",
     "ZoneUnknown": "Zone unknown",

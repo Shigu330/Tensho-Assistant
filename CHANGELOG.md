@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.755.0
+- Plan global, Verify : Demande (X-09) : en tête des listes de suivi, « Ajouter les alarmes (N) » crée une alarme pour chaque ouverture des points à horaire de ce dont la liste a encore besoin ; une alarme déjà présente (même nom, même heure) n'est pas doublée. Non validé en jeu.
+- Tests : ListAlarms755Tests. Verify.ps1 (agent) : 1330/1330, 0 avertissement, 0 erreur ; DLL 0.755.0.0. Non validé en jeu.
+### English
+- Request (X-09): at the top of the tracking lists, « Add the alarms (N) » creates an alarm for each opening of the timed points of what the list still needs; an alarm already there (same name, same time) is not doubled. Not validated in game.
+
 ## 0.754.0
 - Plan global, Verify : Signalement (X-08) : l'infobulle d'un point à horaire sur la carte disait « fermé maintenant » sans compte à rebours. Elle dit maintenant dans combien de temps il ouvre, ou ferme s'il est ouvert, comme la page Récolte. Non validé en jeu.
 - Tests : TimedCountdown754Tests. Verify.ps1 (agent) : 1329/1329, 0 avertissement, 0 erreur ; DLL 0.754.0.0. Non validé en jeu.

@@ -177,6 +177,7 @@ internal sealed partial class MainWindow
             if(configuration.ListPanelsBase && configuration.ListPanelsMetOnly && quests.State.Entries.Count==0 && now-listPanelQuestsAsked>60000){listPanelQuestsAsked=now;quests.RequestRefresh();}
             listPanelLines[key]=known=(now,configuration.ListPanelsBase ? BaseMaterials.Expand(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched).ToArray():wanted);
         }
+        DrawListPanelAlarms(key,known.Lines);
         if(!configuration.ListPanelsBase)
         {
             foreach(var (item,needed) in known.Lines)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
@@ -206,6 +207,45 @@ internal sealed partial class MainWindow
             foreach(var (item,needed) in lines)DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
         }
     }
+    // 0.755 (X-09, user request): the alarms of every timed point of what the list still needs, those already there left out (same label and time, as the
+    // Gathering page names them). Worked out with the list, once a second at most.
+    private readonly Dictionary<string,(long At,TenshoAssistant.Alarms.TenshoAlarm[] Alarms)> listPanelAlarms=[];
+    private void DrawListPanelAlarms(string key,(uint Item,long Needed)[] lines)
+    {
+        var now=Environment.TickCount64;
+        if(!listPanelAlarms.TryGetValue(key,out var known) || now-known.At>1000)listPanelAlarms[key]=known=(now,ListAlarms(lines));
+        ImGui.BeginDisabled(known.Alarms.Length==0);
+        try{if(ImGui.SmallButton(localization.Format("ListPanels.AddAlarms",known.Alarms.Length)+$"###ListAlarms{key}")){AddAlarms(known.Alarms);listPanelAlarms.Remove(key);}}
+        finally{ImGui.EndDisabled();}
+        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(known.Alarms.Length==0 ? "ListPanels.AddAlarmsNone":"ListPanels.AddAlarmsTip"));
+    }
+    private TenshoAssistant.Alarms.TenshoAlarm[] ListAlarms((uint Item,long Needed)[] lines)
+    {
+        if(gatheringCatalog.State.Catalog is not { } catalog)return [];
+        var existing=configuration.Alarms ?? [];
+        var created=new List<TenshoAssistant.Alarms.TenshoAlarm>();
+        foreach(var (item,needed) in lines)
+        {
+            if(GetRecipeHoldings(item) is { HasObservation:true } held && held.Total>=needed)continue;
+            var name=itemCatalog.State.Catalog?.Find(item)?.Name ?? item.ToString();
+            foreach(var source in catalog.ForItem(item))
+            {
+                var timing=source.Timing;
+                if(timing.Kind!=Gathering.GatheringScheduleKind.Limited || timing.OpeningMinutes.Count==0)continue;
+                var place=string.IsNullOrWhiteSpace(source.Place) ? source.Zone:source.Place;
+                var job=TenshoAssistant.Alarms.AlarmSchedule.JobOf(source.TypeId,source.IsFishing);
+                foreach(var alarm in TenshoAssistant.Alarms.AlarmSchedule.ForWindows($"{name} · {place}",timing.OpeningMinutes,DefaultAlarmLead,source.TerritoryId,item))
+                {
+                    alarm.JobId=job;
+                    if(existing.Any(known=>known.Label==alarm.Label && known.Repeat==alarm.Repeat && known.EtMinute==alarm.EtMinute)
+                        || created.Any(known=>known.Label==alarm.Label && known.EtMinute==alarm.EtMinute))continue;
+                    created.Add(alarm);
+                }
+            }
+        }
+        return created.ToArray();
+    }
+
     // 0.752: the zones where an item is gathered, from the gathering catalogue, kept per catalogue.
     private (object? Catalog,Dictionary<uint,string[]> Zones) listPanelZones=(null,[]);
     private IReadOnlyCollection<string> ListPanelZones(uint item)
