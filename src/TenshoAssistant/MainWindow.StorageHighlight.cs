@@ -7,7 +7,7 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal Inventory.StorageHighlightReader? StorageHighlight { get; set; }
-    private long storageIconsAt=-100_000;private IReadOnlySet<uint> storageIcons=new HashSet<uint>();
+    private long storageIconsAt=-100_000;private IReadOnlySet<uint> storageItems=new HashSet<uint>();
 
     /// <summary>Every frame (overlay pass): the wanted icons refreshed once a second from the lists, the frames drawn from the last read.</summary>
     internal void DrawStorageHighlight()
@@ -17,19 +17,15 @@ internal sealed partial class MainWindow
         if(now-storageIconsAt>=1000)
         {
             storageIconsAt=now;
-            var icons=new HashSet<uint>();
-            if(itemCatalog.State.Catalog is { } catalog)
-            {
-                foreach(var key in new[]{"CraftList","Workshop"})
-                    if(ListPanelLinesFor(key) is { } known)
-                        foreach(var (item,_) in known.Lines)
-                            if(catalog.Find(item) is { IconId:not 0 } found)
-                            {icons.Add(found.IconId);icons.Add(1_000_000+found.IconId);}
-            }
-            storageIcons=icons;
+            // 0.839 (X-66): the items, no longer their icons: the reader tells apart items sharing an icon by the storage's own stacks.
+            var items=new HashSet<uint>();
+            foreach(var key in new[]{"CraftList","Workshop"})
+                if(ListPanelLinesFor(key) is { } known)
+                    foreach(var (item,_) in known.Lines)items.Add(item);
+            storageItems=items;
         }
-        if(storageIcons.Count==0)return;
-        reader.Want(storageIcons);
+        if(storageItems.Count==0 || itemCatalog.State.Catalog is not { } catalog)return;
+        reader.Want(storageItems,item=>catalog.Find(item)?.IconId ?? 0);
         foreach(var cell in reader.Cells)DrawGameFrame(cell.X,cell.Y,cell.Width,cell.Height);
     }
 }

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.839.0
+- Plan global, Verify : Signalement (X-66) : chez le servant, l'encadré marquait le vin de cuisine au lieu du vin de cuisine de qualité, et il restait en changeant d'onglet de sac. Causes : les cases étaient reconnues par leur icône seule, et les deux vins ont la même ; une case vide garde son ancienne icône (image cachée), et l'onglet caché masque un parent de la case, pas la case. Maintenant, Tensho lit les piles du rangement ouvert et compare l'icône et la quantité affichée de chaque case : une case n'est encadrée que si toutes les piles qui lui ressemblent sont demandées par une liste (deux objets pareils en tout : pas d'encadré plutôt qu'un faux). La case, son image et tous ses parents doivent être visibles. Non validé en jeu.
+- Tests : StorageHighlight820Tests. Verify.ps1 (agent) : 1425/1425, 0 avertissement, 0 erreur ; DLL 0.839.0.0. Non validé en jeu.
+### English
+- Report (X-66): at the retainer, the frame marked the cooking wine instead of the quality cooking wine, and stayed when another bag tab was chosen. Causes: cells were recognised by their icon alone, and both wines share it; an empty cell keeps its last icon (image hidden), and a hidden tab hides a parent of the cell, not the cell. Tensho now reads the open storage's stacks and compares each cell's icon and shown quantity: a cell is framed only when every stack like it is wanted by a list (two items alike in both: no frame rather than a wrong one). The cell, its image and all its parents must be shown. Not validated in game.
+
 ## 0.838.0
 - Plan global, Verify : Signalement (X-65) : dans la liste de suivi des Marrons glacés, le sirop de bouleau (157 pour 1 demandé) n'apparaissait pas, et rien ne disait qu'il était chez un servant. Cause : un ingrédient qui se fabrique et qu'on détient déjà était retiré du calcul sans être inscrit dans un groupe ; il n'avait donc ni ligne, ni l'icône d'entrepôt qui signale un objet gardé ailleurs (0.822). Il reste maintenant une ligne, pour la quantité prise dans le stock, avec cette icône quand l'objet n'est pas sur vous. Les objets de la liste eux-mêmes ne changent pas. Non validé en jeu.
 - Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1424/1424, 0 avertissement, 0 erreur ; DLL 0.838.0.0. Non validé en jeu.

@@ -172,7 +172,7 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.BeastWiki=beastWiki;
             // X-54 (0.820): the storage windows' cells holding what the lists need.
             Inventory.StorageHighlightReader? storageHighlight=null;
-            registrations.Register(()=>mainWindow.StorageHighlight=storageHighlight=new Inventory.StorageHighlightReader(framework,gameGui,log,()=>configuration.DeveloperMode),()=>storageHighlight?.Dispose());
+            registrations.Register(()=>mainWindow.StorageHighlight=storageHighlight=new Inventory.StorageHighlightReader(framework,gameGui,log,()=>configuration.DeveloperMode,inventory),()=>storageHighlight?.Dispose());
             // X-43 (0.807): the local base of discoveries, read off the frame; nothing is written before it is read.
             var discoveryFolder=Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Discoveries");
             var discoveries=new Discoveries.DiscoveryStore();
