@@ -89,7 +89,15 @@ internal sealed partial class MainWindow
                 if(ImGui.SmallButton(localization.Get("CraftLogUi.OpenSimulator"))){OpenCraftSimulation(forSimulator);IsOpen=true;}
             }
             DrawCraftLogFigures(context.Recipe,context.Stats);
-            if(context.RememberedAt is { } rememberedAt)ImGui.TextColored(Accent,localization.Format("CraftLogUi.Remembered",rememberedAt.ToLocalTime().ToString("g")));
+            // 0.788 (X-29, user report: as Carpenter on a Blacksmith recipe, « not detected »: the note was cut off and in the information colour): both jobs named,
+            // in the warning colour, wrapped, with the button that wears the recipe's job.
+            if(context.RememberedAt is { } rememberedAt)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text,UI.FfxivTheme.Warning);
+                try{ImGui.TextWrapped(localization.Format("CraftLogUi.Remembered",JobName(job),context.Recipe?.CraftType ?? "",rememberedAt.ToLocalTime().ToString("g")));}
+                finally{ImGui.PopStyleColor();}
+                if(context.Recipe is { } worn)DrawEquipRecipeJob(worn,"CraftLogEquipRemembered");
+            }
             if(context.Stats is { } current)
             {
                 CraftLogSection(localization.Get("CraftLogUi.SectionState"));

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.788.0
+- Plan global, Verify : Signalement (X-29) : en Menuisier sur une recette de Métallurgie, le panneau du carnet ne semblait pas voir le mauvais métier. Il le voyait (le calcul utilise les attributs relevés du bon métier), mais la note était en couleur d'information et coupée. Elle dit maintenant « Mauvais métier : vous êtes Menuisier, cette recette est de Métallurgie », en couleur d'avertissement, sur plusieurs lignes, avec le bouton pour porter le métier de la recette. Non validé en jeu.
+- Tests : WrongJob788Tests. Verify.ps1 (agent) : 1358/1358, 0 avertissement, 0 erreur ; DLL 0.788.0.0. Non validé en jeu.
+### English
+- Report (X-29): as Carpenter on a Blacksmith recipe, the crafting log panel did not seem to see the wrong job. It did (the calculation uses the right job's recorded attributes), but the note was in the information colour and cut off. It now says « Wrong job: you are Carpenter, this recipe is Blacksmith », in the warning colour, wrapped, with the button to wear the recipe's job. Not validated in game.
+
 ## 0.787.0
 - Plan global, Verify : Demande (X-28) : l'atelier de compagnie tient compte de ce qui est déjà livré. La capture de la fenêtre de livraison (0.786, livraison de rivets en bronze) a donné sa disposition : phase en cours, lots livrés et requis de chaque objet. Tensho la lit chaque seconde quand elle est ouverte, la garde, retire les phases déjà validées et déduit les lots livrés de la phase en cours, dans le panneau et la page Atelier ; la page dit la phase et l'heure du relevé. Utilisé seulement si cela correspond au projet. Non validé en jeu.
 - Tests : WorkshopDelivered787Tests. Verify.ps1 (agent) : 1357/1357, 0 avertissement, 0 erreur ; DLL 0.787.0.0. Non validé en jeu.

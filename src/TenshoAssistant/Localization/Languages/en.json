@@ -3757,7 +3757,7 @@
     "NotObserved": "Possible Grand Company delivery · open the game's Timers, then Supply missions, to see today's request"
   },
   "CraftLogUi": {
-    "Remembered": "Attributes last read on {0}, not the job you are wearing. Wear it to compute with your current ones.",
+    "Remembered": "Wrong job: you are {0}, this recipe is {1}. Computed with the {1} attributes read on {2}; wear it to compute with your current ones.",
     "SavedFor": "Saved for: {0}",
     "SectionState": "Your state",
     "SectionTarget": "Target",

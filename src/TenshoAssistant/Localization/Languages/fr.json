@@ -3757,7 +3757,7 @@
     "NotObserved": "Livraison GC possible · ouvrez le calendrier du jeu, puis les missions de ravitaillement, pour voir la demande du jour"
   },
   "CraftLogUi": {
-    "Remembered": "Attributs relevés le {0}, pas ceux du métier que vous portez. Portez-le pour calculer avec les actuels.",
+    "Remembered": "Mauvais métier : vous êtes {0}, cette recette est de {1}. Calcul avec les attributs de {1} relevés le {2} ; portez-le pour calculer avec les actuels.",
     "SavedFor": "Enregistrée pour : {0}",
     "SectionState": "Votre état",
     "SectionTarget": "Cible",
