@@ -11,15 +11,21 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     private int itemTooltipFrame=-1;private uint itemTooltipId;
-    private int menuFrame=-1,menuSerial;
+    private int menuFrame=-1;
+    private readonly Dictionary<uint,int> menuSeen=[];
 
     // 0.269: an icon and the name next to it used the same popup id; the open menu was then drawn twice (« plusieurs fois le même »).
-    // Each attached menu gets a per-frame serial; draw order is stable, so the id stays the same while the menu is open.
+    // 0.737 (user report: the right-click menu of a project's material closed at once, now and then): the serial counted every icon of the frame, in every
+    // window, so one icon more or less anywhere before it changed the id and ImGui closed the menu. It now counts only the same item at the same place
+    // (same id stack), which changes only if that very list changes.
     private string UniqueMenuId(string baseId)
     {
         var frame=ImGui.GetFrameCount();
-        if(frame!=menuFrame){menuFrame=frame;menuSerial=0;}
-        return $"{baseId}#{menuSerial++}";
+        if(frame!=menuFrame){menuFrame=frame;menuSeen.Clear();}
+        var key=ImGui.GetID(baseId);
+        var seen=menuSeen.GetValueOrDefault(key);
+        menuSeen[key]=seen+1;
+        return seen==0 ? baseId:$"{baseId}#{seen}";
     }
 
     /// <summary>Game icon of an item; for a real item (Id &gt; 0) also its tooltip and right-click menu, unless <paramref name="interactive"/> is false.</summary>

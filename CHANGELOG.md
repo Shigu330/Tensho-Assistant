@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.737.0
+- Plan global, Verify : Signalement : le menu du clic droit sur l'icône d'un matériau de projet se fermait parfois tout de suite. Cause : son identifiant comptait toutes les icônes de l'image, dans toutes les fenêtres ; une icône de plus ou de moins ailleurs le changeait et ImGui fermait le menu. Correction : il ne compte plus que le même objet au même endroit. Vaut pour toutes les icônes d'objets. Non validé en jeu.
+- Tests : ItemMenu737Tests. Verify.ps1 (agent) : 1312/1312, 0 avertissement, 0 erreur ; DLL 0.737.0.0. Non validé en jeu.
+### English
+- Report: the right-click menu on a project material's icon sometimes closed at once. Cause: its id counted every icon of the frame, in every window; one icon more or less elsewhere changed it and ImGui closed the menu. Fix: it counts only the same item at the same place. Applies to every item icon. Not validated in game.
+
 ## 0.736.0
 - Plan global, Verify : Journal : l'entrée de 0.735 reprenait le texte de 0.734, la publication ayant gardé l'ancienne note ; elle est réécrite. Le script de l'agent efface maintenant la note après chaque publication. Aucun changement du plugin.
 - Tests : RecipeStock735Tests. Verify.ps1 (agent) : 1311/1311, 0 avertissement, 0 erreur ; DLL 0.736.0.0. Non validé en jeu.
