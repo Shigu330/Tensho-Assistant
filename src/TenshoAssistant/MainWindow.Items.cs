@@ -654,8 +654,9 @@ internal sealed partial class MainWindow
     {
         if (!summary.HasObservation) return localization.Get("RecipeUi.UnknownStock");
         var value = $"NQ {summary.Nq:N0} · HQ {summary.Hq:N0}";
-        if (summary.HasUnknown) return localization.Format("RecipeUi.Partial",value);
         var missing = Math.Max(0, required - summary.Total);
+        // 0.735 (user report): a lower bound that already covers the need is enough: crystals held by retainers are never read, yet 490 of 5 is OK.
+        if (summary.HasUnknown) return localization.Format(missing == 0 ? "RecipeUi.PartialEnough":"RecipeUi.Partial",value);
         return missing == 0 ? $"{value} · OK" : localization.Format("RecipeUi.Missing",value,missing.ToString("N0"));
     }
 

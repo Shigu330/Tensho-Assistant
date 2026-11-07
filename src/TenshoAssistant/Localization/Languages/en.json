@@ -4297,7 +4297,8 @@
     "Crafts": "{0} craft(s)",
     "Produced": "→ {0} item(s)",
     "Using": "{0} recipe(s) using {1}",
-    "Partial": "{0} · partial",
+    "Partial": "{0} · at least: some storage not read",
+    "PartialEnough": "{0} · OK, at least this much",
     "Missing": "{0} · Missing {1}",
     "Unclassified": "Unclassified crystals ({0})",
     "QueryTip": "Keeps the recipes whose crafted item name contains this text; case is ignored."

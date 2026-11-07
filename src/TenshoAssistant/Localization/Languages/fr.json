@@ -4297,7 +4297,8 @@
     "Crafts": "{0} craft(s)",
     "Produced": "→ {0} objet(s)",
     "Using": "{0} recette(s) utilisant {1}",
-    "Partial": "{0} · partiel",
+    "Partial": "{0} · au moins : des rangements ne sont pas lus",
+    "PartialEnough": "{0} · OK, au moins autant",
     "Missing": "{0} · Manque {1}",
     "Unclassified": "Cristaux non classés ({0})",
     "QueryTip": "Garde les recettes dont le nom de l'objet fabriqué contient ce texte ; majuscules ignorées."

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.735.0
+- Plan global, Verify : Signalement : « Cette action n'est pas sur vos barres » pour Récolte abondante II, pourtant présente. Cause : la case garde Récolte abondante, que le jeu fait évoluer en II à l'affichage. Correction : la case est comparée à l'action qu'elle affiche. Non validé en jeu.
+- Tests : GatherNext728Tests. Verify.ps1 (agent) : 1311/1311, 0 avertissement, 0 erreur ; DLL 0.735.0.0. Non validé en jeu.
+### English
+- Report: « This action is not on your hotbars » for Bountiful Harvest II, which was there. Cause: the slot keeps Bountiful Harvest, which the game shows as II. Fix: the slot is matched by the action it shows. Not validated in game.
+
 ## 0.734.0
 - Plan global, Verify : Signalement : « Cette action n'est pas sur vos barres » pour Récolte abondante II, pourtant présente. Cause : la case garde Récolte abondante, que le jeu fait évoluer en II à l'affichage. Correction : la case est comparée à l'action qu'elle affiche. Non validé en jeu.
 - Tests : GatherNext728Tests. Verify.ps1 (agent) : 1310/1310, 0 avertissement, 0 erreur ; DLL 0.734.0.0. Non validé en jeu.
