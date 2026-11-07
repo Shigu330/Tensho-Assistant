@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.731.0
+- Plan global, Verify : Signalement : à la fin du plan il restait 53 PR et 90 % de supplément, sans proposer Sols fertiles I. Cause : chaque récolte rend 6 PR (relevé : +6 après une, +30 après cinq), que le plan d'ouverture ne compte pas. Correction : les étapes en tiennent compte, et une fois le plan fini, le calcul est refait avec les PR restants et les taux du moment. Non validé en jeu.
+- Tests : GatherNext728Tests. Verify.ps1 (agent) : 1310/1310, 0 avertissement, 0 erreur ; DLL 0.731.0.0. Non validé en jeu.
+### English
+- Report: at the end of the plan 53 GP and 90 % boon were left, and Pioneer's Gift I was not offered. Cause: each gather gives back 6 GP (+6 after one, +30 after five), which the plan made at the opening does not count. Fix: the steps count it, and once the plan is done, it is worked out again with the GP left and the current rates. Not validated in game.
+
 ## 0.730.0
 - Plan global, Verify : Commandes spéciales : onglet Récompenses, par client : points, gils et assignats à chaque rang et palier, bonus de la semaine, objets liés à chaque rang. Codes des monnaies reliés aux assignats, montants comparés au wiki. Non validé en jeu.
 - Tests : DeliveryRewards730Tests. Verify.ps1 (agent) : 1309/1309, 0 avertissement, 0 erreur ; DLL 0.730.0.0. Non validé en jeu.

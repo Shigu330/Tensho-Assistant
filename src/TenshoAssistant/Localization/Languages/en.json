@@ -1170,6 +1170,7 @@
     "MissingBoon": "boon chance",
     "AfterStart": "Plan not computed: this item was first read after GP was spent at this node, so its rates may already include the bonuses bought.",
     "NextAction": "Next: {0}",
+    "NextLeftover": "Next: {0}, with the GP left",
     "NextGather": "Next: gather {0}",
     "NextOffPlan": "Your GP no longer follows this plan: the next step is yours to choose.",
     "NextNotOnBars": "This action is not on your hotbars.",

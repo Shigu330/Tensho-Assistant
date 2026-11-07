@@ -1170,6 +1170,7 @@
     "MissingBoon": "taux de récolte supplémentaire",
     "AfterStart": "Plan non calculé : cet objet a été lu après une dépense de PR sur ce point, ses taux peuvent déjà inclure les bonus achetés.",
     "NextAction": "Ensuite : {0}",
+    "NextLeftover": "Ensuite : {0}, avec les PR restants",
     "NextGather": "Ensuite : récoltez {0}",
     "NextOffPlan": "Vos PR ne suivent plus ce plan : la suite est à votre choix.",
     "NextNotOnBars": "Cette action n'est pas sur vos barres.",

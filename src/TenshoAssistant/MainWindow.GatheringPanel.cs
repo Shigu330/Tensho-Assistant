@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
     // 0.728 (user request): a frame over the slot of the next action, as on the Mini Cactpot board. Drawn only: the player uses the action.
     internal Gathering.ActionBarLocator? BarLocator { get; set; }
     private uint gatheringBarWanted;
-    private (GpPlan Plan,int Gp,int? Attempts,GpNextStep Step)? gatheringNextCache;
+    private (GpPlan Plan,int Gp,int? Attempts,int? Boon,GpNextStep Step)? gatheringNextCache;
     private static void DrawGatheringBarHighlight(Gathering.ActionBarLocator located)
     {
         if(located.Rects is not { Count:>0 } rects)return;
@@ -69,18 +69,25 @@ internal sealed partial class MainWindow
         }
     }
 
-    private void DrawGatheringNext(GpPlan plan,GatheringNodeStart start,GatheringObservedFrame frame,string itemName,out GpNextStep? step)
+    private void DrawGatheringNext(GpOptimization optimization,GatheringObservedSlot slot,GatheringNodeStart start,GatheringObservedFrame frame,string itemName,out GpNextStep? step)
     {
         step=null;
         if(start.Attempts is not { } startAttempts || frame.Attempts is not { } attempts)return;
-        if(gatheringNextCache is not { } known || !ReferenceEquals(known.Plan,plan) || known.Gp!=(int)frame.Gp || known.Attempts!=attempts)
-            gatheringNextCache=known=(plan,(int)frame.Gp,attempts,GpNextAction.Next(plan,(int)start.Gp,(int)frame.Gp,startAttempts,attempts));
+        var plan=optimization.Best;
+        if(gatheringNextCache is not { } known || !ReferenceEquals(known.Plan,plan) || known.Gp!=(int)frame.Gp || known.Attempts!=attempts || known.Boon!=slot.BoonPercent)
+        {
+            var found=GpNextAction.Next(plan,(int)start.Gp,(int)frame.Gp,startAttempts,attempts);
+            // 0.731 (user report): the end of the plan, with what is left.
+            if(slot.SuccessPercent is { } successNow && slot.BoonPercent is { } boonNow && gpActions.State.Catalog is { } catalog)
+                found=GpNextAction.Leftover(found,optimization.Scenario,plan,catalog,(int)frame.Gp,attempts,successNow,boonNow);
+            gatheringNextCache=known=(plan,(int)frame.Gp,attempts,slot.BoonPercent,found);
+        }
         step=known.Step;
         switch(step.Kind)
         {
             case GpNextKind.Action when step.Action is { } action:
                 DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(28));ImGui.SameLine();
-                ImGui.TextColored(Accent,localization.Format("GatheringPanel.NextAction",action.Name));
+                ImGui.TextColored(Accent,localization.Format(step.Leftover ? "GatheringPanel.NextLeftover":"GatheringPanel.NextAction",action.Name));
                 if(ImGui.IsItemHovered())WrappedTooltip(action.Description);
                 if(configuration.GatheringNextHighlight)
                 {
@@ -245,7 +252,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Format("GatheringPanel.Expected",shown.ExpectedYield.ToString("0.0"),plan.Baseline.ToString("0.0"),shown.Cost));
         if(start.Frozen)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanAtStart",plan.Scenario.Budget));
         if(gatheringPanelBountifulFloor)ImGui.TextDisabled(localization.Get("GatheringPanel.BountifulFloor"));
-        DrawGatheringNext(shown,start,frame,items?.Find(gatheringPanelItem)?.Name ?? gatheringPanelItem.ToString(),out var next);
+        DrawGatheringNext(plan,slot,start,frame,items?.Find(gatheringPanelItem)?.Name ?? gatheringPanelItem.ToString(),out var next);
         // 0.729 (user request): the next action apart from the plan.
         if(next is { Kind:not GpNextKind.Done })ImGui.Separator();
         if(shown.Actions.Count==0)ImGui.TextUnformatted(localization.Get("GpUi.Keep"));

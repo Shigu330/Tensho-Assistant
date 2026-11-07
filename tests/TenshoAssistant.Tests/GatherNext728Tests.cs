@@ -28,7 +28,22 @@ internal static class GatherNext728Tests
         {
             var seen=Next(379,3);
             Check(seen.Kind==GpNextKind.Action && seen.Action==Bountiful && seen.Used[273]==1,"next use");
-            Check(GpNextAction.Tolerance<50,"never as much as the cheapest action");
+            Check(GpNextAction.Tolerance+GpNextAction.ReturnPerGather<50,"one gather back is never the cheapest action");
+        }),
+        ("Gather next (0.731, user report): six attempts, 823 GP, the plan done with 53 GP left and 90 % boon: Pioneer's Gift I for the last gather",() =>
+        {
+            var catalog=new GpActionCatalog(GpActionCatalog.Specs.Select(spec=>new GpAction(spec,"a"+spec.Id,1,"d")).ToArray(),"test");
+            var opened=new GpScenario(17,100,823,6,1,100,60,3,MoreActions:true);
+            GpPlan plan=new(800,31.8m,[new(catalog.Actions.Single(action=>action.Spec.Id==25590),1),new(catalog.Actions.Single(action=>action.Spec.Id==21204),1),new(catalog.Actions.Single(action=>action.Spec.Id==273),5)]);
+            var step=GpNextAction.Next(plan,823,53,6,1);
+            Check(step is { Kind:GpNextKind.Gather,Finished:true } && step.Used[273]==5,"the plan is behind, 30 GP came back over five gathers");
+            var last=GpNextAction.Leftover(step,opened,plan,catalog,53,1,100,90);
+            Check(last is { Kind:GpNextKind.Action,Leftover:true } && last.Action!.Spec.Id==21178,"Pioneer's Gift I");
+            Check(GpNextAction.Leftover(step,opened,plan,catalog,40,1,100,90).Kind==GpNextKind.Gather,"not enough GP");
+            Check(GpNextAction.Leftover(step,opened,plan,catalog,53,0,100,90).Kind==GpNextKind.Gather,"no attempt left");
+            var pending=GpNextAction.Next(plan,823,153,6,2);
+            Check(!pending.Finished && GpNextAction.Leftover(pending,opened,plan,catalog,153,2,100,90)==pending,"a bonus still waiting for its gather: the plan first");
+            Check(GpNextAction.Leftover(step,opened,plan,catalog,53,1,100,100).Kind==GpNextKind.Gather,"already 100 %");
         }),
         ("Gather next: another order is understood, a passed step is skipped, what does not add up is said",() =>
         {
