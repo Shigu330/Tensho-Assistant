@@ -290,8 +290,9 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-46 | Carte : le zoom ne reste pas toujours celui qu'on a réglé ; à faire juste avant la phase 7 | À faire, juste avant la phase 7 |
 | X-47 | Récompenses de quête (fenêtre de la quête) : ni panneau Tensho sous l'info-bulle de l'objet, ni entrée Tensho ; à faire juste avant la phase 7 | À faire, après X-46 |
 | X-48 | Carte : le clic droit sur la cible d'une quête (« Cible indiquée par le jeu (journal) ») n'offre pas l'éthérite la plus proche ; à faire juste avant la phase 7 | À faire, après X-47 |
-| X-49 | Carte : la cible de quête ne disparaît pas après validation de la quête (Ishgard, les Contreforts, capture du 2026-11-07) | À faire, après X-03 |
+| X-49 | Carte : la cible de quête ne disparaît pas après validation de la quête (Ishgard, les Contreforts, capture du 2026-11-07) | Fait en 0.813 : la demande du journal n'a pas de quête (« quest 0 » au journal) ; la cible suit le point de la quête acceptée au même endroit (liste propre du jeu) et part quand il n'y est plus |
 | X-50 | Carte : les icônes de bord de carte doivent passer au-dessus de tout (cachées sous le bandeau des noms, capture d'Abalathia) | À faire, après X-49 |
+| X-51 | Panneau des collectionnables : surligner sur les barres de raccourcis les compétences que le plan demande, comme l'aide à la récolte (capture : Œil-de-verre) | À faire, après X-50 |
 
 ## Rappels de relevés en jeu, par moment
 

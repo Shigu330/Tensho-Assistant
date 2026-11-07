@@ -34,6 +34,21 @@ public static class MapLeves
 /// window's list is still empty (docs/evidence/0.793-game-leve-markers.md). They are added to what the map window gives, each once: the same map, icon and
 /// place within a yalm is the same marker.
 /// </summary>
+/// <summary>
+/// 0.813 (X-49, user report: a quest target stays after the quest step is done): the game's journal request carries no quest (« quest 0 » in the log), so
+/// the target is tied to the accepted quest whose point stands at the same place when it is set; it goes once that quest has no point there any more.
+/// </summary>
+public static class MapQuestTarget
+{
+    public const float Near=6;
+    /// <summary>The quest with a point within a few yalms of the target; 0 when none.</summary>
+    public static uint QuestAt(IReadOnlyList<(uint Quest,uint Map,float X,float Z)> points,uint map,Vector2 world)
+        =>points.Where(point=>point.Map==map && Vector2.Distance(new(point.X,point.Z),world)<=Near).Select(point=>point.Quest).FirstOrDefault();
+    /// <summary>True when that quest no longer has a point there (step done, quest done or given up).</summary>
+    public static bool Gone(IReadOnlyList<(uint Quest,uint Map,float X,float Z)> points,uint quest,uint map,Vector2 world)
+        =>quest!=0 && !points.Any(point=>point.Quest==quest && point.Map==map && Vector2.Distance(new(point.X,point.Z),world)<=Near);
+}
+
 public static class MapGameLeves
 {
     public static IReadOnlyList<T> Merge<T>(IReadOnlyList<T> read,IReadOnlyList<T> game,Func<T,(uint Map,uint Icon,float X,float Z)> key)

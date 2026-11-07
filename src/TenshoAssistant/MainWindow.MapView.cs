@@ -992,6 +992,8 @@ internal sealed partial class MainWindow
     internal IReadOnlyList<IslandPoint>? IslandPoints { get; set; }
     private string? mapGameTargetLeve;
     private DateTimeOffset mapGameTargetSince,mapGameTargetRefresh;
+    // 0.813 (X-49): the accepted quest whose point stood where the target was set; 0 = none found yet.
+    private uint mapGameTargetObjective;
 
     // 0.243 (R-01): a journal target belongs to its quest; once that quest is no longer active (completed or abandoned), the
     // target goes. The quest list is otherwise read every 5 min, so a refresh is asked at most once a minute while such a target
@@ -1000,6 +1002,13 @@ internal sealed partial class MainWindow
     {
         // 0.655 (user report): a leve's target has no quest; it goes when the game no longer lists the leve.
         if(mapGameTarget is not null && TenshoAssistant.Maps.MapLeves.TargetGone(mapGameTargetLeve,TenshoAssistant.Maps.MapLiveReader.AcceptedLeves)){mapGameTarget=null;mapGameTargetLeve=null;return;}
+        // 0.813 (X-49): a journal target without a quest follows the quest point it stood on.
+        if(mapGameTarget is { QuestId:0 } bare && mapLive?.State?.QuestPoints is { } points)
+        {
+            var list=points.Select(point=>(point.Quest,point.MapId,point.X,point.Z)).ToArray();
+            if(mapGameTargetObjective==0)mapGameTargetObjective=TenshoAssistant.Maps.MapQuestTarget.QuestAt(list,bare.MapId,bare.World);
+            else if(TenshoAssistant.Maps.MapQuestTarget.Gone(list,mapGameTargetObjective,bare.MapId,bare.World)){mapGameTarget=null;mapGameTargetObjective=0;return;}
+        }
         if(mapGameTarget is not { QuestId: not 0 } target)return;
         var now=DateTimeOffset.UtcNow;
         if(now>=mapGameTargetRefresh){mapGameTargetRefresh=now.AddMinutes(1);quests.RequestRefresh();}
@@ -1087,6 +1096,7 @@ internal sealed partial class MainWindow
             if(FocusPixel(focus,map,live) is { } pixel)
             {
                 // 0.636 (user report): the icon stays on the way there, even once the game has forgotten its marker.
+                mapGameTargetObjective=0;
                 mapGameTarget=focus.UsesRoute(map) && focus.Route is { } way && focus.RouteIcon!=0 ? (map.MapId,way,focus.RouteIcon,focus.QuestId):focus.Target is { } world && focus.TargetIcon!=0 && map.TerritoryId!=0 && !focus.UsesRoute(map) && (maps.State.Catalog is not { } shownCatalog || focus.EntranceTarget(shownCatalog) is null) ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
                 mapGameTargetQuests=null;mapGameTargetSince=DateTimeOffset.UtcNow;mapGameTargetRefresh=default;
                 mapGameTargetLeve=focus.QuestId==0 ? TenshoAssistant.Maps.MapLiveReader.LeveKeyOf(focus.Title):null;

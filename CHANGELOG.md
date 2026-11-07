@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.813.0
+- Plan global, Verify : Signalement (X-49) : la cible de quête restait sur la carte après validation. Le journal montre que la demande de carte du jeu ne dit pas de quelle quête il s'agit (« quest 0 »), donc la règle qui retirait la cible à la fin de sa quête ne pouvait jamais s'appliquer. La cible est maintenant reliée au point de la quête acceptée qui se trouve au même endroit, lu dans la liste propre du jeu ; elle disparaît quand cette quête n'a plus de point là (étape validée, quête terminée ou abandonnée). Non validé en jeu.
+- Tests : QuestTarget813Tests. Verify.ps1 (agent) : 1399/1399, 0 avertissement, 0 erreur ; DLL 0.813.0.0. Non validé en jeu.
+### English
+- Report (X-49): the quest target stayed on the map after the step was done. The log shows the game's map request does not say which quest (« quest 0 »), so the rule removing the target at the end of its quest could never apply. The target is now tied to the accepted quest's point at the same place, read from the game's own list; it goes when that quest has no point there any more (step done, quest done or given up). Not validated in game.
+
 ## 0.812.0
 - Plan global, Verify : Signalement (X-03), suite : le clic droit sur la ligne d'une alarme ne fonctionnait toujours pas. Le journal de 21:01 montre qu'aucun menu ne s'ouvrait : depuis 0.780, le lien portait le texte « nom (clic droit : Tensho) », et le jeu ne le prenait plus pour un objet. Retour au lien d'objet du jeu de 0.774, validé à 14:29 : le nom de l'objet seul, et l'indication à côté, qui dit maintenant « (clic droit sur le nom : Tensho) ». Non validé en jeu.
 - Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1397/1397, 0 avertissement, 0 erreur ; DLL 0.812.0.0. Non validé en jeu.
