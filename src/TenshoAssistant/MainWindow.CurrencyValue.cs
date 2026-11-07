@@ -77,7 +77,8 @@ internal sealed partial class MainWindow
             {
                 var cost=offer.Sale.Costs.FirstOrDefault(entry=>entry.CurrencyItemId==currencyValueItem)?.Amount ?? 0;
                 var quote=world.WorldId==0 ? null:market.GetCached(world.WorldId,offer.Sale.ItemId);
-                decimal? price=quote is not null && market.IsFresh(quote,now) ? offer.Sale.Hq ? quote.Hq.Minimum:quote.Nq.Minimum:null;
+                // 0.711 (user report): what it really sold for, not what is asked.
+                decimal? price=quote is not null && market.IsFresh(quote,now) ? quote.Sold(offer.Sale.Hq)?.Price:null;
                 return new CurrencyBuy(offer.Sale.ItemId,Math.Max(1,offer.Sale.Quantity),cost,offer.Sale.Hq,price);
             }).Where(buy=>buy.Cost>0));
             var mounts=collected.Where(entry=>entry.Kind==CollectionKind.Mount && entry.ConfirmedUnlocked).Select(entry=>entry.Id).ToHashSet();

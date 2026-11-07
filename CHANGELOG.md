@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.711.0
+- Plan global, Marché : Rapport de l'utilisateur : la rentabilité comptait le prix demandé, or un objet affiché à 2 000 000 de gils ne se vend pas forcément. « Que puis-je fabriquer ? » et « Que faire avec ? » utilisent maintenant ce qui s'est réellement vendu sur votre monde : le plus bas entre la dernière vente et la vente moyenne, avec le nombre de ventes par jour. Sans vente connue, l'objet passe en fin de liste. COMPILED et TESTED, non validé en jeu.
+- Tests : MarketPace710Tests. Verify.ps1 (agent) : 1267/1267, 0 avertissement, 0 erreur ; DLL 0.711.0.0. Non validé en jeu.
+### English
+- User report: profitability counted the asking price, and an item listed at 2,000,000 gil does not always sell. What can I craft? and What to do with it? now use what really sold on your world: the lower of the last sale and the average sale, with sales per day. With no known sale, the item goes last. COMPILED and TESTED, not validated in game.
+
 ## 0.710.0
 - Plan global, Marché : Demande de l'utilisateur : les grosses demandes de prix vont plus vite sans gêner Universalis. Sur « Que faire avec ? » et « Que puis-je fabriquer ? » : une requête à la fois, 100 objets, une par seconde, au lieu de requêtes objet par objet toutes les 3 secondes. Un refus du site (429, 503) arrête la liste et impose au moins 30 secondes de pause. La mémoire garde maintenant 4096 prix, car 128 faisait perdre le début d'une longue liste. COMPILED et TESTED, non validé en jeu.
 - Tests : MarketPace710Tests. Verify.ps1 (agent) : 1265/1265, 0 avertissement, 0 erreur ; DLL 0.710.0.0. Non validé en jeu.

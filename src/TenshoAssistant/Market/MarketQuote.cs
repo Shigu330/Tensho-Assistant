@@ -11,6 +11,16 @@ public sealed record MarketQuote(uint WorldId, uint ItemId, DateTimeOffset Fetch
     MarketQualityPrice Nq, MarketQualityPrice Hq, MarketListing? NqCheapest = null, MarketListing? HqCheapest = null,
     MarketListing? NqRegion = null, MarketListing? HqRegion = null)
 {
+    /// <summary>
+    /// 0.711 (user report): what an item really sold for on this world, not what is asked for it: the lower of the last sale and the average sale, so that one odd sale does not lift it.
+    /// HQ when asked and sold as such, else NQ. Null: no sale known.
+    /// </summary>
+    public (decimal Price,decimal? PerDay)? Sold(bool hq)
+    {
+        static decimal? Value(MarketQualityPrice price)=>price.Average is { } average && price.RecentSale is { } last ? Math.Min(average,last):price.Average ?? price.RecentSale;
+        if(hq && Value(Hq) is { } best)return (best,Hq.Velocity);
+        return Value(Nq) is { } plain ? (plain,Nq.Velocity):null;
+    }
     public bool HasRecentUpload(DateTimeOffset now) => Recent(UploadedAt, now);
     public static bool Recent(DateTimeOffset? uploaded, DateTimeOffset now) => uploaded is { } date
         && date <= now.AddMinutes(5) && now - date <= TimeSpan.FromHours(24);

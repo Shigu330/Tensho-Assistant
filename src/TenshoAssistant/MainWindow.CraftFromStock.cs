@@ -33,8 +33,13 @@ internal sealed partial class MainWindow
     {
         var world=market.State.WorldId;
         if(world==0 || market.GetCached(world,row.Recipe.ResultItemId) is not { } quote || !market.IsFresh(quote,now))return null;
-        var canHq=itemCatalog.State.Catalog?.Find(row.Recipe.ResultItemId)?.CanBeHq==true;
-        return canHq ? quote.Hq.Minimum ?? quote.Nq.Minimum:quote.Nq.Minimum;
+        return quote.Sold(itemCatalog.State.Catalog?.Find(row.Recipe.ResultItemId)?.CanBeHq==true)?.Price;
+    }
+    private string FromStockPerDay(CraftFromStockRow row)
+    {
+        var world=market.State.WorldId;
+        var perDay=world==0 ? null:market.GetCached(world,row.Recipe.ResultItemId)?.Sold(itemCatalog.State.Catalog?.Find(row.Recipe.ResultItemId)?.CanBeHq==true)?.PerDay;
+        return perDay is { } speed ? speed.ToString("0.#",System.Globalization.CultureInfo.CurrentCulture):"?";
     }
 
     // Scrips at the high tier; only rows of one kind of scrip compare, so each kind stays together, by its group's name.
@@ -51,7 +56,7 @@ internal sealed partial class MainWindow
             case 1:
                 foreach(var row in rows)
                 {
-                    if(FromStockMarketUnit(row,now) is { } unit)fromStockValues[row.Recipe.RecipeId]=localization.Format("CraftStock.ValueMarket",Gil(CraftFromStock.Worth(row,unit)),Gil(unit));
+                    if(FromStockMarketUnit(row,now) is { } unit)fromStockValues[row.Recipe.RecipeId]=localization.Format("CraftStock.ValueMarket",Gil(CraftFromStock.Worth(row,unit)),Gil(unit),FromStockPerDay(row));
                     else if(items?.Find(row.Recipe.ResultItemId) is { IsMarketable:false })fromStockValues[row.Recipe.RecipeId]=localization.Get("CraftStock.NotMarket");
                     else if(fromStockAsked.Contains(row.Recipe.ResultItemId))fromStockValues[row.Recipe.RecipeId]=localization.Get("CurrencyValue.NoOffer");
                 }
