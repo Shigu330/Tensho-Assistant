@@ -9,7 +9,7 @@ internal static class AlarmLinkShape771Tests
         ("Alarm link: the game's item link, then the hint for the right click; the item menu has Tensho's entry",() =>
         {
             var plugin=Read("Plugin.cs");
-            Check(plugin.Contains("message.AddText(\" \").AddItemLink(alarm.ItemId,false).AddUiForeground(\" \"+localization.Get(\"Alarms.RightClickTensho\"),3);"),"ring");
+            Check(plugin.Contains("message.AddText(\" \").AddItemLink(alarm.ItemId,false,(mainWindow.AlarmItemName(alarm.ItemId) is { Length:>0 } name ? name+\" \":\"\")+localization.Get(\"Alarms.RightClickTensho\"));"),"0.780: the hint inside the link");
             Check(Read("Items/ItemContextMenuBridge.Dalamud.cs").Contains("raw=gui.HoveredItem;"),"a right click on an item link reaches Tensho's menu through the hovered item");
         }),
     ];

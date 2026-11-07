@@ -224,7 +224,9 @@ public sealed class Plugin : IDalamudPlugin
                     // 0.774 (X-03, user report and Dalamud's console in verbose): the game never handed the « Open in Tensho » link to Dalamud; it took it for an
                     // item tooltip. The ring now carries the game's own item link: hovering shows the item, a right click opens its menu, where Tensho's entry is.
                     if(alarm.ItemId is > 0 and < uint.MaxValue)
-                        message.AddText(" ").AddItemLink(alarm.ItemId,false).AddUiForeground(" "+localization.Get("Alarms.RightClickTensho"),3);
+                        // 0.780 (X-03, user report: the right click did nothing on the grey hint, which was not part of the link): the hint is inside the link, so the
+                        // whole line opens the item's menu.
+                        message.AddText(" ").AddItemLink(alarm.ItemId,false,(mainWindow.AlarmItemName(alarm.ItemId) is { Length:>0 } name ? name+" ":"")+localization.Get("Alarms.RightClickTensho"));
                     chat.Print(message.Build());
                 },alarm=>
                 {

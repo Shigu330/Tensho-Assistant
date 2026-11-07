@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.780.0
+- Plan global, Verify : Signalement (X-03) : le clic droit ne faisait rien sur l'indication grise « (clic droit : Tensho) », qui ne faisait pas partie du lien. L'indication est maintenant dans le lien d'objet : un clic droit sur toute la ligne ouvre le menu de l'objet. Non validé en jeu.
+- Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1347/1347, 0 avertissement, 0 erreur ; DLL 0.780.0.0. Non validé en jeu.
+### English
+- Report (X-03): a right click did nothing on the grey « (right click: Tensho) » hint, which was not part of the link. The hint is now inside the item link: a right click anywhere on the line opens the item's menu. Not validated in game.
+
 ## 0.779.0
 - Plan global, Verify : Signalement (X-24) : après un chargement du plugin, les peaux et la corne passaient en « Autres », puis en « Monstres » plus tard. Cause : la source des monstres (LuminaSupplemental) ne se chargeait que quand une autre page la demandait. Les listes de suivi la demandent maintenant elles-mêmes ; elle se relit de sa copie sur disque, sans réseau tant que la copie existe. Non validé en jeu.
 - Tests : ListZones752Tests. Verify.ps1 (agent) : 1347/1347, 0 avertissement, 0 erreur ; DLL 0.779.0.0. Non validé en jeu.
