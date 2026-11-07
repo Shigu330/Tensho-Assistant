@@ -170,6 +170,23 @@ public sealed class Plugin : IDalamudPlugin
             var beastWiki=new Monsters.BeastWikiIndex(dataCache,()=>configuration.CommunityWiki);
             registrations.Register(()=>{},beastWiki.Dispose);
             mainWindow.BeastWiki=beastWiki;
+            // X-43 (0.807): the local base of discoveries, read off the frame; nothing is written before it is read.
+            var discoveryFolder=Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Discoveries");
+            var discoveries=new Discoveries.DiscoveryStore();
+            mainWindow.DiscoveryStore=discoveries;mainWindow.DiscoveryFolder=discoveryFolder;
+            mainWindow.MonsterName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().GetRowOrDefault(id)?.Singular.ExtractText() ?? "";
+            _=Task.Run(()=>
+            {
+                var saved=Path.Combine(discoveryFolder,"Discoveries.json");
+                try{if(Discoveries.DiscoveryFiles.Read(saved) is { } file)discoveries.Load(file);}
+                catch(Exception error)
+                {
+                    // A file that cannot be read is set aside, never overwritten.
+                    log.Warning(error,"The discoveries could not be read; the file is kept as .broken.");
+                    try{File.Move(saved,saved+".broken",true);}catch(Exception){}
+                }
+                mainWindow.DiscoveriesLoaded=true;
+            });
             // 0.395 (user request): the wiki's spellbook table (one page for every spell) read when the Blue magic page opens, copy first.
             var blueIndex=new BlueSpellWikiIndex(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,()=>configuration.CommunityWiki);
             registrations.Register(()=>{},blueIndex.Dispose);
@@ -1305,6 +1322,7 @@ public sealed class Plugin : IDalamudPlugin
             ("Bank",()=>{if(!autoBankCapture())bankOverlay.Draw();}),
             ("CraftLog",mainWindow.DrawCraftLogHelper),
             ("MonsterIcons",mainWindow.DrawMonsterOverheadIcons),
+            ("Discoveries",mainWindow.CollectDiscoveries),
             ("ItemHover",mainWindow.DrawItemHover),
             ("UndercutClipboard",()=>undercut?.FlushClipboard()),
             ("Cactpot",mainWindow.DrawCactpotOverlay),

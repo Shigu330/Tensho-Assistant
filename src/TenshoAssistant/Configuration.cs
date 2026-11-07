@@ -57,7 +57,7 @@ public static class ConfigurationReset
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringNextHighlight", "CacheLongerDefaults", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
-        "Discord", "ThemeMode", "ThemeModeBeforeTool", "CraftLogTryAllPresets", "GatherPlanFromList", "GatheringListHighlight", "ListPanelsByZone", "ListPanelsFinishedOnly", "ListPanelsNearbyMonsters", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
+        "Discord", "ThemeMode", "ThemeModeBeforeTool", "CraftLogTryAllPresets", "GatherPlanFromList", "GatheringListHighlight", "ListPanelsByZone", "ListPanelsFinishedOnly", "ListPanelsNearbyMonsters", "Discovery", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
         // 0.347 (g, I-08): the two shop reminder settings (the notes themselves are saved data, kept by « restore every setting »).
         "ItemNoteShopReminder", "ItemNoteImportantSound",
@@ -495,6 +495,8 @@ public sealed partial class Configuration
     public bool ListPanelsFinishedOnly { get; set; }
     /// <summary>0.795 (X-35): the list lines and the map say which nearby monster drops a needed item.</summary>
     public bool ListPanelsNearbyMonsters { get; set; } = true;
+    /// <summary>X-43 (0.807): the local base of discoveries, what it notes.</summary>
+    public TenshoAssistant.Discoveries.DiscoverySettings Discovery { get; set; } = new();
     // 0.480 (user report): Scrutiny in the collectable plan, and what the bonuses add, as measured in the game's window.
     public bool CollectableUseScrutiny { get; set; } = true;
     public bool CollectableUseRestore { get; set; } = true;

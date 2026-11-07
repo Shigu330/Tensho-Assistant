@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../src/TenshoAssistant/MyTools/*.cs" Exclude="../../src/TenshoAssistant/MyTools/*.Dalamud.cs" Link="MyTools/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Discoveries/*.cs" Exclude="../../src/TenshoAssistant/Discoveries/*.Dalamud.cs" Link="Discoveries/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Localization/*.cs" Link="Localization/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Carnivale/*.cs" Exclude="../../src/TenshoAssistant/Carnivale/*.Dalamud.cs" Link="Carnivale/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Societies/*.cs" Exclude="../../src/TenshoAssistant/Societies/*.Dalamud.cs" Link="Societies/%(Filename)%(Extension)" />

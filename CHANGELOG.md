@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.807.0
+- Plan global, Verify : Demande (X-43), première étape : une base locale de découvertes. Nouvelle page Monde › Découvertes. Tensho note où vit chaque monstre près duquel vous passez (lieu à 10 yalms près, zone, niveau), dans un fichier de son dossier de réglages ; chaque entrée garde sa provenance (vue par vous, combien de fois, ou importée). Exporter écrit une copie datée à partager ; Importer joint les fichiers déposés dans « Import » sans jamais retirer vos entrées, chaque fichier une fois, les entrées fausses refusées. Recherche par nom de monstre, lieux avec clic droit vers l'éthérite la plus proche. Débogage en mode développeur (journal de chaque entrée, vider la base). Activé, hors débogage aussi ; aucun autre joueur noté, rien d'envoyé. Non validé en jeu.
+- Tests : DiscoveriesTests. Verify.ps1 (agent) : 1393/1393, 0 avertissement, 0 erreur ; DLL 0.807.0.0. Non validé en jeu.
+### English
+- Request (X-43), first step: a local base of discoveries. New page World › Discoveries. Tensho notes where each monster you pass near lives (place to 10 yalms, zone, level), in a file of its settings folder; each entry keeps its provenance (seen by you, how many times, or imported). Export writes a dated copy to share; Import joins the files put in « Import » without ever removing your entries, each file once, wrong entries refused. Search by monster name, places with a right click to the nearest aetheryte. Debugging in developer mode (log of each entry, empty the base). On, outside debugging too; no other player noted, nothing sent. Not validated in game.
+
 ## 0.806.0
 - Plan global, Verify : Lourdeur (X-01) : le relevé de 20:08:14 donne le canevas de la carte à 93 ms (boutiques 16, info-bulles 11, menus 11, texture 6…), mais la ligne « Slow frame » coupait encore à dix morceaux, dont quatre enveloppes, et cachait la moitié des points de la carte. Elle garde maintenant chaque morceau d'une milliseconde ou plus (24 au plus). Mode développeur seulement, aucun changement visible. Non validé en jeu.
 - Tests : SlowParts801Tests. Verify.ps1 (agent) : 1389/1389, 0 avertissement, 0 erreur ; DLL 0.806.0.0. Non validé en jeu.
