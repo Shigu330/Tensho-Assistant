@@ -3,11 +3,17 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
-## 0.735.0
-- Plan global, Verify : Signalement : « Cette action n'est pas sur vos barres » pour Récolte abondante II, pourtant présente. Cause : la case garde Récolte abondante, que le jeu fait évoluer en II à l'affichage. Correction : la case est comparée à l'action qu'elle affiche. Non validé en jeu.
-- Tests : GatherNext728Tests. Verify.ps1 (agent) : 1311/1311, 0 avertissement, 0 erreur ; DLL 0.735.0.0. Non validé en jeu.
+## 0.736.0
+- Plan global, Verify : Journal : l'entrée de 0.735 reprenait le texte de 0.734, la publication ayant gardé l'ancienne note ; elle est réécrite. Le script de l'agent efface maintenant la note après chaque publication. Aucun changement du plugin.
+- Tests : RecipeStock735Tests. Verify.ps1 (agent) : 1311/1311, 0 avertissement, 0 erreur ; DLL 0.736.0.0. Non validé en jeu.
 ### English
-- Report: « This action is not on your hotbars » for Bountiful Harvest II, which was there. Cause: the slot keeps Bountiful Harvest, which the game shows as II. Fix: the slot is matched by the action it shows. Not validated in game.
+- Changelog: the entry of 0.735 repeated the text of 0.734, as the release kept the previous note; it is rewritten. The agent's script now deletes the note after each release. No change to the plugin.
+
+## 0.735.0
+- Plan global, Verify : Signalement : les cristaux marqués « partiel » dans les ingrédients d'une recette, alors que vous en aviez assez. Cause : les cristaux des servants ne sont jamais lus, donc le total est un minimum. Correction : un minimum qui couvre déjà le besoin dit « OK, au moins autant » ; sinon la ligne dit que des rangements ne sont pas lus. (Entrée corrigée en 0.736 : la publication avait repris le texte de 0.734.)
+- Tests : RecipeStock735Tests. Verify.ps1 (agent) : 1311/1311, 0 avertissement, 0 erreur ; DLL 0.735.0.0. Non validé en jeu.
+### English
+- Report: crystals marked « partial » among a recipe's ingredients although there were enough. Cause: retainers' crystals are never read, so the total is a lower bound. Fix: a lower bound that already covers the need says « OK, at least this much »; otherwise the line says some storage is not read. Not validated in game. (Entry corrected in 0.736: the release had copied the text of 0.734.)
 
 ## 0.734.0
 - Plan global, Verify : Signalement : « Cette action n'est pas sur vos barres » pour Récolte abondante II, pourtant présente. Cause : la case garde Récolte abondante, que le jeu fait évoluer en II à l'affichage. Correction : la case est comparée à l'action qu'elle affiche. Non validé en jeu.
