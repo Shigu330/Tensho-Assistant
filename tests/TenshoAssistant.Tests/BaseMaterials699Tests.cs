@@ -27,11 +27,11 @@ internal static class BaseMaterials699Tests
             var lines=BaseMaterials.Expand([(Nail,3),(Ore,2)],item=>item==Nail ? 2:0,Of,item=>item==Nail);
             Check(lines.Count==2 && lines[0].Item==Nail && lines[0].Needed==3 && lines[1].Item==Ore && lines[1].Needed==2,"kept, in order");
         }),
-        ("Base materials (0.838): a crafted ingredient held stays a line, for the part taken; a list item held does not",() =>
+        ("Base materials (0.838): a crafted ingredient held stays a line, for the part taken, at every level",() =>
         {
             var lines=BaseMaterials.Expand([(Part,1)],item=>item==Ingot ? 157:0,Of,_=>false);
             Check(lines.Count==1 && lines[0]==(Ingot,2),"held ingredient shown: one for the part, one for the rivet");
-            Check(BaseMaterials.Expand([(Ingot,1)],item=>item==Ingot ? 5:0,Of,_=>false).Count==0,"the list's own item held: nothing");
+            Check(BaseMaterials.Expand([(Ingot,1)],item=>item==Ingot ? 5:0,Of,_=>false).Single()==(Ingot,1),"0.841: an item asked at the first level and held: a line too (the crafting list hands its ingredients)");
         }),
         ("Base materials: a loop and an endless chain stop",() =>
         {

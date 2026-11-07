@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.841.0
+- Plan global, Verify : Signalement (X-65), suite : le journal de la 0.840 montre que le panneau de la liste d'artisanat reçoit les ingrédients directs de la liste (marron sombre, sirop de bouleau, vin, cristaux), pas les marrons glacés eux-mêmes. Le sirop était donc au premier niveau, que la 0.838 laissait de côté. Un objet qui se fabrique et qu'on détient reste maintenant une ligne à tous les niveaux, pour la quantité prise dans le stock, avec l'icône d'entrepôt s'il est chez un servant. Non validé en jeu.
+- Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1426/1426, 0 avertissement, 0 erreur ; DLL 0.841.0.0. Non validé en jeu.
+### English
+- Report (X-65), follow-up: the 0.840 log shows the crafting list's panel gets the list's direct ingredients (dark chestnut, birch syrup, wine, crystals), not the marrons glacés themselves. The syrup was so at the first level, which 0.838 left out. A crafted item held now stays a line at every level, for the quantity taken from the stock, with the warehouse icon when a retainer holds it. Not validated in game.
+
 ## 0.840.0
 - Plan global, Verify : Signalement (X-65) : après la 0.838, le sirop de bouleau n'apparaît toujours pas dans le panneau de la liste. Le calcul le garde pourtant dans les tests ; pour voir où il se perd en jeu, le mode développeur note au journal, à chaque changement, ce que le panneau demande et chaque ligne obtenue, avec son stock, sa recette et son groupe. Non validé en jeu.
 - Tests : ListPanelLog840Tests. Verify.ps1 (agent) : 1426/1426, 0 avertissement, 0 erreur ; DLL 0.840.0.0. Non validé en jeu.
