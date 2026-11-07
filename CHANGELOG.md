@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.738.0
+- Plan global, Verify : Décision DEC-040 : le passage des pages reste automatique, en mode développeur seulement, avec les requêtes que les pages font à leur ouverture (choix de l'utilisateur). Aucun changement du plugin.
+- Tests : PageSweep724Tests. Verify.ps1 (agent) : 1312/1312, 0 avertissement, 0 erreur ; DLL 0.738.0.0. Non validé en jeu.
+### English
+- Decision DEC-040: the page sweep stays automatic, in developer mode only, with the requests pages make when opened (the user's choice). No change to the plugin.
+
 ## 0.737.0
 - Plan global, Verify : Signalement : le menu du clic droit sur l'icône d'un matériau de projet se fermait parfois tout de suite. Cause : son identifiant comptait toutes les icônes de l'image, dans toutes les fenêtres ; une icône de plus ou de moins ailleurs le changeait et ImGui fermait le menu. Correction : il ne compte plus que le même objet au même endroit. Vaut pour toutes les icônes d'objets. Non validé en jeu.
 - Tests : ItemMenu737Tests. Verify.ps1 (agent) : 1312/1312, 0 avertissement, 0 erreur ; DLL 0.737.0.0. Non validé en jeu.

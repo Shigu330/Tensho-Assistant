@@ -394,3 +394,13 @@ Decision: Pas de soumission au dépôt officiel. Tensho continue sur le dépôt 
 Reason: Décision de l'utilisateur.
 Consequences: La 1.0.0 marque la fin du plan global sur le dépôt personnalisé, sans PR D17 ; c'est toujours l'utilisateur qui la décide. docs/project/PUBLISHING.md reste la liste des règles à tenir, les étapes de soumission ne sont plus à faire. Un petit plugin séparé reste possible un jour, sur sa demande. Découper Tensho en plusieurs plugins : étudié en brouillon le 2026-11-06 et abandonné par l'utilisateur (« on va pas le faire »), branche retirée.
 References: DEC-023, DEC-037, docs/project/PUBLISHING.md
+
+DEC-ID: DEC-040
+Timestamp: 2026-11-07 Europe/Brussels
+Problem: Le passage des pages de l'auto-contrôle (0.724, corrigé en 0.726) ouvre chaque page sans clic ; certaines demandent alors une source communautaire activée dans les réglages (44 requêtes au premier passage, 2 au suivant grâce au cache).
+Evidence: docs/evidence/0.724-page-sweep.md. Choix de l'utilisateur : « Oui, en automatique et que pour dev ».
+Options: Automatique en mode développeur ; seulement sur demande ; automatique sans aucune requête.
+Decision: Automatique, en mode développeur seulement, avec les requêtes que les pages font à leur ouverture, dans les réglages de l'utilisateur. La page Marché reste exclue (Universalis). Hors mode développeur, rien ne se lance.
+Reason: Décision de l'utilisateur.
+Consequences: Le résumé du passage donne le nombre de requêtes et leurs hôtes. Un test vérifie que la fenêtre ne s'ouvre qu'en mode développeur.
+References: DEC-038, docs/evidence/0.724-page-sweep.md
