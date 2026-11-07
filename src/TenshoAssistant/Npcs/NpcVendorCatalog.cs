@@ -25,17 +25,20 @@ public sealed record NpcVendorCacheData(string DataVersion,IReadOnlyList<NpcVend
 /// <summary>Shop links as copied from game sheets; resolution follows direct shops, topic menus, pre-handlers and talk scripts.</summary>
 public static class NpcShopLinks
 {
-    public const int Always=0,DuringFestival=1,DuringQuest=2;
+    public const int Always=0,DuringFestival=1,DuringQuest=2,Unplaced=3;
     /// <summary>
     /// 0.811 (X-45, user report: event vendors on the map while absent): a layout layer's condition. Limsa's planevent.lgb (tools/MapMaskProbe --lgb 128,
     /// docs/evidence/0.811-conditional-npcs.md): 136 layers with a FestivalID, and layers « EVT_OP_ONLY_ENPC », « QST_… », « QB_… » for the opening and quests.
     /// </summary>
+    /// 0.829 (tools/MapMaskProbe --lgb 128, planner.lgb): « QST_ENPC01 » to « QST_ENPC14 » hold the Upper Decks' permanent NPCs (up to 34 a layer): always there.
     public static (int Condition,uint Festival) LayerCondition(string? layer,uint festival)=>festival!=0 ? (DuringFestival,festival)
-        :layer is { } name && (name.StartsWith("QST_",StringComparison.Ordinal) || name.StartsWith("QB_",StringComparison.Ordinal) || name.StartsWith("EVT_OP",StringComparison.Ordinal)) ? (DuringQuest,0u):(Always,0u);
+        :layer is { } name && !name.StartsWith("QST_ENPC",StringComparison.Ordinal)
+         && (name.StartsWith("QST_",StringComparison.Ordinal) || name.StartsWith("QB_",StringComparison.Ordinal) || name.StartsWith("EVT_OP",StringComparison.Ordinal)) ? (DuringQuest,0u):(Always,0u);
     /// <summary>0.823: of two layers placing one NPC, the one that keeps it there more: always, then a festival, then a quest or the opening.</summary>
     public static (int Condition,uint Festival) MorePresent((int Condition,uint Festival) first,(int Condition,uint Festival) second)
         =>first.Condition==Always || second.Condition==Always ? (Always,0u):first.Condition==DuringFestival ? first:second;
     /// <summary>0.811: a place shown on the map: always there, or its festival running; never a quest's or the opening's.</summary>
+    /// 0.829: never a vendor placed by no layer at all (only a Level row): on the Upper Decks all nine are event NPCs (docs/evidence/0.811-conditional-npcs.md).
     public static bool Present(NpcLocation spot,IReadOnlySet<uint> running)=>spot.Condition==Always || spot.Condition==DuringFestival && running.Contains(spot.Festival);
 
     public const int MaximumDepth=4;
@@ -190,7 +193,7 @@ public static class NpcVendorCache
     public const int MaximumRows=500_000;
     // Bump when the sheet-to-record copy rules change without a change of record shape.
     // 2: FateShop links (gemstone traders). 3: InclusionShop links (scrip exchanges), encoded currencies no longer mapped (2026-10-30).
-    private const int CopyRules=14; // 14: Level positions take a festival's condition only. // 13: Level positions take their layer's condition. // 12: layer conditions (festival, quest, opening). 11: Kaede's archaeology talk (Auxesia). 8: observed talk links; 9: planevent.lgb; 10: planner.lgb + header check + crystal exchange. // 4: purple scrips; 5: (type, id) table; 6: currencies keyed by CostType (tomestones vs scrips).
+    private const int CopyRules=15; // 15: QST_ENPC layers permanent; Level-only vendors unplaced. // 14: Level positions take a festival's condition only. // 13: Level positions take their layer's condition. // 12: layer conditions (festival, quest, opening). 11: Kaede's archaeology talk (Auxesia). 8: observed talk links; 9: planevent.lgb; 10: planner.lgb + header check + crystal exchange. // 4: purple scrips; 5: (type, id) table; 6: currencies keyed by CostType (tomestones vs scrips).
     public static readonly string Shape=CatalogCacheKeys.Shape(typeof(NpcVendor),typeof(NpcLocation),typeof(NpcShopSale),typeof(NpcCost),typeof(NpcShopKind));
     public static string Version(string dataVersion)=>CatalogCacheKeys.Version(dataVersion,CopyRules,Shape);
     public static bool Valid(NpcVendorCacheData? data,string dataVersion)

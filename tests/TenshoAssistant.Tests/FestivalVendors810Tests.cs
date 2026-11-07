@@ -13,6 +13,8 @@ internal static class FestivalVendors810Tests
             Check(NpcShopLinks.LayerCondition("QST_ClsArm530",0)==(NpcShopLinks.DuringQuest,0u) && NpcShopLinks.LayerCondition("QB_JobAst401_001",0).Condition==NpcShopLinks.DuringQuest
                 && NpcShopLinks.LayerCondition("EVT_OP_ONLY_ENPC",0).Condition==NpcShopLinks.DuringQuest,"quest, opening");
             Check(NpcShopLinks.LayerCondition("PUB_ENPC_HANDLER",0).Condition==NpcShopLinks.Always && NpcShopLinks.LayerCondition(null,0).Condition==NpcShopLinks.Always,"other layers: always");
+            Check(NpcShopLinks.LayerCondition("QST_ENPC06",0).Condition==NpcShopLinks.Always && NpcShopLinks.LayerCondition("QST_ClsAcn250_000",0).Condition==NpcShopLinks.DuringQuest,"0.829: QST_ENPC permanent");
+            Check(!NpcShopLinks.Present(new NpcLocation(128,11,"",1,1,0,0,0,NpcShopLinks.Unplaced),new HashSet<uint>()),"0.829: a Level-only vendor not on the map");
             Check(NpcShopLinks.MorePresent((2,0),(1,27))==(1,27u) && NpcShopLinks.MorePresent((1,27),(0,0))==(0,0u) && NpcShopLinks.MorePresent((2,0),(2,0))==(2,0u),"0.823: the layer that keeps it most");
             var loader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs"));
             Check(loader.Contains("list[index]=list[index] with {Condition=placed.Condition,Festival=placed.Festival};"),"0.823: Level positions too");

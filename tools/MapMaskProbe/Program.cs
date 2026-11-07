@@ -77,11 +77,29 @@ if(args.Length>2 && args[1]=="--lgb" && uint.TryParse(args[2],out var territoryR
         {
             var npcs=layer.InstanceObjects.Where(o=>o.AssetType==Lumina.Data.Parsing.Layer.LayerEntryType.EventNPC).ToArray();
             if(npcs.Length==0)continue;
-            Console.WriteLine($"{kind} layer {layer.LayerId} \"{layer.Name}\" festival {layer.FestivalID} phase {layer.FestivalPhaseID} npcs {npcs.Length}: "+string.Join(" ",npcs.Take(12).Select(o=>$"{((Lumina.Data.Parsing.Layer.LayerCommon.ENPCInstanceObject)o.Object).ParentData.ParentData.BaseId}@{o.Transform.Translation.X:F0},{o.Transform.Translation.Z:F0}")));
+            Console.WriteLine($"{kind} layer {layer.LayerId} \"{layer.Name}\" festival {layer.FestivalID} phase {layer.FestivalPhaseID} npcs {npcs.Length}: "+string.Join(" ",npcs.Select(o=>$"{((Lumina.Data.Parsing.Layer.LayerCommon.ENPCInstanceObject)o.Object).ParentData.ParentData.BaseId}@{o.Transform.Translation.X:F0},{o.Transform.Translation.Z:F0}")));
         }
     }
 }
 
+
+// X-45 (0.829): « --npc <id> »: every territory whose planevent.lgb or planner.lgb places that event NPC, with the layer, its festival and the territory's map.
+if(args.Length>2 && args[1]=="--npc" && uint.TryParse(args[2],out var npcWanted))
+    foreach(var place in game.GetExcelSheet<TerritoryType>()!)
+    {
+        var bgPath=place.Bg.ExtractText();var cutAt=bgPath.IndexOf("/level/",StringComparison.Ordinal);
+        if(cutAt<0)continue;
+        foreach(var kind in new[]{"planevent","planner"})
+        {
+            var path=$"bg/{bgPath[..(cutAt+1)]}level/{kind}.lgb";
+            if(!game.FileExists(path))continue;
+            Lumina.Data.Files.LgbFile? file;try{file=game.GetFile<Lumina.Data.Files.LgbFile>(path);}catch{continue;}
+            foreach(var layer in file!.Layers)
+                foreach(var o in layer.InstanceObjects)
+                    if(o.AssetType==Lumina.Data.Parsing.Layer.LayerEntryType.EventNPC && ((Lumina.Data.Parsing.Layer.LayerCommon.ENPCInstanceObject)o.Object).ParentData.ParentData.BaseId==npcWanted)
+                        Console.WriteLine($"territory {place.RowId} map {place.Map.RowId} {kind} \"{layer.Name}\" festival {layer.FestivalID}");
+        }
+    }
 
 static class Png
 {
