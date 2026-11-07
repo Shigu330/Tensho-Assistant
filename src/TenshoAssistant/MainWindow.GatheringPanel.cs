@@ -44,7 +44,8 @@ internal sealed partial class MainWindow
     private bool gatheringTrackedPicked;
     private static void DrawGatheringSlotFrame(ActionBarRect rect)
     {
-        var draw=ImGui.GetForegroundDrawList();
+        // 0.764 (X-17): under Tensho's windows, over the game.
+        var draw=ImGui.GetBackgroundDrawList();
         var min=new Vector2(rect.X,rect.Y);var max=min+new Vector2(rect.Width,rect.Height);
         draw.AddRect(min,max,ImGui.GetColorU32(UI.FfxivTheme.Success),6,ImDrawFlags.None,3);
     }
@@ -57,7 +58,8 @@ internal sealed partial class MainWindow
         var now=Environment.TickCount64;
         long Panel(string key)
         {
-            if(!listPanelLines.TryGetValue(key,out var known) || now-known.At>5000)return 0;
+            // 0.764 (X-17): a folded panel still counts; a closed one does not.
+            if(ListPanelLinesFor(key) is not { } known)return 0;
             var needed=known.Lines.Where(line=>line.Item==item).Sum(line=>line.Needed);
             if(needed<=0)return 0;
             var held=GetRecipeHoldings(item);
@@ -72,7 +74,8 @@ internal sealed partial class MainWindow
     private static void DrawGatheringBarHighlight(Gathering.ActionBarLocator located)
     {
         if(located.Rects is not { Count:>0 } rects)return;
-        var draw=ImGui.GetForegroundDrawList();
+        // 0.764 (X-17): under Tensho's windows, over the game.
+        var draw=ImGui.GetBackgroundDrawList();
         var pulse=0.65f+0.35f*MathF.Sin((float)(DateTime.UtcNow.TimeOfDay.TotalSeconds*5));
         var border=ImGui.GetColorU32(UI.FfxivTheme.Gold with {W=pulse});
         var fill=ImGui.GetColorU32(UI.FfxivTheme.Gold with {W=0.18f*pulse});

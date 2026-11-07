@@ -10,7 +10,8 @@ internal static class TrackedNeed751Tests
         {
             var panel=Read("MainWindow.GatheringPanel.cs");
             Check(panel.Contains("return Math.Max(GatherListNeed(item),Panel(\"CraftList\"))+Panel(\"Workshop\")+Panel(\"Preparation\");"),"sum");
-            Check(panel.Contains("now-known.At>5000"),"fresh lists only");
+            Check(panel.Contains("if(ListPanelLinesFor(key) is not { } known)return 0;") && Read("MainWindow.ListPanels.cs").Contains("if(!ListPanelOn(key) || !listPanelSources.TryGetValue(key,out var source))return null;"),"0.764: folded counts, closed does not");
+            Check(!panel.Contains("GetForegroundDrawList") && panel.Contains("ImGui.GetBackgroundDrawList()"),"0.764: frames under Tensho's windows");
             Check(panel.Contains("configuration.GatheringListHighlight && GatheringSlotRects?.Invoke()"),"setting");
             var reader=Read("Gathering/GatheringObservationReader.Dalamud.cs");
             Check(reader.Contains("slotRects=Rects(addon);") && !reader.Contains("FireCallback"),"read only, with the slots");

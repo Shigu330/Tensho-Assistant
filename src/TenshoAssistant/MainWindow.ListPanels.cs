@@ -166,7 +166,21 @@ internal sealed partial class MainWindow
     // W-09 (0.699): worked out at most once a second per panel, not on every frame.
     private readonly Dictionary<string,(long At,(uint Item,long Needed)[] Lines)> listPanelLines=[];
     private long listPanelQuestsAsked=-60001;
+    // 0.764 (X-17, user report): the lines of a panel are also worked out while it is folded, for the gathering help, from the source it last drew with.
+    private readonly Dictionary<string,Func<(uint Item,long Needed)[]>> listPanelSources=[];
+    private bool ListPanelOn(string key)=>key switch{"CraftList"=>configuration.CraftListPanel,"Workshop"=>configuration.WorkshopPanel,"Preparation"=>configuration.PreparationPanel,_=>false};
+    private (long At,(uint Item,long Needed)[] Lines)? ListPanelLinesFor(string key)
+    {
+        if(!ListPanelOn(key) || !listPanelSources.TryGetValue(key,out var source))return null;
+        return ListPanelLinesOf(key,source);
+    }
     private void DrawListPanelEntries(string key,Func<(uint Item,long Needed)[]> entries)
+    {
+        listPanelSources[key]=entries;
+        var known=ListPanelLinesOf(key,entries);
+        DrawListPanelEntriesFrom(key,known);
+    }
+    private (long At,(uint Item,long Needed)[] Lines) ListPanelLinesOf(string key,Func<(uint Item,long Needed)[]> entries)
     {
         var now=Environment.TickCount64;
         if(!listPanelLines.TryGetValue(key,out var known) || now-known.At>1000)
@@ -177,6 +191,10 @@ internal sealed partial class MainWindow
             if(configuration.ListPanelsBase && configuration.ListPanelsMetOnly && quests.State.Entries.Count==0 && now-listPanelQuestsAsked>60000){listPanelQuestsAsked=now;quests.RequestRefresh();}
             listPanelLines[key]=known=(now,configuration.ListPanelsBase ? BaseMaterials.Expand(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched).ToArray():wanted);
         }
+        return known;
+    }
+    private void DrawListPanelEntriesFrom(string key,(long At,(uint Item,long Needed)[] Lines) known)
+    {
         DrawListPanelAlarms(key,known.Lines);
         if(!configuration.ListPanelsBase)
         {

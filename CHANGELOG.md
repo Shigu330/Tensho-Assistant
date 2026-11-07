@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.764.0
+- Plan global, Verify : Signalements (X-17) : panneau de suivi réduit, l'aide perdait « Vos listes en demandent encore » et le cadre ; et les cadres passaient au-dessus des autres fenêtres. Corrections : les lignes d'un panneau réduit sont recalculées (un panneau fermé ne compte pas) ; les cadres de la fenêtre de récolte et des barres sont dessinés sous les fenêtres de Tensho, au-dessus du jeu. Non validé en jeu.
+- Tests : TrackedNeed751Tests. Verify.ps1 (agent) : 1337/1337, 0 avertissement, 0 erreur ; DLL 0.764.0.0. Non validé en jeu.
+### English
+- Reports (X-17): with the tracking panel folded, the help lost « Your lists still need » and its frame; and the frames went over other windows. Fixes: the lines of a folded panel are worked out (a closed panel does not count); the frames on the gathering window and the hotbars are drawn under Tensho's windows, over the game. Not validated in game.
+
 ## 0.763.0
 - Plan global, Verify : Demande (X-16) : quand deux plans de PR donnent le même rendement, l'aide choisit celui qui demande le moins de clics (une action qui dure toute la récolte plutôt qu'une par récolte), puis le moins cher. Un meilleur rendement reste prioritaire. Non validé en jeu.
 - Tests : FewerClicks763Tests. Verify.ps1 (agent) : 1337/1337, 0 avertissement, 0 erreur ; DLL 0.763.0.0. Non validé en jeu.
