@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.732.0
+- Plan global, Verify : Page Récolte : la liste « En ce moment » se calcule hors de l'image ; le passage des pages y avait mesuré une image de 41 ms à chaque minute d'Eorzéa. Non validé en jeu.
+- Tests : PageSweep724Tests. Verify.ps1 (agent) : 1310/1310, 0 avertissement, 0 erreur ; DLL 0.732.0.0. Non validé en jeu.
+### English
+- Gathering page: the « Now and soon » list is worked out off the frame; the page sweep had measured a 41 ms frame there every Eorzea minute. Not validated in game.
+
 ## 0.731.0
 - Plan global, Verify : Signalement : à la fin du plan il restait 53 PR et 90 % de supplément, sans proposer Sols fertiles I. Cause : chaque récolte rend 6 PR (relevé : +6 après une, +30 après cinq), que le plan d'ouverture ne compte pas. Correction : les étapes en tiennent compte, et une fois le plan fini, le calcul est refait avec les PR restants et les taux du moment. Non validé en jeu.
 - Tests : GatherNext728Tests. Verify.ps1 (agent) : 1310/1310, 0 avertissement, 0 erreur ; DLL 0.731.0.0. Non validé en jeu.

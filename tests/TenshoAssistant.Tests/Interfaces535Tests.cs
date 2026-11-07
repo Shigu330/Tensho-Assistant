@@ -320,7 +320,7 @@ internal static class Interfaces535Tests
         ("0.588: the gathering page lists the timed points open now or soon, once per Eorzea minute",() =>
         {
             var view=Read("MainWindow.GatheringBrowser.cs");
-            Check(view.Contains("if(key!=gatheringNowKey)") && view.Contains("DrawGatheringNow(sources);"),"once per Eorzea minute");
+            Check(view.Contains("if(key!=gatheringNowKey && gatheringNowTask is null)") && view.Contains("DrawGatheringNow(sources);"),"once per Eorzea minute");
             Check(Read("Gathering/GatheringTimeline.cs").Contains("source.IsFishing || source.Timing.Kind!=GatheringScheduleKind.Limited"),"timed, no fish");
         }),
         ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>

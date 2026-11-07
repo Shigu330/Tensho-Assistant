@@ -51,6 +51,7 @@ internal static class PageSweep724Tests
             Check(wired.Contains("configuration.DeveloperMode") && wired.Contains("selfCheck?.LastLines.Count>0"),"after the self-check");
             // A hidden window is never hovered: only a raw test of the mouse could react to a click, and the pages have none.
             foreach(var file in Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant"),"MainWindow*.cs"))Check(!File.ReadAllText(file).Contains("IsMouseHoveringRect"),file);
+            Check(Read("MainWindow.GatheringBrowser.cs").Contains("Task.Run(()=>GatheringNow.Rows(all,now,"),"0.732: the slow page found by the sweep works off the frame");
             var pages=Read("MainWindow.PageSweep.cs");
             Check(pages.Contains("entry.Page!=Page.Market") && pages.Contains("page=kept"),"market and page");
             Check(Read("MainWindow.cs").Contains("        OpenGuideOnce();\n        ValidateDrawContext();") || Read("MainWindow.cs").Contains("        OpenGuideOnce();\r\n        ValidateDrawContext();"),"same preparation as the window");

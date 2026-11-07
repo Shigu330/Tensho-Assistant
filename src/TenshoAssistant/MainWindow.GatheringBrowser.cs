@@ -30,12 +30,20 @@ internal sealed partial class MainWindow
     private GatheringSource[] sourceTypes = [];
 
     // 0.588 (C7): recomputed once per Eorzea minute, and only while this section is open.
+    // 0.732: worked out off the frame: the page sweep measured 41 ms for one frame of this page, every Eorzea minute (docs/evidence/0.724-page-sweep.md).
     private long gatheringNowKey=-1;private IReadOnlyList<(GatheringSource Source,GatheringOpening Opening)> gatheringNowRows=[];
+    private Task<IReadOnlyList<(GatheringSource Source,GatheringOpening Opening)>>? gatheringNowTask;
     private void DrawGatheringNow(GatheringCatalog sources)
     {
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("GatheringBrowser.NowTitle")+"###GatheringNow"))return;
         var now=DateTimeOffset.UtcNow;var key=now.ToUnixTimeSeconds()*12/35;
-        if(key!=gatheringNowKey){gatheringNowKey=key;gatheringNowRows=GatheringNow.Rows(sources.Sources,now,TimeSpan.FromHours(1),60);}
+        if(gatheringNowTask is { IsCompleted:true } done){gatheringNowTask=null;if(done.IsCompletedSuccessfully)gatheringNowRows=done.Result;}
+        if(key!=gatheringNowKey && gatheringNowTask is null)
+        {
+            gatheringNowKey=key;
+            var all=sources.Sources;
+            gatheringNowTask=Task.Run(()=>GatheringNow.Rows(all,now,TimeSpan.FromHours(1),60));
+        }
         if(gatheringNowRows.Count==0){ImGui.TextDisabled(localization.Get("GatheringBrowser.NowEmpty"));return;}
         if(!ImGui.BeginTable("GatheringNowRows",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp))return;
         try
