@@ -19,6 +19,8 @@ internal sealed partial class MainWindow
     private DateTimeOffset reminderTimersTriedAt;
     private string? reminderTimersError;
 
+    // 0.687 (user request): the page in tabs.
+    private string? reminderTabFocus;
     private void DrawReminders()
     {
         Heading(localization.Get("Reminders.Title"),localization.Get("Reminders.Description"));
@@ -27,7 +29,7 @@ internal sealed partial class MainWindow
         if(now-reminderTimersTriedAt>=wait)
         {
             reminderTimersTriedAt=now;
-            try{reminderTimers=GameTimers.Read(DailyRoulettes?.Invoke(),ChallengeRows?.Invoke());reminderTimersError=null;}
+            try{reminderTimers=GameTimers.Read(DailyRoulettes?.Invoke(),ChallengeRows?.Invoke(),CompanyActionNames);reminderTimersError=null;TickRemindersFromGame(reminderTimers);}
             catch(Exception error)
             {
                 if(reminderTimersError!=error.Message)log.Warning(error,"Game timers could not be read.");
@@ -35,10 +37,22 @@ internal sealed partial class MainWindow
             }
         }
         var timers=reminderTimers;
-        if(!ImGui.BeginTable("Reminders",6,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        DetailTabs("ReminderTabs",
+        [
+            ("Timers",localization.Get("Reminders.TabTimers"),()=>DrawReminderTimers(timers,now)),
+            ("Tasks",localization.Get("Reminders.TabTasks"),()=>DrawPersonalTasks()),
+            ("Roulettes",localization.Get("Reminders.TabRoulettes"),()=>DrawDailyRoulettes(timers)),
+            ("Squadron",localization.Get("Reminders.TabSquadron"),()=>DrawSquadronPlanner()),
+            ("Status",localization.Get("Reminders.TabStatus"),()=>DrawCharacterStatuses()),
+        ],ref reminderTabFocus);
+    }
+
+    private void DrawReminderTimers(GameTimerSnapshot? timers,DateTimeOffset now)
+    {
+        if(!ImGui.BeginTable("Reminders",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
         try
         {
-            foreach(var key in new[]{"Task","State","Next","Done","Bar",""})ImGui.TableSetupColumn(key.Length==0 ? "":localization.Get("Reminders.Column"+key),key.Length==0 ? ImGuiTableColumnFlags.WidthFixed:ImGuiTableColumnFlags.None,key.Length==0 ? 28:0);
+            foreach(var key in new[]{"Task","State","Next","Done","Bar","Discord",""})ImGui.TableSetupColumn(key.Length==0 ? "":localization.Get("Reminders.Column"+key),key.Length==0 ? ImGuiTableColumnFlags.WidthFixed:ImGuiTableColumnFlags.None,key.Length==0 ? 28:0);
             ImGui.TableHeadersRow();
             var supplyReset=ResetSchedule.NextDaily(now,ResetSchedule.SupplyHour);
             Row("Supply",FontAwesomeIcon.Shield,localization.Get("Reminders.SupplyState"),supplyReset,ResetSchedule.PreviousDaily(now,ResetSchedule.SupplyHour));
@@ -102,17 +116,42 @@ internal sealed partial class MainWindow
             var ventures=timers?.Ventures;
             var nextVenture=ventures?.Where(venture=>venture.Done>now).Select(venture=>venture.Done).Min();
             Row("Ventures",FontAwesomeIcon.Bell,ventures is null ? localization.Get("Reminders.VenturesUnknown")
-                :localization.Format("Reminders.VenturesState",ventures.Count,ventures.Count(venture=>venture.Done is { } done && done<=now)),nextVenture,null);
+                :localization.Format("Reminders.VenturesState",ventures.Count,ventures.Count(venture=>venture.Done is { } done && done<=now)),nextVenture,null,()=>
+            {
+                // 0.570 (T16): retainer by retainer, with a bell; and one bell for when they are all back.
+                if(ventures is not { Count:>0 } || !ImGui.TreeNode(localization.Get("Reminders.VenturesDetail")+"##VenturesDetail"))return;
+                try
+                {
+                    foreach(var (name,end) in ventures)
+                    {
+                        if(end is not { } at)ImGui.TextDisabled(localization.Format("Reminders.VentureNone",name));
+                        else if(at<=now)ImGui.TextColored(Success,localization.Format("Reminders.VentureDone",name));
+                        else
+                        {
+                            ImGui.TextUnformatted(localization.Format("Reminders.VentureAt",name,at.ToLocalTime().ToString("g")));
+                            ImGui.SameLine();
+                            AlarmButton("Venture"+name,localization.Format("Reminders.AlarmTip",name),()=>[new TenshoAlarm{ReminderRow="Ventures",Label=name,Group=localization.Get("Reminders.Title"),Source=AlarmSource.Reminder,Repeat=AlarmRepeat.Once,At=at,LeadMinutes=0}]);
+                        }
+                    }
+                    if(ventures.Where(venture=>venture.Done>now).Select(venture=>venture.Done).Max() is { } lastBack)
+                    {
+                        ImGui.TextUnformatted(localization.Format("Reminders.VenturesAllAt",lastBack.ToLocalTime().ToString("g")));
+                        ImGui.SameLine();
+                        AlarmButton("VenturesAll",localization.Get("Reminders.VenturesAllTip"),()=>[new TenshoAlarm{ReminderRow="Ventures",Label=localization.Get("Reminders.Ventures"),Group=localization.Get("Reminders.Title"),Source=AlarmSource.Reminder,Repeat=AlarmRepeat.Once,At=lastBack,LeadMinutes=0}]);
+                    }
+                }
+                finally{ImGui.TreePop();}
+            });
             // 0.333 (DEC-023 6): Grand Company squadron, mission and training, ends read from the game (PlayerState).
             SquadronRow("SquadronMission",FontAwesomeIcon.Flag,timers?.SquadronMission,SquadronMissionName);
             SquadronRow("SquadronTraining",FontAwesomeIcon.Dumbbell,timers?.SquadronTraining,SquadronTrainingName);
+            CompanyActionsRow(timers?.CompanyBenefits);
         }
         finally{ImGui.EndTable();}
         ImGui.TextDisabled(localization.Get("Reminders.Help"));
-        DrawPersonalTasks();
-        DrawSquadronPlanner();
-        DrawDailyRoulettes(timers);
-        DrawCharacterStatuses();
+        var fromGame=configuration.RemindersFromGame;
+        if(ImGui.Checkbox(localization.Get("Reminders.FromGame"),ref fromGame)){configuration.RemindersFromGame=fromGame;SaveReminders();}
+        Tip("Reminders.FromGameTip");
 
         void SquadronRow(string key,FontAwesomeIcon icon,SquadronTimer? timer,Func<ushort,string?>? nameOf)
         {
@@ -127,6 +166,20 @@ internal sealed partial class MainWindow
                 if(timer.Done is { } end && end>now)next=end;
             }
             Row(key,icon,state,next,null);
+        }
+
+        // T27 (0.651): the active company actions and when each ends, known once the Actions tab was opened.
+        void CompanyActionsRow(IReadOnlyList<CompanyBenefit>? benefits)
+        {
+            string BenefitName(uint status)=>CompanyActionNames?.GetValueOrDefault(status) ?? $"#{status}";
+            string BenefitText(CompanyBenefit benefit)=>benefit.Ends is { } ends && ends>now
+                ? localization.Format("Reminders.CompanyActionLeft",BenefitName(benefit.Status),(int)(ends-now).TotalHours,(ends-now).Minutes):BenefitName(benefit.Status);
+            var state=benefits is null ? localization.Get("Reminders.CompanyActionsUnknown")
+                :benefits.Count==0 ? localization.Get("Reminders.CompanyActionsNone")
+                :string.Join(", ",benefits.Select(BenefitText));
+            if(benefits is { Count:>0 } && benefits.Any(benefit=>benefit.Ends is null))state+=" "+localization.Get("Reminders.CompanyActionsOpen");
+            DateTimeOffset? first=benefits?.Where(benefit=>benefit.Ends>now).Select(benefit=>benefit.Ends).Min();
+            Row("CompanyActions",FontAwesomeIcon.Users,state,first,null);
         }
 
         void Row(string key,FontAwesomeIcon icon,string state,DateTimeOffset? next,DateTimeOffset? lastReset,Action? extra=null)
@@ -167,17 +220,56 @@ internal sealed partial class MainWindow
                 }
                 Tip("Reminders.BarRowTip");
             }
+            // 0.578 (user request): this row's alarms on Discord or not, one by one.
+            ImGui.TableNextColumn();
+            var toDiscord=configuration.Discord?.ReminderRowsOff?.Contains(key)!=true;
+            ImGui.BeginDisabled(configuration.Discord is not { Enabled:true });
+            try
+            {
+                if(ImGui.Checkbox("##Discord"+key,ref toDiscord) && configuration.Discord is { } discord)
+                {
+                    var off=discord.ReminderRowsOff ?? [];
+                    discord.ReminderRowsOff=toDiscord ? off.Where(row=>row!=key).ToList():[..off.Where(row=>row!=key),key];
+                    SaveReminders();
+                }
+            }
+            finally{ImGui.EndDisabled();}
+            if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Reminders.DiscordRowTip"));
             ImGui.TableNextColumn();
             if(next is { } alarmAt && alarmAt>now)
                 AlarmButton("Reminder"+key,localization.Format("Reminders.AlarmTip",localization.Get("Reminders."+key)),
                     // 0.331: the vessels' return goes to Discord under « Free company », as from the Free company page.
-                    ()=>[new TenshoAlarm{Label=localization.Get("Reminders."+key),Group=localization.Get("Reminders.Title"),Source=key=="Voyages" ? AlarmSource.Voyage:AlarmSource.Reminder,Repeat=AlarmRepeat.Once,At=alarmAt,
+                    ()=>[new TenshoAlarm{ReminderRow=key,Label=localization.Get("Reminders."+key),Group=localization.Get("Reminders.Title"),Source=key=="Voyages" ? AlarmSource.Voyage:AlarmSource.Reminder,Repeat=AlarmRepeat.Once,At=alarmAt,
                         LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead)}]);
         }
     }
 
     // Names of squadron missions and trainings from the game data (set by Plugin.cs), kept by id; « #id » when the row is unknown.
+    // 0.584: alarms made from a Reminders row before rows were kept: found once by their name, so that the row's box decides for them too.
+    private static readonly string[] ReminderAlarmRows=["Supply","Deliveries","Fashion","Allied","Leves","Treasure","Bingo","HuntBills","ChallengeLog","DomanEnclave","Voyages","Ventures","SquadronMission","SquadronTraining"];
+    private bool reminderAlarmsLinked;
+    internal void LinkReminderAlarms()
+    {
+        if(reminderAlarmsLinked)return;
+        reminderAlarmsLinked=true;
+        var names=ReminderAlarmRows.ToDictionary(row=>localization.Get("Reminders."+row),row=>row);
+        var changed=false;
+        foreach(var alarm in configuration.Alarms ?? [])
+            if(alarm.ReminderRow.Length==0 && alarm.AutoKey.Length==0 && names.TryGetValue(alarm.Label,out var row)){alarm.ReminderRow=row;changed=true;}
+        if(changed)SaveReminders();
+    }
+    /// <summary>0.558 (T17): from the Reminders page and the server bar, so that the bar's count does not wait for the page.</summary>
+    internal void TickRemindersFromGame(GameTimerSnapshot timers)
+    {
+        KeepHomeTimers(timers);
+        if(!configuration.RemindersFromGame)return;
+        var now=DateTimeOffset.UtcNow;
+        foreach(var row in ReminderCounts.DoneByGame(timers.AlliedQuestsLeft,timers.DeliveriesLeft))
+            if(!ResetSchedule.DoneSince(ReminderDoneAt(row),ReminderCounts.LastReset(row,now)))SetReminderDone(row,now);
+    }
     internal Func<ushort,string?>? SquadronMissionName { get; set; }
+    /// <summary>T27 (0.651): the Status rows the game marks as company actions, with their names (set by Plugin.cs).</summary>
+    internal IReadOnlyDictionary<uint,string>? CompanyActionNames { get; set; }
     internal Func<ushort,string?>? SquadronTrainingName { get; set; }
     private readonly Dictionary<(Func<ushort,string?>,ushort),string> squadronNames=[];
     private string SquadronName(Func<ushort,string?>? nameOf,ushort id)

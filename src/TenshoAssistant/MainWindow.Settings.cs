@@ -113,6 +113,16 @@ internal sealed partial class MainWindow
             BoolSetting("Settings.HoverStock","Settings.HoverStockTip",()=>configuration.HoverShowStock,value=>configuration.HoverShowStock=value,c=>c.HoverShowStock);
             BoolSetting("Settings.HoverUsages","Settings.HoverUsagesTip",()=>configuration.HoverShowUsages,value=>configuration.HoverShowUsages=value,c=>c.HoverShowUsages);
             BoolSetting("Settings.HoverSources","Settings.HoverSourcesTip",()=>configuration.HoverShowSources,value=>configuration.HoverShowSources=value,c=>c.HoverShowSources);
+            // 0.705 (user request): its NPC vendors, set as the list panels are.
+            ImGui.Indent();
+            BoolSetting("Settings.HoverVendors","Settings.HoverVendorsTip",()=>configuration.HoverVendors,value=>configuration.HoverVendors=value,c=>c.HoverVendors);
+            if(configuration.HoverVendors)
+            {
+                BoolSetting("Settings.HoverVendorsMetOnly","Settings.HoverVendorsMetOnlyTip",()=>configuration.HoverVendorsMetOnly,value=>configuration.HoverVendorsMetOnly=value,c=>c.HoverVendorsMetOnly);
+                BoolSetting("Settings.HoverVendorsByCurrency","Settings.HoverVendorsByCurrencyTip",()=>configuration.HoverVendorsByCurrency,value=>configuration.HoverVendorsByCurrency=value,c=>c.HoverVendorsByCurrency);
+                if(configuration.HoverVendorsByCurrency)DrawCurrencyTicks("HoverVendor",()=>configuration.HoverVendorCurrenciesOn,value=>configuration.HoverVendorCurrenciesOn=value);
+            }
+            ImGui.Unindent();
             // 0.377 (g, M-07): comparison with the worn piece.
             BoolSetting("Settings.HoverCompare","Settings.HoverCompareTip",()=>configuration.HoverShowCompare,value=>configuration.HoverShowCompare=value,c=>c.HoverShowCompare);
         }
@@ -151,7 +161,7 @@ internal sealed partial class MainWindow
             // 0.327 (audit 2026-11-02, queue step e): compute as soon as a recipe is selected (default, as before) or only on request.
             ImGui.Indent();
             ImGui.BeginDisabled(!configuration.CraftLogHelperEnabled);
-            try{BoolSetting("ModuleSettings.CraftLogAutoSolve","ModuleSettings.CraftLogAutoSolveTip",()=>configuration.CraftLogAutoSolve,value=>configuration.CraftLogAutoSolve=value,c=>c.CraftLogAutoSolve);}
+            try{BoolSetting("ModuleSettings.ShowEnglishItemName","ModuleSettings.ShowEnglishItemNameTip",()=>configuration.ShowEnglishItemName,value=>configuration.ShowEnglishItemName=value,c=>c.ShowEnglishItemName);BoolSetting("ModuleSettings.CraftLogTryAllPresets","ModuleSettings.CraftLogTryAllPresetsTip",()=>configuration.CraftLogTryAllPresets,value=>configuration.CraftLogTryAllPresets=value,c=>c.CraftLogTryAllPresets);BoolSetting("ModuleSettings.CraftLogAutoSolve","ModuleSettings.CraftLogAutoSolveTip",()=>configuration.CraftLogAutoSolve,value=>configuration.CraftLogAutoSolve=value,c=>c.CraftLogAutoSolve);}
             finally{ImGui.EndDisabled();ImGui.Unindent();}
             DrawObservationSetting("Craft", localization.Get("ModuleSettings.ObserveCraft"),craftLive.State.Enabled,craftLive.SetEnabled);
             ImGui.TextWrapped(localization.Get("ModuleSettings.CraftHelp"));
@@ -162,6 +172,7 @@ internal sealed partial class MainWindow
             // 0.468 (user request, in-game campaign): the projection window beside the synthesis, also here.
             BoolSetting("CraftLiveUi.Panel","CraftLiveUi.PanelTip",()=>configuration.CraftLivePanel,value=>{configuration.CraftLivePanel=value;craftLive.SetEnabled(CraftLiveWanted(configuration));},c=>c.CraftLivePanel);
             BoolSetting("CraftLiveUi.Suggest","CraftLiveUi.SuggestTip",()=>configuration.CraftLiveSuggest,value=>configuration.CraftLiveSuggest=value,c=>c.CraftLiveSuggest);
+            BoolSetting("CraftLiveUi.Follow","CraftLiveUi.FollowTip",()=>configuration.CraftLiveFollow,value=>configuration.CraftLiveFollow=value,c=>c.CraftLiveFollow);
             BoolSetting("CraftSearch.SettingRaphael","CraftSearch.SolverRaphaelTip",()=>search.Raphael,value=>search.Raphael=value,c=>c.CraftSearch?.Raphael==true);
             IntSetting("ModuleSettings.Steps","SettingTips.Steps",()=>search.Steps,value=>search.Steps=value,1,100,searchDefaults.Steps);
             IntSetting("ModuleSettings.Width","SettingTips.Width",()=>search.Width,value=>search.Width=value,1,512,searchDefaults.Width);
@@ -171,12 +182,15 @@ internal sealed partial class MainWindow
             // 0.438 (user request): actions the player forbids, everywhere crafting actions are proposed.
             DrawForbiddenActions(search);
             ImGui.TextColored(Accent,localization.Get("ModuleSettings.Export"));
-            var exportBefore=(search.ExtraWait,search.Echo,search.BuffExtraWait);
+            var exportBefore=(search.ExtraWait,search.Echo,search.BuffExtraWait,search.EchoSound,search.EchoLastOnly);
             IntSetting("ModuleSettings.Wait","SettingTips.Wait",()=>search.ExtraWait,value=>search.ExtraWait=value,0,3,searchDefaults.ExtraWait);
             // X-12 (0.419): the buffs' extra wait apart (shown as the actions' one until changed).
             IntSetting("ModuleSettings.BuffWait","SettingTips.BuffWait",()=>search.BuffExtraWait ?? search.ExtraWait,value=>search.BuffExtraWait=value,0,3,searchDefaults.ExtraWait);
+            BoolSetting("ModuleSettings.AutoSimulate","ModuleSettings.AutoSimulateTip",()=>configuration.CraftSearch.AutoSimulate,value=>configuration.CraftSearch.AutoSimulate=value,c=>c.CraftSearch.AutoSimulate);
             BoolSetting("ModuleSettings.Echo","SettingTips.Echo",()=>configuration.CraftSearch.Echo,value=>configuration.CraftSearch.Echo=value,c=>c.CraftSearch.Echo);
-            if(exportBefore!=(search.ExtraWait,search.Echo,search.BuffExtraWait)){craftMacroExport=null;craftMacroError=null;}
+            IntSetting("ModuleSettings.EchoSound","ModuleSettings.EchoSoundTip",()=>search.EchoSound,value=>search.EchoSound=value,0,16,searchDefaults.EchoSound);
+            BoolSetting("ModuleSettings.EchoLastOnly","ModuleSettings.EchoLastOnlyTip",()=>configuration.CraftSearch.EchoLastOnly,value=>configuration.CraftSearch.EchoLastOnly=value,c=>c.CraftSearch.EchoLastOnly);
+            if(exportBefore!=(search.ExtraWait,search.Echo,search.BuffExtraWait,search.EchoSound,search.EchoLastOnly)){craftMacroExport=null;craftMacroError=null;}
             ImGui.TextDisabled(localization.Get("ModuleSettings.ExportHelp"));
             // Game macros used by « Copy into the game's macros » (0.191).
             var copy=configuration.MacroCopy ??= new();
@@ -281,7 +295,7 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped(localization.Get("ModuleSettings.ProfilesHelp"));
             if(ImGui.Button(localization.Get("ModuleSettings.SortProfiles")))page=Page.SortPreview;
             if(ImGui.Button(localization.Get("ModuleSettings.Presets")))page=Page.CraftPresets;
-            if(ImGui.Button(localization.Get("ModuleSettings.Bookmarks")))page=Page.Maps;
+            if(ImGui.Button(localization.Get("ModuleSettings.Bookmarks"))){page=Page.Maps;mapsTabRequest=1;}
             if(ImGui.Button(localization.Get("ModuleSettings.Deck")))OpenTriadTab("Deck");
             if(ImGui.Button(localization.Get("ModuleSettings.Quests")))page=Page.Quests;
             if(ImGui.Button(localization.Get("ModuleSettings.MacroSequence")))page=Page.MacroChain;

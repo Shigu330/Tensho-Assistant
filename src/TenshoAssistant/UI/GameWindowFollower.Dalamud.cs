@@ -19,7 +19,7 @@ internal sealed class GameWindowFollower : IDisposable
     public GameWindowFollower(IFramework framework,IGameGui gui,IPluginLog log)
     {
         this.framework=framework;this.gui=gui;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     /// <summary>Where the game window is now; the position its reader saw until it is known.</summary>
@@ -50,5 +50,5 @@ internal sealed class GameWindowFollower : IDisposable
         }
     }
 
-    public void Dispose()=>framework.Update-=OnUpdate;
+    public void Dispose()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
 }

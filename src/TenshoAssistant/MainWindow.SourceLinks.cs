@@ -1,3 +1,5 @@
+using System.Numerics;
+using TenshoAssistant.Maps;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Collections;
 using TenshoAssistant.Items;
@@ -63,6 +65,7 @@ internal sealed partial class MainWindow
     private void DrawVendorLink(uint itemId,Npcs.NpcVendor vendor,string label)
     {
         if(ImGui.Selectable(label+$"##SrcNpc{itemId}/{vendor.NpcId}")){npcVendorFocus=vendor.NpcId;page=Page.NpcVendors;IsOpen=true;}
+        NpcMenu($"SrcNpcMenu{itemId}/{vendor.NpcId}",NpcName(vendor),vendor.NpcId,vendor.Locations);
         if(vendor.Locations.FirstOrDefault() is { } place && maps.State.Catalog?.Find(place.MapId) is { } map
            && ImGui.Selectable("    "+localization.Get("SourceLinks.Flag")+$"##SrcFlag{itemId}/{vendor.NpcId}"))PlaceFlagFromMapView(map,place.X,place.Y);
     }
@@ -84,7 +87,7 @@ internal sealed partial class MainWindow
     // lines with the same text are shown once (the same NPC listed under several ids). Craft and gathering stay one line each.
     // 0.256: the lines are computed once (SourceLines) and drawn either in Tensho (ImGui) or in the game's inventory menu.
     private enum SourceGroup { Achievements, Duties, FromItems, Trades, Vendors, Quests, Craft, Gathering }
-    internal sealed record ItemSourceLine(int Group,string Text,Action Open,Action? Flag=null,string? Hint=null);
+    internal sealed record ItemSourceLine(int Group,string Text,Action Open,Action? Flag=null,string? Hint=null,(MapDefinition Map,Vector2 At)? Place=null);
 
     private bool DrawSourceLinks(IReadOnlyList<ItemDefinition> items)
     {
@@ -94,6 +97,7 @@ internal sealed partial class MainWindow
         {
             index++;
             if(ImGui.Selectable(line.Text+$"##SrcLine{index}"))line.Open();
+            if(line.Place is { } spot)PlaceMenu($"SrcLinePlace{index}",spot.Map,spot.At,line.Text);
             if(line.Hint is not null && ImGui.IsItemHovered())WrappedTooltip(line.Hint);
             if(line.Flag is not null && ImGui.Selectable("    "+localization.Get("SourceLinks.Flag")+$"##SrcFlag{index}"))line.Flag();
         }
@@ -131,14 +135,14 @@ internal sealed partial class MainWindow
         var lines=new List<ItemSourceLine>();
         Community.WikiItemAcquisitionState? Wiki(uint id)=>request ? wikiItems?.Get(id):wikiItems?.Peek(id);
         Community.GarlandItemSourceState? Garland(uint id)=>request ? itemSources?.Get(id):itemSources?.Peek(id);
-        void Add(SourceGroup group,string text,Action open,Action? flag=null,string? hint=null)
-        {if(!lines.Any(line=>line.Group==(int)group && line.Text==text))lines.Add(new((int)group,text,()=>{open();IsOpen=true;},flag,hint));}
+        void Add(SourceGroup group,string text,Action open,Action? flag=null,string? hint=null,Npcs.NpcLocation? at=null)
+        {if(!lines.Any(line=>line.Group==(int)group && line.Text==text))lines.Add(new((int)group,text,()=>{open();IsOpen=true;},flag,hint,at is not null && maps.State.Catalog?.Find(at.MapId) is { } atMap ? (atMap,new Vector2(at.X,at.Y)):null));}
         Action? FlagAt(Npcs.NpcLocation? place)=>place is not null && maps.State.Catalog?.Find(place.MapId) is { } map ? ()=>PlaceFlagFromMapView(map,place.X,place.Y):null;
         void Vendor(SourceGroup group,uint itemId,Npcs.NpcVendor vendor,string text)
-            =>Add(group,text,()=>{npcVendorFocus=vendor.NpcId;page=Page.NpcVendors;},FlagAt(vendor.Locations.FirstOrDefault()));
+            =>Add(group,text,()=>{npcVendorFocus=vendor.NpcId;page=Page.NpcVendors;},FlagAt(vendor.Locations.FirstOrDefault()),null,vendor.Locations.FirstOrDefault());
         // No vendor-tool entry for LuminaSupplemental NPCs: the line places the map flag when the position is known.
         void LuminaNpc(SourceGroup group,Npcs.NpcLocation? location,string text)
-            =>Add(group,text,FlagAt(location) ?? (()=>{}),null,localization.Get(location is null ? "SourceLinks.LuminaNpc":"SourceLinks.LuminaNpcFlag"));
+            =>Add(group,text,FlagAt(location) ?? (()=>{}),null,localization.Get(location is null ? "SourceLinks.LuminaNpc":"SourceLinks.LuminaNpcFlag"),location);
         void Currency(uint currencyId,string text)=>Add(SourceGroup.Trades,text,()=>{SelectItem(currencyId);OpenItemSheet();});
         var ids=items.Select(item=>item.Id).ToArray();
         var shownVendors=new HashSet<uint>();

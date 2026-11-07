@@ -6,10 +6,11 @@ public enum InventoryQualityFilter { Any, Normal, HighQuality }
 public enum InventoryPropertyFilter { Any, Yes, No }
 // Null means unknown (item missing from the catalogue): it never satisfies a filter and sorts after known values.
 public sealed record InventorySortMetadata(string Name,uint Category,bool? Marketable=null,bool? CanBeHq=null,EquipmentSlots? Equipment=null,
-    int? ItemLevel=null,int? EquipLevel=null,int? Rarity=null,uint? SellPrice=null,ItemTraits? Traits=null)
+    int? ItemLevel=null,int? EquipLevel=null,int? Rarity=null,uint? SellPrice=null,ItemTraits? Traits=null,ulong? Jobs=null,bool? InGearset=null)
 {
-    public static InventorySortMetadata FromItem(uint id,ItemDefinition? item)=>item is null || item.Id!=id ? new($"Objet {id}",0)
-        :new(item.Name,item.UiCategoryId,item.IsMarketable,item.CanBeHq,item.Equipment,(int)Math.Min(item.ItemLevel,int.MaxValue),item.EquipLevel,item.Rarity,item.SellPrice,item.Traits);
+    /// <summary>0.595 (I21): jobs = the piece's jobs as a mask of ClassJob rows, null when it is no gear; inGearset = in one of the game's sets, null when they were not read.</summary>
+    public static InventorySortMetadata FromItem(uint id,ItemDefinition? item,ulong? jobs=null,bool? inGearset=null)=>item is null || item.Id!=id ? new($"Objet {id}",0)
+        :new(item.Name,item.UiCategoryId,item.IsMarketable,item.CanBeHq,item.Equipment,(int)Math.Min(item.ItemLevel,int.MaxValue),item.EquipLevel,item.Rarity,item.SellPrice,item.Traits,jobs,inGearset);
 }
 public sealed record InventorySortCriterion(InventorySortField Field,bool Descending=false);
 // CategoryId is the single choice saved before 0.77; it stays one member of the category union.
@@ -20,7 +21,9 @@ public sealed record InventorySortZone(string Name,int Start,int Count,uint Cate
     // Range bounds: 0 means "no bound". Rarity: 0 means any, otherwise the exact game value.
     int ItemLevelMin=0,int ItemLevelMax=0,int EquipLevelMin=0,int EquipLevelMax=0,int Rarity=0,uint SellPriceMin=0,uint SellPriceMax=0,
     InventoryPropertyFilter Unique=InventoryPropertyFilter.Any,InventoryPropertyFilter Untradable=InventoryPropertyFilter.Any,InventoryPropertyFilter Dyeable=InventoryPropertyFilter.Any,
-    InventoryPropertyFilter Repairable=InventoryPropertyFilter.Any,InventoryPropertyFilter Collectable=InventoryPropertyFilter.Any);
+    InventoryPropertyFilter Repairable=InventoryPropertyFilter.Any,InventoryPropertyFilter Collectable=InventoryPropertyFilter.Any,
+    // 0.595 (I21): Job: a ClassJob row, 0 for any. InGearset: a piece of one of the game's gear sets, or not.
+    uint Job=0,InventoryPropertyFilter InGearset=InventoryPropertyFilter.Any);
 public sealed record InventorySortProfile(ulong CharacterId,BankStorageKind? Kind,ulong StorageId,IReadOnlyList<InventorySortCriterion> Criteria,IReadOnlyList<InventorySortZone> Zones);
 
 public static class InventorySortRules
@@ -57,7 +60,7 @@ public static class InventorySortRules
                 || !ValidIds(zone.CategoryIds,MaxZoneCategories) || !ValidIds(zone.ItemIds,MaxZoneItems)
                 || !ValidRange(zone.ItemLevelMin,zone.ItemLevelMax,9999) || !ValidRange(zone.EquipLevelMin,zone.EquipLevelMax,255)
                 || zone.SellPriceMax!=0 && zone.SellPriceMin>zone.SellPriceMax || !Rarities.Contains(zone.Rarity)
-                || new[]{zone.Unique,zone.Untradable,zone.Dyeable,zone.Repairable,zone.Collectable}.Any(filter=>!Enum.IsDefined(filter))
+                || new[]{zone.Unique,zone.Untradable,zone.Dyeable,zone.Repairable,zone.Collectable,zone.InGearset}.Any(filter=>!Enum.IsDefined(filter)) || zone.Job>63
                 || zone.Start<0 || zone.Count<=0 || zone.Start>capacity-zone.Count || zone.Preserve && (zone.ReverseFill || zone.ShareUnused))
                 throw new InvalidOperationException("Invalid zone: name, filters or slot limits.");
             for(var slot=zone.Start;slot<zone.Start+zone.Count;slot++)
@@ -67,6 +70,9 @@ public static class InventorySortRules
             }
         }
     }
+    /// <summary>0.595 (I21): a real sort must not run while what a zone asks is unread: its pieces would be sorted as if they matched nothing.</summary>
+    public static bool NeedsGear(InventorySortProfile profile)=>profile.Zones.Any(zone=>zone is not null && !zone.Preserve && zone.Job!=0);
+    public static bool NeedsGearsets(InventorySortProfile profile)=>profile.Zones.Any(zone=>zone is not null && !zone.Preserve && zone.InGearset!=InventoryPropertyFilter.Any);
     public static InventorySortProfile Load(IEnumerable<InventorySortProfile>? saved,InventorySortScope scope,InventorySortField legacy,bool descending)
     {
         var matches=(saved ?? []).Where(profile=>profile is not null && MatchesScope(profile,scope)).Take(2).ToArray();
@@ -159,6 +165,7 @@ public static class InventorySortRules
           && RangeMatches(label.SellPrice,zone.SellPriceMin,zone.SellPriceMax) && (zone.Rarity==0 || label.Rarity==zone.Rarity)
           && TraitMatches(label.Traits,ItemTraits.Unique,zone.Unique) && TraitMatches(label.Traits,ItemTraits.Untradable,zone.Untradable)
           && TraitMatches(label.Traits,ItemTraits.Dyeable,zone.Dyeable) && TraitMatches(label.Traits,ItemTraits.Repairable,zone.Repairable)
-          && TraitMatches(label.Traits,ItemTraits.Collectable,zone.Collectable);
+          && TraitMatches(label.Traits,ItemTraits.Collectable,zone.Collectable)
+          && (zone.Job==0 || label.Jobs is { } jobs && (jobs>>(int)zone.Job&1)!=0) && PropertyMatches(label.InGearset,zone.InGearset);
     }
 }

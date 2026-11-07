@@ -12,7 +12,7 @@ public static class ConfigurationReset
         "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenBase", "CollectableScrutinyGain", "CollectableIntuitionGain", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
-        "Voyages", "GearPlans", "GearMateria", "SubmarineUnlocked", "VesselPlans",
+        "Voyages", "GearPlans", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
         // 0.503 (ONBOARD-001): the pages whose first-visit help was read.
@@ -39,6 +39,10 @@ public static class ConfigurationReset
     {
         // 0.509 (A-04): the suggested move during a synthesis.
         "CraftLiveSuggest",
+        // 0.589 (C5): the sequence followed during a synthesis.
+        "CraftLiveFollow",
+        // 0.594 (I11): the Bank as a list.
+        "BankListView",
         // 0.508 (I-05): the panel beside the retainer sale list.
         "RetainerSalesPanel",
         // 0.503 (ONBOARD-001): first-visit help on the pages.
@@ -47,13 +51,13 @@ public static class ConfigurationReset
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
         "HoverShowCompare",
-        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "HidePanelsBehindGame", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip",
+        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
-        "CurrencyAlerts", "CurrencyServerBar", "CurrencyThresholds",
+        "CurrencyAlerts", "CurrencyServerBar", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
-        "GearOwnedOnly", "ShowHeaderClock", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
-        "HomeShowTools", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
-        "Discord", "ThemeMode", "ThemeModeBeforeTool", "GatherPlanFromList", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
+        "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringNextHighlight", "CacheLongerDefaults", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
+        "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
+        "Discord", "ThemeMode", "ThemeModeBeforeTool", "CraftLogTryAllPresets", "GatherPlanFromList", "GatheringListHighlight", "ListPanelsByZone", "ListPanelsFinishedOnly", "ListPanelsNearbyMonsters", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
         // 0.347 (g, I-08): the two shop reminder settings (the notes themselves are saved data, kept by « restore every setting »).
         "ItemNoteShopReminder", "ItemNoteImportantSound",
@@ -65,6 +69,8 @@ public static class ConfigurationReset
         "ItemSearchLimit",
         // 0.375 (g, M-05): on-screen « to do » panel.
         "TaskPanel",
+        // W-05 (0.691): on-screen lists.
+        "WorkshopPanel", "WorkshopPanelProject", "WorkshopFollowed", "WorkshopDelivered", "PreparationPanel", "PreparationPanelItem", "PreparationPanelRecipe", "PreparationPanelTarget", "CraftListPanel", "CraftListPanelName", "ListPanelsHideInCombat", "ListPanelsHideBehindGame", "CurrencyValueMarket", "ListPanelsBase", "ListPanelsGathering", "ListPanelsVendor", "ListPanelsMonster", "ListPanelsOther", "ListPanelsCrystal", "ListPanelsCurrenciesOn", "ListPanelsMetOnly", "HoverVendors", "HoverVendorsMetOnly", "HoverVendorsByCurrency", "HoverVendorCurrenciesOn",
         // 0.376 (g, M-06): wear alert, bar and thresholds.
         "GearWear",
         // 0.386 (g, X-10): clocks of other time zones.
@@ -113,6 +119,12 @@ public sealed class CraftSearchSettings
     public int BoundedExtraWait => Math.Clamp(ExtraWait, 0, 3);
     // X-12 (0.419): extra wait of the buffs (2-second actions) apart from the other actions; null = same as ExtraWait (before 0.419).
     public int? BuffExtraWait { get; set; }
+    // 0.572 (C15): the simulation runs again by itself after each change of the sequence or the attributes.
+    public bool AutoSimulate { get; set; } = true;
+    // 0.573 (C17): the sound of the end-of-page line, 1 to 16, 0 for none; and that line on the last page only.
+    public int EchoSound { get; set; } = 1;
+    public bool EchoLastOnly { get; set; }
+    public int BoundedEchoSound => Math.Clamp(EchoSound, 0, 16);
     public int? BoundedBuffExtraWait => BuffExtraWait is { } wait ? Math.Clamp(wait, 0, 3) : null;
     // 0.438 (user request): crafting actions the player forbids (names of CraftActionKind); empty by default.
     public List<string> ForbiddenActions { get; set; } = [];
@@ -121,10 +133,19 @@ public sealed class CraftSearchSettings
 }
 
 /// <summary>Tensho map display settings (MAP-016, Mappy-like): each layer can be turned off; values are clamped on use.</summary>
+public sealed class QuestListSettings
+{
+    // 0.550 (T3): the level range of the quest list; 0 = no limit.
+    public int LevelFrom { get; set; }
+    public int LevelTo { get; set; }
+}
+
 public sealed class MapViewSettings
 {
     public bool ShowFixedIcons { get; set; } = true;
     public bool ShowPlaceNames { get; set; } = true;
+    // 0.596 (P12): the names the game writes beside some icons.
+    public bool ShowIconNames { get; set; } = true;
     public bool ShowQuests { get; set; } = true;
     public bool ShowQuestAreas { get; set; } = true;
     public bool ShowFlag { get; set; } = true;
@@ -139,6 +160,27 @@ public sealed class MapViewSettings
     public bool ShowGathering { get; set; } = true;
     // N-09 (0.441): living hunt marks streamed around the player (B, A, S).
     public bool ShowHuntMarks { get; set; } = true;
+    /// <summary>0.795 (X-35): nearby monsters that drop an item the tracking lists still need.</summary>
+    public bool ShowListMonsters { get; set; } = true;
+    /// <summary>0.796 (X-36): nearby monsters the hunting log still asks for.</summary>
+    public bool ShowHuntLogMonsters { get; set; } = true;
+    /// <summary>0.797 (X-37): nearby monsters of a running FATE.</summary>
+    public bool ShowFateMonsters { get; set; } = true;
+    /// <summary>0.798 (X-38): nearby monsters that teach a blue magic spell not learned yet; as Blue Mage only, unless BlueMageMonstersAlways.</summary>
+    public bool ShowBlueMageMonsters { get; set; } = true;
+    public bool BlueMageMonstersAlways { get; set; }
+    /// <summary>0.800 (X-41): nearby monsters that drop a mount, minion or orchestrion roll not owned.</summary>
+    public bool ShowCollectionMonsters { get; set; } = true;
+    public bool AboveCollection { get; set; }
+    /// <summary>0.799 (X-38): icons above the heads of nearby monsters that matter, in the game's view; which reasons, their size, how far, and in combat.</summary>
+    public bool MonsterIconsAbove { get; set; } = true;
+    public bool AboveBlueSpell { get; set; } = true;
+    public bool AboveList { get; set; }
+    public bool AboveHuntLog { get; set; }
+    public bool AboveFate { get; set; }
+    public bool MonsterIconsHideInCombat { get; set; }
+    public int MonsterIconSize { get; set; } = 32;
+    public float MonsterIconDistance { get; set; } = 50;
     public bool GatheringLabels { get; set; } = true;
     // 0.535 (user request): the map without its title bar; off by default.
     public bool HideTitleBar { get; set; }
@@ -157,9 +199,13 @@ public sealed class MapViewSettings
     // Kinds shown on the edge (each its own switch).
     public bool EdgePlayer { get; set; } = true;
     public bool EdgeFlag { get; set; } = true;
+    public bool EdgeFlagCoordinates { get; set; } = true;
+    public bool ShowPlayerCoordinates { get; set; } = true;
     public bool EdgeTarget { get; set; } = true;
     public bool EdgeQuests { get; set; } = true;
     public bool EdgeEvents { get; set; } = true;
+    /// <summary>P17 (0.652): leves apart from the other events.</summary>
+    public bool EdgeLeves { get; set; } = true;
     public bool EdgeFates { get; set; } = true;
     public bool EdgeGathering { get; set; } = true;
     public bool EdgeParty { get; set; } = true;
@@ -175,6 +221,26 @@ public sealed class MapViewSettings
     // 0.378 (g, M-08): the player's bookmarks drawn on the Tensho map (a click places the flag).
     public bool ShowBookmarks { get; set; } = true;
     public float PlaceNameScale { get; set; } = 1f;
+    // 0.546 (P16, user request: on a setting): a short left click on an empty spot places the flag; off by default.
+    public bool FlagOnClick { get; set; }
+    // 0.545 (P5): the wheel's step and direction; 1.15 is what the map always did.
+    public float WheelStep { get; set; } = 1.15f;
+    public bool WheelInvert { get; set; }
+    /// <summary>By how much one wheel notch multiplies the zoom.</summary>
+    public float WheelFactor(float wheel)
+    {
+        var step=Math.Clamp(float.IsFinite(WheelStep) ? WheelStep:1.15f,1.02f,1.5f);
+        return wheel>0 != WheelInvert ? step:1/step;
+    }
+    // 0.543 (P2): names follow the zoom on their own (null: as the icons) and hide under a zoom; gathering labels have their size and threshold, 0.6 being the old fixed one.
+    public float? NameZoomFollow { get; set; }
+    public float NameMinZoom { get; set; }
+    public float GatheringLabelMinZoom { get; set; } = 0.6f;
+    public float GatheringLabelScale { get; set; } = 1f;
+    public float NameFactor(float zoom)=>MathF.Pow(Math.Max(0.01f,zoom),ClampFollow(NameZoomFollow ?? ZoomFollow));
+    public bool NamesShown(float zoom)=>zoom>=Math.Clamp(float.IsFinite(NameMinZoom) ? NameMinZoom:0,0,4);
+    public bool GatheringLabelShown(float zoom)=>zoom>=Math.Clamp(float.IsFinite(GatheringLabelMinZoom) ? GatheringLabelMinZoom:0.6f,0,4);
+    public float GatheringLabelSize(float font)=>font*Math.Clamp(float.IsFinite(GatheringLabelScale) ? GatheringLabelScale:1,0.5f,2f);
     public bool ReplaceGameMap { get; set; } = true;
     // 0.114: FATEs running in the zone (live), with their area.
     public bool ShowFates { get; set; } = true;
@@ -188,6 +254,11 @@ public sealed class MapViewSettings
     // 0.151: areas per kind — shown or not, and colour (RGBA, the fill uses the alpha, the outline is stronger).
     // 0.153: how much icons and names follow the zoom — 0 = fixed size on screen (like the game), 1 = proportional to the map.
     public float ZoomFollow { get; set; } = 0.15f;
+    // 0.542 (P1): the zoom at opening. The last one starts at 50 %, what the map always did; the zoom of a quest or a link was fixed at 100 % at least.
+    public TenshoAssistant.Maps.MapOpenZoom OpenZoom { get; set; } = TenshoAssistant.Maps.MapOpenZoom.Last;
+    public float LastZoom { get; set; } = 0.5f;
+    public float OpenZoomValue { get; set; } = 0.5f;
+    public float FocusZoom { get; set; } = 1f;
     public static float ClampFollow(float value)=>float.IsFinite(value) ? Math.Clamp(value,0f,1f):0.15f;
     /// <summary>Zoom factor applied to icons and names: zoom^follow (1 at 100 % whatever the setting).</summary>
     public float ZoomFactor(float zoom)=>MathF.Pow(Math.Max(0.01f,zoom),ClampFollow(ZoomFollow));
@@ -195,10 +266,29 @@ public sealed class MapViewSettings
     public HashSet<uint>? RightClickIgnore { get; set; }
     public bool RightClickIgnored(uint icon)=>RightClickIgnore?.Contains(icon)==true;
     public bool ShowEventAreas { get; set; } = true;
+    public bool ShowLeveAreas { get; set; } = true;
+    /// <summary>N-07 (0.667), 0.684: what can be gathered on the Island Sanctuary, on its map, by the game's five kinds.</summary>
+    public bool ShowIslandPlants { get; set; } = true;
+    public bool ShowIslandWood { get; set; } = true;
+    public bool ShowIslandRocks { get; set; } = true;
+    public bool ShowIslandEarth { get; set; } = true;
+    public bool ShowIslandFishing { get; set; } = true;
+    /// <summary>An item of no known kind stays as long as one kind is shown.</summary>
+    public bool ShowsIslandKind(TenshoAssistant.Maps.IslandResourceKind? kind)=>kind switch
+    {
+        TenshoAssistant.Maps.IslandResourceKind.Plants=>ShowIslandPlants,
+        TenshoAssistant.Maps.IslandResourceKind.Wood=>ShowIslandWood,
+        TenshoAssistant.Maps.IslandResourceKind.Rocks=>ShowIslandRocks,
+        TenshoAssistant.Maps.IslandResourceKind.Earth=>ShowIslandEarth,
+        TenshoAssistant.Maps.IslandResourceKind.Fishing=>ShowIslandFishing,
+        _=>ShowIslandPlants || ShowIslandWood || ShowIslandRocks || ShowIslandEarth || ShowIslandFishing,
+    };
     public bool ShowFateAreas { get; set; } = true;
     public bool ShowGatheringAreas { get; set; } = true;
     public System.Numerics.Vector4 QuestAreaColor { get; set; } = new(0.95f,0.70f,0.25f,0.25f);
     public System.Numerics.Vector4 EventAreaColor { get; set; } = new(0.30f,0.75f,1.00f,0.30f);
+    /// <summary>P17 (0.652): the game draws them dark green; matched by eye on a capture.</summary>
+    public System.Numerics.Vector4 LeveAreaColor { get; set; } = new(0.15f,0.55f,0.20f,0.40f);
     public System.Numerics.Vector4 FateAreaColor { get; set; } = new(0.75f,0.45f,0.95f,0.25f);
     public System.Numerics.Vector4 GatheringAreaColor { get; set; } = new(0.55f,0.90f,0.55f,0.20f);
     // 0.111: size of each game icon (key = icon id) on top of IconScale; 0 hides that icon, absent keeps 100 %.
@@ -248,6 +338,8 @@ public sealed class MapViewSettings
 public sealed partial class Configuration
 {
     public int Version { get; set; } = 1;
+    /// <summary>0.750 (X-02): the longer cache defaults have been applied to these settings.</summary>
+    public bool CacheLongerDefaults { get; set; }
     private Caching.CachePreferences cache=new();
     public Caching.CachePreferences Cache {get=>Volatile.Read(ref cache);set=>Volatile.Write(ref cache,value ?? new());}
     public List<TenshoAssistant.Macros.MacroSlot> MacroChainPlan { get; set; } = [];
@@ -280,6 +372,8 @@ public sealed partial class Configuration
     public bool HelpBanners { get; set; } = true;
     public bool RetainerSalesPanel { get; set; } = true;
     public bool CraftLiveSuggest { get; set; } = true;
+    public bool CraftLiveFollow { get; set; } = true;
+    public bool BankListView { get; set; }
     public bool OpenOnLoad { get; set; }
     // Retainers and saddlebags copied into the bank cache each time they are opened (0.167), instead of an import button.
     public bool AutoBankCapture { get; set; } = true;
@@ -302,6 +396,8 @@ public sealed partial class Configuration
     public bool ReminderFinishedServerBar { get; set; } = true;
     // 0.458: Reminders rows left out of that icon (their « Bar » box unticked); null = none.
     public List<string>? ReminderBarHidden { get; set; }
+    // 0.558 (T17): a reminder whose counter the game reads at 0 ticks itself until the reset.
+    public bool RemindersFromGame { get; set; } = true;
     // 0.344 (g, I-02): currency threshold alerts (chat, sound and Discord with the alarm options) and their server bar entry, read on
     // the framework thread; thresholds in percent of the cap per currency item (missing = 80 %, 0 = off), replaced whole, never edited
     // in place (copy on write) so the framework thread never sees a dictionary being changed.
@@ -309,6 +405,8 @@ public sealed partial class Configuration
     private Dictionary<uint,int>? currencyThresholds;
     public bool CurrencyAlerts { get=>Volatile.Read(ref currencyAlerts); set=>Volatile.Write(ref currencyAlerts,value); }
     public bool CurrencyServerBar { get=>Volatile.Read(ref currencyServerBar); set=>Volatile.Write(ref currencyServerBar,value); }
+    // 0.606: with the alerts, the weekly limit of the limited tomestones reached.
+    public bool CurrencyWeeklyCapAlert { get; set; } = true;
     public Dictionary<uint,int>? CurrencyThresholds { get=>Volatile.Read(ref currencyThresholds); set=>Volatile.Write(ref currencyThresholds,value); }
     // 0.301: Tensho's own tooltip under the bar icon (the game's is hidden by plugin windows) and how many alarms it lists.
     public bool AlarmBarTooltip { get; set; } = true;
@@ -325,6 +423,10 @@ public sealed partial class Configuration
     public bool RouteUnlockedOnly { get; set; } = true;
     // 0.310 (R-11): gear plans (job → slot → item) and the planner's filters.
     public Dictionary<uint,Dictionary<TenshoAssistant.Gear.GearSlot,uint>>? GearPlans { get; set; }
+    // 0.593 (T25): the other named plans of each job; the one in use stays in GearPlans and GearMateria.
+    public Dictionary<uint,TenshoAssistant.Gear.GearPlanSet>? GearPlanSets { get; set; }
+    // 0.602 (T28): by character, what the collections held at the last reading and what was gained since.
+    public Dictionary<ulong,TenshoAssistant.Collections.CollectionMemory>? CollectionMemories { get; set; }
     public int GearLevelsBelow { get; set; } = 5;
     public bool GearExactOutsideCaps { get; set; } = true;
     public int GearMinItemLevel { get; set; }
@@ -337,16 +439,24 @@ public sealed partial class Configuration
     public Dictionary<uint,Dictionary<TenshoAssistant.Gear.GearSlot,List<uint>>>? GearMateria { get; set; }
     // Header and advanced settings (0.206).
     public bool ShowHeaderClock { get; set; } = true;
+    /// <summary>0.728: a frame on the hotbar slot of the next action of a node's plan.</summary>
+    public bool GatheringNextHighlight { get; set; } = true;
+    /// <summary>0.725: « What can I craft? », market sort: the days of sales counted, 1 to 30.</summary>
+    public int CraftStockSaleDays { get; set; } = 7;
     // In-game gathering help beside the game's gathering window (0.225); turns the gathering window reading on.
     public bool GatheringPanel { get; set; } = true;
     // In-game fishing help while fishing (0.226): fish of the current spot with their bait routes.
     public bool FishingPanel { get; set; } = true;
     // Fashion Report of the week (0.213): owned first, dim the others, by popularity, panel beside the game window.
     public TenshoAssistant.Fashion.FashionOptions FashionOptions { get; set; } = new();
+    public TenshoAssistant.Fashion.FashionOutfit? FashionOutfit { get; set; }
     public bool ShowHeaderEorzeaTime { get; set; } = true;
     public bool ShowIds { get; set; }
     public bool DeveloperMode { get; set; }
     public bool HomeShowTools { get; set; } = true;
+    // 0.599 (T10): the lines of « Today » and the tiles hidden on Home.
+    public List<string>? HomeTodayHidden { get; set; }
+    public List<string>? HomeTilesHidden { get; set; }
     // 0.327 (queue step e): how many results the item search lists (Items page, item pickers of Monster loot and NPC vendors). Read
     // through BoundedItemSearchLimit, so a hand-edited value stays within what ItemCatalog.Search accepts (it throws outside 1–100).
     public int ItemSearchLimit { get; set; } = 30;
@@ -371,6 +481,14 @@ public sealed partial class Configuration
     public int ThemeMode { get; set; }
     // 0.478 (user request, in-game campaign): what the crafting list still needs, in the gathering help; since 0.515 information only.
     public bool GatherPlanFromList { get; set; } = true;
+    /// <summary>0.751 (X-04): frame, on the game's gathering window, the items the tracking lists still need.</summary>
+    public bool GatheringListHighlight { get; set; } = true;
+    /// <summary>0.752 (X-05): in the list panels, what is gathered by zone.</summary>
+    public bool ListPanelsByZone { get; set; } = true;
+    /// <summary>0.785 (X-27): in the list panels, only the finished items (what each list asks for), without their materials.</summary>
+    public bool ListPanelsFinishedOnly { get; set; }
+    /// <summary>0.795 (X-35): the list lines and the map say which nearby monster drops a needed item.</summary>
+    public bool ListPanelsNearbyMonsters { get; set; } = true;
     // 0.480 (user report): Scrutiny in the collectable plan, and what the bonuses add, as measured in the game's window.
     public bool CollectableUseScrutiny { get; set; } = true;
     public bool CollectableUseRestore { get; set; } = true;
@@ -390,6 +508,7 @@ public sealed partial class Configuration
     // 0.328 (map audit): « "MapView": null » in a hand-edited file becomes the defaults here, like Cache, so no draw path reads null.
     private MapViewSettings mapView=new();
     public MapViewSettings MapView {get=>mapView;set=>mapView=value ?? new();}
+    public QuestListSettings QuestList { get; set; } = new();
     // 0.321 (review 0.316, point 6): crafting search limits and macro export options, kept across loads (they were window fields).
     public CraftSearchSettings CraftSearch { get; set; } = new();
     // e) (audit 2026-11-02): scope of the Market page (world, data centre, region), saved when chosen there or in Settings › Interface;
@@ -411,6 +530,18 @@ public sealed partial class Configuration
     // 0.327 (audit 2026-11-02, queue step e): the crafting log panel computes as soon as a recipe is selected (default, as before) or only
     // on request (its « Compute » button, « Recalculate » or the plan's « Simulate this recipe »). Read in Draw only.
     public bool CraftLogAutoSolve { get; set; } = true;
+    // 0.574 (I5): the preparation's cost at the cheapest of the data center, instead of the player's world.
+    public bool CostDataCenter { get; set; }
+    // 0.575 (I3): the preparation's cost also takes an NPC's gil price when lower.
+    public bool CostUseVendors { get; set; } = true;
+    // 0.563 (C31): the player's zones of the weather table, by territory, with the name shown when added.
+    public Dictionary<uint,string>? WeatherFavorites { get; set; }
+    // 0.562 (I19): an item's English name under its own, in the sheet and the tooltip; off by default.
+    public bool ShowEnglishItemName { get; set; }
+    // 0.554 (C3): per character and job, the attributes last read; the player's data, kept by « reset all ».
+    public Dictionary<ulong,Dictionary<uint,TenshoAssistant.Craft.CraftJobStats>>? LastCraftStats { get; set; }
+    // 0.552 (C2): the crafting log panel also tries the sequences saved for other recipes.
+    public bool CraftLogTryAllPresets { get; set; } = true;
     public int SortPreviewField { get; set; }
     public bool SortPreviewDescending { get; set; }
     public List<TenshoAssistant.Inventory.InventorySortProfile>? InventorySortProfiles { get; set; }=[];
@@ -461,6 +592,41 @@ public sealed partial class Configuration
     private List<Reminders.PersonalTask>? personalTasks;
     public List<Reminders.PersonalTask>? PersonalTasks { get=>Volatile.Read(ref personalTasks); set=>Volatile.Write(ref personalTasks,value); }
     public bool TaskPanel { get; set; }
+    // W-05 (0.691): the on-screen lists of a workshop project and of a crafting preparation, and what they show.
+    public bool WorkshopPanel { get; set; }
+    public uint WorkshopPanelProject { get; set; }
+    // 0.694 (user request): the projects followed together, by their row; none: the panel follows the chosen one.
+    public List<uint>? WorkshopFollowed { get; set; }
+    /// <summary>0.787 (X-28): what each project already received, by its item, as last seen in the workshop's delivery window.</summary>
+    public Dictionary<uint,FreeCompany.WorkshopDelivery>? WorkshopDelivered { get; set; }
+    public bool PreparationPanel { get; set; }
+    public uint PreparationPanelItem { get; set; }
+    public uint PreparationPanelRecipe { get; set; }
+    public int PreparationPanelTarget { get; set; }
+    // 0.692 (user report): and of a crafting list, found by its name.
+    public bool CraftListPanel { get; set; }
+    public string CraftListPanelName { get; set; } = "";
+    // 0.693 (user request): shown means shown; hiding them is a choice, off by default.
+    public bool ListPanelsHideInCombat { get; set; }
+    // 0.697 (user request): « What to do with it? » may leave the market alone.
+    public bool CurrencyValueMarket { get; set; } = true;
+    public bool ListPanelsHideBehindGame { get; set; }
+    // W-09 (0.699): the list panels as what is left to fetch, by origin.
+    public bool ListPanelsBase { get; set; }
+    public bool ListPanelsGathering { get; set; } = true;
+    public bool ListPanelsVendor { get; set; } = true;
+    public bool ListPanelsMonster { get; set; } = true;
+    public bool ListPanelsOther { get; set; } = true;
+    // 0.700, 0.701 (user requests): crystals on their own, and the vendor currencies the player ticks; none at the start.
+    public bool ListPanelsCrystal { get; set; } = true;
+    public List<uint>? ListPanelsCurrenciesOn { get; set; }
+    // 0.703 (user request): leave out the offers whose quest is known not to be done.
+    public bool ListPanelsMetOnly { get; set; }
+    // 0.705 (user request): the NPC vendors of item tooltips, set as the list panels are. By default, every vendor as before.
+    public bool HoverVendors { get; set; } = true;
+    public bool HoverVendorsMetOnly { get; set; }
+    public bool HoverVendorsByCurrency { get; set; }
+    public List<uint>? HoverVendorCurrenciesOn { get; set; }
     // 0.448 (N-08, DEC-026): the garden journal (64 beds at most, durations typed by the player) and its chat reminders (on: the player
     // only gets them for beds they noted).
     private List<Reminders.GardenBed>? gardenBeds;

@@ -63,7 +63,7 @@ internal static class Settings327Tests
             Check(initial.Contains("Enum.IsDefined(saved)",StringComparison.Ordinal) && initial.Contains("saved==Page.Diagnostics && !developerMode",StringComparison.Ordinal),"unknown name, or Diagnostics without developer mode: Home");
             var remember = Regex.Match(window,@"private void RememberPage\(\)[\s\S]*?\n    \}").Value;
             Check(remember.Contains("if(!configuration.OpenOnLastPage",StringComparison.Ordinal) && !remember.Contains("save(",StringComparison.Ordinal),"nothing when off, no disk write per page change");
-            Check(Regex.IsMatch(window,@"public override void Draw\(\)\s*\{\s*RememberPage\(\);"),"remembered at the start of Draw");
+            Check(Regex.IsMatch(window,@"private void DrawMain\(\)\s*\{\s*RememberPage\(\);"),"remembered at the start of Draw");
             Check(window.Contains("public override void OnClose()=>SaveLastPage();",StringComparison.Ordinal)
                 && Read("MainWindow.Lifetime.cs").Contains("SaveLastPage();",StringComparison.Ordinal),"written when the window closes or the plugin unloads");
             Check(Read("MainWindow.Settings.cs").Contains("BoolSetting(\"Settings.OpenOnLastPage\",\"SettingTips.OpenOnLastPage\"",StringComparison.Ordinal),"shared row with « ↺ »");

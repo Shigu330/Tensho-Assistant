@@ -25,8 +25,8 @@ internal sealed class CraftLogReader : IDisposable
         IFramework framework,IPlayerState player,IClientState client,IGameGui gui,IPluginLog log)
     {
         this.service=service;this.recipes=recipes;this.configuration=configuration;this.framework=framework;
-        this.player=player;this.client=client;this.gui=gui;this.log=log;framework.Update+=Update;
-        try{client.Logout+=Logout;}catch{framework.Update-=Update;throw;}
+        this.player=player;this.client=client;this.gui=gui;this.log=log;TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
+        try{client.Logout+=Logout;}catch{TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);throw;}
     }
     private void Logout(int type,int code){lock(gate){service.Reset();nextRead=0;}}
     private ulong Owner=>client.IsLoggedIn && player.IsLoaded ? player.ContentId:0;
@@ -87,5 +87,5 @@ internal sealed class CraftLogReader : IDisposable
             }
         }
     }
-    public void Dispose(){lock(gate){if(disposed)return;disposed=true;framework.Update-=Update;client.Logout-=Logout;service.Reset();}}
+    public void Dispose(){lock(gate){if(disposed)return;disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);client.Logout-=Logout;service.Reset();}}
 }

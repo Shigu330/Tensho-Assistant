@@ -10,7 +10,7 @@ internal sealed class DalamudInventoryReader : IDisposable
 {
     private static readonly GameInventoryType[] PlayerContainers =
         [GameInventoryType.Inventory1, GameInventoryType.Inventory2, GameInventoryType.Inventory3,
-            GameInventoryType.Inventory4, GameInventoryType.Crystals];
+            GameInventoryType.Inventory4, GameInventoryType.Crystals, GameInventoryType.EquippedItems];
     private readonly RegistrationScope registrations = new();
     private readonly InventoryCaptureCoordinator coordinator;
     private readonly IFramework framework;
@@ -32,7 +32,7 @@ internal sealed class DalamudInventoryReader : IDisposable
                 () => inventory.InventoryChanged -= OnInventoryChanged);
             registrations.Register(() => client.Login += OnLogin, () => client.Login -= OnLogin);
             registrations.Register(() => client.Logout += OnLogout, () => client.Logout -= OnLogout);
-            registrations.Register(() => framework.Update += OnUpdate, () => framework.Update -= OnUpdate);
+            registrations.Register(() => TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate), () => TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate));
         }
         catch
         {
@@ -42,7 +42,7 @@ internal sealed class DalamudInventoryReader : IDisposable
     }
 
     private static InventorySnapshot Capture(IGameInventory inventory, InventoryOwnerId owner) =>
-        InventoryNativeReader.Capture(inventory, owner, PlayerContainers, "Dalamud.IGameInventory/player-bags+crystals");
+        InventoryNativeReader.Capture(inventory, owner, PlayerContainers, "Dalamud.IGameInventory/player-bags+crystals+equipped");
 
     private void OnInventoryChanged(IReadOnlyCollection<InventoryEventArgs> _) => coordinator.Invalidate();
     private void OnLogin() => coordinator.Invalidate();

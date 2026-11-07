@@ -27,7 +27,7 @@ public sealed class RegenTickReader : IDisposable
     public RegenTickReader(IFramework framework,IObjectTable objects,ICondition condition,Func<bool> enabled,IPluginLog log)
     {
         this.framework=framework;this.objects=objects;this.condition=condition;this.enabled=enabled;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework _)
@@ -37,6 +37,9 @@ public sealed class RegenTickReader : IDisposable
         {
             var local=objects.LocalPlayer;
             var threshold=Alert?.Invoke();
+            // 0.656: a change of zone is not a fall of GP: the alert keeps what it knew (docs/evidence/0.656-gp-alert-teleport.md).
+            if(local is null || condition[ConditionFlag.BetweenAreas] || condition[ConditionFlag.BetweenAreas51])
+            {tracker.Reset();alert.Away();Volatile.Write(ref state,null);return;}
             if(!enabled() && threshold is null || local is null || local.ClassJob.RowId is not (16 or 17 or 18) || condition[ConditionFlag.InCombat])
             {tracker.Reset();alert.Reset();Volatile.Write(ref state,null);return;}
             if(threshold is { } target && alert.Evaluate(local.CurrentGp,local.MaxGp,target))Reached?.Invoke(local.CurrentGp,local.MaxGp);
@@ -55,6 +58,6 @@ public sealed class RegenTickReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

@@ -9,6 +9,13 @@ public sealed record CraftChainStep(RecipeDefinition Recipe, long Crafts, long P
 public sealed record CraftChainResult(long Requested, long Produced, IReadOnlyList<CraftChainStep> Steps,
     IReadOnlyList<CraftChainMaterial> Materials, IReadOnlyDictionary<uint, ItemHoldingsSummary> Observations)
 {
+    /// <summary>0.560 (C24): what is still to find of a material: what was missing at the calculation, less what came in since. Null when the chain does not need it or its stock was unknown.</summary>
+    public long? Remaining(uint item,long stockNow)
+    {
+        var missing=Materials.Where(material=>material.ItemId==item).Sum(material=>material.Amount);
+        if(missing<=0 || !Observations.TryGetValue(item,out var seen) || !seen.HasObservation)return null;
+        return Math.Max(0,missing-Math.Max(0,stockNow-seen.Total));
+    }
     public bool HasUnresolved => Materials.Any(material => material.Reason != CraftChainReason.RawMaterial);
     public bool HasUnknown => Observations.Values.Any(value => !value.HasObservation || value.HasUnknown);
     public bool HasCached => Observations.Values.Any(value => value.HasCached);
@@ -17,6 +24,35 @@ public sealed record CraftChainResult(long Requested, long Produced, IReadOnlyLi
 /// <summary>A bounded proposal, not a proof of recipe unlocks or successful crafting.</summary>
 public static class CraftChain
 {
+    /// <summary>
+    /// 0.591 (C18): the steps as a list to work through: one row per recipe with its total, each after the recipes that make its ingredients.
+    /// Keeping the first position alone could put a recipe before an ingredient only its second batch needed, so the order is worked out
+    /// again: among the rows whose ingredients are ready, the one that came first. Build's own steps stay unmerged.
+    /// </summary>
+    public static IReadOnlyList<CraftChainStep> Merged(IReadOnlyList<CraftChainStep> steps)
+    {
+        ArgumentNullException.ThrowIfNull(steps);
+        var rows=new List<CraftChainStep>();var positions=new Dictionary<uint,int>();
+        foreach(var step in steps)
+        {
+            if(positions.TryGetValue(step.Recipe.RecipeId,out var position))
+                rows[position]=rows[position] with {Crafts=checked(rows[position].Crafts+step.Crafts),Produced=checked(rows[position].Produced+step.Produced)};
+            else {positions[step.Recipe.RecipeId]=rows.Count;rows.Add(step);}
+        }
+        var makers=rows.Select(row=>row.Recipe.ResultItemId).ToHashSet();
+        var ordered=new List<CraftChainStep>(rows.Count);var left=new List<CraftChainStep>(rows);var made=new HashSet<uint>();
+        while(left.Count>0)
+        {
+            bool Ready(CraftChainStep row)=>row.Recipe.Ingredients.All(ingredient=>!makers.Contains(ingredient.ItemId) || made.Contains(ingredient.ItemId) || ingredient.ItemId==row.Recipe.ResultItemId);
+            // Build refuses cycles: the fallback only keeps this loop finite on data it never produces.
+            var next=left.FirstOrDefault(Ready) ?? left[0];
+            left.Remove(next);ordered.Add(next);
+            // Two recipes for one item both count once the first is placed: Build uses one recipe per item.
+            made.Add(next.Recipe.ResultItemId);
+        }
+        return ordered.AsReadOnly();
+    }
+
     public static CraftChainResult Build(RecipeDefinition root, long requested, RecipeCatalog catalog,
         Func<uint, ItemHoldingsSummary> holdings, CancellationToken cancellation = default,
         int maxDepth = 12, int maxNeeds = 2048, IReadOnlyDictionary<uint, uint>? recipeChoices = null)

@@ -32,7 +32,7 @@ public sealed unsafe class DutyProgressReader : IDisposable
     public DutyProgressReader(IFramework framework,IClientState client,IUnlockState unlocks,IDataManager data,IPluginLog log,Func<DutyCatalog?> catalog)
     {
         this.framework=framework;this.client=client;this.unlocks=unlocks;this.data=data;this.log=log;this.catalog=catalog;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     /// <summary>Called by the page while it shows the duty list (UI thread): keeps the reads going for 5 seconds.</summary>
@@ -76,6 +76,6 @@ public sealed unsafe class DutyProgressReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

@@ -1,7 +1,7 @@
 namespace TenshoAssistant.Hunting;
 
 /// <summary>A monster to defeat for a hunting log entry: its name, the kills needed and the zones the game names.</summary>
-public sealed record HuntTarget(string Monster,int Needed,string Zones);
+public sealed record HuntTarget(string Monster,int Needed,string Zones,uint NameId=0);
 
 /// <summary>A hunting log entry (MonsterNote row = log key × 10 000 + rank × 10 + number, 1-based number).</summary>
 public sealed record HuntEntry(uint RowId,string Name,IReadOnlyList<HuntTarget> Targets)
@@ -47,6 +47,29 @@ public static class HuntingLog
         if(slot.Rank<entry.Rank)return 0;
         return entry.Number<slot.Counts.Count && target<slot.Counts[entry.Number].Count
             ? Math.Min(entry.Targets[target].Needed,(int)slot.Counts[entry.Number][target]):null;
+    }
+
+    /// <summary>
+    /// 0.796 (X-36, user request): the monsters still to defeat, by their BNpcName row: entries of each log's current rank (the only one the game counts),
+    /// targets not done, logs shown for the character's company. A log not read gives nothing (unknown is not « missing »).
+    /// </summary>
+    public static IReadOnlyDictionary<uint,IReadOnlyList<(string Entry,int Killed,int Needed)>> Missing(IReadOnlyList<HuntEntry> entries,IReadOnlyList<HuntSlot> slots,uint? company)
+    {
+        var result=new Dictionary<uint,List<(string Entry,int Killed,int Needed)>>();
+        foreach(var entry in entries)
+        {
+            if(MemorySlot(entry.LogKey) is not { } index || index>=slots.Count || !Shown(entry.LogKey,company))continue;
+            var slot=slots[index];
+            if(slot.Rank!=entry.Rank)continue;
+            for(var target=0;target<entry.Targets.Count;target++)
+            {
+                var hunt=entry.Targets[target];
+                if(hunt.NameId==0 || Killed(entry,target,slot) is not { } killed || killed>=hunt.Needed)continue;
+                if(!result.TryGetValue(hunt.NameId,out var rows))result[hunt.NameId]=rows=[];
+                rows.Add((entry.Name,killed,hunt.Needed));
+            }
+        }
+        return result.ToDictionary(pair=>pair.Key,pair=>(IReadOnlyList<(string,int,int)>)pair.Value);
     }
 
     /// <summary>True when every target of the entry is done; null when not read.</summary>

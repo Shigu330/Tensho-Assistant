@@ -38,6 +38,9 @@ internal sealed partial class MainWindow
             foreach (var row in rows)
                 ImGui.TextUnformatted(localization.Format("DiagnosticsUi.DrawTimeLine", row.Name, row.Median.ToString("0.00"), row.Max.ToString("0.00"), row.Count));
         }
+        if(MapFailedParts() is { } mapParts)ImGui.TextColored(UI.FfxivTheme.Warning,mapParts);
+        // 0.601 (C36): which reading of the crafting and gathering helps fails.
+        if(FailedReadings() is {Count:>0} failedReadings)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("ReadFailed.Diagnostics",string.Join(", ",failedReadings.Select(part=>localization.Get("ReadFailed."+part)))));
         DrawSelfCheck();
         DrawMacroObservation();
         ImGui.Spacing();

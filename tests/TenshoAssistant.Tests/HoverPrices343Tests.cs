@@ -26,7 +26,7 @@ internal static class HoverPrices343Tests
             Check(quote.Nq.Minimum == 89 && quote.Nq.RecentSale == 71 && quote.Nq.Average == 104.09m && quote.Nq.Velocity == 93.3m,"world values");
             Check(quote.NqRegion is { Price: 40, WorldId: 33 } && quote.NqCheapest is { Price: 45, WorldId: 83 },"region and data center cheapest");
             Check(quote.Hq.Average is null && quote.Hq.Velocity is null && quote.HqRegion is null,"HQ absent: unknown, never zero");
-            Check(Read("Market/MarketService.cs").Contains("\"universalis-aggregated-v3\"",StringComparison.Ordinal),"disk copies without the new fields are fetched again");
+            Check(Read("Market/MarketService.cs").Contains("\"universalis-aggregated-v4\"",StringComparison.Ordinal),"disk copies without the new fields are fetched again");
         }),
         ("Hover prices: stack of the hovered slot kept only for that item; refresh asked once per Ctrl+Alt press, by the player",() =>
         {

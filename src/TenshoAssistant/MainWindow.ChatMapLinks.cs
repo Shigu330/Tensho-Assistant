@@ -81,6 +81,7 @@ internal sealed partial class MainWindow
                         ImGui.SameLine();
                         var place=map is null ? link.Place:string.IsNullOrWhiteSpace(map.Subzone) ? map.Zone:$"{map.Zone} · {map.Subzone}";
                         ImGui.TextUnformatted($"{link.At.ToLocalTime():t} · {place} ({link.X:0.0}, {link.Y:0.0})");
+                        if(map is not null && MapCatalog.CoordinatesValid(link.X,link.Y))PlaceMenu($"ChatLinkPlace{link.At.Ticks}",map,new(link.X,link.Y),place);
                         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ChatLinks.Line",ChannelName(link.Channel),
                             link.Sender.Length>0 ? link.Sender:localization.Get("ChatLinks.NoSender")));
                     }
@@ -101,7 +102,7 @@ internal sealed partial class MainWindow
     private void AskNearestAetheryteAt(MapDefinition map,Vector2 pixel,string place,bool flag=false,bool direct=false)
     {
         if(flag){var coordinate=MapProjection.CoordinateFromPixel(pixel,map);FlagFromMap(map,coordinate.X,coordinate.Y);}
-        OpenMapView(map.MapId);mapFitRequested=false;mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,1f));mapCenterRequest=pixel;
+        OpenMapView(map.MapId);mapFitRequested=false;mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,MapFocusZoom));mapCenterRequest=pixel;
         mapLive?.RefreshTeleportCosts();
         mapNearestRequest=(map.MapId,pixel,place,DateTimeOffset.UtcNow.AddSeconds(3),direct);
     }

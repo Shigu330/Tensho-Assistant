@@ -1,5 +1,7 @@
 # Publication sur le dépôt officiel Dalamud (D17)
 
+**Depuis DEC-039 (2026-11-05) : pas de soumission.** Tensho reste sur le dépôt personnalisé. Ce document sert de liste des règles Dalamud, qui restent appliquées ; les étapes de soumission ne sont plus à faire.
+
 Règles relues le 2026-11-04 : [soumission](https://dalamud.dev/plugin-publishing/submission),
 [approbation](https://dalamud.dev/plugin-publishing/approval-process),
 [restrictions](https://dalamud.dev/plugin-publishing/restrictions), [politique IA](https://dalamud.dev/plugin-publishing/ai-policy),
@@ -10,18 +12,24 @@ Liste relue contre le code à la version 0.512.
 
 La décision de soumettre appartient à l'auteur (DEC-023 : à la version 1.0.0). Un nouveau plugin passe d'abord par le canal de test. L'alternative
 reste le dépôt personnel, qui existe : `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`, mis à jour par
-`Verify.ps1 -Release` (dernière release : `Stable-0.451.0`, 2026-11-03).
+`Verify.ps1 -Release` (dernière release : `Stable-0.539.0`, 2026-11-05).
+
+
+Réponse reçue sur le Discord de Dalamud, 2026-11-05 (hOst1k, question posée par l'auteur) : pas de limite de taille si le plugin respecte les règles ; plus il est gros, plus le premier examen est long ; mieux vaut ne pas viser trop complexe dès le départ, Simple Tweaks et « VanillaTweaks » (sans doute VanillaPlus) ayant grandi avec le temps. Rôle exact de cette personne dans l'équipe : non vérifié. À cette date : 57 419 lignes de C# dans le plugin, 123 519 lignes suivies par git. Reste la politique IA : une soumission « Auto » trop grosse pour que l'auteur en réponde peut être fermée.
+
+Suite du même échange, 2026-11-05 : après avoir appris les 57 000 lignes écrites avec un agent, goat répond que cette quantité de code n'est pas examinable, new Era ajoute que beaucoup de choses existent déjà dans d'autres plugins, et MidoriKami demande à l'équipe d'approbation (`@dalamud-pac`) s'il existe un repère de taille pour du code écrit par IA. **La soumission d'un seul bloc au dépôt officiel paraît donc compromise**, à revoir par l'auteur avec DEC-037. Le dépôt personnalisé marche déjà et n'attend pas cet examen. État à cette date : 1 120 tests, dont beaucoup lisent le code source sans l'exécuter ; 415 cases d'essai en jeu ouvertes contre 156 cochées ; premier commit le 2026-10-31.
 
 ## Ce qui reste avant la soumission
 
-Par ordre. Les points marqués **règle Dalamud** demandent un résumé et l'accord de l'auteur (consigne du 2026-11-04).
+La soumission vient après tout le [plan global](GLOBAL-PLAN.md) (DEC-037). Par ordre. Les points marqués **règle Dalamud** demandent un résumé et l'accord de l'auteur (consigne du 2026-11-04).
 
 | # | Point | Qui | État |
 |---|---|---|---|
 | 1 | Jouer sur la dernière version : Dalamud demande que l'auteur ait testé. 284 cases ouvertes dans [TESTING](TESTING.md), rien de 0.490 à 0.512 validé en jeu sauf ce que lit l'auto-contrôle | auteur + agent | à faire |
 | 2 | **Règle Dalamud** : titre selon le job, seule action vers le jeu sans clic (réglage désactivé par défaut) | auteur | **décidé** (DEC-035) : gardé tel quel, à présenter dans la PR ; à revoir après la publication, ou si l'équipe le demande |
 | 3 | Alarmes du jeu : rien à changer (relu dans le code en 0.513). Les commandes `/alarm` partent toujours d'un clic du joueur : ajouter une alarme quand le réglage est actif, ou « Envoyer » ; les alarmes automatiques des servants et des vaisseaux n'en créent jamais. À présenter dans la PR | auteur | à écrire dans la PR |
-| 4 | **Règle Dalamud** : dresseur. La page est une liste d'informations ; le panneau du Dédale n'est pas codé (DEC-032). Contacter l'équipe avant de le coder | auteur | en attente : le dresseur est mis de côté |
+| 3 bis | **Règle Dalamud** : JcJ et contenu compétitif : Tensho se coupe en entier, sans réglage (DEC-038, 0.610). À essayer en jeu et à citer dans la soumission | auteur | codé, pas essayé en jeu |
+| 4 | **Règle Dalamud** : dresseur. La page est une liste d'informations ; le panneau du Dédale est abandonné (DEC-038), plus de contact nécessaire pour lui | auteur | traité |
 | 5 | **Règle Dalamud** : fenêtres. « Si ça ressemble à une fenêtre, utiliser l'API de fenêtres. » Tout est converti (0.514, 0.516) sauf les zones de clic invisibles de la Revue de mode ; à vérifier en jeu (#38) | auteur | à vérifier en jeu |
 | 6 | **Règle Dalamud** : déclaration d'IA et texte de la PR écrits par l'auteur ; il doit pouvoir expliquer le code. Taille à assumer : 474 fichiers, 53 700 lignes C# (3,4 Mo), soumission refusable à la discrétion de l'équipe si elle dépasse ce que l'auteur peut justifier | auteur | à faire ; brouillon dans `publish/d17/PULL_REQUEST.md` |
 | 7 | **Règle Dalamud** : icône générée par IA, déclarée. La politique préfère une icône faite main | auteur | à décider : la garder ou la remplacer |

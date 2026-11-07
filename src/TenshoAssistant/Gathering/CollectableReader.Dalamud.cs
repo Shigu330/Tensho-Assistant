@@ -40,7 +40,7 @@ internal sealed class CollectableReader : IDisposable
     public bool HoldingsUnavailable { get; private set; }
 
     public CollectableReader(IFramework framework,IGameGui gui,IClientState client,IDataManager data,IPluginLog log)
-    {this.framework=framework;this.gui=gui;this.client=client;this.data=data;this.log=log;framework.Update+=Update;}
+    {this.framework=framework;this.gui=gui;this.client=client;this.data=data;this.log=log;TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}
 
     private void Load()
     {
@@ -149,5 +149,5 @@ internal sealed class CollectableReader : IDisposable
         return Dalamud.Game.Text.SeStringHandling.SeString.Parse(node->NodeText.AsSpan()).TextValue;
     }
 
-    public void Dispose(){lock(gate){if(disposed)return;disposed=true;framework.Update-=Update;Volatile.Write(ref frame,null);}}
+    public void Dispose(){lock(gate){if(disposed)return;disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);Volatile.Write(ref frame,null);}}
 }

@@ -26,7 +26,7 @@ public sealed unsafe class TitleChanger : IDisposable
     public TitleChanger(IFramework framework,IClientState client,IPlayerState player,IPluginLog log,Func<bool> byJob,Func<IReadOnlyDictionary<uint,ushort>?> jobTitles)
     {
         this.framework=framework;this.client=client;this.player=player;this.log=log;this.byJob=byJob;this.jobTitles=jobTitles;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     /// <summary>The job the character is on now (0 = unknown), read on the framework thread.</summary>
@@ -73,6 +73,6 @@ public sealed unsafe class TitleChanger : IDisposable
     public void Dispose()
     {
         lock(gate){if(disposed)return;disposed=true;}
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

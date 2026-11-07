@@ -81,6 +81,19 @@ internal static class ItemHoldingsTests
             Check(result.Total == 35 && result.Rows.Any(row => row.Label == StorageLabel.Crystals && row.Nq == 25),
                 "crystals are included only when requested");
         }),
+        ("Holdings (0.549): worn gear counts on its own line, and an older copy has no such line", () =>
+        {
+            var worn = new InventorySnapshot(Time, "test", [
+                Container(1, 0, 10), Container(1, 1, 0), Container(1, 2, 0), Container(1, 3, 0),
+                Container(1, 1000, 1)]);
+            var result = ItemHoldings.Build(42, 1, worn, [], StorageFilter.All, includeCrystals: false);
+            Check(result.Total == 11 && result.Rows.Any(row => row.Label == StorageLabel.Worn && row.Nq == 1), "worn line");
+            var older = new InventorySnapshot(Time, "test", [
+                Container(1, 0, 10), Container(1, 1, 0), Container(1, 2, 0), Container(1, 3, 0)]);
+            Check(ItemHoldings.Build(42, 1, older, [], StorageFilter.All, includeCrystals: false).Rows.All(row => row.Label != StorageLabel.Worn), "no line");
+            var bank = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Bank.cs"));
+            Check(bank.Contains("container.Location.Container.Value is >=0 and <=3"), "the Bank's grid stays on the bags");
+        }),
         ("Holdings includes optional premium but requires standard chocobo placeholder", () =>
         {
             var premium = Bank(1, BankStorageKind.PremiumSaddlebag, 0, 4);

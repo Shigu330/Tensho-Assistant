@@ -31,7 +31,7 @@ public sealed unsafe class UndercutWatcher : IDisposable
     {
         this.board=board;this.framework=framework;this.configuration=configuration;this.announce=announce;this.log=log;
         board.OfferingsReceived+=OnOfferings;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework _)
@@ -84,6 +84,6 @@ public sealed unsafe class UndercutWatcher : IDisposable
         if(disposed)return;
         disposed=true;
         board.OfferingsReceived-=OnOfferings;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

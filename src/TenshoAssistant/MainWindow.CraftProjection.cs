@@ -92,10 +92,11 @@ internal sealed partial class MainWindow
     {
         if(windowDisposed || !configuration.CraftLivePanel)return;
         var state=craftLive.State;
+        if(state.Status==CraftLiveStatusKind.Error){DrawReadFailedPanel("TenshoCraftLiveFailed","Synthesis","CraftLive");return;}
         if(state.Frame is null)return;
         var addon=gameGui.GetAddonByName("Synthesis");
         if(addon.IsNull || !addon.IsVisible)return;
-        var viewport=ImGui.GetMainViewport();var width=Math.Min(560,viewport.WorkSize.X);var height=Math.Min(460,viewport.WorkSize.Y);
+        var viewport=ImGui.GetMainViewport();var width=Math.Min(560,viewport.WorkSize.X);var height=Math.Min(craftFollowSources.Length>0 && configuration.CraftLiveFollow ? 580:460,viewport.WorkSize.Y);
         var position=viewport.Pos+addon.Position+new Vector2(addon.ScaledWidth+6,0);
         if(position.X+width>viewport.WorkPos.X+viewport.WorkSize.X)position.X=viewport.Pos.X+addon.Position.X-width-6;
         position=Vector2.Clamp(position,viewport.WorkPos,Vector2.Max(viewport.WorkPos,viewport.WorkPos+viewport.WorkSize-new Vector2(width,height)));
@@ -120,6 +121,7 @@ internal sealed partial class MainWindow
         }
         if(state.ObservedAt is not { } date || now<date || now-date>TimeSpan.FromSeconds(2))
         {ImGui.TextWrapped(localization.Get("CraftProjectionUi.Old"));return;}
+        DrawCraftFollow(frame,catalog);
         if(projectionResult is not { } result)return;
         if(frame.Recipe is { } recipe && projectionRecipe!=recipe.RecipeId)
         {projectionRecipe=recipe.RecipeId;projectionTarget=recipe.Simulation?.Quality ?? 0;}

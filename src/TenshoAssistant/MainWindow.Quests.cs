@@ -32,6 +32,10 @@ internal sealed partial class MainWindow
     private int questViewFilter = -1;
     private string[] questCategories = [];
     private QuestEntry[] questMatches = [];
+    private (int From, int To) questViewLevels;
+    private bool questAvailableNow, questHereOnly;
+    private (bool, bool, string) questViewNarrow;
+    private (int Column, bool Descending) questSort, questViewSort;
     private int questActiveCount;
     private int questCompleteCount;
     private QuestLinks questLinks = new(Array.Empty<QuestEntry>());
@@ -123,30 +127,64 @@ internal sealed partial class MainWindow
             ImGui.Checkbox(localization.Format("QuestsBrowser.OtherCities", questOtherCity.Count) + "###QuestOtherCities", ref questShowOtherCities);
             if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("QuestsBrowser.OtherCitiesHelp", questPlayerCity ?? localization.Get("QuestsBrowser.CityUnknown")));
         }
+        // 0.550 (T3).
+        var levelFrom = configuration.QuestList.LevelFrom; var levelTo = configuration.QuestList.LevelTo;
+        ImGui.SetNextItemWidth(90);
+        var levelsChanged = ImGui.InputInt(localization.Get("QuestsBrowser.LevelFrom") + "###QuestLevelFrom", ref levelFrom);
+        Tip("QuestsBrowser.LevelFromTip");
+        ImGui.SameLine(); ImGui.SetNextItemWidth(90);
+        levelsChanged |= ImGui.InputInt(localization.Get("QuestsBrowser.LevelTo") + "###QuestLevelTo", ref levelTo);
+        Tip("QuestsBrowser.LevelToTip");
+        if (levelsChanged)
+        {
+            configuration.QuestList.LevelFrom = Math.Clamp(levelFrom, 0, 999); configuration.QuestList.LevelTo = Math.Clamp(levelTo, 0, 999);
+            try { save(); } catch (Exception saveFailure) { log.Warning(saveFailure, "Could not save the quest levels."); }
+        }
+        // 0.582 (T11).
+        ImGui.Checkbox(localization.Get("QuestsBrowser.AvailableNow")+"###QuestAvailableNow",ref questAvailableNow);
+        Tip("QuestsBrowser.AvailableNowTip");
+        ImGui.SameLine();
+        ImGui.Checkbox(localization.Get("QuestsBrowser.HereOnly")+"###QuestHereOnly",ref questHereOnly);
+        Tip("QuestsBrowser.HereOnlyTip");
+        var territoryHere=mapLive?.State?.TerritoryId ?? 0;
+        var zoneHere=questHereOnly && territoryHere!=0 ? maps.State.Catalog?.Entries.FirstOrDefault(map=>map.TerritoryId==territoryHere)?.Zone ?? "":"";
         ImGui.TextWrapped(localization.Get("QuestsBrowser.Help"));
         if (!ReferenceEquals(questViewState?.Entries, state.Entries) || questViewQuery != questQuery
             || questViewCategory != questCategory || questViewFilter != questFilter || questViewSection != questSection
-            || questViewShowOtherCities != questShowOtherCities)
+            || questViewShowOtherCities != questShowOtherCities || questViewLevels != (configuration.QuestList.LevelFrom, configuration.QuestList.LevelTo) || questViewSort != questSort || questViewNarrow != (questAvailableNow,questHereOnly,zoneHere))
         {
+            questViewNarrow = (questAvailableNow,questHereOnly,zoneHere);
+            questViewLevels = (configuration.QuestList.LevelFrom, configuration.QuestList.LevelTo); questViewSort = questSort;
             questViewSection = questSection; questViewShowOtherCities = questShowOtherCities;
-            questMatches = state.Entries.Where(entry => (questShowOtherCities || !questOtherCity.Contains(entry.Id))
+            questMatches = TenshoAssistant.Quests.QuestList.Sorted(state.Entries.Where(entry => (questShowOtherCities || !questOtherCity.Contains(entry.Id))
+                && TenshoAssistant.Quests.QuestList.InLevels(entry.Level, questViewLevels.From, questViewLevels.To)
+                && (!questAvailableNow || TenshoAssistant.Quests.QuestList.Available(questLinks, entry))
+                && (!questHereOnly || entry.Zone == zoneHere)
                 && (questSection.Length == 0 || entry.Section == questSection)
                 && (string.IsNullOrWhiteSpace(questCategory) || entry.Category == questCategory)
                 && (questFilter == 0 || entry.Progress == (questFilter == 1 ? QuestProgress.Active : questFilter == 2 ? QuestProgress.Complete : QuestProgress.Unconfirmed))
                 && (string.IsNullOrWhiteSpace(questQuery) || entry.Name.Contains(questQuery.Trim(), StringComparison.OrdinalIgnoreCase)
-                    || entry.Id.ToString(CultureInfo.InvariantCulture) == questQuery.Trim())).ToArray();
+                    || entry.Id.ToString(CultureInfo.InvariantCulture) == questQuery.Trim())), questSort.Column, questSort.Descending);
             questViewState = state; questViewQuery = questQuery;
             questViewCategory = questCategory; questViewFilter = questFilter;
         }
         var matches = questMatches;
         if (matches.Length == 0) { ImGui.TextDisabled(localization.Get("QuestsBrowser.Empty")); return; }
-        if (!ImGui.BeginTable("QuestEntries", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp)) return;
+        if (!ImGui.BeginTable("QuestEntries", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.Sortable)) return;
         try
         {
             ImGui.TableSetupColumn(localization.Get("QuestsBrowser.Quest"), ImGuiTableColumnFlags.WidthStretch, 2);
+            ImGui.TableSetupColumn(localization.Get("QuestsBrowser.Level"));
+            ImGui.TableSetupColumn(localization.Get("QuestsBrowser.Zone"));
             ImGui.TableSetupColumn(localization.Get("QuestsBrowser.Category"));
             ImGui.TableSetupColumn(localization.Get("QuestsBrowser.Progress"));
             ImGui.TableHeadersRow();
+            var specs = ImGui.TableGetSortSpecs();
+            if (!specs.IsNull && specs.SpecsDirty && specs.SpecsCount > 0)
+            {
+                questSort = (specs.Specs.ColumnIndex, specs.Specs.SortDirection == ImGuiSortDirection.Descending);
+                specs.SpecsDirty = false;
+            }
             var clipper = ImGui.ImGuiListClipper();
             try
             {
@@ -162,6 +200,8 @@ internal sealed partial class MainWindow
                 if (ImGui.Selectable($"{entry.Name}##quest{entry.Id}", selectedQuestId == entry.Id)) SelectQuest(entry.Id);
                 if (ImGui.IsItemHovered()) WrappedTooltip(developerMode ? $"{entry.Name}\n{entry.Section} › {entry.Category}\nID: {entry.Id}":$"{entry.Name}\n{entry.Section} › {entry.Category}");
                 QuestMenu($"QuestMenu{entry.Id}", entry.Id, entry.Name);
+                ImGui.TableNextColumn(); if (entry.Level > 0) ImGui.TextUnformatted(entry.Level.ToString(CultureInfo.CurrentCulture)); else ImGui.TextDisabled("?");
+                ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Zone ?? "");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Category);
                 if (entry.Section.Length > 0 && ImGui.IsItemHovered()) WrappedTooltip(entry.Section);
                 ImGui.TableNextColumn();
@@ -206,6 +246,8 @@ internal sealed partial class MainWindow
         if(entry.IsRepeatable)ImGui.TextDisabled(localization.Get("QuestDetails.Repeatable"));
         if(developerMode)ImGui.TextDisabled($"ID {entry.Id}");
         ImGui.TextUnformatted(QuestProgressLabel(entry));
+        // T13 (0.648): what this quest unlocks.
+        foreach(var unlocked in duties.State.Catalog?.UnlockedBy(entry.Id) ?? [])ImGui.TextDisabled(localization.Format("DutyUi.Unlocks",unlocked.Name));
         DrawQuestRewards(entry);
         if (entry.Level != 0)
             ImGui.TextUnformatted(localization.Format("QuestDetails.Level",entry.Level));
@@ -243,6 +285,7 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.TreePop(); }
         }
+        DrawQuestPath(entry);
         var following = questLinks.Following(entry.Id);
         if (ImGui.TreeNode(localization.Format("QuestDetails.Following",following.Count)+"###QuestFollowing"))
         {
@@ -280,6 +323,30 @@ internal sealed partial class MainWindow
     };
 
     // State filters of the Quests page and of an item's quest sources; literal keys, so the tooltip key test sees them.
+    // 0.583 (T12): computed once per quest and per published list.
+    private (QuestLinks Links,uint Id,TenshoAssistant.Quests.QuestList.QuestPath Path)? questPath;
+    private void DrawQuestPath(QuestEntry entry)
+    {
+        if(entry.PreviousQuestIds.Count==0)return;
+        if(questPath is not { } known || !ReferenceEquals(known.Links,questLinks) || known.Id!=entry.Id)
+        {
+            known=(questLinks,entry.Id,TenshoAssistant.Quests.QuestList.PathTo(questLinks,entry.Id));
+            questPath=known;
+        }
+        var path=known.Path;
+        if(path.Todo.Count>0 && ImGui.TreeNodeEx(localization.Format("QuestDetails.PathTitle",path.Todo.Count)+"###QuestPath"))
+        {
+            try
+            {
+                ImGui.TextColored(Accent,localization.Format("QuestDetails.PathFirst",path.Todo[0].Name));
+                foreach(var step in path.Todo.Take(30))DrawQuestLink(step.Id,"path");
+                if(path.Todo.Count>30)ImGui.TextDisabled(localization.Format("QuestDetails.PathMore",path.Todo.Count-30));
+            }
+            finally{ImGui.TreePop();}
+        }
+        if(path.Unknown)ImGui.TextDisabled(localization.Get("QuestDetails.PathUnknown"));
+        if(path.Cut)ImGui.TextDisabled(localization.Get("QuestDetails.PathCut"));
+    }
     private void QuestFilterTip(QuestSourceProgressFilter filter)
     {
         switch (filter)

@@ -1,3 +1,4 @@
+using TenshoAssistant.Maps;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
@@ -137,6 +138,7 @@ internal sealed partial class MainWindow
                             }
                         }
                         finally { ImGui.EndDisabled(); }
+                        if (goTo is { } goSpot) PlaceMenu("GoTherePlace", goSpot.Map, MapProjection.CoordinateFromPixel(goSpot.Pixel, goSpot.Map), string.IsNullOrWhiteSpace(source.Place) ? source.Zone : source.Place);
                         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(localization.Get(goTo is null ? "GatheringDetails.GoThereUnknown":configuration.GoThereTeleport ? "GatheringDetails.GoThereDirectTip":"GatheringDetails.GoThereTip"));
                         DrawGatheringGearset(source);
                         if(ImGui.SmallButton(localization.Get("GatheringDetails.ZoneWeather"))) OpenWeather(source.TerritoryId,source.Zone);

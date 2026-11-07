@@ -16,6 +16,7 @@ internal sealed class RecipeCatalogLoader : IDisposable
     private readonly List<RecipeDefinition> rows = [];
     private ExcelSheet<Recipe>? sheet;
     private ExcelSheet<RecipeLevelTable>? levelSheet;
+    private ExcelSheet<WKSMissionToDoEvalutionRefin>? missionSheet;
     private ExcelSheet<CraftType>? craftSheet;
     private int position;
     private Task<(RecipeCatalog? Catalog, Exception? Error, bool FromCache)>? build;
@@ -36,7 +37,7 @@ internal sealed class RecipeCatalogLoader : IDisposable
         this.framework = framework;
         this.log = log;
         this.cache = cache;
-        try { framework.Update += OnUpdate; }
+        try { TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate); }
         catch { cancellation.Dispose(); throw; }
     }
 
@@ -109,6 +110,7 @@ internal sealed class RecipeCatalogLoader : IDisposable
 
             sheet ??= data.GetExcelSheet<Recipe>();
             levelSheet ??= data.GetExcelSheet<RecipeLevelTable>();
+            missionSheet ??= data.GetExcelSheet<WKSMissionToDoEvalutionRefin>();
             craftSheet ??= data.GetExcelSheet<CraftType>();
             var end = Math.Min(position + 128, sheet.Count);
             var started = Stopwatch.GetTimestamp();
@@ -128,7 +130,9 @@ internal sealed class RecipeCatalogLoader : IDisposable
                     if(!levelSheet.TryGetRow(row.RecipeLevelTable.RowId,out var table))continue;
                     var level = table.ClassJobLevel;
                     var craftType = craftSheet.TryGetRow(row.CraftType.RowId,out var craftRow) ? craftRow.Name.ExtractText():"";
-                    var simulation=RecipeSimulationCopy.Copy(row,table);
+                    // C6 (0.666): CollectableMetadataKey 7 names a Cosmic Exploration row (184 recipes, docs/evidence/0.666-adjusted-recipes.md).
+                    var mission=row.CollectableMetadataKey==7 && missionSheet.TryGetRow(row.CollectableMetadata.RowId,out var thresholds) ? ((int)thresholds.Unknown0,(int)thresholds.Unknown1,(int)thresholds.Unknown2):default;
+                    var simulation=RecipeSimulationCopy.Copy(row,table,mission);
                     rows.Add(new RecipeDefinition(row.RowId, row.ItemResult.RowId, row.AmountResult,
                         craftType, level, ingredients, row.CraftType.RowId,simulation));
                 }
@@ -141,7 +145,7 @@ internal sealed class RecipeCatalogLoader : IDisposable
             var managed = rows.ToArray();
             var version = dataVersion!;
             var token = cancellation.Token;
-            sheet = null; levelSheet = null; craftSheet = null; rows.Clear();
+            sheet = null; levelSheet = null; missionSheet = null; craftSheet = null; rows.Clear();
             if (cache is not null) toPersist = managed;
             build = Task.Run<(RecipeCatalog? Catalog, Exception? Error, bool FromCache)>(() =>
             {
@@ -161,9 +165,9 @@ internal sealed class RecipeCatalogLoader : IDisposable
     {
         if (stopped) return;
         stopped = true;
-        framework.Update -= OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         sheet = null;
-        levelSheet = null; craftSheet = null;
+        levelSheet = null; missionSheet = null; craftSheet = null;
         rows.Clear();
         cacheRead = null;
         toPersist = null;

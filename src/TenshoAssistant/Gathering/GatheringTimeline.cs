@@ -2,6 +2,23 @@ namespace TenshoAssistant.Gathering;
 
 public sealed record GatheringOpening(DateTimeOffset StartsAt,DateTimeOffset EndsAt,bool Current);
 public sealed record GatheringTimeline(GatheringScheduleKind Kind,int EtMinute,DateTimeOffset CalculatedAt,IReadOnlyList<GatheringOpening> Openings);
+/// <summary>0.588 (C7): the timed points open now, then those opening soon. Fish are left out: their weather is not checked here.</summary>
+public static class GatheringNow
+{
+    public static IReadOnlyList<(GatheringSource Source,GatheringOpening Opening)> Rows(IEnumerable<GatheringSource> sources,DateTimeOffset now,TimeSpan soon,int limit)
+    {
+        var rows=new List<(GatheringSource Source,GatheringOpening Opening)>();
+        foreach(var source in sources)
+        {
+            if(source.IsFishing || source.Timing.Kind!=GatheringScheduleKind.Limited)continue;
+            if(GatheringTime.Next(source.Timing,now,1).Openings is not [var opening,..] || !opening.Current && opening.StartsAt>now+soon)continue;
+            rows.Add((source,opening));
+        }
+        return rows.OrderByDescending(row=>row.Opening.Current).ThenBy(row=>row.Opening.Current ? row.Opening.EndsAt:row.Opening.StartsAt).ThenBy(row=>row.Source.ItemId)
+            .DistinctBy(row=>(row.Source.ItemId,row.Source.PointId)).Take(limit).ToArray();
+    }
+}
+
 public static class GatheringTime
 {
     private const long DayTicks=4200L*TimeSpan.TicksPerSecond;

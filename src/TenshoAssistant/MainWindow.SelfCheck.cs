@@ -17,15 +17,18 @@ internal sealed partial class MainWindow
     {
         var items = itemCatalog.State; var recipes = recipeCatalog.State; var gathered = gatheringCatalog.State;
         var places = maps.State; var duty = duties.State; var vendors = npcVendors?.State; var triad = triadNpcs?.State;
+        StartSelfCheckPages();
         return (items.Catalog is not null || items.Error is not null) && (recipes.Catalog is not null || recipes.Error is not null)
             && (gathered.Catalog is not null || gathered.Error is not null) && (places.Catalog is not null || places.Error is not null)
             && (duty.Catalog is not null || duty.Error is not null) && (vendors is null || vendors.Catalog is not null || vendors.Error is not null)
-            && (triad is null || !triad.Loading) && !quests.State.Loading && !collections.State.Loading;
+            && (triad is null || !triad.Loading) && !quests.State.Loading && !collections.State.Loading
+            && selfCheckPages!.All(page => page.Read.IsCompleted);
     }
 
     /// <summary>Readers that read only while a page asks are asked first.</summary>
     internal void PrepareSelfCheck()
     {
+        StartSelfCheckPages();
         GearsetSource?.Want();
         Currencies?.Invoke()?.Want();
         // These ask their reader when called.
@@ -38,6 +41,7 @@ internal sealed partial class MainWindow
         (string, Func<SelfCheckLine>) Own(string domain, Func<SelfCheckLine> read) => (domain, () => Personal(domain, read));
         return
         [
+            .. SelfCheckPageProbes(),
             ("items", () => { var state = itemCatalog.State; return Diagnostics.SelfCheck.Catalog("items", state.Catalog?.Count, state.RowsCopied, state.TotalRows, state.Error); }),
             ("recipes", () => { var state = recipeCatalog.State; return Diagnostics.SelfCheck.Catalog("recipes", state.Catalog?.Count, state.RowsCopied, state.TotalRows, state.Error); }),
             ("gathering", () => { var state = gatheringCatalog.State; return Diagnostics.SelfCheck.Catalog("gathering", state.Catalog?.Count, state.Copied, state.Total, state.Error); }),

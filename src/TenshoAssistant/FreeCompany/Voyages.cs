@@ -85,6 +85,9 @@ public static class Voyages
     }
 
     /// <summary>Next return still to come, over all vessels (null when none is out).</summary>
+    /// <summary>0.603 (T23): the vessels by workshop, the most recently read first.</summary>
+    public static IReadOnlyList<IReadOnlyList<VoyageVessel>> Workshops(IEnumerable<VoyageVessel> vessels)
+        =>vessels.GroupBy(vessel=>vessel.HouseId).OrderByDescending(group=>group.Max(vessel=>vessel.ReadAt)).Select(group=>(IReadOnlyList<VoyageVessel>)group.ToArray()).ToArray();
     public static DateTimeOffset? NextReturn(IEnumerable<VoyageVessel>? vessels,DateTimeOffset now)
         =>(vessels ?? []).Select(vessel=>vessel.ReturnAt).Where(at=>at>now).Min();
 }

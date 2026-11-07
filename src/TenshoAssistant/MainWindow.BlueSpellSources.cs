@@ -13,6 +13,40 @@ internal sealed partial class MainWindow
     private int blueSpellOrder;
     private int? BlueSpellLevel(int number)=>BlueSpellIndex?.Get(number)?.MonsterLevel;
 
+    // 0.798 (X-38, user request): the monsters of every spell, for the nearby monsters (map now, icons above their heads next); read on a click only.
+    private void DrawBlueSpellNearby()
+    {
+        if(BlueSpellNearby is not { } index)return;
+        var spells=collections.State.Entries.Where(entry=>entry.Kind==TenshoAssistant.Collections.CollectionKind.BlueMagic).Select(entry=>entry.Id).ToArray();
+        index.LoadCached(spells);
+        BoolSetting("MapView.ShowBlueMageMonsters","BlueSpellSources.NearbyTip",()=>configuration.MapView.ShowBlueMageMonsters,value=>configuration.MapView.ShowBlueMageMonsters=value,c=>c.MapView.ShowBlueMageMonsters);
+        if(!configuration.MapView.ShowBlueMageMonsters)return;
+        ImGui.Indent();
+        try
+        {
+            BoolSetting("MapView.AboveBlueSpell","BlueSpellSources.AboveTip",()=>configuration.MapView.AboveBlueSpell,value=>configuration.MapView.AboveBlueSpell=value,c=>c.MapView.AboveBlueSpell);
+            BoolSetting("MapView.BlueMageMonstersAlways","BlueSpellSources.AlwaysTip",()=>configuration.MapView.BlueMageMonstersAlways,value=>configuration.MapView.BlueMageMonstersAlways=value,c=>c.MapView.BlueMageMonstersAlways);
+            var missing=spells.Length-index.Known;
+            if(index.Running)
+            {
+                var (done,asked,failed)=index.Progress;
+                ImGui.TextDisabled(localization.Format("BlueSpellSources.NearbyReading",done,asked,failed));
+            }
+            else
+            {
+                ImGui.TextDisabled(localization.Format("BlueSpellSources.NearbyKnown",index.Known,spells.Length));
+                if(missing>0)
+                {
+                    ImGui.SameLine();
+                    if(SourceButton(localization.Format("BlueSpellSources.NearbyFetch",missing),configuration.CommunityWiki,true))index.FetchMissing(spells);
+                    Tip("BlueSpellSources.NearbyFetchTip");
+                }
+                if(index.Error=="disabled")ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
+            }
+        }
+        finally{ImGui.Unindent();}
+    }
+
     // Above the spell list: the order (number, or the lowest teaching monster's level) and how far the wiki reading is.
     private void DrawBlueSpellOrder()
     {
@@ -35,7 +69,17 @@ internal sealed partial class MainWindow
         else if(!configuration.CommunityWiki || index.Error=="disabled")ImGui.TextDisabled(localization.Get("BlueSpellSources.IndexOff"));
         else if(index.Error is not null)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("BlueSpellSources.IndexFailed"));
     }
-    internal Func<string,uint>? EnglishPlaceId { get; set; }
+    /// <summary>0.777 (X-22, user report): every place row with this English name; the game has several for some (« Mor Dhona »: 26, 67, 509).</summary>
+    internal Func<string,IReadOnlyList<uint>>? EnglishPlaceIds { get; set; }
+    private readonly HashSet<string> wikiPlacesNotFound=new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>The map of a wiki place: the first of its place rows that has one; null, and noted once in developer mode, when none has.</summary>
+    private Maps.MapDefinition? MapOfEnglishPlace(string place)
+    {
+        foreach(var id in EnglishPlaceIds?.Invoke(place) ?? [])
+            if(maps.State.Catalog?.ForPlace(id).FirstOrDefault() is { } map)return map;
+        if(developerMode && maps.State.Catalog is not null && wikiPlacesNotFound.Add(place))log.Information("Wiki place without a map: \"{0}\".",place);
+        return null;
+    }
     // 0.390 (user request « sort by the monster's level »): 0 = wiki order, 1 = lowest level first, 2 = highest first (session only).
     private int blueMonsterOrder=1;
     private static readonly string[] BlueMonsterOrders=["OrderWiki","OrderLevelUp","OrderLevelDown"];
@@ -77,8 +121,9 @@ internal sealed partial class MainWindow
             index++;
             ImGui.TextWrapped($"{CommunityMonster(row.Name)} · {row.Level} · {CommunityPlace(row.Location)}");
             var place=BlueSpellSources.Parse(row.Location);
-            if(place.X is not { } x || place.Y is not { } y || EnglishPlaceId?.Invoke(place.Place) is not (> 0 and var placeId)
-               || maps.State.Catalog?.ForPlace(placeId).FirstOrDefault() is not { } map)continue;
+            if(place.X is not { } x || place.Y is not { } y || MapOfEnglishPlace(place.Place) is not { } map)continue;
+            PlaceMenu($"BluePlace{index}",map,new(x,y),CommunityMonster(row.Name));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("EntityMenu.RightClickPlace"));
             ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("BlueSpellSources.Flag")+$"##BlueFlag{index}"))PlaceFlagFromMapView(map,x,y);
         }

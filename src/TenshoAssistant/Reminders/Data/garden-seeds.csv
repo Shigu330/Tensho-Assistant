@@ -111,3 +111,5 @@ seed,harvest,grow,wilt
 47950,47951,24,0
 46803,46804,24,0
 49773,49774,24,0
+# Not in the source: GardeningSeed row 108 (0.540, docs/evidence/0.540-cornflower-seed.md). Ids from the game; 24 h, no wilting: what the source gives for all 26 other pot flowers.
+51189,51190,24,0

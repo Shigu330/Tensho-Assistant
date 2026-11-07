@@ -28,6 +28,28 @@ public sealed class InventoryBankService : IDisposable
     public BankState State => Volatile.Read(ref state);
 
     /// <summary>0.345 (g, I-03): erases every saved storage of one character (the « Erase this character » button); queued like an import.</summary>
+    /// <summary>0.576 (I1): one storage's read, for a retainer sent away or an old storage; only on the player's click.</summary>
+    public Task<BankImportResult> ForgetAsync(BankKey key)
+    {
+        lock (gate)
+        {
+            if (disposed) return Rejected("The bank is stopped.");
+            if (state.Loading) return Rejected("The bank is still loading.");
+            if (loadFailed) return Rejected("Bank loading failed; nothing is changed to protect the file.");
+            if (pending is not null) return Rejected("An import is already running.");
+            var request = new ImportRequest(null, 0, key);
+            pending = request;
+            Publish(new(state.Entries, false, true, null));
+            if (!requests.Writer.TryWrite(request))
+            {
+                pending = null;
+                Publish(new(state.Entries, false, false, state.Error));
+                request.Result.TrySetResult(new(false, "The save service is unavailable."));
+            }
+            return request.Result.Task;
+        }
+    }
+
     public Task<BankImportResult> EraseCharacterAsync(ulong character)
     {
         lock (gate)
@@ -74,6 +96,9 @@ public sealed class InventoryBankService : IDisposable
         }
     }
 
+    // Only touched by the worker: when each entry's file copy was last written in this session.
+    private readonly Dictionary<BankKey, DateTimeOffset> savedAt = [];
+
     private async Task RunAsync()
     {
         try
@@ -106,18 +131,22 @@ public sealed class InventoryBankService : IDisposable
                 lock (gate)
                 {
                     if (disposed) return;
-                    next = request.Erase != 0 ? state.Entries.Where(e => e.Key.CharacterId != request.Erase).ToArray()
+                    next = request.Forget is { } forgotten ? state.Entries.Where(e => e.Key != forgotten).ToArray()
+                        : request.Erase != 0 ? state.Entries.Where(e => e.Key.CharacterId != request.Erase).ToArray()
                         : state.Entries.Where(e => e.Key != request.Entry!.Key).Append(request.Entry!).ToArray();
                 }
                 string? error = null;
-                try { store.Save(Array.AsReadOnly(next)); }
+                // 0.605: the date is new in memory, the file is only rewritten when the contents changed or the saved date grows old.
+                var unchanged = false;
+                lock (gate) unchanged = request.Entry is { } incoming && BankEntryCompare.CanSkipSave(state.Entries.FirstOrDefault(e => e.Key == incoming.Key), incoming, savedAt);
+                try { if (!unchanged) { store.Save(Array.AsReadOnly(next)); if (request.Entry is { } saved) savedAt[saved.Key] = saved.Snapshot.ObservedAt; } }
                 catch (Exception ex) { error = $"Bank save failed: {ex.Message}"; }
                 lock (gate)
                 {
                     if (disposed) return;
                     Publish(new(error is null ? next : state.Entries, false, false, state.Error));
                     pending = null;
-                    request.Result.TrySetResult(new(error is null, error ?? (request.Erase != 0 ? "Character erased." : "Import saved in the bank.")));
+                    request.Result.TrySetResult(new(error is null, error ?? (request.Forget is not null ? "Read erased." : request.Erase != 0 ? "Character erased." : "Import saved in the bank.")));
                 }
             }
         }
@@ -172,7 +201,7 @@ public sealed class InventoryBankService : IDisposable
     }
 
     // 0.345 (g, I-03): Erase != 0 = erase every entry of that character (its file is deleted by the store) instead of importing Entry.
-    private sealed record ImportRequest(BankEntry? Entry, ulong Erase = 0)
+    private sealed record ImportRequest(BankEntry? Entry, ulong Erase = 0, BankKey? Forget = null)
     {
         public TaskCompletionSource<BankImportResult> Result { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
     }

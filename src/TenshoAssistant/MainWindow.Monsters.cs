@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Numerics;
+using TenshoAssistant.Maps;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Monsters;
 
@@ -43,8 +44,17 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(document.Url);
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,document.FetchedAt);
         if(document.Monsters.Count==0)ImGui.TextWrapped(localization.Get("WikiMonsters.Empty"));
+        var wikiRow=0;
         foreach(var row in document.Monsters)
-        {ImGui.TextWrapped($"{CommunityMonster(row.Name)} · {row.Level} · {CommunityPlace(row.Location)}");}
+        {
+            wikiRow++;
+            ImGui.TextWrapped($"{CommunityMonster(row.Name)} · {row.Level} · {CommunityPlace(row.Location)}");
+            // 0.704 (user report): the wiki gives a place: right click, the nearest aetheryte.
+            var place=BlueSpellSources.Parse(row.Location);
+            if(place.X is not { } x || place.Y is not { } y || MapOfEnglishPlace(place.Place) is not { } map)continue;
+            PlaceMenu($"WikiMonsterPlace{wikiRow}",map,new(x,y),CommunityMonster(row.Name));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("EntityMenu.RightClickPlace"));
+        }
     }
     private void DrawMonsterLoot()
     {
@@ -180,9 +190,19 @@ internal sealed partial class MainWindow
         }
         if (chosen is not null && ImGui.SmallButton(localization.Get("MonsterUi.OpenMap")+"##Monster"))
         {
-            selectedMapId=chosen.MapId; mapQuery=""; mapX=20.5f; mapY=20.5f;
-            selectedBookmark=Guid.Empty; bookmarkName=""; bookmarkSaved=false; mapOpenError=null; page=Page.Maps;
+            // 0.551 (T4): at the position the sheet shows (community data), with the flag; without one, the map page as before.
+            if (monster.X is { } x && monster.Y is { } y)
+            {
+                FlagFromMap(chosen,x,y);
+                OpenMapView(chosen.MapId); mapFitRequested=false; mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,MapFocusZoom)); mapCenterRequest=MapProjection.PixelFromCoordinate(new Vector2(x,y),chosen);
+            }
+            else
+            {
+                selectedMapId=chosen.MapId; mapsTabRequest=0; mapQuery=""; mapX=20.5f; mapY=20.5f;
+                selectedBookmark=Guid.Empty; bookmarkName=""; bookmarkSaved=false; mapOpenError=null; page=Page.Maps;
+            }
         }
+        if (chosen is not null && monster.X is { } menuX && monster.Y is { } menuY) PlaceMenu("MonsterPlace",chosen,new(menuX,menuY),monster.Name);
         ImGui.TextDisabled(localization.Get("MonsterUi.MapHelp"));
     }
 }

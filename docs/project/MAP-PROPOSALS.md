@@ -17,6 +17,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P1 — Zoom à l'ouverture, réglable et gardé entre les sessions
 
+- **État (relu le 2026-11-05)** : FAIT 0.542.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : La carte s'ouvre au zoom choisi par le joueur : le dernier zoom utilisé (gardé après une relance du jeu), un pourcentage fixe en suivant le personnage, ou la carte entière. Le zoom appliqué quand on demande une quête ou un lien est réglable lui aussi. Aujourd'hui, la carte démarre toujours à 50 %.
 - **Comment, taille, dépendances** : Ajouter à MapViewSettings : OpenZoomMode (dernier, fixe, carte entière), OpenZoomPercent, FocusZoomPercent (100 % par défaut) et LastZoom. LastZoom est enregistré à la fermeture de la fenêtre ou après une pause, jamais à chaque image. Chaque réglage a son infobulle et son ↺. Les classer dans les listes de ConfigurationReset (un test l'exige). Taille S. Aucune sonde. Une décision : la valeur par défaut. Recommandé : « dernier zoom », avec 50 % la première fois, ce qui ne change rien pour l'utilisateur actuel.
@@ -24,6 +25,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P2 — Taille des étiquettes réglée à part de celle des icônes
 
+- **État (relu le 2026-11-05)** : FAIT 0.543.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Les noms de lieux et les étiquettes de niveau des points de récolte restent lisibles à tous les zooms sans se chevaucher. Sur une carte de région très dézoomée, les noms rétrécissent ou se masquent sous un seuil choisi par le joueur. Les étiquettes de récolte et les repères au bord suivent la taille choisie.
 - **Comment, taille, dépendances** : Ajouter un « Suivi du zoom des noms » séparé (repli : la valeur actuelle) et un « zoom minimal pour afficher les noms », puis faire suivre la même règle aux étiquettes de récolte (seuil réglable, ou zoom minimal, à la place de 0,6). Ajouter éventuellement une échelle des repères au bord. Option : ne pas dessiner un nom qui en recouvre un autre déjà dessiné (test de rectangles, liste bornée par carte). Infobulle et ↺ partout. Taille S. Aucune sonde. Une décision : les valeurs par défaut (recommandé : celles d'aujourd'hui, rien ne change tant que le joueur ne règle rien).
@@ -31,6 +33,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P3 — Éthérite la plus proche du drapeau ou d'un point, avec son coût
 
+- **État (relu le 2026-11-05)** : FAIT 0.544.
 - **État (relu le 2026-11-03)** : en partie : éthérite la plus proche avec son coût pour les liens du chat (0.373) et « Y aller » des lieux de récolte (0.397) ; pas encore depuis le drapeau ou un point quelconque.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Clic droit sur la carte ou sur le drapeau : l'entrée « Se téléporter à l'éthérite la plus proche » donne le nom et le coût réel en gils, puis demande la confirmation habituelle. Plus besoin de chercher soi-même l'éthérite à côté d'un drapeau posé (train de chasse, rendez-vous).
@@ -47,6 +50,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P5 — Molette : zoom depuis toute la fenêtre et pas réglable
 
+- **État (relu le 2026-11-05)** : FAIT 0.545.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : La molette zoome partout au-dessus de la carte : sur le curseur de zoom, sur la colonne d'outils et sur les noms posés par-dessus la carte. Le pas de la molette est réglable et son sens peut être inversé.
 - **Comment, taille, dépendances** : Lire io.MouseWheel quand la fenêtre de la carte ou l'un de ses enfants est survolé (IsWindowHovered RootAndChildWindows). Au-dessus de la colonne ou du curseur, zoomer autour du centre du canevas. Ajouter MapViewSettings.WheelStep et WheelInvert, avec infobulle et ↺. Taille S. Aucune sonde. Une décision : préciser ce que visait la note, puisque la molette marche déjà sur le canevas (recommandé : les trois points ci-dessus).
@@ -76,6 +80,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P9 — ALEA : bonus d'expérience et couleur selon le temps restant
 
+- **État (relu le 2026-11-05)** : FAIT 0.548.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Sur la carte et dans l'onglet ALEA du clic droit, une ALEA avec bonus est marquée, et la couleur indique celles qui vont bientôt finir.
 - **Comment, taille, dépendances** : Copier HasBonus dans MapFateMarker sur le thread du framework, puis afficher le libellé et une couleur selon SecondsLeft. Les seuils sont un choix d'interface, réglable avec infobulle et ↺. Taille S. Relevé en jeu : vérifier que HasBonus correspond à l'icône de bonus du jeu. Pas de décision, sauf les seuils (recommandé : orange sous 5 min).
@@ -83,6 +88,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P10 — Recherche sur la carte (lieux, éthérites, PNJ, quêtes, ressources)
 
+- **État (relu le 2026-11-05)** : FAIT 0.597.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Un champ de recherche dans la fenêtre de la carte trouve un nom de lieu, une éthérite, un PNJ vendeur ou de Triple Triad, un donneur de quête ou une ressource de récolte, sur toutes les cartes. Un clic ouvre la bonne carte, la centre et pose le drapeau.
 - **Comment, taille, dépendances** : Index de recherche construit une seule fois hors Draw (sur un worker), à partir des données déjà en cache : libellés MapMarker de toutes les plages, index local (quêtes, récolte), catalogue des PNJ vendeurs, PNJ Triple Triad. Liste de résultats bornée, avec clipper. Bouton loupe dans la colonne d'outils. Taille M. Sonde seulement pour l'éthernet (sens de la clé DataType 4). Une décision : périmètre des types cherchés (recommandé : tout sauf l'éthernet tant qu'il n'est pas sondé).
@@ -97,6 +103,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P12 — Noms écrits à côté des icônes, comme la carte du jeu
 
+- **État (relu le 2026-11-05)** : FAIT 0.596.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs`.
 - **Ce que le joueur obtient** : Les noms que le jeu écrit à côté de certaines icônes (éthérites, lieux importants) sont écrits sur la carte Tensho avec le même placement, et pas seulement dans l'infobulle.
 - **Comment, taille, dépendances** : Sonder les valeurs de SubtextOrientation, comparées à une capture de la carte du jeu, et consigner le résultat dans docs/evidence. Copier la colonne dans MapIconMarker. Écrire le texte du côté indiqué, à la taille des noms (dépend de la proposition sur les étiquettes). Réglage on/off avec infobulle et ↺. Si la colonne est illisible, aucun texte. Taille M. Décision : l'activer par défaut ou non (recommandé : oui, comme le jeu).
@@ -112,6 +119,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P14 — Mesurer le temps d'affichage de la carte et l'alléger
 
+- **État (relu le 2026-11-05)** : FAIT pour la mesure, 0.489 (ligne « Map » des diagnostics) ; alléger reste à décider sur mesure (tri du 2026-11-05, [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md)).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : La carte, la fenêtre la plus chargée de Tensho, reste fluide, et son coût par image est visible dans Diagnostics, comme celui des autres pages.
 - **Comment, taille, dépendances** : Ajouter une ligne « Carte » au relevé de Diagnostics (même anneau de 120 images). Garder le regroupement des vendeurs par (carte, catalogue, ShowFixedIcons), comme mapGatheringCache, et les marqueurs filtrés par référence de live.Events. Taille S. Relevé en jeu par l'utilisateur, avant et après, comme en 0.292. Pas de décision.
@@ -119,6 +127,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P15 — État des lectures du jeu affiché sur la carte (R-14, partie carte)
 
+- **État (relu le 2026-11-05)** : FAIT 0.569.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Après une mise à jour de FF14, la carte indique précisément ce qui ne marche plus (« marqueurs de quête indisponibles après une mise à jour du jeu », « téléportation indisponible »), au lieu d'une carte vide sans explication. Le reste continue de fonctionner.
 - **Comment, taille, dépendances** : Un statut par partie (position, drapeau, marqueurs, ALEA, objets, groupe, collectés, téléportation, remplacement), publié avec l'état. Chaque lecture est isolée dans son propre try, pour qu'une panne ne coupe pas les autres. Une ligne discrète sur la carte, et le même statut dans Diagnostics. Lié au repli sur la carte du jeu. Taille S à M. Pas de sonde. Décision : faire la partie carte maintenant ou l'intégrer à l'étape g2 R-14 (recommandé : maintenant, puisque e) commence par la carte).
@@ -126,6 +135,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P16 — Option : clic gauche sur la carte pour poser le drapeau
 
+- **État (relu le 2026-11-05)** : FAIT 0.546.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Un clic gauche bref sur un endroit vide de la carte pose le drapeau, sans passer par le menu du clic droit ; un glisser déplace toujours la carte.
 - **Comment, taille, dépendances** : Au relâchement du bouton gauche sans glisser (mapDragged faux), sur une zone sans icône et sur une carte de zone (TerritoryId≠0), appeler PlaceFlagFromMapView. Réglage avec infobulle et ↺. Taille S. Relevé en jeu sur le comportement de la carte du jeu. Décision : activé ou non par défaut (recommandé : désactivé, pour ne rien changer).
@@ -155,6 +165,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P20 — Bouton « Couches » pour tout afficher ou masquer en un clic
 
+- **État (relu le 2026-11-05)** : FAIT 0.547.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Un bouton de la colonne d'outils ouvre une petite liste de couches (quêtes, ALEA, récolte, vendeurs, exploration, courants, groupe, favoris) qu'on affiche ou masque d'un clic, sans ouvrir les réglages.
 - **Comment, taille, dépendances** : Fenêtre surgissante qui reprend les cases existantes (SettingBox, mêmes clés, mêmes ↺), et un 9e bouton dans le calcul de la colonne. Taille S. Aucune sonde. Décision : liste des couches proposées.
@@ -162,6 +173,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P21 — Raccourcis clavier dans la carte
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MapViewWindow.cs`.
 - **Ce que le joueur obtient** : Quand la carte a le focus : +/- pour zoomer, flèches pour la déplacer, Début pour la carte entière, une touche pour suivre le personnage.
 - **Comment, taille, dépendances** : Lire ImGui.IsKeyPressed seulement quand la fenêtre de la carte a le focus et qu'aucun champ texte n'est actif, pour ne pas voler les touches du jeu. Réglage on/off avec infobulle et ↺. Taille S. Aucune sonde. Décision : les touches (recommandé : désactivé par défaut).
@@ -176,6 +188,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P23 — Amis proches sur la carte
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Les amis présents autour du personnage, donc déjà chargés par le jeu, sont dessinés sur la carte Tensho comme les membres du groupe.
 - **Comment, taille, dépendances** : Dans ReadObjects, copier les joueurs avec StatusFlags.Friend (nom, position), au plus N. Nouvelle couche avec taille et priorité, désactivée par défaut. Membres de la compagnie libre : aucune source fiable connue (le tag n'identifie pas sûrement la compagnie), donc laissés de côté sans sonde. Taille S. Décision : ajouter ou non cette couche (vie privée).
@@ -183,6 +196,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P24 — Commande de téléportation par nom (/tensho tp)
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/Plugin.cs`.
 - **Ce que le joueur obtient** : Taper « /tensho tp Ul'dah » (ou un alias) lance la même demande de téléportation que le clic sur une éthérite de la carte, avec son coût.
 - **Comment, taille, dépendances** : Sous-commande qui cherche dans la liste des éthérites (feuille Aetheryte, en cache) puis ouvre la confirmation, ou téléporte directement si l'option le permet. C'est toujours une action explicite du joueur. Taille S. Aucune sonde. Décision : nom de la commande et alias.
@@ -190,6 +204,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P25 — Mini-carte Tensho
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Une petite fenêtre compacte qui suit le personnage (éthérites, groupe, ALEA, drapeau), redimensionnable et zoomable, à côté de la mini-carte du jeu ou à sa place.
 - **Comment, taille, dépendances** : Seconde fenêtre WindowSystem qui réutilise DrawMapCanvas en mode compact (sans menus). La rotation avec la caméra demande de lire l'orientation de la caméra (sonde). Taille L. Décision : la faire ou non, et rotation ou nord en haut.
@@ -197,6 +212,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P26 — Position mise en évidence au survol des listes du clic droit
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.MapLocalLists.cs`.
 - **Ce que le joueur obtient** : En survolant une ligne des onglets du clic droit (quête, PNJ, point de récolte), l'endroit correspondant clignote sur la carte en dessous.
 - **Comment, taille, dépendances** : Garder la position survolée de l'image en cours ; le canevas dessine un anneau pulsé à l'image suivante. Taille S. Aucune sonde. Pas de décision.
@@ -204,6 +220,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P27 — Couleur réglable par icône
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Chaque type d'icône peut recevoir une teinte, en plus de sa taille et de sa priorité, pour repérer d'un coup d'œil ce qui compte.
 - **Comment, taille, dépendances** : Table IconTints (globale et par carte, comme les tailles), appliquée par le paramètre de couleur d'AddImage. Pastille de couleur avec infobulle et ↺ sur chaque ligne. Taille S. Aucune sonde. Décision : utile ou non (faible valeur).

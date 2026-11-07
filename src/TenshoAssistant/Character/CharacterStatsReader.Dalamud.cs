@@ -33,7 +33,7 @@ internal sealed class CharacterStatsReader : IDisposable
     {
         this.service = service; this.framework = framework; this.player = player; this.client = client; this.log = log;
         this.objects=objects;this.data=data;this.gui=gui;
-        framework.Update += OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
     private void OnUpdate(IFramework _)
     {
@@ -98,7 +98,7 @@ internal sealed class CharacterStatsReader : IDisposable
         lock (gate)
         {
             if (disposed) return;
-            disposed = true; framework.Update -= OnUpdate; service.Clear();
+            disposed = true; TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate); service.Clear();
         }
     }
 }

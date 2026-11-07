@@ -3,6 +3,13 @@ namespace TenshoAssistant.Gathering;
 /// <summary>0.518: what a gathering point asks of the player, from the game's sheets. <paramref name="TomeBit"/> and <paramref name="Tome"/> are null for a point without a folklore tome.</summary>
 public sealed record GatherPointNeed(uint JobId,int? TomeBit,string? Tome);
 
+/// <summary>C27 (0.647): the kind of a gathering point, from GatheringPoint.Type (docs/evidence/0.647-gather-point-kinds.md).</summary>
+public enum GatherPointKind{Normal,Timed,Ephemeral,Legendary}
+public static class GatherPointKinds
+{
+    public static GatherPointKind Of(byte type)=>type switch {2=>GatherPointKind.Timed,4=>GatherPointKind.Ephemeral,5=>GatherPointKind.Legendary,_=>GatherPointKind.Normal};
+}
+
 /// <summary>What the logged-in character has, copied on the framework thread.</summary>
 public sealed record GatherKnowledge(int MinerLevel,int BotanistLevel,IReadOnlySet<int> MinerTomes,IReadOnlySet<int> BotanistTomes);
 

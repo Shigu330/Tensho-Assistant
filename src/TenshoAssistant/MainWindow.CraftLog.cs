@@ -19,6 +19,7 @@ internal sealed partial class MainWindow
     private static readonly RaphaelSequenceCache RaphaelSequences=new(RaphaelCraftSolver.Solve);
     private readonly CraftLogSession craftLogSession=new((input,token)=>CraftLogSession.Build(input,token,RaphaelSequences.Solve));
     private string? loggedCraftLogRaphaelError;
+    internal const string RaphaelNotCalled="Raphael not called:";
     private CraftLogInput? craftLogInput;
     private DateTimeOffset craftLogStableSince;
     private bool craftLogStarted;
@@ -56,16 +57,17 @@ internal sealed partial class MainWindow
     }
     internal void DrawCraftLogHelper()
     {
+        if(!windowDisposed && configuration.CraftLogHelperEnabled && craftLog.Error is not null)DrawReadFailedPanel("TenshoCraftLogFailed","RecipeNote","CraftLog");
         var now=DateTimeOffset.UtcNow;var observed=craftLog.Observation;
         if(windowDisposed || !configuration.CraftLogHelperEnabled || observed is null || observed.Revision!=craftLog.Revision || !observed.Fresh(now))
         {ClearCraftLogCalculation();return;}
         var job=observed.CurrentJobId;var manipulationDetected=ManipulationLearned?.Invoke(job)==true;
         if(now-craftLogDetectedAt>=TimeSpan.FromSeconds(1) || craftLogDetectedJob!=job){craftLogDetectedAt=now;craftLogDetectedJob=job;craftLogDetected=CraftDetectedNow?.Invoke(job);}
-        var context=CraftLogContext.Resolve(observed,characterStats.State,recipeCatalog.State.Catalog,now,craftLogManipulation.TryGetValue(job,out var chosen) ? chosen:manipulationDetected,craftLogDetected?.Specialist==true);
+        var context=CraftLogContext.Resolve(observed,characterStats.State,recipeCatalog.State.Catalog,now,craftLogManipulation.TryGetValue(job,out var chosen) ? chosen:manipulationDetected,craftLogDetected?.Specialist==true,job=>RememberedCraftStats(observed.Owner,job));
         var actions=craftActions.State.Catalog;
         var presets=(IReadOnlyList<CraftPreset>?)configuration.CraftPresets ?? Array.Empty<CraftPreset>();
         CraftLogInput? input=context is {Recipe:{ } recipe,Stats:{ } stats} && actions is not null
-            ? new(observed.Owner,recipe,stats,actions,presets,new(CraftLogTarget(recipe),craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,craftMacroBuffWait,craftForbidden,CraftSearchOptions.Raphael),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true):null;
+            ? new(observed.Owner,recipe,stats,actions,presets,new(CraftLogTarget(recipe),craftSolveSteps,craftSolveWidth,craftSolveBudget,craftMacroExtraWait,craftMacroBuffWait,craftForbidden,CraftSearchOptions.Raphael),craftMacroExtraWait,craftMacroEcho,observed.Revision,context.StartingQuality,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true,TryAllPresets:configuration.CraftLogTryAllPresets,EchoSound:CraftSearchOptions.BoundedEchoSound,EchoLastOnly:CraftSearchOptions.EchoLastOnly):null;
         if(input!=craftLogInput)
         {craftLogSession.Cancel();craftLogInput=input;craftLogStableSince=now;craftLogStarted=false;craftLogForceRefresh=false;}
         if(now<craftLogStableSince)craftLogStableSince=now;
@@ -79,7 +81,7 @@ internal sealed partial class MainWindow
         Panels?.Show("TenshoCraftLog",localization.Get("CraftLogUi.Title"),ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoResize,()=>{ImGui.SetNextWindowPos(position,ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(width,height),ImGuiCond.Always);},()=>
         {
             // 0.469 (user request, in-game campaign): the panel in sections (recipe, your state, target, result), figures in a table, explanations in the tooltips of « (?) ».
-            if(context.Recipe is { } selected)DrawCraftLogTitle(selected);
+            if(context.Recipe is { } selected){DrawCraftLogTitle(selected);DrawRecipeFacts(selected);}
             DrawToolSettingsLink("CraftLog");
             if(context.Recipe is { } forSimulator)
             {
@@ -87,6 +89,15 @@ internal sealed partial class MainWindow
                 if(ImGui.SmallButton(localization.Get("CraftLogUi.OpenSimulator"))){OpenCraftSimulation(forSimulator);IsOpen=true;}
             }
             DrawCraftLogFigures(context.Recipe,context.Stats);
+            // 0.788 (X-29, user report: as Carpenter on a Blacksmith recipe, « not detected »: the note was cut off and in the information colour): both jobs named,
+            // in the warning colour, wrapped, with the button that wears the recipe's job.
+            if(context.RememberedAt is { } rememberedAt)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text,UI.FfxivTheme.Warning);
+                try{ImGui.TextWrapped(localization.Format("CraftLogUi.Remembered",JobName(job),context.Recipe?.CraftType ?? "",rememberedAt.ToLocalTime().ToString("g")));}
+                finally{ImGui.PopStyleColor();}
+                if(context.Recipe is { } worn)DrawEquipRecipeJob(worn,"CraftLogEquipRemembered");
+            }
             if(context.Stats is { } current)
             {
                 CraftLogSection(localization.Get("CraftLogUi.SectionState"));
@@ -112,7 +123,10 @@ internal sealed partial class MainWindow
             var state=craftLogSession.State;
             if(state.Result is { } solved)
             {
-                if(solved.RaphaelError is { } raphaelError)
+                // 0.783 (X-25): Raphael not called on purpose (nothing it can take, such as a recipe with no quality to seek) is not a failure.
+                if(solved.RaphaelError is { } skipped && skipped.StartsWith(RaphaelNotCalled,StringComparison.Ordinal))
+                    ImGui.TextDisabled(localization.Get("CraftLogUi.RaphaelNotNeeded"));
+                else if(solved.RaphaelError is { } raphaelError)
                 {
                     if(loggedCraftLogRaphaelError!=raphaelError){loggedCraftLogRaphaelError=raphaelError;log.Warning("Raphael failed for the crafting log, Tensho's search was used: {Reason}",raphaelError);}
                     ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("CraftLogUi.RaphaelFailed"));
@@ -142,8 +156,23 @@ internal sealed partial class MainWindow
             if(result.SearchIssue is { } searchIssue)ImGui.TextWrapped(CraftMessage(searchIssue));
         });
     }
+    private CraftJobStats? RememberedCraftStats(ulong owner,uint job)=>configuration.LastCraftStats?.GetValueOrDefault(owner)?.GetValueOrDefault(job);
+    /// <summary>0.554 (C3): each frame; only what changed is written, so a food or a piece of gear makes one save.</summary>
+    internal void KeepCraftStats()
+    {
+        var state=characterStats.State;
+        if(state.CharacterId==0 || state.JobId is <8 or >15 || state.Level<1 || state.ObservedAt is not { } seen
+            || !state.Values.TryGetValue("Craftsmanship",out var craftsmanship) || !state.Values.TryGetValue("Control",out var control) || !state.Values.TryGetValue("CraftingPoints",out var cp))return;
+        var all=configuration.LastCraftStats??=[];
+        if(!all.TryGetValue(state.CharacterId,out var jobs))all[state.CharacterId]=jobs=[];
+        if(jobs.TryGetValue(state.JobId,out var known) && known.Level==state.Level && known.Craftsmanship==craftsmanship && known.Control==control && known.Cp==cp)return;
+        jobs[state.JobId]=new(state.Level,craftsmanship,control,cp,seen);
+        try{save();}
+        catch(Exception error){log.Warning(error,"Could not save the crafting attributes.");}
+    }
     private void DrawCraftLogMacro(string title,CraftLogMacro? macro,CraftActionCatalog catalog,bool canSave=false)
     {
+        if(macro is {SavedForItem:not 0})ImGui.TextDisabled(localization.Format("CraftLogUi.SavedFor",itemCatalog.State.Catalog?.Find(macro.SavedForItem)?.Name ?? macro.SavedForItem.ToString()));
         ImGui.PushID(title);
         try
         {

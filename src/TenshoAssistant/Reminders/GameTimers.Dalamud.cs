@@ -9,7 +9,8 @@ public sealed record GameTimerSnapshot(DateTimeOffset ReadAt,uint? AlliedQuestsL
     int? DeliveriesLeft,IReadOnlyList<(string Name,DateTimeOffset? Done)>? Ventures,
     SquadronTimer? SquadronMission=null,SquadronTimer? SquadronTraining=null,IReadOnlyList<RouletteDaily>? Roulettes=null,
     WondrousTails? Bingo=null,int? HuntBillsHeld=null,DateTimeOffset? NextMapAllowance=null,
-    (int Done,int Total)? ChallengeLog=null,(int Donated,int Allowance)? DomanEnclave=null,IReadOnlyList<HuntBillProgress>? HuntBills=null);
+    (int Done,int Total)? ChallengeLog=null,(int Donated,int Allowance)? DomanEnclave=null,IReadOnlyList<HuntBillProgress>? HuntBills=null,
+    IReadOnlyList<CompanyBenefit>? CompanyBenefits=null);
 
 /// <summary>g, M-02 (0.372): the Wondrous Tails journal (PlayerState): held or not, stickers placed, expiry, second chance points.</summary>
 // N-03 (0.439): Placed = the 16 cells as bits (IsWeeklyBingoStickerPlaced, address checked); null when not read.
@@ -45,7 +46,7 @@ public static unsafe class GameTimers
         catch(Exception){return null;}
     }
 
-    public static GameTimerSnapshot Read(IReadOnlyList<RouletteRow>? roulettes=null,IReadOnlyList<int>? challengeRows=null)
+    public static GameTimerSnapshot Read(IReadOnlyList<RouletteRow>? roulettes=null,IReadOnlyList<int>? challengeRows=null,IReadOnlyDictionary<uint,string>? companyStatuses=null)
     {
         // R-14 (0.453): before the character is loaded (title screen, character select) the game answers zeros (role bonus « Tank », every
         // roulette open): unknown instead. Each counter guarded on its own: one signature lost after an update dropped every reminder.
@@ -194,7 +195,29 @@ public static unsafe class GameTimers
             if(enclave!=null && enclave->State.Allowance>0)doman=(enclave->State.Donated,enclave->State.Allowance);
         }
         catch(Exception){doman=null;}
-        return new(DateTimeOffset.UtcNow,allied,leves,nextLeves,deliveries,ventures,mission,training,daily,bingo,bills,nextMap,challenge,doman,huntBills);
+        // T27 (0.651): the active company actions, from the player's statuses; their ends from the Free Company agent. Guarded on its own.
+        IReadOnlyList<CompanyBenefit>? benefits=null;
+        if(characterLoaded && companyStatuses is { Count:>0 })
+            try
+            {
+                var local=FFXIVClientStructs.FFXIV.Client.Game.Control.Control.GetLocalPlayer();
+                var statuses=local==null ? null:local->GetStatusManager();
+                if(statuses!=null)
+                {
+                    var active=new List<uint>();
+                    foreach(ref var status in statuses->Status)if(status.StatusId!=0 && companyStatuses.ContainsKey(status.StatusId))active.Add(status.StatusId);
+                    var agent=AgentFreeCompany.Instance();
+                    var timers=new List<uint>();var since=0u;
+                    if(agent!=null)
+                    {
+                        foreach(var left in agent->ActionTimeRemaining.TimeRemainingAtUpdate)timers.Add(left);
+                        since=agent->ActionTimeRemaining.TimeSinceUpdate;
+                    }
+                    benefits=CompanyBenefits.Build(active,timers,since,DateTimeOffset.UtcNow);
+                }
+            }
+            catch(Exception){benefits=null;}
+        return new(DateTimeOffset.UtcNow,allied,leves,nextLeves,deliveries,ventures,mission,training,daily,bingo,bills,nextMap,challenge,doman,huntBills,benefits);
         static DateTimeOffset? Unix(int seconds)=>seconds>0 ? DateTimeOffset.FromUnixTimeSeconds(seconds):null;
     }
 }

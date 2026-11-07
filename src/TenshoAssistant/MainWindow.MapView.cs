@@ -29,11 +29,29 @@ internal sealed partial class MainWindow
     // Vista under the mouse this frame and the one right-clicked (0.201: alarm for its ET window and weather).
     private MapLocalPosition? mapHoveredVista,mapContextVista;
     private MapLocalIndexService? mapLocal;
-    internal void ConfigureMapView(MapLiveReader live,MapMarkerSource markers,MapLocalIndexService local){mapLive=live;mapMarkers=markers;mapLocal=local;}
+    internal void ConfigureMapView(MapLiveReader live,MapMarkerSource markers,MapLocalIndexService local){mapLive=live;mapMarkers=markers;mapLocal=local;mapZoom=MapProjection.ClampZoom(configuration.MapView.OpenZoom==MapOpenZoom.Fixed ? configuration.MapView.OpenZoomValue:configuration.MapView.LastZoom);}
+    // 0.542 (P1): the zoom chosen for the opening; a chosen map still opens whole.
+    private readonly MapZoomMemory mapZoomMemory=new(TimeSpan.FromSeconds(2));
+    private void ApplyOpenZoom()
+    {
+        var settings=configuration.MapView;
+        if(settings.OpenZoom==MapOpenZoom.Fixed)mapZoom=MapProjection.ClampZoom(settings.OpenZoomValue);
+        else if(settings.OpenZoom==MapOpenZoom.Whole){mapViewFollow=false;mapFitRequested=true;}
+    }
+    private float MapFocusZoom=>MapProjection.ClampZoom(configuration.MapView.FocusZoom);
+    /// <summary>Each frame, also when the map closes just after a zoom. Only the last zoom is kept, and only when it has rested.</summary>
+    internal void KeepMapZoom()
+    {
+        var settings=configuration.MapView;
+        if(settings.OpenZoom!=MapOpenZoom.Last || mapZoomMemory.Tick(mapZoom,settings.LastZoom,TimeSpan.FromTicks(DateTimeOffset.UtcNow.UtcTicks)) is not { } rested)return;
+        settings.LastZoom=rested;
+        try{save();saveError=null;}
+        catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save the map zoom.");}
+    }
     // 0.328 (map audit #13): a chosen map opens whole, like NavigateMap; the old zoom and pan belonged to another map.
     // 0.499 (user report): a link to the map brings it above the Tensho window instead of opening behind it.
     private bool mapViewToFront;
-    private void OpenMapView(uint mapId){mapViewMapId=mapId;mapViewFollow=mapId==0;mapFitRequested=mapId!=0;mapViewOpen=true;mapViewToFront=true;}
+    private void OpenMapView(uint mapId){mapViewMapId=mapId;mapViewFollow=mapId==0;mapFitRequested=mapId!=0;if(mapId==0)ApplyOpenZoom();mapViewOpen=true;mapViewToFront=true;}
     // Called when the game map is replaced: the same key (M) that opens the game map toggles the Tensho map.
     // Hosted game map (0.151): the replacer asks whether the Tensho map is still open, and closes it with the game map.
     internal bool MapViewOpen=>Volatile.Read(ref mapViewOpen);
@@ -44,6 +62,7 @@ internal sealed partial class MainWindow
         var mapId=maps.State.Catalog is { } catalog ? request.Resolve(catalog):request.Selected==request.Current ? 0:request.Selected;
         // A quest, aetheryte or FATE was asked (journal, link): never the M toggle, the map opens focused on it.
         var pointed=request.Pointed;
+        if(pointed && request.Territory!=0 && maps.State.Catalog?.MapOf(request.Territory) is { } questMap and not 0)mapQuestMap=questMap;
         if(pointed && mapId==0)mapId=request.Current;
         if(!pointed && mapViewOpen && mapId==0 && mapViewFollow)mapViewOpen=false;
         // A pointed request keeps its own zoom: the focus centres it, or fits the map once it is not found.
@@ -53,7 +72,10 @@ internal sealed partial class MainWindow
     private Vector2? FocusPixel(GameMapRequest focus,MapDefinition map,MapLiveState? live)
     {
         // The game's own target (temporary marker) first, like Mappy: it is on the map the game opened.
-        if(focus.Target is { } target)return MapProjection.PixelFromWorld(new Vector3(target.X,0,target.Y),map);
+        if(focus.UsesRoute(map) && focus.Route is { } route)return MapProjection.PixelFromWorld(new Vector3(route.X,0,route.Y),map);
+        if(maps.State.Catalog is { } entranceCatalog && focus.EntranceTarget(entranceCatalog) is { } entrance && entrance.MapId==map.MapId)return new Vector2(entrance.X,entrance.Y);
+        // 0.628 (user capture, icon in the sea): the target's coordinates are those of its territory: they mean nothing on a world or region map.
+        if(focus.Target is { } target && map.TerritoryId!=0)return MapProjection.PixelFromWorld(new Vector3(target.X,0,target.Y),map);
         if(focus.QuestId!=0)
         {
             var key=focus.QuestId & 0xFFFF;
@@ -115,12 +137,12 @@ internal sealed partial class MainWindow
         mapOverlayHovered=false;
         if(settings.OverlayControls && map is not null && map.TexturePath.Length>0)
         {
-            DrawMapOverlayLayout(catalog,map,live,viewport,window);
+            MeasureMap("map overlay layout",()=>DrawMapOverlayLayout(catalog,map,live,viewport,window));
             return;
         }
         // Layout of the game map: region and zone menus on top, tool column on the left, the map on the right.
-        DrawMapMenus(catalog,map,live);
-        DrawMapTools(map,viewport,window);
+        MeasureMap("map menus",()=>DrawMapMenus(catalog,map,live));
+        MeasureMap("map tools",()=>DrawMapTools(map,viewport,window));
         ImGui.SameLine();
         if(map is null || map.TexturePath.Length==0)
         {
@@ -128,7 +150,35 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped(localization.Get(map is null && live is null && mapViewFollow ? "MapView.PositionUnknown":"MapView.Unavailable"));
             return;
         }
-        DrawMapCanvas(map,live);
+        MeasureMap("map canvas",()=>DrawMapCanvas(map,live));
+    }
+
+    // 0.749 (X-01): the map's frame was 195 ms when it opened; its parts in the slow-frame log, developer mode only.
+    // 0.791 (X-01: « map overlay layout » 110 to 160 ms several times an hour on 2026-11-07, not only at opening): checkpoints inside the canvas, developer mode.
+    private long mapMarkAt;
+    private void MapMarkStart(){if(DeveloperMode)mapMarkAt=System.Diagnostics.Stopwatch.GetTimestamp();}
+    private void MapMark(string part)
+    {
+        if(!DeveloperMode)return;
+        var now=System.Diagnostics.Stopwatch.GetTimestamp();
+        SlowFrames.Add(ImGui.GetFrameCount(),part,System.Diagnostics.Stopwatch.GetElapsedTime(mapMarkAt,now).TotalMilliseconds);
+        mapMarkAt=now;
+    }
+    private static bool MonsterNoteShown(MonsterNote note,MapViewSettings settings)=>note.Kind switch
+    {
+        MonsterNoteKind.List=>settings.ShowListMonsters,
+        MonsterNoteKind.HuntLog=>settings.ShowHuntLogMonsters,
+        MonsterNoteKind.Fate=>settings.ShowFateMonsters,
+        MonsterNoteKind.BlueSpell=>settings.ShowBlueMageMonsters,
+        MonsterNoteKind.Collection=>settings.ShowCollectionMonsters,
+        _=>true,
+    };
+    private void MeasureMap(string part,Action draw)
+    {
+        if(!DeveloperMode){draw();return;}
+        var started=System.Diagnostics.Stopwatch.GetTimestamp();
+        try{draw();}
+        finally{SlowFrames.Add(ImGui.GetFrameCount(),part,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);}
     }
 
     // 0.303 (user request): the map takes the whole window; the region / zone menus (on a dark-to-clear band with the menu
@@ -147,7 +197,7 @@ internal sealed partial class MainWindow
         // 0.305 (user feedback: no button answered): the overlays are submitted BEFORE the map, so their buttons take the click
         // first; the map then ignores the mouse while it is over one of them. They are still drawn above it (child windows).
         mapOverlayHovered=false;
-        if(shown)DrawMapOverlayControls(catalog,map,live,viewport,window,start,area,line,pad,indent,fade,grey);
+        if(shown)MeasureMap("map overlay controls",()=>DrawMapOverlayControls(catalog,map,live,viewport,window,start,area,line,pad,indent,fade,grey));
         else
         {
             mapHeaderList=0;
@@ -155,7 +205,8 @@ internal sealed partial class MainWindow
             if(settings.OverlayZoneName)
             {
                 var name=MapName(map);var sub=map.TerritoryId!=0 && map.Subzone.Length>0 ? "> "+map.Subzone:null;
-                var size=new Vector2(Math.Max(ImGui.CalcTextSize(name).X,sub is null ? 0:ImGui.CalcTextSize(sub).X+indent)+pad*2,(sub is null ? 1:2)*line+pad*2);
+                var places=MapMenus.PlaceLines(live?.MapId ?? 0,map.MapId,live?.Area,live?.SubArea);
+                var size=new Vector2(places.Select(place=>ImGui.CalcTextSize(place).X+indent).Append(ImGui.CalcTextSize(name).X).Append(sub is null ? 0:ImGui.CalcTextSize(sub).X+indent).Max()+pad*2,((sub is null ? 1:2)+places.Count)*line+pad*2);
                 var at=start+new Vector2(38,0);
                 HeaderBand("MapOverlayNameBand",at,size,fade,area-(at-start));
                 ImGui.SetCursorPos(at);
@@ -164,12 +215,13 @@ internal sealed partial class MainWindow
                     ImGui.SetCursorPos(new Vector2(pad,pad));
                     HeaderEntry("Name",name,UI.FfxivTheme.Gold,0,null,false);
                     if(sub is not null)HeaderEntry("Sub",sub,grey,indent,null,false);
+                    for(var place=0;place<places.Count;place++)HeaderEntry($"Place{place}",places[place],grey,indent,null,false);
                 }
                 ImGui.EndChild();
             }
         }
         ImGui.SetCursorPos(start);
-        DrawMapCanvas(map,live);
+        MeasureMap("map canvas",()=>DrawMapCanvas(map,live));
     }
 
     // Region, zone and floor names (the game map's header: stacked, outlined, each unrolling its list downward) to the right of the
@@ -183,20 +235,25 @@ internal sealed partial class MainWindow
         var toolsWidth=DrawMapTools(map,viewport,window,true,area.Y-ImGui.GetTextLineHeight()-16);
         var regionId=markers.RegionOf(map);var region=ResolveMap(catalog,regionId);
         var regions=markers.Regions.Select(id=>ResolveMap(catalog,id)).OfType<MapDefinition>().ToArray();
-        var zones=MapMenus.Zones(catalog.Entries,region);
+        var zones=MapMenus.WithExtras(MapMenus.Zones(catalog.Entries,region),region,map,catalog.Find(mapQuestMap));
         var floors=zones.FirstOrDefault(entry=>entry.Any(floor=>floor.MapId==map.MapId)) ?? [];
         var isZone=map.TerritoryId!=0;var world=localization.Get("MapView.World");
-        static string FloorName(MapDefinition floor)=>floor.Subzone.Length>0 ? floor.Subzone:floor.MapIndex.ToString();
+        static string FloorName(MapDefinition floor)=>MapMenus.FloorLabel(floor);
         var regionName=region is not null ? MapName(region):world;var zoneName=isZone ? MapName(map):"--";
+        // 0.632 (user captures: only « -- » under the world): the world's own floors, Hydaelyn and The First.
+        var worldChoices=markers.WorldChoices(map.MapId);
+        if(worldChoices.Count>0){regionName=world;zoneName=MapName(map);zones=[];}
         var arrow=ImGui.GetTextLineHeight();
         var widths=new List<float>{ImGui.CalcTextSize(regionName).X+arrow,ImGui.CalcTextSize(zoneName).X+arrow+(isZone ? 28:0)};
+        var placeLines=MapMenus.PlaceLines(live?.MapId ?? 0,map.MapId,live?.Area,live?.SubArea);
         if(floors.Count>1)widths.Add(ImGui.CalcTextSize(FloorName(map)).X+arrow);
         else if(isZone && map.Subzone.Length>0)widths.Add(indent+ImGui.CalcTextSize("> "+map.Subzone).X);
+        widths.AddRange(placeLines.Select(place=>indent+ImGui.CalcTextSize(place).X));
         var headerHeight=widths.Count*line+pad*2;
-        var listCount=mapHeaderList switch{1=>regions.Length+1,2=>zones.Count+1,3=>floors.Count,_=>0};
+        var listCount=mapHeaderList switch{1=>regions.Length+1,2=>worldChoices.Count>0 ? worldChoices.Count:zones.Count+1,3=>floors.Count,_=>0};
         var at=start+new Vector2(toolsWidth+4,0);var room=area-(at-start);
         HeaderBand("MapOverlayBand",at,new Vector2(Math.Min(widths.Max()+pad*2+4,room.X),headerHeight),fade,room);
-        var listWidth=regions.Select(MapName).Append(world).Concat(zones.Select(entry=>MapName(entry[0]))).Concat(floors.Select(FloorName))
+        var listWidth=regions.Select(MapName).Append(world).Concat(zones.Select(entry=>MapName(entry[0]))).Concat(floors.Select(FloorName)).Concat(worldChoices.Select(MapName))
             .Select(name=>ImGui.CalcTextSize("> "+name).X).DefaultIfEmpty(80).Max()+indent+28;
         var width=Math.Min(Math.Max(widths.Max(),mapHeaderList==0 ? 0:listWidth)+pad*2+4,room.X);
         var height=Math.Min(headerHeight+listCount*line,room.Y);
@@ -218,8 +275,10 @@ internal sealed partial class MainWindow
             if(isZone)DrawFlightWing(map,live,false);
             if(mapHeaderList==2)
             {
-                ListBackdrop(zones.Count+1);
-                if(HeaderEntry("ZoneRegion","> --",ListColour(!isZone),indent,null)){if(regionId!=0)NavigateMap(regionId);mapHeaderList=0;}
+                ListBackdrop(worldChoices.Count>0 ? worldChoices.Count:zones.Count+1);
+                foreach(var choice in worldChoices)
+                    if(HeaderEntry($"ZoneWorld{choice.MapId}","> "+MapName(choice),ListColour(choice.MapId==map.MapId),indent,null)){NavigateMap(choice.MapId);mapHeaderList=0;}
+                if(worldChoices.Count==0 && HeaderEntry("ZoneRegion","> --",ListColour(!isZone),indent,null)){if(regionId!=0)NavigateMap(regionId);mapHeaderList=0;}
                 foreach(var entry in zones)
                 {
                     var zone=entry[0];
@@ -238,6 +297,7 @@ internal sealed partial class MainWindow
                 }
             }
             else if(isZone && map.Subzone.Length>0)HeaderEntry("Subzone","> "+map.Subzone,grey,indent,null,false);
+            for(var place=0;place<placeLines.Count;place++)HeaderEntry($"Place{place}",placeLines[place],grey,indent,null,false);
         }
         ImGui.EndChild();
         mapOverlayHovered|=headerHovered;
@@ -323,15 +383,19 @@ internal sealed partial class MainWindow
         Tip("MapView.RegionTip");
         ImGui.SameLine();
         var isZone=map.TerritoryId!=0;
-        var zones=MapMenus.Zones(catalog.Entries,ResolveMap(catalog,regionId));
+        var zones=MapMenus.WithExtras(MapMenus.Zones(catalog.Entries,ResolveMap(catalog,regionId)),ResolveMap(catalog,regionId),map,catalog.Find(mapQuestMap));
         var floors=zones.FirstOrDefault(entry=>entry.Any(floor=>floor.MapId==map.MapId)) ?? [];
-        ImGui.SetNextItemWidth(MenuWidth(zones.Select(entry=>MapName(entry[0])).Append(isZone ? MapName(map):"--"),true));
-        var zoneMenu=ImGui.BeginCombo("##MapZone",isZone ? MapName(map):"--");Tip("MapView.ZoneTip");
+        var worldChoices=mapMarkers.WorldChoices(map.MapId);
+        var zoneShown=isZone || worldChoices.Count>0 ? MapName(map):"--";
+        ImGui.SetNextItemWidth(MenuWidth(zones.Select(entry=>MapName(entry[0])).Concat(worldChoices.Select(MapName)).Append(zoneShown),true));
+        var zoneMenu=ImGui.BeginCombo("##MapZone",zoneShown);Tip("MapView.ZoneTip");
         if(zoneMenu)
         {
             try
             {
-                if(ImGui.Selectable("--##ZoneRegion",!isZone) && regionId!=0)NavigateMap(regionId);
+                foreach(var choice in worldChoices)
+                    if(ImGui.Selectable($"{MapName(choice)}##ZoneWorld{choice.MapId}",choice.MapId==map.MapId))NavigateMap(choice.MapId);
+                if(worldChoices.Count==0 && ImGui.Selectable("--##ZoneRegion",!isZone) && regionId!=0)NavigateMap(regionId);
                 foreach(var entry in zones)
                 {
                     var zone=entry[0];
@@ -345,10 +409,10 @@ internal sealed partial class MainWindow
         // Floors of a multi-level map (dungeons), like the game's sub-map menu; a single map shows its subzone name instead.
         if(floors.Count>1)
         {
-            ImGui.SameLine();ImGui.SetNextItemWidth(MenuWidth(floors.Select(floor=>floor.Subzone.Length>0 ? floor.Subzone:floor.MapIndex.ToString()),false));
-            if(ImGui.BeginCombo("##MapFloor",map.Subzone.Length>0 ? map.Subzone:$"{map.MapIndex}"))
+            ImGui.SameLine();ImGui.SetNextItemWidth(MenuWidth(floors.Select(MapMenus.FloorLabel),false));
+            if(ImGui.BeginCombo("##MapFloor",MapMenus.FloorLabel(map)))
             {
-                try{foreach(var floor in floors)if(ImGui.Selectable($"{(floor.Subzone.Length>0 ? floor.Subzone:floor.MapIndex.ToString())}##Floor{floor.MapId}",floor.MapId==map.MapId))NavigateMap(floor.MapId);}
+                try{foreach(var floor in floors)if(ImGui.Selectable($"{MapMenus.FloorLabel(floor)}##Floor{floor.MapId}",floor.MapId==map.MapId))NavigateMap(floor.MapId);}
                 finally{ImGui.EndCombo();}
             }
             Tip("MapView.FloorTip");
@@ -384,9 +448,9 @@ internal sealed partial class MainWindow
         // buttons, so the rest of the map stays draggable.
         var style=ImGui.GetStyle();var step=26+style.ItemSpacing.Y;var label=ImGui.GetTextLineHeightWithSpacing();
         var room=maxHeight>0 ? maxHeight:ImGui.GetContentRegionAvail().Y;
-        var slider=Math.Clamp(room-8*step-label-2*style.ItemSpacing.Y-style.WindowPadding.Y*2,0,80);
+        var slider=Math.Clamp(room-9*step-label-2*style.ItemSpacing.Y-style.WindowPadding.Y*2,0,80);
         if(slider<30)slider=0;
-        const int buttons=8;
+        const int buttons=9;
         var perColumn=slider>0 ? buttons:Math.Clamp((int)((room-label-style.WindowPadding.Y*2)/step),1,buttons);
         var columns=(buttons+perColumn-1)/perColumn;
         var width=34+(columns-1)*30;
@@ -414,8 +478,11 @@ internal sealed partial class MainWindow
                 mapFitDelay=2;
             }
             Place();if(ToolButton(FontAwesomeIcon.Map,"MapView.OpenGameMap",openGameMap is not null))openGameMap?.Invoke();
-            Place();if(ToolButton(FontAwesomeIcon.Cog,"MapView.Settings",true,ImGui.IsPopupOpen("MapViewSettings")))ImGui.OpenPopup("MapViewSettings");
-            DrawMapSettings(map);
+            // 0.547 (P20): the layers in one click, the same settings as the cog's.
+            Place();if(ToolButton(FontAwesomeIcon.LayerGroup,"MapView.Layers",true,ImGui.IsPopupOpen("MapViewLayers")))ImGui.OpenPopup("MapViewLayers");
+            DrawMapLayers();
+            // 0.587 (user request): too many settings for a popup: the cog opens the Map tab of Settings.
+            Place();if(ToolButton(FontAwesomeIcon.Cog,"MapView.Settings",true,false)){page=Page.Settings;requestedSettingsTab="Map";IsOpen=true;BringToFront();}
             if(slider>0)ImGui.Spacing();
             Place();if(ToolButton(FontAwesomeIcon.Plus,"MapView.ZoomIn",true))ZoomTo(mapZoom*1.25f);
             // Slider centred in the column (when there is room for it), the zoom percentage written under the − button.
@@ -444,15 +511,60 @@ internal sealed partial class MainWindow
         finally{ImGui.EndChild();}
         return width;
     }
-    // Mappy-like display settings, saved at each change; every layer can be turned off.
-    private void DrawMapSettings(MapDefinition? map)
+    private void DrawMapLayers()
     {
-        if(!ImGui.BeginPopup("MapViewSettings"))return;
-        // The save error under the help line; Settings › Map writes it under its tabs already.
-        try{DrawMapSettingsBody(map);if(saveError is { } failed)ImGui.TextColored(UI.FfxivTheme.Error,failed);}
+        if(!ImGui.BeginPopup("MapViewLayers"))return;
+        try
+        {
+            var settings=configuration.MapView;var changed=false;
+            void All(bool shown)
+            {
+                settings.ShowQuests=settings.ShowFates=settings.ShowGathering=settings.ShowVendors=settings.ShowSightseeing=settings.ShowAetherCurrents=shown;
+                settings.ShowParty=settings.ShowBookmarks=settings.ShowHuntMarks=settings.ShowTreasure=settings.ShowFixedIcons=settings.ShowPlaceNames=settings.ShowIconNames=shown;
+                settings.ShowIslandPlants=settings.ShowIslandWood=settings.ShowIslandRocks=settings.ShowIslandEarth=settings.ShowIslandFishing=shown;
+                changed=true;
+            }
+            if(ImGui.SmallButton(localization.Get("MapView.LayersAll")))All(true);
+            Tip("MapView.LayersAllTip");
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("MapView.LayersNone")))All(false);
+            Tip("MapView.LayersNoneTip");
+            ImGui.Separator();
+            changed|=SettingBox("MapView.ShowFixedIcons",settings.ShowFixedIcons,value=>settings.ShowFixedIcons=value);
+            changed|=SettingBox("MapView.ShowPlaceNames",settings.ShowPlaceNames,value=>settings.ShowPlaceNames=value);
+            changed|=SettingBox("MapView.ShowIconNames",settings.ShowIconNames,value=>settings.ShowIconNames=value);
+            changed|=SettingBox("MapView.ShowQuests",settings.ShowQuests,value=>settings.ShowQuests=value);
+            changed|=SettingBox("MapView.ShowFates",settings.ShowFates,value=>settings.ShowFates=value);
+            changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value);
+            // 0.684 (user request): the game's five kinds, in this menu only.
+            changed|=SettingBox("MapView.ShowIslandPlants",settings.ShowIslandPlants,value=>settings.ShowIslandPlants=value);
+            changed|=SettingBox("MapView.ShowIslandWood",settings.ShowIslandWood,value=>settings.ShowIslandWood=value);
+            changed|=SettingBox("MapView.ShowIslandRocks",settings.ShowIslandRocks,value=>settings.ShowIslandRocks=value);
+            changed|=SettingBox("MapView.ShowIslandEarth",settings.ShowIslandEarth,value=>settings.ShowIslandEarth=value);
+            changed|=SettingBox("MapView.ShowIslandFishing",settings.ShowIslandFishing,value=>settings.ShowIslandFishing=value);
+            changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value);
+            changed|=SettingBox("MapView.ShowSightseeing",settings.ShowSightseeing,value=>settings.ShowSightseeing=value);
+            changed|=SettingBox("MapView.ShowAetherCurrents",settings.ShowAetherCurrents,value=>settings.ShowAetherCurrents=value);
+            changed|=SettingBox("MapView.ShowParty",settings.ShowParty,value=>settings.ShowParty=value);
+            changed|=SettingBox("MapView.ShowBookmarks",settings.ShowBookmarks,value=>settings.ShowBookmarks=value);
+            changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value);
+            changed|=SettingBox("MapView.ShowListMonsters",settings.ShowListMonsters,value=>settings.ShowListMonsters=value);
+            changed|=SettingBox("MapView.ShowHuntLogMonsters",settings.ShowHuntLogMonsters,value=>settings.ShowHuntLogMonsters=value);
+            changed|=SettingBox("MapView.ShowFateMonsters",settings.ShowFateMonsters,value=>settings.ShowFateMonsters=value);
+            changed|=SettingBox("MapView.ShowBlueMageMonsters",settings.ShowBlueMageMonsters,value=>settings.ShowBlueMageMonsters=value);
+            changed|=SettingBox("MapView.ShowCollectionMonsters",settings.ShowCollectionMonsters,value=>settings.ShowCollectionMonsters=value);
+            changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value);
+            if(changed)
+            {
+                try{save();saveError=null;}
+                catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save map layers.");}
+            }
+            if(saveError is { } failed)ImGui.TextColored(UI.FfxivTheme.Error,failed);
+        }
         finally{ImGui.EndPopup();}
     }
-    // Same body in the map's cog popup and in Settings › Map (0.153: every setting reachable from the Settings page).
+    // Mappy-like display settings, saved at each change; every layer can be turned off.
+    // Settings › Map, opened by the map's cog since 0.587.
     private void DrawMapSettingsBody(MapDefinition? map)
     {
         {
@@ -463,11 +575,22 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.TeleportOnClick",settings.TeleportOnClick,value=>settings.TeleportOnClick=value,MapDefaults.TeleportOnClick);
                 changed|=SettingBox("MapView.ChatLinks",settings.ChatLinks,value=>settings.ChatLinks=value,MapDefaults.ChatLinks);
                 changed|=SettingBox("MapView.ShowPlaceNames",settings.ShowPlaceNames,value=>settings.ShowPlaceNames=value,MapDefaults.ShowPlaceNames);
+                changed|=SettingBox("MapView.ShowIconNames",settings.ShowIconNames,value=>settings.ShowIconNames=value,MapDefaults.ShowIconNames);
                 var names=Math.Clamp(float.IsFinite(settings.PlaceNameScale) ? settings.PlaceNameScale:1,0.5f,1.5f)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.PlaceNameScale"),ref names,50,150,"%.0f %%")){settings.PlaceNameScale=names/100;changed=true;}
                 Tip("SettingTips.PlaceNameScale");
                 if(DefaultButton("PlaceNameScale",settings.PlaceNameScale!=MapDefaults.PlaceNameScale)){settings.PlaceNameScale=MapDefaults.PlaceNameScale;changed=true;}
+                var nameFollow=MapViewSettings.ClampFollow(settings.NameZoomFollow ?? settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.NameZoomFollow"),ref nameFollow,0,100,"%.0f %%")){settings.NameZoomFollow=nameFollow/100;changed=true;}
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.NameZoomFollowHelp"));
+                if(DefaultButton("NameZoomFollow",settings.NameZoomFollow is not null)){settings.NameZoomFollow=null;changed=true;}
+                var nameMinimum=Math.Clamp(settings.NameMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.NameMinZoom"),ref nameMinimum,0,200,"%.0f %%")){settings.NameMinZoom=nameMinimum/100;changed=true;}
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.NameMinZoomHelp"));
+                if(DefaultButton("NameMinZoom",settings.NameMinZoom!=MapDefaults.NameMinZoom)){settings.NameMinZoom=MapDefaults.NameMinZoom;changed=true;}
+                changed|=SettingBox("MapView.FlagOnClick",settings.FlagOnClick,value=>settings.FlagOnClick=value,MapDefaults.FlagOnClick);
                 changed|=SettingBox("MapView.ShowFlag",settings.ShowFlag,value=>settings.ShowFlag=value,MapDefaults.ShowFlag);
+                changed|=SettingBox("MapView.ShowPlayerCoordinates",settings.ShowPlayerCoordinates,value=>settings.ShowPlayerCoordinates=value,MapDefaults.ShowPlayerCoordinates);
                 changed|=SettingBox("MapView.ShowBookmarks",settings.ShowBookmarks,value=>settings.ShowBookmarks=value,MapDefaults.ShowBookmarks);
             }
             if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionQuests"),ImGuiTreeNodeFlags.DefaultOpen))
@@ -486,7 +609,40 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value,MapDefaults.ShowVendors);
                 changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value,MapDefaults.ShowGathering);
                 changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value,MapDefaults.ShowHuntMarks);
+                changed|=SettingBox("MapView.ShowListMonsters",settings.ShowListMonsters,value=>settings.ShowListMonsters=value,MapDefaults.ShowListMonsters);
+                changed|=SettingBox("MapView.ShowHuntLogMonsters",settings.ShowHuntLogMonsters,value=>settings.ShowHuntLogMonsters=value,MapDefaults.ShowHuntLogMonsters);
+                changed|=SettingBox("MapView.ShowFateMonsters",settings.ShowFateMonsters,value=>settings.ShowFateMonsters=value,MapDefaults.ShowFateMonsters);
+                changed|=SettingBox("MapView.ShowBlueMageMonsters",settings.ShowBlueMageMonsters,value=>settings.ShowBlueMageMonsters=value,MapDefaults.ShowBlueMageMonsters);
+                changed|=SettingBox("MapView.ShowCollectionMonsters",settings.ShowCollectionMonsters,value=>settings.ShowCollectionMonsters=value,MapDefaults.ShowCollectionMonsters);
+                changed|=SettingBox("MapView.BlueMageMonstersAlways",settings.BlueMageMonstersAlways,value=>settings.BlueMageMonstersAlways=value,MapDefaults.BlueMageMonstersAlways);
+                // 0.799 (X-38): icons above the monsters' heads, in the game's view.
+                changed|=SettingBox("MapView.MonsterIconsAbove",settings.MonsterIconsAbove,value=>settings.MonsterIconsAbove=value,MapDefaults.MonsterIconsAbove);
+                if(settings.MonsterIconsAbove)
+                {
+                    ImGui.Indent();
+                    changed|=SettingBox("MapView.AboveBlueSpell",settings.AboveBlueSpell,value=>settings.AboveBlueSpell=value,MapDefaults.AboveBlueSpell);
+                    changed|=SettingBox("MapView.AboveList",settings.AboveList,value=>settings.AboveList=value,MapDefaults.AboveList);
+                    changed|=SettingBox("MapView.AboveHuntLog",settings.AboveHuntLog,value=>settings.AboveHuntLog=value,MapDefaults.AboveHuntLog);
+                    changed|=SettingBox("MapView.AboveFate",settings.AboveFate,value=>settings.AboveFate=value,MapDefaults.AboveFate);
+                    changed|=SettingBox("MapView.AboveCollection",settings.AboveCollection,value=>settings.AboveCollection=value,MapDefaults.AboveCollection);
+                    changed|=SettingBox("MapView.MonsterIconsHideInCombat",settings.MonsterIconsHideInCombat,value=>settings.MonsterIconsHideInCombat=value,MapDefaults.MonsterIconsHideInCombat);
+                    var iconSize=Math.Clamp(settings.MonsterIconSize,16,96);ImGui.SetNextItemWidth(160);
+                    if(ImGui.SliderInt(localization.Get("MapView.MonsterIconSize"),ref iconSize,16,96)){settings.MonsterIconSize=iconSize;changed=true;}
+                    Tip("MapView.MonsterIconSizeTip");
+                    var iconDistance=Math.Clamp(settings.MonsterIconDistance,5,150);ImGui.SetNextItemWidth(160);
+                    if(ImGui.SliderFloat(localization.Get("MapView.MonsterIconDistance"),ref iconDistance,5,150,"%.0f")){settings.MonsterIconDistance=iconDistance;changed=true;}
+                    Tip("MapView.MonsterIconDistanceTip");
+                    ImGui.Unindent();
+                }
                 changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
+                var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelMinZoom"),ref labelMinimum,0,200,"%.0f %%")){settings.GatheringLabelMinZoom=labelMinimum/100;changed=true;}
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.GatheringLabelMinZoomHelp"));
+                if(DefaultButton("GatheringLabelMinZoom",settings.GatheringLabelMinZoom!=MapDefaults.GatheringLabelMinZoom)){settings.GatheringLabelMinZoom=MapDefaults.GatheringLabelMinZoom;changed=true;}
+                var labelScale=Math.Clamp(settings.GatheringLabelScale,0.5f,2f)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelScale"),ref labelScale,50,200,"%.0f %%")){settings.GatheringLabelScale=labelScale/100;changed=true;}
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.GatheringLabelScaleHelp"));
+                if(DefaultButton("GatheringLabelScale",settings.GatheringLabelScale!=MapDefaults.GatheringLabelScale)){settings.GatheringLabelScale=MapDefaults.GatheringLabelScale;changed=true;}
             }
             if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionPlayer")))
             {
@@ -500,8 +656,10 @@ internal sealed partial class MainWindow
                     ImGui.Indent();
                     changed|=SettingBox("MapView.EdgePlayerOn",settings.EdgePlayer,value=>settings.EdgePlayer=value,MapDefaults.EdgePlayer);
                     changed|=SettingBox("MapView.EdgeFlagOn",settings.EdgeFlag,value=>settings.EdgeFlag=value,MapDefaults.EdgeFlag);
+                    changed|=SettingBox("MapView.EdgeFlagCoordinatesOn",settings.EdgeFlagCoordinates,value=>settings.EdgeFlagCoordinates=value,MapDefaults.EdgeFlagCoordinates);
                     changed|=SettingBox("MapView.EdgeTargetOn",settings.EdgeTarget,value=>settings.EdgeTarget=value,MapDefaults.EdgeTarget);
                     changed|=SettingBox("MapView.EdgeQuestsOn",settings.EdgeQuests,value=>settings.EdgeQuests=value,MapDefaults.EdgeQuests);
+                    changed|=SettingBox("MapView.EdgeLevesOn",settings.EdgeLeves,value=>settings.EdgeLeves=value,MapDefaults.EdgeLeves);
                     changed|=SettingBox("MapView.EdgeEventsOn",settings.EdgeEvents,value=>settings.EdgeEvents=value,MapDefaults.EdgeEvents);
                     changed|=SettingBox("MapView.EdgeFatesOn",settings.EdgeFates,value=>settings.EdgeFates=value,MapDefaults.EdgeFates);
                     changed|=SettingBox("MapView.EdgeGatheringOn",settings.EdgeGathering,value=>settings.EdgeGathering=value,MapDefaults.EdgeGathering);
@@ -542,6 +700,32 @@ internal sealed partial class MainWindow
                 if(ImGui.SliderFloat(localization.Get("MapView.IconScale"),ref scale,50,200,"%.0f %%")){settings.IconScale=scale/100;changed=true;}
                 Tip("SettingTips.IconScale");
                 if(DefaultButton("IconScale",settings.IconScale!=MapDefaults.IconScale)){settings.IconScale=MapDefaults.IconScale;changed=true;}
+                // 0.542 (P1).
+                ImGui.SetNextItemWidth(160);
+                if(ImGui.BeginCombo(localization.Get("MapView.OpenZoom")+"###MapOpenZoom",localization.Get("MapView.OpenZoom"+settings.OpenZoom)))
+                {
+                    foreach(var mode in Enum.GetValues<MapOpenZoom>())
+                        if(ImGui.Selectable(localization.Get("MapView.OpenZoom"+mode),settings.OpenZoom==mode)){settings.OpenZoom=mode;changed=true;}
+                    ImGui.EndCombo();
+                }
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.OpenZoomHelp"));
+                if(DefaultButton("OpenZoom",settings.OpenZoom!=MapDefaults.OpenZoom)){settings.OpenZoom=MapDefaults.OpenZoom;changed=true;}
+                if(settings.OpenZoom==MapOpenZoom.Fixed)
+                {
+                    var opening=MapProjection.ClampZoom(settings.OpenZoomValue)*100;ImGui.SetNextItemWidth(160);
+                    if(ImGui.SliderFloat(localization.Get("MapView.OpenZoomValue"),ref opening,15,400,"%.0f %%")){settings.OpenZoomValue=opening/100;changed=true;}
+                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.OpenZoomValueHelp"));
+                    if(DefaultButton("OpenZoomValue",settings.OpenZoomValue!=MapDefaults.OpenZoomValue)){settings.OpenZoomValue=MapDefaults.OpenZoomValue;changed=true;}
+                }
+                var focus=MapFocusZoom*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.FocusZoom"),ref focus,15,400,"%.0f %%")){settings.FocusZoom=focus/100;changed=true;}
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.FocusZoomHelp"));
+                if(DefaultButton("FocusZoom",settings.FocusZoom!=MapDefaults.FocusZoom)){settings.FocusZoom=MapDefaults.FocusZoom;changed=true;}
+                var wheel=(Math.Clamp(float.IsFinite(settings.WheelStep) ? settings.WheelStep:1.15f,1.02f,1.5f)-1)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.WheelStep"),ref wheel,2,50,"%.0f %%")){settings.WheelStep=1+wheel/100;changed=true;}
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.WheelStepHelp"));
+                if(DefaultButton("WheelStep",settings.WheelStep!=MapDefaults.WheelStep)){settings.WheelStep=MapDefaults.WheelStep;changed=true;}
+                changed|=SettingBox("MapView.WheelInvert",settings.WheelInvert,value=>settings.WheelInvert=value,MapDefaults.WheelInvert);
                 var follow=MapViewSettings.ClampFollow(settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.ZoomFollow"),ref follow,0,100,"%.0f %%")){settings.ZoomFollow=follow/100;changed=true;}
                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.ZoomFollowHelp"));
@@ -554,6 +738,7 @@ internal sealed partial class MainWindow
             if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionAreas")))
             {
                 changed|=AreaSetting("MapView.AreaQuests",settings.ShowQuestAreas,value=>settings.ShowQuestAreas=value,settings.QuestAreaColor,value=>settings.QuestAreaColor=value,MapDefaults.ShowQuestAreas,MapDefaults.QuestAreaColor);
+                changed|=AreaSetting("MapView.AreaLeves",settings.ShowLeveAreas,value=>settings.ShowLeveAreas=value,settings.LeveAreaColor,value=>settings.LeveAreaColor=value,MapDefaults.ShowLeveAreas,MapDefaults.LeveAreaColor);
                 changed|=AreaSetting("MapView.AreaEvents",settings.ShowEventAreas,value=>settings.ShowEventAreas=value,settings.EventAreaColor,value=>settings.EventAreaColor=value,MapDefaults.ShowEventAreas,MapDefaults.EventAreaColor);
                 changed|=AreaSetting("MapView.AreaFates",settings.ShowFateAreas,value=>settings.ShowFateAreas=value,settings.FateAreaColor,value=>settings.FateAreaColor=value,MapDefaults.ShowFateAreas,MapDefaults.FateAreaColor);
                 changed|=AreaSetting("MapView.AreaGathering",settings.ShowGatheringAreas,value=>settings.ShowGatheringAreas=value,settings.GatheringAreaColor,value=>settings.GatheringAreaColor=value,MapDefaults.ShowGatheringAreas,MapDefaults.GatheringAreaColor);
@@ -588,7 +773,8 @@ internal sealed partial class MainWindow
         var eventIcons=new HashSet<uint>();var fateIcons=new HashSet<uint>();var gatheringIcons=new HashSet<uint>();var targetIcons=new HashSet<uint>();
         if(mapLive?.State is { } live)
         {
-            foreach(var marker in live.Events ?? [])if(marker.MapId==map.MapId){icons.Add(marker.Icon);eventIcons.Add(marker.Icon);}
+            var sameLand=SameLandMaps(map);
+            foreach(var marker in live.Events ?? [])if(sameLand.Contains(marker.MapId)){icons.Add(marker.Icon);eventIcons.Add(marker.Icon);}
             if(live.MapId==map.MapId)foreach(var fate in live.Fates ?? [])if(fate.Icon!=0){icons.Add(fate.Icon);fateIcons.Add(fate.Icon);}
         }
         if(settings.ShowGathering)foreach(var point in MapGatheringPoints(map))if(point.Icon!=0){icons.Add(point.Icon);gatheringIcons.Add(point.Icon);}
@@ -791,11 +977,14 @@ internal sealed partial class MainWindow
     // Enlarge/restore: the new window size only exists two frames later, so the fit waits for it (0.118, user report).
     private int mapFitDelay;
     // Quest, aetheryte or FATE the game asked to show (journal click), focused once the target map is drawn (0.118).
+    private uint mapQuestMap;
     private GameMapRequest? mapFocusRequest;private DateTimeOffset mapFocusUntil;
     // The game's temporary marker (quest or gathering target) is not an event marker: it is kept and drawn here (0.122) until the
     // next game request, since closing the game map would otherwise lose it.
     private (uint MapId,Vector2 World,uint Icon,uint QuestId)? mapGameTarget;
     private Quests.QuestState? mapGameTargetQuests;
+    internal IReadOnlyList<IslandPoint>? IslandPoints { get; set; }
+    private string? mapGameTargetLeve;
     private DateTimeOffset mapGameTargetSince,mapGameTargetRefresh;
 
     // 0.243 (R-01): a journal target belongs to its quest; once that quest is no longer active (completed or abandoned), the
@@ -803,6 +992,8 @@ internal sealed partial class MainWindow
     // is shown; only a list observed after the target was set (not the disk cache) may remove it. Nothing is scanned per frame.
     private void ExpireGameTarget()
     {
+        // 0.655 (user report): a leve's target has no quest; it goes when the game no longer lists the leve.
+        if(mapGameTarget is not null && TenshoAssistant.Maps.MapLeves.TargetGone(mapGameTargetLeve,TenshoAssistant.Maps.MapLiveReader.AcceptedLeves)){mapGameTarget=null;mapGameTargetLeve=null;return;}
         if(mapGameTarget is not { QuestId: not 0 } target)return;
         var now=DateTimeOffset.UtcNow;
         if(now>=mapGameTargetRefresh){mapGameTargetRefresh=now.AddMinutes(1);quests.RequestRefresh();}
@@ -812,6 +1003,19 @@ internal sealed partial class MainWindow
         mapGameTargetQuests=state;
         var key=target.QuestId & 0xFFFF;
         if(!state.Entries.Any(entry=>entry.Progress==Quests.QuestProgress.Active && (entry.Id & 0xFFFF)==key))mapGameTarget=null;
+    }
+    // 0.544 (P3): from any point or the flag, the question of 0.373: nearest aetheryte of this map, its real cost, teleport only if confirmed.
+    private void DrawNearestAetheryteEntry(MapDefinition map)
+    {
+        if(!MapHasAetheryte(map))return;
+        if(ImGui.Selectable(localization.Get("MapView.NearestAetheryte")+"##NearestAetheryte"))AskNearestAetheryteAt(map,mapContextPixel,map.Zone);
+        Tip("MapView.NearestAetheryteTip");
+    }
+    private string? MapFailedParts()
+    {
+        var parts=mapLive?.FailedParts;
+        if(parts is not { Count:>0 })return null;
+        return localization.Format("MapView.PartsUnavailable",string.Join(", ",parts.Select(part=>localization.Get("MapView.Part"+part))));
     }
     private bool mapDragged;
     // 0.328 (map audit #3): the zoom buttons and slider keep the texture pixel at the centre of the view where it is (canvas size of
@@ -827,17 +1031,33 @@ internal sealed partial class MainWindow
     {
         var pixel=MapProjection.PixelFromWorld(world,map);
         mapViewOpen=true;mapViewMapId=map.MapId;mapViewFollow=false;mapFitRequested=false;
-        mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,1f));mapCenterRequest=pixel;
+        mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,MapFocusZoom));mapCenterRequest=pixel;
         if(!flag)return;
         var coordinate=MapProjection.CoordinateFromPixel(pixel,map);
         FlagFromMap(map,coordinate.X,coordinate.Y);
     }
     // Same, without a known position: the whole map.
     private void ShowMapOnTenshoMap(uint mapId){if(mapId==0)return;mapViewOpen=true;NavigateMap(mapId);}
+    // 0.642 (user captures): the target stays when going up, as on the game's map: inside its zone's picture on the region, on the region's link on the world.
+    private (Vector2 Pixel,uint Link)? GameTargetAbove(MapDefinition map,IReadOnlyList<MapIconMarker> markers,uint targetMap,Vector2 world)
+    {
+        if(map.TerritoryId!=0 || mapMarkers is null || maps.State.Catalog is not { } catalog || catalog.Find(targetMap) is not { } zone)return null;
+        foreach(var link in markers)
+            if(link.LinkMapId!=0 && (link.LinkMapId==targetMap || catalog.Find(link.LinkMapId)?.TerritoryId==zone.TerritoryId))
+                return (MapLabels.ZonePixel(new Vector2(link.X,link.Y),MapProjection.PixelFromWorld(new Vector3(world.X,0,world.Y),zone)),targetMap);
+        var region=mapMarkers.RegionOf(zone);
+        foreach(var link in markers)
+            if(region!=0 && link.LinkMapId==region)return (new Vector2(link.X,link.Y),region);
+        return null;
+    }
     private void NavigateMap(uint mapId){if(mapId==0)return;mapViewMapId=mapId;mapViewFollow=false;mapFitRequested=true;}
 
+    private (uint Shown,uint Standing) mapCostsReadFor;
     private void DrawMapCanvas(MapDefinition map,MapLiveState? live)
     {
+        MapMarkStart();
+        // 0.645 (P7): the game's teleport list, read when the shown map or the player's map changes: costs depend on where the player stands.
+        if(mapCostsReadFor!=(map.MapId,live?.MapId ?? 0)){mapCostsReadFor=(map.MapId,live?.MapId ?? 0);mapLive?.RefreshTeleportCosts();}
         var origin=ImGui.GetCursorScreenPos();var size=Vector2.Max(ImGui.GetContentRegionAvail(),new Vector2(64));mapCanvasSize=size;
         ImGui.InvisibleButton("MapCanvas",size,ImGuiButtonFlags.MouseButtonLeft | ImGuiButtonFlags.MouseButtonRight);
         var hovered=ImGui.IsItemHovered() && !mapOverlayHovered;var io=ImGui.GetIO();
@@ -848,27 +1068,34 @@ internal sealed partial class MainWindow
         {
             // Zoom around the cursor: the pixel under the mouse stays under the mouse.
             var before=(io.MousePos-origin-mapPan)/mapZoom;
-            mapZoom=MapProjection.ClampZoom(mapZoom*(io.MouseWheel>0 ? 1.15f:1/1.15f));
+            mapZoom=MapProjection.ClampZoom(mapZoom*configuration.MapView.WheelFactor(io.MouseWheel));
             mapPan=io.MousePos-origin-before*mapZoom;
         }
+        // 0.545 (P5): over the tool column, the slider or the names on the map, the wheel zooms around the centre of the view.
+        else if(io.MouseWheel!=0 && ImGui.IsWindowHovered(ImGuiHoveredFlags.RootAndChildWindows))ZoomTo(mapZoom*configuration.MapView.WheelFactor(io.MouseWheel));
         if(mapFitDelay>0 && --mapFitDelay==0)mapFitRequested=true;
         if(mapFocusRequest is { } focus)
         {
-            // Like the game: the map zooms on what was asked. Markers can arrive a moment after the map opens, so the search
-            // is retried for 1.5 s; nothing found on this map = whole map. Logged (/xllog) to check the quest links in game.
+            // Markers can arrive a moment after the map opens, so the search is retried for 1.5 s. Logged (/xllog) to check the quest links in game.
+            // 0.637 (user request): from the quest journal or an active quest, the map is always adjusted and the zoom stays: centred on what was asked, or on the map until then.
             if(FocusPixel(focus,map,live) is { } pixel)
             {
-                mapGameTarget=focus.Target is { } world && focus.TargetIcon!=0 ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
+                // 0.636 (user report): the icon stays on the way there, even once the game has forgotten its marker.
+                mapGameTarget=focus.UsesRoute(map) && focus.Route is { } way && focus.RouteIcon!=0 ? (map.MapId,way,focus.RouteIcon,focus.QuestId):focus.Target is { } world && focus.TargetIcon!=0 && map.TerritoryId!=0 && !focus.UsesRoute(map) && (maps.State.Catalog is not { } shownCatalog || focus.EntranceTarget(shownCatalog) is null) ? (map.MapId,world,focus.TargetIcon,focus.QuestId):null;
                 mapGameTargetQuests=null;mapGameTargetSince=DateTimeOffset.UtcNow;mapGameTargetRefresh=default;
-                mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(Math.Max(mapZoom,1f));mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
+                mapGameTargetLeve=focus.QuestId==0 ? TenshoAssistant.Maps.MapLiveReader.LeveKeyOf(focus.Title):null;
+                if(mapGameTargetLeve is { } clickedLeve && focus.Target is { } leveArea && focus.TargetScale>0 && map.TerritoryId!=0)
+                    TenshoAssistant.Maps.MapLiveReader.SeedLeveArea(map.MapId,clickedLeve,focus.Title,leveArea,focus.TargetScale,focus.TargetIcon);
+                mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(mapZoom);mapCenterRequest=pixel;mapViewFollow=false;mapFitRequested=false;
                 log.Information("Map focus found on map {0} for quest {1}, aetheryte {2}, FATE {3}.",map.MapId,focus.QuestId,focus.AetheryteId,focus.FateId);
             }
             else if(DateTimeOffset.UtcNow>=mapFocusUntil)
             {
-                mapFocusRequest=null;mapFitRequested=true;
-                var seen=string.Join(" | ",(live?.Events ?? []).Where(marker=>marker.MapId==map.MapId).Take(12).Select(marker=>$"{marker.ObjectiveId}:{marker.Icon}:{marker.Tooltip}"));
+                mapFocusRequest=null;mapCenterRequest=new Vector2(MapProjection.TextureSize/2f);mapFitRequested=false;
+                var seen=string.Join(" | ",(live?.Events ?? []).Where(marker=>SameLandMaps(map).Contains(marker.MapId)).Take(12).Select(marker=>$"{marker.ObjectiveId}:{marker.Icon}:{marker.Tooltip}"));
                 log.Information("Map focus not found on map {0} for quest {1} (journal {2}); markers: {3}",map.MapId,focus.QuestId,focus.QuestLog,seen);
             }
+            else mapCenterRequest=new Vector2(MapProjection.TextureSize/2f);
         }
         if(mapFitRequested)
         {
@@ -897,24 +1124,38 @@ internal sealed partial class MainWindow
             var markers=settings.ShowFixedIcons || settings.ShowPlaceNames ? mapMarkers?.For(map.MarkerRange) ?? []:[];
             if(mapMarkers?.Failed(map.MarkerRange)==true)
                 draw.AddText(origin+new Vector2(8,26),ImGui.GetColorU32(UI.FfxivTheme.TextMuted),localization.Get("MapView.MarkersUnavailable"));
+            // 0.569 (P15): what no longer reads after a game update, instead of a map that just looks empty.
+            if(MapFailedParts() is { } brokenParts)draw.AddText(origin+new Vector2(8,44),ImGui.GetColorU32(UI.FfxivTheme.Warning),brokenParts);
             // Place names first, under the icons, in large outlined text like the game map; they also follow the zoom.
             var font=ImGui.GetFont();var nameScale=Math.Clamp(float.IsFinite(settings.PlaceNameScale) ? settings.PlaceNameScale:1,0.5f,1.5f);
             // 0.152 (user choice « follow the zoom »): names scale with the map like the icons; only a 6 px floor keeps them drawable.
-            var nameSize=Math.Max(6,ImGui.GetFontSize()*2.4f*zoomFactor*nameScale);
-            foreach(var marker in settings.ShowPlaceNames ? markers.Where(marker=>marker.Icon==0):[])
+            var nameSize=Math.Max(6,ImGui.GetFontSize()*2.4f*settings.NameFactor(mapZoom)*nameScale);
+            var placeNameSize=MapLabels.PlaceNameSize(nameSize,mapZoom,nameScale);
+            foreach(var marker in settings.ShowPlaceNames && settings.NamesShown(mapZoom) && MapLabels.PlaceNameShown(map.TerritoryId!=0,mapZoom) ? markers.Where(marker=>marker.Icon==0):[])
             {
                 var centre=origin+mapPan+new Vector2(marker.X,marker.Y)*mapZoom;
-                var text=ImGui.CalcTextSize(marker.Label)*(nameSize/ImGui.GetFontSize());var corner=centre-text/2;
+                var text=ImGui.CalcTextSize(marker.Label)*(placeNameSize/ImGui.GetFontSize());var corner=centre-text/2;
                 var outline=ImGui.GetColorU32(new Vector4(0.96f,0.93f,0.84f,0.9f));
                 foreach(var shift in new[]{new Vector2(-1,0),new Vector2(1,0),new Vector2(0,-1),new Vector2(0,1)})
-                    draw.AddText(font,nameSize,corner+shift,outline,marker.Label);
-                draw.AddText(font,nameSize,corner,ImGui.GetColorU32(new Vector4(0.30f,0.22f,0.12f,1)),marker.Label);
+                    draw.AddText(font,placeNameSize,corner+shift,outline,marker.Label);
+                draw.AddText(font,placeNameSize,corner,ImGui.GetColorU32(new Vector4(0.30f,0.22f,0.12f,1)),marker.Label);
             }
+            // 0.631: the zones of a region map, under everything else, like the game.
+            foreach(var marker in settings.ShowFixedIcons ? markers.Where(marker=>marker.Icon!=0 && marker.LinkMapId!=0 && settings.SizeOf(marker.Icon,map.MapId)>0):[])
+                if(textures.TryGetFromGameIcon(new GameIconLookup(marker.Icon),out var zoneShared) && zoneShared.TryGetWrap(out var zoneImage,out _) && zoneImage is not null && MapLabels.IsZoneImage(marker.LinkMapId,zoneImage.Width))
+                {
+                    var zoneAt=origin+mapPan+new Vector2(marker.X,marker.Y)*mapZoom;var zoneHalf=new Vector2(zoneImage.Width,zoneImage.Height)*MapLabels.ZoneScale*mapZoom;
+                    // The game darkens the parchment with this picture; ImGui only paints over it: a parchment tint comes close (by eye, on the captures).
+                    draw.AddImage(zoneImage.Handle,zoneAt-zoneHalf,zoneAt+zoneHalf,Vector2.Zero,Vector2.One,ImGui.GetColorU32(new Vector4(0.74f,0.70f,0.55f,opacity)));
+                }
             uint? linkUnderMouse=null;
             // Areas first, under every icon: running FATEs, quest areas, gathering points of this map.
             var fates=settings.ShowFates && live?.Fates is { } running && live.MapId==map.MapId ? running:[];
-            var events=settings.ShowQuests && live?.Events is { } liveEvents ? liveEvents.Where(marker=>marker.MapId==map.MapId).ToArray():[];
+            var eventMaps=SameLandMaps(map);
+            var events=settings.ShowQuests && live?.Events is { } liveEvents ? liveEvents.Where(marker=>eventMaps.Contains(marker.MapId)).ToArray():[];
+            MapMark("canvas texture, names, zones");
             var gathering=settings.ShowGathering ? MapGatheringPoints(map):[];
+            MapMark("canvas gathering points");
             // Areas per kind (0.151): quests (marker type 3), leves and other events, FATEs, gathering points; own switch and colour.
             if(settings.ShowFateAreas)
                 foreach(var fate in fates.Where(fate=>fate.Radius>0))
@@ -922,15 +1163,21 @@ internal sealed partial class MainWindow
             foreach(var marker in events.Where(marker=>marker.Radius>0))
             {
                 var quest=marker.MarkerType==3;
-                if(quest ? !settings.ShowQuestAreas:!settings.ShowEventAreas)continue;
-                DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(marker.Position,map)*mapZoom,marker.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,quest ? settings.QuestAreaColor:settings.EventAreaColor);
+                if(quest ? !settings.ShowQuestAreas:marker.IsLeve ? !settings.ShowLeveAreas:!settings.ShowEventAreas)continue;
+                DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(marker.Position,map)*mapZoom,marker.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,quest ? settings.QuestAreaColor:marker.IsLeve ? settings.LeveAreaColor:settings.EventAreaColor);
             }
             if(settings.ShowGatheringAreas)
                 foreach(var point in gathering)
                     if(point.Position is { Radius:>0 } area)
                         DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(area.X,0,area.Z),map)*mapZoom,area.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,settings.GatheringAreaColor);
+            // N-07 (0.667): the Island Sanctuary's resources; world coordinates, to compare with the game's map.
+            IReadOnlyList<IslandPoint> islandPoints=map.TerritoryId==IslandResources.Territory ? (IslandPoints ?? []).Where(point=>settings.ShowsIslandKind(point.Kind)).ToArray():[];
+            if(settings.ShowGatheringAreas)
+                foreach(var point in islandPoints.Where(point=>point.Radius>0))
+                    DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(point.X,0,point.Y),map)*mapZoom,point.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,settings.GatheringAreaColor);
             // Every game icon in one list sorted by priority (0.124: quests used to be drawn above everything whatever the
             // setting). Equal priorities keep the game's layer order: fixed icons, gathering, FATEs, quests, game target.
+            MapMark("canvas areas");
             var icons=new List<MapIconDraw>();
             // worldRadius: area of a quest, FATE or gathering point; hovering inside it lists the icon too (like Mappy).
             void Add(uint icon,int layer,Vector2 pixel,string? label,MapIconMarker? fixedMarker=null,MapLocalGatheringPoint? point=null,float worldRadius=0,Vector2? flag=null)
@@ -948,6 +1195,19 @@ internal sealed partial class MainWindow
                 if(vendorLayout.Merged.TryGetValue(marker,out var vendors)){label=vendors.Label;vendorFlag=vendors.Flag;}
                 Add(marker.Icon,0,new Vector2(marker.X,marker.Y),label,marker,flag:vendorFlag);
             }
+            foreach(var point in islandPoints)
+            {
+                var islandItems=itemCatalog.State.Catalog;
+                var firstItem=islandItems?.Find(point.Items[0]);
+                if(firstItem is { IconId:not 0 })
+                    Add(firstItem.IconId,1,MapProjection.PixelFromWorld(new Vector3(point.X,0,point.Y),map),string.Join("\n",point.Items.Select(item=>islandItems?.Find(item)?.Name ?? item.ToString())),worldRadius:settings.ShowGatheringAreas ? point.Radius:0);
+            }
+            // 0.632 (user captures): a region map also shows the aetherytes of its zones; a click asks for the teleport, as on the zone's map.
+            if(settings.ShowFixedIcons && map.TerritoryId==0 && mapMarkers is not null && maps.State.Catalog is { } zoneCatalog)
+                foreach(var zoneLink in markers.Where(marker=>marker.Icon!=0 && marker.LinkMapId!=0))
+                    if(zoneCatalog.Find(zoneLink.LinkMapId) is { } linkedZone)
+                        foreach(var crystal in mapMarkers.For(linkedZone.MarkerRange).Where(marker=>marker.AetheryteId!=0))
+                            Add(crystal.Icon,0,MapLabels.ZonePixel(new Vector2(zoneLink.X,zoneLink.Y),new Vector2(crystal.X,crystal.Y)),crystal.Label.Length>0 ? crystal.Label:MapName(linkedZone),crystal);
             // 0.328 (map audit #7): hovering inside an area lists its icon only while that kind of area is drawn.
             foreach(var point in gathering)
                 if(point.Position is { } spot && point.Icon!=0)Add(point.Icon,1,MapProjection.PixelFromWorld(new Vector3(spot.X,0,spot.Z),map),GatheringLabelOf(point),point:point,
@@ -957,17 +1217,30 @@ internal sealed partial class MainWindow
             foreach(var vendor in vendorLayout.Lonely)Add(vendor.Icon,1,vendor.Pixel,vendor.Label,flag:vendor.Flag);
             foreach(var fate in fates.Where(fate=>fate.Icon!=0))Add(fate.Icon,2,MapProjection.PixelFromWorld(fate.Position,map),FateLabel(fate),worldRadius:settings.ShowFateAreas ? fate.Radius:0);
             foreach(var marker in events)Add(marker.Icon,3,MapProjection.PixelFromWorld(marker.Position,map),settings.QuestTooltips ? EventLabel(marker):null,
-                worldRadius:(marker.MarkerType==3 ? settings.ShowQuestAreas:settings.ShowEventAreas) ? marker.Radius:0);
+                worldRadius:(marker.MarkerType==3 ? settings.ShowQuestAreas:marker.IsLeve ? settings.ShowLeveAreas:settings.ShowEventAreas) ? marker.Radius:0);
             ExpireGameTarget();
             if(mapGameTarget is { } gameTarget && gameTarget.MapId==map.MapId)
                 Add(gameTarget.Icon,4,MapProjection.PixelFromWorld(new Vector3(gameTarget.World.X,0,gameTarget.World.Y),map),localization.Get("MapView.GameTarget"));
+            // 0.643 (user capture): a click on it goes down one step, like the links.
+            else if(mapGameTarget is { } upperTarget && GameTargetAbove(map,markers,upperTarget.MapId,upperTarget.World) is { } upper)
+                Add(upperTarget.Icon,4,upper.Pixel,localization.Get("MapView.GameTarget"),new MapIconMarker(upper.Pixel.X,upper.Pixel.Y,upperTarget.Icon,"",upper.Link));
             icons.Sort((left,right)=>left.Priority!=right.Priority ? left.Priority.CompareTo(right.Priority):left.Layer!=right.Layer ? left.Layer.CompareTo(right.Layer):left.Order.CompareTo(right.Order));
             MapIconDraw? top=null;var hits=new List<MapIconDraw>();
             if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right))mapIconContext=null;
+            var iconNames=new List<(Vector2 At,Vector2 Size,bool MapLink,string Text,float FontSize,uint Link)>();
             foreach(var item in icons)
             {
-                if(textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
-                    draw.AddImage(image.Handle,item.At-new Vector2(item.Size/2),item.At+new Vector2(item.Size/2));
+                if(textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null && !MapLabels.IsZoneImage(item.Fixed?.LinkMapId ?? 0,image.Width))
+                    // 0.645 (P7): an aetheryte not attuned is greyed.
+                    draw.AddImage(image.Handle,item.At-new Vector2(item.Size/2),item.At+new Vector2(item.Size/2),Vector2.Zero,Vector2.One,
+                        MapLabels.NotAttuned(item.Fixed?.AetheryteId ?? 0,mapLive?.TeleportCosts) ? ImGui.GetColorU32(new Vector4(0.45f,0.45f,0.45f,0.8f)):ImGui.GetColorU32(Vector4.One));
+                // 0.596 (P12): the name the game writes beside this icon, on the side it uses; drawn after the icons (0.623).
+                if(settings.ShowIconNames && settings.NamesShown(mapZoom) && item.Fixed is {Label.Length:>0} named && MapLabels.Shown(named.LinkMapId!=0,mapZoom))
+                {
+                    var iconNameSize=MapLabels.IconNameSize(nameSize);
+                    var iconNameText=ImGui.CalcTextSize(named.Label)*(iconNameSize/ImGui.GetFontSize());
+                    iconNames.Add((item.At+MapLabels.Offset(named.Orientation,item.Size,iconNameText),iconNameText,named.LinkMapId!=0,named.Label,iconNameSize,named.LinkMapId));
+                }
                 // Timed gathering points: a clock badge, green while open now, orange otherwise (0.130).
                 if(item.Point is { Timed:true } timedPoint)
                 {
@@ -975,14 +1248,28 @@ internal sealed partial class MainWindow
                     draw.AddCircleFilled(corner+new Vector2(badge/2),badge*0.62f,ImGui.GetColorU32(new Vector4(0,0,0,0.75f)),16);
                     draw.AddText(UiBuilder.IconFont,badge,corner,ImGui.GetColorU32(TimedPointColor(timedPoint)),FontAwesomeIcon.Clock.ToIconString());
                 }
-                if(item.Point is { } labelled && settings.GatheringLabels && mapZoom>=0.6f)
-                    draw.AddText(item.At+new Vector2(item.Size*0.6f,-ImGui.GetFontSize()/2),ImGui.GetColorU32(UI.FfxivTheme.Text),localization.Format("MapLocal.Level",labelled.Level));
+                if(item.Point is { } labelled && settings.GatheringLabels && settings.GatheringLabelShown(mapZoom))
+                {
+                    var labelSize=settings.GatheringLabelSize(ImGui.GetFontSize());
+                    draw.AddText(ImGui.GetFont(),labelSize,item.At+new Vector2(item.Size*0.6f,-labelSize/2),ImGui.GetColorU32(UI.FfxivTheme.Text),localization.Format("MapLocal.Level",labelled.Level));
+                }
                 if(hovered)
                 {
                     var distance=Vector2.Distance(io.MousePos,item.At);
                     if(distance<=item.Size/2)top=item;
                     if(distance<=Math.Max(item.Size/2,item.Area))hits.Add(item);
                 }
+            }
+            // 0.623: as on the game's map: white with a dark edge, map links in blue-green, and none on top of another.
+            foreach(var index in MapLabels.Fitting(iconNames.Select(name=>(name.At,name.Size,name.MapLink)).ToArray()))
+            {
+                var label=iconNames[index];
+                // 0.626 (user report): the name of a map link opens that map, like its icon (handled with it, below).
+                var overLink=hovered && label.Link!=0 && io.MousePos.X>=label.At.X && io.MousePos.X<=label.At.X+label.Size.X && io.MousePos.Y>=label.At.Y && io.MousePos.Y<=label.At.Y+label.Size.Y;
+                if(overLink)linkUnderMouse=label.Link;
+                foreach(var shift in new[]{new Vector2(-1,0),new Vector2(1,0),new Vector2(0,-1),new Vector2(0,1)})
+                    draw.AddText(font,label.FontSize,label.At+shift,ImGui.GetColorU32(new Vector4(0.05f,0.05f,0.05f,0.9f)),label.Text);
+                draw.AddText(font,label.FontSize,label.At,ImGui.GetColorU32(overLink ? new Vector4(0.8f,1,1,1):label.MapLink ? new Vector4(0.45f,0.9f,0.95f,1):new Vector4(0.97f,0.95f,0.9f,1)),label.Text);
             }
             // Every icon under the cursor (or whose area holds it) is listed in one tooltip, topmost first (0.132, as Mappy does).
             hits.Reverse();
@@ -1016,6 +1303,30 @@ internal sealed partial class MainWindow
                         :item.Kind==MapObjectKind.HuntMark ? localization.Format("MapView.HuntMarkLabel",item.Name,item.Level switch{3=>"S",2=>"A",_=>"B"}):item.Name;
                     if(hovered && Vector2.Distance(io.MousePos,at)<=glyph){tooltip=label;tooltipPoint=null;}
                 }
+            // 0.795 (X-35, user request): nearby monsters that drop an item the tracking lists still need.
+            // 0.796 (X-36): one layer for every reason; one icon per monster, the first reason's, and every reason on hover.
+            if((settings.ShowListMonsters || settings.ShowHuntLogMonsters || settings.ShowFateMonsters || settings.ShowBlueMageMonsters || settings.ShowCollectionMonsters) && live?.Monsters is { Count:>0 } monsters && live.MapId==map.MapId)
+            {
+                RefreshNearbyMonsters();
+                foreach(var monster in monsters)
+                {
+                    var notes=MonsterNotes(monster,live.Fates);
+                    if(notes.Count==0)continue;
+                    MonsterNote? first=null;
+                    foreach(var note in notes)if(MonsterNoteShown(note,settings)){first=note;break;}
+                    if(first is null)continue;
+                    var at=origin+mapPan+MapProjection.PixelFromWorld(monster.Position,map)*mapZoom;
+                    var glyph=Math.Max(4,baseIcon*0.6f);
+                    var (symbol,colour)=MonsterGlyph(first.Kind);
+                    draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
+                    draw.AddText(UiBuilder.IconFont,glyph,at-new Vector2(glyph/2),ImGui.GetColorU32(colour),symbol.ToIconString());
+                    if(hovered && Vector2.Distance(io.MousePos,at)<=glyph)
+                    {
+                        tooltip=localization.Format("MapView.MonsterLabel",monster.Name,monster.Level)+"\n"+string.Join("\n",notes.Where(note=>MonsterNoteShown(note,settings)).Select(note=>note.Text));
+                        tooltipPoint=null;
+                    }
+                }
+            }
             if(settings.ShowFlag && settings.SizeOf(FlagIcon,map.MapId)>0 && live is { Flag:{ } flag } && live.FlagMapId==map.MapId)
             {
                 var flagPixel=MapProjection.PixelFromWorld(new Vector3(flag.X,0,flag.Y),map);var at=origin+mapPan+flagPixel*mapZoom;var iconSize=Math.Max(4,baseIcon*settings.SizeOf(FlagIcon,map.MapId));
@@ -1063,6 +1374,7 @@ internal sealed partial class MainWindow
                 }
             // 0.378 (g, M-08): the player's bookmarks of this map (star); a click on one places the flag there.
             MapBookmark? hoveredBookmark=null;
+            MapMark("canvas icons");
             if(settings.ShowBookmarks && settings.SizeOf(GlyphBookmark,map.MapId) is var bookmarkSize and >0)
                 foreach(var mark in configuration.MapBookmarks ?? [])
                 {
@@ -1088,6 +1400,7 @@ internal sealed partial class MainWindow
             if(settings.ShowPlayer && player is { } here)DrawPlayerArrow(draw,origin+mapPan+here*mapZoom,live!.Rotation,settings.ShowViewCone,MapViewSettings.ClampMarker(settings.PlayerIconScale),
                 MapViewSettings.ClampMarker(settings.ViewConeScale),MapViewSettings.ClampConeOpacity(settings.ViewConeOpacity),settings.ViewConeColor);
             // 0.297 (user request): targets outside the view keep their icon on the map's edge, compass style.
+            MapMark("canvas bookmarks, treasure, player");
             var edgeLabel=settings.ShowEdgeMarkers ? DrawEdgeMarkers(draw,origin,size,map,live,settings,player,events,fates,gathering,hovered,io.MousePos):null;
             if(edgeLabel is not null){tooltip=edgeLabel;sightseeingTip=null;tooltipPoint=null;}
             // Only the topmost icon under the cursor answers: tooltip, map link, teleport or flag.
@@ -1114,10 +1427,21 @@ internal sealed partial class MainWindow
                 if(ImGui.IsMouseClicked(ImGuiMouseButton.Right) && !settings.RightClickIgnored(chosen.Icon) && sightseeingTip is null)
                     mapIconContext=(chosen,(chosen.At-origin-mapPan)/mapZoom);
             }
+            // 0.644 (P6): where the player stands, always; above the cursor's line.
+            if(settings.ShowPlayerCoordinates && player is { } standing)
+            {
+                var own=MapProjection.CoordinateFromPixel(standing,map);
+                var ownLabel=localization.Format("MapView.PlayerCoordinates",own.X.ToString("0.0"),own.Y.ToString("0.0"));
+                var ownBox=ImGui.CalcTextSize(ownLabel)+new Vector2(10,6);
+                var ownTop=size.Y-ownBox.Y*2-10;
+                draw.AddRectFilled(origin+new Vector2(6,ownTop),origin+new Vector2(6+ownBox.X,ownTop+ownBox.Y),ImGui.GetColorU32(UI.FfxivTheme.Panel),3);
+                draw.AddText(origin+new Vector2(11,ownTop+3),ImGui.GetColorU32(UI.FfxivTheme.Text),ownLabel);
+            }
             if(hovered)
             {
                 var coordinate=MapProjection.CoordinateFromPixel((io.MousePos-origin-mapPan)/mapZoom,map);
                 var label=localization.Format("MapView.Cursor",coordinate.X.ToString("0.0"),coordinate.Y.ToString("0.0"));
+                if(player is { } measured)label=localization.Format("MapView.CursorDistance",label,MapProjection.Yalms(measured,(io.MousePos-origin-mapPan)/mapZoom,map).ToString("0"));
                 var box=ImGui.CalcTextSize(label)+new Vector2(10,6);
                 draw.AddRectFilled(origin+new Vector2(6,size.Y-box.Y-6),origin+new Vector2(6+box.X,size.Y-6),ImGui.GetColorU32(UI.FfxivTheme.Panel),3);
                 draw.AddText(origin+new Vector2(11,size.Y-box.Y-3),ImGui.GetColorU32(UI.FfxivTheme.Text),label);
@@ -1129,10 +1453,16 @@ internal sealed partial class MainWindow
             else if(sightseeingTip is { } vistaTip)DrawSightseeingTooltip(vistaTip.Vista,vistaTip.Done);
             else if(tooltip is not null)WrappedTooltip(tooltip);
             else if(hits.Count>0)DrawIconListTooltip(hits,top,settings);
+            // 0.640 (user capture): a quest icon on top of a door hid its link.
+            if(linkUnderMouse is null && edgeLabel is null && top is not { Flag:not null } && top is not { Point:not null } && top is not { Fixed:{ AetheryteId:not 0 } })
+                foreach(var hit in hits)
+                    if(hit.Fixed is { LinkMapId:not 0 } door)linkUnderMouse=door.LinkMapId;
             // Region and world maps: a click (not a drag) on a linked icon opens that map, like the game.
             if(linkUnderMouse is { } link && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)NavigateMap(link);
+            if(settings.FlagOnClick && hovered && top is null && linkUnderMouse is null && hoveredBookmark is null && tooltipPoint is null && sightseeingTip is null && map.TerritoryId!=0 && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)
+            {var spotClicked=MapProjection.CoordinateFromPixel((io.MousePos-origin-mapPan)/mapZoom,map);FlagFromMap(map,spotClicked.X,spotClicked.Y);}
         }
-        finally{draw.PopClipRect();}
+        finally{MapMark("canvas edges and tooltips");draw.PopClipRect();}
         if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right))
         {
             mapContextPixel=(io.MousePos-origin-mapPan)/mapZoom;mapContextVista=mapHoveredVista;
@@ -1172,10 +1502,11 @@ internal sealed partial class MainWindow
                 ImGui.BeginDisabled(live?.Flag is null);
                 try{if(ImGui.Selectable(localization.Get("MapView.RemoveFlag")))mapLive?.RemoveFlag();}
                 finally{ImGui.EndDisabled();}
+                DrawNearestAetheryteEntry(map);
                 // 0.242 (R-01, first part): the journal target icon could not be removed; right click › remove it.
                 if(mapGameTarget is not null && ImGui.Selectable(localization.Get("MapView.RemoveGameTarget")))mapGameTarget=null;
                 ImGui.BeginDisabled(map.TerritoryId==0);
-                try{if(ImGui.Selectable(localization.Get("MapView.UseInTool"))){selectedMapId=map.MapId;mapX=coordinate.X;mapY=coordinate.Y;bookmarkSaved=false;page=Page.Maps;IsOpen=true;}}
+                try{if(ImGui.Selectable(localization.Get("MapView.UseInTool"))){selectedMapId=map.MapId;mapsTabRequest=0;mapX=coordinate.X;mapY=coordinate.Y;bookmarkSaved=false;page=Page.Maps;IsOpen=true;}}
                 finally{ImGui.EndDisabled();}
                 // 0.378 (g, M-08): add a bookmark at the clicked point, named here.
                 if(map.TerritoryId!=0)
@@ -1229,6 +1560,7 @@ internal sealed partial class MainWindow
             finally{ImGui.EndDisabled();}
             // 0.299 (user request): the flag can be removed from every right-click menu that can place it.
             if(live?.Flag is not null && ImGui.Selectable(localization.Get("MapView.RemoveFlag")+"##IconRemoveFlag"))mapLive?.RemoveFlag();
+            DrawNearestAetheryteEntry(map);
             if(item.Fixed is { AetheryteId:not 0 } aetheryte && ImGui.Selectable(localization.Get("MapView.IconTeleport")))
                 {mapTeleportTarget=(aetheryte.AetheryteId,aetheryte.Label);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;}
             if(item.Fixed is { LinkMapId:not 0 } linked && ImGui.Selectable(localization.Get("MapView.IconOpenMap")))NavigateMap(linked.LinkMapId);
@@ -1286,6 +1618,12 @@ internal sealed partial class MainWindow
                     var lines=(hit.Label ?? (mapMarkers?.SymbolName(hit.Icon) is { Length:>0 } symbol ? symbol:localization.Format("MapView.IconUnnamed",hit.Icon))).Split('\n');
                     ImGui.TextColored(Accent,lines[0]);
                     foreach(var line in lines.Skip(hit.Point is null ? 1:2))ImGui.TextDisabled(line);
+                    // 0.645 (P7): the cost on hover, or that it is not attuned.
+                    if(hit.Fixed is { AetheryteId:not 0 } crystal && mapLive?.TeleportCostsFailed!=true && mapLive?.TeleportCosts is { Count:>0 } teleportCosts)
+                    {
+                        if(teleportCosts.TryGetValue(crystal.AetheryteId,out var gilCost))ImGui.TextDisabled(localization.Format("MapView.TeleportCost",gilCost.ToString("N0")));
+                        else ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("MapView.AetheryteNotAttuned"));
+                    }
                     if(hit.Point is { } point)
                     {
                         DrawPointAvailability(point);
@@ -1312,9 +1650,19 @@ internal sealed partial class MainWindow
     // Event marker title: the game's tooltip when it could be read safely, else the name of a quest in progress with the same
     // objective id (0.134: a leve marker took a completed quest's name through a 16-bit id collision), else null → the
     // game's symbol name in the list.
+    internal Func<IReadOnlyList<IslandPlace>>? IslandPlacesLoad { get; set; }
+    private Task<IReadOnlyList<IslandPlace>>? islandPlaces;
+    private string? IslandMarkerName(MapEventMarker marker)
+    {
+        if(IslandPlacesLoad is not { } load || maps.State.Catalog?.Find(marker.MapId)?.TerritoryId!=IslandResources.Territory)return null;
+        islandPlaces??=Task.Run(load);
+        return islandPlaces.IsCompletedSuccessfully ? IslandResources.NearestName(islandPlaces.Result,marker.Position.X,marker.Position.Z):null;
+    }
     private string? EventLabel(MapEventMarker marker)
     {
         if(marker.Tooltip.Length>0)return marker.Tooltip;
+        // 0.684 (user report): the island's markers come with no text, a construction board among them; the sheet says what stands there.
+        if(marker.MarkerType!=3 && IslandMarkerName(marker) is { } islandName)return islandName;
         // Quest marker (type 3): exact quest row from DataId, whatever its progress.
         if(marker.MarkerType==3 && marker.DataId!=0 && QuestOf(marker.DataId+65536u) is { Name.Length:>0 } quest)return quest.Name;
         if(marker.ObjectiveId==0)return null;
@@ -1331,14 +1679,25 @@ internal sealed partial class MainWindow
     private readonly MapPartySmoother mapPartySmoother=new();
     // 0.518 (user report): « open now » only speaks of the hours. A legendary point also asks for its tome, read by this character.
     internal Func<uint,TenshoAssistant.Gathering.GatherPointAccess?>? GatherAccess { get; set; }
+    internal Func<uint,TenshoAssistant.Gathering.GatherPointKind>? GatherKind { get; set; }
     private Vector4 TimedPointColor(MapLocalGatheringPoint point)=>GatherAccess?.Invoke(point.BaseId)?.TomeMissing is not null ? Muted:point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:new Vector4(0.98f,0.62f,0.20f,1);
     private void DrawPointAvailability(MapLocalGatheringPoint point)
     {
         var access=GatherAccess?.Invoke(point.BaseId);
+        // 0.647 (C27): the kind of the point.
+        if(GatherKind?.Invoke(point.BaseId) is { } kind and not TenshoAssistant.Gathering.GatherPointKind.Normal)ImGui.TextDisabled(localization.Get("MapView.PointKind"+kind));
         if(point.Timed)
         {
             var open=point.ActiveAt(EorzeaMinutes());
             ImGui.TextColored(TimedPointColor(point),localization.Format(!open ? "MapView.TimedClosed":access?.TomeMissing is not null ? "MapView.TimedOpenNoTome":"MapView.TimedOpen",point.Schedule!.Label));
+            // 0.754 (X-08, user report: « closed now » without a timer): how long until it opens, or closes, as on the Gathering page.
+            var now=DateTimeOffset.UtcNow;
+            if(TenshoAssistant.Gathering.GatheringTime.Next(point.Schedule,now,1).Openings.FirstOrDefault() is { } next)
+            {
+                var current=next.StartsAt<=now && now<next.EndsAt;
+                var remaining=(current ? next.EndsAt:next.StartsAt)-now;
+                ImGui.TextDisabled(localization.Format(current ? "LocalClock.CountdownClose":"LocalClock.CountdownOpen",Math.Max(0,(int)remaining.TotalHours),remaining.Minutes,remaining.Seconds));
+            }
         }
         if(access is null)return;
         if(access.TomeMissing is { } tome)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MapView.TomeMissing",tome));
@@ -1379,9 +1738,9 @@ internal sealed partial class MainWindow
         GlyphBookmark=>localization.Get("MapView.ShowBookmarks"),
         GlyphTreasureMap=>localization.Get("MapView.TreasureMapIcon"),
         _ when mapMarkers?.SymbolName(icon) is { Length:>0 } known=>known,
-        _ when mapMarkers?.QuestIcons.TryGetValue(icon,out var quest)==true=>localization.Format("MapView.QuestIcon",
+        _ when mapMarkers?.QuestIcons.TryGetValue(icon,out var quest)==true=>localization.Format(MapQuestIcons.NamesItsVariant(quest.Locked,quest.Variant) ? "MapView.QuestIconNamed":"MapView.QuestIcon",
             localization.Get("MapView.QuestKind"+(quest.Row is 1 or 3 or 8 or 10 ? quest.Row:0u)),quest.Row,
-            localization.Get(quest.Locked ? "MapView.QuestLocked":"MapView.QuestAvailable"),quest.Variant),
+            localization.Get(MapQuestIcons.IsStep(quest.Locked,quest.Variant) ? "MapView.QuestStep":quest.Locked ? "MapView.QuestLocked":"MapView.QuestAvailable"),quest.Variant),
         _=>localization.Format("MapView.IconUnnamed",icon),
     };
 
@@ -1511,6 +1870,16 @@ internal sealed partial class MainWindow
     }
     // Vendors standing on a map, with the shop names of each, rebuilt only when the map or the catalogue changes.
     private (uint MapId,object? Catalog,IReadOnlyList<(Npcs.NpcVendor Vendor,Npcs.NpcLocation Spot)> Rows,IReadOnlyDictionary<uint,(string Name,Npcs.NpcShopKind Kind,int Items)> Shops) mapVendorCache=(0,null,[],new Dictionary<uint,(string,Npcs.NpcShopKind,int)>());
+    // 0.679: worked out once per map, not on every frame.
+    private (uint MapId,MapCatalog? Catalog,HashSet<uint> Maps) mapSameLand=(0,null,[]);
+    private HashSet<uint> SameLandMaps(MapDefinition map)
+    {
+        var catalog=maps.State.Catalog;
+        if(mapSameLand.MapId==map.MapId && ReferenceEquals(mapSameLand.Catalog,catalog))return mapSameLand.Maps;
+        var same=(catalog?.SameLand(map) ?? [map.MapId]).ToHashSet();
+        mapSameLand=(map.MapId,catalog,same);
+        return same;
+    }
     private IReadOnlyList<(Npcs.NpcVendor Vendor,Npcs.NpcLocation Spot)> MapVendors(MapDefinition map)
     {
         if(npcVendors?.State.Catalog is not { } catalog)return [];
@@ -1560,6 +1929,8 @@ internal sealed partial class MainWindow
     private string VendorLabel(Npcs.NpcVendor vendor)
     {
         var name=vendor.Name.Length>0 ? vendor.Name:localization.Get("MapLocal.UnnamedVendor");
+        // 0.679: an NPC of a service whose shop no sheet gives: its name and title say what it does.
+        if(vendor.ShopIds.Count==0)return name;
         var lines=new List<string>();var unknown=0;
         foreach(var id in vendor.ShopIds.Distinct())
         {
@@ -1612,7 +1983,7 @@ internal sealed partial class MainWindow
             if(marker.Icon==0 || settings.SizeOf(marker.Icon,map.MapId)<=0)continue;
             var quest=marker.ObjectiveId!=0 ? ActiveQuestByKey(marker.ObjectiveId & 0xFFFF):null;
             if(quest is not null){if(settings.EdgeQuests && shownQuests.Add(quest.Id))targets.Add((MapProjection.PixelFromWorld(marker.Position,map),marker.Icon,quest.Name,false,0));}
-            else if(settings.EdgeEvents)targets.Add((MapProjection.PixelFromWorld(marker.Position,map),marker.Icon,EventLabel(marker) ?? localization.Get("MapView.EdgeEvent"),false,0));
+            else if(marker.IsLeve ? settings.EdgeLeves:settings.EdgeEvents)targets.Add((MapProjection.PixelFromWorld(marker.Position,map),marker.Icon,EventLabel(marker) ?? localization.Get("MapView.EdgeEvent"),false,0));
         }
         if(settings.EdgeFates)
             foreach(var fate in fates.Where(fate=>fate.Icon!=0 && settings.SizeOf(fate.Icon,map.MapId)>0))targets.Add((MapProjection.PixelFromWorld(fate.Position,map),fate.Icon,FateLabel(fate),false,0));
@@ -1644,6 +2015,19 @@ internal sealed partial class MainWindow
             if(isPlayer)DrawPlayerArrow(draw,edge,live!.Rotation,false,0.8f);
             else if(textures.TryGetFromGameIcon(new GameIconLookup(image),out var shared) && shared.TryGetWrap(out var wrap,out _) && wrap is not null)
                 draw.AddImage(wrap.Handle,edge-new Vector2(badge/2),edge+new Vector2(badge/2));
+            // 0.644 (P6, user's precision): the flag's coordinates under its edge icon, not in a corner; above it near the bottom of the map.
+            if(icon==FlagIcon && settings.EdgeFlagCoordinates)
+            {
+                var spot=MapProjection.CoordinateFromPixel(pixel,map);
+                var text=localization.Format("MapView.Cursor",spot.X.ToString("0.0"),spot.Y.ToString("0.0"));
+                if(player is { } standing)text=localization.Format("MapView.CursorDistance",text,MapProjection.Yalms(standing,pixel,map).ToString("0"));
+                var measure=ImGui.CalcTextSize(text);
+                var left=Math.Clamp(edge.X-measure.X/2,origin.X+2,Math.Max(origin.X+2,origin.X+size.X-measure.X-2));
+                var below=edge.Y+badge*0.75f;
+                var top=below+measure.Y>origin.Y+size.Y ? edge.Y-badge*0.75f-measure.Y:below;
+                draw.AddRectFilled(new Vector2(left-3,top-1),new Vector2(left+measure.X+3,top+measure.Y+1),ImGui.GetColorU32(new Vector4(0,0,0,0.6f)),3);
+                draw.AddText(new Vector2(left,top),ImGui.GetColorU32(UI.FfxivTheme.Text),text);
+            }
             if(!hovered || Vector2.Distance(mouse,edge)>badge*0.62f)continue;
             label=$"{name}\n{localization.Get("MapView.EdgeClick")}";
             if(ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged){mapCenterRequest=pixel;mapViewFollow=isPlayer;}

@@ -13,7 +13,7 @@ namespace TenshoAssistant;
 /// </summary>
 internal sealed partial class MainWindow
 {
-    private (uint Job,int Level,int Slot,uint Item,int Gp,int? Attempts,bool Late,int? Success,int? Boon,int? Bountiful,GpActionCatalog Catalog)? gatheringPanelKey;
+    private (uint Job,int Level,int Slot,uint Item,int Gp,int? Attempts,bool Late,int? Success,int? Boon,int? Bountiful,GpActionCatalog Catalog,bool Auto)? gatheringPanelKey;
     private GpOptimization? gatheringPanelPlan;private uint gatheringPanelItem;private string[] gatheringPanelMissing=[];private bool gatheringPanelLate,gatheringPanelBountifulFloor;
     private GatheringNodeStart? gatheringPanelStart;
 
@@ -26,9 +26,113 @@ internal sealed partial class MainWindow
         public Dictionary<(int Index,uint RawItemId),(int? Success,int? Boon,bool Late,int? Quantity)> Slots {get;}=[];
     }
 
+    /// <summary>0.560 (C24): what the last crafting chain still needs of this item; from the chain's state, nothing is computed again.</summary>
+    private string? ChainNeed(uint item,Inventory.ItemHoldingsSummary stock)
+    {
+        if(!stock.HasObservation || craftChain.State is not { Result:{ } result,Input:{ } input } || result.Remaining(item,stock.Total) is not { } left || left<=0)return null;
+        return localization.Format("GatheringPanel.ChainNeed",left.ToString("N0"),itemCatalog.State.Catalog?.Find(input.Recipe.ResultItemId)?.Name ?? input.Recipe.ResultItemId.ToString());
+    }
     internal void DrawGatheringPanel()
     {
-        var observed=gatheringObservation.State;
+        DrawGatheringPanelCore(gatheringObservation.State);
+    }
+
+    /// <summary>0.751 (X-04): the rows of the game's gathering window, from the reader.</summary>
+    internal Func<IReadOnlyList<ActionBarRect?>>? GatheringSlotRects { get; set; }
+    /// <summary>0.753 (X-06): the game's « gather automatically » box; null when not shown.</summary>
+    internal Func<bool?>? GatheringAutoGather { get; set; }
+    private bool gatheringTrackedPicked;
+    private static void DrawGatheringSlotFrame(ActionBarRect rect)
+    {
+        // 0.764 (X-17): under Tensho's windows, over the game.
+        var draw=ImGui.GetBackgroundDrawList();
+        var min=new Vector2(rect.X,rect.Y);var max=min+new Vector2(rect.Width,rect.Height);
+        draw.AddRect(min,max,ImGui.GetColorU32(UI.FfxivTheme.Success),6,ImDrawFlags.None,3);
+    }
+    /// <summary>
+    /// 0.751 (X-04, user request): what the tracking lists still need of an item: the crafting list chosen for the gathering plan, and the lists shown on screen (crafting list,
+    /// workshop, preparation) as they were last worked out, within five seconds. The crafting list is counted once, the larger of its two readings.
+    /// </summary>
+    private long TrackedNeed(uint item)
+    {
+        var now=Environment.TickCount64;
+        long Panel(string key)
+        {
+            // 0.764 (X-17): a folded panel still counts; a closed one does not.
+            if(ListPanelLinesFor(key) is not { } known)return 0;
+            var needed=known.Lines.Where(line=>line.Item==item).Sum(line=>line.Needed);
+            if(needed<=0)return 0;
+            var held=GetRecipeHoldings(item);
+            return Math.Max(0,needed-(held.HasObservation ? held.Total:0));
+        }
+        return Math.Max(GatherListNeed(item),Panel("CraftList"))+Panel("Workshop")+Panel("Preparation");
+    }
+
+    // 0.728 (user request): a frame over the slot of the next action, as on the Mini Cactpot board. Drawn only: the player uses the action.
+    internal Gathering.ActionBarLocator? BarLocator { get; set; }
+    private (GpPlan Plan,int Gp,int? Attempts,int? Boon,GpNextStep Step)? gatheringNextCache;
+    private static void DrawGatheringBarHighlight(Gathering.ActionBarLocator located)
+    {
+        if(located.Rects is not { Count:>0 } rects)return;
+        // 0.764 (X-17): under Tensho's windows, over the game.
+        var draw=ImGui.GetBackgroundDrawList();
+        var pulse=0.65f+0.35f*MathF.Sin((float)(DateTime.UtcNow.TimeOfDay.TotalSeconds*5));
+        var border=ImGui.GetColorU32(UI.FfxivTheme.Gold with {W=pulse});
+        var fill=ImGui.GetColorU32(UI.FfxivTheme.Gold with {W=0.18f*pulse});
+        foreach(var rect in rects)
+        {
+            var min=new Vector2(rect.X,rect.Y);var max=min+new Vector2(rect.Width,rect.Height);
+            draw.AddRectFilled(min,max,fill,6);draw.AddRect(min,max,border,6,ImDrawFlags.None,3);
+        }
+    }
+
+    private void DrawGatheringNext(GpOptimization optimization,GatheringObservedSlot slot,GatheringNodeStart start,GatheringObservedFrame frame,string itemName,out GpNextStep? step)
+    {
+        step=null;
+        if(start.Attempts is not { } startAttempts || frame.Attempts is not { } attempts)return;
+        var plan=optimization.Best;
+        if(gatheringNextCache is not { } known || !ReferenceEquals(known.Plan,plan) || known.Gp!=(int)frame.Gp || known.Attempts!=attempts || known.Boon!=slot.BoonPercent)
+        {
+            var found=GpNextAction.Next(plan,(int)start.Gp,(int)frame.Gp,startAttempts,attempts);
+            gatheringNextCache=known=(plan,(int)frame.Gp,attempts,slot.BoonPercent,found);
+            // 0.731 (user report): the end of the plan, with what is left; 0.747: solved off the frame, the plain step shown meanwhile.
+            if(found is { Kind:GpNextKind.Gather,Finished:true } && !optimization.Scenario.AutoGather && slot.SuccessPercent is { } successNow && slot.BoonPercent is { } boonNow && gpActions.State.Catalog is { } catalog)
+            {
+                var opened=optimization.Scenario;var gp=(int)frame.Gp;
+                gatheringLeftoverSolve=(known,Task.Run(()=>GpNextAction.Leftover(found,opened,plan,catalog,gp,attempts,successNow,boonNow)));
+            }
+        }
+        if(gatheringLeftoverSolve is { Task.IsCompleted:true } leftover)
+        {
+            gatheringLeftoverSolve=null;
+            if(leftover.Task.IsCompletedSuccessfully && Equals(leftover.Key,known))gatheringNextCache=known=known with {Step=leftover.Task.Result};
+        }
+        step=known.Step;
+        switch(step.Kind)
+        {
+            case GpNextKind.Action when step.Action is { } action:
+                DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(28));ImGui.SameLine();
+                ImGui.TextColored(Accent,localization.Format(step.Leftover ? "GatheringPanel.NextLeftover":"GatheringPanel.NextAction",action.Name));
+                if(ImGui.IsItemHovered())WrappedTooltip(action.Description);
+                // 0.733 (user report): asked from here, inside the panel's own window, which is drawn after the overlays: the frame of 0.728 was cleared before it was looked for.
+                if(configuration.GatheringNextHighlight && BarLocator is { } located)
+                {
+                    located.Want(action.Spec.Id);
+                    if(located.ReadFor==action.Spec.Id)
+                    {
+                        if(located.Rects.Count==0)ImGui.TextDisabled(localization.Get("GatheringPanel.NextNotOnBars"));
+                        else DrawGatheringBarHighlight(located);
+                    }
+                }
+                break;
+            case GpNextKind.Gather:ImGui.TextColored(Accent,localization.Format("GatheringPanel.NextGather",itemName));break;
+            case GpNextKind.OffPlan:ImGui.TextDisabled(localization.Get("GatheringPanel.NextOffPlan"));break;
+        }
+    }
+
+    private void DrawGatheringPanelCore(GatheringObservationState observed)
+    {
+        if(!windowDisposed && configuration.GatheringPanel && observed.Status==GatheringObservationStatus.Error)DrawReadFailedPanel("TenshoGatheringFailed","Gathering","Gathering");
         // 0.330: the node's opening values are forgotten when its window closes; a gather or an action only makes the reading « not ready ».
         if(windowDisposed || !configuration.GatheringPanel || observed.Status is not (GatheringObservationStatus.Observed or GatheringObservationStatus.NotReady))gatheringPanelStart=null;
         if(windowDisposed || !configuration.GatheringPanel || gatheringObservation.Window is not { } window
@@ -49,6 +153,12 @@ internal sealed partial class MainWindow
             var rating=stats.JobId==frame.JobId && stats.Values.TryGetValue("Gathering",out var gathering) ? gathering:0;
             RefreshRecipeHoldingsCache();
             var items=itemCatalog.State.Catalog;
+            // 0.756 (X-10, user request): once per node, as soon as its items are read, an item the tracking lists need is put in context first; a click still chooses another.
+            if(!gatheringTrackedPicked && frame.Slots.Any(slot=>slot.ItemId!=0))
+            {
+                gatheringTrackedPicked=true;
+                if(frame.Slots.Where(slot=>slot.ItemId!=0).OrderByDescending(slot=>TrackedNeed(slot.ItemId)).FirstOrDefault() is { } wanted && TrackedNeed(wanted.ItemId)>0)SelectItem(wanted.ItemId);
+            }
             var chosen=frame.Slots.FirstOrDefault(slot=>slot.ItemId!=0 && slot.ItemId==(uint)Math.Max(0,itemId)) ?? frame.Slots.FirstOrDefault(slot=>slot.ItemId!=0);
             // 0.523 (user report): the scrips of a node's collectables, to choose between them.
             var scripRules=frame.Slots.Where(slot=>slot.ItemId!=0).Select(slot=>Collectables?.Catalog?.For(slot.ItemId).FirstOrDefault(rule=>rule.Scrips && rule.RewardHigh>0)).OfType<CollectableRule>().ToArray();
@@ -62,6 +172,7 @@ internal sealed partial class MainWindow
                     DrawItemIcon(item,new Vector2(24));var clicked=ImGui.IsItemClicked();ImGui.SameLine();
                     var bountiful=bountifulBase?.Invoke(slot.ItemId) is { } baseValue ? BountifulEstimate.Bonus(rating,baseValue):null;
                     var stock=GetRecipeHoldings(slot.ItemId);
+                    var needed=ChainNeed(slot.ItemId,stock);
                     // 0.478 (user report: lines cut at the panel's width): the name, then its rates under it.
                     var rates=$"{slot.SuccessPercent?.ToString() ?? "?"} % · {localization.Format("GatheringPanel.Boon",slot.BoonPercent?.ToString() ?? "?")}"
                         +(bountiful is { } bonus ? " · "+localization.Format("GatheringPanel.Bountiful",bonus):"")
@@ -70,6 +181,14 @@ internal sealed partial class MainWindow
                     if(ImGui.Selectable((item?.Name ?? slot.ItemId.ToString())+"##Slot",ReferenceEquals(slot,chosen)) || clicked)SelectItem(slot.ItemId);
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(slot.ItemId);
                     ItemLinksMenu($"GatheringSlot{slot.ItemId}",item);
+                    if(needed is { } need)ImGui.TextColored(Accent,need);
+                    // 0.751 (X-04, user request): what the tracking lists (crafting list, workshop, preparation) still need of this item; framed on the game's window too.
+                    if(TrackedNeed(slot.ItemId) is > 0 and var tracked)
+                    {
+                        ImGui.TextColored(Accent,localization.Format("GatheringPanel.TrackedNeed",tracked.ToString("N0")));
+                        if(configuration.GatheringListHighlight && GatheringSlotRects?.Invoke() is { } rects && slot.Index<rects.Count && rects[slot.Index] is { } rect)
+                            DrawGatheringSlotFrame(rect);
+                    }
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(slot.ItemId);
                     ImGui.TextDisabled(rates);
                     if(scripRules.FirstOrDefault(rule=>rule.ItemId==slot.ItemId) is { } paid)
@@ -103,7 +222,10 @@ internal sealed partial class MainWindow
     {
         if(gatheringPanelStart is not { } start || start.Owner!=owner || start.JobId!=frame.JobId || start.TotalAttempts!=frame.TotalAttempts
            || frame.Slots.Count>0 && !frame.Slots.Any(slot=>start.Slots.ContainsKey((slot.Index,slot.RawItemId))))
+        {
             gatheringPanelStart=start=new(owner,frame);
+            gatheringTrackedPicked=false;
+        }
         start.Frozen|=frame.Gp<start.Gp || frame.Attempts<start.Attempts;
         if(!start.Frozen){start.Gp=frame.Gp;start.Attempts??=frame.Attempts;}
         foreach(var slot in frame.Slots)
@@ -118,6 +240,8 @@ internal sealed partial class MainWindow
     private Func<uint,IReadOnlyList<GatherNodeEffect>>? nodeEffectsOf;
     internal void ConfigureNodeEffects(Func<uint,IReadOnlyList<GatherNodeEffect>> read)=>nodeEffectsOf=read;
     private readonly Dictionary<GatherNodeEffect,decimal> gatheringPanelEffectWith=[];
+    private (object Key,Task<(GpOptimization Plan,Dictionary<GatherNodeEffect,decimal> With)> Task)? gatheringPanelSolve;
+    private (object Key,Task<GpNextStep> Task)? gatheringLeftoverSolve;
     private string? gatheringPanelExtraKey;
     private void DrawGatheringPanelPlan(GatheringObservedSlot? slot,int rating,ItemCatalog? items,GatheringObservedFrame frame)
     {
@@ -128,7 +252,8 @@ internal sealed partial class MainWindow
         if(slot is null || gatheringPanelStart is not { } start || gpActions.State.Catalog is not { } catalog){ImGui.TextDisabled(localization.Get("GatheringPanel.NoPlan"));return;}
         var first=start.Slots.GetValueOrDefault((slot.Index,slot.RawItemId));
         var bountiful=bountifulBase?.Invoke(slot.ItemId) is { } baseValue ? BountifulEstimate.Bonus(rating,baseValue):null;
-        var key=(start.JobId,start.Level,slot.Index,slot.ItemId,(int)start.Gp,start.Attempts,first.Late,first.Success,first.Boon,bountiful,catalog);
+        var auto=GatheringAutoGather?.Invoke()==true;
+        var key=(start.JobId,start.Level,slot.Index,slot.ItemId,(int)start.Gp,start.Attempts,first.Late,first.Success,first.Boon,bountiful,catalog,auto);
         // 0.515: the node's effects, and what else can change the plan without changing the node.
         var perception=GatheringPerception(start.JobId);
         var extraKey=$"{GpForbiddenFor(start.JobId)}|{first.Quantity}|{frame.NodeId}|{frame.MaxGp}|{rating}|{perception}";
@@ -147,17 +272,32 @@ internal sealed partial class MainWindow
             gatheringPanelMissing=[..missing];gatheringPanelBountifulFloor=start.Level>=68 && bountiful is null;
             if(missing.Count==0 && !first.Late && first.Success is { } success && first.Boon is { } boon && start.Attempts is { } attempts && attempts>=1)
             {
-                try
+                // 0.479: the quantity the game shows per gather; a node where it was not read counts one.
+                var quantity=Math.Clamp(first.Quantity ?? 1,1,20);
+                var scenario=new GpScenario(start.JobId,start.Level,(int)start.Gp,attempts,quantity,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbiddenFor(start.JobId),AutoGather:auto);
+                var effects=NodeEffects(frame).Where(effect=>GatherNodeEffects.Missing(effect,(int)frame.MaxGp,rating,perception)>0)
+                    .Select(effect=>(Effect:effect,Better:GatherNodeEffects.With(scenario,effect))).Where(pair=>pair.Better is not null).ToArray();
+                // 0.747 (X-01): solved off the frame: the slow-frame log of 0.745 measured this panel at 97 ms on the frame a node opened.
+                gatheringPanelSolve=(key,Task.Run(()=>
                 {
-                    // 0.479: the quantity the game shows per gather; a node where it was not read counts one.
-                    var quantity=Math.Clamp(first.Quantity ?? 1,1,20);
-                    var scenario=new GpScenario(start.JobId,start.Level,(int)start.Gp,attempts,quantity,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbiddenFor(start.JobId));
-                    gatheringPanelPlan=GpOptimizer.Solve(scenario,catalog);
-                    foreach(var effect in NodeEffects(frame))
-                        if(GatherNodeEffects.Missing(effect,(int)frame.MaxGp,rating,perception)>0 && GatherNodeEffects.With(scenario,effect) is { } better)
-                            gatheringPanelEffectWith[effect]=GpOptimizer.Solve(better,catalog).Best.ExpectedYield;
+                    var solved=GpOptimizer.Solve(scenario,catalog);
+                    var with=effects.ToDictionary(pair=>pair.Effect,pair=>GpOptimizer.Solve(pair.Better!,catalog).Best.ExpectedYield);
+                    return (solved,with);
+                }));
+            }
+        }
+        if(gatheringPanelSolve is { Task.IsCompleted:true } solving)
+        {
+            gatheringPanelSolve=null;
+            if(Equals(solving.Key,gatheringPanelKey))
+            {
+                gatheringPanelEffectWith.Clear();
+                if(solving.Task.IsCompletedSuccessfully)
+                {
+                    gatheringPanelPlan=solving.Task.Result.Plan;
+                    foreach(var (effect,yieldWith) in solving.Task.Result.With)gatheringPanelEffectWith[effect]=yieldWith;
                 }
-                catch(ArgumentException){gatheringPanelPlan=null;gatheringPanelEffectWith.Clear();}
+                else gatheringPanelPlan=null;
             }
         }
         ImGui.TextColored(Accent,localization.Format("GatheringPanel.PlanFor",items?.Find(gatheringPanelItem)?.Name ?? gatheringPanelItem.ToString()));
@@ -165,7 +305,8 @@ internal sealed partial class MainWindow
         if(gatheringPanelPlan is not { } plan)
         {
             if(need>0)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
-            ImGui.TextDisabled(gatheringPanelLate ? localization.Get("GatheringPanel.AfterStart")
+            ImGui.TextDisabled(gatheringPanelSolve is not null && Equals(gatheringPanelSolve.Value.Key,gatheringPanelKey) ? localization.Get("GatheringPanel.Solving")
+                :gatheringPanelLate ? localization.Get("GatheringPanel.AfterStart")
                 :gatheringPanelMissing.Length>0 ? localization.Format("GatheringPanel.Missing",string.Join(", ",gatheringPanelMissing.Select(localization.Get)))
                 :localization.Get("GatheringPanel.NoPlan"));
             return;
@@ -175,12 +316,21 @@ internal sealed partial class MainWindow
         if(need>0)ImGui.TextColored(Accent,shown.ExpectedYield>0 ? localization.Format("GatheringPanel.ListNeedNodes",need.ToString("N0"),Math.Ceiling(need/shown.ExpectedYield).ToString("N0")):localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
         ImGui.TextDisabled(localization.Format("GatheringPanel.Expected",shown.ExpectedYield.ToString("0.0"),plan.Baseline.ToString("0.0"),shown.Cost));
         if(start.Frozen)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanAtStart",plan.Scenario.Budget));
+        if(plan.Scenario.AutoGather)ImGui.TextColored(Accent,localization.Get("GatheringPanel.AutoGatherPlan"));
         if(gatheringPanelBountifulFloor)ImGui.TextDisabled(localization.Get("GatheringPanel.BountifulFloor"));
+        DrawGatheringNext(plan,slot,start,frame,items?.Find(gatheringPanelItem)?.Name ?? gatheringPanelItem.ToString(),out var next);
+        // 0.729 (user request): the next action apart from the plan.
+        if(next is { Kind:not GpNextKind.Done })ImGui.Separator();
         if(shown.Actions.Count==0)ImGui.TextUnformatted(localization.Get("GpUi.Keep"));
         foreach(var use in shown.Actions)
         {
             DrawItemIcon(new ItemDefinition(0,use.Action.Name,false,use.Action.Icon),new Vector2(22));ImGui.SameLine();
-            ImGui.TextUnformatted(use.Count>1 ? $"{use.Action.Name} ×{use.Count}":use.Action.Name);
+            var spent=next?.Used.GetValueOrDefault(use.Action.Spec.Id) ?? 0;
+            var label=use.Count>1 ? $"{use.Action.Name} ×{use.Count}":use.Action.Name;
+            if(spent>0 && use.Count>1 && spent<use.Count)label+=$" ({spent}/{use.Count})";
+            if(spent>=use.Count)ImGui.TextDisabled(label);
+            else if(next?.Action?.Spec.Id==use.Action.Spec.Id)ImGui.TextColored(Accent,label);
+            else ImGui.TextUnformatted(label);
             if(ImGui.IsItemHovered())WrappedTooltip(use.Action.Description);
         }
         if(shown.Actions.Any(use=>use.Action.Spec.Effect==GpEffect.Attempt) && plan.Scenario.Level>=GpScenario.EurekaLevel)

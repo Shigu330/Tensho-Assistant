@@ -56,6 +56,27 @@ internal sealed partial class MainWindow
             Tip("SortUi.DeleteTemplateTip");
         }
         finally{ImGui.EndDisabled();}
+        // 0.566 (I15).
+        ImGui.BeginDisabled(selected is null);
+        try{if(ImGui.SmallButton(localization.Get("SortUi.TemplateCopy")+"##SortTemplateCopy") && selected is not null)ImGui.SetClipboardText(InventorySortTemplates.Encode(selected));}
+        finally{ImGui.EndDisabled();}
+        Tip("SortUi.TemplateCopyTip");
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get("SortUi.TemplatePaste")+"##SortTemplatePaste"))
+        {
+            var previous=configuration.InventorySortTemplates;
+            try
+            {
+                if(InventorySortTemplates.Decode(ImGui.GetClipboardText()) is { } pasted)
+                {
+                    configuration.InventorySortTemplates=InventorySortTemplates.Save(previous,pasted);
+                    save();selectedSortTemplate=pasted.Id;sortTemplateName=pasted.Name;sortRulesError=null;
+                }
+                else sortRulesError="SortUi.TemplatePasteBad";
+            }
+            catch(Exception error){configuration.InventorySortTemplates=previous;sortRulesError="SortUi.TemplatePasteBad";log.Warning(error,"A pasted sort template could not be saved.");}
+        }
+        Tip("SortUi.TemplatePasteTip");
         return draft;
     }
     private void SaveSortTemplate(InventorySortScope scope,InventorySortProfile draft,Guid? id)

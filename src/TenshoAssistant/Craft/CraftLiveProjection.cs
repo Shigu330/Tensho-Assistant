@@ -38,7 +38,10 @@ public static class CraftLiveProjection
         }
         seenCondition=condition;seenGood=goodKnown ? goodPercent:null;
         var p=recipe.Simulation!;
-        if(native.MaxProgress!=p.Progress || native.MaxQuality!=p.Quality || native.MaxDurability!=p.Durability || frame.Progress!=native.Progress || (frame.Quality!=native.Quality && !(p.Quality==0 && native.Quality==0))
+        // 0.784 (X-26, user report: no next move on a recipe where HQ is impossible): the game still shows that recipe's quality bar (2 500), Tensho keeps 0 on purpose
+        // (CraftRecipeQuality.Maximum: nothing to seek); only that gap is accepted.
+        var qualityAgrees=native.MaxQuality==p.Quality || p.Quality==0 && !p.CanHq && !p.Collectable && p.RequiredQuality==0;
+        if(native.MaxProgress!=p.Progress || !qualityAgrees || native.MaxDurability!=p.Durability || frame.Progress!=native.Progress || (frame.Quality!=native.Quality && !(p.Quality==0 && native.Quality==0))
             || frame.Durability!=native.Durability || frame.UiStep!=native.Step || native.Progress>=native.MaxProgress || native.Durability==0)
         {issues.Add("Displayed resources, native values and recipe do not agree, or synthesis finished.");return Result();}
         var effects=CraftObservedEffects.Decode(frame,catalog);

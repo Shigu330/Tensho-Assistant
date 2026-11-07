@@ -10,7 +10,6 @@ internal sealed partial class MainWindow
     private string? CraftMessageKey(string message)=>message switch
     {
         "Simulation parameters missing for this recipe." => "CraftMessages.NoParameters",
-        "Adjusted or fixed-quality recipe outside this simulation's scope." => "CraftMessages.SpecialRecipe",
         // A-13 (0.434): specialist actions and recipes, favourable-condition actions.
         "Specialist recipe: tick Specialist in the attributes." => "CraftMessages.SpecialistRecipe",
         "Specialist action: tick Specialist in the attributes." => "CraftMessages.SpecialistAction",

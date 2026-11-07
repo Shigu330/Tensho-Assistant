@@ -27,7 +27,7 @@ namespace TenshoAssistant;
 // Diagnostics (0.290–0.292). Each page or tool is a partial file MainWindow.<Tool>.cs; services are created in Plugin.cs.
 internal sealed partial class MainWindow : Window, IDisposable
 {
-    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Chocobo, Events, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms, Storage, Reminders, FreeCompany, Gear, Credits, Leves, HuntingLog, OceanFishing, Garden, MyTools, GatheringCollectables, Beastmaster, Help }
+    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Chocobo, Events, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms, Storage, Reminders, FreeCompany, Gear, Credits, Leves, HuntingLog, OceanFishing, Garden, MyTools, GatheringCollectables, Beastmaster, Help, IslandSanctuary, CustomDeliveries, MaskedCarnivale, RelicWeapons, AlliedSocieties, GrandCompanies, SpecialDeliveries, FieldContent, DeepDungeons, Lexicon, Fates }
     // Read from the active theme each time: the game theme can change while the plugin runs.
     private static Vector4 Accent => FfxivTheme.Gold;
     private static Vector4 Success => FfxivTheme.Success;
@@ -101,8 +101,10 @@ internal sealed partial class MainWindow : Window, IDisposable
     // first icon load), a moving average mixed both and kept the spike of a page left just after opening it.
     private readonly Dictionary<Page, (double[] Samples, int Next, int Count)> pageDrawMs = [];
     private readonly Dictionary<string, (double[] Samples, int Next, int Count)> overlayDrawMs = [];
+    internal readonly Diagnostics.SlowFrame SlowFrames = new();
     internal void RecordOverlayDraw(string name, double milliseconds)
     {
+        SlowFrames.Add(ImGui.GetFrameCount(), name, milliseconds);
         // 0.487 (user report: times appeared then went): a panel whose window is closed costs next to nothing, and its zeros pushed its real times out within 2 seconds. Only frames it really drew count.
         if (milliseconds < 0.02) return;
         var ring = overlayDrawMs.TryGetValue(name, out var known) ? known : (Samples: new double[120], Next: 0, Count: 0);
@@ -231,15 +233,16 @@ internal sealed partial class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
+        var started = DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
+        try { DrawMain(); }
+        finally { if (started != 0) SlowFrames.Add(ImGui.GetFrameCount(), "main window", System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds); }
+    }
+
+    private void DrawMain()
+    {
         RememberPage();
         OpenGuideOnce();
-        monsterLoot.SelectItem((uint)Math.Max(0,itemId));
-        ValidateGpCopy();
-        ValidateCraftCopy();
-        ValidateCraftSearch();
-        craftChain.ValidateContext(bankBridge.State.CharacterId, (uint)Math.Max(0, itemId), craftPlanTarget, recipeCatalog.State.Catalog);
-        triadSolve.ValidateContext(bankBridge.State.CharacterId, triadRevision);
-        preparationPrices.ValidateContext(bankBridge.State.CharacterId,market.State.WorldId,(uint)Math.Max(0,itemId),craftPlanTarget,costBasisIndex,costQualityIndex,craftChainChoiceRevision);
+        ValidateDrawContext();
         ImGui.TextColored(Accent, localization.Get("Plugin.Title").ToUpperInvariant());
         ImGui.SameLine();
         ImGui.TextDisabled($"v{BuildVersion}");
@@ -279,6 +282,7 @@ internal sealed partial class MainWindow : Window, IDisposable
                         var drawnPage = page;
                         PageEntryFor(page)?.Draw();
                         var drawMs = System.Diagnostics.Stopwatch.GetElapsedTime(drawStarted).TotalMilliseconds;
+                        if (DeveloperMode) SlowFrames.Add(ImGui.GetFrameCount(), "page " + drawnPage, drawMs);
                         var ring = pageDrawMs.TryGetValue(drawnPage, out var known) ? known : (Samples: new double[120], Next: 0, Count: 0);
                         ring.Samples[ring.Next] = drawMs;
                         pageDrawMs[drawnPage] = (ring.Samples, (ring.Next + 1) % ring.Samples.Length, Math.Min(ring.Count + 1, ring.Samples.Length));
@@ -292,6 +296,17 @@ internal sealed partial class MainWindow : Window, IDisposable
         ImGui.TextDisabled("/tensho");
         ImGui.SameLine();
         ImGui.TextDisabled(localization.Get("UiFragments.Footer"));
+    }
+
+    private void ValidateDrawContext()
+    {
+        monsterLoot.SelectItem((uint)Math.Max(0,itemId));
+        ValidateGpCopy();
+        ValidateCraftCopy();
+        ValidateCraftSearch();
+        craftChain.ValidateContext(bankBridge.State.CharacterId, (uint)Math.Max(0, itemId), craftPlanTarget, recipeCatalog.State.Catalog);
+        triadSolve.ValidateContext(bankBridge.State.CharacterId, triadRevision);
+        preparationPrices.ValidateContext(bankBridge.State.CharacterId,market.State.WorldId,(uint)Math.Max(0,itemId),craftPlanTarget,costBasisIndex,costQualityIndex,craftChainChoiceRevision);
     }
 
     private void DrawNavigation()

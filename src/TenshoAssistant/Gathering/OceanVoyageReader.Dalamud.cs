@@ -18,7 +18,7 @@ internal sealed class OceanVoyageReader : IDisposable
     public OceanVoyageFrame? Frame=>Volatile.Read(ref frame);
 
     public OceanVoyageReader(IFramework framework,IClientState client,IPluginLog log)
-    {this.framework=framework;this.client=client;this.log=log;framework.Update+=Update;}
+    {this.framework=framework;this.client=client;this.log=log;TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}
 
     private unsafe void Update(IFramework unused)
     {
@@ -48,5 +48,5 @@ internal sealed class OceanVoyageReader : IDisposable
         }
     }
 
-    public void Dispose(){lock(gate){if(disposed)return;disposed=true;framework.Update-=Update;Volatile.Write(ref frame,null);}}
+    public void Dispose(){lock(gate){if(disposed)return;disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);Volatile.Write(ref frame,null);}}
 }

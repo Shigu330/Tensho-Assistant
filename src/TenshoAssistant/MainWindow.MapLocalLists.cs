@@ -69,6 +69,7 @@ internal sealed partial class MainWindow
         PlaceFlagFromMapView(map,coordinate.X,coordinate.Y);
         ImGui.CloseCurrentPopup();
     }
+    private static Vector2 CoordinateOf(MapDefinition map,Vector3 world)=>MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(world,map),map);
     private string CoordinateText(MapDefinition map,Vector3 world)
     {
         var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(world,map),map);
@@ -106,13 +107,14 @@ internal sealed partial class MainWindow
         {
             DrawSmallGameIcon(fate.Icon);
             if(ImGui.Selectable($"{FateLabel(fate)}##Fate{fate.Id}"))FlagAt(map,fate.Position);
+            PlaceMenu($"FatePlace{fate.Id}",map,CoordinateOf(map,fate.Position),FateLabel(fate));
             if(ImGui.IsItemHovered())WrappedTooltip(CoordinateText(map,fate.Position)+"\n"+localization.Get("MapLocal.ClickFlag"));
         }
     }
     private string FateLabel(MapFateMarker fate)
     {
         var left=fate.SecondsLeft>0 ? localization.Format("MapLocal.FateTime",fate.SecondsLeft/60,(fate.SecondsLeft%60).ToString("00")):"";
-        return localization.Format("MapLocal.FateLine",fate.Level,fate.Name,fate.Progress)+left;
+        return localization.Format("MapLocal.FateLine",fate.Level,fate.Name,fate.Progress)+left+(fate.HasBonus ? localization.Get("MapLocal.FateBonus"):"");
     }
 
     private void DrawLocalGathering(MapDefinition map)
@@ -132,7 +134,7 @@ internal sealed partial class MainWindow
             {
                 var world=new Vector3(position.X,0,position.Z);
                 if(ImGui.Selectable($"{label}##Gathering{point.BaseId}"))FlagAt(map,world);
-                GatheringToolMenu($"GatheringTool{point.BaseId}",point.Items);
+                GatheringToolMenu($"GatheringTool{point.BaseId}",point.Items,(map,CoordinateOf(map,world)));
                 if(ImGui.IsItemHovered())DrawGatheringTooltip(point);
             }
             else
@@ -193,10 +195,11 @@ internal sealed partial class MainWindow
             ImGui.PushStyleColor(ImGuiCol.Text,state==true ? UI.FfxivTheme.TextMuted:UI.FfxivTheme.Text);
             try{if(ImGui.Selectable($"{mark}  {name}  ({CoordinateText(map,world)})##Collectible{kind}{row.Id}"))FlagAt(map,world);}
             finally{ImGui.PopStyleColor();}
+            if(kind!=MapLocalKind.Sightseeing)PlaceMenu($"CollectiblePlace{kind}{row.Id}",map,CoordinateOf(map,world),name);
             // 0.328: the vista tooltip says « right click: create an alarm »; the row has that menu, as the vista on the Tensho map.
             if(kind==MapLocalKind.Sightseeing && map.TerritoryId!=0 && ImGui.BeginPopupContextItem($"VistaAlarm{row.Id}"))
             {
-                try{DrawVistaAlarmEntry(row,map.TerritoryId);}
+                try{DrawVistaAlarmEntry(row,map.TerritoryId);ImGui.Separator();PlaceEntries(map,CoordinateOf(map,world),"EntityMenu.Here");}
                 finally{ImGui.EndPopup();}
             }
             if(ImGui.IsItemHovered())
@@ -301,6 +304,7 @@ internal sealed partial class MainWindow
                         else OpenMapPointFromPage(target!,point.X,point.Y);
                         ImGui.CloseCurrentPopup();
                     }
+                    if(known)PlaceMenu("FavoritePlace",here ? map:target!,new(point.X,point.Y),name);
                     if(point.Note is { } note && ImGui.IsItemHovered())WrappedTooltip(note);
                 }
                 finally{ImGui.PopID();}
@@ -333,7 +337,7 @@ internal sealed partial class MainWindow
 
     // Right click on a row (0.118, user request): open the matching tool on that entry instead of placing the flag.
     // Right click on a gathering point (0.218): every resource with its icon; the chosen one opens in the gathering tool.
-    private void GatheringToolMenu(string id,IReadOnlyList<uint> resources)
+    private void GatheringToolMenu(string id,IReadOnlyList<uint> resources,(MapDefinition Map,Vector2 At)? place=null)
     {
         if(!ImGui.BeginPopupContextItem(id))return;
         try
@@ -346,6 +350,7 @@ internal sealed partial class MainWindow
                 if(ImGui.Selectable($"{item?.Name ?? $"#{resource}"}##{id}/{resource}")){itemId=(int)resource;page=Page.Gathering;IsOpen=true;mapLocalCloseMenu=true;}
                 if(ImGui.IsItemHovered())DrawItemInfoTooltip(resource);
             }
+            if(place is { } spot){ImGui.Separator();PlaceEntries(spot.Map,spot.At,"EntityMenu.Here");}
         }
         finally{ImGui.EndPopup();}
     }

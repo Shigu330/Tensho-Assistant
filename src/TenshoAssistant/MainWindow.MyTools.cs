@@ -252,12 +252,15 @@ internal sealed partial class MainWindow
         if(counter.Target>0 && count>=counter.Target)ImGui.TextColored(Success,line);else ImGui.TextUnformatted(line);
     }
 
+    // 0.541: its own session, as the preparation session is cleared when the shown recipe changes.
+    private readonly Market.PreparationPriceSession toolPrices=new();
     private void DrawMyToolItems(ItemListBlock block)
     {
-        if(!ImGui.BeginTable("###MyToolItems",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        var worldId=market.State.WorldId;var costRows=new List<(int? Missing,decimal? Price)>();var unpriced=new List<uint>();
+        if(!ImGui.BeginTable("###MyToolItems",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
         try
         {
-            foreach(var column in new[]{"ColumnItem","ColumnWanted","ColumnHeld","ColumnMissing"})ImGui.TableSetupColumn(localization.Get("MyToolsUi."+column));
+            foreach(var column in new[]{"ColumnItem","ColumnWanted","ColumnHeld","ColumnMissing","ColumnPrice"})ImGui.TableSetupColumn(localization.Get("MyToolsUi."+column));
             ImGui.TableHeadersRow();
             RefreshRecipeHoldingsCache();
             var catalog=itemCatalog.State.Catalog;
@@ -280,9 +283,32 @@ internal sealed partial class MainWindow
                     var missing=Math.Max(0,row.Wanted-held.Total);
                     ImGui.TextColored(missing>0 ? UI.FfxivTheme.Error:UI.FfxivTheme.Success,missing.ToString("N0"));
                 }
+                // 0.541 (issue #37): the price of one piece, as the shared cache knows it. Nothing is asked without the button.
+                ImGui.TableNextColumn();
+                var quote=worldId==0 ? null:market.GetCached(worldId,row.Id);
+                var price=quote is null ? null:ToolItemCost.Lowest(quote.Nq.Minimum,quote.Hq.Minimum);
+                if(item is {IsMarketable:false})ImGui.TextDisabled("—");
+                else if(price is { } known)ImGui.TextUnformatted(known.ToString("N0"));
+                else ImGui.TextDisabled("?");
+                if(item is {IsMarketable:true})
+                {
+                    costRows.Add((held.HasObservation ? (int)Math.Clamp(row.Wanted-held.Total,0,int.MaxValue):null,price));
+                    if(quote is null || !market.IsFresh(quote,DateTimeOffset.UtcNow))unpriced.Add(row.Id);
+                }
             }
         }
         finally{ImGui.EndTable();}
+        var (cost,unknown)=ToolItemCost.Missing(costRows);
+        if(cost>0 || unknown>0)ImGui.TextDisabled(localization.Format(unknown>0 ? "MyToolsUi.MissingCostUnknown":"MyToolsUi.MissingCost",cost.ToString("N0"),unknown));
+        var character=bankBridge.State.CharacterId;var batch=toolPrices.State;
+        if(batch.Loading)ImGui.TextDisabled(localization.Format("MyToolsUi.PricesLoading",batch.Completed,batch.Items.Count));
+        else if(unpriced.Count>0 && character!=0 && worldId!=0)
+        {
+            if(SourceButton(localization.Format("MyToolsUi.AskPrices",Math.Min(unpriced.Count,ToolItemCost.MaximumAsked)),configuration.CommunityUniversalis,true))
+                try{_=toolPrices.StartListAsync(market,character,worldId,unpriced.Take(ToolItemCost.MaximumAsked));}
+                catch(Exception error){log.Warning(error,"My Tools prices could not be started.");}
+            Tip("MyToolsUi.AskPricesTip");
+        }
     }
 
     private void DrawMyToolLink(LinkBlock link,int block,string language)

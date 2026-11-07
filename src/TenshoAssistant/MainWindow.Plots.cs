@@ -36,7 +36,7 @@ internal sealed partial class MainWindow
 
     private void DrawPlots()
     {
-        if(Paissa is not { } paissa || !TenshoAssistant.UI.UiComponents.Header(localization.Get("Plots.Title")+"###Plots"))return;
+        if(Paissa is not { } paissa)return;
         ImGui.TextWrapped(localization.Get("Plots.Help"));
         var world=market.State;
         BoolSetting("Plots.Watch","Plots.WatchTip",()=>configuration.PlotWatch,value=>configuration.PlotWatch=value,c=>c.PlotWatch);

@@ -6,6 +6,27 @@ public sealed record InventorySortTemplate(Guid Id,string Name,int ContainerCoun
 
 public static class InventorySortTemplates
 {
+    // 0.566 (I15): a template as text, to paste elsewhere. It holds no character (see above); what comes back is validated and gets its own id.
+    private const string TextPrefix="TENSHO-SORT1:";private const int TextMaximum=65536;
+    public static string Encode(InventorySortTemplate template)
+    {
+        Validate(template);
+        return TextPrefix+Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(template)));
+    }
+    public static InventorySortTemplate? Decode(string? text)
+    {
+        var clean=(text ?? "").Trim();
+        if(clean.Length>TextMaximum || !clean.StartsWith(TextPrefix,StringComparison.Ordinal))return null;
+        try
+        {
+            var read=System.Text.Json.JsonSerializer.Deserialize<InventorySortTemplate>(Convert.FromBase64String(clean[TextPrefix.Length..]));
+            if(read is null)return null;
+            var fresh=read with {Id=Guid.NewGuid()};
+            Validate(fresh);
+            return Copy(fresh);
+        }
+        catch(Exception error) when(error is FormatException or System.Text.Json.JsonException or InvalidOperationException or ArgumentException or NullReferenceException){return null;}
+    }
     public static void Validate(InventorySortTemplate template)
     {
         if(template.Id==Guid.Empty || template.Version!=1 || string.IsNullOrWhiteSpace(template.Name) || template.Name.Length>80

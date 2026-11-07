@@ -1,3 +1,4 @@
+using TenshoAssistant.Competitive;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.Gui.Dtr;
@@ -29,20 +30,24 @@ public sealed class ReminderDtrEntry : IDisposable
     private DateTimeOffset nextRead;
     private bool disposed,warned;
 
-    public ReminderDtrEntry(IDtrBar bar,IFramework framework,IGameGui gui,IPlayerState player,IPluginLog log,Configuration configuration,Func<string,string> text,Action open,Func<DateTimeOffset,IReadOnlyList<string>> todo)
+    private readonly Action<GameTimerSnapshot>? fromGame;
+    public ReminderDtrEntry(IDtrBar bar,IFramework framework,IGameGui gui,IPlayerState player,IPluginLog log,Configuration configuration,Func<string,string> text,Action open,Func<DateTimeOffset,IReadOnlyList<string>> todo,Action<GameTimerSnapshot>? fromGame=null)
     {
+        this.fromGame=fromGame;
         this.framework=framework;this.gui=gui;this.player=player;this.log=log;this.configuration=configuration;this.text=text;this.todo=todo;
         todoEntry=bar.Get("Tensho Assistant (Reminders)");
         finishedEntry=bar.Get("Tensho Assistant (Finished reminders)");
         todoEntry.Shown=false;finishedEntry.Shown=false;
         todoEntry.OnClick=_=>open();finishedEntry.OnClick=_=>open();
-        framework.Update+=OnUpdate;
+        CompetitiveGate.AddAlways(framework,OnUpdate);
     }
 
     private void Hide(){todoEntry.Shown=false;finishedEntry.Shown=false;todoBounds=null;finishedBounds=null;}
 
     private void OnUpdate(IFramework _)
     {
+        // DEC-038: gone from the server bar during a competitive cut; the next tick after it shows it again.
+        if(CompetitiveGate.Cut){todoEntry.Shown=false;finishedEntry.Shown=false;return;}
         var now=DateTimeOffset.UtcNow;
         if(disposed || now<nextRead)return;
         nextRead=now.AddSeconds(5);
@@ -50,6 +55,7 @@ public sealed class ReminderDtrEntry : IDisposable
         try
         {
             var timers=GameTimers.Read();
+            fromGame?.Invoke(timers);
             var finished=ReminderCounts.Finished(timers.Ventures?.Select(venture=>venture.Done),configuration.Voyages,
                 timers.SquadronMission is { } mission ? (mission.Id,mission.Done):null,timers.SquadronTraining is { } training ? (training.Id,training.Done):null,
                 configuration.GardenBeds,now).Where(item=>configuration.ReminderBarHidden?.Contains(item.Kind.ToString())!=true).ToArray();
@@ -105,7 +111,7 @@ public sealed class ReminderDtrEntry : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        CompetitiveGate.RemoveAlways(framework,OnUpdate);
         todoEntry.Remove();finishedEntry.Remove();
     }
 }

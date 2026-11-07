@@ -15,20 +15,27 @@ internal sealed partial class MainWindow
     private (IReadOnlyList<QuestEntry> Source,Dictionary<uint,QuestProgress> Progress)? shopQuests;
     private (IReadOnlyList<CollectionEntry> Source,Dictionary<uint,bool> Done)? shopAchievements;
 
-    private void DrawShopRequirement(NpcShopSale sale)
+    // 0.703: what is known of a sale's quest and achievement: true met, false not met, null not read or none.
+    private (bool? Quest,bool? Achievement) SaleRequirementState(NpcShopSale sale)
     {
         var journal=quests.State.Entries;
         if(!ReferenceEquals(shopQuests?.Source,journal))shopQuests=(journal,journal.GroupBy(entry=>entry.Id).ToDictionary(group=>group.Key,group=>group.First().Progress));
         var collected=collections.State.Entries;
         if(!ReferenceEquals(shopAchievements?.Source,collected))
             shopAchievements=(collected,collected.Where(entry=>entry.Kind==CollectionKind.Achievement).GroupBy(entry=>entry.Id).ToDictionary(group=>group.Key,group=>group.First().ConfirmedUnlocked));
+        bool? quest=sale.QuestRequired!=0 && shopQuests.Value.Progress.TryGetValue(sale.QuestRequired,out var progress) ? progress==QuestProgress.Complete ? true:quests.State.CharacterId==0 ? null:false:null;
+        bool? achievement=sale.AchievementRequired!=0 && shopAchievements.Value.Done.TryGetValue(sale.AchievementRequired,out var done) && done ? true:null;
+        return (quest,achievement);
+    }
+
+    private void DrawShopRequirement(NpcShopSale sale)
+    {
+        var (quest,achievement)=SaleRequirementState(sale);
         var parts=new List<(string Text,bool? Done)>();
         if(sale.QuestRequired!=0)
-            parts.Add((localization.Format("ShopRequirement.Quest",QuestNameOf?.Invoke(sale.QuestRequired) ?? $"#{sale.QuestRequired}"),
-                shopQuests.Value.Progress.TryGetValue(sale.QuestRequired,out var progress) ? progress==QuestProgress.Complete ? true:quests.State.CharacterId==0 ? null:false:null));
+            parts.Add((localization.Format("ShopRequirement.Quest",QuestNameOf?.Invoke(sale.QuestRequired) ?? $"#{sale.QuestRequired}"),quest));
         if(sale.AchievementRequired!=0)
-            parts.Add((localization.Format("ShopRequirement.Achievement",AchievementNameOf?.Invoke(sale.AchievementRequired) ?? $"#{sale.AchievementRequired}"),
-                shopAchievements.Value.Done.TryGetValue(sale.AchievementRequired,out var done) ? done ? true:null:null));
+            parts.Add((localization.Format("ShopRequirement.Achievement",AchievementNameOf?.Invoke(sale.AchievementRequired) ?? $"#{sale.AchievementRequired}"),achievement));
         for(var index=0;index<parts.Count;index++)
         {
             if(index>0)ImGui.SameLine(0,6);

@@ -26,6 +26,10 @@ public sealed class LuminaSupplementalData
     public IReadOnlyList<(int Kind, int Count, IReadOnlyList<uint> Items)> GivesOf(uint sourceItemId) =>
         gives.TryGetValue(sourceItemId, out var kinds)
             ? kinds.OrderBy(pair => pair.Key).Select(pair => (pair.Key, pair.Value.Count, (IReadOnlyList<uint>)pair.Value.Items)).ToArray() : [];
+    /// <summary>W-15 (0.718): every item of one kind of source, with what it gives. The list stops at 24 like the rest: Count is the whole.</summary>
+    public IReadOnlyList<(uint Source, int Count, IReadOnlyList<uint> Items)> SourcesOf(int kind) =>
+        gives.Where(pair => pair.Value.ContainsKey(kind)).OrderBy(pair => pair.Key)
+            .Select(pair => (pair.Key, pair.Value[kind].Count, (IReadOnlyList<uint>)pair.Value[kind].Items)).ToArray();
     public IReadOnlyList<(uint QuestId, string Name, uint Quantity, bool Hq)> QuestsRequiring(uint itemId) =>
         questsRequiring.TryGetValue(itemId, out var list) ? list : [];
     // Shops the game sheets do not link to an NPC (0.199): ENpcShop (ENpcResidentId, ShopId) and NPC positions ENpcPlace (ENpcResidentId,
@@ -54,6 +58,10 @@ public sealed class LuminaSupplementalData
     public bool FromVenture(uint itemId) => ventures.Contains(itemId);
     public uint? StorePriceCents(uint itemId) => storeCents.TryGetValue(itemId, out var cents) ? cents : null;
 
+    private readonly Dictionary<uint, List<uint>> dropsOf = [];
+    /// <summary>0.795 (X-35): the items a monster (BNpcName row) drops, from MobDrop; empty when none is known.</summary>
+    public IReadOnlyList<uint> ItemsDroppedBy(uint nameId) => dropsOf.TryGetValue(nameId, out var list) ? list : [];
+
     public LuminaSupplementalData(IReadOnlyDictionary<string, string> csv, Func<uint, string?>? monsterName = null, Func<uint, string?>? fateName = null,
         Func<uint, string?>? npcName = null, Func<uint, string?>? questName = null)
     {
@@ -81,7 +89,14 @@ public sealed class LuminaSupplementalData
             if (!target.TryGetValue(item, out var list)) target[item] = list = [];
             if (list.Count < 8 && !list.Contains(name)) list.Add(name);
         }
-        foreach (var row in Rows(csv, "MobDrop")) Named(monsters, Uint(row, "ItemId"), monsterName?.Invoke(Uint(row, "BNpcNameId")));
+        foreach (var row in Rows(csv, "MobDrop"))
+        {
+            Named(monsters, Uint(row, "ItemId"), monsterName?.Invoke(Uint(row, "BNpcNameId")));
+            var dropped = Uint(row, "ItemId"); var by = Uint(row, "BNpcNameId");
+            if (dropped == 0 || by == 0) continue;
+            if (!dropsOf.TryGetValue(by, out var items)) dropsOf[by] = items = [];
+            if (!items.Contains(dropped)) items.Add(dropped);
+        }
         foreach (var row in Rows(csv, "FateItem")) Named(fates, Uint(row, "ItemId"), fateName?.Invoke(Uint(row, "FateId")));
         foreach (var row in Rows(csv, "RetainerVentureItem")) if (Uint(row, "ItemId") is var venture and not 0) ventures.Add(venture);
         foreach (var row in Rows(csv, "ItemSupplement"))

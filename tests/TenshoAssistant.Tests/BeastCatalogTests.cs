@@ -90,13 +90,13 @@ internal static class BeastCatalogTests
             Check(windows.Contains("XBMMonsterBookDetail") && windows.Contains("XBMPetParty") && windows.Contains("XBMBattleMonsterDetail"),"the windows wanted");
             Check(!windows.Contains("XBMRanking") && !windows.Contains("XBMResult"),"other players and the character stay out");
             Check(probe.Contains("!developerMode()") && probe.Contains("depth > MaximumDepth") && probe.Contains("found.Count < MaximumTexts") && probe.Contains("written >= MaximumLinesPerWindow"),"off by default, recursion and output bounded");
-            Check(probe.Contains("failed = true;") && probe.Contains("framework.Update -= OnUpdate"),"stops on failure, cleaned up");
+            Check(probe.Contains("failed = true;") && probe.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate)"),"stops on failure, cleaned up");
         }),
         ("Beastmaster page: raw reads guarded, read-only, in the self-check",() =>
         {
             string Code(string file)=>File.ReadAllText(Path.Combine(Path.GetFullPath("src/TenshoAssistant"),file));
             var loader=Code("Beastmaster/BeastCatalogLoader.Dalamud.cs");
-            Check(loader.Contains("raw.Columns.Count != columns") && loader.Contains("service.Fail(error.Message)") && loader.Contains("framework.Update -= OnUpdate"),"guards and cleanup");
+            Check(loader.Contains("raw.Columns.Count != columns") && loader.Contains("service.Fail(error.Message)") && loader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate)"),"guards and cleanup");
             Check(loader.Contains("XBMManager.DataState.Received") && !loader.Contains("SetPetUnlocked"),"read-only, once the game has the list");
             Check(Code("MainWindow.SelfCheck.cs").Contains("(\"beastmaster\", SelfCheckBeastmaster)"),"in the self-check");
         }),

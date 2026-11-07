@@ -11,6 +11,42 @@ public sealed record MarketQuote(uint WorldId, uint ItemId, DateTimeOffset Fetch
     MarketQualityPrice Nq, MarketQualityPrice Hq, MarketListing? NqCheapest = null, MarketListing? HqCheapest = null,
     MarketListing? NqRegion = null, MarketListing? HqRegion = null)
 {
+    /// <summary>
+    /// 0.711 (user report): what an item really sold for on this world, not what is asked for it: the lower of the last sale and the average sale, so that one odd sale does not lift it.
+    /// HQ when asked and sold as such, else NQ. Null: no sale known.
+    /// </summary>
+    public (decimal Price,decimal? PerDay)? Sold(bool hq)
+    {
+        static decimal? Value(MarketQualityPrice price)=>price.Average is { } average && price.RecentSale is { } last ? Math.Min(average,last):price.Average ?? price.RecentSale;
+        // 0.725 (user report): one old HQ sale says nothing when that quality no longer sells and the other one does.
+        var hqStopped=Hq.Velocity==0 && Nq.Velocity>0 && Value(Nq) is not null;
+        if(hq && !hqStopped && Value(Hq) is { } best)return (best,Hq.Velocity);
+        return Value(Nq) is { } plain ? (plain,Nq.Velocity):null;
+    }
+    /// <summary>
+    /// 0.725 (user report): the aggregated answer leaves out the speed of an item with no recent sale, and its window is short. The item's own answer gives the units sold a day over seven
+    /// days, zero included: docs/evidence/0.725-sales-speed.md. Without this answer the speed stays as it was: unknown is not zero.
+    /// </summary>
+    public const int SpeedEntries=200;
+    public static string SpeedUrl(uint world,IReadOnlyCollection<uint> ids)=>
+        $"https://universalis.app/api/v2/{world}/{string.Join(',',ids)}?listings=0&entries={SpeedEntries}&fields={(ids.Count==1 ? "nqSaleVelocity,hqSaleVelocity":"items.nqSaleVelocity,items.hqSaleVelocity")}";
+    public MarketQuote WithSpeed(string? json)
+    {
+        if(string.IsNullOrEmpty(json))return this;
+        try
+        {
+            using var document=JsonDocument.Parse(json,new JsonDocumentOptions{MaxDepth=32});
+            var row=document.RootElement;
+            if(row.ValueKind!=JsonValueKind.Object)return this;
+            if(row.TryGetProperty("items",out var items))
+            {
+                if(items.ValueKind!=JsonValueKind.Object || !items.TryGetProperty(ItemId.ToString(System.Globalization.CultureInfo.InvariantCulture),out row) || row.ValueKind!=JsonValueKind.Object)return this;
+            }
+            static decimal? Speed(JsonElement value,string field)=>value.TryGetProperty(field,out var speed) && speed.TryGetDecimal(out var perDay) && perDay>=0 ? perDay:null;
+            return this with {Nq=Nq with {Velocity=Speed(row,"nqSaleVelocity") ?? Nq.Velocity},Hq=Hq with {Velocity=Speed(row,"hqSaleVelocity") ?? Hq.Velocity}};
+        }
+        catch(JsonException){return this;}
+    }
     public bool HasRecentUpload(DateTimeOffset now) => Recent(UploadedAt, now);
     public static bool Recent(DateTimeOffset? uploaded, DateTimeOffset now) => uploaded is { } date
         && date <= now.AddMinutes(5) && now - date <= TimeSpan.FromHours(24);

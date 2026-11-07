@@ -24,7 +24,7 @@ public sealed class ItemNoteShopReminder : IDisposable
         Action<IReadOnlyList<(uint Item,long Quantity)>,IReadOnlyList<(uint Item,long Quantity)>> remind,IPluginLog log)
     {
         this.framework=framework;this.gui=gui;this.configuration=configuration;this.live=live;this.character=character;this.remind=remind;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework _)
@@ -52,6 +52,6 @@ public sealed class ItemNoteShopReminder : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

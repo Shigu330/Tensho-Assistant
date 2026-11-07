@@ -27,7 +27,7 @@ public sealed unsafe class ChocoboReader : IDisposable
     public ChocoboReader(IFramework framework,IClientState client,IPlayerState player,IUnlockState unlocks,IDataManager data,IPluginLog log)
     {
         this.framework=framework;this.client=client;this.player=player;this.unlocks=unlocks;this.data=data;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     /// <summary>Called by the page while it shows the chocobo (UI thread): keeps the reads going for 5 seconds.</summary>
@@ -66,6 +66,6 @@ public sealed unsafe class ChocoboReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

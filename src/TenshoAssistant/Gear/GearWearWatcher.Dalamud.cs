@@ -22,7 +22,7 @@ public sealed class GearWearWatcher : IDisposable
     public GearWearWatcher(IFramework framework,IClientState client,Func<IReadOnlyList<EquippedPiece>> equipped,Func<GearWearSettings> settings,IPluginLog log)
     {
         this.framework=framework;this.client=client;this.equipped=equipped;this.settings=settings;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework _)
@@ -49,6 +49,6 @@ public sealed class GearWearWatcher : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

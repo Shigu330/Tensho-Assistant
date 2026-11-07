@@ -61,7 +61,7 @@ public sealed unsafe class VoyageWatcher : IDisposable
     public VoyageWatcher(IFramework framework,IDataManager data,Configuration configuration,Action save,IPluginLog log)
     {
         this.framework=framework;this.data=data;this.configuration=configuration;this.save=save;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework _)
@@ -284,6 +284,6 @@ public sealed unsafe class VoyageWatcher : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

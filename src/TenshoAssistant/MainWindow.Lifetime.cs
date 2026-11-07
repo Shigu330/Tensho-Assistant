@@ -11,15 +11,20 @@ internal sealed partial class MainWindow
         // 0.327 (queue step e): the last page used is written once more when the plugin unloads with the window open.
         SaveLastPage();
         craftChain.Dispose();
+        mapFindCancel?.Cancel();mapFindCancel?.Dispose();mapFindCancel=null;
+        fromStockCancel?.Cancel();fromStockCancel?.Dispose();fromStockCancel=null;
         craftSolve.Dispose();
         craftLogSession.Dispose();
         craftLog.Reset();
         triadSolve.Dispose();
         CancelTriadAdvice();
         CancelTriadRequest();
+        simulationThresholdsCancel?.Cancel();simulationThresholdsCancel?.Dispose();
         preparationPrices.Dispose();
+        toolPrices.Dispose();
         routePrices.Dispose();
         currencyPrices.Dispose();
+        fromStockPrices.Dispose();
         cactpotSolve.Dispose();
         // 0.315: the route and build searches stop with the window.
         plannerCancel?.Cancel();plannerCancel?.Dispose();plannerCancel=null;

@@ -21,7 +21,7 @@ public sealed unsafe class BgmReader : IDisposable
     public BgmReader(IFramework framework,IClientState client,IPluginLog log)
     {
         this.framework=framework;this.client=client;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     /// <summary>The BGM row playing now, or null.</summary>
@@ -59,6 +59,6 @@ public sealed unsafe class BgmReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

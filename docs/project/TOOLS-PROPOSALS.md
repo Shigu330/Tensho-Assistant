@@ -9,6 +9,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T0 — Alarmes en heure réelle : à la main, chaque jour, chaque semaine ou à chaque remise à zéro (X-10, partie anticipée)
 
+- **État (relu le 2026-11-05)** : FAIT 0.577.
 - **État (relu le 2026-11-03)** : en partie 0.386 (X-10 : alarme unique à une date locale) ; chaque jour, chaque semaine ou à chaque remise non fait.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Alarms/TenshoAlarm.cs`.
 - **Ce que le joueur obtient** : Une alarme posée une seule fois revient d'elle-même : « 30 min avant la remise hebdomadaire », « chaque jour à 21:00 », « fin des missions de ravitaillement ». La cloche des Rappels propose « à chaque remise à zéro » au lieu d'une alarme unique qui disparaît après avoir sonné. Vous pouvez aussi poser à la main une alarme à une heure locale, ou un minuteur (« dans 45 min »).
@@ -33,6 +34,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T3 — Quêtes : colonnes Niveau et Zone, tri et filtre de niveau
 
+- **État (relu le 2026-11-05)** : FAIT 0.550.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.Quests.cs`.
 - **Ce que le joueur obtient** : La liste des quêtes montre le niveau et la zone de chaque quête. Vous la triez par niveau ou par zone et la limitez à une plage de niveaux, par exemple les quêtes annexes de votre niveau dans une zone.
 - **Comment, taille, dépendances** : Deux colonnes de plus, avec ImGuiTableFlags.Sortable. Le tri est refait seulement quand l'entrée change, comme questMatches (rien de lourd dans Draw). Champs « niveau de … à … » avec infobulle et ↺, mémorisés. Taille S. Dépendances : aucune. Sonde : aucune. Décision : aucune.
@@ -40,6 +42,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T4 — Monstres : drapeau sur la position du monstre, pas au centre de la carte
 
+- **État (relu le 2026-11-05)** : FAIT 0.551.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.Monsters.cs`.
 - **Ce que le joueur obtient** : Sur la fiche d'un monstre qui laisse tomber l'objet, « Ouvrir la carte » pose le drapeau à l'endroit donné par Garland Tools et ouvre la carte Tensho dessus, avec la mention « position communautaire ». Aujourd'hui la carte s'ouvre au centre.
 - **Comment, taille, dépendances** : Si X et Y sont connus : convertir les coordonnées de carte en position monde (Maps/MapProjection) puis appeler ShowOnTenshoMap(map, position). Sinon, garder le comportement actuel. L'infobulle dit que la source est Garland et que l'apparition n'est pas prouvée. Taille S. Dépendances : carte Tensho. Sonde : aucune. Décision : aucune.
@@ -86,6 +89,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T10 — Accueil : bloc « Aujourd'hui » et tuiles au choix
 
+- **État (relu le 2026-11-05)** : FAIT 0.599.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.Home.cs`.
 - **Ce que le joueur obtient** : À l'ouverture de Tensho, vous voyez ce qui compte maintenant : rappels non faits avant la prochaine remise, vaisseaux revenus ou prochain retour, tâches de servants terminées, quêtes suivies, les trois prochaines alarmes. Chaque ligne ouvre sa page. Vous choisissez aussi les tuiles de l'accueil (Rappels, Compagnie libre, Équipement…).
 - **Comment, taille, dépendances** : Déplacer la lecture de GameTimers dans un petit service sur Framework.Update (une fois par seconde, gardé R-14, copie immuable), lu par les Rappels et l'Accueil. Construire le bloc « Aujourd'hui » une fois par seconde (rien de lourd dans Draw). Liste des tuiles dans la configuration : ordre et case par tuile, avec infobulle et ↺. Taille M. Dépendances : « Rappels par personnage », alarmes de retour, « Tâches de servants ». Sonde : aucune. Décision : lignes affichées par défaut (recommandé : toutes, chacune masquable).
@@ -93,6 +97,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T11 — Quêtes « disponibles maintenant » et quêtes de la zone actuelle
 
+- **État (relu le 2026-11-05)** : FAIT 0.582.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.Quests.cs`.
 - **Ce que le joueur obtient** : Un filtre montre les quêtes que vous pouvez prendre : non faites, prérequis terminés, pas exclues par un autre choix (cité de départ, Grande Compagnie), niveau atteint. Un second filtre se limite à la zone où vous êtes, avec le donneur sur la carte. Les conditions que Tensho ne sait pas lire sont signalées (« condition non interprétée ») et ne comptent jamais comme remplies.
 - **Comment, taille, dépendances** : Calcul sur la liste publiée, pas dans Draw : non confirmée + CompletionEvidence + absente de questOtherCity. Niveau comparé à celui du job requis si « Niveaux et expérience de tous les jobs » est fait, sinon seulement affiché. Jointure inconnue ou étape requise : « à vérifier ». Zone : territoire courant, déjà lu par la carte. Taille M. Dépendances : niveaux des jobs pour le filtre de niveau ; colonne ClassJobCategory de Quest à sonder. Décision : inclure les quêtes répétables (recommandé : non par défaut).
@@ -100,6 +105,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T12 — Chemin vers une quête : prérequis restants, nombre et prochaine à faire
 
+- **État (relu le 2026-11-05)** : FAIT 0.583.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Quests/QuestService.cs`.
 - **Ce que le joueur obtient** : Sur la fiche d'une quête (ou d'un contenu, avec « Débloqué par »), Tensho liste dans l'ordre toutes les quêtes encore à faire pour l'atteindre, leur nombre, et la première à prendre maintenant, avec un bouton carte. Utile pour une épopée, un job ou un donjon à débloquer.
 - **Comment, taille, dépendances** : Parcours borné sur un worker annulable : garde de cycle, plafond de nœuds, résultat publié et mis en cache par quête et par observation. Jointure 1 = toutes les branches ; jointure 2 = la branche déjà faite, sinon la plus courte ; mode inconnu = arrêt avec « condition non interprétée ». Liste repliable dans la fiche, un clic ouvre la quête. Taille M. Dépendances : aucune ; sert à « Débloqué par ». Sonde : aucune. Décision : aucune.
@@ -114,6 +120,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T14 — Équipement : préparer le plan d'un autre job que celui porté
 
+- **État (relu le 2026-11-05)** : FAIT 0.580.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.Gear.cs`.
 - **Ce que le joueur obtient** : Un menu de job sur la page Équipement : vous préparez ou consultez le plan de votre soigneur en étant forgeron. Pièces, matérias, pièces à obtenir et essayage fonctionnent ; les attributs réels sont marqués « relevés sur le job porté seulement ».
 - **Comment, taille, dépendances** : Job affiché = job choisi (par défaut, le job porté) ; catalogue filtré pour ce job. Si ce job n'est pas porté, la colonne des attributs ne montre que la somme des pièces et des matérias, sans valeur réelle inventée. Taille M. Dépendances : niveaux des jobs pour le niveau de ce job (sinon un champ niveau). Sonde : aucune. Décision : aucune.
@@ -121,6 +128,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T15 — Revue de mode : tenue de la semaine choisie, essayée en un clic, avec l'endroit de chaque pièce
 
+- **État (relu le 2026-11-05)** : FAIT 0.581.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.FashionWeek.cs`.
 - **Ce que le joueur obtient** : Vous choisissez une pièce par emplacement parmi celles proposées pour la semaine. « Essayer la tenue » les met toutes dans la cabine d'essayage, et une liste dit où se trouve chaque pièce (sacs, arsenal, coffre à apparence, armoire, servant), lesquelles manquent et leurs sources.
 - **Comment, taille, dépendances** : Choix par emplacement gardé jusqu'à la remise hebdomadaire (mardi 08:00 UTC, docs/evidence/0.300-calendar-resets.md). Bouton « Essayer la tenue », sur clic seulement. Tableau emplacement → pièce → rangement, recalculé quand le choix ou les stocks changent. Taille M. Dépendances : aucune. Sonde : aucune. Décision : aucune.
@@ -128,6 +136,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T16 — Tâches de servants : une ligne par servant, avec alarme
 
+- **État (relu le 2026-11-05)** : FAIT 0.570.
 - **État (relu le 2026-11-03)** : en partie 0.371 (alarme automatique à la fin de chaque tâche de servant) et 0.374 (vue de vos personnages).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Reminders.cs`.
 - **Ce que le joueur obtient** : La ligne « Tâches de servants » se déplie : pour chaque servant, sa tâche finie ou son heure de fin, une cloche, et une alarme « quand toutes sont finies ».
@@ -136,6 +145,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T17 — Rappels cochés d'eux-mêmes quand le jeu le dit
 
+- **État (relu le 2026-11-05)** : FAIT 0.558.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Reminders.cs`.
 - **Ce que le joueur obtient** : Quand le jeu indique 0 commande spéciale ou 0 quête de tribu restante, la case « fait » se coche seule jusqu'à la remise. La coche manuelle reste pour le reste.
 - **Comment, taille, dépendances** : Fait = coche manuelle, ou compteur lu à 0 depuis la dernière remise (marqué « d'après le jeu ») ; un compteur inconnu ne permet aucune déduction. Réglage « Cocher d'après le jeu » (activé, infobulle, ↺). Taille S. Dépendances : aucune. Sonde : aucune. Décision : activé par défaut (recommandé : oui).
@@ -143,6 +153,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T18 — Discord : heure lue dans le fuseau de chaque membre, et balises [zone], [objet], [et]
 
+- **État (relu le 2026-11-05)** : FAIT 0.564.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Alarms/DiscordWebhook.cs`.
 - **Ce que le joueur obtient** : Dans un salon partagé de compagnie libre, chaque membre lit l'heure de l'alarme dans son propre fuseau (et « dans 5 minutes »). Vos messages peuvent aussi donner la zone, l'objet et l'heure d'Éorzéa.
 - **Comment, taille, dépendances** : Nouvelles balises [discordtime] (<t:unix:t>), [relative] (<t:unix:R>), [zone], [objet] et [et]. Les noms sont résolus sur le thread du framework quand l'alarme sonne, puis passés au notificateur. [time] ne change pas. Tests de Format. Taille S. Dépendances : aucune. Sonde : aucune (syntaxe de Discord). Décision : changer le modèle par défaut (recommandé : non, garder l'actuel).
@@ -150,6 +161,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T19 — Alarmes : modifier le nom et l'heure, et « Me rappeler dans 5 min »
 
+- **État (relu le 2026-11-05)** : FAIT 0.557.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Alarms.cs`.
 - **Ce que le joueur obtient** : Vous renommez une alarme ou changez son heure ET ou sa date sans la recréer. Une alarme qui vient de sonner peut être reportée de quelques minutes, depuis la page Alarmes ou l'infobulle de la barre du serveur.
 - **Comment, taille, dépendances** : Champs nom et heure, enregistrés en quittant le champ, comme pour Discord. Pour une alarme copiée dans le jeu, un message dit de corriger celle du jeu à la main (Alarms.DeleteInGame). « Reporter » crée une alarme Once au même nom ; durée réglable (5 min, infobulle, ↺). Taille S. Dépendances : aucune. Sonde : aucune. Décision : durée par défaut du report (recommandé : 5 min).
@@ -157,6 +169,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T20 — Alarmes : sonner aussi à l'heure exacte
 
+- **État (relu le 2026-11-05)** : FAIT 0.556.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Alarms/AlarmService.Dalamud.cs`.
 - **Ce que le joueur obtient** : En plus du rappel N minutes avant, l'alarme peut sonner une seconde fois quand la fenêtre s'ouvre : point de récolte, poisson, retour de vaisseau.
 - **Comment, taille, dépendances** : Option par alarme, plus un réglage par défaut « Sonner aussi à l'heure » (désactivé, infobulle, ↺). Un second état « à l'heure traité » évite de sonner deux fois ; Discord seulement au premier son (débit). Tests de Check. Taille S. Dépendances : aucune. Sonde : aucune. Décision : envoyer aussi le second son sur Discord (recommandé : non).
@@ -179,6 +192,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T23 — Compagnie libre : vaisseaux groupés par compagnie, ancien relevé effaçable, valeur du dernier butin
 
+- **État (relu le 2026-11-05)** : FAIT 0.603.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.FreeCompany.cs`.
 - **Ce que le joueur obtient** : Avec des personnages dans plusieurs compagnies, chaque atelier a son propre cadre (nom de la compagnie, date du relevé). Le relevé d'une compagnie quittée peut être effacé. Chaque vaisseau revenu affiche la valeur de son butin au prix PNJ.
 - **Comment, taille, dépendances** : Lire le nom de la compagnie au relevé (source à sonder ; à défaut, « Atelier n »). Un cadre (Header) par maison ; bouton « Effacer ce relevé » à deux clics. Valeur = Σ quantité × prix PNJ (le prix du marché viendra avec f) 2). Taille S. Dépendances : aucune. Sonde : nom de la compagnie. Décision : aucune.
@@ -186,6 +200,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T24 — Discord : un salon par catégorie (plusieurs webhooks)
 
+- **État (relu le 2026-11-05)** : FAIT 0.598.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Alarms/DiscordWebhook.cs`.
 - **Ce que le joueur obtient** : Les retours de vaisseaux partent dans le salon de la compagnie libre, vos alarmes de récolte dans votre salon privé.
 - **Comment, taille, dépendances** : Adresse facultative par catégorie (vide = adresse principale). Chacune est masquée, vérifiée par IsValidUrl, jamais écrite dans les journaux ni dans le rapport de Diagnostics. File et pause de débit propres à chaque adresse ; « Envoyer un test » par adresse. Taille M. Dépendances : aucune. Sonde : aucune. Décision : nombre d'adresses (recommandé : une par catégorie existante).
@@ -193,6 +208,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T25 — Équipement : plusieurs plans nommés par job
 
+- **État (relu le 2026-11-05)** : FAIT 0.593.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Configuration.cs`.
 - **Ce que le joueur obtient** : Pour un même job, vous gardez « montée de niveau », « artisanat » et « meilleur possible », et passez de l'un à l'autre ; chacun se partage par code.
 - **Comment, taille, dépendances** : Liste nommée par job (nom, pièces, matérias) et choix du plan actif. Migration de l'ancien plan en « Plan 1 », avec test. Dupliquer, renommer, supprimer ; l'infobulle dit que la suppression est immédiate (règle 0.325). Taille S-M. Dépendances : aucune. Sonde : aucune. Décision : nombre maximum de plans (recommandé : 10 par job).
@@ -214,6 +230,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T28 — Collections : « Obtenus récemment » et menu des sources pour les emotes
 
+- **État (relu le 2026-11-05)** : FAIT 0.602.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.Collections.cs`.
 - **Ce que le joueur obtient** : Une ligne « Obtenus récemment » liste, avec la date, ce que vous avez gagné depuis le relevé précédent (montures, mascottes, rouleaux…). Le clic droit sur une emote ouvre ses sources, comme pour les montures.
 - **Comment, taille, dépendances** : À chaque observation publiée, comparer avec les identifiants obtenus déjà enregistrés (par personnage, 200 entrées au plus, gardées 90 jours) ; liste en tête de la page. Ajouter Emote au menu des sources. Taille S. Dépendances : « Rappels par personnage » (clé par personnage). Sonde : aucune. Décision : durée de conservation (recommandé : 90 jours).
@@ -221,6 +238,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## T29 — Mini Cactpot : table des gains prouvée et visible
 
+- **État (relu le 2026-11-05)** : FAIT 0.571.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MiniGames/MiniCactpotSolver.cs`.
 - **Ce que le joueur obtient** : Sous le conseil, le gain de chaque somme de ligne (6 à 24) s'affiche, comme sur le ticket du jeu : vous voyez ce que vise la ligne conseillée.
 - **Comment, taille, dépendances** : Chercher la table dans les données du jeu (sonde des feuilles du Gold Saucer) ou la relever sur le ticket en jeu ; preuve dans docs/evidence/ et test qui compare. Tableau repliable sous le conseil. Taille S. Dépendances : séance de relevés. Décision : aucune.

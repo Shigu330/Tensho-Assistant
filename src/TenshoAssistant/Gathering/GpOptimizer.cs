@@ -8,7 +8,7 @@ public sealed record GpActiveEffects(bool Yield=false,bool Gift1=false,bool Gift
 // R-09 (0.410): MoreActions adds Solid Reason / Ageless Words (one more attempt each; from level 90, trait « Enhanced Solid Reason »:
 // 50 % chance of Eureka Moment, i.e. a free attempt with Wise to the World, counted on average) and Clear Vision / Flora Mastery (+15 %
 // on one attempt, placed on the Bountiful attempts first). Off, the model is the one before 0.410.
-public sealed record GpScenario(uint JobId,int Level,int Budget,int Attempts,int BaseYield,int SuccessPercent,int BoonPercent,int BountifulBonus,GpActiveEffects? Active=null,bool MoreActions=false,string Forbidden="")
+public sealed record GpScenario(uint JobId,int Level,int Budget,int Attempts,int BaseYield,int SuccessPercent,int BoonPercent,int BountifulBonus,GpActiveEffects? Active=null,bool MoreActions=false,string Forbidden="",bool AutoGather=false)
 {
     public const int EurekaLevel=90;
     public const decimal EurekaChance=0.5m;
@@ -20,6 +20,21 @@ public sealed record GpOptimization(GpScenario Scenario,decimal Baseline,GpPlan 
 
 public static class GpOptimizer
 {
+    /// <summary>The actions to click: one per use.</summary>
+    public static int Clicks(GpPlan plan)=>plan.Actions.Sum(use=>use.Count);
+
+    /// <summary>
+    /// 0.763 (X-16, user request): the plan within the GP with the best yield; among plans of the same yield, the one with the fewest clicks (an action that lasts
+    /// the whole node rather than one per gather), then the cheapest.
+    /// </summary>
+    public static GpPlan Pick(IEnumerable<GpPlan> plans,int budget)
+    {
+        var within=plans.Where(plan=>plan.Cost<=budget).ToArray();
+        var top=within.Max(plan=>plan.ExpectedYield);
+        return within.Where(plan=>plan.ExpectedYield>=top-YieldTie).OrderBy(Clicks).ThenBy(plan=>plan.Cost).First();
+    }
+    /// <summary>Yields this close are the same result: the computation is exact to far more digits than a gather shows.</summary>
+    public const decimal YieldTie=0.0001m;
     public static GpOptimization Solve(GpScenario input,GpActionCatalog catalog,CancellationToken cancellation=default)
     {
         ArgumentNullException.ThrowIfNull(input); ArgumentNullException.ThrowIfNull(catalog);
@@ -48,7 +63,9 @@ public static class GpOptimizer
         var eureka=input.Level>=GpScenario.EurekaLevel ? GpScenario.EurekaChance:0m;
         // Plans far above the budget are not needed (the next upgrade is the first plan above it): repeated actions stop at budget + 600.
         var reach=input.Budget+600;
-        var maxRestore=restore is null ? 0:Math.Min(input.Attempts,reach/restore.Spec.Cost);
+        // 0.753 (X-06, user request): « gather automatically » runs every attempt without a pause: only what is used before the first gather counts. Lasting effects stay;
+        // an action for one gather is used once, on the first; an attempt given back needs an attempt spent first, so none.
+        var maxRestore=restore is null || input.AutoGather ? 0:Math.Min(input.Attempts,reach/restore.Spec.Cost);
         var bestAtCost=new Dictionary<int,GpPlan>();
         foreach(var chance in chances)
         foreach(var yield in yields)
@@ -68,9 +85,9 @@ public static class GpOptimizer
                 var guaranteed=input.Attempts+restored;
                 var attempts=guaranteed+restored*eureka;
                 var purchasableAttempts=guaranteed-(active.FirstAttemptBonus>0 ? 1:0);
-                var maxClear=clear is null || clearSuccess<=success ? 0:Math.Min(guaranteed,reach/clear.Spec.Cost);
+                var maxClear=clear is null || clearSuccess<=success ? 0:Math.Min(input.AutoGather ? 1:guaranteed,reach/clear.Spec.Cost);
                 for(var cleared=0;cleared<=maxClear;cleared++)
-                for(var count=0;count<=(bountiful is null ? 0:purchasableAttempts);count++)
+                for(var count=0;count<=(bountiful is null ? 0:input.AutoGather ? Math.Min(1,purchasableAttempts):purchasableAttempts);count++)
                 {
                     cancellation.ThrowIfCancellationRequested();
                     var cost=prefixCost+restored*(restore?.Spec.Cost ?? 0)+cleared*(clear?.Spec.Cost ?? 0)+count*(bountiful?.Spec.Cost ?? 0);
@@ -81,7 +98,8 @@ public static class GpOptimizer
                     var firstClear=active.FirstAttemptBonus>0 && cleared>overlap;
                     var expected=ordinary*(cleared*clearSuccess+(attempts-cleared)*success)
                         +bonus*(overlap*clearSuccess+(count-overlap)*success)+active.FirstAttemptBonus*(firstClear ? clearSuccess:success);
-                    if(bestAtCost.TryGetValue(cost,out var old) && old.ExpectedYield>=expected) continue;
+                    var clicks=prefix.Length+restored+cleared+count;
+                    if(bestAtCost.TryGetValue(cost,out var old) && (old.ExpectedYield>expected || old.ExpectedYield==expected && Clicks(old)<=clicks)) continue;
                     var actions=prefix.Select(action=>new GpActionUse(action,1)).ToList();
                     if(restored>0) actions.Add(new(restore!,restored));
                     if(cleared>0) actions.Add(new(clear!,cleared));
@@ -93,7 +111,7 @@ public static class GpOptimizer
         var frontier=new List<GpPlan>(); decimal maximum=-1;
         foreach(var plan in bestAtCost.Values.OrderBy(plan=>plan.Cost))
             if(plan.ExpectedYield>maximum) { frontier.Add(plan); maximum=plan.ExpectedYield; }
-        var best=frontier.Last(plan=>plan.Cost<=input.Budget);
+        var best=Pick(bestAtCost.Values,input.Budget);
         var next=frontier.FirstOrDefault(plan=>plan.Cost>input.Budget && plan.ExpectedYield>best.ExpectedYield);
         var baseline=input.SuccessPercent/100m*(input.Attempts*(input.BaseYield+input.BoonPercent/100m*(active.Tidings ? 2:1))+active.FirstAttemptBonus);
         return new(input,baseline,best,next,Array.AsReadOnly(frontier.ToArray()));

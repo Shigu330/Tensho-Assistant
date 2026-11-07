@@ -30,6 +30,7 @@ internal sealed partial class MainWindow
 
     private void DrawItems()
     {
+        DrawAnnotatedItems();
         Heading(localization.Get("ItemsUi.Title"), localization.Get("ItemsUi.Description"));
         // 0.272 (R-06 step 3): the item sheet holds Stocks, Craft, Usages and Gathering; requests for those tabs (focus flags set
         // by menus and other tools) open the sheet on the matching tab.
@@ -206,7 +207,8 @@ internal sealed partial class MainWindow
             finally { ImGui.EndTabBar(); }
         }
 
-        var live = inventory.Current;
+        // 0.741 (user report): the last reading of the bags while a change is being read, so that counts do not fall to 0 for a moment.
+        var live = inventory.Shown;
         var bankState = bank.State;
         var character = bankBridge.State.CharacterId;
         var catalog = itemCatalog.State.Catalog;
@@ -228,6 +230,7 @@ internal sealed partial class MainWindow
         var summary = groupedHoldings;
         DrawHoldingsSummary(summary);
         DrawStorageGroups(summary);
+        DrawOtherCharacterStocks((uint)itemId,character,bankState);
         if (includeRecipes) DrawRecipes();
         if (bankState.Loading) ImGui.TextDisabled(localization.Get("HoldingsUi.Loading"));
         if (bankState.Error is { } error) DrawDataError(error,"ServiceErrors.Bank");
@@ -382,6 +385,7 @@ internal sealed partial class MainWindow
             {
                 ImGui.Spacing();
                 if (showOutputs) DrawRecipeOutput(recipe);
+                DrawRecipeFacts(recipe);
                 ImGui.TextColored(Accent, localization.Format("RecipeUi.JobLevel",recipe.CraftType,recipe.Level));
                 ImGui.SameLine();
                 ImGui.TextDisabled(localization.Format("RecipeUi.Yield",recipe.ResultAmount));
@@ -627,7 +631,8 @@ internal sealed partial class MainWindow
 
     private void RefreshRecipeHoldingsCache()
     {
-        var live = inventory.Current;
+        // 0.744 (user report, found by the « List zero » line of 0.743): the counts of lists and panels; 0.741 had put this on the item sheet's stock view instead.
+        var live = inventory.Shown;
         var bankState = bank.State;
         var character = bankBridge.State.CharacterId;
         if (ReferenceEquals(recipeHoldingsLive, live) && ReferenceEquals(recipeHoldingsBank, bankState)
@@ -651,8 +656,9 @@ internal sealed partial class MainWindow
     {
         if (!summary.HasObservation) return localization.Get("RecipeUi.UnknownStock");
         var value = $"NQ {summary.Nq:N0} · HQ {summary.Hq:N0}";
-        if (summary.HasUnknown) return localization.Format("RecipeUi.Partial",value);
         var missing = Math.Max(0, required - summary.Total);
+        // 0.735 (user report): a lower bound that already covers the need is enough: crystals held by retainers are never read, yet 490 of 5 is OK.
+        if (summary.HasUnknown) return localization.Format(missing == 0 ? "RecipeUi.PartialEnough":"RecipeUi.Partial",value);
         return missing == 0 ? $"{value} · OK" : localization.Format("RecipeUi.Missing",value,missing.ToString("N0"));
     }
 

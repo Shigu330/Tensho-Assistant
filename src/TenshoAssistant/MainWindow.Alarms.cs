@@ -38,6 +38,30 @@ internal sealed partial class MainWindow
 
     private int DefaultAlarmLead=>configuration.AlarmOptions?.LeadMinutes ?? 5;
 
+    private Guid? alarmEditing;
+    private string alarmEditDate="";private Guid? alarmEditDateFor;
+    private void DrawAlarmEdit(TenshoAlarm alarm,DateTimeOffset now,ref bool changed)
+    {
+        ImGui.Indent();
+        var label=alarm.Label;ImGui.SetNextItemWidth(220);
+        if(ImGui.InputText(localization.Get("Alarms.EditName")+"##AlarmEditName",ref label,100) && label.Trim().Length>0)alarm.Label=label;
+        if(ImGui.IsItemDeactivatedAfterEdit())changed=true;
+        Tip("Alarms.EditNameTip");
+        if(alarm.Repeat==AlarmRepeat.Once)
+        {
+            if(alarmEditDateFor!=alarm.Id){alarmEditDateFor=alarm.Id;alarmEditDate=alarm.At.ToLocalTime().ToString("yyyy-MM-dd HH:mm",System.Globalization.CultureInfo.InvariantCulture);}
+            ImGui.SetNextItemWidth(160);
+            ImGui.InputText(localization.Get("Alarms.EditDate")+"##AlarmEditDate",ref alarmEditDate,20);
+            Tip("Alarms.EditDateTip");
+            if(WorldClocks.ParseLocal(alarmEditDate,now) is { } moved)
+            {
+                if(ImGui.IsItemDeactivatedAfterEdit()){alarm.At=moved;alarm.LastOccurrence=default;alarm.LastRung=default;alarm.LastOnTime=default;changed=true;}
+            }
+            else ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Alarms.EditDateBad"));
+        }
+        if(alarm.GameName.Length>0)ImGui.TextColored(Accent,localization.Get("Alarms.EditInGame"));
+        ImGui.Unindent();
+    }
     private void AddAlarms(IReadOnlyList<TenshoAlarm> added)
     {
         configuration.Alarms??=[];
@@ -188,9 +212,15 @@ internal sealed partial class MainWindow
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.LeadHint",alarm.LeadMinutes)+(weatherNote is null ? "":"\n"+localization.Get(weatherNote)));
     }
 
-    private string AlarmWhen(TenshoAlarm alarm)=>alarm.Repeat==AlarmRepeat.EorzeaDaily
-        ? localization.Format("Alarms.Daily",$"{alarm.EtMinute/60:00}:{alarm.EtMinute%60:00}")
-        : alarm.At.ToLocalTime().ToString("g");
+    private string AlarmWhen(TenshoAlarm alarm)=>alarm.Repeat switch
+    {
+        AlarmRepeat.EorzeaDaily=>localization.Format("Alarms.Daily",$"{alarm.EtMinute/60:00}:{alarm.EtMinute%60:00}"),
+        AlarmRepeat.RealDaily=>localization.Format("Alarms.RealDaily",alarm.At.ToLocalTime().ToString("t")),
+        AlarmRepeat.RealWeekly=>localization.Format("Alarms.RealWeekly",alarm.At.ToLocalTime().ToString("dddd t")),
+        AlarmRepeat.DailyReset=>localization.Get("Alarms.AtDailyReset"),
+        AlarmRepeat.WeeklyReset=>localization.Get("Alarms.AtWeeklyReset"),
+        _=>alarm.At.ToLocalTime().ToString("g"),
+    };
 
     // Alarm group (0.202): the item, or the weather / vista / name the alarm was created for, with its icon.
     private static string AlarmGroupKey(TenshoAlarm alarm)=>alarm.ItemId!=0 ? $"item:{alarm.ItemId}":alarm.Group.Length>0 ? alarm.Group
@@ -218,7 +248,7 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(localization.Get("Alarms.Help"));
         if(alarmStatus.Length>0)ImGui.TextColored(Accent,alarmStatus);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("Alarms.SettingsTitle")+"###AlarmSettingsPage"))DrawAlarmSettings();
-        var now=DateTimeOffset.UtcNow;var changed=false;var remove=new List<TenshoAlarm>();
+        var now=DateTimeOffset.UtcNow;var changed=false;var remove=new List<TenshoAlarm>();var added=new List<TenshoAlarm>();
         // 0.326: an armed « Delete all » not drawn on the previous frame (page left, header folded, group gone) is dropped.
         if(alarmGroupDeleteArmed is not null && ImGui.GetFrameCount()>alarmGroupDeleteSeenFrame+1)alarmGroupDeleteArmed=null;
         if(alarms.Count==0)ImGui.TextDisabled(localization.Get("Alarms.Empty"));
@@ -285,9 +315,17 @@ internal sealed partial class MainWindow
                         if(configuration.Discord is { Enabled:true })
                         {
                             ImGui.SameLine();
-                            var toDiscord=members.All(alarm=>alarm.Discord);
-                            if(ImGui.Checkbox(localization.Get("Discord.GroupOn")+"##GroupDiscord",ref toDiscord)){foreach(var alarm in members)alarm.Discord=toDiscord;changed=true;}
-                            Tip("Discord.GroupOnTip");
+                            // 0.584 (user request): a reminder's alarms are set in Reminders only, no second box here.
+                            if(members.All(alarm=>DiscordWebhook.ReminderRowOf(alarm).Length>0))
+                            {
+                                ImGui.TextDisabled(localization.Get("Discord.SetInReminders"));
+                            }
+                            else
+                            {
+                                var toDiscord=members.All(alarm=>alarm.Discord);
+                                if(ImGui.Checkbox(localization.Get("Discord.GroupOn")+"##GroupDiscord",ref toDiscord)){foreach(var alarm in members)alarm.Discord=toDiscord;changed=true;}
+                                Tip("Discord.GroupOnTip");
+                            }
                         }
                         if(first.ItemId!=0){ImGui.SameLine();if(ImGui.SmallButton(localization.Get("Alarms.OpenItem"))){SelectItem(first.ItemId);OpenItemSheet();}}
                         if(first.TerritoryId!=0){ImGui.SameLine();if(ImGui.SmallButton(localization.Get("Navigation.Weather"))){OpenWeather(first.TerritoryId,maps.State.Catalog?.Entries.FirstOrDefault(map=>map.TerritoryId==first.TerritoryId)?.Zone ?? "");}}
@@ -342,7 +380,15 @@ internal sealed partial class MainWindow
                                             }
                                         }
                                         ImGui.SameLine();
+                                        // 0.557 (T19): name and date on the player's own alarms (an automatic alarm follows its deadline), and « remind me later ».
+                                        if(alarm.AutoKey.Length==0 && ImGui.SmallButton(localization.Get("Alarms.Edit")+"##AlarmEdit"))alarmEditing=alarmEditing==alarm.Id ? null:alarm.Id;
+                                        if(alarm.AutoKey.Length==0){Tip("Alarms.EditTip");ImGui.SameLine();}
+                                        var snooze=configuration.AlarmOptions?.SnoozeMinutes ?? 5;
+                                        if(ImGui.SmallButton(localization.Format("Alarms.Snooze",snooze)+"##AlarmSnooze"))added.Add(AlarmSchedule.Snooze(alarm,now,snooze));
+                                        Tip("Alarms.SnoozeTip");
+                                        ImGui.SameLine();
                                         if(ImGui.SmallButton(localization.Get("Alarms.Delete")))remove.Add(alarm);
+                                        if(alarmEditing==alarm.Id)DrawAlarmEdit(alarm,now,ref changed);
                                         Tip("Alarms.DeleteTip");
                                     }
                                     finally{ImGui.PopID();}
@@ -376,6 +422,7 @@ internal sealed partial class MainWindow
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.AddDailyTip",AlarmSchedule.ClampLead(AlarmRepeat.EorzeaDaily,DefaultAlarmLead)));
         // 0.386 (g, X-10): the same label at a real local date, once.
         DrawManualDateAlarm();
+        if(added.Count>0)AddAlarms(added);
         if(changed)
             try{save();}catch(Exception error){log.Warning(error,"Alarms could not be saved.");alarmStatus=localization.Get("Alarms.SaveFailed");}
         DrawGameAlarms();
@@ -432,6 +479,14 @@ internal sealed partial class MainWindow
         if(DefaultButton("AlarmSound",sound!=defaults.Sound)){sound=defaults.Sound;changed=true;}
         changed|=ImGui.Checkbox(localization.Get("Alarms.Chat"),ref chat);Tip("Advanced.ChatTip");
         if(DefaultButton("AlarmChat",chat!=defaults.Chat)){chat=defaults.Chat;changed=true;}
+        var snoozeMinutes=options.SnoozeMinutes;ImGui.SetNextItemWidth(100);
+        if(ImGui.InputInt(localization.Get("Alarms.SnoozeMinutes"),ref snoozeMinutes,1))options.SnoozeMinutes=Math.Clamp(snoozeMinutes,1,1440);
+        if(ImGui.IsItemDeactivatedAfterEdit())changed=true;Tip("Advanced.SnoozeMinutesTip");
+        if(DefaultButton("AlarmSnooze",options.SnoozeMinutes!=defaults.SnoozeMinutes)){options.SnoozeMinutes=defaults.SnoozeMinutes;changed=true;}
+        var onTime=options.RingOnTime;
+        if(ImGui.Checkbox(localization.Get("Alarms.RingOnTime"),ref onTime)){options.RingOnTime=onTime;changed=true;}
+        Tip("Advanced.RingOnTimeTip");
+        if(DefaultButton("AlarmRingOnTime",onTime!=defaults.RingOnTime)){options.RingOnTime=defaults.RingOnTime;changed=true;}
         changed|=ImGui.Checkbox(localization.Get("Alarms.MuteInDuties"),ref mute);Tip("Advanced.MuteTip");
         if(DefaultButton("AlarmMute",mute!=defaults.MuteInDuties)){mute=defaults.MuteInDuties;changed=true;}
         // Queue step e (audit 2026-11-02): no [Tensho] chat line in a duty either; greyed while it can have no effect (no silence, no chat line).
@@ -468,7 +523,7 @@ internal sealed partial class MainWindow
         if(!changed)return;
         var previous=configuration.AlarmOptions;
         // 0.319: the command delay (Settings › Advanced) is kept; it went back to 500 ms whenever an alarm setting changed.
-        configuration.AlarmOptions=new(){LeadMinutes=Math.Clamp(lead,0,1440),Sound=Math.Clamp(sound,0,5),PlaySound=play,Chat=chat,MuteInDuties=mute,MuteChatInDuties=muteChat,
+        configuration.AlarmOptions=new(){RingOnTime=options.RingOnTime,SnoozeMinutes=options.SnoozeMinutes,LeadMinutes=Math.Clamp(lead,0,1440),Sound=Math.Clamp(sound,0,5),PlaySound=play,Chat=chat,MuteInDuties=mute,MuteChatInDuties=muteChat,
             UseGameAlarms=useGame,GameIncludeWeather=gameWeather,GameCommandDelayMs=previous.GameCommandDelayMs,DutyPopAlert=previous.DutyPopAlert,
             AutoAlarms=previous.AutoAlarms};
         try{save();}catch(Exception error){configuration.AlarmOptions=previous;log.Warning(error,"Alarm settings could not be saved.");}

@@ -1,3 +1,4 @@
+using TenshoAssistant.Competitive;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Gui.Dtr;
@@ -28,11 +29,13 @@ public sealed class CurrencyDtrEntry : IDisposable
         entry=bar.Get("Tensho Assistant · Monnaies");
         entry.Shown=false;
         entry.OnClick=_=>open();
-        framework.Update+=OnUpdate;
+        CompetitiveGate.AddAlways(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework _)
     {
+        // DEC-038: gone from the server bar during a competitive cut; the next tick after it shows it again.
+        if(CompetitiveGate.Cut){entry.Shown=false;return;}
         var now=DateTimeOffset.UtcNow;
         if(disposed || now<nextRefresh)return;
         nextRefresh=now.AddSeconds(1);
@@ -52,7 +55,7 @@ public sealed class CurrencyDtrEntry : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        CompetitiveGate.RemoveAlways(framework,OnUpdate);
         entry.Remove();
     }
 }

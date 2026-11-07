@@ -1,6 +1,8 @@
 namespace TenshoAssistant.Craft;
 
 public sealed record CraftPreset(Guid Id,string Name,uint RecipeId,uint ResultItemId,uint CraftTypeId,IReadOnlyList<CraftActionKind> Actions,DateTimeOffset SavedAt);
+/// <summary>0.590 (C16): the orders of the saved sequences' page.</summary>
+public enum CraftPresetSort {Saved,Name,Item,Job,Newest}
 public static class CraftPresets
 {
     public const int Capacity=100;
@@ -26,6 +28,47 @@ public static class CraftPresets
         bool Used(string candidate)=>source.Any(row=>row is not null && row.RecipeId==recipeId && string.Equals(row.Name?.Trim(),candidate.Trim(),StringComparison.OrdinalIgnoreCase));
         if(!Used(name))return name;
         for(var number=2;;number++)if($"{name} ({number})" is var candidate && !Used(candidate))return candidate;
+    }
+    /// <summary>0.590 (C16): a new name for a sequence, unique for its recipe; changing only its capitals is allowed.</summary>
+    public static IReadOnlyList<CraftPreset> Rename(IReadOnlyList<CraftPreset> source,int index,string name)
+    {
+        if(index<0 || index>=source.Count || source[index] is not { } row)throw new ArgumentOutOfRangeException(nameof(index));
+        var renamed=row with {Name=name.Trim()};
+        if(!Valid(renamed))throw new ArgumentException("A name of 1\u201380 characters is required.");
+        if(source.Where((_,position)=>position!=index).Any(other=>other is not null && other.RecipeId==row.RecipeId && string.Equals(other.Name?.Trim(),renamed.Name,StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException("This name already exists for this recipe.");
+        return Array.AsReadOnly(source.Select((other,position)=>position==index ? renamed:other).ToArray());
+    }
+    /// <summary>0.590 (C16): a copy of a sequence under the next free name, added at the end.</summary>
+    public static IReadOnlyList<CraftPreset> Duplicate(IReadOnlyList<CraftPreset> source,int index)
+    {
+        if(index<0 || index>=source.Count || source[index] is not { } row || !Valid(row))throw new ArgumentOutOfRangeException(nameof(index));
+        return Add(source,row with {Id=Guid.NewGuid(),Name=UniqueName(source,row.RecipeId,row.Name),SavedAt=DateTimeOffset.UtcNow});
+    }
+    /// <summary>
+    /// 0.590 (C16): the positions to show: every word of the search in the name, the item or the job, in the chosen order. An unreadable entry
+    /// has nothing to search: it shows only without a search, last.
+    /// </summary>
+    public static int[] View(IReadOnlyList<CraftPreset> source,string? query,CraftPresetSort sort,Func<CraftPreset,string> item,Func<CraftPreset,string> job)
+    {
+        var words=(query ?? "").Split(' ',StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries);
+        var rows=new List<int>();var unreadable=new List<int>();
+        for(var index=0;index<source.Count;index++)
+        {
+            if(source[index] is not { } row){if(words.Length==0)unreadable.Add(index);continue;}
+            var text=$"{row.Name} {item(row)} {job(row)}";
+            if(words.All(word=>text.Contains(word,StringComparison.OrdinalIgnoreCase)))rows.Add(index);
+        }
+        string Name(int index)=>source[index].Name ?? "";
+        IEnumerable<int> sorted=sort switch
+        {
+            CraftPresetSort.Name=>rows.OrderBy(Name,StringComparer.CurrentCultureIgnoreCase),
+            CraftPresetSort.Item=>rows.OrderBy(index=>item(source[index]),StringComparer.CurrentCultureIgnoreCase).ThenBy(Name,StringComparer.CurrentCultureIgnoreCase),
+            CraftPresetSort.Job=>rows.OrderBy(index=>job(source[index]),StringComparer.CurrentCultureIgnoreCase).ThenBy(Name,StringComparer.CurrentCultureIgnoreCase),
+            CraftPresetSort.Newest=>rows.OrderByDescending(index=>source[index].SavedAt),
+            _=>rows,
+        };
+        return sorted.Concat(unreadable).ToArray();
     }
     public static RecipeDefinition? Resolve(CraftPreset? preset,RecipeCatalog? catalog)=>Valid(preset) ? catalog?.ForResult(preset!.ResultItemId).FirstOrDefault(recipe=>recipe.RecipeId==preset.RecipeId && recipe.CraftTypeId==preset.CraftTypeId):null;
     public static IReadOnlyList<CraftPreset> Remove(IReadOnlyList<CraftPreset> source,int index)

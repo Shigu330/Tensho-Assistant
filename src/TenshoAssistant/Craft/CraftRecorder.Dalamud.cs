@@ -46,6 +46,7 @@ public sealed unsafe class CraftRecorder : IDisposable
 
     private bool OnUseAction(ActionManager* manager,ActionType type,uint actionId,ulong targetId,uint extraParam,ActionManager.UseActionMode mode,uint comboRouteId,bool* outOptAreaTargeted)
     {
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return hook!.Original(manager,type,actionId,targetId,extraParam,mode,comboRouteId,outOptAreaTargeted);
         // A-14 (0.452, review): OriginalDisposeSafe: Original throws into the game's frames once the hook is disposed.
         var result=hook!.OriginalDisposeSafe(manager,type,actionId,targetId,extraParam,mode,comboRouteId,outOptAreaTargeted);
         try

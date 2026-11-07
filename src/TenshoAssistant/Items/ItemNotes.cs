@@ -13,8 +13,20 @@ public sealed record ItemNote(string Text,bool Important,bool ToSell)
 /// Important Item and Sundried, read only). The dictionary is replaced whole on every change (copy on write): the framework thread
 /// reads it for the shop reminder without a lock. Notes are bounded (500 characters, 2 000 items).
 /// </summary>
+public enum AnnotatedFilter {All,Important,ToSell}
+public sealed record AnnotatedItem(uint ItemId,string Name,ItemNote Note);
+
 public static class ItemNotes
 {
+    /// <summary>0.607: the items with a real note or label, sorted by name; every word of the search in the name or the note.</summary>
+    public static AnnotatedItem[] Annotated(IReadOnlyDictionary<uint,ItemNote> notes,AnnotatedFilter filter,string? query,Func<uint,string> name)
+    {
+        var words=(query ?? "").Split(' ',StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries);
+        return notes.Where(pair=>pair.Value is not null && !pair.Value.Empty && (filter switch{AnnotatedFilter.Important=>pair.Value.Important,AnnotatedFilter.ToSell=>pair.Value.ToSell,_=>true}))
+            .Select(pair=>new AnnotatedItem(pair.Key,name(pair.Key),pair.Value))
+            .Where(row=>words.All(word=>row.Name.Contains(word,StringComparison.CurrentCultureIgnoreCase) || row.Note.Text.Contains(word,StringComparison.CurrentCultureIgnoreCase)))
+            .OrderBy(row=>row.Name,StringComparer.CurrentCultureIgnoreCase).ToArray();
+    }
     public const int MaximumText=500,MaximumItems=2000;
 
     /// <summary>A copy of the notes with this item's note set (an empty note removes it); null when the limit would be passed.</summary>

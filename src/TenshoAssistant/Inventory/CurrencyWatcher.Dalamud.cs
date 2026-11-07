@@ -36,11 +36,13 @@ public sealed unsafe class CurrencyWatcher : IDisposable
     public CurrencyWatchState State=>Volatile.Read(ref state);
     /// <summary>Called on the framework thread with the currencies that just crossed their threshold (alerts on only).</summary>
     public Action<IReadOnlyList<CurrencyBalance>>? Crossed { get; set; }
+    public Action<int,int>? WeeklyCapReached { get; set; }
+    private readonly WeeklyCapTracker weeklyCap=new();
 
     public CurrencyWatcher(IFramework framework,IClientState client,IPlayerState player,IDataManager data,Configuration configuration,IPluginLog log)
     {
         this.framework=framework;this.client=client;this.player=player;this.data=data;this.configuration=configuration;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     /// <summary>Called by the Currencies tab while shown (UI thread): reads keep going for 5 seconds even with alerts and bar off.</summary>
@@ -61,6 +63,7 @@ public sealed unsafe class CurrencyWatcher : IDisposable
             Volatile.Write(ref state,new(reading,over,false));
             warned=false;
             if(alerts && crossed.Count>0)Crossed?.Invoke(crossed);
+            if(weeklyCap.Reached(reading.Character,reading.WeeklyTomestones,reading.WeeklyLimit) && alerts && configuration.CurrencyWeeklyCapAlert)WeeklyCapReached?.Invoke(reading.WeeklyTomestones!.Value,reading.WeeklyLimit!.Value);
         }
         catch(Exception error)
         {
@@ -135,6 +138,6 @@ public sealed unsafe class CurrencyWatcher : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

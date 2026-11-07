@@ -41,8 +41,8 @@ internal sealed unsafe class QuestReader : IDisposable
         this.service = service; this.data = data; this.framework = framework;
         this.player = player; this.client = client; this.unlocks = unlocks; this.log = log;
         this.cacheLifetime=cacheLifetime ?? (()=>TimeSpan.FromMinutes(5));this.disk=disk;
-        framework.Update += OnUpdate;
-        try{client.Logout+=OnLogout;}catch{framework.Update-=OnUpdate;throw;}
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
+        try{client.Logout+=OnLogout;}catch{TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);throw;}
     }
     private void OnLogout(int type,int code)
     {
@@ -181,7 +181,7 @@ internal sealed unsafe class QuestReader : IDisposable
         {
             if (disposed) return;
             disposed = true;
-            framework.Update -= OnUpdate;
+            TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
             client.Logout-=OnLogout;
             service.Dispose(); entries.Clear(); quests = null;
             rewardJobs=null;rewardBonuses=null;rewardTomestones=null;rewardDataVersion=null;

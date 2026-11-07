@@ -1,3 +1,4 @@
+using TenshoAssistant.Gathering;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Items;
@@ -24,11 +25,31 @@ internal sealed partial class MainWindow
     private bool fishingPanelManual;
     // 0.398 (g, R-04): the bait in hand, copied on the framework thread (Gathering/FishingBaitReader); null = not a fisher or not read.
     internal Func<uint?>? FishingBait { get; set; }
+    internal Func<double?>? FishingIntuitionLeft { get; set; }
     internal void ToggleFishingPanel()=>fishingPanelManual=!fishingPanelManual;
     private Func<uint,float,float,(uint Id,string Name,float X,float Z,uint[] Fish)?>? fishingSpotAt;
     internal void ConfigureFishingHelp(Func<(uint Job,uint Territory,float X,float Z,bool Fishing)?> now,Func<uint,float,float,(uint Id,string Name,float X,float Z,uint[] Fish)?> spotAt)
     {fishingNow=now;fishingSpotAt=spotAt;}
 
+    // 0.568 (C9): time window and weather now, against what GatherBuddy gives for this fish. The zone's weather is computed once per period.
+    private (uint Territory,long Period,uint? Current,uint? Previous) fishNowWeather;
+    private void DrawFishNow(uint fishId,uint territory)
+    {
+        if(gatherBuddyFish?.State.Data?.Find(fishId) is not { } fish)return;
+        var moment=DateTimeOffset.UtcNow;var period=moment.ToUnixTimeSeconds()/1400;
+        if(fishNowWeather.Territory!=territory || fishNowWeather.Period!=period)
+        {
+            var forecast=weather.State.Catalog;
+            fishNowWeather=(territory,period,forecast?.Forecast(territory,moment,1)[0].Weather?.Id,forecast?.Forecast(territory,moment.AddSeconds(-1400),1)[0].Weather?.Id);
+        }
+        string Mark(bool? value)=>localization.Get(value switch{true=>"FishingPanel.NowYes",false=>"FishingPanel.NowNo",_=>"FishingPanel.NowUnknown"});
+        var parts=new List<string>();
+        if(fish.StartMinute is not null && fish.EndMinute is not null)parts.Add(localization.Format("FishingPanel.NowWindow",Mark(FishNow.InWindow(fish.StartMinute,fish.EndMinute,EorzeaMinutes()))));
+        if(fish.Weathers.Count>0)parts.Add(localization.Format("FishingPanel.NowWeather",Mark(FishNow.WeatherFits(fish.Weathers,fishNowWeather.Current))));
+        if(fish.Transitions.Count>0)parts.Add(localization.Format("FishingPanel.NowBefore",Mark(FishNow.WeatherFits(fish.Transitions,fishNowWeather.Previous))));
+        if(parts.Count==0)return;
+        ImGui.TextDisabled(string.Join(" · ",parts));
+    }
     internal void DrawFishingPanel()
     {
         if(windowDisposed || fishingNow?.Invoke() is not { } now)return;
@@ -51,6 +72,9 @@ internal sealed partial class MainWindow
                 if(ImGui.SmallButton(localization.Get("FishingPanel.Restart")))fishingSince=DateTimeOffset.UtcNow;
                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FishingPanel.RestartHelp"));
             }
+            // C28 (0.663): the time left of the intuition, from the character's status.
+            if(FishingIntuitionLeft?.Invoke() is { } intuitionLeft)
+                ImGui.TextColored(Accent,localization.Format("FishingPanel.IntuitionLeft",(int)intuitionLeft/60,(int)intuitionLeft%60));
             var bites=biteTimes?.Get(here.Id);
             var items=itemCatalog.State.Catalog;
             RefreshRecipeHoldingsCache();
@@ -82,6 +106,8 @@ internal sealed partial class MainWindow
                             ImGui.TableNextColumn();
                             var stock=GetRecipeHoldings(row.FishId);
                             ItemCell(fish,row.FishId,22,$"{fish?.Name ?? row.FishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
+                            if(ChainNeed(row.FishId,stock) is { } need)ImGui.TextColored(Accent,need);
+                            DrawFishNow(row.FishId,now.Territory);
                             ImGui.TableNextColumn();
                             for(var step=0;step<row.Route.Count;step++)
                             {
@@ -161,6 +187,7 @@ internal sealed partial class MainWindow
             {
                 parts.Add(localization.Format("FishingPanel.PredatorsShort",known.Predators.Count));
                 detail.Add(localization.Format("FishingPanel.Predators",string.Join(", ",known.Predators.Select(pair=>$"{items?.Find(pair.Fish)?.Name ?? pair.Fish.ToString()} ×{pair.Count}"))));
+                if(known.Intuition is { } intuition)detail.Add(localization.Format("FishingPanel.Intuition",intuition));
             }
             return (fishId,data.Route(fishId),known.Bite,known.HookSet,string.Join(" · ",parts),string.Join("\n",detail));
         }

@@ -18,6 +18,8 @@ communautaires (LuminaSupplemental, Garland, wiki, GatherBuddy, Teamcraft, prix 
 | Teamcraft (temps de touche) | MIT (code) ; relevés publics de ses utilisateurs, licence des données non relevée | `gubal.ffxivteamcraft.com/graphql` | `Community/FishBiteTimes.cs` | une requête par lieu de pêche (0.231) | « Sources » (`teamcraft-bites`) |
 | FFXIVGachaSpreadsheet (Infi) | MIT | `raw.githubusercontent.com/Infiziert90/FFXIVGachaSpreadsheet/refs/heads/master/website/static/data/` (`FashionReport.json`, `LastUpdate.json`) | `Fashion/FashionDataService.cs` | onglet Revue de mode | « Revue de mode » (`fashion`) |
 
+Source écartée : EorzeaWorld (`eorzeaworld.com`, relevé le 2026-11-06). Sa page À propos interdit l'usage de ses données dans les plugins, addons et outils tiers que les règles de FFXIV interdisent, et la reprise de ses contenus et scripts sans autorisation préalable ; ses pages de contenu répondent par une vérification humaine, à ne pas contourner. Aucune de ses données dans le plugin, sauf accord écrit de son auteur.
+
 Bornes : Garland, wiki, LuminaSupplemental, GatherBuddy et Revue de mode passent par `Community/BoundedHttp.cs` (taille et durée
 bornées) ; Universalis a ses propres bornes (`MarketService` 1 Mo / 12 s ; `MarketBoardService` 4 Mo / 15 s, une requête à la fois,
 3 s d'écart) ; Teamcraft : délai 20 s, réponse refusée au-delà d'un million de caractères (contrôle fait après la lecture). Cache

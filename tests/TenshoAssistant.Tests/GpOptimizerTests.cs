@@ -54,7 +54,8 @@ internal static class GpOptimizerTests
             {
                 var input=new GpScenario(sample%2==0 ? 16u:17u,random.Next(1,101),random.Next(0,1601),random.Next(1,9),random.Next(1,5),random.Next(0,101),random.Next(0,101),random.Next(1,4));
                 var actual=GpOptimizer.Solve(input,catalog); var expected=Oracle(input,catalog);
-                Check(actual.Best.Cost==expected.Cost && actual.Best.ExpectedYield==expected.Expected,$"oracle mismatch for {input}");
+                // 0.763 (X-16): the same yield, with the fewest clicks, may cost more than the cheapest; never more than the budget.
+                Check(actual.Best.ExpectedYield==expected.Expected && actual.Best.Cost<=input.Budget && actual.Best.Cost>=expected.Cost,$"oracle mismatch for {input}");
                 Check(actual.Best.Cost==actual.Best.Actions.Sum(use=>use.Count*use.Action.Spec.Cost) && actual.Best.Cost<=input.Budget,"no unsupported GP borrowing");
             }
         }),

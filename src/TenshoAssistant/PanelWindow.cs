@@ -32,7 +32,7 @@ internal sealed class PanelWindow : Window
 
     public override bool DrawConditions()
     {
-        try { return !broken && panel.Visible() && !(lastPosition is { } at && owner.BarBehindGame(at, lastSize)); }
+        try { return !broken && panel.Visible() && !(panel.StepsAside?.Invoke() != false && lastPosition is { } at && owner.BarBehindGame(at, lastSize, panel.Name)); }
         catch (Exception error) { TurnOff(error); return false; }
     }
 
@@ -67,4 +67,4 @@ internal sealed class PanelWindow : Window
 }
 
 /// <summary>What a panel window shows: <c>Wanted</c> is its setting, <c>Visible</c> the state of the moment; no <c>Close</c>, no close button.</summary>
-internal sealed record PanelDefinition(string Name, string Id, Vector2 At, ImGuiWindowFlags Flags, Func<bool> Wanted, Func<bool> Visible, Action Contents, Action? Close = null, Func<string>? Title = null, float? Alpha = null);
+internal sealed record PanelDefinition(string Name, string Id, Vector2 At, ImGuiWindowFlags Flags, Func<bool> Wanted, Func<bool> Visible, Action Contents, Action? Close = null, Func<string>? Title = null, float? Alpha = null, Func<bool>? StepsAside = null);

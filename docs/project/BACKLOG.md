@@ -13,7 +13,7 @@ Carte (MAP-001, plan : [MAP-016-PLAN](../goals/MAP-016-PLAN.md))
 - Repères d'exploration : **clos** (était « en pause » au 0.154) ; météo du wiki citée, affichée et utilisée par les alarmes depuis 0.201.
 - Icône de type de quête approximative (71141 calculé contre 71151 vu en jeu) ; correspondance `ObjectiveId` en partie non prouvée.
   Toujours ouvert : relevé en jeu attendu, pas bloquant pour D17 (le réglage dit « variante n »).
-- Type de marqueur des mandats (repères au bord de la carte, 0.298) : inconnu, à relever en jeu avec un mandat accepté.
+- Type de marqueur des mandats (repères au bord de la carte, 0.298) : relevé et traité en 0.652 ([preuve](../evidence/0.652-leve-markers.md)).
 - Cadres et textures du jeu tirés des ULD (R-06 étape 6) : cadre retiré en 0.510 (DEC-033), clos.
 
 Objets et collections

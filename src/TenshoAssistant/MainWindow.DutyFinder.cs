@@ -61,6 +61,7 @@ internal sealed partial class MainWindow
         ImGui.BeginGroup();
         ImGui.TextColored(Accent,duty.Name);
         ImGui.TextDisabled(localization.Format("DutyCounts.Level",duty.Category,duty.Level));
+        DrawDutyUnlock(duty);
         ImGui.EndGroup();
         // Source, freshness and refresh on one line; the long explanations go into the (i) tooltip.
         if(state.Loading)ImGui.TextDisabled(localization.Get("DutyUi.Loading"));
@@ -146,6 +147,24 @@ internal sealed partial class MainWindow
 
     // Right click on an item: the other tools for it (0.186) — item sheet, market, recipes, collection, then its sources.
     // 0.233: the same useful tools as the inventory menu and the context item panel (RelevantRoutes), then the item's sources.
+    /// <summary>0.561 (I9): prints a link to this item in the player's own chat, set by the plugin.</summary>
+    internal Action<uint>? ItemLinkToChat { get; set; }
+    /// <summary>
+    /// 0.762 (X-15): the point to go to for an item: one whose place on the map is known, an open one first (a point with no hours is always open), then one in the zone
+    /// the character stands in, then the cheapest teleport; ties by level. Null when the item is not gathered or no point is placed.
+    /// </summary>
+    private (Gathering.GatheringSource Source,(Maps.MapDefinition Map,Vector2 Pixel) Target)? GoThereSource(uint item)
+    {
+        if(gatheringCatalog.State.Catalog?.ForItem(item) is not { Count:>0 } sources)return null;
+        var here=ListPanelZoneHere();var now=DateTimeOffset.UtcNow;
+        return sources.Where(source=>!source.IsHidden).Select(source=>(Source:source,Target:GatheringPointPixel(source))).Where(pair=>pair.Target is not null)
+            .Select(pair=>(pair.Source,Target:pair.Target!.Value))
+            .OrderBy(pair=>pair.Source.Timing.Kind!=Gathering.GatheringScheduleKind.Limited
+                || Gathering.GatheringTime.Next(pair.Source.Timing,now,1).Openings.FirstOrDefault() is { } next && next.StartsAt<=now && now<next.EndsAt ? 0:1)
+            .ThenBy(pair=>pair.Source.Zone==here ? 0:1).ThenBy(pair=>ListPanelZoneCost(pair.Source.Zone) ?? uint.MaxValue).ThenBy(pair=>pair.Source.Level)
+            .Cast<(Gathering.GatheringSource,(Maps.MapDefinition,Vector2))?>().FirstOrDefault();
+    }
+
     private void ItemLinksMenu(string id,ItemDefinition? item)
     {
         if(item is null || !ImGui.BeginPopupContextItem(id))return;
@@ -159,6 +178,25 @@ internal sealed partial class MainWindow
                 && ImGui.Selectable(localization.Get("ItemMenu.TryOn")+$"##TryOn{item.Id}"))TryOnItem(item.Id);
             // 0.360 (g, C-09): add to or remove from the wishlist.
             DrawWishlistToggle(item);
+            // 0.762 (X-15, user request): « Go there » for an item that is gathered, as on the Gathering page: flag, Tensho map and the nearest aetheryte's teleport.
+            if(GoThereSource(item.Id) is { } go && ImGui.Selectable(localization.Get("GatheringDetails.GoThere")+$"##GoThere{item.Id}"))
+            {
+                if(configuration.GoThereEquip)EquipGatheringGearset(go.Source);
+                AskNearestAetheryteAt(go.Target.Map,go.Target.Pixel,string.IsNullOrWhiteSpace(go.Source.Place) ? go.Source.Zone:go.Source.Place,flag:true,direct:configuration.GoThereTeleport);
+            }
+            // 0.561 (I8, I9): the item's name, a link in your own chat, and its pages on the web; nothing is sent to the game's server.
+            if(ImGui.Selectable(localization.Get("ItemMenu.CopyName")+$"##CopyName{item.Id}"))ImGui.SetClipboardText(item.Name);
+            if(ItemLinkToChat is not null && ImGui.Selectable(localization.Get("ItemMenu.LinkChat")+$"##LinkChat{item.Id}"))ItemLinkToChat(item.Id);
+            if(ImGui.BeginMenu(localization.Get("ItemMenu.OpenOn")+$"##OpenOn{item.Id}"))
+            {
+                try
+                {
+                    if(ImGui.MenuItem("Universalis"))Dalamud.Utility.Util.OpenLink(ExternalLinks.Universalis(item.Id));
+                    if(ImGui.MenuItem("Garland Tools"))Dalamud.Utility.Util.OpenLink(ExternalLinks.Garland(item.Id));
+                    if(ImGui.MenuItem("Teamcraft"))Dalamud.Utility.Util.OpenLink(ExternalLinks.Teamcraft(localization.CurrentCode,item.Id));
+                }
+                finally{ImGui.EndMenu();}
+            }
             // 0.405 (user request): the game's crafting / gathering log, opened on this item.
             DrawGameLogEntries(item);
             ImGui.Separator();

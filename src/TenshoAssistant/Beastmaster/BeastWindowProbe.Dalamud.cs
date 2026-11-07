@@ -24,7 +24,7 @@ internal sealed class BeastWindowProbe : IDisposable
     public BeastWindowProbe(IFramework framework, IGameGui gui, IPluginLog log, Func<bool> developerMode)
     {
         this.framework = framework; this.gui = gui; this.log = log; this.developerMode = developerMode;
-        framework.Update += OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private static string Bounded(string text)
@@ -102,5 +102,5 @@ internal sealed class BeastWindowProbe : IDisposable
         }
     }
 
-    public void Dispose() => framework.Update -= OnUpdate;
+    public void Dispose() => TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
 }

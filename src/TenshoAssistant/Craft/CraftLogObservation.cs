@@ -10,10 +10,16 @@ public sealed record CraftLogObservation(ulong Owner,uint RecipeId,uint ItemId,u
 }
 public sealed record CraftLogOpenRequest(ulong Owner,uint RecipeId,uint ItemId);
 
+/// <summary>0.554 (C3): a crafter's attributes as last read while wearing that job; food and medicine included.</summary>
+public sealed record CraftJobStats(int Level,int Craftsmanship,int Control,int Cp,DateTimeOffset SeenAt);
+
 public sealed record CraftLogContext(RecipeDefinition? Recipe,CraftStats? Stats,string? Issue,int StartingQuality=0)
 {
+    /// <summary>0.554: the attributes are those last read for the recipe's job, on this date: the panel says so.</summary>
+    public DateTimeOffset? RememberedAt { get; init; }
+
     // X-11 (0.419): manipulation = the job has learned Manipulation (IUnlockState, read by the caller); it used to be always off.
-    public static CraftLogContext Resolve(CraftLogObservation observation,CharacterStatsState stats,RecipeCatalog? catalog,DateTimeOffset now,bool manipulation=false,bool specialist=false)
+    public static CraftLogContext Resolve(CraftLogObservation observation,CharacterStatsState stats,RecipeCatalog? catalog,DateTimeOffset now,bool manipulation=false,bool specialist=false,Func<uint,CraftJobStats?>? remembered=null)
     {
         if(!observation.Fresh(now))return new(null,null,"Crafting log selection too old or invalid.");
         var recipe=catalog?.ForResult(observation.ItemId).FirstOrDefault(row=>row.RecipeId==observation.RecipeId && row.CraftTypeId==observation.CraftTypeId);
@@ -23,11 +29,19 @@ public sealed record CraftLogContext(RecipeDefinition? Recipe,CraftStats? Stats,
         if(p.Quality>0 && (observation.StartingQuality is null || observation.MaximumQuality!=p.Quality))
             return new(recipe,null,"Crafting log starting quality missing or maximum quality incompatible; calculation suspended.");
         var starting=observation.StartingQuality ?? 0;
+        CraftLogContext WrongJob()
+        {
+            var seen=remembered?.Invoke(recipe.CraftTypeId+8);
+            if(seen is null || seen.Level is <1 or >100 || seen.Craftsmanship is <0 or >100000 || seen.Control is <0 or >100000 || seen.Cp is <0 or >10000
+                || seen.Craftsmanship<p.RequiredCraftsmanship || seen.Control<p.RequiredControl)
+                return new(recipe,null,$"Equip the {recipe.CraftType} job to calculate with its attributes.");
+            return new(recipe,new(seen.Level,seen.Craftsmanship,seen.Control,seen.Cp,manipulation,specialist),null,starting){RememberedAt=seen.SeenAt};
+        }
         if(starting<0 || starting>p.MaxStartingQuality)return new(recipe,null,"Crafting log starting quality outside the recipe's limits.");
-        if(observation.CurrentJobId!=recipe.CraftTypeId+8)return new(recipe,null,$"Equip the {recipe.CraftType} job to calculate with its attributes.");
+        if(observation.CurrentJobId!=recipe.CraftTypeId+8)return WrongJob();
         if(stats.CharacterId!=observation.Owner || stats.ObservedAt is not { } date || now<date || now-date>TimeSpan.FromSeconds(3))
             return new(recipe,null,"Waiting for the character's recent attributes.");
-        if(stats.JobId!=recipe.CraftTypeId+8)return new(recipe,null,$"Equip the {recipe.CraftType} job to calculate with its attributes.");
+        if(stats.JobId!=recipe.CraftTypeId+8)return WrongJob();
         if(!stats.Values.TryGetValue("Craftsmanship",out var cs) || !stats.Values.TryGetValue("Control",out var control)
             || !stats.Values.TryGetValue("CraftingPoints",out var cp) || stats.Level is <1 or >100 || cs is <0 or >100000 || control is <0 or >100000 || cp is <0 or >10000)
             return new(recipe,null,"Crafting attributes incomplete or incompatible.");

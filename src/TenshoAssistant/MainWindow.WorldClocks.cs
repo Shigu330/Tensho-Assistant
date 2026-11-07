@@ -61,21 +61,32 @@ internal sealed partial class MainWindow
     }
 
     // Manual one-off alarm at a real local date, beside the manual ET alarm.
+    // 0.577 (T0): how the alarm with a real date repeats.
+    private int alarmManualRepeat;
+    private static readonly AlarmRepeat[] ManualRepeats=[AlarmRepeat.Once,AlarmRepeat.RealDaily,AlarmRepeat.RealWeekly,AlarmRepeat.DailyReset,AlarmRepeat.WeeklyReset];
     private void DrawManualDateAlarm()
     {
+        ImGui.SetNextItemWidth(170);
+        ImGui.Combo("##AlarmManualRepeat",ref alarmManualRepeat,ManualRepeats.Select(repeat=>localization.Get("Alarms.Repeat"+repeat)).ToArray(),ManualRepeats.Length);
+        Tip("Alarms.RepeatTip");
+        ImGui.SameLine();
+        var chosenRepeat=ManualRepeats[Math.Clamp(alarmManualRepeat,0,ManualRepeats.Length-1)];
+        var byReset=chosenRepeat is AlarmRepeat.DailyReset or AlarmRepeat.WeeklyReset;
+        ImGui.BeginDisabled(byReset);
         ImGui.SetNextItemWidth(160);
         ImGui.InputTextWithHint("##AlarmDate",localization.Get("WorldClocks.DateHint"),ref alarmManualDate,16);
         Tip("WorldClocks.DateTip");
+        ImGui.EndDisabled();
         ImGui.SameLine();
-        var at=WorldClocks.ParseLocal(alarmManualDate,DateTimeOffset.UtcNow);
+        var at=byReset ? DateTimeOffset.UtcNow:WorldClocks.ParseLocal(alarmManualDate,DateTimeOffset.UtcNow);
         ImGui.BeginDisabled(at is null);
         try
         {
             if(ImGui.SmallButton(localization.Get("WorldClocks.AddOnce")) && at is { } when)
             {
                 AddAlarms([new TenshoAlarm{Label=alarmManualLabel.Trim().Length>0 ? alarmManualLabel.Trim():localization.Get("Alarms.ManualDefault"),
-                    Group=localization.Get("WorldClocks.Group"),Source=AlarmSource.Other,Repeat=AlarmRepeat.Once,At=when,
-                    LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead)}]);
+                    Group=localization.Get("WorldClocks.Group"),Source=AlarmSource.Other,Repeat=chosenRepeat,At=when,
+                    LeadMinutes=AlarmSchedule.ClampLead(chosenRepeat,DefaultAlarmLead)}]);
                 alarmManualDate="";
             }
         }

@@ -19,6 +19,7 @@ internal sealed class GatheringCatalogLoader : IDisposable
     private ExcelSheet<FishingNoteInfo>? fishNotes;
     private ExcelSheet<GatheringPoint>? points;
     private ExcelSheet<GatheringItem>? items;
+    private ExcelSheet<SpearfishingItem>? spearItems;
     private ExcelSheet<FishingSpot>? fishing;
     private ExcelSheet<GatheringPointTransient>? transient;
     private ExcelSheet<GatheringRarePopTimeTable>? rareTimes;
@@ -42,7 +43,7 @@ internal sealed class GatheringCatalogLoader : IDisposable
         this.framework = framework;
         this.log = log;
         this.cache = cache;
-        try { framework.Update += OnUpdate; }
+        try { TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate); }
         catch { cancellation.Dispose(); throw; }
     }
 
@@ -109,6 +110,7 @@ internal sealed class GatheringCatalogLoader : IDisposable
                 }
                 points ??= data.GetExcelSheet<GatheringPoint>();
                 items ??= data.GetExcelSheet<GatheringItem>();
+                spearItems ??= data.GetExcelSheet<SpearfishingItem>();
                 fishing ??= data.GetExcelSheet<FishingSpot>();
                 fishParameters ??= data.GetExcelSheet<FishParameter>();
                 fishNotes ??= data.GetExcelSheet<FishingNoteInfo>();
@@ -176,6 +178,14 @@ internal sealed class GatheringCatalogLoader : IDisposable
                         var place = point.PlaceName.Value.Name.ExtractText();
                         foreach (var reference in basis.Item)
                         {
+                            // C29 (0.649, docs/evidence/0.649-spearfishing-sources.md): a spearfishing point names SpearfishingItem rows.
+                            if (reference.RowId != 0 && reference.RowType == typeof(SpearfishingItem) && spearItems!.TryGetRow(reference.RowId, out var spear) && spear.Item.RowId != 0)
+                            {
+                                rows.Add(new(spear.Item.RowId, point.RowId, basis.RowId, type.RowId,
+                                    type.Name.ExtractText(), (uint)Math.Max(0, type.IconMain), basis.GatheringLevel,
+                                    territory.RowId, zone, place, territory.Map.RowId, false, false, ReadSchedule(point)));
+                                continue;
+                            }
                             if (reference.RowId == 0 || reference.RowType != typeof(GatheringItem)) continue;
                             var gatheringItem = items.GetRow(reference.RowId);
                             var item = gatheringItem.Item;
@@ -197,6 +207,7 @@ internal sealed class GatheringCatalogLoader : IDisposable
                 rows.Clear();
                 points = null;
                 items = null;
+                spearItems = null;
                 fishing = null;
                 transient = null;
                 rareTimes = null;
@@ -233,7 +244,7 @@ internal sealed class GatheringCatalogLoader : IDisposable
     private void Stop()
     {
         stopped = true;
-        framework.Update -= OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         rows.Clear();
         notebookRows.Clear();fishParameters=null;fishNotes=null;
         points = null;

@@ -1,5 +1,6 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using TenshoAssistant.Maps;
 using TenshoAssistant.Items;
 using TenshoAssistant.Leves;
 
@@ -23,6 +24,45 @@ internal sealed partial class MainWindow
     private string[] leveClients=[];
     private object? leveListsFor;
     private (int Completed,int Known,int Total) leveCount;
+
+    // W-08 (0.698, user request): right click, the nearest aetheryte: the flag on the place, the Tensho map on it, and the game's teleport question as everywhere else.
+    private void DrawLeveMenu(LeveDefinition leve)
+    {
+        if(!ImGui.BeginPopupContextItem($"LeveMenu{leve.Id}"))return;
+        try
+        {
+            void Entry(string key,LevePlace? place)
+            {
+                var map=place is null ? null:maps.State.Catalog?.Find(place.MapId);
+                ImGui.BeginDisabled(map is null || !MapHasAetheryte(map));
+                try
+                {
+                    if(ImGui.Selectable(localization.Get(key)) && map is not null && place is not null)
+                        AskNearestAetheryteAt(map,MapProjection.PixelFromWorld(new Vector3(place.X,0,place.Z),map),leve.Name,flag:true);
+                }
+                finally{ImGui.EndDisabled();}
+            }
+            Entry("Leves.AetheryteClient",leve.ClientPlace);
+            Entry("Leves.AetheryteStart",leve.StartPlace);
+        }
+        finally{ImGui.EndPopup();}
+    }
+
+    // 0.689 (user report): the tooltip gave only the row's id, in developer mode. It now says what the columns say, which a narrow window hides.
+    private string LeveTooltip(LeveDefinition leve)
+    {
+        var lines=new List<string>
+        {
+            leve.Name,
+            $"{localization.Get("Leves.ColumnLevel")} {leve.Level} · {leve.Type}",
+            $"{localization.Get("Leves.ColumnClient")} : {leve.Client}",
+            $"{localization.Get("Leves.ColumnZone")} : {leve.Zone}",
+            $"{localization.Get("Leves.ColumnGil")} : {leve.Gil:N0}",
+            localization.Format("Leves.TooltipAllowances",leve.Allowances),
+        };
+        if(developerMode)lines.Add($"Leve {leve.Id}");
+        return string.Join("\n",lines);
+    }
 
     private void DrawLeves()
     {
@@ -111,7 +151,8 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     DrawItemIcon(new ItemDefinition(0,leve.Name,false,leve.TypeIcon),size);ImGui.SameLine();
                     ImGui.TextUnformatted(leve.Name);
-                    if(developerMode && ImGui.IsItemHovered())WrappedTooltip($"Leve {leve.Id}");
+                    if(ImGui.IsItemHovered())WrappedTooltip(LeveTooltip(leve));
+                    DrawLeveMenu(leve);
                     ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Level.ToString());
                     ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Type);
                     ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Client);

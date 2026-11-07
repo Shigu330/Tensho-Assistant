@@ -70,6 +70,7 @@ internal sealed partial class MainWindow
     private void DrawGpPlanSettings()
     {
         BoolSetting("GatheringPanel.ListSetting","GatheringPanel.ListSettingTip",()=>configuration.GatherPlanFromList,value=>configuration.GatherPlanFromList=value,c=>c.GatherPlanFromList);
+        BoolSetting("GatheringPanel.ListHighlight","GatheringPanel.ListHighlightTip",()=>configuration.GatheringListHighlight,value=>configuration.GatheringListHighlight=value,c=>c.GatheringListHighlight);
         IntSetting("GatheringPanel.Regen","GatheringPanel.RegenTip",()=>configuration.GpRegenPerTick,value=>configuration.GpRegenPerTick=value,0,50,DefaultConfiguration.GpRegenPerTick);
         if(configuration.GpRegenBase>0)ImGui.TextDisabled(localization.Format("GatheringPanel.RegenObserved",configuration.GpRegenBase,GpTraitBonus(16),GpTraitBonus(17),GpTraitBonus(18)));
         BoolSetting("CollectablePanel.UseScrutiny","CollectablePanel.UseScrutinyTip",()=>configuration.CollectableUseScrutiny,value=>configuration.CollectableUseScrutiny=value,c=>c.CollectableUseScrutiny);
@@ -87,6 +88,14 @@ internal sealed partial class MainWindow
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("GpUi.ForbiddenTitle",forbidden.Count)+"###GpForbiddenActions"))return;
         ImGui.TextWrapped(localization.Get("GpUi.ForbiddenHelp"));
         if(gpActions.State.Catalog is not { } catalog){ImGui.TextDisabled(localization.Get("GatheringPanel.NoPlan"));return;}
+        // 0.728 (user request).
+        var highlight=configuration.GatheringNextHighlight;
+        if(ImGui.Checkbox(localization.Get("GatheringPanel.NextHighlight")+"###GatheringNextHighlight",ref highlight))
+        {
+            configuration.GatheringNextHighlight=highlight;
+            try{save();}catch(Exception error){log.Warning(error,"The hotbar highlight setting could not be saved.");}
+        }
+        Tip("GatheringPanel.NextHighlightTip");
         var changed=false;
         foreach(var (key,miner,botanist) in GpActionRules.Groups(catalog))
         {

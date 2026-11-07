@@ -19,6 +19,20 @@ internal sealed partial class MainWindow
     private ulong simulationCopiedOwner;
     private DateTimeOffset? simulationCopiedAt;
     private CraftSimulationResult? simulationResult;
+    // 0.553 (C4): the attributes a finished sequence needs, off the frame; only shown for the result they were computed from.
+    private (CraftSimulationResult Result,Task<CraftThresholds?> Task)? simulationThresholds;
+    private CancellationTokenSource? simulationThresholdsCancel;
+    private void StartSimulationThresholds(RecipeDefinition recipe,CraftStats stats,int quality,CraftSimulationResult result)
+    {
+        simulationThresholdsCancel?.Cancel();simulationThresholdsCancel?.Dispose();
+        var cancel=simulationThresholdsCancel=new CancellationTokenSource();var token=cancel.Token;var actions=simulationActions.ToArray();
+        simulationThresholds=(result,Task.Run(()=>
+        {
+            try{return CraftStatThresholds.Find(recipe,stats,quality,actions,token);}
+            catch(OperationCanceledException){return null;}
+            catch(Exception error){log.Warning(error,"The sequence's thresholds could not be computed.");return null;}
+        },token));
+    }
     private string? simulationError;
     private CraftSimulationResult? macroExportSimulation;
     private CraftMacroExport? craftMacroExport;
@@ -87,11 +101,40 @@ internal sealed partial class MainWindow
         else ImGui.TextDisabled(localization.Get("CraftMacro.WillUnknown"));
     }
     private string? craftMacroError;
+    // 0.572 (C15): once per change, never at each frame; an error stays until something changes.
+    private string simulationAutoKey="";
+    private bool SimulationAutoDue()
+    {
+        if(!CraftSearchOptions.AutoSimulate || simulationResult is not null || simulationActions.Count==0)return false;
+        var key=$"{simulationRecipe?.RecipeId}|{EffectiveCraftStats()}|{simulationQuality}|{string.Join(',',simulationActions)}";
+        if(key==simulationAutoKey)return false;
+        simulationAutoKey=key;
+        return true;
+    }
+    // 0.572 (C15): a recipe chosen from this page; the list is rebuilt only when the text changes.
+    private string simulationRecipeQuery="",simulationRecipeShown="";private RecipeDefinition[] simulationRecipeHits=[];
+    private void DrawSimulationRecipeSearch()
+    {
+        ImGui.SetNextItemWidth(260);
+        ImGui.InputTextWithHint("##SimulationRecipeSearch",localization.Get("CraftSimulation.RecipeSearch"),ref simulationRecipeQuery,60);
+        Tip("CraftSimulation.RecipeSearchTip");
+        if(simulationRecipeQuery!=simulationRecipeShown)
+        {
+            simulationRecipeShown=simulationRecipeQuery;
+            var items=itemCatalog.State.Catalog;var recipes=recipeCatalog.State.Catalog;
+            simulationRecipeHits=simulationRecipeQuery.Trim().Length<2 || items is null || recipes is null ? []
+                :items.Search(simulationRecipeQuery,100).SelectMany(item=>recipes.ForResult(item.Id)).Take(12).ToArray();
+        }
+        foreach(var hit in simulationRecipeHits)
+            if(ImGui.Selectable($"{itemCatalog.State.Catalog?.Find(hit.ResultItemId)?.Name ?? hit.ResultItemId.ToString()} · {hit.CraftType}##SimulationRecipe{hit.RecipeId}",hit.RecipeId==simulationRecipe?.RecipeId))
+            {OpenCraftSimulation(hit);simulationRecipeQuery="";simulationRecipeShown="";simulationRecipeHits=[];}
+    }
+    private readonly Dictionary<uint,int> simulationHq=[];
     private void OpenCraftSimulation(RecipeDefinition recipe)
     {
         if(simulationRecipe?.RecipeId!=recipe.RecipeId)
         {
-            simulationActions.Clear(); simulationResult=null; simulationError=null; simulationQuality=0;
+            simulationActions.Clear(); simulationResult=null; simulationError=null; simulationQuality=0; simulationHq.Clear();
             simulationCopiedAt=null; simulationCopiedOwner=0; simulationCs=simulationControl=simulationCp=0;
             simulationLevel=100; simulationManipulation=false;
             craftSolveTarget=recipe.Simulation?.Quality ?? 0;
@@ -118,7 +161,7 @@ internal sealed partial class MainWindow
         // 0.408 (user request): the full preparation (quantities, cost, sub-recipe chain) is a tab of this page; the item sheet keeps
         // a short view with a link here.
         // 0.464 (user request, in-game campaign): the crafting list is a tab too, with or without a recipe shown.
-        var preparation=false;var listsTab=false;
+        var preparation=false;var listsTab=false;var stockTab=false;
         if(ImGui.BeginTabBar("CraftPageTabs"))
         {
             try
@@ -129,11 +172,15 @@ internal sealed partial class MainWindow
                 { preparation=true; ImGui.EndTabItem(); }
                 if(ImGui.BeginTabItem(localization.Get("CraftSimulation.ListsTab")+"###CraftListsTab"))
                 { listsTab=true; ImGui.EndTabItem(); }
+                if(ImGui.BeginTabItem(localization.Get("CraftSimulation.StockTab")+"###CraftStockTab"))
+                { stockTab=true; ImGui.EndTabItem(); }
             }
             finally { ImGui.EndTabBar(); }
         }
         focusCraftPage=CraftPageTab.None;
         if(listsTab) { DrawCraftLists(); return; }
+        if(stockTab) { DrawCraftFromStock(); return; }
+        DrawSimulationRecipeSearch();
         if(simulationRecipe is not { } recipe) { ImGui.TextWrapped(localization.Get("CraftSimulation.ChooseRecipe")); return; }
         var resultItem=itemCatalog.State.Catalog?.Find(recipe.ResultItemId);
         DrawItemIcon(resultItem,new Vector2(36)); ImGui.SameLine();
@@ -151,6 +198,10 @@ internal sealed partial class MainWindow
         if(p.Collectable)ImGui.TextColored(Accent,localization.Get("SimulationHelp.Collectable"));
         // A-07 (0.435): expert recipes simulated in the normal condition, said so.
         if(p.Expert)ImGui.TextColored(Accent,localization.Get("CraftSimulation.ExpertNormal"));
+        // C6 (0.666): what these recipes ask, as the data gives it.
+        if(p.LevelScaled)ImGui.TextColored(Accent,localization.Get("CraftSimulation.LevelScaled"));
+        if(p.RequiredQuality>0)ImGui.TextColored(Accent,localization.Format("CraftSimulation.RequiredQuality",p.RequiredQuality.ToString("N0")));
+        if(p.MissionHigh>0)ImGui.TextColored(Accent,localization.Format("CraftSimulation.Mission",string.Join(" / ",new[]{p.MissionLow,p.MissionMid,p.MissionHigh}.Where(threshold=>threshold>0).Select(threshold=>threshold.ToString("N0")))));
         ImGui.TextDisabled(localization.Format("SimulationHelp.Parameters",p.Progress,p.Quality,p.Durability,p.RequiredCraftsmanship,p.RequiredControl));
         ImGui.TextWrapped(localization.Get("SimulationHelp.Model"));
         var stats=characterStats.State;
@@ -162,6 +213,16 @@ internal sealed partial class MainWindow
             simulationCopiedOwner=stats.CharacterId; simulationCopiedAt=stats.ObservedAt; simulationResult=null; simulationError=null;
         }
         DetectCraftState(recipe,job,canCopy,CopyStats);
+        // 0.554 (C3): the job is not worn: its attributes as last read.
+        if(!canCopy && stats.CharacterId!=0 && RememberedCraftStats(stats.CharacterId,job) is { } seenStats)
+        {
+            if(ImGui.SmallButton(localization.Format("CraftSimulation.UseRemembered",seenStats.SeenAt.ToLocalTime().ToString("g"))))
+            {
+                simulationLevel=seenStats.Level;simulationCs=seenStats.Craftsmanship;simulationControl=seenStats.Control;simulationCp=seenStats.Cp;
+                simulationCopiedOwner=0;simulationCopiedAt=null;simulationResult=null;simulationError=null;
+            }
+            Tip("CraftSimulation.UseRememberedTip");
+        }
         ImGui.BeginDisabled(!canCopy);
         try
         {
@@ -179,6 +240,27 @@ internal sealed partial class MainWindow
             changed|=CraftInput(localization.Get("CraftSimulation.Control")+"###SimControl",ref simulationControl,p.RequiredControl>0 ? simulationControl>=p.RequiredControl:null,"CraftSimulation.ControlTip");
             ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("CraftSimulation.Cp")+"###SimCp",ref simulationCp,0); Tip("CraftSimulation.CpTip");
             ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Format("CraftSimulation.StartingQuality",p.MaxStartingQuality)+"###SimQuality",ref simulationQuality,0); Tip("CraftSimulation.StartingQualityTip");
+            // C12 (0.669): from the HQ ingredients chosen.
+            var hqIngredients=recipe.Ingredients.Select(ingredient=>(Ingredient:ingredient,Item:itemCatalog.State.Catalog?.Find(ingredient.ItemId))).Where(entry=>entry.Item is { CanBeHq:true }).ToArray();
+            if(hqIngredients.Length>0 && p.MaxStartingQuality>0 && ImGui.TreeNode(localization.Get("CraftSimulation.HqIngredients")+"###SimHq"))
+            {
+                try
+                {
+                    foreach(var (ingredient,item) in hqIngredients)
+                    {
+                        var hq=simulationHq.GetValueOrDefault(ingredient.ItemId);
+                        ImGui.SetNextItemWidth(110);
+                        if(ImGui.SliderInt($"{item!.Name}###SimHq{ingredient.ItemId}",ref hq,0,ingredient.Amount))
+                        {
+                            simulationHq[ingredient.ItemId]=hq;
+                            simulationQuality=CraftStartingQuality.FromHq(hqIngredients.Select(entry=>(entry.Item!.ItemLevel,entry.Ingredient.Amount,simulationHq.GetValueOrDefault(entry.Ingredient.ItemId))),p.MaxStartingQuality);
+                            changed=true;
+                        }
+                        Tip("CraftSimulation.HqIngredientsTip");
+                    }
+                }
+                finally{ImGui.TreePop();}
+            }
             changed|=ImGui.Checkbox(localization.Get("CraftSimulation.Manipulation")+"###SimManipulation",ref simulationManipulation); Tip("CraftSimulation.ManipulationTip");
             // A-13 (0.434): specialist job.
             changed|=ImGui.Checkbox(localization.Get("CraftSimulation.Specialist")+"###SimSpecialist",ref simulationSpecialist); Tip("CraftSimulation.SpecialistTip");
@@ -229,9 +311,9 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,localization.Format("CraftSequence.Count",simulationActions.Count));
         if(ImGui.SmallButton(localization.Get("CraftSequence.Clear"))) { simulationActions.Clear(); simulationResult=null; simulationError=null; }
         ImGui.SameLine();
-        if(ImGui.Button(localization.Get("CraftSequence.Simulate")))
+        if(ImGui.Button(localization.Get("CraftSequence.Simulate")) || SimulationAutoDue())
         {
-            try { simulationResult=CraftSimulation.Run(recipe,EffectiveCraftStats(),simulationQuality,simulationActions); simulationError=null; }
+            try { simulationResult=CraftSimulation.Run(recipe,EffectiveCraftStats(),simulationQuality,simulationActions); StartSimulationThresholds(recipe,EffectiveCraftStats(),simulationQuality,simulationResult); simulationError=null; }
             catch(ArgumentException error)
             {
                 simulationResult=null;
@@ -246,6 +328,9 @@ internal sealed partial class MainWindow
         {
             var state=result.Final;
             ImGui.TextColored(state.Finish==CraftFinish.Completed ? Success:Accent,localization.Format("CraftSequence.Result",localization.Get(state.Finish switch {CraftFinish.Completed=>"CraftSequence.Completed",CraftFinish.Broken=>"CraftSequence.Broken",_=>"CraftSequence.Incomplete"}),state.Progress,p.Progress,state.Quality,p.Quality,state.Durability,state.Cp));
+            // C13 (0.668): the chance the game would give this quality.
+            if(state.Finish==CraftFinish.Completed && recipe.Simulation is { CanHq:true,Collectable:false,Quality:>0 } hqRecipe)
+                ImGui.TextDisabled(localization.Format("CraftSequence.HqChance",CraftHqChance.Percent(state.Quality,hqRecipe.Quality)));
             if(result.InvalidAction is { } invalid) ImGui.TextWrapped(localization.Format("SimulationHelp.Invalid",invalid+1,CraftMessage(result.Error ?? "—")));
             // A-13 (0.434): success assumed for the actions left to chance.
             if(result.Steps.Any(step=>CraftSimulation.Random(step.Action))) ImGui.TextColored(Accent,localization.Get("CraftSimulation.RandomAssumed"));
@@ -295,12 +380,14 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Format("CraftMacro.Options",craftMacroExtraWait,localization.Get(craftMacroEcho ? "CraftMacro.Yes":"CraftMacro.No")));
         // A-10 (0.422): Macro Chain loaded and pages chained: they end with its /nextmacro.
         if(configuration.MacroCopy?.Chain==true && MacroChainLoaded?.Invoke()==true)ImGui.TextDisabled(localization.Get("CraftMacro.MacroChain"));
+        if(simulationThresholds is { } thresholds && ReferenceEquals(thresholds.Result,result) && thresholds.Task.IsCompletedSuccessfully && thresholds.Task.Result is { } needed)
+            ImGui.TextWrapped(localization.Format("CraftSimulation.Thresholds",needed.Craftsmanship,needed.Control,needed.Cp,needed.CraftsmanshipMargin,needed.ControlMargin,needed.CpMargin));
         ImGui.BeginDisabled(result.Final.Finish!=CraftFinish.Completed || result.Error is not null);
         try
         {
             if(ImGui.Button(localization.Get("CraftMacro.Prepare")))
             {
-                try { craftMacroExport=CraftMacroExporter.Build(result,job,catalog,craftMacroExtraWait,craftMacroEcho,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true); craftMacroError=null; }
+                try { craftMacroExport=CraftMacroExporter.Build(result,job,catalog,craftMacroExtraWait,craftMacroEcho,configuration.MacroCopy?.Chain==true,craftMacroBuffWait,MacroChainLoaded?.Invoke()==true,CraftSearchOptions.BoundedEchoSound,CraftSearchOptions.EchoLastOnly); craftMacroError=null; }
                 catch(ArgumentException error) { craftMacroExport=null; craftMacroError="CraftMacro.Failed"; log.Warning(error,"Could not export craft macros."); }
             }
         }

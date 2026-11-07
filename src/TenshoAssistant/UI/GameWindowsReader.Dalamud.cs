@@ -20,7 +20,7 @@ internal sealed unsafe class GameWindowsReader : IDisposable
     public GameWindowsReader(IFramework framework,IClientState client,IGameGui gui,IPluginLog log,Func<bool> developerMode)
     {
         this.framework=framework;this.client=client;this.gui=gui;this.log=log;this.developerMode=developerMode;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework unused)
@@ -65,5 +65,5 @@ internal sealed unsafe class GameWindowsReader : IDisposable
         }
     }
 
-    public void Dispose()=>framework.Update-=OnUpdate;
+    public void Dispose()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
 }

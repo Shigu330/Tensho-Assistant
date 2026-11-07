@@ -91,6 +91,7 @@ internal sealed partial class MainWindow
                         var categoryId=zone.CategoryId;var categoryIds=zone.CategoryIds;var itemIds=zone.ItemIds;
                         var itemLevelMin=zone.ItemLevelMin;var itemLevelMax=zone.ItemLevelMax;var equipLevelMin=zone.EquipLevelMin;var equipLevelMax=zone.EquipLevelMax;
                         var sellMin=(int)Math.Min(zone.SellPriceMin,int.MaxValue);var sellMax=(int)Math.Min(zone.SellPriceMax,int.MaxValue);var rarity=zone.Rarity;
+                        var zoneJob=zone.Job;var inGearset=(int)zone.InGearset;
                         var traits=new[]{(int)zone.Unique,(int)zone.Untradable,(int)zone.Dyeable,(int)zone.Repairable,(int)zone.Collectable};
                         changed|=ImGui.InputText(localization.Get("SortUi.ZoneName"),ref name,80);Tip("SortUi.ZoneNameTip");
                         ImGui.SetNextItemWidth(100);changed|=ImGui.InputInt(localization.Get("SortUi.FirstSlot"),ref start);Tip("SortUi.FirstSlotTip");
@@ -158,6 +159,21 @@ internal sealed partial class MainWindow
                                 finally{ImGui.EndCombo();}
                             }
                             Tip("SortUi.EquipmentTip");
+                            // 0.595 (I21): the gear of a job, the pieces of the game's gear sets.
+                            GearsetSource?.Want();
+                            ImGui.SetNextItemWidth(250);
+                            if(ImGui.BeginCombo(localization.Get("SortUi.JobFilter"),zoneJob==0 ? localization.Get("SortUi.AnyJob"):JobName(zoneJob)))
+                            {
+                                try
+                                {
+                                    if(ImGui.Selectable(localization.Get("SortUi.AnyJob"),zoneJob==0) && zoneJob!=0){zoneJob=0;changed=true;}
+                                    foreach(var job in (GearsetSource?.State?.JobLevels.Keys ?? []).Where(job=>job is >0 and <=63).OrderBy(JobName,StringComparer.CurrentCultureIgnoreCase).ToArray())
+                                        if(ImGui.Selectable(JobName(job)+$"###SortJob{job}",zoneJob==job) && zoneJob!=job){zoneJob=job;changed=true;}
+                                }
+                                finally{ImGui.EndCombo();}
+                            }
+                            Tip("SortUi.JobFilterTip");
+                            ImGui.SetNextItemWidth(170);changed|=ImGui.Combo(localization.Get("SortUi.InGearset"),ref inGearset,localization.Get("SortUi.BooleanChoices"));Tip("SortUi.InGearsetTip");
                             if(ImGui.TreeNode(localization.Get("SortUi.Advanced")+"###Advanced"))
                             {
                                 try
@@ -178,7 +194,7 @@ internal sealed partial class MainWindow
                             ImGui.TextWrapped(localization.Get("SortUi.MetadataHelp"));
                         }
                         finally{ImGui.EndDisabled();}
-                        zones[index]=zone with{Name=name,Start=Math.Clamp(start,1,scope.Capacity)-1,Count=Math.Clamp(count,1,scope.Capacity),Quality=(InventoryQualityFilter)quality,Query=query,Preserve=preserve,ReverseFill=reverse,
+                        zones[index]=zone with{Job=zoneJob,InGearset=(InventoryPropertyFilter)inGearset,Name=name,Start=Math.Clamp(start,1,scope.Capacity)-1,Count=Math.Clamp(count,1,scope.Capacity),Quality=(InventoryQualityFilter)quality,Query=query,Preserve=preserve,ReverseFill=reverse,
                             Marketable=(InventoryPropertyFilter)marketable,CanBeHq=(InventoryPropertyFilter)potentialHq,Equipment=equipment,CategoryId=categoryId,CategoryIds=categoryIds,ItemIds=itemIds,ShareUnused=share,
                             ItemLevelMin=itemLevelMin,ItemLevelMax=itemLevelMax,EquipLevelMin=equipLevelMin,EquipLevelMax=equipLevelMax,SellPriceMin=(uint)sellMin,SellPriceMax=(uint)sellMax,Rarity=rarity,
                             Unique=(InventoryPropertyFilter)traits[0],Untradable=(InventoryPropertyFilter)traits[1],Dyeable=(InventoryPropertyFilter)traits[2],

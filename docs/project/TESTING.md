@@ -230,7 +230,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Relevés en jeu demandés (preuves, pas des réglages)**
 
-- [ ] Mandat accepté, carte ouverte : relever le type de marqueur d'un mandat (repères au bord « Mandats et autres événements », 0.298).
+- [x] Mandat accepté, carte ouverte : relever le type de marqueur d'un mandat (repères au bord « Mandats et autres événements », 0.298).
 - [ ] Icônes de quête 71141 / 71151 : seulement avec un relevé en jeu (STATUS, points décidés avant D17).
 
 **Encore listés « à valider » dans STATUS avant 0.232**
@@ -721,6 +721,528 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (rapport de l'utilisateur, 2026-11-05, « tous es ok ») (0.539) Déplacer une fenêtre du jeu qui a un panneau de Tensho (récolte, carnet, personnage, mission) : le panneau la suit sans retard visible.
 - [x] (rapport de l'utilisateur, 2026-11-05, « tous es ok ») (0.539) Réglage de la carte activé : un panneau lié qui touche la carte la fait disparaître ; passer d'une infobulle à l'autre ne la fait pas clignoter, et elle revient environ 1 seconde après.
+
+- [ ] (0.540) Journal du jardin : « Graines de centaurée » est dans la liste, avec 24 h ; une plantation de cette graine est reconnue dans le chat. Comparer la durée réelle.
+
+- [ ] (0.541) Mes outils, bloc d'objets : colonne de prix, coût de ce qui manque, bouton « Demander les prix ». Un objet invendable affiche un tiret.
+
+- [ ] (0.542) Carte, réglage « Zoom à l'ouverture » : régler un zoom, relancer le jeu : le dernier zoom revient. Tester aussi « Fixe » et « Carte entière », puis le zoom sur une quête.
+
+- [ ] (0.543) Carte : les quatre réglages des noms et des étiquettes de récolte changent bien l'affichage ; aux valeurs par défaut, rien ne change.
+
+- [x] (0.544) Carte : clic droit sur un point, puis sur le drapeau : « Éthérite la plus proche » donne le nom et le coût, et demande confirmation.
+
+- [ ] (0.545) Carte : la molette zoome aussi sur la colonne d'outils et le curseur ; le pas et l'inversion fonctionnent.
+
+- [ ] (0.546) Carte, réglage activé : un clic gauche sur un endroit vide pose le drapeau ; un glisser ne le pose pas ; un clic sur une icône garde son effet.
+
+- [ ] (0.547) Carte, bouton « Couches » : chaque case change la carte, comme dans les réglages ; « Tout masquer » puis « Tout afficher » ; la colonne tient dans une petite fenêtre.
+
+- [ ] (0.548) Carte : une ALEA à bonus affiche « bonus d'expérience » ; comparer avec l'icône de bonus du jeu. La zone reste rose.
+
+- [ ] (0.549) Porter puis retirer une pièce : la ligne « Équipement porté » suit ; la Revue de mode la dit possédée ; le tri ne la déplace pas.
+
+- [ ] (0.550) Quêtes : colonnes Niveau et Zone, tri en cliquant les titres, plage de niveaux gardée après une relance.
+
+- [ ] (0.551) Monstres : le bouton carte pose le drapeau à la position de la fiche ; comparer avec la position réelle en jeu.
+
+- [ ] (0.552) Carnet d'artisanat : une séquence enregistrée sur une autre recette de même difficulté est proposée, avec « Enregistrée pour ».
+
+- [ ] (0.553) Simulateur : les seuils affichés correspondent ; régler ces valeurs donne le même résultat. Comparer une macro en jeu aux seuils.
+
+- [ ] (0.554) Porter un métier d'artisan, puis un autre : le carnet calcule la recette du premier avec « relevés le… » ; porter le métier reprend les valeurs actuelles.
+
+- [ ] (0.555) Commandes : « /tensho prix » suivi d'un nom d'objet ouvre le marché de cet objet ; essayer aussi objet, recolte et recette, et un nom inconnu.
+
+- [ ] (0.556) Alarmes, réglage activé : l'alarme sonne avec son avance puis à l'heure ; une seule fois chacune, en chat comme en son.
+
+- [ ] (0.557) Alarmes : modifier un nom et une date ; « Dans 5 min » ajoute une alarme qui sonne ; une date passée ou mal écrite est refusée.
+
+- [ ] (0.558) Rappels : finir les quêtes de tribu ou les commandes spéciales : la case se coche seule, et le compteur de la barre suit. Vérifier qu'une connexion ne coche rien à tort.
+
+- [ ] (0.559) Préparation et chaîne : le survol d'un matériau donne le détail par rangement, avec la date pour un servant.
+
+- [ ] (0.560) Calculer une chaîne, puis récolter un de ses matériaux : « Encore N pour… » apparaît et baisse.
+
+- [ ] (0.561) Menu d'un objet : copier le nom ; le lien s'affiche dans le chat, seulement pour vous ; les trois pages s'ouvrent sur le bon objet.
+
+- [ ] (0.562) Réglage activé : la fiche et l'infobulle montrent le nom anglais ; rien en client anglais.
+
+- [ ] (0.563) Météo : ajouter deux zones au tableau, comparer aux prévisions du jeu, retirer une zone ; le tableau reste après une relance.
+
+- [ ] (0.564) Discord : un message avec les cinq balises ; l'heure suit le fuseau du lecteur, et l'heure d'Éorzéa correspond.
+
+- [ ] (0.565) Aperçu du tri : les cases encadrées sont bien celles qui bougent ; le nombre correspond après application.
+
+- [ ] (0.566) Tri : copier un modèle, le supprimer, le coller : il revient et se charge. Un texte quelconque est refusé.
+
+- [ ] (0.567) Marché : le bouton copie le bon prix ; une offre de votre servant n'est pas prise pour la plus basse.
+
+- [ ] (0.568) Aide à la pêche : comparer « créneau », « météo » et « météo d'avant » à l'heure et à la météo du jeu, sur un poisson à conditions.
+
+- [ ] (0.569) Rien à voir en temps normal ; après une mise à jour du jeu, la ligne de la carte et de Diagnostics nomme ce qui manque.
+
+- [ ] (0.570) Rappels : déplier les tâches de servants après la cloche ; les heures correspondent, et les deux cloches créent leur alarme.
+
+- [ ] (0.571) Mini Cactpot : comparer la table affichée au ticket du jeu, somme par somme.
+
+- [ ] (0.572) Simulateur : chercher une recette et l'ouvrir ; ajouter une action : le résultat suit sans clic.
+
+- [ ] (0.573) Macros : régler le son et « dernière page seulement » ; la macro copiée suit, et le son s'entend en jeu.
+
+- [ ] (0.574) Préparation : cocher « Le moins cher du centre de données » : les prix et les mondes suivent, à comparer avec le tableau du marché.
+
+- [ ] (0.575) Préparation : un ingrédient vendu par un PNJ moins cher affiche son prix et « PNJ » ; comparer au marchand en jeu.
+
+- [ ] (0.576) Rangements : effacer le relevé d'un servant (deux clics) : ses objets quittent les stocks, et rouvrir le servant le relit.
+
+- [ ] (0.577) Alarmes : créer une alarme chaque jour et une à la remise à zéro : l'heure annoncée est juste, et elle revient après avoir sonné.
+
+- [ ] (0.578) Rappels, avec Discord activé : décocher une ligne : son alarme sonne sans message Discord ; une autre ligne en envoie toujours un.
+
+- [ ] (0.579) Équipement : cocher « Tous les jobs (mirage) » sur la page : la liste des pièces s'élargit, et la case des filtres suit.
+
+- [ ] (0.580) Équipement : choisir un autre job dans « Plan pour » : la liste de pièces est la sienne, le plan se garde, et revenir au job porté retrouve son plan.
+
+- [ ] (0.581) Revue de mode : cocher une pièce par emplacement ; les pièces possédées sont justes ; « Essayer la tenue » les met dans la cabine.
+
+- [ ] (0.582) Quêtes : « Disponibles maintenant » et « Cette zone » : comparer à quelques quêtes du jeu ; une quête refusée par le jeu malgré le filtre est à signaler.
+
+- [ ] (0.583) Quêtes : sur une quête d'épopée lointaine, la liste et « À prendre ensuite » correspondent au journal du jeu.
+
+- [ ] (0.584) Alarmes : un groupe issu de Rappels n'a plus de case Discord ; décocher ou cocher la ligne dans Rappels décide seul de l'envoi.
+
+- [ ] (0.585) Équipement, « Plan pour » : le texte est à gauche de la liste ; ni 44 ni 45 ; le job porté a sa majuscule.
+
+- [ ] (0.586) Carte : menu de Noscea, Thanalan, forêts : l'aile s'affiche, colorée si vous pouvez voler ; comparer en essayant de voler dans une de ces zones.
+
+- [x] (rapport de l'utilisateur, 2026-11-05, « re ok ») (0.587) Carte : la roue dentée ouvre Paramètres, onglet Carte, au premier plan ; la fenêtre surgissante a disparu ; un réglage changé s'applique à la carte.
+
+- [ ] (0.588) Récolte, section « Ouverts maintenant ou bientôt » : comparer les heures à un point ouvert dans le jeu ; la cloche crée l'alarme.
+
+- [ ] (0.589) Lancer une synthèse sur une recette avec une séquence enregistrée : l'action suivante avance à chaque coup, « Conforme au plan » tant que les chiffres sont égaux, avertissement après un état Bonne ou une autre action.
+
+- [ ] (0.590) Page des séquences : chercher un mot, changer l'ordre, renommer, dupliquer, copier en texte puis coller dans « Importer une macro » du simulateur.
+
+- [ ] (0.591) Préparation d'un objet à sous-recettes : calculer la chaîne, vérifier une ligne par recette et l'ordre, ouvrir le carnet et le simulateur depuis une ligne, cocher une étape.
+
+- [ ] (0.592) Artisanat, onglet « Que puis-je fabriquer ? » : lancer la recherche, comparer quelques lignes à vos sacs, filtrer par métier et niveau.
+
+- [ ] (0.593) Page Équipement : créer un plan, changer des pièces, repasser au premier (pièces et matérias retrouvées), renommer, supprimer, partager le code du plan affiché.
+
+- [ ] (0.594) Banque : cocher « Afficher en liste », trier chaque colonne, filtrer, changer d'onglet, cliquer un objet.
+
+- [ ] (0.595) Règles de tri d'un rangement : une zone avec un job, une zone avec « Dans un set d'équipement » ; vérifier l'aperçu, puis le tri réel.
+
+- [ ] (0.596) Comparer une carte Tensho et celle du jeu : les noms doivent être du même côté de leurs icônes. Essayer la case « Noms des icônes » et le zoom minimal.
+
+- [ ] (0.597) Section Carte : chercher un lieu, une éthérite, un vendeur, un PNJ de Triple Triad, une quête et une ressource, cliquer chacun et vérifier le centre de la carte.
+
+- [ ] (0.598) Réglages › Alarmes › Discord › Un salon par catégorie : mettre une autre adresse pour une catégorie, faire sonner une alarme de cette catégorie et une autre, vérifier les deux salons.
+
+- [ ] (0.599) Accueil : vérifier chaque ligne d'« Aujourd'hui » contre Rappels, Compagnie, Quêtes et Alarmes, cliquer chacune, masquer une ligne et une tuile dans « Personnaliser ».
+
+- [ ] (0.600) Fiche objet d'une recette de livre de maître, onglet Craft : comparer la ligne à ce que dit le carnet du jeu.
+
+- [ ] (0.601) Difficile à provoquer sans mise à jour du jeu : à regarder après la prochaine. Panneau du carnet : la ligne HQ, synthèse rapide et livre s'affiche.
+
+- [ ] (0.602) Collections : ouvrir une fois, obtenir une monture ou une emote, actualiser : elle apparaît dans « Obtenus récemment ». Clic droit sur une emote.
+
+- [ ] (0.603) Avec deux compagnies relevées : deux cadres, chacun avec sa date.
+
+- [ ] (0.604) Pêcher : le panneau de pêche trouve bien le poste ; panneau de récolte : la ligne d'Abondance II s'affiche.
+
+- [ ] (0.605) Garder un sac ouvert : rien à voir, sinon moins d'écritures. Vérifier qu'un objet déplacé apparaît toujours dans la Banque et après un rechargement.
+
+- [ ] (0.606) Atteindre le plafond de la semaine avec les alertes activées : une alerte, pas deux.
+
+- [ ] (0.607) Objets : annoter deux objets, filtrer par étiquette et par texte, cliquer un objet.
+
+- [ ] (0.608) Préparation d'une recette à plusieurs ingrédients : « Lire les prix » répond en quelques secondes.
+
+- [ ] (0.609) Fiche d'un objet qu'un autre personnage possède : la ligne donne ses quantités.
+
+- [ ] (0.610) D'abord hors JcJ : tout marche comme avant, barre de serveur et carte comprises. Puis, un à la fois : quai de Wolves' Den, Crystalline Conflict personnalisé, Battlehall, Mahjong, donjon profond, avec la carte et des panneaux ouverts : tout disparaît, une ligne de chat, tout revient à la sortie.
+
+- [ ] (0.611) Journal Dalamud au chargement : « Competitive cut: N zones known ».
+
+- [ ] (0.612) Hall de l'Arène : Tensho reste actif, y compris pendant un match JcE. Puis un match de l'arène contre un joueur : Tensho se coupe.
+
+- [ ] (0.613) Match de l'arène contre un joueur : Tensho se coupe-t-il ? Le journal dit « PvP instance ».
+
+- [x] (0.614) Hall de l'Arène, duel contre un PNJ : le panneau Triple Triade s'affiche.
+
+- [ ] (0.615) Avec un lien de carte dans le chat pendant une coupure : il n'apparaît pas dans la liste des liens.
+
+- [ ] (0.616) Avec une seule plante notée : un entretien met à jour sa date, une plante arrachée la retire du journal. Avec plusieurs : une ligne de chat, rien ne change.
+
+- [ ] (0.617) Cliquer sur « Agrandir » avec une fenêtre du jeu ouverte : la carte reste visible. Ouvrir ensuite une autre fenêtre par-dessus : elle s'efface, puis revient.
+
+- [ ] (0.618) Carte agrandie : ouvrir l'inventaire, elle reste affichée. Taille normale : elle s'efface quand une fenêtre la touche, puis revient.
+
+- [ ] (0.619) Limsa Lominsa - Le Tillac : le troisième menu donne le nom de la zone et l'aérodrome, plus de « 0 ».
+
+- [ ] (0.620) Limsa - Le Tillac : le menu au-dessus de la carte montre le nom de la zone et l'aérodrome.
+
+- [ ] (0.621) Marcher dans L'Entrepont : les deux lignes de Tensho doivent suivre celles de la carte du jeu.
+
+- [ ] (0.622) Là où il n'y a pas de sous-lieu : une seule ligne, sans « -- ».
+
+- [x] (0.623) Dézoomer et zoomer sur Limsa à côté de la carte du jeu : comparer quels noms apparaissent et quand.
+
+- [ ] (0.624) Ouvrir la carte, ouvrir le menu qui la fait disparaître, le refermer, attendre deux secondes.
+
+- [x] (0.625) Carte ouverte, parler à un PNJ de Triple Triade, refermer son menu : la carte revient. Fermer la carte avec sa touche : elle reste fermée.
+
+- [x] (0.626) Cliquer sur « Limsa Lominsa - L'Entrepont » : la carte change. Glisser depuis le nom ne change pas de carte.
+
+- [ ] (0.627) Cliquer une quête dans le journal, fermer la carte, la rouvrir avec sa touche : elle s'ouvre sur toi. Cliquer une autre quête : elle s'y centre.
+
+- [x] (0.628) Cliquer « Un forgeron fantomatique » dans le journal : la carte de la Ville fantôme s'ouvre, l'icône près de Gerolt. Rouvrir la carte avec sa touche : elle s'ouvre sur toi.
+
+- [ ] (0.629) Cliquer plusieurs fois la même quête dans le journal : la carte reste ouverte sur elle. Fermer avec la touche de carte, rouvrir : elle s'ouvre sur toi.
+
+- [x] (0.630) Cliquer une fois « Un forgeron fantomatique » dans le journal, loin de la Ville fantôme.
+
+- [x] (0.631) Ouvrir la carte de Yok Tural : les zones apparaissent sur le parchemin, comme dans le jeu, sans taches blanches. Comparer aussi une région d'Éorzéa.
+
+- [x] (0.632) Comparer La Noscea et Yok Tural avec le jeu : zones, ton, cristaux. Ouvrir le monde : Tural est là, et le second menu propose Hydaelyn et Premier reflet.
+
+- [ ] (0.633) Loin de la Ville fantôme, cliquer « Un forgeron fantomatique » : Tuliyollal s'ouvre, centrée sur le marqueur. Recliquer : la carte reste sur la quête. Touche de carte : fermée puis rouverte sur toi.
+
+- [ ] (0.634) Cliquer une quête qui demande d'accomplir un donjon : la carte de l'entrée s'ouvre, centrée sur le marqueur du donjon.
+
+- [ ] (0.635) Cliquer une quête, puis la recliquer plusieurs fois : la carte reste sur elle. Fermer et rouvrir avec la touche de carte (M par défaut) : elle s'ouvre sur toi.
+
+- [x] (0.636) Cliquer une quête, la recliquer plusieurs fois : pas de clignotement, l'icône reste. Puis touche de carte : la carte se ferme ; encore la touche : elle s'ouvre sur toi.
+
+- [x] (0.637) Cliquer plusieurs quêtes de zones différentes, dont une de donjon, depuis le journal et la liste des quêtes actives : la carte se centre à chaque fois, sans changer de zoom.
+
+- [x] (0.638) Cliquer une quête de donjon : la carte de l'entrée s'ouvre, centrée sur le marqueur, comme pour la Ville fantôme.
+
+- [x] (0.639) Sur Shaaloani, cliquer la Vallée des Pampas : sa carte s'ouvre. Sur Tuliyollal, cliquer la Ville fantôme : sa carte s'ouvre.
+
+- [x] (0.640) Sur Solution Neuf, cliquer les Locaux de la Société de l'Arcadion : leur carte s'ouvre. Sur l'Écume des cieux d'Abalathia, cliquer le Paddock : sa carte s'ouvre, même avec l'icône de quête dessus.
+
+- [x] (0.641) Cliquer « La combattante féline aux griffes acérées », ouvrir les Locaux de la Société de l'Arcadion : le menu des zones finit par ces locaux et le Ring des Griffes félines, comme le jeu.
+
+- [x] (0.642) Cliquer une quête, remonter à la région puis au monde : la cible reste. Dézoomer une ville : les noms en noir rétrécissent avec la carte.
+
+- [x] (0.643) Cliquer une quête, remonter au monde, cliquer la cible : la région s'ouvre ; la recliquer : la carte de la cible s'ouvre.
+
+- [ ] (0.644) Carte : vos coordonnées restent en bas à gauche et le curseur donne sa distance. Poser un drapeau hors de la vue : ses coordonnées et sa distance s'affichent sous son repère de bord. Comparer une distance avec le jeu.
+
+- [ ] (0.645) Survoler une éthérite harmonisée : son coût s'affiche, le même que dans la fenêtre de téléportation. Une éthérite non harmonisée est grisée et le dit au survol.
+
+- [ ] (0.646) Page Équipement, section Jobs : niveaux et expérience identiques à la fenêtre du jeu, classes et jobs sans doublon, jobs non débloqués grisés.
+
+- [ ] (0.647) Survoler un point légendaire, un éphémère et un à horaire sur la carte : la classe dite correspond au jeu.
+
+- [ ] (0.648) Page Butin des contenus, le Palais des morts : « Débloqué par » donne la quête, son état et son lien. La fiche de cette quête dit « Débloque ».
+
+- [ ] (0.649) Page Récolte : chercher un poisson au harpon, son lieu s'affiche. Comparer avec le carnet du jeu. Ses alarmes et sa carte fonctionnent comme les autres.
+
+- [ ] (0.650) Mode développeur : récolter sans action pendant quelques tics, le journal écrit « Reading gp ». Les relevés suivants sont donnés un par un.
+
+- [x] (0.651) Rappels, ligne Bienfaits de compagnie : les noms s'affichent sans rien ouvrir. Ouvrir l'onglet Bienfaits : le temps restant apparaît, comme dans le jeu. Poser la cloche : l'alarme est à l'heure de fin.
+
+- [x] (0.652) Lancer un mandat, ouvrir la carte : ses zones sont vertes au même endroit que dans le jeu. Réglages de la carte : « Zones des mandats » et le repère « Mandats » agissent seuls. Essayer si possible un mandat de combat.
+
+- [x] (0.653) Mandat lancé, carte ouverte, zone verte visible : cliquer le mandat dans le journal, puis recliquer. La zone et les autres marqueurs restent. Terminer le mandat : la zone disparaît une fois la carte refermée.
+
+- [x] (0.654) Mandat lancé, zone vue une fois : s'éloigner, changer de zone, ouvrir la carte de la zone du mandat, la zone verte reste. Cliquer le mandat dans le journal : elle reste. Abandonner le mandat : elle disparaît.
+
+- [x] (0.655) Accepter un mandat, le cliquer dans le journal : la cible et son repère au bord apparaissent. L'abandonner : ils disparaissent en moins d'une seconde.
+
+- [x] (0.656) Alerte de PR activée, PR pleins : se téléporter, attendre une minute, aucune alarme. Dépenser des PR, se téléporter, attendre la remontée : une seule alarme.
+
+- [x] (0.657) Depuis une autre zone, cliquer le mandat dans le journal : la zone verte s'affiche et reste. Abandonner : la zone et le repère noir partent. PR pleins, se téléporter : aucune alarme, puis dépenser des PR : une alarme à la remontée.
+
+- [x] (0.658) Carte ouverte, se téléporter vers une autre zone : la carte se rouvre à l'arrivée. Vers la même zone aussi. Fermer la carte avec sa touche puis se téléporter : elle reste fermée. Entrer dans un contenu carte ouverte : elle reste fermée.
+
+- [ ] (0.659) Carte ouverte, entrer dans un contenu : elle se rouvre une fois la scène d'ouverture finie. Fermée avec sa touche avant d'entrer : elle reste fermée.
+
+- [ ] (0.660) Vieille Sharlayan, carte du jeu et Tensho côte à côte, au même zoom : les noms ont presque la même largeur et apparaissent à peu près en même temps.
+
+- [ ] (0.661) Incanter une téléportation et fermer la carte avec sa touche : elle reste fermée. Carte ouverte, se téléporter sans y toucher : elle se rouvre à l'arrivée. Dézoomer une ville au maximum : seuls les noms de liens restent, comme le jeu.
+
+- [ ] (0.662) Carte Tensho ouverte, se téléporter plusieurs fois de suite : plus de plantage. Le coût au survol d'une éthérite s'affiche quelques secondes après l'arrivée.
+
+- [ ] (0.663) Pêche : un poisson à proies affiche sa durée d'intuition. Attraper ses proies : le temps restant s'affiche, et sa valeur de départ correspond à la durée annoncée.
+
+- [ ] (0.664) Compagnie libre, onglet Atelier : chercher un projet, comparer ses matériaux et ses quantités à la fenêtre de l'atelier du jeu. Le clic sur un objet ouvre sa fiche.
+
+- [ ] (0.665) Réglages des icônes de la carte : les quêtes disent « disponible », « non disponible » ou « étape en cours » sans numéro. Comparer une quête grisée sur la carte du jeu : elle ne peut pas être prise.
+
+- [ ] (0.666) Exploration cosmique : ouvrir une recette dans le carnet. Tensho ne la refuse plus, et progrès, qualité et solidité sont ceux de la fenêtre du jeu. Lancer une séquence : les gains correspondent à la synthèse. Les seuils affichés correspondent à la mission.
+
+- [ ] (0.667) Île sanctuaire, carte Tensho : les ressources tombent aux bons endroits, le survol les nomme. Réglage « Ressources de l'île sanctuaire » : il les retire. Exploration cosmique : les seuils affichés correspondent à ceux de la mission.
+
+- [ ] (0.668) Faire une synthèse et s'arrêter à plusieurs niveaux de qualité : le pourcentage HQ du jeu correspond à celui du simulateur pour la même qualité.
+
+- [ ] (0.669) Simulateur : choisir des ingrédients HQ, la qualité initiale doit égaler celle du carnet du jeu avec les mêmes ingrédients. Coût de préparation et historique du marché : mêmes valeurs qu'avant, filtres et tri réagissent à l'instant.
+
+- [ ] (0.670) Cartes › Conditions des rangs S : les noms sont lisibles dans la langue du jeu (aucun « # »), les marques de la zone viennent en premier, la recherche filtre. À l'occasion, comparer une condition à ce qui se passe en jeu.
+
+- [ ] (0.671) Sur l'île, Production › Île sanctuaire : Lire avant d'ouvrir l'agenda (doit le demander), puis après : rang, ateliers, entrain, popularité et offre doivent correspondre au jeu. Comparer la valeur estimée aux coquillages d'une création terminée.
+
+- [ ] (0.672) Sur l'île, après lecture : Proposer un agenda. Saisir un cycle proposé dans l'agenda du jeu : mêmes créations efficaces que le jeu, pas de dépassement de 24 h. Comparer le total aux coquillages reçus.
+
+- [ ] (0.673) Île sanctuaire, matériaux : comparer les matériaux d'une création à l'agenda du jeu (colonne Matériaux). Proposer un agenda, ouvrir « Matériaux de cet agenda » et vérifier le total. Saisir une création efficace : regarder si les matériaux retirés comptent une fois ou deux.
+
+- [ ] (0.674) Île sanctuaire, entrain : proposer un agenda et lire la ligne « Entrain sur ce cycle ». Le plafond doit correspondre à vos repères (15, 20, 25, 35, 45 pour 1 à 5). Pendant un cycle, regarder si l'entrain du jeu monte au début ou à la fin d'une création efficace.
+
+- [ ] (0.675) Production › Commandes spéciales : comparer rang, points et livraisons de chaque client à la fenêtre du jeu ; un client non débloqué doit être marqué ; livrer une fois puis Lire de nouveau.
+
+- [ ] (0.676) Compagnie libre › Atelier : la colonne En stock doit donner le même nombre que l'infobulle de l'objet (Madrier d'épicéa : 11 dans le relevé), en orange s'il en manque.
+
+- [ ] (0.677) Cartes & repères : les 4 onglets et leur contenu ; cliquer un favori dans Repères doit ramener sur Cartes avec ses coordonnées ; Paramètres › Favoris doit ouvrir l'onglet Repères ; rien ne doit avoir disparu.
+
+- [ ] (0.678) Production › Félicité insulaire : les mots de la page doivent être ceux de la fenêtre du jeu ; signaler « création » et « efficace » s'ils diffèrent.
+
+- [ ] (0.679) Félicité insulaire : le « ! » de l'objectif doit paraître sur la carte Tensho ; la carte doit rester en changeant de mode ; Marchandréa doit paraître près de la base ; passer près de Laracheteuse pour la capture.
+
+- [ ] (0.680) Félicité insulaire : Laracheteuse et Marchandréa côte à côte sur la carte Tensho, au survol leur nom et leur titre ; le « ! » présent ; la carte reste dans tous les modes.
+
+- [ ] (0.681) Félicité insulaire : les 5 PNJ sur la carte ; au survol de Marchandréa, comparer les boutiques à sa fenêtre dans le jeu ; un objet payé en assignats doit indiquer Marchandréa comme source ; dire si Chamoiselle change de place.
+
+- [ ] (0.682) Carte Tensho › Affichage : décocher Ressources de la Félicité insulaire doit retirer les icônes et leurs zones ; Aucun aussi, Tout les remet.
+
+- [ ] (0.683) Progression › La Grande Mascarade : comparer les niveaux réussis, les ennemis et les temps à la fenêtre du jeu ; le niveau 1 et le niveau 32 surtout.
+
+- [ ] (0.684) Carte Tensho › Affichage : chaque type retire ses icônes et ses zones, comparer aux icônes du jeu ; le sable et l'argile n'ont qu'une icône ; au survol, le « ! » donne le nom du panneau de construction.
+
+- [ ] (0.685) Production › Félicité insulaire › Pâturage : comparer vos animaux à la fenêtre du jeu et noter les nombres d'humeur et de satiété ; Lire la liste sur le wiki : les noms en français, le drapeau sur le bon endroit.
+
+- [ ] (0.686) Félicité insulaire : une seule fabrique lue et planifiée ; comparer disponibilité et évolution de 3 ou 4 créations à « Besoins en biens insulaires ».
+
+- [ ] (0.687) Rappels : les 5 onglets et leur contenu ; rien ne doit avoir disparu.
+
+- [ ] (0.689) Mandats : survoler un mandat doit donner ses informations, surtout en fenêtre étroite.
+
+- [ ] (0.690) Dresseur › Bêtes : comparer la colonne Capture au bestiaire du jeu, pour une bête de zone et une bête de contenu.
+
+- [ ] (0.691) Cocher chaque option : le panneau suit le projet ou la recette, le stock change après un ramassage, il disparaît en combat, la croix le coupe.
+
+- [ ] (0.692) Sur l'île, le panneau du projet d'atelier doit apparaître, et se déplacer ; cocher le panneau de Liste de fabrication.
+
+- [ ] (0.693) Panneau affiché : entrer en combat et ouvrir une fenêtre du jeu par-dessus, il doit rester ; cocher chaque option, il doit se cacher ; la croix le coupe.
+
+- [ ] (0.694) Atelier : Suivre toutes ses parties sur une coque doit ajouter les 4 pièces et additionner leurs matériaux, aussi dans le panneau ; essayer un aéronef et un logement ; la croix retire un projet.
+
+- [ ] (0.695) Rangements › Monnaies : Que faire ? doit ouvrir l'onglet et remplir les prix ; Gils par unité trié du plus rentable ; changer de monnaie dans la liste.
+
+- [ ] (0.696) Que puis-je fabriquer ? : avec des minerais seuls, des objets à plusieurs étapes doivent paraître « avec sous-recettes » ; Préparation › Calculer doit confirmer les étapes ; la recherche ne doit pas figer le jeu.
+
+- [ ] (0.697) Que faire avec ? : décocher la case pendant une recherche doit l'arrêter ; essayer chaque filtre ; dire s'il manque des types de collection.
+
+- [ ] (0.698) Mandats : clic droit, les deux entrées : le drapeau et la question de téléportation doivent viser le bon endroit ; comparer le lieu du mandat avec le jeu.
+
+- [ ] (0.699) Cocher l'option sur un panneau : les matières de base par provenance, le stock sur le requis ; décocher une provenance ; comparer une pièce d'atelier à Préparation › Calculer.
+
+- [ ] (0.700) Panneau en mode provenance : replier une catégorie ; décocher Vendeurs PNJ : les lignes doivent changer ; exclure une monnaie : seuls les objets qu'elle seule achète changent.
+
+- [ ] (0.701) Monnaies des vendeurs : plus de numéros, tout décoché au départ, la recherche filtre ; cocher Gil doit remplir Vendeurs PNJ ; rien de coché : plus aucun PNJ.
+
+- [ ] (0.702) Monnaies des vendeurs : la liste doit être nettement plus courte ; dire s'il reste des monnaies sans intérêt ou s'il en manque.
+
+- [ ] (0.703) Cocher l'option : un objet vendu par un PNJ dont la quête n'est pas faite doit changer de catégorie ; comparer avec Vendeurs PNJ.
+
+- [ ] (0.704) Butin des monstres : clic droit sur une ligne du wiki avec coordonnées ; essayer aussi un vendeur, un favori, le train de chasse, un animal de l'île ; le bon endroit doit être visé.
+
+- [ ] (0.705) Réglages › infobulles : couper les vendeurs, exclure les prérequis, cocher Gil seulement : comparer sur un objet vendu en plusieurs monnaies.
+
+- [x] (0.706) Sur l'île : clic droit sur un animal ou sur la carte Tensho, plus d'entrée éthérite, le drapeau reste ; ailleurs, l'entrée reste. VALIDATED_IN_GAME (rapport de l'utilisateur, 2026-11-07). Étages sans éthérite : à voir quand le cas se présentera.
+
+- [ ] (0.707) Que puis-je fabriquer ? : essayer les 3 tris de rentabilité ; comparer un prix au tableau du marché ; dire si un objet collectionnable doit être rangé autrement ; décocher la case arrête la recherche.
+
+- [ ] (0.708) Progression › Armes reliques : comparer les étapes d'une arme ; avec un livre en cours, comparer les objectifs et les compteurs au livre du jeu.
+
+- [ ] (0.709) Que puis-je fabriquer ? : changer de page, chercher un nom ; tri marché : seule la page se charge ; Charger tous les prix puis classement complet.
+
+- [ ] (0.710) Que puis-je fabriquer ? : Charger tous les prix sur une longue liste : le compteur doit monter par centaines et le classement rester complet ; le jeu ne doit pas saccader.
+
+- [ ] (0.711) Que puis-je fabriquer ? : le haut de liste doit devenir réaliste (les Gourmettes à 2 000 000 doivent descendre si elles ne se vendent pas à ce prix) ; comparer une ligne à l'historique de ventes du marché.
+
+- [ ] (0.712) Que puis-je fabriquer ? › assignats : les objets collectionnables doivent afficher leurs assignats au palier haut et venir en tête ; comparer un montant au jeu.
+
+- [ ] (0.713) Progression › Peuples alliés : comparer rangs et réputation à la fenêtre de réputation du jeu ; si chaque ligne montre le rang du voisin, le dire.
+
+- [ ] (0.714) Progression › Grandes compagnies : comparer grade, sceaux et prix de la promotion au jeu ; vérifier le genre du nom de grade ; comparer quelques articles à la boutique du jeu.
+
+- [ ] (0.715) Progression › Livraisons spéciales : comparer les quêtes faites au journal ; dire si l'onglet du Cristarium contient bien ce qu'il faut.
+
+- [ ] (0.716) Armes reliques : pour une arme de chaque lignée, comparer les étapes au jeu ; dire si une lignée se coupe en deux ou s'il manque une étape, surtout Augmented à la Résistance.
+
+- [ ] (0.717) Progression › Eureka et Bozja : comparer deux ou trois positions à la carte du jeu quand vous y passerez ; Progression › Armes reliques : l'onglet Résistance ne doit plus montrer d'armes Crystarium.
+
+- [ ] (0.718) Progression › Donjons profonds : lire deux textes de poteries et comparer l'état d'un groupe d'étages à la fenêtre du jeu.
+
+- [ ] (0.719) Objets › Lexique : chercher « eureka » puis un mot en anglais ; dire si la première ouverture se sent.
+
+- [ ] (0.720) Progression › Reliques › Eurêka › Armures : choisir votre job et comparer les pièces à vos stocks.
+
+- [ ] (0.721) Monde › ALEA : comparer le lieu de deux ALEA en cours à la carte du jeu.
+
+- [ ] (0.722) Rien à faire : la lecture est relevée dans dalamud.log.
+
+- [ ] (0.723) Masked Carnivale : l'auto-contrôle lit 0 épreuve faite ; dire si c'est juste pour votre personnage.
+
+- [ ] (0.724) Rien à faire : le résultat est relevé dans dalamud.log.
+
+- [ ] (0.725) Que puis-je fabriquer ? › tri par marché : relancez les prix, les ventes par jour doivent s'afficher et le haut de la liste doit se vendre.
+
+- [ ] (0.726) Rien à faire : dites seulement si quelque chose clignote à l'écran après un rechargement.
+
+- [ ] (0.727) Atelier › Coque de type Bronco : le bouton doit dire 4 parties ; retirez la base de tours et le mur avec leur croix.
+
+- [ ] (0.728) À un point de récolte, suivez le plan : la ligne « Ensuite » et le cadre sur la barre doivent suivre chaque étape.
+
+- [ ] (0.729) À un point de récolte : une ligne doit séparer « Ensuite » du plan.
+
+- [ ] (0.730) Commandes spéciales › Récompenses : comparez un client à sa fenêtre en jeu, surtout les objets liés aux rangs.
+
+- [ ] (0.731) À un point de récolte, suivez le plan jusqu'au bout : avec 50 PR ou plus et des essais restants, « Ensuite » doit proposer une action avec les PR restants.
+
+- [ ] (0.732) Rien à faire : le prochain passage des pages le relève dans dalamud.log.
+
+- [ ] (0.733) À un point de récolte : un cadre doré doit clignoter sur la case de l'action « Ensuite » ; Sagesse du fermier seulement après une récolte.
+
+- [ ] (0.734) À un point de récolte : le cadre doit se poser sur Récolte abondante, même placée en version I sur la barre.
+
+- [ ] (0.735) À un point de récolte : le cadre doit se poser sur Récolte abondante, même placée en version I sur la barre.
+
+- [ ] (0.736) Rien à faire.
+
+- [ ] (0.737) Atelier › matériaux : clic droit sur plusieurs icônes, le menu doit rester ouvert.
+
+- [ ] (0.738) Rien à faire.
+
+- [ ] (0.739) Que puis-je fabriquer ? : Rivets en cobalt sur une seule ligne avec deux icônes de métier ; survol = nom du métier.
+
+- [ ] (0.740) Récoltez quelques objets de la liste de suivi : je relis « List blink » dans dalamud.log.
+
+- [ ] (0.741) Récoltez quelques objets de la liste : plus de clignotement ; je vérifie qu'aucun « List blink » ne revient.
+
+- [ ] (0.742) Récoltez quelques objets de la liste : je vérifie qu'aucun « List blink » ne revient.
+
+- [ ] (0.743) Récoltez quelques objets de la liste, puis cliquez « Ouvrir dans Tensho » sur une alarme : je relis le journal.
+
+- [ ] (0.744) Récoltez quelques objets de la liste : plus de clignotement ; je vérifie qu'aucun « List zero » ne revient.
+
+- [ ] (0.745) Jouez normalement un moment : je relis « Slow frame » dans dalamud.log.
+
+- [ ] (0.746) Rien à faire.
+
+- [ ] (0.747) À un point de récolte : le plan apparaît après « Calcul du plan… », sans à-coup ; je relis « Slow frame ».
+
+- [ ] (0.748) Rien à faire : les à-coups après chaque rechargement doivent cesser ; je relis « Slow frame ».
+
+- [ ] (0.749) Ouvrez la carte deux ou trois fois : je relis « Slow frame ».
+
+- [ ] (0.750) Paramètres › Cache & péremption : vérifiez les nouvelles durées.
+
+- [ ] (0.751) Point de récolte avec un objet de votre liste d'atelier : ligne « Vos listes en demandent encore » et cadre vert dans la fenêtre du jeu.
+
+- [ ] (0.752) Liste de l'atelier : sous Récolte, une ligne par zone avec ses objets.
+
+- [ ] (0.753) Point de récolte : cochez « Récolter automatiquement » ; le plan change et le dit.
+
+- [ ] (0.754) Carte : survolez un point à horaire fermé ; une ligne doit dire dans combien de temps il ouvre.
+
+- [ ] (0.755) Liste de l'atelier : « Ajouter les alarmes (N) », puis le nombre doit retomber à 0 ; page Alarmes : pas de doublon.
+
+- [ ] (0.756) Ouvrez un point qui a un objet de vos listes : l'aide doit se placer dessus.
+
+- [ ] (0.757) Liste de l'atelier : repliez une zone ; changez de zone, elle doit passer en tête ; les prix de téléportation s'affichent.
+
+- [ ] (0.758) Liste de l'atelier : un groupe « Points à horaire » en tête, repliable ; chaque zone aussi.
+
+- [ ] (0.759) Cliquez « Ouvrir dans Tensho » sur une alarme, même affichée avant un rechargement : la fiche de l'objet doit s'ouvrir.
+
+- [ ] (0.760) Gardez la liste de l'atelier affichée : plus de gel de plusieurs secondes ; je relis « Slow frame ».
+
+- [ ] (0.761) Liste de l'atelier, groupe Points à horaire : chaque ligne dit ouvert ou fermé, avec le temps.
+
+- [ ] (0.762) Clic droit sur un matériau de la liste de l'atelier : « Y aller » doit placer le drapeau et proposer la téléportation.
+
+- [ ] (0.763) À un point où deux plans se valent, l'aide doit proposer celui avec le moins d'actions.
+
+- [ ] (0.764) Réduisez le panneau de l'atelier : la ligne et le cadre restent ; un panneau de Tensho posé sur la fenêtre de récolte cache le cadre.
+
+- [ ] (0.765) Réduisez le panneau de l'atelier, rechargez le plugin : la ligne « Vos listes en demandent encore » reste à la récolte.
+
+- [ ] (0.766) Rien à faire.
+
+- [ ] (0.767) Ouvrez un servant qui a des cristaux : ils comptent dans les stocks ; Personnages montre les gils des servants.
+
+- [ ] (0.768) Rangements › Gils : icônes et couleurs ; jouez un peu, je relis « Gil other » dans dalamud.log.
+
+- [ ] (0.769) Déposez des gils chez un servant : le total des servants suit aussitôt ; la ligne dit « transfert, hors net ».
+
+- [ ] (0.770) Déposez un objet chez un servant : il apparaît dans les stocks de Tensho en 2 secondes, sans rouvrir.
+
+- [ ] (0.771) À la prochaine alarme, cliquez « Ouvrir dans Tensho » : la fiche de l'objet doit s'ouvrir ; sinon je relis le journal.
+
+- [ ] (0.772) Liste de l'atelier : le nombre d'alarmes ne compte plus que le Minerai de sombracier.
+
+- [ ] (0.773) Une alarme qui sonne suffit ; cliquez « Ouvrir dans Tensho », je relis le journal.
+
+- [ ] (0.774) À la prochaine alarme : clic droit sur le nom de l'objet dans le chat ; le menu doit proposer Tensho.
+
+- [ ] (0.775) Téléportez-vous : la dépense doit aller dans Téléportation.
+
+- [ ] (0.776) Rien à faire.
+
+- [ ] (0.777) Butin des monstres › Peau d'hippogriffe : clic droit sur une ligne « Mor Dhona (27,6) » ; le menu doit proposer l'éthérite la plus proche.
+
+- [ ] (0.778) Créez une alarme : sa case Discord est décochée.
+
+- [ ] (0.779) Rechargez le plugin : les objets de monstres sont dans « Monstres » dès l'ouverture de la liste.
+
+- [ ] (0.780) À la prochaine alarme : clic droit n'importe où sur « Minerai de sombracier (clic droit : Tensho) ».
+
+- [ ] (0.781) À la prochaine alarme : clic droit sur la ligne de l'objet ; je relis « Context menu opened ».
+
+- [ ] (0.782) Rouvrez le carnet d'artisan sur la recette 5623 en cuisinier : plus de gel.
+
+- [ ] (0.783) Carnet d'artisan, Kit de réparation d'appareil : « Raphael non utilisé ».
+
+- [ ] (0.784) Synthèse du Kit de réparation d'appareil : les prochains coups s'affichent.
+
+- [ ] (0.785) Cochez « Objets finis seulement » sous les options des listes : les listes d'artisanat et d'atelier ne montrent plus que leurs objets.
+
+- [ ] (0.786) À l'établi de l'atelier : ouvrez la livraison des matériaux du projet suivi (et la liste des matériaux) ; je relis « Reading workshop ».
+
+- [ ] (0.787) Ouvrez la livraison à l'établi : le panneau d'atelier ne garde que le reste à livrer, la page dit « Livré : phase 2/3 en cours ».
+
+- [ ] (0.788) Carnet en Menuisier sur le Lingot de mithril (Métallurgie) : « Mauvais métier » en orange et le bouton pour porter Forgeron.
+
+- [ ] (0.789) Dépliez « Fabrications restantes » dans la liste d'atelier : les lingots puis les plaques, puis les livraisons.
+
+- [ ] (0.790) Dépliez « Fabrications restantes » : Étape 1, Étape 2… chacune repliable ; lignes « 0 / 36 ».
+
+- [ ] (0.791) Jouez avec la carte de Tensho ouverte ; je relis les « Slow frame ».
+
+- [ ] (0.792) Prenez un mandat, carte du jeu fermée, allez vers sa zone ; je relis « Reading questMarkers ».
+
+- [ ] (0.793) Prenez un mandat sans ouvrir la carte du jeu : sa zone est sur la carte de Tensho ; commencé, ses points aussi.
+
+- [ ] (0.794) Rangements, Que faire avec ?, Sceau de compagnie : la Matière sombre ne doit plus être en tête ; colonnes Ventes / jour et Gils en 7 jours.
+
+- [ ] (0.795) Avec un objet de monstre dans une liste, approchez de ce monstre : patte sur la carte et dans la liste.
+
+- [ ] (0.796) Près d'un monstre de votre bestiaire (rang actuel) : un livre sur la carte, l'entrée et les victoires au survol.
+
+- [ ] (0.797) Près d'un ALÉA en cours : étoiles sur ses monstres. Faites un mandat de combat : je relis « Reading monsterEvents ».
+
+- [ ] (0.798) Page Magie bleue : « Lire les N sorts manquants », puis en mage bleu près d'un monstre qui apprend un sort manquant : chapeau sur la carte.
+
+- [ ] (0.799) En mage bleu, près d'un monstre qui apprend un sort manquant (après « Lire les sorts manquants ») : icône du mage bleu au-dessus de sa tête.
+
+- [ ] (0.800) Près d'un monstre qui lâche une mascotte ou un rouleau que vous n'avez pas : gemme sur la carte.
+
+- [ ] (0.801) Jouez avec la carte ouverte ; je relis les « Slow frame ».
 
 **0.535 : interfaces** — à voir en jouant
 

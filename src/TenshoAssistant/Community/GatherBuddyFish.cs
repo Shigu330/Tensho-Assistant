@@ -14,7 +14,7 @@ namespace TenshoAssistant.Community;
 /// </summary>
 public sealed record GatherBuddyFish(uint FishId, IReadOnlyList<uint> Baits, IReadOnlyList<uint> Mooches, string? HookSet, string? Bite,
     int? StartMinute, int? EndMinute, IReadOnlyList<uint> Weathers, IReadOnlyList<uint> Transitions, string? Lure,
-    IReadOnlyList<(uint Fish, int Count)> Predators, bool Snag, int? SpearSize = null, int? SpearSpeed = null);
+    IReadOnlyList<(uint Fish, int Count)> Predators, bool Snag, int? SpearSize = null, int? SpearSpeed = null, int? Intuition = null);
 
 public sealed class GatherBuddyFishData
 {
@@ -62,7 +62,7 @@ public sealed class GatherBuddyFishData
                 if (calls.Count == 0 || calls[0].Name != "Apply" || Numbers(calls[0].Arguments) is not [var id, ..] || id == 0) continue;
                 var baits = new List<uint>(); var mooches = new List<uint>(); var weathers = new List<uint>(); var transitions = new List<uint>();
                 var predators = new List<(uint, int)>();
-                string? hook = null, bite = null, lure = null; int? start = null, stop = null, spearSize = null, spearSpeed = null; var snag = false;
+                string? hook = null, bite = null, lure = null; int? start = null, stop = null, spearSize = null, spearSpeed = null, intuition = null; var snag = false;
                 foreach (var (name, arguments) in calls.Skip(1))
                     switch (name)
                     {
@@ -84,9 +84,11 @@ public sealed class GatherBuddyFishData
                         case "Snag": snag = arguments.Contains("Required", StringComparison.Ordinal); break;
                         case "Predators":
                             foreach (var pair in Tuples(arguments)) predators.Add(pair);
+                            // C28 (0.663): GatherBuddy's IntuitionLength, before the pairs; 0 where it does not know (docs/evidence/0.663-intuition.md).
+                            if (Numbers(arguments) is { Count: > 0 } numbers && numbers.Count % 2 == 1 && numbers[0] > 0) intuition = (int)numbers[0];
                             break;
                     }
-                result[id] = new(id, baits, mooches, hook, bite, start, stop, weathers, transitions, lure, predators, snag, spearSize, spearSpeed);
+                result[id] = new(id, baits, mooches, hook, bite, start, stop, weathers, transitions, lure, predators, snag, spearSize, spearSpeed, intuition);
             }
         }
         return new(result);
@@ -151,7 +153,7 @@ public sealed record GatherBuddyFishCache(string Text);
 /// </summary>
 public sealed class GatherBuddyFishService : IDisposable
 {
-    private const string Family = "gatherbuddy-fish", Version = "main-v1";
+    private const string Family = "gatherbuddy-fish", Version = "main-v2";
     private const string Listing = "https://api.github.com/repos/Ottermandias/GatherBuddy/contents/GatherBuddy.GameData/Data/Fish";
     private const string Raw = "https://raw.githubusercontent.com/Ottermandias/GatherBuddy/main/GatherBuddy.GameData/Data/Fish/";
     private readonly HttpClient client;

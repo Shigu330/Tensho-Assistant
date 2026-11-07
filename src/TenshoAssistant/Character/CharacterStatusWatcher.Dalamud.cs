@@ -36,7 +36,7 @@ public sealed class CharacterStatusWatcher : IDisposable
                     log.Warning(error,"A character file could not be read; it is not written over.");
                 }))
             statuses[status.ContentId]=status;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     /// <summary>Every known character, the logged-in one first, then by name.</summary>
@@ -147,7 +147,7 @@ public sealed class CharacterStatusWatcher : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         lock(gate){if(current!=0 && !unreadable.Contains(current) && statuses.ContainsKey(current))WriteLocked(current);}
     }
 }

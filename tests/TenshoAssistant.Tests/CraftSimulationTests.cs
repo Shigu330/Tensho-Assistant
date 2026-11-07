@@ -97,7 +97,7 @@ internal static class CraftSimulationTests
         {
             var p=Recipe().Simulation!;
             // 0.435 (A-07): expert recipes are simulated now; a specialist recipe without « Specialist » still fails closed.
-            foreach(var bad in new[]{p with {LevelScaled=true},p with {Specialist=true},p with {Collectable=true,Quality=0},p with {RequiredQuality=1},p with {ProgressDivider=0}})
+            foreach(var bad in new[]{p with {Specialist=true},p with {Collectable=true,Quality=0},p with {ProgressDivider=0}})
                 Throws<ArgumentException>(()=>CraftSimulation.Run(Recipe(bad),Stats,0,[]));
             Throws<ArgumentException>(()=>CraftSimulation.Run(Recipe(p with {RequiredCraftsmanship=1001}),Stats,0,[]));
             Throws<ArgumentOutOfRangeException>(()=>CraftSimulation.Run(Recipe(),Stats,-1,[]));

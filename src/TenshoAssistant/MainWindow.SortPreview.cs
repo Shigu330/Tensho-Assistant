@@ -21,6 +21,15 @@ internal sealed partial class MainWindow
     private string? sortingViewError;
     private string? sortApplyError;
     private uint sortSlotMenuItem;
+    private TenshoAssistant.Gear.GearsetState? sortingViewGearsets;
+    private TenshoAssistant.Gear.GearCatalog? sortingViewGear;
+    /// <summary>0.595 (I21): what the sort knows of an item, with its jobs and whether a gear set holds it.</summary>
+    private Func<uint,InventorySortMetadata> SortDescriber(ItemCatalog catalog)
+    {
+        var gear=GearCatalog?.Invoke();
+        var sets=GearsetSource?.State?.Sets.SelectMany(set=>set.Pieces).Select(piece=>piece.ItemId).ToHashSet();
+        return id=>InventorySortMetadata.FromItem(id,catalog.Find(id),gear?.Find(id)?.Jobs,sets?.Contains(id));
+    }
     private void DrawSortPreview()
     {
         Heading(localization.Get("SortUi.Title"), localization.Get("SortUi.Subtitle"));
@@ -95,13 +104,13 @@ internal sealed partial class MainWindow
         var rules=DrawSortRules(scope,catalog);if(rules is null)return;
         var capacity=scope.Capacity;
         if ((sortingViewResult is null && sortingViewError is null) || !ReferenceEquals(sortingViewSnapshot, snapshot) || !ReferenceEquals(sortingViewCatalog, catalog)
-            || !ReferenceEquals(sortingViewRules,rules))
+            || !ReferenceEquals(sortingViewRules,rules) || !ReferenceEquals(sortingViewGearsets,GearsetSource?.State) || !ReferenceEquals(sortingViewGear,GearCatalog?.Invoke()))
         {
             // 0.329: a failure is kept with its inputs like a result: built again only when one of them changes.
-            try{sortingViewResult=InventorySortRules.Build(containers,scope,rules,id=>InventorySortMetadata.FromItem(id,catalog.Find(id)));sortingViewError=null;}
+            try{var describe=SortDescriber(catalog);sortingViewResult=InventorySortRules.Build(containers,scope,rules,describe);sortingViewError=null;}
             catch(Exception error){sortingViewResult=null;sortingViewError=error.Message;}
             sortingViewSnapshot = snapshot; sortingViewCatalog = catalog;
-            sortingViewRules=rules;
+            sortingViewRules=rules;sortingViewGearsets=GearsetSource?.State;sortingViewGear=GearCatalog?.Invoke();
         }
         // 0.329: the reason is shown (known messages through UiMessages, raw text in developer mode only).
         if(sortingViewResult is not { } preview){ImGui.TextWrapped(localization.Get("SortUi.PreviewError"));if(sortingViewError is { } failure)DrawSortMessage(failure);return;}
@@ -137,6 +146,11 @@ internal sealed partial class MainWindow
         var spacing=ImGui.GetStyle().ItemSpacing.X;
         var framesPerRow=Math.Max(1,(int)((ImGui.GetContentRegionAvail().X+spacing)/(frameWidth+spacing)));
         ImGui.TextDisabled(localization.Get("SortUi.ClickHelp"));
+        // 0.565 (I20): what the sort would move; a stack whose place was not read (-1) says nothing.
+        var movedStacks=0;
+        for(var position=0;position<scope.ContainerCount*scope.SlotsPerContainer;position++)
+            if((preview.Slots is { } all ? all[position]:position<preview.Stacks.Count ? preview.Stacks[position]:null) is { } shown && shown.Stack.DisplayIndex>=0 && shown.Stack.DisplayIndex!=position)movedStacks++;
+        ImGui.TextDisabled(localization.Format("SortUi.Moved",movedStacks));
         var openSlotMenu=false;
         for (var bag = 0; bag < scope.ContainerCount; bag++)
         {
@@ -167,6 +181,7 @@ internal sealed partial class MainWindow
                                     var corner=ImGui.GetCursorScreenPos();
                                     DrawBankSlot(new(stack.Item.Id.Value, stack.Item.IsHighQuality ? 0 : stack.Quantity,
                                         stack.Item.IsHighQuality ? stack.Quantity : 0), slot, select:false);
+                                    if(stack.DisplayIndex>=0 && stack.DisplayIndex!=target)ImGui.GetWindowDrawList().AddRect(corner,corner+new Vector2(slot),ImGui.GetColorU32(UI.FfxivTheme.Gold),0,ImDrawFlags.None,2);
                                     ImGui.SetCursorScreenPos(corner);ImGui.Dummy(new Vector2(slot));
                                     if(ImGui.IsItemClicked()){sortSlotMenuItem=stack.Item.Id.Value;openSlotMenu=true;}
                                 }

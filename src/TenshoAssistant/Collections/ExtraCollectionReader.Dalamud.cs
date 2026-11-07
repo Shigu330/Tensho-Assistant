@@ -33,7 +33,7 @@ public sealed class ExtraCollectionReader : IDisposable
     public ExtraCollectionReader(IFramework framework,IClientState client,IPlayerState player,IUnlockState unlocks,IDataManager data,IPluginLog log)
     {
         this.framework=framework;this.client=client;this.player=player;this.unlocks=unlocks;this.data=data;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     public void Want()=>Volatile.Write(ref wantedUntilTicks,DateTimeOffset.UtcNow.AddSeconds(5).UtcTicks);
@@ -129,6 +129,6 @@ public sealed class ExtraCollectionReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

@@ -91,6 +91,9 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 | 0.346 | Sous-cotation : afficher aussi le prix moyen de vente récent avant de coller (garde-fou contre une offre trop basse) | Demande un appel Universalis de plus |
 | 0.345 | Ne réécrire le fichier d'un personnage que si ses quantités ont changé | Économie d'écritures disque ; aujourd'hui une écriture toutes les 2 minutes par rangement relevé d'office |
 
+Tri des propositions des quatre audits (2026-11-05) : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md).
+Revue du 2026-11-05 avec l'utilisateur : [plan global](GLOBAL-PLAN.md). I-15, N-13 et X-14 sont écartés ; N-10 est repris.
+
 ## Écarts laissés pour une séance avec l'utilisateur
 
 | Écart | Raison |
@@ -98,7 +101,7 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 | I-05 (annonces des servants au marché) | Première version FAITE 0.508, à essayer en jeu ; la suite plus bas |
 | A-03, A-04 (solveur Raphael et suggestions adaptatives) | A-03 FAIT 0.465 (DEC-028, en option). A-04 FAIT 0.509, à essayer en jeu |
 | N-06 (escouade, composition des missions) | FAIT 0.451 (DEC-027) : planificateur depuis les feuilles du jeu et GcArmyManager ; pourcentage « ≈ » jusqu'à la sonde en jeu (TESTING 0.451) ; affinités non comptées ([preuve](../evidence/0.448-n06-n14-sources.md)) |
-| N-07 (île sanctuaire, carte des ressources) | MJIGatheringItem donne X, Y et un rayon par ressource, mais l'unité n'est pas prouvée : à vérifier en jeu avant de placer les zones sur la carte |
+| N-07 (île sanctuaire, carte des ressources et matériaux) | Carte faite en 0.667 (unité des positions à comparer sur l'île) ; matériaux des créations et d'un agenda faits en 0.673, sans vos stocks ([preuve](../evidence/0.673-island-materials.md)) |
 | N-10 (atelier de l'île, solveur) | Gros : lecture de l'offre et de la demande du jeu et solveur ; à faire avec l'utilisateur, voir plus bas |
 | N-04 (loterie immobilière) | État des mises du joueur : structure du jeu non trouvée dans FFXIVClientStructs (à sonder en jeu) |
 | N-12 (conditions d'apparition des rangs S), N-13 (meubles visibles), X-14 (outils d'aménagement) | Règles communautaires par marque, lecture des meubles et correctifs d'affichage : sources et risques à décider ensemble |
@@ -127,6 +130,6 @@ La liste complète de ce qui reste pour la 1.0.0 : [PUBLISHING](PUBLISHING.md) �
 | Point | Pourquoi pas en autonomie | Ce qu'il faudrait |
 |---|---|---|
 | I-15, recherche dans les fenêtres d'inventaire | Passe sur des pointeurs natifs à chaque image, 15 inconnues (numéros d'onglets, noms des grilles de servants, ordre des cases). Coder à l'aveugle peut faire planter le jeu | D'abord une sonde en lecture seule, avec l'utilisateur devant les fenêtres |
-| N-10, atelier de l'île | 16 inconnues (popularité, offre et demande, lecture après ouverture du carnet), conception jamais relue | Une relecture, puis une sonde devant l'agenda de l'île |
+| N-10, atelier de l'île | Fait sans le jeu en 0.671 et 0.672, inconnues listées dans `docs/evidence/0.671-island-workshop.md` | Essais et capture devant l'agenda de l'île ; prévision de la semaine plus tard |
 | I-05, suite | Relevé des offres du jeu, vue de tous les servants | Après un essai de la 0.508 |
 | Dresseur, suite | Mis de côté par l'utilisateur | Sonde déjà en place (0.501) |

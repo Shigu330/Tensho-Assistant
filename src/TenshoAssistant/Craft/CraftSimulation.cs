@@ -2,11 +2,43 @@ namespace TenshoAssistant.Craft;
 
 public sealed record CraftRecipeParameters(int Durability,int Progress,int Quality,int ProgressDivider,int QualityDivider,
     int ProgressModifier,int QualityModifier,int RequiredCraftsmanship,int RequiredControl,int MaxStartingQuality,
-    bool Expert=false,bool LevelScaled=false,bool Specialist=false,bool Collectable=false,int RequiredQuality=0);
+    bool Expert=false,bool LevelScaled=false,bool Specialist=false,bool Collectable=false,int RequiredQuality=0,
+    // 0.600 (C14): shown on the recipe (Craft/RecipeFacts.cs), not used by the simulation.
+    bool CanHq=false,bool QuickSynth=false,int QuickSynthCraftsmanship=0,int QuickSynthControl=0,string MasterBook="",uint RequiredItem=0,string RequiredStatus="",
+    // C6 (0.666): the quality thresholds of a Cosmic Exploration mission (0 = none).
+    int MissionLow=0,int MissionMid=0,int MissionHigh=0);
 // A-13 (0.434): Specialist = the job is a specialist (Careful Observation, Heart and Soul, Quick Innovation, specialist recipes).
 public sealed record CraftStats(int Level,int Craftsmanship,int Control,int Cp,bool ManipulationAllowed=false,bool Specialist=false);
+/// <summary>C13 (0.668): the HQ chance of a final quality, by whole percent of the maximum (table from Craftimizer, MIT; docs/evidence/0.668-hq-chance.md).</summary>
+public static class CraftHqChance
+{
+    private static readonly int[] Table=[
+        1,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,
+        9,9,9,10,10,10,11,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,17,17,
+        17,18,18,18,19,19,20,20,21,22,23,24,26,28,31,34,38,42,47,52,58,64,68,71,
+        74,76,78,80,81,82,83,84,85,86,87,88,89,90,91,92,94,96,98,100];
+    public static int Percent(int quality,int maximum)=>maximum<=0 ? 0:Table[(int)Math.Clamp((long)Math.Max(quality,0)*100/maximum,0,100)];
+}
+/// <summary>C12 (0.669, rule read in Craftimizer, MIT; docs/evidence/0.669-starting-quality.md): the starting quality given by the HQ ingredients chosen, weighted by item level.</summary>
+public static class CraftStartingQuality
+{
+    public static int FromHq(IEnumerable<(uint ItemLevel,int Amount,int Hq)> ingredients,int maximum)
+    {
+        long total=0,chosen=0;
+        foreach(var (level,amount,hq) in ingredients)
+        {
+            total+=(long)level*Math.Max(amount,0);
+            chosen+=(long)level*Math.Clamp(hq,0,Math.Max(amount,0));
+        }
+        return total<=0 ? 0:(int)Math.Floor((float)chosen/total*maximum);
+    }
+}
 public static class CraftRecipeQuality
 {
+    /// <summary>C6 (0.666, rule read in Craftimizer, MIT; docs/evidence/0.666-adjusted-recipes.md): an adjusted recipe's durability starts from 80, not from its level table.</summary>
+    public static int Durability(bool levelScaled,int tableDurability,int factor)=>(levelScaled ? 80:tableDurability)*factor/100;
+    /// <summary>C6 (0.667, read in the game's files): a mission's thresholds are percents of the maximum quality (20, 40, 70).</summary>
+    public static int MissionThreshold(int maximum,int percent)=>checked((int)((long)maximum*percent/100));
     public static int Maximum(bool canHq,bool collectable,int requiredQuality,int baseQuality,int factor)
     {
         if(requiredQuality<0 || baseQuality<0 || factor<0)throw new ArgumentOutOfRangeException(nameof(baseQuality));
@@ -40,8 +72,6 @@ public static class CraftSimulation
     {
         var p=recipe.Simulation;
         if(p is null) return "Simulation parameters missing for this recipe.";
-        if(p.LevelScaled || p.RequiredQuality>0)
-            return "Adjusted or fixed-quality recipe outside this simulation's scope.";
         if(p.Collectable && p.Quality<=0)return "Collectable maximum quality missing or incompatible.";
         if(p.Durability<=0 || p.Progress<=0 || p.Quality<0 || p.ProgressDivider<=0 || p.ProgressModifier<=0
             || p.Quality>0 && (p.QualityDivider<=0 || p.QualityModifier<=0) || p.MaxStartingQuality<0 || p.MaxStartingQuality>p.Quality)

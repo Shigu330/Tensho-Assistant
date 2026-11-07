@@ -202,7 +202,7 @@ internal sealed partial class MainWindow
                 DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();
                 ImGui.TextUnformatted(localization.Format("HoverUi.CollectionItem",item.Name));
                 var known=0;
-                if(npcVendors?.State.Catalog?.ForItem(item.Id) is { Count:>0 } offers)
+                if(HoverOffers(item.Id) is { Count:>0 } offers)
                     foreach(var offer in offers.Take(3).Select(offer=>{known++;return offer;}))
                     {
                         // 0.146: the price goes on its own indented line; on the same line the wrap squeezed it into a column.
@@ -297,6 +297,10 @@ internal sealed partial class MainWindow
     }
 
     // Item tooltip for the tool lists (NPC vendors…): icon, name, category and levels, collection state, stock and uses.
+    private void DrawEnglishItemName(Items.ItemDefinition? item)
+    {
+        if(configuration.ShowEnglishItemName && item is {EnglishName.Length:>0} && !string.Equals(item.EnglishName,item.Name,StringComparison.Ordinal))ImGui.TextDisabled(item.EnglishName);
+    }
     private void DrawItemInfoTooltip(uint id)
     {
         if(ItemTooltipAlreadyDrawn(id))return;
@@ -304,6 +308,7 @@ internal sealed partial class MainWindow
         ImGui.BeginTooltip();
         try
         {
+            DrawEnglishItemName(item);
             ImGui.PushTextWrapPos(ImGui.GetFontSize()*24);
             DrawItemImage(item,new Vector2(32));ImGui.SameLine();
             ImGui.BeginGroup();
@@ -343,7 +348,7 @@ internal sealed partial class MainWindow
         // How to obtain the item itself (0.144: the sources follow the unlocking item, not only the collection page).
         ImGui.TextColored(Accent,localization.Get("HoverUi.HowToGet"));
         var known=0;
-        if(npcVendors?.State.Catalog?.ForItem(id) is { Count:>0 } offers){known++;ImGui.TextUnformatted(localization.Format("HoverUi.VendorCount",offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));}
+        if(HoverOffers(id) is { Count:>0 } offers){known++;ImGui.TextUnformatted(localization.Format("HoverUi.VendorCount",offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));}
         if(quests.State.RewardIndex?.ForItem(id) is { Count:>0 } rewards){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionQuests",string.Join(", ",rewards.Take(3).Select(reward=>reward.Name))));}
         foreach(var achievement in AchievementsRewarding([id]).Take(3)){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionAchievement",achievement));}
         foreach(var dutyId in LuminaDutiesOf(id).Take(3))

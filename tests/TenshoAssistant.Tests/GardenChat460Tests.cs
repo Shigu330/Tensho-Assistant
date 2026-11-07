@@ -38,7 +38,7 @@ internal static class GardenChat460Tests
         ("Garden detection: read from the chat, on by default with its setting, seed read only, no game function that acts, said on the page",() =>
         {
             var watcher=Read("Reminders/GardenChatWatcher.Dalamud.cs");
-            Check(watcher.Contains("chat.ChatMessageUnhandled+=OnMessage;") && watcher.Contains("chat.ChatMessageUnhandled-=OnMessage;") && watcher.Contains("framework.Update-=OnUpdate;"),"subscribed and released");
+            Check(watcher.Contains("chat.ChatMessageUnhandled+=OnMessage;") && watcher.Contains("chat.ChatMessageUnhandled-=OnMessage;") && watcher.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);"),"subscribed and released");
             Check(watcher.Contains("agent->SelectedItems") && !watcher.Contains("ConfirmSeedAndSoilSelection"),"read only");
             Check(new TenshoAssistant.Configuration().GardenDetect && Read("Configuration.cs").Contains("\"GardenDetect\""),"setting");
             foreach(var language in new[]{"en","fr"})

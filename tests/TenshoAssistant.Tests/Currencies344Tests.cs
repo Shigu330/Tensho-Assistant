@@ -80,7 +80,7 @@ internal static class Currencies344Tests
             var watcher = Read("Inventory/CurrencyWatcher.Dalamud.cs");
             Check(watcher.Contains("Resolved((nint)CurrencyManager.MemberFunctionPointers.GetItemCount)",StringComparison.Ordinal)
                 && watcher.Contains("Resolved((nint)InventoryManager.MemberFunctionPointers.GetInventoryItemCount)",StringComparison.Ordinal),"pointers checked before calls");
-            Check(watcher.Contains("framework.Update+=OnUpdate;",StringComparison.Ordinal) && watcher.Contains("framework.Update-=OnUpdate;",StringComparison.Ordinal)
+            Check(watcher.Contains("TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);",StringComparison.Ordinal) && watcher.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);",StringComparison.Ordinal)
                 && watcher.Contains("player.ContentId==0",StringComparison.Ordinal),"framework thread, logged-in character only, removed on dispose");
             Check(Read("MainWindow.Currencies.cs").Contains("new Dictionary<uint,int>(known)",StringComparison.Ordinal),"copy on write");
             Check(File.ReadAllText(Path.GetFullPath("docs/evidence/0.344-currencies.md")).Contains("GetMaxCompanySeals",StringComparison.Ordinal),"evidence of the probe");

@@ -63,6 +63,10 @@ internal sealed partial class MainWindow
         finally{ImGui.EndPopup();}
     }
 
+    // 0.706 (user report): the Island Sanctuary has no aetheryte, nor have other maps: no entry that can only fail. Markers not read yet: the question says so itself.
+    private bool MapHasAetheryte(MapDefinition map)=>map.TerritoryId!=0 && map.TerritoryId!=IslandResources.Territory
+        && (mapMarkers is null || mapMarkers.For(map.MarkerRange).Any(marker=>marker.AetheryteId!=0));
+
     private void MenuHeader(string name)
     {
         ImGui.TextColored(Accent,name);
@@ -77,6 +81,9 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(map.TerritoryId==0);
         try{if(ImGui.Selectable(localization.Get("MapView.Flag")+"##EntityFlag"))PlaceFlagFromMapView(map,coordinate.X,coordinate.Y);}
         finally{ImGui.EndDisabled();}
+        // 0.704 (user request): wherever coordinates are shown, the nearest aetheryte: the flag, the Tensho map on the point, the usual teleport question.
+        if(MapHasAetheryte(map) && ImGui.Selectable(localization.Get("MapView.NearestAetheryte")+"##EntityAetheryte"))
+            AskNearestAetheryteAt(map,MapProjection.PixelFromCoordinate(coordinate,map),place ?? map.Zone,flag:true,direct:configuration.GoThereTeleport);
         // 0.299: remove the flag from here too (when one is placed).
         if(mapLive?.State?.Flag is not null && ImGui.Selectable(localization.Get("MapView.RemoveFlag")+"##EntityRemoveFlag"))mapLive.RemoveFlag();
         if(ImGui.Selectable(localization.Get("EntityMenu.ShowMap")+"##EntityMap"))

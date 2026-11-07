@@ -11,7 +11,7 @@ internal sealed class GatheringObservationReader : IDisposable
     private readonly IFramework framework;private readonly IPlayerState player;private readonly IClientState client;private readonly IGameGui gui;private readonly IObjectTable objects;private readonly IPluginLog log;
     private bool disposed;private long nextRead;private ulong owner;
     public GatheringObservationReader(GatheringObservationService service,IFramework framework,IPlayerState player,IClientState client,IGameGui gui,IObjectTable objects,IPluginLog log)
-    {this.service=service;this.framework=framework;this.player=player;this.client=client;this.gui=gui;this.objects=objects;this.log=log;framework.Update+=Update;}
+    {this.service=service;this.framework=framework;this.player=player;this.client=client;this.gui=gui;this.objects=objects;this.log=log;TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}
     private ulong CurrentOwner=>client.IsLoggedIn && player.IsLoaded ? player.ContentId:0;
     private static unsafe bool Visible(AtkResNode* node)
     {
@@ -32,6 +32,25 @@ internal sealed class GatheringObservationReader : IDisposable
         // R-14 (0.454): type checked above: a plain cast, not a game function that a patch can leave unresolved.
         var text=(AtkTextNode*)node;if(text->NodeText.Length>64)return null;
         return Dalamud.Game.Text.SeStringHandling.SeString.Parse(text->NodeText.AsSpan()).TextValue;
+    }
+    private volatile ActionBarRect?[] slotRects=new ActionBarRect?[8];
+    /// <summary>0.751 (X-04): where each row of the game's gathering window is on the screen, by slot index; null when hidden.</summary>
+    public IReadOnlyList<ActionBarRect?> SlotRects=>slotRects;
+    private volatile int autoGather=-1;
+    /// <summary>0.753 (X-06): « gather automatically the selected item » ticked in the game's window; null when the box is not shown.</summary>
+    public bool? AutoGather=>autoGather<0 ? null:autoGather==1;
+    private static unsafe ActionBarRect?[] Rects(AddonGathering* addon)
+    {
+        var rects=new ActionBarRect?[8];
+        for(var index=0;index<8 && index<addon->GatheredItemComponentCheckbox.Length;index++)
+        {
+            AtkComponentCheckBox* component=addon->GatheredItemComponentCheckbox[index];
+            if(component==null || component->OwnerNode==null || !Visible(&component->OwnerNode->AtkResNode))continue;
+            var node=&component->OwnerNode->AtkResNode;var scale=addon->AtkUnitBase.Scale;
+            var rect=new ActionBarRect(node->ScreenX,node->ScreenY,node->Width*node->ScaleX*scale,node->Height*node->ScaleY*scale);
+            if(rect.Valid)rects[index]=rect;
+        }
+        return rects;
     }
     private static unsafe GatheringRawSlot[] Copy(AddonGathering* addon)
     {
@@ -88,9 +107,12 @@ internal sealed class GatheringObservationReader : IDisposable
                 var target=local.TargetObject;
                 var node=target?.ObjectKind==Dalamud.Game.ClientState.Objects.Enums.ObjectKind.GatheringPoint ? target.BaseId:0;
                 service.Publish(ticket,current,job,level,gp,maxGp,status,attempts,total,slots,node);
+                slotRects=Rects(addon);
+                var quick=addon->QuickGatheringComponentCheckBox;
+                autoGather=quick==null || quick->OwnerNode==null || !Visible(&quick->OwnerNode->AtkResNode) ? -1:quick->IsChecked ? 1:0;
             }
             catch(Exception error){service.Fail(ticket,current,error);nextRead=now+Stopwatch.Frequency*5;log.Warning(error,"Gathering observation unavailable; retry in five seconds.");}
         }
     }
-    public void Dispose(){lock(gate){if(disposed)return;disposed=true;framework.Update-=Update;service.Dispose();}}
+    public void Dispose(){lock(gate){if(disposed)return;disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);service.Dispose();}}
 }

@@ -103,8 +103,9 @@ internal static class PreparationCostTests
         ("Preparation batch deduplicates prices and respects shared cadence across two requested items",()=>
         {
             var times=new List<DateTimeOffset>();
-            using var client=new HttpClient(new MarketTestHandler((request,_)=>{times.Add(DateTimeOffset.UtcNow);return Task.FromResult(Reply(uint.Parse(request.RequestUri!.Segments.Last())));}));
+            using var client=new HttpClient(new MarketTestHandler((request,_)=>{times.Add(DateTimeOffset.UtcNow);return Task.FromResult(Reply(uint.Parse(request.RequestUri!.Segments.Last().Split(',')[0])));}));
             using var market=new MarketService(client);market.SetWorld(1,71,"World");using var session=new PreparationPriceSession();
+            // 0.608 (I4): one request for both, answering only the first: the other is asked alone, after the pause.
             session.StartAsync(market,Context,[42,42,43]).GetAwaiter().GetResult();
             Check(session.State.Completed==2 && !session.State.Loading && session.State.Error is null && times.Count==2,"each unique ingredient fetched once");
             Check(times[1]-times[0]>=TimeSpan.FromSeconds(2.8) && market.State.ItemId==0,"queue shares network spacing without changing manual item");

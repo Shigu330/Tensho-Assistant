@@ -16,7 +16,7 @@ internal static class Languages406Tests
         "Events/Festivals.cs",              // French event names built from the guide NPC (French client only)
         "Alarms/GameAlarmCommand.cs",       // the game's own /alarm command syntax
     };
-    private static readonly HashSet<string> AllowedLiterals = ["pêche"]; // « /tensho pêche », typed by players
+    private static readonly HashSet<string> AllowedLiterals = ["pêche","récolte"]; // « /tensho pêche », « /tensho récolte », typed by players
 
     private static readonly Regex Literal = new(@"\$?""((?:[^""\\\n]|\\.)*)""", RegexOptions.Compiled);
     private static readonly Regex Accented = new("[éèàêçôîûùÉÈÀÊÇœ]", RegexOptions.Compiled);

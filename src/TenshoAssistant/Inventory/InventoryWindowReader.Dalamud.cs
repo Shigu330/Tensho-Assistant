@@ -26,7 +26,7 @@ public sealed unsafe class InventoryWindowReader : IDisposable
     public InventoryWindowReader(IFramework framework,IGameGui gui,Func<bool> enabled,IPluginLog log)
     {
         this.framework=framework;this.gui=gui;this.enabled=enabled;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework _)
@@ -59,6 +59,6 @@ public sealed unsafe class InventoryWindowReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

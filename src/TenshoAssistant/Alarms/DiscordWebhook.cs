@@ -15,7 +15,11 @@ public enum AlarmSource { Other, Gathering, Fishing, Reminder, Voyage, Currency,
 public sealed class DiscordSettings
 {
     public bool Enabled { get; set; }
+    // 0.578 (user request): rows of the Reminders page whose alarms stay off Discord.
+    public List<string>? ReminderRowsOff { get; set; }
     public string WebhookUrl { get; set; } = "";
+    // 0.598 (T24): another channel for a category; without one, the address above. Secrets like it: stored here only, never logged nor reported.
+    public Dictionary<AlarmSource,string>? CategoryUrls { get; set; }
     public string Username { get; set; } = "Tensho";
     // Empty = the localized default message. Placeholders: [label], [minutes], [time], [character].
     public string Template { get; set; } = "";
@@ -64,6 +68,13 @@ public static class DiscordWebhook
         return $"https://{uri.Host}/api/webhooks/{id[..4]}…/***";
     }
 
+    /// <summary>0.598 (T24): where a category posts: its own address when it has a valid one, else the main one.</summary>
+    public static string UrlFor(DiscordSettings settings, AlarmSource source)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        return settings.CategoryUrls?.GetValueOrDefault(source) is { } own && IsValidUrl(own) ? own : settings.WebhookUrl;
+    }
+
     public static bool IsValidRoleId(string? id) => id is not null && Snowflake.IsMatch(id.Trim());
 
     /// <summary>A role id typed or pasted (the bare id, or the mention « &lt;@&amp;id&gt; » Discord copies); "" to remove; null when not a role id.</summary>
@@ -107,24 +118,50 @@ public static class DiscordWebhook
 
     /// <summary>0.344: whether an alert that is not a Tensho alarm (currency thresholds) goes to Discord: setting on, valid address, category on.</summary>
     public static bool ShouldSend(DiscordSettings? settings, AlarmSource source) =>
-        settings is { Enabled: true } && IsValidUrl(settings.WebhookUrl) && CategoryOn(settings, source);
+        settings is { Enabled: true } && IsValidUrl(UrlFor(settings, source)) && CategoryOn(settings, source);
 
-    /// <summary>Whether a ringing alarm goes to Discord: setting on, valid address, the alarm's own switch and its category on.</summary>
+    /// <summary>0.578: the Reminders row of an alarm: the one that made it, or the deadline an automatic one follows. Empty: none.</summary>
+    public static string ReminderRowOf(TenshoAlarm alarm)
+    {
+        ArgumentNullException.ThrowIfNull(alarm);
+        if (alarm.ReminderRow.Length > 0) return alarm.ReminderRow;
+        if (alarm.AutoKey == "squadron:mission") return "SquadronMission";
+        if (alarm.AutoKey == "squadron:training") return "SquadronTraining";
+        if (alarm.AutoKey.StartsWith("venture:", StringComparison.Ordinal)) return "Ventures";
+        if (alarm.AutoKey.StartsWith("vessel:", StringComparison.Ordinal)) return "Voyages";
+        return "";
+    }
+    public static bool ReminderRowOn(DiscordSettings settings, TenshoAlarm alarm) => settings.ReminderRowsOff?.Contains(ReminderRowOf(alarm)) != true;
+
+    /// <summary>Whether a ringing alarm goes to Discord: setting on, valid address, its category on, and its switch: for a reminder, the box of its row in Reminders (0.584: the only one), else the alarm's own.</summary>
     public static bool ShouldSend(DiscordSettings? settings, TenshoAlarm alarm) =>
-        settings is { Enabled: true } && IsValidUrl(settings.WebhookUrl) && alarm.Discord && CategoryOn(settings, SourceOf(alarm));
+        settings is { Enabled: true } && IsValidUrl(UrlFor(settings, SourceOf(alarm))) && (ReminderRowOf(alarm).Length > 0 ? ReminderRowOn(settings, alarm) : alarm.Discord) && CategoryOn(settings, SourceOf(alarm));
 
     /// <summary>
     /// The message text: the alarm's own message, else the template, else the default; placeholders replaced, [character] only when
     /// allowed (else removed), the role mention first when set, cut to Discord's 2000 characters.
     /// </summary>
-    public static string Format(DiscordSettings settings, string defaultTemplate, string? alarmMessage, string label, int minutes, DateTimeOffset localTime, string? character)
+    /// <summary>Eorzea time at this moment, HH:mm (one Eorzean hour lasts 175 seconds).</summary>
+    public static string EorzeaClock(DateTimeOffset moment)
+    {
+        var minutes=moment.ToUnixTimeMilliseconds()*3600/175/1000/60%1440;
+        return $"{minutes/60:00}:{minutes%60:00}";
+    }
+
+    public static string Format(DiscordSettings settings, string defaultTemplate, string? alarmMessage, string label, int minutes, DateTimeOffset localTime, string? character, string? zone = null, string? item = null)
     {
         ArgumentNullException.ThrowIfNull(settings);
         var template = !string.IsNullOrWhiteSpace(alarmMessage) ? alarmMessage! : !string.IsNullOrWhiteSpace(settings.Template) ? settings.Template : defaultTemplate;
         var who = settings.IncludeCharacter ? character ?? "" : "";
         var text = template.Replace("[label]", label, StringComparison.Ordinal).Replace("[minutes]", Math.Max(0, minutes).ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal)
             .Replace("[time]", localTime.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal)
-            .Replace("[character]", who, StringComparison.Ordinal).Trim();
+            .Replace("[character]", who, StringComparison.Ordinal)
+            // 0.564 (T18): Discord writes these two in each reader's own time zone; the Eorzea time and the names of the zone and the item.
+            .Replace("[discordtime]", $"<t:{localTime.ToUnixTimeSeconds()}:t>", StringComparison.Ordinal)
+            .Replace("[relative]", $"<t:{localTime.ToUnixTimeSeconds()}:R>", StringComparison.Ordinal)
+            .Replace("[et]", EorzeaClock(localTime), StringComparison.Ordinal)
+            .Replace("[zone]", zone ?? "", StringComparison.Ordinal)
+            .Replace("[item]", item ?? "", StringComparison.Ordinal).Trim();
         if (settings.IncludeCharacter && who.Length > 0 && !template.Contains("[character]", StringComparison.Ordinal)) text = $"{text} — {who}";
         if (IsValidRoleId(settings.MentionRoleId)) text = $"<@&{settings.MentionRoleId.Trim()}> {text}";
         return text.Length <= ContentMaximum ? text : text[..(ContentMaximum - 1)] + "…";

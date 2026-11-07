@@ -5,7 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 namespace TenshoAssistant.Gear;
 
 /// <summary>The game's gear sets and the job levels (ClassJob row → level; null when not read), copied together.</summary>
-public sealed record GearsetState(IReadOnlyList<GameGearset> Sets,IReadOnlyDictionary<uint,int> JobLevels);
+public sealed record GearsetState(IReadOnlyList<GameGearset> Sets,IReadOnlyDictionary<uint,int> JobLevels,IReadOnlyList<JobProgressRow>? Jobs=null);
 
 /// <summary>
 /// g, M-12 (0.383): while the Gear page asks (<see cref="Want"/>, 5 s window), copies the game's gear sets (RaptureGearsetModule
@@ -21,6 +21,8 @@ public sealed unsafe class GameGearsetReader : IDisposable
     private readonly IClientState client;
     private readonly IPluginLog log;
     private readonly IReadOnlyDictionary<uint,int> expIndex;
+    private readonly IReadOnlyList<(uint Job,int Index)> jobs;
+    private readonly IReadOnlyDictionary<int,int> expToNext;
     private GearsetState? state;
     private volatile bool unavailable;
     /// <summary>0.492 (R-14): the last read failed (perhaps after a game update): State is then null, not the old sets.</summary>
@@ -34,11 +36,12 @@ public sealed unsafe class GameGearsetReader : IDisposable
     /// <summary>Asks to wear the set of this game number (1-based) at the next framework update (player's click only).</summary>
     public void Equip(int number)=>Interlocked.Exchange(ref equipRequest,number-1);
 
-    public GameGearsetReader(IFramework framework,IClientState client,IPluginLog log,IReadOnlyDictionary<uint,int> expIndex)
+    public GameGearsetReader(IFramework framework,IClientState client,IPluginLog log,IReadOnlyDictionary<uint,int> expIndex,IReadOnlyDictionary<uint,int> jobOrder,IReadOnlyDictionary<int,int> expToNext)
     {
-        this.framework=framework;this.client=client;this.log=log;this.expIndex=expIndex;
-        framework.Update+=OnUpdate;
-        try{client.Logout+=OnLogout;}catch{framework.Update-=OnUpdate;throw;}
+        this.framework=framework;this.client=client;this.log=log;this.expIndex=expIndex;this.expToNext=expToNext;
+        jobs=JobProgressList.Jobs(expIndex,jobOrder);
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
+        try{client.Logout+=OnLogout;}catch{TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);throw;}
     }
 
     public void Want()=>Volatile.Write(ref wantedUntil,DateTimeOffset.UtcNow.AddSeconds(5).UtcTicks);
@@ -88,7 +91,16 @@ public sealed unsafe class GameGearsetReader : IDisposable
             if(player!=null && player->IsLoaded)
                 foreach(var (job,exp) in expIndex)
                     if(exp>=0 && exp<player->ClassJobLevels.Length && player->ClassJobLevels[exp] is > 0 and var level)levels[job]=level;
-            Volatile.Write(ref state,new GearsetState(sets,levels));
+            // T21 (0.646): the same slots for the experience.
+            var progress=new List<JobProgressRow>();
+            if(player!=null && player->IsLoaded)
+                foreach(var (job,slot) in jobs)
+                    if(slot>=0 && slot<player->ClassJobLevels.Length && slot<player->ClassJobExperience.Length)
+                    {
+                        var level=(int)player->ClassJobLevels[slot];
+                        progress.Add(new(job,Math.Max(level,0),Math.Max(player->ClassJobExperience[slot],0),expToNext.GetValueOrDefault(level)));
+                    }
+            Volatile.Write(ref state,new GearsetState(sets,levels,progress));
             unavailable=false;
             warned=false;
         }
@@ -107,7 +119,7 @@ public sealed unsafe class GameGearsetReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         client.Logout-=OnLogout;
     }
 }

@@ -17,8 +17,8 @@ internal static class CurrencyValue354Tests
             Check(new CurrencyBuy(4,1,0,false,100m).GilPerUnit is null && new CurrencyBuy(5,1,10,false,0m).GilPerUnit is null,"no cost or no price: unknown");
             Check(CurrencyValue.Rank([unknown,cheap,bundle]).Select(buy => buy.ItemId).SequenceEqual([2u,1u,3u]),"most profitable first, unknown last");
             var page = Read("MainWindow.CurrencyValue.cs");
-            Check(page.Contains("currencyPrices.StartListAsync(market,character,world.WorldId,missing.Take(32))",StringComparison.Ordinal)
-                && page.Contains("configuration.CommunityUniversalis",StringComparison.Ordinal),"prices on a click, 32 at most, Universalis switch honoured");
+            Check(page.Contains("missing.Take(MarketService.BatchMaximum)",StringComparison.Ordinal) && page.Contains("currencyPrices.StartListAsync(market,character,world.WorldId,batch,true)",StringComparison.Ordinal)
+                && page.Contains("configuration.CommunityUniversalis",StringComparison.Ordinal),"prices after the choice of a currency, 100 at a time, Universalis switch honoured");
             Check(Read("MainWindow.Lifetime.cs").Contains("currencyPrices.Dispose();",StringComparison.Ordinal),"session disposed");
         }),
     ];

@@ -20,8 +20,19 @@ internal sealed partial class MainWindow
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("GatheringDetails.EquipTip",set.Number,set.Name.Length>0 ? set.Name:JobName(job)));
     }
 
+    /// <summary>0.600 (C14): HQ, quick synthesis, master book, specialist, required item and status. Whether the book is read is not known here.</summary>
+    private void DrawRecipeFacts(RecipeDefinition recipe)
+    {
+        if(recipe.Simulation is not { } p)return;
+        var parts=RecipeFacts.Of(p,id=>itemCatalog.State.Catalog?.Find(id)?.Name).Select(fact=>fact.Key=="QuickFrom"
+            ? localization.Format("RecipeFacts.QuickFrom",fact.Value.Split('|')[0],fact.Value.Split('|')[1])
+            : localization.Format("RecipeFacts."+fact.Key,fact.Value));
+        ImGui.TextDisabled(string.Join(" · ",parts));
+    }
+
     private void DrawCraftReadiness(RecipeDefinition recipe)
     {
+        DrawRecipeFacts(recipe);
         if(recipe.Simulation is not { } p)return;
         var job=recipe.CraftTypeId+8;
         GearsetSource?.Want();

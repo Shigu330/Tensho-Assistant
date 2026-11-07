@@ -1,3 +1,4 @@
+using TenshoAssistant.Maps;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Craft;
 using TenshoAssistant.Gathering;
@@ -45,6 +46,7 @@ internal sealed partial class MainWindow
                             if(configuration.GoThereEquip)EquipGatheringGearset(row.Source);
                             AskNearestAetheryteAt(target.Map,target.Pixel,string.IsNullOrWhiteSpace(row.Source.Place) ? row.Source.Zone:row.Source.Place,flag:true,direct:configuration.GoThereTeleport);
                         }
+                        PlaceMenu("RoutePlace",target.Map,MapProjection.CoordinateFromPixel(target.Pixel,target.Map),string.IsNullOrWhiteSpace(row.Source.Place) ? row.Source.Zone:row.Source.Place);
                     }
                 }
                 finally{ImGui.PopID();}

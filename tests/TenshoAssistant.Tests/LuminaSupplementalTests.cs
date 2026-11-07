@@ -65,6 +65,9 @@ internal static class LuminaSupplementalTests
             var shark = data.Find(43749)!;
             Check(shark is { StartMinute: 1080, EndMinute: 1200, Lure: "Modest", Bite: "Legendary" } && shark.Weathers.SequenceEqual([7u, 8u])
                 && shark.Transitions.SequenceEqual([1u, 2u]) && shark.Predators.SequenceEqual([(38939u, 4), (36449u, 5)]), "window, weathers, lure, predators");
+            Check(shark.Intuition == 20, "the number before the pairs");
+            var none = GatherBuddyFishData.Parse([@"Apply(data, 1234).Predators(data, 0, (38939, 4));Apply(data, 1235).Predators(data, (38939, 4));Apply(data, 1236).Bite(data, HookSet.Powerful, BiteType.Weak);"]);
+            Check(none.Find(1234)?.Intuition is null || none.Count == 0, "0: not known");
             Check(data.Find(1) is null && data.Route(1).Count == 0, "unknown fish");
             // Older files (Data2.0.cs, read 2026-11-01): spaces before the parenthesis and the whole mooch chain in one call.
             const string older = @"

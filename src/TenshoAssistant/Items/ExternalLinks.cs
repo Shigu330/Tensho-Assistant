@@ -7,6 +7,10 @@ namespace TenshoAssistant.Items;
 /// </summary>
 public static class ExternalLinks
 {
+    // 0.561 (I8): pages by item id, opened in the browser on a click.
+    public static string Universalis(uint item)=>$"https://universalis.app/market/{item}";
+    public static string Garland(uint item)=>$"https://www.garlandtools.org/db/#item/{item}";
+    public static string Teamcraft(string language,uint item)=>$"https://ffxivteamcraft.com/db/{language}/item/{item}";
     public static string Wiki(string englishName)
         =>"https://ffxiv.consolegameswiki.com/wiki/"+Uri.EscapeDataString(englishName.Trim().Replace(' ','_'));
 

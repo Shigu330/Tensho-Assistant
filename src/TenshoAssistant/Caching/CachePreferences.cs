@@ -6,7 +6,19 @@ public enum CacheRetention { FiveMinutes, OneHour, OneDay, SevenDays, Never }
 
 public sealed class CachePreferences
 {
-    private int prices=2,quests,collections=2,sources=3,fashion=3,importedStock=2,craftCalculations=2,completion=3;
+    // 0.750 (X-02, user request: « fresh data are rarely needed, unless they are missing »): longer defaults. Prices and the Fashion Report keep theirs: they change.
+    private int prices=2,quests=1,collections=3,sources=4,fashion=3,importedStock=2,craftCalculations=3,completion=3;
+
+    /// <summary>0.750 (X-02): settings saved with the earlier defaults move to the new ones once; a duration the player chose otherwise stays.</summary>
+    public bool LongerDefaults()
+    {
+        var changed=false;
+        if(Quests==CacheRetention.FiveMinutes){Quests=CacheRetention.OneHour;changed=true;}
+        if(Collections==CacheRetention.OneDay){Collections=CacheRetention.SevenDays;changed=true;}
+        if(Sources==CacheRetention.SevenDays){Sources=CacheRetention.Never;changed=true;}
+        if(CraftCalculations==CacheRetention.OneDay){CraftCalculations=CacheRetention.SevenDays;changed=true;}
+        return changed;
+    }
     public CacheRetention Prices {get=>(CacheRetention)Volatile.Read(ref prices);set=>Volatile.Write(ref prices,(int)value);}
     public CacheRetention Quests {get=>(CacheRetention)Volatile.Read(ref quests);set=>Volatile.Write(ref quests,(int)value);}
     public CacheRetention Collections {get=>(CacheRetention)Volatile.Read(ref collections);set=>Volatile.Write(ref collections,(int)value);}

@@ -32,11 +32,31 @@ public static class GpRegen
 public sealed class GpAlertTracker
 {
     private uint? last;
-    public void Reset()=>last=null;
+    private bool away;
+    private uint? fellTo;
+    public void Reset(){last=null;away=false;fellTo=null;}
+    /// <summary>
+    /// 0.657 (docs/evidence/0.656-gp-alert-teleport.md): the game takes GP at a change of zone, 809 to 772 in the reading. GP at the target before it does not ring when it climbs back.
+    /// A further fall means GP was spent: the alert follows as usual.
+    /// </summary>
+    public void Away()=>away=true;
     public static uint Target(uint maxGp,int threshold)=>threshold<=0 ? maxGp:Math.Min((uint)threshold,maxGp);
     public bool Evaluate(uint gp,uint maxGp,int threshold)
     {
         var target=Target(maxGp,threshold);
+        if(away)
+        {
+            away=false;
+            if(last is { } known && known>=target && gp<target)fellTo=gp;
+        }
+        if(fellTo is { } fell)
+        {
+            if(gp>=target)fellTo=null;
+            else if(gp>=fell){fellTo=gp;return false;}
+            else fellTo=null;
+            last=gp;
+            return false;
+        }
         var reached=last is { } before && before<target && gp>=target && maxGp>0;
         last=gp;
         return reached;

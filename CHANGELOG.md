@@ -3,6 +3,1580 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.801.0
+- Plan global, Verify : Lourdeur (X-01) : le journal montre encore la carte à 165–195 ms et le panneau d'atelier à 93–97 ms, environ toutes les cinq minutes, mais la ligne « Slow frame » ne gardait que les quatre plus gros morceaux, qui étaient les enveloppes (toutes les fenêtres, carte, mise en page, canevas) : les points de mesure de 0.791 n'apparaissaient jamais. Elle en garde maintenant dix. Mode développeur seulement, aucun changement visible. Non validé en jeu.
+- Tests : SlowParts801Tests. Verify.ps1 (agent) : 1382/1382, 0 avertissement, 0 erreur ; DLL 0.801.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01): the log still shows the map at 165-195 ms and the workshop panel at 93-97 ms, about every five minutes, but the « Slow frame » line kept only the four largest parts, which were the wholes (all windows, map, layout, canvas): the 0.791 checkpoints never showed. It now keeps ten. Developer mode only, no visible change. Not validated in game.
+
+## 0.800.0
+- Plan global, Verify : Demande (X-41) : les monstres proches qui lâchent une monture, une mascotte ou un rouleau d'orchestrion que vous n'avez pas sont marqués d'une gemme sur la carte, les objets au survol ; au choix aussi au-dessus de leur tête (désactivé au départ). Ce qui vous manque est lu en jeu ; non lu, rien n'est dit. Réglages dans la carte et sur la page Collections (montures, mascottes, orchestrion). Données de butin : LuminaSupplemental. Non validé en jeu.
+- Tests : CollectionMonsters800Tests. Verify.ps1 (agent) : 1381/1381, 0 avertissement, 0 erreur ; DLL 0.800.0.0. Non validé en jeu.
+### English
+- Request (X-41): nearby monsters that drop a mount, minion or orchestrion roll you lack are marked with a gem on the map, the items on hover; also above their head when chosen (off at first). What you lack is read in game; not read, nothing is said. Settings on the map and on the Collections page (mounts, minions, orchestrion). Drop data: LuminaSupplemental. Not validated in game.
+
+## 0.799.0
+- Plan global, Verify : Demande (X-38), suite : l'icône du mage bleu au-dessus de la tête d'un monstre proche qui apprend un sort que vous n'avez pas, dans la vue du jeu, dessinée derrière les fenêtres de Tensho, les sorts au survol. Au choix aussi pour les monstres de vos listes (patte), du bestiaire (livre) et des ALÉA (étoile), désactivés au départ. Réglages dans la carte (« Icônes au-dessus des monstres proches » : raisons, taille, distance jusqu'à 150 yalms, masquer en combat) et sur la page Magie bleue. Les monstres sont relus tous les dixièmes de seconde pour suivre leurs déplacements. Non validé en jeu.
+- Tests : MonsterIcons799Tests. Verify.ps1 (agent) : 1379/1379, 0 avertissement, 0 erreur ; DLL 0.799.0.0. Non validé en jeu.
+### English
+- Request (X-38), continued: the Blue Mage icon above the head of a nearby monster that teaches a spell you lack, in the game's view, drawn behind Tensho's windows, the spells on hover. Also, when chosen, for monsters of your lists (paw), hunting log (book) and FATEs (star), off at first. Settings on the map (« Icons above nearby monsters »: reasons, size, distance up to 150 yalms, hide in combat) and on the Blue magic page. Monsters are read every tenth of a second to follow their moves. Not validated in game.
+
+## 0.798.0
+- Plan global, Verify : Demande (X-38), première partie : les monstres proches qui apprennent une magie bleue que vous n'avez pas sont marqués d'un chapeau de magicien sur la carte, les sorts au survol. Le jeu ne relie aucun sort à un monstre : la source est le wiki, déjà lu sort par sort ; la page Magie bleue a maintenant un bouton qui lit les sorts manquants, une page toutes les trois secondes, gardées sur le disque, rien sans ce clic. Les noms anglais du wiki sont reliés aux monstres du jeu par leur nom. Réglages : « Monstres pour le mage bleu » (carte et page Magie bleue) et « Même hors mage bleu », désactivé au départ. L'icône au-dessus de la tête vient ensuite. Non validé en jeu.
+- Tests : BlueNearby798Tests. Verify.ps1 (agent) : 1378/1378, 0 avertissement, 0 erreur ; DLL 0.798.0.0. Non validé en jeu.
+### English
+- Request (X-38), first part: nearby monsters that teach a blue magic spell you lack are marked with a wizard's hat on the map, the spells on hover. The game links no spell to a monster: the source is the wiki, already read spell by spell; the Blue magic page now has a button that reads the missing spells, one page every three seconds, kept on disk, nothing without that click. The wiki's English names are matched to the game's monsters by name. Settings: « Monsters for Blue Mage » (map and Blue magic page) and « Even when not Blue Mage », off at first. The icon above the head comes next. Not validated in game.
+
+## 0.797.0
+- Plan global, Verify : Demande (X-37) : les monstres proches qui font partie d'un ALÉA en cours sont marqués d'une étoile sur la carte, avec le nom de l'ALÉA au survol (réglage « Monstres des ALÉA » dans la carte) ; un monstre du même nom hors de l'ALÉA n'est pas marqué. Pour les mandats, le lien entre un monstre et le mandat n'est pas encore connu : en mode développeur, l'événement de chaque monstre proche est noté au journal, à relever pendant un mandat de combat. Non validé en jeu.
+- Tests : FateMonsters797Tests. Verify.ps1 (agent) : 1376/1376, 0 avertissement, 0 erreur ; DLL 0.797.0.0. Non validé en jeu.
+### English
+- Request (X-37): nearby monsters that belong to a running FATE are marked with a star on the map, with the FATE's name on hover (map setting « Monsters of FATEs »); a monster of the same name outside the FATE is not marked. For leves, the link between a monster and the leve is not known yet: in developer mode, each nearby monster's event is written to the log, to read during a battle leve. Not validated in game.
+
+## 0.796.0
+- Plan global, Verify : Demande (X-36) : les monstres proches que le bestiaire demande encore. Sur la carte, un livre marque un monstre encore à vaincre au rang actuel d'un bestiaire (le seul que le jeu compte) ; au survol, l'entrée et les victoires (« Gladiateur 01, 1/2 »). Réglage « Monstres de votre bestiaire » dans la carte, et le même sur la page Bestiaire. Les monstres proches sont maintenant une seule couche : une icône par monstre, toutes ses raisons au survol (butin pour vos listes, bestiaire). Non validé en jeu.
+- Tests : HuntNearby796Tests. Verify.ps1 (agent) : 1374/1374, 0 avertissement, 0 erreur ; DLL 0.796.0.0. Non validé en jeu.
+### English
+- Request (X-36): nearby monsters the hunting log still asks for. On the map, a book marks a monster still to defeat in a log's current rank (the only one the game counts); on hover, the entry and the kills (« Gladiator 01, 1/2 »). Setting « Monsters for your hunting log » on the map, and the same on the Hunting log page. Nearby monsters are now one layer: one icon per monster, every reason on hover (drops for your lists, hunting log). Not validated in game.
+
+## 0.795.0
+- Plan global, Verify : Demande (X-34, X-35) : les monstres proches, en information seulement. Tensho lit les ennemis vivants que le jeu charge autour du personnage (nom, lieu, niveau ; 100 au plus ; coupé en JcJ). Premier usage : un monstre proche qui lâche un objet que vos listes de suivi demandent encore apparaît sur la carte avec une patte (son nom, son niveau et ce qu'il lâche au survol), et la ligne de l'objet dans la liste porte la même patte. Réglages : « Monstres de vos listes » dans la carte, « Monstres proches qui le lâchent » sous « Monstre » dans les options des listes. Données de butin : LuminaSupplemental. Non validé en jeu.
+- Tests : NearbyMonsters795Tests. Verify.ps1 (agent) : 1372/1372, 0 avertissement, 0 erreur ; DLL 0.795.0.0. Non validé en jeu.
+### English
+- Request (X-34, X-35): nearby monsters, as information only. Tensho reads the living enemies the game streams around the character (name, place, level; 100 at most; cut in PvP). First use: a nearby monster that drops an item your tracking lists still need shows on the map with a paw (name, level and drops on hover), and the item's line in the list carries the same paw. Settings: « Monsters for your lists » on the map, « Nearby monsters that drop it » under « Monster » in the list options. Drop data: LuminaSupplemental. Not validated in game.
+
+## 0.794.0
+- Plan global, Verify : Demande (X-33) : « Que faire avec ? » tient compte des ventes par jour, comme « Que puis-je fabriquer ? ». Une vente isolée (Matière sombre grade I « vendue » 350 000) mettait l'objet en tête. Nouvelles colonnes « Ventes / jour » et « Gils en N jours » : ce qui se vend en ce nombre de jours au rythme du marché, sans dépasser ce que votre solde achète ; le classement suit ces gils, la vitesse inconnue en dernier. Le nombre de jours est celui de « Que puis-je fabriquer ? », réglable sur la page. Non validé en jeu.
+- Tests : CurrencySales794Tests. Verify.ps1 (agent) : 1369/1369, 0 avertissement, 0 erreur ; DLL 0.794.0.0. Non validé en jeu.
+### English
+- Request (X-33): « What to do with? » counts the sales per day, like « What can I craft? ». One odd sale (Dark Matter grade I « sold » for 350,000) put the item first. New columns « Sold a day » and « Gil in N days »: what sells in that many days at the market's speed, no more than your balance buys; the ranking follows that gil, unknown speed last. The days are those of « What can I craft? », set on the page too. Not validated in game.
+
+## 0.793.0
+- Plan global, Verify : Demande (X-32) : plus besoin d'ouvrir et fermer la carte du jeu pour voir la zone d'un mandat. La capture de 0.792 (mandat 1670) montre que le jeu tient la zone dans sa propre liste dès l'acceptation, alors que la liste de la fenêtre carte, la seule que Tensho lisait, est vide ; une fois le mandat commencé, elle tient aussi ses points, un de moins à chaque récolte. Tensho lit maintenant cette liste (lecture seule, sans rien ouvrir ni appeler) et ajoute ce qui manque, sans doublon. Non validé en jeu.
+- Tests : GameLeves793Tests. Verify.ps1 (agent) : 1366/1366, 0 avertissement, 0 erreur ; DLL 0.793.0.0. Non validé en jeu.
+### English
+- Request (X-32): no more opening and closing the game map to see a leve's area. The 0.792 capture (leve 1670) shows the game keeps the area in its own list from acceptance, while the map window's list, the only one Tensho read, is empty; once the leve is started it also holds its points, one fewer per gathering. Tensho now reads that list (read only, nothing opened or called) and adds what is missing, without doubles. Not validated in game.
+
+## 0.792.0
+- Plan global, Verify : Demande (X-32) : une solution au blocage qu'on contournait en ouvrant puis fermant la carte du jeu (zone d'un mandat absente tant que la carte du jeu n'avait pas été ouverte à portée). Piste, sans rien ouvrir ni appeler dans le jeu : le jeu garde aussi ses marqueurs de quêtes et de mandats dans sa propre liste (Map), à part de celle de la fenêtre carte que Tensho lit. En mode développeur, cette liste est notée au journal avec l'état de la carte du jeu, pour vérifier qu'elle contient les zones carte fermée. Aucun changement visible. Non validé en jeu.
+- Tests : QuestMarkers792Tests. Verify.ps1 (agent) : 1364/1364, 0 avertissement, 0 erreur ; DLL 0.792.0.0. Non validé en jeu.
+### English
+- Request (X-32): a fix for what opening and closing the game map worked around (a leve's area missing until the game map had been opened in range). Lead, without opening or calling anything in the game: the game also keeps its quest and leve markers in its own list (Map), apart from the map window's list Tensho reads. In developer mode that list is written to the log with the game map's state, to check it holds the areas while the map is closed. No visible change. Not validated in game.
+
+## 0.791.0
+- Plan global, Verify : Lourdeur (X-01) : le journal du 2026-11-07 montre la carte à 110–160 ms plusieurs fois par heure (« map overlay layout »), pas seulement à l'ouverture. Cette mesure englobait tout le dessin de la carte : en mode développeur, elle est maintenant découpée (commandes, puis dans la carte : texture et noms, points de récolte, zones, icônes, signets et joueur, bords et info-bulles), pour trouver le morceau lent. Aucun changement visible. Non validé en jeu.
+- Tests : MapMarks791Tests. Verify.ps1 (agent) : 1363/1363, 0 avertissement, 0 erreur ; DLL 0.791.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01): the 2026-11-07 log shows the map at 110-160 ms several times an hour (« map overlay layout »), not only at opening. That measure covered the whole map drawing: in developer mode it is now split (controls, then inside the map: texture and names, gathering points, areas, icons, bookmarks and player, edges and tooltips), to find the slow part. No visible change. Not validated in game.
+
+## 0.790.0
+- Plan global, Verify : Demande (X-31) : dans « Fabrications restantes », chaque étape se déplie et se replie, jusqu'à l'étape finale, avec son compte (faits / total). Les lignes sont écrites comme les autres, « possédés / demandés » avec les mêmes couleurs ; le métier et le nombre de fabrications restantes passent au survol de l'icône du métier. Non validé en jeu.
+- Tests : CraftStepsFold790Tests. Verify.ps1 (agent) : 1362/1362, 0 avertissement, 0 erreur ; DLL 0.790.0.0. Non validé en jeu.
+### English
+- Request (X-31): in « Crafts left », each step folds and unfolds, down to the final one, with its count (done / total). The lines are written like the others, « held / needed » in the same colours; the job and the crafts left move to the job icon's tooltip. Not validated in game.
+
+## 0.789.0
+- Plan global, Verify : Demande (X-30) : voir les étapes de fabrication qui restent pour les listes d'atelier et d'artisanat. Chaque liste de suivi a une section repliable « Fabrications restantes », par étape (l'étape 1 se fabrique d'abord, chaque objet après ce qui le compose) : icône du métier, objet, nombre de fabrications et quantité obtenue. Le stock est déduit, les objets récoltés ou achetés ne sont pas fabriqués, comme pour les matériaux. Non validé en jeu.
+- Tests : CraftSteps789Tests. Verify.ps1 (agent) : 1361/1361, 0 avertissement, 0 erreur ; DLL 0.789.0.0. Non validé en jeu.
+### English
+- Request (X-30): see the crafting steps left for the workshop and crafting lists. Each tracking list has a folding « Crafts left » section, by step (step 1 is made first, each item after what it is made of): job icon, item, number of crafts and quantity made. The stock is taken off, gathered or bought items are not crafted, as for the materials. Not validated in game.
+
+## 0.788.0
+- Plan global, Verify : Signalement (X-29) : en Menuisier sur une recette de Métallurgie, le panneau du carnet ne semblait pas voir le mauvais métier. Il le voyait (le calcul utilise les attributs relevés du bon métier), mais la note était en couleur d'information et coupée. Elle dit maintenant « Mauvais métier : vous êtes Menuisier, cette recette est de Métallurgie », en couleur d'avertissement, sur plusieurs lignes, avec le bouton pour porter le métier de la recette. Non validé en jeu.
+- Tests : WrongJob788Tests. Verify.ps1 (agent) : 1358/1358, 0 avertissement, 0 erreur ; DLL 0.788.0.0. Non validé en jeu.
+### English
+- Report (X-29): as Carpenter on a Blacksmith recipe, the crafting log panel did not seem to see the wrong job. It did (the calculation uses the right job's recorded attributes), but the note was in the information colour and cut off. It now says « Wrong job: you are Carpenter, this recipe is Blacksmith », in the warning colour, wrapped, with the button to wear the recipe's job. Not validated in game.
+
+## 0.787.0
+- Plan global, Verify : Demande (X-28) : l'atelier de compagnie tient compte de ce qui est déjà livré. La capture de la fenêtre de livraison (0.786, livraison de rivets en bronze) a donné sa disposition : phase en cours, lots livrés et requis de chaque objet. Tensho la lit chaque seconde quand elle est ouverte, la garde, retire les phases déjà validées et déduit les lots livrés de la phase en cours, dans le panneau et la page Atelier ; la page dit la phase et l'heure du relevé. Utilisé seulement si cela correspond au projet. Non validé en jeu.
+- Tests : WorkshopDelivered787Tests. Verify.ps1 (agent) : 1357/1357, 0 avertissement, 0 erreur ; DLL 0.787.0.0. Non validé en jeu.
+### English
+- Request (X-28): the company workshop counts what it already received. The capture of the delivery window (0.786, bronze rivets delivered) gave its layout: phase in progress, sets delivered and required per item. Tensho reads it every second while it is open, keeps it, leaves out the phases already validated and takes the delivered sets off the phase in progress, in the panel and the Workshop page; the page gives the phase and when it was seen. Used only when it fits the project. Not validated in game.
+
+## 0.786.0
+- Plan global, Verify : Demande (X-28) : tenir compte de ce qui est déjà livré à l'atelier de compagnie. Le jeu ne le garde dans aucune structure connue de Tensho (l'agent de la liste des matériaux ne donne que les objets et le résultat) : seule la fenêtre de livraison le montre. Première étape : en mode développeur, cette fenêtre et la liste des matériaux sont notées au journal quand elles s'ouvrent ou changent, pour lire leur disposition avant de compter. Aucun changement visible. Non validé en jeu.
+- Tests : WorkshopCapture786Tests. Verify.ps1 (agent) : 1353/1353, 0 avertissement, 0 erreur ; DLL 0.786.0.0. Non validé en jeu.
+### English
+- Request (X-28): count what the company workshop already received. The game keeps it in no structure Tensho knows (the material list's agent gives only the items and the result): only the delivery window shows it. First step: in developer mode, that window and the material list are written to the log when they open or change, to read their layout before counting. No visible change. Not validated in game.
+
+## 0.785.0
+- Plan global, Verify : Demande (X-27) : les listes de suivi peuvent n'afficher que les objets finis. Nouveau réglage « Objets finis seulement », éteint au départ, sous les options des listes : liste d'artisanat (ses objets), atelier de compagnie (les livraisons), préparation (l'objet préparé), sans leurs matériaux. L'aide de récolte suit toujours les matériaux. Non validé en jeu.
+- Tests : FinishedOnly785Tests. Verify.ps1 (agent) : 1352/1352, 0 avertissement, 0 erreur ; DLL 0.785.0.0. Non validé en jeu.
+### English
+- Request (X-27): the tracking lists can show only the finished items. New setting « Finished items only », off at first, under the list options: crafting list (its items), company workshop (the deliveries), preparation (the prepared item), without their materials. The gathering help still follows the materials. Not validated in game.
+
+## 0.784.0
+- Plan global, Verify : Signalement (X-26) : « Comparer les prochains coups » ne projetait rien sur une recette en haute qualité impossible (Kit de réparation d'appareil) : le jeu y montre une barre de qualité sur 2500, Tensho garde 0 exprès, et la vérification refusait cet écart. Il est maintenant accepté pour une recette sans qualité à chercher ; les autres vérifications restent. Non validé en jeu.
+- Tests : NoHqLive784Tests. Verify.ps1 (agent) : 1351/1351, 0 avertissement, 0 erreur ; DLL 0.784.0.0. Non validé en jeu.
+### English
+- Report (X-26): « Compare the next moves » projected nothing on a recipe where HQ is impossible (Device repair kit): the game shows a quality bar of 2,500 there, Tensho keeps 0 on purpose, and the check refused that gap. It is now accepted for a recipe with no quality to seek; the other checks stay. Not validated in game.
+
+## 0.783.0
+- Plan global, Verify : Suite de X-25, vérifiée en jeu sur capture : la recette qui faisait geler le jeu s'ouvre, Tensho propose sa séquence. Le message « Raphael a échoué » était trompeur, Raphael n'étant pas appelé exprès (recette en haute qualité impossible, sans qualité à chercher) : il dit maintenant « Raphael non utilisé », sans avertissement au journal. Non validé en jeu pour le message.
+- Tests : RaphaelGuard782Tests. Verify.ps1 (agent) : 1350/1350, 0 avertissement, 0 erreur ; DLL 0.783.0.0. Non validé en jeu.
+### English
+- X-25, continued, checked in game on screenshot: the recipe that froze the game opens, Tensho offers its sequence. « Raphael failed » was misleading, Raphael being left out on purpose (HQ impossible, no quality to seek): it now says « Raphael not used », with no warning in the log. The message is not validated in game.
+
+## 0.782.0
+- Plan global, Verify : Gel du jeu (X-25), causé par Tensho : en ouvrant le carnet d'artisan (cuisinier, recette 5623), le solveur Raphael, code natif, a divisé par un gain de qualité de 0 ; une telle erreur arrête le jeu sans pouvoir être rattrapée. Tensho vérifie maintenant chaque valeur avant l'appel (gains nuls, durabilité ou progression nulles, valeurs trop grandes) et, dans ces cas, ne demande rien à Raphael ; sa propre recherche reste. Non validé en jeu.
+- Tests : RaphaelGuard782Tests. Verify.ps1 (agent) : 1350/1350, 0 avertissement, 0 erreur ; DLL 0.782.0.0. Non validé en jeu.
+### English
+- Game freeze (X-25), caused by Tensho: opening the crafting log (culinarian, recipe 5623), the Raphael solver, native code, divided by a quality gain of 0; such an error stops the game and cannot be caught. Tensho now checks every value before the call (zero gains, zero durability or progress, values too large) and, in those cases, asks Raphael nothing; its own search remains. Not validated in game.
+
+## 0.781.0
+- Plan global, Verify : Lien d'alarme (X-03) : le clic droit faisait défiler le chat sans ouvrir de menu. En mode développeur, chaque menu contextuel ouvert est maintenant noté au journal (type, fenêtre, cible, objet survolé), pour voir ce que le jeu ouvre. Aucun changement visible. Non validé en jeu.
+- Tests : MenuLog781Tests. Verify.ps1 (agent) : 1348/1348, 0 avertissement, 0 erreur ; DLL 0.781.0.0. Non validé en jeu.
+### English
+- Alarm link (X-03): the right click scrolled the chat and opened no menu. In developer mode, every context menu opened is now noted in the log (type, window, target, hovered item), to see what the game opens. No visible change. Not validated in game.
+
+## 0.780.0
+- Plan global, Verify : Signalement (X-03) : le clic droit ne faisait rien sur l'indication grise « (clic droit : Tensho) », qui ne faisait pas partie du lien. L'indication est maintenant dans le lien d'objet : un clic droit sur toute la ligne ouvre le menu de l'objet. Non validé en jeu.
+- Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1347/1347, 0 avertissement, 0 erreur ; DLL 0.780.0.0. Non validé en jeu.
+### English
+- Report (X-03): a right click did nothing on the grey « (right click: Tensho) » hint, which was not part of the link. The hint is now inside the item link: a right click anywhere on the line opens the item's menu. Not validated in game.
+
+## 0.779.0
+- Plan global, Verify : Signalement (X-24) : après un chargement du plugin, les peaux et la corne passaient en « Autres », puis en « Monstres » plus tard. Cause : la source des monstres (LuminaSupplemental) ne se chargeait que quand une autre page la demandait. Les listes de suivi la demandent maintenant elles-mêmes ; elle se relit de sa copie sur disque, sans réseau tant que la copie existe. Non validé en jeu.
+- Tests : ListZones752Tests. Verify.ps1 (agent) : 1347/1347, 0 avertissement, 0 erreur ; DLL 0.779.0.0. Non validé en jeu.
+### English
+- Report (X-24): after a plugin reload, hides and the horn sat in « Others », then moved to « Monsters » later. Cause: the monster source (LuminaSupplemental) loaded only when another page asked for it. The tracking lists now ask for it themselves; it is read from its copy on disk, with no network while the copy exists. Not validated in game.
+
+## 0.778.0
+- Plan global, Verify : Demande (X-23) : une nouvelle alarme n'est plus envoyée sur Discord par défaut ; une alarme qui rejoint un groupe prend le réglage du groupe ; vos alarmes déjà enregistrées gardent le leur. Non validé en jeu.
+- Tests : DiscordOff778Tests. Verify.ps1 (agent) : 1347/1347, 0 avertissement, 0 erreur ; DLL 0.778.0.0. Non validé en jeu.
+### English
+- Request (X-23): a new alarm is no longer sent to Discord by default; one joining a group takes the group's setting; your saved alarms keep theirs. Not validated in game.
+
+## 0.777.0
+- Plan global, Verify : Signalement (X-22) : certaines coordonnées du wiki (Butin des monstres, Magie bleue) n'avaient pas le clic droit vers l'éthérite la plus proche. Cause : le nom anglais du lieu n'était traduit qu'en un seul numéro, alors que le jeu en a parfois plusieurs (« Mor Dhona » : 26, 67, 509) ; si le premier n'avait pas de carte, le menu disparaissait. Tous les numéros sont essayés ; un lieu toujours introuvable est noté au journal en mode développeur. Non validé en jeu.
+- Tests : WikiPlaces777Tests. Verify.ps1 (agent) : 1346/1346, 0 avertissement, 0 erreur ; DLL 0.777.0.0. Non validé en jeu.
+### English
+- Report (X-22): some wiki coordinates (Monster loot, Blue magic) had no right click to the nearest aetheryte. Cause: the place's English name was turned into one place row only, while the game sometimes has several (« Mor Dhona »: 26, 67, 509); if the first had no map, the menu was gone. Every row is tried; a place still not found is noted in the log in developer mode. Not validated in game.
+
+## 0.776.0
+- Plan global, Verify : Validé en jeu sur capture de l'utilisateur : l'alarme porte le lien d'objet du jeu, et le clic droit dessus ouvre le menu « Tensho — objet » complet (X-03). Ventes des servants (I-05) notées validées. Aucun changement du plugin.
+- Tests : GilTeleport775Tests. Verify.ps1 (agent) : 1345/1345, 0 avertissement, 0 erreur ; DLL 0.776.0.0. Non validé en jeu.
+### English
+- Validated in game on the user's screenshot: the ring carries the game's item link, and a right click on it opens the full « Tensho — item » menu (X-03). Retainer sales (I-05) recorded as validated. No change to the plugin.
+
+## 0.775.0
+- Plan global, Verify : Journal des gils (X-18) : le relevé montrait des téléportations rangées en « Autre », le jeu prélevant le prix à l'arrivée, après la fermeture de la fenêtre Téléportation. Une dépense qui suit un écran de chargement compte maintenant comme téléportation, jamais un gain. Les anciennes lignes restent comme elles étaient. Non validé en jeu.
+- Tests : GilTeleport775Tests. Verify.ps1 (agent) : 1345/1345, 0 avertissement, 0 erreur ; DLL 0.775.0.0. Non validé en jeu.
+### English
+- Gil journal (X-18): the log showed teleports filed as « Other », the game taking the price on arrival, after the Teleport window closed. A spending right after a loading screen now counts as a teleport, never a gain. Older lines stay as they were. Not validated in game.
+
+## 0.774.0
+- Plan global, Verify : Lien d'alarme (X-03) : la console de Dalamud en mode détaillé montre que le lien « Ouvrir dans Tensho » était bien enregistré, mais que le jeu ne le transmettait jamais à Dalamud ; il ouvrait une bulle d'objet. L'alarme porte maintenant le vrai lien d'objet du jeu, suivi de « (clic droit : Tensho) » : le survol montre l'objet, le clic droit ouvre son menu, avec l'entrée Tensho. Non validé en jeu.
+- Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1344/1344, 0 avertissement, 0 erreur ; DLL 0.774.0.0. Non validé en jeu.
+### English
+- Alarm link (X-03): Dalamud's console in verbose mode shows that the « Open in Tensho » link was registered, but the game never handed it to Dalamud; it opened an item tooltip. The ring now carries the game's own item link, followed by « (right click: Tensho) »: hovering shows the item, a right click opens its menu, with Tensho's entry. Not validated in game.
+
+## 0.773.0
+- Plan global, Verify : Lien d'alarme (X-03), toujours aucun clic après 0.771 : en mode développeur, chaque alarme écrit au journal l'identité du lien imprimé et si Dalamud l'a bien enregistré, pour savoir si le défaut est dans l'enregistrement ou dans le clic. Aucun changement visible. Non validé en jeu.
+- Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1344/1344, 0 avertissement, 0 erreur ; DLL 0.773.0.0. Non validé en jeu.
+### English
+- Alarm link (X-03), still no click after 0.771: in developer mode, each ring writes to the log the printed link's identity and whether Dalamud has it registered, to tell whether the fault is in the registration or in the click. No visible change. Not validated in game.
+
+## 0.772.0
+- Plan global, Verify : Signalement (X-21) : « Ajouter les alarmes » proposait 19 alarmes alors qu'un seul objet en avait besoin. Cause : il comptait aussi les objets qu'on trouve sans horaire (cristaux et éclats, présents aussi sur des points ordinaires). Correction : seuls les objets qui manquent encore et ne poussent qu'à des points à horaire, comme le groupe « Points à horaire ». Non validé en jeu.
+- Tests : ListAlarms755Tests. Verify.ps1 (agent) : 1344/1344, 0 avertissement, 0 erreur ; DLL 0.772.0.0. Non validé en jeu.
+### English
+- Report (X-21): « Add the alarms » offered 19 alarms when one item needed them. Cause: it also counted items found without hours (crystals and shards, also at ordinary points). Fix: only items still missing that grow nowhere but at timed points, as the « Timed points » group. Not validated in game.
+
+## 0.771.0
+- Plan global, Verify : Signalement (X-03) : « Ouvrir dans Tensho » ne marche toujours pas, même avec Tensho seul ; aucun clic n'arrive. Le code de couleur était placé à l'intérieur du lien, entre son début et son texte ; il est maintenant autour, comme pour les liens de Dalamud. Le journal note toujours chaque clic. Non validé en jeu.
+- Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1344/1344, 0 avertissement, 0 erreur ; DLL 0.771.0.0. Non validé en jeu.
+### English
+- Report (X-03): « Open in Tensho » still does not work, even with Tensho alone; no click arrives. The colour code sat inside the link, between its start and its text; it now surrounds it, as Dalamud's own links do. The log still notes each click. Not validated in game.
+
+## 0.770.0
+- Plan global, Verify : Signalement (X-20) : un objet déposé chez un servant, dans les sacoches ou au coffre de compagnie n'apparaissait qu'en rouvrant. Le rangement ouvert est maintenant relu toutes les 2 secondes au lieu de 30 ; le fichier n'est écrit que si la copie change. Non validé en jeu.
+- Tests : OpenStorage770Tests. Verify.ps1 (agent) : 1343/1343, 0 avertissement, 0 erreur ; DLL 0.770.0.0. Non validé en jeu.
+### English
+- Report (X-20): an item put in a retainer, the saddlebag or the company chest showed only after reopening it. The open storage is now read again every 2 seconds instead of 30; the file is written only when the copy changes. Not validated in game.
+
+## 0.769.0
+- Plan global, Verify : Signalement (X-19) : un dépôt chez un servant comptait comme une dépense du personnage et un gain des servants, et le total des servants ne suivait qu'en rouvrant. Corrections : les échanges avec les servants et le coffre de compagnie sont des transferts, affichés à part et hors du net ; une hausse des servants au-delà de vos dépôts compte comme leurs ventes au marché ; le servant ouvert est lu en direct. Les anciennes lignes « Servants » deviennent « Échanges avec les servants ». Non validé en jeu.
+- Tests : GilTransfer769Tests. Verify.ps1 (agent) : 1342/1342, 0 avertissement, 0 erreur ; DLL 0.769.0.0. Non validé en jeu.
+### English
+- Report (X-19): a deposit with a retainer counted as the character's spending and the retainers' gain, and the retainers' total followed only after reopening. Fixes: exchanges with retainers and the company chest are transfers, shown apart and out of the net; a rise of the retainers beyond your deposits counts as their market sales; the open retainer is read live. Older « Retainers » lines become « Exchanges with retainers ». Not validated in game.
+
+## 0.768.0
+- Plan global, Verify : Demande (X-18) : le journal des gils montre l'icône des gils du jeu, une icône par catégorie, les gains en vert et les dépenses en rouge. Pour réduire « Autre » sans deviner : en mode développeur, chaque mouvement « Autre » écrit au journal les fenêtres du jeu ouvertes dans les 15 secondes d'avant. Non validé en jeu.
+- Tests : GilJournal768Tests. Verify.ps1 (agent) : 1340/1340, 0 avertissement, 0 erreur ; DLL 0.768.0.0. Non validé en jeu.
+### English
+- Request (X-18): the gil journal shows the game's gil icon, an icon per category, gains in green and spendings in red. To shrink « Other » without guessing: in developer mode, each « Other » change writes to the log the game windows open in the 15 seconds before. Not validated in game.
+
+## 0.767.0
+- Plan global, Verify : Relevé en jeu (I10), confirmé par l'utilisateur : en enregistrant un servant, Tensho garde aussi ses gils et ses cristaux. Ses cristaux comptent dans les stocks, comptés exactement et non plus comme un minimum ; la page Personnages ajoute « (+N chez les servants) ». Un servant enregistré avant reste valable. Vente des servants (I-05) validée en jeu sur capture. Non validé en jeu pour I10.
+- Tests : RetainerExtras767Tests. Verify.ps1 (agent) : 1339/1339, 0 avertissement, 0 erreur ; DLL 0.767.0.0. Non validé en jeu.
+### English
+- In-game reading (I10), confirmed by the user: when a retainer is recorded, Tensho also keeps its gil and crystals. Its crystals count in the stocks, exactly rather than as a lower bound; the Characters page adds « (+N with retainers) ». A retainer recorded before stays valid. Retainer sales (I-05) validated in game on screenshot. I10 not validated in game.
+
+## 0.766.0
+- Plan global, Verify : Carte, parties non découvertes (P11) : première sonde des données du jeu. Trouvés : la fonction qui dit si une région est découverte, et l'atlas des régions de chaque carte. Manque : où chaque morceau se place sur la carte ; rien n'est deviné, P11 attend. Nouvelle sonde tools/MapMaskProbe. Aucun changement du plugin.
+- Tests : FewerClicks763Tests. Verify.ps1 (agent) : 1337/1337, 0 avertissement, 0 erreur ; DLL 0.766.0.0. Non validé en jeu.
+### English
+- Map, undiscovered parts (P11): first probe of the game's data. Found: the function that says whether a region is discovered, and the region atlas of each map. Missing: where each piece goes on the map; nothing is guessed, P11 waits. New probe tools/MapMaskProbe. No change to the plugin.
+
+## 0.765.0
+- Plan global, Verify : Suite de X-17 : un panneau de suivi réduit depuis le chargement du plugin, jamais dessiné, comptait encore pour rien ; sa source est maintenant connue dès qu'il est actif. Non validé en jeu.
+- Tests : TrackedNeed751Tests. Verify.ps1 (agent) : 1337/1337, 0 avertissement, 0 erreur ; DLL 0.765.0.0. Non validé en jeu.
+### English
+- X-17, continued: a tracking panel folded since the plugin loaded, never drawn, still counted for nothing; its source is now known as soon as it is on. Not validated in game.
+
+## 0.764.0
+- Plan global, Verify : Signalements (X-17) : panneau de suivi réduit, l'aide perdait « Vos listes en demandent encore » et le cadre ; et les cadres passaient au-dessus des autres fenêtres. Corrections : les lignes d'un panneau réduit sont recalculées (un panneau fermé ne compte pas) ; les cadres de la fenêtre de récolte et des barres sont dessinés sous les fenêtres de Tensho, au-dessus du jeu. Non validé en jeu.
+- Tests : TrackedNeed751Tests. Verify.ps1 (agent) : 1337/1337, 0 avertissement, 0 erreur ; DLL 0.764.0.0. Non validé en jeu.
+### English
+- Reports (X-17): with the tracking panel folded, the help lost « Your lists still need » and its frame; and the frames went over other windows. Fixes: the lines of a folded panel are worked out (a closed panel does not count); the frames on the gathering window and the hotbars are drawn under Tensho's windows, over the game. Not validated in game.
+
+## 0.763.0
+- Plan global, Verify : Demande (X-16) : quand deux plans de PR donnent le même rendement, l'aide choisit celui qui demande le moins de clics (une action qui dure toute la récolte plutôt qu'une par récolte), puis le moins cher. Un meilleur rendement reste prioritaire. Non validé en jeu.
+- Tests : FewerClicks763Tests. Verify.ps1 (agent) : 1337/1337, 0 avertissement, 0 erreur ; DLL 0.763.0.0. Non validé en jeu.
+### English
+- Request (X-16): when two GP plans give the same yield, the help picks the one with the fewest clicks (an action lasting the whole node rather than one per gather), then the cheapest. A better yield still comes first. Not validated in game.
+
+## 0.762.0
+- Plan global, Verify : Demande (X-15) : le menu du clic droit d'un objet récolté propose « Y aller », comme la page Récolte : drapeau, carte de Tensho et téléportation vers l'éthérite la plus proche (question, sauf réglage). Le point choisi est un point ouvert d'abord, puis dans votre zone, puis la téléportation la moins chère. Non validé en jeu.
+- Tests : GoThereMenu762Tests. Verify.ps1 (agent) : 1335/1335, 0 avertissement, 0 erreur ; DLL 0.762.0.0. Non validé en jeu.
+### English
+- Request (X-15): the right-click menu of a gathered item offers « Go there », as the Gathering page does: flag, Tensho map and teleport to the nearest aetheryte (a question, unless set otherwise). The point chosen is an open one first, then one in your zone, then the cheapest teleport. Not validated in game.
+
+## 0.761.0
+- Plan global, Verify : Demande (X-14) : dans le groupe « Points à horaire » des listes de suivi, chaque objet dit « ouvert · encore h:mm:ss » ou « fermé · ouvre dans h:mm:ss », d'après le plus proche de ses points. Non validé en jeu.
+- Tests : ZoneOrder757Tests. Verify.ps1 (agent) : 1334/1334, 0 avertissement, 0 erreur ; DLL 0.761.0.0. Non validé en jeu.
+### English
+- Request (X-14): in the « Timed points » group of the tracking lists, each item says « open · h:mm:ss left » or « closed · opens in h:mm:ss », from the nearest of its points. Not validated in game.
+
+## 0.760.0
+- Plan global, Verify : Lourdeur (X-01), régression de 0.757–0.758 : le journal montre le panneau des matériaux de l'atelier bloquant le jeu de 1,7 à 7,6 s, surtout du nettoyage mémoire. Le regroupement par zone et les prix de téléportation étaient recalculés à chaque image, en parcourant toutes les sources de récolte pour chaque zone. Ils sont maintenant calculés une fois par seconde, ou au changement de zone, avec des index préparés une fois. Non validé en jeu.
+- Tests : ZoneOrder757Tests. Verify.ps1 (agent) : 1334/1334, 0 avertissement, 0 erreur ; DLL 0.760.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01), regression of 0.757–0.758: the log shows the workshop materials panel holding the game for 1.7 to 7.6 s, mostly memory collection. The zone grouping and teleport prices were worked out at every frame, scanning every gathering source for each zone. They are now worked out once a second, or when the zone changes, with indexes built once. Not validated in game.
+
+## 0.759.0
+- Plan global, Verify : Signalement (X-03) : « Ouvrir dans Tensho » sur une alarme n'ouvrait rien. Le journal de 0.743 montre qu'aucun clic n'arrivait. Cause, dans le code de Dalamud : un lien sans gestionnaire ne fait rien, et chaque rechargement du plugin effaçait ses gestionnaires ; les messages d'alarme déjà affichés ne menaient donc plus nulle part. Correction : au chargement, les liens de toutes vos alarmes sont réenregistrés. Non validé en jeu.
+- Tests : AlarmLinks759Tests. Verify.ps1 (agent) : 1334/1334, 0 avertissement, 0 erreur ; DLL 0.759.0.0. Non validé en jeu.
+### English
+- Report (X-03): « Open in Tensho » on an alarm opened nothing. The 0.743 log shows that no click arrived. Cause, in Dalamud's code: a link with no handler does nothing, and each reload of the plugin removed its handlers; rings already printed led nowhere. Fix: at load, the links of all your alarms are registered again. Not validated in game.
+
+## 0.758.0
+- Plan global, Verify : Demande (X-13) : dans les listes de suivi, les objets qui ne poussent qu'à des points à horaire forment leur propre groupe, « Points à horaire », en tête et repliable ; leur zone s'affiche au survol. Les autres restent par zone. Non validé en jeu.
+- Tests : ZoneOrder757Tests. Verify.ps1 (agent) : 1333/1333, 0 avertissement, 0 erreur ; DLL 0.758.0.0. Non validé en jeu.
+### English
+- Request (X-13): in the tracking lists, items that grow only at timed points form their own group, « Timed points », first and folding; their zone shows on hover. The others stay by zone. Not validated in game.
+
+## 0.757.0
+- Plan global, Verify : Demandes (X-11, X-12) : dans les listes de suivi, chaque zone de récolte se replie ; la zone où vous êtes vient d'abord (« vous y êtes »), puis les autres de la téléportation la moins chère à la plus chère, avec son prix lu dans le jeu depuis votre position ; un prix inconnu passe après. Non validé en jeu.
+- Tests : ZoneOrder757Tests. Verify.ps1 (agent) : 1333/1333, 0 avertissement, 0 erreur ; DLL 0.757.0.0. Non validé en jeu.
+### English
+- Requests (X-11, X-12): in the tracking lists, each gathering zone folds; the zone you are in comes first (« you are here »), then the others from the cheapest teleport to the dearest, with its price read in the game from where you are; an unknown price goes after. Not validated in game.
+
+## 0.756.0
+- Plan global, Verify : Demande (X-10) : à l'ouverture d'un point de récolte, l'aide se place sur l'objet dont vos listes de suivi ont le plus besoin ; un clic en choisit toujours un autre. X-09 (alarmes des listes) validé en jeu sur votre retour. Non validé en jeu pour X-10.
+- Tests : TrackedFirst756Tests. Verify.ps1 (agent) : 1331/1331, 0 avertissement, 0 erreur ; DLL 0.756.0.0. Non validé en jeu.
+### English
+- Request (X-10): when a node opens, the gathering help puts the item your tracking lists need most in context; a click still picks another. X-09 (list alarms) validated in game on your report. X-10 not validated in game.
+
+## 0.755.0
+- Plan global, Verify : Demande (X-09) : en tête des listes de suivi, « Ajouter les alarmes (N) » crée une alarme pour chaque ouverture des points à horaire de ce dont la liste a encore besoin ; une alarme déjà présente (même nom, même heure) n'est pas doublée. Non validé en jeu.
+- Tests : ListAlarms755Tests. Verify.ps1 (agent) : 1330/1330, 0 avertissement, 0 erreur ; DLL 0.755.0.0. Non validé en jeu.
+### English
+- Request (X-09): at the top of the tracking lists, « Add the alarms (N) » creates an alarm for each opening of the timed points of what the list still needs; an alarm already there (same name, same time) is not doubled. Not validated in game.
+
+## 0.754.0
+- Plan global, Verify : Signalement (X-08) : l'infobulle d'un point à horaire sur la carte disait « fermé maintenant » sans compte à rebours. Elle dit maintenant dans combien de temps il ouvre, ou ferme s'il est ouvert, comme la page Récolte. Non validé en jeu.
+- Tests : TimedCountdown754Tests. Verify.ps1 (agent) : 1329/1329, 0 avertissement, 0 erreur ; DLL 0.754.0.0. Non validé en jeu.
+### English
+- Report (X-08): the map tooltip of a timed point said « closed now » with no countdown. It now says how long until it opens, or closes when open, as the Gathering page does. Not validated in game.
+
+## 0.753.0
+- Plan global, Verify : Demande (X-06) : quand « Récolter automatiquement l'objet sélectionné » est coché dans la fenêtre du jeu, le plan de PR ne garde que ce qui s'utilise avant la première récolte : les effets durables, une action « pour une récolte » une fois au plus, aucun essai rendu ; l'aide le dit. Non validé en jeu.
+- Tests : AutoGather753Tests. Verify.ps1 (agent) : 1328/1328, 0 avertissement, 0 erreur ; DLL 0.753.0.0. Non validé en jeu.
+### English
+- Request (X-06): when « Gather the selected item automatically » is ticked in the game's window, the GP plan keeps only what is used before the first gather: lasting effects, an action for one gather once at most, no attempt given back; the help says so. Not validated in game.
+
+## 0.752.0
+- Plan global, Verify : Demande (X-05) : dans les listes de suivi, les objets à récolter sont rassemblés par zone, celle qui en a le plus d'abord ; un objet présent dans plusieurs zones va avec celle qui en regroupe le plus, pour moins de trajets. Réglable sous « Récolte ». Non validé en jeu.
+- Tests : ListZones752Tests. Verify.ps1 (agent) : 1326/1326, 0 avertissement, 0 erreur ; DLL 0.752.0.0. Non validé en jeu.
+### English
+- Request (X-05): in the tracking lists, items to gather are grouped by zone, the zone holding the most first; an item found in several zones goes with the one that holds most, for fewer trips. Optional, under « Gathering ». Not validated in game.
+
+## 0.751.0
+- Plan global, Verify : Demande (X-04) : au point de récolte, l'aide dit « Vos listes en demandent encore N » pour chaque objet dont la liste d'artisanat, l'atelier ou la préparation affichés ont besoin, et un cadre vert entoure sa ligne dans la fenêtre de récolte du jeu (réglable). Dessin seulement. Non validé en jeu.
+- Tests : TrackedNeed751Tests. Verify.ps1 (agent) : 1324/1324, 0 avertissement, 0 erreur ; DLL 0.751.0.0. Non validé en jeu.
+### English
+- Request (X-04): at a node, the help says « Your lists still need N » for each item the crafting list, the workshop or the preparation shown need, and a green frame surrounds its row in the game's gathering window (optional). Drawn only. Not validated in game.
+
+## 0.750.0
+- Plan global, Verify : Cache (X-02) : durées par défaut plus longues, appliquées une fois aux réglages existants s'ils avaient gardé les anciennes : quêtes 5 min → 1 h, collections 24 h → 7 jours, sources communautaires 7 jours → seulement si absentes, calculs d'artisanat 24 h → 7 jours. Prix et Revue de mode inchangés. « Jamais » devient « Seulement si absent, ou sur Actualiser ». Un choix fait par vous reste. Non validé en jeu.
+- Tests : CacheDefaults750Tests. Verify.ps1 (agent) : 1323/1323, 0 avertissement, 0 erreur ; DLL 0.750.0.0. Non validé en jeu.
+### English
+- Cache (X-02): longer default durations, applied once to existing settings that kept the old ones: quests 5 min → 1 h, collections 24 h → 7 days, community sources 7 days → only when missing, crafting calculations 24 h → 7 days. Prices and the Fashion Report unchanged. « Never » becomes « Only when missing, or on Refresh ». A choice you made stays. Not validated in game.
+
+## 0.749.0
+- Plan global, Verify : Lourdeur (X-01) : en mode développeur, le relevé des images lentes détaille la carte (menus, outils, carte elle-même), qui coûtait 195 ms à l'ouverture. Aucun changement visible. Non validé en jeu.
+- Tests : SlowFrame745Tests. Verify.ps1 (agent) : 1321/1321, 0 avertissement, 0 erreur ; DLL 0.749.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01): in developer mode, the slow-frame log details the map (menus, tools, the map itself), which cost 195 ms when it opened. No visible change. Not validated in game.
+
+## 0.748.0
+- Plan global, Verify : Lourdeur (X-01) : en mode développeur, le passage des pages repassait à chaque rechargement et donnait des images de 110 à 160 ms ; il passe au plus une fois toutes les deux heures, et sa part apparaît dans le relevé des images lentes. Inscrit au plan : X-08, compte à rebours d'un point à horaire fermé. Non validé en jeu.
+- Tests : PageSweep724Tests. Verify.ps1 (agent) : 1321/1321, 0 avertissement, 0 erreur ; DLL 0.748.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01): in developer mode, the page sweep ran at each reload and gave frames of 110 to 160 ms; it now runs at most once in two hours, and its share shows in the slow-frame log. Added to the plan: X-08, countdown of a closed timed point. Not validated in game.
+
+## 0.747.0
+- Plan global, Verify : Lourdeur (X-01) : le plan de PR d'un point de récolte et son recalcul de fin de nœud se font hors de l'image ; le journal avait mesuré 97 ms sur l'image où le point s'ouvre. « Calcul du plan… » s'affiche le temps du calcul. Le relevé des images lentes mesure aussi la fenêtre principale et les autres fenêtres. Non validé en jeu.
+- Tests : SlowFrame745Tests. Verify.ps1 (agent) : 1320/1320, 0 avertissement, 0 erreur ; DLL 0.747.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01): a node's GP plan and its end-of-node replan are worked out off the frame; the log had measured 97 ms on the frame the node opened. « Working out the plan… » shows meanwhile. The slow-frame log also measures the main window and the other windows. Not validated in game.
+
+## 0.746.0
+- Plan global, Verify : Plan : les demandes faites en jouant le 2026-11-07 sont inscrites dans le plan global (X-01 à X-07), avec leur état, pour n'en oublier aucune. Aucun changement du plugin.
+- Tests : SlowFrame745Tests. Verify.ps1 (agent) : 1320/1320, 0 avertissement, 0 erreur ; DLL 0.746.0.0. Non validé en jeu.
+### English
+- Plan: the requests made while playing on 2026-11-07 are written in the global plan (X-01 to X-07), with their state, so that none is forgotten. No change to the plugin.
+
+## 0.745.0
+- Plan global, Verify : Signalement : Tensho paraît lourd. Le journal montre des images de 120 à 230 ms toutes les quelques minutes, et une de 2,6 s, sans dire quelle partie. En mode développeur, chaque image de plus de 100 ms est maintenant écrite au journal avec ses parties les plus coûteuses (panneau, page) et les pauses du moteur .NET. Aucun changement visible. Non validé en jeu.
+- Tests : SlowFrame745Tests. Verify.ps1 (agent) : 1320/1320, 0 avertissement, 0 erreur ; DLL 0.745.0.0. Non validé en jeu.
+### English
+- Report: Tensho feels heavy. The log shows frames of 120 to 230 ms every few minutes, and one of 2.6 s, without saying which part. In developer mode, every frame above 100 ms is now written to the log with its costliest parts (panel, page) and the .NET runtime's pauses. No visible change. Not validated in game.
+
+## 0.744.0
+- Plan global, Verify : Clignotement de la liste de suivi, cause trouvée par le relevé de 0.743 : la lecture affichée des sacs était bonne, mais le calcul des stocks des listes lisait encore la lecture stricte, vide pendant 250 ms. La correction de 0.741 était tombée dans une autre fonction qui commençait par la même ligne. Corrigé, et le test vérifie cette fonction précise. Non validé en jeu.
+- Tests : ListBlink741Tests. Verify.ps1 (agent) : 1318/1318, 0 avertissement, 0 erreur ; DLL 0.744.0.0. Non validé en jeu.
+### English
+- Tracking list blink, cause found by the 0.743 logging: the shown bag reading was fine, but the stock counts of the lists still read the strict one, empty for 250 ms. The 0.741 fix had landed on another function beginning with the same line. Fixed, and the test checks that very function. Not validated in game.
+
+## 0.743.0
+- Plan global, Verify : Le clignotement revient en 0.742 : la cause visée n'était pas la bonne. En mode développeur, le journal écrit maintenant ce que chaque rangement donnait au moment où un stock tombe à 0. Il note aussi les clics sur « Ouvrir dans Tensho » d'une alarme, signalé comme n'ouvrant rien. Aucun changement visible. Non validé en jeu.
+- Tests : ListBlink740Tests. Verify.ps1 (agent) : 1318/1318, 0 avertissement, 0 erreur ; DLL 0.743.0.0. Non validé en jeu.
+### English
+- The blink is back in 0.742: the cause aimed at was not the right one. In developer mode, the log now writes what each storage said when a stock falls to 0. It also logs clicks on an alarm's « Open in Tensho », reported as opening nothing. No visible change. Not validated in game.
+
+## 0.742.0
+- Plan global, Verify : Suite du clignotement : il revenait en 0.741. Le journal montre qu'une lecture faite pendant le changement trouvait les sacs illisibles et était affichée. Correction : à l'écran, un sac illisible garde sa dernière lecture complète du même personnage ; le tri voit toujours ce qui a été lu. Non validé en jeu.
+- Tests : ListBlink742Tests. Verify.ps1 (agent) : 1318/1318, 0 avertissement, 0 erreur ; DLL 0.742.0.0. Non validé en jeu.
+### English
+- Blink, continued: it came back in 0.741. The log shows that a reading taken during the change found the bags unreadable and was shown. Fix: on screen, an unreadable bag keeps its last complete reading of the same character; the sort still sees what was read. Not validated in game.
+
+## 0.741.0
+- Plan global, Verify : Signalement : la liste de suivi clignotait pendant la récolte. Cause, relevée dans le journal : à chaque objet récolté, la lecture des sacs était effacée jusqu'à la suivante (jusqu'à 250 ms), et tous les stocks tombaient à 0. Correction : les stocks affichés gardent la dernière lecture du même personnage ; le tri des sacs, qui agit, attend toujours une lecture sûre. Non validé en jeu.
+- Tests : ListBlink741Tests. Verify.ps1 (agent) : 1316/1316, 0 avertissement, 0 erreur ; DLL 0.741.0.0. Non validé en jeu.
+### English
+- Report: the tracking list blinked while gathering. Cause, found in the log: at each item gathered, the bag reading was cleared until the next one (up to 250 ms), and every stock fell to 0. Fix: stock counts on screen keep the last reading of the same character; the bag sort, which acts, still waits for a sure reading. Not validated in game.
+
+## 0.740.0
+- Plan global, Verify : Signalement : la liste de suivi clignote entre deux valeurs pendant la récolte. Cause non trouvée en lisant le code : en mode développeur, le journal note maintenant la ligne qui revient à sa valeur d'avant, et si c'est le stock ou le besoin. Aucun changement visible. Non validé en jeu.
+- Tests : ListBlink740Tests. Verify.ps1 (agent) : 1315/1315, 0 avertissement, 0 erreur ; DLL 0.740.0.0. Non validé en jeu.
+### English
+- Report: the tracking list blinks between two values while gathering. Cause not found by reading the code: in developer mode, the log now notes the line that goes back to its previous value, and whether the stock or the need moved. No visible change. Not validated in game.
+
+## 0.739.0
+- Plan global, Verify : Demande : « Que puis-je fabriquer ? » montre une ligne par objet, avec une icône par métier qui peut le fabriquer ; le nom du métier, son niveau et les fabrications en infobulle, un clic simule cette recette. Les ventes d'un objet ne sont plus comptées deux fois. Non validé en jeu.
+- Tests : CraftLines739Tests. Verify.ps1 (agent) : 1314/1314, 0 avertissement, 0 erreur ; DLL 0.739.0.0. Non validé en jeu.
+### English
+- Request: « What can I craft? » shows one line per item, with an icon per job that can make it; the job's name, level and crafts on hover, a click simulates that recipe. An item's sales are no longer counted twice. Not validated in game.
+
+## 0.738.0
+- Plan global, Verify : Décision DEC-040 : le passage des pages reste automatique, en mode développeur seulement, avec les requêtes que les pages font à leur ouverture (choix de l'utilisateur). Aucun changement du plugin.
+- Tests : PageSweep724Tests. Verify.ps1 (agent) : 1312/1312, 0 avertissement, 0 erreur ; DLL 0.738.0.0. Non validé en jeu.
+### English
+- Decision DEC-040: the page sweep stays automatic, in developer mode only, with the requests pages make when opened (the user's choice). No change to the plugin.
+
+## 0.737.0
+- Plan global, Verify : Signalement : le menu du clic droit sur l'icône d'un matériau de projet se fermait parfois tout de suite. Cause : son identifiant comptait toutes les icônes de l'image, dans toutes les fenêtres ; une icône de plus ou de moins ailleurs le changeait et ImGui fermait le menu. Correction : il ne compte plus que le même objet au même endroit. Vaut pour toutes les icônes d'objets. Non validé en jeu.
+- Tests : ItemMenu737Tests. Verify.ps1 (agent) : 1312/1312, 0 avertissement, 0 erreur ; DLL 0.737.0.0. Non validé en jeu.
+### English
+- Report: the right-click menu on a project material's icon sometimes closed at once. Cause: its id counted every icon of the frame, in every window; one icon more or less elsewhere changed it and ImGui closed the menu. Fix: it counts only the same item at the same place. Applies to every item icon. Not validated in game.
+
+## 0.736.0
+- Plan global, Verify : Journal : l'entrée de 0.735 reprenait le texte de 0.734, la publication ayant gardé l'ancienne note ; elle est réécrite. Le script de l'agent efface maintenant la note après chaque publication. Aucun changement du plugin.
+- Tests : RecipeStock735Tests. Verify.ps1 (agent) : 1311/1311, 0 avertissement, 0 erreur ; DLL 0.736.0.0. Non validé en jeu.
+### English
+- Changelog: the entry of 0.735 repeated the text of 0.734, as the release kept the previous note; it is rewritten. The agent's script now deletes the note after each release. No change to the plugin.
+
+## 0.735.0
+- Plan global, Verify : Signalement : les cristaux marqués « partiel » dans les ingrédients d'une recette, alors que vous en aviez assez. Cause : les cristaux des servants ne sont jamais lus, donc le total est un minimum. Correction : un minimum qui couvre déjà le besoin dit « OK, au moins autant » ; sinon la ligne dit que des rangements ne sont pas lus. (Entrée corrigée en 0.736 : la publication avait repris le texte de 0.734.)
+- Tests : RecipeStock735Tests. Verify.ps1 (agent) : 1311/1311, 0 avertissement, 0 erreur ; DLL 0.735.0.0. Non validé en jeu.
+### English
+- Report: crystals marked « partial » among a recipe's ingredients although there were enough. Cause: retainers' crystals are never read, so the total is a lower bound. Fix: a lower bound that already covers the need says « OK, at least this much »; otherwise the line says some storage is not read. Not validated in game. (Entry corrected in 0.736: the release had copied the text of 0.734.)
+
+## 0.734.0
+- Plan global, Verify : Signalement : « Cette action n'est pas sur vos barres » pour Récolte abondante II, pourtant présente. Cause : la case garde Récolte abondante, que le jeu fait évoluer en II à l'affichage. Correction : la case est comparée à l'action qu'elle affiche. Non validé en jeu.
+- Tests : GatherNext728Tests. Verify.ps1 (agent) : 1310/1310, 0 avertissement, 0 erreur ; DLL 0.734.0.0. Non validé en jeu.
+### English
+- Report: « This action is not on your hotbars » for Bountiful Harvest II, which was there. Cause: the slot keeps Bountiful Harvest, which the game shows as II. Fix: the slot is matched by the action it shows. Not validated in game.
+
+## 0.733.0
+- Plan global, Verify : Signalements : aucun cadre sur les barres, et « Sagesse du fermier » demandée à 4/4 essais. Causes : la demande de repérage était effacée avant d'être lue, le panneau étant dessiné après ; cette action rend un essai et le jeu la refuse tant qu'aucun n'est dépensé. Corrections : le panneau demande lui-même le repérage ; l'action vient après la première récolte. Non validé en jeu.
+- Tests : GatherNext728Tests. Verify.ps1 (agent) : 1310/1310, 0 avertissement, 0 erreur ; DLL 0.733.0.0. Non validé en jeu.
+### English
+- Reports: no frame on the hotbars, and Ageless Words asked at 4/4 attempts. Causes: the request to find the slot was cleared before it was read, as the panel is drawn later; that action gives back an attempt and the game refuses it while none is spent. Fixes: the panel asks itself; the action comes after the first gather. Not validated in game.
+
+## 0.732.0
+- Plan global, Verify : Page Récolte : la liste « En ce moment » se calcule hors de l'image ; le passage des pages y avait mesuré une image de 41 ms à chaque minute d'Eorzéa. Non validé en jeu.
+- Tests : PageSweep724Tests. Verify.ps1 (agent) : 1310/1310, 0 avertissement, 0 erreur ; DLL 0.732.0.0. Non validé en jeu.
+### English
+- Gathering page: the « Now and soon » list is worked out off the frame; the page sweep had measured a 41 ms frame there every Eorzea minute. Not validated in game.
+
+## 0.731.0
+- Plan global, Verify : Signalement : à la fin du plan il restait 53 PR et 90 % de supplément, sans proposer Sols fertiles I. Cause : chaque récolte rend 6 PR (relevé : +6 après une, +30 après cinq), que le plan d'ouverture ne compte pas. Correction : les étapes en tiennent compte, et une fois le plan fini, le calcul est refait avec les PR restants et les taux du moment. Non validé en jeu.
+- Tests : GatherNext728Tests. Verify.ps1 (agent) : 1310/1310, 0 avertissement, 0 erreur ; DLL 0.731.0.0. Non validé en jeu.
+### English
+- Report: at the end of the plan 53 GP and 90 % boon were left, and Pioneer's Gift I was not offered. Cause: each gather gives back 6 GP (+6 after one, +30 after five), which the plan made at the opening does not count. Fix: the steps count it, and once the plan is done, it is worked out again with the GP left and the current rates. Not validated in game.
+
+## 0.730.0
+- Plan global, Verify : Commandes spéciales : onglet Récompenses, par client : points, gils et assignats à chaque rang et palier, bonus de la semaine, objets liés à chaque rang. Codes des monnaies reliés aux assignats, montants comparés au wiki. Non validé en jeu.
+- Tests : DeliveryRewards730Tests. Verify.ps1 (agent) : 1309/1309, 0 avertissement, 0 erreur ; DLL 0.730.0.0. Non validé en jeu.
+### English
+- Custom deliveries: Rewards tab, per client: points, gil and scrips at each rank and tier, weekly bonus, objects attached to each rank. Currency codes tied to the scrips, amounts compared with the wiki. Not validated in game.
+
+## 0.729.0
+- Plan global, Verify : Aide à la récolte : une ligne sépare la prochaine action du plan, à la demande de l'utilisateur. Non validé en jeu.
+- Tests : GatherNext728Tests. Verify.ps1 (agent) : 1306/1306, 0 avertissement, 0 erreur ; DLL 0.729.0.0. Non validé en jeu.
+### English
+- Gathering help: a line now separates the next action from the plan, as the user asked. Not validated in game.
+
+## 0.728.0
+- Plan global, Verify : Aide à la récolte : la ligne « Ensuite » donne la prochaine action du plan ou dit de récolter, d'après les PR dépensés et les essais restants ; le plan montre ce qui est fait. Un cadre repère l'action sur vos barres (réglable, barres croisées non prises en charge). Tensho n'exécute rien, aucun hook. Non validé en jeu.
+- Tests : GatherNext728Tests. Verify.ps1 (agent) : 1306/1306, 0 avertissement, 0 erreur ; DLL 0.728.0.0. Non validé en jeu.
+### English
+- Gathering help: the « Next » line gives the plan's next action or says to gather, from the GP spent and the attempts left; the plan shows what is done. A frame marks the action on your hotbars (optional, cross hotbars not covered). Tensho uses nothing, no hook. Not validated in game.
+
+## 0.727.0
+- Plan global, Verify : Signalement : « Suivre toutes ses parties » sur la coque Bronco ajoutait aussi une base de tours et un mur de maisonnette. Cause : tout ce qui n'a pas de prototype et l'ordre 1 formait un même groupe. Correction : la catégorie compte aussi. Les aéronefs de type II, oubliés, ont maintenant leurs quatre parties. Les deux projets déjà ajoutés restent à retirer avec leur croix. Non validé en jeu.
+- Tests : WorkshopSets694Tests. Verify.ps1 (agent) : 1301/1301, 0 avertissement, 0 erreur ; DLL 0.727.0.0. Non validé en jeu.
+### English
+- Report: « Follow all its parts » on the Bronco hull also added a tower base and a housing wall. Cause: everything with no prototype and order 1 formed one group. Fix: the category counts too. The second airship class, left out, now gets its four parts. The two projects already added stay until removed with their cross. Not validated in game.
+
+## 0.726.0
+- Plan global, Verify : Correction de 0.724 : hors de l'écran, ImGui sautait le contenu des sous-fenêtres, donc le résultat « 49 pages sans erreur » prouvait peu. Le passage dessine maintenant dans une fenêtre masquée, à l'écran : le contenu s'exécute, rien n'est affiché, et il s'arrête si elle n'est pas masquée.
+- Tests : PageSweep724Tests. Verify.ps1 (agent) : 1300/1300, 0 avertissement, 0 erreur ; DLL 0.726.0.0. Non validé en jeu.
+### English
+- Fix of 0.724: outside the screen, ImGui skipped the content of child windows, so « 49 pages with no error » proved little. The sweep now draws in a hidden window on the screen: the content runs, nothing shows, and it stops if the window is not hidden.
+
+## 0.725.0
+- Plan global, Verify : Signalement : « ventes par jour » restait à « ? ». Cause : la réponse agrégée d'Universalis n'en donne pas sans vente récente. Correction : la vitesse sur sept jours vient de la réponse de l'objet. Demande : le tri par marché de « Que puis-je fabriquer ? » ne compte plus que ce qui peut se vendre dans les jours choisis (7 par défaut, réglable) ; une vieille vente HQ isolée ne fixe plus le prix quand seul le NQ se vend. Prouvé contre les réponses réelles d'Universalis ; non validé en jeu.
+- Tests : SalesSpeed725Tests. Verify.ps1 (agent) : 1300/1300, 0 avertissement, 0 erreur ; DLL 0.725.0.0. Non validé en jeu.
+### English
+- Report: « sales a day » stayed at « ? ». Cause: Universalis's aggregated answer leaves it out without a recent sale. Fix: the seven-day speed comes from the item's own answer. Request: the market sort of « What can I craft? » now counts only what can sell in the chosen days (7 by default, adjustable); one old HQ sale no longer sets the price when only NQ sells. Checked against real Universalis answers; not validated in game.
+
+## 0.724.0
+- Plan global, Verify : Auto-contrôle : en mode développeur, après l'auto-contrôle, chaque page est dessinée hors de l'écran, sans clic possible, et le journal donne son coût et ses erreurs. Il attend pendant les combats, contenus, synthèses, récoltes, pêche et cinématiques. La page Marché reste à part : elle interroge Universalis.
+- Tests : PageSweep724Tests. Verify.ps1 (agent) : 1295/1295, 0 avertissement, 0 erreur ; DLL 0.724.0.0. Non validé en jeu.
+### English
+- Self-check: in developer mode, after the self-check, every page is drawn off-screen with no input possible, and the log gives its cost and any error. It waits during combat, duties, crafting, gathering, fishing and cutscenes. The market page is left out: it asks Universalis.
+
+## 0.723.0
+- Plan global, Verify : Preuves corrigées d'après la première lecture dans le jeu : 50 rapports du front et non 55, 1 123 ALEA nommés, 47 et 41 lieux sur les fronts de Bozja. Aucun changement de code du plugin. COMPILED et TESTED ; lectures de 0.722 exécutées dans le jeu, affichage non validé.
+- Tests : FieldContent717Tests. Verify.ps1 (agent) : 1292/1292, 0 avertissement, 0 erreur ; DLL 0.723.0.0. Non validé en jeu.
+### English
+- Evidence corrected from the first read inside the game: 50 field records rather than 55, 1,123 named FATEs, 47 and 41 places on the Bozjan fronts. No change to the plugin's code. COMPILED and TESTED; the reads of 0.722 ran in the game, display not validated.
+
+## 0.722.0
+- Plan global, Verify : Auto-contrôle : les pages codées sans le jeu sont maintenant lues dans le jeu au rechargement (mode développeur ou sur demande) et leurs comptes vont au journal.
+- Tests : FieldContent717Tests. Verify.ps1 (agent) : 1292/1292, 0 avertissement, 0 erreur ; DLL 0.722.0.0. Non validé en jeu.
+### English
+- Self-check: pages coded without the game are now read in the game at reload (developer mode or on request), with their counts in the log.
+
+## 0.721.0
+- Plan global, W-14b : Trouvé en faisant Eureka et Bozja : les fichiers de zone du jeu donnent le lieu de chaque ALEA. Nouvelle page Monde › ALEA : 47 zones ouvertes et 1 127 ALEA avec niveau et position, recherche par nom dans toutes les zones, clic pour la carte, clic droit pour le drapeau et l'éthérite. Le livre du zodiaque a un bouton « Où ? » sur ses ALEA. COMPILED et TESTED, non validé en jeu.
+- Tests : FieldContent717Tests. Verify.ps1 (agent) : 1291/1291, 0 avertissement, 0 erreur ; DLL 0.721.0.0. Non validé en jeu.
+### English
+- Found while doing Eureka and Bozja: the game's zone files give each FATE's place. New page World > FATEs: 47 open zones and 1,127 FATEs with level and position, search by name in every zone, click for the map, right click for the flag and aetheryte. The Zodiac book has a Where? button on its FATEs. COMPILED and TESTED, not validated in game.
+
+## 0.720.0
+- Plan global, W-13 : Fin des reliques suivantes, sujet choisi par l'utilisateur. La page s'appelle maintenant Reliques ; Eurêka, Résistance et fantômes ont deux onglets, Armes et Armures : pour le groupe de jobs choisi, chaque étape avec ses pièces au survol et le nombre en stock. COMPILED et TESTED, non validé en jeu.
+- Tests : RelicWeapons708Tests. Verify.ps1 (agent) : 1290/1290, 0 avertissement, 0 erreur ; DLL 0.720.0.0. Non validé en jeu.
+### English
+- End of the later relics, a topic chosen by the user. The page is now called Relics; Eureka, Resistance and Phantom have two tabs, Weapons and Armour: for the chosen job group, each stage with its pieces on hover and how many are in stock. COMPILED and TESTED, not validated in game.
+
+## 0.719.0
+- Plan global, W-16 : Lexique, sujet choisi par l'utilisateur. Nouvelle page Objets › Lexique : chercher un mot du jeu en français ou en anglais, sans tenir compte des accents, dans seize types de feuilles (objets, actions, lieux, monstres, PNJ, quêtes, interface…), résultats par pages, clic pour copier. Chargement et recherche hors de l'image. COMPILED et TESTED, non validé en jeu.
+- Tests : Lexicon719Tests. Verify.ps1 (agent) : 1288/1288, 0 avertissement, 0 erreur ; DLL 0.719.0.0. Non validé en jeu.
+### English
+- Lexicon, a topic chosen by the user. New page Objects > Lexicon: search a word of the game in French or English, ignoring accents, across sixteen kinds of sheets (items, actions, places, monsters, NPCs, quests, interface…), results in pages, click to copy. Loaded and searched off the frame. COMPILED and TESTED, not validated in game.
+
+## 0.718.0
+- Plan global, W-15 : Donjons profonds, sujet choisi par l'utilisateur. Nouvelle page Progression › Donjons profonds, un onglet par donjon : étages avec niveau, état et quête de déblocage ; poteries, pierres et objets particuliers avec le texte du jeu, le mot « sous-sol », « étage » ou « zone » rempli selon le donjon ; coffres d'après LuminaSupplemental, sous son réglage. Pas de conseil de combat, et Tensho reste en pause à l'intérieur. Corrigé aussi : deux noms de la liste des sources suivent maintenant le jeu (Eurêka Orthos, Sanctuaire des pèlerins). COMPILED et TESTED, non validé en jeu.
+- Tests : DeepDungeons718Tests. Verify.ps1 (agent) : 1285/1285, 0 avertissement, 0 erreur ; DLL 0.718.0.0. Non validé en jeu.
+### English
+- Deep dungeons, a topic chosen by the user. New page Progression > Deep dungeons, a tab per dungeon: floors with level, state and unlock quest; pomanders, stones and special items with the game's text, its floor word filled in per dungeon; coffers from LuminaSupplemental, under its switch. No fight advice, and Tensho still pauses inside. Also fixed: two source names now follow the game. COMPILED and TESTED, not validated in game.
+
+## 0.717.0
+- Plan global, W-14 : Eureka et Bozja, sujet choisi par l'utilisateur. Nouvelle page Progression › Eureka et Bozja : par zone, les ALEA, escarmouches et affrontements cruciaux avec leur niveau et leur position, lues dans les fichiers de zone du jeu ; clic pour la carte, clic droit pour le drapeau et l'éthérite quand il y en a une ; rapports du front bozjien et actions oubliées avec les textes du jeu. Corrigé aussi : l'étape « Augmented » des armes de la Résistance prenait des armes fabriquées (Augmented Crystarium). Ce que le personnage possède n'est pas lu. COMPILED et TESTED, non validé en jeu.
+- Tests : FieldContent717Tests. Verify.ps1 (agent) : 1281/1281, 0 avertissement, 0 erreur ; DLL 0.717.0.0. Non validé en jeu.
+### English
+- Eureka and Bozja, a topic chosen by the user. New page Progression > Eureka and Bozja: for each zone, FATEs, skirmishes and critical engagements with level and position, read from the game's zone layouts; click for the map, right click for the flag and the aetheryte where there is one; field records and lost actions with the game's texts. Also fixed: the Resistance weapons' Augmented stage took crafted weapons (Augmented Crystarium). What the character holds is not read. COMPILED and TESTED, not validated in game.
+
+## 0.716.0
+- Plan global, W-13 : Reliques suivantes, sujet choisi par l'utilisateur. La page Armes reliques a maintenant un onglet par lignée : Zodiaque, Anima, Eurêka, Résistance, Manderville, Fantômes, avec les étapes par arme et ce que vos stocks détiennent. Les objets viennent des feuilles du jeu ; seuls les noms d'étapes et leurs niveaux ont été relevés sur le wiki, puis comptés dans le jeu. Les armures ne sont pas encore listées. COMPILED et TESTED, non validé en jeu.
+- Tests : RelicWeapons708Tests. Verify.ps1 (agent) : 1278/1278, 0 avertissement, 0 erreur ; DLL 0.716.0.0. Non validé en jeu.
+### English
+- Later relics, a topic chosen by the user. The Relic weapons page now has a tab per line: Zodiac, Anima, Eureka, Resistance, Manderville, Phantom, with stages per weapon and what your stocks hold. Items come from the game's sheets; only stage names and levels were read on the wiki, then counted in the game. Armour is not listed yet. COMPILED and TESTED, not validated in game.
+
+## 0.715.0
+- Plan global, W-12 : Livraisons spéciales, sujet choisi par l'utilisateur. Nouvelle page Progression › Livraisons spéciales : les quêtes de livraison des artisans et récolteurs (Cristarium, académie de Sharlayan, bazar aux Mille Perles), faites ou à faire, avec niveau, lieu et clic droit vers le départ et l'éthérite. COMPILED et TESTED, non validé en jeu.
+- Tests : SpecialDeliveries715Tests. Verify.ps1 (agent) : 1276/1276, 0 avertissement, 0 erreur ; DLL 0.715.0.0. Non validé en jeu.
+### English
+- Special deliveries, a topic chosen by the user. New page Progression > Special deliveries: the delivery quest lines of crafters and gatherers (Crystarium, Studium, Wachumeqimeqi), done or left, with level, place and a right click to the start and the aetheryte. COMPILED and TESTED, not validated in game.
+
+## 0.714.0
+- Plan global, W-11 : Grandes compagnies, sujet choisi par l'utilisateur. Nouvelle page Progression › Grandes compagnies : grade et sceaux dans chacune, prochaine promotion avec sa quête, et un onglet de ce que les sceaux achètent, avec filtre par grade et recherche. Les missions du jour ne sont pas lues : le jeu ne les donne que dans sa fenêtre. COMPILED et TESTED, non validé en jeu.
+- Tests : GrandCompanies714Tests. Verify.ps1 (agent) : 1275/1275, 0 avertissement, 0 erreur ; DLL 0.714.0.0. Non validé en jeu.
+### English
+- Grand Companies, a topic chosen by the user. New page Progression > Grand Companies: grade and seals in each, next promotion with its quest, and a tab of what seals buy, with a grade filter and search. Today's supply missions are not read: the game gives them only in its window. COMPILED and TESTED, not validated in game.
+
+## 0.713.0
+- Plan global, W-10 : Peuples alliés, sujet choisi par l'utilisateur. Nouvelle page Progression › Peuples alliés : pour chaque peuple, son extension, son lieu (clic droit vers l'éthérite), votre rang, votre réputation et la monnaie détenue, avec les quêtes restantes du jour. Lecture seule, sans requête au serveur. Le sujet rejoint le plan avec six autres (W-11 à W-16). COMPILED et TESTED, non validé en jeu.
+- Tests : AlliedSocieties713Tests. Verify.ps1 (agent) : 1271/1271, 0 avertissement, 0 erreur ; DLL 0.713.0.0. Non validé en jeu.
+### English
+- Allied societies, a topic chosen by the user. New page Progression > Allied societies: each society's expansion, place (right click to the aetheryte), your rank, reputation and currency held, with today's quests left. Read only, no server request. It joins the plan with six others (W-11 to W-16). COMPILED and TESTED, not validated in game.
+
+## 0.712.0
+- Plan global, W-06 : Rapport de l'utilisateur : le tri par assignats n'affichait aucun assignat. Les récompenses se chargent à la première demande, et la liste n'était pas recalculée à leur arrivée. Elle l'est maintenant, et la page dit quand elles se chargent. COMPILED et TESTED, non validé en jeu.
+- Tests : MarketPace710Tests. Verify.ps1 (agent) : 1268/1268, 0 avertissement, 0 erreur ; DLL 0.712.0.0. Non validé en jeu.
+### English
+- User report: the scrip sort showed no scrips. The rewards load on first asking and the list was not worked out again when they arrived. It now is, and the page says when they are loading. COMPILED and TESTED, not validated in game.
+
+## 0.711.0
+- Plan global, Marché : Rapport de l'utilisateur : la rentabilité comptait le prix demandé, or un objet affiché à 2 000 000 de gils ne se vend pas forcément. « Que puis-je fabriquer ? » et « Que faire avec ? » utilisent maintenant ce qui s'est réellement vendu sur votre monde : le plus bas entre la dernière vente et la vente moyenne, avec le nombre de ventes par jour. Sans vente connue, l'objet passe en fin de liste. COMPILED et TESTED, non validé en jeu.
+- Tests : MarketPace710Tests. Verify.ps1 (agent) : 1267/1267, 0 avertissement, 0 erreur ; DLL 0.711.0.0. Non validé en jeu.
+### English
+- User report: profitability counted the asking price, and an item listed at 2,000,000 gil does not always sell. What can I craft? and What to do with it? now use what really sold on your world: the lower of the last sale and the average sale, with sales per day. With no known sale, the item goes last. COMPILED and TESTED, not validated in game.
+
+## 0.710.0
+- Plan global, Marché : Demande de l'utilisateur : les grosses demandes de prix vont plus vite sans gêner Universalis. Sur « Que faire avec ? » et « Que puis-je fabriquer ? » : une requête à la fois, 100 objets, une par seconde, au lieu de requêtes objet par objet toutes les 3 secondes. Un refus du site (429, 503) arrête la liste et impose au moins 30 secondes de pause. La mémoire garde maintenant 4096 prix, car 128 faisait perdre le début d'une longue liste. COMPILED et TESTED, non validé en jeu.
+- Tests : MarketPace710Tests. Verify.ps1 (agent) : 1265/1265, 0 avertissement, 0 erreur ; DLL 0.710.0.0. Non validé en jeu.
+### English
+- User request: large price requests go faster without troubling Universalis. On What to do with it? and What can I craft?: one request at a time, 100 items, one a second, instead of single requests every 3 seconds. A refusal (429, 503) stops the list and holds at least 30 seconds. The memory now keeps 4096 prices: 128 lost the start of a long list. COMPILED and TESTED, not validated in game.
+
+## 0.709.0
+- Plan global, W-06 : Demande de l'utilisateur : « Que puis-je fabriquer ? » s'affiche par pages de 25, avec une recherche par nom dans toute la liste. En tri marché, les prix viennent page par page et chaque page est classée seule ; « Charger tous les prix » les demande tous, et toute la liste est alors classée. COMPILED et TESTED, non validé en jeu.
+- Tests : CraftChained696Tests. Verify.ps1 (agent) : 1261/1261, 0 avertissement, 0 erreur ; DLL 0.709.0.0. Non validé en jeu.
+### English
+- User request: What can I craft? shows pages of 25, with a name search across the whole list. On the market sort, prices come page by page and each page is ranked on its own; Load all prices asks for them all, and the whole list is then ranked. COMPILED and TESTED, not validated in game.
+
+## 0.708.0
+- Plan global, W-03 : Armes reliques, première partie. Nouvelle page Progression › Armes reliques : les armes du zodiaque par étape, ce que vos stocks en détiennent, et le livre en cours avec ses monstres, donjons, aléas et mandats. Lecture seule, sans requête au serveur. Les extensions suivantes ne sont pas encore couvertes. COMPILED et TESTED, non validé en jeu.
+- Tests : RelicWeapons708Tests. Verify.ps1 (agent) : 1259/1259, 0 avertissement, 0 erreur ; DLL 0.708.0.0. Non validé en jeu.
+### English
+- Relic weapons, first part. New page Progression > Relic weapons: Zodiac weapons by stage, what your stocks hold, and the book in progress with its monsters, dungeons, FATEs and leves. Read only, no server request. Later expansions are not covered yet. COMPILED and TESTED, not validated in game.
+
+## 0.707.0
+- Plan global, W-06 : Demande de l'utilisateur : « Que puis-je fabriquer ? » se trie par niveau, gils au marché, vente à un PNJ ou assignats, avec la valeur sur chaque ligne. Marché : prix minimum de votre monde (Universalis), HQ si l'objet peut l'être, demandés au choix de ce tri, avec une case pour arrêter. Assignats : palier haut, chaque sorte à part. Les matériaux ne sont pas déduits, ils sont déjà en stock. COMPILED et TESTED, non validé en jeu.
+- Tests : CraftChained696Tests. Verify.ps1 (agent) : 1255/1255, 0 avertissement, 0 erreur ; DLL 0.707.0.0. Non validé en jeu.
+### English
+- User request: What can I craft? sorts by level, market gil, NPC sale or scrips, with the value on each line. Market: your world's lowest price (Universalis), HQ when the item can be, asked when this sort is chosen, with a box to stop. Scrips: high tier, each kind apart. Materials are not deducted, as they are already in stock. COMPILED and TESTED, not validated in game.
+
+## 0.706.0
+- Plan global, Éthérites : Rapport de l'utilisateur : la Félicité insulaire n'a pas de téléportation. L'entrée « Éthérite la plus proche » disparaît sur cette carte et sur toute carte sans éthérite, dans les menus et sur la carte Tensho. COMPILED et TESTED, non validé en jeu.
+- Tests : PlaceMenus704Tests. Verify.ps1 (agent) : 1254/1254, 0 avertissement, 0 erreur ; DLL 0.706.0.0. Non validé en jeu.
+### English
+- User report: the Island Sanctuary has no teleport. The nearest aetheryte entry goes away on that map and on any map with no aetheryte, in menus and on the Tensho map. COMPILED and TESTED, not validated in game.
+
+## 0.705.0
+- Plan global, Infobulles : Demande de l'utilisateur : les vendeurs PNJ des infobulles ont leurs réglages, sous Comment l'obtenir : les afficher ou non, exclure les prérequis non remplis, ne garder que certaines monnaies. Par défaut, tout reste affiché comme avant. La fiche de l'objet et l'outil des vendeurs ne changent pas. COMPILED et TESTED, non validé en jeu.
+- Tests : PlaceMenus704Tests. Verify.ps1 (agent) : 1253/1253, 0 avertissement, 0 erreur ; DLL 0.705.0.0. Non validé en jeu.
+### English
+- User request: the NPC vendors of tooltips have their settings, under How to get it: show them or not, leave out unmet requirements, keep only some currencies. By default everything shows as before. The item sheet and vendor tool do not change. COMPILED and TESTED, not validated in game.
+
+## 0.704.0
+- Plan global, Éthérites : Demande de l'utilisateur : partout où des coordonnées s'affichent, le clic droit propose l'éthérite la plus proche, avec drapeau et question de téléportation habituelle. Ajouté aux lieux de monstres du wiki et de Garland, sources de magie bleue, liens du chat, train de chasse, animaux de l'île, favoris, listes de la carte Tensho, recherche sur les cartes, page Cartes, fiches de vendeurs, sources d'objets, suivi, carnet d'exploration et récolte. Un test exige ce menu sur toute page qui place un drapeau. COMPILED et TESTED, non validé en jeu.
+- Tests : PlaceMenus704Tests. Verify.ps1 (agent) : 1252/1252, 0 avertissement, 0 erreur ; DLL 0.704.0.0. Non validé en jeu.
+### English
+- User request: wherever coordinates show, a right click offers the nearest aetheryte, with the flag and the usual teleport question. Added to wiki and Garland monster places, blue magic sources, chat links, hunt train, island animals, bookmarks, the Tensho map's lists, map search, the Maps page, vendor sheets, item sources, tracker, sightseeing log and gathering. A test requires this menu on any page placing a flag. COMPILED and TESTED, not validated in game.
+
+## 0.703.0
+- Plan global, W-09 : Demande de l'utilisateur : option « Exclure les PNJ aux prérequis non remplis » dans les panneaux : un article dont la quête n'est pas faite ne compte plus. Un prérequis non lu compte comme rempli : les hauts faits ne sont retenus que s'ils sont confirmés, et le rang de compagnie n'est pas vérifié. Désactivée par défaut. COMPILED et TESTED, non validé en jeu.
+- Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1249/1249, 0 avertissement, 0 erreur ; DLL 0.703.0.0. Non validé en jeu.
+### English
+- User request: Leave out NPCs with unmet requirements, in the panels: an article whose quest is not done no longer counts. A requirement not read counts as met: achievements only when confirmed, and company rank is not checked. Off by default. COMPILED and TESTED, not validated in game.
+
+## 0.702.0
+- Plan global, W-09 : Demande de l'utilisateur : la liste des monnaies ne garde que celles des PNJ qui vendent vraiment des matériaux, c'est-à-dire un ingrédient d'une recette ou une fourniture d'un projet d'atelier. Une monnaie déjà cochée reste listée pour pouvoir être décochée. COMPILED et TESTED, non validé en jeu.
+- Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1248/1248, 0 avertissement, 0 erreur ; DLL 0.702.0.0. Non validé en jeu.
+### English
+- User request: the currency list keeps only those of NPCs really selling materials: a recipe ingredient or a workshop project supply. A currency already ticked stays listed so it can be unticked. COMPILED and TESTED, not validated in game.
+
+## 0.701.0
+- Plan global, W-09 : Rapport et demande de l'utilisateur : la liste des monnaies montrait des numéros. #0 est une monnaie que le jeu code et que rien ne résout, #8223 une ligne sans nom dans la feuille du jeu : ils sortent de la liste et leurs offres ne comptent pas. #4294905804 est le code interne de Tensho pour les crédits de compagnie, maintenant nommés. La liste part tout décochée, avec une recherche par nom et « Tout décocher » : un PNJ ne compte que si toutes les monnaies qu'il demande sont cochées. COMPILED et TESTED, non validé en jeu.
+- Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1247/1247, 0 avertissement, 0 erreur ; DLL 0.701.0.0. Non validé en jeu.
+### English
+- User report and request: the currency list showed numbers. #0 is a currency the game encodes and nothing resolves, #8223 a row with no name in the game's sheet: they leave the list and their offers do not count. #4294905804 is Tensho's own code for company credits, now named. The list starts all unticked, with a name search and Untick all: an NPC counts only if every currency it asks for is ticked. COMPILED and TESTED, not validated in game.
+
+## 0.700.0
+- Plan global, W-09 : Demandes de l'utilisateur : dans les panneaux, chaque provenance se replie, avec le nombre d'objets complets, et les cristaux ont leur propre catégorie. La case Vendeurs PNJ coupe les PNJ du calcul : ce qu'ils vendent descend à ses ingrédients ou passe sous une autre provenance. Une liste exclut des monnaies : un PNJ qui ne prend que celles-là ne compte plus. COMPILED et TESTED, non validé en jeu.
+- Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1246/1246, 0 avertissement, 0 erreur ; DLL 0.700.0.0. Non validé en jeu.
+### English
+- User requests: in the panels, each origin folds, with the count of complete items, and crystals have their own category. The NPC vendors box removes vendors from the calculation: what they sell goes down to its ingredients or under another origin. A list leaves currencies out: an NPC taking only those no longer counts. COMPILED and TESTED, not validated in game.
+
+## 0.699.0
+- Plan global, W-09 : Demande de l'utilisateur : les panneaux à l'écran (atelier, préparation, liste de fabrication) ont une option « Seulement ce qui reste à récupérer, par provenance » : ce qui se fabrique est remplacé par ses ingrédients, jusqu'à ce qui se récolte, s'achète à un PNJ, tombe d'un monstre ou s'obtient autrement, avec une case par provenance. Un objet fabriqué qui s'achète ou se récolte reste tel quel. Les monstres viennent de LuminaSupplemental, donc de la source communautaire. COMPILED et TESTED, non validé en jeu.
+- Tests : BaseMaterials699Tests. Verify.ps1 (agent) : 1244/1244, 0 avertissement, 0 erreur ; DLL 0.699.0.0. Non validé en jeu.
+### English
+- User request: the on-screen panels (workshop, preparation, crafting list) have an option showing only what is left to fetch, by origin: crafted items are replaced by their ingredients, down to what is gathered, bought from an NPC, dropped by a monster or found otherwise, with a box per origin. A crafted item that can be bought or gathered stays as it is. Monsters come from LuminaSupplemental, the community source. COMPILED and TESTED, not validated in game.
+
+## 0.698.0
+- Plan global, W-08 : Demande de l'utilisateur : clic droit sur un mandat : « Éthérite la plus proche du mandateur » ou « du mandat ». Le drapeau se place, la carte Tensho s'ouvre dessus et la question de téléportation habituelle s'affiche. Le lieu vient des feuilles du jeu (LevelLevemete, LevelStart). COMPILED et TESTED, non validé en jeu.
+- Tests : ReminderTabs687Tests. Verify.ps1 (agent) : 1239/1239, 0 avertissement, 0 erreur ; DLL 0.698.0.0. Non validé en jeu.
+### English
+- User request: right click on a leve: nearest aetheryte to the client or to the leve. The flag is placed, the Tensho map opens on it and the usual teleport question shows. The place comes from the game's sheets (LevelLevemete, LevelStart). COMPILED and TESTED, not validated in game.
+
+## 0.697.0
+- Plan global, Monnaies : Demande de l'utilisateur : l'onglet « Que faire avec ? » a une case « Chercher les prix du marché », qui arrête aussi une recherche en cours, un filtre (Tout, Collection seulement, Collection manquante, Vendable au marché) et une recherche par nom. La collection couvre les montures et les mascottes. COMPILED et TESTED, non validé en jeu.
+- Tests : CurrencyValue695Tests. Verify.ps1 (agent) : 1238/1238, 0 avertissement, 0 erreur ; DLL 0.697.0.0. Non validé en jeu.
+### English
+- User request: the What to do with it? tab has a Look up market prices box, which also stops a running search, a filter (Everything, Collection only, Collection still missing, Sold on the market) and a name search. Collection covers mounts and minions. COMPILED and TESTED, not validated in game.
+
+## 0.696.0
+- Plan global, W-07 : Demande de l'utilisateur : « Que puis-je fabriquer ? » compte maintenant les sous-recettes, du minerai à la dernière étape, avec un seul stock partagé. Une case permet de revenir aux ingrédients directs. Le nombre est un minimum : les restes d'une sous-fabrication ne sont pas réutilisés et une seule recette par objet est essayée. La profondeur et le nombre sont bornés. COMPILED et TESTED, non validé en jeu.
+- Tests : CraftChained696Tests. Verify.ps1 (agent) : 1237/1237, 0 avertissement, 0 erreur ; DLL 0.696.0.0. Non validé en jeu.
+### English
+- User request: What can I craft? now counts sub-recipes, from the ore through every step, on one shared stock. A box goes back to direct ingredients. The count is a minimum: leftovers are not reused and one recipe per item is tried. Depth and count are bounded. COMPILED and TESTED, not validated in game.
+
+## 0.695.0
+- Plan global, Monnaies : Rapport et demande de l'utilisateur : « Que faire ? » ne montrait aucun prix du marché, car il fallait un second clic, 32 prix à la fois, et un échec ne s'affichait pas. Choisir une monnaie demande maintenant les prix, par lots de 32 jusqu'au bout, sous l'interrupteur Universalis ; un échec s'affiche avec Réessayer ; un objet sans offre l'indique. La page a son propre onglet, Rangements › Que faire avec ?, avec le choix de la monnaie. COMPILED et TESTED, non validé en jeu.
+- Tests : CurrencyValue695Tests. Verify.ps1 (agent) : 1233/1233, 0 avertissement, 0 erreur ; DLL 0.695.0.0. Non validé en jeu.
+### English
+- User report and request: What to do with it? showed no market price: it took a second click, 32 prices at a time, and a failure did not show. Choosing a currency now asks for the prices, in batches of 32 to the end, under the Universalis switch; a failure shows with Try again; an item with no offer says so. The page has its own tab, Storage > What to do with it?, with the currency picker. COMPILED and TESTED, not validated in game.
+
+## 0.694.0
+- Plan global, W-05 : Demande de l'utilisateur : dans Compagnie libre › Atelier, « Suivre ce projet » et « Suivre toutes ses parties » ajoutent des projets à une liste de projets suivis. Leurs matériaux s'additionnent, sur la page et dans le panneau à l'écran. Les parties sont reliées par le prototype et l'ordre du jeu, relevés pour les sous-marins. COMPILED et TESTED, non validé en jeu.
+- Tests : WorkshopSets694Tests. Verify.ps1 (agent) : 1231/1231, 0 avertissement, 0 erreur ; DLL 0.694.0.0. Non validé en jeu.
+### English
+- User request: in Free Company > Workshop, Follow this project and Follow all its parts add projects to a followed list. Their materials add up, on the page and in the on-screen panel. Parts are linked by the game's draft and order, read for submarines. COMPILED and TESTED, not validated in game.
+
+## 0.693.0
+- Plan global, W-05 : Demande de l'utilisateur : les panneaux de projet d'atelier, de préparation et de liste de fabrication restent affichés, en combat et derrière les fenêtres du jeu, tant qu'on ne les coupe pas. Deux cases, désactivées par défaut, permettent de les cacher en combat ou derrière les fenêtres. Restent la coupure en JcJ et en contenu classé, et le masquage de toute l'interface par le jeu. COMPILED et TESTED, non validé en jeu.
+- Tests : ListPanels691Tests. Verify.ps1 (agent) : 1228/1228, 0 avertissement, 0 erreur ; DLL 0.693.0.0. Non validé en jeu.
+### English
+- User request: the workshop, preparation and crafting list panels stay up, in combat and behind game windows, until turned off. Two boxes, off by default, hide them in combat or behind game windows. The cut in PvP and ranked content, and the game hiding its whole interface, still apply. COMPILED and TESTED, not validated in game.
+
+## 0.692.0
+- Plan global, W-05 : Rapports de l'utilisateur : la case manquait dans Liste de fabrication, elle y est, avec son panneau à l'écran qui suit la liste choisie. Le panneau d'atelier ne s'affichait pas sur l'île : le journal, qui dit désormais ce qui écarte un panneau, a donné la cause : sa place par défaut chevauche les jauges de métier (JobHudRRP0, JobHudRRP1), comptées comme des fenêtres devant lui. Elles n'en sont plus, ni le tableau de gestion de l'île. COMPILED et TESTED, non validé en jeu.
+- Tests : ListPanels691Tests. Verify.ps1 (agent) : 1228/1228, 0 avertissement, 0 erreur ; DLL 0.692.0.0. Non validé en jeu.
+### English
+- User reports: the box was missing from the Crafting list tab; it is there, with an on-screen panel following the chosen list. The workshop panel did not show on the island: the log, which now says what hides a panel, gave the cause: its default place overlaps the job gauges (JobHudRRP0, JobHudRRP1), counted as windows in front of it. They no longer count, nor does the island's management board. COMPILED and TESTED, not validated in game.
+
+## 0.691.0
+- Plan global, W-05 : Demande de l'utilisateur : deux petits panneaux à l'écran, juste la liste des matériaux avec le stock sur le requis. Compagnie libre › Atelier : « Afficher ce projet à l'écran », qui suit le projet choisi. Artisanat › Préparation : « Afficher cette préparation à l'écran », qui suit la recette et la quantité. Masqués en combat, retenus entre deux sessions, désactivés par défaut. COMPILED et TESTED, non validé en jeu.
+- Tests : ListPanels691Tests. Verify.ps1 (agent) : 1227/1227, 0 avertissement, 0 erreur ; DLL 0.691.0.0. Non validé en jeu.
+### English
+- User request: two small on-screen panels, just the list of materials with stock over needed. Free Company > Workshop: show this project, following the chosen project. Crafting > Preparation: show this preparation, following recipe and target. Hidden in combat, kept between sessions, off by default. COMPILED and TESTED, not validated in game.
+
+## 0.690.0
+- Plan global, Dresseur : Rapport de l'utilisateur : la page Dresseur ne disait pas où capturer les bêtes. Nouvelle colonne Capture : la zone ou le contenu, lus dans les feuilles du jeu, dans la langue du jeu, et la recherche les trouve. L'ennemi à capturer et ses coordonnées ne sont pas dans ces colonnes. Sens des colonnes déduit, à comparer au bestiaire du jeu. Île : la comparaison de l'utilisateur confirme la popularité, la disponibilité et l'évolution sur 14 créations, et les cycles de repos. COMPILED et TESTED, non validé en jeu pour la capture.
+- Tests : BeastPlaces688Tests. Verify.ps1 (agent) : 1225/1225, 0 avertissement, 0 erreur ; DLL 0.690.0.0. Non validé en jeu.
+### English
+- User report: the Beastmaster page did not say where to catch beasts. New Caught at column: the zone or duty, from the game's sheets, in its language, and search finds them. The enemy to catch and its coordinates are not in these columns. The columns' meaning is inferred, to compare with the game's bestiary. Island: the user's comparison confirms popularity, supply and demand shift on 14 crafts, and the rest cycles. COMPILED and TESTED, capture not validated in game.
+
+## 0.689.0
+- Plan global, Mandats : Rapport de l'utilisateur : l'infobulle d'un mandat ne donnait que son identifiant, en mode développeur. Elle donne maintenant le niveau, le type, le mandateur, la zone, les gils et les allocations, pour tout le monde ; l'identifiant reste en mode développeur. COMPILED et TESTED, non validé en jeu.
+- Tests : ReminderTabs687Tests. Verify.ps1 (agent) : 1223/1223, 0 avertissement, 0 erreur ; DLL 0.689.0.0. Non validé en jeu.
+### English
+- User report: a leve's tooltip gave only its id, in developer mode. It now gives level, type, client, zone, gil and allowances, for everyone; the id stays in developer mode. COMPILED and TESTED, not validated in game.
+
+## 0.688.0
+- Version sans changement de code : une erreur de l'agent a publié le numéro alors que le correctif n'avait pas été appliqué, avec le texte de la 0.687. La colonne Capture du Dresseur est en 0.690.
+- Tests : 1222/1222.
+
+### English
+
+No code change: an agent error published this number with the fix not applied and the text of 0.687. The Beastmaster column is in 0.690.
+
+## 0.687.0
+- Plan global, Rappels : Demande de l'utilisateur : la page Rappels passe en 5 onglets : Minuteurs, Mes tâches, Roulettes, Escadron, État du personnage. Rien n'est retiré. COMPILED et TESTED, non validé en jeu.
+- Tests : ReminderTabs687Tests. Verify.ps1 (agent) : 1222/1222, 0 avertissement, 0 erreur ; DLL 0.687.0.0. Non validé en jeu.
+### English
+- User request: the Reminders page becomes 5 tabs: Timers, My tasks, Roulettes, Squadron, Character status. Nothing is removed. COMPILED and TESTED, not validated in game.
+
+## 0.686.0
+- Plan global, Félicité insulaire : Corrections, captures de l'utilisateur : Tensho lisait quatre fabriques alors qu'une seule est prête, et préparait une planification pour les quatre ; seules les fabriques construites comptent maintenant, d'après un octet observé sur un seul joueur. Les mots de la disponibilité et de l'évolution sont ceux du jeu (Introuvable, En surplus, Forte augmentation, Constante…), et « fabrique » remplace « atelier » sur la page. COMPILED et TESTED, non validé en jeu.
+- Tests : IslandWorkshops686Tests. Verify.ps1 (agent) : 1221/1221, 0 avertissement, 0 erreur ; DLL 0.686.0.0. Non validé en jeu.
+### English
+- Fixes from user screenshots: Tensho read four workshops with only one ready, and planned for four; only built ones now count, from a byte observed on one player. Supply and demand shift use the game's French words, and fabrique replaces atelier on the page. COMPILED and TESTED, not validated in game.
+
+## 0.685.0
+- Plan global, W-04 : Animaux de la Félicité insulaire, à la demande de l'utilisateur. La page passe en deux onglets, Atelier et Pâturage. Pâturage : vos animaux lus dans le jeu (surnom, humeur, satiété, collecte, curation), et sur clic la liste du wiki : lieu avec drapeau, heure d'Éorzéa, météo, taille, capture, ressources. Le jeu ne donne ni lieux ni conditions : ces données sont lues sur le wiki à la demande, marquées comme communautaires, avec noms, objets et météos dans la langue du jeu. Rien n'est collecté ni nourri. COMPILED et TESTED, non validé en jeu.
+- Tests : IslandAnimals685Tests. Verify.ps1 (agent) : 1219/1219, 0 avertissement, 0 erreur ; DLL 0.685.0.0. Non validé en jeu.
+### English
+- Island Sanctuary animals, at the user's request. The page becomes two tabs, Workshop and Pasture. Pasture: your animals read from the game, and on a click the wiki's list: place with a flag, Eorzea time, weather, size, capture, leavings. The game holds neither places nor conditions: those are read from the wiki on request, marked as community data, with names, items and weathers in the game's language. Nothing is collected or fed. COMPILED and TESTED, not validated in game.
+
+## 0.684.0
+- Plan global, Félicité insulaire, carte : Demandes de l'utilisateur : les ressources de la Félicité insulaire se règlent par type, avec les cinq types du jeu (plantes, bois, roches, terre, pêche), dans le menu Affichage seulement. Deux lieux du même type au même endroit ne font plus qu'une icône. Le « ! » sans texte prend le nom de ce qui se trouve là, un panneau de construction par exemple. Le classement des objets par type est déduit des noms : aucune feuille ne le donne. COMPILED et TESTED, non validé en jeu.
+- Tests : Island679Tests. Verify.ps1 (agent) : 1213/1213, 0 avertissement, 0 erreur ; DLL 0.684.0.0. Non validé en jeu.
+### English
+- User requests: the Island Sanctuary's resources are set by kind, the game's five kinds, in the Display menu only. Two places of one kind on one spot make one icon. The marker with no text takes the name of what stands there, such as a construction board. Sorting items into kinds is inferred from their names: no sheet gives it. COMPILED and TESTED, not validated in game.
+
+## 0.683.0
+- Plan global, W-02 : La Grande Mascarade, sujet choisi par l'utilisateur. Nouvelle page Progression › La Grande Mascarade : les 32 niveaux, réussis ou non, avec leurs ennemis, le temps standard et le temps idéal, et un filtre « Non réussis seulement ». Aucun conseil de combat : les faiblesses de la feuille ne sont pas reprises. Lecture seule, sans requête au serveur. COMPILED et TESTED, non validé en jeu.
+- Tests : MaskedCarnivale683Tests. Verify.ps1 (agent) : 1209/1209, 0 avertissement, 0 erreur ; DLL 0.683.0.0. Non validé en jeu.
+### English
+- Masked Carnivale, a topic chosen by the user. New page Progression > Masked Carnivale: the 32 stages, cleared or not, with their enemies, standard and ideal times, and an « only those left » filter. No fight advice: the sheet's weaknesses are left out. Read only, no server request. COMPILED and TESTED, not validated in game.
+
+## 0.682.0
+- Plan global, Félicité insulaire, carte : Correction, rapport de l'utilisateur : les ressources de la Félicité insulaire ne se désactivaient pas depuis le menu Affichage de la carte, et « Aucun » les laissait. La case y est ajoutée, Tout et Aucun les comptent, et dans les réglages elle passe de la section des quêtes à celle des récoltes. COMPILED et TESTED, non validé en jeu.
+- Tests : Island679Tests. Verify.ps1 (agent) : 1203/1203, 0 avertissement, 0 erreur ; DLL 0.682.0.0. Non validé en jeu.
+### English
+- Fix from a user report: the Island Sanctuary's resources could not be turned off from the map's display menu, and None left them on. The box is added there, All and None count them, and in the settings it moves from the quest section to the gathering one. COMPILED and TESTED, not validated in game.
+
+## 0.681.0
+- Plan global, Félicité insulaire, carte : Demande de l'utilisateur : Rodolfermier (Champs), Béberger (Pâturage) et Chamoiselle (Guide) paraissent sur la carte Tensho. Marchandréa est reliée aux 8 boutiques payées en assignats insulaires azur et émeraude : ses articles entrent dans les sources d'objets. Ce lien est déduit, aucune feuille ne le donne. COMPILED et TESTED, non validé en jeu.
+- Tests : Island679Tests. Verify.ps1 (agent) : 1202/1202, 0 avertissement, 0 erreur ; DLL 0.681.0.0. Non validé en jeu.
+### English
+- User request: Rodolfermier, Béberger and Chamoiselle appear on the Tensho map. Marchandréa is linked to the 8 shops priced in Seafarer's and Islander's Cowries, so their goods join the item sources. That link is inferred: no sheet gives it. COMPILED and TESTED, not validated in game.
+
+## 0.680.0
+- Plan global, Félicité insulaire, carte : Laracheteuse (Exportations) paraît sur la carte Tensho, à la position lue dans le jeu : aucun fichier du jeu ne la donne. La même lecture montre des repères sur deux versions de la carte à la fois (773 et 775), ce qui explique le « ! » manquant. La capture temporaire est retirée. COMPILED et TESTED, non validé en jeu.
+- Tests : Island679Tests. Verify.ps1 (agent) : 1201/1201, 0 avertissement, 0 erreur ; DLL 0.680.0.0. Non validé en jeu.
+### English
+- Laracheteuse (Exportations) appears on the Tensho map, at the position read in the game: no game file gives it. The same reading shows markers on two versions of the map at once (773 and 775), which explains the missing marker. The temporary capture is removed. COMPILED and TESTED, not validated in game.
+
+## 0.679.0
+- Plan global, Félicité insulaire, carte : Corrections, rapports de l'utilisateur. Le marqueur « ! » de l'objectif de développement manquait : l'île a plusieurs versions de sa carte dans le jeu et Tensho ne gardait que les repères de la version affichée. La carte Tensho disparaissait dans tous les modes : MJIPadGuide, invisible, comptait comme une fenêtre devant elle. Marchandréa (Divers) et Laracheteuse (Exportations) sont ajoutées comme PNJ de service, sans vente inventée : Marchandréa est placée d'après la feuille Level ; Laracheteuse n'a de position dans aucun fichier du jeu, une capture en mode développeur relève sa place. COMPILED et TESTED, non validé en jeu.
+- Tests : Island679Tests. Verify.ps1 (agent) : 1200/1200, 0 avertissement, 0 erreur ; DLL 0.679.0.0. Non validé en jeu.
+### English
+- Fixes from user reports. The development objective's marker was missing: the island has several versions of its map in the game and Tensho kept only the markers of the one shown. The Tensho map left in every mode: the invisible MJIPadGuide counted as a window in front of it. Marchandréa and Laracheteuse are added as service NPCs with no made-up sales: the first is placed from the Level sheet; the second is in no game file, and a developer-mode capture records its position. COMPILED and TESTED, not validated in game.
+
+## 0.678.0
+- Plan global, Félicité insulaire : Correction, rapport de l'utilisateur : le jeu dit « Félicité insulaire », pas « Île sanctuaire ». Le reste de la page a été comparé à la feuille Addon du jeu : « entrain » devient « enthousiasme », « agenda » devient « carnet de fabrication » ou « planification », « offre » devient « disponibilité », « rang de l'île » devient « rang de félicité ». Ces mots étaient des traductions de l'agent. Textes français seulement. COMPILED et TESTED, non validé en jeu.
+- Tests : Languages. Verify.ps1 (agent) : 1195/1195, 0 avertissement, 0 erreur ; DLL 0.678.0.0. Non validé en jeu.
+### English
+- Fix from a user report: the French game says Félicité insulaire, not Île sanctuaire. The rest of the page was compared with the game's Addon sheet and its French words corrected: enthousiasme, carnet de fabrication, planification, disponibilité, rang de félicité. French texts only. COMPILED and TESTED, not validated in game.
+
+## 0.677.0
+- Plan global, Cartes : Demande de l'utilisateur : la page Cartes & repères était une longue suite de sections, elle passe en onglets. Cartes : recherche, liste des cartes, coordonnées. Repères : favoris, liens du chat, annuaire des lieux. Chasse : train de chasse et conditions des rangs S, ouverts d'office. Terrains en vente : PaissaDB. Le bouton d'ouverture de la carte Tensho reste au-dessus. Choisir un favori, utiliser un point de la carte ou le lieu d'un monstre ramène sur l'onglet Cartes, qui contient les coordonnées. COMPILED et TESTED, non validé en jeu.
+- Tests : MapTabs677Tests. Verify.ps1 (agent) : 1195/1195, 0 avertissement, 0 erreur ; DLL 0.677.0.0. Non validé en jeu.
+### English
+- User request: the Maps page was one long run of sections and is now in tabs. Maps: search, map list, coordinates. Markers: bookmarks, chat links, place directory. Hunt: hunt train and S rank conditions, open by default. Plots for sale: PaissaDB. The button that opens the Tensho map stays above them. Choosing a bookmark, a point from the map or a monster's place brings the Maps tab forward, since it holds the coordinates. COMPILED and TESTED, not validated in game.
+
+## 0.676.0
+- Plan global, C22 : Correction, rapport de l'utilisateur : dans Compagnie libre › Atelier, la colonne « En stock » restait sur un tiret alors que l'infobulle de l'objet donnait le bon nombre. Cause : c'était la seule page à lire les stocks sans les rafraîchir, elle ne voyait donc que ce qu'une autre page avait déjà lu. Corrigé, et un test exige désormais le rafraîchissement de toute page qui lit les stocks. COMPILED et TESTED, non validé en jeu.
+- Tests : WorkshopStock676Tests. Verify.ps1 (agent) : 1193/1193, 0 avertissement, 0 erreur ; DLL 0.676.0.0. Non validé en jeu.
+### English
+- Fix from a user report: in Free Company > Workshop, the In stock column stayed on a dash while the item's tooltip gave the right count. Cause: it was the only page reading the stocks without refreshing them. Fixed, and a test now requires the refresh on every page that reads stocks. COMPILED and TESTED, not validated in game.
+
+## 0.675.0
+- Plan global, W-01 : Commandes spéciales, sujet choisi par l'utilisateur. Nouvelle page Production › Commandes spéciales : pour chaque client, son lieu, son niveau, son rang, ses points et ses livraisons de la semaine, avec le reste de la semaine et le renouvellement. Les clients sans leur quête faite sont marqués non débloqués. Lecture seule, sans requête au serveur. Les objets demandés cette semaine ne sont pas affichés : le jeu ne les donne que dans la fenêtre du client. Le site EorzeaWorld interdit l'usage de ses données dans un plugin : rien n'en vient, c'est noté dans REFERENCES. COMPILED et TESTED, non validé en jeu.
+- Tests : CustomDeliveries675Tests. Verify.ps1 (agent) : 1192/1192, 0 avertissement, 0 erreur ; DLL 0.675.0.0. Non validé en jeu.
+### English
+- Custom deliveries, a topic chosen by the user. New page Production > Custom deliveries: each client's place, level, rank, points and deliveries this week, with what is left this week and the renewal. Clients whose quest is not done are marked not unlocked. Read only, no server request. This week's requested items are not shown: the game gives them only in the client's window. EorzeaWorld forbids using its data in a plugin: nothing comes from it, and REFERENCES says so. COMPILED and TESTED, not validated in game.
+
+## 0.674.0
+- Plan global, N-10 : Île sanctuaire (N-10, entrain) : le total d'un agenda compte maintenant la montée de l'entrain, une création efficace à la fois, jusqu'au plafond lu d'après vos repères, et la page affiche son évolution sur le cycle. Les sources divergent sur le moment de la hausse (début ou fin de la création) : la fin est retenue, le total le plus bas. Le choix des créations ne change pas. Crédit ajouté : page Island Workshop du wiki, qui confirme aussi qu'une création efficace consomme ses matériaux une seule fois.
+- Tests : Island groove. Verify.ps1 (agent) : 1186/1186, 0 avertissement, 0 erreur ; DLL 0.674.0.0. Non validé en jeu.
+### English
+- Island sanctuary (N-10, groove): an agenda's total now counts the groove's rise, one efficient craft at a time, up to the cap from your landmarks, and the page shows how it moves over the cycle. Sources differ on when it rises (start or end of the craft): the end is kept, the lower total. The choice of crafts does not change. Credit added: the wiki's Island Workshop page, which also confirms an efficient craft uses its materials once.
+
+## 0.673.0
+- Plan global, N-07 : Île sanctuaire (N-07, liste des matériaux) : chaque création affiche ses matériaux, et un agenda proposé donne le total de ses matériaux pour un cycle, à copier. D'après les données du jeu ; une création efficace compte une fois (un guide le dit, à comparer en jeu) ; les stocks de l'île ne sont pas lus. Plan : l'île de Lunule est notée pour plus tard, à la demande de l'utilisateur. Script de version : la ligne de reprise ne garde plus de restes après un numéro de version.
+- Tests : Island materials. Verify.ps1 (agent) : 1182/1182, 0 avertissement, 0 erreur ; DLL 0.673.0.0. Non validé en jeu.
+### English
+- Island sanctuary (N-07, materials list): each craft shows its materials, and a proposed agenda gives its total materials for one cycle, to copy. From the game's data; an efficient craft counts once (a guide says so, to compare in game); the island's stocks are not read. Plan: Occult Crescent is noted for later, as the user asked. Version script: the resume line no longer leaves remains after a version number.
+
+## 0.672.0
+- Plan global, N-10 : Île sanctuaire (N-10), deuxième partie : « Proposer un agenda » calcule un cycle pour vos ateliers construits, atelier par atelier, en tenant compte de l'offre déjà utilisée, et se copie en texte. Vous le saisissez vous-même : Tensho ne programme rien. Un bon agenda plutôt que le meilleur : l'entrain ne monte pas pendant le calcul, et les matériaux ne sont pas vérifiés. Règle des créations efficaces réécrite d'après Workshop Optimizer Plugin (MIT). La prévision de la semaine reste à faire.
+- Tests : Island agenda. Verify.ps1 (agent) : 1178/1178, 0 avertissement, 0 erreur ; DLL 0.672.0.0. Non validé en jeu.
+### English
+- Island sanctuary (N-10), second part: « Propose an agenda » computes one cycle for your built workshops, one workshop at a time, taking the supply already used into account, and copies as text. You enter it yourself: Tensho schedules nothing. A good agenda rather than the best: groove does not rise in the computation, and materials are not checked. Efficient-craft rule rewritten from Workshop Optimizer Plugin (MIT). The week's forecast remains to do.
+
+## 0.671.0
+- Plan global, N-10 : Île sanctuaire (N-10), première partie : nouvelle page Production › Île sanctuaire. Une fois l'agenda ouvert dans le jeu, un clic copie le rang, les ateliers, l'entrain, la popularité, l'offre et la demande, et la table donne une valeur estimée par création. Tensho ne demande rien au serveur et ne programme rien. Le rang d'atelier, l'arrondi et les deux lectures de l'entrain restent à vérifier en jeu ; la capture en écrit les valeurs.
+- Tests : Island. Verify.ps1 (agent) : 1172/1172, 0 avertissement, 0 erreur ; DLL 0.671.0.0. Non validé en jeu.
+### English
+- Island sanctuary (N-10), first part: new page Production › Island sanctuary. Once the agenda is open in the game, a click copies the rank, workshops, groove, popularity, supply and demand, and the table gives an estimated value per craft. Tensho asks the server for nothing and schedules nothing. The workshop row, the rounding and the two groove readings remain to check in game; the capture writes their values.
+
+## 0.670.0
+- Plan global, N-12 : Chasse (N-12) : Cartes › « Conditions des rangs S » donne, pour les 50 marques, la condition d'apparition, la fenêtre et si la tentative est sûre ou aléatoire. Ces conditions ne sont pas dans les données du jeu : savoir communautaire croisé entre plusieurs sources (wiki, guide, S Rank Assistant en lecture seule), réécrit dans les mots de Tensho, crédité. Noms dans la langue du jeu ; les marques de votre zone en premier. Pas de compteurs.
+- Tests : S rank conditions. Verify.ps1 (agent) : 1166/1166, 0 avertissement, 0 erreur ; DLL 0.670.0.0. Non validé en jeu.
+### English
+- Hunt (N-12): Maps › « S rank conditions » gives, for the 50 marks, the spawn condition, the window and whether an attempt is certain or random. These conditions are not in the game's data: community knowledge crossed between several sources (wiki, guide, S Rank Assistant read only), in Tensho's own words, credited. Names in the game's language; the marks of your zone first. No counters.
+
+## 0.669.0
+- Plan global, C12, I22 : Artisanat (C12) : dans le simulateur, un curseur par ingrédient pouvant être HQ calcule la qualité initiale selon le niveau d'objet (règle de Craftimizer, MIT), qui peut encore être tapée. À comparer à la qualité du carnet du jeu. Performance (I22) : l'historique du marché filtre et calcule ses statistiques une fois par changement, et le coût de préparation se recalcule au plus une fois par seconde, comme celui de la chaîne ; le gain n'est pas mesuré en jeu.
+- Tests : Collectible. Verify.ps1 (agent) : 1163/1163, 0 avertissement, 0 erreur ; DLL 0.669.0.0. Non validé en jeu.
+### English
+- Crafting (C12): in the simulator, a slider per ingredient that can be HQ computes the starting quality by item level (rule from Craftimizer, MIT), which can still be typed. To compare with the game's crafting log. Performance (I22): the market history filters and computes its statistics once per change, and the preparation cost is rebuilt at most once a second, like the chain's; the gain is not measured in game.
+
+## 0.668.0
+- Plan global, C13 : Artisanat (C13) : le simulateur donne la chance HQ d'une qualité finale, d'après la table de Craftimizer (MIT), pour une recette qui peut être HQ. La table reste à comparer à la synthèse du jeu : la capture écrit les valeurs du jeu.
+- Tests : Craft. Verify.ps1 (agent) : 1163/1163, 0 avertissement, 0 erreur ; DLL 0.668.0.0. Non validé en jeu.
+### English
+- Crafting (C13): the simulator gives the HQ chance of a final quality, from Craftimizer's table (MIT), for a recipe that can be HQ. The table remains to compare with the game's synthesis: the capture writes the game's values.
+
+## 0.667.0
+- Plan global, N-07 : Carte (N-07, partie carte) : sur l'île sanctuaire, les ressources à récolter s'affichent avec leur zone et leur nom, d'après les données du jeu, avec un réglage. Leur place reste à comparer sur l'île : l'unité des positions n'est pas prouvée. Artisanat (C6) : correction de la 0.666, les seuils de mission sont des pourcentages de la qualité maximale, relus dans les fichiers du jeu.
+- Tests : Island resources. Verify.ps1 (agent) : 1163/1163, 0 avertissement, 0 erreur ; DLL 0.667.0.0. Non validé en jeu.
+### English
+- Map (N-07, the map part): on the Island Sanctuary, resources show with their area and name, from the game's data, with a setting. Their place remains to compare on the island: the unit of the positions is not proven. Crafting (C6): correction to 0.666, mission thresholds are percents of the maximum quality, read in the game's files.
+
+## 0.666.0
+- Plan global, C6 : Artisanat (C6) : le simulateur, le carnet et la synthèse en direct acceptent les recettes à niveau ajusté et à qualité imposée, dont l'Exploration cosmique. La page dit ce que demande la recette : niveau 100, qualité requise et seuils de mission. Règles lues dans Craftimizer (MIT) et réécrites. Les seuils sont affichés mais pas encore visés par la recherche, et rien n'est comparé en jeu. Le catalogue de recettes se reconstruit une fois.
+- Tests : Craft. Verify.ps1 (agent) : 1162/1162, 0 avertissement, 0 erreur ; DLL 0.666.0.0. Non validé en jeu.
+### English
+- Crafting (C6): the simulator, the log panel and live synthesis accept adjusted and fixed-quality recipes, Cosmic Exploration included. The page says what the recipe asks: level 100, required quality and mission thresholds. Rules read in Craftimizer (MIT) and rewritten. Thresholds are shown but not yet aimed at by the search, and nothing is compared in game. The recipe catalogue is rebuilt once.
+
+## 0.665.0
+- Plan global, P22 : Carte (P22) : les réglages d'icônes nomment les variantes de quête relevées : la variante 1 est une quête proposée, disponible ou non, et l'icône 71155 une étape en cours. Les autres gardent leur numéro, car rien ne dit leur sens. D'après les journaux et les données, à confirmer en jeu.
+- Tests : Quest icons. Verify.ps1 (agent) : 1162/1162, 0 avertissement, 0 erreur ; DLL 0.665.0.0. Non validé en jeu.
+### English
+- Map (P22): the icon settings name the quest variants read: variant 1 is a quest on offer, available or not, and icon 71155 a step under way. The others keep their number, as nothing tells their meaning. From the logs and the data, to confirm in game.
+
+## 0.664.0
+- Plan global, C22 : Compagnie libre (C22) : un onglet Atelier liste les projets de l'atelier, avec leurs matériaux pièce par pièce et phase par phase, le total du projet et vos stocks relevés, et un lien vers chaque objet. Ce que l'atelier a déjà reçu n'est pas lu. La quantité requise est lue comme la quantité par livraison multipliée par le nombre de livraisons, d'après le nom des colonnes : à comparer à la fenêtre du jeu.
+- Tests : Workshop projects. Verify.ps1 (agent) : 1161/1161, 0 avertissement, 0 erreur ; DLL 0.664.0.0. Non validé en jeu.
+### English
+- Free Company (C22): a Workshop tab lists the workshop's projects, with their materials part by part and phase by phase, the project's total and your stocks as read, and a link to each item. What the workshop has already received is not read. The need is read as the quantity per delivery times the number of deliveries, from the columns' names: to compare with the game's window.
+
+## 0.663.0
+- Plan global, C28 : Pêche (C28) : pour un poisson à proies, l'aide à la pêche et la page Récolte donnent la durée de l'intuition selon GatherBuddy ; l'aide affiche aussi le temps restant quand l'intuition est active. Le nombre est lu comme des secondes d'après son nom et ses valeurs : à confirmer sur une vraie intuition. Les données GatherBuddy sont téléchargées une fois de plus.
+- Tests : GatherBuddy. Verify.ps1 (agent) : 1160/1160, 0 avertissement, 0 erreur ; DLL 0.663.0.0. Non validé en jeu.
+### English
+- Fishing (C28): for a fish with predators, the fishing help and the Gathering page give the intuition's length according to GatherBuddy; the help also shows the time left when intuition is on. The number is read as seconds from its name and values: to confirm on a real intuition. GatherBuddy data are downloaded once more.
+
+## 0.662.0
+- Plan global, 0.662 : Plantage du jeu corrigé : Tensho appelait une fonction du jeu (la liste de téléportation) pendant un changement de zone, sans joueur chargé. Ce risque existait depuis la 0.645, quand le survol des éthérites a demandé cette liste à chaque changement de carte. La fonction n'est plus appelée qu'une fois le joueur présent depuis 3 secondes. Les coûts au survol arrivent donc un instant après l'arrivée.
+- Tests : Teleport list. Verify.ps1 (agent) : 1160/1160, 0 avertissement, 0 erreur ; DLL 0.662.0.0. Non validé en jeu.
+### English
+- Game crash fixed: Tensho called a game function (the teleport list) during a change of zone, with no player loaded. The risk existed since 0.645, when aetheryte hovering began asking for this list at each map change. The function is now called only once the player has been there for 3 seconds. Costs on hover therefore arrive a moment after arrival.
+
+## 0.661.0
+- Plan global, 0.661 : Carte : fermer la carte avec sa touche pendant une incantation la laisse fermée, et elle ne revient plus juste avant le chargement : le joueur doit rester libre 1,5 seconde avant qu'elle revienne. Très dézoomée, une zone ne garde que ses noms de liens, comme le jeu : les noms de lieux partent sous 60 %, valeur choisie à l'œil. Les cartes de région et du monde gardent les leurs.
+- Tests : Map resume. Verify.ps1 (agent) : 1159/1159, 0 avertissement, 0 erreur ; DLL 0.661.0.0. Non validé en jeu.
+### English
+- Map: closing the map with its key during a cast leaves it closed, and it no longer comes back just before the loading screen: the player must stay free for 1.5 seconds first. Far out, a zone keeps only its link names, like the game: place names go below 60 %, a value chosen by eye. Region and world maps keep theirs.
+
+## 0.660.0
+- Plan global, 0.660 : Carte : les noms sont plus petits et plus proches de ceux du jeu : noms de lieux à 0,65 du réglage, noms à côté des icônes à 0,41, mesurés sur tes captures. Les noms à côté des icônes apparaissent dès 75 % de zoom au lieu de 100 %, valeur choisie à l'œil.
+- Tests : Map labels. Verify.ps1 (agent) : 1159/1159, 0 avertissement, 0 erreur ; DLL 0.660.0.0. Non validé en jeu.
+### English
+- Map: names are smaller and closer to the game's: place names at 0.65 of the setting, names beside icons at 0.41, measured on the user's captures. Names beside icons appear from 75 % zoom instead of 100 %, a value chosen by eye.
+
+## 0.659.0
+- Plan global, 0.659 : Carte : une carte ouverte revient aussi à l'entrée dans un contenu en instance, une fois le joueur libre. Le JcJ et le contenu classé restent à part : la coupure compétitive annule l'attente.
+- Tests : Map resume. Verify.ps1 (agent) : 1159/1159, 0 avertissement, 0 erreur ; DLL 0.659.0.0. Non validé en jeu.
+### English
+- Map: an open map also comes back on entering a duty, once the player is free. PvP and ranked content stay apart: the competitive cut cancels the wait.
+
+## 0.658.0
+- Plan global, 0.658 : Carte : après une téléportation, la carte se rouvre, y compris dans une autre zone. Elle ne revenait que dans la même zone, d'où le « pas tout le temps ». La fermeture pendant un sort ou un changement de zone compte aussi comme un événement. Elle ne revient pas si la nouvelle zone est un contenu en instance, ni après une fermeture par sa touche. Fermer la carte avec sa touche pendant un sort la fera revenir.
+- Tests : Map resume. Verify.ps1 (agent) : 1159/1159, 0 avertissement, 0 erreur ; DLL 0.658.0.0. Non validé en jeu.
+### English
+- Map: after a teleport the map opens again, in another zone too. It only came back in the same zone, hence « not every time ». A close during a cast or a change of zone also counts as an event. It does not come back if the new zone is a duty, nor after being closed with its key. Closing the map with its key during a cast will bring it back.
+
+## 0.657.0
+- Plan global, 0.657 : Carte : depuis une autre zone, cliquer un mandat dans le journal affiche sa zone verte sur la carte Tensho. Le jeu la donne dans sa demande de carte, avec son rayon, et elle reste jusqu'à ce que le jeu ne liste plus le mandat. Récolte : l'alerte de PR ne sonne plus quand les PR remontent après un changement de zone, qui en retire (809 à 772 au relevé) ; elle sonne de nouveau dès que des PR sont dépensés. Les 15 secondes de la 0.656 sont retirées.
+- Tests : Leve areas. Verify.ps1 (agent) : 1158/1158, 0 avertissement, 0 erreur ; DLL 0.657.0.0. Non validé en jeu.
+### English
+- Map: from another zone, clicking a leve in the journal shows its green area on the Tensho map. The game gives it in its map request, with its radius, and it stays until the game no longer lists the leve. Gathering: the GP alert no longer rings when GP climbs back after a change of zone, which takes some (809 to 772 in the reading); it rings again once GP is spent. The 15 seconds of 0.656 are gone.
+
+## 0.656.0
+- Plan global, 0.656 : Récolte : l'alerte de PR ne sonne plus après une téléportation quand les PR étaient déjà pleins. Elle garde ce qu'elle savait pendant le changement de zone et ne lit rien pendant 15 secondes après. Des PR réellement remontés pendant la téléportation la font encore sonner, une fois. La cause exacte est déduite du code : le journal écrit maintenant les PR autour d'un changement de zone pour le vérifier.
+- Tests : GP alert. Verify.ps1 (agent) : 1157/1157, 0 avertissement, 0 erreur ; DLL 0.656.0.0. Non validé en jeu.
+### English
+- Gathering: the GP alert no longer rings after a teleport when GP was already full. It keeps what it knew across the change of zone and reads nothing for 15 seconds after it. GP that truly rose during the teleport still rings it, once. The exact cause is inferred from the code: the log now writes GP around a change of zone to check it.
+
+## 0.655.0
+- Plan global, 0.655 : Carte : le repère noir au bord, la cible du journal sur un mandat, part quand le jeu ne liste plus le mandat. Il reste sinon jusqu'à ce qu'on le retire à la main, comme avant. Le lien passe par le titre de la demande de carte du jeu, écrit maintenant au journal : qu'il soit bien le nom du mandat reste à voir en jeu.
+- Tests : Leve target. Verify.ps1 (agent) : 1156/1156, 0 avertissement, 0 erreur ; DLL 0.655.0.0. Non validé en jeu.
+### English
+- Map: the dark edge badge, the journal's target on a leve, goes when the game no longer lists the leve. Otherwise it stays until removed by hand, as before. The link goes through the title of the game's map request, now written to the log: that it is the leve's name remains to be seen in game.
+
+## 0.654.0
+- Plan global, 0.654 : Carte : la zone d'un mandat reste affichée quand vous n'y êtes pas, y compris depuis une autre zone, une fois que le jeu l'a donnée. Tensho la garde, carte par carte, tant que le jeu liste le mandat comme accepté, et l'oublie dès qu'il ne l'est plus, par exemple s'il est abandonné. Une zone jamais vue depuis le dernier chargement ne peut pas s'afficher : rien n'est sauvegardé. La capture écrit aussi l'état des mandats acceptés.
+- Tests : Leve areas. Verify.ps1 (agent) : 1155/1155, 0 avertissement, 0 erreur ; DLL 0.654.0.0. Non validé en jeu.
+### English
+- Map: a leve's area stays shown when you are not on it, even from another zone, once the game has given it. Tensho keeps it, map by map, as long as the game lists the leve as accepted, and forgets it as soon as it is not, for instance when abandoned. An area not seen since the last load cannot be shown: nothing is saved. The capture also writes the state of accepted leves.
+
+## 0.653.0
+- Plan global, 0.653 : Carte : cliquer un mandat lancé dans le journal ne retire plus sa zone. Pendant cette demande, le jeu vide toute sa liste de marqueurs, les 12 et pas seulement celui du mandat, puis la remplit de nouveau. Tensho garde ce qu'il a lu juste avant, tant que dure la demande et sur la même carte.
+- Tests : Event markers. Verify.ps1 (agent) : 1154/1154, 0 avertissement, 0 erreur ; DLL 0.653.0.0. Non validé en jeu.
+### English
+- Map: clicking a started leve in the journal no longer removes its area. During this request the game empties its whole marker list, all 12 and not only the leve's, then fills it again. Tensho keeps what it read just before, while the request lasts and on the same map.
+
+## 0.652.0
+- Plan global, P17 : Carte (P17) : les mandats forment une catégorie à part. Leurs zones sont en vert comme dans le jeu, avec leur propre réglage et leur couleur, et leurs repères au bord ont leur interrupteur, séparés des autres événements. Un marqueur est reconnu par l'icône relevée en jeu ou par son nom, trouvé dans la feuille des mandats. Le journal écrit aussi le rayon et le texte de chaque type de marqueur. Seul un mandat de mineur a été relevé, et le vert est réglé à l'œil.
+- Tests : Leve markers. Verify.ps1 (agent) : 1153/1153, 0 avertissement, 0 erreur ; DLL 0.652.0.0. Non validé en jeu.
+### English
+- Map (P17): leves are now a category of their own. Their areas are green as in the game, with their own setting and colour, and their edge markers have their own switch, apart from other events. A marker is recognised by the icon read in game or by its name, found in the Leve sheet. The log also writes the radius and text of each marker kind. Only a miner leve was read, and the green is matched by eye.
+
+## 0.651.0
+- Plan global, T27 : Rappels (T27) : une ligne « Bienfaits de compagnie » nomme ceux actifs sur votre personnage et, une fois l'onglet Bienfaits de la fenêtre de compagnie ouvert, le temps restant de chacun, avec l'heure de la première fin et une cloche. Le nom vient du statut, sans le rang (« Prix d'ami », pas « Prix d'ami II »). Les minuteurs sont associés aux bienfaits dans l'ordre, ce que le relevé n'a pas pu prouver. La capture de relevés ne suit plus les PR ni ces minuteurs.
+- Tests : Company actions. Verify.ps1 (agent) : 1152/1152, 0 avertissement, 0 erreur ; DLL 0.651.0.0. Non validé en jeu.
+### English
+- Reminders (T27): a « Company actions » row names those active on your character and, once the Actions tab of the Free Company window was opened, the time left for each, with the time of the first end and a bell. The name comes from the status, without the rank. Timers are paired with actions in order, which the reading could not prove. The reading capture no longer follows GP or these timers.
+
+## 0.650.0
+- Plan global, C33 : Relevés en jeu (phase 5, C33 et T5) : en mode développeur seulement, une capture temporaire écrit dans le journal ce que les points suivants attendent : PR pendant une récolte, statuts d'un récolteur dont l'intuition, chance HQ à côté de la qualité, lignes de chat d'une prise, minuteurs des actions de compagnie, cristaux et gils des servants, journaux de voyage des dirigeables. Rien n'est changé dans le jeu, et chaque partie a une limite de lignes. Coupée en JcJ et en contenu classé comme le reste.
+- Tests : Reading capture. Verify.ps1 (agent) : 1151/1151, 0 avertissement, 0 erreur ; DLL 0.650.0.0. Non validé en jeu.
+### English
+- In-game readings (phase 5, C33 and T5): in developer mode only, a temporary capture writes to the log what the next points need: GP while gathering, a gatherer's statuses including intuition, the HQ chance beside the quality, the chat lines of a catch, company action timers, retainers' crystals and gil, airship voyage logs. Nothing changes in the game, and each part has a line limit. Cut in PvP and ranked content like everything else.
+
+## 0.649.0
+- Plan global, C29 : Récolte (C29) : les poissons au harpon apparaissent dans la recherche de la page Récolte avec leur lieu, comme les autres ressources. Le catalogue est reconstruit une fois.
+- Tests : Gathering sources. Verify.ps1 (agent) : 1150/1150, 0 avertissement, 0 erreur ; DLL 0.649.0.0. Non validé en jeu.
+### English
+- Gathering (C29): spearfishing fish appear in the Gathering page's search with their place, like other resources. The catalogue is rebuilt once.
+
+## 0.648.0
+- Plan global, T13 : Contenus et quêtes (T13) : la page Butin des contenus et le panneau de la Recherche de mission disent quelle quête débloque un contenu, avec son état et un lien ; la fiche d'une quête dit ce qu'elle débloque. Seuls environ 130 contenus sur plus de 700 nomment leur quête dans les données du jeu ; pour les autres, rien n'est affiché, et rien n'est deviné.
+- Tests : Duty unlocks. Verify.ps1 (agent) : 1149/1149, 0 avertissement, 0 erreur ; DLL 0.648.0.0. Non validé en jeu.
+### English
+- Duties and quests (T13): the Duty loot page and the Duty Finder panel say which quest unlocks a duty, with its state and a link; a quest's sheet says what it unlocks. Only about 130 duties out of more than 700 name their quest in the game's data; for the others nothing is shown, and nothing is guessed.
+
+## 0.647.0
+- Plan global, C27 : Récolte (C27) : le survol d'un point de récolte sur la carte donne sa classe : à horaire, éphémère ou légendaire, déduite du type du point dans les données du jeu. Le tome requis était déjà indiqué depuis la 0.518. Les libellés sont ceux de Tensho, déduits des données.
+- Tests : Gather point kinds. Verify.ps1 (agent) : 1148/1148, 0 avertissement, 0 erreur ; DLL 0.647.0.0. Non validé en jeu.
+### English
+- Gathering (C27): hovering a gathering point on the map gives its kind: timed, ephemeral or legendary, inferred from the point's type in the game's data. The required tome has been shown since 0.518. The labels are Tensho's, inferred from the data.
+
+## 0.646.0
+- Plan global, T21 : Équipement (T21) : une section liste tous les jobs dans l'ordre du jeu, avec leur niveau et une barre d'expérience, et ceux pas encore débloqués. Les niveaux suivent la lecture déjà faite pour les ensembles ; l'expérience du niveau vient de la feuille ParamGrow.
+- Tests : Job progress. Verify.ps1 (agent) : 1147/1147, 0 avertissement, 0 erreur ; DLL 0.646.0.0. Non validé en jeu.
+### English
+- Gear (T21): a section lists all jobs in the game's order, with their level and an experience bar, and those not unlocked yet. Levels follow the read already made for gear sets; a level's experience comes from the ParamGrow sheet.
+
+## 0.645.0
+- Plan global, P7 : Carte (P7) : une éthérite absente de la liste de téléportation du jeu est grisée, et son survol dit qu'elle n'est pas harmonisée ; une éthérite harmonisée donne son coût au survol. La liste est relue quand la carte affichée ou votre carte change.
+- Tests : Map labels. Verify.ps1 (agent) : 1146/1146, 0 avertissement, 0 erreur ; DLL 0.645.0.0. Non validé en jeu.
+### English
+- Map (P7): an aetheryte missing from the game's teleport list is greyed, and its tooltip says it is not attuned; an attuned aetheryte gives its cost on hover. The list is read again when the shown map or your map changes.
+
+## 0.644.0
+- Plan global, P6 : Carte (P6) : vos coordonnées restent affichées en bas à gauche, le curseur donne aussi sa distance en yalms par rapport à vous, et le repère de bord du drapeau montre dessous ses coordonnées et sa distance. Deux réglages, activés par défaut.
+- Tests : Map. Verify.ps1 (agent) : 1145/1145, 0 avertissement, 0 erreur ; DLL 0.644.0.0. Non validé en jeu.
+### English
+- Map (P6): your coordinates stay at the bottom left, the cursor also gives its distance in yalms from you, and the flag's edge marker shows its coordinates and distance underneath. Two settings, on by default.
+
+## 0.643.0
+- Plan global, phase 5 : Carte (capture de l'utilisateur) : sur la carte de région ou du monde, la cible de la quête ne se cliquait pas. Un clic descend maintenant d'une étape : du monde à la région, de la région à la carte de la cible.
+- Tests : Map labels. Verify.ps1 (agent) : 1145/1145, 0 avertissement, 0 erreur ; DLL 0.643.0.0. Non validé en jeu.
+### English
+- Map (user capture): on the region or world map, the quest's target could not be clicked. A click now goes down one step: from the world to the region, from the region to the target's map.
+
+## 0.642.0
+- Plan global, phase 5 : Carte (captures de l'utilisateur, jeu à côté de Tensho) : la cible d'une quête reste en remontant, dans l'image de sa zone sur la carte de région et sur le lien de la région sur le monde, comme le jeu. Les noms de lieux en noir suivent maintenant la carte en vue éloignée, et ne sont plus trop grands. Différence gardée : au clic, Tensho ouvre directement la zone, là où le jeu passe par le monde.
+- Tests : Map labels. Verify.ps1 (agent) : 1145/1145, 0 avertissement, 0 erreur ; DLL 0.642.0.0. Non validé en jeu.
+### English
+- Map (user captures, game beside Tensho): a quest's target stays when going up, inside its zone's picture on the region map and on the region's link on the world, like the game. Black place names now follow the map when zoomed out and are no longer too large. Difference kept: on a click, Tensho opens the zone directly, where the game goes through the world.
+
+## 0.641.0
+- Plan global, phase 5 : Carte (capture de l'utilisateur, jeu à côté de Tensho) : le menu des zones du jeu ajoute des cartes sans catégorie, vu pour la carte affichée et celle de la quête, comme les Locaux de la Société de l'Arcadion et le Ring des Griffes félines. Tensho les ajoute à la fin de sa liste. La règle exacte du jeu reste inconnue : sa liste défile et peut en contenir d'autres.
+- Tests : Map. Verify.ps1 (agent) : 1144/1144, 0 avertissement, 0 erreur ; DLL 0.641.0.0. Non validé en jeu.
+### English
+- Map (user capture, game beside Tensho): the game's zone menu adds maps with no category, seen for the shown map and the quest's map, such as Locaux de la Société de l'Arcadion and Ring des Griffes félines. Tensho adds them at the end of its list. The game's exact rule remains unknown: its list scrolls and may hold others.
+
+## 0.640.0
+- Plan global, phase 5 : Carte (captures de l'utilisateur) : les Locaux de la Société de l'Arcadion et le Paddock ne menaient nulle part, car seuls deux types d'icônes étaient pris en compte, et une icône de quête par-dessus cachait aussi le lien. Toute icône nommée comme une carte l'ouvre maintenant, même sous une icône de quête. Les services n'ont pas de nom et ne changent pas.
+- Tests : Map labels. Verify.ps1 (agent) : 1144/1144, 0 avertissement, 0 erreur ; DLL 0.640.0.0. Non validé en jeu.
+### English
+- Map (user captures): Locaux de la Société de l'Arcadion and Le Paddock led nowhere, because only two kinds of icons were covered, and a quest icon on top also hid the link. Any icon named like a map now opens it, even under a quest icon. Services have no name and do not change.
+
+## 0.639.0
+- Plan global, phase 5 : Carte (demande de l'utilisateur) : cliquer l'icône d'un donjon, ou celle d'une porte comme la Ville fantôme, ou leur nom, ouvre la carte nommée. Le jeu le fait pour la Ville fantôme ; pour les donjons, c'est un ajout de Tensho, demandé. Leur nom s'affiche donc comme celui d'un lien, aussi en vue éloignée.
+- Tests : Map labels. Verify.ps1 (agent) : 1144/1144, 0 avertissement, 0 erreur ; DLL 0.639.0.0. Non validé en jeu.
+### English
+- Map (user request): clicking a dungeon's icon, or a door's like Phantom Village, or their name, opens the map it names. The game does it for Phantom Village; for dungeons it is a Tensho addition, as requested. Their names therefore show like a link's, also when zoomed out.
+
+## 0.638.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : une quête de donjon ouvrait encore la carte du donjon, car une carte de ce territoire était trouvée avant le chemin donné par le jeu. Elle ouvre maintenant la carte de l'entrée, centrée sur le marqueur du jeu, comme les autres quêtes au-delà d'un changement de zone. À l'intérieur du donjon, sa propre carte.
+- Tests : Map request. Verify.ps1 (agent) : 1143/1143, 0 avertissement, 0 erreur ; DLL 0.638.0.0. Non validé en jeu.
+### English
+- Map (user report, log): a dungeon quest still opened the dungeon's map, because a map of that territory was found before the way given by the game. It now opens the entrance's map, centred on the game's marker, like other quests beyond a zone change. Inside the dungeon, its own map.
+
+## 0.637.0
+- Plan global, phase 5 : Carte (demande de l'utilisateur) : depuis le journal de quêtes ou une quête active, la carte est ajustée à chaque fois et le zoom ne change plus. Elle se centre sur la quête, ou sur le milieu de la carte tant que rien n'est trouvé, au lieu de garder l'ancienne position puis d'afficher la carte entière. Les autres ouvertures, comme les liens du chat ou la recherche, gardent le réglage de zoom.
+- Tests : Map request. Verify.ps1 (agent) : 1142/1142, 0 avertissement, 0 erreur ; DLL 0.637.0.0. Non validé en jeu.
+### English
+- Map (user request): from the quest journal or an active quest, the map is adjusted every time and the zoom no longer changes. It centres on the quest, or on the middle of the map while nothing is found, instead of keeping the old position and then showing the whole map. Other openings, such as chat links or search, keep the zoom setting.
+
+## 0.636.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur) : recliquer une quête faisait clignoter la carte du jeu, que Tensho rouvrait, et effaçait l'icône, car le jeu oublie alors son marqueur. La carte du jeu reste fermée et seule celle de Tensho reste ouverte sur la quête, avec son icône gardée. La touche de carte la ferme toujours.
+- Tests : Map request. Verify.ps1 (agent) : 1141/1141, 0 avertissement, 0 erreur ; DLL 0.636.0.0. Non validé en jeu.
+### English
+- Map (user report): clicking a quest again made the game's map blink, as Tensho reopened it, and erased the icon, as the game then forgets its marker. The game's map stays closed and only the Tensho map stays open on the quest, with its icon kept. The map key still closes it.
+
+## 0.635.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : recliquer une quête déjà affichée ramenait la carte sur le joueur, car le jeu ferme sa carte à ce clic et oublie la demande. La dernière quête demandée est gardée et la carte se rouvre dessus. Les essais 0.629 et 0.633, cochés trop vite d'après un malentendu, sont décochés.
+- Tests : Map request. Verify.ps1 (agent) : 1141/1141, 0 avertissement, 0 erreur ; DLL 0.635.0.0. Non validé en jeu.
+### English
+- Map (user report, log): clicking a quest already shown brought the map back to the player, because the game closes its map on that click and forgets the request. The last quest asked is kept and the map opens again on it. Checks 0.629 and 0.633, ticked too early after a misunderstanding, are unticked.
+
+## 0.634.0
+- Plan global, phase 5 : Carte (demande de l'utilisateur) : une quête dans un donjon ouvre, depuis l'extérieur, la carte où se trouve son entrée, centrée sur le marqueur du donjon. Le marqueur vient des données du jeu : 102 donjons sur 122 en ont un, les autres gardent la carte demandée par le jeu. À l'intérieur du donjon, sa propre carte. Non vu : la demande du jeu pour une quête de donjon, le journal n'en contient aucune.
+- Tests : Map request. Verify.ps1 (agent) : 1141/1141, 0 avertissement, 0 erreur ; DLL 0.634.0.0. Non validé en jeu.
+### English
+- Map (user request): a quest in a dungeon opens, from outside, the map holding its entrance, centred on the dungeon's marker. The marker comes from the game's data: 102 dungeons out of 122 have one, the others keep the map the game asks. Inside the dungeon, its own map. Not seen: the game's request for a dungeon quest, none is in the log.
+
+## 0.633.0
+- Plan global, phase 5 : Carte (rapport et captures de l'utilisateur, sonde du journal). Une quête au-delà d'un changement de zone ouvre la carte où se trouve ce passage, comme le montre le jeu : Tuliyollal pour la Ville fantôme, centrée sur son marqueur. Déjà dans la zone, la carte de la zone. Le clic sur une même quête suit maintenant l'état du bouton de la souris, car l'indicateur du jeu restait faux dans le journal. Sous « Monde », le menu ne défile plus. La sonde temporaire de la 0.630 est retirée.
+- Tests : Map request. Verify.ps1 (agent) : 1140/1140, 0 avertissement, 0 erreur ; DLL 0.633.0.0. Non validé en jeu.
+### English
+- Map (user report and captures, log probe). A quest beyond a zone change opens the map holding that passage, as the game shows it: Tuliyollal for Phantom Village, centred on its marker. Already in the zone, the zone's map. A click on the same quest now follows the mouse button's state, because the game's flag stayed false in the log. Under « World », the menu no longer scrolls. The temporary probe of 0.630 is removed.
+
+## 0.632.0
+- Plan global, phase 5 : Carte (captures de l'utilisateur, jeu à côté de Tensho). Cartes de région : les zones sont à la bonne échelle (la 0.631 les dessinait trop grandes), dans un ton de parchemin, avec les cristaux de leurs zones, cliquables pour la téléportation. Carte du monde : celle du jeu avec Tural et non plus l'ancienne, et sous « Monde » le choix Hydaelyn / Premier reflet, comme les étages d'une zone, au lieu de « -- ». Le ton est réglé à l'œil : ImGui ne sait pas assombrir comme le jeu.
+- Tests : Map labels. Verify.ps1 (agent) : 1139/1139, 0 avertissement, 0 erreur ; DLL 0.632.0.0. Non validé en jeu.
+### English
+- Map (user captures, game beside Tensho). Region maps: zones at the right scale (0.631 drew them too large), in a parchment tone, with the crystals of their zones, clickable to teleport. World map: the game's one with Tural instead of the old one, and under « World » the choice Hydaelyn / The First, like a zone's floors, instead of « -- ». The tone is set by eye: ImGui cannot darken like the game.
+
+## 0.631.0
+- Plan global, phase 5 : Carte (rapport et capture de l'utilisateur) : sur une carte de région, l'icône d'un lien est l'image de toute la zone. Tensho la réduisait à la taille d'une icône, d'où des taches blanches. Elle est maintenant dessinée à sa taille, sous les icônes, comme le jeu. Pas encore fait : les cristaux que le jeu ajoute sur ces cartes, et le clic sur toute la forme d'une zone.
+- Tests : Map labels. Verify.ps1 (agent) : 1138/1138, 0 avertissement, 0 erreur ; DLL 0.631.0.0. Non validé en jeu.
+### English
+- Map (user report and capture): on a region map, a link's icon is a picture of the whole zone. Tensho shrank it to icon size, hence white blotches. It is now drawn at its own size, under the icons, like the game. Not done yet: the crystals the game adds on these maps, and clicking anywhere on a zone's shape.
+
+## 0.630.0
+- Plan global, phase 5 : Carte (rapport et captures de l'utilisateur) : pour une quête au-delà d'un PNJ de changement de zone, le jeu montre ce PNJ. Sonde temporaire, en lecture seule, dans le journal : à l'ouverture d'une quête, ce que le jeu garde pour la cible (marqueurs temporaires, d'événement et de quête), pour savoir où il range cet endroit. Rien ne change encore à l'écran.
+- Tests : Map request. Verify.ps1 (agent) : 1137/1137, 0 avertissement, 0 erreur ; DLL 0.630.0.0. Non validé en jeu.
+### English
+- Map (user report and captures): for a quest beyond a zone-change NPC, the game shows that NPC. Temporary read-only probe in the log: when a quest opens, what the game keeps for the target (temporary, event and quest markers), to learn where it stores that place. Nothing changes on screen yet.
+
+## 0.629.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : cliquer la quête déjà affichée fermait ou rouvrait la carte, sans aller sur la quête, car le jeu ferme alors sa carte et la 0.627 prenait la demande pour la touche de carte. Un clic gauche juste avant, lu dans les entrées du jeu, distingue les deux : la carte reste ouverte et revient sur la quête. La touche de carte l'ouvre toujours sur le joueur. Limite : un clic à la manette ne se voit pas ainsi.
+- Tests : Map request. Verify.ps1 (agent) : 1137/1137, 0 avertissement, 0 erreur ; DLL 0.629.0.0. Non validé en jeu.
+### English
+- Map (user report, log): clicking the quest already shown closed or reopened the map without going to the quest, because the game then closes its map and 0.627 took the request for the map key. A left click just before, read from the game's inputs, tells them apart: the map stays open and returns to the quest. The map key still opens it on the player. Limit: a controller click is not seen this way.
+
+## 0.628.0
+- Plan global, phase 5 : Carte (rapport et captures de l'utilisateur, journal) : une quête d'une zone sans région, comme la Ville fantôme, fait demander au jeu la carte du monde avec les coordonnées de la zone ; Tensho les plaçait sur le monde, donc en pleine mer. La carte propre à la zone, celle que la feuille TerritoryType du jeu indique, s'ouvre maintenant avec l'icône dessus, et aucune cible n'est plus posée sur une carte du monde ou de région. Différence voulue : le jeu reste sur le monde, à côté de Yok Tural.
+- Tests : Map request. Verify.ps1 (agent) : 1136/1136, 0 avertissement, 0 erreur ; DLL 0.628.0.0. Non validé en jeu.
+### English
+- Map (user report and captures, log): a quest in a zone without a region, such as Phantom Village, makes the game ask for the world map with the zone's coordinates; Tensho placed them on the world, so in the middle of the sea. The zone's own map, named by the game's TerritoryType sheet, now opens with the icon on it, and no target is placed on a world or region map any more. Deliberate difference: the game stays on the world map, beside Yok Tural.
+
+## 0.627.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : après un clic sur une quête, chaque ouverture avec la touche de carte revenait sur cette quête, car le jeu garde sa dernière demande. Une demande identique à la précédente ouvre maintenant la carte sur le joueur. Limite : recliquer la même quête après avoir fermé la carte ne la recentre plus sur elle.
+- Tests : Map request. Verify.ps1 (agent) : 1135/1135, 0 avertissement, 0 erreur ; DLL 0.627.0.0. Non validé en jeu.
+### English
+- Map (user report, log): after clicking a quest, each opening with the map key went back to that quest, because the game keeps its last request. A request identical to the previous one now opens the map on the player. Limit: clicking the same quest again after closing the map no longer centres on it.
+
+## 0.626.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur) : cliquer sur le nom d'un lien de carte, comme « Limsa Lominsa - L'Entrepont », ouvre cette carte, comme son icône ; le nom s'éclaircit au survol.
+- Tests : Map labels. Verify.ps1 (agent) : 1134/1134, 0 avertissement, 0 erreur ; DLL 0.626.0.0. Non validé en jeu.
+### English
+- Map (user report): clicking the name of a map link, such as « Limsa Lominsa - L'Entrepont », opens that map, like its icon; the name lightens on hover.
+
+## 0.625.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur, journal) : parler à un PNJ fait fermer sa carte au jeu, et la carte Tensho se fermait pour de bon. Fermée ainsi, elle se rouvre une fois le joueur libre, dans la même zone. Fermée par la touche de carte, elle reste fermée.
+- Tests : Map resume. Verify.ps1 (agent) : 1133/1133, 0 avertissement, 0 erreur ; DLL 0.625.0.0. Non validé en jeu.
+### English
+- Map (user report, log): talking to an NPC makes the game close its map, and the Tensho map closed for good. Closed that way, it opens again once the player is free, in the same zone. Closed with the map key, it stays closed.
+
+## 0.624.0
+- Plan global, phase 5 : Carte : le journal dit maintenant pourquoi elle s'efface ou revient (fenêtre du jeu ou panneau, lesquelles), et quand le jeu ferme sa propre carte, pour comprendre le rapport « la carte disparaît à l'ouverture d'un menu et ne revient pas ». Pas de correctif encore.
+- Tests : Map enlarged. Verify.ps1 (agent) : 1130/1130, 0 avertissement, 0 erreur ; DLL 0.624.0.0. Non validé en jeu.
+### English
+- Map: the log now says why it steps aside or comes back (game window or panel, which ones), and when the game closes its own map, to understand the report « the map vanishes when a menu opens and never comes back ». No fix yet.
+
+## 0.623.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur, captures du jeu) : les noms à côté des icônes se chevauchaient. Comme sur la carte du jeu, de loin seuls les liens de carte gardent leur nom, les autres reviennent de près ; deux noms ne se superposent plus, et les couleurs suivent le jeu (blanc, liens en bleu-vert). Le zoom exact du jeu n'est pas connu : seuil à ajuster en jeu.
+- Tests : Map labels. Verify.ps1 (agent) : 1130/1130, 0 avertissement, 0 erreur ; DLL 0.623.0.0. Non validé en jeu.
+### English
+- Map (user report, with captures of the game): the names beside icons overlapped. As on the game's map, zoomed out only map links keep their name, the others come back close up; two names no longer overlap, and colours follow the game (white, links in blue-green). The game's exact zoom is unknown: threshold to adjust in game.
+
+## 0.622.0
+- Plan global, phase 5 : Carte (demande de l'utilisateur) : le sous-lieu ne s'écrit que s'il existe, sans le « -- » de la carte du jeu.
+- Tests : Map place. Verify.ps1 (agent) : 1129/1129, 0 avertissement, 0 erreur ; DLL 0.622.0.0. Non validé en jeu.
+### English
+- Map (user request): the sub-place is written only when there is one, without the game map's « -- ».
+
+## 0.621.0
+- Plan global, phase 5 : Carte (comparée au jeu par l'utilisateur) : sous la zone, Tensho écrit maintenant le lieu où se trouve le joueur, puis le sous-lieu ou « -- », comme la carte du jeu, seulement sur la carte où il est. Lu dans TerritoryInfo sur le thread framework, avec garde.
+- Tests : Map place. Verify.ps1 (agent) : 1129/1129, 0 avertissement, 0 erreur ; DLL 0.621.0.0. Non validé en jeu.
+### English
+- Map (compared with the game by the user): under the zone, Tensho now writes where the player stands, then the sub-place or « -- », like the game's map, only on the player's map. Read from TerritoryInfo on the framework thread, guarded.
+
+## 0.620.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur) : le « 0 » restait dans le menu au-dessus de la carte ; il suit maintenant la même règle que l'autre menu. Plan : le JcJ, le classé, les timers et les instances particulières passent en dernier dans les essais en jeu.
+- Tests : Map floors. Verify.ps1 (agent) : 1128/1128, 0 avertissement, 0 erreur ; DLL 0.620.0.0. Non validé en jeu.
+### English
+- Map (user report): the « 0 » remained in the menu above the map; it now follows the same rule as the other menu. Plan: PvP, ranked content, timers and specific instances come last in the in-game checks.
+
+## 0.619.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur) : le menu des étages affichait « 0 » pour une carte principale sans sous-zone, comme le Tillac de Limsa à côté de son aérodrome ; il affiche maintenant le nom de la zone.
+- Tests : Map floors. Verify.ps1 (agent) : 1128/1128, 0 avertissement, 0 erreur ; DLL 0.619.0.0. Non validé en jeu.
+### English
+- Map (user report): the floor menu showed « 0 » for a main map without a subzone, such as Limsa's upper decks beside its Airship Landing; it now shows the zone's name.
+
+## 0.618.0
+- Plan global, phase 5 : Carte (précision de l'utilisateur) : agrandie, elle reste visible quelles que soient les fenêtres du jeu ; à sa taille normale, elle s'efface comme avant. Remplace la règle de la 0.617, retirée. Reconnue aussi à sa taille après un rechargement.
+- Tests : Map enlarged. Verify.ps1 (agent) : 1127/1127, 0 avertissement, 0 erreur ; DLL 0.618.0.0. Non validé en jeu.
+### English
+- Map (user's precision): enlarged, it stays visible whatever game windows it touches; at its usual size it steps aside as before. Replaces the 0.617 rule, removed. Also recognised by its size after a reload.
+
+## 0.617.0
+- Plan global, phase 5 : Carte (rapport de l'utilisateur) : cliquer sur « Agrandir » la rendait invisible, car elle touchait alors une fenêtre du jeu. Une fenêtre déjà là au moment où la carte s'ouvre, s'agrandit, se déplace ou change de taille ne la cache plus ; seules celles qui s'ouvrent après la font s'effacer. En mode développeur, le journal dit lesquelles.
+- Tests : Map aside. Verify.ps1 (agent) : 1128/1128, 0 avertissement, 0 erreur ; DLL 0.617.0.0. Non validé en jeu.
+### English
+- Map (user report): clicking « Enlarge » made it invisible, because it then touched a game window. A window already there when the map opens, enlarges, moves or is resized no longer hides it; only those opened afterwards make it step aside. In developer mode, the log says which ones.
+
+## 0.616.0
+- Plan global, #36 : Jardin : l'entretien et la plante arrachée sont reconnus dans le chat, messages captés en jeu (LogMessage 4017, 3450, 4025, 3452). Avec un seul emplacement noté à cet endroit, le journal se met à jour ; avec plusieurs, rien n'est deviné et une ligne de chat le dit. Reste la récolte, en attente du timer.
+- Tests : Garden care. Verify.ps1 (agent) : 1125/1125, 0 avertissement, 0 erreur ; DLL 0.616.0.0. Non validé en jeu.
+### English
+- Garden: tending and uprooting are recognised in the chat, messages captured in game (LogMessage 4017, 3450, 4025, 3452). With one bed noted at that place the journal updates; with several nothing is guessed and a chat line says so. The harvest remains, waiting for the timer.
+
+## 0.615.0
+- Plan global, DEC-038 : Coupure compétitive : un oubli corrigé. Les deux lecteurs du chat (jardin, liens de carte) lisaient encore pendant la coupure ; ils sont maintenant arrêtés, et un test l'impose.
+- Tests : Competitive (0.615). Verify.ps1 (agent) : 1121/1121, 0 avertissement, 0 erreur ; DLL 0.615.0.0. Non validé en jeu.
+### English
+- Competitive cut: a gap closed. The two chat listeners (garden, map links) still read during a cut; they now stop, enforced by a test.
+
+## 0.614.0
+- Plan global, DEC-038 : Triple Triade : dans le hall de la Battlehall (579), l'aide de match revient contre un PNJ identifié, comme ailleurs. Contre un joueur, aucun PNJ n'est identifié : pas d'aide. Les tournois (940, 941) restent sans aide.
+- Tests : Triad advisor. Verify.ps1 (agent) : 1120/1120, 0 avertissement, 0 erreur ; DLL 0.614.0.0. Non validé en jeu.
+### English
+- Triple Triad: in the Battlehall's hall (579), match help is back against an identified NPC, as elsewhere. Against a player no NPC is identified: no help. Tournaments (940, 941) stay without help.
+
+## 0.613.0
+- Plan global, DEC-038 : Coupure compétitive, Battlehall : le journal montre que le hall public est lui aussi lié à un contenu (BoundByDuty vrai), donc seul IsInPvPInstance reste utilisé. Hall : plus de coupure, constaté. Vrai dans un match de l'arène : à confirmer.
+- Tests : Competitive (0.612). Verify.ps1 (agent) : 1120/1120, 0 avertissement, 0 erreur ; DLL 0.613.0.0. Non validé en jeu.
+### English
+- Competitive cut, Battlehall: the log shows the public hall is bound to a content too (BoundByDuty true), so only IsInPvPInstance stays. Hall: no more cut, observed. True in an arena match: to confirm.
+
+## 0.612.0
+- Plan global, DEC-038 : Coupure compétitive : la Battlehall (territoire 579) est aussi un hall public avec des matchs JcE. Tensho n'y est plus coupé à l'arrivée ni pendant ces matchs, seulement dans l'instance de l'arène, d'après IsInPvPInstance ou BoundByDuty. Hypothèse à confirmer en jeu : le journal écrit les valeurs lues.
+- Tests : Competitive (0.612). Verify.ps1 (agent) : 1120/1120, 0 avertissement, 0 erreur ; DLL 0.612.0.0. Non validé en jeu.
+### English
+- Competitive cut: the Battlehall (territory 579) is also a public hall with PvE matches. Tensho is no longer cut on arrival or during those, only in the arena's instance, from IsInPvPInstance or BoundByDuty. A hypothesis to confirm in game: the log writes the values read.
+
+## 0.611.0
+- Plan global, DEC-038 : Coupure compétitive : le journal dit le nombre de zones connues au chargement et chaque début ou fin de coupure, avec le territoire, pour vérifier les essais en jeu.
+- Tests : Competitive. Verify.ps1 (agent) : 1119/1119, 0 avertissement, 0 erreur ; DLL 0.611.0.0. Non validé en jeu.
+### English
+- Competitive cut: the log says how many zones are known at load, and each start or end of a cut with its territory, to check the in-game tests.
+
+## 0.610.0
+- Plan global, DEC-038 : Tensho se coupe tout seul en JcJ et en contenu classé, sans réglage, et repart tout seul : JcJ, Battlehall et tournois de Triple Triade, Lord of Verminion, Mahjong, Dédale bestial, donjons profonds, quai de Wolves' Den. Rien n'est lu du jeu : tous les abonnements au framework passent par un gardien, qu'un test impose. Affichage, commandes et menu contextuel coupés, barre de serveur masquée, carte du jeu rendue, Discord vidé, une ligne de chat à l'entrée. Écarts : COMPETITIVE-OFF-PLAN.md.
+- Tests : Competitive. Verify.ps1 (agent) : 1119/1119, 0 avertissement, 0 erreur ; DLL 0.610.0.0. Non validé en jeu.
+### English
+- Tensho stops on its own in PvP and ranked content, with no setting, and comes back on its own: PvP, Triple Triad Battlehall and tournaments, Lord of Verminion, Mahjong, Beastmaster labyrinth, deep dungeons, Wolves' Den pier. Nothing is read from the game: every framework subscription goes through a gate, enforced by a test. UI, commands and context menu off, server bar hidden, game map given back, Discord queue dropped, one chat line on entry. Gaps: COMPETITIVE-OFF-PLAN.md.
+
+## 0.609.0
+- Plan global, phase 4 : Fiche objet : « Sur vos autres personnages » donne, pour chacun, les quantités NQ et HQ et la date, d'après ce que la Banque a enregistré. Version compacte : pas de recherche globale, et un rangement jamais lu n'est pas compté.
+- Tests : Other stocks. Verify.ps1 (agent) : 1115/1115, 0 avertissement, 0 erreur ; DLL 0.609.0.0. Non validé en jeu.
+### English
+- Item sheet: « On your other characters » gives each one's NQ and HQ quantities and date, from what the Bank saved. Compact version: no global search, and a storage never read is not counted.
+
+## 0.608.0
+- Plan global, I4 : Prix du coût de préparation et des listes : une seule requête Universalis pour toute la liste au lieu d'une par objet toutes les 3 secondes. Les objets sans réponse sont demandés seuls comme avant, et une panne du serveur arrête la liste. Preuve : docs/evidence/0.608-universalis-batch.md. La limite de 32 objets par liste reste en place.
+- Tests : Market batch. Verify.ps1 (agent) : 1113/1113, 0 avertissement, 0 erreur ; DLL 0.608.0.0. Non validé en jeu.
+### English
+- Prices of the preparation cost and lists: a single Universalis request for the whole list instead of one per item every 3 seconds. Items without an answer are asked alone as before, and a server failure stops the list. Evidence: docs/evidence/0.608-universalis-batch.md. The limit of 32 items per list stays.
+
+## 0.607.0
+- Plan global, phase 4 : Objets : section « Objets annotés » : ce qui a une note ou une étiquette, filtré par étiquette (Important, À vendre) et par texte dans le nom ou la note ; un clic ouvre l'objet.
+- Tests : Annotated. Verify.ps1 (agent) : 1110/1110, 0 avertissement, 0 erreur ; DLL 0.607.0.0. Non validé en jeu.
+### English
+- Items: « Annotated items » section: what has a note or a label, filtered by label (Important, To sell) and by text in the name or note; a click opens the item.
+
+## 0.606.0
+- Plan global, phase 4 : Monnaies : avec les alertes activées, Tensho prévient une fois quand les mémoquartz limités de la semaine atteignent leur plafond, dans le chat, par un son et sur Discord ; une case le retire.
+- Tests : Weekly cap. Verify.ps1 (agent) : 1108/1108, 0 avertissement, 0 erreur ; DLL 0.606.0.0. Non validé en jeu.
+### English
+- Currencies: with alerts on, Tensho says once when the week's limited tomestones reach their limit, in chat, by sound and on Discord; a box removes it.
+
+## 0.605.0
+- Plan global, phase 4 : Banque : un rangement relevé d'office et inchangé n'est plus réécrit à chaque lecture (toutes les 2 minutes, ou 30 secondes) : le fichier n'est écrit que si son contenu change, ou au plus une fois par heure pour sa date. La date reste à jour en mémoire.
+- Tests : Bank save. Verify.ps1 (agent) : 1106/1106, 0 avertissement, 0 erreur ; DLL 0.605.0.0. Non validé en jeu.
+### English
+- Bank: a storage read automatically and unchanged is no longer rewritten at each reading (every 2 minutes, or 30 seconds): the file is written only when its contents change, or at most once an hour for its date. The date stays current in memory.
+
+## 0.604.0
+- Plan global, C35 : Aide à la pêche : le joueur est copié sur le thread framework et l'affichage ne lit que cette copie ; les tables des postes de pêche et d'Abondance II sont construites hors de l'affichage à la première demande. Rien de visible, sinon moins d'à-coup à la première ouverture ; ces deux lignes peuvent manquer un court instant.
+- Tests : Fishing help. Verify.ps1 (agent) : 1104/1104, 0 avertissement, 0 erreur ; DLL 0.604.0.0. Non validé en jeu.
+### English
+- Fishing help: the player is copied on the framework thread and the frame only reads that copy; the fishing spot and Bountiful II tables are built off the frame on first use. Nothing visible except less stutter on first opening; those two lines may be missing for a moment.
+
+## 0.603.0
+- Plan global, T23 : Compagnie libre : avec des personnages dans plusieurs compagnies, chaque atelier a son cadre et la date de son relevé. Oublier une compagnie existait déjà. Pas fait : le nom de la compagnie (pas enregistré, cadres numérotés) et la valeur du dernier butin.
+- Tests : Workshops. Verify.ps1 (agent) : 1103/1103, 0 avertissement, 0 erreur ; DLL 0.603.0.0. Non validé en jeu.
+### English
+- Free company: with characters in several companies, each workshop has its own frame and reading date. Forgetting a company already existed. Not done: the company's name (not stored, frames are numbered) and the value of the last loot.
+
+## 0.602.0
+- Plan global, T28 : Collections : « Obtenus récemment » liste avec la date ce qui a été gagné depuis le relevé précédent (la première lecture sert de base ; ni les succès ni les types lus à part, coiffures et autres, ne sont suivis) ; le clic droit sur une emote ouvre ses sources.
+- Tests : Recent. Verify.ps1 (agent) : 1102/1102, 0 avertissement, 0 erreur ; DLL 0.602.0.0. Non validé en jeu.
+### English
+- Collections: « Recently obtained » lists with the date what was gained since the previous reading (the first reading is the baseline; achievements and the separately read kinds, hairstyles and others, are not followed); right-clicking an emote opens its sources.
+
+## 0.601.0
+- Plan global, C36 : Si la lecture du carnet, de la synthèse ou de la récolte échoue, une courte ligne « indisponible » apparaît à côté de la fenêtre du jeu au lieu de rien, et Diagnostics nomme la lecture. La pêche n'est pas couverte. Aussi : la ligne de faits de C14 dans le panneau du carnet.
+- Tests : Failed reading. Verify.ps1 (agent) : 1099/1099, 0 avertissement, 0 erreur ; DLL 0.601.0.0. Non validé en jeu.
+### English
+- If reading the crafting log, the synthesis or gathering fails, a short « unavailable » line appears beside the game's window instead of nothing, and Diagnostics names the reading. Fishing is not covered. Also: C14's facts line in the Crafting Log panel.
+
+## 0.600.0
+- Plan global, C14 : La recette dit, sur la fiche objet et dans le simulateur : HQ possible ou non, synthèse rapide et ses minimums, livre de maître, spécialiste, recette experte, objet et état requis, depuis la feuille Recipe du jeu. L'écart chiffré existait déjà dans le simulateur (A-12). Pas fait : savoir si le livre est lu, et l'affichage dans le panneau du carnet.
+- Tests : Recipe facts. Verify.ps1 (agent) : 1097/1097, 0 avertissement, 0 erreur ; DLL 0.600.0.0. Non validé en jeu.
+### English
+- The recipe says, on the item sheet and in the simulator: HQ possible or not, quick synthesis and its minimums, master book, specialist, expert, required item and status, from the game's Recipe sheet. The numeric gap already existed in the simulator (A-12). Not done: whether the book is read, and the Crafting Log panel.
+
+## 0.599.0
+- Plan global, T10 : Accueil : bloc « Aujourd'hui » : rappels à faire, ce qui est terminé (servants, vaisseaux, escouade, jardin), prochain vaisseau, quêtes suivies, trois prochaines alarmes ; un clic ouvre la page. « Personnaliser » choisit les lignes et les tuiles affichées (par défaut : toutes). Rien n'est lu du jeu ici, et le bloc est refait une fois par seconde.
+- Tests : Today. Verify.ps1 (agent) : 1094/1094, 0 avertissement, 0 erreur ; DLL 0.599.0.0. Non validé en jeu.
+### English
+- Home: « Today » block: reminders to do, what is finished (ventures, vessels, squadron, garden), next vessel, followed quests, next three alarms; a click opens the page. « Customize » picks the lines and tiles shown (all by default). Nothing is read from the game here, and the block is rebuilt once a second.
+
+## 0.598.0
+- Plan global, T24 : Discord : chaque catégorie peut écrire dans son propre salon (une adresse de webhook par catégorie, vide : l'adresse principale). Adresses masquées, gardées lors d'une remise à zéro, jamais dans le journal ni les rapports.
+- Tests : Discord channels. Verify.ps1 (agent) : 1091/1091, 0 avertissement, 0 erreur ; DLL 0.598.0.0. Non validé en jeu.
+### English
+- Discord: each category can post to its own channel (one webhook address per category, empty: the main address). Addresses masked, kept by a reset, never in the log or reports.
+
+## 0.597.0
+- Plan global, P10 : Section Carte du plugin : un champ cherche sur toutes les cartes un lieu, une éthérite, un vendeur, un PNJ de Triple Triad, un donneur de quête ou une ressource ; un clic ouvre la carte Tensho centrée sur le résultat, sans poser de drapeau. Liste préparée hors de l'affichage.
+- Tests : Map search. Verify.ps1 (agent) : 1087/1087, 0 avertissement, 0 erreur ; DLL 0.597.0.0. Non validé en jeu.
+### English
+- Plugin's Maps section: a field searches every map for a place, an aetheryte, a vendor, a Triple Triad NPC, a quest giver or a resource; a click opens the Tensho map centred on the result, without a flag. The list is prepared off the frame.
+
+## 0.596.0
+- Plan global, P12 : Carte : les noms que le jeu écrit à côté de certaines icônes (éthérites, lieux importants) sont écrits sur la carte Tensho, du même côté, à partir du même zoom que les noms de lieux ; case « Noms des icônes » pour les retirer. Le côté vient de MapMarker.SubtextOrientation, mesuré sur les données du jeu (preuve : docs/evidence/0.596-map-label-orientation.md), à confirmer en jeu.
+- Tests : Map labels. Verify.ps1 (agent) : 1083/1083, 0 avertissement, 0 erreur ; DLL 0.596.0.0. Non validé en jeu.
+### English
+- Map: the names the game writes beside some icons (aetherytes, important places) are written on Tensho's map, on the same side, from the same zoom as place names; an « Icon names » box removes them. The side comes from MapMarker.SubtextOrientation, measured on the game's data (evidence: docs/evidence/0.596-map-label-orientation.md), to confirm in game.
+
+## 0.595.0
+- Plan global, I21 : Règles de tri : une zone peut ne prendre que l'équipement d'un job, ou les pièces de vos sets d'équipement du jeu (oui ou non). Tant que les sets ne sont pas lus, le tri réel attend et le dit ; rien ne bouge sur ce qui n'est pas lu.
+- Tests : Sort gear. Verify.ps1 (agent) : 1080/1080, 0 avertissement, 0 erreur ; DLL 0.595.0.0. Non validé en jeu.
+### English
+- Sorting rules: a zone can take only the gear of a job, or the pieces of your game gear sets (yes or no). While the sets are unread, a real sort waits and says so; nothing moves on what is unread.
+
+## 0.594.0
+- Plan global, I11 : Banque : case « Afficher en liste » : un objet par ligne avec NQ, HQ, total et ses rangements, à la place des grilles, triable par nom, catégorie ou quantité en cliquant sur la colonne ; l'onglet et les filtres restent appliqués.
+- Tests : Bank list. Verify.ps1 (agent) : 1077/1077, 0 avertissement, 0 erreur ; DLL 0.594.0.0. Non validé en jeu.
+### English
+- Bank: « Show as a list » box: one item per line with NQ, HQ, total and its storages, instead of the grids, sorted by name, category or quantity by clicking the column; the tab and filters still apply.
+
+## 0.593.0
+- Plan global, T25 : Page Équipement : plusieurs plans nommés par job. Liste des plans, nouveau plan (copie de l'actuel), renommer, supprimer ; en prendre un garde l'actuel tel quel, et le code de partage donne le plan affiché.
+- Tests : Gear plans. Verify.ps1 (agent) : 1074/1074, 0 avertissement, 0 erreur ; DLL 0.593.0.0. Non validé en jeu.
+### English
+- Gear page: several named plans per job. A list of plans, new plan (a copy of the current one), rename, delete; taking one keeps the current one as it is, and the share code gives the plan shown.
+
+## 0.592.0
+- Plan global, C21 : Nouvel onglet « Que puis-je fabriquer ? » dans Artisanat : sur un clic, les recettes que les sacs et la Banque enregistrée peuvent fabriquer maintenant, avec le nombre de fabrications, filtrées par métier et niveau. Ingrédients directs seulement ; un stock jamais vu n'est pas compté comme zéro.
+- Tests : From stock. Verify.ps1 (agent) : 1069/1069, 0 avertissement, 0 erreur ; DLL 0.592.0.0. Non validé en jeu.
+### English
+- New « What can I craft? » tab in Crafting: on a click, the recipes the bags and saved Bank can make now, with the number of crafts, filtered by job and level. Direct ingredients only; a stock never seen is not taken as zero.
+
+## 0.591.0
+- Plan global, C18 : Dans la chaîne de fabrication, une recette rencontrée plusieurs fois n'a plus qu'une ligne avec son total, chaque ligne venant après les recettes de ses ingrédients ; chaque ligne a ses boutons Carnet et Simuler et une case « fait », gardée jusqu'au prochain calcul.
+- Tests : Chain. Verify.ps1 (agent) : 1064/1064, 0 avertissement, 0 erreur ; DLL 0.591.0.0. Non validé en jeu.
+### English
+- In the crafting chain, a recipe met several times is now one row with its total, each row after the recipes of its ingredients; each row has Log and Simulate buttons and a done box, kept until the next calculation.
+
+## 0.590.0
+- Plan global, C16 : La page des séquences enregistrées se cherche par nom, objet ou métier et se trie ; une séquence se renomme, se duplique et se copie en texte. L'import d'une macro collée existait déjà dans le simulateur (0.425) et relit ce texte.
+- Tests : Sequences. Verify.ps1 (agent) : 1060/1060, 0 avertissement, 0 erreur ; DLL 0.590.0.0. Non validé en jeu.
+### English
+- The saved sequences' page can be searched by name, item or job and sorted; a sequence can be renamed, duplicated and copied as text. Importing a pasted macro already existed in the simulator (0.425) and reads that text back.
+
+## 0.589.0
+- Plan global, C5 : Pendant une synthèse, la fenêtre à côté de la synthèse et la page Synthèse en cours suivent la séquence choisie (simulateur, séquence enregistrée pour la recette, suggestion du panneau du carnet) : action suivante, chiffres du plan contre ceux du jeu, avertissement quand ils se séparent, avec les états autres que Normal déjà joués. Réglage pour le retirer. Rien n'est joué.
+- Tests : Follow. Verify.ps1 (agent) : 1056/1056, 0 avertissement, 0 erreur ; DLL 0.589.0.0. Non validé en jeu.
+### English
+- During a synthesis, the window beside it and the live craft page follow the chosen sequence (simulator, saved for the recipe, Crafting Log panel's suggestion): next action, the plan's numbers against the game's, a warning when they part, with the non-Normal states already played. A setting turns it off. Nothing is played.
+
+## 0.588.0
+- Plan global, C7 : page Récolte : une section liste les points à horaire ouverts maintenant, puis ceux qui ouvrent dans l'heure, avec le temps restant, la zone, le niveau et une cloche. Recalculée une fois par minute d'Éorzéa. Les poissons ne sont pas inclus : leur météo n'y est pas vérifiée. Les filtres de métier et de niveau restent à faire.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1049/1049, 0 avertissement, 0 erreur ; DLL 0.588.0.0. Non validé en jeu.
+### English
+- The gathering page lists the timed points open now, then those opening within the hour, with a countdown and a bell.
+
+## 0.587.0
+- Plan global, Carte : demande de l'utilisateur : la roue dentée de la carte ouvre l'onglet Carte des Paramètres, au lieu d'une fenêtre surgissante devenue trop longue. Ce sont les mêmes réglages, et la liste des icônes reste celle de la carte affichée.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1048/1048, 0 avertissement, 0 erreur ; DLL 0.587.0.0. Non validé en jeu.
+### English
+- The map's cog now opens the Map tab of Settings instead of a long popup.
+
+## 0.586.0
+- Plan global, Carte : rapport de l'utilisateur en jeu : pas d'aile sur les vieilles zones. Tensho lisait le lien depuis l'ensemble de courants, qui ne nomme que Mor Dhona, alors que toutes ces zones partagent l'ensemble 19 (docs/evidence/0.586-flight-sets.md). Il lit maintenant la colonne de chaque zone.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1047/1047, 0 avertissement, 0 erreur ; DLL 0.586.0.0. Non validé en jeu.
+### English
+- The map's wing now shows on the old zones too (La Noscea, Thanalan, the Shroud, Coerthas): they share one aether current set, which only named Mor Dhona.
+
+## 0.585.0
+- Plan global, Équipement : rapport de l'utilisateur en jeu : la liste « Plan pour » montrait deux jobs nommés 44 et 45 : ce sont des lignes vides de la feuille ClassJob, qui pointent sur le compteur du pugiliste. L'index des niveaux ignore les lignes sans nom, pour tous ses usages (docs/evidence/0.585-classjob-empty-rows.md). Le texte passe avant la liste, et le job porté prend sa majuscule.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1046/1046, 0 avertissement, 0 erreur ; DLL 0.585.0.0. Non validé en jeu.
+### English
+- The gear page's job list no longer shows two empty rows of the game's job sheet. Its label now comes before the list.
+
+## 0.584.0
+- Plan global, Rappels : demande de l'utilisateur : le réglage Discord d'un rappel n'existe plus qu'à un endroit. Sur la page Alarmes, un groupe issu de Rappels dit « Discord : réglé dans Rappels » au lieu de sa case, et seule la case de la ligne dans Rappels décide. Les autres alarmes gardent la leur, et les alarmes de rappel plus anciennes sont reliées à leur ligne par leur nom.
+- Tests : DiscordWebhookTests complété. Verify.ps1 (agent) : 1045/1045, 0 avertissement, 0 erreur ; DLL 0.584.0.0. Non validé en jeu.
+### English
+- A reminder's Discord switch now exists in one place: the Alarms page says it is set in Reminders, and only that row's box decides. Other alarms keep their own.
+
+## 0.583.0
+- Plan global, T12 : fiche d'une quête : ce qui reste à faire avant elle, dans l'ordre, et la prochaine à prendre. Parcours borné sans récursion, qui résiste à un cycle et à une très longue chaîne. Une condition illisible est dite.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1045/1045, 0 avertissement, 0 erreur ; DLL 0.583.0.0. Non validé en jeu.
+### English
+- A quest's sheet lists what is left to do before it, in order, and the next one to take.
+
+## 0.582.0
+- Plan global, T11 : page Quêtes : filtres « Disponibles maintenant » (non commencée, prérequis connus faits) et « Cette zone ». Un niveau ou une étape que Tensho ne sait pas lire n'est pas vérifié, et l'infobulle le dit. Le donneur sur la carte reste sur la fiche de la quête.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1044/1044, 0 avertissement, 0 erreur ; DLL 0.582.0.0. Non validé en jeu.
+### English
+- The quest page has two more filters: available now and this zone. What Tensho cannot read is not checked, and the tooltip says so.
+
+## 0.581.0
+- Plan global, T15 : Revue de mode : une case par pièce compose la tenue de la semaine, gardée jusqu'à la remise. La section dit quelles pièces sont possédées, avec le rangement au survol, et « Essayer la tenue » les met dans la cabine d'essayage, sur clic. Les sources des pièces manquantes restent dans la fiche d'objet.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1043/1043, 0 avertissement, 0 erreur ; DLL 0.581.0.0. Non validé en jeu.
+### English
+- Fashion Report: a box per piece builds the week's outfit. It says which pieces are owned and where, and a button tries them all on.
+
+## 0.580.0
+- Plan global, T14 : page Équipement : un menu « Plan pour » prépare le plan d'un autre job sans le porter : pièces, matérias, essayage. Ses attributs réels ne sont pas affichés, car ils ne se lisent qu'en le portant, et aucune pièce portée ne lui est prêtée. La somme des pièces n'est pas encore affichée pour ce job.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1042/1042, 0 avertissement, 0 erreur ; DLL 0.580.0.0. Non validé en jeu.
+### English
+- The gear page can plan another job than the one worn: pieces, materia and try on. Its real attributes are not shown, as they are only read while wearing it.
+
+## 0.579.0
+- Plan global, Équipement : demande de l'utilisateur : la case « Tous les jobs (mirage) » est aussi directement sur la page Équipement. Elle existait derrière le bouton de filtres et dans les Paramètres ; c'est le même réglage, sans doublon.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1041/1041, 0 avertissement, 0 erreur ; DLL 0.579.0.0. Non validé en jeu.
+### English
+- The All jobs (glamour) box is now on the gear page itself. It is the same setting as in the filters.
+
+## 0.578.0
+- Plan global, Rappels : demande de l'utilisateur : dans Rappels, une case Discord par ligne décide si les alarmes de ce rappel partent sur Discord, y compris les alarmes automatiques (servants, escouade, vaisseaux). Par défaut, tout reste coché, et la catégorie des réglages garde son effet.
+- Tests : DiscordWebhookTests complété. Verify.ps1 (agent) : 1040/1040, 0 avertissement, 0 erreur ; DLL 0.578.0.0. Non validé en jeu.
+### English
+- The Reminders page has a Discord box per row: it decides whether that reminder's alarms go to Discord, automatic ones included.
+
+## 0.577.0
+- Plan global, T0 : alarmes en heure réelle : une fois, chaque jour, chaque semaine à partir d'une date, ou à chaque remise à zéro du jour ou de la semaine, sans date. Les alarmes existantes ne changent pas.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1040/1040, 0 avertissement, 0 erreur ; DLL 0.577.0.0. Non validé en jeu.
+### English
+- Alarms in real time can now repeat every day, every week, or at each daily or weekly reset.
+
+## 0.576.0
+- Plan global, I1 : page Rangements : un servant qui n'est plus à la sonnette est signalé, jamais effacé tout seul, et « Effacer ce relevé » (deux clics) retire un relevé de vos stocks.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1039/1039, 0 avertissement, 0 erreur ; DLL 0.576.0.0. Non validé en jeu.
+### English
+- The storage page flags a retainer no longer at the bell, and a read can be erased with two clicks.
+
+## 0.575.0
+- Plan global, I3 : le coût de préparation prend le prix en gils d'un PNJ quand il est plus bas que le marché, aussi pour un objet que le marché ne vend pas ; la ligne le marque. Réglage activé par défaut, à part si du HQ est demandé. La ligne du Résumé de la page Marché reste à faire.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1038/1038, 0 avertissement, 0 erreur ; DLL 0.575.0.0. Non validé en jeu.
+### English
+- The preparation's cost now takes an NPC's gil price when lower, also for items the market does not sell. The line is marked.
+
+## 0.574.0
+- Plan global, I5 : le coût de préparation peut se calculer au moins cher du centre de données, et chaque ligne nomme alors le monde où acheter. Aucune nouvelle requête. Réglage désactivé par défaut.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1037/1037, 0 avertissement, 0 erreur ; DLL 0.574.0.0. Non validé en jeu.
+### English
+- The preparation's cost can use the cheapest offer of the data center, naming the world to buy on.
+
+## 0.573.0
+- Plan global, C17 : macros : son de la ligne de fin réglable de 1 à 16, ou aucun, et ligne de fin sur la dernière page seulement. Par défaut, rien ne change. L'attente séparée existait déjà (0.419). L'icône des macros reste à sonder en jeu.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1036/1036, 0 avertissement, 0 erreur ; DLL 0.573.0.0. Non validé en jeu.
+### English
+- Macro export: the end line's sound can be set from 1 to 16 or none, and the line can stay on the last page only.
+
+## 0.572.0
+- Plan global, C15 : le simulateur a sa propre recherche de recette, et le résultat se recalcule seul après chaque changement, une fois par changement (réglage activé par défaut). Le glisser-déposer des actions reste à faire.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1035/1035, 0 avertissement, 0 erreur ; DLL 0.572.0.0. Non validé en jeu.
+### English
+- The simulator has its own recipe search, and it runs again by itself once after each change.
+
+## 0.571.0
+- Plan global, T29 : la page Mini Cactpot montre, repliée, la table des gains selon la somme de la ligne : celle que le conseil utilise déjà. Elle reste à comparer au ticket du jeu en phase 6.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1034/1034, 0 avertissement, 0 erreur ; DLL 0.571.0.0. Non validé en jeu.
+### English
+- The Mini Cactpot page shows, folded, the gains by line sum that the advice uses.
+
+## 0.570.0
+- Plan global, T16 : la ligne des tâches de servants se déplie : par servant, sa tâche finie ou son heure de fin avec une cloche, et une alarme pour le retour du dernier. L'alarme automatique de 0.371 reste.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1033/1033, 0 avertissement, 0 erreur ; DLL 0.570.0.0. Non validé en jeu.
+### English
+- The retainer tasks line expands: each retainer with its end time and a bell, and one alarm for the last back.
+
+## 0.569.0
+- Plan global, P15 : après une mise à jour du jeu, la carte dit ce qui ne se lit plus (vol, marqueurs de quête, ALEA, groupe…) au lieu de sembler vide, et Diagnostics aussi. Une partie qui se relit quitte la liste.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1032/1032, 0 avertissement, 0 erreur ; DLL 0.569.0.0. Non validé en jeu.
+### English
+- The map and Diagnostics now say which parts no longer read, perhaps after a game update. A part that reads again leaves the list.
+
+## 0.568.0
+- Plan global, C9 : dans l'aide à la pêche, chaque poisson dit si son créneau, sa météo et sa météo d'avant sont bons maintenant (oui, non, ?), d'après GatherBuddy. Météo calculée une fois par période. C0 était déjà présent : rien à coder.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1031/1031, 0 avertissement, 0 erreur ; DLL 0.568.0.0. Non validé en jeu.
+### English
+- The fishing help shows, for each fish, whether its time window, weather and previous weather hold now.
+
+## 0.567.0
+- Plan global, I18 : page Marché : un bouton copie le prix le plus bas moins 1, sans vos servants, avec la date du relevé dans l'infobulle. Il reprend le calcul existant de la sous-cotation. Copié seulement : rien n'est mis en vente.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1030/1030, 0 avertissement, 0 erreur ; DLL 0.567.0.0. Non validé en jeu.
+### English
+- The market page can copy the lowest offer minus 1, without your retainers. It is only copied.
+
+## 0.566.0
+- Plan global, I15 : un modèle de tri se copie en texte et se colle dans une autre bibliothèque. Le texte collé est vérifié et reçoit son propre identifiant ; il ne contient ni personnage ni objet possédé.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1029/1029, 0 avertissement, 0 erreur ; DLL 0.566.0.0. Non validé en jeu.
+### English
+- Sort templates can be copied as text and pasted elsewhere. Pasted text is checked first.
+
+## 0.565.0
+- Plan global, I20 : l'aperçu du tri encadre en or les cases qui changeraient et en donne le nombre. Une pile dont la place n'a pas été lue ne compte pas.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1028/1028, 0 avertissement, 0 erreur ; DLL 0.565.0.0. Non validé en jeu.
+### English
+- The sort preview frames in gold the slots that would change and counts them.
+
+## 0.564.0
+- Plan global, T18 : nouvelles balises des messages Discord : [discordtime] (l'heure dans le fuseau de chaque lecteur), [relative], [et], [zone] et [item]. [time] ne change pas. Un nom inconnu ne laisse rien.
+- Tests : DiscordWebhookTests complété. Verify.ps1 (agent) : 1027/1027, 0 avertissement, 0 erreur ; DLL 0.564.0.0. Non validé en jeu.
+### English
+- New Discord message markers: [discordtime] and [relative] read in each reader's time zone, [et], [zone] and [item].
+
+## 0.563.0
+- Plan global, C31 : page Météo : un tableau de vos zones, 12 au plus, sur les 6 prochaines périodes. Calculé une fois par période. Un clic sur une zone l'affiche.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1027/1027, 0 avertissement, 0 erreur ; DLL 0.563.0.0. Non validé en jeu.
+### English
+- The weather page has a table of your zones, up to 12, over the next 6 periods.
+
+## 0.562.0
+- Plan global, I19 : réglage, désactivé par défaut : le nom anglais d'un objet sous le sien, dans sa fiche et son infobulle, quand ils diffèrent.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1026/1026, 0 avertissement, 0 erreur ; DLL 0.562.0.0. Non validé en jeu.
+### English
+- New setting, off by default: an item's English name under its own, in its sheet and tooltip.
+
+## 0.561.0
+- Plan global, I8 : le menu d'un objet copie son nom, affiche un lien dans votre propre chat (message local, rien n'est envoyé au serveur) et ouvre sa page sur Universalis, Garland Tools ou Teamcraft, sur clic. Avec I9. Le menu du jeu n'a pas encore ces entrées.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1025/1025, 0 avertissement, 0 erreur ; DLL 0.561.0.0. Non validé en jeu.
+### English
+- An item's menu now copies its name, prints a link in your own chat and opens its page on Universalis, Garland Tools or Teamcraft.
+
+## 0.560.0
+- Plan global, C24 : dans les aides à la récolte et à la pêche, un objet utile à la dernière chaîne d'artisanat est marqué « Encore 14 pour… », et le nombre baisse à mesure de la récolte.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1024/1024, 0 avertissement, 0 erreur ; DLL 0.560.0.0. Non validé en jeu.
+### English
+- The gathering and fishing helps mark an item the last crafting chain still needs, and the number falls as you get it.
+
+## 0.559.0
+- Plan global, C19 : au survol d'un matériau, dans la préparation et la chaîne : le détail par rangement (sacs, servant, sacoche), avec la date des relevés enregistrés. Rien n'est recalculé.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1023/1023, 0 avertissement, 0 erreur ; DLL 0.559.0.0. Non validé en jeu.
+### English
+- Hovering a material in the preparation and the chain lists which storage holds it, with the date of saved reads.
+
+## 0.558.0
+- Plan global, T17 : quand le jeu indique 0 quête de tribu ou 0 commande spéciale restante, la case de Rappels se coche seule jusqu'à la remise, aussi pour le compteur de la barre du serveur. Un compteur inconnu ne coche rien. Réglage activé par défaut.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1022/1022, 0 avertissement, 0 erreur ; DLL 0.558.0.0. Non validé en jeu.
+### English
+- A reminder ticks itself when the game reads 0 tribal quests or 0 special deliveries left. An unknown counter ticks nothing.
+
+## 0.557.0
+- Plan global, T19 : sur une alarme : « Modifier » (nom et, pour une alarme unique, date) et « Dans 5 min », qui ajoute la même alarme une fois de plus. Une alarme automatique ne se modifie pas, car elle suit son échéance. Pour une copie dans le jeu, un message dit de la corriger à la main.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1021/1021, 0 avertissement, 0 erreur ; DLL 0.557.0.0. Non validé en jeu.
+### English
+- Alarms can be edited (name and, for a one-off, date) and put off with a button that adds the same alarm a few minutes later.
+
+## 0.556.0
+- Plan global, T20 : réglage, désactivé par défaut : une alarme sonne avec son avance, puis une seconde fois à l'heure exacte, sans doubler Discord. Une occurrence écartée pour sa météo ne sonne pas. Réglage général : pas d'option par alarme.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1020/1020, 0 avertissement, 0 erreur ; DLL 0.556.0.0. Non validé en jeu.
+### English
+- New alarm setting, off by default: an alarm rings its lead ahead, then again at the exact time. Discord only gets the first.
+
+## 0.555.0
+- Plan global, I16 : commandes « /tensho objet », « prix », « recolte » et « recette » (aussi item, price, gather, recipe), avec C32 : elles ouvrent le premier objet trouvé dans Tensho, comme wiki et lodestone.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1019/1019, 0 avertissement, 0 erreur ; DLL 0.555.0.0. Non validé en jeu.
+### English
+- New commands: /tensho item, price, gather and recipe, in French and English, open the first matching item in Tensho.
+
+## 0.554.0
+- Plan global, C3 : le panneau du carnet calcule avec les derniers attributs relevés du métier de la recette, marqués « relevés le… », au lieu de dire « Équipez le métier ». Le simulateur propose les mêmes valeurs. Écrit seulement quand ça change. Le bouton « Simuler avec ces attributs » de la page Équipement reste à faire.
+- Tests : CraftThresholds553Tests complété. Verify.ps1 (agent) : 1018/1018, 0 avertissement, 0 erreur ; DLL 0.554.0.0. Non validé en jeu.
+### English
+- The crafting log panel and the simulator can use a job's last read attributes when that job is not worn, always marked with the date.
+
+## 0.553.0
+- Plan global, C4 : sous une simulation terminée, l'Habileté, le Contrôle et les PS minimum pour que la séquence finisse à la même qualité, avec la marge. Calcul hors du dessin, annulé si le résultat change, avec le moteur de simulation.
+- Tests : CraftThresholds553Tests. Verify.ps1 (agent) : 1017/1017, 0 avertissement, 0 erreur ; DLL 0.553.0.0. Non validé en jeu.
+### English
+- Under a finished simulation, the lowest Craftsmanship, Control and CP the sequence needs at that quality, with the margin.
+
+## 0.552.0
+- Plan global, C2 : le panneau du carnet essaie aussi les séquences enregistrées pour d'autres recettes, et montre la meilleure qui termine, avec la recette d'origine. Réglage activé par défaut. La partie « Essayer mes séquences » du simulateur reste à faire.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1016/1016, 0 avertissement, 0 erreur ; DLL 0.552.0.0. Non validé en jeu.
+### English
+- The crafting log panel also tries sequences saved for other recipes and says which recipe the best one was saved for.
+
+## 0.551.0
+- Plan global, T4 : le bouton carte d'un monstre pose le drapeau à la position de sa fiche et ouvre la carte Tensho dessus, au lieu du centre. L'aide dit que la position vient de Garland Tools et qu'une apparition n'y est pas prouvée. Sans position, rien ne change.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1015/1015, 0 avertissement, 0 erreur ; DLL 0.551.0.0. Non validé en jeu.
+### English
+- A monster's map button now places the flag at its known position (community data from Garland Tools) and opens the Tensho map there.
+
+## 0.550.0
+- Plan global, T3 : la liste des quêtes montre le niveau et la zone, se trie sur chaque colonne et se limite à une plage de niveaux, gardée entre les sessions. Une quête de niveau inconnu n'est pas prise pour le niveau 0.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1014/1014, 0 avertissement, 0 erreur ; DLL 0.550.0.0. Non validé en jeu.
+### English
+- The quest list shows level and zone, sorts on every column and can be limited to a level range.
+
+## 0.549.0
+- Plan global, I0 : l'équipement porté compte comme possédé, sur une ligne « Équipement porté » : la Revue de mode ne dit plus « non possédé » pour une pièce portée, et le stock au survol et la fiche objet l'incluent. Le tri et la grille de la Banque restent sur les sacs.
+- Tests : ItemHoldingsTests complété. Verify.ps1 (agent) : 1013/1013, 0 avertissement, 0 erreur ; DLL 0.549.0.0. Non validé en jeu.
+### English
+- Worn gear now counts as owned, on its own line, for example in the Fashion Report and in stocks. Sorting and the Bank's grid are unchanged.
+
+## 0.548.0
+- Plan global, P9 : une ALEA à bonus d'expérience le dit dans son libellé, sur la carte et dans la liste du clic droit (`IFate.HasBonus`). À la demande de l'utilisateur, la zone garde sa couleur rose : pas de couleur selon le temps restant.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1012/1012, 0 avertissement, 0 erreur ; DLL 0.548.0.0. Non validé en jeu.
+### English
+- A FATE with an EXP bonus says so in its label, on the map and in the right-click list. Its area keeps its colour.
+
+## 0.547.0
+- Plan global, P20 : bouton « Couches » dans la colonne d'outils : les couches de la carte en une petite liste, avec « Tout afficher » et « Tout masquer ». Ce sont les mêmes réglages que dans la roue dentée, sans doublon.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1011/1011, 0 avertissement, 0 erreur ; DLL 0.547.0.0. Non validé en jeu.
+### English
+- A Layers button in the map's tool column lists the layers, with show all and hide all. They are the same settings as in the cog.
+
+## 0.546.0
+- Plan global, P16 : réglage, désactivé par défaut (demande de l'utilisateur) : un clic gauche bref sur un endroit vide d'une carte de zone pose le drapeau. Un glisser déplace toujours la carte, et un clic sur une icône garde son effet.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1010/1010, 0 avertissement, 0 erreur ; DLL 0.546.0.0. Non validé en jeu.
+### English
+- New setting, off by default: a short left click on an empty spot of a zone map places the flag.
+
+## 0.545.0
+- Plan global, P5 : la molette ne zoomait que sur le fond de carte. Elle marche maintenant sur toute la fenêtre de la carte (colonne d'outils, curseur, noms posés dessus), autour du centre de la vue. Réglages : pas de la molette et sens inversé. Par défaut, le pas reste 15 %.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1009/1009, 0 avertissement, 0 erreur ; DLL 0.545.0.0. Non validé en jeu.
+### English
+- The mouse wheel now zooms over the whole map window. Its step and direction are settings.
+
+## 0.544.0
+- Plan global, P3 : depuis un point quelconque ou le drapeau, le clic droit de la carte propose l'éthérite la plus proche avec son coût. Déjà présent : le calcul et la question de 0.373, repris sans doublon. Téléportation seulement après confirmation.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1008/1008, 0 avertissement, 0 erreur ; DLL 0.544.0.0. Non validé en jeu.
+### English
+- The map's right-click menus now offer the nearest aetheryte of that map from any point or the flag, with its cost, after confirmation.
+
+## 0.543.0
+- Plan global, P2 : les noms de lieux suivaient le zoom comme les icônes et se chevauchaient une fois dézoomés ; les étiquettes de récolte avaient une taille et un seuil figés. Réglages : suivi du zoom des noms, zoom minimal des noms, seuil et taille des étiquettes de récolte. Par défaut, rien ne change.
+- Tests : MapZoom542Tests complété. Verify.ps1 (agent) : 1007/1007, 0 avertissement, 0 erreur ; DLL 0.543.0.0. Non validé en jeu.
+### English
+- Map place names can follow the zoom apart from the icons and hide under a chosen zoom. Gathering labels have their own size and threshold.
+
+## 0.542.0
+- Tri des propositions, lot 1, P1 (demande de l'utilisateur) : la carte démarrait toujours à 50 %, et le zoom sur une quête ou un lien était figé à 100 % au moins. Trois réglages : zoom à l'ouverture (dernier zoom utilisé, gardé après une relance ; zoom fixe en suivant le personnage ; carte entière), valeur du zoom fixe, zoom sur une quête ou un lien. Par défaut, le dernier zoom, à 50 % la première fois. Il est enregistré après 2 secondes sans changement, jamais à chaque image. Une carte choisie s'ouvre toujours en entier.
+- Tests : MapZoom542Tests. Verify.ps1 (agent) : 1006/1006, 0 avertissement, 0 erreur ; DLL 0.542.0.0. Non validé en jeu.
+### English
+- The map's zoom at opening is now a setting: last zoom used (kept across restarts), fixed zoom following the character, or the whole map. The zoom used on a quest or link is a setting too.
+
+## 0.541.0
+- Plan global, phase 1 (issue #37) : le bloc d'objets de « Mes outils » ne montrait pas les prix. Nouvelle colonne « Prix à l'unité » (le plus bas de NQ et HQ dans le cache partagé), coût de ce qui manque, et bouton « Demander les prix », 32 objets au plus par clic. Un prix ou un stock inconnu est compté comme inconnu (« au moins »), jamais comme gratuit. Rien n'est demandé sans le clic.
+- Tests : Interfaces535Tests complété. Verify.ps1 (agent) : 1005/1005, 0 avertissement, 0 erreur ; DLL 0.541.0.0. Non validé en jeu.
+### English
+- The item block of My Tools now shows prices: price each, cost of what is missing, and a button that asks Universalis for them.
+
+## 0.540.0
+- Plan global, phase 1 (issue #36) : les bleuets manquaient au journal du jardin : la ligne 108 de `GardeningSeed` n'est pas dans les données de Lotlab. « Graines de centaurée » (51189, récolte 51190) est ajoutée. Identifiants tirés des données du jeu ; 24 h sans flétrissement, déduits des 26 autres fleurs en pot, modifiables dans le journal (docs/evidence/0.540-cornflower-seed.md). Une plantation de cette graine lue dans le chat est donc reconnue.
+- Tests : GardenSeeds449Tests complété. Verify.ps1 (agent) : 1004/1004, 0 avertissement, 0 erreur ; DLL 0.540.0.0. Non validé en jeu.
+### English
+- The garden journal now knows cornflower seeds, missing from the embedded data (game row 108). Their 24 hours are inferred from the 26 other pot flowers.
+
 ## 0.539.0
 - Rapport de l'utilisateur en jeu : en déplaçant une fenêtre du jeu, le panneau de Tensho lié à elle suivait avec du retard, car sa position venait des lecteurs, rafraîchis 5 fois par seconde (1 fois pour le personnage). Un nouveau lecteur `UI/GameWindowFollower.Dalamud.cs` relit à chaque tick la seule position des fenêtres dont un panneau est affiché ; rien n'est lu quand aucun panneau ne le demande. Panneaux concernés : récolte, objets de collection, pêche au harpon, personnage, mission, carnet d'artisanat, Fashion Report, Triple Triade, import de banque.
 - Rapport de l'utilisateur en jeu : nos panneaux liés ne faisaient pas disparaître la carte (réglage « S'effacer devant les fenêtres du jeu »), alors que leur fenêtre le fait. Ils comptent maintenant, ainsi que le panneau de survol ; les panneaux placés librement (pêche, voyage en mer) ne comptent pas. Précision de l'utilisateur : la fenêtre principale de Tensho ne doit pas faire disparaître la carte ; c'est le cas, et un test le garde.

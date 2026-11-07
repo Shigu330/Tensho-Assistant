@@ -47,6 +47,7 @@ internal sealed partial class MainWindow
                 {
                     ImGui.SameLine();
                     if(ImGui.SmallButton(localization.Get("Tracker.Map")))OpenMapPointFromPage(map,place.X,place.Y);
+                    PlaceMenu("TrackerPlace",map,new(place.X,place.Y),map.Zone);
                 }
             }
             finally{ImGui.PopID();}
@@ -54,7 +55,7 @@ internal sealed partial class MainWindow
     }
 
     /// <summary>0.514: the free-standing panels, as Dalamud windows; Plugin adds them to its window system.</summary>
-    internal PanelWindow[] CreatePanelWindows()=>[new(this,TrackerPanel),new(this,TasksPanel),new(this,WearPanel),new(this,RegenTickPanel)];
+    internal PanelWindow[] CreatePanelWindows()=>[new(this,TrackerPanel),new(this,TasksPanel),new(this,WearPanel),new(this,RegenTickPanel),new(this,WorkshopListPanel),new(this,PreparationListPanel),new(this,CraftListListPanel)];
     /// <summary>0.537: the game's windows, for the interfaces that step aside when one comes in front.</summary>
     internal Func<IReadOnlyList<UI.GameWindow>>? GameWindowSource { get; set; }
     internal IReadOnlyList<UI.GameWindow> GameWindowList=>GameWindowSource?.Invoke() ?? [];
@@ -64,9 +65,35 @@ internal sealed partial class MainWindow
         var screen=ImGui.GetMainViewport().Size;
         return UI.GameWindows.Covers(GameWindowList,at.X,at.Y,size.X,size.Y,screen.X,screen.Y);
     }
-    internal bool BarBehindGame(Vector2 at,Vector2 size)=>configuration.HideBarsBehindGame && BehindGame(at,size);
+    internal bool BarBehindGame(Vector2 at,Vector2 size,string? name=null)
+    {
+        var behind=configuration.HideBarsBehindGame && BehindGame(at,size);
+        // 0.692: what hides a panel, on each change, to read a « panel never shows » report in the log.
+        if(name is not null && panelsBehind.GetValueOrDefault(name)!=behind)
+        {
+            panelsBehind[name]=behind;
+            log.Information("Panel {0} {1}: at {2}, size {3}; windows: {4}.",name,behind ? "steps aside":"comes back",at,size,string.Join(", ",GameWindowList.Where(window=>UI.GameWindows.Touch(at.X,at.Y,size.X,size.Y,window.X,window.Y,window.Width,window.Height)).Select(window=>window.Name)));
+        }
+        return behind;
+    }
+    private readonly Dictionary<string,bool> panelsBehind=[];
     // 0.539 (user report): a panel attached to a game window goes with it: it hides the map as the window does.
-    internal bool MapBehindGame(Vector2 at,Vector2 size)=>configuration.MapView.HideBehindGame && (BehindGame(at,size) || Panels?.Over(at,size)==true);
+    internal bool MapBehindGame(Vector2 at,Vector2 size)
+    {
+        if(!configuration.MapView.HideBehindGame)return false;
+        var screen=ImGui.GetMainViewport().WorkSize;
+        if(UI.MapEnlarged.Is(mapRestore is not null,size.X,size.Y,screen.X,screen.Y))return false;
+        var byWindow=BehindGame(at,size);var byPanel=Panels?.Over(at,size)==true;
+        var covered=byWindow || byPanel;
+        // What makes the map step aside, on each change, to read a « map never comes back » report in the log.
+        if(covered!=mapWasCovered)
+        {
+            mapWasCovered=covered;
+            log.Information("Map {0}: game window {1}, panel {2}, at {3}, size {4}; windows: {5}.",covered ? "steps aside":"comes back",byWindow,byPanel,at,size,string.Join(", ",GameWindowList.Where(window=>UI.GameWindows.Touch(at.X,at.Y,size.X,size.Y,window.X,window.Y,window.Width,window.Height)).Select(window=>window.Name)));
+        }
+        return covered;
+    }
+    private bool mapWasCovered;
     /// <summary>0.539: where a game window is now against where its reader saw it, for the panels that follow it.</summary>
     internal Func<string,float,float,Vector2>? GameWindowFollow { get; set; }
     internal Vector2 WindowMoved(string addon,float x,float y)=>GameWindowFollow is { } follow ? follow(addon,x,y)-new Vector2(x,y):Vector2.Zero;

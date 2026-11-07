@@ -1,6 +1,7 @@
 namespace TenshoAssistant.Alarms;
 
-public enum AlarmRepeat { Once, EorzeaDaily }
+// 0.577 (T0): in real time: from a date (At), each day or week; or at each game reset.
+public enum AlarmRepeat { Once, EorzeaDaily, RealDaily, RealWeekly, DailyReset, WeeklyReset }
 public enum AlarmCheck { None, Fire, SkipWeather }
 
 /// <summary>
@@ -30,12 +31,18 @@ public sealed class TenshoAlarm
     public bool Enabled { get; set; } = true;
     // Occurrence already handled (fired or skipped for its weather), so it is not handled twice.
     public DateTimeOffset LastOccurrence { get; set; }
+    // 0.556 (T20): the occurrence that really rang (LastOccurrence also marks one skipped for its weather), and the one that rang again on time.
+    public DateTimeOffset LastRung { get; set; }
+    public DateTimeOffset LastOnTime { get; set; }
     // R-12 (0.319): tool that created the alarm (Discord categories; older alarms: Other, the gathering job then decides), whether it
     // goes to Discord when the webhook is on, and its own Discord message (empty = the template of the settings).
     public AlarmSource Source { get; set; }
     // 0.371 (g, M-01): key of the deadline an automatic alarm follows (AutoAlarms); empty for the player's own alarms.
     public string AutoKey { get; set; } = "";
-    public bool Discord { get; set; } = true;
+    // 0.578 (user request): the row of the Reminders page this alarm comes from, for its Discord box.
+    public string ReminderRow { get; set; } = "";
+    /// <summary>0.778 (X-23, user request): off for a new alarm; one joining a group takes the group's (MainWindow.AddAlarms). A saved alarm keeps its own.</summary>
+    public bool Discord { get; set; }
     public string DiscordMessage { get; set; } = "";
 }
 
@@ -47,6 +54,10 @@ public sealed class AlarmSettings
     public bool PlaySound { get; set; } = true;
     public bool Chat { get; set; } = true;
     public bool MuteInDuties { get; set; } = true;
+    // 0.556 (T20): ring a second time at the exact time; Discord only gets the first.
+    public bool RingOnTime { get; set; }
+    // 0.557 (T19): how long « remind me later » waits.
+    public int SnoozeMinutes { get; set; } = 5;
     // Queue step e (audit 2026-11-02): with MuteInDuties, no [Tensho] chat line in a duty either. Off by default (the line stays, as
     // before); Discord and the alarms copied into the game are not affected.
     public bool MuteChatInDuties { get; set; }
@@ -81,6 +92,15 @@ public static class AlarmSchedule
     {
         ArgumentNullException.ThrowIfNull(alarm);
         if (alarm.Repeat == AlarmRepeat.Once) return alarm.At > after ? alarm.At : null;
+        if (alarm.Repeat == AlarmRepeat.DailyReset) return TenshoAssistant.Reminders.ResetSchedule.NextDaily(after, TenshoAssistant.Reminders.ResetSchedule.DailyHour);
+        if (alarm.Repeat == AlarmRepeat.WeeklyReset) return TenshoAssistant.Reminders.ResetSchedule.NextWeekly(after, TenshoAssistant.Reminders.ResetSchedule.WeeklyDay, TenshoAssistant.Reminders.ResetSchedule.WeeklyHour);
+        if (alarm.Repeat is AlarmRepeat.RealDaily or AlarmRepeat.RealWeekly)
+        {
+            if (alarm.At > after) return alarm.At;
+            var days = alarm.Repeat == AlarmRepeat.RealDaily ? 1 : 7;
+            var periods = (long)Math.Floor((after - alarm.At).TotalDays / days) + 1;
+            return alarm.At.AddDays(periods * days);
+        }
         var minute = Math.Clamp(alarm.EtMinute, 0, 1439);
         var seconds = after.ToUnixTimeMilliseconds() / 1000.0;
         var occurrence = Math.Floor(seconds / EtDaySeconds) * EtDaySeconds + minute * EtMinuteSeconds;
@@ -112,6 +132,22 @@ public static class AlarmSchedule
         if (alarm.PreviousWeathers.Count > 0 && (weatherAt?.Invoke(occurrence.AddSeconds(-1400)) is not { } previous || !alarm.PreviousWeathers.Contains(previous)))
             return (AlarmCheck.SkipWeather, occurrence);
         return (AlarmCheck.Fire, occurrence);
+    }
+
+    /// <summary>0.557 (T19): the same alarm once more in a few minutes; the original is left alone.</summary>
+    public static TenshoAlarm Snooze(TenshoAlarm alarm, DateTimeOffset now, int minutes)
+    {
+        ArgumentNullException.ThrowIfNull(alarm);
+        return new TenshoAlarm { Label = alarm.Label, Group = alarm.Group, IconId = alarm.IconId, JobId = alarm.JobId, ItemId = alarm.ItemId, TerritoryId = alarm.TerritoryId,
+            Source = alarm.Source, Discord = alarm.Discord, DiscordMessage = alarm.DiscordMessage, Repeat = AlarmRepeat.Once, At = now.AddMinutes(Math.Clamp(minutes, 1, 1440)), LeadMinutes = 0 };
+    }
+
+    /// <summary>0.556 (T20): the occurrence to ring again at its exact time: it rang ahead, its time has come, and it has not rung twice. Without a lead the first ring was already on time.</summary>
+    public static DateTimeOffset? OnTimeDue(TenshoAlarm alarm, DateTimeOffset now)
+    {
+        ArgumentNullException.ThrowIfNull(alarm);
+        if (!alarm.Enabled || ClampLead(alarm.Repeat, alarm.LeadMinutes) == 0 || Next(alarm, now.AddSeconds(-30)) is not { } occurrence) return null;
+        return occurrence <= now && occurrence == alarm.LastRung && occurrence != alarm.LastOnTime ? occurrence : null;
     }
 
     /// <summary>Daily alarms for every ET window start of an item (gathering point or fish), without duplicates.</summary>

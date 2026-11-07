@@ -35,7 +35,7 @@ internal sealed class BeastCatalogLoader : IDisposable
             catch (OperationCanceledException) { }
             catch (Exception error) { log.Warning(error, "Beastmaster data unavailable."); service.Fail(error.Message); }
         }, token);
-        framework.Update += OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private static object? Cell(object? value) => value is ReadOnlySeString text ? text.ExtractText() : value;
@@ -71,7 +71,14 @@ internal sealed class BeastCatalogLoader : IDisposable
             id => actions.TryGetRow(id, out var action) ? (int)action.AttackType.RowId : 0,
             id => enemies.TryGetRow(id, out var enemy) ? enemy.Singular.ExtractText() : "",
             id => actions.TryGetRow(id, out var action) ? action.Name.ExtractText() : "",
-            id => contents.TryGetRow(id, out var content) ? (content.Name.ExtractText(), (int)content.ClassJobLevelRequired, (int)content.ItemLevelRequired) : ("", 0, 0));
+            id => contents.TryGetRow(id, out var content) ? (content.Name.ExtractText(), (int)content.ClassJobLevelRequired, (int)content.ItemLevelRequired) : ("", 0, 0),
+            // 0.688: 1 a zone (PlaceName), 2 a duty (ContentFinderCondition); 0 is the beast the job starts with.
+            catchPlace: (kind, id) => kind switch
+            {
+                1 => data.GetExcelSheet<PlaceName>().GetRowOrDefault(id)?.Name.ExtractText() ?? "",
+                2 => data.GetExcelSheet<ContentFinderCondition>().GetRowOrDefault(id)?.Name.ExtractText() ?? "",
+                _ => "",
+            });
     }
 
     private unsafe void OnUpdate(IFramework _)
@@ -97,5 +104,5 @@ internal sealed class BeastCatalogLoader : IDisposable
         }
     }
 
-    public void Dispose() { framework.Update -= OnUpdate; cancellation.Cancel(); cancellation.Dispose(); }
+    public void Dispose() { TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate); cancellation.Cancel(); cancellation.Dispose(); }
 }

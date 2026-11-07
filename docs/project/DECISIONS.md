@@ -364,3 +364,43 @@ Decision: Plan pour le seul nœud en cours. Tous les effets du lieu lus dans les
 Reason: Décision de l'utilisateur.
 Consequences: Les réglages de bonus et de secondes entre nœuds disparaissent ; celui de la liste ne commande plus que sa ligne. « PR par tic » reste pour la barre de PR.
 References: docs/evidence/0.515-node-effects.md
+
+DEC-ID: DEC-037
+Timestamp: 2026-11-05 Europe/Brussels
+Problem: Revue de toutes les propositions avec l'utilisateur : 100 points gardés pour avant la 1.0.0, 12 rejetés ([GLOBAL-PLAN](GLOBAL-PLAN.md)).
+Evidence: Réponses de l'utilisateur à la revue ; question « Où places-tu la 1.0.0 dans le plan ? », réponse « Après tout le plan ».
+Options: Après la phase 2 (recommandé par l'agent : publication plus tôt, moins de code à examiner) ; après tout le plan.
+Decision: La 1.0.0 et la soumission viennent après tout le plan global, campagne de tests en jeu comprise.
+Reason: Décision de l'utilisateur : « Si c'est refuser pour la taille je pourrais rien y faire mais je veux faire un plugin complet ».
+Consequences: La publication arrive plus tard et la soumission est plus grosse à examiner ; l'équipe Dalamud peut la refuser si elle la juge trop lourde (PUBLISHING, point 6). Tout ce qui demande de jouer vient en dernier, un point à la fois.
+References: docs/project/GLOBAL-PLAN.md
+
+DEC-ID: DEC-038
+Timestamp: 2026-11-05 Europe/Brussels
+Problem: Tensho tourne partout en JcJ et en contenu classé ; seuls les conseils de Triple Triade y sont coupés (DEC-033).
+Evidence: Demande de l'utilisateur : « prevoir que en pvp le plugin se deactive et reactive apres pvp pas de reglages fais obligatoirement pareil pour match classer triad ou dresseur ou autre tous ce qui pourrais etre detecter par SE ou cree un impact sur des classements fais un plan pas de code pour ca pour le moment ». Règle Dalamud : pas d'avantage en environnement compétitif ou JcJ.
+Options: Une coupure par outil, ou une coupure de tout le plugin.
+Decision: Tout le plugin se coupe et repart seul en JcJ et en contenu classé, obligatoirement, sans réglage. Plan seulement pour le moment. Choix D1 à D5 de la liste à cocher du 2026-11-05 : voir le plan. Panneau du Dédale de DEC-032 abandonné.
+Reason: Décision de l'utilisateur.
+Consequences: docs/project/COMPETITIVE-OFF-PLAN.md, docs/evidence/0.600-competitive-inventory.md. Codé en 0.610 sur le feu vert de l'utilisateur.
+References: DEC-032, DEC-033, CONTRIBUTING.md, docs/project/PUBLISHING.md
+
+DEC-ID: DEC-039
+Timestamp: 2026-11-05 Europe/Brussels
+Problem: Le 2026-11-05, sur le Discord de Dalamud, plusieurs membres de l'équipe jugent Tensho trop gros pour être relu et en grande partie déjà couvert par d'autres plugins.
+Evidence: Échange noté dans docs/project/PUBLISHING.md. Décision de l'utilisateur : « on continue tampis pour dalamud mais on tiens toujours a leurs consigne et regles ».
+Options: Découper en petits plugins ; se passer de Dalamud ; continuer sur le dépôt personnalisé.
+Decision: Pas de soumission au dépôt officiel. Tensho continue sur le dépôt personnalisé, et le plan continue. Les règles et consignes de Dalamud restent appliquées comme si le plugin était soumis. Remplace la partie soumission de DEC-023 et DEC-037.
+Reason: Décision de l'utilisateur.
+Consequences: La 1.0.0 marque la fin du plan global sur le dépôt personnalisé, sans PR D17 ; c'est toujours l'utilisateur qui la décide. docs/project/PUBLISHING.md reste la liste des règles à tenir, les étapes de soumission ne sont plus à faire. Un petit plugin séparé reste possible un jour, sur sa demande. Découper Tensho en plusieurs plugins : étudié en brouillon le 2026-11-06 et abandonné par l'utilisateur (« on va pas le faire »), branche retirée.
+References: DEC-023, DEC-037, docs/project/PUBLISHING.md
+
+DEC-ID: DEC-040
+Timestamp: 2026-11-07 Europe/Brussels
+Problem: Le passage des pages de l'auto-contrôle (0.724, corrigé en 0.726) ouvre chaque page sans clic ; certaines demandent alors une source communautaire activée dans les réglages (44 requêtes au premier passage, 2 au suivant grâce au cache).
+Evidence: docs/evidence/0.724-page-sweep.md. Choix de l'utilisateur : « Oui, en automatique et que pour dev ».
+Options: Automatique en mode développeur ; seulement sur demande ; automatique sans aucune requête.
+Decision: Automatique, en mode développeur seulement, avec les requêtes que les pages font à leur ouverture, dans les réglages de l'utilisateur. La page Marché reste exclue (Universalis). Hors mode développeur, rien ne se lance.
+Reason: Décision de l'utilisateur.
+Consequences: Le résumé du passage donne le nombre de requêtes et leurs hôtes. Un test vérifie que la fenêtre ne s'ouvre qu'en mode développeur. 0.748 (X-01, lourdeur signalée par l'utilisateur) : au plus un passage toutes les deux heures, quels que soient les rechargements.
+References: DEC-038, docs/evidence/0.724-page-sweep.md

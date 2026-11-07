@@ -11,7 +11,7 @@ string[] names=args.Length>2 ? args[2..]:["XBMPet","XBMPetParamGrow","XBMBattleD
 string Cell(object? value)=>value switch
 {
     null=>"",
-    ReadOnlySeString text=>text.ExtractText().Replace("\n"," ").Replace("|","/"),
+    ReadOnlySeString text=>(Environment.GetEnvironmentVariable("PROBE_MACRO")=="1" ? text.ToMacroString():text.ExtractText()).Replace("\n"," ").Replace("|","/"),
     _=>value.ToString() ?? "",
 };
 foreach(var name in names)

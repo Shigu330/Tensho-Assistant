@@ -1,3 +1,5 @@
+using Dalamud.Interface;
+using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Inventory;
 
@@ -14,12 +16,24 @@ internal sealed partial class MainWindow
     private (GilJournalState State,int Period)? gilViewKey;
     private IReadOnlyList<(GilCategory Category,long Gained,long Spent)>[] gilTotals=[];
 
+    private static Dalamud.Interface.FontAwesomeIcon GilCategoryIcon(GilCategory category)=>category switch
+    {
+        GilCategory.NpcShop=>Dalamud.Interface.FontAwesomeIcon.Store,
+        GilCategory.Market=>Dalamud.Interface.FontAwesomeIcon.BalanceScale,
+        GilCategory.Repair=>Dalamud.Interface.FontAwesomeIcon.Wrench,
+        GilCategory.Teleport=>Dalamud.Interface.FontAwesomeIcon.LocationArrow,
+        GilCategory.Retainer=>Dalamud.Interface.FontAwesomeIcon.UserTie,
+        GilCategory.Company=>Dalamud.Interface.FontAwesomeIcon.Users,
+        _=>Dalamud.Interface.FontAwesomeIcon.QuestionCircle,
+    };
     private void DrawGilJournal()
     {
         ImGui.TextWrapped(localization.Get("GilJournal.Help"));
         if(GilJournalState?.Invoke() is not { } state){ImGui.TextDisabled(localization.Get("CharacterUi.Offline"));return;}
         if(state.Unavailable)ImGui.TextColored(Accent,localization.Get("GilJournal.Unreadable"));
         string Amount(long? value)=>value is { } known ? known.ToString("N0"):localization.Get("Currencies.Unknown");
+        // 0.768 (X-18, user request): the game's gil icon by the balances.
+        DrawItemIcon(itemCatalog.State.Catalog?.Find(1),new Vector2(ImGui.GetTextLineHeight()+2),false);ImGui.SameLine();
         ImGui.TextUnformatted(localization.Format("GilJournal.Balances",Amount(state.Gil),Amount(state.RetainersGil),Amount(state.CompanyGil)));
         Tip("GilJournal.BalancesTip");
         ImGui.SetNextItemWidth(160);
@@ -41,7 +55,8 @@ internal sealed partial class MainWindow
         {
             var totals=gilTotals[(int)source];
             if(totals.Count==0)continue;
-            ImGui.TextColored(Accent,localization.Format("GilJournal.Source"+source,totals.Sum(total=>total.Gained-total.Spent).ToString("+#,0;-#,0;0")));
+            // 0.769 (X-19): transfers with the retainers or the company chest stay out of the net.
+            ImGui.TextColored(Accent,localization.Format("GilJournal.Source"+source,totals.Where(total=>!GilJournal.IsTransfer(total.Category)).Sum(total=>total.Gained-total.Spent).ToString("+#,0;-#,0;0")));
             if(!ImGui.BeginTable("GilTotals"+source,4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))continue;
             try
             {
@@ -50,10 +65,23 @@ internal sealed partial class MainWindow
                 foreach(var (category,gained,spent) in totals)
                 {
                     ImGui.TableNextRow();
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("GilJournal.Category"+category));
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(Part(gained));
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(Part(spent));
-                    ImGui.TableNextColumn();ImGui.TextUnformatted((gained-spent).ToString("+#,0;-#,0;0"));
+                    ImGui.TableNextColumn();
+                    // 0.768 (X-18): an icon per category, the gains in green, the spendings and a loss in red.
+                    ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
+                    try{ImGui.TextColored(Muted,GilCategoryIcon(category).ToIconString());}
+                    finally{ImGui.PopFont();}
+                    ImGui.SameLine();ImGui.TextUnformatted(localization.Get("GilJournal.Category"+category));
+                    if(GilJournal.IsTransfer(category))
+                    {
+                        ImGui.TableNextColumn();ImGui.TextDisabled(Part(gained));
+                        ImGui.TableNextColumn();ImGui.TextDisabled(Part(spent));
+                        ImGui.TableNextColumn();ImGui.TextDisabled(localization.Get("GilJournal.Transfer"));
+                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GilJournal.TransferTip"));
+                        continue;
+                    }
+                    ImGui.TableNextColumn();if(gained>0)ImGui.TextColored(Success,Part(gained));else ImGui.TextDisabled(Part(gained));
+                    ImGui.TableNextColumn();if(spent>0)ImGui.TextColored(UI.FfxivTheme.Warning,Part(spent));else ImGui.TextDisabled(Part(spent));
+                    ImGui.TableNextColumn();ImGui.TextColored(gained>=spent ? Success:UI.FfxivTheme.Warning,(gained-spent).ToString("+#,0;-#,0;0"));
                 }
             }
             finally{ImGui.EndTable();}

@@ -15,7 +15,7 @@ internal sealed class GpCatalogLoader : IDisposable
     private int position;
     private bool stopped;
     public GpCatalogLoader(GpCatalogService service,IDataManager data,IFramework framework,IPluginLog log)
-    { this.service=service; this.data=data; this.framework=framework; this.log=log; framework.Update+=Update; }
+    { this.service=service; this.data=data; this.framework=framework; this.log=log; TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update); }
     private void Update(IFramework unused)
     {
         lock(gate)
@@ -40,6 +40,6 @@ internal sealed class GpCatalogLoader : IDisposable
             catch(Exception error) { service.Fail(error); log.Warning(error,"Gathering GP model catalog unavailable."); Stop(); }
         }
     }
-    private void Stop() { stopped=true; framework.Update-=Update; copied.Clear(); }
+    private void Stop() { stopped=true; TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update); copied.Clear(); }
     public void Dispose() { lock(gate) { if(!stopped) Stop(); service.Clear(); } }
 }

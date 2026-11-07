@@ -29,6 +29,46 @@ internal sealed partial class MainWindow
     private string? notebookExportMessage;
     private GatheringSource[] sourceTypes = [];
 
+    // 0.588 (C7): recomputed once per Eorzea minute, and only while this section is open.
+    // 0.732: worked out off the frame: the page sweep measured 41 ms for one frame of this page, every Eorzea minute (docs/evidence/0.724-page-sweep.md).
+    private long gatheringNowKey=-1;private IReadOnlyList<(GatheringSource Source,GatheringOpening Opening)> gatheringNowRows=[];
+    private Task<IReadOnlyList<(GatheringSource Source,GatheringOpening Opening)>>? gatheringNowTask;
+    private void DrawGatheringNow(GatheringCatalog sources)
+    {
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("GatheringBrowser.NowTitle")+"###GatheringNow"))return;
+        var now=DateTimeOffset.UtcNow;var key=now.ToUnixTimeSeconds()*12/35;
+        if(gatheringNowTask is { IsCompleted:true } done){gatheringNowTask=null;if(done.IsCompletedSuccessfully)gatheringNowRows=done.Result;}
+        if(key!=gatheringNowKey && gatheringNowTask is null)
+        {
+            gatheringNowKey=key;
+            var all=sources.Sources;
+            gatheringNowTask=Task.Run(()=>GatheringNow.Rows(all,now,TimeSpan.FromHours(1),60));
+        }
+        if(gatheringNowRows.Count==0){ImGui.TextDisabled(localization.Get("GatheringBrowser.NowEmpty"));return;}
+        if(!ImGui.BeginTable("GatheringNowRows",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp))return;
+        try
+        {
+            foreach(var (source,opening) in gatheringNowRows)
+            {
+                ImGui.TableNextRow();ImGui.TableNextColumn();
+                ImGui.PushID($"{source.ItemId}/{source.PointId}");
+                try
+                {
+                    var item=itemCatalog.State.Catalog?.Find(source.ItemId);
+                    DrawItemIcon(item,new Vector2(22));ImGui.SameLine();
+                    if(ImGui.Selectable(item?.Name ?? source.ItemId.ToString()))OpenGathering(source.ItemId);
+                    ImGui.TableNextColumn();ImGui.TextDisabled($"{source.Zone} · {localization.Format("GatheringPanel.Level",source.Level)}");
+                    ImGui.TableNextColumn();
+                    var left=(opening.Current ? opening.EndsAt:opening.StartsAt)-now;
+                    if(opening.Current)ImGui.TextColored(UI.FfxivTheme.Success,localization.Format("GatheringBrowser.NowOpen",(int)left.TotalMinutes,left.Seconds.ToString("00")));
+                    else ImGui.TextUnformatted(localization.Format("GatheringBrowser.NowSoon",(int)left.TotalMinutes,left.Seconds.ToString("00")));
+                    ImGui.TableNextColumn();DrawGatheringAlarmButton($"GatheringNowAlarm{source.ItemId}/{source.PointId}",source);
+                }
+                finally{ImGui.PopID();}
+            }
+        }
+        finally{ImGui.EndTable();}
+    }
     private void DrawGatheringBrowser()
     {
         Heading(localization.Get("GatheringBrowser.Title"),localization.Get("GatheringBrowser.Description"));
@@ -67,6 +107,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         if (ImGui.SmallButton(localization.Get("GatheringBrowser.Reset")+"###SourceReset")) { sourceQuery = ""; sourceZoneQuery = ""; sourceTypeFilter = null; }
         Tip("GatheringBrowser.ResetTip");
+        DrawGatheringNow(sources);
         var notebook = DrawNotebookBar(items);
         if (!ReferenceEquals(sourceViewCatalog, sources) || !ReferenceEquals(sourceViewItems, items)
             || sourceViewQuery != sourceQuery || sourceViewZoneQuery != sourceZoneQuery || sourceViewTypeFilter != sourceTypeFilter

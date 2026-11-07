@@ -15,7 +15,7 @@ internal static class SortButton388Tests
                 && button.Contains("visualSort.Request(InventoryVisualSortPlan.Build(snapshot,result,scope),DateTimeOffset.UtcNow)",StringComparison.Ordinal),"same plan as the page");
             Check(button.Contains("inventorySortButtonMessage=ApplyBagSort(character);",StringComparison.Ordinal),"on click");
             var reader = Read("Inventory/InventoryWindowReader.Dalamud.cs");
-            Check(reader.Contains("framework.Update+=OnUpdate;",StringComparison.Ordinal) && reader.Contains("framework.Update-=OnUpdate;",StringComparison.Ordinal),"framework thread, cleaned up");
+            Check(reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);",StringComparison.Ordinal) && reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);",StringComparison.Ordinal),"framework thread, cleaned up");
         }),
     ];
 }

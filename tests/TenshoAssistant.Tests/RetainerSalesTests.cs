@@ -63,7 +63,7 @@ internal static class RetainerSalesTests
             var reader=Read("Market/RetainerSalesReader.Dalamud.cs");
             var panel=Read("MainWindow.RetainerSales.cs");
             foreach(var word in new[]{"SetRetainerMarketPrice","MoveToRetainerMarket","MoveFromRetainerMarket","OpenRetainerSell","FireCallback","ReceiveEvent","SetAtkValues","SendCommand"})Check(!reader.Contains(word) && !panel.Contains(word),"changes nothing: "+word);
-            Check(reader.Contains("agent->RetainerSellListAddonId != unit->Id") && reader.Contains("count > RetainerSales.MaximumListings") && reader.Contains("framework.Update -= OnUpdate"),"window confirmed, rows bounded, cleaned up");
+            Check(reader.Contains("agent->RetainerSellListAddonId != unit->Id") && reader.Contains("count > RetainerSales.MaximumListings") && reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate)"),"window confirmed, rows bounded, cleaned up");
             Check(panel.Split("RetainerCompare?.Request(").Length==2 && panel.Contains("if (ImGui.SmallButton(localization.Get(\"RetainerSales.Compare\")))"),"asked on the click only");
             Check(!reader.Contains("RetainerCompare") && !reader.Contains("Request("),"never by the reader");
             Check(panel.Contains("ImGui.SetClipboardText(paste.ToString())"),"the only write");

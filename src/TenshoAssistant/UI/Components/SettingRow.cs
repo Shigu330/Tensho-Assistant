@@ -106,12 +106,14 @@ internal sealed partial class MainWindow
             var fresh=new Configuration();
             // R-12 (0.319): the Discord settings go back to their defaults (sending off) but the webhook address the player typed is kept.
             var webhook=configuration.Discord?.WebhookUrl ?? "";
+            var categoryWebhooks=configuration.Discord?.CategoryUrls;
             var properties=typeof(Configuration).GetProperties(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.Instance)
                 .Where(property=>property.CanRead && property.CanWrite && property.GetIndexParameters().Length==0 && ConfigurationReset.Reset.Contains(property.Name)).ToArray();
             // 0.321: the previous values come back when saving fails (they stayed reset in memory).
             var previous=properties.Select(property=>(property,property.GetValue(configuration))).ToArray();
             foreach(var property in properties)property.SetValue(configuration,property.GetValue(fresh));
             (configuration.Discord??=new()).WebhookUrl=webhook;
+            configuration.Discord.CategoryUrls=categoryWebhooks;
             try
             {
                 save();saveError=null;

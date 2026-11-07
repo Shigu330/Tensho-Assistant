@@ -49,6 +49,7 @@ internal sealed partial class MainWindow
         if(fish.Snag)details.Add(localization.Get("FishingPanel.Snag"));
         if(details.Count>0)ImGui.TextColored(Accent,string.Join(" · ",details));
         if(fish.Predators.Count>0)ImGui.TextWrapped(localization.Format("FishingPanel.Predators",string.Join(", ",fish.Predators.Select(pair=>$"{items?.Find(pair.Fish)?.Name ?? pair.Fish.ToString()} ×{pair.Count}"))));
+        if(fish.Intuition is { } intuition)ImGui.TextDisabled(localization.Format("FishingPanel.Intuition",intuition));
         // ET window with the next openings (same countdown as the gathering points).
         if(fish.StartMinute is { } start && fish.EndMinute is { } stop)
             DrawGatheringTime(GatheringSchedule.FromEphemeral((ushort)(start/60*100+start%60),(ushort)(stop/60%24*100+stop%60)));

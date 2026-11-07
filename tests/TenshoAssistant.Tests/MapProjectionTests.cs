@@ -102,6 +102,15 @@ internal static class MapProjectionTests
             var zones=MapMenus.Zones(maps,region);
             Check(zones.Select(entry=>entry[0].Zone).SequenceEqual(new[]{"Radz-at-Han","Thavnair","Garlemald","Tour de Zott"}),"order and one entry per priority");
             Check(zones[3].Select(floor=>floor.MapId).SequenceEqual(new uint[]{701,702,703}),"floors ordered by map index");
+            Check(Math.Abs(MapProjection.Yalms(new System.Numerics.Vector2(0,0),new System.Numerics.Vector2(30,40),new MapDefinition(1,1,"","","",0,200))-25)<0.01f,"P6: pixels to yalms, by the map's scale");
+            var hall=new MapDefinition(938,1224,"","Hall","",0,400,RegionPlaceId:4501);
+            var ring=new MapDefinition(927,1225,"","Ring","",0,400,RegionPlaceId:4501);
+            var foreign=new MapDefinition(5,6,"","Other","",0,100,RegionPlaceId:7);
+            var inMenu=new MapDefinition(856,1186,"","City","",0,100,RegionPlaceId:4501,MenuCategory:21,MenuPriority:2);
+            var tural=new MapDefinition(921,0,"","Xak Tural","",0,100,RegionPlaceId:4501,MenuCategory:21,MenuPriority:1);
+            var listed=MapMenus.WithExtras([[inMenu]],tural,hall,ring,hall,foreign,inMenu,null);
+            Check(string.Join(",",listed.Select(entry=>entry[0].MapId))=="856,938,927","after the others, once, in this region only");
+            Check(MapMenus.WithExtras([[inMenu]],null,hall).Count==1,"no region: as it was");
             Check(MapMenus.Zones(maps,null).Count==0 && MapMenus.Zones(maps,Menu(1,"x","",0,0,0)).Count==0,"no category, no menu");
         }),
         ("Map texture paths follow the game layout and refuse unexpected ids",()=>

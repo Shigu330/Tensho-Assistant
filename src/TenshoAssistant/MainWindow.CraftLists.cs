@@ -48,6 +48,10 @@ internal sealed partial class MainWindow
         lists=store.Lists;
         if(lists.Count==0){ImGui.TextDisabled(localization.Get("CraftLists.None"));return;}
         var list=lists[Math.Clamp(craftListIndex,0,lists.Count-1)];
+        // 0.692 (user report): the list on screen; the panel follows the list chosen here.
+        BoolSetting("CraftLists.Panel","CraftLists.PanelTip",()=>configuration.CraftListPanel,value=>configuration.CraftListPanel=value,c=>c.CraftListPanel);
+        if(configuration.CraftListPanel)DrawListPanelOptions();
+        if(configuration.CraftListPanelName!=list.Name){configuration.CraftListPanelName=list.Name;SaveReminders();}
         if(list.Entries.Count==0){ImGui.TextDisabled(localization.Get("CraftLists.Empty"));return;}
         var items=itemCatalog.State.Catalog;var recipes=recipeCatalog.State.Catalog;
         foreach(var entry in list.Entries)
@@ -73,8 +77,7 @@ internal sealed partial class MainWindow
         }
         // The direct ingredients of every item, against the recorded stocks.
         RefreshRecipeHoldingsCache();
-        var plans=list.Entries.Select(entry=>recipes?.ForResult(entry.ItemId) is { Count:>0 } own ? CraftPlan.Build(PreferredRecipe(own),(int)Math.Min(entry.Quantity,int.MaxValue),GetRecipeHoldings):null)
-            .OfType<CraftPlan>().ToArray();
+        var plans=CraftListPlans(list);
         ImGui.TextColored(Accent,localization.Get("CraftLists.Ingredients"));
         // 0.464 (user request, in-game campaign): a table with icons and the full item tooltip.
         if(ImGui.BeginTable("CraftListIngredients",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))
@@ -107,6 +110,13 @@ internal sealed partial class MainWindow
             if(ImGui.Button(localization.Get("PlanUi.TeamcraftCopy")+"###CraftListTeamcraft"))ImGui.SetClipboardText(teamcraft);
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("PlanUi.TeamcraftTip"));
         }
+    }
+
+    private CraftPlan[] CraftListPlans(CraftList list)
+    {
+        var recipes=recipeCatalog.State.Catalog;
+        return list.Entries.Select(entry=>recipes?.ForResult(entry.ItemId) is { Count:>0 } own ? CraftPlan.Build(PreferredRecipe(own),(int)Math.Min(entry.Quantity,int.MaxValue),GetRecipeHoldings):null)
+            .OfType<CraftPlan>().ToArray();
     }
 
     // Preparation › « Add to the list »: the recipe's item and the quantity to produce.

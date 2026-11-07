@@ -4,7 +4,7 @@ public enum StorageFilter { All, PlayerBags, Chocobo, Retainers }
 public enum StorageCategory { PlayerBags, Chocobo, Retainer, Armoury, GlamourDresser, Armoire, FreeCompany }
 
 /// <summary>Which storage a row is, for its translated name (0.322: the names were French literals shown to every player).</summary>
-public enum StorageLabel { PlayerBags, Crystals, SaddlebagMissing, Saddlebag, PremiumSaddlebag, Retainer, RetainersMissing, Armoury, GlamourDresser, Armoire, FreeCompanyChest }
+public enum StorageLabel { PlayerBags, Crystals, SaddlebagMissing, Saddlebag, PremiumSaddlebag, Retainer, RetainersMissing, Armoury, GlamourDresser, Armoire, FreeCompanyChest, Worn }
 
 /// <summary>A storage's quantities; <see cref="Name"/> is the retainer's own name (from the game) and empty for the other storages,
 /// whose shown name comes from <see cref="Label"/>.</summary>
@@ -40,6 +40,10 @@ public static class ItemHoldings
             if (includeCrystals && characterId != 0 && live is not null)
                 rows.Add(Observe(StorageCategory.PlayerBags, "", false, live,
                     [new InventoryLocation(new(characterId), new(2001))]) with { Label = StorageLabel.Crystals });
+            // 0.549 (I0): what is worn counts as owned, on its own line. A copy saved before this version has no such container: no line, not an unknown one.
+            if (characterId != 0 && live is not null && live.Containers.ContainsKey(new InventoryLocation(new(characterId), new(1000))))
+                rows.Add(Observe(StorageCategory.PlayerBags, "", false, live,
+                    [new InventoryLocation(new(characterId), new(1000))]) with { Label = StorageLabel.Worn });
         }
 
         // Armoury chest (0.235): counted with the character's own storage when it has been read.
@@ -71,8 +75,10 @@ public static class ItemHoldings
                     || entry.Key.Kind != BankStorageKind.Retainer) continue;
                 hasRetainer = true;
                 var row = ObserveBank(entry, StorageCategory.Retainer, entry.Name) with { Label = StorageLabel.Retainer };
-                // 0.329: a retainer's crystal container is never imported: for a crystal its row is a lower bound, not a known zero.
-                rows.Add(crystal && row.Coverage == InventoryCoverage.Complete ? row with { Coverage = InventoryCoverage.Partial } : row);
+                // 0.329: a retainer's crystal container was never imported: for a crystal its row is a lower bound, not a known zero.
+                // 0.767 (I10): a copy that has it counts it, and is exact.
+                var hasCrystals = entry.Snapshot.Containers.Keys.Any(location => location.Container.Value == BankStorageScope.RetainerCrystals);
+                rows.Add(crystal && !hasCrystals && row.Coverage == InventoryCoverage.Complete ? row with { Coverage = InventoryCoverage.Partial } : row);
             }
             if (!hasRetainer) rows.Add(Unknown(StorageCategory.Retainer, "") with { Label = StorageLabel.RetainersMissing });
         }
@@ -102,7 +108,9 @@ public static class ItemHoldings
             // A malformed owner cannot be queried; it conveys no observation of this storage.
             if (owner == 0) return Unknown(category, name) with { IsCached = true };
             return Observe(category, name, true, entry.Snapshot,
-                BankStorageScope.ContainerIds(entry.Key.Kind).Select(id => new InventoryLocation(new(owner), new(id))));
+                BankStorageScope.ContainerIds(entry.Key.Kind).Concat(BankStorageScope.OptionalContainerIds(entry.Key.Kind)
+                    .Where(id => entry.Snapshot.Containers.ContainsKey(new InventoryLocation(new(owner), new(id)))))
+                    .Select(id => new InventoryLocation(new(owner), new(id))));
         }
 
         StorageHolding Observe(StorageCategory category, string name, bool cached,

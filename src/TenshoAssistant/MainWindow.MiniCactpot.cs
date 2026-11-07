@@ -51,8 +51,26 @@ internal sealed partial class MainWindow
             draw.AddRectFilled(min,max,fill,6);draw.AddRect(min,max,border,6,ImDrawFlags.None,3);
         }
     }
+    // 0.571 (T29): the gains the advice is computed with, as on the game's ticket.
+    private void DrawMiniCactpotRewards()
+    {
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("CactpotUi.RewardsTitle")+"###MiniCactpotRewards"))return;
+        if(!ImGui.BeginTable("MiniCactpotRewards",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp))return;
+        try
+        {
+            foreach(var column in new[]{0,1,0,1})ImGui.TableSetupColumn(localization.Get(column==0 ? "CactpotUi.RewardsSum":"CactpotUi.RewardsGain"));
+            ImGui.TableHeadersRow();
+            for(var sum=6;sum<=24;sum++)
+            {
+                ImGui.TableNextColumn();ImGui.TextUnformatted(sum.ToString());
+                ImGui.TableNextColumn();ImGui.TextUnformatted(MiniCactpotSolver.RewardOf(sum).ToString("N0"));
+            }
+        }
+        finally{ImGui.EndTable();}
+    }
     private void DrawMiniCactpot()
     {
+        DrawMiniCactpotRewards();
         Heading(localization.Get("CactpotUi.Title"),localization.Get("CactpotUi.Description"));
         if(windowDisposed)return;
         var observation=cactpotObservation.State;var enabled=observation.Enabled;

@@ -7,7 +7,10 @@ public readonly record struct GameWindow(string Name,float X,float Y,float Width
 public static class GameWindows
 {
     // What the game keeps on screen without being a window in front of anything (log of 2026-11-05, docs/evidence/0.537-game-windows.md): HUD parts start with « _ ». 0.538 (user capture): its tooltips count, like its windows.
-    private static readonly string[] NotWindows=["_","NamePlate","CastBar","ChatLog","ScenarioTree","CursorAddon","AreaMap"];
+    // 0.679 (user report, log of 2026-11-06): MJIPadGuide is up in every mode of the Island Sanctuary with nothing to see, and made the map leave.
+    // 0.692 (user report, log of 2026-11-06: « Panel WorkshopPanel steps aside ... windows: JobHudRRP0, JobHudRRP1 »): the job gauges are HUD, always up: a panel over them could never be seen, nor moved away.
+    // MJIHud, the island's management board, is the same kind of thing.
+    private static readonly string[] NotWindows=["_","NamePlate","CastBar","ChatLog","ScenarioTree","CursorAddon","AreaMap","MJIPadGuide","MJIHud","JobHud"];
     public static bool Ignored(string name)=>NotWindows.Any(start=>name.StartsWith(start,StringComparison.Ordinal));
 
     /// <param name="anchors">The game window the interface belongs to, by the start of its name: it and its parts never cover it, and only what is in front of it counts. None: whatever touches it.</param>
@@ -29,6 +32,17 @@ public static class GameWindows
 
     public static bool Touch(float x,float y,float width,float height,float otherX,float otherY,float otherWidth,float otherHeight)=>
         x<otherX+otherWidth && otherX<x+width && y<otherY+otherHeight && otherY<y+height;
+}
+
+/// <summary>
+/// 0.618 (user report): the map enlarged is a view of the whole map: it stays, whatever window it touches. At its usual size it stays in a corner, and steps aside.
+/// Judged on its size too, so that it holds after a reload, which forgets the button's state.
+/// </summary>
+public static class MapEnlarged
+{
+    public const float Share=0.85f;
+    public static bool Is(bool enlargeButton,float width,float height,float screenWidth,float screenHeight)
+        =>enlargeButton || width>=screenWidth*Share && height>=screenHeight*Share;
 }
 
 /// <summary>0.539 (user request): an interface leaves at once and comes back only after a moment with nothing in front, so that going from one tooltip to the next does not make it blink.</summary>

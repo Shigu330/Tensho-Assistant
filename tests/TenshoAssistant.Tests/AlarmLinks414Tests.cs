@@ -10,9 +10,8 @@ internal static class AlarmLinks414Tests
         {
             var plugin=Read("Plugin.cs");
             Check(plugin.Contains("if(mainWindow.AlarmPlace(alarm) is { } place)") && plugin.Contains(".AddMapLink(place.TerritoryId,place.MapId,place.X,place.Y,0.05f)"),"map link only when known");
-            Check(plugin.Contains("chat.AddChatLinkHandler(alarm.ItemId,") && plugin.Contains("alarmLinks.Count>=256") && plugin.Contains("chat.RemoveChatLinkHandler();alarmLinks.Clear();"),
-                "one handler per item, bounded, removed on unload");
-            Check(plugin.Contains("RawPayload.LinkTerminator") && plugin.Contains("Alarms.OpenInTensho"),"link closed, text translated");
+            // 0.774 (X-03): the game's item link instead of a Dalamud link the game never handed over.
+            Check(plugin.Contains(".AddItemLink(alarm.ItemId,false,") && plugin.Contains("Alarms.RightClickTensho") && !plugin.Contains("AddChatLinkHandler("),"item link, text translated");
             Check(Read("Alarms/AlarmService.Dalamud.cs").Contains("chat(alarm,$\"{alarm.Label}|{minutes}|{occurrence.ToLocalTime():HH:mm}\")"),"the alarm goes with its line");
             var links=Read("MainWindow.AlarmLinks.cs");
             Check(links.Contains("source.TerritoryId==alarm.TerritoryId") && links.Contains("GatheringPointPixel(source)") && links.Contains("float.IsFinite(coordinate.X)"),

@@ -33,7 +33,7 @@ internal sealed class DutyFinderReader : IDisposable
     public DutyFinderReader(DutyFinderService service, IFramework framework, IGameGui gui, IPluginLog log, Func<bool> capture)
     {
         this.service = service; this.framework = framework; this.gui = gui; this.log = log; this.capture = capture;
-        framework.Update += OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     private unsafe void OnUpdate(IFramework _)
@@ -61,5 +61,5 @@ internal sealed class DutyFinderReader : IDisposable
         catch (Exception error) { service.Publish(null); nextRead = now + Stopwatch.Frequency * 5; log.Warning(error, "Duty finder selection unavailable."); }
     }
 
-    public void Dispose() { framework.Update -= OnUpdate; service.Publish(null); }
+    public void Dispose() { TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate); service.Publish(null); }
 }

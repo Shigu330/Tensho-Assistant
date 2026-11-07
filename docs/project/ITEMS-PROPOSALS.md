@@ -9,6 +9,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I0 — Compter les pièces portées dans les stocks et dans « possédé »
 
+- **État (relu le 2026-11-05)** : FAIT 0.549.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Inventory/DalamudInventoryReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : L'équipement porté compte comme possédé. La Revue de mode de la semaine ne dit plus « non possédé » pour la pièce que vous portez. Le stock au survol et la fiche objet l'incluent, sur une ligne « Porté ». Les filtres « possédé » des autres outils le comptent aussi.
 - **Comment, taille, dépendances** : Ajouter GameInventoryType.EquippedItems (1000) à la capture faite sur le thread framework, avec le même lecteur IGameInventory et la même couverture. Ajouter une StorageLabel « Porté » (catégorie PlayerBags), traduite dans Inventory/StorageNames.cs. Le tri (InventorySortScope, conteneurs 0-3) et la grille de la Banque (MainWindow.Bank.cs:184-186, conteneurs 0-3) ne sont pas touchés : un test doit le vérifier, avec un relevé de tous les consommateurs de inventory.Current (Diagnostics, tri, Banque). Taille S. Sonde : aucune pour la lecture ; vérification en jeu ensuite (porter puis retirer une pièce). Décision : compter le porté partout comme possédé (recommandé : oui, sur une ligne à part pour rester visible).
@@ -16,6 +17,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I1 — Signaler et effacer le relevé d'un servant renvoyé ou d'un ancien rangement
 
+- **État (relu le 2026-11-05)** : FAIT 0.576.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Inventory/BankService.cs`.
 - **Ce que le joueur obtient** : Un servant renvoyé ne compte plus pour toujours dans vos stocks. La page Rangements signale les servants enregistrés qui n'apparaissent plus à la sonnette, et un bouton « Effacer ce relevé » (deux clics) les retire. Vos totaux redeviennent justes : survol, fiche, « manquant » de l'artisanat, Revue de mode.
 - **Comment, taille, dépendances** : Ajouter InventoryBankService.DeleteAsync(BankKey), dans la même file bornée et avec la même écriture atomique (FileInventoryBankStore). Bouton dans « Imports » (DrawImportManager) avec la confirmation en deux clics de MainWindow.Alarms.cs. Mention « absent de la sonnette » quand KnownRetainers est connu et ne contient pas ce servant ; jamais d'effacement automatique. Taille S-M. Sonde : aucune. Décision : aucune nouvelle (partie du choix I-03, faisable avant g) ; à confirmer : effacement manuel seulement (recommandé).
@@ -31,6 +33,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I3 — Prix des marchands PNJ dans le coût de préparation et sur la page Marché
 
+- **État (relu le 2026-11-05)** : FAIT 0.575.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.PreparationCost.cs`.
 - **Ce que le joueur obtient** : Pour chaque ingrédient vendu en gils par un marchand PNJ, le coût de préparation montre le prix PNJ à côté du minimum du marché et peut retenir le moins cher. Le Résumé de la page Marché dit « Vendu par un PNJ : X gils » (nom et lieu, lien vers le marchand). Vous n'achetez plus au marché ce qui coûte moins cher chez un marchand.
 - **Comment, taille, dépendances** : Fonction pure « prix PNJ en gils » (offre NpcShopKind.Gil la moins chère, qualité de l'offre NpcShopSale.Hq) passée à PreparationCost.BuildDemands. Nouvelle colonne, état « PNJ » et choix de qualité « moins cher, PNJ compris ». Page Marché : une ligne au Résumé avec DrawVendorLink. Aucune requête réseau. Taille S-M. Sonde : aucune (feuilles déjà lues) ; un contrôle en jeu sur un objet connu. Dépendance : partie de A-06 (domaine Artisanat), faisable avant g. Décision : le PNJ entre-t-il dans le total « moins cher » (recommandé : oui, sur une ligne marquée « PNJ »).
@@ -45,6 +48,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I5 — Coût de préparation au prix du centre de données (option de A-06)
 
+- **État (relu le 2026-11-05)** : FAIT 0.574.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Market/PreparationCost.cs`.
 - **Ce que le joueur obtient** : Le coût de préparation se calcule au monde actuel ou au moins cher du centre de données, avec le monde où acheter, pour qui change de monde pour faire ses achats.
 - **Comment, taille, dépendances** : Combo « Portée : monde / centre de données » avec infobulle, mémorisé avec ↺. Chaque ligne indique le monde (MarketState.NameOf). Copie texte complétée. Aucune nouvelle requête. Taille S. Sonde : aucune. Dépendance : partie de A-06, faisable avant g. Décision : aucune nouvelle (option déjà choisie).
@@ -68,6 +72,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I8 — X-07, partie anticipée : ouvrir l'objet sur Universalis, Garland Tools, Teamcraft ou le wiki
 
+- **État (relu le 2026-11-05)** : FAIT 0.561.
 - **État (relu le 2026-11-03)** : en partie 0.349 (X-07 : wiki et Lodestone) ; Universalis, Garland Tools et Teamcraft pas dans ce menu.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.DutyFinder.cs`.
 - **Ce que le joueur obtient** : Clic droit sur un objet, dans les fenêtres Tensho et dans le menu « Tensho » du jeu : « Ouvrir sur… » ouvre la page de l'objet dans le navigateur.
@@ -76,6 +81,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I9 — Copier le nom de l'objet et lien d'objet dans le chat (local)
 
+- **État (relu le 2026-11-05)** : FAIT 0.561, avec I8.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.DutyFinder.cs`.
 - **Ce que le joueur obtient** : Clic droit sur un objet : « Copier le nom », à coller dans la recherche du marché du jeu. « Lien dans le chat » : Tensho écrit dans votre seul chat un lien cliquable de l'objet, que vous partagez ensuite vous-même si vous le voulez.
 - **Comment, taille, dépendances** : ImGui.SetClipboardText(item.Name). Lien : SeStringBuilder.AddItemLink(id, hq) puis IChatGui.Print, un message local : rien n'est envoyé au serveur. Mêmes entrées dans le menu du jeu. Taille S. Sonde : aucune. Décision : ajouter ces entrées, non choisies en c) (recommandé : « Copier le nom » oui, le lien en option).
@@ -91,6 +97,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I11 — Vue en liste triable de la Banque
 
+- **État (relu le 2026-11-05)** : FAIT 0.594.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Bank.cs`.
 - **Ce que le joueur obtient** : En plus des grilles 5 × 7, une vue « Liste » : un objet par ligne, avec NQ, HQ, total et les rangements où il se trouve, triable par nom, quantité ou catégorie. Avec plusieurs servants, vous voyez enfin d'un coup d'œil où sont vos matériaux.
 - **Comment, taille, dépendances** : Bascule « Grille / Liste », mémorisée, avec infobulle et ↺. Table ImGui triable par en-tête, avec clipper, sur le modèle de MainWindow.MarketBoard.cs. Lignes recalculées seulement quand la source ou un filtre change. Recherche alignée sur la normalisation du catalogue. Taille S-M. Sonde : aucune. Décision : vue par défaut (recommandé : la grille, comme aujourd'hui).
@@ -114,6 +121,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I14 — Annuler le dernier tri
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Inventory/InventoryVisualSortBridge.Dalamud.cs`.
 - **Ce que le joueur obtient** : Après « Appliquer », un bouton « Annuler le dernier tri » remet l'ordre précédent des sacs ou du rangement ouvert, tant que rien n'a bougé depuis.
 - **Comment, taille, dépendances** : Garder l'ordre d'avant (copie managée des pages et des cases) avec l'instantané vérifié. « Annuler » construit un plan inverse soumis aux mêmes contrôles (plan.Matches, RequireOpenForSort, SortFunctionIndex). L'annulation est perdue au changement de personnage ou de rangement et au moindre mouvement d'objet. Taille S-M. Sonde : aucune ; test en jeu. Décision : un seul niveau d'annulation, pour la session (recommandé).
@@ -121,6 +129,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I15 — Partager un modèle de tri en texte (copier / coller)
 
+- **État (relu le 2026-11-05)** : FAIT 0.566.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.SortTemplates.cs`.
 - **Ce que le joueur obtient** : Un modèle de rangement se copie en texte et se colle chez un autre joueur ou sur un autre PC.
 - **Comment, taille, dépendances** : Export : JSON versionné, compressé en base64, avec un préfixe du type « Tensho-Tri-1: », mis dans le presse-papiers. Import : taille bornée (par exemple 64 Kio), lecture stricte puis InventorySortTemplates.Validate, nouvel identifiant, nom unique. Les identifiants d'objets et de catégories sont ceux du jeu, indépendants de la langue. Infobulles sur les deux boutons. Taille S. Sonde : aucune. Décision : le format (recommandé : celui-ci).
@@ -128,6 +137,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I16 — Commandes « /tensho objet » et « /tensho prix »
 
+- **État (relu le 2026-11-05)** : FAIT 0.555.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Plugin.cs`.
 - **Ce que le joueur obtient** : « /tensho objet minerai de fer » ouvre la fiche de l'objet, ou la recherche s'il y a plusieurs résultats ; « /tensho prix … » ouvre la page Marché. Les deux marchent aussi dans une macro du jeu.
 - **Comment, taille, dépendances** : Lire les arguments (mots français et anglais), chercher avec ItemCatalog.Search, puis SelectItem et OpenItemSheet, ou OpenRoute(Market). Traduire l'aide de la commande (Plugin.CommandHelp). Taille S. Sonde : aucune. Décision : les mots-clés (recommandé : objet/item et prix/price ; marchand/vendor en option).
@@ -143,6 +153,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I18 — I-07, partie anticipée : copier « prix le plus bas − 1 » depuis la page Marché
 
+- **État (relu le 2026-11-05)** : FAIT 0.567.
 - **État (relu le 2026-11-03)** : en partie 0.346 (I-07 : à l’ouverture des offres dans le jeu) ; pas depuis la page Marché.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.MarketBoard.cs`.
 - **Ce que le joueur obtient** : Sur l'onglet Annonces de Tensho, un bouton copie le prix le plus bas moins 1 (NQ ou HQ). Vos propres servants sont marqués, pour ne pas vous sous-coter.
@@ -151,6 +162,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I19 — Nom anglais de l'objet dans la fiche et l'infobulle
 
+- **État (relu le 2026-11-05)** : FAIT 0.562.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.ItemSheet.cs`.
 - **Ce que le joueur obtient** : En option, le nom anglais de l'objet s'affiche sous son nom, utile avec les guides et les wikis en anglais.
 - **Comment, taille, dépendances** : Case « Nom anglais », désactivée par défaut, avec infobulle et ↺. Affiché seulement si le client n'est pas en anglais et si le nom diffère. Taille S. Sonde : aucune. Décision : l'ajouter (nouveau).
@@ -158,6 +170,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I20 — Aperçu du tri : cases déplacées signalées
 
+- **État (relu le 2026-11-05)** : FAIT 0.565.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.SortPreview.cs`.
 - **Ce que le joueur obtient** : L'aperçu encadre les cases qui changent et dit combien d'objets bougent. « Appliquer » est grisé quand le tri ne changerait rien.
 - **Comment, taille, dépendances** : Comparer la case d'origine (DisplayIndex) à la case cible dans la projection en cache. Ajouter un cadre de couleur et un compteur ; le calcul suit la projection et ne se refait pas à chaque image. Taille S. Sonde : aucune. Décision : aucune.
@@ -165,6 +178,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## I21 — Filtre de job et de set d'équipement dans les règles de tri
 
+- **État (relu le 2026-11-05)** : FAIT 0.595.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/Inventory/InventorySortRules.cs`.
 - **Ce que le joueur obtient** : Une zone de tri peut ne prendre que l'équipement d'un job, ou les pièces de vos sets d'équipement.
 - **Comment, taille, dépendances** : Copier ClassJobCategory (liste de jobs) dans le catalogue, puis ajouter un filtre de job à la zone. Pour les sets : sonde de RaptureGearsetModule d'abord. Taille M. Décision : l'ajouter, nouveau (recommandé : avec ou après I-14).

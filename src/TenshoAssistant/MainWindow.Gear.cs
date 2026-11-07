@@ -31,6 +31,30 @@ internal sealed partial class MainWindow
     // Stats in the order of the game's Character window (BaseParam rows); weapon damage first.
     private static readonly int[] GearStatOrder=[12,13,1,2,3,4,5,27,22,44,45,46,19,6,21,24,70,71,11,72,73,10];
 
+    private uint gearJob;
+    private CharacterStatsState DrawGearJobPicker(CharacterStatsState real)
+    {
+        GearsetSource?.Want();
+        var levels=GearsetSource?.State?.JobLevels;
+        var shown=gearJob!=0 && gearJob!=real.JobId && levels?.TryGetValue(gearJob,out var known)==true
+            ? real with {JobId=gearJob,Job=JobName(gearJob),Level=known,Values=new Dictionary<string,int>(),Category=0,Role=0,Modifiers=default}:real;
+        // 0.585 (user report): the label first, then the list.
+        ImGui.AlignTextToFramePadding();ImGui.TextUnformatted(localization.Get("Gear.PlanFor"));ImGui.SameLine();
+        ImGui.SetNextItemWidth(180);
+        if(ImGui.BeginCombo("###GearJob",JobName(shown.JobId)))
+        {
+            try
+            {
+                if(ImGui.Selectable(localization.Format("Gear.WornJob",JobName(real.JobId)),shown.JobId==real.JobId))gearJob=0;
+                foreach(var job in (levels?.Keys ?? []).Where(job=>job!=real.JobId).OrderBy(JobName,StringComparer.CurrentCultureIgnoreCase))
+                    if(ImGui.Selectable(JobName(job)+$" · {levels![job]}###GearJob{job}",job==shown.JobId))gearJob=job;
+            }
+            finally{ImGui.EndCombo();}
+        }
+        Tip("Gear.PlanForTip");
+        if(shown.JobId!=real.JobId)ImGui.TextColored(Accent,localization.Get("Gear.OtherJobNote"));
+        return shown;
+    }
     private void DrawGearPlanner()
     {
         Heading(localization.Get("Gear.Title"),localization.Get("Gear.Description"));
@@ -39,9 +63,16 @@ internal sealed partial class MainWindow
         if(state.CharacterId==0){ImGui.TextWrapped(localization.Get("CharacterUi.Offline"));return;}
         if(catalog is null){ImGui.TextDisabled(GearNotReady);return;}
         if(EquippedGearUnavailable?.Invoke()==true){ImGui.TextWrapped(localization.Get("Gear.WornUnavailable"));return;}
-        var worn=(EquippedGear?.Invoke() ?? []).Where(piece=>catalog.Find(piece.ItemId) is not null).ToDictionary(piece=>piece.Slot);
+        // 0.580 (T14): the plan of another job than the one worn: its pieces and materia; what is worn and read belongs to the worn job only.
+        state=DrawGearJobPicker(state);
+        var otherJob=state.JobId!=characterStats.State.JobId;
+        var worn=(EquippedGear?.Invoke() ?? []).Where(piece=>!otherJob && catalog.Find(piece.ItemId) is not null).ToDictionary(piece=>piece.Slot);
+        // 0.579 (user request): on the page itself, not only behind the filters button: the same setting.
+        BoolSetting("Gear.AllJobs","Gear.AllJobsTip",()=>configuration.GearAllJobs,value=>configuration.GearAllJobs=value,c=>c.GearAllJobs);
         DrawGearWear(catalog);
         DrawGameGearsets(catalog);
+        DrawJobProgress();
+        DrawGearPlanPicker(state.JobId);
         var plans=configuration.GearPlans??=[];
         var plan=plans.GetValueOrDefault(state.JobId) ?? [];
         var assumeHq=configuration.GearAssumeHq;

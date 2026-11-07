@@ -103,6 +103,20 @@ public static class CreditCatalog
         new("Discord", CreditKind.Online, "Discord", "Discord Inc.", "proprietary", "https://discord.com/developers/docs/resources/webhook", "",
             ["Alarms/DiscordNotifier.cs", "Alarms/DiscordWebhook.cs", "MainWindow.Discord.cs", "MainWindow.Alarms.cs", "Plugin.cs"], ["discord.com", "discordapp.com", "ptb.discord.com", "canary.discord.com"], "Discord.Enabled", false),
         // 0.456: the planting rules of crossbreeding (facts, in our own words): docs/evidence/0.456-garden-grid.md.
+        // 0.671 (N-10): how a craft's value moves on the island, in Tensho's own code; the game's sheets give the ratios.
+        new("WorkshopOptimizer", CreditKind.Rule, "Workshop Optimizer Plugin", "belzaru17", "MIT", "https://github.com/belzaru17/WorkshopOptimizerPlugin", "https://github.com/belzaru17/WorkshopOptimizerPlugin/blob/main/LICENSE",
+            ["Island/IslandCatalog.cs", "Island/IslandPlanner.cs", "MainWindow.IslandSanctuary.cs"], [], "", false),
+        // 0.670 (N-12): the spawn conditions of the S ranks, crossed and in Tensho's own words.
+        new("EliteMarks", CreditKind.Rule, "Elite Marks (FFXIV Console Games Wiki)", "", "GFDL-1.2-or-later", "https://ffxiv.consolegameswiki.com/wiki/Elite_Marks", "https://ffxiv.consolegameswiki.com/wiki/FFXIV_Wiki:About",
+            ["Hunting/SRankConditions.cs", "MainWindow.SRankConditions.cs"], [], "", false),
+        new("IslandPastureWiki", CreditKind.Rule, "Island Pasture (FFXIV Console Games Wiki)", "", "GFDL-1.2-or-later", "https://ffxiv.consolegameswiki.com/wiki/Island_Pasture", "https://ffxiv.consolegameswiki.com/wiki/FFXIV_Console_Games_Wiki:Copyrights",
+            ["Island/IslandAnimals.cs", "MainWindow.IslandPasture.cs"], [], "", false),
+        new("IslandWorkshopWiki", CreditKind.Rule, "Island Workshop (FFXIV Console Games Wiki)", "", "GFDL-1.2-or-later", "https://ffxiv.consolegameswiki.com/wiki/Island_Workshop", "https://ffxiv.consolegameswiki.com/wiki/FFXIV_Wiki:About",
+            ["Island/IslandMaterials.cs", "Island/IslandCatalog.cs"], [], "", false),
+        new("SRankGuide", CreditKind.Rule, "Final Fantasy XIV: The Hunt (S rank guide)", "", "none", "https://srankguide.carrd.co", "",
+            ["Hunting/SRankConditions.cs"], [], "", false),
+        new("SRankAssistant", CreditKind.Reference, "S Rank Assistant", "TheRedheadedWitch", "none", "https://github.com/TheRedheadedWitch/SRankAssistant", "",
+            ["Hunting/SRankConditions.cs"], [], "", false),
         new("GardeningGuide", CreditKind.Rule, "Gardening Guide (FFXIV Console Games Wiki)", "", "GFDL-1.2-or-later", "https://ffxiv.consolegameswiki.com/wiki/Gardening_Guide", "https://ffxiv.consolegameswiki.com/wiki/FFXIV_Wiki:About",
             ["Reminders/GardenCrosses.cs", "MainWindow.GardenCrosses.cs"], [], "", false),
         new("GatherBuddyReborn", CreditKind.Rule, "GatherBuddyReborn", "FFXIV-CombatReborn", "Apache-2.0", "https://github.com/FFXIV-CombatReborn/GatherBuddyReborn", "https://raw.githubusercontent.com/FFXIV-CombatReborn/GatherBuddyReborn/main/LICENSE",

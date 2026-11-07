@@ -9,7 +9,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C0 — K1 — A-01, partie anticipée : choisir la qualité visée dans le panneau du carnet
 
-- **État (relu le 2026-11-03)** : en partie 0.419 (A-01 : seuils des collectionnables comme cibles de qualité de la recherche) ; choix libre de la qualité dans le panneau du carnet non fait.
+- **État (relu le 2026-11-05)** : déjà présent : `DrawCraftLogTarget` et `CraftLogTargets`, cible par recette dans le panneau du carnet, repérés à la revue du code.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.CraftLog.cs`.
 - **Ce que le joueur obtient** : Dans le panneau à côté du carnet de synthèse, vous choisissez la cible : qualité maximale (comme aujourd'hui), une valeur tapée ou un pourcentage du maximum. Pour un objet livré en NQ, un collectionnable à palier bas ou une montée de niveau, la macro proposée devient plus courte et coûte moins de PS. Les paliers exacts des collectionnables viendront ensuite avec A-01, après la sonde.
 - **Comment, taille, dépendances** : Réglage « Cible du carnet » (maximum / valeur / %), avec infobulle et ↺ ; il entre dans CraftLogInput.Options, donc dans la clé du cache (CraftLogSession.CacheKey). Afficher « cible : N / max » au-dessus des macros. Taille S. Dépendances : aucune ; les paliers des collectionnables (CollectablesShopRefine…) restent pour A-01. Sonde : aucune pour cette partie. Décision : valeur par défaut (recommandé : maximum, comme aujourd'hui).
@@ -25,6 +25,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C2 — K3 — Essayer ses séquences sauvegardées sur toutes les recettes
 
+- **État (relu le 2026-11-05)** : FAIT 0.552.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Craft/CraftLogSession.cs`.
 - **Ce que le joueur obtient** : Le panneau du carnet essaie aussi vos séquences enregistrées pour d'autres recettes (la même macro sert souvent à toute une série de recettes de même difficulté, quel que soit le métier) et affiche la meilleure qui termine et atteint la cible, avec son nom et la recette d'origine. Une bibliothèque de quelques macros génériques suffit alors.
 - **Comment, taille, dépendances** : Dans CraftLogSession.Build (déjà sur un worker annulable), simuler toutes les séquences valides, garder les meilleures par CraftSolver.BetterCompletion, étiqueter « Séquence X (enregistrée pour Y) ». Réglage « Essayer les séquences des autres recettes » (activé, infobulle, ↺). Même chose dans le simulateur (« Essayer mes séquences »). Taille S. Sonde : aucune. Décision : activé par défaut (recommandé : oui).
@@ -32,6 +33,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C3 — K4 — Simuler un autre métier sans le porter : derniers attributs relevés par métier et attributs prévus de la page Équipement
 
+- **État (relu le 2026-11-05)** : FAIT 0.554.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.CraftSimulation.cs`.
 - **Ce que le joueur obtient** : Le carnet du jeu laisse parcourir les recettes de tous les métiers. Le panneau calcule alors avec les derniers attributs relevés du métier de la recette (marqués « relevés le … »), au lieu de dire « Équipez le métier ». Le simulateur propose les mêmes valeurs, et un bouton « Simuler avec ces attributs » sur la page Équipement envoie l'Habileté, le Contrôle et les PS prévus (pièces et matérias choisies) au simulateur.
 - **Comment, taille, dépendances** : Garder par personnage et par métier le dernier relevé (Habileté, Contrôle, PS, niveau, date) dans la configuration (données de l'utilisateur, comme les séquences). Résolution : métier porté d'abord, sinon relevé marqué, recalcul dès que le métier est porté. Bouton sur la page Équipement quand le métier affiché est un artisan. Taille S. Sonde : aucune. Décision : utiliser les relevés dans le panneau du carnet (recommandé : oui, toujours marqué, nourriture éventuelle comprise dans le relevé).
@@ -39,6 +41,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C4 — K5 — Seuils d'attributs d'une séquence : Habileté, Contrôle et PS minimum
 
+- **État (relu le 2026-11-05)** : FAIT 0.553.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.CraftSimulation.cs`.
 - **Ce que le joueur obtient** : Sous une simulation terminée : « Cette séquence tient avec au moins 3 950 Habileté, 3 820 Contrôle et 590 PS (marge : +120, +45, +12) ». Vous savez tout de suite si un plat, une matéria ou une pièce moins chère suffit, ou ce qui manque pour atteindre la cible.
 - **Comment, taille, dépendances** : Fonction pure CraftStatThresholds : dichotomie sur l'Habileté (la séquence termine), sur le Contrôle (qualité ≥ cible), PS = somme des coûts ; bornes de la recette (RequiredCraftsmanship, RequiredControl). Calcul sur une tâche annulable au changement de résultat, jamais dans Draw. Taille S. Dépendances : CraftSimulation.Run. Sonde : aucune (aucune donnée nouvelle). Décision : aucune.
@@ -46,6 +49,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C5 — K6 — Suivre sa séquence pendant la synthèse : action suivante et écart avec le plan
 
+- **État (relu le 2026-11-05)** : FAIT 0.589.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.CraftLive.cs`.
 - **Ce que le joueur obtient** : Un petit panneau à côté de la fenêtre de synthèse du jeu suit la séquence choisie (celle du panneau du carnet ou du simulateur) : « Étape 7/22 : Innovation », progression et qualité attendues contre celles du jeu, et un avertissement quand une condition Bonne, Excellente ou Médiocre a fait diverger la synthèse. Utile pour qui fabrique à la main sans macro. Affichage seulement, rien n'est exécuté.
 - **Comment, taille, dépendances** : Réutiliser CraftLiveReader (observation opt-in déjà gardée) : comparer native.Step et les ressources à l'étape correspondante de la simulation, afficher l'action suivante et l'écart. Panneau accroché à la fenêtre Synthesis comme celui du carnet, réglage avec infobulle et ↺. Taille M. Dépendances : observation « Craft » ; A-04 remplacera plus tard l'action suivante par un nouveau calcul. Sonde : aucune ; relevé en jeu ensuite. Décision : quelle séquence suivre (recommandé : celle du panneau du carnet pour cette recette, sinon celle du simulateur).
@@ -60,6 +64,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C7 — G1 — R-13, partie anticipée : points à horaire ouverts maintenant ou bientôt
 
+- **État (relu le 2026-11-05)** : FAIT 0.588.
 - **État (relu le 2026-11-03)** : en partie 0.415 (R-13 : fenêtre de suivi des objets des alarmes) ; liste « ouverts maintenant ou bientôt » non faite.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.GatheringBrowser.cs`.
 - **Ce que le joueur obtient** : Sur la page Récolte, un onglet « Maintenant » liste tous les points à horaire ET (mineur, botaniste) ouverts, puis ceux qui ouvrent dans l'heure réelle, triés par prochaine fenêtre, avec compte à rebours, zone, niveau et bouton d'alarme. Filtres : métier, niveau, objets cachés. Vous savez où aller sans chercher objet par objet.
@@ -68,6 +73,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C8 — G2 — Plan PA du panneau de récolte : quantité observée et effets déjà actifs
 
+- **État (relu le 2026-11-05)** : FAIT 0.515–0.517 (plan par nœud et effets du lieu ; tri du 2026-11-05, [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md)).
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.GatheringPanel.cs`.
 - **Ce que le joueur obtient** : Le plan PA du panneau en jeu tient compte de ce qui est déjà acheté sur le point (Rendement accru, Don de la terre, Bonne augure…) et de la quantité affichée : il ne propose plus une action déjà active et ne compte plus son effet deux fois. Le gain attendu affiché devient fiable.
 - **Comment, taille, dépendances** : Sonde d'abord : identifiants des statuts posés par chaque action (Lumina Status, avec tools/GatheringActionsProbe), puis lecture des statuts du joueur dans GatheringObservationReader (framework, gardée R-14). Remplir GpActiveEffects et le rendement de base (quantité affichée moins l'effet actif) ; « effets actifs inconnus » si la lecture échoue. Taille S-M. Dépendances : R-09 (Raisonnement solide, Eurêka) complétera le modèle. Décision : aucune.
@@ -75,6 +81,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C9 — G3 — R-02, partie anticipée : « possible maintenant ? » dans l'aide à la pêche
 
+- **État (relu le 2026-11-05)** : FAIT 0.568.
 - **État (relu le 2026-11-03)** : en partie 0.396 (R-02 : prochaines fenêtres sur la fiche du poisson) ; pas dans l’aide à la pêche.
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.FishingPanel.cs`.
 - **Ce que le joueur obtient** : Chaque poisson de l'aide à la pêche et de « Comment le pêcher » montre trois pastilles : créneau ET ouvert, météo actuelle conforme, météo précédente conforme (✓ / ✗ / ?). Vous voyez tout de suite quels poissons sont possibles là, maintenant, sans croiser vous-même avec la page Météo.
@@ -112,6 +119,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C14 — K11 — A-12, partie anticipée : fiche de recette complète (livre de maître, synthèse rapide, HQ, prérequis, écart chiffré)
 
+- **État (relu le 2026-11-05)** : FAIT 0.600.
 - **État (relu le 2026-11-03)** : en partie 0.427 (A-12 : niveau, Habileté, Contrôle face au personnage, « Équiper ») ; livre de maître, synthèse rapide et HQ non faits.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Craft/RecipeCatalogLoader.Dalamud.cs`.
 - **Ce que le joueur obtient** : La recette (onglet Craft de la fiche objet et panneau du carnet) dit : livre de recettes de maître requis (et s'il est lu), synthèse rapide possible, HQ possible, spécialiste requis, objet ou statut requis, et l'écart chiffré « Habileté 3 950 / 4 000 : −50 ». Vous savez pourquoi une recette n'est pas faisable.
@@ -120,6 +128,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C15 — K12 — Simulateur plus direct : choix de la recette dans la page, résultat recalculé tout seul, glisser-déposer
 
+- **État (relu le 2026-11-05)** : FAIT 0.572.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.CraftSimulation.cs`.
 - **Ce que le joueur obtient** : Le simulateur a sa propre recherche de recette (nom, métier, niveau) ; le résultat se met à jour à chaque action ajoutée, déplacée ou retirée, sans clic sur « Simuler » ; les actions se déplacent par glisser-déposer ; deux barres montrent progression et qualité.
 - **Comment, taille, dépendances** : Recherche réutilisant le catalogue d'objets et RecipeCatalog.ForResult (index calculé une fois). Simulation relancée une fois par changement (clé de la séquence et des attributs), au plus 100 actions, jamais à chaque image. Glisser-déposer ImGui. Réglage « Simuler automatiquement » (activé, infobulle, ↺). Taille S. Sonde : aucune. Décision : recalcul automatique par défaut (recommandé : oui).
@@ -127,6 +136,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C16 — K13 — Bibliothèque des séquences : recherche, renommer, dupliquer, copier et coller en texte (A-08, partie texte)
 
+- **État (relu le 2026-11-05)** : FAIT 0.590.
 - **État (relu le 2026-11-03)** : en partie 0.425 (A-08 : import d’une macro collée) ; recherche, renommer, dupliquer non faits.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.CraftPresets.cs`.
 - **Ce que le joueur obtient** : La page des séquences enregistrées se cherche par nom, objet ou métier et se trie ; une séquence se renomme, se duplique, se copie en texte de macro et, dans l'autre sens, une macro /ac collée devient une séquence vérifiable dans le simulateur.
@@ -135,6 +145,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C17 — K14 — Options d'export des macros : attentes séparées (X-12), son, écho final, icône
 
+- **État (relu le 2026-11-05)** : FAIT 0.573.
 - **État (relu le 2026-11-03)** : en partie 0.419 (X-12 : attente à part pour les buffs) ; son, écho final, icône non faits.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Craft/CraftMacroExport.cs`.
 - **Ce que le joueur obtient** : Vous réglez l'attente des actions et celle des effets séparément, choisissez le son de fin (ou aucun), l'écho sur chaque page ou seulement sur la dernière, et l'icône des macros écrites dans le jeu au lieu du « ? » imposé.
@@ -143,6 +154,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C18 — K15 — Chaîne de fabrication : boutons par étape, étapes identiques regroupées, cases « fait »
 
+- **État (relu le 2026-11-05)** : FAIT 0.591.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.CraftChain.cs`.
 - **Ce que le joueur obtient** : Chaque étape de la chaîne a ses boutons « Carnet » (ouvre le carnet du jeu sur la recette) et « Simuler » ; les étapes répétées d'une même recette sont montrées regroupées (×N au total) ; vous cochez les étapes faites au fil de la session.
 - **Comment, taille, dépendances** : Regroupement à l'affichage seulement (somme par RecipeId, ordre de la première apparition), le calcul ne change pas. Boutons réutilisant OpenCraftLog (sur clic). Cases gardées pour la session (ou dans la configuration, à choisir). Taille S-M. Dépendances : A-05 (listes multi-objets) reprendra la vue. Sonde : aucune. Décision : cases gardées entre les sessions ou non (recommandé : session seulement).
@@ -150,6 +162,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C19 — K16 — Où sont mes matériaux : détail par rangement dans la préparation et la chaîne
 
+- **État (relu le 2026-11-05)** : FAIT 0.559.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.CraftPlan.cs`.
 - **Ce que le joueur obtient** : Au survol de « Relevé » d'un ingrédient : « Sacs 12 · Servant Lune 40 (relevé du 01/11) · Sacoche 8 ». Vous savez quel servant appeler avant de fabriquer, sans ouvrir la fiche de chaque objet.
 - **Comment, taille, dépendances** : Infobulle commune (même rendu que l'onglet Stocks de la fiche) sur les cellules de la préparation et des matériaux de la chaîne, à partir des Rows déjà calculées ; rien de recalculé à chaque image. Taille S. Sonde : aucune. Décision : aucune.
@@ -165,6 +178,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C21 — K18 — « Que puis-je fabriquer ? » avec mes stocks
 
+- **État (relu le 2026-11-05)** : FAIT 0.592.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Items.cs`.
 - **Ce que le joueur obtient** : Une liste des recettes faisables tout de suite avec vos sacs et la Banque enregistrée, filtrée par métier et niveau, avec le nombre de fabrications possibles. Pratique pour écouler des matériaux ou monter un métier.
 - **Comment, taille, dépendances** : Calcul sur un worker annulable au clic (toutes les recettes, ingrédients directs), résultat gardé tant que l'inventaire et la Banque ne changent pas ; borne basse (≥) quand un stock est inconnu, comme aujourd'hui. Taille M. Dépendances : aucune. Sonde : aucune. Décision : ingrédients directs seulement ou sous-crafts compris (recommandé : directs d'abord).
@@ -179,6 +193,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C23 — K20 — Action suivante mise en évidence sur les barres de raccourcis
 
+- **État (relu le 2026-11-05)** : ÉCARTÉE à la revue avec l'utilisateur ([plan global](GLOBAL-PLAN.md)).
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Craft/CraftLiveReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Pendant une synthèse suivie (K6, puis A-04), l'action conseillée clignote sur vos barres comme une action combo du jeu. Vous fabriquez à la main sans quitter les barres des yeux. Rien n'est exécuté.
 - **Comment, taille, dépendances** : Nouveau hook en lecture/retour seul (ActionManager.IsActionHighlighted), créé seulement quand le réglage est activé (désactivé par défaut, infobulle, ↺), gardé R-14 (désactivé proprement si la signature change), libéré au Dispose. Taille M. Dépendances : K6 ou A-04 pour l'action conseillée. Sonde : signature dans FFXIVClientStructs. Décision : accepter un nouveau hook (recommandé : oui, désactivé par défaut).
@@ -186,6 +201,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C24 — G8 — Besoin restant de la préparation dans les aides de récolte et de pêche
 
+- **État (relu le 2026-11-05)** : FAIT 0.560.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.GatheringPanel.cs`.
 - **Ce que le joueur obtient** : Au point de récolte ou de pêche, l'objet utile à votre dernière chaîne d'artisanat est marqué : « Encore 14 pour Lingot de… ». Le nombre baisse à mesure que vous récoltez.
 - **Comment, taille, dépendances** : Restant = manque au calcul − (stock actuel − stock au calcul), borné à 0 ; lu depuis l'état de la session de chaîne, sans recalcul. Même mention dans l'aide à la pêche. Taille S. Dépendances : aucune ; A-05 (listes) l'étendra. Sonde : aucune. Décision : aucune.
@@ -238,6 +254,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C31 — G12 — Météo de plusieurs zones en un tableau (zones favorites)
 
+- **État (relu le 2026-11-05)** : FAIT 0.563.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.Weather.cs`.
 - **Ce que le joueur obtient** : La page Météo montre la météo actuelle et les prochaines de vos zones favorites, ou de toutes les zones d'une extension, sur une seule grille. Utile pour enchaîner poissons et points selon la météo.
 - **Comment, taille, dépendances** : Liste de zones favorites dans la configuration (données de l'utilisateur), grille recalculée une fois par période de 1 400 s ; clic sur une zone = vue actuelle. Taille S. Dépendances : aucune. Sonde : aucune. Décision : nombre de périodes (recommandé : 6).
@@ -245,6 +262,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C32 — G13 — Commandes « /tensho recolte » et « /tensho recette » (suite de I16)
 
+- **État (relu le 2026-11-05)** : FAIT 0.555, avec I16.
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Plugin.cs`.
 - **Ce que le joueur obtient** : « /tensho recolte minerai de fer » ouvre la page Récolte sur l'objet, « /tensho recette … » ouvre son onglet Craft ; utilisables aussi dans une macro du jeu, comme /gather de GatherBuddy.
 - **Comment, taille, dépendances** : Même analyse d'arguments que I16, OpenGathering et l'onglet Craft ; mots français et anglais ; aide de la commande traduite. Taille S. Dépendances : I16. Sonde : aucune. Décision : mots-clés (recommandé : recolte/gather et recette/recipe).
@@ -259,6 +277,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C34 — K21 — Missions d'approvisionnement de la Grande Compagnie du jour
 
+- **État (relu le 2026-11-05)** : FAIT 0.469 (`Items/GcSupplyToday.cs` ; tri du 2026-11-05, [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md)).
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/MainWindow.Reminders.cs`.
 - **Ce que le joueur obtient** : La liste des objets demandés aujourd'hui par votre Grande Compagnie (artisans et récolteurs), avec vos stocks et un lien vers la recette ou la récolte. Pratique pour la montée en niveau.
 - **Comment, taille, dépendances** : Sonde d'abord : où le client garde la liste du jour après ouverture de la fenêtre d'approvisionnement ou des minuteurs (FFXIVClientStructs, à sonder), aucune requête déclenchée par Tensho. Puis copie sur le framework, gardée R-14, affichée sur la page Rappels. Taille M. Dépendances : aucune. Décision : emplacement (recommandé : page Rappels).
@@ -266,6 +285,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C35 — G15 — Aide à la pêche : lectures du jeu et premières tables hors de Draw
 
+- **État (relu le 2026-11-05)** : FAIT 0.604.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/Plugin.cs`.
 - **Ce que le joueur obtient** : Rien de visible, sinon l'absence d'à-coup à la première ouverture de l'aide à la pêche ou du panneau de récolte, et une aide qui reste conforme aux règles du projet après une mise à jour.
 - **Comment, taille, dépendances** : Copier job, territoire, position et état de pêche sur IFramework.Update (comme les autres lecteurs) ; construire les deux tables avec le catalogue de récolte (worker, cache), lues ensuite sans feuille Excel. Taille S. Sonde : aucune. Décision : aucune.
@@ -273,6 +293,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C36 — G16 — R-14, partie artisanat et récolte : une aide illisible le dit au lieu de disparaître
 
+- **État (relu le 2026-11-05)** : FAIT 0.601.
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/Craft/CraftLogReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Après une mise à jour du jeu, le panneau du carnet, l'aide à la récolte ou la synthèse en direct affichent « indisponible après une mise à jour du jeu » à leur place habituelle, et Diagnostics dit quelle lecture a échoué. Aujourd'hui, le panneau disparaît sans rien dire.
 - **Comment, taille, dépendances** : Statut par lecteur (carnet, synthèse, récolte, pêche) publié avec l'état, court message traduit à l'emplacement du panneau, ligne dans Diagnostics. Taille S. Dépendances : passage complet R-14 à l'étape g2. Sonde : aucune. Décision : aucune.

@@ -51,7 +51,7 @@ internal sealed partial class MainWindow
 
     private void DrawHuntTrain(MapCatalog catalog)
     {
-        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("HuntTrain.Title",huntTrain.Count)+"###HuntTrain"))return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("HuntTrain.Title",huntTrain.Count)+"###HuntTrain",ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextWrapped(localization.Get("HuntTrain.Help"));
         ImGui.Checkbox(localization.Get("HuntTrain.Record")+"###HuntTrainRecord",ref huntTrainRecording);
         Tip("HuntTrain.RecordTip");
@@ -107,6 +107,7 @@ internal sealed partial class MainWindow
                 var rank=stop.Rank switch{3=>"S",2=>"A",_=>"B"};
                 ImGui.TextColored(stop.Visited ? Muted:Accent,localization.Format("HuntTrain.Stop",index+1,stop.Name,rank,stop.Zone,stop.X.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),
                     stop.Y.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),stop.SeenAt.ToLocalTime().ToString("t")));
+                if(catalog.Find(stop.MapId) is { } stopMap)PlaceMenu("TrainPlace",stopMap,new(stop.X,stop.Y),stop.Name);
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("HuntTrain.Flag")) && catalog.Find(stop.MapId) is { } map)
                 {OpenMapPointFromPage(map,stop.X,stop.Y);huntTrain=HuntTrain.MarkVisited(huntTrain,index);huntTrainCalled=index;}

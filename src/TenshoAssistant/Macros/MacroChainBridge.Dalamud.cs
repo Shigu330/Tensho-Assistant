@@ -42,7 +42,7 @@ internal sealed unsafe class MacroChainBridge : IDisposable
                 if (!commands.AddHandler(MacroDefinition.Marker, new CommandInfo(OnMarker) { HelpMessage = "Last-line marker for Tensho sequences.", ShowInHelp = false }))
                     throw new InvalidOperationException("Command /tenshonext already registered.");
             }, () => commands.RemoveHandler(MacroDefinition.Marker));
-            registrations.Register(() => framework.Update += Update, () => framework.Update -= Update);
+            registrations.Register(() => TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update), () => TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update));
         }
         catch { registrations.Dispose(); throw; }
     }
@@ -65,7 +65,7 @@ internal sealed unsafe class MacroChainBridge : IDisposable
             {
                 if (ownCallAddress != (nint)macro || ownCallThread != Environment.CurrentManagedThreadId)
                 {
-                    if (!disposed && (shell == null || !shell->MacroLocked)) sequence.ObserveExternalStart();
+                    if (!disposed && !TenshoAssistant.Competitive.CompetitiveGate.Cut && (shell == null || !shell->MacroLocked)) sequence.ObserveExternalStart();
                 }
                 else { ownCallAddress = 0; ownCallThread = 0; }
             }

@@ -47,6 +47,7 @@ internal sealed partial class MainWindow
         try
         {
             ImGui.TextColored(Accent,item?.Name ?? localization.Format("BankUi.Item",id));
+            DrawEnglishItemName(item);
             var facts=new List<string>();
             if(item is { UiCategoryName.Length:>0 })facts.Add(item.UiCategoryName);
             if(item is { ItemLevel:>1 })facts.Add(localization.Format("HoverUi.Levels",item.ItemLevel,item.EquipLevel));

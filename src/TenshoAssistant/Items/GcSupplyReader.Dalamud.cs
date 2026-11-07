@@ -23,7 +23,7 @@ internal sealed class GcSupplyReader : IDisposable
     public GcSupplyReader(IFramework framework,IGameGui gui,IClientState client,IPlayerState player,IDataManager data,IPluginLog log,Func<ItemUseCatalog?> catalog,GcSupplyToday today,Action<GcSupplySeen> learned)
     {
         this.framework=framework;this.gui=gui;this.client=client;this.player=player;this.data=data;this.log=log;this.catalog=catalog;this.today=today;this.learned=learned;
-        framework.Update+=Update;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
     }
 
     private void Update(IFramework _)
@@ -98,6 +98,6 @@ internal sealed class GcSupplyReader : IDisposable
     public void Dispose()
     {
         if(disposed)return;
-        disposed=true;framework.Update-=Update;
+        disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);
     }
 }

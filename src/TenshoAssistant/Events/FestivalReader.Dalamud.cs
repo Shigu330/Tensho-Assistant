@@ -63,7 +63,7 @@ public sealed unsafe class FestivalReader : IDisposable
             catch(OperationCanceledException){}
             catch(Exception error){QuestsFailed=true;log.Warning(error,"Festival quests could not be built.");}
         },token);
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     /// <summary>Called by the page while it is shown (UI thread): keeps the reads going for 5 seconds; the first call reads the layouts.</summary>
@@ -150,7 +150,7 @@ public sealed unsafe class FestivalReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         cancellation.Cancel();cancellation.Dispose();
     }
 }

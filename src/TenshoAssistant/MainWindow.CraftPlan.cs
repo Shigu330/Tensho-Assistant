@@ -25,6 +25,14 @@ internal sealed partial class MainWindow
         if(craftLog.Error is { } nativeError)DrawDataError(nativeError,"ServiceErrors.CraftLog");
     }
 
+    /// <summary>0.559 (C19): where a material is, from the rows already computed: nothing is read again.</summary>
+    private void DrawStorageDetail(Inventory.ItemHoldingsSummary holdings)
+    {
+        var lines=holdings.Rows.Where(row=>row.Nq+row.Hq>0).Select(row=>row.IsCached && row.ObservedAt is { } seen
+            ? localization.Format("PlanUi.StoredCached",Inventory.StorageNames.Of(localization,row),(row.Nq+row.Hq).ToString("N0"),seen.ToLocalTime().ToString("d"))
+            : localization.Format("PlanUi.Stored",Inventory.StorageNames.Of(localization,row),(row.Nq+row.Hq).ToString("N0"))).ToArray();
+        WrappedTooltip(lines.Length>0 ? string.Join("\n",lines):localization.Get("PlanUi.StoredNone"));
+    }
     private void OpenCraftPreparation(RecipeDefinition recipe)
     {
         OpenCraftSimulation(recipe);
@@ -52,6 +60,14 @@ internal sealed partial class MainWindow
         Tip("PlanUi.TargetTip");
         craftPlanTarget = Math.Clamp(craftPlanTarget, 1, 999999);
         var plan = CraftPlan.Build(recipe, craftPlanTarget, GetRecipeHoldings);
+        // W-05 (0.691): the on-screen list follows the recipe and the target shown here.
+        BoolSetting("PlanUi.Panel", "PlanUi.PanelTip", () => configuration.PreparationPanel, value => configuration.PreparationPanel = value, c => c.PreparationPanel);
+        if (configuration.PreparationPanel) DrawListPanelOptions();
+        if (configuration.PreparationPanel && (configuration.PreparationPanelRecipe != recipe.RecipeId || configuration.PreparationPanelTarget != craftPlanTarget))
+        {
+            configuration.PreparationPanelItem = recipe.ResultItemId; configuration.PreparationPanelRecipe = recipe.RecipeId; configuration.PreparationPanelTarget = craftPlanTarget;
+            SaveReminders();
+        }
         ImGui.TextColored(Accent, localization.Format("PlanUi.Summary",plan.Crafts.ToString("N0"),plan.Produced.ToString("N0")));
         if (plan.Produced > plan.Requested) ImGui.TextDisabled(localization.Format("PlanUi.Surplus",(plan.Produced-plan.Requested).ToString("N0")));
         if (plan.Materials.Count == 0)
@@ -87,6 +103,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(material.Required.ToString("N0"));
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted(material.Holdings.HasObservation ? material.Holdings.Total.ToString("N0") : localization.Get("PlanUi.Unknown"));
+                    if (ImGui.IsItemHovered()) DrawStorageDetail(material.Holdings);
                     ImGui.TableNextColumn();
                     if (!material.Holdings.HasObservation) ImGui.TextDisabled(localization.Get("PlanUi.Verify"));
                     else ImGui.TextColored(material.Uncovered == 0 ? Success : Accent, material.Uncovered.ToString("N0"));

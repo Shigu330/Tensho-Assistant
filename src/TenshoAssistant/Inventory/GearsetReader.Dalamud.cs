@@ -27,7 +27,7 @@ public sealed unsafe class GearsetReader : IDisposable
     public GearsetReader(IFramework framework,IPlayerState player,IPluginLog log)
     {
         this.framework=framework;this.player=player;this.log=log;
-        framework.Update+=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     public void Want()=>Volatile.Write(ref wantedUntilTicks,DateTimeOffset.UtcNow.AddSeconds(5).UtcTicks);
@@ -66,6 +66,6 @@ public sealed unsafe class GearsetReader : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        framework.Update-=OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

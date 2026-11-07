@@ -27,6 +27,7 @@ internal sealed class BankInventoryBridge : IDisposable
     private TimeSpan nextPoll;
     private TimeSpan retainerSince;
     private BankKey? lastRetainer;
+    internal static readonly TimeSpan OpenStorageRefresh = TimeSpan.FromSeconds(2);
     private BankKey? requested;
     private Task<BankImportResult>? importing;
     // Automatic capture (0.167): each storage is copied once per opening, then again every 30 s while it stays open.
@@ -61,7 +62,7 @@ internal sealed class BankInventoryBridge : IDisposable
         this.client = client;
         this.framework = framework;
         this.log = log;
-        framework.Update += OnUpdate;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
     public void RequestImport(BankKey key)
@@ -164,8 +165,10 @@ internal sealed class BankInventoryBridge : IDisposable
                     foreach (var openKey in open)
                     {
                         var always = openKey.Kind is BankStorageKind.Armoury or BankStorageKind.GlamourDresser or BankStorageKind.Armoire || BankStorageScope.IsCharacterOwn(openKey.Kind);
+                        // 0.770 (X-20, user report: an item put in a retainer, the saddlebag or the company chest showed only after reopening it):
+                        // an open storage is read again every 2 seconds; the bank file is written only when the copy changed (0.605).
                         if ((auto || always) && (!autoCaptured.TryGetValue(openKey, out var last)
-                            || now - last >= (always ? TimeSpan.FromMinutes(2) : TimeSpan.FromSeconds(30))))
+                            || now - last >= (always ? TimeSpan.FromMinutes(2) : OpenStorageRefresh)))
                         { autoCaptured[openKey] = now; requested = openKey; break; }
                     }
                 if (requested is not { } key) return;
@@ -182,6 +185,13 @@ internal sealed class BankInventoryBridge : IDisposable
                     BankStorageKind.Armoire => ArmoireSnapshot(owner),
                     _ => InventoryNativeReader.Capture(inventory, owner, types, $"Dalamud/manual-bank/{key.Kind}"),
                 };
+                // 0.767 (I10): the retainer's gil and crystals, kept only when read whole; otherwise the pages are recorded as before.
+                if (BankStorageScope.OptionalContainerIds(key.Kind) is { Count: > 0 } extras)
+                {
+                    var more = InventoryNativeReader.Capture(inventory, owner, extras.Select(id => (GameInventoryType)id).ToArray(), $"Dalamud/manual-bank/{key.Kind}/extras");
+                    var whole = more.Containers.Values.Where(c => c.Coverage == InventoryCoverage.Complete).ToArray();
+                    if (whole.Length > 0) snapshot = new InventorySnapshot(snapshot.ObservedAt, snapshot.Source, snapshot.Containers.Values.Concat(whole));
+                }
                 var after = key.Kind == BankStorageKind.Retainer ? GetRetainer(CharacterId)
                     : key.Kind == BankStorageKind.Armoury || BankStorageScope.IsCharacterOwn(key.Kind) ? (IsLoaded(key.Kind) ? context : null)
                     : key.Kind is BankStorageKind.GlamourDresser or BankStorageKind.Armoire ? context
@@ -366,7 +376,7 @@ internal sealed class BankInventoryBridge : IDisposable
             if (disposed) return;
             disposed = true;
             requested = null;
-            framework.Update -= OnUpdate;
+            TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
             Volatile.Write(ref state, new(0, null, null, null, null));
         }
     }
