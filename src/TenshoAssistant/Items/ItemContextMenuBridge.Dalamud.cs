@@ -37,6 +37,9 @@ internal sealed class ItemContextMenuBridge : IDisposable
         try
         {
             session.Clear();
+            // 0.781 (X-03, user report: a right click on the ring's item scrolled the chat and opened nothing): developer mode, what the game opened.
+            if(configuration.DeveloperMode)
+                log.Information("Context menu opened: type {0}, addon \"{1}\", target {2}, hovered item {3}.",args.MenuType,args.AddonName ?? "",args.Target?.GetType().Name ?? "none",gui.HoveredItem);
             if(disposed || !configuration.ItemContextMenuEnabled || Owner==0)return;
             var owner=Owner;
             ulong raw;

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.781.0
+- Plan global, Verify : Lien d'alarme (X-03) : le clic droit faisait défiler le chat sans ouvrir de menu. En mode développeur, chaque menu contextuel ouvert est maintenant noté au journal (type, fenêtre, cible, objet survolé), pour voir ce que le jeu ouvre. Aucun changement visible. Non validé en jeu.
+- Tests : MenuLog781Tests. Verify.ps1 (agent) : 1348/1348, 0 avertissement, 0 erreur ; DLL 0.781.0.0. Non validé en jeu.
+### English
+- Alarm link (X-03): the right click scrolled the chat and opened no menu. In developer mode, every context menu opened is now noted in the log (type, window, target, hovered item), to see what the game opens. No visible change. Not validated in game.
+
 ## 0.780.0
 - Plan global, Verify : Signalement (X-03) : le clic droit ne faisait rien sur l'indication grise « (clic droit : Tensho) », qui ne faisait pas partie du lien. L'indication est maintenant dans le lien d'objet : un clic droit sur toute la ligne ouvre le menu de l'objet. Non validé en jeu.
 - Tests : AlarmLinkShape771Tests. Verify.ps1 (agent) : 1347/1347, 0 avertissement, 0 erreur ; DLL 0.780.0.0. Non validé en jeu.
