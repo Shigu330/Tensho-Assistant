@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.849.0
+- Plan global, Verify : Demande (X-71) : reprendre les flèches haut et bas de la carte du jeu, partout. La sonde des interfaces du jeu montre que sa carte prend ses chevrons dans la texture ui/uld/NaviMap.tex : le chevron orange (24 × 24) est la forme vue à Mor Dhona et dans la Mer de Rubis. La carte de Tensho dessine maintenant ce chevron du jeu, pointe en haut pour plus haut, retourné pour plus bas, sur toutes les icônes de quête, d'événement et d'ALÉA, à la place de la flèche de la 0.844. Le seuil de hauteur reste le réglage de Tensho. Non validé en jeu.
+- Tests : HeightArrows844Tests. Verify.ps1 (agent) : 1430/1430, 0 avertissement, 0 erreur ; DLL 0.849.0.0. Non validé en jeu.
+### English
+- Request (X-71): the game map's own up and down arrows, everywhere. The game interface probe shows its map takes its chevrons from the texture ui/uld/NaviMap.tex: the orange chevron (24 × 24) is the shape seen at Mor Dhona and in The Ruby Sea. Tensho's map now draws that game chevron, pointing up for above, turned down for below, on every quest, event and FATE icon, instead of 0.844's arrow. The height threshold stays Tensho's setting. Not validated in game.
+
 ## 0.848.0
 - Plan global, Verify : Signalement (X-70) : la zone de la nouvelle étape d'une quête (« L'art du sushi », Mer de Rubis) manquait sur la carte de Tensho tant que la carte du jeu n'avait pas été rouverte, ou qu'on n'y entrait pas. Cause, lue dans le journal : Tensho prenait les marqueurs de quête dans la liste de la fenêtre carte du jeu, qui n'est refaite qu'à son ouverture ; la liste de quêtes que le jeu garde lui-même suit chaque étape aussitôt. Les quêtes de cette liste remplacent maintenant celles de la fenêtre, sans rouvrir la carte. Non validé en jeu.
 - Tests : QuestEvents848Tests. Verify.ps1 (agent) : 1430/1430, 0 avertissement, 0 erreur ; DLL 0.848.0.0. Non validé en jeu.

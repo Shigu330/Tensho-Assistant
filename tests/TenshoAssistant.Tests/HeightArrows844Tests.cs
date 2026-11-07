@@ -14,6 +14,10 @@ internal static class HeightArrows844Tests
             Check(settings.HeightArrows && settings.HeightArrowYalms==10,"defaults");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             Check(view.Contains("height:marker.Position.Y);") && view.Contains("height:fate.Position.Y);"),"quests, events, FATEs");
+            // 0.849 (X-71): the game's chevron, turned down for « below ».
+            var (upFrom,upTo)=MapHeight.ChevronUv(1);var (downFrom,downTo)=MapHeight.ChevronUv(-1);
+            Check(upFrom.Y<upTo.Y && downFrom.Y>downTo.Y && upFrom.X==downFrom.X,"turned down");
+            Check(MapHeight.ChevronTexture=="ui/uld/NaviMap.tex" && view.Contains("textures.GetFromGame(MapHeight.ChevronTexture)"),"the game's texture");
         }),
     ];
 }

@@ -1274,12 +1274,14 @@ internal sealed partial class MainWindow
                     // 0.645 (P7): an aetheryte not attuned is greyed.
                     draw.AddImage(image.Handle,item.At-new Vector2(item.Size/2),item.At+new Vector2(item.Size/2),Vector2.Zero,Vector2.One,
                         MapLabels.NotAttuned(item.Fixed?.AetheryteId ?? 0,mapLive?.TeleportCosts) ? ImGui.GetColorU32(new Vector4(0.45f,0.45f,0.45f,0.8f)):ImGui.GetColorU32(Vector4.One));
-                // 0.844 (X-67, user request): above or below the player, an arrow on the icon's lower right corner, as the game map does.
-                if(MapHeight.Arrow(item.Height,playerHeight,settings.HeightArrowYalms) is var arrow and not 0)
+                // 0.844 (X-67, user request): above or below the player, an arrow on the icon, as the game map does.
+                // 0.849 (X-71, user request: the game's own arrows): the game's orange chevron (MapHeight.Chevron), up above, turned down below, over the icon's lower half.
+                if(MapHeight.Arrow(item.Height,playerHeight,settings.HeightArrowYalms) is var arrow and not 0
+                   && textures.GetFromGame(MapHeight.ChevronTexture).TryGetWrap(out var chevron,out _) && chevron is not null)
                 {
-                    var badge=Math.Max(8,item.Size*0.5f);var corner=item.At+new Vector2(item.Size*0.15f,item.Size*0.05f);
-                    draw.AddCircleFilled(corner+new Vector2(badge/2),badge*0.6f,ImGui.GetColorU32(new Vector4(0,0,0,0.75f)),16);
-                    draw.AddText(UiBuilder.IconFont,badge,corner,ImGui.GetColorU32(new Vector4(1f,0.62f,0.15f,1f)),(arrow>0 ? FontAwesomeIcon.ArrowUp:FontAwesomeIcon.ArrowDown).ToIconString());
+                    var side=Math.Max(10,item.Size*0.75f);var centre=item.At+new Vector2(0,item.Size*0.3f);
+                    var (from,to)=MapHeight.ChevronUv(arrow);
+                    draw.AddImage(chevron.Handle,centre-new Vector2(side/2),centre+new Vector2(side/2),from,to);
                 }
                 // 0.596 (P12): the name the game writes beside this icon, on the side it uses; drawn after the icons (0.623).
                 if(settings.ShowIconNames && settings.NamesShown(mapZoom) && item.Fixed is {Label.Length:>0} named && MapLabels.Shown(named.LinkMapId!=0,mapZoom))

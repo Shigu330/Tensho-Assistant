@@ -7,6 +7,18 @@ namespace TenshoAssistant.Maps;
 /// </summary>
 public static class MapHeight
 {
+    /// <summary>
+    /// 0.849 (X-71, user request: « the game's icons », seen at Mor Dhona): the game's orange chevron, pointing up, from its map textures (tools/UldProbe --parts
+    /// NaviMap NaviMap: part U 352, V 96, 24 × 24 of the 448 × 212 texture; tools/MapMaskProbe --tex shows it, docs/evidence/0.849-height-chevron.md).
+    /// </summary>
+    public const string ChevronTexture="ui/uld/NaviMap.tex";
+    /// <summary>The chevron's texture coordinates: as the game cuts it for « above », upside down for « below ».</summary>
+    public static (System.Numerics.Vector2 From,System.Numerics.Vector2 To) ChevronUv(int arrow)
+    {
+        var top=new System.Numerics.Vector2(352f/448,96f/212);var bottom=new System.Numerics.Vector2(376f/448,120f/212);
+        return arrow<0 ? (new(top.X,bottom.Y),new(bottom.X,top.Y)):(top,bottom);
+    }
+
     /// <summary>1 above, -1 below, 0 within the threshold or unknown.</summary>
     public static int Arrow(float target,float player,float threshold)
     {

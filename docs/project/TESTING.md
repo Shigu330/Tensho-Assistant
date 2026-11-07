@@ -1338,6 +1338,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.848) Faire une étape de quête carte du jeu fermée : la zone suivante apparaît sur la carte de Tensho dans la seconde.
 
+- [ ] (0.849) Mer de Rubis ou Mor Dhona : chevron orange du jeu sur les icônes plus hautes ou plus basses.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

@@ -5,6 +5,17 @@ using Lumina.Excel.Sheets;
 // Read-only: which texture files exist for a map, and its discovery columns. Arguments: the sqpack directory, then map rows or a place name.
 using var game=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.English,CacheFileResources=false});
 var maps=game.GetExcelSheet<Map>()!;
+// 0.849 (X-71): « --tex <game path> <out.png> »: any game texture as an image, on grey to see its transparency.
+if(args.Length>3 && args[1]=="--tex")
+{
+    var tex=game.GetFile<Lumina.Data.Files.TexFile>(args[2])!;
+    var data=tex.ImageData;int w=tex.Header.Width,h=tex.Header.Height;
+    var rgb=new byte[w*h*3];
+    for(var i=0;i<w*h;i++){var a=data[i*4+3]/255f;for(var c=0;c<3;c++)rgb[i*3+c]=(byte)(data[i*4+2-c]*a+96*(1-a));}
+    Png.Write(args[3],w,h,rgb);
+    Console.WriteLine($"PNG {args[2]} {w}x{h}");
+    return;
+}
 // 0.834 (X-64): « --item <name> »: an item's gathering points, their territory and map, and whether ExportedGatheringPoint places their base.
 if(args.Length>2 && args[1]=="--item")
 {
