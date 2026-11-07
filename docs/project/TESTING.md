@@ -1308,6 +1308,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.833) Liste de suivi, « Y aller » sur un objet de l'Arrière-pays dravanien : question « Se téléporter à Idyllée ? », puis « par l'éthernet : Porte du Prologue / de l'Épilogue ».
 
+- [ ] (0.834) Clic droit sur Haricots émeraude dans la liste : « Y aller » et « Placer le drapeau ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

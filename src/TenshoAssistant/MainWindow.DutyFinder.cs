@@ -157,9 +157,12 @@ internal sealed partial class MainWindow
     {
         if(gatheringCatalog.State.Catalog?.ForItem(item) is not { Count:>0 } sources)return null;
         var here=ListPanelZoneHere();var now=DateTimeOffset.UtcNow;
-        return sources.Where(source=>!source.IsHidden).Select(source=>(Source:source,Target:GatheringPointPixel(source))).Where(pair=>pair.Target is not null)
+        // 0.834 (X-64, user report: no « Go there » for Emerald beans, Cyclops onion): both are hidden items of their point (GatheringItem.IsHidden), whose
+        // point and map are known (tools/MapMaskProbe --item, docs/evidence/0.834-hidden-gathering-items.md); a hidden source now comes after the others, no longer left out.
+        return sources.Select(source=>(Source:source,Target:GatheringPointPixel(source))).Where(pair=>pair.Target is not null)
             .Select(pair=>(pair.Source,Target:pair.Target!.Value))
-            .OrderBy(pair=>pair.Source.Timing.Kind!=Gathering.GatheringScheduleKind.Limited
+            .OrderBy(pair=>pair.Source.IsHidden ? 1:0)
+            .ThenBy(pair=>pair.Source.Timing.Kind!=Gathering.GatheringScheduleKind.Limited
                 || Gathering.GatheringTime.Next(pair.Source.Timing,now,1).Openings.FirstOrDefault() is { } next && next.StartsAt<=now && now<next.EndsAt ? 0:1)
             .ThenBy(pair=>pair.Source.Zone==here ? 0:1).ThenBy(pair=>ListPanelZoneCost(pair.Source.Zone) ?? uint.MaxValue).ThenBy(pair=>pair.Source.Level)
             .Cast<(Gathering.GatheringSource,(Maps.MapDefinition,Vector2))?>().FirstOrDefault();

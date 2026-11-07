@@ -5,6 +5,30 @@ using Lumina.Excel.Sheets;
 // Read-only: which texture files exist for a map, and its discovery columns. Arguments: the sqpack directory, then map rows or a place name.
 using var game=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.English,CacheFileResources=false});
 var maps=game.GetExcelSheet<Map>()!;
+// 0.834 (X-64): « --item <name> »: an item's gathering points, their territory and map, and whether ExportedGatheringPoint places their base.
+if(args.Length>2 && args[1]=="--item")
+{
+    var items=game.GetExcelSheet<Item>()!.Where(item=>item.Name.ExtractText().Equals(args[2],StringComparison.OrdinalIgnoreCase)).Select(item=>item.RowId).ToHashSet();
+    var gatheringItems=game.GetExcelSheet<GatheringItem>()!.Where(row=>items.Contains(row.Item.RowId)).Select(row=>row.RowId).ToHashSet();
+    var exported=game.GetExcelSheet<ExportedGatheringPoint>()!;
+    // The GatheringItemPoint links (gathering item → points), as Tensho's catalog reads them too.
+    var links=game.GetSubrowExcelSheet<GatheringItemPoint>()!;
+    foreach(var gatheringItem in gatheringItems)
+        if(links.TryGetRow(gatheringItem,out var linked))
+            foreach(var link in linked)
+                if(link.GatheringPoint.ValueNullable is { } point)
+                    Console.WriteLine($"LINK item {gatheringItem} point {point.RowId} base {point.GatheringPointBase.RowId} territory {point.TerritoryType.RowId} {(point.PlaceName.ValueNullable?.Name.ExtractText() ?? "")} map {(point.TerritoryType.ValueNullable?.Map.RowId ?? 0)} exported {(exported.GetRowOrDefault(point.GatheringPointBase.RowId) is { } spot ? $"{spot.X},{spot.Y}":"none")}");
+    foreach(var basis in game.GetExcelSheet<GatheringPointBase>()!)
+    {
+        if(!basis.Item.Any(entry=>gatheringItems.Contains(entry.RowId)))continue;
+        var placed=exported.GetRowOrDefault(basis.RowId) is { } spot ? $"{spot.X},{spot.Y} radius {spot.Radius}":"none";
+        Console.WriteLine($"BASE {basis.RowId} level {basis.GatheringLevel} type {basis.GatheringType.RowId} exported {placed}");
+        foreach(var point in game.GetExcelSheet<GatheringPoint>()!)
+            if(point.GatheringPointBase.RowId==basis.RowId)
+                Console.WriteLine($"  POINT {point.RowId} territory {point.TerritoryType.RowId} {(point.PlaceName.ValueNullable?.Name.ExtractText() ?? "")} map {(point.TerritoryType.ValueNullable?.Map.RowId ?? 0)} type {point.Type}");
+    }
+    return;
+}
 // 0.833 (X-63): « --markers <place> »: a zone map's fixed markers (DataType 1 = link to a map, 3 = aetheryte, 4 = aethernet shard) and the territory's Aetheryte rows.
 if(args.Length>2 && args[1]=="--markers")
 {

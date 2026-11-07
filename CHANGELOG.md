@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.834.0
+- Plan global, Verify : Signalement (X-64, suite de X-60) : ni « Y aller » ni « Placer le drapeau » pour les Haricots émeraude, ni pour l'Échalion cyclope. Cause, lue dans les données du jeu : ces objets ne poussent que comme objets cachés de leur point (Colonie du Propriétaire dans L'Écume des cieux de Dravania, Forêt des Chocobos dans l'Avant-pays dravanien), et « Y aller » écartait toute source cachée, alors que le point et sa carte sont connus. Une source cachée passe maintenant après les autres, au lieu d'être écartée. Non validé en jeu.
+- Tests : HiddenGoThere834Tests. Verify.ps1 (agent) : 1421/1421, 0 avertissement, 0 erreur ; DLL 0.834.0.0. Non validé en jeu.
+### English
+- Report (X-64, follow-up of X-60): neither « Go there » nor « Place the flag » for Emerald beans, nor for Cyclops onion. Cause, read in the game data: these items grow only as hidden items of their point (Landlord Colony in The Churning Mists, Chocobo Forest in The Dravanian Forelands), and « Go there » left out every hidden source, though the point and its map are known. A hidden source now comes after the others instead of being left out. Not validated in game.
+
 ## 0.833.0
 - Plan global, Verify : Demande (X-63) : « Y aller » vers une zone sans éthérite. Les données du jeu le permettent : les portes de l'éthernet d'Idyllée (Porte du Prologue, Porte de l'Épilogue) sont rangées sous l'Arrière-pays dravanien, et les cartes portent des liens vers leurs voisines. Tensho prend d'abord la porte d'éthernet placée dans la zone, la plus proche du point, par l'éthérite de sa ville ; sinon l'éthérite harmonisée la moins chère d'une zone voisine qui donne sur la zone, avec la porte de son éthernet la plus proche de l'entrée. La question de téléportation dit l'étape d'éthernet ; s'il n'y a pas d'éthernet, elle le dit en rouge avant la téléportation (jamais de téléportation directe dans ce cas). Valable pour toute zone sans éthérite. Non validé en jeu.
 - Tests : ZoneEntries833Tests. Verify.ps1 (agent) : 1420/1420, 0 avertissement, 0 erreur ; DLL 0.833.0.0. Non validé en jeu.
