@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.819.0
+- Plan global, Verify : Signalement (X-53), suite : le yak laineux et le loaghtan n'étaient pas signalés. Le jeu a souvent plusieurs numéros pour un même monstre (deux « yak laineux »), et les données de butin n'en citent parfois qu'un. Un monstre proche est maintenant relié à son butin par son numéro, par son nom (les autres numéros du même nom) et par les pages du wiki déjà copiées sur votre disque pour les objets que la liste demande (comme la page « Butin des monstres » les montre) ; aucune requête n'est faite. La ligne du journal de 0.818 reste, pour vérifier. Non validé en jeu.
+- Tests : DropsByName819Tests. Verify.ps1 (agent) : 1407/1407, 0 avertissement, 0 erreur ; DLL 0.819.0.0. Non validé en jeu.
+### English
+- Report (X-53), continued: the woolly yak and the loaghtan were not marked. The game often has several rows for one monster (two « woolly yak »), and the drop data sometimes cite only one. A nearby monster is now matched to its drops by its row, by its name (other rows of the same name) and by the wiki pages already copied on your disk for the items the list needs (as the Monster loot page shows them); no request is made. The 0.818 log line stays, to check. Not validated in game.
+
 ## 0.818.0
 - Plan global, Verify : Signalement (X-53) : le yak laineux et le loaghtan, qui lâchent des objets de votre liste de suivi, n'étaient signalés ni sur la carte ni au-dessus d'eux. Les données de butin sont bonnes (la bouteille de lait de yak est bien reliée aux deux yaks laineux du jeu). En mode développeur, une ligne du journal dit maintenant, à chaque changement, ce que voit chaque étape : monstres lus, objets demandés par la liste, butins reliés, réglages ; pour trouver l'étape qui manque. L'icône au-dessus de la tête des monstres de liste est désactivée au départ (réglage de la carte « Butin pour vos listes »). Aucun changement visible. Non validé en jeu.
 - Tests : NearbyLog818Tests. Verify.ps1 (agent) : 1405/1405, 0 avertissement, 0 erreur ; DLL 0.818.0.0. Non validé en jeu.

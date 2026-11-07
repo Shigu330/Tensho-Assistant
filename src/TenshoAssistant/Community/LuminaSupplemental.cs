@@ -59,6 +59,9 @@ public sealed class LuminaSupplementalData
     public uint? StorePriceCents(uint itemId) => storeCents.TryGetValue(itemId, out var cents) ? cents : null;
 
     private readonly Dictionary<uint, List<uint>> dropsOf = [];
+    private readonly Dictionary<string, List<uint>> dropsByName = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>0.819 (X-53): the items dropped by any monster of that name: the game has several BNpcName rows for one name (woolly yak: 3479, 11214) and MobDrop may cite only some.</summary>
+    public IReadOnlyList<uint> ItemsDroppedByName(string name) => dropsByName.TryGetValue(name.Trim(), out var list) ? list : [];
     /// <summary>0.795 (X-35): the items a monster (BNpcName row) drops, from MobDrop; empty when none is known.</summary>
     public IReadOnlyList<uint> ItemsDroppedBy(uint nameId) => dropsOf.TryGetValue(nameId, out var list) ? list : [];
 
@@ -96,6 +99,11 @@ public sealed class LuminaSupplementalData
             if (dropped == 0 || by == 0) continue;
             if (!dropsOf.TryGetValue(by, out var items)) dropsOf[by] = items = [];
             if (!items.Contains(dropped)) items.Add(dropped);
+            if (monsterName?.Invoke(by) is { Length: > 0 } named)
+            {
+                if (!dropsByName.TryGetValue(named.Trim(), out var byName)) dropsByName[named.Trim()] = byName = [];
+                if (!byName.Contains(dropped)) byName.Add(dropped);
+            }
         }
         foreach (var row in Rows(csv, "FateItem")) Named(fates, Uint(row, "ItemId"), fateName?.Invoke(Uint(row, "FateId")));
         foreach (var row in Rows(csv, "RetainerVentureItem")) if (Uint(row, "ItemId") is var venture and not 0) ventures.Add(venture);

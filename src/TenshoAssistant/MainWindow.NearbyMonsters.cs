@@ -36,13 +36,31 @@ internal sealed partial class MainWindow
                 if(ListPanelLinesFor(key) is { } known)
                     foreach(var (item,amount) in known.Lines)
                         if(GetRecipeHoldings(item) is not { HasObservation:true } held || held.Total<amount)needed.Add(item);
+            // 0.819 (X-53, user report: a woolly yak, a loaghtan not marked): drops by the monster's row, by its name (other rows of the same name), and by the wiki's
+            // pages already on disk for the items the list needs (their English monster names matched to rows); no request is made.
+            var names=monsters.GroupBy(monster=>monster.NameId).ToDictionary(group=>group.Key,group=>group.First().Name);
+            var wikiDrops=new Dictionary<uint,List<uint>>();
+            if(wikiMonsterSources is { } wiki && EnglishMonsterIds is { } englishIds)
+                foreach(var item in needed)
+                {
+                    wiki.Warm(item);
+                    if(wiki.Cached(item) is not { Monsters:{ Count:>0 } rows })continue;
+                    foreach(var row in rows)
+                        foreach(var id in englishIds(row.Name.Trim()))
+                        {
+                            if(!wikiDrops.TryGetValue(id,out var items))wikiDrops[id]=items=[];
+                            if(!items.Contains(item))items.Add(item);
+                        }
+                }
+            IReadOnlyList<uint> Drops(uint id)=>data.ItemsDroppedBy(id).Concat(names.TryGetValue(id,out var name) ? data.ItemsDroppedByName(name):[])
+                .Concat(wikiDrops.TryGetValue(id,out var fromWiki) ? fromWiki:[]).Distinct().ToArray();
             foreach(var id in ids)
-                if(NearbyMonsters.ListDrops(id,data.ItemsDroppedBy,needed) is { Count:>0 } drops)
+                if(NearbyMonsters.ListDrops(id,Drops,needed) is { Count:>0 } drops)
                     Note(id,MonsterNoteKind.List,localization.Format("MapView.MonsterDrops",string.Join(", ",drops.Select(item=>itemCatalog.State.Catalog?.Find(item)?.Name ?? item.ToString()))));
-            if(configuration.ListPanelsNearbyMonsters)nearbyDroppedItems=NearbyMonsters.DroppedNearby(monsters.Select(monster=>(monster.NameId,monster.Name)),data.ItemsDroppedBy,needed);
+            if(configuration.ListPanelsNearbyMonsters)nearbyDroppedItems=NearbyMonsters.DroppedNearby(monsters.Select(monster=>(monster.NameId,monster.Name)),Drops,needed);
             // 0.818 (X-53, user report: the woolly yak, the loaghtan not marked): what the chain sees, in developer mode, when it changes.
             NearbyMonstersLog($"{monsters.Count} monsters ({string.Join(", ",monsters.Select(monster=>$"{monster.Name} {monster.NameId}").Distinct().Take(8))}); list needs {needed.Count} items; "
-                +$"drops matched for {notes.Count(pair=>pair.Value.Any(note=>note.Kind==MonsterNoteKind.List))} monsters ({string.Join(", ",ids.Take(8).Select(id=>$"{id}:{data.ItemsDroppedBy(id).Count}"))}); "
+                +$"drops matched for {notes.Count(pair=>pair.Value.Any(note=>note.Kind==MonsterNoteKind.List))} monsters ({string.Join(", ",ids.Take(8).Select(id=>$"{id}:{data.ItemsDroppedBy(id).Count}/{Drops(id).Count}"))}); wiki {wikiDrops.Count}; "
                 +$"panel {configuration.ListPanelsNearbyMonsters}, map {configuration.MapView.ShowListMonsters}, above {configuration.MapView.AboveList}");
         }
         else NearbyMonstersLog($"{monsters.Count} monsters; drop data {(lumina?.State.Data is null ? "not loaded":"loaded")}, panel {configuration.ListPanelsNearbyMonsters}, map {configuration.MapView.ShowListMonsters}");
