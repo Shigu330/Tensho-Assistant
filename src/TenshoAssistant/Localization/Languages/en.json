@@ -1161,6 +1161,7 @@
     "Bountiful": "Bountiful +{0}",
     "PlanFor": "GP plan for {0}",
     "Expected": "≈ {0} items (no GP: {1}) · cost {2} GP",
+    "Solving": "Working out the plan…",
     "NoPlan": "Plan unavailable (click an item, wait for the node to be read).",
     "Footer": "Click an item = context item; plan computed like the GP tool (estimated Bountiful).",
     "Setting": "In-game gathering help",

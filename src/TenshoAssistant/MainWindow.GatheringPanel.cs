@@ -62,10 +62,18 @@ internal sealed partial class MainWindow
         if(gatheringNextCache is not { } known || !ReferenceEquals(known.Plan,plan) || known.Gp!=(int)frame.Gp || known.Attempts!=attempts || known.Boon!=slot.BoonPercent)
         {
             var found=GpNextAction.Next(plan,(int)start.Gp,(int)frame.Gp,startAttempts,attempts);
-            // 0.731 (user report): the end of the plan, with what is left.
-            if(slot.SuccessPercent is { } successNow && slot.BoonPercent is { } boonNow && gpActions.State.Catalog is { } catalog)
-                found=GpNextAction.Leftover(found,optimization.Scenario,plan,catalog,(int)frame.Gp,attempts,successNow,boonNow);
             gatheringNextCache=known=(plan,(int)frame.Gp,attempts,slot.BoonPercent,found);
+            // 0.731 (user report): the end of the plan, with what is left; 0.747: solved off the frame, the plain step shown meanwhile.
+            if(found is { Kind:GpNextKind.Gather,Finished:true } && slot.SuccessPercent is { } successNow && slot.BoonPercent is { } boonNow && gpActions.State.Catalog is { } catalog)
+            {
+                var opened=optimization.Scenario;var gp=(int)frame.Gp;
+                gatheringLeftoverSolve=(known,Task.Run(()=>GpNextAction.Leftover(found,opened,plan,catalog,gp,attempts,successNow,boonNow)));
+            }
+        }
+        if(gatheringLeftoverSolve is { Task.IsCompleted:true } leftover)
+        {
+            gatheringLeftoverSolve=null;
+            if(leftover.Task.IsCompletedSuccessfully && Equals(leftover.Key,known))gatheringNextCache=known=known with {Step=leftover.Task.Result};
         }
         step=known.Step;
         switch(step.Kind)
@@ -184,6 +192,8 @@ internal sealed partial class MainWindow
     private Func<uint,IReadOnlyList<GatherNodeEffect>>? nodeEffectsOf;
     internal void ConfigureNodeEffects(Func<uint,IReadOnlyList<GatherNodeEffect>> read)=>nodeEffectsOf=read;
     private readonly Dictionary<GatherNodeEffect,decimal> gatheringPanelEffectWith=[];
+    private (object Key,Task<(GpOptimization Plan,Dictionary<GatherNodeEffect,decimal> With)> Task)? gatheringPanelSolve;
+    private (object Key,Task<GpNextStep> Task)? gatheringLeftoverSolve;
     private string? gatheringPanelExtraKey;
     private void DrawGatheringPanelPlan(GatheringObservedSlot? slot,int rating,ItemCatalog? items,GatheringObservedFrame frame)
     {
@@ -213,17 +223,32 @@ internal sealed partial class MainWindow
             gatheringPanelMissing=[..missing];gatheringPanelBountifulFloor=start.Level>=68 && bountiful is null;
             if(missing.Count==0 && !first.Late && first.Success is { } success && first.Boon is { } boon && start.Attempts is { } attempts && attempts>=1)
             {
-                try
+                // 0.479: the quantity the game shows per gather; a node where it was not read counts one.
+                var quantity=Math.Clamp(first.Quantity ?? 1,1,20);
+                var scenario=new GpScenario(start.JobId,start.Level,(int)start.Gp,attempts,quantity,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbiddenFor(start.JobId));
+                var effects=NodeEffects(frame).Where(effect=>GatherNodeEffects.Missing(effect,(int)frame.MaxGp,rating,perception)>0)
+                    .Select(effect=>(Effect:effect,Better:GatherNodeEffects.With(scenario,effect))).Where(pair=>pair.Better is not null).ToArray();
+                // 0.747 (X-01): solved off the frame: the slow-frame log of 0.745 measured this panel at 97 ms on the frame a node opened.
+                gatheringPanelSolve=(key,Task.Run(()=>
                 {
-                    // 0.479: the quantity the game shows per gather; a node where it was not read counts one.
-                    var quantity=Math.Clamp(first.Quantity ?? 1,1,20);
-                    var scenario=new GpScenario(start.JobId,start.Level,(int)start.Gp,attempts,quantity,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbiddenFor(start.JobId));
-                    gatheringPanelPlan=GpOptimizer.Solve(scenario,catalog);
-                    foreach(var effect in NodeEffects(frame))
-                        if(GatherNodeEffects.Missing(effect,(int)frame.MaxGp,rating,perception)>0 && GatherNodeEffects.With(scenario,effect) is { } better)
-                            gatheringPanelEffectWith[effect]=GpOptimizer.Solve(better,catalog).Best.ExpectedYield;
+                    var solved=GpOptimizer.Solve(scenario,catalog);
+                    var with=effects.ToDictionary(pair=>pair.Effect,pair=>GpOptimizer.Solve(pair.Better!,catalog).Best.ExpectedYield);
+                    return (solved,with);
+                }));
+            }
+        }
+        if(gatheringPanelSolve is { Task.IsCompleted:true } solving)
+        {
+            gatheringPanelSolve=null;
+            if(Equals(solving.Key,gatheringPanelKey))
+            {
+                gatheringPanelEffectWith.Clear();
+                if(solving.Task.IsCompletedSuccessfully)
+                {
+                    gatheringPanelPlan=solving.Task.Result.Plan;
+                    foreach(var (effect,yieldWith) in solving.Task.Result.With)gatheringPanelEffectWith[effect]=yieldWith;
                 }
-                catch(ArgumentException){gatheringPanelPlan=null;gatheringPanelEffectWith.Clear();}
+                else gatheringPanelPlan=null;
             }
         }
         ImGui.TextColored(Accent,localization.Format("GatheringPanel.PlanFor",items?.Find(gatheringPanelItem)?.Name ?? gatheringPanelItem.ToString()));
@@ -231,7 +256,8 @@ internal sealed partial class MainWindow
         if(gatheringPanelPlan is not { } plan)
         {
             if(need>0)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
-            ImGui.TextDisabled(gatheringPanelLate ? localization.Get("GatheringPanel.AfterStart")
+            ImGui.TextDisabled(gatheringPanelSolve is not null && Equals(gatheringPanelSolve.Value.Key,gatheringPanelKey) ? localization.Get("GatheringPanel.Solving")
+                :gatheringPanelLate ? localization.Get("GatheringPanel.AfterStart")
                 :gatheringPanelMissing.Length>0 ? localization.Format("GatheringPanel.Missing",string.Join(", ",gatheringPanelMissing.Select(localization.Get)))
                 :localization.Get("GatheringPanel.NoPlan"));
             return;

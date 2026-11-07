@@ -24,6 +24,10 @@ internal static class SlowFrame745Tests
             var plugin=Read("Plugin.cs");
             Check(plugin.Contains("if(!mainWindow.DeveloperMode){DrawFrame();return;}") && plugin.Contains("private void DrawFrame()"),"wrapped");
             Check(Read("MainWindow.cs").Contains("SlowFrames.Add(ImGui.GetFrameCount(), \"page \" + drawnPage, drawMs)"),"pages too");
+            Check(plugin.Contains("\"setup\"") && plugin.Contains("\"all windows\"") && Read("MainWindow.cs").Contains("\"main window\""),"0.747: the rest named");
+            var panel=Read("MainWindow.GatheringPanel.cs");
+            Check(panel.Contains("gatheringPanelSolve=(key,Task.Run(()=>") && !panel.Contains("gatheringPanelPlan=GpOptimizer.Solve(scenario,catalog);"),"0.747: the node's plan off the frame");
+            Check(panel.Contains("gatheringLeftoverSolve=(known,Task.Run(()=>GpNextAction.Leftover("),"0.747: the end-of-node replan too");
         }),
     ];
 }

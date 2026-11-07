@@ -233,6 +233,13 @@ internal sealed partial class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
+        var started = DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
+        try { DrawMain(); }
+        finally { if (started != 0) SlowFrames.Add(ImGui.GetFrameCount(), "main window", System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds); }
+    }
+
+    private void DrawMain()
+    {
         RememberPage();
         OpenGuideOnce();
         ValidateDrawContext();

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.747.0
+- Plan global, Verify : Lourdeur (X-01) : le plan de PR d'un point de récolte et son recalcul de fin de nœud se font hors de l'image ; le journal avait mesuré 97 ms sur l'image où le point s'ouvre. « Calcul du plan… » s'affiche le temps du calcul. Le relevé des images lentes mesure aussi la fenêtre principale et les autres fenêtres. Non validé en jeu.
+- Tests : SlowFrame745Tests. Verify.ps1 (agent) : 1320/1320, 0 avertissement, 0 erreur ; DLL 0.747.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01): a node's GP plan and its end-of-node replan are worked out off the frame; the log had measured 97 ms on the frame the node opened. « Working out the plan… » shows meanwhile. The slow-frame log also measures the main window and the other windows. Not validated in game.
+
 ## 0.746.0
 - Plan global, Verify : Plan : les demandes faites en jouant le 2026-11-07 sont inscrites dans le plan global (X-01 à X-07), avec leur état, pour n'en oublier aucune. Aucun changement du plugin.
 - Tests : SlowFrame745Tests. Verify.ps1 (agent) : 1320/1320, 0 avertissement, 0 erreur ; DLL 0.746.0.0. Non validé en jeu.

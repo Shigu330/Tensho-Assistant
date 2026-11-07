@@ -1161,6 +1161,7 @@
     "Bountiful": "Abondance +{0}",
     "PlanFor": "Plan de PR pour {0}",
     "Expected": "≈ {0} objets (sans PR : {1}) · coût {2} PR",
+    "Solving": "Calcul du plan…",
     "NoPlan": "Plan indisponible (cliquez un objet, attendez la lecture du point).",
     "Footer": "Clic sur un objet = objet en contexte ; plan calculé comme l'outil PR (Abondance estimée).",
     "Setting": "Aide à la récolte en jeu",

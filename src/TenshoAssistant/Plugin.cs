@@ -1263,6 +1263,7 @@ public sealed class Plugin : IDalamudPlugin
     }
     private void DrawFrame()
     {
+        var setupStarted=mainWindow.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp():0;
         fonts?.Apply(fontSettings() ?? new());
         if(commandInfo is not null && commandLocalizationRevision!=localization.Revision)
         {commandInfo.HelpMessage=localization.Get("Plugin.CommandHelp");commandLocalizationRevision=localization.Revision;}
@@ -1275,6 +1276,8 @@ public sealed class Plugin : IDalamudPlugin
         mainWindow.LinkReminderAlarms();
         if(guideWindow is not null)guideWindow.IsOpen=mainWindow.GuideOpen;
         foreach(var panel in panelWindows)panel.Follow();
+        // 0.747 (X-01): the parts the slow-frame line left « not measured ».
+        if(setupStarted!=0)mainWindow.SlowFrames.Add(Dalamud.Bindings.ImGui.ImGui.GetFrameCount(),"setup",System.Diagnostics.Stopwatch.GetElapsedTime(setupStarted).TotalMilliseconds);
         overlays??=
         [
             ("Bank",()=>{if(!autoBankCapture())bankOverlay.Draw();}),
@@ -1318,7 +1321,9 @@ public sealed class Plugin : IDalamudPlugin
         }
         // 0.516: the panels attached to a game window have asked above; all the windows are drawn after them.
         attachedPanels?.Apply();
+        var windowsStarted=mainWindow.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp():0;
         windows.Draw();
+        if(windowsStarted!=0)mainWindow.SlowFrames.Add(Dalamud.Bindings.ImGui.ImGui.GetFrameCount(),"all windows",System.Diagnostics.Stopwatch.GetElapsedTime(windowsStarted).TotalMilliseconds);
         attachedPanels?.EndFrame();
     }
     private (string Name,Action Draw)[]? overlays;
