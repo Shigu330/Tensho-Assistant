@@ -96,6 +96,14 @@ public static class CraftFromStock
         return new(rows.OrderByDescending(row=>row.Recipe.Level).ThenByDescending(row=>row.Count).ThenBy(row=>row.Recipe.RecipeId).ToArray(),undecided);
     }
 
+    /// <summary>0.709 (user request): one page of a list. A page past the end gives the last one; the page returned tells which.</summary>
+    public static (T[] Rows,int Page,int Pages) Paged<T>(IReadOnlyList<T> rows,int page,int size)
+    {
+        var pages=Math.Max(1,(rows.Count+size-1)/size);
+        var shown=Math.Clamp(page,0,pages-1);
+        return (rows.Skip(shown*size).Take(size).ToArray(),shown,pages);
+    }
+
     /// <summary>W-06 (0.707): most valuable first, unknown values last in their order. A value is what the crafts would bring, without the materials, which are already in stock.</summary>
     public static CraftFromStockRow[] Ranked(IEnumerable<CraftFromStockRow> rows,Func<CraftFromStockRow,decimal?> value)
         =>rows.Select((row,index)=>(row,index,worth:value(row))).OrderBy(entry=>entry.worth is null ? 1:0).ThenByDescending(entry=>entry.worth ?? 0).ThenBy(entry=>entry.index).Select(entry=>entry.row).ToArray();

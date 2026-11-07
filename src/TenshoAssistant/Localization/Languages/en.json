@@ -687,6 +687,14 @@
     "ReferenceSummary": "Reference keys: {0} · languages: {1}"
   },
   "CraftStock": {
+    "NameSearch": "Item name…",
+    "NameSearchTip": "Part of the name of what is crafted, across the whole list.",
+    "Page": "Page {0} / {1}",
+    "PreviousTip": "Previous page.",
+    "NextTip": "Next page.",
+    "LoadAll": "Load all prices ({0})",
+    "LoadAllTip": "Asks Universalis for every price still missing, 32 at a time, then ranks the whole list. Without it, prices come page by page, and each page is ranked on its own.",
+    "Complete": "All prices loaded: the whole list is ranked.",
     "Sort": "Sort",
     "SortLevel": "By level",
     "SortMarket": "Most profitable: market gil",

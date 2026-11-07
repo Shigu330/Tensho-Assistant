@@ -16,7 +16,12 @@ internal sealed partial class MainWindow
     private string fromStockJob="";
     private int fromStockMin=1,fromStockMax=100;
     private bool fromStockChained=true;
-    private (CraftFromStockResult Source,string Job,int Min,int Max,int Sort,int Prices,bool Loading,CraftFromStockRow[] Rows)? fromStockView;
+    private (CraftFromStockResult Source,string Job,int Min,int Max,int Sort,int Prices,bool Loading,string Query,int Page,CraftFromStockRow[] Rows,CraftFromStockRow[] Shown,int Pages)? fromStockView;
+    // 0.709 (user request): a list by pages. On the market sort, prices come page by page, or all on a click; the whole list is ranked once they are all there.
+    private const int FromStockPageSize=25;
+    private int fromStockPage;
+    private string fromStockQuery="";
+    private bool fromStockLoadAll,fromStockMarketComplete;
     // W-06 (0.707, user request): 0 level, 1 market, 2 NPC sale, 3 scrips.
     private int fromStockSort;
     private bool fromStockPricesOn=true;
@@ -50,7 +55,8 @@ internal sealed partial class MainWindow
                     else if(items?.Find(row.Recipe.ResultItemId) is { IsMarketable:false })fromStockValues[row.Recipe.RecipeId]=localization.Get("CraftStock.NotMarket");
                     else if(fromStockAsked.Contains(row.Recipe.ResultItemId))fromStockValues[row.Recipe.RecipeId]=localization.Get("CurrencyValue.NoOffer");
                 }
-                return CraftFromStock.Ranked(rows,row=>FromStockMarketUnit(row,now) is { } unit ? CraftFromStock.Worth(row,unit):null);
+                fromStockMarketComplete=rows.All(row=>FromStockMarketUnit(row,now) is not null || items?.Find(row.Recipe.ResultItemId) is not { IsMarketable:true } || fromStockAsked.Contains(row.Recipe.ResultItemId));
+                return fromStockMarketComplete ? CraftFromStock.Ranked(rows,row=>FromStockMarketUnit(row,now) is { } unit ? CraftFromStock.Worth(row,unit):null):rows;
             case 2:
                 foreach(var row in rows)
                     if(items?.Find(row.Recipe.ResultItemId) is { SellPrice:>0 } sold)fromStockValues[row.Recipe.RecipeId]=localization.Format("CraftStock.ValueNpc",Gil(CraftFromStock.Worth(row,sold.SellPrice)),Gil(sold.SellPrice));
@@ -65,15 +71,24 @@ internal sealed partial class MainWindow
     }
 
     // Market prices of what is listed, 32 at a time, from the choice of this sort on; the box stops them.
-    private void DrawFromStockPrices(CraftFromStockRow[] rows)
+    private void DrawFromStockPrices(CraftFromStockRow[] all,CraftFromStockRow[] page)
     {
         if(fromStockSort!=1)return;
         ImGui.Checkbox(localization.Get("CurrencyValue.Market")+"###FromStockMarket",ref fromStockPricesOn);
         Tip("CraftStock.MarketTip");
         if(!fromStockPricesOn){if(fromStockPrices.State.Loading)fromStockPrices.Cancel();return;}
         var prices=fromStockPrices.State;var world=market.State.WorldId;var character=bankBridge.State.CharacterId;var now=DateTimeOffset.UtcNow;var items=itemCatalog.State.Catalog;
-        var missing=rows.Where(row=>FromStockMarketUnit(row,now) is null && items?.Find(row.Recipe.ResultItemId) is { IsMarketable:true } && !fromStockAsked.Contains(row.Recipe.ResultItemId)).Select(row=>row.Recipe.ResultItemId).Distinct().ToArray();
-        if(prices.Loading){ImGui.SameLine();ImGui.TextDisabled(localization.Format("CurrencyValue.Fetching",fromStockAsked.Count,fromStockAsked.Count+missing.Length));return;}
+        var marketable=all.Where(row=>items?.Find(row.Recipe.ResultItemId) is { IsMarketable:true }).Select(row=>row.Recipe.ResultItemId).Distinct().Count();
+        var left=all.Count(row=>FromStockMarketUnit(row,now) is null && items?.Find(row.Recipe.ResultItemId) is { IsMarketable:true } && !fromStockAsked.Contains(row.Recipe.ResultItemId));
+        if(left>0 && !prices.Loading && !fromStockLoadAll)
+        {
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Format("CraftStock.LoadAll",left)))fromStockLoadAll=true;
+            Tip("CraftStock.LoadAllTip");
+        }
+        else if(left==0 && !prices.Loading){ImGui.SameLine();ImGui.TextDisabled(localization.Get("CraftStock.Complete"));}
+        var missing=(fromStockLoadAll ? all:page).Where(row=>FromStockMarketUnit(row,now) is null && items?.Find(row.Recipe.ResultItemId) is { IsMarketable:true } && !fromStockAsked.Contains(row.Recipe.ResultItemId)).Select(row=>row.Recipe.ResultItemId).Distinct().ToArray();
+        if(prices.Loading){ImGui.SameLine();ImGui.TextDisabled(localization.Format("CurrencyValue.Fetching",fromStockAsked.Count,marketable));return;}
         if(prices.Error is { } failed)
         {
             ImGui.SameLine();ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("CurrencyValue.FetchFailed"));
@@ -85,7 +100,7 @@ internal sealed partial class MainWindow
         }
         if(world==0 || character==0){ImGui.SameLine();ImGui.TextDisabled(localization.Get("CurrencyValue.NoWorld"));return;}
         if(!configuration.CommunityUniversalis){ImGui.SameLine();ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));return;}
-        if(missing.Length==0)return;
+        if(missing.Length==0){fromStockLoadAll=false;return;}
         var batch=missing.Take(32).ToArray();
         fromStockAsked.UnionWith(batch);
         try{_=fromStockPrices.StartListAsync(market,character,world,batch);}
@@ -144,13 +159,41 @@ internal sealed partial class MainWindow
         string[] sorts=[localization.Get("CraftStock.SortLevel"),localization.Get("CraftStock.SortMarket"),localization.Get("CraftStock.SortNpc"),localization.Get("CraftStock.SortScrips")];
         ImGui.Combo(localization.Get("CraftStock.Sort")+"###CraftStockSort",ref fromStockSort,sorts,sorts.Length);
         Tip("CraftStock.SortTip");
+        ImGui.SameLine();ImGui.SetNextItemWidth(240);
+        ImGui.InputTextWithHint("###CraftStockName",localization.Get("CraftStock.NameSearch"),ref fromStockQuery,100);
+        Tip("CraftStock.NameSearchTip");
         var priceState=fromStockPrices.State;
-        if(fromStockView is not { } known || !ReferenceEquals(known.Source,result) || known.Job!=fromStockJob || known.Min!=fromStockMin || known.Max!=fromStockMax || known.Sort!=fromStockSort || known.Prices!=priceState.Completed || known.Loading!=priceState.Loading)
-            fromStockView=known=(result,fromStockJob,fromStockMin,fromStockMax,fromStockSort,priceState.Completed,priceState.Loading,FromStockRanked(CraftFromStock.Filter(result.Rows,fromStockJob,fromStockMin,fromStockMax)));
-        var rows=known.Rows;
-        DrawFromStockPrices(rows);
+        if(fromStockView is not { } known || !ReferenceEquals(known.Source,result) || known.Job!=fromStockJob || known.Min!=fromStockMin || known.Max!=fromStockMax || known.Sort!=fromStockSort || known.Prices!=priceState.Completed || known.Loading!=priceState.Loading || known.Query!=fromStockQuery || known.Page!=fromStockPage)
+        {
+            if(fromStockView is { } before && (before.Job!=fromStockJob || before.Min!=fromStockMin || before.Max!=fromStockMax || before.Sort!=fromStockSort || before.Query!=fromStockQuery || !ReferenceEquals(before.Source,result)))fromStockPage=0;
+            var names=itemCatalog.State.Catalog;
+            var filtered=CraftFromStock.Filter(result.Rows,fromStockJob,fromStockMin,fromStockMax).Where(row=>fromStockQuery.Length==0 || names?.Find(row.Recipe.ResultItemId)?.Name.Contains(fromStockQuery,StringComparison.CurrentCultureIgnoreCase)==true).ToArray();
+            var ranked=FromStockRanked(filtered);
+            var (shownRows,shownPage,pages)=CraftFromStock.Paged(ranked,fromStockPage,FromStockPageSize);
+            fromStockPage=shownPage;
+            // Until every price is there, only the page can be ranked: the whole list would move under the reader.
+            if(fromStockSort==1 && !fromStockMarketComplete)
+            {
+                var now=DateTimeOffset.UtcNow;
+                shownRows=CraftFromStock.Ranked(shownRows,row=>FromStockMarketUnit(row,now) is { } unit ? CraftFromStock.Worth(row,unit):null);
+            }
+            fromStockView=known=(result,fromStockJob,fromStockMin,fromStockMax,fromStockSort,priceState.Completed,priceState.Loading,fromStockQuery,fromStockPage,ranked,shownRows,pages);
+        }
+        var rows=known.Shown;
+        DrawFromStockPrices(known.Rows,rows);
         if(fromStockSort!=0)ImGui.TextDisabled(localization.Get("CraftStock.ValueHelp"));
-        ImGui.TextColored(Accent,localization.Format("CraftStock.Count",rows.Length.ToString("N0"),result.Rows.Count.ToString("N0")));
+        ImGui.TextColored(Accent,localization.Format("CraftStock.Count",known.Rows.Length.ToString("N0"),result.Rows.Count.ToString("N0")));
+        ImGui.SameLine();
+        ImGui.BeginDisabled(fromStockPage<=0);
+        try{if(ImGui.SmallButton("<###CraftStockPrevious"))fromStockPage--;}
+        finally{ImGui.EndDisabled();}
+        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("CraftStock.PreviousTip"));
+        ImGui.SameLine();ImGui.TextUnformatted(localization.Format("CraftStock.Page",fromStockPage+1,known.Pages));
+        ImGui.SameLine();
+        ImGui.BeginDisabled(fromStockPage>=known.Pages-1);
+        try{if(ImGui.SmallButton(">###CraftStockNext"))fromStockPage++;}
+        finally{ImGui.EndDisabled();}
+        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("CraftStock.NextTip"));
         if(result.Undecided>0)ImGui.TextDisabled(localization.Format("CraftStock.Undecided",result.Undecided.ToString("N0")));
         if(rows.Length==0){ImGui.TextDisabled(localization.Get("CraftStock.Empty"));return;}
         DrawChainList("CraftStockList",rows.Length,index=>

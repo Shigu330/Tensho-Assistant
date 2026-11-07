@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.709.0
+- Plan global, W-06 : Demande de l'utilisateur : « Que puis-je fabriquer ? » s'affiche par pages de 25, avec une recherche par nom dans toute la liste. En tri marché, les prix viennent page par page et chaque page est classée seule ; « Charger tous les prix » les demande tous, et toute la liste est alors classée. COMPILED et TESTED, non validé en jeu.
+- Tests : CraftChained696Tests. Verify.ps1 (agent) : 1261/1261, 0 avertissement, 0 erreur ; DLL 0.709.0.0. Non validé en jeu.
+### English
+- User request: What can I craft? shows pages of 25, with a name search across the whole list. On the market sort, prices come page by page and each page is ranked on its own; Load all prices asks for them all, and the whole list is then ranked. COMPILED and TESTED, not validated in game.
+
 ## 0.708.0
 - Plan global, W-03 : Armes reliques, première partie. Nouvelle page Progression › Armes reliques : les armes du zodiaque par étape, ce que vos stocks en détiennent, et le livre en cours avec ses monstres, donjons, aléas et mandats. Lecture seule, sans requête au serveur. Les extensions suivantes ne sont pas encore couvertes. COMPILED et TESTED, non validé en jeu.
 - Tests : RelicWeapons708Tests. Verify.ps1 (agent) : 1259/1259, 0 avertissement, 0 erreur ; DLL 0.708.0.0. Non validé en jeu.

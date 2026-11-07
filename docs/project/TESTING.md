@@ -1058,6 +1058,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.708) Progression › Armes reliques : comparer les étapes d'une arme ; avec un livre en cours, comparer les objectifs et les compteurs au livre du jeu.
 
+- [ ] (0.709) Que puis-je fabriquer ? : changer de page, chercher un nom ; tri marché : seule la page se charge ; Charger tous les prix puis classement complet.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

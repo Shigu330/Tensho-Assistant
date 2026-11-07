@@ -13,6 +13,21 @@ internal static class CraftChained696Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Pages: rows by page, a page past the end gives the last, an empty list has one page",() =>
+        {
+            var rows=Enumerable.Range(1,60).ToArray();
+            var (first,page,pages)=CraftFromStock.Paged(rows,0,25);
+            Check(first.Length==25 && first[0]==1 && page==0 && pages==3,"first page");
+            var (last,lastPage,_)=CraftFromStock.Paged(rows,9,25);
+            Check(last.Length==10 && last[0]==51 && lastPage==2,"past the end");
+            Check(CraftFromStock.Paged(Array.Empty<int>(),0,25).Pages==1,"empty");
+        }),
+        ("Pages: market prices follow the page, or all on a click, and the whole list is ranked only then",() =>
+        {
+            var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CraftFromStock.cs"));
+            Check(page.Contains("(fromStockLoadAll ? all:page).Where("),"page or all");
+            Check(page.Contains("return fromStockMarketComplete ? CraftFromStock.Ranked("),"whole ranking when complete");
+        }),
         ("Most profitable: value first, unknown last, the yield and the crafts counted",() =>
         {
             CraftFromStockRow Row(uint id,long count,int yield)=>new(new(id,id,yield,"Job",1,[new(Ore,1)]),count,false);
