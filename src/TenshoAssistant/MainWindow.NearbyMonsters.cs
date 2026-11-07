@@ -5,7 +5,7 @@ using TenshoAssistant.Monsters;
 namespace TenshoAssistant;
 
 /// <summary>0.796: why a nearby monster is shown; the first note picks its map icon.</summary>
-internal enum MonsterNoteKind { List, HuntLog, Fate, BlueSpell }
+internal enum MonsterNoteKind { List, HuntLog, Fate, BlueSpell, Collection }
 internal sealed record MonsterNote(MonsterNoteKind Kind,string Text);
 
 // 0.795 (X-34, X-35), 0.796 (X-36), user requests: what each nearby monster means for the player, worked out once a second, drawn every frame.
@@ -58,6 +58,18 @@ internal sealed partial class MainWindow
             foreach(var id in ids)
                 if(blue.SpellsOf(id).Where(notLearned.ContainsKey).Select(spell=>notLearned[spell]).ToArray() is { Length:>0 } taught)
                     Note(id,MonsterNoteKind.BlueSpell,localization.Format("MapView.MonsterBlueSpell",string.Join(", ",taught)));
+        }
+        // X-41: drops that unlock a mount, a minion or an orchestrion roll not owned (read in game; not read: nothing said).
+        if(configuration.MapView.ShowCollectionMonsters && lumina?.State.Data is { } loot && itemCatalog.State.Catalog is { } catalog && collections.State.Entries is { Count:>0 } collected)
+        {
+            var missingMounts=collected.Where(entry=>entry.Kind==TenshoAssistant.Collections.CollectionKind.Mount && !entry.ConfirmedUnlocked).Select(entry=>entry.Id).ToHashSet();
+            var missingMinions=collected.Where(entry=>entry.Kind==TenshoAssistant.Collections.CollectionKind.Companion && !entry.ConfirmedUnlocked).Select(entry=>entry.Id).ToHashSet();
+            var missingRolls=collected.Where(entry=>entry.Kind==TenshoAssistant.Collections.CollectionKind.Orchestrion && !entry.ConfirmedUnlocked).Select(entry=>entry.Id).ToHashSet();
+            bool Missing(uint item)=>catalog.Find(item) is { } found && (found.MountId!=0 && missingMounts.Contains(found.MountId) || found.CompanionId!=0 && missingMinions.Contains(found.CompanionId)
+                || found.OrchestrionId!=0 && missingRolls.Contains(found.OrchestrionId));
+            foreach(var id in ids)
+                if(NearbyMonsters.CollectionDrops(id,loot.ItemsDroppedBy,Missing) is { Count:>0 } wanted)
+                    Note(id,MonsterNoteKind.Collection,localization.Format("MapView.MonsterCollection",string.Join(", ",wanted.Select(item=>catalog.Find(item)?.Name ?? item.ToString()))));
         }
         nearbyMonsterNotes=notes.ToDictionary(pair=>pair.Key,pair=>(IReadOnlyList<MonsterNote>)pair.Value);
     }

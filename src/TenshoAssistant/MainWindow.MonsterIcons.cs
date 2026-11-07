@@ -49,6 +49,7 @@ internal sealed partial class MainWindow
         MonsterNoteKind.List=>settings.AboveList,
         MonsterNoteKind.HuntLog=>settings.AboveHuntLog,
         MonsterNoteKind.Fate=>settings.AboveFate,
+        MonsterNoteKind.Collection=>settings.AboveCollection,
         _=>false,
     };
     internal static (FontAwesomeIcon Symbol,Vector4 Colour) MonsterGlyph(MonsterNoteKind kind)=>kind switch
@@ -56,6 +57,7 @@ internal sealed partial class MainWindow
         MonsterNoteKind.HuntLog=>(FontAwesomeIcon.BookOpen,new Vector4(0.55f,0.80f,0.98f,1)),
         MonsterNoteKind.Fate=>(FontAwesomeIcon.Star,new Vector4(0.95f,0.85f,0.40f,1)),
         MonsterNoteKind.BlueSpell=>(FontAwesomeIcon.HatWizard,new Vector4(0.40f,0.60f,1f,1)),
+        MonsterNoteKind.Collection=>(FontAwesomeIcon.Gem,new Vector4(0.95f,0.50f,0.85f,1)),
         _=>(FontAwesomeIcon.Paw,new Vector4(0.98f,0.55f,0.35f,1)),
     };
 }

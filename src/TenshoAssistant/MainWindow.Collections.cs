@@ -111,6 +111,9 @@ internal sealed partial class MainWindow
             }
         }
         DrawCollectionSourceFilter(kind);
+        // 0.800 (X-41): nearby monsters that drop what is missing here, set from here too.
+        if(kind is CollectionKind.Mount or CollectionKind.Companion or CollectionKind.Orchestrion)
+            BoolSetting("MapView.ShowCollectionMonsters","CollectionsBrowser.NearbyTip",()=>configuration.MapView.ShowCollectionMonsters,value=>configuration.MapView.ShowCollectionMonsters=value,c=>c.MapView.ShowCollectionMonsters);
         // 0.395 (user request): the blue magic list sorted by the lowest level of the monsters that teach each spell (wiki, read on opening).
         if(blueMagic){DrawBlueSpellOrder();DrawBlueSpellNearby();}
         var blueOrder=blueMagic ? blueSpellOrder:0;var blueRevision=blueMagic && blueSpellOrder!=0 ? BlueSpellIndex?.Revision ?? 0:0;

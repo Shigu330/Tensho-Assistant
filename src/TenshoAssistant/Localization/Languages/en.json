@@ -1723,6 +1723,7 @@
     "WaitQuick": "Scenario copying waits for quick gathering to stop."
   },
   "CollectionsBrowser": {
+    "NearbyTip": "Nearby monsters that drop a missing mount, minion or orchestrion roll, on the Tensho map (a gem). Same setting as the map's.",
     "Recent": "Recently obtained ({0})",
     "RecentLine": "{0} · {1}",
     "Title": "Collections",
@@ -3141,6 +3142,11 @@
     "MonsterIconDistance": "Up to (yalms)",
     "MonsterIconSizeTip": "Size of the icons above the monsters, in pixels (16 to 96).\nDefault: 32.",
     "MonsterIconDistanceTip": "Only monsters this close to you get an icon (5 to 150 yalms); the game may load fewer.\nDefault: 50.",
+    "ShowCollectionMonsters": "Monsters with a missing collectible",
+    "ShowCollectionMonstersHelp": "Living monsters around you that drop a mount, a minion or an orchestrion roll you do not have (a gem), according to the drop data (LuminaSupplemental); the items on hover. Information only.\nDefault: on.",
+    "AboveCollection": "Missing collectibles",
+    "AboveCollectionHelp": "A gem above a monster that drops a mount, minion or orchestrion roll you lack.\nDefault: off.",
+    "MonsterCollection": "Drops for your collection: {0}",
     "ShowHuntMarks": "Nearby hunt marks",
     "ShowHuntMarksHelp": "Living hunt marks the game has loaded around you (ranks B, A, S), on the Tensho map: blue B, orange A, red S.\nDefault: on.",
     "HuntMarkLabel": "{0} (rank {1})",

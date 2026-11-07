@@ -1240,6 +1240,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.799) En mage bleu, près d'un monstre qui apprend un sort manquant (après « Lire les sorts manquants ») : icône du mage bleu au-dessus de sa tête.
 
+- [ ] (0.800) Près d'un monstre qui lâche une mascotte ou un rouleau que vous n'avez pas : gemme sur la carte.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

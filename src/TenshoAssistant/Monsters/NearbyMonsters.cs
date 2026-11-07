@@ -7,6 +7,10 @@ public static class NearbyMonsters
     public static IReadOnlyList<uint> ListDrops(uint nameId,Func<uint,IReadOnlyList<uint>> drops,IReadOnlySet<uint> needed)
         =>needed.Count==0 ? []:drops(nameId).Where(needed.Contains).Distinct().ToArray();
 
+    /// <summary>0.800 (X-41): the items this monster drops that unlock a collection entry still missing (mount, minion, orchestrion roll), each once.</summary>
+    public static IReadOnlyList<uint> CollectionDrops(uint nameId,Func<uint,IReadOnlyList<uint>> drops,Func<uint,bool> missing)
+        =>drops(nameId).Where(missing).Distinct().ToArray();
+
     /// <summary>For each needed item, the names of the nearby monsters that drop it, each once.</summary>
     public static IReadOnlyDictionary<uint,IReadOnlyList<string>> DroppedNearby(IEnumerable<(uint NameId,string Name)> monsters,Func<uint,IReadOnlyList<uint>> drops,IReadOnlySet<uint> needed)
     {

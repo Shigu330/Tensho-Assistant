@@ -1723,6 +1723,7 @@
     "WaitQuick": "La copie de scénario attend l’arrêt de la récolte rapide."
   },
   "CollectionsBrowser": {
+    "NearbyTip": "Les monstres proches qui lâchent une monture, une mascotte ou un rouleau d'orchestrion manquant, sur la carte Tensho (une gemme). Même réglage que celui de la carte.",
     "Recent": "Obtenus récemment ({0})",
     "RecentLine": "{0} · {1}",
     "Title": "Collections",
@@ -3141,6 +3142,11 @@
     "MonsterIconDistance": "Jusqu'à (yalms)",
     "MonsterIconSizeTip": "Taille des icônes au-dessus des monstres, en pixels (16 à 96).\nPar défaut : 32.",
     "MonsterIconDistanceTip": "Seuls les monstres à cette distance de vous ont une icône (5 à 150 yalms) ; le jeu peut en charger moins.\nPar défaut : 50.",
+    "ShowCollectionMonsters": "Monstres avec une pièce de collection manquante",
+    "ShowCollectionMonstersHelp": "Les monstres vivants autour de vous qui lâchent une monture, une mascotte ou un rouleau d'orchestrion que vous n'avez pas (une gemme), selon les données de butin (LuminaSupplemental) ; les objets au survol. Information seulement.\nPar défaut : activé.",
+    "AboveCollection": "Pièces de collection manquantes",
+    "AboveCollectionHelp": "Une gemme au-dessus d'un monstre qui lâche une monture, une mascotte ou un rouleau d'orchestrion qui vous manque.\nPar défaut : désactivé.",
+    "MonsterCollection": "Lâche pour votre collection : {0}",
     "ShowHuntMarks": "Marques de chasse proches",
     "ShowHuntMarksHelp": "Les marques de chasse vivantes que le jeu a chargées autour de vous (rangs B, A, S), sur la carte Tensho : bleu B, orange A, rouge S.\nPar défaut : activé.",
     "HuntMarkLabel": "{0} (rang {1})",

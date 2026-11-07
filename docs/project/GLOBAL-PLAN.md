@@ -282,7 +282,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-38 | Mage bleu : monstres proches qui apprennent une compétence pas encore apprise, icône mage bleu au-dessus de leur tête ; réglage pour l'avoir tout le temps, même hors mage bleu | Fait en 0.798 (carte, réglages, données du wiki lues au clic) et 0.799 (icône du mage bleu au-dessus de la tête, dans la vue du jeu ; aussi au choix pour listes, bestiaire, ALÉA ; taille, distance, combat) |
 | X-39 | Dresseur : monstres proches du bestiaire du dresseur, même affichage et mêmes réglages | Après X-34 ; données d'abord |
 | X-40 | Monstres proches : autres usages à proposer, et des réglages cohérents à l'endroit approprié (carte, page concernée) pour chaque usage | Après X-34 |
-| X-41 | Monstres proches : ceux qui lâchent un objet de collection qui manque (monture, mascotte, orchestrion), si les données de butin le disent | Après X-34 ; données d'abord |
+| X-41 | Monstres proches : ceux qui lâchent un objet de collection qui manque (monture, mascotte, orchestrion), si les données de butin le disent | Fait en 0.800 : gemme sur la carte, au choix au-dessus de la tête ; réglages dans la carte et sur la page Collections (montures, mascottes, orchestrion) ; MobDrop de LuminaSupplemental |
 
 ## Retenu pour plus tard
 

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.800.0
+- Plan global, Verify : Demande (X-41) : les monstres proches qui lâchent une monture, une mascotte ou un rouleau d'orchestrion que vous n'avez pas sont marqués d'une gemme sur la carte, les objets au survol ; au choix aussi au-dessus de leur tête (désactivé au départ). Ce qui vous manque est lu en jeu ; non lu, rien n'est dit. Réglages dans la carte et sur la page Collections (montures, mascottes, orchestrion). Données de butin : LuminaSupplemental. Non validé en jeu.
+- Tests : CollectionMonsters800Tests. Verify.ps1 (agent) : 1381/1381, 0 avertissement, 0 erreur ; DLL 0.800.0.0. Non validé en jeu.
+### English
+- Request (X-41): nearby monsters that drop a mount, minion or orchestrion roll you lack are marked with a gem on the map, the items on hover; also above their head when chosen (off at first). What you lack is read in game; not read, nothing is said. Settings on the map and on the Collections page (mounts, minions, orchestrion). Drop data: LuminaSupplemental. Not validated in game.
+
 ## 0.799.0
 - Plan global, Verify : Demande (X-38), suite : l'icône du mage bleu au-dessus de la tête d'un monstre proche qui apprend un sort que vous n'avez pas, dans la vue du jeu, dessinée derrière les fenêtres de Tensho, les sorts au survol. Au choix aussi pour les monstres de vos listes (patte), du bestiaire (livre) et des ALÉA (étoile), désactivés au départ. Réglages dans la carte (« Icônes au-dessus des monstres proches » : raisons, taille, distance jusqu'à 150 yalms, masquer en combat) et sur la page Magie bleue. Les monstres sont relus tous les dixièmes de seconde pour suivre leurs déplacements. Non validé en jeu.
 - Tests : MonsterIcons799Tests. Verify.ps1 (agent) : 1379/1379, 0 avertissement, 0 erreur ; DLL 0.799.0.0. Non validé en jeu.
