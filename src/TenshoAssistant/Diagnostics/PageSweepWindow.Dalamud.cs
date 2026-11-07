@@ -27,11 +27,14 @@ internal sealed class PageSweepWindow : Window
     private bool created;
     private int silentFrames;
 
-    public PageSweepWindow(bool developerMode,Func<bool> ready,Func<bool> busy,Func<IReadOnlyList<(string Name,Action Draw)>> entries,int skipped,IPluginLog log)
+    private readonly Action<string,double> record;
+    private readonly Action finished;
+    public PageSweepWindow(bool developerMode,Func<bool> ready,Func<bool> busy,Func<IReadOnlyList<(string Name,Action Draw)>> entries,int skipped,IPluginLog log,
+        Action<string,double>? record=null,Action? finished=null)
         :base(Name,ImGuiWindowFlags.NoTitleBar|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoInputs|ImGuiWindowFlags.NoFocusOnAppearing
             |ImGuiWindowFlags.NoBringToFrontOnFocus|ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoDocking|ImGuiWindowFlags.NoCollapse,true)
     {
-        this.ready=ready;this.busy=busy;this.entries=entries;this.skipped=skipped;this.log=log;
+        this.ready=ready;this.busy=busy;this.entries=entries;this.skipped=skipped;this.log=log;this.record=record ?? ((_,_)=>{});this.finished=finished ?? (()=>{});
         Position=new Vector2(-30000,-30000);PositionCondition=ImGuiCond.Always;
         Size=new Vector2(1000,760);SizeCondition=ImGuiCond.Always;
         RespectCloseHotkey=false;DisableWindowSounds=true;AllowPinning=false;AllowClickthrough=false;ShowCloseButton=false;
@@ -89,12 +92,16 @@ internal sealed class PageSweepWindow : Window
             failure=error.GetType().Name+": "+error.Message;
             log.Warning(error,"Page sweep: {0} failed to draw.",current);
         }
-        sweep.Drawn(System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds,failure);
+        var spent=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+        // 0.748: its share of a slow frame, by name.
+        record("page sweep "+current,spent);
+        sweep.Drawn(spent,failure);
         if(!sweep.Done)return;
         IsOpen=false;
         var lines=sweep.Lines;
         foreach(var line in lines)log.Information("{0}",line.Format());
         var sent=BoundedHttp.Sent.Select(host=>(host.Key,Count:host.Value-sentBefore.GetValueOrDefault(host.Key))).Where(host=>host.Count>0).ToArray();
+        finished();
         log.Information("{0}",PageSweep.Summary(lines,skipped,sent.Sum(host=>host.Count),string.Join(", ",sent.Select(host=>$"{host.Key} {host.Count}"))));
     }
 }

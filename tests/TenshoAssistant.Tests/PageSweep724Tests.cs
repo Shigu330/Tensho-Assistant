@@ -24,6 +24,17 @@ internal static class PageSweep724Tests
             Check(sweep.Lines.All(line=>line.Detail.StartsWith($"{PageSweep.FirstPassDraws+PageSweep.SecondPassDraws} draws")),"both passes");
             Check(new PageSweep([]).Done,"nothing to draw");
         }),
+        ("Page sweep (0.748): at most once in two hours, whatever the reloads; an unreadable or future time lets it run",() =>
+        {
+            var now=new DateTimeOffset(2026,11,7,12,0,0,TimeSpan.Zero);
+            Check(PageSweep.Due(null,now) && PageSweep.Due("garbage",now),"never run");
+            Check(!PageSweep.Due(now.AddMinutes(-30).ToString("O"),now),"half an hour ago");
+            Check(PageSweep.Due(now.AddHours(-2).ToString("O"),now),"two hours ago");
+            Check(PageSweep.Due(now.AddHours(1).ToString("O"),now),"a clock set back");
+            var plugin=Read("Plugin.cs");
+            Check(plugin.Contains("configuration.DeveloperMode && sweepDue") && plugin.Contains("\"PageSweepLast.txt\""),"wired");
+            Check(Read("Diagnostics/PageSweepWindow.Dalamud.cs").Contains("record(\"page sweep \"+current,spent);"),"its share of a slow frame");
+        }),
         ("Page sweep: an error is kept and fails the page, slow is only for a settled page, and the summary counts them",() =>
         {
             var sweep=new PageSweep(["Broken"]);

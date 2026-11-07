@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.748.0
+- Plan global, Verify : Lourdeur (X-01) : en mode développeur, le passage des pages repassait à chaque rechargement et donnait des images de 110 à 160 ms ; il passe au plus une fois toutes les deux heures, et sa part apparaît dans le relevé des images lentes. Inscrit au plan : X-08, compte à rebours d'un point à horaire fermé. Non validé en jeu.
+- Tests : PageSweep724Tests. Verify.ps1 (agent) : 1321/1321, 0 avertissement, 0 erreur ; DLL 0.748.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01): in developer mode, the page sweep ran at each reload and gave frames of 110 to 160 ms; it now runs at most once in two hours, and its share shows in the slow-frame log. Added to the plan: X-08, countdown of a closed timed point. Not validated in game.
+
 ## 0.747.0
 - Plan global, Verify : Lourdeur (X-01) : le plan de PR d'un point de récolte et son recalcul de fin de nœud se font hors de l'image ; le journal avait mesuré 97 ms sur l'image où le point s'ouvre. « Calcul du plan… » s'affiche le temps du calcul. Le relevé des images lentes mesure aussi la fenêtre principale et les autres fenêtres. Non validé en jeu.
 - Tests : SlowFrame745Tests. Verify.ps1 (agent) : 1320/1320, 0 avertissement, 0 erreur ; DLL 0.747.0.0. Non validé en jeu.

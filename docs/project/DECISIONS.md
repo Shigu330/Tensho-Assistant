@@ -402,5 +402,5 @@ Evidence: docs/evidence/0.724-page-sweep.md. Choix de l'utilisateur : « Oui, en
 Options: Automatique en mode développeur ; seulement sur demande ; automatique sans aucune requête.
 Decision: Automatique, en mode développeur seulement, avec les requêtes que les pages font à leur ouverture, dans les réglages de l'utilisateur. La page Marché reste exclue (Universalis). Hors mode développeur, rien ne se lance.
 Reason: Décision de l'utilisateur.
-Consequences: Le résumé du passage donne le nombre de requêtes et leurs hôtes. Un test vérifie que la fenêtre ne s'ouvre qu'en mode développeur.
+Consequences: Le résumé du passage donne le nombre de requêtes et leurs hôtes. Un test vérifie que la fenêtre ne s'ouvre qu'en mode développeur. 0.748 (X-01, lourdeur signalée par l'utilisateur) : au plus un passage toutes les deux heures, quels que soient les rechargements.
 References: DEC-038, docs/evidence/0.724-page-sweep.md

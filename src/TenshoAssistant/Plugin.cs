@@ -1164,7 +1164,12 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(() => windows.AddWindow(mainWindow), () => windows.RemoveWindow(mainWindow));
             // 0.724: developer mode only, once per load, after the self-check: every page drawn out of sight, what it cost and any error in the log.
             Diagnostics.PageSweepWindow? pageSweep=null;
-            registrations.Register(() => windows.AddWindow(pageSweep = new Diagnostics.PageSweepWindow(configuration.DeveloperMode,
+            // 0.748 (X-01): at most one sweep every two hours, whatever the reloads; the time of the last one is kept beside the self-check's memory.
+            var sweepFile=Path.Combine(pluginInterface.GetPluginConfigDirectory(),"PageSweepLast.txt");
+            string? sweepLast=null;
+            try{if(File.Exists(sweepFile))sweepLast=File.ReadAllText(sweepFile);}catch(Exception error) when(error is IOException or UnauthorizedAccessException){log.Warning(error,"Page sweep time could not be read.");}
+            var sweepDue=Diagnostics.PageSweep.Due(sweepLast,DateTimeOffset.UtcNow);
+            registrations.Register(() => windows.AddWindow(pageSweep = new Diagnostics.PageSweepWindow(configuration.DeveloperMode && sweepDue,
                 () => client.IsLoggedIn && player.IsLoaded && selfCheck?.LastLines.Count>0,
                 () => !client.IsLoggedIn || !player.IsLoaded || new[]
                 {
@@ -1172,7 +1177,9 @@ public sealed class Plugin : IDalamudPlugin
                     Dalamud.Game.ClientState.Conditions.ConditionFlag.Crafting,Dalamud.Game.ClientState.Conditions.ConditionFlag.Gathering,Dalamud.Game.ClientState.Conditions.ConditionFlag.Fishing,
                     Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas,Dalamud.Game.ClientState.Conditions.ConditionFlag.WatchingCutscene,Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedInCutSceneEvent,
                 }.Any(flag => condition[flag]),
-                mainWindow.PageSweepEntries,MainWindow.PageSweepSkipped,log)), () => { if (pageSweep is not null) windows.RemoveWindow(pageSweep); });
+                mainWindow.PageSweepEntries,MainWindow.PageSweepSkipped,log,
+                (name,ms)=>mainWindow.SlowFrames.Add(Dalamud.Bindings.ImGui.ImGui.GetFrameCount(),name,ms),
+                ()=>{try{File.WriteAllText(sweepFile,DateTimeOffset.UtcNow.ToString("O",System.Globalization.CultureInfo.InvariantCulture));}catch(Exception error) when(error is IOException or UnauthorizedAccessException){log.Warning(error,"Page sweep time could not be saved.");}})), () => { if (pageSweep is not null) windows.RemoveWindow(pageSweep); });
             registrations.Register(() => windows.AddWindow(guideWindow = new GuideWindow(mainWindow)), () => { if (guideWindow is not null) windows.RemoveWindow(guideWindow); guideWindow = null; });
             registrations.Register(() => windows.AddWindow(mapWindow = new MapViewWindow(mainWindow)), () => { if (mapWindow is not null) windows.RemoveWindow(mapWindow); });
             registrations.Register(() => { attachedPanels = new AttachedPanels(windows, mainWindow); mainWindow.Panels = attachedPanels; bankOverlay.Panels = attachedPanels; }, () => { mainWindow.Panels = null; bankOverlay.Panels = null; attachedPanels?.Dispose(); attachedPanels = null; });

@@ -6,6 +6,10 @@ namespace TenshoAssistant.Diagnostics;
 /// </summary>
 public sealed class PageSweep
 {
+    /// <summary>0.748 (X-01, user report: Tensho feels heavy): at most one sweep in this time, whatever the reloads; each sweep costs frames of 100 to 200 ms when pages first draw.</summary>
+    public static readonly TimeSpan Spacing=TimeSpan.FromHours(2);
+    public static bool Due(string? lastRun,DateTimeOffset now)=>!DateTimeOffset.TryParse(lastRun,System.Globalization.CultureInfo.InvariantCulture,System.Globalization.DateTimeStyles.RoundtripKind,out var last)
+        || last>now || now-last>=Spacing;
     public const int FramesBetweenDraws=10,FirstPassDraws=20,SecondPassDraws=3;
     /// <summary>One frame at 60 images a second: a settled page that costs this much alone is worth looking at.</summary>
     public const double SlowMs=16;
