@@ -30,7 +30,8 @@ internal static class SeenPrices817Tests
             Check(seen is { Nq.Minimum:100 } && seen.NqCheapest?.WorldId==34,"seen, other worlds kept");
             var fresh=old with {UploadedAt=Now};
             Check(SeenPrices.Prefer(Entry(),fresh,Now) is null,"Universalis newer: Universalis");
-            Check(SeenPrices.Prefer(Entry(),null,Now) is not null,"no Universalis: seen");
+            Check(SeenPrices.Prefer(Entry(),null,Now) is not null,"no Universalis and its source off: seen alone");
+            Check(SeenPrices.Prefer(Entry(),null,Now,true) is null,"0.821: no Universalis yet but its source on: wait for it, so it is asked and its other worlds come");
             var store=new SeenPriceStore();
             store.SeeListings(33,5000,7,[new(100,false,1)],Now);store.SeeListings(33,5000,7,[new(90,false,1)],Now);
             Check(store.Get(33,5000)!.Listings.Count==2,"pages of one request add up");

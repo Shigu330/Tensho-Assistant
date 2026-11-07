@@ -181,7 +181,7 @@ public sealed class Plugin : IDalamudPlugin
             // X-52 (0.817): the prices seen at the market board, in place of Universalis' when newer.
             var seenPrices=new Market.SeenPriceStore();
             mainWindow.SeenPrices=seenPrices;
-            market.Seen=(world,item,universalis)=>configuration.Discovery.Enabled && configuration.Discovery.MarketPrices ? seenPrices.Prefer(world,item,universalis,DateTimeOffset.UtcNow):null;
+            market.Seen=(world,item,universalis)=>configuration.Discovery.Enabled && configuration.Discovery.MarketPrices ? seenPrices.Prefer(world,item,universalis,DateTimeOffset.UtcNow,configuration.CommunityUniversalis):null;
             Market.SeenPriceReader? seenReader=null;
             registrations.Register(()=>seenReader=new Market.SeenPriceReader(marketBoardEvents,seenPrices,()=>market.State.WorldId,()=>configuration.Discovery.Enabled && configuration.Discovery.MarketPrices,log),()=>seenReader?.Dispose());
             _=Task.Run(()=>

@@ -48,10 +48,15 @@ public static class SeenPrices
     public static MarketQuote Quote(SeenMarketEntry entry,MarketQuote? universalis,DateTimeOffset now)=>new(entry.World,entry.Item,entry.Seen,entry.Seen,
         Quality(entry.Listings,entry.Sales,false,now),Quality(entry.Listings,entry.Sales,true,now),universalis?.NqCheapest,universalis?.HqCheapest,universalis?.NqRegion,universalis?.HqRegion);
 
-    /// <summary>The seen quote when it is newer than Universalis' data for that world (its upload, else its fetch); otherwise null.</summary>
-    public static MarketQuote? Prefer(SeenMarketEntry? entry,MarketQuote? universalis,DateTimeOffset now)
+    /// <summary>
+    /// The seen quote when it is newer than Universalis' data for that world (its upload, else its fetch); otherwise null.
+    /// 0.821 (user report: the other worlds vanished): with no Universalis quote yet, nothing while Universalis is asked (« waitForUniversalis »), so that the request
+    /// is still made and its other worlds and region come back; only with that source off does the seen quote stand alone.
+    /// </summary>
+    public static MarketQuote? Prefer(SeenMarketEntry? entry,MarketQuote? universalis,DateTimeOffset now,bool waitForUniversalis=false)
     {
         if(entry is null || entry.Listings.Count==0 && entry.Sales.Count==0)return null;
+        if(universalis is null && waitForUniversalis)return null;
         if(universalis is not null && (universalis.UploadedAt ?? universalis.FetchedAt)>=entry.Seen)return null;
         return Quote(entry,universalis,now);
     }
@@ -98,11 +103,12 @@ public sealed class SeenPriceStore
     }
 
     /// <summary>The seen quote when newer than Universalis' (SeenPrices.Prefer), without copying the entry; computed again only when the entry or Universalis' quote changes.</summary>
-    public MarketQuote? Prefer(uint world,uint item,MarketQuote? universalis,DateTimeOffset now)
+    public MarketQuote? Prefer(uint world,uint item,MarketQuote? universalis,DateTimeOffset now,bool waitForUniversalis=false)
     {
         lock(gate)
         {
             if(!entries.TryGetValue((world,item),out var entry))return null;
+            if(universalis is null && waitForUniversalis)return null;
             if(quotes.TryGetValue((world,item),out var known) && known.Seen==entry.Seen && ReferenceEquals(known.Universalis,universalis))return known.Quote;
             var quote=SeenPrices.Prefer(entry,universalis,now);
             quotes[(world,item)]=(entry.Seen,universalis,quote);

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.821.0
+- Plan global, Verify : Signalement (X-52), suite : le prix vu au tableau des ventes effaçait ce qu'Universalis ajoute (le moins cher sur les autres mondes et dans la région). Sur un objet dont Tensho n'avait pas encore de copie d'Universalis, le prix vu passait pour complet, et Universalis n'était plus interrogé. Maintenant, sans copie d'Universalis, le prix vu attend sa réponse ; ensuite les deux sont réunis : votre monde depuis le tableau des ventes s'il est plus récent, les autres mondes et la région depuis Universalis. Source Universalis coupée : le prix vu seul. Non validé en jeu.
+- Tests : SeenPrices817Tests. Verify.ps1 (agent) : 1408/1408, 0 avertissement, 0 erreur ; DLL 0.821.0.0. Non validé en jeu.
+### English
+- Report (X-52), continued: the price seen at the market board erased what Universalis adds (the cheapest on other worlds and in the region). On an item Tensho had no Universalis copy of yet, the seen price passed for complete, and Universalis was no longer asked. Now, with no Universalis copy, the seen price waits for its answer; then both are joined: your world from the board when newer, other worlds and region from Universalis. Universalis source off: the seen price alone. Not validated in game.
+
 ## 0.820.0
 - Plan global, Verify : Demande (X-54) : quand l'inventaire d'un servant, la sacoche du chocobo ou le coffre de compagnie est ouvert, les cases qui contiennent un objet de vos listes de suivi d'artisanat ou d'atelier sont encadrées (le même cadre doré que l'aide à la récolte). Les cases sont repérées par l'icône de l'objet (NQ et HQ) : un objet qui partage cette icône est encadré aussi. Réglage dans les options des listes, activé. En mode développeur, le journal dit quelles fenêtres sont lues et combien de cases sont encadrées. Non validé en jeu.
 - Tests : StorageHighlight820Tests. Verify.ps1 (agent) : 1408/1408, 0 avertissement, 0 erreur ; DLL 0.820.0.0. Non validé en jeu.
