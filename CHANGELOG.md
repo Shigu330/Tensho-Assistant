@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.837.0
+- Plan global, Verify : Signalement (X-03), résolu par l'essai « /tensho linktest » : sur le lien d'objet du chat, le jeu ouvre bien son menu et le donne à Tensho (journal de 23:35, objet survolé 12898), mais Tensho le prenait pour un menu de personnage, parce qu'un nom y figure. Le menu du chat reçoit maintenant l'entrée Tensho quand l'objet du lien, tel que le jeu le garde, est l'objet survolé ; un clic droit sur le nom d'un joueur n'en reçoit toujours pas. Vaut pour l'alarme et pour tout lien d'objet du chat. Non validé en jeu.
+- Tests : ChatItemMenu837Tests. Verify.ps1 (agent) : 1423/1423, 0 avertissement, 0 erreur ; DLL 0.837.0.0. Non validé en jeu.
+### English
+- Report (X-03), solved by the « /tensho linktest » test: on a chat item link, the game does open its menu and hands it to Tensho (log at 23:35, hovered item 12898), but Tensho took it for a character's menu because a name is set. The chat's menu now gets the Tensho entry when the link's item, as the game keeps it, is the hovered item; a right click on a player's name still gets none. Works for the alarm and for any item link in the chat. Not validated in game.
+
 ## 0.836.0
 - Plan global, Verify : Signalement (X-03) : toujours aucun menu au clic droit sur l'objet de l'alarme (morille, 23:06). Le journal de Dalamud montre que la ligne s'imprime, puis qu'aucun menu ne s'ouvre : l'événement n'arrive pas du tout à Tensho, le jeu n'ouvre rien. Pour trouver la forme qui marche, une commande de développeur, « /tensho linktest », imprime quatre lignes : A et B avec le lien d'objet du jeu (clic droit), C et D avec un lien Tensho (clic gauche), chacune en type par défaut puis en Écho. Chaque menu ouvert et chaque clic sont notés au journal. Non validé en jeu.
 - Tests : LinkTest836Tests. Verify.ps1 (agent) : 1422/1422, 0 avertissement, 0 erreur ; DLL 0.836.0.0. Non validé en jeu.

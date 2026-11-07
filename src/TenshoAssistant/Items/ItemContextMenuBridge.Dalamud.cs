@@ -31,6 +31,13 @@ internal sealed class ItemContextMenuBridge : IDisposable
     private void OnLogout(int type,int code)=>session.Clear();
     /// <summary>0.808 (X-44): windows that list items only (crafting log, its material list and tree): their menu is about the hovered item.</summary>
     internal static readonly IReadOnlySet<string> ItemWindows=new HashSet<string>(StringComparer.Ordinal){"RecipeNote","RecipeMaterialList","RecipeTree","RecipeProductList"};
+    /// <summary>0.837 (X-03): the chat's link item (AgentChatLog.ContextItemId, framework thread) is the hovered item, HQ or not.</summary>
+    private static unsafe bool ChatLinkItem(ulong hovered)
+    {
+        var agent=FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentChatLog.Instance();
+        return agent!=null && ChatLinkMatches(agent->ContextItemId,hovered);
+    }
+    internal static bool ChatLinkMatches(uint linked,ulong hovered)=>linked!=0 && hovered!=0 && linked%1_000_000==hovered%1_000_000;
     private bool Current(ItemMenuToken token)=>!disposed && session.IsCurrent(token,configuration.ItemContextMenuEnabled,Owner,catalog.State.Catalog,DateTimeOffset.UtcNow);
 
     private void OnMenuOpened(IMenuOpenedArgs args)
@@ -58,8 +65,11 @@ internal sealed class ItemContextMenuBridge : IDisposable
                 // menu opened is used. Menus aimed at a character (player, NPC, party member) never get the Tensho entry.
                 // 0.808 (X-44, user report: no Tensho entry in the crafting log): the game's item windows aim no character, whatever their target holds.
                 var itemWindow=ItemWindows.Contains(args.AddonName ?? "");
+                // 0.837 (X-03, « /tensho linktest », dalamud.log 23:35: the chat's menu opened on the item link, hovered item 12898, « name set »): an item link
+                // in the chat is the game's link item, the same as the hovered one; a player's name in the chat still gets no entry.
+                var chatItem=args.AddonName=="ChatLog" && ChatLinkItem(gui.HoveredItem);
                 if(args.MenuType!=ContextMenuType.Default || args.Target is not MenuTargetDefault target
-                   || !itemWindow && (target.TargetContentId!=0 || target.TargetObject is not null || !string.IsNullOrEmpty(target.TargetName)))return;
+                   || !itemWindow && !chatItem && (target.TargetContentId!=0 || target.TargetObject is not null || !string.IsNullOrEmpty(target.TargetName)))return;
                 raw=gui.HoveredItem;
                 if(raw==0)return;
             }
