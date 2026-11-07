@@ -50,6 +50,7 @@
     <Compile Include="../../src/TenshoAssistant/Maps/MapLabels.cs" Link="Maps/MapLabels.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapDiscovery.cs" Link="Maps/MapDiscovery.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/ZoneEntries.cs" Link="Maps/ZoneEntries.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/MapHeight.cs" Link="Maps/MapHeight.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapResume.cs" Link="Maps/MapResume.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/IslandResources.cs" Link="Maps/IslandResources.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/JobProgress.cs" Link="Gear/JobProgress.cs" />

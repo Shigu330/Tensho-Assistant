@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.844.0
+- Plan global, Verify : Demande (X-67) : sur la carte de Tensho, une flèche dit qu'une cible est plus haut ou plus bas, comme sur la carte du jeu. La capture montre que le jeu ne garde pas cette flèche dans ses marqueurs (même drapeau à la hauteur du joueur et 38 yalms plus bas) : sa carte compare les hauteurs au dessin. Tensho fait de même : une flèche orange en bas à droite des icônes de quête, d'événement et d'ALÉA plus hautes ou plus basses que vous. Le seuil est un réglage de Tensho (10 yalms par défaut, de 2 à 50), pas un chiffre du jeu, qui n'est pas connu. La capture de développeur n'écrit plus une ligne toutes les demi-secondes. Non validé en jeu.
+- Tests : HeightArrows844Tests. Verify.ps1 (agent) : 1428/1428, 0 avertissement, 0 erreur ; DLL 0.844.0.0. Non validé en jeu.
+### English
+- Request (X-67): on Tensho's map, an arrow says a target is above or below, as on the game map. The capture shows the game keeps no such arrow in its markers (same flag at the player's height and 38 yalms below): its map compares heights when drawing. Tensho does the same: an orange arrow at the lower right of quest, event and FATE icons above or below you. The threshold is Tensho's setting (10 yalms by default, 2 to 50), not the game's figure, which is not known. The developer capture no longer writes a line every half second. Not validated in game.
+
 ## 0.843.0
 - Plan global, Verify : Demande (X-67), relevé affiné : le premier relevé ne contenait que les icônes fixes de la carte. La capture garde maintenant les icônes de quête et d'événement, les marqueurs aux drapeaux inhabituels ou à icône secondaire, et ajoute aux marqueurs d'événement leurs drapeaux et leur état, pour trouver où le jeu note la flèche haut ou bas. Non validé en jeu.
 - Tests : MapMarkers842Tests. Verify.ps1 (agent) : 1427/1427, 0 avertissement, 0 erreur ; DLL 0.843.0.0. Non validé en jeu.

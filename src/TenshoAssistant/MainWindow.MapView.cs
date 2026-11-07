@@ -642,6 +642,15 @@ internal sealed partial class MainWindow
                     Tip("MapView.MonsterIconDistanceTip");
                     ImGui.Unindent();
                 }
+                // 0.844 (X-67): the arrows above or below, and their threshold.
+                changed|=SettingBox("MapView.HeightArrows",settings.HeightArrows,value=>settings.HeightArrows=value,MapDefaults.HeightArrows);
+                if(settings.HeightArrows)
+                {
+                    var heightYalms=Math.Clamp(settings.HeightArrowYalms,2,50);ImGui.SetNextItemWidth(160);
+                    if(ImGui.SliderFloat(localization.Get("MapView.HeightArrowYalms"),ref heightYalms,2,50,"%.0f")){settings.HeightArrowYalms=heightYalms;changed=true;}
+                    Tip("MapView.HeightArrowYalmsTip");
+                    if(DefaultButton("HeightArrowYalms",settings.HeightArrowYalms!=MapDefaults.HeightArrowYalms)){settings.HeightArrowYalms=MapDefaults.HeightArrowYalms;changed=true;}
+                }
                 changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
                 var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelMinZoom"),ref labelMinimum,0,200,"%.0f %%")){settings.GatheringLabelMinZoom=labelMinimum/100;changed=true;}
@@ -1203,12 +1212,14 @@ internal sealed partial class MainWindow
             MapMark("canvas areas");
             var icons=new List<MapIconDraw>();
             // worldRadius: area of a quest, FATE or gathering point; hovering inside it lists the icon too (like Mappy).
-            void Add(uint icon,int layer,Vector2 pixel,string? label,MapIconMarker? fixedMarker=null,MapLocalGatheringPoint? point=null,float worldRadius=0,Vector2? flag=null)
+            void Add(uint icon,int layer,Vector2 pixel,string? label,MapIconMarker? fixedMarker=null,MapLocalGatheringPoint? point=null,float worldRadius=0,Vector2? flag=null,float height=float.NaN)
             {
                 var own=settings.SizeOf(icon,map.MapId);if(own<=0)return;
                 icons.Add(new(settings.PriorityOf(icon,map.MapId),layer,icons.Count,icon,origin+mapPan+pixel*mapZoom,Math.Max(4,baseIcon*own),label,fixedMarker,point,
-                    worldRadius*Math.Max(1,map.SizeFactor)/100f*mapZoom,flag));
+                    worldRadius*Math.Max(1,map.SizeFactor)/100f*mapZoom,flag,height));
             }
+            // 0.844 (X-67): the player's height, when the player stands on this map's land; the arrows need it.
+            var playerHeight=settings.HeightArrows && live is { } heightLive && eventMaps.Contains(heightLive.MapId) ? heightLive.Position.Y:float.NaN;
             // NPC vendors (0.140): a vendor standing by the game's icon for it (shop or service icon, MapVendorIcons, MAP-017) adds its
             // shops to that icon's tooltip instead of a second icon; others get the game icon of their kind (cached, VendorLayout).
             var vendorLayout=settings.ShowVendors ? VendorLayout(map,markers,settings.ShowFixedIcons):MapVendorLayout.None;
@@ -1240,9 +1251,9 @@ internal sealed partial class MainWindow
             // NPC vendors (0.139): the game's « Échoppe » map icon (MapSymbol 60412, docs/evidence/0.139.0-symbols-probe.log), in the
             // same list, sizes and priorities as the game icons; click = flag.
             foreach(var vendor in vendorLayout.Lonely)Add(vendor.Icon,1,vendor.Pixel,vendor.Label,flag:vendor.Flag);
-            foreach(var fate in fates.Where(fate=>fate.Icon!=0))Add(fate.Icon,2,MapProjection.PixelFromWorld(fate.Position,map),FateLabel(fate),worldRadius:settings.ShowFateAreas ? fate.Radius:0);
+            foreach(var fate in fates.Where(fate=>fate.Icon!=0))Add(fate.Icon,2,MapProjection.PixelFromWorld(fate.Position,map),FateLabel(fate),worldRadius:settings.ShowFateAreas ? fate.Radius:0,height:fate.Position.Y);
             foreach(var marker in events)Add(marker.Icon,3,MapProjection.PixelFromWorld(marker.Position,map),settings.QuestTooltips ? EventLabel(marker):null,
-                worldRadius:(marker.MarkerType==3 ? settings.ShowQuestAreas:marker.IsLeve ? settings.ShowLeveAreas:settings.ShowEventAreas) ? marker.Radius:0);
+                worldRadius:(marker.MarkerType==3 ? settings.ShowQuestAreas:marker.IsLeve ? settings.ShowLeveAreas:settings.ShowEventAreas) ? marker.Radius:0,height:marker.Position.Y);
             ExpireGameTarget();
             if(mapGameTarget is { } gameTarget && gameTarget.MapId==map.MapId)
                 Add(gameTarget.Icon,4,MapProjection.PixelFromWorld(new Vector3(gameTarget.World.X,0,gameTarget.World.Y),map),localization.Get("MapView.GameTarget"));
@@ -1260,6 +1271,13 @@ internal sealed partial class MainWindow
                     // 0.645 (P7): an aetheryte not attuned is greyed.
                     draw.AddImage(image.Handle,item.At-new Vector2(item.Size/2),item.At+new Vector2(item.Size/2),Vector2.Zero,Vector2.One,
                         MapLabels.NotAttuned(item.Fixed?.AetheryteId ?? 0,mapLive?.TeleportCosts) ? ImGui.GetColorU32(new Vector4(0.45f,0.45f,0.45f,0.8f)):ImGui.GetColorU32(Vector4.One));
+                // 0.844 (X-67, user request): above or below the player, an arrow on the icon's lower right corner, as the game map does.
+                if(MapHeight.Arrow(item.Height,playerHeight,settings.HeightArrowYalms) is var arrow and not 0)
+                {
+                    var badge=Math.Max(8,item.Size*0.5f);var corner=item.At+new Vector2(item.Size*0.15f,item.Size*0.05f);
+                    draw.AddCircleFilled(corner+new Vector2(badge/2),badge*0.6f,ImGui.GetColorU32(new Vector4(0,0,0,0.75f)),16);
+                    draw.AddText(UiBuilder.IconFont,badge,corner,ImGui.GetColorU32(new Vector4(1f,0.62f,0.15f,1f)),(arrow>0 ? FontAwesomeIcon.ArrowUp:FontAwesomeIcon.ArrowDown).ToIconString());
+                }
                 // 0.596 (P12): the name the game writes beside this icon, on the side it uses; drawn after the icons (0.623).
                 if(settings.ShowIconNames && settings.NamesShown(mapZoom) && item.Fixed is {Label.Length:>0} named && MapLabels.Shown(named.LinkMapId!=0,mapZoom))
                 {
@@ -1587,7 +1605,8 @@ internal sealed partial class MainWindow
     }
 
     // One game icon to draw on the canvas, sorted by priority then layer then insertion.
-    private readonly record struct MapIconDraw(int Priority,int Layer,int Order,uint Icon,Vector2 At,float Size,string? Label,MapIconMarker? Fixed,MapLocalGatheringPoint? Point,float Area=0,Vector2? Flag=null);
+    private readonly record struct MapIconDraw(int Priority,int Layer,int Order,uint Icon,Vector2 At,float Size,string? Label,MapIconMarker? Fixed,MapLocalGatheringPoint? Point,float Area=0,Vector2? Flag=null,
+        float Height=float.NaN);
     private (MapIconDraw Icon,Vector2 Pixel)? mapIconContext;private bool mapGeneralMenuRequested;
 
     // R-04 (0.245): the menu of one map icon — its name, flag there, then what the icon offers (teleport, open the linked map,

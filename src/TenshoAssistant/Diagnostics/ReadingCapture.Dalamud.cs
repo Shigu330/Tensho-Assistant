@@ -197,7 +197,8 @@ public sealed unsafe class ReadingCapture : IDisposable
         var agent=AgentMap.Instance();
         if(agent==null || agent->MapMarkerCount==0)return;
         var count=Math.Min((int)agent->MapMarkerCount,agent->MapMarkers.Length);
-        var text=new StringBuilder($"map {agent->CurrentMapId}, {count} markers, player height {(objects.LocalPlayer?.Position.Y ?? float.NaN):F1}:");
+        // 0.844: the player's height no longer decides a new line (it wrote one every half second).
+        var text=new StringBuilder($"map {agent->CurrentMapId}, {count} markers:");
         var shown=0;
         for(var index=0;index<count && shown<60;index++)
         {
@@ -210,7 +211,7 @@ public sealed unsafe class ReadingCapture : IDisposable
         var now=text.ToString();
         if(now==mapMarkers)return;
         mapMarkers=now;
-        Line("mapMarkers",60,now);
+        Line("mapMarkers",60,now+$" (player height {(objects.LocalPlayer?.Position.Y ?? float.NaN):F1})");
     }
 
     private void ReadMonsterEvents()

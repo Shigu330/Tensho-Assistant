@@ -185,6 +185,9 @@ public sealed class MapViewSettings
     public bool AboveHuntLog { get; set; }
     public bool AboveFate { get; set; }
     public bool MonsterIconsHideInCombat { get; set; }
+    // 0.844 (X-67): an up or down arrow on quest, event and FATE icons above or below the player, and from which height difference (Tensho's choice).
+    public bool HeightArrows { get; set; } = true;
+    public float HeightArrowYalms { get; set; } = 10;
     public int MonsterIconSize { get; set; } = 32;
     public float MonsterIconDistance { get; set; } = 50;
     public bool GatheringLabels { get; set; } = true;
