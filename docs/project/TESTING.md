@@ -1122,6 +1122,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.740) Récoltez quelques objets de la liste de suivi : je relis « List blink » dans dalamud.log.
 
+- [ ] (0.741) Récoltez quelques objets de la liste : plus de clignotement ; je vérifie qu'aucun « List blink » ne revient.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

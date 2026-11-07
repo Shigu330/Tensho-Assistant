@@ -207,7 +207,8 @@ internal sealed partial class MainWindow
             finally { ImGui.EndTabBar(); }
         }
 
-        var live = inventory.Current;
+        // 0.741 (user report): the last reading of the bags while a change is being read, so that counts do not fall to 0 for a moment.
+        var live = inventory.Shown;
         var bankState = bank.State;
         var character = bankBridge.State.CharacterId;
         var catalog = itemCatalog.State.Catalog;

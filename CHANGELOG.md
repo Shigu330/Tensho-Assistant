@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.741.0
+- Plan global, Verify : Signalement : la liste de suivi clignotait pendant la récolte. Cause, relevée dans le journal : à chaque objet récolté, la lecture des sacs était effacée jusqu'à la suivante (jusqu'à 250 ms), et tous les stocks tombaient à 0. Correction : les stocks affichés gardent la dernière lecture du même personnage ; le tri des sacs, qui agit, attend toujours une lecture sûre. Non validé en jeu.
+- Tests : ListBlink741Tests. Verify.ps1 (agent) : 1316/1316, 0 avertissement, 0 erreur ; DLL 0.741.0.0. Non validé en jeu.
+### English
+- Report: the tracking list blinked while gathering. Cause, found in the log: at each item gathered, the bag reading was cleared until the next one (up to 250 ms), and every stock fell to 0. Fix: stock counts on screen keep the last reading of the same character; the bag sort, which acts, still waits for a sure reading. Not validated in game.
+
 ## 0.740.0
 - Plan global, Verify : Signalement : la liste de suivi clignote entre deux valeurs pendant la récolte. Cause non trouvée en lisant le code : en mode développeur, le journal note maintenant la ligne qui revient à sa valeur d'avant, et si c'est le stock ou le besoin. Aucun changement visible. Non validé en jeu.
 - Tests : ListBlink740Tests. Verify.ps1 (agent) : 1315/1315, 0 avertissement, 0 erreur ; DLL 0.740.0.0. Non validé en jeu.

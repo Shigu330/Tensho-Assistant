@@ -20,8 +20,10 @@ internal static class InventoryCaptureTests
             Check(reads == 1 && service.Current is not null, "initial capture");
             coordinator.Tick(TimeSpan.FromSeconds(10));
             Check(reads == 1, "no polling of already observed bags");
+            var before = service.Current;
             for (var i = 0; i < 100; i++) coordinator.Invalidate();
             Check(service.Current is null, "event immediately invalidates old data");
+            Check(ReferenceEquals(service.Shown, before), "0.741: the display keeps the last reading meanwhile");
             coordinator.Tick(TimeSpan.FromSeconds(10));
             Check(reads == 2, "burst coalesced");
             coordinator.Invalidate();
@@ -41,6 +43,7 @@ internal static class InventoryCaptureTests
             currentOwner = null;
             coordinator.Tick(TimeSpan.FromSeconds(1));
             Check(service.Current is null && reads == 1, "logout does not read bags");
+            Check(service.Shown is null, "0.741: nor shows them");
             currentOwner = new InventoryOwnerId(2);
             coordinator.Tick(TimeSpan.FromSeconds(2));
             Check(service.Current!.Containers.Keys.All(k => k.Owner.Value == 2), "new character only");
@@ -74,6 +77,7 @@ internal static class InventoryCaptureTests
                 owner => { reads++; return fail ? throw new InvalidOperationException() : Batch(owner); }, _ => errors++);
             coordinator.Tick(TimeSpan.Zero);
             Check(service.Current is null && errors == 1, "failure invalidates");
+            Check(service.Shown is null, "0.741: a failed reading shows nothing");
             coordinator.Tick(TimeSpan.FromSeconds(1));
             coordinator.Tick(TimeSpan.FromSeconds(5));
             Check(reads == 2 && errors == 1, "retry throttled and error logged once");

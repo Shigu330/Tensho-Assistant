@@ -22,7 +22,8 @@ internal sealed class InventoryCaptureCoordinator(
             if (disposed) return;
             generation++;
             dirty = true;
-            service.Clear();
+            // 0.741: the same character's bags changed: unknown for what acts, still shown for display until read again.
+            service.Invalidate();
         }
     }
 
