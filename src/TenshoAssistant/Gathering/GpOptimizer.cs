@@ -8,7 +8,7 @@ public sealed record GpActiveEffects(bool Yield=false,bool Gift1=false,bool Gift
 // R-09 (0.410): MoreActions adds Solid Reason / Ageless Words (one more attempt each; from level 90, trait « Enhanced Solid Reason »:
 // 50 % chance of Eureka Moment, i.e. a free attempt with Wise to the World, counted on average) and Clear Vision / Flora Mastery (+15 %
 // on one attempt, placed on the Bountiful attempts first). Off, the model is the one before 0.410.
-public sealed record GpScenario(uint JobId,int Level,int Budget,int Attempts,int BaseYield,int SuccessPercent,int BoonPercent,int BountifulBonus,GpActiveEffects? Active=null,bool MoreActions=false,string Forbidden="")
+public sealed record GpScenario(uint JobId,int Level,int Budget,int Attempts,int BaseYield,int SuccessPercent,int BoonPercent,int BountifulBonus,GpActiveEffects? Active=null,bool MoreActions=false,string Forbidden="",bool AutoGather=false)
 {
     public const int EurekaLevel=90;
     public const decimal EurekaChance=0.5m;
@@ -48,7 +48,9 @@ public static class GpOptimizer
         var eureka=input.Level>=GpScenario.EurekaLevel ? GpScenario.EurekaChance:0m;
         // Plans far above the budget are not needed (the next upgrade is the first plan above it): repeated actions stop at budget + 600.
         var reach=input.Budget+600;
-        var maxRestore=restore is null ? 0:Math.Min(input.Attempts,reach/restore.Spec.Cost);
+        // 0.753 (X-06, user request): « gather automatically » runs every attempt without a pause: only what is used before the first gather counts. Lasting effects stay;
+        // an action for one gather is used once, on the first; an attempt given back needs an attempt spent first, so none.
+        var maxRestore=restore is null || input.AutoGather ? 0:Math.Min(input.Attempts,reach/restore.Spec.Cost);
         var bestAtCost=new Dictionary<int,GpPlan>();
         foreach(var chance in chances)
         foreach(var yield in yields)
@@ -68,9 +70,9 @@ public static class GpOptimizer
                 var guaranteed=input.Attempts+restored;
                 var attempts=guaranteed+restored*eureka;
                 var purchasableAttempts=guaranteed-(active.FirstAttemptBonus>0 ? 1:0);
-                var maxClear=clear is null || clearSuccess<=success ? 0:Math.Min(guaranteed,reach/clear.Spec.Cost);
+                var maxClear=clear is null || clearSuccess<=success ? 0:Math.Min(input.AutoGather ? 1:guaranteed,reach/clear.Spec.Cost);
                 for(var cleared=0;cleared<=maxClear;cleared++)
-                for(var count=0;count<=(bountiful is null ? 0:purchasableAttempts);count++)
+                for(var count=0;count<=(bountiful is null ? 0:input.AutoGather ? Math.Min(1,purchasableAttempts):purchasableAttempts);count++)
                 {
                     cancellation.ThrowIfCancellationRequested();
                     var cost=prefixCost+restored*(restore?.Spec.Cost ?? 0)+cleared*(clear?.Spec.Cost ?? 0)+count*(bountiful?.Spec.Cost ?? 0);

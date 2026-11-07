@@ -36,6 +36,9 @@ internal sealed class GatheringObservationReader : IDisposable
     private volatile ActionBarRect?[] slotRects=new ActionBarRect?[8];
     /// <summary>0.751 (X-04): where each row of the game's gathering window is on the screen, by slot index; null when hidden.</summary>
     public IReadOnlyList<ActionBarRect?> SlotRects=>slotRects;
+    private volatile int autoGather=-1;
+    /// <summary>0.753 (X-06): « gather automatically the selected item » ticked in the game's window; null when the box is not shown.</summary>
+    public bool? AutoGather=>autoGather<0 ? null:autoGather==1;
     private static unsafe ActionBarRect?[] Rects(AddonGathering* addon)
     {
         var rects=new ActionBarRect?[8];
@@ -105,6 +108,8 @@ internal sealed class GatheringObservationReader : IDisposable
                 var node=target?.ObjectKind==Dalamud.Game.ClientState.Objects.Enums.ObjectKind.GatheringPoint ? target.BaseId:0;
                 service.Publish(ticket,current,job,level,gp,maxGp,status,attempts,total,slots,node);
                 slotRects=Rects(addon);
+                var quick=addon->QuickGatheringComponentCheckBox;
+                autoGather=quick==null || quick->OwnerNode==null || !Visible(&quick->OwnerNode->AtkResNode) ? -1:quick->IsChecked ? 1:0;
             }
             catch(Exception error){service.Fail(ticket,current,error);nextRead=now+Stopwatch.Frequency*5;log.Warning(error,"Gathering observation unavailable; retry in five seconds.");}
         }

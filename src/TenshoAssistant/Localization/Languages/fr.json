@@ -1181,6 +1181,7 @@
     "TrackedNeed": "Vos listes en demandent encore {0}",
     "ListHighlight": "Encadrer dans la fenêtre de récolte du jeu les objets de mes listes",
     "ListHighlightTip": "Au point de récolte, un cadre vert sur les lignes de la fenêtre du jeu dont la liste d'artisanat, l'atelier ou la préparation affichés à l'écran ont encore besoin. Dessin seulement.",
+    "AutoGatherPlan": "« Récolter automatiquement » est coché : seul ce qui s'utilise avant la première récolte compte.",
     "PlanAtStart": "Plan établi à l'ouverture du point ({0} PR) : les actions déjà utilisées en font partie.",
     "BountifulFloor": "Bonus d'Abondance inconnu (valeur de récolte ou base de l'objet non lue) : le plan compte +1, le minimum de la règle."
   },

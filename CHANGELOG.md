@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.753.0
+- Plan global, Verify : Demande (X-06) : quand « Récolter automatiquement l'objet sélectionné » est coché dans la fenêtre du jeu, le plan de PR ne garde que ce qui s'utilise avant la première récolte : les effets durables, une action « pour une récolte » une fois au plus, aucun essai rendu ; l'aide le dit. Non validé en jeu.
+- Tests : AutoGather753Tests. Verify.ps1 (agent) : 1328/1328, 0 avertissement, 0 erreur ; DLL 0.753.0.0. Non validé en jeu.
+### English
+- Request (X-06): when « Gather the selected item automatically » is ticked in the game's window, the GP plan keeps only what is used before the first gather: lasting effects, an action for one gather once at most, no attempt given back; the help says so. Not validated in game.
+
 ## 0.752.0
 - Plan global, Verify : Demande (X-05) : dans les listes de suivi, les objets à récolter sont rassemblés par zone, celle qui en a le plus d'abord ; un objet présent dans plusieurs zones va avec celle qui en regroupe le plus, pour moins de trajets. Réglable sous « Récolte ». Non validé en jeu.
 - Tests : ListZones752Tests. Verify.ps1 (agent) : 1326/1326, 0 avertissement, 0 erreur ; DLL 0.752.0.0. Non validé en jeu.

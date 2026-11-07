@@ -1,6 +1,6 @@
 # État courant (mis à jour 2026-11-04)
 
-VERSION: 0.752.0.0 (dernière release : Stable-0.539.0, 2026-11-05) — Verify.ps1 (agent) 1326/1326, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
+VERSION: 0.753.0.0 (dernière release : Stable-0.539.0, 2026-11-05) — Verify.ps1 (agent) 1328/1328, 0 avertissement, 0 erreur, langues et paquet verts. Détail par version : [CHANGELOG.md](../../CHANGELOG.md).
 GOAL: finir le plan global, sur le dépôt personnalisé, sans soumission (DEC-039) ; voir [GOAL](GOAL.md) et [PUBLISHING](../project/PUBLISHING.md).
 QUOTA: plus de réserve (utilisateur, 2026-11-05) : coder tant que possible, reprise tenue à jour ici. L'agent ne voit pas le compteur. Dernier relevé de l'utilisateur (2026-11-05) : 5 h 0 %, réinitialisation à 9:50 ; semaine 95 %, réinitialisation à 23:00 (une vingtaine de versions ≈ 1 % de la semaine).
 
@@ -18,6 +18,7 @@ Sur rapports de l'utilisateur, détail dans [STATUS-ARCHIVE](STATUS-ARCHIVE.md) 
 - campagne guidée du 2026-11-04 : lots 1 à 9 (sur place, alarmes, ville, caserne, atelier, récolte et pêche, carte, Triple Triade, Mini Cactpot, revue de mode, collections, quêtes, contenus, compagnie). Lot 10 clos à la demande de l'utilisateur (« J'ai casiment tous essaie, les dernières erreurs on verra en jeu »). La chasse et le train de chasse (lot 7, points 12 à 16) restent à tester quand il en fera.
 - 2026-11-07, sur rapport de l'utilisateur (« récolte ok pour ce que j'ai pu voir ») : aide à la récolte 0.728–0.734, ligne « Ensuite », cadre sur la barre, ordre des étapes ; les cas non vus (Sagesse du fermier après la première récolte, PR restants en fin de nœud) restent à revoir s'ils se présentent.
 - 2026-11-07, sur capture de l'utilisateur (« c'est ok ») : ventes par jour et tri par marché de « Que puis-je fabriquer ? » (0.725), « ~X gils en 7 jours », toute la liste classée.
+- 2026-11-07, sur captures de l'utilisateur : X-04 (objets des listes au point de récolte, cadre vert dans la fenêtre du jeu, 0.751) et X-05 (listes par zone de récolte, 0.752).
 - Auto-contrôle, dernier passage relu dans dalamud.log : 27 ok, 4 vus avant, 0 non lu, 0 suspect, 0 échec.
 
 ## À valider en jeu
@@ -32,7 +33,7 @@ Liste complète : [TESTING](../project/TESTING.md), 284 cases ouvertes, aucune d
 Dépôt personnel : installation et mise à jour fonctionnent (rapport de l'utilisateur, 2026-11-05, 0.539.0). Possible depuis cette release : galerie de Mes outils (0.476) et liste de vidéos (0.506), qui lisent la branche `main`.
 
 ## Prochaine action
-0) [Plan global](../project/GLOBAL-PLAN.md) : phases 1 à 4 sans jouer, puis le jeu en dernier, un point à la fois ; la 1.0.0 après tout le plan (DEC-037). Feu vert donné le 2026-11-05 : enchaîner les phases 1 à 4 sans demander. Phase 1 finie. Reprise : X-06 récolte automatique, X-08 compte à rebours, X-09 alarmes des listes ; X-01 carte et X-03 lien d'alarme attendent un essai. Pas de soumission au dépôt officiel (DEC-039).
+0) [Plan global](../project/GLOBAL-PLAN.md) : phases 1 à 4 sans jouer, puis le jeu en dernier, un point à la fois ; la 1.0.0 après tout le plan (DEC-037). Feu vert donné le 2026-11-05 : enchaîner les phases 1 à 4 sans demander. Phase 1 finie. Reprise : X-08 compte à rebours, X-09 alarmes des listes, X-10 aide sur les objets des listes, X-11 zones repliables ; X-01 carte et X-03 lien d'alarme attendent un essai. Pas de soumission au dépôt officiel (DEC-039).
 1) Décisions de l'auteur sur les points Dalamud ([PUBLISHING](../project/PUBLISHING.md) « Ce qui reste », points 4 à 7 ; titre selon le job décidé, DEC-035), avec son accord à chaque règle.
 2) Fait le 2026-11-05 : release Stable-0.539.0, sur demande de l'utilisateur. La prochaine : une séance de jeu sur la dernière version d'abord (DEC-033).
 3) Vérifier en jeu les fenêtres converties (issue #38).

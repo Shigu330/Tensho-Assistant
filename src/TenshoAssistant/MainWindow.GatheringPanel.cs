@@ -13,7 +13,7 @@ namespace TenshoAssistant;
 /// </summary>
 internal sealed partial class MainWindow
 {
-    private (uint Job,int Level,int Slot,uint Item,int Gp,int? Attempts,bool Late,int? Success,int? Boon,int? Bountiful,GpActionCatalog Catalog)? gatheringPanelKey;
+    private (uint Job,int Level,int Slot,uint Item,int Gp,int? Attempts,bool Late,int? Success,int? Boon,int? Bountiful,GpActionCatalog Catalog,bool Auto)? gatheringPanelKey;
     private GpOptimization? gatheringPanelPlan;private uint gatheringPanelItem;private string[] gatheringPanelMissing=[];private bool gatheringPanelLate,gatheringPanelBountifulFloor;
     private GatheringNodeStart? gatheringPanelStart;
 
@@ -39,6 +39,8 @@ internal sealed partial class MainWindow
 
     /// <summary>0.751 (X-04): the rows of the game's gathering window, from the reader.</summary>
     internal Func<IReadOnlyList<ActionBarRect?>>? GatheringSlotRects { get; set; }
+    /// <summary>0.753 (X-06): the game's « gather automatically » box; null when not shown.</summary>
+    internal Func<bool?>? GatheringAutoGather { get; set; }
     private static void DrawGatheringSlotFrame(ActionBarRect rect)
     {
         var draw=ImGui.GetForegroundDrawList();
@@ -90,7 +92,7 @@ internal sealed partial class MainWindow
             var found=GpNextAction.Next(plan,(int)start.Gp,(int)frame.Gp,startAttempts,attempts);
             gatheringNextCache=known=(plan,(int)frame.Gp,attempts,slot.BoonPercent,found);
             // 0.731 (user report): the end of the plan, with what is left; 0.747: solved off the frame, the plain step shown meanwhile.
-            if(found is { Kind:GpNextKind.Gather,Finished:true } && slot.SuccessPercent is { } successNow && slot.BoonPercent is { } boonNow && gpActions.State.Catalog is { } catalog)
+            if(found is { Kind:GpNextKind.Gather,Finished:true } && !optimization.Scenario.AutoGather && slot.SuccessPercent is { } successNow && slot.BoonPercent is { } boonNow && gpActions.State.Catalog is { } catalog)
             {
                 var opened=optimization.Scenario;var gp=(int)frame.Gp;
                 gatheringLeftoverSolve=(known,Task.Run(()=>GpNextAction.Leftover(found,opened,plan,catalog,gp,attempts,successNow,boonNow)));
@@ -237,7 +239,8 @@ internal sealed partial class MainWindow
         if(slot is null || gatheringPanelStart is not { } start || gpActions.State.Catalog is not { } catalog){ImGui.TextDisabled(localization.Get("GatheringPanel.NoPlan"));return;}
         var first=start.Slots.GetValueOrDefault((slot.Index,slot.RawItemId));
         var bountiful=bountifulBase?.Invoke(slot.ItemId) is { } baseValue ? BountifulEstimate.Bonus(rating,baseValue):null;
-        var key=(start.JobId,start.Level,slot.Index,slot.ItemId,(int)start.Gp,start.Attempts,first.Late,first.Success,first.Boon,bountiful,catalog);
+        var auto=GatheringAutoGather?.Invoke()==true;
+        var key=(start.JobId,start.Level,slot.Index,slot.ItemId,(int)start.Gp,start.Attempts,first.Late,first.Success,first.Boon,bountiful,catalog,auto);
         // 0.515: the node's effects, and what else can change the plan without changing the node.
         var perception=GatheringPerception(start.JobId);
         var extraKey=$"{GpForbiddenFor(start.JobId)}|{first.Quantity}|{frame.NodeId}|{frame.MaxGp}|{rating}|{perception}";
@@ -258,7 +261,7 @@ internal sealed partial class MainWindow
             {
                 // 0.479: the quantity the game shows per gather; a node where it was not read counts one.
                 var quantity=Math.Clamp(first.Quantity ?? 1,1,20);
-                var scenario=new GpScenario(start.JobId,start.Level,(int)start.Gp,attempts,quantity,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbiddenFor(start.JobId));
+                var scenario=new GpScenario(start.JobId,start.Level,(int)start.Gp,attempts,quantity,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbiddenFor(start.JobId),AutoGather:auto);
                 var effects=NodeEffects(frame).Where(effect=>GatherNodeEffects.Missing(effect,(int)frame.MaxGp,rating,perception)>0)
                     .Select(effect=>(Effect:effect,Better:GatherNodeEffects.With(scenario,effect))).Where(pair=>pair.Better is not null).ToArray();
                 // 0.747 (X-01): solved off the frame: the slow-frame log of 0.745 measured this panel at 97 ms on the frame a node opened.
@@ -300,6 +303,7 @@ internal sealed partial class MainWindow
         if(need>0)ImGui.TextColored(Accent,shown.ExpectedYield>0 ? localization.Format("GatheringPanel.ListNeedNodes",need.ToString("N0"),Math.Ceiling(need/shown.ExpectedYield).ToString("N0")):localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
         ImGui.TextDisabled(localization.Format("GatheringPanel.Expected",shown.ExpectedYield.ToString("0.0"),plan.Baseline.ToString("0.0"),shown.Cost));
         if(start.Frozen)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanAtStart",plan.Scenario.Budget));
+        if(plan.Scenario.AutoGather)ImGui.TextColored(Accent,localization.Get("GatheringPanel.AutoGatherPlan"));
         if(gatheringPanelBountifulFloor)ImGui.TextDisabled(localization.Get("GatheringPanel.BountifulFloor"));
         DrawGatheringNext(plan,slot,start,frame,items?.Find(gatheringPanelItem)?.Name ?? gatheringPanelItem.ToString(),out var next);
         // 0.729 (user request): the next action apart from the plan.

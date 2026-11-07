@@ -1181,6 +1181,7 @@
     "TrackedNeed": "Your lists still need {0}",
     "ListHighlight": "Frame the items my lists need on the game's gathering window",
     "ListHighlightTip": "At a node, a green frame on the rows of the game's window whose item the crafting list, the workshop or the preparation shown on screen still needs. Drawn only.",
+    "AutoGatherPlan": "« Gather automatically » is ticked: only what is used before the first gather counts.",
     "PlanAtStart": "Plan made when the node opened ({0} GP): the actions already used are part of it.",
     "BountifulFloor": "Bountiful bonus unknown (gathering rating or item base not read): the plan counts +1, the rule's minimum."
   },

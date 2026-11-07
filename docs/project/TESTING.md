@@ -1146,6 +1146,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.752) Liste de l'atelier : sous Récolte, une ligne par zone avec ses objets.
 
+- [ ] (0.753) Point de récolte : cochez « Récolter automatiquement » ; le plan change et le dit.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
