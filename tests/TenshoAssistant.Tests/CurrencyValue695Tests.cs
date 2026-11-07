@@ -17,7 +17,7 @@ internal static class CurrencyValue695Tests
             Check(page.Contains("currencyPricesWanted=true;"),"the choice asks");
             Check(page.Contains("&& configuration.CommunityUniversalis)"),"source switch");
             Check(page.Contains("!currencyPricesAsked.Contains(row.ItemId)"),"asked once");
-            Check(page.Contains("missing.Take(32)"),"bounded batches");
+            Check(page.Contains("missing.Take(MarketService.BatchMaximum)"),"bounded batches");
             Check(page.Contains("CurrencyValue.FetchFailed"),"failure shown");
         }),
         ("Currency value: the market can be left alone, a running search stops, and the list filters",() =>

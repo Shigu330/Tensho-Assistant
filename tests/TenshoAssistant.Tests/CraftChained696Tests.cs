@@ -36,7 +36,7 @@ internal static class CraftChained696Tests
             var ranked=CraftFromStock.Ranked([none,one,many],row=>row==none ? null:CraftFromStock.Worth(row,10));
             Check(ranked[0]==many && ranked[1]==one && ranked[2]==none,"most valuable first, unknown last");
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CraftFromStock.cs"));
-            Check(page.Contains("missing.Take(32)") && page.Contains("configuration.CommunityUniversalis"),"bounded, under the source switch");
+            Check(page.Contains("missing.Take(TenshoAssistant.Market.MarketService.BatchMaximum)") && page.Contains("configuration.CommunityUniversalis"),"bounded, under the source switch");
         }),
         ("Chained crafts: from the ore alone, through every step, on one stock",() =>
         {

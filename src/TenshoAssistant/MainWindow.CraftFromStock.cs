@@ -101,9 +101,9 @@ internal sealed partial class MainWindow
         if(world==0 || character==0){ImGui.SameLine();ImGui.TextDisabled(localization.Get("CurrencyValue.NoWorld"));return;}
         if(!configuration.CommunityUniversalis){ImGui.SameLine();ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));return;}
         if(missing.Length==0){fromStockLoadAll=false;return;}
-        var batch=missing.Take(32).ToArray();
+        var batch=missing.Take(TenshoAssistant.Market.MarketService.BatchMaximum).ToArray();
         fromStockAsked.UnionWith(batch);
-        try{_=fromStockPrices.StartListAsync(market,character,world,batch);}
+        try{_=fromStockPrices.StartListAsync(market,character,world,batch,true);}
         catch(Exception error){fromStockPricesOn=false;log.Warning(error,"Craftable prices could not be started.");}
     }
 

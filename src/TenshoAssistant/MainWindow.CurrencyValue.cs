@@ -120,9 +120,9 @@ internal sealed partial class MainWindow
             if(currencyPricesWanted && missing.Length>0 && (prices.Error is null || refresh) && world.WorldId!=0 && character!=0 && configuration.CommunityUniversalis)
                 try
                 {
-                    var batch=missing.Take(32).ToArray();
+                    var batch=missing.Take(MarketService.BatchMaximum).ToArray();
                     currencyPricesAsked.UnionWith(batch);
-                    _=currencyPrices.StartListAsync(market,character,world.WorldId,batch);
+                    _=currencyPrices.StartListAsync(market,character,world.WorldId,batch,true);
                 }
                 catch(Exception error){currencyPricesWanted=false;log.Warning(error,"Currency value prices could not be started.");}
             else if(missing.Length==0)currencyPricesWanted=false;

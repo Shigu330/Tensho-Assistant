@@ -1060,6 +1060,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.709) Que puis-je fabriquer ? : changer de page, chercher un nom ; tri marché : seule la page se charge ; Charger tous les prix puis classement complet.
 
+- [ ] (0.710) Que puis-je fabriquer ? : Charger tous les prix sur une longue liste : le compteur doit monter par centaines et le classement rester complet ; le jeu ne doit pas saccader.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

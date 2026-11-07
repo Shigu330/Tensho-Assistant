@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.710.0
+- Plan global, Marché : Demande de l'utilisateur : les grosses demandes de prix vont plus vite sans gêner Universalis. Sur « Que faire avec ? » et « Que puis-je fabriquer ? » : une requête à la fois, 100 objets, une par seconde, au lieu de requêtes objet par objet toutes les 3 secondes. Un refus du site (429, 503) arrête la liste et impose au moins 30 secondes de pause. La mémoire garde maintenant 4096 prix, car 128 faisait perdre le début d'une longue liste. COMPILED et TESTED, non validé en jeu.
+- Tests : MarketPace710Tests. Verify.ps1 (agent) : 1265/1265, 0 avertissement, 0 erreur ; DLL 0.710.0.0. Non validé en jeu.
+### English
+- User request: large price requests go faster without troubling Universalis. On What to do with it? and What can I craft?: one request at a time, 100 items, one a second, instead of single requests every 3 seconds. A refusal (429, 503) stops the list and holds at least 30 seconds. The memory now keeps 4096 prices: 128 lost the start of a long list. COMPILED and TESTED, not validated in game.
+
 ## 0.709.0
 - Plan global, W-06 : Demande de l'utilisateur : « Que puis-je fabriquer ? » s'affiche par pages de 25, avec une recherche par nom dans toute la liste. En tri marché, les prix viennent page par page et chaque page est classée seule ; « Charger tous les prix » les demande tous, et toute la liste est alors classée. COMPILED et TESTED, non validé en jeu.
 - Tests : CraftChained696Tests. Verify.ps1 (agent) : 1261/1261, 0 avertissement, 0 erreur ; DLL 0.709.0.0. Non validé en jeu.

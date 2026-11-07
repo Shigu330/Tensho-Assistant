@@ -24,16 +24,16 @@ public sealed class PreparationPriceSession : IDisposable
         return Run(market,context,copied);
     }
 
-    /// <summary>0.335: a bounded list outside the craft plan (submarine route loot): only a character, a world and 1 to 32 items.</summary>
-    public Task StartListAsync(MarketService market, ulong character, uint world, IEnumerable<uint> ids)
+    /// <summary>0.335: a bounded list outside the craft plan (submarine route loot): only a character, a world and 1 to 32 items. 0.710, bulk: up to 100, in one request, and nothing more for items with no price.</summary>
+    public Task StartListAsync(MarketService market, ulong character, uint world, IEnumerable<uint> ids, bool bulk = false)
     {
         ArgumentNullException.ThrowIfNull(market); ArgumentNullException.ThrowIfNull(ids);
         var copied=ids.Distinct().ToArray();
-        if (copied.Length is 0 or > 32 || copied.Any(id=>id==0) || character==0 || world==0) throw new ArgumentException("Invalid price list.");
-        return Run(market,new(character,world,0,0,0,0,0),copied);
+        if (copied.Length==0 || copied.Length>(bulk ? MarketService.BatchMaximum:32) || copied.Any(id=>id==0) || character==0 || world==0) throw new ArgumentException("Invalid price list.");
+        return Run(market,new(character,world,0,0,0,0,0),copied,bulk);
     }
 
-    private Task Run(MarketService market, PreparationPriceContext context, uint[] copied)
+    private Task Run(MarketService market, PreparationPriceContext context, uint[] copied, bool bulk = false)
     {
         lock (gate)
         {
@@ -48,6 +48,12 @@ public sealed class PreparationPriceSession : IDisposable
                 var completed=0;
                 try
                 {
+                    if(bulk)
+                    {
+                        if(await market.FillCacheAsync(copied,context.CharacterId,context.WorldId,token,true).ConfigureAwait(false) is { } refused)throw new InvalidOperationException(refused);
+                        lock (gate) { if (!disposed && ticket==generation) state=new(context,list,copied.Length,0,false,null); }
+                        return;
+                    }
                     // 0.608 (I4): one request for the list; the loop below then finds them in the cache, and asks for the others as before.
                     if(await market.FillCacheAsync(copied,context.CharacterId,context.WorldId,token).ConfigureAwait(false) is { } failed)throw new InvalidOperationException(failed);
                     foreach (var id in copied)
