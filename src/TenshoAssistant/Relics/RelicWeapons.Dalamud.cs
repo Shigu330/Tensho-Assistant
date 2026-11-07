@@ -28,7 +28,13 @@ internal static class RelicCatalogLoader
             var leves=row.Leve.Select(item=>item.ValueNullable).Where(item=>item is { RowId:not 0 }).Select(item=>new RelicTarget(item!.Value.Name.ExtractText(),item.Value.PlaceNameStartZone.ValueNullable?.Name.ExtractText() ?? "")).ToArray();
             books[row.RowId]=new(row.RowId,row.EventItem.ValueNullable?.Name.ExtractText() ?? "",monsters,dungeons,fates,leves);
         }
-        return new(RelicBoard.Lines(stages),books);
+        // W-13 (0.716): the later relics, found in the sheet by item level and English name.
+        var levels=RelicBoard.Levels();
+        var english=data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.English);
+        var rows=english.Where(row=>row.EquipSlotCategory.RowId is 1 or 13 && levels.Contains((int)row.LevelItem.RowId))
+            .Select(row=>new RelicItemRow(row.RowId,row.Name.ExtractText(),(int)row.LevelItem.RowId,row.Rarity,row.ClassJobCategory.RowId)).ToArray();
+        var families=RelicBoard.Rules.Select(family=>(family.Key,RelicBoard.FamilyLines(rows,family.Stages))).Where(family=>family.Item2.Count>0).ToArray();
+        return new(RelicBoard.Lines(stages),books,families);
     }
 }
 

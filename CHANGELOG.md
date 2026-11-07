@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.716.0
+- Plan global, W-13 : Reliques suivantes, sujet choisi par l'utilisateur. La page Armes reliques a maintenant un onglet par lignée : Zodiaque, Anima, Eurêka, Résistance, Manderville, Fantômes, avec les étapes par arme et ce que vos stocks détiennent. Les objets viennent des feuilles du jeu ; seuls les noms d'étapes et leurs niveaux ont été relevés sur le wiki, puis comptés dans le jeu. Les armures ne sont pas encore listées. COMPILED et TESTED, non validé en jeu.
+- Tests : RelicWeapons708Tests. Verify.ps1 (agent) : 1278/1278, 0 avertissement, 0 erreur ; DLL 0.716.0.0. Non validé en jeu.
+### English
+- Later relics, a topic chosen by the user. The Relic weapons page now has a tab per line: Zodiac, Anima, Eureka, Resistance, Manderville, Phantom, with stages per weapon and what your stocks hold. Items come from the game's sheets; only stage names and levels were read on the wiki, then counted in the game. Armour is not listed yet. COMPILED and TESTED, not validated in game.
+
 ## 0.715.0
 - Plan global, W-12 : Livraisons spéciales, sujet choisi par l'utilisateur. Nouvelle page Progression › Livraisons spéciales : les quêtes de livraison des artisans et récolteurs (Cristarium, académie de Sharlayan, bazar aux Mille Perles), faites ou à faire, avec niveau, lieu et clic droit vers le départ et l'éthérite. COMPILED et TESTED, non validé en jeu.
 - Tests : SpecialDeliveries715Tests. Verify.ps1 (agent) : 1276/1276, 0 avertissement, 0 erreur ; DLL 0.715.0.0. Non validé en jeu.

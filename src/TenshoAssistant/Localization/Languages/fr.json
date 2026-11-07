@@ -6270,8 +6270,15 @@
     "HideBehindGameTip": "Désactivé par défaut. Activé : un panneau s'écarte quand une fenêtre du jeu le touche, puis revient."
   },
   "Relics": {
+    "Subtitle": "Les armes reliques de chaque extension, d'après le jeu. Les armures ne sont pas encore listées.",
+    "Loading": "Lecture des feuilles…",
+    "FamilyZodiac": "Zodiaque",
+    "FamilyAnima": "Anima",
+    "FamilyEureka": "Eurêka",
+    "FamilyResistance": "Résistance",
+    "FamilyManderville": "Manderville",
+    "FamilyPhantom": "Fantômes",
     "Title": "Armes reliques",
-    "Subtitle": "Les armes du zodiaque, d'après le jeu. Les extensions suivantes ne sont pas encore lues.",
     "Help": "Les étapes viennent des feuilles du jeu, ce que vous détenez de vos stocks relevés, le livre de ce que le jeu détient. Une arme qui n'est plus dans vos stocks ne compte pas comme détenue.",
     "Read": "Lire de nouveau",
     "ReadTip": "Copie une fois ce que le jeu détient de votre livre. Aucune requête et aucune action dans le jeu.",

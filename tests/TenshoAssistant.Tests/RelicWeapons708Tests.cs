@@ -28,6 +28,22 @@ internal static class RelicWeapons708Tests
             Check(total==5 && done==3,"m1, d, l");
             Check(RelicBoard.Done(Book,new(RelicReadStatus.Loaded,1,[],[],[],[])).Done==0,"nothing read");
         }),
+        ("Relic families: a stage is its level and its word, a higher level's word is not taken, and a base line is found by its next stage",() =>
+        {
+            RelicItemRow[] rows=[new(1,"Phantom Sword Penumbrae",745,4,10),new(2,"Phantom Sword Umbrae",760,4,10),new(3,"Phantom Sword Penumbrae",1,4,10),new(4,"Phantom Axe Penumbrae",745,4,11),
+                new(5,"Honorbound",485,4,10),new(6,"Honorbound Recollection",500,4,10),new(7,"Other Sword",485,4,10)];
+            var lines=RelicBoard.FamilyLines(rows,[new(745,"Penumbrae"),new(760,"Umbrae")]);
+            Check(lines.Count==2 && lines[0].SequenceEqual([1u,2u]) && lines[1].SequenceEqual([4u]),"by jobs, in stage order, not the replica at level 1");
+            var bases=RelicBoard.Stage(rows,new(485,null,4,null," Recollection")).ToArray();
+            Check(bases.Length==1 && bases[0].Id==5,"only the weapon with a next stage");
+        }),
+        ("Relic families: the rules cover the five lines, and rarity keeps out what a level alone would take",() =>
+        {
+            Check(RelicBoard.Rules.Select(family=>family.Key).SequenceEqual(["Anima","Eureka","Resistance","Manderville","Phantom"]),"lines");
+            Check(RelicBoard.Levels().Contains(795) && RelicBoard.Levels().Contains(170),"levels");
+            RelicItemRow[] rows=[new(1,"Almace",210,4,1),new(2,"Crafted Blade",210,2,1)];
+            Check(RelicBoard.Stage(rows,new(210,null,4)).Single().Id==1,"rarity");
+        }),
         ("Relics: the page only reads, on the framework thread, once the character is loaded",() =>
         {
             var reader=Read("Relics/RelicWeapons.Dalamud.cs");

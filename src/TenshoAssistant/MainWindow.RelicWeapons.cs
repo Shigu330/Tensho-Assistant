@@ -13,17 +13,23 @@ internal sealed partial class MainWindow
     private bool relicCatalogTried,relicReadFailed;
     private Task<RelicProgress>? relicRead;
     private RelicProgress? relicProgress;
-    private int relicLine;
+
+    private Task<RelicCatalog?>? relicCatalogTask;
+    private readonly Dictionary<string,int> relicLines=[];
+    private string? relicTabFocus;
 
     private void DrawRelicWeapons()
     {
         Heading(localization.Get("Relics.Title"),localization.Get("Relics.Subtitle"));
-        if(!relicCatalogTried)
+        // W-13 (0.716): every weapon of the sheet is looked at: off the frame.
+        if(!relicCatalogTried && RelicCatalogLoad is { } load)
         {
             relicCatalogTried=true;
-            relicCatalog=RelicCatalogLoad?.Invoke();
+            relicCatalogTask=Task.Run(load);
             relicRead=ReadRelics?.Invoke();
         }
+        if(relicCatalogTask is { IsCompleted:false }){ImGui.TextDisabled(localization.Get("Relics.Loading"));return;}
+        if(relicCatalogTask is { } done && relicCatalog is null){relicCatalog=done.IsCompletedSuccessfully ? done.Result:null;}
         if(relicCatalog is not { Lines.Count:>0 } catalog){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Relics.SheetsUnavailable"));return;}
         ImGui.TextWrapped(localization.Get("Relics.Help"));
         if(relicRead is { IsCompleted:true } read)
@@ -37,45 +43,49 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Relics.ReadTip"));
         RefreshRecipeHoldingsCache();
+        var tabs=new List<(string Key,string Label,Action Draw)>{("Zodiac",localization.Get("Relics.FamilyZodiac"),()=>{DrawRelicFamily("Zodiac",catalog.Lines);DrawRelicBook(catalog);})};
+        foreach(var (key,lines) in catalog.Families ?? [])tabs.Add((key,localization.Get("Relics.Family"+key),()=>DrawRelicFamily(key,lines)));
+        DetailTabs("RelicTabs",tabs,ref relicTabFocus);
+    }
+
+    private void DrawRelicFamily(string family,IReadOnlyList<IReadOnlyList<uint>> lines)
+    {
         var items=itemCatalog.State.Catalog;
         string Name(uint id)=>items?.Find(id)?.Name ?? $"#{id}";
-        relicLine=Math.Clamp(relicLine,0,catalog.Lines.Count-1);
-        var line=catalog.Lines[relicLine];
+        var chosen=Math.Clamp(relicLines.GetValueOrDefault(family),0,lines.Count-1);
+        var line=lines[chosen];
         ImGui.SetNextItemWidth(280);
-        if(ImGui.BeginCombo(localization.Get("Relics.Weapon")+"###RelicLine",Name(line[0])))
+        if(ImGui.BeginCombo(localization.Get("Relics.Weapon")+$"###RelicLine{family}",Name(line[0])))
         {
-            try{for(var index=0;index<catalog.Lines.Count;index++)if(ImGui.Selectable($"{Name(catalog.Lines[index][0])}##RelicLine{index}",index==relicLine))relicLine=index;}
+            try{for(var index=0;index<lines.Count;index++)if(ImGui.Selectable($"{Name(lines[index][0])}##RelicLine{family}{index}",index==chosen))relicLines[family]=index;}
             finally{ImGui.EndCombo();}
         }
         Tip("Relics.WeaponTip");
         long? Held(uint id){var stock=GetRecipeHoldings(id);return stock.HasObservation ? stock.Total:null;}
         var reached=RelicBoard.Reached(line,Held);
         ImGui.TextUnformatted(reached is null ? localization.Get("Relics.StocksUnknown"):reached<0 ? localization.Get("Relics.NoneHeld"):localization.Format("Relics.Reached",reached+1,line.Count,Name(line[reached.Value])));
-        if(ImGui.BeginTable("###RelicStages",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV))
+        if(!ImGui.BeginTable($"###RelicStages{family}",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV))return;
+        try
         {
-            try
+            ImGui.TableSetupColumn(localization.Get("Relics.ColumnStage"));
+            ImGui.TableSetupColumn(localization.Get("Relics.ColumnWeapon"));
+            ImGui.TableSetupColumn(localization.Get("Relics.ColumnHeld"));
+            ImGui.TableHeadersRow();
+            var size=new Vector2(ImGui.GetTextLineHeight());
+            for(var index=0;index<line.Count;index++)
             {
-                ImGui.TableSetupColumn(localization.Get("Relics.ColumnStage"));
-                ImGui.TableSetupColumn(localization.Get("Relics.ColumnWeapon"));
-                ImGui.TableSetupColumn(localization.Get("Relics.ColumnHeld"));
-                ImGui.TableHeadersRow();
-                var size=new Vector2(ImGui.GetTextLineHeight());
-                for(var index=0;index<line.Count;index++)
-                {
-                    ImGui.TableNextRow();
-                    ImGui.TableNextColumn();ImGui.TextUnformatted((index+1).ToString());
-                    ImGui.TableNextColumn();DrawItemIcon(items?.Find(line[index]),size);
-                    if(ImGui.IsItemHovered())DrawItemInfoTooltip(line[index]);
-                    ImGui.SameLine();ImGui.TextUnformatted(Name(line[index]));
-                    ImGui.TableNextColumn();
-                    if(Held(line[index]) is not { } held)ImGui.TextDisabled("?");
-                    else if(held>0)ImGui.TextColored(Success,held.ToString("N0"));
-                    else ImGui.TextDisabled("0");
-                }
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();ImGui.TextUnformatted((index+1).ToString());
+                ImGui.TableNextColumn();DrawItemIcon(items?.Find(line[index]),size);
+                if(ImGui.IsItemHovered())DrawItemInfoTooltip(line[index]);
+                ImGui.SameLine();ImGui.TextUnformatted(Name(line[index]));
+                ImGui.TableNextColumn();
+                if(Held(line[index]) is not { } held)ImGui.TextDisabled("?");
+                else if(held>0)ImGui.TextColored(Success,held.ToString("N0"));
+                else ImGui.TextDisabled("0");
             }
-            finally{ImGui.EndTable();}
         }
-        DrawRelicBook(catalog);
+        finally{ImGui.EndTable();}
     }
 
     private void DrawRelicBook(RelicCatalog catalog)

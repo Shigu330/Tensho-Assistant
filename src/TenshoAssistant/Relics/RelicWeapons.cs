@@ -3,8 +3,14 @@ namespace TenshoAssistant.Relics;
 /// <summary>W-03 (0.708): something a Zodiac book asks for. Needed: monsters to defeat; 0 for the others, done or not. docs/evidence/0.708-relic-weapons.md.</summary>
 public sealed record RelicTarget(string Name,string Place,int Needed=0);
 public sealed record RelicBook(uint Row,string Name,IReadOnlyList<RelicTarget> Monsters,IReadOnlyList<RelicTarget> Dungeons,IReadOnlyList<RelicTarget> Fates,IReadOnlyList<RelicTarget> Leves);
-/// <summary>The weapons, one list per class, an item per stage in the game's order; and the books by their row.</summary>
-public sealed record RelicCatalog(IReadOnlyList<IReadOnlyList<uint>> Lines,IReadOnlyDictionary<uint,RelicBook> Books);
+/// <summary>The weapons, one list per class, an item per stage in the game's order; and the books by their row. Families: the later relics, key then lines, in that order.</summary>
+public sealed record RelicCatalog(IReadOnlyList<IReadOnlyList<uint>> Lines,IReadOnlyDictionary<uint,RelicBook> Books,IReadOnlyList<(string Key,IReadOnlyList<IReadOnlyList<uint>> Lines)>? Families=null);
+
+/// <summary>W-13 (0.716): a weapon as the sheet has it. Name: English, whatever the game's language, because stages are recognised by it. Category: its jobs, which stay the same from stage to stage.</summary>
+public readonly record struct RelicItemRow(uint Id,string Name,int Level,int Rarity,uint Category);
+
+/// <summary>A stage: its item level, a word in the English name if the level is not enough, and the lowest rarity. docs/evidence/0.716-relic-families.md.</summary>
+public sealed record RelicStageRule(int Level,string? Word=null,int Rarity=3,string? Excluding=null,string? AlsoNamed=null);
 
 public enum RelicReadStatus { Loaded,NotLoaded,Unavailable }
 /// <summary>What the game holds of the book in progress, copied on the framework thread. Note 0: no book.</summary>
@@ -15,6 +21,40 @@ public sealed record RelicProgress(RelicReadStatus Status,uint Note,IReadOnlyLis
 
 public static class RelicBoard
 {
+    public static readonly IReadOnlyList<(string Key,IReadOnlyList<RelicStageRule> Stages)> Rules=
+    [
+        ("Anima",[new(170,"Animated"),new(200,"Awoken"),new(210,null,4),new(230,"Hyperconductive"),new(240,null,4),new(260,"Sharpened"),new(270,null,4),new(275,"Lux")]),
+        ("Eureka",[new(290,"Antiquated"),new(355,"Anemos"),new(370,"Elemental"),new(375,"Elemental"),new(380,"Elemental"),new(385,"Pyros"),new(405,"Eureka"),new(405,"Physeos")]),
+        ("Resistance",[new(485,null,4,null," Recollection"),new(500,"Augmented"),new(500,"Recollection"),new(510,"Law's Order"),new(515,"Law's Order"),new(535,"Blade's")]),
+        ("Manderville",[new(615,"Manderville"),new(630,"Amazing Manderville"),new(645,"Majestic Manderville"),new(665,"Mandervillous")]),
+        ("Phantom",[new(745,"Penumbrae"),new(760,"Umbrae"),new(775,"Obscurum"),new(790,"Eclipticum"),new(795,"Occultum")]),
+    ];
+
+    /// <summary>The levels to read from the sheet, so that the rest of it is left alone.</summary>
+    public static IReadOnlySet<int> Levels()=>Rules.SelectMany(family=>family.Stages).Select(stage=>stage.Level).ToHashSet();
+
+    /// <summary>Which rows a stage holds. AlsoNamed: a row whose name, with these words after it, is a weapon too: the base of a line with no word of its own.</summary>
+    public static IEnumerable<RelicItemRow> Stage(IReadOnlyList<RelicItemRow> rows,RelicStageRule rule)
+    {
+        var names=rule.AlsoNamed is null ? null:rows.Select(row=>row.Name).ToHashSet(StringComparer.Ordinal);
+        return rows.Where(row=>row.Level==rule.Level && row.Rarity>=rule.Rarity
+            && (rule.Word is null || row.Name.Contains(rule.Word,StringComparison.Ordinal))
+            && (rule.AlsoNamed is null || names!.Contains(row.Name+rule.AlsoNamed)));
+    }
+
+    /// <summary>One line per set of jobs, an item per stage in the rules' order; a line missing a stage keeps the others.</summary>
+    public static IReadOnlyList<IReadOnlyList<uint>> FamilyLines(IReadOnlyList<RelicItemRow> rows,IReadOnlyList<RelicStageRule> stages)
+    {
+        var lines=new Dictionary<uint,List<uint>>();var order=new List<uint>();
+        foreach(var stage in stages)
+            foreach(var row in Stage(rows,stage).OrderBy(row=>row.Id))
+            {
+                if(!lines.TryGetValue(row.Category,out var line)){lines[row.Category]=line=[];order.Add(row.Category);}
+                if(!line.Contains(row.Id))line.Add(row.Id);
+            }
+        return order.Select(category=>(IReadOnlyList<uint>)lines[category]).ToArray();
+    }
+
     /// <summary>Stages as rows, classes as columns, into one list per class. An item 0 is no weapon at that stage; a class with none is left out.</summary>
     public static IReadOnlyList<IReadOnlyList<uint>> Lines(IReadOnlyList<IReadOnlyList<uint>> stages)
     {

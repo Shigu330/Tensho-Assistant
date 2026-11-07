@@ -6270,8 +6270,15 @@
     "HideBehindGameTip": "Off by default. On: a panel leaves while a game window touches it, and comes back after."
   },
   "Relics": {
+    "Subtitle": "Relic weapons of each expansion, from the game. Armour is not listed yet.",
+    "Loading": "Reading the sheets…",
+    "FamilyZodiac": "Zodiac",
+    "FamilyAnima": "Anima",
+    "FamilyEureka": "Eureka",
+    "FamilyResistance": "Resistance",
+    "FamilyManderville": "Manderville",
+    "FamilyPhantom": "Phantom",
     "Title": "Relic weapons",
-    "Subtitle": "The Zodiac weapons, from the game. Later expansions are not read yet.",
     "Help": "Stages come from the game's sheets, what you hold from your read stocks, the book from what the game holds. A weapon no longer in your stocks is not counted as held.",
     "Read": "Read again",
     "ReadTip": "Copies what the game holds of your book, once. No request and no action in the game.",
