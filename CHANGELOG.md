@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.733.0
+- Plan global, Verify : Signalements : aucun cadre sur les barres, et « Sagesse du fermier » demandée à 4/4 essais. Causes : la demande de repérage était effacée avant d'être lue, le panneau étant dessiné après ; cette action rend un essai et le jeu la refuse tant qu'aucun n'est dépensé. Corrections : le panneau demande lui-même le repérage ; l'action vient après la première récolte. Non validé en jeu.
+- Tests : GatherNext728Tests. Verify.ps1 (agent) : 1310/1310, 0 avertissement, 0 erreur ; DLL 0.733.0.0. Non validé en jeu.
+### English
+- Reports: no frame on the hotbars, and Ageless Words asked at 4/4 attempts. Causes: the request to find the slot was cleared before it was read, as the panel is drawn later; that action gives back an attempt and the game refuses it while none is spent. Fixes: the panel asks itself; the action comes after the first gather. Not validated in game.
+
 ## 0.732.0
 - Plan global, Verify : Page Récolte : la liste « En ce moment » se calcule hors de l'image ; le passage des pages y avait mesuré une image de 41 ms à chaque minute d'Eorzéa. Non validé en jeu.
 - Tests : PageSweep724Tests. Verify.ps1 (agent) : 1310/1310, 0 avertissement, 0 erreur ; DLL 0.732.0.0. Non validé en jeu.

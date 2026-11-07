@@ -77,6 +77,8 @@ public static class GpNextAction
         for(var index=0;index<steps.Count;index++)
         {
             if(done[index] || steps[index].Attempt!=0 && steps[index].Attempt<gather)continue;
+            // 0.733 (user report): an action that gives an attempt back cannot be used while none is spent: after the first gather.
+            if(steps[index].Action.Spec.Effect==GpEffect.Attempt && gather==1)continue;
             return steps[index].Attempt>gather ? new(GpNextKind.Gather,null,used):new(GpNextKind.Action,steps[index].Action,used);
         }
         return new(GpNextKind.Gather,null,used,Finished:true);

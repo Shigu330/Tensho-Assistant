@@ -20,13 +20,14 @@ internal sealed class ActionBarLocator : IDisposable
     private int frames;
     private bool failed;
     private volatile IReadOnlyList<ActionBarRect> rects=[];
-    private volatile bool read;
+    private uint wanted,readFor;
+    private long wantedAt;
 
-    /// <summary>The action to find; 0: none. Written by the drawing, read here.</summary>
-    public uint Wanted { get; set; }
+    /// <summary>Asked at each frame by the drawing while an action is to be found; a request older than half a second is dropped.</summary>
+    public void Want(uint action){Volatile.Write(ref wanted,action);Volatile.Write(ref wantedAt,System.Diagnostics.Stopwatch.GetTimestamp());}
     public IReadOnlyList<ActionBarRect> Rects=>rects;
-    /// <summary>False until the bars have been read for this action.</summary>
-    public bool Read=>read;
+    /// <summary>The action the rectangles are for; 0 until the bars have been read for one.</summary>
+    public uint ReadFor=>Volatile.Read(ref readFor);
 
     public ActionBarLocator(IFramework framework,IGameGui gui,IPluginLog log)
     {
@@ -43,8 +44,9 @@ internal sealed class ActionBarLocator : IDisposable
 
     private unsafe void OnUpdate(IFramework _)
     {
-        var wanted=Wanted;
-        if(wanted==0){if(read){rects=[];read=false;}return;}
+        var wanted=Volatile.Read(ref this.wanted);
+        if(wanted!=0 && System.Diagnostics.Stopwatch.GetElapsedTime(Volatile.Read(ref wantedAt))>TimeSpan.FromMilliseconds(500))wanted=0;
+        if(wanted==0){if(Volatile.Read(ref readFor)!=0){Volatile.Write(ref readFor,0u);rects=[];}return;}
         if(failed || ++frames<FramesBetweenReads)return;
         frames=0;
         try
@@ -72,11 +74,11 @@ internal sealed class ActionBarLocator : IDisposable
                 }
             }
             rects=found;
-            read=true;
+            Volatile.Write(ref readFor,wanted);
         }
         catch(Exception error)
         {
-            failed=true;rects=[];read=false;
+            failed=true;rects=[];Volatile.Write(ref readFor,0u);
             log.Warning(error,"The hotbars could not be read: no highlight until the plugin reloads.");
         }
     }

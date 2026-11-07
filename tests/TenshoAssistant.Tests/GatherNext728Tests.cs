@@ -59,8 +59,11 @@ internal static class GatherNext728Tests
             Check(Next(823,4,new(0,5m,[])).Kind==GpNextKind.Gather,"nothing to buy");
             var attempt=Act(215,300,GpEffect.Attempt);
             GpPlan more=new(400,9m,[new(attempt,1),new(Bountiful,1)]);
-            Check(GpNextAction.Next(more,800,800,4,4).Action==attempt,"attempt first");
-            Check(GpNextAction.Next(more,800,500,4,5).Action==Bountiful,"no gather counted when the attempt was added");
+            // 0.733 (user report): Ageless Words asked at 4/4 attempts, when the game does not allow it.
+            Check(GpNextAction.Next(more,800,800,4,4).Action==Bountiful,"no attempt spent: the bonus first");
+            Check(GpNextAction.Next(more,800,700,4,4).Kind==GpNextKind.Gather,"then gather");
+            Check(GpNextAction.Next(more,800,706,4,3).Action==attempt,"after the first gather, the attempt back");
+            Check(GpNextAction.Next(new(300,9m,[new(attempt,1)]),800,800,4,4).Kind==GpNextKind.Gather,"alone: gather first");
             var clear=Act(4086,50,GpEffect.NextSuccess);
             GpPlan both=new(250,9m,[new(Bountiful,2),new(clear,1)]);
             Check(GpNextAction.Steps(both).Select(step=>(step.Action.Spec.Id,step.Attempt)).SequenceEqual([(273u,1),(4086u,1),(273u,2)]),"attempt by attempt");
@@ -73,7 +76,8 @@ internal static class GatherNext728Tests
             Check(!locator.Contains("PulseActionBarSlot") && !locator.Contains("UseAction") && !locator.Contains("Hook"),"nothing called or hooked");
             Check(locator.Contains("HotbarSlotType.Action"),"only an action");
             var panel=Read("MainWindow.GatheringPanel.cs");
-            Check(panel.Contains("configuration.GatheringNextHighlight") && panel.Contains("located.Wanted=gatheringBarWanted"),"setting");
+            Check(panel.Contains("configuration.GatheringNextHighlight && BarLocator is { } located") && panel.Contains("located.Want(action.Spec.Id)") && panel.Contains("DrawGatheringBarHighlight(located)"),"setting, asked and drawn inside the panel");
+            Check(!panel.Contains("located.Wanted=0"),"0.733: nothing clears the request after the panel asked");
             Check(!Read("Gathering/GpNextAction.cs").Contains("Dalamud"),"pure");
             Check(panel.IndexOf("DrawGatheringNext(shown")<panel.IndexOf("if(next is { Kind:not GpNextKind.Done })ImGui.Separator();"),"a line between the next action and the plan");
         }),

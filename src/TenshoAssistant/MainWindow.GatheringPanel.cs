@@ -34,26 +34,11 @@ internal sealed partial class MainWindow
     }
     internal void DrawGatheringPanel()
     {
-        var observed=gatheringObservation.State;
-        // 0.728: set again below while a plan has a next action; otherwise nothing is looked for.
-        var located=BarLocator;
-        var wantedBefore=located?.Wanted ?? 0;
-        if(located is not null)located.Wanted=0;
-        gatheringBarWanted=0;
-        try{DrawGatheringPanelCore(observed);}
-        finally
-        {
-            if(located is not null)
-            {
-                located.Wanted=gatheringBarWanted;
-                if(gatheringBarWanted!=0 && gatheringBarWanted==wantedBefore)DrawGatheringBarHighlight(located);
-            }
-        }
+        DrawGatheringPanelCore(gatheringObservation.State);
     }
 
     // 0.728 (user request): a frame over the slot of the next action, as on the Mini Cactpot board. Drawn only: the player uses the action.
     internal Gathering.ActionBarLocator? BarLocator { get; set; }
-    private uint gatheringBarWanted;
     private (GpPlan Plan,int Gp,int? Attempts,int? Boon,GpNextStep Step)? gatheringNextCache;
     private static void DrawGatheringBarHighlight(Gathering.ActionBarLocator located)
     {
@@ -89,10 +74,15 @@ internal sealed partial class MainWindow
                 DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(28));ImGui.SameLine();
                 ImGui.TextColored(Accent,localization.Format(step.Leftover ? "GatheringPanel.NextLeftover":"GatheringPanel.NextAction",action.Name));
                 if(ImGui.IsItemHovered())WrappedTooltip(action.Description);
-                if(configuration.GatheringNextHighlight)
+                // 0.733 (user report): asked from here, inside the panel's own window, which is drawn after the overlays: the frame of 0.728 was cleared before it was looked for.
+                if(configuration.GatheringNextHighlight && BarLocator is { } located)
                 {
-                    gatheringBarWanted=action.Spec.Id;
-                    if(BarLocator is { Read:true,Rects.Count:0 })ImGui.TextDisabled(localization.Get("GatheringPanel.NextNotOnBars"));
+                    located.Want(action.Spec.Id);
+                    if(located.ReadFor==action.Spec.Id)
+                    {
+                        if(located.Rects.Count==0)ImGui.TextDisabled(localization.Get("GatheringPanel.NextNotOnBars"));
+                        else DrawGatheringBarHighlight(located);
+                    }
                 }
                 break;
             case GpNextKind.Gather:ImGui.TextColored(Accent,localization.Format("GatheringPanel.NextGather",itemName));break;
