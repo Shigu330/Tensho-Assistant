@@ -298,7 +298,12 @@ internal sealed partial class MainWindow
                         DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
                         if(group.Timed && ImGui.IsItemHovered())WrappedTooltip(string.Join(", ",ListPanelZones(item)));
                         // 0.761 (X-14, user request): open or closed now, and for how long.
-                        if(group.Timed && ListPanelTimedState(item) is { } state){ImGui.SameLine();ImGui.TextColored(state.Open ? Success:Muted,state.Text);}
+                        // 0.827 (X-59, user request): the timer alone, green while open, red while closed; the words on hover.
+                        if(group.Timed && ListPanelTimedState(item) is { } state)
+                        {
+                            ImGui.SameLine();ImGui.TextColored(state.Open ? Success:UI.FfxivTheme.Error,state.Text);
+                            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(state.Open ? "ListPanels.TimedOpenHint":"ListPanels.TimedClosedHint"));
+                        }
                     }
                 }
                 finally{ImGui.TreePop();}

@@ -6431,8 +6431,10 @@
     "Left": "Not cleared"
   },
   "ListPanels": {
-    "TimedOpen": "open · {0}:{1:00}:{2:00} left",
-    "TimedClosed": "closed · opens in {0}:{1:00}:{2:00}",
+    "TimedOpen": "{0}:{1:00}:{2:00}",
+    "TimedClosed": "{0}:{1:00}:{2:00}",
+    "TimedOpenHint": "Open: closes when the timer ends.",
+    "TimedClosedHint": "Closed: opens when the timer ends.",
     "TimedGroup": "Timed points",
     "ZoneHere": "you are here",
     "ZoneCost": "teleport {0} gil",

@@ -6431,8 +6431,10 @@
     "Left": "Non réussi"
   },
   "ListPanels": {
-    "TimedOpen": "ouvert · encore {0}:{1:00}:{2:00}",
-    "TimedClosed": "fermé · ouvre dans {0}:{1:00}:{2:00}",
+    "TimedOpen": "{0}:{1:00}:{2:00}",
+    "TimedClosed": "{0}:{1:00}:{2:00}",
+    "TimedOpenHint": "Ouvert : se ferme à la fin du minuteur.",
+    "TimedClosedHint": "Fermé : ouvre à la fin du minuteur.",
     "TimedGroup": "Points à horaire",
     "ZoneHere": "vous y êtes",
     "ZoneCost": "téléportation {0} gils",

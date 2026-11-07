@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.827.0
+- Plan global, Verify : Demande (X-59) : dans les listes de suivi, les points à horaire n'affichent plus « ouvert » ni « fermé » : le minuteur seul, en vert quand le point est ouvert, en rouge quand il est fermé ; le sens reste au survol. Non validé en jeu.
+- Tests : TimedColours827Tests. Verify.ps1 (agent) : 1413/1413, 0 avertissement, 0 erreur ; DLL 0.827.0.0. Non validé en jeu.
+### English
+- Request (X-59): in the tracking lists, timed points no longer show « open » or « closed »: the timer alone, green while open, red while closed; the meaning stays on hover. Not validated in game.
+
 ## 0.826.0
 - Plan global, Verify : Demande (X-58) : depuis le clic droit, on peut ajouter un objet qui se fabrique à une liste d'artisanat déjà créée : « Ajouter à une liste d'artisanat » dans le menu de Tensho (un choix par liste), et une entrée par liste dans le sous-menu Tensho du menu du jeu. L'objet est ajouté avec une unité, ou une de plus s'il y est déjà. Non validé en jeu.
 - Tests : AddToList826Tests. Verify.ps1 (agent) : 1412/1412, 0 avertissement, 0 erreur ; DLL 0.826.0.0. Non validé en jeu.
