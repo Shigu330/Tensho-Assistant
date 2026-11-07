@@ -41,6 +41,7 @@ internal sealed partial class MainWindow
     internal Func<IReadOnlyList<ActionBarRect?>>? GatheringSlotRects { get; set; }
     /// <summary>0.753 (X-06): the game's « gather automatically » box; null when not shown.</summary>
     internal Func<bool?>? GatheringAutoGather { get; set; }
+    private bool gatheringTrackedPicked;
     private static void DrawGatheringSlotFrame(ActionBarRect rect)
     {
         var draw=ImGui.GetForegroundDrawList();
@@ -149,6 +150,12 @@ internal sealed partial class MainWindow
             var rating=stats.JobId==frame.JobId && stats.Values.TryGetValue("Gathering",out var gathering) ? gathering:0;
             RefreshRecipeHoldingsCache();
             var items=itemCatalog.State.Catalog;
+            // 0.756 (X-10, user request): once per node, as soon as its items are read, an item the tracking lists need is put in context first; a click still chooses another.
+            if(!gatheringTrackedPicked && frame.Slots.Any(slot=>slot.ItemId!=0))
+            {
+                gatheringTrackedPicked=true;
+                if(frame.Slots.Where(slot=>slot.ItemId!=0).OrderByDescending(slot=>TrackedNeed(slot.ItemId)).FirstOrDefault() is { } wanted && TrackedNeed(wanted.ItemId)>0)SelectItem(wanted.ItemId);
+            }
             var chosen=frame.Slots.FirstOrDefault(slot=>slot.ItemId!=0 && slot.ItemId==(uint)Math.Max(0,itemId)) ?? frame.Slots.FirstOrDefault(slot=>slot.ItemId!=0);
             // 0.523 (user report): the scrips of a node's collectables, to choose between them.
             var scripRules=frame.Slots.Where(slot=>slot.ItemId!=0).Select(slot=>Collectables?.Catalog?.For(slot.ItemId).FirstOrDefault(rule=>rule.Scrips && rule.RewardHigh>0)).OfType<CollectableRule>().ToArray();
@@ -212,7 +219,10 @@ internal sealed partial class MainWindow
     {
         if(gatheringPanelStart is not { } start || start.Owner!=owner || start.JobId!=frame.JobId || start.TotalAttempts!=frame.TotalAttempts
            || frame.Slots.Count>0 && !frame.Slots.Any(slot=>start.Slots.ContainsKey((slot.Index,slot.RawItemId))))
+        {
             gatheringPanelStart=start=new(owner,frame);
+            gatheringTrackedPicked=false;
+        }
         start.Frozen|=frame.Gp<start.Gp || frame.Attempts<start.Attempts;
         if(!start.Frozen){start.Gp=frame.Gp;start.Attempts??=frame.Attempts;}
         foreach(var slot in frame.Slots)

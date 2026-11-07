@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.756.0
+- Plan global, Verify : Demande (X-10) : à l'ouverture d'un point de récolte, l'aide se place sur l'objet dont vos listes de suivi ont le plus besoin ; un clic en choisit toujours un autre. X-09 (alarmes des listes) validé en jeu sur votre retour. Non validé en jeu pour X-10.
+- Tests : TrackedFirst756Tests. Verify.ps1 (agent) : 1331/1331, 0 avertissement, 0 erreur ; DLL 0.756.0.0. Non validé en jeu.
+### English
+- Request (X-10): when a node opens, the gathering help puts the item your tracking lists need most in context; a click still picks another. X-09 (list alarms) validated in game on your report. X-10 not validated in game.
+
 ## 0.755.0
 - Plan global, Verify : Demande (X-09) : en tête des listes de suivi, « Ajouter les alarmes (N) » crée une alarme pour chaque ouverture des points à horaire de ce dont la liste a encore besoin ; une alarme déjà présente (même nom, même heure) n'est pas doublée. Non validé en jeu.
 - Tests : ListAlarms755Tests. Verify.ps1 (agent) : 1330/1330, 0 avertissement, 0 erreur ; DLL 0.755.0.0. Non validé en jeu.
