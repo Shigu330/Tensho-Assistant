@@ -16,7 +16,8 @@ public sealed record NpcCost(uint CurrencyItemId,uint Amount,uint RawCurrency=0)
 public sealed record NpcShopSale(uint ShopId,NpcShopKind Kind,string ShopName,uint ItemId,uint Quantity,bool Hq,IReadOnlyList<NpcCost> Costs,byte RequiredRank=0,
     uint QuestRequired=0,uint AchievementRequired=0);
 // X/Y are map coordinates as shown in game; World* are kept to place the map flag exactly.
-public sealed record NpcLocation(uint TerritoryId,uint MapId,string Zone,float X,float Y,float WorldX,float WorldY,float WorldZ);
+/// <summary>0.811 (X-45): Condition 0 = always there, 1 = only while its festival (Festival) runs, 2 = only during a quest or the opening (layer QST_, QB_, EVT_OP).</summary>
+public sealed record NpcLocation(uint TerritoryId,uint MapId,string Zone,float X,float Y,float WorldX,float WorldY,float WorldZ,int Condition=0,uint Festival=0);
 public sealed record NpcVendor(uint NpcId,string Name,IReadOnlyList<uint> ShopIds,IReadOnlyList<NpcLocation> Locations);
 public sealed record NpcVendorOffer(NpcVendor Vendor,NpcShopSale Sale);
 public sealed record NpcVendorCacheData(string DataVersion,IReadOnlyList<NpcVendor> Vendors,IReadOnlyList<NpcShopSale> Sales);
@@ -24,6 +25,16 @@ public sealed record NpcVendorCacheData(string DataVersion,IReadOnlyList<NpcVend
 /// <summary>Shop links as copied from game sheets; resolution follows direct shops, topic menus, pre-handlers and talk scripts.</summary>
 public static class NpcShopLinks
 {
+    public const int Always=0,DuringFestival=1,DuringQuest=2;
+    /// <summary>
+    /// 0.811 (X-45, user report: event vendors on the map while absent): a layout layer's condition. Limsa's planevent.lgb (tools/MapMaskProbe --lgb 128,
+    /// docs/evidence/0.811-conditional-npcs.md): 136 layers with a FestivalID, and layers « EVT_OP_ONLY_ENPC », « QST_… », « QB_… » for the opening and quests.
+    /// </summary>
+    public static (int Condition,uint Festival) LayerCondition(string? layer,uint festival)=>festival!=0 ? (DuringFestival,festival)
+        :layer is { } name && (name.StartsWith("QST_",StringComparison.Ordinal) || name.StartsWith("QB_",StringComparison.Ordinal) || name.StartsWith("EVT_OP",StringComparison.Ordinal)) ? (DuringQuest,0u):(Always,0u);
+    /// <summary>0.811: a place shown on the map: always there, or its festival running; never a quest's or the opening's.</summary>
+    public static bool Present(NpcLocation spot,IReadOnlySet<uint> running)=>spot.Condition==Always || spot.Condition==DuringFestival && running.Contains(spot.Festival);
+
     public const int MaximumDepth=4;
     public static IReadOnlyList<uint> Resolve(IEnumerable<uint> npcData,IReadOnlySet<uint> shops,IReadOnlyDictionary<uint,IReadOnlyList<uint>> indirections)
     {
@@ -176,7 +187,7 @@ public static class NpcVendorCache
     public const int MaximumRows=500_000;
     // Bump when the sheet-to-record copy rules change without a change of record shape.
     // 2: FateShop links (gemstone traders). 3: InclusionShop links (scrip exchanges), encoded currencies no longer mapped (2026-10-30).
-    private const int CopyRules=11; // 11: Kaede's archaeology talk (Auxesia). 8: observed talk links; 9: planevent.lgb; 10: planner.lgb + header check + crystal exchange. // 4: purple scrips; 5: (type, id) table; 6: currencies keyed by CostType (tomestones vs scrips).
+    private const int CopyRules=12; // 12: layer conditions (festival, quest, opening). 11: Kaede's archaeology talk (Auxesia). 8: observed talk links; 9: planevent.lgb; 10: planner.lgb + header check + crystal exchange. // 4: purple scrips; 5: (type, id) table; 6: currencies keyed by CostType (tomestones vs scrips).
     public static readonly string Shape=CatalogCacheKeys.Shape(typeof(NpcVendor),typeof(NpcLocation),typeof(NpcShopSale),typeof(NpcCost),typeof(NpcShopKind));
     public static string Version(string dataVersion)=>CatalogCacheKeys.Version(dataVersion,CopyRules,Shape);
     public static bool Valid(NpcVendorCacheData? data,string dataVersion)

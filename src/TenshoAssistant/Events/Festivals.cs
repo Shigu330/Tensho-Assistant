@@ -19,15 +19,6 @@ public sealed record FestivalLayouts(IReadOnlyDictionary<uint,IReadOnlyList<(uin
 /// </summary>
 public static class Festivals
 {
-    /// <summary>
-    /// 0.810 (X-45, user report: event vendors on the map while absent in game): the NPCs a festival places (by territory) that no running festival places.
-    /// Running festivals not read yet: none running, so every festival NPC is absent (they are there only a few weeks a year).
-    /// </summary>
-    public static IReadOnlySet<(uint Npc,uint Territory)> Absent(FestivalLayouts layouts,IReadOnlySet<uint> running)
-    {
-        var present=layouts.Npcs.Where(pair=>running.Contains(pair.Key)).SelectMany(pair=>pair.Value).ToHashSet();
-        return layouts.Npcs.Where(pair=>!running.Contains(pair.Key)).SelectMany(pair=>pair.Value).Where(place=>!present.Contains(place)).ToHashSet();
-    }
 
     /// <summary>FestivalName rows (id, English name); « None » and « Unknown » are no name.</summary>
     public static IReadOnlyDictionary<uint,string> ReadNames(TextReader reader)

@@ -64,6 +64,25 @@ foreach(var map in maps)
     break;
 }
 
+// X-45 (0.811): « --lgb <territory row> »: each layer of planevent.lgb and planner.lgb with its festival and its event NPCs, to tell which NPCs only an event places.
+if(args.Length>2 && args[1]=="--lgb" && uint.TryParse(args[2],out var territoryRow) && game.GetExcelSheet<TerritoryType>()!.GetRowOrDefault(territoryRow) is { } territory)
+{
+    var bg=territory.Bg.ExtractText();var cut=bg.IndexOf("/level/",StringComparison.Ordinal);
+    foreach(var kind in new[]{"planevent","planner","bg"})
+    {
+        var path=$"bg/{bg[..(cut+1)]}level/{kind}.lgb";
+        if(!game.FileExists(path)){Console.WriteLine($"{path}: missing");continue;}
+        var file=game.GetFile<Lumina.Data.Files.LgbFile>(path)!;
+        foreach(var layer in file.Layers)
+        {
+            var npcs=layer.InstanceObjects.Where(o=>o.AssetType==Lumina.Data.Parsing.Layer.LayerEntryType.EventNPC).ToArray();
+            if(npcs.Length==0)continue;
+            Console.WriteLine($"{kind} layer {layer.LayerId} \"{layer.Name}\" festival {layer.FestivalID} phase {layer.FestivalPhaseID} npcs {npcs.Length}: "+string.Join(" ",npcs.Take(12).Select(o=>$"{((Lumina.Data.Parsing.Layer.LayerCommon.ENPCInstanceObject)o.Object).ParentData.ParentData.BaseId}@{o.Transform.Translation.X:F0},{o.Transform.Translation.Z:F0}")));
+        }
+    }
+}
+
+
 static class Png
 {
     public static void Write(string path,int w,int h,byte[] rgb)

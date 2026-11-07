@@ -257,8 +257,10 @@ internal sealed class NpcVendorLoader : IDisposable
                         var x=NpcShopLinks.MapCoordinate(position.X,map.OffsetX,map.SizeFactor);var y=NpcShopLinks.MapCoordinate(position.Z,map.OffsetY,map.SizeFactor);
                         if(!locations.TryGetValue(id,out var list))locations[id]=list=[];
                         // Several territories share one layout (e.g. instanced copies): keep one entry per map and spot.
+                        // 0.811 (X-45): the layer says whether the NPC is always there, during a festival, or only during a quest or the opening.
+                        var (condition,festival)=NpcShopLinks.LayerCondition(layer.Name,layer.FestivalID);
                         if(list.Count<8 && !list.Any(known=>known.MapId==map.RowId && Math.Abs(known.X-x)<0.1f && Math.Abs(known.Y-y)<0.1f))
-                            list.Add(new(territory.RowId,map.RowId,zone,x,y,position.X,position.Y,position.Z));
+                            list.Add(new(territory.RowId,map.RowId,zone,x,y,position.X,position.Y,position.Z,condition,festival));
                     }
                 }
                 yield return ++count;

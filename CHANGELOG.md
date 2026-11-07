@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.811.0
+- Plan global, Verify : Signalement (X-45), suite : des PNJ restaient sur la carte de Limsa alors qu'ils ne sont pas là en jeu. Les fichiers du jeu le disent : dans Limsa, à côté des 136 couches d'événements saisonniers, des dizaines de couches ne placent des PNJ que pendant une quête ou l'ouverture du jeu (« QST_… », « QB_… », « EVT_OP_ONLY_ENPC »). Chaque position de marchand garde maintenant la condition de sa couche : toujours là, pendant un événement (montrée seulement pendant cet événement), ou pendant une quête ou l'ouverture (jamais montrée sur la carte). La copie du catalogue des marchands est reconstruite une fois. Non validé en jeu.
+- Tests : FestivalVendors810Tests. Verify.ps1 (agent) : 1397/1397, 0 avertissement, 0 erreur ; DLL 0.811.0.0. Non validé en jeu.
+### English
+- Report (X-45), continued: NPCs stayed on Limsa's map while absent in game. The game's files say why: in Limsa, beside 136 seasonal event layers, dozens of layers place NPCs only during a quest or the game's opening (« QST_… », « QB_… », « EVT_OP_ONLY_ENPC »). Each vendor position now keeps its layer's condition: always there, during an event (shown only while it runs), or during a quest or the opening (never shown on the map). The vendors catalogue copy is rebuilt once. Not validated in game.
+
 ## 0.810.0
 - Plan global, Verify : Signalement (X-45) : des marchands d'événement saisonnier étaient sur la carte (Limsa, la Dunette) alors qu'ils ne sont pas là en jeu. Tensho sait déjà quels PNJ chaque événement place et quels événements sont en cours : sur la carte, un PNJ d'événement n'est plus montré que pendant son événement. Non validé en jeu.
 - Tests : FestivalVendors810Tests. Verify.ps1 (agent) : 1397/1397, 0 avertissement, 0 erreur ; DLL 0.810.0.0. Non validé en jeu.
