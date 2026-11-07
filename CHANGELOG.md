@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.729.0
+- Plan global, Verify : Aide à la récolte : une ligne sépare la prochaine action du plan, à la demande de l'utilisateur. Non validé en jeu.
+- Tests : GatherNext728Tests. Verify.ps1 (agent) : 1306/1306, 0 avertissement, 0 erreur ; DLL 0.729.0.0. Non validé en jeu.
+### English
+- Gathering help: a line now separates the next action from the plan, as the user asked. Not validated in game.
+
 ## 0.728.0
 - Plan global, Verify : Aide à la récolte : la ligne « Ensuite » donne la prochaine action du plan ou dit de récolter, d'après les PR dépensés et les essais restants ; le plan montre ce qui est fait. Un cadre repère l'action sur vos barres (réglable, barres croisées non prises en charge). Tensho n'exécute rien, aucun hook. Non validé en jeu.
 - Tests : GatherNext728Tests. Verify.ps1 (agent) : 1306/1306, 0 avertissement, 0 erreur ; DLL 0.728.0.0. Non validé en jeu.

@@ -60,6 +60,7 @@ internal static class GatherNext728Tests
             var panel=Read("MainWindow.GatheringPanel.cs");
             Check(panel.Contains("configuration.GatheringNextHighlight") && panel.Contains("located.Wanted=gatheringBarWanted"),"setting");
             Check(!Read("Gathering/GpNextAction.cs").Contains("Dalamud"),"pure");
+            Check(panel.IndexOf("DrawGatheringNext(shown")<panel.IndexOf("if(next is { Kind:not GpNextKind.Done })ImGui.Separator();"),"a line between the next action and the plan");
         }),
     ];
 }

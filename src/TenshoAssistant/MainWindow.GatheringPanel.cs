@@ -246,6 +246,8 @@ internal sealed partial class MainWindow
         if(start.Frozen)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanAtStart",plan.Scenario.Budget));
         if(gatheringPanelBountifulFloor)ImGui.TextDisabled(localization.Get("GatheringPanel.BountifulFloor"));
         DrawGatheringNext(shown,start,frame,items?.Find(gatheringPanelItem)?.Name ?? gatheringPanelItem.ToString(),out var next);
+        // 0.729 (user request): the next action apart from the plan.
+        if(next is { Kind:not GpNextKind.Done })ImGui.Separator();
         if(shown.Actions.Count==0)ImGui.TextUnformatted(localization.Get("GpUi.Keep"));
         foreach(var use in shown.Actions)
         {
