@@ -1252,6 +1252,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.805) Jouez avec la carte Tensho ouverte ; je relis les « Slow frame ».
 
+- [ ] (0.806) Jouez avec la carte ouverte ; je relis les « Slow frame ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

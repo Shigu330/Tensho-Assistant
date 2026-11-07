@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.806.0
+- Plan global, Verify : Lourdeur (X-01) : le relevé de 20:08:14 donne le canevas de la carte à 93 ms (boutiques 16, info-bulles 11, menus 11, texture 6…), mais la ligne « Slow frame » coupait encore à dix morceaux, dont quatre enveloppes, et cachait la moitié des points de la carte. Elle garde maintenant chaque morceau d'une milliseconde ou plus (24 au plus). Mode développeur seulement, aucun changement visible. Non validé en jeu.
+- Tests : SlowParts801Tests. Verify.ps1 (agent) : 1389/1389, 0 avertissement, 0 erreur ; DLL 0.806.0.0. Non validé en jeu.
+### English
+- Heaviness (X-01): the 20:08:14 reading gives the map canvas at 93 ms (vendors 16, tooltips 11, menus 11, texture 6…), but the « Slow frame » line still cut at ten parts, four of them wholes, and hid half of the map's checkpoints. It now keeps every part of a millisecond or more (24 at most). Developer mode only, no visible change. Not validated in game.
+
 ## 0.805.0
 - Plan global, Verify : Lourdeur (X-01) : les relevés de 18:50 à 20:01 montrent le dessin de la carte à 102–169 ms toutes les 5 à 10 minutes, dont « canvas icons » 34 à 71 ms et 40 à 60 ms hors des points de mesure. En mode développeur, de nouveaux points découpent cette partie (boutiques, liste des icônes, dessin des icônes, objets proches, monstres) et la fin du dessin (menus, éthérite la plus proche), pour trouver le morceau à sortir de l'image. Le clic droit sur une alarme (X-03) est validé en jeu. Aucun changement visible. Non validé en jeu.
 - Tests : MapMarks791Tests. Verify.ps1 (agent) : 1389/1389, 0 avertissement, 0 erreur ; DLL 0.805.0.0. Non validé en jeu.

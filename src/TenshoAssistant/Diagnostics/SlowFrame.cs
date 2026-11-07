@@ -22,7 +22,8 @@ public sealed class SlowFrame
         if(total<Limit)return null;
         var mine=currentFrame==frame ? parts:[];
         // 0.801 (X-01): ten parts, not four; the four were the nested wholes (all windows, Map, map overlay layout, map canvas) and hid the 0.791 checkpoints.
-        var top=mine.OrderByDescending(part=>part.Ms).Take(10).ToArray();
+        // 0.806 (X-01): every part of 1 ms or more (24 at most): ten were still filled by the nested wholes and hid half of the map's checkpoints (20:08:14).
+        var top=mine.OrderByDescending(part=>part.Ms).Where(part=>part.Ms>=1).Take(24).ToArray();
         var rest=Math.Max(0,total-mine.Sum(part=>part.Ms));
         return FormattableString.Invariant($"Slow frame: {total:0} ms; ")+string.Join(", ",top.Select(part=>FormattableString.Invariant($"{part.Name} {part.Ms:0} ms")))
             +FormattableString.Invariant($"{(top.Length>0 ? ", ":"")}not measured {rest:0} ms; runtime pauses {gcPauseMs:0} ms");

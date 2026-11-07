@@ -5,6 +5,6 @@ internal static class SlowParts801Tests
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         ("Slow frame: ten parts listed",() =>
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/SlowFrame.cs")).Contains("var top=mine.OrderByDescending(part=>part.Ms).Take(10).ToArray();"),"ten")),
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/SlowFrame.cs")).Contains("var top=mine.OrderByDescending(part=>part.Ms).Where(part=>part.Ms>=1).Take(24).ToArray();"),"0.806: every part of 1 ms or more")),
     ];
 }
