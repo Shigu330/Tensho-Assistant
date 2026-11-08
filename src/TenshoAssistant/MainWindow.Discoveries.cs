@@ -14,6 +14,8 @@ internal sealed partial class MainWindow
     internal Func<uint,string>? MonsterName { get; set; }
     /// <summary>X-72 C (0.856): a FATE's name from the game's sheet.</summary>
     internal Func<uint,string>? FateName { get; set; }
+    /// <summary>X-74 (0.860): a duty's name (ContentFinderCondition).</summary>
+    internal Func<uint,string>? DutyName { get; set; }
     internal Market.SeenPriceStore? SeenPrices { get; set; }
     /// <summary>Set once the saved base is read (or found missing): nothing is written before, so that a slow read never loses it.</summary>
     internal volatile bool DiscoveriesLoaded;
@@ -85,9 +87,28 @@ internal sealed partial class MainWindow
         if(!discoveryFateNames.TryGetValue(id,out var name))discoveryFateNames[id]=name=FateName?.Invoke(id) is { Length:>0 } found ? found:$"#{id}";
         return name;
     }
-    /// <summary>0.856 (X-72 C): the name shown for a fact: the monster, the hunt mark with its rank, or the FATE.</summary>
+    private static readonly DiscoveryKind[] ItemSourceKinds=[DiscoveryKind.Desynthesis,DiscoveryKind.Venture,DiscoveryKind.DutyChest,DiscoveryKind.FateReward,
+        DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition];
+    private string DiscoveryItemName(uint id)=>itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}";
+    private string DiscoveryDutyName(uint id)=>DutyName?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
+    /// <summary>X-74 (0.860): the level column: a monster's levels, a quantity range, or the Eorzea hours a fish was caught.</summary>
+    private static string DiscoveryFactLevel(DiscoveryFact fact)
+    {
+        if(fact.Kind==DiscoveryKind.FishCondition)return $"{fact.LevelMin/60:00}:{fact.LevelMin%60:00}–{fact.LevelMax/60:00}:{fact.LevelMax%60:00} ET";
+        var range=fact.LevelMin==fact.LevelMax ? fact.LevelMax.ToString():$"{fact.LevelMin}–{fact.LevelMax}";
+        return ItemSourceKinds.Contains(fact.Kind) ? "×"+range:range;
+    }
+    /// <summary>0.856 (X-72 C): the name shown for a fact: the monster, the hunt mark with its rank, or the FATE. 0.860: the item and its source.</summary>
     private string DiscoveryFactName(DiscoveryFact fact)=>fact.Kind switch
     {
+        DiscoveryKind.Desynthesis=>localization.Format("DiscoveriesUi.FromDesynthesis",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
+        DiscoveryKind.Venture=>localization.Format("DiscoveriesUi.FromVenture",DiscoveryItemName(fact.Subject),fact.Detail),
+        DiscoveryKind.DutyChest=>localization.Format("DiscoveriesUi.FromDutyChest",DiscoveryItemName(fact.Subject),DiscoveryDutyName(fact.Detail)),
+        DiscoveryKind.FateReward=>localization.Format("DiscoveriesUi.FromFate",DiscoveryItemName(fact.Subject),DiscoveryFateName(fact.Detail)),
+        DiscoveryKind.MonsterDrop=>localization.Format("DiscoveriesUi.FromMonster",DiscoveryItemName(fact.Subject),DiscoveryMonsterName(fact.Detail)),
+        DiscoveryKind.ItemFromItem=>localization.Format("DiscoveriesUi.FromItem",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
+        DiscoveryKind.FishCatch=>localization.Format("DiscoveriesUi.FromBait",DiscoveryItemName(fact.Subject),fact.Detail==0 ? "?":DiscoveryItemName(fact.Detail)),
+        DiscoveryKind.FishCondition=>localization.Format("DiscoveriesUi.FishWeather",DiscoveryItemName(fact.Subject),weather.State.Catalog?.Weather(fact.Detail)?.Name ?? $"#{fact.Detail}"),
         DiscoveryKind.HuntMarkPlace=>localization.Format("DiscoveriesUi.HuntMarkName",DiscoveryMonsterName(fact.Subject),fact.LevelMax switch {1=>"B",2=>"A",3=>"S",_=>"?"}),
         DiscoveryKind.FateSeen=>localization.Format("DiscoveriesUi.FateName",DiscoveryFateName(fact.Subject)),
         _=>DiscoveryMonsterName(fact.Subject),
@@ -104,6 +125,8 @@ internal sealed partial class MainWindow
             BoolSetting("DiscoveriesUi.MonsterPlaces","DiscoveriesUi.MonsterPlacesTip",()=>configuration.Discovery.MonsterPlaces,value=>configuration.Discovery.MonsterPlaces=value,c=>c.Discovery.MonsterPlaces);
             BoolSetting("DiscoveriesUi.HuntMarks","DiscoveriesUi.HuntMarksTip",()=>configuration.Discovery.HuntMarks,value=>configuration.Discovery.HuntMarks=value,c=>c.Discovery.HuntMarks);
             BoolSetting("DiscoveriesUi.Fates","DiscoveriesUi.FatesTip",()=>configuration.Discovery.Fates,value=>configuration.Discovery.Fates=value,c=>c.Discovery.Fates);
+            BoolSetting("DiscoveriesUi.ItemSources","DiscoveriesUi.ItemSourcesTip",()=>configuration.Discovery.ItemSources,value=>configuration.Discovery.ItemSources=value,c=>c.Discovery.ItemSources);
+            BoolSetting("DiscoveriesUi.Fishing","DiscoveriesUi.FishingTip",()=>configuration.Discovery.Fishing,value=>configuration.Discovery.Fishing=value,c=>c.Discovery.Fishing);
             BoolSetting("DiscoveriesUi.MarketPrices","DiscoveriesUi.MarketPricesTip",()=>configuration.Discovery.MarketPrices,value=>configuration.Discovery.MarketPrices=value,c=>c.Discovery.MarketPrices);
             ImGui.Unindent();
         }
@@ -215,7 +238,9 @@ internal sealed partial class MainWindow
             // 0.856 (X-72 C): the hunt marks and the FATEs seen too, by their names.
             discoveryRows=[..store.Find(DiscoveryKind.MonsterPlace,id=>DiscoveryMonsterName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),200),
                 ..store.Find(DiscoveryKind.HuntMarkPlace,id=>DiscoveryMonsterName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),100),
-                ..store.Find(DiscoveryKind.FateSeen,id=>DiscoveryFateName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),100)];
+                ..store.Find(DiscoveryKind.FateSeen,id=>DiscoveryFateName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),100),
+                // X-74 (0.860): the items got and their sources, by the item's or the source's name.
+                ..ItemSourceKinds.SelectMany(kind=>store.Find(kind,_=>true,20_000)).Where(fact=>DiscoveryFactName(fact).Contains(wanted,StringComparison.CurrentCultureIgnoreCase)).Take(200)];
         }
         if(discoveryRows.Count==0){ImGui.TextDisabled(localization.Get("DiscoveriesUi.NoneFound"));return;}
         if(!ImGui.BeginTable("Discoveries",6,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
@@ -229,7 +254,7 @@ internal sealed partial class MainWindow
                 var fact=discoveryRows[index];var map=catalog?.Find(fact.Map);
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted(DiscoveryFactName(fact));
-                ImGui.TableNextColumn();ImGui.TextUnformatted(map is null ? $"#{fact.Map}":MapName(map));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(fact.Map==0 ? (fact.Kind==DiscoveryKind.DutyChest ? DiscoveryDutyName(fact.Detail):"—"):map is null ? $"#{fact.Map}":MapName(map));
                 ImGui.TableNextColumn();
                 if(map is null)ImGui.TextDisabled("—");
                 else
@@ -248,7 +273,7 @@ internal sealed partial class MainWindow
                     }
                     if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("DiscoveriesUi.PlaceTip"));
                 }
-                ImGui.TableNextColumn();ImGui.TextUnformatted(fact.LevelMin==fact.LevelMax ? fact.LevelMax.ToString():$"{fact.LevelMin}–{fact.LevelMax}");
+                ImGui.TableNextColumn();ImGui.TextUnformatted(DiscoveryFactLevel(fact));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(fact.Seen.ToString("N0"));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(fact.Imported.ToString("N0"));
             }

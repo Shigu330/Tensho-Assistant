@@ -319,14 +319,15 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-73.2 | Marché : historiques de ventes fusionnés d'une ouverture à l'autre (vitesse de vente calculée sur place) | 0.858 : chaque ouverture du tableau ajoute ses 20 ventes à celles gardées (sans doublon), 200 ventes et 30 jours au plus ; la vitesse de vente se calcule sur tout ce qui est gardé |
 | X-73.3 | Pêche : drapeaux du carnet du jeu (« sans condition d'heure ni de météo ») à la place de la donnée communautaire | 0.859 : le panneau de pêche lit d'abord le carnet du jeu ; « aucune condition d'heure » ou « de météo » y retire la fenêtre ou la météo de GatherBuddy et de Garland ; « ni heure ni météo (jeu) » affiché ; inconnu : rien ne change |
 | X-73.4 | Revue de mode : thème et catégories lus dans le jeu (FashionCheckManager) au lieu des suppositions | À faire |
-| X-73.5 | Désynthèse et réduction : objets obtenus de quel objet (AgentSalvage, AgentPurify) | À faire |
-| X-73.6 | Tâches des servants : récompenses vues (AgentRetainerTask) | À faire |
-| X-73.7 | Coffres des missions : objets vus par mission (Loot.Items) | À faire |
+| X-73.5 | Désynthèse et réduction : objets obtenus de quel objet (AgentSalvage, AgentPurify) | 0.860 : désynthèse lue dans AgentSalvage (objet désynthétisé, résultats et quantités) |
+| X-73.6 | Tâches des servants : récompenses vues (AgentRetainerTask) | 0.860 : récompenses des tâches lues dans AgentRetainerTask quand le résultat s'affiche |
+| X-73.7 | Coffres des missions : objets vus par mission (Loot.Items) | 0.860 : objets des coffres lus dans Loot.Items en mission (CFC du territoire) |
 | X-73.8 | Voyages : butin par secteur (déjà lu dans l'atelier) | À faire |
 | X-73.9 | Mage bleu et dresseur : sort appris et bête apprivoisée, avec le monstre | À faire |
 | X-73.10 | Pêche : prises (appât, mooch, lieu), temps de touche, conditions vues ; sondes en jeu d'abord | À faire |
-| X-73.11 | Butin des monstres : objets reçus après la mort de sa cible (le plus risqué : attribution) | À faire |
+| X-73.11 | Butin des monstres : objets reçus après la mort de sa cible (le plus risqué : attribution) | 0.860 : gains des sacs dans les 3 s après la mort de sa propre cible, hors mission, hors fenêtres de boutique, d'échange, de servant, de courrier, d'artisanat |
 | X-73.12 | Le reste selon la carte : coffres d'objets, ALÉA récompenses, panoramas, animaux de l'île, fêtes vues | À faire |
+| X-74 | Consigne de nuit (2026-11-08, l'utilisateur dort) : ajouter le plus de parseurs cohérents possible (« mieux vaut prendre plus et retirer ensuite »), compléter le jeu de données selon nos besoins, revoir le plan de l'étape 7 pour qu'il colle au code actuel, puis passer à l'étape 7 une fois les plans en place ; ultracode autorisé au besoin | En cours ; 0.860 : observateur des objets obtenus (ItemDiscoveryWatcher) : désynthèse, tâches, coffres de mission, récompenses d'ALÉA, butin de sa cible, objets ouverts, poissons pris (appât, lieu, météo, heure) ; textes du résumé des genres de la 0.856 qui manquaient |
 
 ## Rappels de relevés en jeu, par moment
 

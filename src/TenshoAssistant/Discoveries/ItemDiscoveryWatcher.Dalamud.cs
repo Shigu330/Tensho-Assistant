@@ -1,0 +1,174 @@
+using System.Numerics;
+using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.Inventory;
+using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.Game.Fate;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+
+namespace TenshoAssistant.Discoveries;
+
+/// <summary>
+/// X-74 (0.860, user request, the night of 2026-11-08: « add as many coherent parsers as possible », after the community map docs/evidence/0.857-community-map.md):
+/// where the items the player gets come from, read on the framework thread ten times a second, copied, written to the local discoveries base only.
+/// - Desynthesis: AgentSalvage.DesynthItemId and DesynthResults (ItemId, Quantity) while its result is open.
+/// - Ventures: AgentRetainerTask.RetainerData (RewardRetainerTaskId, RewardItemIds, RewardItemCount) while « RetainerTaskResult » shows.
+/// - Duty chests: Loot.Items (ItemId, ItemCount, ChestObjectId) inside a duty (TerritoryType.ContentFinderCondition).
+/// - From the bags' changes (ItemGains): fish caught while fishing (with the bait, PlayerState.FishingBait, and the weather, WeatherManager), a FATE's reward
+///   (FateManager.CurrentFate ending), what the player's own target dropped (dead within 3 s, outside duties), what an item opened gave (one unit of a usable item
+///   spent). Shops, trades, retainers, mail, market and crafting windows stop the attribution.
+/// Never another player: only the player's own target (a battle NPC) and game rows. Cut in PvP (CompetitiveGate).
+/// </summary>
+public sealed unsafe class ItemDiscoveryWatcher : IDisposable
+{
+    private static readonly GameInventoryType[] Bags=[GameInventoryType.Inventory1,GameInventoryType.Inventory2,GameInventoryType.Inventory3,GameInventoryType.Inventory4,GameInventoryType.Crystals];
+    private static readonly string[] BusyWindows=["Shop","ShopExchangeItem","ShopExchangeCurrency","InclusionShop","ShopCard","Trade","RetainerList","InventoryRetainer",
+        "InventoryRetainerLarge","RetainerSellList","RetainerSell","LetterList","LetterViewer","ItemSearch","ItemSearchResult","FreeCompanyChest","InventoryBuddy",
+        "InventoryBuddy2","GrandCompanySupplyList","GrandCompanyExchange","MiragePrismPrismBox","Cabinet","Repair","MateriaAttach","PurifyResult","SalvageResult",
+        "SalvageItemSelector","Synthesis","SynthesisSimple","RecipeNote","RetainerTaskResult","ContentsTutorial","SkyIslandFinishReward"];
+    private readonly IFramework framework;private readonly IClientState client;private readonly IGameGui gui;private readonly IObjectTable objects;private readonly ITargetManager targets;
+    private readonly ICondition condition;private readonly IGameInventory inventory;private readonly DiscoveryStore store;private readonly IPluginLog log;
+    private readonly Func<DiscoverySettings> settings;private readonly Func<bool> debug;private readonly Func<uint,uint> dutyOf;private readonly Func<uint,bool> isFish;private readonly Func<uint,bool> usable;
+    private Dictionary<uint,long>? before;private long nextRead;private bool disposed,warned;
+    private string salvageSeen="",ventureSeen="";private readonly HashSet<(uint Chest,uint Index,uint Item)> lootSeen=[];private uint lootTerritory;
+    private uint fateId;private long fateEndedAt=-100_000;
+    private (uint Name,uint Territory,uint Map,Vector3 Place,int Level,long At) death=(0,0,0,default,0,-100_000);
+
+    public ItemDiscoveryWatcher(IFramework framework,IClientState client,IGameGui gui,IObjectTable objects,ITargetManager targets,ICondition condition,IGameInventory inventory,
+        DiscoveryStore store,IPluginLog log,Func<DiscoverySettings> settings,Func<bool> debug,Func<uint,uint> dutyOf,Func<uint,bool> isFish,Func<uint,bool> usable)
+    {
+        this.framework=framework;this.client=client;this.gui=gui;this.objects=objects;this.targets=targets;this.condition=condition;this.inventory=inventory;
+        this.store=store;this.log=log;this.settings=settings;this.debug=debug;this.dutyOf=dutyOf;this.isFish=isFish;this.usable=usable;
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
+    }
+
+    private void Update(IFramework unused)
+    {
+        if(disposed)return;
+        var now=Environment.TickCount64;
+        if(now<nextRead)return;
+        nextRead=now+100;
+        var wanted=settings();
+        if(!wanted.Enabled || !wanted.ItemSources && !wanted.Fishing || !client.IsLoggedIn || objects.LocalPlayer is not { } me){before=null;return;}
+        try
+        {
+            var at=DateTimeOffset.UtcNow;var territory=client.TerritoryType;var map=client.MapId;var duty=dutyOf(territory);
+            if(wanted.ItemSources)
+            {
+                ReadSalvage(at);ReadVenture(at);ReadLoot(at,territory,duty);
+                ReadFate(now);ReadTarget(now,territory,map);
+            }
+            var counts=Counts();
+            if(before is null){before=counts;return;}
+            var gains=ItemGains.Gains(before,counts);var losses=ItemGains.Losses(before,counts);before=counts;
+            if(gains.Count==0 || gains.Count>16)return;
+            var fishing=wanted.Fishing && condition[ConditionFlag.Fishing];
+            var busy=!fishing && (condition[ConditionFlag.Crafting] || condition[ConditionFlag.Gathering] || condition[ConditionFlag.PreparingToCraft]
+                || BusyWindows.Any(name=>gui.GetAddonByName(name) is { IsNull:false,IsVisible:true }));
+            var spent=ItemGains.SingleSpent(losses);
+            var cause=ItemGains.Attribute(fishing,busy || !wanted.ItemSources,now,fateEndedAt,fateId,death.At,duty!=0,spent,spent is { } used && usable(used),spent is { } same && gains.ContainsKey(same));
+            foreach(var (item,count) in gains)
+            {
+                var quantity=(int)Math.Min(count,100_000);var added=false;var kind=DiscoveryKind.ItemFromItem;
+                switch(cause)
+                {
+                    case ItemGains.Cause.Fishing when isFish(item):
+                        var bait=PlayerState.Instance() is var state && state!=null ? state->FishingBait:0u;
+                        var weather=FFXIVClientStructs.FFXIV.Client.Game.WeatherManager.Instance() is var manager && manager!=null ? manager->GetCurrentWeather():(byte)0;
+                        added=store.SeeSource(DiscoveryKind.FishCatch,item,bait,quantity,at,territory,map,me.Position);
+                        store.SeeSource(DiscoveryKind.FishCondition,item,weather,EorzeaMinute(at),at,territory);
+                        kind=DiscoveryKind.FishCatch;break;
+                    case ItemGains.Cause.FateReward:
+                        added=store.SeeSource(DiscoveryKind.FateReward,item,fateId,quantity,at);kind=DiscoveryKind.FateReward;break;
+                    case ItemGains.Cause.MonsterDrop:
+                        added=store.SeeSource(DiscoveryKind.MonsterDrop,item,death.Name,quantity,at,death.Territory,death.Map,death.Place);kind=DiscoveryKind.MonsterDrop;break;
+                    case ItemGains.Cause.Opened:
+                        added=store.SeeSource(DiscoveryKind.ItemFromItem,item,spent!.Value,quantity,at);break;
+                    default:continue;
+                }
+                if(added && debug())log.Information("Discovery: {0} item {1} ×{2}.",kind,item,quantity);
+            }
+        }
+        catch(Exception error){before=null;if(!warned){warned=true;log.Warning(error,"The item discoveries could not be read.");}}
+    }
+
+    // Eorzea minute of the day (175 s an Eorzea hour), as Tensho's clocks count it.
+    private static int EorzeaMinute(DateTimeOffset at)=>(int)(at.ToUnixTimeMilliseconds()*3600/175/1000/60%1440);
+
+    private Dictionary<uint,long> Counts()
+    {
+        var counts=new Dictionary<uint,long>();
+        foreach(var bag in Bags)
+            foreach(var slot in inventory.GetInventoryItems(bag))
+                if(!slot.IsEmpty && slot.BaseItemId!=0 && slot.Quantity>0)counts[slot.BaseItemId]=counts.GetValueOrDefault(slot.BaseItemId)+slot.Quantity;
+        return counts;
+    }
+
+    private void ReadSalvage(DateTimeOffset at)
+    {
+        var agent=AgentSalvage.Instance();
+        if(agent==null || !agent->IsSalvageResultAddonOpen || agent->DesynthItemId==0){salvageSeen="";return;}
+        var source=agent->DesynthItemId%1_000_000;var results=new List<(uint Item,int Count)>();
+        foreach(var result in agent->DesynthResults)if(result.ItemId!=0 && result.Quantity>0)results.Add((result.ItemId%1_000_000,result.Quantity));
+        var signature=source+":"+string.Join(",",results.Select(result=>$"{result.Item}x{result.Count}"));
+        if(results.Count==0 || signature==salvageSeen)return;
+        salvageSeen=signature;
+        foreach(var (item,count) in results)store.SeeSource(DiscoveryKind.Desynthesis,item,source,count,at);
+        if(debug())log.Information("Discovery: desynthesis of {0}: {1}.",source,signature);
+    }
+
+    private void ReadVenture(DateTimeOffset at)
+    {
+        if(gui.GetAddonByName("RetainerTaskResult") is not { IsNull:false,IsVisible:true }){ventureSeen="";return;}
+        var agent=AgentRetainerTask.Instance();
+        if(agent==null)return;
+        var data=agent->RetainerData;var task=(uint)data.RewardRetainerTaskId;
+        if(task==0)return;
+        var rewards=new List<(uint Item,int Count)>();
+        for(var index=0;index<data.RewardItemIds.Length && index<data.RewardItemCount.Length;index++)
+            if(data.RewardItemIds[index] is var id and not 0)rewards.Add((id%1_000_000,(int)Math.Min(data.RewardItemCount[index],100_000u)));
+        var signature=task+":"+string.Join(",",rewards.Select(reward=>$"{reward.Item}x{reward.Count}"));
+        if(rewards.Count==0 || signature==ventureSeen)return;
+        ventureSeen=signature;
+        foreach(var (item,count) in rewards)store.SeeSource(DiscoveryKind.Venture,item,task,count,at);
+        if(debug())log.Information("Discovery: venture {0}.",signature);
+    }
+
+    private void ReadLoot(DateTimeOffset at,uint territory,uint duty)
+    {
+        if(territory!=lootTerritory){lootSeen.Clear();lootTerritory=territory;}
+        if(duty==0)return;
+        var loot=Loot.Instance();
+        if(loot==null)return;
+        foreach(var item in loot->Items)
+        {
+            if(item.ItemId==0 || item.ChestObjectId==0 || lootSeen.Count>=256 || !lootSeen.Add((item.ChestObjectId,item.ChestItemIndex,item.ItemId)))continue;
+            store.SeeSource(DiscoveryKind.DutyChest,item.ItemId%1_000_000,duty,Math.Max(1,(int)item.ItemCount),at,territory);
+            if(debug())log.Information("Discovery: duty {0} chest item {1} ×{2}.",duty,item.ItemId,item.ItemCount);
+        }
+    }
+
+    private void ReadFate(long now)
+    {
+        var manager=FateManager.Instance();
+        if(manager==null || manager->CurrentFate==null)return;
+        var fate=manager->CurrentFate;
+        fateId=fate->FateId;
+        if(fate->State is FateState.Ending or FateState.Ended)fateEndedAt=now;
+    }
+
+    private void ReadTarget(long now,uint territory,uint map)
+    {
+        if(targets.Target is not IBattleNpc { BattleNpcKind:BattleNpcSubKind.Combatant } npc || npc.CurrentHp!=0 || npc.NameId==0)return;
+        if(death.Name==npc.NameId && now-death.At<5_000)return;
+        death=(npc.NameId,territory,map,npc.Position,npc.Level,now);
+    }
+
+    public void Dispose()
+    {
+        if(disposed)return;
+        disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);
+    }
+}

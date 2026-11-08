@@ -6,7 +6,9 @@ namespace TenshoAssistant.Discoveries;
 /// <summary>X-43 (0.807): what a fact is about. Numbers are kept in files: never reuse one.</summary>
 // X-72 C (0.856, user choice « ABC »): hunt marks' spawn places (B, A and S ranks: in no game sheet, only in community data) and the FATEs seen (place, level,
 // when). HuntMarkPlace: Subject = BNpcName row, Detail = BNpcBase row, levels = the rank (1 B, 2 A, 3 S). FateSeen: Subject = Fate row, levels = the FATE's level.
-public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3 }
+// X-74 (0.860, the night's parsers, ItemDiscoveryWatcher): where items come from. Subject = the item got; Detail = its source (source item, RetainerTask row, CFC row,
+// Fate row, BNpcName row, bait item, weather row); levels = the quantities seen (FishCondition: the Eorzea minutes seen). Places only for MonsterDrop and FishCatch.
+public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynthesis=4, Venture=5, DutyChest=6, FateReward=7, MonsterDrop=8, ItemFromItem=9, FishCatch=10, FishCondition=11 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported
@@ -71,6 +73,29 @@ public sealed class DiscoveryStore
     public static readonly TimeSpan FateGap=TimeSpan.FromHours(1);
     public bool SeeFate(uint fateId,uint territory,uint map,Vector3 position,int level,DateTimeOffset at)
         =>See(DiscoveryKind.FateSeen,fateId,0,territory,map,position,level,at,FateGap);
+
+    /// <summary>X-74 (0.860): an item got from a source; every event counts once (the watcher sends each once); a place only when a map is given.</summary>
+    public bool SeeSource(DiscoveryKind kind,uint subject,uint detail,int value,DateTimeOffset at,uint territory=0,uint map=0,Vector3? place=null)
+    {
+        var position=map==0 ? Vector3.Zero:place ?? Vector3.Zero;
+        if(subject==0 || value<0 || !float.IsFinite(position.X) || !float.IsFinite(position.Z))return false;
+        var (cellX,cellZ)=Cell(position.X,position.Z);
+        var fact=new DiscoveryFact{Kind=kind,Subject=subject,Detail=detail,Territory=territory,Map=map,CellX=cellX,CellZ=cellZ,X=position.X,Z=position.Z,
+            LevelMin=value,LevelMax=value,Seen=1,First=at,Last=at};
+        lock(gate)
+        {
+            if(facts.TryGetValue(fact.Key,out var known))
+            {
+                known.LevelMin=Math.Min(known.LevelMin,value);known.LevelMax=Math.Max(known.LevelMax,value);known.Seen++;
+                if(at>known.Last)known.Last=at;
+                Dirty=true;revision++;
+                return false;
+            }
+            if(facts.Count>=MaxFacts)return false;
+            facts[fact.Key]=fact;Dirty=true;revision++;
+            return true;
+        }
+    }
 
     private bool See(DiscoveryKind kind,uint subject,uint detail,uint territory,uint map,Vector3 position,int level,DateTimeOffset at,TimeSpan gap)
     {
@@ -145,9 +170,11 @@ public sealed class DiscoveryStore
     }
 
     /// <summary>What an imported fact must hold: a known kind, a subject and a map, finite places in their cell, levels and dates that make sense.</summary>
-    public static bool Valid(DiscoveryFact? fact)=>fact is not null && Enum.IsDefined(fact.Kind) && fact.Subject!=0 && fact.Map!=0
+    /// <summary>X-74 (0.860): the kinds that hold a place (a map); the others are about items and sources only.</summary>
+    public static bool HasPlace(DiscoveryKind kind)=>kind is DiscoveryKind.MonsterPlace or DiscoveryKind.HuntMarkPlace or DiscoveryKind.FateSeen or DiscoveryKind.MonsterDrop or DiscoveryKind.FishCatch;
+    public static bool Valid(DiscoveryFact? fact)=>fact is not null && Enum.IsDefined(fact.Kind) && fact.Subject!=0 && (fact.Map!=0 || !HasPlace(fact.Kind))
         && float.IsFinite(fact.X) && float.IsFinite(fact.Z) && Math.Abs(fact.X)<=10_000 && Math.Abs(fact.Z)<=10_000 && Cell(fact.X,fact.Z)==(fact.CellX,fact.CellZ)
-        && fact.LevelMin is >= 0 and <= 200 && fact.LevelMax is >= 0 and <= 200 && fact.LevelMin<=Math.Max(fact.LevelMin,fact.LevelMax)
+        && fact.LevelMin is >= 0 and <= 100_000 && fact.LevelMax is >= 0 and <= 100_000 && fact.LevelMin<=Math.Max(fact.LevelMin,fact.LevelMax)
         && fact.Seen>=0 && fact.Imported>=0 && fact.First<=fact.Last && fact.Last<=DateTimeOffset.UtcNow.AddDays(1);
 
     public void Load(DiscoveryFile file)

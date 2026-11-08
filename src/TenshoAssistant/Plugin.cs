@@ -179,6 +179,15 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.DiscoveryStore=discoveries;mainWindow.DiscoveryFolder=discoveryFolder;
             mainWindow.MonsterName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().GetRowOrDefault(id)?.Singular.ExtractText() ?? "";
             mainWindow.FateName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Fate>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
+            mainWindow.DutyName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
+            // X-74 (0.860): where the items got come from, and the fish caught (Discoveries/ItemDiscoveryWatcher).
+            HashSet<uint>? fishItems=null;var territoryDuties=new Dictionary<uint,uint>();
+            Discoveries.ItemDiscoveryWatcher? itemWatcher=null;
+            registrations.Register(()=>itemWatcher=new Discoveries.ItemDiscoveryWatcher(framework,client,gameGui,objects,targets,condition,inventory,discoveries,log,
+                ()=>configuration.Discovery,()=>configuration.DeveloperMode && configuration.Discovery.DebugLog,
+                territory=>territoryDuties.TryGetValue(territory,out var duty) ? duty:territoryDuties[territory]=data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(territory)?.ContentFinderCondition.RowId ?? 0,
+                item=>(fishItems??=data.GetExcelSheet<Lumina.Excel.Sheets.FishParameter>().Where(row=>row.Item.RowType==typeof(Lumina.Excel.Sheets.Item)).Select(row=>row.Item.RowId).ToHashSet()).Contains(item),
+                item=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(item)?.ItemAction.RowId is > 0),()=>itemWatcher?.Dispose());
             // X-52 (0.817): the prices seen at the market board, in place of Universalis' when newer.
             var seenPrices=new Market.SeenPriceStore();
             mainWindow.SeenPrices=seenPrices;
