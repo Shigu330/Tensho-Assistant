@@ -2150,6 +2150,9 @@
     "Bookmarks": "Repères favoris ({0})"
   },
   "MarketBoard": {
+    "SeenAdded": "Complété par ce que vous avez vu au tableau du jeu : {0} offres, {1} ventes.",
+    "SeenInGame": "(vu en jeu)",
+    "SeenHelp": "Vu au tableau du jeu sur un monde visité, plus récent qu'Universalis pour ce monde. Tensho ne garde aucun nom de vendeur : ces offres ne comptent pas pour « copier le prix pour passer en dessous ». Réglage : Monde › Découvertes › prix du marché.",
     "CopyUndercut": "Copier {0} (le plus bas moins 1)",
     "CopyUndercutTip": "Offre la plus basse sans vos servants : {0} gils, relevée le {1}. Le jeu peut être en avance sur cette liste. Copié seulement : vous le collez vous-même.",
     "NotMarketable": "Cet objet ne se vend pas au marché.",

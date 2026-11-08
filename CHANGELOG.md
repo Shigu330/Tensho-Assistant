@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.868.0
+- Plan global, Verify : Demande (X-73) : la page Marché utilise maintenant ce que vous avez vu au tableau du jeu. Dans les onglets Offres et Historique, les offres d'un monde vu en jeu remplacent celles d'Universalis pour ce monde quand elles sont plus récentes (moins de 24 h), marquées « (vu en jeu) », sans nom de vendeur ; les ventes vues s'ajoutent sans doublon ; si Universalis est coupé ou en panne, ce qui a été vu s'affiche seul. Le bouton « copier le prix pour passer en dessous » ne compte que les offres d'Universalis, car vos propres servants ne se distinguent pas dans ce qui a été vu. Décision notée : documents vivants traduits juste avant la 1.0.0. Non validé en jeu.
+- Tests : SeenBoard868Tests. Verify.ps1 (agent) : 1451/1451, 0 avertissement, 0 erreur ; DLL 0.868.0.0. Non validé en jeu.
+### English
+- Request (X-73): the Market page now uses what you saw at the game's board. In the Listings and History tabs, a world's offers seen in game replace Universalis' for that world when more recent (under 24 h), marked « (seen in game) », with no seller name; sales seen are added without twins; with Universalis off or failing, what was seen stands alone. The « copy the undercut price » button counts only Universalis' offers, since your own retainers cannot be told apart in what was seen. Decision noted: living documents translated just before 1.0.0. Not validated in game.
+
 ## 0.867.0
 - Plan global, Verify : Étape 7, Git : les tickets étaient déjà en anglais. Le ticket de soumission au dépôt officiel de Dalamud est fermé comme non prévu (décision DEC-039 : dépôt personnalisé seulement) et son jalon s'appelle maintenant « 1.0.0 — Custom repository release » ; un ticket suit le travail des découvertes (#42). La description du dépôt GitHub reste à changer avec votre accord. Rien dans le plugin ne change.
 - Tests : CreditCatalogTests. Verify.ps1 (agent) : 1448/1448, 0 avertissement, 0 erreur ; DLL 0.867.0.0. Non validé en jeu.

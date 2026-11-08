@@ -74,6 +74,48 @@ public static class SeenPrices
         return candidates.OrderBy(candidate=>candidate.Price).ThenByDescending(candidate=>candidate.UploadedAt).FirstOrDefault();
     }
 
+    /// <summary>
+    /// X-73.12 (0.868, user request: « in the end use more than Universalis »): the market page's board completed by what was seen at the game's board. A world's
+    /// offers seen stand in place of Universalis' for that world when seen after its latest review there (or Universalis has none there) and while current
+    /// (CurrentOffers); the sales seen are added without twins. No board (source off or failed): what was seen stands alone, its speed worked out from its sales.
+    /// The 5 % tax is worked out as Universalis gives it. No retainer is ever kept: the seen offers are marked Seen.
+    /// </summary>
+    public static MarketBoard? WithSeen(MarketBoard? board,string scope,uint item,IReadOnlyList<(string World,SeenMarketEntry Entry)> seen,DateTimeOffset now)
+    {
+        var used=seen.Where(pair=>pair.World.Length>0 && pair.Entry.Item==item && (pair.Entry.Listings.Count>0 || pair.Entry.Sales.Count>0)).ToArray();
+        if(used.Length==0)return board;
+        var offers=(board?.Offers ?? []).ToList();var sales=(board?.Sales ?? []).ToList();var changed=false;
+        var known=sales.Select(sale=>(sale.UnitPrice,sale.Quantity,sale.Hq,sale.World,sale.At.ToUnixTimeSeconds())).ToHashSet();
+        foreach(var (world,entry) in used)
+        {
+            if(entry.Listings.Count>0 && now-entry.ListingsAt<=CurrentOffers)
+            {
+                var latest=offers.Where(offer=>offer.World==world).Select(offer=>offer.ReviewedAt ?? DateTimeOffset.MinValue).DefaultIfEmpty(DateTimeOffset.MinValue).Max();
+                if(entry.ListingsAt>latest)
+                {
+                    offers.RemoveAll(offer=>offer.World==world);
+                    offers.AddRange(entry.Listings.Where(listing=>listing.Price>0 && listing.Quantity>0).Select(listing=>new MarketOffer((long)Math.Round(listing.Price),
+                        listing.Quantity,listing.Hq,world,"",(long)Math.Round(listing.Price*listing.Quantity*0.05m),entry.ListingsAt,true)));
+                    changed=true;
+                }
+            }
+            foreach(var sale in entry.Sales)
+            {
+                var row=new MarketSale((long)Math.Round(sale.Price),Math.Max(1,sale.Quantity),sale.Hq,world,sale.At);
+                if(row.UnitPrice>0 && row.At<=now.AddMinutes(5) && known.Add((row.UnitPrice,row.Quantity,row.Hq,row.World,row.At.ToUnixTimeSeconds()))){sales.Add(row);changed=true;}
+            }
+        }
+        if(!changed)return board;
+        double? Speed(bool? hq)
+        {
+            if(sales.Count==0)return null;
+            var days=Math.Max(1,(now-sales.Min(sale=>sale.At)).TotalDays);
+            return Math.Round(sales.Where(sale=>hq is null || sale.Hq==hq).Sum(sale=>(double)sale.Quantity)/days,2);
+        }
+        return new MarketBoard(board?.Scope ?? scope,item,board?.FetchedAt ?? used.Max(pair=>pair.Entry.Seen),offers.OrderBy(offer=>offer.UnitPrice).ToArray(),
+            sales.OrderByDescending(sale=>sale.At).Take(MaxSales).ToArray(),board?.UnitsPerDay ?? Speed(null),board?.NqUnitsPerDay ?? Speed(false),board?.HqUnitsPerDay ?? Speed(true));
+    }
+
     /// <summary>The quote of what was seen; Universalis' other worlds and region kept from its own quote when there is one.</summary>
     public static MarketQuote Quote(SeenMarketEntry entry,MarketQuote? universalis,DateTimeOffset now)=>new(entry.World,entry.Item,entry.Seen,entry.Seen,
         Quality(entry.Listings,entry.Sales,false,now),Quality(entry.Listings,entry.Sales,true,now),universalis?.NqCheapest,universalis?.HqCheapest,universalis?.NqRegion,universalis?.HqRegion);
@@ -100,6 +142,9 @@ public sealed class SeenPriceStore
     private readonly Dictionary<(uint World,uint Item),SeenMarketEntry> entries=[];
     public bool Dirty { get; private set; }
     public int Count{get{lock(gate)return entries.Count;}}
+    /// <summary>X-73.12 (0.868): grows at each change, so that a page works its view out again only then.</summary>
+    public long Revision{get{lock(gate)return revision;}}
+    private long revision;
 
     /// <summary>A page of offers: a new request replaces the last offers, a later page of the same request adds to them.</summary>
     public void SeeListings(uint world,uint item,uint request,IEnumerable<SeenListing> page,DateTimeOffset at)
@@ -110,7 +155,7 @@ public sealed class SeenPriceStore
             var entry=Entry(world,item);if(entry is null)return;
             if(entry.ListingsRequest!=request || at-entry.ListingsAt>TimeSpan.FromMinutes(2)){entry.Listings=[];entry.ListingsRequest=request;}
             foreach(var listing in page)if(entry.Listings.Count<SeenPrices.MaxListings && listing.Price>0)entry.Listings.Add(listing);
-            entry.ListingsAt=at;Dirty=true;
+            entry.ListingsAt=at;Dirty=true;revision++;
         }
     }
 
@@ -122,7 +167,7 @@ public sealed class SeenPriceStore
             var entry=Entry(world,item);if(entry is null)return;
             // X-73.2 (0.858, user request: learn in game what comes from Universalis): the game shows the last 20 sales; each opening adds to those kept.
             entry.Sales=SeenPrices.MergeSales(entry.Sales,sales,at);
-            entry.SalesAt=at;Dirty=true;
+            entry.SalesAt=at;Dirty=true;revision++;
         }
     }
 
@@ -178,12 +223,15 @@ public sealed class SeenPriceStore
     public void Load(IEnumerable<SeenMarketEntry> saved)
     {
         lock(gate)
+        {
+            revision++;
             foreach(var entry in saved)
                 // X-73.1 (0.857): nothing older than KeptFor is loaded.
                 if(entry.World!=0 && entry.Item!=0 && entries.Count<MaxEntries && DateTimeOffset.UtcNow-entry.Seen<=SeenPrices.KeptFor)
                     entries[(entry.World,entry.Item)]=new SeenMarketEntry{World=entry.World,Item=entry.Item,ListingsRequest=entry.ListingsRequest,
                         Listings=entry.Listings.Where(listing=>listing.Price>0).Take(SeenPrices.MaxListings).ToList(),ListingsAt=entry.ListingsAt,
                         Sales=entry.Sales.Where(sale=>sale.Price>0).Take(SeenPrices.MaxSales).ToList(),SalesAt=entry.SalesAt};
+        }
     }
 
     public static List<SeenMarketEntry>? Read(string path)=>File.Exists(path) && new FileInfo(path).Length<=64L*1024*1024 ? JsonSerializer.Deserialize<List<SeenMarketEntry>>(File.ReadAllText(path)):null;

@@ -5,7 +5,8 @@ namespace TenshoAssistant.Market;
 // R-06 step 4 (0.270): every listing and recent sale of an item on a world, data center or region (Universalis
 // /api/v2/{scope}/{item}, fields probed in docs/evidence/0.270-universalis-listings.md). A world scope gives no world name per
 // listing: the scope name is used. Tax is the 5 % the buyer pays on top of the listing total.
-public sealed record MarketOffer(long UnitPrice,int Quantity,bool Hq,string World,string Retainer,long Tax,DateTimeOffset? ReviewedAt)
+// X-73.12 (0.868): Seen = seen at the game's market board (no retainer is ever kept for those), not from Universalis.
+public sealed record MarketOffer(long UnitPrice,int Quantity,bool Hq,string World,string Retainer,long Tax,DateTimeOffset? ReviewedAt,bool Seen=false)
 {
     public long Total=>UnitPrice*Quantity;
     public long Cost=>Total+Tax;
