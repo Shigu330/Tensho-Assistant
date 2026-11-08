@@ -30,6 +30,8 @@ public sealed unsafe class ReadingCapture : IDisposable
     private string mapMarkers="";
     private string statuses="",synthesis="",workshop="",questMarkers="",monsterEvents="",eventMarkers="",leves="",retainer="",airship="",islandState="",islandAgenda="";
     private bool fishing,disposed,warned;
+    // X-73.13 (0.869): the fishing line's state (cast, bite, how long, the player's animation at the bite), aetherial reduction results, items asked at a hand-in.
+    private int fishState=-1;private long castAt=-100_000;private string purify="",npcTrade="";
     private long slowAt;
 
     public ReadingCapture(IFramework framework,IObjectTable objects,ICondition condition,IGameGui gui,IChatGui chat,Func<bool> enabled,IPluginLog log)
@@ -59,6 +61,7 @@ public sealed unsafe class ReadingCapture : IDisposable
             if(job is 16 or 17 or 18)ReadStatuses(local);
             var flag=condition[ConditionFlag.Fishing];
             if(flag!=fishing){fishing=flag;Line("fishing",200,$"fishing flag {flag}");}
+            if(job==18)ReadFishingLine(local);
             var now=DateTime.UtcNow.Ticks;
             if(now-slowAt<SlowPartEvery)return;
             slowAt=now;
@@ -72,12 +75,71 @@ public sealed unsafe class ReadingCapture : IDisposable
             ReadRetainer();
             ReadAirships();
             ReadIsland();
+            ReadPurify();
+            ReadNpcTrade();
             warned=false;
         }
         catch(Exception error)
         {
             if(!warned){warned=true;log.Warning(error,"A reading could not be made.");}
         }
+    }
+
+    // X-73.13 (0.869): each change of the fishing line's state (FishingEventHandler, held by EventFramework.EventHandlerModule: no handler id to find), the cast's
+    // bait flags (lures, mooch, swimbait), the time since the cast, and at the bite the player's animation slots (where the bite strength ! / !! / !!! is believed to show).
+    private void ReadFishingLine(Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter local)
+    {
+        var events=FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.Instance();
+        if(events==null)return;
+        var handler=events->EventHandlerModule.FishingEventHandler;
+        if(handler==null)return;
+        var state=(int)handler->State;
+        if(state==fishState)return;
+        fishState=state;
+        var now=Environment.TickCount64;
+        if(state is 1 or 12 && now-castAt>3_000)castAt=now;
+        var text=new StringBuilder($"line state {state} ({handler->State}), bait flags {(int)handler->CurrentCastBaitFlags} ({handler->CurrentCastBaitFlags}), {(now-castAt)/1000.0:F1} s since cast");
+        text.Append($", mooch {handler->CanMoochPreviousCatch}/{handler->CanMooch2PreviousCatch}");
+        if(state==5)
+        {
+            var character=(FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)local.Address;
+            var sequencer=&character->Timeline.TimelineSequencer;
+            text.Append(", timelines");
+            for(var slot=0;slot<sequencer->TimelineIds.Length;slot++)if(sequencer->TimelineIds[slot]!=0)text.Append($" {slot}:{sequencer->TimelineIds[slot]}");
+        }
+        Line("fishline",400,text.ToString());
+    }
+
+    // X-73.13 (0.869): what aetherial reduction gives (AgentPurify: the item reduced, the results and their counts, the bonus flag).
+    private void ReadPurify()
+    {
+        var agent=AgentPurify.Instance();
+        if(agent==null)return;
+        var text=new StringBuilder($"item {agent->ResultItemId}, bonus {agent->ResultBonus}, auto {agent->AutoItemId} left {agent->AutoItemsLeft}/{agent->AutoItemCount}, results");
+        foreach(var result in agent->Results)if(result.ItemId!=0)text.Append($" {result.ItemId}x{result.Count}");
+        var all=text.ToString();
+        if(all==purify || agent->ResultItemId==0 && agent->AutoItemId==0)return;
+        purify=all;
+        Line("purify",60,all);
+    }
+
+    // X-73.13 (0.869): the items an NPC asks for at a hand-in (UIState.NpcTrade, the « Request » window), with the target's base id to find the quest.
+    private void ReadNpcTrade()
+    {
+        var ui=FFXIVClientStructs.FFXIV.Client.Game.UI.UIState.Instance();
+        if(ui==null)return;
+        var requests=&ui->NpcTrade.Requests;
+        var request=gui.GetAddonByName("Request");
+        var text=new StringBuilder($"window {(request.IsNull ? "closed":request.IsVisible ? "shown":"hidden")}, target {objects.LocalPlayer?.TargetObject?.BaseId ?? 0}, items");
+        for(var index=0;index<Math.Min((int)requests->Count,requests->Items.Length);index++)
+        {
+            var item=requests->Items[index];
+            text.Append($" {item.ItemId}x{item.RequiredQuantity}{(item.WantHQ ? " HQ":"")}{(item.WantCollectible ? $" collectible {item.MinCollectibility}":"")}");
+        }
+        var all=text.ToString();
+        if(all==npcTrade || requests->Count==0 && request.IsNull)return;
+        npcTrade=all;
+        Line("npctrade",60,all);
     }
 
     // C28, G2: the statuses of a gatherer, 568 Fisher's Intuition and 2891 Spearfisher's Intuition among them.

@@ -1378,6 +1378,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.868) Ouvrir le tableau du jeu pour un objet, puis Tensho › Marché › Offres sur le même objet : les offres de votre monde marquées « (vu en jeu) ».
 
+- [ ] (0.869) Mode développeur : pêcher une dizaine de fois (dont une touche !!! si possible et un mooch), faire une réduction éthérée, ouvrir une remise d'objet de quête ; le journal garde les lignes « Reading fishline / purify / npctrade ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

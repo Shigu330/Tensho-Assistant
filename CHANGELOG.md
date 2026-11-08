@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.869.0
+- Plan global, Verify : Demande (X-73.13) : sondes avant les derniers parseurs. En mode développeur, le journal Dalamud note maintenant : à chaque changement d'état de la ligne de pêche, l'état (lancer, ligne à l'eau, touche, ferrage…), le type de lancer (leurres, mooch), le temps depuis le lancer et, à la touche, les animations du personnage (là où devrait se voir ! / !! / !!!) ; le résultat d'une réduction éthérée (objet réduit, objets obtenus et quantités) ; les objets qu'un PNJ demande à la remise (objet, quantité, HQ, collectionnable) avec la cible. Rien n'est gardé ni envoyé : ce sont des relevés à lire. Non validé en jeu.
+- Tests : Probes869Tests. Verify.ps1 (agent) : 1452/1452, 0 avertissement, 0 erreur ; DLL 0.869.0.0. Non validé en jeu.
+### English
+- Request (X-73.13): probes before the last parsers. In developer mode, the Dalamud log now notes: at each change of the fishing line's state, the state (cast, line in water, bite, hooking…), the cast kind (lures, mooch), the time since the cast and, at the bite, the character's animations (where ! / !! / !!! should show); the result of an aetherial reduction (item reduced, items obtained and counts); the items an NPC asks for at a hand-in (item, quantity, HQ, collectable) with the target. Nothing is kept or sent: these are readings to read. Not validated in game.
+
 ## 0.868.0
 - Plan global, Verify : Demande (X-73) : la page Marché utilise maintenant ce que vous avez vu au tableau du jeu. Dans les onglets Offres et Historique, les offres d'un monde vu en jeu remplacent celles d'Universalis pour ce monde quand elles sont plus récentes (moins de 24 h), marquées « (vu en jeu) », sans nom de vendeur ; les ventes vues s'ajoutent sans doublon ; si Universalis est coupé ou en panne, ce qui a été vu s'affiche seul. Le bouton « copier le prix pour passer en dessous » ne compte que les offres d'Universalis, car vos propres servants ne se distinguent pas dans ce qui a été vu. Décision notée : documents vivants traduits juste avant la 1.0.0. Non validé en jeu.
 - Tests : SeenBoard868Tests. Verify.ps1 (agent) : 1451/1451, 0 avertissement, 0 erreur ; DLL 0.868.0.0. Non validé en jeu.
