@@ -160,6 +160,12 @@ public sealed class MapViewSettings
     // 0.107: nearby objects, teleport, per-layer options and replacing the game map (requested by the user, on by default).
     public bool ShowTreasure { get; set; } = true;
     public bool ShowGathering { get; set; } = true;
+    // X-80 (0.895, user request: « gathering points should be split into miner, botanist and fisher »): under ShowGathering, one switch per gatherer.
+    public bool ShowMiningPoints { get; set; } = true;
+    public bool ShowBotanyPoints { get; set; } = true;
+    public bool ShowFishingPoints { get; set; } = true;
+    /// <summary>X-80 (0.895): a gathering job's points (16 miner, 17 botanist, 18 fisher: rod and spearfishing).</summary>
+    public bool ShowsGatherer(uint job)=>job switch{16=>ShowMiningPoints,17=>ShowBotanyPoints,_=>ShowFishingPoints};
     // N-09 (0.441): living hunt marks streamed around the player (B, A, S).
     public bool ShowHuntMarks { get; set; } = true;
     /// <summary>0.795 (X-35): nearby monsters that drop an item the tracking lists still need.</summary>

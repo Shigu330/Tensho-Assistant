@@ -3280,6 +3280,12 @@
     "NpcSaleStack": "Vente au PNJ (NQ) : {0} gils l'unité, pile de {1} : {2} gils"
   },
   "MapView": {
+    "ShowMiningPoints": "Mineur",
+    "ShowMiningPointsHelp": "Les points de minage et de carrière de la carte.",
+    "ShowBotanyPoints": "Botaniste",
+    "ShowBotanyPointsHelp": "Les points de coupe et de fauche de la carte.",
+    "ShowFishingPoints": "Pêcheur",
+    "ShowFishingPointsHelp": "Les trous de pêche et les points de harpon de la carte.",
     "VistaSeen": "Inscrit par vous par {0} à {1} ET.",
     "Partplace": "lieu",
     "ShowIconNames": "Noms des icônes",

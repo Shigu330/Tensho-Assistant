@@ -104,8 +104,10 @@ public sealed record MapLocalQuest(QuestEntry Quest,MapLocalPosition Position);
 // Icon: the gathering type's map icon (GatheringType.IconMain, copied into GatheringSource.IconId).
 // Schedule (0.130): the point's Eorzea windows when limited (unspoiled, ephemeral, legendary), else null.
 public sealed record MapLocalGatheringPoint(uint BaseId,string Type,int Level,string Place,IReadOnlyList<uint> Items,bool Hidden,MapLocalPosition? Position,uint Icon=0,
-    GatheringSchedule? Schedule=null)
+    GatheringSchedule? Schedule=null,uint TypeId=0)
 {
+    /// <summary>X-80 (0.895): the job of the point: GatheringType 0–1 miner (16), 2–3 botanist (17), spearfishing (4–5) and fishing spots (100) fisher (18).</summary>
+    public uint Job=>TypeId switch{0 or 1=>16,2 or 3=>17,_=>18};
     public bool Timed=>Schedule is { Kind:GatheringScheduleKind.Limited, Windows.Count:>0 };
     /// <summary>True when an Eorzea minute of the day falls in one of the windows (windows may cross midnight).</summary>
     public bool ActiveAt(int eorzeaMinutes)=>Timed && Schedule!.Windows.Any(window=>
@@ -148,7 +150,7 @@ public static class MapLocalLists
                 var first=group.First();
                 return new MapLocalGatheringPoint(first.BaseId,first.TypeName,first.Level,first.Place,group.Select(source=>source.ItemId).Distinct().Order().ToArray(),
                     group.Any(source=>source.IsHidden),first.IsFishing ? index.Fishing(first.BaseId):index.Gathering(first.BaseId),first.IsFishing ? FishingSpotIcon:first.IconId,
-                    group.Select(source=>source.Schedule).FirstOrDefault(schedule=>schedule is { Kind:GatheringScheduleKind.Limited }));
+                    group.Select(source=>source.Schedule).FirstOrDefault(schedule=>schedule is { Kind:GatheringScheduleKind.Limited }),first.TypeId);
             })
             .GroupBy(point=>point.Type.Length>0 ? point.Type:"—")
             .OrderBy(group=>group.Key,StringComparer.CurrentCultureIgnoreCase)

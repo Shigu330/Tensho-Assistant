@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.895.0
+- Plan global, Verify : Demande de l'utilisateur (X-80) : sur la carte, « Points de récolte » est séparé en Mineur, Botaniste et Pêcheur. Trois cases sous ce réglage (grisées quand il est coupé), dans le menu des calques et dans les réglages de la carte, prises en compte par « Tout » et « Rien » ; Pêcheur regroupe les trous de pêche et les points de harpon. Non validé en jeu.
+- Tests : MapGatherers895Tests. Verify.ps1 (agent) : 1478/1478, 0 avertissement, 0 erreur ; DLL 0.895.0.0. Non validé en jeu.
+### English
+- User's request (X-80): on the map, « Gathering points » is split into Miner, Botanist and Fisher. Three boxes under that setting (greyed while it is off), in the layers menu and the map settings, set by « All » and « None »; Fisher covers fishing spots and spearfishing points. Not validated in game.
+
 ## 0.894.0
 - Plan global, Verify : Retours de l'utilisateur (captures) : l'aide au harpon montrait toujours la liste de la zone, et le carnet de pêche dessine une zone pour les trous de pêche. Harpon (X-79) : le point visé était bien trouvé (32074 à 32076), mais plusieurs points partagent une même base de récolte (465) et le catalogue n'en garde qu'un ; le point est maintenant reconnu par sa base, ce qui donne les six poissons que le jeu montre pour ce point. Carte (X-78) : la zone des trous de pêche est dessinée, son rayon mesuré sur la carte du carnet de pêche (trois trous de La Mer de Rubis : environ 0,155 × le rayon du jeu, en pixels de carte, à ±5 % ; preuve : docs/evidence/0.894-fishing-spot-area.md). Non validé en jeu.
 - Tests : Spearfish890Tests. Verify.ps1 (agent) : 1477/1477, 0 avertissement, 0 erreur ; DLL 0.894.0.0. Non validé en jeu.

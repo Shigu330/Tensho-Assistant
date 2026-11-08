@@ -1,5 +1,6 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface;
 using Dalamud.Interface.Textures;
 using TenshoAssistant.Maps;
@@ -525,6 +526,7 @@ internal sealed partial class MainWindow
             var settings=configuration.MapView;var changed=false;
             void All(bool shown)
             {
+                settings.ShowMiningPoints=settings.ShowBotanyPoints=settings.ShowFishingPoints=shown;
                 settings.ShowQuests=settings.ShowFates=settings.ShowGathering=settings.ShowVendors=settings.ShowSightseeing=settings.ShowAetherCurrents=shown;
                 settings.ShowParty=settings.ShowBookmarks=settings.ShowHuntMarks=settings.ShowTreasure=settings.ShowFixedIcons=settings.ShowPlaceNames=settings.ShowIconNames=shown;
                 settings.ShowIslandPlants=settings.ShowIslandWood=settings.ShowIslandRocks=settings.ShowIslandEarth=settings.ShowIslandFishing=shown;
@@ -542,6 +544,7 @@ internal sealed partial class MainWindow
             changed|=SettingBox("MapView.ShowQuests",settings.ShowQuests,value=>settings.ShowQuests=value);
             changed|=SettingBox("MapView.ShowFates",settings.ShowFates,value=>settings.ShowFates=value);
             changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value);
+            changed|=GathererBoxes(settings,false);
             // 0.684 (user request): the game's five kinds, in this menu only.
             changed|=SettingBox("MapView.ShowIslandPlants",settings.ShowIslandPlants,value=>settings.ShowIslandPlants=value);
             changed|=SettingBox("MapView.ShowIslandWood",settings.ShowIslandWood,value=>settings.ShowIslandWood=value);
@@ -616,6 +619,7 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value,MapDefaults.ShowTreasure);
                 changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value,MapDefaults.ShowVendors);
                 changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value,MapDefaults.ShowGathering);
+                changed|=GathererBoxes(settings,true);
                 changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value,MapDefaults.ShowHuntMarks);
                 changed|=SettingBox("MapView.ShowListMonsters",settings.ShowListMonsters,value=>settings.ShowListMonsters=value,MapDefaults.ShowListMonsters);
                 changed|=SettingBox("MapView.ShowHuntLogMonsters",settings.ShowHuntLogMonsters,value=>settings.ShowHuntLogMonsters=value,MapDefaults.ShowHuntLogMonsters);
@@ -967,6 +971,21 @@ internal sealed partial class MainWindow
         return changed;
     }
     // 0.262: a map setting box with its help (key + « Help » when written) and the « ↺ » button once it differs from the default.
+    /// <summary>X-80 (0.895): the three gatherers under « Gathering points », greyed while it is off.</summary>
+    private bool GathererBoxes(MapViewSettings settings,bool defaults)
+    {
+        var changed=false;
+        ImGui.Indent();
+        using(ImRaii.Disabled(!settings.ShowGathering))
+        {
+            changed|=SettingBox("MapView.ShowMiningPoints",settings.ShowMiningPoints,value=>settings.ShowMiningPoints=value,defaults ? MapDefaults.ShowMiningPoints:null);
+            changed|=SettingBox("MapView.ShowBotanyPoints",settings.ShowBotanyPoints,value=>settings.ShowBotanyPoints=value,defaults ? MapDefaults.ShowBotanyPoints:null);
+            changed|=SettingBox("MapView.ShowFishingPoints",settings.ShowFishingPoints,value=>settings.ShowFishingPoints=value,defaults ? MapDefaults.ShowFishingPoints:null);
+        }
+        ImGui.Unindent();
+        return changed;
+    }
+
     private bool SettingBox(string key,bool value,Action<bool> apply,bool? fallback=null)
     {
         var changed=ImGui.Checkbox(localization.Get(key)+"###"+key,ref value);
@@ -1193,7 +1212,8 @@ internal sealed partial class MainWindow
             var eventMaps=SameLandMaps(map);
             var events=settings.ShowQuests && live?.Events is { } liveEvents ? liveEvents.Where(marker=>eventMaps.Contains(marker.MapId)).ToArray():[];
             MapMark("canvas texture, names, zones");
-            var gathering=settings.ShowGathering ? MapGatheringPoints(map):[];
+            // X-80 (0.895): only the gatherers ticked.
+            var gathering=settings.ShowGathering ? MapGatheringPoints(map).Where(point=>settings.ShowsGatherer(point.Job)).ToArray():[];
             MapMark("canvas gathering points");
             // Areas per kind (0.151): quests (marker type 3), leves and other events, FATEs, gathering points; own switch and colour.
             if(settings.ShowFateAreas)

@@ -3280,6 +3280,12 @@
     "NpcSaleStack": "NPC sale (NQ): {0} gil each, stack of {1}: {2} gil"
   },
   "MapView": {
+    "ShowMiningPoints": "Miner",
+    "ShowMiningPointsHelp": "The mining and quarrying points of the map.",
+    "ShowBotanyPoints": "Botanist",
+    "ShowBotanyPointsHelp": "The logging and harvesting points of the map.",
+    "ShowFishingPoints": "Fisher",
+    "ShowFishingPointsHelp": "The fishing spots and spearfishing points of the map.",
     "VistaSeen": "Registered by you in {0} at {1} ET.",
     "Partplace": "place",
     "ShowIconNames": "Icon names",
