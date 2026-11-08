@@ -78,9 +78,9 @@ internal static class Parsers911Tests
         ("Duty chests: the deep dungeon coffers and the loot window record the territory, one fact per item and duty",() =>
         {
             var watcher=Source("Discoveries/ItemDiscoveryWatcher.Dalamud.cs");
-            Check(watcher.Contains("added=store.SeeSource(DiscoveryKind.DutyChest,item,duty,quantity,at,territory);kind=DiscoveryKind.DutyChest;break;"),"coffer with its territory");
-            Check(watcher.Contains("store.SeeSource(DiscoveryKind.DutyChest,item.ItemId%1_000_000,duty,Math.Max(1,(int)item.ItemCount),at,territory);"),"loot with its territory");
-            Check(Regex.Matches(watcher,@"SeeSource\(DiscoveryKind\.DutyChest,[^;]*\);").All(match=>match.Value.EndsWith(",at,territory);",StringComparison.Ordinal)),"every duty chest");
+            Check(watcher.Contains("added=store.SeeSource(DiscoveryKind.DutyChest,item,duty,quantity,at,territory,hq:hq);kind=DiscoveryKind.DutyChest;break;"),"coffer with its territory");
+            Check(watcher.Contains("store.SeeSource(DiscoveryKind.DutyChest,item.ItemId%1_000_000,duty,Math.Max(1,(int)item.ItemCount),at,territory,hq:ItemGains.IsHq(item.ItemId));"),"loot with its territory");
+            Check(Regex.Matches(watcher,@"SeeSource\(DiscoveryKind\.DutyChest,[^;]*\);").All(match=>Regex.IsMatch(match.Value,@",at,territory(,hq:[^;]*)?\);$")),"every duty chest (0.916: the HQ flag may follow)");
             var store=new DiscoveryStore();
             Check(store.SeeSource(DiscoveryKind.DutyChest,5,780,1,At,561),"from the loot window");
             Check(!store.SeeSource(DiscoveryKind.DutyChest,5,780,2,At.AddMinutes(1),561),"from a coffer: the same fact");

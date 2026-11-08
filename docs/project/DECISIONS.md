@@ -404,3 +404,43 @@ Decision: Automatique, en mode développeur seulement, avec les requêtes que le
 Reason: Décision de l'utilisateur.
 Consequences: Le résumé du passage donne le nombre de requêtes et leurs hôtes. Un test vérifie que la fenêtre ne s'ouvre qu'en mode développeur. 0.748 (X-01, lourdeur signalée par l'utilisateur) : au plus un passage toutes les deux heures, quels que soient les rechargements.
 References: DEC-038, docs/evidence/0.724-page-sweep.md
+
+DEC-ID: DEC-041
+Timestamp: 2026-11-08 Europe/Brussels
+Problem: Le document « a faire » demande des outils de contenus (Eurêka, Bozja, donjons profonds, île Lunule, raids fatals) avec des tableaux stratégiques ; DEC-009 a retiré le domaine Combat (seule exception : le dresseur, informations seulement, JcE, DEC-032).
+Evidence: Réponse de l'utilisateur au lot de décisions du 2026-11-08 : « On peut être beaucoup plus permissif, mais que pour préparer les combats, pas en combat, tant que FF14 ne peut pas nous détecter ; je suis ok, pareil pour autre contenu ».
+Options: Élargir l'exception à la préparation des combats ; garder le combat dehors.
+Decision: Exception élargie : des informations pour préparer les combats et les contenus (mécaniques, ordre, placements écrits, objectifs, progression), en JcE seulement. Rien pendant un combat (affichage masqué en combat), rien ne lit les données de combat (pas d'ACT/IINACT, pas de journal de combat), aucune action automatisée, tout coupé en JcJ et en contenu classé (DEC-038). Les règles Dalamud restent le critère (PUBLISHING.md), au-delà de ce que le jeu peut détecter.
+Reason: Décision de l'utilisateur, encadrée par les règles Dalamud gardées (DEC-039).
+Consequences: X-90 peut prévoir des tableaux de préparation ; résumé et accord de l'utilisateur avant chaque outil qui touche une règle Dalamud.
+References: DEC-009, DEC-032, DEC-033, DEC-038, DEC-039, docs/project/GLOBAL-PLAN.md (X-90)
+
+DEC-ID: DEC-042
+Timestamp: 2026-11-08 Europe/Brussels
+Problem: Le format du fichier des découvertes n'a pas de place pour le HQ, des compteurs par valeur ou des dénominateurs (taux de butin futurs) ; le changer après la 1.0.0 obligerait à migrer les fichiers de tous les joueurs.
+Evidence: Plan X-76 2c (étape E1, docs/evidence/x76-2bc-plan.md) ; réponse de l'utilisateur : « Fais-le au plus vite ».
+Options: Avant la 1.0.0 ; plus tard.
+Decision: Format fixé tout de suite : champs facultatifs ajoutés, version du format montée, lecture des anciens fichiers gardée, outil de fusion mis à jour.
+Reason: Décision de l'utilisateur.
+Consequences: Fait avant X-85.
+References: DEC-039, tools/discoveries-merge.py
+
+DEC-ID: DEC-043
+Timestamp: 2026-11-08 Europe/Brussels
+Problem: Durées des voyages de sous-marins calculées par une formule communautaire (SubmarineTracker, MIT) ; le jeu a ses propres fonctions de calcul.
+Evidence: X-75.6 ; réponse de l'utilisateur : « Oui si lecture pure ».
+Options: Fonctions du jeu si elles ne font que calculer ; garder la formule.
+Decision: Les fonctions du jeu sont appelées seulement si elles ne font que calculer (aucune action, aucun envoi au serveur, aucun état modifié), sur le fil du framework ; sinon la formule reste, contrôlée contre le jeu.
+Reason: Décision de l'utilisateur.
+Consequences: Une sonde prouve d'abord la nature de la fonction ; preuve dans docs/evidence.
+References: X-75.6, docs/evidence/0.874-probe-coverage.md
+
+DEC-ID: DEC-044
+Timestamp: 2026-11-08 Europe/Brussels
+Problem: Pêche en mer (X-85) : quel appât déclenche le courant spectral, si les données du jeu ne le disent pas.
+Evidence: Réponse de l'utilisateur : « Vos relevés, puis la commu ».
+Options: Relevés d'abord puis source communautaire marquée ; relevés seulement.
+Decision: Les relevés en jeu de l'utilisateur d'abord ; en attendant, une source communautaire indiquée comme telle, coupée par le réglage « données du jeu et observées seulement » (X-76 étape 3).
+Reason: Décision de l'utilisateur.
+Consequences: Un parseur note les courants spectraux observés et l'appât du lancer.
+References: X-85, X-76

@@ -33,7 +33,7 @@ internal static class ProbeSet874Tests
                 Check(watcher.Contains(window),"busy window "+window);
             Check(watcher.Contains("if(gains.Count==0 || gains.Count>16)return;"),"16 gains at most");
             Check(watcher.Contains("if(gui.GetAddonByName(\"RetainerTaskResult\") is not { IsNull:false,IsVisible:true }){ventureSeen=\"\";return;}")
-                && watcher.Contains("store.SeeSource(DiscoveryKind.Venture,item,task,count,at);"),"ventures: result window only");
+                && watcher.Contains("store.SeeSource(DiscoveryKind.Venture,item,task,count,at,hq:hq);"),"ventures: result window only");
             Check(watcher.Contains("if(territory!=lootTerritory){lootSeen.Clear();lootTerritory=territory;}") && watcher.Contains("if(duty==0)return;"),"duty chests: in a duty, reset per zone");
             Check(watcher.Contains("if(fate->State is FateState.Ending or FateState.Ended)fateEndedAt=now;"),"FATE end");
             Check(watcher.Contains("if(targets.Target is not IBattleNpc { BattleNpcKind:BattleNpcSubKind.Combatant } npc || npc.CurrentHp!=0 || npc.NameId==0)return;"),"own target, a monster, dead");

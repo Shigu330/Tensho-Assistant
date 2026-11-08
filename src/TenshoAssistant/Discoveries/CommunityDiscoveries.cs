@@ -19,14 +19,18 @@ public static class CommunityDiscoveries
 
     public static DiscoveryFile? Parse(string json)
     {
+        // X-76 E1 (0.916): versions 1 and 2 (DiscoveryFile.Readable).
         var file=JsonSerializer.Deserialize<DiscoveryFile>(json);
-        return file is { Version:DiscoveryFile.CurrentVersion, Facts:not null } ? file:null;
+        return DiscoveryFile.Readable(file) ? file:null;
     }
 
-    /// <summary>Only what you saw yourself: imported facts are not sent back. 0.883: dated by its newest fact, so that the same facts give the same file (and hash).</summary>
+    /// <summary>
+    /// Only what you saw yourself: imported facts are not sent back. 0.883: dated by its newest fact, so that the same facts give the same file (and hash).
+    /// X-76 E1 (0.916): nor the imported HQ sightings and values (written as version 2).
+    /// </summary>
     public static DiscoveryFile Mine(DiscoveryFile all)
     {
-        var facts=all.Facts.Where(fact=>fact.Seen>0).Select(fact=>{var copy=fact.Copy();copy.Imported=0;return copy;})
+        var facts=all.Facts.Where(fact=>fact.Seen>0).Select(fact=>{var copy=fact.Copy();copy.Imported=0;copy.ImportedHq=0;copy.ImportedValues=null;return copy;})
             .OrderBy(fact=>fact.Key,StringComparer.Ordinal).ToList();
         return new(){Written=facts.Count==0 ? DateTimeOffset.UnixEpoch:facts.Max(fact=>fact.Last),Producer=all.Producer,Facts=facts};
     }

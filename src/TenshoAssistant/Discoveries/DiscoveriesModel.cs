@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace TenshoAssistant.Discoveries;
 
@@ -67,16 +68,93 @@ public sealed class DiscoveryFact
     public int Imported { get; set; }
     public DateTimeOffset First { get; set; }
     public DateTimeOffset Last { get; set; }
+    // X-76 E1 (0.916, DEC-042, file version 2, docs/evidence/0.916-discoveries-format.md): optional, left out of the file when empty, so that a version 1 file
+    // reads as it is. Like Seen and Imported, yours and imported ones are kept apart: only yours are shared (CommunityDiscoveries.Mine), never echoed back.
+    /// <summary>How many of your sightings were HQ (an item got: catches, drops, rewards, chests); never more than the sightings counted in <see cref="Values"/>.</summary>
+    [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingDefault)]
+    public int Hq { get; set; }
+    /// <summary>The value seen at each of your sightings (level, quantity, bite time…): value → count, at most <see cref="ValueCounts.MaxValues"/> values.</summary>
+    [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]
+    public Dictionary<int,int>? Values { get; set; }
+    /// <summary>The imported HQ sightings: the largest number an imported file gave (a file read again is not counted twice).</summary>
+    [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingDefault)]
+    public int ImportedHq { get; set; }
+    /// <summary>The imported values: per value, the largest count an imported file gave.</summary>
+    [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]
+    public Dictionary<int,int>? ImportedValues { get; set; }
     public string Key=>$"{(int)Kind}:{Subject}:{Detail}:{Territory}:{Map}:{CellX}:{CellZ}";
-    public DiscoveryFact Copy()=>(DiscoveryFact)MemberwiseClone();
+    public DiscoveryFact Copy()
+    {
+        var copy=(DiscoveryFact)MemberwiseClone();
+        copy.Values=Values is null ? null:new(Values);copy.ImportedValues=ImportedValues is null ? null:new(ImportedValues);
+        return copy;
+    }
     /// <summary>X-76 (0.908): how many times a fact was seen in game, yours and imported together (static: nothing more is written in the files).</summary>
     public static int TimesOf(DiscoveryFact fact)=>fact.Seen+fact.Imported;
 }
 
-/// <summary>The file: a version, who wrote it, when, and the facts.</summary>
+/// <summary>
+/// X-76 E1 (0.916): a bounded histogram of the values seen (value → count). A new value when <see cref="MaxValues"/> are already kept is counted under the
+/// nearest value kept (the lower one on a tie): no sighting is lost, the shape stays close. Counts stop at <see cref="MaxCount"/>.
+/// </summary>
+public static class ValueCounts
+{
+    public const int MaxValues=32,MaxValue=100_000,MaxCount=100_000_000;
+
+    /// <summary>Count added under the value, or under the nearest value kept when the histogram is full.</summary>
+    public static void Add(ref Dictionary<int,int>? values,int value,int count=1)
+    {
+        if(count<=0)return;
+        values??=[];
+        var key=values.ContainsKey(value) || values.Count<MaxValues ? value:Nearest(values,value);
+        values[key]=(int)Math.Min((long)values.GetValueOrDefault(key)+count,MaxCount);
+    }
+
+    /// <summary>The value kept closest to this one, the lower one on a tie.</summary>
+    public static int Nearest(IReadOnlyDictionary<int,int> values,int value)=>
+        values.Keys.OrderBy(key=>Math.Abs((long)key-value)).ThenBy(key=>key).First();
+
+    /// <summary>Both histograms added (values of the second taken in increasing order).</summary>
+    public static Dictionary<int,int>? Sum(Dictionary<int,int>? first,Dictionary<int,int>? second)
+    {
+        var result=first is null ? null:new Dictionary<int,int>(first);
+        if(second is not null)foreach(var (value,count) in second.OrderBy(pair=>pair.Key))Add(ref result,value,count);
+        return result;
+    }
+
+    /// <summary>Per value, the largest count of the two (an imported file read again adds nothing).</summary>
+    public static Dictionary<int,int>? Max(Dictionary<int,int>? first,Dictionary<int,int>? second)
+    {
+        var result=first is null ? null:new Dictionary<int,int>(first);
+        if(second is null)return result;
+        foreach(var (value,count) in second.OrderBy(pair=>pair.Key))
+        {
+            if(count<=0)continue;
+            result??=[];
+            var key=result.ContainsKey(value) || result.Count<MaxValues ? value:Nearest(result,value);
+            result[key]=Math.Max(result.GetValueOrDefault(key),Math.Min(count,MaxCount));
+        }
+        return result;
+    }
+
+    public static long Total(IReadOnlyDictionary<int,int>? values)=>values?.Values.Sum(count=>(long)count) ?? 0;
+    /// <summary>An HQ count held within the sightings of its histogram (a count stopped at <see cref="MaxCount"/> or folded by a largest-count join can be lower).</summary>
+    public static int AtMostTotal(long hq,IReadOnlyDictionary<int,int>? values)=>(int)Math.Clamp(hq,0,Math.Min(Total(values),int.MaxValue));
+
+    /// <summary>What a file may hold: at most <see cref="MaxValues"/> values from 0 to <see cref="MaxValue"/>, each counted 1 to <see cref="MaxCount"/> times.</summary>
+    public static bool Valid(IReadOnlyDictionary<int,int>? values)=>values is null
+        || values.Count<=MaxValues && values.All(pair=>pair.Key is >= 0 and <= MaxValue && pair.Value is >= 1 and <= MaxCount);
+}
+
+/// <summary>
+/// The file: a version, who wrote it, when, and the facts. X-76 E1 (0.916): version 2 adds the optional Hq, Values, ImportedHq and ImportedValues of a fact;
+/// version 1 files, which have none of them, are still read as they are.
+/// </summary>
 public sealed class DiscoveryFile
 {
-    public const int CurrentVersion=1;
+    public const int CurrentVersion=2,OldestVersion=1;
+    /// <summary>A file this version reads: a known version and a list of facts.</summary>
+    public static bool Readable(DiscoveryFile? file)=>file is { Version:>=OldestVersion and <=CurrentVersion, Facts:not null };
     public int Version { get; set; }=CurrentVersion;
     public string Producer { get; set; }="Tensho Assistant";
     public DateTimeOffset Written { get; set; }
@@ -111,19 +189,24 @@ public sealed class DiscoveryStore
     public bool SeeFate(uint fateId,uint territory,uint map,Vector3 position,int level,DateTimeOffset at)
         =>position.X==0 && position.Z==0 ? false:See(DiscoveryKind.FateSeen,fateId,0,territory,map,position,level,at,FateGap);
 
-    /// <summary>X-74 (0.860): an item got from a source; every event counts once (the watcher sends each once); a place only when a map is given.</summary>
-    public bool SeeSource(DiscoveryKind kind,uint subject,uint detail,int value,DateTimeOffset at,uint territory=0,uint map=0,Vector3? place=null)
+    /// <summary>
+    /// X-74 (0.860): an item got from a source; every event counts once (the watcher sends each once); a place only when a map is given. X-76 E1 (0.916): the
+    /// value is also counted in the fact's Values, and « hq » (an HQ item got) in its Hq.
+    /// </summary>
+    public bool SeeSource(DiscoveryKind kind,uint subject,uint detail,int value,DateTimeOffset at,uint territory=0,uint map=0,Vector3? place=null,bool hq=false)
     {
         var position=map==0 ? Vector3.Zero:place ?? Vector3.Zero;
-        if(subject==0 || value<0 || !float.IsFinite(position.X) || !float.IsFinite(position.Z))return false;
+        if(subject==0 || value<0 || value>ValueCounts.MaxValue || !float.IsFinite(position.X) || !float.IsFinite(position.Z))return false;
         var (cellX,cellZ)=Cell(position.X,position.Z);
         var fact=new DiscoveryFact{Kind=kind,Subject=subject,Detail=detail,Territory=territory,Map=map,CellX=cellX,CellZ=cellZ,X=position.X,Z=position.Z,
-            LevelMin=value,LevelMax=value,Seen=1,First=at,Last=at};
+            LevelMin=value,LevelMax=value,Seen=1,First=at,Last=at,Hq=hq ? 1:0,Values=new(){[value]=1}};
         lock(gate)
         {
             if(facts.TryGetValue(fact.Key,out var known))
             {
                 known.LevelMin=Math.Min(known.LevelMin,value);known.LevelMax=Math.Max(known.LevelMax,value);known.Seen++;
+                var values=known.Values;ValueCounts.Add(ref values,value);known.Values=values;
+                if(hq)known.Hq++;
                 if(at>known.Last)known.Last=at;
                 Dirty=true;revision++;
                 return false;
@@ -150,14 +233,20 @@ public sealed class DiscoveryStore
     {
         if(subject==0 || map==0 || !float.IsFinite(position.X) || !float.IsFinite(position.Z))return false;
         var (cellX,cellZ)=Cell(position.X,position.Z);
+        // X-76 E1 (0.916): the level counted in Values at each sighting counted in Seen; 0 (not known) is not counted.
+        var counted=level is > 0 and <= ValueCounts.MaxValue;
         var fact=new DiscoveryFact{Kind=kind,Subject=subject,Detail=detail,Territory=territory,Map=map,CellX=cellX,CellZ=cellZ,X=position.X,Z=position.Z,
-            LevelMin=level,LevelMax=level,Seen=1,First=at,Last=at};
+            LevelMin=level,LevelMax=level,Seen=1,First=at,Last=at,Values=counted ? new(){[level]=1}:null};
         lock(gate)
         {
             if(facts.TryGetValue(fact.Key,out var known))
             {
                 if(level>0){known.LevelMin=known.LevelMin==0 ? level:Math.Min(known.LevelMin,level);known.LevelMax=Math.Max(known.LevelMax,level);}
-                if(at-known.Last>=gap)known.Seen++;
+                if(at-known.Last>=gap)
+                {
+                    known.Seen++;
+                    if(counted){var values=known.Values;ValueCounts.Add(ref values,level);known.Values=values;}
+                }
                 if(at>known.Last)known.Last=at;
                 Dirty=true;
                 return false;
@@ -189,11 +278,15 @@ public sealed class DiscoveryStore
                     known.LevelMax=Math.Max(known.LevelMax,source.LevelMax);
                     if(source.First<known.First)known.First=source.First;
                     if(source.Last>known.Last)known.Last=source.Last;
+                    // X-76 E1 (0.916): the file's HQ sightings and values (its own and its imported ones) kept apart from yours, the largest per value.
+                    var (hq,values)=ImportedPart(source);
+                    known.ImportedValues=ValueCounts.Max(known.ImportedValues,values);known.ImportedHq=ValueCounts.AtMostTotal(Math.Max(known.ImportedHq,hq),known.ImportedValues);
                     joined++;
                     continue;
                 }
                 if(facts.Count>=MaxFacts){refused++;continue;}
                 var copy=source.Copy();copy.Seen=0;copy.Imported=1;
+                (copy.ImportedHq,copy.ImportedValues)=ImportedPart(source);copy.Hq=0;copy.Values=null;
                 facts[copy.Key]=copy;added++;
             }
             if(added+joined>0){Dirty=true;revision++;}
@@ -208,10 +301,22 @@ public sealed class DiscoveryStore
         if(float.IsFinite(copy.X) && float.IsFinite(copy.Z))(copy.CellX,copy.CellZ)=Cell(copy.X,copy.Z);
         return copy;
     }
-    /// <summary>X-72 B (0.855): two facts of one cell made one: sightings and imports added, the widest levels and dates, the first exact place kept.</summary>
+    /// <summary>X-76 E1 (0.916): what an imported fact brings as imported: its HQ sightings and values, its own and its imported ones together.</summary>
+    public static (int Hq,Dictionary<int,int>? Values) ImportedPart(DiscoveryFact source)
+    {
+        var values=ValueCounts.Sum(source.Values,source.ImportedValues);
+        return (ValueCounts.AtMostTotal((long)source.Hq+source.ImportedHq,values),values);
+    }
+
+    /// <summary>
+    /// X-72 B (0.855): two facts of one cell made one: sightings and imports added, the widest levels and dates, the first exact place kept. X-76 E1 (0.916):
+    /// HQ sightings and values added, yours to yours, imported to imported.
+    /// </summary>
     public static void Join(DiscoveryFact known,DiscoveryFact other)
     {
         known.Seen+=other.Seen;known.Imported+=other.Imported;
+        known.Values=ValueCounts.Sum(known.Values,other.Values);known.ImportedValues=ValueCounts.Sum(known.ImportedValues,other.ImportedValues);
+        known.Hq=ValueCounts.AtMostTotal((long)known.Hq+other.Hq,known.Values);known.ImportedHq=ValueCounts.AtMostTotal((long)known.ImportedHq+other.ImportedHq,known.ImportedValues);
         if(other.LevelMin>0)known.LevelMin=known.LevelMin==0 ? other.LevelMin:Math.Min(known.LevelMin,other.LevelMin);
         known.LevelMax=Math.Max(known.LevelMax,other.LevelMax);
         if(other.First<known.First){known.First=other.First;known.X=other.X;known.Z=other.Z;}
@@ -223,13 +328,16 @@ public sealed class DiscoveryStore
         or DiscoveryKind.NpcPlace or DiscoveryKind.BlueSpellCaster or DiscoveryKind.FishBite or DiscoveryKind.SpearShadow;
     /// <summary>
     /// What an imported fact must hold: a known kind, a subject and a map, finite places in their cell, levels and dates that make sense. 0.911 (X-76): a FATE
-    /// at exactly (0, 0) is the zero position the game gives for about a second (entering a zone, reloading): refused, read or imported.
+    /// at exactly (0, 0) is the zero position the game gives for about a second (entering a zone, reloading): refused, read or imported. X-76 E1 (0.916): the
+    /// histograms within their bounds (ValueCounts.Valid), never more HQ sightings than sightings counted in them.
     /// </summary>
     public static bool Valid(DiscoveryFact? fact)=>fact is not null && Enum.IsDefined(fact.Kind) && fact.Subject!=0 && (fact.Map!=0 || !HasPlace(fact.Kind))
         && !(fact.Kind==DiscoveryKind.FateSeen && fact.X==0 && fact.Z==0)
         && float.IsFinite(fact.X) && float.IsFinite(fact.Z) && Math.Abs(fact.X)<=10_000 && Math.Abs(fact.Z)<=10_000 && Cell(fact.X,fact.Z)==(fact.CellX,fact.CellZ)
         && fact.LevelMin is >= 0 and <= 100_000 && fact.LevelMax is >= 0 and <= 100_000 && fact.LevelMin<=Math.Max(fact.LevelMin,fact.LevelMax)
-        && fact.Seen>=0 && fact.Imported>=0 && fact.First<=fact.Last && fact.Last<=DateTimeOffset.UtcNow.AddDays(1);
+        && fact.Seen>=0 && fact.Imported>=0 && fact.First<=fact.Last && fact.Last<=DateTimeOffset.UtcNow.AddDays(1)
+        && ValueCounts.Valid(fact.Values) && ValueCounts.Valid(fact.ImportedValues)
+        && fact.Hq>=0 && fact.Hq<=ValueCounts.Total(fact.Values) && fact.ImportedHq>=0 && fact.ImportedHq<=ValueCounts.Total(fact.ImportedValues);
 
     public void Load(DiscoveryFile file)
     {
@@ -310,7 +418,7 @@ public static class DiscoveryFiles
     {
         if(!File.Exists(path) || new FileInfo(path).Length>MaxBytes)return null;
         var file=JsonSerializer.Deserialize<DiscoveryFile>(File.ReadAllText(path),Options);
-        return file is { Version:DiscoveryFile.CurrentVersion, Facts:not null } ? file:null;
+        return DiscoveryFile.Readable(file) ? file:null;
     }
 
     public static void Write(string path,DiscoveryFile file)

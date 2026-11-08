@@ -36,7 +36,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     private readonly IFramework framework;private readonly IClientState client;private readonly IGameGui gui;private readonly IObjectTable objects;private readonly ITargetManager targets;
     private readonly ICondition condition;private readonly IGameInventory inventory;private readonly DiscoveryStore store;private readonly IPluginLog log;
     private readonly Func<DiscoverySettings> settings;private readonly Func<bool> debug;private readonly Func<uint,uint> dutyOf;private readonly Func<uint,bool> isFish;private readonly Func<uint,bool> usable;
-    private Dictionary<uint,long>? before;private long nextRead;private bool disposed,warned;
+    private Dictionary<uint,long>? before,beforeHq;private long nextRead;private bool disposed,warned;
     private uint shopNpcSeen;
     private void ReadShopNpc(DateTimeOffset at,uint territory,uint map)
     {
@@ -200,9 +200,11 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                 ReadSalvage(at);ReadPurify(at);ReadHandIn(at,now);ReadVenture(at);ReadLoot(at,territory,duty);
                 ReadFate(now);ReadTarget(now,territory,map);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);ReadShopNpc(at,territory,map);ReadCasters(at,territory,map);
             }
-            var counts=Counts();
-            if(before is null){before=counts;return;}
+            var (counts,hqCounts)=Counts();
+            if(before is null || beforeHq is null){before=counts;beforeHq=hqCounts;return;}
             var gains=ItemGains.Gains(before,counts);var losses=ItemGains.Losses(before,counts);before=counts;
+            // X-76 E1 (0.916): a gain is an HQ sighting when HQ units of the item came in (the bags count HQ apart, slot.IsHq).
+            var hqGains=ItemGains.Gains(beforeHq,hqCounts);beforeHq=hqCounts;
             if(gains.Count==0 || gains.Count>16)return;
             var fishing=wanted.Fishing && condition[ConditionFlag.Fishing];
             var busy=!fishing && (condition[ConditionFlag.Crafting] || condition[ConditionFlag.Gathering] || condition[ConditionFlag.PreparingToCraft]
@@ -218,7 +220,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                 field,deepDungeon);
             foreach(var (item,count) in gains)
             {
-                var quantity=(int)Math.Min(count,100_000);var added=false;var kind=DiscoveryKind.ItemFromItem;
+                var quantity=(int)Math.Min(count,100_000);var added=false;var kind=DiscoveryKind.ItemFromItem;var hq=hqGains.ContainsKey(item);
                 switch(cause)
                 {
                     case ItemGains.Cause.Fishing when isFish(item):
@@ -226,7 +228,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                         var flags=events!=null && events->EventHandlerModule.FishingEventHandler is var handler && handler!=null ? (int)handler->CurrentCastBaitFlags:0;
                         var bait=(flags & 16)!=0 && lastFish!=0 ? lastFish:PlayerState.Instance() is var state && state!=null ? state->FishingBait:0u;
                         var weather=FFXIVClientStructs.FFXIV.Client.Game.WeatherManager.Instance() is var manager && manager!=null ? manager->GetCurrentWeather():(byte)0;
-                        added=store.SeeSource(DiscoveryKind.FishCatch,item,bait,quantity,at,territory,map,me.Position);
+                        added=store.SeeSource(DiscoveryKind.FishCatch,item,bait,quantity,at,territory,map,me.Position,hq);
                         store.SeeSource(DiscoveryKind.FishCondition,item,weather,EorzeaMinute(at),at,territory);
                         if((flags & 3) is 1 or 2)store.SeeSource(DiscoveryKind.FishLure,item,(uint)(flags & 3),1,at,territory);
                         if(PreviousWeather?.Invoke(territory,at) is { } before and not 0)store.SeeSource(DiscoveryKind.FishTransition,item,before,EorzeaMinute(at),at,territory);
@@ -236,14 +238,14 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                         bitAt=-100_000;
                         kind=DiscoveryKind.FishCatch;break;
                     case ItemGains.Cause.FateReward:
-                        added=store.SeeSource(DiscoveryKind.FateReward,item,fateId,quantity,at);kind=DiscoveryKind.FateReward;break;
+                        added=store.SeeSource(DiscoveryKind.FateReward,item,fateId,quantity,at,hq:hq);kind=DiscoveryKind.FateReward;break;
                     case ItemGains.Cause.MonsterDrop:
-                        added=store.SeeSource(DiscoveryKind.MonsterDrop,item,death.Name,quantity,at,death.Territory,death.Map,death.Place);kind=DiscoveryKind.MonsterDrop;break;
+                        added=store.SeeSource(DiscoveryKind.MonsterDrop,item,death.Name,quantity,at,death.Territory,death.Map,death.Place,hq);kind=DiscoveryKind.MonsterDrop;break;
                     case ItemGains.Cause.Opened:
-                        added=store.SeeSource(DiscoveryKind.ItemFromItem,item,spent!.Value,quantity,at);break;
+                        added=store.SeeSource(DiscoveryKind.ItemFromItem,item,spent!.Value,quantity,at,hq:hq);break;
                     case ItemGains.Cause.DungeonCoffer:
                         // 0.911 (X-76): with the territory, like the duty's loot window (ReadLoot): one fact per item and duty.
-                        added=store.SeeSource(DiscoveryKind.DutyChest,item,duty,quantity,at,territory);kind=DiscoveryKind.DutyChest;break;
+                        added=store.SeeSource(DiscoveryKind.DutyChest,item,duty,quantity,at,territory,hq:hq);kind=DiscoveryKind.DutyChest;break;
                     default:continue;
                 }
                 if(added && debug())log.Information("Discovery: {0} item {1} ×{2}.",kind,item,quantity);
@@ -255,25 +257,31 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     // Eorzea minute of the day (175 s an Eorzea hour), as Tensho's clocks count it.
     private static int EorzeaMinute(DateTimeOffset at)=>Gathering.GatheringTime.MinuteOfDay(at);
 
-    private Dictionary<uint,long> Counts()
+    /// <summary>Per item, the units in the bags, HQ and NQ together; and apart, the HQ units (X-76 E1, 0.916).</summary>
+    private (Dictionary<uint,long> All,Dictionary<uint,long> Hq) Counts()
     {
-        var counts=new Dictionary<uint,long>();
+        var counts=new Dictionary<uint,long>();var hq=new Dictionary<uint,long>();
         foreach(var bag in Bags)
             foreach(var slot in inventory.GetInventoryItems(bag))
-                if(!slot.IsEmpty && slot.BaseItemId!=0 && slot.Quantity>0)counts[slot.BaseItemId]=counts.GetValueOrDefault(slot.BaseItemId)+slot.Quantity;
-        return counts;
+                if(!slot.IsEmpty && slot.BaseItemId!=0 && slot.Quantity>0)
+                {
+                    counts[slot.BaseItemId]=counts.GetValueOrDefault(slot.BaseItemId)+slot.Quantity;
+                    if(slot.IsHq)hq[slot.BaseItemId]=hq.GetValueOrDefault(slot.BaseItemId)+slot.Quantity;
+                }
+        return (counts,hq);
     }
 
     private void ReadSalvage(DateTimeOffset at)
     {
         var agent=AgentSalvage.Instance();
         if(agent==null || !agent->IsSalvageResultAddonOpen || agent->DesynthItemId==0){salvageSeen="";return;}
-        var source=agent->DesynthItemId%1_000_000;var results=new List<(uint Item,int Count)>();
-        foreach(var result in agent->DesynthResults)if(result.ItemId!=0 && result.Quantity>0)results.Add((result.ItemId%1_000_000,result.Quantity));
+        var source=agent->DesynthItemId%1_000_000;var results=new List<(uint Item,int Count,bool Hq)>();
+        // X-76 E1 (0.916): an HQ result carries the HQ offset in its raw id (not seen in game yet).
+        foreach(var result in agent->DesynthResults)if(result.ItemId!=0 && result.Quantity>0)results.Add((result.ItemId%1_000_000,result.Quantity,ItemGains.IsHq(result.ItemId)));
         var signature=source+":"+string.Join(",",results.Select(result=>$"{result.Item}x{result.Count}"));
         if(results.Count==0 || signature==salvageSeen)return;
         salvageSeen=signature;
-        foreach(var (item,count) in results)store.SeeSource(DiscoveryKind.Desynthesis,item,source,count,at);
+        foreach(var (item,count,hq) in results)store.SeeSource(DiscoveryKind.Desynthesis,item,source,count,at,hq:hq);
         if(debug())log.Information("Discovery: desynthesis of {0}: {1}.",source,signature);
     }
 
@@ -429,13 +437,14 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         if(agent==null)return;
         var data=agent->RetainerData;var task=(uint)data.RewardRetainerTaskId;
         if(task==0)return;
-        var rewards=new List<(uint Item,int Count)>();
+        var rewards=new List<(uint Item,int Count,bool Hq)>();
+        // X-76 E1 (0.916): an HQ reward carries the HQ offset in its raw id (not seen in game yet).
         for(var index=0;index<data.RewardItemIds.Length && index<data.RewardItemCount.Length;index++)
-            if(data.RewardItemIds[index] is var id and not 0)rewards.Add((id%1_000_000,(int)Math.Min(data.RewardItemCount[index],100_000u)));
+            if(data.RewardItemIds[index] is var id and not 0)rewards.Add((id%1_000_000,(int)Math.Min(data.RewardItemCount[index],100_000u),ItemGains.IsHq(id)));
         var signature=task+":"+string.Join(",",rewards.Select(reward=>$"{reward.Item}x{reward.Count}"));
         if(rewards.Count==0 || signature==ventureSeen)return;
         ventureSeen=signature;
-        foreach(var (item,count) in rewards)store.SeeSource(DiscoveryKind.Venture,item,task,count,at);
+        foreach(var (item,count,hq) in rewards)store.SeeSource(DiscoveryKind.Venture,item,task,count,at,hq:hq);
         if(debug())log.Information("Discovery: venture {0}.",signature);
     }
 
@@ -448,7 +457,8 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         foreach(var item in loot->Items)
         {
             if(item.ItemId==0 || item.ChestObjectId==0 || lootSeen.Count>=256 || !lootSeen.Add((item.ChestObjectId,item.ChestItemIndex,item.ItemId)))continue;
-            store.SeeSource(DiscoveryKind.DutyChest,item.ItemId%1_000_000,duty,Math.Max(1,(int)item.ItemCount),at,territory);
+            // X-76 E1 (0.916): an HQ item carries the HQ offset in its raw id (not seen in game yet).
+            store.SeeSource(DiscoveryKind.DutyChest,item.ItemId%1_000_000,duty,Math.Max(1,(int)item.ItemCount),at,territory,hq:ItemGains.IsHq(item.ItemId));
             if(debug())log.Information("Discovery: duty {0} chest item {1} ×{2}.",duty,item.ItemId,item.ItemCount);
         }
     }

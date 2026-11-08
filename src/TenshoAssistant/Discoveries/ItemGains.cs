@@ -22,6 +22,8 @@ public static class ItemGains
     /// </summary>
     public const uint KeyItemStart=2_000_000;
     public static uint BaseItem(uint raw)=>raw>=KeyItemStart ? raw:raw%500_000;
+    /// <summary>X-76 E1 (0.916): a raw item id carrying the HQ offset (1 000 000 to 1 999 999), as the loot window and the venture and desynthesis results give it.</summary>
+    public static bool IsHq(uint raw)=>raw is >= 1_000_000 and < KeyItemStart;
 
     /// <summary>
     /// X-73.18 (0.898, user request: multiple catches happen often): the shadows of the fish of one multiple catch. The fish caught (chat) and the slots speared
