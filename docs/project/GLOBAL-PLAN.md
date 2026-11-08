@@ -258,6 +258,8 @@ et plus, en prévision de futurs outils »).
   source communautaire encore lue, et ce que les outils prévus du plan auront besoin de garder dès maintenant.
 - Les ajouts sûrs sont codés ; ceux qui demandent un relevé en jeu vont dans la table des rappels.
 
+**Ordre fixé par l'utilisateur (2026-11-08, nuit) :** « fais X-93 en premier et le nettoyage après, on reprendra le reste après » : X-93 en entier (aucune découverte oubliée, découvertes partagées à la demande), puis X-76 étapes 3 à 9, puis le reste (X-85 V2…, X-86 à X-97).
+
 **Ordre rappelé par l'utilisateur (2026-11-08, soir) :** « uniformisation en premier, comme ça on l'applique à tout nouveau parseur » : 2b H7–H10 puis 2c P4–P10 et E2–E5 passent avant la suite de X-85 (V2 points à V6), X-86 à X-89 et tout nouveau parseur.
 
 **Avancement 2b et 2c :** plan rendu par un workflow (`docs/evidence/x76-2bc-plan.md`) : harmonisation H1 info-bulles (0.913), H2 couleurs du thème (thèmes clairs, 0.912),

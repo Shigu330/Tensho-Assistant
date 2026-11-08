@@ -179,7 +179,14 @@ public sealed class DiscoveryStore
     // X-72 B (0.855, user choice after the parser review: 87 % of the 10-yalm places seen once, 640 facts instead of 1 469 at 50 yalms): 50-yalm cells; facts of
     // older cells are moved to theirs and joined when loaded or imported (Recell, Join).
     public const float CellSize=50;
+    /// <summary>
+    /// X-93 (0.939, user: never forget a discovery): the bound applies to the shared facts held in memory only (imported, not seen by you). Your own sightings are
+    /// never refused, and nothing already held is ever removed to make room; a shared fact left out is counted (<see cref="LeftOut"/>) and the page says so.
+    /// </summary>
     public const int MaxFacts=200_000;
+    /// <summary>X-93 (0.939): shared facts left out since the start because the shared part was full.</summary>
+    public int LeftOut { get; private set; }
+    private int SharedHeld()=>facts.Values.Count(fact=>fact.Seen==0);
     /// <summary>A second sighting of the same place counts only after this long: standing beside a monster is one sighting.</summary>
     public static readonly TimeSpan SightingGap=TimeSpan.FromMinutes(10);
     private readonly object gate=new();
@@ -235,7 +242,7 @@ public sealed class DiscoveryStore
                 Dirty=true;revision++;
                 return false;
             }
-            if(facts.Count>=MaxFacts)return false;
+            // X-93 (0.939): your own sighting is never refused.
             Put(fact);Dirty=true;revision++;
             return true;
         }
@@ -275,7 +282,7 @@ public sealed class DiscoveryStore
                 Dirty=true;
                 return false;
             }
-            if(facts.Count>=MaxFacts)return false;
+            // X-93 (0.939): your own sighting is never refused.
             Put(fact);Dirty=true;revision++;
             return true;
         }
@@ -290,6 +297,7 @@ public sealed class DiscoveryStore
         int added=0,joined=0,refused=0;
         lock(gate)
         {
+            var shared=SharedHeld();
             foreach(var original in imported)
             {
                 // 0.855: an older file's cells are moved to ours first.
@@ -308,8 +316,8 @@ public sealed class DiscoveryStore
                     joined++;
                     continue;
                 }
-                if(facts.Count>=MaxFacts){refused++;continue;}
-                var copy=source.Copy();copy.Seen=0;copy.Imported=1;
+                if(shared>=MaxFacts){LeftOut++;continue;}
+                var copy=source.Copy();copy.Seen=0;copy.Imported=1;shared++;
                 (copy.ImportedHq,copy.ImportedValues)=ImportedPart(source);copy.Hq=0;copy.Values=null;
                 Put(copy);added++;
             }
@@ -368,7 +376,7 @@ public sealed class DiscoveryStore
         lock(gate)
         {
             // 0.855: each fact moved to its 50-yalm cell; those meeting in one are joined, and the base is written again, smaller.
-            var read=0;
+            var read=0;var shared=SharedHeld();
             foreach(var original in file.Facts)
             {
                 if(original is null)continue;
@@ -376,7 +384,10 @@ public sealed class DiscoveryStore
                 if(!Valid(fact))continue;
                 read++;
                 if(facts.TryGetValue(fact.Key,out var known)){Join(known,fact);continue;}
-                if(facts.Count<MaxFacts)Put(fact);
+                // X-93 (0.939): yours always; a shared fact while the shared part has room, else counted as left out.
+                if(fact.Seen>0)Put(fact);
+                else if(shared<MaxFacts){Put(fact);shared++;}
+                else LeftOut++;
             }
             if(read>facts.Count || file.Facts.Any(fact=>fact is not null && Cell(fact.X,fact.Z)!=(fact.CellX,fact.CellZ)))Dirty=true;
             revision++;

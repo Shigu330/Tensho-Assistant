@@ -599,6 +599,8 @@
     "DutyChestOpened": "{0}: treasure chest",
     "SummaryMonsterKill": "Enemies seen defeated: {0} ({1} seen by you, {2} imported only)",
     "SummaryDutyChestOpened": "Duty chests seen: {0} ({1} seen by you, {2} imported only)",
+    "SharedFull": "{0} shared discoveries were left out: the shared part is full ({1}). Yours are always kept; nothing is forgotten.",
+    "SharedNearlyFull": "Shared discoveries: {0} of {1}. Yours are always kept.",
     "SummaryFishBite": "Fish bites seen: {0} ({1} seen by you, {2} imported only)",
     "ExchangeTitle": "Exchange with other players (GitHub)",
     "ExchangeHelp": "Share what you discovered and take what others found. Without connecting, the automatic exchange only takes the common discoveries. A discovery never holds a player's name, position or id.",

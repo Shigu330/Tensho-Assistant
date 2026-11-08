@@ -320,6 +320,10 @@ internal sealed partial class MainWindow
             ImGui.Unindent();
         }
         var summary=store.Summary();
+        // X-93 (0.939): never silent: shared discoveries left out because the shared part is full, or nearly full.
+        var sharedHeld=summary.Sum(row=>row.ImportedOnly);
+        if(store.LeftOut>0)ImGui.TextColored(Warning,localization.Format("DiscoveriesUi.SharedFull",store.LeftOut.ToString("N0"),Discoveries.DiscoveryStore.MaxFacts.ToString("N0")));
+        else if(sharedHeld>=Discoveries.DiscoveryStore.MaxFacts*9/10)ImGui.TextColored(Warning,localization.Format("DiscoveriesUi.SharedNearlyFull",sharedHeld.ToString("N0"),Discoveries.DiscoveryStore.MaxFacts.ToString("N0")));
         if(summary.Count==0)ImGui.TextDisabled(localization.Get("DiscoveriesUi.Empty"));
         if(SeenPrices is { Count:>0 } prices)ImGui.TextUnformatted(localization.Format("DiscoveriesUi.SummaryPrices",prices.Count.ToString("N0")));
         foreach(var (kind,total,seen,importedOnly) in summary)ImGui.TextUnformatted(localization.Format("DiscoveriesUi.Summary"+kind,total.ToString("N0"),seen.ToString("N0"),importedOnly.ToString("N0")));
