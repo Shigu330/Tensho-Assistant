@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.863.0
+- Plan global, Verify : Demande (X-73.9) : le mage bleu et le dresseur appris en jeu plutôt que sur le wiki. Quand un sort de mage bleu est appris (le jeu le signale) ou qu'une bête s'ajoute au carnet du dresseur, la base de découvertes garde le sort ou la bête avec le monstre qui vient d'être vaincu (dans les 15 secondes), ou à défaut votre cible, et son lieu. Non validé en jeu.
+- Tests : LearnedTamed863Tests. Verify.ps1 (agent) : 1446/1446, 0 avertissement, 0 erreur ; DLL 0.863.0.0. Non validé en jeu.
+### English
+- Request (X-73.9): blue mage and beastmaster learned in game rather than from the wiki. When a blue magic spell is learned (the game says so) or a beast joins the Beastmaster's log, the discoveries base keeps the spell or the beast with the monster just defeated (within 15 seconds), else your target, and its place. Not validated in game.
+
 ## 0.862.0
 - Plan global, Verify : Demande (X-73.8) : le butin des voyages appris en jeu. Chaque entrée du butin d'un sous-marin porte son secteur : la base de découvertes garde maintenant, une fois par voyage, chaque objet avec le secteur qui l'a donné et sa quantité, ainsi que les secteurs débloqués et celui qui les a débloqués (l'arbre des déblocages venait jusqu'ici des données communautaires). Les aéronefs ne donnent pas le secteur de chaque entrée : laissés de côté. Non validé en jeu.
 - Tests : VoyageSectors862Tests. Verify.ps1 (agent) : 1445/1445, 0 avertissement, 0 erreur ; DLL 0.862.0.0. Non validé en jeu.

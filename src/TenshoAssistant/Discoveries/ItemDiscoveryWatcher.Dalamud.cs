@@ -35,6 +35,39 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     private string salvageSeen="",ventureSeen="";private readonly HashSet<(uint Chest,uint Index,uint Item)> lootSeen=[];private uint lootTerritory;
     private uint fateId;private long fateEndedAt=-100_000;
     private (uint Name,uint Territory,uint Map,Vector3 Place,int Level,long At) death=(0,0,0,default,0,-100_000);
+    // X-73.9 (0.863): blue magic spells learned (IUnlockState.Unlock, AozAction rows, handled on the next read) and beasts tamed (the Beastmaster's obtained set).
+    public Func<IReadOnlySet<uint>?>? Beasts { get; set; }
+    private IReadOnlySet<uint>? beastsBefore;private IUnlockState? unlocks;private readonly Queue<uint> spellsLearned=new();
+    public void WatchUnlocks(IUnlockState state){unlocks=state;state.Unlock+=OnUnlock;}
+    private void OnUnlock(Lumina.Excel.RowRef row)
+    {
+        if(disposed || TenshoAssistant.Competitive.CompetitiveGate.Cut || row.RowType!=typeof(Lumina.Excel.Sheets.AozAction) || spellsLearned.Count>=16)return;
+        spellsLearned.Enqueue(row.RowId);
+    }
+    /// <summary>The monster a new spell or beast is put down to: the one that died within 15 s, else the player's own target (a battle NPC).</summary>
+    private (uint Name,uint Territory,uint Map,Vector3 Place)? RecentMonster(long now,uint territory,uint map)
+    {
+        if(death.Name!=0 && now-death.At is >= 0 and <= 15_000)return (death.Name,death.Territory,death.Map,death.Place);
+        return targets.Target is IBattleNpc { BattleNpcKind:BattleNpcSubKind.Combatant,NameId:not 0 } npc ? (npc.NameId,territory,map,npc.Position):null;
+    }
+    private void ReadLearned(DateTimeOffset at,long now,uint territory,uint map)
+    {
+        while(spellsLearned.TryDequeue(out var spell))
+        {
+            var monster=RecentMonster(now,territory,map);
+            store.SeeSource(DiscoveryKind.BlueSpellLearned,spell,monster?.Name ?? 0,1,at,monster?.Territory ?? 0,monster?.Map ?? 0,monster?.Place);
+            if(debug())log.Information("Discovery: blue spell {0} learned, monster {1}.",spell,monster?.Name ?? 0);
+        }
+        if(Beasts?.Invoke() is not { } obtained)return;
+        if(beastsBefore is { } known)
+            foreach(var beast in obtained.Where(id=>!known.Contains(id)).Take(8))
+            {
+                var monster=RecentMonster(now,territory,map);
+                store.SeeSource(DiscoveryKind.BeastTamed,beast,monster?.Name ?? 0,1,at,monster?.Territory ?? 0,monster?.Map ?? 0,monster?.Place);
+                if(debug())log.Information("Discovery: beast {0} tamed, monster {1}.",beast,monster?.Name ?? 0);
+            }
+        beastsBefore=obtained;
+    }
 
     public ItemDiscoveryWatcher(IFramework framework,IClientState client,IGameGui gui,IObjectTable objects,ITargetManager targets,ICondition condition,IGameInventory inventory,
         DiscoveryStore store,IPluginLog log,Func<DiscoverySettings> settings,Func<bool> debug,Func<uint,uint> dutyOf,Func<uint,bool> isFish,Func<uint,bool> usable)
@@ -58,7 +91,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             if(wanted.ItemSources)
             {
                 ReadSalvage(at);ReadVenture(at);ReadLoot(at,territory,duty);
-                ReadFate(now);ReadTarget(now,territory,map);
+                ReadFate(now);ReadTarget(now,territory,map);ReadLearned(at,now,territory,map);
             }
             var counts=Counts();
             if(before is null){before=counts;return;}
@@ -170,5 +203,6 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     {
         if(disposed)return;
         disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);
+        if(unlocks is not null)unlocks.Unlock-=OnUnlock;
     }
 }

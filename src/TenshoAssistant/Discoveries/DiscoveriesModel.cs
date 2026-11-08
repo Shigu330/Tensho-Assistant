@@ -14,7 +14,10 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     FashionEvaluation=12,
     // X-73.8 (0.862): submersible voyages: VoyageDrop: Subject = item, Detail = SubmarineExploration row (sector), levels = quantities; VoyageUnlock: Subject = the
     // sector unlocked, Detail = the sector whose voyage unlocked it.
-    VoyageDrop=13, VoyageUnlock=14 }
+    VoyageDrop=13, VoyageUnlock=14,
+    // X-73.9 (0.863): BlueSpellLearned: Subject = AozAction row, Detail = the BNpcName it is put down to (0: none), with its place when known; BeastTamed: Subject = the
+    // Beastmaster's beast id, the same Detail and place.
+    BlueSpellLearned=15, BeastTamed=16 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported

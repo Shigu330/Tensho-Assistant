@@ -581,6 +581,10 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "SummaryBlueSpellLearned": "Sorts de mage bleu appris : {0} ({1} vus par vous, {2} importés seulement)",
+    "SummaryBeastTamed": "Bêtes apprivoisées : {0} ({1} vues par vous, {2} importées seulement)",
+    "SpellFrom": "{0} appris de {1}",
+    "BeastFrom": "{0} apprivoisé de {1}",
     "SummaryVoyageDrop": "Butin des voyages par secteur : {0} ({1} vus par vous, {2} importés seulement)",
     "SummaryVoyageUnlock": "Secteurs débloqués : {0} ({1} vus par vous, {2} importés seulement)",
     "FromSector": "{0} ← secteur {1}",
