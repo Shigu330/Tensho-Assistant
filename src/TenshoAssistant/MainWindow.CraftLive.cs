@@ -15,6 +15,24 @@ internal sealed partial class MainWindow
     private CraftActionCatalog? liveEffectsCatalog;
     private CraftEffectObservation? liveEffectsObservation;
     /// <summary>0.464: the synthesis is read when its setting or its panel asks.</summary>
+    /// <summary>
+    /// X-76 step 3 (0.948, user report: « 3 times the same setting »): the « Compare the next moves » window, and under it, indented and greyed while it is
+    /// off, its two parts (the suggested move, the chosen sequence followed). One block for the Settings page and the Live craft page.
+    /// </summary>
+    private void DrawCraftLiveSettings()
+    {
+        BoolSetting("CraftLiveUi.Panel","CraftLiveUi.PanelTip",()=>configuration.CraftLivePanel,value=>{configuration.CraftLivePanel=value;craftLive.SetEnabled(CraftLiveWanted(configuration));},c=>c.CraftLivePanel);
+        ImGui.Indent();
+        var off=!configuration.CraftLivePanel;
+        if(off)ImGui.BeginDisabled();
+        try
+        {
+            BoolSetting("CraftLiveUi.Suggest","CraftLiveUi.SuggestTip",()=>configuration.CraftLiveSuggest,value=>configuration.CraftLiveSuggest=value,c=>c.CraftLiveSuggest);
+            BoolSetting("CraftLiveUi.Follow","CraftLiveUi.FollowTip",()=>configuration.CraftLiveFollow,value=>configuration.CraftLiveFollow=value,c=>c.CraftLiveFollow);
+        }
+        finally{if(off)ImGui.EndDisabled();ImGui.Unindent();}
+    }
+
     internal static bool CraftLiveWanted(Configuration settings)=>settings.CraftLivePanel || settings.Observations?.GetValueOrDefault("Craft")==true;
 
     private void DrawCraftLive()
@@ -22,9 +40,7 @@ internal sealed partial class MainWindow
         Heading(localization.Get("CraftLiveUi.Title"),localization.Get("CraftLiveUi.Description"));
         var state=craftLive.State;
         DrawToolSettingsLink("CraftLive");
-        BoolSetting("CraftLiveUi.Panel","CraftLiveUi.PanelTip",()=>configuration.CraftLivePanel,value=>{configuration.CraftLivePanel=value;craftLive.SetEnabled(CraftLiveWanted(configuration));},c=>c.CraftLivePanel);
-        BoolSetting("CraftLiveUi.Suggest","CraftLiveUi.SuggestTip",()=>configuration.CraftLiveSuggest,value=>configuration.CraftLiveSuggest=value,c=>c.CraftLiveSuggest);
-        BoolSetting("CraftLiveUi.Follow","CraftLiveUi.FollowTip",()=>configuration.CraftLiveFollow,value=>configuration.CraftLiveFollow=value,c=>c.CraftLiveFollow);
+        DrawCraftLiveSettings();
         ImGui.TextWrapped(localization.Get("CraftLiveUi.Help"));
         ImGui.TextUnformatted(state.Status switch {CraftLiveStatusKind.Disabled=>localization.Get("CraftLiveUi.Disabled"),CraftLiveStatusKind.Waiting=>localization.Get("CraftLiveUi.Waiting"),CraftLiveStatusKind.Offline=>localization.Get("CraftLiveUi.Offline"),CraftLiveStatusKind.AddonAbsent=>localization.Get("CraftLiveUi.Absent"),CraftLiveStatusKind.NotReady=>localization.Get("CraftLiveUi.NotReady"),CraftLiveStatusKind.Error=>localization.Get("CraftLiveUi.Error"),_=>localization.Get("CraftLiveUi.Partial")});
         if(developerMode && state.Error is { } error)ImGui.TextWrapped(RawMessage(error));

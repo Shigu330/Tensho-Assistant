@@ -3030,9 +3030,9 @@
   },
   "CraftLiveUi": {
     "Follow": "Suivre pendant une synthèse la séquence choisie",
-    "FollowTip": "Dans la fenêtre à côté de la synthèse, affiche l'action suivante de la séquence choisie et ses chiffres face à ceux du jeu. Elle ne fait que les afficher : c'est vous qui jouez les actions.\nPar défaut : activé.",
+    "FollowTip": "Une partie de la fenêtre « Comparer les prochains coups » ci-dessus : elle y affiche aussi l'action suivante de la séquence choisie et ses chiffres face à ceux du jeu. Elle ne fait que les afficher : c'est vous qui jouez les actions. Grisé tant que cette fenêtre est coupée.\nPar défaut : activé.",
     "Suggest": "Conseiller un coup pendant une synthèse",
-    "SuggestTip": "Dans la comparaison, conseille un prochain coup calculé d'après l'état en cours de la synthèse. Il ne fait que l'afficher : vous le jouez vous-même.\nPar défaut : activé.",
+    "SuggestTip": "Une partie de la fenêtre « Comparer les prochains coups » ci-dessus : elle y conseille aussi un prochain coup calculé d'après l'état en cours de la synthèse. Elle ne fait que l'afficher : vous le jouez vous-même. Grisé tant que cette fenêtre est coupée.\nPar défaut : activé.",
     "Panel": "Fenêtre « Comparer les prochains coups » à côté de la synthèse",
     "PanelTip": "Pendant une synthèse, affiche la projection de la prochaine action à côté de la fenêtre du jeu. Elle ne fait que lire et afficher ; rien n'est exécuté. Sa croix décoche ce réglage.\nPar défaut : activé.",
     "Title": "Synthèse en cours",

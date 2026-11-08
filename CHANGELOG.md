@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.948.0
+- Plan global, Verify : Réglages de l'artisanat, sur votre signalement (« 3 fois le même réglage ») : ce n'étaient pas trois réglages pareils mais une fenêtre et deux de ses parties, sans que rien ne le montre. « Fenêtre Comparer les prochains coups » reste en tête ; « Conseiller un coup » et « Suivre la séquence choisie » sont maintenant en retrait dessous, grisés quand la fenêtre est coupée, avec des info-bulles qui le disent ; un seul bloc pour la page Paramètres et la page de l'artisanat en direct. Le coup conseillé n'est plus calculé quand la fenêtre est coupée. Non validé en jeu.
+- Tests : CraftLiveGroup948Tests. Verify.ps1 (agent) : 1560/1560, 0 avertissement, 0 erreur ; DLL 0.948.0.0. Non validé en jeu.
+### English
+- Craft settings, after your report (« 3 times the same setting »): they were not three alike settings but one window and two of its parts, with nothing showing it. « Compare the next moves window » stays on top; « Suggest a move » and « Follow the chosen sequence » are now indented under it, greyed while the window is off, with tooltips saying so; one block for the Settings page and the live craft page. The suggested move is no longer worked out while the window is off. Not validated in game.
+
 ## 0.947.0
 - Plan global, Verify : Nettoyage X-76, étape 4 (info-bulles et textes) : un nouveau test vérifie que la ligne « Par défaut » de chacun des 137 réglages oui/non dit la vraie valeur par défaut, en anglais et en français (elles sont toutes justes ; le test empêche une erreur à l'avenir). Anglais et français : 6 900 textes chacun, aucun manquant ; allemand et japonais : 35 textes traduits, le reste s'affiche en anglais (signalé, comme prévu). L'aide et le guide seront relus contre les pages finales avec les documents (X-91). Non validé en jeu.
 - Tests : DefaultLines947Tests. Verify.ps1 (agent) : 1559/1559, 0 avertissement, 0 erreur ; DLL 0.947.0.0. Non validé en jeu.

@@ -25,7 +25,7 @@ internal sealed partial class MainWindow
     private bool suggestLoading;
     private void UpdateCraftSuggestion(CraftProjectionResult result,string forbidden)
     {
-        if(!configuration.CraftLiveSuggest || result.Suggest is not { } input || windowDisposed)
+        if(!configuration.CraftLivePanel || !configuration.CraftLiveSuggest || result.Suggest is not { } input || windowDisposed)
         {
             lock(suggestGate){suggestCancel?.Cancel();suggestCancel?.Dispose();suggestCancel=null;suggestKey="";suggestion=null;suggestLoading=false;}
             return;

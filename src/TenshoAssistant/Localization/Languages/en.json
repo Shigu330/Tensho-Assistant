@@ -3030,9 +3030,9 @@
   },
   "CraftLiveUi": {
     "Follow": "Follow during a synthesis the sequence you chose",
-    "FollowTip": "In the window beside the synthesis, shows the next action of the chosen sequence and its numbers against the game's. It only shows them: you play the actions yourself.\nDefault: on.",
+    "FollowTip": "A part of the « Compare the next moves » window above: it also shows the next action of the chosen sequence and its numbers against the game's. It only shows them: you play the actions yourself. Greyed while that window is off.\nDefault: on.",
     "Suggest": "Suggest a move during a synthesis",
-    "SuggestTip": "In the comparison, suggests a next move worked out from the current state of the synthesis. It only shows it: you play it yourself.\nDefault: on.",
+    "SuggestTip": "A part of the « Compare the next moves » window above: it also suggests a next move worked out from the current state of the synthesis. It only shows it: you play it yourself. Greyed while that window is off.\nDefault: on.",
     "Panel": "« Compare next actions » window beside the synthesis",
     "PanelTip": "While you craft, shows the next-action projection beside the game's Synthesis window. It only reads and shows; nothing is executed. Its cross turns this setting off.\nDefault: on.",
     "Title": "Current synthesis",

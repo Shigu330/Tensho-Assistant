@@ -157,9 +157,7 @@ internal sealed partial class MainWindow
             var search=CraftSearchOptions;var searchDefaults=DefaultConfiguration.CraftSearch;
             // A-03 (0.465, DEC-028): the optional Raphael solver.
             // 0.468 (user request, in-game campaign): the projection window beside the synthesis, also here.
-            BoolSetting("CraftLiveUi.Panel","CraftLiveUi.PanelTip",()=>configuration.CraftLivePanel,value=>{configuration.CraftLivePanel=value;craftLive.SetEnabled(CraftLiveWanted(configuration));},c=>c.CraftLivePanel);
-            BoolSetting("CraftLiveUi.Suggest","CraftLiveUi.SuggestTip",()=>configuration.CraftLiveSuggest,value=>configuration.CraftLiveSuggest=value,c=>c.CraftLiveSuggest);
-            BoolSetting("CraftLiveUi.Follow","CraftLiveUi.FollowTip",()=>configuration.CraftLiveFollow,value=>configuration.CraftLiveFollow=value,c=>c.CraftLiveFollow);
+            DrawCraftLiveSettings();
             BoolSetting("CraftSearch.SettingRaphael","CraftSearch.SolverRaphaelTip",()=>search.Raphael,value=>search.Raphael=value,c=>c.CraftSearch?.Raphael==true);
             IntSetting("ModuleSettings.Steps","SettingTips.Steps",()=>search.Steps,value=>search.Steps=value,1,100,searchDefaults.Steps);
             IntSetting("ModuleSettings.Width","SettingTips.Width",()=>search.Width,value=>search.Width=value,1,512,searchDefaults.Width);
