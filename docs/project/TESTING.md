@@ -1476,6 +1476,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.917) Page Pêche en mer : une ligne d'état par port (« pas encore vérifié » tant que vous n'avez pas embarqué). À bord : l'aide à la pêche ordinaire ne s'ouvre pas, le panneau de voyage oui ; dalamud.log contient « Ocean schedule sighting ». Après un voyage de chaque port : l'état change.
 
+- [ ] (0.918) En pêche en mer : le panneau de voyage montre les icônes, l'appât en main encadré en vert, la touche en couleur, le temps de touche et le chronomètre ; « Poissons du courant spectral » en vert, à ouvrir.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

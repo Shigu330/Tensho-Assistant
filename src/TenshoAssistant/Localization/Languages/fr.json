@@ -6313,6 +6313,9 @@
     "Fish": "Poisson",
     "Bait": "Appât",
     "Bite": "Touche",
+    "BiteTime": "Temps de touche",
+    "SpectralFish": "Poissons du courant spectral ({0})",
+    "SpectralFishTip": "Poissons pêchés seulement pendant le courant spectral (le second lieu de pêche de cet endroit dans les données du jeu). Ouvrez pour voir leurs appâts et touches.",
     "Mission": "{0} : {1} / {2}",
     "Points": "Points : {0} · poissons pris : {1}",
     "Credit": "Données du jeu ; appâts et touches : GatherBuddy (Apache-2.0), « ? » si inconnus."

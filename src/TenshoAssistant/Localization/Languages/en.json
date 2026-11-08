@@ -6313,6 +6313,9 @@
     "Fish": "Fish",
     "Bait": "Bait",
     "Bite": "Bite",
+    "BiteTime": "Bite time",
+    "SpectralFish": "Spectral current fish ({0})",
+    "SpectralFishTip": "Fish only caught while the spectral current is there (the game's second spot of this place). Open to see their baits and bites.",
     "Mission": "{0}: {1} / {2}",
     "Points": "Points: {0} · fish caught: {1}",
     "Credit": "Game data; baits and bites: GatherBuddy (Apache-2.0), « ? » when unknown."

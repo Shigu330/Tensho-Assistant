@@ -56,6 +56,67 @@ internal sealed partial class MainWindow
             slot,slot%Math.Max(1,timetable.Count),port,route,state.Sightings,state.Candidates.Count,state.Check,string.Join(", ",state.Candidates.Take(24)));
     }
 
+    // X-85 V2 (0.918): stopwatch of the voyage panel (started when a cast starts, as the usual fishing help, which is off at sea).
+    private DateTimeOffset? oceanFishingSince;private bool oceanFishingBefore;
+
+    /// <summary>
+    /// X-85 V2 (0.918): the fish of one ocean spot as in the usual fishing help: icon and stock, bait route with icons (green frame on the bait in
+    /// hand, mooches), bite and hookset in colour, bite time of that spot (Teamcraft) against the stopwatch. Baits and bites: GatherBuddy.
+    /// </summary>
+    private void DrawOceanFishTable(string id,IReadOnlyList<uint> fishList,uint spotId,uint? inHand,int? elapsed)
+    {
+        if(fishList.Count==0 || !ImGui.BeginTable(id,4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingFixedFit|ImGuiTableFlags.BordersInnerV))return;
+        try
+        {
+            var items=itemCatalog.State.Catalog;var bites=biteTimes?.Get(spotId);
+            ImGui.TableSetupColumn(localization.Get("OceanVoyage.Fish"));ImGui.TableSetupColumn(localization.Get("OceanVoyage.Bait"));
+            ImGui.TableSetupColumn(localization.Get("OceanVoyage.Bite"));ImGui.TableSetupColumn(localization.Get("OceanVoyage.BiteTime"));
+            ImGui.TableHeadersRow();
+            foreach(var fishId in fishList)
+            {
+                var row=FishRow(fishId,spotId);var fish=items?.Find(fishId);
+                ImGui.PushID((int)fishId);
+                try
+                {
+                    ImGui.TableNextRow();ImGui.TableNextColumn();
+                    var stock=GetRecipeHoldings(fishId);
+                    ItemCell(fish,fishId,22,$"{fish?.Name ?? fishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
+                    ImGui.TableNextColumn();
+                    for(var step=0;step<row.Route.Count;step++)
+                    {
+                        if(step>0){ImGui.SameLine(0,2);ImGui.TextDisabled("›");ImGui.SameLine(0,2);}
+                        var bait=items?.Find(row.Route[step]);
+                        DrawItemIcon(bait,new Vector2(22));
+                        if(step==0 && inHand==row.Route[0])
+                            ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin()-new Vector2(1),ImGui.GetItemRectMax()+new Vector2(1),ImGui.GetColorU32(Success),3,ImDrawFlags.None,2);
+                        if(ImGui.IsItemHovered())WrappedTooltip((bait?.Name ?? row.Route[step].ToString())+(step==0 ? "":"\n"+localization.Get("FishingSources.Mooch")));
+                    }
+                    if(row.Route.Count==0)ImGui.TextDisabled("?");
+                    ImGui.TableNextColumn();
+                    var bite=(row.Bite is "Weak" or "Strong" or "Legendary") ? row.Bite:null;var hook=(row.HookSet is "Precise" or "Powerful") ? row.HookSet:null;
+                    if(bite is not null || hook is not null)
+                    {
+                        var colour=bite switch{"Weak"=>Success,"Strong"=>Warning,"Legendary"=>Error,_=>Muted};
+                        ImGui.TextColored(colour,(bite switch{"Weak"=>"!","Strong"=>"!!","Legendary"=>"!!!",_=>"?"})+(hook is not null ? " "+localization.Get("FishingPanel.HookShort"+hook):""));
+                        TipText(localization.Get(bite is not null ? "FishingPanel.Bite"+bite:"FishingPanel.BiteUnknown")+(hook is not null ? " · "+localization.Get("FishingPanel.Hook"+hook):""));
+                    }
+                    else ImGui.TextDisabled("?");
+                    ImGui.TableNextColumn();
+                    if(bites?.Times?.GetValueOrDefault(fishId) is { } time)
+                    {
+                        var inside=elapsed is { } spent && spent>=time.Minimum && spent<=time.Maximum;
+                        var text=localization.Format("FishingPanel.BiteShort",time.Minimum,time.Maximum,time.Usual);
+                        if(inside)ImGui.TextColored(Success,text);else ImGui.TextUnformatted(text);
+                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FishingPanel.BiteTime",time.Minimum,time.Maximum,time.Usual)+"\n"+localization.Format("FishingPanel.BiteTimeHelp",time.Reports));
+                    }
+                    else ImGui.TextDisabled(bites is { Loading:true } ? "…":"—");
+                }
+                finally{ImGui.PopID();}
+            }
+        }
+        finally{ImGui.EndTable();}
+    }
+
     internal void DrawOceanVoyagePanel()
     {
         if(OceanVoyage?.Frame is { } aboard)CheckOceanSchedule(aboard);
@@ -67,25 +128,46 @@ internal sealed partial class MainWindow
             if(stop.Spectral)ImGui.TextColored(UI.FfxivTheme.Success,localization.Get("OceanVoyage.Spectral"));
             if(stop.NextSpot is { } next)ImGui.TextDisabled(localization.Format("OceanVoyage.Next",next.Place,localization.Get("OceanFishing.Time"+stop.NextTime)));
             gatherBuddyFish?.Request();
-            var guide=gatherBuddyFish?.State.Data;var items=itemCatalog.State.Catalog;
-            if(stop.Fish.Count>0 && ImGui.BeginTable("OceanVoyageFish",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingFixedFit))
+            RefreshRecipeHoldingsCache();
+            // X-85 V2 (0.918): stopwatch of the cast, intuition and bait in hand, as the usual fishing help.
+            var fishingState=fishingNow?.Invoke()?.Fishing==true;
+            if(fishingState && !oceanFishingBefore)oceanFishingSince=DateTimeOffset.UtcNow;
+            if(!fishingState)oceanFishingSince=null;
+            oceanFishingBefore=fishingState;
+            var elapsed=oceanFishingSince is { } since ? (int)(DateTimeOffset.UtcNow-since).TotalSeconds:(int?)null;
+            if(elapsed is { } seconds)
             {
-                try
+                ImGui.TextColored(Accent,localization.Format("FishingPanel.Elapsed",seconds));
+                ImGui.SameLine();
+                if(ImGui.SmallButton(localization.Get("FishingPanel.Restart")+"##OceanRestart"))oceanFishingSince=DateTimeOffset.UtcNow;
+                Tip("FishingPanel.RestartHelp");
+            }
+            if(FishingIntuitionLeft?.Invoke() is { } intuitionLeft)
+                ImGui.TextColored(Accent,localization.Format("FishingPanel.IntuitionLeft",(int)intuitionLeft/60,(int)intuitionLeft%60));
+            var items=itemCatalog.State.Catalog;
+            var inHand=FishingBait?.Invoke() is > 0 and var baitId ? baitId:(uint?)null;
+            var spotId=stop.Spectral ? stop.Spot.SpectralSpot:stop.Spot.MainSpot;
+            if(inHand is { } held)
+            {
+                var baitItem=items?.Find(held);var baitStock=GetRecipeHoldings(held);
+                ImGui.TextDisabled(localization.Get("FishingPanel.BaitInHand"));ImGui.SameLine();
+                ItemCell(baitItem,held,20,$"{baitItem?.Name ?? held.ToString()}{(baitStock.HasObservation ? $" ×{baitStock.Total:N0}":"")}");
+                ImGui.SameLine();
+                ImGui.TextColored(Success,localization.Format("FishingPanel.BaitMatches",stop.Fish.Count(fish=>FishRow(fish,spotId).Route is [var first,..] && first==held)));
+            }
+            DrawOceanFishTable("OceanVoyageFish",stop.Fish,spotId,inHand,elapsed);
+            // The spectral current's fish, highlighted, folded while the current is not there (they are never in the usual spot: IKDSpot.SpotSub).
+            if(!stop.Spectral && stop.Spot.SpectralSpot!=0 && data.SpotFish.GetValueOrDefault(stop.Spot.SpectralSpot) is { Count:>0 } spectralFish)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text,Success);
+                var open=ImGui.TreeNode(localization.Format("OceanVoyage.SpectralFish",spectralFish.Count)+"##OceanSpectralFish");
+                ImGui.PopStyleColor();
+                Tip("OceanVoyage.SpectralFishTip");
+                if(open)
                 {
-                    ImGui.TableSetupColumn(localization.Get("OceanVoyage.Fish"));ImGui.TableSetupColumn(localization.Get("OceanVoyage.Bait"));ImGui.TableSetupColumn(localization.Get("OceanVoyage.Bite"));
-                    ImGui.TableHeadersRow();
-                    foreach(var fish in stop.Fish)
-                    {
-                        ImGui.TableNextRow();ImGui.TableNextColumn();
-                        ImGui.TextUnformatted(items?.Find(fish)?.Name ?? $"ID {fish}");
-                        ImGui.TableNextColumn();
-                        var route=guide?.Route(fish) ?? [];
-                        ImGui.TextUnformatted(route.Count>0 ? string.Join(" › ",route.Select(step=>items?.Find(step)?.Name ?? $"ID {step}")):"?");
-                        ImGui.TableNextColumn();
-                        ImGui.TextUnformatted(guide?.Find(fish)?.Bite switch{"Weak"=>"!","Strong"=>"!!","Legendary"=>"!!!",_=>"?"});
-                    }
+                    try{DrawOceanFishTable("OceanSpectralFish",spectralFish,stop.Spot.SpectralSpot,inHand,null);}
+                    finally{ImGui.TreePop();}
                 }
-                finally{ImGui.EndTable();}
             }
             var missions=OceanVoyages.Missions(data,frame);
             if(missions.Count>0)
@@ -96,7 +178,8 @@ internal sealed partial class MainWindow
             }
             ImGui.Separator();
             ImGui.TextUnformatted(localization.Format("OceanVoyage.Points",frame.Points.ToString("N0"),frame.Caught));
-            ImGui.TextDisabled(localization.Get("OceanVoyage.Credit"));
+            ImGui.TextDisabled(localization.Get("FishingPanel.SourcesShort"));
+            Tip("OceanVoyage.Credit");
         });
     }
 }
