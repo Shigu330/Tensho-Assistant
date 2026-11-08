@@ -64,7 +64,7 @@ public sealed class CharacterStatusWatcher : IDisposable
             var done=new Dictionary<string,DateTimeOffset>(status.Done ?? []);
             if(at is { } when)done[key]=when;else done.Remove(key);
             statuses[current]=status with{Done=done};
-            WriteLocked(current);
+            QueueWrite(current);
             return true;
         }
     }
@@ -115,7 +115,8 @@ public sealed class CharacterStatusWatcher : IDisposable
                 statuses[id]=merged;
                 if(changed || now>=nextSave)
                 {
-                    if(WriteLocked(id) && migrated){configuration.ReminderDone=null;saveConfiguration();}
+                    if(migrated){if(WriteLocked(id)){configuration.ReminderDone=null;saveConfiguration();}}
+                    else QueueWrite(id);
                     nextSave=now.AddMinutes(10);
                 }
             }
@@ -127,6 +128,14 @@ public sealed class CharacterStatusWatcher : IDisposable
             if(!warned){warned=true;log.Warning(error,"The character status could not be read.");}
         }
     }
+
+    /// <summary>X-76 H10 (0.925): a copy of the character's status written off the framework thread (and off the window's drawing).</summary>
+    private void QueueWrite(ulong id)
+    {
+        var copy=statuses[id];
+        (writer??=new((error,message)=>log.Warning(error,message))).Enqueue("A character file could not be saved.",()=>CharacterStatuses.Write(folder,copy));
+    }
+    private BackgroundWriter? writer;
 
     private bool WriteLocked(ulong id)
     {
@@ -148,6 +157,7 @@ public sealed class CharacterStatusWatcher : IDisposable
         if(disposed)return;
         disposed=true;
         TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
+        writer?.Flush(TimeSpan.FromSeconds(3));
         lock(gate){if(current!=0 && !unreadable.Contains(current) && statuses.ContainsKey(current))WriteLocked(current);}
     }
 }

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.925.0
+- Plan global, Verify : Nettoyage X-76, harmonisation H10 (fin, écritures) : le journal des gils (chaque minute), l'état du personnage (toutes les dix minutes et à chaque case « fait » cochée dans la fenêtre) et l'historique des voyages (à chaque lecture de l'atelier) ne s'écrivent plus sur le fil du jeu ni pendant le dessin de la fenêtre : une copie est écrite à côté, dans l'ordre, et un échec est noté au journal. La seule écriture qui a besoin du résultat (déplacement unique des anciennes cases partagées) reste immédiate ; à la fermeture du plugin, Tensho attend la fin des écritures (trois secondes au plus). Reste une décision pour vous (DEC-038). Rien de visible en jeu, sinon moins d'à-coups possibles. Non validé en jeu.
+- Tests : BackgroundWriter925Tests. Verify.ps1 (agent) : 1538/1538, 0 avertissement, 0 erreur ; DLL 0.925.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, harmonisation H10 (end, writes): the gil journal (every minute), the character status (every ten minutes and at each « done » box ticked in the window) and the voyage history (at each workshop read) are no longer written on the game's thread or while the window draws: a copy is written aside, in order, and a failure is logged. The only write that needs its result (the one-time move of the old shared boxes) stays immediate; when the plugin closes, Tensho waits for the writes (three seconds at most). One decision left for you (DEC-038). Nothing visible in game, apart from fewer possible hitches. Not validated in game.
+
 ## 0.924.0
 - Plan global, Verify : Nettoyage X-76, harmonisation H10 (deuxième partie, abonnements) : les cinq lecteurs qui s'abonnent à plusieurs événements du jeu (collections, liens de carte du chat, menu des objets, découvertes, capture du mode développeur) passent par un seul composant : si un abonnement échoue en route, ceux déjà faits sont défaits, et la fermeture les retire dans l'ordre inverse. Un recomptage n'a trouvé aucun lecteur qui oublie de se désabonner. Rien de visible en jeu. Non validé en jeu.
 - Tests : Registrations924Tests. Verify.ps1 (agent) : 1537/1537, 0 avertissement, 0 erreur ; DLL 0.924.0.0. Non validé en jeu.

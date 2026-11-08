@@ -1490,6 +1490,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.924) Rien de visible ; recharger le plugin ne laisse pas d'erreur dans dalamud.log.
 
+- [ ] (0.925) Rien de visible : journal des gils, cases « fait » et historique des voyages enregistrés comme avant (vérifier après un rechargement).
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

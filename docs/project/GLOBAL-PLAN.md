@@ -262,7 +262,7 @@ et plus, en prévision de futurs outils »).
 
 **Avancement 2b et 2c :** plan rendu par un workflow (`docs/evidence/x76-2bc-plan.md`) : harmonisation H1 info-bulles (0.913), H2 couleurs du thème (thèmes clairs, 0.912),
 H3 enregistrement des réglages et retour arrière, H4 curseurs enregistrés au relâchement (0.914), H5 composants de réglage, H6 ligne « Par défaut » (0.915), H7 états des pages (0.920),
-H8 affichage des objets (0.921), H9 journaux (0.922), H10 fichiers et abonnements ; parseurs P1 HQ des remises, P2 attribution des gains, P3 libellé de chaque sorte (0.911),
+H8 affichage des objets (0.921), H9 journaux (0.922), H10 fichiers et abonnements (0.923–0.925 ; reste la décision DEC-038 sur UndercutWatcher, à soumettre) ; parseurs P1 HQ des remises, P2 attribution des gains, P3 libellé de chaque sorte (0.911),
 P4 état « débloqué » des objets, P5 feuilles du jeu à la place de données communautaires, P6 Intuition et prédateurs, P7 secteurs des sous-marins,
 P8 compteurs pour des taux, P9 données lues mais jetées, P10 récompenses de fin de mission ; étapes ajoutées E1 format du fichier des découvertes figé (0.916, DEC-042)
 avant la 1.0.0, E2 test des règles d'interface, E3 test des preuves citées, E4 aide « une fois par événement », E5 tenue face à une grosse masse de données (X-93, essai de charge d'abord). Vérification des données déjà relevées

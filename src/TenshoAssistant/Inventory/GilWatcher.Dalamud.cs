@@ -146,8 +146,10 @@ public sealed unsafe class GilWatcher : IDisposable
     {
         nextSave=now.AddMinutes(1);
         if(!dirty || character==0 || loadFailed)return;
-        try{GilJournal.Write(Path.Combine(folder,FileName(character)),GilJournal.Prune(entries,now));dirty=false;}
-        catch(Exception error){log.Warning(error,"Gil journal could not be saved.");}
+        // X-76 H10 (0.925): a copy is written off the framework thread.
+        var path=Path.Combine(folder,FileName(character));var copy=GilJournal.Prune(entries,now).ToArray();
+        (writer??=new((error,message)=>log.Warning(error,message))).Enqueue("Gil journal could not be saved.",()=>GilJournal.Write(path,copy));
+        dirty=false;
     }
 
     public void Dispose()
@@ -156,5 +158,7 @@ public sealed unsafe class GilWatcher : IDisposable
         disposed=true;
         TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         Save(DateTimeOffset.UtcNow);
+        if(writer?.Flush(TimeSpan.FromSeconds(3))==false)log.Warning("Gil journal: the last write did not finish before the plugin closed.");
     }
+    private BackgroundWriter? writer;
 }
