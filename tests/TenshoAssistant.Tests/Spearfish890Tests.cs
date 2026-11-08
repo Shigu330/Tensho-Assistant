@@ -28,6 +28,7 @@ internal static class Spearfish890Tests
             Check(panel.Contains("for(var index=0;index<3;index++)") && panel.Contains("var listed=ofPoint ? rows:rows.Where(row=>row.Seen || row.InSight).ToArray();"),"fixed layout");
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/SpearfishingReader.Dalamud.cs"));
             Check(reader.Contains("if(lastPoint==0 && point() is var target and not 0)"),"node kept");
+            Check(panel.Contains("DrawItemIcon(items?.Find(row.Fish),new Vector2(side));") && panel.Contains("DrawItemIcon(items?.Find(match.Fish),new Vector2(ImGui.GetTextLineHeight()));"),"icons");
         }),
     ];
 }

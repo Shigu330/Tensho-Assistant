@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.893.0
+- Plan global, Verify : Demande de l'utilisateur (X-79) : l'aide au harpon montre l'icône de chaque poisson pour aider visuellement. Chaque poisson de la liste a son icône (survol : la fiche de l'objet), avec un cadre en couleur quand son ombre est en vue ; chaque ligne d'emplacement montre les icônes des poissons de la liste qui ont cette ombre (quatre au plus). La mise en page reste fixe. Non validé en jeu.
+- Tests : Spearfish890Tests. Verify.ps1 (agent) : 1477/1477, 0 avertissement, 0 erreur ; DLL 0.893.0.0. Non validé en jeu.
+### English
+- User's request (X-79): the spearfishing help shows each fish's icon to help the eye. Each fish of the list has its icon (hover: the item's card), framed in the accent colour when its shadow is in sight; each slot line shows the icons of the list's fish with that shadow (four at most). The layout stays fixed. Not validated in game.
+
 ## 0.892.0
 - Plan global, Verify : Retour de l'utilisateur sur la 0.891 (capture) : le panneau de harpon affichait toute la zone (le point visé n'était pas reconnu) et la liste bougeait sans cesse. Corrections (X-79) : mise en page fixe, trois lignes d'emplacement toujours présentes (« — » quand vide), lignes de la liste qui gardent leur place et leur largeur, seuls la couleur et la marque « » » changent pour les poissons en vue ; le point est pris à l'ouverture de la fenêtre (la cible, sinon le point de récolte le plus proche à moins de 12 yalms) et gardé, écrit une fois dans le journal ; sans point connu, la liste de zone ne garde que vos prises et les poissons en vue. Le mode développeur montre le numéro du point et le nombre de poissons. Non validé en jeu.
 - Tests : Spearfish890Tests. Verify.ps1 (agent) : 1477/1477, 0 avertissement, 0 erreur ; DLL 0.892.0.0. Non validé en jeu.

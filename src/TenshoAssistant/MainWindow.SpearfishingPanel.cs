@@ -8,7 +8,7 @@ namespace TenshoAssistant;
 /// R-15 (0.417): while the game's spearfishing window is open (setting FishingPanel, as the fishing help), a panel beside it.
 /// X-79 (0.891, user request: « the list should stay all the time and highlight the right size », the old one vanished with the fish): the fish in sight (size,
 /// speed), then every fish of the node (else of the zone) always listed in a fixed order, each with its shadow (yours first, else GatherBuddy's), the ones
-/// whose shadow is in sight highlighted. 0.892: a fixed layout (three slot lines, rows that keep their place and width), the node found when the window opens.
+/// whose shadow is in sight highlighted. 0.893: the fish's icons (list and slot lines). 0.892: a fixed layout (three slot lines, rows that keep their place and width), the node found when the window opens.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -63,19 +63,31 @@ internal sealed partial class MainWindow
                 if(frame.Slots.FirstOrDefault(slot=>slot.Index==index && slot.Available) is not { } slot){ImGui.TextDisabled(localization.Format("Spearfishing.SlotEmpty",index+1));continue;}
                 ImGui.TextColored(Accent,localization.Format("Spearfishing.SlotShadow",index+1,SpearShadowText(slot.Size,slot.Speed))
                     +(slot.Large ? " · "+localization.Get("Spearfishing.GuaranteedLarge"):""));
+                // 0.893 (user request: the fish's icon, to help the eye): the icons of the fish of the list with this shadow, four at most, at text height.
+                foreach(var match in rows.Where(row=>row.Size==slot.Size && row.Speed==slot.Speed).Take(4))
+                {
+                    ImGui.SameLine();
+                    DrawItemIcon(items?.Find(match.Fish),new Vector2(ImGui.GetTextLineHeight()));
+                }
             }
             ImGui.Separator();
             // Without a node, the zone's list would be too long: only the fish you speared there and those whose shadow is in sight.
             var listed=ofPoint ? rows:rows.Where(row=>row.Seen || row.InSight).ToArray();
             ImGui.TextUnformatted(localization.Get(ofPoint ? "Spearfishing.PointFish":"Spearfishing.ZoneFish"));
             if(listed.Count==0)ImGui.TextDisabled(localization.Get("Spearfishing.NoList"));
+            // 0.893 (user request): each fish with its icon; a fish in sight gets a frame around its icon and the accent colour (same height and width either way).
+            var side=ImGui.GetTextLineHeight()*1.6f;
             foreach(var row in listed)
             {
                 var text=(items?.Find(row.Fish)?.Name ?? $"ID {row.Fish}")+" — "+(row.Size is { } size && row.Speed is { } speed ? SpearShadowText(size,speed):"?")
                     +(row.Seen ? " · "+localization.Get("Spearfishing.Seen"):"");
-                if(row.InSight)ImGui.TextColored(Accent,"» "+text);
-                else if(row.Size is null)ImGui.TextDisabled("   "+text);
-                else ImGui.TextColored(Muted,"   "+text);
+                DrawItemIcon(items?.Find(row.Fish),new Vector2(side));
+                if(row.InSight)ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin()-new Vector2(1),ImGui.GetItemRectMax()+new Vector2(1),ImGui.GetColorU32(Accent),3,ImDrawFlags.None,2);
+                ImGui.SameLine();
+                ImGui.SetCursorPosY(ImGui.GetCursorPosY()+(side-ImGui.GetTextLineHeight())/2);
+                if(row.InSight)ImGui.TextColored(Accent,text);
+                else if(row.Size is null)ImGui.TextDisabled(text);
+                else ImGui.TextColored(Muted,text);
             }
             if(developerMode)ImGui.TextDisabled($"node {frame.PointId} · {fishHere.Length} fish · slots "+string.Join(" ",frame.Slots.Select(slot=>$"{(slot.Available ? 1:0)}/{slot.Size}/{slot.Speed}")));
             if(data is null)ImGui.TextDisabled(localization.Get("Spearfishing.NoData"));
