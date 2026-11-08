@@ -156,14 +156,14 @@ internal sealed partial class MainWindow
                 if(AchievementNamed(line) is { } named)
                     Add(SourceGroup.Achievements,localization.Format("SourceLinks.Achievement",named.Name),()=>OpenAchievement(named));
             // Duties from LuminaSupplemental (ContentFinderCondition id = DutyId, 0.188), then those named by Garland (« instance », 0.181).
-            // X-75.2 (0.875): duties whose chests you saw give it come first.
+            // X-75.2 (0.875): duties whose chests were seen in game giving it (yours or shared) come first.
             var dutyList=(Seen()?.DutiesByItem.GetValueOrDefault(item.Id) ?? []).Concat(LuminaDutiesOf(item.Id)).Distinct().Take(4).Select(id=>duties.State.Catalog?.Find(id))
                 .Concat((Garland(item.Id)?.List?.Sources ?? []).Where(source=>source.Type=="instance").Take(4)
                     .Select(source=>duties.State.Catalog?.Entries.FirstOrDefault(duty=>duty.InstanceId==source.Id)));
             foreach(var duty in dutyList)
                 if(duty is { } lootDuty)
                     Add(SourceGroup.Duties,localization.Format("SourceLinks.Duty",lootDuty.Name),()=>{dutyLoot.Select(lootDuty);showDutyDetails=true;dutyItemQuery="";page=Page.DutyLoot;});
-            // X-75.2 (0.875): the items you saw it come from (desynthesis, opened), before LuminaSupplemental's.
+            // X-75.2 (0.875): the items it was seen in game coming from (yours or shared: desynthesis, opened), before LuminaSupplemental's.
             foreach(var source in (Seen()?.SourcesByItem.GetValueOrDefault(item.Id) ?? []).Take(4))
             {
                 var name=itemCatalog.State.Catalog?.Find(source)?.Name ?? source.ToString();

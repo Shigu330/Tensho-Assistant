@@ -32,9 +32,9 @@ Found by four read-only agents (one theme each: places and times, Draw caches, g
 | 25 | "H h mm" duration hard-coded 4 times on the airship and submarine pages | 4 | low | no | 0.906 |
 | 26 | Reminders.In "in H h mm (date)" line duplicated between Free Company and Reminders | 2 | low | no | 0.906 |
 | 27 | Unused duration formatter CacheAge.Label with a hard-coded French "j" | 1 | low | no | 0.906 |
-| 28 | "Seen by you" labels are shown for imported and community facts (10 keys, one rule missing) | 18 | low | yes | to do |
-| 29 | Most-seen spearfishing shadow of a fish is computed twice | 2 | low | no | to do |
-| 30 | Discovery fact formatting repeated: Seen+Imported sum (10x), level range (2x), Eorzea-hour range (3x) | 13 | low | no | to do |
+| 28 | "Seen by you" labels are shown for imported and community facts (10 keys, one rule missing) | 18 | low | yes | 0.908 |
+| 29 | Most-seen spearfishing shadow of a fish is computed twice | 2 | low | no | 0.908 |
+| 30 | Discovery fact formatting repeated: Seen+Imported sum (10x), level range (2x), Eorzea-hour range (3x) | 13 | low | no | 0.908 |
 | 31 | Tool directory: the same reference strings in four switches, and a French reference « Banque d'objets » | 8 | low | yes | to do |
 | 32 | Crystal classifier keeps French canonical values, mapped back to English keys by two parallel arrays | 7 | low | no | to do |
 | 33 | French storage names still built in BankInventoryBridge while their siblings are English | 3 | low | no | to do |
@@ -71,3 +71,10 @@ Found by four read-only agents (one theme each: places and times, Draw caches, g
 - Two hand-written bounded downloads (retainer prices, community help) now go through `BoundedHttp` (same limits, counted by the self-check, strict
   UTF-8 handled); one Tensho User-Agent; the market board service no longer disposes a client it was given; the map no longer reads AgentMap
   without checking it (two places).
+
+## 0.908 — discoveries (findings 28 to 30)
+
+- The tools read the whole discoveries base, own and imported facts alike (the shared GitHub file), but sixteen labels said « seen by you »: they
+  now say « seen in game » (every fact is an observation in game, the player's or another player's). The Discoveries page keeps its « seen by you » /
+  « imported only » counts, and « nothing seen by you to share » stays (only your own facts are shared).
+- One most-seen spearfishing shadow (`DiscoveryStore.MostSeenSpearShadow`), one « times seen » (`DiscoveryFact.TimesOf`), one level range text.

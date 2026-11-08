@@ -12,7 +12,7 @@ internal sealed partial class MainWindow
     internal BlueSpellWikiIndex? BlueSpellIndex { get; set; }
     private int blueSpellOrder;
     private int? BlueSpellLevel(int number)=>BlueSpellIndex?.Get(number)?.MonsterLevel;
-    // X-75.4 (0.878): the monsters you saw casting the spell (or that you learned it from), with their levels and places, before the wiki's list.
+    // X-75.4 (0.878): the monsters seen in game casting the spell or teaching it (yours or shared), with their levels and places, before the wiki's list.
     private void DrawBlueSpellSeen(uint spellId)
     {
         if(DiscoveryStore is not { } store || !DiscoveriesLoaded)return;

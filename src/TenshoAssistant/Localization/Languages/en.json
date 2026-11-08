@@ -667,7 +667,7 @@
     "FatesTip": "Each FATE running near you: its place, its level, when you first and last saw it, and how many times (once an hour at most).\nDefault: on.",
     "HuntMarkName": "{0} (hunt, rank {1})",
     "FateName": "FATE: {0}",
-    "SeenHere": "Seen by you: {0} ({1}, {2}), lv. {3}",
+    "SeenHere": "Seen in game: {0} ({1}, {2}), lv. {3}",
     "SeenHereTip": "From your discoveries base (World › Discoveries). Right click: the nearest aetheryte with the flag, or the flag alone.",
     "MarketPrices": "Prices seen at the market board",
     "MarketPricesTip": "When you open an item at the market board, its offers and last sales are kept (never a seller's or buyer's name). For your world, Tensho then uses them in place of Universalis' when they are newer; other worlds and items you never opened stay with Universalis.\nDefault: on.",
@@ -1200,8 +1200,8 @@
     "MissingTip": "Keeps only the collection items (mount, minion, card, roll) you do not have yet."
   },
   "ItemUseRefs": {
-    "SeenQuests": "Asked by quests (seen by you: {0})",
-    "SeenGives": "Seen giving ({0}, by you)",
+    "SeenQuests": "Asked by quests (seen in game: {0})",
+    "SeenGives": "Seen giving ({0}, in game)",
     "Currency": "Currency: exchangeable for {0} item(s)",
     "CurrencyHelp": "Game shops taking this item as payment; click an NPC = vendor tool, an item = its sheet.",
     "Gives": "What it gives ({0})",
@@ -1333,7 +1333,7 @@
   },
   "FishingPanel": {
     "SeenShort": "seen",
-    "SeenByYou": "Seen by you (×{0}): {1}",
+    "SeenInGame": "Seen in game (×{0}): {1}",
     "SeenBaits": "bait or mooch {0}",
     "SeenBefore": "after {0}",
     "SeenWeather": "in {0}",
@@ -2705,7 +2705,7 @@
     "RefreshTip": "Reloads the loot from Garland Tools, skipping the kept copy."
   },
   "SourceLinks": {
-    "SeenFromItem": "From {0} (seen by you)",
+    "SeenFromItem": "From {0} (seen in game)",
     "GroupAchievements": "Achievements ({0})",
     "GroupDuties": "Duties ({0})",
     "GroupFromItems": "From other items ({0})",
@@ -3036,7 +3036,7 @@
     "Durability": "Durability: {0} / {1}"
   },
   "DutyUi": {
-    "SeenChest": "Chest (seen by you)",
+    "SeenChest": "Chest (seen in game)",
     "UnlockedBy": "Unlocked by:",
     "Unlocks": "Unlocks: {0}",
     "Title": "Duty loot",
@@ -3099,7 +3099,7 @@
     "Tools": "All tools for this item"
   },
   "HoverUi": {
-    "SeenSource": "Seen by you: {0}",
+    "SeenSource": "Seen in game: {0}",
     "CollectionHowUnknown": "The game data does not say which item teaches it: how to obtain it is unknown to Tensho (quest, achievement, content or shop possible).",
     "Compare": "Compared with your worn gear",
     "CompareWith": "With {0}:",
@@ -3218,7 +3218,7 @@
     "ShowBotanyPointsHelp": "The logging and harvesting points of the map.",
     "ShowFishingPoints": "Fisher",
     "ShowFishingPointsHelp": "The fishing spots and spearfishing points of the map.",
-    "VistaSeen": "Registered by you in {0} at {1} ET.",
+    "VistaSeen": "Registered in game in {0} at {1} ET.",
     "Partplace": "place",
     "ShowIconNames": "Icon names",
     "ShowIconNamesHelp": "Writes the names the game writes beside some icons (aetherytes, important places), on the same side, from the same zoom as the place names. Their size follows the place names' size. Without this box, they stay in the icon's tooltip.\nDefault: on.",
@@ -3618,8 +3618,8 @@
     "BackToItem": "Back to the item search"
   },
   "MonsterUi": {
-    "SeenDrops": "Seen dropping it (by you)",
-    "SeenDropsHelp": "Monsters you defeated just before receiving this item, with where you saw them. Learned in game: World › Discoveries.",
+    "SeenDrops": "Seen dropping it (in game)",
+    "SeenDropsHelp": "Monsters defeated just before this item was received, with where they were seen. Learned in game: World › Discoveries.",
     "Lumina": "Main source · LuminaSupplemental",
     "LuminaHelp": "Monsters dropping this item (LuminaSupplemental, Critical-Impact); places: wiki and Garland below.",
     "Title": "Monster loot",
@@ -5577,7 +5577,7 @@
     "Roulette": "duty roulette"
   },
   "BlueSpellSources": {
-    "Seen": "Seen by you",
+    "Seen": "Seen in game",
     "SeenLine": "{0} (level {1}): seen casting it or taught it",
     "AboveTip": "The Blue Mage job icon above the head of a nearby monster that teaches a spell you lack, in the game's view. Same setting as the map's.",
     "NearbyTip": "Nearby monsters that teach a spell you have not learned, on the Tensho map, according to the wiki pages read below. Same setting as the map's.",
@@ -6264,11 +6264,11 @@
     "SettingTip": "Small on-screen window with the items of your active Tensho alarms (gathering, fishing), soonest first with the time left; click a name: its sheet; « Map »: the game map on the point when known. Hidden with the game’s interface; the cross closes it.\nDefault: off."
   },
   "Spearfishing": {
-    "Legend": "S, M, L: small, average, large shadow. Each > is one speed step (> slowest). Star: guaranteed large. Eye: a shadow you saw. Hover a line for the words.",
-    "ZoneFish": "Node unknown: fish of the zone you speared or in sight",
+    "Legend": "S, M, L: small, average, large shadow. Each > is one speed step (> slowest). Star: guaranteed large. Eye: a shadow seen in game. Hover a line for the words.",
+    "ZoneFish": "Node unknown: fish of the zone seen in game or in sight",
     "NoList": "No spearfishing fish known here.",
     "SizeSpeed": "{0}, speed {1}",
-    "Seen": "seen by you",
+    "Seen": "seen in game",
     "SeenShadow": "spearfishing: {0}",
     "Title": "Spearfishing help",
     "Small": "small",
@@ -6683,7 +6683,7 @@
     "ActionsHint": "Hover a name for the game's description. Those you hold are not read."
   },
   "DeepDungeon": {
-    "SeenLoot": "Seen in the coffers ({0}, by you)",
+    "SeenLoot": "Seen in the coffers ({0}, in game)",
     "Title": "Deep dungeons",
     "Subtitle": "To get ready outside: Tensho pauses inside them, and gives no fight advice.",
     "Loading": "Reading the game data…",
@@ -6952,7 +6952,7 @@
     "WeeklyNone": "No limited tomestone at the moment."
   },
   "Events": {
-    "SeenDays": "Seen running by you from {0} to {1}.",
+    "SeenDays": "Seen running in game from {0} to {1}.",
     "Title": "Events",
     "Description": "The seasonal events running now, as the game announces them, with their quests, what you have already done and the rewards. The game gives no dates: only running events are listed.",
     "Partake": "Player events (partake.gg)",

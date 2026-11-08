@@ -68,6 +68,8 @@ public sealed class DiscoveryFact
     public DateTimeOffset Last { get; set; }
     public string Key=>$"{(int)Kind}:{Subject}:{Detail}:{Territory}:{Map}:{CellX}:{CellZ}";
     public DiscoveryFact Copy()=>(DiscoveryFact)MemberwiseClone();
+    /// <summary>X-76 (0.908): how many times a fact was seen in game, yours and imported together (static: nothing more is written in the files).</summary>
+    public static int TimesOf(DiscoveryFact fact)=>fact.Seen+fact.Imported;
 }
 
 /// <summary>The file: a version, who wrote it, when, and the facts.</summary>
@@ -250,17 +252,21 @@ public sealed class DiscoveryStore
     /// <summary>The facts of a kind whose subject passes the filter, most seen first.</summary>
     public IReadOnlyList<DiscoveryFact> Find(DiscoveryKind kind,Func<uint,bool> subject,int max)
     {
-        lock(gate)return facts.Values.Where(fact=>fact.Kind==kind && subject(fact.Subject)).OrderByDescending(fact=>fact.Seen+fact.Imported).ThenBy(fact=>fact.Subject)
+        lock(gate)return facts.Values.Where(fact=>fact.Kind==kind && subject(fact.Subject)).OrderByDescending(DiscoveryFact.TimesOf).ThenBy(fact=>fact.Subject)
             .Take(max).Select(fact=>fact.Copy()).ToArray();
     }
+
+    /// <summary>X-76 (0.908): the spearfishing shadow (size, speed) seen in game most often for a fish (yours or shared), if any.</summary>
+    public (int Size,int Speed)? MostSeenSpearShadow(uint fish)=>
+        Find(DiscoveryKind.SpearShadow,subject=>subject==fish,8).Select(fact=>((int,int)?)((int)fact.Detail,fact.LevelMin)).FirstOrDefault();
 }
 
 /// <summary>X-72 A (0.854): the places of a monster for the tools: per map, its most seen place; the most seen maps first.</summary>
 public static class SeenPlaces
 {
     public static DiscoveryFact[] ByMap(IEnumerable<DiscoveryFact> facts,int maps)=>
-        facts.GroupBy(fact=>fact.Map).Select(group=>group.OrderByDescending(fact=>fact.Seen+fact.Imported).First())
-            .OrderByDescending(fact=>fact.Seen+fact.Imported).Take(maps).ToArray();
+        facts.GroupBy(fact=>fact.Map).Select(group=>group.OrderByDescending(DiscoveryFact.TimesOf).First())
+            .OrderByDescending(DiscoveryFact.TimesOf).Take(maps).ToArray();
 }
 
 /// <summary>X-43 (0.807): the files: the base, the exports (a dated copy) and the imports (every .json of the import folder, read once, then renamed).</summary>

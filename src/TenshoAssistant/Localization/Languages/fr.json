@@ -667,7 +667,7 @@
     "FatesTip": "Chaque ALÉA en cours près de vous : son lieu, son niveau, quand vous l'avez vue la première et la dernière fois, et combien de fois (une fois par heure au plus).\nPar défaut : activé.",
     "HuntMarkName": "{0} (chasse, rang {1})",
     "FateName": "ALÉA : {0}",
-    "SeenHere": "Vu par vous : {0} ({1}, {2}), niv. {3}",
+    "SeenHere": "Vu en jeu : {0} ({1}, {2}), niv. {3}",
     "SeenHereTip": "D'après votre base de découvertes (Monde › Découvertes). Clic droit : l'éthérite la plus proche avec le drapeau, ou le drapeau seul.",
     "MarketPrices": "Prix vus au tableau des ventes",
     "MarketPricesTip": "Quand vous ouvrez un objet au tableau des ventes, ses offres et ses dernières ventes sont gardées (jamais le nom d'un vendeur ni d'un acheteur). Pour votre monde, Tensho les utilise alors à la place de ceux d'Universalis quand elles sont plus récentes ; les autres mondes et les objets jamais ouverts restent sur Universalis.\nPar défaut : activé.",
@@ -1200,8 +1200,8 @@
     "MissingTip": "Ne garde que les objets de collection (monture, mascotte, carte, rouleau) que vous n'avez pas encore."
   },
   "ItemUseRefs": {
-    "SeenQuests": "Demandé par des quêtes (vu par vous : {0})",
-    "SeenGives": "Vu donner ({0}, par vous)",
+    "SeenQuests": "Demandé par des quêtes (vu en jeu : {0})",
+    "SeenGives": "Vu donner ({0}, en jeu)",
     "Currency": "Monnaie : échangeable contre {0} objet(s)",
     "CurrencyHelp": "Boutiques du jeu qui acceptent cet objet comme paiement ; clic sur un PNJ = outil Vendeurs, sur un objet = sa fiche.",
     "Gives": "Ce qu'il donne ({0})",
@@ -1333,7 +1333,7 @@
   },
   "FishingPanel": {
     "SeenShort": "vu",
-    "SeenByYou": "Vu par vous (×{0}) : {1}",
+    "SeenInGame": "Vu en jeu (×{0}) : {1}",
     "SeenBaits": "appât ou mooch {0}",
     "SeenBefore": "après {0}",
     "SeenWeather": "par {0}",
@@ -2705,7 +2705,7 @@
     "RefreshTip": "Recharge le butin depuis Garland Tools, sans passer par la copie gardée."
   },
   "SourceLinks": {
-    "SeenFromItem": "De {0} (vu par vous)",
+    "SeenFromItem": "De {0} (vu en jeu)",
     "GroupAchievements": "Hauts faits ({0})",
     "GroupDuties": "Contenus ({0})",
     "GroupFromItems": "À partir d'autres objets ({0})",
@@ -3036,7 +3036,7 @@
     "Durability": "Solidité : {0} / {1}"
   },
   "DutyUi": {
-    "SeenChest": "Coffre (vu par vous)",
+    "SeenChest": "Coffre (vu en jeu)",
     "UnlockedBy": "Débloqué par :",
     "Unlocks": "Débloque : {0}",
     "Title": "Butin des contenus",
@@ -3099,7 +3099,7 @@
     "Tools": "Tous les outils avec cet objet"
   },
   "HoverUi": {
-    "SeenSource": "Vu par vous : {0}",
+    "SeenSource": "Vu en jeu : {0}",
     "CollectionHowUnknown": "Les données du jeu ne disent pas quel objet l'apprend : obtention inconnue dans Tensho (quête, succès, contenu ou boutique possibles).",
     "Compare": "Comparé à l'équipement porté",
     "CompareWith": "Avec {0} :",
@@ -3218,7 +3218,7 @@
     "ShowBotanyPointsHelp": "Les points de coupe et de fauche de la carte.",
     "ShowFishingPoints": "Pêcheur",
     "ShowFishingPointsHelp": "Les trous de pêche et les points de harpon de la carte.",
-    "VistaSeen": "Inscrit par vous par {0} à {1} ET.",
+    "VistaSeen": "Inscrit en jeu par {0} à {1} ET.",
     "Partplace": "lieu",
     "ShowIconNames": "Noms des icônes",
     "ShowIconNamesHelp": "Écrit les noms que le jeu écrit à côté de certaines icônes (éthérites, lieux importants), du même côté, à partir du même zoom que les noms de lieux. Leur taille suit celle des noms de lieux. Sans cette case, ils restent dans l'infobulle de l'icône.\nPar défaut : activé.",
@@ -3618,8 +3618,8 @@
     "BackToItem": "Retour à la recherche par objet"
   },
   "MonsterUi": {
-    "SeenDrops": "Vu le laisser (par vous)",
-    "SeenDropsHelp": "Monstres vaincus juste avant de recevoir cet objet, avec l'endroit où vous les avez vus. Appris en jeu : Monde › Découvertes.",
+    "SeenDrops": "Vu le laisser (en jeu)",
+    "SeenDropsHelp": "Monstres vaincus juste avant de recevoir cet objet, avec l'endroit où ils ont été vus. Appris en jeu : Monde › Découvertes.",
     "Lumina": "Source principale · LuminaSupplemental",
     "LuminaHelp": "Monstres qui lâchent cet objet (LuminaSupplemental, Critical-Impact) ; lieux : wiki et Garland ci-dessous.",
     "Title": "Butin des monstres",
@@ -5577,7 +5577,7 @@
     "Roulette": "mission aléatoire"
   },
   "BlueSpellSources": {
-    "Seen": "Vu par vous",
+    "Seen": "Vu en jeu",
     "SeenLine": "{0} (niveau {1}) : vu le lancer ou l'a appris",
     "AboveTip": "L'icône du mage bleu au-dessus de la tête d'un monstre proche qui apprend un sort que vous n'avez pas, dans la vue du jeu. Même réglage que celui de la carte.",
     "NearbyTip": "Les monstres proches qui apprennent un sort que vous n'avez pas, sur la carte Tensho, selon les pages du wiki lues ci-dessous. Même réglage que celui de la carte.",
@@ -6264,11 +6264,11 @@
     "SettingTip": "Petite fenêtre à l’écran avec les objets de vos alarmes Tensho actives (récolte, pêche), la plus proche en premier et le temps restant ; clic sur un nom : la fiche ; « Carte » : la carte du jeu sur le point quand il est connu. Masquée avec l’interface du jeu ; la croix la ferme.\nPar défaut : désactivé."
   },
   "Spearfishing": {
-    "Legend": "S, M, L : petite, moyenne, grande ombre. Chaque > est un cran de vitesse (> le plus lent). Étoile : grand garanti. Œil : ombre vue par vous. Survol d'une ligne : les mots.",
-    "ZoneFish": "Point inconnu : poissons de la zone pris par vous ou en vue",
+    "Legend": "S, M, L : petite, moyenne, grande ombre. Chaque > est un cran de vitesse (> le plus lent). Étoile : grand garanti. Œil : ombre vue en jeu. Survol d'une ligne : les mots.",
+    "ZoneFish": "Point inconnu : poissons de la zone vus en jeu ou en vue",
     "NoList": "Aucun poisson au harpon connu ici.",
     "SizeSpeed": "{0}, vitesse {1}",
-    "Seen": "vu par vous",
+    "Seen": "vu en jeu",
     "SeenShadow": "harpon : {0}",
     "Title": "Aide au harpon",
     "Small": "petit",
@@ -6683,7 +6683,7 @@
     "ActionsHint": "Survolez un nom pour lire la description du jeu. Celles que vous détenez ne sont pas lues."
   },
   "DeepDungeon": {
-    "SeenLoot": "Vu dans les coffres ({0}, par vous)",
+    "SeenLoot": "Vu dans les coffres ({0}, en jeu)",
     "Title": "Donjons profonds",
     "Subtitle": "Pour préparer dehors : Tensho se met en pause à l'intérieur, et ne donne aucun conseil de combat.",
     "Loading": "Lecture des données du jeu…",
@@ -6952,7 +6952,7 @@
     "WeeklyNone": "Pas de mémoquartz limité en ce moment."
   },
   "Events": {
-    "SeenDays": "Vue en cours par vous du {0} au {1}.",
+    "SeenDays": "Vue en cours en jeu du {0} au {1}.",
     "Title": "Événements",
     "Description": "Les événements saisonniers en cours, tels que le jeu les annonce, avec leurs quêtes, ce que vous avez déjà fait et les récompenses. Le jeu ne donne pas les dates : seuls les événements en cours sont listés.",
     "Partake": "Événements de joueurs (partake.gg)",

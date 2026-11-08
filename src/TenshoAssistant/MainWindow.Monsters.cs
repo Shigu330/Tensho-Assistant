@@ -17,7 +17,7 @@ internal sealed partial class MainWindow
     internal void ConfigureWikiSources(WikiMonsterSources service)=>wikiMonsterSources=service;
     private void DrawWikiMonsterSources(uint id)
     {
-        // X-75.2 (0.875): the monsters you saw dropping it come first, with where you saw them; then the community lists.
+        // X-75.2 (0.875): the monsters seen in game dropping it (yours or shared) come first, with where they were seen; then the community lists.
         if(Seen()?.MonstersByItem.GetValueOrDefault(id) is { Length:>0 } seenMonsters
            && TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.SeenDrops")+"###SeenMonsters",ImGuiTreeNodeFlags.DefaultOpen))
         {

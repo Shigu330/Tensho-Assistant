@@ -100,7 +100,7 @@ internal sealed partial class MainWindow
         if(!discoveryFateNames.TryGetValue(id,out var name))discoveryFateNames[id]=name=FateName?.Invoke(id) is { Length:>0 } found ? found:$"#{id}";
         return name;
     }
-    /// <summary>X-74 (0.865): where you saw this item come from (the item-source kinds, most seen first, four at most); worked out again when the base changes.</summary>
+    /// <summary>X-74 (0.865): where this item was seen in game coming from (yours or shared; the item-source kinds, most seen first, four at most); worked out again when the base changes.</summary>
     private (uint Item,long Revision,string[] Lines) discoveredSources=(0,-1,[]);
     internal IReadOnlyList<string> DiscoveredSourcesOf(uint item)
     {
@@ -109,8 +109,8 @@ internal sealed partial class MainWindow
         var lines=ItemSourceKinds.Where(kind=>kind is not (DiscoveryKind.FishCondition or DiscoveryKind.FestivalSeen or DiscoveryKind.VistaSeen or DiscoveryKind.VoyageUnlock
                 or DiscoveryKind.BlueSpellLearned or DiscoveryKind.BeastTamed or DiscoveryKind.FashionEvaluation or DiscoveryKind.NpcPlace or DiscoveryKind.BlueSpellCaster
                 or DiscoveryKind.FishLure or DiscoveryKind.FishTransition or DiscoveryKind.FishBite or DiscoveryKind.QuestItemAsked or DiscoveryKind.SpearShadow))
-            .SelectMany(kind=>store.Find(kind,subject=>subject==item,4)).OrderByDescending(fact=>fact.Seen+fact.Imported).Take(4)
-            .Select(fact=>$"{DiscoveryFactName(fact)} ({DiscoveryFactLevel(fact)}, ×{fact.Seen+fact.Imported})").ToArray();
+            .SelectMany(kind=>store.Find(kind,subject=>subject==item,4)).OrderByDescending(DiscoveryFact.TimesOf).Take(4)
+            .Select(fact=>$"{DiscoveryFactName(fact)} ({DiscoveryFactLevel(fact)}, ×{DiscoveryFact.TimesOf(fact)})").ToArray();
         discoveredSources=(item,store.Revision,lines);
         return lines;
     }
@@ -160,7 +160,7 @@ internal sealed partial class MainWindow
         seenIndex=(store.Revision,index);
         return index;
     }
-    /// <summary>X-75.3 (0.877): what you saw for a fish (baits or mooched fish, weathers, weathers before, lures, Eorzea hours), one line; never a requirement.</summary>
+    /// <summary>X-75.3 (0.877): what was seen in game for a fish (yours or shared: baits or mooched fish, weathers, weathers before, lures, Eorzea hours), one line; never a requirement.</summary>
     private (long Revision,Dictionary<uint,string?> Lines) seenFishLines=(-1,[]);
     internal string? SeenFishLine(uint fish)
     {
@@ -175,16 +175,16 @@ internal sealed partial class MainWindow
         if(Weathers(DiscoveryKind.FishCondition) is { Length:>0 } during)parts.Add(localization.Format("FishingPanel.SeenWeather",during));
         if(store.Find(DiscoveryKind.FishCondition,subject=>subject==fish,64) is { Count:>0 } hours)
             parts.Add(EtRange(hours.Min(fact=>fact.LevelMin),hours.Max(fact=>fact.LevelMax)));
-        // X-73.18 (0.887): the bites you saw: strength and time from the cast.
+        // X-73.18 (0.887): the bites seen in game (yours or shared): strength and time from the cast.
         if(store.Find(DiscoveryKind.FishBite,subject=>subject==fish,32) is { Count:>0 } bites)
             parts.Add(string.Join(", ",bites.GroupBy(fact=>fact.Detail).OrderBy(group=>group.Key).Select(group=>
                 $"{(group.Key switch{1=>"!",2=>"!!",3=>"!!!",_=>"?"})} {group.Min(fact=>fact.LevelMin)/10.0:0.0}–{group.Max(fact=>fact.LevelMax)/10.0:0.0} s")));
         if(store.Find(DiscoveryKind.FishLure,subject=>subject==fish,2) is { Count:>0 } lures)
             parts.Add(string.Join(", ",lures.Select(fact=>localization.Get(fact.Detail==1 ? "FishingPanel.SeenAmbitious":"FishingPanel.SeenModest"))));
-        // X-73.18 (0.890, 0.891): the spearfishing shadows you saw it have.
+        // X-73.18 (0.890, 0.891): the spearfishing shadows it was seen in game with (yours or shared).
         var shadows=store.Find(DiscoveryKind.SpearShadow,subject=>subject==fish,8);
         if(shadows.Count>0)parts.Add(localization.Format("Spearfishing.SeenShadow",string.Join(", ",shadows.Select(fact=>SpearShadowText((int)fact.Detail,fact.LevelMin)).Distinct())));
-        var line=parts.Count==0 ? null:localization.Format("FishingPanel.SeenByYou",catches.Sum(fact=>fact.Seen+fact.Imported)+shadows.Sum(fact=>fact.Seen+fact.Imported),string.Join(" · ",parts));
+        var line=parts.Count==0 ? null:localization.Format("FishingPanel.SeenInGame",catches.Sum(DiscoveryFact.TimesOf)+shadows.Sum(DiscoveryFact.TimesOf),string.Join(" · ",parts));
         if(seenFishLines.Lines.Count<2048)seenFishLines.Lines[fish]=line;
         return line;
     }
@@ -240,12 +240,14 @@ internal sealed partial class MainWindow
     private static DateTime DiscoveryDay(int day)=>new DateTime(2013,8,27).AddDays(day);
     // « HH:mm–HH:mm ET » of two Eorzea minutes of the day.
     private static string EtRange(int from,int to)=>$"{Gathering.GatheringTime.Clock(from)}–{Gathering.GatheringTime.Clock(to)} ET";
+    // X-76 (0.908): « a » or « a–b », a level or quantity range.
+    private static string LevelRange(int min,int max)=>min==max ? max.ToString():$"{min}–{max}";
     private static string DiscoveryFactLevel(DiscoveryFact fact)
     {
         if(fact.Kind==DiscoveryKind.FestivalSeen)
             return $"{DiscoveryDay(fact.LevelMin):d} – {DiscoveryDay(fact.LevelMax):d}";
         if(fact.Kind is DiscoveryKind.FishCondition or DiscoveryKind.VistaSeen)return EtRange(fact.LevelMin,fact.LevelMax);
-        var range=fact.LevelMin==fact.LevelMax ? fact.LevelMax.ToString():$"{fact.LevelMin}–{fact.LevelMax}";
+        var range=LevelRange(fact.LevelMin,fact.LevelMax);
         return ItemSourceKinds.Contains(fact.Kind) ? "×"+range:range;
     }
     /// <summary>0.856 (X-72 C): the name shown for a fact: the monster, the hunt mark with its rank, or the FATE. 0.860: the item and its source.</summary>
@@ -371,7 +373,7 @@ internal sealed partial class MainWindow
             var fact=rows[index];
             if(catalog.Find(fact.Map) is not { } map)continue;
             var pixel=MapProjection.PixelFromWorld(new Vector3(fact.X,0,fact.Z),map);var place=MapProjection.CoordinateFromPixel(pixel,map);
-            var level=fact.LevelMin==fact.LevelMax ? fact.LevelMax.ToString():$"{fact.LevelMin}–{fact.LevelMax}";
+            var level=LevelRange(fact.LevelMin,fact.LevelMax);
             ImGui.PushStyleColor(ImGuiCol.Text,Muted);
             try{ImGui.Selectable(localization.Format("DiscoveriesUi.SeenHere",MapName(map),MapProjection.CoordinateNumber(place.X),MapProjection.CoordinateNumber(place.Y),level)+$"##Seen{key}{index}");}
             finally{ImGui.PopStyleColor();}

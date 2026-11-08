@@ -114,7 +114,7 @@ internal sealed partial class MainWindow
                 finally{ImGui.PopID();}
             }
         }
-        // X-75.2 (0.875): what you saw this item give (desynthesis, opened), before LuminaSupplemental's lists.
+        // X-75.2 (0.875): what this item was seen in game giving (yours or shared: desynthesis, opened), before LuminaSupplemental's lists.
         if(Seen()?.GivesBySource.GetValueOrDefault(id) is { Length:>0 } seenGives
            && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.SeenGives",seenGives.Length)+"###UseSeenGives"))
         {
@@ -145,7 +145,7 @@ internal sealed partial class MainWindow
                     }
                     ImGui.Unindent();
                 }
-            // X-73.18 (0.889): the quests you saw ask for it come first.
+            // X-73.18 (0.889): the quests seen in game asking for it (yours or shared) come first.
             if(DiscoveryStore is { } seenStore && DiscoveriesLoaded && seenStore.Find(Discoveries.DiscoveryKind.QuestItemAsked,subject=>subject==id,16) is { Count:>0 } seenAsks
                && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.SeenQuests",seenAsks.Count)+"###UseSeenQuests"))
                 foreach(var fact in seenAsks)

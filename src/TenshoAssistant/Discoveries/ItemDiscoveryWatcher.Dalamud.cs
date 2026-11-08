@@ -364,8 +364,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         }
         catch(Exception error){if(!warned){warned=true;log.Warning(error,"The spearfishing catches could not be read from the chat.");}}
     }
-    private (int Size,int Speed)? SeenSpearShadow(uint item)=>store.Find(DiscoveryKind.SpearShadow,subject=>subject==item,8).OrderByDescending(fact=>fact.Seen+fact.Imported)
-        .Select(fact=>((int,int)?)((int)fact.Detail,fact.LevelMin)).FirstOrDefault();
+    private (int Size,int Speed)? SeenSpearShadow(uint item)=>store.MostSeenSpearShadow(item);
     private void ReadSpear(DateTimeOffset at,long now,uint territory,uint map,Vector3 position)
     {
         var handle=gui.GetAddonByName("SpearFishing");

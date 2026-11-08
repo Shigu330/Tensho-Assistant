@@ -8,7 +8,7 @@ namespace TenshoAssistant;
 /// <summary>
 /// R-15 (0.417): while the game's spearfishing window is open (setting FishingPanel, as the fishing help), a panel beside it.
 /// X-79 (0.891, user request: « the list should stay all the time and highlight the right size », the old one vanished with the fish): the fish in sight (size,
-/// speed), then every fish of the node (else of the zone) always listed in a fixed order, each with its shadow (yours first, else GatherBuddy's), the ones
+/// speed), then every fish of the node (else of the zone) always listed in a fixed order, each with its shadow (seen in game first, yours or shared, else GatherBuddy's), the ones
 /// whose shadow is in sight highlighted. 0.893: the fish's icons (list and slot lines). 0.892: a fixed layout (three slot lines, rows that keep their place and width), the node found when the window opens.
 /// </summary>
 internal sealed partial class MainWindow
@@ -19,15 +19,14 @@ internal sealed partial class MainWindow
     private string SpearShadowText(int size,int speed)=>localization.Format("Spearfishing.SizeSpeed",
         localization.Get(size switch{1=>"Spearfishing.Small",2=>"Spearfishing.Average",3=>"Spearfishing.Large",_=>"Spearfishing.UnknownSize"}),
         Gathering.Spearfishing.SpeedName(speed) is { } name ? localization.Get("Spearfishing.Speed"+name):speed.ToString());
-    /// <summary>X-73.18 (0.891): the shadow you saw a fish have most often; worked out again only when the base changes.</summary>
+    /// <summary>X-73.18 (0.891): the shadow a fish was seen in game with most often (yours or shared); worked out again only when the base changes.</summary>
     private (long Revision,Dictionary<uint,(int Size,int Speed)?> Shadows) seenShadows=(-1,[]);
     private (int Size,int Speed)? SeenShadowOf(uint fish)
     {
         if(DiscoveryStore is not { } store || !DiscoveriesLoaded)return null;
         if(seenShadows.Revision!=store.Revision)seenShadows=(store.Revision,[]);
         if(seenShadows.Shadows.TryGetValue(fish,out var known))return known;
-        (int,int)? shadow=store.Find(TenshoAssistant.Discoveries.DiscoveryKind.SpearShadow,subject=>subject==fish,16).OrderByDescending(fact=>fact.Seen+fact.Imported)
-            .Select(fact=>((int,int)?)((int)fact.Detail,fact.LevelMin)).FirstOrDefault();
+        var shadow=store.MostSeenSpearShadow(fish);
         if(seenShadows.Shadows.Count<1024)seenShadows.Shadows[fish]=shadow;
         return shadow;
     }
@@ -68,7 +67,7 @@ internal sealed partial class MainWindow
             var rows=Gathering.Spearfishing.Rows(fishHere,SeenShadowOf,Community,frame.Slots);
             // 0.892 (user report: « it changes all the time »): a fixed layout. Three slot lines always; the list keeps its rows, the fish in sight are framed and coloured.
             // 0.897 (user request: too much text to read in real time): sizes S/M/L, speeds as chevrons (one per step of 50), a star for a guaranteed large fish, an
-            // eye for the shadows you saw; the words on hover.
+            // eye for the shadows seen in game (yours or shared); the words on hover.
             var disabled=new Vector4(0.55f,0.55f,0.55f,1);
             var widest=rows.Select(row=>Gathering.Spearfishing.SpeedStep(row.Speed ?? 0)).Concat(frame.Slots.Select(slot=>Gathering.Spearfishing.SpeedStep(slot.Speed))).DefaultIfEmpty(1).Max();
             var shadowWidth=ImGui.CalcTextSize("L "+new string('>',Math.Max(1,widest))).X;
@@ -93,7 +92,7 @@ internal sealed partial class MainWindow
                 }
             }
             ImGui.Separator();
-            // Without a node, the zone's list would be too long: only the fish you speared there and those whose shadow is in sight.
+            // Without a node, the zone's list would be too long: only the fish seen in game there (yours or shared) and those whose shadow is in sight.
             var listed=ofPoint ? rows:rows.Where(row=>row.Seen || row.InSight).ToArray();
             if(!ofPoint)ImGui.TextDisabled(localization.Get("Spearfishing.ZoneFish"));
             if(listed.Count==0)ImGui.TextDisabled(localization.Get("Spearfishing.NoList"));

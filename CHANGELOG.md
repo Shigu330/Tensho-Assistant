@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.908.0
+- Plan global, Verify : Nettoyage complet (X-76), étape 2, quatrième famille, découvertes : les outils lisent toute la base des découvertes, vos observations comme celles importées du fichier commun GitHub, mais seize libellés disaient « vu par vous » ; ils disent maintenant « vu en jeu » (chaque fait vient d'une observation en jeu, la vôtre ou celle d'un autre joueur). La page Découvertes garde ses compteurs « vues par vous » / « importées seulement ». Une seule ombre de harpon la plus vue, un seul « nombre de fois vu », un seul texte de plage de niveaux. Détail : docs/evidence/x76-2-duplicates.md. Non validé en jeu.
+- Tests : SeenInGame908Tests. Verify.ps1 (agent) : 1491/1491, 0 avertissement, 0 erreur ; DLL 0.908.0.0. Non validé en jeu.
+### English
+- Full clean-up (X-76), step 2, fourth family, discoveries: the tools read the whole discoveries base, your observations and those imported from the shared GitHub file alike, but sixteen labels said « seen by you »; they now say « seen in game » (every fact comes from an observation in game, yours or another player's). The Discoveries page keeps its « seen by you » / « imported only » counts. One most-seen spearfishing shadow, one « times seen », one level range text. Detail: docs/evidence/x76-2-duplicates.md. Not validated in game.
+
 ## 0.907.0
 - Plan global, Verify : Nettoyage complet (X-76), étape 2, troisième famille, fenêtres du jeu et requêtes web : une seule lecture des valeurs des fenêtres du jeu, un seul contrôle « même fenêtre, toujours affichée » pour quatre lecteurs, une seule garde de parcours des éléments d'interface (R-14 : nombre d'éléments et chargement vérifiés) pour six lecteurs, dont quatre n'en avaient qu'une partie ; deux téléchargements écrits à la main passent par le lecteur borné commun ; un seul en-tête Tensho pour les requêtes. Deux défauts corrigés : le service du marché fermait un client web qu'on lui avait prêté, et la carte appelait le jeu sans vérifier qu'il répondait (deux endroits). Détail : docs/evidence/x76-2-duplicates.md. Non validé en jeu (à surveiller : surlignage des collectionnables et des inventaires, lecture d'un point de récolte).
 - Tests : Probes881Tests. Verify.ps1 (agent) : 1488/1488, 0 avertissement, 0 erreur ; DLL 0.907.0.0. Non validé en jeu.

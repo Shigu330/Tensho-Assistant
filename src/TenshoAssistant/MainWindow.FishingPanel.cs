@@ -194,7 +194,7 @@ internal sealed partial class MainWindow
             var parts=new List<string>();var detail=new List<string>();
             if(free is not null){parts.Add(free);detail.Add(localization.Get("FishingPanel.NoConditionDetail"));}
             if(timeLimited!=false && known.StartMinute is { } start && known.EndMinute is { } stop)
-            {var window=$"{GatheringTime.Clock(start)}–{GatheringTime.Clock(stop%1440)} ET";parts.Add(window);detail.Add(window);}
+            {var window=EtRange(start,stop%1440);parts.Add(window);detail.Add(window);}
             if(weatherLimited!=false && known.Transitions.Count>0){parts.Add(Weathers(known.Transitions)+" ›");detail.Add(localization.Format("FishingPanel.Previous",Weathers(known.Transitions)));}
             if(weatherLimited!=false && known.Weathers.Count>0){parts.Add(Weathers(known.Weathers));detail.Add(localization.Format("FishingPanel.Weather",Weathers(known.Weathers)));}
             if(known.Lure is { } lure){parts.Add(lure);detail.Add(localization.Format("FishingPanel.Lure",lure));}
@@ -205,7 +205,7 @@ internal sealed partial class MainWindow
                 detail.Add(localization.Format("FishingPanel.Predators",string.Join(", ",known.Predators.Select(pair=>$"{items?.Find(pair.Fish)?.Name ?? pair.Fish.ToString()} ×{pair.Count}"))));
                 if(known.Intuition is { } intuition)detail.Add(localization.Format("FishingPanel.Intuition",intuition));
             }
-            // X-75.3 (0.877): what you saw yourself, after the community conditions, in the detail.
+            // X-75.3 (0.877): what was seen in game (yours or shared), after the community conditions, in the detail.
             if(SeenFishLine(fishId) is { } seenLine){parts.Add(localization.Get("FishingPanel.SeenShort"));detail.Add(seenLine);}
             return (fishId,data.Route(fishId),known.Bite,known.HookSet,string.Join(" · ",parts),string.Join("\n",detail));
         }
