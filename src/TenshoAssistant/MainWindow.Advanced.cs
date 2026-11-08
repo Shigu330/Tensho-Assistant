@@ -65,6 +65,8 @@ internal sealed partial class MainWindow
         ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Advanced.SourcesTitle"));
         ImGui.TextDisabled(localization.Get("Advanced.SourcesHelp"));
+        DrawGameDataOnly();
+        if(configuration.GameDataOnly)ImGui.BeginDisabled();
         BoolSetting("Advanced.Lumina","Advanced.LuminaTip",()=>configuration.CommunityLumina,value=>configuration.CommunityLumina=value,c=>c.CommunityLumina);
         BoolSetting("Advanced.Garland","Advanced.GarlandTip",()=>configuration.CommunityGarland,value=>configuration.CommunityGarland=value,c=>c.CommunityGarland);
         BoolSetting("Advanced.Wiki","Advanced.WikiTip",()=>configuration.CommunityWiki,value=>configuration.CommunityWiki=value,c=>c.CommunityWiki);
@@ -74,6 +76,7 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.Fashion","Advanced.FashionTip",()=>configuration.CommunityFashion,value=>configuration.CommunityFashion=value,c=>c.CommunityFashion);
         // 0.324: Universalis as a whole; « prices on hover » under it, greyed while Universalis is off.
         BoolSetting("Advanced.Universalis","Advanced.UniversalisTip",()=>configuration.CommunityUniversalis,value=>{configuration.CommunityUniversalis=value;if(!value)market.CancelBackground();},c=>c.CommunityUniversalis);
+        if(configuration.GameDataOnly)ImGui.EndDisabled();
         ImGui.Indent();
         if(!configuration.CommunityUniversalis)ImGui.BeginDisabled();
         try

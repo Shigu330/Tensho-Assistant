@@ -725,7 +725,7 @@
     "DebugLog": "Noter chaque nouvelle entrée au journal",
     "DebugLogTip": "Écrit chaque nouvelle découverte dans le journal.\nPar défaut : désactivé.",
     "Clear": "Vider la base…",
-    "ClearTip": "Retire toutes les découvertes, les vôtres et les importées.",
+    "ClearTip": "Retire toutes les découvertes, les vôtres et les importées. Une copie zip du dossier Discoveries est faite avant dans le dossier Backups (jamais la clé GitHub).",
     "ClearSure": "Retirer toutes les découvertes ? C'est définitif (exportez d'abord pour garder une copie).",
     "ClearYes": "Oui, vider",
     "ClearNo": "Non"
@@ -1053,6 +1053,8 @@
     "InnerQuiet": "Calme intérieur"
   },
   "Advanced": {
+    "GameDataOnly": "Données du jeu et observées seulement",
+    "GameDataOnlyTip": "Coupe d’un coup les sept sources communautaires ci-dessous (aucun téléchargement, leurs lignes quittent les info-bulles) ; vos choix pour chacune sont gardés et reviennent quand vous décochez. Vos découvertes et celles partagées restent.\nPar défaut : désactivé.",
     "SnoozeMinutesTip": "Ce que le bouton de report d'une alarme attend.\nPar défaut : 5 minutes.",
     "RingOnTimeTip": "Une alarme sonne avec son avance, puis une seconde fois à l'heure exacte. Discord ne reçoit que le premier message.\nPar défaut : désactivé.",
     "RetainerSales": "Panneau à côté de la liste de ventes des servants",
@@ -2361,6 +2363,14 @@
     "MenuHelp": "Au clic droit d'un objet (inventaire, boutiques, échanges, listes d'objets), l'entrée « Tensho — objet » ouvre les outils utiles à cet objet (usages, stocks, fabrication, récolte, PNJ vendeurs, marché, butin des contenus et des monstres, quête, collection, fiche « Comment l'obtenir », tous les outils), puis ses sources groupées par type. Aucun prix n'est demandé par ce menu. Les liens de discussion et objets spéciaux ne sont pas couverts.\nPar défaut : désactivé."
   },
   "CacheUi": {
+    "Clear": "Vider le cache…",
+    "ClearTip": "Retire tous les téléchargements et calculs gardés (prix, quêtes, sources, artisanat…) ; ils sont redemandés au besoin. Une copie zip est faite avant dans le dossier Backups (les 5 dernières sont gardées).",
+    "ClearSure": "Vider le cache ? Une copie zip est faite avant.",
+    "ClearYes": "Vider",
+    "ClearNo": "Annuler",
+    "Clearing": "Vidage du cache…",
+    "Cleared": "{0} fichier(s) du cache retiré(s) ; copie : {1}",
+    "ClearFailed": "Le cache n’a pas pu être vidé (détails dans le journal de Dalamud).",
     "Completion": "Titres et succès (états conservés)",
     "Title": "Cache & péremption",
     "Help": "Les données sont conservées sur disque. Consulter réutilise un cache valable ; Actualiser force sa mise à jour dans l’outil. Réduire une durée s’applique aussi aux caches déjà enregistrés.",

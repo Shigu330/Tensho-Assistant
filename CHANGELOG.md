@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.945.0
+- Plan global, Verify : Nettoyage X-76, étape 3 (fin des demandes notées) : nouvelle case « Données du jeu et observées seulement » (Paramètres › Avancé, sources) qui coupe d'un coup les sept sources communautaires, garde le choix de chacune et le rend quand on la décoche (vos découvertes restent) ; nouveau bouton « Vider le cache… » (Paramètres › Données, cache), avec confirmation ; avant de vider le cache ou les découvertes, Tensho fait une copie zip dans le dossier Backups du plugin (les 5 dernières de chaque sorte sont gardées ; la clé GitHub n'est jamais copiée). Non validé en jeu.
+- Tests : GameOnlyBackup945Tests. Verify.ps1 (agent) : 1558/1558, 0 avertissement, 0 erreur ; DLL 0.945.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, step 3 (end of the noted requests): new « Game data and what you observed only » box (Settings › Advanced, sources) that turns the seven community sources off at once, keeps each one's choice and gives it back when unticked (your discoveries stay); new « Empty the cache… » button (Settings › Data, cache), with a confirmation; before emptying the cache or the discoveries, Tensho takes a zip copy in the plugin's Backups folder (the last 5 of each kind are kept; the GitHub key is never copied). Not validated in game.
+
 ## 0.944.0
 - Plan global, Verify : Nettoyage X-76, étape 3 (réglages) : inventaire complet écrit dans docs/project/SETTINGS.md (301 lignes : chaque réglage, son défaut, où le changer, son effet réel, ce qui se passe s'il est coupé), relevé par trois agents et revérifié par un quatrième ; sur 100 anomalies signalées, 9 confirmées et corrigées : la barre de PR se lisait aussi quand seul « plan depuis la liste » était coché (elle suit maintenant l'aide à la récolte) ; le bouton par défaut de l'attente des bonus remet bien « comme les actions » ; une seule case pour les zones de quête sur la carte ; une info-bulle propre aux cristaux ; cinq info-bulles corrigées pour dire ce que le réglage fait vraiment (infobulle de la barre du serveur, aide à la pêche, encadrement des rangements, Eurêka des collectionnables, panneau de l'atelier). Non validé en jeu.
 - Tests : SettingsFixes944Tests. Verify.ps1 (agent) : 1556/1556, 0 avertissement, 0 erreur ; DLL 0.944.0.0. Non validé en jeu.

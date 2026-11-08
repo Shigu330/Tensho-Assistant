@@ -725,7 +725,7 @@
     "DebugLog": "Log each new entry",
     "DebugLogTip": "Writes each new discovery to the log.\nDefault: off.",
     "Clear": "Empty the base…",
-    "ClearTip": "Removes every discovery, yours and imported.",
+    "ClearTip": "Removes every discovery, yours and imported. A zip copy of the Discoveries folder is taken first in the Backups folder (never the GitHub key).",
     "ClearSure": "Remove every discovery? This cannot be undone (export first to keep a copy).",
     "ClearYes": "Yes, empty it",
     "ClearNo": "No"
@@ -1053,6 +1053,8 @@
     "InnerQuiet": "Inner Quiet"
   },
   "Advanced": {
+    "GameDataOnly": "Game data and what you observed only",
+    "GameDataOnlyTip": "Turns off the seven community sources below at once (no download, their lines leave the tooltips); your own choices for each are kept and come back when you untick it. Your discoveries and the shared ones stay.\nDefault: off.",
     "SnoozeMinutesTip": "How long the button that puts off an alarm waits.\nDefault: 5 minutes.",
     "RingOnTimeTip": "An alarm rings its lead ahead, then a second time at the exact time. Discord only gets the first.\nDefault: off.",
     "RetainerSales": "Panel beside the retainer sale list",
@@ -2361,6 +2363,14 @@
     "MenuHelp": "On right-clicking an item (inventory, shops, exchanges, item lists), the « Tensho — item » entry opens the tools useful for that item (uses, stocks, crafting, gathering, NPC vendors, market, duty and monster loot, quest, collection, « How to obtain » sheet, all tools), then its sources grouped by kind. This menu does not request prices. Chat links and special items are not covered.\nDefault: off."
   },
   "CacheUi": {
+    "Clear": "Empty the cache…",
+    "ClearTip": "Removes every cached download and calculation (prices, quests, sources, craft…); they are fetched again when needed. A zip copy is taken first in the Backups folder (the last 5 are kept).",
+    "ClearSure": "Empty the cache? A zip copy is taken first.",
+    "ClearYes": "Empty",
+    "ClearNo": "Cancel",
+    "Clearing": "Emptying the cache…",
+    "Cleared": "{0} cached file(s) removed; copy: {1}",
+    "ClearFailed": "The cache could not be emptied (details in the Dalamud log).",
     "Completion": "Titles and achievements (states kept)",
     "Title": "Cache & expiry",
     "Help": "Data is stored on disk. Look up reuses fresh cache; Refresh forces an update. Shorter retention also applies to existing cached entries.",

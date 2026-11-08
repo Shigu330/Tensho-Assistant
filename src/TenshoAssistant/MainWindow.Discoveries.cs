@@ -490,7 +490,13 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(folder);
         if(!discoveryClearAsked){if(ImGui.SmallButton(localization.Get("DiscoveriesUi.Clear")))discoveryClearAsked=true;Tip("DiscoveriesUi.ClearTip");return;}
         ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("DiscoveriesUi.ClearSure"));
-        if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ClearYes"))){store.Clear();SaveDiscoveries(false);discoveryClearAsked=false;}
+        if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ClearYes")))
+        {
+            // X-76 step 3 (0.945, user request): a zip copy of the Discoveries folder first (never the GitHub token), then the base emptied.
+            try{BackupZip.Create(folder,Path.Combine(Path.GetDirectoryName(folder) ?? folder,"Backups"),"discoveries",DateTimeOffset.UtcNow,new HashSet<string>{"github.token"});}
+            catch(Exception error){log.Warning(error,"The discoveries copy before emptying failed; nothing was removed.");discoveryClearAsked=false;return;}
+            store.Clear();SaveDiscoveries(false);discoveryClearAsked=false;
+        }
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ClearNo")))discoveryClearAsked=false;
     }
