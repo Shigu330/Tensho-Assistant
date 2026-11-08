@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.927.0
+- Plan global, Verify : Nettoyage X-76, parseurs P4 (état « débloqué » des objets) : Tensho demande maintenant au jeu si un objet apprend quelque chose (emote, coiffure, barde de chocobo, accessoire de mode, partition, carte…) et si votre personnage l'a déjà appris ; avant, seuls les montures et les mascottes étaient connues. L'info-bulle de l'objet affiche « Apprend quelque chose : déjà appris / pas encore appris », le filtre « pas encore obtenu » du butin et la valeur des monnaies en tiennent compte. Rien n'est demandé hors connexion ni en JcJ. Non validé en jeu.
+- Tests : ItemUnlock927Tests. Verify.ps1 (agent) : 1540/1540, 0 avertissement, 0 erreur ; DLL 0.927.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, parsers P4 (item unlock state): Tensho now asks the game whether an item teaches something (emote, hairstyle, chocobo barding, fashion accessory, orchestrion roll, card…) and whether your character already learned it; before, only mounts and minions were known. The item tooltip shows « Teaches: already learned / not learned yet », the loot « not obtained only » filter and the currency value use it. Nothing is asked when logged out or in PvP. Not validated in game.
+
 ## 0.926.0
 - Plan global, Verify : Coupure en JcJ (DEC-038, avec votre accord : « y a pas de vendeur en pvp donc oui ») : la lecture des offres du marché pendant une mise en vente (prix à copier sous le moins cher) était la seule lecture encore active en JcJ et en contenu classé ; elle s'arrête maintenant comme toutes les autres. Fin de l'harmonisation 2b du nettoyage X-76. Non validé en jeu.
 - Tests : UndercutCut926Tests. Verify.ps1 (agent) : 1539/1539, 0 avertissement, 0 erreur ; DLL 0.926.0.0. Non validé en jeu.

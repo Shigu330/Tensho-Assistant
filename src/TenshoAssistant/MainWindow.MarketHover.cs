@@ -113,9 +113,17 @@ internal sealed partial class MainWindow
             :item.CompanionId!=0 ? (Collections.CollectionKind.Companion,item.CompanionId)
             :item.TripleTriadCardId!=0 ? (Collections.CollectionKind.TripleTriad,item.TripleTriadCardId)
             :item.OrchestrionId!=0 ? (Collections.CollectionKind.Orchestrion,item.OrchestrionId):null;
-        if(link is not { } target)return;
+        if(link is not { } target)
+        {
+            // X-76 P4 (0.927): any other item that teaches something, as the game says.
+            if(GameItemUnlocked(item.Id) is not { } learned)return;
+            ImGui.TextColored(learned ? UI.FfxivTheme.Success:UI.FfxivTheme.Error,localization.Format("HoverUi.Unlock",localization.Get(learned ? "HoverUi.UnlockYes":"HoverUi.UnlockNo")));
+            return;
+        }
         var entry=CollectionEntryOf(target.Kind,target.Id);
         var acquisition=CollectionStateOf(entry);
+        if(acquisition==Collections.CollectionAcquisition.Unknown && GameItemUnlocked(item.Id) is { } game)
+            acquisition=game ? Collections.CollectionAcquisition.Acquired:Collections.CollectionAcquisition.NotAcquired;
         var colour=acquisition switch{Collections.CollectionAcquisition.Acquired=>UI.FfxivTheme.Success,Collections.CollectionAcquisition.NotAcquired=>UI.FfxivTheme.Error,_=>UI.FfxivTheme.TextMuted};
         ImGui.TextColored(colour,localization.Format("HoverUi.Collection",localization.Get("HoverUi.CollectionKind"+target.Kind),localization.Get("HoverUi.Collection"+acquisition)));
     }
@@ -369,7 +377,7 @@ internal sealed partial class MainWindow
     // e): true when a part turned on has something to draw for this item; Stock and « How to get it » always draw their heading.
     // Cheap lookups, cut short with the default settings (stock on).
     private bool HoverInfoShown(Items.ItemDefinition? item,uint id)=>configuration.HoverShowStock || configuration.HoverShowSources
-        || configuration.HoverShowCollection && item is { MountId:not 0 } or { CompanionId:not 0 } or { TripleTriadCardId:not 0 } or { OrchestrionId:not 0 }
+        || configuration.HoverShowCollection && (item is { MountId:not 0 } or { CompanionId:not 0 } or { TripleTriadCardId:not 0 } or { OrchestrionId:not 0 } || item is not null && GameItemUnlocked(item.Id) is not null)
         || configuration.HoverShowUsages && HoveredUsageLines(id).Count>0;
 
     private void DrawHoveredUsages(uint id)

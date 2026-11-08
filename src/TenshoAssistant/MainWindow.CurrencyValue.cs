@@ -113,8 +113,10 @@ internal sealed partial class MainWindow
             }).Where(buy=>buy.Cost>0),balance,days);
             var mounts=collected.Where(entry=>entry.Kind==CollectionKind.Mount && entry.ConfirmedUnlocked).Select(entry=>entry.Id).ToHashSet();
             var minions=collected.Where(entry=>entry.Kind==CollectionKind.Companion && entry.ConfirmedUnlocked).Select(entry=>entry.Id).ToHashSet();
-            currencyValueOwned=currencyValueRows.Select(row=>items?.Find(row.ItemId)).OfType<Items.ItemDefinition>().Where(item=>item.MountId!=0 || item.CompanionId!=0)
-                .DistinctBy(item=>item.Id).ToDictionary(item=>item.Id,item=>item.MountId!=0 ? mounts.Contains(item.MountId):minions.Contains(item.CompanionId));
+            // X-76 P4 (0.927): besides mounts and minions, every item the game says teaches something.
+            currencyValueOwned=currencyValueRows.Select(row=>items?.Find(row.ItemId)).OfType<Items.ItemDefinition>()
+                .Where(item=>item.MountId!=0 || item.CompanionId!=0 || GameItemUnlocked(item.Id) is not null)
+                .DistinctBy(item=>item.Id).ToDictionary(item=>item.Id,item=>item.MountId!=0 ? mounts.Contains(item.MountId):item.CompanionId!=0 ? minions.Contains(item.CompanionId):GameItemUnlocked(item.Id)==true);
             currencyValueKey=key;
         }
         ImGui.TextWrapped(localization.Get("CurrencyValue.Help"));
