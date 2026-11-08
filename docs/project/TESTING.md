@@ -1404,6 +1404,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.881) Mode développeur, journal « Reading addons / fashion / islandobjects » : pêche au harpon, aéronef envoyé puis revenu, sous-marin revenu, sertissage forcé, extraction de matéria, lettre avec pièce jointe, revue de mode (avant et après jugement), île sanctuaire près des animaux.
 
+- [ ] (0.882) Monde › Découvertes : « Partager les miennes » → le dossier Export s'ouvre avec un zip, et le navigateur sur le ticket ; « Récupérer les découvertes communes » → « pas encore publié » tant qu'aucune release n'a le fichier.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

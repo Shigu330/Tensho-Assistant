@@ -1,0 +1,22 @@
+name: Discoveries
+description: Share the discoveries Tensho learned while you played (World › Discoveries › « Share mine »).
+title: "Discoveries: "
+labels: ["discoveries"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Attach the zip Tensho wrote in the « Export » folder (drag it into the box below). It holds only game rows and places:
+        never a player's name, position or id. It is checked, then merged into `community-discoveries/discoveries.json`.
+  - type: textarea
+    id: file
+    attributes:
+      label: Discoveries file
+      description: Drop the Tensho-discoveries-….zip here.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Tensho version
+      placeholder: 0.882.0

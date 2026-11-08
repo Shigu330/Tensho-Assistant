@@ -584,6 +584,15 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "TakeCommon": "Récupérer les découvertes communes",
+    "TakeCommonTip": "Télécharge, sur ce clic seulement, les découvertes partagées par d'autres joueurs, publiées dans le dépôt de Tensho (GitHub), et les joint aux vôtres comme importées. Rien des vôtres n'est retiré ni envoyé. Un même fichier n'est joint qu'une fois.",
+    "CommonMissing": "Le fichier commun n'est pas encore publié (ou GitHub n'a pas répondu).",
+    "CommonSame": "Déjà à jour : le fichier commun n'a pas changé.",
+    "CommonDone": "Découvertes communes : {0} nouvelles, {1} jointes, {2} refusées.",
+    "Share": "Partager les miennes",
+    "ShareTip": "Écrit les découvertes que vous avez vues vous-même (pas celles importées) dans un zip du dossier « Export », ouvre ce dossier et la page « nouveau ticket » de GitHub dans votre navigateur : joignez-y le zip. Rien ne quitte votre PC tant que vous n'envoyez pas le ticket. Une découverte ne contient jamais le nom, la position ni l'identifiant d'un joueur.",
+    "ShareEmpty": "Rien de vu par vous à partager pour l'instant.",
+    "ShareDone": "{0} découvertes écrites dans {1} ; joignez ce zip au ticket ouvert dans votre navigateur.",
     "SummaryBlueSpellCaster": "Monstres vus lançant un sort de mage bleu : {0} ({1} vus par vous, {2} importés seulement)",
     "SpellCaster": "{1} vu lançant {0}",
     "SummaryFishTransition": "Poissons et météo précédente : {0} ({1} vus par vous, {2} importés seulement)",
