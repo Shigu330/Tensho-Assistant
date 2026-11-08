@@ -1903,7 +1903,7 @@ internal sealed partial class MainWindow
             wikiVistas?.Request();
             if(WikiVistaFor(vista) is { } wiki)
             {
-                ImGui.TextColored(Accent,localization.Format(wiki.Section==0 ? "MapView.VistaNumberArr":"MapView.VistaNumberEx",wiki.Number,ExpansionName(wiki.Section)));
+                ImGui.TextColored(Accent,VistaNumber(vista) is { Length:>0 } number ? number:localization.Format(wiki.Section==0 ? "MapView.VistaNumberArr":"MapView.VistaNumberEx",wiki.Number,ExpansionName(wiki.Section)));
                 if(wiki.Weathers.Count>0)
                 {
                     var names=wiki.Weathers.Select(name=>weather.State.Catalog?.WeatherBySourceName(name,territory) is { } known ? (known.Name,known.Id):(name,0u)).ToArray();

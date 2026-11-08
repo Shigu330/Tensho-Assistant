@@ -207,12 +207,15 @@ internal sealed partial class MainWindow
     }
     // 0.328: the sightseeing log number, as in the vista tooltip: the wiki's when its row is matched (numbering restarts in each
     // expansion), else the sheet row order, which is the log number only for the 80 A Realm Reborn vistas (no number beyond).
+    // X-76 P5 (0.929): the game's own numbering first (AdventureExPhase, Maps/VistaLogNumbers.cs), the wiki's only when the game data is not there.
     private string VistaNumber(MapLocalPosition vista)
     {
+        if(VistaPhases?.Invoke() is { } phases && Maps.VistaLogNumbers.Of(vista.Id,phases) is { } game)
+            return localization.Format(game.Expansion==0 ? "MapView.VistaNumberArr":"MapView.VistaNumberEx",game.Number,ExpansionName(game.Expansion));
         if(WikiVistaFor(vista) is { } wiki)return localization.Format(wiki.Section==0 ? "MapView.VistaNumberArr":"MapView.VistaNumberEx",wiki.Number,ExpansionName(wiki.Section));
-        var order=vista.Id-2162688u;
-        return order<80 ? localization.Format("MapView.VistaNumberArr",(int)order+1):"";
+        return "";
     }
+    internal Func<IReadOnlyList<(uint Begin,uint End,int Expansion)>?>? VistaPhases { get; set; }
     // Maps showing the same ground as the shown map (MapCatalog.Equivalent walks every map), kept per catalogue and map.
     private IReadOnlySet<uint> EquivalentMaps(MapDefinition map)
     {

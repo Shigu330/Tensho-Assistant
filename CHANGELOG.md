@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.929.0
+- Plan global, Verify : Nettoyage X-76, parseurs P5 (vues panoramiques) : le numéro du carnet des vues panoramiques vient maintenant des données du jeu pour toutes les extensions (feuille AdventureExPhase : la numérotation repart à chaque extension et continue sur les deux parties de Dawntrail) ; avant, seules les 80 vues de A Realm Reborn avaient un numéro sans le wiki. Le wiki ne sert plus qu'en secours. Non validé en jeu.
+- Tests : VistaNumbers929Tests. Verify.ps1 (agent) : 1542/1542, 0 avertissement, 0 erreur ; DLL 0.929.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, parsers P5 (vistas): the sightseeing log number now comes from the game's data for every expansion (AdventureExPhase sheet: numbering restarts with each expansion and continues across Dawntrail's two parts); before, only the 80 A Realm Reborn vistas had a number without the wiki. The wiki is now only a fallback. Not validated in game.
+
 ## 0.928.0
 - Plan global, Verify : Nettoyage X-76, parseurs P5 (première partie, tâches de servants) : l'info-bulle d'un objet dit maintenant, d'après les données du jeu, quelle tâche ciblée de servant le rapporte, avec le niveau du servant et les métiers (« Tâche de servant : niveau 50 (Mineur) »). La ligne de LuminaSupplemental ne reste que pour les objets que le jeu ne liste pas (tâches d'exploration). Non validé en jeu.
 - Tests : Ventures928Tests. Verify.ps1 (agent) : 1541/1541, 0 avertissement, 0 erreur ; DLL 0.928.0.0. Non validé en jeu.

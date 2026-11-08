@@ -1260,6 +1260,13 @@ public sealed class Plugin : IDalamudPlugin
                 catch(Exception error){log.Warning(error,"Retainer venture sheets unavailable (perhaps after a game update).");return new Dictionary<uint,IReadOnlyList<(int Level,string Jobs)>>();}
             });
             mainWindow.VentureTasksOf=id=>ventureTasks.Value.GetValueOrDefault(id) ?? [];
+            // X-76 P5 (0.929): the sightseeing log phases of each expansion (AdventureExPhase), read once.
+            var vistaPhases=new Lazy<IReadOnlyList<(uint Begin,uint End,int Expansion)>?>(()=>
+            {
+                try{return data.GetExcelSheet<Lumina.Excel.Sheets.AdventureExPhase>().Select(row=>(row.AdventureBegin.RowId,row.AdventureEnd.RowId,(int)row.Expansion.RowId)).ToArray();}
+                catch(Exception error){log.Warning(error,"Sightseeing log phases unavailable (perhaps after a game update).");return null;}
+            });
+            mainWindow.VistaPhases=()=>vistaPhases.Value;
             mainWindow.GpActionUnlocked=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row && (row.UnlockLink.RowId==0 || unlocks.IsActionUnlocked(row));
             mainWindow.GpTraitsUnlocked=job=>
             {
