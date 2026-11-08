@@ -312,40 +312,6 @@ internal sealed partial class MainWindow
             Tip("DiscoveriesUi.ImportTip");
         }
         finally{ImGui.EndDisabled();}
-        // X-77 (0.882): the common file of the repository, and sending yours through a GitHub issue, each on a click.
-        ImGui.BeginDisabled(busy);
-        try
-        {
-            if(ImGui.SmallButton(localization.Get("DiscoveriesUi.TakeCommon")))
-                Run(()=>
-                {
-                    using var client=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromSeconds(30)};
-                    string json;
-                    try{json=Community.BoundedHttp.ReadAsync(client,new Uri(CommunityDiscoveries.Address),CommunityDiscoveries.MaxBytes,CancellationToken.None).GetAwaiter().GetResult();}
-                    catch(System.Net.Http.HttpRequestException){return localization.Get("DiscoveriesUi.CommonMissing");}
-                    var hash=CommunityDiscoveries.Hash(json);var marker=Path.Combine(folder,"community.sha256");
-                    if(File.Exists(marker) && File.ReadAllText(marker).Trim()==hash)return localization.Get("DiscoveriesUi.CommonSame");
-                    if(CommunityDiscoveries.Parse(json) is not { } common)return localization.Get("DiscoveriesUi.FileFailed");
-                    var result=store.Merge(common.Facts);
-                    File.WriteAllText(marker,hash);
-                    return localization.Format("DiscoveriesUi.CommonDone",result.Added.ToString("N0"),result.Joined.ToString("N0"),result.Refused.ToString("N0"));
-                });
-            Tip("DiscoveriesUi.TakeCommonTip");
-            ImGui.SameLine();
-            if(ImGui.SmallButton(localization.Get("DiscoveriesUi.Share")))
-                Run(()=>
-                {
-                    var mine=CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow,false));
-                    if(mine.Facts.Count==0)return localization.Get("DiscoveriesUi.ShareEmpty");
-                    var path=Path.Combine(folder,"Export",CommunityDiscoveries.ShareName(DateTimeOffset.UtcNow));
-                    CommunityDiscoveries.WriteShare(path,mine);
-                    Dalamud.Utility.Util.OpenLink(Path.GetDirectoryName(path)!);
-                    Dalamud.Utility.Util.OpenLink(CommunityDiscoveries.IssueAddress);
-                    return localization.Format("DiscoveriesUi.ShareDone",mine.Facts.Count.ToString("N0"),path);
-                });
-            Tip("DiscoveriesUi.ShareTip");
-        }
-        finally{ImGui.EndDisabled();}
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("DiscoveriesUi.OpenFolder")))
         {

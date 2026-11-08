@@ -1410,6 +1410,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.884) Après la prochaine release : « Récupérer les découvertes communes » → « Fichier commun récupéré ».
 
+- [ ] (0.885) Monde › Découvertes : plus de « Récupérer » ni « Partager » ; « Échanger maintenant » marche toujours.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
