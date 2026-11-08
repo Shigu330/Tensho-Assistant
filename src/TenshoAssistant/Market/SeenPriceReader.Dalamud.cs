@@ -6,10 +6,12 @@ namespace TenshoAssistant.Market;
 /// <summary>
 /// X-52 (0.817, user request): what the game's market board shows when the player opens an item (Dalamud IMarketBoard: offers by pages, the last 20 sales), kept for the
 /// player's world. Only prices, qualities, quantities and dates: never a retainer's, seller's or buyer's name or id. Cut in PvP; off with its setting.
+/// X-73.14 (0.870): each offer also says whether it is one of your retainers' (its retainer id compared with yours, then dropped).
 /// </summary>
 public sealed class SeenPriceReader : IDisposable
 {
     private readonly IMarketBoard board;private readonly SeenPriceStore store;private readonly Func<uint> world;private readonly Func<bool> enabled;private readonly IPluginLog log;
+    public Func<IReadOnlySet<ulong>?>? OwnRetainers { get; set; }
     private bool disposed,warned;
 
     public SeenPriceReader(IMarketBoard board,SeenPriceStore store,Func<uint> world,Func<bool> enabled,IPluginLog log)
@@ -23,7 +25,12 @@ public sealed class SeenPriceReader : IDisposable
     private void OnOfferings(IMarketBoardCurrentOfferings offerings)
     {
         if(Off || offerings.ItemListings.Count==0)return;
-        try{store.SeeListings(world(),offerings.ItemListings[0].ItemId,(uint)offerings.RequestId,offerings.ItemListings.Select(listing=>new SeenListing(listing.PricePerUnit,listing.IsHq,(int)listing.ItemQuantity)),DateTimeOffset.UtcNow);}
+        try
+        {
+            var own=OwnRetainers?.Invoke();
+            store.SeeListings(world(),offerings.ItemListings[0].ItemId,(uint)offerings.RequestId,offerings.ItemListings.Select(listing=>new SeenListing(listing.PricePerUnit,listing.IsHq,
+                (int)listing.ItemQuantity,own?.Contains(listing.RetainerId)==true)),DateTimeOffset.UtcNow,own is { Count:>0 });
+        }
         catch(Exception error){if(!warned){warned=true;log.Warning(error,"The market board offers could not be noted.");}}
     }
 

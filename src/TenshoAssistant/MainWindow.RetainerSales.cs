@@ -24,12 +24,32 @@ internal sealed partial class MainWindow
         Panels?.Show("TenshoRetainerSales", localization.Get("RetainerSales.Title"), ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse, () => { ImGui.SetNextWindowPos(position, ImGuiCond.Always); ImGui.SetNextWindowSizeConstraints(new Vector2(width, 0), new Vector2(width, Math.Max(240, viewport.WorkSize.Y - 40))); }, () => DrawRetainerSalesContent(state));
     }
 
+    // X-73.14 (0.870): by item, the other sellers seen at the game's board on the home world (SeenPrices.RetainerOffers); worked out again when the prices seen,
+    // Universalis' answer or the minute change, never each frame.
+    private (long Revision, object? Universalis, long Minute, object? Listings, Dictionary<uint, RetainerItemOffers> Offers) retainerSeen = (-1, null, 0, null, []);
+    private Dictionary<uint, RetainerItemOffers> RetainerSeenOffers(RetainerSalesState state, IReadOnlyDictionary<uint, RetainerItemOffers>? universalis)
+    {
+        if (SeenPrices is not { } store || !configuration.Discovery.Enabled || !configuration.Discovery.MarketPrices) return [];
+        var now = DateTimeOffset.UtcNow; var minute = now.ToUnixTimeSeconds() / 60; var revision = store.Revision;
+        if (retainerSeen.Revision == revision && ReferenceEquals(retainerSeen.Universalis, universalis) && retainerSeen.Minute == minute && ReferenceEquals(retainerSeen.Listings, state))
+            return retainerSeen.Offers;
+        var prices = market.State;
+        var world = prices.WorldName == state.HomeWorld ? prices.WorldId : prices.WorldNames?.FirstOrDefault(pair => pair.Value == state.HomeWorld).Key ?? 0;
+        var offers = new Dictionary<uint, RetainerItemOffers>();
+        if (world != 0)
+            foreach (var item in state.Listings.Select(listing => listing.ItemId).Distinct())
+                if (TenshoAssistant.Market.SeenPrices.RetainerOffers(store.Get(world, item), state.HomeWorld, universalis?.GetValueOrDefault(item), now) is { } seen) offers[item] = seen;
+        retainerSeen = (revision, universalis, minute, state, offers);
+        return offers;
+    }
+
     private void DrawRetainerSalesContent(RetainerSalesState state)
     {
         if (state.Status == RetainerSalesStatus.Unavailable) { ImGui.TextWrapped(localization.Get("RetainerSales.Unavailable")); return; }
         if (state.Listings.Count == 0) { ImGui.TextDisabled(localization.Get("RetainerSales.Empty")); return; }
         var compare = RetainerCompare?.State;
         var fresh = compare is { Items: not null } && compare.World == state.HomeWorld ? compare.Items : null;
+        var seen = RetainerSeenOffers(state, fresh);
         if (!state.AtHome) ImGui.TextWrapped(localization.Get("RetainerSales.NotHome"));
         ImGui.BeginDisabled(RetainerCompare is null || compare is { Loading: true } || !state.AtHome || !configuration.CommunityUniversalis);
         try
@@ -53,7 +73,8 @@ internal sealed partial class MainWindow
             var catalog = itemCatalog.State.Catalog;
             foreach (var listing in state.Listings)
             {
-                var offers = fresh?.GetValueOrDefault(listing.ItemId);
+                // X-73.14 (0.870): the offers seen at the game's board on your home world when newer than Universalis'.
+                var offers = seen.GetValueOrDefault(listing.ItemId) ?? fresh?.GetValueOrDefault(listing.ItemId);
                 var verdict = RetainerSales.Compare(listing, offers, state.OwnNames);
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
@@ -63,6 +84,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(listing.UnitPrice?.ToString("N0") ?? "?");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(verdict.Lowest?.ToString("N0") ?? "—");
                 if (verdict.Competitor is { Length: > 0 } seller && ImGui.IsItemHovered()) WrappedTooltip(localization.Format("RetainerSales.Seller", seller, offers?.DataAt?.ToLocalTime().ToString("g") ?? "?"));
+                else if (verdict.Lowest is not null && offers?.Offers.FirstOrDefault()?.Seen == true && ImGui.IsItemHovered()) WrappedTooltip(localization.Format("RetainerSales.SeenAt", offers.DataAt?.ToLocalTime().ToString("g") ?? "?"));
                 ImGui.TableNextColumn();
                 var (key, color) = verdict.Kind switch
                 {

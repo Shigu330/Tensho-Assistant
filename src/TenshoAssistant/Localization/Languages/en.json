@@ -554,6 +554,7 @@
     "WindowBestiaryWhere": "As a beastmaster, open it once: the beasts you have then show as obtained."
   },
   "RetainerSales": {
+    "SeenAt": "Seen at the game's market board at {0}: no seller name is kept.",
     "Title": "Your sales",
     "Unavailable": "The sale list could not be read, perhaps after a game update.",
     "Empty": "This retainer sells nothing.",
@@ -2150,9 +2151,10 @@
     "Bookmarks": "Bookmarked markers ({0})"
   },
   "MarketBoard": {
+    "SeenYours": "(seen in game, yours)",
     "SeenAdded": "Completed with what you saw at the game's market board: {0} offers, {1} sales.",
     "SeenInGame": "(seen in game)",
-    "SeenHelp": "Seen at the game's market board on a world you visited, more recent than Universalis for that world. Tensho keeps no seller name, so these offers are left out of « copy the undercut price ». Settings: World › Discoveries › market prices.",
+    "SeenHelp": "Seen at the game's market board on a world you visited, more recent than Universalis for that world. Tensho keeps no seller name, only whether the offer is one of your retainers': yours are left out of « copy the undercut price ». Settings: World › Discoveries › market prices.",
     "CopyUndercut": "Copy {0} (lowest minus 1)",
     "CopyUndercutTip": "Lowest offer without your retainers: {0} gil, read on {1}. The game may be ahead of this list. Only copied: you paste it yourself.",
     "NotMarketable": "This item cannot be sold on the market board.",

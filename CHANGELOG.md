@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.870.0
+- Plan global, Verify : Demande (X-73.14) : la comparaison des servants et la copie du prix utilisent aussi ce que vous avez vu au tableau. En lisant les offres, Tensho compare le numéro de servant de chaque offre aux vôtres et ne garde que « à vous / pas à vous » (aucun numéro, aucun nom). La liste de ventes d'un servant compare alors vos prix aux offres vues sur votre monde quand elles sont plus récentes qu'Universalis (moins de 24 h), sans avoir à cliquer « Comparer » ; dans la page Marché, vos offres vues sont marquées « (vu en jeu, à vous) » et les autres comptent pour « copier le prix pour passer en dessous ». Si vos servants n'étaient pas encore connus au moment de la lecture, rien n'est conclu. Non validé en jeu.
+- Tests : OwnOffers870Tests. Verify.ps1 (agent) : 1454/1454, 0 avertissement, 0 erreur ; DLL 0.870.0.0. Non validé en jeu.
+### English
+- Request (X-73.14): the retainer comparison and the undercut copy also use what you saw at the board. When reading offers, Tensho compares each offer's retainer id with yours and keeps only « yours / not yours » (no id, no name). A retainer's sale list then compares your prices with the offers seen on your world when newer than Universalis (under 24 h), without clicking « Compare »; on the Market page, your seen offers are marked « (seen in game, yours) » and the others count for « copy the undercut price ». If your retainers were not known yet at the reading, nothing is concluded. Not validated in game.
+
 ## 0.869.0
 - Plan global, Verify : Demande (X-73.13) : sondes avant les derniers parseurs. En mode développeur, le journal Dalamud note maintenant : à chaque changement d'état de la ligne de pêche, l'état (lancer, ligne à l'eau, touche, ferrage…), le type de lancer (leurres, mooch), le temps depuis le lancer et, à la touche, les animations du personnage (là où devrait se voir ! / !! / !!!) ; le résultat d'une réduction éthérée (objet réduit, objets obtenus et quantités) ; les objets qu'un PNJ demande à la remise (objet, quantité, HQ, collectionnable) avec la cible. Rien n'est gardé ni envoyé : ce sont des relevés à lire. Non validé en jeu.
 - Tests : Probes869Tests. Verify.ps1 (agent) : 1452/1452, 0 avertissement, 0 erreur ; DLL 0.869.0.0. Non validé en jeu.

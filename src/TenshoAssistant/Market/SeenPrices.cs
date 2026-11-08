@@ -3,7 +3,8 @@ using System.Text.Json;
 namespace TenshoAssistant.Market;
 
 /// <summary>X-52 (0.817): one offer as the game's market board shows it: unit price, quality, quantity. No retainer, seller or buyer is kept.</summary>
-public sealed record SeenListing(decimal Price,bool Hq,int Quantity);
+// X-73.14 (0.870): Own = one of your retainers' offers (the offer's retainer id compared with yours when it was read; only this yes/no is kept, never the id).
+public sealed record SeenListing(decimal Price,bool Hq,int Quantity,bool Own=false);
 /// <summary>X-52 (0.817): one sale of the board's history (the game gives the last 20): unit price, quality, quantity, when.</summary>
 public sealed record SeenSale(decimal Price,bool Hq,int Quantity,DateTimeOffset At);
 
@@ -15,6 +16,8 @@ public sealed class SeenMarketEntry
     public List<SeenListing> Listings { get; set; }=[];
     public DateTimeOffset ListingsAt { get; set; }
     public uint ListingsRequest { get; set; }
+    /// <summary>X-73.14 (0.870): your retainers were known when these offers were read, so their Own flags can be trusted.</summary>
+    public bool OwnKnown { get; set; }
     public List<SeenSale> Sales { get; set; }=[];
     public DateTimeOffset SalesAt { get; set; }
     public DateTimeOffset Seen=>ListingsAt>SalesAt ? ListingsAt:SalesAt;
@@ -95,7 +98,7 @@ public static class SeenPrices
                 {
                     offers.RemoveAll(offer=>offer.World==world);
                     offers.AddRange(entry.Listings.Where(listing=>listing.Price>0 && listing.Quantity>0).Select(listing=>new MarketOffer((long)Math.Round(listing.Price),
-                        listing.Quantity,listing.Hq,world,"",(long)Math.Round(listing.Price*listing.Quantity*0.05m),entry.ListingsAt,true)));
+                        listing.Quantity,listing.Hq,world,"",(long)Math.Round(listing.Price*listing.Quantity*0.05m),entry.ListingsAt,true,entry.OwnKnown ? listing.Own:null)));
                     changed=true;
                 }
             }
@@ -114,6 +117,18 @@ public static class SeenPrices
         }
         return new MarketBoard(board?.Scope ?? scope,item,board?.FetchedAt ?? used.Max(pair=>pair.Entry.Seen),offers.OrderBy(offer=>offer.UnitPrice).ToArray(),
             sales.OrderByDescending(sale=>sale.At).Take(MaxSales).ToArray(),board?.UnitsPerDay ?? Speed(null),board?.NqUnitsPerDay ?? Speed(false),board?.HqUnitsPerDay ?? Speed(true));
+    }
+
+    /// <summary>
+    /// X-73.14 (0.870): the other sellers' offers on your home world as seen at the game's board, for the retainer comparison: only when your retainers were known
+    /// at the reading, while current (CurrentOffers) and newer than Universalis' upload; your own offers left out by their flag. Null otherwise.
+    /// </summary>
+    public static RetainerItemOffers? RetainerOffers(SeenMarketEntry? entry,string world,RetainerItemOffers? universalis,DateTimeOffset now)
+    {
+        if(entry is not { OwnKnown:true } || entry.Listings.Count==0 || now-entry.ListingsAt>CurrentOffers)return null;
+        if(universalis?.DataAt is { } uploaded && uploaded>=entry.ListingsAt)return null;
+        return new(entry.Listings.Where(listing=>!listing.Own && listing.Price>0 && listing.Quantity>0).Select(listing=>new MarketOffer((long)Math.Round(listing.Price),listing.Quantity,
+            listing.Hq,world,"",(long)Math.Round(listing.Price*listing.Quantity*0.05m),entry.ListingsAt,true,false)).OrderBy(offer=>offer.UnitPrice).ToArray(),entry.ListingsAt);
     }
 
     /// <summary>The quote of what was seen; Universalis' other worlds and region kept from its own quote when there is one.</summary>
@@ -147,13 +162,14 @@ public sealed class SeenPriceStore
     private long revision;
 
     /// <summary>A page of offers: a new request replaces the last offers, a later page of the same request adds to them.</summary>
-    public void SeeListings(uint world,uint item,uint request,IEnumerable<SeenListing> page,DateTimeOffset at)
+    public void SeeListings(uint world,uint item,uint request,IEnumerable<SeenListing> page,DateTimeOffset at,bool ownKnown=false)
     {
         if(world==0 || item==0)return;
         lock(gate)
         {
             var entry=Entry(world,item);if(entry is null)return;
-            if(entry.ListingsRequest!=request || at-entry.ListingsAt>TimeSpan.FromMinutes(2)){entry.Listings=[];entry.ListingsRequest=request;}
+            if(entry.ListingsRequest!=request || at-entry.ListingsAt>TimeSpan.FromMinutes(2)){entry.Listings=[];entry.ListingsRequest=request;entry.OwnKnown=ownKnown;}
+            else entry.OwnKnown&=ownKnown;
             foreach(var listing in page)if(entry.Listings.Count<SeenPrices.MaxListings && listing.Price>0)entry.Listings.Add(listing);
             entry.ListingsAt=at;Dirty=true;revision++;
         }
@@ -215,7 +231,7 @@ public sealed class SeenPriceStore
     public SeenMarketEntry? Get(uint world,uint item)
     {
         lock(gate)return entries.TryGetValue((world,item),out var entry) ? new SeenMarketEntry{World=entry.World,Item=entry.Item,Listings=[..entry.Listings],ListingsAt=entry.ListingsAt,
-            ListingsRequest=entry.ListingsRequest,Sales=[..entry.Sales],SalesAt=entry.SalesAt}:null;
+            ListingsRequest=entry.ListingsRequest,OwnKnown=entry.OwnKnown,Sales=[..entry.Sales],SalesAt=entry.SalesAt}:null;
     }
 
     public List<SeenMarketEntry> Snapshot(){lock(gate){Dirty=false;return entries.Values.Select(entry=>Get(entry.World,entry.Item)!).ToList();}}
@@ -228,7 +244,7 @@ public sealed class SeenPriceStore
             foreach(var entry in saved)
                 // X-73.1 (0.857): nothing older than KeptFor is loaded.
                 if(entry.World!=0 && entry.Item!=0 && entries.Count<MaxEntries && DateTimeOffset.UtcNow-entry.Seen<=SeenPrices.KeptFor)
-                    entries[(entry.World,entry.Item)]=new SeenMarketEntry{World=entry.World,Item=entry.Item,ListingsRequest=entry.ListingsRequest,
+                    entries[(entry.World,entry.Item)]=new SeenMarketEntry{World=entry.World,Item=entry.Item,ListingsRequest=entry.ListingsRequest,OwnKnown=entry.OwnKnown,
                         Listings=entry.Listings.Where(listing=>listing.Price>0).Take(SeenPrices.MaxListings).ToList(),ListingsAt=entry.ListingsAt,
                         Sales=entry.Sales.Where(sale=>sale.Price>0).Take(SeenPrices.MaxSales).ToList(),SalesAt=entry.SalesAt};
         }

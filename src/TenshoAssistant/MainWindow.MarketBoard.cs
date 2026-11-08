@@ -30,10 +30,8 @@ internal sealed partial class MainWindow
     private MarketOffer[] marketShown=[];
     // X-73.12 (0.868): the board shown, completed by what was seen at the game's board; worked out again when the board, the prices seen or the minute change.
     private (MarketBoard? Board,string Scope,uint Item,long Revision,long Minute,MarketBoard? Shown) marketSeenKey;
-    private MarketBoard? marketRawBoard;
     private MarketBoard? BoardWithSeen(MarketBoard? board,string scope,uint item)
     {
-        marketRawBoard=board;
         if(SeenPrices is not { } store || !configuration.Discovery.Enabled || !configuration.Discovery.MarketPrices)return board;
         var now=DateTimeOffset.UtcNow;var minute=now.ToUnixTimeSeconds()/60;var revision=store.Revision;
         if(marketSeenKey.Item==item && ReferenceEquals(marketSeenKey.Board,board) && marketSeenKey.Scope==scope && marketSeenKey.Revision==revision && marketSeenKey.Minute==minute)
@@ -143,7 +141,7 @@ internal sealed partial class MainWindow
         else if(state.Board is { } fetched)ImGui.TextDisabled(localization.Format("MarketDates.Fetched",fetched.FetchedAt.ToLocalTime().ToString("g")));
         var shown=state.ItemId==item && state.Scope==scopeName ? state.Board:null;
         // X-73.12 (0.868): while Universalis is still asked, nothing yet; then its board completed by what was seen in game, or what was seen alone when it has none.
-        if(shown is null && state.Loading){marketRawBoard=null;return null;}
+        if(shown is null && state.Loading)return null;
         var completed=BoardWithSeen(shown,scopeName,item);
         if(completed is not null && !ReferenceEquals(completed,shown))
         {
@@ -222,7 +220,8 @@ internal sealed partial class MainWindow
         // 0.567 (I18): from this page too: your retainers are left out, by name, and the date says how old the list is (the game itself may be ahead).
         var ownRetainers=bankBridge.State.KnownRetainers?.Select(known=>known.Name).ToHashSet(StringComparer.Ordinal) ?? [];
         // X-73.12 (0.868): the offers seen in game have no seller name, so your own cannot be told apart: only Universalis' offers count here.
-        if(Undercut.Price((marketRawBoard ?? board).Offers.Where(offer=>!offer.Seen && !ownRetainers.Contains(offer.Retainer) && offer.UnitPrice is >0 and <=uint.MaxValue).Select(offer=>new UndercutListing((uint)offer.UnitPrice,offer.Hq,0)),new HashSet<ulong>()) is { } lowest)
+        // X-73.14 (0.870): a seen offer counts when known not to be yours.
+        if(Undercut.Price(board.Offers.Where(offer=>(offer.Seen ? offer.Own==false:!ownRetainers.Contains(offer.Retainer)) && offer.UnitPrice is >0 and <=uint.MaxValue).Select(offer=>new UndercutListing((uint)offer.UnitPrice,offer.Hq,0)),new HashSet<ulong>()) is { } lowest)
         {
             if(ImGui.SmallButton(localization.Format("MarketBoard.CopyUndercut",lowest.Paste.ToString("N0"))))ImGui.SetClipboardText(lowest.Paste.ToString(System.Globalization.CultureInfo.InvariantCulture));
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("MarketBoard.CopyUndercutTip",lowest.Lowest.ToString("N0"),board.FetchedAt.ToLocalTime().ToString("g")));
@@ -251,7 +250,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted(offer.Hq ? "HQ":"NQ");
                 ImGui.TableNextColumn();ImGui.TextUnformatted(offer.World);
                 ImGui.TableNextColumn();
-                if(offer.Seen){ImGui.TextDisabled(localization.Get("MarketBoard.SeenInGame"));Tip("MarketBoard.SeenHelp");}
+                if(offer.Seen){ImGui.TextDisabled(localization.Get(offer.Own==true ? "MarketBoard.SeenYours":"MarketBoard.SeenInGame"));Tip("MarketBoard.SeenHelp");}
                 else ImGui.TextUnformatted(offer.Retainer);
                 ImGui.TableNextColumn();ImGui.TextDisabled(offer.ReviewedAt?.ToLocalTime().ToString("g") ?? "—");
             }

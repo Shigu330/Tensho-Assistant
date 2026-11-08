@@ -201,7 +201,8 @@ public sealed class Plugin : IDalamudPlugin
                 return seenPrices.WithDataCenter(quote,market.State.WorldNames?.Keys.ToArray() ?? [],now);
             };
             Market.SeenPriceReader? seenReader=null;
-            registrations.Register(()=>seenReader=new Market.SeenPriceReader(marketBoardEvents,seenPrices,()=>market.State.WorldId,()=>configuration.Discovery.Enabled && configuration.Discovery.MarketPrices,log),()=>seenReader?.Dispose());
+            registrations.Register(()=>seenReader=new Market.SeenPriceReader(marketBoardEvents,seenPrices,()=>market.State.WorldId,()=>configuration.Discovery.Enabled && configuration.Discovery.MarketPrices,log)
+                {OwnRetainers=()=>bankBridge.State.KnownRetainers?.Select(known=>known.Id).ToHashSet()},()=>seenReader?.Dispose());
             _=Task.Run(()=>
             {
                 try{if(Market.SeenPriceStore.Read(Path.Combine(discoveryFolder,"MarketSeen.json")) is { } prices)seenPrices.Load(prices);}

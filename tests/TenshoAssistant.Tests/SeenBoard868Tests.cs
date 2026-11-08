@@ -30,8 +30,8 @@ internal static class SeenBoard868Tests
         ("Seen board: the page completes its board, and the undercut copy counts only Universalis' offers",() =>
         {
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MarketBoard.cs"));
-            Check(page.Contains("var completed=BoardWithSeen(shown,scopeName,item);") && page.Contains("if(shown is null && state.Loading){marketRawBoard=null;return null;}"),"completed");
-            Check(page.Contains("(marketRawBoard ?? board).Offers.Where(offer=>!offer.Seen && !ownRetainers.Contains(offer.Retainer)"),"undercut");
+            Check(page.Contains("var completed=BoardWithSeen(shown,scopeName,item);") && page.Contains("if(shown is null && state.Loading)return null;"),"completed");
+            Check(page.Contains("board.Offers.Where(offer=>(offer.Seen ? offer.Own==false:!ownRetainers.Contains(offer.Retainer))"),"undercut (0.870: seen offers known not yours)");
         }),
     ];
 }
