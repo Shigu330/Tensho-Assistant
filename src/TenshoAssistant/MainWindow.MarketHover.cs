@@ -355,11 +355,15 @@ internal sealed partial class MainWindow
         foreach(var achievement in AchievementsRewarding([id]).Take(3)){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionAchievement",achievement));}
         foreach(var dutyId in LuminaDutiesOf(id).Take(3))
             if(duties.State.Catalog?.Find(dutyId) is { } lootDuty){known++;ImGui.TextUnformatted(localization.Format("HoverUi.LuminaDuty",lootDuty.Name));}
+        // X-76 P5 (0.928): targeted retainer ventures from the game's sheets (RetainerTask → RetainerTaskNormal.Item), level and jobs.
+        var ventureTasks=VentureTasksOf?.Invoke(id) ?? [];
+        if(ventureTasks.Count>0){known++;ImGui.TextWrapped(localization.Format("HoverUi.Venture",string.Join(", ",ventureTasks.Take(3).Select(task=>localization.Format("HoverUi.VentureTask",task.Level,task.Jobs)))));}
         if(lumina?.State.Data is { } supplement)
         {
             if(supplement.MonstersOf(id) is { Count:>0 } mobs){known++;ImGui.TextWrapped(localization.Format("HoverUi.LuminaMonsters",string.Join(", ",mobs.Take(4))));}
             if(supplement.FatesOf(id) is { Count:>0 } fates){known++;ImGui.TextWrapped(localization.Format("HoverUi.LuminaFates",string.Join(", ",fates.Take(3))));}
-            if(supplement.FromVenture(id)){known++;ImGui.TextUnformatted(localization.Get("HoverUi.LuminaVenture"));}
+            // Exploration ventures give no item list in the sheets: the community line stays for them only.
+            if(ventureTasks.Count==0 && supplement.FromVenture(id)){known++;ImGui.TextUnformatted(localization.Get("HoverUi.LuminaVenture"));}
             foreach(var (kind,count,sources) in supplement.SupplementsOf(id))
             {
                 known++;

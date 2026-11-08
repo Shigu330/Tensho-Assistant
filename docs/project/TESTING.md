@@ -1496,6 +1496,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.927) Survoler un objet qui apprend une emote ou une coiffure, déjà apprise puis non apprise : ligne « Apprend quelque chose : … » verte ou rouge.
 
+- [ ] (0.928) Survoler un minerai ou un bois courant : ligne « Tâche de servant : niveau … (…) ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

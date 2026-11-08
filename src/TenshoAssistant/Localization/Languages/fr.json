@@ -3174,6 +3174,8 @@
     "GarlandType_npc": "PNJ",
     "LuminaMonsters": "Monstres : {0} (LuminaSupplemental)",
     "LuminaFates": "ALEA : {0} (LuminaSupplemental)",
+    "Venture": "Tâche de servant : {0}",
+    "VentureTask": "niveau {0} ({1})",
     "LuminaVenture": "Tâche de servant (LuminaSupplemental)",
     "LuminaStore": "Boutique en ligne : {0} USD (LuminaSupplemental)",
     "Supplement0": "Obtenu depuis : {0}",

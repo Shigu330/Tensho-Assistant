@@ -8,6 +8,8 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal Func<uint,bool?>? ItemUnlockState { get; set; }
+    /// <summary>X-76 P5 (0.928): the targeted retainer ventures that bring an item (retainer level, job category), from the game's sheets.</summary>
+    internal Func<uint,IReadOnlyList<(int Level,string Jobs)>>? VentureTasksOf { get; set; }
     private readonly Dictionary<uint,(bool? Value,long At)> itemUnlockCache=[];
 
     private bool? GameItemUnlocked(uint itemId)

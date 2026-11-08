@@ -1243,6 +1243,23 @@ public sealed class Plugin : IDalamudPlugin
                 try{return data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id) is { } row && unlocks.IsItemUnlockable(row) ? unlocks.IsItemUnlocked(row):null;}
                 catch(Exception){return null;}
             };
+            // X-76 P5 (0.928): targeted ventures by item, read once from RetainerTask (not random) → RetainerTaskNormal.Item.
+            var ventureTasks=new Lazy<IReadOnlyDictionary<uint,IReadOnlyList<(int Level,string Jobs)>>>(()=>
+            {
+                try
+                {
+                    var normal=data.GetExcelSheet<Lumina.Excel.Sheets.RetainerTaskNormal>();var found=new Dictionary<uint,List<(int Level,string Jobs)>>();
+                    foreach(var task in data.GetExcelSheet<Lumina.Excel.Sheets.RetainerTask>())
+                    {
+                        if(task.IsRandom || task.Task.RowId==0 || normal.GetRowOrDefault(task.Task.RowId) is not { } row || row.Item.RowId==0)continue;
+                        if(!found.TryGetValue(row.Item.RowId,out var list))found[row.Item.RowId]=list=[];
+                        list.Add((task.RetainerLevel,task.ClassJobCategory.ValueNullable?.Name.ExtractText() ?? ""));
+                    }
+                    return found.ToDictionary(pair=>pair.Key,pair=>(IReadOnlyList<(int Level,string Jobs)>)pair.Value.Distinct().OrderBy(task=>task.Level).ToArray());
+                }
+                catch(Exception error){log.Warning(error,"Retainer venture sheets unavailable (perhaps after a game update).");return new Dictionary<uint,IReadOnlyList<(int Level,string Jobs)>>();}
+            });
+            mainWindow.VentureTasksOf=id=>ventureTasks.Value.GetValueOrDefault(id) ?? [];
             mainWindow.GpActionUnlocked=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row && (row.UnlockLink.RowId==0 || unlocks.IsActionUnlocked(row));
             mainWindow.GpTraitsUnlocked=job=>
             {

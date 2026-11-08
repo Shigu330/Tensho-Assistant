@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.928.0
+- Plan global, Verify : Nettoyage X-76, parseurs P5 (première partie, tâches de servants) : l'info-bulle d'un objet dit maintenant, d'après les données du jeu, quelle tâche ciblée de servant le rapporte, avec le niveau du servant et les métiers (« Tâche de servant : niveau 50 (Mineur) »). La ligne de LuminaSupplemental ne reste que pour les objets que le jeu ne liste pas (tâches d'exploration). Non validé en jeu.
+- Tests : Ventures928Tests. Verify.ps1 (agent) : 1541/1541, 0 avertissement, 0 erreur ; DLL 0.928.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, parsers P5 (first part, retainer ventures): an item's tooltip now says, from the game's data, which targeted retainer venture brings it, with the retainer level and jobs (« Retainer venture: level 50 (Miner) »). The LuminaSupplemental line stays only for items the game does not list (exploration ventures). Not validated in game.
+
 ## 0.927.0
 - Plan global, Verify : Nettoyage X-76, parseurs P4 (état « débloqué » des objets) : Tensho demande maintenant au jeu si un objet apprend quelque chose (emote, coiffure, barde de chocobo, accessoire de mode, partition, carte…) et si votre personnage l'a déjà appris ; avant, seuls les montures et les mascottes étaient connues. L'info-bulle de l'objet affiche « Apprend quelque chose : déjà appris / pas encore appris », le filtre « pas encore obtenu » du butin et la valeur des monnaies en tiennent compte. Rien n'est demandé hors connexion ni en JcJ. Non validé en jeu.
 - Tests : ItemUnlock927Tests. Verify.ps1 (agent) : 1540/1540, 0 avertissement, 0 erreur ; DLL 0.927.0.0. Non validé en jeu.

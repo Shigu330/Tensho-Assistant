@@ -3174,6 +3174,8 @@
     "GarlandType_npc": "NPC",
     "LuminaMonsters": "Monsters: {0} (LuminaSupplemental)",
     "LuminaFates": "FATEs: {0} (LuminaSupplemental)",
+    "Venture": "Retainer venture: {0}",
+    "VentureTask": "level {0} ({1})",
     "LuminaVenture": "Retainer venture (LuminaSupplemental)",
     "LuminaStore": "Online store: {0} USD (LuminaSupplemental)",
     "Supplement0": "Obtained from: {0}",
