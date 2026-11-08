@@ -1444,6 +1444,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.901) Île sanctuaire : près d'un opo-opo ou d'un agneau, la carte de Tensho montre son icône ; calques › « Animaux de l'île » les cache.
 
+- [ ] (0.902) Carte › calques : « Rien » décoche aussi les six lignes de monstres, « Tout » les coche.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

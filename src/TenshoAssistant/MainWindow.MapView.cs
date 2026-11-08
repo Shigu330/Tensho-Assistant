@@ -530,6 +530,8 @@ internal sealed partial class MainWindow
                 settings.ShowQuests=settings.ShowFates=settings.ShowGathering=settings.ShowVendors=settings.ShowSightseeing=settings.ShowAetherCurrents=shown;
                 settings.ShowParty=settings.ShowBookmarks=settings.ShowHuntMarks=settings.ShowTreasure=settings.ShowFixedIcons=settings.ShowPlaceNames=settings.ShowIconNames=shown;
                 settings.ShowIslandPlants=settings.ShowIslandWood=settings.ShowIslandRocks=settings.ShowIslandEarth=settings.ShowIslandFishing=settings.ShowIslandAnimals=shown;
+                // 0.902 (user report: the monster layers were left out of All and None).
+                settings.ShowListMonsters=settings.ShowHuntLogMonsters=settings.ShowFateMonsters=settings.ShowBlueMageMonsters=settings.ShowCollectionMonsters=settings.ShowBeastMonsters=shown;
                 changed=true;
             }
             if(ImGui.SmallButton(localization.Get("MapView.LayersAll")))All(true);

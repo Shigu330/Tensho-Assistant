@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.902.0
+- Plan global, Verify : Retours de l'utilisateur : animaux de l'île sur la carte validés en jeu (« icônes ok ») ; dans le menu des calques de la carte, « Tout » et « Rien » ne réglaient pas les six calques de monstres (vos listes, bestiaire, ALÉA, mage bleu, pièce de collection manquante, dresseur). Ils les règlent maintenant, et un test vérifie que chaque case « Afficher … » du menu est couverte par « Tout » et « Rien ». Non validé en jeu.
+- Tests : MapLayersAll902Tests. Verify.ps1 (agent) : 1482/1482, 0 avertissement, 0 erreur ; DLL 0.902.0.0. Non validé en jeu.
+### English
+- User's reports: island animals on the map validated in game (« icons ok »); in the map's layers menu, « All » and « None » did not set the six monster layers (your lists, hunting log, FATEs, blue mage, missing collection piece, beastmaster). They now do, and a test checks every « Show … » box of the menu is covered by « All » and « None ». Not validated in game.
+
 ## 0.901.0
 - Plan global, Verify : Retour de l'utilisateur sur l'île sanctuaire (X-83) : à côté d'un animal, aucune icône sur la carte. Le relevé de la 0.881 a vu les monstres autour (opo-opo, agneau égaré) ; la feuille du jeu des animaux de l'île (MJIAnimals) relie chaque animal capturable à son monstre et à son icône. La carte montre maintenant les animaux capturables présents autour de vous, avec leur icône ; réglage « Animaux de l'île » dans le menu des calques (activé par défaut). Données du jeu seulement (preuve : docs/evidence/0.901-island-animals.md). Non validé en jeu.
 - Tests : IslandAnimals901Tests. Verify.ps1 (agent) : 1481/1481, 0 avertissement, 0 erreur ; DLL 0.901.0.0. Non validé en jeu.
