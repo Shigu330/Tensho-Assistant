@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.960.0
+- Plan global, Verify : Carte, votre signalement (X-94) : un trou de pêche (pêcheur niv. 95, Détroit ouest de Zorgor) s'affichait comme « point légendaire » demandant un tome de mineur. Cause : la nature d'un point et son tome étaient cherchés par le numéro du point dans la table des points de récolte, alors qu'un trou de pêche a un numéro d'une autre table ; celui du Détroit ouest de Zorgor tombait sur un point légendaire de mineur. Les lieux de pêche ne sont plus cherchés dans cette table. Aussi : question ajoutée à revoir sur les poissons de collection (X-97). Non validé en jeu.
+- Tests : FishingHoleKind960Tests. Verify.ps1 (agent) : 1587/1587, 0 avertissement, 0 erreur ; DLL 0.960.0.0. Non validé en jeu.
+### English
+- Map, your report (X-94): a fishing hole (fisher lv. 95, Zorgor strait) showed as a « legendary point » asking for a miner's tome. Cause: a point's kind and tome were looked up by the point's number in the gathering point table, while a fishing hole's number belongs to another table; the Zorgor strait's fell on a miner's legendary point. Fishing spots are no longer looked up there. Also: a question added to review about collectable fish (X-97). Not validated in game.
+
 ## 0.959.0
 - Plan global, Verify : Pêche, votre signalement « météo : ? » au Détroit ouest de Zorgor (X-96) : Shaaloani, comme toutes les zones de Shadowbringers, Thavnair, Garlemald et quelques zones de Dawntrail (24 en tout), a dans les données du jeu une « météo individuelle », la météo forcée tant que l'histoire de la zone n'est pas faite (la lumière éternelle de Shadowbringers). Tensho refusait toute prévision dans ces zones, d'où les « ? ». Sans rien inventer : 10 secondes après votre arrivée dans une telle zone, Tensho compare la prévision normale à la météo du jeu ; si elles concordent (votre histoire y est faite), la zone est notée et prévue comme les autres ensuite (aide à la pêche, alarmes, fenêtres de pêche, page Météo). Preuve : docs/evidence/0.959-individual-weather.md. Non validé en jeu.
 - Tests : IndividualWeather959Tests. Verify.ps1 (agent) : 1586/1586, 0 avertissement, 0 erreur ; DLL 0.959.0.0. Non validé en jeu.

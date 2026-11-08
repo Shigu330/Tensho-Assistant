@@ -143,4 +143,4 @@ La liste complète de ce qui reste pour la 1.0.0 : [PUBLISHING](PUBLISHING.md) �
 | 3 | Réorganisation des pages de réglages (X-76 étape 3) | Proposition concrète après la passe des groupes de réglages | — |
 | 4 | Choix provisoires depuis la 0.345 (tableau en tête de ce fichier) | Les passer en un seul lot, cases à cocher, à la fin du nettoyage (étape 9) | — |
 | 5 | Ventes des servants (I-05) | Garder la comparaison Universalis sur clic | Demander une fois à l'ouverture, sur réglage |
-
+| 6 | Poissons de collection « pas pris en compte » (X-97) | Question : où l'avez-vous vu ? Les prises collectionnables sont bien comptées dans les sacs et les découvertes ; proposition : afficher dans l'aide à la pêche la collectionnabilité visée et les assignats d'un poisson collectionnable | — |

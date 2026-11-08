@@ -1885,12 +1885,18 @@ internal sealed partial class MainWindow
     internal Func<uint,TenshoAssistant.Gathering.GatherPointKind>? GatherKind { get; set; }
     // Light text on the map's own dark backdrops (overlay lists, slider labels): fixed, as the backdrop does not follow the theme.
     private static readonly Vector4 MapOverlayText=new(0.93f,0.93f,0.93f,1);
-    private Vector4 TimedPointColor(MapLocalGatheringPoint point)=>GatherAccess?.Invoke(point.BaseId)?.TomeMissing is not null ? Muted:point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:UI.FfxivTheme.Warning;
+    /// <summary>
+    /// X-94 (0.960, user report: a fishing hole shown as a miner's legendary point asking for a tome): a fishing spot's id is a FishingSpot row (type 100),
+    /// not a GatheringPointBase row; its number then named another point. Kind and tome are read for gathering points only (miner, botanist, spearfishing).
+    /// </summary>
+    private static bool IsGatheringPointBase(MapLocalGatheringPoint point)=>point.TypeId!=100;
+    private TenshoAssistant.Gathering.GatherPointAccess? PointAccess(MapLocalGatheringPoint point)=>IsGatheringPointBase(point) ? GatherAccess?.Invoke(point.BaseId):null;
+    private Vector4 TimedPointColor(MapLocalGatheringPoint point)=>PointAccess(point)?.TomeMissing is not null ? Muted:point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:UI.FfxivTheme.Warning;
     private void DrawPointAvailability(MapLocalGatheringPoint point)
     {
-        var access=GatherAccess?.Invoke(point.BaseId);
+        var access=PointAccess(point);
         // 0.647 (C27): the kind of the point.
-        if(GatherKind?.Invoke(point.BaseId) is { } kind and not TenshoAssistant.Gathering.GatherPointKind.Normal)ImGui.TextDisabled(localization.Get("MapView.PointKind"+kind));
+        if(IsGatheringPointBase(point) && GatherKind?.Invoke(point.BaseId) is { } kind and not TenshoAssistant.Gathering.GatherPointKind.Normal)ImGui.TextDisabled(localization.Get("MapView.PointKind"+kind));
         if(point.Timed)
         {
             var open=point.ActiveAt(EorzeaMinutes());
