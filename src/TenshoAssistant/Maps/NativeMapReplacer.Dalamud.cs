@@ -197,7 +197,7 @@ internal sealed class NativeMapReplacer : IDisposable
             quest=agent->CurrentOpenMapInfo.QuestId;aetheryte=agent->CurrentOpenMapInfo.AetheryteId;fate=agent->CurrentOpenMapInfo.FateId;
         }
         var title=questLog && agent!=null ? MapLiveReader.TooltipText(&agent->CurrentOpenMapInfo.TitleString):"";
-        if(log)this.log.Information("Game map hosted: type {0}, map {1}, territory {2}, selected {3}, quest {4}, aetheryte {5}, fate {6}, target {7}, title \"{8}\".",type,requested,territory,selected,quest,aetheryte,fate,target?.ToString() ?? "none",title);
+        if(log)this.log.Information("Game map hosted: type {0}, map {1}, territory {2}, selected {3}, quest {4}, aetheryte {5}, fate {6}, target {7}, title \"{8}\", scale {9}, icon {10}.",type,requested,territory,selected,quest,aetheryte,fate,target?.ToString() ?? "none",title,targetScale,targetIcon);
         var route=questLog && agent!=null ? FindRoute(agent):(0u,null,0u);
         if(log && route.MapId!=0)this.log.Information("Game map route: event marker on map {0} at {1}.",route.MapId,route.Position?.ToString() ?? "none");
         return (new(selected,requested,territory,client.MapId,quest,aetheryte,fate,questLog,target,targetIcon,route.MapId,route.Position,route.Icon,title,targetScale),$"{type}|{requested}|{territory}|{quest}|{aetheryte}|{fate}|{target}");

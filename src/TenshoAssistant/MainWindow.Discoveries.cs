@@ -108,7 +108,7 @@ internal sealed partial class MainWindow
         if(discoveredSources.Item==item && discoveredSources.Revision==store.Revision)return discoveredSources.Lines;
         var lines=ItemSourceKinds.Where(kind=>kind is not (DiscoveryKind.FishCondition or DiscoveryKind.FestivalSeen or DiscoveryKind.VistaSeen or DiscoveryKind.VoyageUnlock
                 or DiscoveryKind.BlueSpellLearned or DiscoveryKind.BeastTamed or DiscoveryKind.FashionEvaluation or DiscoveryKind.NpcPlace or DiscoveryKind.BlueSpellCaster
-                or DiscoveryKind.FishLure or DiscoveryKind.FishTransition or DiscoveryKind.FishBite or DiscoveryKind.QuestItemAsked))
+                or DiscoveryKind.FishLure or DiscoveryKind.FishTransition or DiscoveryKind.FishBite or DiscoveryKind.QuestItemAsked or DiscoveryKind.SpearfishShadow))
             .SelectMany(kind=>store.Find(kind,subject=>subject==item,4)).OrderByDescending(fact=>fact.Seen+fact.Imported).Take(4)
             .Select(fact=>$"{DiscoveryFactName(fact)} ({DiscoveryFactLevel(fact)}, ×{fact.Seen+fact.Imported})").ToArray();
         discoveredSources=(item,store.Revision,lines);
@@ -181,7 +181,10 @@ internal sealed partial class MainWindow
                 $"{(group.Key switch{1=>"!",2=>"!!",3=>"!!!",_=>"?"})} {group.Min(fact=>fact.LevelMin)/10.0:0.0}–{group.Max(fact=>fact.LevelMax)/10.0:0.0} s")));
         if(store.Find(DiscoveryKind.FishLure,subject=>subject==fish,2) is { Count:>0 } lures)
             parts.Add(string.Join(", ",lures.Select(fact=>localization.Get(fact.Detail==1 ? "FishingPanel.SeenAmbitious":"FishingPanel.SeenModest"))));
-        var line=parts.Count==0 ? null:localization.Format("FishingPanel.SeenByYou",catches.Sum(fact=>fact.Seen+fact.Imported),string.Join(" · ",parts));
+        // X-73.18 (0.890): the spearfishing shadows you saw it have.
+        var shadows=store.Find(DiscoveryKind.SpearfishShadow,subject=>subject==fish,8);
+        if(shadows.Count>0)parts.Add(localization.Format("Spearfishing.SeenShadow",string.Join(", ",shadows.Select(fact=>SpearShadowText((int)fact.Detail,fact.LevelMin)).Distinct())));
+        var line=parts.Count==0 ? null:localization.Format("FishingPanel.SeenByYou",catches.Sum(fact=>fact.Seen+fact.Imported)+shadows.Sum(fact=>fact.Seen+fact.Imported),string.Join(" · ",parts));
         if(seenFishLines.Lines.Count<2048)seenFishLines.Lines[fish]=line;
         return line;
     }
@@ -252,6 +255,7 @@ internal sealed partial class MainWindow
         DiscoveryKind.FateReward=>localization.Format("DiscoveriesUi.FromFate",DiscoveryItemName(fact.Subject),DiscoveryFateName(fact.Detail)),
         DiscoveryKind.MonsterDrop=>localization.Format("DiscoveriesUi.FromMonster",DiscoveryItemName(fact.Subject),DiscoveryMonsterName(fact.Detail)),
         DiscoveryKind.QuestItemAsked=>localization.Format("DiscoveriesUi.QuestAsked",DiscoveryItemName(fact.Subject),DiscoveryQuestName(fact.Detail)),
+        DiscoveryKind.SpearfishShadow=>localization.Format("DiscoveriesUi.SpearShadow",DiscoveryItemName(fact.Subject),SpearShadowText((int)fact.Detail,fact.LevelMin)),
         DiscoveryKind.Reduction=>localization.Format("DiscoveriesUi.FromReduction",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
         DiscoveryKind.ItemFromItem=>localization.Format("DiscoveriesUi.FromItem",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
         DiscoveryKind.FishCatch=>localization.Format("DiscoveriesUi.FromBait",DiscoveryItemName(fact.Subject),fact.Detail==0 ? "?":DiscoveryItemName(fact.Detail)),

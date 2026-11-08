@@ -189,7 +189,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         {
             var at=DateTimeOffset.UtcNow;var territory=client.TerritoryType;var map=client.MapId;var duty=dutyOf(territory);
             CheckWeather(at,now,territory,duty);
-            if(wanted.Fishing && me.ClassJob.RowId==18)ReadLine(now,me);
+            if(wanted.Fishing && me.ClassJob.RowId==18){ReadLine(now,me);ReadSpear(at,territory,map,me.Position);}
             if(wanted.ItemSources)
             {
                 ReadSalvage(at);ReadPurify(at);ReadHandIn(at,now);ReadVenture(at);ReadLoot(at,territory,duty);
@@ -332,6 +332,42 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         var quest=0x10000u+changed[0];
         foreach(var (item,quantity,hq) in pending.Items)store.SeeSource(DiscoveryKind.QuestItemAsked,item,quest,quantity,at);
         if(debug())log.Information("Discovery: quest {0} asked for {1}.",quest,string.Join(", ",pending.Items.Select(entry=>$"{entry.Item}x{entry.Quantity}")));
+    }
+
+    /// <summary>
+    /// X-73.18 (0.890, docs/evidence/0.890-spearfishing.md): spearfishing. The window's AtkValues 21 (catches so far) and 12 (the item last caught) were read in game:
+    /// 21 grows by one at each catch, 12 is then the fish the chat names. The shadows in sight are AddonSpearFishing.Fish (three slots, named fields of
+    /// FFXIVClientStructs, read since 0.417), taken at the read before the catch. The catch keeps its shadow only when every shadow in sight was alike.
+    /// </summary>
+    private int spearCatches=-1;private (int Size,int Speed)[] spearInSight=[];
+    private static int SpearValue(FFXIVClientStructs.FFXIV.Component.GUI.AtkValue value)=>value.Type switch
+    {
+        FFXIVClientStructs.FFXIV.Component.GUI.AtkValueType.Int=>value.Int,
+        FFXIVClientStructs.FFXIV.Component.GUI.AtkValueType.UInt=>value.UInt>int.MaxValue ? -1:(int)value.UInt,
+        _=>-1,
+    };
+    private void ReadSpear(DateTimeOffset at,uint territory,uint map,Vector3 position)
+    {
+        var handle=gui.GetAddonByName("SpearFishing");
+        if(handle.IsNull || !handle.IsVisible){spearCatches=-1;spearInSight=[];return;}
+        var unit=(FFXIVClientStructs.FFXIV.Component.GUI.AtkUnitBase*)handle.Address;var addon=(FFXIVClientStructs.FFXIV.Client.UI.AddonSpearFishing*)handle.Address;
+        if(unit->AtkValues==null || unit->AtkValuesCount<=21)return;
+        var count=SpearValue(unit->AtkValues[21]);var item=SpearValue(unit->AtkValues[12]);
+        var before=spearInSight;var inSight=new List<(int,int)>();
+        for(var index=0;index<addon->Fish.Length;index++)
+        {
+            var fish=addon->Fish[index];
+            if(fish.Available)inSight.Add(((int)fish.Size,fish.Speed));
+        }
+        spearInSight=inSight.ToArray();
+        if(count<0)return;
+        if(spearCatches>=0 && count==spearCatches+1 && item>0 && ItemGains.SpearShadow(before) is { } shadow)
+        {
+            store.SeeSource(DiscoveryKind.SpearfishShadow,(uint)item,(uint)shadow.Size,shadow.Speed,at,territory,map,position);
+            if(debug())log.Information("Discovery: spearfishing {0}, shadow size {1}, speed {2}.",item,shadow.Size,shadow.Speed);
+        }
+        else if(count>spearCatches && spearCatches>=0 && debug())log.Information("Discovery: spearfishing {0}, shadow unknown ({1} kinds in sight).",item,before.Distinct().Count());
+        spearCatches=count;
     }
 
     private void ReadVenture(DateTimeOffset at)

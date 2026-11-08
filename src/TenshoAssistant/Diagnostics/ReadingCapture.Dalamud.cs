@@ -134,6 +134,17 @@ public sealed unsafe class ReadingCapture : IDisposable
                 else if(value.Type==AtkValueType.Int)values.Append($" {index}={value.Int}");
                 else if(value.Type==AtkValueType.Bool)values.Append($" {index}={value.Bool}");
             }
+            // 0.890 (X-73.18): the spearfishing shadows in sight (AddonSpearFishing.Fish), to check the catch's shadow against the window.
+            if(name=="SpearFishing")
+            {
+                var spear=(AddonSpearFishing*)handle.Address;
+                values.Append(" | slots");
+                for(var slot=0;slot<spear->Fish.Length;slot++)
+                {
+                    var fish=spear->Fish[slot];
+                    values.Append($" {slot}:{(fish.Available ? 1:0)}/{(int)fish.Size}/{fish.Speed}/{(fish.GuaranteedLarge ? 1:0)}/{(fish.InverseDirection ? 1:0)}");
+                }
+            }
             var all=values.ToString();
             if(windowValues.GetValueOrDefault(name)==all)continue;
             windowValues[name]=all;

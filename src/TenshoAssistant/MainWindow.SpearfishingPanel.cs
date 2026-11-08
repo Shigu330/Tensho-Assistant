@@ -13,6 +13,23 @@ internal sealed partial class MainWindow
 {
     internal SpearfishingReader? Spearfishing { get; set; }
 
+    /// <summary>X-73.18 (0.890): a shadow's size and speed, in words.</summary>
+    private string SpearShadowText(int size,int speed)=>localization.Format("Spearfishing.SizeSpeed",
+        localization.Get(size switch{1=>"Spearfishing.Small",2=>"Spearfishing.Average",3=>"Spearfishing.Large",_=>"Spearfishing.UnknownSize"}),
+        Gathering.Spearfishing.SpeedName(speed) is { } name ? localization.Get("Spearfishing.Speed"+name):speed.ToString());
+    /// <summary>X-73.18 (0.890): the fish you speared in this zone with this shadow; worked out again only when the base changes.</summary>
+    private (long Revision,Dictionary<(int,int,uint),uint[]> Fish) seenSpearfish=(-1,[]);
+    private IReadOnlyList<uint> SeenSpearfish(int size,int speed,uint territory)
+    {
+        if(DiscoveryStore is not { } store || !DiscoveriesLoaded)return [];
+        if(seenSpearfish.Revision!=store.Revision)seenSpearfish=(store.Revision,[]);
+        if(seenSpearfish.Fish.TryGetValue((size,speed,territory),out var known))return known;
+        var found=store.Find(TenshoAssistant.Discoveries.DiscoveryKind.SpearfishShadow,_=>true,4096)
+            .Where(fact=>fact.Territory==territory && fact.Detail==size && fact.LevelMin<=speed && speed<=fact.LevelMax).Select(fact=>fact.Subject).Distinct().Order().ToArray();
+        if(seenSpearfish.Fish.Count<256)seenSpearfish.Fish[(size,speed,territory)]=found;
+        return found;
+    }
+
     internal void DrawSpearfishingPanel()
     {
         if(windowDisposed || !configuration.FishingPanel || Spearfishing?.Frame is not { } frame)return;
@@ -31,10 +48,13 @@ internal sealed partial class MainWindow
                 var speed=Gathering.Spearfishing.SpeedName(slot.Speed) is { } name ? localization.Get("Spearfishing.Speed"+name):slot.Speed.ToString();
                 ImGui.TextColored(Muted,localization.Format("Spearfishing.Slot",slot.Index+1,size,speed)+(slot.Large ? " · "+localization.Get("Spearfishing.GuaranteedLarge"):""));
                 if(developerMode)ImGui.TextDisabled($"size {slot.Size} · speed {slot.Speed} · reverse {slot.Reverse}");
-                if(data is null){ImGui.TextDisabled(localization.Get("Spearfishing.NoData"));continue;}
+                // X-73.18 (0.890): what you speared here with this shadow comes first.
+                var seenHere=SeenSpearfish(slot.Size,slot.Speed,frame.TerritoryId);
+                foreach(var fish in seenHere)ImGui.TextColored(Accent,(items?.Find(fish)?.Name ?? $"ID {fish}")+" · "+localization.Get("Spearfishing.Seen"));
+                if(data is null){if(seenHere.Count==0)ImGui.TextDisabled(localization.Get("Spearfishing.NoData"));continue;}
                 var candidates=Gathering.Spearfishing.Candidates(data.Spearfish,slot,InZone);
-                if(candidates.InZone.Count+candidates.Elsewhere.Count==0){ImGui.TextDisabled(localization.Get("Spearfishing.NoMatch"));continue;}
-                foreach(var fish in candidates.InZone)ImGui.TextColored(Accent,items?.Find(fish)?.Name ?? $"ID {fish}");
+                if(candidates.InZone.Count+candidates.Elsewhere.Count+seenHere.Count==0){ImGui.TextDisabled(localization.Get("Spearfishing.NoMatch"));continue;}
+                foreach(var fish in candidates.InZone.Where(fish=>!seenHere.Contains(fish)))ImGui.TextColored(Accent,items?.Find(fish)?.Name ?? $"ID {fish}");
                 foreach(var fish in candidates.Elsewhere.Take(3))ImGui.TextDisabled(items?.Find(fish)?.Name ?? $"ID {fish}");
             }
             if(shown==0)ImGui.TextDisabled(localization.Get("Spearfishing.NoFish"));

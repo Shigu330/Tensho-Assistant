@@ -19,6 +19,13 @@ public static class ItemGains
     /// <summary>X-73.18 (0.888): an item id without its HQ (+1 000 000) or collectable (+500 000) offset.</summary>
     public static uint BaseItem(uint raw)=>raw%500_000;
 
+    /// <summary>
+    /// X-73.18 (0.890): the shadow a speared fish had, from the shadows in sight just before the catch (size 1–3, speed): known only when they all had the same
+    /// size and speed, else null (which one was speared is not told by the game).
+    /// </summary>
+    public static (int Size,int Speed)? SpearShadow(IReadOnlyList<(int Size,int Speed)> inSight)=>
+        inSight.Distinct().ToArray() is [var only] && only.Size is >= 1 and <= 3 && only.Speed>0 ? only:null;
+
     /// <summary>X-73.18 (0.887): the bite strength from the player's animation slot 7 at the bite (FishingHookStrength 292 !, 293 !!, 294 !!!); 0 unknown.</summary>
     public static uint BiteStrength(ushort timeline)=>timeline switch{292=>1,293=>2,294=>3,_=>0};
 
