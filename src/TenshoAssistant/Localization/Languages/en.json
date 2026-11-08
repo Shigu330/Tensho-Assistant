@@ -6487,6 +6487,7 @@
     "SearchTip": "Filters the list. The marks of your zone come first.",
     "Empty": "Nothing matches.",
     "HereZone": "In this zone",
+    "FateSeen": "FATE « {0} » seen in game at {1}, {2} (×{3})",
     "Window": "Window: {0} to {1} h ({2} to {3} h after a maintenance)",
     "Sure": "certain once the window is open",
     "Random": "random, even with the window open",

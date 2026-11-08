@@ -67,5 +67,14 @@ internal sealed partial class MainWindow
         var mark=row.Mark;
         var window=localization.Format("SRank.Window",mark.Minimum,mark.Maximum,mark.MaintenanceMinimum,mark.MaintenanceMaximum);
         ImGui.TextDisabled(mark.Odds switch{SRankOdds.Guaranteed=>window+" · "+localization.Get("SRank.Sure"),SRankOdds.Chance=>window+" · "+localization.Get("SRank.Random"),_=>window});
+        // X-91 (0.971, planned in X-75.5, docs/evidence/x91-parsers-check.md): where the condition's FATE was seen in game (yours or shared), from the discoveries.
+        if(DiscoveryStore is { } seenStore && DiscoveriesLoaded && maps.State.Catalog is { } seenMaps)
+            foreach(var fate in mark.Refs.Where(item=>item.Kind==SRankRefKind.Fate))
+                foreach(var fact in seenStore.Find(Discoveries.DiscoveryKind.FateSeen,fate.Id,3))
+                    if(seenMaps.Find(fact.Map) is { } seenMap)
+                    {
+                        var at=MapProjection.CoordinateFromWorld(new System.Numerics.Vector3(fact.X,0,fact.Z),seenMap);
+                        ImGui.TextDisabled(localization.Format("SRank.FateSeen",DiscoveryFateName(fate.Id),MapProjection.CoordinateNumber(at.X),MapProjection.CoordinateNumber(at.Y),Discoveries.DiscoveryFact.TimesOf(fact)));
+                    }
     }
 }

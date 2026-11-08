@@ -1582,6 +1582,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.970) Quêtes : survoler une quête, ligne « Extension : … ». Survoler un objet récolté (ex. un minerai de Heavensward) : ligne « Extension (d'après ses lieux de récolte) : Heavensward ».
 
+- [ ] (0.971) Cartes › Conditions des rangs S, un rang S à ALÉA (ex. un ALÉA déjà vu) : ligne « ALÉA « … » vu en jeu en x, y (×n) ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

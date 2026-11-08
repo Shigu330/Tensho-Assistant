@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.971.0
+- Plan global, Verify : Dernière vérification des parseurs (X-91, votre document « à faire ») : chaque parseur prévu au plan comparé au code (bilan : docs/evidence/x91-parsers-check.md). Un seul point prévu manquait : la page des rangs S affiche maintenant où l'ALÉA de la condition a été vu en jeu (par vous ou partagé), avec ses coordonnées. Tout le reste est codé, attend un relevé en jeu déjà noté dans la table des rappels (servants, fin de mission, leurre nageur), ou a été laissé exprès avec sa raison. Non validé en jeu.
+- Tests : ParsersCheck971Tests. Verify.ps1 (agent) : 1599/1599, 0 avertissement, 0 erreur ; DLL 0.971.0.0. Non validé en jeu.
+### English
+- Last check of the parsers (X-91, your « to do » document): every parser planned compared with the code (report: docs/evidence/x91-parsers-check.md). One planned item was missing: the S rank page now shows where the condition's FATE was seen in game (yours or shared), with its coordinates. Everything else is coded, waits for an in-game reading already in the reminder table (retainers, duty end, swimbait), or was left on purpose with its reason. Not validated in game.
+
 ## 0.970.0
 - Plan global, Verify : Extension d'origine (X-89, votre document « à faire ») : l'info-bulle d'une quête et sa fiche donnent son extension, lue dans les données du jeu. Pour un objet, le jeu ne donne pas d'extension : la ligne « Extension (d'après…) » n'apparaît que quand toutes ses sources sûres donnent la même extension, ses lieux de récolte ou de pêche et les quêtes qui le donnent ; une source inconnue ou deux extensions différentes, et rien n'est affiché (jamais deviné). Non validé en jeu.
 - Tests : Expansion970Tests. Verify.ps1 (agent) : 1598/1598, 0 avertissement, 0 erreur ; DLL 0.970.0.0. Non validé en jeu.

@@ -6487,6 +6487,7 @@
     "SearchTip": "Filtre la liste. Les marques de votre zone viennent en premier.",
     "Empty": "Aucun résultat.",
     "HereZone": "Dans cette zone",
+    "FateSeen": "ALÉA « {0} » vu en jeu en {1}, {2} (×{3})",
     "Window": "Fenêtre : {0} à {1} h ({2} à {3} h après une maintenance)",
     "Sure": "sûr une fois la fenêtre ouverte",
     "Random": "aléatoire, même fenêtre ouverte",
