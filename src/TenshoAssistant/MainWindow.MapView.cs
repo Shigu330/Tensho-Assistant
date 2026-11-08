@@ -1322,10 +1322,21 @@ internal sealed partial class MainWindow
             if(settings.ShowFateAreas)
                 foreach(var fate in fates.Where(fate=>fate.Radius>0))
                     DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(fate.Position,map)*mapZoom,fate.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,settings.FateAreaColor);
+            // X-86 (0.967, user request): a quest or event area above or below the player gets the game's chevron across the whole area, faint, so the
+            // icons inside stay visible (an area without an icon had no arrow at all).
+            var areaPlayerHeight=settings.HeightArrows && live is { } areaLive && eventMaps.Contains(areaLive.MapId) ? areaLive.Position.Y:float.NaN;
+            var areaChevron=float.IsNaN(areaPlayerHeight) || !textures.GetFromGame(MapHeight.ChevronTexture).TryGetWrap(out var areaChevronWrap,out _) ? null:areaChevronWrap;
             foreach(var marker in events.Where(marker=>marker.Radius>0))
             {
                 var quest=marker.MarkerType==3;
                 if(quest ? !settings.ShowQuestAreas:marker.IsLeve ? !settings.ShowLeveAreas:!settings.ShowEventAreas)continue;
+                if(areaChevron is not null && MapHeight.Arrow(marker.Position.Y,areaPlayerHeight,settings.HeightArrowYalms) is var areaArrow and not 0)
+                {
+                    var areaCentre=origin+mapPan+MapProjection.PixelFromWorld(marker.Position,map)*mapZoom;
+                    var areaSide=Math.Max(12,marker.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom*1.4f);
+                    var (areaFrom,areaTo)=MapHeight.ChevronUv(areaArrow);
+                    draw.AddImage(areaChevron.Handle,areaCentre-new Vector2(areaSide/2),areaCentre+new Vector2(areaSide/2),areaFrom,areaTo,ImGui.GetColorU32(new Vector4(1,1,1,0.3f)));
+                }
                 DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(marker.Position,map)*mapZoom,marker.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,quest ? settings.QuestAreaColor:marker.IsLeve ? settings.LeveAreaColor:settings.EventAreaColor);
             }
             if(settings.ShowGatheringAreas)

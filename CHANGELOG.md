@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.967.0
+- Plan global, Verify : Carte (X-86) : une zone de quête ou d'événement au-dessus ou au-dessous de vous porte maintenant la flèche de hauteur du jeu, en grand chevron discret sur toute la zone (les icônes dedans restent visibles) ; avant, une zone sans icône n'avait aucune flèche. Le décalage des parties non découvertes (Eurêka Anemos) demande une capture en jeu : ajouté aux relevés. Non validé en jeu.
+- Tests : AreaArrows967Tests. Verify.ps1 (agent) : 1594/1594, 0 avertissement, 0 erreur ; DLL 0.967.0.0. Non validé en jeu.
+### English
+- Map (X-86): a quest or event area above or below you now carries the game's height arrow, as a large faint chevron across the whole area (the icons inside stay visible); before, an area without an icon had no arrow. The offset of the undiscovered parts (Eureka Anemos) needs an in-game capture: added to the readings. Not validated in game.
+
 ## 0.966.0
 - Plan global, Verify : Carte (X-86, votre document « à faire ») : une case « Quêtes pas encore disponibles » dans le menu du clic droit de la carte (et dans Paramètres › Carte, sous « Quêtes et objectifs ») affiche ou masque les marqueurs de quête que le jeu dessine verrouillés. Activée par défaut, comme avant. Non validé en jeu.
 - Tests : LockedQuests966Tests. Verify.ps1 (agent) : 1593/1593, 0 avertissement, 0 erreur ; DLL 0.966.0.0. Non validé en jeu.
