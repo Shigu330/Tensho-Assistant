@@ -584,8 +584,8 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
+    "SummarySpearShadow": "Spearfishing shadows seen: {0} ({1} seen by you, {2} imported only)",
     "SpearShadow": "{0}: spearfishing shadow {1}",
-    "SummarySpearfishShadow": "Spearfishing shadows seen: {0} ({1} seen by you, {2} imported only)",
     "QuestAsked": "{0} asked by « {1} »",
     "SummaryQuestItemAsked": "Items asked by quests: {0} ({1} seen by you, {2} imported only)",
     "FromReduction": "{0} ← aetherial reduction of {1}",
@@ -6334,6 +6334,11 @@
     "SettingTip": "Small on-screen window with the items of your active Tensho alarms (gathering, fishing), soonest first with the time left; click a name: its sheet; « Map »: the game map on the point when known. Hidden with the game’s interface; the cross closes it.\nDefault: off."
   },
   "Spearfishing": {
+    "PointFish": "Fish of this node:",
+    "ZoneFish": "Spearfishing fish of this zone:",
+    "InSight": "in sight",
+    "NoList": "No spearfishing fish known here.",
+    "Elsewhere": "Not a fish of this node; elsewhere: {0}",
     "SizeSpeed": "{0}, speed {1}",
     "Seen": "seen by you",
     "SeenShadow": "spearfishing: {0}",

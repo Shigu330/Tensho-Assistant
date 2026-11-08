@@ -1422,6 +1422,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.890) Harpon (mode développeur) : quelques prises ; panneau de harpon : « vu par vous » ; Monde › Découvertes : « Ombres au harpon vues ». Carte : carnet de pêche › un trou de La Mer de Rubis › afficher sur la carte.
 
+- [ ] (0.891) Harpon : la liste du point reste affichée ; un poisson de la bonne ombre en vue passe en couleur « en vue ». Carte : les trous de pêche en poisson orange. Carnet de pêche › un trou › afficher sur la carte (pour la zone).
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

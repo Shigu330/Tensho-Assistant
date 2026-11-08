@@ -12,13 +12,14 @@ namespace TenshoAssistant.Gathering;
 internal sealed class SpearfishingReader : IDisposable
 {
     private readonly object gate=new();
-    private readonly IFramework framework;private readonly IGameGui gui;private readonly IClientState client;private readonly IPluginLog log;
+    private readonly IFramework framework;private readonly IGameGui gui;private readonly IClientState client;private readonly IPluginLog log;private readonly Func<uint> point;
+    private uint lastPoint;
     private bool disposed;private long nextRead;private int warned;
     private SpearfishFrame? frame;
     public SpearfishFrame? Frame=>Volatile.Read(ref frame);
 
-    public SpearfishingReader(IFramework framework,IGameGui gui,IClientState client,IPluginLog log)
-    {this.framework=framework;this.gui=gui;this.client=client;this.log=log;TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}
+    public SpearfishingReader(IFramework framework,IGameGui gui,IClientState client,IPluginLog log,Func<uint> point)
+    {this.framework=framework;this.gui=gui;this.client=client;this.log=log;this.point=point;TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}
 
     private unsafe void Update(IFramework unused)
     {
@@ -29,7 +30,9 @@ internal sealed class SpearfishingReader : IDisposable
             try
             {
                 var handle=gui.GetAddonByName("SpearFishing");
-                if(!client.IsLoggedIn || handle.IsNull || !handle.IsReady || !handle.IsVisible || gui.GameUiHidden){Volatile.Write(ref frame,null);return;}
+                if(!client.IsLoggedIn || handle.IsNull || !handle.IsReady || !handle.IsVisible || gui.GameUiHidden){Volatile.Write(ref frame,null);lastPoint=0;return;}
+                // 0.891 (X-79): the node targeted (a GatheringPoint row), kept while the window stays open.
+                if(point() is var target and not 0)lastPoint=target;
                 var addon=(AddonSpearFishing*)handle.Address;var unit=(AtkUnitBase*)handle.Address;
                 if(unit->RootNode==null || addon->Fish.Length!=3){Volatile.Write(ref frame,null);return;}
                 var slots=new SpearfishSlot[3];
@@ -38,7 +41,7 @@ internal sealed class SpearfishingReader : IDisposable
                     var fish=addon->Fish[index];
                     slots[index]=new(index,fish.Available,(int)fish.Size,fish.Speed,fish.GuaranteedLarge,fish.InverseDirection);
                 }
-                Volatile.Write(ref frame,new SpearfishFrame(slots,client.TerritoryType,unit->X,unit->Y,unit->RootNode->Width*unit->Scale,DateTimeOffset.UtcNow));
+                Volatile.Write(ref frame,new SpearfishFrame(slots,client.TerritoryType,unit->X,unit->Y,unit->RootNode->Width*unit->Scale,DateTimeOffset.UtcNow,lastPoint));
             }
             catch(Exception error)
             {

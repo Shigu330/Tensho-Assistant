@@ -124,6 +124,13 @@ public static class MapLocalLists
             .ToArray();
     }
 
+    /// <summary>
+    /// X-78 (0.891, user request: the fishing spot « as on FF14 », an orange fish like the spearfishing one): the game's orange fish map icon, 60465, next to the
+    /// gathering types' icons (60461–60464, GatheringType.IconOff) and drawn like the spearfishing fish 60929 (docs/evidence/0.891-spearfishing-slots.md). No sheet
+    /// names it: chosen by its look, for the map only (the gathering lists keep their icon).
+    /// </summary>
+    public const uint FishingSpotIcon=60465;
+
     /// <summary>Gathering points of the map by gathering type, one row per point base or fishing spot (items merged).</summary>
     public static IReadOnlyList<(string Type,IReadOnlyList<MapLocalGatheringPoint> Points)> Gathering(IEnumerable<GatheringSource> sources,MapLocalIndex index,uint mapId)
     {
@@ -134,7 +141,7 @@ public static class MapLocalLists
             {
                 var first=group.First();
                 return new MapLocalGatheringPoint(first.BaseId,first.TypeName,first.Level,first.Place,group.Select(source=>source.ItemId).Distinct().Order().ToArray(),
-                    group.Any(source=>source.IsHidden),first.IsFishing ? index.Fishing(first.BaseId):index.Gathering(first.BaseId),first.IconId,
+                    group.Any(source=>source.IsHidden),first.IsFishing ? index.Fishing(first.BaseId):index.Gathering(first.BaseId),first.IsFishing ? FishingSpotIcon:first.IconId,
                     group.Select(source=>source.Schedule).FirstOrDefault(schedule=>schedule is { Kind:GatheringScheduleKind.Limited }));
             })
             .GroupBy(point=>point.Type.Length>0 ? point.Type:"—")

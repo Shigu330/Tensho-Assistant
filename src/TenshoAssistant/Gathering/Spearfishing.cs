@@ -25,6 +25,20 @@ public static class Spearfishing
     /// <summary>The GatherBuddy name of a speed (language files key « Spearfishing.Speed{name} »), or null for a value it does not name.</summary>
     public static string? SpeedName(int speed)=>Speeds.FirstOrDefault(pair=>pair.Value==speed).Key;
 
+    /// <summary>
+    /// X-79 (0.891, user request: the whole list always shown, the fish in sight highlighted): every fish of the point, in a fixed order (size, speed, id) so that
+    /// it does not move while fish come and go.
+    /// </summary>
+    public static IReadOnlyList<SpearfishRow> Rows(IEnumerable<uint> fish,Func<uint,(int Size,int Speed)?> seen,Func<uint,(int Size,int Speed)?> community,IReadOnlyList<SpearfishSlot> slots)
+    {
+        var inSight=slots.Where(slot=>slot.Available).Select(slot=>(slot.Size,slot.Speed)).ToHashSet();
+        return fish.Distinct().Select(id=>
+        {
+            var own=seen(id);var shadow=own ?? community(id);
+            return new SpearfishRow(id,shadow?.Size,shadow?.Speed,own is not null,shadow is { } known && inSight.Contains(known));
+        }).OrderBy(row=>row.Size ?? 9).ThenBy(row=>row.Speed ?? int.MaxValue).ThenBy(row=>row.Fish).ToArray();
+    }
+
     public static SpearfishCandidates Candidates(IEnumerable<GatherBuddyFish> fish,SpearfishSlot slot,Func<uint,bool> inZone)
     {
         if(!slot.Available || slot.Size is < 1 or > 3 || slot.Speed<=0)return new([],[]);
@@ -34,4 +48,8 @@ public static class Spearfishing
 }
 
 /// <summary>R-15 (0.417): what Tensho read in the game's spearfishing window, with the zone and the window's place on screen.</summary>
-public sealed record SpearfishFrame(IReadOnlyList<SpearfishSlot> Slots,uint TerritoryId,float X,float Y,float Width,DateTimeOffset ObservedAt);
+/// <summary>0.891: PointId = the GatheringPoint row of the node targeted when the window opened (0 when none was seen).</summary>
+public sealed record SpearfishFrame(IReadOnlyList<SpearfishSlot> Slots,uint TerritoryId,float X,float Y,float Width,DateTimeOffset ObservedAt,uint PointId=0);
+
+/// <summary>X-79 (0.891): one fish of the point in the spearfishing panel: its shadow (yours first, else GatherBuddy's), and whether a shadow like it is in sight.</summary>
+public sealed record SpearfishRow(uint Fish,int? Size,int? Speed,bool Seen,bool InSight);

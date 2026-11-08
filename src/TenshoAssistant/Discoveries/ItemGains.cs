@@ -20,8 +20,8 @@ public static class ItemGains
     public static uint BaseItem(uint raw)=>raw%500_000;
 
     /// <summary>
-    /// X-73.18 (0.890): the shadow a speared fish had, from the shadows in sight just before the catch (size 1–3, speed): known only when they all had the same
-    /// size and speed, else null (which one was speared is not told by the game).
+    /// X-73.18 (0.890, 0.891): the shadow a speared fish had, from the slots that left the window with their size and speed kept just before the catch (size 1–3,
+    /// speed): known only when they all had the same size and speed, else null.
     /// </summary>
     public static (int Size,int Speed)? SpearShadow(IReadOnlyList<(int Size,int Speed)> inSight)=>
         inSight.Distinct().ToArray() is [var only] && only.Size is >= 1 and <= 3 && only.Speed>0 ? only:null;
