@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Fields;
@@ -69,7 +68,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();
                 if(row.Level is { } level)ImGui.TextUnformatted(level.ToString());else ImGui.TextDisabled("—");
                 ImGui.TableNextColumn();
-                if(coordinate is { } at)ImGui.TextUnformatted(string.Create(CultureInfo.InvariantCulture,$"X {at.X:0.0} Y {at.Y:0.0}"));else ImGui.TextDisabled("—");
+                if(coordinate is { } at)ImGui.TextUnformatted(MapProjection.CoordinateText(at));else ImGui.TextDisabled("—");
             }
         }
         finally{ImGui.EndTable();}

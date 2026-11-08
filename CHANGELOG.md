@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.905.0
+- Plan global, Verify : Nettoyage complet (X-76), étape 2 (doublons et cohérence) : quatre agents ont relevé 37 logiques écrites plusieurs fois ou incohérentes (liste et état : docs/evidence/x76-2-duplicates.md). Première famille, les coordonnées de carte : une seule conversion de la position du jeu en coordonnées de carte, une seule écriture « X 12.3 Y 4.5 » et un seul format des nombres, toujours avec un point comme le jeu (un Windows en français affichait « 12,3 » sur certaines pages et « 12.3 » sur d'autres), un seul nom par défaut des signets ; la position d'un monstre (Garland Tools) passe de 2 décimales à 1. Nouveaux tests, dont un avec Windows en français. Non validé en jeu.
+- Tests : MapCoordinates905Tests. Verify.ps1 (agent) : 1485/1485, 0 avertissement, 0 erreur ; DLL 0.905.0.0. Non validé en jeu.
+### English
+- Full clean-up (X-76), step 2 (duplicates and coherence): four agents found 37 pieces of logic written several times or incoherent (list and state: docs/evidence/x76-2-duplicates.md). First family, map coordinates: one conversion from the game position to map coordinates, one « X 12.3 Y 4.5 » text and one number format, always with a dot as the game writes them (a Windows set to French showed « 12,3 » on some pages and « 12.3 » on others), one default bookmark name; a monster's position (Garland Tools) goes from 2 decimals to 1. New tests, one with Windows in French. Not validated in game.
+
 ## 0.904.0
 - Plan global, Verify : Nettoyage complet (X-76), étapes 0 et 1 : point de départ mesuré et gardé (docs/evidence/x76-0-baseline.md : 589 fichiers C#, 69 148 lignes, 6 925 clés de langue, 279 réglages, 27 hôtes cités, 20 parties de capture) avec une sauvegarde zip ; code mort cherché par une compilation d'essai (analyseurs « membre jamais utilisé »), un script et une contre-vérification par quatre agents : 91 éléments inutiles retirés (87 clés de langue, surtout l'ancienne page Personnage, et 8 morceaux de code sans appel), 2 éléments gardés car encore utilisés (preuve : docs/evidence/0.904-dead-code.md). Aucun changement de comportement. Validé en jeu par l'utilisateur : filtre « Tout » / « Rien » de la carte (0.902).
 - Tests : PlaceMenus704Tests. Verify.ps1 (agent) : 1483/1483, 0 avertissement, 0 erreur ; DLL 0.904.0.0. Non validé en jeu.

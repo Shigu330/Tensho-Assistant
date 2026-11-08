@@ -22,6 +22,10 @@ public static class MapProjection
     {var scale=Scale(map.SizeFactor);return new((world.X+map.OffsetX)*scale+1024,(world.Z+map.OffsetY)*scale+1024);}
     public static Vector2 CoordinateFromPixel(Vector2 pixel,MapDefinition map)
     {var scale=Scale(map.SizeFactor);return new(41f/scale*pixel.X/TextureSize+1,41f/scale*pixel.Y/TextureSize+1);}
+    public static Vector2 CoordinateFromWorld(Vector3 world,MapDefinition map)=>CoordinateFromPixel(PixelFromWorld(world,map),map);
+    /// <summary>One map coordinate as the game writes it: one decimal, always with a dot whatever the Windows language.</summary>
+    public static string CoordinateNumber(float value)=>value.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture);
+    public static string CoordinateText(Vector2 coordinate)=>$"X {CoordinateNumber(coordinate.X)} Y {CoordinateNumber(coordinate.Y)}";
     public static Vector2 PixelFromCoordinate(Vector2 coordinate,MapDefinition map)
     {var scale=Scale(map.SizeFactor);return new((coordinate.X-1)*TextureSize*scale/41f,(coordinate.Y-1)*TextureSize*scale/41f);}
     public static bool OnMap(Vector2 pixel)=>pixel.X>=0 && pixel.Y>=0 && pixel.X<=TextureSize && pixel.Y<=TextureSize;

@@ -65,16 +65,12 @@ internal sealed partial class MainWindow
 
     private void FlagAt(MapDefinition map,Vector3 world)
     {
-        var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(world,map),map);
+        var coordinate=MapProjection.CoordinateFromWorld(world,map);
         PlaceFlagFromMapView(map,coordinate.X,coordinate.Y);
         ImGui.CloseCurrentPopup();
     }
-    private static Vector2 CoordinateOf(MapDefinition map,Vector3 world)=>MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(world,map),map);
-    private string CoordinateText(MapDefinition map,Vector3 world)
-    {
-        var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(world,map),map);
-        return $"X {coordinate.X:0.0}  Y {coordinate.Y:0.0}";
-    }
+    private static Vector2 CoordinateOf(MapDefinition map,Vector3 world)=>MapProjection.CoordinateFromWorld(world,map);
+    private static string CoordinateText(MapDefinition map,Vector3 world)=>MapProjection.CoordinateText(CoordinateOf(map,world));
 
     private void DrawLocalQuests(MapDefinition map)
     {
@@ -239,7 +235,7 @@ internal sealed partial class MainWindow
             var name=vendor.Name.Length>0 ? vendor.Name:localization.Get("MapLocal.UnnamedVendor");
             // Same icon as on the map: the game's icon the vendor stands by (MAP-017), else the icon of its kind.
             DrawSmallGameIcon(VendorMarker(vendorMarkers,MapProjection.PixelFromWorld(new Vector3(spot.WorldX,0,spot.WorldZ),map),VendorIconOf(vendor))?.Icon ?? VendorIconOf(vendor));
-            if(ImGui.Selectable($"{name}  (X {spot.X:0.0}  Y {spot.Y:0.0})##Vendor{vendor.NpcId}/{spot.X}/{spot.Y}")){PlaceFlagFromMapView(map,spot.X,spot.Y);ImGui.CloseCurrentPopup();}
+            if(ImGui.Selectable($"{name}  ({MapProjection.CoordinateText(new(spot.X,spot.Y))})##Vendor{vendor.NpcId}/{spot.X}/{spot.Y}")){PlaceFlagFromMapView(map,spot.X,spot.Y);ImGui.CloseCurrentPopup();}
             NpcMenu($"VendorTool{vendor.NpcId}/{spot.X}/{spot.Y}",name,vendor.NpcId,vendor.Locations);
             if(ImGui.IsItemHovered())WrappedTooltip(VendorLabel(vendor)+"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
         }
@@ -264,7 +260,7 @@ internal sealed partial class MainWindow
             var locked=npc.Available(questsDone)==false;
             var lacking=(missing.Count>0 ? "  "+localization.Format("MapLocal.TriadMissing",missing.Count):"")+(locked ? "  "+localization.Get("TriadNpcs.QuestNeeded"):"");
             ImGui.PushStyleColor(ImGuiCol.Text,locked || (beaten==true && missing.Count==0) ? UI.FfxivTheme.TextMuted:UI.FfxivTheme.Text);
-            try{if(ImGui.Selectable($"{mark}  {npc.Name}  (X {npc.X:0.0}  Y {npc.Y:0.0}){lacking}##LocalTriad{npc.MatchId}")){PlaceFlagFromMapView(map,npc.X,npc.Y);ImGui.CloseCurrentPopup();}}
+            try{if(ImGui.Selectable($"{mark}  {npc.Name}  ({MapProjection.CoordinateText(new(npc.X,npc.Y))}){lacking}##LocalTriad{npc.MatchId}")){PlaceFlagFromMapView(map,npc.X,npc.Y);ImGui.CloseCurrentPopup();}}
             finally{ImGui.PopStyleColor();}
             NpcMenu($"TriadTool{npc.MatchId}",npc.Name,0,[new(map.TerritoryId,map.MapId,map.Zone,npc.X,npc.Y,0,0,0)],("MapLocal.OpenTriadTool",()=>OpenTriadTab("Npcs")));
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("TriadNpcs.Tooltip",npc.Fee,npc.RewardCards.Count==0 ? "—"
@@ -296,7 +292,7 @@ internal sealed partial class MainWindow
                     Tip("MapLocal.FavoriteRemoveTip");
                     ImGui.SameLine();
                     var name=(point.Group is { } group ? $"[{group}] ":"")+point.Name.Replace("##","# #");
-                    var place=here || !known ? $"{point.X:F1}, {point.Y:F1}":$"{target!.Zone} · {point.X:F1}, {point.Y:F1}";
+                    var place=here || !known ? $"{MapProjection.CoordinateNumber(point.X)}, {MapProjection.CoordinateNumber(point.Y)}":$"{target!.Zone} · {MapProjection.CoordinateNumber(point.X)}, {MapProjection.CoordinateNumber(point.Y)}";
                     if(!known)ImGui.TextDisabled(localization.Format("MapLocal.FavoriteUnknown",name));
                     else if(ImGui.Selectable($"{name} ({place})###Favorite"))
                     {

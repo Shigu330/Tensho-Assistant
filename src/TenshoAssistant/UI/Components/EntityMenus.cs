@@ -19,7 +19,7 @@ internal sealed partial class MainWindow
             if(ImGui.Selectable(localization.Get("EntityMenu.OpenQuest"))){SelectQuest(questId);questShowDetails=true;page=Page.Quests;IsOpen=true;}
             // Where the quest starts (cached map position index).
             if(mapLocal?.State.Index?.Quest(questId) is { } start && maps.State.Catalog?.Find(start.MapId) is { } map)
-                PlaceEntries(map,MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(new Vector3(start.X,0,start.Z),map),map),"EntityMenu.QuestStart");
+                PlaceEntries(map,MapProjection.CoordinateFromWorld(new Vector3(start.X,0,start.Z),map),"EntityMenu.QuestStart");
         }
         finally{ImGui.EndPopup();}
     }
@@ -80,7 +80,7 @@ internal sealed partial class MainWindow
     private void PlaceEntries(MapDefinition map,Vector2 coordinate,string? titleKey,string? place=null)
     {
         // A place text already carries its coordinates (NpcPlace): they are not repeated.
-        ImGui.TextDisabled(place ?? $"{(titleKey is null ? map.Zone:localization.Get(titleKey))}  (X {coordinate.X:0.0}  Y {coordinate.Y:0.0})");
+        ImGui.TextDisabled(place ?? $"{(titleKey is null ? map.Zone:localization.Get(titleKey))}  ({MapProjection.CoordinateText(coordinate)})");
         ImGui.BeginDisabled(map.TerritoryId==0);
         try{if(ImGui.Selectable(localization.Get("MapView.Flag")+"##EntityFlag"))PlaceFlagFromMapView(map,coordinate.X,coordinate.Y);}
         finally{ImGui.EndDisabled();}

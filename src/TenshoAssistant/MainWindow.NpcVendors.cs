@@ -116,7 +116,7 @@ internal sealed partial class MainWindow
     private string NpcName(NpcVendor vendor)=>vendor.Name.Length>0 ? char.ToUpper(vendor.Name[0],System.Globalization.CultureInfo.CurrentCulture)+vendor.Name[1..]
         :localization.Format("NpcUi.Unnamed",vendor.NpcId);
     private string NpcPlace(NpcLocation location)=>localization.Format("NpcUi.Place",location.Zone.Length>0 ? location.Zone:localization.Get("NpcUi.UnknownZone"),
-        location.X.ToString("0.0"),location.Y.ToString("0.0"));
+        Maps.MapProjection.CoordinateNumber(location.X),Maps.MapProjection.CoordinateNumber(location.Y));
     // Amount followed by the currency's game icon; the name is only a tooltip (when the window accepts input) or a fallback text.
     private void DrawNpcCosts(NpcShopSale sale,float iconSize,bool tooltips)
     {

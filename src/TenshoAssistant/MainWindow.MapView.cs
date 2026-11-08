@@ -1471,7 +1471,7 @@ internal sealed partial class MainWindow
                     var at=origin+mapPan+MapProjection.PixelFromCoordinate(new Vector2(mark.X,mark.Y),map)*mapZoom;
                     if(!DrawGlyph(draw,at,FontAwesomeIcon.Star,new Vector4(1f,0.85f,0.35f,1),baseIcon*bookmarkSize,hovered,io.MousePos))continue;
                     hoveredBookmark=mark;sightseeingTip=null;tooltipPoint=null;
-                    tooltip=(mark.Group is { } group ? $"[{group}] ":"")+mark.Name+$" ({mark.X:0.0}, {mark.Y:0.0})"+(mark.Note is { } note ? "\n"+note:"")+"\n"+localization.Get("MapView.BookmarkClick");
+                    tooltip=(mark.Group is { } group ? $"[{group}] ":"")+mark.Name+$" ({MapProjection.CoordinateNumber(mark.X)}, {MapProjection.CoordinateNumber(mark.Y)})"+(mark.Note is { } note ? "\n"+note:"")+"\n"+localization.Get("MapView.BookmarkClick");
                 }
             if(hoveredBookmark is { } clicked && top is null && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)FlagFromMap(map,clicked.X,clicked.Y);
             // 0.384 (g, M-14): the deciphered treasure map's spot, with the treasure layer; a click places the flag there.
@@ -1521,7 +1521,7 @@ internal sealed partial class MainWindow
                 if(chosen.Flag is { } vendorSpot && released)FlagFromMap(map,vendorSpot.X,vendorSpot.Y);
                 if(chosen.Point is { Position:{ } spot })
                 {
-                    if(released){var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(new Vector3(spot.X,0,spot.Z),map),map);FlagFromMap(map,coordinate.X,coordinate.Y);}
+                    if(released){var coordinate=MapProjection.CoordinateFromWorld(new Vector3(spot.X,0,spot.Z),map);FlagFromMap(map,coordinate.X,coordinate.Y);}
                 }
                 // R-04 (0.245): right click on an icon opens that icon's menu, unless the icon is in the « general menu » list.
                 if(ImGui.IsMouseClicked(ImGuiMouseButton.Right) && !settings.RightClickIgnored(chosen.Icon) && sightseeingTip is null)
@@ -1531,7 +1531,7 @@ internal sealed partial class MainWindow
             if(settings.ShowPlayerCoordinates && player is { } standing)
             {
                 var own=MapProjection.CoordinateFromPixel(standing,map);
-                var ownLabel=localization.Format("MapView.PlayerCoordinates",own.X.ToString("0.0"),own.Y.ToString("0.0"));
+                var ownLabel=localization.Format("MapView.PlayerCoordinates",MapProjection.CoordinateNumber(own.X),MapProjection.CoordinateNumber(own.Y));
                 var ownBox=ImGui.CalcTextSize(ownLabel)+new Vector2(10,6);
                 var ownTop=size.Y-ownBox.Y*2-10;
                 draw.AddRectFilled(origin+new Vector2(6,ownTop),origin+new Vector2(6+ownBox.X,ownTop+ownBox.Y),ImGui.GetColorU32(UI.FfxivTheme.Panel),3);
@@ -1540,7 +1540,7 @@ internal sealed partial class MainWindow
             if(hovered)
             {
                 var coordinate=MapProjection.CoordinateFromPixel((io.MousePos-origin-mapPan)/mapZoom,map);
-                var label=localization.Format("MapView.Cursor",coordinate.X.ToString("0.0"),coordinate.Y.ToString("0.0"));
+                var label=localization.Format("MapView.Cursor",MapProjection.CoordinateNumber(coordinate.X),MapProjection.CoordinateNumber(coordinate.Y));
                 if(player is { } measured)label=localization.Format("MapView.CursorDistance",label,MapProjection.Yalms(measured,(io.MousePos-origin-mapPan)/mapZoom,map).ToString("0"));
                 var box=ImGui.CalcTextSize(label)+new Vector2(10,6);
                 draw.AddRectFilled(origin+new Vector2(6,size.Y-box.Y-6),origin+new Vector2(6+box.X,size.Y-6),ImGui.GetColorU32(UI.FfxivTheme.Panel),3);
@@ -1601,7 +1601,7 @@ internal sealed partial class MainWindow
             try
             {
                 var coordinate=MapProjection.CoordinateFromPixel(mapContextPixel,map);
-                ImGui.TextDisabled(localization.Format("MapView.Cursor",coordinate.X.ToString("0.0"),coordinate.Y.ToString("0.0")));
+                ImGui.TextDisabled(localization.Format("MapView.Cursor",MapProjection.CoordinateNumber(coordinate.X),MapProjection.CoordinateNumber(coordinate.Y)));
                 ImGui.BeginDisabled(map.TerritoryId==0);
                 try{if(ImGui.Selectable(localization.Get("MapView.Flag")))FlagFromMap(map,coordinate.X,coordinate.Y);}
                 finally{ImGui.EndDisabled();}
@@ -1623,7 +1623,7 @@ internal sealed partial class MainWindow
                     ImGui.SameLine();
                     if(ImGui.SmallButton(localization.Get("MapView.AddBookmark")))
                     {
-                        var name=string.IsNullOrWhiteSpace(mapContextBookmarkName) ? $"{map.Zone} · {coordinate.X:F1}, {coordinate.Y:F1}":mapContextBookmarkName;
+                        var name=string.IsNullOrWhiteSpace(mapContextBookmarkName) ? MapBookmarks.DefaultName(map.Zone,coordinate.X,coordinate.Y):mapContextBookmarkName;
                         if(SaveBookmarks(items=>MapBookmarks.Add(items,MapBookmarks.Create(map,name,MathF.Round(coordinate.X,1),MathF.Round(coordinate.Y,1))),adding:true))
                             {mapContextBookmarkName="";ImGui.CloseCurrentPopup();}
                     }
@@ -1879,7 +1879,7 @@ internal sealed partial class MainWindow
         if(!ReferenceEquals(wikiVistaMatch.Document,document) || !ReferenceEquals(wikiVistaMatch.Index,index))
         {
             var games=index.All(MapLocalKind.Sightseeing).Select(row=>catalog.Find(row.MapId) is { } map
-                ? MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(new Vector3(row.X,0,row.Z),map),map) is var c ? (row.Id,(int)(row.Id-2162688u),c.X,c.Y):default
+                ? MapProjection.CoordinateFromWorld(new Vector3(row.X,0,row.Z),map) is var c ? (row.Id,(int)(row.Id-2162688u),c.X,c.Y):default
                 :default).Where(entry=>entry.Id!=0);
             wikiVistaMatch=(document,index,WikiVistaParser.Match(document.Rows,games));
         }
@@ -2147,7 +2147,7 @@ internal sealed partial class MainWindow
             if(icon==FlagIcon && settings.EdgeFlagCoordinates)
             {
                 var spot=MapProjection.CoordinateFromPixel(pixel,map);
-                var text=localization.Format("MapView.Cursor",spot.X.ToString("0.0"),spot.Y.ToString("0.0"));
+                var text=localization.Format("MapView.Cursor",MapProjection.CoordinateNumber(spot.X),MapProjection.CoordinateNumber(spot.Y));
                 if(player is { } standing)text=localization.Format("MapView.CursorDistance",text,MapProjection.Yalms(standing,pixel,map).ToString("0"));
                 var measure=ImGui.CalcTextSize(text);
                 var left=Math.Clamp(edge.X-measure.X/2,origin.X+2,Math.Max(origin.X+2,origin.X+size.X-measure.X-2));

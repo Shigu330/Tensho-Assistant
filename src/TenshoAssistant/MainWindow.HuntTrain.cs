@@ -35,16 +35,16 @@ internal sealed partial class MainWindow
             foreach(var item in nearby.Where(item=>item.Kind==MapObjectKind.HuntMark && item.Level>=2))
             {
                 if(!huntMarksAnnounced.Add($"{map.MapId}/{item.Name}"))continue;
-                var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(item.Position,map),map);
+                var coordinate=MapProjection.CoordinateFromWorld(item.Position,map);
                 ChatNotice?.Invoke(localization.Format("HuntTrain.MarkAlert",item.Name,item.Level==3 ? "S":"A",map.Zone,
-                    coordinate.X.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),coordinate.Y.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture)));
+                    MapProjection.CoordinateNumber(coordinate.X),MapProjection.CoordinateNumber(coordinate.Y)));
                 if(configuration.AlarmOptions.PlaySound)Alarms.AlarmService.PlaySound(configuration.AlarmOptions.Sound,log);
             }
         if(huntMarksAnnounced.Count>200)huntMarksAnnounced.Clear();
         if(!huntTrainRecording)return;
         foreach(var item in nearby.Where(item=>item.Kind==MapObjectKind.HuntMark && (item.Level>=2 || huntTrainRankB)))
         {
-            var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(item.Position,map),map);
+            var coordinate=MapProjection.CoordinateFromWorld(item.Position,map);
             huntTrain=HuntTrain.Add(huntTrain,new(item.Name,item.Level,map.MapId,map.TerritoryId,map.Zone,coordinate.X,coordinate.Y,now));
         }
     }
@@ -105,8 +105,8 @@ internal sealed partial class MainWindow
             try
             {
                 var rank=stop.Rank switch{3=>"S",2=>"A",_=>"B"};
-                ImGui.TextColored(stop.Visited ? Muted:Accent,localization.Format("HuntTrain.Stop",index+1,stop.Name,rank,stop.Zone,stop.X.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),
-                    stop.Y.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),stop.SeenAt.ToLocalTime().ToString("t")));
+                ImGui.TextColored(stop.Visited ? Muted:Accent,localization.Format("HuntTrain.Stop",index+1,stop.Name,rank,stop.Zone,MapProjection.CoordinateNumber(stop.X),
+                    MapProjection.CoordinateNumber(stop.Y),stop.SeenAt.ToLocalTime().ToString("t")));
                 if(catalog.Find(stop.MapId) is { } stopMap)PlaceMenu("TrainPlace",stopMap,new(stop.X,stop.Y),stop.Name);
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("HuntTrain.Flag")) && catalog.Find(stop.MapId) is { } map)

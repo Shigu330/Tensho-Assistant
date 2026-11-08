@@ -92,7 +92,7 @@ internal sealed partial class MainWindow
                                 ImGui.TextUnformatted((point?.Group is { } group ? $"[{group}] " : "") + (string.IsNullOrWhiteSpace(point?.Name) ? localization.Get("MapsUi.Unnamed") : point.Name));
                                 if (point is not null && ImGui.IsItemHovered())
                                 {
-                                    WrappedTooltip(valid ? $"{map!.Zone} · {map.Subzone}\nX {point.X:F1} · Y {point.Y:F1}" + (point.Note is { } note ? "\n" + note : "")
+                                    WrappedTooltip(valid ? $"{map!.Zone} · {map.Subzone}\nX {MapProjection.CoordinateNumber(point.X)} · Y {MapProjection.CoordinateNumber(point.Y)}" + (point.Note is { } note ? "\n" + note : "")
                                         : localization.Get("MapsUi.MissingBookmark"));
                                 }
                             }
@@ -170,7 +170,7 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(-1);
         if (ImGui.InputTextWithHint("##BookmarkName", localization.Get("MapsUi.Name"), ref bookmarkName, MapBookmarks.NameLimit * 4 + 1)) bookmarkSaved = false;
         Tip("MapsUi.BookmarkNameTip");
-        string Name() => string.IsNullOrWhiteSpace(bookmarkName) ? $"{selected.Zone} · {mapX:F1}, {mapY:F1}" : bookmarkName;
+        string Name() => string.IsNullOrWhiteSpace(bookmarkName) ? MapBookmarks.DefaultName(selected.Zone, mapX, mapY) : bookmarkName;
         // 0.378 (g, M-08): optional group and note.
         ImGui.SetNextItemWidth(160);
         if (ImGui.InputTextWithHint("##BookmarkGroup", localization.Get("MapsUi.Group"), ref bookmarkGroup, MapBookmarks.GroupLimit * 4 + 1)) bookmarkSaved = false;

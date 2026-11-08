@@ -80,7 +80,7 @@ internal sealed partial class MainWindow
                     {
                         var (npc,beaten,missing)=rows[index];
                         ImGui.TableNextRow();ImGui.TableNextColumn();
-                        var place=npc.MapId!=0 ? $"{npc.Zone} (X {npc.X:0.0}, Y {npc.Y:0.0})":localization.Get("TriadNpcs.NoPlace");
+                        var place=npc.MapId!=0 ? $"{npc.Zone} ({Maps.MapProjection.CoordinateText(new(npc.X,npc.Y))})":localization.Get("TriadNpcs.NoPlace");
                         if(ImGui.Selectable($"{npc.Name}##TriadNpc{npc.MatchId}",false,ImGuiSelectableFlags.SpanAllColumns) && npc.MapId!=0
                            && maps.State.Catalog?.Find(npc.MapId) is { } map)PlaceFlagFromMapView(map,npc.X,npc.Y);
                         NpcMenu($"TriadNpcMenu{npc.MatchId}",npc.Name,0,maps.State.Catalog?.Find(npc.MapId) is { } npcMap ? [new(npcMap.TerritoryId,npcMap.MapId,npcMap.Zone,npc.X,npc.Y,0,0,0)]:[]);

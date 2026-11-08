@@ -129,7 +129,7 @@ internal sealed partial class MainWindow
         Npcs.NpcLocation? place=null;
         if(store.Find(DiscoveryKind.NpcPlace,subject=>subject==npc,1).FirstOrDefault() is { } fact && catalog.Find(fact.Map) is { } map)
         {
-            var at=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(new Vector3(fact.X,0,fact.Z),map),map);
+            var at=MapProjection.CoordinateFromWorld(new Vector3(fact.X,0,fact.Z),map);
             place=new Npcs.NpcLocation(fact.Territory,fact.Map,map.Zone,at.X,at.Y,fact.X,0,fact.Z);
         }
         if(seenNpcPlaces.Places.Count<4096)seenNpcPlaces.Places[npc]=place;
@@ -371,7 +371,7 @@ internal sealed partial class MainWindow
             var pixel=MapProjection.PixelFromWorld(new Vector3(fact.X,0,fact.Z),map);var place=MapProjection.CoordinateFromPixel(pixel,map);
             var level=fact.LevelMin==fact.LevelMax ? fact.LevelMax.ToString():$"{fact.LevelMin}–{fact.LevelMax}";
             ImGui.PushStyleColor(ImGuiCol.Text,Muted);
-            try{ImGui.Selectable(localization.Format("DiscoveriesUi.SeenHere",MapName(map),place.X.ToString("0.0"),place.Y.ToString("0.0"),level)+$"##Seen{key}{index}");}
+            try{ImGui.Selectable(localization.Format("DiscoveriesUi.SeenHere",MapName(map),MapProjection.CoordinateNumber(place.X),MapProjection.CoordinateNumber(place.Y),level)+$"##Seen{key}{index}");}
             finally{ImGui.PopStyleColor();}
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("DiscoveriesUi.SeenHereTip"));
             if(!ImGui.BeginPopupContextItem($"SeenMenu{key}{index}"))continue;
@@ -422,7 +422,7 @@ internal sealed partial class MainWindow
                 else
                 {
                     var pixel=MapProjection.PixelFromWorld(new Vector3(fact.X,0,fact.Z),map);var place=MapProjection.CoordinateFromPixel(pixel,map);
-                    ImGui.Selectable(localization.Format("DiscoveriesUi.Coordinates",place.X.ToString("0.0"),place.Y.ToString("0.0"))+$"##DiscoveryPlace{index}");
+                    ImGui.Selectable(localization.Format("DiscoveriesUi.Coordinates",MapProjection.CoordinateNumber(place.X),MapProjection.CoordinateNumber(place.Y))+$"##DiscoveryPlace{index}");
                     if(ImGui.BeginPopupContextItem($"DiscoveryMenu{index}"))
                     {
                         try

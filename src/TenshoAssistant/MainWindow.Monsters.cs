@@ -155,7 +155,7 @@ internal sealed partial class MainWindow
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,detail.FetchedAt);
         ImGui.TextUnformatted(localization.Format("MonsterUi.Description",detail.Name,detail.Level.Length == 0 ? localization.Get("MonsterUi.Missing") : detail.Level));
         ImGui.TextUnformatted(MonsterZone(detail.PlaceNameId));
-        if (detail.X is { } x && detail.Y is { } y) ImGui.TextDisabled(localization.Format("MonsterUi.Position",x.ToString("F2"),y.ToString("F2")));
+        if (detail.X is { } x && detail.Y is { } y) ImGui.TextDisabled(localization.Format("MonsterUi.Position",MapProjection.CoordinateNumber(x),MapProjection.CoordinateNumber(y)));
         else ImGui.TextDisabled(localization.Get("MonsterUi.NoPosition"));
         if (detail.HasDrops && !detail.DropItemIds.Contains(state.ItemId))
             ImGui.TextWrapped(localization.Get("MonsterUi.Mismatch"));
