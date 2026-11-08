@@ -11,6 +11,8 @@ internal sealed partial class MainWindow
 {
     internal DiscoveryStore? DiscoveryStore { get; set; }
     internal string? DiscoveryFolder { get; set; }
+    /// <summary>X-77.1 (0.883): the exchange with the repository through GitHub (connection by code, opt-in automatic exchange).</summary>
+    internal GitHubExchange? DiscoveryExchange { get; set; }
     internal Func<uint,string>? MonsterName { get; set; }
     /// <summary>X-72 C (0.856): a FATE's name from the game's sheet.</summary>
     internal Func<uint,string>? FateName { get; set; }
@@ -60,6 +62,8 @@ internal sealed partial class MainWindow
                         log.Information("Discovery: FATE {0} ({1}) on map {2} at {3:F1}, {4:F1}.",fate.Name,fate.Id,here.MapId,fate.Position.X,fate.Position.Z);
         }
         if((store.Dirty || SeenPrices?.Dirty==true) && now-discoveriesSavedAt>60_000)SaveDiscoveries(false);
+        // X-77.1 (0.883): the automatic exchange, only when the player turned it on, once a day at most.
+        if(settings.Enabled && settings.AutoExchange && DiscoveryExchange is { } exchange && exchange.Due(DateTimeOffset.UtcNow))exchange.Exchange(store,exchange.Connected);
     }
 
     /// <summary>The base written off the frame (on unload: at once).</summary>
@@ -173,6 +177,52 @@ internal sealed partial class MainWindow
         var line=parts.Count==0 ? null:localization.Format("FishingPanel.SeenByYou",catches.Sum(fact=>fact.Seen+fact.Imported),string.Join(" · ",parts));
         if(seenFishLines.Lines.Count<2048)seenFishLines.Lines[fish]=line;
         return line;
+    }
+    // X-77.1 (0.883): connection to GitHub by a code, exchange now, automatic exchange (off by default), disconnection.
+    private void DrawDiscoveryExchange(DiscoveryStore store)
+    {
+        if(DiscoveryExchange is not { } exchange)return;
+        ImGui.Spacing();
+        ImGui.TextColored(Accent,localization.Get("DiscoveriesUi.ExchangeTitle"));
+        Tip("DiscoveriesUi.ExchangeHelp");
+        var working=exchange.Busy;
+        if(!exchange.Connected)
+        {
+            if(exchange.UserCode is { } code)
+            {
+                ImGui.TextUnformatted(localization.Format("DiscoveriesUi.ConnectCode",code));
+                ImGui.SameLine();
+                if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ConnectCopy")))ImGui.SetClipboardText(code);
+                ImGui.SameLine();
+                if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ConnectOpen")))Dalamud.Utility.Util.OpenLink(exchange.VerifyAddress ?? "https://github.com/login/device");
+            }
+            else
+            {
+                ImGui.BeginDisabled(working);
+                try{if(ImGui.SmallButton(localization.Get("DiscoveriesUi.Connect")))exchange.Connect();}
+                finally{ImGui.EndDisabled();}
+                Tip("DiscoveriesUi.ConnectTip");
+            }
+        }
+        else
+        {
+            ImGui.TextUnformatted(localization.Format("DiscoveriesUi.ConnectedAs",exchange.Login));
+            ImGui.SameLine();
+            ImGui.BeginDisabled(working);
+            try{if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ExchangeNow")))exchange.Exchange(store,true);}
+            finally{ImGui.EndDisabled();}
+            Tip("DiscoveriesUi.ExchangeNowTip");
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("DiscoveriesUi.Disconnect")))exchange.Disconnect();
+            Tip("DiscoveriesUi.DisconnectTip");
+        }
+        BoolSetting("DiscoveriesUi.AutoExchange","DiscoveriesUi.AutoExchangeTip",()=>configuration.Discovery.AutoExchange,value=>configuration.Discovery.AutoExchange=value,c=>c.Discovery.AutoExchange);
+        if(exchange.Exchanged is { } last)ImGui.TextDisabled(localization.Format("DiscoveriesUi.ExchangedAt",last.ToLocalTime().ToString("g")));
+        if(working)ImGui.TextDisabled(localization.Get("DiscoveriesUi.Working"));
+        else if(exchange.Message is { } said)
+            ImGui.TextWrapped(said.Key=="ExchangeDone"
+                ? localization.Format("DiscoveriesUi.ExchangeDone",said.Args[0],said.Args[1],localization.Get("DiscoveriesUi."+said.Args[2]),said.Args[3].Length>0 ? localization.Get("DiscoveriesUi."+said.Args[3]):"")
+                :localization.Format("DiscoveriesUi."+said.Key,said.Args.Cast<object>().ToArray()));
     }
     private string DiscoveryItemName(uint id)=>itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}";
     private string DiscoveryDutyName(uint id)=>DutyName?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
@@ -303,6 +353,7 @@ internal sealed partial class MainWindow
             catch(Exception error){log.Warning(error,"The discoveries folder could not be opened.");}
         }
         Tip("DiscoveriesUi.OpenFolderTip");
+        DrawDiscoveryExchange(store);
         if(busy)ImGui.TextDisabled(localization.Get("DiscoveriesUi.Working"));
         else if(discoveryMessage is { } message)ImGui.TextWrapped(message);
         void Run(Func<string> work)

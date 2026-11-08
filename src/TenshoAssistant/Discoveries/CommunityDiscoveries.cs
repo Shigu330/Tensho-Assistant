@@ -27,9 +27,30 @@ public static class CommunityDiscoveries
         return file is { Version:DiscoveryFile.CurrentVersion, Facts:not null } ? file:null;
     }
 
-    /// <summary>Only what you saw yourself: imported facts are not sent back.</summary>
-    public static DiscoveryFile Mine(DiscoveryFile all)=>new(){Written=all.Written,Producer=all.Producer,
-        Facts=all.Facts.Where(fact=>fact.Seen>0).Select(fact=>{var copy=fact.Copy();copy.Imported=0;return copy;}).ToList()};
+    /// <summary>Only what you saw yourself: imported facts are not sent back. 0.883: dated by its newest fact, so that the same facts give the same file (and hash).</summary>
+    public static DiscoveryFile Mine(DiscoveryFile all)
+    {
+        var facts=all.Facts.Where(fact=>fact.Seen>0).Select(fact=>{var copy=fact.Copy();copy.Imported=0;return copy;})
+            .OrderBy(fact=>fact.Key,StringComparer.Ordinal).ToList();
+        return new(){Written=facts.Count==0 ? DateTimeOffset.UnixEpoch:facts.Max(fact=>fact.Last),Producer=all.Producer,Facts=facts};
+    }
+
+    /// <summary>X-77.1 (0.883): the file as one line of text for a gist: JSON, gzip, base64.</summary>
+    public static string Encode(DiscoveryFile file)
+    {
+        using var memory=new MemoryStream();
+        using(var gzip=new GZipStream(memory,CompressionLevel.Optimal,true))JsonSerializer.Serialize(gzip,file);
+        return Convert.ToBase64String(memory.ToArray());
+    }
+    public static DiscoveryFile? Decode(string text)
+    {
+        using var memory=new MemoryStream(Convert.FromBase64String(text.Trim()));
+        using var gzip=new GZipStream(memory,CompressionMode.Decompress);
+        using var reader=new StreamReader(gzip);
+        var buffer=new char[MaxBytes/2];var read=reader.ReadBlock(buffer,0,buffer.Length);
+        if(!reader.EndOfStream)throw new InvalidDataException("Shared discoveries too large.");
+        return Parse(new string(buffer,0,read));
+    }
 
     public static string ShareName(DateTimeOffset at)=>$"Tensho-discoveries-{at.ToUniversalTime():yyyyMMdd-HHmmss}.zip";
 

@@ -1406,6 +1406,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.882) Monde › Découvertes : « Partager les miennes » → le dossier Export s'ouvre avec un zip, et le navigateur sur le ticket ; « Récupérer les découvertes communes » → « pas encore publié » tant qu'aucune release n'a le fichier.
 
+- [ ] (0.883) Monde › Découvertes : « Connecter GitHub » → code, l'approuver sur github.com/login/device → « Connecté à GitHub en tant que … » ; « Échanger maintenant » → « Vos découvertes ont été envoyées » et un ticket « Discoveries: <login> » dans le dépôt.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

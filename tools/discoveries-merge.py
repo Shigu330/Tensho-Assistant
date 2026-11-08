@@ -1,5 +1,5 @@
 """X-77 (0.882): merges shared discovery files into community-discoveries/discoveries.json (maintainer tool, run by hand, offline).
-Usage: python tools/discoveries-merge.py community-discoveries/discoveries.json <file.zip|file.json> ...
+Usage: python tools/discoveries-merge.py community-discoveries/discoveries.json <file.zip|file.json|gist:ID|https://gist.github.com/...> ...
 Rules mirror DiscoveryStore.Valid and Merge (src/TenshoAssistant/Discoveries/DiscoveriesModel.cs): a fact that does not hold is refused; each shared file
 counts as one import of a fact (Seen is kept at 0 in the common file); levels and dates are widened. Nothing personal can be in a fact by construction;
 the tool still refuses any property it does not know."""
@@ -25,10 +25,19 @@ def read(path):
             if z.getinfo(name).file_size>64*1024*1024:raise ValueError("too large")
             return json.loads(z.read(name).decode("utf-8"))
     return json.load(open(path,encoding="utf-8"))
+def from_gist(reference):
+    """0.883: a gist id or URL (from a « Discoveries: <login> » issue), read through the GitHub CLI; the file is base64 of gzip of JSON."""
+    import base64,gzip,subprocess
+    gist=reference.rstrip("/").split("/")[-1]
+    raw=subprocess.run(["gh","api",f"gists/{gist}","--jq",'.files["tensho-discoveries.b64"].raw_url'],capture_output=True,text=True,check=True).stdout.strip()
+    text=subprocess.run(["gh","api",raw],capture_output=True,text=True,check=True).stdout if raw.startswith("https://api.") else __import__("urllib.request").request.urlopen(raw).read().decode()
+    data=gzip.decompress(base64.b64decode(text.strip()))
+    if len(data)>64*1024*1024:raise ValueError("too large")
+    return json.loads(data.decode("utf-8"))
 def main(common_path,inputs):
     common=json.load(open(common_path,encoding="utf-8"));facts={key(f):f for f in common["Facts"]}
     for path in inputs:
-        data=read(path);added=joined=refused=0
+        data=from_gist(path) if path.startswith("gist:") or "gist.github.com" in path else read(path);added=joined=refused=0
         if data.get("Version")!=1:print(path,"refused: version");continue
         for f in data.get("Facts",[]):
             if not valid(f):refused+=1;continue

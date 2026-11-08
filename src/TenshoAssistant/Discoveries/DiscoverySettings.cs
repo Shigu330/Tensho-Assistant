@@ -16,4 +16,6 @@ public sealed class DiscoverySettings
     /// <summary>X-52 (0.817): the prices seen at the market board, in place of Universalis' for the player's world when newer.</summary>
     public bool MarketPrices { get; set; }=true;
     public bool DebugLog { get; set; }
+    /// <summary>X-77.1 (0.883): once a day, take the common file and (when GitHub is connected) send your own sightings. Off by default: the player turns it on.</summary>
+    public bool AutoExchange { get; set; }
 }

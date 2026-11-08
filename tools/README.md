@@ -15,6 +15,7 @@ dotnet run --project tools/ShopCurrencyProbe -- "C:\Program Files (x86)\SquareEn
 | Probe | What it checks |
 |---|---|
 | `ApiProbe` | Members of Dalamud, FFXIVClientStructs and Lumina types by reflection on metadata only (`--find-method=`, `--find-struct=`, `--find-excel=`, or a full type name): used before calling a native API. Reads `%AppData%\XIVLauncher\addon\Hooks\dev`. |
+| `discoveries-merge.py` | Maintainer tool (X-77, 0.882): merges the discovery files players shared (zip or json from a « Discoveries » issue) into `community-discoveries/discoveries.json`, with the plugin's validity rules; offline. |
 | `XbmProbe` | Every column of the Beastmaster (XBM) sheets, read raw: sqpack directory, then a language and optionally sheet names. |
 | `ShopCurrencyProbe` | The general probe: one block per `PROBE_*` environment variable (shops and currencies, NPC positions, vessel parts, gear and materia, quest genres and start cities, map markers, gathering levels, event icons…). Set the variable(s), run, keep the output as evidence. The list of variables is in the plugin's contributor panel (Diagnostics, developer mode). |
 | `CollectionProbe` | The collections projection (mounts, minions, cards…) built from the game sheets, and that it stays usable after the game data is released. |
@@ -58,6 +59,7 @@ dotnet run --project tools/ShopCurrencyProbe -- "C:\Program Files (x86)\SquareEn
 | Sonde | Ce qu'elle vérifie |
 |---|---|
 | `ApiProbe` | Les membres des types de Dalamud, FFXIVClientStructs et Lumina, par réflexion sur les métadonnées seulement (`--find-method=`, `--find-struct=`, `--find-excel=`, ou un nom de type complet) : avant d'appeler une API native. Lit `%AppData%\XIVLauncher\addon\Hooks\dev`. |
+| `discoveries-merge.py` | Outil du mainteneur (X-77, 0.882) : fusionne les fichiers de découvertes partagés par les joueurs (zip ou json d'un ticket « Discoveries ») dans `community-discoveries/discoveries.json`, avec les règles de validité du plugin ; hors ligne. |
 | `XbmProbe` | Toutes les colonnes des feuilles du dresseur (XBM), lues brutes : dossier sqpack, puis une langue et, au choix, des noms de feuilles. |
 | `ShopCurrencyProbe` | La sonde générale : un bloc par variable d'environnement `PROBE_*` (boutiques et monnaies, positions des PNJ, pièces de vaisseaux, équipement et matérias, genres de quêtes et cités de départ, marqueurs de carte, niveaux de récolte, icônes d'événements…). Réglez la ou les variables, lancez, gardez la sortie comme preuve. La liste des variables est dans le panneau contributeur du plugin (Diagnostics, mode développeur). |
 | `CollectionProbe` | La projection des collections (montures, mascottes, cartes…) construite à partir des feuilles du jeu, et qu'elle reste utilisable après la libération des données du jeu. |
