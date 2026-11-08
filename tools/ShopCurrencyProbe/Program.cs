@@ -5,6 +5,16 @@ using Lumina.Excel.Sheets;
 // Read-only evidence for NPC-VENDORS-014: how scrip exchanges encode currencies and how NPCs reach their shops.
 if(args.Length is <1 or >2)throw new ArgumentException("Supply installed sqpack directory and optionally an item name.");
 using var data=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.French,CacheFileResources=false});
+// PROBE_SRANK (X-76 P5, 0.931): the notorious monsters of every territory (TerritoryType.NotoriousMonsterTerritory -> NotoriousMonster: BNpcName,
+// Rank), to check Tensho's S rank table (Hunting/SRankConditions.cs) against the game; read-only.
+if(Environment.GetEnvironmentVariable("PROBE_SRANK") is { Length:>0 })
+{
+    var names=data.Excel.GetSheet<BNpcName>(Language.English);
+    foreach(var territory in data.Excel.GetSheet<TerritoryType>().Where(row=>row.NotoriousMonsterTerritory.RowId!=0))
+        foreach(var monster in territory.NotoriousMonsterTerritory.ValueNullable?.NotoriousMonsters.Where(m=>m.RowId!=0) ?? [])
+            Console.WriteLine($"NM territory {territory.RowId} monster {monster.RowId} name {monster.ValueNullable?.BNpcName.RowId} '{names.GetRowOrDefault(monster.ValueNullable?.BNpcName.RowId ?? 0)?.Singular.ExtractText()}' rank {monster.ValueNullable?.Rank}");
+    return;
+}
 // PROBE_OCEANFISH (X-85 research): every column of the ocean fishing sheets (IKDContentBonus, IKDFishParam, IKDSpot with the fish of
 // both spots, IKDRoute's unnamed columns, IKDPlayerMissionCondition with its raw macros), the ocean fish rows of FishParameter, and the
 // game texts that name the spectral current or the scrips; read-only.

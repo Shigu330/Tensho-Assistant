@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.931.0
+- Plan global, Verify : Nettoyage X-76, parseurs P5 (rangs S) : la table des rangs S de Tensho (conditions d'apparition, données communautaires) est maintenant vérifiée contre les données du jeu : les 50 marques sont toutes des rangs S de leur zone, et aucun rang S du jeu ne manque. Un test garde cette vérification (nouvelle sonde PROBE_SRANK, preuve docs/evidence/0.931-srank-check.md). Rien de visible. Non validé en jeu.
+- Tests : SRankCheck931Tests. Verify.ps1 (agent) : 1544/1544, 0 avertissement, 0 erreur ; DLL 0.931.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, parsers P5 (S ranks): Tensho's S rank table (spawn conditions, community data) is now checked against the game's data: the 50 marks are all S ranks of their zone, and no S rank of the game is missing. A test keeps this check (new probe mode PROBE_SRANK, evidence docs/evidence/0.931-srank-check.md). Nothing visible. Not validated in game.
+
 ## 0.930.0
 - Plan global, Verify : Nettoyage X-76, parseurs P5 (mage bleu) : pour un sort de mage bleu appris dans une mission (donjon, défi…), la page des collections affiche maintenant le niveau de la mission, lu dans les données du jeu, après le lieu. Non validé en jeu.
 - Tests : BlueDuty930Tests. Verify.ps1 (agent) : 1543/1543, 0 avertissement, 0 erreur ; DLL 0.930.0.0. Non validé en jeu.
