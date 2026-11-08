@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.934.0
+- Plan global, Verify : Nettoyage X-76, parseurs P7 (sous-marins) : les trouvailles des sous-marins gardent maintenant leur qualité (HQ), et chaque secteur exploré est noté une fois par voyage, avec la surveillance du sous-marin et s'il y a eu deux trouvailles (nouvelle sorte « visite de secteur ») : c'est le nombre de visites qui servira aux taux de butin (P8). L'outil de fusion connaît cette sorte. Le sens des lignes de prospection et de rendement reste à relever en jeu. Non validé en jeu.
+- Tests : VoyageFacts934Tests. Verify.ps1 (agent) : 1547/1547, 0 avertissement, 0 erreur ; DLL 0.934.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, parsers P7 (submersibles): submersible finds now keep their quality (HQ), and each explored sector is noted once per voyage, with the vessel's surveillance and whether there were two finds (new kind « sector visit »): the number of visits will serve the drop rates (P8). The merge tool knows this kind. The meaning of the survey and yield lines is still to read in game. Not validated in game.
+
 ## 0.933.0
 - Plan global, Verify : Nettoyage X-76, parseurs P6 (pêche) : trois nouvelles sortes de découvertes, sans changer le format des fichiers. Le temps de touche est maintenant noté aussi avec l'appât du lancer (ou le poisson utilisé pour la pêche au vif) ; quand l'Intuition du pêcheur commence, Tensho note le poisson pêché juste avant (celui qui l'a déclenchée : indice de prédateur) et sa durée, puis les poissons pêchés tant qu'elle dure. L'outil de fusion des découvertes partagées connaît ces sortes. Ordre exact du statut et de la prise à confirmer en jeu ; le leurre nageur attend un relevé en jeu. Non validé en jeu.
 - Tests : FishingFacts933Tests. Verify.ps1 (agent) : 1546/1546, 0 avertissement, 0 erreur ; DLL 0.933.0.0. Non validé en jeu.

@@ -62,7 +62,10 @@ public sealed unsafe class VoyageWatcher : IDisposable
     /// X-73.8 (0.862): each submersible voyage's loot by sector (HousingWorkshopSubmarineGathered.Point, ItemIdPrimary/Additional and counts) and the sector each
     /// one unlocked (UnlockedPoint), once per voyage, for the discoveries base. Airship entries carry no sector: left out.
     /// </summary>
-    public Action<uint,uint,int>? SectorLoot { get; set; }
+    /// <summary>Item, sector, quantity, HQ (X-76 P7, 0.934: HouseWorkshopSubmarineGathered.ItemHQPrimary / ItemHQAdditional).</summary>
+    public Action<uint,uint,int,bool>? SectorLoot { get; set; }
+    /// <summary>X-76 P7 (0.934): one visit per sector of a voyage: sector, second find (DoubleDip), the vessel's surveillance.</summary>
+    public Action<uint,bool,int>? SectorVisit { get; set; }
     public Action<uint,uint>? SectorUnlock { get; set; }
     private readonly HashSet<(ulong House,int Slot,uint Registered)> voyagesNoted=[];
 
@@ -122,8 +125,9 @@ public sealed unsafe class VoyageWatcher : IDisposable
                     foreach(var found in sub.GatheredData)
                     {
                         if(found.Point==0)continue;
-                        if(found.ItemIdPrimary!=0)SectorLoot?.Invoke(found.ItemIdPrimary%1_000_000,found.Point,found.ItemCountPrimary);
-                        if(found.ItemIdAdditional!=0)SectorLoot?.Invoke(found.ItemIdAdditional%1_000_000,found.Point,found.ItemCountAdditional);
+                        if(found.ItemIdPrimary!=0)SectorLoot?.Invoke(found.ItemIdPrimary%1_000_000,found.Point,found.ItemCountPrimary,found.ItemHQPrimary || found.ItemIdPrimary>=1_000_000);
+                        if(found.ItemIdAdditional!=0)SectorLoot?.Invoke(found.ItemIdAdditional%1_000_000,found.Point,found.ItemCountAdditional,found.ItemHQAdditional || found.ItemIdAdditional>=1_000_000);
+                        SectorVisit?.Invoke(found.Point,found.DoubleDip,sub.SurveillanceBase+sub.SurveillanceBonus);
                         if(found.UnlockedPoint!=0)SectorUnlock?.Invoke(found.UnlockedPoint,found.Point);
                     }
                 var ids=new List<uint>();

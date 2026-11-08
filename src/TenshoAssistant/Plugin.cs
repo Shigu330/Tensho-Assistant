@@ -533,7 +533,8 @@ public sealed class Plugin : IDalamudPlugin
             var voyageHistory=new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"VoyageHistory.json"),(error,message)=>log.Warning(error,message));
             registrations.Register(()=>voyages=new FreeCompany.VoyageWatcher(framework,data,configuration,()=>pluginInterface.SavePluginConfig(configuration),log){Observed=voyageHistory.Observe,
                 // X-73.8 (0.862): each submersible voyage's loot by sector and the sectors it unlocked, for the discoveries base.
-                SectorLoot=(item,sector,count)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.VoyageDrop,item,sector,count,DateTimeOffset.UtcNow);},
+                SectorLoot=(item,sector,count,hq)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.VoyageDrop,item,sector,count,DateTimeOffset.UtcNow,hq:hq);},
+                SectorVisit=(sector,twice,surveillance)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.VoyageVisit,sector,twice ? 1u:0u,surveillance,DateTimeOffset.UtcNow);},
                 SectorUnlock=(unlocked,sector)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.VoyageUnlock,unlocked,sector,1,DateTimeOffset.UtcNow);}},()=>voyages?.Dispose());
             mainWindow.VoyageHistorySource=voyageHistory;
             mainWindow.SubmarineCatalog=()=>voyages?.Catalog;

@@ -49,7 +49,10 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     // where it was caught (the same cast as FishBite, keyed by bait). IntuitionStart: Subject = the fish caught just before Fisher's Intuition (status 568) began
     // (the catch that started it: a predator candidate), levels = the intuition's length in seconds, place. IntuitionCatch: Subject = a fish caught while the
     // intuition lasted, Detail = the fish that started it (0 unknown). Seen with, not proven to be required.
-    FishBiteBait=29, IntuitionStart=30, IntuitionCatch=31 }
+    FishBiteBait=29, IntuitionStart=30, IntuitionCatch=31,
+    // X-76 P7 (0.934): VoyageVisit: Subject = the sector (SubmarineExploration row) a submersible explored, Detail = 1 when the game gave a second find there
+    // (DoubleDip), else 0, levels = the vessel's surveillance at that voyage. One per sector of a voyage: the count of visits behind the drop rates (P8).
+    VoyageVisit=32 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported

@@ -14,7 +14,7 @@ internal static class FishingFacts933Tests
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs"));
             Check(watcher.Contains("store.SeeSource(DiscoveryKind.FishBiteBait,item,bait,") && watcher.Contains("store.SeeSource(DiscoveryKind.IntuitionStart,trigger,0,intuition.Seconds,")
                 && watcher.Contains("store.SeeSource(DiscoveryKind.IntuitionCatch,item,running.Trigger,1,at,territory);"),"written");
-            Check(File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py")).Contains("KINDS=set(range(1,32))-{26,27};PLACED={1,2,3,8,10,19,22,23,28,29,30}"),"merge tool");
+            Check(File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py")).Contains("PLACED={1,2,3,8,10,19,22,23,28,29,30}"),"merge tool");
         }),
     ];
 }

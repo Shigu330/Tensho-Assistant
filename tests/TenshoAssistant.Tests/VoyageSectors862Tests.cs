@@ -8,7 +8,7 @@ internal static class VoyageSectors862Tests
         {
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/FreeCompany/VoyageWatcher.Dalamud.cs"));
             Check(watcher.Contains("voyagesNoted.Add((houseId,slot,sub.RegisterTime))"),"once per voyage");
-            Check(watcher.Contains("SectorLoot?.Invoke(found.ItemIdPrimary%1_000_000,found.Point,found.ItemCountPrimary);") && watcher.Contains("SectorUnlock?.Invoke(found.UnlockedPoint,found.Point);"),"by sector");
+            Check(watcher.Contains("SectorLoot?.Invoke(found.ItemIdPrimary%1_000_000,found.Point,found.ItemCountPrimary,") && watcher.Contains("SectorUnlock?.Invoke(found.UnlockedPoint,found.Point);"),"by sector");
             Check(Enum.IsDefined(TenshoAssistant.Discoveries.DiscoveryKind.VoyageDrop) && !TenshoAssistant.Discoveries.DiscoveryStore.HasPlace(TenshoAssistant.Discoveries.DiscoveryKind.VoyageDrop),"no place");
         }),
     ];
