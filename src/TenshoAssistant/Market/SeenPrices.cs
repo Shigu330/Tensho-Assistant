@@ -269,7 +269,6 @@ public sealed class SeenPriceStore
     public static List<SeenMarketEntry>? Read(string path)=>File.Exists(path) && new FileInfo(path).Length<=64L*1024*1024 ? JsonSerializer.Deserialize<List<SeenMarketEntry>>(File.ReadAllText(path)):null;
     public static void Write(string path,List<SeenMarketEntry> entries)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        var temporary=path+".tmp";File.WriteAllText(temporary,JsonSerializer.Serialize(entries));File.Move(temporary,path,true);
+        AtomicFile.Write(path,JsonSerializer.Serialize(entries));
     }
 }

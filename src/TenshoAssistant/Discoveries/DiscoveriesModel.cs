@@ -423,10 +423,7 @@ public static class DiscoveryFiles
 
     public static void Write(string path,DiscoveryFile file)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        var temporary=path+".tmp";
-        File.WriteAllText(temporary,JsonSerializer.Serialize(file,Options));
-        File.Move(temporary,path,true);
+        AtomicFile.Write(path,JsonSerializer.Serialize(file,Options));
     }
 
     public static string ExportName(DateTimeOffset at)=>$"Discoveries-{at.ToUniversalTime():yyyyMMdd-HHmmss}.json";

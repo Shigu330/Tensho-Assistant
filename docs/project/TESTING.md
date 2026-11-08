@@ -1486,6 +1486,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.922) Rien de visible ; dalamud.log est plus court hors mode développeur.
 
+- [ ] (0.923) Rien de visible : vos listes, découvertes et historiques s'enregistrent comme avant.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

@@ -100,11 +100,7 @@ public static class CharacterStatuses
     public static void Write(string folder,CharacterStatus status)
     {
         if(status.ContentId==0)throw new ArgumentException("No character.",nameof(status));
-        Directory.CreateDirectory(folder);
-        var path=Path.Combine(folder,FileName(status.ContentId));
-        var temporary=path+"."+Guid.NewGuid().ToString("N")+".tmp";
-        File.WriteAllBytes(temporary,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,Bound(status)),Json));
-        File.Move(temporary,path,true);
+        AtomicFile.Write(Path.Combine(folder,FileName(status.ContentId)),JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,Bound(status)),Json));
     }
 
     /// <summary>Every character file of the folder; a bad file is reported and skipped (and never written over by another character).</summary>

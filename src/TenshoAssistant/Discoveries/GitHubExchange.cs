@@ -52,7 +52,9 @@ public sealed class GitHubExchange : IDisposable
     public GitHubExchange(string folder)
     {
         this.folder=folder;
-        try{if(File.Exists(MetaPath))meta=JsonSerializer.Deserialize<GitHubExchangeMeta>(File.ReadAllText(MetaPath)) ?? new();}catch(Exception){meta=new();}
+        // X-76 H10 (0.923): an unreadable file is kept aside as « .broken » before a new one is started (it was written over later).
+        try{if(File.Exists(MetaPath))meta=JsonSerializer.Deserialize<GitHubExchangeMeta>(File.ReadAllText(MetaPath)) ?? new();}
+        catch(Exception){meta=new();try{File.Move(MetaPath,MetaPath+".broken",true);}catch(Exception){}}
         try{if(File.Exists(TokenPath))token=Encoding.UTF8.GetString(UserSecret.Unprotect(File.ReadAllBytes(TokenPath)));}catch(Exception){token=null;}
     }
 
@@ -202,8 +204,7 @@ public sealed class GitHubExchange : IDisposable
         try
         {
             string json;lock(gate)json=JsonSerializer.Serialize(meta);
-            Directory.CreateDirectory(folder);
-            var temporary=MetaPath+".tmp";File.WriteAllText(temporary,json);File.Move(temporary,MetaPath,true);
+            AtomicFile.Write(MetaPath,json);
         }
         catch(Exception){}
     }

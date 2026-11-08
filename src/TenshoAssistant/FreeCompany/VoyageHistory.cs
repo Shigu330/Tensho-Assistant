@@ -89,10 +89,7 @@ public static class VoyageHistory
     /// <summary>Writes the history through a temporary file.</summary>
     public static void Write(string path,IReadOnlyList<VoyageRecord> records)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        var temporary=path+"."+Guid.NewGuid().ToString("N")+".tmp";
-        File.WriteAllBytes(temporary,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,records.ToArray()),Json));
-        File.Move(temporary,path,true);
+        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,records.ToArray()),Json));
     }
 }
 

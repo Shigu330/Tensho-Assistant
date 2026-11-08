@@ -95,9 +95,6 @@ public static class GilJournal
     /// <summary>Writes a journal file through a temporary file (a crash never leaves half a file).</summary>
     public static void Write(string path,IReadOnlyList<GilEntry> entries)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        var temporary=path+"."+Guid.NewGuid().ToString("N")+".tmp";
-        File.WriteAllBytes(temporary,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,entries.ToArray()),Json));
-        File.Move(temporary,path,true);
+        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,entries.ToArray()),Json));
     }
 }

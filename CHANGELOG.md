@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.923.0
+- Plan global, Verify : Nettoyage X-76, harmonisation H10 (première partie, fichiers) : une seule façon d'enregistrer un fichier : un fichier temporaire au nom unique, puis remplacé d'un coup, et toujours effacé même après un échec. Elle sert maintenant aux huit fichiers enregistrés (listes d'artisanat, historique des voyages, journal des gils, Mes outils, état du personnage, découvertes, prix vus, échange GitHub) ; trois utilisaient un nom « .tmp » fixe, qui pouvait se heurter à une autre écriture. Un fichier d'échange GitHub illisible est mis de côté (« .broken ») au lieu d'être écrasé. Rien de visible en jeu. Non validé en jeu.
+- Tests : AtomicFile923Tests. Verify.ps1 (agent) : 1536/1536, 0 avertissement, 0 erreur ; DLL 0.923.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, harmonisation H10 (first part, files): one way to save a file: a temporary file with a unique name, then swapped in at once, and always removed, even after a failure. It now serves the eight saved files (craft lists, voyage history, gil journal, My tools, character status, discoveries, prices seen, GitHub exchange); three used a fixed « .tmp » name that could clash with another write. An unreadable GitHub exchange file is kept aside (« .broken ») instead of being overwritten. Nothing visible in game. Not validated in game.
+
 ## 0.922.0
 - Plan global, Verify : Nettoyage X-76, harmonisation H9 (journaux) : un échec de lecture qui se répète (sélection de l'outil de mission, contexte de l'objet survolé, position sur la carte) n'est plus écrit toutes les cinq secondes dans dalamud.log, mais une fois, puis de nouveau seulement après une lecture réussie. Les captures d'enquête (lignes du jardin dans le chat, ventes des servants, fenêtre de ravitaillement de la Grande Compagnie, panneaux qui s'écartent) ne s'écrivent plus qu'en mode développeur. Un seul niveau (avertissement) pour un catalogue qui ne se construit pas ; tous les messages du journal en gabarits. Rien de visible en jeu. Non validé en jeu.
 - Tests : Logs922Tests. Verify.ps1 (agent) : 1535/1535, 0 avertissement, 0 erreur ; DLL 0.922.0.0. Non validé en jeu.
