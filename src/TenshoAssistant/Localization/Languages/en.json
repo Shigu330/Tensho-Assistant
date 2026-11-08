@@ -4892,6 +4892,7 @@
     "SourceReference": "Source reference: {0}"
   },
   "Common": {
+    "Copied": "Copied",
     "SaveError": "Save failed. Try again; details are in the Dalamud log.",
     "Dismiss": "Hide this message"
   },

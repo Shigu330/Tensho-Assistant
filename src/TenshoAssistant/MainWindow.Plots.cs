@@ -49,7 +49,7 @@ internal sealed partial class MainWindow
         try{if(ImGui.SmallButton(localization.Format("Plots.Fetch",world.WorldName)))paissa.Request(world.WorldId);}
         finally{ImGui.EndDisabled();}
         if(state.Loading)ImGui.TextDisabled(localization.Get("Plots.Loading"));
-        if(state.Error is { } error){ImGui.TextWrapped(localization.Get("Plots.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
+        if(state.Error is { } error)DrawDataError(error,"Plots.Error");
         if(state.WorldId!=world.WorldId || state.Plots is not { } plots)return;
         if(state.ReadAt is { } at)ImGui.TextDisabled(localization.Format("Plots.ReadAt",at.ToLocalTime().ToString("t")));
         var shown=plots.Where(PlotMatches).ToArray();

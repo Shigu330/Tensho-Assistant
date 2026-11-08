@@ -99,7 +99,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();
                 if (verdict.Paste is { } paste)
                 {
-                    if (ImGui.SmallButton($"{paste:N0}##RetainerPaste{listing.Row}")) ImGui.SetClipboardText(paste.ToString());
+                    CopyButton($"{paste:N0}##RetainerPaste{listing.Row}",()=>paste.ToString());
                     Tip("RetainerSales.CopyTip");
                 }
             }

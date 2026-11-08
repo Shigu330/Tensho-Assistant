@@ -107,7 +107,7 @@ internal sealed partial class MainWindow
         }
         if(TeamcraftExport.Link(list.Entries.Select(entry=>(entry.ItemId,recipes?.ForResult(entry.ItemId) is { Count:>0 } own ? (uint?)PreferredRecipe(own).RecipeId:null,entry.Quantity))) is { } teamcraft)
         {
-            if(ImGui.Button(localization.Get("PlanUi.TeamcraftCopy")+"###CraftListTeamcraft"))ImGui.SetClipboardText(teamcraft);
+            CopyButton(localization.Get("PlanUi.TeamcraftCopy")+"###CraftListTeamcraft",()=>teamcraft);
             Tip("PlanUi.TeamcraftTip");
         }
     }

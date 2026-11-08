@@ -112,7 +112,7 @@ internal sealed partial class MainWindow
                 if(wrongJob)DrawEquipRecipeJob(context.Recipe!,"CraftLogEquip");
                 return;
             }
-            if(actions is null){if(craftActions.State.Error is { } failure)DrawDataError(failure,"ServiceErrors.Craft");else ImGui.TextWrapped(localization.Get("CraftLogUi.ActionsLoading"));return;}
+            if(actions is null){if(craftActions.State.Error is { } failure)DrawDataError(failure,"ServiceErrors.Craft");else EmptyState("CraftLogUi.ActionsLoading");return;}
             if(context.Recipe is {Simulation.Quality:>0} aimed)
             {
                 CraftLogSection(localization.Get("CraftLogUi.SectionTarget"));
@@ -200,7 +200,7 @@ internal sealed partial class MainWindow
             {
                 var block=macro.Export.Pages[page];
                 if(page%3!=0)ImGui.SameLine();
-                if(ImGui.SmallButton(localization.Format("CraftLogUi.Copy",block.Number,macro.Export.Pages.Count)))ImGui.SetClipboardText(block.Text);
+                CopyButton(localization.Format("CraftLogUi.Copy",block.Number,macro.Export.Pages.Count),()=>block.Text);
             }
             DrawMacroToGame(macro.Export.Pages,true);
             if(ImGui.SmallButton(localization.Get("CraftLogUi.Edit")))

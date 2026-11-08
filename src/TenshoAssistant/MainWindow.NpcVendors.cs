@@ -33,7 +33,7 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,SelectedItem?.Name ?? localization.Format("MonsterUi.Item",id));
         DrawItemCollection(SelectedItem);
         var offers=catalog.ForItem(id);
-        if(offers.Count==0){ImGui.TextWrapped(localization.Get("NpcUi.None"));return;}
+        if(offers.Count==0){EmptyState("NpcUi.None");return;}
         ImGui.TextDisabled(localization.Format("NpcUi.Count",offers.Count,offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));
         ImGui.TextDisabled(localization.Get("NpcUi.FlagHelp"));
         if(mapOpenError is { } flagError)ImGui.TextColored(Accent,flagError);

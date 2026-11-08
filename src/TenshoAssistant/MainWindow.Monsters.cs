@@ -59,11 +59,11 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         if(view.Loading)ImGui.TextDisabled(localization.Get("WikiMonsters.Loading"));
         if(view.Error is { } error)
-        {ImGui.TextWrapped(localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"WikiMonsters.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
+        DrawDataError(error,"WikiMonsters.Error");
         if(view.Document is not { } document)return;
         ImGui.TextWrapped(document.Url);
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,document.FetchedAt);
-        if(document.Monsters.Count==0)ImGui.TextWrapped(localization.Get("WikiMonsters.Empty"));
+        if(document.Monsters.Count==0)EmptyState("WikiMonsters.Empty");
         var wikiRow=0;
         foreach(var row in document.Monsters)
         {
@@ -96,7 +96,7 @@ internal sealed partial class MainWindow
             if (state.Item is not null)
             { ImGui.SameLine(); if (SourceButton(localization.Get("MonsterUi.Refresh")+"##Monster",configuration.CommunityGarland,true)) _ = monsterLoot.RequestItemAsync(true); }
         }
-        if (state.Error is { } error) { ImGui.TextWrapped(localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"MonsterUi.Error")); if(developerMode)ImGui.TextWrapped(RawMessage(error)); }
+        if (state.Error is { } error) DrawDataError(error,"MonsterUi.Error");
         ImGui.TextWrapped(localization.Get("MonsterUi.Source"));
         if (state.Item is not { } itemDocument) return;
         ImGui.TextDisabled(localization.Format("MonsterSource.Retrieved",itemDocument.FetchedAt.ToLocalTime().ToString("g")));

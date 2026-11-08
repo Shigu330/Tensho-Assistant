@@ -111,10 +111,10 @@ internal sealed partial class MainWindow
 
         ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Advanced.SupportTitle"));
-        if(ImGui.SmallButton(localization.Get("Advanced.CopyReport")))ImGui.SetClipboardText(BugReport());
+        CopyButton(localization.Get("Advanced.CopyReport"),()=>BugReport());
         Tip("Advanced.CopyReportTip");
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("Advanced.CopyRepository")))ImGui.SetClipboardText(RepositoryUrl);
+        CopyButton(localization.Get("Advanced.CopyRepository"),()=>RepositoryUrl);
         Tip("Advanced.CopyRepositoryTip");
     }
 
@@ -146,13 +146,13 @@ internal sealed partial class MainWindow
     {
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("Contributor.Title")+"###ContributorHelp",ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextWrapped(localization.Get("Contributor.Intro"));
-        if(ImGui.SmallButton(localization.Get("Advanced.CopyRepository")+"##ContribRepo"))ImGui.SetClipboardText(RepositoryUrl);
+        CopyButton(localization.Get("Advanced.CopyRepository")+"##ContribRepo",()=>RepositoryUrl);
         Tip("Advanced.CopyRepositoryTip");
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("Advanced.CopyReport")+"##ContribReport"))ImGui.SetClipboardText(BugReport());
+        CopyButton(localization.Get("Advanced.CopyReport")+"##ContribReport",()=>BugReport());
         Tip("Advanced.CopyReportTip");
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("Contributor.CopyBuild")))ImGui.SetClipboardText(@".\scripts\Verify.ps1");
+        CopyButton(localization.Get("Contributor.CopyBuild"),()=>@".\scripts\Verify.ps1");
         Tip("Contributor.CopyBuildTip");
         ImGui.TextDisabled(localization.Get("Contributor.License"));
         if(ImGui.TreeNode(localization.Get("Contributor.DocsTitle")+"###ContribDocs"))

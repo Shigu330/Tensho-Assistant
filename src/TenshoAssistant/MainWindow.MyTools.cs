@@ -57,10 +57,10 @@ internal sealed partial class MainWindow
         if(ImGui.SmallButton(localization.Get("MyToolsUi.Edit"))){myToolDraft=ToolDraft.From(tool.Template);myToolDraftProblem=null;return;}
         Tip("MyToolsUi.EditTip");
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("MyToolsUi.Share")))ImGui.SetClipboardText(ToolTemplateFormat.Encode(tool.Json));
+        CopyButton(localization.Get("MyToolsUi.Share"),()=>ToolTemplateFormat.Encode(tool.Json));
         Tip("MyToolsUi.ShareTip");
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("MyToolsUi.CopyJson")))ImGui.SetClipboardText(tool.Json);
+        CopyButton(localization.Get("MyToolsUi.CopyJson"),()=>tool.Json);
         Tip("MyToolsUi.CopyJsonTip");
         ImGui.SameLine();
         if(myToolRemoveArmed!=tool.Template.Id)

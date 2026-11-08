@@ -53,7 +53,7 @@ internal sealed partial class MainWindow
         if (ImGui.Button(localization.Get("CollectionsBrowser.Refresh"))) collections.RequestRefresh();
         ImGui.SameLine();
         ImGui.TextDisabled(state.Loading ? localization.Get("CollectionsBrowser.Loading") : state.ObservedAt is { } date ? localization.Format("CollectionsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("CollectionsBrowser.Offline"));
-        if (state.Error is { } error) { ImGui.TextWrapped(localization.Get("CollectionsBrowser.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error)); }
+        if (state.Error is { } error) DrawDataError(error,"CollectionsBrowser.Error");
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Collections,state.ObservedAt,state.FromCache);
         if(!blueMagic)DrawCollectionRecent(state);
         // 0.360 (g, C-09): the Wishlist tab, set again by its tab on every frame it is shown.
@@ -249,7 +249,7 @@ internal sealed partial class MainWindow
                     ImGui.TextWrapped(spell.Description);
                     ImGui.TextWrapped(string.IsNullOrWhiteSpace(spell.Location) ? localization.Get("BlueSpell.MissingLocation") : localization.Format("BlueSpell.Location",spell.Location));
                     ImGui.TextColored(spell.ConfirmedUnlocked ? Success : Muted,localization.Get(spell.ConfirmedUnlocked ? "BlueSpell.Learned":"CollectionState.Unknown"));
-                    if (ImGui.Button(localization.Get("BlueSpell.Copy"))) ImGui.SetClipboardText(spell.Name);
+                    CopyButton(localization.Get("BlueSpell.Copy"),()=>spell.Name);
                     DrawBlueSpellMonsters(spell.Id);
                 }
                 if (ImGui.Button(localization.Get("BlueSpell.Close"))) ImGui.CloseCurrentPopup();

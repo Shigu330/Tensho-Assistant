@@ -205,7 +205,7 @@ internal sealed partial class MainWindow
             dutyViewLanguageRevision=localization.Revision; dutyViewCollections=collections.State;
         }
         ImGui.TextDisabled(localization.Format("DutyCounts.Items",dutyItemMatches.Length));
-        if (dutyItemMatches.Length == 0) { ImGui.TextWrapped(localization.Get("DutyUi.Empty")); return; }
+        if (dutyItemMatches.Length == 0) { EmptyState("DutyUi.Empty"); return; }
         if (!ImGui.BeginTable("DutyLootEntries",2,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp)) return;
         try
         {

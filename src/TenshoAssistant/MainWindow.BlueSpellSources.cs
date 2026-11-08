@@ -117,12 +117,12 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndDisabled();}
         if(view.Loading)ImGui.TextDisabled(localization.Get("WikiMonsters.Loading"));
-        if(view.Error is { } error){ImGui.TextWrapped(localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"WikiMonsters.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
+        if(view.Error is { } error)DrawDataError(error,"WikiMonsters.Error");
         if(view.Document is not { } document){ImGui.TextDisabled(localization.Get("BlueSpellSources.Help"));return;}
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,document.FetchedAt);
         // 0.387: a page the wiki does not have (revision 0) is said as such, with the title asked, instead of « no monster ».
         if(document.Revision==0){ImGui.TextWrapped(localization.Format("BlueSpellSources.Missing",document.Title));ImGui.TextDisabled(document.Url);return;}
-        if(document.Monsters.Count==0){ImGui.TextWrapped(localization.Get("BlueSpellSources.Empty"));ImGui.TextDisabled(document.Url);return;}
+        if(document.Monsters.Count==0){EmptyState("BlueSpellSources.Empty");ImGui.TextDisabled(document.Url);return;}
         ImGui.SetNextItemWidth(200);
         if(ImGui.BeginCombo("##BlueMonsterOrder",localization.Get("BlueSpellSources."+BlueMonsterOrders[Math.Clamp(blueMonsterOrder,0,2)])))
         {

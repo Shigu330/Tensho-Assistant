@@ -51,7 +51,7 @@ internal sealed partial class MainWindow
         ImGui.Spacing();
         ImGui.Separator();
         ImGui.TextWrapped(localization.Get("Credits.Footer"));
-        if(ImGui.SmallButton(localization.Get("Advanced.CopyRepository")+"###CreditsRepo"))ImGui.SetClipboardText(RepositoryUrl);
+        CopyButton(localization.Get("Advanced.CopyRepository")+"###CreditsRepo",()=>RepositoryUrl);
         Tip("Advanced.CopyRepositoryTip");
     }
 
@@ -81,14 +81,14 @@ internal sealed partial class MainWindow
         finally{ImGui.PopTextWrapPos();}
         if(credit.Url.Length>0)
         {
-            if(ImGui.SmallButton(localization.Get("Credits.CopyLink")))ImGui.SetClipboardText(credit.Url);
+            CopyButton(localization.Get("Credits.CopyLink"),()=>credit.Url);
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Credits.CopyLinkTip",credit.Url));
         }
         ImGui.TableNextColumn();
         ImGui.TextWrapped(CreditLicense(credit));
         if(credit.LicenseUrl.Length>0)
         {
-            if(ImGui.SmallButton(localization.Get("Credits.CopyLicense")))ImGui.SetClipboardText(credit.LicenseUrl);
+            CopyButton(localization.Get("Credits.CopyLicense"),()=>credit.LicenseUrl);
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Credits.CopyLinkTip",credit.LicenseUrl));
         }
         ImGui.TableNextColumn();

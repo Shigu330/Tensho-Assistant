@@ -4892,6 +4892,7 @@
     "SourceReference": "Référence source : {0}"
   },
   "Common": {
+    "Copied": "Copié",
     "SaveError": "Échec de sauvegarde. Réessayez ; les détails sont dans le journal Dalamud.",
     "Dismiss": "Masquer ce message"
   },

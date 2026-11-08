@@ -102,7 +102,7 @@ internal sealed partial class MainWindow
             ImGui.TextDisabled(localization.Get("BankUi.NoOpen"));
         if (menus.Message is { } message) DrawServiceMessage(message,"ServiceErrors.Bank");
         if (menus.ReadsUnavailable) ImGui.TextColored(Accent,localization.Get("ServiceStatus.StorageReadUnavailable"));
-        if (state.Loading) ImGui.TextWrapped(localization.Get("BankUi.Loading"));
+        if (state.Loading) EmptyState("BankUi.Loading");
         if (state.Error is { } error) DrawDataError(error,"ServiceErrors.Bank");
         if (menus.CharacterId == 0)
         {

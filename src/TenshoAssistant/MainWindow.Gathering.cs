@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
         var sources = catalog.ForItem((uint)itemId);
         if (sources.Count == 0)
         {
-            ImGui.TextWrapped(localization.Get("GatheringDetails.Empty"));
+            EmptyState("GatheringDetails.Empty");
             ImGui.TextDisabled(localization.Get("GatheringDetails.Coverage"));
             return;
         }

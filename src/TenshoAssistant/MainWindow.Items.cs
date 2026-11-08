@@ -69,7 +69,7 @@ internal sealed partial class MainWindow
         if (!snapshot.Containers.TryGetValue(location, out var container)
             || container.Coverage == InventoryCoverage.Unknown)
         {
-            ImGui.TextWrapped(localization.Get("ItemsUi.CrystalLoading"));
+            EmptyState("ItemsUi.CrystalLoading");
             return;
         }
         if (container.Quantities.Count == 0)
@@ -782,7 +782,7 @@ internal sealed partial class MainWindow
         }
         if (searchResults.Count == 0)
         {
-            ImGui.TextUnformatted(localization.Get("ItemsUi.Empty"));
+            EmptyState("ItemsUi.Empty");
             return;
         }
         // 0.292 (user request): the result list folds, leaving the room to the item sheet.

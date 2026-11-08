@@ -84,7 +84,7 @@ internal sealed partial class MainWindow
         if(islandAgenda is not { } agenda)return;
         if(agenda.Chains.Count==0){ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Island.NoAgenda"));return;}
         ImGui.SameLine();
-        if(ImGui.Button(localization.Get("Island.Copy")))ImGui.SetClipboardText(IslandAgendaText(agenda));
+        CopyButton(localization.Get("Island.Copy"),()=>IslandAgendaText(agenda));
         Tip("Island.CopyTip");
         foreach(var line in IslandAgendaText(agenda).Split('\n'))ImGui.TextUnformatted(line);
         ImGui.TextDisabled(localization.Get("Island.AgendaLimits"));
@@ -98,7 +98,7 @@ internal sealed partial class MainWindow
         if(!IslandMaterials.Complete(agenda))ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Island.MaterialsIncomplete"));
         ImGui.TextDisabled(localization.Get("Island.MaterialsLimits"));
         if(islandMaterialTotals.Count==0)return;
-        if(ImGui.Button(localization.Get("Island.MaterialsCopy")))ImGui.SetClipboardText(string.Join("\n",islandMaterialTotals.Select(item=>localization.Format("Island.MaterialAmount",item.Name,item.Amount))));
+        CopyButton(localization.Get("Island.MaterialsCopy"),()=>string.Join("\n",islandMaterialTotals.Select(item=>localization.Format("Island.MaterialAmount",item.Name,item.Amount))));
         if(!ImGui.BeginTable("###IslandMaterialsTable",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV))return;
         try
         {

@@ -24,13 +24,13 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndDisabled();}
         if(state.Loading)ImGui.TextDisabled(localization.Get("FishingSources.Loading"));
-        if(state.Error is { } error){ImGui.TextWrapped(localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"FishingSources.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
+        if(state.Error is { } error)DrawDataError(error,"FishingSources.Error");
         if(state.Item is not { } document)return;
         ImGui.TextDisabled(localization.Format("FishingSources.Fetched",document.FetchedAt.ToLocalTime().ToString("g")));
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,document.FetchedAt);
         if(document.FishingError is not null){ImGui.TextWrapped(localization.Get("FishingSources.Invalid"));return;}
         if(document.Fishing is not {SpotsKnown:true} fishing){ImGui.TextWrapped(localization.Get("FishingSources.Missing"));return;}
-        if(fishing.Spots.Count==0)ImGui.TextWrapped(localization.Get("FishingSources.Empty"));
+        if(fishing.Spots.Count==0)EmptyState("FishingSources.Empty");
         for(var index=0;index<fishing.Spots.Count;index++)
         {
             var spot=fishing.Spots[index];ImGui.PushID(index);

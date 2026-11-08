@@ -193,7 +193,7 @@ internal sealed partial class MainWindow
         DrawCraftReadiness(recipe);
         if(preparation) { DrawCraftPlan(recipe); return; }
         if(CraftSimulation.Unsupported(recipe) is { } unsupported) { ImGui.TextWrapped(CraftMessage(unsupported)); return; }
-        if(craftActions.State.Catalog is not { } catalog) { if(craftActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Craft"); else ImGui.TextWrapped(localization.Get("SimulationHelp.Loading")); return; }
+        if(craftActions.State.Catalog is not { } catalog) { if(craftActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Craft"); else EmptyState("SimulationHelp.Loading"); return; }
         var p=recipe.Simulation!; var job=recipe.CraftTypeId+8;
         if(p.Collectable)ImGui.TextColored(Accent,localization.Get("SimulationHelp.Collectable"));
         // A-07 (0.435): expert recipes simulated in the normal condition, said so.
@@ -405,7 +405,7 @@ internal sealed partial class MainWindow
             {
                 if(TenshoAssistant.UI.UiComponents.Header(localization.Format("CraftMacro.Block",block.Number,export.Pages.Count,block.Lines.Count)+"###MacroBlock",ImGuiTreeNodeFlags.DefaultOpen))
                 {
-                    if(ImGui.SmallButton(localization.Get("CraftMacro.Copy"))) ImGui.SetClipboardText(block.Text);
+                    CopyButton(localization.Get("CraftMacro.Copy"),()=>block.Text);
                     foreach(var line in block.Lines) ImGui.TextUnformatted(line);
                 }
             }

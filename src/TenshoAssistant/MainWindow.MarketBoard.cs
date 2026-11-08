@@ -136,7 +136,7 @@ internal sealed partial class MainWindow
             if(state.Error is { } staleError && developerMode){ImGui.SameLine();ImGui.TextDisabled(staleError);}
         }
         else if(state.Cooldown)ImGui.TextDisabled(localization.Get("MarketBoard.Cooldown"));
-        else if(state.Error is { } error){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"MarketDates.Error"));if(developerMode){ImGui.SameLine();ImGui.TextDisabled(RawMessage(error));}}
+        else if(state.Error is { } error)DrawDataError(error,"MarketDates.Error");
         else if(state.Board is { } fetched)ImGui.TextDisabled(localization.Format("MarketDates.Fetched",fetched.FetchedAt.ToLocalTime().ToString("g")));
         var shown=state.ItemId==item && state.Scope==scopeName ? state.Board:null;
         // X-73.12 (0.868): while Universalis is still asked, nothing yet; then its board completed by what was seen in game, or what was seen alone when it has none.
@@ -222,7 +222,7 @@ internal sealed partial class MainWindow
         // X-73.14 (0.870): a seen offer counts when known not to be yours.
         if(Undercut.Price(board.Offers.Where(offer=>(offer.Seen ? offer.Own==false:!ownRetainers.Contains(offer.Retainer)) && offer.UnitPrice is >0 and <=uint.MaxValue).Select(offer=>new UndercutListing((uint)offer.UnitPrice,offer.Hq,0)),new HashSet<ulong>()) is { } lowest)
         {
-            if(ImGui.SmallButton(localization.Format("MarketBoard.CopyUndercut",lowest.Paste.ToString("N0"))))ImGui.SetClipboardText(lowest.Paste.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            CopyButton(localization.Format("MarketBoard.CopyUndercut",lowest.Paste.ToString("N0")),()=>lowest.Paste.ToString(System.Globalization.CultureInfo.InvariantCulture));
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("MarketBoard.CopyUndercutTip",lowest.Lowest.ToString("N0"),board.FetchedAt.ToLocalTime().ToString("g")));
         }
         ImGui.TextDisabled(localization.Format("MarketBoard.Count",marketShown.Length,board.Offers.Count));

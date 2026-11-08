@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
         if (ImGui.Button(localization.Get("QuestsBrowser.Refresh"))) quests.RequestRefresh();
         ImGui.SameLine();
         ImGui.TextDisabled(state.Loading ? localization.Get("QuestsBrowser.Loading") : state.ObservedAt is { } date ? localization.Format("QuestsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("QuestsBrowser.Offline"));
-        if (state.Error is { } error) {ImGui.TextWrapped(localization.Get("QuestsBrowser.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
+        if (state.Error is { } error) DrawDataError(error,"QuestsBrowser.Error");
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Quests,state.ObservedAt,state.FromCache);
         DrawFollowedQuests();
         if (ImGui.SmallButton(localization.Get("QuestsBrowser.Catalogue")+"###QuestCatalogue")) questShowDetails = false;
@@ -386,7 +386,7 @@ internal sealed partial class MainWindow
         if (TenshoAssistant.UI.UiComponents.Header(localization.Format("QuestsBrowser.Followed",followed?.Count ?? 0)+"###FollowedQuests"))
         {
             ImGui.TextDisabled(localization.Get("QuestsBrowser.FollowHelp"));
-            if (followed is not { Count: > 0 }) ImGui.TextWrapped(localization.Get("QuestsBrowser.FollowEmpty"));
+            if (followed is not { Count: > 0 }) EmptyState("QuestsBrowser.FollowEmpty");
             else
             {
                 uint? remove = null;

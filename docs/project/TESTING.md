@@ -1480,6 +1480,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.919) Atelier de la compagnie, après avoir consulté les résultats de l'aéronef : onglet des navires, « Dernier voyage : Mer de nuages - secteur 1 › … ».
 
+- [ ] (0.920) Pages avec une erreur de source (source coupée ou hors ligne) : ligne rouge ; pages vides : ligne grise ; un bouton Copier : « Copié » à côté pendant deux secondes.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

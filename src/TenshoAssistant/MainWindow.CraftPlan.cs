@@ -123,7 +123,7 @@ internal sealed partial class MainWindow
         // A-09 (0.423): the target as a Teamcraft list (import link built here; copied, or opened on click).
         if (TeamcraftExport.Link([(recipe.ResultItemId, recipe.RecipeId, (long)plan.Requested)]) is { } teamcraft)
         {
-            if (ImGui.Button(localization.Get("PlanUi.TeamcraftCopy"))) ImGui.SetClipboardText(teamcraft);
+            CopyButton(localization.Get("PlanUi.TeamcraftCopy"),()=>teamcraft);
             Tip("PlanUi.TeamcraftTip");
             ImGui.SameLine();
             if (ImGui.Button(localization.Get("PlanUi.TeamcraftOpen"))) Dalamud.Utility.Util.OpenLink(teamcraft);

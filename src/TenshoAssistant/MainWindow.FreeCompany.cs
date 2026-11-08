@@ -42,7 +42,7 @@ internal sealed partial class MainWindow
     {
         var vessels=configuration.Voyages ?? [];
         if(VoyageReadUnavailable?.Invoke()==true)ImGui.TextColored(Accent,localization.Get("FreeCompany.ReadUnavailable"));
-        if(vessels.Count==0){ImGui.TextWrapped(localization.Get("FreeCompany.NoData"));return;}
+        if(vessels.Count==0){EmptyState("FreeCompany.NoData");return;}
         var now=DateTimeOffset.UtcNow;
         // 0.603 (T23): one frame per workshop: several companies are not mixed, each has the date of its own reading.
         var workshops=FreeCompany.Voyages.Workshops(vessels);

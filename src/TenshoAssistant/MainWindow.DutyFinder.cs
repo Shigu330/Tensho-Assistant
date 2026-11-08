@@ -66,7 +66,7 @@ internal sealed partial class MainWindow
         // Source, freshness and refresh on one line; the long explanations go into the (i) tooltip.
         if(state.Loading)ImGui.TextDisabled(localization.Get("DutyUi.Loading"));
         else if(state.Document is { } fetched)ImGui.TextDisabled(localization.Format("DutyFinder.Fetched",fetched.FetchedAt.ToLocalTime().ToString("g")));
-        else if(state.Error is { } error)ImGui.TextColored(Accent,localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"ServiceErrors.Duty"));
+        else if(state.Error is { } error)DrawDataError(error,"ServiceErrors.Duty");
         ImGui.SameLine();
         ImGui.PushFont(UiBuilder.IconFont);
         // 0.325: the ↻ button has its own tooltip, drawn once the icon font is popped.

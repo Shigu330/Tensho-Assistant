@@ -29,7 +29,7 @@ internal sealed partial class MainWindow
                 ImGui.TextUnformatted(text);
                 if(place.Note.Length>0 && ImGui.IsItemHovered())WrappedTooltip(place.Note);
                 ImGui.SameLine();
-                if(ImGui.SmallButton(localization.Get("Places.Copy")))ImGui.SetClipboardText(text+(place.Note.Length>0 ? " ("+place.Note+")":""));
+                CopyButton(localization.Get("Places.Copy"),()=>text+(place.Note.Length>0 ? " ("+place.Note+")":""));
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("Places.Remove")) && ImGui.GetIO().KeyCtrl){SavePlaces(PlaceDirectory.Remove(places,place.Id));return;}
                 Tip("Places.RemoveTip");

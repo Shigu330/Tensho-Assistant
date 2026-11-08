@@ -40,7 +40,7 @@ internal sealed partial class MainWindow
         // Game flags (« Special Event Flag », or no quest and no NPC of their own) are not events: left out, counted in developer mode.
         var shown=state.Active.Where(festival=>!Events.Festivals.Technical(festival.Id,reader.Names,questsOf,layouts)).ToArray();
         if(developerMode && shown.Length<state.Active.Count)ImGui.TextDisabled(localization.Format("Events.Technical",state.Active.Count-shown.Length));
-        if(shown.Length==0){ImGui.TextWrapped(localization.Get("Events.None"));return;}
+        if(shown.Length==0){EmptyState("Events.None");return;}
         if(layouts is null)ImGui.TextDisabled(localization.Get(reader.LayoutsFailed ? "Events.LayoutsUnavailable":"Events.LayoutsLoading"));
         foreach(var festival in shown)
         {

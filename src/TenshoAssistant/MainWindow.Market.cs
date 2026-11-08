@@ -41,7 +41,7 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(localization.Format("MarketDates.Cache",localization.Get("CacheDuration."+CacheChoiceKeys[(int)configuration.Cache.Get(TenshoAssistant.Caching.CacheArea.Prices)])));
         if (state.ItemId != (uint)itemId) return;
         if (state.Loading) ImGui.TextDisabled(localization.Get("MarketUi.Loading"));
-        if (state.Error is { } error) {ImGui.TextWrapped(localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"MarketDates.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
+        if (state.Error is { } error) DrawDataError(error,"MarketDates.Error");
         if (state.Quote is not { } quote) return;
         ImGui.TextDisabled(localization.Format("MarketDates.Fetched",quote.FetchedAt.ToLocalTime().ToString("g")));
         ImGui.TextDisabled(market.IsFresh(quote,DateTimeOffset.UtcNow) ? localization.Get("MarketUi.Fresh"):localization.Get("MarketUi.Expired"));

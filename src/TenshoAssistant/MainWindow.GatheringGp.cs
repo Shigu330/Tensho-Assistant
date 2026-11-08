@@ -42,7 +42,7 @@ internal sealed partial class MainWindow
         DrawGatheringObservation();
         // 0.330: a catalogue failure (sheet changed by a game update) is shown translated, its detail in developer mode only (R-14).
         if(gpActions.State.Catalog is not { } catalog)
-        { if(gpActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Gp"); else ImGui.TextWrapped(localization.Get("GpUi.Loading")); return; }
+        { if(gpActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Gp"); else EmptyState("GpUi.Loading"); return; }
         ImGui.TextWrapped(localization.Get("GpUi.Help"));
         var stats=characterStats.State;
         var canCopy=stats.CharacterId!=0 && stats.JobId is 16 or 17 && stats.CurrentGp is not null

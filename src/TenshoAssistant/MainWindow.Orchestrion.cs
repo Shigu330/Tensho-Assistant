@@ -66,11 +66,11 @@ internal sealed partial class MainWindow
                 ImGui.TextWrapped(localization.Get("OrchestrionDetails.Help"));
                 if(!string.IsNullOrWhiteSpace(entry.Description)){ImGui.Separator();ImGui.TextWrapped(entry.Description);}
                 ImGui.Separator();
-                if(itemCatalog.State.Catalog is not { } catalog)ImGui.TextWrapped(localization.Get("OrchestrionDetails.Loading"));
+                if(itemCatalog.State.Catalog is not { } catalog)EmptyState("OrchestrionDetails.Loading");
                 else
                 {
                     var items=catalog.ForOrchestrion(entry.Id);
-                    if(items.Count==0)ImGui.TextWrapped(localization.Get("OrchestrionDetails.Empty"));
+                    if(items.Count==0)EmptyState("OrchestrionDetails.Empty");
                     foreach(var item in items)
                     {
                         if(ItemCell(item,item.Id,32)){page=Page.Items;focusStocksTab=true;ImGui.CloseCurrentPopup();}

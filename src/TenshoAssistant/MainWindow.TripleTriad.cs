@@ -239,7 +239,7 @@ internal sealed partial class MainWindow
                         }
                     }
                     finally { clipper.End(); clipper.Destroy(); }
-                    if (triadMatches.Length == 0) ImGui.TextWrapped(localization.Get("TriadUi.Empty"));
+                    if (triadMatches.Length == 0) EmptyState("TriadUi.Empty");
                 }
             }
             finally { ImGui.EndChild(); }

@@ -164,7 +164,7 @@ internal sealed partial class MainWindow
                         }
                     }
                     finally { clipper.End(); clipper.Destroy(); }
-                    if (sourceMatches.Length == 0) ImGui.TextWrapped(localization.Get("GatheringBrowser.Empty"));
+                    if (sourceMatches.Length == 0) EmptyState("GatheringBrowser.Empty");
                 }
             }
             finally { ImGui.EndChild(); }

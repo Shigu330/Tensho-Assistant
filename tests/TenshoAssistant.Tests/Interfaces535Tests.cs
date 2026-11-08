@@ -174,7 +174,7 @@ internal static class Interfaces535Tests
         ("0.567: the market page copies the lowest offer minus 1, without your retainers",() =>
         {
             var board=Read("MainWindow.MarketBoard.cs");
-            Check(board.Contains("!ownRetainers.Contains(offer.Retainer)") && board.Contains("ImGui.SetClipboardText(lowest.Paste"),"only copied, own retainers left out");
+            Check(board.Contains("!ownRetainers.Contains(offer.Retainer)") && board.Contains("()=>lowest.Paste.ToString("),"only copied, own retainers left out");
         }),
         ("0.568: a fish's window and weather now: unknown stays unknown, and a window can cross midnight",() =>
         {

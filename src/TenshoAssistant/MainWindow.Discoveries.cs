@@ -205,7 +205,7 @@ internal sealed partial class MainWindow
             {
                 ImGui.TextUnformatted(localization.Format("DiscoveriesUi.ConnectCode",code));
                 ImGui.SameLine();
-                if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ConnectCopy")))ImGui.SetClipboardText(code);
+                CopyButton(localization.Get("DiscoveriesUi.ConnectCopy"),()=>code);
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ConnectOpen")))Dalamud.Utility.Util.OpenLink(exchange.VerifyAddress ?? "https://github.com/login/device");
             }
