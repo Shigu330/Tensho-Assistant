@@ -1981,7 +1981,9 @@ internal sealed partial class MainWindow
         if(npcVendors?.State.Catalog is not { } catalog)return [];
         // 0.810, 0.811 (X-45): a festival's NPCs only while it runs; a quest's or the opening's never (their layer says which, NpcLocation.Condition).
         var festivals=Festivals?.Invoke();festivals?.Want();
-        var running=festivals?.State?.Active.Select(festival=>festival.Id).ToHashSet() ?? [];
+        // X-95 (0.950): not read yet (logging in, a reload): the last known list stands, instead of « none » then the list again.
+        var festivalState=festivals?.State;
+        var running=festivalState?.Active.Select(festival=>festival.Id).ToHashSet() ?? (mapVendorCache.Festivals is { Length:>0 } kept ? kept.Split(',').Select(uint.Parse).ToHashSet():[]);
         var festivalKey=string.Join(',',running.Order());
         if(mapVendorCache.MapId!=map.MapId || !ReferenceEquals(mapVendorCache.Catalog,catalog) || mapVendorCache.Festivals!=festivalKey)
         {

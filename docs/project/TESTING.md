@@ -1540,6 +1540,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.949) Paramètres › Avancé : « Terrains en vente (PaissaDB) » ; décoché, la page des terrains ne relève plus rien. Découvertes : l'avertissement au-dessus de « Se connecter ».
 
+- [ ] (0.950) Changer de zone avec la carte ouverte : moins d'à-coups ; en mode développeur, la ligne « Map vendors on map » n'apparaît plus qu'une fois par changement de carte.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

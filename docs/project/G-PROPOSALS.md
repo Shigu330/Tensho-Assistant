@@ -133,3 +133,14 @@ La liste complète de ce qui reste pour la 1.0.0 : [PUBLISHING](PUBLISHING.md) �
 | N-10, atelier de l'île | Fait sans le jeu en 0.671 et 0.672, inconnues listées dans `docs/evidence/0.671-island-workshop.md` | Essais et capture devant l'agenda de l'île ; prévision de la semaine plus tard |
 | I-05, suite | Relevé des offres du jeu, vue de tous les servants | Après un essai de la 0.508 |
 | Dresseur, suite | Mis de côté par l'utilisateur | Sonde déjà en place (0.501) |
+
+## À revoir avec l'utilisateur (notées le 2026-11-08 au soir, demande « continue en notant les propositions »)
+
+| # | Sujet | Proposition (recommandée) | Autre choix |
+|---|---|---|---|
+| 1 | Coupure JcJ des travaux déjà lancés (DEC-038, audit 0.949) | Annuler dès le début de la coupure : connexion GitHub en attente, échange de découvertes, lectures Garland et wiki, prix d'une préparation ; couper l'alerte Discord « mission trouvée » en JcJ | Laisser comme aujourd'hui (non retenu le 2026-11-08) |
+| 2 | Position exacte dans les découvertes partagées (audit 0.949) | N'envoyer que la case de 50 yalms | Garder la position exacte (non retenu le 2026-11-08) |
+| 3 | Réorganisation des pages de réglages (X-76 étape 3) | Proposition concrète après la passe des groupes de réglages | — |
+| 4 | Choix provisoires depuis la 0.345 (tableau en tête de ce fichier) | Les passer en un seul lot, cases à cocher, à la fin du nettoyage (étape 9) | — |
+| 5 | Ventes des servants (I-05) | Garder la comparaison Universalis sur clic | Demander une fois à l'ouverture, sur réglage |
+

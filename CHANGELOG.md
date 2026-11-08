@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.950.0
+- Plan global, Verify : Images lentes de la carte (X-95), première cause trouvée dans le journal : à chaque changement de zone, les fêtes en cours étaient lues vides un instant, et la carte reconstruisait deux fois de suite toute sa liste de vendeurs et leurs icônes (263 fois dans le journal, une cinquantaine de millisecondes chaque fois). Une liste vide juste après une liste de fêtes n'est retenue qu'à la lecture suivante, et la carte garde la dernière liste connue tant que rien n'est lu. Preuve : docs/evidence/0.950-map-slow-frames.md. Non validé en jeu.
+- Tests : FestivalFlicker950Tests. Verify.ps1 (agent) : 1562/1562, 0 avertissement, 0 erreur ; DLL 0.950.0.0. Non validé en jeu.
+### English
+- Map slow frames (X-95), first cause found in the log: at each zone change the running festivals were read empty for a moment, and the map rebuilt its whole vendor list and their icons twice in a row (263 times in the log, about fifty milliseconds each). An empty list right after a festival list is kept only at the next read, and the map keeps the last known list while nothing is read. Evidence: docs/evidence/0.950-map-slow-frames.md. Not validated in game.
+
 ## 0.949.0
 - Plan global, Verify : Nettoyage X-76, étape 5 (réseau, vie privée, règles Dalamud), avec vos choix : PaissaDB (terrains en vente) a maintenant son propre interrupteur dans les sources, et « Données du jeu et observées seulement » le coupe aussi ; l'échange des découvertes par GitHub figure dans les crédits avec ses adresses ; les relevés envoyés ne portent plus que le jour, jamais l'heure ; avant la connexion à GitHub, un avertissement dit clairement que votre nom GitHub et les relevés envoyés deviennent publics ; la fiche du plugin cite le changement d'équipement parmi les actions qui touchent le jeu. Audit complet rangé dans docs/evidence/0.949-network-rules.md. Non retenus pour l'instant : l'arrêt en JcJ des travaux déjà lancés et la position exacte partagée. Non validé en jeu.
 - Tests : NetworkRules949Tests. Verify.ps1 (agent) : 1561/1561, 0 avertissement, 0 erreur ; DLL 0.949.0.0. Non validé en jeu.
