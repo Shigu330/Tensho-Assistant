@@ -58,7 +58,7 @@ internal sealed partial class MainWindow
                 if(prices)
                 {
                     if(usages || compare.Count>0)ImGui.Separator();
-                    DrawHoveredPrices(priced!,item?.CanBeHq ?? true,observed.Stack);
+                    MeasureMap("hover prices",()=>DrawHoveredPrices(priced!,item?.CanBeHq ?? true,observed.Stack));
                 }
             }
             finally{ImGui.PopTextWrapPos();}
@@ -331,8 +331,9 @@ internal sealed partial class MainWindow
     {
         // 0.347 (g, I-08): the player's own note first.
         DrawItemNoteLine(id);
-        if(!hoverPanel || configuration.HoverShowCollection)DrawItemCollection(item);
-        if(!hoverPanel || configuration.HoverShowStock)DrawHoveredStock(id);
+        // X-95 (0.951): the parts of the item panel timed in developer mode (the panel reached 173 ms in the slow frame log).
+        if(!hoverPanel || configuration.HoverShowCollection)MeasureMap("hover collection",()=>DrawItemCollection(item));
+        if(!hoverPanel || configuration.HoverShowStock)MeasureMap("hover stock",()=>DrawHoveredStock(id));
         // 0.346 (g, I-06): NPC sale price (Item.PriceLow, game data), and the hovered stack's when the game tooltip is for one of the
         // player's slots; for NQ (the HQ price is not in the sheet); nothing when the item does not sell to NPCs (price 0).
         if(item is { SellPrice:>0 } sold)
@@ -342,7 +343,7 @@ internal sealed partial class MainWindow
                 ? localization.Format("HoverUi.NpcSaleStack",sold.SellPrice.ToString("N0"),count,(sold.SellPrice*(long)count).ToString("N0"))
                 :localization.Format("HoverUi.NpcSale",sold.SellPrice.ToString("N0")));
         }
-        if(!hoverPanel || configuration.HoverShowUsages)DrawHoveredUsages(id);
+        if(!hoverPanel || configuration.HoverShowUsages)MeasureMap("hover usages",()=>DrawHoveredUsages(id));
         // « How to get it » is the last part: hidden, its Garland / wiki fallback is not asked from the hover either.
         if(hoverPanel && !configuration.HoverShowSources)return;
         // How to obtain the item itself (0.144: the sources follow the unlocking item, not only the collection page).

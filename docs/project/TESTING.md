@@ -1542,6 +1542,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.950) Changer de zone avec la carte ouverte : moins d'à-coups ; en mode développeur, la ligne « Map vendors on map » n'apparaît plus qu'une fois par changement de carte.
 
+- [ ] (0.951) Mode développeur : ouvrir l'accueil et survoler des objets ; les lignes « Slow frame » nomment les parties.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

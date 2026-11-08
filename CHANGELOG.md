@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.951.0
+- Plan global, Verify : Images lentes (X-95) : en mode développeur, la page d'accueil et le panneau de survol d'objet sont maintenant mesurés partie par partie (guide, alertes, aujourd'hui, tuiles, outils ; collection, stock, usages, prix), pour que le prochain relevé « Slow frame » dise quelle partie coûte (l'accueil a atteint 119 ms, le panneau 173 ms). Rien ne change hors du mode développeur. Non validé en jeu.
+- Tests : FestivalFlicker950Tests. Verify.ps1 (agent) : 1562/1562, 0 avertissement, 0 erreur ; DLL 0.951.0.0. Non validé en jeu.
+### English
+- Slow frames (X-95): in developer mode the Home page and the item hover panel are now timed part by part (guide, alerts, today, tiles, tools; collection, stock, uses, prices), so the next « Slow frame » reading says which part costs (Home reached 119 ms, the panel 173 ms). Nothing changes outside developer mode. Not validated in game.
+
 ## 0.950.0
 - Plan global, Verify : Images lentes de la carte (X-95), première cause trouvée dans le journal : à chaque changement de zone, les fêtes en cours étaient lues vides un instant, et la carte reconstruisait deux fois de suite toute sa liste de vendeurs et leurs icônes (263 fois dans le journal, une cinquantaine de millisecondes chaque fois). Une liste vide juste après une liste de fêtes n'est retenue qu'à la lecture suivante, et la carte garde la dernière liste connue tant que rien n'est lu. Preuve : docs/evidence/0.950-map-slow-frames.md. Non validé en jeu.
 - Tests : FestivalFlicker950Tests. Verify.ps1 (agent) : 1562/1562, 0 avertissement, 0 erreur ; DLL 0.950.0.0. Non validé en jeu.

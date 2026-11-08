@@ -16,26 +16,27 @@ internal sealed partial class MainWindow
     private void DrawHome()
     {
         Heading(localization.Get("Home.Title"),localization.Get("Home.Description"));
-        DrawGuideOnHome();
+        MeasureMap("home guide",DrawGuideOnHome);
         var items=itemCatalog.State;var recipes=recipeCatalog.State;
         var ready=items.Catalog is not null && recipes.Catalog is not null;
         UiComponents.StatusBadge(localization.Get(ready ? "Home.Ready":"Home.Loading"),ready ? Success:Accent);
         ImGui.SameLine();
         ImGui.TextDisabled(localization.Format("Home.Catalogues",items.Catalog?.Count ?? 0,recipes.Catalog?.Count ?? 0));
-        DrawHomeAlerts();
+        // X-95 (0.951): each part of Home timed in developer mode (the page reached 119 ms in the slow frame log).
+        MeasureMap("home alerts",DrawHomeAlerts);
         ImGui.Separator();
-        DrawHomeToday();
+        MeasureMap("home today",DrawHomeToday);
         ImGui.Separator();
-        DrawHomeTiles();
+        MeasureMap("home tiles",DrawHomeTiles);
         if(SelectedItem is { } contextItem)
         {
             ImGui.Separator();
             ImGui.TextColored(Accent,localization.Format("Home.ContextItem",contextItem.Name));
-            DrawContextTools();
+            MeasureMap("home context tools",DrawContextTools);
         }
         ImGui.Separator();
         if(revealHomeTools){ImGui.SetNextItemOpen(true);revealHomeTools=false;}
-        if(configuration.HomeShowTools && TenshoAssistant.UI.UiComponents.Header(localization.Get("Plugin.AllTools")+"###HomeTools"))DrawTools();
+        if(configuration.HomeShowTools && TenshoAssistant.UI.UiComponents.Header(localization.Get("Plugin.AllTools")+"###HomeTools"))MeasureMap("home tools",DrawTools);
     }
 
     // Work in progress, next alarm and errors, in one short block.
