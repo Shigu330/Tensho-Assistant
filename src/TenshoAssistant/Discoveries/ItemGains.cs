@@ -16,8 +16,12 @@ public static class ItemGains
     private static readonly DateTimeOffset DayZero=new(2013,8,27,0,0,0,TimeSpan.Zero);
     public static int DayNumber(DateTimeOffset at)=>(int)Math.Clamp((at-DayZero).TotalDays,0,100_000);
 
-    /// <summary>X-73.18 (0.888): an item id without its HQ (+1 000 000) or collectable (+500 000) offset.</summary>
-    public static uint BaseItem(uint raw)=>raw%500_000;
+    /// <summary>
+    /// X-73.18 (0.888): an item id without its HQ (+1 000 000) or collectable (+500 000) offset. 0.911 (X-76): key items (EventItem rows, 2 000 000 and up)
+    /// have no offset and are kept as they are.
+    /// </summary>
+    public const uint KeyItemStart=2_000_000;
+    public static uint BaseItem(uint raw)=>raw>=KeyItemStart ? raw:raw%500_000;
 
     /// <summary>
     /// X-73.18 (0.898, user request: multiple catches happen often): the shadows of the fish of one multiple catch. The fish caught (chat) and the slots speared

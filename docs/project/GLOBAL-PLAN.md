@@ -258,6 +258,16 @@ et plus, en prévision de futurs outils »).
   source communautaire encore lue, et ce que les outils prévus du plan auront besoin de garder dès maintenant.
 - Les ajouts sûrs sont codés ; ceux qui demandent un relevé en jeu vont dans la table des rappels.
 
+**Avancement 2b et 2c :** plan rendu par un workflow (`docs/evidence/x76-2bc-plan.md`) : harmonisation H1 info-bulles, H2 couleurs du thème (thèmes clairs),
+H3 enregistrement des réglages et retour arrière, H4 curseurs enregistrés au relâchement, H5 composants de réglage, H6 ligne « Par défaut », H7 états des pages,
+H8 affichage des objets, H9 journaux, H10 fichiers et abonnements ; parseurs P1 HQ des remises, P2 attribution des gains, P3 libellé de chaque sorte (0.911),
+P4 état « débloqué » des objets, P5 feuilles du jeu à la place de données communautaires, P6 Intuition et prédateurs, P7 secteurs des sous-marins,
+P8 compteurs pour des taux, P9 données lues mais jetées, P10 récompenses de fin de mission ; étapes ajoutées E1 format du fichier des découvertes figé
+avant la 1.0.0, E2 test des règles d'interface, E3 test des preuves citées, E4 aide « une fois par événement ». Vérification des données déjà relevées
+(demande de l'utilisateur) : sonde `tools/DiscoveryCheckProbe`, 1281 faits, 11 faux venant de 3 défauts corrigés en 0.911
+(`docs/evidence/0.911-discoveries-check.md`). Décision pour le lot de fin : la lecture des offres du marché pendant une mise en vente
+(UndercutWatcher) ne s'arrête pas en JcJ (DEC-038), résumé à faire à l'utilisateur avant d'y toucher.
+
 **3. Réglages : inventaire complet et remise en ordre.**
 - Tableau de tous les réglages (`docs/project/SETTINGS.md`) : nom, valeur par défaut, où il est lu, page, info-bulle, effet réel, ce qui se passe s'il est coupé.
 - Corrections : réglage sans effet, effet différent de son nom, défaut incohérent, doublon entre pages.

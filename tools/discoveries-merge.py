@@ -27,6 +27,7 @@ def valid(f):
         f.pop("Key",None)  # computed by the plugin (DiscoveryFact.Key): written in its files, recomputed here
         if set(f)-FIELDS or f["Kind"] not in KINDS or f["Subject"]<=0:return False
         if f["Kind"] in PLACED and f["Map"]==0:return False
+        if f["Kind"]==3 and f["X"]==0 and f["Z"]==0:return False  # 0.911: a FATE at exactly (0, 0) is the game's zero position for about a second
         if not all(math.isfinite(f[n]) and abs(f[n])<=10000 for n in ("X","Z")):return False
         if (math.floor(f["X"]/CELL),math.floor(f["Z"]/CELL))!=(f["CellX"],f["CellZ"]):return False
         if not (0<=f["LevelMin"]<=100000 and 0<=f["LevelMax"]<=100000):return False

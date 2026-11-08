@@ -116,6 +116,9 @@ internal sealed partial class MainWindow
     }
     private static readonly DiscoveryKind[] ItemSourceKinds=[DiscoveryKind.Reduction,DiscoveryKind.Desynthesis,DiscoveryKind.Venture,DiscoveryKind.DutyChest,DiscoveryKind.FateReward,
         DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition,DiscoveryKind.FashionEvaluation,DiscoveryKind.VoyageDrop,DiscoveryKind.VoyageUnlock,DiscoveryKind.BlueSpellLearned,DiscoveryKind.BeastTamed,DiscoveryKind.FestivalSeen,DiscoveryKind.VistaSeen];
+    /// <summary>0.911 (X-76): the other kinds the page's search lists too (never shown as an item's source); with the places, FATEs and item sources, every kind.</summary>
+    private static readonly DiscoveryKind[] OtherSeenKinds=[DiscoveryKind.NpcPlace,DiscoveryKind.BlueSpellCaster,DiscoveryKind.FishLure,DiscoveryKind.FishTransition,DiscoveryKind.FishBite,
+        DiscoveryKind.QuestItemAsked,DiscoveryKind.SpearShadow];
     /// <summary>
     /// X-73.16 (0.872): where you saw a shopkeeper, as a vendor place, for the vendors the game sheets do not place (their own places always come first).
     /// Worked out again only when the base changes.
@@ -234,7 +237,10 @@ internal sealed partial class MainWindow
                 ? localization.Format("DiscoveriesUi.ExchangeDone",said.Args[0],said.Args[1],localization.Get("DiscoveriesUi."+said.Args[2]),said.Args[3].Length>0 ? localization.Get("DiscoveriesUi."+said.Args[3]):"")
                 :localization.Format("DiscoveriesUi."+said.Key,said.Args.Cast<object>().ToArray()));
     }
-    private string DiscoveryItemName(uint id)=>itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}";
+    /// <summary>X-76 (0.911): a key item's name (EventItem row, 2 000 000 and up).</summary>
+    internal Func<uint,string?>? KeyItemNameOf { get; set; }
+    private string DiscoveryItemName(uint id)=>id>=ItemGains.KeyItemStart ? KeyItemNameOf?.Invoke(id) is { Length:>0 } key ? key:$"#{id}"
+        :itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}";
     private string DiscoveryDutyName(uint id)=>DutyName?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
     private static DateTime DiscoveryDay(int day)=>new DateTime(2013,8,27).AddDays(day);
     // « HH:mm–HH:mm ET » of two Eorzea minutes of the day.
@@ -246,10 +252,15 @@ internal sealed partial class MainWindow
     {
         if(fact.Kind==DiscoveryKind.FestivalSeen)
             return $"{DiscoveryDay(fact.LevelMin):d} – {DiscoveryDay(fact.LevelMax):d}";
-        if(fact.Kind is DiscoveryKind.FishCondition or DiscoveryKind.VistaSeen)return EtRange(fact.LevelMin,fact.LevelMax);
+        if(fact.Kind is DiscoveryKind.FishCondition or DiscoveryKind.VistaSeen or DiscoveryKind.FishTransition)return EtRange(fact.LevelMin,fact.LevelMax);
+        if(fact.Kind==DiscoveryKind.FishBite)return BiteRange(fact.LevelMin,fact.LevelMax)+" s";
         var range=LevelRange(fact.LevelMin,fact.LevelMax);
-        return ItemSourceKinds.Contains(fact.Kind) ? "×"+range:range;
+        return ItemSourceKinds.Contains(fact.Kind) || fact.Kind==DiscoveryKind.QuestItemAsked ? "×"+range:range;
     }
+    // 0.911 (X-76): a bite time range from tenths of a second, « 1.2–3.4 ».
+    private static string BiteRange(int min,int max)=>min==max ? $"{min/10.0:0.0}":$"{min/10.0:0.0}–{max/10.0:0.0}";
+    private static string BiteMark(uint strength)=>strength switch{1=>"!",2=>"!!",3=>"!!!",_=>"?"};
+    private string DiscoveryWeatherName(uint id)=>weather.State.Catalog?.Weather(id)?.Name ?? $"#{id}";
     /// <summary>0.856 (X-72 C): the name shown for a fact: the monster, the hunt mark with its rank, or the FATE. 0.860: the item and its source.</summary>
     private string DiscoveryFactName(DiscoveryFact fact)=>fact.Kind switch
     {
@@ -258,7 +269,7 @@ internal sealed partial class MainWindow
         DiscoveryKind.DutyChest=>localization.Format("DiscoveriesUi.FromDutyChest",DiscoveryItemName(fact.Subject),DiscoveryDutyName(fact.Detail)),
         DiscoveryKind.FateReward=>localization.Format("DiscoveriesUi.FromFate",DiscoveryItemName(fact.Subject),DiscoveryFateName(fact.Detail)),
         DiscoveryKind.MonsterDrop=>localization.Format("DiscoveriesUi.FromMonster",DiscoveryItemName(fact.Subject),DiscoveryMonsterName(fact.Detail)),
-        DiscoveryKind.QuestItemAsked=>localization.Format("DiscoveriesUi.QuestAsked",DiscoveryItemName(fact.Subject),DiscoveryQuestName(fact.Detail)),
+        DiscoveryKind.QuestItemAsked=>localization.Format("DiscoveriesUi.QuestAsked",DiscoveryItemName(QuestItemAsks.Item(fact.Subject))+(QuestItemAsks.Hq(fact.Subject) ? " HQ":""),DiscoveryQuestName(fact.Detail)),
         DiscoveryKind.SpearShadow=>localization.Format("DiscoveriesUi.SpearShadow",DiscoveryItemName(fact.Subject),SpearShadowText((int)fact.Detail,fact.LevelMin)),
         DiscoveryKind.Reduction=>localization.Format("DiscoveriesUi.FromReduction",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
         DiscoveryKind.ItemFromItem=>localization.Format("DiscoveriesUi.FromItem",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
@@ -273,9 +284,15 @@ internal sealed partial class MainWindow
         DiscoveryKind.VoyageUnlock=>localization.Format("DiscoveriesUi.SectorUnlock",DiscoverySectorName(fact.Subject),DiscoverySectorName(fact.Detail)),
         DiscoveryKind.FashionEvaluation=>localization.Format("DiscoveriesUi.FashionJudged",DiscoveryItemName(fact.Subject),fashionHints.State.Catalog?.Hints.FirstOrDefault(hint=>hint.Id==fact.Detail)?.Name ?? $"#{fact.Detail}"),
         DiscoveryKind.FishCondition=>localization.Format("DiscoveriesUi.FishWeather",DiscoveryItemName(fact.Subject),weather.State.Catalog?.Weather(fact.Detail)?.Name ?? $"#{fact.Detail}"),
+        // 0.911 (X-76): the fishing kinds read as fish, not as monsters.
+        DiscoveryKind.FishLure=>localization.Format("DiscoveriesUi.FishLure",DiscoveryItemName(fact.Subject),fact.Detail switch
+            {1=>localization.Get("FishingPanel.SeenAmbitious"),2=>localization.Get("FishingPanel.SeenModest"),_=>$"#{fact.Detail}"}),
+        DiscoveryKind.FishTransition=>localization.Format("DiscoveriesUi.FishTransition",DiscoveryItemName(fact.Subject),DiscoveryWeatherName(fact.Detail)),
+        DiscoveryKind.FishBite=>localization.Format("DiscoveriesUi.FishBite",DiscoveryItemName(fact.Subject),BiteMark(fact.Detail),BiteRange(fact.LevelMin,fact.LevelMax)),
         DiscoveryKind.HuntMarkPlace=>localization.Format("DiscoveriesUi.HuntMarkName",DiscoveryMonsterName(fact.Subject),fact.LevelMax switch {1=>"B",2=>"A",3=>"S",_=>"?"}),
         DiscoveryKind.FateSeen=>localization.Format("DiscoveriesUi.FateName",DiscoveryFateName(fact.Subject)),
-        _=>DiscoveryMonsterName(fact.Subject),
+        DiscoveryKind.MonsterPlace=>DiscoveryMonsterName(fact.Subject),
+        _=>$"#{fact.Subject}",
     };
 
     private void DrawDiscoveries()
@@ -406,7 +423,8 @@ internal sealed partial class MainWindow
                 ..store.Find(DiscoveryKind.HuntMarkPlace,id=>DiscoveryMonsterName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),100),
                 ..store.Find(DiscoveryKind.FateSeen,id=>DiscoveryFateName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),100),
                 // X-74 (0.860): the items got and their sources, by the item's or the source's name.
-                ..ItemSourceKinds.SelectMany(kind=>store.Find(kind,_=>true,20_000)).Where(fact=>DiscoveryFactName(fact).Contains(wanted,StringComparison.CurrentCultureIgnoreCase)).Take(200)];
+                // 0.911 (X-76): and every other kind (OtherSeenKinds).
+                ..ItemSourceKinds.Concat(OtherSeenKinds).SelectMany(kind=>store.Find(kind,_=>true,20_000)).Where(fact=>DiscoveryFactName(fact).Contains(wanted,StringComparison.CurrentCultureIgnoreCase)).Take(200)];
         }
         if(discoveryRows.Count==0){ImGui.TextDisabled(localization.Get("DiscoveriesUi.NoneFound"));return;}
         if(!ImGui.BeginTable("Discoveries",6,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;

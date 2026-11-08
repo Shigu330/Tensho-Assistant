@@ -145,11 +145,13 @@ internal sealed partial class MainWindow
                     }
                     ImGui.Unindent();
                 }
-            // X-73.18 (0.889): the quests seen in game asking for it (yours or shared) come first.
-            if(DiscoveryStore is { } seenStore && DiscoveriesLoaded && seenStore.Find(Discoveries.DiscoveryKind.QuestItemAsked,subject=>subject==id,16) is { Count:>0 } seenAsks
+            // X-73.18 (0.889): the quests seen in game asking for it (yours or shared) come first. 0.911: an HQ demand (the item's HQ id) says « HQ ».
+            if(DiscoveryStore is { } seenStore && DiscoveriesLoaded
+               && seenStore.Find(Discoveries.DiscoveryKind.QuestItemAsked,subject=>Discoveries.QuestItemAsks.IsOf(subject,id),16) is { Count:>0 } seenAsks
                && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.SeenQuests",seenAsks.Count)+"###UseSeenQuests"))
                 foreach(var fact in seenAsks)
-                    if(ImGui.Selectable(localization.Format("ItemUseRefs.Quest",DiscoveryQuestName(fact.Detail),fact.LevelMax)+$"##SeenAsk{fact.Detail}"))
+                    if(ImGui.Selectable(localization.Format("ItemUseRefs.Quest",DiscoveryQuestName(fact.Detail),LevelRange(fact.LevelMin,fact.LevelMax))
+                        +(Discoveries.QuestItemAsks.Hq(fact.Subject) ? " HQ":"")+$"##SeenAsk{fact.Detail}:{fact.Subject}"))
                     {page=Page.Quests;SelectQuest(fact.Detail);}
             var asked=data.QuestsRequiring(id);
             if(asked.Count>0 && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.Quests",asked.Count)+"###UseQuests"))

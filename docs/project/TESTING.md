@@ -1462,6 +1462,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.910) Barre d'infos du serveur : l'entrée des monnaies s'appelle « Tensho Assistant (Currencies) » dans les réglages Dalamud ; la réactiver si besoin.
 
+- [ ] (0.911) Monde › Découvertes : les faits de pêche portent un libellé de pêche ; les ALÉA à (0,0) ont disparu.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

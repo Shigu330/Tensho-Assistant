@@ -344,7 +344,8 @@ internal sealed class MapLiveReader : IDisposable
         foreach(var fate in fateTable)
         {
             if(result.Count>=64)break;
-            if(fate is null || !float.IsFinite(fate.Position.X) || !float.IsFinite(fate.Position.Z))continue;
+            // 0.911 (X-76): the game gives a FATE a zero position for about a second (entering the zone, reloading): skipped until it has its place.
+            if(fate is null || !float.IsFinite(fate.Position.X) || !float.IsFinite(fate.Position.Z) || fate.Position==Vector3.Zero)continue;
             result.Add(new(fate.FateId,fate.Name.TextValue,fate.Level,fate.MapIconId!=0 ? fate.MapIconId:fate.IconId,fate.Position,
                 float.IsFinite(fate.Radius) ? Math.Max(0,fate.Radius):0,fate.Progress,Math.Max(0,fate.TimeRemaining),fate.State.ToString(),fate.HasBonus));
         }

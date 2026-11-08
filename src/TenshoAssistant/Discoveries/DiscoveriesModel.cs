@@ -34,8 +34,9 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     FishBite=23,
     // X-73.18 (0.888, docs/evidence/0.888-aetherial-reduction.md): Reduction: Subject = item obtained, Detail = the collectable reduced, levels = quantities.
     Reduction=24,
-    // X-73.18 (0.889, docs/evidence/0.889-hand-in.md): QuestItemAsked: Subject = item handed in, Detail = the Quest row whose step changed just after (HQ adds
-    // 1 000 000 to nothing: the HQ demand is kept as LevelMax = 1), LevelMin = quantity asked.
+    // X-73.18 (0.889, docs/evidence/0.889-hand-in.md): QuestItemAsked: Subject = item handed in, Detail = the Quest row whose step changed just after, levels =
+    // the quantities asked. 0.911 (X-76): an HQ demand is kept under the item's HQ id (Subject = 1 000 000 + item, the game's own convention, QuestItemAsks), so
+    // it is its own fact; facts written before 0.911 hold the plain item, HQ or not. A key item (EventItem row, 2 000 000 and up) is kept as its own id.
     QuestItemAsked=25,
     // 26 was 0.890's spearfishing shadow, taken from the shadows left in sight: wrong (docs/evidence/0.891-spearfishing-slots.md); its facts are refused when read.
     // 27 was 0.891's: the item was read a moment too early (it lags the catch count) and the speed could be the doubled one (docs/evidence/0.896-spearfishing-lag.md);
@@ -108,7 +109,7 @@ public sealed class DiscoveryStore
     /// <summary>X-72 C (0.856): a FATE seen running; one more sighting after an hour, longer than any FATE lasts.</summary>
     public static readonly TimeSpan FateGap=TimeSpan.FromHours(1);
     public bool SeeFate(uint fateId,uint territory,uint map,Vector3 position,int level,DateTimeOffset at)
-        =>See(DiscoveryKind.FateSeen,fateId,0,territory,map,position,level,at,FateGap);
+        =>position.X==0 && position.Z==0 ? false:See(DiscoveryKind.FateSeen,fateId,0,territory,map,position,level,at,FateGap);
 
     /// <summary>X-74 (0.860): an item got from a source; every event counts once (the watcher sends each once); a place only when a map is given.</summary>
     public bool SeeSource(DiscoveryKind kind,uint subject,uint detail,int value,DateTimeOffset at,uint territory=0,uint map=0,Vector3? place=null)
@@ -131,6 +132,18 @@ public sealed class DiscoveryStore
             facts[fact.Key]=fact;Dirty=true;revision++;
             return true;
         }
+    }
+
+    /// <summary>
+    /// X-76 (0.911): a festival running on a day (days since 2013-08-27): counted once a day, also across plugin reloads: nothing is added when your own fact of
+    /// this festival and phase already reaches that day. True when the fact is new.
+    /// </summary>
+    public bool SeeFestival(uint festival,uint phase,int day,DateTimeOffset at)
+    {
+        lock(gate)
+            if(facts.TryGetValue(new DiscoveryFact{Kind=DiscoveryKind.FestivalSeen,Subject=festival,Detail=phase}.Key,out var known) && known.Seen>0 && known.LevelMax>=day)
+                return false;
+        return SeeSource(DiscoveryKind.FestivalSeen,festival,phase,day,at);
     }
 
     private bool See(DiscoveryKind kind,uint subject,uint detail,uint territory,uint map,Vector3 position,int level,DateTimeOffset at,TimeSpan gap)
@@ -208,8 +221,12 @@ public sealed class DiscoveryStore
     /// <summary>X-74 (0.860): the kinds that hold a place (a map); the others are about items and sources only.</summary>
     public static bool HasPlace(DiscoveryKind kind)=>kind is DiscoveryKind.MonsterPlace or DiscoveryKind.HuntMarkPlace or DiscoveryKind.FateSeen or DiscoveryKind.MonsterDrop or DiscoveryKind.FishCatch
         or DiscoveryKind.NpcPlace or DiscoveryKind.BlueSpellCaster or DiscoveryKind.FishBite or DiscoveryKind.SpearShadow;
-    /// <summary>What an imported fact must hold: a known kind, a subject and a map, finite places in their cell, levels and dates that make sense.</summary>
+    /// <summary>
+    /// What an imported fact must hold: a known kind, a subject and a map, finite places in their cell, levels and dates that make sense. 0.911 (X-76): a FATE
+    /// at exactly (0, 0) is the zero position the game gives for about a second (entering a zone, reloading): refused, read or imported.
+    /// </summary>
     public static bool Valid(DiscoveryFact? fact)=>fact is not null && Enum.IsDefined(fact.Kind) && fact.Subject!=0 && (fact.Map!=0 || !HasPlace(fact.Kind))
+        && !(fact.Kind==DiscoveryKind.FateSeen && fact.X==0 && fact.Z==0)
         && float.IsFinite(fact.X) && float.IsFinite(fact.Z) && Math.Abs(fact.X)<=10_000 && Math.Abs(fact.Z)<=10_000 && Cell(fact.X,fact.Z)==(fact.CellX,fact.CellZ)
         && fact.LevelMin is >= 0 and <= 100_000 && fact.LevelMax is >= 0 and <= 100_000 && fact.LevelMin<=Math.Max(fact.LevelMin,fact.LevelMax)
         && fact.Seen>=0 && fact.Imported>=0 && fact.First<=fact.Last && fact.Last<=DateTimeOffset.UtcNow.AddDays(1);
@@ -259,6 +276,20 @@ public sealed class DiscoveryStore
     /// <summary>X-76 (0.908): the spearfishing shadow (size, speed) seen in game most often for a fish (yours or shared), if any.</summary>
     public (int Size,int Speed)? MostSeenSpearShadow(uint fish)=>
         Find(DiscoveryKind.SpearShadow,subject=>subject==fish,8).Select(fact=>((int,int)?)((int)fact.Detail,fact.LevelMin)).FirstOrDefault();
+}
+
+/// <summary>
+/// X-76 (0.911): the subject of a QuestItemAsked fact: the item, or its HQ id (1 000 000 + item) when the quest asks for HQ. A key item (EventItem row,
+/// 2 000 000 and up) is kept as it is and is never HQ.
+/// </summary>
+public static class QuestItemAsks
+{
+    public const uint HqOffset=1_000_000;
+    public static uint Subject(uint item,bool hq)=>ItemGains.BaseItem(item) is var plain && (plain==0 || plain>=ItemGains.KeyItemStart || !hq) ? plain:plain+HqOffset;
+    public static uint Item(uint subject)=>ItemGains.BaseItem(subject);
+    public static bool Hq(uint subject)=>subject is >= HqOffset and < ItemGains.KeyItemStart;
+    /// <summary>True for the facts about this item, HQ demanded or not.</summary>
+    public static bool IsOf(uint subject,uint item)=>item!=0 && subject!=0 && Item(subject)==ItemGains.BaseItem(item);
 }
 
 /// <summary>X-72 A (0.854): the places of a monster for the tools: per map, its most seen place; the most seen maps first.</summary>

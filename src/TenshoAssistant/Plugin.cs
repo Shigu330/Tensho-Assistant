@@ -660,6 +660,8 @@ public sealed class Plugin : IDalamudPlugin
             };
             // 0.352 (g, I-11): names of the quests and achievements that unlock shop articles.
             mainWindow.QuestNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Quest>().GetRowOrDefault(id)?.Name.ExtractText();
+            // 0.911 (X-76): a key item's name (EventItem row), for the hand-ins seen in game.
+            mainWindow.KeyItemNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.EventItem>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.AchievementNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Achievement>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.351 (g, I-04): gil journal, one file per character (GilJournal/<id>.json), kept 90 days.
             Inventory.GilWatcher? gilWatcher=null;

@@ -24,17 +24,19 @@ namespace TenshoAssistant.Discoveries;
 public sealed unsafe class ItemDiscoveryWatcher : IDisposable
 {
     private static readonly GameInventoryType[] Bags=[GameInventoryType.Inventory1,GameInventoryType.Inventory2,GameInventoryType.Inventory3,GameInventoryType.Inventory4,GameInventoryType.Crystals];
-    private static readonly string[] BusyWindows=["Shop","ShopExchangeItem","ShopExchangeCurrency","InclusionShop","ShopCard","Trade","RetainerList","InventoryRetainer",
+    // X-73.16 (0.872): the shop windows; while one is shown, the event NPC targeted is the shopkeeper, noted once per opening with its place.
+    private static readonly string[] ShopWindows=["Shop","ShopExchangeItem","ShopExchangeCurrency","ShopExchangeCoin","InclusionShop","ShopCard","GrandCompanyExchange",
+        "FreeShop","CollectablesShop","SkyIslandExchange"];
+    // 0.911 (X-76): every shop window stops the attribution (a purchase just after a FATE or a kill is not its reward), then trades, retainers, mail, market, crafting.
+    // Declared after ShopWindows: static fields are set in order.
+    private static readonly string[] BusyWindows=[..ShopWindows,"Trade","RetainerList","InventoryRetainer",
         "InventoryRetainerLarge","RetainerSellList","RetainerSell","LetterList","LetterViewer","ItemSearch","ItemSearchResult","FreeCompanyChest","InventoryBuddy",
-        "InventoryBuddy2","GrandCompanySupplyList","GrandCompanyExchange","MiragePrismPrismBox","Cabinet","Repair","MateriaAttach","PurifyResult","SalvageResult",
+        "InventoryBuddy2","GrandCompanySupplyList","MiragePrismPrismBox","Cabinet","Repair","MateriaAttach","PurifyResult","SalvageResult",
         "SalvageItemSelector","Synthesis","SynthesisSimple","RecipeNote","RetainerTaskResult","ContentsTutorial","SkyIslandFinishReward"];
     private readonly IFramework framework;private readonly IClientState client;private readonly IGameGui gui;private readonly IObjectTable objects;private readonly ITargetManager targets;
     private readonly ICondition condition;private readonly IGameInventory inventory;private readonly DiscoveryStore store;private readonly IPluginLog log;
     private readonly Func<DiscoverySettings> settings;private readonly Func<bool> debug;private readonly Func<uint,uint> dutyOf;private readonly Func<uint,bool> isFish;private readonly Func<uint,bool> usable;
     private Dictionary<uint,long>? before;private long nextRead;private bool disposed,warned;
-    // X-73.16 (0.872): the shop windows; while one is shown, the event NPC targeted is the shopkeeper, noted once per opening with its place.
-    private static readonly string[] ShopWindows=["Shop","ShopExchangeItem","ShopExchangeCurrency","ShopExchangeCoin","InclusionShop","ShopCard","GrandCompanyExchange",
-        "FreeShop","CollectablesShop","SkyIslandExchange"];
     private uint shopNpcSeen;
     private void ReadShopNpc(DateTimeOffset at,uint territory,uint map)
     {
@@ -123,8 +125,9 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             if(day!=festivalDay && FFXIVClientStructs.FFXIV.Client.Game.GameMain.Instance() is var game && game!=null)
             {
                 festivalDay=day;
+                // 0.911 (X-76): festivalDay starts again at each plugin load: the store counts a day once (SeeFestival), reloads included.
                 foreach(var festival in game->ActiveFestivals)
-                    if(festival.Id!=0)store.SeeSource(DiscoveryKind.FestivalSeen,festival.Id,festival.Phase,day,at);
+                    if(festival.Id!=0)store.SeeFestival(festival.Id,festival.Phase,day,at);
             }
         }
         if(Vistas?.Invoke() is not { } registered)return;
@@ -239,7 +242,8 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                     case ItemGains.Cause.Opened:
                         added=store.SeeSource(DiscoveryKind.ItemFromItem,item,spent!.Value,quantity,at);break;
                     case ItemGains.Cause.DungeonCoffer:
-                        added=store.SeeSource(DiscoveryKind.DutyChest,item,duty,quantity,at);kind=DiscoveryKind.DutyChest;break;
+                        // 0.911 (X-76): with the territory, like the duty's loot window (ReadLoot): one fact per item and duty.
+                        added=store.SeeSource(DiscoveryKind.DutyChest,item,duty,quantity,at,territory);kind=DiscoveryKind.DutyChest;break;
                     default:continue;
                 }
                 if(added && debug())log.Information("Discovery: {0} item {1} ×{2}.",kind,item,quantity);
@@ -332,8 +336,9 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         handIn=null;
         if(changed.Length!=1)return;
         var quest=0x10000u+changed[0];
-        foreach(var (item,quantity,hq) in pending.Items)store.SeeSource(DiscoveryKind.QuestItemAsked,item,quest,quantity,at);
-        if(debug())log.Information("Discovery: quest {0} asked for {1}.",quest,string.Join(", ",pending.Items.Select(entry=>$"{entry.Item}x{entry.Quantity}")));
+        // 0.911 (X-76): an HQ demand under the item's HQ id (QuestItemAsks), the quantity in the levels.
+        foreach(var (item,quantity,hq) in pending.Items)store.SeeSource(DiscoveryKind.QuestItemAsked,QuestItemAsks.Subject(item,hq),quest,quantity,at);
+        if(debug())log.Information("Discovery: quest {0} asked for {1}.",quest,string.Join(", ",pending.Items.Select(entry=>$"{entry.Item}x{entry.Quantity}{(entry.Hq ? " HQ":"")}")));
     }
 
     /// <summary>
