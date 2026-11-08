@@ -438,6 +438,7 @@ public sealed class Plugin : IDalamudPlugin
             if(itemWatcher is not null){itemWatcher.Beasts=()=>beasts.State.Obtained;itemWatcher.WatchUnlocks(unlocks);itemWatcher.Vistas=()=>mapLive?.State?.Sightseen;
                 var blueActions=data.GetExcelSheet<Lumina.Excel.Sheets.AozAction>().Where(row=>row.Action.RowId!=0).GroupBy(row=>row.Action.RowId).ToDictionary(group=>group.Key,group=>group.First().RowId);
                 itemWatcher.BlueSpellOfAction=action=>blueActions.GetValueOrDefault(action);
+                itemWatcher.ForecastWeather=(territory,at)=>weather.State.Catalog?.Forecast(territory,at,1) is { Count:>0 } current ? current[0].Weather?.Id ?? 0:0;
                 itemWatcher.PreviousWeather=(territory,at)=>weather.State.Catalog?.Forecast(territory,at.AddSeconds(-1400),1) is { Count:>0 } before ? before[0].Weather?.Id ?? 0:0;}
             mainWindow.BeastName=id=>beasts.State.Catalog?.Beasts.FirstOrDefault(beast=>beast.Id==id)?.Name ?? "";
             mainWindow.SpellName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.AozAction>().GetRowOrDefault(id) is { } spell ? data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(spell.Action.RowId)?.Name.ExtractText() ?? "":"";

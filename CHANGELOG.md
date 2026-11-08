@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.880.0
+- Plan global, Verify : Demande (X-75.6) : deux règles venues des outils communautaires sont maintenant contrôlées par le jeu lui-même. Pêche en mer : à bord, la route que le jeu indique est comparée à celle que donne l'horaire pour ce départ, une fois par voyage ; un écart est écrit dans le journal Dalamud. Météo : 10 secondes après l'entrée dans une zone ouverte, la météo prévue par Tensho est comparée à celle du jeu (comptée ; détail dans le journal de débogage des découvertes). Les durées des voyages de sous-marins pourraient venir des fonctions de calcul du jeu, comme celles des aéronefs : décision à vous soumettre. Non validé en jeu.
+- Tests : GameChecks880Tests. Verify.ps1 (agent) : 1467/1467, 0 avertissement, 0 erreur ; DLL 0.880.0.0. Non validé en jeu.
+### English
+- Request (X-75.6): two rules taken from community tools are now checked by the game itself. Ocean fishing: aboard, the route the game gives is compared with the timetable's for that departure, once per voyage; a mismatch is written to the Dalamud log. Weather: 10 seconds after entering an open zone, Tensho's forecast is compared with the game's (counted; details in the discoveries debug log). Submarine voyage times could come from the game's computing functions, like the airships': a decision to put to you. Not validated in game.
+
 ## 0.879.0
 - Plan global, Verify : Demande (X-75.5) : d'autres pages lisent ce qui a été vu en jeu. Page Événements : « Vue en cours par vous du … au … » pour chaque fête. Carte, info-bulle d'un panorama : « Inscrit par vous par <météo> à <heure> ET », avant les météos du wiki. Prix : le moins cher de la région (survol, listes) est complété par les offres vues sur les mondes de la région visités (voyage entre centres de données), comme celui du centre de données depuis la 0.857 ; la région de chaque monde vient des feuilles du jeu. Nouvelle demande notée (X-77) : un échange des découvertes par Git, avant le nettoyage ; une règle Dalamud y entre en jeu, un résumé vous sera soumis avant. Non validé en jeu.
 - Tests : SeenPages879Tests. Verify.ps1 (agent) : 1466/1466, 0 avertissement, 0 erreur ; DLL 0.879.0.0. Non validé en jeu.

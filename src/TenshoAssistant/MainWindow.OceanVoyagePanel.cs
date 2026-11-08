@@ -13,9 +13,33 @@ internal sealed partial class MainWindow
 {
     internal OceanVoyageReader? OceanVoyage { get; set; }
     internal Func<OceanVoyageData?>? OceanVoyageData { get; set; }
+    /// <summary>
+    /// X-75.6 (0.880): the community timetable checked against the game once per voyage: the route the game says aboard must be one of the two routes the loop
+    /// (start and 2-hour step read in GatherBuddy) gives for that departure. The result is logged; a mismatch always, a match in developer mode.
+    /// </summary>
+    private uint oceanRouteChecked;
+    internal (int Matches,int Mismatches) OceanScheduleChecks { get; private set; }
+    private void CheckOceanSchedule(OceanVoyageFrame frame)
+    {
+        if(frame.RouteId==oceanRouteChecked || OceanTimetable?.Invoke() is not { } timetable)return;
+        oceanRouteChecked=frame.RouteId;
+        var slot=(long)Math.Floor((DateTimeOffset.UtcNow+OceanSchedule.Boarding-OceanSchedule.LoopStart)/OceanSchedule.Step);
+        var expected=timetable.At(Math.Max(0,slot));
+        if(expected.Aldenard?.Id==frame.RouteId || expected.Othard?.Id==frame.RouteId)
+        {
+            OceanScheduleChecks=(OceanScheduleChecks.Matches+1,OceanScheduleChecks.Mismatches);
+            if(developerMode)log.Information("Ocean schedule check: route {0} matches departure {1:u}.",frame.RouteId,expected.At);
+        }
+        else
+        {
+            OceanScheduleChecks=(OceanScheduleChecks.Matches,OceanScheduleChecks.Mismatches+1);
+            log.Warning("Ocean schedule check: the game says route {0}, the timetable gives {1} / {2} for departure {3:u}.",frame.RouteId,expected.Aldenard?.Id ?? 0,expected.Othard?.Id ?? 0,expected.At);
+        }
+    }
 
     internal void DrawOceanVoyagePanel()
     {
+        if(OceanVoyage?.Frame is { } aboard)CheckOceanSchedule(aboard);
         if(windowDisposed || !configuration.FishingPanel || OceanVoyage?.Frame is not { } frame || frame.Status==4 || OceanVoyageData?.Invoke() is not { } data)return;
         Panels?.Show("TenshoOceanVoyage",localization.Get("OceanVoyage.Title"),ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.AlwaysAutoResize,()=>{ImGui.SetNextWindowPos(new Vector2(60,300),ImGuiCond.FirstUseEver);},()=>
         {

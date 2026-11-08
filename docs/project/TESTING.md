@@ -1400,6 +1400,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.879) Pendant une fête : Événements « Vue en cours par vous » ; un panorama inscrit : son info-bulle « Inscrit par vous ».
 
+- [ ] (0.880) Pêche en mer : à bord, aucune ligne « Ocean schedule check: the game says » dans le journal (sinon l'horaire est faux).
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

@@ -54,6 +54,24 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     /// <summary>X-75.3 (0.877): the weather of the period before (territory, moment), from the game's forecast; 0 when not known.</summary>
     public Func<uint,DateTimeOffset,uint>? PreviousWeather { get; set; }
     private uint lastFish;
+    /// <summary>
+    /// X-75.6 (0.880): the weather formula (WeatherCatalog, rule read in the community tools) checked against the game: 10 s after entering a zone, the forecast
+    /// for now against WeatherManager.GetCurrentWeather. Zones with their own weather (some quests and duties) can differ: counted, logged in the debug log only.
+    /// </summary>
+    public Func<uint,DateTimeOffset,uint>? ForecastWeather { get; set; }
+    public (int Matches,int Mismatches) WeatherChecks { get; private set; }
+    private uint weatherZone;private long weatherCheckAt=-100_000;
+    private void CheckWeather(DateTimeOffset at,long now,uint territory,uint duty)
+    {
+        if(territory!=weatherZone){weatherZone=territory;weatherCheckAt=duty==0 ? now+10_000:-100_000;return;}
+        if(weatherCheckAt<0 || now<weatherCheckAt || ForecastWeather is not { } forecast)return;
+        weatherCheckAt=-100_000;
+        var expected=forecast(territory,at);
+        var actual=FFXIVClientStructs.FFXIV.Client.Game.WeatherManager.Instance() is var manager && manager!=null ? manager->GetCurrentWeather():(byte)0;
+        if(expected==0 || actual==0)return;
+        WeatherChecks=expected==actual ? (WeatherChecks.Matches+1,WeatherChecks.Mismatches):(WeatherChecks.Matches,WeatherChecks.Mismatches+1);
+        if(debug())log.Information("Weather check in territory {0}: forecast {1}, game {2}.",territory,expected,actual);
+    }
     /// <summary>X-75.4 (0.878): the AozAction row of an action id (0: not a blue spell); battle NPCs casting one are noted once per cast.</summary>
     public Func<uint,uint>? BlueSpellOfAction { get; set; }
     private readonly Dictionary<ulong,uint> castsSeen=[];
@@ -149,6 +167,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         try
         {
             var at=DateTimeOffset.UtcNow;var territory=client.TerritoryType;var map=client.MapId;var duty=dutyOf(territory);
+            CheckWeather(at,now,territory,duty);
             if(wanted.ItemSources)
             {
                 ReadSalvage(at);ReadVenture(at);ReadLoot(at,territory,duty);
