@@ -624,9 +624,18 @@ public sealed class Plugin : IDalamudPlugin
                             spotFish[id]=fishingSpot.Item.Select(item=>item.RowId).Where(item=>item!=0).ToArray();
                             if(fishingSpot.TerritoryType.RowId!=0)territories.Add(fishingSpot.TerritoryType.RowId);
                         }
+                    // X-85 V3 (0.961): each mission's criterion from the English texts (species words matched to the bonus rows), each fish's species.
+                    var words=Gathering.OceanMissionRules.SpeciesWords(data.GetExcelSheet<Lumina.Excel.Sheets.IKDContentBonus>(Dalamud.Game.ClientLanguage.English)
+                        .Select(row=>(row.RowId,row.Requirement.ExtractText())));
+                    var englishMissions=data.GetExcelSheet<Lumina.Excel.Sheets.IKDPlayerMissionCondition>(Dalamud.Game.ClientLanguage.English);
                     var missions=data.GetExcelSheet<Lumina.Excel.Sheets.IKDPlayerMissionCondition>().Where(row=>!row.Unknown0.IsEmpty)
-                        .ToDictionary(row=>row.RowId,row=>new Gathering.OceanMission(row.Unknown0.ExtractText(),row.Unknown1));
-                    return new Gathering.OceanVoyageData(routes,spots,spotFish,missions){Territories=territories};
+                        .ToDictionary(row=>row.RowId,row=>new Gathering.OceanMission(row.Unknown0.ExtractText(),row.Unknown1,
+                            englishMissions.GetRowOrDefault(row.RowId) is { } english ? Gathering.OceanMissionRules.Parse(english.Unknown0.ExtractText(),words):null));
+                    var fishBonuses=new Dictionary<uint,uint[]>();
+                    foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.IKDFishParam>())
+                        if(row.Fish.ValueNullable?.Item.RowId is { } item and not 0)
+                            fishBonuses[item]=row.IKDContentBonus.Select(bonus=>bonus.RowId).Where(id=>id!=0).ToArray();
+                    return new Gathering.OceanVoyageData(routes,spots,spotFish,missions){Territories=territories,FishBonuses=fishBonuses};
                 }
                 catch(Exception error){log.Warning(error,"Ocean fishing voyage data unavailable.");return null;}
             });

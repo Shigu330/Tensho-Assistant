@@ -12,7 +12,7 @@ public sealed record OceanVoyageFrame(uint RouteId,int Zone,int Status,bool Spec
 public sealed record OceanSpot(uint Id,string Place,uint MainSpot,uint SpectralSpot);
 
 /// <summary>A mission (IKDPlayerMissionCondition): its text in the game's language and the number to reach.</summary>
-public sealed record OceanMission(string Text,int Target);
+public sealed record OceanMission(string Text,int Target,OceanMissionCriterion? Criterion=null);
 
 /// <summary>
 /// The game's ocean fishing data, copied once: routes (IKDRoute: places and moment rows of the three stops), places (IKDSpot), the
@@ -23,6 +23,8 @@ public sealed record OceanVoyageData(IReadOnlyDictionary<uint,(uint[] Spots,uint
 {
     /// <summary>X-85 V1 (0.917): the territories of the ocean fishing spots (FishingSpot.TerritoryType of every IKDSpot spot), read in the game data.</summary>
     public IReadOnlySet<uint> Territories { get; init; }=new HashSet<uint>();
+    /// <summary>X-85 V3 (0.961): each ocean fish's species rows (IKDFishParam: FishParameter.Item → IKDContentBonus rows).</summary>
+    public IReadOnlyDictionary<uint,uint[]> FishBonuses { get; init; }=new Dictionary<uint,uint[]>();
 }
 
 /// <summary>The stop being fished: its place, moment, the spot (spectral or not) and its fish; the next stop when there is one.</summary>

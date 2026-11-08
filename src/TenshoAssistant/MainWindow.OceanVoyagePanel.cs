@@ -63,7 +63,7 @@ internal sealed partial class MainWindow
     /// X-85 V2 (0.918): the fish of one ocean spot as in the usual fishing help: icon and stock, bait route with icons (green frame on the bait in
     /// hand, mooches), bite and hookset in colour, bite time of that spot (Teamcraft) against the stopwatch. Baits and bites: GatherBuddy.
     /// </summary>
-    private void DrawOceanFishTable(string id,IReadOnlyList<uint> fishList,uint spotId,uint? inHand,int? elapsed)
+    private void DrawOceanFishTable(string id,IReadOnlyList<uint> fishList,uint spotId,uint? inHand,int? elapsed,Func<uint,string?,IReadOnlyList<string>>? countsFor=null)
     {
         if(fishList.Count==0 || !ImGui.BeginTable(id,4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingFixedFit|ImGuiTableFlags.BordersInnerV))return;
         try
@@ -81,6 +81,15 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     var stock=GetRecipeHoldings(fishId);
                     ItemCell(fish,fishId,22,$"{fish?.Name ?? fishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
+                    // X-85 V3 (0.961, user request): a mark on the fish that count for a mission not done yet, the missions in its tooltip.
+                    if(countsFor?.Invoke(fishId,row.Bite) is { Count:>0 } wanted)
+                    {
+                        ImGui.SameLine();
+                        ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
+                        try{ImGui.TextColored(Accent,Dalamud.Interface.FontAwesomeExtensions.ToIconString(Dalamud.Interface.FontAwesomeIcon.Bullseye));}
+                        finally{ImGui.PopFont();}
+                        TipText(localization.Format("OceanVoyage.ForMission",string.Join("\n",wanted)));
+                    }
                     ImGui.TableNextColumn();
                     for(var step=0;step<row.Route.Count;step++)
                     {
@@ -156,7 +165,10 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();
                 ImGui.TextColored(Success,localization.Format("FishingPanel.BaitMatches",stop.Fish.Count(fish=>FishRow(fish,spotId).Route is [var first,..] && first==held)));
             }
-            DrawOceanFishTable("OceanVoyageFish",stop.Fish,spotId,inHand,elapsed);
+            var missionsNow=frame.Missions.Where(mission=>mission.Type!=0 && data.Missions.ContainsKey(mission.Type))
+                .Select(mission=>(data.Missions[mission.Type].Text,mission.Progress,data.Missions[mission.Type].Target,data.Missions[mission.Type].Criterion)).ToArray();
+            IReadOnlyList<string> CountsFor(uint fish,string? bite)=>OceanMissionRules.CountsFor(fish,data.FishBonuses,bite,missionsNow);
+            DrawOceanFishTable("OceanVoyageFish",stop.Fish,spotId,inHand,elapsed,CountsFor);
             // The spectral current's fish, highlighted, folded while the current is not there (they are never in the usual spot: IKDSpot.SpotSub).
             if(!stop.Spectral && stop.Spot.SpectralSpot!=0 && data.SpotFish.GetValueOrDefault(stop.Spot.SpectralSpot) is { Count:>0 } spectralFish)
             {
@@ -166,7 +178,7 @@ internal sealed partial class MainWindow
                 Tip("OceanVoyage.SpectralFishTip");
                 if(open)
                 {
-                    try{DrawOceanFishTable("OceanSpectralFish",spectralFish,stop.Spot.SpectralSpot,inHand,null);}
+                    try{DrawOceanFishTable("OceanSpectralFish",spectralFish,stop.Spot.SpectralSpot,inHand,null,CountsFor);}
                     finally{ImGui.TreePop();}
                 }
             }

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.961.0
+- Plan global, Verify : Pêche en mer, V3 (votre demande : mettre en évidence les poissons des objectifs) : dans le panneau de voyage, une cible apparaît à côté de chaque poisson qui compte pour un objectif pas encore rempli, et son info-bulle dit lequel. Les objectifs d'espèce (requins, crabes, crevettes ou céphalopodes…) sont reliés aux poissons par les données du jeu, sans liste écrite à la main ; les objectifs de touche (!, !!, !!!) par la touche connue de GatherBuddy. Les objectifs d'étoiles ne sont pas encore marqués : la valeur des étoiles lue dans le jeu n'est pas prouvée (143 poissons sur 259 à quatre étoiles). Preuve : docs/evidence/0.961-ocean-missions.md. Non validé en jeu.
+- Tests : OceanMissions961Tests. Verify.ps1 (agent) : 1588/1588, 0 avertissement, 0 erreur ; DLL 0.961.0.0. Non validé en jeu.
+### English
+- Ocean fishing, V3 (your request: highlight the fish for the missions): in the voyage panel, a target appears next to each fish that counts for a mission not done yet, and its tooltip says which. Species missions (sharks, crabs, shrimp or squid…) are linked to the fish through the game's data, with no hand-written list; bite missions (!, !!, !!!) through GatherBuddy's known bite. Star missions are not marked yet: the star value read in the game is not proven (143 of 259 fish at four stars). Evidence: docs/evidence/0.961-ocean-missions.md. Not validated in game.
+
 ## 0.960.0
 - Plan global, Verify : Carte, votre signalement (X-94) : un trou de pêche (pêcheur niv. 95, Détroit ouest de Zorgor) s'affichait comme « point légendaire » demandant un tome de mineur. Cause : la nature d'un point et son tome étaient cherchés par le numéro du point dans la table des points de récolte, alors qu'un trou de pêche a un numéro d'une autre table ; celui du Détroit ouest de Zorgor tombait sur un point légendaire de mineur. Les lieux de pêche ne sont plus cherchés dans cette table. Aussi : question ajoutée à revoir sur les poissons de collection (X-97). Non validé en jeu.
 - Tests : FishingHoleKind960Tests. Verify.ps1 (agent) : 1587/1587, 0 avertissement, 0 erreur ; DLL 0.960.0.0. Non validé en jeu.
