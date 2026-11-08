@@ -120,6 +120,9 @@ public sealed class Plugin : IDalamudPlugin
             garland.Enabled=()=>configuration.CommunityGarland;
             market.Enabled=()=>configuration.CommunityUniversalis;
             marketBoard.Enabled=()=>configuration.CommunityUniversalis;
+            // X-73.15 (0.871): the region of each data centre from the game sheet, so that Universalis' table is asked only for what the game does not name.
+            marketBoard.GameRegions=data.GetExcelSheet<Lumina.Excel.Sheets.WorldDCGroupType>().Where(row=>row.Name.ExtractText().Length>0 && row.Region.RowId!=0)
+                .GroupBy(row=>row.Name.ExtractText(),StringComparer.OrdinalIgnoreCase).ToDictionary(group=>group.Key,group=>group.First().Region.RowId,StringComparer.OrdinalIgnoreCase);
             fashionData.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Fashion),dataCache);
             fashionData.Enabled=()=>configuration.CommunityFashion;
             MarketWorldReader? marketReader = null;

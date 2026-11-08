@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.871.0
+- Plan global, Verify : Demande (X-73.15) : la région de chaque centre de données (pour l'étendue « Région » de la page Marché) vient maintenant de la feuille du jeu (WorldDCGroupType) au lieu d'une demande à Universalis à chaque session ; la table d'Universalis ne sert plus qu'au centre « cloud » ou à un centre inconnu. Les noms de région restent ceux qu'Universalis attend. Le centre Shadow, absent de la table d'Universalis, a maintenant sa région. Plan : demandes X-75 (un test par sonde, sondes manquantes) et X-76 (nettoyage complet du code, ultracode accordé) notées après le plan en cours, avant la traduction des documents. Non validé en jeu.
+- Tests : Regions871Tests. Verify.ps1 (agent) : 1455/1455, 0 avertissement, 0 erreur ; DLL 0.871.0.0. Non validé en jeu.
+### English
+- Request (X-73.15): each data centre's region (for the Market page's « Region » scope) now comes from the game sheet (WorldDCGroupType) instead of a request to Universalis each session; Universalis' table is only used for the cloud data centre or an unknown one. Region names stay those Universalis expects. The Shadow data centre, missing from Universalis' table, now has its region. Plan: requests X-75 (a test per probe, missing probes) and X-76 (full code cleanup, ultracode agreed) noted after the current plan, before the documents translation. Not validated in game.
+
 ## 0.870.0
 - Plan global, Verify : Demande (X-73.14) : la comparaison des servants et la copie du prix utilisent aussi ce que vous avez vu au tableau. En lisant les offres, Tensho compare le numéro de servant de chaque offre aux vôtres et ne garde que « à vous / pas à vous » (aucun numéro, aucun nom). La liste de ventes d'un servant compare alors vos prix aux offres vues sur votre monde quand elles sont plus récentes qu'Universalis (moins de 24 h), sans avoir à cliquer « Comparer » ; dans la page Marché, vos offres vues sont marquées « (vu en jeu, à vous) » et les autres comptent pour « copier le prix pour passer en dessous ». Si vos servants n'étaient pas encore connus au moment de la lecture, rien n'est conclu. Non validé en jeu.
 - Tests : OwnOffers870Tests. Verify.ps1 (agent) : 1454/1454, 0 avertissement, 0 erreur ; DLL 0.870.0.0. Non validé en jeu.

@@ -33,6 +33,12 @@ public sealed class MarketBoardService : IDisposable
     // 0.324: the « Universalis » switch; off = no request at all (board and data centre table), known boards still shown.
     public const string SourceOff=MarketService.SourceOff;
     public Func<bool>? Enabled { get; set; }
+    /// <summary>
+    /// X-73.15 (0.871, user request: the game's own data before community data): data centre name → WorldRegionGroup row, from the game sheet WorldDCGroupType.
+    /// A region known here is named without asking Universalis; the others (cloud, unknown) still use its table. docs/evidence/0.871-regions.md.
+    /// </summary>
+    public IReadOnlyDictionary<string,uint>? GameRegions { get; set; }
+    public static string? UniversalisRegion(uint region)=>region switch{1=>"Japan",2=>"North-America",3=>"Europe",4=>"Oceania",5=>"中国",6=>"한국",_=>null};
 
     public MarketBoardService(HttpClient? client=null)
     {
@@ -45,6 +51,7 @@ public sealed class MarketBoardService : IDisposable
     /// <summary>Universalis region of a data center; null until the table is read (first call starts the read) or when unknown.</summary>
     public string? RegionOf(string dataCenter)
     {
+        if(GameRegions?.GetValueOrDefault(dataCenter) is { } row && UniversalisRegion(row) is { } known)return known;
         lock(gate)
         {
             if(regions is { } table)return table.GetValueOrDefault(dataCenter);

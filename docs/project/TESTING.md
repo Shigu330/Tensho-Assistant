@@ -1382,6 +1382,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.870) Ouvrir le tableau du jeu sur un objet que vous vendez, puis la liste de ventes du servant : le verdict sans cliquer « Comparer » ; survol du prix le plus bas : « Vu au tableau du jeu à … ».
 
+- [ ] (0.871) Tensho › Marché › Offres : l'étendue « Région » est nommée tout de suite (Europe, Japon…).
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
