@@ -47,12 +47,13 @@ public sealed unsafe class ReadingCapture : IDisposable
         chat.ChatMessageUnhandled+=OnMessage;
     }
 
-    /// <summary>Writes a line, up to the limit of its part.</summary>
-    private void Line(string part,int limit,string text)
+    /// <summary>Writes a line, up to the limit of its part (0.899: or of its own key, so that one window does not use up the others' lines).</summary>
+    private void Line(string part,int limit,string text,string? key=null)
     {
-        var count=lines.GetValueOrDefault(part);
+        var counted=key ?? part;
+        var count=lines.GetValueOrDefault(counted);
         if(count>=limit)return;
-        lines[part]=count+1;
+        lines[counted]=count+1;
         log.Information("Reading {0}: {1}",part,text);
     }
 
@@ -148,7 +149,8 @@ public sealed unsafe class ReadingCapture : IDisposable
             var all=values.ToString();
             if(windowValues.GetValueOrDefault(name)==all)continue;
             windowValues[name]=all;
-            Line("addons",160,$"{name}:{all}");
+            // 0.899 (the user's melding test wrote nothing: the spearfishing sessions had used the 160 lines of « addons »): a limit per window.
+            Line("addons",160,$"{name}:{all}","addons/"+name);
         }
     }
 

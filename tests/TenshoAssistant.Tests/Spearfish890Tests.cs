@@ -25,6 +25,9 @@ internal static class Spearfish890Tests
             Check(rows.Select(row=>row.Fish).SequenceEqual(new uint[]{20164,20155,20146,99}),"order");
             Check(rows[1] is { Seen:true, InSight:true, Size:2 } && rows[2] is { InSight:false } && rows[3] is { Size:null, InSight:false },"seen first, in sight, unknown");
             Check(TenshoAssistant.Maps.MapLocalLists.FishingSpotIcon==60465,"icon");
+            // 0.899: a capture line limit per window.
+            var capture=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs"));
+            Check(capture.Contains("Line(\"addons\",160,$\"{name}:{all}\",\"addons/\"+name);"),"limit per window");
             // 0.897: S/M/L and chevrons.
             Check(Spearfishing.ShortShadow(1,150)=="S >>" && Spearfishing.ShortShadow(2,200)=="M >>>" && Spearfishing.ShortShadow(3,400)=="L >>>>>>>" && Spearfishing.ShortShadow(3,0)=="L","short shadow");
             // 0.892: a fixed layout and the node kept once found.

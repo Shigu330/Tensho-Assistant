@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.899.0
+- Plan global, Verify : Essai en jeu de l'utilisateur, sertissage forcé (X-75.7) : les taux affichés par le jeu pour une matéria de degré I (80, 40, 20 et 10 %) sont exactement ceux des feuilles du jeu que Tensho lit déjà (MateriaJoinRate et MateriaJoinRateGatherCraft) ; seuls les degrés XI et XII viennent encore de Teamcraft, à vérifier avec une telle matéria (preuve : docs/evidence/0.899-overmeld-rates.md). Le relevé du mode développeur n'avait rien écrit : les séances de harpon avaient épuisé les 160 lignes partagées par toutes les fenêtres ; chaque fenêtre a maintenant sa propre limite. Prises multiples au harpon (0.898) validées en jeu : six doubles prises, toutes justes. Non validé en jeu (la limite par fenêtre).
+- Tests : Spearfish890Tests. Verify.ps1 (agent) : 1479/1479, 0 avertissement, 0 erreur ; DLL 0.899.0.0. Non validé en jeu.
+### English
+- User's in-game test, advanced melding (X-75.7): the rates the game shows for a grade I materia (80, 40, 20 and 10 %) are exactly those of the game sheets Tensho already reads (MateriaJoinRate and MateriaJoinRateGatherCraft); only grades XI and XII still come from Teamcraft, to check with such a materia (evidence: docs/evidence/0.899-overmeld-rates.md). The developer-mode capture wrote nothing: the spearfishing sessions had used the 160 lines shared by every window; each window now has its own limit. Spearfishing multiple catches (0.898) validated in game: six double catches, all right. Not validated in game (the per-window limit).
+
 ## 0.898.0
 - Plan global, Verify : Retour de l'utilisateur sur la 0.897 (« beaucoup plus clair visuellement ») et demande (X-73.18) : noter aussi les prises multiples, fréquentes. Les poissons d'une prise multiple sont lus dans le chat (une ligne « Vous avez pêché … » par poisson, avec le lien de l'objet), et les ombres harponnées dans la fenêtre. Si toutes les ombres sont pareilles, chaque poisson la reçoit ; sinon un poisson dont l'ombre est déjà connue (vue par vous) la prend et le dernier reçoit l'ombre restante ; ce qui reste ambigu n'est pas noté. Abonnement au chat possédé par le relevé et retiré à sa fermeture. Non validé en jeu.
 - Tests : SpearMulti898Tests. Verify.ps1 (agent) : 1479/1479, 0 avertissement, 0 erreur ; DLL 0.898.0.0. Non validé en jeu.
