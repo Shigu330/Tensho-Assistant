@@ -6340,10 +6340,8 @@
     "SettingTip": "Small on-screen window with the items of your active Tensho alarms (gathering, fishing), soonest first with the time left; click a name: its sheet; « Map »: the game map on the point when known. Hidden with the game’s interface; the cross closes it.\nDefault: off."
   },
   "Spearfishing": {
-    "SlotEmpty": "Fish {0}: —",
-    "SlotShadow": "Fish {0}: {1}",
-    "ZoneFish": "Node unknown: fish of the zone you speared or in sight:",
-    "PointFish": "Fish of this node:",
+    "Legend": "S, M, L: small, average, large shadow. Each > is one speed step (> slowest). Star: guaranteed large. Eye: a shadow you saw. Hover a line for the words.",
+    "ZoneFish": "Node unknown: fish of the zone you speared or in sight",
     "InSight": "in sight",
     "NoList": "No spearfishing fish known here.",
     "Elsewhere": "Not a fish of this node; elsewhere: {0}",
@@ -6360,7 +6358,7 @@
     "NoData": "GatherBuddy data not loaded (source setting, or still loading).",
     "NoMatch": "No known fish with this size and speed.",
     "NoFish": "No fish in sight.",
-    "Credit": "Speeds and sizes: GatherBuddy (Apache-2.0); in colour, the fish of this zone.",
+    "Credit": "Sizes and speeds: GatherBuddy (Apache-2.0); hover for the legend.",
     "SpeedSuperSlow": "super slow",
     "SpeedExtremelySlow": "extremely slow",
     "SpeedVerySlow": "very slow",

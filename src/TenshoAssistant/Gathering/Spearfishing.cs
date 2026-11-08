@@ -39,6 +39,12 @@ public static class Spearfishing
         }).OrderBy(row=>row.Size ?? 9).ThenBy(row=>row.Speed ?? int.MaxValue).ThenBy(row=>row.Fish).ToArray();
     }
 
+    /// <summary>X-79 (0.897, user request: less text, sizes S M L, speeds as chevrons): a shadow at a glance, e.g. « M >>> ».</summary>
+    public static string SizeLetter(int size)=>size switch{1=>"S",2=>"M",3=>"L",_=>"?"};
+    /// <summary>X-79 (0.897): one chevron per speed step of 50 above 50 (100 → 1, 150 → 2, 200 → 3 … 600 → 11), 0 when unknown.</summary>
+    public static int SpeedStep(int speed)=>speed<=50 ? 0:Math.Min(12,(speed-50)/50);
+    public static string ShortShadow(int size,int speed)=>$"{SizeLetter(size)} {new string('>',SpeedStep(speed))}".TrimEnd();
+
     /// <summary>0.896: the shadows a slot may stand for: its speed, and half of it (a shadow's speed doubles while it swims, docs/evidence/0.896-spearfishing-lag.md).</summary>
     public static IEnumerable<(int Size,int Speed)> Shadows(SpearfishSlot slot)
     {

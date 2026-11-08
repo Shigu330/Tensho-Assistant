@@ -1434,6 +1434,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.896) Harpon : quelques prises ; chaque « vu par vous » doit garder la même ombre d'une prise à l'autre (Crabe-pagaie petit).
 
+- [ ] (0.897) Harpon : lignes « 1 M >>> » et liste « S >> Nom » ; survol : les mots.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

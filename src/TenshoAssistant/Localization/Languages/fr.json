@@ -6340,10 +6340,8 @@
     "SettingTip": "Petite fenêtre à l’écran avec les objets de vos alarmes Tensho actives (récolte, pêche), la plus proche en premier et le temps restant ; clic sur un nom : la fiche ; « Carte » : la carte du jeu sur le point quand il est connu. Masquée avec l’interface du jeu ; la croix la ferme.\nPar défaut : désactivé."
   },
   "Spearfishing": {
-    "SlotEmpty": "Poisson {0} : —",
-    "SlotShadow": "Poisson {0} : {1}",
-    "ZoneFish": "Point inconnu : poissons de la zone pris par vous ou en vue :",
-    "PointFish": "Poissons de ce point :",
+    "Legend": "S, M, L : petite, moyenne, grande ombre. Chaque > est un cran de vitesse (> le plus lent). Étoile : grand garanti. Œil : ombre vue par vous. Survol d'une ligne : les mots.",
+    "ZoneFish": "Point inconnu : poissons de la zone pris par vous ou en vue",
     "InSight": "en vue",
     "NoList": "Aucun poisson au harpon connu ici.",
     "Elsewhere": "Pas un poisson de ce point ; ailleurs : {0}",
@@ -6360,7 +6358,7 @@
     "NoData": "Données GatherBuddy non chargées (réglage des sources ou chargement en cours).",
     "NoMatch": "Aucun poisson connu avec cette taille et cette vitesse.",
     "NoFish": "Aucun poisson en vue.",
-    "Credit": "Vitesses et tailles : GatherBuddy (Apache-2.0) ; en couleur, les poissons de cette zone.",
+    "Credit": "Tailles et vitesses : GatherBuddy (Apache-2.0) ; survol : la légende.",
     "SpeedSuperSlow": "super lente",
     "SpeedExtremelySlow": "extrêmement lente",
     "SpeedVerySlow": "très lente",

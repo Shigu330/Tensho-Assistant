@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.897.0
+- Plan global, Verify : Retours de l'utilisateur : zones des trous de pêche comparées au carnet de pêche (« c'est ok je pense »), filtre de carte par métier validé, harpon 0.896 validé en jeu (9 prises aux ombres cohérentes dans le journal). Demande (X-79) : moins de texte dans l'aide au harpon, trop dur à lire en temps réel. L'ombre s'écrit maintenant S, M ou L suivi de chevrons de vitesse (un par cran de 50 : « > » le plus lent), une étoile marque un grand garanti, un œil une ombre vue par vous ; les mots restent au survol, la légende au survol de la ligne GatherBuddy. Non validé en jeu.
+- Tests : Spearfish890Tests. Verify.ps1 (agent) : 1478/1478, 0 avertissement, 0 erreur ; DLL 0.897.0.0. Non validé en jeu.
+### English
+- User's reports: fishing-spot areas compared with the fishing log (« ok I think »), map filter by job validated, spearfishing 0.896 validated in game (9 catches with consistent shadows in the log). Request (X-79): less text in the spearfishing help, too hard to read in real time. A shadow is now S, M or L followed by speed chevrons (one per step of 50: « > » slowest), a star marks a guaranteed large fish, an eye a shadow you saw; the words stay on hover, the legend on hovering the GatherBuddy line. Not validated in game.
+
 ## 0.896.0
 - Plan global, Verify : Retour de l'utilisateur sur le harpon (« beaucoup mieux », capture) : le Crabe-pagaie était noté « grand, vitesse très rapide ». Le journal montre deux causes : la fenêtre augmente le compteur de prises un instant avant de changer le poisson pris (le crabe a reçu l'ombre du poisson suivant), et la vitesse d'une ombre peut doubler pendant qu'elle nage (250 → 500, 400 → 800). Corrections (X-73.18) : la prise est notée quand le poisson pris change (ou 0,6 s après, même poisson), deux prises d'un coup ne sont pas notées ; la vitesse est celle de l'apparition de l'ombre ; le panneau reconnaît aussi une ombre accélérée. Les ombres notées jusqu'ici sont écartées (preuve : docs/evidence/0.896-spearfishing-lag.md). Non validé en jeu.
 - Tests : Spearfish890Tests. Verify.ps1 (agent) : 1478/1478, 0 avertissement, 0 erreur ; DLL 0.896.0.0. Non validé en jeu.
