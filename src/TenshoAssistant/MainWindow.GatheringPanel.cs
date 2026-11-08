@@ -123,7 +123,7 @@ internal sealed partial class MainWindow
         switch(step.Kind)
         {
             case GpNextKind.Action when step.Action is { } action:
-                DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(28));ImGui.SameLine();
+                DrawGameIcon(action.Icon,new Vector2(28));ImGui.SameLine();
                 ImGui.TextColored(Accent,localization.Format(step.Leftover ? "GatheringPanel.NextLeftover":"GatheringPanel.NextAction",action.Name));
                 if(ImGui.IsItemHovered())WrappedTooltip(action.Description);
                 // 0.733 (user report): asked from here, inside the panel's own window, which is drawn after the overlays: the frame of 0.728 was cleared before it was looked for.
@@ -155,7 +155,7 @@ internal sealed partial class MainWindow
         {
             // Job header: its own icon (ClassJob 62100 + job) and colour, so miner and botanist help never look alike.
             var colour=miner ? Warning:Success;
-            DrawItemIcon(new ItemDefinition(0,"",false,62100+frame.JobId),new Vector2(28));ImGui.SameLine();
+            DrawGameIcon(62100+frame.JobId,new Vector2(28));ImGui.SameLine();
             ImGui.BeginGroup();
             ImGui.TextColored(colour,localization.Get(miner ? "GatheringPanel.Miner":"GatheringPanel.Botanist")+$" · {localization.Format("GatheringPanel.Level",frame.Level)}");
             ImGui.TextDisabled(localization.Format("GatheringPanel.Resources",frame.Gp,frame.MaxGp,frame.Attempts?.ToString() ?? "?",frame.TotalAttempts?.ToString() ?? "?"));
@@ -340,7 +340,7 @@ internal sealed partial class MainWindow
         if(shown.Actions.Count==0)ImGui.TextUnformatted(localization.Get("GpUi.Keep"));
         foreach(var use in shown.Actions)
         {
-            DrawItemIcon(new ItemDefinition(0,use.Action.Name,false,use.Action.Icon),new Vector2(22));ImGui.SameLine();
+            DrawGameIcon(use.Action.Icon,new Vector2(22));ImGui.SameLine();
             var spent=next?.Used.GetValueOrDefault(use.Action.Spec.Id) ?? 0;
             var label=use.Count>1 ? $"{use.Action.Name} ×{use.Count}":use.Action.Name;
             if(spent>0 && use.Count>1 && spent<use.Count)label+=$" ({spent}/{use.Count})";
@@ -369,14 +369,14 @@ internal sealed partial class MainWindow
         foreach(var action in actions)
         {
             if(GatheringActionRow?.Invoke(action.Id) is not { } row)continue;
-            DrawItemIcon(new ItemDefinition(0,row.Name,false,row.Icon),new Vector2(22));ImGui.SameLine();
+            DrawGameIcon(row.Icon,new Vector2(22));ImGui.SameLine();
             ImGui.TextUnformatted($"{row.Name} · {action.Cost} {localization.Get("GatheringPanel.CrystalGp")}");
             if(ImGui.IsItemHovered())WrappedTooltip(row.Description);
         }
         foreach(var (id,left) in cooling)
             if(GatheringActionRow?.Invoke(id) is { } row)
             {
-                DrawItemIcon(new ItemDefinition(0,row.Name,false,row.Icon),new Vector2(22));ImGui.SameLine();
+                DrawGameIcon(row.Icon,new Vector2(22));ImGui.SameLine();
                 ImGui.TextDisabled(localization.Format("GatheringPanel.CrystalWait",row.Name,Math.Ceiling(left ?? 0).ToString("0")));
                 if(ImGui.IsItemHovered())WrappedTooltip(row.Description);
             }

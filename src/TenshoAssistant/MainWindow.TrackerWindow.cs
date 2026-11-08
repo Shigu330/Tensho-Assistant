@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
             ImGui.PushID(row.Id.ToString());
             try
             {
-                DrawItemIcon(new ItemDefinition(0,row.Label,false,row.IconId),new Vector2(20));ImGui.SameLine();
+                DrawGameIcon(row.IconId,new Vector2(20));ImGui.SameLine();
                 if(ImGui.Selectable(row.Label,false,ImGuiSelectableFlags.None,new Vector2(220,0))){OpenAlarmItem(row.ItemId);IsOpen=true;}
                 ImGui.SameLine();
                 var left=row.At-now;

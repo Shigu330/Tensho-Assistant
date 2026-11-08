@@ -61,7 +61,7 @@ internal sealed partial class MainWindow
             ImGui.PushID((int)leve.RowId);
             try
             {
-                DrawItemIcon(new ItemDefinition(0,leve.Name,false,leve.IconId),new Vector2(24));ImGui.SameLine();
+                DrawGameIcon(leve.IconId,new Vector2(24));ImGui.SameLine();
                 var job=string.IsNullOrWhiteSpace(leve.Job) ? localization.Get("ItemUsesUi.UnknownJob"):leve.Job;
                 var level=leve.Level>0 ? localization.Format("QuestDetails.Level",leve.Level):localization.Get("ItemUsesUi.UnknownLevel");
                 if(!TenshoAssistant.UI.UiComponents.Header($"{leve.Name} · {job} · {level}"))continue;
@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
                     try
                     {
                         var quantityText=request.Quantity is { } quantity ? $"× {quantity}":localization.Get("ItemUsesUi.Quantity");
-                        if(ItemCell(item,request.ItemId,28,$"{item?.Name ?? localization.Format("CraftPresetMessages.Item",request.ItemId)}  {quantityText}"))focusUsesTab=true;
+                        if(ItemCell(item,request.ItemId,28,$"{item?.Name ?? localization.Format("BankUi.Item",request.ItemId)}  {quantityText}"))focusUsesTab=true;
                     }
                     finally{ImGui.PopID();}
                 }

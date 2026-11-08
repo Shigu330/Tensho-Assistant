@@ -30,7 +30,7 @@ internal sealed partial class MainWindow
         DrawItemIcon(SelectedItem,new Vector2(40));
         ItemCollectionMenu("SelectedItemCollection",SelectedItem);
         ImGui.SameLine();
-        ImGui.TextColored(Accent,SelectedItem?.Name ?? localization.Format("MonsterUi.Item",id));
+        ImGui.TextColored(Accent,SelectedItem?.Name ?? localization.Format("BankUi.Item",id));
         DrawItemCollection(SelectedItem);
         var offers=catalog.ForItem(id);
         if(offers.Count==0){EmptyState("NpcUi.None");return;}
@@ -102,7 +102,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     var item=items?.Find(sale.ItemId);
                     DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();
-                    if(ImGui.Selectable($"{item?.Name ?? localization.Format("MonsterUi.Item",sale.ItemId)}##Sale{shop.Key}/{sale.ItemId}/{sale.Quantity}")){itemId=(int)sale.ItemId;npcVendorFocus=0;}
+                    if(ImGui.Selectable($"{item?.Name ?? localization.Format("BankUi.Item",sale.ItemId)}##Sale{shop.Key}/{sale.ItemId}/{sale.Quantity}")){itemId=(int)sale.ItemId;npcVendorFocus=0;}
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(sale.ItemId);
                     ItemCollectionMenu($"SaleCollection{shop.Key}/{sale.ItemId}",item);
                     ImGui.TableNextColumn();DrawNpcCosts(sale,16,true);
@@ -141,7 +141,7 @@ internal sealed partial class MainWindow
                 continue;
             }
             var currency=cost.CurrencyItemId==0 ? null:itemCatalog.State.Catalog?.Find(cost.CurrencyItemId);
-            if(currency is null)ImGui.TextDisabled(cost.CurrencyItemId==0 ? localization.Format("NpcUi.EncodedCurrency",cost.RawCurrency):localization.Format("MonsterUi.Item",cost.CurrencyItemId));
+            if(currency is null)ImGui.TextDisabled(cost.CurrencyItemId==0 ? localization.Format("NpcUi.EncodedCurrency",cost.RawCurrency):localization.Format("BankUi.Item",cost.CurrencyItemId));
             else
             {
                 DrawItemIcon(currency,new Vector2(iconSize),tooltips);

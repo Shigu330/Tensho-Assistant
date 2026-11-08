@@ -902,9 +902,7 @@ internal sealed partial class MainWindow
                     var corner=ImGui.GetItemRectMin();var glyphSize=square*0.8f;
                     ImGui.GetWindowDrawList().AddText(UiBuilder.IconFont,glyphSize,corner+new Vector2((square-glyphSize)/2),ImGui.GetColorU32(glyph.Colour),glyph.Symbol.ToIconString());
                 }
-                else if(textures.TryGetFromGameIcon(new GameIconLookup(icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
-                    ImGui.Image(image.Handle,new Vector2(ImGui.GetFrameHeight()));
-                else ImGui.Dummy(new Vector2(ImGui.GetFrameHeight()));
+                else DrawGameIcon(icon,new Vector2(ImGui.GetFrameHeight()));
                 ImGui.SameLine();
                 var percent=(visible ? own:1)*100;
                 ImGui.BeginDisabled(!visible);
@@ -1004,18 +1002,6 @@ internal sealed partial class MainWindow
         if(localization.Has(key+"Help"))Tip(key+"Help");
         if(fallback is { } byDefault && DefaultButton(key,value!=byDefault)){apply(byDefault);changed=true;}
         return changed;
-    }
-
-    private bool ToolButton(FontAwesomeIcon icon,string tooltipKey,bool enabled,bool active=false)
-    {
-        ImGui.BeginDisabled(!enabled);
-        if(active)ImGui.PushStyleColor(ImGuiCol.Button,UI.FfxivTheme.Selected);
-        ImGui.PushFont(UiBuilder.IconFont);
-        bool clicked;
-        try{clicked=ImGui.Button($"{icon.ToIconString()}##{tooltipKey}",new Vector2(26));}
-        finally{ImGui.PopFont();if(active)ImGui.PopStyleColor();ImGui.EndDisabled();}
-        Tip(tooltipKey);
-        return clicked && enabled;
     }
 
     private (Vector2 Size,Vector2 Position)? mapResize;
@@ -1724,8 +1710,7 @@ internal sealed partial class MainWindow
             {
                 if(shown++>=12){ImGui.TextDisabled(localization.Format("MapView.HoverMore",hits.Count-12));break;}
                 if(shown>1)ImGui.Separator();
-                if(textures.TryGetFromGameIcon(new GameIconLookup(hit.Icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)ImGui.Image(image.Handle,size);
-                else ImGui.Dummy(size);
+                DrawGameIcon(hit.Icon,size);
                 ImGui.SameLine();
                 ImGui.BeginGroup();
                 try
@@ -1958,8 +1943,7 @@ internal sealed partial class MainWindow
                     _=>localization.Format("MapView.VistaLogEx",state.SightseeingUnlock,state.SightseeingUnlockEx),
                 });
             }
-            if(done==true && vista.Data!=0 && textures.TryGetFromGameIcon(new GameIconLookup(vista.Data),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
-                ImGui.Image(image.Handle,new Vector2(160,90));
+            if(done==true && vista.Data!=0)DrawGameIcon(vista.Data,new Vector2(160,90),false);
         }
     }
     private void DrawGatheringTooltip(MapLocalGatheringPoint point)

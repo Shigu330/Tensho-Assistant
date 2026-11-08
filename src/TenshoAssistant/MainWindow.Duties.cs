@@ -117,7 +117,7 @@ internal sealed partial class MainWindow
                 {
                     var duty = dutyMatches[index];
                     ImGui.TableNextRow(); ImGui.TableNextColumn();
-                    DrawItemIcon(new ItemDefinition(0,duty.Name,false,duty.Icon),new Vector2(24));
+                    DrawGameIcon(duty.Icon,new Vector2(24));
                     var clicked = ImGui.IsItemClicked(); ImGui.SameLine();
                     if (ImGui.Selectable($"{duty.Name}##Duty{duty.DutyId}",dutyLoot.State.Duty?.DutyId == duty.DutyId,ImGuiSelectableFlags.None,new Vector2(0,24)) || clicked)
                     { dutyLoot.Select(duty); showDutyDetails = true; dutyItemQuery = ""; }
@@ -144,7 +144,7 @@ internal sealed partial class MainWindow
     {
         var state = dutyLoot.State;
         if (state.Duty is not { } duty) return;
-        DrawItemIcon(new ItemDefinition(0,duty.Name,false,duty.Icon),new Vector2(32)); ImGui.SameLine();
+        DrawGameIcon(duty.Icon,new Vector2(32)); ImGui.SameLine();
         ImGui.TextColored(Accent,duty.Name);
         ImGui.TextDisabled(localization.Format("DutyCounts.Level",duty.Category,duty.Level));
         ImGui.SameLine(); DrawDutyStatus(DutyProgressSource?.Invoke()?.Of(duty.InstanceId));

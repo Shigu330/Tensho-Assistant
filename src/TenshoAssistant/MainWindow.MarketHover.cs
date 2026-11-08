@@ -43,7 +43,7 @@ internal sealed partial class MainWindow
                 if(width is null)
                 {
                     DrawItemIcon(item,new Vector2(28));ImGui.SameLine();
-                    ImGui.TextColored(Accent,item?.Name ?? localization.Format("HoverUi.Item",hovered.ItemId));
+                    ImGui.TextColored(Accent,item?.Name ?? localization.Format("BankUi.Item",hovered.ItemId));
                 }
                 if(compare.Count>0)
                 {
@@ -306,7 +306,7 @@ internal sealed partial class MainWindow
             DrawEnglishItemName(item);
             DrawItemImage(item,new Vector2(32));ImGui.SameLine();
             ImGui.BeginGroup();
-            ImGui.TextColored(Accent,item?.Name ?? localization.Format("HoverUi.Item",id));
+            ImGui.TextColored(Accent,item?.Name ?? localization.Format("BankUi.Item",id));
             if(item is { UiCategoryName.Length:>0 })ImGui.TextDisabled(item.UiCategoryName);
             ImGui.EndGroup();
             if(item is { ItemLevel:>1 })ImGui.TextDisabled(localization.Format("HoverUi.Levels",item.ItemLevel,item.EquipLevel));

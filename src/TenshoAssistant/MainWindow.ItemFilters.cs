@@ -90,8 +90,7 @@ internal sealed partial class MainWindow
             if(keyItemQuery.Trim().Length>0 && keyItemResults.Count==0)ImGui.TextDisabled(localization.Get("ItemFilters.KeyItemsNone"));
             foreach(var (id,name,icon) in keyItemResults)
             {
-                if(icon!=0 && textures.TryGetFromGameIcon(new Dalamud.Interface.Textures.GameIconLookup(icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
-                {ImGui.Image(image.Handle,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();}
+                if(DrawGameIcon(icon,new Vector2(ImGui.GetTextLineHeight()),false))ImGui.SameLine();
                 ImGui.TextUnformatted(ShowIds ? $"{name}  ({id})":name);
             }
         }

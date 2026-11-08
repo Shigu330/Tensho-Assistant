@@ -185,7 +185,7 @@ internal sealed partial class MainWindow
         var info=CollectableActionInfo?.Invoke(action);
         DrawCollectableRisk(advice,rule);
         ImGui.TextColored(Accent,localization.Get("CollectablePanel.Next"));
-        DrawItemIcon(info is { } shown ? new TenshoAssistant.Items.ItemDefinition(0,shown.Name,false,shown.Icon):null,new Vector2(32));
+        DrawGameIcon(info?.Icon ?? 0,new Vector2(32));
         ImGui.SameLine();
         // 0.528 (user capture): this line was cut at the panel's width.
         ImGui.TextWrapped(gain.Length>0 ? $"{info?.Name ?? advice.Move.ToString()} ({gain})":info?.Name ?? advice.Move.ToString());

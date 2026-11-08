@@ -81,7 +81,7 @@ internal sealed partial class MainWindow
                     try
                     {
                         ImGui.TableNextRow();ImGui.TableNextColumn();
-                        DrawItemIcon(new ItemDefinition(0,source.Name,false,source.Icon),new Vector2(28));var clicked=ImGui.IsItemClicked();ImGui.SameLine();
+                        DrawGameIcon(source.Icon,new Vector2(28));var clicked=ImGui.IsItemClicked();ImGui.SameLine();
                         clicked|=ImGui.Selectable(source.Name);
                         if(ImGui.IsItemHovered())WrappedTooltip($"{source.Name}\n{source.Category}"+(developerMode ? $"\nID: {source.QuestId}":""));
                         if(clicked){SelectQuest(source.QuestId);page=Page.Quests;}

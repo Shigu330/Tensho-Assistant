@@ -95,7 +95,7 @@ internal sealed partial class MainWindow
         {
             var action=miner ?? botanist;
             if(action is null)continue;
-            DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(24));
+            DrawGameIcon(action.Icon,new Vector2(24));
             if(ImGui.IsItemHovered())WrappedTooltip(action.Description);
             ImGui.SameLine();
             var name=miner is not null && botanist is not null && miner.Name!=botanist.Name ? $"{miner.Name} / {botanist.Name}":action.Name;

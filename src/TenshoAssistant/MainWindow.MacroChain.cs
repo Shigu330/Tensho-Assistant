@@ -53,7 +53,7 @@ internal sealed partial class MainWindow
                     ImGui.PushID($"Macro{macro.Slot.Book}/{macro.Slot.Index}");
                     try
                     {
-                        DrawItemIcon(new ItemDefinition(0, macro.Slot.Name, false, macro.IconId), new Vector2(24));
+                        DrawGameIcon(macro.IconId,new Vector2(24));
                         ImGui.SameLine();
                         if (ImGui.SmallButton(localization.Get("MacroCounts.Add")+$"###AddMacro{macro.Slot.Index}") && macroPlan.Count < 32)
                         { macroPlan.Add(macro.Slot); macroPlanSaved = false; }

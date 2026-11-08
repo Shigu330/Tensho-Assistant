@@ -194,7 +194,7 @@ internal sealed partial class MainWindow
             {
                 var entry = matches[index];
                 ImGui.TableNextRow(); ImGui.TableNextColumn();
-                DrawItemIcon(new ItemDefinition(0, entry.Name, false, entry.Icon), new Vector2(24));
+                DrawGameIcon(entry.Icon,new Vector2(24));
                 if (ImGui.IsItemClicked()) SelectQuest(entry.Id);
                 ImGui.SameLine();
                 if (ImGui.Selectable($"{entry.Name}##quest{entry.Id}", selectedQuestId == entry.Id)) SelectQuest(entry.Id);
@@ -238,7 +238,7 @@ internal sealed partial class MainWindow
         if (ImGui.SmallButton(localization.Get("QuestDetails.Close"))) { selectedQuestId = 0; questShowDetails = false; questNavigation.Clear(); return; }
         var entry = questLinks.Find(selectedQuestId);
         if (entry is null) { ImGui.TextDisabled(localization.Format("QuestDetails.Missing",selectedQuestId)); return; }
-        DrawItemIcon(new ItemDefinition(0, entry.Name, false, entry.Icon), new Vector2(36));
+        DrawGameIcon(entry.Icon,new Vector2(36));
         ImGui.SameLine(); ImGui.TextColored(Accent, entry.Name);
         var followed = configuration.FollowedQuests?.Contains(entry.Id) == true;
         if (ImGui.SmallButton(localization.Get(followed ? "QuestDetails.Unfollow":"QuestDetails.Follow"))) SaveFollowedQuest(entry.Id, !followed);
@@ -301,7 +301,7 @@ internal sealed partial class MainWindow
         var linked = questLinks.Find(id);
         if (linked is not null)
         {
-            DrawItemIcon(new ItemDefinition(0, linked.Name, false, linked.Icon), new Vector2(24));
+            DrawGameIcon(linked.Icon,new Vector2(24));
             if (ImGui.IsItemClicked()) SelectQuest(id);
             ImGui.SameLine();
         }

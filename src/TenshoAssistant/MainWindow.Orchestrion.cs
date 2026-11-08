@@ -42,8 +42,8 @@ internal sealed partial class MainWindow
             if(ImGui.Selectable(localization.Get("OrchestrionDetails.AllCategories"),orchestrionCategoryFilter is null))orchestrionCategoryFilter=null;
             foreach(var category in orchestrionCategories)
             {
-                DrawItemIcon(new ItemDefinition(0,category.Music!.CategoryName,false,category.IconId),new Vector2(22));ImGui.SameLine();
-                if(ImGui.Selectable($"{category.Music.CategoryName}##MusicCategory{category.Music.CategoryId}",category.Music.CategoryId==orchestrionCategoryFilter))orchestrionCategoryFilter=category.Music.CategoryId;
+                DrawGameIcon(category.IconId,new Vector2(22));ImGui.SameLine();
+                if(ImGui.Selectable($"{category.Music!.CategoryName}##MusicCategory{category.Music.CategoryId}",category.Music.CategoryId==orchestrionCategoryFilter))orchestrionCategoryFilter=category.Music.CategoryId;
             }
         }
         finally{ImGui.EndCombo();}

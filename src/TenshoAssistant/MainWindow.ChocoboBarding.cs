@@ -67,8 +67,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();
                 foreach(var icon in new[]{set.IconHead,set.IconBody,set.IconLegs})
                 {
-                    if(icon!=0 && textures.TryGetFromGameIcon(new GameIconLookup(icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
-                    {ImGui.Image(image.Handle,size);ImGui.SameLine();}
+                    if(DrawGameIcon(icon,size,false))ImGui.SameLine();
                 }
                 ImGui.TextUnformatted(set.Name);
                 ImGui.TableNextColumn();

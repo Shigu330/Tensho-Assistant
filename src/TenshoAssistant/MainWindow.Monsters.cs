@@ -85,7 +85,7 @@ internal sealed partial class MainWindow
         var state = monsterLoot.State;
         if (state.ItemId == 0) { ImGui.TextWrapped(localization.Get("MonsterUi.Help")); return; }
         DrawItemIcon(SelectedItem,new Vector2(40)); ImGui.SameLine();
-        ImGui.TextColored(Accent,SelectedItem?.Name ?? localization.Format("MonsterUi.Item",state.ItemId));
+        ImGui.TextColored(Accent,SelectedItem?.Name ?? localization.Format("BankUi.Item",state.ItemId));
         // LuminaSupplemental, then the wiki (DrawWikiMonsterSources); Garland stays as a folded complement for monster pages and map links.
         DrawWikiMonsterSources(state.ItemId);
         if (!TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.GarlandSection")+"###GarlandMonsters")) return;
@@ -183,7 +183,7 @@ internal sealed partial class MainWindow
                         for (var index=clipper.DisplayStart;index<clipper.DisplayEnd;index++)
                         {
                             var id=detail.DropItemIds[index]; var item=itemCatalog.State.Catalog?.Find(id);
-                            ItemCell(item,id,24,item is null ? localization.Format("MonsterUi.Item",id):null);
+                            ItemCell(item,id,24,item is null ? localization.Format("BankUi.Item",id):null);
                         }
                     }
                     finally { clipper.End(); clipper.Destroy(); }

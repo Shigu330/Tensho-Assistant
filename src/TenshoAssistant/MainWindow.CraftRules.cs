@@ -22,7 +22,7 @@ internal sealed partial class MainWindow
             var name=metadata?.Name ?? spec.Kind.ToString();
             var on=forbidden.Contains(spec.Kind);
             // 0.457 (user request, in-game campaign): the action's icon, as in the simulator.
-            DrawItemIcon(metadata is null ? null:new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(24));
+            DrawGameIcon(metadata?.Icon ?? 0,new Vector2(24));
             ImGui.SameLine();
             if(ImGui.Checkbox($"{name} ({localization.Format("CraftRules.Level",spec.Level)})###Forbid{spec.Kind}",ref on))
             {

@@ -353,8 +353,7 @@ internal sealed partial class MainWindow
     private void DrawSmallGameIcon(uint icon)
     {
         var size=new Vector2(ImGui.GetTextLineHeight());
-        if(icon!=0 && textures.TryGetFromGameIcon(new GameIconLookup(icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)ImGui.Image(image.Handle,size);
-        else ImGui.Dummy(size);
+        DrawGameIcon(icon,size);
         ImGui.SameLine();
     }
 }

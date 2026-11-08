@@ -66,7 +66,7 @@ internal sealed partial class MainWindow
                 if(preset is not null)
                 {
                     var item=itemCatalog.State.Catalog?.Find(preset.ResultItemId);DrawItemIcon(item,new Vector2(28));ImGui.SameLine();
-                    ImGui.TextWrapped($"{preset.Name} · {item?.Name ?? localization.Format("CraftPresetMessages.Item", preset.ResultItemId)}");
+                    ImGui.TextWrapped($"{preset.Name} · {item?.Name ?? localization.Format("BankUi.Item", preset.ResultItemId)}");
                     ImGui.TextDisabled(localization.Format("CraftPresetMessages.Details",recipe is null ? localization.Get("CraftPresetMessages.Unresolved") : $"{recipe.CraftType} {recipe.Level}",preset.Actions?.Count ?? 0,preset.SavedAt.ToLocalTime().ToString("g")));
                     if(developerMode)ImGui.TextDisabled(localization.Format("DevMode.RecipeId",preset.RecipeId));
                 }

@@ -226,7 +226,7 @@ internal sealed partial class MainWindow
                 {
                     if(craft.Recipe.CraftTypeId<8)
                     {
-                        DrawItemIcon(new Items.ItemDefinition(0,craft.Recipe.CraftType,false,62108+craft.Recipe.CraftTypeId),new Vector2(ImGui.GetTextLineHeight()),false);
+                        DrawGameIcon(62108+craft.Recipe.CraftTypeId,new Vector2(ImGui.GetTextLineHeight()));
                         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.CraftRuns",craft.Recipe.CraftType,craft.Runs.ToString("N0")));
                         ImGui.SameLine();
                     }
@@ -324,7 +324,7 @@ internal sealed partial class MainWindow
     private void DrawListZoneCost(uint gil)
     {
         var size=new Vector2(ImGui.GetTextLineHeight());
-        ImGui.SameLine();DrawItemIcon(new Items.ItemDefinition(0,"",false,TeleportIcon),size);
+        ImGui.SameLine();DrawGameIcon(TeleportIcon,size);
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.ZoneCost",gil.ToString("N0")));
         ImGui.SameLine();DrawItemIcon(itemCatalog.State.Catalog?.Find(1) ?? new Items.ItemDefinition(1,"",false,65002),size);
         ImGui.SameLine();ImGui.TextUnformatted(gil.ToString("N0"));

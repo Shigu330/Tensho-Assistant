@@ -68,7 +68,7 @@ internal sealed partial class MainWindow
                 {
                     ImGui.TableNextColumn();
                     if(entry.Weather is not { } value){ImGui.TextDisabled("?");continue;}
-                    DrawItemIcon(new ItemDefinition(0,value.Name,false,value.Icon),new Vector2(24));
+                    DrawGameIcon(value.Icon,new Vector2(24));
                     if(ImGui.IsItemHovered())WrappedTooltip($"{value.Name}\n{entry.StartsAt.ToLocalTime():g} · {entry.EtHours} ET");
                 }
             }
@@ -109,7 +109,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();ImGui.TextUnformatted(entry.StartsAt.ToLocalTime().ToString("g"));
                     ImGui.TableNextColumn();ImGui.TextUnformatted($"{entry.EndsAt.ToLocalTime():g} · {entry.EtHours} ET");
                     ImGui.TableNextColumn();
-                    if(entry.Weather is { } value){DrawItemIcon(new ItemDefinition(0,value.Name,false,value.Icon),new Vector2(28));ImGui.SameLine();ImGui.TextUnformatted(value.Name);}
+                    if(entry.Weather is { } value){DrawGameIcon(value.Icon,new Vector2(28));ImGui.SameLine();ImGui.TextUnformatted(value.Name);}
                     else
                     {
                         ImGui.TextWrapped(localization.Get("WeatherDetails.Unknown"));

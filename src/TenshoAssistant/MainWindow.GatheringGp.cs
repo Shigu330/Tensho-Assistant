@@ -128,7 +128,7 @@ internal sealed partial class MainWindow
         if(best.Actions.Count==0) ImGui.TextUnformatted(localization.Get("GpUi.Keep"));
         foreach(var use in best.Actions)
         {
-            DrawItemIcon(new ItemDefinition(0,use.Action.Name,false,use.Action.Icon),new Vector2(28)); ImGui.SameLine();
+            DrawGameIcon(use.Action.Icon,new Vector2(28)); ImGui.SameLine();
             var repeat=use.Action.Spec.Effect is GpEffect.Bountiful1 or GpEffect.Bountiful2;
             var when=use.Action.Spec.Effect switch
             {
@@ -164,7 +164,7 @@ internal sealed partial class MainWindow
     private bool DrawGpDeclaredEffect(GpActionCatalog catalog,GpEffect effect,string label,ref bool active)
     {
         var metadata=catalog.Actions.First(action=>action.Spec.JobId==gpJob && action.Spec.Effect==effect);
-        DrawItemIcon(new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(24));
+        DrawGameIcon(metadata.Icon,new Vector2(24));
         if(ImGui.IsItemHovered())WrappedTooltip(metadata.Description);
         ImGui.SameLine();var toggled=ImGui.Checkbox(label,ref active);
         Tip("GpUi.ActiveEffectTip");

@@ -99,7 +99,7 @@ internal sealed partial class MainWindow
                 if(matched is null)ImGui.TextWrapped(localization.Format("FishingWeather.Unmatched",name));
                 else
                 {
-                    DrawItemIcon(new TenshoAssistant.Items.ItemDefinition(0,matched.Name,false,matched.Icon),new Vector2(24));
+                    DrawGameIcon(matched.Icon,new Vector2(24));
                     if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FishingWeather.Source",name));
                     ImGui.SameLine();ImGui.TextUnformatted(matched.Name);
                 }

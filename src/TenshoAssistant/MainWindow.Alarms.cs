@@ -237,7 +237,7 @@ internal sealed partial class MainWindow
         var size=new Vector2(32);
         if(first.ItemId!=0 && itemCatalog.State.Catalog?.Find(first.ItemId) is { } item)
         {DrawItemIcon(item,size);return;}
-        if(first.IconId!=0){DrawItemIcon(new Items.ItemDefinition(0,title,false,first.IconId),size);if(ImGui.IsItemHovered())WrappedTooltip(title);return;}
+        if(first.IconId!=0){DrawGameIcon(first.IconId,size);if(ImGui.IsItemHovered())WrappedTooltip(title);return;}
         ImGui.PushFont(UiBuilder.IconFont);
         try{ImGui.Button(FontAwesomeIcon.Bell.ToIconString()+"##GroupIcon",size);}
         finally{ImGui.PopFont();}
@@ -265,7 +265,7 @@ internal sealed partial class MainWindow
             var sectionTitle=section.Key==0 ? localization.Get("Alarms.OtherSection"):JobName(section.Key);
             ImGui.Spacing();
             // ClassJob icon 62100 + job (62116 miner, 62117 botanist, 62118 fisher), as the gathering catalogue uses for fishing.
-            if(section.Key!=0){DrawItemIcon(new Items.ItemDefinition(0,sectionTitle,false,62100+section.Key),new Vector2(ImGui.GetFrameHeight()));ImGui.SameLine();}
+            if(section.Key!=0){DrawGameIcon(62100+section.Key,new Vector2(ImGui.GetFrameHeight()));ImGui.SameLine();}
             if(!TenshoAssistant.UI.UiComponents.Header($"{sectionTitle} ({section.Count()})###JobSection{section.Key}",ImGuiTreeNodeFlags.DefaultOpen))continue;
             foreach(var group in section.GroupBy(AlarmGroupKey).OrderBy(group=>group.Min(alarm=>alarm.Enabled ? NextAlarm(alarm,now) ?? DateTimeOffset.MaxValue:DateTimeOffset.MaxValue)))
             {

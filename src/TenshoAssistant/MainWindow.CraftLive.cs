@@ -59,7 +59,7 @@ internal sealed partial class MainWindow
             foreach(var effect in observation.Effects)
             {
                 var icon=effect.Metadata.Icon+(effect.Metadata.MaxStacks>0 ? (uint)(Math.Clamp(effect.Counter ?? 1,1,(int)effect.Metadata.MaxStacks)-1):0);
-                DrawItemIcon(new ItemDefinition(0,effect.Metadata.Name,false,icon),new Vector2(28));ImGui.SameLine();
+                DrawGameIcon(icon,new Vector2(28));ImGui.SameLine();
                 ImGui.TextUnformatted(effect.Metadata.Name+" · "+(effect.Indefinite && effect.Counter is null ? localization.Get("LiveDetails.Present"):effect.Counter?.ToString() ?? localization.Get("LiveDetails.UnknownCounter")));
                 if(ImGui.IsItemHovered())WrappedTooltip(effect.Metadata.Description);
             }

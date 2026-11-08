@@ -191,7 +191,7 @@ internal sealed partial class MainWindow
             {
                 if(index%perRow!=0)ImGui.SameLine(0,iconGap);
                 var metadata=catalog.Find(job,steps[index].Action);
-                DrawItemIcon(metadata is null ? null:new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(iconSize));
+                DrawGameIcon(metadata?.Icon ?? 0,new Vector2(iconSize));
                 if(ImGui.IsItemHovered())WrappedTooltip($"{index+1}. {metadata?.Name ?? steps[index].Action.ToString()}");
             }
             if(steps.Count>30)ImGui.TextDisabled(localization.Format("CraftLogUi.More",steps.Count-30));
@@ -241,7 +241,7 @@ internal sealed partial class MainWindow
         ImGui.BeginGroup();
         try
         {
-            using(TenshoAssistant.UI.UiComponents.PushSectionFont())ImGui.TextWrapped(item?.Name ?? localization.Format("CraftLogUi.Item",recipe.ResultItemId));
+            using(TenshoAssistant.UI.UiComponents.PushSectionFont())ImGui.TextWrapped(item?.Name ?? localization.Format("BankUi.Item",recipe.ResultItemId));
             ImGui.TextColored(Accent,recipe.Simulation?.Collectable==true ? $"{recipe.CraftType} · {localization.Get("CraftLogUi.Collectable")}":recipe.CraftType);
         }
         finally{ImGui.EndGroup();}
@@ -285,7 +285,7 @@ internal sealed partial class MainWindow
         // 0.469 (user request): the skill's icon instead of its name; what was detected is in its tooltip, and beside it only when the box says otherwise.
         ImGui.SameLine();
         var skill=craftActions.State.Catalog?.Find(job,CraftActionKind.Manipulation);
-        DrawItemIcon(skill is null ? null:new ItemDefinition(0,skill.Name,false,skill.Icon),new Vector2(28));
+        DrawGameIcon(skill?.Icon ?? 0,new Vector2(28));
         if(ImGui.IsItemHovered())WrappedTooltip((skill?.Name ?? CraftActionKind.Manipulation.ToString())+"\n"+localization.Format("CraftLogUi.ManipulationDetected",CraftYesNo(detected))+"\n"+localization.Get("CraftLogUi.ManipulationTip"));
         if(used!=detected){ImGui.SameLine();ImGui.TextDisabled(localization.Format("CraftLogUi.ManipulationDetected",CraftYesNo(detected)));}
     }

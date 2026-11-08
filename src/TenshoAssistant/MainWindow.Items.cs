@@ -458,7 +458,7 @@ internal sealed partial class MainWindow
                 ImGui.SetCursorScreenPos(buttonPosition + new Vector2(3));
                 // Native framed class icons: 62100 + ClassJob ID, crafters 8..15.
                 if (craftTypeId < 8)
-                    DrawItemIcon(new ItemDefinition(0, craftType, false, 62108 + craftTypeId), new Vector2(32));
+                    DrawGameIcon(62108 + craftTypeId,new Vector2(32));
                 // 0.207: the icon was the last item, so the next SameLine started after it (3 px lower and further right each time);
                 // an invisible item over the button restores the button's place for the next one.
                 ImGui.SetCursorScreenPos(buttonPosition);

@@ -291,7 +291,7 @@ internal sealed partial class MainWindow
                             ImGui.BeginDisabled(forbidden || simulationActions.Count>=100 || simulationLevel<spec.Level || spec.Kind==CraftActionKind.Manipulation && !simulationManipulation);
                             try
                             {
-                                DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(26)); var click=ImGui.IsItemClicked();
+                                DrawGameIcon(action.Icon,new Vector2(26)); var click=ImGui.IsItemClicked();
                                 TipText(action.Description);
                                 ImGui.SameLine(); click|=ImGui.SmallButton(action.Name);
                                 if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(forbidden ? localization.Get("CraftRules.ForbiddenTip"):localization.Format("SimulationHelp.Action",action.Description,spec.Level,spec.Cp));
@@ -352,7 +352,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.PushID(i);
                     try
                     {
-                        DrawItemIcon(metadata is null ? null:new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(24)); ImGui.SameLine();
+                        DrawGameIcon(metadata?.Icon ?? 0,new Vector2(24)); ImGui.SameLine();
                         ImGui.TextWrapped($"{i+1}. {metadata?.Name ?? kind.ToString()}");
                         if(ImGui.IsItemHovered() && step is not null) WrappedTooltip(localization.Format("SimulationHelp.Effects",step.After.Veneration,step.After.Innovation,step.After.GreatStrides,step.After.WasteNot,step.After.Manipulation,step.After.MuscleMemory,localization.Get(step.After.TrainedPerfection ? "SimulationHelp.Protected":step.After.UsedTrainedPerfection ? "SimulationHelp.Used":"SimulationHelp.Available")));
                         if(ImGui.SmallButton(localization.Get("CraftPresets.Remove"))) { simulationActions.RemoveAt(i); simulationResult=null; break; }

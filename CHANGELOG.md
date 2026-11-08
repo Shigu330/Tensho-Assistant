@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.921.0
+- Plan global, Verify : Nettoyage X-76, harmonisation H8 (affichage des objets) : une seule façon de dessiner une icône du jeu qui n'est pas un objet (contenus, actions, métiers, cartes, météos…) : 41 contournements et 6 dessins à la main remplacés, même résolution partout (haute définition). Un seul texte de repli pour un objet sans nom (« Objet 123 ») au lieu de cinq copies. Le bouton carré de la barre d'outils de la carte devient un composant commun, à la taille de la police. Aucun changement voulu à l'écran, à part des icônes plus nettes à quelques endroits. Non validé en jeu.
+- Tests : ItemDisplay921Tests. Verify.ps1 (agent) : 1534/1534, 0 avertissement, 0 erreur ; DLL 0.921.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, harmonisation H8 (item display): one way to draw a game icon that is not an item (duties, actions, jobs, cards, weathers…): 41 workarounds and 6 hand-drawn icons replaced, same resolution everywhere (high definition). One fallback text for an unnamed item (« Item 123 ») instead of five copies. The square map tool-bar button becomes a shared component, sized on the font. No intended change on screen, apart from sharper icons in a few places. Not validated in game.
+
 ## 0.920.0
 - Plan global, Verify : Nettoyage X-76, harmonisation H7 (ordre rappelé par l'utilisateur : l'uniformisation d'abord, pour que chaque nouveau parseur la suive) : les lignes d'état des pages ont une seule forme. Erreurs de données : en rouge par un seul composant, le texte brut seulement en mode développeur (avant, plusieurs pages l'écrivaient en blanc ou en doré). Lignes « rien ici » et « chargement » : en gris, partout pareil. Boutons « Copier » : petits, avec « Copié » affiché deux secondes. Un test empêche les anciennes formes de revenir. Aussi dans cette version : X-93 ajouté au plan (tenue face à une grosse masse de données : essai de charge d'abord) et l'ordre « uniformisation avant les nouveaux parseurs ». Non validé en jeu.
 - Tests : StatusLines920Tests. Verify.ps1 (agent) : 1533/1533, 0 avertissement, 0 erreur ; DLL 0.920.0.0. Non validé en jeu.

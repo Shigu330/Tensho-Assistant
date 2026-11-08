@@ -226,7 +226,7 @@ internal sealed partial class MainWindow
                             ImGui.PushID((int)entry.Id);
                             try
                             {
-                                DrawItemIcon(new ItemDefinition(0, entry.Name, false, entry.IconId), new Vector2(36));
+                                DrawGameIcon(entry.IconId,new Vector2(36));
                                 var clicked = ImGui.IsItemClicked();
                                 DrawEntryMark(entry);
                                 TriadCardTooltip(entry.Id);
@@ -258,7 +258,7 @@ internal sealed partial class MainWindow
     private void DrawTriadCardDetails(CollectionEntry entry)
     {
         var card = entry.Card!;
-        DrawItemIcon(new ItemDefinition(0, entry.Name, false, entry.IconId), new Vector2(80));
+        DrawGameIcon(entry.IconId,new Vector2(80));
         TriadCardTooltip(entry.Id);
         ImGui.SameLine(); ImGui.TextColored(Accent, $"{card.Label} · {entry.Name}");
         ImGui.TextUnformatted(new string('★', card.Stars));
@@ -322,7 +322,7 @@ internal sealed partial class MainWindow
             ImGui.PushID(index);
             try
             {
-                DrawItemIcon(new ItemDefinition(0, entry?.Name ?? localization.Format("UiFragments.Card",id), false, entry?.IconId ?? 0), new Vector2(44));
+                DrawGameIcon(entry?.IconId ?? 0,new Vector2(44));
                 TriadCardTooltip(id);
                 ImGui.SameLine();
                 ImGui.TextUnformatted(entry is null ? localization.Format("UiFragments.CardUnavailable",id) : $"{entry.Card!.Label} · {entry.Name} · {new string('★', entry.Card.Stars)}");

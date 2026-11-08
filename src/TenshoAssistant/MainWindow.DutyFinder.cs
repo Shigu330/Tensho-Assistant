@@ -57,7 +57,7 @@ internal sealed partial class MainWindow
     private void DrawDutyFinderLoot(DutyLootService loot,DutyDefinition duty)
     {
         var state=loot.State;
-        DrawItemIcon(new ItemDefinition(0,duty.Name,false,duty.Icon),new Vector2(28));ImGui.SameLine();
+        DrawGameIcon(duty.Icon,new Vector2(28));ImGui.SameLine();
         ImGui.BeginGroup();
         ImGui.TextColored(Accent,duty.Name);
         ImGui.TextDisabled(localization.Format("DutyCounts.Level",duty.Category,duty.Level));

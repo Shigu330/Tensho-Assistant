@@ -182,7 +182,8 @@ internal sealed partial class MainWindow
                     try{if(ImGui.Button(FontAwesomeIcon.Crown.ToIconString()+$"##TitleIcon{entry.Id}",new Vector2(32))){selectedCompletionKind=kind;selectedCompletionId=entry.Id;openCompletionDetails=true;}}
                     finally{ImGui.PopFont();}
                 }
-                else DrawItemIcon(musicItem ?? new ItemDefinition(0, entry.Name, false, entry.IconId), new Vector2(32));
+                else if(musicItem is not null)DrawItemIcon(musicItem,new Vector2(32));
+                else DrawGameIcon(entry.IconId,new Vector2(32));
                 // An item icon (orchestrion roll) carries its own badge; the other entries get it here.
                 if(musicItem is null)DrawEntryMark(entry);
                 if(kind==CollectionKind.TripleTriad)TriadCardTooltip(entry.Id);
@@ -243,7 +244,7 @@ internal sealed partial class MainWindow
                 var spell = state.Entries.FirstOrDefault(entry => entry.Kind == CollectionKind.BlueMagic && entry.Id == selectedBlueSpell);
                 if (spell is not null)
                 {
-                    DrawItemIcon(new ItemDefinition(0, spell.Name, false, spell.IconId), new Vector2(40));
+                    DrawGameIcon(spell.IconId,new Vector2(40));
                     ImGui.SameLine(); ImGui.TextColored(Accent, $"{spell.Number} · {spell.Name}");
                     ImGui.TextUnformatted(localization.Format("BlueSpell.Rank",spell.Rank));
                     ImGui.TextWrapped(spell.Description);

@@ -149,7 +149,7 @@ internal sealed partial class MainWindow
                 {
                     var leve=leveRows[index];
                     ImGui.TableNextRow();ImGui.TableNextColumn();
-                    DrawItemIcon(new ItemDefinition(0,leve.Name,false,leve.TypeIcon),size);ImGui.SameLine();
+                    DrawGameIcon(leve.TypeIcon,size);ImGui.SameLine();
                     ImGui.TextUnformatted(leve.Name);
                     if(ImGui.IsItemHovered())WrappedTooltip(LeveTooltip(leve));
                     DrawLeveMenu(leve);

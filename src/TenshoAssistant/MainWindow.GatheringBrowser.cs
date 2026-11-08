@@ -98,7 +98,7 @@ internal sealed partial class MainWindow
             ImGui.PushID($"SourceType{type.TypeId}");
             try
             {
-                DrawItemIcon(new ItemDefinition(0, type.TypeName, false, type.IconId), new Vector2(28));
+                DrawGameIcon(type.IconId,new Vector2(28));
                 if (ImGui.IsItemClicked()) sourceTypeFilter = type.TypeId;
                 if (ImGui.IsItemHovered()) WrappedTooltip(type.TypeName);
             }

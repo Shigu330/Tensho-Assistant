@@ -44,7 +44,7 @@ internal sealed partial class MainWindow
         try
         {
             // CraftType 0 to 7 are the crafters in ClassJob order, 8 to 15; their icons are 62100 + job, as the gathering panel uses.
-            if(recipe.CraftTypeId<8)DrawItemIcon(new Items.ItemDefinition(0,recipe.CraftType,false,62108+recipe.CraftTypeId),new System.Numerics.Vector2(ImGui.GetTextLineHeight()+4),false);
+            if(recipe.CraftTypeId<8)DrawGameIcon(62108+recipe.CraftTypeId,new System.Numerics.Vector2(ImGui.GetTextLineHeight()+4));
             else ImGui.TextUnformatted(recipe.CraftType);
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("CraftStock.JobIconTip",recipe.CraftType,FromStockRowText(row)));
             if(ImGui.IsItemClicked())OpenCraftSimulation(recipe);
