@@ -47,7 +47,18 @@ public sealed class WeatherCatalog
             return (int)(((first>>8)^first)%100);
         }
     }
-    public IReadOnlyList<WeatherPeriod> Forecast(uint territory,DateTimeOffset date,int count=6)
+    /// <summary>
+    /// X-96 (0.959, user report « météo : ? » at the Zorgor strait): a zone with an IndividualWeather row (24 territories: Shadowbringers, Thavnair,
+    /// Garlemald, several Dawntrail zones; docs/evidence/0.959-individual-weather.md) has a forced weather until its story is done. It stays « unknown »
+    /// (never invented) unless the game itself confirmed the standard forecast there for this player: the in-game check (ItemDiscoveryWatcher.CheckWeather)
+    /// compares it with WeatherManager and records the zone (Configuration.WeatherStoryZones). Null: nothing confirmed (tests, tools).
+    /// </summary>
+    public static Func<uint,bool>? StoryWeatherConfirmed { get; set; }
+
+    public IReadOnlyList<WeatherPeriod> Forecast(uint territory,DateTimeOffset date,int count=6)=>Forecast(territory,date,count,false);
+
+    /// <summary>The forecast; <paramref name="evenIndividual"/> applies the standard table to a zone with individual weather (for the in-game check).</summary>
+    public IReadOnlyList<WeatherPeriod> Forecast(uint territory,DateTimeOffset date,int count,bool evenIndividual)
     {
         var seconds=date.ToUnixTimeSeconds();
         if(seconds<0 || count is <1 or >24 || seconds/1400*1400+(long)count*1400>DateTimeOffset.MaxValue.ToUnixTimeSeconds())throw new ArgumentOutOfRangeException(nameof(date));
@@ -56,7 +67,7 @@ public sealed class WeatherCatalog
         {
             var time=DateTimeOffset.FromUnixTimeSeconds(start+index*1400L);var target=Target(time);WeatherDefinition? weather=null;string? reason=null;
             if(zone is null || zone.RateId==0 || zone.Shares.Count==0)reason="Weather table missing.";
-            else if(zone.Individual)reason="Individual / forced weather not covered.";
+            else if(zone.Individual && !evenIndividual && StoryWeatherConfirmed?.Invoke(territory)!=true)reason="Individual / forced weather not covered.";
             else if(zone.Shares.Any(share=>share.Chance is <0 or >100) || zone.Shares.Sum(share=>(long)share.Chance)>100)reason="Inconsistent weather table.";
             else
             {

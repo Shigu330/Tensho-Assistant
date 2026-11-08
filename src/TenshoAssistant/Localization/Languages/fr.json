@@ -1790,7 +1790,7 @@
     "Coverage": "Répartition statique et couverture",
     "Rates": "Couverture des taux natifs : {0}/100",
     "Incomplete": "La table ne couvre pas tous les tirages : les périodes correspondantes restent inconnues.",
-    "Individual": "Cette zone référence une météo individuelle : prévision standard non appliquée."
+    "Individual": "Cette zone peut avoir une météo forcée tant que son histoire n'est pas faite (comme la lumière éternelle de Shadowbringers) ; ensuite, la prévision ci-dessous s'applique. Tensho la compare à la météo du jeu quand vous y êtes."
   },
   "GatheringDetails": {
     "GoThereEquipSetting": "« Y aller » : équiper aussi le métier",

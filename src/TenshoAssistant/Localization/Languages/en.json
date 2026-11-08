@@ -1790,7 +1790,7 @@
     "Coverage": "Static distribution and coverage",
     "Rates": "Native rate coverage: {0}/100",
     "Incomplete": "The table does not cover every roll; corresponding periods remain unknown.",
-    "Individual": "This zone uses individual weather; standard forecasting is not applied."
+    "Individual": "This zone can have a forced weather until its story is done (such as the eternal light of Shadowbringers); after that, the forecast below applies. Tensho compares it with the game's weather when you are there."
   },
   "GatheringDetails": {
     "GoThereEquipSetting": "« Go there »: also equip the job",

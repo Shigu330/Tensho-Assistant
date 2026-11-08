@@ -103,6 +103,8 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     /// for now against WeatherManager.GetCurrentWeather. Zones with their own weather (some quests and duties) can differ: counted, logged in the debug log only.
     /// </summary>
     public Func<uint,DateTimeOffset,uint>? ForecastWeather { get; set; }
+    /// <summary>X-96 (0.959): each in-game weather check (territory, forecast matched the game).</summary>
+    public Action<uint,bool>? WeatherChecked { get; set; }
     public (int Matches,int Mismatches) WeatherChecks { get; private set; }
     private uint weatherZone;private long weatherCheckAt=-100_000;
     private void CheckWeather(DateTimeOffset at,long now,uint territory,uint duty)
@@ -114,6 +116,8 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         var actual=FFXIVClientStructs.FFXIV.Client.Game.WeatherManager.Instance() is var manager && manager!=null ? manager->GetCurrentWeather():(byte)0;
         if(expected==0 || actual==0)return;
         WeatherChecks=expected==actual ? (WeatherChecks.Matches+1,WeatherChecks.Mismatches):(WeatherChecks.Matches,WeatherChecks.Mismatches+1);
+        // X-96 (0.959): the result also tells whether a zone with a story weather now follows the standard forecast.
+        WeatherChecked?.Invoke(territory,expected==actual);
         if(debug())log.Information("Weather check in territory {0}: forecast {1}, game {2}.",territory,expected,actual);
     }
     /// <summary>X-75.4 (0.878): the AozAction row of an action id (0: not a blue spell); battle NPCs casting one are noted once per cast.</summary>
