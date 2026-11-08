@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.935.0
+- Plan global, Verify : Nettoyage X-76, parseurs P8 (compteurs) : pour calculer plus tard des taux de butin, Tensho compte maintenant les ennemis ciblés vus vaincus (les mêmes morts que celles qui donnent leur butin aux monstres) et les coffres de mission (une fois par coffre) ; les visites de secteurs des sous-marins sont comptées depuis la 0.934. Nouvelles sortes connues de l'outil de fusion. Aussi : X-94 ajouté au plan (trou de pêche pris pour un point légendaire de mineur sur la carte, votre capture). Non validé en jeu.
+- Tests : DropCounts935Tests. Verify.ps1 (agent) : 1548/1548, 0 avertissement, 0 erreur ; DLL 0.935.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, parsers P8 (counts): to compute drop rates later, Tensho now counts the targeted enemies seen defeated (the same deaths that credit monsters with their drops) and the duty chests (once per chest); submersible sector visits are counted since 0.934. New kinds known to the merge tool. Also: X-94 added to the plan (a fishing hole taken for a miner's legendary point on the map, your screenshot). Not validated in game.
+
 ## 0.934.0
 - Plan global, Verify : Nettoyage X-76, parseurs P7 (sous-marins) : les trouvailles des sous-marins gardent maintenant leur qualité (HQ), et chaque secteur exploré est noté une fois par voyage, avec la surveillance du sous-marin et s'il y a eu deux trouvailles (nouvelle sorte « visite de secteur ») : c'est le nombre de visites qui servira aux taux de butin (P8). L'outil de fusion connaît cette sorte. Le sens des lignes de prospection et de rendement reste à relever en jeu. Non validé en jeu.
 - Tests : VoyageFacts934Tests. Verify.ps1 (agent) : 1547/1547, 0 avertissement, 0 erreur ; DLL 0.934.0.0. Non validé en jeu.

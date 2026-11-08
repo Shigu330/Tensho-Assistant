@@ -226,7 +226,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             if(wanted.ItemSources)
             {
                 ReadSalvage(at);ReadPurify(at);ReadHandIn(at,now);ReadVenture(at);ReadLoot(at,territory,duty);
-                ReadFate(now);ReadTarget(now,territory,map);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);ReadShopNpc(at,territory,map);ReadCasters(at,territory,map);
+                ReadFate(now);ReadTarget(now,at,territory,map);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);ReadShopNpc(at,territory,map);ReadCasters(at,territory,map);
             }
             var (counts,hqCounts)=Counts();
             if(before is null || beforeHq is null){before=counts;beforeHq=hqCounts;return;}
@@ -486,15 +486,18 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         if(debug())log.Information("Discovery: venture {0}.",signature);
     }
 
+    private readonly HashSet<uint> chestsSeen=[];
     private void ReadLoot(DateTimeOffset at,uint territory,uint duty)
     {
-        if(territory!=lootTerritory){lootSeen.Clear();lootTerritory=territory;}
+        if(territory!=lootTerritory){lootSeen.Clear();chestsSeen.Clear();lootTerritory=territory;}
         if(duty==0)return;
         var loot=Loot.Instance();
         if(loot==null)return;
         foreach(var item in loot->Items)
         {
             if(item.ItemId==0 || item.ChestObjectId==0 || lootSeen.Count>=256 || !lootSeen.Add((item.ChestObjectId,item.ChestItemIndex,item.ItemId)))continue;
+            // X-76 P8 (0.935): a chest seen for the first time in this zone counts once for its duty.
+            if(chestsSeen.Add(item.ChestObjectId))store.SeeSource(DiscoveryKind.DutyChestOpened,duty,0,1,at,territory);
             // X-76 E1 (0.916): an HQ item carries the HQ offset in its raw id (not seen in game yet).
             store.SeeSource(DiscoveryKind.DutyChest,item.ItemId%1_000_000,duty,Math.Max(1,(int)item.ItemCount),at,territory,hq:ItemGains.IsHq(item.ItemId));
             if(debug())log.Information("Discovery: duty {0} chest item {1} ×{2}.",duty,item.ItemId,item.ItemCount);
@@ -510,11 +513,13 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         if(fate->State is FateState.Ending or FateState.Ended)fateEndedAt=now;
     }
 
-    private void ReadTarget(long now,uint territory,uint map)
+    private void ReadTarget(long now,DateTimeOffset at,uint territory,uint map)
     {
         if(targets.Target is not IBattleNpc { BattleNpcKind:BattleNpcSubKind.Combatant } npc || npc.CurrentHp!=0 || npc.NameId==0)return;
         if(death.Name==npc.NameId && now-death.At<5_000)return;
         death=(npc.NameId,territory,map,npc.Position,npc.Level,now);
+        // X-76 P8 (0.935): the same deaths MonsterDrop credits, counted: the denominator of a drop rate.
+        store.SeeSource(DiscoveryKind.MonsterKill,npc.NameId,0,npc.Level,at,territory);
     }
 
     public void Dispose()

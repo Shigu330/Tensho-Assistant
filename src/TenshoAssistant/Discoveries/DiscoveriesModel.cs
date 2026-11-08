@@ -52,7 +52,11 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     FishBiteBait=29, IntuitionStart=30, IntuitionCatch=31,
     // X-76 P7 (0.934): VoyageVisit: Subject = the sector (SubmarineExploration row) a submersible explored, Detail = 1 when the game gave a second find there
     // (DoubleDip), else 0, levels = the vessel's surveillance at that voyage. One per sector of a voyage: the count of visits behind the drop rates (P8).
-    VoyageVisit=32 }
+    VoyageVisit=32,
+    // X-76 P8 (0.935): the counts behind a drop rate. MonsterKill: Subject = BNpcName of a targeted enemy seen dying (as MonsterDrop credits its drops), levels = its
+    // level. DutyChestOpened: Subject = the duty (ContentFinderCondition row) whose loot window listed a new chest (ChestObjectId; whether that id stays the same
+    // for one chest is not proven), counted once per chest.
+    MonsterKill=33, DutyChestOpened=34 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported
