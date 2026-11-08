@@ -241,6 +241,7 @@ internal sealed partial class MainWindow
     private string DutySourceLabel(DutyLootEntry entry) => entry.Kind switch
     {
         DutyLootSourceKind.Reward => localization.Get("DutyUi.Reward"),
+        DutyLootSourceKind.Seen => localization.Get("DutyUi.SeenChest"),
         DutyLootSourceKind.FightCoffer => localization.Format("DutyCounts.Fight",entry.SourceIndex+1) + (string.IsNullOrWhiteSpace(entry.SourceName) ? "" : $" · {entry.SourceName}"),
         _ => localization.Format("DutyCounts.Coffer",entry.SourceIndex+1)
     };

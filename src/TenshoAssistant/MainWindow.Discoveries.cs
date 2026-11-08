@@ -134,7 +134,8 @@ internal sealed partial class MainWindow
     /// worked out once per change of the base (bounded reads), for the pages that still read LuminaSupplemental, Garland or the wiki.
     /// </summary>
     internal sealed record SeenIndex(IReadOnlyDictionary<uint,uint[]> DropsByMonster,IReadOnlyDictionary<uint,uint[]> MonstersByItem,IReadOnlyDictionary<uint,uint[]> BeastsByMonster,
-        IReadOnlyDictionary<uint,uint[]> GivesBySource,IReadOnlyDictionary<uint,uint[]> SourcesByItem,IReadOnlyDictionary<uint,uint[]> DutiesByItem);
+        IReadOnlyDictionary<uint,uint[]> GivesBySource,IReadOnlyDictionary<uint,uint[]> SourcesByItem,IReadOnlyDictionary<uint,uint[]> DutiesByItem,
+        IReadOnlyDictionary<uint,uint[]> ItemsByDuty);
     private (long Revision,SeenIndex? Index) seenIndex=(-1,null);
     internal SeenIndex? Seen()
     {
@@ -144,9 +145,10 @@ internal sealed partial class MainWindow
             facts.Where(fact=>key(fact)!=0 && value(fact)!=0).GroupBy(key).ToDictionary(group=>group.Key,group=>group.Select(value).Distinct().Take(32).ToArray());
         var drops=store.Find(DiscoveryKind.MonsterDrop,_=>true,20_000);
         var fromItems=store.Find(DiscoveryKind.Desynthesis,_=>true,20_000).Concat(store.Find(DiscoveryKind.ItemFromItem,_=>true,20_000)).ToArray();
+        var chests=store.Find(DiscoveryKind.DutyChest,_=>true,20_000);
         var index=new SeenIndex(By(drops,fact=>fact.Detail,fact=>fact.Subject),By(drops,fact=>fact.Subject,fact=>fact.Detail),
             By(store.Find(DiscoveryKind.BeastTamed,_=>true,2_000),fact=>fact.Detail,fact=>fact.Subject),By(fromItems,fact=>fact.Detail,fact=>fact.Subject),
-            By(fromItems,fact=>fact.Subject,fact=>fact.Detail),By(store.Find(DiscoveryKind.DutyChest,_=>true,20_000),fact=>fact.Subject,fact=>fact.Detail));
+            By(fromItems,fact=>fact.Subject,fact=>fact.Detail),By(chests,fact=>fact.Subject,fact=>fact.Detail),By(chests,fact=>fact.Detail,fact=>fact.Subject));
         seenIndex=(store.Revision,index);
         return index;
     }

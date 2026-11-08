@@ -3,7 +3,8 @@ using System.Text.Json;
 
 namespace TenshoAssistant.Duties;
 
-public enum DutyLootSourceKind { Reward, FightCoffer, ZoneCoffer }
+// X-75.2 (0.876): Seen = a chest of this duty you saw give the item (discoveries), whatever the fight or chest.
+public enum DutyLootSourceKind { Reward, FightCoffer, ZoneCoffer, Seen }
 public sealed record DutyLootEntry(uint ItemId, DutyLootSourceKind Kind, int SourceIndex, string SourceName);
 public sealed record DutyLootDocument(uint InstanceId, DateTimeOffset FetchedAt, bool HasRewards,
     bool HasFights, bool HasCoffers, IReadOnlyList<DutyLootEntry> Entries)

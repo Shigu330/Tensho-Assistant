@@ -3045,6 +3045,7 @@
     "Durability": "Solidité : {0} / {1}"
   },
   "DutyUi": {
+    "SeenChest": "Coffre (vu par vous)",
     "UnlockedBy": "Débloqué par :",
     "Unlocks": "Débloque : {0}",
     "Title": "Butin des contenus",
@@ -6698,6 +6699,7 @@
     "ActionsHint": "Survolez un nom pour lire la description du jeu. Celles que vous détenez ne sont pas lues."
   },
   "DeepDungeon": {
+    "SeenLoot": "Vu dans les coffres ({0}, par vous)",
     "Title": "Donjons profonds",
     "Subtitle": "Pour préparer dehors : Tensho se met en pause à l'intérieur, et ne donne aucun conseil de combat.",
     "Loading": "Lecture des données du jeu…",

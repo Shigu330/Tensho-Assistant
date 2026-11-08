@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.876.0
+- Plan global, Verify : Demande (X-75.2, suite) : trois autres endroits lisent d'abord ce qui a été vu en jeu. Le menu clic droit d'un objet propose la mission dont un coffre vous l'a donné, et le butin de monstre dès qu'un monstre vu le laisse, même sans LuminaSupplemental ni Garland. La liste d'une mission ajoute « Coffre (vu par vous) » pour les objets vus dans ses coffres. La page des donjons sans fond montre « Vu dans les coffres » pour les objets reçus aux étages, même avec les fichiers communautaires coupés. Ordre noté au plan : finir X-75, faire les essais en jeu nécessaires, puis le nettoyage X-76, puis les documents .md revérifiés contre le code. Non validé en jeu.
+- Tests : SeenFirst876Tests. Verify.ps1 (agent) : 1463/1463, 0 avertissement, 0 erreur ; DLL 0.876.0.0. Non validé en jeu.
+### English
+- Request (X-75.2, continued): three more places read what was seen in game first. An item's right-click menu offers the duty whose chest gave it to you, and monster loot as soon as a monster seen drops it, even without LuminaSupplemental or Garland. A duty's list adds « Chest (seen by you) » for items seen in its chests. The deep dungeon page shows « Seen in the coffers » for items received on its floors, even with the community files off. Order noted in the plan: finish X-75, do the needed in-game tests, then the X-76 cleanup, then the .md documents checked against the code. Not validated in game.
+
 ## 0.875.0
 - Plan global, Verify : Demande (X-75.2) : ce que Tensho a appris en jeu passe maintenant en premier sur les pages qui lisaient encore seulement les sources communautaires. Page Monstres : « Vu le laisser (par vous) », les monstres vaincus juste avant de recevoir l'objet, avec l'endroit. Carte, monstres proches : le butin vu de ce monstre s'ajoute à celui de LuminaSupplemental, et les bêtes apprivoisées depuis un monstre comptent, même sans la page du wiki. Provenances d'un objet (collections, menu) : les missions dont un coffre l'a donné et les objets d'où il est sorti (désynthèse, objet ouvert) en premier. Usages d'un objet : « Vu donner (par vous) ». Non validé en jeu.
 - Tests : SeenFirst875Tests. Verify.ps1 (agent) : 1462/1462, 0 avertissement, 0 erreur ; DLL 0.875.0.0. Non validé en jeu.

@@ -13,7 +13,7 @@ internal sealed partial class MainWindow
 {
     private LuminaSupplementalService? lumina;
     internal void ConfigureLumina(LuminaSupplementalService service)=>lumina=service;
-    private (DutyLootDocument? Garland,LuminaSupplementalData? Data,uint Duty,DutyLootDocument? Result) dutyDocumentCache,dutyFinderDocumentCache;
+    private (DutyLootDocument? Garland,LuminaSupplementalData? Data,uint Duty,long Seen,DutyLootDocument? Result) dutyDocumentCache,dutyFinderDocumentCache;
 
     private IReadOnlyCollection<uint> LuminaDutiesOf(uint itemId){lumina?.Request();return lumina?.State.Data?.DutiesOf(itemId) ?? [];}
 
@@ -25,9 +25,12 @@ internal sealed partial class MainWindow
         var data=lumina?.State.Data;
         if(state.Duty is not { } duty)return state.Document;
         var cached=panel ? dutyFinderDocumentCache:dutyDocumentCache;
-        if(ReferenceEquals(cached.Garland,state.Document) && ReferenceEquals(cached.Data,data) && cached.Duty==duty.DutyId)
+        // X-75.2 (0.876): the items you saw this duty's chests give come with the community lists.
+        var seenRevision=DiscoveryStore?.Revision ?? -1;
+        if(ReferenceEquals(cached.Garland,state.Document) && ReferenceEquals(cached.Data,data) && cached.Duty==duty.DutyId && cached.Seen==seenRevision)
             return cached.Result;
-        var extra=data?.ForDuty(duty.DutyId) ?? [];
+        IReadOnlyList<DutyLootEntry> extra=(data?.ForDuty(duty.DutyId) ?? []).Concat((Seen()?.ItemsByDuty.GetValueOrDefault(duty.DutyId) ?? [])
+            .Select(item=>new DutyLootEntry(item,DutyLootSourceKind.Seen,0,""))).ToArray();
         DutyLootDocument? result=state.Document;
         if(extra.Count>0)
         {
@@ -36,7 +39,7 @@ internal sealed partial class MainWindow
             result=new DutyLootDocument(duty.InstanceId,state.Document?.FetchedAt ?? DateTimeOffset.UtcNow,state.Document?.HasRewards ?? false,true,true,
                 Array.AsReadOnly(garland.Concat(extra).ToArray()));
         }
-        if(panel)dutyFinderDocumentCache=(state.Document,data,duty.DutyId,result);else dutyDocumentCache=(state.Document,data,duty.DutyId,result);
+        if(panel)dutyFinderDocumentCache=(state.Document,data,duty.DutyId,seenRevision,result);else dutyDocumentCache=(state.Document,data,duty.DutyId,seenRevision,result);
         return result;
     }
 }

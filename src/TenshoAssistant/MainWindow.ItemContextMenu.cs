@@ -54,8 +54,9 @@ internal sealed partial class MainWindow
     }
 
     // First duty that drops the item: LuminaSupplemental, then Garland (instances) when already loaded.
+    // X-75.2 (0.876): a duty whose chest you saw give it comes first.
     private Duties.DutyDefinition? FirstDutyOf(uint itemId)=>
-        LuminaDutiesOf(itemId).Select(id=>duties.State.Catalog?.Find(id)).FirstOrDefault(found=>found is not null)
+        (Seen()?.DutiesByItem.GetValueOrDefault(itemId) ?? []).Concat(LuminaDutiesOf(itemId)).Select(id=>duties.State.Catalog?.Find(id)).FirstOrDefault(found=>found is not null)
         ?? (itemSources?.Get(itemId).List?.Sources ?? []).Where(source=>source.Type=="instance")
             .Select(source=>duties.State.Catalog?.Entries.FirstOrDefault(entry=>entry.InstanceId==source.Id)).FirstOrDefault(found=>found is not null);
 
@@ -77,7 +78,7 @@ internal sealed partial class MainWindow
         if(npcVendors?.State.Catalog is not { } vendors || vendors.ForItem(itemId).Count>0 || LuminaSellers(itemId,null).Count>0)routes.Add(ItemContextRoute.NpcVendors);
         if(item is null || item.IsMarketable)routes.Add(ItemContextRoute.Market);
         if(FirstDutyOf(itemId) is not null)routes.Add(ItemContextRoute.DutyLoot);
-        if(lumina?.State.Data?.MonstersOf(itemId).Count>0 || (itemSources?.Get(itemId).List?.Sources ?? []).Any(source=>source.Type=="mob"))routes.Add(ItemContextRoute.MonsterLoot);
+        if(Seen()?.MonstersByItem.ContainsKey(itemId)==true || lumina?.State.Data?.MonstersOf(itemId).Count>0 || (itemSources?.Get(itemId).List?.Sources ?? []).Any(source=>source.Type=="mob"))routes.Add(ItemContextRoute.MonsterLoot);
         if(quests.State.RewardIndex?.ForItem(itemId) is { Count:>0 })routes.Add(ItemContextRoute.Quest);
         if(CollectionOf(item) is not null)routes.Add(ItemContextRoute.Collection);
         routes.Add(ItemContextRoute.Stocks);

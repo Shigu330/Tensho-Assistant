@@ -95,6 +95,19 @@ internal sealed partial class MainWindow
     // What the coffers give comes from the community files, under their own switch.
     private void DrawDeepDungeonLoot(DeepDungeonEntry dungeon)
     {
+        // X-75.2 (0.876): what you saw the floors' coffers give (discoveries, by the floors' duties) comes first, and stays with the community files off.
+        if(duties.State.Catalog is { } catalog && Seen() is { } seen)
+        {
+            var found=DeepDungeonBoard.Floors(catalog.Entries,dungeon.Name).SelectMany(floor=>seen.ItemsByDuty.GetValueOrDefault(floor.DutyId) ?? []).Distinct().Take(64).ToArray();
+            if(found.Length>0 && UI.UiComponents.Header(localization.Format("DeepDungeon.SeenLoot",found.Length)+"###DeepDungeonSeen",ImGuiTreeNodeFlags.DefaultOpen))
+                foreach(var result in found)
+                {
+                    var got=itemCatalog.State.Catalog?.Find(result);
+                    ImGui.PushID((int)result);
+                    try{ItemCell(got,result,20,got is null ? result.ToString():null);}
+                    finally{ImGui.PopID();}
+                }
+        }
         if(!configuration.CommunityLumina){ImGui.TextDisabled(localization.Get("DeepDungeon.LootOff"));return;}
         lumina?.Request();
         if(lumina?.State.Data is not { } data){ImGui.TextDisabled(localization.Get("DeepDungeon.LootLoading"));return;}

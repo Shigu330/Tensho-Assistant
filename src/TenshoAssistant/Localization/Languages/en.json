@@ -3045,6 +3045,7 @@
     "Durability": "Durability: {0} / {1}"
   },
   "DutyUi": {
+    "SeenChest": "Chest (seen by you)",
     "UnlockedBy": "Unlocked by:",
     "Unlocks": "Unlocks: {0}",
     "Title": "Duty loot",
@@ -6698,6 +6699,7 @@
     "ActionsHint": "Hover a name for the game's description. Those you hold are not read."
   },
   "DeepDungeon": {
+    "SeenLoot": "Seen in the coffers ({0}, by you)",
     "Title": "Deep dungeons",
     "Subtitle": "To get ready outside: Tensho pauses inside them, and gives no fight advice.",
     "Loading": "Reading the game data…",
