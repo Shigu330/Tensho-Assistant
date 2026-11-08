@@ -44,6 +44,31 @@ public static class SeenPrices
             sold.Length>0 ? Math.Round(sold.Average(sale=>sale.Price),0):null,velocity);
     }
 
+    /// <summary>X-73.1 (0.857): a world's offers count for « cheapest of the data center » this long after they were seen.</summary>
+    public static readonly TimeSpan CurrentOffers=TimeSpan.FromHours(24);
+    /// <summary>X-73.1 (0.857): what is kept: entries seen within this long.</summary>
+    public static readonly TimeSpan KeptFor=TimeSpan.FromDays(90);
+
+    /// <summary>
+    /// X-73.1 (0.857, user request: prices seen on the other worlds of the data center, when one goes there, complete Universalis): the cheapest offer of the data
+    /// center from Universalis' and from each visited world's lowest offer seen. Universalis' world gives way to what was seen there later; another world seen
+    /// counts while its offers are current (CurrentOffers). docs/evidence/0.857-community-map.md (market report).
+    /// </summary>
+    public static MarketListing? Cheapest(MarketListing? universalis,IEnumerable<(uint World,decimal? Price,DateTimeOffset At)> seen,DateTimeOffset now)
+    {
+        var worlds=seen.Where(entry=>entry.World!=0).ToList();
+        var candidates=new List<MarketListing>();
+        if(universalis is { } listing)
+        {
+            var there=worlds.FirstOrDefault(entry=>entry.World==listing.WorldId);
+            if(there.World!=0 && there.At>(listing.UploadedAt ?? DateTimeOffset.MinValue)){if(there.Price is { } price)candidates.Add(new(price,listing.WorldId,there.At));}
+            else candidates.Add(listing);
+        }
+        foreach(var (world,price,at) in worlds)
+            if(price is { } offer && now-at<=CurrentOffers && world!=universalis?.WorldId)candidates.Add(new(offer,world,at));
+        return candidates.OrderBy(candidate=>candidate.Price).ThenByDescending(candidate=>candidate.UploadedAt).FirstOrDefault();
+    }
+
     /// <summary>The quote of what was seen; Universalis' other worlds and region kept from its own quote when there is one.</summary>
     public static MarketQuote Quote(SeenMarketEntry entry,MarketQuote? universalis,DateTimeOffset now)=>new(entry.World,entry.Item,entry.Seen,entry.Seen,
         Quality(entry.Listings,entry.Sales,false,now),Quality(entry.Listings,entry.Sales,true,now),universalis?.NqCheapest,universalis?.HqCheapest,universalis?.NqRegion,universalis?.HqRegion);
@@ -102,6 +127,25 @@ public sealed class SeenPriceStore
         return entries[(world,item)]=new SeenMarketEntry{World=world,Item=item};
     }
 
+    /// <summary>X-73.1 (0.857): the quote with its data-center cheapest offers completed by the worlds seen (SeenPrices.Cheapest).</summary>
+    public MarketQuote? WithDataCenter(MarketQuote? quote,IReadOnlyCollection<uint> worlds,DateTimeOffset now)
+    {
+        if(quote is null || worlds.Count==0)return quote;
+        var nq=new List<(uint,decimal?,DateTimeOffset)>();var hq=new List<(uint,decimal?,DateTimeOffset)>();
+        lock(gate)
+            foreach(var world in worlds)
+            {
+                if(!entries.TryGetValue((world,quote.ItemId),out var entry) || entry.Listings.Count==0)continue;
+                if(!lowest.TryGetValue((world,quote.ItemId),out var known) || known.At!=entry.ListingsAt)
+                    lowest[(world,quote.ItemId)]=known=(entry.ListingsAt,Lowest(entry.Listings,false),Lowest(entry.Listings,true));
+                nq.Add((world,known.Nq,known.At));hq.Add((world,known.Hq,known.At));
+            }
+        if(nq.Count==0)return quote;
+        return quote with {NqCheapest=SeenPrices.Cheapest(quote.NqCheapest,nq,now),HqCheapest=SeenPrices.Cheapest(quote.HqCheapest,hq,now)};
+    }
+    private static decimal? Lowest(IReadOnlyList<SeenListing> listings,bool hq)=>listings.Where(listing=>listing.Hq==hq && listing.Price>0).Select(listing=>(decimal?)listing.Price).Min();
+    private readonly Dictionary<(uint World,uint Item),(DateTimeOffset At,decimal? Nq,decimal? Hq)> lowest=[];
+
     /// <summary>The seen quote when newer than Universalis' (SeenPrices.Prefer), without copying the entry; computed again only when the entry or Universalis' quote changes.</summary>
     public MarketQuote? Prefer(uint world,uint item,MarketQuote? universalis,DateTimeOffset now,bool waitForUniversalis=false)
     {
@@ -129,7 +173,8 @@ public sealed class SeenPriceStore
     {
         lock(gate)
             foreach(var entry in saved)
-                if(entry.World!=0 && entry.Item!=0 && entries.Count<MaxEntries)
+                // X-73.1 (0.857): nothing older than KeptFor is loaded.
+                if(entry.World!=0 && entry.Item!=0 && entries.Count<MaxEntries && DateTimeOffset.UtcNow-entry.Seen<=SeenPrices.KeptFor)
                     entries[(entry.World,entry.Item)]=new SeenMarketEntry{World=entry.World,Item=entry.Item,ListingsRequest=entry.ListingsRequest,
                         Listings=entry.Listings.Where(listing=>listing.Price>0).Take(SeenPrices.MaxListings).ToList(),ListingsAt=entry.ListingsAt,
                         Sales=entry.Sales.Where(sale=>sale.Price>0).Take(SeenPrices.MaxSales).ToList(),SalesAt=entry.SalesAt};

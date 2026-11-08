@@ -182,7 +182,14 @@ public sealed class Plugin : IDalamudPlugin
             // X-52 (0.817): the prices seen at the market board, in place of Universalis' when newer.
             var seenPrices=new Market.SeenPriceStore();
             mainWindow.SeenPrices=seenPrices;
-            market.Seen=(world,item,universalis)=>configuration.Discovery.Enabled && configuration.Discovery.MarketPrices ? seenPrices.Prefer(world,item,universalis,DateTimeOffset.UtcNow,configuration.CommunityUniversalis):null;
+            // X-73.1 (0.857): then the data center's cheapest offers completed by the worlds visited.
+            market.Seen=(world,item,universalis)=>
+            {
+                if(!configuration.Discovery.Enabled || !configuration.Discovery.MarketPrices)return null;
+                var now=DateTimeOffset.UtcNow;
+                var quote=seenPrices.Prefer(world,item,universalis,now,configuration.CommunityUniversalis) ?? universalis;
+                return seenPrices.WithDataCenter(quote,market.State.WorldNames?.Keys.ToArray() ?? [],now);
+            };
             Market.SeenPriceReader? seenReader=null;
             registrations.Register(()=>seenReader=new Market.SeenPriceReader(marketBoardEvents,seenPrices,()=>market.State.WorldId,()=>configuration.Discovery.Enabled && configuration.Discovery.MarketPrices,log),()=>seenReader?.Dispose());
             _=Task.Run(()=>

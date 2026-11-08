@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.857.0
+- Plan global, Verify : Demande (X-73.1) : les prix vus sur les autres mondes du centre de données, quand on s'y rend, complètent Universalis. Ils étaient déjà gardés pour chaque monde visité, mais seul le monde courant s'en servait. Maintenant, le prix le plus bas du centre de données compare celui d'Universalis aux offres vues sur chaque monde visité : une offre vue compte 24 heures, et le monde qu'Universalis désigne cède la place à ce qu'on y a vu plus tard. Les relevés de plus de 90 jours ne sont plus chargés. Non validé en jeu.
+- Tests : DataCenterSeen857Tests. Verify.ps1 (agent) : 1438/1438, 0 avertissement, 0 erreur ; DLL 0.857.0.0. Non validé en jeu.
+### English
+- Request (X-73.1): prices seen on the data center's other worlds, when one goes there, complete Universalis. They were already kept per visited world, but only the current world used them. The data center's lowest price now compares Universalis' with the offers seen on each visited world: an offer seen counts for 24 hours, and the world Universalis names gives way to what was seen there later. Records older than 90 days are no longer loaded. Not validated in game.
+
 ## 0.856.0
 - Plan global, Verify : Choix de l'utilisateur (X-72, C) : la base de découvertes relève deux genres de plus. Où apparaissent les monstres de chasse (rangs B, A et S) : ces lieux ne sont dans aucune donnée du jeu, seulement dans les données communautaires. Et les ALÉA vues : leur lieu, leur niveau, la première et la dernière fois, et combien de fois (une fois par heure au plus). Chacun a son réglage (activé par défaut) ; la recherche de Monde › Découvertes les trouve par leur nom. Non validé en jeu.
 - Tests : MoreKinds856Tests. Verify.ps1 (agent) : 1436/1436, 0 avertissement, 0 erreur ; DLL 0.856.0.0. Non validé en jeu.
