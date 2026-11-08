@@ -21,8 +21,10 @@ internal sealed class GcSupplyReader : IDisposable
     private ItemUseCatalog? indexedFor;private IReadOnlyDictionary<string,uint>? names;
     private long nextRead;private bool warned,disposed;private int loggedHash;
 
-    public GcSupplyReader(IFramework framework,IGameGui gui,IClientState client,IPlayerState player,IDataManager data,IPluginLog log,Func<ItemUseCatalog?> catalog,GcSupplyToday today,Action<GcSupplySeen> learned)
-    {
+    // X-76 H9 (0.922): developer captures are logged in developer mode only.
+    private readonly Func<bool>? developer;
+    public GcSupplyReader(IFramework framework,IGameGui gui,IClientState client,IPlayerState player,IDataManager data,IPluginLog log,Func<ItemUseCatalog?> catalog,GcSupplyToday today,Action<GcSupplySeen> learned,Func<bool>? developer=null)
+    {this.developer=developer;
         this.framework=framework;this.gui=gui;this.client=client;this.player=player;this.data=data;this.log=log;this.catalog=catalog;this.today=today;this.learned=learned;
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
     }
@@ -61,7 +63,7 @@ internal sealed class GcSupplyReader : IDisposable
         if(hash!=loggedHash)
         {
             loggedHash=hash;
-            log.Information("Grand Company supply window: {Values} values, {Texts} texts, delivery items {Found}; texts: {Sample}",addon->AtkValuesCount,distinct.Length,found,string.Join(" | ",distinct.Take(MaxLoggedTexts)));
+            if(developer?.Invoke()==true)log.Information("Grand Company supply window: {Values} values, {Texts} texts, delivery items {Found}; texts: {Sample}",addon->AtkValuesCount,distinct.Length,found,string.Join(" | ",distinct.Take(MaxLoggedTexts)));
         }
         if(today.Observe(player.ContentId,ResetSchedule.PreviousDaily(DateTimeOffset.UtcNow,ResetSchedule.SupplyHour),found) && today.Seen is { } seen)learned(seen);
     }

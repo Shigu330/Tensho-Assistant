@@ -111,7 +111,7 @@ internal sealed class NpcVendorLoader : IDisposable
             }
             catch(Exception error)
             {
-                log.Error(error,"Tensho NPC vendor catalog could not be built.");
+                log.Warning(error,"Tensho NPC vendor catalog could not be built.");
                 service.Fail(error);Stop();
             }
         }

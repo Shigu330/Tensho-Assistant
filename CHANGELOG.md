@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.922.0
+- Plan global, Verify : Nettoyage X-76, harmonisation H9 (journaux) : un échec de lecture qui se répète (sélection de l'outil de mission, contexte de l'objet survolé, position sur la carte) n'est plus écrit toutes les cinq secondes dans dalamud.log, mais une fois, puis de nouveau seulement après une lecture réussie. Les captures d'enquête (lignes du jardin dans le chat, ventes des servants, fenêtre de ravitaillement de la Grande Compagnie, panneaux qui s'écartent) ne s'écrivent plus qu'en mode développeur. Un seul niveau (avertissement) pour un catalogue qui ne se construit pas ; tous les messages du journal en gabarits. Rien de visible en jeu. Non validé en jeu.
+- Tests : Logs922Tests. Verify.ps1 (agent) : 1535/1535, 0 avertissement, 0 erreur ; DLL 0.922.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, harmonisation H9 (logs): a repeated read failure (duty finder selection, hovered item context, map position) is no longer written to dalamud.log every five seconds, but once, then again only after a good read. Investigation captures (garden chat lines, retainer sales, Grand Company supply window, panels stepping aside) are written in developer mode only. One level (warning) for a catalogue that cannot be built; every log message is a template. Nothing visible in game. Not validated in game.
+
 ## 0.921.0
 - Plan global, Verify : Nettoyage X-76, harmonisation H8 (affichage des objets) : une seule façon de dessiner une icône du jeu qui n'est pas un objet (contenus, actions, métiers, cartes, météos…) : 41 contournements et 6 dessins à la main remplacés, même résolution partout (haute définition). Un seul texte de repli pour un objet sans nom (« Objet 123 ») au lieu de cinq copies. Le bouton carré de la barre d'outils de la carte devient un composant commun, à la taille de la police. Aucun changement voulu à l'écran, à part des icônes plus nettes à quelques endroits. Non validé en jeu.
 - Tests : ItemDisplay921Tests. Verify.ps1 (agent) : 1534/1534, 0 avertissement, 0 erreur ; DLL 0.921.0.0. Non validé en jeu.

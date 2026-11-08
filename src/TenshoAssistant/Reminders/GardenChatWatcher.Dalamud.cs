@@ -31,8 +31,10 @@ internal sealed class GardenChatWatcher : IDisposable
     private DateTimeOffset chosenAt,nextPoll;
 
     /// <param name="planted">Event, seed item when known, and the place (« zone ward-plot ») when readable.</param>
-    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted)
-    {
+    // X-76 H9 (0.922): developer captures are logged in developer mode only.
+    private readonly Func<bool>? developer;
+    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<bool>? developer=null)
+    {this.developer=developer;
         this.chat=chat;this.framework=framework;this.data=data;this.client=client;this.log=log;this.enabled=enabled;this.isSeed=isSeed;this.planted=planted;
         chat.ChatMessageUnhandled+=OnMessage;
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
@@ -106,7 +108,7 @@ internal sealed class GardenChatWatcher : IDisposable
         try
         {
             var sender=message.Sender.TextValue.Trim();var text=message.Message.TextValue;
-            if(sender.Length==0 && InHousing())log.Information("Garden chat capture: [{0}] {1}",(int)message.LogKind,text);
+            if(developer?.Invoke()==true && sender.Length==0 && InHousing())log.Information("Garden chat capture: [{0}] {1}",(int)message.LogKind,text);
             if(Rules()?.Read(sender,text) is not { } found)return;
             if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted){planted(found,null,Place());return;}
             var seed=chosenSeed!=0 && DateTimeOffset.UtcNow-chosenAt<TimeSpan.FromSeconds(60) ? chosenSeed:(uint?)null;

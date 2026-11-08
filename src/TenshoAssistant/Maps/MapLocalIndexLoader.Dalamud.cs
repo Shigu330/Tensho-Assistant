@@ -99,7 +99,7 @@ internal sealed class MapLocalIndexLoader : IDisposable
             }
             catch(Exception error)
             {
-                log.Error(error,"Tensho map positions could not be built.");
+                log.Warning(error,"Tensho map positions could not be built.");
                 service.Fail(error);Stop();
             }
         }

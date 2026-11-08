@@ -8,6 +8,7 @@ internal sealed class ItemHoverReader : IDisposable
     private readonly object gate=new();private readonly Configuration configuration;private readonly ItemHoverCoordinator coordinator;
     private readonly MarketService market;private readonly ItemCatalogService items;private readonly IGameGui gui;private readonly IPlayerState player;private readonly ItemHoverService context;
     private readonly IClientState client;private readonly IFramework framework;private readonly IPluginLog log;private DateTimeOffset retryAt;private bool disposed;
+    private bool failureLogged;
     // 0.343 (I-01): Ctrl+Alt while hovering asks the price again (once per press: the keys must be released before the next one).
     public IKeyState? Keys { get; init; }
     private bool refreshHeld;
@@ -48,8 +49,10 @@ internal sealed class ItemHoverReader : IDisposable
                 else
                     try{context.SetStack(ReadStack(raw));}
                     catch(Exception error){stackFailed=true;context.SetStack(null);log.Warning(error,"Stack of the hovered item unavailable.");}
+                failureLogged=false;
             }
-            catch(Exception error){coordinator.Clear();retryAt=now.AddSeconds(5);log.Warning(error,"Item hover context unavailable; retry in five seconds.");}
+            // X-76 H9 (0.922): logged once until a read succeeds again (it was logged every 5 s).
+            catch(Exception error){coordinator.Clear();retryAt=now.AddSeconds(5);if(!failureLogged){failureLogged=true;log.Warning(error,"Item hover context unavailable; retried every five seconds, logged again only after a good read.");}}
         }
     }
     private bool stackFailed;

@@ -448,7 +448,7 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.GuideNewInstall=newInstall;
             // 0.508 (I-05): the retainer sale list. Read only while it is open; Universalis on the panel's button only.
             Market.RetainerSalesReader? retainerSales=null;
-            registrations.Register(()=>retainerSales=new Market.RetainerSalesReader(framework,gameGui,client,player,log,()=>configuration.RetainerSalesPanel),()=>retainerSales?.Dispose());
+            registrations.Register(()=>retainerSales=new Market.RetainerSalesReader(framework,gameGui,client,player,log,()=>configuration.RetainerSalesPanel,()=>configuration.DeveloperMode),()=>retainerSales?.Dispose());
             mainWindow.RetainerSalesSource=()=>retainerSales?.State ?? new(Market.RetainerSalesStatus.Closed,[],new HashSet<string>(),"",false);
             Market.RetainerCompareService? retainerCompare=null;
             registrations.Register(()=>mainWindow.RetainerCompare=retainerCompare=new Market.RetainerCompareService{Enabled=()=>configuration.CommunityUniversalis},()=>retainerCompare?.Dispose());
@@ -976,7 +976,7 @@ public sealed class Plugin : IDalamudPlugin
                         ?? throw new InvalidOperationException("Embedded garden crossbreeds are missing.");
                     using var reader=new StreamReader(stream);
                     var crosses=Reminders.GardenCrosses.Read(reader,english);
-                    if(crosses.Unmatched.Count>0)log.Information($"Garden crossbreeds: {crosses.Unmatched.Count} source names not in the English Item sheet: {string.Join(", ",crosses.Unmatched)}.");
+                    if(crosses.Unmatched.Count>0)log.Information("Garden crossbreeds: {0} source names not in the English Item sheet: {1}.",crosses.Unmatched.Count,string.Join(", ",crosses.Unmatched));
                     var items=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();
                     IReadOnlyDictionary<uint,string> names=crosses.Seeds.Concat([MainWindow.GardenTopsoil3,MainWindow.GardenTopsoil2]).Distinct().ToDictionary(id=>id,id=>items.GetRowOrDefault(id)?.Name.ExtractText() ?? "");
                     return (crosses,names);
@@ -1017,7 +1017,7 @@ public sealed class Plugin : IDalamudPlugin
             // 0.460 (DEC-027 follow-up, user request): plantings read from the chat.
             Reminders.GardenChatWatcher? gardenWatcher=null;
             registrations.Register(()=>gardenWatcher=new Reminders.GardenChatWatcher(chatGui,framework,data,client,log,()=>configuration.GardenDetect,
-                id=>mainWindow.GardenSeedCatalog?.Invoke().Any(row=>row.Item1.SeedId==id)==true,mainWindow.GardenPlanted),()=>gardenWatcher?.Dispose());
+                id=>mainWindow.GardenSeedCatalog?.Invoke().Any(row=>row.Item1.SeedId==id)==true,mainWindow.GardenPlanted,developer:()=>configuration.DeveloperMode),()=>gardenWatcher?.Dispose());
             mainWindow.SquadronTrainingName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyTraining>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.321: a failing Try On (game function moved) is logged once and its buttons turn off for the session.
             mainWindow.TryOnItem=item=>
@@ -1263,7 +1263,7 @@ public sealed class Plugin : IDalamudPlugin
             {
                 configuration.GcSupplySeen=seen;
                 try{pluginInterface.SavePluginConfig(configuration);}catch(Exception error){log.Warning(error,"Today's Grand Company request could not be saved.");}
-            }),()=>gcSupplyReader?.Dispose());
+            },developer:()=>configuration.DeveloperMode),()=>gcSupplyReader?.Dispose());
             registrations.Register(() => catalogLoader = new ItemCatalogLoader(itemCatalog, data, framework, log, dataCache),
                 () => catalogLoader?.Dispose());
             RecipeCatalogLoader? recipeLoader = null;
@@ -1461,7 +1461,7 @@ public sealed class Plugin : IDalamudPlugin
             if(brokenOverlays.Contains(name))continue;
             var started=mainWindow.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp():0;
             try{draw();}
-            catch(Exception error){brokenOverlays.Add(name);log.Error(error,$"Overlay {name} turned off until the plugin reloads (perhaps after a game update).");}
+            catch(Exception error){brokenOverlays.Add(name);log.Error(error,"Overlay {0} turned off until the plugin reloads (perhaps after a game update).",name);}
             // 0.486 (user report): the panels beside the game's windows count too, in developer mode.
             if(started!=0)mainWindow.RecordOverlayDraw(name,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);
         }
@@ -1476,7 +1476,7 @@ public sealed class Plugin : IDalamudPlugin
     private T LoadSheet<T>(string name,Func<T> read,T unavailable)
     {
         try{return read();}
-        catch(Exception error){log.Warning(error,$"Sheet {name} unavailable (perhaps after a game update); its feature stays off.");return unavailable;}
+        catch(Exception error){log.Warning(error,"Sheet {0} unavailable (perhaps after a game update); its feature stays off.",name);return unavailable;}
     }
     private readonly HashSet<string> brokenOverlays=[];
 

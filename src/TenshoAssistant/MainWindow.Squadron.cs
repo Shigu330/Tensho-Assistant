@@ -94,17 +94,20 @@ internal sealed partial class MainWindow
     /// <summary>The in-game probe: writes the raw squadron, the sheet attributes and the planner's result to the Dalamud log (English).</summary>
     private void LogSquadronProbe(SquadronRaw raw,IReadOnlyList<SquadronMember> members,SquadronMission mission,SquadronRequirement set,IReadOnlyList<SquadronParty> parties)
     {
-        log.Information($"Squadron probe: progress {raw.Progress}, current expedition {raw.CurrentExpedition}, training bonus {raw.Bonus.Physical}/{raw.Bonus.Mental}/{raw.Bonus.Tactical}.");
+        log.Information("Squadron probe: progress {0}, current expedition {1}, training bonus {2}/{3}/{4}.",raw.Progress,raw.CurrentExpedition,raw.Bonus.Physical,raw.Bonus.Mental,raw.Bonus.Tactical);
         foreach(var member in raw.Members)
         {
             var stats=members.First(planned=>planned.Slot==member.Slot).Stats;
-            log.Information($"Squadron probe: slot {member.Slot} npc {member.ENpcResidentId} race {member.Race} class {member.ClassJob} level {member.Level} exp {member.Experience} flags {member.Flags}"
-                +$" trait {member.ActiveTrait}/{member.ActiveTraitCond} inactive {member.InactiveTrait}/{member.InactiveTraitCond} sheet stats {(stats is { } known ? $"{known.Physical}/{known.Mental}/{known.Tactical}":"unknown")}.");
+            log.Information("Squadron probe: slot {0} npc {1} race {2} class {3} level {4} exp {5} flags {6} trait {7}/{8} inactive {9}/{10} sheet stats {11}.",
+                member.Slot,member.ENpcResidentId,member.Race,member.ClassJob,member.Level,member.Experience,member.Flags,member.ActiveTrait,member.ActiveTraitCond,
+                member.InactiveTrait,member.InactiveTraitCond,stats is { } known ? $"{known.Physical}/{known.Mental}/{known.Tactical}":"unknown");
         }
-        log.Information($"Squadron probe: mission {mission.Id} level {mission.Level} type {mission.Type} base {mission.PercentBase}%, set {squadronSet+1} requires {set.Required.Physical}/{set.Required.Mental}/{set.Required.Tactical}"
-            +$" (+{set.PercentPhysical}/+{set.PercentMental}/+{set.PercentTactical}, all +{set.PercentAll}).");
+        log.Information("Squadron probe: mission {0} level {1} type {2} base {3}%, set {4} requires {5}/{6}/{7} (+{8}/+{9}/+{10}, all +{11}).",
+            mission.Id,mission.Level,mission.Type,mission.PercentBase,squadronSet+1,set.Required.Physical,set.Required.Mental,set.Required.Tactical,
+            set.PercentPhysical,set.PercentMental,set.PercentTactical,set.PercentAll);
         foreach(var party in parties)
-            log.Information($"Squadron probe: party slots {string.Join(',',party.Members.Select(member=>member.Slot))} total {party.Total.Physical}/{party.Total.Mental}/{party.Total.Tactical} met {party.Met} estimate {party.Percent}%.");
+            log.Information("Squadron probe: party slots {0} total {1}/{2}/{3} met {4} estimate {5}%.",string.Join(',',party.Members.Select(member=>member.Slot)),
+                party.Total.Physical,party.Total.Mental,party.Total.Tactical,party.Met,party.Percent);
         ChatNotice?.Invoke(localization.Get("Squadron.Logged"));
     }
 }

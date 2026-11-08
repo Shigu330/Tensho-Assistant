@@ -46,6 +46,7 @@ internal sealed class MapLiveReader : IDisposable
     private readonly Dictionary<uint,(uint Set,uint[] Currents)> currents=[];
     private readonly Dictionary<uint,bool> mounts=[];
     private MapLiveState? state;private bool disposed;private DateTimeOffset retryAt;private DateTimeOffset flightAt;
+    private bool positionFailureLogged;
     private IReadOnlyDictionary<uint,MapFlightState>? flights;private int removeFlag;
     private IReadOnlyList<MapEventMarker> events=[];private DateTimeOffset eventsAt;
     private IReadOnlyList<MapObjectMarker> nearby=[];private IReadOnlyList<MapMonster> monsters=[];private IReadOnlyList<MapQuestPoint>? questPoints;
@@ -227,8 +228,10 @@ internal sealed class MapLiveReader : IDisposable
             var inCombat=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             var inDuty=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty56];
             Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName,monsters,discoveryMap,undiscovered,questPoints));
+            positionFailureLogged=false;
         }
-        catch(Exception error){Volatile.Write(ref state,null);retryAt=now.AddSeconds(5);log.Warning(error,"Map position unavailable; retry in five seconds.");}
+        // X-76 H9 (0.922): logged once until a read succeeds again (it was logged every 5 s).
+        catch(Exception error){Volatile.Write(ref state,null);retryAt=now.AddSeconds(5);if(!positionFailureLogged){positionFailureLogged=true;log.Warning(error,"Map position unavailable; retried every five seconds, logged again only after a good read.");}}
     }
     // Parts whose read failed, logged once each (the reads repeat every half second or two seconds).
     private readonly HashSet<string> failedReads=[];
