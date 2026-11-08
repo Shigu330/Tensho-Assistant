@@ -11,6 +11,7 @@ def key(f):return f"{f['Kind']}:{f['Subject']}:{f['Detail']}:{f['Territory']}:{f
 def when(text):return datetime.fromisoformat(text.replace("Z","+00:00"))
 def valid(f):
     try:
+        f.pop("Key",None)  # computed by the plugin (DiscoveryFact.Key): written in its files, recomputed here
         if set(f)-FIELDS or f["Kind"] not in KINDS or f["Subject"]<=0:return False
         if f["Kind"] in PLACED and f["Map"]==0:return False
         if not all(math.isfinite(f[n]) and abs(f[n])<=10000 for n in ("X","Z")):return False
@@ -28,7 +29,7 @@ def read(path):
 def from_gist(reference):
     """0.883: a gist id or URL (from a « Discoveries: <login> » issue), read through the GitHub CLI; the file is base64 of gzip of JSON."""
     import base64,gzip,subprocess
-    gist=reference.rstrip("/").split("/")[-1]
+    gist=reference.removeprefix("gist:").rstrip("/").split("/")[-1]
     raw=subprocess.run(["gh","api",f"gists/{gist}","--jq",'.files["tensho-discoveries.b64"].raw_url'],capture_output=True,text=True,check=True).stdout.strip()
     text=subprocess.run(["gh","api",raw],capture_output=True,text=True,check=True).stdout if raw.startswith("https://api.") else __import__("urllib.request").request.urlopen(raw).read().decode()
     data=gzip.decompress(base64.b64decode(text.strip()))

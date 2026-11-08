@@ -22,7 +22,9 @@ internal static class CommunityDiscoveries882Tests
                 Check(CommunityDiscoveries.Parse(text) is { Facts.Count:1 },"round trip");
             }
             finally{File.Delete(path);}
-            Check(CommunityDiscoveries.Parse(File.ReadAllText(Path.GetFullPath("community-discoveries/discoveries.json"))) is { Facts.Count:0 },"common file");
+            // 0.884: the first shared gist (#43) merged: the common file parses and only holds imported facts.
+            Check(CommunityDiscoveries.Parse(File.ReadAllText(Path.GetFullPath("community-discoveries/discoveries.json"))) is { Facts.Count:>0 } common
+                && common.Facts.All(fact=>fact.Seen==0 && fact.Imported>0 && DiscoveryStore.Valid(fact)),"common file");
             Check(CommunityDiscoveries.Address.StartsWith("https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/",StringComparison.Ordinal),"read from main");
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Discoveries.cs"));
             Check(page.Contains("if(ImGui.SmallButton(localization.Get(\"DiscoveriesUi.TakeCommon\")))") && page.Contains("Dalamud.Utility.Util.OpenLink(CommunityDiscoveries.IssueAddress);"),"on clicks only");
