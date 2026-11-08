@@ -584,6 +584,8 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
+    "SummaryBlueSpellCaster": "Monsters seen casting a blue spell: {0} ({1} seen by you, {2} imported only)",
+    "SpellCaster": "{1} seen casting {0}",
     "SummaryFishTransition": "Fish and the weather before: {0} ({1} seen by you, {2} imported only)",
     "SummaryFishLure": "Fish caught with a lure: {0} ({1} seen by you, {2} imported only)",
     "SummaryNpcPlace": "Shopkeepers placed: {0} ({1} seen by you, {2} imported only)",
@@ -5607,6 +5609,8 @@
     "Roulette": "duty roulette"
   },
   "BlueSpellSources": {
+    "Seen": "Seen by you",
+    "SeenLine": "{0} (level {1}): seen casting it or taught it",
     "AboveTip": "The Blue Mage job icon above the head of a nearby monster that teaches a spell you lack, in the game's view. Same setting as the map's.",
     "NearbyTip": "Nearby monsters that teach a spell you have not learned, on the Tensho map, according to the wiki pages read below. Same setting as the map's.",
     "AlwaysTip": "Whatever the job worn; otherwise only as Blue Mage.",

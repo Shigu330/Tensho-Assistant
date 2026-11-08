@@ -25,7 +25,10 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     NpcPlace=19,
     // X-75.3 (0.877): FishLure: Subject = fish, Detail = 1 Ambitious / 2 Modest lure on the cast that caught it; FishTransition: Subject = fish, Detail = the
     // weather of the previous period (the game's forecast 1400 s earlier), levels = Eorzea minutes. Seen with, never « required ».
-    FishLure=20, FishTransition=21 }
+    FishLure=20, FishTransition=21,
+    // X-75.4 (0.878): BlueSpellCaster: Subject = AozAction row, Detail = the BNpcName seen casting its action (cast bar), with its place, levels = the caster's level.
+    // « Seen casting », not « teaches »: some casters do not teach it.
+    BlueSpellCaster=22 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported
@@ -189,7 +192,7 @@ public sealed class DiscoveryStore
     /// <summary>What an imported fact must hold: a known kind, a subject and a map, finite places in their cell, levels and dates that make sense.</summary>
     /// <summary>X-74 (0.860): the kinds that hold a place (a map); the others are about items and sources only.</summary>
     public static bool HasPlace(DiscoveryKind kind)=>kind is DiscoveryKind.MonsterPlace or DiscoveryKind.HuntMarkPlace or DiscoveryKind.FateSeen or DiscoveryKind.MonsterDrop or DiscoveryKind.FishCatch
-        or DiscoveryKind.NpcPlace;
+        or DiscoveryKind.NpcPlace or DiscoveryKind.BlueSpellCaster;
     public static bool Valid(DiscoveryFact? fact)=>fact is not null && Enum.IsDefined(fact.Kind) && fact.Subject!=0 && (fact.Map!=0 || !HasPlace(fact.Kind))
         && float.IsFinite(fact.X) && float.IsFinite(fact.Z) && Math.Abs(fact.X)<=10_000 && Math.Abs(fact.Z)<=10_000 && Cell(fact.X,fact.Z)==(fact.CellX,fact.CellZ)
         && fact.LevelMin is >= 0 and <= 100_000 && fact.LevelMax is >= 0 and <= 100_000 && fact.LevelMin<=Math.Max(fact.LevelMin,fact.LevelMax)

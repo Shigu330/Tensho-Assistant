@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.878.0
+- Plan global, Verify : Demande (X-75.4) : le mage bleu appris en jeu va plus loin. Un monstre vu en train de lancer (barre d'incantation) l'action d'un sort de mage bleu est noté avec son niveau et son lieu, une fois par incantation, quel que soit votre job, même pour un sort pas encore appris. La fenêtre d'un sort montre d'abord « Vu par vous » : les monstres vus le lancer ou dont vous l'avez appris, avec leurs niveaux et lieux, avant la liste du wiki. « Vu le lancer » ne veut pas dire qu'il l'enseigne. Non validé en jeu.
+- Tests : BlueCasters878Tests. Verify.ps1 (agent) : 1465/1465, 0 avertissement, 0 erreur ; DLL 0.878.0.0. Non validé en jeu.
+### English
+- Request (X-75.4): blue magic learned in game goes further. A monster seen casting (cast bar) a blue spell's action is noted with its level and place, once per cast, whatever your job, even for a spell not learned yet. A spell's window first shows « Seen by you »: the monsters seen casting it or that you learned it from, with their levels and places, before the wiki's list. « Seen casting » does not mean it teaches it. Not validated in game.
+
 ## 0.877.0
 - Plan global, Verify : Demande (X-75.3) : la pêche apprise en jeu se complète. Une prise au mooch est maintenant notée avec le poisson pris juste avant (et non l'appât en main) ; un leurre ambitieux ou modeste est noté ; la météo de la période précédente (prévision du jeu) est notée avec la prise. Dans le panneau de pêche, la ligne d'un poisson montre « vu » et son détail « Vu par vous (×N) : appât ou mooch …, après …, par …, heures ET, leurre » : ce que vous avez vu, jamais présenté comme une condition. Ajout noté à X-76 : un réglage unique qui coupe toutes les sources hors jeu, et vider le cache et les découvertes avec une sauvegarde avant. Non validé en jeu.
 - Tests : Fishing877Tests. Verify.ps1 (agent) : 1464/1464, 0 avertissement, 0 erreur ; DLL 0.877.0.0. Non validé en jeu.

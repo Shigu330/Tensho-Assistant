@@ -54,6 +54,26 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     /// <summary>X-75.3 (0.877): the weather of the period before (territory, moment), from the game's forecast; 0 when not known.</summary>
     public Func<uint,DateTimeOffset,uint>? PreviousWeather { get; set; }
     private uint lastFish;
+    /// <summary>X-75.4 (0.878): the AozAction row of an action id (0: not a blue spell); battle NPCs casting one are noted once per cast.</summary>
+    public Func<uint,uint>? BlueSpellOfAction { get; set; }
+    private readonly Dictionary<ulong,uint> castsSeen=[];
+    private void ReadCasters(DateTimeOffset at,uint territory,uint map)
+    {
+        if(BlueSpellOfAction is not { } spellOf || map==0)return;
+        var casting=new HashSet<ulong>();
+        foreach(var actor in objects)
+        {
+            if(actor is not IBattleNpc { BattleNpcKind:BattleNpcSubKind.Combatant,IsCasting:true,NameId:not 0 } npc || casting.Count>=64)continue;
+            casting.Add(npc.GameObjectId);
+            var action=npc.CastActionId;
+            if(castsSeen.GetValueOrDefault(npc.GameObjectId)==action)continue;
+            castsSeen[npc.GameObjectId]=action;
+            if(spellOf(action) is not (> 0 and var spell))continue;
+            store.SeeSource(DiscoveryKind.BlueSpellCaster,spell,npc.NameId,npc.Level,at,territory,map,npc.Position);
+            if(debug())log.Information("Discovery: monster {0} casting blue spell {1}.",npc.NameId,spell);
+        }
+        foreach(var gone in castsSeen.Keys.Where(id=>!casting.Contains(id)).ToArray())castsSeen.Remove(gone);
+    }
     private IReadOnlySet<uint>? vistasBefore;private int festivalDay=-1;private long festivalsAt=-100_000;
     private void ReadSeasonal(DateTimeOffset at,long now)
     {
@@ -132,7 +152,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             if(wanted.ItemSources)
             {
                 ReadSalvage(at);ReadVenture(at);ReadLoot(at,territory,duty);
-                ReadFate(now);ReadTarget(now,territory,map);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);ReadShopNpc(at,territory,map);
+                ReadFate(now);ReadTarget(now,territory,map);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);ReadShopNpc(at,territory,map);ReadCasters(at,territory,map);
             }
             var counts=Counts();
             if(before is null){before=counts;return;}

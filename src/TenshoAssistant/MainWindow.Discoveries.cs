@@ -101,7 +101,8 @@ internal sealed partial class MainWindow
         if(item==0 || DiscoveryStore is not { } store || !DiscoveriesLoaded)return [];
         if(discoveredSources.Item==item && discoveredSources.Revision==store.Revision)return discoveredSources.Lines;
         var lines=ItemSourceKinds.Where(kind=>kind is not (DiscoveryKind.FishCondition or DiscoveryKind.FestivalSeen or DiscoveryKind.VistaSeen or DiscoveryKind.VoyageUnlock
-                or DiscoveryKind.BlueSpellLearned or DiscoveryKind.BeastTamed or DiscoveryKind.FashionEvaluation or DiscoveryKind.NpcPlace))
+                or DiscoveryKind.BlueSpellLearned or DiscoveryKind.BeastTamed or DiscoveryKind.FashionEvaluation or DiscoveryKind.NpcPlace or DiscoveryKind.BlueSpellCaster
+                or DiscoveryKind.FishLure or DiscoveryKind.FishTransition))
             .SelectMany(kind=>store.Find(kind,subject=>subject==item,4)).OrderByDescending(fact=>fact.Seen+fact.Imported).Take(4)
             .Select(fact=>$"{DiscoveryFactName(fact)} ({DiscoveryFactLevel(fact)}, ×{fact.Seen+fact.Imported})").ToArray();
         discoveredSources=(item,store.Revision,lines);
@@ -195,6 +196,7 @@ internal sealed partial class MainWindow
         DiscoveryKind.MonsterDrop=>localization.Format("DiscoveriesUi.FromMonster",DiscoveryItemName(fact.Subject),DiscoveryMonsterName(fact.Detail)),
         DiscoveryKind.ItemFromItem=>localization.Format("DiscoveriesUi.FromItem",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
         DiscoveryKind.FishCatch=>localization.Format("DiscoveriesUi.FromBait",DiscoveryItemName(fact.Subject),fact.Detail==0 ? "?":DiscoveryItemName(fact.Detail)),
+        DiscoveryKind.BlueSpellCaster=>localization.Format("DiscoveriesUi.SpellCaster",DiscoveryNamed(SpellName,fact.Subject),DiscoveryMonsterName(fact.Detail)),
         DiscoveryKind.BlueSpellLearned=>localization.Format("DiscoveriesUi.SpellFrom",DiscoveryNamed(SpellName,fact.Subject),fact.Detail==0 ? "?":DiscoveryMonsterName(fact.Detail)),
         DiscoveryKind.BeastTamed=>localization.Format("DiscoveriesUi.BeastFrom",DiscoveryNamed(BeastName,fact.Subject),fact.Detail==0 ? "?":DiscoveryMonsterName(fact.Detail)),
         DiscoveryKind.FestivalSeen=>localization.Format("DiscoveriesUi.FestivalSeen",fact.Subject,fact.Detail),

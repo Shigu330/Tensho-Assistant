@@ -584,6 +584,8 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "SummaryBlueSpellCaster": "Monstres vus lançant un sort de mage bleu : {0} ({1} vus par vous, {2} importés seulement)",
+    "SpellCaster": "{1} vu lançant {0}",
     "SummaryFishTransition": "Poissons et météo précédente : {0} ({1} vus par vous, {2} importés seulement)",
     "SummaryFishLure": "Poissons pris au leurre : {0} ({1} vus par vous, {2} importés seulement)",
     "SummaryNpcPlace": "Marchands placés : {0} ({1} vus par vous, {2} importés seulement)",
@@ -5607,6 +5609,8 @@
     "Roulette": "mission aléatoire"
   },
   "BlueSpellSources": {
+    "Seen": "Vu par vous",
+    "SeenLine": "{0} (niveau {1}) : vu le lancer ou l'a appris",
     "AboveTip": "L'icône du mage bleu au-dessus de la tête d'un monstre proche qui apprend un sort que vous n'avez pas, dans la vue du jeu. Même réglage que celui de la carte.",
     "NearbyTip": "Les monstres proches qui apprennent un sort que vous n'avez pas, sur la carte Tensho, selon les pages du wiki lues ci-dessous. Même réglage que celui de la carte.",
     "AlwaysTip": "Quel que soit le métier porté ; sinon seulement en mage bleu.",
