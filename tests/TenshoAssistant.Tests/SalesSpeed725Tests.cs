@@ -82,7 +82,9 @@ internal static class SalesSpeed725Tests
             Check(ranked[0]==sells && ranked[1]==old && ranked[2]==unknown,"order");
             var page=Read("MainWindow.CraftFromStock.cs");
             Check(page.Contains("CraftFromStock.Ranked(rows,row=>FromStockSaleValue(row,now))") && !page.Contains("Worth(row,unit)"),"the sort counts what can sell");
-            Check(page.Contains("fromStockView=null") && page.Contains("Math.Clamp(saleDays,1,30)"),"the days apply at once");
+            // X-76 H4 (0.914): the days field is the helper shared with the currency page (MainWindow.CurrencyValue.cs).
+            var days=Read("MainWindow.CurrencyValue.cs");
+            Check(page.Contains("SaleDaysSetting(") && days.Contains("fromStockView=null") && days.Contains("Math.Clamp(saleDays,1,30)"),"the days apply at once");
             var service=Read("Market/MarketService.cs");
             Check(service.Contains("MarketQuote.Parse(json,world,id,at).WithSpeed(speed)") && service.Contains(".WithSpeed(await SpeedAsync(world,[itemId],token)"),"both requests");
             Check(service.Contains("if(ServerPause((int)response.StatusCode,response.Headers.RetryAfter?.Delta) is { } room)") && !service.Contains("universalis-aggregated-v3"),"pause kept, older copies refetched");

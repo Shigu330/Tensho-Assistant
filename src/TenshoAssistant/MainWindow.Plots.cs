@@ -44,7 +44,7 @@ internal sealed partial class MainWindow
         var size=configuration.PlotWatchSize;
         ImGui.SetNextItemWidth(160);
         if(ImGui.Combo(localization.Get("Plots.Size")+"###PlotSize",ref size,[localization.Get("Plots.AnySize"),PlotSize(0),PlotSize(1),PlotSize(2)],4))
-        {configuration.PlotWatchSize=size;try{save();}catch(Exception failure){log.Warning(failure,"Plot watch size could not be saved.");}}
+            SaveSetting("PlotWatchSize",()=>configuration.PlotWatchSize,value=>configuration.PlotWatchSize=value,size);
         Tip("Plots.SizeTip");
         var state=paissa.State;
         ImGui.BeginDisabled(world.WorldId==0 || state.Loading);

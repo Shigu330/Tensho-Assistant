@@ -39,10 +39,7 @@ internal sealed partial class MainWindow
                 var memories=configuration.CollectionMemories??=[];
                 if(!memories.TryGetValue(state.CharacterId,out var read))memories[state.CharacterId]=read=new();
                 if(CollectionRecent.Update(read,state.Entries,DateTimeOffset.UtcNow))
-                {
-                    try{save();saveError=null;}
-                    catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Recently obtained could not be saved.");}
-                }
+                    TrySave("Recently obtained");
             }
         }
         if(configuration.CollectionMemories?.GetValueOrDefault(state.CharacterId) is not {Recent.Count:>0} memory)return;

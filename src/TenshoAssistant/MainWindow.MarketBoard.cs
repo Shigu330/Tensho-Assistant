@@ -20,9 +20,8 @@ internal sealed partial class MainWindow
     private void ChooseMarketScope(MarketScope scope)
     {
         if(configuration.MarketBoardScope==scope)return;
-        // Applied at once; when saving fails the choice lasts until the plugin is reloaded, as before e).
-        configuration.MarketBoardScope=scope;
-        try{save();}catch(Exception error){log.Warning(error,"Market scope could not be saved.");}
+        // X-76 H3 (0.914): the shared save; the previous scope comes back when saving fails (it lasted until the plugin was reloaded).
+        SaveSetting("MarketBoardScope",()=>configuration.MarketBoardScope,value=>configuration.MarketBoardScope=value,scope);
     }
     private int marketQuality,marketMinQuantity,marketMaxQuantity,marketMinPrice,marketMaxPrice,marketWanted;
     private string marketWorld="";

@@ -4893,7 +4893,8 @@
     "SourceReference": "Référence source : {0}"
   },
   "Common": {
-    "SaveError": "Échec de sauvegarde. Réessayez ; les détails sont dans le journal Dalamud."
+    "SaveError": "Échec de sauvegarde. Réessayez ; les détails sont dans le journal Dalamud.",
+    "Dismiss": "Masquer ce message"
   },
   "CraftDebug": {
     "Flags": "Drapeaux état 0x{0:X8} · synthèse 0x{1:X2}",

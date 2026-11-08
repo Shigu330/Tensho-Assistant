@@ -251,3 +251,8 @@ Ranked X-76 plan: 10 harmonisation versions (2b), 10 parser items (2c) and 4 ext
   on a greyed control are fixed, and a few more by the same change); the 12 BeginTooltip blocks share one wrap width; the two server-bar tooltips share
   their placement; one help marker (icon). Kept: composite tooltips and about 95 computed-text tooltips (their text is built only on hover). The test of
   setting tooltips now checks every Tip/HelpMarker key exists in English and French (667 keys, none missing).
+- 0.914: H3 + H4. One save path for settings (TrySave in SettingRow.cs, UI/SettingSave.cs testable): a failed save restores the previous value, logs
+  once and shows one error line in the main window's footer (with a hide button; the map layers popup, a separate window, keeps its own). Alarm options
+  are now edited on a copy, so a failed save really restores them (the restore used the same object before). IntSetting restores too. Sliders and number
+  fields (gear, wear, alarm bar, command delay, map settings, macro copy, sale days) change live but write the file only when the edit ends or when no
+  control is held (map settings: colour pickers make « edit ended » unreliable), no more disk write per frame or per key. One sale-days editor.

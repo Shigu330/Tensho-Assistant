@@ -290,9 +290,5 @@ internal sealed partial class MainWindow
         =>ReminderCounts.Todo(ReminderDoneAt,configuration.ReminderBarHidden,now).Select(row=>localization.Get("Reminders."+row))
             .Concat(PersonalTasks.Pending(configuration.PersonalTasks,now).Select(task=>task.Name)).ToArray();
 
-    private void SaveReminders()
-    {
-        try{save();saveError=null;}
-        catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Reminders could not be saved.");}
-    }
+    private void SaveReminders()=>TrySave("Reminders");
 }

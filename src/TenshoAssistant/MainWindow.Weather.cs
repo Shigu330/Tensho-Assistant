@@ -19,6 +19,14 @@ internal sealed partial class MainWindow
     // 0.563 (C31): several zones in one table, computed once per period (1 400 s), not at each frame.
     private const int WeatherFavoritePeriods=6,WeatherFavoriteZones=12;
     private long weatherFavoritesPeriod=-1;private readonly Dictionary<uint,IReadOnlyList<WeatherPeriod>> weatherFavoritesGrid=[];
+    // X-76 H3 (0.914): the zone shown added to or removed from the table; undone when saving fails (it was only logged).
+    private void ToggleWeatherFavorite(Dictionary<uint,string> favorites,bool kept)
+    {
+        var territory=weatherTerritory;var zone=weatherZone;var removed=favorites.GetValueOrDefault(territory) ?? zone;
+        if(kept)favorites.Remove(territory);else favorites[territory]=zone;
+        weatherFavoritesPeriod=-1;
+        TrySave("Weather zones",()=>{if(kept)favorites[territory]=removed;else favorites.Remove(territory);});
+    }
     private void DrawWeatherFavorites(WeatherCatalog catalog)
     {
         var favorites=configuration.WeatherFavorites;
@@ -30,9 +38,7 @@ internal sealed partial class MainWindow
                 if(ImGui.SmallButton(localization.Get(kept ? "Weather.FavoriteRemove":"Weather.FavoriteAdd")+"##WeatherFavorite"))
                 {
                     favorites=configuration.WeatherFavorites??=[];
-                    if(kept)favorites.Remove(weatherTerritory);else favorites[weatherTerritory]=weatherZone;
-                    weatherFavoritesPeriod=-1;
-                    try{save();}catch(Exception error){log.Warning(error,"Could not save the weather zones.");}
+                    ToggleWeatherFavorite(favorites,kept);
                 }
                 Tip("Weather.FavoriteTip");
             }

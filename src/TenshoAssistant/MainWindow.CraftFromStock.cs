@@ -109,15 +109,7 @@ internal sealed partial class MainWindow
         ImGui.Checkbox(localization.Get("CurrencyValue.Market")+"###FromStockMarket",ref fromStockPricesOn);
         Tip("CraftStock.MarketTip");
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(70*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
-        var saleDays=FromStockDays;
-        if(ImGui.InputInt(localization.Get("CraftStock.SaleDays")+"###FromStockDays",ref saleDays,0))
-        {
-            configuration.CraftStockSaleDays=Math.Clamp(saleDays,1,30);
-            fromStockView=null;
-            try{save();}catch(Exception error){log.Warning(error,"Sale days could not be saved.");}
-        }
-        Tip("CraftStock.SaleDaysTip");
+        SaleDaysSetting("FromStockDays","CraftStock.SaleDaysTip");
         if(!fromStockPricesOn){if(fromStockPrices.State.Loading)fromStockPrices.Cancel();return;}
         var prices=fromStockPrices.State;var world=market.State.WorldId;var character=bankBridge.State.CharacterId;var now=DateTimeOffset.UtcNow;var items=itemCatalog.State.Catalog;
         var marketable=all.Where(row=>items?.Find(row.Recipe.ResultItemId) is { IsMarketable:true }).Select(row=>row.Recipe.ResultItemId).Distinct().Count();

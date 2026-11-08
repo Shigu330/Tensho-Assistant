@@ -74,6 +74,12 @@ public sealed class AlarmSettings
     // 0.371 (g, M-01): automatic alarms at the ventures' end and the vessels' return (user's choice: on by default).
     public bool AutoAlarms { get; set; } = true;
 
+    /// <summary>
+    /// X-76 H3 (0.914): a separate copy with every field (all are values). The settings page edits the copy and saves it, so the saved
+    /// object stays untouched and a failed save puts it back as it was.
+    /// </summary>
+    public AlarmSettings Copy() => (AlarmSettings)MemberwiseClone();
+
     /// <summary>Whether a ringing Tensho alarm plays its sound: not in a duty while MuteInDuties is on.</summary>
     public bool SoundAllowed(bool inDuty) => PlaySound && !(MuteInDuties && inDuty);
     /// <summary>Whether it writes its [Tensho] chat line: not in a duty when MuteInDuties and MuteChatInDuties are both on.</summary>

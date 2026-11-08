@@ -54,11 +54,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
     }
 
-    private void SaveClocks()
-    {
-        try{save();saveError=null;}
-        catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Clocks could not be saved.");}
-    }
+    private void SaveClocks()=>TrySave("Clocks");
 
     // Manual one-off alarm at a real local date, beside the manual ET alarm.
     // 0.577 (T0): how the alarm with a real date repeats.

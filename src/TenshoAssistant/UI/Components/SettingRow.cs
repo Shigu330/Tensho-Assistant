@@ -34,18 +34,94 @@ internal sealed partial class MainWindow
 
     /// <summary>
     /// A saved whole-number setting (0.321): field without +/- buttons, value bounded as typed and kept in memory, saved once when the
-    /// field is left after an edit (no disk write per key press), tooltip and « ↺ » to the default.
+    /// field is left after an edit (no disk write per key press), tooltip and « ↺ » to the default. X-76 H3 (0.914): the value the field
+    /// had when the edit began comes back when saving fails.
     /// </summary>
     private void IntSetting(string labelKey,string tipKey,Func<int> read,Action<int> write,int min,int max,int fallback,float width=130)
     {
-        var value=read();
+        var before=read();var value=before;
         ImGui.SetNextItemWidth(width);
         if(ImGui.InputInt(localization.Get(labelKey)+"###"+labelKey,ref value,0))write(Math.Clamp(value,min,max));
-        if(ImGui.IsItemDeactivatedAfterEdit())
-            try{save();saveError=null;}
-            catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Setting {Setting} could not be saved.",labelKey);}
+        SaveWhenEditEnds(labelKey,write,before);
         Tip(tipKey);
         if(DefaultButton(labelKey,read()!=fallback))SaveSetting(labelKey,read,write,fallback);
+    }
+
+    /// <summary>
+    /// X-76 H4 (0.914): a saved whole-number setting on a slider. The value follows the drag in memory (what it changes is seen at once)
+    /// and the settings file is written once, when the slider is released after a change (no disk write per frame); tooltip and « ↺ ».
+    /// </summary>
+    private void SliderSetting(string labelKey,string tipKey,Func<int> read,Action<int> write,int min,int max,int fallback,string format="%d",float width=160)
+    {
+        var before=read();var value=Math.Clamp(before,min,max);
+        ImGui.SetNextItemWidth(width);
+        if(ImGui.SliderInt(localization.Get(labelKey)+"###"+labelKey,ref value,min,max,format))write(value);
+        SaveWhenEditEnds(labelKey,write,before);
+        Tip(tipKey);
+        if(DefaultButton(labelKey,read()!=fallback))SaveSetting(labelKey,read,write,fallback);
+    }
+
+    /// <summary>X-76 H4 (0.914): the same slider for a decimal setting.</summary>
+    private void SliderSetting(string labelKey,string tipKey,Func<float> read,Action<float> write,float min,float max,float fallback,string format="%.2f",float width=160)
+    {
+        var before=read();var value=Math.Clamp(float.IsFinite(before) ? before:fallback,min,max);
+        ImGui.SetNextItemWidth(width);
+        if(ImGui.SliderFloat(localization.Get(labelKey)+"###"+labelKey,ref value,min,max,format))write(value);
+        SaveWhenEditEnds(labelKey,write,before);
+        Tip(tipKey);
+        if(DefaultButton(labelKey,read()!=fallback))SaveSetting(labelKey,read,write,fallback);
+    }
+
+    // X-76 H3/H4 (0.914): how to put back the value a number field or slider had when its edit began (one control is active at a
+    // time); used when saving the finished edit fails.
+    private Action? editRollback;
+
+    /// <summary>
+    /// Called right after a number control that writes its value in memory as it changes: remembers the value it started from when it
+    /// becomes active, and saves once when it is left after an edit, putting that value back if saving fails.
+    /// </summary>
+    private void SaveWhenEditEnds<T>(string what,Action<T> write,T before)
+    {
+        if(ImGui.IsItemActivated())editRollback=Restore(write,before);
+        if(!ImGui.IsItemDeactivatedAfterEdit())return;
+        var rollback=editRollback ?? UI.SettingSave.Keep;editRollback=null;
+        TrySave(what,rollback);
+    }
+
+    // Built only when an edit begins or a value is saved, not every frame.
+    private static Action Restore<T>(Action<T> write,T value)=>()=>write(value);
+
+    /// <summary>
+    /// X-76 H3 (0.914): every save made from this window goes through here. When saving fails the rollback puts the previous value
+    /// back in memory, the warning names what was saved (once per failure) and the window's footer shows the error; true when saved.
+    /// </summary>
+    private bool TrySave(string what,Action rollback)
+    {
+        if(UI.SettingSave.Run(save,rollback) is not { } error){saveError=null;return true;}
+        saveError=localization.Get("Common.SaveError");
+        log.Warning(error,"{What} could not be saved.",what);
+        return false;
+    }
+
+    /// <summary>The same when nothing is to be put back: the value stays in memory and the next save that works writes it.</summary>
+    private bool TrySave(string what)=>TrySave(what,UI.SettingSave.Keep);
+
+    /// <summary>
+    /// X-76 H3 (0.914): the one place the main window shows saveError, in its footer whatever the page, with a button that hides it;
+    /// false when there is nothing to show (the footer then shows its usual line).
+    /// </summary>
+    private bool DrawSaveError()
+    {
+        if(saveError is not { } failed)return false;
+        ImGui.PushFont(UiBuilder.IconFont);
+        bool hide;
+        try{hide=ImGui.SmallButton(FontAwesomeIcon.Times.ToIconString()+"###HideSaveError");}
+        finally{ImGui.PopFont();}
+        Tip("Common.Dismiss");
+        ImGui.SameLine();
+        ImGui.TextColored(Error,failed);
+        if(hide)saveError=null;
+        return true;
     }
 
     private static readonly MapViewSettings MapDefaults=new();
@@ -80,8 +156,7 @@ internal sealed partial class MainWindow
     private void SaveSetting<T>(string labelKey,Func<T> read,Action<T> write,T value)
     {
         var previous=read();write(value);
-        try{save();saveError=null;}
-        catch(Exception error){write(previous);saveError=localization.Get("Common.SaveError");log.Warning(error,"Setting {Setting} could not be saved.",labelKey);}
+        TrySave(labelKey,Restore(write,previous));
     }
 }
 
@@ -114,9 +189,8 @@ internal sealed partial class MainWindow
             foreach(var property in properties)property.SetValue(configuration,property.GetValue(fresh));
             (configuration.Discord??=new()).WebhookUrl=webhook;
             configuration.Discord.CategoryUrls=categoryWebhooks;
-            try
+            if(TrySave("Default settings",()=>{foreach(var (property,value) in previous)property.SetValue(configuration,value);}))
             {
-                save();saveError=null;
                 discordUrlEdit=null;discordNameEdit=null;discordTemplateEdit=null;discordRoleEdit=null;discordGroupEdits.Clear();
                 discordNotifier?.Clear();
                 // 0.330 (audit): macro text prepared with the old export options (echo, wait, chaining) is dropped, as the single rows do,
@@ -126,11 +200,6 @@ internal sealed partial class MainWindow
                 // 0.331 (audit): the running developer mode follows the restored setting (Diagnostics, IDs, capture logs, translation keys),
                 // as the developer checkbox does; it was cached once at start.
                 developerMode=configuration.DeveloperMode;if(!developerMode)localization.ShowKeys=false;
-            }
-            catch(Exception error)
-            {
-                foreach(var (property,value) in previous)property.SetValue(configuration,value);
-                saveError=localization.Get("Common.SaveError");log.Warning(error,"Default settings could not be saved.");
             }
         }
         ImGui.SameLine();

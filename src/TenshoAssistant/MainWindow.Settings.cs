@@ -35,7 +35,14 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.EndTabBar();}
         }
-        if(saveError is not null)ImGui.TextWrapped(saveError);
+    }
+
+    // X-76 H4 (0.914): the macro copy settings as saved before the edit not written yet; they come back when saving it fails.
+    private TenshoAssistant.Macros.MacroCopySettings? macroCopySaved;
+    private void SaveMacroCopy()
+    {
+        var previous=macroCopySaved!;macroCopySaved=null;
+        TrySave("Macro copy settings",()=>configuration.MacroCopy=previous);
     }
 
     private void SettingsTab(string key,Action draw)
@@ -77,14 +84,8 @@ internal sealed partial class MainWindow
                         var previousLanguage = configuration.LanguageCode;
                         configuration.LanguageCode = language.Code;
                         localization.SetLanguage(language.Code);
-                        try { save(); saveError = null; }
-                        catch (Exception error)
-                        {
-                            configuration.LanguageCode = previousLanguage;
-                            localization.SetLanguage(languageCode);
-                            saveError = localization.Get("Common.SaveError");
-                            log.Warning(error, "Could not save localization preference.");
-                        }
+                        // The error text is read after the rollback, in the language put back.
+                        TrySave("Language", () => { configuration.LanguageCode = previousLanguage; localization.SetLanguage(languageCode); });
                     }
             }
             finally { ImGui.EndCombo(); }
@@ -227,10 +228,11 @@ internal sealed partial class MainWindow
             if(copyChanged)
             {
                 start=Math.Clamp(start,0,99);end=Math.Clamp(end,start,99);
-                var previous=configuration.MacroCopy;
+                // X-76 H4 (0.914): applied at once, written once no field is being typed in any more (it was written on every key press).
+                macroCopySaved??=configuration.MacroCopy;
                 configuration.MacroCopy=new(){Book=book,Start=start,End=end,Prefix=prefix.Trim(),OverwriteAny=any,Chain=chain};
-                try{save();}catch(Exception error){configuration.MacroCopy=previous;log.Warning(error,"Macro copy settings could not be saved.");}
             }
+            if(macroCopySaved is not null && !ImGui.IsAnyItemActive())SaveMacroCopy();
             ImGui.TextDisabled(localization.Get("ModuleSettings.MacroCopyHelp"));
         }
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("Alarms.SettingsTitle"),ImGuiTreeNodeFlags.DefaultOpen))DrawAlarmSettings();
@@ -330,15 +332,7 @@ internal sealed partial class MainWindow
         configuration.Observations ??= new();
         var hadPrevious=configuration.Observations.TryGetValue(id,out var previous);
         configuration.Observations[id]=value;
-        try { save();saveError=null; }
-        catch(Exception error)
-        {
-            if(hadPrevious)configuration.Observations[id]=previous;
-            else configuration.Observations.Remove(id);
-            saveError=localization.Get("Common.SaveError");
-            log.Warning(error,"Could not save observation preference {Observation}",id);
-            return;
-        }
+        if(!TrySave("Observation "+id,()=>{if(hadPrevious)configuration.Observations[id]=previous;else configuration.Observations.Remove(id);}))return;
         apply(value);
     }
 
@@ -360,14 +354,11 @@ internal sealed partial class MainWindow
         var hadPrevious=observations.TryGetValue("Gathering",out var previous);var previousPanel=configuration.GatheringPanel;
         if(observe is { } wanted)observations["Gathering"]=wanted;
         if(panel is { } shown)configuration.GatheringPanel=shown;
-        try{save();saveError=null;}
-        catch(Exception error)
+        if(!TrySave("Gathering observation and help",()=>
         {
             if(hadPrevious)observations["Gathering"]=previous;else observations.Remove("Gathering");
             configuration.GatheringPanel=previousPanel;
-            saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save the gathering observation and help.");
-            return;
-        }
+        }))return;
         ApplyGatheringObservation();
     }
 

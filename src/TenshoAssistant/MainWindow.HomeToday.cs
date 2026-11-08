@@ -77,9 +77,5 @@ internal sealed partial class MainWindow
         finally{ImGui.EndPopup();}
     }
 
-    private void SaveHome()
-    {
-        try{save();saveError=null;}
-        catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Home choices could not be saved.");}
-    }
+    private void SaveHome()=>TrySave("Home choices");
 }

@@ -89,13 +89,7 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(localization.Get("GpUi.ForbiddenHelp"));
         if(gpActions.State.Catalog is not { } catalog){ImGui.TextDisabled(localization.Get("GatheringPanel.NoPlan"));return;}
         // 0.728 (user request).
-        var highlight=configuration.GatheringNextHighlight;
-        if(ImGui.Checkbox(localization.Get("GatheringPanel.NextHighlight")+"###GatheringNextHighlight",ref highlight))
-        {
-            configuration.GatheringNextHighlight=highlight;
-            try{save();}catch(Exception error){log.Warning(error,"The hotbar highlight setting could not be saved.");}
-        }
-        Tip("GatheringPanel.NextHighlightTip");
+        BoolSetting("GatheringPanel.NextHighlight","GatheringPanel.NextHighlightTip",()=>configuration.GatheringNextHighlight,value=>configuration.GatheringNextHighlight=value,c=>c.GatheringNextHighlight);
         var changed=false;
         foreach(var (key,miner,botanist) in GpActionRules.Groups(catalog))
         {
@@ -115,10 +109,15 @@ internal sealed partial class MainWindow
         }
         if(forbidden.Count>0 && ImGui.SmallButton(localization.Get("GpUi.ForbiddenClear"))){forbidden.Clear();changed=true;}
         if(!changed)return;
+        SaveForbiddenGatheringActions(forbidden.Order(StringComparer.Ordinal).ToList());
+    }
+
+    // X-76 H3 (0.914): the previous list comes back when saving fails.
+    private void SaveForbiddenGatheringActions(List<string> next)
+    {
         var previous=configuration.GpForbiddenActions;
-        configuration.GpForbiddenActions=forbidden.Order(StringComparer.Ordinal).ToList();
+        configuration.GpForbiddenActions=next;
         gpResult=null;gatheringPanelKey=null;
-        try{save();saveError=null;}
-        catch(Exception error){configuration.GpForbiddenActions=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Forbidden gathering actions could not be saved.");}
+        TrySave("Forbidden gathering actions",()=>configuration.GpForbiddenActions=previous);
     }
 }

@@ -14,8 +14,6 @@ internal sealed partial class MainWindow
 {
     private const string RepositoryUrl = "https://github.com/Shigu330/Tensho-Assistant";
     private bool clearAlarmsArmed;private int clearAlarmsSeenFrame;
-    // 0.331 (audit): value of the slider being dragged as it was before the drag, put back when the save on release fails.
-    private int sliderBefore;
 
     // WrappedTooltip, Tip, TipText and HelpMarker: UI/Components/Tooltip.cs (X-76 H1).
 
@@ -35,17 +33,9 @@ internal sealed partial class MainWindow
         BoolSetting("Tracker.Setting","Tracker.SettingTip",()=>configuration.TrackerWindow,value=>configuration.TrackerWindow=value,c=>c.TrackerWindow);
         ImGui.Indent();
         BoolSetting("Advanced.AlarmBarTooltip","Advanced.AlarmBarTooltipTip",()=>configuration.AlarmBarTooltip,value=>configuration.AlarmBarTooltip=value,c=>c.AlarmBarTooltip);
-        // 0.331 (audit): the sliders follow the drag in memory and save once, when released (no disk write per frame).
-        var barBefore=configuration.AlarmBarTooltipCount;
-        var barCount=Math.Clamp(barBefore,1,10);ImGui.SetNextItemWidth(120);
-        if(ImGui.SliderInt(localization.Get("Advanced.AlarmBarTooltipCount")+"###AlarmBarCount",ref barCount,1,10))configuration.AlarmBarTooltipCount=barCount;
-        if(ImGui.IsItemActivated())sliderBefore=barBefore;
-        if(ImGui.IsItemDeactivatedAfterEdit())
-            try{save();saveError=null;}
-            catch(Exception error){configuration.AlarmBarTooltipCount=sliderBefore;saveError=localization.Get("Common.SaveError");log.Warning(error,"Setting {Setting} could not be saved.","AlarmBarTooltipCount");}
-        Tip("Advanced.AlarmBarTooltipCountTip");
-        if(DefaultButton("AlarmBarTooltipCount",configuration.AlarmBarTooltipCount!=DefaultConfiguration.AlarmBarTooltipCount))
-            SaveSetting("AlarmBarTooltipCount",()=>configuration.AlarmBarTooltipCount,value=>configuration.AlarmBarTooltipCount=value,DefaultConfiguration.AlarmBarTooltipCount);
+        // 0.331 (audit): the sliders follow the drag in memory and save once, when released (no disk write per frame); X-76 H4 (0.914): SliderSetting.
+        SliderSetting("Advanced.AlarmBarTooltipCount","Advanced.AlarmBarTooltipCountTip",()=>configuration.AlarmBarTooltipCount,value=>configuration.AlarmBarTooltipCount=value,
+            1,10,DefaultConfiguration.AlarmBarTooltipCount,width:120);
         ImGui.Unindent();
     }
 
@@ -61,13 +51,13 @@ internal sealed partial class MainWindow
         {
             developerMode=developer;if(!developer)localization.ShowKeys=false;
             configuration.DeveloperMode=developer;
-            try{save();saveError=null;}catch(Exception error){developerMode=configuration.DeveloperMode=!developer;saveError=localization.Get("Common.SaveError");log.Warning(error,"Developer mode could not be saved.");}
+            TrySave("Developer mode",()=>developerMode=configuration.DeveloperMode=!developer);
         }
         Tip("Advanced.DeveloperTip");
         if(BoolDefaultButton("DeveloperMode",DefaultConfiguration.DeveloperMode,developerMode))
         {
             developerMode=configuration.DeveloperMode=false;localization.ShowKeys=false;
-            try{save();saveError=null;}catch(Exception error){developerMode=configuration.DeveloperMode=true;saveError=localization.Get("Common.SaveError");log.Warning(error,"Developer mode could not be saved.");}
+            TrySave("Developer mode",()=>developerMode=configuration.DeveloperMode=true);
         }
         BoolSetting("Advanced.ShowIds","Advanced.ShowIdsTip",()=>configuration.ShowIds,value=>configuration.ShowIds=value,c=>c.ShowIds);
         if(developerMode && ImGui.SmallButton(localization.Get("Navigation.Diagnostics")))page=Page.Diagnostics;
@@ -99,22 +89,11 @@ internal sealed partial class MainWindow
 
         ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Advanced.AlarmsTitle"));
-        var options=configuration.AlarmOptions??=new();
-        var delayBefore=options.GameCommandDelayMs;var delay=delayBefore;
-        ImGui.SetNextItemWidth(200);
-        // 0.331 (audit): saved once, when the slider is released (it saved the whole configuration on every frame of a drag).
-        if(ImGui.SliderInt(localization.Get("Advanced.CommandDelay")+"###CommandDelay",ref delay,250,5000,"%d ms"))options.GameCommandDelayMs=delay;
-        if(ImGui.IsItemActivated())sliderBefore=delayBefore;
-        if(ImGui.IsItemDeactivatedAfterEdit())
-            try{save();}catch(Exception error){options.GameCommandDelayMs=sliderBefore;log.Warning(error,"Alarm delay could not be saved.");}
-        Tip("Advanced.CommandDelayTip");
-        // 0.260: « ↺ » back to the default delay (read from a fresh AlarmSettings).
-        var defaultDelay=new TenshoAssistant.Alarms.AlarmSettings().GameCommandDelayMs;
-        if(DefaultButton("CommandDelay",options.GameCommandDelayMs!=defaultDelay))
-        {
-            var previous=options.GameCommandDelayMs;options.GameCommandDelayMs=defaultDelay;
-            try{save();}catch(Exception error){options.GameCommandDelayMs=previous;log.Warning(error,"Alarm delay could not be saved.");}
-        }
+        configuration.AlarmOptions??=new();
+        // 0.331 (audit): saved once, when the slider is released (it saved the whole configuration on every frame of a drag); 0.260: « ↺ »
+        // back to the default delay (read from a fresh Configuration). X-76 H4 (0.914): SliderSetting.
+        SliderSetting("Advanced.CommandDelay","Advanced.CommandDelayTip",()=>configuration.AlarmOptions.GameCommandDelayMs,value=>configuration.AlarmOptions.GameCommandDelayMs=value,
+            250,5000,DefaultConfiguration.AlarmOptions.GameCommandDelayMs,"%d ms",200);
         // Two clicks: the first arms the button, the second deletes. 0.331 (audit): an arming not drawn on the previous frame (page or
         // tab left) is dropped, as for the alarm groups (0.326).
         if(clearAlarmsArmed && ImGui.GetFrameCount()>clearAlarmsSeenFrame+1)clearAlarmsArmed=false;

@@ -104,9 +104,15 @@ internal sealed partial class MainWindow
         changed|=ImGui.Checkbox(localization.Get("FashionWeek.Panel"),ref panel);Tip("FashionWeek.PanelTip");
         if(DefaultButton("FashionPanel",panel!=defaults.ShowPanel)){panel=defaults.ShowPanel;changed=true;}
         if(!changed)return;
+        SaveFashionOptions(new(){OwnedFirst=owned,DimUnowned=dim,ByPopularity=popular,ShowPanel=panel});
+    }
+
+    // X-76 H3 (0.914): the previous options come back when saving fails.
+    private void SaveFashionOptions(TenshoAssistant.Fashion.FashionOptions next)
+    {
         var previous=configuration.FashionOptions;
-        configuration.FashionOptions=new(){OwnedFirst=owned,DimUnowned=dim,ByPopularity=popular,ShowPanel=panel};
-        try{save();}catch(Exception error){configuration.FashionOptions=previous;log.Warning(error,"Fashion options could not be saved.");}
+        configuration.FashionOptions=next;
+        TrySave("Fashion options",()=>configuration.FashionOptions=previous);
     }
 
     // The 11 slots: category of the week, pieces reported for it (owned / total), expandable list.

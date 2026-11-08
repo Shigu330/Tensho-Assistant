@@ -299,6 +299,8 @@ internal sealed partial class MainWindow : Window, IDisposable
             finally { ImGui.EndTable(); }
         }
         ImGui.Separator();
+        // X-76 H3 (0.914): a failed save is said here, whatever the page; else the usual footer.
+        if(DrawSaveError())return;
         ImGui.TextDisabled("/tensho");
         ImGui.SameLine();
         ImGui.TextDisabled(localization.Get("UiFragments.Footer"));

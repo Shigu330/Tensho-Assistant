@@ -4893,7 +4893,8 @@
     "SourceReference": "Source reference: {0}"
   },
   "Common": {
-    "SaveError": "Save failed. Try again; details are in the Dalamud log."
+    "SaveError": "Save failed. Try again; details are in the Dalamud log.",
+    "Dismiss": "Hide this message"
   },
   "CraftDebug": {
     "Flags": "State flags 0x{0:X8} · synthesis 0x{1:X2}",

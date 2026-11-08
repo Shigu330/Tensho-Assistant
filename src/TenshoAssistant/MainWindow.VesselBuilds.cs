@@ -50,8 +50,7 @@ internal sealed partial class MainWindow
     {
         var plans=configuration.VesselPlans??=[];
         if(build is null)plans.Remove(key);else plans[key]=build.ToList();
-        try{save();saveError=null;}
-        catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Vessel build could not be saved.");}
+        TrySave("Vessel build");
     }
 
     private void DrawVesselBuilds()

@@ -202,17 +202,11 @@ internal sealed partial class MainWindow
     // Filters and options, also reachable from Settings (every setting with its tooltip and « ↺ »).
     private void DrawGearSettings()
     {
-        var below=Math.Clamp(configuration.GearLevelsBelow,0,30);ImGui.SetNextItemWidth(140);
-        if(ImGui.SliderInt(localization.Get("Gear.LevelsBelow")+"###GearLevelsBelow",ref below,0,30))SaveSetting("GearLevelsBelow",()=>configuration.GearLevelsBelow,value=>configuration.GearLevelsBelow=value,below);
-        Tip("Gear.LevelsBelowTip");
-        if(DefaultButton("GearLevelsBelow",configuration.GearLevelsBelow!=DefaultConfiguration.GearLevelsBelow))
-            SaveSetting("GearLevelsBelow",()=>configuration.GearLevelsBelow,value=>configuration.GearLevelsBelow=value,DefaultConfiguration.GearLevelsBelow);
+        // X-76 H4 (0.914): the slider and the field follow the edit in memory and are written once, when released or left (they were
+        // written on every frame of a drag and every key press).
+        SliderSetting("Gear.LevelsBelow","Gear.LevelsBelowTip",()=>configuration.GearLevelsBelow,value=>configuration.GearLevelsBelow=value,0,30,DefaultConfiguration.GearLevelsBelow,width:140);
         BoolSetting("Gear.ExactOutsideCaps","Gear.ExactOutsideCapsTip",()=>configuration.GearExactOutsideCaps,value=>configuration.GearExactOutsideCaps=value,c=>c.GearExactOutsideCaps);
-        var minimum=Math.Max(0,configuration.GearMinItemLevel);ImGui.SetNextItemWidth(140);
-        if(ImGui.InputInt(localization.Get("Gear.MinItemLevel")+"###GearMinItemLevel",ref minimum))SaveSetting("GearMinItemLevel",()=>configuration.GearMinItemLevel,value=>configuration.GearMinItemLevel=value,Math.Max(0,minimum));
-        Tip("Gear.MinItemLevelTip");
-        if(DefaultButton("GearMinItemLevel",configuration.GearMinItemLevel!=DefaultConfiguration.GearMinItemLevel))
-            SaveSetting("GearMinItemLevel",()=>configuration.GearMinItemLevel,value=>configuration.GearMinItemLevel=value,DefaultConfiguration.GearMinItemLevel);
+        IntSetting("Gear.MinItemLevel","Gear.MinItemLevelTip",()=>configuration.GearMinItemLevel,value=>configuration.GearMinItemLevel=value,0,int.MaxValue,DefaultConfiguration.GearMinItemLevel,140);
         BoolSetting("Gear.AssumeHq","Gear.AssumeHqTip",()=>configuration.GearAssumeHq,value=>configuration.GearAssumeHq=value,c=>c.GearAssumeHq);
         BoolSetting("Gear.AllJobs","Gear.AllJobsTip",()=>configuration.GearAllJobs,value=>configuration.GearAllJobs=value,c=>c.GearAllJobs);
         BoolSetting("Gear.OwnedOnly","Gear.OwnedOnlyTip",()=>configuration.GearOwnedOnly,value=>configuration.GearOwnedOnly=value,c=>c.GearOwnedOnly);
@@ -716,9 +710,5 @@ internal sealed partial class MainWindow
         SaveGearPlan();
     }
 
-    private void SaveGearPlan()
-    {
-        try{save();saveError=null;}
-        catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Gear plan could not be saved.");}
-    }
+    private void SaveGearPlan()=>TrySave("Gear plan");
 }

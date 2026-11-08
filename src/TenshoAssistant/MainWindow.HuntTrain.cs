@@ -81,7 +81,7 @@ internal sealed partial class MainWindow
         {
             foreach(var channel in HuntTrain.AnnounceChannels)
                 if(ImGui.Selectable(channel,channel==configuration.HuntAnnounceChannel))
-                {configuration.HuntAnnounceChannel=channel;try{save();}catch(Exception failure){log.Warning(failure,"Hunt call channel could not be saved.");}}
+                    SaveSetting("HuntAnnounceChannel",()=>configuration.HuntAnnounceChannel,value=>configuration.HuntAnnounceChannel=value,channel);
             ImGui.EndCombo();
         }
         Tip("HuntTrain.ChannelTip");

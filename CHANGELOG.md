@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.914.0
+- Plan global, Verify : Nettoyage complet (X-76), étape 2b, enregistrement des réglages (H3 et H4) : un seul chemin d'enregistrement ; si l'écriture échoue, le réglage revient à sa valeur précédente et une seule ligne d'erreur s'affiche en bas de la fenêtre principale, sur toutes les pages (avec un bouton pour la masquer). Les options d'alarme sont modifiées sur une copie : un échec les restaure vraiment (avant, la restauration utilisait le même objet et ne rétablissait rien). Les curseurs et champs de nombres (équipement, usure, barre d'alarmes, délai des commandes, réglages de la carte, copie de macros, jours de vente) s'appliquent en direct mais n'écrivent le fichier qu'au relâchement, au lieu d'une écriture par image ou par touche. Un seul éditeur des jours de vente. Non validé en jeu.
+- Tests : SettingsSave914Tests. Verify.ps1 (agent) : 1516/1516, 0 avertissement, 0 erreur ; DLL 0.914.0.0. Non validé en jeu.
+### English
+- Full clean-up (X-76), step 2b, saving settings (H3 and H4): one save path; if the write fails, the setting goes back to its previous value and one error line shows at the bottom of the main window, on every page (with a hide button). Alarm options are edited on a copy: a failure really restores them (before, the restore used the same object and brought nothing back). Sliders and number fields (gear, wear, alarm bar, command delay, map settings, macro copy, sale days) apply live but write the file only on release, instead of one write per frame or per key. One sale-days editor. Not validated in game.
+
 ## 0.913.0
 - Plan global, Verify : Nettoyage complet (X-76), étape 2b, harmonisation des info-bulles (H1) : une seule aide pour les info-bulles (UI/Components/Tooltip.cs) ; environ 140 info-bulles écrites à la main passent par elle et s'affichent aussi sur un contrôle grisé (trois disparaissaient justement quand le bouton était grisé : carte d'un point de récolte, galerie d'outils, action de la simulation d'artisanat) ; toutes les info-bulles ont la même largeur ; une seule marque d'aide (icône i) ; le test des info-bulles vérifie maintenant que les 667 clés existent en anglais et en français. Non validé en jeu.
 - Tests : Tooltips913Tests. Verify.ps1 (agent) : 1509/1509, 0 avertissement, 0 erreur ; DLL 0.913.0.0. Non validé en jeu.

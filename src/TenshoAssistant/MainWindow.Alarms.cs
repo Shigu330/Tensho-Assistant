@@ -471,8 +471,8 @@ internal sealed partial class MainWindow
         var useGame=options.UseGameAlarms;var gameWeather=options.GameIncludeWeather;var muteChat=options.MuteChatInDuties;
         // 0.324: « ↺ » after each option.
         var defaults=DefaultConfiguration.AlarmOptions;
-        ImGui.SetNextItemWidth(100);if(ImGui.InputInt(localization.Get("Alarms.DefaultLead"),ref lead,1))options.LeadMinutes=Math.Clamp(lead,0,1440);
-        if(ImGui.IsItemDeactivatedAfterEdit())changed=true;Tip("Advanced.LeadTip");
+        // X-76 H3 (0.914): nothing is written into the saved options before their save (a failed save could not bring them back).
+        changed|=AlarmNumber(localization.Get("Alarms.DefaultLead"),"AlarmLeadMinutes","Advanced.LeadTip",lead,0,1440,out lead);
         if(DefaultButton("AlarmLead",lead!=defaults.LeadMinutes)){lead=defaults.LeadMinutes;changed=true;}
         changed|=ImGui.Checkbox(localization.Get("Alarms.PlaySound"),ref play);Tip("Advanced.PlaySoundTip");
         if(DefaultButton("AlarmPlaySound",play!=defaults.PlaySound)){play=defaults.PlaySound;changed=true;}
@@ -487,14 +487,12 @@ internal sealed partial class MainWindow
         if(DefaultButton("AlarmSound",sound!=defaults.Sound)){sound=defaults.Sound;changed=true;}
         changed|=ImGui.Checkbox(localization.Get("Alarms.Chat"),ref chat);Tip("Advanced.ChatTip");
         if(DefaultButton("AlarmChat",chat!=defaults.Chat)){chat=defaults.Chat;changed=true;}
-        var snoozeMinutes=options.SnoozeMinutes;ImGui.SetNextItemWidth(100);
-        if(ImGui.InputInt(localization.Get("Alarms.SnoozeMinutes"),ref snoozeMinutes,1))options.SnoozeMinutes=Math.Clamp(snoozeMinutes,1,1440);
-        if(ImGui.IsItemDeactivatedAfterEdit())changed=true;Tip("Advanced.SnoozeMinutesTip");
-        if(DefaultButton("AlarmSnooze",options.SnoozeMinutes!=defaults.SnoozeMinutes)){options.SnoozeMinutes=defaults.SnoozeMinutes;changed=true;}
+        changed|=AlarmNumber(localization.Get("Alarms.SnoozeMinutes"),"AlarmSnoozeMinutes","Advanced.SnoozeMinutesTip",options.SnoozeMinutes,1,1440,out var snooze);
+        if(DefaultButton("AlarmSnooze",snooze!=defaults.SnoozeMinutes)){snooze=defaults.SnoozeMinutes;changed=true;}
         var onTime=options.RingOnTime;
-        if(ImGui.Checkbox(localization.Get("Alarms.RingOnTime"),ref onTime)){options.RingOnTime=onTime;changed=true;}
+        changed|=ImGui.Checkbox(localization.Get("Alarms.RingOnTime"),ref onTime);
         Tip("Advanced.RingOnTimeTip");
-        if(DefaultButton("AlarmRingOnTime",onTime!=defaults.RingOnTime)){options.RingOnTime=defaults.RingOnTime;changed=true;}
+        if(DefaultButton("AlarmRingOnTime",onTime!=defaults.RingOnTime)){onTime=defaults.RingOnTime;changed=true;}
         changed|=ImGui.Checkbox(localization.Get("Alarms.MuteInDuties"),ref mute);Tip("Advanced.MuteTip");
         if(DefaultButton("AlarmMute",mute!=defaults.MuteInDuties)){mute=defaults.MuteInDuties;changed=true;}
         // Queue step e (audit 2026-11-02): no [Tensho] chat line in a duty either; greyed while it can have no effect (no silence, no chat line).
@@ -529,11 +527,35 @@ internal sealed partial class MainWindow
         if(page!=Page.Alarms && ImGui.SmallButton(localization.Get("Alarms.Open"))){page=Page.Alarms;}
         ImGui.TextDisabled(localization.Get("Alarms.SettingsHelp"));
         if(!changed)return;
+        // 0.319: the command delay (Settings › Advanced) is kept; it went back to 500 ms whenever an alarm setting changed. X-76 H3 (0.914):
+        // a copy keeps it with every other field (duty ready alert, automatic alarms, and any field added later).
+        var next=configuration.AlarmOptions.Copy();
+        next.LeadMinutes=Math.Clamp(lead,0,1440);next.Sound=Math.Clamp(sound,0,5);next.PlaySound=play;next.Chat=chat;next.MuteInDuties=mute;next.MuteChatInDuties=muteChat;
+        next.UseGameAlarms=useGame;next.GameIncludeWeather=gameWeather;next.SnoozeMinutes=Math.Clamp(snooze,1,1440);next.RingOnTime=onTime;
+        SaveAlarmOptions(next);
+    }
+
+    /// <summary>X-76 H3 (0.914): the edited copy replaces the saved options; when saving fails the untouched previous object comes back.</summary>
+    private void SaveAlarmOptions(AlarmSettings next)
+    {
         var previous=configuration.AlarmOptions;
-        // 0.319: the command delay (Settings › Advanced) is kept; it went back to 500 ms whenever an alarm setting changed.
-        configuration.AlarmOptions=new(){RingOnTime=options.RingOnTime,SnoozeMinutes=options.SnoozeMinutes,LeadMinutes=Math.Clamp(lead,0,1440),Sound=Math.Clamp(sound,0,5),PlaySound=play,Chat=chat,MuteInDuties=mute,MuteChatInDuties=muteChat,
-            UseGameAlarms=useGame,GameIncludeWeather=gameWeather,GameCommandDelayMs=previous.GameCommandDelayMs,DutyPopAlert=previous.DutyPopAlert,
-            AutoAlarms=previous.AutoAlarms};
-        try{save();}catch(Exception error){configuration.AlarmOptions=previous;log.Warning(error,"Alarm settings could not be saved.");}
+        configuration.AlarmOptions=next;
+        TrySave("Alarm settings",()=>configuration.AlarmOptions=previous);
+    }
+
+    // X-76 H3 (0.914): a number typed in the alarm options waits here until its field is left, so the saved options are never changed
+    // before their save; one field is active at a time.
+    private (string Id,int Value)? alarmTyped;
+
+    /// <summary>An alarm option number field (+/- buttons) with its tooltip: the value shown (typed or saved), true once when the field is left after an edit.</summary>
+    private bool AlarmNumber(string label,string id,string tipKey,int saved,int min,int max,out int value)
+    {
+        value=alarmTyped is { } typed && typed.Id==id ? typed.Value:saved;
+        ImGui.SetNextItemWidth(100);
+        if(ImGui.InputInt(label+"###"+id,ref value,1)){value=Math.Clamp(value,min,max);alarmTyped=(id,value);}
+        Tip(tipKey);
+        var done=ImGui.IsItemDeactivatedAfterEdit();
+        if((done || !ImGui.IsItemActive()) && alarmTyped?.Id==id)alarmTyped=null;
+        return done;
     }
 }

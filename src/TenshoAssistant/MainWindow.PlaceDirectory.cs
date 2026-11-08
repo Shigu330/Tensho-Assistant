@@ -64,7 +64,6 @@ internal sealed partial class MainWindow
     {
         var previous=configuration.PlaceDirectory;
         configuration.PlaceDirectory=places.ToList();
-        try{save();saveError=null;}
-        catch(Exception error){configuration.PlaceDirectory=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Place directory could not be saved.");}
+        TrySave("Place directory",()=>configuration.PlaceDirectory=previous);
     }
 }

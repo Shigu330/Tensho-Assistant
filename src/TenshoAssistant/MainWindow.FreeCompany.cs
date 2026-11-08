@@ -125,17 +125,11 @@ internal sealed partial class MainWindow
         configuration.Voyages=(vessels ?? []).Where(vessel=>vessel.HouseId!=house).ToList();
         configuration.SubmarineUnlocked=unlocked?.Where(entry=>entry.Key!=key).ToDictionary(entry=>entry.Key,entry=>entry.Value);
         configuration.VesselPlans=plans?.Where(entry=>!Voyages.IsPlanOf(entry.Key,house)).ToDictionary(entry=>entry.Key,entry=>entry.Value);
-        try
+        if(TrySave("Forgotten free company",()=>(configuration.Voyages,configuration.SubmarineUnlocked,configuration.VesselPlans)=(vessels,unlocked,plans)))
         {
-            save();saveError=null;
             // The Builds tab and the planner leave a forgotten vessel (Builds: first submarine read, else manual; planner: manual input).
             if(buildVesselKey is not null && Voyages.IsPlanOf(buildVesselKey,house)){buildVesselKey=null;buildCandidates=[];buildSearchKey=null;}
             if(plannerVesselKey is not null && Voyages.IsPlanOf(plannerVesselKey,house))plannerVesselKey=null;
-        }
-        catch(Exception error)
-        {
-            (configuration.Voyages,configuration.SubmarineUnlocked,configuration.VesselPlans)=(vessels,unlocked,plans);
-            saveError=localization.Get("Common.SaveError");log.Warning(error,"Free company could not be forgotten.");
         }
     }
 

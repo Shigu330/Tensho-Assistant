@@ -16,7 +16,8 @@ internal static class DutyPop366Tests
             var plugin = Read("Plugin.cs");
             Check(plugin.Contains("if(!options.DutyPopAlert)return;",StringComparison.Ordinal) && plugin.Contains("options.ChatAllowed(inDuty)",StringComparison.Ordinal)
                 && plugin.Contains("()=>client.CfPop+=OnDutyPop,()=>client.CfPop-=OnDutyPop",StringComparison.Ordinal),"opt-in, silence rules, released");
-            Check(Read("MainWindow.Alarms.cs").Contains("DutyPopAlert=previous.DutyPopAlert",StringComparison.Ordinal),"kept when the other alarm options are saved");
+            // X-76 H3 (0.914): the page edits a copy of the saved options, which keeps the alert.
+            Check(Read("MainWindow.Alarms.cs").Contains("var next=configuration.AlarmOptions.Copy();",StringComparison.Ordinal) && new AlarmSettings { DutyPopAlert = true }.Copy().DutyPopAlert,"kept when the other alarm options are saved");
         }),
     ];
 }

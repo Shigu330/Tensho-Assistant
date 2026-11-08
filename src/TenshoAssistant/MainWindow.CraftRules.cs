@@ -33,9 +33,14 @@ internal sealed partial class MainWindow
         }
         if(forbidden.Count>0 && ImGui.SmallButton(localization.Get("CraftRules.Clear"))){forbidden=new HashSet<CraftActionKind>();changed=true;}
         if(!changed)return;
+        SaveForbiddenCraftActions(search,forbidden.Select(kind=>kind.ToString()).Order(StringComparer.Ordinal).ToList());
+    }
+
+    // X-76 H3 (0.914): the previous list comes back when saving fails.
+    private void SaveForbiddenCraftActions(CraftSearchSettings search,List<string> next)
+    {
         var previous=search.ForbiddenActions;
-        search.ForbiddenActions=forbidden.Select(kind=>kind.ToString()).Order(StringComparer.Ordinal).ToList();
-        try{save();saveError=null;craftMacroExport=null;craftMacroError=null;}
-        catch(Exception error){search.ForbiddenActions=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Forbidden crafting actions could not be saved.");}
+        search.ForbiddenActions=next;
+        if(TrySave("Forbidden crafting actions",()=>search.ForbiddenActions=previous)){craftMacroExport=null;craftMacroError=null;}
     }
 }

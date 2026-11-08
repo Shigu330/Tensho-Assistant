@@ -23,7 +23,8 @@ internal sealed partial class MainWindow
     {
         if(!configuration.TrackerWindow)return;
         configuration.TrackerWindow=false;
-        try{save();}catch(Exception error){log.Warning(error,"Tracker window setting could not be saved.");}
+        // X-76 H3 (0.914): a closed window stays closed when saving fails (the player asked for it); the next save writes it.
+        TrySave("Tracker window");
     }
 
     private void DrawTrackerContents()

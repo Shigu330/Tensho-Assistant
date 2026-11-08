@@ -46,8 +46,8 @@ internal sealed partial class MainWindow
         var settings=configuration.MapView;
         if(settings.OpenZoom!=MapOpenZoom.Last || mapZoomMemory.Tick(mapZoom,settings.LastZoom,TimeSpan.FromTicks(DateTimeOffset.UtcNow.UtcTicks)) is not { } rested)return;
         settings.LastZoom=rested;
-        try{save();saveError=null;}
-        catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save the map zoom.");}
+        // X-76 H3 (0.914): the rested zoom stays in memory when saving fails (it is the zoom in use); the next save writes it.
+        TrySave("Map zoom");
     }
     // 0.328 (map audit #13): a chosen map opens whole, like NavigateMap; the old zoom and pan belonged to another map.
     // 0.499 (user report): a link to the map brings it above the Tensho window instead of opening behind it.
@@ -567,12 +567,10 @@ internal sealed partial class MainWindow
             changed|=SettingBox("MapView.ShowCollectionMonsters",settings.ShowCollectionMonsters,value=>settings.ShowCollectionMonsters=value);
             changed|=SettingBox("MapView.ShowBeastMonsters",settings.ShowBeastMonsters,value=>settings.ShowBeastMonsters=value);
             changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value);
-            if(changed)
-            {
-                try{save();saveError=null;}
-                catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save map layers.");}
-            }
-            if(saveError is { } failed)ImGui.TextColored(UI.FfxivTheme.Error,failed);
+            // X-76 H3 (0.914): the layers shown stay as ticked when saving fails (the next save writes them). This menu is in the map
+            // window, where the main window's footer is not seen, so it keeps its own error line.
+            if(changed)TrySave("Map layers");
+            if(saveError is { } failed)ImGui.TextColored(Error,failed);
         }
         finally{ImGui.EndPopup();}
     }
@@ -781,13 +779,21 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.HideInDuty",settings.HideInDuty,value=>settings.HideInDuty=value,MapDefaults.HideInDuty);
             }
             ImGui.TextDisabled(localization.Get("MapView.SettingsHelp"));
-            if(changed)
-            {
-                // 0.328 (map audit #41): a failed save is said (Common.SaveError), like the other settings.
-                try{save();saveError=null;}
-                catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save map settings.");}
-            }
+            // 0.328 (map audit #41): a failed save is said (Common.SaveError), like the other settings. X-76 H4 (0.914): every change
+            // applies at once (the map follows a slider while it is dragged), but the file is written only once no control is held any
+            // more: on release of a slider or a colour picker, when a typed number is left, at once for a box or a « ↺ ».
+            mapSettingsPending|=changed;
+            if(mapSettingsPending && !ImGui.IsAnyItemActive())SaveMapSettings();
         }
+    }
+    // X-76 H4 (0.914): map settings changed in memory and not written yet (a slider, colour or number still held). Any save writes the
+    // whole configuration, so a change left pending when the page closes mid-drag is also written by the next save of anything.
+    private bool mapSettingsPending;
+    // The values stay in memory when saving fails (the map shows them); the next save writes them.
+    private void SaveMapSettings()
+    {
+        mapSettingsPending=false;
+        TrySave("Map settings");
     }
     // One row per kind of game icon on the shown map (fixed icons, quest/event markers, FATEs, flag): visible box, size, priority.
     // Scope (0.119): « All maps » edits the global table; « This map » writes overrides kept for this map only, cleared by
