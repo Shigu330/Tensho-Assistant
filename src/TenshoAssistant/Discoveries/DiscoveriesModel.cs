@@ -45,7 +45,9 @@ public sealed class DiscoveryFile
 /// <summary>X-43 (0.807): the local base of discoveries; every method is safe from any thread.</summary>
 public sealed class DiscoveryStore
 {
-    public const float CellSize=10;
+    // X-72 B (0.855, user choice after the parser review: 87 % of the 10-yalm places seen once, 640 facts instead of 1 469 at 50 yalms): 50-yalm cells; facts of
+    // older cells are moved to theirs and joined when loaded or imported (Recell, Join).
+    public const float CellSize=50;
     public const int MaxFacts=200_000;
     /// <summary>A second sighting of the same place counts only after this long: standing beside a monster is one sighting.</summary>
     public static readonly TimeSpan SightingGap=TimeSpan.FromMinutes(10);
@@ -89,9 +91,11 @@ public sealed class DiscoveryStore
         int added=0,joined=0,refused=0;
         lock(gate)
         {
-            foreach(var source in imported)
+            foreach(var original in imported)
             {
-                if(!Valid(source)){refused++;continue;}
+                // 0.855: an older file's cells are moved to ours first.
+                var source=original is null ? null:Recell(original);
+                if(source is null || !Valid(source)){refused++;continue;}
                 if(facts.TryGetValue(source.Key,out var known))
                 {
                     known.Imported++;
@@ -111,6 +115,23 @@ public sealed class DiscoveryStore
         return (added,joined,refused);
     }
 
+    /// <summary>X-72 B (0.855): a copy in the cell of its exact place (older files used 10-yalm cells).</summary>
+    public static DiscoveryFact Recell(DiscoveryFact fact)
+    {
+        var copy=fact.Copy();
+        if(float.IsFinite(copy.X) && float.IsFinite(copy.Z))(copy.CellX,copy.CellZ)=Cell(copy.X,copy.Z);
+        return copy;
+    }
+    /// <summary>X-72 B (0.855): two facts of one cell made one: sightings and imports added, the widest levels and dates, the first exact place kept.</summary>
+    public static void Join(DiscoveryFact known,DiscoveryFact other)
+    {
+        known.Seen+=other.Seen;known.Imported+=other.Imported;
+        if(other.LevelMin>0)known.LevelMin=known.LevelMin==0 ? other.LevelMin:Math.Min(known.LevelMin,other.LevelMin);
+        known.LevelMax=Math.Max(known.LevelMax,other.LevelMax);
+        if(other.First<known.First){known.First=other.First;known.X=other.X;known.Z=other.Z;}
+        if(other.Last>known.Last)known.Last=other.Last;
+    }
+
     /// <summary>What an imported fact must hold: a known kind, a subject and a map, finite places in their cell, levels and dates that make sense.</summary>
     public static bool Valid(DiscoveryFact? fact)=>fact is not null && Enum.IsDefined(fact.Kind) && fact.Subject!=0 && fact.Map!=0
         && float.IsFinite(fact.X) && float.IsFinite(fact.Z) && Math.Abs(fact.X)<=10_000 && Math.Abs(fact.Z)<=10_000 && Cell(fact.X,fact.Z)==(fact.CellX,fact.CellZ)
@@ -121,7 +142,18 @@ public sealed class DiscoveryStore
     {
         lock(gate)
         {
-            foreach(var fact in file.Facts)if(Valid(fact) && facts.Count<MaxFacts)facts[fact.Key]=fact.Copy();
+            // 0.855: each fact moved to its 50-yalm cell; those meeting in one are joined, and the base is written again, smaller.
+            var read=0;
+            foreach(var original in file.Facts)
+            {
+                if(original is null)continue;
+                var fact=Recell(original);
+                if(!Valid(fact))continue;
+                read++;
+                if(facts.TryGetValue(fact.Key,out var known)){Join(known,fact);continue;}
+                if(facts.Count<MaxFacts)facts[fact.Key]=fact;
+            }
+            if(read>facts.Count || file.Facts.Any(fact=>fact is not null && Cell(fact.X,fact.Z)!=(fact.CellX,fact.CellZ)))Dirty=true;
             revision++;
         }
     }

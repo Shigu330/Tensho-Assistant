@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.855.0
+- Plan global, Verify : Choix de l'utilisateur (X-72, B) : la base de découvertes passe à des cases de 50 yalms au lieu de 10 (87 % des relevés n'avaient été vus qu'une fois ; 640 relevés au lieu de 1 469 sur votre base). Au chargement et à l'import, chaque relevé est replacé dans sa case ; ceux qui tombent dans la même sont fusionnés : vues et imports additionnés, niveaux et dates les plus larges, premier lieu exact gardé. La base est réécrite, plus petite ; un ancien fichier importé est accepté. Non validé en jeu.
+- Tests : Cells855Tests. Verify.ps1 (agent) : 1435/1435, 0 avertissement, 0 erreur ; DLL 0.855.0.0. Non validé en jeu.
+### English
+- User choice (X-72, B): the discoveries base moves to 50-yalm cells instead of 10 (87 % of the facts had been seen once; 640 facts instead of 1,469 on your base). When loaded or imported, each fact is moved to its cell; those meeting in one are joined: sightings and imports added, the widest levels and dates, the first exact place kept. The base is written again, smaller; an older imported file is accepted. Not validated in game.
+
 ## 0.854.0
 - Plan global, Verify : Choix de l'utilisateur (X-72, A) : la base de découvertes sert maintenant aux outils. Sur la page Butin des monstres et dans le carnet de chasse, chaque monstre que vous avez vu affiche « Vu par vous : zone (X, Y), niveau » : un lieu par carte, le plus vu, quatre cartes au plus. Clic droit : l'éthérite la plus proche avec le drapeau, ou le drapeau seul. Non validé en jeu.
 - Tests : SeenPlaces854Tests. Verify.ps1 (agent) : 1433/1433, 0 avertissement, 0 erreur ; DLL 0.854.0.0. Non validé en jeu.

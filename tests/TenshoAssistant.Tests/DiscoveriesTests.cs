@@ -16,8 +16,8 @@ internal static class DiscoveriesTests
             Check(!store.SeeMonster(10,20,130,11,new Vector3(108,0,-1),14,At.AddMinutes(1)),"same cell");
             store.SeeMonster(10,20,130,11,new Vector3(104,0,-3),11,At.AddMinutes(12));
             var fact=store.Find(DiscoveryKind.MonsterPlace,_=>true,10).Single();
-            Check(fact.Seen==2 && fact.LevelMin==11 && fact.LevelMax==14 && fact.X==101 && fact.CellX==10 && fact.CellZ==-1,"counted, widened, first place kept");
-            Check(store.SeeMonster(10,20,130,11,new Vector3(111,0,-5),12,At),"next cell: new");
+            Check(fact.Seen==2 && fact.LevelMin==11 && fact.LevelMax==14 && fact.X==101 && fact.CellX==2 && fact.CellZ==-1,"counted, widened, first place kept (0.855: 50-yalm cells)");
+            Check(store.SeeMonster(10,20,130,11,new Vector3(151,0,-5),12,At),"next cell: new");
             Check(!store.SeeMonster(0,20,130,11,Vector3.Zero,1,At) && !store.SeeMonster(10,20,130,0,Vector3.Zero,1,At),"no name or map: nothing");
         }),
         ("Discoveries: an import joins, never removes; new facts come in as imported only; wrong facts are refused",() =>
@@ -27,9 +27,9 @@ internal static class DiscoveriesTests
             var file=friend.Snapshot(At);
             var broken=file.Facts[0].Copy();broken.CellX+=3;
             var result=mine.Merge(file.Facts.Append(broken).Append(null!));
-            Check(result==(1,1,2),"one new, one joined, two refused");
+            Check(result==(1,2,1),"one new, two joined (0.855: a wrong cell is moved to its own), one refused");
             var joined=mine.Find(DiscoveryKind.MonsterPlace,id=>id==10,5).Single();
-            Check(joined.Seen==1 && joined.Imported==1 && joined.LevelMax==15 && joined.First==At.AddDays(-1),"ours kept, widened");
+            Check(joined.Seen==1 && joined.Imported==2 && joined.LevelMax==15 && joined.First==At.AddDays(-1),"ours kept, widened");
             var added=mine.Find(DiscoveryKind.MonsterPlace,id=>id==30,5).Single();
             Check(added.Seen==0 && added.Imported==1,"imported only");
             Check(mine.Summary().Single()==(DiscoveryKind.MonsterPlace,2,1,1),"summary");
