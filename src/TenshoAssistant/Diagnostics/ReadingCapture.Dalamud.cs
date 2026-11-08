@@ -93,6 +93,7 @@ public sealed unsafe class ReadingCapture : IDisposable
             ReadWindows();
             ReadFashion();
             ReadIslandObjects();
+            ReadFields();
             warned=false;
         }
         catch(Exception error)
@@ -168,6 +169,41 @@ public sealed unsafe class ReadingCapture : IDisposable
         Line("fashion",40,all);
     }
 
+    // X-90 (0.973, user request « Eureka: elemental level and magia allocation »; DEC-041: preparation, the player's own progress only, nothing of
+    // the combat): the field states the game keeps (ClientStructs EurekaState, BozjaState, OccultCrescentState, members checked with tools/ApiProbe),
+    // written on change in developer mode, to prove the fields before a page uses them.
+    private string fieldState="";
+    private void ReadFields()
+    {
+        var text="";
+        var eurekaDirector=FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.GetPublicContentDirectorByType(FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.PublicContentDirectorType.Eureka);
+        var bozjaDirector=FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.GetPublicContentDirectorByType(FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.PublicContentDirectorType.Bozja);
+        var occultDirector=FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.GetPublicContentDirectorByType(FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.PublicContentDirectorType.OccultCrescent);
+        if(eurekaDirector!=null)
+        {
+            var eureka=(FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.PublicContentEureka*)eurekaDirector;
+            var state=eureka->State;
+            text=$"eureka max {eureka->MaxElementalLevel}, exp {state.CurrentExperience}/{state.NeededExperience}, magia fire {state.Fire} ice {state.Ice} wind {state.Wind} earth {state.Earth} lightning {state.Lightning} water {state.Water}, magicite {state.Magicite}, aether {state.MagiaAether} charge {state.MagiaAetherCharge}";
+        }
+        else if(bozjaDirector!=null)
+        {
+            var bozja=(FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.PublicContentBozja*)bozjaDirector;
+            var holster=new StringBuilder();
+            foreach(var action in bozja->State.HolsterActions)if(action!=0)holster.Append(' ').Append(action);
+            text=$"bozja exp {bozja->State.CurrentExperience}/{bozja->State.NeededExperience}, holster{holster}";
+        }
+        else if(occultDirector!=null)
+        {
+            var occult=(FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.PublicContentOccultCrescent*)occultDirector;
+            var state=occult->State;
+            var levels=new StringBuilder();
+            foreach(var level in state.SupportJobLevels)levels.Append(' ').Append(level);
+            text=$"occult knowledge {state.CurrentKnowledge}/{state.NeededKnowledge} sync {state.KnowledgeLevelSync}, support job {state.CurrentSupportJob} levels{levels}, silver {state.Silver} gold {state.Gold}";
+        }
+        if(text==fieldState)return;
+        fieldState=text;
+        if(text.Length>0)Line("fields",120,text);
+    }
     private void ReadIslandObjects()
     {
         if((nint)MJIManager.StaticAddressPointers.ppInstance==0)return;

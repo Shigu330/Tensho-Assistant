@@ -1586,6 +1586,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.972) Après la prochaine mise à jour du jeu : dalamud.log, lignes « Game data check: … » ; auto-contrôle, ligne « game data ».
 
+- [ ] (0.973) Mode développeur, en Eurêka : dalamud.log, lignes « Reading fields: eureka … » ; changer la magia : nouvelle ligne.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
