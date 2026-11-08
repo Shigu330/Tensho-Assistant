@@ -18,8 +18,9 @@ public sealed record MapEventMarker(uint MapId,uint Icon,Vector3 Position,float 
 
 // Nearby game objects shown on the map (coffers, gathering points); Level is the gathering level when known, else 0.
 // N-09 (0.441): HuntMark = a living hunt mark (NotoriousMonster by BNpcBase); Level holds its rank (1 B, 2 A, 3 S).
-public enum MapObjectKind { Treasure, Gathering, HuntMark }
-public sealed record MapObjectMarker(MapObjectKind Kind,string Name,Vector3 Position,int Level,uint NameId=0,uint BaseId=0);
+// 0.901 (X-83): IslandAnimal: a wild animal of the Island Sanctuary that can be caught (MJIAnimals, by BNpcBase), Icon = its icon in the sheet.
+public enum MapObjectKind { Treasure, Gathering, HuntMark, IslandAnimal }
+public sealed record MapObjectMarker(MapObjectKind Kind,string Name,Vector3 Position,int Level,uint NameId=0,uint BaseId=0,uint Icon=0);
 /// <summary>0.813 (X-49): one point of an accepted quest as the game's own Map holds it (MarkerInfo.ObjectiveId, MapMarkerData map and place).</summary>
 public sealed record MapQuestPoint(uint Quest,uint MapId,float X,float Z);
 /// <summary>0.795 (X-34): a living enemy the game streams around the player: its name row, base row, name, place and level. Information only.</summary>
@@ -100,6 +101,8 @@ internal sealed class MapLiveReader : IDisposable
     }
     // N-09 (0.441): hunt marks by BNpcBase → rank (docs/evidence/0.441-hunt-marks.md).
     private readonly Dictionary<uint,int> huntMarks=[];
+    // 0.901 (X-83, docs/evidence/0.901-island-animals.md): the island's animals that can be caught: BNpcBase → icon (MJIAnimals).
+    private readonly Dictionary<uint,uint> islandAnimals=[];
     private readonly TeleportListGate teleportGate=new();
     private long teleport;private int costsRequest;private IReadOnlyDictionary<uint,uint>? teleportCosts;
     /// <summary>Queues a teleport to an aetheryte (game action, normal gil cost); sent on the next framework tick.</summary>
@@ -165,6 +168,12 @@ internal sealed class MapLiveReader : IDisposable
                 if(mark.BNpcBase.RowId!=0 && mark.Rank is >= 1 and <= 3)huntMarks.TryAdd(mark.BNpcBase.RowId,mark.Rank);
         }
         catch(Exception error){log.Warning(error,"Hunt mark data unavailable: marks are not shown on the map.");}
+        try
+        {
+            foreach(var animal in data.GetExcelSheet<Lumina.Excel.Sheets.MJIAnimals>())
+                if(animal.BNpcBase.RowId!=0 && animal.Icon>0)islandAnimals.TryAdd(animal.BNpcBase.RowId,(uint)animal.Icon);
+        }
+        catch(Exception error){log.Warning(error,"Island animal data unavailable: they are not shown on the map.");}
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
     }
     private bool teleportFailed;
@@ -274,13 +283,16 @@ internal sealed class MapLiveReader : IDisposable
                 Dalamud.Game.ClientState.Objects.Enums.ObjectKind.GatheringPoint=>MapObjectKind.Gathering,
                 Dalamud.Game.ClientState.Objects.Enums.ObjectKind.BattleNpc when huntMarks.ContainsKey(item.BaseId)
                     && item is Dalamud.Game.ClientState.Objects.Types.IBattleNpc { CurrentHp:>0 }=>MapObjectKind.HuntMark,
+                Dalamud.Game.ClientState.Objects.Enums.ObjectKind.BattleNpc when islandAnimals.ContainsKey(item.BaseId)
+                    && item is Dalamud.Game.ClientState.Objects.Types.IBattleNpc { CurrentHp:>0 }=>MapObjectKind.IslandAnimal,
                 _=>(MapObjectKind?)null,
             };
             if(kind is null || !item.IsTargetable)continue;
             // 0.856 (X-72 C): a hunt mark keeps its name and base rows, for the discoveries base.
             result.Add(new(kind.Value,item.Name.TextValue,item.Position,kind==MapObjectKind.Gathering ? gatheringLevels.GetValueOrDefault(item.BaseId)
                 :kind==MapObjectKind.HuntMark ? huntMarks.GetValueOrDefault(item.BaseId):0,
-                kind==MapObjectKind.HuntMark && item is Dalamud.Game.ClientState.Objects.Types.IBattleNpc mark ? mark.NameId:0,kind==MapObjectKind.HuntMark ? item.BaseId:0));
+                kind==MapObjectKind.HuntMark && item is Dalamud.Game.ClientState.Objects.Types.IBattleNpc mark ? mark.NameId:0,kind==MapObjectKind.HuntMark ? item.BaseId:0,
+                kind==MapObjectKind.IslandAnimal ? islandAnimals.GetValueOrDefault(item.BaseId):0));
         }
         return result.AsReadOnly();
     }

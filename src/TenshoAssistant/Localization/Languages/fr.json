@@ -3280,6 +3280,8 @@
     "NpcSaleStack": "Vente au PNJ (NQ) : {0} gils l'unité, pile de {1} : {2} gils"
   },
   "MapView": {
+    "ShowIslandAnimals": "Animaux de l'île",
+    "ShowIslandAnimalsHelp": "Sur l'île sanctuaire, les animaux sauvages autour de vous qui peuvent être capturés, avec leur icône (données du jeu).",
     "ShowMiningPoints": "Mineur",
     "ShowMiningPointsHelp": "Les points de minage et de carrière de la carte.",
     "ShowBotanyPoints": "Botaniste",

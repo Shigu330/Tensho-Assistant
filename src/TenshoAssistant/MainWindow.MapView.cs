@@ -529,7 +529,7 @@ internal sealed partial class MainWindow
                 settings.ShowMiningPoints=settings.ShowBotanyPoints=settings.ShowFishingPoints=shown;
                 settings.ShowQuests=settings.ShowFates=settings.ShowGathering=settings.ShowVendors=settings.ShowSightseeing=settings.ShowAetherCurrents=shown;
                 settings.ShowParty=settings.ShowBookmarks=settings.ShowHuntMarks=settings.ShowTreasure=settings.ShowFixedIcons=settings.ShowPlaceNames=settings.ShowIconNames=shown;
-                settings.ShowIslandPlants=settings.ShowIslandWood=settings.ShowIslandRocks=settings.ShowIslandEarth=settings.ShowIslandFishing=shown;
+                settings.ShowIslandPlants=settings.ShowIslandWood=settings.ShowIslandRocks=settings.ShowIslandEarth=settings.ShowIslandFishing=settings.ShowIslandAnimals=shown;
                 changed=true;
             }
             if(ImGui.SmallButton(localization.Get("MapView.LayersAll")))All(true);
@@ -551,6 +551,7 @@ internal sealed partial class MainWindow
             changed|=SettingBox("MapView.ShowIslandRocks",settings.ShowIslandRocks,value=>settings.ShowIslandRocks=value);
             changed|=SettingBox("MapView.ShowIslandEarth",settings.ShowIslandEarth,value=>settings.ShowIslandEarth=value);
             changed|=SettingBox("MapView.ShowIslandFishing",settings.ShowIslandFishing,value=>settings.ShowIslandFishing=value);
+            changed|=SettingBox("MapView.ShowIslandAnimals",settings.ShowIslandAnimals,value=>settings.ShowIslandAnimals=value);
             changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value);
             changed|=SettingBox("MapView.ShowSightseeing",settings.ShowSightseeing,value=>settings.ShowSightseeing=value);
             changed|=SettingBox("MapView.ShowAetherCurrents",settings.ShowAetherCurrents,value=>settings.ShowAetherCurrents=value);
@@ -810,6 +811,7 @@ internal sealed partial class MainWindow
         if(settings.ShowSightseeing)icons.Add(GlyphVista);
         if(settings.ShowAetherCurrents)icons.Add(GlyphCurrent);
         if(settings.ShowGathering)icons.Add(GlyphNearbyGathering);
+        if(settings.ShowIslandAnimals && map.TerritoryId==IslandResources.Territory)icons.Add(GlyphIslandAnimal);
         if(settings.ShowParty)icons.Add(GlyphParty);
         if(settings.ShowBookmarks)icons.Add(GlyphBookmark);
         if(settings.ShowTreasure)icons.Add(GlyphTreasureMap);
@@ -1353,8 +1355,8 @@ internal sealed partial class MainWindow
             if(live?.Objects is { } nearby && live.MapId==map.MapId)
                 foreach(var item in nearby)
                 {
-                    if(item.Kind switch{MapObjectKind.Treasure=>!settings.ShowTreasure,MapObjectKind.HuntMark=>!settings.ShowHuntMarks,_=>!settings.ShowGathering})continue;
-                    var kindSize=settings.SizeOf(item.Kind==MapObjectKind.Treasure ? TreasureIcon:GlyphNearbyGathering,map.MapId);
+                    if(item.Kind switch{MapObjectKind.Treasure=>!settings.ShowTreasure,MapObjectKind.HuntMark=>!settings.ShowHuntMarks,MapObjectKind.IslandAnimal=>!settings.ShowIslandAnimals,_=>!settings.ShowGathering})continue;
+                    var kindSize=settings.SizeOf(item.Kind switch{MapObjectKind.Treasure=>TreasureIcon,MapObjectKind.IslandAnimal=>GlyphIslandAnimal,_=>GlyphNearbyGathering},map.MapId);
                     if(kindSize<=0)continue;
                     var at=origin+mapPan+MapProjection.PixelFromWorld(item.Position,map)*mapZoom;
                     var glyph=Math.Max(4,baseIcon*0.6f*kindSize);
@@ -1362,6 +1364,14 @@ internal sealed partial class MainWindow
                     {
                         var half=Math.Max(4,baseIcon*kindSize)/2;
                         draw.AddImage(chest.Handle,at-new Vector2(half),at+new Vector2(half));
+                        glyph=half*2;
+                    }
+                    // 0.901 (X-83): an island animal with its own icon (MJIAnimals.Icon).
+                    else if(item.Kind==MapObjectKind.IslandAnimal && item.Icon!=0 && textures.TryGetFromGameIcon(new GameIconLookup(item.Icon),out var animalShared) && animalShared.TryGetWrap(out var animalImage,out _) && animalImage is not null)
+                    {
+                        var half=Math.Max(4,baseIcon*kindSize)/2;
+                        draw.AddCircleFilled(at,half*1.05f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
+                        draw.AddImage(animalImage.Handle,at-new Vector2(half),at+new Vector2(half));
                         glyph=half*2;
                     }
                     else
@@ -1815,7 +1825,8 @@ internal sealed partial class MainWindow
     // « Coffre au trésor » map icon of the game (MapSymbol 63852, docs/evidence/0.139.0-symbols-probe.log), used for nearby coffers (0.210).
     private const uint TreasureIcon=63852;
     // Keys of Tensho's own map layers in the icon size/priority tables (outside the game's icon id range).
-    private const uint GlyphVista=0xFFFF0001,GlyphCurrent=0xFFFF0002,GlyphNearbyGathering=0xFFFF0003,GlyphParty=0xFFFF0004,GlyphBookmark=0xFFFF0005,GlyphTreasureMap=0xFFFF0006;
+    private const uint GlyphVista=0xFFFF0001,GlyphCurrent=0xFFFF0002,GlyphNearbyGathering=0xFFFF0003,GlyphParty=0xFFFF0004,GlyphBookmark=0xFFFF0005,GlyphTreasureMap=0xFFFF0006,
+        GlyphIslandAnimal=0xFFFF0007;
     private static (FontAwesomeIcon Symbol,Vector4 Colour)? TenshoGlyph(uint icon)=>icon switch
     {
         GlyphVista=>(FontAwesomeIcon.Binoculars,new Vector4(0.98f,0.82f,0.30f,1)),
@@ -1824,6 +1835,7 @@ internal sealed partial class MainWindow
         GlyphParty=>(FontAwesomeIcon.Users,new Vector4(0.35f,0.6f,1f,1)),
         GlyphBookmark=>(FontAwesomeIcon.Star,new Vector4(1f,0.85f,0.35f,1)),
         GlyphTreasureMap=>(FontAwesomeIcon.Gem,new Vector4(0.95f,0.55f,0.25f,1)),
+        GlyphIslandAnimal=>(FontAwesomeIcon.Paw,new Vector4(0.85f,0.75f,0.55f,1)),
         _=>null,
     };
     private string IconRowName(uint icon)=>icon switch
@@ -1835,6 +1847,7 @@ internal sealed partial class MainWindow
         GlyphParty=>localization.Get("MapView.ShowParty"),
         GlyphBookmark=>localization.Get("MapView.ShowBookmarks"),
         GlyphTreasureMap=>localization.Get("MapView.TreasureMapIcon"),
+        GlyphIslandAnimal=>localization.Get("MapView.ShowIslandAnimals"),
         _ when mapMarkers?.SymbolName(icon) is { Length:>0 } known=>known,
         _ when mapMarkers?.QuestIcons.TryGetValue(icon,out var quest)==true=>localization.Format(MapQuestIcons.NamesItsVariant(quest.Locked,quest.Variant) ? "MapView.QuestIconNamed":"MapView.QuestIcon",
             localization.Get("MapView.QuestKind"+(quest.Row is 1 or 3 or 8 or 10 ? quest.Row:0u)),quest.Row,

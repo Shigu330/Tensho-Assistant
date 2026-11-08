@@ -288,6 +288,8 @@ public sealed class MapViewSettings
     public bool ShowIslandRocks { get; set; } = true;
     public bool ShowIslandEarth { get; set; } = true;
     public bool ShowIslandFishing { get; set; } = true;
+    /// <summary>X-83 (0.901, user report: no icon beside an island animal): the island's wild animals that can be caught, with their icon.</summary>
+    public bool ShowIslandAnimals { get; set; } = true;
     /// <summary>An item of no known kind stays as long as one kind is shown.</summary>
     public bool ShowsIslandKind(TenshoAssistant.Maps.IslandResourceKind? kind)=>kind switch
     {

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.901.0
+- Plan global, Verify : Retour de l'utilisateur sur l'île sanctuaire (X-83) : à côté d'un animal, aucune icône sur la carte. Le relevé de la 0.881 a vu les monstres autour (opo-opo, agneau égaré) ; la feuille du jeu des animaux de l'île (MJIAnimals) relie chaque animal capturable à son monstre et à son icône. La carte montre maintenant les animaux capturables présents autour de vous, avec leur icône ; réglage « Animaux de l'île » dans le menu des calques (activé par défaut). Données du jeu seulement (preuve : docs/evidence/0.901-island-animals.md). Non validé en jeu.
+- Tests : IslandAnimals901Tests. Verify.ps1 (agent) : 1481/1481, 0 avertissement, 0 erreur ; DLL 0.901.0.0. Non validé en jeu.
+### English
+- User's report on the Island Sanctuary (X-83): beside an animal, no icon on the map. The 0.881 capture saw the monsters around (opo-opo, stray lamb); the game's island animals sheet (MJIAnimals) links each animal that can be caught to its monster and its icon. The map now shows the animals that can be caught around you, with their icon; setting « Island animals » in the layers menu (on by default). Game data only (evidence: docs/evidence/0.901-island-animals.md). Not validated in game.
+
 ## 0.900.0
 - Plan global, Verify : Essai en jeu de l'utilisateur, revue de mode (X-75.7) : les tenues jugées sont lues (thème, catégories, note de chaque emplacement, teintures) et notées dans les découvertes ; l'aperçu de la revue est lu (thème, meilleur score, tentatives restantes) ; le parseur des tenues jugées (0.861) est validé en jeu. Correction (retour de l'utilisateur) : dans la liste d'un emplacement, le clic droit sur l'icône d'une pièce non possédée ouvrait un menu grisé et transparent, parce que la ligne atténuée englobait aussi le menu de l'icône (celui du nom était déjà corrigé en 0.214) ; seule l'image est maintenant atténuée. Non validé en jeu (la correction).
 - Tests : FashionIconMenu900Tests. Verify.ps1 (agent) : 1480/1480, 0 avertissement, 0 erreur ; DLL 0.900.0.0. Non validé en jeu.

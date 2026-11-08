@@ -3280,6 +3280,8 @@
     "NpcSaleStack": "NPC sale (NQ): {0} gil each, stack of {1}: {2} gil"
   },
   "MapView": {
+    "ShowIslandAnimals": "Island animals",
+    "ShowIslandAnimalsHelp": "On the Island Sanctuary, the wild animals around you that can be caught, with their icon (game data).",
     "ShowMiningPoints": "Miner",
     "ShowMiningPointsHelp": "The mining and quarrying points of the map.",
     "ShowBotanyPoints": "Botanist",
