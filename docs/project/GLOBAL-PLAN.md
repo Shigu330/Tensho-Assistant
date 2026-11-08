@@ -289,7 +289,7 @@ avant la 1.0.0, E2 test des règles d'interface (couvert par les tests 912 à 92
 - Contrôle de la liste des règles Dalamud (`docs/project/PUBLISHING.md`) point par point ; tout écart résumé à l'utilisateur avant de corriger.
 - Données gardées sur le disque : liste, taille maximale, purge, ce que « vider » efface.
 
-**6. Robustesse et performance.**
+**6. Robustesse et performance.** — 0.950–0.951 : vendeurs de la carte, mesures fines ; audit des calculs par image (agent, checkpoints/x76-draw-cost.json, 9 constats) : lot 1 en 0.955 (fiche vendeur, ensembles d'équipement, Banque, hauts faits par nom) ; lot 2 à suivre (monstres proches, menus de la carte, guide, collections) ;
 - Chaque lecture native : thread du framework, pointeur vérifié, copie, coupure en JcJ, résistance aux mises à jour du jeu (R-14).
 - Chaque abonnement, minuterie et tâche : propriétaire et nettoyage (test existant étendu si besoin).
 - Draw : boucles et allocations par image, caches recalculés trop souvent ; le relevé « Slow frame » sert de juge.

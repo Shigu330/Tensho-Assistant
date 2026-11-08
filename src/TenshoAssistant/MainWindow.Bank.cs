@@ -18,7 +18,7 @@ internal sealed partial class MainWindow
     private string BankEntryName(BankEntry entry)=>StorageNames.Of(localization,entry.Key.Kind,entry.Name);
     private readonly record struct BankItemRow(uint ItemId, long Nq, long Hq);
     private readonly record struct BankSourceViewKey(ulong Character,InventorySnapshot? Live,BankState Bank,ItemCatalog? Items,bool Personal,BankKey? Origin);
-    private readonly record struct BankFrameViewKey(BankSourceViewKey Source,string Category,int Quality,string Query,int LanguageRevision,TenshoAssistant.Caching.CacheRetention Retention,long Second);
+    private readonly record struct BankFrameViewKey(BankSourceViewKey Source,string Category,int Quality,string Query,int LanguageRevision,TenshoAssistant.Caching.CacheRetention Retention,DateTimeOffset? NextExpiry,DateTime Today);
     private BankState? bankEntriesSource;
     private ulong bankEntriesCharacter;
     private BankEntry[] bankEntriesView=[];
@@ -289,8 +289,12 @@ internal sealed partial class MainWindow
         BoolSetting("BankUi.ListView","BankUi.ListViewTip",()=>configuration.BankListView,value=>configuration.BankListView=value,c=>c.BankListView);
 
         var now=DateTimeOffset.UtcNow;
+        // X-76 (0.955): no longer a per-second field: the frames are rebuilt when a selected snapshot turns expired (or fresh), and when the
+        // local day changes (time or date in the title), so the « expired » mark still comes on time.
+        var nextExpiry=TenshoAssistant.Caching.CacheAge.NextChange(selectedEntries.Select(entry=>(DateTimeOffset?)entry.Snapshot.ObservedAt),now,
+            configuration.Cache.Duration(TenshoAssistant.Caching.CacheArea.ImportedStock));
         var frameKey=new BankFrameViewKey(sourceKey,bankCategoryFilter,bankQualityFilter,bankQuery,localization.Revision,
-            configuration.Cache.Get(TenshoAssistant.Caching.CacheArea.ImportedStock),now.ToUnixTimeSeconds());
+            configuration.Cache.Get(TenshoAssistant.Caching.CacheArea.ImportedStock),nextExpiry,now.ToLocalTime().Date);
         if(bankFrameViewKey!=frameKey)
         {
             bankHasVisibleItems=bankSourceRows.Any(pair=>MatchesBankFilters(new(pair.Key,pair.Value.Nq,pair.Value.Hq)));

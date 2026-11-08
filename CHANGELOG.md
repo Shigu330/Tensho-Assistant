@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.955.0
+- Plan global, Verify : Nettoyage X-76, étape 6 (performance, premier lot), d'après un audit des calculs refaits à chaque image : la fiche d'un vendeur ne parcourt plus les 39 000 ventes du jeu à chaque image (index par boutique et par PNJ construits une fois) ; les ensembles d'équipement ne sont plus recalculés toutes les deux secondes quand rien n'a changé (la page Équipement et l'aperçu du tri en profitent) ; la Banque n'est plus reconstruite chaque seconde, seulement quand un relevé importé passe « périmé » ou au changement de jour ; la recherche d'un haut fait par son nom dans l'info-bulle devient une recherche directe. Rien ne change à l'écran. Non validé en jeu.
+- Tests : DrawCost955Tests. Verify.ps1 (agent) : 1579/1579, 0 avertissement, 0 erreur ; DLL 0.955.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, step 6 (performance, first batch), from an audit of work redone every frame: a vendor's sheet no longer walks the game's 39,000 sales every frame (indexes by shop and by NPC built once); gear sets are no longer recomputed every two seconds when nothing changed (the Gear page and the sort preview benefit); the Bank is no longer rebuilt every second, only when an imported snapshot turns « expired » or the day changes; looking up an achievement by name in the tooltip becomes a direct lookup. Nothing changes on screen. Not validated in game.
+
 ## 0.954.0
 - Plan global, Verify : Nettoyage X-76, étape 3 (fin des groupes de réglages) : les trois recoupements trouvés sont réglés. Panneaux des listes : les groupes par provenance (récolte, vendeur, monstre, autre, cristaux) sont grisés quand « seulement les objets finis » est coché, puisqu'aucun matériau n'est montré alors ; « Afficher les ID » est grisé en mode développeur, qui les affiche déjà ; dans « Que puis-je fabriquer ? », la case des prix du marché a son propre nom (« Prix du marché pour cette liste ») et dit qu'elle vaut pour cette page seulement, au lieu de reprendre celui du réglage de la valeur des monnaies. Non validé en jeu.
 - Tests : SettingOverlaps954Tests. Verify.ps1 (agent) : 1575/1575, 0 avertissement, 0 erreur ; DLL 0.954.0.0. Non validé en jeu.

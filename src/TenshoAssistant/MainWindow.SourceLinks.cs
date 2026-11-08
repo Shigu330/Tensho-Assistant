@@ -51,8 +51,7 @@ internal sealed partial class MainWindow
     // A wiki line naming an achievement in English, matched to the game's achievement (0.180).
     private CollectionEntry? AchievementNamed(Community.WikiAcquisitionLine line)=>
         line.Heading.Equals("Achievement",StringComparison.OrdinalIgnoreCase) || line.Heading.Equals("Achievements",StringComparison.OrdinalIgnoreCase)
-            ? collections.State.Entries.FirstOrDefault(entry=>entry.Kind==CollectionKind.Achievement && entry.Achievement is { EnglishName.Length:>0 } metadata
-                && metadata.EnglishName.Equals(line.Text,StringComparison.OrdinalIgnoreCase)):null;
+            ? AchievementByEnglishName(line.Text):null; // X-76 (0.955): a look-up in the collection index (UI/Components/DataIndexes.cs), not a scan per line and frame.
     // 0.331: the state filter and the category are reset to the achievement's, which they could hide (as OpenCompletion).
     private void OpenAchievement(CollectionEntry achievement)
     {

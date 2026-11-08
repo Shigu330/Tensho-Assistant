@@ -4,9 +4,6 @@ using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
 namespace TenshoAssistant.Gear;
 
-/// <summary>The game's gear sets and the job levels (ClassJob row → level; null when not read), copied together.</summary>
-public sealed record GearsetState(IReadOnlyList<GameGearset> Sets,IReadOnlyDictionary<uint,int> JobLevels,IReadOnlyList<JobProgressRow>? Jobs=null);
-
 /// <summary>
 /// g, M-12 (0.383): while the Gear page asks (<see cref="Want"/>, 5 s window), copies the game's gear sets (RaptureGearsetModule
 /// entries that exist: number, name, job, item level, pieces and materia) and the job levels (PlayerState.ClassJobLevels by the job's
@@ -100,7 +97,9 @@ public sealed unsafe class GameGearsetReader : IDisposable
                         var level=(int)player->ClassJobLevels[slot];
                         progress.Add(new(job,Math.Max(level,0),Math.Max(player->ClassJobExperience[slot],0),expToNext.GetValueOrDefault(level)));
                     }
-            Volatile.Write(ref state,new GearsetState(sets,levels,progress));
+            // X-76 (0.955): an unchanged copy keeps the published object (GearsetState in Gear/Gearsets.cs), so the pages' caches keyed on it stay.
+            var next=new GearsetState(sets,levels,progress);
+            if(!next.SameAs(Volatile.Read(ref state)))Volatile.Write(ref state,next);
             unavailable=false;
             warned=false;
         }

@@ -126,7 +126,24 @@ public sealed class NpcVendorCatalog
     {
         Source=source;Vendors=vendors;Sales=sales;this.byItem=byItem;VendorCount=vendors.Count;SaleCount=sales.Count;
         salesByItem=sales.GroupBy(sale=>sale.ItemId).ToFrozenDictionary(group=>group.Key,group=>(IReadOnlyList<NpcShopSale>)group.ToArray());
+        // X-76 (0.955): the vendor sheet read every sale and every vendor on each frame; these are built once with the catalogue.
+        // Shops keep the order of their first sale in Sales, sales their order in Sales (as the page's former GroupBy did).
+        var shops=sales.GroupBy(sale=>sale.ShopId).Select((group,order)=>(group.Key,Order:order,Sales:(IReadOnlyList<NpcShopSale>)Array.AsReadOnly(group.ToArray()))).ToArray();
+        salesByShop=shops.ToFrozenDictionary(shop=>shop.Key,shop=>shop.Sales);
+        var shopOrder=shops.ToDictionary(shop=>shop.Key,shop=>shop.Order);
+        vendorByNpc=vendors.GroupBy(vendor=>vendor.NpcId).ToFrozenDictionary(group=>group.Key,group=>group.First());
+        shopsByNpc=vendorByNpc.ToFrozenDictionary(pair=>pair.Key,pair=>(IReadOnlyList<IReadOnlyList<NpcShopSale>>)Array.AsReadOnly(pair.Value.ShopIds.Distinct()
+            .Where(shopOrder.ContainsKey).OrderBy(shop=>shopOrder[shop]).Select(shop=>salesByShop[shop]).ToArray()));
     }
+    private readonly FrozenDictionary<uint,IReadOnlyList<NpcShopSale>> salesByShop;
+    private readonly FrozenDictionary<uint,NpcVendor> vendorByNpc;
+    private readonly FrozenDictionary<uint,IReadOnlyList<IReadOnlyList<NpcShopSale>>> shopsByNpc;
+    /// <summary>Every sale of one shop, in the order of Sales; empty when the shop sells nothing.</summary>
+    public IReadOnlyList<NpcShopSale> SalesOfShop(uint shopId)=>salesByShop.GetValueOrDefault(shopId) ?? [];
+    /// <summary>The vendor of this NPC id (the first one kept by Build), or null.</summary>
+    public NpcVendor? Vendor(uint npcId)=>vendorByNpc.GetValueOrDefault(npcId);
+    /// <summary>The shops of this NPC's vendor that sell something, each one's sales (never empty), shops in the order of their first sale in Sales.</summary>
+    public IReadOnlyList<IReadOnlyList<NpcShopSale>> ShopsOf(uint npcId)=>shopsByNpc.GetValueOrDefault(npcId) ?? [];
     // Every sale of an item, also in shops no NPC of the sheets opens (0.199: matched with LuminaSupplemental ENpcShop).
     private readonly FrozenDictionary<uint,IReadOnlyList<NpcShopSale>> salesByItem;
     public IReadOnlyList<NpcShopSale> SalesOf(uint itemId)=>salesByItem.GetValueOrDefault(itemId) ?? [];

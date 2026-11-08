@@ -24,7 +24,7 @@ internal sealed partial class MainWindow
             if(developerMode && state.Error is { } error)ImGui.TextWrapped(RawMessage(error));
             return;
         }
-        if(npcVendorFocus!=0 && catalog.Vendors.FirstOrDefault(vendor=>vendor.NpcId==npcVendorFocus) is { } focused){DrawNpcVendorSheet(catalog,focused);return;}
+        if(npcVendorFocus!=0 && catalog.Vendor(npcVendorFocus) is { } focused){DrawNpcVendorSheet(catalog,focused);return;}
         if(itemId<=0){ImGui.TextWrapped(localization.Get("NpcUi.Help"));return;}
         var id=(uint)itemId;
         DrawItemIcon(SelectedItem,new Vector2(40));
@@ -85,16 +85,18 @@ internal sealed partial class MainWindow
                 if(ImGui.SmallButton(localization.Get("MapView.ShowOnMap")+$"##VendorMap{location.MapId}/{location.X}/{location.Y}"))ShowOnTenshoMap(map,new Vector3(location.WorldX,0,location.WorldZ));
             }
         }
-        var sales=catalog.Sales.Where(sale=>vendor.ShopIds.Contains(sale.ShopId)).GroupBy(sale=>sale.ShopId).ToArray();
-        if(sales.Length==0){ImGui.TextDisabled(localization.Get("MapLocal.ShopsNone"));return;}
+        // X-76 (0.955): the shops' sales come from the catalogue's index (built once), not from a scan of every sale on each frame.
+        var sales=catalog.ShopsOf(vendor.NpcId);
+        if(sales.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.ShopsNone"));return;}
         var items=itemCatalog.State.Catalog;
         foreach(var shop in sales)
         {
-            var first=shop.First();
+            var first=shop[0];
+            var shopKey=first.ShopId;
             var title=first.ShopName.Length>0 && !(localization.CurrentCode!="ja" && first.ShopName.Any(c=>c is >= '\u3040' and <= '\u30FF' or >= '\u4E00' and <= '\u9FFF'))
                 ? first.ShopName:localization.Get("MapLocal.ShopKind"+first.Kind);
-            if(!TenshoAssistant.UI.UiComponents.Header($"{title} ({shop.Count()})##Shop{shop.Key}"))continue;
-            if(!ImGui.BeginTable($"VendorShop{shop.Key}",2,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))continue;
+            if(!TenshoAssistant.UI.UiComponents.Header($"{title} ({shop.Count})##Shop{shopKey}"))continue;
+            if(!ImGui.BeginTable($"VendorShop{shopKey}",2,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))continue;
             try
             {
                 foreach(var sale in shop)
@@ -102,9 +104,9 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     var item=items?.Find(sale.ItemId);
                     DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();
-                    if(ImGui.Selectable($"{item?.Name ?? localization.Format("BankUi.Item",sale.ItemId)}##Sale{shop.Key}/{sale.ItemId}/{sale.Quantity}")){itemId=(int)sale.ItemId;npcVendorFocus=0;}
+                    if(ImGui.Selectable($"{item?.Name ?? localization.Format("BankUi.Item",sale.ItemId)}##Sale{shopKey}/{sale.ItemId}/{sale.Quantity}")){itemId=(int)sale.ItemId;npcVendorFocus=0;}
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(sale.ItemId);
-                    ItemCollectionMenu($"SaleCollection{shop.Key}/{sale.ItemId}",item);
+                    ItemCollectionMenu($"SaleCollection{shopKey}/{sale.ItemId}",item);
                     ImGui.TableNextColumn();DrawNpcCosts(sale,16,true);
                 }
             }

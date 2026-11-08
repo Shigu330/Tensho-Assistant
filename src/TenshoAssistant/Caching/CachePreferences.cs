@@ -49,4 +49,20 @@ public sealed class CachePreferences
 public static class CacheAge
 {
     public static bool Fresh(DateTimeOffset? recordedAt,DateTimeOffset now,TimeSpan duration)=>recordedAt is { } date && duration>TimeSpan.Zero && now>=date && now-date<duration;
+    /// <summary>
+    /// X-76 (0.955): the first instant after <paramref name="now"/> at which <see cref="Fresh"/> changes for one of these dates (a date reached,
+    /// or its lifetime over); null when none will change. A view keyed on it is rebuilt when a record turns fresh or expired, not every second.
+    /// </summary>
+    public static DateTimeOffset? NextChange(IEnumerable<DateTimeOffset?> recordedAt,DateTimeOffset now,TimeSpan duration)
+    {
+        if(duration<=TimeSpan.Zero)return null;
+        DateTimeOffset? next=null;
+        foreach(var recorded in recordedAt)
+        {
+            if(recorded is not { } date)continue;
+            DateTimeOffset? change=now<date ? date:duration<=DateTimeOffset.MaxValue-date && now<date+duration ? date+duration:null;
+            if(change is { } at && (next is null || at<next))next=at;
+        }
+        return next;
+    }
 }
