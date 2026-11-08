@@ -52,6 +52,8 @@ public sealed unsafe class UndercutWatcher : IDisposable
 
     private void OnOfferings(IMarketBoardCurrentOfferings offerings)
     {
+        // DEC-038 (user's go-ahead 2026-11-08, « y a pas de vendeur en pvp donc oui »): nothing read in PvP or ranked content, like every other reader.
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
         try
         {
             if(disposed || !configuration.UndercutClipboard || offerings.ItemListings.Count==0)return;

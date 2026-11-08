@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.926.0
+- Plan global, Verify : Coupure en JcJ (DEC-038, avec votre accord : « y a pas de vendeur en pvp donc oui ») : la lecture des offres du marché pendant une mise en vente (prix à copier sous le moins cher) était la seule lecture encore active en JcJ et en contenu classé ; elle s'arrête maintenant comme toutes les autres. Fin de l'harmonisation 2b du nettoyage X-76. Non validé en jeu.
+- Tests : UndercutCut926Tests. Verify.ps1 (agent) : 1539/1539, 0 avertissement, 0 erreur ; DLL 0.926.0.0. Non validé en jeu.
+### English
+- PvP cut (DEC-038, with your go-ahead: « there are no vendors in PvP, so yes »): reading the market offers during a listing (price to copy under the lowest) was the only reading still active in PvP and ranked content; it now stops like all the others. End of harmonisation 2b of the X-76 clean-up. Not validated in game.
+
 ## 0.925.0
 - Plan global, Verify : Nettoyage X-76, harmonisation H10 (fin, écritures) : le journal des gils (chaque minute), l'état du personnage (toutes les dix minutes et à chaque case « fait » cochée dans la fenêtre) et l'historique des voyages (à chaque lecture de l'atelier) ne s'écrivent plus sur le fil du jeu ni pendant le dessin de la fenêtre : une copie est écrite à côté, dans l'ordre, et un échec est noté au journal. La seule écriture qui a besoin du résultat (déplacement unique des anciennes cases partagées) reste immédiate ; à la fermeture du plugin, Tensho attend la fin des écritures (trois secondes au plus). Reste une décision pour vous (DEC-038). Rien de visible en jeu, sinon moins d'à-coups possibles. Non validé en jeu.
 - Tests : BackgroundWriter925Tests. Verify.ps1 (agent) : 1538/1538, 0 avertissement, 0 erreur ; DLL 0.925.0.0. Non validé en jeu.
