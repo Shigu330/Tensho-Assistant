@@ -22,6 +22,8 @@ internal sealed partial class MainWindow
     internal Func<uint,string>? SectorName { get; set; }
     /// <summary>X-73.9 (0.863): a blue magic spell's and a beast's names.</summary>
     internal Func<uint,string>? SpellName { get; set; }
+    /// <summary>X-73.18 (0.889): a Quest row's name (QuestNameOf, MainWindow.ShopRequirements.cs), or its number.</summary>
+    private string DiscoveryQuestName(uint id)=>QuestNameOf?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
     internal Func<uint,string>? BeastName { get; set; }
     private string DiscoveryNamed(Func<uint,string>? name,uint id)=>name?.Invoke(id) is { Length:>0 } found ? found:$"#{id}";
     private string DiscoverySectorName(uint id)=>SectorName?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
@@ -106,7 +108,7 @@ internal sealed partial class MainWindow
         if(discoveredSources.Item==item && discoveredSources.Revision==store.Revision)return discoveredSources.Lines;
         var lines=ItemSourceKinds.Where(kind=>kind is not (DiscoveryKind.FishCondition or DiscoveryKind.FestivalSeen or DiscoveryKind.VistaSeen or DiscoveryKind.VoyageUnlock
                 or DiscoveryKind.BlueSpellLearned or DiscoveryKind.BeastTamed or DiscoveryKind.FashionEvaluation or DiscoveryKind.NpcPlace or DiscoveryKind.BlueSpellCaster
-                or DiscoveryKind.FishLure or DiscoveryKind.FishTransition or DiscoveryKind.FishBite))
+                or DiscoveryKind.FishLure or DiscoveryKind.FishTransition or DiscoveryKind.FishBite or DiscoveryKind.QuestItemAsked))
             .SelectMany(kind=>store.Find(kind,subject=>subject==item,4)).OrderByDescending(fact=>fact.Seen+fact.Imported).Take(4)
             .Select(fact=>$"{DiscoveryFactName(fact)} ({DiscoveryFactLevel(fact)}, ×{fact.Seen+fact.Imported})").ToArray();
         discoveredSources=(item,store.Revision,lines);
@@ -249,6 +251,7 @@ internal sealed partial class MainWindow
         DiscoveryKind.DutyChest=>localization.Format("DiscoveriesUi.FromDutyChest",DiscoveryItemName(fact.Subject),DiscoveryDutyName(fact.Detail)),
         DiscoveryKind.FateReward=>localization.Format("DiscoveriesUi.FromFate",DiscoveryItemName(fact.Subject),DiscoveryFateName(fact.Detail)),
         DiscoveryKind.MonsterDrop=>localization.Format("DiscoveriesUi.FromMonster",DiscoveryItemName(fact.Subject),DiscoveryMonsterName(fact.Detail)),
+        DiscoveryKind.QuestItemAsked=>localization.Format("DiscoveriesUi.QuestAsked",DiscoveryItemName(fact.Subject),DiscoveryQuestName(fact.Detail)),
         DiscoveryKind.Reduction=>localization.Format("DiscoveriesUi.FromReduction",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
         DiscoveryKind.ItemFromItem=>localization.Format("DiscoveriesUi.FromItem",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
         DiscoveryKind.FishCatch=>localization.Format("DiscoveriesUi.FromBait",DiscoveryItemName(fact.Subject),fact.Detail==0 ? "?":DiscoveryItemName(fact.Detail)),

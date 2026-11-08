@@ -584,6 +584,8 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "QuestAsked": "{0} demandé par « {1} »",
+    "SummaryQuestItemAsked": "Objets demandés par des quêtes : {0} ({1} vus par vous, {2} importés seulement)",
     "FromReduction": "{0} ← éthérolyse de {1}",
     "SummaryReduction": "Éthérolyses : {0} ({1} vues par vous, {2} importées seulement)",
     "SummaryFishBite": "Touches de poissons vues : {0} ({1} vues par vous, {2} importées seulement)",
@@ -1201,6 +1203,7 @@
     "MissingTip": "Ne garde que les objets de collection (monture, mascotte, carte, rouleau) que vous n'avez pas encore."
   },
   "ItemUseRefs": {
+    "SeenQuests": "Demandé par des quêtes (vu par vous : {0})",
     "SeenGives": "Vu donner ({0}, par vous)",
     "Currency": "Monnaie : échangeable contre {0} objet(s)",
     "CurrencyHelp": "Boutiques du jeu qui acceptent cet objet comme paiement ; clic sur un PNJ = outil Vendeurs, sur un objet = sa fiche.",

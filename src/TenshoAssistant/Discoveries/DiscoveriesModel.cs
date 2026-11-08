@@ -33,7 +33,10 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     // caught, levels = the bite time in tenths of a second from the cast (casts under Chum are left out).
     FishBite=23,
     // X-73.18 (0.888, docs/evidence/0.888-aetherial-reduction.md): Reduction: Subject = item obtained, Detail = the collectable reduced, levels = quantities.
-    Reduction=24 }
+    Reduction=24,
+    // X-73.18 (0.889, docs/evidence/0.889-hand-in.md): QuestItemAsked: Subject = item handed in, Detail = the Quest row whose step changed just after (HQ adds
+    // 1 000 000 to nothing: the HQ demand is kept as LevelMax = 1), LevelMin = quantity asked.
+    QuestItemAsked=25 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported

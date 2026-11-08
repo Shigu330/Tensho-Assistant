@@ -145,6 +145,12 @@ internal sealed partial class MainWindow
                     }
                     ImGui.Unindent();
                 }
+            // X-73.18 (0.889): the quests you saw ask for it come first.
+            if(DiscoveryStore is { } seenStore && DiscoveriesLoaded && seenStore.Find(Discoveries.DiscoveryKind.QuestItemAsked,subject=>subject==id,16) is { Count:>0 } seenAsks
+               && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.SeenQuests",seenAsks.Count)+"###UseSeenQuests"))
+                foreach(var fact in seenAsks)
+                    if(ImGui.Selectable(localization.Format("ItemUseRefs.Quest",DiscoveryQuestName(fact.Detail),fact.LevelMax)+$"##SeenAsk{fact.Detail}"))
+                    {page=Page.Quests;SelectQuest(fact.Detail);}
             var asked=data.QuestsRequiring(id);
             if(asked.Count>0 && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.Quests",asked.Count)+"###UseQuests"))
                 foreach(var (questId,name,quantity,hq) in asked)

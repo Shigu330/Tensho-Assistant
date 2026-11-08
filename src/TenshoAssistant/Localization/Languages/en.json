@@ -584,6 +584,8 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
+    "QuestAsked": "{0} asked by « {1} »",
+    "SummaryQuestItemAsked": "Items asked by quests: {0} ({1} seen by you, {2} imported only)",
     "FromReduction": "{0} ← aetherial reduction of {1}",
     "SummaryReduction": "Aetherial reductions: {0} ({1} seen by you, {2} imported only)",
     "SummaryFishBite": "Fish bites seen: {0} ({1} seen by you, {2} imported only)",
@@ -1201,6 +1203,7 @@
     "MissingTip": "Keeps only the collection items (mount, minion, card, roll) you do not have yet."
   },
   "ItemUseRefs": {
+    "SeenQuests": "Asked by quests (seen by you: {0})",
     "SeenGives": "Seen giving ({0}, by you)",
     "Currency": "Currency: exchangeable for {0} item(s)",
     "CurrencyHelp": "Game shops taking this item as payment; click an NPC = vendor tool, an item = its sheet.",

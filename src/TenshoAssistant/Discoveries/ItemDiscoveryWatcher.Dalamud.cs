@@ -192,7 +192,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             if(wanted.Fishing && me.ClassJob.RowId==18)ReadLine(now,me);
             if(wanted.ItemSources)
             {
-                ReadSalvage(at);ReadPurify(at);ReadVenture(at);ReadLoot(at,territory,duty);
+                ReadSalvage(at);ReadPurify(at);ReadHandIn(at,now);ReadVenture(at);ReadLoot(at,territory,duty);
                 ReadFate(now);ReadTarget(now,territory,map);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);ReadShopNpc(at,territory,map);ReadCasters(at,territory,map);
             }
             var counts=Counts();
@@ -288,6 +288,50 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         purifySeen=signature;
         foreach(var (item,count) in results)store.SeeSource(DiscoveryKind.Reduction,item,source,count,at);
         if(debug())log.Information("Discovery: aetherial reduction of {0}: {1}.",source,signature);
+    }
+
+    /// <summary>
+    /// X-73.18 (0.889, proved for a leve by the in-game capture, docs/evidence/0.889-hand-in.md): the items an NPC asks for in the « Request » window
+    /// (UIState.NpcTrade). The quest is the one whose step changes (or that ends) within 15 s after the window closes: the leve did so 4 s after. Leves are
+    /// game data already: only quests are kept. Unverified for a quest until a quest hand-in is seen.
+    /// </summary>
+    private (List<(uint Item,int Quantity,bool Hq)> Items,Dictionary<ushort,byte> Steps,long ClosedAt)? handIn;
+    private static Dictionary<ushort,byte> QuestSteps()
+    {
+        var steps=new Dictionary<ushort,byte>();
+        var quests=FFXIVClientStructs.FFXIV.Client.Game.QuestManager.Instance();
+        if(quests==null)return steps;
+        foreach(var quest in quests->NormalQuests)if(quest.QuestId!=0)steps[quest.QuestId]=quest.Sequence;
+        return steps;
+    }
+    private void ReadHandIn(DateTimeOffset at,long now)
+    {
+        var shown=gui.GetAddonByName("Request") is { IsNull:false,IsVisible:true };
+        if(shown)
+        {
+            var ui=UIState.Instance();
+            if(ui==null)return;
+            var requests=&ui->NpcTrade.Requests;
+            var items=new List<(uint,int,bool)>();
+            for(var index=0;index<Math.Min((int)requests->Count,requests->Items.Length);index++)
+            {
+                ref var item=ref requests->Items[index];
+                if(item.ItemId!=0 && item.RequiredQuantity>0)items.Add((ItemGains.BaseItem(item.ItemId),item.RequiredQuantity,item.WantHQ));
+            }
+            if(items.Count>0)handIn=(items,handIn?.Steps ?? QuestSteps(),-1);
+            return;
+        }
+        if(handIn is not { } pending)return;
+        if(pending.ClosedAt<0){handIn=pending with {ClosedAt=now};return;}
+        if(now-pending.ClosedAt>15_000){handIn=null;return;}
+        var after=QuestSteps();
+        var changed=pending.Steps.Where(step=>!after.TryGetValue(step.Key,out var sequence) || sequence!=step.Value).Select(step=>step.Key).ToArray();
+        if(changed.Length==0)return;
+        handIn=null;
+        if(changed.Length!=1)return;
+        var quest=0x10000u+changed[0];
+        foreach(var (item,quantity,hq) in pending.Items)store.SeeSource(DiscoveryKind.QuestItemAsked,item,quest,quantity,at);
+        if(debug())log.Information("Discovery: quest {0} asked for {1}.",quest,string.Join(", ",pending.Items.Select(entry=>$"{entry.Item}x{entry.Quantity}")));
     }
 
     private void ReadVenture(DateTimeOffset at)
