@@ -139,7 +139,14 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             var busy=!fishing && (condition[ConditionFlag.Crafting] || condition[ConditionFlag.Gathering] || condition[ConditionFlag.PreparingToCraft]
                 || BusyWindows.Any(name=>gui.GetAddonByName(name) is { IsNull:false,IsVisible:true }));
             var spent=ItemGains.SingleSpent(losses);
-            var cause=ItemGains.Attribute(fishing,busy || !wanted.ItemSources,now,fateEndedAt,fateId,death.At,duty!=0,spent,spent is { } used && usable(used),spent is { } same && gains.ContainsKey(same));
+            // X-73.17 (0.873): field content and deep dungeons, told by the game's own directors (no territory list).
+            var events=FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.Instance();
+            var deepDungeon=duty!=0 && events!=null && events->GetInstanceContentDeepDungeon()!=null;
+            var field=duty!=0 && events!=null && (FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.GetPublicContentDirectorByType(FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.PublicContentDirectorType.Eureka)!=null
+                || FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.GetPublicContentDirectorByType(FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.PublicContentDirectorType.Bozja)!=null
+                || FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.GetPublicContentDirectorByType(FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.PublicContentDirectorType.OccultCrescent)!=null);
+            var cause=ItemGains.Attribute(fishing,busy || !wanted.ItemSources,now,fateEndedAt,fateId,death.At,duty!=0,spent,spent is { } used && usable(used),spent is { } same && gains.ContainsKey(same),
+                field,deepDungeon);
             foreach(var (item,count) in gains)
             {
                 var quantity=(int)Math.Min(count,100_000);var added=false;var kind=DiscoveryKind.ItemFromItem;
@@ -157,6 +164,8 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                         added=store.SeeSource(DiscoveryKind.MonsterDrop,item,death.Name,quantity,at,death.Territory,death.Map,death.Place);kind=DiscoveryKind.MonsterDrop;break;
                     case ItemGains.Cause.Opened:
                         added=store.SeeSource(DiscoveryKind.ItemFromItem,item,spent!.Value,quantity,at);break;
+                    case ItemGains.Cause.DungeonCoffer:
+                        added=store.SeeSource(DiscoveryKind.DutyChest,item,duty,quantity,at);kind=DiscoveryKind.DutyChest;break;
                     default:continue;
                 }
                 if(added && debug())log.Information("Discovery: {0} item {1} ×{2}.",kind,item,quantity);

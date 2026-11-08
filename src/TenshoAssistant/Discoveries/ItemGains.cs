@@ -20,14 +20,20 @@ public static class ItemGains
     public static uint? SingleSpent(IReadOnlyDictionary<uint,long> losses)=>losses.Count==1 && losses.First().Value==1 ? losses.First().Key:null;
 
     /// <summary>What a gain is put down to, in this order; the moments (milliseconds) are the watcher's clock.</summary>
-    public enum Cause { None, Fishing, FateReward, MonsterDrop, Opened }
-    public static Cause Attribute(bool fishing,bool busy,long now,long fateEndedAt,uint fate,long deathAt,bool inDuty,uint? spent,bool spentUsable,bool spentGained)
+    /// <summary>
+    /// X-73.17 (0.873): field content (Eureka, Bozja, Occult Crescent, deep dungeons) is a duty where monsters still drop into the bags, so a kill counts there;
+    /// in a deep dungeon a gain with nothing spent and no kill is a coffer of the floor (DungeonCoffer).
+    /// </summary>
+    public enum Cause { None, Fishing, FateReward, MonsterDrop, Opened, DungeonCoffer }
+    public static Cause Attribute(bool fishing,bool busy,long now,long fateEndedAt,uint fate,long deathAt,bool inDuty,uint? spent,bool spentUsable,bool spentGained,
+        bool field=false,bool deepDungeon=false)
     {
         if(fishing)return Cause.Fishing;
         if(busy)return Cause.None;
         if(fate!=0 && now-fateEndedAt is >= 0 and <= 15_000)return Cause.FateReward;
-        if(!inDuty && now-deathAt is >= 0 and <= 3_000)return Cause.MonsterDrop;
+        if((!inDuty || field || deepDungeon) && now-deathAt is >= 0 and <= 3_000)return Cause.MonsterDrop;
         if(spent is not null && spentUsable && !spentGained)return Cause.Opened;
+        if(deepDungeon && spent is null)return Cause.DungeonCoffer;
         return Cause.None;
     }
 }

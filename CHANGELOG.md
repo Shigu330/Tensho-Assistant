@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.873.0
+- Plan global, Verify : Demande (X-73.17) : le butin d'Eurêka, de Bozja, du Croissant occulte et des donjons sans fond est maintenant noté. Ces zones sont des instances, où Tensho ne notait pas le butin des monstres : un objet reçu dans les 3 secondes après la mort de votre cible y compte désormais comme butin de ce monstre. En donjon sans fond, un objet reçu sans rien dépenser ni monstre vaincu compte comme coffre de l'étage. Ces zones sont reconnues par le jeu lui-même, sans liste de territoires. Les sacs et coffres ouverts ensuite depuis l'inventaire étaient déjà notés. Non validé en jeu.
+- Tests : FieldContent873Tests. Verify.ps1 (agent) : 1457/1457, 0 avertissement, 0 erreur ; DLL 0.873.0.0. Non validé en jeu.
+### English
+- Request (X-73.17): loot in Eureka, Bozja, the Occult Crescent and deep dungeons is now noted. These zones are instances, where Tensho did not note monster loot: an item received within 3 seconds after your target's death now counts there as that monster's loot. In a deep dungeon, an item received with nothing spent and no monster defeated counts as a floor coffer. The zones are recognised by the game itself, with no territory list. Sacks and coffers opened later from the inventory were already noted. Not validated in game.
+
 ## 0.872.0
 - Plan global, Verify : Demande (X-73.16) : le lieu des marchands que les feuilles du jeu ne placent pas est maintenant appris en jeu. Quand une fenêtre de boutique s'ouvre (boutique, échanges, compagnie, collectionnables…), le PNJ ciblé est noté avec sa zone et sa position dans la base de découvertes, une fois par ouverture. Ce lieu sert là où un vendeur n'avait pas de lieu : page Marchands, info-bulle des objets, provenances (« Où l'obtenir »), avant les lieux de LuminaSupplemental. Les lieux des feuilles du jeu passent toujours en premier. Non validé en jeu.
 - Tests : ShopNpc872Tests. Verify.ps1 (agent) : 1456/1456, 0 avertissement, 0 erreur ; DLL 0.872.0.0. Non validé en jeu.
