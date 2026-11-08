@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.943.0
+- Plan global, Verify : X-93, votre choix : la limite des découvertes partagées gardées en mémoire passe à 200 000 par sorte (au lieu de 200 000 en tout) ; une sorte pleine ne bloque plus les autres. Vos découvertes ne sont toujours jamais refusées ; le message de la page Découvertes parle maintenant de la sorte pleine. Non validé en jeu.
+- Tests : NeverForget939Tests. Verify.ps1 (agent) : 1555/1555, 0 avertissement, 0 erreur ; DLL 0.943.0.0. Non validé en jeu.
+### English
+- X-93, your choice: the bound on shared discoveries kept in memory becomes 200,000 per kind (instead of 200,000 in all); a full kind no longer blocks the others. Your discoveries are still never refused; the Discoveries page message now names the full kind. Not validated in game.
+
 ## 0.942.0
 - Plan global, Verify : X-93, fin : la page Découvertes lit toutes les sortes partagées encore sur le disque quand elle est ouverte (« Lecture des découvertes partagées… » pendant ce temps), pour montrer des totaux complets ; ailleurs, seules les sortes demandées sont lues. X-93 est terminé (0.938 à 0.942) : recherches indexées, vos découvertes jamais refusées, partagées à part par sorte, compressées et lues à la demande. Non validé en jeu.
 - Tests : SharedLazy941Tests. Verify.ps1 (agent) : 1555/1555, 0 avertissement, 0 erreur ; DLL 0.942.0.0. Non validé en jeu.

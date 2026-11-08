@@ -18,6 +18,9 @@ internal static class NeverForget939Tests
             Check(added==DiscoveryStore.MaxFacts && store.LeftOut==0,"shared part filled");
             var (more,_,_)=store.Merge([Shared(999_999_000)]);
             Check(more==0 && store.LeftOut==1,"shared left out, counted");
+            // 0.943 (« 200 000 par sorte »): another kind still has its own room.
+            var (other,_,_)=store.Merge([new DiscoveryFact{Kind=DiscoveryKind.Venture,Subject=1,Detail=1,LevelMin=1,LevelMax=1,Seen=1,First=at,Last=at}]);
+            Check(other==1 && store.LeftOut==1,"per kind");
             Check(store.SeeSource(DiscoveryKind.FishCatch,5,1,1,at,1,1,new Vector3(1,0,1)),"yours kept past the bound");
             Check(store.Find(DiscoveryKind.Desynthesis,1u,1).Count==1 && store.Find(DiscoveryKind.FishCatch,5u,1).Count==1,"nothing removed");
             var reloaded=new DiscoveryStore();reloaded.Load(store.Snapshot(at));

@@ -180,7 +180,7 @@ public sealed class DiscoveryStore
     // older cells are moved to theirs and joined when loaded or imported (Recell, Join).
     public const float CellSize=50;
     /// <summary>
-    /// X-93 (0.939, user: never forget a discovery): the bound applies to the shared facts held in memory only (imported, not seen by you). Your own sightings are
+    /// X-93 (0.939, user: never forget a discovery): the bound applies to the shared facts held in memory only (imported, not seen by you), per kind since 0.943. Your own sightings are
     /// never refused, and nothing already held is ever removed to make room; a shared fact left out is counted (<see cref="LeftOut"/>) and the page says so.
     /// </summary>
     public const int MaxFacts=200_000;
@@ -229,7 +229,8 @@ public sealed class DiscoveryStore
     }
     /// <summary>X-93 (0.939): shared facts left out since the start because the shared part was full.</summary>
     public int LeftOut { get; private set; }
-    private int SharedHeld()=>facts.Values.Count(fact=>fact.Seen==0);
+    // X-93 (0.943, user's choice: « 200 000 par sorte »): the bound counts the shared facts of each kind apart.
+    private Dictionary<DiscoveryKind,int> SharedHeld()=>facts.Values.Where(fact=>fact.Seen==0).GroupBy(fact=>fact.Kind).ToDictionary(group=>group.Key,group=>group.Count());
     /// <summary>A second sighting of the same place counts only after this long: standing beside a monster is one sighting.</summary>
     public static readonly TimeSpan SightingGap=TimeSpan.FromMinutes(10);
     private readonly object gate=new();
@@ -362,8 +363,8 @@ public sealed class DiscoveryStore
                     joined++;
                     continue;
                 }
-                if(shared>=MaxFacts){LeftOut++;continue;}
-                var copy=source.Copy();copy.Seen=0;copy.Imported=1;shared++;
+                if(shared.GetValueOrDefault(source.Kind)>=MaxFacts){LeftOut++;continue;}
+                var copy=source.Copy();copy.Seen=0;copy.Imported=1;shared[source.Kind]=shared.GetValueOrDefault(source.Kind)+1;
                 (copy.ImportedHq,copy.ImportedValues)=ImportedPart(source);copy.Hq=0;copy.Values=null;
                 Put(copy);added++;
             }
@@ -432,7 +433,7 @@ public sealed class DiscoveryStore
                 if(facts.TryGetValue(fact.Key,out var known)){Join(known,fact);continue;}
                 // X-93 (0.939): yours always; a shared fact while the shared part has room, else counted as left out.
                 if(fact.Seen>0)Put(fact);
-                else if(shared<MaxFacts){Put(fact);shared++;}
+                else if(shared.GetValueOrDefault(fact.Kind)<MaxFacts){Put(fact);shared[fact.Kind]=shared.GetValueOrDefault(fact.Kind)+1;}
                 else LeftOut++;
             }
             if(count && read>facts.Count || file.Facts.Any(fact=>fact is not null && Cell(fact.X,fact.Z)!=(fact.CellX,fact.CellZ)))Dirty=true;

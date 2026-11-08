@@ -326,7 +326,7 @@ internal sealed partial class MainWindow
         if(store.SharedKindsWaiting is > 0 and var waiting)ImGui.TextDisabled(localization.Format("DiscoveriesUi.SharedReading",waiting));
         var summary=store.Summary();
         // X-93 (0.939): never silent: shared discoveries left out because the shared part is full, or nearly full.
-        var sharedHeld=summary.Sum(row=>row.ImportedOnly);
+        var sharedHeld=summary.Count==0 ? 0:summary.Max(row=>row.ImportedOnly);
         if(store.LeftOut>0)ImGui.TextColored(Warning,localization.Format("DiscoveriesUi.SharedFull",store.LeftOut.ToString("N0"),Discoveries.DiscoveryStore.MaxFacts.ToString("N0")));
         else if(sharedHeld>=Discoveries.DiscoveryStore.MaxFacts*9/10)ImGui.TextColored(Warning,localization.Format("DiscoveriesUi.SharedNearlyFull",sharedHeld.ToString("N0"),Discoveries.DiscoveryStore.MaxFacts.ToString("N0")));
         if(summary.Count==0)ImGui.TextDisabled(localization.Get("DiscoveriesUi.Empty"));
