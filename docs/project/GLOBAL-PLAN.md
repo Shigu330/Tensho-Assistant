@@ -180,7 +180,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | T5 | Une séance de relevés en jeu pour ces outils, avant de coder | S |  |
 | ~~T13~~ fait en 0.648 pour les contenus que les données nomment | Contenus et quêtes : « Débloqué par » et « Débloque » | M | Environ 130 contenus sur plus de 700 ; à compléter si une source sûre est trouvée. |
 | ~~T21~~ fait en 0.646 | Personnage : niveaux et expérience de tous les jobs | S |  |
-| T26 | Dirigeables : trajet du dernier voyage reconstitué | S | 2026-11-07 : l'aéronef de l'utilisateur est en construction, à relever à son premier retour |
+| T26 | Dirigeables : trajet du dernier voyage reconstitué | S | 2026-11-07 : l'aéronef de l'utilisateur est en construction, à relever à son premier retour. 2026-11-08 18:50 : premier retour relevé (« Reading airship » : butin par escale, 23 lignes du journal de bord avec les noms des secteurs, heure de retour ; `docs/evidence/0.919-airship-reading-2026-11-08.log`) : lecteur du trajet fait en 0.919 (« Dernier voyage » sur l'onglet des navires, compagnie à un seul aéronef) ; à vérifier en jeu au prochain retour |
 | ~~T27~~ fait en 0.651 | Actions de compagnie actives : heure de fin et alarme | M |  |
 
 ### Gros chantiers et idée

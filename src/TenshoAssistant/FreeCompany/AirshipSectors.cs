@@ -1,5 +1,38 @@
 namespace TenshoAssistant.FreeCompany;
 
+/// <summary>
+/// T26 (0.919): the route of an airship's last voyage, rebuilt from the game's voyage log (WorkshopTerritory.Airship.AirshipLogs: lines such as
+/// « Mettons le cap vers “Mer de nuages - secteur 1” », docs/evidence/0.919-airship-reading-2026-11-08.log). Each line is searched for the
+/// sector names of AirshipExplorationPoint (client language), longest first so « … secteur 1 » never matches inside « … secteur 10 »; the
+/// sectors are kept in the order they first appear. Unknown text is ignored, nothing is guessed.
+/// </summary>
+public static class AirshipLogRoute
+{
+    public static IReadOnlyList<uint> Sectors(IEnumerable<string> lines,IEnumerable<(uint Id,string Name)> sectors)
+    {
+        var names=sectors.Where(sector=>sector.Name.Length>0).OrderByDescending(sector=>sector.Name.Length).ToArray();
+        var found=new List<(int Line,int At,uint Id)>();
+        var lineIndex=0;
+        foreach(var raw in lines)
+        {
+            var line=raw ?? "";
+            var taken=new bool[line.Length];
+            foreach(var (id,name) in names)
+            {
+                for(var at=line.IndexOf(name,StringComparison.Ordinal);at>=0;at=line.IndexOf(name,at+1,StringComparison.Ordinal))
+                {
+                    if(taken.AsSpan(at,name.Length).Contains(true))continue;
+                    taken.AsSpan(at,name.Length).Fill(true);
+                    found.Add((lineIndex,at,id));
+                }
+            }
+            lineIndex++;
+        }
+        return found.OrderBy(match=>match.Line).ThenBy(match=>match.At).Select(match=>match.Id).Distinct().ToArray();
+    }
+}
+
+
 /// <summary>An airship exploration sector (AirshipExplorationPoint row, game data) with its unlock (LuminaSupplemental) when known.</summary>
 public sealed record AirshipSector(uint Id,string Name,string ShortName,int RankReq,int CeruleumTanks,int SurveyDistance,int SurveyMinutes,uint Exp,
     AirshipUnlock? Unlock);

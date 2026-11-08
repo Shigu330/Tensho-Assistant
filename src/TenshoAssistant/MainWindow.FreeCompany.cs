@@ -151,6 +151,12 @@ internal sealed partial class MainWindow
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FreeCompany.Exp",vessel.Exp.ToString("N0"),vessel.NextExp.ToString("N0")));
         ImGui.TableNextColumn();
         if(vessel.Route.Count>0)ImGui.TextWrapped(string.Join(" › ",vessel.Route));
+        // T26 (0.919): an airship's last voyage, rebuilt from the game's voyage log.
+        else if(vessel.Kind==VesselKind.Airship && vessel.LastRoute.Count>0)
+        {
+            ImGui.TextWrapped(localization.Format("FreeCompany.LastRoute",string.Join(" › ",vessel.LastRoute)));
+            Tip("FreeCompany.LastRouteTip");
+        }
         else ImGui.TextDisabled(vessel.Kind==VesselKind.Airship ? localization.Get("FreeCompany.RouteUnknown"):"—");
         // Return: time left, « returned » (finds listed in the tooltip), or « at the dock ».
         ImGui.TableNextColumn();

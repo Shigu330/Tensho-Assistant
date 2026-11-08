@@ -5063,6 +5063,8 @@
     "Registered": "Enregistré le {0}",
     "Rank": "Rang {0}",
     "Exp": "Expérience : {0} / {1} pour le rang suivant",
+    "LastRoute": "Dernier voyage : {0}",
+    "LastRouteTip": "Lu dans le journal de bord du jeu quand vous consultez les résultats de l'aéronef dans l'atelier (seulement si la compagnie a un seul aéronef : le journal ne dit pas duquel il parle).",
     "RouteUnknown": "Trajet non donné par le jeu",
     "Returned": "Rentré",
     "Idle": "Au port",

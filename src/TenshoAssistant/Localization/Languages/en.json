@@ -5063,6 +5063,8 @@
     "Registered": "Registered on {0}",
     "Rank": "Rank {0}",
     "Exp": "Experience: {0} / {1} to the next rank",
+    "LastRoute": "Last voyage: {0}",
+    "LastRouteTip": "Read in the game's voyage log when you view the airship's results in the workshop (only when the company has one airship: the log does not say which one it is about).",
     "RouteUnknown": "Route not given by the game",
     "Returned": "Returned",
     "Idle": "At the dock",

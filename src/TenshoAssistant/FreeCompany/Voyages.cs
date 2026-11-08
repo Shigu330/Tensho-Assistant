@@ -36,6 +36,8 @@ public sealed record VoyageVessel
     // aftcastle); empty or 0 = not read yet (vessels saved before 0.315).
     public List<uint> Parts { get; init; } = [];
     public DateTimeOffset ReadAt { get; init; }
+    // T26 (0.919): airships only: the sector names of the last voyage read in the game's voyage log (client language at read time).
+    public List<string> LastRoute { get; init; } = [];
 }
 
 /// <summary>Pure rules of the free company voyages page (tested).</summary>
@@ -61,7 +63,7 @@ public static class Voyages
         =>a.HouseId==b.HouseId && a.Kind==b.Kind && a.Slot==b.Slot && a.Name==b.Name && a.Rank==b.Rank && a.Exp==b.Exp && a.NextExp==b.NextExp
             && a.RegisteredAt==b.RegisteredAt && a.ReturnAt==b.ReturnAt && a.Route.SequenceEqual(b.Route) && a.Loot.SequenceEqual(b.Loot)
             && a.Points.SequenceEqual(b.Points) && a.Surveillance==b.Surveillance && a.Retrieval==b.Retrieval && a.Speed==b.Speed && a.Range==b.Range && a.Favor==b.Favor
-            && a.Parts.SequenceEqual(b.Parts);
+            && a.Parts.SequenceEqual(b.Parts) && a.LastRoute.SequenceEqual(b.LastRoute);
 
     /// <summary>
     /// 0.315 (review): unlocked sectors belong to one company. A selected vessel uses its own house's list (null = not read yet:
