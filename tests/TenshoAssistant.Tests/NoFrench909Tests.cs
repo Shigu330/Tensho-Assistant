@@ -13,6 +13,11 @@ internal static class NoFrench909Tests
     ];
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
+        ("Server info bar: English titles only, like the alarms' and reminders' entries (0.910)",() =>
+        {
+            var bar=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Alarms/CurrencyDtrEntry.Dalamud.cs"));
+            Check(bar.Contains("bar.Get(\"Tensho Assistant (Currencies)\")") && !bar.Contains("Monnaies"),"currency entry");
+        }),
         ("No French: the crystal classifier returns the English keys of CrystalElements.* and CrystalSizes.*",() =>
         {
             Check(CrystalClassifier.Elements.SequenceEqual(["Fire","Ice","Wind","Earth","Lightning","Water"]),"elements: "+string.Join(",",CrystalClassifier.Elements));

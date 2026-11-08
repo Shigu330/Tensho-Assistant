@@ -8,7 +8,8 @@ using TenshoAssistant.Inventory;
 namespace TenshoAssistant.Alarms;
 
 /// <summary>
-/// g, I-02 (0.344): a second server info bar entry, « Tensho Assistant · Monnaies » (fixed title, apart from the alarms' entry), shown
+/// g, I-02 (0.344): a second server info bar entry, « Tensho Assistant (Currencies) » (fixed title, apart from the alarms' entry; 0.910: renamed from
+/// a French title, with the user's agreement: Dalamud keys the entry's settings by its title, so they start afresh), shown
 /// only while a tracked currency is at or over its threshold and the setting is on: « ⚠ n », its tooltip lists them, a click opens the
 /// Currencies tab. Refreshed once a second on the framework thread from the watcher's published state. Removed on dispose.
 /// </summary>
@@ -26,7 +27,7 @@ public sealed class CurrencyDtrEntry : IDisposable
     public CurrencyDtrEntry(IDtrBar bar,IFramework framework,Configuration configuration,Func<CurrencyWatchState?> state,Func<string,string> text,Action open)
     {
         this.framework=framework;this.configuration=configuration;this.state=state;this.text=text;
-        entry=bar.Get("Tensho Assistant · Monnaies");
+        entry=bar.Get("Tensho Assistant (Currencies)");
         entry.Shown=false;
         entry.OnClick=_=>open();
         CompetitiveGate.AddAlways(framework,OnUpdate);

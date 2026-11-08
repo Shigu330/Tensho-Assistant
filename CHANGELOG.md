@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.910.0
+- Plan global, Verify : Décision de l'utilisateur (X-76, règle des langues) : l'entrée « Monnaies » de la barre d'infos du serveur avait un titre français ; elle s'appelle maintenant « Tensho Assistant (Currencies) », comme les entrées des alarmes et des rappels. Dalamud range les réglages de l'entrée sous son titre : ils repartent de zéro (l'utilisateur est le seul à utiliser le plugin et l'a accepté). Non validé en jeu.
+- Tests : NoFrench909Tests. Verify.ps1 (agent) : 1494/1494, 0 avertissement, 0 erreur ; DLL 0.910.0.0. Non validé en jeu.
+### English
+- User's decision (X-76, language rule): the « Monnaies » server info bar entry had a French title; it is now « Tensho Assistant (Currencies) », like the alarms' and reminders' entries. Dalamud keys the entry's settings by its title: they start afresh (the user is the only one using the plugin and agreed). Not validated in game.
+
 ## 0.909.0
 - Plan global, Verify : Nettoyage complet (X-76), étape 2, cinquième famille, règle des langues : plus de français dans le code. Le classement des cristaux rend des clés anglaises (le français ne sert plus qu'à reconnaître les noms d'objets français), les noms de stockage sont construits en anglais (le nom affiché ne change pas), 34 commentaires en français passés en anglais (les noms du jeu et les textes du jeu analysés restent tels quels), 21 commentaires de documentation remis sur l'élément qu'ils décrivent. Ajout au plan, à la demande de l'utilisateur : étapes 2b (harmonisation du code : une seule façon de faire chaque geste, info-bulles comprises) et 2c (couverture des parseurs, données oubliées et besoins des futurs outils). Détail : docs/evidence/x76-2-duplicates.md. Non validé en jeu.
 - Tests : NoFrench909Tests. Verify.ps1 (agent) : 1493/1493, 0 avertissement, 0 erreur ; DLL 0.909.0.0. Non validé en jeu.
