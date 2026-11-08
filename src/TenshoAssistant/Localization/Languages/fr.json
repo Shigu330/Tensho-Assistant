@@ -3243,6 +3243,7 @@
     "NpcSaleStack": "Vente au PNJ (NQ) : {0} gils l'unité, pile de {1} : {2} gils"
   },
   "MapView": {
+    "VistaSeen": "Inscrit par vous par {0} à {1} ET.",
     "Partplace": "lieu",
     "ShowIconNames": "Noms des icônes",
     "ShowIconNamesHelp": "Écrit les noms que le jeu écrit à côté de certaines icônes (éthérites, lieux importants), du même côté, à partir du même zoom que les noms de lieux. Leur taille suit celle des noms de lieux. Sans cette case, ils restent dans l'infobulle de l'icône.\nPar défaut : activé.",
@@ -6981,6 +6982,7 @@
     "WeeklyNone": "Pas de mémoquartz limité en ce moment."
   },
   "Events": {
+    "SeenDays": "Vue en cours par vous du {0} au {1}.",
     "Title": "Événements",
     "Description": "Les événements saisonniers en cours, tels que le jeu les annonce, avec leurs quêtes, ce que vous avez déjà fait et les récompenses. Le jeu ne donne pas les dates : seuls les événements en cours sont listés.",
     "Partake": "Événements de joueurs (partake.gg)",

@@ -210,6 +210,22 @@ public sealed class SeenPriceStore
         if(nq.Count==0)return quote;
         return quote with {NqCheapest=SeenPrices.Cheapest(quote.NqCheapest,nq,now),HqCheapest=SeenPrices.Cheapest(quote.HqCheapest,hq,now)};
     }
+    /// <summary>X-75.5 (0.879): the same for the region's cheapest offers, from every world of the region seen (Data Center Travel), newer than Universalis' and current.</summary>
+    public MarketQuote? WithRegion(MarketQuote? quote,IReadOnlyCollection<uint> worlds,DateTimeOffset now)
+    {
+        if(quote is null || worlds.Count==0)return quote;
+        var nq=new List<(uint,decimal?,DateTimeOffset)>();var hq=new List<(uint,decimal?,DateTimeOffset)>();
+        lock(gate)
+            foreach(var world in worlds)
+            {
+                if(!entries.TryGetValue((world,quote.ItemId),out var entry) || entry.Listings.Count==0)continue;
+                if(!lowest.TryGetValue((world,quote.ItemId),out var known) || known.At!=entry.ListingsAt)
+                    lowest[(world,quote.ItemId)]=known=(entry.ListingsAt,Lowest(entry.Listings,false),Lowest(entry.Listings,true));
+                nq.Add((world,known.Nq,known.At));hq.Add((world,known.Hq,known.At));
+            }
+        if(nq.Count==0)return quote;
+        return quote with {NqRegion=SeenPrices.Cheapest(quote.NqRegion,nq,now),HqRegion=SeenPrices.Cheapest(quote.HqRegion,hq,now)};
+    }
     private static decimal? Lowest(IReadOnlyList<SeenListing> listings,bool hq)=>listings.Where(listing=>listing.Hq==hq && listing.Price>0).Select(listing=>(decimal?)listing.Price).Min();
     private readonly Dictionary<(uint World,uint Item),(DateTimeOffset At,decimal? Nq,decimal? Hq)> lowest=[];
 

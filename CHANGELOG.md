@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.879.0
+- Plan global, Verify : Demande (X-75.5) : d'autres pages lisent ce qui a été vu en jeu. Page Événements : « Vue en cours par vous du … au … » pour chaque fête. Carte, info-bulle d'un panorama : « Inscrit par vous par <météo> à <heure> ET », avant les météos du wiki. Prix : le moins cher de la région (survol, listes) est complété par les offres vues sur les mondes de la région visités (voyage entre centres de données), comme celui du centre de données depuis la 0.857 ; la région de chaque monde vient des feuilles du jeu. Nouvelle demande notée (X-77) : un échange des découvertes par Git, avant le nettoyage ; une règle Dalamud y entre en jeu, un résumé vous sera soumis avant. Non validé en jeu.
+- Tests : SeenPages879Tests. Verify.ps1 (agent) : 1466/1466, 0 avertissement, 0 erreur ; DLL 0.879.0.0. Non validé en jeu.
+### English
+- Request (X-75.5): more pages read what was seen in game. Events page: « Seen running by you from … to … » for each festival. Map, vista tooltip: « Registered by you in <weather> at <hour> ET », before the wiki's weathers. Prices: the region's cheapest (tooltip, lists) is completed by the offers seen on the region's worlds visited (Data Center Travel), like the data centre's since 0.857; each world's region comes from the game sheets. New request noted (X-77): sharing discoveries through Git, before the cleanup; a Dalamud rule applies, a summary will be put to you first. Not validated in game.
+
 ## 0.878.0
 - Plan global, Verify : Demande (X-75.4) : le mage bleu appris en jeu va plus loin. Un monstre vu en train de lancer (barre d'incantation) l'action d'un sort de mage bleu est noté avec son niveau et son lieu, une fois par incantation, quel que soit votre job, même pour un sort pas encore appris. La fenêtre d'un sort montre d'abord « Vu par vous » : les monstres vus le lancer ou dont vous l'avez appris, avec leurs niveaux et lieux, avant la liste du wiki. « Vu le lancer » ne veut pas dire qu'il l'enseigne. Non validé en jeu.
 - Tests : BlueCasters878Tests. Verify.ps1 (agent) : 1465/1465, 0 avertissement, 0 erreur ; DLL 0.878.0.0. Non validé en jeu.

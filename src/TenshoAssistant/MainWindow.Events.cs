@@ -56,6 +56,9 @@ internal sealed partial class MainWindow
                 ImGui.TextDisabled(french is not null ? localization.Format("Events.NameFromGuide",guide!,english ?? "—")
                     :english is not null ? localization.Get("Events.NameEnglishOnly"):localization.Get("Events.NameUnknown"));
                 if(developerMode)ImGui.TextDisabled(localization.Format("Events.Raw",festival.Id,festival.Phase));
+                // X-75.5 (0.879): the days you saw it running (this year and before), from the discoveries.
+                if(DiscoveryStore is { } seenStore && DiscoveriesLoaded && seenStore.Find(Discoveries.DiscoveryKind.FestivalSeen,subject=>subject==festival.Id,16) is { Count:>0 } seenDays)
+                    ImGui.TextDisabled(localization.Format("Events.SeenDays",new DateTime(2013,8,27).AddDays(seenDays.Min(fact=>fact.LevelMin)).ToString("d"),new DateTime(2013,8,27).AddDays(seenDays.Max(fact=>fact.LevelMax)).ToString("d")));
                 if(questsOf is null)ImGui.TextDisabled(localization.Get(reader.QuestsFailed ? "Events.QuestsUnavailable":"Events.Loading"));
                 else if(questsOf.GetValueOrDefault(festival.Id) is { Count:>0 } ids)
                 {

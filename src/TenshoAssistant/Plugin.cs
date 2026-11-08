@@ -196,12 +196,24 @@ public sealed class Plugin : IDalamudPlugin
             var seenPrices=new Market.SeenPriceStore();
             mainWindow.SeenPrices=seenPrices;
             // X-73.1 (0.857): then the data center's cheapest offers completed by the worlds visited.
+            Dictionary<uint,uint>? worldRegions=null;(uint World,uint[] Worlds) regionWorlds=(0,[]);
+            uint[] RegionWorlds(uint home)
+            {
+                if(home==0)return [];
+                if(regionWorlds.World==home)return regionWorlds.Worlds;
+                worldRegions??=data.GetExcelSheet<Lumina.Excel.Sheets.World>().Where(row=>row.IsPublic && row.DataCenter.RowId!=0)
+                    .ToDictionary(row=>row.RowId,row=>row.DataCenter.ValueNullable?.Region.RowId ?? 0);
+                var region=worldRegions.GetValueOrDefault(home);
+                regionWorlds=(home,region==0 ? []:worldRegions.Where(pair=>pair.Value==region).Select(pair=>pair.Key).ToArray());
+                return regionWorlds.Worlds;
+            }
             market.Seen=(world,item,universalis)=>
             {
                 if(!configuration.Discovery.Enabled || !configuration.Discovery.MarketPrices)return null;
                 var now=DateTimeOffset.UtcNow;
                 var quote=seenPrices.Prefer(world,item,universalis,now,configuration.CommunityUniversalis) ?? universalis;
-                return seenPrices.WithDataCenter(quote,market.State.WorldNames?.Keys.ToArray() ?? [],now);
+                // X-75.5 (0.879): and the region's, from the worlds of the region seen (World → data centre → region, game sheets).
+                return seenPrices.WithRegion(seenPrices.WithDataCenter(quote,market.State.WorldNames?.Keys.ToArray() ?? [],now),RegionWorlds(market.State.WorldId),now);
             };
             Market.SeenPriceReader? seenReader=null;
             registrations.Register(()=>seenReader=new Market.SeenPriceReader(marketBoardEvents,seenPrices,()=>market.State.WorldId,()=>configuration.Discovery.Enabled && configuration.Discovery.MarketPrices,log)

@@ -1398,6 +1398,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.878) Combattre un monstre qui lance un sort de mage bleu (barre d'incantation) : Monde › Découvertes « vu lançant » ; Collections › Magie bleue, fenêtre du sort : « Vu par vous ».
 
+- [ ] (0.879) Pendant une fête : Événements « Vue en cours par vous » ; un panorama inscrit : son info-bulle « Inscrit par vous ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
