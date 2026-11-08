@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.858.0
+- Plan global, Verify : Demande (X-73.2) : le jeu ne montre que les 20 dernières ventes d'un objet ; chaque ouverture du tableau remplaçait les précédentes. Elles s'ajoutent maintenant à celles déjà gardées, sans doublon, jusqu'à 200 ventes et 30 jours ; la vitesse de vente vue se calcule sur tout ce qui est gardé, comme Universalis. Non validé en jeu.
+- Tests : SalesMerge858Tests. Verify.ps1 (agent) : 1439/1439, 0 avertissement, 0 erreur ; DLL 0.858.0.0. Non validé en jeu.
+### English
+- Request (X-73.2): the game shows only an item's last 20 sales; each board opening replaced the earlier ones. They are now added to those kept, without twins, up to 200 sales and 30 days; the seen sales speed is worked out over all that is kept, as Universalis does. Not validated in game.
+
 ## 0.857.0
 - Plan global, Verify : Demande (X-73.1) : les prix vus sur les autres mondes du centre de données, quand on s'y rend, complètent Universalis. Ils étaient déjà gardés pour chaque monde visité, mais seul le monde courant s'en servait. Maintenant, le prix le plus bas du centre de données compare celui d'Universalis aux offres vues sur chaque monde visité : une offre vue compte 24 heures, et le monde qu'Universalis désigne cède la place à ce qu'on y a vu plus tard. Les relevés de plus de 90 jours ne sont plus chargés. Non validé en jeu.
 - Tests : DataCenterSeen857Tests. Verify.ps1 (agent) : 1438/1438, 0 avertissement, 0 erreur ; DLL 0.857.0.0. Non validé en jeu.

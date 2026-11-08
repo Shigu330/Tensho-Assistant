@@ -27,7 +27,12 @@ public sealed class SeenMarketEntry
 /// </summary>
 public static class SeenPrices
 {
-    public const int MaxListings=200,MaxSales=40;
+    // X-73.2 (0.858): 200 sales kept (Universalis' own window for the speed), merged from one opening to the next, 30 days at most.
+    public const int MaxListings=200,MaxSales=200;
+    public static readonly TimeSpan SalesKept=TimeSpan.FromDays(30);
+    /// <summary>X-73.2 (0.858): the sales already kept and those just seen, without twins (same time, price, quantity, quality), newest first, bounded.</summary>
+    public static List<SeenSale> MergeSales(IEnumerable<SeenSale> kept,IEnumerable<SeenSale> seen,DateTimeOffset at)=>
+        kept.Concat(seen).Where(sale=>sale.Price>0 && sale.At<=at.AddMinutes(5) && at-sale.At<=SalesKept).Distinct().OrderByDescending(sale=>sale.At).Take(MaxSales).ToList();
 
     public static MarketQualityPrice Quality(IReadOnlyList<SeenListing> listings,IReadOnlyList<SeenSale> sales,bool hq,DateTimeOffset now)
     {
@@ -115,7 +120,8 @@ public sealed class SeenPriceStore
         lock(gate)
         {
             var entry=Entry(world,item);if(entry is null)return;
-            entry.Sales=sales.Where(sale=>sale.Price>0 && sale.At<=at.AddMinutes(5)).OrderByDescending(sale=>sale.At).Take(SeenPrices.MaxSales).ToList();
+            // X-73.2 (0.858, user request: learn in game what comes from Universalis): the game shows the last 20 sales; each opening adds to those kept.
+            entry.Sales=SeenPrices.MergeSales(entry.Sales,sales,at);
             entry.SalesAt=at;Dirty=true;
         }
     }

@@ -1,6 +1,6 @@
 <Project Sdk="Dalamud.NET.Sdk">
   <PropertyGroup>
-    <Version>0.857.0</Version>
+    <Version>0.858.0</Version>
     <AssemblyName>TenshoAssistant</AssemblyName>
     <RootNamespace>TenshoAssistant</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
