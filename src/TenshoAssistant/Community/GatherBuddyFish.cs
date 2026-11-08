@@ -167,12 +167,12 @@ public sealed class GatherBuddyFishService : IDisposable
     public Func<bool>? Enabled { get; set; }
     public GatherBuddyFishState State => Enabled?.Invoke() == false ? new(null, false, null) : Volatile.Read(ref state);
 
-    // 0.330: a client can be given (managed tests, as FishBiteTimeService); the service's own keeps its 30 s timeout and User-Agent.
+    // 0.330: a client can be given (managed tests, as FishBiteTimeService); the service's own keeps its 30 s timeout. X-76 (step 2): the User-Agent is added
+    // by BoundedHttp to each request, no longer also as a default header of the client.
     public GatherBuddyFishService(Func<TimeSpan> lifetime, DataCache? cache, HttpClient? client = null)
     {
         this.lifetime = lifetime; this.cache = cache;
         ownsClient = client is null; this.client = client ?? new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-        if (ownsClient) this.client.DefaultRequestHeaders.UserAgent.ParseAdd("TenshoAssistant");
     }
 
     public void Request()

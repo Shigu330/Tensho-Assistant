@@ -128,13 +128,7 @@ public sealed unsafe class ReadingCapture : IDisposable
             if(handle.IsNull || !handle.IsVisible){windowValues.Remove(name);continue;}
             var unit=(AtkUnitBase*)handle.Address;
             var values=new StringBuilder();
-            for(var index=0;index<Math.Min((int)unit->AtkValuesCount,96) && unit->AtkValues!=null;index++)
-            {
-                var value=unit->AtkValues[index];
-                if(value.Type==AtkValueType.UInt)values.Append($" {index}={value.UInt}");
-                else if(value.Type==AtkValueType.Int)values.Append($" {index}={value.Int}");
-                else if(value.Type==AtkValueType.Bool)values.Append($" {index}={value.Bool}");
-            }
+            AppendValues(values,unit,96);
             // 0.890 (X-73.18): the spearfishing shadows in sight (AddonSpearFishing.Fish), to check the catch's shadow against the window.
             if(name=="SpearFishing")
             {
@@ -283,14 +277,7 @@ public sealed unsafe class ReadingCapture : IDisposable
             if(handle.IsNull || !handle.IsVisible)continue;
             var addon=(AtkUnitBase*)handle.Address;
             text.Append($" [{name}: {addon->AtkValuesCount} values");
-            for(var index=0;index<Math.Min((int)addon->AtkValuesCount,400) && addon->AtkValues!=null;index++)
-            {
-                var value=addon->AtkValues[index];
-                if(value.Type==AtkValueType.UInt)text.Append($" {index}={value.UInt}");
-                else if(value.Type==AtkValueType.Int)text.Append($" {index}={value.Int}");
-                else if(value.Type==AtkValueType.Bool)text.Append($" {index}={value.Bool}");
-                else if(value.Type is AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString)text.Append($" {index}=\"{value.GetValueAsString()}\"");
-            }
+            AppendValues(text,addon,400,texts:true);
             text.Append(']');
         }
         var agent=AgentCompanyCraftMaterial.Instance();
@@ -404,14 +391,21 @@ public sealed unsafe class ReadingCapture : IDisposable
         if(text==synthesis)return;
         synthesis=text;
         var values=new StringBuilder();
-        for(var index=0;index<Math.Min((int)addon->AtkValuesCount,64) && addon->AtkValues!=null;index++)
-        {
-            var value=addon->AtkValues[index];
-            if(value.Type==AtkValueType.UInt)values.Append($" {index}={value.UInt}");
-            else if(value.Type==AtkValueType.Int)values.Append($" {index}={value.Int}");
-            else if(value.Type==AtkValueType.Bool)values.Append($" {index}={value.Bool}");
-        }
+        AppendValues(values,&addon->AtkUnitBase,64);
         Line("synthesis",150,$"{text}; values:{values}");
+    }
+
+    // X-76 (step 2): a window's first values, written « index=value » (numbers and flags; texts only when asked), the same for every part above.
+    private static void AppendValues(StringBuilder to,AtkUnitBase* unit,int max,bool texts=false)
+    {
+        for(var index=0;index<Math.Min((int)unit->AtkValuesCount,max) && unit->AtkValues!=null;index++)
+        {
+            var value=unit->AtkValues[index];
+            if(value.Type==AtkValueType.UInt)to.Append($" {index}={value.UInt}");
+            else if(value.Type==AtkValueType.Int)to.Append($" {index}={value.Int}");
+            else if(value.Type==AtkValueType.Bool)to.Append($" {index}={value.Bool}");
+            else if(texts && TenshoAssistant.UI.AtkValueRead.IsText(value.Type))to.Append($" {index}=\"{value.GetValueAsString()}\"");
+        }
     }
 
     // I10: are the crystals and the gil of a retainer loaded while its inventory is open?

@@ -1454,6 +1454,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.906) Rien de nouveau à voir : horaires ET, comptes à rebours des points de récolte et durées de voyage inchangés.
 
+- [ ] (0.907) En jeu : surlignage des collectionnables (fenêtre d'échange) et des inventaires (recherche), récolte sur un point : rien ne doit avoir changé.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

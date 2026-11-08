@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Dalamud.Game.Inventory;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using TenshoAssistant.UI;
 
 namespace TenshoAssistant.Inventory;
 
@@ -96,7 +97,7 @@ public sealed unsafe class StorageHighlightReader : IDisposable
 
     private static void FindIcons(AtkUldManager* manager,int depth,List<(uint Icon,nint Node,int? Quantity)> found)
     {
-        if(manager==null || depth>4 || manager->NodeList==null || manager->NodeListCount>1024 || found.Count>=400)return;
+        if(depth>4 || !UiNodes.Walkable(manager) || manager->NodeListCount>1024 || found.Count>=400)return;
         for(var index=0;index<manager->NodeListCount;index++)
         {
             var node=manager->NodeList[index];

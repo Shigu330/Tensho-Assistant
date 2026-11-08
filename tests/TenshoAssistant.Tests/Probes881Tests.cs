@@ -8,8 +8,8 @@ internal static class Probes881Tests
         {
             var capture=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs"));
             var windows=capture[capture.IndexOf("private void ReadWindows()",StringComparison.Ordinal)..capture.IndexOf("private void ReadFashion()",StringComparison.Ordinal)];
-            Check(!windows.Contains("AtkValueType.String"),"no text from windows");
-            Check(windows.Contains("Math.Min((int)unit->AtkValuesCount,96)") && windows.Contains("if(windowValues.GetValueOrDefault(name)==all)continue;"),"bounded, on change");
+            Check(!windows.Contains("AtkValueType.String") && !windows.Contains("IsText("),"no text from windows");
+            Check(windows.Contains("AppendValues(values,unit,96);") && capture.Contains("index<Math.Min((int)unit->AtkValuesCount,max)") && windows.Contains("if(windowValues.GetValueOrDefault(name)==all)continue;"),"bounded, on change");
             Check(capture.Contains("if(all==fashionSeen)return;") && capture.Contains("if(all==islandObjects)return;"),"on change");
         }),
     ];

@@ -5,14 +5,14 @@ Found by four read-only agents (one theme each: places and times, Draw caches, g
 
 | # | Finding | Sites | Risk | Change | State |
 |---|---|---|---|---|---|
-| 1 | Same AtkValue-to-int converter written twice, and the 'is this value text' check written 7 times | 9 | low | no | to do |
-| 2 | ReadingCapture dumps window numbers with the same loop 3 times in one file | 3 | low | no | to do |
-| 3 | 'Is the window still the same and shown' check after copying, written 4 times (plus the same opening check) | 4 | low | no | to do |
-| 4 | Incoherence: native node-tree walks do not use the same safety guard (R-14 NodeListSize/LoadedState only in some) | 6 | medium | no | to do |
-| 5 | BoundedHttp re-implemented by hand in RetainerCompareService and CommunityHelpIndex | 3 | low | no | to do |
-| 6 | Tensho User-Agent built in 5 places with different values; GatherBuddyFish sends it twice; Market services set it on injected clients | 5 | low | no | to do |
-| 7 | Incoherent HttpClient ownership: MarketBoardService disposes a client it may not own; 14 copies of 'client ?? new HttpClient{Timeout}' + owns flag | 14 | low | no | to do |
-| 8 | Incoherence: AgentMap.Instance() dereferenced without the null check used elsewhere in the same file | 5 | low | no | to do |
+| 1 | Same AtkValue-to-int converter written twice, and the 'is this value text' check written 7 times | 9 | low | no | 0.907 |
+| 2 | ReadingCapture dumps window numbers with the same loop 3 times in one file | 3 | low | no | 0.907 |
+| 3 | 'Is the window still the same and shown' check after copying, written 4 times (plus the same opening check) | 4 | low | no | 0.907 |
+| 4 | Incoherence: native node-tree walks do not use the same safety guard (R-14 NodeListSize/LoadedState only in some) | 6 | medium | no | 0.907 |
+| 5 | BoundedHttp re-implemented by hand in RetainerCompareService and CommunityHelpIndex | 3 | low | no | 0.907 |
+| 6 | Tensho User-Agent built in 5 places with different values; GatherBuddyFish sends it twice; Market services set it on injected clients | 5 | low | no | 0.907 |
+| 7 | Incoherent HttpClient ownership: MarketBoardService disposes a client it may not own; 14 copies of 'client ?? new HttpClient{Timeout}' + owns flag | 14 | low | no | 0.907 |
+| 8 | Incoherence: AgentMap.Instance() dereferenced without the null check used elsewhere in the same file | 5 | low | no | 0.907 |
 | 9 | Developer-log window-value dumps written 3 times with the same switch but different output formats | 3 | medium | yes | to do |
 | 10 | Quest / achievement / triad-card lookups rebuilt per page instead of using the shared DataIndexes | 9 | low | no | to do |
 | 11 | Per-key memo dictionary reset when a generation changes (Revision, second, catalogue reference): 7 copies with different size policies | 7 | low | no | to do |
@@ -60,3 +60,14 @@ Found by four read-only agents (one theme each: places and times, Draw caches, g
 - One « H h mm » for the airship and submarine pages, one « in H h mm (date) » for reminders and the company page.
 - `CacheAge.Label` removed (no caller, a French « j » for days in code).
 - Texts unchanged.
+
+## 0.907 — game windows and web requests (findings 1 to 8)
+
+- `UI/AtkValueRead`: one number reader and one « is text » check for the game windows' values (was 2 + 7 copies).
+- The developer-mode capture dumps a window's values through one helper (3 loops before); output identical.
+- `UI/GameWindowCheck.StillShown`: the « same window, still shown after copying » check of four readers (craft, gathering, mini cactpot, triad).
+- `UI/UiNodes.Walkable`: one node-tree guard (R-14: node count within the list size, component loaded) for the six walkers; four of them had only
+  part of it (gathering node, collectable and storage highlights, beastmaster probe). **To watch in game**: these highlights and the gathering read.
+- Two hand-written bounded downloads (retainer prices, community help) now go through `BoundedHttp` (same limits, counted by the self-check, strict
+  UTF-8 handled); one Tensho User-Agent; the market board service no longer disposes a client it was given; the map no longer reads AgentMap
+  without checking it (two places).

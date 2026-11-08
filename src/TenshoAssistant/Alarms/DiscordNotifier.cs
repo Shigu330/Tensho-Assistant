@@ -45,8 +45,8 @@ public sealed class DiscordNotifier : IDisposable
     {
         ownsClient = client is null;
         this.client = client ?? new HttpClient { Timeout = TimeSpan.FromSeconds(10), MaxResponseContentBufferSize = 64 * 1024 };
-        // Discord asks HTTP clients for a descriptive User-Agent; no personal data in it.
-        if (ownsClient) this.client.DefaultRequestHeaders.UserAgent.ParseAdd($"TenshoAssistant/{typeof(DiscordNotifier).Assembly.GetName().Version?.ToString(3) ?? "0"} (+https://github.com/Shigu330/Tensho-Assistant)");
+        // Discord asks HTTP clients for a descriptive User-Agent; no personal data in it. X-76 (step 2): Tensho's one User-Agent, with the project's address.
+        if (ownsClient) this.client.DefaultRequestHeaders.UserAgent.ParseAdd($"{Community.BoundedHttp.UserAgent} (+https://github.com/Shigu330/Tensho-Assistant)");
         this.delay = delay ?? Task.Delay;
     }
 

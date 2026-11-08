@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using TenshoAssistant.UI;
 
 namespace TenshoAssistant.Fashion;
 
@@ -49,7 +50,7 @@ internal sealed class FashionCheckReader : IDisposable
                 // R-14 (0.453): a slot value the window does not have is a changed layout (unknown), never « no category this week ».
                 if (unit->AtkValues == null || index >= unit->AtkValuesCount) throw new InvalidOperationException($"FashionCheck has {unit->AtkValuesCount} values, slot {slot} needs index {index}.");
                 var value = unit->AtkValues[index];
-                categories[slot] = value.Type is AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString
+                categories[slot] = AtkValueRead.IsText(value.Type)
                     ? value.GetValueAsString() ?? "" : "";
             }
             // Slot rows (0.219): node 8 + n of the window (layout learned from Avant-Garde, read only), screen position and size.

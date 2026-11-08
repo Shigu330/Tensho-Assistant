@@ -366,12 +366,6 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     }
     private (int Size,int Speed)? SeenSpearShadow(uint item)=>store.Find(DiscoveryKind.SpearShadow,subject=>subject==item,8).OrderByDescending(fact=>fact.Seen+fact.Imported)
         .Select(fact=>((int,int)?)((int)fact.Detail,fact.LevelMin)).FirstOrDefault();
-    private static int SpearValue(FFXIVClientStructs.FFXIV.Component.GUI.AtkValue value)=>value.Type switch
-    {
-        FFXIVClientStructs.FFXIV.Component.GUI.AtkValueType.Int=>value.Int,
-        FFXIVClientStructs.FFXIV.Component.GUI.AtkValueType.UInt=>value.UInt>int.MaxValue ? -1:(int)value.UInt,
-        _=>-1,
-    };
     private void ReadSpear(DateTimeOffset at,long now,uint territory,uint map,Vector3 position)
     {
         var handle=gui.GetAddonByName("SpearFishing");
@@ -387,7 +381,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             spearShown[index]=fish.Available;
         }
         if(spearGone.Count>32)spearGone.RemoveRange(0,spearGone.Count-32);
-        var count=SpearValue(unit->AtkValues[21]);var item=SpearValue(unit->AtkValues[12]);
+        var count=TenshoAssistant.UI.AtkValueRead.Number(unit->AtkValues[21]);var item=TenshoAssistant.UI.AtkValueRead.Number(unit->AtkValues[12]);
         if(spearPending is { } pending && (item>0 && item!=pending.Item || now>=pending.Until))
         {
             spearPending=null;

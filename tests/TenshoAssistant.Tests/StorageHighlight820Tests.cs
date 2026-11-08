@@ -9,7 +9,7 @@ internal static class StorageHighlight820Tests
         {
             var reader=Read("Inventory/StorageHighlightReader.Dalamud.cs");
             Check(reader.Contains("\"InventoryRetainerLarge\"") && reader.Contains("\"InventoryBuddy\"") && reader.Contains("\"FreeCompanyChest\"") && !reader.Contains("\"InventoryGrid"),"other storages, not the bags");
-            Check(reader.Contains("if(manager==null || depth>4 || manager->NodeList==null || manager->NodeListCount>1024 || found.Count>=400)return;"),"bounded");
+            Check(reader.Contains("if(depth>4 || !UiNodes.Walkable(manager) || manager->NodeListCount>1024 || found.Count>=400)return;"),"bounded, R-14 guard");
             var page=Read("MainWindow.StorageHighlight.cs");
             Check(page.Contains("new[]{\"CraftList\",\"Workshop\"}") && reader.Contains("icons.Add(1_000_000+shown);"),"lists, HQ");
             Check(new TenshoAssistant.Configuration().ListPanelsStorageHighlight,"on by default");

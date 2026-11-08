@@ -3,6 +3,7 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
+using TenshoAssistant.UI;
 
 namespace TenshoAssistant.Gathering;
 
@@ -91,7 +92,7 @@ internal sealed class CollectableReader : IDisposable
                         AtkValueType.Int=>$"{index}:int {value.Int}",
                         AtkValueType.UInt=>$"{index}:uint {value.UInt}",
                         AtkValueType.Bool=>$"{index}:bool {value.Byte!=0}",
-                        AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString=>$"{index}:text {Short(value.GetValueAsString())}",
+                        _ when AtkValueRead.IsText(value.Type)=>$"{index}:text {Short(value.GetValueAsString())}",
                         _=>$"{index}:{value.Type}",
                     });
                 }
@@ -132,7 +133,7 @@ internal sealed class CollectableReader : IDisposable
 
     private static unsafe void FindIcons(AtkUldManager* manager,int depth,List<(uint Icon,nint Node)> found)
     {
-        if(manager==null || depth>3 || manager->NodeList==null || manager->NodeListCount>512 || found.Count>=40)return;
+        if(depth>3 || !UiNodes.Walkable(manager) || manager->NodeListCount>512 || found.Count>=40)return;
         for(var index=0;index<manager->NodeListCount;index++)
         {
             var node=manager->NodeList[index];

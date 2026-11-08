@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using TenshoAssistant.UI;
 
 namespace TenshoAssistant.Gathering;
 
@@ -20,7 +21,7 @@ internal sealed class GatheringObservationReader : IDisposable
     }
     private static unsafe AtkResNode* Node(AtkUldManager* manager,uint id)
     {
-        if(manager==null || manager->NodeList==null || manager->NodeListCount is <1 or >GatheringUiLayout.MaxNodes || manager->NodeListCount>manager->NodeListSize)return null;
+        if(!UiNodes.Walkable(manager) || manager->NodeListCount is <1 or >GatheringUiLayout.MaxNodes)return null;
         AtkResNode* found=null;
         for(var index=0;index<manager->NodeListCount;index++)
         {var node=manager->NodeList[index];if(node!=null && node->NodeId==id){if(found!=null)return null;found=node;}}
@@ -96,8 +97,7 @@ internal sealed class GatheringObservationReader : IDisposable
                 var job=local.ClassJob.RowId;var level=local.Level;var gp=local.CurrentGp;var maxGp=local.MaxGp;
                 var attempts=Text((AtkResNode*)addon->IntegrityLeftover);var total=Text((AtkResNode*)addon->IntegrityTotal);var slots=Copy(addon);
                 if(CurrentOwner!=current){service.BeginRead(CurrentOwner);return;}
-                var after=gui.GetAddonByName("Gathering");
-                if(after.IsNull || after.Address!=handle.Address || !after.IsReady || !after.IsVisible || gui.GameUiHidden
+                if(!GameWindowCheck.StillShown(gui,"Gathering",handle)
                     || objects.LocalPlayer?.Address!=local.Address || local.ClassJob.RowId!=job || local.Level!=level || local.CurrentGp!=gp || local.MaxGp!=maxGp
                     || addon->GatherStatus!=status || Text((AtkResNode*)addon->IntegrityLeftover)!=attempts || Text((AtkResNode*)addon->IntegrityTotal)!=total || !slots.SequenceEqual(Copy(addon)))
                 {service.Missing(ticket,current,GatheringObservationStatus.NotReady);return;}

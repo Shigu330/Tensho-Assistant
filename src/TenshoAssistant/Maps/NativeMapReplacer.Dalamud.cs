@@ -121,7 +121,7 @@ internal sealed class NativeMapReplacer : IDisposable
                     // 0.636: the Tensho map stayed open after a click closed the game's: the map key now closes it, as if the game's were open.
                     if(detached && !clicked && tenshoOpen())
                     {
-                        detached=false;hosted=false;Restore(unit);AgentMap.Instance()->Hide();visible=false;
+                        detached=false;hosted=false;Restore(unit);HideGameMap();visible=false;
                         log.Information("The map key closes the Tensho map left open.");
                         closeTensho();
                     }
@@ -161,7 +161,7 @@ internal sealed class NativeMapReplacer : IDisposable
                         closeTensho();
                     }
                 }
-                else if(!tenshoOpen()){hosted=false;Restore(unit);AgentMap.Instance()->Hide();visible=false;}
+                else if(!tenshoOpen()){hosted=false;Restore(unit);HideGameMap();visible=false;}
                 else
                 {
                     // Off screen every frame (the game moves it back when it animates); a new request (journal, link) is relayed.
@@ -179,6 +179,8 @@ internal sealed class NativeMapReplacer : IDisposable
     {
         if(unit!=null && unit->RootNode!=null)unit->RootNode->SetPositionFloat(unit->X,unit->Y);
     }
+    // X-76 (step 2): the game map's agent checked like everywhere else in this file before it is asked to close.
+    private static unsafe void HideGameMap(){var agent=AgentMap.Instance();if(agent!=null)agent->Hide();}
     // What the game asked (CurrentOpenMapInfo, temporary target), with a signature to notice a new request while hosted.
     // A quest, flag or link asks for a map through CurrentOpenMapInfo; at the first frame SelectedMapId can still be the world map.
     private unsafe (GameMapRequest Request,string Signature) ReadRequest(bool log)

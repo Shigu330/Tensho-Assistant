@@ -56,7 +56,8 @@ internal static class Resilience452Tests
             var bgm=Read("Collections/BgmReader.Dalamud.cs");
             Check(bgm.Contains("count is > 0 and <= 32 && count==system->NumScenes") && !bgm.Contains("foreach(ref var scene"),"BGM");
             var triad=Read("MiniGames/TriadObservationReader.Dalamud.cs");
-            Check(triad.Split("!Walkable(manager, depth)").Length==3 && triad.Contains("manager->NodeListCount <= manager->NodeListSize && manager->LoadedState == AtkLoadState.Loaded"),"walks");
+            Check(triad.Split("!Walkable(manager, depth)").Length==3 && triad.Contains("=> depth <= 4 && UiNodes.Walkable(manager);")
+                && Read("UI/UiNodes.Dalamud.cs").Contains("manager->NodeListCount<=manager->NodeListSize && manager->LoadedState==AtkLoadState.Loaded"),"walks");
             Check(triad.Split("TextureType").Length>=3 && !triad.Contains("asset == null || asset->AtkTexture.Resource == null"),"union");
             var tryOn=Read("Items/TryOn.Dalamud.cs");
             Check(tryOn.Contains("if (!characterReady) return false;") && tryOn.Contains("(nint)AgentTryon.MemberFunctionPointers.TryOn == 0") && Read("Plugin.cs").Contains("Items.TryOn.Item(item,player.IsLoaded,"),"try on");

@@ -10,7 +10,7 @@ internal static class CollectableHighlight815Tests
             Check(panel.Contains("if(!advice.Impossible && info is { Icon:not 0 } wanted && configuration.GatheringNextHighlight && Collectables is { } reader)"),"conditions");
             Check(panel.Contains("reader.WantIcon(wanted.Icon);") && panel.Contains("DrawGameFrame(rect.X,rect.Y,rect.Width,rect.Height);") && !panel.Contains("BarLocator"),"the window, not the bars");
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/CollectableReader.Dalamud.cs"));
-            Check(reader.Contains("if(manager==null || depth>3 || manager->NodeList==null || manager->NodeListCount>512 || found.Count>=40)return;"),"bounded walk");
+            Check(reader.Contains("if(depth>3 || !UiNodes.Walkable(manager) || manager->NodeListCount>512 || found.Count>=40)return;"),"bounded walk, R-14 guard");
         }),
     ];
 }

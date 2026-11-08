@@ -3,6 +3,7 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 using TenshoAssistant.Reminders;
+using TenshoAssistant.UI;
 
 namespace TenshoAssistant.Items;
 
@@ -51,7 +52,7 @@ internal sealed class GcSupplyReader : IDisposable
             for(var position=0;position<addon->AtkValuesCount && texts.Count<MaxTexts;position++)
             {
                 var value=addon->AtkValues[position];
-                if(value.Type is AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString && value.GetValueAsString() is {Length:>0 and <=MaxTextLength} text)texts.Add(text);
+                if(AtkValueRead.IsText(value.Type) && value.GetValueAsString() is {Length:>0 and <=MaxTextLength} text)texts.Add(text);
             }
         Walk(&addon->UldManager,0,texts);
         var found=GcSupplyToday.Match(texts,index);
@@ -67,7 +68,7 @@ internal sealed class GcSupplyReader : IDisposable
 
     private static unsafe void Walk(AtkUldManager* manager,int depth,List<string> texts)
     {
-        if(manager==null || depth>MaxDepth || manager->NodeList==null || manager->NodeListCount>manager->NodeListSize || manager->LoadedState!=AtkLoadState.Loaded)return;
+        if(depth>MaxDepth || !UiNodes.Walkable(manager))return;
         for(var index=0;index<manager->NodeListCount && texts.Count<MaxTexts;index++)
         {
             var node=manager->NodeList[index];

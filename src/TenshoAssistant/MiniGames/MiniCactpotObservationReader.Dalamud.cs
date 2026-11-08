@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using TenshoAssistant.UI;
 
 namespace TenshoAssistant.MiniGames;
 
@@ -57,8 +58,7 @@ internal sealed class MiniCactpotObservationReader : IDisposable
                 if(gui.GameUiHidden || !handle.IsReady || !handle.IsVisible){service.Missing(ticket,current,MiniCactpotObservationStatus.NotReady);return;}
                 var addon=(AddonLotteryDaily*)handle.Address;var board=Copy(addon);
                 if(CurrentOwner!=current){service.BeginRead(CurrentOwner);return;}
-                var after=gui.GetAddonByName("LotteryDaily");
-                if(after.IsNull || after.Address!=handle.Address || !after.IsReady || !after.IsVisible || gui.GameUiHidden || !board.SequenceEqual(Copy(addon)))
+                if(!GameWindowCheck.StillShown(gui,"LotteryDaily",handle) || !board.SequenceEqual(Copy(addon)))
                 {service.Missing(ticket,current,MiniCactpotObservationStatus.NotReady);return;}
                 service.Publish(ticket,current,board,Tiles(addon),Lanes(addon));
             }

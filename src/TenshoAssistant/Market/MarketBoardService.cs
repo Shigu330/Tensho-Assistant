@@ -18,6 +18,8 @@ public sealed class MarketBoardService : IDisposable
     private const string Family="market-board",Version="universalis-board-v1";
     private readonly object gate=new();
     private readonly HttpClient client;
+    // X-76 (step 2): a client given by the caller is the caller's to dispose (as MarketService).
+    private readonly bool ownsClient;
     private readonly Dictionary<(string Scope,uint Item),MarketBoard> cache=[];
     private readonly CancellationTokenSource disposal=new();
     private Func<TimeSpan> lifetime=()=>TimeSpan.FromMinutes(5);
@@ -42,8 +44,10 @@ public sealed class MarketBoardService : IDisposable
 
     public MarketBoardService(HttpClient? client=null)
     {
+        ownsClient=client is null;
         this.client=client ?? new HttpClient{Timeout=TimeSpan.FromSeconds(15),MaxResponseContentBufferSize=4*1024*1024};
-        this.client.DefaultRequestHeaders.UserAgent.ParseAdd($"TenshoAssistant/{typeof(MarketBoardService).Assembly.GetName().Version?.ToString(3) ?? "1.0.0"}");
+        // X-76 (step 2): Tensho's one User-Agent, on its own client only (a given client keeps its headers).
+        if(ownsClient)this.client.DefaultRequestHeaders.UserAgent.ParseAdd(Community.BoundedHttp.UserAgent);
     }
     public MarketBoardState State=>Volatile.Read(ref state);
     public void ConfigureCache(Func<TimeSpan> cacheLifetime,DataCache? store=null){lock(gate){lifetime=cacheLifetime;disk=store;}}
@@ -147,6 +151,6 @@ public sealed class MarketBoardService : IDisposable
     public void Dispose()
     {
         lock(gate){if(disposed)return;disposed=true;}
-        disposal.Cancel();disposal.Dispose();client.Dispose();
+        disposal.Cancel();disposal.Dispose();if(ownsClient)client.Dispose();
     }
 }

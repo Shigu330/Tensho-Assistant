@@ -150,7 +150,8 @@ public sealed class MarketService : IDisposable
     {
         ownsClient = client is null;
         this.client = client ?? new HttpClient { Timeout = TimeSpan.FromSeconds(12), MaxResponseContentBufferSize = 1048576 };
-        this.client.DefaultRequestHeaders.UserAgent.ParseAdd($"TenshoAssistant/{typeof(MarketService).Assembly.GetName().Version?.ToString(3) ?? "1.0.0"}");
+        // X-76 (step 2): Tensho's one User-Agent, on its own client only (a given client keeps its headers).
+        if (ownsClient) this.client.DefaultRequestHeaders.UserAgent.ParseAdd(Community.BoundedHttp.UserAgent);
     }
     public void SetWorld(ulong character, uint worldId, string worldName, string dataCenterName = "", IReadOnlyDictionary<uint, string>? worldNames = null)
     {
