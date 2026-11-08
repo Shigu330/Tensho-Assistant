@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.944.0
+- Plan global, Verify : Nettoyage X-76, étape 3 (réglages) : inventaire complet écrit dans docs/project/SETTINGS.md (301 lignes : chaque réglage, son défaut, où le changer, son effet réel, ce qui se passe s'il est coupé), relevé par trois agents et revérifié par un quatrième ; sur 100 anomalies signalées, 9 confirmées et corrigées : la barre de PR se lisait aussi quand seul « plan depuis la liste » était coché (elle suit maintenant l'aide à la récolte) ; le bouton par défaut de l'attente des bonus remet bien « comme les actions » ; une seule case pour les zones de quête sur la carte ; une info-bulle propre aux cristaux ; cinq info-bulles corrigées pour dire ce que le réglage fait vraiment (infobulle de la barre du serveur, aide à la pêche, encadrement des rangements, Eurêka des collectionnables, panneau de l'atelier). Non validé en jeu.
+- Tests : SettingsFixes944Tests. Verify.ps1 (agent) : 1556/1556, 0 avertissement, 0 erreur ; DLL 0.944.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, step 3 (settings): full inventory written in docs/project/SETTINGS.md (301 rows: each setting, its default, where to change it, its real effect, what happens when off), gathered by three agents and checked again by a fourth; of 100 flagged issues, 9 confirmed and fixed: the GP bar reader also ran when only « plan from the list » was ticked (it now follows the gathering help); the buff wait's default button really returns to « as the actions »; one control for quest areas on the map; a tooltip of its own for crystals; five tooltips fixed to say what the setting really does (server bar tooltip, fishing help, storage frames, collectables' Eureka, workshop panel). Not validated in game.
+
 ## 0.943.0
 - Plan global, Verify : X-93, votre choix : la limite des découvertes partagées gardées en mémoire passe à 200 000 par sorte (au lieu de 200 000 en tout) ; une sorte pleine ne bloque plus les autres. Vos découvertes ne sont toujours jamais refusées ; le message de la page Découvertes parle maintenant de la sorte pleine. Non validé en jeu.
 - Tests : NeverForget939Tests. Verify.ps1 (agent) : 1555/1555, 0 avertissement, 0 erreur ; DLL 0.943.0.0. Non validé en jeu.

@@ -43,7 +43,7 @@ internal sealed partial class MainWindow
             ImGui.Unindent();
         }
         BoolSetting("ListPanels.Other","ListPanels.OriginTip",()=>configuration.ListPanelsOther,value=>configuration.ListPanelsOther=value,c=>c.ListPanelsOther);
-        BoolSetting("ListPanels.Crystal","ListPanels.OriginTip",()=>configuration.ListPanelsCrystal,value=>configuration.ListPanelsCrystal=value,c=>c.ListPanelsCrystal);
+        BoolSetting("ListPanels.Crystal","ListPanels.CrystalTip",()=>configuration.ListPanelsCrystal,value=>configuration.ListPanelsCrystal=value,c=>c.ListPanelsCrystal);
         ImGui.Unindent();
     }
     private IReadOnlyList<WorkshopProject> workshopPanelShown=[];

@@ -1,0 +1,4 @@
+2026-11-08 17:15:49.199 +01:00 [WRN] [TenshoAssistant] Ocean schedule check: the game says route 14, the timetable gives 12 / 15 for departure 2026-11-08 16:00:00Z.
+2026-11-08 17:33:46.831 +01:00 [WRN] [TenshoAssistant] Ocean schedule check: the game says route 14, the timetable gives 12 / 15 for departure 2026-11-08 16:00:00Z.
+2026-11-08 21:15:32.642 +01:00 [WRN] [TenshoAssistant] Ocean schedule check: the game says route 17, the timetable gives 6 / 18 for departure 2026-11-08 20:00:00Z.
+2026-11-08 21:15:32.754 +01:00 [INF] [TenshoAssistant] Ocean schedule sighting: slot 249086, loop row 110, port "Othard", route 17; 1 sighting(s) of this port, 12 shift(s) still possible ("Contradicted"): 8, 19, 30, 41, 52, 63, 74, 85, 96, 107, 118, 141.

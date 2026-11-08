@@ -570,7 +570,7 @@ public sealed class Plugin : IDalamudPlugin
             // g, X-06 (0.391): gatherer GP regeneration tick (on-screen bar, off by default).
             Gathering.RegenTickReader? regenTick=null;
             // g, R-08 (0.403): GP alert at the threshold (chat line and sound with the alarm options), once per rise.
-            registrations.Register(()=>regenTick=new Gathering.RegenTickReader(framework,objects,condition,()=>configuration.GpTickBar || configuration.GatherPlanFromList,log)
+            registrations.Register(()=>regenTick=new Gathering.RegenTickReader(framework,objects,condition,()=>configuration.GpTickBar || configuration.GatheringPanel,log)
             {
                 Alert=()=>configuration.GpAlert ? configuration.GpAlertThreshold:null,
                 Reached=(gp,max)=>

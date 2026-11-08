@@ -172,7 +172,7 @@ internal sealed partial class MainWindow
             var exportBefore=(search.ExtraWait,search.Echo,search.BuffExtraWait,search.EchoSound,search.EchoLastOnly);
             IntSetting("ModuleSettings.Wait","SettingTips.Wait",()=>search.ExtraWait,value=>search.ExtraWait=value,0,3,searchDefaults.ExtraWait);
             // X-12 (0.419): the buffs' extra wait apart (shown as the actions' one until changed).
-            IntSetting("ModuleSettings.BuffWait","SettingTips.BuffWait",()=>search.BuffExtraWait ?? search.ExtraWait,value=>search.BuffExtraWait=value,0,3,searchDefaults.ExtraWait);
+            IntSetting("ModuleSettings.BuffWait","SettingTips.BuffWait",()=>search.BuffExtraWait ?? search.ExtraWait,value=>search.BuffExtraWait=value==search.ExtraWait ? null:value,0,3,search.ExtraWait);
             BoolSetting("ModuleSettings.AutoSimulate","ModuleSettings.AutoSimulateTip",()=>configuration.CraftSearch.AutoSimulate,value=>configuration.CraftSearch.AutoSimulate=value,c=>c.CraftSearch.AutoSimulate);
             BoolSetting("ModuleSettings.Echo","SettingTips.Echo",()=>configuration.CraftSearch.Echo,value=>configuration.CraftSearch.Echo=value,c=>c.CraftSearch.Echo);
             IntSetting("ModuleSettings.EchoSound","ModuleSettings.EchoSoundTip",()=>search.EchoSound,value=>search.EchoSound=value,0,16,searchDefaults.EchoSound);
