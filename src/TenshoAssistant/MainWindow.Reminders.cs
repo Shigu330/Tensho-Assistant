@@ -155,9 +155,8 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndTable();}
         ImGui.TextDisabled(localization.Get("Reminders.Help"));
-        var fromGame=configuration.RemindersFromGame;
-        if(ImGui.Checkbox(localization.Get("Reminders.FromGame"),ref fromGame)){configuration.RemindersFromGame=fromGame;SaveReminders();}
-        Tip("Reminders.FromGameTip");
+        // X-76 H5 (0.915): shared row (rollback when saving fails, « ↺ »).
+        BoolSetting("Reminders.FromGame","Reminders.FromGameTip",()=>configuration.RemindersFromGame,value=>configuration.RemindersFromGame=value,c=>c.RemindersFromGame);
 
         void SquadronRow(string key,FontAwesomeIcon icon,SquadronTimer? timer,Func<ushort,string?>? nameOf)
         {

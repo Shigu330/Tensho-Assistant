@@ -39,8 +39,8 @@ internal sealed partial class MainWindow
         changed |= ImGui.Combo(localization.Get("CostUi.Quality")+"##Cost",ref costQualityIndex,new[] {"NQ","HQ",localization.Get("CostUi.Cheapest")},3);
         Tip("CostUi.QualityTip");
         // X-76 H3 (0.914): the shared setting row (restored when saving fails, which was only logged).
-        BoolSetting("CostUi.DataCenter","CostUi.DataCenterTip",()=>configuration.CostDataCenter,value=>configuration.CostDataCenter=value);
-        BoolSetting("CostUi.Vendors","CostUi.VendorsTip",()=>configuration.CostUseVendors,value=>configuration.CostUseVendors=value);
+        BoolSetting("CostUi.DataCenter","CostUi.DataCenterTip",()=>configuration.CostDataCenter,value=>configuration.CostDataCenter=value,c=>c.CostDataCenter);
+        BoolSetting("CostUi.Vendors","CostUi.VendorsTip",()=>configuration.CostUseVendors,value=>configuration.CostUseVendors=value,c=>c.CostUseVendors);
         if(changed) {preparationPrices.Cancel(); preparationCostError=null;}
         PreparationCostEstimate estimate;
         try

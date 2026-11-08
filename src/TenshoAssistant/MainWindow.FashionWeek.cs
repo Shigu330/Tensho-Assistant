@@ -89,30 +89,12 @@ internal sealed partial class MainWindow
 
     private void DrawFashionOptions()
     {
+        // X-76 H5 (0.915): one shared row per option (tooltip, « ↺ », the value restored when saving fails).
         var options=configuration.FashionOptions??=new();
-        var owned=options.OwnedFirst;var dim=options.DimUnowned;var popular=options.ByPopularity;var panel=options.ShowPanel;var changed=false;
-        // 0.324: « ↺ » after each option.
-        var defaults=DefaultConfiguration.FashionOptions;
-        changed|=ImGui.Checkbox(localization.Get("FashionWeek.OwnedFirst"),ref owned);Tip("FashionWeek.OwnedFirstTip");
-        if(DefaultButton("FashionOwnedFirst",owned!=defaults.OwnedFirst)){owned=defaults.OwnedFirst;changed=true;}
-        ImGui.SameLine();
-        changed|=ImGui.Checkbox(localization.Get("FashionWeek.Dim"),ref dim);Tip("FashionWeek.DimTip");
-        if(DefaultButton("FashionDim",dim!=defaults.DimUnowned)){dim=defaults.DimUnowned;changed=true;}
-        ImGui.SameLine();
-        changed|=ImGui.Checkbox(localization.Get("FashionWeek.Popular"),ref popular);Tip("FashionWeek.PopularTip");
-        if(DefaultButton("FashionPopular",popular!=defaults.ByPopularity)){popular=defaults.ByPopularity;changed=true;}
-        changed|=ImGui.Checkbox(localization.Get("FashionWeek.Panel"),ref panel);Tip("FashionWeek.PanelTip");
-        if(DefaultButton("FashionPanel",panel!=defaults.ShowPanel)){panel=defaults.ShowPanel;changed=true;}
-        if(!changed)return;
-        SaveFashionOptions(new(){OwnedFirst=owned,DimUnowned=dim,ByPopularity=popular,ShowPanel=panel});
-    }
-
-    // X-76 H3 (0.914): the previous options come back when saving fails.
-    private void SaveFashionOptions(TenshoAssistant.Fashion.FashionOptions next)
-    {
-        var previous=configuration.FashionOptions;
-        configuration.FashionOptions=next;
-        TrySave("Fashion options",()=>configuration.FashionOptions=previous);
+        BoolSetting("FashionWeek.OwnedFirst","FashionWeek.OwnedFirstTip",()=>options.OwnedFirst,value=>options.OwnedFirst=value,c=>c.FashionOptions.OwnedFirst);
+        BoolSetting("FashionWeek.Dim","FashionWeek.DimTip",()=>options.DimUnowned,value=>options.DimUnowned=value,c=>c.FashionOptions.DimUnowned);
+        BoolSetting("FashionWeek.Popular","FashionWeek.PopularTip",()=>options.ByPopularity,value=>options.ByPopularity=value,c=>c.FashionOptions.ByPopularity);
+        BoolSetting("FashionWeek.Panel","FashionWeek.PanelTip",()=>options.ShowPanel,value=>options.ShowPanel=value,c=>c.FashionOptions.ShowPanel);
     }
 
     // The 11 slots: category of the week, pieces reported for it (owned / total), expandable list.

@@ -88,7 +88,9 @@ internal static class SettingsSave914Tests
             })
                 Check(!Source(file).Contains(gone,StringComparison.Ordinal),file+": still saved by hand ("+gone+")");
             Check(Source("MainWindow.PreparationCost.cs").Contains("BoolSetting(\"CostUi.DataCenter\",\"CostUi.DataCenterTip\"",StringComparison.Ordinal),"cost scope: shared row");
-            Check(Source("MainWindow.Plots.cs").Contains("SaveSetting(\"PlotWatchSize\",",StringComparison.Ordinal) && Source("MainWindow.HuntTrain.cs").Contains("SaveSetting(\"HuntAnnounceChannel\",",StringComparison.Ordinal)
+            // X-76 H5 (0.915): the plot size and the hunt call channel are ComboSetting rows, which save through SaveSetting.
+            Check(Source("MainWindow.Plots.cs").Contains("ComboSetting(\"Plots.Size\",",StringComparison.Ordinal) && Source("MainWindow.HuntTrain.cs").Contains("ComboSetting(\"HuntCallChannel\",",StringComparison.Ordinal)
+                && Between(Source("UI/Components/SettingRow.cs"),"private void ComboSetting<T>(","\n    }").Contains("SaveSetting(labelKey,read,write,value);",StringComparison.Ordinal)
                 && Source("MainWindow.MarketBoard.cs").Contains("SaveSetting(\"MarketBoardScope\",",StringComparison.Ordinal),"combo choices restored when saving fails");
             Check(Source("MainWindow.Weather.cs").Contains("TrySave(\"Weather zones\",()=>{if(kept)favorites[territory]=removed;else favorites.Remove(territory);});",StringComparison.Ordinal),"weather zone undone");
         }),

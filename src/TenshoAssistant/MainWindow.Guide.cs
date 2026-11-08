@@ -171,12 +171,13 @@ internal sealed partial class MainWindow
                 BoolSetting("Advanced.Fashion", "Advanced.FashionTip", () => configuration.CommunityFashion, value => configuration.CommunityFashion = value, c => c.CommunityFashion);
                 break;
             case GuideStep.Settings:
-                BoolSetting("MapView.ReplaceGameMap", "Guide.ReplaceMapTip", () => configuration.MapView.ReplaceGameMap, value => configuration.MapView.ReplaceGameMap = value);
-                BoolSetting("Settings.UsageHover", "InterfaceHelp.UsageHelp", () => configuration.ItemUsagesOnHover, value => configuration.ItemUsagesOnHover = value);
-                BoolSetting("Settings.ContextMenu", "InterfaceHelp.MenuHelp", () => configuration.ItemContextMenuEnabled, value => configuration.ItemContextMenuEnabled = value);
-                BoolSetting("BankUi.AutoSetting", "BankUi.AutoSettingHelp", () => configuration.AutoBankCapture, value => configuration.AutoBankCapture = value);
-                BoolSetting("Settings.OpenOnLogin", "Settings.OpenOnLoginHelp", () => configuration.OpenOnLogin, value => configuration.OpenOnLogin = value);
-                BoolSetting("Settings.HelpBanners", "SettingTips.HelpBanners", () => configuration.HelpBanners, value => configuration.HelpBanners = value);
+                // X-76 H5 (0.915): « ↺ » on these rows too, and the map row has the same tooltip as in Settings › Map.
+                BoolSetting("MapView.ReplaceGameMap", "MapView.ReplaceGameMapHelp", () => configuration.MapView.ReplaceGameMap, value => configuration.MapView.ReplaceGameMap = value, c => c.MapView.ReplaceGameMap);
+                BoolSetting("Settings.UsageHover", "InterfaceHelp.UsageHelp", () => configuration.ItemUsagesOnHover, value => configuration.ItemUsagesOnHover = value, c => c.ItemUsagesOnHover);
+                BoolSetting("Settings.ContextMenu", "InterfaceHelp.MenuHelp", () => configuration.ItemContextMenuEnabled, value => configuration.ItemContextMenuEnabled = value, c => c.ItemContextMenuEnabled);
+                BoolSetting("BankUi.AutoSetting", "BankUi.AutoSettingHelp", () => configuration.AutoBankCapture, value => configuration.AutoBankCapture = value, c => c.AutoBankCapture);
+                BoolSetting("Settings.OpenOnLogin", "Settings.OpenOnLoginHelp", () => configuration.OpenOnLogin, value => configuration.OpenOnLogin = value, c => c.OpenOnLogin);
+                BoolSetting("Settings.HelpBanners", "SettingTips.HelpBanners", () => configuration.HelpBanners, value => configuration.HelpBanners = value, c => c.HelpBanners);
                 break;
             case GuideStep.Interests:
                 foreach (var interest in Enum.GetValues<GuideInterest>())

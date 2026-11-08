@@ -58,14 +58,11 @@ internal sealed partial class MainWindow
     {
         ImGui.TextColored(Accent, localization.Get("Settings.Window"));
         // 0.324: shared setting rows (tooltip and « ↺ »).
+        // X-76 H6 (0.915): the help is the row's tooltip only (it was also written under the row).
         BoolSetting("Settings.OpenOnLoad","Settings.OpenOnLoadHelp",()=>configuration.OpenOnLoad,value=>configuration.OpenOnLoad=value,c=>c.OpenOnLoad);
-        ImGui.TextDisabled(localization.Get("Settings.OpenOnLoadHelp"));
-        ImGui.Spacing();
         BoolSetting("Settings.OpenOnLogin","Settings.OpenOnLoginHelp",()=>configuration.OpenOnLogin,value=>configuration.OpenOnLogin=value,c=>c.OpenOnLogin);
-        ImGui.TextDisabled(localization.Get("Settings.OpenOnLoginHelp"));
-        ImGui.Spacing();
+        BoolSetting("Settings.HelpBanners","SettingTips.HelpBanners",()=>configuration.HelpBanners,value=>configuration.HelpBanners=value,c=>c.HelpBanners);
         // 0.327 (queue step e): opening page, shared row (tooltip and « ↺ »); turning it on remembers the current page at once.
-        BoolSetting("Settings.HelpBanners","SettingTips.HelpBanners",()=>configuration.HelpBanners,value=>configuration.HelpBanners=value);
         BoolSetting("Settings.OpenOnLastPage","SettingTips.OpenOnLastPage",()=>configuration.OpenOnLastPage,value=>{configuration.OpenOnLastPage=value;rememberedPage=null;RememberPage();},c=>c.OpenOnLastPage);
         ImGui.Spacing(); ImGui.Separator();
         DrawHeaderSettings();
@@ -135,20 +132,9 @@ internal sealed partial class MainWindow
         IntSetting("Settings.ItemSearchLimit","SettingTips.ItemSearchLimit",()=>Configuration.BoundedItemSearchLimit(configuration.ItemSearchLimit),value=>configuration.ItemSearchLimit=value,Configuration.MinimumItemSearchLimit,Configuration.MaximumItemSearchLimit,DefaultConfiguration.ItemSearchLimit);
         // e) (audit 2026-11-02): scope the Market page opens on; a choice made on that page is saved here too. Plain names: the region
         // would need the Universalis data centre table, which this page must not ask for.
-        var scopeNow=MarketScopeShown;
-        ImGui.SetNextItemWidth(200);
-        if(ImGui.BeginCombo(localization.Get("Settings.MarketScope")+"###MarketBoardScope",localization.Get("Settings.MarketScope"+scopeNow)))
-        {
-            try
-            {
-                foreach(var scope in Enum.GetValues<TenshoAssistant.Market.MarketScope>())
-                    if(ImGui.Selectable(localization.Get("Settings.MarketScope"+scope),scope==scopeNow) && scope!=configuration.MarketBoardScope)SaveSetting("Settings.MarketScope",()=>configuration.MarketBoardScope,value=>configuration.MarketBoardScope=value,scope);
-            }
-            finally{ImGui.EndCombo();}
-        }
-        Tip("Settings.MarketScopeTip");
-        if(DefaultButton("MarketBoardScope",configuration.MarketBoardScope!=DefaultConfiguration.MarketBoardScope))
-            SaveSetting("Settings.MarketScope",()=>configuration.MarketBoardScope,value=>configuration.MarketBoardScope=value,DefaultConfiguration.MarketBoardScope);
+        // X-76 H5 (0.915): shared combo row; an unknown saved value is shown as the data centre (MarketScopeShown).
+        ComboSetting("Settings.MarketScope","Settings.MarketScopeTip",()=>MarketScopeShown,value=>configuration.MarketBoardScope=value,
+            Enum.GetValues<TenshoAssistant.Market.MarketScope>().Select(scope=>(scope,localization.Get("Settings.MarketScope"+scope))).ToArray(),DefaultConfiguration.MarketBoardScope,200);
         ImGui.Spacing(); ImGui.Separator();
     }
     private void DrawModuleSettings()
@@ -195,21 +181,13 @@ internal sealed partial class MainWindow
             ImGui.TextDisabled(localization.Get("ModuleSettings.ExportHelp"));
             // Game macros used by « Copy into the game's macros » (0.191).
             var copy=configuration.MacroCopy ??= new();
-            var book=copy.Book;var start=copy.Start;var end=copy.End;var prefix=copy.Prefix;var any=copy.OverwriteAny;var chain=copy.Chain;
+            var start=copy.Start;var end=copy.End;var prefix=copy.Prefix;
             var copyChanged=false;
-            ImGui.SetNextItemWidth(160);
-            if(ImGui.BeginCombo(localization.Get("ModuleSettings.MacroBook"),localization.Get(book==1 ? "CraftMacro.Shared":"CraftMacro.Individual")))
-            {
-                try
-                {
-                    if(ImGui.Selectable(localization.Get("CraftMacro.Individual"),book==0)){book=0;copyChanged=true;}
-                    if(ImGui.Selectable(localization.Get("CraftMacro.Shared"),book==1)){book=1;copyChanged=true;}
-                }
-                finally{ImGui.EndCombo();}
-            }
-            Tip("SettingTips.MacroBook");
             var macroDefaults=DefaultConfiguration.MacroCopy;
-            if(DefaultButton("MacroBook",book!=macroDefaults.Book)){book=macroDefaults.Book;copyChanged=true;}
+            // X-76 H5 (0.915): the book and the two switches are shared rows, saved on click; the slot range and the name prefix below
+            // are typed, bound to each other and written once no field is being typed in any more.
+            ComboSetting("ModuleSettings.MacroBook","SettingTips.MacroBook",()=>copy.Book,value=>copy.Book=value,
+                [(0,localization.Get("CraftMacro.Individual")),(1,localization.Get("CraftMacro.Shared"))],macroDefaults.Book);
             ImGui.SetNextItemWidth(100);copyChanged|=ImGui.InputInt(localization.Get("ModuleSettings.MacroStart"),ref start,0);
             Tip("SettingTips.MacroStart");
             if(DefaultButton("MacroStart",start!=macroDefaults.Start)){start=macroDefaults.Start;if(end<start)end=macroDefaults.End;copyChanged=true;}
@@ -219,18 +197,14 @@ internal sealed partial class MainWindow
             ImGui.SetNextItemWidth(160);copyChanged|=ImGui.InputText(localization.Get("ModuleSettings.MacroPrefix"),ref prefix,12);
             Tip("SettingTips.MacroPrefix");
             if(DefaultButton("MacroPrefix",prefix!=macroDefaults.Prefix)){prefix=macroDefaults.Prefix;copyChanged=true;}
-            copyChanged|=ImGui.Checkbox(localization.Get("ModuleSettings.MacroOverwrite"),ref any);
-            Tip("SettingTips.MacroOverwrite");
-            if(DefaultButton("MacroOverwrite",any!=macroDefaults.OverwriteAny)){any=macroDefaults.OverwriteAny;copyChanged=true;}
-            if(ImGui.Checkbox(localization.Get("ModuleSettings.MacroChain"),ref chain)){copyChanged=true;craftMacroExport=null;}
-            Tip("SettingTips.MacroChain");
-            if(DefaultButton("MacroChain",chain!=macroDefaults.Chain)){chain=macroDefaults.Chain;copyChanged=true;craftMacroExport=null;}
+            BoolSetting("ModuleSettings.MacroOverwrite","SettingTips.MacroOverwrite",()=>copy.OverwriteAny,value=>copy.OverwriteAny=value,c=>c.MacroCopy.OverwriteAny);
+            BoolSetting("ModuleSettings.MacroChain","SettingTips.MacroChain",()=>copy.Chain,value=>{copy.Chain=value;craftMacroExport=null;},c=>c.MacroCopy.Chain);
             if(copyChanged)
             {
                 start=Math.Clamp(start,0,99);end=Math.Clamp(end,start,99);
                 // X-76 H4 (0.914): applied at once, written once no field is being typed in any more (it was written on every key press).
                 macroCopySaved??=configuration.MacroCopy;
-                configuration.MacroCopy=new(){Book=book,Start=start,End=end,Prefix=prefix.Trim(),OverwriteAny=any,Chain=chain};
+                configuration.MacroCopy=new(){Book=copy.Book,Start=start,End=end,Prefix=prefix.Trim(),OverwriteAny=copy.OverwriteAny,Chain=copy.Chain};
             }
             if(macroCopySaved is not null && !ImGui.IsAnyItemActive())SaveMacroCopy();
             ImGui.TextDisabled(localization.Get("ModuleSettings.MacroCopyHelp"));
@@ -250,7 +224,7 @@ internal sealed partial class MainWindow
             var gatheringPanel=configuration.GatheringPanel;
             if(ImGui.Checkbox(localization.Get("GatheringPanel.Setting")+"###GatheringPanel.Setting",ref gatheringPanel))SaveGatheringChoice(gatheringPanel ? true:null,gatheringPanel);
             Tip("GatheringPanel.SettingTip");
-            if(BoolDefaultButton("GatheringPanel.Setting",DefaultConfiguration.GatheringPanel,configuration.GatheringPanel))
+            if(DefaultButton("GatheringPanel.Setting",configuration.GatheringPanel!=DefaultConfiguration.GatheringPanel,OnOff(DefaultConfiguration.GatheringPanel)))
                 SaveGatheringChoice(DefaultConfiguration.GatheringPanel ? true:null,DefaultConfiguration.GatheringPanel);
             ImGui.TextWrapped(localization.Get("ModuleSettings.GatheringHelp"));
             DrawGpPlanSettings();
@@ -290,7 +264,6 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.HidePanelsBehindGame","Advanced.HidePanelsBehindGameTip",()=>configuration.HidePanelsBehindGame,value=>configuration.HidePanelsBehindGame=value,c=>c.HidePanelsBehindGame);
         BoolSetting("Advanced.HideBarsBehindGame","Advanced.HideBarsBehindGameTip",()=>configuration.HideBarsBehindGame,value=>configuration.HideBarsBehindGame=value,c=>c.HideBarsBehindGame);
         BoolSetting("BankUi.AutoSetting","BankUi.AutoSettingHelp",()=>configuration.AutoBankCapture,value=>configuration.AutoBankCapture=value,c=>c.AutoBankCapture);
-        ImGui.TextDisabled(localization.Get("BankUi.AutoSettingHelp"));
         DrawCacheSettings();
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ModuleSettings.Profiles")))
         {
@@ -307,9 +280,8 @@ internal sealed partial class MainWindow
     {
         if (developerMode && TenshoAssistant.UI.UiComponents.Header(localization.Get("Settings.DebugLocalization") + "###LocalizationDebug"))
         {
-            var showKeys = localization.ShowKeys;
-            if (ImGui.Checkbox(localization.Get("Developer.ShowKeys") + "###ShowTranslationKeys", ref showKeys)) localization.ShowKeys = showKeys;
-            Tip("Contributor.ShowKeysTip");
+            // X-76 H6 (0.915): « Show translation keys » is in one place, Settings › Advanced › Localization, where contributors are sent
+            // and which is shown without developer mode; this developer tab keeps the reload and the full report.
             if (ImGui.SmallButton(localization.Get("Navigation.Diagnostics"))) page = Page.Diagnostics;
             if (ImGui.SmallButton(localization.Get("Settings.ReloadTranslations"))) localization.Reload();
             Tip("Advanced.ReloadTip");
@@ -341,7 +313,7 @@ internal sealed partial class MainWindow
     {
         var clicked=ImGui.Checkbox(label+"###Observe"+id,ref enabled);
         Tip(tipKey);
-        if(BoolDefaultButton("Observe"+id,fallback,enabled)){enabled=fallback;clicked=true;}
+        if(DefaultButton("Observe"+id,enabled!=fallback,OnOff(fallback))){enabled=fallback;clicked=true;}
         return clicked ? enabled:null;
     }
 

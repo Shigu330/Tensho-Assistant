@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
             TrySave("Developer mode",()=>developerMode=configuration.DeveloperMode=!developer);
         }
         Tip("Advanced.DeveloperTip");
-        if(BoolDefaultButton("DeveloperMode",DefaultConfiguration.DeveloperMode,developerMode))
+        if(DefaultButton("DeveloperMode",developerMode!=DefaultConfiguration.DeveloperMode,OnOff(DefaultConfiguration.DeveloperMode)))
         {
             developerMode=configuration.DeveloperMode=false;localization.ShowKeys=false;
             TrySave("Developer mode",()=>developerMode=configuration.DeveloperMode=true);

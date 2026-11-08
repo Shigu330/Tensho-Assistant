@@ -71,10 +71,9 @@ internal static class SourceSwitch324Tests
             string Read(string file) => File.ReadAllText(Path.Combine(Source,file));
             var expected = new (string File,string[] Ids)[]
             {
-                ("MainWindow.Settings.cs",["\"MacroBook\"","\"MacroStart\"","\"MacroEnd\"","\"MacroPrefix\"","\"MacroOverwrite\"","\"MacroChain\""]),
+                ("MainWindow.Settings.cs",["\"MacroStart\"","\"MacroEnd\"","\"MacroPrefix\""]),
                 ("MainWindow.Caching.cs",["\"Cache\"+area"]),
                 ("MainWindow.Alarms.cs",["\"AlarmLead\"","\"AlarmPlaySound\"","\"AlarmSound\"","\"AlarmChat\"","\"AlarmMute\"","\"AlarmUseGame\"","\"AlarmGameWeather\""]),
-                ("MainWindow.FashionWeek.cs",["\"FashionOwnedFirst\"","\"FashionDim\"","\"FashionPopular\"","\"FashionPanel\""]),
                 ("MainWindow.MapView.cs",["\"Area\"+key"]),
             };
             foreach (var (file,ids) in expected)
@@ -82,6 +81,15 @@ internal static class SourceSwitch324Tests
                 var text = Read(file);
                 foreach (var id in ids) Check(text.Contains("DefaultButton(" + id,StringComparison.Ordinal),file + ": " + id);
             }
+            // X-76 H5 (0.915): the macro book and switches and the Fashion Report options are shared rows, whose « ↺ » comes with the row.
+            foreach (var (file,row) in new[]
+            {
+                ("MainWindow.Settings.cs","ComboSetting(\"ModuleSettings.MacroBook\","),
+                ("MainWindow.Settings.cs","BoolSetting(\"ModuleSettings.MacroOverwrite\","),("MainWindow.Settings.cs","BoolSetting(\"ModuleSettings.MacroChain\","),
+                ("MainWindow.FashionWeek.cs","BoolSetting(\"FashionWeek.OwnedFirst\","),("MainWindow.FashionWeek.cs","BoolSetting(\"FashionWeek.Dim\","),
+                ("MainWindow.FashionWeek.cs","BoolSetting(\"FashionWeek.Popular\","),("MainWindow.FashionWeek.cs","BoolSetting(\"FashionWeek.Panel\","),
+            })
+                Check(Read(file).Contains(row,StringComparison.Ordinal),file + ": " + row);
             var settings = Read("MainWindow.Settings.cs");
             foreach (var key in new[] { "Settings.OpenOnLoad","Settings.OpenOnLogin","Settings.UsageHover","Settings.ContextMenu","DutyFinder.Setting","CharacterStats.Setting","BankUi.AutoSetting" })
             {

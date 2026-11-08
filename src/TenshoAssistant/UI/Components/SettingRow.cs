@@ -10,26 +10,48 @@ internal sealed partial class MainWindow
 {
     private static readonly Configuration DefaultConfiguration=new();
 
-    /// <summary>A saved boolean setting: checkbox, tooltip, reset to default; the value is restored when saving fails.</summary>
-    private void BoolSetting(string labelKey,string tipKey,Func<bool> read,Action<bool> write,Func<Configuration,bool>? defaultOf=null)
+    /// <summary>
+    /// A saved boolean setting: checkbox, tooltip, reset to default; the value is restored when saving fails. X-76 H5 (0.915): the default
+    /// is required, so every on/off row has its « ↺ ».
+    /// </summary>
+    private void BoolSetting(string labelKey,string tipKey,Func<bool> read,Action<bool> write,Func<Configuration,bool> defaultOf)
     {
         var value=read();
         if(ImGui.Checkbox(localization.Get(labelKey)+"###"+labelKey,ref value))SaveSetting(labelKey,read,write,value);
         Tip(tipKey);
-        if(defaultOf?.Invoke(DefaultConfiguration) is { } fallback && BoolDefaultButton(labelKey,fallback,read()))SaveSetting(labelKey,read,write,fallback);
+        var fallback=defaultOf(DefaultConfiguration);
+        if(DefaultButton(labelKey,read()!=fallback,OnOff(fallback)))SaveSetting(labelKey,read,write,fallback);
     }
 
-    /// <summary>The « ↺ » of an on/off setting (BoolSetting, observation rows, 0.330), naming the default; shown only when the value differs, true when clicked.</summary>
-    private bool BoolDefaultButton(string id,bool fallback,bool value)
+    /// <summary>The name of an on/off default, for the « ↺ » tooltip.</summary>
+    private string OnOff(bool value)=>localization.Get(value ? "Settings.On":"Settings.Off");
+
+    /// <summary>
+    /// X-76 H5 (0.915): a saved choice in a list: combo, tooltip and « ↺ » naming the default option; the previous choice comes back when
+    /// saving fails. Options are (value, text shown); without label (showLabel false) the combo keeps its id.
+    /// </summary>
+    private void ComboSetting<T>(string labelKey,string tipKey,Func<T> read,Action<T> write,IReadOnlyList<(T Value,string Label)> options,T fallback,float width=160,bool showLabel=true)
     {
-        if(fallback==value)return false;
-        ImGui.SameLine();
-        ImGui.PushFont(UiBuilder.IconFont);
-        bool reset;
-        try{reset=ImGui.SmallButton(FontAwesomeIcon.Undo.ToIconString()+"###Default"+id);}
-        finally{ImGui.PopFont();}
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Settings.ResetOne",localization.Get(fallback ? "Settings.On":"Settings.Off")));
-        return reset;
+        var current=read();
+        var comparer=EqualityComparer<T>.Default;
+        string? shown=null,defaultName=null;
+        foreach(var (value,label) in options)
+        {
+            if(comparer.Equals(value,current))shown=label;
+            if(comparer.Equals(value,fallback))defaultName=label;
+        }
+        ImGui.SetNextItemWidth(width);
+        if(ImGui.BeginCombo((showLabel ? localization.Get(labelKey):"")+"###"+labelKey,shown ?? current?.ToString() ?? ""))
+        {
+            try
+            {
+                foreach(var (value,label) in options)
+                    if(ImGui.Selectable(label,comparer.Equals(value,current)) && !comparer.Equals(value,current))SaveSetting(labelKey,read,write,value);
+            }
+            finally{ImGui.EndCombo();}
+        }
+        Tip(tipKey);
+        if(DefaultButton(labelKey,!comparer.Equals(read(),fallback),defaultName))SaveSetting(labelKey,read,write,fallback);
     }
 
     /// <summary>
@@ -126,8 +148,11 @@ internal sealed partial class MainWindow
 
     private static readonly MapViewSettings MapDefaults=new();
 
-    /// <summary>The « ↺ » button after any setting control, shown only when the value differs from its default; true when clicked.</summary>
-    private bool DefaultButton(string id,bool differs)
+    /// <summary>
+    /// The « ↺ » button after any setting control, shown only when the value differs from its default; true when clicked. Its tooltip
+    /// names the default when one is given (on/off rows, combo options). X-76 H5 (0.915): the one reset button (the on/off one merged in).
+    /// </summary>
+    private bool DefaultButton(string id,bool differs,string? defaultName=null)
     {
         if(!differs)return false;
         ImGui.SameLine();
@@ -135,7 +160,8 @@ internal sealed partial class MainWindow
         bool clicked;
         try{clicked=ImGui.SmallButton(FontAwesomeIcon.Undo.ToIconString()+"###Default"+id);}
         finally{ImGui.PopFont();}
-        Tip("Settings.ResetValue");
+        if(defaultName is null)Tip("Settings.ResetValue");
+        else if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Format("Settings.ResetOne",defaultName));
         return clicked;
     }
 

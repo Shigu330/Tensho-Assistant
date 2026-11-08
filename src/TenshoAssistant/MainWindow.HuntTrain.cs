@@ -22,6 +22,8 @@ internal sealed partial class MainWindow
     private int? huntTrainCalled;
     internal Action<string>? SendHuntCall { get; set; }
     private DateTimeOffset huntCallSentAt;
+    // The channels of the call combo, built once (each channel is its own text).
+    private static readonly (string Value,string Label)[] HuntChannelOptions=HuntTrain.AnnounceChannels.Select(channel=>(channel,channel)).ToArray();
 
     /// <summary>Called every frame: notes the marks met (once a second, while recording) and announces the A and S marks (setting).</summary>
     internal void ObserveHuntTrain()
@@ -76,15 +78,9 @@ internal sealed partial class MainWindow
         Tip("HuntTrain.AnnounceTip");
         // X-13 (0.447, decided 2026-11-03): sent to the chosen channel on click only, once the flag is on that stop, 5 s apart.
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(70);
-        if(ImGui.BeginCombo("###HuntCallChannel",configuration.HuntAnnounceChannel))
-        {
-            foreach(var channel in HuntTrain.AnnounceChannels)
-                if(ImGui.Selectable(channel,channel==configuration.HuntAnnounceChannel))
-                    SaveSetting("HuntAnnounceChannel",()=>configuration.HuntAnnounceChannel,value=>configuration.HuntAnnounceChannel=value,channel);
-            ImGui.EndCombo();
-        }
-        Tip("HuntTrain.ChannelTip");
+        // X-76 H5 (0.915): shared combo row without label (rollback when saving fails, « ↺ »).
+        ComboSetting("HuntCallChannel","HuntTrain.ChannelTip",()=>configuration.HuntAnnounceChannel,value=>configuration.HuntAnnounceChannel=value,
+            HuntChannelOptions,DefaultConfiguration.HuntAnnounceChannel,70,showLabel:false);
         ImGui.SameLine();
         var command=HuntTrain.ChatCommand(configuration.HuntAnnounceChannel,announce);
         var ready=huntTrainCalled is not null && command is not null && SendHuntCall is not null && DateTimeOffset.UtcNow-huntCallSentAt>=TimeSpan.FromSeconds(5);

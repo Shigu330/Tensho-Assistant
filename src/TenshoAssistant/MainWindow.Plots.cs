@@ -41,11 +41,9 @@ internal sealed partial class MainWindow
         var world=market.State;
         BoolSetting("Plots.Watch","Plots.WatchTip",()=>configuration.PlotWatch,value=>configuration.PlotWatch=value,c=>c.PlotWatch);
         IntSetting("Plots.Minutes","Plots.MinutesTip",()=>configuration.PlotWatchMinutes,value=>configuration.PlotWatchMinutes=value,10,240,DefaultConfiguration.PlotWatchMinutes);
-        var size=configuration.PlotWatchSize;
-        ImGui.SetNextItemWidth(160);
-        if(ImGui.Combo(localization.Get("Plots.Size")+"###PlotSize",ref size,[localization.Get("Plots.AnySize"),PlotSize(0),PlotSize(1),PlotSize(2)],4))
-            SaveSetting("PlotWatchSize",()=>configuration.PlotWatchSize,value=>configuration.PlotWatchSize=value,size);
-        Tip("Plots.SizeTip");
+        // X-76 H5 (0.915): shared combo row (rollback when saving fails, « ↺ »); 0 = any size, then small, medium, large.
+        ComboSetting("Plots.Size","Plots.SizeTip",()=>configuration.PlotWatchSize,value=>configuration.PlotWatchSize=value,
+            [(0,localization.Get("Plots.AnySize")),(1,PlotSize(0)),(2,PlotSize(1)),(3,PlotSize(2))],DefaultConfiguration.PlotWatchSize);
         var state=paissa.State;
         ImGui.BeginDisabled(world.WorldId==0 || state.Loading);
         try{if(ImGui.SmallButton(localization.Format("Plots.Fetch",world.WorldName)))paissa.Request(world.WorldId);}

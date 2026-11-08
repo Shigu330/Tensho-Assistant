@@ -256,3 +256,8 @@ Ranked X-76 plan: 10 harmonisation versions (2b), 10 parser items (2c) and 4 ext
   are now edited on a copy, so a failed save really restores them (the restore used the same object before). IntSetting restores too. Sliders and number
   fields (gear, wear, alarm bar, command delay, map settings, macro copy, sale days) change live but write the file only when the edit ends or when no
   control is held (map settings: colour pickers make « edit ended » unreliable), no more disk write per frame or per key. One sale-days editor.
+- 0.915: H5 + H6. Every on/off setting row has its reset button (BoolSetting's default is required; one DefaultButton); new ComboSetting for plot
+  size, hunt call channel, market scope and macro book; raw checkboxes turned into BoolSetting (reminders, Fashion Report options one per row, macro copy
+  switches, cost options, guide rows); the guide's map replacement row uses the same tooltip as the settings; help texts shown twice now shown once (as the
+  tooltip); « Show translation keys » kept in Advanced › Localization only. Every setting tooltip ends with « Default: … » / « Par défaut : … » (99 tips
+  added, 239 in all), checked against a fresh Configuration by a test. Raw checkboxes kept on purpose are listed in the test with their reason.

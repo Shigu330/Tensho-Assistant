@@ -102,8 +102,8 @@ internal sealed partial class MainWindow
             changed|=DrawGpDeclaredEffect(catalog,GpEffect.BoonChance2,localization.Get("GpUi.Gift2"),ref gpGift2Active);
             changed|=DrawGpDeclaredEffect(catalog,GpEffect.BoonYield,localization.Get("GpUi.Tidings"),ref gpTidingsActive);
             ImGui.SetNextItemWidth(110);changed|=ImGui.InputInt(localization.Get("GpUi.FirstBonus"),ref gpFirstAttemptBonus,0);
+            // X-76 H6 (0.915): the help is the field's tooltip only (it was also written under the field).
             Tip("GpUi.FirstHelp");
-            ImGui.TextWrapped(localization.Get("GpUi.FirstHelp"));
             changed|=ImGui.Checkbox(localization.Get("GpUi.OtherEffect"),ref gpOtherEffects);
             Tip("GpUi.OtherEffectTip");
         }
