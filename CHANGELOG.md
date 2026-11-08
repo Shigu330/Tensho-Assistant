@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.937.0
+- Plan global, Verify : Nettoyage X-76, étapes E2 à E4 : un test vérifie maintenant que chacune des 163 preuves citées par le code existe bien dans docs/evidence (règle 7) ; les « une fois par événement » des lecteurs (butin des coffres, coffres, voyages) oublient les plus anciens au lieu de s'arrêter en silence (le butin cessait d'être noté après 256 objets dans une même zone). E2 est déjà couverte par les tests des versions 0.912 à 0.922. Relevés en jeu ajoutés au plan : servants (P9), fin de mission (P10), leurre nageur (P6). Non validé en jeu.
+- Tests : Evidence937Tests. Verify.ps1 (agent) : 1551/1551, 0 avertissement, 0 erreur ; DLL 0.937.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, steps E2 to E4: a test now checks that each of the 163 evidence files cited by the code exists in docs/evidence (rule 7); the watchers' « once per event » sets (chest loot, chests, voyages) forget the oldest instead of silently stopping (chest loot stopped being noted after 256 items in one zone). E2 is already covered by the tests of 0.912 to 0.922. In-game readings added to the plan: retainers (P9), end of duty (P10), swimbait (P6). Not validated in game.
+
 ## 0.936.0
 - Plan global, Verify : Nettoyage X-76, parseurs P9 (première partie) : la liste « Vos personnages » garde maintenant, pour chaque personnage, ce que Tensho lisait déjà mais jetait : mandats disponibles (et prochaine recharge), livraisons spéciales restantes de la semaine, quêtes tribales restantes du jour, fin de la mission et de l'entraînement de l'escouade. Nouvelle colonne « Autres » (détail au survol) ; les compteurs du jour et de la semaine ne s'affichent que s'ils ont été lus depuis la remise à zéro. Non validé en jeu.
 - Tests : CharacterTimers936Tests. Verify.ps1 (agent) : 1549/1549, 0 avertissement, 0 erreur ; DLL 0.936.0.0. Non validé en jeu.

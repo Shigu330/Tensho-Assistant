@@ -46,7 +46,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         store.SeeSource(DiscoveryKind.NpcPlace,npc.BaseId,0,1,at,territory,map,npc.Position);
         if(debug())log.Information("Discovery: shop NPC {0} at territory {1}.",npc.BaseId,territory);
     }
-    private string salvageSeen="",ventureSeen="";private readonly HashSet<(uint Chest,uint Index,uint Item)> lootSeen=[];private uint lootTerritory;
+    private string salvageSeen="",ventureSeen="";private readonly OnceSet<(uint Chest,uint Index,uint Item)> lootSeen=new(1024);private uint lootTerritory;
     private uint fateId;private long fateEndedAt=-100_000;
     private (uint Name,uint Territory,uint Map,Vector3 Place,int Level,long At) death=(0,0,0,default,0,-100_000);
     // X-73.9 (0.863): blue magic spells learned (IUnlockState.Unlock, AozAction rows, handled on the next read) and beasts tamed (the Beastmaster's obtained set).
@@ -486,7 +486,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         if(debug())log.Information("Discovery: venture {0}.",signature);
     }
 
-    private readonly HashSet<uint> chestsSeen=[];
+    private readonly OnceSet<uint> chestsSeen=new(256);
     private void ReadLoot(DateTimeOffset at,uint territory,uint duty)
     {
         if(territory!=lootTerritory){lootSeen.Clear();chestsSeen.Clear();lootTerritory=territory;}
@@ -495,7 +495,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         if(loot==null)return;
         foreach(var item in loot->Items)
         {
-            if(item.ItemId==0 || item.ChestObjectId==0 || lootSeen.Count>=256 || !lootSeen.Add((item.ChestObjectId,item.ChestItemIndex,item.ItemId)))continue;
+            if(item.ItemId==0 || item.ChestObjectId==0 || !lootSeen.Add((item.ChestObjectId,item.ChestItemIndex,item.ItemId)))continue;
             // X-76 P8 (0.935): a chest seen for the first time in this zone counts once for its duty.
             if(chestsSeen.Add(item.ChestObjectId))store.SeeSource(DiscoveryKind.DutyChestOpened,duty,0,1,at,territory);
             // X-76 E1 (0.916): an HQ item carries the HQ offset in its raw id (not seen in game yet).

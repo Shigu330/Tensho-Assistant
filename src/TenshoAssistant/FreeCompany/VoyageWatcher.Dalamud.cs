@@ -67,7 +67,7 @@ public sealed unsafe class VoyageWatcher : IDisposable
     /// <summary>X-76 P7 (0.934): one visit per sector of a voyage: sector, second find (DoubleDip), the vessel's surveillance.</summary>
     public Action<uint,bool,int>? SectorVisit { get; set; }
     public Action<uint,uint>? SectorUnlock { get; set; }
-    private readonly HashSet<(ulong House,int Slot,uint Registered)> voyagesNoted=[];
+    private readonly OnceSet<(ulong House,int Slot,uint Registered)> voyagesNoted=new(4096);
 
     public VoyageWatcher(IFramework framework,IDataManager data,Configuration configuration,Action save,IPluginLog log)
     {
@@ -112,7 +112,7 @@ public sealed unsafe class VoyageWatcher : IDisposable
                 foreach(var point in sub.CurrentExplorationPoints)
                     if(point!=0 && points.GetRowOrDefault(point) is { } row)route.Add(row.Destination.ExtractText());
                 var loot=new List<VoyageLoot>();
-                var noteSectors=(SectorLoot is not null || SectorUnlock is not null) && sub.RegisterTime!=0 && voyagesNoted.Count<4096;
+                var noteSectors=(SectorLoot is not null || SectorUnlock is not null) && sub.RegisterTime!=0;
                 var sectorsFound=false;
                 foreach(var found in sub.GatheredData)
                 {
