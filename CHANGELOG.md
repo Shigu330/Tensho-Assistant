@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.958.0
+- Plan global, Verify : Pêche (lot X-98, vos remarques du voyage) : les temps de touche dépassés par le chronomètre passent en rouge (panneau de pêche en mer et aide à la pêche) ; la progression d'un objectif est plafonnée à son but, comme dans le jeu (« 24 / 5 » devient « 5 / 5 ») ; les points et le nombre de prises, mal lus (57 359 au lieu de 3 820), ne s'affichent plus que s'ils sont vraisemblables, lus dans le tableau des résultats quand il est rempli, avec un relevé dans le journal en mode développeur pour prouver le bon champ ; le départ de 16 h UTC (route 14, lu dans le jeu avant que Tensho note les départs) compte maintenant comme relevé prouvé pour l'horaire de Kugane. Non validé en jeu.
+- Tests : OceanFixes958Tests. Verify.ps1 (agent) : 1585/1585, 0 avertissement, 0 erreur ; DLL 0.958.0.0. Non validé en jeu.
+### English
+- Fishing (X-98 batch, your notes from the voyage): bite times passed by the stopwatch turn red (ocean fishing panel and fishing help); a mission's progress is capped at its target, as in the game (« 24 / 5 » becomes « 5 / 5 »); points and catches, misread (57,359 instead of 3,820), show only when plausible, read from the results table when it is filled, with a developer-mode log line to prove the right field; the 16:00 UTC departure (route 14, read in game before Tensho noted departures) now counts as a proven sighting for the Kugane timetable. Not validated in game.
+
 ## 0.957.0
 - Plan global, Verify : Nettoyage X-76, étapes 7 à 9 : état des tests (1 587 cas, aucun doublon ; les tests qui lisent le texte du code restent, faute de pouvoir lancer sans le jeu le code lié au jeu, et les nouveaux testent le comportement quand c'est possible), dépôt vérifié (fichiers ignorés, liste des outils, compilation et CodeQL au vert, aucune alerte), comparaison avec le point de départ écrite dans docs/evidence/x76-9-comparison.md (+2,4 % de lignes pour 53 versions avec de nouvelles fonctions, clés de langue en et fr toujours égales, mêmes adresses, aucun avertissement désactivé). Reste avec vous : le passage en jeu guidé de chaque page et les propositions notées. Non validé en jeu.
 - Tests : DrawCost956Tests. Verify.ps1 (agent) : 1584/1584, 0 avertissement, 0 erreur ; DLL 0.957.0.0. Non validé en jeu.

@@ -151,7 +151,8 @@ internal sealed partial class MainWindow
                             {
                                 var inside=elapsed is { } spent && spent>=time.Minimum && spent<=time.Maximum;
                                 var text=localization.Format("FishingPanel.BiteShort",time.Minimum,time.Maximum,time.Usual);
-                                if(inside)ImGui.TextColored(Success,text);else ImGui.TextUnformatted(text);
+                                // X-98 (0.958, user request): green while the bite time runs, red once the stopwatch has passed it.
+                        if(inside)ImGui.TextColored(Success,text);else if(elapsed is { } passed && passed>time.Maximum)ImGui.TextColored(Error,text);else ImGui.TextUnformatted(text);
                                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FishingPanel.BiteTime",time.Minimum,time.Maximum,time.Usual)+"\n"+localization.Format("FishingPanel.BiteTimeHelp",time.Reports));
                             }
                             else ImGui.TextDisabled(bites is { Loading:true } ? "…":"—");

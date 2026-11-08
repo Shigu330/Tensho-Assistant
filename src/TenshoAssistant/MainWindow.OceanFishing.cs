@@ -18,7 +18,8 @@ internal sealed partial class MainWindow
     {
         Heading(localization.Get("OceanFishing.Title"),localization.Get("OceanFishing.Description"));
         if(OceanTimetable?.Invoke() is not { } baseSchedule){ImGui.TextDisabled(localization.Get("OceanFishing.Unavailable"));return;}
-        var states=oceanPortStates ??= (baseSchedule.State(OceanPort.Aldenard,configuration.OceanSightings),baseSchedule.State(OceanPort.Othard,configuration.OceanSightings));
+        var sightings=(configuration.OceanSightings ?? []).Concat(OceanSchedule.Proven).GroupBy(sighting=>(sighting.Slot,sighting.Route)).Select(group=>group.First()).ToArray();
+        var states=oceanPortStates ??= (baseSchedule.State(OceanPort.Aldenard,sightings),baseSchedule.State(OceanPort.Othard,sightings));
         var schedule=baseSchedule.WithOffsets(states.Aldenard.Offset,states.Othard.Offset);
         DrawOceanPortState("OceanFishing.ColumnIndigo",states.Aldenard);
         DrawOceanPortState("OceanFishing.ColumnRuby",states.Othard);

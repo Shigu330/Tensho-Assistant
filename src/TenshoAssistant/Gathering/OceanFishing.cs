@@ -59,6 +59,11 @@ public sealed class OceanSchedule(IReadOnlyList<(uint Aldenard,uint Othard)> loo
     public int Count=>loop.Count;
 
     /// <summary>The loop slot of the departure a player is aboard (or boarding) at <paramref name="aboard"/>.</summary>
+    /// <summary>
+    /// X-98 (0.958): sightings proven before 0.917 saved them: the game said route 14 for the 2026-11-08 16:00 UTC departure (slot 249084), log line kept in
+    /// docs/evidence/x85-ocean-sightings-2026-11-08.log. They count with yours.
+    /// </summary>
+    public static readonly IReadOnlyList<OceanSighting> Proven=[new(){Slot=249084,Route=14}];
     public static long SlotOf(DateTimeOffset aboard)=>Math.Max(0,(long)Math.Floor((aboard+Boarding-LoopStart)/Step));
 
     public OceanSchedule WithOffsets(int aldenard,int othard)=>new(loop,routes){AldenardOffset=aldenard,OthardOffset=othard};

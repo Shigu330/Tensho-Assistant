@@ -43,6 +43,12 @@ public static class OceanVoyages
         return new(frame.Zone,spot,time,frame.Spectral,fish,next,nextTime);
     }
 
+    /// <summary>
+    /// X-98 (0.958): points and catches only when they can be true for one voyage (the game showed 3,820 points while the field read 57,359 and 27,127
+    /// catches: the player's line is filled only at some moments). Unproven: the panel hides them otherwise.
+    /// </summary>
+    public static bool Plausible(OceanVoyageFrame frame)=>frame.Points is >= 0 and <= 30_000 && frame.Caught is >= 0 and <= 400;
+
     /// <summary>The missions as (text, progress, target); a type the data does not know is left out.</summary>
     public static IReadOnlyList<(string Text,int Progress,int Target)> Missions(OceanVoyageData data,OceanVoyageFrame frame)
         =>frame.Missions.Where(mission=>mission.Type!=0 && data.Missions.ContainsKey(mission.Type))

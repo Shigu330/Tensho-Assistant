@@ -622,7 +622,7 @@ public sealed class Plugin : IDalamudPlugin
             });
             mainWindow.OceanVoyageData=()=>oceanVoyageData.Value;
             OceanVoyageReader? oceanVoyageReader=null;
-            registrations.Register(()=>mainWindow.OceanVoyage=oceanVoyageReader=new OceanVoyageReader(framework,client,log),()=>oceanVoyageReader?.Dispose());
+            registrations.Register(()=>mainWindow.OceanVoyage=oceanVoyageReader=new OceanVoyageReader(framework,client,log){Developer=()=>configuration.DeveloperMode},()=>oceanVoyageReader?.Dispose());
             // 0.388 (user request): position of the game's inventory window, for the sort button drawn above it.
             Inventory.InventoryWindowReader? inventoryWindow=null;
             registrations.Register(()=>inventoryWindow=new Inventory.InventoryWindowReader(framework,gameGui,()=>configuration.InventorySortButton,log),()=>inventoryWindow?.Dispose());

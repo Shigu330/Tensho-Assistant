@@ -15,6 +15,9 @@ internal sealed class OceanVoyageReader : IDisposable
     private readonly IFramework framework;private readonly IClientState client;private readonly IPluginLog log;
     private bool disposed;private long nextRead;private int warned;
     private OceanVoyageFrame? frame;
+    private (int,int) lastLogged=(-1,-1);
+    /// <summary>X-98 (0.958): developer mode, a reading of the voyage fields logged at each zone or status change.</summary>
+    public Func<bool>? Developer { get; set; }
     public OceanVoyageFrame? Frame=>Volatile.Read(ref frame);
 
     public OceanVoyageReader(IFramework framework,IClientState client,IPluginLog log)
@@ -36,6 +39,17 @@ internal sealed class OceanVoyageReader : IDisposable
                 var zone=(int)voyage->CurrentZone;var status=(int)voyage->Status;
                 if(zone is < 0 or > 2 || status is < 0 or > 4 || voyage->CurrentRoute is 0 or > 1000){Volatile.Write(ref frame,null);return;}
                 var player=voyage->LocalPlayerAllResult;
+                // X-98 (0.958): the results table holds the local player's line at LocalIndexInAllResult once it is filled; preferred when it is.
+                var local=voyage->LocalIndexInAllResult;var size=voyage->AllResultSize;
+                if(size>0 && local<size && local<voyage->AllResults.Length && voyage->AllResults[local].TotalPoints is var tablePoints && tablePoints>0)
+                    player=voyage->AllResults[local];
+                if(Developer?.Invoke()==true && (zone,status)!=lastLogged)
+                {
+                    lastLogged=(zone,status);
+                    log.Information("Ocean voyage reading: route {0}, zone {1}, status {2}, local line {3} pts / {4} fish, table {5} of {6}, missions {7}/{8}/{9}.",
+                        voyage->CurrentRoute,zone,status,voyage->LocalPlayerAllResult.TotalPoints,voyage->LocalPlayerAllResult.CaughtFish,local,size,
+                        voyage->Mission1Progress,voyage->Mission2Progress,voyage->Mission3Progress);
+                }
                 Volatile.Write(ref frame,new OceanVoyageFrame(voyage->CurrentRoute,zone,status,voyage->SpectralCurrentActive,voyage->WeatherId,
                     [(voyage->Mission1Type,voyage->Mission1Progress),(voyage->Mission2Type,voyage->Mission2Progress),(voyage->Mission3Type,voyage->Mission3Progress)],
                     player.TotalPoints,player.CaughtFish,DateTimeOffset.UtcNow));
