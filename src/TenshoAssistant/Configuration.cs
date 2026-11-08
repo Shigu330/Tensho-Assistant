@@ -150,6 +150,8 @@ public sealed class MapViewSettings
     public bool ShowIconNames { get; set; } = true;
     public bool ShowQuests { get; set; } = true;
     public bool ShowQuestAreas { get; set; } = true;
+    // X-86 (0.966, user request): the quest markers the game shows locked (quests not available yet) can be hidden.
+    public bool ShowLockedQuests { get; set; } = true;
     public bool ShowFlag { get; set; } = true;
     public bool ShowPlayer { get; set; } = true;
     public float IconScale { get; set; } = 1f;

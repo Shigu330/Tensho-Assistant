@@ -78,7 +78,9 @@ internal static class MapSettingGroups953Tests
         ("Map setting groups 953: quest tooltips under quests, hide collected under vistas and currents (15, 16)",() =>
         {
             var map=MapSettings();
-            Greyed(map,"ImGui.BeginDisabled(!settings.ShowQuests);\n                try{changed|="+Box("QuestTooltips"),Box("QuestTooltips"),"quest tooltips");
+            // 0.966: the block also holds « quests not available yet ».
+            Greyed(map,"ImGui.BeginDisabled(!settings.ShowQuests);\n                try\n                {\n                    changed|="+Box("QuestTooltips"),Box("QuestTooltips"),"quest tooltips");
+            Check(Depth(map,"ImGui.BeginDisabled(!settings.ShowQuests);",Box("ShowLockedQuests"))>=1,"locked quests greyed under quests");
             Check(map.IndexOf(Box("ShowQuests"),StringComparison.Ordinal)<map.IndexOf(Box("QuestTooltips"),StringComparison.Ordinal),"right under quests");
             Check(Depth(map,"ImGui.BeginDisabled(!settings.ShowQuests);",Box("ShowFates"))==0,"FATEs not greyed");
             Greyed(map,"ImGui.BeginDisabled(!settings.ShowSightseeing && !settings.ShowAetherCurrents);",Box("HideCollected"),"hide collected");

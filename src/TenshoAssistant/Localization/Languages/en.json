@@ -3374,6 +3374,8 @@
     "TeleportOnClickHelp": "Clicking an aetheryte offers to teleport there, with the cost read from the game's teleport list.\nDefault: on.",
     "ShowPlaceNamesHelp": "Shows the zone's place names, as on the game map.\nDefault: on.",
     "ShowFlagHelp": "Shows the map flag (yours or one from a link).\nDefault: on.",
+    "ShowLockedQuests": "Quests not available yet",
+    "ShowLockedQuestsHelp": "Shows the quest markers the game draws locked (quests you cannot take yet). Greyed while « Quests and objectives » is off.\nDefault: on.",
     "ShowQuestsHelp": "Shows the quest, objective and event markers the game puts on its map.\nDefault: on.",
     "ShowQuestAreasHelp": "Draws the search area of quest objectives (coloured circle).\nDefault: on.",
     "QuestTooltipsHelp": "Hovering a quest marker shows the quest name. Greyed while « Quests and objectives » is off: no marker is drawn then.\nDefault: on.",

@@ -646,7 +646,11 @@ internal sealed partial class MainWindow
                 // X-76 step 3 (0.953): read only for the quest markers, drawn only with « Quests and objectives »: indented and greyed under it.
                 ImGui.Indent();
                 ImGui.BeginDisabled(!settings.ShowQuests);
-                try{changed|=SettingBox("MapView.QuestTooltips",settings.QuestTooltips,value=>settings.QuestTooltips=value,MapDefaults.QuestTooltips);}
+                try
+                {
+                    changed|=SettingBox("MapView.QuestTooltips",settings.QuestTooltips,value=>settings.QuestTooltips=value,MapDefaults.QuestTooltips);
+                    changed|=SettingBox("MapView.ShowLockedQuests",settings.ShowLockedQuests,value=>settings.ShowLockedQuests=value,MapDefaults.ShowLockedQuests);
+                }
                 finally{ImGui.EndDisabled();ImGui.Unindent();}
                 changed|=SettingBox("MapView.ShowFates",settings.ShowFates,value=>settings.ShowFates=value,MapDefaults.ShowFates);
                 changed|=SettingBox("MapView.ShowSightseeing",settings.ShowSightseeing,value=>settings.ShowSightseeing=value,MapDefaults.ShowSightseeing);
@@ -1378,7 +1382,10 @@ internal sealed partial class MainWindow
             // same list, sizes and priorities as the game icons; click = flag.
             foreach(var vendor in vendorLayout.Lonely)Add(vendor.Icon,1,vendor.Pixel,vendor.Label,flag:vendor.Flag);
             foreach(var fate in fates.Where(fate=>fate.Icon!=0))Add(fate.Icon,2,MapProjection.PixelFromWorld(fate.Position,map),FateLabel(fate),worldRadius:settings.ShowFateAreas ? fate.Radius:0,height:fate.Position.Y);
-            foreach(var marker in events)Add(marker.Icon,3,MapProjection.PixelFromWorld(marker.Position,map),settings.QuestTooltips ? EventLabel(marker):null,
+            // X-86 (0.966): locked quest markers (the game's « not available yet » icons) left out when the player hides them.
+            foreach(var marker in events)
+                if(settings.ShowLockedQuests || mapMarkers?.QuestIcons.TryGetValue(marker.Icon,out var questIcon)!=true || !questIcon.Locked)
+                Add(marker.Icon,3,MapProjection.PixelFromWorld(marker.Position,map),settings.QuestTooltips ? EventLabel(marker):null,
                 worldRadius:(marker.MarkerType==3 ? settings.ShowQuestAreas:marker.IsLeve ? settings.ShowLeveAreas:settings.ShowEventAreas) ? marker.Radius:0,height:marker.Position.Y);
             ExpireGameTarget();
             if(mapGameTarget is { } gameTarget && gameTarget.MapId==map.MapId)
@@ -1698,6 +1705,12 @@ internal sealed partial class MainWindow
             {
                 var coordinate=MapProjection.CoordinateFromPixel(mapContextPixel,map);
                 ImGui.TextDisabled(localization.Format("MapView.Cursor",MapProjection.CoordinateNumber(coordinate.X),MapProjection.CoordinateNumber(coordinate.Y)));
+                // X-86 (0.966, user request): quests not available yet, shown or hidden from the right-click menu too.
+                var contextSettings=configuration.MapView;
+                ImGui.BeginDisabled(!contextSettings.ShowQuests);
+                try{if(SettingBox("MapView.ShowLockedQuests",contextSettings.ShowLockedQuests,value=>contextSettings.ShowLockedQuests=value))SaveMapSettings();}
+                finally{ImGui.EndDisabled();}
+                ImGui.Separator();
                 ImGui.BeginDisabled(map.TerritoryId==0);
                 try{if(ImGui.Selectable(localization.Get("MapView.Flag")))FlagFromMap(map,coordinate.X,coordinate.Y);}
                 finally{ImGui.EndDisabled();}
