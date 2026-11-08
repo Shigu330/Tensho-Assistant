@@ -1548,6 +1548,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.953) Paramètres › Carte : décocher « Points de récolte », « Quêtes et objectifs » ou « Icônes du jeu » grise les réglages en retrait dessous.
 
+- [ ] (0.954) Panneaux des listes : cocher « seulement les objets finis » grise les provenances ; « Que puis-je fabriquer ? », tri par marché : « Prix du marché pour cette liste ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

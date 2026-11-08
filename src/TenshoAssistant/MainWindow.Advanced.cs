@@ -68,7 +68,10 @@ internal sealed partial class MainWindow
             developerMode=configuration.DeveloperMode=false;localization.ShowKeys=false;
             TrySave("Developer mode",()=>developerMode=configuration.DeveloperMode=true);
         }
-        BoolSetting("Advanced.ShowIds","Advanced.ShowIdsTip",()=>configuration.ShowIds,value=>configuration.ShowIds=value,c=>c.ShowIds);
+        // X-76 step 3 (0.954): developer mode already shows the ids, so the box is greyed then.
+        ImGui.BeginDisabled(developerMode);
+        try{BoolSetting("Advanced.ShowIds","Advanced.ShowIdsTip",()=>configuration.ShowIds,value=>configuration.ShowIds=value,c=>c.ShowIds);}
+        finally{ImGui.EndDisabled();}
         if(developerMode && ImGui.SmallButton(localization.Get("Navigation.Diagnostics")))page=Page.Diagnostics;
 
         ImGui.Separator();

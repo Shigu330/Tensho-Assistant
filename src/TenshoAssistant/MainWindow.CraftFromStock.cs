@@ -106,7 +106,8 @@ internal sealed partial class MainWindow
     private void DrawFromStockPrices(CraftFromStockRow[] all,CraftFromStockRow[] page)
     {
         if(fromStockSort!=1)return;
-        ImGui.Checkbox(localization.Get("CurrencyValue.Market")+"###FromStockMarket",ref fromStockPricesOn);
+        // X-76 step 3 (0.954): its own label: this page's box, not saved, not the currency value page's setting.
+        ImGui.Checkbox(localization.Get("CraftStock.Market")+"###FromStockMarket",ref fromStockPricesOn);
         Tip("CraftStock.MarketTip");
         ImGui.SameLine();
         SaleDaysSetting("FromStockDays","CraftStock.SaleDaysTip");

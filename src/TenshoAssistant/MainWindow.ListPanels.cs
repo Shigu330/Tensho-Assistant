@@ -26,6 +26,9 @@ internal sealed partial class MainWindow
         BoolSetting("ListPanels.Base","ListPanels.BaseTip",()=>configuration.ListPanelsBase,value=>configuration.ListPanelsBase=value,c=>c.ListPanelsBase);
         if(!configuration.ListPanelsBase)return;
         ImGui.Indent();
+        // X-76 step 3 (0.954): the origin groups sort materials; with « finished items only » no material is shown, so they are greyed.
+        ImGui.BeginDisabled(configuration.ListPanelsFinishedOnly);
+        try{
         BoolSetting("ListPanels.Gathering","ListPanels.OriginTip",()=>configuration.ListPanelsGathering,value=>configuration.ListPanelsGathering=value,c=>c.ListPanelsGathering);
         if(configuration.ListPanelsGathering)
         {
@@ -48,6 +51,8 @@ internal sealed partial class MainWindow
         }
         BoolSetting("ListPanels.Other","ListPanels.OriginTip",()=>configuration.ListPanelsOther,value=>configuration.ListPanelsOther=value,c=>c.ListPanelsOther);
         BoolSetting("ListPanels.Crystal","ListPanels.CrystalTip",()=>configuration.ListPanelsCrystal,value=>configuration.ListPanelsCrystal=value,c=>c.ListPanelsCrystal);
+        }
+        finally{ImGui.EndDisabled();}
         ImGui.Unindent();
     }
     private IReadOnlyList<WorkshopProject> workshopPanelShown=[];
