@@ -184,6 +184,47 @@ public sealed class DiscoveryStore
     /// never refused, and nothing already held is ever removed to make room; a shared fact left out is counted (<see cref="LeftOut"/>) and the page says so.
     /// </summary>
     public const int MaxFacts=200_000;
+    /// <summary>
+    /// X-93 (0.941): shared kinds loaded on demand. With a source set (<see cref="UseSharedSource"/>), a kind whose shared file exists is read the first time
+    /// something asks for it (a search in the background: the answer comes a moment later, the page refreshes on the next revision; an import at once), so
+    /// the shared facts of the kinds no page uses never take memory. Without a source (tests, tools), everything is held as before.
+    /// </summary>
+    private Func<DiscoveryKind,DiscoveryFile?>? sharedSource;
+    private readonly HashSet<DiscoveryKind> sharedWaiting=[],sharedLoading=[];
+    public void UseSharedSource(Func<DiscoveryKind,DiscoveryFile?> source,IEnumerable<DiscoveryKind> onDisk)
+    {
+        lock(gate){sharedSource=source;sharedWaiting.Clear();sharedWaiting.UnionWith(onDisk);}
+    }
+    /// <summary>The kinds whose shared facts are all in memory (their file may be written and removed); the others are left alone on disk.</summary>
+    public IReadOnlySet<DiscoveryKind> SharedKindsHeld()
+    {
+        lock(gate)return Enum.GetValues<DiscoveryKind>().Where(kind=>!sharedWaiting.Contains(kind)).ToHashSet();
+    }
+    public int SharedKindsWaiting{get{lock(gate)return sharedWaiting.Count;}}
+    // Under the lock: asks for a kind in the background.
+    private void Want(DiscoveryKind kind)
+    {
+        if(sharedSource is not { } source || !sharedWaiting.Contains(kind) || !sharedLoading.Add(kind))return;
+        _=Task.Run(()=>
+        {
+            DiscoveryFile? file=null;
+            try{file=source(kind);}catch(Exception){file=null;}
+            lock(gate){if(file is not null)LoadLocked(file,false);sharedWaiting.Remove(kind);sharedLoading.Remove(kind);revision++;}
+        });
+    }
+    /// <summary>Reads at once the shared kinds still on disk among <paramref name="kinds"/> (before an import joins facts to them); the file read outside the lock.</summary>
+    private void NeedNow(IEnumerable<DiscoveryKind> kinds)
+    {
+        Func<DiscoveryKind,DiscoveryFile?>? source;DiscoveryKind[] wanted;
+        lock(gate){source=sharedSource;wanted=kinds.Distinct().Where(kind=>sharedWaiting.Contains(kind)).ToArray();}
+        if(source is null)return;
+        foreach(var kind in wanted)
+        {
+            DiscoveryFile? file=null;
+            try{file=source(kind);}catch(Exception){file=null;}
+            lock(gate){if(sharedWaiting.Contains(kind)){if(file is not null)LoadLocked(file,false);sharedWaiting.Remove(kind);revision++;}}
+        }
+    }
     /// <summary>X-93 (0.939): shared facts left out since the start because the shared part was full.</summary>
     public int LeftOut { get; private set; }
     private int SharedHeld()=>facts.Values.Count(fact=>fact.Seen==0);
@@ -295,10 +336,13 @@ public sealed class DiscoveryStore
     public (int Added,int Joined,int Refused) Merge(IEnumerable<DiscoveryFact> imported)
     {
         int added=0,joined=0,refused=0;
+        // X-93 (0.941): the kinds of the file are read first, so a fact already shared is joined, never doubled.
+        var list=imported as IReadOnlyCollection<DiscoveryFact> ?? imported.ToArray();
+        NeedNow(list.Where(fact=>fact is not null).Select(fact=>fact.Kind));
         lock(gate)
         {
             var shared=SharedHeld();
-            foreach(var original in imported)
+            foreach(var original in list)
             {
                 // 0.855: an older file's cells are moved to ours first.
                 var source=original is null ? null:Recell(original);
@@ -371,9 +415,9 @@ public sealed class DiscoveryStore
         && ValueCounts.Valid(fact.Values) && ValueCounts.Valid(fact.ImportedValues)
         && fact.Hq>=0 && fact.Hq<=ValueCounts.Total(fact.Values) && fact.ImportedHq>=0 && fact.ImportedHq<=ValueCounts.Total(fact.ImportedValues);
 
-    public void Load(DiscoveryFile file)
+    public void Load(DiscoveryFile file){lock(gate)LoadLocked(file,true);}
+    private void LoadLocked(DiscoveryFile file,bool count)
     {
-        lock(gate)
         {
             // 0.855: each fact moved to its 50-yalm cell; those meeting in one are joined, and the base is written again, smaller.
             var read=0;var shared=SharedHeld();
@@ -389,7 +433,7 @@ public sealed class DiscoveryStore
                 else if(shared<MaxFacts){Put(fact);shared++;}
                 else LeftOut++;
             }
-            if(read>facts.Count || file.Facts.Any(fact=>fact is not null && Cell(fact.X,fact.Z)!=(fact.CellX,fact.CellZ)))Dirty=true;
+            if(count && read>facts.Count || file.Facts.Any(fact=>fact is not null && Cell(fact.X,fact.Z)!=(fact.CellX,fact.CellZ)))Dirty=true;
             revision++;
         }
     }
@@ -400,7 +444,7 @@ public sealed class DiscoveryStore
         lock(gate){if(saving)Dirty=false;return new DiscoveryFile{Written=at,Facts=facts.Values.Select(fact=>fact.Copy()).ToList()};}
     }
 
-    public void Clear(){lock(gate){facts.Clear();index.Clear();Dirty=true;revision++;}}
+    public void Clear(){lock(gate){facts.Clear();index.Clear();sharedWaiting.Clear();Dirty=true;revision++;}}
 
     /// <summary>Per kind: the facts, those seen by the player, those only imported.</summary>
     public IReadOnlyList<(DiscoveryKind Kind,int Total,int Seen,int ImportedOnly)> Summary()
@@ -414,6 +458,7 @@ public sealed class DiscoveryStore
     {
         lock(gate)
         {
+            Want(kind);
             if(!index.TryGetValue(kind,out var bySubject))return [];
             return bySubject.Where(pair=>subject(pair.Key)).SelectMany(pair=>pair.Value).OrderByDescending(DiscoveryFact.TimesOf).ThenBy(fact=>fact.Subject)
                 .Take(max).Select(fact=>fact.Copy()).ToArray();
@@ -425,6 +470,7 @@ public sealed class DiscoveryStore
     {
         lock(gate)
         {
+            Want(kind);
             if(!index.TryGetValue(kind,out var bySubject) || !bySubject.TryGetValue(subject,out var list))return [];
             return list.OrderByDescending(DiscoveryFact.TimesOf).Take(max).Select(fact=>fact.Copy()).ToArray();
         }
@@ -480,14 +526,15 @@ public static class DiscoveryFiles
     /// format as an exported file; the main file keeps your facts only (with their imported counts). A kind file is written again only when its content changed
     /// (<paramref name="written"/> holds the last content written per kind, for this session), and removed when the kind has no shared fact any more.
     /// </summary>
-    public static void WriteSplit(string mainPath,DiscoveryFile all,Dictionary<DiscoveryKind,string> written)
+    public static void WriteSplit(string mainPath,DiscoveryFile all,Dictionary<DiscoveryKind,string> written,IReadOnlySet<DiscoveryKind>? held=null)
     {
+        // X-93 (0.941): the shared files first, then yours: a stop between the two never loses a shared fact. Kinds still on disk (not held) are left alone.
         var mine=all.Facts.Where(fact=>fact.Seen>0).ToList();
-        Write(mainPath,new DiscoveryFile{Version=all.Version,Producer=all.Producer,Written=all.Written,Facts=mine});
         var folder=SharedFolder(mainPath);
         var byKind=all.Facts.Where(fact=>fact.Seen==0).GroupBy(fact=>fact.Kind).ToDictionary(group=>group.Key,group=>group.OrderBy(fact=>fact.Key,StringComparer.Ordinal).ToList());
         foreach(var (kind,facts) in byKind)
         {
+            if(held is not null && !held.Contains(kind))continue;
             var json=JsonSerializer.Serialize(new DiscoveryFile{Version=all.Version,Producer=all.Producer,Written=all.Written,Facts=facts},Options);
             var content=json[(json.IndexOf("\"Facts\"",StringComparison.Ordinal) is var at and >= 0 ? at:0)..];
             if(written.TryGetValue(kind,out var last) && last==content && File.Exists(SharedPath(folder,kind)))continue;
@@ -501,7 +548,18 @@ public static class DiscoveryFiles
         }
         if(Directory.Exists(folder))
             foreach(var path in Directory.GetFiles(folder,"kind-*.json.gz"))
-                if(KindOf(path) is { } kind && !byKind.ContainsKey(kind)){File.Delete(path);written.Remove(kind);}
+                if(KindOf(path) is { } kind && !byKind.ContainsKey(kind) && (held is null || held.Contains(kind))){File.Delete(path);written.Remove(kind);}
+        Write(mainPath,new DiscoveryFile{Version=all.Version,Producer=all.Producer,Written=all.Written,Facts=mine});
+    }
+
+    /// <summary>X-93 (0.941): the shared kinds that have a file next to the main file.</summary>
+    public static IReadOnlyList<DiscoveryKind> SharedKindsOnDisk(string mainPath)
+        =>Directory.Exists(SharedFolder(mainPath)) ? Directory.GetFiles(SharedFolder(mainPath),"kind-*.json.gz").Select(KindOf).OfType<DiscoveryKind>().Distinct().ToArray():[];
+    /// <summary>X-93 (0.941): one shared kind file (null when missing; an unreadable one reported and set aside).</summary>
+    public static DiscoveryFile? ReadSharedKind(string mainPath,DiscoveryKind kind,Action<string,Exception> broken)
+    {
+        var path=SharedPath(SharedFolder(mainPath),kind);
+        return File.Exists(path) ? ReadSharedFile(path,broken):null;
     }
 
     /// <summary>X-93 (0.940): every shared kind file next to the main file (unreadable ones reported through <paramref name="broken"/> and set aside).</summary>
@@ -510,6 +568,10 @@ public static class DiscoveryFiles
         var folder=SharedFolder(mainPath);
         if(!Directory.Exists(folder))yield break;
         foreach(var path in Directory.GetFiles(folder,"kind-*.json.gz").Order(StringComparer.Ordinal))
+            if(ReadSharedFile(path,broken) is { } file)yield return file;
+    }
+    private static DiscoveryFile? ReadSharedFile(string path,Action<string,Exception> broken)
+    {
         {
             DiscoveryFile? file=null;
             try
@@ -523,8 +585,8 @@ public static class DiscoveryFiles
                 file=JsonSerializer.Deserialize<DiscoveryFile>(bounded.ToArray(),Options);
                 if(!DiscoveryFile.Readable(file))throw new InvalidDataException("Unknown shared discoveries file.");
             }
-            catch(Exception error){broken(path,error);try{File.Move(path,path+".broken",true);}catch(Exception){}continue;}
-            yield return file!;
+            catch(Exception error){broken(path,error);try{File.Move(path,path+".broken",true);}catch(Exception){}return null;}
+            return file;
         }
     }
 

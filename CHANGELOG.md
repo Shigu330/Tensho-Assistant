@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.941.0
+- Plan global, Verify : X-93, troisième partie : les découvertes partagées sont lues seulement quand une page a besoin de leur sorte (en arrière-plan, la réponse arrive un instant après), ou tout de suite avant d'y joindre une importation, pour ne jamais compter deux fois la même ; les sortes que rien ne demande restent sur le disque et ne prennent pas de mémoire. Les fichiers partagés s'écrivent maintenant avant le vôtre, pour qu'un arrêt entre les deux ne perde rien. Non validé en jeu.
+- Tests : SharedLazy941Tests. Verify.ps1 (agent) : 1555/1555, 0 avertissement, 0 erreur ; DLL 0.941.0.0. Non validé en jeu.
+### English
+- X-93, third part: shared discoveries are read only when a page needs their kind (in the background, the answer comes a moment later), or at once before an import is joined to them, so the same one is never counted twice; kinds nothing asks for stay on disk and take no memory. The shared files are now written before yours, so a stop between the two loses nothing. Not validated in game.
+
 ## 0.940.0
 - Plan global, Verify : X-93, deuxième partie : vos découvertes et les découvertes partagées ne sont plus mélangées dans un seul fichier. Discoveries.json ne garde que les vôtres ; les partagées vont dans le dossier Discoveries/Shared, un fichier compressé par sorte, réécrit seulement quand il change (avant, tout le fichier était réécrit chaque minute). Un fichier partagé illisible est mis de côté sans empêcher les autres de se charger. L'ancien fichier se range tout seul au prochain enregistrement. Suite : charger une sorte partagée seulement quand une page en a besoin. Non validé en jeu.
 - Tests : SharedSplit940Tests. Verify.ps1 (agent) : 1554/1554, 0 avertissement, 0 erreur ; DLL 0.940.0.0. Non validé en jeu.
