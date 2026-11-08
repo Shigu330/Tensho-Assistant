@@ -239,3 +239,10 @@ Ranked X-76 plan: 10 harmonisation versions (2b), 10 parser items (2c) and 4 ext
 - **E2. One "UI rules" test that cannot go backwards.** It forbids hand-written key tooltips, fixed text colours in `MainWindow*.cs`, and `try{save();` outside `SettingRow.cs`. Without it, H1 to H5 drift back with every new page.
 - **E3. One test for every docs/evidence path cited by the code.** 159 paths are cited, and only 3 tests check theirs today. It keeps CLAUDE.md rule 7 enforced through the renames of step 7.
 - **E4. One "once per event" helper for watchers.** `lootSeen` stops silently at 256 entries (`ItemDiscoveryWatcher.Dalamud.cs:445`, confirmed). The 4096 cap on `voyagesNoted` was not checked.
+## Done
+
+- 0.911: P1, P2, P3 and the three defects found by the check of the recorded data (docs/evidence/0.911-discoveries-check.md).
+- 0.912: H2. Theme aliases Text, Error, Warning, Selected; fixed text colours replaced on the gear, vessel, map timed points, fishing bites, gathering
+  panel and spearfishing pages; one state mark (DrawStateMark: check, cross, question in the icon font) for beastmaster, guide, Fashion Report, chocobo
+  barding, gear and recipes; « ✓ »/« ✗ » removed from texts (the game font lacks « ✗ »); selected toggle buttons use the theme's Selected colour.
+  Kept fixed: colours drawn on the map image or its own dark badges, icon tints, dye and Triple Triad side colours (data), self-contrasted badges.

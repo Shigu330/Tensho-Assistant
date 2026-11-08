@@ -81,7 +81,7 @@ internal sealed partial class MainWindow
             // 0.534 (user choice): greyed when it gives the same as Safe on this node.
             var same=balancedOff && cap==50;
             if(same)ImGui.BeginDisabled();
-            if(chosen)ImGui.PushStyleColor(ImGuiCol.Button,Accent with {W=0.55f});
+            if(chosen)ImGui.PushStyleColor(ImGuiCol.Button,Selected);
             bool clicked;
             ImGui.PushFont(UiBuilder.IconFont);
             try{clicked=ImGui.Button(icon.ToIconString()+$"###CollectableRisk{cap}");}

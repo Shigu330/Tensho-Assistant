@@ -105,7 +105,8 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow(); ImGui.TableNextColumn();
                 DrawSmallGameIcon(beast.Icon); ImGui.SameLine();
                 var known = obtained?.Contains(beast.Id);
-                ImGui.TextColored(known == true ? Success : known == false ? Muted : Accent, (known == true ? "✓ " : known == false ? "✗ " : "? ") + beast.Name);
+                DrawStateMark(known); ImGui.SameLine();
+                ImGui.TextColored(known == true ? Success : known == false ? Muted : Accent, beast.Name);
                 if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("BeastUi.Tooltip", beast.Id, beast.Assault, beast.Volley));
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.Family);
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));

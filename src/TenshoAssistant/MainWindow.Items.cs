@@ -451,7 +451,7 @@ internal sealed partial class MainWindow
             try
             {
                 var selected = string.Equals(craftBookFilter, craftType, StringComparison.Ordinal);
-                if (selected) ImGui.PushStyleColor(ImGuiCol.Button, Accent);
+                if (selected) ImGui.PushStyleColor(ImGuiCol.Button, Selected);
                 var clicked = ImGui.Button("##CraftBookJob", new Vector2(38, 38));
                 var buttonPosition = ImGui.GetItemRectMin();
                 var buttonHovered = ImGui.IsItemHovered();
@@ -480,7 +480,7 @@ internal sealed partial class MainWindow
         RecipeLog?.Want();
         if (RecipeLog?.State?.WasCrafted(recipe.RecipeId) is not { } crafted) return;
         ImGui.SameLine();
-        if (crafted) ImGui.TextDisabled(localization.Get("RecipeUi.Crafted"));
+        if (crafted) { DrawStateMark(true); ImGui.SameLine(); ImGui.TextDisabled(localization.Get("RecipeUi.Crafted")); }
         else ImGui.TextColored(Accent, localization.Get("RecipeUi.NeverCrafted"));
         if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("RecipeUi.CraftedTip"));
     }

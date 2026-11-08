@@ -68,7 +68,7 @@ internal sealed partial class MainWindow
             // 0.892 (user report: « it changes all the time »): a fixed layout. Three slot lines always; the list keeps its rows, the fish in sight are framed and coloured.
             // 0.897 (user request: too much text to read in real time): sizes S/M/L, speeds as chevrons (one per step of 50), a star for a guaranteed large fish, an
             // eye for the shadows seen in game (yours or shared); the words on hover.
-            var disabled=new Vector4(0.55f,0.55f,0.55f,1);
+            var disabled=Vector4.Lerp(Muted,UI.FfxivTheme.Panel,0.35f);
             var widest=rows.Select(row=>Gathering.Spearfishing.SpeedStep(row.Speed ?? 0)).Concat(frame.Slots.Select(slot=>Gathering.Spearfishing.SpeedStep(slot.Speed))).DefaultIfEmpty(1).Max();
             var shadowWidth=ImGui.CalcTextSize("L "+new string('>',Math.Max(1,widest))).X;
             for(var index=0;index<3;index++)

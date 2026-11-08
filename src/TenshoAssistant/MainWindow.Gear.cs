@@ -248,7 +248,7 @@ internal sealed partial class MainWindow
             if(shown is null)ImGui.TextDisabled("—");
             else
             {
-                ImGui.PushStyleColor(ImGuiCol.Text,changed ? UI.FfxivTheme.Gold:new Vector4(0.93f,0.93f,0.93f,1));
+                ImGui.PushStyleColor(ImGuiCol.Text,changed ? UI.FfxivTheme.Gold:Text);
                 var clicked=ImGui.Selectable($"{shown.Name}{(hq ? " ":"")}##GearName",false,ImGuiSelectableFlags.None,new Vector2(0,0));
                 ImGui.PopStyleColor();
                 if(clicked){gearSearch="";ImGui.OpenPopup("GearPick");}
@@ -320,7 +320,7 @@ internal sealed partial class MainWindow
                         foreach(var (param,delta) in differences)
                         {
                             ImGui.SameLine();
-                            ImGui.TextColored(delta>0 ? Success:new Vector4(0.9f,0.45f,0.4f,1),$"{(delta>0 ? "+":"")}{delta} {localization.Get("Gear.Param"+param)}");
+                            ImGui.TextColored(delta>0 ? Success:Error,$"{(delta>0 ? "+":"")}{delta} {localization.Get("Gear.Param"+param)}");
                         }
                     }
                 }
@@ -410,9 +410,9 @@ internal sealed partial class MainWindow
                 }
                 ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("Gear.Param"+param));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(now.ToString("N0"));
-                ImGui.TableNextColumn();ImGui.TextColored(later!=now ? UI.FfxivTheme.Gold:new Vector4(0.93f,0.93f,0.93f,1),later.ToString("N0"));
+                ImGui.TableNextColumn();ImGui.TextColored(later!=now ? UI.FfxivTheme.Gold:Text,later.ToString("N0"));
                 ImGui.TableNextColumn();
-                if(later!=now)ImGui.TextColored(later>now ? Success:new Vector4(0.9f,0.45f,0.4f,1),$"{(later>now ? "+":"")}{later-now:N0}");
+                if(later!=now)ImGui.TextColored(later>now ? Success:Error,$"{(later>now ? "+":"")}{later-now:N0}");
             }
             // Combat jobs: the derived values (critical rate, damage bonus…) in the same columns, same formulas as the Character page.
             if(!combat || state.Modifiers.Div<=0)return;
@@ -424,7 +424,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted(row.Value);
                 ImGui.TableNextColumn();
                 var later=laterRows.GetValueOrDefault(row.Key);
-                ImGui.TextColored(later is not null && later.Value!=row.Value ? UI.FfxivTheme.Gold:new Vector4(0.93f,0.93f,0.93f,1),later?.Value ?? "—");
+                ImGui.TextColored(later is not null && later.Value!=row.Value ? UI.FfxivTheme.Gold:Text,later?.Value ?? "—");
             }
         }
         finally{ImGui.EndTable();}
@@ -442,8 +442,8 @@ internal sealed partial class MainWindow
         {
             var centre=at+new Vector2(radius+socket*(radius*2+4),size.Y/2);
             var overmeld=socket>=item.MateriaSlots;
-            if(socket<melds.Count)draw.AddCircleFilled(centre,radius,ImGui.GetColorU32(overmeld ? new Vector4(0.85f,0.45f,0.3f,1):new Vector4(0.35f,0.8f,0.55f,1)));
-            draw.AddCircle(centre,radius,ImGui.GetColorU32(overmeld ? new Vector4(0.85f,0.45f,0.3f,0.9f):UI.FfxivTheme.Gold),0,1.2f);
+            if(socket<melds.Count)draw.AddCircleFilled(centre,radius,ImGui.GetColorU32(overmeld ? Warning:Success));
+            draw.AddCircle(centre,radius,ImGui.GetColorU32(overmeld ? Warning with {W=0.9f}:UI.FfxivTheme.Gold),0,1.2f);
         }
         if(hovered)
         {
@@ -461,7 +461,7 @@ internal sealed partial class MainWindow
                     }
                 foreach(var param in melds.Select(meld=>catalog.FindMateria(meld.Row)?.Param ?? 0).Where(param=>param!=0).Distinct())
                     if(GearRules.Wasted(item,hq,catalog.MateriaValues(melds),param) is > 0 and var lost)
-                        ImGui.TextColored(new Vector4(0.9f,0.45f,0.4f,1),localization.Format("Gear.Wasted",lost,localization.Get("Gear.Param"+param)));
+                        ImGui.TextColored(Error,localization.Format("Gear.Wasted",lost,localization.Get("Gear.Param"+param)));
                 DrawPieceCaps(item,hq,catalog.MateriaValues(melds),CombatCategory(state.Category));
                 ImGui.TextDisabled(localization.Get("Gear.SocketsClick"));
             }
@@ -508,7 +508,7 @@ internal sealed partial class MainWindow
                             var grade=option.Grades.Where(entry=>!overmeld || GearRules.OvermeldAllowed(entry.Grade,socket-item.MateriaSlots)).Select(entry=>entry.Grade).DefaultIfEmpty(0).Max();
                             var meld=new MeldedMateria(option.Row,grade);
                             var waste=SocketWaste(catalog,item,hq,list,socket,meld);
-                            if(waste>0)ImGui.PushStyleColor(ImGuiCol.Text,MeldWarning);
+                            if(waste>0)ImGui.PushStyleColor(ImGuiCol.Text,Warning);
                             var picked=ImGui.Selectable(localization.Get("Gear.Param"+option.Param)+(waste>0 ? "  "+localization.Format("Gear.OverCap",waste):"")+$"##Kind{option.Row}",option.Row==current.Row);
                             if(waste>0)ImGui.PopStyleColor();
                             if(picked)
@@ -532,7 +532,7 @@ internal sealed partial class MainWindow
                             {
                                 if(overmeld && !GearRules.OvermeldAllowed(grade,socket-item.MateriaSlots))continue;
                                 var waste=SocketWaste(catalog,item,hq,list,socket,new(kind.Row,grade));
-                                if(waste>0)ImGui.PushStyleColor(ImGuiCol.Text,MeldWarning);
+                                if(waste>0)ImGui.PushStyleColor(ImGuiCol.Text,Warning);
                                 var gradeRate=overmeld ? "  · "+OvermeldRateText(catalog,kind,grade,socket-item.MateriaSlots,hq):"";
                                 var picked=ImGui.Selectable($"{name} (+{value}){gradeRate}{(waste>0 ? "  "+localization.Format("Gear.OverCap",waste):"")}##Grade{grade}",grade==current.Grade);
                                 if(waste>0)ImGui.PopStyleColor();
@@ -553,9 +553,9 @@ internal sealed partial class MainWindow
                     {
                         ImGui.SameLine();
                         ImGui.PushFont(UiBuilder.IconFont);
-                        try{ImGui.TextColored(MeldWarning,FontAwesomeIcon.ExclamationTriangle.ToIconString());}
+                        try{ImGui.TextColored(Warning,FontAwesomeIcon.ExclamationTriangle.ToIconString());}
                         finally{ImGui.PopFont();}
-                        ImGui.SameLine();ImGui.TextColored(MeldWarning,localization.Format("Gear.OverCap",lost));
+                        ImGui.SameLine();ImGui.TextColored(Warning,localization.Format("Gear.OverCap",lost));
                         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Gear.OverCapTip",lost,localization.Get("Gear.Param"+kind.Param),item.Caps?.GetValueOrDefault(kind.Param) ?? 0));
                     }
                 }
@@ -571,7 +571,7 @@ internal sealed partial class MainWindow
             var gained=GearRules.PieceParams(item,hq,values).GetValueOrDefault(param)-item.ParamsFor(hq).GetValueOrDefault(param);
             var lost=GearRules.Wasted(item,hq,values,param);
             var cap=item.Caps?.GetValueOrDefault(param) ?? 0;
-            ImGui.TextColored(lost>0 ? new Vector4(0.9f,0.45f,0.4f,1):Success,localization.Format("Gear.MeldResult",localization.Get("Gear.Param"+param),gained,lost,cap));
+            ImGui.TextColored(lost>0 ? Error:Success,localization.Format("Gear.MeldResult",localization.Get("Gear.Param"+param),gained,lost,cap));
         }
         DrawPieceCaps(item,hq,catalog.MateriaValues(list),combat);
         if(gearMeldsWorn(slot) is { Count:>0 } wornMelds && ImGui.Button(localization.Get("Gear.MateriaWorn"))){list=wornMelds.ToList();changed=true;}
@@ -609,15 +609,13 @@ internal sealed partial class MainWindow
                 if(combat ? param is 10 or 11 or >= 70:param is not (10 or 11 or >= 70))continue;
                 var value=values.GetValueOrDefault(param);var cap=caps[param];
                 ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("Gear.Param"+param));
-                ImGui.TableNextColumn();ImGui.TextColored(value>=cap ? UI.FfxivTheme.Gold:new Vector4(0.93f,0.93f,0.93f,1),$"{value} / {cap}");
+                ImGui.TableNextColumn();ImGui.TextColored(value>=cap ? UI.FfxivTheme.Gold:Text,$"{value} / {cap}");
                 ImGui.TableNextColumn();
                 if(value>=cap)ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("Gear.AtCap"));else ImGui.TextDisabled($"+{cap-value}");
             }
         }
         finally{ImGui.EndTable();}
     }
-
-    private static readonly Vector4 MeldWarning=new(0.95f,0.55f,0.3f,1);
 
     // R-11 step 2 (0.314): what the character owns — bags, armoury chest, glamour dresser, armoire, saddlebag, retainers (the same
     // counts as the item tooltips, Inventory/ItemHoldings.cs), cached per item until the inventory or the Bank changes.
@@ -639,9 +637,7 @@ internal sealed partial class MainWindow
     {
         var worn=IsWorn(id);var owned=GearOwned(id);
         var have=worn || owned is { Total:>0 };
-        ImGui.PushFont(UiBuilder.IconFont);
-        try{ImGui.TextColored(have ? Success:Muted,(have ? FontAwesomeIcon.Check:FontAwesomeIcon.Times).ToIconString());}
-        finally{ImGui.PopFont();}
+        DrawStateMark(have);
         if(!ImGui.IsItemHovered())return;
         ImGui.BeginTooltip();
         try

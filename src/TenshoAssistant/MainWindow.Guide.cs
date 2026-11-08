@@ -76,7 +76,8 @@ internal sealed partial class MainWindow
         foreach (var task in tasks)
         {
             var done = check ? GuideWindowDone(task.Key) : configuration.GuideWindowsDone?.Contains(task.Key) == true;
-            ImGui.TextColored(done ? Success : Muted, (done ? "✓ " : "○ ") + localization.Get($"Guide.Window{task.Key}"));
+            DrawStateMark(done); ImGui.SameLine();
+            ImGui.TextColored(done ? Success : Muted, localization.Get($"Guide.Window{task.Key}"));
             if (!done) { ImGui.Indent(); ImGui.PushTextWrapPos(0); ImGui.TextDisabled(localization.Get($"Guide.Window{task.Key}Where")); ImGui.PopTextWrapPos(); ImGui.Unindent(); }
         }
     }

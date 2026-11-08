@@ -133,7 +133,10 @@ internal sealed partial class MainWindow
                 // 0.217: a slot without category still opens when it can be dyed (weapon to feet): its dyes of the week stay visible.
                 // Slots without a category open too (from the game window's buttons): they say so; weapon to feet also show their dyes.
                 var open=fashionOpenSlot==slot;
-                if(ImGui.Selectable($"{(open ? "▼":"▶")} {label}  {counts}{(ownedCount>0 ? " ✓":"")}###FashionSlot",open))fashionOpenSlot=open ? -1:slot;
+                var slotText=$"{(open ? "▼":"▶")} {label}  {counts}";var slotStart=ImGui.GetCursorPosX();
+                if(ImGui.Selectable(slotText+"###FashionSlot",open))fashionOpenSlot=open ? -1:slot;
+                // The owned mark right after the row's text, drawn over the full-width row (it does not take the click).
+                if(ownedCount>0){ImGui.SameLine(slotStart+ImGui.CalcTextSize(slotText).X+ImGui.GetStyle().ItemSpacing.X);DrawStateMark(true);}
                 if(!open)continue;
                 var childVisible=ImGui.BeginChild("FashionSlotList",new Vector2(0,compact ? 200:260),true);
                 try{if(childVisible)DrawFashionSlotBody(frame,slot,compact);}

@@ -138,10 +138,10 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.TextUnformatted(index<names.Count && names[index].Length>0 ? names[index]:localization.Get("VesselBuilds.Stat"+index));
                 ImGui.TableNextColumn();
                 if(readStats is { } now)ImGui.TextUnformatted(now[index].ToString());else ImGui.TextDisabled("—");
-                ImGui.TableNextColumn();ImGui.TextColored(readStats is { } before && before[index]!=later ? UI.FfxivTheme.Gold:new Vector4(0.93f,0.93f,0.93f,1),later.ToString());
+                ImGui.TableNextColumn();ImGui.TextColored(readStats is { } before && before[index]!=later ? UI.FfxivTheme.Gold:Text,later.ToString());
                 ImGui.TableNextColumn();
                 if(readStats is { } reference && reference[index]!=later)
-                    ImGui.TextColored(later>reference[index] ? Success:new Vector4(0.9f,0.45f,0.4f,1),$"{(later>reference[index] ? "+":"")}{later-reference[index]}");
+                    ImGui.TextColored(later>reference[index] ? Success:Error,$"{(later>reference[index] ? "+":"")}{later-reference[index]}");
             }
             Row(localization.Get("VesselBuilds.Cost"),current is null ? "—":$"{current.Cost} / {current.Capacity}",$"{planned.Cost} / {planned.Capacity}",planned.OverCapacity,localization.Get("VesselBuilds.CostTip"));
             Row(localization.Get("VesselBuilds.PartRank"),current is null ? "—":current.HighestPartRank.ToString(),localization.Format("VesselBuilds.PartRankValue",planned.HighestPartRank,plan.Rank),planned.RankTooLow,localization.Get("VesselBuilds.PartRankTip"));
@@ -153,7 +153,7 @@ internal sealed partial class MainWindow
         // Self-check: the read stats should equal the read parts plus the rank bonus (not yet verified in game; a gap is shown, not hidden).
         if(readStats is { } shown && current is not null && current.Stats!=shown)
         {
-            ImGui.TextColored(new Vector4(0.95f,0.55f,0.3f,1),localization.Get("VesselBuilds.Mismatch"));
+            ImGui.TextColored(Warning,localization.Get("VesselBuilds.Mismatch"));
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("VesselBuilds.MismatchTip",
                 string.Join(" / ",Enumerable.Range(0,5).Select(index=>shown[index])),string.Join(" / ",Enumerable.Range(0,5).Select(index=>current.Stats[index]))));
         }
@@ -163,9 +163,9 @@ internal sealed partial class MainWindow
             ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.TextUnformatted(label);
             if(ImGui.IsItemHovered())WrappedTooltip(tip);
             ImGui.TableNextColumn();ImGui.TextDisabled(now);
-            ImGui.TableNextColumn();ImGui.TextColored(problem ? new Vector4(0.9f,0.45f,0.4f,1):new Vector4(0.93f,0.93f,0.93f,1),later);
+            ImGui.TableNextColumn();ImGui.TextColored(problem ? Error:Text,later);
             ImGui.TableNextColumn();
-            if(problem)ImGui.TextColored(new Vector4(0.9f,0.45f,0.4f,1),localization.Get("VesselBuilds.Problem"));
+            if(problem)ImGui.TextColored(Error,localization.Get("VesselBuilds.Problem"));
         }
     }
 
@@ -186,7 +186,7 @@ internal sealed partial class MainWindow
             if(ImGui.IsItemClicked(ImGuiMouseButton.Left))ImGui.OpenPopup("VesselPick");
             ImGui.SameLine();ImGui.BeginGroup();
             ImGui.TextDisabled(localization.Get($"VesselBuilds.Slot{plan.Kind}{slot}"));
-            ImGui.PushStyleColor(ImGuiCol.Text,changed ? UI.FfxivTheme.Gold:new Vector4(0.93f,0.93f,0.93f,1));
+            ImGui.PushStyleColor(ImGuiCol.Text,changed ? UI.FfxivTheme.Gold:Text);
             var clicked=ImGui.Selectable($"{part?.Name ?? "—"}##VesselPartName",false);
             ImGui.PopStyleColor();
             if(clicked)ImGui.OpenPopup("VesselPick");
@@ -226,7 +226,7 @@ internal sealed partial class MainWindow
                     var delta=option.Stats[index]-(current?.Stats[index] ?? 0);
                     if(delta==0)continue;
                     ImGui.SameLine();
-                    ImGui.TextColored(delta>0 ? Success:new Vector4(0.9f,0.45f,0.4f,1),$"{(delta>0 ? "+":"")}{delta} {localization.Get("VesselBuilds.Short"+index)}");
+                    ImGui.TextColored(delta>0 ? Success:Error,$"{(delta>0 ? "+":"")}{delta} {localization.Get("VesselBuilds.Short"+index)}");
                 }
             }
         }
@@ -251,10 +251,10 @@ internal sealed partial class MainWindow
         ImGui.TextUnformatted(string.Join(" › ",order.Select(sector=>sector.Name)));
         // 0.315 review: the game refuses a route above the vessel's rank.
         var needed=VesselBuilds.RouteRank(sectors.Select(sector=>sector.RankReq));
-        if(plan.Rank<needed)ImGui.TextColored(new Vector4(0.9f,0.45f,0.4f,1),localization.Format("VesselBuilds.RouteRankTooLow",needed,plan.Rank));
+        if(plan.Rank<needed)ImGui.TextColored(Error,localization.Format("VesselBuilds.RouteRankTooLow",needed,plan.Rank));
         var breakpoint=VesselBuilds.RouteBreakpoint(catalog.Breakpoints,buildRoute);
         var time=TimeSpan.FromSeconds(SecondsOf(Math.Max(1,planned.Stats.Speed)));
-        ImGui.TextColored(distance>planned.Stats.Range ? new Vector4(0.9f,0.45f,0.4f,1):Success,localization.Format("VesselBuilds.Distance",distance,planned.Stats.Range));
+        ImGui.TextColored(distance>planned.Stats.Range ? Error:Success,localization.Format("VesselBuilds.Distance",distance,planned.Stats.Range));
         ImGui.SameLine();ImGui.TextUnformatted(localization.Format("VesselBuilds.Duration",(int)time.TotalHours,time.Minutes));
         if(breakpoint is null)ImGui.TextDisabled(localization.Get("VesselBuilds.BreakpointsUnknown"));
         else

@@ -138,7 +138,7 @@ internal sealed partial class MainWindow
                             var bite=(row.Bite is "Weak" or "Strong" or "Legendary") ? row.Bite:null;var hook=(row.HookSet is "Precise" or "Powerful") ? row.HookSet:null;
                             if(bite is not null || hook is not null)
                             {
-                                var colour=bite switch{"Weak"=>new Vector4(0.45f,0.85f,0.45f,1),"Strong"=>new Vector4(0.95f,0.80f,0.30f,1),"Legendary"=>new Vector4(0.95f,0.35f,0.35f,1),_=>Muted};
+                                var colour=bite switch{"Weak"=>Success,"Strong"=>Warning,"Legendary"=>Error,_=>Muted};
                                 ImGui.TextColored(colour,(bite switch{"Weak"=>"!","Strong"=>"!!","Legendary"=>"!!!",_=>"?"})+(hook is not null ? " "+localization.Get("FishingPanel.HookShort"+hook):""));
                                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(bite is not null ? "FishingPanel.Bite"+bite:"FishingPanel.BiteUnknown")+(hook is not null ? " · "+localization.Get("FishingPanel.Hook"+hook):""));
                             }

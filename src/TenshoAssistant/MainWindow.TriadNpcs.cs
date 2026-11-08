@@ -27,11 +27,11 @@ internal sealed partial class MainWindow
     private object? triadNpcNamesKey;
     private Dictionary<uint,TriadNpc> triadNpcNames=[];
     internal void ConfigureTriadNpcs(TriadNpcService service)=>triadNpcs=service;
-    // 0.493 (user report): what the NPC asks for, for its tooltips; a quest done has ✓.
+    // 0.493 (user report): what the NPC asks for, for its tooltips; a quest done says so (a word: tooltips are plain text, without the icon font).
     private string TriadQuestLines(TriadNpc npc,IReadOnlySet<uint>? done)
     {
         if(npc.RequiredQuests.Count==0)return "";
-        var lines=npc.RequiredQuests.Select(quest=>"  "+(quest.Name.Length>0 ? quest.Name:quest.QuestId.ToString())+(done?.Contains(quest.QuestId)==true ? " ✓":""));
+        var lines=npc.RequiredQuests.Select(quest=>"  "+(quest.Name.Length>0 ? quest.Name:quest.QuestId.ToString())+(done?.Contains(quest.QuestId)==true ? " · "+localization.Get("TriadNpcs.QuestDone"):""));
         return "\n"+localization.Get(npc.AnyQuest ? "TriadNpcs.QuestsAny":"TriadNpcs.QuestsAll")+Environment.NewLine+string.Join(Environment.NewLine,lines);
     }
 
@@ -168,7 +168,7 @@ internal sealed partial class MainWindow
                         var where=new List<string>();
                         foreach(var match in source?.NpcMatchIds ?? [])
                             if(npcNames.TryGetValue(match,out var npc))
-                                where.Add(npc.Name+(npc.MapId!=0 ? $" ({npc.Zone})":"")+(Beaten(match)==true ? " ✓":"")+(npc.Available(questsDone)==false ? " · "+localization.Get("TriadNpcs.QuestNeeded"):""));
+                                where.Add(npc.Name+(npc.MapId!=0 ? $" ({npc.Zone})":"")+(Beaten(match)==true ? " · "+localization.Get("TriadNpcs.NpcBeaten"):"")+(npc.Available(questsDone)==false ? " · "+localization.Get("TriadNpcs.QuestNeeded"):""));
                         if(source is { PackName.Length:>0 })where.Add(localization.Format("TriadNpcs.Pack",source.PackName));
                         ImGui.TextDisabled(where.Count>0 ? string.Join(" · ",where):localization.Get("TriadNpcs.OtherSource"));
                         ImGui.EndGroup();

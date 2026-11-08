@@ -311,7 +311,7 @@ internal sealed partial class MainWindow
         // A click elsewhere on the map rolls the list up.
         if(mapHeaderList!=0 && !headerHovered && ImGui.IsMouseClicked(ImGuiMouseButton.Left))mapHeaderList=0;
 
-        static Vector4 ListColour(bool current)=>current ? UI.FfxivTheme.Gold:new Vector4(0.93f,0.93f,0.93f,1);
+        static Vector4 ListColour(bool current)=>current ? UI.FfxivTheme.Gold:MapOverlayText;
         void ListBackdrop(int count)
         {
             var from=ImGui.GetCursorScreenPos();
@@ -510,7 +510,7 @@ internal sealed partial class MainWindow
                 // 0.308 (user feedback: nearly invisible on the map): dark backdrop like the names' band, light text.
                 var at=ImGui.GetCursorScreenPos();var size=ImGui.CalcTextSize(text);
                 ImGui.GetWindowDrawList().AddRectFilled(at-new Vector2(3,1),at+size+new Vector2(3,1),ImGui.GetColorU32(new Vector4(0,0,0,0.72f)),3);
-                ImGui.TextColored(new Vector4(0.93f,0.93f,0.93f,1),text);
+                ImGui.TextColored(MapOverlayText,text);
             }
             else ImGui.TextDisabled(text);
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.ZoomLevel"));
@@ -1790,7 +1790,9 @@ internal sealed partial class MainWindow
     // 0.518 (user report): « open now » only speaks of the hours. A legendary point also asks for its tome, read by this character.
     internal Func<uint,TenshoAssistant.Gathering.GatherPointAccess?>? GatherAccess { get; set; }
     internal Func<uint,TenshoAssistant.Gathering.GatherPointKind>? GatherKind { get; set; }
-    private Vector4 TimedPointColor(MapLocalGatheringPoint point)=>GatherAccess?.Invoke(point.BaseId)?.TomeMissing is not null ? Muted:point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:new Vector4(0.98f,0.62f,0.20f,1);
+    // Light text on the map's own dark backdrops (overlay lists, slider labels): fixed, as the backdrop does not follow the theme.
+    private static readonly Vector4 MapOverlayText=new(0.93f,0.93f,0.93f,1);
+    private Vector4 TimedPointColor(MapLocalGatheringPoint point)=>GatherAccess?.Invoke(point.BaseId)?.TomeMissing is not null ? Muted:point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:UI.FfxivTheme.Warning;
     private void DrawPointAvailability(MapLocalGatheringPoint point)
     {
         var access=GatherAccess?.Invoke(point.BaseId);

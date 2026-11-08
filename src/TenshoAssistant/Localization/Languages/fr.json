@@ -478,8 +478,8 @@
     "AnswerEmptyPage": "Le jeu ne donne certaines données qu'une fois sa fenêtre ouverte, ou une fois connecté. Le « ? » de la page dit ce qu'elle attend. Ouvrez une fois cette fenêtre : Tensho garde ce qu'il a lu.",
     "QuestionWhyOpen": "Pourquoi dois-je ouvrir une fenêtre du jeu ?",
     "AnswerWhyOpen": "Tensho ne lit que ce que le jeu a sur votre ordinateur. Les servants, le coffre à apparence, les titres ou les succès ne sont envoyés par le serveur qu'à leur ouverture.",
-    "QuestionMarks": "Que veulent dire ✓, ✗ et ?",
-    "AnswerMarks": "✓ le jeu le confirme, ✗ il dit non, ? il ne l'a pas encore dit. Tensho ne transforme pas un inconnu en non.",
+    "QuestionMarks": "Que veulent dire la coche, la croix et le point d'interrogation ?",
+    "AnswerMarks": "Une coche : le jeu le confirme ; une croix : il dit non ; un point d'interrogation : il ne l'a pas encore dit. Tensho ne transforme pas un inconnu en non.",
     "QuestionInternet": "Qu'est-ce qui part sur Internet ?",
     "AnswerInternet": "Les prix, le butin, les pages du wiki et les données communautaires sont demandés à ces sites, avec l'objet ou la page que vous consultez. Chaque source se coupe dans Paramètres › Avancé. La liste et les licences sont dans Crédits. Les prix que vous ouvrez au tableau des ventes sont gardés et, pour votre monde, remplacent ceux d'Universalis quand ils sont plus récents.",
     "QuestionSaved": "Que garde Tensho sur mon PC ?",
@@ -521,7 +521,7 @@
     "StepInterestsTitle": "À quoi jouez-vous ?",
     "StepInterestsText": "Cochez ce qui vous intéresse : la suite du guide s'adapte. Si vous ne cochez rien, il montre tout. Rien n'est masqué hors du guide.",
     "StepWindowsTitle": "Fenêtres du jeu à ouvrir une fois",
-    "StepWindowsText": "Tensho ne lit que ce que le jeu a sur votre ordinateur, et le jeu ne reçoit certaines données qu'à l'ouverture de leur fenêtre. Ouvrez-les quand vous y passez : chacune reçoit son ✓ toute seule, et cela peut attendre. Tensho ne les ouvre pas à votre place.",
+    "StepWindowsText": "Tensho ne lit que ce que le jeu a sur votre ordinateur, et le jeu ne reçoit certaines données qu'à l'ouverture de leur fenêtre. Ouvrez-les quand vous y passez : chacune reçoit sa coche toute seule, et cela peut attendre. Tensho ne les ouvre pas à votre place.",
     "StepVisitTitle": "Petit tour",
     "StepEndTitle": "C'est tout",
     "StepEndText": "Le « ? » en haut à droite explique la page où vous êtes. Aide les cherche toutes, répond aux questions fréquentes, relance ce guide et permet de signaler un problème. Ce qui reste à ouvrir reste sur l'accueil.\n\nBon jeu.",
@@ -1199,7 +1199,7 @@
     "Equipment": "Équipement",
     "Other": "Autres",
     "Missing": "Non obtenus seulement",
-    "Tip": "Filtre le butin par type d'objet. Sur l'icône : ✓ vert = objet de collection obtenu, ✗ rouge = pas encore obtenu.",
+    "Tip": "Filtre le butin par type d'objet. Sur l'icône : coche verte = objet de collection obtenu, croix rouge = pas encore obtenu.",
     "MissingTip": "Ne garde que les objets de collection (monture, mascotte, carte, rouleau) que vous n'avez pas encore."
   },
   "ItemUseRefs": {
@@ -2699,7 +2699,7 @@
   "DutyFinder": {
     "Lumina": "Coffres : LuminaSupplemental (Critical-Impact), donnée communautaire ; récompenses : Garland Tools.",
     "NoCoffers": "La source (Garland Tools) n'a ni coffre de boss ni coffre de zone pour ce contenu : seules les récompenses sont connues. Le jeu ne publie pas ces listes.",
-    "Fetched": "Butin récupéré le {0} · ✓ = collection obtenue",
+    "Fetched": "Butin récupéré le {0} · coche = collection obtenue",
     "Title": "Tensho — butin du contenu",
     "Setting": "Afficher le butin du contenu sélectionné à côté de l'outil de mission du jeu",
     "Roulette": "Mission aléatoire : le contenu n'est connu qu'à l'entrée.",
@@ -2767,7 +2767,9 @@
     "OtherSource": "autre source : survoler l'icône (comment l'obtenir).",
     "OnlyOpenTip": "Masque les PNJ battus dont toutes les cartes à gagner sont confirmées obtenues ; un PNJ dont l'état n'est pas lu reste affiché.",
     "SearchTip": "Partie du nom d'une carte dont l'obtention n'est pas confirmée ; majuscules ignorées.",
-    "BeatenUnavailable": "PNJ battus indisponibles : lecture du jeu en échec (peut-être après une mise à jour du jeu)."
+    "BeatenUnavailable": "PNJ battus indisponibles : lecture du jeu en échec (peut-être après une mise à jour du jeu).",
+    "QuestDone": "faite",
+    "NpcBeaten": "battu"
   },
   "TriadDecks": {
     "Highlighted": "Tensho : cartes du deck « {0} » encadrées en vert",
@@ -4449,7 +4451,7 @@
     "ChoiceTip": "Plusieurs recettes produisent cet ingrédient : choisissez celle à développer, puis relancez le calcul de la chaîne."
   },
   "RecipeUi": {
-    "Crafted": "✓ déjà fabriquée",
+    "Crafted": "déjà fabriquée",
     "NeverCrafted": "jamais fabriquée",
     "CraftedTip": "Lu dans le carnet d’artisanat du personnage : une recette jamais fabriquée donne un bonus d’expérience à la première fabrication.",
     "NeverCraftedOnly": "Jamais fabriquées seulement",

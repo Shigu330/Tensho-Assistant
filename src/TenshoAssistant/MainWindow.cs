@@ -1,5 +1,6 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using TenshoAssistant.Inventory;
@@ -32,6 +33,11 @@ internal sealed partial class MainWindow : Window, IDisposable
     private static Vector4 Accent => FfxivTheme.Gold;
     private static Vector4 Success => FfxivTheme.Success;
     private static Vector4 Muted => FfxivTheme.TextMuted;
+    private static Vector4 Text => FfxivTheme.Text;
+    private static Vector4 Error => FfxivTheme.Error;
+    private static Vector4 Warning => FfxivTheme.Warning;
+    // Background of a chosen toggle button (as the map's buttons): readable with the theme's text on light themes too.
+    private static Vector4 Selected => FfxivTheme.Selected;
     private static readonly string BuildVersion = typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?";
     private readonly Configuration configuration;
     private readonly Action save;
@@ -346,6 +352,19 @@ internal sealed partial class MainWindow : Window, IDisposable
     private static void Heading(string title, string description)
     {
         UiComponents.SectionHeader(title, description);
+    }
+
+    // One state mark for every page: check = the game confirms it (owned, done, unlocked), cross = it says no, question mark = not read yet.
+    // Drawn from the icon font: « ✗ » is missing from the game font (0.341, it showed as « = »).
+    private static void DrawStateMark(bool? state)
+    {
+        ImGui.PushFont(UiBuilder.IconFont);
+        try
+        {
+            var icon=state switch{true=>FontAwesomeIcon.Check,false=>FontAwesomeIcon.Times,_=>FontAwesomeIcon.Question};
+            ImGui.TextColored(state switch{true=>Success,false=>Muted,_=>Accent},icon.ToIconString());
+        }
+        finally{ImGui.PopFont();}
     }
 
     private void DrawCatalogStatus()

@@ -154,7 +154,7 @@ internal sealed partial class MainWindow
         Panels?.Show("TenshoGatheringPanel",localization.Get(miner ? "GatheringPanel.TitleMiner":"GatheringPanel.TitleBotanist"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.AlwaysAutoResize,()=>{ImGui.SetNextWindowPos(new Vector2(window.X+window.Width+6,window.Y)+WindowMoved("Gathering",window.X,window.Y),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(360,0),ImGuiCond.Always);},()=>
         {
             // Job header: its own icon (ClassJob 62100 + job) and colour, so miner and botanist help never look alike.
-            var colour=miner ? new Vector4(0.95f,0.65f,0.30f,1):new Vector4(0.45f,0.85f,0.45f,1);
+            var colour=miner ? Warning:Success;
             DrawItemIcon(new ItemDefinition(0,"",false,62100+frame.JobId),new Vector2(28));ImGui.SameLine();
             ImGui.BeginGroup();
             ImGui.TextColored(colour,localization.Get(miner ? "GatheringPanel.Miner":"GatheringPanel.Botanist")+$" · {localization.Format("GatheringPanel.Level",frame.Level)}");

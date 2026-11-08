@@ -478,8 +478,8 @@
     "AnswerEmptyPage": "The game only gives some data once its window has been opened, or once you are logged in. The « ? » of the page says what it waits for. Open that window once: Tensho keeps what it read.",
     "QuestionWhyOpen": "Why must I open a game window?",
     "AnswerWhyOpen": "Tensho only reads what the game has on your computer. Retainers, the dresser, titles or achievements are only sent by the server when you open them.",
-    "QuestionMarks": "What do ✓, ✗ and ? mean?",
-    "AnswerMarks": "✓ the game confirms it, ✗ it says no, ? it has not said yet. Tensho does not turn an unknown into a no.",
+    "QuestionMarks": "What do the check mark, the cross and the question mark mean?",
+    "AnswerMarks": "A check mark: the game confirms it; a cross: it says no; a question mark: it has not said yet. Tensho does not turn an unknown into a no.",
     "QuestionInternet": "What goes on the Internet?",
     "AnswerInternet": "Prices, loot, wiki pages and community data are asked of those community sites, with the item or page you are looking at. Each source can be turned off in Settings › Advanced. The list and the licences are in Credits. Prices you open at the market board are kept and, for your world, used in place of Universalis' when they are newer.",
     "QuestionSaved": "What does Tensho keep on my PC?",
@@ -521,7 +521,7 @@
     "StepInterestsTitle": "What do you play?",
     "StepInterestsText": "Tick what interests you: the rest of this guide adapts. If you tick nothing, it shows everything. Nothing is hidden outside the guide.",
     "StepWindowsTitle": "Game windows to open once",
-    "StepWindowsText": "Tensho only reads what the game has on your computer, and the game only gets some data once its window has been opened. Open these when you are next there: each gets its ✓ by itself, and you can do this later. Tensho does not open them for you.",
+    "StepWindowsText": "Tensho only reads what the game has on your computer, and the game only gets some data once its window has been opened. Open these when you are next there: each gets its check mark by itself, and you can do this later. Tensho does not open them for you.",
     "StepVisitTitle": "A look around",
     "StepEndTitle": "That's all",
     "StepEndText": "The « ? » at the top right explains the page you are on. Help searches all of them, answers frequent questions, restarts this guide, and lets you report a problem. What is left to open stays on the Home page.\n\nGood game.",
@@ -1199,7 +1199,7 @@
     "Equipment": "Equipment",
     "Other": "Other",
     "Missing": "Not obtained only",
-    "Tip": "Filters the loot by item kind. On the icon: green ✓ = collection item obtained, red ✗ = not obtained yet.",
+    "Tip": "Filters the loot by item kind. On the icon: green check mark = collection item obtained, red cross = not obtained yet.",
     "MissingTip": "Keeps only the collection items (mount, minion, card, roll) you do not have yet."
   },
   "ItemUseRefs": {
@@ -2699,7 +2699,7 @@
   "DutyFinder": {
     "Lumina": "Coffers: LuminaSupplemental (Critical-Impact), community data; rewards: Garland Tools.",
     "NoCoffers": "The source (Garland Tools) has no boss or zone coffer for this duty: only the rewards are known. The game does not publish these lists.",
-    "Fetched": "Loot fetched {0} · ✓ = collection obtained",
+    "Fetched": "Loot fetched {0} · check mark = collection obtained",
     "Title": "Tensho — duty loot",
     "Setting": "Show the loot of the duty selected in the game's Duty Finder",
     "Roulette": "Roulette: the duty is only known on entry.",
@@ -2767,7 +2767,9 @@
     "OtherSource": "other source: hover the icon (how to obtain).",
     "OnlyOpenTip": "Hides beaten NPCs whose reward cards are all confirmed obtained; an NPC whose state is not read stays shown.",
     "SearchTip": "Part of the name of a card not confirmed as obtained; case ignored.",
-    "BeatenUnavailable": "Beaten NPCs unavailable: the game read failed (maybe after a game update)."
+    "BeatenUnavailable": "Beaten NPCs unavailable: the game read failed (maybe after a game update).",
+    "QuestDone": "done",
+    "NpcBeaten": "beaten"
   },
   "TriadDecks": {
     "Highlighted": "Tensho: cards of the « {0} » deck framed in green",
@@ -4449,7 +4451,7 @@
     "ChoiceTip": "Several recipes make this ingredient: choose the one to expand, then calculate the chain again."
   },
   "RecipeUi": {
-    "Crafted": "✓ crafted before",
+    "Crafted": "crafted before",
     "NeverCrafted": "never crafted",
     "CraftedTip": "Read from the character’s crafting log: a recipe never crafted gives bonus experience on the first craft.",
     "NeverCraftedOnly": "Never crafted only",
