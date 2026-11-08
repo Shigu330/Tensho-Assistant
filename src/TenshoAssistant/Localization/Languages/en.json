@@ -584,6 +584,8 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
+    "FromReduction": "{0} ← aetherial reduction of {1}",
+    "SummaryReduction": "Aetherial reductions: {0} ({1} seen by you, {2} imported only)",
     "SummaryFishBite": "Fish bites seen: {0} ({1} seen by you, {2} imported only)",
     "ExchangeTitle": "Exchange with other players (GitHub)",
     "ExchangeHelp": "Share what you discovered and take what others found. Without connecting, the automatic exchange only takes the common discoveries. A discovery never holds a player's name, position or id.",

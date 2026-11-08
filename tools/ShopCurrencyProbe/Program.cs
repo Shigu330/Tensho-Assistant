@@ -829,6 +829,33 @@ if(Environment.GetEnvironmentVariable("PROBE_FISHSPOT") is { Length:>0 } spotQue
     }
     return;
 }
+// PROBE_REDUCE (0.888, user asked where to get an item for the aetherial reduction test): items the game marks reducible (Item.AetherialReduce > 0) that are
+// gathered (GatheringItem in a GatheringPointBase), with the gathering type, the point level, the zone and whether the point is ephemeral (GatheringPointTransient).
+if(Environment.GetEnvironmentVariable("PROBE_REDUCE") is { Length:>0 })
+{
+    var itemsSheet=data.Excel.GetSheet<Item>();var transient=data.Excel.GetSheet<GatheringPointTransient>();
+    var reducible=itemsSheet.Where(item=>item.AetherialReduce>0).Select(item=>item.RowId).ToHashSet();
+    var gatheringToItem=data.Excel.GetSheet<GatheringItem>().Where(row=>row.Item.RowType==typeof(Item) && reducible.Contains(row.Item.RowId)).ToDictionary(row=>row.RowId,row=>row.Item.RowId);
+    var seen=new HashSet<string>();
+    foreach(var point in data.Excel.GetSheet<GatheringPoint>())
+    {
+        if(point.GatheringPointBase.RowId==0 || point.TerritoryType.RowId==0)continue;
+        var basis=point.GatheringPointBase.Value;
+        foreach(var entry in basis.Item)
+        {
+            if(!gatheringToItem.TryGetValue(entry.RowId,out var itemId))continue;
+            var timing=transient.TryGetRow(point.RowId,out var found) ? found:default;
+            var ephemeral=timing.RowId!=0 && timing.EphemeralStartTime!=65535 && timing.EphemeralStartTime!=timing.EphemeralEndTime;
+            var zone=point.TerritoryType.Value.PlaceName.Value.Name.ExtractText();
+            var rare=timing.RowId!=0 && timing.GatheringRarePopTimeTable.RowId!=0 ? timing.GatheringRarePopTimeTable.Value:default;
+            var rareText=rare.RowId==0 ? "":" rare "+string.Join(",",Enumerable.Range(0,rare.StartTime.Count).Where(index=>rare.Duration[index]!=0).Select(index=>$"{rare.StartTime[index]}+{rare.Duration[index]}min"));
+            var line=$"REDUCE {itemsSheet.GetRow(itemId).Name.ExtractText()} | {basis.GatheringType.Value.Name.ExtractText()} level {basis.GatheringLevel} | {zone} | point {point.RowId} type {point.Type} | ephemeral {ephemeral} {timing.EphemeralStartTime}-{timing.EphemeralEndTime}{rareText}";
+            if(seen.Add(line))Console.WriteLine(line);
+        }
+    }
+    Console.WriteLine($"REDUCE reducible items {reducible.Count}, gathered {gatheringToItem.Values.Distinct().Count()}");
+    return;
+}
 // PROBE_GATHERLEVEL (0.224): for gathering items named like the value, GatheringItem → GatheringItemLevelConvertTable (level, stars)
 // → ItemLevel row of that level with its Gathering and Perception columns (base values of the Bountiful bonus rule).
 if(Environment.GetEnvironmentVariable("PROBE_GATHERLEVEL") is { Length:>0 } gatherName)

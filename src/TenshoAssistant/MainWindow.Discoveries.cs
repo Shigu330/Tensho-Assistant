@@ -112,7 +112,7 @@ internal sealed partial class MainWindow
         discoveredSources=(item,store.Revision,lines);
         return lines;
     }
-    private static readonly DiscoveryKind[] ItemSourceKinds=[DiscoveryKind.Desynthesis,DiscoveryKind.Venture,DiscoveryKind.DutyChest,DiscoveryKind.FateReward,
+    private static readonly DiscoveryKind[] ItemSourceKinds=[DiscoveryKind.Reduction,DiscoveryKind.Desynthesis,DiscoveryKind.Venture,DiscoveryKind.DutyChest,DiscoveryKind.FateReward,
         DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition,DiscoveryKind.FashionEvaluation,DiscoveryKind.VoyageDrop,DiscoveryKind.VoyageUnlock,DiscoveryKind.BlueSpellLearned,DiscoveryKind.BeastTamed,DiscoveryKind.FestivalSeen,DiscoveryKind.VistaSeen];
     /// <summary>
     /// X-73.16 (0.872): where you saw a shopkeeper, as a vendor place, for the vendors the game sheets do not place (their own places always come first).
@@ -149,7 +149,8 @@ internal sealed partial class MainWindow
         Dictionary<uint,uint[]> By(IEnumerable<DiscoveryFact> facts,Func<DiscoveryFact,uint> key,Func<DiscoveryFact,uint> value)=>
             facts.Where(fact=>key(fact)!=0 && value(fact)!=0).GroupBy(key).ToDictionary(group=>group.Key,group=>group.Select(value).Distinct().Take(32).ToArray());
         var drops=store.Find(DiscoveryKind.MonsterDrop,_=>true,20_000);
-        var fromItems=store.Find(DiscoveryKind.Desynthesis,_=>true,20_000).Concat(store.Find(DiscoveryKind.ItemFromItem,_=>true,20_000)).ToArray();
+        var fromItems=store.Find(DiscoveryKind.Desynthesis,_=>true,20_000).Concat(store.Find(DiscoveryKind.ItemFromItem,_=>true,20_000))
+            .Concat(store.Find(DiscoveryKind.Reduction,_=>true,20_000)).ToArray();
         var chests=store.Find(DiscoveryKind.DutyChest,_=>true,20_000);
         var index=new SeenIndex(By(drops,fact=>fact.Detail,fact=>fact.Subject),By(drops,fact=>fact.Subject,fact=>fact.Detail),
             By(store.Find(DiscoveryKind.BeastTamed,_=>true,2_000),fact=>fact.Detail,fact=>fact.Subject),By(fromItems,fact=>fact.Detail,fact=>fact.Subject),
@@ -248,6 +249,7 @@ internal sealed partial class MainWindow
         DiscoveryKind.DutyChest=>localization.Format("DiscoveriesUi.FromDutyChest",DiscoveryItemName(fact.Subject),DiscoveryDutyName(fact.Detail)),
         DiscoveryKind.FateReward=>localization.Format("DiscoveriesUi.FromFate",DiscoveryItemName(fact.Subject),DiscoveryFateName(fact.Detail)),
         DiscoveryKind.MonsterDrop=>localization.Format("DiscoveriesUi.FromMonster",DiscoveryItemName(fact.Subject),DiscoveryMonsterName(fact.Detail)),
+        DiscoveryKind.Reduction=>localization.Format("DiscoveriesUi.FromReduction",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
         DiscoveryKind.ItemFromItem=>localization.Format("DiscoveriesUi.FromItem",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
         DiscoveryKind.FishCatch=>localization.Format("DiscoveriesUi.FromBait",DiscoveryItemName(fact.Subject),fact.Detail==0 ? "?":DiscoveryItemName(fact.Detail)),
         DiscoveryKind.BlueSpellCaster=>localization.Format("DiscoveriesUi.SpellCaster",DiscoveryNamed(SpellName,fact.Subject),DiscoveryMonsterName(fact.Detail)),

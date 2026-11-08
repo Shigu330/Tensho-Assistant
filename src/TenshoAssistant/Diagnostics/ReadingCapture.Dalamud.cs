@@ -472,6 +472,9 @@ public sealed unsafe class ReadingCapture : IDisposable
         try
         {
             if(message.Sender.TextValue.Trim().Length!=0)return;
+            // 0.888 (privacy, found in the user's log): a message that names a player (« X uses … ») is never written, not even masked: the name followed
+            // the marker as plain text. Only the game's own lines about you remain.
+            if(message.Message.Payloads.Any(payload=>payload is Dalamud.Game.Text.SeStringHandling.Payloads.PlayerPayload))return;
             if(objects.LocalPlayer?.ClassJob.RowId==18)Line("fishing",200,$"chat [{(int)message.LogKind}] {message.Message.TextValue}");
             // 0.809 (X-43, step 3): which game messages tell a defeat, a drop, a blue spell learned, a beast caught. The first five of each message kind,
             // sender empty (the game speaking), player names masked, item rows written out.

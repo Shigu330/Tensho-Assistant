@@ -31,7 +31,9 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     BlueSpellCaster=22,
     // X-73.18 (0.887, docs/evidence/0.887-fishing-bite.md): FishBite: Subject = fish, Detail = bite strength (1 !, 2 !!, 3 !!!, 0 unknown), place = where it was
     // caught, levels = the bite time in tenths of a second from the cast (casts under Chum are left out).
-    FishBite=23 }
+    FishBite=23,
+    // X-73.18 (0.888, docs/evidence/0.888-aetherial-reduction.md): Reduction: Subject = item obtained, Detail = the collectable reduced, levels = quantities.
+    Reduction=24 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported

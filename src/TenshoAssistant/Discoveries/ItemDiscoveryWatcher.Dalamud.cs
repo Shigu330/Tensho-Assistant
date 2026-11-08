@@ -192,7 +192,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             if(wanted.Fishing && me.ClassJob.RowId==18)ReadLine(now,me);
             if(wanted.ItemSources)
             {
-                ReadSalvage(at);ReadVenture(at);ReadLoot(at,territory,duty);
+                ReadSalvage(at);ReadPurify(at);ReadVenture(at);ReadLoot(at,territory,duty);
                 ReadFate(now);ReadTarget(now,territory,map);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);ReadShopNpc(at,territory,map);ReadCasters(at,territory,map);
             }
             var counts=Counts();
@@ -269,6 +269,25 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         salvageSeen=signature;
         foreach(var (item,count) in results)store.SeeSource(DiscoveryKind.Desynthesis,item,source,count,at);
         if(debug())log.Information("Discovery: desynthesis of {0}: {1}.",source,signature);
+    }
+
+    /// <summary>
+    /// X-73.18 (0.888, proved by the in-game capture, docs/evidence/0.888-aetherial-reduction.md): aetherial reduction (« Éthérolyse ») read in AgentPurify while
+    /// its result window shows: the collectable reduced (ResultItemId, +500 000 for a collectable) and each result (ItemId, Count), once per result.
+    /// </summary>
+    private string purifySeen="";
+    private void ReadPurify(DateTimeOffset at)
+    {
+        if(gui.GetAddonByName("PurifyResult") is not { IsNull:false,IsVisible:true }){purifySeen="";return;}
+        var agent=AgentPurify.Instance();
+        if(agent==null || agent->ResultItemId==0)return;
+        var source=ItemGains.BaseItem(agent->ResultItemId);var results=new List<(uint Item,int Count)>();
+        foreach(var result in agent->Results)if(result.ItemId!=0 && result.Count>0)results.Add((ItemGains.BaseItem(result.ItemId),result.Count));
+        var signature=source+":"+string.Join(",",results.Select(result=>$"{result.Item}x{result.Count}"));
+        if(results.Count==0 || signature==purifySeen)return;
+        purifySeen=signature;
+        foreach(var (item,count) in results)store.SeeSource(DiscoveryKind.Reduction,item,source,count,at);
+        if(debug())log.Information("Discovery: aetherial reduction of {0}: {1}.",source,signature);
     }
 
     private void ReadVenture(DateTimeOffset at)
