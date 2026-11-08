@@ -1432,6 +1432,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.895) Carte › calques : décocher Botaniste, les points de coupe et de fauche disparaissent, le reste demeure.
 
+- [ ] (0.896) Harpon : quelques prises ; chaque « vu par vous » doit garder la même ombre d'une prise à l'autre (Crabe-pagaie petit).
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

@@ -65,7 +65,7 @@ internal sealed partial class MainWindow
                 ImGui.TextColored(Accent,localization.Format("Spearfishing.SlotShadow",index+1,SpearShadowText(slot.Size,slot.Speed))
                     +(slot.Large ? " · "+localization.Get("Spearfishing.GuaranteedLarge"):""));
                 // 0.893 (user request: the fish's icon, to help the eye): the icons of the fish of the list with this shadow, four at most, at text height.
-                foreach(var match in rows.Where(row=>row.Size==slot.Size && row.Speed==slot.Speed).Take(4))
+                foreach(var match in rows.Where(row=>row.Size is { } size && row.Speed is { } speed && Gathering.Spearfishing.Shadows(slot).Contains((size,speed))).Take(4))
                 {
                     ImGui.SameLine();
                     DrawItemIcon(items?.Find(match.Fish),new Vector2(ImGui.GetTextLineHeight()));

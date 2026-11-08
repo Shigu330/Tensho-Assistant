@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.896.0
+- Plan global, Verify : Retour de l'utilisateur sur le harpon (« beaucoup mieux », capture) : le Crabe-pagaie était noté « grand, vitesse très rapide ». Le journal montre deux causes : la fenêtre augmente le compteur de prises un instant avant de changer le poisson pris (le crabe a reçu l'ombre du poisson suivant), et la vitesse d'une ombre peut doubler pendant qu'elle nage (250 → 500, 400 → 800). Corrections (X-73.18) : la prise est notée quand le poisson pris change (ou 0,6 s après, même poisson), deux prises d'un coup ne sont pas notées ; la vitesse est celle de l'apparition de l'ombre ; le panneau reconnaît aussi une ombre accélérée. Les ombres notées jusqu'ici sont écartées (preuve : docs/evidence/0.896-spearfishing-lag.md). Non validé en jeu.
+- Tests : Spearfish890Tests. Verify.ps1 (agent) : 1478/1478, 0 avertissement, 0 erreur ; DLL 0.896.0.0. Non validé en jeu.
+### English
+- User's report on spearfishing (« much better », capture): the Crabe-pagaie was noted « large, very fast ». The log shows two causes: the window raises the catch count a moment before it changes the fish caught (the crab got the next fish's shadow), and a shadow's speed can double while it swims (250 → 500, 400 → 800). Fixes (X-73.18): the catch is noted when the fish caught changes (or 0.6 s later, same fish), two catches at once are not noted; the speed is the shadow's when it appeared; the panel also recognises a sped-up shadow. Shadows noted so far are dropped (evidence: docs/evidence/0.896-spearfishing-lag.md). Not validated in game.
+
 ## 0.895.0
 - Plan global, Verify : Demande de l'utilisateur (X-80) : sur la carte, « Points de récolte » est séparé en Mineur, Botaniste et Pêcheur. Trois cases sous ce réglage (grisées quand il est coupé), dans le menu des calques et dans les réglages de la carte, prises en compte par « Tout » et « Rien » ; Pêcheur regroupe les trous de pêche et les points de harpon. Non validé en jeu.
 - Tests : MapGatherers895Tests. Verify.ps1 (agent) : 1478/1478, 0 avertissement, 0 erreur ; DLL 0.895.0.0. Non validé en jeu.

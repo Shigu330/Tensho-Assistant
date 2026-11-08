@@ -11,9 +11,11 @@ internal static class Spearfish890Tests
         {
             Check(ItemGains.SpearShadow([(2,200)])==(2,200) && ItemGains.SpearShadow([(2,200),(2,200)])==(2,200),"alike");
             Check(ItemGains.SpearShadow([(2,200),(1,150)]) is null && ItemGains.SpearShadow([]) is null && ItemGains.SpearShadow([(0,200)]) is null,"unknown");
-            Check(DiscoveryStore.HasPlace(DiscoveryKind.SpearShadow) && !Enum.IsDefined(typeof(DiscoveryKind),26),"kind 27, 26 refused");
+            Check(DiscoveryStore.HasPlace(DiscoveryKind.SpearShadow) && (int)DiscoveryKind.SpearShadow==28 && !Enum.IsDefined(typeof(DiscoveryKind),26) && !Enum.IsDefined(typeof(DiscoveryKind),27),"kind 28, 26 and 27 refused");
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs"));
-            Check(watcher.Contains("if(spearShown[index] && !fish.Available && (int)fish.Size is >= 1 and <= 3 && fish.Speed>0)spearGone.Add(((int)fish.Size,fish.Speed,now));"),"slot left");
+            Check(watcher.Contains("if(fish.Available && !spearShown[index])spearFirst[index]=(size,fish.Speed);"),"speed when it appeared");
+            Check(watcher.Contains("if(spearPending is { } pending && (item>0 && item!=pending.Item || now>=pending.Until))"),"item lag");
+            Check(Spearfishing.Shadows(new SpearfishSlot(0,true,3,800,false,false)).SequenceEqual(new[]{(3,800),(3,400)}),"doubled speed");
             Check(watcher.Contains("var speared=spearGone.Where(gone=>now-gone.At<=1_500)"),"1.5 s");
         }),
         ("Spearfishing panel: every fish of the node in a fixed order, yours first, in sight highlighted; fishing spot icon 60465 on the map",() =>

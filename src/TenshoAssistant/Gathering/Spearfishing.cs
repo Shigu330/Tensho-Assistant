@@ -31,12 +31,19 @@ public static class Spearfishing
     /// </summary>
     public static IReadOnlyList<SpearfishRow> Rows(IEnumerable<uint> fish,Func<uint,(int Size,int Speed)?> seen,Func<uint,(int Size,int Speed)?> community,IReadOnlyList<SpearfishSlot> slots)
     {
-        var inSight=slots.Where(slot=>slot.Available).Select(slot=>(slot.Size,slot.Speed)).ToHashSet();
+        var inSight=slots.Where(slot=>slot.Available).SelectMany(Shadows).ToHashSet();
         return fish.Distinct().Select(id=>
         {
             var own=seen(id);var shadow=own ?? community(id);
             return new SpearfishRow(id,shadow?.Size,shadow?.Speed,own is not null,shadow is { } known && inSight.Contains(known));
         }).OrderBy(row=>row.Size ?? 9).ThenBy(row=>row.Speed ?? int.MaxValue).ThenBy(row=>row.Fish).ToArray();
+    }
+
+    /// <summary>0.896: the shadows a slot may stand for: its speed, and half of it (a shadow's speed doubles while it swims, docs/evidence/0.896-spearfishing-lag.md).</summary>
+    public static IEnumerable<(int Size,int Speed)> Shadows(SpearfishSlot slot)
+    {
+        yield return (slot.Size,slot.Speed);
+        if(slot.Speed>0 && slot.Speed%2==0)yield return (slot.Size,slot.Speed/2);
     }
 
     public static SpearfishCandidates Candidates(IEnumerable<GatherBuddyFish> fish,SpearfishSlot slot,Func<uint,bool> inZone)

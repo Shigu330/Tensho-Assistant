@@ -335,12 +335,15 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     }
 
     /// <summary>
-    /// X-73.18 (0.890, 0.891, docs/evidence/0.891-spearfishing-slots.md): spearfishing. The window's AtkValues 21 (catches so far) and 12 (the item last caught),
-    /// read in game: 21 grows by one at each catch, 12 is then the fish the chat names. The fish speared is the slot of AddonSpearFishing.Fish that stops being
-    /// available while keeping its size and speed (a fish that swims away is cleared to zero), in the 1.5 s before the catch; eleven catches of the user's
-    /// capture gave each fish one shadow only this way.
+    /// X-73.18 (0.890, 0.891, 0.896; docs/evidence/0.891-spearfishing-slots.md, 0.896-spearfishing-lag.md): spearfishing. The window's AtkValues 21 (catches so far)
+    /// and 12 (the item last caught): 21 grows by one at each catch, 12 follows a moment later (0.896: read once with the fish before). The fish speared is the slot
+    /// of AddonSpearFishing.Fish that stops being available while keeping its size and speed (a fish that swims away is cleared to zero), in the 1.5 s before the
+    /// catch; its speed is the one it had when it appeared (a shadow's speed can double while it swims). The catch is written once 12 changes, or 0.6 s later
+    /// (the same fish again); two catches at once, or a second one before, give nothing.
     /// </summary>
-    private int spearCatches=-1;private readonly bool[] spearShown=new bool[3];private readonly List<(int Size,int Speed,long At)> spearGone=[];
+    private int spearCatches=-1;private readonly bool[] spearShown=new bool[3];private readonly (int Size,int Speed)[] spearFirst=new (int,int)[3];
+    private readonly List<(int Size,int Speed,long At)> spearGone=[];
+    private (int Item,(int Size,int Speed)? Shadow,long Until,DateTimeOffset At,uint Territory,uint Map,Vector3 Position)? spearPending;
     private static int SpearValue(FFXIVClientStructs.FFXIV.Component.GUI.AtkValue value)=>value.Type switch
     {
         FFXIVClientStructs.FFXIV.Component.GUI.AtkValueType.Int=>value.Int,
@@ -350,29 +353,37 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     private void ReadSpear(DateTimeOffset at,long now,uint territory,uint map,Vector3 position)
     {
         var handle=gui.GetAddonByName("SpearFishing");
-        if(handle.IsNull || !handle.IsVisible){spearCatches=-1;Array.Clear(spearShown);spearGone.Clear();return;}
+        if(handle.IsNull || !handle.IsVisible){spearCatches=-1;Array.Clear(spearShown);spearGone.Clear();spearPending=null;return;}
         var unit=(FFXIVClientStructs.FFXIV.Component.GUI.AtkUnitBase*)handle.Address;var addon=(FFXIVClientStructs.FFXIV.Client.UI.AddonSpearFishing*)handle.Address;
         if(unit->AtkValues==null || unit->AtkValuesCount<=21)return;
         for(var index=0;index<Math.Min(addon->Fish.Length,spearShown.Length);index++)
         {
-            var fish=addon->Fish[index];
-            if(spearShown[index] && !fish.Available && (int)fish.Size is >= 1 and <= 3 && fish.Speed>0)spearGone.Add(((int)fish.Size,fish.Speed,now));
+            var fish=addon->Fish[index];var size=(int)fish.Size;
+            if(fish.Available && !spearShown[index])spearFirst[index]=(size,fish.Speed);
+            if(spearShown[index] && !fish.Available && size is >= 1 and <= 3 && fish.Speed>0)
+                spearGone.Add((size,spearFirst[index].Size==size && spearFirst[index].Speed>0 ? spearFirst[index].Speed:fish.Speed,now));
             spearShown[index]=fish.Available;
         }
         if(spearGone.Count>32)spearGone.RemoveRange(0,spearGone.Count-32);
         var count=SpearValue(unit->AtkValues[21]);var item=SpearValue(unit->AtkValues[12]);
-        if(count<0)return;
-        if(count<spearCatches)spearGone.Clear();
-        if(spearCatches>=0 && count==spearCatches+1 && item>0)
+        if(spearPending is { } pending && (item>0 && item!=pending.Item || now>=pending.Until))
         {
-            var speared=spearGone.Where(gone=>now-gone.At<=1_500).Select(gone=>(gone.Size,gone.Speed)).ToArray();
-            if(ItemGains.SpearShadow(speared) is { } shadow)
+            spearPending=null;
+            if(item>0 && pending.Shadow is { } shadow)
             {
-                store.SeeSource(DiscoveryKind.SpearShadow,(uint)item,(uint)shadow.Size,shadow.Speed,at,territory,map,position);
+                store.SeeSource(DiscoveryKind.SpearShadow,(uint)item,(uint)shadow.Size,shadow.Speed,pending.At,pending.Territory,pending.Map,pending.Position);
                 if(debug())log.Information("Discovery: spearfishing {0}, shadow size {1}, speed {2}.",item,shadow.Size,shadow.Speed);
             }
-            else if(debug())log.Information("Discovery: spearfishing {0}, shadow unknown ({1} kinds left the window).",item,speared.Distinct().Count());
+            else if(debug())log.Information("Discovery: spearfishing {0}, shadow unknown.",item);
+        }
+        if(count<0)return;
+        if(count<spearCatches){spearGone.Clear();spearPending=null;}
+        else if(spearCatches>=0 && count>spearCatches)
+        {
+            var speared=spearGone.Where(gone=>now-gone.At<=1_500).Select(gone=>(gone.Size,gone.Speed)).ToArray();
             spearGone.Clear();
+            if(count==spearCatches+1 && spearPending is null)spearPending=(item,ItemGains.SpearShadow(speared),now+600,at,territory,map,position);
+            else{spearPending=null;if(debug())log.Information("Discovery: spearfishing, {0} catches at once: not noted.",count-spearCatches);}
         }
         spearCatches=count;
     }

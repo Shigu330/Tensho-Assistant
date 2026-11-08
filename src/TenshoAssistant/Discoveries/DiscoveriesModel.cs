@@ -38,9 +38,11 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     // 1 000 000 to nothing: the HQ demand is kept as LevelMax = 1), LevelMin = quantity asked.
     QuestItemAsked=25,
     // 26 was 0.890's spearfishing shadow, taken from the shadows left in sight: wrong (docs/evidence/0.891-spearfishing-slots.md); its facts are refused when read.
-    // X-73.18 (0.891): SpearShadow: Subject = fish speared, Detail = the shadow's size (1 small, 2 average, 3 large), levels = its speed, place = where it was
-    // speared. The shadow is the slot that left the window with its size and speed kept, just before the catch.
-    SpearShadow=27 }
+    // 27 was 0.891's: the item was read a moment too early (it lags the catch count) and the speed could be the doubled one (docs/evidence/0.896-spearfishing-lag.md);
+    // its facts are refused when read.
+    // X-73.18 (0.896): SpearShadow: Subject = fish speared, Detail = the shadow's size (1 small, 2 average, 3 large), levels = its speed when it appeared, place =
+    // where it was speared. The shadow is the slot that left the window with its size and speed kept, just before the catch.
+    SpearShadow=28 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported

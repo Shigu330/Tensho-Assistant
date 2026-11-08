@@ -17,7 +17,7 @@ import base64,collections,gzip,json,math,os,re,subprocess,sys,urllib.request,zip
 from datetime import datetime,timezone,timedelta
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COMMON=os.path.join(ROOT,"community-discoveries","discoveries.json");PLAYERS=os.path.join(ROOT,"community-discoveries","players")
-KINDS=set(range(1,28))-{26};PLACED={1,2,3,8,10,19,22,23,27}  # 26: 0.890's wrong spearfishing shadow;CELL=50;MAX_FACTS=200_000
+KINDS=set(range(1,29))-{26,27};PLACED={1,2,3,8,10,19,22,23,28}  # 26, 27: 0.890's and 0.891's wrong spearfishing shadows;CELL=50;MAX_FACTS=200_000
 FIELDS={"Kind","Subject","Detail","Territory","Map","CellX","CellZ","X","Z","LevelMin","LevelMax","Seen","Imported","First","Last"}
 
 def key(f):return f"{f['Kind']}:{f['Subject']}:{f['Detail']}:{f['Territory']}:{f['Map']}:{f['CellX']}:{f['CellZ']}"
