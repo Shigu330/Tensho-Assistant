@@ -32,6 +32,12 @@ public sealed unsafe class ReadingCapture : IDisposable
     private bool fishing,disposed,warned;
     // X-73.13 (0.869): the fishing line's state (cast, bite, how long, the player's animation at the bite), aetherial reduction results, items asked at a hand-in.
     private int fishState=-1;private long castAt=-100_000;private string purify="",npcTrade="";
+    // X-75.7 (0.881, docs/evidence/0.874-probe-coverage.md): the windows whose numbers would replace community data (spearfishing size and speed, airship
+    // destinations and results, submarine results, overmeld rate, spiritbond extraction, letters' attachments), the Fashion Report preview and best score
+    // (dyes, evaluations), and the island's wild animals. Numbers only: no text is written, so no name (a letter's sender) can reach the log.
+    private static readonly string[] ProbedWindows=["SpearFishing","AirShipExploration","AirShipExplorationResult","SubmarineExplorationResult","MateriaAttachDialog",
+        "Materialize","LetterViewer"];
+    private readonly Dictionary<string,string> windowValues=[];private string fashionSeen="",islandObjects="";
     private long slowAt;
 
     public ReadingCapture(IFramework framework,IObjectTable objects,ICondition condition,IGameGui gui,IChatGui chat,Func<bool> enabled,IPluginLog log)
@@ -77,6 +83,9 @@ public sealed unsafe class ReadingCapture : IDisposable
             ReadIsland();
             ReadPurify();
             ReadNpcTrade();
+            ReadWindows();
+            ReadFashion();
+            ReadIslandObjects();
             warned=false;
         }
         catch(Exception error)
@@ -108,6 +117,56 @@ public sealed unsafe class ReadingCapture : IDisposable
             for(var slot=0;slot<sequencer->TimelineIds.Length;slot++)if(sequencer->TimelineIds[slot]!=0)text.Append($" {slot}:{sequencer->TimelineIds[slot]}");
         }
         Line("fishline",400,text.ToString());
+    }
+
+    private void ReadWindows()
+    {
+        foreach(var name in ProbedWindows)
+        {
+            var handle=gui.GetAddonByName(name);
+            if(handle.IsNull || !handle.IsVisible){windowValues.Remove(name);continue;}
+            var unit=(AtkUnitBase*)handle.Address;
+            var values=new StringBuilder();
+            for(var index=0;index<Math.Min((int)unit->AtkValuesCount,96) && unit->AtkValues!=null;index++)
+            {
+                var value=unit->AtkValues[index];
+                if(value.Type==AtkValueType.UInt)values.Append($" {index}={value.UInt}");
+                else if(value.Type==AtkValueType.Int)values.Append($" {index}={value.Int}");
+                else if(value.Type==AtkValueType.Bool)values.Append($" {index}={value.Bool}");
+            }
+            var all=values.ToString();
+            if(windowValues.GetValueOrDefault(name)==all)continue;
+            windowValues[name]=all;
+            Line("addons",160,$"{name}:{all}");
+        }
+    }
+
+    private void ReadFashion()
+    {
+        var manager=FFXIVClientStructs.FFXIV.Client.Game.FashionCheckManager.Instance();
+        if(manager==null)return;
+        var best=&manager->HighScore;
+        var text=new StringBuilder($"preview theme {manager->Preview.WeeklyTheme}, high {manager->Preview.HighScore}, remaining {manager->Preview.Remaining}; theme {manager->Theme.WeeklyTheme}; best score {best->Score}, slots");
+        for(var slot=0;slot<best->ItemIds.Length;slot++)
+            if(best->ItemIds[slot]!=0)text.Append($" {slot}:{best->ItemIds[slot]}/{(slot<best->ItemEvaluations.Length ? best->ItemEvaluations[slot]:0)}/dye {(slot<best->Stain0Ids.Length ? best->Stain0Ids[slot]:0)},{(slot<best->Stain1Ids.Length ? best->Stain1Ids[slot]:0)}");
+        var all=text.ToString();
+        if(all==fashionSeen)return;
+        fashionSeen=all;
+        Line("fashion",40,all);
+    }
+
+    private void ReadIslandObjects()
+    {
+        if((nint)MJIManager.StaticAddressPointers.ppInstance==0)return;
+        var manager=MJIManager.Instance();
+        if(manager==null || !manager->IsPlayerInSanctuary){islandObjects="";return;}
+        var seen=objects.Where(actor=>actor.ObjectKind is Dalamud.Game.ClientState.Objects.Enums.ObjectKind.BattleNpc && actor.BaseId!=0).Take(40)
+            .Select(actor=>actor is Dalamud.Game.ClientState.Objects.Types.IBattleNpc npc ? $"{npc.BaseId}/{npc.NameId}/{npc.BattleNpcKind}":$"{actor.BaseId}")
+            .Distinct().Order(StringComparer.Ordinal).ToArray();
+        var all=string.Join(" ",seen);
+        if(all==islandObjects)return;
+        islandObjects=all;
+        Line("islandobjects",40,all);
     }
 
     // X-73.13 (0.869): what aetherial reduction gives (AgentPurify: the item reduced, the results and their counts, the bonus flag).

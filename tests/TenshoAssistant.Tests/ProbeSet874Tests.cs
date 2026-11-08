@@ -5,7 +5,8 @@ internal static class ProbeSet874Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
-    private static readonly string[] Parts=["airship","eventMarkers","fishing","fishline","island","islandAgenda","leves","mapMarkers","messages","monsterEvents","npctrade",
+    // 0.881 (X-75.7): addons, fashion, islandobjects added.
+    private static readonly string[] Parts=["addons","airship","eventMarkers","fashion","fishing","fishline","island","islandAgenda","islandobjects","leves","mapMarkers","messages","monsterEvents","npctrade",
         "purify","questMarkers","retainer","statuses","synthesis","workshop"];
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [

@@ -1402,6 +1402,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.880) Pêche en mer : à bord, aucune ligne « Ocean schedule check: the game says » dans le journal (sinon l'horaire est faux).
 
+- [ ] (0.881) Mode développeur, journal « Reading addons / fashion / islandobjects » : pêche au harpon, aéronef envoyé puis revenu, sous-marin revenu, sertissage forcé, extraction de matéria, lettre avec pièce jointe, revue de mode (avant et après jugement), île sanctuaire près des animaux.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

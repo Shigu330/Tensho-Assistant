@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.881.0
+- Plan global, Verify : Demande (X-75.7) : nouvelles sondes en mode développeur avant les derniers parseurs. Le journal note maintenant, à chaque changement : les nombres des fenêtres de pêche au harpon (taille, vitesse), d'exploration et de résultat des aéronefs, de résultat des sous-marins, de sertissage forcé (taux), d'extraction de matéria (lien solide) et du courrier (pièces jointes), sans aucun texte, donc sans nom ; l'aperçu de la revue de mode et le meilleur score avec teintures ; les animaux sauvages de l'île (numéros). Les relevés à faire en jeu sont listés. Non validé en jeu.
+- Tests : Probes881Tests. Verify.ps1 (agent) : 1468/1468, 0 avertissement, 0 erreur ; DLL 0.881.0.0. Non validé en jeu.
+### English
+- Request (X-75.7): new developer-mode probes before the last parsers. The log now notes, at each change: the numbers of the spearfishing (size, speed), airship exploration and result, submarine result, overmeld (rate), materia extraction (spiritbond) and letter (attachments) windows, with no text at all, so no name; the Fashion Report preview and best score with dyes; the island's wild animals (ids). The in-game readings to make are listed. Not validated in game.
+
 ## 0.880.0
 - Plan global, Verify : Demande (X-75.6) : deux règles venues des outils communautaires sont maintenant contrôlées par le jeu lui-même. Pêche en mer : à bord, la route que le jeu indique est comparée à celle que donne l'horaire pour ce départ, une fois par voyage ; un écart est écrit dans le journal Dalamud. Météo : 10 secondes après l'entrée dans une zone ouverte, la météo prévue par Tensho est comparée à celle du jeu (comptée ; détail dans le journal de débogage des découvertes). Les durées des voyages de sous-marins pourraient venir des fonctions de calcul du jeu, comme celles des aéronefs : décision à vous soumettre. Non validé en jeu.
 - Tests : GameChecks880Tests. Verify.ps1 (agent) : 1467/1467, 0 avertissement, 0 erreur ; DLL 0.880.0.0. Non validé en jeu.
