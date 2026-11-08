@@ -98,7 +98,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(followed.Contains(selected.Id));
         try{if(ImGui.SmallButton(localization.Get("FreeCompany.WorkshopFollow")))Follow([selected]);}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("FreeCompany.WorkshopFollowTip"));
+        Tip("FreeCompany.WorkshopFollowTip");
         var set=WorkshopStock.SameSet(projects,selected);
         if(set.Count>1)
         {
@@ -115,7 +115,7 @@ internal sealed partial class MainWindow
         foreach(var project in shown)
         {
             if(ImGui.SmallButton($"×##WorkshopUnfollow{project.Id}"))removed=project.Id;
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FreeCompany.WorkshopUnfollowTip"));
+            Tip("FreeCompany.WorkshopUnfollowTip");
             ImGui.SameLine();ImGui.TextUnformatted(WorkshopName(project));
         }
         if(removed is { } gone){configuration.WorkshopFollowed=followed.Where(id=>id!=gone).ToList();SaveReminders();}

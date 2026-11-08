@@ -77,7 +77,7 @@ internal sealed partial class MainWindow
                         ImGui.TableNextColumn();ImGui.TextDisabled(Part(gained));
                         ImGui.TableNextColumn();ImGui.TextDisabled(Part(spent));
                         ImGui.TableNextColumn();ImGui.TextDisabled(localization.Get("GilJournal.Transfer"));
-                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GilJournal.TransferTip"));
+                        Tip("GilJournal.TransferTip");
                         continue;
                     }
                     ImGui.TableNextColumn();if(gained>0)ImGui.TextColored(Success,Part(gained));else ImGui.TextDisabled(Part(gained));

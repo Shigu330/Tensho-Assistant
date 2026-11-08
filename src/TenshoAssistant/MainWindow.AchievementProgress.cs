@@ -26,7 +26,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("AchievementProgress.Ask")+$"##Ask{id}") && AchievementProgressSource?.Request(id)==false)
             saveError=localization.Get("AchievementProgress.Wait");
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("AchievementProgress.AskTip"));
+        Tip("AchievementProgress.AskTip");
     }
 
     private void ToggleTracked(uint id)

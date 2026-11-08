@@ -78,10 +78,10 @@ internal sealed partial class MainWindow
                     Tip("ChainUi.DoneTip");
                     ImGui.SameLine();
                     if (ImGui.SmallButton(localization.Get("ChainUi.Log"))) OpenCraftLog(step.Recipe);
-                    if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("ChainUi.LogTip"));
+                    Tip("ChainUi.LogTip");
                     ImGui.SameLine();
                     if (ImGui.SmallButton(localization.Get("ChainUi.Simulate"))) OpenCraftSimulation(step.Recipe);
-                    if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("ChainUi.SimulateTip"));
+                    Tip("ChainUi.SimulateTip");
                     ImGui.SameLine();
                     DrawChainItem(step.Recipe.ResultItemId);
                     ImGui.SameLine();

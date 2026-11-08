@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
         var announce=localization.Format("HuntTrain.AnnounceText",called.Name,called.Rank switch{3=>"S",2=>"A",_=>"B"},called.Zone);
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("HuntTrain.Announce")))ImGui.SetClipboardText(announce+" <flag>");
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("HuntTrain.AnnounceTip"));
+        Tip("HuntTrain.AnnounceTip");
         // X-13 (0.447, decided 2026-11-03): sent to the chosen channel on click only, once the flag is on that stop, 5 s apart.
         ImGui.SameLine();
         ImGui.SetNextItemWidth(70);
@@ -91,13 +91,12 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(!ready);
         if(ImGui.SmallButton(localization.Get("HuntTrain.Send")) && ready){SendHuntCall!(command!);huntCallSentAt=DateTimeOffset.UtcNow;}
         ImGui.EndDisabled();
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            WrappedTooltip(localization.Get(huntTrainCalled is null ? "HuntTrain.SendNeedsFlag":"HuntTrain.SendTip"));
+        Tip(huntTrainCalled is null ? "HuntTrain.SendNeedsFlag":"HuntTrain.SendTip");
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("HuntTrain.Copy")))ImGui.SetClipboardText(HuntTrain.Export(huntTrain));
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("HuntTrain.Clear")) && ImGui.GetIO().KeyCtrl){huntTrain=[];huntTrainCalled=null;return;}
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("HuntTrain.ClearTip"));
+        Tip("HuntTrain.ClearTip");
         for(var index=0;index<huntTrain.Count;index++)
         {
             var stop=huntTrain[index];

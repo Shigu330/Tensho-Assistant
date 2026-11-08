@@ -42,7 +42,7 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,localization.Get("Home.TodayTitle"));
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("Home.Customize")))ImGui.OpenPopup("HomeCustomize");
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Home.CustomizeTip"));
+        Tip("Home.CustomizeTip");
         DrawHomeCustomize();
         foreach(var (key,text,target,good) in homeToday)
         {

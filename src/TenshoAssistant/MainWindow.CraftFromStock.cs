@@ -232,13 +232,13 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(fromStockPage<=0);
         try{if(ImGui.SmallButton("<###CraftStockPrevious"))fromStockPage--;}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("CraftStock.PreviousTip"));
+        Tip("CraftStock.PreviousTip");
         ImGui.SameLine();ImGui.TextUnformatted(localization.Format("CraftStock.Page",fromStockPage+1,known.Pages));
         ImGui.SameLine();
         ImGui.BeginDisabled(fromStockPage>=known.Pages-1);
         try{if(ImGui.SmallButton(">###CraftStockNext"))fromStockPage++;}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("CraftStock.NextTip"));
+        Tip("CraftStock.NextTip");
         if(result.Undecided>0)ImGui.TextDisabled(localization.Format("CraftStock.Undecided",result.Undecided.ToString("N0")));
         if(rows.Length==0){ImGui.TextDisabled(localization.Get("CraftStock.Empty"));return;}
         DrawChainList("CraftStockList",rows.Length,index=>
@@ -253,11 +253,11 @@ internal sealed partial class MainWindow
                 foreach(var recipe in line.All){ImGui.SameLine();DrawFromStockJob(recipe);}
                 ImGui.SameLine();
                 ImGui.TextDisabled(FromStockRowText(row));
-                if(row.Chained && ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftStock.RowChainedTip"));
+                if(row.Chained)Tip("CraftStock.RowChainedTip");
                 if(fromStockValues.TryGetValue(row.Recipe.RecipeId,out var worth)){ImGui.SameLine();ImGui.TextColored(Success,worth);}
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("ChainUi.Simulate")))OpenCraftSimulation(row.Recipe);
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("ChainUi.SimulateTip"));
+                Tip("ChainUi.SimulateTip");
             }
             finally{ImGui.PopID();}
         },Math.Max(260,ImGui.GetContentRegionAvail().Y));

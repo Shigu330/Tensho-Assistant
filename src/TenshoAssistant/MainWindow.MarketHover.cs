@@ -168,10 +168,8 @@ internal sealed partial class MainWindow
     // quests that reward them, recipes that make them.
     private void DrawCollectionTooltip(Collections.CollectionEntry entry)
     {
-        ImGui.BeginTooltip();
-        try
+        using(TooltipScope.Begin())
         {
-            ImGui.PushTextWrapPos(ImGui.GetFontSize()*26);
             ImGui.TextColored(Accent,entry.Name);
             var acquisition=CollectionStateOf(entry);
             ImGui.TextColored(acquisition switch{Collections.CollectionAcquisition.Acquired=>UI.FfxivTheme.Success,Collections.CollectionAcquisition.NotAcquired=>UI.FfxivTheme.Error,_=>UI.FfxivTheme.TextMuted},
@@ -222,9 +220,7 @@ internal sealed partial class MainWindow
             // 0.331: the right-click menu exists for these kinds only (MainWindow.Collections.cs), not for emotes.
             if(entry.Kind is Collections.CollectionKind.Mount or Collections.CollectionKind.Companion or Collections.CollectionKind.TripleTriad or Collections.CollectionKind.Orchestrion)
                 ImGui.TextDisabled(localization.Get("SourceLinks.Hint"));
-            ImGui.PopTextWrapPos();
         }
-        finally{ImGui.EndTooltip();}
     }
 
     private Community.GarlandItemSourceService? itemSources;
@@ -305,11 +301,9 @@ internal sealed partial class MainWindow
     {
         if(ItemTooltipAlreadyDrawn(id))return;
         var item=itemCatalog.State.Catalog?.Find(id);
-        ImGui.BeginTooltip();
-        try
+        using(TooltipScope.Begin())
         {
             DrawEnglishItemName(item);
-            ImGui.PushTextWrapPos(ImGui.GetFontSize()*24);
             DrawItemImage(item,new Vector2(32));ImGui.SameLine();
             ImGui.BeginGroup();
             ImGui.TextColored(Accent,item?.Name ?? localization.Format("HoverUi.Item",id));
@@ -318,9 +312,7 @@ internal sealed partial class MainWindow
             if(item is { ItemLevel:>1 })ImGui.TextDisabled(localization.Format("HoverUi.Levels",item.ItemLevel,item.EquipLevel));
             if(ShowIds)ImGui.TextDisabled($"ID {id}");
             DrawItemInfoBody(item,id);
-            ImGui.PopTextWrapPos();
         }
-        finally{ImGui.EndTooltip();}
     }
 
     // 0.257: the body of the common item tooltip (collection, stock, usages, how to get it), also drawn under the game's tooltip so

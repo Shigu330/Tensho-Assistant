@@ -46,7 +46,7 @@ internal sealed partial class MainWindow
         Tip("TriadSort.OrderTip");
         ImGui.SameLine();
         if (ImGui.SmallButton(localization.Get("TriadSort.Rules") + "##TriadScoreRules")) ImGui.OpenPopup("TriadScoreRules");
-        if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("TriadSort.ScoreHelp"));
+        Tip("TriadSort.ScoreHelp");
         if (!ImGui.BeginPopup("TriadScoreRules")) return;
         try
         {

@@ -142,7 +142,7 @@ internal sealed partial class MainWindow
             var place=BlueSpellSources.Parse(row.Location);
             if(place.X is not { } x || place.Y is not { } y || MapOfEnglishPlace(place.Place) is not { } map)continue;
             PlaceMenu($"BluePlace{index}",map,new(x,y),CommunityMonster(row.Name));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("EntityMenu.RightClickPlace"));
+            Tip("EntityMenu.RightClickPlace");
             ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("BlueSpellSources.Flag")+$"##BlueFlag{index}"))PlaceFlagFromMapView(map,x,y);
         }

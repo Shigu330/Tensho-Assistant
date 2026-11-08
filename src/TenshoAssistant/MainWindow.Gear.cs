@@ -256,7 +256,7 @@ internal sealed partial class MainWindow
                 ItemLinksMenu("GearSlotMenu",definition);
                 ImGui.TextDisabled(localization.Format("Gear.LevelLine",shown.Level,shown.ItemLevel));
                 if(changed || look is not null){ImGui.SameLine();DrawOwnedMark(shown.Id);}
-                if(look is not null){ImGui.SameLine();ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("Gear.GlamourOnly"));if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Gear.GlamourOnlyTip"));}
+                if(look is not null){ImGui.SameLine();ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("Gear.GlamourOnly"));Tip("Gear.GlamourOnlyTip");}
                 else if(shown.SocketCount>0){ImGui.SameLine();DrawMateriaSockets(catalog,state,slot,shown,hq);}
             }
             ImGui.EndGroup();
@@ -447,8 +447,7 @@ internal sealed partial class MainWindow
         }
         if(hovered)
         {
-            ImGui.BeginTooltip();
-            try
+            using(TooltipScope.Begin())
             {
                 ImGui.TextColored(UI.FfxivTheme.Gold,localization.Format("Gear.Sockets",item.MateriaSlots,item.SocketCount-item.MateriaSlots));
                 for(var socket=0;socket<melds.Count;socket++)
@@ -465,7 +464,6 @@ internal sealed partial class MainWindow
                 DrawPieceCaps(item,hq,catalog.MateriaValues(melds),CombatCategory(state.Category));
                 ImGui.TextDisabled(localization.Get("Gear.SocketsClick"));
             }
-            finally{ImGui.EndTooltip();}
         }
         if(ImGui.IsItemClicked())ImGui.OpenPopup("GearMateria");
         if(!ImGui.BeginPopup("GearMateria"))return;
@@ -639,15 +637,13 @@ internal sealed partial class MainWindow
         var have=worn || owned is { Total:>0 };
         DrawStateMark(have);
         if(!ImGui.IsItemHovered())return;
-        ImGui.BeginTooltip();
-        try
+        using(TooltipScope.Begin())
         {
             if(worn)ImGui.TextColored(Success,localization.Get("Gear.Worn"));
             if(owned is null || !owned.HasObservation){if(!worn)ImGui.TextDisabled(localization.Get("HoverUi.OwnedUnknown"));return;}
             foreach(var row in owned.Rows.Where(row=>row.Nq+row.Hq>0))ImGui.TextUnformatted(localization.Format("HoverUi.StorageRow",StorageRowName(row),(row.Nq+row.Hq).ToString("N0")));
             if(!have)ImGui.TextDisabled(localization.Get(owned.HasUnknown ? "Gear.NotOwnedPartial":"Gear.NotOwned"));
         }
-        finally{ImGui.EndTooltip();}
     }
 
     // Pieces of the plan the character does not own yet, each with its sources (the item menu's groups: vendors, crafting, duties…).

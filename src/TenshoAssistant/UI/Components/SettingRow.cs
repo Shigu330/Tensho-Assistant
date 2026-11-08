@@ -59,7 +59,7 @@ internal sealed partial class MainWindow
         bool clicked;
         try{clicked=ImGui.SmallButton(FontAwesomeIcon.Undo.ToIconString()+"###Default"+id);}
         finally{ImGui.PopFont();}
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Settings.ResetValue"));
+        Tip("Settings.ResetValue");
         return clicked;
     }
 

@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
             var place=BlueSpellSources.Parse(row.Location);
             if(place.X is not { } x || place.Y is not { } y || MapOfEnglishPlace(place.Place) is not { } map)continue;
             PlaceMenu($"WikiMonsterPlace{wikiRow}",map,new(x,y),CommunityMonster(row.Name));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("EntityMenu.RightClickPlace"));
+            Tip("EntityMenu.RightClickPlace");
         }
     }
     private void DrawMonsterLoot()

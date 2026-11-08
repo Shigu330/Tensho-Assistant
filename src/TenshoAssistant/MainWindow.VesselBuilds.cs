@@ -264,11 +264,11 @@ internal sealed partial class MainWindow
             var retrieval=VesselBuilds.Retrieval(planned.Stats.Retrieval,breakpoint);
             var favor=VesselBuilds.FavorReached(planned.Stats.Favor,breakpoint)==true;
             ImGui.TextColored(surveillance==SurveillanceTier.High ? Success:UI.FfxivTheme.Gold,localization.Format("VesselBuilds.SurveillanceLine",names.ElementAtOrDefault(0) ?? "",planned.Stats.Surveillance,breakpoint.T2,breakpoint.T3,localization.Get("VesselBuilds.Tier"+surveillance)));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("VesselBuilds.SurveillanceTip"));
+            Tip("VesselBuilds.SurveillanceTip");
             ImGui.TextColored(retrieval==RetrievalTier.Optimal ? Success:UI.FfxivTheme.Gold,localization.Format("VesselBuilds.RetrievalLine",names.ElementAtOrDefault(1) ?? "",planned.Stats.Retrieval,breakpoint.Normal,breakpoint.Optimal,localization.Get("VesselBuilds.Retrieval"+retrieval)));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("VesselBuilds.RetrievalTip"));
+            Tip("VesselBuilds.RetrievalTip");
             ImGui.TextColored(favor ? Success:UI.FfxivTheme.Gold,localization.Format("VesselBuilds.FavorLine",names.ElementAtOrDefault(4) ?? "",planned.Stats.Favor,breakpoint.Favor,localization.Get(favor ? "VesselBuilds.FavorYes":"VesselBuilds.FavorNo")));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("VesselBuilds.FavorTip"));
+            Tip("VesselBuilds.FavorTip");
             // 0.334 (DEC-023, point 1): the community table is kept; on its 19 sectors below every record, the tier is said unconfirmed.
             if(VesselBuilds.Unconfirmed(buildRoute))
             {
@@ -280,7 +280,7 @@ internal sealed partial class MainWindow
         if(VesselBuilds.VoyagesUntilRepair(damage) is { } voyages)
         {
             ImGui.TextDisabled(localization.Format("VesselBuilds.Wear",voyages,damage));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("VesselBuilds.WearTip"));
+            Tip("VesselBuilds.WearTip");
         }
         DrawBestBuilds(catalog,plan,distance,breakpoint,SecondsOf,sectors.Select(sector=>sector.RankReq).ToArray());
     }

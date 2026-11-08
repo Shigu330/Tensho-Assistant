@@ -159,7 +159,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();
                     var stock=GetRecipeHoldings(id);
                     ImGui.TextUnformatted(!stock.HasObservation ? localization.Get("FashionUi.Unknown") : $"{stock.Total:N0}{(stock.HasCached ? localization.Get("UiFragments.CacheSuffix"):"")}{(stock.HasUnknown ? localization.Get("UiFragments.PartialSuffix"):"")}");
-                    if(ImGui.IsItemHovered()) WrappedTooltip(localization.Get("FashionUi.StockHelp"));
+                    Tip("FashionUi.StockHelp");
                 }
             }
             finally { clipper.End(); clipper.Destroy(); }

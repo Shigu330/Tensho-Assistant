@@ -442,7 +442,7 @@ internal sealed partial class MainWindow
                 craftBookFilter = string.Empty;
         }
         finally { ImGui.PopFont(); }
-        if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("RecipeUi.AllJobs"));
+        Tip("RecipeUi.AllJobs");
 
         foreach (var (craftType, craftTypeId) in craftTypes)
         {
@@ -482,7 +482,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         if (crafted) { DrawStateMark(true); ImGui.SameLine(); ImGui.TextDisabled(localization.Get("RecipeUi.Crafted")); }
         else ImGui.TextColored(Accent, localization.Get("RecipeUi.NeverCrafted"));
-        if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("RecipeUi.CraftedTip"));
+        Tip("RecipeUi.CraftedTip");
     }
     private void DrawCraftBook(IReadOnlyList<RecipeDefinition> recipes, string source)
     {
@@ -616,7 +616,7 @@ internal sealed partial class MainWindow
             var buttonWidth = Math.Max(90, ImGui.CalcTextSize(label).X + 20);
             if (ImGui.Selectable($"{label}##IngredientButton", false, ImGuiSelectableFlags.None, new Vector2(buttonWidth, 30)))
                 SelectItem(ingredient.ItemId);
-            if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("RecipeUi.IngredientHint"));
+            Tip("RecipeUi.IngredientHint");
             ImGui.SameLine();
             ImGui.TextDisabled($"× {ingredient.Amount}");
             ImGui.SameLine();

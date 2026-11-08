@@ -226,7 +226,7 @@ internal sealed partial class MainWindow
                     else
                     {
                         DrawItemIcon(local,new Vector2(28)); ImGui.SameLine(); ImGui.TextDisabled(item.Name);
-                        if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("UiFragments.MissingItem"));
+                        Tip("UiFragments.MissingItem");
                     }
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted(item.Sources.Length == 1 ? DutySourceLabel(item.Sources[0]) : $"{item.Sources.Length} sources");

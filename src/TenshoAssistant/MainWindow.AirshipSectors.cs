@@ -60,7 +60,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted(sector.RankReq.ToString());
                 ImGui.TableNextColumn();ImGui.TextUnformatted(sector.CeruleumTanks.ToString());
                 ImGui.TableNextColumn();ImGui.TextUnformatted(HoursMinutes(TimeSpan.FromMinutes(sector.SurveyMinutes)));
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("AirshipSectors.SurveyTip"));
+                Tip("AirshipSectors.SurveyTip");
                 ImGui.TableNextColumn();ImGui.TextUnformatted(sector.Exp>0 ? sector.Exp.ToString("N0"):"—");
                 ImGui.TableNextColumn();
                 var unlock=sector.Unlock;
@@ -85,8 +85,7 @@ internal sealed partial class MainWindow
 
     private void DrawAirshipLootTooltip(IReadOnlyList<uint> drops,ItemCatalog? items)
     {
-        ImGui.BeginTooltip();
-        try
+        using(TooltipScope.Begin())
         {
             ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("AirshipSectors.LootTitle"));
             foreach(var id in drops.Take(30))
@@ -96,6 +95,5 @@ internal sealed partial class MainWindow
                 ImGui.TextUnformatted(definition?.Name ?? $"#{id}");
             }
         }
-        finally{ImGui.EndTooltip();}
     }
 }

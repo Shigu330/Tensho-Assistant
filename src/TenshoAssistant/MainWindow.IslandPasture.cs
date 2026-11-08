@@ -32,7 +32,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(ReadPasture is null || pastureRead is not null);
         try{if(ImGui.Button(localization.Get("Island.PastureRead")))pastureRead=ReadPasture!();}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Island.PastureReadTip"));
+        Tip("Island.PastureReadTip");
         if(pastureFailed)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Island.PastureUnavailable"));
         else if(pasture is { } current)DrawPastureTable(current);
         ImGui.Separator();
@@ -79,7 +79,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(state.Loading);
         try{if(ImGui.Button(localization.Get("Island.AnimalListRead")))source.Request();}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Island.AnimalListReadTip"));
+        Tip("Island.AnimalListReadTip");
         if(state.Error is not null)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Island.AnimalListFailed"));
         if(state.Document is not { } document)return;
         if(!ReferenceEquals(document,islandAnimalsFrom))
@@ -122,7 +122,7 @@ internal sealed partial class MainWindow
                 try{if(ImGui.SmallButton($"{Maps.MapProjection.CoordinateText(new(animal.X,animal.Y))}##IslandAnimal{index}") && map is not null)OpenMapPointFromPage(map,animal.X,animal.Y);}
                 finally{ImGui.EndDisabled();}
                 if(map is not null)PlaceMenu($"IslandAnimalPlace{index}",map,new(animal.X,animal.Y),animal.Name);
-                if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Island.AnimalPlaceTip"));
+                Tip("Island.AnimalPlaceTip");
                 ImGui.TableNextColumn();ImGui.TextUnformatted(animal.Time.Length>0 ? animal.Time:localization.Get("Island.AnyTime"));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(animal.Weather.Length>0 ? animal.Weather:localization.Get("Island.AnyWeather"));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(animal.Size);

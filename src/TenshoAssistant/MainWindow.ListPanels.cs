@@ -310,7 +310,7 @@ internal sealed partial class MainWindow
                         if(group.Timed && ListPanelTimedState(item) is { } state)
                         {
                             ImGui.SameLine();ImGui.TextColored(state.Open ? Success:UI.FfxivTheme.Error,state.Text);
-                            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(state.Open ? "ListPanels.TimedOpenHint":"ListPanels.TimedClosedHint"));
+                            Tip(state.Open ? "ListPanels.TimedOpenHint":"ListPanels.TimedClosedHint");
                         }
                     }
                 }
@@ -360,7 +360,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(known.Alarms.Length==0);
         try{if(ImGui.SmallButton(localization.Format("ListPanels.AddAlarms",known.Alarms.Length)+$"###ListAlarms{key}")){AddAlarms(known.Alarms);listPanelAlarms.Remove(key);}}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(known.Alarms.Length==0 ? "ListPanels.AddAlarmsNone":"ListPanels.AddAlarmsTip"));
+        Tip(known.Alarms.Length==0 ? "ListPanels.AddAlarmsNone":"ListPanels.AddAlarmsTip");
     }
     private TenshoAssistant.Alarms.TenshoAlarm[] ListAlarms((uint Item,long Needed)[] lines)
     {

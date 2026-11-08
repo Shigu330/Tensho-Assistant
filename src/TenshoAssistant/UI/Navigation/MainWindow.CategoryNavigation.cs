@@ -34,7 +34,7 @@ internal sealed partial class MainWindow
                 clicked=ImGui.Selectable($"{localization.Get("Navigation.Category"+key)}###NavCategory{key}");
         }
         finally{ImGui.PopStyleColor();}
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(collapsed ? "Navigation.Expand":"Navigation.Collapse"));
+        Tip(collapsed ? "Navigation.Expand":"Navigation.Collapse");
         if(clicked)
         {
             var set=configuration.NavigationCollapsed??=[];

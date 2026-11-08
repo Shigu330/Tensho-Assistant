@@ -17,25 +17,7 @@ internal sealed partial class MainWindow
     // 0.331 (audit): value of the slider being dragged as it was before the drag, put back when the save on release fails.
     private int sliderBefore;
 
-    // Tooltip text wrapped to a readable width (0.207: long help texts went past the screen edge).
-    private static void WrappedTooltip(string text)
-    {
-        ImGui.BeginTooltip();
-        try
-        {
-            ImGui.PushTextWrapPos(ImGui.GetFontSize()*32);
-            try{ImGui.TextUnformatted(text);}
-            finally{ImGui.PopTextWrapPos();}
-        }
-        finally{ImGui.EndTooltip();}
-    }
-
-    // Tooltip of the last drawn item (also when disabled).
-    private void Tip(string key)
-    {
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(key));
-    }
-
+    // WrappedTooltip, Tip, TipText and HelpMarker: UI/Components/Tooltip.cs (X-76 H1).
 
     // Header and home options (Settings › General).
     private void DrawHeaderSettings()

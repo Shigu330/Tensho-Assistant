@@ -52,7 +52,7 @@ internal sealed partial class MainWindow
         // X-73.4 (0.861): the theme the game gives, once its window has been read; the « week + 9 » rule only before.
         var theme=fashionThemeName?.Invoke(fashionCheck?.Last is { WeeklyTheme:not 0 } read && read.ObservedAt>=FashionWeek.Bounds(now).Start ? read.WeeklyTheme:FashionWeek.ThemeRow(now));
         ImGui.TextColored(Accent,localization.Format("FashionWeek.Theme",theme is { Length:>0 } ? theme:localization.Get("FashionWeek.ThemeUnknown")));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FashionWeek.ThemeHelp"));
+        Tip("FashionWeek.ThemeHelp");
         ImGui.TextDisabled(localization.Format("FashionWeek.Reset",next.ToLocalTime().ToString("g"),Math.Max(0,(int)(next-now).TotalHours)));
         DrawFashionOptions();
         if(fashionCheck?.Last is not { } frame){ImGui.TextWrapped(localization.Get("FashionWeek.OpenInGame"));return;}

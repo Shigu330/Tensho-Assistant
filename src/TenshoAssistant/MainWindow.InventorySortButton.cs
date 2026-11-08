@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
                     }
                 }
                 finally{ImGui.EndDisabled();}
-                if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("SortButton.Tip"));
+                Tip("SortButton.Tip");
                 if(inventorySortButtonMessage is { } message && DateTimeOffset.UtcNow<inventorySortButtonUntil)
                 {
                     ImGui.SameLine();

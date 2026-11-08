@@ -104,7 +104,7 @@ internal sealed partial class MainWindow
                 var line=localization.Get(on ? "Credits.SettingOn":"Credits.SettingOff")
                     +(credit.SettingPartial ? " · "+localization.Format("Credits.SettingPartial",localization.Get("Credits.SettingScope."+credit.Id)):"");
                 ImGui.TextColored(on ? Success:Muted,line);
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Credits.SettingTip"));
+                Tip("Credits.SettingTip");
             }
             if(credit.Files.Count>0)
             {

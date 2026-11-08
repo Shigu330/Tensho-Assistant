@@ -182,10 +182,10 @@ internal sealed partial class MainWindow
         {
             ImGui.TextUnformatted(localization.Get(key));ImGui.SameLine();
             ImGui.SetNextItemWidth(90);ImGui.InputInt("##Min"+id,ref minimum,0);minimum=Math.Clamp(minimum,0,limit);
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MarketBoard.MinHelp"));
+            Tip("MarketBoard.MinHelp");
             ImGui.SameLine();ImGui.TextUnformatted("–");ImGui.SameLine();
             ImGui.SetNextItemWidth(90);ImGui.InputInt("##Max"+id,ref maximum,0);maximum=Math.Clamp(maximum,0,limit);
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MarketBoard.MaxHelp"));
+            Tip("MarketBoard.MaxHelp");
         }
     }
 
@@ -195,7 +195,7 @@ internal sealed partial class MainWindow
         DrawMarketFilters(board,true);
         ImGui.TextUnformatted(localization.Get("MarketBoard.Wanted"));ImGui.SameLine();
         ImGui.SetNextItemWidth(90);ImGui.InputInt("##Wanted",ref marketWanted,0);marketWanted=Math.Clamp(marketWanted,0,MarketBoardMath.MaximumWanted);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MarketBoard.WantedHelp"));
+        Tip("MarketBoard.WantedHelp");
         var filter=CurrentMarketFilter();
         if(!ReferenceEquals(marketViewKey.Board,board) || marketViewKey.Filter!=filter || marketViewKey.Wanted!=marketWanted)
         {
@@ -272,7 +272,7 @@ internal sealed partial class MainWindow
         }
         var velocity=filter.Hq switch{true=>board.HqUnitsPerDay,false=>board.NqUnitsPerDay,_=>board.UnitsPerDay};
         ImGui.TextUnformatted(velocity is { } perDay ? localization.Format("MarketBoard.Velocity",perDay.ToString("0.#")):localization.Get("MarketBoard.VelocityUnknown"));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MarketBoard.VelocityHelp"));
+        Tip("MarketBoard.VelocityHelp");
         if(marketSalesStats is { } stats)
             ImGui.TextColored(Accent,localization.Format("MarketBoard.Stats",stats.Minimum.ToString("N0"),stats.Average.ToString("N0"),stats.Maximum.ToString("N0"),stats.Sales,stats.Units.ToString("N0")));
         else{ImGui.TextDisabled(localization.Get("MarketBoard.NoSales"));return;}

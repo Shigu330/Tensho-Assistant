@@ -70,7 +70,7 @@ internal sealed partial class MainWindow
             foreach(var (label,open) in ExternalLinksFor(id))
             {
                 if(ImGui.SmallButton(label+$"##External{label}"))open();
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("ExternalLinks.Tip"));
+                Tip("ExternalLinks.Tip");
                 ImGui.SameLine();
             }
             ImGui.NewLine();

@@ -77,12 +77,12 @@ internal sealed partial class MainWindow
             try{if(ImGui.SmallButton(FontAwesomeIcon.SyncAlt.ToIconString()+"##DutyFinderRefresh"))_=loot.RequestAsync(true);}
             finally{ImGui.EndDisabled();}
             refreshHovered=ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled);
-            ImGui.SameLine();ImGui.TextDisabled(FontAwesomeIcon.InfoCircle.ToIconString());
         }
         finally{ImGui.PopFont();}
         if(refreshHovered)WrappedTooltip(localization.Get(configuration.CommunityGarland ? "DutyFinder.RefreshTip":"Advanced.SourceOffTip"));
-        else if(ImGui.IsItemHovered())
-            WrappedTooltip(localization.Get("DutyUi.Source")+(state.Document is { HasRewards:true, HasFights:true, HasCoffers:true } ? "":"\n"+localization.Get("DutyUi.Partial")));
+        ImGui.SameLine();
+        if(state.Document is { HasRewards:true, HasFights:true, HasCoffers:true })HelpMarker("DutyUi.Source");
+        else HelpMarkerText(localization.Get("DutyUi.Source")+"\n"+localization.Get("DutyUi.Partial"));
         if(DutyDocument(state,true) is not { } document)return;
         if(lumina?.State.Data?.ForDuty(duty.DutyId) is { Count:>0 })ImGui.TextDisabled(localization.Get("DutyFinder.Lumina"));
         var view=DutyFinderViewOf(document);

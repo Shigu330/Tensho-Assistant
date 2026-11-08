@@ -69,13 +69,13 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(lexiconPage<=0);
         try{if(ImGui.SmallButton("<###LexiconPrevious"))lexiconPage--;}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Lexicon.PreviousTip"));
+        Tip("Lexicon.PreviousTip");
         ImGui.SameLine();ImGui.TextUnformatted(localization.Format("Lexicon.Page",lexiconPage+1,pages));
         ImGui.SameLine();
         ImGui.BeginDisabled(lexiconPage>=pages-1);
         try{if(ImGui.SmallButton(">###LexiconNext"))lexiconPage++;}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Lexicon.NextTip"));
+        Tip("Lexicon.NextTip");
         if(!ImGui.BeginTable("###LexiconRows",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))return;
         try
         {
@@ -98,6 +98,6 @@ internal sealed partial class MainWindow
     private void DrawLexiconWord(string word,string id)
     {
         if(ImGui.Selectable($"{word}##{id}"))ImGui.SetClipboardText(word);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Lexicon.CopyTip"));
+        Tip("Lexicon.CopyTip");
     }
 }

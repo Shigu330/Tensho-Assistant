@@ -35,7 +35,7 @@ internal sealed partial class MainWindow
         Tip("Garden.CrossesUsesTip");
         ImGui.SetNextItemWidth(260);
         var open=ImGui.BeginCombo("##GardenCrossSeed",gardenCrossSeed==0 ? localization.Get("Garden.CrossesPick"):Name(gardenCrossSeed));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Garden.CrossesPickTip"));
+        Tip("Garden.CrossesPickTip");
         if(open)
         {
             try

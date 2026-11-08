@@ -32,7 +32,7 @@ internal sealed partial class MainWindow
                 if(ImGui.SmallButton(localization.Get("Places.Copy")))ImGui.SetClipboardText(text+(place.Note.Length>0 ? " ("+place.Note+")":""));
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("Places.Remove")) && ImGui.GetIO().KeyCtrl){SavePlaces(PlaceDirectory.Remove(places,place.Id));return;}
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Places.RemoveTip"));
+                Tip("Places.RemoveTip");
             }
             finally{ImGui.PopID();}
         }

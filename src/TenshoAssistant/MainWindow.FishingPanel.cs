@@ -82,7 +82,7 @@ internal sealed partial class MainWindow
                 ImGui.TextColored(Accent,localization.Format("FishingPanel.Elapsed",seconds));
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("FishingPanel.Restart")))fishingSince=DateTimeOffset.UtcNow;
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FishingPanel.RestartHelp"));
+                Tip("FishingPanel.RestartHelp");
             }
             // C28 (0.663): the time left of the intuition, from the character's status.
             if(FishingIntuitionLeft?.Invoke() is { } intuitionLeft)
@@ -169,7 +169,7 @@ internal sealed partial class MainWindow
             }
             // Sources in a tooltip, so the window keeps the width of its table.
             ImGui.TextDisabled(localization.Get("FishingPanel.SourcesShort"));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(gatherBuddyFish?.State.Data is not null ? "FishingPanel.FooterGatherBuddy":"FishingPanel.Footer"));
+            Tip(gatherBuddyFish?.State.Data is not null ? "FishingPanel.FooterGatherBuddy":"FishingPanel.Footer");
             if(gatherBuddyFish?.State is { Loading:true })ImGui.TextDisabled(localization.Get("FishingPanel.GatherBuddyLoading"));
         },fishingPanelManual ? ()=>fishingPanelManual=false:null);
     }
@@ -178,7 +178,7 @@ internal sealed partial class MainWindow
     private void DrawFishingPanelButton()
     {
         if(ImGui.SmallButton(localization.Get(fishingPanelManual ? "FishingPanel.Close":"FishingPanel.Open")+"##FishingPanelButton"))ToggleFishingPanel();
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FishingPanel.OpenHelp"));
+        Tip("FishingPanel.OpenHelp");
     }
 
     // One fish of the panel: bait route, bite, hookset and conditions (short text + full tooltip), GatherBuddy first, else Garland.

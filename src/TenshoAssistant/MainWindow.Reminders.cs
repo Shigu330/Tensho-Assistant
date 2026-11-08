@@ -100,7 +100,7 @@ internal sealed partial class MainWindow
                     var shuffled=Reminders.WondrousTailsLines.Shuffled();
                     ImGui.TextDisabled(localization.Format("Reminders.BingoOdds",Percent(odds.AtLeastOne),Percent(odds.AtLeastTwo),Percent(odds.Three)));
                     ImGui.TextDisabled(localization.Format("Reminders.BingoShuffle",Percent(shuffled.AtLeastOne),Percent(shuffled.AtLeastTwo),Percent(shuffled.Three)));
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Reminders.BingoOddsHelp"));
+                    Tip("Reminders.BingoOddsHelp");
                     static string Percent(double value)=>(value*100).ToString("0.#");
                 });
             Row("HuntBills",FontAwesomeIcon.Crosshairs,timers?.HuntBillsHeld is { } bills ? localization.Format("Reminders.HuntBillsState",bills):localization.Get("Reminders.Unknown"),
@@ -195,7 +195,7 @@ internal sealed partial class MainWindow
             try{ImGui.TextColored(Accent,icon.ToIconString());}
             finally{ImGui.PopFont();}
             ImGui.SameLine();ImGui.TextUnformatted(localization.Get("Reminders."+key));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Reminders."+key+"Help"));
+            Tip("Reminders."+key+"Help");
             ImGui.TableNextColumn();ImGui.TextUnformatted(state);
             extra?.Invoke();
             ImGui.TableNextColumn();
@@ -236,7 +236,7 @@ internal sealed partial class MainWindow
                 }
             }
             finally{ImGui.EndDisabled();}
-            if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Reminders.DiscordRowTip"));
+            Tip("Reminders.DiscordRowTip");
             ImGui.TableNextColumn();
             if(next is { } alarmAt && alarmAt>now)
                 AlarmButton("Reminder"+key,localization.Format("Reminders.AlarmTip",localization.Get("Reminders."+key)),

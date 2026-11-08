@@ -41,7 +41,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(ReadGc is null || gcRead is not null);
         try{if(ImGui.Button(localization.Get("GrandCompany.Read")))gcRead=ReadGc!(catalog.Ranks.Count+1);}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("GrandCompany.ReadTip"));
+        Tip("GrandCompany.ReadTip");
         if(gcFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("GrandCompany.Unavailable"));return;}
         if(gcSnapshot is not { } current)return;
         switch(current.Status)

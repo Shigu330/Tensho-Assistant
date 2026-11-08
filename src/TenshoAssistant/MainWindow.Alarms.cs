@@ -317,7 +317,7 @@ internal sealed partial class MainWindow
                     {
                         ImGui.SameLine();
                         if(ImGui.SmallButton(localization.Get("Alarms.SendGroup"))){alarmStatus="";SendAlarmsToGame(members,(configuration.AlarmOptions ?? new()) is var o ? new AlarmSettings{Sound=o.Sound,MuteInDuties=o.MuteInDuties,GameIncludeWeather=true}:new());}
-                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Alarms.SendGroupHelp"));
+                        Tip("Alarms.SendGroupHelp");
                     }
                         // R-12 (0.319): this group's alarms on Discord, shown while the webhook is on.
                         if(configuration.Discord is { Enabled:true })
@@ -509,7 +509,7 @@ internal sealed partial class MainWindow
         finally{if(muteChatOff)ImGui.EndDisabled();ImGui.Unindent();}
         // Game alarms through the game's « /alarm » command (0.205).
         changed|=ImGui.Checkbox(localization.Get("Alarms.UseGame"),ref useGame);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Alarms.UseGameHelp"));
+        Tip("Alarms.UseGameHelp");
         if(DefaultButton("AlarmUseGame",useGame!=defaults.UseGameAlarms)){useGame=defaults.UseGameAlarms;changed=true;}
         if(useGame)
         {

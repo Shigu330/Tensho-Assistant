@@ -13,12 +13,12 @@ internal sealed partial class MainWindow
     {
         if(TitleChangerSource is not { } changer || !entry.ConfirmedUnlocked || entry.Id>ushort.MaxValue)return;
         if(ImGui.SmallButton(localization.Get("Titles.Wear")+$"##Wear{entry.Id}"))changer.Wear((ushort)entry.Id);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Titles.WearTip"));
+        Tip("Titles.WearTip");
         var job=changer.CurrentJob;
         if(job==0)return;
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Format("Titles.ForJob",JobName(job))+$"##ForJob{entry.Id}"))SetJobTitle(job,(ushort)entry.Id);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Titles.ForJobTip"));
+        Tip("Titles.ForJobTip");
     }
 
     private void SetJobTitle(uint job,ushort? title)
@@ -40,10 +40,10 @@ internal sealed partial class MainWindow
             if(ImGui.SmallButton(localization.Get("Titles.Random")))changer.Wear((ushort)obtained[Random.Shared.Next(obtained.Length)].Id);
         }
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Titles.RandomTip"));
+        Tip("Titles.RandomTip");
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("Titles.None")))changer.Wear(0);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Titles.NoneTip"));
+        Tip("Titles.NoneTip");
         BoolSetting("Titles.ByJob","Titles.ByJobTip",()=>configuration.JobTitlesEnabled,value=>configuration.JobTitlesEnabled=value,c=>c.JobTitlesEnabled);
         if(configuration.JobTitles is not { Count:>0 } map){ImGui.TextDisabled(localization.Get("Titles.ByJobEmpty"));return;}
         foreach(var (job,title) in map.OrderBy(pair=>pair.Key).ToArray())

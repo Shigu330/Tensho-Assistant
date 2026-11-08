@@ -213,8 +213,8 @@ internal sealed partial class MainWindow
                         }
                     }
                 }
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("RoutePlanner.ToBuildTip"));
-                else if(rowHovered)DrawRouteLootTooltip(catalog,route,missingPrices);
+                Tip("RoutePlanner.ToBuildTip");
+                if(rowHovered && !ImGui.IsItemHovered())DrawRouteLootTooltip(catalog,route,missingPrices);
             }
         }
         finally{ImGui.EndTable();}
@@ -288,8 +288,7 @@ internal sealed partial class MainWindow
     // Hovering a route: what one voyage brings on average, item by item, with its NPC value.
     private void DrawRouteLootTooltip(SubmarineCatalog catalog,PlannedRoute route,int missingPrices)
     {
-        ImGui.BeginTooltip();
-        try
+        using(TooltipScope.Begin())
         {
             ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("RoutePlanner.LootTitle"));
             var items=itemCatalog.State.Catalog;
@@ -315,6 +314,5 @@ internal sealed partial class MainWindow
             if(values is not null && route.Sectors.Any(values.BandFallback.Contains))ImGui.TextDisabled(localization.Get("RoutePlanner.BandFallback"));
             if(missingPrices>0)ImGui.TextDisabled(localization.Format("RoutePlanner.PricesMissing",missingPrices));
         }
-        finally{ImGui.EndTooltip();}
     }
 }

@@ -246,3 +246,8 @@ Ranked X-76 plan: 10 harmonisation versions (2b), 10 parser items (2c) and 4 ext
   panel and spearfishing pages; one state mark (DrawStateMark: check, cross, question in the icon font) for beastmaster, guide, Fashion Report, chocobo
   barding, gear and recipes; « ✓ »/« ✗ » removed from texts (the game font lacks « ✗ »); selected toggle buttons use the theme's Selected colour.
   Kept fixed: colours drawn on the map image or its own dark badges, icon tints, dye and Triple Triad side colours (data), self-contrasted badges.
+- 0.913: H1. Tooltip helpers in UI/Components/Tooltip.cs (WrappedTooltip, Tip, TipText, HelpMarker, TooltipScope with one wrap width); 110
+  hand-written key tooltips, 21 copies of Tip's body and 10 conditional ones go through Tip (shown on greyed controls too: three tooltips that vanished
+  on a greyed control are fixed, and a few more by the same change); the 12 BeginTooltip blocks share one wrap width; the two server-bar tooltips share
+  their placement; one help marker (icon). Kept: composite tooltips and about 95 computed-text tooltips (their text is built only on hover). The test of
+  setting tooltips now checks every Tip/HelpMarker key exists in English and French (667 keys, none missing).

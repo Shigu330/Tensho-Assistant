@@ -79,7 +79,7 @@ internal sealed partial class MainWindow
                     changed|=ImGui.InputInt(localization.Get("GpUi.Attempts"),ref gpAttempts,0);
                     Tip("GpUi.AttemptsTip");
                     ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("GpUi.Yield"),ref gpBaseYield,0);
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GpUi.YieldHelp"));
+                    Tip("GpUi.YieldHelp");
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Success"),ref gpSuccess,0);
                     Tip("GpUi.SuccessTip");
@@ -87,7 +87,7 @@ internal sealed partial class MainWindow
                     Tip("GpUi.BoonTip");
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Bountiful"),ref gpBountiful,0);
-                    if(ImGui.IsItemHovered()) WrappedTooltip(localization.Get("GpUi.BountifulHelp"));
+                    Tip("GpUi.BountifulHelp");
                     ImGui.TableNextColumn();
                     if(DrawBountifulEstimate() is { } estimate && estimate!=gpBountiful){gpBountiful=estimate;changed=true;}
                 }
@@ -183,7 +183,7 @@ internal sealed partial class MainWindow
         if(baseValue is not { } valueBase || rating<=0 || BountifulEstimate.Bonus(rating,valueBase) is not { } bonus)
         {
             ImGui.TextDisabled(localization.Get("GpUi.BountifulEstimateNone"));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GpUi.BountifulEstimateNoneHelp"));
+            Tip("GpUi.BountifulEstimateNoneHelp");
             return null;
         }
         ImGui.TextColored(Accent,localization.Format("GpUi.BountifulEstimate",bonus));

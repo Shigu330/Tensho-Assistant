@@ -80,7 +80,7 @@ internal sealed partial class MainWindow
                                     if (open && point is not null && map is not null)
                                     { SelectBookmark(point); OpenMapPointFromPage(map, point.X, point.Y); }
                                     if (point is not null && map is not null) PlaceMenu("BookmarkPlace", map, new(point.X, point.Y), point.Name);
-                                    if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("MapsUi.BookmarkOpen"));
+                                    Tip("MapsUi.BookmarkOpen");
                                     ImGui.SameLine();
                                     if (ImGui.SmallButton(localization.Get("MapsUi.Load")) && point is not null) SelectBookmark(point);
                                 }

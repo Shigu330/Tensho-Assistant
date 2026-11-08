@@ -84,7 +84,7 @@ internal sealed partial class MainWindow
             && ReferenceEquals(configuration.MacroChainPlan,chain.Plan) && pages.Select(page=>page.Text).SequenceEqual(chain.Texts))
         {
             if(ImGui.SmallButton(localization.Get("CraftMacro.StartChain")+"##MacroChainStart"))macroChain.RequestStart(chain.Plan);
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftMacro.StartChainHelp"));
+            Tip("CraftMacro.StartChainHelp");
         }
         if(macroWriter?.SlotsOf(copy.Book) is { } states)
         {
@@ -188,7 +188,7 @@ internal sealed partial class MainWindow
         if(developerMode)ImGui.TextDisabled($"ID {recipe.RecipeId}");
         // 0.405 (user request): this recipe in the game's crafting log.
         if(ImGui.SmallButton(localization.Get("GameLogs.Recipe")))OpenGameRecipe(recipe);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GameLogs.RecipeTip"));
+        Tip("GameLogs.RecipeTip");
         // A-12 (0.427): level, Craftsmanship and Control against the recipe; the job's gear set on click.
         DrawCraftReadiness(recipe);
         if(preparation) { DrawCraftPlan(recipe); return; }
@@ -292,7 +292,7 @@ internal sealed partial class MainWindow
                             try
                             {
                                 DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(26)); var click=ImGui.IsItemClicked();
-                                if(ImGui.IsItemHovered()) WrappedTooltip(action.Description);
+                                TipText(action.Description);
                                 ImGui.SameLine(); click|=ImGui.SmallButton(action.Name);
                                 if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(forbidden ? localization.Get("CraftRules.ForbiddenTip"):localization.Format("SimulationHelp.Action",action.Description,spec.Level,spec.Cp));
                                 if(click && !forbidden && simulationActions.Count<100 && simulationLevel>=spec.Level && (spec.Kind!=CraftActionKind.Manipulation || simulationManipulation))

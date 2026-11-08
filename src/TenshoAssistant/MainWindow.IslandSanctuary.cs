@@ -48,7 +48,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(ReadIsland is null || islandRead is not null);
         try{if(ImGui.Button(localization.Get("Island.Read")))islandRead=ReadIsland!(catalog);}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Island.ReadTip"));
+        Tip("Island.ReadTip");
         if(islandReadFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Island.Unavailable"));return;}
         if(island is not { } current)return;
         switch(current.Status)
@@ -80,12 +80,12 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(islandPlanning is not null);
         try{if(ImGui.Button(localization.Get("Island.Propose")))islandPlanning=Task.Run(()=>IslandPlanner.Propose(catalog,current));}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Island.ProposeTip"));
+        Tip("Island.ProposeTip");
         if(islandAgenda is not { } agenda)return;
         if(agenda.Chains.Count==0){ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Island.NoAgenda"));return;}
         ImGui.SameLine();
         if(ImGui.Button(localization.Get("Island.Copy")))ImGui.SetClipboardText(IslandAgendaText(agenda));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Island.CopyTip"));
+        Tip("Island.CopyTip");
         foreach(var line in IslandAgendaText(agenda).Split('\n'))ImGui.TextUnformatted(line);
         ImGui.TextDisabled(localization.Get("Island.AgendaLimits"));
         DrawIslandMaterials(agenda);

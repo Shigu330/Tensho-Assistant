@@ -33,7 +33,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(ReadSquadron is null || squadronRead is not null);
         try{if(ImGui.Button(localization.Get("Squadron.Read")))squadronRead=ReadSquadron!();}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Squadron.ReadTip"));
+        Tip("Squadron.ReadTip");
         if(squadron is null)
         {
             if(squadronReadFailed)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Squadron.Unavailable"));
@@ -56,7 +56,7 @@ internal sealed partial class MainWindow
         var mission=missions.FirstOrDefault(row=>row.Id==squadronMission);
         ImGui.SetNextItemWidth(320);
         var open=ImGui.BeginCombo("##SquadronMission",mission is null ? localization.Get("Squadron.PickMission"):localization.Format("Squadron.MissionRow",mission.Name,mission.Level));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Squadron.PickMissionTip"));
+        Tip("Squadron.PickMissionTip");
         if(open)
         {
             try

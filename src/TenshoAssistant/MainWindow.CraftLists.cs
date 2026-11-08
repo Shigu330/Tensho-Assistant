@@ -33,7 +33,7 @@ internal sealed partial class MainWindow
             Tip("CraftLists.ListTip");
             ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("CraftLists.Delete")) && ImGui.GetIO().KeyCtrl){store.Set(craftListIndex,null);craftListIndex=0;return;}
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftLists.DeleteTip"));
+            Tip("CraftLists.DeleteTip");
         }
         ImGui.SetNextItemWidth(200);
         ImGui.InputTextWithHint("###CraftListName",localization.Get("CraftLists.NewName"),ref craftListName,CraftLists.MaxName);
@@ -108,7 +108,7 @@ internal sealed partial class MainWindow
         if(TeamcraftExport.Link(list.Entries.Select(entry=>(entry.ItemId,recipes?.ForResult(entry.ItemId) is { Count:>0 } own ? (uint?)PreferredRecipe(own).RecipeId:null,entry.Quantity))) is { } teamcraft)
         {
             if(ImGui.Button(localization.Get("PlanUi.TeamcraftCopy")+"###CraftListTeamcraft"))ImGui.SetClipboardText(teamcraft);
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("PlanUi.TeamcraftTip"));
+            Tip("PlanUi.TeamcraftTip");
         }
     }
 
@@ -142,6 +142,6 @@ internal sealed partial class MainWindow
         if(ImGui.Button(localization.Format("CraftLists.Add",list.Name)))
             craftListMessage=CraftLists.Add(list,recipe.ResultItemId,quantity) is { } added && store.Set(Math.Clamp(craftListIndex,0,lists.Count-1),added)
                 ? localization.Format("CraftLists.Added",list.Name):localization.Get("CraftLists.AddFailed");
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftLists.AddTip"));
+        Tip("CraftLists.AddTip");
     }
 }

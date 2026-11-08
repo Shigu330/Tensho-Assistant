@@ -47,7 +47,7 @@ internal sealed partial class MainWindow
                 DrawItemIcon(definition,size);DrawCollectionMark(definition);ImGui.SameLine();
                 ImGui.Selectable((definition?.Name ?? $"#{id}")+$"##WishItem{id}");
                 ItemLinksMenu($"WishMenu{id}",definition);
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Wishlist.RowTip"));
+                Tip("Wishlist.RowTip");
                 ImGui.TableNextColumn();
                 if(CollectionOf(definition) is { } entry)
                 {

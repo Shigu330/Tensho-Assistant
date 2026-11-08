@@ -74,13 +74,13 @@ internal sealed partial class MainWindow
         if(state.LowestCondition is { } condition)
         {
             ImGui.TextColored(state.ToRepair>0 ? UI.FfxivTheme.Error:Success,localization.Format("GearWear.BarCondition",condition));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GearWear.BarConditionTip"));
+            Tip("GearWear.BarConditionTip");
         }
         if(state.HighestSpiritbond is { } bond)
         {
             if(state.LowestCondition is not null)ImGui.SameLine();
             ImGui.TextColored(state.ToExtract>0 ? Accent:Muted,localization.Format("GearWear.BarSpiritbond",bond.ToString("0")));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GearWear.BarSpiritbondTip"));
+            Tip("GearWear.BarSpiritbondTip");
         }
     }
 }

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.913.0
+- Plan global, Verify : Nettoyage complet (X-76), étape 2b, harmonisation des info-bulles (H1) : une seule aide pour les info-bulles (UI/Components/Tooltip.cs) ; environ 140 info-bulles écrites à la main passent par elle et s'affichent aussi sur un contrôle grisé (trois disparaissaient justement quand le bouton était grisé : carte d'un point de récolte, galerie d'outils, action de la simulation d'artisanat) ; toutes les info-bulles ont la même largeur ; une seule marque d'aide (icône i) ; le test des info-bulles vérifie maintenant que les 667 clés existent en anglais et en français. Non validé en jeu.
+- Tests : Tooltips913Tests. Verify.ps1 (agent) : 1509/1509, 0 avertissement, 0 erreur ; DLL 0.913.0.0. Non validé en jeu.
+### English
+- Full clean-up (X-76), step 2b, tooltip harmonisation (H1): one tooltip helper (UI/Components/Tooltip.cs); about 140 hand-written tooltips go through it and also show on greyed controls (three vanished exactly when the button was greyed: a gathering point's map, the tools gallery, a craft simulation action); every tooltip has the same width; one help marker (i icon); the tooltip test now checks the 667 keys exist in English and French. Not validated in game.
+
 ## 0.912.0
 - Plan global, Verify : Nettoyage complet (X-76), étape 2b, harmonisation des couleurs (H2) : les textes à couleur fixe suivent maintenant le thème (texte, erreur, avertissement, réussite, sélection) sur les pages Équipement, constructions de vaisseaux, points de récolte à horaire de la carte, touches de pêche, panneau de récolte et harpon ; la page Équipement redevient lisible avec les thèmes clairs. Une seule marque d'état (coche, croix, point d'interrogation dans la police d'icônes) pour le dresseur, le guide, la revue de mode, les bardes de chocobo, l'équipement et les recettes ; les « ✓ » et « ✗ » des textes sont remplacés (la police du jeu n'a pas « ✗ »). Les boutons sélectionnés ont tous la couleur de sélection du thème. Restent fixes : ce qui est dessiné sur l'image de la carte, les teintes d'icônes, les couleurs de teinture et de la Triple Triade (données). Non validé en jeu.
 - Tests : ThemeColours912Tests. Verify.ps1 (agent) : 1506/1506, 0 avertissement, 0 erreur ; DLL 0.912.0.0. Non validé en jeu.

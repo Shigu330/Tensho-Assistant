@@ -82,7 +82,7 @@ internal sealed partial class MainWindow
                 {
                     ImGui.SameLine();
                     SpearGlyph(FontAwesomeIcon.Star,new Vector4(1f,0.82f,0.3f,1));
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Spearfishing.GuaranteedLarge"));
+                    Tip("Spearfishing.GuaranteedLarge");
                 }
                 // 0.893 (user request: the fish's icon, to help the eye): the icons of the fish of the list with this shadow, four at most, at text height.
                 foreach(var match in rows.Where(row=>row.Size is { } size && row.Speed is { } speed && Gathering.Spearfishing.Shadows(slot).Contains((size,speed))).Take(4))
@@ -116,13 +116,13 @@ internal sealed partial class MainWindow
                 {
                     ImGui.SameLine();
                     SpearGlyph(FontAwesomeIcon.Eye,colour);
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Spearfishing.Seen"));
+                    Tip("Spearfishing.Seen");
                 }
             }
             if(developerMode)ImGui.TextDisabled($"node base {frame.BaseId} · {fishHere.Length} fish · slots "+string.Join(" ",frame.Slots.Select(slot=>$"{(slot.Available ? 1:0)}/{slot.Size}/{slot.Speed}")));
             if(data is null)ImGui.TextDisabled(localization.Get("Spearfishing.NoData"));
             ImGui.TextDisabled(localization.Get("Spearfishing.Credit"));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Spearfishing.Legend"));
+            Tip("Spearfishing.Legend");
         });
     }
 }

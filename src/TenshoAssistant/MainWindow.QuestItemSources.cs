@@ -87,7 +87,7 @@ internal sealed partial class MainWindow
                         if(clicked){SelectQuest(source.QuestId);page=Page.Quests;}
                         ImGui.TableNextColumn();
                         ImGui.TextColored(row.Progress==QuestProgress.Complete ? Success:Muted,QuestProgressLabel(row.Progress,row.Sequence));
-                        if(row.IsRepeatable && row.Progress==QuestProgress.Complete && ImGui.IsItemHovered())WrappedTooltip(localization.Get("QuestSources.Repeatable"));
+                        if(row.IsRepeatable && row.Progress==QuestProgress.Complete)Tip("QuestSources.Repeatable");
                         ImGui.TableNextColumn();ImGui.TextUnformatted(source.Category);
                         ImGui.TableNextColumn();ImGui.TextDisabled(source.Variants.Count==1 ? localization.Get("QuestSourceCounts.VariantOne"):localization.Format("QuestSourceCounts.Variants",source.Variants.Count));
                         if(ImGui.IsItemHovered())WrappedTooltip(string.Join('\n',source.Variants.Take(12).Select(line=>

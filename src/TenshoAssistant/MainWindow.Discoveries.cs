@@ -394,7 +394,7 @@ internal sealed partial class MainWindow
             ImGui.PushStyleColor(ImGuiCol.Text,Muted);
             try{ImGui.Selectable(localization.Format("DiscoveriesUi.SeenHere",MapName(map),MapProjection.CoordinateNumber(place.X),MapProjection.CoordinateNumber(place.Y),level)+$"##Seen{key}{index}");}
             finally{ImGui.PopStyleColor();}
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("DiscoveriesUi.SeenHereTip"));
+            Tip("DiscoveriesUi.SeenHereTip");
             if(!ImGui.BeginPopupContextItem($"SeenMenu{key}{index}"))continue;
             try
             {
@@ -455,7 +455,7 @@ internal sealed partial class MainWindow
                         }
                         finally{ImGui.EndPopup();}
                     }
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("DiscoveriesUi.PlaceTip"));
+                    Tip("DiscoveriesUi.PlaceTip");
                 }
                 ImGui.TableNextColumn();ImGui.TextUnformatted(DiscoveryFactLevel(fact));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(fact.Seen.ToString("N0"));

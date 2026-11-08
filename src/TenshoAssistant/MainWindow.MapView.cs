@@ -513,7 +513,7 @@ internal sealed partial class MainWindow
                 ImGui.TextColored(MapOverlayText,text);
             }
             else ImGui.TextDisabled(text);
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.ZoomLevel"));
+            Tip("MapView.ZoomLevel");
         }
         finally{ImGui.EndChild();}
         return width;
@@ -596,11 +596,11 @@ internal sealed partial class MainWindow
                 if(DefaultButton("PlaceNameScale",settings.PlaceNameScale!=MapDefaults.PlaceNameScale)){settings.PlaceNameScale=MapDefaults.PlaceNameScale;changed=true;}
                 var nameFollow=MapViewSettings.ClampFollow(settings.NameZoomFollow ?? settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.NameZoomFollow"),ref nameFollow,0,100,"%.0f %%")){settings.NameZoomFollow=nameFollow/100;changed=true;}
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.NameZoomFollowHelp"));
+                Tip("MapView.NameZoomFollowHelp");
                 if(DefaultButton("NameZoomFollow",settings.NameZoomFollow is not null)){settings.NameZoomFollow=null;changed=true;}
                 var nameMinimum=Math.Clamp(settings.NameMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.NameMinZoom"),ref nameMinimum,0,200,"%.0f %%")){settings.NameMinZoom=nameMinimum/100;changed=true;}
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.NameMinZoomHelp"));
+                Tip("MapView.NameMinZoomHelp");
                 if(DefaultButton("NameMinZoom",settings.NameMinZoom!=MapDefaults.NameMinZoom)){settings.NameMinZoom=MapDefaults.NameMinZoom;changed=true;}
                 changed|=SettingBox("MapView.FlagOnClick",settings.FlagOnClick,value=>settings.FlagOnClick=value,MapDefaults.FlagOnClick);
                 changed|=SettingBox("MapView.ShowFlag",settings.ShowFlag,value=>settings.ShowFlag=value,MapDefaults.ShowFlag);
@@ -664,11 +664,11 @@ internal sealed partial class MainWindow
                 changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
                 var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelMinZoom"),ref labelMinimum,0,200,"%.0f %%")){settings.GatheringLabelMinZoom=labelMinimum/100;changed=true;}
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.GatheringLabelMinZoomHelp"));
+                Tip("MapView.GatheringLabelMinZoomHelp");
                 if(DefaultButton("GatheringLabelMinZoom",settings.GatheringLabelMinZoom!=MapDefaults.GatheringLabelMinZoom)){settings.GatheringLabelMinZoom=MapDefaults.GatheringLabelMinZoom;changed=true;}
                 var labelScale=Math.Clamp(settings.GatheringLabelScale,0.5f,2f)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelScale"),ref labelScale,50,200,"%.0f %%")){settings.GatheringLabelScale=labelScale/100;changed=true;}
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.GatheringLabelScaleHelp"));
+                Tip("MapView.GatheringLabelScaleHelp");
                 if(DefaultButton("GatheringLabelScale",settings.GatheringLabelScale!=MapDefaults.GatheringLabelScale)){settings.GatheringLabelScale=MapDefaults.GatheringLabelScale;changed=true;}
             }
             if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionPlayer")))
@@ -735,27 +735,27 @@ internal sealed partial class MainWindow
                         if(ImGui.Selectable(localization.Get("MapView.OpenZoom"+mode),settings.OpenZoom==mode)){settings.OpenZoom=mode;changed=true;}
                     ImGui.EndCombo();
                 }
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.OpenZoomHelp"));
+                Tip("MapView.OpenZoomHelp");
                 if(DefaultButton("OpenZoom",settings.OpenZoom!=MapDefaults.OpenZoom)){settings.OpenZoom=MapDefaults.OpenZoom;changed=true;}
                 if(settings.OpenZoom==MapOpenZoom.Fixed)
                 {
                     var opening=MapProjection.ClampZoom(settings.OpenZoomValue)*100;ImGui.SetNextItemWidth(160);
                     if(ImGui.SliderFloat(localization.Get("MapView.OpenZoomValue"),ref opening,15,400,"%.0f %%")){settings.OpenZoomValue=opening/100;changed=true;}
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.OpenZoomValueHelp"));
+                    Tip("MapView.OpenZoomValueHelp");
                     if(DefaultButton("OpenZoomValue",settings.OpenZoomValue!=MapDefaults.OpenZoomValue)){settings.OpenZoomValue=MapDefaults.OpenZoomValue;changed=true;}
                 }
                 var focus=MapFocusZoom*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.FocusZoom"),ref focus,15,400,"%.0f %%")){settings.FocusZoom=focus/100;changed=true;}
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.FocusZoomHelp"));
+                Tip("MapView.FocusZoomHelp");
                 if(DefaultButton("FocusZoom",settings.FocusZoom!=MapDefaults.FocusZoom)){settings.FocusZoom=MapDefaults.FocusZoom;changed=true;}
                 var wheel=(Math.Clamp(float.IsFinite(settings.WheelStep) ? settings.WheelStep:1.15f,1.02f,1.5f)-1)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.WheelStep"),ref wheel,2,50,"%.0f %%")){settings.WheelStep=1+wheel/100;changed=true;}
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.WheelStepHelp"));
+                Tip("MapView.WheelStepHelp");
                 if(DefaultButton("WheelStep",settings.WheelStep!=MapDefaults.WheelStep)){settings.WheelStep=MapDefaults.WheelStep;changed=true;}
                 changed|=SettingBox("MapView.WheelInvert",settings.WheelInvert,value=>settings.WheelInvert=value,MapDefaults.WheelInvert);
                 var follow=MapViewSettings.ClampFollow(settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.ZoomFollow"),ref follow,0,100,"%.0f %%")){settings.ZoomFollow=follow/100;changed=true;}
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.ZoomFollowHelp"));
+                Tip("MapView.ZoomFollowHelp");
                 if(DefaultButton("ZoomFollow",settings.ZoomFollow!=MapDefaults.ZoomFollow)){settings.ZoomFollow=MapDefaults.ZoomFollow;changed=true;}
                 var opacity=MapViewSettings.ClampOpacity(settings.Opacity)*100;ImGui.SetNextItemWidth(160);
                 if(ImGui.SliderFloat(localization.Get("MapView.Opacity"),ref opacity,20,100,"%.0f %%")){settings.Opacity=opacity/100;changed=true;}
@@ -915,7 +915,7 @@ internal sealed partial class MainWindow
                 try{ImGui.SetNextItemWidth(70);if(ImGui.InputInt("##Priority",ref priority,1)){settings.SetPriority(icon,scope,priority);changed=true;}}
                 finally{ImGui.EndDisabled();}
                 if(layer)Tip("MapView.IconsLayerFixed");
-                else if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.IconsPriority"));
+                else Tip("MapView.IconsPriority");
                 ImGui.SameLine();
                 // R-04: right click on this icon = its own menu (on) or the general map menu; one list for all maps.
                 // 0.298 (user request): a mouse button instead of a second checkbox, so the two settings of the row are not confused.
@@ -935,7 +935,7 @@ internal sealed partial class MainWindow
                 else if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(ownMenu ? "MapView.IconsOwnMenuOn":"MapView.IconsOwnMenuOff")+"\n"+localization.Get("MapView.IconsOwnMenu"));
                 ImGui.SameLine();
                 ImGui.TextUnformatted(iconName);
-                if(TenshoGlyph(icon) is not null && ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.TenshoIconHelp"));
+                if(TenshoGlyph(icon) is not null)Tip("MapView.TenshoIconHelp");
                 // 0.328 (map audit #14/#40): the row's « ↺ ». All maps: this icon's default size, priority and right-click mode. This map:
                 // its overrides go, so it follows the global settings again (the right-click mode has one value for all maps).
                 var differs=scope==0
@@ -967,7 +967,7 @@ internal sealed partial class MainWindow
     {
         var changed=false;
         if(ImGui.Checkbox(localization.Get(key)+"##Area"+key,ref shown)){applyShown(shown);changed=true;}
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(key+"Help"));
+        Tip(key+"Help");
         ImGui.SameLine(ImGui.GetFontSize()*14);
         if(ImGui.ColorEdit4("##Colour"+key,ref colour,ImGuiColorEditFlags.NoInputs | ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.AlphaPreviewHalf)){applyColour(colour);changed=true;}
         Tip("SettingTips.AreaColour");
@@ -995,7 +995,7 @@ internal sealed partial class MainWindow
         var changed=ImGui.Checkbox(localization.Get(key)+"###"+key,ref value);
         if(changed)apply(value);
         // 0.328 (map audit #39): also when greyed (edge kinds, zone name), whose help says what they depend on.
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) && localization.Get(key+"Help") is { } help && !help.StartsWith('['))WrappedTooltip(help);
+        if(localization.Has(key+"Help"))Tip(key+"Help");
         if(fallback is { } byDefault && DefaultButton(key,value!=byDefault)){apply(byDefault);changed=true;}
         return changed;
     }
@@ -1008,7 +1008,7 @@ internal sealed partial class MainWindow
         bool clicked;
         try{clicked=ImGui.Button($"{icon.ToIconString()}##{tooltipKey}",new Vector2(26));}
         finally{ImGui.PopFont();if(active)ImGui.PopStyleColor();ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(tooltipKey));
+        Tip(tooltipKey);
         return clicked && enabled;
     }
 
@@ -1711,8 +1711,7 @@ internal sealed partial class MainWindow
     // items with icons; the clickable (topmost) icon says what a click does. Unnamed icons use the game's symbol name.
     private void DrawIconListTooltip(IReadOnlyList<MapIconDraw> hits,MapIconDraw? top,MapViewSettings settings)
     {
-        ImGui.BeginTooltip();
-        try
+        using(TooltipScope.Begin())
         {
             var size=new Vector2(ImGui.GetTextLineHeight()*1.6f);var shown=0;
             foreach(var hit in hits)
@@ -1755,7 +1754,6 @@ internal sealed partial class MainWindow
                 finally{ImGui.EndGroup();}
             }
         }
-        finally{ImGui.EndTooltip();}
     }
     // Event marker title: the game's tooltip when it could be read safely, else the name of a quest in progress with the same
     // objective id (0.134: a leve marker took a completed quest's name through a 16-bit id collision), else null → the
@@ -1889,8 +1887,7 @@ internal sealed partial class MainWindow
     // Sightseeing log entry: number (row order), name, state, and the game's picture once discovered.
     private void DrawSightseeingTooltip(MapLocalPosition vista,bool? done)
     {
-        ImGui.BeginTooltip();
-        try
+        using(TooltipScope.Begin())
         {
             ImGui.TextColored(Accent,localization.Format("MapView.Vista",vista.Name));
             ImGui.TextDisabled(localization.Get(done switch{true=>"MapView.VistaDone",false=>"MapView.VistaTodo",_=>"MapView.CollectedUnknown"}));
@@ -1930,9 +1927,7 @@ internal sealed partial class MainWindow
                 ImGui.TextDisabled(localization.Get("Alarms.VistaRightClick"));
                 if(wiki.Comment.Length>0)
                 {
-                    ImGui.PushTextWrapPos(ImGui.GetFontSize()*30);
                     ImGui.TextWrapped(localization.Format("MapView.VistaWhere",wiki.Comment));
-                    ImGui.PopTextWrapPos();
                 }
                 ImGui.TextDisabled(localization.Format("MapView.VistaWikiSource",wikiVistas!.State.Document!.FetchedAt.ToLocalTime().ToString("g")));
             }
@@ -1960,12 +1955,10 @@ internal sealed partial class MainWindow
             if(done==true && vista.Data!=0 && textures.TryGetFromGameIcon(new GameIconLookup(vista.Data),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
                 ImGui.Image(image.Handle,new Vector2(160,90));
         }
-        finally{ImGui.EndTooltip();}
     }
     private void DrawGatheringTooltip(MapLocalGatheringPoint point)
     {
-        ImGui.BeginTooltip();
-        try
+        using(TooltipScope.Begin())
         {
             if(point.Icon!=0){DrawSmallGameIcon(point.Icon);}
             ImGui.TextColored(Accent,$"{point.Type} · {localization.Format("MapLocal.Level",point.Level)}{(point.Hidden ? " "+localization.Get("MapLocal.Hidden"):"")}");
@@ -1980,7 +1973,6 @@ internal sealed partial class MainWindow
             }
             ImGui.TextDisabled(localization.Get("MapLocal.ClickFlag"));
         }
-        finally{ImGui.EndTooltip();}
     }
     // Vendors standing on a map, with the shop names of each, rebuilt only when the map or the catalogue changes.
     private (uint MapId,object? Catalog,IReadOnlyList<(Npcs.NpcVendor Vendor,Npcs.NpcLocation Spot)> Rows,IReadOnlyDictionary<uint,(string Name,Npcs.NpcShopKind Kind,int Items)> Shops,string Festivals) mapVendorCache=(0,null,[],new Dictionary<uint,(string,Npcs.NpcShopKind,int)>(),"");

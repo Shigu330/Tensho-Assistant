@@ -15,7 +15,7 @@ internal sealed partial class MainWindow
         var now=DateTimeOffset.UtcNow;var minute=GatheringTime.MinuteOfDay(now);
         // Eorzea time only (0.206): the PC time is shown once, in the header next to the version.
         ImGui.TextColored(Accent,localization.Format("GatheringClock.Time",minute/60,minute%60));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GatheringClock.Disclaimer"));
+        Tip("GatheringClock.Disclaimer");
     }
     // Countdown of an opening: the time until it closes (open) or opens (closed), also used by the map tooltip of a timed point.
     private string WindowCountdown((bool Open,TimeSpan Left) state)

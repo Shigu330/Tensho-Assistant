@@ -228,8 +228,7 @@ internal sealed partial class MainWindow
         using(TenshoAssistant.UI.UiComponents.PushSectionFont())ImGui.TextColored(Accent,title);
         if(help is not null)
         {
-            ImGui.SameLine();ImGui.TextDisabled("(?)");
-            if(ImGui.IsItemHovered())WrappedTooltip(help);
+            ImGui.SameLine();HelpMarkerText(help);
         }
         ImGui.Separator();
     }

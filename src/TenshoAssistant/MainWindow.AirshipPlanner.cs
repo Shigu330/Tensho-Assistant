@@ -129,7 +129,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted((route.UnknownExp>0 ? "≥ ":"")+route.ExpPerDay.ToString("N0"));
                 ImGui.TableNextColumn();
                 if(ImGui.SmallButton(localization.Get("AirshipPlanner.Use")+$"##AirshipUse{index}")){airshipChosen.Clear();airshipChosen.AddRange(route.Sectors);}
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("AirshipPlanner.UseTip"));
+                Tip("AirshipPlanner.UseTip");
             }
         }
         finally{ImGui.EndTable();}

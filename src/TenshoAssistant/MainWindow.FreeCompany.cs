@@ -58,7 +58,7 @@ internal sealed partial class MainWindow
     {
         if(count>1)ImGui.TextColored(Accent,localization.Format("FreeCompany.Workshop",number));
         ImGui.TextDisabled(localization.Format("FreeCompany.ReadAt",vessels.Max(vessel=>vessel.ReadAt).ToLocalTime().ToString("g")));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FreeCompany.ReadAtTip"));
+        Tip("FreeCompany.ReadAtTip");
         foreach(var kind in new[]{VesselKind.Submarine,VesselKind.Airship})
         {
             var list=vessels.Where(vessel=>vessel.Kind==kind).ToArray();
@@ -170,7 +170,7 @@ internal sealed partial class MainWindow
             ImGui.PushFont(UiBuilder.IconFont);
             try{ImGui.TextDisabled(FontAwesomeIcon.BoxOpen.ToIconString());}
             finally{ImGui.PopFont();}
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FreeCompany.LootHint"));
+            Tip("FreeCompany.LootHint");
             if(ImGui.IsItemClicked())ImGui.OpenPopup("VesselLoot"+id);
             if(ImGui.BeginPopup("VesselLoot"+id))
             {

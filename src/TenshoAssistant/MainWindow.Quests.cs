@@ -265,7 +265,7 @@ internal sealed partial class MainWindow
                     if (mapLocal?.State.Index?.Quest(entry.Id) is { } giver && giver.MapId == issuerMap.MapId) ShowOnTenshoMap(issuerMap, new Vector3(giver.X, 0, giver.Z));
                     else ShowMapOnTenshoMap(issuerMap.MapId);
                 }
-                if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("QuestDetails.MapHelp"));
+                Tip("QuestDetails.MapHelp");
             }
             else ImGui.TextDisabled(localization.Get("QuestDetails.NoMap"));
         }

@@ -41,7 +41,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(ReadRelics is null || relicRead is not null);
         try{if(ImGui.Button(localization.Get("Relics.Read")))relicRead=ReadRelics!();}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Relics.ReadTip"));
+        Tip("Relics.ReadTip");
         RefreshRecipeHoldingsCache();
         var tabs=new List<(string Key,string Label,Action Draw)>{("Zodiac",localization.Get("Relics.FamilyZodiac"),()=>{DrawRelicFamily("Zodiac",catalog.Lines);DrawRelicBook(catalog);})};
         foreach(var (key,lines) in catalog.Families ?? [])

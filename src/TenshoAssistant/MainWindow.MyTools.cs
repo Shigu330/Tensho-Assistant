@@ -29,13 +29,13 @@ internal sealed partial class MainWindow
         DrawMyToolsThemeReturn(store);
         if(myToolDraft is { } draft){DrawMyToolEditor(store,draft);return;}
         if(ImGui.SmallButton(localization.Get("MyToolsUi.Create"))){myToolDraft=ToolDraft.New();myToolDraftProblem=null;return;}
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.CreateTip"));
+        Tip("MyToolsUi.CreateTip");
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get(myToolsImporting ? "MyToolsUi.ImportClose":"MyToolsUi.Import"))){myToolsImporting=!myToolsImporting;myToolsPreview=null;}
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.ImportTip"));
+        Tip("MyToolsUi.ImportTip");
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get(myToolsGalleryOpen ? "MyToolsUi.GalleryClose":"MyToolsUi.Gallery")))myToolsGalleryOpen=!myToolsGalleryOpen;
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.GalleryTip"));
+        Tip("MyToolsUi.GalleryTip");
         if(myToolsImporting)DrawMyToolsImport(store);
         if(myToolsGalleryOpen)DrawMyToolsGallery(store);
         var tools=store.Tools;
@@ -55,25 +55,25 @@ internal sealed partial class MainWindow
     {
         if(tool.Template.Author is { } author){ImGui.TextDisabled(localization.Format("MyToolsUi.Author",author));ImGui.SameLine();}
         if(ImGui.SmallButton(localization.Get("MyToolsUi.Edit"))){myToolDraft=ToolDraft.From(tool.Template);myToolDraftProblem=null;return;}
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.EditTip"));
+        Tip("MyToolsUi.EditTip");
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("MyToolsUi.Share")))ImGui.SetClipboardText(ToolTemplateFormat.Encode(tool.Json));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.ShareTip"));
+        Tip("MyToolsUi.ShareTip");
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("MyToolsUi.CopyJson")))ImGui.SetClipboardText(tool.Json);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.CopyJsonTip"));
+        Tip("MyToolsUi.CopyJsonTip");
         ImGui.SameLine();
         if(myToolRemoveArmed!=tool.Template.Id)
         {
             if(ImGui.SmallButton(localization.Get("MyToolsUi.Remove")))myToolRemoveArmed=tool.Template.Id;
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.RemoveTip"));
+            Tip("MyToolsUi.RemoveTip");
         }
         else if(ImGui.SmallButton(localization.Get("MyToolsUi.RemoveConfirm"))){store.Remove(tool.Template.Id);myToolSelected=null;myToolRemoveArmed=null;}
         // T8: a tool only proposes; the setting changes on this click, and the button at the top of the page brings it back.
         if(tool.Template.Theme is { } theme && configuration.ThemeMode!=ToolTemplateFormat.ThemeMode(theme))
         {
             if(ImGui.SmallButton(localization.Format("MyToolsUi.ThemeApply",ThemeName(theme))+"###MyToolThemeApply"))SaveTheme(ToolTemplateFormat.ThemeMode(theme),configuration.ThemeModeBeforeTool ?? configuration.ThemeMode);
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.ThemeApplyTip"));
+            Tip("MyToolsUi.ThemeApplyTip");
         }
     }
 
@@ -86,7 +86,7 @@ internal sealed partial class MainWindow
         if(target==current)return;
         var name=target==0 ? localization.Get("MyToolsUi.ThemeGame"):localization.Get("Theme."+(UI.PluginTheme)Math.Clamp(target-1,0,Enum.GetValues<UI.PluginTheme>().Length-1));
         if(ImGui.SmallButton(localization.Format("MyToolsUi.ThemeReturn",name)+"###MyToolThemeReturn"))SaveTheme(target);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.ThemeReturnTip"));
+        Tip("MyToolsUi.ThemeReturnTip");
     }
 
     private string ThemeName(string theme)=>localization.Get("Theme."+(UI.PluginTheme)(ToolTemplateFormat.ThemeMode(theme)-1));
@@ -98,7 +98,7 @@ internal sealed partial class MainWindow
         if(ImGui.SmallButton(localization.Get("MyToolsUi.Paste")))myToolsPasted=ImGui.GetClipboardText() ?? "";
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("MyToolsUi.Check")))myToolsPreview=ToolTemplateFormat.Import(myToolsPasted);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.CheckTip"));
+        Tip("MyToolsUi.CheckTip");
         if(myToolsPreview is not { } preview)return;
         if(preview.Problem is { } problem)
         {
@@ -121,7 +121,7 @@ internal sealed partial class MainWindow
         if(state.Entries is null && !state.Loading)
         {
             if(ImGui.SmallButton(localization.Get("MyToolsUi.GalleryLoad")))_=MyToolsGallery.LoadListAsync();
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.GalleryLoadTip"));
+            Tip("MyToolsUi.GalleryLoadTip");
         }
         if(state.Loading)ImGui.TextDisabled(localization.Get("MyToolsUi.GalleryLoading"));
         if(state.Problem is { } problem)
@@ -142,7 +142,7 @@ internal sealed partial class MainWindow
                     ImGui.BeginDisabled(state.Loading);
                     try{if(ImGui.SmallButton(localization.Get("MyToolsUi.GalleryOpen")))_=gallery.OpenAsync(entry);}
                     finally{ImGui.EndDisabled();}
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsUi.GalleryOpenTip"));
+                    Tip("MyToolsUi.GalleryOpenTip");
                     ImGui.SameLine();
                     ImGui.TextUnformatted(entry.Name.For(language));
                     if(entry.Author is { } author){ImGui.SameLine();ImGui.TextDisabled(localization.Format("MyToolsUi.Author",author));}

@@ -310,7 +310,7 @@ internal sealed partial class MainWindow
             {
                 if (ImGui.SmallButton(localization.Format("UiFragments.Move",entry?.Name ?? localization.Format("UiFragments.Card",card.Label),candidate.Move.Square/3+1,candidate.Move.Square%3+1,blue,10-blue)))
                 { ApplyTriadMove(candidate.Move); break; }
-                if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("TriadSim.Apply"));
+                Tip("TriadSim.Apply");
             }
             finally { ImGui.PopID(); }
         }

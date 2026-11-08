@@ -157,7 +157,7 @@ internal sealed partial class MainWindow
                                     ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
                                     try { ImGui.TextColored(Success, Dalamud.Interface.FontAwesomeIcon.Check.ToIconString()); }
                                     finally { ImGui.PopFont(); }
-                                    if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("Notebooks.DoneTip"));
+                                    Tip("Notebooks.DoneTip");
                                 }
                             }
                             finally { ImGui.PopID(); }

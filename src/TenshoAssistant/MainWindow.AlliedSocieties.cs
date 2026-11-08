@@ -34,7 +34,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(ReadAllied is null || alliedRead is not null);
         try{if(ImGui.Button(localization.Get("Allied.Read")))alliedRead=ReadAllied!(catalog);}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Allied.ReadTip"));
+        Tip("Allied.ReadTip");
         if(alliedFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Allied.Unavailable"));return;}
         if(allied is not { } current)return;
         switch(current.Status)

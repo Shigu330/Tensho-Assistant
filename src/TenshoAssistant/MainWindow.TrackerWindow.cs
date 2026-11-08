@@ -41,7 +41,7 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();
                 var left=row.At-now;
                 ImGui.TextColored(left<=TimeSpan.FromMinutes(5) ? Accent:Muted,AlarmDtrEntry.Remaining(left)+(row.Weather ? " *":""));
-                if(row.Weather && ImGui.IsItemHovered())WrappedTooltip(localization.Get("Alarms.WeatherCondition"));
+                if(row.Weather)Tip("Alarms.WeatherCondition");
                 if(configuration.Alarms?.FirstOrDefault(alarm=>alarm.Id==row.Id) is { } alarm && AlarmPlace(alarm) is { } place
                    && maps.State.Catalog?.Find(place.MapId) is { } map)
                 {

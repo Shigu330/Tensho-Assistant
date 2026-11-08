@@ -148,7 +148,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(GardenJournal.TendAt(bed) is null);
         try{if(ImGui.SmallButton(localization.Get("Garden.Tend"))){GardenJournal.Tend(bed,now);changed=true;}}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Garden.TendTip"));
+        Tip("Garden.TendTip");
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("Garden.Remove")))removed=bed;
         Tip("Garden.RemoveTip");
@@ -187,7 +187,7 @@ internal sealed partial class MainWindow
             }
         }
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(beds.Count>=GardenJournal.Capacity ? "Garden.Full":"Garden.PlantTip"));
+        Tip(beds.Count>=GardenJournal.Capacity ? "Garden.Full":"Garden.PlantTip");
         if(newBedError is { } error)ImGui.TextColored(UI.FfxivTheme.Error,error);
     }
 
@@ -199,7 +199,7 @@ internal sealed partial class MainWindow
         {
             ImGui.SetNextItemWidth(160);
             var open=ImGui.BeginCombo("##NewBedSeedPick",localization.Get("Garden.SeedPick"));
-            if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(seeds.Count==0 ? "Garden.SeedPickNone":"Garden.SeedPickTip"));
+            Tip(seeds.Count==0 ? "Garden.SeedPickNone":"Garden.SeedPickTip");
             if(open)
             {
                 try
