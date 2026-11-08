@@ -30,7 +30,9 @@ internal sealed class ItemContextMenuBridge : IDisposable
 
     private void OnLogout(int type,int code)=>session.Clear();
     /// <summary>0.808 (X-44): windows that list items only (crafting log, its material list and tree): their menu is about the hovered item.</summary>
-    internal static readonly IReadOnlySet<string> ItemWindows=new HashSet<string>(StringComparer.Ordinal){"RecipeNote","RecipeMaterialList","RecipeTree","RecipeProductList"};
+    // 0.852 (X-47, dalamud.log 2026-11-07 22:11:48: « addon JournalAccept, hovered item 5707, name set », left out as a character's menu): the quest windows' rewards.
+    internal static readonly IReadOnlySet<string> ItemWindows=new HashSet<string>(StringComparer.Ordinal){"RecipeNote","RecipeMaterialList","RecipeTree","RecipeProductList",
+        "JournalAccept","JournalResult","JournalDetail"};
     /// <summary>0.837 (X-03): the chat's link item (AgentChatLog.ContextItemId, framework thread) is the hovered item, HQ or not.</summary>
     private static unsafe bool ChatLinkItem(ulong hovered)
     {

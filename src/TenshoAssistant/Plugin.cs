@@ -988,7 +988,7 @@ public sealed class Plugin : IDalamudPlugin
             MacroObservationReader? macroObserver = null;
             registrations.Register(() => macroObserver = new MacroObservationReader(macroObservations, framework, player, client, log), () => macroObserver?.Dispose());
             ItemHoverReader? hoverReader = null;
-            registrations.Register(() => hoverReader = new ItemHoverReader(configuration, market, itemHover, itemCatalog, gameGui, player, client, framework, log) { InDuty = () => mapLive?.State is { InDuty: true }, Keys = keyState },
+            registrations.Register(() => hoverReader = new ItemHoverReader(configuration, market, itemHover, itemCatalog, gameGui, player, client, framework, log) { InDuty = () => mapLive?.State is { InDuty: true }, Keys = keyState, Developer=()=>configuration.DeveloperMode, },
                 () => hoverReader?.Dispose());
             MapCatalogLoader? mapLoader = null;
             registrations.Register(() => mapLoader = new MapCatalogLoader(maps, data, framework, log), () => mapLoader?.Dispose());

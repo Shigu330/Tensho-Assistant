@@ -32,6 +32,12 @@ internal sealed class ItemHoverReader : IDisposable
                 // e) (audit 2026-11-02): « hide in duties » stops the observation itself: no panel, no hover price asked for it.
                 var hidden=configuration.HoverHideInDuty && InDuty();
                 var raw=(prices || usages) && owner!=0 && !hidden && !gui.GameUiHidden ? gui.HoveredItem:0;
+                // 0.852 (X-47, user report: no Tensho panel under a quest reward's tooltip): developer mode, why a hovered item gets no panel, once per item and reason.
+                if(Developer() && raw==0 && gui.HoveredItem is var seen and not 0)
+                {
+                    var why=!prices && !usages ? "prices and uses off":owner==0 ? "not logged in":hidden ? "hidden in duties":gui.GameUiHidden ? "game UI hidden":"other";
+                    if(blockedLogged!=(seen,why)){blockedLogged=(seen,why);log.Information("Item hover without panel: item {0}, {1}.",seen,why);}
+                }
                 if(Owner!=owner || raw!=0 && (gui.GameUiHidden || gui.HoveredItem!=raw)){coordinator.Clear();return;}
                 var held=Keys is { } keys && keys[Dalamud.Game.ClientState.Keys.VirtualKey.CONTROL] && keys[Dalamud.Game.ClientState.Keys.VirtualKey.MENU];
                 var refresh=held && !refreshHeld && raw!=0 && configuration.HoverPriceRefresh;refreshHeld=held;
@@ -47,6 +53,9 @@ internal sealed class ItemHoverReader : IDisposable
         }
     }
     private bool stackFailed;
+    private (ulong Item,string Why) blockedLogged;
+    /// <summary>0.852 (X-47): developer mode, set by the plugin; false when not given.</summary>
+    public Func<bool> Developer { get; init; } = ()=>false;
     // Only the visible game tooltip's screen rectangle is copied; no pointer outlives this call.
     private ItemHoverAnchor? ReadTooltip()
     {

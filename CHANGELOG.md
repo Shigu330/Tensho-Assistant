@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.852.0
+- Plan global, Verify : Signalement (X-47) : dans la fenêtre d'une quête, les récompenses n'avaient ni l'entrée Tensho au clic droit, ni le panneau Tensho sous l'info-bulle. Menu : le journal montre que le jeu ouvrait bien son menu (fenêtre JournalAccept, objet survolé), mais Tensho le prenait pour un menu de personnage ; les fenêtres de quête comptent maintenant comme fenêtres d'objets, l'entrée Tensho y apparaît. Panneau : la cause n'est pas prouvée ; le mode développeur note désormais pourquoi un objet survolé n'a pas de panneau, pour trancher. Non validé en jeu.
+- Tests : QuestRewards852Tests. Verify.ps1 (agent) : 1431/1431, 0 avertissement, 0 erreur ; DLL 0.852.0.0. Non validé en jeu.
+### English
+- Report (X-47): in a quest window, rewards had neither Tensho's entry on a right click nor Tensho's panel under the tooltip. Menu: the log shows the game did open its menu (JournalAccept window, hovered item), but Tensho took it for a character's menu; quest windows now count as item windows, and the Tensho entry appears. Panel: the cause is not proven; developer mode now logs why a hovered item gets no panel, to settle it. Not validated in game.
+
 ## 0.851.0
 - Plan global, Verify : Retour (X-71) : le chevron haut ou bas doit être un peu plus petit. Il passe de 75 % à 55 % de la taille de l'icône, un peu plus bas sous son milieu. Non validé en jeu.
 - Tests : HeightArrows844Tests. Verify.ps1 (agent) : 1430/1430, 0 avertissement, 0 erreur ; DLL 0.851.0.0. Non validé en jeu.
