@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.947.0
+- Plan global, Verify : Nettoyage X-76, étape 4 (info-bulles et textes) : un nouveau test vérifie que la ligne « Par défaut » de chacun des 137 réglages oui/non dit la vraie valeur par défaut, en anglais et en français (elles sont toutes justes ; le test empêche une erreur à l'avenir). Anglais et français : 6 900 textes chacun, aucun manquant ; allemand et japonais : 35 textes traduits, le reste s'affiche en anglais (signalé, comme prévu). L'aide et le guide seront relus contre les pages finales avec les documents (X-91). Non validé en jeu.
+- Tests : DefaultLines947Tests. Verify.ps1 (agent) : 1559/1559, 0 avertissement, 0 erreur ; DLL 0.947.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, step 4 (tooltips and texts): a new test checks that the « Default » line of each of the 137 on/off settings states the real default, in English and in French (all are right; the test keeps them so). English and French: 6,900 texts each, none missing; German and Japanese: 35 translated texts, the rest shows in English (reported, as planned). The help and the guide will be read again against the final pages with the documents (X-91). Not validated in game.
+
 ## 0.946.0
 - Plan global, Verify : Pêche en mer, correction sur votre signalement (capture : Tensho affichait « Mer de Rubis · nuit » quand le jeu montrait le soleil) : le moment de la journée de chaque escale était mal lu. Les données du jeu donnent 1, 2 ou 3 par escale ; Tensho lisait 1 nuit, 2 jour, 3 crépuscule (règle reprise d'un autre outil), c'est en fait 1 jour, 2 crépuscule, 3 nuit, ce qui donne bien jour → crépuscule → nuit d'une escale à l'autre. Concerne le panneau de voyage, l'horaire des départs et le nom des voyages (« crépuscule », « nuit »…). Votre premier voyage (16 h UTC) commençait donc au crépuscule, pas de jour. À confirmer au prochain voyage. Preuve : docs/evidence/0.946-ocean-time.md. Non validé en jeu.
 - Tests : OceanFishing392Tests. Verify.ps1 (agent) : 1558/1558, 0 avertissement, 0 erreur ; DLL 0.946.0.0. Non validé en jeu.

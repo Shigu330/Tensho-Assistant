@@ -279,7 +279,7 @@ avant la 1.0.0, E2 test des règles d'interface (couvert par les tests 912 à 92
 - Réglages manquants là où un comportement est imposé sans choix.
 - Demandes déjà notées : un réglage unique « données du jeu et observées seulement » (coupe d'un coup toutes les sources communautaires) ; vider le cache et les découvertes avec une sauvegarde zip juste avant.
 
-**4. Info-bulles et textes.**
+**4. Info-bulles et textes.** — 0.947 : la ligne « Par défaut » des 137 réglages oui/non vérifiée contre la vraie valeur, en anglais et en français (toutes justes, test DefaultLines947Tests) ; info-bulles des réglages relues par l'inventaire de l'étape 3 (4 corrigées en 0.944) ; anglais et français : 6 900 clés chacun, aucune manquante ; allemand et japonais : 35 clés, le reste en anglais (signalé, pas traduit) ; reste : l'aide et le guide relus contre les pages finales, avec les documents (X-91).
 - Chaque info-bulle relue contre le code, celles des réglages d'abord, avec une ligne « Par défaut : … » juste.
 - Parité anglais et français ; allemand et japonais : signaler seulement ce qui manque.
 - Textes de l'aide et du guide alignés sur l'état final des pages.

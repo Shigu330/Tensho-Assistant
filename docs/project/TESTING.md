@@ -1534,6 +1534,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.946) Prochain voyage : à chaque escale, le moment affiché par Tensho (jour, crépuscule, nuit) est celui du soleil / demi-soleil / lune de la fenêtre du jeu.
 
+- [ ] (0.947) Rien de visible.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
