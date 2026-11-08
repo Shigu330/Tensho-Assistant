@@ -110,6 +110,14 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             bitAt=now;
             var character=(FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)me.Address;
             biteStrength=ItemGains.BiteStrength(character->Timeline.TimelineSequencer.TimelineIds[7]);
+            // X-98 (5) (0.965): at sea the strength is often unknown; in developer mode the timeline slots are logged then, to find where the bite is.
+            if(biteStrength==0 && debug())
+            {
+                var slots=new List<string>();
+                for(var slot=0;slot<character->Timeline.TimelineSequencer.TimelineIds.Length;slot++)
+                    if(character->Timeline.TimelineSequencer.TimelineIds[slot] is var id and not 0)slots.Add($"{slot}:{id}");
+                log.Information("Discovery: bite strength unknown; timeline slots {0}.",string.Join(" ",slots));
+            }
         }
     }
     /// <summary>

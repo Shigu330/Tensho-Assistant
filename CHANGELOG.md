@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.965.0
+- Plan global, Verify : Pêche en mer (X-98, point 5) : la force de la touche (! / !! / !!!) est souvent lue « inconnue » en mer. Pour trouver où le jeu la met à bord, en mode développeur, Tensho écrit maintenant dans le journal les animations en cours quand la touche est inconnue ; le prochain voyage dira laquelle porte la touche. Rien ne change hors du mode développeur. Non validé en jeu.
+- Tests : BiteSlots965Tests. Verify.ps1 (agent) : 1592/1592, 0 avertissement, 0 erreur ; DLL 0.965.0.0. Non validé en jeu.
+### English
+- Ocean fishing (X-98, point 5): the bite strength (! / !! / !!!) is often read « unknown » at sea. To find where the game keeps it aboard, in developer mode Tensho now writes the current animation slots to the log when the bite is unknown; the next voyage will tell which slot holds it. Nothing changes outside developer mode. Not validated in game.
+
 ## 0.964.0
 - Plan global, Verify : Pêche en mer, V2 (points) et V6 (assignats) : le jeu tient, pour chaque poisson de l'escale, le nombre de prises et les points gagnés. Tensho note maintenant les points de chaque prise (la hausse des points à chaque nouvelle prise, bonus du moment compris) comme découverte, et le panneau affiche « 120 pts » à côté d'un poisson dont les points ont été vus, avec au survol ce que le poisson a rapporté pendant ce voyage. Pour viser les 10 000 points (seuil des assignats orange selon la communauté), les poissons qui rapportent le plus deviennent visibles. En fin de voyage, en mode développeur, les deux montants d'assignats du jeu sont écrits dans le journal pour prouver lequel est l'orange et lequel le violet, avant de les afficher. Non validé en jeu.
 - Tests : OceanPoints964Tests. Verify.ps1 (agent) : 1591/1591, 0 avertissement, 0 erreur ; DLL 0.964.0.0. Non validé en jeu.

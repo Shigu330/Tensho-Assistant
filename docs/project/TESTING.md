@@ -1570,6 +1570,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.964) Prochain voyage : « … pts » apparaît à côté des poissons après leur première prise ; en fin de voyage, dalamud.log contient « Ocean voyage result: … scrip1 … scrip2 … » (à comparer avec l'écran de fin).
 
+- [ ] (0.965) Prochain voyage, mode développeur : dalamud.log contient « bite strength unknown; timeline slots … » à chaque touche inconnue.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
