@@ -601,6 +601,7 @@
     "SummaryDutyChestOpened": "Coffres de mission vus : {0} ({1} vus par vous, {2} importés seulement)",
     "SharedFull": "{0} découvertes partagées ont été laissées de côté : la partie partagée est pleine ({1}). Les vôtres sont toujours gardées ; rien n’est oublié.",
     "SharedNearlyFull": "Découvertes partagées : {0} sur {1}. Les vôtres sont toujours gardées.",
+    "SharedReading": "Lecture des découvertes partagées ({0} sortes restantes)…",
     "SummaryFishBite": "Touches de poissons vues : {0} ({1} vues par vous, {2} importées seulement)",
     "ExchangeTitle": "Échange avec les autres joueurs (GitHub)",
     "ExchangeHelp": "Partager ce que vous avez découvert et prendre ce que d'autres ont trouvé. Sans connexion, l'échange automatique récupère seulement les découvertes communes. Une découverte ne contient jamais le nom, la position ni l'identifiant d'un joueur.",

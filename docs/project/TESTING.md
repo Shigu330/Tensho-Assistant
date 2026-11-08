@@ -1524,6 +1524,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.941) Recharger le plugin : page Découvertes, les nombres des sortes apparaissent quand une page les demande ; info-bulles « vu en jeu » comme avant.
 
+- [ ] (0.942) Ouvrir la page Découvertes : mêmes totaux qu'avant.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

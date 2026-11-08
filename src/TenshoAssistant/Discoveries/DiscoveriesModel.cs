@@ -201,6 +201,8 @@ public sealed class DiscoveryStore
         lock(gate)return Enum.GetValues<DiscoveryKind>().Where(kind=>!sharedWaiting.Contains(kind)).ToHashSet();
     }
     public int SharedKindsWaiting{get{lock(gate)return sharedWaiting.Count;}}
+    /// <summary>X-93 (0.942): the Discoveries page shows every kind's totals: it asks for all the shared kinds still on disk.</summary>
+    public void WantAll(){lock(gate)foreach(var kind in sharedWaiting.ToArray())Want(kind);}
     // Under the lock: asks for a kind in the background.
     private void Want(DiscoveryKind kind)
     {

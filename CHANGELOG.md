@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.942.0
+- Plan global, Verify : X-93, fin : la page Découvertes lit toutes les sortes partagées encore sur le disque quand elle est ouverte (« Lecture des découvertes partagées… » pendant ce temps), pour montrer des totaux complets ; ailleurs, seules les sortes demandées sont lues. X-93 est terminé (0.938 à 0.942) : recherches indexées, vos découvertes jamais refusées, partagées à part par sorte, compressées et lues à la demande. Non validé en jeu.
+- Tests : SharedLazy941Tests. Verify.ps1 (agent) : 1555/1555, 0 avertissement, 0 erreur ; DLL 0.942.0.0. Non validé en jeu.
+### English
+- X-93, end: the Discoveries page reads every shared kind still on disk when it is open (« Reading the shared discoveries… » meanwhile), to show full totals; elsewhere only the kinds asked for are read. X-93 is done (0.938 to 0.942): indexed searches, your discoveries never refused, shared ones apart by kind, compressed and read on demand. Not validated in game.
+
 ## 0.941.0
 - Plan global, Verify : X-93, troisième partie : les découvertes partagées sont lues seulement quand une page a besoin de leur sorte (en arrière-plan, la réponse arrive un instant après), ou tout de suite avant d'y joindre une importation, pour ne jamais compter deux fois la même ; les sortes que rien ne demande restent sur le disque et ne prennent pas de mémoire. Les fichiers partagés s'écrivent maintenant avant le vôtre, pour qu'un arrêt entre les deux ne perde rien. Non validé en jeu.
 - Tests : SharedLazy941Tests. Verify.ps1 (agent) : 1555/1555, 0 avertissement, 0 erreur ; DLL 0.941.0.0. Non validé en jeu.

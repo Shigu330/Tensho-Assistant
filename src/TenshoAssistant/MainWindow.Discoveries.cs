@@ -321,6 +321,9 @@ internal sealed partial class MainWindow
             BoolSetting("DiscoveriesUi.MarketPrices","DiscoveriesUi.MarketPricesTip",()=>configuration.Discovery.MarketPrices,value=>configuration.Discovery.MarketPrices=value,c=>c.Discovery.MarketPrices);
             ImGui.Unindent();
         }
+        // X-93 (0.942): the page reads every shared kind still on disk, and says so while it does.
+        store.WantAll();
+        if(store.SharedKindsWaiting is > 0 and var waiting)ImGui.TextDisabled(localization.Format("DiscoveriesUi.SharedReading",waiting));
         var summary=store.Summary();
         // X-93 (0.939): never silent: shared discoveries left out because the shared part is full, or nearly full.
         var sharedHeld=summary.Sum(row=>row.ImportedOnly);

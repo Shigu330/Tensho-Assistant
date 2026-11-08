@@ -31,6 +31,9 @@ internal static class SharedLazy941Tests
                 Check(File.Exists(DiscoveryFiles.SharedPath(DiscoveryFiles.SharedFolder(main),DiscoveryKind.Venture)),"kind not read left alone");
                 var (added,joined,_)=store.Merge([Shared(DiscoveryKind.Venture,8)]);
                 Check(added==0 && joined==1 && store.Find(DiscoveryKind.Venture,8u,1).Single().Imported==2,"import joins the kind read first");
+                store.WantAll();
+                for(var wait=0;wait<200 && store.SharedKindsWaiting>0;wait++)Thread.Sleep(10);
+                Check(store.SharedKindsWaiting==0,"page reads every kind");
                 store.Clear();
                 DiscoveryFiles.WriteSplit(main,store.Snapshot(at),written,store.SharedKindsHeld());
                 Check(DiscoveryFiles.SharedKindsOnDisk(main).Count==0,"cleared base removes the shared files");
