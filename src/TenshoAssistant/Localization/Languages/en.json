@@ -3096,6 +3096,7 @@
     "Tools": "All tools for this item"
   },
   "HoverUi": {
+    "SeenSource": "Seen by you: {0}",
     "CollectionHowUnknown": "The game data does not say which item teaches it: how to obtain it is unknown to Tensho (quest, achievement, content or shop possible).",
     "Compare": "Compared with your worn gear",
     "CompareWith": "With {0}:",

@@ -94,6 +94,19 @@ internal sealed partial class MainWindow
         if(!discoveryFateNames.TryGetValue(id,out var name))discoveryFateNames[id]=name=FateName?.Invoke(id) is { Length:>0 } found ? found:$"#{id}";
         return name;
     }
+    /// <summary>X-74 (0.865): where you saw this item come from (the item-source kinds, most seen first, four at most); worked out again when the base changes.</summary>
+    private (uint Item,long Revision,string[] Lines) discoveredSources=(0,-1,[]);
+    internal IReadOnlyList<string> DiscoveredSourcesOf(uint item)
+    {
+        if(item==0 || DiscoveryStore is not { } store || !DiscoveriesLoaded)return [];
+        if(discoveredSources.Item==item && discoveredSources.Revision==store.Revision)return discoveredSources.Lines;
+        var lines=ItemSourceKinds.Where(kind=>kind is not (DiscoveryKind.FishCondition or DiscoveryKind.FestivalSeen or DiscoveryKind.VistaSeen or DiscoveryKind.VoyageUnlock
+                or DiscoveryKind.BlueSpellLearned or DiscoveryKind.BeastTamed or DiscoveryKind.FashionEvaluation))
+            .SelectMany(kind=>store.Find(kind,subject=>subject==item,4)).OrderByDescending(fact=>fact.Seen+fact.Imported).Take(4)
+            .Select(fact=>$"{DiscoveryFactName(fact)} ({DiscoveryFactLevel(fact)}, ×{fact.Seen+fact.Imported})").ToArray();
+        discoveredSources=(item,store.Revision,lines);
+        return lines;
+    }
     private static readonly DiscoveryKind[] ItemSourceKinds=[DiscoveryKind.Desynthesis,DiscoveryKind.Venture,DiscoveryKind.DutyChest,DiscoveryKind.FateReward,
         DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition,DiscoveryKind.FashionEvaluation,DiscoveryKind.VoyageDrop,DiscoveryKind.VoyageUnlock,DiscoveryKind.BlueSpellLearned,DiscoveryKind.BeastTamed,DiscoveryKind.FestivalSeen,DiscoveryKind.VistaSeen];
     private string DiscoveryItemName(uint id)=>itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}";

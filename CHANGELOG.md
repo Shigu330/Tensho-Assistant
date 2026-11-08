@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.865.0
+- Plan global, Verify : Consigne de nuit (X-74) : les relevés servent maintenant à la fiche des objets. Dans « Comment l'obtenir » (sous l'info-bulle et sur la fiche), les provenances que vous avez vues en jeu passent en premier : « Vu par vous : … » (désynthèse, coffre de mission, ALÉA, monstre, tâche, objet ouvert, pêche, secteur de voyage), avec les quantités et le nombre de fois. Une provenance vue compte comme connue : Garland et le wiki ne sont plus interrogés pour cet objet. Non validé en jeu.
+- Tests : SeenSources865Tests. Verify.ps1 (agent) : 1448/1448, 0 avertissement, 0 erreur ; DLL 0.865.0.0. Non validé en jeu.
+### English
+- Night instruction (X-74): the records now serve the item sheet. In « How to get it » (under the tooltip and on the sheet), the sources you saw in game come first: « Seen by you: … » (desynthesis, duty chest, FATE, monster, venture, opened item, fishing, voyage sector), with the quantities and how many times. A source seen counts as known: Garland and the wiki are no longer asked for that item. Not validated in game.
+
 ## 0.864.0
 - Plan global, Verify : Demande (X-73.12) : deux relevés de plus. Les fêtes en cours, lues dans le jeu, notées une fois par jour : la base garde leur premier et leur dernier jour vus (leurs dates ne viennent plus seulement des sources communautaires). Les panoramas inscrits, avec la météo et l'heure d'Eorzéa du moment, pour compléter peu à peu les météos que donnait le wiki. Non validé en jeu.
 - Tests : Seasonal864Tests. Verify.ps1 (agent) : 1447/1447, 0 avertissement, 0 erreur ; DLL 0.864.0.0. Non validé en jeu.

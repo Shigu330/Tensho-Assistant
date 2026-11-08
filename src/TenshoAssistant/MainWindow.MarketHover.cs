@@ -348,6 +348,8 @@ internal sealed partial class MainWindow
         // How to obtain the item itself (0.144: the sources follow the unlocking item, not only the collection page).
         ImGui.TextColored(Accent,localization.Get("HoverUi.HowToGet"));
         var known=0;
+        // X-74 (0.865): what you saw in game first (discoveries base); a source seen there makes the Garland / wiki fallback needless.
+        foreach(var seen in DiscoveredSourcesOf(id)){known++;ImGui.TextWrapped(localization.Format("HoverUi.SeenSource",seen));}
         if(HoverOffers(id) is { Count:>0 } offers){known++;ImGui.TextUnformatted(localization.Format("HoverUi.VendorCount",offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));}
         if(quests.State.RewardIndex?.ForItem(id) is { Count:>0 } rewards){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionQuests",string.Join(", ",rewards.Take(3).Select(reward=>reward.Name))));}
         foreach(var achievement in AchievementsRewarding([id]).Take(3)){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionAchievement",achievement));}

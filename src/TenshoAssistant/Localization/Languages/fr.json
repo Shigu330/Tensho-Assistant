@@ -3096,6 +3096,7 @@
     "Tools": "Tous les outils avec cet objet"
   },
   "HoverUi": {
+    "SeenSource": "Vu par vous : {0}",
     "CollectionHowUnknown": "Les données du jeu ne disent pas quel objet l'apprend : obtention inconnue dans Tensho (quête, succès, contenu ou boutique possibles).",
     "Compare": "Comparé à l'équipement porté",
     "CompareWith": "Avec {0} :",
