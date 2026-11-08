@@ -242,8 +242,9 @@ internal sealed partial class MainWindow
         var toolsWidth=DrawMapTools(map,viewport,window,true,area.Y-ImGui.GetTextLineHeight()-16);
         var regionId=markers.RegionOf(map);var region=ResolveMap(catalog,regionId);
         var regions=markers.Regions.Select(id=>ResolveMap(catalog,id)).OfType<MapDefinition>().ToArray();
-        var zones=MapMenus.WithExtras(MapMenus.Zones(catalog.Entries,region),region,map,catalog.Find(mapQuestMap));
-        var floors=zones.FirstOrDefault(entry=>entry.Any(floor=>floor.MapId==map.MapId)) ?? [];
+        mapZoneMenu.Update(catalog,region,map,mapQuestMap);
+        var zones=mapZoneMenu.Zones;
+        var floors=mapZoneMenu.Floors;
         var isZone=map.TerritoryId!=0;var world=localization.Get("MapView.World");
         static string FloorName(MapDefinition floor)=>MapMenus.FloorLabel(floor);
         var regionName=region is not null ? MapName(region):world;var zoneName=isZone ? MapName(map):"--";
@@ -260,8 +261,15 @@ internal sealed partial class MainWindow
         var listCount=mapHeaderList switch{1=>regions.Length+1,2=>worldChoices.Count>0 ? worldChoices.Count:zones.Count+1,3=>floors.Count,_=>0};
         var at=start+new Vector2(toolsWidth+4,0);var room=area-(at-start);
         HeaderBand("MapOverlayBand",at,new Vector2(Math.Min(widths.Max()+pad*2+4,room.X),headerHeight),fade,room);
-        var listWidth=regions.Select(MapName).Append(world).Concat(zones.Select(entry=>MapName(entry[0]))).Concat(floors.Select(FloorName)).Concat(worldChoices.Select(MapName))
-            .Select(name=>ImGui.CalcTextSize("> "+name).X).DefaultIfEmpty(80).Max()+indent+28;
+        // X-76 (0.956): the widest name of the lists, measured again only when the lists, the language or the font size change.
+        var listKey=new MapMenuWidthKey(catalog,mapZoneMenu.Builds,localization.Revision,ImGui.GetFontSize());
+        if(mapOverlayListKey!=listKey)
+        {
+            mapOverlayListKey=listKey;
+            mapOverlayListText=regions.Select(MapName).Append(world).Concat(zones.Select(entry=>MapName(entry[0]))).Concat(floors.Select(FloorName)).Concat(worldChoices.Select(MapName))
+                .Select(name=>ImGui.CalcTextSize("> "+name).X).DefaultIfEmpty(80).Max();
+        }
+        var listWidth=mapOverlayListText+indent+28;
         var width=Math.Min(Math.Max(widths.Max(),mapHeaderList==0 ? 0:listWidth)+pad*2+4,room.X);
         var height=Math.Min(headerHeight+listCount*line,room.Y);
         ImGui.SetCursorPos(at);
@@ -369,15 +377,34 @@ internal sealed partial class MainWindow
     }
 
     private MapDefinition? ResolveMap(MapCatalog catalog,uint id)=>id==0 ? null:catalog.Find(id) ?? mapMarkers?.Overview(id);
+    // X-76 (0.956): the zone list and floors kept until the shown map changes (MapZoneMenu), and the widest name of each menu kept per list, language and font size.
+    private readonly MapZoneMenu mapZoneMenu=new();
+    private readonly record struct MapMenuWidthKey(MapCatalog Catalog,int Lists,int LanguageRevision,float FontSize);
+    private MapMenuWidthKey? mapMenuWidthKey,mapOverlayListKey;
+    private float mapRegionNamesWidth,mapZoneNamesWidth,mapFloorNamesWidth,mapOverlayListText;
     private static string MapName(MapDefinition map)=>map.Zone.Length>0 ? map.Zone:map.Region;
 
     private void DrawMapMenus(MapCatalog catalog,MapDefinition? map,MapLiveState? live)
     {
         if(mapMarkers is null || map is null){ImGui.TextColored(Accent,localization.Get("MapView.NoMap"));return;}
         var regionId=mapMarkers.RegionOf(map);
-        var regionNames=mapMarkers.Regions.Select(id=>ResolveMap(catalog,id)).OfType<MapDefinition>().Select(MapName).Append(localization.Get("MapView.World"));
-        ImGui.SetNextItemWidth(MenuWidth(regionNames,false));
-        if(ImGui.BeginCombo("##MapRegion",ResolveMap(catalog,regionId) is { } region ? MapName(region):localization.Get("MapView.World")))
+        var regionMap=ResolveMap(catalog,regionId);
+        mapZoneMenu.Update(catalog,regionMap,map,mapQuestMap);
+        var zones=mapZoneMenu.Zones;
+        var floors=mapZoneMenu.Floors;
+        var worldChoices=mapMarkers.WorldChoices(map.MapId);
+        var isZone=map.TerritoryId!=0;
+        var zoneShown=isZone || worldChoices.Count>0 ? MapName(map):"--";
+        var widthKey=new MapMenuWidthKey(catalog,mapZoneMenu.Builds,localization.Revision,ImGui.GetFontSize());
+        if(mapMenuWidthKey!=widthKey)
+        {
+            mapMenuWidthKey=widthKey;
+            mapRegionNamesWidth=MenuTextWidth(mapMarkers.Regions.Select(id=>ResolveMap(catalog,id)).OfType<MapDefinition>().Select(MapName).Append(localization.Get("MapView.World")));
+            mapZoneNamesWidth=MenuTextWidth(zones.Select(entry=>MapName(entry[0])).Concat(worldChoices.Select(MapName)).Append(zoneShown));
+            mapFloorNamesWidth=MenuTextWidth(floors.Select(MapMenus.FloorLabel));
+        }
+        ImGui.SetNextItemWidth(MenuWidth(mapRegionNamesWidth,false));
+        if(ImGui.BeginCombo("##MapRegion",regionMap is { } region ? MapName(region):localization.Get("MapView.World")))
         {
             try
             {
@@ -389,12 +416,7 @@ internal sealed partial class MainWindow
         }
         Tip("MapView.RegionTip");
         ImGui.SameLine();
-        var isZone=map.TerritoryId!=0;
-        var zones=MapMenus.WithExtras(MapMenus.Zones(catalog.Entries,ResolveMap(catalog,regionId)),ResolveMap(catalog,regionId),map,catalog.Find(mapQuestMap));
-        var floors=zones.FirstOrDefault(entry=>entry.Any(floor=>floor.MapId==map.MapId)) ?? [];
-        var worldChoices=mapMarkers.WorldChoices(map.MapId);
-        var zoneShown=isZone || worldChoices.Count>0 ? MapName(map):"--";
-        ImGui.SetNextItemWidth(MenuWidth(zones.Select(entry=>MapName(entry[0])).Concat(worldChoices.Select(MapName)).Append(zoneShown),true));
+        ImGui.SetNextItemWidth(MenuWidth(mapZoneNamesWidth,true));
         var zoneMenu=ImGui.BeginCombo("##MapZone",zoneShown);Tip("MapView.ZoneTip");
         if(zoneMenu)
         {
@@ -416,7 +438,7 @@ internal sealed partial class MainWindow
         // Floors of a multi-level map (dungeons), like the game's sub-map menu; a single map shows its subzone name instead.
         if(floors.Count>1)
         {
-            ImGui.SameLine();ImGui.SetNextItemWidth(MenuWidth(floors.Select(MapMenus.FloorLabel),false));
+            ImGui.SameLine();ImGui.SetNextItemWidth(MenuWidth(mapFloorNamesWidth,false));
             if(ImGui.BeginCombo("##MapFloor",MapMenus.FloorLabel(map)))
             {
                 try{foreach(var floor in floors)if(ImGui.Selectable($"{MapMenus.FloorLabel(floor)}##Floor{floor.MapId}",floor.MapId==map.MapId))NavigateMap(floor.MapId);}
@@ -428,9 +450,10 @@ internal sealed partial class MainWindow
     }
 
     // Menu as wide as its longest entry plus the arrow (and the wing column for zones), so names are never cut or padded.
-    private static float MenuWidth(IEnumerable<string> names,bool wing)
+    // X-76 (0.956): the longest entry is measured when its list changes (MenuTextWidth); the frame's padding is added on every frame.
+    private static float MenuTextWidth(IEnumerable<string> names)=>names.Select(name=>ImGui.CalcTextSize(name).X).DefaultIfEmpty(40).Max();
+    private static float MenuWidth(float text,bool wing)
     {
-        var text=names.Select(name=>ImGui.CalcTextSize(name).X).DefaultIfEmpty(40).Max();
         var style=ImGui.GetStyle();
         return text+style.FramePadding.X*2+ImGui.GetFrameHeight()+(wing ? 26:0)+style.ItemInnerSpacing.X;
     }

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.956.0
+- Plan global, Verify : Nettoyage X-76, étape 6 (performance, second lot) : les monstres proches ne reconstruisent plus chaque seconde leurs listes tirées des collections (montures, mascottes, partitions manquantes, sorts non appris, noms des bêtes), seulement quand les collections changent ; les menus des zones de la carte et leur largeur ne sont plus recalculés à chaque image ; l'étape « Fenêtres » du guide ne refait ses vérifications que quand une donnée change ; les compteurs du résumé des collections sont calculés une fois avec la liste. Rien ne change à l'écran. Non validé en jeu.
+- Tests : DrawCost956Tests. Verify.ps1 (agent) : 1584/1584, 0 avertissement, 0 erreur ; DLL 0.956.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, step 6 (performance, second batch): nearby monsters no longer rebuild every second their lists drawn from the collections (missing mounts, minions, rolls, spells not learned, beast names), only when the collections change; the map's zone menus and their width are no longer worked out every frame; the guide's « Windows » step checks again only when something changes; the collections summary counts are worked out once with the list. Nothing changes on screen. Not validated in game.
+
 ## 0.955.0
 - Plan global, Verify : Nettoyage X-76, étape 6 (performance, premier lot), d'après un audit des calculs refaits à chaque image : la fiche d'un vendeur ne parcourt plus les 39 000 ventes du jeu à chaque image (index par boutique et par PNJ construits une fois) ; les ensembles d'équipement ne sont plus recalculés toutes les deux secondes quand rien n'a changé (la page Équipement et l'aperçu du tri en profitent) ; la Banque n'est plus reconstruite chaque seconde, seulement quand un relevé importé passe « périmé » ou au changement de jour ; la recherche d'un haut fait par son nom dans l'info-bulle devient une recherche directe. Rien ne change à l'écran. Non validé en jeu.
 - Tests : DrawCost955Tests. Verify.ps1 (agent) : 1579/1579, 0 avertissement, 0 erreur ; DLL 0.955.0.0. Non validé en jeu.

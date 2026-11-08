@@ -19,6 +19,8 @@ internal sealed partial class MainWindow
     private int collectionViewFilter = -1;
     private CollectionEntry[] collectionViewEntries = [];
     private CollectionEntry[] collectionViewMatches = [];
+    // X-76 (0.956): the summary's counts, worked out with collectionViewEntries instead of on every frame.
+    private int collectionViewAcquired, collectionViewNotAcquired, collectionViewUnknown;
     private uint? collectionViewMusicCategory;
     private uint? collectionViewAchievementCategory;
     // 0.365 (g, C-04): the kinds read by ExtraCollectionReader, in the user's order (GAPS.md C-04).
@@ -136,6 +138,9 @@ internal sealed partial class MainWindow
                 .ThenBy(entry => blueMagic || kind is CollectionKind.Ornament or CollectionKind.McGuffin or CollectionKind.Folklore ? entry.Number:kind==CollectionKind.Orchestrion ? entry.Music?.Order ?? int.MaxValue:kind==CollectionKind.Title ? entry.Title?.Order ?? int.MaxValue:kind==CollectionKind.Achievement ? entry.Achievement?.Order ?? int.MaxValue:0)
                 .ThenBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase).ToArray();
             if(blueOrder!=0)collectionViewEntries=Monsters.BlueSpellSources.SortByMonsterLevel(collectionViewEntries,entry=>BlueSpellLevel(entry.Number),blueOrder);
+            collectionViewAcquired=collectionViewEntries.Count(entry=>entry.ConfirmedUnlocked);
+            collectionViewNotAcquired=collectionViewEntries.Count(entry=>entry.Acquisition==CollectionAcquisition.NotAcquired);
+            collectionViewUnknown=collectionViewEntries.Count(entry=>entry.Acquisition==CollectionAcquisition.Unknown);
             // 0.331: « Unconfirmed » (non-completion kinds) = everything the game does not confirm as obtained, by the same rule as the
             // ✓ / ✗ badge (CollectionStateOf), so a mount or minion read as not unlocked stays listed there.
             bool StateMatches(CollectionEntry entry)=>collectionFilter switch
@@ -149,8 +154,8 @@ internal sealed partial class MainWindow
                 && (string.IsNullOrWhiteSpace(collectionQuery) || entry.Name.Contains(collectionQuery.Trim(), StringComparison.OrdinalIgnoreCase))).ToArray();
         }
         var entries = collectionViewEntries;
-        ImGui.TextColored(Accent,localization.Format(kind==CollectionKind.Achievement ? "CollectionSummary.Completed":"CollectionSummary.Acquired",entries.Count(entry=>entry.ConfirmedUnlocked),entries.Length));
-        if(completion)ImGui.TextDisabled(localization.Format(kind==CollectionKind.Achievement ? "CollectionSummary.Incomplete":"CollectionSummary.Missing",entries.Count(entry=>entry.Acquisition==CollectionAcquisition.NotAcquired),entries.Count(entry=>entry.Acquisition==CollectionAcquisition.Unknown)));
+        ImGui.TextColored(Accent,localization.Format(kind==CollectionKind.Achievement ? "CollectionSummary.Completed":"CollectionSummary.Acquired",collectionViewAcquired,entries.Length));
+        if(completion)ImGui.TextDisabled(localization.Format(kind==CollectionKind.Achievement ? "CollectionSummary.Incomplete":"CollectionSummary.Missing",collectionViewNotAcquired,collectionViewUnknown));
         ImGui.TextWrapped(localization.Get("CollectionSummary.Help"));
         if (state.CharacterId == 0) ImGui.TextDisabled(localization.Get("CollectionSummary.Login"));
         var openDetails = false;

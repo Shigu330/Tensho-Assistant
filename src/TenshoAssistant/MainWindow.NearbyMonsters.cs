@@ -1,3 +1,4 @@
+using TenshoAssistant.Caching;
 using TenshoAssistant.Hunting;
 using TenshoAssistant.Maps;
 using TenshoAssistant.Monsters;
@@ -17,6 +18,11 @@ internal sealed partial class MainWindow
     private long nearbyMonstersAt=-100_000;
     private IReadOnlyDictionary<uint,IReadOnlyList<MonsterNote>> nearbyMonsterNotes=NoMonsterNotes;
     private IReadOnlyDictionary<uint,IReadOnlyList<string>> nearbyDroppedItems=NoDroppedItems;
+    // X-76 (0.956): what the notes draw from the collections and the beast catalogue, built again only when a new state or catalogue is published
+    // (the notes themselves are still worked out once a second).
+    private readonly ReferenceMemo<TenshoAssistant.Collections.CollectionState,NearbyMissingCollections> nearbyMissingCollections=new(state=>NearbyMissingCollections.From(state.Entries));
+    private readonly ReferenceMemo<TenshoAssistant.Collections.CollectionState,NearbyBlueSpells> nearbyBlueSpells=new(state=>NearbyBlueSpells.From(state.Entries));
+    private readonly ReferenceMemo<TenshoAssistant.Beastmaster.BeastCatalog,Dictionary<uint,string>> nearbyBeastNames=new(catalog=>catalog.Beasts.ToDictionary(beast=>beast.Id,beast=>beast.Name));
     private void RefreshNearbyMonsters()
     {
         var now=Environment.TickCount64;
@@ -78,9 +84,8 @@ internal sealed partial class MainWindow
         // X-38: the spells a monster teaches that are not learned yet; as Blue Mage, or always when chosen.
         if(configuration.MapView.ShowBlueMageMonsters && (configuration.MapView.BlueMageMonstersAlways || characterStats.State.JobId==BlueMageJob) && BlueSpellNearby is { } blue)
         {
-            var spells=collections.State.Entries.Where(entry=>entry.Kind==TenshoAssistant.Collections.CollectionKind.BlueMagic).ToArray();
-            blue.LoadCached(spells.Select(entry=>entry.Id).ToArray());
-            var notLearned=spells.Where(entry=>!entry.ConfirmedUnlocked).ToDictionary(entry=>entry.Id,entry=>entry.Name);
+            var (spells,notLearned)=nearbyBlueSpells.Of(collections.State);
+            blue.LoadCached(spells);
             foreach(var id in ids)
                 if(blue.SpellsOf(id).Where(notLearned.ContainsKey).Select(spell=>notLearned[spell]).ToArray() is { Length:>0 } taught)
                     Note(id,MonsterNoteKind.BlueSpell,localization.Format("MapView.MonsterBlueSpell",string.Join(", ",taught)));
@@ -99,17 +104,15 @@ internal sealed partial class MainWindow
                     map[monster]=list.Concat(map.GetValueOrDefault(monster) ?? []).Distinct().ToList();
                 beastMonsters=map.ToDictionary(pair=>pair.Key,pair=>(IReadOnlyList<uint>)pair.Value);
             }
-            var names=beastCatalog.Beasts.ToDictionary(beast=>beast.Id,beast=>beast.Name);
+            var names=nearbyBeastNames.Of(beastCatalog);
             foreach(var id in ids)
                 if(beastMonsters.TryGetValue(id,out var beasts) && beasts.Where(beast=>!tamed.Contains(beast) && names.ContainsKey(beast)).Select(beast=>names[beast]).ToArray() is { Length:>0 } wild)
                     Note(id,MonsterNoteKind.Beast,localization.Format("MapView.MonsterBeast",string.Join(", ",wild)));
         }
         // X-41: drops that unlock a mount, a minion or an orchestrion roll not owned (read in game; not read: nothing said).
-        if(configuration.MapView.ShowCollectionMonsters && lumina?.State.Data is { } loot && itemCatalog.State.Catalog is { } catalog && collections.State.Entries is { Count:>0 } collected)
+        if(configuration.MapView.ShowCollectionMonsters && lumina?.State.Data is { } loot && itemCatalog.State.Catalog is { } catalog && collections.State is { Entries.Count:>0 } collected)
         {
-            var missingMounts=collected.Where(entry=>entry.Kind==TenshoAssistant.Collections.CollectionKind.Mount && !entry.ConfirmedUnlocked).Select(entry=>entry.Id).ToHashSet();
-            var missingMinions=collected.Where(entry=>entry.Kind==TenshoAssistant.Collections.CollectionKind.Companion && !entry.ConfirmedUnlocked).Select(entry=>entry.Id).ToHashSet();
-            var missingRolls=collected.Where(entry=>entry.Kind==TenshoAssistant.Collections.CollectionKind.Orchestrion && !entry.ConfirmedUnlocked).Select(entry=>entry.Id).ToHashSet();
+            var (missingMounts,missingMinions,missingRolls)=nearbyMissingCollections.Of(collected);
             bool Missing(uint item)=>catalog.Find(item) is { } found && (found.MountId!=0 && missingMounts.Contains(found.MountId) || found.CompanionId!=0 && missingMinions.Contains(found.CompanionId)
                 || found.OrchestrionId!=0 && missingRolls.Contains(found.OrchestrionId));
             foreach(var id in ids)

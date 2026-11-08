@@ -42,6 +42,30 @@ public static class MapMenus
             .Select(group=>(IReadOnlyList<MapDefinition>)group.OrderBy(map=>map.MapIndex).ThenBy(map=>map.MapId).ToArray()).ToArray();
 }
 
+/// <summary>
+/// X-76 (0.956): the zone menu (with its extras) and the shown map's floors, kept while the catalogue, the region, the shown map and the quest's map stay
+/// the same: they change on navigation only, and the menus are drawn every frame. Draw-thread only.
+/// </summary>
+public sealed class MapZoneMenu
+{
+    private (MapCatalog? Catalog,uint Region,uint Map,uint Quest) key;
+    public IReadOnlyList<IReadOnlyList<MapDefinition>> Zones { get; private set; } = [];
+    public IReadOnlyList<MapDefinition> Floors { get; private set; } = [];
+    /// <summary>Changes each time the lists are built again: a key for what is measured from them.</summary>
+    public int Builds { get; private set; }
+    public void Update(MapCatalog catalog,MapDefinition? region,MapDefinition map,uint questMap)
+    {
+        ArgumentNullException.ThrowIfNull(catalog);
+        ArgumentNullException.ThrowIfNull(map);
+        var next=(catalog,region?.MapId ?? 0,map.MapId,questMap);
+        if(Builds>0 && key==next)return;
+        key=next;
+        Zones=MapMenus.WithExtras(MapMenus.Zones(catalog.Entries,region),region,map,catalog.Find(questMap));
+        Floors=Zones.FirstOrDefault(entry=>entry.Any(floor=>floor.MapId==map.MapId)) ?? [];
+        Builds++;
+    }
+}
+
 /// <summary>0.634: where a dungeon is entered, in map pixels (docs/evidence/0.634-dungeon-entrances.md).</summary>
 public sealed record MapEntrance(uint MapId,float X,float Y);
 public static class MapEntrances

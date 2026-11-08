@@ -71,11 +71,28 @@ internal sealed partial class MainWindow
 
     private long guideChecklistNext;
     private bool guideChecklistDone;
+    // X-76 (0.956): the guide's « Windows » step works out each task's mark when one of the states it reads is published again (or the tasks,
+    // or what is saved, change), not on every frame: the collections are thousands of rows.
+    private readonly record struct GuideWindowsKey(object? Collections, object? Bank, object? CraftLog, object? Beasts, bool Voyages, HashSet<string>? Saved, int SavedCount, string Tasks);
+    private GuideWindowsKey? guideWindowsKey;
+    private bool[] guideWindowsDone = [];
     private void DrawGuideWindows(IReadOnlyList<GuideWindowTask> tasks, bool check = true)
     {
-        foreach (var task in tasks)
+        if (check)
         {
-            var done = check ? GuideWindowDone(task.Key) : configuration.GuideWindowsDone?.Contains(task.Key) == true;
+            var key = new GuideWindowsKey(collections.State, bank.State, craftLog.Observation, Beasts?.State, configuration.Voyages is { Count: > 0 },
+                configuration.GuideWindowsDone, configuration.GuideWindowsDone?.Count ?? 0, string.Join('|', tasks.Select(task => task.Key)));
+            if (guideWindowsKey != key || guideWindowsDone.Length != tasks.Count)
+            {
+                guideWindowsDone = tasks.Select(task => GuideWindowDone(task.Key)).ToArray();
+                // Read after the marks: a mark seen for the first time is saved by GuideWindowDone, and that must not ask for another pass.
+                guideWindowsKey = key with { Saved = configuration.GuideWindowsDone, SavedCount = configuration.GuideWindowsDone?.Count ?? 0 };
+            }
+        }
+        for (var index = 0; index < tasks.Count; index++)
+        {
+            var task = tasks[index];
+            var done = check ? guideWindowsDone[index] : configuration.GuideWindowsDone?.Contains(task.Key) == true;
             DrawStateMark(done); ImGui.SameLine();
             ImGui.TextColored(done ? Success : Muted, localization.Get($"Guide.Window{task.Key}"));
             if (!done) { ImGui.Indent(); ImGui.PushTextWrapPos(0); ImGui.TextDisabled(localization.Get($"Guide.Window{task.Key}Where")); ImGui.PopTextWrapPos(); ImGui.Unindent(); }
