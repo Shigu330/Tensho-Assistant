@@ -170,10 +170,12 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     }
 
     public ItemDiscoveryWatcher(IFramework framework,IClientState client,IGameGui gui,IObjectTable objects,ITargetManager targets,ICondition condition,IGameInventory inventory,
-        DiscoveryStore store,IPluginLog log,Func<DiscoverySettings> settings,Func<bool> debug,Func<uint,uint> dutyOf,Func<uint,bool> isFish,Func<uint,bool> usable)
+        DiscoveryStore store,IPluginLog log,Func<DiscoverySettings> settings,Func<bool> debug,Func<uint,uint> dutyOf,Func<uint,bool> isFish,Func<uint,bool> usable,
+        Dalamud.Plugin.Services.IChatGui? chat=null)
     {
         this.framework=framework;this.client=client;this.gui=gui;this.objects=objects;this.targets=targets;this.condition=condition;this.inventory=inventory;
         this.store=store;this.log=log;this.settings=settings;this.debug=debug;this.dutyOf=dutyOf;this.isFish=isFish;this.usable=usable;
+        this.chat=chat;if(chat is not null)chat.ChatMessageUnhandled+=OnSpearChat;
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
     }
 
@@ -344,6 +346,26 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     private int spearCatches=-1;private readonly bool[] spearShown=new bool[3];private readonly (int Size,int Speed)[] spearFirst=new (int,int)[3];
     private readonly List<(int Size,int Speed,long At)> spearGone=[];
     private (int Item,(int Size,int Speed)? Shadow,long Until,DateTimeOffset At,uint Territory,uint Map,Vector3 Position)? spearPending;
+    // X-73.18 (0.898): a multiple catch waits for the chat's « you caught … » lines (one per fish, kind 67 GatheringSystemMessage, an item link, no sender).
+    private (int Count,(int Size,int Speed)[] Speared,long Start,long Until,DateTimeOffset At,uint Territory,uint Map,Vector3 Position)? spearMulti;
+    private readonly List<(uint Item,long At)> spearChat=[];
+    private readonly Dalamud.Plugin.Services.IChatGui? chat;
+    private void OnSpearChat(Dalamud.Game.Chat.IChatMessage message)
+    {
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
+        if(disposed || spearCatches<0)return;
+        try
+        {
+            if((int)message.LogKind!=67 || message.Sender.TextValue.Trim().Length!=0)return;
+            var items=message.Message.Payloads.OfType<Dalamud.Game.Text.SeStringHandling.Payloads.ItemPayload>().Select(payload=>ItemGains.BaseItem(payload.ItemId)).Distinct().ToArray();
+            if(items.Length!=1 || items[0]==0)return;
+            spearChat.Add((items[0],Environment.TickCount64));
+            if(spearChat.Count>16)spearChat.RemoveAt(0);
+        }
+        catch(Exception error){if(!warned){warned=true;log.Warning(error,"The spearfishing catches could not be read from the chat.");}}
+    }
+    private (int Size,int Speed)? SeenSpearShadow(uint item)=>store.Find(DiscoveryKind.SpearShadow,subject=>subject==item,8).OrderByDescending(fact=>fact.Seen+fact.Imported)
+        .Select(fact=>((int,int)?)((int)fact.Detail,fact.LevelMin)).FirstOrDefault();
     private static int SpearValue(FFXIVClientStructs.FFXIV.Component.GUI.AtkValue value)=>value.Type switch
     {
         FFXIVClientStructs.FFXIV.Component.GUI.AtkValueType.Int=>value.Int,
@@ -353,7 +375,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     private void ReadSpear(DateTimeOffset at,long now,uint territory,uint map,Vector3 position)
     {
         var handle=gui.GetAddonByName("SpearFishing");
-        if(handle.IsNull || !handle.IsVisible){spearCatches=-1;Array.Clear(spearShown);spearGone.Clear();spearPending=null;return;}
+        if(handle.IsNull || !handle.IsVisible){spearCatches=-1;Array.Clear(spearShown);spearGone.Clear();spearPending=null;spearMulti=null;spearChat.Clear();return;}
         var unit=(FFXIVClientStructs.FFXIV.Component.GUI.AtkUnitBase*)handle.Address;var addon=(FFXIVClientStructs.FFXIV.Client.UI.AddonSpearFishing*)handle.Address;
         if(unit->AtkValues==null || unit->AtkValuesCount<=21)return;
         for(var index=0;index<Math.Min(addon->Fish.Length,spearShown.Length);index++)
@@ -376,14 +398,28 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             }
             else if(debug())log.Information("Discovery: spearfishing {0}, shadow unknown.",item);
         }
+        if(spearMulti is { } multi)
+        {
+            var lines=spearChat.Where(line=>line.At>=multi.Start-1_500).Select(line=>line.Item).ToArray();
+            if(lines.Length>=multi.Count || now>=multi.Until)
+            {
+                spearMulti=null;
+                var caught=lines.Length>=multi.Count ? lines[^multi.Count..]:[];
+                var found=ItemGains.SpearAssign(caught,multi.Speared,SeenSpearShadow);
+                foreach(var (fish,size,speed) in found)store.SeeSource(DiscoveryKind.SpearShadow,fish,(uint)size,speed,multi.At,multi.Territory,multi.Map,multi.Position);
+                if(debug())log.Information("Discovery: spearfishing, {0} at once: {1} fish read in the chat, {2} slots, shadows {3}.",multi.Count,caught.Length,multi.Speared.Length,
+                    found.Count==0 ? "unknown":string.Join(", ",found.Select(entry=>$"{entry.Item} {entry.Size}/{entry.Speed}")));
+            }
+        }
         if(count<0)return;
-        if(count<spearCatches){spearGone.Clear();spearPending=null;}
+        if(count<spearCatches){spearGone.Clear();spearPending=null;spearMulti=null;}
         else if(spearCatches>=0 && count>spearCatches)
         {
             var speared=spearGone.Where(gone=>now-gone.At<=1_500).Select(gone=>(gone.Size,gone.Speed)).ToArray();
             spearGone.Clear();
-            if(count==spearCatches+1 && spearPending is null)spearPending=(item,ItemGains.SpearShadow(speared),now+600,at,territory,map,position);
-            else{spearPending=null;if(debug())log.Information("Discovery: spearfishing, {0} catches at once: not noted.",count-spearCatches);}
+            if(spearPending is not null || spearMulti is not null){spearPending=null;spearMulti=null;if(debug())log.Information("Discovery: spearfishing, catches too close together: not noted.");}
+            else if(count==spearCatches+1)spearPending=(item,ItemGains.SpearShadow(speared),now+600,at,territory,map,position);
+            else spearMulti=(count-spearCatches,speared,now,now+1_200,at,territory,map,position);
         }
         spearCatches=count;
     }
@@ -440,5 +476,6 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         if(disposed)return;
         disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);
         if(unlocks is not null)unlocks.Unlock-=OnUnlock;
+        if(chat is not null)chat.ChatMessageUnhandled-=OnSpearChat;
     }
 }

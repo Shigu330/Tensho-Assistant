@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.898.0
+- Plan global, Verify : Retour de l'utilisateur sur la 0.897 (« beaucoup plus clair visuellement ») et demande (X-73.18) : noter aussi les prises multiples, fréquentes. Les poissons d'une prise multiple sont lus dans le chat (une ligne « Vous avez pêché … » par poisson, avec le lien de l'objet), et les ombres harponnées dans la fenêtre. Si toutes les ombres sont pareilles, chaque poisson la reçoit ; sinon un poisson dont l'ombre est déjà connue (vue par vous) la prend et le dernier reçoit l'ombre restante ; ce qui reste ambigu n'est pas noté. Abonnement au chat possédé par le relevé et retiré à sa fermeture. Non validé en jeu.
+- Tests : SpearMulti898Tests. Verify.ps1 (agent) : 1479/1479, 0 avertissement, 0 erreur ; DLL 0.898.0.0. Non validé en jeu.
+### English
+- User's report on 0.897 (« much clearer visually ») and request (X-73.18): note multiple catches too, which are frequent. The fish of a multiple catch are read in the chat (one « you caught … » line per fish, with the item link), and the shadows speared in the window. When all shadows are alike each fish gets it; otherwise a fish whose shadow is already known (seen by you) takes it and the last one gets the shadow left; what stays ambiguous is not noted. The chat subscription is owned by the watcher and removed when it closes. Not validated in game.
+
 ## 0.897.0
 - Plan global, Verify : Retours de l'utilisateur : zones des trous de pêche comparées au carnet de pêche (« c'est ok je pense »), filtre de carte par métier validé, harpon 0.896 validé en jeu (9 prises aux ombres cohérentes dans le journal). Demande (X-79) : moins de texte dans l'aide au harpon, trop dur à lire en temps réel. L'ombre s'écrit maintenant S, M ou L suivi de chevrons de vitesse (un par cran de 50 : « > » le plus lent), une étoile marque un grand garanti, un œil une ombre vue par vous ; les mots restent au survol, la légende au survol de la ligne GatherBuddy. Non validé en jeu.
 - Tests : Spearfish890Tests. Verify.ps1 (agent) : 1478/1478, 0 avertissement, 0 erreur ; DLL 0.897.0.0. Non validé en jeu.

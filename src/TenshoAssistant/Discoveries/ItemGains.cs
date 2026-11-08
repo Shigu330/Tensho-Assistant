@@ -23,6 +23,23 @@ public static class ItemGains
     /// X-73.18 (0.890, 0.891): the shadow a speared fish had, from the slots that left the window with their size and speed kept just before the catch (size 1–3,
     /// speed): known only when they all had the same size and speed, else null.
     /// </summary>
+    /// <summary>
+    /// X-73.18 (0.898, user request: multiple catches happen often): the shadows of the fish of one multiple catch. The fish caught (chat) and the slots speared
+    /// (window) must be as many. All slots alike: every fish has that shadow. Otherwise a fish whose shadow you already saw takes it, and the last fish left takes the
+    /// last shadow left (or all the fish left take it when the shadows left are alike). What stays ambiguous is left out.
+    /// </summary>
+    public static IReadOnlyList<(uint Item,int Size,int Speed)> SpearAssign(IReadOnlyList<uint> caught,IReadOnlyList<(int Size,int Speed)> speared,Func<uint,(int Size,int Speed)?> known)
+    {
+        if(caught.Count==0 || caught.Count!=speared.Count || speared.Any(shadow=>shadow.Size is < 1 or > 3 || shadow.Speed<=0))return [];
+        if(speared.Distinct().Count()==1)return caught.Select(item=>(item,speared[0].Size,speared[0].Speed)).ToArray();
+        var left=speared.ToList();var unknown=new List<uint>();var result=new List<(uint,int,int)>();
+        foreach(var item in caught)
+            if(known(item) is { } shadow && left.Remove(shadow))result.Add((item,shadow.Size,shadow.Speed));
+            else unknown.Add(item);
+        if(unknown.Count>0 && left.Distinct().Count()==1)result.AddRange(unknown.Select(item=>(item,left[0].Size,left[0].Speed)));
+        return result;
+    }
+
     public static (int Size,int Speed)? SpearShadow(IReadOnlyList<(int Size,int Speed)> inSight)=>
         inSight.Distinct().ToArray() is [var only] && only.Size is >= 1 and <= 3 && only.Speed>0 ? only:null;
 

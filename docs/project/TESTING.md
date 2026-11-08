@@ -1436,6 +1436,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.897) Harpon : lignes « 1 M >>> » et liste « S >> Nom » ; survol : les mots.
 
+- [ ] (0.898) Harpon (mode développeur, journal des découvertes) : une prise multiple donne « Discovery: spearfishing, 2 at once: … shadows … ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
