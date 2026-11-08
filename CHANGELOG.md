@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.859.0
+- Plan global, Verify : Demande (X-73.3) : le carnet de pêche du jeu dit lui-même si un poisson a une condition d'heure ou de météo. Le panneau de pêche le lit maintenant d'abord : quand le jeu dit « aucune », la fenêtre horaire ou la météo données par GatherBuddy ou Garland ne s'affichent plus, et le panneau écrit « ni heure ni météo (jeu) » ; la marque « maintenant » suit la même règle. Quand le jeu ne le dit pas, rien ne change. Non validé en jeu.
+- Tests : FishRestrictions859Tests. Verify.ps1 (agent) : 1440/1440, 0 avertissement, 0 erreur ; DLL 0.859.0.0. Non validé en jeu.
+### English
+- Request (X-73.3): the game's own fishing log says whether a fish has a time or weather condition. The fishing panel now reads it first: when the game says « none », the time window or weather from GatherBuddy or Garland is no longer shown, and the panel writes « no time or weather condition (game) »; the « now » marks follow the same rule. When the game does not say, nothing changes. Not validated in game.
+
 ## 0.858.0
 - Plan global, Verify : Demande (X-73.2) : le jeu ne montre que les 20 dernières ventes d'un objet ; chaque ouverture du tableau remplaçait les précédentes. Elles s'ajoutent maintenant à celles déjà gardées, sans doublon, jusqu'à 200 ventes et 30 jours ; la vitesse de vente vue se calcule sur tout ce qui est gardé, comme Universalis. Non validé en jeu.
 - Tests : SalesMerge858Tests. Verify.ps1 (agent) : 1439/1439, 0 avertissement, 0 erreur ; DLL 0.858.0.0. Non validé en jeu.

@@ -33,9 +33,21 @@ internal sealed partial class MainWindow
 
     // 0.568 (C9): time window and weather now, against what GatherBuddy gives for this fish. The zone's weather is computed once per period.
     private (uint Territory,long Period,uint? Current,uint? Previous) fishNowWeather;
+    /// <summary>
+    /// X-73.3 (0.859, user request: learn from the game what comes from community data): the game's own fishing log says whether a fish has a time or a weather
+    /// condition (FishingNoteInfo.TimeRestriction / WeatherRestriction, copied by FishingNotebookCopy). False there means none, whatever a community source says;
+    /// null: not known from the game. Several notebook rows for one fish: only when all agree.
+    /// </summary>
+    private (bool? Time,bool? Weather) FishRestrictions(uint fishId)
+    {
+        if(gatheringCatalog.State.Catalog?.Fishing.ForItem(fishId) is not { Count:>0 } notes)return (null,null);
+        static bool? All(IEnumerable<bool?> values){var list=values.ToArray();return list.All(value=>value==false) ? false:list.All(value=>value==true) ? true:null;}
+        return (All(notes.Select(note=>note.TimeRestricted)),All(notes.Select(note=>note.WeatherRestricted)));
+    }
     private void DrawFishNow(uint fishId,uint territory)
     {
         if(gatherBuddyFish?.State.Data?.Find(fishId) is not { } fish)return;
+        var (timeLimited,weatherLimited)=FishRestrictions(fishId);
         var moment=DateTimeOffset.UtcNow;var period=moment.ToUnixTimeSeconds()/1400;
         if(fishNowWeather.Territory!=territory || fishNowWeather.Period!=period)
         {
@@ -44,9 +56,9 @@ internal sealed partial class MainWindow
         }
         string Mark(bool? value)=>localization.Get(value switch{true=>"FishingPanel.NowYes",false=>"FishingPanel.NowNo",_=>"FishingPanel.NowUnknown"});
         var parts=new List<string>();
-        if(fish.StartMinute is not null && fish.EndMinute is not null)parts.Add(localization.Format("FishingPanel.NowWindow",Mark(FishNow.InWindow(fish.StartMinute,fish.EndMinute,EorzeaMinutes()))));
-        if(fish.Weathers.Count>0)parts.Add(localization.Format("FishingPanel.NowWeather",Mark(FishNow.WeatherFits(fish.Weathers,fishNowWeather.Current))));
-        if(fish.Transitions.Count>0)parts.Add(localization.Format("FishingPanel.NowBefore",Mark(FishNow.WeatherFits(fish.Transitions,fishNowWeather.Previous))));
+        if(timeLimited!=false && fish.StartMinute is not null && fish.EndMinute is not null)parts.Add(localization.Format("FishingPanel.NowWindow",Mark(FishNow.InWindow(fish.StartMinute,fish.EndMinute,EorzeaMinutes()))));
+        if(weatherLimited!=false && fish.Weathers.Count>0)parts.Add(localization.Format("FishingPanel.NowWeather",Mark(FishNow.WeatherFits(fish.Weathers,fishNowWeather.Current))));
+        if(weatherLimited!=false && fish.Transitions.Count>0)parts.Add(localization.Format("FishingPanel.NowBefore",Mark(FishNow.WeatherFits(fish.Transitions,fishNowWeather.Previous))));
         if(parts.Count==0)return;
         ImGui.TextDisabled(string.Join(" · ",parts));
     }
@@ -174,13 +186,17 @@ internal sealed partial class MainWindow
     {
         var items=itemCatalog.State.Catalog;var catalog=weather.State.Catalog;
         string Weathers(IEnumerable<uint> ids)=>string.Join(", ",ids.Select(id=>catalog?.Weather(id)?.Name ?? id.ToString()));
+        // X-73.3 (0.859): what the game's fishing log says first; a community window or weather is left out when the game says there is none.
+        var (timeLimited,weatherLimited)=FishRestrictions(fishId);
+        string? free=timeLimited==false && weatherLimited==false ? localization.Get("FishingPanel.NoCondition"):null;
         if(gatherBuddyFish?.State.Data is { } data && data.Find(fishId) is { } known)
         {
             var parts=new List<string>();var detail=new List<string>();
-            if(known.StartMinute is { } start && known.EndMinute is { } stop)
+            if(free is not null){parts.Add(free);detail.Add(localization.Get("FishingPanel.NoConditionDetail"));}
+            if(timeLimited!=false && known.StartMinute is { } start && known.EndMinute is { } stop)
             {var window=$"{start/60:00}:{start%60:00}–{stop/60%24:00}:{stop%60:00} ET";parts.Add(window);detail.Add(window);}
-            if(known.Transitions.Count>0){parts.Add(Weathers(known.Transitions)+" ›");detail.Add(localization.Format("FishingPanel.Previous",Weathers(known.Transitions)));}
-            if(known.Weathers.Count>0){parts.Add(Weathers(known.Weathers));detail.Add(localization.Format("FishingPanel.Weather",Weathers(known.Weathers)));}
+            if(weatherLimited!=false && known.Transitions.Count>0){parts.Add(Weathers(known.Transitions)+" ›");detail.Add(localization.Format("FishingPanel.Previous",Weathers(known.Transitions)));}
+            if(weatherLimited!=false && known.Weathers.Count>0){parts.Add(Weathers(known.Weathers));detail.Add(localization.Format("FishingPanel.Weather",Weathers(known.Weathers)));}
             if(known.Lure is { } lure){parts.Add(lure);detail.Add(localization.Format("FishingPanel.Lure",lure));}
             if(known.Snag){parts.Add(localization.Get("FishingPanel.SnagShort"));detail.Add(localization.Get("FishingPanel.Snag"));}
             if(known.Predators.Count>0)
@@ -194,10 +210,11 @@ internal sealed partial class MainWindow
         var here=itemSources?.Get(fishId).List?.Fishing?.Spots.FirstOrDefault(entry=>entry.SpotId==spotId);
         var route=here?.BaitChains is { Count:>0 } chains ? chains[0]:(IReadOnlyList<uint>)[];
         var conditions=new List<string>();
+        if(free is not null)conditions.Add(free);
         if(here?.Conditions is { Error:null } found)
         {
-            if(found.Timing.Kind==Gathering.GatheringScheduleKind.Limited)conditions.Add(found.Timing.Label);
-            if(found.Weather is { Count:>0 } names)conditions.Add(string.Join(", ",names));
+            if(timeLimited!=false && found.Timing.Kind==Gathering.GatheringScheduleKind.Limited)conditions.Add(found.Timing.Label);
+            if(weatherLimited!=false && found.Weather is { Count:>0 } names)conditions.Add(string.Join(", ",names));
         }
         return (fishId,route,null,null,string.Join(" · ",conditions),string.Join("\n",conditions));
     }

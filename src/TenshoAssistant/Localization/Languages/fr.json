@@ -1253,6 +1253,8 @@
     "BountifulFloor": "Bonus d'Abondance inconnu (valeur de récolte ou base de l'objet non lue) : le plan compte +1, le minimum de la règle."
   },
   "FishingPanel": {
+    "NoCondition": "ni heure ni météo (jeu)",
+    "NoConditionDetail": "Le carnet de pêche du jeu ne donne à ce poisson aucune condition d'heure ni de météo : il mord à toute heure, par tous les temps.",
     "NowYes": "oui",
     "NowNo": "non",
     "NowUnknown": "?",

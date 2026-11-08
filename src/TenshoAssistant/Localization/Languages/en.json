@@ -1253,6 +1253,8 @@
     "BountifulFloor": "Bountiful bonus unknown (gathering rating or item base not read): the plan counts +1, the rule's minimum."
   },
   "FishingPanel": {
+    "NoCondition": "no time or weather condition (game)",
+    "NoConditionDetail": "The game's fishing log gives this fish no time and no weather condition: it bites at any hour, in any weather.",
     "NowYes": "yes",
     "NowNo": "no",
     "NowUnknown": "?",
