@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.940.0
+- Plan global, Verify : X-93, deuxième partie : vos découvertes et les découvertes partagées ne sont plus mélangées dans un seul fichier. Discoveries.json ne garde que les vôtres ; les partagées vont dans le dossier Discoveries/Shared, un fichier compressé par sorte, réécrit seulement quand il change (avant, tout le fichier était réécrit chaque minute). Un fichier partagé illisible est mis de côté sans empêcher les autres de se charger. L'ancien fichier se range tout seul au prochain enregistrement. Suite : charger une sorte partagée seulement quand une page en a besoin. Non validé en jeu.
+- Tests : SharedSplit940Tests. Verify.ps1 (agent) : 1554/1554, 0 avertissement, 0 erreur ; DLL 0.940.0.0. Non validé en jeu.
+### English
+- X-93, second part: your discoveries and the shared ones are no longer mixed in one file. Discoveries.json keeps yours only; the shared ones go to the Discoveries/Shared folder, one compressed file per kind, rewritten only when it changes (before, the whole file was rewritten every minute). An unreadable shared file is set aside without stopping the others from loading. The old file sorts itself out at the next save. Next: load a shared kind only when a page needs it. Not validated in game.
+
 ## 0.939.0
 - Plan global, Verify : X-93 (votre décision : ne jamais oublier une découverte), première partie : vos propres relevés ne sont plus jamais refusés, quelle que soit la taille de la base ; la limite de 200 000 ne vaut plus que pour les découvertes partagées gardées en mémoire, et une découverte partagée laissée de côté est comptée et signalée sur la page Découvertes (avant, tout était refusé en silence au-delà de 200 000). Rien de ce qui est déjà gardé n'est jamais retiré. Mesure de mémoire corrigée : environ 270 octets par découverte (50 Mo à 200 000). Suite : découvertes partagées rangées à part par sorte et compressées, puis chargées seulement quand une page en a besoin. Non validé en jeu.
 - Tests : NeverForget939Tests. Verify.ps1 (agent) : 1553/1553, 0 avertissement, 0 erreur ; DLL 0.939.0.0. Non validé en jeu.

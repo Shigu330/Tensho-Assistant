@@ -475,6 +475,64 @@ public static class DiscoveryFiles
         AtomicFile.Write(path,JsonSerializer.Serialize(file,Options));
     }
 
+    /// <summary>
+    /// X-93 (0.940): the shared facts (imported, not seen by you) are kept apart from yours: <c>Shared/kind-NN.json.gz</c>, one gzip file per kind, in the same
+    /// format as an exported file; the main file keeps your facts only (with their imported counts). A kind file is written again only when its content changed
+    /// (<paramref name="written"/> holds the last content written per kind, for this session), and removed when the kind has no shared fact any more.
+    /// </summary>
+    public static void WriteSplit(string mainPath,DiscoveryFile all,Dictionary<DiscoveryKind,string> written)
+    {
+        var mine=all.Facts.Where(fact=>fact.Seen>0).ToList();
+        Write(mainPath,new DiscoveryFile{Version=all.Version,Producer=all.Producer,Written=all.Written,Facts=mine});
+        var folder=SharedFolder(mainPath);
+        var byKind=all.Facts.Where(fact=>fact.Seen==0).GroupBy(fact=>fact.Kind).ToDictionary(group=>group.Key,group=>group.OrderBy(fact=>fact.Key,StringComparer.Ordinal).ToList());
+        foreach(var (kind,facts) in byKind)
+        {
+            var json=JsonSerializer.Serialize(new DiscoveryFile{Version=all.Version,Producer=all.Producer,Written=all.Written,Facts=facts},Options);
+            var content=json[(json.IndexOf("\"Facts\"",StringComparison.Ordinal) is var at and >= 0 ? at:0)..];
+            if(written.TryGetValue(kind,out var last) && last==content && File.Exists(SharedPath(folder,kind)))continue;
+            using(var buffer=new MemoryStream())
+            {
+                using(var gzip=new System.IO.Compression.GZipStream(buffer,System.IO.Compression.CompressionLevel.Optimal,true))
+                    gzip.Write(System.Text.Encoding.UTF8.GetBytes(json));
+                AtomicFile.Write(SharedPath(folder,kind),buffer.ToArray());
+            }
+            written[kind]=content;
+        }
+        if(Directory.Exists(folder))
+            foreach(var path in Directory.GetFiles(folder,"kind-*.json.gz"))
+                if(KindOf(path) is { } kind && !byKind.ContainsKey(kind)){File.Delete(path);written.Remove(kind);}
+    }
+
+    /// <summary>X-93 (0.940): every shared kind file next to the main file (unreadable ones reported through <paramref name="broken"/> and set aside).</summary>
+    public static IEnumerable<DiscoveryFile> ReadShared(string mainPath,Action<string,Exception> broken)
+    {
+        var folder=SharedFolder(mainPath);
+        if(!Directory.Exists(folder))yield break;
+        foreach(var path in Directory.GetFiles(folder,"kind-*.json.gz").Order(StringComparer.Ordinal))
+        {
+            DiscoveryFile? file=null;
+            try
+            {
+                if(new FileInfo(path).Length>MaxBytes)throw new InvalidDataException("Shared discoveries file too large.");
+                using var stream=File.OpenRead(path);
+                using var gzip=new System.IO.Compression.GZipStream(stream,System.IO.Compression.CompressionMode.Decompress);
+                using var bounded=new MemoryStream();
+                var chunk=new byte[81920];int read;long total=0;
+                while((read=gzip.Read(chunk,0,chunk.Length))>0){total+=read;if(total>MaxBytes*4)throw new InvalidDataException("Shared discoveries file too large.");bounded.Write(chunk,0,read);}
+                file=JsonSerializer.Deserialize<DiscoveryFile>(bounded.ToArray(),Options);
+                if(!DiscoveryFile.Readable(file))throw new InvalidDataException("Unknown shared discoveries file.");
+            }
+            catch(Exception error){broken(path,error);try{File.Move(path,path+".broken",true);}catch(Exception){}continue;}
+            yield return file!;
+        }
+    }
+
+    public static string SharedFolder(string mainPath)=>Path.Combine(Path.GetDirectoryName(mainPath) ?? "","Shared");
+    public static string SharedPath(string folder,DiscoveryKind kind)=>Path.Combine(folder,$"kind-{(int)kind:00}.json.gz");
+    private static DiscoveryKind? KindOf(string path)
+        =>Path.GetFileName(path) is var name && name.Length>=12 && int.TryParse(name.AsSpan(5,2),out var number) && Enum.IsDefined((DiscoveryKind)number) ? (DiscoveryKind)number:null;
+
     public static string ExportName(DateTimeOffset at)=>$"Discoveries-{at.ToUniversalTime():yyyyMMdd-HHmmss}.json";
 
     /// <summary>Every file of the import folder joined to the store; each one read is renamed « .imported » so that it is not joined twice.</summary>

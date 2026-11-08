@@ -35,6 +35,7 @@ internal sealed partial class MainWindow
     private IReadOnlyList<DiscoveryFact> discoveryRows=[];private string? discoveryMessage;private bool discoveryClearAsked;
     private readonly Dictionary<uint,string> discoveryNames=[];
     private string DiscoveryBase=>Path.Combine(DiscoveryFolder ?? "","Discoveries.json");
+    private readonly Dictionary<DiscoveryKind,string> sharedWritten=[];
 
     /// <summary>Once a second, every frame's overlay pass: the monsters in range noted; the base written every minute when it changed.</summary>
     internal void CollectDiscoveries()
@@ -77,7 +78,8 @@ internal sealed partial class MainWindow
         var prices=SeenPrices is { Dirty:true } seen ? seen.Snapshot():null;var pricesPath=Path.Combine(DiscoveryFolder,"MarketSeen.json");
         void Write()
         {
-            try{DiscoveryFiles.Write(path,file);if(prices is not null)Market.SeenPriceStore.Write(pricesPath,prices);}
+            // X-93 (0.940): yours in Discoveries.json, the shared ones apart, by kind, compressed (DiscoveryFiles.WriteSplit).
+            try{lock(sharedWritten)DiscoveryFiles.WriteSplit(path,file,sharedWritten);if(prices is not null)Market.SeenPriceStore.Write(pricesPath,prices);}
             catch(Exception error){log.Warning(error,"The discoveries could not be saved.");}
             finally{Volatile.Write(ref discoverySaving,0);}
         }

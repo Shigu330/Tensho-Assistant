@@ -233,6 +233,9 @@ public sealed class Plugin : IDalamudPlugin
                     log.Warning(error,"The discoveries could not be read; the file is kept as .broken.");
                     try{File.Move(saved,saved+".broken",true);}catch(Exception){}
                 }
+                // X-93 (0.940): the shared discoveries, kept apart by kind (an unreadable kind file is set aside, the others still load).
+                foreach(var shared in Discoveries.DiscoveryFiles.ReadShared(saved,(path,error)=>log.Warning(error,"Shared discoveries {0} could not be read; the file is kept as .broken.",Path.GetFileName(path))))
+                    discoveries.Load(shared);
                 mainWindow.DiscoveriesLoaded=true;
             });
             // 0.395 (user request): the wiki's spellbook table (one page for every spell) read when the Blue magic page opens, copy first.
