@@ -152,6 +152,27 @@ internal sealed partial class MainWindow
         seenIndex=(store.Revision,index);
         return index;
     }
+    /// <summary>X-75.3 (0.877): what you saw for a fish (baits or mooched fish, weathers, weathers before, lures, Eorzea hours), one line; never a requirement.</summary>
+    private (long Revision,Dictionary<uint,string?> Lines) seenFishLines=(-1,[]);
+    internal string? SeenFishLine(uint fish)
+    {
+        if(DiscoveryStore is not { } store || !DiscoveriesLoaded)return null;
+        if(seenFishLines.Revision!=store.Revision)seenFishLines=(store.Revision,[]);
+        if(seenFishLines.Lines.TryGetValue(fish,out var known))return known;
+        var catches=store.Find(DiscoveryKind.FishCatch,subject=>subject==fish,16);
+        string Weathers(DiscoveryKind kind)=>string.Join(", ",store.Find(kind,subject=>subject==fish,8).Select(fact=>weather.State.Catalog?.Weather(fact.Detail)?.Name ?? $"#{fact.Detail}").Distinct());
+        var parts=new List<string>();
+        if(catches.Where(fact=>fact.Detail!=0).Select(fact=>DiscoveryItemName(fact.Detail)).Distinct().ToArray() is { Length:>0 } baits)parts.Add(localization.Format("FishingPanel.SeenBaits",string.Join(", ",baits)));
+        if(Weathers(DiscoveryKind.FishTransition) is { Length:>0 } before)parts.Add(localization.Format("FishingPanel.SeenBefore",before));
+        if(Weathers(DiscoveryKind.FishCondition) is { Length:>0 } during)parts.Add(localization.Format("FishingPanel.SeenWeather",during));
+        if(store.Find(DiscoveryKind.FishCondition,subject=>subject==fish,64) is { Count:>0 } hours)
+            parts.Add($"{hours.Min(fact=>fact.LevelMin)/60:00}:{hours.Min(fact=>fact.LevelMin)%60:00}–{hours.Max(fact=>fact.LevelMax)/60:00}:{hours.Max(fact=>fact.LevelMax)%60:00} ET");
+        if(store.Find(DiscoveryKind.FishLure,subject=>subject==fish,2) is { Count:>0 } lures)
+            parts.Add(string.Join(", ",lures.Select(fact=>localization.Get(fact.Detail==1 ? "FishingPanel.SeenAmbitious":"FishingPanel.SeenModest"))));
+        var line=parts.Count==0 ? null:localization.Format("FishingPanel.SeenByYou",catches.Sum(fact=>fact.Seen+fact.Imported),string.Join(" · ",parts));
+        if(seenFishLines.Lines.Count<2048)seenFishLines.Lines[fish]=line;
+        return line;
+    }
     private string DiscoveryItemName(uint id)=>itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}";
     private string DiscoveryDutyName(uint id)=>DutyName?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
     /// <summary>X-74 (0.860): the level column: a monster's levels, a quantity range, or the Eorzea hours a fish was caught.</summary>

@@ -205,6 +205,8 @@ internal sealed partial class MainWindow
                 detail.Add(localization.Format("FishingPanel.Predators",string.Join(", ",known.Predators.Select(pair=>$"{items?.Find(pair.Fish)?.Name ?? pair.Fish.ToString()} ×{pair.Count}"))));
                 if(known.Intuition is { } intuition)detail.Add(localization.Format("FishingPanel.Intuition",intuition));
             }
+            // X-75.3 (0.877): what you saw yourself, after the community conditions, in the detail.
+            if(SeenFishLine(fishId) is { } seenLine){parts.Add(localization.Get("FishingPanel.SeenShort"));detail.Add(seenLine);}
             return (fishId,data.Route(fishId),known.Bite,known.HookSet,string.Join(" · ",parts),string.Join("\n",detail));
         }
         var here=itemSources?.Get(fishId).List?.Fishing?.Spots.FirstOrDefault(entry=>entry.SpotId==spotId);

@@ -584,6 +584,8 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "SummaryFishTransition": "Poissons et météo précédente : {0} ({1} vus par vous, {2} importés seulement)",
+    "SummaryFishLure": "Poissons pris au leurre : {0} ({1} vus par vous, {2} importés seulement)",
     "SummaryNpcPlace": "Marchands placés : {0} ({1} vus par vous, {2} importés seulement)",
     "NpcPlace": "Boutique de {0}",
     "SummaryFestivalSeen": "Fêtes vues : {0} ({1} vues par vous, {2} importées seulement)",
@@ -1297,6 +1299,13 @@
     "BountifulFloor": "Bonus d'Abondance inconnu (valeur de récolte ou base de l'objet non lue) : le plan compte +1, le minimum de la règle."
   },
   "FishingPanel": {
+    "SeenShort": "vu",
+    "SeenByYou": "Vu par vous (×{0}) : {1}",
+    "SeenBaits": "appât ou mooch {0}",
+    "SeenBefore": "après {0}",
+    "SeenWeather": "par {0}",
+    "SeenAmbitious": "avec un leurre ambitieux",
+    "SeenModest": "avec un leurre modeste",
     "NoCondition": "ni heure ni météo (jeu)",
     "NoConditionDetail": "Le carnet de pêche du jeu ne donne à ce poisson aucune condition d'heure ni de météo : il mord à toute heure, par tous les temps.",
     "NowYes": "oui",

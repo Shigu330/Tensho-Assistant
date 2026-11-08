@@ -51,6 +51,9 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     public Func<IReadOnlySet<uint>?>? Beasts { get; set; }
     // X-73.12 (0.864): the festivals running (once a day each: their first and last days seen) and the vistas registered (with the weather and the Eorzea minute).
     public Func<IReadOnlySet<uint>?>? Vistas { get; set; }
+    /// <summary>X-75.3 (0.877): the weather of the period before (territory, moment), from the game's forecast; 0 when not known.</summary>
+    public Func<uint,DateTimeOffset,uint>? PreviousWeather { get; set; }
+    private uint lastFish;
     private IReadOnlySet<uint>? vistasBefore;private int festivalDay=-1;private long festivalsAt=-100_000;
     private void ReadSeasonal(DateTimeOffset at,long now)
     {
@@ -153,10 +156,15 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                 switch(cause)
                 {
                     case ItemGains.Cause.Fishing when isFish(item):
-                        var bait=PlayerState.Instance() is var state && state!=null ? state->FishingBait:0u;
+                        // X-75.3 (0.877): the cast's flags (FishingEventHandler): a mooch is put down to the fish caught before, not the bait in hand; a lure is kept.
+                        var flags=events!=null && events->EventHandlerModule.FishingEventHandler is var handler && handler!=null ? (int)handler->CurrentCastBaitFlags:0;
+                        var bait=(flags & 16)!=0 && lastFish!=0 ? lastFish:PlayerState.Instance() is var state && state!=null ? state->FishingBait:0u;
                         var weather=FFXIVClientStructs.FFXIV.Client.Game.WeatherManager.Instance() is var manager && manager!=null ? manager->GetCurrentWeather():(byte)0;
                         added=store.SeeSource(DiscoveryKind.FishCatch,item,bait,quantity,at,territory,map,me.Position);
                         store.SeeSource(DiscoveryKind.FishCondition,item,weather,EorzeaMinute(at),at,territory);
+                        if((flags & 3) is 1 or 2)store.SeeSource(DiscoveryKind.FishLure,item,(uint)(flags & 3),1,at,territory);
+                        if(PreviousWeather?.Invoke(territory,at) is { } before and not 0)store.SeeSource(DiscoveryKind.FishTransition,item,before,EorzeaMinute(at),at,territory);
+                        lastFish=item;
                         kind=DiscoveryKind.FishCatch;break;
                     case ItemGains.Cause.FateReward:
                         added=store.SeeSource(DiscoveryKind.FateReward,item,fateId,quantity,at);kind=DiscoveryKind.FateReward;break;

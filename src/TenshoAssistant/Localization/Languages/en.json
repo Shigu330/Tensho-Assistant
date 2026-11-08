@@ -584,6 +584,8 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
+    "SummaryFishTransition": "Fish and the weather before: {0} ({1} seen by you, {2} imported only)",
+    "SummaryFishLure": "Fish caught with a lure: {0} ({1} seen by you, {2} imported only)",
     "SummaryNpcPlace": "Shopkeepers placed: {0} ({1} seen by you, {2} imported only)",
     "NpcPlace": "Shop of {0}",
     "SummaryFestivalSeen": "Festivals seen: {0} ({1} seen by you, {2} imported only)",
@@ -1297,6 +1299,13 @@
     "BountifulFloor": "Bountiful bonus unknown (gathering rating or item base not read): the plan counts +1, the rule's minimum."
   },
   "FishingPanel": {
+    "SeenShort": "seen",
+    "SeenByYou": "Seen by you (×{0}): {1}",
+    "SeenBaits": "bait or mooch {0}",
+    "SeenBefore": "after {0}",
+    "SeenWeather": "in {0}",
+    "SeenAmbitious": "with an ambitious lure",
+    "SeenModest": "with a modest lure",
     "NoCondition": "no time or weather condition (game)",
     "NoConditionDetail": "The game's fishing log gives this fish no time and no weather condition: it bites at any hour, in any weather.",
     "NowYes": "yes",

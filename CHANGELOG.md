@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.877.0
+- Plan global, Verify : Demande (X-75.3) : la pêche apprise en jeu se complète. Une prise au mooch est maintenant notée avec le poisson pris juste avant (et non l'appât en main) ; un leurre ambitieux ou modeste est noté ; la météo de la période précédente (prévision du jeu) est notée avec la prise. Dans le panneau de pêche, la ligne d'un poisson montre « vu » et son détail « Vu par vous (×N) : appât ou mooch …, après …, par …, heures ET, leurre » : ce que vous avez vu, jamais présenté comme une condition. Ajout noté à X-76 : un réglage unique qui coupe toutes les sources hors jeu, et vider le cache et les découvertes avec une sauvegarde avant. Non validé en jeu.
+- Tests : Fishing877Tests. Verify.ps1 (agent) : 1464/1464, 0 avertissement, 0 erreur ; DLL 0.877.0.0. Non validé en jeu.
+### English
+- Request (X-75.3): fishing learned in game is completed. A mooch catch is now noted with the fish caught just before (not the bait in hand); an ambitious or modest lure is noted; the previous period's weather (the game's forecast) is noted with the catch. In the fishing panel, a fish row shows « seen » and its detail « Seen by you (×N): bait or mooch …, after …, in …, ET hours, lure »: what you saw, never presented as a requirement. Added to X-76: a single setting turning off every non-game source, and clearing the cache and discoveries with a backup first. Not validated in game.
+
 ## 0.876.0
 - Plan global, Verify : Demande (X-75.2, suite) : trois autres endroits lisent d'abord ce qui a été vu en jeu. Le menu clic droit d'un objet propose la mission dont un coffre vous l'a donné, et le butin de monstre dès qu'un monstre vu le laisse, même sans LuminaSupplemental ni Garland. La liste d'une mission ajoute « Coffre (vu par vous) » pour les objets vus dans ses coffres. La page des donjons sans fond montre « Vu dans les coffres » pour les objets reçus aux étages, même avec les fichiers communautaires coupés. Ordre noté au plan : finir X-75, faire les essais en jeu nécessaires, puis le nettoyage X-76, puis les documents .md revérifiés contre le code. Non validé en jeu.
 - Tests : SeenFirst876Tests. Verify.ps1 (agent) : 1463/1463, 0 avertissement, 0 erreur ; DLL 0.876.0.0. Non validé en jeu.

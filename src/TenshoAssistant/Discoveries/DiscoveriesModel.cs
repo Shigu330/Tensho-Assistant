@@ -22,7 +22,10 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     // vista's row (as the map reads it), Detail = the weather when registered, levels = the Eorzea minutes.
     FestivalSeen=17, VistaSeen=18,
     // X-73.16 (0.872): NpcPlace: Subject = the ENpc (ENpcResident row) whose shop was opened, with its place; Detail 0. For the vendors no game sheet places.
-    NpcPlace=19 }
+    NpcPlace=19,
+    // X-75.3 (0.877): FishLure: Subject = fish, Detail = 1 Ambitious / 2 Modest lure on the cast that caught it; FishTransition: Subject = fish, Detail = the
+    // weather of the previous period (the game's forecast 1400 s earlier), levels = Eorzea minutes. Seen with, never « required ».
+    FishLure=20, FishTransition=21 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported
