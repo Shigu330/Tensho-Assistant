@@ -37,6 +37,32 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     private (uint Name,uint Territory,uint Map,Vector3 Place,int Level,long At) death=(0,0,0,default,0,-100_000);
     // X-73.9 (0.863): blue magic spells learned (IUnlockState.Unlock, AozAction rows, handled on the next read) and beasts tamed (the Beastmaster's obtained set).
     public Func<IReadOnlySet<uint>?>? Beasts { get; set; }
+    // X-73.12 (0.864): the festivals running (once a day each: their first and last days seen) and the vistas registered (with the weather and the Eorzea minute).
+    public Func<IReadOnlySet<uint>?>? Vistas { get; set; }
+    private IReadOnlySet<uint>? vistasBefore;private int festivalDay=-1;private long festivalsAt=-100_000;
+    private void ReadSeasonal(DateTimeOffset at,long now)
+    {
+        if(now-festivalsAt>=60_000)
+        {
+            festivalsAt=now;
+            var day=ItemGains.DayNumber(at);
+            if(day!=festivalDay && FFXIVClientStructs.FFXIV.Client.Game.GameMain.Instance() is var game && game!=null)
+            {
+                festivalDay=day;
+                foreach(var festival in game->ActiveFestivals)
+                    if(festival.Id!=0)store.SeeSource(DiscoveryKind.FestivalSeen,festival.Id,festival.Phase,day,at);
+            }
+        }
+        if(Vistas?.Invoke() is not { } registered)return;
+        if(vistasBefore is { } known)
+            foreach(var vista in registered.Where(id=>!known.Contains(id)).Take(4))
+            {
+                var weather=FFXIVClientStructs.FFXIV.Client.Game.WeatherManager.Instance() is var manager && manager!=null ? manager->GetCurrentWeather():(byte)0;
+                store.SeeSource(DiscoveryKind.VistaSeen,vista,weather,EorzeaMinute(at),at);
+                if(debug())log.Information("Discovery: vista {0} registered in weather {1}.",vista,weather);
+            }
+        vistasBefore=registered;
+    }
     private IReadOnlySet<uint>? beastsBefore;private IUnlockState? unlocks;private readonly Queue<uint> spellsLearned=new();
     public void WatchUnlocks(IUnlockState state){unlocks=state;state.Unlock+=OnUnlock;}
     private void OnUnlock(Lumina.Excel.RowRef row)
@@ -91,7 +117,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             if(wanted.ItemSources)
             {
                 ReadSalvage(at);ReadVenture(at);ReadLoot(at,territory,duty);
-                ReadFate(now);ReadTarget(now,territory,map);ReadLearned(at,now,territory,map);
+                ReadFate(now);ReadTarget(now,territory,map);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);
             }
             var counts=Counts();
             if(before is null){before=counts;return;}

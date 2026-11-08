@@ -12,6 +12,10 @@ public static class ItemGains
     public static Dictionary<uint,long> Losses(IReadOnlyDictionary<uint,long> before,IReadOnlyDictionary<uint,long> after)=>
         before.Where(pair=>pair.Value>after.GetValueOrDefault(pair.Key)).ToDictionary(pair=>pair.Key,pair=>pair.Value-after.GetValueOrDefault(pair.Key));
 
+    /// <summary>X-73.12 (0.864): days since 2013-08-27 (the game's relaunch), the scale festivals' days are kept in.</summary>
+    private static readonly DateTimeOffset DayZero=new(2013,8,27,0,0,0,TimeSpan.Zero);
+    public static int DayNumber(DateTimeOffset at)=>(int)Math.Clamp((at-DayZero).TotalDays,0,100_000);
+
     /// <summary>The one item spent, by exactly one unit, in a change (an opened coffer, a used bag); null when anything else was spent too.</summary>
     public static uint? SingleSpent(IReadOnlyDictionary<uint,long> losses)=>losses.Count==1 && losses.First().Value==1 ? losses.First().Key:null;
 

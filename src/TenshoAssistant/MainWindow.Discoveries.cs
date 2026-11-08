@@ -95,13 +95,16 @@ internal sealed partial class MainWindow
         return name;
     }
     private static readonly DiscoveryKind[] ItemSourceKinds=[DiscoveryKind.Desynthesis,DiscoveryKind.Venture,DiscoveryKind.DutyChest,DiscoveryKind.FateReward,
-        DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition,DiscoveryKind.FashionEvaluation,DiscoveryKind.VoyageDrop,DiscoveryKind.VoyageUnlock,DiscoveryKind.BlueSpellLearned,DiscoveryKind.BeastTamed];
+        DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition,DiscoveryKind.FashionEvaluation,DiscoveryKind.VoyageDrop,DiscoveryKind.VoyageUnlock,DiscoveryKind.BlueSpellLearned,DiscoveryKind.BeastTamed,DiscoveryKind.FestivalSeen,DiscoveryKind.VistaSeen];
     private string DiscoveryItemName(uint id)=>itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}";
     private string DiscoveryDutyName(uint id)=>DutyName?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
     /// <summary>X-74 (0.860): the level column: a monster's levels, a quantity range, or the Eorzea hours a fish was caught.</summary>
+    private static DateTime DiscoveryDay(int day)=>new DateTime(2013,8,27).AddDays(day);
     private static string DiscoveryFactLevel(DiscoveryFact fact)
     {
-        if(fact.Kind==DiscoveryKind.FishCondition)return $"{fact.LevelMin/60:00}:{fact.LevelMin%60:00}–{fact.LevelMax/60:00}:{fact.LevelMax%60:00} ET";
+        if(fact.Kind==DiscoveryKind.FestivalSeen)
+            return $"{DiscoveryDay(fact.LevelMin):d} – {DiscoveryDay(fact.LevelMax):d}";
+        if(fact.Kind is DiscoveryKind.FishCondition or DiscoveryKind.VistaSeen)return $"{fact.LevelMin/60:00}:{fact.LevelMin%60:00}–{fact.LevelMax/60:00}:{fact.LevelMax%60:00} ET";
         var range=fact.LevelMin==fact.LevelMax ? fact.LevelMax.ToString():$"{fact.LevelMin}–{fact.LevelMax}";
         return ItemSourceKinds.Contains(fact.Kind) ? "×"+range:range;
     }
@@ -117,6 +120,8 @@ internal sealed partial class MainWindow
         DiscoveryKind.FishCatch=>localization.Format("DiscoveriesUi.FromBait",DiscoveryItemName(fact.Subject),fact.Detail==0 ? "?":DiscoveryItemName(fact.Detail)),
         DiscoveryKind.BlueSpellLearned=>localization.Format("DiscoveriesUi.SpellFrom",DiscoveryNamed(SpellName,fact.Subject),fact.Detail==0 ? "?":DiscoveryMonsterName(fact.Detail)),
         DiscoveryKind.BeastTamed=>localization.Format("DiscoveriesUi.BeastFrom",DiscoveryNamed(BeastName,fact.Subject),fact.Detail==0 ? "?":DiscoveryMonsterName(fact.Detail)),
+        DiscoveryKind.FestivalSeen=>localization.Format("DiscoveriesUi.FestivalSeen",fact.Subject,fact.Detail),
+        DiscoveryKind.VistaSeen=>localization.Format("DiscoveriesUi.VistaSeen",fact.Subject,weather.State.Catalog?.Weather(fact.Detail)?.Name ?? $"#{fact.Detail}"),
         DiscoveryKind.VoyageDrop=>localization.Format("DiscoveriesUi.FromSector",DiscoveryItemName(fact.Subject),DiscoverySectorName(fact.Detail)),
         DiscoveryKind.VoyageUnlock=>localization.Format("DiscoveriesUi.SectorUnlock",DiscoverySectorName(fact.Subject),DiscoverySectorName(fact.Detail)),
         DiscoveryKind.FashionEvaluation=>localization.Format("DiscoveriesUi.FashionJudged",DiscoveryItemName(fact.Subject),fashionHints.State.Catalog?.Hints.FirstOrDefault(hint=>hint.Id==fact.Detail)?.Name ?? $"#{fact.Detail}"),

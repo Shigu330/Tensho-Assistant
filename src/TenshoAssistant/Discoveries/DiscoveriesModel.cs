@@ -17,7 +17,10 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     VoyageDrop=13, VoyageUnlock=14,
     // X-73.9 (0.863): BlueSpellLearned: Subject = AozAction row, Detail = the BNpcName it is put down to (0: none), with its place when known; BeastTamed: Subject = the
     // Beastmaster's beast id, the same Detail and place.
-    BlueSpellLearned=15, BeastTamed=16 }
+    BlueSpellLearned=15, BeastTamed=16,
+    // X-73.12 (0.864): FestivalSeen: Subject = Festival row, Detail = phase, levels = the first and last days seen (days since 2013-08-27); VistaSeen: Subject = the
+    // vista's row (as the map reads it), Detail = the weather when registered, levels = the Eorzea minutes.
+    FestivalSeen=17, VistaSeen=18 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported

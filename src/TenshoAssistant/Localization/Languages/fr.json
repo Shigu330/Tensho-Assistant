@@ -581,6 +581,10 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "SummaryFestivalSeen": "Fêtes vues : {0} ({1} vues par vous, {2} importées seulement)",
+    "SummaryVistaSeen": "Panoramas inscrits : {0} ({1} vus par vous, {2} importés seulement)",
+    "FestivalSeen": "Fête n° {0}, phase {1}",
+    "VistaSeen": "Panorama n° {0} inscrit par {1}",
     "SummaryBlueSpellLearned": "Sorts de mage bleu appris : {0} ({1} vus par vous, {2} importés seulement)",
     "SummaryBeastTamed": "Bêtes apprivoisées : {0} ({1} vues par vous, {2} importées seulement)",
     "SpellFrom": "{0} appris de {1}",

@@ -419,7 +419,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>beastLoader=new Beastmaster.BeastCatalogLoader(beasts,data,framework,client,player,log),()=>beastLoader?.Dispose());
             mainWindow.Beasts=beasts;
             // X-73.9 (0.863): spells learned and beasts tamed, put down to their monster, for the discoveries base.
-            if(itemWatcher is not null){itemWatcher.Beasts=()=>beasts.State.Obtained;itemWatcher.WatchUnlocks(unlocks);}
+            if(itemWatcher is not null){itemWatcher.Beasts=()=>beasts.State.Obtained;itemWatcher.WatchUnlocks(unlocks);itemWatcher.Vistas=()=>mapLive?.State?.Sightseen;}
             mainWindow.BeastName=id=>beasts.State.Catalog?.Beasts.FirstOrDefault(beast=>beast.Id==id)?.Name ?? "";
             mainWindow.SpellName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.AozAction>().GetRowOrDefault(id) is { } spell ? data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(spell.Action.RowId)?.Name.ExtractText() ?? "":"";
             mainWindow.GuideNewInstall=newInstall;

@@ -1368,6 +1368,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.863) Apprendre un sort de mage bleu : Monde › Découvertes, « appris de » le monstre.
 
+- [ ] (0.864) Pendant une fête, Monde › Découvertes : « Fêtes vues » ; inscrire un panorama : il apparaît avec sa météo.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

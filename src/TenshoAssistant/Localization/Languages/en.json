@@ -581,6 +581,10 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
+    "SummaryFestivalSeen": "Festivals seen: {0} ({1} seen by you, {2} imported only)",
+    "SummaryVistaSeen": "Vistas registered: {0} ({1} seen by you, {2} imported only)",
+    "FestivalSeen": "Festival #{0}, phase {1}",
+    "VistaSeen": "Vista #{0} registered in {1}",
     "SummaryBlueSpellLearned": "Blue magic spells learned: {0} ({1} seen by you, {2} imported only)",
     "SummaryBeastTamed": "Beasts tamed: {0} ({1} seen by you, {2} imported only)",
     "SpellFrom": "{0} learned from {1}",

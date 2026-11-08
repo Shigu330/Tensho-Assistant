@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.864.0
+- Plan global, Verify : Demande (X-73.12) : deux relevés de plus. Les fêtes en cours, lues dans le jeu, notées une fois par jour : la base garde leur premier et leur dernier jour vus (leurs dates ne viennent plus seulement des sources communautaires). Les panoramas inscrits, avec la météo et l'heure d'Eorzéa du moment, pour compléter peu à peu les météos que donnait le wiki. Non validé en jeu.
+- Tests : Seasonal864Tests. Verify.ps1 (agent) : 1447/1447, 0 avertissement, 0 erreur ; DLL 0.864.0.0. Non validé en jeu.
+### English
+- Request (X-73.12): two more records. The festivals running, read in the game, noted once a day: the base keeps their first and last days seen (their dates no longer come only from community sources). The vistas registered, with the weather and Eorzea time of the moment, to complete little by little the weathers the wiki gave. Not validated in game.
+
 ## 0.863.0
 - Plan global, Verify : Demande (X-73.9) : le mage bleu et le dresseur appris en jeu plutôt que sur le wiki. Quand un sort de mage bleu est appris (le jeu le signale) ou qu'une bête s'ajoute au carnet du dresseur, la base de découvertes garde le sort ou la bête avec le monstre qui vient d'être vaincu (dans les 15 secondes), ou à défaut votre cible, et son lieu. Non validé en jeu.
 - Tests : LearnedTamed863Tests. Verify.ps1 (agent) : 1446/1446, 0 avertissement, 0 erreur ; DLL 0.863.0.0. Non validé en jeu.
