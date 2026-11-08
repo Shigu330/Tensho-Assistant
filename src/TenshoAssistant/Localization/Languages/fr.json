@@ -3218,6 +3218,10 @@
     "NpcSaleStack": "Vente au PNJ (NQ) : {0} gils l'unité, pile de {1} : {2} gils"
   },
   "MapView": {
+    "AnimalSize1": "Petit animal",
+    "AnimalSize2": "Animal moyen",
+    "AnimalSize3": "Grand animal",
+    "AnimalLeavings": "Produits au pâturage : {0}",
     "ShowIslandAnimals": "Animaux de l'île",
     "ShowIslandAnimalsHelp": "Sur l'île sanctuaire, les animaux sauvages autour de vous qui peuvent être capturés, avec leur icône (données du jeu).\nPar défaut : activé.",
     "ShowMiningPoints": "Mineur",

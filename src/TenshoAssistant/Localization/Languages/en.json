@@ -3218,6 +3218,10 @@
     "NpcSaleStack": "NPC sale (NQ): {0} gil each, stack of {1}: {2} gil"
   },
   "MapView": {
+    "AnimalSize1": "Small animal",
+    "AnimalSize2": "Medium animal",
+    "AnimalSize3": "Large animal",
+    "AnimalLeavings": "Leavings in the pasture: {0}",
     "ShowIslandAnimals": "Island animals",
     "ShowIslandAnimalsHelp": "On the Island Sanctuary, the wild animals around you that can be caught, with their icon (game data).\nDefault: on.",
     "ShowMiningPoints": "Miner",

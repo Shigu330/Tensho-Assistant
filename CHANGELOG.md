@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.932.0
+- Plan global, Verify : Nettoyage X-76, parseurs P5 (fin, animaux de l'île) : au survol d'un animal de l'île sur la carte, Tensho affiche sa taille (petit, moyen ou grand, lu dans le jeu : à confirmer en jeu) et les deux produits qu'il donne au pâturage. P5 est terminé (0.928 à 0.932 : tâches de servants, vues panoramiques, mage bleu, rangs S, animaux de l'île). Non validé en jeu.
+- Tests : IslandAnimals932Tests. Verify.ps1 (agent) : 1545/1545, 0 avertissement, 0 erreur ; DLL 0.932.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, parsers P5 (end, island animals): hovering an island animal on the map shows its size (small, medium or large, read from the game: to confirm in game) and the two leavings it gives in the pasture. P5 is done (0.928 to 0.932: ventures, vistas, blue magic, S ranks, island animals). Not validated in game.
+
 ## 0.931.0
 - Plan global, Verify : Nettoyage X-76, parseurs P5 (rangs S) : la table des rangs S de Tensho (conditions d'apparition, données communautaires) est maintenant vérifiée contre les données du jeu : les 50 marques sont toutes des rangs S de leur zone, et aucun rang S du jeu ne manque. Un test garde cette vérification (nouvelle sonde PROBE_SRANK, preuve docs/evidence/0.931-srank-check.md). Rien de visible. Non validé en jeu.
 - Tests : SRankCheck931Tests. Verify.ps1 (agent) : 1544/1544, 0 avertissement, 0 erreur ; DLL 0.931.0.0. Non validé en jeu.

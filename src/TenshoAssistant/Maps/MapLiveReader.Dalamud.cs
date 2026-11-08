@@ -104,6 +104,9 @@ internal sealed class MapLiveReader : IDisposable
     private readonly Dictionary<uint,int> huntMarks=[];
     // 0.901 (X-83, docs/evidence/0.901-island-animals.md): the island's animals that can be caught: BNpcBase → icon (MJIAnimals).
     private readonly Dictionary<uint,uint> islandAnimals=[];
+    /// <summary>X-76 P5 (0.932): each island animal's size (MJIAnimals.Size, 1 to 3) and its two leavings (MJIAnimals.Reward), by BNpcBase row.</summary>
+    public IReadOnlyDictionary<uint,(byte Size,uint[] Rewards)> IslandAnimalInfo=>islandAnimalInfo;
+    private readonly Dictionary<uint,(byte Size,uint[] Rewards)> islandAnimalInfo=[];
     private readonly TeleportListGate teleportGate=new();
     private long teleport;private int costsRequest;private IReadOnlyDictionary<uint,uint>? teleportCosts;
     /// <summary>Queues a teleport to an aetheryte (game action, normal gil cost); sent on the next framework tick.</summary>
@@ -172,7 +175,11 @@ internal sealed class MapLiveReader : IDisposable
         try
         {
             foreach(var animal in data.GetExcelSheet<Lumina.Excel.Sheets.MJIAnimals>())
-                if(animal.BNpcBase.RowId!=0 && animal.Icon>0)islandAnimals.TryAdd(animal.BNpcBase.RowId,(uint)animal.Icon);
+                if(animal.BNpcBase.RowId!=0 && animal.Icon>0)
+                {
+                    islandAnimals.TryAdd(animal.BNpcBase.RowId,(uint)animal.Icon);
+                    islandAnimalInfo.TryAdd(animal.BNpcBase.RowId,(animal.Size,animal.Reward.Select(reward=>reward.RowId).Where(id=>id!=0).ToArray()));
+                }
         }
         catch(Exception error){log.Warning(error,"Island animal data unavailable: they are not shown on the map.");}
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
