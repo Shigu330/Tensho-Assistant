@@ -8,7 +8,7 @@ namespace TenshoAssistant;
 /// R-15 (0.417): while the game's spearfishing window is open (setting FishingPanel, as the fishing help), a panel beside it.
 /// X-79 (0.891, user request: « the list should stay all the time and highlight the right size », the old one vanished with the fish): the fish in sight (size,
 /// speed), then every fish of the node (else of the zone) always listed in a fixed order, each with its shadow (yours first, else GatherBuddy's), the ones
-/// whose shadow is in sight highlighted.
+/// whose shadow is in sight highlighted. 0.892: a fixed layout (three slot lines, rows that keep their place and width), the node found when the window opens.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -56,35 +56,28 @@ internal sealed partial class MainWindow
             (int,int)? Community(uint fish)=>data?.Find(fish) is { SpearSize:{ } size,SpearSpeed:{ } speed } ? (size,speed):null;
             var (ofPoint,fishHere)=SpearfishOf(frame.PointId,frame.TerritoryId);
             var rows=Gathering.Spearfishing.Rows(fishHere,SeenShadowOf,Community,frame.Slots);
-            // The fish in sight, one short line each.
-            var shown=0;
-            foreach(var slot in frame.Slots.Where(slot=>slot.Available))
+            // 0.892 (user report: « it changes all the time »): a fixed layout. Three slot lines always, absent ones as « — »; the list keeps its rows and its widths, the
+            // fish in sight are only coloured and marked in front.
+            for(var index=0;index<3;index++)
             {
-                shown++;
-                var size=localization.Get(slot.Size switch{1=>"Spearfishing.Small",2=>"Spearfishing.Average",3=>"Spearfishing.Large",_=>"Spearfishing.UnknownSize"});
-                var speed=Gathering.Spearfishing.SpeedName(slot.Speed) is { } name ? localization.Get("Spearfishing.Speed"+name):slot.Speed.ToString();
-                ImGui.TextColored(Muted,localization.Format("Spearfishing.Slot",slot.Index+1,size,speed)+(slot.Large ? " · "+localization.Get("Spearfishing.GuaranteedLarge"):""));
-                if(developerMode)ImGui.TextDisabled($"size {slot.Size} · speed {slot.Speed} · reverse {slot.Reverse}");
-                // A shadow no fish of the list has: GatherBuddy's fish of other places, three at most.
-                if(!rows.Any(row=>row.Size==slot.Size && row.Speed==slot.Speed) && data is not null)
-                {
-                    var elsewhere=Gathering.Spearfishing.Candidates(data.Spearfish,slot,_=>false).Elsewhere;
-                    ImGui.TextDisabled(elsewhere.Count==0 ? localization.Get("Spearfishing.NoMatch")
-                        :localization.Format("Spearfishing.Elsewhere",string.Join(", ",elsewhere.Take(3).Select(fish=>items?.Find(fish)?.Name ?? $"ID {fish}"))));
-                }
+                if(frame.Slots.FirstOrDefault(slot=>slot.Index==index && slot.Available) is not { } slot){ImGui.TextDisabled(localization.Format("Spearfishing.SlotEmpty",index+1));continue;}
+                ImGui.TextColored(Accent,localization.Format("Spearfishing.SlotShadow",index+1,SpearShadowText(slot.Size,slot.Speed))
+                    +(slot.Large ? " · "+localization.Get("Spearfishing.GuaranteedLarge"):""));
             }
-            if(shown==0)ImGui.TextDisabled(localization.Get("Spearfishing.NoFish"));
             ImGui.Separator();
+            // Without a node, the zone's list would be too long: only the fish you speared there and those whose shadow is in sight.
+            var listed=ofPoint ? rows:rows.Where(row=>row.Seen || row.InSight).ToArray();
             ImGui.TextUnformatted(localization.Get(ofPoint ? "Spearfishing.PointFish":"Spearfishing.ZoneFish"));
-            if(rows.Count==0)ImGui.TextDisabled(localization.Get("Spearfishing.NoList"));
-            foreach(var row in rows)
+            if(listed.Count==0)ImGui.TextDisabled(localization.Get("Spearfishing.NoList"));
+            foreach(var row in listed)
             {
                 var text=(items?.Find(row.Fish)?.Name ?? $"ID {row.Fish}")+" — "+(row.Size is { } size && row.Speed is { } speed ? SpearShadowText(size,speed):"?")
                     +(row.Seen ? " · "+localization.Get("Spearfishing.Seen"):"");
-                if(row.InSight)ImGui.TextColored(Accent,"» "+text+" · "+localization.Get("Spearfishing.InSight"));
+                if(row.InSight)ImGui.TextColored(Accent,"» "+text);
                 else if(row.Size is null)ImGui.TextDisabled("   "+text);
-                else ImGui.TextUnformatted("   "+text);
+                else ImGui.TextColored(Muted,"   "+text);
             }
+            if(developerMode)ImGui.TextDisabled($"node {frame.PointId} · {fishHere.Length} fish · slots "+string.Join(" ",frame.Slots.Select(slot=>$"{(slot.Available ? 1:0)}/{slot.Size}/{slot.Speed}")));
             if(data is null)ImGui.TextDisabled(localization.Get("Spearfishing.NoData"));
             ImGui.TextDisabled(localization.Get("Spearfishing.Credit"));
         });

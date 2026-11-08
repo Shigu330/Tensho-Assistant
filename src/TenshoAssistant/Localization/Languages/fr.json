@@ -6334,8 +6334,10 @@
     "SettingTip": "Petite fenêtre à l’écran avec les objets de vos alarmes Tensho actives (récolte, pêche), la plus proche en premier et le temps restant ; clic sur un nom : la fiche ; « Carte » : la carte du jeu sur le point quand il est connu. Masquée avec l’interface du jeu ; la croix la ferme.\nPar défaut : désactivé."
   },
   "Spearfishing": {
+    "SlotEmpty": "Poisson {0} : —",
+    "SlotShadow": "Poisson {0} : {1}",
+    "ZoneFish": "Point inconnu : poissons de la zone pris par vous ou en vue :",
     "PointFish": "Poissons de ce point :",
-    "ZoneFish": "Poissons au harpon de la zone :",
     "InSight": "en vue",
     "NoList": "Aucun poisson au harpon connu ici.",
     "Elsewhere": "Pas un poisson de ce point ; ailleurs : {0}",
