@@ -4,7 +4,9 @@ using System.Text.Json;
 namespace TenshoAssistant.Discoveries;
 
 /// <summary>X-43 (0.807): what a fact is about. Numbers are kept in files: never reuse one.</summary>
-public enum DiscoveryKind { MonsterPlace=1 }
+// X-72 C (0.856, user choice « ABC »): hunt marks' spawn places (B, A and S ranks: in no game sheet, only in community data) and the FATEs seen (place, level,
+// when). HuntMarkPlace: Subject = BNpcName row, Detail = BNpcBase row, levels = the rank (1 B, 2 A, 3 S). FateSeen: Subject = Fate row, levels = the FATE's level.
+public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported
@@ -61,17 +63,27 @@ public sealed class DiscoveryStore
 
     /// <summary>A monster seen at a place; true when the place is new for it.</summary>
     public bool SeeMonster(uint nameId,uint baseId,uint territory,uint map,Vector3 position,int level,DateTimeOffset at)
+        =>See(DiscoveryKind.MonsterPlace,nameId,baseId,territory,map,position,level,at,SightingGap);
+    /// <summary>X-72 C (0.856): a hunt mark (rank 1 B, 2 A, 3 S) seen at a place.</summary>
+    public bool SeeHuntMark(uint nameId,uint baseId,uint territory,uint map,Vector3 position,int rank,DateTimeOffset at)
+        =>See(DiscoveryKind.HuntMarkPlace,nameId,baseId,territory,map,position,rank,at,SightingGap);
+    /// <summary>X-72 C (0.856): a FATE seen running; one more sighting after an hour, longer than any FATE lasts.</summary>
+    public static readonly TimeSpan FateGap=TimeSpan.FromHours(1);
+    public bool SeeFate(uint fateId,uint territory,uint map,Vector3 position,int level,DateTimeOffset at)
+        =>See(DiscoveryKind.FateSeen,fateId,0,territory,map,position,level,at,FateGap);
+
+    private bool See(DiscoveryKind kind,uint subject,uint detail,uint territory,uint map,Vector3 position,int level,DateTimeOffset at,TimeSpan gap)
     {
-        if(nameId==0 || map==0 || !float.IsFinite(position.X) || !float.IsFinite(position.Z))return false;
+        if(subject==0 || map==0 || !float.IsFinite(position.X) || !float.IsFinite(position.Z))return false;
         var (cellX,cellZ)=Cell(position.X,position.Z);
-        var fact=new DiscoveryFact{Kind=DiscoveryKind.MonsterPlace,Subject=nameId,Detail=baseId,Territory=territory,Map=map,CellX=cellX,CellZ=cellZ,X=position.X,Z=position.Z,
+        var fact=new DiscoveryFact{Kind=kind,Subject=subject,Detail=detail,Territory=territory,Map=map,CellX=cellX,CellZ=cellZ,X=position.X,Z=position.Z,
             LevelMin=level,LevelMax=level,Seen=1,First=at,Last=at};
         lock(gate)
         {
             if(facts.TryGetValue(fact.Key,out var known))
             {
                 if(level>0){known.LevelMin=known.LevelMin==0 ? level:Math.Min(known.LevelMin,level);known.LevelMax=Math.Max(known.LevelMax,level);}
-                if(at-known.Last>=SightingGap)known.Seen++;
+                if(at-known.Last>=gap)known.Seen++;
                 if(at>known.Last)known.Last=at;
                 Dirty=true;
                 return false;

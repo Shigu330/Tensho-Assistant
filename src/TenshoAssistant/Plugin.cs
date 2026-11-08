@@ -178,6 +178,7 @@ public sealed class Plugin : IDalamudPlugin
             var discoveries=new Discoveries.DiscoveryStore();
             mainWindow.DiscoveryStore=discoveries;mainWindow.DiscoveryFolder=discoveryFolder;
             mainWindow.MonsterName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().GetRowOrDefault(id)?.Singular.ExtractText() ?? "";
+            mainWindow.FateName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Fate>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
             // X-52 (0.817): the prices seen at the market board, in place of Universalis' when newer.
             var seenPrices=new Market.SeenPriceStore();
             mainWindow.SeenPrices=seenPrices;

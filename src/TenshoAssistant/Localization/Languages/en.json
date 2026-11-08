@@ -581,6 +581,12 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
+    "HuntMarks": "Hunt marks' spawn places",
+    "HuntMarksTip": "Each hunt mark (rank B, A or S) you pass by: its place (within 50 yalms), its zone and its rank. These places are in no game data.\nDefault: on.",
+    "Fates": "FATEs seen",
+    "FatesTip": "Each FATE running near you: its place, its level, when you first and last saw it, and how many times (once an hour at most).\nDefault: on.",
+    "HuntMarkName": "{0} (hunt, rank {1})",
+    "FateName": "FATE: {0}",
     "SeenHere": "Seen by you: {0} ({1}, {2}), lv. {3}",
     "SeenHereTip": "From your discoveries base (World › Discoveries). Right click: the nearest aetheryte with the flag, or the flag alone.",
     "MarketPrices": "Prices seen at the market board",
@@ -592,7 +598,7 @@
     "Enabled": "Note discoveries",
     "EnabledTip": "Note what you discover while playing. Everything stays on your disk.\nDefault: on.",
     "MonsterPlaces": "Where monsters live",
-    "MonsterPlacesTip": "Each monster you pass near: its place (to 10 yalms), its zone and its level.\nDefault: on.",
+    "MonsterPlacesTip": "Each monster you pass near: its place (to 50 yalms), its zone and its level.\nDefault: on.",
     "Empty": "No discovery yet.",
     "SummaryMonsterPlace": "Monster places: {0} ({1} seen by you, {2} imported only)",
     "Export": "Export",

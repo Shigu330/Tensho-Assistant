@@ -581,6 +581,12 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "HuntMarks": "Où apparaissent les monstres de chasse",
+    "HuntMarksTip": "Chaque monstre de chasse (rang B, A ou S) près duquel vous passez : son lieu (à 50 yalms près), sa zone et son rang. Ces lieux ne sont dans aucune donnée du jeu.\nPar défaut : activé.",
+    "Fates": "ALÉA vues",
+    "FatesTip": "Chaque ALÉA en cours près de vous : son lieu, son niveau, quand vous l'avez vue la première et la dernière fois, et combien de fois (une fois par heure au plus).\nPar défaut : activé.",
+    "HuntMarkName": "{0} (chasse, rang {1})",
+    "FateName": "ALÉA : {0}",
     "SeenHere": "Vu par vous : {0} ({1}, {2}), niv. {3}",
     "SeenHereTip": "D'après votre base de découvertes (Monde › Découvertes). Clic droit : l'éthérite la plus proche avec le drapeau, ou le drapeau seul.",
     "MarketPrices": "Prix vus au tableau des ventes",
@@ -592,7 +598,7 @@
     "Enabled": "Noter les découvertes",
     "EnabledTip": "Note ce que vous découvrez en jouant. Tout reste sur votre disque.\nPar défaut : activé.",
     "MonsterPlaces": "Où vivent les monstres",
-    "MonsterPlacesTip": "Chaque monstre près duquel vous passez : son lieu (à 10 yalms près), sa zone et son niveau.\nPar défaut : activé.",
+    "MonsterPlacesTip": "Chaque monstre près duquel vous passez : son lieu (à 50 yalms près), sa zone et son niveau.\nPar défaut : activé.",
     "Empty": "Aucune découverte pour l'instant.",
     "SummaryMonsterPlace": "Lieux de monstres : {0} ({1} vus par vous, {2} importés seulement)",
     "Export": "Exporter",

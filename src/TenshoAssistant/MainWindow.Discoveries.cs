@@ -12,6 +12,8 @@ internal sealed partial class MainWindow
     internal DiscoveryStore? DiscoveryStore { get; set; }
     internal string? DiscoveryFolder { get; set; }
     internal Func<uint,string>? MonsterName { get; set; }
+    /// <summary>X-72 C (0.856): a FATE's name from the game's sheet.</summary>
+    internal Func<uint,string>? FateName { get; set; }
     internal Market.SeenPriceStore? SeenPrices { get; set; }
     /// <summary>Set once the saved base is read (or found missing): nothing is written before, so that a slow read never loses it.</summary>
     internal volatile bool DiscoveriesLoaded;
@@ -34,6 +36,19 @@ internal sealed partial class MainWindow
             foreach(var monster in monsters)
                 if(store.SeeMonster(monster.NameId,monster.BaseId,live.TerritoryId,live.MapId,monster.Position,monster.Level,at) && developerMode && settings.DebugLog)
                     log.Information("Discovery: monster {0} (name {1}, base {2}) on map {3} at {4:F1}, {5:F1}, level {6}.",monster.Name,monster.NameId,monster.BaseId,live.MapId,monster.Position.X,monster.Position.Z,monster.Level);
+        }
+        // X-72 C (0.856): the hunt marks' spawn places and the FATEs seen.
+        if(settings.Enabled && mapLive?.State is { MapId:not 0 } here)
+        {
+            var at=DateTimeOffset.UtcNow;
+            if(settings.HuntMarks)
+                foreach(var mark in here.Objects ?? [])
+                    if(mark.Kind==MapObjectKind.HuntMark && store.SeeHuntMark(mark.NameId,mark.BaseId,here.TerritoryId,here.MapId,mark.Position,mark.Level,at) && developerMode && settings.DebugLog)
+                        log.Information("Discovery: hunt mark {0} (name {1}, rank {2}) on map {3} at {4:F1}, {5:F1}.",mark.Name,mark.NameId,mark.Level,here.MapId,mark.Position.X,mark.Position.Z);
+            if(settings.Fates)
+                foreach(var fate in here.Fates ?? [])
+                    if(store.SeeFate(fate.Id,here.TerritoryId,here.MapId,fate.Position,fate.Level,at) && developerMode && settings.DebugLog)
+                        log.Information("Discovery: FATE {0} ({1}) on map {2} at {3:F1}, {4:F1}.",fate.Name,fate.Id,here.MapId,fate.Position.X,fate.Position.Z);
         }
         if((store.Dirty || SeenPrices?.Dirty==true) && now-discoveriesSavedAt>60_000)SaveDiscoveries(false);
     }
@@ -64,6 +79,20 @@ internal sealed partial class MainWindow
         return name;
     }
 
+    private readonly Dictionary<uint,string> discoveryFateNames=[];
+    private string DiscoveryFateName(uint id)
+    {
+        if(!discoveryFateNames.TryGetValue(id,out var name))discoveryFateNames[id]=name=FateName?.Invoke(id) is { Length:>0 } found ? found:$"#{id}";
+        return name;
+    }
+    /// <summary>0.856 (X-72 C): the name shown for a fact: the monster, the hunt mark with its rank, or the FATE.</summary>
+    private string DiscoveryFactName(DiscoveryFact fact)=>fact.Kind switch
+    {
+        DiscoveryKind.HuntMarkPlace=>localization.Format("DiscoveriesUi.HuntMarkName",DiscoveryMonsterName(fact.Subject),fact.LevelMax switch {1=>"B",2=>"A",3=>"S",_=>"?"}),
+        DiscoveryKind.FateSeen=>localization.Format("DiscoveriesUi.FateName",DiscoveryFateName(fact.Subject)),
+        _=>DiscoveryMonsterName(fact.Subject),
+    };
+
     private void DrawDiscoveries()
     {
         TenshoAssistant.UI.UiComponents.SectionHeader(localization.Get("DiscoveriesUi.Title"),localization.Get("DiscoveriesUi.Help"));
@@ -73,6 +102,8 @@ internal sealed partial class MainWindow
         {
             ImGui.Indent();
             BoolSetting("DiscoveriesUi.MonsterPlaces","DiscoveriesUi.MonsterPlacesTip",()=>configuration.Discovery.MonsterPlaces,value=>configuration.Discovery.MonsterPlaces=value,c=>c.Discovery.MonsterPlaces);
+            BoolSetting("DiscoveriesUi.HuntMarks","DiscoveriesUi.HuntMarksTip",()=>configuration.Discovery.HuntMarks,value=>configuration.Discovery.HuntMarks=value,c=>c.Discovery.HuntMarks);
+            BoolSetting("DiscoveriesUi.Fates","DiscoveriesUi.FatesTip",()=>configuration.Discovery.Fates,value=>configuration.Discovery.Fates=value,c=>c.Discovery.Fates);
             BoolSetting("DiscoveriesUi.MarketPrices","DiscoveriesUi.MarketPricesTip",()=>configuration.Discovery.MarketPrices,value=>configuration.Discovery.MarketPrices=value,c=>c.Discovery.MarketPrices);
             ImGui.Unindent();
         }
@@ -181,7 +212,10 @@ internal sealed partial class MainWindow
         {
             discoverySearched=discoverySearch;discoveryShownRevision=store.Revision;
             var wanted=discoverySearch.Trim();
-            discoveryRows=store.Find(DiscoveryKind.MonsterPlace,id=>DiscoveryMonsterName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),200);
+            // 0.856 (X-72 C): the hunt marks and the FATEs seen too, by their names.
+            discoveryRows=[..store.Find(DiscoveryKind.MonsterPlace,id=>DiscoveryMonsterName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),200),
+                ..store.Find(DiscoveryKind.HuntMarkPlace,id=>DiscoveryMonsterName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),100),
+                ..store.Find(DiscoveryKind.FateSeen,id=>DiscoveryFateName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),100)];
         }
         if(discoveryRows.Count==0){ImGui.TextDisabled(localization.Get("DiscoveriesUi.NoneFound"));return;}
         if(!ImGui.BeginTable("Discoveries",6,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
@@ -194,7 +228,7 @@ internal sealed partial class MainWindow
             {
                 var fact=discoveryRows[index];var map=catalog?.Find(fact.Map);
                 ImGui.TableNextRow();
-                ImGui.TableNextColumn();ImGui.TextUnformatted(DiscoveryMonsterName(fact.Subject));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(DiscoveryFactName(fact));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(map is null ? $"#{fact.Map}":MapName(map));
                 ImGui.TableNextColumn();
                 if(map is null)ImGui.TextDisabled("—");

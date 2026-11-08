@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.856.0
+- Plan global, Verify : Choix de l'utilisateur (X-72, C) : la base de découvertes relève deux genres de plus. Où apparaissent les monstres de chasse (rangs B, A et S) : ces lieux ne sont dans aucune donnée du jeu, seulement dans les données communautaires. Et les ALÉA vues : leur lieu, leur niveau, la première et la dernière fois, et combien de fois (une fois par heure au plus). Chacun a son réglage (activé par défaut) ; la recherche de Monde › Découvertes les trouve par leur nom. Non validé en jeu.
+- Tests : MoreKinds856Tests. Verify.ps1 (agent) : 1436/1436, 0 avertissement, 0 erreur ; DLL 0.856.0.0. Non validé en jeu.
+### English
+- User choice (X-72, C): the discoveries base notes two more kinds. Where hunt marks appear (ranks B, A and S): these places are in no game data, only in community data. And the FATEs seen: their place, level, first and last time, and how many times (once an hour at most). Each has its setting (on by default); the World › Discoveries search finds them by name. Not validated in game.
+
 ## 0.855.0
 - Plan global, Verify : Choix de l'utilisateur (X-72, B) : la base de découvertes passe à des cases de 50 yalms au lieu de 10 (87 % des relevés n'avaient été vus qu'une fois ; 640 relevés au lieu de 1 469 sur votre base). Au chargement et à l'import, chaque relevé est replacé dans sa case ; ceux qui tombent dans la même sont fusionnés : vues et imports additionnés, niveaux et dates les plus larges, premier lieu exact gardé. La base est réécrite, plus petite ; un ancien fichier importé est accepté. Non validé en jeu.
 - Tests : Cells855Tests. Verify.ps1 (agent) : 1435/1435, 0 avertissement, 0 erreur ; DLL 0.855.0.0. Non validé en jeu.

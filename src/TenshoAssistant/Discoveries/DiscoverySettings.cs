@@ -5,6 +5,9 @@ public sealed class DiscoverySettings
 {
     public bool Enabled { get; set; }=true;
     public bool MonsterPlaces { get; set; }=true;
+    /// <summary>X-72 C (0.856): the hunt marks' spawn places, and the FATEs seen.</summary>
+    public bool HuntMarks { get; set; }=true;
+    public bool Fates { get; set; }=true;
     /// <summary>X-52 (0.817): the prices seen at the market board, in place of Universalis' for the player's world when newer.</summary>
     public bool MarketPrices { get; set; }=true;
     public bool DebugLog { get; set; }

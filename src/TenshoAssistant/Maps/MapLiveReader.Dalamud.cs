@@ -19,7 +19,7 @@ public sealed record MapEventMarker(uint MapId,uint Icon,Vector3 Position,float 
 // Nearby game objects shown on the map (coffers, gathering points); Level is the gathering level when known, else 0.
 // N-09 (0.441): HuntMark = a living hunt mark (NotoriousMonster by BNpcBase); Level holds its rank (1 B, 2 A, 3 S).
 public enum MapObjectKind { Treasure, Gathering, HuntMark }
-public sealed record MapObjectMarker(MapObjectKind Kind,string Name,Vector3 Position,int Level);
+public sealed record MapObjectMarker(MapObjectKind Kind,string Name,Vector3 Position,int Level,uint NameId=0,uint BaseId=0);
 /// <summary>0.813 (X-49): one point of an accepted quest as the game's own Map holds it (MarkerInfo.ObjectiveId, MapMarkerData map and place).</summary>
 public sealed record MapQuestPoint(uint Quest,uint MapId,float X,float Z);
 /// <summary>0.795 (X-34): a living enemy the game streams around the player: its name row, base row, name, place and level. Information only.</summary>
@@ -277,8 +277,10 @@ internal sealed class MapLiveReader : IDisposable
                 _=>(MapObjectKind?)null,
             };
             if(kind is null || !item.IsTargetable)continue;
+            // 0.856 (X-72 C): a hunt mark keeps its name and base rows, for the discoveries base.
             result.Add(new(kind.Value,item.Name.TextValue,item.Position,kind==MapObjectKind.Gathering ? gatheringLevels.GetValueOrDefault(item.BaseId)
-                :kind==MapObjectKind.HuntMark ? huntMarks.GetValueOrDefault(item.BaseId):0));
+                :kind==MapObjectKind.HuntMark ? huntMarks.GetValueOrDefault(item.BaseId):0,
+                kind==MapObjectKind.HuntMark && item is Dalamud.Game.ClientState.Objects.Types.IBattleNpc mark ? mark.NameId:0,kind==MapObjectKind.HuntMark ? item.BaseId:0));
         }
         return result.AsReadOnly();
     }
