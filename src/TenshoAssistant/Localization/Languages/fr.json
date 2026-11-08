@@ -3755,6 +3755,7 @@
     "QueryHint": "Termes de nom ou d’identifiant séparés par ; (facultatif)",
     "Categories": "Catégories, par ordre de priorité (l’une d’elles suffit)",
     "CategoryPriorityHelp": "La zone place d’abord les piles de la catégorie 1, puis 2, etc. ; les critères ordonnent chaque catégorie. « < » remonte une catégorie.",
+    "AddGroup": "+ groupe entier : {0}… ({1} catégories)",
     "AddCategory": "Ajouter une catégorie…",
     "CategoryFilterHint": "Tapez pour filtrer (ex. med, peche)",
     "NoCategoryMatch": "Aucune catégorie ne correspond.",

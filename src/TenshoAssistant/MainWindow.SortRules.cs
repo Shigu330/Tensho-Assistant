@@ -11,6 +11,8 @@ namespace TenshoAssistant;
 // profiles; editing never sorts.
 internal sealed partial class MainWindow
 {
+    /// <summary>X-88 (0.969): the group of an item category (ItemUICategory.OrderMajor; 0 when unknown).</summary>
+    internal Func<uint,int>? SortCategoryGroup { get; set; }
     private InventorySortProfile? sortRulesDraft;
     private InventorySortScope? sortRulesScope;
     private string? sortRulesError;
@@ -131,6 +133,20 @@ internal sealed partial class MainWindow
                                         ImGui.SetNextItemWidth(-1);
                                         ImGui.InputTextWithHint("##CategoryFilter",localization.Get("SortUi.CategoryFilterHint"),ref sortCategoryFilter,64);Tip("SortUi.CategoryFilterTip");
                                         var filter=sortCategoryFilter.Trim();var shown=0;
+                                        // X-88 (0.969, user request: « add sorts more easily by groups »): the game's own groups of item categories
+                                        // (ItemUICategory.OrderMajor) added in one click; a group is named by its first categories (the game gives no name).
+                                        if(filter.Length==0 && SortCategoryGroup is { } groupOf)
+                                        {
+                                            foreach(var group in catalog.Categories.GroupBy(value=>groupOf(value.Id)).Where(group=>group.Key>0).OrderBy(group=>group.Key))
+                                            {
+                                                var missing=group.Where(value=>!categories.Contains(value.Id)).ToArray();
+                                                if(missing.Length<2)continue;
+                                                var label=localization.Format("SortUi.AddGroup",string.Join(", ",group.Take(3).Select(value=>value.Name)),group.Count());
+                                                if(ImGui.Selectable(label+"##SortGroup"+group.Key))
+                                                {categoryId=0;categoryIds=SortIds(categories.Concat(missing.Select(value=>value.Id)).Take(InventorySortRules.MaxZoneCategories));changed=true;}
+                                            }
+                                            ImGui.Separator();
+                                        }
                                         foreach(var value in catalog.Categories.Where(value=>!categories.Contains(value.Id)
                                             && (filter.Length==0 || System.Globalization.CultureInfo.InvariantCulture.CompareInfo.IndexOf(value.Name,filter,
                                                 System.Globalization.CompareOptions.IgnoreCase|System.Globalization.CompareOptions.IgnoreNonSpace)>=0)))

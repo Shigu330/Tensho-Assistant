@@ -1291,6 +1291,8 @@ public sealed class Plugin : IDalamudPlugin
                 catch(Exception error){log.Warning(error,"Sightseeing log phases unavailable (perhaps after a game update).");return null;}
             });
             mainWindow.VistaPhases=()=>vistaPhases.Value;
+            // X-88 (0.969): the game's group of an item category, for « add a whole group » in the sorting rules.
+            mainWindow.SortCategoryGroup=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ItemUICategory>().GetRowOrDefault(id)?.OrderMajor ?? 0;
             mainWindow.GpActionUnlocked=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id) is { } row && (row.UnlockLink.RowId==0 || unlocks.IsActionUnlocked(row));
             mainWindow.GpTraitsUnlocked=job=>
             {

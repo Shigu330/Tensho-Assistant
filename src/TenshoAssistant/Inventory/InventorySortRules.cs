@@ -32,7 +32,8 @@ public static class InventorySortRules
         =>profile.CharacterId==scope.CharacterId && profile.Kind==scope.Storage?.Kind && profile.StorageId==(scope.Storage?.StorageId ?? 0);
     public static InventorySortProfile Default(InventorySortScope scope,InventorySortField sort=InventorySortField.Name,bool descending=false)
         =>new(scope.CharacterId,scope.Storage?.Kind,scope.Storage?.StorageId ?? 0,Array.AsReadOnly(new[]{new InventorySortCriterion(sort,descending)}),Array.AsReadOnly(Array.Empty<InventorySortZone>()));
-    public const int MaxZoneCategories=64,MaxZoneItems=128;
+    // X-88 (0.969, user report: « after 64 I cannot any more »): 256 categories a zone, above the game's ~110 item categories, so a zone can take all.
+    public const int MaxZoneCategories=256,MaxZoneItems=128;
     public static InventorySortProfile Copy(InventorySortProfile value)
         =>value with{Criteria=Array.AsReadOnly(value.Criteria.ToArray()),Zones=CopyZones(value.Zones)};
     internal static IReadOnlyList<InventorySortZone> CopyZones(IReadOnlyList<InventorySortZone> zones)

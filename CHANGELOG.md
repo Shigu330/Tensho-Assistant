@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.969.0
+- Plan global, Verify : Tri d'inventaire (X-88, votre document « à faire ») : une zone de tri accepte maintenant jusqu'à 256 catégories (au-delà des quelque 110 du jeu ; la limite était 64), et le menu « Ajouter une catégorie » propose en tête d'ajouter d'un clic un groupe entier de catégories, d'après les groupes du jeu (armes, outils, armures, accessoires, matériaux…), chacun nommé par ses premières catégories. Non validé en jeu.
+- Tests : SortGroups969Tests. Verify.ps1 (agent) : 1596/1596, 0 avertissement, 0 erreur ; DLL 0.969.0.0. Non validé en jeu.
+### English
+- Inventory sorting (X-88, your « to do » document): a sorting zone now takes up to 256 categories (above the game's ~110; the limit was 64), and the « Add a category » menu offers first to add a whole group of categories in one click, from the game's groups (weapons, tools, armour, accessories, materials…), each named by its first categories. Not validated in game.
+
 ## 0.968.0
 - Plan global, Verify : Mandats (X-87, votre document « à faire ») : la zone d'un mandat accepté ne reste plus affichée une fois ce mandat commencé (le jeu donne la zone du mandat en cours à part ; les marqueurs que le jeu ne dessine pas sont aussi laissés de côté) ; pendant un mandat, les monstres qui en sont la cible apparaissent sur la carte avec l'icône du mandat du jeu, avec au survol « cible de votre mandat ». Le lien entre un monstre et le mandat (identifiant d'événement) n'est pas encore prouvé : en mode développeur, le journal écrit les événements des monstres proches au début d'un mandat. Non validé en jeu.
 - Tests : Leves968Tests. Verify.ps1 (agent) : 1595/1595, 0 avertissement, 0 erreur ; DLL 0.968.0.0. Non validé en jeu.

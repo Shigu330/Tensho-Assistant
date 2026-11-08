@@ -3755,6 +3755,7 @@
     "QueryHint": "Name or identifier terms separated by ; (optional)",
     "Categories": "Categories, by priority (any of them matches)",
     "CategoryPriorityHelp": "The zone places stacks of category 1 first, then 2, and so on; the criteria order each category. \"<\" raises a category.",
+    "AddGroup": "+ whole group: {0}… ({1} categories)",
     "AddCategory": "Add a category…",
     "CategoryFilterHint": "Type to filter (e.g. med, fish)",
     "NoCategoryMatch": "No category matches.",

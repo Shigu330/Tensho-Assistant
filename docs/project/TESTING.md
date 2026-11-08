@@ -1578,6 +1578,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.968) Accepter et commencer un mandat de combat : la zone « acceptée » disparaît, seule celle du mandat en cours reste ; ses cibles portent l'icône du mandat sur la carte.
 
+- [ ] (0.969) Tri › une zone › « Ajouter une catégorie » : lignes « + groupe entier : … » en tête ; plus de 64 catégories possibles.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
