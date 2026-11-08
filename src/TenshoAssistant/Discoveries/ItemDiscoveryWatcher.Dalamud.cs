@@ -55,6 +55,27 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     public Func<uint,DateTimeOffset,uint>? PreviousWeather { get; set; }
     private uint lastFish;
     /// <summary>
+    /// X-73.18 (0.887, proved by the in-game capture, docs/evidence/0.887-fishing-bite.md): the line's state at 10 Hz. The cast starts at CastingOut (1); lures do
+    /// not restart it; at Bite (5) the player's animation slot 7 holds the bite strength (FishingHookStrength 292 !, 293 !!, 294 !!!). A cast under Chum
+    /// (status 763, « Amorçage ») is not measured.
+    /// </summary>
+    private int lineState=-1;private long castStarted=-100_000,bitAt=-100_000;private bool castChum;private uint biteStrength;
+    private void ReadLine(long now,Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter me)
+    {
+        var events=FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.Instance();
+        var handler=events==null ? null:events->EventHandlerModule.FishingEventHandler;
+        var state=handler==null ? -1:(int)handler->State;
+        if(state==lineState)return;
+        lineState=state;
+        if(state==1){castStarted=now;bitAt=-100_000;castChum=me.StatusList.Any(status=>status.StatusId==763);}
+        else if(state==5 && castStarted>0)
+        {
+            bitAt=now;
+            var character=(FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)me.Address;
+            biteStrength=ItemGains.BiteStrength(character->Timeline.TimelineSequencer.TimelineIds[7]);
+        }
+    }
+    /// <summary>
     /// X-75.6 (0.880): the weather formula (WeatherCatalog, rule read in the community tools) checked against the game: 10 s after entering a zone, the forecast
     /// for now against WeatherManager.GetCurrentWeather. Zones with their own weather (some quests and duties) can differ: counted, logged in the debug log only.
     /// </summary>
@@ -168,6 +189,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         {
             var at=DateTimeOffset.UtcNow;var territory=client.TerritoryType;var map=client.MapId;var duty=dutyOf(territory);
             CheckWeather(at,now,territory,duty);
+            if(wanted.Fishing && me.ClassJob.RowId==18)ReadLine(now,me);
             if(wanted.ItemSources)
             {
                 ReadSalvage(at);ReadVenture(at);ReadLoot(at,territory,duty);
@@ -204,6 +226,9 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                         if((flags & 3) is 1 or 2)store.SeeSource(DiscoveryKind.FishLure,item,(uint)(flags & 3),1,at,territory);
                         if(PreviousWeather?.Invoke(territory,at) is { } before and not 0)store.SeeSource(DiscoveryKind.FishTransition,item,before,EorzeaMinute(at),at,territory);
                         lastFish=item;
+                        if(bitAt>castStarted && castStarted>0 && !castChum && bitAt-castStarted is > 0 and < 600_000)
+                            store.SeeSource(DiscoveryKind.FishBite,item,biteStrength,(int)((bitAt-castStarted)/100),at,territory,map,me.Position);
+                        bitAt=-100_000;
                         kind=DiscoveryKind.FishCatch;break;
                     case ItemGains.Cause.FateReward:
                         added=store.SeeSource(DiscoveryKind.FateReward,item,fateId,quantity,at);kind=DiscoveryKind.FateReward;break;

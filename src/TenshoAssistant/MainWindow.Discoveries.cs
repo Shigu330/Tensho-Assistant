@@ -106,7 +106,7 @@ internal sealed partial class MainWindow
         if(discoveredSources.Item==item && discoveredSources.Revision==store.Revision)return discoveredSources.Lines;
         var lines=ItemSourceKinds.Where(kind=>kind is not (DiscoveryKind.FishCondition or DiscoveryKind.FestivalSeen or DiscoveryKind.VistaSeen or DiscoveryKind.VoyageUnlock
                 or DiscoveryKind.BlueSpellLearned or DiscoveryKind.BeastTamed or DiscoveryKind.FashionEvaluation or DiscoveryKind.NpcPlace or DiscoveryKind.BlueSpellCaster
-                or DiscoveryKind.FishLure or DiscoveryKind.FishTransition))
+                or DiscoveryKind.FishLure or DiscoveryKind.FishTransition or DiscoveryKind.FishBite))
             .SelectMany(kind=>store.Find(kind,subject=>subject==item,4)).OrderByDescending(fact=>fact.Seen+fact.Imported).Take(4)
             .Select(fact=>$"{DiscoveryFactName(fact)} ({DiscoveryFactLevel(fact)}, ×{fact.Seen+fact.Imported})").ToArray();
         discoveredSources=(item,store.Revision,lines);
@@ -172,6 +172,10 @@ internal sealed partial class MainWindow
         if(Weathers(DiscoveryKind.FishCondition) is { Length:>0 } during)parts.Add(localization.Format("FishingPanel.SeenWeather",during));
         if(store.Find(DiscoveryKind.FishCondition,subject=>subject==fish,64) is { Count:>0 } hours)
             parts.Add($"{hours.Min(fact=>fact.LevelMin)/60:00}:{hours.Min(fact=>fact.LevelMin)%60:00}–{hours.Max(fact=>fact.LevelMax)/60:00}:{hours.Max(fact=>fact.LevelMax)%60:00} ET");
+        // X-73.18 (0.887): the bites you saw: strength and time from the cast.
+        if(store.Find(DiscoveryKind.FishBite,subject=>subject==fish,32) is { Count:>0 } bites)
+            parts.Add(string.Join(", ",bites.GroupBy(fact=>fact.Detail).OrderBy(group=>group.Key).Select(group=>
+                $"{(group.Key switch{1=>"!",2=>"!!",3=>"!!!",_=>"?"})} {group.Min(fact=>fact.LevelMin)/10.0:0.0}–{group.Max(fact=>fact.LevelMax)/10.0:0.0} s")));
         if(store.Find(DiscoveryKind.FishLure,subject=>subject==fish,2) is { Count:>0 } lures)
             parts.Add(string.Join(", ",lures.Select(fact=>localization.Get(fact.Detail==1 ? "FishingPanel.SeenAmbitious":"FishingPanel.SeenModest"))));
         var line=parts.Count==0 ? null:localization.Format("FishingPanel.SeenByYou",catches.Sum(fact=>fact.Seen+fact.Imported),string.Join(" · ",parts));

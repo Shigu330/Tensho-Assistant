@@ -222,6 +222,64 @@ Demande de l'utilisateur (2026-11-05) : tout remettre à jour une fois le plan c
 - **Précision de l'utilisateur (2026-11-08) :** les documents `.md` ne sont pas seulement traduits : chacun est revérifié contre le code actuel, juste après le nettoyage X-76.
 - **Décision de l'utilisateur (2026-11-08, « Oui, à la fin ») :** les documents de travail vivants de `docs/project` (GLOBAL-PLAN, TESTING, BACKLOG, USER-REQUESTS, DECISIONS, GAPS, REFERENCES, les *-PROPOSALS, PROPOSALS-TRIAGE, COMPETITIVE-OFF-PLAN) changent à chaque version ; les traduire maintenant obligerait à tenir deux copies. Défaut recommandé : les traduire en dernier, juste avant la 1.0.0, une fois la phase 6 finie ; les fichiers publics sont faits maintenant. **Choisi : traduits juste avant la 1.0.0, une seule fois.**
 
+## Nettoyage complet avant la 1.0.0 (X-76, plan détaillé du 2026-11-08) — approuvé par l'utilisateur (« Oui, ce plan »)
+
+Demande de l'utilisateur : « un nettoyage qui te semblerait plus complet et cohérent avant une version 1.0.0 ». Ordre : après les essais en jeu nécessaires,
+avant les documents `.md` (revérifiés contre le code puis traduits). Ultracode accordé. Règle de toute l'étape : **rien n'est retiré sans preuve qu'il est inutile**,
+une famille de changements par version, `Verify` vert à chaque fois, sauvegarde zip dans `checkpoints/` avant de commencer.
+
+**0. Point de départ mesuré.** Chiffres relevés et gardés dans `docs/evidence/` pour comparer à la fin : fichiers et lignes par dossier, tests, clés de langue
+(en, fr, de, ja), réglages, hôtes réseau appelés, parties de la capture, types natifs lus, avertissements désactivés.
+
+**1. Code mort et restes.**
+- Compilation d'essai avec les analyseurs « membre jamais utilisé » activés (sans les garder) : types, méthodes, champs, propriétés jamais lus.
+- Clés de langue jamais demandées par le code (un script compare les fichiers de langue au code ; les clés construites par nom sont listées à part).
+- Ressources embarquées, fichiers de données, outils et scripts que plus rien n'utilise.
+- Parties de la capture du mode développeur déjà prouvées (leves, retainer, synthesis…) et journaux de débogage d'enquêtes closes.
+- Réglages toujours vrais ou jamais lus ; anciennes branches de migration de configuration trop vieilles (la lecture des anciennes valeurs reste).
+- Contre-vérification par un second agent qui cherche à prouver que chaque élément sert encore (réflexion, nom construit, test, sauvegarde, commande).
+
+**2. Doublons et cohérence du code.**
+- Logiques écrites plusieurs fois (formatage des lieux et heures, caches « par révision », lectures de fenêtres du jeu, clients HTTP, menus de lieu) : une seule version partagée quand le risque est faible.
+- Noms et termes alignés (« découverte », « vu par vous », « importé », « source communautaire ») dans le code et les textes.
+- Commentaires dépassés corrigés ; aucun français dans le code (règle des langues).
+- Fichiers trop longs (Plugin.cs, gros fichiers MainWindow) : découpés seulement là où le découpage est mécanique et couvert par les tests.
+
+**3. Réglages : inventaire complet et remise en ordre.**
+- Tableau de tous les réglages (`docs/project/SETTINGS.md`) : nom, valeur par défaut, où il est lu, page, info-bulle, effet réel, ce qui se passe s'il est coupé.
+- Corrections : réglage sans effet, effet différent de son nom, défaut incohérent, doublon entre pages.
+- Réorganisation des pages de réglages par thème si l'inventaire le justifie (décision groupée soumise à l'utilisateur, ancienne valeur toujours lue).
+- Réglages manquants là où un comportement est imposé sans choix.
+- Demandes déjà notées : un réglage unique « données du jeu et observées seulement » (coupe d'un coup toutes les sources communautaires) ; vider le cache et les découvertes avec une sauvegarde zip juste avant.
+
+**4. Info-bulles et textes.**
+- Chaque info-bulle relue contre le code, celles des réglages d'abord, avec une ligne « Par défaut : … » juste.
+- Parité anglais et français ; allemand et japonais : signaler seulement ce qui manque.
+- Textes de l'aide et du guide alignés sur l'état final des pages.
+
+**5. Réseau, vie privée et règles Dalamud.**
+- Liste de chaque hôte appelé : quand (clic, automatique choisi par l'utilisateur), limite de taille, délai, en-tête, coupure en JcJ, réglage qui le coupe.
+- Contrôle de la liste des règles Dalamud (`docs/project/PUBLISHING.md`) point par point ; tout écart résumé à l'utilisateur avant de corriger.
+- Données gardées sur le disque : liste, taille maximale, purge, ce que « vider » efface.
+
+**6. Robustesse et performance.**
+- Chaque lecture native : thread du framework, pointeur vérifié, copie, coupure en JcJ, résistance aux mises à jour du jeu (R-14).
+- Chaque abonnement, minuterie et tâche : propriétaire et nettoyage (test existant étendu si besoin).
+- Draw : boucles et allocations par image, caches recalculés trop souvent ; le relevé « Slow frame » sert de juge.
+
+**7. Tests.**
+- Tests qui figent un ancien texte exact au lieu d'un comportement : réécrits sur le comportement.
+- Tests manquants pour ce que le nettoyage touche (réglages, migrations, nouveau réglage global).
+- Tests morts ou en double retirés.
+
+**8. Dépôt.**
+- `.gitignore`, scripts, `tools/README.md`, flux CodeQL et compilation, alertes ouvertes, étiquettes, jalons et tickets fermés sur preuve.
+- `community-discoveries` et `community-help` contrôlés (règle de validation des découvertes).
+
+**9. Fin de l'étape.**
+- Comparaison avec le point de départ (preuve dans `docs/evidence/`).
+- Un passage en jeu rapide de chaque page (liste guidée, un point à la fois), avant les documents puis la 1.0.0.
+
 ## Sujets ajoutés le 2026-11-06
 
 Choisis par l'utilisateur à partir de la liste de rubriques d'un site français. Aucune donnée de ce site : voir [REFERENCES](REFERENCES.md). Tout vient des feuilles et des structures du jeu.
@@ -342,7 +400,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-73.15 | Table centre de données → région depuis les feuilles du jeu (WorldDCGroupType) au lieu d'Universalis | 0.871 : région lue dans la feuille du jeu (Japon, Amérique du Nord, Europe, Océanie, Chine, Corée) ; la table d'Universalis n'est plus demandée que pour le centre « cloud » ou un inconnu ; `docs/evidence/0.871-regions.md` |
 | X-73.16 | Lieu des marchands absents des feuilles : noté à l'ouverture de leur boutique (cible, zone, position) | 0.872 : PNJ ciblé noté avec son lieu quand une fenêtre de boutique s'ouvre (une fois par ouverture) ; utilisé pour les vendeurs que les feuilles ne placent pas (page Marchands, info-bulle, provenances, avant LuminaSupplemental) |
 | X-73.17 | Butin des coffres des donjons sans fond, d'Eurêka et de Bozja | 0.873 : en Eurêka, Bozja, Croissant occulte et donjon sans fond (reconnus par le jeu lui-même), un objet reçu juste après un monstre vaincu compte comme butin de ce monstre ; en donjon sans fond, un objet reçu sans rien dépenser compte comme coffre de l'étage ; les sacs et coffres ouverts ensuite étaient déjà notés (objets ouverts, 0.860) |
-| X-73.18 | Après les relevés de X-73.13 : temps et type de touche, mooch, Intuition et prédateurs ; réduction éthérée ; objets de quête | Attend les relevés en jeu |
+| X-73.18 | Après les relevés de X-73.13 : temps et type de touche, mooch, Intuition et prédateurs ; réduction éthérée ; objets de quête | 0.887 : relevé de pêche de l'utilisateur (`docs/evidence/0.887-fishing-bite.md`) : type de touche (animation 7 : 292 !, 293 !!, 294 !!!), temps depuis le lancer (les leurres ne le relancent pas), lancers sous Amorçage (763) exclus ; ligne « Vu par vous » du panneau de pêche ; restent Intuition et prédateurs, réduction, objets de quête (relevés à faire) |
 | X-74 | Consigne de nuit (2026-11-08, l'utilisateur dort) : ajouter le plus de parseurs cohérents possible (« mieux vaut prendre plus et retirer ensuite »), compléter le jeu de données selon nos besoins, revoir le plan de l'étape 7 pour qu'il colle au code actuel, puis passer à l'étape 7 une fois les plans en place ; ultracode autorisé au besoin | Fait pour la nuit (0.857 à 0.867) ; 0.860 : observateur des objets obtenus (ItemDiscoveryWatcher) : désynthèse, tâches, coffres de mission, récompenses d'ALÉA, butin de sa cible, objets ouverts, poissons pris (appât, lieu, météo, heure) ; textes du résumé des genres de la 0.856 qui manquaient ; 0.861 à 0.864 : revue de mode, voyages, mage bleu et dresseur, fêtes et panoramas ; 0.865 : « Comment l'obtenir » montre d'abord « Vu par vous », qui dispense de Garland et du wiki |
 | X-75 | Demande du 2026-11-08 : un test pour chaque sonde ; revérifier qu'aucune sonde ne manque pour découvrir en jeu les données prises ailleurs que dans les feuilles du jeu. Placement : après le plan en cours (X-73.15 à X-73.17), avant la traduction des documents vivants | À faire |
 | X-75.1 | Un test pour chaque sonde : liste des parties de la capture figée par un test, test de texte pour chaque sonde et parseur qui n'en a pas ; relevés en jeu ajoutés à TESTING et aux rappels | 0.874 : rapport `docs/evidence/0.874-probe-coverage.md` (64 sources, 46 sondes) ; `ProbeSet874Tests` fige les 17 parties de la capture et teste les gardes des sondes qui n'en avaient pas ; relevés en jeu de chaque sonde listés dans TESTING (0.874) |

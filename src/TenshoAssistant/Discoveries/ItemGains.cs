@@ -16,6 +16,9 @@ public static class ItemGains
     private static readonly DateTimeOffset DayZero=new(2013,8,27,0,0,0,TimeSpan.Zero);
     public static int DayNumber(DateTimeOffset at)=>(int)Math.Clamp((at-DayZero).TotalDays,0,100_000);
 
+    /// <summary>X-73.18 (0.887): the bite strength from the player's animation slot 7 at the bite (FishingHookStrength 292 !, 293 !!, 294 !!!); 0 unknown.</summary>
+    public static uint BiteStrength(ushort timeline)=>timeline switch{292=>1,293=>2,294=>3,_=>0};
+
     /// <summary>The one item spent, by exactly one unit, in a change (an opened coffer, a used bag); null when anything else was spent too.</summary>
     public static uint? SingleSpent(IReadOnlyDictionary<uint,long> losses)=>losses.Count==1 && losses.First().Value==1 ? losses.First().Key:null;
 

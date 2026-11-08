@@ -584,6 +584,7 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "SummaryFishBite": "Touches de poissons vues : {0} ({1} vues par vous, {2} importées seulement)",
     "ExchangeTitle": "Échange avec les autres joueurs (GitHub)",
     "ExchangeHelp": "Partager ce que vous avez découvert et prendre ce que d'autres ont trouvé. Sans connexion, l'échange automatique récupère seulement les découvertes communes. Une découverte ne contient jamais le nom, la position ni l'identifiant d'un joueur.",
     "Connect": "Connecter GitHub",
