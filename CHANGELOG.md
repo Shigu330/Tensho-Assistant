@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.957.0
+- Plan global, Verify : Nettoyage X-76, étapes 7 à 9 : état des tests (1 587 cas, aucun doublon ; les tests qui lisent le texte du code restent, faute de pouvoir lancer sans le jeu le code lié au jeu, et les nouveaux testent le comportement quand c'est possible), dépôt vérifié (fichiers ignorés, liste des outils, compilation et CodeQL au vert, aucune alerte), comparaison avec le point de départ écrite dans docs/evidence/x76-9-comparison.md (+2,4 % de lignes pour 53 versions avec de nouvelles fonctions, clés de langue en et fr toujours égales, mêmes adresses, aucun avertissement désactivé). Reste avec vous : le passage en jeu guidé de chaque page et les propositions notées. Non validé en jeu.
+- Tests : DrawCost956Tests. Verify.ps1 (agent) : 1584/1584, 0 avertissement, 0 erreur ; DLL 0.957.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, steps 7 to 9: test survey (1,587 cases, no duplicate; tests that read the source text stay, since game-bound code cannot run without the game, and new tests check behaviour where possible), repository checked (ignore rules, tools list, build and CodeQL green, no alert), comparison with the starting point written in docs/evidence/x76-9-comparison.md (+2.4 % lines for 53 versions with new features, en and fr language keys still equal, same addresses, no warning disabled). Left with you: the guided in-game pass of each page and the noted proposals. Not validated in game.
+
 ## 0.956.0
 - Plan global, Verify : Nettoyage X-76, étape 6 (performance, second lot) : les monstres proches ne reconstruisent plus chaque seconde leurs listes tirées des collections (montures, mascottes, partitions manquantes, sorts non appris, noms des bêtes), seulement quand les collections changent ; les menus des zones de la carte et leur largeur ne sont plus recalculés à chaque image ; l'étape « Fenêtres » du guide ne refait ses vérifications que quand une donnée change ; les compteurs du résumé des collections sont calculés une fois avec la liste. Rien ne change à l'écran. Non validé en jeu.
 - Tests : DrawCost956Tests. Verify.ps1 (agent) : 1584/1584, 0 avertissement, 0 erreur ; DLL 0.956.0.0. Non validé en jeu.

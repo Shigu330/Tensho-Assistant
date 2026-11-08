@@ -303,7 +303,7 @@ avant la 1.0.0, E2 test des règles d'interface (couvert par les tests 912 à 92
 - `.gitignore`, scripts, `tools/README.md`, flux CodeQL et compilation, alertes ouvertes, étiquettes, jalons et tickets fermés sur preuve.
 - `community-discoveries` et `community-help` contrôlés (règle de validation des découvertes).
 
-**9. Fin de l'étape.**
+**9. Fin de l'étape.** — 0.957 : comparaison écrite (`docs/evidence/x76-9-comparison.md`) ; étapes 7 et 8 faites (état des tests, dépôt propre) ; reste le passage en jeu guidé avec l'utilisateur et les propositions à revoir.
 - Comparaison avec le point de départ (preuve dans `docs/evidence/`).
 - Un passage en jeu rapide de chaque page (liste guidée, un point à la fois), avant les documents puis la 1.0.0.
 
