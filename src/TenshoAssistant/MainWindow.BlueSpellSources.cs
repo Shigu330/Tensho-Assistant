@@ -42,7 +42,10 @@ internal sealed partial class MainWindow
         ImGui.Indent();
         try
         {
-            BoolSetting("MapView.AboveBlueSpell","BlueSpellSources.AboveTip",()=>configuration.MapView.AboveBlueSpell,value=>configuration.MapView.AboveBlueSpell=value,c=>c.MapView.AboveBlueSpell);
+            // X-76 step 3 (0.953): every overhead icon needs « Icons above nearby monsters » (DrawMonsterOverheadIcons): greyed while it is off.
+            ImGui.BeginDisabled(!configuration.MapView.MonsterIconsAbove);
+            try{BoolSetting("MapView.AboveBlueSpell","BlueSpellSources.AboveTip",()=>configuration.MapView.AboveBlueSpell,value=>configuration.MapView.AboveBlueSpell=value,c=>c.MapView.AboveBlueSpell);}
+            finally{ImGui.EndDisabled();}
             BoolSetting("MapView.BlueMageMonstersAlways","BlueSpellSources.AlwaysTip",()=>configuration.MapView.BlueMageMonstersAlways,value=>configuration.MapView.BlueMageMonstersAlways=value,c=>c.MapView.BlueMageMonstersAlways);
             var missing=spells.Length-index.Known;
             if(index.Running)

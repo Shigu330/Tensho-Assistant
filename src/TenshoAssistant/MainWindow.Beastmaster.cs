@@ -43,7 +43,10 @@ internal sealed partial class MainWindow
         ImGui.Indent();
         try
         {
-            BoolSetting("MapView.AboveBeast", "BeastUi.AboveTip", () => configuration.MapView.AboveBeast, value => configuration.MapView.AboveBeast = value, c => c.MapView.AboveBeast);
+            // X-76 step 3 (0.953): every overhead icon needs « Icons above nearby monsters » (DrawMonsterOverheadIcons): greyed while it is off.
+            ImGui.BeginDisabled(!configuration.MapView.MonsterIconsAbove);
+            try { BoolSetting("MapView.AboveBeast", "BeastUi.AboveTip", () => configuration.MapView.AboveBeast, value => configuration.MapView.AboveBeast = value, c => c.MapView.AboveBeast); }
+            finally { ImGui.EndDisabled(); }
             BoolSetting("MapView.BeastMonstersAlways", "BeastUi.AlwaysTip", () => configuration.MapView.BeastMonstersAlways, value => configuration.MapView.BeastMonstersAlways = value, c => c.MapView.BeastMonstersAlways);
             if (wiki.Running) ImGui.TextDisabled(localization.Get("BeastUi.WikiReading"));
             else
