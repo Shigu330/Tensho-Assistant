@@ -103,6 +103,10 @@ public sealed class CharacterStatusWatcher : IDisposable
                 BingoHeld=timers.Bingo?.Held,BingoStickers=timers.Bingo?.Stickers,BingoExpires=timers.Bingo?.Expires,
                 HuntBills=timers.HuntBillsHeld,
                 RoulettesDone=rouletteDone,RoulettesTotal=rouletteDone is null ? null:timers.Roulettes!.Count,RoulettesAt=rouletteDone is null ? null:now,
+                LeveAllowances=timers.LeveAllowances,NextLeveAllowances=timers.NextLeveAllowances,
+                DeliveriesLeft=timers.DeliveriesLeft,AlliedQuestsLeft=(int?)timers.AlliedQuestsLeft,
+                TimersAt=timers.DeliveriesLeft is null && timers.AlliedQuestsLeft is null ? null:now,
+                SquadronMissionDone=timers.SquadronMission?.Done,SquadronTrainingDone=timers.SquadronTraining?.Done,
             };
             lock(gate)
             {

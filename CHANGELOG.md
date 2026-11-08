@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.936.0
+- Plan global, Verify : Nettoyage X-76, parseurs P9 (première partie) : la liste « Vos personnages » garde maintenant, pour chaque personnage, ce que Tensho lisait déjà mais jetait : mandats disponibles (et prochaine recharge), livraisons spéciales restantes de la semaine, quêtes tribales restantes du jour, fin de la mission et de l'entraînement de l'escouade. Nouvelle colonne « Autres » (détail au survol) ; les compteurs du jour et de la semaine ne s'affichent que s'ils ont été lus depuis la remise à zéro. Non validé en jeu.
+- Tests : CharacterTimers936Tests. Verify.ps1 (agent) : 1549/1549, 0 avertissement, 0 erreur ; DLL 0.936.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, parsers P9 (first part): the « Your characters » list now keeps, for each character, what Tensho already read but dropped: leve allowances (and the next refill), custom deliveries left this week, allied society quests left today, the end of the squadron's mission and training. New « Other » column (details on hover); the daily and weekly counts show only when read since their reset. Not validated in game.
+
 ## 0.935.0
 - Plan global, Verify : Nettoyage X-76, parseurs P8 (compteurs) : pour calculer plus tard des taux de butin, Tensho compte maintenant les ennemis ciblés vus vaincus (les mêmes morts que celles qui donnent leur butin aux monstres) et les coffres de mission (une fois par coffre) ; les visites de secteurs des sous-marins sont comptées depuis la 0.934. Nouvelles sortes connues de l'outil de fusion. Aussi : X-94 ajouté au plan (trou de pêche pris pour un point légendaire de mineur sur la carte, votre capture). Non validé en jeu.
 - Tests : DropCounts935Tests. Verify.ps1 (agent) : 1548/1548, 0 avertissement, 0 erreur ; DLL 0.935.0.0. Non validé en jeu.

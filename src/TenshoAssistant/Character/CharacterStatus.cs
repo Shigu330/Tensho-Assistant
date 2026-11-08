@@ -26,6 +26,15 @@ public sealed record CharacterStatus
     public int? RoulettesTotal { get; init; }
     public DateTimeOffset? RoulettesAt { get; init; }
     public Dictionary<string,DateTimeOffset>? Done { get; init; }
+    // X-76 P9 (0.936): what GameTimers.Read already gave and was dropped: leve allowances (and the next ones), custom deliveries left this week, allied
+    // society quests left today, the squadron's mission and training ends; TimersAt = when the daily and weekly counts were read.
+    public int? LeveAllowances { get; init; }
+    public DateTimeOffset? NextLeveAllowances { get; init; }
+    public int? DeliveriesLeft { get; init; }
+    public int? AlliedQuestsLeft { get; init; }
+    public DateTimeOffset? TimersAt { get; init; }
+    public DateTimeOffset? SquadronMissionDone { get; init; }
+    public DateTimeOffset? SquadronTrainingDone { get; init; }
 }
 
 /// <summary>
@@ -53,6 +62,13 @@ public static class CharacterStatuses
             RoulettesTotal=fresh.RoulettesDone is null ? old.RoulettesTotal:fresh.RoulettesTotal,
             RoulettesAt=fresh.RoulettesDone is null ? old.RoulettesAt:fresh.RoulettesAt,
             Done=fresh.Done ?? old.Done,
+            LeveAllowances=fresh.LeveAllowances ?? old.LeveAllowances,
+            NextLeveAllowances=fresh.LeveAllowances is null ? old.NextLeveAllowances:fresh.NextLeveAllowances,
+            DeliveriesLeft=fresh.DeliveriesLeft ?? old.DeliveriesLeft,
+            AlliedQuestsLeft=fresh.AlliedQuestsLeft ?? old.AlliedQuestsLeft,
+            TimersAt=fresh.DeliveriesLeft is null && fresh.AlliedQuestsLeft is null ? old.TimersAt:fresh.TimersAt,
+            SquadronMissionDone=fresh.SquadronMissionDone ?? old.SquadronMissionDone,
+            SquadronTrainingDone=fresh.SquadronTrainingDone ?? old.SquadronTrainingDone,
         };
     }
 
@@ -60,7 +76,7 @@ public static class CharacterStatuses
     public static bool Changed(CharacterStatus? old,CharacterStatus fresh)
     {
         if(old is null)return true;
-        var a=old with{SeenAt=default,Ventures=null,Done=null,RoulettesAt=null};var b=fresh with{SeenAt=default,Ventures=null,Done=null,RoulettesAt=null};
+        var a=old with{SeenAt=default,Ventures=null,Done=null,RoulettesAt=null,TimersAt=null};var b=fresh with{SeenAt=default,Ventures=null,Done=null,RoulettesAt=null,TimersAt=null};
         return a!=b || !Same(old.Ventures,fresh.Ventures) || !Same(old.Done,fresh.Done);
     }
     private static bool Same(VentureState[]? a,VentureState[]? b)=>a is null ? b is null:b is not null && a.SequenceEqual(b);
@@ -79,6 +95,10 @@ public static class CharacterStatuses
     /// <summary>Daily roulettes done today, or null when the last read was before the daily reset (the count then means nothing).</summary>
     public static (int Done,int Total)? RoulettesToday(CharacterStatus status,DateTimeOffset lastDailyReset)
         =>status is { RoulettesDone:{ } done,RoulettesTotal:{ } total,RoulettesAt:{ } at } && at>=lastDailyReset ? (done,total):null;
+
+    /// <summary>X-76 P9 (0.936): allied quests left today and deliveries left this week, each only when read since its reset (null otherwise).</summary>
+    public static (int? Allied,int? Deliveries) DailyWeekly(CharacterStatus status,DateTimeOffset lastDaily,DateTimeOffset lastWeekly)
+        =>status.TimersAt is not { } at ? (null,null):(at>=lastDaily ? status.AlliedQuestsLeft:null,at>=lastWeekly ? status.DeliveriesLeft:null);
 
     public static string FileName(ulong contentId)=>contentId.ToString(CultureInfo.InvariantCulture)+".json";
 

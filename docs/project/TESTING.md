@@ -1512,6 +1512,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.935) Vaincre quelques ennemis ciblés, ouvrir un coffre en mission : page Découvertes, « vaincu » et « coffre au trésor ».
 
+- [ ] (0.936) Rappels, « Vos personnages » : colonne « Autres » avec mandats, livraisons et quêtes tribales du personnage connecté ; survol pour l'escouade.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
