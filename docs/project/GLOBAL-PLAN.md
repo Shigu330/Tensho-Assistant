@@ -322,7 +322,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-73.5 | Désynthèse et réduction : objets obtenus de quel objet (AgentSalvage, AgentPurify) | 0.860 : désynthèse lue dans AgentSalvage (objet désynthétisé, résultats et quantités) |
 | X-73.6 | Tâches des servants : récompenses vues (AgentRetainerTask) | 0.860 : récompenses des tâches lues dans AgentRetainerTask quand le résultat s'affiche |
 | X-73.7 | Coffres des missions : objets vus par mission (Loot.Items) | 0.860 : objets des coffres lus dans Loot.Items en mission (CFC du territoire) |
-| X-73.8 | Voyages : butin par secteur (déjà lu dans l'atelier) | À faire |
+| X-73.8 | Voyages : butin par secteur (déjà lu dans l'atelier) | 0.862 : butin des sous-marins par secteur (HousingWorkshopSubmarineGathered.Point) et secteurs débloqués (UnlockedPoint), une fois par voyage ; les aéronefs ne donnent pas de secteur par entrée : laissés de côté |
 | X-73.9 | Mage bleu et dresseur : sort appris et bête apprivoisée, avec le monstre | À faire |
 | X-73.10 | Pêche : prises (appât, mooch, lieu), temps de touche, conditions vues ; sondes en jeu d'abord | À faire |
 | X-73.11 | Butin des monstres : objets reçus après la mort de sa cible (le plus risqué : attribution) | 0.860 : gains des sacs dans les 3 s après la mort de sa propre cible, hors mission, hors fenêtres de boutique, d'échange, de servant, de courrier, d'artisanat |

@@ -581,6 +581,10 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "SummaryVoyageDrop": "Butin des voyages par secteur : {0} ({1} vus par vous, {2} importés seulement)",
+    "SummaryVoyageUnlock": "Secteurs débloqués : {0} ({1} vus par vous, {2} importés seulement)",
+    "FromSector": "{0} ← secteur {1}",
+    "SectorUnlock": "{0} débloqué par {1}",
     "SummaryFashionEvaluation": "Jugements de la Fashion Report : {0} ({1} vus par vous, {2} importés seulement)",
     "FashionReport": "Jugements de la Fashion Report",
     "FashionReportTip": "Quand la fenêtre de la Fashion Report montre votre tenue jugée : chaque pièce, la catégorie de son emplacement et la note du jeu (gardée telle que le jeu la donne).\nPar défaut : activé.",

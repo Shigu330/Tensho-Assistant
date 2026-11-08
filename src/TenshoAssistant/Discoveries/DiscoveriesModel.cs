@@ -11,7 +11,10 @@ namespace TenshoAssistant.Discoveries;
 public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynthesis=4, Venture=5, DutyChest=6, FateReward=7, MonsterDrop=8, ItemFromItem=9, FishCatch=10, FishCondition=11,
     // X-73.4 (0.861): the Fashion Report's judgement: Subject = the item worn, Detail = the slot's category row, Territory = the week's theme row, levels = the raw
     // evaluation byte (its meaning is not proved yet: kept raw, read later).
-    FashionEvaluation=12 }
+    FashionEvaluation=12,
+    // X-73.8 (0.862): submersible voyages: VoyageDrop: Subject = item, Detail = SubmarineExploration row (sector), levels = quantities; VoyageUnlock: Subject = the
+    // sector unlocked, Detail = the sector whose voyage unlocked it.
+    VoyageDrop=13, VoyageUnlock=14 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported

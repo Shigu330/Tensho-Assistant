@@ -58,6 +58,14 @@ public sealed unsafe class VoyageWatcher : IDisposable
     /// <summary>0.331 (audit, R-14): the last workshop read failed in whole or in part (game update?); the saved values were kept. Cleared by a clean read.</summary>
     public bool ReadUnavailable { get; private set; }
 
+    /// <summary>
+    /// X-73.8 (0.862): each submersible voyage's loot by sector (HousingWorkshopSubmarineGathered.Point, ItemIdPrimary/Additional and counts) and the sector each
+    /// one unlocked (UnlockedPoint), once per voyage, for the discoveries base. Airship entries carry no sector: left out.
+    /// </summary>
+    public Action<uint,uint,int>? SectorLoot { get; set; }
+    public Action<uint,uint>? SectorUnlock { get; set; }
+    private readonly HashSet<(ulong House,int Slot,uint Registered)> voyagesNoted=[];
+
     public VoyageWatcher(IFramework framework,IDataManager data,Configuration configuration,Action save,IPluginLog log)
     {
         this.framework=framework;this.data=data;this.configuration=configuration;this.save=save;this.log=log;
@@ -101,11 +109,23 @@ public sealed unsafe class VoyageWatcher : IDisposable
                 foreach(var point in sub.CurrentExplorationPoints)
                     if(point!=0 && points.GetRowOrDefault(point) is { } row)route.Add(row.Destination.ExtractText());
                 var loot=new List<VoyageLoot>();
+                var noteSectors=(SectorLoot is not null || SectorUnlock is not null) && sub.RegisterTime!=0 && voyagesNoted.Count<4096;
+                var sectorsFound=false;
                 foreach(var found in sub.GatheredData)
                 {
                     if(found.ItemIdPrimary!=0)loot.Add(new(found.ItemIdPrimary,found.ItemCountPrimary));
                     if(found.ItemIdAdditional!=0)loot.Add(new(found.ItemIdAdditional,found.ItemCountAdditional));
+                    if(found.Point!=0 && (found.ItemIdPrimary!=0 || found.ItemIdAdditional!=0))sectorsFound=true;
                 }
+                // X-73.8 (0.862): once per voyage (house, slot, registration), when its loot is known.
+                if(noteSectors && sectorsFound && voyagesNoted.Add((houseId,slot,sub.RegisterTime)))
+                    foreach(var found in sub.GatheredData)
+                    {
+                        if(found.Point==0)continue;
+                        if(found.ItemIdPrimary!=0)SectorLoot?.Invoke(found.ItemIdPrimary%1_000_000,found.Point,found.ItemCountPrimary);
+                        if(found.ItemIdAdditional!=0)SectorLoot?.Invoke(found.ItemIdAdditional%1_000_000,found.Point,found.ItemCountAdditional);
+                        if(found.UnlockedPoint!=0)SectorUnlock?.Invoke(found.UnlockedPoint,found.Point);
+                    }
                 var ids=new List<uint>();
                 foreach(var point in sub.CurrentExplorationPoints)if(point!=0)ids.Add(point);
                 // Stats: parts (« Base ») plus the rank's bonus, as the game's submersible window adds them.

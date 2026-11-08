@@ -179,6 +179,7 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.DiscoveryStore=discoveries;mainWindow.DiscoveryFolder=discoveryFolder;
             mainWindow.MonsterName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().GetRowOrDefault(id)?.Singular.ExtractText() ?? "";
             mainWindow.FateName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Fate>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
+            mainWindow.SectorName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.SubmarineExploration>().GetRowOrDefault(id)?.Destination.ExtractText() ?? "";
             mainWindow.DutyName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
             // X-74 (0.860): where the items got come from, and the fish caught (Discoveries/ItemDiscoveryWatcher).
             HashSet<uint>? fishItems=null;var territoryDuties=new Dictionary<uint,uint>();
@@ -503,7 +504,10 @@ public sealed class Plugin : IDalamudPlugin
             FreeCompany.VoyageWatcher? voyages=null;
             // g, M-10 (0.379): voyage loot history, one local file (VoyageHistory.json), 180 days.
             var voyageHistory=new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"VoyageHistory.json"),(error,message)=>log.Warning(error,message));
-            registrations.Register(()=>voyages=new FreeCompany.VoyageWatcher(framework,data,configuration,()=>pluginInterface.SavePluginConfig(configuration),log){Observed=voyageHistory.Observe},()=>voyages?.Dispose());
+            registrations.Register(()=>voyages=new FreeCompany.VoyageWatcher(framework,data,configuration,()=>pluginInterface.SavePluginConfig(configuration),log){Observed=voyageHistory.Observe,
+                // X-73.8 (0.862): each submersible voyage's loot by sector and the sectors it unlocked, for the discoveries base.
+                SectorLoot=(item,sector,count)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.VoyageDrop,item,sector,count,DateTimeOffset.UtcNow);},
+                SectorUnlock=(unlocked,sector)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.VoyageUnlock,unlocked,sector,1,DateTimeOffset.UtcNow);}},()=>voyages?.Dispose());
             mainWindow.VoyageHistorySource=voyageHistory;
             mainWindow.SubmarineCatalog=()=>voyages?.Catalog;
             mainWindow.VesselParts=()=>voyages?.PartCatalog;
