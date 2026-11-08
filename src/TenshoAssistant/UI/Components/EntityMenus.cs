@@ -64,8 +64,11 @@ internal sealed partial class MainWindow
     }
 
     // 0.706 (user report): the Island Sanctuary has no aetheryte, nor have other maps: no entry that can only fail. Markers not read yet: the question says so itself.
+    // 0.853 (X-48, user report: no nearest aetheryte on a quest's target, Limsa's Upper Decks): a map without an aetheryte of its own counts too when there is
+    // a way in (X-63, ZoneEntries): an aethernet shard placed there (the Upper Decks' guilds), or a neighbouring map; the teleport question then says the way.
     private bool MapHasAetheryte(MapDefinition map)=>map.TerritoryId!=0 && map.TerritoryId!=IslandResources.Territory
-        && (mapMarkers is null || mapMarkers.For(map.MarkerRange).Any(marker=>marker.AetheryteId!=0));
+        && (mapMarkers is null || mapMarkers.For(map.MarkerRange).Any(marker=>marker.AetheryteId!=0 || marker.LinkMapId!=0)
+            || mapMarkers.Aetherytes.Any(row=>!row.Main && row.Group!=0 && row.Territory==map.TerritoryId));
 
     private void MenuHeader(string name)
     {

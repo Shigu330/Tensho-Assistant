@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.853.0
+- Plan global, Verify : Signalement (X-48) : le clic droit sur la cible d'une quête n'offrait pas l'éthérite la plus proche. L'entrée existe sur toutes les icônes, mais n'apparaissait que sur une carte qui a sa propre éthérite ; le Tillac de Limsa n'en a pas, seulement des portes d'éthernet. Une carte compte maintenant aussi quand on peut y entrer : une porte d'éthernet placée là, ou une carte voisine ; la question de téléportation dit alors le chemin (éthérite de Limsa, puis l'éthernet jusqu'à la porte la plus proche), comme pour « Y aller » depuis la 0.833. Vaut aussi pour les mandats et les découvertes. Non validé en jeu.
+- Tests : NearestOnTarget853Tests. Verify.ps1 (agent) : 1432/1432, 0 avertissement, 0 erreur ; DLL 0.853.0.0. Non validé en jeu.
+### English
+- Report (X-48): a right click on a quest's target did not offer the nearest aetheryte. The entry exists on every icon but appeared only on a map with its own aetheryte; Limsa's Upper Decks has none, only aethernet shards. A map now counts too when there is a way in: an aethernet shard placed there, or a neighbouring map; the teleport question then gives the way (Limsa's aetheryte, then the aethernet to the nearest shard), as « Go there » does since 0.833. Also for leves and discoveries. Not validated in game.
+
 ## 0.852.0
 - Plan global, Verify : Signalement (X-47) : dans la fenêtre d'une quête, les récompenses n'avaient ni l'entrée Tensho au clic droit, ni le panneau Tensho sous l'info-bulle. Menu : le journal montre que le jeu ouvrait bien son menu (fenêtre JournalAccept, objet survolé), mais Tensho le prenait pour un menu de personnage ; les fenêtres de quête comptent maintenant comme fenêtres d'objets, l'entrée Tensho y apparaît. Panneau : la cause n'est pas prouvée ; le mode développeur note désormais pourquoi un objet survolé n'a pas de panneau, pour trancher. Non validé en jeu.
 - Tests : QuestRewards852Tests. Verify.ps1 (agent) : 1431/1431, 0 avertissement, 0 erreur ; DLL 0.852.0.0. Non validé en jeu.
