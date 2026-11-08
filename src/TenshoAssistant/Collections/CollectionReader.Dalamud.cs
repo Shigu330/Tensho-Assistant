@@ -257,6 +257,7 @@ internal sealed partial class CollectionReader : IDisposable
                             var number = 0;
                             var description = "";
                             var location = "";
+                            var dutyLevel = 0;
                             if (blueDetails.TryGetRow(row.RowId, out var details))
                             {
                                 number = details.Number;
@@ -271,12 +272,15 @@ internal sealed partial class CollectionReader : IDisposable
                                     else if (source.RowType == typeof(TerritoryType))
                                         location = data.GetExcelSheet<TerritoryType>().TryGetRow(source.RowId, out var territory) ? territory.PlaceName.ValueNullable?.Name.ExtractText() ?? "" : "";
                                     else if (source.RowType == typeof(ContentFinderCondition))
-                                        location = data.GetExcelSheet<ContentFinderCondition>().TryGetRow(source.RowId, out var content) ? content.Name.ExtractText() : "";
+                                    {
+                                        // X-76 P5 (0.930): the duty's required level, from the same row (ContentFinderCondition.ClassJobLevelRequired).
+                                        if (data.GetExcelSheet<ContentFinderCondition>().TryGetRow(source.RowId, out var content)) { location = content.Name.ExtractText(); dutyLevel = content.ClassJobLevelRequired; }
+                                    }
                                 }
                                     catch (Exception) { location = ""; blueIssue = "Blue magic spell catalogue partly read; the other collections can still be browsed."; }
                             }
                             entries.Add(new(CollectionKind.BlueMagic, row.RowId, name, action.Icon,
-                                character != 0 && unlocks.IsAozActionUnlocked(row), number, row.Rank, description, location));
+                                character != 0 && unlocks.IsAozActionUnlocked(row), number, row.Rank, description, location, DutyLevel: dutyLevel));
                         }
                     }
                 }

@@ -12,7 +12,7 @@ public sealed record OrchestrionMetadata(uint CategoryId,string CategoryName,int
 public sealed record CollectionCategoryIssue(CollectionKind Kind,string Reason);
 public sealed record CollectionEntry(CollectionKind Kind, uint Id, string Name, uint IconId, bool ConfirmedUnlocked,
     int Number = 0, int Rank = 0, string Description = "", string Location = "", TriadCardDefinition? Card = null,OrchestrionMetadata? Music=null,
-    TitleMetadata? Title=null,AchievementMetadata? Achievement=null,bool NegativeConfirmed=false,uint ItemId=0)
+    TitleMetadata? Title=null,AchievementMetadata? Achievement=null,bool NegativeConfirmed=false,uint ItemId=0,int DutyLevel=0)
 {
     public CollectionAcquisition Acquisition=>ConfirmedUnlocked ? CollectionAcquisition.Acquired:NegativeConfirmed ? CollectionAcquisition.NotAcquired:CollectionAcquisition.Unknown;
 }

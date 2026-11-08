@@ -248,7 +248,7 @@ internal sealed partial class MainWindow
                     ImGui.SameLine(); ImGui.TextColored(Accent, $"{spell.Number} · {spell.Name}");
                     ImGui.TextUnformatted(localization.Format("BlueSpell.Rank",spell.Rank));
                     ImGui.TextWrapped(spell.Description);
-                    ImGui.TextWrapped(string.IsNullOrWhiteSpace(spell.Location) ? localization.Get("BlueSpell.MissingLocation") : localization.Format("BlueSpell.Location",spell.Location));
+                    ImGui.TextWrapped(string.IsNullOrWhiteSpace(spell.Location) ? localization.Get("BlueSpell.MissingLocation") : localization.Format("BlueSpell.Location",spell.Location)+(spell.DutyLevel>0 ? " "+localization.Format("BlueSpell.DutyLevel",spell.DutyLevel):""));
                     ImGui.TextColored(spell.ConfirmedUnlocked ? Success : Muted,localization.Get(spell.ConfirmedUnlocked ? "BlueSpell.Learned":"CollectionState.Unknown"));
                     CopyButton(localization.Get("BlueSpell.Copy"),()=>spell.Name);
                     DrawBlueSpellMonsters(spell.Id);

@@ -1942,6 +1942,7 @@
     "Title": "Blue magic spell details",
     "Rank": "Rank: {0}",
     "MissingLocation": "Learning location not reported in the covered data.",
+    "DutyLevel": "(duty level {0})",
     "Location": "Reported location: {0}",
     "Learned": "Confirmed learned",
     "Copy": "Copy spell name",

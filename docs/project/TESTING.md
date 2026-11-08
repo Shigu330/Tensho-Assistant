@@ -1500,6 +1500,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.929) Carte d'une zone de Stormblood ou plus récente : survol d'une vue panoramique, « Carnet Stormblood n° 0xx » ; la liste des vues de la carte a ses numéros.
 
+- [ ] (0.930) Collections, magie bleue : un sort appris en donjon affiche « (mission de niveau …) » après le lieu.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

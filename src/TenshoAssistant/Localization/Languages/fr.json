@@ -1942,6 +1942,7 @@
     "Title": "Fiche de sort Mage bleu",
     "Rank": "Rang : {0}",
     "MissingLocation": "Lieu d’apprentissage non renseigné dans les données couvertes.",
+    "DutyLevel": "(mission de niveau {0})",
     "Location": "Lieu indiqué : {0}",
     "Learned": "Appris confirmé",
     "Copy": "Copier le nom du sort",

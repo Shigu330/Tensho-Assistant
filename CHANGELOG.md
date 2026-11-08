@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.930.0
+- Plan global, Verify : Nettoyage X-76, parseurs P5 (mage bleu) : pour un sort de mage bleu appris dans une mission (donjon, défi…), la page des collections affiche maintenant le niveau de la mission, lu dans les données du jeu, après le lieu. Non validé en jeu.
+- Tests : BlueDuty930Tests. Verify.ps1 (agent) : 1543/1543, 0 avertissement, 0 erreur ; DLL 0.930.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, parsers P5 (blue magic): for a blue-magic spell learned in a duty (dungeon, trial…), the collections page now shows the duty's level, read from the game's data, after the place. Not validated in game.
+
 ## 0.929.0
 - Plan global, Verify : Nettoyage X-76, parseurs P5 (vues panoramiques) : le numéro du carnet des vues panoramiques vient maintenant des données du jeu pour toutes les extensions (feuille AdventureExPhase : la numérotation repart à chaque extension et continue sur les deux parties de Dawntrail) ; avant, seules les 80 vues de A Realm Reborn avaient un numéro sans le wiki. Le wiki ne sert plus qu'en secours. Non validé en jeu.
 - Tests : VistaNumbers929Tests. Verify.ps1 (agent) : 1542/1542, 0 avertissement, 0 erreur ; DLL 0.929.0.0. Non validé en jeu.
