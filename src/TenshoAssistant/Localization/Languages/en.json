@@ -2070,6 +2070,7 @@
     "Repeatable": "Repeatable",
     "Level": "Reported level: {0}",
     "OtherLevel": "Additional level requirement: {0}",
+    "Expansion": "Expansion: {0}",
     "Zone": "Zone: {0}",
     "Map": "View zone map",
     "MapHelp": "Tensho map centred on the quest giver with the flag when its position is known, else the whole map.",
@@ -3248,6 +3249,9 @@
     "Stack": "Stack of {0}: ~{1}",
     "Region": "Cheapest in the region:",
     "RefreshHint": "Ctrl+Alt: refresh this price.",
+    "ExpansionZones": "Expansion (from where it is gathered): {0}",
+    "ExpansionQuests": "Expansion (from the quests giving it): {0}",
+    "ExpansionBoth": "Expansion (from where it is gathered and the quests giving it): {0}",
     "NpcSale": "NPC sale (NQ): {0} gil each",
     "NpcSaleStack": "NPC sale (NQ): {0} gil each, stack of {1}: {2} gil"
   },

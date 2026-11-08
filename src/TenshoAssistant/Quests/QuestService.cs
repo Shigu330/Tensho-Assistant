@@ -20,6 +20,8 @@ public sealed record QuestEntry(uint Id, string Name, string Category, uint Icon
     public ushort Level { get; init; }
     public ushort AdditionalLevel { get; init; }
     public string Zone { get; init; } = "";
+    /// <summary>X-89 (0.970): the quest's expansion from the game (Quest.Expansion); empty when the link does not resolve.</summary>
+    public string Expansion { get; init; } = "";
     public uint IssuerId { get; init; }
     public uint IssuerMapId { get; init; }
     public uint IssuerTerritoryId { get; init; }

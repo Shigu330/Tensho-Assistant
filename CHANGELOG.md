@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.970.0
+- Plan global, Verify : Extension d'origine (X-89, votre document « à faire ») : l'info-bulle d'une quête et sa fiche donnent son extension, lue dans les données du jeu. Pour un objet, le jeu ne donne pas d'extension : la ligne « Extension (d'après…) » n'apparaît que quand toutes ses sources sûres donnent la même extension, ses lieux de récolte ou de pêche et les quêtes qui le donnent ; une source inconnue ou deux extensions différentes, et rien n'est affiché (jamais deviné). Non validé en jeu.
+- Tests : Expansion970Tests. Verify.ps1 (agent) : 1598/1598, 0 avertissement, 0 erreur ; DLL 0.970.0.0. Non validé en jeu.
+### English
+- Origin expansion (X-89, your « to do » document): a quest's tooltip and its details give its expansion, read from the game's data. For an item, the game gives no expansion: the « Expansion (from…) » line shows only when all its sure sources give the same expansion, where it is gathered or fished and the quests giving it; one unknown source or two different expansions, and nothing is shown (never guessed). Not validated in game.
+
 ## 0.969.0
 - Plan global, Verify : Tri d'inventaire (X-88, votre document « à faire ») : une zone de tri accepte maintenant jusqu'à 256 catégories (au-delà des quelque 110 du jeu ; la limite était 64), et le menu « Ajouter une catégorie » propose en tête d'ajouter d'un clic un groupe entier de catégories, d'après les groupes du jeu (armes, outils, armures, accessoires, matériaux…), chacun nommé par ses premières catégories. Non validé en jeu.
 - Tests : SortGroups969Tests. Verify.ps1 (agent) : 1596/1596, 0 avertissement, 0 erreur ; DLL 0.969.0.0. Non validé en jeu.

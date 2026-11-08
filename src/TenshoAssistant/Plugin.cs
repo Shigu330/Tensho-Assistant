@@ -719,6 +719,11 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.WorldName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.World>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.TerritoryName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id) is { } territory && territory.PlaceName.RowId!=0
                 ? territory.PlaceName.Value.Name.ExtractText():null;
+            // X-89 (0.970): expansions from the game's sheets (TerritoryType.ExVersion, Quest.Expansion), for the item tooltips' origin line.
+            mainWindow.TerritoryExpansion=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id) is { } expansionTerritory && expansionTerritory.ExVersion.IsValid
+                ? expansionTerritory.ExVersion.Value.Name.ExtractText():null;
+            mainWindow.QuestExpansion=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Quest>().GetRowOrDefault(id) is { } expansionQuest && expansionQuest.Expansion.IsValid
+                ? expansionQuest.Expansion.Value.Name.ExtractText():null;
             mainWindow.GrandCompanyNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GrandCompany>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.EquippedGearUnavailable=()=>gear?.Unavailable==true;
             // 0.333: names of the squadron's mission and training (Reminders).

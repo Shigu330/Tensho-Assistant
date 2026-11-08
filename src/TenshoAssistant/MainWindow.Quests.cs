@@ -198,7 +198,9 @@ internal sealed partial class MainWindow
                 if (ImGui.IsItemClicked()) SelectQuest(entry.Id);
                 ImGui.SameLine();
                 if (ImGui.Selectable($"{entry.Name}##quest{entry.Id}", selectedQuestId == entry.Id)) SelectQuest(entry.Id);
-                if (ImGui.IsItemHovered()) WrappedTooltip(developerMode ? $"{entry.Name}\n{entry.Section} › {entry.Category}\nID: {entry.Id}":$"{entry.Name}\n{entry.Section} › {entry.Category}");
+                // X-89 (0.970): the quest's expansion (game data) in its tooltip.
+                if (ImGui.IsItemHovered()) WrappedTooltip($"{entry.Name}\n{entry.Section} › {entry.Category}"
+                    +(entry.Expansion is { Length:>0 } questExpansion ? "\n"+localization.Format("QuestDetails.Expansion",questExpansion):"")+(developerMode ? $"\nID: {entry.Id}":""));
                 QuestMenu($"QuestMenu{entry.Id}", entry.Id, entry.Name);
                 ImGui.TableNextColumn(); if (entry.Level > 0) ImGui.TextUnformatted(entry.Level.ToString(CultureInfo.CurrentCulture)); else ImGui.TextDisabled("?");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Zone ?? "");
@@ -253,6 +255,7 @@ internal sealed partial class MainWindow
             ImGui.TextUnformatted(localization.Format("QuestDetails.Level",entry.Level));
         if(entry.AdditionalLevel!=0)ImGui.TextUnformatted(localization.Format("QuestDetails.OtherLevel",entry.AdditionalLevel));
         if (!string.IsNullOrWhiteSpace(entry.Zone)) ImGui.TextUnformatted(localization.Format("QuestDetails.Zone",entry.Zone));
+        if (!string.IsNullOrWhiteSpace(entry.Expansion)) ImGui.TextUnformatted(localization.Format("QuestDetails.Expansion",entry.Expansion));
         if (developerMode && entry.IssuerId != 0) ImGui.TextDisabled(localization.Format("DevMode.IssuerId",entry.IssuerId));
         if (entry.IssuerMapId != 0 && entry.IssuerTerritoryId != 0)
         {

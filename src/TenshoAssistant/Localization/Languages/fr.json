@@ -2070,6 +2070,7 @@
     "Repeatable": "Répétable",
     "Level": "Niveau renseigné : {0}",
     "OtherLevel": "Autre seuil de niveau : {0}",
+    "Expansion": "Extension : {0}",
     "Zone": "Zone : {0}",
     "Map": "Consulter la carte de la zone",
     "MapHelp": "Carte Tensho centrée sur le donneur avec le drapeau quand sa position est connue, sinon la carte entière.",
@@ -3248,6 +3249,9 @@
     "Stack": "Pile de {0} : ~{1}",
     "Region": "Le moins cher de la région :",
     "RefreshHint": "Ctrl+Alt : actualiser ce prix.",
+    "ExpansionZones": "Extension (d'après ses lieux de récolte) : {0}",
+    "ExpansionQuests": "Extension (d'après les quêtes qui le donnent) : {0}",
+    "ExpansionBoth": "Extension (d'après ses lieux de récolte et les quêtes qui le donnent) : {0}",
     "NpcSale": "Vente au PNJ (NQ) : {0} gils l'unité",
     "NpcSaleStack": "Vente au PNJ (NQ) : {0} gils l'unité, pile de {1} : {2} gils"
   },

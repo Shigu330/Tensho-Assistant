@@ -327,10 +327,32 @@ internal sealed partial class MainWindow
     // both show the same; the header (icon, name) is left to the caller.
     // e) (audit 2026-11-02): hoverPanel = the panel under the game's item tooltip, whose four parts follow Settings › Interface;
     // Tensho's own item tooltips and the item sheet (hoverPanel false) always draw every part.
+    // X-89 (0.970, user request): the item's expansion, only when its sure sources agree (Quests/ExpansionOrigin.cs); computed once per item
+    // and catalogue (no sheet read each frame), nothing while the gathering catalogue or the quest rewards are not loaded.
+    internal Func<uint,string?>? TerritoryExpansion { get; set; }
+    internal Func<uint,string?>? QuestExpansion { get; set; }
+    private readonly Dictionary<uint,(string Name,int From)?> itemExpansions=[];
+    private (object? Gathering,object? Rewards) itemExpansionsFor;
+    private void DrawItemExpansion(uint id)
+    {
+        if(TerritoryExpansion is not { } zoneExpansion || QuestExpansion is not { } questExpansion)return;
+        var gathering=gatheringCatalog.State.Catalog;var rewards=quests.State.RewardIndex;
+        if(gathering is null || rewards is null)return;
+        if(!ReferenceEquals(itemExpansionsFor.Gathering,gathering) || !ReferenceEquals(itemExpansionsFor.Rewards,rewards) || itemExpansions.Count>4096)
+        {itemExpansions.Clear();itemExpansionsFor=(gathering,rewards);}
+        if(!itemExpansions.TryGetValue(id,out var origin))
+        {
+            var zones=gathering.ForItem(id).Select(source=>source.TerritoryId).Distinct().Select(territory=>territory==0 ? null:zoneExpansion(territory)).ToArray();
+            var fromQuests=rewards.ForItem(id).Select(reward=>reward.QuestId).Distinct().Select(quest=>questExpansion(quest)).ToArray();
+            itemExpansions[id]=origin=TenshoAssistant.Quests.ExpansionOrigin.Of(zones,fromQuests);
+        }
+        if(origin is { } found)ImGui.TextDisabled(localization.Format(found.From switch{1=>"HoverUi.ExpansionZones",2=>"HoverUi.ExpansionQuests",_=>"HoverUi.ExpansionBoth"},found.Name));
+    }
     private void DrawItemInfoBody(Items.ItemDefinition? item,uint id,bool hoverPanel=false)
     {
         // 0.347 (g, I-08): the player's own note first.
         DrawItemNoteLine(id);
+        DrawItemExpansion(id);
         // X-95 (0.951): the parts of the item panel timed in developer mode (the panel reached 173 ms in the slow frame log).
         if(!hoverPanel || configuration.HoverShowCollection)MeasureMap("hover collection",()=>DrawItemCollection(item));
         if(!hoverPanel || configuration.HoverShowStock)MeasureMap("hover stock",()=>DrawHoveredStock(id));
