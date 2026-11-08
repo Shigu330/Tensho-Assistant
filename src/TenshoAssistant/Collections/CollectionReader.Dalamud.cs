@@ -30,6 +30,7 @@ internal sealed partial class CollectionReader : IDisposable
     private bool orchestrionUnavailable,orchestrionUnlockUnavailable;
     private string? orchestrionIssue,blueIssue,triadIssue;
     private readonly List<CollectionEntry> entries = [];
+    private readonly RegistrationScope registrations = new();
     private int position;
     private ulong character;
     private bool scanning = true;
@@ -50,9 +51,14 @@ internal sealed partial class CollectionReader : IDisposable
         this.service = service; this.data = data; this.framework = framework;
         this.player = player; this.client = client; this.unlocks = unlocks; this.log = log;
         this.cacheLifetime=cacheLifetime ?? (()=>TimeSpan.FromDays(1));this.disk=disk;this.completionLifetime=completionLifetime ?? (()=>TimeSpan.FromDays(7));
-        unlocks.Unlock+=OnCollectionUnlock;
-        try{TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);try{client.Logout+=OnLogout;}catch{TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);throw;}}
-        catch{unlocks.Unlock-=OnCollectionUnlock;throw;}
+        // X-76 H10 (0.924): subscriptions owned by one RegistrationScope: a failure part-way undoes the ones already made; Dispose releases them in reverse order.
+        try
+        {
+            registrations.Register(()=>unlocks.Unlock+=OnCollectionUnlock,()=>unlocks.Unlock-=OnCollectionUnlock);
+            registrations.Register(()=>TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate),()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate));
+            registrations.Register(()=>client.Logout+=OnLogout,()=>client.Logout-=OnLogout);
+        }
+        catch{registrations.Dispose();throw;}
     }
     private void OnCollectionUnlock(RowRef row)
     {
@@ -317,9 +323,7 @@ internal sealed partial class CollectionReader : IDisposable
         {
         if (disposed) return;
         disposed = true;
-        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
-        client.Logout-=OnLogout;
-        unlocks.Unlock-=OnCollectionUnlock;
+        registrations.Dispose();
         service.Clear();
         entries.Clear(); mounts = null; companions = null; emotes = null; blue = null; blueDetails = null;
         cards = null; cardDetails = null;

@@ -7,6 +7,7 @@ namespace TenshoAssistant.Items;
 
 internal sealed class ItemContextMenuBridge : IDisposable
 {
+    private readonly RegistrationScope registrations=new();
     private readonly Configuration configuration;
     private readonly IContextMenu menus;
     private readonly IPlayerState player;
@@ -23,9 +24,13 @@ internal sealed class ItemContextMenuBridge : IDisposable
     {
         this.configuration=configuration;this.menus=menus;this.player=player;this.client=client;this.catalog=catalog;this.log=log;
         this.localization=localization;this.gui=gui;
-        menus.OnMenuOpened+=OnMenuOpened;
-        try{client.Logout+=OnLogout;}
-        catch{menus.OnMenuOpened-=OnMenuOpened;throw;}
+        // X-76 H10 (0.924): subscriptions owned by one RegistrationScope: a failure part-way undoes the ones already made; Dispose releases them in reverse order.
+        try
+        {
+            registrations.Register(()=>menus.OnMenuOpened+=OnMenuOpened,()=>menus.OnMenuOpened-=OnMenuOpened);
+            registrations.Register(()=>client.Logout+=OnLogout,()=>client.Logout-=OnLogout);
+        }
+        catch{registrations.Dispose();throw;}
     }
 
     private void OnLogout(int type,int code)=>session.Clear();
@@ -150,6 +155,6 @@ internal sealed class ItemContextMenuBridge : IDisposable
     public void Dispose()
     {
         if(disposed)return;disposed=true;
-        menus.OnMenuOpened-=OnMenuOpened;client.Logout-=OnLogout;session.Dispose();
+        registrations.Dispose();session.Dispose();
     }
 }

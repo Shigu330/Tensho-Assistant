@@ -9,7 +9,7 @@ internal static class LearnedTamed863Tests
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs"));
             Check(watcher.Contains("if(disposed || TenshoAssistant.Competitive.CompetitiveGate.Cut || row.RowType!=typeof(Lumina.Excel.Sheets.AozAction)"),"queued, cut");
             Check(watcher.Contains("obtained.Where(id=>!known.Contains(id))") && watcher.Contains("now-death.At is >= 0 and <= 15_000"),"growth, monster");
-            Check(watcher.Contains("if(unlocks is not null)unlocks.Unlock-=OnUnlock;"),"unsubscribed");
+            Check(watcher.Contains("()=>state.Unlock-=OnUnlock)"),"unsubscribed");
             var store=new TenshoAssistant.Discoveries.DiscoveryStore();
             Check(store.SeeSource(TenshoAssistant.Discoveries.DiscoveryKind.BlueSpellLearned,5,0,1,DateTimeOffset.UtcNow),"a spell with no monster is kept");
         }),

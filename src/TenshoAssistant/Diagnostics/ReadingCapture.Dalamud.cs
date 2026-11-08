@@ -43,9 +43,15 @@ public sealed unsafe class ReadingCapture : IDisposable
     public ReadingCapture(IFramework framework,IObjectTable objects,ICondition condition,IGameGui gui,IChatGui chat,Func<bool> enabled,IPluginLog log)
     {
         this.framework=framework;this.objects=objects;this.condition=condition;this.gui=gui;this.chat=chat;this.enabled=enabled;this.log=log;
-        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
-        chat.ChatMessageUnhandled+=OnMessage;
+        // X-76 H10 (0.924): subscriptions owned by one RegistrationScope: a failure part-way undoes the ones already made; Dispose releases them in reverse order.
+        try
+        {
+            registrations.Register(()=>TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate),()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate));
+            registrations.Register(()=>chat.ChatMessageUnhandled+=OnMessage,()=>chat.ChatMessageUnhandled-=OnMessage);
+        }
+        catch{registrations.Dispose();throw;}
     }
+    private readonly RegistrationScope registrations=new();
 
     /// <summary>Writes a line, up to the limit of its part (0.899: or of its own key, so that one window does not use up the others' lines).</summary>
     private void Line(string part,int limit,string text,string? key=null)
@@ -515,7 +521,6 @@ public sealed unsafe class ReadingCapture : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
-        chat.ChatMessageUnhandled-=OnMessage;
+        registrations.Dispose();
     }
 }

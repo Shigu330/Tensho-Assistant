@@ -16,7 +16,7 @@ internal static class SpearMulti898Tests
             var three=ItemGains.SpearAssign([10,11,12],[(3,300),(1,200),(1,200)],item=>item==10 ? (3,300):null);
             Check(three.Count==3 && three.Contains((11u,1,200)) && three.Contains((12u,1,200)),"rest alike");
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs"));
-            Check(watcher.Contains("if((int)message.LogKind!=67 || message.Sender.TextValue.Trim().Length!=0)return;") && watcher.Contains("chat.ChatMessageUnhandled-=OnSpearChat;"),"chat, owned");
+            Check(watcher.Contains("if((int)message.LogKind!=67 || message.Sender.TextValue.Trim().Length!=0)return;") && watcher.Contains("()=>chat.ChatMessageUnhandled-=OnSpearChat)"),"chat, owned");
         }),
     ];
 }

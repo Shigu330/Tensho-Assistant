@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.924.0
+- Plan global, Verify : Nettoyage X-76, harmonisation H10 (deuxième partie, abonnements) : les cinq lecteurs qui s'abonnent à plusieurs événements du jeu (collections, liens de carte du chat, menu des objets, découvertes, capture du mode développeur) passent par un seul composant : si un abonnement échoue en route, ceux déjà faits sont défaits, et la fermeture les retire dans l'ordre inverse. Un recomptage n'a trouvé aucun lecteur qui oublie de se désabonner. Rien de visible en jeu. Non validé en jeu.
+- Tests : Registrations924Tests. Verify.ps1 (agent) : 1537/1537, 0 avertissement, 0 erreur ; DLL 0.924.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, harmonisation H10 (second part, subscriptions): the five readers that subscribe to several game events (collections, chat map links, item menu, discoveries, developer capture) go through one component: if a subscription fails part-way, the ones already made are undone, and closing removes them in reverse order. A recount found no reader that forgets to unsubscribe. Nothing visible in game. Not validated in game.
+
 ## 0.923.0
 - Plan global, Verify : Nettoyage X-76, harmonisation H10 (première partie, fichiers) : une seule façon d'enregistrer un fichier : un fichier temporaire au nom unique, puis remplacé d'un coup, et toujours effacé même après un échec. Elle sert maintenant aux huit fichiers enregistrés (listes d'artisanat, historique des voyages, journal des gils, Mes outils, état du personnage, découvertes, prix vus, échange GitHub) ; trois utilisaient un nom « .tmp » fixe, qui pouvait se heurter à une autre écriture. Un fichier d'échange GitHub illisible est mis de côté (« .broken ») au lieu d'être écrasé. Rien de visible en jeu. Non validé en jeu.
 - Tests : AtomicFile923Tests. Verify.ps1 (agent) : 1536/1536, 0 avertissement, 0 erreur ; DLL 0.923.0.0. Non validé en jeu.

@@ -141,7 +141,8 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         vistasBefore=registered;
     }
     private IReadOnlySet<uint>? beastsBefore;private IUnlockState? unlocks;private readonly Queue<uint> spellsLearned=new();
-    public void WatchUnlocks(IUnlockState state){unlocks=state;state.Unlock+=OnUnlock;}
+    public void WatchUnlocks(IUnlockState state){unlocks=state;registrations.Register(()=>state.Unlock+=OnUnlock,()=>state.Unlock-=OnUnlock);}
+    private readonly RegistrationScope registrations=new();
     private void OnUnlock(Lumina.Excel.RowRef row)
     {
         if(disposed || TenshoAssistant.Competitive.CompetitiveGate.Cut || row.RowType!=typeof(Lumina.Excel.Sheets.AozAction) || spellsLearned.Count>=16)return;
@@ -178,8 +179,14 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     {
         this.framework=framework;this.client=client;this.gui=gui;this.objects=objects;this.targets=targets;this.condition=condition;this.inventory=inventory;
         this.store=store;this.log=log;this.settings=settings;this.debug=debug;this.dutyOf=dutyOf;this.isFish=isFish;this.usable=usable;
-        this.chat=chat;if(chat is not null)chat.ChatMessageUnhandled+=OnSpearChat;
-        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
+        this.chat=chat;
+        // X-76 H10 (0.924): subscriptions owned by one RegistrationScope: a failure part-way undoes the ones already made; Dispose releases them in reverse order.
+        try
+        {
+            if(chat is not null)registrations.Register(()=>chat.ChatMessageUnhandled+=OnSpearChat,()=>chat.ChatMessageUnhandled-=OnSpearChat);
+            registrations.Register(()=>TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update),()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update));
+        }
+        catch{registrations.Dispose();throw;}
     }
 
     private void Update(IFramework unused)
@@ -482,8 +489,6 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     public void Dispose()
     {
         if(disposed)return;
-        disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);
-        if(unlocks is not null)unlocks.Unlock-=OnUnlock;
-        if(chat is not null)chat.ChatMessageUnhandled-=OnSpearChat;
+        disposed=true;registrations.Dispose();
     }
 }

@@ -46,7 +46,7 @@ internal static class ChatMapLinks373Tests
         ("Chat map links: read after the other plugins, cleared at logout, never saved, teleport only through the question",() =>
         {
             var watcher = Read("Maps/ChatMapLinkWatcher.Dalamud.cs");
-            Check(watcher.Contains("chat.ChatMessageUnhandled+=OnMessage;",StringComparison.Ordinal) && watcher.Contains("chat.ChatMessageUnhandled-=OnMessage;",StringComparison.Ordinal)
+            Check(watcher.Contains("()=>chat.ChatMessageUnhandled+=OnMessage,",StringComparison.Ordinal) && watcher.Contains("()=>chat.ChatMessageUnhandled-=OnMessage)",StringComparison.Ordinal)
                 && watcher.Contains("private void OnLogout(int type,int code)=>History.Clear();",StringComparison.Ordinal),"subscription owned and cleaned");
             Check(!Read("Configuration.cs").Contains("ChatMapLink",StringComparison.Ordinal),"history never in the configuration");
             var page = Read("MainWindow.ChatMapLinks.cs");
