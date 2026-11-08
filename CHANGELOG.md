@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.900.0
+- Plan global, Verify : Essai en jeu de l'utilisateur, revue de mode (X-75.7) : les tenues jugées sont lues (thème, catégories, note de chaque emplacement, teintures) et notées dans les découvertes ; l'aperçu de la revue est lu (thème, meilleur score, tentatives restantes) ; le parseur des tenues jugées (0.861) est validé en jeu. Correction (retour de l'utilisateur) : dans la liste d'un emplacement, le clic droit sur l'icône d'une pièce non possédée ouvrait un menu grisé et transparent, parce que la ligne atténuée englobait aussi le menu de l'icône (celui du nom était déjà corrigé en 0.214) ; seule l'image est maintenant atténuée. Non validé en jeu (la correction).
+- Tests : FashionIconMenu900Tests. Verify.ps1 (agent) : 1480/1480, 0 avertissement, 0 erreur ; DLL 0.900.0.0. Non validé en jeu.
+### English
+- User's in-game test, Fashion Report (X-75.7): judged outfits are read (theme, categories, each slot's evaluation, dyes) and noted in the discoveries; the report preview is read (theme, high score, attempts left); the judged-outfit parser (0.861) is validated in game. Fix (user report): in a slot's list, right-clicking the icon of a piece you do not own opened a greyed, see-through menu, because the dimmed row also wrapped the icon's menu (the name's was fixed in 0.214); only the image is dimmed now. Fix not validated in game.
+
 ## 0.899.0
 - Plan global, Verify : Essai en jeu de l'utilisateur, sertissage forcé (X-75.7) : les taux affichés par le jeu pour une matéria de degré I (80, 40, 20 et 10 %) sont exactement ceux des feuilles du jeu que Tensho lit déjà (MateriaJoinRate et MateriaJoinRateGatherCraft) ; seuls les degrés XI et XII viennent encore de Teamcraft, à vérifier avec une telle matéria (preuve : docs/evidence/0.899-overmeld-rates.md). Le relevé du mode développeur n'avait rien écrit : les séances de harpon avaient épuisé les 160 lignes partagées par toutes les fenêtres ; chaque fenêtre a maintenant sa propre limite. Prises multiples au harpon (0.898) validées en jeu : six doubles prises, toutes justes. Non validé en jeu (la limite par fenêtre).
 - Tests : Spearfish890Tests. Verify.ps1 (agent) : 1479/1479, 0 avertissement, 0 erreur ; DLL 0.899.0.0. Non validé en jeu.

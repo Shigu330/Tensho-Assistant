@@ -167,7 +167,17 @@ internal sealed partial class MainWindow
             if(dim)ImGui.PushStyleVar(ImGuiStyleVar.Alpha,0.45f);
             try
             {
-                DrawItemIcon(item,new Vector2(compact ? 22:26));var clicked=ImGui.IsItemClicked();ImGui.SameLine();
+                // 0.900 (user report: the icon's right-click menu came out greyed): only the image is dimmed; its tooltip and menu are drawn without the dimming, like the
+                // name's (0.214).
+                DrawItemImage(item,new Vector2(compact ? 22:26));var clicked=ImGui.IsItemClicked();var iconHovered=ImGui.IsItemHovered();
+                if(dim)ImGui.PopStyleVar();
+                if(item is { Id:>0 })
+                {
+                    if(iconHovered)DrawItemInfoTooltip(id);
+                    ItemLinksMenu(UniqueMenuId($"FashionWeekIcon{hint}/{id}"),item);
+                }
+                if(dim)ImGui.PushStyleVar(ImGuiStyleVar.Alpha,0.45f);
+                ImGui.SameLine();
                 var stock=owned==true ? $" · ×{GetRecipeHoldings(id).Total:N0}":"";
                 clicked|=ImGui.Selectable($"{item?.Name ?? localization.Format("BankUi.Item",id)}{stock}##FashionWeekItem{hint}/{id}",itemId==id);
                 var hovered=ImGui.IsItemHovered();
