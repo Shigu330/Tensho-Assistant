@@ -118,7 +118,7 @@ internal sealed partial class MainWindow
         DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition,DiscoveryKind.FashionEvaluation,DiscoveryKind.VoyageDrop,DiscoveryKind.VoyageUnlock,DiscoveryKind.BlueSpellLearned,DiscoveryKind.BeastTamed,DiscoveryKind.FestivalSeen,DiscoveryKind.VistaSeen];
     /// <summary>0.911 (X-76): the other kinds the page's search lists too (never shown as an item's source); with the places, FATEs and item sources, every kind.</summary>
     private static readonly DiscoveryKind[] OtherSeenKinds=[DiscoveryKind.NpcPlace,DiscoveryKind.BlueSpellCaster,DiscoveryKind.FishLure,DiscoveryKind.FishTransition,DiscoveryKind.FishBite,
-        DiscoveryKind.QuestItemAsked,DiscoveryKind.SpearShadow];
+        DiscoveryKind.QuestItemAsked,DiscoveryKind.SpearShadow,DiscoveryKind.FishBiteBait,DiscoveryKind.IntuitionStart,DiscoveryKind.IntuitionCatch];
     /// <summary>
     /// X-73.16 (0.872): where you saw a shopkeeper, as a vendor place, for the vendors the game sheets do not place (their own places always come first).
     /// Worked out again only when the base changes.
@@ -253,7 +253,8 @@ internal sealed partial class MainWindow
         if(fact.Kind==DiscoveryKind.FestivalSeen)
             return $"{DiscoveryDay(fact.LevelMin):d} – {DiscoveryDay(fact.LevelMax):d}";
         if(fact.Kind is DiscoveryKind.FishCondition or DiscoveryKind.VistaSeen or DiscoveryKind.FishTransition)return EtRange(fact.LevelMin,fact.LevelMax);
-        if(fact.Kind==DiscoveryKind.FishBite)return BiteRange(fact.LevelMin,fact.LevelMax)+" s";
+        if(fact.Kind is DiscoveryKind.FishBite or DiscoveryKind.FishBiteBait)return BiteRange(fact.LevelMin,fact.LevelMax)+" s";
+        if(fact.Kind==DiscoveryKind.IntuitionStart)return LevelRange(fact.LevelMin,fact.LevelMax)+" s";
         var range=LevelRange(fact.LevelMin,fact.LevelMax);
         return ItemSourceKinds.Contains(fact.Kind) || fact.Kind==DiscoveryKind.QuestItemAsked ? "×"+range:range;
     }
@@ -289,6 +290,9 @@ internal sealed partial class MainWindow
             {1=>localization.Get("FishingPanel.SeenAmbitious"),2=>localization.Get("FishingPanel.SeenModest"),_=>$"#{fact.Detail}"}),
         DiscoveryKind.FishTransition=>localization.Format("DiscoveriesUi.FishTransition",DiscoveryItemName(fact.Subject),DiscoveryWeatherName(fact.Detail)),
         DiscoveryKind.FishBite=>localization.Format("DiscoveriesUi.FishBite",DiscoveryItemName(fact.Subject),BiteMark(fact.Detail),BiteRange(fact.LevelMin,fact.LevelMax)),
+        DiscoveryKind.FishBiteBait=>localization.Format("DiscoveriesUi.FishBiteBait",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail),BiteRange(fact.LevelMin,fact.LevelMax)),
+        DiscoveryKind.IntuitionStart=>localization.Format("DiscoveriesUi.IntuitionStart",DiscoveryItemName(fact.Subject),LevelRange(fact.LevelMin,fact.LevelMax)),
+        DiscoveryKind.IntuitionCatch=>localization.Format("DiscoveriesUi.IntuitionCatch",DiscoveryItemName(fact.Subject),fact.Detail==0 ? "?":DiscoveryItemName(fact.Detail)),
         DiscoveryKind.HuntMarkPlace=>localization.Format("DiscoveriesUi.HuntMarkName",DiscoveryMonsterName(fact.Subject),fact.LevelMax switch {1=>"B",2=>"A",3=>"S",_=>"?"}),
         DiscoveryKind.FateSeen=>localization.Format("DiscoveriesUi.FateName",DiscoveryFateName(fact.Subject)),
         DiscoveryKind.MonsterPlace=>DiscoveryMonsterName(fact.Subject),

@@ -62,6 +62,27 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     /// (status 763, « Amorçage ») is not measured.
     /// </summary>
     private int lineState=-1;private long castStarted=-100_000,bitAt=-100_000;private bool castChum;private uint biteStrength;
+    /// <summary>
+    /// X-76 P6 (0.933): Fisher's Intuition (status 568, as FishingBaitReader). When it appears, the fish caught last is its trigger, unless a catch lands within
+    /// <see cref="IntuitionGrace"/> (the status can show before the bags count the fish): that one is. The start is written once the grace is over; the catches
+    /// while it lasts are written with the trigger. Not proven in game yet (docs/evidence/0.933-fishing-intuition.md).
+    /// </summary>
+    private sealed record IntuitionRun(long Started,uint Trigger,int Seconds,bool Written);
+    private IntuitionRun? intuition;
+    private const long IntuitionGrace=3000;
+    private const uint IntuitionStatus=568;
+    private void ReadIntuition(long now,DateTimeOffset at,uint territory,uint map,Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter me)
+    {
+        var status=me.StatusList.FirstOrDefault(entry=>entry.StatusId==IntuitionStatus);
+        if(status is null){intuition=null;return;}
+        if(intuition is null){intuition=new(now,0,(int)Math.Round(status.RemainingTime),false);return;}
+        if(!intuition.Written && now-intuition.Started>=IntuitionGrace)
+        {
+            var trigger=intuition.Trigger!=0 ? intuition.Trigger:lastFish;
+            intuition=intuition with{Trigger=trigger,Written=true};
+            if(trigger!=0 && intuition.Seconds is > 0 and < 3600)store.SeeSource(DiscoveryKind.IntuitionStart,trigger,0,intuition.Seconds,at,territory,map,me.Position);
+        }
+    }
     private void ReadLine(long now,Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter me)
     {
         var events=FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.Instance();
@@ -201,7 +222,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         {
             var at=DateTimeOffset.UtcNow;var territory=client.TerritoryType;var map=client.MapId;var duty=dutyOf(territory);
             CheckWeather(at,now,territory,duty);
-            if(wanted.Fishing && me.ClassJob.RowId==18){ReadLine(now,me);ReadSpear(at,now,territory,map,me.Position);}
+            if(wanted.Fishing && me.ClassJob.RowId==18){ReadLine(now,me);ReadSpear(at,now,territory,map,me.Position);ReadIntuition(now,at,territory,map,me);}
             if(wanted.ItemSources)
             {
                 ReadSalvage(at);ReadPurify(at);ReadHandIn(at,now);ReadVenture(at);ReadLoot(at,territory,duty);
@@ -241,7 +262,17 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                         if(PreviousWeather?.Invoke(territory,at) is { } before and not 0)store.SeeSource(DiscoveryKind.FishTransition,item,before,EorzeaMinute(at),at,territory);
                         lastFish=item;
                         if(bitAt>castStarted && castStarted>0 && !castChum && bitAt-castStarted is > 0 and < 600_000)
+                        {
                             store.SeeSource(DiscoveryKind.FishBite,item,biteStrength,(int)((bitAt-castStarted)/100),at,territory,map,me.Position);
+                            // X-76 P6 (0.933): the same bite time, keyed by the cast's bait.
+                            if(bait!=0)store.SeeSource(DiscoveryKind.FishBiteBait,item,bait,(int)((bitAt-castStarted)/100),at,territory,map,me.Position);
+                        }
+                        // X-76 P6 (0.933): a catch that lands just after the intuition began is the one that started it; later ones are caught under it.
+                        if(intuition is { } running)
+                        {
+                            if(running.Trigger==0 && now-running.Started<IntuitionGrace)intuition=running with{Trigger=item};
+                            else store.SeeSource(DiscoveryKind.IntuitionCatch,item,running.Trigger,1,at,territory);
+                        }
                         bitAt=-100_000;
                         kind=DiscoveryKind.FishCatch;break;
                     case ItemGains.Cause.FateReward:

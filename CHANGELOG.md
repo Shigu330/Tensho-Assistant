@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.933.0
+- Plan global, Verify : Nettoyage X-76, parseurs P6 (pêche) : trois nouvelles sortes de découvertes, sans changer le format des fichiers. Le temps de touche est maintenant noté aussi avec l'appât du lancer (ou le poisson utilisé pour la pêche au vif) ; quand l'Intuition du pêcheur commence, Tensho note le poisson pêché juste avant (celui qui l'a déclenchée : indice de prédateur) et sa durée, puis les poissons pêchés tant qu'elle dure. L'outil de fusion des découvertes partagées connaît ces sortes. Ordre exact du statut et de la prise à confirmer en jeu ; le leurre nageur attend un relevé en jeu. Non validé en jeu.
+- Tests : FishingFacts933Tests. Verify.ps1 (agent) : 1546/1546, 0 avertissement, 0 erreur ; DLL 0.933.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, parsers P6 (fishing): three new discovery kinds, without changing the file format. The bite time is now also kept with the cast's bait (or the fish used for a mooch); when Fisher's Intuition starts, Tensho notes the fish caught just before (the one that started it: a predator hint) and its length, then the fish caught while it lasts. The shared discoveries merge tool knows these kinds. Exact order of the status and the catch to confirm in game; swimbait waits for an in-game capture. Not validated in game.
+
 ## 0.932.0
 - Plan global, Verify : Nettoyage X-76, parseurs P5 (fin, animaux de l'île) : au survol d'un animal de l'île sur la carte, Tensho affiche sa taille (petit, moyen ou grand, lu dans le jeu : à confirmer en jeu) et les deux produits qu'il donne au pâturage. P5 est terminé (0.928 à 0.932 : tâches de servants, vues panoramiques, mage bleu, rangs S, animaux de l'île). Non validé en jeu.
 - Tests : IslandAnimals932Tests. Verify.ps1 (agent) : 1545/1545, 0 avertissement, 0 erreur ; DLL 0.932.0.0. Non validé en jeu.

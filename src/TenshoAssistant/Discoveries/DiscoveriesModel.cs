@@ -44,7 +44,12 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     // its facts are refused when read.
     // X-73.18 (0.896): SpearShadow: Subject = fish speared, Detail = the shadow's size (1 small, 2 average, 3 large), levels = its speed when it appeared, place =
     // where it was speared. The shadow is the slot that left the window with its size and speed kept, just before the catch.
-    SpearShadow=28 }
+    SpearShadow=28,
+    // X-76 P6 (0.933): FishBiteBait: Subject = fish, Detail = the bait of the cast (the fish before for a mooch), levels = the bite time in tenths of a second, place =
+    // where it was caught (the same cast as FishBite, keyed by bait). IntuitionStart: Subject = the fish caught just before Fisher's Intuition (status 568) began
+    // (the catch that started it: a predator candidate), levels = the intuition's length in seconds, place. IntuitionCatch: Subject = a fish caught while the
+    // intuition lasted, Detail = the fish that started it (0 unknown). Seen with, not proven to be required.
+    FishBiteBait=29, IntuitionStart=30, IntuitionCatch=31 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported
@@ -325,7 +330,7 @@ public sealed class DiscoveryStore
 
     /// <summary>X-74 (0.860): the kinds that hold a place (a map); the others are about items and sources only.</summary>
     public static bool HasPlace(DiscoveryKind kind)=>kind is DiscoveryKind.MonsterPlace or DiscoveryKind.HuntMarkPlace or DiscoveryKind.FateSeen or DiscoveryKind.MonsterDrop or DiscoveryKind.FishCatch
-        or DiscoveryKind.NpcPlace or DiscoveryKind.BlueSpellCaster or DiscoveryKind.FishBite or DiscoveryKind.SpearShadow;
+        or DiscoveryKind.NpcPlace or DiscoveryKind.BlueSpellCaster or DiscoveryKind.FishBite or DiscoveryKind.SpearShadow or DiscoveryKind.FishBiteBait or DiscoveryKind.IntuitionStart;
     /// <summary>
     /// What an imported fact must hold: a known kind, a subject and a map, finite places in their cell, levels and dates that make sense. 0.911 (X-76): a FATE
     /// at exactly (0, 0) is the zero position the game gives for about a second (entering a zone, reloading): refused, read or imported. X-76 E1 (0.916): the
