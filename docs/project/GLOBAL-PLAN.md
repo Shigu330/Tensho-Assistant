@@ -284,7 +284,7 @@ avant la 1.0.0, E2 test des règles d'interface (couvert par les tests 912 à 92
 - Parité anglais et français ; allemand et japonais : signaler seulement ce qui manque.
 - Textes de l'aide et du guide alignés sur l'état final des pages.
 
-**5. Réseau, vie privée et règles Dalamud.**
+**5. Réseau, vie privée et règles Dalamud.** — 0.949 : audit (`docs/evidence/0.949-network-rules.md`) ; choix de l'utilisateur appliqués (interrupteur PaissaDB couvert par « données du jeu seulement », échange GitHub crédité, dates partagées arrondies au jour, avertissement avant connexion, manifeste) ; non retenus pour l'instant : arrêt en JcJ des travaux déjà lancés et alerte Discord « mission trouvée », position exacte partagée.
 - Liste de chaque hôte appelé : quand (clic, automatique choisi par l'utilisateur), limite de taille, délai, en-tête, coupure en JcJ, réglage qui le coupe.
 - Contrôle de la liste des règles Dalamud (`docs/project/PUBLISHING.md`) point par point ; tout écart résumé à l'utilisateur avant de corriger.
 - Données gardées sur le disque : liste, taille maximale, purge, ce que « vider » efface.

@@ -580,6 +580,7 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
+    "PublicWarning": "Before connecting: sharing is public. Your GitHub name appears in a public issue of Tensho's repository, and the sightings you send (places, items, the day of each) can be read by anyone. Nothing about your character is sent.",
     "SummarySpearShadow": "Spearfishing shadows seen: {0} ({1} seen by you, {2} imported only)",
     "SpearShadow": "{0}: spearfishing shadow {1}",
     "QuestAsked": "{0} asked by « {1} »",
@@ -1125,6 +1126,8 @@
     "MuteTip": "No sound while in a duty; the chat message stays, unless the option just below is ticked.\nDefault: on.",
     "MuteChatTip": "While you are in a duty, the alarm's [Tensho] line is not written in the chat either. No effect while « No sound in duties » or « Chat message » is unticked. Alarms copied into the game and Discord messages do not change.\nDefault: off.",
     "GameWeatherTip": "The game rings every ET day without looking at the weather: tick only if that suits you.",
+    "Paissa": "Plots for sale (PaissaDB)",
+    "PaissaTip": "Asks PaissaDB for the open plots of your world (only the world id is sent), on « Fetch » and for the plot watch. Off: nothing is asked.\nDefault: on.",
     "Fashion": "Fashion Report (FFXIVGachaSpreadsheet)",
     "FashionTip": "Downloads the week's pieces and dyes from FFXIVGachaSpreadsheet (GitHub). Off: no download any more; a recent copy kept on disk is still shown.\nDefault: on.",
     "Universalis": "Universalis (market prices)",
@@ -4115,6 +4118,7 @@
     "ProprietaryLicense": "proprietary, all rights reserved",
     "Footer": "Something missing or a licence to fix? Report it on Tensho's GitHub repository:",
     "Items": {
+      "DiscoveriesExchange": "Shared discoveries: after you connect your GitHub account, Tensho reads the common base of this plugin's repository and sends your own sightings (places, items, the day of each) to a gist linked from a public issue; nothing about your character is sent.",
       "ToolGallery": "Tools shared by players (My tools › Gallery): data only, no code, read from this plugin's repository on your click; nothing about you is sent.",
       "LuminaSupplementalAirships": "Airship sector unlock tree, possible loot list (without quantity or rate) and English names of seasonal events (embedded snapshots, GPL-3.0 notice at the top of the files).",
       "Dalamud": "Plugin host: game data, framework, player state, chat, commands, server info bar, context menus, textures, hooks, windows and saving the configuration.",

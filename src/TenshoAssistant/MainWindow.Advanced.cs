@@ -74,6 +74,8 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.Teamcraft","Advanced.TeamcraftTip",()=>configuration.CommunityTeamcraftBites,value=>configuration.CommunityTeamcraftBites=value,c=>c.CommunityTeamcraftBites);
         // 0.321 (review 0.316, point 2): the Fashion Report source had no switch.
         BoolSetting("Advanced.Fashion","Advanced.FashionTip",()=>configuration.CommunityFashion,value=>configuration.CommunityFashion=value,c=>c.CommunityFashion);
+        // X-76 step 5 (0.949): PaissaDB (plots for sale), with its switch.
+        BoolSetting("Advanced.Paissa","Advanced.PaissaTip",()=>configuration.CommunityPaissa,value=>configuration.CommunityPaissa=value,c=>c.CommunityPaissa);
         // 0.324: Universalis as a whole; « prices on hover » under it, greyed while Universalis is off.
         BoolSetting("Advanced.Universalis","Advanced.UniversalisTip",()=>configuration.CommunityUniversalis,value=>{configuration.CommunityUniversalis=value;if(!value)market.CancelBackground();},c=>c.CommunityUniversalis);
         if(configuration.GameDataOnly)ImGui.EndDisabled();

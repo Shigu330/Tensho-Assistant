@@ -94,7 +94,10 @@ public static class CreditCatalog
             ["Community/FishBiteTimes.cs", "Plugin.cs", "MainWindow.FishingPanel.cs", "MainWindow.GatheringFish.cs", "MainWindow.Advanced.cs", "Gear/GearCatalog.cs", "MainWindow.Gear.cs", "Craft/TeamcraftExport.cs", "MainWindow.CraftPlan.cs"], ["gubal.ffxivteamcraft.com", "ffxivteamcraft.com"], "CommunityTeamcraftBites", false),
         // 0.445 (N-05): open plots, read only, the world id only is sent; no licence stated by the project.
         new("PaissaDB", CreditKind.Online, "PaissaDB", "zhudotexe", "none", "https://github.com/zhudotexe/FFXIV_PaissaDB", "",
-            ["Community/PaissaDb.cs", "MainWindow.Plots.cs", "Plugin.cs"], ["paissadb.zhu.codes"], "PlotWatch", false),
+            ["Community/PaissaDb.cs", "MainWindow.Plots.cs", "Plugin.cs"], ["paissadb.zhu.codes"], "CommunityPaissa", false),
+        // X-76 step 5 (0.949): the discoveries exchange through GitHub (sign-in, the common base, your gist and its issue), only after you connect.
+        new("DiscoveriesExchange", CreditKind.Online, "Tensho Assistant shared discoveries (GitHub)", "Tensho Assistant players", "CC0-1.0", "https://github.com/Shigu330/Tensho-Assistant/tree/main/community-discoveries", "https://creativecommons.org/publicdomain/zero/1.0/",
+            ["Discoveries/GitHubExchange.cs", "Discoveries/CommunityDiscoveries.cs", "MainWindow.Discoveries.cs"], ["github.com", "api.github.com", "raw.githubusercontent.com"], "", false),
         // 0.447 (X-04, decided 2026-11-03): player events, opened in the player's browser on a click; nothing is fetched by Tensho.
         new("ToolGallery", CreditKind.Online, "Tensho Assistant community tools", "Tensho Assistant contributors", "CC0-1.0", "https://github.com/Shigu330/Tensho-Assistant/tree/main/community-templates", "https://creativecommons.org/publicdomain/zero/1.0/",
             ["MyTools/ToolGallery.cs", "MainWindow.MyTools.cs"], ["raw.githubusercontent.com"], "", false),

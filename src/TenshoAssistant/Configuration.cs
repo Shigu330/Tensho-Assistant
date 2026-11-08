@@ -57,7 +57,7 @@ public static class ConfigurationReset
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringNextHighlight", "CacheLongerDefaults", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
-        "Discord", "ThemeMode", "ThemeModeBeforeTool", "GameDataOnly", "CommunityBeforeGameOnly", "CraftLogTryAllPresets", "GatherPlanFromList", "GatheringListHighlight", "ListPanelsByZone", "ListPanelsFinishedOnly", "ListPanelsNearbyMonsters", "ListPanelsStorageHighlight", "Discovery", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
+        "Discord", "ThemeMode", "ThemeModeBeforeTool", "GameDataOnly", "CommunityBeforeGameOnly", "CommunityPaissa", "CraftLogTryAllPresets", "GatherPlanFromList", "GatheringListHighlight", "ListPanelsByZone", "ListPanelsFinishedOnly", "ListPanelsNearbyMonsters", "ListPanelsStorageHighlight", "Discovery", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
         // 0.347 (g, I-08): the two shop reminder settings (the notes themselves are saved data, kept by « restore every setting »).
         "ItemNoteShopReminder", "ItemNoteImportantSound",
@@ -531,6 +531,8 @@ public sealed partial class Configuration
     // X-76 step 3 (0.945, user request): « game and observed data only » turns the seven community sources off at once; their choices are kept
     // (one bit each: Lumina, Garland, Wiki, GatherBuddy, Teamcraft, Fashion, Universalis) and come back when it is unticked.
     public bool GameDataOnly { get; set; }
+    // X-76 step 5 (0.949, user's go-ahead): PaissaDB (plots for sale) as a source with its switch, like the seven others.
+    public bool CommunityPaissa { get; set; }=true;
     public int? CommunityBeforeGameOnly { get; set; }
     // 0.328 (map audit): « "MapView": null » in a hand-edited file becomes the defaults here, like Cache, so no draw path reads null.
     private MapViewSettings mapView=new();

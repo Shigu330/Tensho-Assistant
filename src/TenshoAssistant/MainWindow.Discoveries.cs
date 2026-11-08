@@ -213,6 +213,10 @@ internal sealed partial class MainWindow
             }
             else
             {
+                // X-76 step 5 (0.949, user's go-ahead): said before connecting, not only in a tooltip.
+                ImGui.PushTextWrapPos();
+                try{ImGui.TextColored(Warning,localization.Get("DiscoveriesUi.PublicWarning"));}
+                finally{ImGui.PopTextWrapPos();}
                 ImGui.BeginDisabled(working);
                 try{if(ImGui.SmallButton(localization.Get("DiscoveriesUi.Connect")))exchange.Connect();}
                 finally{ImGui.EndDisabled();}

@@ -580,6 +580,7 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "PublicWarning": "Avant de vous connecter : le partage est public. Votre nom GitHub apparaît dans un ticket public du dépôt de Tensho, et les relevés envoyés (lieux, objets, le jour de chacun) sont lisibles par tous. Rien sur votre personnage n’est envoyé.",
     "SummarySpearShadow": "Ombres au harpon vues : {0} ({1} vues par vous, {2} importées seulement)",
     "SpearShadow": "{0} : ombre au harpon {1}",
     "QuestAsked": "{0} demandé par « {1} »",
@@ -1125,6 +1126,8 @@
     "MuteTip": "Pas de son quand vous êtes en mission ; le message dans le chat reste, sauf avec l'option juste en dessous.\nPar défaut : activé.",
     "MuteChatTip": "Quand vous êtes en mission, la ligne [Tensho] de l'alarme n'est pas écrite non plus dans le chat. Sans effet si « Pas de son en mission » ou « Message dans le chat » est décoché. Les alarmes copiées dans le jeu et les messages Discord ne changent pas.\nPar défaut : désactivé.",
     "GameWeatherTip": "Le jeu sonne chaque jour ET, sans regarder la météo : à cocher seulement si cela vous convient.",
+    "Paissa": "Terrains en vente (PaissaDB)",
+    "PaissaTip": "Demande à PaissaDB les terrains libres de votre monde (seul le numéro du monde est envoyé), sur « Relever » et pour la surveillance des terrains. Désactivé : rien n’est demandé.\nPar défaut : activé.",
     "Fashion": "Revue de mode (FFXIVGachaSpreadsheet)",
     "FashionTip": "Télécharge les pièces et teintures de la semaine depuis FFXIVGachaSpreadsheet (GitHub). Désactivé : plus aucun téléchargement ; une copie récente gardée sur disque reste affichée.\nPar défaut : activé.",
     "Universalis": "Universalis (prix du marché)",
@@ -4115,6 +4118,7 @@
     "ProprietaryLicense": "propriétaire, tous droits réservés",
     "Footer": "Un oubli ou une licence à corriger ? Signalez-le sur le dépôt GitHub de Tensho :",
     "Items": {
+      "DiscoveriesExchange": "Découvertes partagées : après la connexion de votre compte GitHub, Tensho lit la base commune du dépôt de ce plugin et envoie vos propres relevés (lieux, objets, le jour de chacun) dans un gist lié depuis un ticket public ; rien sur votre personnage n’est envoyé.",
       "ToolGallery": "Outils partagés par des joueurs (Mes outils › Galerie) : données seulement, aucun code, lus depuis le dépôt du plugin sur votre clic ; rien sur vous n'est envoyé.",
       "LuminaSupplementalAirships": "Arbre de déblocage des secteurs de dirigeable, liste du butin possible (sans quantité ni taux) et noms anglais des événements saisonniers (instantanés embarqués, avis GPL-3.0 en tête des fichiers).",
       "Dalamud": "Hôte du plugin : services (données du jeu, framework, état du joueur, chat, commandes, barre d'infos serveur, menus contextuels, textures, hooks), fenêtres et sauvegarde de la configuration.",

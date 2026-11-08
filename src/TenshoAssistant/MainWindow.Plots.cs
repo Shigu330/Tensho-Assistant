@@ -19,7 +19,7 @@ internal sealed partial class MainWindow
     /// <summary>Called every frame: the watch's next read when it is due.</summary>
     internal void WatchPlots()
     {
-        if(!configuration.PlotWatch || Paissa is not { } paissa || market.State.WorldId==0)return;
+        if(!configuration.PlotWatch || !configuration.CommunityPaissa || Paissa is not { } paissa || market.State.WorldId==0)return;
         var now=DateTimeOffset.UtcNow;
         if(now<plotWatchAt)return;
         plotWatchAt=now.AddMinutes(Math.Clamp(configuration.PlotWatchMinutes,10,240));
@@ -45,7 +45,9 @@ internal sealed partial class MainWindow
         ComboSetting("Plots.Size","Plots.SizeTip",()=>configuration.PlotWatchSize,value=>configuration.PlotWatchSize=value,
             [(0,localization.Get("Plots.AnySize")),(1,PlotSize(0)),(2,PlotSize(1)),(3,PlotSize(2))],DefaultConfiguration.PlotWatchSize);
         var state=paissa.State;
-        ImGui.BeginDisabled(world.WorldId==0 || state.Loading);
+        // X-76 step 5 (0.949): nothing is asked while the PaissaDB source is off (Settings › Advanced, or « game data only »).
+        if(!configuration.CommunityPaissa)ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
+        ImGui.BeginDisabled(world.WorldId==0 || state.Loading || !configuration.CommunityPaissa);
         try{if(ImGui.SmallButton(localization.Format("Plots.Fetch",world.WorldName)))paissa.Request(world.WorldId);}
         finally{ImGui.EndDisabled();}
         if(state.Loading)ImGui.TextDisabled(localization.Get("Plots.Loading"));

@@ -28,9 +28,11 @@ public static class CommunityDiscoveries
     /// Only what you saw yourself: imported facts are not sent back. 0.883: dated by its newest fact, so that the same facts give the same file (and hash).
     /// X-76 E1 (0.916): nor the imported HQ sightings and values (written as version 2).
     /// </summary>
+    public static DateTimeOffset Day(DateTimeOffset at)=>new(at.UtcDateTime.Date,TimeSpan.Zero);
     public static DiscoveryFile Mine(DiscoveryFile all)
     {
-        var facts=all.Facts.Where(fact=>fact.Seen>0).Select(fact=>{var copy=fact.Copy();copy.Imported=0;copy.ImportedHq=0;copy.ImportedValues=null;return copy;})
+        // X-76 step 5 (0.949, user's go-ahead): what leaves the PC carries the day only, never the time of a sighting.
+        var facts=all.Facts.Where(fact=>fact.Seen>0).Select(fact=>{var copy=fact.Copy();copy.Imported=0;copy.ImportedHq=0;copy.ImportedValues=null;copy.First=Day(copy.First);copy.Last=Day(copy.Last);return copy;})
             .OrderBy(fact=>fact.Key,StringComparer.Ordinal).ToList();
         return new(){Written=facts.Count==0 ? DateTimeOffset.UnixEpoch:facts.Max(fact=>fact.Last),Producer=all.Producer,Facts=facts};
     }
