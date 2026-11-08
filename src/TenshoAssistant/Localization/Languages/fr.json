@@ -5972,6 +5972,15 @@
     "TimeSunset": "crépuscule",
     "TimeUnknown": "?",
     "Stop": "Escale {0} : {1} ({2})",
+    "PortVerified": "{0} : horaire vérifié en jeu ({1} voyage(s) vu(s)).",
+    "PortUnverified": "{0} : horaire pas encore vérifié en jeu (calage de la communauté). Il est vérifié à chaque embarquement.",
+    "PortUnsettled": "{0} : {1} voyage(s) vu(s) d'accord avec l'horaire, {2} calages encore possibles : embarquez de nouveau pour trancher.",
+    "PortContradicted": "{0} : le jeu a contredit l'horaire de la communauté ; {1} calages encore possibles : les routes qui peuvent partir sont affichées. Embarquez de nouveau pour trancher.",
+    "PortInconsistent": "{0} : les {1} voyage(s) vu(s) ne collent à aucun calage de la boucle : horaire inconnu (signalez-le, s'il vous plaît).",
+    "Possible": "l'un de : {0}",
+    "PossibleMany": "? ({0} voyages possibles)",
+    "PossibleTip": "Les voyages vus en jeu ne tranchent pas encore ce port : voici les voyages qui peuvent partir à cette heure.",
+    "UnverifiedTip": "Pas encore vérifié en jeu pour ce port : les voyages où vous embarquez le tranchent.",
     "Help": "Un départ toutes les 2 heures ; l'embarquement dure 15 minutes. Horaires calculés depuis la boucle du jeu (144 départs) ; survol d'un trajet : ses escales."
   },
   "FontSettings": {

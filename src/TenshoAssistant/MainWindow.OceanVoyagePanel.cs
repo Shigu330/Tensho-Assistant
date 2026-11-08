@@ -16,12 +16,14 @@ internal sealed partial class MainWindow
     /// <summary>
     /// X-75.6 (0.880): the community timetable checked against the game once per voyage: the route the game says aboard must be one of the two routes the loop
     /// (start and 2-hour step read in GatherBuddy) gives for that departure. The result is logged; a mismatch always, a match in developer mode.
+    /// X-85 V1 (0.917): the departure is also saved as a sighting (slot, route): the sightings settle each port's shift (OceanSchedule.State);
+    /// the log gives the slot, the loop row and the shifts still possible, for the evidence.
     /// </summary>
     private uint oceanRouteChecked;
     internal (int Matches,int Mismatches) OceanScheduleChecks { get; private set; }
     private void CheckOceanSchedule(OceanVoyageFrame frame)
     {
-        if(frame.RouteId==oceanRouteChecked || OceanTimetable?.Invoke() is not { } timetable)return;
+        if(frame.RouteId==0 || frame.RouteId==oceanRouteChecked || OceanTimetable?.Invoke() is not { } timetable)return;
         oceanRouteChecked=frame.RouteId;
         var slot=(long)Math.Floor((DateTimeOffset.UtcNow+OceanSchedule.Boarding-OceanSchedule.LoopStart)/OceanSchedule.Step);
         var expected=timetable.At(Math.Max(0,slot));
@@ -35,6 +37,23 @@ internal sealed partial class MainWindow
             OceanScheduleChecks=(OceanScheduleChecks.Matches,OceanScheduleChecks.Mismatches+1);
             log.Warning("Ocean schedule check: the game says route {0}, the timetable gives {1} / {2} for departure {3:u}.",frame.RouteId,expected.Aldenard?.Id ?? 0,expected.Othard?.Id ?? 0,expected.At);
         }
+        RecordOceanSighting(timetable,Math.Max(0,slot),frame.RouteId);
+    }
+
+    private void RecordOceanSighting(OceanSchedule timetable,long slot,uint route)
+    {
+        if(timetable.PortOf(route) is not { } port){log.Warning("Ocean schedule: route {0} is not in one port's column of the loop; sighting not kept.",route);return;}
+        var sightings=configuration.OceanSightings ??= [];
+        if(!sightings.Any(sighting=>sighting.Slot==slot && sighting.Route==route))
+        {
+            sightings.Add(new OceanSighting{Slot=slot,Route=route});
+            if(sightings.Count>64)sightings.RemoveAt(0);
+            try{save();}catch(Exception error){log.Warning(error,"Ocean fishing sighting could not be saved.");}
+            oceanPortStates=null;
+        }
+        var state=timetable.State(port,sightings);
+        log.Information("Ocean schedule sighting: slot {0}, loop row {1}, port {2}, route {3}; {4} sighting(s) of this port, {5} shift(s) still possible ({6}): {7}.",
+            slot,slot%Math.Max(1,timetable.Count),port,route,state.Sightings,state.Candidates.Count,state.Check,string.Join(", ",state.Candidates.Take(24)));
     }
 
     internal void DrawOceanVoyagePanel()

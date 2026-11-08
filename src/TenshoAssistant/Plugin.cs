@@ -603,12 +603,16 @@ public sealed class Plugin : IDalamudPlugin
                     var spots=data.GetExcelSheet<Lumina.Excel.Sheets.IKDSpot>().Where(row=>row.PlaceName.RowId!=0)
                         .ToDictionary(row=>row.RowId,row=>new Gathering.OceanSpot(row.RowId,row.PlaceName.ValueNullable?.Name.ExtractText() ?? "",row.SpotMain.RowId,row.SpotSub.RowId));
                     var fishingSpots=data.GetExcelSheet<Lumina.Excel.Sheets.FishingSpot>();
-                    var spotFish=new Dictionary<uint,IReadOnlyList<uint>>();
+                    var spotFish=new Dictionary<uint,IReadOnlyList<uint>>();var territories=new HashSet<uint>();
                     foreach(var id in spots.Values.SelectMany(spot=>new[]{spot.MainSpot,spot.SpectralSpot}).Where(id=>id!=0).Distinct())
-                        if(fishingSpots.GetRowOrDefault(id) is { } fishingSpot)spotFish[id]=fishingSpot.Item.Select(item=>item.RowId).Where(item=>item!=0).ToArray();
+                        if(fishingSpots.GetRowOrDefault(id) is { } fishingSpot)
+                        {
+                            spotFish[id]=fishingSpot.Item.Select(item=>item.RowId).Where(item=>item!=0).ToArray();
+                            if(fishingSpot.TerritoryType.RowId!=0)territories.Add(fishingSpot.TerritoryType.RowId);
+                        }
                     var missions=data.GetExcelSheet<Lumina.Excel.Sheets.IKDPlayerMissionCondition>().Where(row=>!row.Unknown0.IsEmpty)
                         .ToDictionary(row=>row.RowId,row=>new Gathering.OceanMission(row.Unknown0.ExtractText(),row.Unknown1));
-                    return new Gathering.OceanVoyageData(routes,spots,spotFish,missions);
+                    return new Gathering.OceanVoyageData(routes,spots,spotFish,missions){Territories=territories};
                 }
                 catch(Exception error){log.Warning(error,"Ocean fishing voyage data unavailable.");return null;}
             });

@@ -65,7 +65,10 @@ internal sealed partial class MainWindow
     internal void DrawFishingPanel()
     {
         if(windowDisposed || fishingNow?.Invoke() is not { } now)return;
-        var automatic=configuration.FishingPanel && now.Fishing && now.Job==18;
+        // X-85 V1 (0.917): at sea the usual help picks a wrong spot or none: off while the voyage director is read, or in an ocean fishing
+        // territory (read in the game data) when it is not; the ocean voyage panel takes over. Opening it by hand still works.
+        var atSea=OceanVoyage?.Frame is not null || OceanVoyageData?.Invoke()?.Territories.Contains(now.Territory)==true;
+        var automatic=configuration.FishingPanel && now.Fishing && now.Job==18 && !atSea;
         if(!automatic && !fishingPanelManual)return;
         var spot=fishingSpotAt?.Invoke(now.Territory,now.X,now.Z);
         var title=localization.Format("FishingPanel.Title",spot?.Name ?? localization.Get("FishingPanel.NoSpotTitle"));

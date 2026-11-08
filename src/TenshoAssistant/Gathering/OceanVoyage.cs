@@ -19,7 +19,11 @@ public sealed record OceanMission(string Text,int Target);
 /// fish of each fishing spot (FishingSpot.Item) and the missions. docs/evidence/0.418-ocean-voyage.md.
 /// </summary>
 public sealed record OceanVoyageData(IReadOnlyDictionary<uint,(uint[] Spots,uint[] Times)> Routes,IReadOnlyDictionary<uint,OceanSpot> Spots,
-    IReadOnlyDictionary<uint,IReadOnlyList<uint>> SpotFish,IReadOnlyDictionary<uint,OceanMission> Missions);
+    IReadOnlyDictionary<uint,IReadOnlyList<uint>> SpotFish,IReadOnlyDictionary<uint,OceanMission> Missions)
+{
+    /// <summary>X-85 V1 (0.917): the territories of the ocean fishing spots (FishingSpot.TerritoryType of every IKDSpot spot), read in the game data.</summary>
+    public IReadOnlySet<uint> Territories { get; init; }=new HashSet<uint>();
+}
 
 /// <summary>The stop being fished: its place, moment, the spot (spectral or not) and its fish; the next stop when there is one.</summary>
 public sealed record OceanStopView(int Index,OceanSpot Spot,OceanTime Time,bool Spectral,IReadOnlyList<uint> Fish,OceanSpot? NextSpot,OceanTime NextTime);

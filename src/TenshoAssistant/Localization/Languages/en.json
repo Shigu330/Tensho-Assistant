@@ -5972,6 +5972,15 @@
     "TimeSunset": "sunset",
     "TimeUnknown": "?",
     "Stop": "Stop {0}: {1} ({2})",
+    "PortVerified": "{0}: timetable checked in game ({1} voyage(s) seen).",
+    "PortUnverified": "{0}: timetable not checked in game yet (community alignment). It is checked each time you board.",
+    "PortUnsettled": "{0}: {1} voyage(s) seen agree with the timetable, {2} alignments still possible: board again to settle it.",
+    "PortContradicted": "{0}: the game contradicted the community timetable; {1} alignments still possible: the routes that can leave are shown. Board again to settle it.",
+    "PortInconsistent": "{0}: the {1} voyage(s) seen fit no alignment of the loop: timetable unknown (please report it).",
+    "Possible": "one of: {0}",
+    "PossibleMany": "? ({0} voyages possible)",
+    "PossibleTip": "The voyages seen in game do not settle this port yet: these are the voyages that can leave at this time.",
+    "UnverifiedTip": "Not checked in game yet for this port: it is settled by the voyages you board.",
     "Help": "One departure every 2 hours; boarding lasts 15 minutes. Times computed from the game's loop (144 departures); hover a voyage: its stops."
   },
   "FontSettings": {
