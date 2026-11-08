@@ -14,7 +14,7 @@ internal static class DropsByName819Tests
         ("Drops by name: the nearby monsters use the row, the name and the wiki's copies, without a request",() =>
         {
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.NearbyMonsters.cs"));
-            Check(page.Contains("data.ItemsDroppedBy(id).Concat(names.TryGetValue(id,out var name) ? data.ItemsDroppedByName(name):[])") && page.Contains("wiki.Warm(item);"),"three sources");
+            Check(page.Contains(".Concat(data.ItemsDroppedBy(id)).Concat(names.TryGetValue(id,out var name) ? data.ItemsDroppedByName(name):[])") && page.Contains("wiki.Warm(item);"),"three sources");
             var wiki=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Monsters/WikiMonsterSources.cs"));
             Check(wiki.Contains("_=ReadCachedAsync(itemId,disposal.Token);") && wiki.Contains("public WikiMonsterDocument? Cached(uint itemId)"),"disk and memory only");
         }),

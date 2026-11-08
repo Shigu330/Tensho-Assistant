@@ -114,6 +114,20 @@ internal sealed partial class MainWindow
                 finally{ImGui.PopID();}
             }
         }
+        // X-75.2 (0.875): what you saw this item give (desynthesis, opened), before LuminaSupplemental's lists.
+        if(Seen()?.GivesBySource.GetValueOrDefault(id) is { Length:>0 } seenGives
+           && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.SeenGives",seenGives.Length)+"###UseSeenGives"))
+        {
+            ImGui.Indent();
+            foreach(var result in seenGives)
+            {
+                var got=items?.Find(result);
+                ImGui.PushID((int)result);
+                try{if(ItemCell(got,result,20,got is null ? result.ToString():null))focusUsesTab=true;}
+                finally{ImGui.PopID();}
+            }
+            ImGui.Unindent();
+        }
         if(lumina?.State.Data is { } data)
         {
             var given=data.GivesOf(id);

@@ -17,6 +17,19 @@ internal sealed partial class MainWindow
     internal void ConfigureWikiSources(WikiMonsterSources service)=>wikiMonsterSources=service;
     private void DrawWikiMonsterSources(uint id)
     {
+        // X-75.2 (0.875): the monsters you saw dropping it come first, with where you saw them; then the community lists.
+        if(Seen()?.MonstersByItem.GetValueOrDefault(id) is { Length:>0 } seenMonsters
+           && TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.SeenDrops")+"###SeenMonsters",ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            foreach(var monster in seenMonsters)
+            {
+                ImGui.BulletText(DiscoveryMonsterName(monster));
+                ImGui.Indent();
+                try{DrawSeenPlaces("SeenLoot"+monster,subject=>subject==monster,DiscoveryMonsterName(monster));}
+                finally{ImGui.Unindent();}
+            }
+            ImGui.TextDisabled(localization.Get("MonsterUi.SeenDropsHelp"));
+        }
         // LuminaSupplemental first (0.190): monsters dropping the item, from MobDrop with names from the game sheet BNpcName.
         lumina?.Request();
         if(lumina?.State.Data?.MonstersOf(id) is { Count:>0 } mobs && TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.Lumina")+"###LuminaMonsters",ImGuiTreeNodeFlags.DefaultOpen))

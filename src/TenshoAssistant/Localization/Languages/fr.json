@@ -1165,6 +1165,7 @@
     "MissingTip": "Ne garde que les objets de collection (monture, mascotte, carte, rouleau) que vous n'avez pas encore."
   },
   "ItemUseRefs": {
+    "SeenGives": "Vu donner ({0}, par vous)",
     "Currency": "Monnaie : échangeable contre {0} objet(s)",
     "CurrencyHelp": "Boutiques du jeu qui acceptent cet objet comme paiement ; clic sur un PNJ = outil Vendeurs, sur un objet = sa fiche.",
     "Gives": "Ce qu'il donne ({0})",
@@ -2709,6 +2710,7 @@
     "RefreshTip": "Recharge le butin depuis Garland Tools, sans passer par la copie gardée."
   },
   "SourceLinks": {
+    "SeenFromItem": "De {0} (vu par vous)",
     "GroupAchievements": "Hauts faits ({0})",
     "GroupDuties": "Contenus ({0})",
     "GroupFromItems": "À partir d'autres objets ({0})",
@@ -3632,6 +3634,8 @@
     "BackToItem": "Retour à la recherche par objet"
   },
   "MonsterUi": {
+    "SeenDrops": "Vu le laisser (par vous)",
+    "SeenDropsHelp": "Monstres vaincus juste avant de recevoir cet objet, avec l'endroit où vous les avez vus. Appris en jeu : Monde › Découvertes.",
     "Lumina": "Source principale · LuminaSupplemental",
     "LuminaHelp": "Monstres qui lâchent cet objet (LuminaSupplemental, Critical-Impact) ; lieux : wiki et Garland ci-dessous.",
     "Title": "Butin des monstres",

@@ -1165,6 +1165,7 @@
     "MissingTip": "Keeps only the collection items (mount, minion, card, roll) you do not have yet."
   },
   "ItemUseRefs": {
+    "SeenGives": "Seen giving ({0}, by you)",
     "Currency": "Currency: exchangeable for {0} item(s)",
     "CurrencyHelp": "Game shops taking this item as payment; click an NPC = vendor tool, an item = its sheet.",
     "Gives": "What it gives ({0})",
@@ -2709,6 +2710,7 @@
     "RefreshTip": "Reloads the loot from Garland Tools, skipping the kept copy."
   },
   "SourceLinks": {
+    "SeenFromItem": "From {0} (seen by you)",
     "GroupAchievements": "Achievements ({0})",
     "GroupDuties": "Duties ({0})",
     "GroupFromItems": "From other items ({0})",
@@ -3632,6 +3634,8 @@
     "BackToItem": "Back to the item search"
   },
   "MonsterUi": {
+    "SeenDrops": "Seen dropping it (by you)",
+    "SeenDropsHelp": "Monsters you defeated just before receiving this item, with where you saw them. Learned in game: World › Discoveries.",
     "Lumina": "Main source · LuminaSupplemental",
     "LuminaHelp": "Monsters dropping this item (LuminaSupplemental, Critical-Impact); places: wiki and Garland below.",
     "Title": "Monster loot",

@@ -129,6 +129,27 @@ internal sealed partial class MainWindow
         return place;
     }
     internal IReadOnlyList<Npcs.NpcLocation> VendorLocations(Npcs.NpcVendor vendor)=>vendor.Locations.Count>0 ? vendor.Locations:SeenNpcPlace(vendor.NpcId) is { } seen ? [seen]:[];
+    /// <summary>
+    /// X-75.2 (0.875, user request: what was learned in game first wherever community data is read): the discoveries by monster, by item and by source item,
+    /// worked out once per change of the base (bounded reads), for the pages that still read LuminaSupplemental, Garland or the wiki.
+    /// </summary>
+    internal sealed record SeenIndex(IReadOnlyDictionary<uint,uint[]> DropsByMonster,IReadOnlyDictionary<uint,uint[]> MonstersByItem,IReadOnlyDictionary<uint,uint[]> BeastsByMonster,
+        IReadOnlyDictionary<uint,uint[]> GivesBySource,IReadOnlyDictionary<uint,uint[]> SourcesByItem,IReadOnlyDictionary<uint,uint[]> DutiesByItem);
+    private (long Revision,SeenIndex? Index) seenIndex=(-1,null);
+    internal SeenIndex? Seen()
+    {
+        if(DiscoveryStore is not { } store || !DiscoveriesLoaded)return null;
+        if(seenIndex.Revision==store.Revision)return seenIndex.Index;
+        Dictionary<uint,uint[]> By(IEnumerable<DiscoveryFact> facts,Func<DiscoveryFact,uint> key,Func<DiscoveryFact,uint> value)=>
+            facts.Where(fact=>key(fact)!=0 && value(fact)!=0).GroupBy(key).ToDictionary(group=>group.Key,group=>group.Select(value).Distinct().Take(32).ToArray());
+        var drops=store.Find(DiscoveryKind.MonsterDrop,_=>true,20_000);
+        var fromItems=store.Find(DiscoveryKind.Desynthesis,_=>true,20_000).Concat(store.Find(DiscoveryKind.ItemFromItem,_=>true,20_000)).ToArray();
+        var index=new SeenIndex(By(drops,fact=>fact.Detail,fact=>fact.Subject),By(drops,fact=>fact.Subject,fact=>fact.Detail),
+            By(store.Find(DiscoveryKind.BeastTamed,_=>true,2_000),fact=>fact.Detail,fact=>fact.Subject),By(fromItems,fact=>fact.Detail,fact=>fact.Subject),
+            By(fromItems,fact=>fact.Subject,fact=>fact.Detail),By(store.Find(DiscoveryKind.DutyChest,_=>true,20_000),fact=>fact.Subject,fact=>fact.Detail));
+        seenIndex=(store.Revision,index);
+        return index;
+    }
     private string DiscoveryItemName(uint id)=>itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}";
     private string DiscoveryDutyName(uint id)=>DutyName?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
     /// <summary>X-74 (0.860): the level column: a monster's levels, a quantity range, or the Eorzea hours a fish was caught.</summary>

@@ -53,7 +53,9 @@ internal sealed partial class MainWindow
                             if(!items.Contains(item))items.Add(item);
                         }
                 }
-            IReadOnlyList<uint> Drops(uint id)=>data.ItemsDroppedBy(id).Concat(names.TryGetValue(id,out var name) ? data.ItemsDroppedByName(name):[])
+            // X-75.2 (0.875): the drops you saw from that monster first.
+            var seenDrops=Seen()?.DropsByMonster;
+            IReadOnlyList<uint> Drops(uint id)=>(seenDrops?.GetValueOrDefault(id) ?? []).Concat(data.ItemsDroppedBy(id)).Concat(names.TryGetValue(id,out var name) ? data.ItemsDroppedByName(name):[])
                 .Concat(wikiDrops.TryGetValue(id,out var fromWiki) ? fromWiki:[]).Distinct().ToArray();
             foreach(var id in ids)
                 if(NearbyMonsters.ListDrops(id,Drops,needed) is { Count:>0 } drops)
@@ -84,10 +86,19 @@ internal sealed partial class MainWindow
                     Note(id,MonsterNoteKind.BlueSpell,localization.Format("MapView.MonsterBlueSpell",string.Join(", ",taught)));
         }
         // X-39: beasts not tamed yet, by the wiki's « tamed from » enemy; as Beastmaster, or always when chosen.
+        // X-75.2 (0.875): beasts tamed from a monster (yours or imported) count first, and without the wiki.
         if(configuration.MapView.ShowBeastMonsters && (configuration.MapView.BeastMonstersAlways || characterStats.State.JobId==BeastmasterJob)
-            && BeastWiki?.Book is { } bestiary && Beasts?.State is { Catalog:{ } beastCatalog, Obtained:{ } tamed } && EnglishMonsterIds is { } english)
+            && Beasts?.State is { Catalog:{ } beastCatalog, Obtained:{ } tamed } && (BeastWiki?.Book is not null || Seen()?.BeastsByMonster.Count>0))
         {
-            if(beastMonstersFor!=(BeastWiki.Revision,english)){beastMonstersFor=(BeastWiki.Revision,english);beastMonsters=BeastWikiParser.Map(bestiary.Rows,english);}
+            var seenBeasts=Seen()?.BeastsByMonster;
+            if(beastMonstersFor!=(BeastWiki?.Revision ?? -1,(object?)EnglishMonsterIds ?? seenBeasts))
+            {
+                beastMonstersFor=(BeastWiki?.Revision ?? -1,(object?)EnglishMonsterIds ?? seenBeasts);
+                var map=BeastWiki?.Book is { } bestiary && EnglishMonsterIds is { } english ? BeastWikiParser.Map(bestiary.Rows,english).ToDictionary(pair=>pair.Key,pair=>pair.Value.ToList()):[];
+                foreach(var (monster,list) in seenBeasts ?? new Dictionary<uint,uint[]>())
+                    map[monster]=list.Concat(map.GetValueOrDefault(monster) ?? []).Distinct().ToList();
+                beastMonsters=map.ToDictionary(pair=>pair.Key,pair=>(IReadOnlyList<uint>)pair.Value);
+            }
             var names=beastCatalog.Beasts.ToDictionary(beast=>beast.Id,beast=>beast.Name);
             foreach(var id in ids)
                 if(beastMonsters.TryGetValue(id,out var beasts) && beasts.Where(beast=>!tamed.Contains(beast) && names.ContainsKey(beast)).Select(beast=>names[beast]).ToArray() is { Length:>0 } wild)
