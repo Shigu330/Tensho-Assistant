@@ -12,7 +12,7 @@ public enum MapLocalKind { QuestIssuer, GatheringPoint, FishingSpot, Sightseeing
 /// GatheringPointBase). MapId is 0 when the row gives no map: gathering points take the map of their catalogue source.
 /// Proof of the links: docs/evidence/0.114.0-local-probe.log (Fate.Location is not a Level row, so FATEs have no static position).
 /// Fishing spots (0.126): FishingSpot.X/Z are map texture pixels (docs/evidence/0.126.0-fishing-probe.log, equal to Garland's
-/// coordinates for spots 2 and 35), converted to world X/Z; their radius unit is unproven, so Radius is 0.
+/// coordinates for spots 2 and 35), converted to world X/Z; 0.894: their radius from FishingSpot.Radius × FishingSpotRadiusFactor (texture pixels), in world units.
 /// </summary>
 // Sightseeing (0.127): Id = Adventure row, Data = its discovered picture icon, Name = vista name (Adventure → Level).
 // AetherCurrent (0.127): Id = AetherCurrent row; field currents placed by the Level whose Object is the EObj carrying it
@@ -86,7 +86,13 @@ public static class MapLocalIndexCache
     public const int MaximumRows=200_000;
     // Bump when the Lumina → MapLocalPosition copy rules change without a change of record shape.
     // 2: quest giver rows carry the quest kind's map icon in Data (0.151).
-    private const int CopyRules=2;
+    // 3: fishing spots carry their area (0.894, FishingSpotRadiusFactor).
+    private const int CopyRules=3;
+    /// <summary>
+    /// X-78 (0.894, docs/evidence/0.894-fishing-spot-area.md): FishingSpot.Radius in map texture pixels (as FishingSpot.X/Z), measured on the fishing log's own map
+    /// of La Mer de Rubis (user capture): spots of radius 1000 drew circles of about 155 texture pixels, the 2000 one about 310. Approximate (±5 %).
+    /// </summary>
+    public const float FishingSpotRadiusFactor=0.155f;
     public static readonly string Shape=CatalogCacheKeys.Shape(typeof(MapLocalPosition),typeof(MapLocalKind));
     public static string Version(string dataVersion)=>CatalogCacheKeys.Version(dataVersion,CopyRules,Shape);
     public static bool Valid(MapLocalIndexCacheData? data,string dataVersion)

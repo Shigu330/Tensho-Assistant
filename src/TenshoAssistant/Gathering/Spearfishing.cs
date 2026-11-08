@@ -48,8 +48,8 @@ public static class Spearfishing
 }
 
 /// <summary>R-15 (0.417): what Tensho read in the game's spearfishing window, with the zone and the window's place on screen.</summary>
-/// <summary>0.891: PointId = the GatheringPoint row of the node targeted when the window opened (0 when none was seen).</summary>
-public sealed record SpearfishFrame(IReadOnlyList<SpearfishSlot> Slots,uint TerritoryId,float X,float Y,float Width,DateTimeOffset ObservedAt,uint PointId=0);
+/// <summary>0.891, 0.894: BaseId = the GatheringPointBase row of the node targeted when the window opened (0 when none was seen).</summary>
+public sealed record SpearfishFrame(IReadOnlyList<SpearfishSlot> Slots,uint TerritoryId,float X,float Y,float Width,DateTimeOffset ObservedAt,uint BaseId=0);
 
 /// <summary>X-79 (0.891): one fish of the point in the spearfishing panel: its shadow (yours first, else GatherBuddy's), and whether a shadow like it is in sight.</summary>
 public sealed record SpearfishRow(uint Fish,int? Size,int? Speed,bool Seen,bool InSight);

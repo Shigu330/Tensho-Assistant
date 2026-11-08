@@ -30,7 +30,8 @@ internal sealed partial class MainWindow
         if(seenShadows.Shadows.Count<1024)seenShadows.Shadows[fish]=shadow;
         return shadow;
     }
-    /// <summary>X-79 (0.891): the spearfishing fish of the node, else of the zone (catalogue rows of type 4 or 5); worked out once per node.</summary>
+    /// <summary>X-79 (0.891, 0.894: by the node's base, as the game's node tooltip lists them): the spearfishing fish of the node, else of the zone (catalogue rows of
+    /// type 4 or 5); worked out once per node.</summary>
     private (uint Point,uint Territory,object? Catalog,bool OfPoint,uint[] Fish) spearFishOf=(0,0,null,false,[]);
     private (bool OfPoint,uint[] Fish) SpearfishOf(uint point,uint territory)
     {
@@ -38,7 +39,7 @@ internal sealed partial class MainWindow
         if(catalog is null)return (false,[]);
         if(spearFishOf.Point!=point || spearFishOf.Territory!=territory || !ReferenceEquals(spearFishOf.Catalog,catalog))
         {
-            var ofPoint=point==0 ? []:catalog.Sources.Where(source=>source.PointId==point && source.TypeId is 4 or 5).Select(source=>source.ItemId).Distinct().ToArray();
+            var ofPoint=point==0 ? []:catalog.Sources.Where(source=>source.BaseId==point && source.TypeId is 4 or 5).Select(source=>source.ItemId).Distinct().ToArray();
             var fish=ofPoint.Length>0 ? ofPoint:catalog.Sources.Where(source=>source.TerritoryId==territory && source.TypeId is 4 or 5).Select(source=>source.ItemId).Distinct().ToArray();
             spearFishOf=(point,territory,catalog,ofPoint.Length>0,fish);
         }
@@ -54,7 +55,7 @@ internal sealed partial class MainWindow
             var data=gatherBuddyFish?.State.Data;
             var items=itemCatalog.State.Catalog;
             (int,int)? Community(uint fish)=>data?.Find(fish) is { SpearSize:{ } size,SpearSpeed:{ } speed } ? (size,speed):null;
-            var (ofPoint,fishHere)=SpearfishOf(frame.PointId,frame.TerritoryId);
+            var (ofPoint,fishHere)=SpearfishOf(frame.BaseId,frame.TerritoryId);
             var rows=Gathering.Spearfishing.Rows(fishHere,SeenShadowOf,Community,frame.Slots);
             // 0.892 (user report: « it changes all the time »): a fixed layout. Three slot lines always, absent ones as « — »; the list keeps its rows and its widths, the
             // fish in sight are only coloured and marked in front.
@@ -89,7 +90,7 @@ internal sealed partial class MainWindow
                 else if(row.Size is null)ImGui.TextDisabled(text);
                 else ImGui.TextColored(Muted,text);
             }
-            if(developerMode)ImGui.TextDisabled($"node {frame.PointId} · {fishHere.Length} fish · slots "+string.Join(" ",frame.Slots.Select(slot=>$"{(slot.Available ? 1:0)}/{slot.Size}/{slot.Speed}")));
+            if(developerMode)ImGui.TextDisabled($"node base {frame.BaseId} · {fishHere.Length} fish · slots "+string.Join(" ",frame.Slots.Select(slot=>$"{(slot.Available ? 1:0)}/{slot.Size}/{slot.Speed}")));
             if(data is null)ImGui.TextDisabled(localization.Get("Spearfishing.NoData"));
             ImGui.TextDisabled(localization.Get("Spearfishing.Credit"));
         });

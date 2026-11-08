@@ -28,6 +28,11 @@ internal static class Spearfish890Tests
             Check(panel.Contains("for(var index=0;index<3;index++)") && panel.Contains("var listed=ofPoint ? rows:rows.Where(row=>row.Seen || row.InSight).ToArray();"),"fixed layout");
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/SpearfishingReader.Dalamud.cs"));
             Check(reader.Contains("if(lastPoint==0 && point() is var target and not 0)"),"node kept");
+            // 0.894: the node by its base; fishing spots with an area.
+            var factor=TenshoAssistant.Maps.MapLocalIndexCache.FishingSpotRadiusFactor;
+            Check(panel.Contains("source.BaseId==point && source.TypeId is 4 or 5") && factor>0.14f && factor<0.17f,"base, area");
+            var loader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs"));
+            Check(loader.Contains("spot.Radius*MapLocalIndexCache.FishingSpotRadiusFactor/scale"),"fishing spot radius");
             Check(panel.Contains("DrawItemIcon(items?.Find(row.Fish),new Vector2(side));") && panel.Contains("DrawItemIcon(items?.Find(match.Fish),new Vector2(ImGui.GetTextLineHeight()));"),"icons");
         }),
     ];

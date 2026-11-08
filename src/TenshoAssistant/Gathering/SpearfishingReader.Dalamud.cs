@@ -33,7 +33,7 @@ internal sealed class SpearfishingReader : IDisposable
                 if(!client.IsLoggedIn || handle.IsNull || !handle.IsReady || !handle.IsVisible || gui.GameUiHidden){Volatile.Write(ref frame,null);lastPoint=0;return;}
                 // 0.891 (X-79): the node targeted (a GatheringPoint row), kept while the window stays open. 0.892 (user capture: the zone's list was shown): the first
                 // node found is kept (no change while the window is open), else the nearest one; written once to the log.
-                if(lastPoint==0 && point() is var target and not 0){lastPoint=target;log.Information("Spearfishing window: node {0}.",target);}
+                if(lastPoint==0 && point() is var target and not 0){lastPoint=target;log.Information("Spearfishing window: node base {0}.",target);}
                 var addon=(AddonSpearFishing*)handle.Address;var unit=(AtkUnitBase*)handle.Address;
                 if(unit->RootNode==null || addon->Fish.Length!=3){Volatile.Write(ref frame,null);return;}
                 var slots=new SpearfishSlot[3];
@@ -42,7 +42,7 @@ internal sealed class SpearfishingReader : IDisposable
                     var fish=addon->Fish[index];
                     slots[index]=new(index,fish.Available,(int)fish.Size,fish.Speed,fish.GuaranteedLarge,fish.InverseDirection);
                 }
-                Volatile.Write(ref frame,new SpearfishFrame(slots,client.TerritoryType,unit->X,unit->Y,unit->RootNode->Width*unit->Scale,DateTimeOffset.UtcNow,lastPoint));
+                Volatile.Write(ref frame,new SpearfishFrame(slots,client.TerritoryType,unit->X,unit->Y,unit->RootNode->Width*unit->Scale,DateTimeOffset.UtcNow,BaseId:lastPoint));
             }
             catch(Exception error)
             {

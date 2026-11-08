@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.894.0
+- Plan global, Verify : Retours de l'utilisateur (captures) : l'aide au harpon montrait toujours la liste de la zone, et le carnet de pêche dessine une zone pour les trous de pêche. Harpon (X-79) : le point visé était bien trouvé (32074 à 32076), mais plusieurs points partagent une même base de récolte (465) et le catalogue n'en garde qu'un ; le point est maintenant reconnu par sa base, ce qui donne les six poissons que le jeu montre pour ce point. Carte (X-78) : la zone des trous de pêche est dessinée, son rayon mesuré sur la carte du carnet de pêche (trois trous de La Mer de Rubis : environ 0,155 × le rayon du jeu, en pixels de carte, à ±5 % ; preuve : docs/evidence/0.894-fishing-spot-area.md). Non validé en jeu.
+- Tests : Spearfish890Tests. Verify.ps1 (agent) : 1477/1477, 0 avertissement, 0 erreur ; DLL 0.894.0.0. Non validé en jeu.
+### English
+- User's reports (captures): the spearfishing help still listed the whole zone, and the fishing log draws an area for fishing spots. Spearfishing (X-79): the node was found (32074 to 32076), but several points share one gathering base (465) and the catalogue keeps one; the node is now recognised by its base, giving the six fish the game shows for it. Map (X-78): fishing spots get their area, its radius measured on the fishing log's map (three spots of La Mer de Rubis: about 0.155 × the game's radius, in map pixels, ±5 %; evidence: docs/evidence/0.894-fishing-spot-area.md). Not validated in game.
+
 ## 0.893.0
 - Plan global, Verify : Demande de l'utilisateur (X-79) : l'aide au harpon montre l'icône de chaque poisson pour aider visuellement. Chaque poisson de la liste a son icône (survol : la fiche de l'objet), avec un cadre en couleur quand son ombre est en vue ; chaque ligne d'emplacement montre les icônes des poissons de la liste qui ont cette ombre (quatre au plus). La mise en page reste fixe. Non validé en jeu.
 - Tests : Spearfish890Tests. Verify.ps1 (agent) : 1477/1477, 0 avertissement, 0 erreur ; DLL 0.893.0.0. Non validé en jeu.
