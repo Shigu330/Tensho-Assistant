@@ -620,7 +620,7 @@
     "Disconnect": "Déconnecter",
     "DisconnectTip": "Oublie l'autorisation sur ce PC. Pour la retirer tout à fait : github.com › Settings › Applications › Tensho Assistant.",
     "AutoExchange": "Échange automatique",
-    "AutoExchangeTip": "Une fois par jour au plus : récupère les découvertes communes et, si GitHub est connecté, envoie vos nouvelles. Rien n'est envoyé tant que c'est coupé.\nPar défaut : désactivé.",
+    "AutoExchangeTip": "Une fois par jour au plus : récupère les découvertes communes et, si GitHub est connecté, envoie vos nouvelles. Rien n'est envoyé tant que c'est coupé. Ne fonctionne que si « Noter les découvertes » est activé (grisé sinon).\nPar défaut : désactivé.",
     "ExchangedAt": "Dernier échange : {0}",
     "ExchangeDone": "Échange fait : {0} nouvelles, {1} jointes. {2} {3}",
     "CommonTaken": "Fichier commun récupéré.",
@@ -797,9 +797,9 @@
     "Language": "Langue de Tensho. Par défaut : celle du jeu. Les textes manquants d'une langue s'affichent en anglais.",
     "Theme": "Couleurs de Tensho. « Suivre le jeu » reprend le thème choisi dans les options du jeu. Par défaut : suivre le jeu.",
     "CraftLog": "Panneau d'aide aux macros à côté du carnet de synthèse du jeu, pour la recette ouverte.\nPar défaut : activé.",
-    "Steps": "Nombre maximal d'actions qu'explore la recherche de rotation d'artisanat. Plus haut = plus long à calculer.\nPar défaut : 40.",
-    "Width": "Nombre de pistes gardées à chaque étape de la recherche. Plus haut = meilleur résultat possible, mais plus lent.\nPar défaut : 128.",
-    "Budget": "Nombre maximal de transitions examinées avant d'arrêter la recherche. Évite un calcul trop long sur les grosses recettes.\nPar défaut : 100 000.",
+    "Steps": "Nombre maximal d'actions qu'explore la recherche de rotation d'artisanat. Plus haut = plus long à calculer. Sert à la recherche de Tensho : quand Raphael est désactivé, ou quand Raphael échoue (grisé tant que Raphael est activé).\nPar défaut : 40.",
+    "Width": "Nombre de pistes gardées à chaque étape de la recherche. Plus haut = meilleur résultat possible, mais plus lent. Sert à la recherche de Tensho : quand Raphael est désactivé, ou quand Raphael échoue (grisé tant que Raphael est activé).\nPar défaut : 128.",
+    "Budget": "Nombre maximal de transitions examinées avant d'arrêter la recherche. Évite un calcul trop long sur les grosses recettes. Sert à la recherche de Tensho : quand Raphael est désactivé, ou quand Raphael échoue (grisé tant que Raphael est activé).\nPar défaut : 100 000.",
     "Wait": "Secondes ajoutées après chaque action dans les macros générées (lag réseau). 0 = attentes normales du jeu.\nPar défaut : 0.",
     "Echo": "Ajoute une ligne de message sonore à la fin de chaque bloc de macro généré, pour savoir qu'il est fini.\nPar défaut : activé.",
     "MacroBook": "Où copier les macros dans le jeu : macros individuelles (ce personnage) ou partagées (tous les personnages).\nPar défaut : macros individuelles.",
@@ -1114,7 +1114,7 @@
     "HidePanelsBehindGame": "Panneaux effacés devant les fenêtres du jeu",
     "HidePanelsBehindGameTip": "Un panneau à côté d'une fenêtre du jeu se cache quand une autre fenêtre du jeu passe devant lui, et revient ensuite.\nPar défaut : activé.",
     "HideBarsBehindGame": "Barres et panneaux libres effacés devant les fenêtres du jeu",
-    "HideBarsBehindGameTip": "Les barres de PR et d'usure, le suivi et les tâches à l'écran se cachent quand une fenêtre du jeu les touche, et reviennent ensuite.\nPar défaut : activé.",
+    "HideBarsBehindGameTip": "Les barres de PR et d'usure, le suivi, les tâches à l'écran et les panneaux de liste (avec leur propre case) se cachent quand une fenêtre du jeu les touche, et reviennent ensuite.\nPar défaut : activé.",
     "CharacterPanelTip": "Ouvre le panneau des stats réelles (%) à côté de la fenêtre Personnage du jeu.\nPar défaut : activé.",
     "ReloadTip": "Relit les fichiers de langue sans relancer le plugin.",
     "ObservationTip": "Lit en direct une fenêtre du jeu (rien n'est modifié) ; désactivez-le si vous n'utilisez pas l'outil.",
@@ -4017,7 +4017,7 @@
     "ChannelTip": "Une adresse de webhook Discord pour cette catégorie. Enregistrée quand vous quittez le champ ; videz-le pour revenir à l'adresse principale. Ce qui attendait d'être envoyé est abandonné quand elle change.\nPar défaut : vide (l'adresse principale).",
     "SetInReminders": "Discord : réglé dans Rappels",
     "DutyPop": "Mission prête",
-    "DutyPopTip": "Envoie l'alerte « mission prête » (Alarmes) quand elle est activée.\nPar défaut : activé.",
+    "DutyPopTip": "Envoie l'alerte « mission prête » (Alarmes) quand elle est activée. Grisé tant que « Alerte quand une mission est prête » (réglages des alarmes) est désactivé : il n'y a alors rien à envoyer.\nPar défaut : activé.",
     "Title": "Discord",
     "Help": "Envoie les alarmes Tensho dans un salon de votre serveur Discord, par un webhook (Discord › Paramètres du salon › Intégrations › Webhooks › Copier l'URL). Rien n'est envoyé tant que l'adresse n'est pas saisie et l'envoi activé, sauf le bouton « Envoyer un test », sur votre clic. Seul le message de l'alarme part, et le nom du personnage seulement si vous l'ajoutez. Les alarmes écrites dans la liste du jeu sonnent dans le jeu ; elles sont quand même envoyées sur Discord. Effacer l'adresse ou couper l'envoi abandonne les messages encore en attente.",
     "Enabled": "Envoyer les alarmes sur Discord",
@@ -4068,7 +4068,7 @@
     "MentionInvalid": "Identifiant refusé : collez l'identifiant numérique du rôle (17 à 20 chiffres) ou sa mention <@&…>. Il n'est pas enregistré.",
     "Blocked": "Discord a demandé une pause : prochain envoi dans {0} s.",
     "Currencies": "Monnaies",
-    "CurrenciesTip": "Envoie les alertes de plafond des monnaies (Rangements › Monnaies) dans ce salon.\nPar défaut : activé."
+    "CurrenciesTip": "Envoie les alertes de plafond des monnaies (Rangements › Monnaies) dans ce salon. Grisé tant que « Alertes de plafond » (Rangements › Monnaies) est désactivé : il n'y a alors rien à envoyer.\nPar défaut : activé."
   },
   "Credits": {
     "Title": "Crédits",
@@ -6613,7 +6613,7 @@
     "HideInCombat": "Cacher ces panneaux en combat",
     "HideInCombatTip": "Désactivé : un panneau de liste reste affiché tant que vous ne le coupez pas.\nPar défaut : désactivé.",
     "HideBehindGame": "Cacher ces panneaux derrière les fenêtres du jeu",
-    "HideBehindGameTip": "Activé : un panneau s'écarte quand une fenêtre du jeu le touche, puis revient.\nPar défaut : désactivé."
+    "HideBehindGameTip": "Activé : un panneau s'écarte quand une fenêtre du jeu le touche, puis revient. Il faut que Paramètres › Données › « Barres et panneaux libres effacés devant les fenêtres du jeu » soit activé (grisé sinon).\nPar défaut : désactivé."
   },
   "Relics": {
     "Subtitle": "Les armes et armures reliques de chaque extension, d'après le jeu.",

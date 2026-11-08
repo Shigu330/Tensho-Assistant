@@ -76,27 +76,41 @@ internal sealed partial class MainWindow
             if(settings.WebhookUrl.Length==0)ImGui.TextDisabled(localization.Get("Discord.UrlEmpty"));
             else ImGui.TextColored(Success,localization.Format("Discord.UrlSaved",DiscordWebhook.Redact(settings.WebhookUrl)));
         }
-        DiscordText("Discord.Username","Discord.UsernameTip",ref discordNameEdit,()=>configuration.Discord.Username,value=>configuration.Discord.Username=value,DiscordDefaults.Username,80,"",
-            typed=>DiscordWebhook.Username(typed));
-        DiscordText("Discord.Template","Discord.TemplateTip",ref discordTemplateEdit,()=>configuration.Discord.Template,value=>configuration.Discord.Template=value,DiscordDefaults.Template,300,
-            localization.Get("Discord.DefaultTemplate"),typed=>typed.Trim());
-        ImGui.TextDisabled(localization.Get("Discord.Categories"));
+        // X-76 step 3 (0.952): every post goes through ShouldSend, which needs « Post alarms to Discord »: what shapes a post is indented
+        // under it and greyed while it is off. The address and the test post (sent without that switch) stay outside.
         ImGui.Indent();
+        ImGui.BeginDisabled(!configuration.Discord.Enabled);
         try
         {
-            BoolSetting("Discord.Gathering","Discord.CategoryTip",()=>configuration.Discord.Gathering,value=>configuration.Discord.Gathering=value,c=>c.Discord.Gathering);
-            BoolSetting("Discord.Fishing","Discord.CategoryTip",()=>configuration.Discord.Fishing,value=>configuration.Discord.Fishing=value,c=>c.Discord.Fishing);
-            BoolSetting("Discord.Reminders","Discord.CategoryTip",()=>configuration.Discord.Reminders,value=>configuration.Discord.Reminders=value,c=>c.Discord.Reminders);
-            BoolSetting("Discord.Voyages","Discord.CategoryTip",()=>configuration.Discord.Voyages,value=>configuration.Discord.Voyages=value,c=>c.Discord.Voyages);
-            BoolSetting("Discord.Other","Discord.CategoryTip",()=>configuration.Discord.Other,value=>configuration.Discord.Other=value,c=>c.Discord.Other);
-            BoolSetting("Discord.Currencies","Discord.CurrenciesTip",()=>configuration.Discord.Currencies,value=>configuration.Discord.Currencies=value,c=>c.Discord.Currencies);
-            BoolSetting("Discord.DutyPop","Discord.DutyPopTip",()=>configuration.Discord.DutyPop,value=>configuration.Discord.DutyPop=value,c=>c.Discord.DutyPop);
+            DiscordText("Discord.Username","Discord.UsernameTip",ref discordNameEdit,()=>configuration.Discord.Username,value=>configuration.Discord.Username=value,DiscordDefaults.Username,80,"",
+                typed=>DiscordWebhook.Username(typed));
+            DiscordText("Discord.Template","Discord.TemplateTip",ref discordTemplateEdit,()=>configuration.Discord.Template,value=>configuration.Discord.Template=value,DiscordDefaults.Template,300,
+                localization.Get("Discord.DefaultTemplate"),typed=>typed.Trim());
+            ImGui.TextDisabled(localization.Get("Discord.Categories"));
+            ImGui.Indent();
+            try
+            {
+                BoolSetting("Discord.Gathering","Discord.CategoryTip",()=>configuration.Discord.Gathering,value=>configuration.Discord.Gathering=value,c=>c.Discord.Gathering);
+                BoolSetting("Discord.Fishing","Discord.CategoryTip",()=>configuration.Discord.Fishing,value=>configuration.Discord.Fishing=value,c=>c.Discord.Fishing);
+                BoolSetting("Discord.Reminders","Discord.CategoryTip",()=>configuration.Discord.Reminders,value=>configuration.Discord.Reminders=value,c=>c.Discord.Reminders);
+                BoolSetting("Discord.Voyages","Discord.CategoryTip",()=>configuration.Discord.Voyages,value=>configuration.Discord.Voyages=value,c=>c.Discord.Voyages);
+                BoolSetting("Discord.Other","Discord.CategoryTip",()=>configuration.Discord.Other,value=>configuration.Discord.Other=value,c=>c.Discord.Other);
+                // X-76 step 3 (0.952): these two are sent only when their alert is on elsewhere (Storage › Currencies « Cap alerts »,
+                // Alarms « Alert when a duty is ready »): greyed while it is off, their tips name it.
+                ImGui.BeginDisabled(!configuration.CurrencyAlerts);
+                try{BoolSetting("Discord.Currencies","Discord.CurrenciesTip",()=>configuration.Discord.Currencies,value=>configuration.Discord.Currencies=value,c=>c.Discord.Currencies);}
+                finally{ImGui.EndDisabled();}
+                ImGui.BeginDisabled(configuration.AlarmOptions?.DutyPopAlert!=true);
+                try{BoolSetting("Discord.DutyPop","Discord.DutyPopTip",()=>configuration.Discord.DutyPop,value=>configuration.Discord.DutyPop=value,c=>c.Discord.DutyPop);}
+                finally{ImGui.EndDisabled();}
+            }
+            finally{ImGui.Unindent();}
+            DrawDiscordCategoryChannels();
+            BoolSetting("Discord.Character","Discord.CharacterTip",()=>configuration.Discord.IncludeCharacter,value=>configuration.Discord.IncludeCharacter=value,c=>c.Discord.IncludeCharacter);
+            DiscordText("Discord.Mention","Discord.MentionTip",ref discordRoleEdit,()=>configuration.Discord.MentionRoleId,value=>configuration.Discord.MentionRoleId=value,DiscordDefaults.MentionRoleId,32,"",
+                DiscordWebhook.RoleIdFrom,"Discord.MentionInvalid");
         }
-        finally{ImGui.Unindent();}
-        DrawDiscordCategoryChannels();
-        BoolSetting("Discord.Character","Discord.CharacterTip",()=>configuration.Discord.IncludeCharacter,value=>configuration.Discord.IncludeCharacter=value,c=>c.Discord.IncludeCharacter);
-        DiscordText("Discord.Mention","Discord.MentionTip",ref discordRoleEdit,()=>configuration.Discord.MentionRoleId,value=>configuration.Discord.MentionRoleId=value,DiscordDefaults.MentionRoleId,32,"",
-            DiscordWebhook.RoleIdFrom,"Discord.MentionInvalid");
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
         // Test post: only with a saved valid address, on the player's click; one at a time.
         var state=discordNotifier?.State;
         var ready=DiscordWebhook.IsValidUrl(settings.WebhookUrl) && state is not { Pending:>0 };

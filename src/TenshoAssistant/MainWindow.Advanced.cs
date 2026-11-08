@@ -27,16 +27,25 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.AlarmServerBar","Advanced.AlarmServerBarTip",()=>configuration.AlarmServerBar,value=>configuration.AlarmServerBar=value,c=>c.AlarmServerBar);
         BoolSetting("Advanced.ReminderServerBar","Advanced.ReminderServerBarTip",()=>configuration.ReminderServerBar,value=>configuration.ReminderServerBar=value,c=>c.ReminderServerBar);
         BoolSetting("Advanced.ReminderFinishedServerBar","Advanced.ReminderFinishedServerBarTip",()=>configuration.ReminderFinishedServerBar,value=>configuration.ReminderFinishedServerBar=value,c=>c.ReminderFinishedServerBar);
+        // X-76 step 3 (0.952): the server bar tooltip belongs to the three bar entries above (not to the tracking window it sat under):
+        // greyed while none of them is on; its count is read by the alarm entry only, greyed while that entry or the tooltip is off.
+        ImGui.Indent();
+        ImGui.BeginDisabled(!configuration.AlarmServerBar && !configuration.ReminderServerBar && !configuration.ReminderFinishedServerBar);
+        try
+        {
+            BoolSetting("Advanced.AlarmBarTooltip","Advanced.AlarmBarTooltipTip",()=>configuration.AlarmBarTooltip,value=>configuration.AlarmBarTooltip=value,c=>c.AlarmBarTooltip);
+            ImGui.Indent();
+            ImGui.BeginDisabled(!configuration.AlarmBarTooltip || !configuration.AlarmServerBar);
+            // 0.331 (audit): the sliders follow the drag in memory and save once, when released (no disk write per frame); X-76 H4 (0.914): SliderSetting.
+            try{SliderSetting("Advanced.AlarmBarTooltipCount","Advanced.AlarmBarTooltipCountTip",()=>configuration.AlarmBarTooltipCount,value=>configuration.AlarmBarTooltipCount=value,
+                1,10,DefaultConfiguration.AlarmBarTooltipCount,width:120);}
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
+        }
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
         // 0.426 (user request): close Tensho when it opens a game window.
         BoolSetting("Advanced.CloseOnGameWindow","Advanced.CloseOnGameWindowTip",()=>configuration.CloseOnGameWindow,value=>configuration.CloseOnGameWindow=value,c=>c.CloseOnGameWindow);
         // 0.415 (g, R-13): pinned tracking window.
         BoolSetting("Tracker.Setting","Tracker.SettingTip",()=>configuration.TrackerWindow,value=>configuration.TrackerWindow=value,c=>c.TrackerWindow);
-        ImGui.Indent();
-        BoolSetting("Advanced.AlarmBarTooltip","Advanced.AlarmBarTooltipTip",()=>configuration.AlarmBarTooltip,value=>configuration.AlarmBarTooltip=value,c=>c.AlarmBarTooltip);
-        // 0.331 (audit): the sliders follow the drag in memory and save once, when released (no disk write per frame); X-76 H4 (0.914): SliderSetting.
-        SliderSetting("Advanced.AlarmBarTooltipCount","Advanced.AlarmBarTooltipCountTip",()=>configuration.AlarmBarTooltipCount,value=>configuration.AlarmBarTooltipCount=value,
-            1,10,DefaultConfiguration.AlarmBarTooltipCount,width:120);
-        ImGui.Unindent();
     }
 
     private void DrawAdvancedSettings()
@@ -84,8 +93,12 @@ internal sealed partial class MainWindow
         try
         {
             BoolSetting("Settings.MarketHover","Advanced.MarketTip",()=>configuration.MarketPricesOnHover,value=>{configuration.MarketPricesOnHover=value;if(!value)market.CancelBackground();},c=>c.MarketPricesOnHover);
-            // 0.343 (I-01): refresh key for the hovered price.
-            BoolSetting("Advanced.HoverRefresh","Advanced.HoverRefreshTip",()=>configuration.HoverPriceRefresh,value=>configuration.HoverPriceRefresh=value,c=>c.HoverPriceRefresh);
+            // 0.343 (I-01): refresh key for the hovered price. X-76 step 3 (0.952): under « prices on hover », greyed while it is off (the
+            // hover reader drops the refresh with the prices, ItemHoverCoordinator).
+            ImGui.Indent();
+            ImGui.BeginDisabled(!configuration.MarketPricesOnHover);
+            try{BoolSetting("Advanced.HoverRefresh","Advanced.HoverRefreshTip",()=>configuration.HoverPriceRefresh,value=>configuration.HoverPriceRefresh=value,c=>c.HoverPriceRefresh);}
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
         }
         finally{if(!configuration.CommunityUniversalis)ImGui.EndDisabled();ImGui.Unindent();}
         // 0.346 (g, I-07): not tied to Universalis: it uses the offers the game shows when you open them.

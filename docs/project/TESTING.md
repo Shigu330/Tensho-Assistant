@@ -1544,6 +1544,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.951) Mode développeur : ouvrir l'accueil et survoler des objets ; les lignes « Slow frame » nomment les parties.
 
+- [ ] (0.952) Paramètres : décocher un réglage principal (Discord, alertes de monnaies, aide à la récolte…) grise ses parties en retrait dessous.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

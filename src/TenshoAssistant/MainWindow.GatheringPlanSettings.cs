@@ -69,16 +69,26 @@ internal sealed partial class MainWindow
     /// <summary>Settings › Modules › Gathering, and the GP page.</summary>
     private void DrawGpPlanSettings()
     {
-        BoolSetting("GatheringPanel.ListSetting","GatheringPanel.ListSettingTip",()=>configuration.GatherPlanFromList,value=>configuration.GatherPlanFromList=value,c=>c.GatherPlanFromList);
-        BoolSetting("GatheringPanel.ListHighlight","GatheringPanel.ListHighlightTip",()=>configuration.GatheringListHighlight,value=>configuration.GatheringListHighlight=value,c=>c.GatheringListHighlight);
+        // X-76 step 3 (0.952): what only the gathering and collectable panels read, under their switch and greyed while it is off; the GP
+        // regeneration (also the tick bar) and the forbidden actions (also the GP page) stay outside.
+        ImGui.Indent();
+        ImGui.BeginDisabled(!configuration.GatheringPanel);
+        try
+        {
+            BoolSetting("GatheringPanel.ListSetting","GatheringPanel.ListSettingTip",()=>configuration.GatherPlanFromList,value=>configuration.GatherPlanFromList=value,c=>c.GatherPlanFromList);
+            BoolSetting("GatheringPanel.ListHighlight","GatheringPanel.ListHighlightTip",()=>configuration.GatheringListHighlight,value=>configuration.GatheringListHighlight=value,c=>c.GatheringListHighlight);
+            // 0.728 (user request). X-76 step 3 (0.952): drawn once, here, no longer under the forbidden actions.
+            BoolSetting("GatheringPanel.NextHighlight","GatheringPanel.NextHighlightTip",()=>configuration.GatheringNextHighlight,value=>configuration.GatheringNextHighlight=value,c=>c.GatheringNextHighlight);
+            BoolSetting("CollectablePanel.UseScrutiny","CollectablePanel.UseScrutinyTip",()=>configuration.CollectableUseScrutiny,value=>configuration.CollectableUseScrutiny=value,c=>c.CollectableUseScrutiny);
+            DrawCollectableRisk();
+            if(DefaultButton("CollectableRisk",CollectableRisk.Snap(configuration.CollectableRiskTolerance)!=DefaultConfiguration.CollectableRiskTolerance)){configuration.CollectableRiskTolerance=DefaultConfiguration.CollectableRiskTolerance;SaveReminders();}
+            BoolSetting("CollectablePanel.UseFocus","CollectablePanel.UseFocusTip",()=>configuration.CollectableUseFocus,value=>configuration.CollectableUseFocus=value,c=>c.CollectableUseFocus);
+            BoolSetting("CollectablePanel.UsePriming","CollectablePanel.UsePrimingTip",()=>configuration.CollectableUsePriming,value=>configuration.CollectableUsePriming=value,c=>c.CollectableUsePriming);
+            BoolSetting("CollectablePanel.UseRestore","CollectablePanel.UseRestoreTip",()=>configuration.CollectableUseRestore,value=>configuration.CollectableUseRestore=value,c=>c.CollectableUseRestore);
+        }
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
         IntSetting("GatheringPanel.Regen","GatheringPanel.RegenTip",()=>configuration.GpRegenPerTick,value=>configuration.GpRegenPerTick=value,0,50,DefaultConfiguration.GpRegenPerTick);
         if(configuration.GpRegenBase>0)ImGui.TextDisabled(localization.Format("GatheringPanel.RegenObserved",configuration.GpRegenBase,GpTraitBonus(16),GpTraitBonus(17),GpTraitBonus(18)));
-        BoolSetting("CollectablePanel.UseScrutiny","CollectablePanel.UseScrutinyTip",()=>configuration.CollectableUseScrutiny,value=>configuration.CollectableUseScrutiny=value,c=>c.CollectableUseScrutiny);
-        DrawCollectableRisk();
-        if(DefaultButton("CollectableRisk",CollectableRisk.Snap(configuration.CollectableRiskTolerance)!=DefaultConfiguration.CollectableRiskTolerance)){configuration.CollectableRiskTolerance=DefaultConfiguration.CollectableRiskTolerance;SaveReminders();}
-        BoolSetting("CollectablePanel.UseFocus","CollectablePanel.UseFocusTip",()=>configuration.CollectableUseFocus,value=>configuration.CollectableUseFocus=value,c=>c.CollectableUseFocus);
-        BoolSetting("CollectablePanel.UsePriming","CollectablePanel.UsePrimingTip",()=>configuration.CollectableUsePriming,value=>configuration.CollectableUsePriming=value,c=>c.CollectableUsePriming);
-        BoolSetting("CollectablePanel.UseRestore","CollectablePanel.UseRestoreTip",()=>configuration.CollectableUseRestore,value=>configuration.CollectableUseRestore=value,c=>c.CollectableUseRestore);
         DrawGpForbiddenActions();
     }
 
@@ -88,8 +98,6 @@ internal sealed partial class MainWindow
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("GpUi.ForbiddenTitle",forbidden.Count)+"###GpForbiddenActions"))return;
         ImGui.TextWrapped(localization.Get("GpUi.ForbiddenHelp"));
         if(gpActions.State.Catalog is not { } catalog){ImGui.TextDisabled(localization.Get("GatheringPanel.NoPlan"));return;}
-        // 0.728 (user request).
-        BoolSetting("GatheringPanel.NextHighlight","GatheringPanel.NextHighlightTip",()=>configuration.GatheringNextHighlight,value=>configuration.GatheringNextHighlight=value,c=>c.GatheringNextHighlight);
         var changed=false;
         foreach(var (key,miner,botanist) in GpActionRules.Groups(catalog))
         {

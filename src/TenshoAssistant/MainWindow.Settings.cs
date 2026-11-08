@@ -111,23 +111,26 @@ internal sealed partial class MainWindow
             BoolSetting("Settings.HoverStock","Settings.HoverStockTip",()=>configuration.HoverShowStock,value=>configuration.HoverShowStock=value,c=>c.HoverShowStock);
             BoolSetting("Settings.HoverUsages","Settings.HoverUsagesTip",()=>configuration.HoverShowUsages,value=>configuration.HoverShowUsages=value,c=>c.HoverShowUsages);
             BoolSetting("Settings.HoverSources","Settings.HoverSourcesTip",()=>configuration.HoverShowSources,value=>configuration.HoverShowSources=value,c=>c.HoverShowSources);
-            // 0.705 (user request): its NPC vendors, set as the list panels are.
-            ImGui.Indent();
-            BoolSetting("Settings.HoverVendors","Settings.HoverVendorsTip",()=>configuration.HoverVendors,value=>configuration.HoverVendors=value,c=>c.HoverVendors);
-            if(configuration.HoverVendors)
-            {
-                BoolSetting("Settings.HoverVendorsMetOnly","Settings.HoverVendorsMetOnlyTip",()=>configuration.HoverVendorsMetOnly,value=>configuration.HoverVendorsMetOnly=value,c=>c.HoverVendorsMetOnly);
-                BoolSetting("Settings.HoverVendorsByCurrency","Settings.HoverVendorsByCurrencyTip",()=>configuration.HoverVendorsByCurrency,value=>configuration.HoverVendorsByCurrency=value,c=>c.HoverVendorsByCurrency);
-                if(configuration.HoverVendorsByCurrency)DrawCurrencyTicks("HoverVendor",()=>configuration.HoverVendorCurrenciesOn,value=>configuration.HoverVendorCurrenciesOn=value);
-            }
-            ImGui.Unindent();
             // 0.377 (g, M-07): comparison with the worn piece.
             BoolSetting("Settings.HoverCompare","Settings.HoverCompareTip",()=>configuration.HoverShowCompare,value=>configuration.HoverShowCompare=value,c=>c.HoverShowCompare);
         }
         finally{ImGui.EndDisabled();ImGui.Unindent();}
+        // 0.705 (user request): NPC vendors in item tooltips, set as the list panels are. X-76 step 3 (0.952): out of the « item uses » block,
+        // Tensho's own item tooltips (How to get, collection) use it whether that panel is on or not.
+        BoolSetting("Settings.HoverVendors","Settings.HoverVendorsTip",()=>configuration.HoverVendors,value=>configuration.HoverVendors=value,c=>c.HoverVendors);
+        if(configuration.HoverVendors)
+        {
+            ImGui.Indent();
+            BoolSetting("Settings.HoverVendorsMetOnly","Settings.HoverVendorsMetOnlyTip",()=>configuration.HoverVendorsMetOnly,value=>configuration.HoverVendorsMetOnly=value,c=>c.HoverVendorsMetOnly);
+            BoolSetting("Settings.HoverVendorsByCurrency","Settings.HoverVendorsByCurrencyTip",()=>configuration.HoverVendorsByCurrency,value=>configuration.HoverVendorsByCurrency=value,c=>c.HoverVendorsByCurrency);
+            if(configuration.HoverVendorsByCurrency)DrawCurrencyTicks("HoverVendor",()=>configuration.HoverVendorCurrenciesOn,value=>configuration.HoverVendorCurrenciesOn=value);
+            ImGui.Unindent();
+        }
         // e) (audit 2026-11-02): the whole panel under the game's item tooltip (prices included) is left out while bound by duty.
         BoolSetting("Settings.HoverHideInDuty","Settings.HoverHideInDutyTip",()=>configuration.HoverHideInDuty,value=>configuration.HoverHideInDuty=value,c=>c.HoverHideInDuty);
         BoolSetting("Settings.ContextMenu","InterfaceHelp.MenuHelp",()=>configuration.ItemContextMenuEnabled,value=>configuration.ItemContextMenuEnabled=value,c=>c.ItemContextMenuEnabled);
+        // X-76 step 3 (0.952): the item sheet and Tensho's item tooltips, not the crafting log helper it was drawn under.
+        BoolSetting("ModuleSettings.ShowEnglishItemName","ModuleSettings.ShowEnglishItemNameTip",()=>configuration.ShowEnglishItemName,value=>configuration.ShowEnglishItemName=value,c=>c.ShowEnglishItemName);
         // 0.327 (queue step e): number of item search results, shared row (tooltip and « ↺ »).
         IntSetting("Settings.ItemSearchLimit","SettingTips.ItemSearchLimit",()=>Configuration.BoundedItemSearchLimit(configuration.ItemSearchLimit),value=>configuration.ItemSearchLimit=value,Configuration.MinimumItemSearchLimit,Configuration.MaximumItemSearchLimit,DefaultConfiguration.ItemSearchLimit);
         // e) (audit 2026-11-02): scope the Market page opens on; a choice made on that page is saved here too. Plain names: the region
@@ -148,7 +151,7 @@ internal sealed partial class MainWindow
             // 0.327 (audit 2026-11-02, queue step e): compute as soon as a recipe is selected (default, as before) or only on request.
             ImGui.Indent();
             ImGui.BeginDisabled(!configuration.CraftLogHelperEnabled);
-            try{BoolSetting("ModuleSettings.ShowEnglishItemName","ModuleSettings.ShowEnglishItemNameTip",()=>configuration.ShowEnglishItemName,value=>configuration.ShowEnglishItemName=value,c=>c.ShowEnglishItemName);BoolSetting("ModuleSettings.CraftLogTryAllPresets","ModuleSettings.CraftLogTryAllPresetsTip",()=>configuration.CraftLogTryAllPresets,value=>configuration.CraftLogTryAllPresets=value,c=>c.CraftLogTryAllPresets);BoolSetting("ModuleSettings.CraftLogAutoSolve","ModuleSettings.CraftLogAutoSolveTip",()=>configuration.CraftLogAutoSolve,value=>configuration.CraftLogAutoSolve=value,c=>c.CraftLogAutoSolve);}
+            try{BoolSetting("ModuleSettings.CraftLogTryAllPresets","ModuleSettings.CraftLogTryAllPresetsTip",()=>configuration.CraftLogTryAllPresets,value=>configuration.CraftLogTryAllPresets=value,c=>c.CraftLogTryAllPresets);BoolSetting("ModuleSettings.CraftLogAutoSolve","ModuleSettings.CraftLogAutoSolveTip",()=>configuration.CraftLogAutoSolve,value=>configuration.CraftLogAutoSolve=value,c=>c.CraftLogAutoSolve);}
             finally{ImGui.EndDisabled();ImGui.Unindent();}
             DrawObservationSetting("Craft", localization.Get("ModuleSettings.ObserveCraft"),craftLive.State.Enabled,craftLive.SetEnabled);
             ImGui.TextWrapped(localization.Get("ModuleSettings.CraftHelp"));
@@ -159,22 +162,38 @@ internal sealed partial class MainWindow
             // 0.468 (user request, in-game campaign): the projection window beside the synthesis, also here.
             DrawCraftLiveSettings();
             BoolSetting("CraftSearch.SettingRaphael","CraftSearch.SolverRaphaelTip",()=>search.Raphael,value=>search.Raphael=value,c=>c.CraftSearch?.Raphael==true);
-            IntSetting("ModuleSettings.Steps","SettingTips.Steps",()=>search.Steps,value=>search.Steps=value,1,100,searchDefaults.Steps);
-            IntSetting("ModuleSettings.Width","SettingTips.Width",()=>search.Width,value=>search.Width=value,1,512,searchDefaults.Width);
-            IntSetting("ModuleSettings.Budget","SettingTips.Budget",()=>search.Budget,value=>search.Budget=value,1,500000,searchDefaults.Budget);
+            // X-76 step 3 (0.952): Tensho's own search limits, under Raphael and greyed while it is on (Raphael reads none of them; the
+            // crafting log still falls back to Tensho's search when Raphael fails, their tips say so).
+            ImGui.Indent();
+            ImGui.BeginDisabled(search.Raphael);
+            try
+            {
+                IntSetting("ModuleSettings.Steps","SettingTips.Steps",()=>search.Steps,value=>search.Steps=value,1,100,searchDefaults.Steps);
+                IntSetting("ModuleSettings.Width","SettingTips.Width",()=>search.Width,value=>search.Width=value,1,512,searchDefaults.Width);
+                IntSetting("ModuleSettings.Budget","SettingTips.Budget",()=>search.Budget,value=>search.Budget=value,1,500000,searchDefaults.Budget);
+            }
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
             ValidateCraftSearch();
             ImGui.TextDisabled(localization.Get("ModuleSettings.SearchHelp"));
             // 0.438 (user request): actions the player forbids, everywhere crafting actions are proposed.
             DrawForbiddenActions(search);
+            // X-76 step 3 (0.952): a simulator option, above the Export heading.
+            BoolSetting("ModuleSettings.AutoSimulate","ModuleSettings.AutoSimulateTip",()=>configuration.CraftSearch.AutoSimulate,value=>configuration.CraftSearch.AutoSimulate=value,c=>c.CraftSearch.AutoSimulate);
             ImGui.TextColored(Accent,localization.Get("ModuleSettings.Export"));
             var exportBefore=(search.ExtraWait,search.Echo,search.BuffExtraWait,search.EchoSound,search.EchoLastOnly);
             IntSetting("ModuleSettings.Wait","SettingTips.Wait",()=>search.ExtraWait,value=>search.ExtraWait=value,0,3,searchDefaults.ExtraWait);
             // X-12 (0.419): the buffs' extra wait apart (shown as the actions' one until changed).
             IntSetting("ModuleSettings.BuffWait","SettingTips.BuffWait",()=>search.BuffExtraWait ?? search.ExtraWait,value=>search.BuffExtraWait=value==search.ExtraWait ? null:value,0,3,search.ExtraWait);
-            BoolSetting("ModuleSettings.AutoSimulate","ModuleSettings.AutoSimulateTip",()=>configuration.CraftSearch.AutoSimulate,value=>configuration.CraftSearch.AutoSimulate=value,c=>c.CraftSearch.AutoSimulate);
             BoolSetting("ModuleSettings.Echo","SettingTips.Echo",()=>configuration.CraftSearch.Echo,value=>configuration.CraftSearch.Echo=value,c=>c.CraftSearch.Echo);
-            IntSetting("ModuleSettings.EchoSound","ModuleSettings.EchoSoundTip",()=>search.EchoSound,value=>search.EchoSound=value,0,16,searchDefaults.EchoSound);
-            BoolSetting("ModuleSettings.EchoLastOnly","ModuleSettings.EchoLastOnlyTip",()=>configuration.CraftSearch.EchoLastOnly,value=>configuration.CraftSearch.EchoLastOnly=value,c=>c.CraftSearch.EchoLastOnly);
+            // X-76 step 3 (0.952): the echo's sound and « last only » are read only with the echo (CraftMacroExport), greyed while it is off.
+            ImGui.Indent();
+            ImGui.BeginDisabled(!configuration.CraftSearch.Echo);
+            try
+            {
+                IntSetting("ModuleSettings.EchoSound","ModuleSettings.EchoSoundTip",()=>search.EchoSound,value=>search.EchoSound=value,0,16,searchDefaults.EchoSound);
+                BoolSetting("ModuleSettings.EchoLastOnly","ModuleSettings.EchoLastOnlyTip",()=>configuration.CraftSearch.EchoLastOnly,value=>configuration.CraftSearch.EchoLastOnly=value,c=>c.CraftSearch.EchoLastOnly);
+            }
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
             if(exportBefore!=(search.ExtraWait,search.Echo,search.BuffExtraWait,search.EchoSound,search.EchoLastOnly)){craftMacroExport=null;craftMacroError=null;}
             ImGui.TextDisabled(localization.Get("ModuleSettings.ExportHelp"));
             // Game macros used by « Copy into the game's macros » (0.191).

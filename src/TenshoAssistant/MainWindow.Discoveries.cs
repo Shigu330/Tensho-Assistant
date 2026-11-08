@@ -235,7 +235,10 @@ internal sealed partial class MainWindow
             if(ImGui.SmallButton(localization.Get("DiscoveriesUi.Disconnect")))exchange.Disconnect();
             Tip("DiscoveriesUi.DisconnectTip");
         }
-        BoolSetting("DiscoveriesUi.AutoExchange","DiscoveriesUi.AutoExchangeTip",()=>configuration.Discovery.AutoExchange,value=>configuration.Discovery.AutoExchange=value,c=>c.Discovery.AutoExchange);
+        // X-76 step 3 (0.952): the automatic exchange runs only while discoveries are noted (settings.Enabled), greyed while that is off; its tip says so.
+        ImGui.BeginDisabled(!configuration.Discovery.Enabled);
+        try{BoolSetting("DiscoveriesUi.AutoExchange","DiscoveriesUi.AutoExchangeTip",()=>configuration.Discovery.AutoExchange,value=>configuration.Discovery.AutoExchange=value,c=>c.Discovery.AutoExchange);}
+        finally{ImGui.EndDisabled();}
         if(exchange.Exchanged is { } last)ImGui.TextDisabled(localization.Format("DiscoveriesUi.ExchangedAt",last.ToLocalTime().ToString("g")));
         if(working)ImGui.TextDisabled(localization.Get("DiscoveriesUi.Working"));
         else if(exchange.Message is { } said)

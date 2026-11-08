@@ -39,14 +39,25 @@ internal sealed partial class MainWindow
         if(Paissa is not { } paissa)return;
         ImGui.TextWrapped(localization.Get("Plots.Help"));
         var world=market.State;
-        BoolSetting("Plots.Watch","Plots.WatchTip",()=>configuration.PlotWatch,value=>configuration.PlotWatch=value,c=>c.PlotWatch);
-        IntSetting("Plots.Minutes","Plots.MinutesTip",()=>configuration.PlotWatchMinutes,value=>configuration.PlotWatchMinutes=value,10,240,DefaultConfiguration.PlotWatchMinutes);
+        // X-76 step 3 (0.952): the watch reads nothing while the PaissaDB source is off (WatchPlots), greyed then with the source-off note;
+        // its interval is read only while it watches, indented and greyed while it is off.
+        if(!configuration.CommunityPaissa)ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
+        ImGui.BeginDisabled(!configuration.CommunityPaissa);
+        try
+        {
+            BoolSetting("Plots.Watch","Plots.WatchTip",()=>configuration.PlotWatch,value=>configuration.PlotWatch=value,c=>c.PlotWatch);
+            ImGui.Indent();
+            ImGui.BeginDisabled(!configuration.PlotWatch);
+            try{IntSetting("Plots.Minutes","Plots.MinutesTip",()=>configuration.PlotWatchMinutes,value=>configuration.PlotWatchMinutes=value,10,240,DefaultConfiguration.PlotWatchMinutes);}
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
+        }
+        finally{ImGui.EndDisabled();}
         // X-76 H5 (0.915): shared combo row (rollback when saving fails, « ↺ »); 0 = any size, then small, medium, large.
         ComboSetting("Plots.Size","Plots.SizeTip",()=>configuration.PlotWatchSize,value=>configuration.PlotWatchSize=value,
             [(0,localization.Get("Plots.AnySize")),(1,PlotSize(0)),(2,PlotSize(1)),(3,PlotSize(2))],DefaultConfiguration.PlotWatchSize);
         var state=paissa.State;
-        // X-76 step 5 (0.949): nothing is asked while the PaissaDB source is off (Settings › Advanced, or « game data only »).
-        if(!configuration.CommunityPaissa)ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
+        // X-76 step 5 (0.949): nothing is asked while the PaissaDB source is off (Settings › Advanced, or « game data only »); the note is
+        // shown above the watch (X-76 step 3, 0.952).
         ImGui.BeginDisabled(world.WorldId==0 || state.Loading || !configuration.CommunityPaissa);
         try{if(ImGui.SmallButton(localization.Format("Plots.Fetch",world.WorldName)))paissa.Request(world.WorldId);}
         finally{ImGui.EndDisabled();}

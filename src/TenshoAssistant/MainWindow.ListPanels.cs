@@ -16,7 +16,11 @@ internal sealed partial class MainWindow
     private void DrawListPanelOptions()
     {
         BoolSetting("ListPanels.HideInCombat","ListPanels.HideInCombatTip",()=>configuration.ListPanelsHideInCombat,value=>configuration.ListPanelsHideInCombat=value,c=>c.ListPanelsHideInCombat);
-        BoolSetting("ListPanels.HideBehindGame","ListPanels.HideBehindGameTip",()=>configuration.ListPanelsHideBehindGame,value=>configuration.ListPanelsHideBehindGame=value,c=>c.ListPanelsHideBehindGame);
+        // X-76 step 3 (0.952): a panel steps aside only through BarBehindGame, which needs Settings › Data « bars and free panels step aside »:
+        // greyed while that is off, the tip names it.
+        ImGui.BeginDisabled(!configuration.HideBarsBehindGame);
+        try{BoolSetting("ListPanels.HideBehindGame","ListPanels.HideBehindGameTip",()=>configuration.ListPanelsHideBehindGame,value=>configuration.ListPanelsHideBehindGame=value,c=>c.ListPanelsHideBehindGame);}
+        finally{ImGui.EndDisabled();}
         BoolSetting("ListPanels.FinishedOnly","ListPanels.FinishedOnlyTip",()=>configuration.ListPanelsFinishedOnly,value=>configuration.ListPanelsFinishedOnly=value,c=>c.ListPanelsFinishedOnly);
         BoolSetting("ListPanels.StorageHighlight","ListPanels.StorageHighlightTip",()=>configuration.ListPanelsStorageHighlight,value=>configuration.ListPanelsStorageHighlight=value,c=>c.ListPanelsStorageHighlight);
         BoolSetting("ListPanels.Base","ListPanels.BaseTip",()=>configuration.ListPanelsBase,value=>configuration.ListPanelsBase=value,c=>c.ListPanelsBase);
