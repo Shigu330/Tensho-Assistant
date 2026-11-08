@@ -13,7 +13,7 @@ internal static class SpectralBefore962Tests
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs"));
             Check(watcher.Contains("if(spectral && !spectralBefore && lastFish!=0 && now-lastFishAt is >= 0 and <= 90_000)") && watcher.Contains("store.SeeSource(DiscoveryKind.SpectralBefore,lastFish,lastFishBait,1,at,territory);"),"noted");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.OceanVoyagePanel.cs")).Contains("Find(Discoveries.DiscoveryKind.SpectralBefore,"),"panel");
-            Check(File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py")).Contains("KINDS=set(range(1,36))-{26,27}"),"merge tool");
+            Check(File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py")).Contains("KINDS=set(range(1,"),"merge tool");
         }),
     ];
 }

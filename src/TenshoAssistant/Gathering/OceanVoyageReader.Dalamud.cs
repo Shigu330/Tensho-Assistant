@@ -19,6 +19,12 @@ internal sealed class OceanVoyageReader : IDisposable
     /// <summary>X-98 (0.958): developer mode, a reading of the voyage fields logged at each zone or status change.</summary>
     public Func<bool>? Developer { get; set; }
     public OceanVoyageFrame? Frame=>Volatile.Read(ref frame);
+    /// <summary>
+    /// X-85 V2 (0.964): each new catch at a stop with the points it brought (the zone's FishData points grew by that much for one more fish): item, points,
+    /// territory. Called on the framework thread.
+    /// </summary>
+    public Action<uint,int>? CatchPoints { get; set; }
+    private readonly Dictionary<uint,(int Count,int Points)> zoneSeen=[];private int zoneSeenFor=-1;private bool scripsLogged;
 
     public OceanVoyageReader(IFramework framework,IClientState client,IPluginLog log)
     {this.framework=framework;this.client=client;this.log=log;TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}
@@ -50,9 +56,29 @@ internal sealed class OceanVoyageReader : IDisposable
                         voyage->CurrentRoute,zone,status,voyage->LocalPlayerAllResult.TotalPoints,voyage->LocalPlayerAllResult.CaughtFish,local,size,
                         voyage->Mission1Progress,voyage->Mission2Progress,voyage->Mission3Progress);
                 }
+                // X-85 V2 (0.964): the current stop's fish counts and points (FirstZoneFishData, SecondZoneFishData, ThirdZoneFishData), copied.
+                var zoneData=zone switch{0=>voyage->FirstZoneFishData,1=>voyage->SecondZoneFishData,_=>voyage->ThirdZoneFishData};
+                var zoneFish=new List<(uint,int,int,int)>();
+                foreach(ref readonly var fish in zoneData)
+                    if(fish.ItemId!=0)zoneFish.Add((fish.ItemId%1_000_000,fish.NqAmount,fish.HqAmount,(int)Math.Min(fish.TotalPoints,int.MaxValue)));
+                if(zone!=zoneSeenFor){zoneSeen.Clear();zoneSeenFor=zone;foreach(var (item,nq,hq,points) in zoneFish)zoneSeen[item]=(nq+hq,points);}
+                else
+                    foreach(var (item,nq,hq,points) in zoneFish)
+                    {
+                        var was=zoneSeen.GetValueOrDefault(item);
+                        if(nq+hq==was.Count+1 && points>was.Points)CatchPoints?.Invoke(item,points-was.Points);
+                        zoneSeen[item]=(nq+hq,points);
+                    }
+                // X-85 V6 (0.964): the voyage's result, logged once in developer mode to prove which scrip field is which (orange or purple).
+                if(status==4 && !scripsLogged && Developer?.Invoke()==true)
+                {
+                    scripsLogged=true;var result=voyage->IndividualResult;
+                    log.Information("Ocean voyage result: route {0}, points {1}, experience {2}, scrip1 {3}, scrip2 {4}.",voyage->CurrentRoute,result.TotalPoints,result.ExperiencePoints,result.Scrip1Amount,result.Scrip2Amount);
+                }
+                if(status!=4)scripsLogged=false;
                 Volatile.Write(ref frame,new OceanVoyageFrame(voyage->CurrentRoute,zone,status,voyage->SpectralCurrentActive,voyage->WeatherId,
                     [(voyage->Mission1Type,voyage->Mission1Progress),(voyage->Mission2Type,voyage->Mission2Progress),(voyage->Mission3Type,voyage->Mission3Progress)],
-                    player.TotalPoints,player.CaughtFish,DateTimeOffset.UtcNow));
+                    player.TotalPoints,player.CaughtFish,DateTimeOffset.UtcNow){ZoneFish=zoneFish});
             }
             catch(Exception error)
             {

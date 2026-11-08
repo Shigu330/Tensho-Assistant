@@ -6,7 +6,11 @@ namespace TenshoAssistant.Gathering;
 /// weather, the three missions (IKDPlayerMissionCondition row, progress), the player's points and fish caught.
 /// </summary>
 public sealed record OceanVoyageFrame(uint RouteId,int Zone,int Status,bool Spectral,uint WeatherId,
-    IReadOnlyList<(uint Type,int Progress)> Missions,int Points,int Caught,DateTimeOffset ObservedAt);
+    IReadOnlyList<(uint Type,int Progress)> Missions,int Points,int Caught,DateTimeOffset ObservedAt)
+{
+    /// <summary>X-85 V2 (0.964): the fish caught at the current stop this voyage (FishData of the zone: item, NQ, HQ, points earned with it).</summary>
+    public IReadOnlyList<(uint Item,int Nq,int Hq,int Points)> ZoneFish { get; init; }=[];
+}
 
 /// <summary>An ocean fishing place (IKDSpot): its name and its two fishing spots, the usual one and the spectral current's.</summary>
 public sealed record OceanSpot(uint Id,string Place,uint MainSpot,uint SpectralSpot);

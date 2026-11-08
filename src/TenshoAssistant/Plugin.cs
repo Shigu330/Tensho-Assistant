@@ -641,7 +641,8 @@ public sealed class Plugin : IDalamudPlugin
             });
             mainWindow.OceanVoyageData=()=>oceanVoyageData.Value;
             OceanVoyageReader? oceanVoyageReader=null;
-            registrations.Register(()=>mainWindow.OceanVoyage=oceanVoyageReader=new OceanVoyageReader(framework,client,log){Developer=()=>configuration.DeveloperMode},()=>oceanVoyageReader?.Dispose());
+            registrations.Register(()=>mainWindow.OceanVoyage=oceanVoyageReader=new OceanVoyageReader(framework,client,log){Developer=()=>configuration.DeveloperMode,
+                CatchPoints=(item,points)=>{if(configuration.Discovery.Enabled && configuration.Discovery.Fishing)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.FishPoints,item,0,Math.Min(points,100_000),DateTimeOffset.UtcNow,client.TerritoryType);}},()=>oceanVoyageReader?.Dispose());
             // 0.388 (user request): position of the game's inventory window, for the sort button drawn above it.
             Inventory.InventoryWindowReader? inventoryWindow=null;
             registrations.Register(()=>inventoryWindow=new Inventory.InventoryWindowReader(framework,gameGui,()=>configuration.InventorySortButton,log),()=>inventoryWindow?.Dispose());

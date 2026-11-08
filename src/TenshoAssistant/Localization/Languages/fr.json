@@ -605,6 +605,8 @@
     "SharedReading": "Lecture des découvertes partagées ({0} sortes restantes)…",
     "SpectralBefore": "{0} : pêché avec {1} juste avant un courant spectral",
     "SummarySpectralBefore": "Prises avant un courant spectral : {0} ({1} vues par vous, {2} importées seulement)",
+    "FishPoints": "{0} : {1} points par prise en mer",
+    "SummaryFishPoints": "Points de poissons en mer vus : {0} ({1} vus par vous, {2} importés seulement)",
     "SummaryFishBite": "Touches de poissons vues : {0} ({1} vues par vous, {2} importées seulement)",
     "ExchangeTitle": "Échange avec les autres joueurs (GitHub)",
     "ExchangeHelp": "Partager ce que vous avez découvert et prendre ce que d'autres ont trouvé. Sans connexion, l'échange automatique récupère seulement les découvertes communes. Une découverte ne contient jamais le nom, la position ni l'identifiant d'un joueur.",
@@ -6371,6 +6373,9 @@
     "SpectralSeenTitle": "Pêché juste avant un courant spectral ici :",
     "SpectralSeenTip": "Vos prises (et celles partagées) notées quand un courant spectral a commencé à cette escale, avec leur appât. Vu avec, pas prouvé comme déclencheur : la prise d'un autre joueur peut lancer le courant.",
     "SpectralSeen": "{0} avec {1} (×{2})",
+    "FishPoints": "{0} pts",
+    "FishPointsTip": "Points rapportés par une prise de ce poisson, vus en jeu (les vôtres et ceux partagés ; bonus du moment compris).",
+    "FishEarned": "Ce voyage à cette escale : {0} pris, {1} points.",
     "Mission": "{0} : {1} / {2}",
     "Points": "Points : {0} · poissons pris : {1}",
     "Credit": "Données du jeu ; appâts et touches : GatherBuddy (Apache-2.0), « ? » si inconnus."

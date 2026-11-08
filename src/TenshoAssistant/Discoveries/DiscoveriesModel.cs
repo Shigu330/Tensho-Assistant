@@ -59,7 +59,10 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     MonsterKill=33, DutyChestOpened=34,
     // X-85 V4 (0.962): SpectralBefore: Subject = the fish you caught last before a spectral current began at an ocean stop (within 90 s), Detail = the bait of
     // that cast (or the fish mooched), territory = the voyage's. Seen with, not proven to trigger it: another player's catch can start the current.
-    SpectralBefore=35 }
+    SpectralBefore=35,
+    // X-85 V2 (0.964): FishPoints: Subject = an ocean fish, levels = the points one catch of it brought (the stop's FishData points grew by that much; bonuses
+    // of the moment included), territory = the voyage's.
+    FishPoints=36 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported

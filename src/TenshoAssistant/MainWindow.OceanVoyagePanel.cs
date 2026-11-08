@@ -81,6 +81,16 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     var stock=GetRecipeHoldings(fishId);
                     ItemCell(fish,fishId,22,$"{fish?.Name ?? fishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
+                    // X-85 V2 (0.964): points this fish brings, as seen in game (one catch), and what it earned this voyage at this stop.
+                    var seenPoints=DiscoveryStore is { } pointsStore && DiscoveriesLoaded ? pointsStore.Find(Discoveries.DiscoveryKind.FishPoints,fishId,1).FirstOrDefault():null;
+                    var earned=OceanVoyage?.Frame?.ZoneFish.FirstOrDefault(entry=>entry.Item==fishId) is { Item:not 0 } here ? here:default;
+                    if(seenPoints is not null || earned.Points>0)
+                    {
+                        ImGui.SameLine();
+                        ImGui.TextColored(Muted,seenPoints is { } seen ? localization.Format("OceanVoyage.FishPoints",LevelRange(seen.LevelMin,seen.LevelMax)):"");
+                        if(earned.Points>0)TipText(localization.Format("OceanVoyage.FishEarned",earned.Nq+earned.Hq,earned.Points.ToString("N0")));
+                        else TipText(localization.Get("OceanVoyage.FishPointsTip"));
+                    }
                     // X-85 V5 (0.963): a fish that needs Fisher's Intuition (GatherBuddy predators): an eye, the fish to catch first in its tooltip.
                     if(gatherBuddyFish?.State.Data?.Find(fishId) is { Predators.Count:>0 } needs)
                     {

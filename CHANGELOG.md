@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.964.0
+- Plan global, Verify : Pêche en mer, V2 (points) et V6 (assignats) : le jeu tient, pour chaque poisson de l'escale, le nombre de prises et les points gagnés. Tensho note maintenant les points de chaque prise (la hausse des points à chaque nouvelle prise, bonus du moment compris) comme découverte, et le panneau affiche « 120 pts » à côté d'un poisson dont les points ont été vus, avec au survol ce que le poisson a rapporté pendant ce voyage. Pour viser les 10 000 points (seuil des assignats orange selon la communauté), les poissons qui rapportent le plus deviennent visibles. En fin de voyage, en mode développeur, les deux montants d'assignats du jeu sont écrits dans le journal pour prouver lequel est l'orange et lequel le violet, avant de les afficher. Non validé en jeu.
+- Tests : OceanPoints964Tests. Verify.ps1 (agent) : 1591/1591, 0 avertissement, 0 erreur ; DLL 0.964.0.0. Non validé en jeu.
+### English
+- Ocean fishing, V2 (points) and V6 (scrips): the game keeps, for each fish of the stop, the number caught and the points earned. Tensho now notes each catch's points (the rise in points at each new catch, current bonuses included) as a discovery, and the panel shows « 120 pts » next to a fish whose points were seen, with what the fish brought this voyage on hover. To aim at 10,000 points (the orange scrip threshold according to the community), the fish worth most become visible. At the end of a voyage, in developer mode, the game's two scrip amounts are written to the log to prove which is orange and which purple, before showing them. Not validated in game.
+
 ## 0.963.0
 - Plan global, Verify : Pêche en mer, V5 : dans le panneau de voyage, un œil marque les poissons qui demandent l'Intuition du pêcheur ; son info-bulle dit quels poissons pêcher d'abord (et combien), et la durée de l'intuition quand elle est connue (GatherBuddy). La pêche au vif était déjà montrée par les icônes d'appât (appât › poisson à réutiliser), et le temps restant de l'intuition en tête du panneau. Non validé en jeu.
 - Tests : OceanIntuition963Tests. Verify.ps1 (agent) : 1590/1590, 0 avertissement, 0 erreur ; DLL 0.963.0.0. Non validé en jeu.
