@@ -581,6 +581,10 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
+    "SummaryFashionEvaluation": "Fashion Report judgements: {0} ({1} seen by you, {2} imported only)",
+    "FashionReport": "Fashion Report judgements",
+    "FashionReportTip": "When the Fashion Report window shows your outfit judged: each piece, its slot's category and the game's mark for it (kept as the game gives it).\nDefault: on.",
+    "FashionJudged": "{0} judged for « {1} »",
     "SummaryHuntMarkPlace": "Hunt marks' places: {0} ({1} seen by you, {2} imported only)",
     "SummaryFateSeen": "FATEs seen: {0} ({1} seen by you, {2} imported only)",
     "SummaryDesynthesis": "Desynthesis results: {0} ({1} seen by you, {2} imported only)",

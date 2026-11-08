@@ -88,7 +88,7 @@ internal sealed partial class MainWindow
         return name;
     }
     private static readonly DiscoveryKind[] ItemSourceKinds=[DiscoveryKind.Desynthesis,DiscoveryKind.Venture,DiscoveryKind.DutyChest,DiscoveryKind.FateReward,
-        DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition];
+        DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition,DiscoveryKind.FashionEvaluation];
     private string DiscoveryItemName(uint id)=>itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}";
     private string DiscoveryDutyName(uint id)=>DutyName?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
     /// <summary>X-74 (0.860): the level column: a monster's levels, a quantity range, or the Eorzea hours a fish was caught.</summary>
@@ -108,6 +108,7 @@ internal sealed partial class MainWindow
         DiscoveryKind.MonsterDrop=>localization.Format("DiscoveriesUi.FromMonster",DiscoveryItemName(fact.Subject),DiscoveryMonsterName(fact.Detail)),
         DiscoveryKind.ItemFromItem=>localization.Format("DiscoveriesUi.FromItem",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
         DiscoveryKind.FishCatch=>localization.Format("DiscoveriesUi.FromBait",DiscoveryItemName(fact.Subject),fact.Detail==0 ? "?":DiscoveryItemName(fact.Detail)),
+        DiscoveryKind.FashionEvaluation=>localization.Format("DiscoveriesUi.FashionJudged",DiscoveryItemName(fact.Subject),fashionHints.State.Catalog?.Hints.FirstOrDefault(hint=>hint.Id==fact.Detail)?.Name ?? $"#{fact.Detail}"),
         DiscoveryKind.FishCondition=>localization.Format("DiscoveriesUi.FishWeather",DiscoveryItemName(fact.Subject),weather.State.Catalog?.Weather(fact.Detail)?.Name ?? $"#{fact.Detail}"),
         DiscoveryKind.HuntMarkPlace=>localization.Format("DiscoveriesUi.HuntMarkName",DiscoveryMonsterName(fact.Subject),fact.LevelMax switch {1=>"B",2=>"A",3=>"S",_=>"?"}),
         DiscoveryKind.FateSeen=>localization.Format("DiscoveriesUi.FateName",DiscoveryFateName(fact.Subject)),
@@ -127,6 +128,7 @@ internal sealed partial class MainWindow
             BoolSetting("DiscoveriesUi.Fates","DiscoveriesUi.FatesTip",()=>configuration.Discovery.Fates,value=>configuration.Discovery.Fates=value,c=>c.Discovery.Fates);
             BoolSetting("DiscoveriesUi.ItemSources","DiscoveriesUi.ItemSourcesTip",()=>configuration.Discovery.ItemSources,value=>configuration.Discovery.ItemSources=value,c=>c.Discovery.ItemSources);
             BoolSetting("DiscoveriesUi.Fishing","DiscoveriesUi.FishingTip",()=>configuration.Discovery.Fishing,value=>configuration.Discovery.Fishing=value,c=>c.Discovery.Fishing);
+            BoolSetting("DiscoveriesUi.FashionReport","DiscoveriesUi.FashionReportTip",()=>configuration.Discovery.FashionReport,value=>configuration.Discovery.FashionReport=value,c=>c.Discovery.FashionReport);
             BoolSetting("DiscoveriesUi.MarketPrices","DiscoveriesUi.MarketPricesTip",()=>configuration.Discovery.MarketPrices,value=>configuration.Discovery.MarketPrices=value,c=>c.Discovery.MarketPrices);
             ImGui.Unindent();
         }

@@ -11,6 +11,8 @@ public sealed class DiscoverySettings
     /// <summary>X-74 (0.860): where the items got come from (desynthesis, ventures, duty chests, FATEs, monsters, opened items), and the fish caught.</summary>
     public bool ItemSources { get; set; }=true;
     public bool Fishing { get; set; }=true;
+    /// <summary>X-73.4 (0.861): the Fashion Report's judgement of the outfit shown.</summary>
+    public bool FashionReport { get; set; }=true;
     /// <summary>X-52 (0.817): the prices seen at the market board, in place of Universalis' for the player's world when newer.</summary>
     public bool MarketPrices { get; set; }=true;
     public bool DebugLog { get; set; }

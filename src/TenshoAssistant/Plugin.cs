@@ -1135,7 +1135,16 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>fashionLoader=new FashionHintLoader(fashionHints,data,framework,log),()=>fashionLoader?.Dispose());
             var fashionCheck=new Fashion.FashionCheckService();
             Fashion.FashionCheckReader? fashionCheckReader=null;
-            registrations.Register(()=>fashionCheckReader=new Fashion.FashionCheckReader(fashionCheck,framework,gameGui,log,()=>mainWindow.DeveloperMode),()=>fashionCheckReader?.Dispose());
+            registrations.Register(()=>fashionCheckReader=new Fashion.FashionCheckReader(fashionCheck,framework,gameGui,log,()=>mainWindow.DeveloperMode)
+            {
+                // X-73.4 (0.861): the outfit judged, for the discoveries base.
+                Judged=(theme,slots)=>
+                {
+                    if(!configuration.Discovery.Enabled || !configuration.Discovery.FashionReport || mainWindow.DiscoveryStore is not { } store)return;
+                    var at=DateTimeOffset.UtcNow;
+                    foreach(var slot in slots)store.SeeSource(Discoveries.DiscoveryKind.FashionEvaluation,slot.Item,slot.Category,slot.Evaluation,at,theme);
+                },
+            },()=>fashionCheckReader?.Dispose());
             mainWindow.ConfigureFashionStains(id=>data.GetExcelSheet<Lumina.Excel.Sheets.Stain>().TryGetRow(id,out var stain) ? (stain.Name.ExtractText(),stain.Color):null);
             mainWindow.ConfigureFashionCheck(fashionCheck,row=>data.GetExcelSheet<Lumina.Excel.Sheets.FashionCheckWeeklyTheme>().TryGetRow(row,out var theme) ? theme.Name.ExtractText():null);
             QuestReader? questReader = null;

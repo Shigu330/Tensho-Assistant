@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.861.0
+- Plan global, Verify : Demande (X-73.4) : la Fashion Report lue dans le jeu plutôt que devinée. Tensho prend maintenant la catégorie de chaque emplacement par son numéro dans le jeu (le nom affiché ne sert plus qu'en secours), et le thème de la semaine tel que le jeu le donne, au lieu de la règle « semaine + 9 » des outils communautaires. Quand la fenêtre montre votre tenue jugée, chaque pièce, sa catégorie et la note du jeu sont gardées dans la base de découvertes (réglage « Jugements de la Fashion Report ») ; la note est gardée brute, son sens reste à prouver. Non validé en jeu.
+- Tests : FashionGame861Tests. Verify.ps1 (agent) : 1444/1444, 0 avertissement, 0 erreur ; DLL 0.861.0.0. Non validé en jeu.
+### English
+- Request (X-73.4): the Fashion Report read in the game instead of guessed. Tensho now takes each slot's category by its number in the game (the name shown only as a fallback), and the week's theme as the game gives it, instead of the community tools' « week + 9 » rule. When the window shows your outfit judged, each piece, its category and the game's mark are kept in the discoveries base (setting « Fashion Report judgements »); the mark is kept raw, its meaning still to prove. Not validated in game.
+
 ## 0.860.0
 - Plan global, Verify : Consigne de nuit (X-74) : la base de découvertes apprend d'où viennent les objets obtenus, pour remplacer peu à peu LuminaSupplemental, Garland et le wiki. Un nouvel observateur, dix fois par seconde, note : les résultats de désynthèse (lus dans le jeu), les récompenses des tâches de servants, les objets des coffres de mission, les récompenses d'ALÉA, ce que lâche votre propre cible (dans les 3 secondes, hors mission), ce que donne un objet ouvert (coffre, sac), et chaque poisson pris avec son appât, son lieu, la météo et l'heure d'Eorzéa. Rien n'est noté pendant une boutique, un échange, un servant, le courrier ou l'artisanat ; jamais un autre joueur. Deux réglages dans Monde › Découvertes ; la recherche de la page trouve ces relevés par le nom de l'objet ou de la source. Les textes du résumé des genres ajoutés en 0.856 manquaient : ajoutés. Non validé en jeu.
 - Tests : ItemSources860Tests. Verify.ps1 (agent) : 1443/1443, 0 avertissement, 0 erreur ; DLL 0.860.0.0. Non validé en jeu.

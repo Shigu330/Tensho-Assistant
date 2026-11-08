@@ -8,7 +8,10 @@ namespace TenshoAssistant.Discoveries;
 // when). HuntMarkPlace: Subject = BNpcName row, Detail = BNpcBase row, levels = the rank (1 B, 2 A, 3 S). FateSeen: Subject = Fate row, levels = the FATE's level.
 // X-74 (0.860, the night's parsers, ItemDiscoveryWatcher): where items come from. Subject = the item got; Detail = its source (source item, RetainerTask row, CFC row,
 // Fate row, BNpcName row, bait item, weather row); levels = the quantities seen (FishCondition: the Eorzea minutes seen). Places only for MonsterDrop and FishCatch.
-public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynthesis=4, Venture=5, DutyChest=6, FateReward=7, MonsterDrop=8, ItemFromItem=9, FishCatch=10, FishCondition=11 }
+public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynthesis=4, Venture=5, DutyChest=6, FateReward=7, MonsterDrop=8, ItemFromItem=9, FishCatch=10, FishCondition=11,
+    // X-73.4 (0.861): the Fashion Report's judgement: Subject = the item worn, Detail = the slot's category row, Territory = the week's theme row, levels = the raw
+    // evaluation byte (its meaning is not proved yet: kept raw, read later).
+    FashionEvaluation=12 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported

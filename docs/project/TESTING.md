@@ -1362,6 +1362,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.860) Désynthétiser un objet, ouvrir un coffre, pêcher : Monde › Découvertes, le résumé compte ces relevés ; chercher le nom de l'objet.
 
+- [ ] (0.861) Fashion Report, fenêtre ouverte : les catégories et le thème ; après un jugement, Monde › Découvertes les compte.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

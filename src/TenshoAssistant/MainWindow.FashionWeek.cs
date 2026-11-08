@@ -25,6 +25,12 @@ internal sealed partial class MainWindow
     // Hint id of a category name shown by the game (FashionCheckThemeCategory name, same client language).
     private uint FashionHintIdOf(string category)=>category.Length==0 ? 0
         :fashionHints.State.Catalog?.Hints.FirstOrDefault(hint=>string.Equals(hint.Name,category,StringComparison.CurrentCultureIgnoreCase))?.Id ?? 0;
+    /// <summary>X-73.4 (0.861): the slot's category: the game's own id when it is a known hint, else the name match as before.</summary>
+    private uint FashionHintOf(FashionCheckFrame frame,int slot)
+    {
+        if(frame.CategoryIds is { } ids && slot<ids.Count && ids[slot] is var id and not 0 && fashionHints.State.Catalog?.Hints.Any(hint=>hint.Id==id)==true)return id;
+        return FashionHintIdOf(slot<frame.Categories.Count ? frame.Categories[slot]:"");
+    }
 
     private IReadOnlyList<FashionCandidate> FashionSlotCandidates(uint hint,EquipmentSlots slot)
     {
@@ -43,7 +49,8 @@ internal sealed partial class MainWindow
     private void DrawFashionWeek()
     {
         var now=DateTimeOffset.UtcNow;var (_,next)=FashionWeek.Bounds(now);
-        var theme=fashionThemeName?.Invoke(FashionWeek.ThemeRow(now));
+        // X-73.4 (0.861): the theme the game gives, once its window has been read; the « week + 9 » rule only before.
+        var theme=fashionThemeName?.Invoke(fashionCheck?.Last is { WeeklyTheme:not 0 } read && read.ObservedAt>=FashionWeek.Bounds(now).Start ? read.WeeklyTheme:FashionWeek.ThemeRow(now));
         ImGui.TextColored(Accent,localization.Format("FashionWeek.Theme",theme is { Length:>0 } ? theme:localization.Get("FashionWeek.ThemeUnknown")));
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FashionWeek.ThemeHelp"));
         ImGui.TextDisabled(localization.Format("FashionWeek.Reset",next.ToLocalTime().ToString("g"),Math.Max(0,(int)(next-now).TotalHours)));
@@ -114,7 +121,7 @@ internal sealed partial class MainWindow
         for(var slot=0;slot<FashionWeek.SlotCount && slot<frame.Categories.Count;slot++)
         {
             var category=frame.Categories[slot];
-            var hint=FashionHintIdOf(category);
+            var hint=FashionHintOf(frame,slot);
             var candidates=FashionSlotCandidates(hint,FashionWeek.Slots[slot]);
             var ownedCount=candidates.Count(entry=>FashionOwned(entry.Match.ItemId)==true);
             var label=$"{localization.Get("FashionWeek.Slot"+slot)} · {(category.Length>0 ? category:localization.Get("FashionWeek.NoCategory"))}";
@@ -140,7 +147,7 @@ internal sealed partial class MainWindow
     private void DrawFashionSlotBody(FashionCheckFrame frame,int slot,bool compact)
     {
         var category=slot<frame.Categories.Count ? frame.Categories[slot]:"";
-        var hint=FashionHintIdOf(category);
+        var hint=FashionHintOf(frame,slot);
         if(category.Length>0)DrawFashionSlotItems(FashionSlotCandidates(hint,FashionWeek.Slots[slot]),compact,hint,slot);
         else ImGui.TextDisabled(localization.Get("FashionWeek.NoCategoryWeek"));
         if(slot<6)DrawFashionDyes(slot);
