@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.968.0
+- Plan global, Verify : Mandats (X-87, votre document « à faire ») : la zone d'un mandat accepté ne reste plus affichée une fois ce mandat commencé (le jeu donne la zone du mandat en cours à part ; les marqueurs que le jeu ne dessine pas sont aussi laissés de côté) ; pendant un mandat, les monstres qui en sont la cible apparaissent sur la carte avec l'icône du mandat du jeu, avec au survol « cible de votre mandat ». Le lien entre un monstre et le mandat (identifiant d'événement) n'est pas encore prouvé : en mode développeur, le journal écrit les événements des monstres proches au début d'un mandat. Non validé en jeu.
+- Tests : Leves968Tests. Verify.ps1 (agent) : 1595/1595, 0 avertissement, 0 erreur ; DLL 0.968.0.0. Non validé en jeu.
+### English
+- Leves (X-87, your « to do » document): an accepted leve's area no longer stays shown once that leve has started (the game gives the area of the leve under way apart; markers the game does not draw are left out too); during a leve, the monsters it targets show on the map with the game's leve icon, with « target of your leve » on hover. The link between a monster and the leve (event id) is not proven yet: in developer mode, the log writes the nearby monsters' events when a leve starts. Not validated in game.
+
 ## 0.967.0
 - Plan global, Verify : Carte (X-86) : une zone de quête ou d'événement au-dessus ou au-dessous de vous porte maintenant la flèche de hauteur du jeu, en grand chevron discret sur toute la zone (les icônes dedans restent visibles) ; avant, une zone sans icône n'avait aucune flèche. Le décalage des parties non découvertes (Eurêka Anemos) demande une capture en jeu : ajouté aux relevés. Non validé en jeu.
 - Tests : AreaArrows967Tests. Verify.ps1 (agent) : 1594/1594, 0 avertissement, 0 erreur ; DLL 0.967.0.0. Non validé en jeu.

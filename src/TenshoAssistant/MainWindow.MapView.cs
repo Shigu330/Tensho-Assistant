@@ -163,6 +163,7 @@ internal sealed partial class MainWindow
     // 0.791 (X-01: « map overlay layout » 110 to 160 ms several times an hour on 2026-11-07, not only at opening): checkpoints inside the canvas, developer mode.
     private long mapMarkAt;
     private void MapMarkStart(){if(DeveloperMode)mapMarkAt=System.Diagnostics.Stopwatch.GetTimestamp();}
+    private uint leveLogged;
     private void MapMark(string part)
     {
         if(!DeveloperMode)return;
@@ -1527,6 +1528,25 @@ internal sealed partial class MainWindow
                         tooltip=localization.Format("MapView.MonsterLabel",monster.Name,monster.Level)+"\n"+string.Join("\n",notes.Where(note=>MonsterNoteShown(note,settings)).Select(note=>note.Text));
                         tooltipPoint=null;
                     }
+                }
+            }
+            // X-87 (0.968, user request): while a leve is under way, the monsters whose event is that leve (EventId low part = the leve's objective id) get
+            // the leve marker's own game icon. Developer mode logs the nearby events once per leve, to prove the link.
+            if(settings.ShowQuests && live is { ActiveLeve:{ } leve, Monsters:{ Count:>0 } leveMonsters } && live.MapId==map.MapId
+               && textures.TryGetFromGameIcon(new GameIconLookup(leve.Icon),out var leveShared) && leveShared.TryGetWrap(out var leveIcon,out _) && leveIcon is not null)
+            {
+                if(developerMode && leveLogged!=leve.Objective)
+                {
+                    leveLogged=leve.Objective;
+                    log.Information("Leve {0} (icon {1}): nearby monster events {2}.",leve.Objective,leve.Icon,string.Join(", ",leveMonsters.Where(entry=>entry.EventId!=0).Select(entry=>$"{entry.NameId}:{entry.EventId:X8}").Distinct().Take(20)));
+                }
+                var leveSize=Math.Max(4,baseIcon*0.7f);
+                foreach(var monster in leveMonsters)
+                {
+                    if(monster.EventId==0 || (monster.EventId & 0xFFFF)!=leve.Objective)continue;
+                    var at=origin+mapPan+MapProjection.PixelFromWorld(monster.Position,map)*mapZoom;
+                    draw.AddImage(leveIcon.Handle,at-new Vector2(leveSize/2),at+new Vector2(leveSize/2));
+                    if(hovered && Vector2.Distance(io.MousePos,at)<=leveSize/2){tooltip=localization.Format("MapView.LeveTarget",monster.Name,monster.Level);tooltipPoint=null;}
                 }
             }
             MapMark("canvas monsters");

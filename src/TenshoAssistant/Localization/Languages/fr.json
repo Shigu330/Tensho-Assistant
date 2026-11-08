@@ -3376,6 +3376,7 @@
     "ShowFlagHelp": "Affiche le drapeau posé sur la carte (le vôtre ou celui d'un lien).\nPar défaut : activé.",
     "ShowLockedQuests": "Quêtes pas encore disponibles",
     "ShowLockedQuestsHelp": "Montre les marqueurs de quête que le jeu dessine verrouillés (quêtes que vous ne pouvez pas encore prendre). Grisé tant que « Quêtes et objectifs » est coupé.\nPar défaut : activé.",
+    "LeveTarget": "{0} (niveau {1}) : cible de votre mandat",
     "ShowQuestsHelp": "Affiche les marqueurs des quêtes, objectifs et événements que le jeu montre sur sa carte.\nPar défaut : activé.",
     "ShowQuestAreasHelp": "Dessine la zone de recherche des objectifs de quête (cercle coloré).\nPar défaut : activé.",
     "QuestTooltipsHelp": "Au survol d'un marqueur de quête : le nom de la quête. Grisé tant que « Quêtes et objectifs » est désactivé : aucun marqueur n'est alors dessiné.\nPar défaut : activé.",

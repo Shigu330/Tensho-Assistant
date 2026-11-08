@@ -35,7 +35,11 @@ public sealed record MapLiveState(uint TerritoryId,uint MapId,Vector3 Position,f
     IReadOnlyDictionary<uint,MapFlightState>? Flights=null,IReadOnlyList<MapEventMarker>? Events=null,bool InCombat=false,bool InDuty=false,
     IReadOnlyList<MapObjectMarker>? Objects=null,IReadOnlyList<MapFateMarker>? Fates=null,IReadOnlyList<MapPartyMarker>? Party=null,
     IReadOnlySet<uint>? UnlockedCurrents=null,IReadOnlySet<uint>? Sightseen=null,int SightseeingUnlock=-1,int SightseeingUnlockEx=-1,string Area="",string SubArea="",
-    IReadOnlyList<MapMonster>? Monsters=null,uint DiscoveryMapId=0,IReadOnlyList<int>? Undiscovered=null,IReadOnlyList<MapQuestPoint>? QuestPoints=null);
+    IReadOnlyList<MapMonster>? Monsters=null,uint DiscoveryMapId=0,IReadOnlyList<int>? Undiscovered=null,IReadOnlyList<MapQuestPoint>? QuestPoints=null)
+{
+    /// <summary>X-87 (0.968): the leve under way (Map.ActiveLevequestMarker): its objective id and the game's icon of its marker; null when none.</summary>
+    public (uint Objective,uint Icon)? ActiveLeve { get; init; }
+}
 
 // Party member in the same territory as the player (not the player): job icon = 62100 + ClassJob row.
 public sealed record MapPartyMarker(string Name,uint Job,int Level,Vector3 Position);
@@ -234,7 +238,7 @@ internal sealed class MapLiveReader : IDisposable
             try{ReadPlace();Read("place");}catch(Exception error){areaName=subAreaName="";Failed("place",error);}
             var inCombat=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             var inDuty=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty56];
-            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName,monsters,discoveryMap,undiscovered,questPoints));
+            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName,monsters,discoveryMap,undiscovered,questPoints){ActiveLeve=ReadActiveLeve()});
             positionFailureLogged=false;
         }
         // X-76 H9 (0.922): logged once until a read succeeds again (it was logged every 5 s).
@@ -488,6 +492,15 @@ internal sealed class MapLiveReader : IDisposable
         return result;
     }
     // 0.793 (X-32): the leve areas the game keeps itself, with or without its map open: each accepted leve's area, and the points of the one started.
+    private static unsafe (uint Objective,uint Icon)? ReadActiveLeve()
+    {
+        var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
+        if(map==null || !map->ActiveLevequestMarker.ShouldRender || map->ActiveLevequestMarker.ObjectiveId==0)return null;
+        var data=map->ActiveLevequestMarker.MarkerData;
+        if(data.LongCount is <=0 or >32)return null;
+        foreach(var entry in data)if(entry.IconId!=0)return (map->ActiveLevequestMarker.ObjectiveId,entry.IconId);
+        return null;
+    }
     private static unsafe IReadOnlyList<MapEventMarker> ReadGameLeves()
     {
         var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
@@ -507,9 +520,14 @@ internal sealed class MapLiveReader : IDisposable
                 result.Add(new(data.MapId,data.IconId,data.Position,float.IsFinite(data.Radius) ? Math.Max(0,data.Radius):0,text,data.ObjectiveId,data.MarkerType,data.DataId,true));
             }
         }
+        // X-87 (0.968, user report: the leve's area stays shown once it has started): a marker group the game does not draw (ShouldRender) is left out,
+        // and so is an accepted leve's marker once that same leve is under way (same objective id as the active marker).
+        var active=map->ActiveLevequestMarker.ShouldRender && map->ActiveLevequestMarker.MarkerData.LongCount>0 ? map->ActiveLevequestMarker.ObjectiveId:0u;
         var leves=map->LevequestMarkers;
-        for(var index=0;index<leves.Length;index++)fixed(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info=&leves[index])From(info);
-        From(&map->ActiveLevequestMarker);
+        for(var index=0;index<leves.Length;index++)
+            fixed(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info=&leves[index])
+                if(info->ShouldRender && (active==0 || info->ObjectiveId!=active))From(info);
+        if(map->ActiveLevequestMarker.ShouldRender)From(&map->ActiveLevequestMarker);
         return result;
     }
     private static IReadOnlyList<MapEventMarker> lastEvents=[];private static uint lastEventsMap;
