@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.903.0
+- Plan global, Verify : Essai en jeu de l'utilisateur, courrier (X-75.7) : une lettre avec un sirop de bouleau et 1 gil. La sonde a montré les pièces jointes (objet, quantité, vides après « Tout prendre ») ; le journal des gils avait classé le gil en « Autre ». Nouveau (X-84) : les gils reçus d'une lettre ou joints à une lettre sont rangés dans la catégorie « Courrier (lettres) » du journal des gils. Les objets pris d'une lettre étaient déjà écartés des découvertes. Preuve : docs/evidence/0.903-letters.md. Non validé en jeu.
+- Tests : GilMail903Tests. Verify.ps1 (agent) : 1483/1483, 0 avertissement, 0 erreur ; DLL 0.903.0.0. Non validé en jeu.
+### English
+- User's in-game test, mail (X-75.7): a letter with one birch syrup and 1 gil. The probe showed the attachments (item, quantity, empty after « Take all »); the gil journal had filed the gil under « Other ». New (X-84): gil received from a letter or attached to one goes under « Mail (letters) » in the gil journal. Items taken from a letter were already left out of the discoveries. Evidence: docs/evidence/0.903-letters.md. Not validated in game.
+
 ## 0.902.0
 - Plan global, Verify : Retours de l'utilisateur : animaux de l'île sur la carte validés en jeu (« icônes ok ») ; dans le menu des calques de la carte, « Tout » et « Rien » ne réglaient pas les six calques de monstres (vos listes, bestiaire, ALÉA, mage bleu, pièce de collection manquante, dresseur). Ils les règlent maintenant, et un test vérifie que chaque case « Afficher … » du menu est couverte par « Tout » et « Rien ». Non validé en jeu.
 - Tests : MapLayersAll902Tests. Verify.ps1 (agent) : 1482/1482, 0 avertissement, 0 erreur ; DLL 0.902.0.0. Non validé en jeu.

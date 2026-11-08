@@ -6,7 +6,8 @@ namespace TenshoAssistant.Inventory;
 public enum GilSource { Character, Retainers, Company }
 
 /// <summary>What the change most likely was, from the game window open when it happened (Other when none matched).</summary>
-public enum GilCategory { Other, NpcShop, Market, Repair, Teleport, Retainer, Company }
+// 0.903 (X-84): Mail: gil taken from a letter or attached to one (LetterViewer, LetterEditor). Added last: the saved numbers stay the same.
+public enum GilCategory { Other, NpcShop, Market, Repair, Teleport, Retainer, Company, Mail }
 
 /// <summary>One change of a gil balance: when, by how much, the balance after it, whose, and its category.</summary>
 public sealed record GilEntry(DateTimeOffset At,long Delta,long Balance,GilSource Source,GilCategory Category);
@@ -29,6 +30,8 @@ public static class GilJournal
         ("Shop",GilCategory.NpcShop),("InclusionShop",GilCategory.NpcShop),("ShopExchangeItem",GilCategory.NpcShop),
         ("Bank",GilCategory.Retainer),("RetainerList",GilCategory.Retainer),("SelectString",GilCategory.Other),
         ("FreeCompanyChest",GilCategory.Company),
+        // 0.903 (X-84, user's test, docs/evidence/0.903-letters.md): the log showed « Gil other: +1, windows seen in the last 15 s: LetterList, LetterViewer … ».
+        ("LetterViewer",GilCategory.Mail),("LetterEditor",GilCategory.Mail),
         // 0.775 (X-18): the game takes the teleport's price on arrival, after its window closed: the log showed « Gil other: -1,240, windows seen in the last
         // 15 s: NowLoading » with the chat line « Vous avez dépensé 1240 gils pour vous téléporter ». Only a spending counts (see GilWatcher).
         ("NowLoading",GilCategory.Teleport),
