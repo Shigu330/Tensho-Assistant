@@ -1384,6 +1384,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.871) Tensho › Marché › Offres : l'étendue « Région » est nommée tout de suite (Europe, Japon…).
 
+- [ ] (0.872) Ouvrir la boutique d'un marchand, puis Monde › Découvertes : « Marchands placés : 1 ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

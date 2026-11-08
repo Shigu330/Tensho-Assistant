@@ -101,7 +101,7 @@ internal sealed partial class MainWindow
         if(item==0 || DiscoveryStore is not { } store || !DiscoveriesLoaded)return [];
         if(discoveredSources.Item==item && discoveredSources.Revision==store.Revision)return discoveredSources.Lines;
         var lines=ItemSourceKinds.Where(kind=>kind is not (DiscoveryKind.FishCondition or DiscoveryKind.FestivalSeen or DiscoveryKind.VistaSeen or DiscoveryKind.VoyageUnlock
-                or DiscoveryKind.BlueSpellLearned or DiscoveryKind.BeastTamed or DiscoveryKind.FashionEvaluation))
+                or DiscoveryKind.BlueSpellLearned or DiscoveryKind.BeastTamed or DiscoveryKind.FashionEvaluation or DiscoveryKind.NpcPlace))
             .SelectMany(kind=>store.Find(kind,subject=>subject==item,4)).OrderByDescending(fact=>fact.Seen+fact.Imported).Take(4)
             .Select(fact=>$"{DiscoveryFactName(fact)} ({DiscoveryFactLevel(fact)}, ×{fact.Seen+fact.Imported})").ToArray();
         discoveredSources=(item,store.Revision,lines);
@@ -109,6 +109,26 @@ internal sealed partial class MainWindow
     }
     private static readonly DiscoveryKind[] ItemSourceKinds=[DiscoveryKind.Desynthesis,DiscoveryKind.Venture,DiscoveryKind.DutyChest,DiscoveryKind.FateReward,
         DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition,DiscoveryKind.FashionEvaluation,DiscoveryKind.VoyageDrop,DiscoveryKind.VoyageUnlock,DiscoveryKind.BlueSpellLearned,DiscoveryKind.BeastTamed,DiscoveryKind.FestivalSeen,DiscoveryKind.VistaSeen];
+    /// <summary>
+    /// X-73.16 (0.872): where you saw a shopkeeper, as a vendor place, for the vendors the game sheets do not place (their own places always come first).
+    /// Worked out again only when the base changes.
+    /// </summary>
+    private (long Revision,Dictionary<uint,Npcs.NpcLocation?> Places) seenNpcPlaces=(-1,[]);
+    internal Npcs.NpcLocation? SeenNpcPlace(uint npc)
+    {
+        if(npc==0 || DiscoveryStore is not { } store || !DiscoveriesLoaded || maps.State.Catalog is not { } catalog)return null;
+        if(seenNpcPlaces.Revision!=store.Revision)seenNpcPlaces=(store.Revision,[]);
+        if(seenNpcPlaces.Places.TryGetValue(npc,out var known))return known;
+        Npcs.NpcLocation? place=null;
+        if(store.Find(DiscoveryKind.NpcPlace,subject=>subject==npc,1).FirstOrDefault() is { } fact && catalog.Find(fact.Map) is { } map)
+        {
+            var at=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(new Vector3(fact.X,0,fact.Z),map),map);
+            place=new Npcs.NpcLocation(fact.Territory,fact.Map,map.Zone,at.X,at.Y,fact.X,0,fact.Z);
+        }
+        if(seenNpcPlaces.Places.Count<4096)seenNpcPlaces.Places[npc]=place;
+        return place;
+    }
+    internal IReadOnlyList<Npcs.NpcLocation> VendorLocations(Npcs.NpcVendor vendor)=>vendor.Locations.Count>0 ? vendor.Locations:SeenNpcPlace(vendor.NpcId) is { } seen ? [seen]:[];
     private string DiscoveryItemName(uint id)=>itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}";
     private string DiscoveryDutyName(uint id)=>DutyName?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
     /// <summary>X-74 (0.860): the level column: a monster's levels, a quantity range, or the Eorzea hours a fish was caught.</summary>
@@ -134,6 +154,7 @@ internal sealed partial class MainWindow
         DiscoveryKind.BlueSpellLearned=>localization.Format("DiscoveriesUi.SpellFrom",DiscoveryNamed(SpellName,fact.Subject),fact.Detail==0 ? "?":DiscoveryMonsterName(fact.Detail)),
         DiscoveryKind.BeastTamed=>localization.Format("DiscoveriesUi.BeastFrom",DiscoveryNamed(BeastName,fact.Subject),fact.Detail==0 ? "?":DiscoveryMonsterName(fact.Detail)),
         DiscoveryKind.FestivalSeen=>localization.Format("DiscoveriesUi.FestivalSeen",fact.Subject,fact.Detail),
+        DiscoveryKind.NpcPlace=>localization.Format("DiscoveriesUi.NpcPlace",SquadronMemberName?.Invoke(fact.Subject) is { Length:>0 } npcName ? npcName:$"#{fact.Subject}"),
         DiscoveryKind.VistaSeen=>localization.Format("DiscoveriesUi.VistaSeen",fact.Subject,weather.State.Catalog?.Weather(fact.Detail)?.Name ?? $"#{fact.Detail}"),
         DiscoveryKind.VoyageDrop=>localization.Format("DiscoveriesUi.FromSector",DiscoveryItemName(fact.Subject),DiscoverySectorName(fact.Detail)),
         DiscoveryKind.VoyageUnlock=>localization.Format("DiscoveriesUi.SectorUnlock",DiscoverySectorName(fact.Subject),DiscoverySectorName(fact.Detail)),

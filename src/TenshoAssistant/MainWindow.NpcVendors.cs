@@ -55,9 +55,10 @@ internal sealed partial class MainWindow
                 {
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     ImGui.Selectable(NpcName(offer.Vendor)+"##Offer",false,ImGuiSelectableFlags.SpanAllColumns);
-                    NpcMenu("NpcFlag",NpcName(offer.Vendor),offer.Vendor.NpcId,offer.Vendor.Locations);
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(offer.Vendor.Locations.Count==0 ? localization.Get("NpcUi.NoLocation")
-                        :string.Join(" · ",offer.Vendor.Locations.Take(2).Select(NpcPlace))+(offer.Vendor.Locations.Count>2 ? localization.Format("HoverUi.More",offer.Vendor.Locations.Count-2):""));
+                    var places=VendorLocations(offer.Vendor);
+                    NpcMenu("NpcFlag",NpcName(offer.Vendor),offer.Vendor.NpcId,places);
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(places.Count==0 ? localization.Get("NpcUi.NoLocation")
+                        :string.Join(" · ",places.Take(2).Select(NpcPlace))+(places.Count>2 ? localization.Format("HoverUi.More",places.Count-2):""));
                     ImGui.TableNextColumn();DrawNpcCosts(offer.Sale,18,true);
                     ImGui.TableNextColumn();ImGui.TextUnformatted(offer.Sale.ShopName.Length>0 ? offer.Sale.ShopName:localization.Get("NpcUi.Kind"+offer.Sale.Kind));
                 }
@@ -158,7 +159,7 @@ internal sealed partial class MainWindow
         // Short cost first (amount + icon), then the wrapped name and place: wrapping text never pushes the icons off the panel.
         foreach(var offer in offers.Take(HoverNpcLines))
         {
-            var place=offer.Vendor.Locations.Count>0 ? NpcPlace(offer.Vendor.Locations[0]):localization.Get("NpcUi.NoLocation");
+            var place=VendorLocations(offer.Vendor) is { Count:>0 } places ? NpcPlace(places[0]):localization.Get("NpcUi.NoLocation");
             DrawNpcCosts(offer.Sale,ImGui.GetTextLineHeight(),false);ImGui.SameLine(0,6);
             ImGui.TextWrapped(localization.Format("HoverUi.Npc",NpcName(offer.Vendor),place));
         }

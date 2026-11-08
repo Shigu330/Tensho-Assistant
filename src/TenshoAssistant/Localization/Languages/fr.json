@@ -584,6 +584,8 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "SummaryNpcPlace": "Marchands placés : {0} ({1} vus par vous, {2} importés seulement)",
+    "NpcPlace": "Boutique de {0}",
     "SummaryFestivalSeen": "Fêtes vues : {0} ({1} vues par vous, {2} importées seulement)",
     "SummaryVistaSeen": "Panoramas inscrits : {0} ({1} vus par vous, {2} importés seulement)",
     "FestivalSeen": "Fête n° {0}, phase {1}",

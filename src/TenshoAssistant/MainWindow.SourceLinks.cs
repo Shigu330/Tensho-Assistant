@@ -60,13 +60,13 @@ internal sealed partial class MainWindow
         collectionFilter=0;achievementCategoryFilter=achievement.Achievement?.CategoryId;IsOpen=true;
     }
 
-    private string VendorPlace(Npcs.NpcVendor vendor)=>vendor.Locations.FirstOrDefault() is { } place ? NpcPlace(place):localization.Get("NpcUi.NoLocation");
+    private string VendorPlace(Npcs.NpcVendor vendor)=>VendorLocations(vendor).FirstOrDefault() is { } place ? NpcPlace(place):localization.Get("NpcUi.NoLocation");
     // Vendor line (opens the vendor tool) and, when placed, its map flag sub-link.
     private void DrawVendorLink(uint itemId,Npcs.NpcVendor vendor,string label)
     {
         if(ImGui.Selectable(label+$"##SrcNpc{itemId}/{vendor.NpcId}")){npcVendorFocus=vendor.NpcId;page=Page.NpcVendors;IsOpen=true;}
-        NpcMenu($"SrcNpcMenu{itemId}/{vendor.NpcId}",NpcName(vendor),vendor.NpcId,vendor.Locations);
-        if(vendor.Locations.FirstOrDefault() is { } place && maps.State.Catalog?.Find(place.MapId) is { } map
+        NpcMenu($"SrcNpcMenu{itemId}/{vendor.NpcId}",NpcName(vendor),vendor.NpcId,VendorLocations(vendor));
+        if(VendorLocations(vendor).FirstOrDefault() is { } place && maps.State.Catalog?.Find(place.MapId) is { } map
            && ImGui.Selectable("    "+localization.Get("SourceLinks.Flag")+$"##SrcFlag{itemId}/{vendor.NpcId}"))PlaceFlagFromMapView(map,place.X,place.Y);
     }
 
@@ -79,7 +79,7 @@ internal sealed partial class MainWindow
         return catalog.SalesOf(itemId).Where(sale=>!sold.Contains(sale.ShopId) && (currency is null || sale.Costs.Any(cost=>cost.CurrencyItemId==currency)))
             .SelectMany(sale=>data.NpcsOfShop(sale.ShopId)).Distinct().Take(4)
             .Select(npc=>(npc,data.NpcName(npc) is { Length:>0 } name ? char.ToUpper(name[0],System.Globalization.CultureInfo.CurrentCulture)+name[1..]:npc.ToString(),
-                data.PlaceOf(npc) is { } place ? new Npcs.NpcLocation(place.TerritoryId,place.MapId,maps.State.Catalog?.Find(place.MapId)?.Zone ?? "",place.X,place.Y,0,0,0):null))
+                SeenNpcPlace(npc) ?? (data.PlaceOf(npc) is { } place ? new Npcs.NpcLocation(place.TerritoryId,place.MapId,maps.State.Catalog?.Find(place.MapId)?.Zone ?? "",place.X,place.Y,0,0,0):null)))
             .ToArray();
     }
     /// <summary>Menu entries for the sources of these items; false when none is known.</summary>

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.872.0
+- Plan global, Verify : Demande (X-73.16) : le lieu des marchands que les feuilles du jeu ne placent pas est maintenant appris en jeu. Quand une fenêtre de boutique s'ouvre (boutique, échanges, compagnie, collectionnables…), le PNJ ciblé est noté avec sa zone et sa position dans la base de découvertes, une fois par ouverture. Ce lieu sert là où un vendeur n'avait pas de lieu : page Marchands, info-bulle des objets, provenances (« Où l'obtenir »), avant les lieux de LuminaSupplemental. Les lieux des feuilles du jeu passent toujours en premier. Non validé en jeu.
+- Tests : ShopNpc872Tests. Verify.ps1 (agent) : 1456/1456, 0 avertissement, 0 erreur ; DLL 0.872.0.0. Non validé en jeu.
+### English
+- Request (X-73.16): the place of shopkeepers the game sheets do not place is now learned in game. When a shop window opens (shop, exchanges, grand company, collectables…), the targeted NPC is noted with its zone and position in the discoveries base, once per opening. That place is used where a vendor had none: NPC vendors page, item tooltip, sources (« Where to get it »), before LuminaSupplemental's places. The game sheets' places always come first. Not validated in game.
+
 ## 0.871.0
 - Plan global, Verify : Demande (X-73.15) : la région de chaque centre de données (pour l'étendue « Région » de la page Marché) vient maintenant de la feuille du jeu (WorldDCGroupType) au lieu d'une demande à Universalis à chaque session ; la table d'Universalis ne sert plus qu'au centre « cloud » ou à un centre inconnu. Les noms de région restent ceux qu'Universalis attend. Le centre Shadow, absent de la table d'Universalis, a maintenant sa région. Plan : demandes X-75 (un test par sonde, sondes manquantes) et X-76 (nettoyage complet du code, ultracode accordé) notées après le plan en cours, avant la traduction des documents. Non validé en jeu.
 - Tests : Regions871Tests. Verify.ps1 (agent) : 1455/1455, 0 avertissement, 0 erreur ; DLL 0.871.0.0. Non validé en jeu.

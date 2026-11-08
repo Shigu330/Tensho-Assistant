@@ -584,6 +584,8 @@
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
+    "SummaryNpcPlace": "Shopkeepers placed: {0} ({1} seen by you, {2} imported only)",
+    "NpcPlace": "Shop of {0}",
     "SummaryFestivalSeen": "Festivals seen: {0} ({1} seen by you, {2} imported only)",
     "SummaryVistaSeen": "Vistas registered: {0} ({1} seen by you, {2} imported only)",
     "FestivalSeen": "Festival #{0}, phase {1}",

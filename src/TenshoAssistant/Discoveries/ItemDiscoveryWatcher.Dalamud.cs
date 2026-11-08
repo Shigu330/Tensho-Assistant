@@ -32,6 +32,18 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     private readonly ICondition condition;private readonly IGameInventory inventory;private readonly DiscoveryStore store;private readonly IPluginLog log;
     private readonly Func<DiscoverySettings> settings;private readonly Func<bool> debug;private readonly Func<uint,uint> dutyOf;private readonly Func<uint,bool> isFish;private readonly Func<uint,bool> usable;
     private Dictionary<uint,long>? before;private long nextRead;private bool disposed,warned;
+    // X-73.16 (0.872): the shop windows; while one is shown, the event NPC targeted is the shopkeeper, noted once per opening with its place.
+    private static readonly string[] ShopWindows=["Shop","ShopExchangeItem","ShopExchangeCurrency","ShopExchangeCoin","InclusionShop","ShopCard","GrandCompanyExchange",
+        "FreeShop","CollectablesShop","SkyIslandExchange"];
+    private uint shopNpcSeen;
+    private void ReadShopNpc(DateTimeOffset at,uint territory,uint map)
+    {
+        if(!ShopWindows.Any(name=>gui.GetAddonByName(name) is { IsNull:false,IsVisible:true })){shopNpcSeen=0;return;}
+        if(targets.Target is not { ObjectKind:Dalamud.Game.ClientState.Objects.Enums.ObjectKind.EventNpc,BaseId:not 0 } npc || npc.BaseId==shopNpcSeen || map==0)return;
+        shopNpcSeen=npc.BaseId;
+        store.SeeSource(DiscoveryKind.NpcPlace,npc.BaseId,0,1,at,territory,map,npc.Position);
+        if(debug())log.Information("Discovery: shop NPC {0} at territory {1}.",npc.BaseId,territory);
+    }
     private string salvageSeen="",ventureSeen="";private readonly HashSet<(uint Chest,uint Index,uint Item)> lootSeen=[];private uint lootTerritory;
     private uint fateId;private long fateEndedAt=-100_000;
     private (uint Name,uint Territory,uint Map,Vector3 Place,int Level,long At) death=(0,0,0,default,0,-100_000);
@@ -117,7 +129,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             if(wanted.ItemSources)
             {
                 ReadSalvage(at);ReadVenture(at);ReadLoot(at,territory,duty);
-                ReadFate(now);ReadTarget(now,territory,map);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);
+                ReadFate(now);ReadTarget(now,territory,map);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);ReadShopNpc(at,territory,map);
             }
             var counts=Counts();
             if(before is null){before=counts;return;}
