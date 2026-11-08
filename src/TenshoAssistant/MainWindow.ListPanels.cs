@@ -412,7 +412,7 @@ internal sealed partial class MainWindow
         foreach(var source in gatheringCatalog.State.Catalog?.ForItem(item) ?? [])
         {
             if(source.Timing.Kind!=Gathering.GatheringScheduleKind.Limited || Gathering.GatheringTime.Next(source.Timing,now,1).Openings.FirstOrDefault() is not { } next)continue;
-            var open=next.StartsAt<=now && now<next.EndsAt;var left=(open ? next.EndsAt:next.StartsAt)-now;
+            var (open,left)=next.At(now);
             if(best is null || open && !best.Value.Open || open==best.Value.Open && left<best.Value.Left)best=(open,left);
         }
         (bool,string)? state=best is { } found ? (found.Open,localization.Format(found.Open ? "ListPanels.TimedOpen":"ListPanels.TimedClosed",Math.Max(0,(int)found.Left.TotalHours),found.Left.Minutes,found.Left.Seconds)):null;

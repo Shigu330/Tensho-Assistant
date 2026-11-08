@@ -1452,6 +1452,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.905) Carte et listes : toutes les coordonnées s'écrivent « 12.3 » avec un point (curseur, joueur, PNJ, ALÉA, signets, triple triade, île).
 
+- [ ] (0.906) Rien de nouveau à voir : horaires ET, comptes à rebours des points de récolte et durées de voyage inchangés.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

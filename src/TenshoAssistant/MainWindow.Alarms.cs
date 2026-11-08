@@ -221,7 +221,7 @@ internal sealed partial class MainWindow
 
     private string AlarmWhen(TenshoAlarm alarm)=>alarm.Repeat switch
     {
-        AlarmRepeat.EorzeaDaily=>localization.Format("Alarms.Daily",$"{alarm.EtMinute/60:00}:{alarm.EtMinute%60:00}"),
+        AlarmRepeat.EorzeaDaily=>localization.Format("Alarms.Daily",GatheringTime.Clock(alarm.EtMinute)),
         AlarmRepeat.RealDaily=>localization.Format("Alarms.RealDaily",alarm.At.ToLocalTime().ToString("t")),
         AlarmRepeat.RealWeekly=>localization.Format("Alarms.RealWeekly",alarm.At.ToLocalTime().ToString("dddd t")),
         AlarmRepeat.DailyReset=>localization.Get("Alarms.AtDailyReset"),

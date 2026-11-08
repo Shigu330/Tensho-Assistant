@@ -188,7 +188,7 @@ internal sealed partial class MainWindow
                 // This ImGui ignores later overlapping items in IsItemHovered: one tooltip per row, chosen after the button (0.315 review).
                 var rowHovered=ImGui.IsItemHovered();
                 ImGui.TableNextColumn();ImGui.TextUnformatted($"{route.Distance} / {plannerRange}");
-                ImGui.TableNextColumn();var time=TimeSpan.FromSeconds(route.Seconds);ImGui.TextUnformatted($"{(int)time.TotalHours} h {time.Minutes:00}");
+                ImGui.TableNextColumn();ImGui.TextUnformatted(HoursMinutes(TimeSpan.FromSeconds(route.Seconds)));
                 // 0.335: a market price is missing on this route: its items count at the NPC price, the value is a lower bound (≥).
                 var missingPrices=index-1<plannerMissingCounts.Length ? plannerMissingCounts[index-1]:0;
                 var atLeast=missingPrices>0 ? "≥ ":"";

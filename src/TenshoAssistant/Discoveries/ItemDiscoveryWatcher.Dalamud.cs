@@ -249,7 +249,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     }
 
     // Eorzea minute of the day (175 s an Eorzea hour), as Tensho's clocks count it.
-    private static int EorzeaMinute(DateTimeOffset at)=>(int)(at.ToUnixTimeMilliseconds()*3600/175/1000/60%1440);
+    private static int EorzeaMinute(DateTimeOffset at)=>Gathering.GatheringTime.MinuteOfDay(at);
 
     private Dictionary<uint,long> Counts()
     {

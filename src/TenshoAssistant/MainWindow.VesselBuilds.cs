@@ -343,7 +343,7 @@ internal sealed partial class MainWindow
                     +"\n"+localization.Format("VesselBuilds.CandidateCost",candidate.Summary.Cost,candidate.Summary.Capacity)
                     +(VesselBuilds.VoyagesUntilRepair(candidate.DamagePerVoyage) is { } voyages ? "\n"+localization.Format("VesselBuilds.Wear",voyages,candidate.DamagePerVoyage):""));
                 for(var index=0;index<5;index++){ImGui.TableNextColumn();ImGui.TextUnformatted(candidate.Summary.Stats[index].ToString());}
-                ImGui.TableNextColumn();var time=TimeSpan.FromSeconds(candidate.Seconds);ImGui.TextUnformatted($"{(int)time.TotalHours} h {time.Minutes:00}");
+                ImGui.TableNextColumn();ImGui.TextUnformatted(HoursMinutes(TimeSpan.FromSeconds(candidate.Seconds)));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(candidate.Summary.Repair.ToString());
                 ImGui.TableNextColumn();
                 if(ImGui.SmallButton(localization.Get("VesselBuilds.Apply")+$"##Apply{row}")){StoreVesselPlan(buildVesselKey!,candidate.Build);}

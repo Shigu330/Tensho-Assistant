@@ -161,11 +161,7 @@ internal sealed partial class MainWindow
         // Return: time left, « returned » (finds listed in the tooltip), or « at the dock ».
         ImGui.TableNextColumn();
         var state=Voyages.StateOf(vessel,now);
-        if(state==VoyageState.Voyaging && vessel.ReturnAt is { } at)
-        {
-            var left=at-now;
-            ImGui.TextUnformatted(localization.Format("Reminders.In",(int)left.TotalHours,left.Minutes,at.ToLocalTime().ToString("g")));
-        }
+        if(state==VoyageState.Voyaging && vessel.ReturnAt is { } at)ImGui.TextUnformatted(InText(at,now));
         else if(state==VoyageState.Returned)ImGui.TextColored(Accent,localization.Get("FreeCompany.Returned"));
         else ImGui.TextDisabled(localization.Get("FreeCompany.Idle"));
         if(vessel.Loot.Count>0)

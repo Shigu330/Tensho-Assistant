@@ -174,7 +174,7 @@ internal sealed partial class MainWindow
         if(Weathers(DiscoveryKind.FishTransition) is { Length:>0 } before)parts.Add(localization.Format("FishingPanel.SeenBefore",before));
         if(Weathers(DiscoveryKind.FishCondition) is { Length:>0 } during)parts.Add(localization.Format("FishingPanel.SeenWeather",during));
         if(store.Find(DiscoveryKind.FishCondition,subject=>subject==fish,64) is { Count:>0 } hours)
-            parts.Add($"{hours.Min(fact=>fact.LevelMin)/60:00}:{hours.Min(fact=>fact.LevelMin)%60:00}–{hours.Max(fact=>fact.LevelMax)/60:00}:{hours.Max(fact=>fact.LevelMax)%60:00} ET");
+            parts.Add(EtRange(hours.Min(fact=>fact.LevelMin),hours.Max(fact=>fact.LevelMax)));
         // X-73.18 (0.887): the bites you saw: strength and time from the cast.
         if(store.Find(DiscoveryKind.FishBite,subject=>subject==fish,32) is { Count:>0 } bites)
             parts.Add(string.Join(", ",bites.GroupBy(fact=>fact.Detail).OrderBy(group=>group.Key).Select(group=>
@@ -238,11 +238,13 @@ internal sealed partial class MainWindow
     private string DiscoveryDutyName(uint id)=>DutyName?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
     /// <summary>X-74 (0.860): the level column: a monster's levels, a quantity range, or the Eorzea hours a fish was caught.</summary>
     private static DateTime DiscoveryDay(int day)=>new DateTime(2013,8,27).AddDays(day);
+    // « HH:mm–HH:mm ET » of two Eorzea minutes of the day.
+    private static string EtRange(int from,int to)=>$"{Gathering.GatheringTime.Clock(from)}–{Gathering.GatheringTime.Clock(to)} ET";
     private static string DiscoveryFactLevel(DiscoveryFact fact)
     {
         if(fact.Kind==DiscoveryKind.FestivalSeen)
             return $"{DiscoveryDay(fact.LevelMin):d} – {DiscoveryDay(fact.LevelMax):d}";
-        if(fact.Kind is DiscoveryKind.FishCondition or DiscoveryKind.VistaSeen)return $"{fact.LevelMin/60:00}:{fact.LevelMin%60:00}–{fact.LevelMax/60:00}:{fact.LevelMax%60:00} ET";
+        if(fact.Kind is DiscoveryKind.FishCondition or DiscoveryKind.VistaSeen)return EtRange(fact.LevelMin,fact.LevelMax);
         var range=fact.LevelMin==fact.LevelMax ? fact.LevelMax.ToString():$"{fact.LevelMin}–{fact.LevelMax}";
         return ItemSourceKinds.Contains(fact.Kind) ? "×"+range:range;
     }

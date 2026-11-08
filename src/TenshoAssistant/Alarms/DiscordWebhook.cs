@@ -142,11 +142,7 @@ public static class DiscordWebhook
     /// allowed (else removed), the role mention first when set, cut to Discord's 2000 characters.
     /// </summary>
     /// <summary>Eorzea time at this moment, HH:mm (one Eorzean hour lasts 175 seconds).</summary>
-    public static string EorzeaClock(DateTimeOffset moment)
-    {
-        var minutes=moment.ToUnixTimeMilliseconds()*3600/175/1000/60%1440;
-        return $"{minutes/60:00}:{minutes%60:00}";
-    }
+    public static string EorzeaClock(DateTimeOffset moment)=>Gathering.GatheringTime.Clock(Gathering.GatheringTime.MinuteOfDay(moment));
 
     public static string Format(DiscordSettings settings, string defaultTemplate, string? alarmMessage, string label, int minutes, DateTimeOffset localTime, string? character, string? zone = null, string? item = null)
     {

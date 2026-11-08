@@ -5,7 +5,11 @@ namespace TenshoAssistant.Gathering;
 public sealed record WeatherDefinition(uint Id,string Name,uint Icon,string? EnglishName=null);
 public sealed record WeatherShare(uint WeatherId,int Chance);
 public sealed record ZoneWeather(uint TerritoryId,uint RateId,IReadOnlyList<WeatherShare> Shares,bool Individual=false);
-public sealed record WeatherPeriod(DateTimeOffset StartsAt,DateTimeOffset EndsAt,int EtHour,WeatherDefinition? Weather,string? UnknownReason);
+public sealed record WeatherPeriod(DateTimeOffset StartsAt,DateTimeOffset EndsAt,int EtHour,WeatherDefinition? Weather,string? UnknownReason)
+{
+    /// <summary>The Eorzea hours of this 8-hour period, « HH–HH ».</summary>
+    public string EtHours=>$"{EtHour:00}–{(EtHour+8)%24:00}";
+}
 public sealed class WeatherCatalog
 {
     private readonly FrozenDictionary<uint,WeatherDefinition> definitions;

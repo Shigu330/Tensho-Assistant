@@ -1802,12 +1802,7 @@ internal sealed partial class MainWindow
             ImGui.TextColored(TimedPointColor(point),localization.Format(!open ? "MapView.TimedClosed":access?.TomeMissing is not null ? "MapView.TimedOpenNoTome":"MapView.TimedOpen",point.Schedule!.Label));
             // 0.754 (X-08, user report: « closed now » without a timer): how long until it opens, or closes, as on the Gathering page.
             var now=DateTimeOffset.UtcNow;
-            if(TenshoAssistant.Gathering.GatheringTime.Next(point.Schedule,now,1).Openings.FirstOrDefault() is { } next)
-            {
-                var current=next.StartsAt<=now && now<next.EndsAt;
-                var remaining=(current ? next.EndsAt:next.StartsAt)-now;
-                ImGui.TextDisabled(localization.Format(current ? "LocalClock.CountdownClose":"LocalClock.CountdownOpen",Math.Max(0,(int)remaining.TotalHours),remaining.Minutes,remaining.Seconds));
-            }
+            if(TenshoAssistant.Gathering.GatheringTime.Next(point.Schedule,now,1).Openings.FirstOrDefault() is { } next)ImGui.TextDisabled(WindowCountdown(next.At(now)));
         }
         if(access is null)return;
         if(access.TomeMissing is { } tome)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MapView.TomeMissing",tome));
@@ -1887,8 +1882,8 @@ internal sealed partial class MainWindow
     }
     private string ExpansionName(int section)=>localization.Get("MapView.Expansion"+Math.Clamp(section,0,5));
 
-    // Eorzea time: 1 Eorzea day = 70 real minutes (3600/175 Eorzea seconds per real second).
-    private static int EorzeaMinutes()=>(int)(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()*3600/175/1000/60%1440);
+    // Eorzea minute of the day now (one Eorzea day = 70 real minutes), from the one shared formula.
+    private static int EorzeaMinutes()=>Gathering.GatheringTime.MinuteOfDay(DateTimeOffset.UtcNow);
     // Sightseeing log entry: number (row order), name, state, and the game's picture once discovered.
     private void DrawSightseeingTooltip(MapLocalPosition vista,bool? done)
     {
@@ -1914,7 +1909,7 @@ internal sealed partial class MainWindow
             // X-75.5 (0.879): the weather and hour you registered it in, before the wiki's weathers (seen with, not « required »).
             if(DiscoveryStore is { } vistaStore && DiscoveriesLoaded && vistaStore.Find(Discoveries.DiscoveryKind.VistaSeen,subject=>subject==vista.Id,4) is { Count:>0 } registered)
                 foreach(var fact in registered)
-                    ImGui.TextColored(UI.FfxivTheme.Success,localization.Format("MapView.VistaSeen",weather.State.Catalog?.Weather(fact.Detail)?.Name ?? $"#{fact.Detail}",$"{fact.LevelMin/60:00}:{fact.LevelMin%60:00}"));
+                    ImGui.TextColored(UI.FfxivTheme.Success,localization.Format("MapView.VistaSeen",weather.State.Catalog?.Weather(fact.Detail)?.Name ?? $"#{fact.Detail}",Gathering.GatheringTime.Clock(fact.LevelMin)));
             wikiVistas?.Request();
             if(WikiVistaFor(vista) is { } wiki)
             {

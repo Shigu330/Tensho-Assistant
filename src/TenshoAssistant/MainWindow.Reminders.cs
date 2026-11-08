@@ -47,6 +47,12 @@ internal sealed partial class MainWindow
         ],ref reminderTabFocus);
     }
 
+    // « in H h mm (date) » of a coming time, on the Reminders page and the Free Company voyages.
+    private string InText(DateTimeOffset at,DateTimeOffset now)
+    {
+        var left=at-now;
+        return localization.Format("Reminders.In",(int)left.TotalHours,left.Minutes,at.ToLocalTime().ToString("g"));
+    }
     private void DrawReminderTimers(GameTimerSnapshot? timers,DateTimeOffset now)
     {
         if(!ImGui.BeginTable("Reminders",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
@@ -193,11 +199,7 @@ internal sealed partial class MainWindow
             ImGui.TableNextColumn();ImGui.TextUnformatted(state);
             extra?.Invoke();
             ImGui.TableNextColumn();
-            if(next is { } at)
-            {
-                var left=at-now;
-                ImGui.TextUnformatted(localization.Format("Reminders.In",(int)left.TotalHours,left.Minutes,at.ToLocalTime().ToString("g")));
-            }
+            if(next is { } at)ImGui.TextUnformatted(InText(at,now));
             else ImGui.TextDisabled("—");
             ImGui.TableNextColumn();
             if(lastReset is { } reset)

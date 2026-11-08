@@ -63,7 +63,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();
                     if(entry.Weather is not { } value){ImGui.TextDisabled("?");continue;}
                     DrawItemIcon(new ItemDefinition(0,value.Name,false,value.Icon),new Vector2(24));
-                    if(ImGui.IsItemHovered())WrappedTooltip($"{value.Name}\n{entry.StartsAt.ToLocalTime():g} · {entry.EtHour:00}–{(entry.EtHour+8)%24:00} ET");
+                    if(ImGui.IsItemHovered())WrappedTooltip($"{value.Name}\n{entry.StartsAt.ToLocalTime():g} · {entry.EtHours} ET");
                 }
             }
         }
@@ -101,7 +101,7 @@ internal sealed partial class MainWindow
                 {
                     var entry=weatherForecast[i];ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.TextUnformatted(i==0 ? localization.Get("Weather.Current"):localization.Format("Weather.Next",i));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(entry.StartsAt.ToLocalTime().ToString("g"));
-                    ImGui.TableNextColumn();ImGui.TextUnformatted($"{entry.EndsAt.ToLocalTime():g} · {entry.EtHour:00}–{(entry.EtHour+8)%24:00} ET");
+                    ImGui.TableNextColumn();ImGui.TextUnformatted($"{entry.EndsAt.ToLocalTime():g} · {entry.EtHours} ET");
                     ImGui.TableNextColumn();
                     if(entry.Weather is { } value){DrawItemIcon(new ItemDefinition(0,value.Name,false,value.Icon),new Vector2(28));ImGui.SameLine();ImGui.TextUnformatted(value.Name);}
                     else
@@ -183,7 +183,7 @@ internal sealed partial class MainWindow
                     ()=>[new TenshoAlarm{Label=$"{wanted.Name} · {weatherZone}",Group=$"{wanted.Name} · {weatherZone}",IconId=wanted.Icon,Repeat=AlarmRepeat.Once,At=entry.StartsAt,LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead),TerritoryId=weatherTerritory}]);
             else AlarmButtonSpace();
             ImGui.SameLine();
-            ImGui.TextUnformatted(localization.Format("Weather.Occurrence",entry.StartsAt.ToLocalTime().ToString("g"),entry.EndsAt.ToLocalTime().ToString("t"),$"{entry.EtHour:00}–{(entry.EtHour+8)%24:00}",
+            ImGui.TextUnformatted(localization.Format("Weather.Occurrence",entry.StartsAt.ToLocalTime().ToString("g"),entry.EndsAt.ToLocalTime().ToString("t"),entry.EtHours,
                 Math.Max(0,(int)(entry.StartsAt-now).TotalMinutes)));
         }
     }

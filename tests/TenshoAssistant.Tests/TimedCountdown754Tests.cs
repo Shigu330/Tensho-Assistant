@@ -11,7 +11,11 @@ internal static class TimedCountdown754Tests
             var map=Read("MainWindow.MapView.cs");
             var tip=map[map.IndexOf("private void DrawPointAvailability")..];
             tip=tip[..tip.IndexOf("if(access is null)return;")];
-            Check(tip.Contains("GatheringTime.Next(point.Schedule,now,1)") && tip.Contains("\"LocalClock.CountdownOpen\""),"countdown");
+            // 0.906 (X-76): the countdown text is the shared WindowCountdown of the Gathering page.
+            Check(tip.Contains("GatheringTime.Next(point.Schedule,now,1)") && tip.Contains("WindowCountdown(next.At(now))"),"countdown");
+            var clock=Read("MainWindow.GatheringTime.cs");
+            var helper=clock[clock.IndexOf("private string WindowCountdown(")..];
+            Check(helper[..helper.IndexOf(';')].Contains("\"LocalClock.CountdownOpen\""),"countdown text");
         }),
     ];
 }

@@ -18,20 +18,20 @@ Found by four read-only agents (one theme each: places and times, Draw caches, g
 | 11 | Per-key memo dictionary reset when a generation changes (Revision, second, catalogue reference): 7 copies with different size policies | 7 | low | no | to do |
 | 12 | Two-click 'armed' delete button with the 'dropped if not drawn last frame' guard, written three times | 8 | low | no | to do |
 | 13 | Inconsistency: four other two-click delete buttons stay armed after the page is left | 8 | low | yes | to do |
-| 14 | Timed gathering point 'open now and time left' worked out in four places, with the countdown text twice | 6 | low | no | to do |
+| 14 | Timed gathering point 'open now and time left' worked out in four places, with the countdown text twice | 6 | low | no | 0.906 |
 | 15 | 'Ask for the quest journal at most once a minute while it is empty' written three times with two timestamps | 5 | low | no | to do |
 | 16 | EquivalentMaps and SameLandMaps: the same single-slot cache of (map, catalogue) to a HashSet, with different guards | 4 | low | no | to do |
 | 17 | World position to map coordinate conversion inlined 8 times although a helper exists | 9 | low | no | 0.905 |
 | 18 | The "X 12.3 Y 4.5" coordinate text is hand-written with 5 spacings and 2 cultures | 9 | low | yes | 0.905 |
 | 19 | Coordinate numbers passed to localized texts: current culture at some sites, invariant at others | 12 | low | yes | 0.905 |
 | 20 | Default bookmark name built twice the same way, differently from the import, and saved | 3 | low | no | 0.905 |
-| 21 | Eorzea minute of the day computed in 4 places | 4 | low | no | to do |
-| 22 | Eorzea "HH:mm" from a minute of the day written by hand about 8 times | 8 | low | no | to do |
-| 23 | Weather ET 8-hour window text written 3 times on the Weather page | 3 | low | no | to do |
-| 24 | Timed gathering countdown (open or closed, time left, h:mm:ss) repeated on 3 pages | 3 | low | no | to do |
-| 25 | "H h mm" duration hard-coded 4 times on the airship and submarine pages | 4 | low | no | to do |
-| 26 | Reminders.In "in H h mm (date)" line duplicated between Free Company and Reminders | 2 | low | no | to do |
-| 27 | Unused duration formatter CacheAge.Label with a hard-coded French "j" | 1 | low | no | to do |
+| 21 | Eorzea minute of the day computed in 4 places | 4 | low | no | 0.906 |
+| 22 | Eorzea "HH:mm" from a minute of the day written by hand about 8 times | 8 | low | no | 0.906 |
+| 23 | Weather ET 8-hour window text written 3 times on the Weather page | 3 | low | no | 0.906 |
+| 24 | Timed gathering countdown (open or closed, time left, h:mm:ss) repeated on 3 pages | 3 | low | no | 0.906 |
+| 25 | "H h mm" duration hard-coded 4 times on the airship and submarine pages | 4 | low | no | 0.906 |
+| 26 | Reminders.In "in H h mm (date)" line duplicated between Free Company and Reminders | 2 | low | no | 0.906 |
+| 27 | Unused duration formatter CacheAge.Label with a hard-coded French "j" | 1 | low | no | 0.906 |
 | 28 | "Seen by you" labels are shown for imported and community facts (10 keys, one rule missing) | 18 | low | yes | to do |
 | 29 | Most-seen spearfishing shadow of a fish is computed twice | 2 | low | no | to do |
 | 30 | Discovery fact formatting repeated: Seen+Imported sum (10x), level range (2x), Eorzea-hour range (3x) | 13 | low | no | to do |
@@ -50,3 +50,13 @@ Found by four read-only agents (one theme each: places and times, Draw caches, g
   writes them: a Windows set to French showed « 12,3 » on some pages and « 12.3 » on others. Also the monster position from Garland Tools (2 decimals
   before, 1 now, like the game).
 - One default bookmark name (`MapBookmarks.DefaultName`), used by the two places that built it.
+
+## 0.906 — Eorzea time and durations (findings 14, 21 to 27)
+
+- One Eorzea minute of the day (`GatheringTime.MinuteOfDay`, the exact formula) for the map, the discoveries and the Discord alarms.
+- One « HH:mm » (`GatheringTime.Clock`) for schedules, alarms, discoveries, the fishing panel and the map.
+- One weather window text (`WeatherPeriod.EtHours`), one opening state (`GatheringOpening.At(now)`: open, time left) and one countdown text
+  (`WindowCountdown`) for the gathering clock, the map tooltip, the lists and the duty finder.
+- One « H h mm » for the airship and submarine pages, one « in H h mm (date) » for reminders and the company page.
+- `CacheAge.Label` removed (no caller, a French « j » for days in code).
+- Texts unchanged.

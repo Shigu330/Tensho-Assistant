@@ -194,7 +194,7 @@ internal sealed partial class MainWindow
             var parts=new List<string>();var detail=new List<string>();
             if(free is not null){parts.Add(free);detail.Add(localization.Get("FishingPanel.NoConditionDetail"));}
             if(timeLimited!=false && known.StartMinute is { } start && known.EndMinute is { } stop)
-            {var window=$"{start/60:00}:{start%60:00}–{stop/60%24:00}:{stop%60:00} ET";parts.Add(window);detail.Add(window);}
+            {var window=$"{GatheringTime.Clock(start)}–{GatheringTime.Clock(stop%1440)} ET";parts.Add(window);detail.Add(window);}
             if(weatherLimited!=false && known.Transitions.Count>0){parts.Add(Weathers(known.Transitions)+" ›");detail.Add(localization.Format("FishingPanel.Previous",Weathers(known.Transitions)));}
             if(weatherLimited!=false && known.Weathers.Count>0){parts.Add(Weathers(known.Weathers));detail.Add(localization.Format("FishingPanel.Weather",Weathers(known.Weathers)));}
             if(known.Lure is { } lure){parts.Add(lure);detail.Add(localization.Format("FishingPanel.Lure",lure));}

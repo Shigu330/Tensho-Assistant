@@ -35,14 +35,13 @@ public sealed class GatheringSchedule
         Label = kind switch
         {
             GatheringScheduleKind.Unrestricted => "No ET time restriction",
-            GatheringScheduleKind.Limited => string.Join(" · ", Windows.Select(w => $"{Time(w.StartMinute)}–{Time(w.EndMinute)}")) + " ET",
+            GatheringScheduleKind.Limited => string.Join(" · ", Windows.Select(w => $"{GatheringTime.Clock(w.StartMinute)}–{GatheringTime.Clock(w.EndMinute)}")) + " ET",
             GatheringScheduleKind.NoWindow => "No ET window reported",
             GatheringScheduleKind.Invalid => "ET schedule cannot be interpreted",
             _ => "ET schedule unknown / not covered",
         };
     }
 
-    private static string Time(int minute) => $"{minute / 60:00}:{minute % 60:00}";
     private static bool TryMinutes(ushort value, out int minutes)
     {
         minutes = value / 100 * 60 + value % 100;

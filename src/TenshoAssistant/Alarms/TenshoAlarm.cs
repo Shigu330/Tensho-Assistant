@@ -160,7 +160,7 @@ public static class AlarmSchedule
         IReadOnlyList<uint>? weathers = null, IReadOnlyList<uint>? previous = null) =>
         startMinutes.Select(minute => ((minute % 1440) + 1440) % 1440).Distinct().Order().Select(minute => new TenshoAlarm
         {
-            Label = $"{label} · {minute / 60:00}:{minute % 60:00} ET", Repeat = AlarmRepeat.EorzeaDaily, EtMinute = minute,
+            Label = $"{label} · {Gathering.GatheringTime.Clock(minute)} ET", Repeat = AlarmRepeat.EorzeaDaily, EtMinute = minute,
             LeadMinutes = ClampLead(AlarmRepeat.EorzeaDaily, lead), TerritoryId = territory, ItemId = item,
             Weathers = [.. weathers ?? []], PreviousWeathers = [.. previous ?? []],
         }).ToArray();

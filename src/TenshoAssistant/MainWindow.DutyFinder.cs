@@ -165,7 +165,7 @@ internal sealed partial class MainWindow
             .Select(pair=>(pair.Source,Target:pair.Target!.Value))
             .OrderBy(pair=>pair.Source.IsHidden ? 1:0)
             .ThenBy(pair=>pair.Source.Timing.Kind!=Gathering.GatheringScheduleKind.Limited
-                || Gathering.GatheringTime.Next(pair.Source.Timing,now,1).Openings.FirstOrDefault() is { } next && next.StartsAt<=now && now<next.EndsAt ? 0:1)
+                || Gathering.GatheringTime.Next(pair.Source.Timing,now,1).Openings.FirstOrDefault() is { } next && next.At(now).Open ? 0:1)
             .ThenBy(pair=>pair.Source.Zone==here ? 0:1).ThenBy(pair=>ListPanelZoneCost(pair.Source.Zone) ?? uint.MaxValue).ThenBy(pair=>pair.Source.Level)
             .Cast<(Gathering.GatheringSource,(Maps.MapDefinition,Vector2))?>().FirstOrDefault();
     }

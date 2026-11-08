@@ -49,5 +49,4 @@ public sealed class CachePreferences
 public static class CacheAge
 {
     public static bool Fresh(DateTimeOffset? recordedAt,DateTimeOffset now,TimeSpan duration)=>recordedAt is { } date && duration>TimeSpan.Zero && now>=date && now-date<duration;
-    public static string Label(TimeSpan duration)=>duration>=CachePreferences.NeverExpires ? "∞":duration.TotalDays>=1 ? $"{duration.TotalDays:0} j":duration.TotalHours>=1 ? $"{duration.TotalHours:0} h":$"{duration.TotalMinutes:0} min";
 }

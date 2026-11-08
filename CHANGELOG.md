@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.906.0
+- Plan global, Verify : Nettoyage complet (X-76), étape 2, deuxième famille, heures et durées : une seule formule de la minute d'Eorzéa, une seule écriture « HH:mm », un seul texte de la tranche météo, un seul calcul « ouvert / temps restant » et un seul compte à rebours pour les points de récolte à horaire (horloge de récolte, info-bulle de carte, listes, recherche de mission), une seule écriture « H h mm » pour les aéronefs et sous-marins, une seule ligne « dans H h mm » pour les rappels et la compagnie ; un formateur inutilisé (avec un « j » français dans le code) retiré. Textes inchangés ; nouveaux tests de valeur (docs/evidence/x76-2-duplicates.md). Non validé en jeu.
+- Tests : EorzeaTime906Tests. Verify.ps1 (agent) : 1488/1488, 0 avertissement, 0 erreur ; DLL 0.906.0.0. Non validé en jeu.
+### English
+- Full clean-up (X-76), step 2, second family, times and durations: one Eorzea minute formula, one « HH:mm », one weather window text, one « open / time left » computation and one countdown for timed gathering points (gathering clock, map tooltip, lists, duty finder), one « H h mm » for airships and submarines, one « in H h mm » line for reminders and the company page; an unused formatter (with a French « j » in code) removed. Texts unchanged; new value tests (docs/evidence/x76-2-duplicates.md). Not validated in game.
+
 ## 0.905.0
 - Plan global, Verify : Nettoyage complet (X-76), étape 2 (doublons et cohérence) : quatre agents ont relevé 37 logiques écrites plusieurs fois ou incohérentes (liste et état : docs/evidence/x76-2-duplicates.md). Première famille, les coordonnées de carte : une seule conversion de la position du jeu en coordonnées de carte, une seule écriture « X 12.3 Y 4.5 » et un seul format des nombres, toujours avec un point comme le jeu (un Windows en français affichait « 12,3 » sur certaines pages et « 12.3 » sur d'autres), un seul nom par défaut des signets ; la position d'un monstre (Garland Tools) passe de 2 décimales à 1. Nouveaux tests, dont un avec Windows en français. Non validé en jeu.
 - Tests : MapCoordinates905Tests. Verify.ps1 (agent) : 1485/1485, 0 avertissement, 0 erreur ; DLL 0.905.0.0. Non validé en jeu.

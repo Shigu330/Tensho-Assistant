@@ -17,6 +17,9 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,localization.Format("GatheringClock.Time",minute/60,minute%60));
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GatheringClock.Disclaimer"));
     }
+    // Countdown of an opening: the time until it closes (open) or opens (closed), also used by the map tooltip of a timed point.
+    private string WindowCountdown((bool Open,TimeSpan Left) state)
+        =>localization.Format(state.Open ? "LocalClock.CountdownClose":"LocalClock.CountdownOpen",Math.Max(0,(int)state.Left.TotalHours),state.Left.Minutes,state.Left.Seconds);
     // 0.330: text of a schedule for the UI and the copies: its windows (language-neutral) or the translated text of its kind.
     private string ScheduleText(GatheringSchedule schedule)=>schedule.TextKey is { } key ? localization.Get(key):schedule.Label;
     private void DrawGatheringTime(GatheringSchedule schedule)
@@ -28,10 +31,9 @@ internal sealed partial class MainWindow
         if(!gatheringTimeCache.TryGetValue(schedule.Key,out var timeline) || timeline.Openings.FirstOrDefault() is { } cached && cached.EndsAt<=now)
         {timeline=GatheringTime.Next(schedule,now);gatheringTimeCache[schedule.Key]=timeline;}
         if(timeline.Openings.FirstOrDefault() is not { } first)return;
-        var current=first.StartsAt<=now && now<first.EndsAt;
+        var (current,remaining)=first.At(now);
         ImGui.TextColored(current ? Success:Muted,localization.Format(current ? "LocalClock.Current":"LocalClock.Next",current ? first.EndsAt.ToLocalTime().ToString("HH:mm:ss"):first.StartsAt.ToLocalTime().ToString("g")));
-        var remaining=(current ? first.EndsAt:first.StartsAt)-now;
-        ImGui.TextDisabled(localization.Format(current ? "LocalClock.CountdownClose":"LocalClock.CountdownOpen",Math.Max(0,(int)remaining.TotalHours),remaining.Minutes,remaining.Seconds));
+        ImGui.TextDisabled(WindowCountdown((current,remaining)));
         if(ImGui.IsItemHovered())WrappedTooltip(string.Join('\n',timeline.Openings.Select(window=>$"{window.StartsAt.ToLocalTime():g}–{window.EndsAt.ToLocalTime():g}"))+"\n"+localization.Get("GatheringClock.Disclaimer"));
     }
 }

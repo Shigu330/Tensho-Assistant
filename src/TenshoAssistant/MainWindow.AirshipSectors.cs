@@ -59,7 +59,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted(sector.Name);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(sector.RankReq.ToString());
                 ImGui.TableNextColumn();ImGui.TextUnformatted(sector.CeruleumTanks.ToString());
-                ImGui.TableNextColumn();ImGui.TextUnformatted($"{sector.SurveyMinutes/60} h {sector.SurveyMinutes%60:00}");
+                ImGui.TableNextColumn();ImGui.TextUnformatted(HoursMinutes(TimeSpan.FromMinutes(sector.SurveyMinutes)));
                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("AirshipSectors.SurveyTip"));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(sector.Exp>0 ? sector.Exp.ToString("N0"):"—");
                 ImGui.TableNextColumn();
