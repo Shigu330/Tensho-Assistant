@@ -81,6 +81,16 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     var stock=GetRecipeHoldings(fishId);
                     ItemCell(fish,fishId,22,$"{fish?.Name ?? fishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
+                    // X-85 V5 (0.963): a fish that needs Fisher's Intuition (GatherBuddy predators): an eye, the fish to catch first in its tooltip.
+                    if(gatherBuddyFish?.State.Data?.Find(fishId) is { Predators.Count:>0 } needs)
+                    {
+                        ImGui.SameLine();
+                        ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
+                        try{ImGui.TextColored(Warning,Dalamud.Interface.FontAwesomeExtensions.ToIconString(Dalamud.Interface.FontAwesomeIcon.Eye));}
+                        finally{ImGui.PopFont();}
+                        var predators=localization.Format("FishingPanel.Predators",string.Join(", ",needs.Predators.Select(pair=>$"{items?.Find(pair.Fish)?.Name ?? pair.Fish.ToString()} ×{pair.Count}")));
+                        TipText(needs.Intuition is { } seconds ? predators+"\n"+localization.Format("FishingPanel.Intuition",seconds):predators);
+                    }
                     // X-85 V3 (0.961, user request): a mark on the fish that count for a mission not done yet, the missions in its tooltip.
                     if(countsFor?.Invoke(fishId,row.Bite) is { Count:>0 } wanted)
                     {

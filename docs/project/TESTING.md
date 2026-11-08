@@ -1566,6 +1566,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.962) Prochain voyage, quand un courant spectral commence : page Découvertes « pêché avec … juste avant un courant spectral » ; au voyage suivant sur la même escale, la ligne dans le panneau.
 
+- [ ] (0.963) Panneau de voyage : un œil à côté des poissons à intuition ; survol, les poissons à pêcher d'abord.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

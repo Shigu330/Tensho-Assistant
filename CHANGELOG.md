@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.963.0
+- Plan global, Verify : Pêche en mer, V5 : dans le panneau de voyage, un œil marque les poissons qui demandent l'Intuition du pêcheur ; son info-bulle dit quels poissons pêcher d'abord (et combien), et la durée de l'intuition quand elle est connue (GatherBuddy). La pêche au vif était déjà montrée par les icônes d'appât (appât › poisson à réutiliser), et le temps restant de l'intuition en tête du panneau. Non validé en jeu.
+- Tests : OceanIntuition963Tests. Verify.ps1 (agent) : 1590/1590, 0 avertissement, 0 erreur ; DLL 0.963.0.0. Non validé en jeu.
+### English
+- Ocean fishing, V5: in the voyage panel, an eye marks the fish that need Fisher's Intuition; its tooltip says which fish to catch first (and how many), and the intuition's length when known (GatherBuddy). Mooching was already shown by the bait icons (bait › fish to mooch), and the intuition time left at the top of the panel. Not validated in game.
+
 ## 0.962.0
 - Plan global, Verify : Pêche en mer, V4 (votre priorité 1, meilleur appât pour le courant spectral) : rien dans les données du jeu ne dit ce qui déclenche le courant spectral. Tensho le relève donc maintenant : quand un courant commence à une escale, votre dernière prise (dans les 90 secondes) et son appât sont notés (nouvelle sorte de découverte, partagée si vous le voulez) ; le panneau de voyage affiche « Pêché juste avant un courant spectral ici : poisson avec appât (×n) ». C'est un « vu avec », pas une preuve : la prise d'un autre joueur peut aussi lancer le courant. L'outil de fusion connaît cette sorte. Non validé en jeu.
 - Tests : SpectralBefore962Tests. Verify.ps1 (agent) : 1589/1589, 0 avertissement, 0 erreur ; DLL 0.962.0.0. Non validé en jeu.
