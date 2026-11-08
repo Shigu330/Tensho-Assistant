@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.946.0
+- Plan global, Verify : Pêche en mer, correction sur votre signalement (capture : Tensho affichait « Mer de Rubis · nuit » quand le jeu montrait le soleil) : le moment de la journée de chaque escale était mal lu. Les données du jeu donnent 1, 2 ou 3 par escale ; Tensho lisait 1 nuit, 2 jour, 3 crépuscule (règle reprise d'un autre outil), c'est en fait 1 jour, 2 crépuscule, 3 nuit, ce qui donne bien jour → crépuscule → nuit d'une escale à l'autre. Concerne le panneau de voyage, l'horaire des départs et le nom des voyages (« crépuscule », « nuit »…). Votre premier voyage (16 h UTC) commençait donc au crépuscule, pas de jour. À confirmer au prochain voyage. Preuve : docs/evidence/0.946-ocean-time.md. Non validé en jeu.
+- Tests : OceanFishing392Tests. Verify.ps1 (agent) : 1558/1558, 0 avertissement, 0 erreur ; DLL 0.946.0.0. Non validé en jeu.
+### English
+- Ocean fishing, fix after your report (screenshot: Tensho showed « Ruby Sea · night » while the game showed the sun): each stop's moment of the day was read wrongly. The game's data give 1, 2 or 3 per stop; Tensho read 1 night, 2 day, 3 sunset (a rule taken from another tool), it is in fact 1 day, 2 sunset, 3 night, which gives day → sunset → night from stop to stop. Affects the voyage panel, the departures timetable and the voyages' names (« sunset », « night »…). Your first voyage (16:00 UTC) therefore started at sunset, not by day. To confirm on the next voyage. Evidence: docs/evidence/0.946-ocean-time.md. Not validated in game.
+
 ## 0.945.0
 - Plan global, Verify : Nettoyage X-76, étape 3 (fin des demandes notées) : nouvelle case « Données du jeu et observées seulement » (Paramètres › Avancé, sources) qui coupe d'un coup les sept sources communautaires, garde le choix de chacune et le rend quand on la décoche (vos découvertes restent) ; nouveau bouton « Vider le cache… » (Paramètres › Données, cache), avec confirmation ; avant de vider le cache ou les découvertes, Tensho fait une copie zip dans le dossier Backups du plugin (les 5 dernières de chaque sorte sont gardées ; la clé GitHub n'est jamais copiée). Non validé en jeu.
 - Tests : GameOnlyBackup945Tests. Verify.ps1 (agent) : 1558/1558, 0 avertissement, 0 erreur ; DLL 0.945.0.0. Non validé en jeu.

@@ -1532,6 +1532,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.945) Paramètres › Avancé : cocher « Données du jeu et observées seulement » (les sources se grisent et se décochent), décocher (elles reviennent comme avant) ; Paramètres › Données : « Vider le cache… », puis le dossier Backups contient la copie.
 
+- [ ] (0.946) Prochain voyage : à chaque escale, le moment affiché par Tensho (jour, crépuscule, nuit) est celui du soleil / demi-soleil / lune de la fenêtre du jeu.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

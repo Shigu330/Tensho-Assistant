@@ -1,9 +1,9 @@
 namespace TenshoAssistant.Gathering;
 
-/// <summary>Moment of the day at an ocean fishing stop (IKDTimeDefine row: 1 night, 2 day, 3 sunset).</summary>
+/// <summary>Moment of the day at an ocean fishing stop (IKDTimeDefine row: 1 day, 2 sunset, 3 night; 0.946).</summary>
 public enum OceanTime { Unknown, Night, Day, Sunset }
 
-/// <summary>One stop of a voyage: its place and the moment of the day there.</summary>
+/// <summary>One stop of a voyage: its place and the moment of the day there (IKDTimeDefine 1 day, 2 sunset, 3 night since 0.946).</summary>
 public sealed record OceanStop(string Place,OceanTime Time);
 
 /// <summary>An ocean fishing voyage (IKDRoute): its game name, its three stops, and the moment it is named after (the last stop's).</summary>
@@ -94,7 +94,12 @@ public sealed class OceanSchedule(IReadOnlyList<(uint Aldenard,uint Othard)> loo
     public IReadOnlyList<OceanRoute> Possible(long index,OceanPort port,IReadOnlyList<int> candidates)
         =>loop.Count==0 ? []:candidates.Select(shift=>Column(port,index+shift)).Distinct().Select(id=>routes.GetValueOrDefault(id)).OfType<OceanRoute>().OrderBy(route=>route.Id).ToArray();
 
-    public static OceanTime TimeOf(uint defineRow)=>defineRow switch{1=>OceanTime.Night,2=>OceanTime.Day,3=>OceanTime.Sunset,_=>OceanTime.Unknown};
+    /// <summary>
+    /// X-85 (0.946, user report 2026-11-08 with a capture): IKDTimeDefine 1 = day, 2 = sunset, 3 = night. The 0.392 reading (1 night, 2 day, 3 sunset) was
+    /// wrong: on route 17 the game showed the sun at its third stop (row 1), and every route then goes day → sunset → night from stop to stop, as the game
+    /// does (docs/evidence/0.946-ocean-time.md).
+    /// </summary>
+    public static OceanTime TimeOf(uint defineRow)=>defineRow switch{1=>OceanTime.Day,2=>OceanTime.Sunset,3=>OceanTime.Night,_=>OceanTime.Unknown};
 
     public IReadOnlyCollection<OceanRoute> Routes=>routes.Values.OrderBy(route=>route.Id).ToArray();
 
