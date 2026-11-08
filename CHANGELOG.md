@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.867.0
+- Plan global, Verify : Étape 7, Git : les tickets étaient déjà en anglais. Le ticket de soumission au dépôt officiel de Dalamud est fermé comme non prévu (décision DEC-039 : dépôt personnalisé seulement) et son jalon s'appelle maintenant « 1.0.0 — Custom repository release » ; un ticket suit le travail des découvertes (#42). La description du dépôt GitHub reste à changer avec votre accord. Rien dans le plugin ne change.
+- Tests : CreditCatalogTests. Verify.ps1 (agent) : 1448/1448, 0 avertissement, 0 erreur ; DLL 0.867.0.0. Non validé en jeu.
+### English
+- Phase 7, Git: the issues were already in English. The issue for the submission to Dalamud's official repository is closed as not planned (decision DEC-039: custom repository only) and its milestone is now « 1.0.0 — Custom repository release »; an issue follows the discoveries work (#42). The GitHub repository description is left to change with your agreement. Nothing changes in the plugin.
+
 ## 0.866.0
 - Plan global, Verify : Étape 7 (consigne de nuit X-74), premier passage. Crédits : chaque site appelé par le code est crédité ; quatorze plugins lus pour leurs idées et cités dans le code n'étaient pas dans la liste (Allagan Item Search, Item Search, Currency Spender, CurrencyAlert, Currency Watchdog, GilDelta, TrackyTrack, Glamour Log, AkuItemSets, LeveHelper, SimpleCompare, Tick Tracker, TooltipNotes, Hunty) : ajoutés, avec dépôt, auteur et licence vérifiés à la source, rien de copié. README : toutes les pages décrites dans les deux langues. Aide du plugin : textes dépassés corrigés, une question « Que garde Tensho sur mon PC ? », deux arrêts de plus au guide. Les 14 fichiers .md publics : anglais d'abord, traduction française en bas. Recherche de la page Découvertes : son indication parle maintenant de tout ce qu'elle trouve. Non validé en jeu.
 - Tests : CreditCatalogTests. Verify.ps1 (agent) : 1448/1448, 0 avertissement, 0 erreur ; DLL 0.866.0.0. Non validé en jeu.
