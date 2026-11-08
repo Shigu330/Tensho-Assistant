@@ -55,7 +55,21 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     public Func<IReadOnlySet<uint>?>? Vistas { get; set; }
     /// <summary>X-75.3 (0.877): the weather of the period before (territory, moment), from the game's forecast; 0 when not known.</summary>
     public Func<uint,DateTimeOffset,uint>? PreviousWeather { get; set; }
-    private uint lastFish;
+    private uint lastFish;private uint lastFishBait;private long lastFishAt=-100_000;
+    // X-85 V4 (0.962): the spectral current of the ocean stop, read on the framework thread; its start notes the catch just before it.
+    private bool spectralBefore;
+    private void ReadSpectral(DateTimeOffset at,long now,uint territory)
+    {
+        var events=FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.Instance();
+        var voyage=events==null ? null:events->GetInstanceContentOceanFishing();
+        var spectral=voyage!=null && voyage->SpectralCurrentActive;
+        if(spectral && !spectralBefore && lastFish!=0 && now-lastFishAt is >= 0 and <= 90_000)
+        {
+            store.SeeSource(DiscoveryKind.SpectralBefore,lastFish,lastFishBait,1,at,territory);
+            if(debug())log.Information("Discovery: spectral current after catch {0} (bait {1}).",lastFish,lastFishBait);
+        }
+        spectralBefore=spectral;
+    }
     /// <summary>
     /// X-73.18 (0.887, proved by the in-game capture, docs/evidence/0.887-fishing-bite.md): the line's state at 10 Hz. The cast starts at CastingOut (1); lures do
     /// not restart it; at Bite (5) the player's animation slot 7 holds the bite strength (FishingHookStrength 292 !, 293 !!, 294 !!!). A cast under Chum
@@ -226,7 +240,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         {
             var at=DateTimeOffset.UtcNow;var territory=client.TerritoryType;var map=client.MapId;var duty=dutyOf(territory);
             CheckWeather(at,now,territory,duty);
-            if(wanted.Fishing && me.ClassJob.RowId==18){ReadLine(now,me);ReadSpear(at,now,territory,map,me.Position);ReadIntuition(now,at,territory,map,me);}
+            if(wanted.Fishing && me.ClassJob.RowId==18){ReadLine(now,me);ReadSpear(at,now,territory,map,me.Position);ReadIntuition(now,at,territory,map,me);ReadSpectral(at,now,territory);}
             if(wanted.ItemSources)
             {
                 ReadSalvage(at);ReadPurify(at);ReadHandIn(at,now);ReadVenture(at);ReadLoot(at,territory,duty);
@@ -264,7 +278,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                         store.SeeSource(DiscoveryKind.FishCondition,item,weather,EorzeaMinute(at),at,territory);
                         if((flags & 3) is 1 or 2)store.SeeSource(DiscoveryKind.FishLure,item,(uint)(flags & 3),1,at,territory);
                         if(PreviousWeather?.Invoke(territory,at) is { } before and not 0)store.SeeSource(DiscoveryKind.FishTransition,item,before,EorzeaMinute(at),at,territory);
-                        lastFish=item;
+                        lastFish=item;lastFishBait=bait;lastFishAt=now;
                         if(bitAt>castStarted && castStarted>0 && !castChum && bitAt-castStarted is > 0 and < 600_000)
                         {
                             store.SeeSource(DiscoveryKind.FishBite,item,biteStrength,(int)((bitAt-castStarted)/100),at,territory,map,me.Position);

@@ -603,6 +603,8 @@
     "SharedFull": "{0} shared discoveries were left out: their kind is full ({1} shared per kind). Yours are always kept; nothing is forgotten.",
     "SharedNearlyFull": "Shared discoveries: {0} in the largest kind, of {1} per kind. Yours are always kept.",
     "SharedReading": "Reading the shared discoveries ({0} kinds left)…",
+    "SpectralBefore": "{0}: caught with {1} just before a spectral current",
+    "SummarySpectralBefore": "Catches before a spectral current: {0} ({1} seen by you, {2} imported only)",
     "SummaryFishBite": "Fish bites seen: {0} ({1} seen by you, {2} imported only)",
     "ExchangeTitle": "Exchange with other players (GitHub)",
     "ExchangeHelp": "Share what you discovered and take what others found. Without connecting, the automatic exchange only takes the common discoveries. A discovery never holds a player's name, position or id.",
@@ -6366,6 +6368,9 @@
     "SpectralFish": "Spectral current fish ({0})",
     "SpectralFishTip": "Fish only caught while the spectral current is there (the game's second spot of this place). Open to see their baits and bites.",
     "ForMission": "Counts for: {0}",
+    "SpectralSeenTitle": "Caught just before a spectral current here:",
+    "SpectralSeenTip": "Your catches (and shared ones) noted when a spectral current began at this stop, with their bait. Seen with, not proven to start it: another player's catch can start the current.",
+    "SpectralSeen": "{0} with {1} (×{2})",
     "Mission": "{0}: {1} / {2}",
     "Points": "Points: {0} · fish caught: {1}",
     "Credit": "Game data; baits and bites: GatherBuddy (Apache-2.0), « ? » when unknown."

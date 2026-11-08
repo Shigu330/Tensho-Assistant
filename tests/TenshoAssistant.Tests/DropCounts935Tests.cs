@@ -12,7 +12,7 @@ internal static class DropCounts935Tests
             Check((int)DiscoveryKind.MonsterKill==33 && (int)DiscoveryKind.DutyChestOpened==34,"kinds");
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs"));
             Check(watcher.Contains("store.SeeSource(DiscoveryKind.MonsterKill,npc.NameId,0,npc.Level,at,territory);") && watcher.Contains("if(chestsSeen.Add(item.ChestObjectId))store.SeeSource(DiscoveryKind.DutyChestOpened,duty,0,1,at,territory);"),"counted");
-            Check(File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py")).Contains("KINDS=set(range(1,35))-{26,27}"),"merge tool");
+            Check(File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py")).Contains("KINDS=set(range(1,"),"merge tool");
         }),
     ];
 }

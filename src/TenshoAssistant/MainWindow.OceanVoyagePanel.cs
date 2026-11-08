@@ -182,6 +182,21 @@ internal sealed partial class MainWindow
                     finally{ImGui.TreePop();}
                 }
             }
+            // X-85 V4 (0.962, user's priority 1): what was caught just before a spectral current at this stop (yours and shared), most seen first.
+            if(!stop.Spectral && DiscoveryStore is { } seenStore && DiscoveriesLoaded)
+            {
+                var stopFish=stop.Fish.ToHashSet();
+                var before=seenStore.Find(Discoveries.DiscoveryKind.SpectralBefore,fish=>stopFish.Contains(fish),3);
+                if(before.Count>0)
+                {
+                    ImGui.TextColored(Accent,localization.Get("OceanVoyage.SpectralSeenTitle"));
+                    Tip("OceanVoyage.SpectralSeenTip");
+                    var names=itemCatalog.State.Catalog;
+                    foreach(var fact in before)
+                        ImGui.TextUnformatted(localization.Format("OceanVoyage.SpectralSeen",names?.Find(fact.Subject)?.Name ?? $"#{fact.Subject}",
+                            fact.Detail==0 ? "?":names?.Find(fact.Detail)?.Name ?? $"#{fact.Detail}",Discoveries.DiscoveryFact.TimesOf(fact)));
+                }
+            }
             var missions=OceanVoyages.Missions(data,frame);
             if(missions.Count>0)
             {

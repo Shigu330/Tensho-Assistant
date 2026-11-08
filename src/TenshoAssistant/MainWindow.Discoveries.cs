@@ -120,7 +120,7 @@ internal sealed partial class MainWindow
         DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition,DiscoveryKind.FashionEvaluation,DiscoveryKind.VoyageDrop,DiscoveryKind.VoyageUnlock,DiscoveryKind.BlueSpellLearned,DiscoveryKind.BeastTamed,DiscoveryKind.FestivalSeen,DiscoveryKind.VistaSeen];
     /// <summary>0.911 (X-76): the other kinds the page's search lists too (never shown as an item's source); with the places, FATEs and item sources, every kind.</summary>
     private static readonly DiscoveryKind[] OtherSeenKinds=[DiscoveryKind.NpcPlace,DiscoveryKind.BlueSpellCaster,DiscoveryKind.FishLure,DiscoveryKind.FishTransition,DiscoveryKind.FishBite,
-        DiscoveryKind.QuestItemAsked,DiscoveryKind.SpearShadow,DiscoveryKind.FishBiteBait,DiscoveryKind.IntuitionStart,DiscoveryKind.IntuitionCatch,DiscoveryKind.VoyageVisit,DiscoveryKind.MonsterKill,DiscoveryKind.DutyChestOpened];
+        DiscoveryKind.QuestItemAsked,DiscoveryKind.SpearShadow,DiscoveryKind.FishBiteBait,DiscoveryKind.IntuitionStart,DiscoveryKind.IntuitionCatch,DiscoveryKind.VoyageVisit,DiscoveryKind.MonsterKill,DiscoveryKind.DutyChestOpened,DiscoveryKind.SpectralBefore];
     /// <summary>
     /// X-73.16 (0.872): where you saw a shopkeeper, as a vendor place, for the vendors the game sheets do not place (their own places always come first).
     /// Worked out again only when the base changes.
@@ -300,6 +300,7 @@ internal sealed partial class MainWindow
         DiscoveryKind.FishTransition=>localization.Format("DiscoveriesUi.FishTransition",DiscoveryItemName(fact.Subject),DiscoveryWeatherName(fact.Detail)),
         DiscoveryKind.FishBite=>localization.Format("DiscoveriesUi.FishBite",DiscoveryItemName(fact.Subject),BiteMark(fact.Detail),BiteRange(fact.LevelMin,fact.LevelMax)),
         DiscoveryKind.VoyageVisit=>localization.Format(fact.Detail==1 ? "DiscoveriesUi.VoyageVisitTwice":"DiscoveriesUi.VoyageVisit",DiscoverySectorName(fact.Subject)),
+        DiscoveryKind.SpectralBefore=>localization.Format("DiscoveriesUi.SpectralBefore",DiscoveryItemName(fact.Subject),fact.Detail==0 ? "?":DiscoveryItemName(fact.Detail)),
         DiscoveryKind.MonsterKill=>localization.Format("DiscoveriesUi.MonsterKill",DiscoveryMonsterName(fact.Subject)),
         DiscoveryKind.DutyChestOpened=>localization.Format("DiscoveriesUi.DutyChestOpened",DiscoveryDutyName(fact.Subject)),
         DiscoveryKind.FishBiteBait=>localization.Format("DiscoveriesUi.FishBiteBait",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail),BiteRange(fact.LevelMin,fact.LevelMax)),

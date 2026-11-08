@@ -603,6 +603,8 @@
     "SharedFull": "{0} découvertes partagées ont été laissées de côté : leur sorte est pleine ({1} partagées par sorte). Les vôtres sont toujours gardées ; rien n’est oublié.",
     "SharedNearlyFull": "Découvertes partagées : {0} dans la plus grande sorte, sur {1} par sorte. Les vôtres sont toujours gardées.",
     "SharedReading": "Lecture des découvertes partagées ({0} sortes restantes)…",
+    "SpectralBefore": "{0} : pêché avec {1} juste avant un courant spectral",
+    "SummarySpectralBefore": "Prises avant un courant spectral : {0} ({1} vues par vous, {2} importées seulement)",
     "SummaryFishBite": "Touches de poissons vues : {0} ({1} vues par vous, {2} importées seulement)",
     "ExchangeTitle": "Échange avec les autres joueurs (GitHub)",
     "ExchangeHelp": "Partager ce que vous avez découvert et prendre ce que d'autres ont trouvé. Sans connexion, l'échange automatique récupère seulement les découvertes communes. Une découverte ne contient jamais le nom, la position ni l'identifiant d'un joueur.",
@@ -6366,6 +6368,9 @@
     "SpectralFish": "Poissons du courant spectral ({0})",
     "SpectralFishTip": "Poissons pêchés seulement pendant le courant spectral (le second lieu de pêche de cet endroit dans les données du jeu). Ouvrez pour voir leurs appâts et touches.",
     "ForMission": "Compte pour : {0}",
+    "SpectralSeenTitle": "Pêché juste avant un courant spectral ici :",
+    "SpectralSeenTip": "Vos prises (et celles partagées) notées quand un courant spectral a commencé à cette escale, avec leur appât. Vu avec, pas prouvé comme déclencheur : la prise d'un autre joueur peut lancer le courant.",
+    "SpectralSeen": "{0} avec {1} (×{2})",
     "Mission": "{0} : {1} / {2}",
     "Points": "Points : {0} · poissons pris : {1}",
     "Credit": "Données du jeu ; appâts et touches : GatherBuddy (Apache-2.0), « ? » si inconnus."

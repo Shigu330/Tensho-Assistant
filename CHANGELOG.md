@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.962.0
+- Plan global, Verify : Pêche en mer, V4 (votre priorité 1, meilleur appât pour le courant spectral) : rien dans les données du jeu ne dit ce qui déclenche le courant spectral. Tensho le relève donc maintenant : quand un courant commence à une escale, votre dernière prise (dans les 90 secondes) et son appât sont notés (nouvelle sorte de découverte, partagée si vous le voulez) ; le panneau de voyage affiche « Pêché juste avant un courant spectral ici : poisson avec appât (×n) ». C'est un « vu avec », pas une preuve : la prise d'un autre joueur peut aussi lancer le courant. L'outil de fusion connaît cette sorte. Non validé en jeu.
+- Tests : SpectralBefore962Tests. Verify.ps1 (agent) : 1589/1589, 0 avertissement, 0 erreur ; DLL 0.962.0.0. Non validé en jeu.
+### English
+- Ocean fishing, V4 (your priority 1, the best bait for the spectral current): nothing in the game's data says what starts the spectral current. Tensho now records it: when a current begins at a stop, your last catch (within 90 seconds) and its bait are noted (new discovery kind, shared if you want); the voyage panel shows « Caught just before a spectral current here: fish with bait (×n) ». It is « seen with », not proof: another player's catch can also start the current. The merge tool knows this kind. Not validated in game.
+
 ## 0.961.0
 - Plan global, Verify : Pêche en mer, V3 (votre demande : mettre en évidence les poissons des objectifs) : dans le panneau de voyage, une cible apparaît à côté de chaque poisson qui compte pour un objectif pas encore rempli, et son info-bulle dit lequel. Les objectifs d'espèce (requins, crabes, crevettes ou céphalopodes…) sont reliés aux poissons par les données du jeu, sans liste écrite à la main ; les objectifs de touche (!, !!, !!!) par la touche connue de GatherBuddy. Les objectifs d'étoiles ne sont pas encore marqués : la valeur des étoiles lue dans le jeu n'est pas prouvée (143 poissons sur 259 à quatre étoiles). Preuve : docs/evidence/0.961-ocean-missions.md. Non validé en jeu.
 - Tests : OceanMissions961Tests. Verify.ps1 (agent) : 1588/1588, 0 avertissement, 0 erreur ; DLL 0.961.0.0. Non validé en jeu.

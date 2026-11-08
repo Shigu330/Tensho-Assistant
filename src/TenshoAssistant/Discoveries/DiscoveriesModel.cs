@@ -56,7 +56,10 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     // X-76 P8 (0.935): the counts behind a drop rate. MonsterKill: Subject = BNpcName of a targeted enemy seen dying (as MonsterDrop credits its drops), levels = its
     // level. DutyChestOpened: Subject = the duty (ContentFinderCondition row) whose loot window listed a new chest (ChestObjectId; whether that id stays the same
     // for one chest is not proven), counted once per chest.
-    MonsterKill=33, DutyChestOpened=34 }
+    MonsterKill=33, DutyChestOpened=34,
+    // X-85 V4 (0.962): SpectralBefore: Subject = the fish you caught last before a spectral current began at an ocean stop (within 90 s), Detail = the bait of
+    // that cast (or the fish mooched), territory = the voyage's. Seen with, not proven to trigger it: another player's catch can start the current.
+    SpectralBefore=35 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported
