@@ -160,5 +160,4 @@ internal static class InternalMessages
         ["Title catalogue unavailable; the other collections can still be browsed."]="InternalMessages.TitleCatalogueUnavailableTheOther",
     };
     public static string? Key(string message)=>Keys.GetValueOrDefault(message);
-    public static IEnumerable<string> AllKeys=>Keys.Values;
 }

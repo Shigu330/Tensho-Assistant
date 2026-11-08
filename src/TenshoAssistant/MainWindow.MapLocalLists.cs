@@ -354,12 +354,6 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndPopup();}
     }
-    private void ToolMenu(string id,string labelKey,Action open)
-    {
-        if(!ImGui.BeginPopupContextItem(id))return;
-        try{if(ImGui.Selectable(localization.Get(labelKey))){open();IsOpen=true;mapLocalCloseMenu=true;}}
-        finally{ImGui.EndPopup();}
-    }
     private void DrawSmallGameIcon(uint icon)
     {
         var size=new Vector2(ImGui.GetTextLineHeight());

@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.904.0
+- Plan global, Verify : Nettoyage complet (X-76), étapes 0 et 1 : point de départ mesuré et gardé (docs/evidence/x76-0-baseline.md : 589 fichiers C#, 69 148 lignes, 6 925 clés de langue, 279 réglages, 27 hôtes cités, 20 parties de capture) avec une sauvegarde zip ; code mort cherché par une compilation d'essai (analyseurs « membre jamais utilisé »), un script et une contre-vérification par quatre agents : 91 éléments inutiles retirés (87 clés de langue, surtout l'ancienne page Personnage, et 8 morceaux de code sans appel), 2 éléments gardés car encore utilisés (preuve : docs/evidence/0.904-dead-code.md). Aucun changement de comportement. Validé en jeu par l'utilisateur : filtre « Tout » / « Rien » de la carte (0.902).
+- Tests : PlaceMenus704Tests. Verify.ps1 (agent) : 1483/1483, 0 avertissement, 0 erreur ; DLL 0.904.0.0. Non validé en jeu.
+### English
+- Full clean-up (X-76), steps 0 and 1: starting point measured and kept (docs/evidence/x76-0-baseline.md: 589 C# files, 69,148 lines, 6,925 language keys, 279 settings, 27 hosts named, 20 capture parts) with a zip backup; dead code searched by a trial build (« unused member » analysers), a script and a counter-check by four agents: 91 unused items removed (87 language keys, mostly the old Character page, and 8 pieces of code without a caller), 2 items kept as still used (evidence: docs/evidence/0.904-dead-code.md). No change of behaviour. Validated in game by the user: the map's « All » / « None » filter (0.902).
+
 ## 0.903.0
 - Plan global, Verify : Essai en jeu de l'utilisateur, courrier (X-75.7) : une lettre avec un sirop de bouleau et 1 gil. La sonde a montré les pièces jointes (objet, quantité, vides après « Tout prendre ») ; le journal des gils avait classé le gil en « Autre ». Nouveau (X-84) : les gils reçus d'une lettre ou joints à une lettre sont rangés dans la catégorie « Courrier (lettres) » du journal des gils. Les objets pris d'une lettre étaient déjà écartés des découvertes. Preuve : docs/evidence/0.903-letters.md. Non validé en jeu.
 - Tests : GilMail903Tests. Verify.ps1 (agent) : 1483/1483, 0 avertissement, 0 erreur ; DLL 0.903.0.0. Non validé en jeu.

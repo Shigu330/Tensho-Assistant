@@ -40,8 +40,7 @@ internal sealed class BankInventoryBridge : IDisposable
     private bool outfitSlotsFailed;
     private readonly Dictionary<BankKey, TimeSpan> autoCaptured = [];
     private IReadOnlyList<(ulong Id, string Name)>? knownRetainers;
-    // 0.329 (R-14): optional reads that failed once (logged once); the first failure of each posts ReadUnavailable.
-    private const string ReadUnavailable = "A storage could not be read (perhaps after a game update); the other storages are still recorded.";
+    // 0.329 (R-14): optional reads that failed once (logged once).
     private readonly HashSet<string> failedReads = [];
     private bool importingSilent;
     private bool disposed;

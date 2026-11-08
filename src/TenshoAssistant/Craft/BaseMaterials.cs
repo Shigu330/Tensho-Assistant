@@ -3,8 +3,6 @@ namespace TenshoAssistant.Craft;
 /// <summary>W-09 (0.699): where an item comes from, for the on-screen lists. What several sources give goes under the first of these.</summary>
 public enum ItemOrigin { Gathering,Vendor,Monster,Other,Crystal }
 
-public sealed record BaseMaterial(uint Item,long Needed,ItemOrigin Origin);
-
 public static class BaseMaterials
 {
     /// <summary>How deep recipes are followed; the recursion stops here whatever the game's data holds.</summary>

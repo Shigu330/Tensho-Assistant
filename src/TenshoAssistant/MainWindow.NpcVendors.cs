@@ -10,7 +10,6 @@ namespace TenshoAssistant;
 // sheet opened from the Tensho map (one NPC's places and stock) and the short vendor rows of the item hover panel.
 internal sealed partial class MainWindow
 {
-    public const int HoverNpcLines=2;
     private NpcVendorService? npcVendors;
     internal void ConfigureNpcVendors(NpcVendorService service)=>npcVendors=service;
 
@@ -149,20 +148,5 @@ internal sealed partial class MainWindow
             }
         }
         if(sale.Quantity>1 || sale.Hq){ImGui.SameLine(0,6);ImGui.TextDisabled(localization.Format("NpcUi.Receives",sale.Quantity,sale.Hq ? " HQ":""));}
-    }
-
-    // Compact hover rows: first vendors with place and cost icons, then an explicit "+N" pointing at the tool.
-    private int HoveredNpcCount(uint id)=>HoverOffers(id).Count;
-    private void DrawHoveredNpcs(uint id)
-    {
-        if(HoverOffers(id) is not { Count:>0 } offers)return;
-        // Short cost first (amount + icon), then the wrapped name and place: wrapping text never pushes the icons off the panel.
-        foreach(var offer in offers.Take(HoverNpcLines))
-        {
-            var place=VendorLocations(offer.Vendor) is { Count:>0 } places ? NpcPlace(places[0]):localization.Get("NpcUi.NoLocation");
-            DrawNpcCosts(offer.Sale,ImGui.GetTextLineHeight(),false);ImGui.SameLine(0,6);
-            ImGui.TextWrapped(localization.Format("HoverUi.Npc",NpcName(offer.Vendor),place));
-        }
-        if(offers.Count>HoverNpcLines)ImGui.TextDisabled(localization.Format("HoverUi.NpcMore",offers.Count-HoverNpcLines));
     }
 }

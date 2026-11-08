@@ -11,7 +11,6 @@ internal static class UiMessages
             "The bank is still loading." => "ServiceStatus.BankLoading",
             "Bank loading failed; imports are blocked to protect the file." => "ServiceStatus.BankLoadFailed",
             "An import is already running." => "ServiceStatus.ImportPending",
-            "A storage could not be read (perhaps after a game update); the other storages are still recorded." => "ServiceStatus.StorageReadUnavailable",
             "The save service is unavailable." => "ServiceStatus.SaveUnavailable",
             "Import saved in the bank." => "ServiceStatus.ImportSaved",
             "Bank stopped; import cancelled." => "ServiceStatus.ImportStopped",

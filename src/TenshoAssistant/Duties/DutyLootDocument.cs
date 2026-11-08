@@ -9,7 +9,6 @@ public sealed record DutyLootEntry(uint ItemId, DutyLootSourceKind Kind, int Sou
 public sealed record DutyLootDocument(uint InstanceId, DateTimeOffset FetchedAt, bool HasRewards,
     bool HasFights, bool HasCoffers, IReadOnlyList<DutyLootEntry> Entries)
 {
-    public string Provider => "Garland Tools";
     public bool HasUnparsedFightDrops { get; init; }
     // Presence of all categories still does not establish an exhaustive drop table.
     public bool IsExhaustive => false;
