@@ -30,7 +30,7 @@ public sealed record CharacterStatus
 
 /// <summary>
 /// g, M-04 (0.374): merging a fresh read into the kept status, the overview figures, and the files (one per character,
-/// Characters/&lt;local character id&gt;.json, user's choice « un fichier par personnage, comme I-03 »).
+/// Characters/&lt;local character id&gt;.json, user's choice: one file per character, like I-03).
 /// </summary>
 public static class CharacterStatuses
 {

@@ -319,7 +319,7 @@ internal sealed partial class MainWindow
         }
     }
     private sealed record ListZoneGroup(string Id,string Label,string Note,bool Timed,(uint Item,long Needed)[] Lines,uint? Cost=null);
-    // 0.824 (X-56, user request: icons, no words): the Teleport action's icon (Action row 5 « Téléportation », icon 111, tools/XbmProbe) and the gil's (item 1).
+    // 0.824 (X-56, user request: icons, no words): the Teleport action's icon (Action row 5 « Teleport », icon 111, tools/XbmProbe) and the gil's (item 1).
     private const uint TeleportIcon=111;
     private void DrawListZoneCost(uint gil)
     {

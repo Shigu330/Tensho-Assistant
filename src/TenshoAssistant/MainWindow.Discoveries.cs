@@ -236,12 +236,12 @@ internal sealed partial class MainWindow
     }
     private string DiscoveryItemName(uint id)=>itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}";
     private string DiscoveryDutyName(uint id)=>DutyName?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
-    /// <summary>X-74 (0.860): the level column: a monster's levels, a quantity range, or the Eorzea hours a fish was caught.</summary>
     private static DateTime DiscoveryDay(int day)=>new DateTime(2013,8,27).AddDays(day);
     // « HH:mm–HH:mm ET » of two Eorzea minutes of the day.
     private static string EtRange(int from,int to)=>$"{Gathering.GatheringTime.Clock(from)}–{Gathering.GatheringTime.Clock(to)} ET";
     // X-76 (0.908): « a » or « a–b », a level or quantity range.
     private static string LevelRange(int min,int max)=>min==max ? max.ToString():$"{min}–{max}";
+    /// <summary>X-74 (0.860): the level column: a monster's levels, a quantity range, or the Eorzea hours a fish was caught.</summary>
     private static string DiscoveryFactLevel(DiscoveryFact fact)
     {
         if(fact.Kind==DiscoveryKind.FestivalSeen)

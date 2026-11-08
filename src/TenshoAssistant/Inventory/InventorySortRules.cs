@@ -9,7 +9,7 @@ public sealed record InventorySortMetadata(string Name,uint Category,bool? Marke
     int? ItemLevel=null,int? EquipLevel=null,int? Rarity=null,uint? SellPrice=null,ItemTraits? Traits=null,ulong? Jobs=null,bool? InGearset=null)
 {
     /// <summary>0.595 (I21): jobs = the piece's jobs as a mask of ClassJob rows, null when it is no gear; inGearset = in one of the game's sets, null when they were not read.</summary>
-    public static InventorySortMetadata FromItem(uint id,ItemDefinition? item,ulong? jobs=null,bool? inGearset=null)=>item is null || item.Id!=id ? new($"Objet {id}",0)
+    public static InventorySortMetadata FromItem(uint id,ItemDefinition? item,ulong? jobs=null,bool? inGearset=null)=>item is null || item.Id!=id ? new($"Item {id}",0)
         :new(item.Name,item.UiCategoryId,item.IsMarketable,item.CanBeHq,item.Equipment,(int)Math.Min(item.ItemLevel,int.MaxValue),item.EquipLevel,item.Rarity,item.SellPrice,item.Traits,jobs,inGearset);
 }
 public sealed record InventorySortCriterion(InventorySortField Field,bool Descending=false);

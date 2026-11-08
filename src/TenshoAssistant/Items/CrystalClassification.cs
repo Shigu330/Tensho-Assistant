@@ -7,14 +7,18 @@ public sealed record CrystalClassification(string Element, string Size);
 
 public static class CrystalClassifier
 {
-    public static readonly string[] Elements = ["Feu", "Glace", "Vent", "Terre", "Foudre", "Eau"];
-    public static readonly string[] Sizes = ["Éclats", "Cristaux", "Agrégats"];
+    // 0.909: the result is the English key itself (language keys CrystalElements.* and CrystalSizes.*), in the page's column and row order.
+    public static readonly string[] Elements = ["Fire", "Ice", "Wind", "Earth", "Lightning", "Water"];
+    public static readonly string[] Sizes = ["Shards", "Crystals", "Clusters"];
 
-    // 0.322: the English item name first (the catalogue keeps it for every client language), the French name as a fallback; the result
-    // keeps the French canonical values above, which the page maps to its translated keys. A German or Japanese client used to leave
-    // every crystal unclassified.
+    // 0.322: the English item name first (the catalogue keeps it for every client language), the French name as a fallback. A German
+    // or Japanese client used to leave every crystal unclassified.
     private static readonly string[] EnglishElements = ["FIRE", "ICE", "WIND", "EARTH", "LIGHTNING", "WATER"];
     private static readonly string[] EnglishSizes = ["SHARD", "CRYSTAL", "CLUSTER"];
+
+    // Game data: the French client's element words and size stems (accents removed), same order as Elements and Sizes.
+    private static readonly string[] FrenchElements = ["FEU", "GLACE", "VENT", "TERRE", "FOUDRE", "EAU"];
+    private static readonly string[] FrenchSizes = ["ECLAT", "CRISTAL", "AGREGAT"];
 
     public static CrystalClassification? Classify(string name, string? englishName)
     {
@@ -32,17 +36,12 @@ public static class CrystalClassifier
     {
         ArgumentNullException.ThrowIfNull(name);
         var normalized = RemoveMarks(name).ToUpperInvariant().Replace('’', '\'');
-        var element = Elements.FirstOrDefault(value =>
-        {
-            var upper = value.ToUpperInvariant();
-            return normalized.Contains($"DE {upper}", StringComparison.Ordinal)
-                || normalized.Contains($"D'{upper}", StringComparison.Ordinal);
-        });
-        if (element is null) return null;
-        var size = normalized.Contains("ECLAT", StringComparison.Ordinal) ? "Éclats"
-            : normalized.Contains("CRISTAL", StringComparison.Ordinal) ? "Cristaux"
-            : normalized.Contains("AGREGAT", StringComparison.Ordinal) ? "Agrégats" : null;
-        return size is null ? null : new(element, size);
+        var element = Array.FindIndex(FrenchElements, upper =>
+            normalized.Contains($"DE {upper}", StringComparison.Ordinal)
+            || normalized.Contains($"D'{upper}", StringComparison.Ordinal));
+        if (element < 0) return null;
+        var size = Array.FindIndex(FrenchSizes, stem => normalized.Contains(stem, StringComparison.Ordinal));
+        return size < 0 ? null : new(Elements[element], Sizes[size]);
     }
 
     private static string RemoveMarks(string value)

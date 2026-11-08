@@ -20,10 +20,6 @@ public static class ItemGains
     public static uint BaseItem(uint raw)=>raw%500_000;
 
     /// <summary>
-    /// X-73.18 (0.890, 0.891): the shadow a speared fish had, from the slots that left the window with their size and speed kept just before the catch (size 1–3,
-    /// speed): known only when they all had the same size and speed, else null.
-    /// </summary>
-    /// <summary>
     /// X-73.18 (0.898, user request: multiple catches happen often): the shadows of the fish of one multiple catch. The fish caught (chat) and the slots speared
     /// (window) must be as many. All slots alike: every fish has that shadow. Otherwise a fish whose shadow you already saw takes it, and the last fish left takes the
     /// last shadow left (or all the fish left take it when the shadows left are alike). What stays ambiguous is left out.
@@ -40,6 +36,10 @@ public static class ItemGains
         return result;
     }
 
+    /// <summary>
+    /// X-73.18 (0.890, 0.891): the shadow a speared fish had, from the slots that left the window with their size and speed kept just before the catch (size 1–3,
+    /// speed): known only when they all had the same size and speed, else null.
+    /// </summary>
     public static (int Size,int Speed)? SpearShadow(IReadOnlyList<(int Size,int Speed)> inSight)=>
         inSight.Distinct().ToArray() is [var only] && only.Size is >= 1 and <= 3 && only.Speed>0 ? only:null;
 
@@ -49,12 +49,13 @@ public static class ItemGains
     /// <summary>The one item spent, by exactly one unit, in a change (an opened coffer, a used bag); null when anything else was spent too.</summary>
     public static uint? SingleSpent(IReadOnlyDictionary<uint,long> losses)=>losses.Count==1 && losses.First().Value==1 ? losses.First().Key:null;
 
-    /// <summary>What a gain is put down to, in this order; the moments (milliseconds) are the watcher's clock.</summary>
-    /// <summary>
-    /// X-73.17 (0.873): field content (Eureka, Bozja, Occult Crescent, deep dungeons) is a duty where monsters still drop into the bags, so a kill counts there;
-    /// in a deep dungeon a gain with nothing spent and no kill is a coffer of the floor (DungeonCoffer).
-    /// </summary>
+    /// <summary>What a gain is put down to.</summary>
     public enum Cause { None, Fishing, FateReward, MonsterDrop, Opened, DungeonCoffer }
+    /// <summary>
+    /// What a gain is put down to, in this order; the moments (milliseconds) are the watcher's clock. X-73.17 (0.873): field content (Eureka, Bozja, Occult
+    /// Crescent, deep dungeons) is a duty where monsters still drop into the bags, so a kill counts there; in a deep dungeon a gain with nothing spent and no kill
+    /// is a coffer of the floor (DungeonCoffer).
+    /// </summary>
     public static Cause Attribute(bool fishing,bool busy,long now,long fateEndedAt,uint fate,long deathAt,bool inDuty,uint? spent,bool spentUsable,bool spentGained,
         bool field=false,bool deepDungeon=false)
     {

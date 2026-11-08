@@ -27,7 +27,6 @@ public sealed class InventoryBankService : IDisposable
     public Task Completion => completion.Task;
     public BankState State => Volatile.Read(ref state);
 
-    /// <summary>0.345 (g, I-03): erases every saved storage of one character (the « Erase this character » button); queued like an import.</summary>
     /// <summary>0.576 (I1): one storage's read, for a retainer sent away or an old storage; only on the player's click.</summary>
     public Task<BankImportResult> ForgetAsync(BankKey key)
     {
@@ -50,6 +49,7 @@ public sealed class InventoryBankService : IDisposable
         }
     }
 
+    /// <summary>0.345 (g, I-03): erases every saved storage of one character (the « Erase this character » button); queued like an import.</summary>
     public Task<BankImportResult> EraseCharacterAsync(ulong character)
     {
         lock (gate)

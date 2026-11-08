@@ -3,7 +3,7 @@ namespace TenshoAssistant.Quests;
 public enum QuestProgress { Unconfirmed, Active, Complete }
 public sealed record QuestEntry(uint Id, string Name, string Category, uint Icon, QuestProgress Progress, byte? Sequence)
 {
-    // 0.283: journal section (« Épopée », « Quêtes annexes », « Chroniques d'une nouvelle ère »…) above the genre held in Category
+    // 0.283: journal section (main scenario, side quests, Chronicles of a New Era…) above the genre held in Category
     // (docs/evidence/0.283-quest-journal-sections.md); SectionId keeps the game's order, 255 = none.
     public string Section { get; init; } = "";
     public byte SectionId { get; init; } = 255;

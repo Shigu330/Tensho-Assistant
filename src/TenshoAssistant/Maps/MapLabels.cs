@@ -2,11 +2,6 @@ using System.Numerics;
 
 namespace TenshoAssistant.Maps;
 
-/// <summary>
-/// 0.596 (P12): where the name of a map icon goes, as on the game's map. Measured from the MapMarker sheet: 1 left, 2 right, 3 below, 4 above
-/// (docs/evidence/0.596-map-label-orientation.md); the rare other values are not established and go to the right.
-/// </summary>
-/// <summary>P17 (0.652): a leve's marker on the map: the icon read in game, or a tooltip naming a row of the Leve sheet (docs/evidence/0.652-leve-markers.md).</summary>
 /// <summary>P22 (0.665): what a quest icon's variant is known to mean (docs/evidence/0.665-quest-icon-variants.md). Variant 1 is the quest on offer; a locked variant 5 marks a step of a quest under way. The others say their number.</summary>
 public static class MapQuestIcons
 {
@@ -14,6 +9,7 @@ public static class MapQuestIcons
     public static bool IsStep(bool locked,int variant)=>locked && variant==5;
 }
 
+/// <summary>P17 (0.652): a leve's marker on the map: the icon read in game, or a tooltip naming a row of the Leve sheet (docs/evidence/0.652-leve-markers.md).</summary>
 public static class MapLeves
 {
     public const uint AreaIcon=60492;
@@ -25,15 +21,6 @@ public static class MapLeves
         =>markerType!=3 && (icon==AreaIcon || tooltip.Length>0 && names?.Contains(Key(tooltip))==true);
 }
 
-/// <summary>
-/// 0.653 (user report): while the journal has the game's map on a leve, the game empties its event markers, every one of them, and fills them again once that request ends
-/// (docs/evidence/0.653-markers-during-journal-request.md). Those read just before stay until then, on the same map.
-/// </summary>
-/// <summary>
-/// 0.793 (X-32, user request: what opening and closing the game map unblocked): the game's own leve markers (UIState Map) hold a leve's area while the map
-/// window's list is still empty (docs/evidence/0.793-game-leve-markers.md). They are added to what the map window gives, each once: the same map, icon and
-/// place within a yalm is the same marker.
-/// </summary>
 /// <summary>
 /// 0.813 (X-49, user report: a quest target stays after the quest step is done): the game's journal request carries no quest (« quest 0 » in the log), so
 /// the target is tied to the accepted quest whose point stands at the same place when it is set; it goes once that quest has no point there any more.
@@ -64,6 +51,11 @@ public static class MapQuestEvents
     }
 }
 
+/// <summary>
+/// 0.793 (X-32, user request: what opening and closing the game map unblocked): the game's own leve markers (UIState Map) hold a leve's area while the map
+/// window's list is still empty (docs/evidence/0.793-game-leve-markers.md). They are added to what the map window gives, each once: the same map, icon and
+/// place within a yalm is the same marker.
+/// </summary>
 public static class MapGameLeves
 {
     public static IReadOnlyList<T> Merge<T>(IReadOnlyList<T> read,IReadOnlyList<T> game,Func<T,(uint Map,uint Icon,float X,float Z)> key)
@@ -81,6 +73,10 @@ public static class MapGameLeves
     }
 }
 
+/// <summary>
+/// 0.653 (user report): while the journal has the game's map on a leve, the game empties its event markers, every one of them, and fills them again once that request ends
+/// (docs/evidence/0.653-markers-during-journal-request.md). Those read just before stay until then, on the same map.
+/// </summary>
 public static class MapEventHold
 {
     public static bool Holds(int read,bool journalRequest,uint currentMap,uint keptMap)=>read==0 && journalRequest && currentMap!=0 && currentMap==keptMap;
@@ -158,7 +154,10 @@ public static class MapLabels
         return kept.ToArray();
     }
 
-    /// <summary>The top-left corner of the text, from the icon's centre.</summary>
+    /// <summary>
+    /// The top-left corner of the text, from the icon's centre. 0.596 (P12): where the name of a map icon goes, as on the game's map. Measured from the MapMarker
+    /// sheet: 1 left, 2 right, 3 below, 4 above (docs/evidence/0.596-map-label-orientation.md); the rare other values are not established and go to the right.
+    /// </summary>
     public static Vector2 Offset(byte orientation,float iconSize,Vector2 text)
     {
         var gap=iconSize/2+1;

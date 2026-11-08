@@ -20,7 +20,7 @@ public sealed class GitHubExchangeMeta
 }
 
 /// <summary>
-/// X-77.1 (0.883, user choice « Connexion GitHub » and « automatique ferait aussi upload ? »: yes, opt-in). GitHub's device flow (OAuth App of the repository,
+/// X-77.1 (0.883, user choice: a GitHub sign-in, and the automatic exchange uploads too: yes, opt-in). GitHub's device flow (OAuth App of the repository,
 /// client id below, not a secret; no client secret in the plugin): Tensho shows a code, the player approves it on github.com; the token is kept on this PC only,
 /// protected by Windows for this user (DPAPI), and can be revoked on GitHub at any time. An exchange: the common file of the repository joined as imported
 /// (once per version of the file), then, when connected, the player's own sightings (never imported ones) written to one secret gist of theirs, updated each

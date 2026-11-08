@@ -55,16 +55,6 @@ public static class NpcShopLinks
         return Array.AsReadOnly(found.Distinct().Order().ToArray());
     }
     /// <summary>
-    /// Cost of a special shop entry: direct item ids are exact; encoded small ids stay raw. Probe 2026-10-30
-    /// (docs/evidence/0.92.0-shop-currency-probe.log): scrip exchanges use type 16 id 4 for both crafter and gatherer scrips,
-    /// so neither TomestonesItem nor any single table maps these ids; they are shown unresolved, never guessed.
-    /// </summary>
-    /// <summary>
-    /// Talk scripts that open shops from compiled script code, never from a sheet. Each entry is backed by an in-game
-    /// observation (2026-10-30: « Prêtresse à la robe noire », Wolves' Den, menu « Échanger des marques de loup » mêlée 1/2,
-    /// distance) and docs/evidence/0.97.0-wolf-npc-probe.log: the only three wolf-mark shops (type 4) that no sheet references.
-    /// </summary>
-    /// <summary>
     /// 0.679 (user report): NPCs of a service whose shop is opened by script code, with no sheet to give it. They are placed on the map by name and title, with no sales.
     /// On the Island Sanctuary: Marchandréa « Divers », Laracheteuse « Exportations », Rodolfermier « Champs », Béberger « Pâturage », Chamoiselle « Guide »: docs/evidence/0.679-island-map.md.
     /// </summary>
@@ -73,6 +63,11 @@ public static class NpcShopLinks
     /// <summary>0.680: where the game placed an NPC that no sheet and no layout places, read in the game (docs/evidence/0.679-island-map.md). Id, territory, map, world position.</summary>
     public static readonly IReadOnlyList<(uint Npc,uint Territory,uint Map,float X,float Y,float Z)> ObservedPlaces=[(1043464,1055,773,-266.316f,41.001f,207.874f)];
 
+    /// <summary>
+    /// Talk scripts that open shops from compiled script code, never from a sheet. Each entry is backed by an in-game
+    /// observation (2026-10-30: « Prêtresse à la robe noire », Wolves' Den, menu « Échanger des marques de loup » mêlée 1/2,
+    /// distance) and docs/evidence/0.97.0-wolf-npc-probe.log: the only three wolf-mark shops (type 4) that no sheet references.
+    /// </summary>
     public static readonly IReadOnlyDictionary<uint,IReadOnlyList<uint>> ObservedTalkShops=new Dictionary<uint,IReadOnlyList<uint>>
     {
         [721280]=[1769743,1770537,1769744],
@@ -88,6 +83,11 @@ public static class NpcShopLinks
         [721862]=[1771038],
     };
     public const byte TomestoneCost=2,ScripCost=3;
+    /// <summary>
+    /// Cost of a special shop entry: direct item ids are exact; encoded small ids stay raw. Probe 2026-10-30
+    /// (docs/evidence/0.92.0-shop-currency-probe.log): scrip exchanges use type 16 id 4 for both crafter and gatherer scrips,
+    /// so neither TomestonesItem nor any single table maps these ids; they are shown unresolved, never guessed.
+    /// </summary>
     public static NpcCost Currency(byte encoding,uint costId,uint amount,byte costType=0)
     {
         if(encoding==0 || costId>=100)return new(costId,amount);

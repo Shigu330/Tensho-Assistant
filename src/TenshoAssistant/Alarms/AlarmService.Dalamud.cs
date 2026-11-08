@@ -7,12 +7,12 @@ using TenshoAssistant.Gathering;
 
 namespace TenshoAssistant.Alarms;
 
-/// <summary>A game alarm (AgentAlarm, « Alarmes » window of the game), copied read-only.</summary>
+/// <summary>A game alarm (AgentAlarm, the game's alarm window), copied read-only.</summary>
 public sealed record GameAlarm(string Name, int ClockTime, int Hour, int Minute, int Reminder, bool Repeat, int Index = 0, int Sound = 0, int Timestamp = 0, int Flags = 0);
 
 /// <summary>
 /// Rings Tensho alarms (0.201) on the framework thread, once a second: the chat line and the sound of the game's alarms
-/// (AgentAlarm.PlayAlarmSoundEffect, the same bell/music box… as the game's « Alarmes » window), optionally silent while bound by duty.
+/// (AgentAlarm.PlayAlarmSoundEffect, the same bell/music box… as the game's alarm window), optionally silent while bound by duty.
 /// Also copies the game's own alarms (AgentAlarm.Alarms, NumActiveAlarms) and can open the game's alarm window. Game alarms are created
 /// (0.205, on the player's click or with the « game alarms » setting) through the game's own « /alarm » text command
 /// (UIModule.ProcessChatBoxEntry), one command every half second, only commands built by GameAlarmCommand, never above 30 game alarms.

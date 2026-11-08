@@ -24,7 +24,7 @@ internal sealed partial class MainWindow
             var routes=RelevantRoutes(id);
             var recipes=recipeCatalog.State.Catalog;
             sheetTabs=[];
-            // « Craft lié » shows both directions: made from a recipe, or an ingredient of one.
+            // « Related crafting » (ItemsUi.Craft) shows both directions: made from a recipe, or an ingredient of one.
             if(recipes is null || recipes.ForResult(id).Count>0 || recipes.ForIngredient(id).Count>0)sheetTabs.Add("Craft");
             if(routes.Contains(Items.ItemContextRoute.Usages))sheetTabs.Add("Uses");
             if(routes.Contains(Items.ItemContextRoute.Gathering))sheetTabs.Add("Gathering");
@@ -33,7 +33,7 @@ internal sealed partial class MainWindow
     }
 
     // 0.273: every link to an item lands on the item's sheet, open on the requested tab (Overview by default); since 0.280 the
-    // « Objets » page has no other top tab.
+    // « Items » page has no other top tab.
     private void OpenItemSheet(string tab="Overview"){page=Page.Items;itemSheetFocus=tab;}
 
     private void DrawItemSheet()
@@ -59,7 +59,7 @@ internal sealed partial class MainWindow
             ImGui.TextDisabled(string.Join(" · ",facts));
             if(market.GetCached(market.State.WorldId,id) is { } quote && (quote.Nq.Minimum ?? quote.Hq.Minimum) is { } lowest)
             {
-                // 0.329: the date is when Tensho fetched the price (« consulté »); an old or undated world upload is flagged as
+                // 0.329: the date is when Tensho fetched the price (« Fetched », HoverUi.Fetched); an old or undated world upload is flagged as
                 // on the Market page and the hover.
                 ImGui.TextDisabled(localization.Format("ItemSheet.Price",lowest.ToString("N0"),quote.FetchedAt.ToLocalTime().ToString("g")));
                 DrawGilIcon();

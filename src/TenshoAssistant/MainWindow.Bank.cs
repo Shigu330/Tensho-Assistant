@@ -306,7 +306,7 @@ internal sealed partial class MainWindow
                     foreach(var entry in selectedEntries)
                     {
                         var expired=!TenshoAssistant.Caching.CacheAge.Fresh(entry.Snapshot.ObservedAt,now,configuration.Cache.Duration(TenshoAssistant.Caching.CacheArea.ImportedStock));
-                        // 0.329: the date too when the snapshot is not from today (« Stocks importés » keeps one for a day by default).
+                        // 0.329: the date too when the snapshot is not from today (« Imported stock », CacheUi.Stocks, keeps one for a day by default).
                         var observed=entry.Snapshot.ObservedAt.ToLocalTime();
                         AddDisplayFrames(localization.Format("BankUi.Frame",BankEntryName(entry),observed.ToString(observed.Date==now.ToLocalTime().Date ? "t":"g"),expired ? localization.Get("BankUi.ExpiredSuffix"):""),entry.Snapshot.Containers.Values,groups,errors);
                     }

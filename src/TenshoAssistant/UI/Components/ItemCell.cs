@@ -14,7 +14,7 @@ internal sealed partial class MainWindow
     private int menuFrame=-1;
     private readonly Dictionary<uint,int> menuSeen=[];
 
-    // 0.269: an icon and the name next to it used the same popup id; the open menu was then drawn twice (« plusieurs fois le même »).
+    // 0.269: an icon and the name next to it used the same popup id; the open menu was then drawn twice (user report: the same menu several times).
     // 0.737 (user report: the right-click menu of a project's material closed at once, now and then): the serial counted every icon of the frame, in every
     // window, so one icon more or less anywhere before it changed the id and ImGui closed the menu. It now counts only the same item at the same place
     // (same id stack), which changes only if that very list changes.

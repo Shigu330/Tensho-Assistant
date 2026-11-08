@@ -62,7 +62,7 @@ internal sealed partial class MainWindow
 
     /// <summary>
     /// Tools useful for an item (0.208), in display order; a tool whose catalogue is not loaded yet is kept (unknown ≠ none). Used by the
-    /// inventory's « Tensho — objet » menu and the context item panel.
+    /// inventory's « Tensho — item » menu (ItemMenu.Title) and the context item panel.
     /// </summary>
     internal IReadOnlyList<ItemContextRoute> RelevantRoutes(uint itemId)
     {

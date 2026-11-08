@@ -70,10 +70,6 @@ public static class GameGearsets
         return result;
     }
 
-    /// <summary>
-    /// 0.385 (g, X-08): a job at random for the dailies, as one of its sets (the lowest number of each job, so a job with many sets is not
-    /// favoured); with <paramref name="belowTop"/>, only jobs under the highest level among the player's jobs (levels unknown = kept).
-    /// </summary>
     /// <summary>R-10 (0.411): the job's set with the lowest number (the one the game's own job switch would use first), or none.</summary>
     public static GameGearset? ForJob(IReadOnlyList<GameGearset> sets,uint job)=>sets.Where(set=>set.Job==job).OrderBy(set=>set.Number).FirstOrDefault();
 
@@ -83,6 +79,10 @@ public static class GameGearsets
     /// </summary>
     public static uint? GatheringJob(uint gatheringType,bool fishing)=>fishing ? 18u : gatheringType switch { 0 or 1=>16u, 2 or 3=>17u, _=>null };
 
+    /// <summary>
+    /// 0.385 (g, X-08): a job at random for the dailies, as one of its sets (the lowest number of each job, so a job with many sets is not
+    /// favoured); with <paramref name="belowTop"/>, only jobs under the highest level among the player's jobs (levels unknown = kept).
+    /// </summary>
     public static GameGearset? RandomJob(IReadOnlyList<GameGearset> sets,IReadOnlyDictionary<uint,int> levels,bool belowTop,Func<int,int> next)
     {
         var top=levels.Count>0 ? levels.Values.Max():0;

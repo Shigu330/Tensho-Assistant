@@ -35,7 +35,7 @@ internal sealed partial class MainWindow
                 ImGui.BeginDisabled(visualSort.State.Pending);
                 try
                 {
-                    // 0.389 (user choice): the icon is inside the button, so the whole « ⇅ Trier » is clickable.
+                    // 0.389 (user choice): the icon is inside the button, so the whole « ⇅ Sort » (SortButton.Label) is clickable.
                     var icon=FontAwesomeIcon.SortAmountDown.ToIconString();var label=localization.Get("SortButton.Label");
                     ImGui.PushFont(UiBuilder.IconFont);
                     Vector2 iconSize;

@@ -46,6 +46,9 @@ internal static class ReviewFixes322Tests
             var builder = File.ReadAllText(Path.Combine(Source,"Inventory","ItemHoldings.cs"));
             foreach (var literal in new[] { "Sacs du personnage","Cristaux","Sacoche","Servant","non importé","Arsenal","Coffre","Armoire" })
                 Check(!builder.Contains("\"" + literal,StringComparison.Ordinal),"no French storage name built in ItemHoldings: " + literal);
+            var bridge = File.ReadAllText(Path.Combine(Source,"Inventory","BankInventoryBridge.Dalamud.cs"));
+            foreach (var literal in new[] { "Arsenal","Sacoche" })
+                Check(!bridge.Contains("\"" + literal,StringComparison.Ordinal),"no French storage name built in the bank bridge: " + literal);
             var localization = new TenshoAssistant.Localization.LocalizationManager((error,message) => throw new InvalidOperationException(message,error));
             localization.SetLanguage("en");
             var armoury = StorageNames.Of(localization,BankStorageKind.Armoury,"Arsenal");
@@ -67,10 +70,10 @@ internal static class ReviewFixes322Tests
         }),
         ("Crystals are classified from the English name on every client, the French name as a fallback",()=>
         {
-            Check(CrystalClassifier.Classify("Feuerscherbe","Fire Shard") is { Element: "Feu", Size: "Éclats" },"German client, English name");
-            Check(CrystalClassifier.Classify("雷のクリスタル","Lightning Crystal") is { Element: "Foudre", Size: "Cristaux" },"Japanese client, English name");
-            Check(CrystalClassifier.Classify("x","Water Cluster") is { Element: "Eau", Size: "Agrégats" },"cluster");
-            Check(CrystalClassifier.Classify("Cristal de foudre","") is { Element: "Foudre", Size: "Cristaux" },"French fallback");
+            Check(CrystalClassifier.Classify("Feuerscherbe","Fire Shard") is { Element: "Fire", Size: "Shards" },"German client, English name");
+            Check(CrystalClassifier.Classify("雷のクリスタル","Lightning Crystal") is { Element: "Lightning", Size: "Crystals" },"Japanese client, English name");
+            Check(CrystalClassifier.Classify("x","Water Cluster") is { Element: "Water", Size: "Clusters" },"cluster");
+            Check(CrystalClassifier.Classify("Cristal de foudre","") is { Element: "Lightning", Size: "Crystals" },"French fallback");
             Check(CrystalClassifier.Classify("Fire Shard Hat","Fire Shard Hat") is null,"not a crystal");
         }),
     ];

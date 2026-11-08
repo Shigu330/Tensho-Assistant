@@ -33,7 +33,7 @@ internal sealed partial class MainWindow
             decks.Add(new TriadSavedDeck{Name=name,NpcId=request.NpcId,Cards=generated.Deck.Select(card=>card.Id).ToList()});
         }))triadShownDeck=name;
     }
-    // Tooltip of every card icon (0.198): the card item's full sheet (« Comment l'obtenir », links) when the card has an item, else its name.
+    // Tooltip of every card icon (0.198): the card item's full sheet (« How to get it », links) when the card has an item, else its name.
     // 0.268: also the card item's right-click menu (tools and sources), so every card icon or name answers the same way.
     private void TriadCardTooltip(uint id)
     {

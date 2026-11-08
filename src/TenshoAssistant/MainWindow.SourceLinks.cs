@@ -83,7 +83,7 @@ internal sealed partial class MainWindow
             .ToArray();
     }
     /// <summary>Menu entries for the sources of these items; false when none is known.</summary>
-    // 0.251 (user request): the sources are grouped by kind, each group a sub-menu that opens on hover (« Échanges (12) »…);
+    // 0.251 (user request): the sources are grouped by kind, each group a sub-menu that opens on hover (« Exchanges (12) »…);
     // lines with the same text are shown once (the same NPC listed under several ids). Craft and gathering stay one line each.
     // 0.256: the lines are computed once (SourceLines) and drawn either in Tensho (ImGui) or in the game's inventory menu.
     private enum SourceGroup { Achievements, Duties, FromItems, Trades, Vendors, Quests, Craft, Gathering }

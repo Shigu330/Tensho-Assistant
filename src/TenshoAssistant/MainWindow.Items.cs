@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
         string? sheetTab = focusStocksTab ? "Stocks" : focusCraftTab ? "Craft" : focusUsesTab ? "Uses" : focusGatherTab ? "Gathering" : null;
         focusStocksTab = focusCraftTab = focusUsesTab = focusGatherTab = false;
         if (sheetTab is not null) itemSheetFocus = sheetTab;
-        // 0.280 (R-06 step 3): « Objets » is the search and the item sheet; storages, crystals and imports moved to « Rangements ».
+        // 0.280 (R-06 step 3): « Items » is the search and the item sheet; storages, crystals and imports moved to « Storage ».
         DrawItemSearch();
         DrawManualItemId();
         DrawItemSheet();
@@ -94,8 +94,6 @@ internal sealed partial class MainWindow
 
     private static readonly string[] CrystalElements = CrystalClassifier.Elements;
     private static readonly string[] CrystalSizes = CrystalClassifier.Sizes;
-    private static readonly string[] CrystalElementKeys=["Fire","Ice","Wind","Earth","Lightning","Water"];
-    private static readonly string[] CrystalSizeKeys=["Shards","Crystals","Clusters"];
 
     private void DrawCrystalElementTable(IReadOnlyList<CrystalCell> crystals)
     {
@@ -109,13 +107,13 @@ internal sealed partial class MainWindow
             foreach (var element in CrystalElements)
             {
                 ImGui.TableNextColumn();
-                ImGui.TextColored(Accent, localization.Get("CrystalElements."+CrystalElementKeys[Array.IndexOf(CrystalElements,element)]));
+                ImGui.TextColored(Accent, localization.Get("CrystalElements."+element));
             }
             foreach (var size in CrystalSizes)
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
-                ImGui.TextDisabled(localization.Get("CrystalSizes."+CrystalSizeKeys[Array.IndexOf(CrystalSizes,size)]));
+                ImGui.TextDisabled(localization.Get("CrystalSizes."+size));
                 foreach (var element in CrystalElements)
                 {
                     ImGui.TableNextColumn();
@@ -240,7 +238,7 @@ internal sealed partial class MainWindow
 
     private void DrawRecipes()
     {
-        // 0.292: shown inside the sheet's « Craft lié » tab; the header that repeated the tab name is gone.
+        // 0.292: shown inside the sheet's « Related crafting » tab (ItemsUi.Craft); the header that repeated the tab name is gone.
         ImGui.PushStyleColor(ImGuiCol.ChildBg, TenshoAssistant.UI.FfxivTheme.Panel);
         ImGui.PushStyleColor(ImGuiCol.Border, TenshoAssistant.UI.FfxivTheme.Border);
         var visible = ImGui.BeginChild("RecipePanel", new Vector2(-1, 0), true);

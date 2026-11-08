@@ -135,7 +135,7 @@ internal sealed partial class MainWindow
     {
         if(maps.State.Catalog is not { } catalog)return;
         var live=mapLive?.State;var viewport=ImGui.GetMainViewport();
-        // Read here, outside the tool column: inside a child these calls return the child's size (the « Réduire » bug).
+        // Read here, outside the tool column: inside a child these calls return the child's size (the « Restore » button bug, MapView.Restore).
         var window=(ImGui.GetWindowSize(),ImGui.GetWindowPos());
         if(mapViewFollow && live is { MapId:>0 })mapViewMapId=live.MapId;
         var map=catalog.Find(mapViewMapId) ?? mapMarkers?.Overview(mapViewMapId);
@@ -1179,8 +1179,8 @@ internal sealed partial class MainWindow
             else draw.AddText(origin+new Vector2(8),ImGui.GetColorU32(UI.FfxivTheme.TextMuted),localization.Get(textureFailure is not null ? "MapView.Unavailable":"MapView.Loading"));
             string? tooltip=null;MapLocalGatheringPoint? tooltipPoint=null;(MapLocalPosition Vista,bool? Done)? sightseeingTip=null;
             // Icons follow the map zoom exactly (32 px at 100 %, 0.113 at the user's request); 4 px floor only so they never vanish.
-            // Each game icon can then be resized or hidden on its own (settings, « Icônes de cette carte »).
-            // 0.153: zoom^follow (setting « Suivi du zoom ») so icons set for a close zoom stay readable when zoomed out.
+            // Each game icon can then be resized or hidden on its own (settings, « Icons on this map », MapView.SectionIcons).
+            // 0.153: zoom^follow (setting « Zoom follow », MapView.ZoomFollow) so icons set for a close zoom stay readable when zoomed out.
             var zoomFactor=settings.ZoomFactor(mapZoom);
             var baseIcon=Math.Max(4,32*zoomFactor*MapViewSettings.ClampScale(settings.IconScale));
             var markers=settings.ShowFixedIcons || settings.ShowPlaceNames ? mapMarkers?.For(map.MarkerRange) ?? []:[];
@@ -1279,7 +1279,7 @@ internal sealed partial class MainWindow
             foreach(var point in gathering)
                 if(point.Position is { } spot && point.Icon!=0)Add(point.Icon,1,MapProjection.PixelFromWorld(new Vector3(spot.X,0,spot.Z),map),GatheringLabelOf(point),point:point,
                     worldRadius:settings.ShowGatheringAreas ? spot.Radius:0);
-            // NPC vendors (0.139): the game's « Échoppe » map icon (MapSymbol 60412, docs/evidence/0.139.0-symbols-probe.log), in the
+            // NPC vendors (0.139): the game's shop map icon (MapSymbol 60412, docs/evidence/0.139.0-symbols-probe.log), in the
             // same list, sizes and priorities as the game icons; click = flag.
             foreach(var vendor in vendorLayout.Lonely)Add(vendor.Icon,1,vendor.Pixel,vendor.Label,flag:vendor.Flag);
             foreach(var fate in fates.Where(fate=>fate.Icon!=0))Add(fate.Icon,2,MapProjection.PixelFromWorld(fate.Position,map),FateLabel(fate),worldRadius:settings.ShowFateAreas ? fate.Radius:0,height:fate.Position.Y);
@@ -1351,7 +1351,7 @@ internal sealed partial class MainWindow
             }
             // Every icon under the cursor (or whose area holds it) is listed in one tooltip, topmost first (0.132, as Mappy does).
             hits.Reverse();
-            // Nearby coffers with the game's « Coffre au trésor » map icon (0.210), and gathering points the game streams for your current job
+            // Nearby coffers with the game's treasure coffer map icon (0.210), and gathering points the game streams for your current job
             // (icon-font symbol); both sized and hidden from the icon settings like the game's icons.
             MapMark("canvas icons drawn");
             if(live?.Objects is { } nearby && live.MapId==map.MapId)
@@ -1693,7 +1693,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndPopup();}
     }
     private const uint VendorIcon=60412,ExchangeIcon=60935;
-    // Game shop icons (MapSymbol, docs/evidence/0.139.0-symbols-probe.log): 60412 Échoppe, 60935 Échangeur, 63851 Marchand.
+    // Game shop icons (MapSymbol, docs/evidence/0.139.0-symbols-probe.log): 60412 shop, 60935 exchange, 63851 merchant.
     private static MapIconMarker[] VendorCandidates(IReadOnlyList<MapIconMarker> markers)=>
         markers.Where(marker=>MapVendorIcons.Shops.Contains(marker.Icon) || MapVendorIcons.Services.Contains(marker.Icon)).ToArray();
     private static MapIconMarker? VendorMarker(MapIconMarker[] candidates,Vector2 pixel,uint preferred=0)
@@ -1701,7 +1701,7 @@ internal sealed partial class MainWindow
         var index=MapVendorIcons.Nearest(candidates.Select(marker=>(marker.X,marker.Y,marker.Icon,marker.Label.Length>0)).ToArray(),pixel,preferred);
         return index<0 ? null:candidates[index];
     }
-    // Gil shop = Échoppe; only special exchanges = Échangeur.
+    // Gil shop = the shop icon; only special exchanges = the exchange icon.
     private uint VendorIconOf(Npcs.NpcVendor vendor)
     {
         var kinds=vendor.ShopIds.Select(id=>mapVendorCache.Shops.TryGetValue(id,out var shop) ? shop.Kind:(Npcs.NpcShopKind?)null).OfType<Npcs.NpcShopKind>().ToArray();
@@ -1819,7 +1819,7 @@ internal sealed partial class MainWindow
             mapGatheringCache=(map.MapId,catalog,index,MapLocalLists.Gathering(catalog.Sources,index,map.MapId).SelectMany(group=>group.Points).ToArray());
         return mapGatheringCache.Points;
     }
-    // « Coffre au trésor » map icon of the game (MapSymbol 63852, docs/evidence/0.139.0-symbols-probe.log), used for nearby coffers (0.210).
+    // Treasure coffer map icon of the game (MapSymbol 63852, docs/evidence/0.139.0-symbols-probe.log), used for nearby coffers (0.210).
     private const uint TreasureIcon=63852;
     // Keys of Tensho's own map layers in the icon size/priority tables (outside the game's icon id range).
     private const uint GlyphVista=0xFFFF0001,GlyphCurrent=0xFFFF0002,GlyphNearbyGathering=0xFFFF0003,GlyphParty=0xFFFF0004,GlyphBookmark=0xFFFF0005,GlyphTreasureMap=0xFFFF0006,

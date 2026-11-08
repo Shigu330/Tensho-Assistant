@@ -137,13 +137,13 @@ public static class DiscordWebhook
     public static bool ShouldSend(DiscordSettings? settings, TenshoAlarm alarm) =>
         settings is { Enabled: true } && IsValidUrl(UrlFor(settings, SourceOf(alarm))) && (ReminderRowOf(alarm).Length > 0 ? ReminderRowOn(settings, alarm) : alarm.Discord) && CategoryOn(settings, SourceOf(alarm));
 
+    /// <summary>Eorzea time at this moment, HH:mm (one Eorzean hour lasts 175 seconds).</summary>
+    public static string EorzeaClock(DateTimeOffset moment)=>Gathering.GatheringTime.Clock(Gathering.GatheringTime.MinuteOfDay(moment));
+
     /// <summary>
     /// The message text: the alarm's own message, else the template, else the default; placeholders replaced, [character] only when
     /// allowed (else removed), the role mention first when set, cut to Discord's 2000 characters.
     /// </summary>
-    /// <summary>Eorzea time at this moment, HH:mm (one Eorzean hour lasts 175 seconds).</summary>
-    public static string EorzeaClock(DateTimeOffset moment)=>Gathering.GatheringTime.Clock(Gathering.GatheringTime.MinuteOfDay(moment));
-
     public static string Format(DiscordSettings settings, string defaultTemplate, string? alarmMessage, string label, int minutes, DateTimeOffset localTime, string? character, string? zone = null, string? item = null)
     {
         ArgumentNullException.ThrowIfNull(settings);

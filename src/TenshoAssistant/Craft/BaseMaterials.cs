@@ -22,10 +22,6 @@ public static class BaseMaterials
     public static ItemOrigin OriginOf(bool gathered,bool sold,bool dropped)=>gathered ? ItemOrigin.Gathering:sold ? ItemOrigin.Vendor:dropped ? ItemOrigin.Monster:ItemOrigin.Other;
 
     /// <summary>
-    /// What has to be fetched for a list: a crafted item not in stock is replaced by its ingredients, unless it can be gathered or bought (<paramref name="fetched"/>). Crafted items in stock
-    /// are used first, all from one stock. Base items keep their whole need, so that the list shows their stock against it. Each once, in the order it first comes.
-    /// </summary>
-    /// <summary>
     /// 0.752 (X-05, user request): the gathered lines of a list, by zone, for fewer trips: the zone where the most remaining items grow comes first and takes them,
     /// then the next among what is left. An item with no zone goes last, under an empty name. Zones of equal weight keep their name order.
     /// </summary>
@@ -89,6 +85,10 @@ public static class BaseMaterials
         return runs.Select(pair=>new CraftStep(pair.Key,recipes[pair.Key],pair.Value,deepest-level[pair.Key]+1){Needed=asked[pair.Key]}).OrderBy(step=>step.Step).ToArray();
     }
 
+    /// <summary>
+    /// What has to be fetched for a list: a crafted item not in stock is replaced by its ingredients, unless it can be gathered or bought (<paramref name="fetched"/>). Crafted items in stock
+    /// are used first, all from one stock. Base items keep their whole need, so that the list shows their stock against it. Each once, in the order it first comes.
+    /// </summary>
     public static IReadOnlyList<(uint Item,long Needed)> Expand(IEnumerable<(uint Item,long Amount)> wanted,Func<uint,long> stock,Func<uint,RecipeDefinition?> recipeOf,Func<uint,bool> fetched)
     {
         var needed=new Dictionary<uint,long>();var order=new List<uint>();var used=new Dictionary<uint,long>();var open=new HashSet<uint>();

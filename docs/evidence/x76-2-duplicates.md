@@ -36,10 +36,10 @@ Found by four read-only agents (one theme each: places and times, Draw caches, g
 | 29 | Most-seen spearfishing shadow of a fish is computed twice | 2 | low | no | 0.908 |
 | 30 | Discovery fact formatting repeated: Seen+Imported sum (10x), level range (2x), Eorzea-hour range (3x) | 13 | low | no | 0.908 |
 | 31 | Tool directory: the same reference strings in four switches, and a French reference « Banque d'objets » | 8 | low | yes | to do |
-| 32 | Crystal classifier keeps French canonical values, mapped back to English keys by two parallel arrays | 7 | low | no | to do |
-| 33 | French storage names still built in BankInventoryBridge while their siblings are English | 3 | low | no | to do |
-| 34 | Doc comments detached from their member (stacked <summary> blocks) and one stale cell size | 19 | low | no | to do |
-| 35 | French text in English comments: Tensho's own UI labels and user quotes | 11 | low | no | to do |
+| 32 | Crystal classifier keeps French canonical values, mapped back to English keys by two parallel arrays | 7 | low | no | 0.909 |
+| 33 | French storage names still built in BankInventoryBridge while their siblings are English | 3 | low | no | 0.909 |
+| 34 | Doc comments detached from their member (stacked <summary> blocks) and one stale cell size | 19 | low | no | 0.909 |
+| 35 | French text in English comments: Tensho's own UI labels and user quotes | 11 | low | no | 0.909 |
 | 36 | Chat command words: matched in two places by hand, accent variants inconsistent, and a doc comment on the wrong method | 5 | low | no | to do |
 | 37 | « No character » state worded three ways on four pages | 8 | low | yes | to do |
 
@@ -78,3 +78,15 @@ Found by four read-only agents (one theme each: places and times, Draw caches, g
   now say « seen in game » (every fact is an observation in game, the player's or another player's). The Discoveries page keeps its « seen by you » /
   « imported only » counts, and « nothing seen by you to share » stays (only your own facts are shared).
 - One most-seen spearfishing shadow (`DiscoveryStore.MostSeenSpearShadow`), one « times seen » (`DiscoveryFact.TimesOf`), one level range text.
+
+## 0.909 — French in code, misplaced doc comments (findings 32 to 35)
+
+- The crystal classifier returns the English keys (Fire…Water, Shards/Crystals/Clusters); the French words stay only as match data for French item
+  names; the page's two parallel key arrays are gone.
+- Storage names built in English (« Armoury chest », « Chocobo saddlebag »; the shown name comes from StorageNames by kind, old saved names still read);
+  an unknown item sorts as « Item {id} ».
+- 21 doc summaries put back on the member they describe (18 places), one stale fact fixed (50-yalm cells).
+- 34 French comments: Tensho's own labels quoted in English (with the key), user quotes paraphrased, game terms in English when sure. Kept as data:
+  game names (items, NPCs, places, duties), the game's French chat texts the code parses, the French command aliases players type.
+- Left for the user: the server info bar title « Tensho Assistant · Monnaies » is French, but Dalamud keys the entry's settings by its title (renaming
+  it resets them).

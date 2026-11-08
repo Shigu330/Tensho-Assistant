@@ -6,7 +6,7 @@ using System.Text.Json;
 namespace TenshoAssistant.Discoveries;
 
 /// <summary>
-/// X-77 (0.882): sharing through Git what the parsers learned. 0.885 (user request: « garde que auto »): only the GitHub exchange remains (GitHubExchange: the common
+/// X-77 (0.882): sharing through Git what the parsers learned. 0.885 (user request: keep only the automatic exchange): only the GitHub exchange remains (GitHubExchange: the common
 /// file community-discoveries/discoveries.json of main joined as imported, your own sightings sent to your gist, on the opt-in automatic exchange or « Exchange now »);
 /// the zip-and-issue way and its buttons are gone. This class keeps the shared helpers: the file's address, hash, parsing, own sightings, gist encoding.
 /// </summary>

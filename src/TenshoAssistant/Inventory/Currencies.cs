@@ -16,16 +16,6 @@ public sealed record CurrencyBalance(CurrencyDefinition Currency,long? Amount,lo
 public sealed record CurrencyReading(ulong Character,DateTimeOffset ReadAt,IReadOnlyList<CurrencyBalance> Balances,int? WeeklyTomestones,int? WeeklyLimit);
 
 /// <summary>
-/// g, I-02 (0.344): threshold alerts, original code (ideas from CurrencyAlert, MIT, and Currency Watchdog, read only; docs/evidence/
-/// 0.344-currencies.md). A threshold is a percentage of the cap (it follows the Grand Company rank's cap), 80 % by default, 0 = off.
-/// One alert when a balance crosses its threshold upwards; re-armed when it falls 2 points under it (under the threshold itself for
-/// thresholds of 2 % or less). The first read of a character arms silently: a currency already over its threshold is listed but not
-/// announced; a changed threshold re-arms that currency only, silently (0.344 review). A single 0 does not arm: during login the game
-/// answers 0 before the real balance arrives, which would turn the real balance into a false crossing; two 0 reads in a row (5 s apart)
-/// are a real 0 and arm, so a later jump over the threshold is announced (0.344 fix check). A balance or cap
-/// not read changes nothing. Caps of 1 or less and of a million or more are not percentage caps (gil, MGP): never alerted.
-/// </summary>
-/// <summary>
 /// 0.606: true once when the limited tomestones of the week reach their limit. Already at the limit at the first reading of a character: no alert,
 /// nothing just happened. Under the limit again (the weekly reset) it can ring next week; an unknown or zero limit says nothing.
 /// </summary>
@@ -43,6 +33,16 @@ public sealed class WeeklyCapTracker
     }
 }
 
+/// <summary>
+/// g, I-02 (0.344): threshold alerts, original code (ideas from CurrencyAlert, MIT, and Currency Watchdog, read only; docs/evidence/
+/// 0.344-currencies.md). A threshold is a percentage of the cap (it follows the Grand Company rank's cap), 80 % by default, 0 = off.
+/// One alert when a balance crosses its threshold upwards; re-armed when it falls 2 points under it (under the threshold itself for
+/// thresholds of 2 % or less). The first read of a character arms silently: a currency already over its threshold is listed but not
+/// announced; a changed threshold re-arms that currency only, silently (0.344 review). A single 0 does not arm: during login the game
+/// answers 0 before the real balance arrives, which would turn the real balance into a false crossing; two 0 reads in a row (5 s apart)
+/// are a real 0 and arm, so a later jump over the threshold is announced (0.344 fix check). A balance or cap
+/// not read changes nothing. Caps of 1 or less and of a million or more are not percentage caps (gil, MGP): never alerted.
+/// </summary>
 public sealed class CurrencyAlertTracker
 {
     public const int DefaultPercent=80,Hysteresis=2;

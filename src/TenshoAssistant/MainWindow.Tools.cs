@@ -178,7 +178,7 @@ internal sealed partial class MainWindow
             finally { ImGui.PopID(); }
             used += 34 + ImGui.GetStyle().ItemSpacing.X;
         }
-        // 0.208: the same useful tools as the inventory's « Tensho — objet » menu (RelevantRoutes), as icons.
+        // 0.208: the same useful tools as the inventory's « Tensho — item » menu (ItemMenu.Title) (RelevantRoutes), as icons.
         foreach (var route in RelevantRoutes(item.Id))
         {
             if (route is Items.ItemContextRoute.Tools) continue;

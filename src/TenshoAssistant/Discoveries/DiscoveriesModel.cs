@@ -47,7 +47,7 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported
 /// (Imported, how many files had it). Only game rows and places: never a player's name, position or id.
-/// MonsterPlace: Subject = BNpcName row, Detail = BNpcBase row, the territory and map, the 10-yalm cell, the first exact place, the levels seen.
+/// MonsterPlace: Subject = BNpcName row, Detail = BNpcBase row, the territory and map, the 50-yalm cell (CellSize), the first exact place, the levels seen.
 /// </summary>
 public sealed class DiscoveryFact
 {
@@ -205,10 +205,10 @@ public sealed class DiscoveryStore
         if(other.Last>known.Last)known.Last=other.Last;
     }
 
-    /// <summary>What an imported fact must hold: a known kind, a subject and a map, finite places in their cell, levels and dates that make sense.</summary>
     /// <summary>X-74 (0.860): the kinds that hold a place (a map); the others are about items and sources only.</summary>
     public static bool HasPlace(DiscoveryKind kind)=>kind is DiscoveryKind.MonsterPlace or DiscoveryKind.HuntMarkPlace or DiscoveryKind.FateSeen or DiscoveryKind.MonsterDrop or DiscoveryKind.FishCatch
         or DiscoveryKind.NpcPlace or DiscoveryKind.BlueSpellCaster or DiscoveryKind.FishBite or DiscoveryKind.SpearShadow;
+    /// <summary>What an imported fact must hold: a known kind, a subject and a map, finite places in their cell, levels and dates that make sense.</summary>
     public static bool Valid(DiscoveryFact? fact)=>fact is not null && Enum.IsDefined(fact.Kind) && fact.Subject!=0 && (fact.Map!=0 || !HasPlace(fact.Kind))
         && float.IsFinite(fact.X) && float.IsFinite(fact.Z) && Math.Abs(fact.X)<=10_000 && Math.Abs(fact.Z)<=10_000 && Cell(fact.X,fact.Z)==(fact.CellX,fact.CellZ)
         && fact.LevelMin is >= 0 and <= 100_000 && fact.LevelMax is >= 0 and <= 100_000 && fact.LevelMin<=Math.Max(fact.LevelMin,fact.LevelMax)
