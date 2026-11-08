@@ -16,7 +16,7 @@ internal sealed partial class MainWindow
     private void DrawBlueSpellSeen(uint spellId)
     {
         if(DiscoveryStore is not { } store || !DiscoveriesLoaded)return;
-        var seen=store.Find(Discoveries.DiscoveryKind.BlueSpellCaster,subject=>subject==spellId,64).Concat(store.Find(Discoveries.DiscoveryKind.BlueSpellLearned,subject=>subject==spellId,16))
+        var seen=store.Find(Discoveries.DiscoveryKind.BlueSpellCaster,spellId,64).Concat(store.Find(Discoveries.DiscoveryKind.BlueSpellLearned,spellId,16))
             .Where(fact=>fact.Detail!=0).GroupBy(fact=>fact.Detail).Take(8).ToArray();
         if(seen.Length==0)return;
         ImGui.TextColored(Accent,localization.Get("BlueSpellSources.Seen"));

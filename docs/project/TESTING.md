@@ -1516,6 +1516,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.937) Rien de visible ; en mission longue (donjon profond), le butin des coffres reste noté après 256 objets.
 
+- [ ] (0.938) Rien de visible : page Découvertes, aide à la pêche (lignes « vu ») et info-bulles comme avant.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

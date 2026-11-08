@@ -1898,7 +1898,7 @@ internal sealed partial class MainWindow
             var utcNow=DateTimeOffset.UtcNow;
             if(mapVistaRetryAt==default)mapVistaRetryAt=utcNow.AddMinutes(1);
             // X-75.5 (0.879): the weather and hour it was registered in, seen in game (yours or shared), before the wiki's weathers (seen with, not « required »).
-            if(DiscoveryStore is { } vistaStore && DiscoveriesLoaded && vistaStore.Find(Discoveries.DiscoveryKind.VistaSeen,subject=>subject==vista.Id,4) is { Count:>0 } registered)
+            if(DiscoveryStore is { } vistaStore && DiscoveriesLoaded && vistaStore.Find(Discoveries.DiscoveryKind.VistaSeen,vista.Id,4) is { Count:>0 } registered)
                 foreach(var fact in registered)
                     ImGui.TextColored(UI.FfxivTheme.Success,localization.Format("MapView.VistaSeen",weather.State.Catalog?.Weather(fact.Detail)?.Name ?? $"#{fact.Detail}",Gathering.GatheringTime.Clock(fact.LevelMin)));
             wikiVistas?.Request();

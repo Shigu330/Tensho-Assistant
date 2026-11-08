@@ -184,6 +184,18 @@ public sealed class DiscoveryStore
     public static readonly TimeSpan SightingGap=TimeSpan.FromMinutes(10);
     private readonly object gate=new();
     private readonly Dictionary<string,DiscoveryFact> facts=new(StringComparer.Ordinal);
+    /// <summary>
+    /// X-93 (0.938, load test docs/evidence/0.938-discoveries-load.md): the facts by kind and subject, kept with every insertion, so a search reads only its kind
+    /// (or its subject) instead of the whole base: a search took about 2 ms at 200 000 facts, and the fishing help makes several per fish on every frame.
+    /// </summary>
+    private readonly Dictionary<DiscoveryKind,Dictionary<uint,List<DiscoveryFact>>> index=[];
+    private void Put(DiscoveryFact fact)
+    {
+        facts[fact.Key]=fact;
+        if(!index.TryGetValue(fact.Kind,out var bySubject))index[fact.Kind]=bySubject=[];
+        if(!bySubject.TryGetValue(fact.Subject,out var list))bySubject[fact.Subject]=list=[];
+        list.Add(fact);
+    }
     private int revision;
     public int Revision=>Volatile.Read(ref revision);
     public bool Dirty { get; private set; }
@@ -224,7 +236,7 @@ public sealed class DiscoveryStore
                 return false;
             }
             if(facts.Count>=MaxFacts)return false;
-            facts[fact.Key]=fact;Dirty=true;revision++;
+            Put(fact);Dirty=true;revision++;
             return true;
         }
     }
@@ -264,7 +276,7 @@ public sealed class DiscoveryStore
                 return false;
             }
             if(facts.Count>=MaxFacts)return false;
-            facts[fact.Key]=fact;Dirty=true;revision++;
+            Put(fact);Dirty=true;revision++;
             return true;
         }
     }
@@ -299,7 +311,7 @@ public sealed class DiscoveryStore
                 if(facts.Count>=MaxFacts){refused++;continue;}
                 var copy=source.Copy();copy.Seen=0;copy.Imported=1;
                 (copy.ImportedHq,copy.ImportedValues)=ImportedPart(source);copy.Hq=0;copy.Values=null;
-                facts[copy.Key]=copy;added++;
+                Put(copy);added++;
             }
             if(added+joined>0){Dirty=true;revision++;}
         }
@@ -364,7 +376,7 @@ public sealed class DiscoveryStore
                 if(!Valid(fact))continue;
                 read++;
                 if(facts.TryGetValue(fact.Key,out var known)){Join(known,fact);continue;}
-                if(facts.Count<MaxFacts)facts[fact.Key]=fact;
+                if(facts.Count<MaxFacts)Put(fact);
             }
             if(read>facts.Count || file.Facts.Any(fact=>fact is not null && Cell(fact.X,fact.Z)!=(fact.CellX,fact.CellZ)))Dirty=true;
             revision++;
@@ -377,7 +389,7 @@ public sealed class DiscoveryStore
         lock(gate){if(saving)Dirty=false;return new DiscoveryFile{Written=at,Facts=facts.Values.Select(fact=>fact.Copy()).ToList()};}
     }
 
-    public void Clear(){lock(gate){facts.Clear();Dirty=true;revision++;}}
+    public void Clear(){lock(gate){facts.Clear();index.Clear();Dirty=true;revision++;}}
 
     /// <summary>Per kind: the facts, those seen by the player, those only imported.</summary>
     public IReadOnlyList<(DiscoveryKind Kind,int Total,int Seen,int ImportedOnly)> Summary()
@@ -389,8 +401,22 @@ public sealed class DiscoveryStore
     /// <summary>The facts of a kind whose subject passes the filter, most seen first.</summary>
     public IReadOnlyList<DiscoveryFact> Find(DiscoveryKind kind,Func<uint,bool> subject,int max)
     {
-        lock(gate)return facts.Values.Where(fact=>fact.Kind==kind && subject(fact.Subject)).OrderByDescending(DiscoveryFact.TimesOf).ThenBy(fact=>fact.Subject)
-            .Take(max).Select(fact=>fact.Copy()).ToArray();
+        lock(gate)
+        {
+            if(!index.TryGetValue(kind,out var bySubject))return [];
+            return bySubject.Where(pair=>subject(pair.Key)).SelectMany(pair=>pair.Value).OrderByDescending(DiscoveryFact.TimesOf).ThenBy(fact=>fact.Subject)
+                .Take(max).Select(fact=>fact.Copy()).ToArray();
+        }
+    }
+
+    /// <summary>X-93 (0.938): the facts of a kind about one subject, most seen first, straight from the index.</summary>
+    public IReadOnlyList<DiscoveryFact> Find(DiscoveryKind kind,uint subject,int max)
+    {
+        lock(gate)
+        {
+            if(!index.TryGetValue(kind,out var bySubject) || !bySubject.TryGetValue(subject,out var list))return [];
+            return list.OrderByDescending(DiscoveryFact.TimesOf).Take(max).Select(fact=>fact.Copy()).ToArray();
+        }
     }
 
     /// <summary>X-76 (0.908): the spearfishing shadow (size, speed) seen in game most often for a fish (yours or shared), if any.</summary>

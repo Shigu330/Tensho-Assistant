@@ -130,7 +130,7 @@ internal sealed partial class MainWindow
         if(seenNpcPlaces.Revision!=store.Revision)seenNpcPlaces=(store.Revision,[]);
         if(seenNpcPlaces.Places.TryGetValue(npc,out var known))return known;
         Npcs.NpcLocation? place=null;
-        if(store.Find(DiscoveryKind.NpcPlace,subject=>subject==npc,1).FirstOrDefault() is { } fact && catalog.Find(fact.Map) is { } map)
+        if(store.Find(DiscoveryKind.NpcPlace,npc,1).FirstOrDefault() is { } fact && catalog.Find(fact.Map) is { } map)
         {
             var at=MapProjection.CoordinateFromWorld(new Vector3(fact.X,0,fact.Z),map);
             place=new Npcs.NpcLocation(fact.Territory,fact.Map,map.Zone,at.X,at.Y,fact.X,0,fact.Z);
@@ -170,22 +170,22 @@ internal sealed partial class MainWindow
         if(DiscoveryStore is not { } store || !DiscoveriesLoaded)return null;
         if(seenFishLines.Revision!=store.Revision)seenFishLines=(store.Revision,[]);
         if(seenFishLines.Lines.TryGetValue(fish,out var known))return known;
-        var catches=store.Find(DiscoveryKind.FishCatch,subject=>subject==fish,16);
+        var catches=store.Find(DiscoveryKind.FishCatch,fish,16);
         string Weathers(DiscoveryKind kind)=>string.Join(", ",store.Find(kind,subject=>subject==fish,8).Select(fact=>weather.State.Catalog?.Weather(fact.Detail)?.Name ?? $"#{fact.Detail}").Distinct());
         var parts=new List<string>();
         if(catches.Where(fact=>fact.Detail!=0).Select(fact=>DiscoveryItemName(fact.Detail)).Distinct().ToArray() is { Length:>0 } baits)parts.Add(localization.Format("FishingPanel.SeenBaits",string.Join(", ",baits)));
         if(Weathers(DiscoveryKind.FishTransition) is { Length:>0 } before)parts.Add(localization.Format("FishingPanel.SeenBefore",before));
         if(Weathers(DiscoveryKind.FishCondition) is { Length:>0 } during)parts.Add(localization.Format("FishingPanel.SeenWeather",during));
-        if(store.Find(DiscoveryKind.FishCondition,subject=>subject==fish,64) is { Count:>0 } hours)
+        if(store.Find(DiscoveryKind.FishCondition,fish,64) is { Count:>0 } hours)
             parts.Add(EtRange(hours.Min(fact=>fact.LevelMin),hours.Max(fact=>fact.LevelMax)));
         // X-73.18 (0.887): the bites seen in game (yours or shared): strength and time from the cast.
-        if(store.Find(DiscoveryKind.FishBite,subject=>subject==fish,32) is { Count:>0 } bites)
+        if(store.Find(DiscoveryKind.FishBite,fish,32) is { Count:>0 } bites)
             parts.Add(string.Join(", ",bites.GroupBy(fact=>fact.Detail).OrderBy(group=>group.Key).Select(group=>
                 $"{(group.Key switch{1=>"!",2=>"!!",3=>"!!!",_=>"?"})} {group.Min(fact=>fact.LevelMin)/10.0:0.0}–{group.Max(fact=>fact.LevelMax)/10.0:0.0} s")));
-        if(store.Find(DiscoveryKind.FishLure,subject=>subject==fish,2) is { Count:>0 } lures)
+        if(store.Find(DiscoveryKind.FishLure,fish,2) is { Count:>0 } lures)
             parts.Add(string.Join(", ",lures.Select(fact=>localization.Get(fact.Detail==1 ? "FishingPanel.SeenAmbitious":"FishingPanel.SeenModest"))));
         // X-73.18 (0.890, 0.891): the spearfishing shadows it was seen in game with (yours or shared).
-        var shadows=store.Find(DiscoveryKind.SpearShadow,subject=>subject==fish,8);
+        var shadows=store.Find(DiscoveryKind.SpearShadow,fish,8);
         if(shadows.Count>0)parts.Add(localization.Format("Spearfishing.SeenShadow",string.Join(", ",shadows.Select(fact=>SpearShadowText((int)fact.Detail,fact.LevelMin)).Distinct())));
         var line=parts.Count==0 ? null:localization.Format("FishingPanel.SeenInGame",catches.Sum(DiscoveryFact.TimesOf)+shadows.Sum(DiscoveryFact.TimesOf),string.Join(" · ",parts));
         if(seenFishLines.Lines.Count<2048)seenFishLines.Lines[fish]=line;

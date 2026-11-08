@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.938.0
+- Plan global, Verify : Nettoyage X-76, étape E5 et X-93 (grosse masse de données) : essai de charge de la base des découvertes avec des faits inventés (nouvel outil tools/DiscoveryLoadProbe). À 200 000 faits (le plafond actuel) : chargement 0,3 s, enregistrement 0,5 s (déjà hors de l'image), fichier de 49 Mo, mais chaque recherche parcourait toute la base (2 ms) et l'aide à la pêche en fait plusieurs par poisson à chaque image. Corrigé : les découvertes sont maintenant rangées par sorte et par sujet, les 10 recherches d'un seul sujet vont droit au but. Restent à décider : que faire au-delà du plafond de 200 000 (aujourd'hui les nouvelles sont ignorées sans le dire) et la compression du fichier partagé. Preuve : docs/evidence/0.938-discoveries-load.md. Non validé en jeu.
+- Tests : DiscoveryIndex938Tests. Verify.ps1 (agent) : 1552/1552, 0 avertissement, 0 erreur ; DLL 0.938.0.0. Non validé en jeu.
+### English
+- X-76 clean-up, step E5 and X-93 (large mass of data): load test of the discoveries base with invented facts (new tool tools/DiscoveryLoadProbe). At 200,000 facts (the current cap): load 0.3 s, save 0.5 s (already off the frame), a 49 MB file, but each search walked the whole base (2 ms) and the fishing help makes several per fish on every frame. Fixed: discoveries are now indexed by kind and subject, the 10 one-subject searches go straight to it. Left to decide: what to do past the 200,000 cap (new facts are silently ignored today) and compressing the shared file. Evidence: docs/evidence/0.938-discoveries-load.md. Not validated in game.
+
 ## 0.937.0
 - Plan global, Verify : Nettoyage X-76, étapes E2 à E4 : un test vérifie maintenant que chacune des 163 preuves citées par le code existe bien dans docs/evidence (règle 7) ; les « une fois par événement » des lecteurs (butin des coffres, coffres, voyages) oublient les plus anciens au lieu de s'arrêter en silence (le butin cessait d'être noté après 256 objets dans une même zone). E2 est déjà couverte par les tests des versions 0.912 à 0.922. Relevés en jeu ajoutés au plan : servants (P9), fin de mission (P10), leurre nageur (P6). Non validé en jeu.
 - Tests : Evidence937Tests. Verify.ps1 (agent) : 1551/1551, 0 avertissement, 0 erreur ; DLL 0.937.0.0. Non validé en jeu.
