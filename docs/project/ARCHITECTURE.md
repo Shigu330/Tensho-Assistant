@@ -1,13 +1,266 @@
 # Architecture
 
-## Vue d'ensemble — état au 0.315.0 (2026-11-02), carte des modules complétée le 2026-11-04 (0.512)
+> *Traduction française plus bas.*
 
-> Carte du code, pas un journal : le détail par version est dans le [CHANGELOG](../../CHANGELOG.md), l'état en jeu dans
-> [STATUS](../ai/STATUS.md). Cette vue remplace celle du 0.154.0 (2026-10-31, historique git). Le code fait foi.
+## Overview — state at 0.865 (2026-11-08)
 
-Un projet plugin (`src/TenshoAssistant`, .NET 10, Dalamud.NET.Sdk 15, une seule DLL) et un exécutable de tests sans dépendance native
-(`tests/TenshoAssistant.Tests`) qui compile par lien les fichiers C# purs du plugin et lit les fichiers de `FreeCompany/Data/` depuis
-les sources.
+> A map of the code, not a journal: the detail of each version is in the [CHANGELOG](../../CHANGELOG.md), the in-game state in the
+> [global plan](GLOBAL-PLAN.md) and [TESTING](TESTING.md). The code is the reference. The design notes written for each goal from
+> 2026-10-27 to 2026-10-29 (the « History of the domains and versions » archive) were removed from this file on 2026-11-08: their names,
+> counters and states belonged to their date. They stay readable in git (this file at version 0.865.0, commit `2da535d`).
+
+One plugin project (`src/TenshoAssistant`, .NET 10, Dalamud.NET.Sdk 15, a single DLL, plus the native library of the optional Raphael
+solver next to it) and a test program without native dependency (`tests/TenshoAssistant.Tests`) that compiles the pure C# files of the
+plugin by link and reads the embedded data files from the sources.
+
+| Files | Role |
+|---|---|
+| `*.Dalamud.cs` | touch the game (Dalamud services, FFXIVClientStructs); never compiled into the tests |
+| `*.Lumina.cs` | typed copies of Excel sheets, shared with the probes of `tools/` |
+| others | pure C# (models, rules, services); tested when the test project includes them |
+
+### Host and life cycle (`Plugin.cs`)
+
+- `Plugin` receives the Dalamud services by injection, loads `Configuration` v1 (another version raises an error, the file is not
+  overwritten), creates the services, `MainWindow`, `MapViewWindow`, `GuideWindow`, the free-standing `PanelWindow`s and `AttachedPanels`
+  (panels beside the game's windows, in the same `WindowSystem`), and registers every reader, loader, bridge and network service in
+  `RegistrationScope`: cleanup in reverse order, idempotent, continued after an error; a failure of the constructor triggers the same
+  cleanup.
+- Competitive cut (DEC-038): every framework subscription goes through `Competitive/CompetitiveGate`; while the player is in PvP or
+  ranked content (`CompetitiveZones`, from the game's data), the whole plugin stops, with no setting, and starts again after.
+- Command `/tensho`: opens the window; `peche`, `pêche`, `fish` or `fishing` open or close the fishing help; `todo <task>` (or `tache`,
+  `tâche`) adds a task to Reminders; `wiki <item>` and `lodestone <item>` open the item's page in the browser; `item`, `price`, `gather`
+  or `recipe` (also `craft` and the French words) followed by an item name open the first matching item in that tool
+  (`MainWindow.CommandRoute`); `selftest` writes the self-check to the log; `linktest` (developer mode) prints test links.
+  `OpenMainUi`, `OpenConfigUi` (Settings), opening at login (`OpenOnLogin`). Fonts of the Tensho window built by `UI/FontManager`
+  (the game's title font by default), released at unload.
+- Panels beside the game's windows go through `Panels?.Show(...)` (`AttachedPanels`), for example: crafting log help, synthesis
+  projection, gathering and collectable panels, fishing and spearfishing panels, ocean voyage, item hover, inventory sort button,
+  retainer sales, duty finder, Character window, Fashion Report slots, Triple Triad deck request. The bank import panel shows only when
+  the automatic capture is off (`BankImportOverlay`).
+
+### Module map (`src/TenshoAssistant/`)
+
+| Folder | Main content |
+|---|---|
+| `Items/` | shared item catalogue (`ItemCatalog` + loader + cache, mount / minion / orchestrion unlocks), uses (`ItemUseCatalog`), hover (`ItemHover`, `ItemHoverReader`), context menu of the game's inventory (`ItemContextMenuBridge`, `ItemContextMenuSession`), crystals, slots, `TryOn` (the game's Try On window), item notes and wishlist (`ItemNotes`, `Wishlist`), Grand Company supply of the day (`GcSupplyToday`), external links (`ExternalLinks`), search filters |
+| `Inventory/` | live inventory (`InventoryService`, `DalamudInventoryReader`), Bank (`InventoryBankService`, `PerCharacterBankStore` + `FileInventoryBankStore`: one file per character; `BankInventoryBridge`: retainers, saddlebags, armoury chest, glamour dresser, armoire), ownership (`ItemHoldings`, `OtherCharacterStocks`), native visual sort (rules, scopes, templates, preview, `InventoryVisualSort` + bridge), currencies (`Currencies`, `CurrencyWatcher`), gil journal (`GilJournal`, `GilWatcher`), storage highlight and report |
+| `Market/` | Universalis: summary and hover price (`MarketService`, `MarketWorldReader`, `MarketHover`, `ItemHoverCoordinator`); listings, history and cost for N units (`MarketBoard`, `MarketBoardService`); preparation cost (`PreparationCost`, `PreparationPriceSession`); retainer sales (`RetainerSales` + reader), undercut watch (`Undercut` + watcher), prices seen at the market board (`SeenPrices` + reader), craft profit (`CraftProfit`), currency value (`CurrencyValue`) |
+| `Craft/` | recipes and actions (catalogues + loaders), simulator, solver (`CraftSolveSession`) and the optional Raphael solver (`RaphaelCraftSolver`, `RaphaelSequenceCache`), conditions envelope, live synthesis (`CraftLive*`, opt-in), crafting log help (`CraftLog*`), plan and chain (`CraftPlan`, `CraftChain*`), presets, macro export and import, crafting lists (`CraftLists`), crafting recorder (`CraftRecorder`, `CraftRecording`), Teamcraft export link (`TeamcraftExport`), crafting from stock, consumables |
+| `Gathering/` | gathering and fishing points (catalogue + cache), time windows (`GatheringSchedule`, `GatheringTimeline`), weather (`WeatherCatalogLoader`, `WeatherForecast`), fishing log and forecasts (`FishingNotebook`, `FishingForecast`, `FishNow`, `FishWindows`), observation of the gathering window, GP (`GpActions`, `GpOptimizer`, `GpNextAction`), Bountiful Yield II estimate (`BountifulEstimate`), collectables, spearfishing, ocean fishing (`OceanFishing`, `OceanVoyage` + reader), notebooks, gathering route, GP regeneration tick |
+| `Community/` | bounded network access (`BoundedHttp`) and community sources: Garland Tools (`GarlandClient`, `GarlandItemSources`), wiki (`WikiItemAcquisition`), LuminaSupplemental, GatherBuddy (`GatherBuddyFish`), Teamcraft (`FishBiteTimes`), PaissaDB (`PaissaDb`), fishing parsers (`FishingSources`, `FishingConditions`), community names (`CommunityNames`) |
+| `Monsters/`, `Duties/` | monster loot (`MonsterLootService`, `WikiMonsterSources`), blue magic sources (`BlueSpellSources`, `BlueSpellWikiIndex`, `BlueSpellMonsterIndex`), Beastmaster wiki index (`BeastWikiIndex`), meaning of nearby monsters (`NearbyMonsters`, information only); duties (`DutyCatalog`), loot (`DutyLootService`), duty finder panel (`DutyFinderReader`), duty progress (`DutyProgress` + reader) |
+| `Fashion/` | Fashion Report: community data (`FashionDataService`), hints (`FashionHintLoader`), the game window (`FashionCheckReader`) |
+| `Maps/` | Tensho map: catalogue, markers (`MapMarkerSource`), projection, live state (`MapLiveReader`: position, flag, FATEs, party, nearby objects and monsters, teleport), local index (`MapLocalIndex` + loader), replacement of the game map (`NativeMapReplacer`), bookmarks and place directory, sightseeing from the wiki (`WikiVistas`), map links of the chat (`ChatMapLinks` + watcher), hunt train (`HuntTrain`, `HuntAnnouncer`), map discovery, search, zoom memory, treasure maps, island resources |
+| `Npcs/` | NPC vendors (`NpcVendorCatalog` + loader): gil shops, exchanges, free company shops |
+| `Quests/`, `Collections/` | quests (reader, rewards and reverse index, quest items, start cities, options not taken); collections, titles, achievements, orchestrion (`CollectionReader` + partial `Completion`, `ExtraCollectionReader`, `BgmReader`), outfits, achievement progress, title by job (`TitleChanger`) |
+| `Character/` | character statistics (`CharacterStatsReader`, `StatFormulas`), what Tensho last read for each of the player's characters (`CharacterStatus` + watcher) |
+| `Gear/` | gear planner: `GearCatalog` (pieces, rules, materia and caps, `TENSHO-GEAR1:` sharing), `GearLoader`, plan sets, comparison, gearsets (`Gearsets`, `GameGearsetReader`), gear wear, job levels (`JobProgress`), chocobo barding (`ChocoboBarding` + reader) |
+| `FreeCompany/` | submarines and airships: `Voyages` (records, merged by house), `VoyageWatcher` (reading the workshop, catalogues), `VoyagePlanner` (best routes), `VesselBuilds` (builds, tiers, wear), airship sectors and planner, voyage history, workshop projects and deliveries, `Data/` (embedded files) |
+| `Island/` | island sanctuary: catalogue + loader, reader (on the player's click), workshop planner, materials, pasture animals |
+| `Deliveries/`, `GrandCompanies/`, `Societies/`, `Leves/`, `Hunting/` | custom and special deliveries; Grand Companies; allied societies; guildleves (`LeveCatalog`, `LeveProgressReader`); hunting log (`HuntingLog` + reader) and S rank conditions (`SRankConditions`) |
+| `Carnivale/`, `Relics/`, `Fields/`, `DeepDungeons/`, `Lexicon/` | Masked Carnivale; relic weapons and armour; Eureka and Bozja (`FieldBoard`) and FATEs; deep dungeons; lexicon of the game's words — each a model and its `*.Dalamud.cs` reader |
+| `Events/` | seasonal events (`Festivals`, `FestivalReader`), `Data/festival-names.csv` (embedded) |
+| `Discoveries/` | local discoveries base (`DiscoveriesModel`: facts with their provenance, import with merge, export), its settings (`DiscoverySettings`), and what it notes from the game (`ItemDiscoveryWatcher`, `ItemGains`); game rows and places only, never another player |
+| `Competitive/` | PvP and ranked content cut (`CompetitiveGate`, `CompetitiveZones`, DEC-038) |
+| `Credits/` | the single list of credits (`CreditCatalog`: the game, libraries, embedded data, online data, rules taken up, references read, tools), shown by `MainWindow.Credits.cs` and checked by the tests (embedded data, network hosts, settings, MIT notices) |
+| `Alarms/`, `Reminders/` | Tensho alarms (`TenshoAlarm`, `AlarmService`, the game's `/alarm` command through `GameAlarmCommand`, automatic alarms `AutoAlarms` + watcher, server info bar entries for alarms, reminders and currencies, Discord webhook `DiscordWebhook` (pure rules) and `DiscordNotifier` (queue and sending on a worker), tracked alarms, world clocks); reminders of the calendar (`ResetSchedule`, `GameTimers`), garden (journal, seeds, crossbreeds, chat watcher), squadron planner and reader, hunt bills, personal tasks, Wondrous Tails odds, company benefits, `Data/` (embedded garden files) |
+| `MiniGames/` | Mini Cactpot (solver, session, observation); Triple Triad (cards, solver, match simulator and advice, card score, NPCs, observation) |
+| `Macros/` | macro chain (`MacroSequence`, `MacroChainService` / `MacroChainBridge`, observation); writing crafting macros into the game (`MacroSlotPlan`, `MacroWriter`) |
+| `Caching/` | disk cache (`DataCache`), durations (`CachePreferences`), keys (`CatalogCacheKeys`, `GameCacheIdentity`), validation (`CacheSnapshots`) |
+| `Localization/` | `LocalizationManager`, `LocalizationValidator`, `Languages/*.json` (embedded) |
+| `Help/`, `Guide/` | help of each page and search (`HelpIndex`), report a problem (`ProblemReport`, prefilled GitHub form), community videos (`CommunityHelpIndex`, read on a click); first-run guide (`GuideFlow`; `GuideWindow.cs`, at the root, in the `WindowSystem`) |
+| `Diagnostics/` | self-check at reload in developer mode (`SelfCheck`, `SelfCheckRunner`), page sweep (`PageSweep`, `PageSweepWindow`, DEC-040), slow frame log (`SlowFrame`), blink watch, temporary in-game readings (`ReadingCapture`) |
+| `Beastmaster/` | Beastmaster page, the game's data read raw (`BeastCatalog` + loader); window probe (`BeastWindowProbe`), without an advice panel (DEC-032) |
+| `MyTools/` | the player's tools and the community gallery, data only (`ToolTemplate`, `ToolTemplateStore`, `ToolGallery` read on a click) |
+| `UI/` | theme (`FfxivTheme`, `ThemePalettes`, `GameThemeReader`), fonts (`FontManager`, `FontSettings`), `UiComponents`, `UiMessages`, `InternalMessages`, the game's visible windows (`GameWindowsReader`, `GameWindowFollower`), shared templates `Components/`, navigation bar `Navigation/` |
+| root | `Plugin`, `Configuration` (+ `Configuration.Dalamud.cs`), `RegistrationScope`, `MainWindow.*.cs` (one partial per page or part), `MapViewWindow`, `GuideWindow`, `PanelWindow`, `AttachedPanels`, `BankImportOverlay` |
+
+### Main window
+
+`MainWindow`: a side bar sorted in foldable groups (state kept in `NavigationCollapsed`), « item in context » under the bar, content page
+on the right. Every page is one line of `MainWindow.Pages.cs` (`PageEntries`): its group, its label, its draw method and its source; the
+navigation, the drawing and the source shown to contributors all read it. Today:
+
+| Group | Pages (pages reached only from tabs in brackets) |
+|---|---|
+| — | Home, My tools |
+| ITEMS | Items (search + item sheet), Storage, Inventory sorting, Market, Lexicon |
+| PRODUCTION | Crafting (live synthesis, presets), Gathering (GP planning, collectables), Ocean fishing, Island sanctuary, Custom deliveries, Macro chain |
+| WORLD | Map, Weather, FATEs, Alarms, Reminders, Garden, Free company, NPC vendors, Duty loot, Monster loot, Discoveries |
+| PROGRESSION | Quests, Events, Collections (Blue magic), Masked Carnivale, Relics, Allied societies, Grand Companies, Special deliveries, Eureka and Bozja, Deep dungeons, Gear, Chocobo, Guildleves, Hunting log, Beastmaster |
+| GOLD SAUCER | Fashion Report, Triple Triad, Mini Cactpot |
+| PREFERENCES | Help, Settings (General, Interface, Modules, Map, Data, Advanced; Debug in developer mode), Credits, Diagnostics (developer mode) |
+
+The map has its own window (`MapViewWindow`), whose content and open state stay in `MainWindow.MapView.cs`.
+
+Shared templates (`UI/Components/`):
+
+- `ItemCell.cs`: `DrawItemIcon` / `ItemCell`, the item icon of every module: shared item tooltip (one per frame), ✓ / ✗ badge of
+  collection items (unknown = no badge), right click = useful tools (`RelevantRoutes`) and grouped sources (`SourceLines`,
+  `MainWindow.SourceLinks.cs`), unique menu id (`UniqueMenuId`). The same content (`DrawItemInfoBody`) serves the panel under the game's
+  tooltip; the same sources, the Tensho menu of the game's inventory.
+- `SettingRow.cs`: setting with tooltip and ↺ button (default read on a new `Configuration`); « Reset everything to default ».
+- `DetailPage.cs`: header then tabs, only the open tab is computed (item sheet, Triple Triad sub-tabs).
+- `EntityMenus.cs`: one right-click menu per kind of thing (quest, NPC, monster, place).
+- `DataIndexes.cs`: indexes of collections and quests, rebuilt when the list is read again, never at each frame.
+
+### Data flow
+
+```
+game data (Lumina sheets, native memory)
+  └─ *.Dalamud.cs readers / loaders on IFramework.Update: copy into managed records
+       └─ optional worker (index, catalogue) → atomic publication of an immutable state (Volatile / lock, generation)
+            └─ Draw (MainWindow, panels): reads the published state, caches its computations, never waits
+network sources (Community/, Market/, Fashion/, Maps/WikiVistas, Monsters/) → bounded request → published state + DataCache
+player actions (flag removal, teleport, /alarm, macros, sort, import) → request in a queue → run on IFramework.Update
+```
+
+- Static catalogues: copied in batches on the framework thread (a few rows or about 2 ms per frame), then indexed on a worker; copy kept in
+  the disk cache (`catalog-*`).
+- Live reads: each reader has its own rate, written in its code; for example the game's visible windows ten times a second, the alarms
+  once a second, the automatic alarms and the character status every 30 seconds, the running festivals every 10 seconds, the discoveries
+  ten times a second. Observations of the synthesis, the Mini Cactpot and Triple Triad run only when turned on.
+- Native strings read with a bound (example: `Utf8String` of the map tooltips, length = `BufUsed − 1`, see
+  [the crash excerpt](../evidence/0.133.0-crash-excerpt.log)); search of addon nodes bounded.
+
+Known gaps to the rule « Draw reads neither pointer nor Excel sheet » (noted on 2026-11-02, not checked again since):
+
+- `MainWindow.Reminders.cs` calls `GameTimers.Read()` (QuestManager, SatisfactionSupplyManager, RetainerManager) from Draw, at most once
+  a second and only with the Reminders page open.
+- Functions passed by `Plugin.cs` and called from Draw: fishing help (player, territory, « fishing » condition each frame; `FishingSpot`
+  table built at the first call), Bountiful Yield II base (`GatheringItem`, `ItemLevel`, built at the first call), job names, dyes and
+  Fashion Report themes (`TryGetRow` at the call).
+- `TryOn.Item` (`AgentTryon.TryOn`) is called from Draw, on a player's click.
+- Placing the flag: `IGameGui.OpenMapWithMapLink` is called from Draw, on a click; removing the flag goes through the queue of
+  `MapLiveReader`.
+- `MapMarkerSource` reads from Draw, at the first use of each key, the sheets `MapMarker`, `Map` (region and world maps), `EventIconType`
+  and `MapSymbol`, then keeps the copy in memory.
+- `VoyageWatcher` builds its sector and part catalogues in one go on the framework thread (first pass), not in batches; `GearLoader` and
+  `TriadNpcLoader` read the Lumina sheets directly on a worker.
+
+### Background work and cancellation
+
+| Owner | Work | End and cancellation |
+|---|---|---|
+| catalogue loaders (`ItemCatalogLoader`, `RecipeCatalogLoader`, `GatheringCatalogLoader`, `NpcVendorLoader`, `MapLocalIndexLoader`, `MapCatalogLoader`, `DutyCatalogLoader`, `ItemUseCatalogLoader`, and the others named `*Loader`) | index on a worker after the framework copy | result taken at a later `Update`; `Dispose` unsubscribes and cancels |
+| `GearLoader`, `TriadNpcLoader` | catalogue from Lumina on a worker | token cancelled at `Dispose` |
+| sessions: `CraftSolveSession`, `CraftChainSession`, `CraftLogSession`, `TriadSolveSession`, `MiniCactpotSolveSession`, `PreparationPriceSession`, rewards index of `QuestService` | computation or requests | generation + token; late result rejected; closed by `MainWindow.Dispose` or by their service |
+| `MainWindow` pages: Triple Triad advice and deck request, best routes, best builds | search on a worker, restarted (the old one cancelled) when its inputs change | cancelled by `MainWindow.Dispose` (`MainWindow.Lifetime.cs`) |
+| network services (`MarketService`, `MarketBoardService`, `GarlandClient` and `GarlandItemSourceService`, `WikiItemAcquisitionService`, `WikiMonsterSources`, `WikiVistaSource`, `LuminaSupplementalService`, `GatherBuddyFishService`, `FishBiteTimeService`, `FashionDataService`, `PaissaDbService`, `ToolGallery`) | one request at a time or a queue, bounded answer | `Dispose` through `RegistrationScope`; LuminaSupplemental and GatherBuddy wait 5 min after a failure and keep their expired copy if the network fails |
+| `InventoryBankService` | reading / writing the bank files (queue bounded to one request) | `Dispose` closes the queue without waiting for an I/O already started |
+| `DataCache` | disk reads and writes outside the framework | `Dispose` waits 2 s at most, then cancels |
+
+### Configuration and persistence
+
+- `Configuration` v1 (`Configuration.cs`, pure C# shared with the tests; `Configuration.Dalamud.cs` adds `IPluginConfiguration`), saved
+  by `SavePluginConfig`. `MainWindow` writes settings through `SaveSetting`, which puts the former value back if saving fails.
+- Content: settings (including `MapViewSettings`, `Cache`, the switches of the community sources, `Discovery`) and some user data
+  (alarms, reminders done, vessels read, unlocked sectors, build plans, gear and materia plans, presets, decks, followed quests,
+  bookmarks, macro plan, sort profiles and templates, item notes, wishlist, garden beds, personal tasks…).
+- Defaults: a new `Configuration` is the reference of the ↺ buttons. « Reset everything to default » (Settings › Advanced,
+  `UI/Components/SettingRow.cs`) copies by reflection, from a new configuration, only the properties listed in `ConfigurationReset.Reset`
+  (`Configuration.cs`); the Discord webhook address typed is kept. `ConfigurationReset.Kept` keeps the user's data and the interface
+  state. A test requires every public property to be in exactly one of the two lists: **every new property of `Configuration` must be
+  placed in one of them**.
+- Separate files in the plugin's configuration folder, never touched by the reset: `InventoryBank/` (one file per character, schema 1,
+  16 MiB at most, bounded entries and containers; written through a temporary file then replaced, with `.bak`), `GilJournal/`,
+  `Characters/`, `Discoveries/`, `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, `Exports/`, `DataCache-v1/`; in developer
+  mode, `SelfCheckSeen.json` and `PageSweepLast.txt` (see [SECURITY](../../SECURITY.md)).
+
+### Caches (`Caching/`)
+
+- `DataCache-v1` in the plugin's configuration folder: one file per family + scope + version, versioned envelope (schema, family, scope,
+  version, date); bounded size per entry, in number of files and in total; only the last entry of a family and scope is kept; the
+  catalogues (`catalog-*`) are never evicted by number.
+- Static catalogues (`catalog-items`, `catalog-recipes`, `catalog-gathering`, `catalog-npc-vendors`, `catalog-map-positions`…): key =
+  game data + language + shape of the copy (`CatalogCacheKeys`), never the plugin version.
+- Snapshots per character (quests, collections): key `GameCacheIdentity` (plugin version + language + data versions), so read again
+  after each new plugin version.
+- Durations per area (`CacheArea`, Settings › Data), defaults since 0.750 (X-02): Prices 1 day, Quests 1 h, Collections 7 days, Sources
+  « Only when missing, or on Refresh », Fashion Report 7 days, Imported stock 1 day (only flags the age), Crafting computations 7 days,
+  Titles and achievements 7 days; choices 5 min, 1 h, 24 h, 7 days or « Only when missing, or on Refresh ». Full record of the sources and
+  rates at the time of the audit: [docs/evidence/0.246-cache-audit.md](../evidence/0.246-cache-audit.md).
+
+### Embedded resources and external sources
+
+| Data | Where | Source and licence |
+|---|---|---|
+| languages `Localization/Languages/*.json` | embedded in the DLL; a `Localization/Languages` folder next to the DLL overrides them (translators); Verify refuses a JSON shipped in the package | Tensho |
+| `FreeCompany/Data/submarine-loot.json` | embedded; average loot per sector, made by `tools/submarine-loot.py`, read once by `VoyageWatcher` | FFXIVGachaSpreadsheet (MIT, community records) |
+| `FreeCompany/Data/submarine-breakpoints.csv` | embedded; thresholds of the sectors (surveillance, retrieval, favour) | SubmarineTracker (MIT, licence notice at the top of the file) |
+| `FreeCompany/Data/airship-unlock.csv`, `airship-drop.csv` | embedded; airship sectors | LuminaSupplemental (GPL-3.0, notice in the file) |
+| `Events/Data/festival-names.csv` | embedded; English names of seasonal events | LuminaSupplemental (GPL-3.0, notice in the file) |
+| `Reminders/Data/garden-seeds.csv`, `garden-crosses.csv` | embedded; growing times and crossbreeds, made by `tools/garden-data.py` | FFXIV Gardening Tracker (GPL-3.0), FFXIV Crossbreed Helper (MIT), notices in the files |
+| main stat modifier table (levels 1–100) | in the code (`Character/StatFormulas.cs`) | Character Panel Refined (MIT) |
+| `images/icon.png` | copied next to the DLL (not embedded) | Tensho |
+| prices, listings, history, data centres | network (bounded `HttpClient`) | Universalis API |
+| item sources, loot | network (`BoundedHttp`) | Garland Tools |
+| monster loot, acquisition, sightseeing, blue magic, Beastmaster and pasture pages | network (`BoundedHttp`) | ffxiv.consolegameswiki.com |
+| duty loot, monsters, FATEs, ventures, shop, desynthesis… | network (GitHub, `BoundedHttp`) | LuminaSupplemental (GPL-3.0) |
+| baits, conditions and fishing windows | network (GitHub, `BoundedHttp`) | GatherBuddy (Apache-2.0) |
+| bite times | network (GraphQL, `FishBiteTimes`) | Teamcraft public reports (MIT) |
+| Fashion Report (`FashionReport.json`) | network (GitHub, `BoundedHttp`) | FFXIVGachaSpreadsheet (MIT) |
+| open housing plots | network (`BoundedHttp`) | PaissaDB |
+
+Embedding rule: only data under a licence compatible with GPL v3, with source, licence and copyright in the file
+([DEC-021](DECISIONS.md)). References read without copying code: listed on the Credits page (`Credits/CreditCatalog.cs`, « references
+read ») and in [REFERENCES.md](REFERENCES.md); credits: [README](../../README.md).
+
+### Tensho map (`Maps/`, `MainWindow.MapView.cs`, `MainWindow.MapLocalLists.cs`)
+
+- `MapCatalogLoader` copies the `Map` sheet (zone maps); `MapMarkerSource` reads on demand, from Draw, `MapMarker`, `Map` (regions and
+  world), `MapSymbol` and `EventIconType`, kept in memory (known gap, see above); `MapProjection` converts world ↔ texture ↔ screen.
+- `MapLiveReader` publishes position, flag, FATEs, party, the game's event markers (quests, leves), nearby objects, living enemies around
+  the player (information only, 100 at most), aether currents and unlocked sightseeing entries, combat / instance; it runs on the
+  framework thread the requests of the interface (remove the flag, teleport, teleport costs).
+- `MapLocalIndexLoader` builds the local index per map (quest givers, gathering and fishing points, sightseeing, currents);
+  `NpcVendorLoader` the vendors. Both go through the disk cache. NPCs placed by an event are shown only during that event.
+- `NativeMapReplacer` keeps the `AreaMap` addon open off screen so that the game keeps updating its markers, reads the open request
+  (`AgentMap`, journal quest, aetheryte, FATE) and opens the Tensho map instead; the game map is restored when it closes or at unload.
+- Layouts: classic (region / zone menus at the top, tool column on the left) or « Menus and tools over the map » (`OverlayControls`): tools
+  and names submitted before the map (child windows) to take the click, the map ignores the mouse over them. Edge markers for targets out
+  of view (`DrawEdgeMarkers`).
+- Right click: the icon's own menu (`RightClickIgnore` sends an icon to the general menu), general menu with tabs (Favourites, Quests,
+  FATEs, Gathering, Aetherytes, Vendors, Triple Triad, Aether currents, Sightseeing log).
+- Settings: `MapViewSettings` in `Configuration` (global and per-map icon sizes and priorities, coloured areas, view cone, edge markers,
+  layout, nearby monster layers, zoom at opening).
+
+### Item sources (« How to get it »)
+
+Order: game data (NPC vendors including free company shops, exchanges, quests, achievements, recipes, gathering), LuminaSupplemental data
+(duties, monsters, FATEs, ventures, shop, items from items), then Garland Tools, then the « Acquisition » section of the wiki. « How to get
+it » shows Garland only if no other source is known, and the wiki only if Garland knows nothing either; but Garland is asked for almost
+every item put in context (selected item, sheet, Tensho and game menus), because the useful tools (`RelevantRoutes`: duties, monsters) and
+`SourceLines` (duties, exchanges) read it. Garland and the wiki are turned off in Settings › Advanced. Seals of another Grand Company than
+the character's are left out (unknown company = everything shown). The market is a criterion, not a source. The rows are computed once
+(`SourceLines`) and shown in the Tensho menu as in the menu of the game's inventory.
+
+### Interface and languages
+
+`UI/FfxivTheme.cs` holds the palette (following the game's theme through `GameThemeReader`, or forced); PreDraw / PostDraw for the
+windows, disposable scopes for the panels. `LocalizationManager` loads the embedded JSON (English = reference and fallback, French
+complete, German and Japanese partial); a test fails Verify if a setting tooltip named in the code is missing in English or French. Game
+data (items, actions, places) comes from the game's catalogue, in the game's language; Tensho's own texts are in the plugin's language.
+See [Localization/README.md](../../Localization/README.md). Dates shown in local time; computations in UTC and Eorzea time.
+
+The build and the managed tests do not validate the ImGui rendering nor the native reads: only the in-game test does (state per version:
+[global plan](GLOBAL-PLAN.md), [TESTING](TESTING.md), [CHANGELOG](../../CHANGELOG.md)).
+
+---
+
+# Architecture (français)
+
+## Vue d'ensemble — état au 0.865 (2026-11-08)
+
+> Carte du code, pas un journal : le détail par version est dans le [CHANGELOG](../../CHANGELOG.md), l'état en jeu dans le
+> [plan global](GLOBAL-PLAN.md) et [TESTING](TESTING.md). Le code fait foi. Les notes de conception écrites pour chaque objectif du
+> 2026-10-27 au 2026-10-29 (l'archive « Historique des domaines et des versions ») ont été retirées de ce fichier le 2026-11-08 : leurs
+> noms, compteurs et états étaient ceux de leur date. Elles restent lisibles dans git (ce fichier à la version 0.865.0, commit `2da535d`).
+
+Un projet plugin (`src/TenshoAssistant`, .NET 10, Dalamud.NET.Sdk 15, une seule DLL, plus à côté la bibliothèque native du solveur
+Raphael facultatif) et un programme de tests sans dépendance native (`tests/TenshoAssistant.Tests`) qui compile par lien les fichiers C#
+purs du plugin et lit les fichiers de données embarqués depuis les sources.
 
 | Fichiers | Rôle |
 |---|---|
@@ -17,73 +270,86 @@ les sources.
 
 ### Hôte et cycle de vie (`Plugin.cs`)
 
-- `Plugin` reçoit les services Dalamud par injection, charge `Configuration` v1 (une autre version lève une erreur, le fichier n'est
-  pas écrasé), crée les services, `MainWindow`, `MapViewWindow`, `GuideWindow`, les `PanelWindow` (suivi, tâches, barres) et `AttachedPanels` (panneaux à côté des fenêtres du jeu, 0.516 ; même `WindowSystem`), et enregistre chaque lecteur, chargeur, pont
-  et service réseau dans `RegistrationScope` : nettoyage en ordre inverse, idempotent, poursuivi après erreur ; un échec du
-  constructeur déclenche le même nettoyage.
-- Commande `/tensho` (argument `peche`, `pêche`, `fish` ou `fishing` : ouvre ou ferme l'aide à la pêche), `OpenMainUi`,
-  `OpenConfigUi` (Paramètres), ouverture à la connexion (`OpenOnLogin`). Polices de titre du jeu (TrumpGothic 24 et 19 px, atlas de
-  Dalamud ; police normale tant qu'elles ne sont pas prêtes), libérées au déchargement.
-- `Plugin.Draw` : demande venue du menu contextuel du jeu, thème, état d'ouverture de la carte, puis les panneaux (ils demandent leur fenêtre à `AttachedPanels`), enfin `windows.Draw()` (0.516). Panneaux
-  posés à côté des fenêtres du jeu : import de banque (seulement si la capture automatique est coupée), aide du carnet de synthèse,
-  survol d'objet, Mini Cactpot, infobulle de l'icône d'alarme, Triple Triade (match, demande de deck, rappel de deck), Personnage,
-  outil de mission, Revue de mode, récolte, pêche.
+- `Plugin` reçoit les services Dalamud par injection, charge `Configuration` v1 (une autre version lève une erreur, le fichier n'est pas
+  écrasé), crée les services, `MainWindow`, `MapViewWindow`, `GuideWindow`, les `PanelWindow` libres et `AttachedPanels` (panneaux à côté
+  des fenêtres du jeu, dans le même `WindowSystem`), et enregistre chaque lecteur, chargeur, pont et service réseau dans
+  `RegistrationScope` : nettoyage en ordre inverse, idempotent, poursuivi après erreur ; un échec du constructeur déclenche le même
+  nettoyage.
+- Coupure compétitive (DEC-038) : chaque abonnement au framework passe par `Competitive/CompetitiveGate` ; tant que le joueur est en JcJ
+  ou en contenu classé (`CompetitiveZones`, d'après les données du jeu), le plugin entier s'arrête, sans réglage, et reprend ensuite.
+- Commande `/tensho` : ouvre la fenêtre ; `peche`, `pêche`, `fish` ou `fishing` ouvrent ou ferment l'aide à la pêche ; `todo <tâche>` (ou
+  `tache`, `tâche`) ajoute une tâche aux Rappels ; `wiki <objet>` et `lodestone <objet>` ouvrent la page de l'objet dans le navigateur ;
+  `objet`, `prix`, `recolte` ou `recette` (aussi les mots anglais `item`, `price`, `gather`, `recipe`, `craft`) suivis d'un nom d'objet
+  ouvrent le premier objet trouvé dans cet outil (`MainWindow.CommandRoute`) ; `selftest` écrit l'auto-contrôle au journal ; `linktest` (mode
+  développeur) affiche des liens d'essai. `OpenMainUi`, `OpenConfigUi` (Paramètres), ouverture à la connexion (`OpenOnLogin`). Polices de
+  la fenêtre Tensho construites par `UI/FontManager` (police de titre du jeu par défaut), libérées au déchargement.
+- Les panneaux à côté des fenêtres du jeu passent par `Panels?.Show(...)` (`AttachedPanels`), par exemple : aide du carnet de synthèse,
+  projection de la synthèse, panneaux de récolte et d'objets de collection, panneaux de pêche et de pêche au harpon, traversée de pêche en
+  mer, survol d'objet, bouton de tri de l'inventaire, ventes des servants, outil de mission, fenêtre Personnage, emplacements de la Revue
+  de mode, demande de deck de Triple Triade. Le panneau d'import de banque ne s'affiche que si la capture automatique est coupée
+  (`BankImportOverlay`).
 
 ### Carte des modules (`src/TenshoAssistant/`)
 
 | Dossier | Contenu principal |
 |---|---|
-| `Items/` | catalogue d'objets commun (`ItemCatalog` + loader + cache, déblocages monture / mascotte / orchestrion), usages (`ItemUseCatalog`), survol (`ItemHover`, `ItemHoverReader`), menu contextuel de l'inventaire du jeu (`ItemContextMenuBridge`, `ItemContextMenuSession`), cristaux, emplacements, `TryOn` (cabine d'essayage du jeu, 0.310) |
-| `Inventory/` | inventaire live (`InventoryService`, `DalamudInventoryReader` : sacs 1–4 et cristaux), Banque (`InventoryBankService`, `FileInventoryBankStore`, `BankInventoryBridge` : servants, sacoches, arsenal, coffre à apparence, armoire), possession (`ItemHoldings`), tri visuel natif (règles, portées, modèles, aperçu, `InventoryVisualSort` + bridge) |
-| `Market/` | Universalis : résumé et prix au survol (`MarketService`, `MarketWorldReader`, `MarketHover`, `ItemHoverCoordinator`) ; annonces, historique et coût pour N unités (`MarketBoard`, `MarketBoardService`, page Marché et onglet Marché de la fiche objet) ; coût de préparation (`PreparationCost`, `PreparationPriceSession`) |
-| `Craft/` | recettes et actions (catalogues + loaders), simulateur, solveur (`CraftSolveSession`), enveloppe des conditions, synthèse en direct (`CraftLive*`, opt-in), aide du carnet (`CraftLog*`), plan et chaîne (`CraftPlan`, `CraftChain*`), préréglages, export de macros |
-| `Gathering/` | points de récolte et de pêche (catalogue + cache), horaires (`GatheringSchedule`, `GatheringTimeline`), météo (`WeatherCatalogLoader`, `WeatherForecast`), carnet et prévisions de pêche, observation de la fenêtre de récolte, PR (`GpActions`, `GpOptimizer`), estimation d'Abondance II (`BountifulEstimate`) |
-| `Community/` | accès réseau borné (`BoundedHttp`) et sources communautaires : Garland Tools (`GarlandClient`, `GarlandItemSources`), wiki (`WikiItemAcquisition`), LuminaSupplemental, GatherBuddy (`GatherBuddyFish`), Teamcraft (`FishBiteTimes`), analyseurs de pêche (`FishingSources`, `FishingConditions`) |
-| `Monsters/`, `Duties/` | butin des monstres (Garland, wiki, survol) ; contenus (`DutyCatalog`), butin (`DutyLootService`), panneau de l'outil de mission (`DutyFinderReader`) |
-| `Fashion/` | Revue de mode : données communautaires (`FashionDataService`), indices (`FashionHintLoader`), fenêtre du jeu (`FashionCheckReader`) |
-| `Maps/` | carte Tensho : catalogue, marqueurs (`MapMarkerSource`), projection, état live (`MapLiveReader`), index local (`MapLocalIndex` + loader), remplacement de la carte du jeu (`NativeMapReplacer`), favoris, repères d'exploration du wiki (`WikiVistas`) |
-| `Npcs/` | marchands PNJ (`NpcVendorCatalog` + loader) : boutiques gil, échanges, boutiques de compagnie libre (`FccShop`, 0.295) |
-| `Quests/`, `Collections/` | quêtes (lecteur, récompenses et index inverse, objets de quête, cités de départ, options non prises) ; collections, titres, succès, orchestrion (`CollectionReader` + partial `Completion`) |
-| `Character/` | statistiques du personnage (`CharacterStatsReader`, `StatFormulas`) |
-| `Gear/` | planificateur d'équipement (0.310–0.314) : `GearCatalog` (pièces, règles, matérias et plafonds, partage `TENSHO-GEAR1:`), `GearLoader` (catalogue, équipement porté) |
-| `FreeCompany/` | sous-marins et dirigeables (0.307–0.315) : `Voyages` (relevés, fusion par maison), `VoyageWatcher` (lecture de l'atelier, catalogues), `VoyagePlanner` (meilleurs trajets), `VesselBuilds` (montages, paliers, usure), `Data/` (fichiers embarqués) |
-| `Credits/` | liste unique des crédits (`CreditCatalog` : le jeu, bibliothèques, données intégrées, données en ligne, règles reprises, références lues, outils), affichée par `MainWindow.Credits.cs` et vérifiée par `CreditCatalogTests` (données intégrées, hôtes réseau, réglages, avis MIT) |
-| `Alarms/`, `Reminders/` | alarmes Tensho (`TenshoAlarm`, `AlarmService`, commande `/alarm` du jeu via `GameAlarmCommand`, icône de la barre du serveur `AlarmDtrEntry`, webhook Discord `DiscordWebhook` (règles pures) et `DiscordNotifier` (file et envoi sur un worker, R-12)) ; rappels du Calendrier (`ResetSchedule`, compteurs `GameTimers`) |
+| `Items/` | catalogue d'objets commun (`ItemCatalog` + chargeur + cache, déblocages monture / mascotte / orchestrion), usages (`ItemUseCatalog`), survol (`ItemHover`, `ItemHoverReader`), menu contextuel de l'inventaire du jeu (`ItemContextMenuBridge`, `ItemContextMenuSession`), cristaux, emplacements, `TryOn` (cabine d'essayage du jeu), notes d'objets et liste d'envies (`ItemNotes`, `Wishlist`), approvisionnement du jour de la Grande Compagnie (`GcSupplyToday`), liens externes (`ExternalLinks`), filtres de recherche |
+| `Inventory/` | inventaire live (`InventoryService`, `DalamudInventoryReader`), Banque (`InventoryBankService`, `PerCharacterBankStore` + `FileInventoryBankStore` : un fichier par personnage ; `BankInventoryBridge` : servants, sacoches, arsenal, coffre à apparence, armoire), possession (`ItemHoldings`, `OtherCharacterStocks`), tri visuel natif (règles, portées, modèles, aperçu, `InventoryVisualSort` + pont), monnaies (`Currencies`, `CurrencyWatcher`), journal des gils (`GilJournal`, `GilWatcher`), mise en évidence et rapport des rangements |
+| `Market/` | Universalis : résumé et prix au survol (`MarketService`, `MarketWorldReader`, `MarketHover`, `ItemHoverCoordinator`) ; annonces, historique et coût pour N unités (`MarketBoard`, `MarketBoardService`) ; coût de préparation (`PreparationCost`, `PreparationPriceSession`) ; ventes des servants (`RetainerSales` + lecteur), surveillance des prix cassés (`Undercut` + veilleur), prix vus au tableau des ventes (`SeenPrices` + lecteur), rentabilité des fabrications (`CraftProfit`), valeur des monnaies (`CurrencyValue`) |
+| `Craft/` | recettes et actions (catalogues + chargeurs), simulateur, solveur (`CraftSolveSession`) et solveur Raphael facultatif (`RaphaelCraftSolver`, `RaphaelSequenceCache`), enveloppe des conditions, synthèse en direct (`CraftLive*`, sur option), aide du carnet (`CraftLog*`), plan et chaîne (`CraftPlan`, `CraftChain*`), préréglages, export et import de macros, listes d'artisanat (`CraftLists`), enregistreur d'artisanat (`CraftRecorder`, `CraftRecording`), lien d'export Teamcraft (`TeamcraftExport`), fabrication depuis le stock, consommables |
+| `Gathering/` | points de récolte et de pêche (catalogue + cache), horaires (`GatheringSchedule`, `GatheringTimeline`), météo (`WeatherCatalogLoader`, `WeatherForecast`), carnet et prévisions de pêche (`FishingNotebook`, `FishingForecast`, `FishNow`, `FishWindows`), observation de la fenêtre de récolte, PR (`GpActions`, `GpOptimizer`, `GpNextAction`), estimation d'Abondance II (`BountifulEstimate`), objets de collection, pêche au harpon, pêche en mer (`OceanFishing`, `OceanVoyage` + lecteur), carnets, itinéraire de récolte, tic de régénération des PR |
+| `Community/` | accès réseau borné (`BoundedHttp`) et sources de la communauté : Garland Tools (`GarlandClient`, `GarlandItemSources`), wiki (`WikiItemAcquisition`), LuminaSupplemental, GatherBuddy (`GatherBuddyFish`), Teamcraft (`FishBiteTimes`), PaissaDB (`PaissaDb`), analyseurs de pêche (`FishingSources`, `FishingConditions`), noms de la communauté (`CommunityNames`) |
+| `Monsters/`, `Duties/` | butin des monstres (`MonsterLootService`, `WikiMonsterSources`), sources de la magie bleue (`BlueSpellSources`, `BlueSpellWikiIndex`, `BlueSpellMonsterIndex`), index du dresseur sur le wiki (`BeastWikiIndex`), sens des monstres proches (`NearbyMonsters`, information seulement) ; contenus (`DutyCatalog`), butin (`DutyLootService`), panneau de l'outil de mission (`DutyFinderReader`), progression des contenus (`DutyProgress` + lecteur) |
+| `Fashion/` | Revue de mode : données de la communauté (`FashionDataService`), indices (`FashionHintLoader`), fenêtre du jeu (`FashionCheckReader`) |
+| `Maps/` | carte Tensho : catalogue, marqueurs (`MapMarkerSource`), projection, état live (`MapLiveReader` : position, drapeau, ALEA, groupe, objets et monstres proches, téléportation), index local (`MapLocalIndex` + chargeur), remplacement de la carte du jeu (`NativeMapReplacer`), favoris et répertoire des lieux, exploration du wiki (`WikiVistas`), liens de carte du chat (`ChatMapLinks` + veilleur), train de chasse (`HuntTrain`, `HuntAnnouncer`), découverte des cartes, recherche, mémoire du zoom, cartes au trésor, ressources de l'île |
+| `Npcs/` | marchands PNJ (`NpcVendorCatalog` + chargeur) : boutiques à gils, échanges, boutiques de compagnie libre |
+| `Quests/`, `Collections/` | quêtes (lecteur, récompenses et index inverse, objets de quête, cités de départ, options non prises) ; collections, titres, succès, orchestrion (`CollectionReader` + partiel `Completion`, `ExtraCollectionReader`, `BgmReader`), tenues, progression des succès, titre selon le job (`TitleChanger`) |
+| `Character/` | statistiques du personnage (`CharacterStatsReader`, `StatFormulas`), ce que Tensho a lu en dernier pour chacun des personnages du joueur (`CharacterStatus` + veilleur) |
+| `Gear/` | planificateur d'équipement : `GearCatalog` (pièces, règles, matérias et plafonds, partage `TENSHO-GEAR1:`), `GearLoader`, ensembles de plans, comparaison, ensembles d'équipement (`Gearsets`, `GameGearsetReader`), usure, niveaux des jobs (`JobProgress`), barde de chocobo (`ChocoboBarding` + lecteur) |
+| `FreeCompany/` | sous-marins et dirigeables : `Voyages` (relevés, fusion par maison), `VoyageWatcher` (lecture de l'atelier, catalogues), `VoyagePlanner` (meilleurs trajets), `VesselBuilds` (montages, paliers, usure), secteurs et planificateur des dirigeables, historique des voyages, projets et livraisons de l'atelier, `Data/` (fichiers embarqués) |
+| `Island/` | Félicité insulaire : catalogue + chargeur, lecteur (sur clic du joueur), planificateur de l'atelier, matériaux, animaux du pâturage |
+| `Deliveries/`, `GrandCompanies/`, `Societies/`, `Leves/`, `Hunting/` | commandes et livraisons spéciales ; Grandes compagnies ; peuples alliés ; mandats (`LeveCatalog`, `LeveProgressReader`) ; bestiaire (`HuntingLog` + lecteur) et conditions des rangs S (`SRankConditions`) |
+| `Carnivale/`, `Relics/`, `Fields/`, `DeepDungeons/`, `Lexicon/` | Grande Mascarade ; armes et armures reliques ; Eureka et Bozja (`FieldBoard`) et ALEA ; donjons profonds ; lexique des mots du jeu — chacun un modèle et son lecteur `*.Dalamud.cs` |
+| `Events/` | événements saisonniers (`Festivals`, `FestivalReader`), `Data/festival-names.csv` (embarqué) |
+| `Discoveries/` | base locale de découvertes (`DiscoveriesModel` : faits avec leur provenance, import avec fusion, export), ses réglages (`DiscoverySettings`), et ce qu'elle relève dans le jeu (`ItemDiscoveryWatcher`, `ItemGains`) ; des lignes du jeu et des lieux seulement, jamais un autre joueur |
+| `Competitive/` | coupure en JcJ et en contenu classé (`CompetitiveGate`, `CompetitiveZones`, DEC-038) |
+| `Credits/` | liste unique des crédits (`CreditCatalog` : le jeu, bibliothèques, données intégrées, données en ligne, règles reprises, références lues, outils), affichée par `MainWindow.Credits.cs` et vérifiée par les tests (données intégrées, hôtes réseau, réglages, avis MIT) |
+| `Alarms/`, `Reminders/` | alarmes Tensho (`TenshoAlarm`, `AlarmService`, commande `/alarm` du jeu via `GameAlarmCommand`, alarmes automatiques `AutoAlarms` + veilleur, entrées de la barre d'infos du serveur pour les alarmes, les rappels et les monnaies, webhook Discord `DiscordWebhook` (règles pures) et `DiscordNotifier` (file et envoi sur un worker), alarmes suivies, horloges du monde) ; rappels du calendrier (`ResetSchedule`, `GameTimers`), jardinage (journal, graines, croisements, veilleur du chat), planificateur et lecteur de l'escouade, contrats de chasse, tâches personnelles, chances du Carnet mystérieux, avantages de compagnie, `Data/` (fichiers de jardinage embarqués) |
 | `MiniGames/` | Mini Cactpot (solveur, session, observation) ; Triple Triade (cartes, solveur, simulateur et conseil de match, score de carte, PNJ, observation) |
 | `Macros/` | chaîne de macros (`MacroSequence`, `MacroChainService` / `MacroChainBridge`, observation) ; écriture des macros d'artisanat dans le jeu (`MacroSlotPlan`, `MacroWriter`) |
 | `Caching/` | cache disque (`DataCache`), durées (`CachePreferences`), clés (`CatalogCacheKeys`, `GameCacheIdentity`), validation (`CacheSnapshots`) |
 | `Localization/` | `LocalizationManager`, `LocalizationValidator`, `Languages/*.json` (embarqués) |
-| `Help/`, `Guide/` | aide de chaque page et recherche (`HelpIndex`), signaler un problème (`ProblemReport`, formulaire GitHub prérempli), vidéos de la communauté (`CommunityHelp`, lues sur clic) ; guide de première prise en main (`GuideFlow` ; `GuideWindow.cs`, à la racine, dans le `WindowSystem`) ; 0.502–0.506, [ONBOARD-001](../goals/ONBOARD-001.md) |
-| `Diagnostics/` | auto-contrôle au rechargement en mode développeur (`SelfCheck`, `SelfCheckRunner`), mémoire de ce qui a déjà été vu ; 0.494–0.496 |
-| `Beastmaster/` | page dresseur, données du jeu lues brutes (`BeastCatalog`) ; sonde des fenêtres (`BeastWindowProbe`), sans panneau de conseil ; 0.500–0.501, DEC-032 |
-| `MyTools/` | outils du joueur et galerie communautaire, données seulement (`ToolGallery`, lue sur clic) ; terminé en 0.476, [TEMPLATES-001](../goals/TEMPLATES-001.md) |
-| `UI/` | thème (`FfxivTheme`, `ThemePalettes`, `GameThemeReader`), `UiComponents` (en-têtes, polices de titre), `UiMessages`, modèles communs `Components/`, barre des sous-pages `Navigation/` |
-| racine | `Plugin`, `Configuration` (+ `Configuration.Dalamud.cs`), `RegistrationScope`, `MainWindow.*.cs` (un partial par outil), `MapViewWindow`, `BankImportOverlay` |
+| `Help/`, `Guide/` | aide de chaque page et recherche (`HelpIndex`), signaler un problème (`ProblemReport`, formulaire GitHub prérempli), vidéos de la communauté (`CommunityHelpIndex`, lues sur clic) ; guide de première prise en main (`GuideFlow` ; `GuideWindow.cs`, à la racine, dans le `WindowSystem`) |
+| `Diagnostics/` | auto-contrôle au rechargement en mode développeur (`SelfCheck`, `SelfCheckRunner`), passage des pages (`PageSweep`, `PageSweepWindow`, DEC-040), relevé des images lentes (`SlowFrame`), surveillance des clignotements, relevés en jeu temporaires (`ReadingCapture`) |
+| `Beastmaster/` | page dresseur, données du jeu lues brutes (`BeastCatalog` + chargeur) ; sonde des fenêtres (`BeastWindowProbe`), sans panneau de conseil (DEC-032) |
+| `MyTools/` | outils du joueur et galerie de la communauté, données seulement (`ToolTemplate`, `ToolTemplateStore`, `ToolGallery` lue sur clic) |
+| `UI/` | thème (`FfxivTheme`, `ThemePalettes`, `GameThemeReader`), polices (`FontManager`, `FontSettings`), `UiComponents`, `UiMessages`, `InternalMessages`, fenêtres visibles du jeu (`GameWindowsReader`, `GameWindowFollower`), modèles communs `Components/`, barre de navigation `Navigation/` |
+| racine | `Plugin`, `Configuration` (+ `Configuration.Dalamud.cs`), `RegistrationScope`, `MainWindow.*.cs` (un partiel par page ou partie), `MapViewWindow`, `GuideWindow`, `PanelWindow`, `AttachedPanels`, `BankImportOverlay` |
 
 ### Fenêtre principale
 
-`MainWindow` : barre latérale de 200 px rangée par catégories repliables (état gardé dans `NavigationCollapsed`), « objet en
-contexte » sous la barre, page de contenu à droite.
+`MainWindow` : barre latérale rangée par groupes repliables (état gardé dans `NavigationCollapsed`), « objet en contexte » sous la barre,
+page de contenu à droite. Chaque page est une ligne de `MainWindow.Pages.cs` (`PageEntries`) : son groupe, son libellé, sa méthode de
+dessin et sa source ; la navigation, le dessin et la source montrée aux contributeurs la lisent tous. Aujourd'hui :
 
-| Catégorie | Pages (sous-onglets) |
+| Groupe | Pages (entre parenthèses, les pages atteintes seulement par des onglets) |
 |---|---|
-| — | Accueil & outils (répertoire `MainWindow.Tools.cs` : 18 fiches, les 17 plugins de référence + Banque d'objets) |
-| OBJETS | Objets (recherche + fiche objet), Rangements (Banque, Cristaux, Imports), Tri de l'inventaire, Marché (Résumé, Annonces, Historique) |
-| PRODUCTION | Artisanat (Simulation, Séquences sauvegardées, Synthèse en cours ; le carnet ouvre la fiche objet), Récolte (+ Planification des PR), Enchaînement de macros |
-| MONDE | Carte, Météo, Alarmes, Rappels, Compagnie libre (Vaisseaux, Meilleurs trajets, Montages), PNJ vendeurs, Butin des contenus, Butin des monstres |
-| PROGRESSION | Quêtes, Collections (+ Grimoire Mage bleu), Personnage, Équipement |
+| — | Accueil & outils, Mes outils |
+| OBJETS | Objets (recherche + fiche objet), Rangements, Tri de l'inventaire, Marché, Lexique |
+| PRODUCTION | Artisanat (synthèse en direct, préréglages), Récolte (planification des PR, objets de collection), Pêche en mer, Félicité insulaire, Commandes spéciales, Enchaînement de macros |
+| MONDE | Carte, Météo, ALEA, Alarmes, Rappels, Jardinage, Compagnie libre, PNJ vendeurs, Butin des contenus, Butin des monstres, Découvertes |
+| PROGRESSION | Quêtes, Événements, Collections (magie bleue), La Grande Mascarade, Reliques, Peuples alliés, Grandes compagnies, Livraisons spéciales, Eureka et Bozja, Donjons profonds, Équipement, Chocobo, Mandats, Bestiaire, Dresseur |
 | GOLD SAUCER | Revue de mode, Triple Triade, Mini Cactpot |
-| PRÉFÉRENCES | Paramètres (Général, Interface, Modules, Carte, Données, Avancé ; Debug en mode développeur), Diagnostics (mode développeur) |
+| PRÉFÉRENCES | Aide, Paramètres (Général, Interface, Modules, Carte, Données, Avancé ; Debug en mode développeur), Crédits, Diagnostics (mode développeur) |
 
 La carte a sa propre fenêtre (`MapViewWindow`), dont le contenu et l'état d'ouverture restent dans `MainWindow.MapView.cs`.
-Diagnostics garde le temps d'affichage des 120 dernières images de chaque page (médiane et maximum, 0.292).
 
-Modèles communs (`UI/Components/`, R-06) :
+Modèles communs (`UI/Components/`) :
 
-- `ItemCell.cs` : `DrawItemIcon` / `ItemCell`, l'icône d'objet de tous les modules : infobulle d'objet commune (une seule par
-  image), pastille ✓ / ✗ des objets de collection (inconnu = pas de pastille), clic droit = outils utiles (`RelevantRoutes`) et sources
-  groupées (`SourceLines`, `MainWindow.SourceLinks.cs`), identifiant de menu unique (`UniqueMenuId`). Le même contenu
-  (`DrawItemInfoBody`) sert au panneau sous l'infobulle du jeu ; les mêmes sources, au menu Tensho de l'inventaire du jeu.
+- `ItemCell.cs` : `DrawItemIcon` / `ItemCell`, l'icône d'objet de tous les modules : infobulle d'objet commune (une seule par image),
+  pastille ✓ / ✗ des objets de collection (inconnu = pas de pastille), clic droit = outils utiles (`RelevantRoutes`) et sources groupées
+  (`SourceLines`, `MainWindow.SourceLinks.cs`), identifiant de menu unique (`UniqueMenuId`). Le même contenu (`DrawItemInfoBody`) sert au
+  panneau sous l'infobulle du jeu ; les mêmes sources, au menu Tensho de l'inventaire du jeu.
 - `SettingRow.cs` : réglage avec infobulle et bouton ↺ (défaut lu sur une `Configuration` neuve) ; « Tout remettre par défaut ».
 - `DetailPage.cs` : en-tête puis onglets, seul l'onglet ouvert est calculé (fiche objet, sous-onglets de Triple Triade).
 - `EntityMenus.cs` : un menu de clic droit par type de chose (quête, PNJ, monstre, lieu).
@@ -96,128 +362,125 @@ données du jeu (feuilles Lumina, mémoire native)
   └─ lecteurs / chargeurs *.Dalamud.cs sur IFramework.Update : copie en records managés
        └─ worker éventuel (index, catalogue) → publication atomique d'un état immuable (Volatile / verrou, génération)
             └─ Draw (MainWindow, panneaux) : lit l'état publié, met ses calculs en cache, n'attend jamais
-sources réseau (Community/, Market/, Fashion/, Maps/WikiVistas) → requête bornée → état publié + DataCache
+sources réseau (Community/, Market/, Fashion/, Maps/WikiVistas, Monsters/) → requête bornée → état publié + DataCache
 actions du joueur (retrait du drapeau, téléportation, /alarm, macros, tri, import) → demande en file → exécutée sur IFramework.Update
 ```
 
-- Catalogues statiques : copie par lots sur le thread framework (objets et recettes 128 lignes / 2 ms, la plupart des autres feuilles
-  32 lignes / 2 ms, PNJ vendeurs et index de carte 2 ms par image), puis index sur un worker ; copie gardée en cache disque (`catalog-*`).
-- Lectures live (cadences relevées dans le code) : position et drapeau de la carte à chaque image, marqueurs / objets proches / ALEA /
-  groupe toutes les 500 ms, vols et courants toutes les 2 s ; synthèse en direct, carnet, récolte, Mini Cactpot et Triple Triade à
-  5 Hz (synthèse, Mini Cactpot et Triple Triade seulement si leur observation est activée) ; équipement porté, statistiques du
-  personnage, alarmes et icône d'alarme chaque seconde ; atelier de compagnie libre toutes les 3 s ; PNJ de Triple Triade battus toutes
-  les 5 s ; fenêtres de banque toutes les 100 ms, et avec la capture automatique, rangement ouvert relu toutes les 30 s (arsenal,
-  coffre à apparence, armoire : 2 min).
+- Catalogues statiques : copie par lots sur le thread framework (quelques lignes ou environ 2 ms par image), puis index sur un worker ;
+  copie gardée en cache disque (`catalog-*`).
+- Lectures live : chaque lecteur a sa cadence, écrite dans son code ; par exemple les fenêtres visibles du jeu dix fois par seconde, les
+  alarmes chaque seconde, les alarmes automatiques et l'état des personnages toutes les 30 secondes, les fêtes en cours toutes les
+  10 secondes, les découvertes dix fois par seconde. Les observations de la synthèse, du Mini Cactpot et de la Triple Triade ne tournent
+  que si elles sont activées.
 - Chaînes natives lues avec une borne (exemple : `Utf8String` des infobulles de la carte, longueur = `BufUsed − 1`, voir
-  [l'extrait du plantage](../evidence/0.133.0-crash-excerpt.log)) ; recherche de nœuds d'addon bornée (512 nœuds pour `_DTR`).
+  [l'extrait du plantage](../evidence/0.133.0-crash-excerpt.log)) ; recherche de nœuds d'addon bornée.
 
-Écarts connus à la règle « Draw ne lit ni pointeur ni feuille Excel » (relevés le 2026-11-02, non tranchés) :
+Écarts connus à la règle « Draw ne lit ni pointeur ni feuille Excel » (relevés le 2026-11-02, pas revérifiés depuis) :
 
-- `MainWindow.Reminders.cs` appelle `GameTimers.Read()` (QuestManager, SatisfactionSupplyManager, RetainerManager) depuis Draw, au
-  plus une fois par seconde et seulement page Rappels ouverte.
+- `MainWindow.Reminders.cs` appelle `GameTimers.Read()` (QuestManager, SatisfactionSupplyManager, RetainerManager) depuis Draw, au plus
+  une fois par seconde et seulement page Rappels ouverte.
 - Fonctions passées par `Plugin.cs` et appelées depuis Draw : aide à la pêche (joueur, territoire, condition « pêche » à chaque image ;
   table `FishingSpot` construite au premier appel), base d'Abondance II (`GatheringItem`, `ItemLevel`, construite au premier appel),
   noms de jobs, teintures et thèmes de la Revue de mode (`TryGetRow` à l'appel).
 - `TryOn.Item` (`AgentTryon.TryOn`) est appelé depuis Draw, sur un clic du joueur.
-- Pose du drapeau (0.328, audit de la carte) : `IGameGui.OpenMapWithMapLink` est appelé depuis Draw, sur un clic (carte Tensho et ses
-  listes du clic droit, page Cartes, favoris, menus Tensho des sources d'objets et des choses du jeu, PNJ de Triple Triade) ; le retrait
-  du drapeau, lui, passe par la file de `MapLiveReader`.
-- `MapMarkerSource` (carte Tensho, 0.328) lit depuis Draw, au premier usage de chaque clé, les feuilles `MapMarker` (par plage de
-  marqueurs), `Map` (cartes de région et du monde), `EventIconType` et `MapSymbol`, puis garde la copie en mémoire (dessin de la carte,
-  menus de région, liste des icônes).
-- `VoyageWatcher` construit ses catalogues de secteurs et de pièces en une seule fois sur le thread framework (premier passage), pas
-  par lots ; `GearLoader` et `TriadNpcLoader` lisent les feuilles Lumina directement sur un worker.
+- Pose du drapeau : `IGameGui.OpenMapWithMapLink` est appelé depuis Draw, sur un clic ; le retrait du drapeau, lui, passe par la file de
+  `MapLiveReader`.
+- `MapMarkerSource` lit depuis Draw, au premier usage de chaque clé, les feuilles `MapMarker`, `Map` (cartes de région et du monde),
+  `EventIconType` et `MapSymbol`, puis garde la copie en mémoire.
+- `VoyageWatcher` construit ses catalogues de secteurs et de pièces en une seule fois sur le thread framework (premier passage), pas par
+  lots ; `GearLoader` et `TriadNpcLoader` lisent les feuilles Lumina directement sur un worker.
 
 ### Travail en tâche de fond et annulation
 
 | Propriétaire | Travail | Fin et annulation |
 |---|---|---|
-| chargeurs de catalogues (`ItemCatalogLoader`, `RecipeCatalogLoader`, `GatheringCatalogLoader`, `NpcVendorLoader`, `MapLocalIndexLoader`, `MapCatalogLoader`, `DutyCatalogLoader`, `ItemUseCatalogLoader`) | index sur worker après la copie framework | résultat consommé à un `Update` suivant ; `Dispose` désabonne et annule |
+| chargeurs de catalogues (`ItemCatalogLoader`, `RecipeCatalogLoader`, `GatheringCatalogLoader`, `NpcVendorLoader`, `MapLocalIndexLoader`, `MapCatalogLoader`, `DutyCatalogLoader`, `ItemUseCatalogLoader`, et les autres nommés `*Loader`) | index sur worker après la copie framework | résultat consommé à un `Update` suivant ; `Dispose` désabonne et annule |
 | `GearLoader`, `TriadNpcLoader` | catalogue depuis Lumina sur worker | jeton annulé au `Dispose` |
-| sessions : `CraftSolveSession`, `CraftChainSession`, `CraftLogSession`, `TriadSolveSession`, `MiniCactpotSolveSession`, `PreparationPriceSession` (2 min au plus), index des récompenses de `QuestService` | calcul ou requêtes | génération + jeton ; résultat tardif rejeté ; fermées par `MainWindow.Dispose` ou par leur service |
-| pages de `MainWindow` : conseil et demande de deck de Triple Triade, meilleurs trajets (`plannerCancel`), meilleurs montages (`buildSearchCancel`) | recherche sur worker, relancée (l'ancienne annulée) quand ses entrées changent | annulées par `MainWindow.Dispose` (`MainWindow.Lifetime.cs` ; trajets et montages depuis 0.315) |
-| services réseau (`MarketService`, `MarketBoardService`, `GarlandClient` et `GarlandItemSourceService`, `WikiItemAcquisitionService`, `WikiMonsterSources`, `MonsterHoverSources`, `WikiVistaSource`, `LuminaSupplementalService`, `GatherBuddyFishService`, `FishBiteTimeService`, `FashionDataService`) | une requête à la fois ou une file, réponse bornée | `Dispose` par `RegistrationScope` ; LuminaSupplemental et GatherBuddy attendent 5 min après un échec et gardent leur copie expirée si le réseau échoue (0.246) |
-| `InventoryBankService` | lecture / écriture de `InventoryBank.json` (file bornée à une demande) | `Dispose` ferme la file sans attendre une E/S engagée |
+| sessions : `CraftSolveSession`, `CraftChainSession`, `CraftLogSession`, `TriadSolveSession`, `MiniCactpotSolveSession`, `PreparationPriceSession`, index des récompenses de `QuestService` | calcul ou requêtes | génération + jeton ; résultat tardif rejeté ; fermées par `MainWindow.Dispose` ou par leur service |
+| pages de `MainWindow` : conseil et demande de deck de Triple Triade, meilleurs trajets, meilleurs montages | recherche sur worker, relancée (l'ancienne annulée) quand ses entrées changent | annulées par `MainWindow.Dispose` (`MainWindow.Lifetime.cs`) |
+| services réseau (`MarketService`, `MarketBoardService`, `GarlandClient` et `GarlandItemSourceService`, `WikiItemAcquisitionService`, `WikiMonsterSources`, `WikiVistaSource`, `LuminaSupplementalService`, `GatherBuddyFishService`, `FishBiteTimeService`, `FashionDataService`, `PaissaDbService`, `ToolGallery`) | une requête à la fois ou une file, réponse bornée | `Dispose` par `RegistrationScope` ; LuminaSupplemental et GatherBuddy attendent 5 min après un échec et gardent leur copie expirée si le réseau échoue |
+| `InventoryBankService` | lecture / écriture des fichiers de la Banque (file bornée à une demande) | `Dispose` ferme la file sans attendre une E/S engagée |
 | `DataCache` | lectures et écritures disque hors framework | `Dispose` attend 2 s au plus, puis annule |
 
 ### Configuration et persistance
 
 - `Configuration` v1 (`Configuration.cs`, C# pur partagé avec les tests ; `Configuration.Dalamud.cs` ajoute `IPluginConfiguration`),
-  enregistrée par `SavePluginConfig`. Écrivains : `MainWindow` (`SaveSetting` remet l'ancienne valeur si l'enregistrement échoue),
-  `AlarmService`, `VoyageWatcher` (seulement quand le relevé change).
-- Contenu : réglages (dont `MapViewSettings`, `Cache`, sources communautaires activables `CommunityLumina` / `Garland` / `Wiki` /
-  `GatherBuddy` / `TeamcraftBites`, `Observations`) et données de l'utilisateur (alarmes, rappels faits, vaisseaux lus, secteurs
-  débloqués, plans de montage, plans d'équipement et de matérias, préréglages, decks, quêtes suivies, favoris, plan de macros, profils
-  et modèles de tri).
+  enregistrée par `SavePluginConfig`. `MainWindow` écrit les réglages par `SaveSetting`, qui remet l'ancienne valeur si l'enregistrement
+  échoue.
+- Contenu : réglages (dont `MapViewSettings`, `Cache`, les interrupteurs des sources de la communauté, `Discovery`) et une partie des
+  données de l'utilisateur (alarmes, rappels faits, vaisseaux lus, secteurs débloqués, plans de montage, plans d'équipement et de
+  matérias, préréglages, decks, quêtes suivies, favoris, plan de macros, profils et modèles de tri, notes d'objets, liste d'envies,
+  parcelles du jardin, tâches personnelles…).
 - Défauts : une `Configuration` neuve sert de référence aux boutons ↺. « Tout remettre par défaut » (Paramètres › Avancé,
   `UI/Components/SettingRow.cs`) recopie par réflexion, depuis une configuration neuve, les seules propriétés listées dans
-  `ConfigurationReset.Reset` (`Configuration.cs`, 0.321) ; l'adresse du webhook Discord tapée est gardée. `ConfigurationReset.Kept`
-  garde les données de l'utilisateur et l'état de l'interface : `Version`, `Alarms`, `ReminderDone`, `TreasureMapAt`, `MacroChainPlan`,
-  `MapBookmarks`, `CraftPresets`, `TripleTriadDeck`, `TripleTriadDecks`, `FollowedQuests`, `Observations`, `InventorySortProfiles`,
-  `InventorySortTemplates`, `LanguageCode`, `Voyages`, `GearPlans`, `GearMateria`, `SubmarineUnlocked`, `VesselPlans`,
-  `NavigationCollapsed`. Un test exige que chaque propriété publique soit dans exactement une des deux listes : **toute nouvelle
-  propriété de `Configuration` doit être placée dans l'une d'elles** (0.315 : vaisseaux et plans étaient effacés).
-- Fichiers à part, jamais touchés par la remise à zéro : `InventoryBank.json` (Banque : schéma 1, 16 Mio au plus, 4 096 entrées,
-  16 conteneurs par entrée, 4 096 cases par conteneur, numéros de case < 100 000 ; écriture par fichier temporaire puis remplacement
-  avec `.bak`) et `DataCache-v1/`.
+  `ConfigurationReset.Reset` (`Configuration.cs`) ; l'adresse du webhook Discord tapée est gardée. `ConfigurationReset.Kept` garde les
+  données de l'utilisateur et l'état de l'interface. Un test exige que chaque propriété publique soit dans exactement une des deux
+  listes : **toute nouvelle propriété de `Configuration` doit être placée dans l'une d'elles**.
+- Fichiers à part dans le dossier de configuration du plugin, jamais touchés par la remise à zéro : `InventoryBank/` (un fichier par
+  personnage, schéma 1, 16 Mio au plus, entrées et conteneurs bornés ; écriture par fichier temporaire puis remplacement, avec `.bak`),
+  `GilJournal/`, `Characters/`, `Discoveries/`, `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, `Exports/`, `DataCache-v1/` ; en
+  mode développeur, `SelfCheckSeen.json` et `PageSweepLast.txt` (voir [SECURITY](../../SECURITY.md)).
 
 ### Caches (`Caching/`)
 
 - `DataCache-v1` dans le dossier de configuration du plugin : un fichier par famille + portée + version, enveloppe versionnée (schéma,
-  famille, portée, version, date) ; 32 Mio par entrée, 2 048 fichiers hors catalogues, 256 Mio au total ; seule la dernière entrée
-  d'une même famille et portée est gardée ; les catalogues (`catalog-*`) ne sont jamais évincés au nombre.
-- Catalogues statiques (`catalog-items`, `catalog-recipes`, `catalog-gathering`, `catalog-npc-vendors`, `catalog-map-positions`) : clé
+  famille, portée, version, date) ; taille bornée par entrée, en nombre de fichiers et au total ; seule la dernière entrée d'une même
+  famille et portée est gardée ; les catalogues (`catalog-*`) ne sont jamais évincés au nombre.
+- Catalogues statiques (`catalog-items`, `catalog-recipes`, `catalog-gathering`, `catalog-npc-vendors`, `catalog-map-positions`…) : clé
   = données du jeu + langue + forme de la copie (`CatalogCacheKeys`), jamais la version du plugin.
-- Instantanés par personnage (quêtes, collections) : clé `GameCacheIdentity` (version du plugin + langue + versions des données),
-  donc relus après chaque nouvelle version du plugin.
-- Durées par domaine (`CacheArea`, Paramètres › Données) : Prix (1 j par défaut), Quêtes (5 min), Collections (1 j), Sources (7 j),
-  Revue de mode (7 j), Stock importé (1 j, signale seulement l'ancienneté), Calculs d'artisanat (1 j), Titres et succès (7 j) ; choix
-  5 min, 1 h, 24 h, 7 j ou « Jamais (seulement sur demande) » (0.281). Relevé complet des sources et cadences :
-  [docs/evidence/0.246-cache-audit.md](../evidence/0.246-cache-audit.md).
+- Instantanés par personnage (quêtes, collections) : clé `GameCacheIdentity` (version du plugin + langue + versions des données), donc
+  relus après chaque nouvelle version du plugin.
+- Durées par domaine (`CacheArea`, Paramètres › Données), valeurs par défaut depuis la 0.750 (X-02) : Prix 1 j, Quêtes 1 h, Collections
+  7 j, Sources « Seulement si absent, ou sur Actualiser », Revue de mode 7 j, Stock importé 1 j (signale seulement l'ancienneté), Calculs
+  d'artisanat 7 j, Titres et succès 7 j ; choix 5 min, 1 h, 24 h, 7 j ou « Seulement si absent, ou sur Actualiser ». Relevé complet des
+  sources et cadences au moment de l'audit : [docs/evidence/0.246-cache-audit.md](../evidence/0.246-cache-audit.md).
 
 ### Ressources embarquées et sources externes
 
 | Donnée | Où | Source et licence |
 |---|---|---|
-| langues `Localization/Languages/*.json` | embarquées dans la DLL ; un dossier `Localization/Languages` posé à côté de la DLL les remplace (traducteurs) ; Verify refuse un JSON livré dans le paquet (0.248) | Tensho |
-| `FreeCompany/Data/submarine-loot.json` | embarqué ; butin moyen par secteur, produit par `tools/submarine-loot.py`, lu une fois par `VoyageWatcher` | FFXIVGachaSpreadsheet (MIT, relevés communautaires) |
-| `FreeCompany/Data/submarine-breakpoints.csv` | embarqué ; seuils de 143 secteurs (surveillance, récupération, faveur) | SubmarineTracker (MIT, avis de licence en tête du fichier) |
+| langues `Localization/Languages/*.json` | embarquées dans la DLL ; un dossier `Localization/Languages` posé à côté de la DLL les remplace (traducteurs) ; Verify refuse un JSON livré dans le paquet | Tensho |
+| `FreeCompany/Data/submarine-loot.json` | embarqué ; butin moyen par secteur, produit par `tools/submarine-loot.py`, lu une fois par `VoyageWatcher` | FFXIVGachaSpreadsheet (MIT, relevés de la communauté) |
+| `FreeCompany/Data/submarine-breakpoints.csv` | embarqué ; seuils des secteurs (surveillance, récupération, faveur) | SubmarineTracker (MIT, avis de licence en tête du fichier) |
+| `FreeCompany/Data/airship-unlock.csv`, `airship-drop.csv` | embarqués ; secteurs des dirigeables | LuminaSupplemental (GPL-3.0, avis dans le fichier) |
+| `Events/Data/festival-names.csv` | embarqué ; noms anglais des événements saisonniers | LuminaSupplemental (GPL-3.0, avis dans le fichier) |
+| `Reminders/Data/garden-seeds.csv`, `garden-crosses.csv` | embarqués ; durées de pousse et croisements, produits par `tools/garden-data.py` | FFXIV Gardening Tracker (GPL-3.0), FFXIV Crossbreed Helper (MIT), avis dans les fichiers |
 | table du modificateur de statistique principale (niveaux 1–100) | dans le code (`Character/StatFormulas.cs`) | Character Panel Refined (MIT) |
 | `images/icon.png` | copiée à côté de la DLL (non embarquée) | Tensho |
-| prix, annonces, historique, centres de données | réseau (`HttpClient` borné : 1 Mio résumé, 4 Mio annonces) | API Universalis |
+| prix, annonces, historique, centres de données | réseau (`HttpClient` borné) | API Universalis |
 | sources d'objets, butins | réseau (`BoundedHttp`) | Garland Tools |
-| butin des monstres, acquisition, repères d'exploration | réseau (`BoundedHttp`) | ffxiv.consolegameswiki.com |
+| butin des monstres, acquisition, exploration, magie bleue, pages du dresseur et du pâturage | réseau (`BoundedHttp`) | ffxiv.consolegameswiki.com |
 | butin des contenus, monstres, ALEA, entreprises, boutique, désynthèse… | réseau (GitHub, `BoundedHttp`) | LuminaSupplemental (GPL-3.0) |
 | appâts, conditions et créneaux de pêche | réseau (GitHub, `BoundedHttp`) | GatherBuddy (Apache-2.0) |
 | temps de touche | réseau (GraphQL, `FishBiteTimes`) | rapports publics de Teamcraft (MIT) |
 | Revue de mode (`FashionReport.json`) | réseau (GitHub, `BoundedHttp`) | FFXIVGachaSpreadsheet (MIT) |
+| terrains libres | réseau (`BoundedHttp`) | PaissaDB |
 
 Règle d'embarquement : seulement une donnée sous licence compatible avec la GPL v3, avec source, licence et copyright dans le fichier
-([DEC-021](DECISIONS.md)). Références lues sans copie de code : SubmarineTracker (formules de trajet), Argus (MIT), HimbeertoniRaidTool
-(MIT), Glamourer (Apache-2.0), xivgear.app (sans licence), plugins AGPL (Mappy, SortaKinda, Avant-Garde…). Détail :
-[REFERENCES.md](REFERENCES.md) ; crédits : [README](../../README.md).
+([DEC-021](DECISIONS.md)). Références lues sans copie de code : listées sur la page Crédits (`Credits/CreditCatalog.cs`, « références
+lues ») et dans [REFERENCES.md](REFERENCES.md) ; crédits : [README](../../README.md).
 
 ### Carte Tensho (`Maps/`, `MainWindow.MapView.cs`, `MainWindow.MapLocalLists.cs`)
 
 - `MapCatalogLoader` copie la feuille `Map` (cartes des zones) ; `MapMarkerSource` lit à la demande, depuis Draw, `MapMarker`, `Map`
-  (régions et monde), `MapSymbol` et `EventIconType`, gardés en mémoire (écart connu, voir plus haut) ; `MapProjection` convertit
-  monde ↔ texture ↔ écran.
-- `MapLiveReader` publie position, drapeau, ALEA, groupe, marqueurs d'événement du jeu (quêtes, mandats), objets proches, courants
-  éthérés et repères d'exploration débloqués, combat / instance ; il exécute sur le thread framework les demandes de l'interface (retirer le
-  drapeau, téléportation, coûts de téléportation).
+  (régions et monde), `MapSymbol` et `EventIconType`, gardés en mémoire (écart connu, voir plus haut) ; `MapProjection` convertit monde ↔
+  texture ↔ écran.
+- `MapLiveReader` publie position, drapeau, ALEA, groupe, marqueurs d'événement du jeu (quêtes, mandats), objets proches, ennemis vivants
+  autour du joueur (information seulement, 100 au plus), courants éthérés et repères d'exploration débloqués, combat / instance ; il
+  exécute sur le thread framework les demandes de l'interface (retirer le drapeau, téléportation, coûts de téléportation).
 - `MapLocalIndexLoader` construit l'index local par carte (donneurs de quête, points de récolte et de pêche, exploration, courants) ;
-  `NpcVendorLoader` les marchands. Les deux passent par le cache disque.
+  `NpcVendorLoader` les marchands. Les deux passent par le cache disque. Les PNJ placés par un événement ne sont montrés que pendant cet
+  événement.
 - `NativeMapReplacer` garde l'addon `AreaMap` ouvert hors écran pour que le jeu continue à mettre à jour ses marqueurs, lit la demande
-  d'ouverture (`AgentMap`, quête du journal, téléporteur, ALEA) et ouvre la carte Tensho à la place ; la carte du jeu est restaurée à
-  la fermeture ou au déchargement.
+  d'ouverture (`AgentMap`, quête du journal, téléporteur, ALEA) et ouvre la carte Tensho à la place ; la carte du jeu est restaurée à la
+  fermeture ou au déchargement.
 - Dispositions : classique (menus de région / zone en haut, colonne d'outils à gauche) ou « Menus et outils par-dessus la carte »
-  (`OverlayControls`, 0.303–0.308) : outils et noms soumis avant la carte (fenêtres enfants) pour prendre le clic, la carte ignore la
-  souris sur eux ; affichés quand la souris est sur la fenêtre (élément actif compris) ; bandeau en dégradé ; nom de zone permanent
-  (`OverlayZoneName`). Repères au bord pour les cibles hors de la vue (`DrawEdgeMarkers`, interrupteurs `Edge*`, 0.297).
-- Clic droit : menu propre à l'icône (0.245 ; `RightClickIgnore` renvoie une icône au menu général), menu général à onglets
-  (Quêtes, ALEA, Récolte, Éthérites, Vendeurs, Triple Triad, Exploration, Courants).
-- Réglages : `MapViewSettings` dans `Configuration` (tailles et priorités d'icônes globales et par carte, valeurs par défaut de 0.289,
-  zones colorées, cône de vision, repères au bord, disposition).
+  (`OverlayControls`) : outils et noms soumis avant la carte (fenêtres enfants) pour prendre le clic, la carte ignore la souris sur eux.
+  Repères au bord pour les cibles hors de la vue (`DrawEdgeMarkers`).
+- Clic droit : menu propre à l'icône (`RightClickIgnore` renvoie une icône au menu général), menu général à onglets (Favoris, Quêtes,
+  ALEA, Récolte, Éthérites, Vendeurs, Triple Triade, Courants éthérés, Carnet d'exploration).
+- Réglages : `MapViewSettings` dans `Configuration` (tailles et priorités d'icônes globales et par carte, zones colorées, cône de vision,
+  repères au bord, disposition, couches des monstres proches, zoom à l'ouverture).
 
 ### Sources d'objets (« Comment l'obtenir »)
 
@@ -225,197 +488,19 @@ Ordre : données du jeu (marchands PNJ dont boutiques de compagnie libre, échan
 LuminaSupplemental (contenus, monstres, ALEA, entreprises, boutique, objets d'origine), puis Garland Tools, puis section « Acquisition »
 du wiki. « Comment l'obtenir » n'affiche Garland que si aucune autre source n'est connue, et le wiki que si Garland ne connaît rien non
 plus ; mais Garland est interrogé pour presque chaque objet mis en contexte (objet sélectionné, fiche, menus Tensho et du jeu), car les
-outils utiles (`RelevantRoutes` : contenus, monstres) et `SourceLines` (contenus, échanges) le lisent (0.329). Garland et le wiki se
-coupent dans Paramètres › Avancé. Les sceaux d'une autre Grande Compagnie que celle du personnage sont écartés
-(compagnie inconnue = tout affiché, 0.296). Le marché est un critère, pas une source. Les lignes sont calculées une fois
-(`SourceLines`) et affichées dans le menu Tensho comme dans le menu de l'inventaire du jeu.
+outils utiles (`RelevantRoutes` : contenus, monstres) et `SourceLines` (contenus, échanges) le lisent. Garland et le wiki se coupent dans
+Paramètres › Avancé. Les sceaux d'une autre Grande Compagnie que celle du personnage sont écartés (compagnie inconnue = tout affiché). Le
+marché est un critère, pas une source. Les lignes sont calculées une fois (`SourceLines`) et affichées dans le menu Tensho comme dans le
+menu de l'inventaire du jeu.
 
 ### Interface et langues
 
-`UI/FfxivTheme.cs` porte la palette (suivie sur le thème du jeu par `GameThemeReader`, ou forcée) ; PreDraw / PostDraw pour les
-fenêtres, scopes jetables pour les panneaux. `LocalizationManager` charge les JSON embarqués (anglais = référence et repli, français
-complet, allemand et japonais partiels) ; un test fait échouer Verify si une infobulle de réglage citée dans le code manque en anglais
-ou en français (0.287). Les noms d'objets, actions et lieux viennent du catalogue du jeu. Voir
-[Localization/README.md](../../Localization/README.md). Dates affichées en heure locale ; calculs en UTC et heure d'Éorzéa.
-
-La compilation et les tests managés ne valident pas le rendu ImGui ni la lecture native : seul l'essai en jeu le fait
-(état par version : [STATUS](../ai/STATUS.md), [CHANGELOG](../../CHANGELOG.md)).
-
-## Historique des domaines et des versions
-
-> Archive : notes de conception écrites au moment de chaque objectif (2026-10-27 → 2026-10-29). Elles restent justes sur les
-> principes, mais les noms de versions, compteurs de tests et « état courant » sont ceux de leur date. Le code fait foi.
-
-USE-CONTEXT-004 : ItemContextMenuBridge possède IContextMenu.OnMenuOpened et Logout. Seule la cible Inventory est lue au callback ; closures sans args/target/pointeur. ItemContextMenuSession conserve un jeton normalisé, propriétaire, révision et date, rejette remplacement/logout/désactivation/expiration après deux minutes et remet au plus une navigation au Draw suivant. Draw revalide le contexte puis MainWindow.OpenItemContext réutilise SelectItem et les routes existantes. Pas de poller natif ou réseau supplémentaire.
-
-État au 0.75.0 (2026-10-29, archive) : [cache partagé et péremption réglable](../goals/CACHE-001.md). Prix, quêtes, collections, sources communautaires, Revue de mode et calculs du carnet réutilisent des instantanés persistants datés. Durées indépendantes dans Réglages : 5 min, 1 h, 24 h ou 7 j ; actualisation forcée depuis les outils. Les imports restent manuels et signalent leur péremption ; les observations en direct gardent une invalidation courte. 466/466 tests/package/SHA-256 passants, zéro avertissement/erreur ; validation en jeu de ce cache encore à faire.
-
-QUEST-ITEM-SOURCES-004 : QuestRewardIndex figé construit par worker pur depuis les copies de QuestService ; aucune API native. QuestState sépare chargement/erreur d’index et observation. Publication verrouillée par génération/snapshot/annulation ; nouvelles données/invalidation/clear/fail/dispose annulent et retirent le handle courant, finally libère le jeton. Reader.Dispose termine le service. UI recherche O(1), clipper et navigation SelectQuest existante ; cache de métadonnées lié à Entries pour éviter une reconstruction à chaque frame en fiche ou à la seule publication de l’index.
-
-QUEST-REWARDS-003 : QuestRewardSnapshot immuable s’ajoute à QuestEntry, indépendant du owner/progrès. QuestRewardCopy.Lumina partagé reader/probe décode les RowRef polymorphes et toutes les sous-lignes métier/rang ; référence non Item jamais normalisée en Item. Correspondance Tomestones par clé étrangère, inconnus et parent/subrow/slots conservés. Tables lues/cachées dans le lecteur Quest existant (32/2 ms), erreurs de récompenses isolées de la progression, cleanup étendu. Draw ne consulte que les modèles/Item communs.
-
-COLL-003 : lecteur partagé étendu via partial Completion, 32 lignes/2 ms. CompletionCopy.Lumina copie strictement Title/Achievement/category/kind et récompenses. CollectionAcquisitionEvidence sépare positif, négatif sous couverture stable et inconnu ; offline/invalidation effacent les deux preuves, contradiction refusée avant publication. Le signal Unlock ne copie que RowType et coalesce RequestRefresh ; pending en fin de scan empêche publication, changement de chargement relance, rollback et Dispose couvrent les deux abonnements. UI catégories/fiches liées en cache, clipper, Item/contexte existants.
-
-COLL-002 : CollectionReader ajoute la phase Orchestrion dans ses lots de 32/2 ms, mêmes owner/garde framework/rafraîchissement. OrchestrionCopy.Lumina partage la projection strictement jointe avec CollectionProbe. CollectionCategoryIssue isole les erreurs nouvelles sans effacer les autres catégories ; snapshot readonly et nettoyage existants étendus. ItemDefinition.OrchestrionId et index ForOrchestrion étendent le catalogue commun, copie typée ItemOrchestrionCopy.Lumina ; aucune feuille/RowRef dans Draw. Fiches et Usages naviguent via SelectItem/contexte commun ; aucun lecteur, cache ou réseau supplémentaire.
-
-GATHER-FISH-FORECAST-010 : FishingForecast est un calcul pur borné (1–24 périodes), utilisant WeatherCatalog.Forecast et GatheringTime.Between (clipping/fusion rationnelle des plages, horizon ≤ neuf jours ET). ReportedFields indique la couverture ; bool? ReportedConditionsMatch conserve vrai/faux/inconnu. MainWindow calcule seulement au clic et lie son dernier résultat aux références conditions/catalogue et IDs Item/territoire. Ni réseau, ni lecture native ou worker ajoutés ; pas de promesse de capture.
-
-GATHER-FISH-WEATHER-009 : WeatherDefinition ajoute EnglishName optionnel, WeatherCopy.Lumina partage la copie locale/anglaise par RowId entre loader/probes. Le loader météo existant lit les définitions complètes avant les territoires, lots 32/2 ms ; erreur anglaise isolée. WeatherCatalog construit un index (TerritoryId, nom anglais exact) parmi les poids positifs seulement si métadonnées complètes et identité unique. Aucun fallback global/local approximatif ; Draw récupère nom local et icône sans feuille native.
-
-GATHER-FISH-WINDOWS-008 : FishingConditionParser ajoute une projection optionnelle par variante sans affecter les appâts/monstres en cas d’erreur. Horaires entiers ET normalisés par GatheringSchedule et conversion/cache DrawGatheringTime existants ; listes météo readonly conservant les noms de source. Aucune correspondance météo locale supposée ni calcul d’intersection. Cadres de lieu repliables, lien vers prévisions natives existantes.
-
-GATHER-FISH-SOURCES-007 : FishingSourceParser étend la projection d’objet MonsterItemDocument/MonsterLootService existante, sans second service/cache/transport. Parsing optionnel borné et isolé des références de monstres ; chaînes readonly, index FishingSpot typé pour Draw. La sélection ne fait aucune requête. Consultation/actualisation manuelle, FetchedAt et états inconnus explicites.
-
-GATHER-FISH-006 : FishingNotebookIndex est inclus dans GatheringCatalog, sans second service. FishingNotebookCopy.Lumina projette FishParameter/FishingNoteInfo sur framework, RowId et Item strictement concordants ; champs non interprétés restent inconnus. Le loader existant ajoute la phase bornée et transmet uniquement records/strings/primitives au worker. Draw utilise l’index immuable. Ce carnet natif reste distinct des appâts communautaires.
-
-SORT-TEMPLATES-007 : InventorySortTemplates sépare règles réutilisables (version, GUID, nom, géométrie, critères/zones) des profils appartenant aux personnages/rangements. La validation de contenu est partagée sans propriétaire factice. Un modèle compatible est copié/relié au scope courant dans le brouillon, sans reçu de capture ni application. Configuration v1 ajoute une bibliothèque vide, rollback à la sauvegarde. Verify.ps1 compare aussi les SHA-256 DLL/manifeste du ZIP aux fichiers canoniques.
-
-SORT-FILTERS-006 : InventorySortMetadata transporte propriétés bool? et masque nullable depuis le catalogue Item commun, avec contrôle d’identité et cache par ID durant l’aperçu. Les callbacks nom/catégorie antérieurs restent compatibles, autres propriétés inconnues. EquipmentSlotMap centralise aussi MainHand/OffHand/SoulCrystal ; le loader étend la copie existante, sans nouveau lecteur. Les filtres Oui/Non n’acceptent pas Unknown ; la permutation native reste inchangée.
-
-SORT-PROTECTED-005 ajoute Preserve/ReverseFill facultatifs à la zone. Le moteur valide les indices par InventorySortScope.Extract, retire les piles protégées avant tous les filtres et conserve les trous ; le plan positionné partagé assure la bijection physique. Une inversion change les cibles de la zone filtrée sans inverser les critères. Le bridge natif reste inchangé ; zéro lecture supplémentaire.
-
-SORT-RULES-004 : InventorySortRules fournit profils validés par scope, critères multiples et zones filtrées sans chevauchement. ItemCatalog expose les catégories natives dédupliquées, calculées lors de sa construction. InventorySortResult.Slots conserve les trous ; InventoryVisualSortPlan les transforme en vraies cases physiques vides et vérifie l’ensemble des piles avant la permutation existante. Configuration v1 ajoute des profils indépendants et leurs listes copiées ; sauvegarde distincte du clic d’application, rollback en cas d’erreur.
-
-SORT-SCOPES-003 : InventorySortScope distingue personnage, propriétaire natif, conteneurs et capacité. BankInventoryBridge partage contrôles de fenêtre/chargement et capture directe sans import. Le service exige la référence du snapshot exact publié pour ce scope ; un cache cloné ne suffit pas. Capture/application partagent génération et lifecycle. Inspection deux minutes, recapture fraîche et bon servant/module vérifiés au framework ; géométrie d’aperçu adaptée.
-
-SORT-NATIVE-002 : InventoryVisualSortPlan transforme l’aperçu commun en permutation managée de toutes les cases personnelles, vides incluses. InventoryVisualSortService possède une demande explicite et ses générations. InventoryVisualSortBridge recapture et vérifie au framework.Update avant de permuter les entrées visuelles existantes et marquer HasChanges ; aucun pointeur conservé, aucun transfert physique. Logout/Dispose annulent. La lecture commune actualise l’ordre chaque seconde ; les caches importés ne servent pas de source d’écriture.
-
-Historique 0.5.27 : catalogue Item/Recipe, banque à ordre visuel natif, carnet par métier et préparation sont implémentés ; les sections anciennes ci-dessous décrivent leur historique. La sortie du plugin est imposée dans le csproj à bin/x64/Configuration, y compris lors d'un build direct. Les extensions réutilisent ces services ; le checkpoint actuel et GOAL.md font autorité.
-
-Un projet plugin et un exécutable de tests sans dépendance native. CORE-000 fournit l'hôte ; CORE-001 ajoute le modèle d'inventaire commun.
-
-CRAFT-SIM-001 : les paramètres de simulation sont des valeurs immuables de RecipeDefinition, dans le catalogue partagé. Un loader framework borné vérifie et copie 136 actions métiers, puis publie un catalogue atomique ; pas de pointeur ou ligne native dans le moteur/UI. CraftSimulation retourne un état par étape, limite 100 actions, arrête à la première impossibilité/fin/casse et accepte l'annulation. MainWindow.CraftSimulation possède la séquence et invalide les résultats à l'édition, les attributs copiés au changement de personnage. Pas de worker ni d'exécution native ajoutés.
-
-CRAFT-MACRO-001 : export pur vers pages de 15 lignes maximum à partir des étapes d'une simulation terminée. Noms natifs cités et validés, attentes bornées, pages immuables ; l'UI lie l'export à l'identité du résultat et fournit une copie par bloc. Aucun appel au module de macros ou au bridge de Macro Chain.
-
-CRAFT-SOLVE-001 : transition pure partagée avec le simulateur, recherche par faisceau déterministe bornée, déduplication d'état complet et replay de la proposition. Session propriétaire du worker/CTS/génération ; entrées managées copiées, invalidation owner/recette/scénario/contexte et rejet des publications tardives. Le solveur normal ne lit ni ne commande une synthèse native.
-
-CRAFT-ACTIONS-002 étend le même moteur à 26 actions / 208 variantes natives. CraftSimState conserve deux booléens distincts pour la protection persistante de Main suprême et son utilisation unique ; leur égalité participe à la déduplication de recherche. Les efficacités progression/qualité de Travail minutieux sont séparées. Les règles d'ouverture/niveau/Parcimonie/Calme intérieur précèdent tout débit de ressources.
-
-CRAFT-LIVE-001 ajoute un lecteur framework opt-in à 5 Hz, avec champs nommés de CraftEventHandler/AddonSynthesis et PS/statuts de LocalPlayer. Publication atomique d'un cadre managé immuable, lease propriétaire/génération, contrôles de stabilité/visibilité et bornes de lecture. Les effets bruts et étapes natives/UI restent distincts ; aucun état de solveur n'est fabriqué à partir des champs non établis. Draw ne lit aucun pointeur.
-
-CRAFT-LIVE-002 étend le catalogue natif à douze métadonnées Status et décode les compteurs Param des effets reconnus. StatusesComplete exige une énumération entière de longueur bornée ; doublons/bornes/effets non modélisés restent signalés. L'historique d'une protection consommée est nullable et les procs ne deviennent pas un combo inventé. Les résultats du décodeur sont immuables et ne sont pas injectés dans le solveur.
-
-GATHER-WEATHER-001 : WeatherCatalog immuable/partagé, poids et noms/icônes natifs copiés par territoire, prévisions UTC/ET déterministes et tirages manquants inconnus. Loader framework borné avec désinscription ; cache de présentation par territoire/période/catalogue. Mappy et les sources de récolte ouvrent la même page ; aucune dépendance au réseau ou à un pointeur natif dans Draw.
-
-GATHER-WINDOWS-003 : GatheringTime consomme les horaires normalisés déjà copiés, convertit les bornes rationnelles ET en ticks UTC et fusionne les fenêtres contiguës à minuit. Résultats immuables/calculés ; cache UI borné par seconde et clé d'horaire, fin de fenêtre invalidée immédiatement. Pas de nouveau service natif ou de détection de disponibilité.
-
-CRAFT-PRESETS-001 ajoute une liste typée dans Configuration v1, avec copies d'actions, résolution par IDs et mutations pures bornées. Commit remplace temporairement la liste pour SavePluginConfig puis restaure la référence précédente sur échec. Chargement UI invalide résultat/export/recherche ; aucun attribut ou état natif persisté. Les lignes non résolues restent conservées.
-
-CRAFT-LIVE-003 ajoute des valeurs typées contrôlées et des admissibilités natives à la copie framework. La projection pure d'un coup utilise Apply sur les états possibles de combo/historique et retourne des intervalles, sans choisir un état inconnu. Cache UI par identité de cadre/catalogue et rejet à deux secondes. Les codes Normale du handler (1) et de l'addon (0) restent distincts ; aucune API de coût à paramètres inconnus ou exécution native n'est appelée.
-
-CRAFT-CONDITIONS-004 partage la classification des outils dans ItemCatalog, avec copie anglaise bornée et absence de bonus seulement si déclaration explicitement vide. L’outil principal observé est copié et revérifié, son ID conservé même sans métadonnées. Qualité nullable si le bonus favorable est inconnu ; les autres ressources restent disponibles. Textes visibles décodés en SeString.TextValue avant publication.
-
-CRAFT-CONDITION-RANGE-005 réutilise Apply pour une séquence fixe commencée Normale. Au plus quatre conditions × deux qualités extrêmes, transitions ordinaires forcées et monotonie ; autres ressources vérifiées identiques à la simulation normale. Résultat immuable et cache UI par résultat/scénario d’outil ; aucun worker ou historique natif ajouté. Une influence future sur l’admissibilité ou les ressources provoque un refus explicite au lieu d’un intervalle trompeur.
-
-CACT-LIVE-002 copie neuf GameNumbers du LotteryDaily visible à 5 Hz sur framework, revérifie fenêtre/propriétaire/valeurs et publie un cadre managé immuable. Le service d’observation possède ses leases ; fermeture, erreur, désactivation et changement de personnage invalident les données. MiniCactpotSolveSession possède workers/CTS/générations et rejette succès/erreurs tardifs. L’UI synchronise uniquement un ticket récent jouable et relance le solveur commun lorsque valeurs ou propriétaire changent ; Draw ne lit aucun pointeur. Saisie manuelle et observation utilisent la même session.
-
-GATHER-NATIVE-004 ajoute une observation de huit lignes Gathering, opt-in à 5 Hz sur framework. Nœuds bornés/type/visibilité/texte contrôlés et cadre managé immuable revérifié avant publication. Les identifiants GatheringUiLayout sont partagés avec le probe ULD local. Les taux affichés ne deviennent pas des bases du modèle PR : CopyResources transmet seulement propriétaire, métier/niveau, PR et tentatives cohérentes ; la copie UI invalide résultat et paramètres de base à renseigner. Aucun worker, hook ou commande natifs supplémentaires.
-
-GP-ACTIVE-005 ajoute GpActiveEffects immuable, optionnel dans GpScenario pour conserver le scénario historique. Les valeurs courantes incluent les familles déclarées ; leur nouvelle sélection est exclue, Évangile modifie le supplément et le bonus limité déjà payé n’est ajouté qu’une fois. Les achats d’Abondance commencent après la première tentative déjà bonifiée. Le même moteur construit base/frontière/coût supplémentaire ; aucun service natif ou worker nouveau. Éditions d’effets invalident le résultat ; la copie de ressources remet les paramètres et déclarations manuels à renseigner.
-
-USE-002 ajoute ItemUseCatalog immuable : index inverse de remises, ensembles GC/aquarium et provenance. ItemUseSheetCopy.Lumina est la projection synchrone partagée avec ItemUseProbe ; toutes les RowRef sont résolues/copiées sur framework. Le loader possède abonnement/CTS/worker, copie au plus 32 lignes avec budget doux 2 ms et ne construit les index qu’à partir de valeurs managées. Les tests purs excluent explicitement *.Lumina.cs. L’onglet Usages et les fiches d’outil réutilisent le même contexte et le catalogue de recettes existant ; aucun nouvel inventaire ou action de remise.
-
-USE-HOVER-003 remplace le lecteur privé MarketHoverReader par un seul ItemHoverReader framework. ItemHoverService publie identité/qualité/propriétaire/dates sans dépendance au monde ou à la commercialisation ; normalisation des marqueurs publics centralisée. ItemHoverCoordinator applique séparément la politique du marché, avec RequestHoverAsync bornée au propriétaire/monde attendus. Un seul panneau DrawItemHover reçoit prix/usages selon leurs options ; les usages ne déclenchent pas de réseau. Exceptions, désactivation, disparition, owner et Dispose effacent le contexte ; aucune référence native différée.
-
-`Plugin` reçoit IDalamudPluginInterface, ICommandManager et IPluginLog par injection constructeur Dalamud. Il charge Configuration v1, refuse une version inconnue sans la remplacer, crée MainWindow et possède WindowSystem ainsi que RegistrationScope.
-
-RegistrationScope enregistre uniquement les acquisitions réussies, nettoie dans l'ordre inverse, poursuit après une erreur et rend Dispose idempotent. Un échec du constructeur déclenche le même nettoyage. La commande `/tensho`, Draw, OpenMainUi et OpenConfigUi ont tous une désinscription.
-
-MainWindow affiche l'état du socle et une préférence OpenOnLoad. Sa modification appelle SavePluginConfig immédiatement ; un échec restaure la valeur affichée et inscrit l'erreur dans le journal. La visibilité de la fenêtre reste temporaire. INV-001 ajoute un diagnostic de l'inventaire consommant seulement les snapshots managés ; aucune lecture native dans Draw.
-
-Configuration.cs et RegistrationScope.cs sont partagés par inclusion avec les tests. Configuration.Dalamud.cs ajoute uniquement IPluginConfiguration au plugin. Les tests vérifient le comportement managé ; ils ne simulent pas l'hôte Dalamud ni ImGui.
-
-## Inventaire commun — CORE-001
-
-InventorySnapshot décrit un lot d'observation : ObservedAt normalisé UTC, Source et dictionnaire figé de conteneurs. Chaque InventoryLocation contient des types distincts InventoryOwnerId et InventoryContainerId ; InventoryItem sépare InventoryItemId de IsHighQuality. L'owner doit être non nul, le container peut être zéro. La conversion des identifiants natifs reste la responsabilité de l'adaptateur futur.
-
-InventoryContainerSnapshot copie les piles et additionne les quantités du même objet/qualité avec détection de dépassement. Il conserve InventoryCoverage Unknown/Partial/Complete pour ce conteneur uniquement. Une observation Unknown ne peut contenir de pile. Une liste vide n'est complète que si la couverture a été explicitement déclarée Complete par le producteur ; le modèle ne peut pas prouver cette déclaration.
-
-GetQuantity impose une portée non vide et déduplique les conteneurs demandés. Le résultat contient ObservedQuantity (borne minimale) et ExactQuantity nullable. L'exactitude exige tous les conteneurs demandés complets ; un conteneur hors snapshot est Unknown. Des observations connues mélangées à des inconnues donnent Partial. Propriétaires et qualités ne sont jamais fusionnés implicitement.
-
-InventoryService publie un seul snapshot immuable via échange atomique. Replace remplace le lot entier, sans historique ni fusion ; Clear invalide toute observation. L'ordre de publication fait autorité, pas l'horloge murale. Un consommateur conserve une référence stable au snapshot et à ses métadonnées pendant son calcul. Le producteur devra garantir l'ordre de collecte et vider le service en cas de changement de personnage/déconnexion.
-
-## Acquisition Dalamud — INV-001
-
-Plugin possède maintenant InventoryService et DalamudInventoryReader. Le reader s'abonne à IFramework.Update, IGameInventory.InventoryChanged, Login et Logout via RegistrationScope. Son Dispose désabonne puis ferme le coordinateur et vide le service. Un échec de construction déclenche le même nettoyage. Aucun hook, offset, worker ou timer n'est ajouté.
-
-Sur un callback Update confirmé par IsInFrameworkUpdateThread, le reader vérifie IsLoggedIn, IPlayerState.IsLoaded et ContentId. Il lit Inventory1–Inventory4 (identifiants locaux 0–3), consomme immédiatement chaque ReadOnlySpan<GameInventoryItem> et copie BaseItemId/IsHq/Quantity dans des piles managées. Les spans et les slots ne quittent jamais cette lecture. La portée exclut équipement, cristaux, sacoche, servants et compagnie.
-
-L'API publique locale ne fournit pas de preuve de chargement/complétude des conteneurs. Un span vide devient Unknown, un span non vide devient Partial même si tous les slots sont vides. Aucun Complete n'est produit. Cela permet de présenter une borne minimale sans transformer une absence observée en quantité zéro exacte. Un contrat plus fort nécessitera une preuve supplémentaire, pas un simple changement de label.
-
-Mise à jour INV-002 / 0.1.1 : ce comportement Partial systématique décrit la première version 0.1.0. L'adaptateur ajoute maintenant une preuve distincte depuis FFXIVClientStructs installé (REF-INV-LOAD), sans modifier le contrat de IGameInventory. Sur le même framework thread, InventoryManager.Instance/GetInventoryContainer fournissent l'en-tête typé du sac. IsLoaded, Items non nul, type attendu et Size positif borné autorisent la lecture. Après copie, manager/conteneur/buffer et taille doivent être stables, le sac toujours chargé, et le nombre de slots copiés égal à Size. Ces conditions produisent Complete pour ce sac. Aucun offset numérique n'est ajouté ; les pointeurs restent locaux à Capture.
-
-Un en-tête non lisible avant/après la lecture produit Unknown et aucune pile conservée. Une lecture de taille ou buffer incohérents reste Partial. InventoryReadEvidence exprime et teste les faits managés nécessaires sans conserver d'adresse. La taille maximale 1000 est un garde-fou, pas une hypothèse que tous les sacs ont une taille fixe. Une reprise toutes les cinq secondes s'applique maintenant aux sacs Partial comme Unknown, jusqu'à complétude.
-
-InventoryCaptureCoordinator est managé et testé : un verrou sérialise collecte, publication, invalidation et Dispose ; un compteur de génération rejette une collecte invalidée pendant son exécution. L'identité est relue avant publication ; tout lot d'un autre propriétaire est rejeté. Toute invalidation vide immédiatement le service. Les rafales sont coalescées, avec intervalle minimal de 250 ms entre lectures ; les conteneurs Unknown ou erreurs déclenchent une reprise après cinq secondes. Si tous les sacs ont été observés, seuls de nouveaux événements/changements d'identité déclenchent une nouvelle lecture. L'identité seule est vérifiée chaque frame, sans scan des sacs.
-
-Les exceptions de collecte vident le service et sont journalisées une fois par séquence d'échecs, avec réarmement après succès. L'horloge monotone Stopwatch régit les reprises ; ObservedAt UTC date les données. Aucun historique n'est accumulé.
-
-MainWindow présente quatre états de sac, la date UTC et une requête par identifiant de base/NQ-HQ. Le total est explicitement affiché comme minimum observé, total inconnu. Les domaines Craftimizer/GatherBuddy/SortaKinda consommeront la même instance. L'intégration est compilée mais non encore validée dans un client de jeu.
-
-Depuis 0.1.1, MainWindow affiche aussi l'état « complet » et « Total dans les quatre sacs : X NQ/HQ » uniquement lorsque les quatre conteneurs sont complets. Les captures utilisateur de 0.1.0 valident l'affichage et les quantités d'exemples ; la preuve native ajoutée par 0.1.1 attend son propre essai live.
-
-## Ouverture automatique — 0.1.2
-
-Deux préférences indépendantes : OpenOnLoad ouvre la fenêtre lors de la construction du plugin ; OpenOnLogin l'ouvre sur IClientState.Login. Le callback Login est possédé par RegistrationScope et désabonné au Dispose ; il relit la préférence courante à chaque connexion. Configuration reste en version 1 : les anciens fichiers gardent OpenOnLoad et reçoivent OpenOnLogin=false par défaut. Les deux cases sont sauvegardées ensemble après une modification, et leurs valeurs précédentes sont restaurées si la sauvegarde échoue.
-
-Depuis 0.1.3, le diagnostic affiche ensemble les deux requêtes NQ et HQ du même snapshot, puis leur somme. La case de filtre HQ est supprimée. Le résultat est exact seulement si les quatre sacs sont complets ; il reste minimal ou inconnu selon la couverture sinon. La collecte native et les préférences ne changent pas.
-
-## Catalogue d'objets commun — ITEM-001 / 0.1.4
-
-Plugin possède une seule instance ItemCatalogService et son loader. Le loader extrait RowId, Name.ExtractText() et CanBeHq depuis Lumina Item dans la langue de la feuille. La copie s'effectue par lots au framework (128 lignes maximum, budget souple de deux ms entre deux lignes), puis seules des définitions et chaînes managées sont confiées au worker annulable. Une génération est construite par chargement du plugin, sans nouveau scan à chaque reconnexion. Les noms vides et RowId zéro sont exclus ; un ID dupliqué est une erreur explicite.
-
-ItemCatalog est immuable : dictionnaire figé par ID et tableau privé trié de noms normalisés. Il conserve la source, la langue, les versions des repositories du jeu et le schéma Lumina, plus le numéro de génération. Pas de timestamp par ligne statique. Find est une lecture par ID ; Search normalise casse/accents/espaces, exige tous les mots et renvoie au plus 30 résultats par défaut (limite maximale 100, requête maximale 128 caractères). L'ordre est déterministe, nom normalisé puis ID. La recherche parcourt l'index en mémoire seulement lorsque la requête ou l'instance de catalogue change ; elle ne relit pas Excel.
-
-ItemCatalogService publie atomiquement un état immuable (progression, catalogue ou erreur). Le worker ne publie jamais directement : Update ne consomme son résultat qu'une fois terminé et sous le verrou du loader. Dispose annule le worker, désabonne, vide les références source et le service ; aucune attente bloquante. Les erreurs du worker sont capturées dans son résultat, y compris si le plugin est déchargé avant publication. Les callbacks déjà engagés sont sérialisés avec Dispose.
-
-MainWindow met en cache les résultats (30 maximum), affiche le chargement/erreur et permet une sélection qui renseigne l'identifiant déjà consommé par les totaux NQ/HQ des sacs. Recherche/catalogue restent utilisables même si l'inventaire est momentanément inconnu. Aucun autre service d'objet par domaine n'est ajouté.
-
-## Interface commune — UI-003 / 0.2.0
-
-MainWindow reste une seule fenêtre propriétaire d'un contexte de sélection (itemId et requête). Sa présentation est séparée en fichiers partial : MainWindow.cs (cadre/navigation/accueil), MainWindow.Items.cs (recherche et quantités), MainWindow.Settings.cs (réglages et diagnostics) et MainWindow.Tools.cs (répertoire produit).
-
-Cinq destinations concrètes : Accueil présente l'outil disponible et l'état des données ; Objets & inventaire recherche et affiche NQ/HQ/total ; Tous les outils décrit et filtre le périmètre futur ; Réglages conserve les deux préférences persistantes indépendantes ; Diagnostics expose version, sources, génération et couverture des sacs. Les domaines futurs sont regroupés dans le répertoire, pas enregistrés comme faux modules ni présentés comme fonctionnels.
-
-Le répertoire comporte les 17 références autoritaires, regroupées en Artisanat, Récolte & pêche, Objets & économie, Collections & progression, Exploration & butin, Jeux & Gold Saucer, Personnage & macros. Tous les outils métier sont encore « à venir » ; le catalogue et l'inventaire communs restent des fondations disponibles, pas un dix-huitième plugin prioritaire.
-
-Le cadre réserve 200 pixels à la navigation ; le panneau principal utilise la largeur restante. Chaque panneau défile indépendamment. Taille par défaut 1040 × 700 à la première ouverture, minimum 760 × 480. Le style Dalamud existant est conservé, avec titres or et états disponibles verts. Les tables/children/listes ont des scopes équilibrés protégés par finally. Pas de nouvelle dépendance, service par page, abonnement ou lecture du jeu ; les pages consomment les mêmes ItemCatalogService et InventoryService.
-
-### Répertoire par icônes — UI-004 / 0.2.1
-
-Le répertoire remplace les sections détaillées développées par une grille adaptative de deux à cinq colonnes. PlannedTool conserve une référence d'icône FontAwesome native par outil ; IconButton utilise les polices existantes de Dalamud. La grille montre uniquement icône et nom. Description, domaine et état se trouvent dans une fiche modale commune, ouverte au clic seulement, avec fermeture explicite.
-
-La sélection d'une fiche (selectedTool ou fondation disponible) est distincte de la sélection d'objet itemId ; consulter une fiche ne perd pas l'objet en contexte. La tuile disponible ouvre la page Items via sa fiche ; les 17 références futures restent À venir. La demande d'ouverture de popup est traitée après la table, au même niveau de pile ID que son rendu. Aucun fichier d'image ni texture propriétaire n'est requis.
-
-## Banque manuelle des rangements — BANK-001 / 0.3.0
-
-InventoryNativeReader factorise la lecture typée des conteneurs, sa copie managée et les preuves IsLoaded/type/taille/buffer déjà utilisées pour les sacs. Le lecteur live et les imports consomment cette même implémentation ; aucune logique native par domaine craft/récolte n'est dupliquée. InventoryContainerSnapshot expose son dictionnaire figé de quantités pour la persistance, sans exposer de collection mutable.
-
-BankKey distingue CharacterId, BankStorageKind et StorageId. Le servant utilise son ID propre comme propriétaire des sept conteneurs et comme StorageId ; sacoche standard et extension utilisent le propriétaire personnage et StorageId zéro, distinguées par Kind. BankEntry réutilise InventorySnapshot, sa source et son ObservedAt UTC. BankEntryValidator exige exactement le groupe complet prévu, le bon propriétaire et des quantités compatibles avec les bornes natives (au plus 1000 slots × Int32 par conteneur).
-
-InventoryBankService est la source commune des relevés historiques, distincte du snapshot live InventoryService. État immuable publié atomiquement, chargement/sauvegarde sur un worker avec Channel borné, une demande en attente maximum. Un import remplace seulement sa BankKey ; publication après commit disque. Chargement corrompu bloquant pour les écritures ; échec de sauvegarde transitoire rapporté avec ancien état conservé et retry possible. Dispose ferme la file, termine les tâches publiques et empêche les publications suivantes, sans attendre un appel IO synchrone engagé.
-
-FileInventoryBankStore encode schéma 1, SavedAtUtc distinct d'ObservedAtUtc, IDs et quantités NQ/HQ par conteneur. Fichier limité à 16 MiB, groupes/éléments bornés, propriétés JSON obligatoires et doublons refusés. Save valide le fichier existant, écrit/flush un temporaire propre à l'opération puis remplace atomiquement avec .bak ; Load ne récupère .bak que si le primaire est absent. Un primaire corrompu est préservé et signalé. Un seul writer par chemin est prévu ; coordination multi-processus non implémentée.
-
-BankInventoryBridge observe les fenêtres, positions et identités au framework toutes les 100 ms. Aucun scan d'objet hors demande explicite. Il publie seulement des BankMenuContext managés (clé, nom, position et disponibilité), puis revalide clé/personnage/menu/conteneurs avant et après la copie d'un import demandé. GetActiveRetainer seul est insuffisant car il réfère LastSelectedRetainerId ; l'inventaire visible et les contrôles de stabilité sont requis.
-
-BankImportOverlay dessine les panneaux compagnons même quand la fenêtre principale est fermée. Ils suivent la fenêtre de l'inventaire servant ou chocobo et restent dans le viewport. Le bouton envoie une clé managée au bridge ; il ne lit pas de mémoire native dans Draw. Une extension chocobo non chargée n'est pas importée. Les callbacks appartiennent au plugin ; les panels n'injectent ni hook ni nœud natif.
-
-MainWindow ajoute Banque d'objets et conserve la même recherche/sélection. Les résultats montrent les stocks importés du personnage courant, propriétaires, NQ/HQ et dates, même après fermeture des inventaires. Le cumul sacs + cache est nommé « recensé » avec avertissement de décalage après transferts, jamais « total exact possédé ». Les relevés des autres personnages sont conservés mais non additionnés. Équipements/cristaux/marché des servants restent hors des sept pages ; cette portée est affichée.
-
-## Vue unifiée illustrée — UI-005 / 0.4.0
-
-L'interface Objets & rangements fusionne les vues Objets & inventaire et Banque d'objets de 0.3.0 ; les services sous-jacents restent distincts par nature des données, pas par outil. Le menu latéral et la fiche de l'outil disponible pointent vers cette destination unique. L'import reste manuel et sa gestion se trouve dans une section repliable, sans modifier le fichier de banque ni sa portée.
-
-ItemDefinition contient maintenant IconId, copié depuis Item.Icon au même passage que le nom. MainWindow reçoit ITextureProvider par injection et dessine les icônes du jeu dans les résultats, la fiche et le contexte latéral. Les wraps sont empruntés uniquement pour la frame UI : aucun stockage entre frames, aucun Dispose de texture partagée, aucun worker texture propre au plugin.
-
-ItemHoldings est une projection pure et immuable des snapshots existants, filtrée par personnage et par type de rangement. Pour le personnage, seules les quatre clés 0–3 sont demandées ; un propriétaire étranger ou un conteneur absent reste inconnu. Les relevés servant/chocobo gardent leur date et qualité. Les rubriques non importées produisent des lignes Unknown ; l'extension de sacoche est optionnelle. Les quantités sont additionnées avec contrôle des dépassements ; les lignes retournées sont détachées des collections appelantes.
-
-Les indicateurs HasObservation/HasUnknown/HasCached/IsExact commandent la présentation. Une somme avec cache n'est jamais un total exact au présent, même si toutes ses observations étaient complètes. Le filtre Personnage seul peut être exact. Les groupes et filtres réutilisent le même itemId, sans nouvelle lecture native ou banque par page.
-
-Le résultat projeté est mis en cache par itemId, personnage, références du snapshot live et de BankState, et filtre. Il est recalculé seulement quand ce contexte change. La recherche conserve son cache existant et limite le rendu au nombre de résultats réglé dans Paramètres › Interface (30 par défaut, 10 à 100), avec icônes. À partir de 720 pixels disponibles dans le contenu, recherche (300 pixels) et fiche sont côte à côte ; sinon les blocs sont empilés. La liste de résultats ajuste sa hauteur au nombre d'objets, sans grand panneau vide pour quelques résultats.
-
-## Catalogue de recettes — CRAFT-001A / 0.5.0
-
-RecipeCatalog est un index managé par ResultItemId. Chaque RecipeDefinition conserve son RecipeId, son rendement, le nom du CraftType, le niveau de RecipeLevelTable et la liste d'IDs/quantités d'ingrédients ; deux recettes produisant le même objet restent deux variantes. RecipeCatalogLoader copie Recipe par lots de 128 sur le thread framework, puis construit l'index sur un worker. MainWindow affiche les variantes dans une section repliable de la fiche objet. Cette tranche ne déduit pas encore la possession des ingrédients et ne lance aucune action de craft.
+`UI/FfxivTheme.cs` porte la palette (suivie sur le thème du jeu par `GameThemeReader`, ou forcée) ; PreDraw / PostDraw pour les fenêtres,
+scopes jetables pour les panneaux. `LocalizationManager` charge les JSON embarqués (anglais = référence et repli, français complet,
+allemand et japonais partiels) ; un test fait échouer Verify si une infobulle de réglage citée dans le code manque en anglais ou en
+français. Les données du jeu (objets, actions, lieux) viennent du catalogue du jeu, dans la langue du jeu ; les textes propres à Tensho
+sont dans la langue du plugin. Voir [Localization/README.md](../../Localization/README.md). Dates affichées en heure locale ; calculs en
+UTC et heure d'Éorzéa.
+
+La compilation et les tests managés ne valident pas le rendu ImGui ni la lecture native : seul l'essai en jeu le fait (état par version :
+[plan global](GLOBAL-PLAN.md), [TESTING](TESTING.md), [CHANGELOG](../../CHANGELOG.md)).

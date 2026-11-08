@@ -1372,6 +1372,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.865) Désynthétiser un objet, puis survoler un résultat : « Vu par vous : … ← désynthèse de … ».
 
+- [ ] (0.866) Crédits : les nouvelles références ; Aide : « Que garde Tensho sur mon PC ? » ; Découvertes : l'indication de recherche.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

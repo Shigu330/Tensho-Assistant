@@ -18,7 +18,8 @@ public static class GuideFlow
     private static readonly GuideStop[] AllStops =
     [
         new("Items"), new("Storage"), new("Market", GuideInterest.Market), new("CraftSimulation", GuideInterest.Crafting), new("Gathering", GuideInterest.Gathering),
-        new("Maps"), new("Alarms"), new("Reminders"), new("FreeCompany", GuideInterest.FreeCompany), new("Quests"), new("Collections", GuideInterest.Collections),
+        new("OceanFishing", GuideInterest.Gathering), new("Maps"), new("Alarms"), new("Reminders"), new("Discoveries"), new("FreeCompany", GuideInterest.FreeCompany),
+        new("Quests"), new("Collections", GuideInterest.Collections),
         new("Gear"), new("TripleTriad", GuideInterest.TripleTriad), new("Settings"), new("Help"),
     ];
     private static readonly GuideWindowTask[] AllWindows =
