@@ -86,6 +86,9 @@ internal sealed partial class MainWindow
                     }
                     else ImGui.TextDisabled($"?/{hunt.Needed}");
                     ImGui.TableNextColumn();ImGui.TextWrapped(hunt.Zones);
+                    // X-72 A (0.854): where you saw it, by its name row when known, else by its name.
+                    var seenName=hunt.Monster;var seenRow=hunt.NameId;
+                    DrawSeenPlaces($"Hunt{entry.RowId}.{target}",subject=>seenRow!=0 ? subject==seenRow:string.Equals(DiscoveryMonsterName(subject),seenName,StringComparison.CurrentCultureIgnoreCase),seenName);
                 }
         }
         finally{ImGui.EndTable();}

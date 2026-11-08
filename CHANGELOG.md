@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.854.0
+- Plan global, Verify : Choix de l'utilisateur (X-72, A) : la base de découvertes sert maintenant aux outils. Sur la page Butin des monstres et dans le carnet de chasse, chaque monstre que vous avez vu affiche « Vu par vous : zone (X, Y), niveau » : un lieu par carte, le plus vu, quatre cartes au plus. Clic droit : l'éthérite la plus proche avec le drapeau, ou le drapeau seul. Non validé en jeu.
+- Tests : SeenPlaces854Tests. Verify.ps1 (agent) : 1433/1433, 0 avertissement, 0 erreur ; DLL 0.854.0.0. Non validé en jeu.
+### English
+- User choice (X-72, A): the discoveries base now serves the tools. On the monster loot page and in the hunting log, each monster you have seen shows « Seen by you: zone (X, Y), level »: one place per map, the most seen, four maps at most. Right click: the nearest aetheryte with the flag, or the flag alone. Not validated in game.
+
 ## 0.853.0
 - Plan global, Verify : Signalement (X-48) : le clic droit sur la cible d'une quête n'offrait pas l'éthérite la plus proche. L'entrée existe sur toutes les icônes, mais n'apparaissait que sur une carte qui a sa propre éthérite ; le Tillac de Limsa n'en a pas, seulement des portes d'éthernet. Une carte compte maintenant aussi quand on peut y entrer : une porte d'éthernet placée là, ou une carte voisine ; la question de téléportation dit alors le chemin (éthérite de Limsa, puis l'éthernet jusqu'à la porte la plus proche), comme pour « Y aller » depuis la 0.833. Vaut aussi pour les mandats et les découvertes. Non validé en jeu.
 - Tests : NearestOnTarget853Tests. Verify.ps1 (agent) : 1432/1432, 0 avertissement, 0 erreur ; DLL 0.853.0.0. Non validé en jeu.

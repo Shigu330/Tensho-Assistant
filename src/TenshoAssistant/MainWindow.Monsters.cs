@@ -21,7 +21,14 @@ internal sealed partial class MainWindow
         lumina?.Request();
         if(lumina?.State.Data?.MonstersOf(id) is { Count:>0 } mobs && TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.Lumina")+"###LuminaMonsters",ImGuiTreeNodeFlags.DefaultOpen))
         {
-            foreach(var mob in mobs)ImGui.BulletText(mob);
+            foreach(var mob in mobs)
+            {
+                ImGui.BulletText(mob);
+                // X-72 A (0.854): where you saw it.
+                ImGui.Indent();
+                try{DrawSeenPlaces("Loot"+mob,subject=>string.Equals(DiscoveryMonsterName(subject),mob,StringComparison.CurrentCultureIgnoreCase),mob);}
+                finally{ImGui.Unindent();}
+            }
             ImGui.TextDisabled(localization.Get("MonsterUi.LuminaHelp"));
         }
         if(wikiMonsterSources is not { } wiki)return;

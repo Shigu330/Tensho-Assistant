@@ -149,6 +149,14 @@ public sealed class DiscoveryStore
     }
 }
 
+/// <summary>X-72 A (0.854): the places of a monster for the tools: per map, its most seen place; the most seen maps first.</summary>
+public static class SeenPlaces
+{
+    public static DiscoveryFact[] ByMap(IEnumerable<DiscoveryFact> facts,int maps)=>
+        facts.GroupBy(fact=>fact.Map).Select(group=>group.OrderByDescending(fact=>fact.Seen+fact.Imported).First())
+            .OrderByDescending(fact=>fact.Seen+fact.Imported).Take(maps).ToArray();
+}
+
 /// <summary>X-43 (0.807): the files: the base, the exports (a dated copy) and the imports (every .json of the import folder, read once, then renamed).</summary>
 public static class DiscoveryFiles
 {

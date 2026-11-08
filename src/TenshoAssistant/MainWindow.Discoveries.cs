@@ -132,6 +132,44 @@ internal sealed partial class MainWindow
         }
     }
 
+    // X-72 A (0.854, user choice « ABC » after the parser review: no tool used the places seen): where you saw a monster, for the tools: one line per map, its
+    // most seen place, four maps at most; right click: the nearest aetheryte with the flag, or the flag alone. Worked out again when the base changes.
+    private readonly Dictionary<string,(long Revision,DiscoveryFact[] Rows)> seenPlaces=[];
+    private DiscoveryFact[] SeenPlacesOf(string key,Func<uint,bool> subject)
+    {
+        if(DiscoveryStore is not { } store || !DiscoveriesLoaded)return [];
+        if(seenPlaces.TryGetValue(key,out var known) && known.Revision==store.Revision)return known.Rows;
+        var rows=SeenPlaces.ByMap(store.Find(DiscoveryKind.MonsterPlace,subject,500),4);
+        if(seenPlaces.Count>=256)seenPlaces.Clear();
+        seenPlaces[key]=(store.Revision,rows);
+        return rows;
+    }
+    internal void DrawSeenPlaces(string key,Func<uint,bool> subject,string name)
+    {
+        var rows=SeenPlacesOf(key,subject);
+        if(rows.Length==0 || maps.State.Catalog is not { } catalog)return;
+        for(var index=0;index<rows.Length;index++)
+        {
+            var fact=rows[index];
+            if(catalog.Find(fact.Map) is not { } map)continue;
+            var pixel=MapProjection.PixelFromWorld(new Vector3(fact.X,0,fact.Z),map);var place=MapProjection.CoordinateFromPixel(pixel,map);
+            var level=fact.LevelMin==fact.LevelMax ? fact.LevelMax.ToString():$"{fact.LevelMin}–{fact.LevelMax}";
+            ImGui.PushStyleColor(ImGuiCol.Text,Muted);
+            try{ImGui.Selectable(localization.Format("DiscoveriesUi.SeenHere",MapName(map),place.X.ToString("0.0"),place.Y.ToString("0.0"),level)+$"##Seen{key}{index}");}
+            finally{ImGui.PopStyleColor();}
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("DiscoveriesUi.SeenHereTip"));
+            if(!ImGui.BeginPopupContextItem($"SeenMenu{key}{index}"))continue;
+            try
+            {
+                ImGui.BeginDisabled(!MapHasAetheryte(map));
+                try{if(ImGui.Selectable(localization.Get("MapView.NearestAetheryte")))AskNearestAetheryteAt(map,pixel,name,flag:true);}
+                finally{ImGui.EndDisabled();}
+                if(ImGui.Selectable(localization.Get("ItemMenu.PlaceFlag")))FlagFromMap(map,place.X,place.Y);
+            }
+            finally{ImGui.EndPopup();}
+        }
+    }
+
     // The places of the monsters whose name holds the search, most seen first, 200 at most; right click on the place: the nearest aetheryte.
     private void DrawDiscoveryPlaces(DiscoveryStore store)
     {

@@ -581,6 +581,8 @@
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
+    "SeenHere": "Vu par vous : {0} ({1}, {2}), niv. {3}",
+    "SeenHereTip": "D'après votre base de découvertes (Monde › Découvertes). Clic droit : l'éthérite la plus proche avec le drapeau, ou le drapeau seul.",
     "MarketPrices": "Prix vus au tableau des ventes",
     "MarketPricesTip": "Quand vous ouvrez un objet au tableau des ventes, ses offres et ses dernières ventes sont gardées (jamais le nom d'un vendeur ni d'un acheteur). Pour votre monde, Tensho les utilise alors à la place de ceux d'Universalis quand elles sont plus récentes ; les autres mondes et les objets jamais ouverts restent sur Universalis.\nPar défaut : activé.",
     "SummaryPrices": "Prix vus au marché : {0} objets",
