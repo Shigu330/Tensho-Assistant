@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-## Overview — state at 0.865 (2026-11-08)
+## Overview — state at 0.971 (2026-11-09)
 
 > A map of the code, not a journal: the detail of each version is in the [CHANGELOG](../../CHANGELOG.md), the in-game state in the
 > [global plan](GLOBAL-PLAN.md) and [TESTING](TESTING.md). The code is the reference. The design notes written for each goal from
@@ -61,7 +61,7 @@ plugin by link and reads the embedded data files from the sources.
 | `Deliveries/`, `GrandCompanies/`, `Societies/`, `Leves/`, `Hunting/` | custom and special deliveries; Grand Companies; allied societies; guildleves (`LeveCatalog`, `LeveProgressReader`); hunting log (`HuntingLog` + reader) and S rank conditions (`SRankConditions`) |
 | `Carnivale/`, `Relics/`, `Fields/`, `DeepDungeons/`, `Lexicon/` | Masked Carnivale; relic weapons and armour; Eureka and Bozja (`FieldBoard`) and FATEs; deep dungeons; lexicon of the game's words — each a model and its `*.Dalamud.cs` reader |
 | `Events/` | seasonal events (`Festivals`, `FestivalReader`), `Data/festival-names.csv` (embedded) |
-| `Discoveries/` | local discoveries base (`DiscoveriesModel`: facts with their provenance, import with merge, export), its settings (`DiscoverySettings`), and what it notes from the game (`ItemDiscoveryWatcher`, `ItemGains`); game rows and places only, never another player |
+| `Discoveries/` | local discoveries base (`DiscoveriesModel`: facts with their provenance, import with merge, export; the player's own facts in `Discoveries.json`, the shared ones in `Shared/`, one compressed file per kind, read only when a page needs that kind), its settings (`DiscoverySettings`), what it notes from the game (`ItemDiscoveryWatcher`, `ItemGains`), and the exchange with other players (`GitHubExchange`, `CommunityDiscoveries`: GitHub sign-in on the player's click, own facts sent to the player's gist with an issue, the common file `community-discoveries/discoveries.json` joined as imported; « Exchange now » or the opt-in daily exchange); game rows and places only, never another player |
 | `Competitive/` | PvP and ranked content cut (`CompetitiveGate`, `CompetitiveZones`, DEC-038) |
 | `Credits/` | the single list of credits (`CreditCatalog`: the game, libraries, embedded data, online data, rules taken up, references read, tools), shown by `MainWindow.Credits.cs` and checked by the tests (embedded data, network hosts, settings, MIT notices) |
 | `Alarms/`, `Reminders/` | Tensho alarms (`TenshoAlarm`, `AlarmService`, the game's `/alarm` command through `GameAlarmCommand`, automatic alarms `AutoAlarms` + watcher, server info bar entries for alarms, reminders and currencies, Discord webhook `DiscordWebhook` (pure rules) and `DiscordNotifier` (queue and sending on a worker), tracked alarms, world clocks); reminders of the calendar (`ResetSchedule`, `GameTimers`), garden (journal, seeds, crossbreeds, chat watcher), squadron planner and reader, hunt bills, personal tasks, Wondrous Tails odds, company benefits, `Data/` (embedded garden files) |
@@ -73,8 +73,8 @@ plugin by link and reads the embedded data files from the sources.
 | `Diagnostics/` | self-check at reload in developer mode (`SelfCheck`, `SelfCheckRunner`), page sweep (`PageSweep`, `PageSweepWindow`, DEC-040), slow frame log (`SlowFrame`), blink watch, temporary in-game readings (`ReadingCapture`) |
 | `Beastmaster/` | Beastmaster page, the game's data read raw (`BeastCatalog` + loader); window probe (`BeastWindowProbe`), without an advice panel (DEC-032) |
 | `MyTools/` | the player's tools and the community gallery, data only (`ToolTemplate`, `ToolTemplateStore`, `ToolGallery` read on a click) |
-| `UI/` | theme (`FfxivTheme`, `ThemePalettes`, `GameThemeReader`), fonts (`FontManager`, `FontSettings`), `UiComponents`, `UiMessages`, `InternalMessages`, the game's visible windows (`GameWindowsReader`, `GameWindowFollower`), shared templates `Components/`, navigation bar `Navigation/` |
-| root | `Plugin`, `Configuration` (+ `Configuration.Dalamud.cs`), `RegistrationScope`, `MainWindow.*.cs` (one partial per page or part), `MapViewWindow`, `GuideWindow`, `PanelWindow`, `AttachedPanels`, `BankImportOverlay` |
+| `UI/` | theme (`FfxivTheme`, `ThemePalettes`, `GameThemeReader`), fonts (`FontManager`, `FontSettings`), `UiComponents`, `UiMessages`, `InternalMessages`, setting save with rollback (`SettingSave`), the game's visible windows (`GameWindowsReader`, `GameWindowFollower`), shared templates `Components/`, navigation bar `Navigation/` |
+| root | `Plugin`, `Configuration` (+ `Configuration.Dalamud.cs`), `CommunitySources` (« game data and what you observed only »), `RegistrationScope`, saved files (`AtomicFile`: temporary file then swap; `BackgroundWriter`: writes off the framework thread, in order; `BackupZip`: zip copy before a folder is emptied), `OnceSet` (bounded « once per event »), `MainWindow.*.cs` (one partial per page or part), `MapViewWindow`, `GuideWindow`, `PanelWindow`, `AttachedPanels`, `BankImportOverlay` |
 
 ### Main window
 
@@ -100,7 +100,9 @@ Shared templates (`UI/Components/`):
   collection items (unknown = no badge), right click = useful tools (`RelevantRoutes`) and grouped sources (`SourceLines`,
   `MainWindow.SourceLinks.cs`), unique menu id (`UniqueMenuId`). The same content (`DrawItemInfoBody`) serves the panel under the game's
   tooltip; the same sources, the Tensho menu of the game's inventory.
-- `SettingRow.cs`: setting with tooltip and ↺ button (default read on a new `Configuration`); « Reset everything to default ».
+- `SettingRow.cs`: setting with tooltip and ↺ button (default read on a new `Configuration`); « Reset everything to default ». A failed
+  save puts the previous value back and shows one error line at the bottom of the main window (`UI/SettingSave.cs`).
+- `Tooltip.cs`: one tooltip helper (also on greyed controls); `StatusLines.cs`: one look for empty or loading lines.
 - `DetailPage.cs`: header then tabs, only the open tab is computed (item sheet, Triple Triad sub-tabs).
 - `EntityMenus.cs`: one right-click menu per kind of thing (quest, NPC, monster, place).
 - `DataIndexes.cs`: indexes of collections and quests, rebuilt when the list is read again, never at each frame.
@@ -165,8 +167,11 @@ Known gaps to the rule « Draw reads neither pointer nor Excel sheet » (noted o
   placed in one of them**.
 - Separate files in the plugin's configuration folder, never touched by the reset: `InventoryBank/` (one file per character, schema 1,
   16 MiB at most, bounded entries and containers; written through a temporary file then replaced, with `.bak`), `GilJournal/`,
-  `Characters/`, `Discoveries/`, `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, `Exports/`, `DataCache-v1/`; in developer
-  mode, `SelfCheckSeen.json` and `PageSweepLast.txt` (see [SECURITY](../../SECURITY.md)).
+  `Characters/`, `Discoveries/` (`Discoveries.json`, `Shared/`, `MarketSeen.json`; with the GitHub exchange, `github.json` and the token
+  `github.token`, protected for this Windows user by DPAPI), `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, `Exports/`,
+  `DataCache-v1/`, `Backups/` (zip copies taken before the cache or the discoveries are emptied, GitHub token left out); in developer
+  mode, `SelfCheckSeen.json` and `PageSweepLast.txt` (see [SECURITY](../../SECURITY.md)). Saved files are written through `AtomicFile`
+  (temporary file, then swapped in).
 
 ### Caches (`Caching/`)
 
@@ -202,6 +207,9 @@ Known gaps to the rule « Draw reads neither pointer nor Excel sheet » (noted o
 | bite times | network (GraphQL, `FishBiteTimes`) | Teamcraft public reports (MIT) |
 | Fashion Report (`FashionReport.json`) | network (GitHub, `BoundedHttp`) | FFXIVGachaSpreadsheet (MIT) |
 | open housing plots | network (`BoundedHttp`) | PaissaDB |
+| common discoveries file (`community-discoveries/discoveries.json`) | network (raw.githubusercontent.com), on « Exchange now » or the opt-in daily exchange | Tensho's repository (players' readings) |
+| sign-in, gist and issue of the discoveries exchange | network (github.com, api.github.com), only after the player connects GitHub | GitHub |
+| alarm, currency and duty-pop posts | network (the player's own webhook, discord.com hosts only) | Discord |
 
 Embedding rule: only data under a licence compatible with GPL v3, with source, licence and copyright in the file
 ([DEC-021](DECISIONS.md)). References read without copying code: listed on the Credits page (`Credits/CreditCatalog.cs`, « references
@@ -251,7 +259,7 @@ The build and the managed tests do not validate the ImGui rendering nor the nati
 
 # Architecture (français)
 
-## Vue d'ensemble — état au 0.865 (2026-11-08)
+## Vue d'ensemble — état au 0.971 (2026-11-09)
 
 > Carte du code, pas un journal : le détail par version est dans le [CHANGELOG](../../CHANGELOG.md), l'état en jeu dans le
 > [plan global](GLOBAL-PLAN.md) et [TESTING](TESTING.md). Le code fait foi. Les notes de conception écrites pour chaque objectif du
@@ -301,7 +309,7 @@ purs du plugin et lit les fichiers de données embarqués depuis les sources.
 | `Community/` | accès réseau borné (`BoundedHttp`) et sources de la communauté : Garland Tools (`GarlandClient`, `GarlandItemSources`), wiki (`WikiItemAcquisition`), LuminaSupplemental, GatherBuddy (`GatherBuddyFish`), Teamcraft (`FishBiteTimes`), PaissaDB (`PaissaDb`), analyseurs de pêche (`FishingSources`, `FishingConditions`), noms de la communauté (`CommunityNames`) |
 | `Monsters/`, `Duties/` | butin des monstres (`MonsterLootService`, `WikiMonsterSources`), sources de la magie bleue (`BlueSpellSources`, `BlueSpellWikiIndex`, `BlueSpellMonsterIndex`), index du dresseur sur le wiki (`BeastWikiIndex`), sens des monstres proches (`NearbyMonsters`, information seulement) ; contenus (`DutyCatalog`), butin (`DutyLootService`), panneau de l'outil de mission (`DutyFinderReader`), progression des contenus (`DutyProgress` + lecteur) |
 | `Fashion/` | Revue de mode : données de la communauté (`FashionDataService`), indices (`FashionHintLoader`), fenêtre du jeu (`FashionCheckReader`) |
-| `Maps/` | carte Tensho : catalogue, marqueurs (`MapMarkerSource`), projection, état live (`MapLiveReader` : position, drapeau, ALEA, groupe, objets et monstres proches, téléportation), index local (`MapLocalIndex` + chargeur), remplacement de la carte du jeu (`NativeMapReplacer`), favoris et répertoire des lieux, exploration du wiki (`WikiVistas`), liens de carte du chat (`ChatMapLinks` + veilleur), train de chasse (`HuntTrain`, `HuntAnnouncer`), découverte des cartes, recherche, mémoire du zoom, cartes au trésor, ressources de l'île |
+| `Maps/` | carte Tensho : catalogue, marqueurs (`MapMarkerSource`), projection, état live (`MapLiveReader` : position, drapeau, ALÉA, groupe, objets et monstres proches, téléportation), index local (`MapLocalIndex` + chargeur), remplacement de la carte du jeu (`NativeMapReplacer`), favoris et répertoire des lieux, exploration du wiki (`WikiVistas`), liens de carte du chat (`ChatMapLinks` + veilleur), train de chasse (`HuntTrain`, `HuntAnnouncer`), découverte des cartes, recherche, mémoire du zoom, cartes au trésor, ressources de l'île |
 | `Npcs/` | marchands PNJ (`NpcVendorCatalog` + chargeur) : boutiques à gils, échanges, boutiques de compagnie libre |
 | `Quests/`, `Collections/` | quêtes (lecteur, récompenses et index inverse, objets de quête, cités de départ, options non prises) ; collections, titres, succès, orchestrion (`CollectionReader` + partiel `Completion`, `ExtraCollectionReader`, `BgmReader`), tenues, progression des succès, titre selon le job (`TitleChanger`) |
 | `Character/` | statistiques du personnage (`CharacterStatsReader`, `StatFormulas`), ce que Tensho a lu en dernier pour chacun des personnages du joueur (`CharacterStatus` + veilleur) |
@@ -309,9 +317,9 @@ purs du plugin et lit les fichiers de données embarqués depuis les sources.
 | `FreeCompany/` | sous-marins et dirigeables : `Voyages` (relevés, fusion par maison), `VoyageWatcher` (lecture de l'atelier, catalogues), `VoyagePlanner` (meilleurs trajets), `VesselBuilds` (montages, paliers, usure), secteurs et planificateur des dirigeables, historique des voyages, projets et livraisons de l'atelier, `Data/` (fichiers embarqués) |
 | `Island/` | Félicité insulaire : catalogue + chargeur, lecteur (sur clic du joueur), planificateur de l'atelier, matériaux, animaux du pâturage |
 | `Deliveries/`, `GrandCompanies/`, `Societies/`, `Leves/`, `Hunting/` | commandes et livraisons spéciales ; Grandes compagnies ; peuples alliés ; mandats (`LeveCatalog`, `LeveProgressReader`) ; bestiaire (`HuntingLog` + lecteur) et conditions des rangs S (`SRankConditions`) |
-| `Carnivale/`, `Relics/`, `Fields/`, `DeepDungeons/`, `Lexicon/` | Grande Mascarade ; armes et armures reliques ; Eureka et Bozja (`FieldBoard`) et ALEA ; donjons profonds ; lexique des mots du jeu — chacun un modèle et son lecteur `*.Dalamud.cs` |
+| `Carnivale/`, `Relics/`, `Fields/`, `DeepDungeons/`, `Lexicon/` | Grande Mascarade ; armes et armures reliques ; Eureka et Bozja (`FieldBoard`) et ALÉA ; donjons profonds ; lexique des mots du jeu — chacun un modèle et son lecteur `*.Dalamud.cs` |
 | `Events/` | événements saisonniers (`Festivals`, `FestivalReader`), `Data/festival-names.csv` (embarqué) |
-| `Discoveries/` | base locale de découvertes (`DiscoveriesModel` : faits avec leur provenance, import avec fusion, export), ses réglages (`DiscoverySettings`), et ce qu'elle relève dans le jeu (`ItemDiscoveryWatcher`, `ItemGains`) ; des lignes du jeu et des lieux seulement, jamais un autre joueur |
+| `Discoveries/` | base locale de découvertes (`DiscoveriesModel` : faits avec leur provenance, import avec fusion, export ; les faits du joueur dans `Discoveries.json`, les faits partagés dans `Shared/`, un fichier compressé par sorte, lu seulement quand une page a besoin de cette sorte), ses réglages (`DiscoverySettings`), ce qu'elle relève dans le jeu (`ItemDiscoveryWatcher`, `ItemGains`), et l'échange avec les autres joueurs (`GitHubExchange`, `CommunityDiscoveries` : connexion GitHub sur clic du joueur, ses faits envoyés dans son gist avec un ticket, le fichier commun `community-discoveries/discoveries.json` joint comme importé ; « Échanger maintenant » ou l'échange quotidien sur option) ; des lignes du jeu et des lieux seulement, jamais un autre joueur |
 | `Competitive/` | coupure en JcJ et en contenu classé (`CompetitiveGate`, `CompetitiveZones`, DEC-038) |
 | `Credits/` | liste unique des crédits (`CreditCatalog` : le jeu, bibliothèques, données intégrées, données en ligne, règles reprises, références lues, outils), affichée par `MainWindow.Credits.cs` et vérifiée par les tests (données intégrées, hôtes réseau, réglages, avis MIT) |
 | `Alarms/`, `Reminders/` | alarmes Tensho (`TenshoAlarm`, `AlarmService`, commande `/alarm` du jeu via `GameAlarmCommand`, alarmes automatiques `AutoAlarms` + veilleur, entrées de la barre d'infos du serveur pour les alarmes, les rappels et les monnaies, webhook Discord `DiscordWebhook` (règles pures) et `DiscordNotifier` (file et envoi sur un worker), alarmes suivies, horloges du monde) ; rappels du calendrier (`ResetSchedule`, `GameTimers`), jardinage (journal, graines, croisements, veilleur du chat), planificateur et lecteur de l'escouade, contrats de chasse, tâches personnelles, chances du Carnet mystérieux, avantages de compagnie, `Data/` (fichiers de jardinage embarqués) |
@@ -323,8 +331,8 @@ purs du plugin et lit les fichiers de données embarqués depuis les sources.
 | `Diagnostics/` | auto-contrôle au rechargement en mode développeur (`SelfCheck`, `SelfCheckRunner`), passage des pages (`PageSweep`, `PageSweepWindow`, DEC-040), relevé des images lentes (`SlowFrame`), surveillance des clignotements, relevés en jeu temporaires (`ReadingCapture`) |
 | `Beastmaster/` | page dresseur, données du jeu lues brutes (`BeastCatalog` + chargeur) ; sonde des fenêtres (`BeastWindowProbe`), sans panneau de conseil (DEC-032) |
 | `MyTools/` | outils du joueur et galerie de la communauté, données seulement (`ToolTemplate`, `ToolTemplateStore`, `ToolGallery` lue sur clic) |
-| `UI/` | thème (`FfxivTheme`, `ThemePalettes`, `GameThemeReader`), polices (`FontManager`, `FontSettings`), `UiComponents`, `UiMessages`, `InternalMessages`, fenêtres visibles du jeu (`GameWindowsReader`, `GameWindowFollower`), modèles communs `Components/`, barre de navigation `Navigation/` |
-| racine | `Plugin`, `Configuration` (+ `Configuration.Dalamud.cs`), `RegistrationScope`, `MainWindow.*.cs` (un partiel par page ou partie), `MapViewWindow`, `GuideWindow`, `PanelWindow`, `AttachedPanels`, `BankImportOverlay` |
+| `UI/` | thème (`FfxivTheme`, `ThemePalettes`, `GameThemeReader`), polices (`FontManager`, `FontSettings`), `UiComponents`, `UiMessages`, `InternalMessages`, enregistrement d'un réglage avec retour arrière (`SettingSave`), fenêtres visibles du jeu (`GameWindowsReader`, `GameWindowFollower`), modèles communs `Components/`, barre de navigation `Navigation/` |
+| racine | `Plugin`, `Configuration` (+ `Configuration.Dalamud.cs`), `CommunitySources` (« Données du jeu et observées seulement »), `RegistrationScope`, fichiers enregistrés (`AtomicFile` : fichier temporaire puis échange ; `BackgroundWriter` : écritures hors du thread framework, dans l'ordre ; `BackupZip` : copie zip avant de vider un dossier), `OnceSet` (« une fois par événement » borné), `MainWindow.*.cs` (un partiel par page ou partie), `MapViewWindow`, `GuideWindow`, `PanelWindow`, `AttachedPanels`, `BankImportOverlay` |
 
 ### Fenêtre principale
 
@@ -337,7 +345,7 @@ dessin et sa source ; la navigation, le dessin et la source montrée aux contrib
 | — | Accueil & outils, Mes outils |
 | OBJETS | Objets (recherche + fiche objet), Rangements, Tri de l'inventaire, Marché, Lexique |
 | PRODUCTION | Artisanat (synthèse en direct, préréglages), Récolte (planification des PR, objets de collection), Pêche en mer, Félicité insulaire, Commandes spéciales, Enchaînement de macros |
-| MONDE | Carte, Météo, ALEA, Alarmes, Rappels, Jardinage, Compagnie libre, PNJ vendeurs, Butin des contenus, Butin des monstres, Découvertes |
+| MONDE | Carte, Météo, ALÉA, Alarmes, Rappels, Jardinage, Compagnie libre, PNJ vendeurs, Butin des contenus, Butin des monstres, Découvertes |
 | PROGRESSION | Quêtes, Événements, Collections (magie bleue), La Grande Mascarade, Reliques, Peuples alliés, Grandes compagnies, Livraisons spéciales, Eureka et Bozja, Donjons profonds, Équipement, Chocobo, Mandats, Bestiaire, Dresseur |
 | GOLD SAUCER | Revue de mode, Triple Triade, Mini Cactpot |
 | PRÉFÉRENCES | Aide, Paramètres (Général, Interface, Modules, Carte, Données, Avancé ; Debug en mode développeur), Crédits, Diagnostics (mode développeur) |
@@ -350,7 +358,10 @@ Modèles communs (`UI/Components/`) :
   pastille ✓ / ✗ des objets de collection (inconnu = pas de pastille), clic droit = outils utiles (`RelevantRoutes`) et sources groupées
   (`SourceLines`, `MainWindow.SourceLinks.cs`), identifiant de menu unique (`UniqueMenuId`). Le même contenu (`DrawItemInfoBody`) sert au
   panneau sous l'infobulle du jeu ; les mêmes sources, au menu Tensho de l'inventaire du jeu.
-- `SettingRow.cs` : réglage avec infobulle et bouton ↺ (défaut lu sur une `Configuration` neuve) ; « Tout remettre par défaut ».
+- `SettingRow.cs` : réglage avec infobulle et bouton ↺ (défaut lu sur une `Configuration` neuve) ; « Tout remettre par défaut ». Un
+  enregistrement raté remet l'ancienne valeur et affiche une ligne d'erreur en bas de la fenêtre principale (`UI/SettingSave.cs`).
+- `Tooltip.cs` : une seule aide pour les infobulles (aussi sur les commandes grisées) ; `StatusLines.cs` : un seul aspect pour les lignes
+  vides ou de chargement.
 - `DetailPage.cs` : en-tête puis onglets, seul l'onglet ouvert est calculé (fiche objet, sous-onglets de Triple Triade).
 - `EntityMenus.cs` : un menu de clic droit par type de chose (quête, PNJ, monstre, lieu).
 - `DataIndexes.cs` : index des collections et des quêtes, refaits quand la liste est relue, jamais à chaque image.
@@ -418,8 +429,11 @@ actions du joueur (retrait du drapeau, téléportation, /alarm, macros, tri, imp
   listes : **toute nouvelle propriété de `Configuration` doit être placée dans l'une d'elles**.
 - Fichiers à part dans le dossier de configuration du plugin, jamais touchés par la remise à zéro : `InventoryBank/` (un fichier par
   personnage, schéma 1, 16 Mio au plus, entrées et conteneurs bornés ; écriture par fichier temporaire puis remplacement, avec `.bak`),
-  `GilJournal/`, `Characters/`, `Discoveries/`, `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, `Exports/`, `DataCache-v1/` ; en
-  mode développeur, `SelfCheckSeen.json` et `PageSweepLast.txt` (voir [SECURITY](../../SECURITY.md)).
+  `GilJournal/`, `Characters/`, `Discoveries/` (`Discoveries.json`, `Shared/`, `MarketSeen.json` ; avec l'échange GitHub, `github.json` et
+  le jeton `github.token`, protégé pour cet utilisateur Windows par DPAPI), `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`,
+  `Exports/`, `DataCache-v1/`, `Backups/` (copies zip prises avant de vider le cache ou les découvertes, jeton GitHub exclu) ; en mode
+  développeur, `SelfCheckSeen.json` et `PageSweepLast.txt` (voir [SECURITY](../../SECURITY.md)). Les fichiers enregistrés sont écrits par
+  `AtomicFile` (fichier temporaire, puis échangé d'un coup).
 
 ### Caches (`Caching/`)
 
@@ -450,11 +464,14 @@ actions du joueur (retrait du drapeau, téléportation, /alarm, macros, tri, imp
 | prix, annonces, historique, centres de données | réseau (`HttpClient` borné) | API Universalis |
 | sources d'objets, butins | réseau (`BoundedHttp`) | Garland Tools |
 | butin des monstres, acquisition, exploration, magie bleue, pages du dresseur et du pâturage | réseau (`BoundedHttp`) | ffxiv.consolegameswiki.com |
-| butin des contenus, monstres, ALEA, entreprises, boutique, désynthèse… | réseau (GitHub, `BoundedHttp`) | LuminaSupplemental (GPL-3.0) |
+| butin des contenus, monstres, ALÉA, entreprises, boutique, désynthèse… | réseau (GitHub, `BoundedHttp`) | LuminaSupplemental (GPL-3.0) |
 | appâts, conditions et créneaux de pêche | réseau (GitHub, `BoundedHttp`) | GatherBuddy (Apache-2.0) |
 | temps de touche | réseau (GraphQL, `FishBiteTimes`) | rapports publics de Teamcraft (MIT) |
 | Revue de mode (`FashionReport.json`) | réseau (GitHub, `BoundedHttp`) | FFXIVGachaSpreadsheet (MIT) |
 | terrains libres | réseau (`BoundedHttp`) | PaissaDB |
+| fichier commun des découvertes (`community-discoveries/discoveries.json`) | réseau (raw.githubusercontent.com), sur « Échanger maintenant » ou l'échange quotidien sur option | dépôt de Tensho (relevés des joueurs) |
+| connexion, gist et ticket de l'échange des découvertes | réseau (github.com, api.github.com), seulement après que le joueur a connecté GitHub | GitHub |
+| messages des alarmes, des monnaies et de l'outil de mission | réseau (webhook du joueur, hôtes discord.com seulement) | Discord |
 
 Règle d'embarquement : seulement une donnée sous licence compatible avec la GPL v3, avec source, licence et copyright dans le fichier
 ([DEC-021](DECISIONS.md)). Références lues sans copie de code : listées sur la page Crédits (`Credits/CreditCatalog.cs`, « références
@@ -465,27 +482,27 @@ lues ») et dans [REFERENCES.md](REFERENCES.md) ; crédits : [README](../../READ
 - `MapCatalogLoader` copie la feuille `Map` (cartes des zones) ; `MapMarkerSource` lit à la demande, depuis Draw, `MapMarker`, `Map`
   (régions et monde), `MapSymbol` et `EventIconType`, gardés en mémoire (écart connu, voir plus haut) ; `MapProjection` convertit monde ↔
   texture ↔ écran.
-- `MapLiveReader` publie position, drapeau, ALEA, groupe, marqueurs d'événement du jeu (quêtes, mandats), objets proches, ennemis vivants
+- `MapLiveReader` publie position, drapeau, ALÉA, groupe, marqueurs d'événement du jeu (quêtes, mandats), objets proches, ennemis vivants
   autour du joueur (information seulement, 100 au plus), courants éthérés et repères d'exploration débloqués, combat / instance ; il
   exécute sur le thread framework les demandes de l'interface (retirer le drapeau, téléportation, coûts de téléportation).
 - `MapLocalIndexLoader` construit l'index local par carte (donneurs de quête, points de récolte et de pêche, exploration, courants) ;
   `NpcVendorLoader` les marchands. Les deux passent par le cache disque. Les PNJ placés par un événement ne sont montrés que pendant cet
   événement.
 - `NativeMapReplacer` garde l'addon `AreaMap` ouvert hors écran pour que le jeu continue à mettre à jour ses marqueurs, lit la demande
-  d'ouverture (`AgentMap`, quête du journal, téléporteur, ALEA) et ouvre la carte Tensho à la place ; la carte du jeu est restaurée à la
+  d'ouverture (`AgentMap`, quête du journal, téléporteur, ALÉA) et ouvre la carte Tensho à la place ; la carte du jeu est restaurée à la
   fermeture ou au déchargement.
 - Dispositions : classique (menus de région / zone en haut, colonne d'outils à gauche) ou « Menus et outils par-dessus la carte »
   (`OverlayControls`) : outils et noms soumis avant la carte (fenêtres enfants) pour prendre le clic, la carte ignore la souris sur eux.
   Repères au bord pour les cibles hors de la vue (`DrawEdgeMarkers`).
 - Clic droit : menu propre à l'icône (`RightClickIgnore` renvoie une icône au menu général), menu général à onglets (Favoris, Quêtes,
-  ALEA, Récolte, Éthérites, Vendeurs, Triple Triade, Courants éthérés, Carnet d'exploration).
+  ALÉA, Récolte, Éthérites, Vendeurs, Triple Triade, Courants éthérés, Carnet d'exploration).
 - Réglages : `MapViewSettings` dans `Configuration` (tailles et priorités d'icônes globales et par carte, zones colorées, cône de vision,
   repères au bord, disposition, couches des monstres proches, zoom à l'ouverture).
 
 ### Sources d'objets (« Comment l'obtenir »)
 
 Ordre : données du jeu (marchands PNJ dont boutiques de compagnie libre, échanges, quêtes, succès, recettes, récolte), données de
-LuminaSupplemental (contenus, monstres, ALEA, entreprises, boutique, objets d'origine), puis Garland Tools, puis section « Acquisition »
+LuminaSupplemental (contenus, monstres, ALÉA, entreprises, boutique, objets d'origine), puis Garland Tools, puis section « Acquisition »
 du wiki. « Comment l'obtenir » n'affiche Garland que si aucune autre source n'est connue, et le wiki que si Garland ne connaît rien non
 plus ; mais Garland est interrogé pour presque chaque objet mis en contexte (objet sélectionné, fiche, menus Tensho et du jeu), car les
 outils utiles (`RelevantRoutes` : contenus, monstres) et `SourceLines` (contenus, échanges) le lisent. Garland et le wiki se coupent dans

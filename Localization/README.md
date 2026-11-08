@@ -20,7 +20,7 @@
 
 English is the reference language. Missing keys fall back to English, then to `[Key.Name]`.
 
-Current state (2026-11-08, version 0.865): English and French are complete (French must stay complete); German (`de.json`) and Japanese
+Current state (2026-11-09, version 0.971): English and French are complete (French must stay complete); German (`de.json`) and Japanese
 (`ja.json`) translate 35 keys only and have not been reviewed by native speakers. The completion of each language is shown in
 Settings → Debug and in the contributor panel of Diagnostics (developer mode).
 
@@ -28,8 +28,8 @@ Language files are discovered automatically; no enum or C# window changes are ne
 The languages live only inside `TenshoAssistant.dll` (embedded resources, since 0.248); the package ships no language file. To test a
 translation, create a `Localization/Languages` folder next to the installed DLL and put the JSON file there: external values override
 bundled values. Use Settings → Advanced to enable Developer mode, then Settings → Debug → Reload translations to load edits from the
-installed plugin's `Localization/Languages` directory. The same panel can show translation keys. Reloading is explicit; JSON is never
-parsed by the normal translation lookup during rendering.
+installed plugin's `Localization/Languages` directory. The contributor panel of Diagnostics (developer mode) can show translation keys.
+Reloading is explicit; JSON is never parsed by the normal translation lookup during rendering.
 
 Invalid external placeholder formats are ignored at reload: the bundled value is kept, or English is used for a partial added language.
 The diagnostics still report the invalid editable file so it can be corrected. Valid reordered placeholders are supported, for example
@@ -61,7 +61,7 @@ official game catalog: these files translate the plugin interface, and game data
 
 L'anglais est la langue de référence. Les clés manquantes se replient sur l'anglais, puis sur `[Key.Name]`.
 
-État actuel (2026-11-08, version 0.865) : l'anglais et le français sont complets (le français doit le rester) ; l'allemand (`de.json`)
+État actuel (2026-11-09, version 0.971) : l'anglais et le français sont complets (le français doit le rester) ; l'allemand (`de.json`)
 et le japonais (`ja.json`) ne traduisent que 35 clés et n'ont pas été relus par des locuteurs natifs. L'avancement de chaque langue est
 affiché dans Paramètres → Debug et dans le panneau contributeur de Diagnostics (mode développeur).
 
@@ -69,8 +69,8 @@ Les fichiers de langue sont trouvés automatiquement ; aucun changement d'énum�
 Les langues vivent seulement dans `TenshoAssistant.dll` (ressources embarquées, depuis la 0.248) ; le paquet ne livre aucun fichier de
 langue. Pour essayer une traduction, créez un dossier `Localization/Languages` à côté de la DLL installée et posez-y le fichier JSON : les
 valeurs externes remplacent les valeurs embarquées. Dans Paramètres → Avancé, activez le mode développeur, puis Paramètres → Debug →
-Recharger les traductions pour charger les modifications du dossier `Localization/Languages` du plugin installé. Le même panneau peut
-afficher les clés de traduction. Le rechargement est explicite ; le JSON n'est jamais lu par la recherche normale des traductions pendant
+Recharger les traductions pour charger les modifications du dossier `Localization/Languages` du plugin installé. Le panneau
+contributeur de Diagnostics (mode développeur) peut afficher les clés de traduction. Le rechargement est explicite ; le JSON n'est jamais lu par la recherche normale des traductions pendant
 le rendu.
 
 Les formats d'espaces réservés externes invalides sont ignorés au rechargement : la valeur embarquée est gardée, ou l'anglais est utilisé

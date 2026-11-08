@@ -30,7 +30,7 @@ PvE only ([DEC-032](DECISIONS.md)); game advice in PvE only ([DEC-033](DECISIONS
 ## Extensions asked for by the user
 
 The requests of [USER-REQUESTS](USER-REQUESTS.md) and the [global plan](GLOBAL-PLAN.md) add domains outside the 17 plugins, without
-removing any. In the code today (version 0.865, 2026-11-08), they are these pages of the navigation (`MainWindow.Pages.cs`), besides the
+removing any. In the code today (version 0.971, 2026-11-09), they are these pages of the navigation (`MainWindow.Pages.cs`), besides the
 pages of the 17 plugins:
 
 | Group | Pages added |
@@ -88,14 +88,14 @@ tenues ([DEC-039](DECISIONS.md), [PUBLISHING](PUBLISHING.md)).
 ## Extensions demandées par l'utilisateur
 
 Les demandes de [USER-REQUESTS](USER-REQUESTS.md) et le [plan global](GLOBAL-PLAN.md) ajoutent des domaines hors des 17 plugins, sans en
-retirer aucun. Dans le code aujourd'hui (version 0.865, 2026-11-08), ce sont ces pages de la navigation (`MainWindow.Pages.cs`), en plus
+retirer aucun. Dans le code aujourd'hui (version 0.971, 2026-11-09), ce sont ces pages de la navigation (`MainWindow.Pages.cs`), en plus
 des pages des 17 plugins :
 
 | Groupe | Pages ajoutées |
 |---|---|
 | Objets | Rangements, Lexique |
 | Production | Pêche en mer, Félicité insulaire, Commandes spéciales |
-| Monde | Météo, ALEA, Alarmes, Rappels, Jardinage, Compagnie libre, PNJ vendeurs, Découvertes |
+| Monde | Météo, ALÉA, Alarmes, Rappels, Jardinage, Compagnie libre, PNJ vendeurs, Découvertes |
 | Progression | Événements, La Grande Mascarade, Reliques, Peuples alliés, Grandes compagnies, Livraisons spéciales, Eureka et Bozja, Donjons profonds, Équipement, Chocobo, Mandats, Bestiaire, Dresseur |
 | Préférences et haut de la liste | Aide, Crédits, Mes outils |
 

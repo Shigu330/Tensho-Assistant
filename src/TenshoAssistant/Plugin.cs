@@ -27,6 +27,8 @@ public sealed class Plugin : IDalamudPlugin
     private const string Command = "/tensho";
     private readonly RegistrationScope registrations = new();
     private readonly IPluginLog log;
+    // X-92 (0.972): the game data check after a game update, cancelled when the plugin unloads.
+    private readonly CancellationTokenSource gameDataCancel=new();
     private readonly LocalizationManager localization;
     private readonly MainWindow mainWindow;
     private MapViewWindow? mapWindow;
@@ -912,6 +914,9 @@ public sealed class Plugin : IDalamudPlugin
                 catch(Exception error){log.Warning(error,"Deep dungeon sheets unreadable (game update?).");return null;}
             };
             // W-14 (0.717): Eureka and Bozja, from the game's files, off the frame.
+            // X-92 (0.972): what is new in the game's sheets since the last load (log and self-check).
+            var gameDataCheck=Diagnostics.GameDataWatch.Start(data,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GameDataSnapshot.json"),log,gameDataCancel.Token);
+            mainWindow.GameDataCheck=()=>gameDataCheck;
             mainWindow.FieldCatalogLoad=()=>
             {
                 try{return Fields.FieldCatalogLoader.Read(data,log);}
@@ -1544,6 +1549,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public void Dispose()
     {
+        gameDataCancel.Cancel();
         try { registrations.Dispose(); }
         catch (AggregateException error) { log.Error(error, "Failed to release some Tensho registrations."); }
     }

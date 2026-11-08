@@ -11,7 +11,7 @@ Rules re-read on 2026-11-04: [submission](https://dalamud.dev/plugin-publishing/
 [metadata](https://dalamud.dev/plugin-development/plugin-metadata),
 [technical considerations](https://dalamud.dev/plugin-development/technical-considerations), README of
 [DalamudPluginsD17](https://github.com/goatcorp/DalamudPluginsD17). How they build: [record](../evidence/0.512-d17-build.md).
-List checked against the code at version 0.865 (2026-11-08).
+List checked against the code at version 0.971 (2026-11-09).
 
 The custom repository: `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`, updated by `Verify.ps1 -Release`
 (latest release: `Stable-0.802.0`, 2026-11-07). Version 1.0.0 marks the end of the global plan on this custom repository; the user decides
@@ -42,7 +42,7 @@ agreement (instruction of 2026-11-04).
 | 3 bis | **Dalamud rule**: PvP and competitive content: Tensho stops entirely, with no setting (DEC-038, 0.610) | author | coded, not tried in game |
 | 4 | **Dalamud rule**: Beastmaster. The page is a list of information; the Labyrinth panel is dropped (DEC-038) | author | handled |
 | 5 | **Dalamud rule**: windows. « If it looks like a window, use the window API. » Everything is converted (0.514, 0.516) except the invisible click zones of the Fashion Report; to check in game (#38) | author | to check in game |
-| 6 | **Dalamud rule**: AI disclosure and pull request text written by the author, who must be able to explain the code. Size on 2026-11-08: 587 C# files, 67,740 lines in the plugin | author | not needed since DEC-039; draft in `publish/d17/PULL_REQUEST.md` |
+| 6 | **Dalamud rule**: AI disclosure and pull request text written by the author, who must be able to explain the code. Size on 2026-11-09: 608 C# files, 71,194 lines in the plugin | author | not needed since DEC-039; draft in `publish/d17/PULL_REQUEST.md` |
 | 7 | **Dalamud rule**: AI-generated icon, declared. The policy prefers a hand-made icon | author | open: keep it or replace it |
 | 8 | Screenshots for the installer: `images/image1.png` to `image5.png`, 730×380 at most. Optional, none exist | author (in game) | open |
 | 9 | Move to 1.0.0 (author's decision), Verify, public commit, release `Stable-1.0.0` | agent, on request | at the end |
@@ -64,14 +64,14 @@ agreement (instruction of 2026-11-04).
 | No automation (crafting, dialogues, loot…) | compliant: simulator, solver and suggested move without execution; the crafting recorder only reads the actions the player uses | `Craft/CraftRecorder.Dalamud.cs` |
 | Combat elements informative only, what the player would already know | parser: none (DEC-009). Beastmaster page: game data (DEC-032). Nearby monsters: name, place and level only, nothing about the fight (`Maps/MapLiveReader.Dalamud.cs`) | `MainWindow.Beastmaster.cs`, `MainWindow.NearbyMonsters.cs` |
 | No advantage in competitive content | the whole plugin stops in PvP and ranked content (DEC-038); Triple Triad advice against NPCs only, never in tournaments or against a player (DEC-033) | `Competitive/`, `MainWindow.TriadAdvice.cs` |
-| Account ids: only one's own | compliant: only `player.ContentId` (local character) is used as a key | `*.Dalamud.cs` readers |
-| No personal data sent, HTTPS, host names | compliant. Universalis, Garland Tools, wiki, Teamcraft (one GraphQL query per fishing spot), PaissaDB, GitHub (LuminaSupplemental, GatherBuddy, FFXIVGachaSpreadsheet, gallery and videos of this repository). Exception chosen by the player: Discord webhook off by default, Discord hosts only, character name only as an option, address never logged | [SECURITY](../../SECURITY.md) |
+| Account ids: only one's own | compliant: only `player.ContentId` (local character) is used as a key; the offers read at the market board keep no seller name or id, only whether an offer is one of the player's retainers' | `*.Dalamud.cs` readers, `Market/SeenPriceReader.Dalamud.cs` |
+| No personal data sent, HTTPS, host names | compliant. Universalis, Garland Tools, wiki, Teamcraft (one GraphQL query per fishing spot), PaissaDB, GitHub (LuminaSupplemental, GatherBuddy, FFXIVGachaSpreadsheet, gallery and videos of this repository); the eight data sources each have their switch and « Game data and what you observed only » turns them off at once; the gallery and the videos are read on a click only. Exceptions chosen by the player: Discord webhook off by default, Discord hosts only, character name only as an option, address never logged; shared discoveries exchange through GitHub, sending only after the player connects GitHub, own sightings with the day only, to a secret gist and one issue named by the GitHub login, token encrypted on the PC (DPAPI) | [SECURITY](../../SECURITY.md) |
 | Report a problem | prefilled GitHub form, opened in the browser; nothing is sent by the plugin | `Help/ProblemReport.cs` |
 | No telemetry | compliant: none | — |
 | Lumina rather than XIVAPI | compliant: game sheets; XIVAPI is not called by the plugin | [evidence](../evidence/0.451-xivapi-v2.md) |
 | Icon `images/icon.png` 1:1, 64–512 px | done: 512×512, generated by the agent, declared in the description | `src/TenshoAssistant/images/icon.png`, `publish/d17/…/images/icon.png` |
 | `manifest.toml` in `testing/live/TenshoAssistant/` | ready, **commit hash not filled** (not needed since DEC-039) | `publish/d17/testing/live/TenshoAssistant/manifest.toml` |
-| AI disclosure in the pull request | « Auto » level draft, checked in 0.865; **to be rewritten by the author** if a submission ever happens | `publish/d17/PULL_REQUEST.md` |
+| AI disclosure in the pull request | « Auto » level draft, checked in 0.971; **to be rewritten by the author** if a submission ever happens | `publish/d17/PULL_REQUEST.md` |
 | AI-assisted translations reviewed by speakers | German and Japanese: 35 keys, not reviewed, declared; English and French complete | `src/TenshoAssistant/Localization/Languages/` |
 | Embedded data under a compatible licence, notice kept | done: SubmarineTracker and FFXIVGachaSpreadsheet (MIT, full text in the file), LuminaSupplemental airship and festival tables (GPL-3.0), Character Panel Refined (MIT, in the code), Lotlab FFXIV Gardening Tracker (GPL-3.0), nick75g crossbreeds (MIT); credits in the README and the Credits page | `FreeCompany/Data/`, `Events/Data/`, `Reminders/Data/`, `Character/StatFormulas.cs`, `Credits/CreditCatalog.cs` |
 
@@ -112,7 +112,7 @@ Règles relues le 2026-11-04 : [soumission](https://dalamud.dev/plugin-publishin
 [métadonnées](https://dalamud.dev/plugin-development/plugin-metadata),
 [considérations techniques](https://dalamud.dev/plugin-development/technical-considerations), README de
 [DalamudPluginsD17](https://github.com/goatcorp/DalamudPluginsD17). Compilation chez eux : [relevé](../evidence/0.512-d17-build.md).
-Liste relue contre le code à la version 0.865 (2026-11-08).
+Liste relue contre le code à la version 0.971 (2026-11-09).
 
 Le dépôt personnalisé : `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`, mis à jour par
 `Verify.ps1 -Release` (dernière release : `Stable-0.802.0`, 2026-11-07). La version 1.0.0 marque la fin du plan global sur ce dépôt
@@ -144,7 +144,7 @@ et l'accord de l'auteur (consigne du 2026-11-04).
 | 3 bis | **Règle Dalamud** : JcJ et contenu compétitif : Tensho se coupe en entier, sans réglage (DEC-038, 0.610) | auteur | codé, pas essayé en jeu |
 | 4 | **Règle Dalamud** : dresseur. La page est une liste d'informations ; le panneau du Dédale est abandonné (DEC-038) | auteur | traité |
 | 5 | **Règle Dalamud** : fenêtres. « Si ça ressemble à une fenêtre, utiliser l'API de fenêtres. » Tout est converti (0.514, 0.516) sauf les zones de clic invisibles de la Revue de mode ; à vérifier en jeu (#38) | auteur | à vérifier en jeu |
-| 6 | **Règle Dalamud** : déclaration d'IA et texte de la PR écrits par l'auteur, qui doit pouvoir expliquer le code. Taille au 2026-11-08 : 587 fichiers C#, 67 740 lignes dans le plugin | auteur | plus nécessaire depuis DEC-039 ; brouillon dans `publish/d17/PULL_REQUEST.md` |
+| 6 | **Règle Dalamud** : déclaration d'IA et texte de la PR écrits par l'auteur, qui doit pouvoir expliquer le code. Taille au 2026-11-09 : 608 fichiers C#, 71 194 lignes dans le plugin | auteur | plus nécessaire depuis DEC-039 ; brouillon dans `publish/d17/PULL_REQUEST.md` |
 | 7 | **Règle Dalamud** : icône générée par IA, déclarée. La politique préfère une icône faite main | auteur | ouvert : la garder ou la remplacer |
 | 8 | Captures pour l'installeur : `images/image1.png` à `image5.png`, 730×380 au plus. Facultatif, aucune n'existe | auteur (en jeu) | ouvert |
 | 9 | Passer à 1.0.0 (décision de l'auteur), Verify, commit public, release `Stable-1.0.0` | agent, sur demande | à la fin |
@@ -166,14 +166,14 @@ et l'accord de l'auteur (consigne du 2026-11-04).
 | Pas d'automatisation (artisanat, dialogues, butin…) | conforme : simulateur, solveur et coup conseillé sans exécution ; l'enregistreur d'artisanat ne fait que lire les actions qu'utilise le joueur | `Craft/CraftRecorder.Dalamud.cs` |
 | Éléments de combat seulement informatifs, ce que le joueur saurait déjà | parser : aucun (DEC-009). Page dresseur : données du jeu (DEC-032). Monstres proches : nom, lieu et niveau seulement, rien sur le combat (`Maps/MapLiveReader.Dalamud.cs`) | `MainWindow.Beastmaster.cs`, `MainWindow.NearbyMonsters.cs` |
 | Aucun avantage en contenu compétitif | le plugin entier s'arrête en JcJ et en contenu classé (DEC-038) ; conseil de Triple Triade contre les PNJ seulement, jamais en tournoi ni contre un joueur (DEC-033) | `Competitive/`, `MainWindow.TriadAdvice.cs` |
-| Identifiants de compte : seulement le sien | conforme : seul `player.ContentId` (personnage local) sert de clé | lecteurs `*.Dalamud.cs` |
-| Aucune donnée personnelle envoyée, HTTPS, nom d'hôte | conforme. Universalis, Garland Tools, wiki, Teamcraft (une requête GraphQL par lieu de pêche), PaissaDB, GitHub (LuminaSupplemental, GatherBuddy, FFXIVGachaSpreadsheet, galerie et vidéos de ce dépôt). Exception choisie par le joueur : webhook Discord désactivé par défaut, hôtes de Discord seulement, nom du personnage seulement sur option, adresse jamais journalisée | [SECURITY](../../SECURITY.md) |
+| Identifiants de compte : seulement le sien | conforme : seul `player.ContentId` (personnage local) sert de clé ; les offres lues au tableau des ventes ne gardent ni nom ni identifiant de vendeur, seulement si une offre est celle d'un servant du joueur | lecteurs `*.Dalamud.cs`, `Market/SeenPriceReader.Dalamud.cs` |
+| Aucune donnée personnelle envoyée, HTTPS, nom d'hôte | conforme. Universalis, Garland Tools, wiki, Teamcraft (une requête GraphQL par lieu de pêche), PaissaDB, GitHub (LuminaSupplemental, GatherBuddy, FFXIVGachaSpreadsheet, galerie et vidéos de ce dépôt) ; les huit sources de données ont chacune leur interrupteur et « Données du jeu et observées seulement » les coupe d'un coup ; la galerie et les vidéos ne sont lues que sur un clic. Exceptions choisies par le joueur : webhook Discord désactivé par défaut, hôtes de Discord seulement, nom du personnage seulement sur option, adresse jamais journalisée ; échange des découvertes partagées par GitHub, qui n'envoie qu'après la connexion du joueur à GitHub, ses propres observations avec le jour seulement, vers un gist secret et un ticket au nom de son identifiant GitHub, jeton chiffré sur le PC (DPAPI) | [SECURITY](../../SECURITY.md) |
 | Signaler un problème | formulaire GitHub prérempli, ouvert dans le navigateur ; rien n'est envoyé par le plugin | `Help/ProblemReport.cs` |
 | Pas de télémétrie | conforme : aucune | — |
 | Lumina plutôt que XIVAPI | conforme : feuilles du jeu ; XIVAPI n'est pas appelé par le plugin | [preuve](../evidence/0.451-xivapi-v2.md) |
 | Icône `images/icon.png` 1:1, 64–512 px | fait : 512×512, générée par l'agent, déclarée dans la description | `src/TenshoAssistant/images/icon.png`, `publish/d17/…/images/icon.png` |
 | `manifest.toml` dans `testing/live/TenshoAssistant/` | prêt, **hash du commit non renseigné** (plus nécessaire depuis DEC-039) | `publish/d17/testing/live/TenshoAssistant/manifest.toml` |
-| Déclaration d'IA dans la PR | brouillon niveau « Auto » relu en 0.865 ; **à réécrire par l'auteur** si une soumission a lieu un jour | `publish/d17/PULL_REQUEST.md` |
+| Déclaration d'IA dans la PR | brouillon niveau « Auto » relu en 0.971 ; **à réécrire par l'auteur** si une soumission a lieu un jour | `publish/d17/PULL_REQUEST.md` |
 | Traductions assistées par IA relues par des locuteurs | allemand et japonais : 35 clés, non relues, déclarées ; anglais et français complets | `src/TenshoAssistant/Localization/Languages/` |
 | Données embarquées sous licence compatible, avis conservé | fait : SubmarineTracker et FFXIVGachaSpreadsheet (MIT, texte complet dans le fichier), tables des dirigeables et des fêtes de LuminaSupplemental (GPL-3.0), Character Panel Refined (MIT, dans le code), FFXIV Gardening Tracker de Lotlab (GPL-3.0), croisements de nick75g (MIT) ; crédits dans le README et la page Crédits | `FreeCompany/Data/`, `Events/Data/`, `Reminders/Data/`, `Character/StatFormulas.cs`, `Credits/CreditCatalog.cs` |
 

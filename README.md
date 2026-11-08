@@ -25,8 +25,9 @@ The sidebar groups the pages in foldable categories (the list is `MainWindow.Pag
 | Preferences | **Help**, **Settings**, **Credits**, **Diagnostics** (developer mode only) |
 
 Chat commands: `/tensho` opens the window; `/tensho fish` (also `fishing`, `peche`, `pêche`) opens or closes the fishing help;
-`/tensho todo <task>` adds a free task to Reminders; `/tensho wiki <item>` and `/tensho lodestone <item>` open the item's page in the
-browser; `/tenshonext` is the end-of-page marker of macro chains. Dalamud's « open » and « settings » buttons open the window and its
+`/tensho todo <task>` adds a free task to Reminders; `/tensho item <item>`, `price`, `gather` and `recipe` (also `objet`, `prix`,
+`recolte`, `recette`) open the item in Tensho (item sheet, Market, Gathering, Crafting); `/tensho wiki <item>` and
+`/tensho lodestone <item>` open the item's page in the browser; `/tenshonext` is the end-of-page marker of macro chains. Dalamud's « open » and « settings » buttons open the window and its
 Settings page.
 
 ## Architecture
@@ -58,15 +59,17 @@ What the code does today. In-game validation of each part is tracked in [docs/pr
   (achievements, duties, other items, exchanges, NPC vendors, quests), « Try on » for equipment, « Add to my wishlist », and the
   obtained ✓ / not obtained ✗ mark on collectibles. Grand Company seal sources only show your own company.
 - **In the game**, each an option: a Tensho entry in the inventory right-click menu, a panel under the inventory item tooltip (uses, how
-  to get it, NPC sale price, comparison with the worn piece), market prices on hover (last sale, average, sales per day, region's
+  to get it, NPC sale price, comparison with the worn piece, what it teaches and whether you learned it, the retainer venture that
+  brings it, its expansion when all its sure sources agree), market prices on hover (last sale, average, sales per day, region's
   cheapest, stack value; Ctrl+Alt refreshes), a « Sort » button inside the game's inventory window.
 - **Storage**: Bank (retainers, saddlebags, premium saddlebag, armoury chest, glamour dresser, armoire, free company chest: each known
   once opened in game), Characters (one file per character), Crystals, Currencies (caps, weekly tomestones, cap alerts), « What to do
   with it? » (what a currency buys, its price there, what it sold for on your world, the gil each unit brings), Gil journal (90 days,
   categorized changes), Report (stacks to merge, armoury pieces used by no gear set, armoire candidates, look-alike glamour items),
   Imports.
-- **Retainer sales**: beside a retainer's sale list, your items and prices as the game shows them; on a click, a comparison with other sellers through Universalis and a price to copy. Nothing is changed in the game.
-- **Inventory sorting**: profiles, templates, rules and protected zones with a preview; the sort is applied only on click.
+- **Retainer sales**: beside a retainer's sale list, your items and prices as the game shows them; on a click, a comparison with other sellers through Universalis and a price to copy; the offers you saw at the board on your world are used without a click when newer. Nothing is changed in the game.
+- **Inventory sorting**: profiles, templates, rules and protected zones with a preview (up to 256 categories a zone, a whole group of
+  the game's categories added in one click); the sort is applied only on click.
 - **Market** (Universalis): Summary, Listings (world / data centre / region, quality, quantity and world filters, cheapest set of whole
   listings for N units, tax included) and Sale history; cached on disk, the last known board is shown, dated, when Universalis fails.
   Optional undercut: the lowest offer minus 1 copied to the clipboard (off by default). The prices you see at the game's market board
@@ -101,10 +104,12 @@ What the code does today. In-game validation of each part is tracked in [docs/pr
   (job) » on each spot, the game's gathering log opened on an item.
 - Fishing: bait, mooch, windows and weather from GatherBuddy (Garland Tools as fallback), bite times from Teamcraft reports, next real
   windows of a fish with one-off alarms; fishing alarms carry the weather conditions and a map link.
-- **Ocean fishing** page: next departures and voyages with their stops, alarm before a departure.
+- **Ocean fishing** page: next departures and voyages with their stops, alarm before a departure; the community timetable is checked
+  against the voyages you board (« checked in game » or « not checked yet » per port).
 - In-game help panels: beside the gathering window, the Collectable window and the spearfishing window; while fishing (fish of the
-  nearest spot, bait in hand; `/tensho fish` opens it by hand); during an ocean voyage (stop, spectral current, fish with bait and bite,
-  missions). Optional GP tick bar and GP threshold alert.
+  nearest spot, bait in hand; `/tensho fish` opens it by hand); during an ocean voyage (stop, spectral current, fish with bait, bite and
+  bite time, missions with the fish that count for them, points per fish seen, Fisher's Intuition marks, catches seen just before a
+  spectral current). Optional GP tick bar and GP threshold alert.
 
 ### Island sanctuary and deliveries
 
@@ -126,28 +131,38 @@ What the code does today. In-game validation of each part is tracked in [docs/pr
   NPC vendors, Triple Triad NPCs, nearby hunt marks coloured by rank, the deciphered treasure map spot, flag (place and remove from every
   menu), teleport with the real gil cost, bookmarks (stars, note, group, `TENSHO-MAP1` sharing code, pasted « Place ( x , y ) » lines),
   local lists by tab (quests, FATEs, gathering, aetherytes, vendors, Triple Triad, sightseeing log, currents), each icon's own
-  right-click menu.
+  right-click menu. Also: gathering points by job (Miner, Botanist, Fisher), quests not available yet (a box), nearby monsters for your
+  lists, hunting log, FATEs, Blue Mage, missing collectibles and Beastmaster, your leve's targets, Island Sanctuary animals.
 - **Maps** page: map links seen in the chat (flag, nearest aetheryte), hunt train recorder (A/S marks met, next flag, copied list and
-  conductor call with `<flag>`, optional A/S mark alert), place directory (residential addresses), open plots of your world from PaissaDB
+  conductor call with `<flag>`, optional A/S mark alert), S rank spawn conditions (community knowledge, with where their FATE was seen
+  in game), place directory (residential addresses), open plots of your world from PaissaDB
   (on click, optional watch, off by default).
 - **Map options** (Settings › Map), each with a tooltip and ↺: menus and tools drawn over the map (off by default) with the zone name
   always shown; markers on the map edge for off-view targets, each kind switchable; position marker and view cone; area colours; hide in
   combat or duty; icon sizes and priorities.
-- **Weather**: forecasts by zone.
+- **Weather**: forecasts by zone; a zone whose weather the game forces until its story is done is forecast only once the game's
+  weather was seen to match.
 - **FATEs**: every FATE the game's files place in the open zones, running or not, with its level and place; starts on your zone,
   search across all zones; click shows it on the map, right click places the flag or picks the nearest aetheryte. The relic page's
   FATEs open here.
-- **Discoveries**: a base kept on your disk only (folder « Discoveries »); the note-taking and its main kinds are settings, on by
-  default. Noted while you play: where monsters live, hunt marks' spawn places, FATEs seen, where the items you get come from (desynthesis, ventures, duty chests, FATE rewards, your own
-  target's drops, opened items), fish caught (bait, place, weather, Eorzea hour), voyage loot and sectors unlocked, Fashion Report
-  judgements, festivals and vistas, blue magic spells learned and beasts tamed, and the market prices seen at the board on each world
-  you visit. Each entry says whether you saw it or imported it; export a dated copy, import files from others. No other player is
-  ever noted, nothing is sent. The places seen show in the Hunting log and Monster loot, the item sources in the item hover panel.
+- **Discoveries**: a base kept on your disk (folder « Discoveries »; the shared ones apart in `Discoveries/Shared`, one compressed file
+  per kind); the note-taking and its main kinds are settings, on by default. Noted while you play: where monsters live, hunt marks'
+  spawn places, FATEs seen, where the items you get come from (desynthesis, aetherial reduction, ventures, duty chests, FATE rewards,
+  your own target's drops, opened items), items asked at quest hand-ins, fish caught (bait or mooch, lure, place, weather, Eorzea hour,
+  bite strength and time, Fisher's Intuition), spearfishing shadows, ocean fishing points and catches just before a spectral current,
+  voyage loot, sectors visited and unlocked, Fashion Report judgements, festivals and vistas, blue magic spells learned or seen cast and
+  beasts tamed, shopkeepers' places, counts of monsters defeated and duty chests opened, and the market prices seen at the board on
+  each world you visit. Each entry says whether you saw it or imported it; export a dated copy, import files from others, empty the
+  base (a zip copy is taken first in the Backups folder). No other player is ever noted. Nothing leaves your PC unless you connect
+  GitHub (a code to approve on github.com, after a warning that sharing is public): « Exchange now », or the « Automatic exchange »
+  setting (off by default), takes the common discoveries of the repository and sends only what you saw yourself to a secret gist in
+  your name, with one issue per player; the maintainer checks and merges them. The places seen show in the Hunting log, Monster loot
+  and other pages, the item sources in the item hover panel.
 - **Alarms**: Tensho alarms (once at a date, every Eorzea day at an ET time, or at a real local date; weather conditions for fish), chat
   line with links and the game's alarm sound, optional copy into the game's alarm list through `/alarm` (off by default), automatic
   alarms for ventures and vessels, clocks of other time zones, an optional pinned tracking window. Alarm clock in the game's server info
   bar (Settings › General). Optional Discord webhook (off by default): ringing alarms are posted in a channel of your server, with a
-  message per category or per alarm group, an optional role mention and a test button.
+  message per category or per alarm group, an optional role mention and a test button; currency cap and « duty ready » alerts too.
 - **Reminders**: the game calendar timers (supply missions, custom deliveries, Fashion Report, allied society quests, leve allowances,
   treasure maps, retainer ventures, company voyages, Grand Company squadron) with resets and alarm buttons; Wondrous Tails (tasks, line
   odds), hunt bills (targets and kills), daily roulettes and role bonus, challenge log, Doman Enclave; « done » boxes per character, all
@@ -173,8 +188,8 @@ What the code does today. In-game validation of each part is tracked in [docs/pr
 
 - **Quests**: the game journal's quest kinds and genres with completion percentages; quests of the other starting cities and options
   not taken are hidden and left out of percentages (a box shows them); followed quests, rewards, item sources; quest menu with flag,
-  Tensho map and zone weather.
-- **Events**: running festivals, their quests and event shops.
+  Tensho map and zone weather; a quest's tooltip gives its expansion.
+- **Events**: running festivals, their quests and event shops; a link opens partake.gg (player events) in your browser.
 - **Collections**: mounts, minions, emotes, orchestrion (music playing now, favourites), titles (wear, random, per job), achievements
   (progress, tracked ones), Blue magic (teaching monsters sorted by level), hairstyles, fashion accessories, glasses, bardings,
   portraits, master books, outfits, wishlist and more, with the obtained state, a source filter and how to obtain each entry (vendors,
@@ -224,8 +239,10 @@ What the code does today. In-game validation of each part is tracked in [docs/pr
 
 - **Help**: a « ? » on every page, a first-visit note, a search across all the help, a first-steps guide you can leave at any step, community videos and guides read on a click, and a form that opens the project's GitHub ticket filled in, in your browser.
 - Settings tabs: General (opening, header clock, alarm bar), Interface (language, theme, fonts, item hover and menu options), Modules,
-  Map, Data (in-game panels, automatic storage save, cache durations including « Never (on request only) »), Advanced (« Restore all
-  defaults », developer mode, community sources on / off, hover prices, game command delay), Debug (developer mode). Each setting has a
+  Map, Data (in-game panels, automatic storage save, cache durations including « Never (on request only) », « Empty the cache… » with a
+  zip copy first in the Backups folder), Advanced (« Restore all defaults », developer mode, each community source on / off, PaissaDB
+  included, and « Game data and what you observed only » that turns them all off at once, hover prices, game command delay), Debug
+  (developer mode). Each setting has a
   tooltip and a ↺ restore-default button. Game data is shown in the game client's language, Tensho's own texts in the plugin language.
 - **Folklore** tomes, read or not, are a tab of Collections.
 - **Credits**: everything Tensho uses (game, libraries, embedded and online data) with its licence and the setting tied to it.
@@ -249,6 +266,7 @@ What the code does today. In-game validation of each part is tracked in [docs/pr
 ├── publish/github/           copies of the files that live in .github/
 ├── community-help/           help videos and guides listed in the plugin
 ├── community-templates/      community tool gallery (data only)
+├── community-discoveries/    shared discoveries: the common file and each player's merged file (tools/discoveries-merge.py)
 ├── docs/                     documentation map: docs/README.md
 │   ├── project/              scope, roadmap, architecture, testing, references, decisions, publishing
 │   └── evidence/             probe outputs cited by the code
@@ -330,7 +348,7 @@ Framework and tools:
 
 - Final Fantasy XIV and its game data (sheets read through Dalamud / Lumina), Dalamud and FFXIVClientStructs
 - Dalamud.NET SDK, .NET SDK and runtime, PowerShell scripts for verification and release
-- [Raphael.Net](https://github.com/WorkingRobot/Raphael.Net) by Asriel (MIT, NuGet, native library): the crafting solver
+- [Raphael.Net](https://github.com/WorkingRobot/Raphael.Net) by Asriel (MIT, NuGet, native library) and raphael-rs by KonaeAkira (Apache-2.0): the crafting solver
 
 Community data used by the plugin (licence compatible with GPL-3.0, or service API):
 
@@ -348,6 +366,8 @@ Community data used by the plugin (licence compatible with GPL-3.0, or service A
   monster sources), the [FFXIV Console Games Wiki](https://ffxiv.consolegameswiki.com/) (monster drops, sightseeing log, acquisition;
   island animals and workshop rules),
   [PaissaDB](https://github.com/zhudotexe/FFXIV_PaissaDB) by zhudotexe (open housing plots, read on click or by the optional watch)
+- this repository on GitHub (CC0-1.0): the shared discoveries (on « Exchange now » or the optional automatic exchange) and the community tools gallery (read
+  on click); [Partake](https://www.partake.gg/) (player events, opened in your browser); Discord (the optional alarm webhook)
 
 Read to understand, never copied (facts only, original code):
 
@@ -403,7 +423,8 @@ La barre latérale range les pages en catégories repliables (la liste est `Main
 | Préférences | **Aide**, **Paramètres**, **Crédits**, **Diagnostics** (mode développeur seulement) |
 
 Commandes : `/tensho` ouvre la fenêtre ; `/tensho peche` (ou `pêche`, `fish`, `fishing`) ouvre ou ferme l'aide à la pêche ;
-`/tensho todo <tâche>` ajoute une tâche libre aux Rappels ; `/tensho wiki <objet>` et `/tensho lodestone <objet>` ouvrent la page de
+`/tensho todo <tâche>` ajoute une tâche libre aux Rappels ; `/tensho objet <objet>`, `prix`, `recolte` et `recette` (ou `item`,
+`price`, `gather`, `recipe`) ouvrent l'objet dans Tensho (fiche objet, Marché, Récolte, Artisanat) ; `/tensho wiki <objet>` et `/tensho lodestone <objet>` ouvrent la page de
 l'objet dans le navigateur ; `/tenshonext` est le marqueur de fin de page de l'enchaînement de macros. Les boutons « ouvrir » et
 « réglages » de Dalamud ouvrent la fenêtre et sa page Paramètres.
 
@@ -433,7 +454,8 @@ Ce que fait le code aujourd'hui. La validation en jeu de chaque partie est suivi
   souhaits », marque obtenu ✓ / non obtenu ✗ sur les objets de collection. Les sources en sceaux ne gardent que la Grande Compagnie du
   personnage.
 - **Dans le jeu**, chacun sur option : entrée Tensho dans le menu du clic droit de l'inventaire, panneau sous l'infobulle des objets
-  (usages, comment l'obtenir, prix de revente au PNJ, comparaison avec la pièce portée), prix au survol (dernière vente, moyenne, ventes
+  (usages, comment l'obtenir, prix de revente au PNJ, comparaison avec la pièce portée, ce qu'il apprend et si vous l'avez déjà
+  appris, la tâche de servant qui le rapporte, son extension quand toutes ses sources sûres concordent), prix au survol (dernière vente, moyenne, ventes
   par jour, moins cher de la région, valeur de la pile ; Ctrl+Alt actualise), bouton « Trier » dans la fenêtre d'inventaire du jeu.
 - **Rangements** : Banque (servants, sacoches, sacoche premium, arsenal, coffre à apparence, armoire, coffre de compagnie : chacun connu
   après son ouverture en jeu), Personnages (un fichier par personnage), Cristaux, Monnaies (plafonds, mémoquartz de la semaine, alertes),
@@ -441,8 +463,10 @@ Ce que fait le code aujourd'hui. La validation en jeu de chaque partie est suivi
   rapporte chaque unité), Gils (journal de 90 jours, changements classés), Rapport (piles à regrouper, pièces d'arsenal sans ensemble,
   objets à ranger dans l'armoire, apparences identiques), Imports.
 - **Ventes des servants** : à côté de la liste de vente d'un servant, vos objets et vos prix tels que le jeu les montre ; sur clic, une
-  comparaison avec les autres vendeurs par Universalis et un prix à copier. Rien n'est changé dans le jeu.
-- **Tri de l'inventaire** : profils, modèles, règles et zones protégées avec aperçu ; le tri n'est appliqué que sur clic.
+  comparaison avec les autres vendeurs par Universalis et un prix à copier ; les offres vues au tableau des ventes sur votre monde
+  servent sans clic quand elles sont plus récentes. Rien n'est changé dans le jeu.
+- **Tri de l'inventaire** : profils, modèles, règles et zones protégées avec aperçu (jusqu'à 256 catégories par zone, un groupe entier
+  de catégories du jeu ajouté en un clic) ; le tri n'est appliqué que sur clic.
 - **Marché** (Universalis) : Résumé, Annonces (monde / centre de données / région, filtres, lot le moins cher pour N unités, taxe
   comprise) et Historique des ventes ; cache disque, dernier état connu affiché et daté quand Universalis ne répond pas. Sous-cotation
   facultative : l'offre la plus basse moins 1 copiée dans le presse-papiers (désactivée par défaut). Les prix que vous voyez au tableau
@@ -479,10 +503,12 @@ Ce que fait le code aujourd'hui. La validation en jeu de chaque partie est suivi
   proche, téléportation sur confirmation) et « Équiper (métier) » sur chaque lieu, carnet de récolte du jeu ouvert sur un objet.
 - Pêche : appâts, pêche au vif, créneaux et météo de GatherBuddy (Garland Tools en secours), temps de touche des relevés Teamcraft,
   prochaines vraies fenêtres d'un poisson avec alarmes uniques ; les alarmes de pêche portent les conditions météo et un lien de carte.
-- Page **Pêche en mer** : prochains départs et trajets avec leurs escales, alarme avant un départ.
+- Page **Pêche en mer** : prochains départs et trajets avec leurs escales, alarme avant un départ ; l'horaire communautaire est
+  vérifié avec les voyages où vous embarquez (« vérifié en jeu » ou « pas encore vérifié » pour chaque port).
 - Panneaux d'aide en jeu : à côté de la fenêtre de récolte, de la fenêtre Collectionnable et de la fenêtre de harpon ; pendant la pêche
   (poissons du lieu, appât en main ; `/tensho peche` pour l'ouvrir à la main) ; pendant la pêche en mer (escale, courant spectral,
-  poissons avec appât et touche, missions). Barre du tic de PR et alerte au seuil de PR en option.
+  poissons avec appât, touche et temps de touche, missions avec les poissons qui y comptent, points vus par poisson, marques de
+  l'Intuition du pêcheur, prises vues juste avant un courant spectral). Barre du tic de PR et alerte au seuil de PR en option.
 
 ### Félicité insulaire et livraisons
 
@@ -505,31 +531,42 @@ Ce que fait le code aujourd'hui. La validation en jeu de chaque partie est suivi
   fois obtenus), PNJ vendeurs, PNJ de Triple Triade, marques de chasse proches colorées par rang, emplacement de la carte au trésor
   déchiffrée, drapeau (poser et retirer depuis tous les menus), téléportation au coût réel, favoris (étoiles, note, groupe, code de
   partage `TENSHO-MAP1`, lignes « Lieu ( x , y ) » collées), listes locales par onglet (dont le carnet d'exploration), menu propre à
-  chaque icône au clic droit.
+  chaque icône au clic droit. Aussi : points de récolte par métier (Mineur, Botaniste, Pêcheur), quêtes pas encore disponibles (une
+  case), monstres proches pour vos listes, le bestiaire, les ALÉA, le mage bleu, les objets de collection manquants et le dresseur, les
+  cibles de votre mandat, les animaux de la Félicité insulaire.
 - Page **Carte** : liens de carte vus dans le chat (drapeau, éthérite la plus proche), train de chasse (marques A/S rencontrées, drapeau
-  suivant, liste et annonce du conducteur copiées avec `<flag>`, alerte des marques A/S en option), annuaire des lieux (adresses
+  suivant, liste et annonce du conducteur copiées avec `<flag>`, alerte des marques A/S en option), conditions d'apparition des rangs S
+  (savoir de la communauté, avec l'endroit où leur ALÉA a été vue en jeu), annuaire des lieux (adresses
   résidentielles), terrains en vente de votre monde par PaissaDB (sur clic, surveillance en option, désactivée par défaut).
 - **Options de la carte** (Paramètres › Carte, chacune avec infobulle et ↺) : menus et outils par-dessus la carte (désactivé par
   défaut) avec le nom de la zone toujours affiché ; repères au bord de la carte pour les cibles hors de la vue, chaque type réglable ;
   position et cône de vision ; couleurs des zones ; masquage en combat ou en mission ; tailles et priorités des icônes.
-- **Météo** : prévisions par zone.
+- **Météo** : prévisions par zone ; une zone dont le jeu impose la météo jusqu'à la fin de son histoire n'est prévue qu'une fois la
+  météo du jeu vue identique.
 - **ALEA** : tous les ALEA que les fichiers du jeu placent dans les zones ouvertes, en cours ou non, avec leur niveau et leur lieu ;
   commence sur votre zone, recherche dans toutes les zones ; clic : voir sur la carte, clic droit : drapeau ou éthérite la plus proche.
   Les ALEA de la page des reliques s'ouvrent ici.
-- **Découvertes** : une base gardée sur votre disque seulement (dossier « Discoveries ») ; la prise de notes et ses principaux types
-  sont des réglages, activés par défaut. Noté en jouant : où vivent les monstres, où apparaissent les monstres de chasse, les ALÉA vues,
-  d'où viennent les objets obtenus (désynthèse, tâches de servants, coffres de mission, récompenses d'ALÉA, ce que lâche votre propre
-  cible, objets ouverts), les poissons pris (appât, lieu, météo, heure d'Éorzéa), le butin des voyages et les secteurs débloqués, les
-  jugements de la Revue de mode, les fêtes et les panoramas, les sorts de mage bleu appris et les bêtes apprivoisées, et les prix vus
-  au tableau des ventes sur chaque monde visité. Chaque entrée dit si vous l'avez vue ou importée ; export d'une copie datée, import
-  des fichiers d'autres joueurs. Aucun autre joueur n'est jamais noté, rien n'est envoyé. Les lieux vus s'affichent dans le Bestiaire
-  et le Butin des monstres, les sources d'objets dans le panneau de survol des objets.
+- **Découvertes** : une base gardée sur votre disque (dossier « Discoveries » ; les découvertes partagées à part dans
+  `Discoveries/Shared`, un fichier compressé par type) ; la prise de notes et ses principaux types sont des réglages, activés par
+  défaut. Noté en jouant : où vivent les monstres, où apparaissent les monstres de chasse, les ALÉA vues, d'où viennent les objets
+  obtenus (désynthèse, réduction éthérée, tâches de servants, coffres de mission, récompenses d'ALÉA, ce que lâche votre propre cible,
+  objets ouverts), les objets demandés lors des remises de quête, les poissons pris (appât ou pêche au vif, leurre, lieu, météo, heure
+  d'Éorzéa, force et temps de touche, Intuition du pêcheur), les ombres de la pêche au harpon, les points de la pêche en mer et les
+  prises juste avant un courant spectral, le butin des voyages, les secteurs visités et débloqués, les jugements de la Revue de mode,
+  les fêtes et les panoramas, les sorts de mage bleu appris ou vus lancés et les bêtes apprivoisées, le lieu des marchands, le nombre
+  de monstres vaincus et de coffres de mission ouverts, et les prix vus au tableau des ventes sur chaque monde visité. Chaque entrée dit
+  si vous l'avez vue ou importée ; export d'une copie datée, import des fichiers d'autres joueurs, vidage de la base (une copie zip est
+  faite avant dans le dossier Backups). Aucun autre joueur n'est jamais noté. Rien ne quitte votre PC sauf si vous connectez GitHub (un
+  code à approuver sur github.com, après un avertissement : le partage est public) : « Échanger maintenant », ou le réglage « Échange
+  automatique » (désactivé par défaut), récupère les découvertes communes du dépôt et envoie seulement ce que vous avez vu vous-même
+  dans un gist secret à votre nom, avec un ticket par joueur ; le mainteneur les vérifie et les fusionne. Les lieux vus s'affichent dans
+  le Bestiaire, le Butin des monstres et d'autres pages, les sources d'objets dans le panneau de survol des objets.
 - **Alarmes** : alarmes Tensho (une fois à une date, chaque jour d'Éorzéa à une heure ET, ou à une date locale réelle ; conditions météo
   pour les poissons), ligne dans le chat avec liens et son des alarmes du jeu, copie facultative dans la liste d'alarmes du jeu par
   `/alarm` (désactivée par défaut), alarmes automatiques des tâches de servant et des vaisseaux, horloges d'autres fuseaux, fenêtre de
   suivi épinglée en option. Icône d'alarme dans la barre d'informations du serveur (Paramètres › Général). Webhook Discord en option
   (désactivé par défaut) : les alarmes qui sonnent sont envoyées dans un salon de votre serveur, avec un message par catégorie ou par
-  groupe d'alarmes, la mention d'un rôle au choix et un bouton de test.
+  groupe d'alarmes, la mention d'un rôle au choix et un bouton de test ; les alertes de plafond des monnaies et « mission prête » aussi.
 - **Rappels** : minuteurs du calendrier du jeu (missions de ravitaillement, commandes spéciales, Revue de mode, quêtes des peuples
   alliés, autorisations de mandats, cartes au trésor, tâches de servant, expéditions de la compagnie, escouade de Grande Compagnie) avec
   remises à zéro et alarmes ; Livre d'or (tâches, chances de lignes), contrats de chasse (cibles et victimes), missions aléatoires du
@@ -556,8 +593,9 @@ Ce que fait le code aujourd'hui. La validation en jeu de chaque partie est suivi
 ### Quêtes, collections et progression
 
 - **Quêtes** : types et genres du journal du jeu avec pourcentages ; quêtes des autres cités de départ et options non prises masquées
-  et hors pourcentages (une case les réaffiche) ; quêtes suivies, récompenses, sources d'objets ; menu de quête (drapeau, carte, météo).
-- **Événements** : fêtes en cours, leurs quêtes et leurs boutiques.
+  et hors pourcentages (une case les réaffiche) ; quêtes suivies, récompenses, sources d'objets ; menu de quête (drapeau, carte, météo) ; l'infobulle d'une quête donne son extension.
+- **Événements** : fêtes en cours, leurs quêtes et leurs boutiques ; un lien ouvre partake.gg (événements de joueurs) dans votre
+  navigateur.
 - **Collections** : montures, mascottes, emotes, orchestrion (musique en cours, favoris), titres (porter, au hasard, par job), hauts
   faits (progression, succès suivis), grimoire Mage bleu (monstres triés par niveau), coiffures, accessoires de mode, lunettes, bardes,
   portraits, livres de maître, tenues, liste de souhaits et d'autres, avec l'état obtenu, un filtre par source et comment obtenir chaque
@@ -614,8 +652,9 @@ Ce que fait le code aujourd'hui. La validation en jeu de chaque partie est suivi
   projet, rempli, dans votre navigateur.
 - Onglets des paramètres : Général (ouverture, horloge de l'en-tête, barre d'alarme), Interface (langue, thème, polices, survol et menu
   des objets), Modules, Carte, Données (panneaux en jeu, enregistrement des rangements, durées de cache dont « Jamais (seulement sur
-  demande) »), Avancé (« Tout remettre par défaut », mode développeur, sources communautaires, prix au survol, délai des commandes du
-  jeu), Debug (mode développeur). Chaque réglage a une infobulle et un bouton ↺. Les données du jeu sont affichées dans la langue du
+  demande) », « Vider le cache… » avec une copie zip faite avant dans le dossier Backups), Avancé (« Tout remettre par défaut », mode
+  développeur, chaque source communautaire activée ou non, PaissaDB comprise, et « Données du jeu et observées seulement » qui les coupe
+  toutes d'un coup, prix au survol, délai des commandes du jeu), Debug (mode développeur). Chaque réglage a une infobulle et un bouton ↺. Les données du jeu sont affichées dans la langue du
   client, les textes de Tensho dans la langue du plugin.
 - Les tomes de **folklore**, lus ou non, sont un onglet des Collections.
 - **Crédits** : tout ce qu'utilise Tensho (jeu, bibliothèques, données embarquées et en ligne) avec sa licence et le réglage lié.
@@ -699,9 +738,12 @@ servent que lorsque le jeu ne les a pas, et sont toujours citées.
   (Infi, MIT : Revue de mode téléchargée, butin moyen des sous-marins embarqué) ; SubmarineTracker (Infi, MIT : seuils des secteurs
   embarqués, avis dans `src/TenshoAssistant/FreeCompany/Data/submarine-breakpoints.csv`, à l'origine la feuille communautaire
   « Submersible Loot Spreadsheet » d'Elena / saerielle ; formules de voyage comprises en lisant son code ; usure d'après la feuille
-  « Submersibles durability damage ») ; Raphael.Net (Asriel, MIT : solveur d'artisanat) ; FFXIV Gardening Tracker (Lotlab, GPL-3.0 : durées du jardinage, embarquées) et FFXIV Crossbreed Helper (nick75g, MIT : croisements, embarqués) ; table des modificateurs de niveau de Character Panel Refined (Kouzukii, MIT, avis complet dans `Character/StatFormulas.cs`) ;
+  « Submersibles durability damage ») ; Raphael.Net (Asriel, MIT) et raphael-rs (KonaeAkira, Apache-2.0) : solveur d'artisanat ; FFXIV Gardening Tracker (Lotlab, GPL-3.0 : durées du jardinage, embarquées) et FFXIV Crossbreed Helper (nick75g, MIT : croisements, embarqués) ; table des modificateurs de niveau de Character Panel Refined (Kouzukii, MIT, avis complet dans `Character/StatFormulas.cs`) ;
   [Universalis](https://universalis.app/), [Garland Tools](https://www.garlandtools.org/), le [wiki FFXIV](https://ffxiv.consolegameswiki.com/),
-  [PaissaDB](https://github.com/zhudotexe/FFXIV_PaissaDB) de zhudotexe (terrains en vente, lus sur clic ou par la surveillance facultative).
+  [PaissaDB](https://github.com/zhudotexe/FFXIV_PaissaDB) de zhudotexe (terrains en vente, lus sur clic ou par la surveillance facultative) ;
+  ce dépôt sur GitHub (CC0-1.0 : découvertes partagées, sur « Échanger maintenant » ou par l'échange automatique facultatif, et galerie
+  des outils de la communauté, lue sur clic) ; [Partake](https://www.partake.gg/) (événements de joueurs, ouvert dans votre
+  navigateur) ; Discord (webhook facultatif des alarmes).
 - Lus pour comprendre, jamais copiés : Mappy et SortaKinda (AGPL-3.0-or-later) et les autres références de `docs/project/ROADMAP.md` ;
   Craftimizer (écriture des macros) ; HimbeertoniRaidTool (MIT), Glamourer (Apache-2.0), xivgear.app (sans licence) pour l'équipement ;
   Argus (licence non confirmée) pour les montages. Règle reprise comme fait, avec du code original : frozen_rabbit_tome (sans licence) pour la

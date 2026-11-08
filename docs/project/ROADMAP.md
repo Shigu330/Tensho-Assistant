@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-State on 2026-11-08 (version 0.865): the work plan now lives in the [global plan](GLOBAL-PLAN.md), and the history of each version in
+State on 2026-11-09 (version 0.971): the work plan now lives in the [global plan](GLOBAL-PLAN.md), and the history of each version in
 [CHANGELOG.md](../../CHANGELOG.md). This file keeps the authoritative list of the 17 reference plugins and what Tensho covers of each, the
 user requests R-01 to R-14, the pages added outside the 17 plugins, the open questions and the decisions taken along the way. The
 17 rows stay PARTIAL: no complete in-game validation. Release: the custom repository, see [PUBLISHING](PUBLISHING.md) (no submission to
@@ -69,11 +69,12 @@ game. The plans R-06 and R-11 are agent files (`docs/goals/`), outside the repos
 
 ## Pages outside the 17 plugins
 
-The navigation of the code today (`MainWindow.Pages.cs`, version 0.865) has these pages besides those of the 17 plugins: Storage, Lexicon;
+The navigation of the code today (`MainWindow.Pages.cs`, version 0.971) has these pages besides those of the 17 plugins: Storage, Lexicon;
 Ocean fishing, Island sanctuary, Custom deliveries; Weather, FATEs, Alarms, Reminders, Garden, Free company, NPC vendors, Discoveries;
 Events, Masked Carnivale, Relics, Allied societies, Grand Companies, Special deliveries, Eureka and Bozja, Deep dungeons, Gear, Chocobo,
 Guildleves, Hunting log, Beastmaster; Help, Credits, My tools. The Character page was removed in 0.341 (the Gear page shows the same real
-values; the panel beside the game's Character window stays).
+values; the panel beside the game's Character window stays). Since 0.882 the Discoveries page also exchanges the players'
+in-game readings through GitHub, on the player's click or the opt-in daily exchange (no data taken from websites).
 
 ## To decide / to review
 
@@ -158,7 +159,7 @@ Combat/ACT/IINACT: removed from the project (user decision 2026-10-31).
 
 # Feuille de route des 17 plugins
 
-État au 2026-11-08 (version 0.865) : le plan de travail vit maintenant dans le [plan global](GLOBAL-PLAN.md), et l'historique de chaque
+État au 2026-11-09 (version 0.971) : le plan de travail vit maintenant dans le [plan global](GLOBAL-PLAN.md), et l'historique de chaque
 version dans [CHANGELOG.md](../../CHANGELOG.md). Ce fichier garde la liste qui fait foi des 17 plugins de référence et ce que Tensho
 couvre de chacun, les demandes de l'utilisateur R-01 à R-14, les pages ajoutées hors des 17 plugins, les questions ouvertes et les
 décisions prises en route. Les 17 lignes restent PARTIAL : aucune validation en jeu complète. Diffusion : le dépôt personnalisé, voir
@@ -191,7 +192,7 @@ du dépôt.
 | 9 | USE-001 | Item Use | PunishedPineapple | Usages courants d'un objet | ACTIVE | PARTIAL | Onglet, survol sur option et menu Inventory (0.207, validé) ; recettes/mandats/GC/aquarium/orchestrion et sources de quêtes ; onglet Usages de la fiche objet (0.272) ; menu Tensho de l'inventaire du jeu et panneau sous son infobulle alignés sur Tensho (0.256–0.257, à valider) ; autres usages/disponibilité/liens à compléter | — | C |
 | 10 | GP-001 | LazyGatherer | Hiroa | Optimisation des PR de récolte | ACTIVE | PARTIAL | Optimiseur manuel avec familles déjà payées et bonus limité ; observation/copie des ressources (testés à l'époque) ; bonus de Récolte abondante II prérempli par une règle de la communauté citée, affiché « estimé » et modifiable (0.224, à valider) ; décodeur natif/régénération/procs/objets de collection et rendu en jeu à compléter | [base d'Abondance](../evidence/0.224-bountiful-base.md) | D |
 | 11 | MACRO-001 | Macro Chain | Caraxi | Exécution de macros successives | ACTIVE | PARTIAL | Plan persistant, protocole de marqueur de fin, arrêt/identité et tests managés ; plan rempli après copie des macros dans le jeu, et enchaînement, validés en jeu (0.196, « macro chain fonctionne ») | — | D |
-| 12 | MAP-001 | Mappy | MidoriKami, harbingerftw | Carte en jeu polyvalente | ACTIVE | PARTIAL | Carte Tensho remplaçant la carte du jeu (M, quête du journal, téléporteurs) : icônes du jeu à taille/priorité par carte, quêtes et mandats, ALEA, groupe, récolte/pêche à horaires, courants, exploration (météo du wiki), marchands, drapeau, téléportation au coût réel, listes par onglet. Validé en jeu : 0.100–0.156 (dont carte hôte hors écran, zones colorées, zoom, commises de Rowena), variantes de carte (0.171–0.175), icônes de quêtes (0.211), réglages et cône de vision (0.287–0.289), repères au bord de la carte et « Retirer le drapeau » (0.297–0.299), menus et outils par-dessus la carte (0.303–0.306). À valider : R-01 (0.242–0.243), R-03 (0.244), R-04 (0.245), fond du zoom (0.308). Inconnus : type de marqueur des mandats, sens des variantes d'icônes de quête | [icônes d'événements](../evidence/0.211-event-icons.md) | C |
+| 12 | MAP-001 | Mappy | MidoriKami, harbingerftw | Carte en jeu polyvalente | ACTIVE | PARTIAL | Carte Tensho remplaçant la carte du jeu (M, quête du journal, téléporteurs) : icônes du jeu à taille/priorité par carte, quêtes et mandats, ALÉA, groupe, récolte/pêche à horaires, courants, exploration (météo du wiki), marchands, drapeau, téléportation au coût réel, listes par onglet. Validé en jeu : 0.100–0.156 (dont carte hôte hors écran, zones colorées, zoom, commises de Rowena), variantes de carte (0.171–0.175), icônes de quêtes (0.211), réglages et cône de vision (0.287–0.289), repères au bord de la carte et « Retirer le drapeau » (0.297–0.299), menus et outils par-dessus la carte (0.303–0.306). À valider : R-01 (0.242–0.243), R-03 (0.244), R-04 (0.245), fond du zoom (0.308). Inconnus : type de marqueur des mandats, sens des variantes d'icônes de quête | [icônes d'événements](../evidence/0.211-event-icons.md) | C |
 | 13 | LOOT-001 | Monster Loot Hunter | Sylf | Sources de matériaux sur les monstres | ACTIVE | PARTIAL | Matériau/monstre/zone, fiches, cache/cadence/annulation et contexte testés ; LuminaSupplemental (MobDrop) en tête (0.190, validé), puis le wiki FFXIV et Garland pour les lieux ; données partielles | — | B |
 | 14 | MARKET-001 | Price Insight | Kouzukii | Prix du marché au survol d'un objet | ACTIVE | PARTIAL | Consultation manuelle et survol sur option NQ/HQ/monde, accroché à l'infobulle, stock et moins cher du centre de données validés en jeu (0.85–0.86) ; page Marché enrichie (R-06 étape 4 : annonces Universalis, filtres, coût pour N unités, historique, tri des colonnes) validée en jeu (0.270–0.271) ; repli sur le cache disque si Universalis échoue (0.281, à valider) | [annonces Universalis](../evidence/0.270-universalis-listings.md) | B |
 | 15 | QUEST-001 | QuestTracker | isaiahcat, keifufu | Progression et complétion des quêtes | ACTIVE | PARTIAL | Fiches/liens/niveaux/zones/carte, récompenses natives conditionnelles et index inverse Objet → quête hors du dessin ; progression observée jointe aux sources d'un objet (0.76, validé) ; types de quêtes des sections du journal, pourcentages, cités de départ et options non prises (0.283–0.286, validés). Monnaies/rangs non prouvés ; disponibilité à compléter | [sections du journal](../evidence/0.283-quest-journal-sections.md), [cités de départ](../evidence/0.285-quest-start-cities.md), [options](../evidence/0.286-quest-alternatives.md) | B |
@@ -226,11 +227,13 @@ plans R-06 et R-11 sont des fichiers de l'agent (`docs/goals/`), hors du dépôt
 
 ## Pages hors des 17 plugins
 
-La navigation du code aujourd'hui (`MainWindow.Pages.cs`, version 0.865) a ces pages en plus de celles des 17 plugins : Rangements,
-Lexique ; Pêche en mer, Félicité insulaire, Commandes spéciales ; Météo, ALEA, Alarmes, Rappels, Jardinage, Compagnie libre, PNJ vendeurs,
+La navigation du code aujourd'hui (`MainWindow.Pages.cs`, version 0.971) a ces pages en plus de celles des 17 plugins : Rangements,
+Lexique ; Pêche en mer, Félicité insulaire, Commandes spéciales ; Météo, ALÉA, Alarmes, Rappels, Jardinage, Compagnie libre, PNJ vendeurs,
 Découvertes ; Événements, La Grande Mascarade, Reliques, Peuples alliés, Grandes compagnies, Livraisons spéciales, Eureka et Bozja, Donjons
 profonds, Équipement, Chocobo, Mandats, Bestiaire, Dresseur ; Aide, Crédits, Mes outils. La page Personnage a été retirée en 0.341 (la page
-Équipement montre les mêmes valeurs réelles ; le panneau à côté de la fenêtre Personnage du jeu reste).
+Équipement montre les mêmes valeurs réelles ; le panneau à côté de la fenêtre Personnage du jeu reste). Depuis la 0.882, la page
+Découvertes échange aussi les relevés en jeu des joueurs par GitHub, sur clic du joueur ou par l'échange quotidien sur option (aucune
+donnée prise sur des sites web).
 
 ## À décider / à revoir
 

@@ -44,12 +44,14 @@ The tests read files by relative path (`src/TenshoAssistant/...`): run them from
 
 - Code: `src/TenshoAssistant/` (one folder per domain; files ending in `*.Dalamud.cs` touch the game, files ending in `*.Lumina.cs` copy
   game sheets, and the others are pure C# and testable). Pages are `MainWindow.<Page>.cs` partial files, listed in `MainWindow.Pages.cs`;
-  shared UI templates are in `UI/Components/` (`ItemCell`, `DetailPage`, `SettingRow`, `EntityMenus`, `DataIndexes`). Embedded data
+  shared UI templates are in `UI/Components/` (`ItemCell`, `DetailPage`, `SettingRow`, `EntityMenus`, `DataIndexes`, `Tooltip`,
+  `StatusLines`, `ToolButton`). Embedded data
   files are in `FreeCompany/Data/`, `Reminders/Data/`, `Events/Data/` and `Localization/Languages/`. The code map is in
   [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md).
 - Tests: `tests/TenshoAssistant.Tests/` (no-framework test program using `Check(condition, "message")`).
 - Probes: `tools/` (read-only console programs over the game files or APIs, e.g. `tools/ShopCurrencyProbe`, `tools/ApiProbe`) and data
-  scripts (`tools/submarine-loot.py`, `tools/garden-data.py`).
+  scripts (`tools/submarine-loot.py`, `tools/garden-data.py`; `tools/discoveries-merge.py`, the maintainer's merge of the shared
+  discoveries into `community-discoveries/`, see its [README](community-discoveries/README.md)).
 - Scripts: `scripts/Verify.ps1` (checks), `scripts/Release.ps1` (git steps, called by `Verify.ps1`), `scripts/New-Tool.ps1` (skeleton
   of a new page), `scripts/Update-ToolGallery.ps1` (community tool gallery), `commit-release.bat` (root).
 - Documentation: see [docs/README.md](docs/README.md). History: [CHANGELOG.md](CHANGELOG.md).
@@ -66,11 +68,17 @@ The tests read files by relative path (`src/TenshoAssistant/...`): run them from
   sources use `Community/BoundedHttp.cs`; the Universalis clients (`Market/MarketService.cs`, `Market/MarketBoardService.cs`) have their
   own `HttpClient` with a timeout and a response size limit, and the Teamcraft client (`Community/FishBiteTimes.cs`) also goes through
   `BoundedHttp.SendAsync` (POST, read within 1 MiB). Requests start from a player action or a page that needs the data, never in a loop after a
-  failure. Each source has its switch in Settings › Advanced.
+  failure. Each source has its switch in Settings › Advanced, and « Game data and what you observed only » turns them all off at once.
+  The shared discoveries exchange (`Discoveries/GitHubExchange.cs`) sends something only after the player connects GitHub.
 - Every subscription, task, or window has an owner and cleanup (proper plugin shutdown/unsubscription).
 - Interface: text belongs in `src/TenshoAssistant/Localization/Languages/*.json` (English is the reference, French must be complete); no hardcoded text.
+  Code, comments and log lines are in English; French stays in the code only as game data to recognise (a test checks it).
 - Settings: each setting has a tooltip and a ↺ « restore default » button (`SettingRow`, `BoolSetting`, `DefaultButton`). A test fails
-  `Verify.ps1` when a setting tooltip named in the code (`Tip`, `BoolSetting`, map settings) is missing in English or French.
+  `Verify.ps1` when a setting tooltip named in the code (`Tip`, `BoolSetting`, map settings) is missing in English or French, or when the
+  « Default » line of an on/off setting's tooltip does not state its real default. A setting that only matters when another is on is
+  indented under it and greyed while that one is off.
+- Shared helpers: tooltips through `Tip` / `TipText` (`UI/Components/Tooltip.cs`), « nothing here » and « loading » lines through
+  `EmptyState` (`UI/Components/StatusLines.cs`), saved files through `AtomicFile.Write` (temporary file, then swapped in).
 - Style: follow the neighboring code (naming, comment density, compact C# style used by the project).
 - Licences: the project is under **GPL v3**. Data or code under a compatible licence (MIT, Apache-2.0, BSD, CC0, CC-BY, GPL-3.0, and
   EUPL-1.2 through its compatibility clause, decision DEC-025) may be used with credit in the README « Credits » and on the Credits page
@@ -249,11 +257,12 @@ Les tests lisent des fichiers par chemin relatif (`src/TenshoAssistant/...`) : l
 - Code : `src/TenshoAssistant/` (un dossier par domaine ; les fichiers en `*.Dalamud.cs` touchent au jeu, ceux en `*.Lumina.cs` copient
   des feuilles du jeu, et les autres sont du C# pur, testable). Les pages sont des fichiers partiels `MainWindow.<Page>.cs`, listés dans
   `MainWindow.Pages.cs` ; les modèles d'interface communs sont dans `UI/Components/` (`ItemCell`, `DetailPage`, `SettingRow`,
-  `EntityMenus`, `DataIndexes`). Les fichiers de données embarqués sont dans `FreeCompany/Data/`, `Reminders/Data/`, `Events/Data/` et
+  `EntityMenus`, `DataIndexes`, `Tooltip`, `StatusLines`, `ToolButton`). Les fichiers de données embarqués sont dans `FreeCompany/Data/`, `Reminders/Data/`, `Events/Data/` et
   `Localization/Languages/`. La carte du code est dans [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md).
 - Tests : `tests/TenshoAssistant.Tests/` (programme de test sans framework, avec `Check(condition, "message")`).
 - Sondes : `tools/` (programmes console en lecture seule sur les fichiers ou les API du jeu, par exemple `tools/ShopCurrencyProbe`,
-  `tools/ApiProbe`) et scripts de données (`tools/submarine-loot.py`, `tools/garden-data.py`).
+  `tools/ApiProbe`) et scripts de données (`tools/submarine-loot.py`, `tools/garden-data.py` ; `tools/discoveries-merge.py`, la fusion
+  par le mainteneur des découvertes partagées dans `community-discoveries/`, voir son [README](community-discoveries/README.md)).
 - Scripts : `scripts/Verify.ps1` (contrôles), `scripts/Release.ps1` (étapes git, appelé par `Verify.ps1`), `scripts/New-Tool.ps1`
   (squelette d'une nouvelle page), `scripts/Update-ToolGallery.ps1` (galerie d'outils de la communauté), `commit-release.bat` (racine).
 - Documentation : voir [docs/README.md](docs/README.md). Historique : [CHANGELOG.md](CHANGELOG.md).
@@ -274,13 +283,18 @@ Les tests lisent des fichiers par chemin relatif (`src/TenshoAssistant/...`) : l
   `Market/MarketBoardService.cs`) ont leur propre `HttpClient` avec un délai et une limite de taille de réponse, et le client Teamcraft
   (`Community/FishBiteTimes.cs`) passe aussi par `BoundedHttp.SendAsync` (POST, lu dans 1 Mio). Les requêtes partent d'une action du
   joueur ou d'une page qui a besoin des données, jamais en boucle après un échec. Chaque source a son interrupteur dans
-  Paramètres › Avancé.
+  Paramètres › Avancé, et « Données du jeu et observées seulement » les coupe toutes d'un coup. L'échange des découvertes partagées
+  (`Discoveries/GitHubExchange.cs`) n'envoie quelque chose qu'après la connexion du joueur à GitHub.
 - Chaque abonnement, tâche ou fenêtre a un propriétaire et un nettoyage (arrêt et désabonnement propres du plugin).
 - Interface : le texte va dans `src/TenshoAssistant/Localization/Languages/*.json` (l'anglais est la référence, le français doit être
-  complet) ; aucun texte en dur.
+  complet) ; aucun texte en dur. Le code, les commentaires et les lignes du journal sont en anglais ; le français ne reste dans le code
+  que comme donnée du jeu à reconnaître (un test le contrôle).
 - Réglages : chaque réglage a une infobulle et un bouton ↺ « remettre par défaut » (`SettingRow`, `BoolSetting`, `DefaultButton`). Un test
   fait échouer `Verify.ps1` quand une infobulle de réglage nommée dans le code (`Tip`, `BoolSetting`, réglages de la carte) manque en
-  anglais ou en français.
+  anglais ou en français, ou quand la ligne « Par défaut » de l'infobulle d'un réglage oui/non ne dit pas sa vraie valeur par défaut. Un
+  réglage qui ne compte que quand un autre est actif est mis en retrait sous lui et grisé tant que celui-ci est coupé.
+- Outils communs : les infobulles par `Tip` / `TipText` (`UI/Components/Tooltip.cs`), les lignes « rien ici » et « chargement » par
+  `EmptyState` (`UI/Components/StatusLines.cs`), les fichiers enregistrés par `AtomicFile.Write` (fichier temporaire, puis échangé).
 - Style : suivre le code voisin (noms, densité des commentaires, style C# compact du projet).
 - Licences : le projet est sous **GPL v3**. Des données ou du code sous une licence compatible (MIT, Apache-2.0, BSD, CC0, CC-BY, GPL-3.0,
   et EUPL-1.2 par sa clause de compatibilité, décision DEC-025) peuvent être utilisés avec un crédit dans la partie « Credits » du README

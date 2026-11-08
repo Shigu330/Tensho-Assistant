@@ -1060,7 +1060,7 @@
   },
   "Advanced": {
     "GameDataOnly": "Données du jeu et observées seulement",
-    "GameDataOnlyTip": "Coupe d’un coup les sept sources communautaires ci-dessous (aucun téléchargement, leurs lignes quittent les info-bulles) ; vos choix pour chacune sont gardés et reviennent quand vous décochez. Vos découvertes et celles partagées restent.\nPar défaut : désactivé.",
+    "GameDataOnlyTip": "Coupe d’un coup les huit sources communautaires ci-dessous (aucun téléchargement, leurs lignes quittent les info-bulles) ; vos choix pour chacune sont gardés et reviennent quand vous décochez. Vos découvertes et celles partagées restent.\nPar défaut : désactivé.",
     "SnoozeMinutesTip": "Ce que le bouton de report d'une alarme attend.\nPar défaut : 5 minutes.",
     "RingOnTimeTip": "Une alarme sonne avec son avance, puis une seconde fois à l'heure exacte. Discord ne reçoit que le premier message.\nPar défaut : désactivé.",
     "RetainerSales": "Panneau à côté de la liste de ventes des servants",

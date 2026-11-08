@@ -1,4 +1,4 @@
-<!-- Draft prepared by the AI agent at the author's request (first written 2026-10-31, checked against the code on 2026-11-08, version 0.865).
+<!-- Draft prepared by the AI agent at the author's request (first written 2026-10-31, checked against the code on 2026-11-09, version 0.971).
 No submission to the official repository is planned (DEC-039, 2026-11-05): this draft is kept in case the author changes his mind, and as a
 summary of what the plugin does. The Dalamud AI policy asks that the AI disclosure and the pull request description be written by a human:
 rewrite it in your own words before posting. Do not post it as it is.
@@ -31,13 +31,17 @@ of what the player discovers while playing.
 - Network: Universalis (world + item id), Garland Tools, FFXIV Console Games Wiki, Teamcraft's public bite time reports, PaissaDB (open
   plots, on a click or with its optional watch), data files hosted on GitHub (LuminaSupplemental, GatherBuddy, FFXIVGachaSpreadsheet) and
   this repository (community tool gallery and help videos, on a click), over HTTPS, only when the matching page is opened, an item is
-  hovered, the player clicks or a setting asks for it, with bounded responses, cached on disk. Each source has a switch. No player data is
-  sent, no telemetry.
-- Discord (optional, off by default): Tensho alarms and currency cap alerts can be posted to a Discord webhook the player enters (Discord
-  hosts only, HTTPS POST). Only the message is sent, plus the character's name if the player enables it; the address is never logged.
+  hovered, the player clicks or a setting asks for it, with bounded responses, cached on disk. Each data source has a switch, and one box
+  turns them all off. No player data is sent, no telemetry.
+- Discord (optional, off by default): Tensho alarms, currency cap alerts and « duty ready » alerts can be posted to a Discord webhook the
+  player enters (Discord hosts only, HTTPS POST). Only the message is sent, plus the character's name if the player enables it; the
+  address is never logged.
 - Reporting a problem opens a prefilled GitHub form in the player's browser; the plugin sends nothing.
 - The local discoveries base stays on the player's disk: game rows and places only (monsters' places, item sources, fish caught…), never
-  another player's name, position or id; import and export are files the player handles.
+  another player's name, position or id; import and export are files the player handles. Sharing is optional: only after the player
+  connects GitHub (a code approved on github.com, no password in the game), the exchange sends the player's own sightings, dated to the
+  day only, to a secret gist of theirs, with one issue in this repository named by their GitHub login; the token stays on the PC,
+  encrypted for the Windows user.
 - NuGet dependency: Raphael.Net 5.0.0 (MIT, native solver library), the version Craftimizer uses.
 - Embedded community data, licences kept in the files: SubmarineTracker and FFXIVGachaSpreadsheet (MIT), LuminaSupplemental airship and
   festival tables (GPL-3.0), Character Panel Refined level table (MIT), FFXIV Gardening Tracker (GPL-3.0), FFXIV Crossbreed Helper (MIT).
@@ -89,14 +93,17 @@ Triade, des chaînes de macros, les outils du joueur, et une base locale de ce q
   PaissaDB (terrains libres, sur un clic ou avec sa surveillance facultative), fichiers de données hébergés sur GitHub (LuminaSupplemental,
   GatherBuddy, FFXIVGachaSpreadsheet) et ce dépôt (galerie d'outils de la communauté et vidéos d'aide, sur un clic), en HTTPS, seulement
   quand la page concernée est ouverte, qu'un objet est survolé, que le joueur clique ou qu'un réglage le demande, avec des réponses bornées
-  et gardées en cache sur disque. Chaque source a un interrupteur. Aucune donnée du joueur n'est envoyée, aucune télémétrie.
-- Discord (facultatif, désactivé par défaut) : les alarmes Tensho et les alertes de plafond de monnaie peuvent être envoyées à un webhook
-  Discord saisi par le joueur (hôtes de Discord seulement, HTTPS POST). Seul le message est envoyé, plus le nom du personnage si le joueur
-  l'active ; l'adresse n'est jamais journalisée.
+  et gardées en cache sur disque. Chaque source de données a un interrupteur, et une case les coupe toutes. Aucune donnée du joueur n'est
+  envoyée, aucune télémétrie.
+- Discord (facultatif, désactivé par défaut) : les alarmes Tensho, les alertes de plafond de monnaie et les alertes « mission prête »
+  peuvent être envoyées à un webhook Discord saisi par le joueur (hôtes de Discord seulement, HTTPS POST). Seul le message est envoyé,
+  plus le nom du personnage si le joueur l'active ; l'adresse n'est jamais journalisée.
 - Signaler un problème ouvre un formulaire GitHub prérempli dans le navigateur du joueur ; le plugin n'envoie rien.
 - La base locale de découvertes reste sur le disque du joueur : des lignes du jeu et des lieux seulement (lieux des monstres, sources des
   objets, poissons pris…), jamais le nom, la position ou l'identifiant d'un autre joueur ; import et export sont des fichiers que le joueur
-  manipule.
+  manipule. Le partage est facultatif : seulement après que le joueur a connecté GitHub (un code approuvé sur github.com, aucun mot de
+  passe dans le jeu), l'échange envoie ce que le joueur a vu lui-même, daté du jour seulement, dans un gist secret à son nom, avec un
+  ticket dans ce dépôt au nom de son identifiant GitHub ; le jeton reste sur le PC, chiffré pour l'utilisateur Windows.
 - Dépendance NuGet : Raphael.Net 5.0.0 (MIT, bibliothèque native de solveur), la version qu'utilise Craftimizer.
 - Données de la communauté embarquées, licences gardées dans les fichiers : SubmarineTracker et FFXIVGachaSpreadsheet (MIT), tables des
   dirigeables et des fêtes de LuminaSupplemental (GPL-3.0), table de niveaux de Character Panel Refined (MIT), FFXIV Gardening Tracker

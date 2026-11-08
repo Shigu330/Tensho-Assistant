@@ -10,7 +10,7 @@ Traduction française plus bas. -->
 - [ ] `.\scripts\Verify.ps1` is green (paste its last `VERSION …` line), or `.\scripts\Verify.ps1 -TestsOnly` if you do not have the game.
 - [ ] New pure logic has tests in `tests/TenshoAssistant.Tests`.
 - [ ] A `## x.y.z` entry at the top of `CHANGELOG.md`, with a `### English` section; community changes take the third number (x.y.Z).
-- [ ] Every new setting has a tooltip and a « ↺ » default button; texts are in `en.json` and `fr.json` (French uses « vous »).
+- [ ] Every new setting has a tooltip and a « ↺ » default button; texts are in `en.json` and `fr.json` (French uses « vous »); code, comments and log lines are in English.
 - [ ] Game data first; community data only when the game lacks it, with its licence and a credit (Credits page, `src/TenshoAssistant/Credits/CreditCatalog.cs`).
 - [ ] Nothing copied from code under AGPL or without a licence; evidence of probes or data in `docs/evidence/`.
 - [ ] No automation of game actions, nothing sent to the game's servers without a click, no combat or PvP advantage, nothing a player cannot normally see; every framework subscription goes through `CompetitiveGate`.
@@ -34,7 +34,7 @@ Merci de contribuer. Les pull requests visent la branche Devloppement (main ne r
 - [ ] `.\scripts\Verify.ps1` est vert (collez sa dernière ligne `VERSION …`), ou `.\scripts\Verify.ps1 -TestsOnly` si vous n'avez pas le jeu.
 - [ ] La nouvelle logique pure a des tests dans `tests/TenshoAssistant.Tests`.
 - [ ] Une entrée `## x.y.z` en tête de `CHANGELOG.md`, avec une section `### English` ; les changements de la communauté prennent le troisième numéro (x.y.Z).
-- [ ] Chaque nouveau réglage a une infobulle et un bouton « ↺ » de valeur par défaut ; les textes sont dans `en.json` et `fr.json` (le français utilise « vous »).
+- [ ] Chaque nouveau réglage a une infobulle et un bouton « ↺ » de valeur par défaut ; les textes sont dans `en.json` et `fr.json` (le français utilise « vous ») ; le code, les commentaires et les lignes du journal sont en anglais.
 - [ ] Données du jeu d'abord ; données de la communauté seulement quand le jeu ne les a pas, avec leur licence et un crédit (page Crédits, `src/TenshoAssistant/Credits/CreditCatalog.cs`).
 - [ ] Rien de copié depuis du code sous AGPL ou sans licence ; preuves des sondes ou des données dans `docs/evidence/`.
 - [ ] Aucune automatisation d'actions du jeu, rien d'envoyé aux serveurs du jeu sans clic, aucun avantage en combat ou en JcJ, rien qu'un joueur ne peut pas voir normalement ; chaque abonnement au framework passe par `CompetitiveGate`.

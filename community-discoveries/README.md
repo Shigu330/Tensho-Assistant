@@ -5,10 +5,11 @@
 `discoveries.json` holds the discoveries players shared through World › Discoveries › « Exchange with other players (GitHub) »: each connected player's
 own sightings go to a secret gist of theirs, with one « Discoveries: <login> » issue in this repository pointing to it. Tensho downloads this file during
 an exchange (automatic once a day when turned on, or « Exchange now ») and joins it to the base as imported. A discovery holds game rows and places only:
-never a player's name, position or id.
+never a player's name, position or id; what leaves the PC carries the day of each sighting, never its time.
 
-The maintainer merges the gists with `python tools/discoveries-merge.py sync` (each player's valid facts kept in `players/<issue>.json`, facts that do not
-hold refused, then `discoveries.json` rebuilt from the player files with `rebuild`: each player counts as one import of a fact), then commits the result.
+The maintainer merges the gists with `python tools/discoveries-merge.py sync` (GitHub CLI needed; `--dry-run` reports only): each player's valid facts kept
+in `players/<issue>.json`, facts that do not hold refused, a player whose refusals pass 5 % flagged and left out, then `discoveries.json` rebuilt from the
+player files with `rebuild` (each player counts as one import of a fact); then the result is committed.
 The file reaches players with the next release (it is read from `main`).
 
 **File format (version 2, since Tensho 0.916).** `{"Version":2,"Producer":…,"Written":…,"Facts":[…]}`. A fact is identified by `Kind`, `Subject`, `Detail`,
@@ -24,11 +25,13 @@ the sums over the players. Version 1 files (without them) are still read.
 `discoveries.json` contient les découvertes partagées par les joueurs avec Monde › Découvertes › « Échange avec les autres joueurs (GitHub) » : ce que
 chaque joueur connecté a vu lui-même part dans un gist secret à son nom, avec un ticket « Discoveries: <login> » dans ce dépôt qui y renvoie. Tensho
 télécharge ce fichier lors d'un échange (automatique une fois par jour quand il est activé, ou « Échanger maintenant ») et le joint à la base comme importé.
-Une découverte ne contient que des lignes et des lieux du jeu : jamais le nom, la position ni l'identifiant d'un joueur.
+Une découverte ne contient que des lignes et des lieux du jeu : jamais le nom, la position ni l'identifiant d'un joueur ; ce qui quitte le PC porte le jour
+de chaque observation, jamais son heure.
 
-Le mainteneur fusionne les gists avec `python tools/discoveries-merge.py sync` (les faits valides de chaque joueur gardés dans `players/<ticket>.json`, les
-faits invalides refusés, puis `discoveries.json` reconstruit à partir des fichiers des joueurs avec `rebuild` : chaque joueur compte comme un import d'un
-fait), puis valide le résultat. Le fichier arrive chez les joueurs avec la release suivante (lu sur `main`).
+Le mainteneur fusionne les gists avec `python tools/discoveries-merge.py sync` (GitHub CLI nécessaire ; `--dry-run` fait seulement le rapport) : les faits
+valides de chaque joueur gardés dans `players/<ticket>.json`, les faits invalides refusés, un joueur dont les refus dépassent 5 % signalé et laissé de côté,
+puis `discoveries.json` reconstruit à partir des fichiers des joueurs avec `rebuild` (chaque joueur compte comme un import d'un fait) ; puis le résultat est
+enregistré dans le dépôt. Le fichier arrive chez les joueurs avec la release suivante (lu sur `main`).
 
 **Format du fichier (version 2, depuis Tensho 0.916).** `{"Version":2,"Producer":…,"Written":…,"Facts":[…]}`. Un fait est identifié par `Kind`, `Subject`,
 `Detail`, `Territory`, `Map`, `CellX`, `CellZ` ; il contient le premier lieu exact (`X`, `Z`), les valeurs extrêmes vues (`LevelMin`, `LevelMax`), `Seen`,

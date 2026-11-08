@@ -1,6 +1,6 @@
 namespace TenshoAssistant;
 
-/// <summary>X-76 step 3 (0.945): « game and observed data only »: the seven community sources off at once, their choices kept (one bit each) and given back.</summary>
+/// <summary>X-76 step 3 (0.945): « game and observed data only »: the community sources off at once (eight since PaissaDB, 0.949), their choices kept (one bit each) and given back.</summary>
 public static class CommunitySources
 {
     public static int Bits(Configuration c)=>(c.CommunityLumina ? 1:0)|(c.CommunityGarland ? 2:0)|(c.CommunityWiki ? 4:0)|(c.CommunityGatherBuddy ? 8:0)

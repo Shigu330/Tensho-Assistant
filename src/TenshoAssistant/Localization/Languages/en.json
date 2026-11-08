@@ -1060,7 +1060,7 @@
   },
   "Advanced": {
     "GameDataOnly": "Game data and what you observed only",
-    "GameDataOnlyTip": "Turns off the seven community sources below at once (no download, their lines leave the tooltips); your own choices for each are kept and come back when you untick it. Your discoveries and the shared ones stay.\nDefault: off.",
+    "GameDataOnlyTip": "Turns off the eight community sources below at once (no download, their lines leave the tooltips); your own choices for each are kept and come back when you untick it. Your discoveries and the shared ones stay.\nDefault: off.",
     "SnoozeMinutesTip": "How long the button that puts off an alarm waits.\nDefault: 5 minutes.",
     "RingOnTimeTip": "An alarm rings its lead ahead, then a second time at the exact time. Discord only gets the first.\nDefault: off.",
     "RetainerSales": "Panel beside the retainer sale list",
