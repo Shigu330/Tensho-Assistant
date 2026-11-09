@@ -11,46 +11,91 @@ namespace TenshoAssistant;
 // (shown as a name for orientation), a filter, a details popup and a link to its Tensho page. Also the item
 // context icons of the sidebar (DrawContextTools: the same useful routes as the inventory's « Tensho » item menu). The list is
 // fixed in PlannedTools; pages added later (weather, alarms, reminders, free company, gear, NPC vendors) joined it in 0.315.
+// System plan 4.13 and 4.14: the directory is completed from the list of pages (MainWindow.Pages.cs): a page that no written row opens gets
+// a row of its own (its help title and purpose, PageHelp, in every language), so a new page is never missing from it; the pages left out
+// are listed below with their reason, and a test (PageCoverageTests) holds both rules.
 internal sealed partial class MainWindow
 {
-    private sealed record PlannedTool(string Group, string Name, string Reference, string Description, FontAwesomeIcon Icon);
+    /// <param name="Page">The page its « Open » button shows (the written rows add a tab on some pages, OpenDirectoryTool).</param>
+    private sealed record PlannedTool(string Group, string Name, string Reference, string Description, FontAwesomeIcon Icon, Page Page);
     private PlannedTool? selectedTool;
     private string ToolDetailsPopup => ToolText("DetailsTitle")+"###TenshoToolDetails";
 
     // Product directory, not registrations of unimplemented modules. Scope remains in ROADMAP.md.
     private static readonly PlannedTool[] PlannedTools =
     [
-        new("Groups.Crafting", "Crafting.Name", "Craftimizer", "Crafting.Description", FontAwesomeIcon.Hammer),
-        new("Groups.Gathering", "Gathering.Name", "GatherBuddy", "Gathering.Description", FontAwesomeIcon.Fish),
-        new("Groups.Gathering", "GatheringGp.Name", "LazyGatherer", "GatheringGp.Description", FontAwesomeIcon.Seedling),
-        new("Groups.Items", "Sorting.Name", "SortaKinda", "Sorting.Description", FontAwesomeIcon.Boxes),
-        new("Groups.Items", "Bank.Name", "Banque d'objets", "Bank.Description", FontAwesomeIcon.Archive),
-        new("Groups.Items", "ItemUses.Name", "Item Use", "ItemUses.Description", FontAwesomeIcon.Recycle),
-        new("Groups.Items", "Market.Name", "Price Insight", "Market.Description", FontAwesomeIcon.Coins),
-        new("Groups.Progress", "Collections.Name", "Collections", "Collections.Description", FontAwesomeIcon.Trophy),
-        new("Groups.Progress", "Quests.Name", "QuestTracker", "Quests.Description", FontAwesomeIcon.Tasks),
-        new("Groups.Progress", "BlueMagic.Name", "Blue Mage Helper", "BlueMagic.Description", FontAwesomeIcon.BookOpen),
-        new("Groups.World", "Maps.Name", "Mappy", "Maps.Description", FontAwesomeIcon.MapMarkedAlt),
-        new("Groups.World", "DutyLoot.Name", "Duty Loot Preview", "DutyLoot.Description", FontAwesomeIcon.Dungeon),
-        new("Groups.World", "MonsterLoot.Name", "Monster Loot Hunter", "MonsterLoot.Description", FontAwesomeIcon.Dragon),
-        new("Groups.Games", "Fashion.Name", "Avant-Garde", "Fashion.Description", FontAwesomeIcon.Tshirt),
-        new("Groups.Games", "Cactpot.Name", "ezMiniCactpot", "Cactpot.Description", FontAwesomeIcon.TicketAlt),
-        new("Groups.Games", "Triad.Name", "TriadBuddy", "Triad.Description", FontAwesomeIcon.Clone),
-        new("Groups.Character", "Character.Name", "Character Panel Refined", "Character.Description", FontAwesomeIcon.ChartBar),
-        new("Groups.Character", "Macros.Name", "Macro Chain", "Macros.Description", FontAwesomeIcon.Link),
+        new("Groups.Crafting", "Crafting.Name", "Craftimizer", "Crafting.Description", FontAwesomeIcon.Hammer, Page.Items),
+        new("Groups.Gathering", "Gathering.Name", "GatherBuddy", "Gathering.Description", FontAwesomeIcon.Fish, Page.Gathering),
+        new("Groups.Gathering", "GatheringGp.Name", "LazyGatherer", "GatheringGp.Description", FontAwesomeIcon.Seedling, Page.GatheringGp),
+        new("Groups.Items", "Sorting.Name", "SortaKinda", "Sorting.Description", FontAwesomeIcon.Boxes, Page.SortPreview),
+        new("Groups.Items", "Bank.Name", "Banque d'objets", "Bank.Description", FontAwesomeIcon.Archive, Page.Storage),
+        new("Groups.Items", "ItemUses.Name", "Item Use", "ItemUses.Description", FontAwesomeIcon.Recycle, Page.Items),
+        new("Groups.Items", "Market.Name", "Price Insight", "Market.Description", FontAwesomeIcon.Coins, Page.Market),
+        new("Groups.Progress", "Collections.Name", "Collections", "Collections.Description", FontAwesomeIcon.Trophy, Page.Collections),
+        new("Groups.Progress", "Quests.Name", "QuestTracker", "Quests.Description", FontAwesomeIcon.Tasks, Page.Quests),
+        new("Groups.Progress", "BlueMagic.Name", "Blue Mage Helper", "BlueMagic.Description", FontAwesomeIcon.BookOpen, Page.BlueMagic),
+        new("Groups.World", "Maps.Name", "Mappy", "Maps.Description", FontAwesomeIcon.MapMarkedAlt, Page.Maps),
+        new("Groups.World", "DutyLoot.Name", "Duty Loot Preview", "DutyLoot.Description", FontAwesomeIcon.Dungeon, Page.DutyLoot),
+        new("Groups.World", "MonsterLoot.Name", "Monster Loot Hunter", "MonsterLoot.Description", FontAwesomeIcon.Dragon, Page.MonsterLoot),
+        new("Groups.Games", "Fashion.Name", "Avant-Garde", "Fashion.Description", FontAwesomeIcon.Tshirt, Page.Fashion),
+        new("Groups.Games", "Cactpot.Name", "ezMiniCactpot", "Cactpot.Description", FontAwesomeIcon.TicketAlt, Page.MiniCactpot),
+        new("Groups.Games", "Triad.Name", "TriadBuddy", "Triad.Description", FontAwesomeIcon.Clone, Page.TripleTriad),
+        new("Groups.Character", "Character.Name", "Character Panel Refined", "Character.Description", FontAwesomeIcon.ChartBar, Page.Gear),
+        new("Groups.Character", "Macros.Name", "Macro Chain", "Macros.Description", FontAwesomeIcon.Link, Page.MacroChain),
         // 0.315 (docs pass): tools added since 0.200 that had no directory entry; Tensho's own tools use a « Tensho: » reference.
-        new("Groups.Character", "Gear.Name", "Tensho: Gear", "Gear.Description", FontAwesomeIcon.Tshirt),
-        new("Groups.Items", "FreeCompany.Name", "Tensho: FreeCompany", "FreeCompany.Description", FontAwesomeIcon.Ship),
-        new("Groups.Items", "NpcVendors.Name", "Tensho: NpcVendors", "NpcVendors.Description", FontAwesomeIcon.Store),
-        new("Groups.Gathering", "Weather.Name", "Tensho: Weather", "Weather.Description", FontAwesomeIcon.CloudSun),
-        new("Groups.Gathering", "Alarms.Name", "Tensho: Alarms", "Alarms.Description", FontAwesomeIcon.Bell),
-        new("Groups.Progress", "Reminders.Name", "Tensho: Reminders", "Reminders.Description", FontAwesomeIcon.CalendarCheck),
+        new("Groups.Character", "Gear.Name", "Tensho: Gear", "Gear.Description", FontAwesomeIcon.Tshirt, Page.Gear),
+        new("Groups.Items", "FreeCompany.Name", "Tensho: FreeCompany", "FreeCompany.Description", FontAwesomeIcon.Ship, Page.FreeCompany),
+        new("Groups.Items", "NpcVendors.Name", "Tensho: NpcVendors", "NpcVendors.Description", FontAwesomeIcon.Store, Page.NpcVendors),
+        new("Groups.Gathering", "Weather.Name", "Tensho: Weather", "Weather.Description", FontAwesomeIcon.CloudSun, Page.Weather),
+        new("Groups.Gathering", "Alarms.Name", "Tensho: Alarms", "Alarms.Description", FontAwesomeIcon.Bell, Page.Alarms),
+        new("Groups.Progress", "Reminders.Name", "Tensho: Reminders", "Reminders.Description", FontAwesomeIcon.CalendarCheck, Page.Reminders),
     ];
     // 0.331 (audit): the directory draws a heading on each group change, so it lists the tools grouped (first-seen group order, array
     // order inside a group); entries appended later no longer repeat a heading. Built once, after PlannedTools (same file).
-    private static readonly PlannedTool[] DirectoryTools = PlannedTools.GroupBy(tool => tool.Group).SelectMany(group => group).ToArray();
+    private PlannedTool[]? directoryTools;
+    private PlannedTool[] DirectoryTools => directoryTools ??= PlannedTools.Concat(PageTools()).GroupBy(tool => tool.Group).SelectMany(group => group).ToArray();
 
-    private string ToolText(string key)=>localization.Get("ToolDirectory."+key);
+    /// <summary>Pages that are not tools of their own, with the reason (a test refuses a page missing from the directory and from here).</summary>
+    private static readonly Dictionary<Page, string> DirectoryLeftOut = new()
+    {
+        [Page.Home] = "the directory is on it",
+        [Page.Settings] = "preferences, not a tool",
+        [Page.Help] = "the help, reached from the « ? » of every page",
+        [Page.Credits] = "the sources and thanks, not a tool",
+        [Page.Diagnostics] = "developer mode only",
+        [Page.CraftLive] = "a tab of Crafting, reached from the crafting row's details",
+        [Page.CraftPresets] = "a tab of Crafting, reached from the crafting row's details",
+        [Page.GatheringCollectables] = "a tab of Gathering",
+    };
+
+    /// <summary>One row for every page of the list that no written row opens and that is not left out.</summary>
+    private IEnumerable<PlannedTool> PageTools()
+    {
+        var opened = PlannedTools.Select(tool => tool.Page).ToHashSet();
+        foreach (var entry in PageEntries)
+            if (!opened.Contains(entry.Page) && !DirectoryLeftOut.ContainsKey(entry.Page))
+                yield return new(DirectoryGroup(entry), $"PageHelp.{entry.Page}Title", "Tensho: " + entry.Page, $"PageHelp.{entry.Page}Purpose", FontAwesomeIcon.Wrench, entry.Page);
+    }
+
+    /// <summary>The directory's group of a page, from its navigation group.</summary>
+    private static string DirectoryGroup(PageEntry entry) => entry.Page switch
+    {
+        Page.OceanFishing or Page.IslandSanctuary or Page.Garden => "Groups.Gathering",
+        Page.Chocobo or Page.Lexicon or Page.MyTools => "Groups.Character",
+        Page.RelicWeapons => "Groups.Progress",
+        _ => entry.Category switch
+        {
+            "Objects" or "Tracking" => "Groups.Items",
+            "Production" => "Groups.Crafting",
+            "World" or "Content" => "Groups.World",
+            "GoldSaucer" => "Groups.Games",
+            "Progression" => "Groups.Progress",
+            _ => "Groups.Character",
+        },
+    };
+
+    // A page's own row reads its help texts; the written rows read the directory's texts.
+    private string ToolText(string key)=>localization.Get(key.StartsWith("PageHelp.",StringComparison.Ordinal) ? key : "ToolDirectory."+key);
 
     private void DrawTools()
     {
@@ -84,7 +129,7 @@ internal sealed partial class MainWindow
                         ImGui.PushStyleColor(ImGuiCol.Text,Muted);
                         try{ImGui.TextWrapped(ToolText(tool.Description));}finally{ImGui.PopStyleColor();}
                         ImGui.TableNextColumn();
-                        if(ImGui.SmallButton(ToolText("Open")))OpenDirectoryTool(tool.Reference);
+                        if(ImGui.SmallButton(ToolText("Open")))OpenDirectoryTool(tool);
                         ImGui.SameLine();
                         if(ImGui.SmallButton(ToolText("Details")))
                         {selectedTool=tool;openDetails=true;}
@@ -99,35 +144,15 @@ internal sealed partial class MainWindow
         DrawToolDetails();
     }
 
-    private void OpenDirectoryTool(string reference)
+    private void OpenDirectoryTool(PlannedTool tool)
     {
-        switch(reference)
+        page = tool.Page;
+        switch(tool.Reference)
         {
-            case "Craftimizer":page=Page.Items;focusCraftTab=true;break;
-            case "GatherBuddy":page=Page.Gathering;gatheringTypeFilter=null;break;
-            case "LazyGatherer":page=Page.GatheringGp;break;
-            case "SortaKinda":page=Page.SortPreview;break;
-            case "Banque d'objets":page=Page.Storage;focusBankTab=true;break;
-            case "Item Use":page=Page.Items;focusUsesTab=true;break;
-            case "Price Insight":page=Page.Market;break;
-            case "Collections":page=Page.Collections;break;
-            case "QuestTracker":page=Page.Quests;break;
-            case "Blue Mage Helper":page=Page.BlueMagic;break;
-            case "Mappy":page=Page.Maps;break;
-            case "Duty Loot Preview":page=Page.DutyLoot;break;
-            case "Monster Loot Hunter":page=Page.MonsterLoot;break;
-            case "Avant-Garde":page=Page.Fashion;break;
-            case "ezMiniCactpot":page=Page.MiniCactpot;break;
-            case "TriadBuddy":page=Page.TripleTriad;break;
-            case "Character Panel Refined":page=Page.Gear;break;
-            case "Macro Chain":page=Page.MacroChain;break;
-            case "Tensho: Gear":page=Page.Gear;break;
-            case "Tensho: FreeCompany":page=Page.FreeCompany;break;
-            case "Tensho: NpcVendors":page=Page.NpcVendors;break;
-            case "Tensho: Weather":page=Page.Weather;break;
-            case "Tensho: Alarms":page=Page.Alarms;break;
-            case "Tensho: Reminders":page=Page.Reminders;break;
-            default:OpenToolDirectory(reference);break;
+            case "Craftimizer":focusCraftTab=true;break;
+            case "GatherBuddy":gatheringTypeFilter=null;break;
+            case "Banque d'objets":focusBankTab=true;break;
+            case "Item Use":focusUsesTab=true;break;
         }
     }
 
@@ -244,7 +269,7 @@ internal sealed partial class MainWindow
                 if(ImGui.SmallButton(localization.Get("ToolDetails.Presets"))){page=Page.CraftPresets;ImGui.CloseCurrentPopup();}
             }
             ImGui.Spacing();
-            if(ImGui.Button(ToolText("Open"),new Vector2(-1,28))){OpenDirectoryTool(tool.Reference);ImGui.CloseCurrentPopup();}
+            if(ImGui.Button(ToolText("Open"),new Vector2(-1,28))){OpenDirectoryTool(tool);ImGui.CloseCurrentPopup();}
             if(ImGui.Button(ToolText("Close"),new Vector2(-1,28)))ImGui.CloseCurrentPopup();
         }
         finally{ImGui.EndPopup();}

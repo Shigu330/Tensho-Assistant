@@ -22,6 +22,47 @@ public static class GuideFlow
         new("Quests"), new("Collections", GuideInterest.Collections),
         new("Gear"), new("TripleTriad", GuideInterest.TripleTriad), new("Settings"), new("Help"),
     ];
+    // System plan 4.13: every page is a stop of the visit or is left out here with its reason; a test (PageCoverageTests) refuses a page in
+    // neither. The visit shows what a new player needs to start; the rest is found from the navigation and the Home tool directory.
+    private static readonly Dictionary<string, string> LeftOut = new()
+    {
+        ["Home"] = "the guide starts and ends there",
+        ["CraftLive"] = "a tab of Crafting, shown at its stop",
+        ["CraftPresets"] = "a tab of Crafting, shown at its stop",
+        ["GatheringGp"] = "a tab of Gathering, shown at its stop",
+        ["GatheringCollectables"] = "a tab of Gathering, shown at its stop",
+        ["BlueMagic"] = "a tab of Collections, shown at its stop",
+        ["Diagnostics"] = "developer mode only",
+        ["Credits"] = "sources and thanks, not a first step",
+        ["SortPreview"] = "useful once the bags are full; listed in the Home tool directory",
+        ["MacroChain"] = "for players who already craft with macros; listed in the Home tool directory",
+        ["Weather"] = "the map and gathering pages show the weather they need",
+        ["Garden"] = "for players with a garden; listed in the Home tool directory",
+        ["IslandSanctuary"] = "for players who unlocked the island; listed in the Home tool directory",
+        ["NpcVendors"] = "reached from an item's sources",
+        ["DutyLoot"] = "reached from an item's sources",
+        ["MonsterLoot"] = "reached from an item's sources",
+        ["Fates"] = "content found while playing; listed in the Home tool directory",
+        ["Events"] = "seasonal; Home shows the running events",
+        ["Chocobo"] = "a side page of Gear",
+        ["Leves"] = "content found while playing; listed in the Home tool directory",
+        ["HuntingLog"] = "content found while playing; listed in the Home tool directory",
+        ["AlliedSocieties"] = "content found while playing; listed in the Home tool directory",
+        ["GrandCompanies"] = "content found while playing; listed in the Home tool directory",
+        ["SpecialDeliveries"] = "content found while playing; listed in the Home tool directory",
+        ["CustomDeliveries"] = "content found while playing; listed in the Home tool directory",
+        ["MaskedCarnivale"] = "content found while playing; listed in the Home tool directory",
+        ["RelicWeapons"] = "content found while playing; listed in the Home tool directory",
+        ["FieldContent"] = "content found while playing; listed in the Home tool directory",
+        ["DeepDungeons"] = "content found while playing; listed in the Home tool directory",
+        ["Beastmaster"] = "content found while playing; listed in the Home tool directory",
+        ["Fashion"] = "a weekly Gold Saucer event; listed in the Home tool directory",
+        ["MiniCactpot"] = "a daily Gold Saucer game; listed in the Home tool directory",
+        ["Lexicon"] = "looked up when needed; listed in the Home tool directory",
+        ["MyTools"] = "Home shows it at the top of the navigation",
+    };
+    /// <summary>Pages that are not stops of the visit, with the reason.</summary>
+    public static IReadOnlyDictionary<string, string> LeftOutOfVisit => LeftOut;
     private static readonly GuideWindowTask[] AllWindows =
     [
         new("Retainer"), new("Dresser"), new("Armoire"), new("CompanyChest", GuideInterest.FreeCompany), new("Workshop", GuideInterest.FreeCompany),

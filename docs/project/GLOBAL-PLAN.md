@@ -239,7 +239,7 @@ Demande de l'utilisateur (2026-11-05) : tout remettre à jour une fois le plan c
 2. La liste de tous les outils, sur l'accueil et partout où elle apparaît, en anglais et en français.
 3. L'aide et la prise en main du plugin : elles décrivent les outils.
 4. Tous les fichiers `.md` du dépôt, à jour puis en français et en anglais : l'anglais toujours en premier, avec une mention en français disant que la traduction est en bas.
-5. Sur Git, tout en anglais si possible : messages de commit, issues, releases et ce que GitHub affiche.
+5. Sur Git et GitHub, deux langues, l'anglais d'abord puis le français (décision de l'utilisateur du 2026-11-09, qui remplace « tout en anglais si possible ») : corps des commits, commentaires des issues, notes de release, annonces ; titres courts, étiquettes et jalons en anglais seulement. Un seul format, `tools/bilingual.py`, que suivent `scripts/Release.ps1` (corps des commits) et `tools/discoveries-merge.py notice` ; les notes de release suivent avec la chaîne de release. Les issues ouvertes reçoivent le français quand elles sont touchées.
 
 **Revue du plan (2026-11-08, consigne de nuit X-74), pour coller au code de la 0.865 :**
 - L'étape 7 passe avant la phase 6 (essais en jeu), à la demande de l'utilisateur ; ce qui changera aux essais retouchera seulement les textes concernés.

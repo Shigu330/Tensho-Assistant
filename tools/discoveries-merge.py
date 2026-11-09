@@ -9,6 +9,10 @@ Usage:
       Rebuilds discoveries.json from community-discoveries/players/*.json.
   python tools/discoveries-merge.py check <file.json|file.zip|gist:ID>
       Validates one file and prints its report, without writing.
+  python tools/discoveries-merge.py notice <issue> merged <version> <facts> [--dry-run]
+  python tools/discoveries-merge.py notice <issue> flag <refused> <total> [--dry-run]
+      Comments the ticket in English then French (tools/bilingual.py): facts merged into a version, or a share not merged because over 5 % of
+      its facts were refused. --dry-run: prints the comment only.
 
 Rules mirror DiscoveryStore.Valid (src/TenshoAssistant/Discoveries/DiscoveriesModel.cs): a fact that does not hold is refused; any property the plugin does
 not write is refused (the computed « Key » is accepted and dropped). In the common file each fact has Seen 0 and Imported = the number of players who have it;
@@ -143,10 +147,25 @@ def sync(dry):
         json.dump({"Issue":issue["number"],"Facts":facts},open(os.path.join(PLAYERS,f"{issue['number']}.json"),"w",encoding="utf-8",newline="\n"),ensure_ascii=False,separators=(",",":"))
     if not dry:rebuild()
 
+def notice(argv):
+    sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
+    from bilingual import compose
+    dry="--dry-run" in argv;argv=[a for a in argv if a!="--dry-run"]
+    if len(argv)!=4 or argv[1] not in ("merged","flag") or not argv[0].isdigit():print(__doc__);return 2
+    issue,what,a,b=argv
+    if what=="merged":body=compose(f"Merged into {a}: {b} facts. Thank you! They reach every player with the next release.",
+                                   f"Fusionné dans la {a} : {b} faits. Merci ! Ils arrivent chez tous les joueurs avec la prochaine release.")
+    else:body=compose(f"Not merged: {a} of {b} facts were refused (over 5 %). Please update Tensho Assistant, export again and update the gist.",
+                      f"Pas fusionné : {a} faits refusés sur {b} (plus de 5 %). Merci de mettre Tensho Assistant à jour, d'exporter à nouveau et de mettre le gist à jour.")
+    if dry:print(body);return 0
+    out=subprocess.run(["gh","issue","comment",issue,"-R","Shigu330/Tensho-Assistant","--body",body],capture_output=True,text=True)
+    print(f"#{issue}: {'commented' if out.returncode==0 else 'comment failed'}");return out.returncode
+
 if __name__=="__main__":
     if len(sys.argv)<2:print(__doc__);sys.exit(2)
     command=sys.argv[1]
     if command=="sync":sync("--dry-run" in sys.argv)
     elif command=="rebuild":rebuild()
     elif command=="check" and len(sys.argv)==3:print(clean(read(sys.argv[2]))[1])
+    elif command=="notice":sys.exit(notice(sys.argv[2:]))
     else:print(__doc__);sys.exit(2)

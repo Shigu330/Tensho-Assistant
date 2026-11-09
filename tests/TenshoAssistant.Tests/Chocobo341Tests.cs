@@ -11,7 +11,7 @@ internal static class Chocobo341Tests
         {
             var window = Read("MainWindow.cs");
             var pages=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Pages.cs"));Check(pages.Contains("new(Page.Chocobo,\"Progression\",PageLabel(\"Navigation.Chocobo\"),DrawChocoboPage,",StringComparison.Ordinal) && !window.Contains("Page.Character",StringComparison.Ordinal),"Chocobo page, no Character page");
-            Check(!Read("MainWindow.Home.cs").Contains("Page.Character",StringComparison.Ordinal) && Read("MainWindow.Tools.cs").Contains("case \"Character Panel Refined\":page=Page.Gear;",StringComparison.Ordinal),"home tile and tool directory point to Gear");
+            Check(!Read("MainWindow.Home.cs").Contains("Page.Character",StringComparison.Ordinal) && Read("MainWindow.Tools.cs").Contains("\"Character Panel Refined\", \"Character.Description\", FontAwesomeIcon.ChartBar, Page.Gear)",StringComparison.Ordinal),"home tile and tool directory point to Gear");
             var character = Read("MainWindow.Character.cs");
             Check(!character.Contains("DrawCharacterStats",StringComparison.Ordinal) && character.Contains("internal void DrawCharacterPanel()",StringComparison.Ordinal),"page removed, panel kept");
             Check(!Read("MainWindow.Gear.cs").Contains("DrawChocoboBarding",StringComparison.Ordinal),"barding no longer at the bottom of Gear");

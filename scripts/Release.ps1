@@ -53,16 +53,18 @@ try {
     if ($start -lt 0) { throw "CHANGELOG.md has no '## $version' entry: add it before committing." }
     $end = $start + 1
     while ($end -lt $lines.Count -and -not $lines[$end].StartsWith('## ')) { $end++ }
-    # Git and GitHub are in English: the commit body and release notes come from the '### English' part of the entry (the French text
-    # above it stays in CHANGELOG.md for the maintainer).
+    # The commit body holds the '### English' part of the entry, then the French part above it (Join-Bilingual below); the release notes
+    # and repo.json still hold the English part only.
     $entry = $lines[($start + 1)..($end - 1)]
     $english = [Array]::FindIndex($entry, [Predicate[string]] { param($line) $line.Trim() -eq '### English' })
     if ($english -lt 0) { Write-Host "CHANGELOG.md entry '## $version' has no '### English' section: add the English notes (used for git and GitHub)." -ForegroundColor Yellow; exit 2 }
     $notes = ($entry[($english + 1)..($entry.Count - 1)] -join "`n").Trim()
     if (-not $notes) { Write-Host "The '### English' section of '## $version' is empty." -ForegroundColor Yellow; exit 2 }
+    $notesFr = if ($english -gt 0) { ($entry[0..($english - 1)] -join "`n").Trim() } else { '' }
 
-    # English notes of every CHANGELOG version (0.234): a commit or a release covers all the versions since the last one, newest first.
-    $entries = [ordered]@{}
+    # Notes of every CHANGELOG version (0.234): a commit or a release covers all the versions since the last one, newest first.
+    # English part after '### English', French part before it.
+    $entries = [ordered]@{}; $entriesFr = [ordered]@{}
     for ($index = 0; $index -lt $lines.Count; $index++) {
         if ($lines[$index] -notmatch '^## (\d+\.\d+\.\d+)\s*$') { continue }
         $number = $Matches[1]; $next = $index + 1
@@ -70,12 +72,22 @@ try {
         $body = [string[]]@(if ($next -gt $index + 1) { $lines[($index + 1)..($next - 1)] })
         $at = [Array]::FindIndex($body, [Predicate[string]] { param($line) $line.Trim() -eq '### English' })
         $entries[$number] = if ($at -ge 0) { ($body[($at + 1)..($body.Count - 1)] -join "`n").Trim() } else { '' }
+        $entriesFr[$number] = if ($at -gt 0) { ($body[0..($at - 1)] -join "`n").Trim() } elseif ($at -lt 0) { ($body -join "`n").Trim() } else { '' }
     }
-    function Get-NotesSince([string]$Since) {
+    function Get-NotesSince([string]$Since, [switch]$French) {
         $from = if ($Since) { [version]$Since } else { [version]'0.0.0' }
         $covered = @($entries.Keys | Where-Object { [version]$_ -gt $from -and [version]$_ -le [version]$version } | Sort-Object { [version]$_ } -Descending)
-        if ($covered.Count -le 1) { return $notes }
-        return ($covered | ForEach-Object { "## $_`n" + $(if ($entries[$_]) { $entries[$_] } else { '(no English notes)' }) }) -join "`n`n"
+        if ($covered.Count -le 1) { return $(if ($French) { $notesFr } else { $notes }) }
+        $source = if ($French) { $entriesFr } else { $entries }
+        $missing = if ($French) { '(pas de notes en français)' } else { '(no English notes)' }
+        return ($covered | ForEach-Object { "## $_`n" + $(if ($source[$_]) { $source[$_] } else { $missing }) }) -join "`n`n"
+    }
+    # Git and GitHub in two languages (2026-11-09): English first, then this marker line, then French. Same format as tools/bilingual.py
+    # (its self-test reads the marker here).
+    $bilingualMarker = 'Français :'
+    function Join-Bilingual([string]$English, [string]$French) {
+        if (-not $French.Trim()) { return $English.Trim() }
+        return "$($English.Trim())`n`n$bilingualMarker`n`n$($French.Trim())"
     }
 
     $branch = (Invoke-Git @('rev-parse', '--abbrev-ref', 'HEAD')).Trim()
@@ -98,7 +110,7 @@ try {
             # Body: every version since the last committed one (subject 'x.y.z…' of the latest commit carrying a version).
             $lastCommitted = @(Invoke-Git @('log', '-200', '--format=%s') | ForEach-Object { if ($_ -match '^(\d+\.\d+\.\d+)') { $Matches[1] } } | Select-Object -First 1)
             $since = if ($lastCommitted.Count -gt 0 -and [version]$lastCommitted[0] -lt [version]$version) { $lastCommitted[0] } else { $version }
-            $commitNotes = if ($since -eq $version) { $notes } else { Get-NotesSince $since }
+            $commitNotes = if ($since -eq $version) { Join-Bilingual $notes $notesFr } else { Join-Bilingual (Get-NotesSince $since) (Get-NotesSince $since -French) }
             # 0.446: optional last line (e.g. the agent's 'Co-Authored-By: …'), from the environment; empty for the maintainer's own commits.
             $trailer = if ($env:TENSHO_COMMIT_TRAILER) { "`n$($env:TENSHO_COMMIT_TRAILER.Trim())`n" } else { '' }
             [IO.File]::WriteAllText($message, "$subject`n`n$commitNotes`n$trailer", [Text.UTF8Encoding]::new($false))
