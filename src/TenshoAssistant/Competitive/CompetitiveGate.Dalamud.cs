@@ -11,6 +11,8 @@ namespace TenshoAssistant.Competitive;
 /// </summary>
 internal static class CompetitiveGate
 {
+    /// <summary>X-109 (0.979): developer mode, given once the configuration is loaded (the gate starts before it).</summary>
+    internal static Func<bool>? Developer { get; set; }
     private static readonly object Gate=new();
     private static readonly Dictionary<IFramework.OnUpdateDelegate,IFramework.OnUpdateDelegate> Wrappers=[];
     private static volatile bool cut;
@@ -53,6 +55,9 @@ internal sealed class CompetitiveWatcher : IDisposable
     private readonly ICondition condition;
     private string arenaSeen="";
 
+    // X-109 (0.979, DEC-047): developer reading inside the labyrinth only, to prove when a fight starts (nothing else runs there).
+    private string labyrinthSeen="";
+    private DateTimeOffset labyrinthNext;
     public CompetitiveWatcher(IFramework framework,IClientState client,IDataManager data,IPluginLog log,IGameGui gui,ICondition condition)
     {
         this.framework=framework;this.client=client;this.log=log;this.gui=gui;this.condition=condition;
@@ -82,10 +87,45 @@ internal sealed class CompetitiveWatcher : IDisposable
     private bool Decide()=>CompetitiveZones.IsCut(client.IsLoggedIn,(uint)client.TerritoryType,client.IsPvP,zones,CompetitiveGate.Cut,InArenaInstance());
     private void Tick(IFramework _)
     {
+        if(CompetitiveGate.Developer?.Invoke()==true && CompetitiveZones.Labyrinth.Contains((uint)client.TerritoryType))
+            try{ReadLabyrinth();}catch(Exception error){if(labyrinthSeen!="failed"){labyrinthSeen="failed";log.Warning(error,"Labyrinth reading failed.");}}
         var now=Decide();
         if(now==CompetitiveGate.Cut)return;
         log.Information("Competitive cut {0}: territory {1}, PvP {2}.",now ? "on":"off",client.TerritoryType,client.IsPvP);
         CompetitiveGate.Set(now,true);
+    }
+    /// <summary>
+    /// X-109 (0.979, DEC-047): read only, twice a second, written on change: the game's « in combat » and « bound by duty » states and the names of the
+    /// visible windows, so the moment a fight starts (and the board's windows) can be told from the log. Developer mode only, labyrinth only.
+    /// </summary>
+    private unsafe void ReadLabyrinth()
+    {
+        var at=DateTimeOffset.UtcNow;
+        if(at<labyrinthNext)return;
+        labyrinthNext=at.AddMilliseconds(500);
+        var names=new List<string>();
+        var manager=FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkUnitManager.Instance();
+        if(manager!=null)
+        {
+            var layers=manager->AtkUnitManager.DepthLayers;
+            for(var layer=0;layer<layers.Length;layer++)
+            {
+                ref var list=ref layers[layer];
+                var count=Math.Min((int)list.Count,list.Entries.Length);
+                for(var index=0;index<count && names.Count<64;index++)
+                {
+                    FFXIVClientStructs.FFXIV.Component.GUI.AtkUnitBase* unit=list.Entries[index].Value;
+                    if(unit==null || !unit->IsVisible)continue;
+                    var name=unit->NameString;
+                    if(name.Length>0)names.Add(name);
+                }
+            }
+        }
+        var seen=$"territory {client.TerritoryType}, in combat {condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat]}, bound by duty {condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty]}, "
+            +$"cut {CompetitiveGate.Cut}, windows: {string.Join(", ",names.Distinct().Order(StringComparer.Ordinal))}";
+        if(seen==labyrinthSeen)return;
+        labyrinthSeen=seen;
+        log.Information("Labyrinth reading: {0}",seen);
     }
     public void Dispose()
     {

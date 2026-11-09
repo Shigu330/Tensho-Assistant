@@ -454,3 +454,23 @@ Decision: 1 coupure JcJ : laissée comme aujourd'hui (travaux lancés non annul�
 Reason: Décisions de l'utilisateur.
 Consequences: X-97 (aide à la pêche), X-90 (wiki, notes, schéma, bestiaire), plan des réglages à proposer.
 References: G-PROPOSALS, DEC-026, DEC-038, DEC-041, docs/project/CONTENT-TOOLS.md
+
+DEC-ID: DEC-046
+Timestamp: 2026-11-09 Europe/Brussels
+Problem: Maximiseur d'équipe du dresseur (demande du 2026-11-09) alors que DEC-032 excluait une « meilleure équipe » calculée sans nouvelle décision (le Dédale bestial a des classements).
+Evidence: Réponse de l'utilisateur après le rappel de la règle : « équipe calculée tant que ce n'est pas pendant le combat, je pense que c'est ok ».
+Options: Couverture des faiblesses seulement ; équipe calculée hors combat ; rien de plus.
+Decision: Équipe calculée permise, préparée hors combat : depuis la page Tensho, avant d'entrer, d'après les faiblesses des ennemis rencontrés (relevés) et les bêtes possédées ; résultat en cache disque. Rien pendant un combat, rien à l'intérieur du Dédale (DEC-038 coupe Tensho en contenu classé), aucune action automatisée, JcE seulement. Complète DEC-032 et DEC-041.
+Reason: Décision de l'utilisateur, règle Dalamud rappelée avant (dépôt personnalisé, DEC-039).
+Consequences: Point X-109 du plan ; le calcul reste une aide de préparation, affichée comme telle.
+References: DEC-032, DEC-038, DEC-039, DEC-041, issue #34
+
+DEC-ID: DEC-047
+Timestamp: 2026-11-09 Europe/Brussels
+Problem: Aide au choix des 3 bêtes de chaque affrontement du Dédale bestial : l'écran du plateau est dans l'instance (relevé du 2026-11-09 : « Competitive cut on: territory 1339 » à l'entrée, juste après la fenêtre de mission), où DEC-038 coupe tout Tensho.
+Evidence: Réponse de l'utilisateur après le rappel de DEC-038 et de la règle Dalamud (classements, avantage en contenu compétitif) : couper « au début de chaque combat ».
+Options: Coupure à l'entrée, tout préparé avant ; coupure au début de chaque combat (exception).
+Decision: Exception limitée à DEC-038 pour le Dédale bestial : dans ses territoires, tout Tensho reste coupé sauf le panneau d'équipe du dresseur et la lecture minimale qu'il demande, actifs seulement devant le plateau, entre les combats ; coupés dès le début de chaque combat et pendant tout combat. Aucune action automatisée, rien qui lise le combat. Le reste du contenu classé est inchangé.
+Reason: Décision de l'utilisateur, règle Dalamud rappelée avant (dépôt personnalisé, DEC-039).
+Consequences: X-109 : le moment du début de combat est à prouver en jeu (relevé de développement autorisé par cette exception) avant d'activer le panneau ; en doute, coupé.
+References: DEC-032, DEC-038, DEC-039, DEC-041, DEC-046

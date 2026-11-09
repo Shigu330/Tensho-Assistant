@@ -1598,6 +1598,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.978) Planter (le journal note l'emplacement), à maturité récolter : ligne « Jardin : … récolté, retiré du journal ».
 
+- [ ] (0.979) Mode développeur, dans le Dédale : plateau, « Commencer le combat », fin du combat, plateau suivant ; dalamud.log, lignes « Labyrinth reading: … ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

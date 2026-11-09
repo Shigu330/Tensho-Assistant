@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.979.0
+- Plan global, Verify : Dédale bestial (X-109, DEC-047), relevé pour l'essai de ce soir : en mode développeur et seulement dans le Dédale, Tensho écrit au journal, à chaque changement, l'état « en combat » du jeu, l'état « en mission » et les noms des fenêtres visibles (lecture seule, deux fois par seconde). Il servira à trouver le moment exact où un combat commence, avant d'activer le panneau d'équipe entre les combats. Tout le reste de Tensho reste coupé dans le Dédale. Décisions DEC-046 et DEC-047 et plan X-108 à X-111 notés. Non validé en jeu.
+- Tests : Labyrinth979Tests. Verify.ps1 (agent) : 1608/1608, 0 avertissement, 0 erreur ; DLL 0.979.0.0. Non validé en jeu.
+### English
+- Beastmaster labyrinth (X-109, DEC-047), reading for tonight's test: in developer mode and only in the labyrinth, Tensho writes to the log, on each change, the game's « in combat » state, the « bound by duty » state and the names of the visible windows (read only, twice a second). It will find the exact moment a fight starts, before the team panel is enabled between fights. The rest of Tensho stays cut in the labyrinth. Decisions DEC-046 and DEC-047 and plan items X-108 to X-111 recorded. Not validated in game.
+
 ## 0.978.0
 - Plan global, Verify : Jardin (ticket #36, votre récolte de cette nuit) : la récolte est maintenant reconnue : un gain d'objet pendant que la cible est un emplacement du potager, dans un logement (relevé : docs/evidence/0.978-garden-harvest.md). L'emplacement récolté est retiré du journal avec une ligne « Jardin : … récolté » ; s'il y en a plusieurs à cet endroit, celui arrivé à maturité seul est choisi, sinon rien n'est deviné. Les pots de fleurs ne sont pas encore reconnus (objet non relevé). Non validé en jeu.
 - Tests : GardenHarvest978Tests. Verify.ps1 (agent) : 1607/1607, 0 avertissement, 0 erreur ; DLL 0.978.0.0. Non validé en jeu.

@@ -9,6 +9,8 @@ public static class CompetitiveZones
 {
     public const uint DeepDungeonContentType=21;
     public static readonly IReadOnlySet<uint> Listed=new HashSet<uint>{940,941,831,1339,1340,1341,1342,1343};
+    /// <summary>X-109 (0.979, DEC-047): the Beastmaster labyrinth's territories (one per board; 1339 read in game on 2026-11-09 at the 1st board's entry).</summary>
+    public static readonly IReadOnlySet<uint> Labyrinth=new HashSet<uint>{1339,1340,1341,1342,1343};
     /// <summary>
     /// 0.612 (user report, in game): territory 579 is also a public hall with PvE matches, so neither the place nor a match proves anything: stopped only in
     /// the arena's own instance. What marks it is measured in game (the watcher logs it): docs/project/COMPETITIVE-OFF-PLAN.md.

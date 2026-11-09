@@ -108,6 +108,7 @@ public sealed class Plugin : IDalamudPlugin
             var saved = pluginInterface.GetPluginConfig() as Configuration;
             var newInstall = saved is null;
             var configuration = saved ?? new Configuration();
+            TenshoAssistant.Competitive.CompetitiveGate.Developer=()=>configuration.DeveloperMode;
             autoBankCapture = () => configuration.AutoBankCapture;
             fontSettings = () => configuration.Fonts;
             if (configuration.Version != 1)
