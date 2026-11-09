@@ -23,7 +23,8 @@ internal sealed partial class MainWindow
     {
         if(!configuration.TrackerWindow)return;
         configuration.TrackerWindow=false;
-        try{save();}catch(Exception error){log.Warning(error,"Tracker window setting could not be saved.");}
+        // X-76 H3 (0.914): a closed window stays closed when saving fails (the player asked for it); the next save writes it.
+        TrySave("Tracker window");
     }
 
     private void DrawTrackerContents()
@@ -36,12 +37,12 @@ internal sealed partial class MainWindow
             ImGui.PushID(row.Id.ToString());
             try
             {
-                DrawItemIcon(new ItemDefinition(0,row.Label,false,row.IconId),new Vector2(20));ImGui.SameLine();
+                DrawGameIcon(row.IconId,new Vector2(20));ImGui.SameLine();
                 if(ImGui.Selectable(row.Label,false,ImGuiSelectableFlags.None,new Vector2(220,0))){OpenAlarmItem(row.ItemId);IsOpen=true;}
                 ImGui.SameLine();
                 var left=row.At-now;
                 ImGui.TextColored(left<=TimeSpan.FromMinutes(5) ? Accent:Muted,AlarmDtrEntry.Remaining(left)+(row.Weather ? " *":""));
-                if(row.Weather && ImGui.IsItemHovered())WrappedTooltip(localization.Get("Alarms.WeatherCondition"));
+                if(row.Weather)Tip("Alarms.WeatherCondition");
                 if(configuration.Alarms?.FirstOrDefault(alarm=>alarm.Id==row.Id) is { } alarm && AlarmPlace(alarm) is { } place
                    && maps.State.Catalog?.Find(place.MapId) is { } map)
                 {
@@ -69,7 +70,7 @@ internal sealed partial class MainWindow
     {
         var behind=configuration.HideBarsBehindGame && BehindGame(at,size);
         // 0.692: what hides a panel, on each change, to read a « panel never shows » report in the log.
-        if(name is not null && panelsBehind.GetValueOrDefault(name)!=behind)
+        if(name is not null && panelsBehind.GetValueOrDefault(name)!=behind && developerMode)
         {
             panelsBehind[name]=behind;
             log.Information("Panel {0} {1}: at {2}, size {3}; windows: {4}.",name,behind ? "steps aside":"comes back",at,size,string.Join(", ",GameWindowList.Where(window=>UI.GameWindows.Touch(at.X,at.Y,size.X,size.Y,window.X,window.Y,window.Width,window.Height)).Select(window=>window.Name)));
@@ -89,7 +90,7 @@ internal sealed partial class MainWindow
         if(covered!=mapWasCovered)
         {
             mapWasCovered=covered;
-            log.Information("Map {0}: game window {1}, panel {2}, at {3}, size {4}; windows: {5}.",covered ? "steps aside":"comes back",byWindow,byPanel,at,size,string.Join(", ",GameWindowList.Where(window=>UI.GameWindows.Touch(at.X,at.Y,size.X,size.Y,window.X,window.Y,window.Width,window.Height)).Select(window=>window.Name)));
+            if(developerMode)log.Information("Map {0}: game window {1}, panel {2}, at {3}, size {4}; windows: {5}.",covered ? "steps aside":"comes back",byWindow,byPanel,at,size,string.Join(", ",GameWindowList.Where(window=>UI.GameWindows.Touch(at.X,at.Y,size.X,size.Y,window.X,window.Y,window.Width,window.Height)).Select(window=>window.Name)));
         }
         return covered;
     }
@@ -99,5 +100,5 @@ internal sealed partial class MainWindow
     internal Vector2 WindowMoved(string addon,float x,float y)=>GameWindowFollow is { } follow ? follow(addon,x,y)-new Vector2(x,y):Vector2.Zero;
     /// <summary>0.516: the panels attached to a game window.</summary>
     internal AttachedPanels? Panels { get; set; }
-    internal void PanelFailed(string name,Exception error)=>log.Error(error,$"Overlay {name} turned off until the plugin reloads (perhaps after a game update).");
+    internal void PanelFailed(string name,Exception error)=>log.Error(error,"Overlay {0} turned off until the plugin reloads (perhaps after a game update).",name);
 }

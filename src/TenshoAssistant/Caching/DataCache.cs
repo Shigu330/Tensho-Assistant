@@ -148,6 +148,22 @@ public sealed class DataCache : IDisposable
         catch(Exception error) when(error is IOException or UnauthorizedAccessException){return null;}
     }
     public Task FlushAsync(){lock(gate)return writes;}
+    /// <summary>X-76 step 3 (0.945): the cache folder.</summary>
+    public string Root=>root;
+    /// <summary>X-76 step 3 (0.945): every cached file removed, once the writes asked before are done; the count removed.</summary>
+    public async Task<int> ClearAsync()
+    {
+        Task pending;lock(gate)pending=writes;
+        try{await pending.ConfigureAwait(false);}catch(Exception){}
+        lock(gate)
+        {
+            var removed=0;
+            if(Directory.Exists(root))
+                foreach(var file in Directory.GetFiles(root,"*",SearchOption.AllDirectories))
+                    try{File.Delete(file);removed++;}catch(IOException){}catch(UnauthorizedAccessException){}
+            return removed;
+        }
+    }
     public Task<bool> InvalidateAsync(string family,string scope,string version)=>WriteAsync<object?>(family,scope,version,null,DateTimeOffset.MinValue);
     public void Dispose()
     {

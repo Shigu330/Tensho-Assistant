@@ -6,20 +6,30 @@ namespace TenshoAssistant.Gathering;
 /// weather, the three missions (IKDPlayerMissionCondition row, progress), the player's points and fish caught.
 /// </summary>
 public sealed record OceanVoyageFrame(uint RouteId,int Zone,int Status,bool Spectral,uint WeatherId,
-    IReadOnlyList<(uint Type,int Progress)> Missions,int Points,int Caught,DateTimeOffset ObservedAt);
+    IReadOnlyList<(uint Type,int Progress)> Missions,int Points,int Caught,DateTimeOffset ObservedAt)
+{
+    /// <summary>X-85 V2 (0.964): the fish caught at the current stop this voyage (FishData of the zone: item, NQ, HQ, points earned with it).</summary>
+    public IReadOnlyList<(uint Item,int Nq,int Hq,int Points)> ZoneFish { get; init; }=[];
+}
 
 /// <summary>An ocean fishing place (IKDSpot): its name and its two fishing spots, the usual one and the spectral current's.</summary>
 public sealed record OceanSpot(uint Id,string Place,uint MainSpot,uint SpectralSpot);
 
 /// <summary>A mission (IKDPlayerMissionCondition): its text in the game's language and the number to reach.</summary>
-public sealed record OceanMission(string Text,int Target);
+public sealed record OceanMission(string Text,int Target,OceanMissionCriterion? Criterion=null);
 
 /// <summary>
 /// The game's ocean fishing data, copied once: routes (IKDRoute: places and moment rows of the three stops), places (IKDSpot), the
 /// fish of each fishing spot (FishingSpot.Item) and the missions. docs/evidence/0.418-ocean-voyage.md.
 /// </summary>
 public sealed record OceanVoyageData(IReadOnlyDictionary<uint,(uint[] Spots,uint[] Times)> Routes,IReadOnlyDictionary<uint,OceanSpot> Spots,
-    IReadOnlyDictionary<uint,IReadOnlyList<uint>> SpotFish,IReadOnlyDictionary<uint,OceanMission> Missions);
+    IReadOnlyDictionary<uint,IReadOnlyList<uint>> SpotFish,IReadOnlyDictionary<uint,OceanMission> Missions)
+{
+    /// <summary>X-85 V1 (0.917): the territories of the ocean fishing spots (FishingSpot.TerritoryType of every IKDSpot spot), read in the game data.</summary>
+    public IReadOnlySet<uint> Territories { get; init; }=new HashSet<uint>();
+    /// <summary>X-85 V3 (0.961): each ocean fish's species rows (IKDFishParam: FishParameter.Item → IKDContentBonus rows).</summary>
+    public IReadOnlyDictionary<uint,uint[]> FishBonuses { get; init; }=new Dictionary<uint,uint[]>();
+}
 
 /// <summary>The stop being fished: its place, moment, the spot (spectral or not) and its fish; the next stop when there is one.</summary>
 public sealed record OceanStopView(int Index,OceanSpot Spot,OceanTime Time,bool Spectral,IReadOnlyList<uint> Fish,OceanSpot? NextSpot,OceanTime NextTime);
@@ -38,6 +48,12 @@ public static class OceanVoyages
         {next=following;nextTime=route.Times.Length>frame.Zone+1 ? OceanSchedule.TimeOf(route.Times[frame.Zone+1]):OceanTime.Unknown;}
         return new(frame.Zone,spot,time,frame.Spectral,fish,next,nextTime);
     }
+
+    /// <summary>
+    /// X-98 (0.958): points and catches only when they can be true for one voyage (the game showed 3,820 points while the field read 57,359 and 27,127
+    /// catches: the player's line is filled only at some moments). Unproven: the panel hides them otherwise.
+    /// </summary>
+    public static bool Plausible(OceanVoyageFrame frame)=>frame.Points is >= 0 and <= 30_000 && frame.Caught is >= 0 and <= 400;
 
     /// <summary>The missions as (text, progress, target); a type the data does not know is left out.</summary>
     public static IReadOnlyList<(string Text,int Progress,int Target)> Missions(OceanVoyageData data,OceanVoyageFrame frame)

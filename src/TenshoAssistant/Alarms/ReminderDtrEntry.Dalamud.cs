@@ -93,18 +93,13 @@ public sealed class ReminderDtrEntry : IDisposable
 
     private void Tooltip((Vector2 Min,Vector2 Max)? bounds,string title,IEnumerable<string> lines)
     {
-        if(bounds is not { } box)return;
-        var mouse=ImGui.GetIO().MousePos;
-        if(mouse.X<box.Min.X || mouse.X>box.Max.X || mouse.Y<box.Min.Y || mouse.Y>box.Max.Y)return;
-        ImGui.SetNextWindowPos(new Vector2(box.Min.X,box.Max.Y+4));
-        ImGui.BeginTooltip();
-        try
+        if(!TooltipScope.UnderBox(bounds))return;
+        using(TooltipScope.Begin())
         {
             ImGui.TextColored(UI.FfxivTheme.Gold,title);
             foreach(var line in lines)ImGui.TextUnformatted(line);
             ImGui.TextDisabled(text("Reminders.BarClick"));
         }
-        finally{ImGui.EndTooltip();}
     }
 
     public void Dispose()

@@ -42,7 +42,7 @@ internal sealed partial class MainWindow
             var (text,state)=parts[index];
             var suffix=localization.Get(state==true ? "ShopRequirement.Done":state==false ? "ShopRequirement.ToDo":"ShopRequirement.Unknown");
             if(state==true)ImGui.TextColored(Success,$"{text} {suffix}");else ImGui.TextColored(Accent,$"{text} {suffix}");
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("ShopRequirement.Tip"));
+            Tip("ShopRequirement.Tip");
         }
     }
 }

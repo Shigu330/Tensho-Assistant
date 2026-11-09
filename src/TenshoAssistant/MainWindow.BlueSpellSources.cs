@@ -12,6 +12,24 @@ internal sealed partial class MainWindow
     internal BlueSpellWikiIndex? BlueSpellIndex { get; set; }
     private int blueSpellOrder;
     private int? BlueSpellLevel(int number)=>BlueSpellIndex?.Get(number)?.MonsterLevel;
+    // X-75.4 (0.878): the monsters seen in game casting the spell or teaching it (yours or shared), with their levels and places, before the wiki's list.
+    private void DrawBlueSpellSeen(uint spellId)
+    {
+        if(DiscoveryStore is not { } store || !DiscoveriesLoaded)return;
+        var seen=store.Find(Discoveries.DiscoveryKind.BlueSpellCaster,spellId,64).Concat(store.Find(Discoveries.DiscoveryKind.BlueSpellLearned,spellId,16))
+            .Where(fact=>fact.Detail!=0).GroupBy(fact=>fact.Detail).Take(8).ToArray();
+        if(seen.Length==0)return;
+        ImGui.TextColored(Accent,localization.Get("BlueSpellSources.Seen"));
+        foreach(var monster in seen)
+        {
+            var levels=monster.Where(fact=>fact.Kind==Discoveries.DiscoveryKind.BlueSpellCaster).ToArray();
+            var level=levels.Length==0 ? "?":levels.Min(fact=>fact.LevelMin)==levels.Max(fact=>fact.LevelMax) ? levels[0].LevelMin.ToString():$"{levels.Min(fact=>fact.LevelMin)}–{levels.Max(fact=>fact.LevelMax)}";
+            ImGui.BulletText(localization.Format("BlueSpellSources.SeenLine",DiscoveryMonsterName(monster.Key),level));
+            ImGui.Indent();
+            try{DrawSeenPlaces("BlueSeen"+monster.Key,subject=>subject==monster.Key,DiscoveryMonsterName(monster.Key));}
+            finally{ImGui.Unindent();}
+        }
+    }
 
     // 0.798 (X-38, user request): the monsters of every spell, for the nearby monsters (map now, icons above their heads next); read on a click only.
     private void DrawBlueSpellNearby()
@@ -24,7 +42,10 @@ internal sealed partial class MainWindow
         ImGui.Indent();
         try
         {
-            BoolSetting("MapView.AboveBlueSpell","BlueSpellSources.AboveTip",()=>configuration.MapView.AboveBlueSpell,value=>configuration.MapView.AboveBlueSpell=value,c=>c.MapView.AboveBlueSpell);
+            // X-76 step 3 (0.953): every overhead icon needs « Icons above nearby monsters » (DrawMonsterOverheadIcons): greyed while it is off.
+            ImGui.BeginDisabled(!configuration.MapView.MonsterIconsAbove);
+            try{BoolSetting("MapView.AboveBlueSpell","BlueSpellSources.AboveTip",()=>configuration.MapView.AboveBlueSpell,value=>configuration.MapView.AboveBlueSpell=value,c=>c.MapView.AboveBlueSpell);}
+            finally{ImGui.EndDisabled();}
             BoolSetting("MapView.BlueMageMonstersAlways","BlueSpellSources.AlwaysTip",()=>configuration.MapView.BlueMageMonstersAlways,value=>configuration.MapView.BlueMageMonstersAlways=value,c=>c.MapView.BlueMageMonstersAlways);
             var missing=spells.Length-index.Known;
             if(index.Running)
@@ -86,6 +107,7 @@ internal sealed partial class MainWindow
 
     private void DrawBlueSpellMonsters(uint spellId)
     {
+        DrawBlueSpellSeen(spellId);
         if(BlueSpellWiki is not { } wiki)return;
         wiki.Select(spellId);
         ImGui.Separator();
@@ -98,12 +120,12 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndDisabled();}
         if(view.Loading)ImGui.TextDisabled(localization.Get("WikiMonsters.Loading"));
-        if(view.Error is { } error){ImGui.TextWrapped(localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"WikiMonsters.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
+        if(view.Error is { } error)DrawDataError(error,"WikiMonsters.Error");
         if(view.Document is not { } document){ImGui.TextDisabled(localization.Get("BlueSpellSources.Help"));return;}
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,document.FetchedAt);
         // 0.387: a page the wiki does not have (revision 0) is said as such, with the title asked, instead of « no monster ».
         if(document.Revision==0){ImGui.TextWrapped(localization.Format("BlueSpellSources.Missing",document.Title));ImGui.TextDisabled(document.Url);return;}
-        if(document.Monsters.Count==0){ImGui.TextWrapped(localization.Get("BlueSpellSources.Empty"));ImGui.TextDisabled(document.Url);return;}
+        if(document.Monsters.Count==0){EmptyState("BlueSpellSources.Empty");ImGui.TextDisabled(document.Url);return;}
         ImGui.SetNextItemWidth(200);
         if(ImGui.BeginCombo("##BlueMonsterOrder",localization.Get("BlueSpellSources."+BlueMonsterOrders[Math.Clamp(blueMonsterOrder,0,2)])))
         {
@@ -123,7 +145,7 @@ internal sealed partial class MainWindow
             var place=BlueSpellSources.Parse(row.Location);
             if(place.X is not { } x || place.Y is not { } y || MapOfEnglishPlace(place.Place) is not { } map)continue;
             PlaceMenu($"BluePlace{index}",map,new(x,y),CommunityMonster(row.Name));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("EntityMenu.RightClickPlace"));
+            Tip("EntityMenu.RightClickPlace");
             ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("BlueSpellSources.Flag")+$"##BlueFlag{index}"))PlaceFlagFromMapView(map,x,y);
         }

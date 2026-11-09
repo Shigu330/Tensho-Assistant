@@ -5,8 +5,8 @@ using TenshoAssistant.Beastmaster;
 namespace TenshoAssistant;
 
 // Progression › Beastmaster (0.500, user request): the beasts, with their attributes at a chosen rank, and the boards of the Beast Labyrinth with
-// their enemies and bonuses. Reads only. No team advice yet: what makes a beast better against an enemy is not established
-// (docs/evidence/0.500-xbm-columns.md).
+// their enemies and bonuses. Reads only. 0.980 (X-109, DEC-046): a team tab, prepared out of combat, following plain rules said on the page
+// (docs/evidence/0.980-beast-teams.md).
 internal sealed partial class MainWindow
 {
     internal BeastService? Beasts { get; set; }
@@ -30,11 +30,42 @@ internal sealed partial class MainWindow
         [
             ("Beasts", localization.Get("BeastUi.Beasts"), () => DrawBeastList(state, catalog)),
             ("Boards", localization.Get("BeastUi.Boards"), () => DrawBeastBoards(catalog)),
+            ("Team", localization.Get("BeastUi.Team"), () => DrawBeastTeam(state, catalog)),
         ], ref beastTabFocus);
+    }
+
+    // 0.804 (X-39, user request): where to tame what is missing, nearby; the wiki's bestiary read on a click only.
+    private void DrawBeastNearby()
+    {
+        if (BeastWiki is not { } wiki) return;
+        wiki.LoadCached();
+        BoolSetting("MapView.ShowBeastMonsters", "BeastUi.NearbyTip", () => configuration.MapView.ShowBeastMonsters, value => configuration.MapView.ShowBeastMonsters = value, c => c.MapView.ShowBeastMonsters);
+        if (!configuration.MapView.ShowBeastMonsters) return;
+        ImGui.Indent();
+        try
+        {
+            // X-76 step 3 (0.953): every overhead icon needs « Icons above nearby monsters » (DrawMonsterOverheadIcons): greyed while it is off.
+            ImGui.BeginDisabled(!configuration.MapView.MonsterIconsAbove);
+            try { BoolSetting("MapView.AboveBeast", "BeastUi.AboveTip", () => configuration.MapView.AboveBeast, value => configuration.MapView.AboveBeast = value, c => c.MapView.AboveBeast); }
+            finally { ImGui.EndDisabled(); }
+            BoolSetting("MapView.BeastMonstersAlways", "BeastUi.AlwaysTip", () => configuration.MapView.BeastMonstersAlways, value => configuration.MapView.BeastMonstersAlways = value, c => c.MapView.BeastMonstersAlways);
+            if (wiki.Running) ImGui.TextDisabled(localization.Get("BeastUi.WikiReading"));
+            else
+            {
+                ImGui.TextDisabled(wiki.Book is { } book ? localization.Format("BeastUi.WikiKnown", book.Rows.Count, book.FetchedAt.ToLocalTime().ToString("g")) : localization.Get("BeastUi.WikiNone"));
+                ImGui.SameLine();
+                if (SourceButton(localization.Get(wiki.Book is null ? "BeastUi.WikiFetch" : "BeastUi.WikiRefresh"), configuration.CommunityWiki, true)) wiki.Fetch();
+                Tip("BeastUi.WikiFetchTip");
+                if (wiki.Error == "disabled") ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
+                else if (wiki.Error is not null) ImGui.TextColored(UI.FfxivTheme.Warning, localization.Get("BeastUi.WikiFailed"));
+            }
+        }
+        finally { ImGui.Unindent(); }
     }
 
     private void DrawBeastList(BeastState state, BeastCatalog catalog)
     {
+        DrawBeastNearby();
         var obtained = state.Obtained;
         if (obtained is null) ImGui.TextDisabled(localization.Get(state.ObtainedUnavailable ? "BeastUi.ObtainedFailed" : "BeastUi.ObtainedUnknown"));
         else ImGui.TextDisabled(localization.Format("BeastUi.ObtainedCount", obtained.Count, catalog.Beasts.Count));
@@ -78,7 +109,8 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow(); ImGui.TableNextColumn();
                 DrawSmallGameIcon(beast.Icon); ImGui.SameLine();
                 var known = obtained?.Contains(beast.Id);
-                ImGui.TextColored(known == true ? Success : known == false ? Muted : Accent, (known == true ? "✓ " : known == false ? "✗ " : "? ") + beast.Name);
+                DrawStateMark(known); ImGui.SameLine();
+                ImGui.TextColored(known == true ? Success : known == false ? Muted : Accent, beast.Name);
                 if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("BeastUi.Tooltip", beast.Id, beast.Assault, beast.Volley));
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.Family);
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
@@ -86,14 +118,20 @@ internal sealed partial class MainWindow
                 foreach (var value in new[] { stats?.Strength, stats?.Intelligence, stats?.PhysicalResistance, stats?.MagicalResistance, stats?.Vitality })
                 { ImGui.TableNextColumn(); ImGui.TextUnformatted(value?.ToString() ?? "?"); }
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.CatchPlace);
+                // X-110 (0.984, user request: where to tame each beast, exact place): places seen in game, the common place menu on them (X-111).
+                if (BeastPlacesOf(beast.Id) is { Count: > 0 } places)
+                {
+                    ImGui.SameLine(); ImGui.TextColored(Accent, localization.Format("BeastUi.PlacesSeen", places.Count));
+                    Tip("BeastUi.PlacesSeenTip");
+                    NpcMenu($"BeastPlaces{beast.Id}", beast.Name, 0, places);
+                }
             }
         }
         finally { ImGui.EndTable(); }
     }
 
-    private void DrawBeastBoards(BeastCatalog catalog)
+    private Board DrawBeastBoardChoice(BeastCatalog catalog)
     {
-        if (catalog.Boards.Count == 0) { ImGui.TextDisabled(localization.Get("BeastUi.NoBoard")); return; }
         beastBoard = Math.Clamp(beastBoard, 0, catalog.Boards.Count - 1);
         var board = catalog.Boards[beastBoard];
         ImGui.SetNextItemWidth(320);
@@ -103,6 +141,148 @@ internal sealed partial class MainWindow
             finally { ImGui.EndCombo(); }
         }
         Tip("BeastUi.BoardTip");
+        return board;
+    }
+
+    // X-109 (0.980, DEC-046): the 10 beasts for a board and the 3 of each fight, prepared out of combat, kept on disk (BeastTeams.json).
+    internal Func<string>? BeastTeamsFile { get; set; }
+    private BeastTeams.SavedPlans? beastPlans;
+    private bool beastPlansLoaded;
+    private Task<BoardPlan>? beastPlanTask;
+    private (uint Board, string Key)? beastPlanFor;
+    internal BoardPlan? BeastPlanFor(Board board, BeastState state)
+    {
+        if (!beastPlansLoaded)
+        {
+            beastPlansLoaded = true;
+            try { if (BeastTeamsFile?.Invoke() is { } file && File.Exists(file)) beastPlans = BeastTeams.Read(File.ReadAllText(file)); }
+            catch (Exception error) { log.Warning(error, "Beast team plans unreadable."); }
+            beastPlans ??= new([], []);
+        }
+        var key = BeastTeams.Key(state.Obtained, BeastRanks);
+        if (beastPlanTask is { IsCompleted: true } done && beastPlanFor is { } wanted)
+        {
+            beastPlanTask = null;
+            if (done.IsCompletedSuccessfully)
+            {
+                beastPlans!.Plans[wanted.Board] = done.Result; beastPlans.Keys[wanted.Board] = wanted.Key;
+                try { if (BeastTeamsFile?.Invoke() is { } file) AtomicFile.Write(file, BeastTeams.Write(beastPlans)); }
+                catch (Exception error) { log.Warning(error, "Beast team plans could not be saved."); }
+            }
+        }
+        if (beastPlans!.Keys.GetValueOrDefault(board.Id) == key && beastPlans.Plans.TryGetValue(board.Id, out var plan)) return plan;
+        if (beastPlanTask is null && state.Catalog is { } catalog)
+        {
+            var held = state.Obtained; var ranks = BeastRanks;
+            beastPlanFor = (board.Id, key);
+            beastPlanTask = Task.Run(() => BeastTeams.Plan(board, catalog.Beasts, held, ranks));
+        }
+        return beastPlans.Plans.GetValueOrDefault(board.Id);
+    }
+    /// <summary>X-109 (0.981): each beast's rank read in the game's team window, kept on disk with the plans; null: unknown, the board's limit is assumed.</summary>
+    internal IReadOnlyDictionary<uint, int>? BeastRanks => beastPlans?.Ranks;
+    /// <summary>X-109 (0.981): ranks read in the game's team window: merged with those known, saved when they change.</summary>
+    internal void BeastRanksRead(Dictionary<uint, int> ranks)
+    {
+        if (beastPlans is null) return;
+        var known = beastPlans.Ranks ?? [];
+        if (ranks.All(pair => known.TryGetValue(pair.Key, out var rank) && rank == pair.Value)) return;
+        var merged = new Dictionary<uint, int>(known);
+        foreach (var (beast, rank) in ranks) merged[beast] = rank;
+        beastPlans = beastPlans with { Ranks = merged };
+        try { if (BeastTeamsFile?.Invoke() is { } file) AtomicFile.Write(file, BeastTeams.Write(beastPlans)); }
+        catch (Exception error) { log.Warning(error, "Beast team plans could not be saved."); }
+    }
+    /// <summary>X-109 (0.981): the board of a labyrinth territory (its ContentFinderCondition); null outside.</summary>
+    internal Func<uint, uint>? BeastBoardOfTerritory { get; set; }
+
+    /// <summary>X-109 (0.981, DEC-047): the panel beside the game's board: in the labyrinth its own board, before entering the board chosen here.</summary>
+    internal void DrawBeastBoardPanel()
+    {
+        var state = Beasts?.State;
+        if (state?.Catalog is not { } catalog || catalog.Boards.Count == 0) { EmptyState("BeastUi.Loading"); return; }
+        Board board;
+        if (TenshoAssistant.Competitive.CompetitiveGate.Cut)
+        {
+            var id = BeastBoardOfTerritory?.Invoke(CurrentTerritory?.Invoke() ?? 0) ?? 0;
+            if (catalog.Boards.FirstOrDefault(row => row.Id == id) is not { } here) { EmptyState("BeastUi.TeamBoardUnknown"); return; }
+            board = here;
+            ImGui.TextColored(Accent, board.Name);
+        }
+        else board = DrawBeastBoardChoice(catalog);
+        if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
+        DrawBeastPlan(plan, board, catalog, state.Obtained is null);
+        ImGui.TextDisabled(localization.Get("BeastUi.TeamPanelNote"));
+    }
+
+    private void DrawBeastTeam(BeastState state, BeastCatalog catalog)
+    {
+        if (catalog.Boards.Count == 0) { ImGui.TextDisabled(localization.Get("BeastUi.NoBoard")); return; }
+        var board = DrawBeastBoardChoice(catalog);
+        BoolSetting("BeastUi.BoardPanel", "BeastUi.BoardPanelTip", () => configuration.ShowBeastBoardPanel, value => configuration.ShowBeastBoardPanel = value, c => c.ShowBeastBoardPanel);
+        ImGui.TextWrapped(localization.Get("BeastUi.TeamRules"));
+        if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
+        DrawBeastPlan(plan, board, catalog, state.Obtained is null);
+    }
+
+    internal void DrawBeastPlan(BoardPlan plan, Board board, BeastCatalog catalog, bool heldUnknown)
+    {
+        Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
+        if (heldUnknown) ImGui.TextColored(Warning, localization.Get("BeastUi.TeamHeldUnknown"));
+        if (plan.RanksAssumed) ImGui.TextDisabled(localization.Format("BeastUi.TeamRanksAssumed", board.RankLimit));
+        ImGui.TextColored(Accent, localization.Format("BeastUi.TeamTen", plan.Team.Count));
+        foreach (var pick in plan.Team)
+        {
+            if (Of(pick.Beast) is not { } beast) continue;
+            DrawSmallGameIcon(beast.Icon); ImGui.SameLine();
+            ImGui.TextUnformatted(localization.Format("BeastUi.TeamBeast", beast.Name, pick.Rank, beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical")));
+        }
+        ImGui.Spacing();
+        foreach (var battle in plan.Battles)
+        {
+            if (battle.Battle >= board.Battles.Count) continue;
+            var fight = board.Battles[battle.Battle];
+            ImGui.TextColored(Accent, fight.Guardian ? localization.Get("BeastUi.Guardian") : localization.Format("BeastUi.TeamFight", battle.Battle));
+            ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.TeamHit", battle.WeaknessesHit, battle.Enemies));
+            ImGui.TextDisabled("    " + string.Join(", ", fight.Enemies.Select(enemy => enemy.Weakness.Length > 0 ? $"{enemy.Name} ({enemy.Weakness})" : enemy.Name)));
+            ImGui.TextUnformatted("    → " + string.Join(", ", battle.Team.Select(pick => Of(pick.Beast)?.Name ?? $"#{pick.Beast}")));
+        }
+    }
+
+    /// <summary>
+    /// X-110 (0.984): where a beast was seen tamed (BeastTamed with a place: yours or shared), then where the monster it is tamed from was seen
+    /// (MonsterPlace; the monster from those tames, or from the wiki's « tamed from » enemy). Six places at most; worked out again when the base changes.
+    /// </summary>
+    private (int Wiki, object? Seen, int Revision)? beastPlacesFor;
+    private Dictionary<uint, IReadOnlyList<Npcs.NpcLocation>> beastPlaces = [];
+    private IReadOnlyList<Npcs.NpcLocation> BeastPlacesOf(uint beast)
+    {
+        if (DiscoveryStore is not { } store || !DiscoveriesLoaded || maps.State.Catalog is not { } catalog) return [];
+        var key = (BeastWiki?.Revision ?? -1, (object?)Seen(), store.Revision);
+        if (beastPlacesFor != key) { beastPlacesFor = key; beastPlaces = []; }
+        if (beastPlaces.TryGetValue(beast, out var known)) return known;
+        var places = new List<Npcs.NpcLocation>();
+        void Add(Discoveries.DiscoveryFact fact)
+        {
+            if (fact.Map == 0 || places.Count >= 6 || catalog.Find(fact.Map) is not { } map) return;
+            var at = Maps.MapProjection.CoordinateFromWorld(new Vector3(fact.X, 0, fact.Z), map);
+            if (places.Any(place => place.MapId == fact.Map && Vector2.Distance(new Vector2(place.X, place.Y), at) < 1)) return;
+            places.Add(new(fact.Territory, fact.Map, map.Zone, at.X, at.Y, fact.X, 0, fact.Z));
+        }
+        var tames = store.Find(Discoveries.DiscoveryKind.BeastTamed, beast, 8);
+        foreach (var fact in tames) Add(fact);
+        var monsters = new HashSet<uint>(tames.Select(fact => fact.Detail).Where(id => id != 0));
+        if (BeastWiki?.Book is { } book && EnglishMonsterIds is { } english)
+            foreach (var row in book.Rows.Where(row => row.Number == beast)) foreach (var id in english(row.Enemy.Trim())) monsters.Add(id);
+        foreach (var monster in monsters.Take(4)) foreach (var fact in store.Find(Discoveries.DiscoveryKind.MonsterPlace, monster, 3)) Add(fact);
+        if (beastPlaces.Count < 512) beastPlaces[beast] = places;
+        return places;
+    }
+
+    private void DrawBeastBoards(BeastCatalog catalog)
+    {
+        if (catalog.Boards.Count == 0) { ImGui.TextDisabled(localization.Get("BeastUi.NoBoard")); return; }
+        var board = DrawBeastBoardChoice(catalog);
         ImGui.TextUnformatted(localization.Format("BeastUi.BoardLine", board.Level, board.ItemLevel, board.TeamSize, board.RankLimit));
         ImGui.TextDisabled(localization.Get("BeastUi.WeaknessNote"));
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("BeastUi.Enemies"), ImGuiTreeNodeFlags.DefaultOpen))
@@ -116,6 +296,8 @@ internal sealed partial class MainWindow
                     DrawSmallGameIcon(enemy.Icon); ImGui.SameLine();
                     ImGui.TextUnformatted(enemy.Name);
                     if (enemy.Weakness.Length > 0) { ImGui.SameLine(); ImGui.TextColored(Success, localization.Format("BeastUi.Weakness", enemy.Weakness)); }
+                    // X-109 (0.980): the game's stars of the enemy (same order as its board window).
+                    if (enemy.Stars is { } stars) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.Stars", stars.Strength, stars.Intelligence, stars.PhysicalResistance, stars.MagicalResistance, stars.Vitality)); }
                     foreach (var action in enemy.Actions)
                         ImGui.TextDisabled("    " + string.Join(" · ", new[] { action.Name, action.Shape, action.Target }.Where(part => part.Length > 0)));
                 }

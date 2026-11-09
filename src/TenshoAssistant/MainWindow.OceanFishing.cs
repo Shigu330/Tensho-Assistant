@@ -11,11 +11,18 @@ internal sealed partial class MainWindow
 {
     internal Func<OceanSchedule?>? OceanTimetable { get; set; }
     private uint oceanRouteFilter;
+    /// <summary>X-85 V1 (0.917): state of each port from the saved sightings; recomputed when a sighting is added (null = to compute).</summary>
+    private (OceanPortState Aldenard,OceanPortState Othard)? oceanPortStates;
 
     private void DrawOceanFishing()
     {
         Heading(localization.Get("OceanFishing.Title"),localization.Get("OceanFishing.Description"));
-        if(OceanTimetable?.Invoke() is not { } schedule){ImGui.TextDisabled(localization.Get("OceanFishing.Unavailable"));return;}
+        if(OceanTimetable?.Invoke() is not { } baseSchedule){ImGui.TextDisabled(localization.Get("OceanFishing.Unavailable"));return;}
+        var sightings=(configuration.OceanSightings ?? []).Concat(OceanSchedule.Proven).GroupBy(sighting=>(sighting.Slot,sighting.Route)).Select(group=>group.First()).ToArray();
+        var states=oceanPortStates ??= (baseSchedule.State(OceanPort.Aldenard,sightings),baseSchedule.State(OceanPort.Othard,sightings));
+        var schedule=baseSchedule.WithOffsets(states.Aldenard.Offset,states.Othard.Offset);
+        DrawOceanPortState("OceanFishing.ColumnIndigo",states.Aldenard);
+        DrawOceanPortState("OceanFishing.ColumnRuby",states.Othard);
         var now=DateTimeOffset.UtcNow;
         ImGui.SetNextItemWidth(320);
         var selected=schedule.Routes.FirstOrDefault(route=>route.Id==oceanRouteFilter);
@@ -48,8 +55,9 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();
                     if(departure.At<=now)ImGui.TextColored(Success,localization.Format("OceanFishing.Boarding",(int)Math.Ceiling((departure.At+OceanSchedule.Boarding-now).TotalMinutes)));
                     else{var left=departure.At-now;ImGui.TextUnformatted(localization.Format("OceanFishing.Countdown",(int)left.TotalHours,left.Minutes));}
-                    ImGui.TableNextColumn();DrawOceanRoute(departure.Aldenard);
-                    ImGui.TableNextColumn();DrawOceanRoute(departure.Othard);
+                    var index=(long)Math.Round((departure.At-OceanSchedule.LoopStart)/OceanSchedule.Step);
+                    ImGui.TableNextColumn();DrawOceanRoute(departure.Aldenard,baseSchedule,index,OceanPort.Aldenard,states.Aldenard);
+                    ImGui.TableNextColumn();DrawOceanRoute(departure.Othard,baseSchedule,index,OceanPort.Othard,states.Othard);
                     ImGui.TableNextColumn();
                     if(departure.At>now)
                         AlarmButton("Ocean",localization.Get("OceanFishing.AlarmTip"),()=>[new TenshoAlarm{
@@ -66,12 +74,34 @@ internal sealed partial class MainWindow
 
     private string RouteLabel(OceanRoute route)=>$"{route.Name} ({localization.Get("OceanFishing.Time"+route.Label)})";
 
-    private void DrawOceanRoute(OceanRoute? route)
+    private void DrawOceanPortState(string portKey,OceanPortState state)
     {
-        if(route is null){ImGui.TextDisabled("—");return;}
+        var port=localization.Get(portKey);
+        switch(state.Check)
+        {
+            case OceanCheck.Verified:ImGui.TextColored(Success,localization.Format("OceanFishing.PortVerified",port,state.Sightings));break;
+            case OceanCheck.Contradicted when state.Candidates.Count==0:ImGui.TextColored(Error,localization.Format("OceanFishing.PortInconsistent",port,state.Sightings));break;
+            case OceanCheck.Contradicted:ImGui.TextColored(Warning,localization.Format("OceanFishing.PortContradicted",port,state.Candidates.Count));break;
+            default:ImGui.TextColored(Muted,localization.Format(state.Sightings==0 ? "OceanFishing.PortUnverified":"OceanFishing.PortUnsettled",port,state.Sightings,state.Candidates.Count));break;
+        }
+    }
+
+    private void DrawOceanRoute(OceanRoute? route,OceanSchedule schedule,long index,OceanPort port,OceanPortState state)
+    {
+        if(route is null)
+        {
+            var possible=state.Check==OceanCheck.Contradicted ? schedule.Possible(index,port,state.Candidates):[];
+            if(possible.Count is > 0 and <= 3)ImGui.TextColored(Warning,localization.Format("OceanFishing.Possible",string.Join(" / ",possible.Select(RouteLabel))));
+            else ImGui.TextDisabled(possible.Count>3 ? localization.Format("OceanFishing.PossibleMany",possible.Count):"—");
+            if(possible.Count>0)Tip("OceanFishing.PossibleTip");
+            return;
+        }
         var highlight=route.Id==oceanRouteFilter;
-        if(highlight)ImGui.TextColored(Accent,RouteLabel(route));else ImGui.TextUnformatted(RouteLabel(route));
+        if(highlight)ImGui.TextColored(Accent,RouteLabel(route));
+        else if(state.Check==OceanCheck.Verified)ImGui.TextUnformatted(RouteLabel(route));
+        else ImGui.TextColored(Muted,RouteLabel(route)+" ?");
         if(ImGui.IsItemHovered())
-            WrappedTooltip(string.Join("\n",route.Stops.Select((stop,index)=>localization.Format("OceanFishing.Stop",index+1,stop.Place,localization.Get("OceanFishing.Time"+stop.Time)))));
+            WrappedTooltip(string.Join("\n",route.Stops.Select((stop,stopIndex)=>localization.Format("OceanFishing.Stop",stopIndex+1,stop.Place,localization.Get("OceanFishing.Time"+stop.Time))))
+                +(state.Check==OceanCheck.Verified ? "":"\n"+localization.Get("OceanFishing.UnverifiedTip")));
     }
 }

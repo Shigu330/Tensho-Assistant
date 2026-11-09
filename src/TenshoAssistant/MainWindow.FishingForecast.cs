@@ -62,7 +62,7 @@ internal sealed partial class MainWindow
             }
             ImGui.TextColored(span.ReportedConditionsMatch==true ? Accent:Muted,$"{spanStart.ToLocalTime():g}–{span.EndsAt.ToLocalTime():g} · {label}");
         }
-        if(!anyCandidate)ImGui.TextWrapped(localization.Get("FishingWindows.Empty"));
+        if(!anyCandidate)EmptyState("FishingWindows.Empty");
         ImGui.TextWrapped(localization.Get("FishingWindows.Disclaimer"));
     }
 }

@@ -21,6 +21,9 @@ internal sealed partial class MainWindow
     private sealed class GatheringNodeStart(ulong owner,GatheringObservedFrame frame)
     {
         public ulong Owner {get;}=owner;public uint JobId {get;}=frame.JobId;public int Level {get;}=frame.Level;public int? TotalAttempts {get;}=frame.TotalAttempts;
+        public uint NodeId {get;}=frame.NodeId;
+        // 0.831 (X-61): the attempts last read, to see a new node of the same kind open (they go up again).
+        public int? LastAttempts {get;set;}=frame.Attempts;
         public uint Gp {get;set;}=frame.Gp;public int? Attempts {get;set;}=frame.Attempts;public bool Frozen {get;set;}
         // Success and boon of each slot (index, raw item) as first read; Late: first read after GP was spent at the node.
         public Dictionary<(int Index,uint RawItemId),(int? Success,int? Boon,bool Late,int? Quantity)> Slots {get;}=[];
@@ -71,6 +74,15 @@ internal sealed partial class MainWindow
     // 0.728 (user request): a frame over the slot of the next action, as on the Mini Cactpot board. Drawn only: the player uses the action.
     internal Gathering.ActionBarLocator? BarLocator { get; set; }
     private (GpPlan Plan,int Gp,int? Attempts,int? Boon,GpNextStep Step)? gatheringNextCache;
+    // 0.816: one golden frame over a part of a game window, under Tensho's windows.
+    private static void DrawGameFrame(float x,float y,float width,float height)
+    {
+        var draw=ImGui.GetBackgroundDrawList();
+        var pulse=0.65f+0.35f*MathF.Sin((float)(DateTime.UtcNow.TimeOfDay.TotalSeconds*5));
+        var min=new Vector2(x,y);var max=min+new Vector2(width,height);
+        draw.AddRectFilled(min,max,ImGui.GetColorU32(UI.FfxivTheme.Gold with {W=0.18f*pulse}),6);
+        draw.AddRect(min,max,ImGui.GetColorU32(UI.FfxivTheme.Gold with {W=pulse}),6,ImDrawFlags.None,3);
+    }
     private static void DrawGatheringBarHighlight(Gathering.ActionBarLocator located)
     {
         if(located.Rects is not { Count:>0 } rects)return;
@@ -111,7 +123,7 @@ internal sealed partial class MainWindow
         switch(step.Kind)
         {
             case GpNextKind.Action when step.Action is { } action:
-                DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(28));ImGui.SameLine();
+                DrawGameIcon(action.Icon,new Vector2(28));ImGui.SameLine();
                 ImGui.TextColored(Accent,localization.Format(step.Leftover ? "GatheringPanel.NextLeftover":"GatheringPanel.NextAction",action.Name));
                 if(ImGui.IsItemHovered())WrappedTooltip(action.Description);
                 // 0.733 (user report): asked from here, inside the panel's own window, which is drawn after the overlays: the frame of 0.728 was cleared before it was looked for.
@@ -142,8 +154,8 @@ internal sealed partial class MainWindow
         Panels?.Show("TenshoGatheringPanel",localization.Get(miner ? "GatheringPanel.TitleMiner":"GatheringPanel.TitleBotanist"),ImGuiWindowFlags.NoSavedSettings|ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoMove|ImGuiWindowFlags.AlwaysAutoResize,()=>{ImGui.SetNextWindowPos(new Vector2(window.X+window.Width+6,window.Y)+WindowMoved("Gathering",window.X,window.Y),ImGuiCond.Always);ImGui.SetNextWindowSize(new Vector2(360,0),ImGuiCond.Always);},()=>
         {
             // Job header: its own icon (ClassJob 62100 + job) and colour, so miner and botanist help never look alike.
-            var colour=miner ? new Vector4(0.95f,0.65f,0.30f,1):new Vector4(0.45f,0.85f,0.45f,1);
-            DrawItemIcon(new ItemDefinition(0,"",false,62100+frame.JobId),new Vector2(28));ImGui.SameLine();
+            var colour=miner ? Warning:Success;
+            DrawGameIcon(62100+frame.JobId,new Vector2(28));ImGui.SameLine();
             ImGui.BeginGroup();
             ImGui.TextColored(colour,localization.Get(miner ? "GatheringPanel.Miner":"GatheringPanel.Botanist")+$" · {localization.Format("GatheringPanel.Level",frame.Level)}");
             ImGui.TextDisabled(localization.Format("GatheringPanel.Resources",frame.Gp,frame.MaxGp,frame.Attempts?.ToString() ?? "?",frame.TotalAttempts?.ToString() ?? "?"));
@@ -221,11 +233,15 @@ internal sealed partial class MainWindow
     private void TrackGatheringNode(ulong owner,GatheringObservedFrame frame)
     {
         if(gatheringPanelStart is not { } start || start.Owner!=owner || start.JobId!=frame.JobId || start.TotalAttempts!=frame.TotalAttempts
-           || frame.Slots.Count>0 && !frame.Slots.Any(slot=>start.Slots.ContainsKey((slot.Index,slot.RawItemId))))
+           || frame.Slots.Count>0 && !frame.Slots.Any(slot=>start.Slots.ContainsKey((slot.Index,slot.RawItemId)))
+           // 0.831 (X-61, user report: « read after GP was spent » with 4/4 attempts): the next node of the same kind shares its slots, and its window can open
+           // before a closed one is read; another node row, or attempts going up again, is a new node, and nothing spent at the last one freezes it.
+           || GatheringNodes.IsNew(start.NodeId,start.LastAttempts,frame.NodeId,frame.Attempts))
         {
             gatheringPanelStart=start=new(owner,frame);
             gatheringTrackedPicked=false;
         }
+        start.LastAttempts=frame.Attempts ?? start.LastAttempts;
         start.Frozen|=frame.Gp<start.Gp || frame.Attempts<start.Attempts;
         if(!start.Frozen){start.Gp=frame.Gp;start.Attempts??=frame.Attempts;}
         foreach(var slot in frame.Slots)
@@ -324,7 +340,7 @@ internal sealed partial class MainWindow
         if(shown.Actions.Count==0)ImGui.TextUnformatted(localization.Get("GpUi.Keep"));
         foreach(var use in shown.Actions)
         {
-            DrawItemIcon(new ItemDefinition(0,use.Action.Name,false,use.Action.Icon),new Vector2(22));ImGui.SameLine();
+            DrawGameIcon(use.Action.Icon,new Vector2(22));ImGui.SameLine();
             var spent=next?.Used.GetValueOrDefault(use.Action.Spec.Id) ?? 0;
             var label=use.Count>1 ? $"{use.Action.Name} ×{use.Count}":use.Action.Name;
             if(spent>0 && use.Count>1 && spent<use.Count)label+=$" ({spent}/{use.Count})";
@@ -353,14 +369,14 @@ internal sealed partial class MainWindow
         foreach(var action in actions)
         {
             if(GatheringActionRow?.Invoke(action.Id) is not { } row)continue;
-            DrawItemIcon(new ItemDefinition(0,row.Name,false,row.Icon),new Vector2(22));ImGui.SameLine();
+            DrawGameIcon(row.Icon,new Vector2(22));ImGui.SameLine();
             ImGui.TextUnformatted($"{row.Name} · {action.Cost} {localization.Get("GatheringPanel.CrystalGp")}");
             if(ImGui.IsItemHovered())WrappedTooltip(row.Description);
         }
         foreach(var (id,left) in cooling)
             if(GatheringActionRow?.Invoke(id) is { } row)
             {
-                DrawItemIcon(new ItemDefinition(0,row.Name,false,row.Icon),new Vector2(22));ImGui.SameLine();
+                DrawGameIcon(row.Icon,new Vector2(22));ImGui.SameLine();
                 ImGui.TextDisabled(localization.Format("GatheringPanel.CrystalWait",row.Name,Math.Ceiling(left ?? 0).ToString("0")));
                 if(ImGui.IsItemHovered())WrappedTooltip(row.Description);
             }

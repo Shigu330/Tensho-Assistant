@@ -10,7 +10,7 @@ namespace TenshoAssistant;
 // every Tensho window; the reason on hover. Information only, read from what the game already shows (its monsters, its spellbook, the wiki's sources).
 internal sealed partial class MainWindow
 {
-    private const uint BlueMageIcon=62100+BlueMageJob;
+    private const uint BlueMageIcon=62100+BlueMageJob,BeastmasterIcon=62100+BeastmasterJob;
     internal void DrawMonsterOverheadIcons()
     {
         var settings=configuration.MapView;
@@ -30,7 +30,7 @@ internal sealed partial class MainWindow
             foreach(var note in notes)if(MonsterIconAbove(note.Kind,settings)){first=note;break;}
             if(first is null || !gameGui.WorldToScreen(monster.Position+new Vector3(0,monster.Height+0.6f,0),out var screen))continue;
             var corner=screen-new Vector2(size/2,size);
-            if(first.Kind==MonsterNoteKind.BlueSpell && textures.TryGetFromGameIcon(new GameIconLookup(BlueMageIcon),out var shared) && shared.TryGetWrap(out var icon,out _) && icon is not null)
+            if(first.Kind is MonsterNoteKind.BlueSpell or MonsterNoteKind.Beast && textures.TryGetFromGameIcon(new GameIconLookup(first.Kind==MonsterNoteKind.Beast ? BeastmasterIcon:BlueMageIcon),out var shared) && shared.TryGetWrap(out var icon,out _) && icon is not null)
                 draw.AddImage(icon.Handle,corner,corner+new Vector2(size));
             else
             {
@@ -50,6 +50,9 @@ internal sealed partial class MainWindow
         MonsterNoteKind.HuntLog=>settings.AboveHuntLog,
         MonsterNoteKind.Fate=>settings.AboveFate,
         MonsterNoteKind.Collection=>settings.AboveCollection,
+        MonsterNoteKind.Beast=>settings.AboveBeast,
+        MonsterNoteKind.Relic=>settings.AboveRelic,
+        MonsterNoteKind.Wish=>settings.AboveWish,
         _=>false,
     };
     internal static (FontAwesomeIcon Symbol,Vector4 Colour) MonsterGlyph(MonsterNoteKind kind)=>kind switch
@@ -58,6 +61,9 @@ internal sealed partial class MainWindow
         MonsterNoteKind.Fate=>(FontAwesomeIcon.Star,new Vector4(0.95f,0.85f,0.40f,1)),
         MonsterNoteKind.BlueSpell=>(FontAwesomeIcon.HatWizard,new Vector4(0.40f,0.60f,1f,1)),
         MonsterNoteKind.Collection=>(FontAwesomeIcon.Gem,new Vector4(0.95f,0.50f,0.85f,1)),
+        MonsterNoteKind.Beast=>(FontAwesomeIcon.Dragon,new Vector4(0.45f,0.85f,0.55f,1)),
+        MonsterNoteKind.Relic=>(FontAwesomeIcon.ShieldAlt,new Vector4(0.95f,0.75f,0.30f,1)),
+        MonsterNoteKind.Wish=>(FontAwesomeIcon.Heart,new Vector4(0.95f,0.40f,0.55f,1)),
         _=>(FontAwesomeIcon.Paw,new Vector4(0.98f,0.55f,0.35f,1)),
     };
 }

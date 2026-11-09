@@ -81,7 +81,7 @@ internal sealed partial class MainWindow
             // 0.534 (user choice): greyed when it gives the same as Safe on this node.
             var same=balancedOff && cap==50;
             if(same)ImGui.BeginDisabled();
-            if(chosen)ImGui.PushStyleColor(ImGuiCol.Button,Accent with {W=0.55f});
+            if(chosen)ImGui.PushStyleColor(ImGuiCol.Button,Selected);
             bool clicked;
             ImGui.PushFont(UiBuilder.IconFont);
             try{clicked=ImGui.Button(icon.ToIconString()+$"###CollectableRisk{cap}");}
@@ -185,10 +185,21 @@ internal sealed partial class MainWindow
         var info=CollectableActionInfo?.Invoke(action);
         DrawCollectableRisk(advice,rule);
         ImGui.TextColored(Accent,localization.Get("CollectablePanel.Next"));
-        DrawItemIcon(info is { } shown ? new TenshoAssistant.Items.ItemDefinition(0,shown.Name,false,shown.Icon):null,new Vector2(32));
+        DrawGameIcon(info?.Icon ?? 0,new Vector2(32));
         ImGui.SameLine();
         // 0.528 (user capture): this line was cut at the panel's width.
         ImGui.TextWrapped(gain.Length>0 ? $"{info?.Name ?? advice.Move.ToString()} ({gain})":info?.Name ?? advice.Move.ToString());
+        // 0.815, 0.816 (X-51, user request): the move the plan asks for, framed on the game's collectable window itself (its button with that action's icon),
+        // with the gathering help's setting and frame.
+        if(!advice.Impossible && info is { Icon:not 0 } wanted && configuration.GatheringNextHighlight && Collectables is { } reader)
+        {
+            reader.WantIcon(wanted.Icon);
+            if(reader.IconRect is { } rect && rect.Icon==wanted.Icon)
+            {
+                if(rect.Width<=0)ImGui.TextDisabled(localization.Get("CollectablePanel.NextNotInWindow"));
+                else DrawGameFrame(rect.X,rect.Y,rect.Width,rect.Height);
+            }
+        }
         ImGui.PushTextWrapPos(0);
         try
         {

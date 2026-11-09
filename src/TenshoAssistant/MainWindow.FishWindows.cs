@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
             fishWindowsKey=key;
         }
         ImGui.TextColored(Accent,localization.Get("FishWindows.Title"));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FishWindows.Help"));
+        Tip("FishWindows.Help");
         if(fishWindows is not { } windows){ImGui.TextDisabled(localization.Get("FishWindows.Unknown"));return;}
         if(windows.Count==0){ImGui.TextDisabled(localization.Get(fish.Weathers.Count+fish.Transitions.Count==0 && fish.StartMinute is null ? "FishWindows.Always":"FishWindows.None"));return;}
         foreach(var window in windows)

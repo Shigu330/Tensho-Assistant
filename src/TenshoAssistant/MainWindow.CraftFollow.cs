@@ -80,7 +80,7 @@ internal sealed partial class MainWindow
         if(view.Next is { } next)
         {
             var action=catalog.Find(frame.Raw.JobId,next);
-            if(action is not null){DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(28));ImGui.SameLine();}
+            if(action is not null){DrawGameIcon(action.Icon,new Vector2(28));ImGui.SameLine();}
             ImGui.TextColored(Accent,localization.Format("CraftProjectionUi.FollowNext",view.Position+1,view.Total,action?.Name ?? next.ToString()));
             if(!frame.Animating && frame.Raw.ActionsNative?.FirstOrDefault(row=>row.Kind==next) is {Status:not 0})
                 ImGui.TextColored(Accent,localization.Get("CraftProjectionUi.FollowBlocked"));

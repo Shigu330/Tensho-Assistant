@@ -95,12 +95,8 @@ public sealed unsafe class AlarmDtrEntry : IDisposable
     /// <summary>Draws Tensho's tooltip below the entry while the mouse is over it (ImGui, from the plugin's draw).</summary>
     public void DrawTooltip()
     {
-        if(disposed || !configuration.AlarmBarTooltip || bounds is not { } box || !entry.Shown)return;
-        var mouse=ImGui.GetIO().MousePos;
-        if(mouse.X<box.Min.X || mouse.X>box.Max.X || mouse.Y<box.Min.Y || mouse.Y>box.Max.Y)return;
-        ImGui.SetNextWindowPos(new Vector2(box.Min.X,box.Max.Y+4));
-        ImGui.BeginTooltip();
-        try
+        if(disposed || !configuration.AlarmBarTooltip || !entry.Shown || !TooltipScope.UnderBox(bounds))return;
+        using(TooltipScope.Begin())
         {
             if(upcoming.Count==0){ImGui.TextUnformatted(text("Alarms.BarNone"));return;}
             ImGui.TextColored(UI.FfxivTheme.Gold,text("Alarms.BarTitle"));
@@ -109,7 +105,6 @@ public sealed unsafe class AlarmDtrEntry : IDisposable
                     +(conditioned ? " · "+text("Alarms.WeatherCondition"):""));
             ImGui.TextDisabled(text("Alarms.BarClick"));
         }
-        finally{ImGui.EndTooltip();}
     }
 
     public void Dispose()

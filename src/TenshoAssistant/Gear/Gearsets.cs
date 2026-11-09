@@ -8,6 +8,34 @@ public sealed record GearsetPiece(GearSlot Slot,uint ItemId,bool Hq,IReadOnlyLis
 /// <summary>A gear set of the game (RaptureGearsetModule) as copied on the framework thread: number shown in game, name, job, item level.</summary>
 public sealed record GameGearset(int Number,string Name,uint Job,int ItemLevel,IReadOnlyList<GearsetPiece> Pieces);
 
+/// <summary>The game's gear sets and the job levels (ClassJob row → level; null when not read), copied together.</summary>
+public sealed record GearsetState(IReadOnlyList<GameGearset> Sets,IReadOnlyDictionary<uint,int> JobLevels,IReadOnlyList<JobProgressRow>? Jobs=null)
+{
+    /// <summary>
+    /// X-76 (0.955): the same content as <paramref name="before"/>: sets (number, name, job, item level, pieces with item, HQ and materia),
+    /// job levels and progress. The reader then keeps the old object, so the caches keyed on its reference are not rebuilt every read.
+    /// </summary>
+    public bool SameAs(GearsetState? before)
+    {
+        if(ReferenceEquals(before,this))return true;
+        if(before is null || before.Sets.Count!=Sets.Count || before.JobLevels.Count!=JobLevels.Count || (before.Jobs is null)!=(Jobs is null))return false;
+        for(var index=0;index<Sets.Count;index++)
+        {
+            var (old,now)=(before.Sets[index],Sets[index]);
+            if(old.Number!=now.Number || !string.Equals(old.Name,now.Name,StringComparison.Ordinal) || old.Job!=now.Job || old.ItemLevel!=now.ItemLevel
+               || old.Pieces.Count!=now.Pieces.Count)return false;
+            for(var piece=0;piece<now.Pieces.Count;piece++)
+            {
+                var (was,current)=(old.Pieces[piece],now.Pieces[piece]);
+                if(was.Slot!=current.Slot || was.ItemId!=current.ItemId || was.Hq!=current.Hq || !was.Materia.SequenceEqual(current.Materia))return false;
+            }
+        }
+        foreach(var (job,level) in JobLevels)
+            if(!before.JobLevels.TryGetValue(job,out var was) || was!=level)return false;
+        return Jobs is null || before.Jobs!.SequenceEqual(Jobs);
+    }
+}
+
 /// <summary>A better piece the player already owns for one slot of a set: the set's piece (null = empty slot) and the owned one.</summary>
 public sealed record GearsetUpgrade(GearSlot Slot,GearItem? Current,GearItem Better,bool Hq);
 
@@ -70,10 +98,6 @@ public static class GameGearsets
         return result;
     }
 
-    /// <summary>
-    /// 0.385 (g, X-08): a job at random for the dailies, as one of its sets (the lowest number of each job, so a job with many sets is not
-    /// favoured); with <paramref name="belowTop"/>, only jobs under the highest level among the player's jobs (levels unknown = kept).
-    /// </summary>
     /// <summary>R-10 (0.411): the job's set with the lowest number (the one the game's own job switch would use first), or none.</summary>
     public static GameGearset? ForJob(IReadOnlyList<GameGearset> sets,uint job)=>sets.Where(set=>set.Job==job).OrderBy(set=>set.Number).FirstOrDefault();
 
@@ -83,6 +107,10 @@ public static class GameGearsets
     /// </summary>
     public static uint? GatheringJob(uint gatheringType,bool fishing)=>fishing ? 18u : gatheringType switch { 0 or 1=>16u, 2 or 3=>17u, _=>null };
 
+    /// <summary>
+    /// 0.385 (g, X-08): a job at random for the dailies, as one of its sets (the lowest number of each job, so a job with many sets is not
+    /// favoured); with <paramref name="belowTop"/>, only jobs under the highest level among the player's jobs (levels unknown = kept).
+    /// </summary>
     public static GameGearset? RandomJob(IReadOnlyList<GameGearset> sets,IReadOnlyDictionary<uint,int> levels,bool belowTop,Func<int,int> next)
     {
         var top=levels.Count>0 ? levels.Values.Max():0;

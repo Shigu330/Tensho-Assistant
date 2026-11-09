@@ -24,11 +24,14 @@ internal sealed partial class MainWindow
         GilCategory.Teleport=>Dalamud.Interface.FontAwesomeIcon.LocationArrow,
         GilCategory.Retainer=>Dalamud.Interface.FontAwesomeIcon.UserTie,
         GilCategory.Company=>Dalamud.Interface.FontAwesomeIcon.Users,
+        GilCategory.Mail=>Dalamud.Interface.FontAwesomeIcon.Envelope,
         _=>Dalamud.Interface.FontAwesomeIcon.QuestionCircle,
     };
     private void DrawGilJournal()
     {
         ImGui.TextWrapped(localization.Get("GilJournal.Help"));
+        // X-107 (0.986): the gil of the day in the server info bar.
+        BoolSetting("GilJournal.ServerBar","GilJournal.ServerBarTip",()=>configuration.GilServerBar,value=>configuration.GilServerBar=value,c=>c.GilServerBar);
         if(GilJournalState?.Invoke() is not { } state){ImGui.TextDisabled(localization.Get("CharacterUi.Offline"));return;}
         if(state.Unavailable)ImGui.TextColored(Accent,localization.Get("GilJournal.Unreadable"));
         string Amount(long? value)=>value is { } known ? known.ToString("N0"):localization.Get("Currencies.Unknown");
@@ -76,7 +79,7 @@ internal sealed partial class MainWindow
                         ImGui.TableNextColumn();ImGui.TextDisabled(Part(gained));
                         ImGui.TableNextColumn();ImGui.TextDisabled(Part(spent));
                         ImGui.TableNextColumn();ImGui.TextDisabled(localization.Get("GilJournal.Transfer"));
-                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GilJournal.TransferTip"));
+                        Tip("GilJournal.TransferTip");
                         continue;
                     }
                     ImGui.TableNextColumn();if(gained>0)ImGui.TextColored(Success,Part(gained));else ImGui.TextDisabled(Part(gained));

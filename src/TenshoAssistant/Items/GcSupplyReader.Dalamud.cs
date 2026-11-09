@@ -3,6 +3,7 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 using TenshoAssistant.Reminders;
+using TenshoAssistant.UI;
 
 namespace TenshoAssistant.Items;
 
@@ -20,8 +21,10 @@ internal sealed class GcSupplyReader : IDisposable
     private ItemUseCatalog? indexedFor;private IReadOnlyDictionary<string,uint>? names;
     private long nextRead;private bool warned,disposed;private int loggedHash;
 
-    public GcSupplyReader(IFramework framework,IGameGui gui,IClientState client,IPlayerState player,IDataManager data,IPluginLog log,Func<ItemUseCatalog?> catalog,GcSupplyToday today,Action<GcSupplySeen> learned)
-    {
+    // X-76 H9 (0.922): developer captures are logged in developer mode only.
+    private readonly Func<bool>? developer;
+    public GcSupplyReader(IFramework framework,IGameGui gui,IClientState client,IPlayerState player,IDataManager data,IPluginLog log,Func<ItemUseCatalog?> catalog,GcSupplyToday today,Action<GcSupplySeen> learned,Func<bool>? developer=null)
+    {this.developer=developer;
         this.framework=framework;this.gui=gui;this.client=client;this.player=player;this.data=data;this.log=log;this.catalog=catalog;this.today=today;this.learned=learned;
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
     }
@@ -51,7 +54,7 @@ internal sealed class GcSupplyReader : IDisposable
             for(var position=0;position<addon->AtkValuesCount && texts.Count<MaxTexts;position++)
             {
                 var value=addon->AtkValues[position];
-                if(value.Type is AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString && value.GetValueAsString() is {Length:>0 and <=MaxTextLength} text)texts.Add(text);
+                if(AtkValueRead.IsText(value.Type) && value.GetValueAsString() is {Length:>0 and <=MaxTextLength} text)texts.Add(text);
             }
         Walk(&addon->UldManager,0,texts);
         var found=GcSupplyToday.Match(texts,index);
@@ -60,14 +63,14 @@ internal sealed class GcSupplyReader : IDisposable
         if(hash!=loggedHash)
         {
             loggedHash=hash;
-            log.Information("Grand Company supply window: {Values} values, {Texts} texts, delivery items {Found}; texts: {Sample}",addon->AtkValuesCount,distinct.Length,found,string.Join(" | ",distinct.Take(MaxLoggedTexts)));
+            if(developer?.Invoke()==true)log.Information("Grand Company supply window: {Values} values, {Texts} texts, delivery items {Found}; texts: {Sample}",addon->AtkValuesCount,distinct.Length,found,string.Join(" | ",distinct.Take(MaxLoggedTexts)));
         }
         if(today.Observe(player.ContentId,ResetSchedule.PreviousDaily(DateTimeOffset.UtcNow,ResetSchedule.SupplyHour),found) && today.Seen is { } seen)learned(seen);
     }
 
     private static unsafe void Walk(AtkUldManager* manager,int depth,List<string> texts)
     {
-        if(manager==null || depth>MaxDepth || manager->NodeList==null || manager->NodeListCount>manager->NodeListSize || manager->LoadedState!=AtkLoadState.Loaded)return;
+        if(depth>MaxDepth || !UiNodes.Walkable(manager))return;
         for(var index=0;index<manager->NodeListCount && texts.Count<MaxTexts;index++)
         {
             var node=manager->NodeList[index];

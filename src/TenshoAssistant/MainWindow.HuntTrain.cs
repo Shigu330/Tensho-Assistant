@@ -22,6 +22,8 @@ internal sealed partial class MainWindow
     private int? huntTrainCalled;
     internal Action<string>? SendHuntCall { get; set; }
     private DateTimeOffset huntCallSentAt;
+    // The channels of the call combo, built once (each channel is its own text).
+    private static readonly (string Value,string Label)[] HuntChannelOptions=HuntTrain.AnnounceChannels.Select(channel=>(channel,channel)).ToArray();
 
     /// <summary>Called every frame: notes the marks met (once a second, while recording) and announces the A and S marks (setting).</summary>
     internal void ObserveHuntTrain()
@@ -35,16 +37,16 @@ internal sealed partial class MainWindow
             foreach(var item in nearby.Where(item=>item.Kind==MapObjectKind.HuntMark && item.Level>=2))
             {
                 if(!huntMarksAnnounced.Add($"{map.MapId}/{item.Name}"))continue;
-                var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(item.Position,map),map);
+                var coordinate=MapProjection.CoordinateFromWorld(item.Position,map);
                 ChatNotice?.Invoke(localization.Format("HuntTrain.MarkAlert",item.Name,item.Level==3 ? "S":"A",map.Zone,
-                    coordinate.X.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),coordinate.Y.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture)));
+                    MapProjection.CoordinateNumber(coordinate.X),MapProjection.CoordinateNumber(coordinate.Y)));
                 if(configuration.AlarmOptions.PlaySound)Alarms.AlarmService.PlaySound(configuration.AlarmOptions.Sound,log);
             }
         if(huntMarksAnnounced.Count>200)huntMarksAnnounced.Clear();
         if(!huntTrainRecording)return;
         foreach(var item in nearby.Where(item=>item.Kind==MapObjectKind.HuntMark && (item.Level>=2 || huntTrainRankB)))
         {
-            var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(item.Position,map),map);
+            var coordinate=MapProjection.CoordinateFromWorld(item.Position,map);
             huntTrain=HuntTrain.Add(huntTrain,new(item.Name,item.Level,map.MapId,map.TerritoryId,map.Zone,coordinate.X,coordinate.Y,now));
         }
     }
@@ -72,32 +74,25 @@ internal sealed partial class MainWindow
         var called=huntTrain[huntTrainCalled ?? HuntTrain.Next(huntTrain) ?? huntTrain.Count-1];
         var announce=localization.Format("HuntTrain.AnnounceText",called.Name,called.Rank switch{3=>"S",2=>"A",_=>"B"},called.Zone);
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("HuntTrain.Announce")))ImGui.SetClipboardText(announce+" <flag>");
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("HuntTrain.AnnounceTip"));
+        CopyButton(localization.Get("HuntTrain.Announce"),()=>announce+" <flag>");
+        Tip("HuntTrain.AnnounceTip");
         // X-13 (0.447, decided 2026-11-03): sent to the chosen channel on click only, once the flag is on that stop, 5 s apart.
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(70);
-        if(ImGui.BeginCombo("###HuntCallChannel",configuration.HuntAnnounceChannel))
-        {
-            foreach(var channel in HuntTrain.AnnounceChannels)
-                if(ImGui.Selectable(channel,channel==configuration.HuntAnnounceChannel))
-                {configuration.HuntAnnounceChannel=channel;try{save();}catch(Exception failure){log.Warning(failure,"Hunt call channel could not be saved.");}}
-            ImGui.EndCombo();
-        }
-        Tip("HuntTrain.ChannelTip");
+        // X-76 H5 (0.915): shared combo row without label (rollback when saving fails, « ↺ »).
+        ComboSetting("HuntCallChannel","HuntTrain.ChannelTip",()=>configuration.HuntAnnounceChannel,value=>configuration.HuntAnnounceChannel=value,
+            HuntChannelOptions,DefaultConfiguration.HuntAnnounceChannel,70,showLabel:false);
         ImGui.SameLine();
         var command=HuntTrain.ChatCommand(configuration.HuntAnnounceChannel,announce);
         var ready=huntTrainCalled is not null && command is not null && SendHuntCall is not null && DateTimeOffset.UtcNow-huntCallSentAt>=TimeSpan.FromSeconds(5);
         ImGui.BeginDisabled(!ready);
         if(ImGui.SmallButton(localization.Get("HuntTrain.Send")) && ready){SendHuntCall!(command!);huntCallSentAt=DateTimeOffset.UtcNow;}
         ImGui.EndDisabled();
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            WrappedTooltip(localization.Get(huntTrainCalled is null ? "HuntTrain.SendNeedsFlag":"HuntTrain.SendTip"));
+        Tip(huntTrainCalled is null ? "HuntTrain.SendNeedsFlag":"HuntTrain.SendTip");
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("HuntTrain.Copy")))ImGui.SetClipboardText(HuntTrain.Export(huntTrain));
+        CopyButton(localization.Get("HuntTrain.Copy"),()=>HuntTrain.Export(huntTrain));
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("HuntTrain.Clear")) && ImGui.GetIO().KeyCtrl){huntTrain=[];huntTrainCalled=null;return;}
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("HuntTrain.ClearTip"));
+        Tip("HuntTrain.ClearTip");
         for(var index=0;index<huntTrain.Count;index++)
         {
             var stop=huntTrain[index];
@@ -105,8 +100,8 @@ internal sealed partial class MainWindow
             try
             {
                 var rank=stop.Rank switch{3=>"S",2=>"A",_=>"B"};
-                ImGui.TextColored(stop.Visited ? Muted:Accent,localization.Format("HuntTrain.Stop",index+1,stop.Name,rank,stop.Zone,stop.X.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),
-                    stop.Y.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture),stop.SeenAt.ToLocalTime().ToString("t")));
+                ImGui.TextColored(stop.Visited ? Muted:Accent,localization.Format("HuntTrain.Stop",index+1,stop.Name,rank,stop.Zone,MapProjection.CoordinateNumber(stop.X),
+                    MapProjection.CoordinateNumber(stop.Y),stop.SeenAt.ToLocalTime().ToString("t")));
                 if(catalog.Find(stop.MapId) is { } stopMap)PlaceMenu("TrainPlace",stopMap,new(stop.X,stop.Y),stop.Name);
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("HuntTrain.Flag")) && catalog.Find(stop.MapId) is { } map)

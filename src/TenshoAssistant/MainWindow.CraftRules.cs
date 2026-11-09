@@ -22,7 +22,7 @@ internal sealed partial class MainWindow
             var name=metadata?.Name ?? spec.Kind.ToString();
             var on=forbidden.Contains(spec.Kind);
             // 0.457 (user request, in-game campaign): the action's icon, as in the simulator.
-            DrawItemIcon(metadata is null ? null:new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(24));
+            DrawGameIcon(metadata?.Icon ?? 0,new Vector2(24));
             ImGui.SameLine();
             if(ImGui.Checkbox($"{name} ({localization.Format("CraftRules.Level",spec.Level)})###Forbid{spec.Kind}",ref on))
             {
@@ -33,9 +33,14 @@ internal sealed partial class MainWindow
         }
         if(forbidden.Count>0 && ImGui.SmallButton(localization.Get("CraftRules.Clear"))){forbidden=new HashSet<CraftActionKind>();changed=true;}
         if(!changed)return;
+        SaveForbiddenCraftActions(search,forbidden.Select(kind=>kind.ToString()).Order(StringComparer.Ordinal).ToList());
+    }
+
+    // X-76 H3 (0.914): the previous list comes back when saving fails.
+    private void SaveForbiddenCraftActions(CraftSearchSettings search,List<string> next)
+    {
         var previous=search.ForbiddenActions;
-        search.ForbiddenActions=forbidden.Select(kind=>kind.ToString()).Order(StringComparer.Ordinal).ToList();
-        try{save();saveError=null;craftMacroExport=null;craftMacroError=null;}
-        catch(Exception error){search.ForbiddenActions=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Forbidden crafting actions could not be saved.");}
+        search.ForbiddenActions=next;
+        if(TrySave("Forbidden crafting actions",()=>search.ForbiddenActions=previous)){craftMacroExport=null;craftMacroError=null;}
     }
 }

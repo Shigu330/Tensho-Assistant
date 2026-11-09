@@ -30,7 +30,7 @@ public sealed unsafe class VoyageWatcher : IDisposable
     private readonly Action save;
     private readonly IPluginLog log;
     private DateTimeOffset nextRead;
-    private bool disposed,catalogTried,airshipsWarned,unlockedWarned;
+    private bool disposed,catalogTried,airshipsWarned,unlockedWarned,airshipLogWarned;
     // 0.331 (audit): house whose read was saved during the current workshop visit (null outside the workshop).
     private ulong? visitSaved;
     private SubmarineCatalog? catalog;
@@ -57,6 +57,20 @@ public sealed unsafe class VoyageWatcher : IDisposable
 
     /// <summary>0.331 (audit, R-14): the last workshop read failed in whole or in part (game update?); the saved values were kept. Cleared by a clean read.</summary>
     public bool ReadUnavailable { get; private set; }
+
+    /// <summary>
+    /// X-73.8 (0.862): each submersible voyage's loot by sector (HousingWorkshopSubmarineGathered.Point, ItemIdPrimary/Additional and counts) and the sector each
+    /// one unlocked (UnlockedPoint), once per voyage, for the discoveries base. Airship entries carry no sector: left out.
+    /// </summary>
+    /// <summary>Item, sector, quantity, HQ (X-76 P7, 0.934: HouseWorkshopSubmarineGathered.ItemHQPrimary / ItemHQAdditional).</summary>
+    public Action<uint,uint,int,bool>? SectorLoot { get; set; }
+    /// <summary>X-73 (0.1003): an airship's find: item, AirshipExplorationPoint row, quantity; once per voyage (AirshipLogRoute.Pair).</summary>
+    public Action<uint,uint,int>? AirshipLoot { get; set; }
+    private readonly OnceSet<(ulong House,int Slot,uint Registered)> airshipsNoted=new(1024);
+    /// <summary>X-76 P7 (0.934): one visit per sector of a voyage: sector, second find (DoubleDip), the vessel's surveillance.</summary>
+    public Action<uint,bool,int>? SectorVisit { get; set; }
+    public Action<uint,uint>? SectorUnlock { get; set; }
+    private readonly OnceSet<(ulong House,int Slot,uint Registered)> voyagesNoted=new(4096);
 
     public VoyageWatcher(IFramework framework,IDataManager data,Configuration configuration,Action save,IPluginLog log)
     {
@@ -101,11 +115,24 @@ public sealed unsafe class VoyageWatcher : IDisposable
                 foreach(var point in sub.CurrentExplorationPoints)
                     if(point!=0 && points.GetRowOrDefault(point) is { } row)route.Add(row.Destination.ExtractText());
                 var loot=new List<VoyageLoot>();
+                var noteSectors=(SectorLoot is not null || SectorUnlock is not null) && sub.RegisterTime!=0;
+                var sectorsFound=false;
                 foreach(var found in sub.GatheredData)
                 {
                     if(found.ItemIdPrimary!=0)loot.Add(new(found.ItemIdPrimary,found.ItemCountPrimary));
                     if(found.ItemIdAdditional!=0)loot.Add(new(found.ItemIdAdditional,found.ItemCountAdditional));
+                    if(found.Point!=0 && (found.ItemIdPrimary!=0 || found.ItemIdAdditional!=0))sectorsFound=true;
                 }
+                // X-73.8 (0.862): once per voyage (house, slot, registration), when its loot is known.
+                if(noteSectors && sectorsFound && voyagesNoted.Add((houseId,slot,sub.RegisterTime)))
+                    foreach(var found in sub.GatheredData)
+                    {
+                        if(found.Point==0)continue;
+                        if(found.ItemIdPrimary!=0)SectorLoot?.Invoke(found.ItemIdPrimary%1_000_000,found.Point,found.ItemCountPrimary,found.ItemHQPrimary || found.ItemIdPrimary>=1_000_000);
+                        if(found.ItemIdAdditional!=0)SectorLoot?.Invoke(found.ItemIdAdditional%1_000_000,found.Point,found.ItemCountAdditional,found.ItemHQAdditional || found.ItemIdAdditional>=1_000_000);
+                        SectorVisit?.Invoke(found.Point,found.DoubleDip,sub.SurveillanceBase+sub.SurveillanceBonus);
+                        if(found.UnlockedPoint!=0)SectorUnlock?.Invoke(found.UnlockedPoint,found.Point);
+                    }
                 var ids=new List<uint>();
                 foreach(var point in sub.CurrentExplorationPoints)if(point!=0)ids.Add(point);
                 // Stats: parts (« Base ») plus the rank's bonus, as the game's submersible window adds them.
@@ -123,22 +150,35 @@ public sealed unsafe class VoyageWatcher : IDisposable
             try
             {
                 var airships=workshop->Airship.Data;
+                var lastRouteRead=AirshipLastRoute(workshop,houseId);
+                var lastRoute=lastRouteRead?.Names;
+                (int Slot,uint Registered,List<(uint,int,uint,int)> Stops)? single=null;
                 for(var index=0;index<Math.Min(workshop->Airship.AirshipCount,airships.Length);index++)
                 {
                     ref var air=ref airships[index];
                     if(air.RankId==0)continue;
-                    var loot=new List<VoyageLoot>();
+                    var loot=new List<VoyageLoot>();var stops=new List<(uint,int,uint,int)>();
                     foreach(var found in air.GatheredData)
                     {
                         if(found.ItemIdPrimary!=0)loot.Add(new(found.ItemIdPrimary,found.ItemCountPrimary));
                         if(found.ItemIdAdditional!=0)loot.Add(new(found.ItemIdAdditional,found.ItemCountAdditional));
+                        stops.Add((found.ItemIdPrimary,found.ItemCountPrimary,found.ItemIdAdditional,found.ItemCountAdditional));
                     }
+                    single=(index+1,air.RegisterTime,stops);
                     // 0.315: airship stats (single totals: airship ranks add no bonus) and part rows (« AirshipExplorationPart Key »).
                     airRead.Add(new VoyageVessel{HouseId=houseId,Kind=VesselKind.Airship,Slot=index+1,Name=air.NameString,Rank=air.RankId,Exp=air.CurrentExp,NextExp=air.NextLevelExp,
                         RegisteredAt=Time(air.RegisterTime),ReturnAt=Time(air.ReturnTime),Loot=loot,ReadAt=now,
                         Surveillance=air.Surveillance,Retrieval=air.Retrieval,Speed=air.Speed,Range=air.Range,Favor=air.Favor,
                         Parts=PartsBySlot(VesselKind.Airship,[air.HullId,air.SternId,air.BowId,air.BridgeId])});
                 }
+                // T26 (0.919): the log does not say which airship it is about: kept only when the company has a single airship.
+                // X-73 (0.1003): the single airship's finds, paired with the route's sectors, once per voyage, for the discoveries base.
+                if(airRead.Count==1 && AirshipLoot is not null && lastRouteRead is { } routeRead && single is { Registered:not 0 } one
+                   && AirshipLogRoute.Pair(one.Stops,routeRead.Ids) is { Count:>0 } paired && airshipsNoted.Add((houseId,one.Slot,one.Registered)))
+                    foreach(var (item,sector,count) in paired)AirshipLoot(item,sector,count);
+                if(airRead.Count==1)
+                    airRead[0]=airRead[0] with {LastRoute=lastRoute ?? (configuration.Voyages ?? []).FirstOrDefault(vessel=>vessel.HouseId==houseId && vessel.Kind==VesselKind.Airship && vessel.Slot==airRead[0].Slot)?.LastRoute ?? []};
+                else if(airRead.Count>1 && lastRoute is { Count:>0 } && !airshipLogWarned){airshipLogWarned=true;log.Information("Airship voyage log read, but {0} airships: the route is not attached to one.",airRead.Count);}
                 airshipsWarned=false;
             }
             catch(Exception error)
@@ -186,6 +226,28 @@ public sealed unsafe class VoyageWatcher : IDisposable
             log.Warning(error,"Free company voyages could not be read.");
             nextRead=now.AddSeconds(60);
         }
+    }
+
+    /// <summary>
+    /// T26 (0.919): the sector names of the voyage log (null when the log is empty: nothing read, the saved route is kept). Sector names from
+    /// AirshipExplorationPoint.Name in the client language; read on the framework thread with the rest of the workshop.
+    /// </summary>
+    private (List<string> Names,List<uint> Ids)? AirshipLastRoute(WorkshopTerritory* workshop,ulong houseId)
+    {
+        var lines=new List<string>();
+        for(var index=0;index<workshop->Airship.AirshipLogs.Length;index++)
+        {
+            fixed(FFXIVClientStructs.FFXIV.Client.System.String.Utf8String* entry=&workshop->Airship.AirshipLogs[index])
+            {
+                var line=TenshoAssistant.Maps.MapLiveReader.TooltipText(entry);
+                if(line.Length>0)lines.Add(line);
+            }
+        }
+        if(lines.Count==0)return null;
+        var sectors=data.GetExcelSheet<AirshipExplorationPoint>().Where(row=>!row.Name.IsEmpty).Select(row=>(row.RowId,row.Name.ExtractText())).ToArray();
+        var names=sectors.ToDictionary(sector=>sector.RowId,sector=>sector.Item2);
+        var ids=AirshipLogRoute.Sectors(lines,sectors).ToList();
+        return (ids.Select(id=>names[id]).ToList(),ids);
     }
 
     // 0.336: sheet rows 0 to 24 are the sectors (row 22 is the old Diadem, carries passengers, not offered); unnamed rows are skipped.

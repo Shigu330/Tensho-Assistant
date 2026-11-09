@@ -139,7 +139,7 @@ internal sealed class ItemCatalogLoader : IDisposable
                             (row.IsUnique ? ItemTraits.Unique:0)|(row.IsUntradable ? ItemTraits.Untradable:0)|(row.DyeCount>0 ? ItemTraits.Dyeable:0)
                             |(row.ItemRepair.RowId!=0 ? ItemTraits.Repairable:0)|(row.IsCollectable ? ItemTraits.Collectable:0),
                             english?.Name.ExtractText() ?? "",
-                            ItemUnlockCopy.Mount(row),ItemUnlockCopy.Companion(row)));
+                            ItemUnlockCopy.Mount(row),ItemUnlockCopy.Companion(row),row.ClassJobCategory.RowId));
                     }
                     if (Stopwatch.GetElapsedTime(started) >= TimeSpan.FromMilliseconds(2)) break;
                 }
@@ -160,7 +160,7 @@ internal sealed class ItemCatalogLoader : IDisposable
             }
             catch (Exception error)
             {
-                log.Error(error, "Tensho item catalog could not be built.");
+                log.Warning(error, "Tensho item catalog could not be built.");
                 service.Fail();
                 Stop();
             }

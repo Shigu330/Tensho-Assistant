@@ -47,6 +47,12 @@ internal sealed partial class MainWindow
         ],ref reminderTabFocus);
     }
 
+    // « in H h mm (date) » of a coming time, on the Reminders page and the Free Company voyages.
+    private string InText(DateTimeOffset at,DateTimeOffset now)
+    {
+        var left=at-now;
+        return localization.Format("Reminders.In",(int)left.TotalHours,left.Minutes,at.ToLocalTime().ToString("g"));
+    }
     private void DrawReminderTimers(GameTimerSnapshot? timers,DateTimeOffset now)
     {
         if(!ImGui.BeginTable("Reminders",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
@@ -94,7 +100,7 @@ internal sealed partial class MainWindow
                     var shuffled=Reminders.WondrousTailsLines.Shuffled();
                     ImGui.TextDisabled(localization.Format("Reminders.BingoOdds",Percent(odds.AtLeastOne),Percent(odds.AtLeastTwo),Percent(odds.Three)));
                     ImGui.TextDisabled(localization.Format("Reminders.BingoShuffle",Percent(shuffled.AtLeastOne),Percent(shuffled.AtLeastTwo),Percent(shuffled.Three)));
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Reminders.BingoOddsHelp"));
+                    Tip("Reminders.BingoOddsHelp");
                     static string Percent(double value)=>(value*100).ToString("0.#");
                 });
             Row("HuntBills",FontAwesomeIcon.Crosshairs,timers?.HuntBillsHeld is { } bills ? localization.Format("Reminders.HuntBillsState",bills):localization.Get("Reminders.Unknown"),
@@ -149,9 +155,8 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndTable();}
         ImGui.TextDisabled(localization.Get("Reminders.Help"));
-        var fromGame=configuration.RemindersFromGame;
-        if(ImGui.Checkbox(localization.Get("Reminders.FromGame"),ref fromGame)){configuration.RemindersFromGame=fromGame;SaveReminders();}
-        Tip("Reminders.FromGameTip");
+        // X-76 H5 (0.915): shared row (rollback when saving fails, « ↺ »).
+        BoolSetting("Reminders.FromGame","Reminders.FromGameTip",()=>configuration.RemindersFromGame,value=>configuration.RemindersFromGame=value,c=>c.RemindersFromGame);
 
         void SquadronRow(string key,FontAwesomeIcon icon,SquadronTimer? timer,Func<ushort,string?>? nameOf)
         {
@@ -189,15 +194,11 @@ internal sealed partial class MainWindow
             try{ImGui.TextColored(Accent,icon.ToIconString());}
             finally{ImGui.PopFont();}
             ImGui.SameLine();ImGui.TextUnformatted(localization.Get("Reminders."+key));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Reminders."+key+"Help"));
+            Tip("Reminders."+key+"Help");
             ImGui.TableNextColumn();ImGui.TextUnformatted(state);
             extra?.Invoke();
             ImGui.TableNextColumn();
-            if(next is { } at)
-            {
-                var left=at-now;
-                ImGui.TextUnformatted(localization.Format("Reminders.In",(int)left.TotalHours,left.Minutes,at.ToLocalTime().ToString("g")));
-            }
+            if(next is { } at)ImGui.TextUnformatted(InText(at,now));
             else ImGui.TextDisabled("—");
             ImGui.TableNextColumn();
             if(lastReset is { } reset)
@@ -234,7 +235,7 @@ internal sealed partial class MainWindow
                 }
             }
             finally{ImGui.EndDisabled();}
-            if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Reminders.DiscordRowTip"));
+            Tip("Reminders.DiscordRowTip");
             ImGui.TableNextColumn();
             if(next is { } alarmAt && alarmAt>now)
                 AlarmButton("Reminder"+key,localization.Format("Reminders.AlarmTip",localization.Get("Reminders."+key)),
@@ -288,9 +289,5 @@ internal sealed partial class MainWindow
         =>ReminderCounts.Todo(ReminderDoneAt,configuration.ReminderBarHidden,now).Select(row=>localization.Get("Reminders."+row))
             .Concat(PersonalTasks.Pending(configuration.PersonalTasks,now).Select(task=>task.Name)).ToArray();
 
-    private void SaveReminders()
-    {
-        try{save();saveError=null;}
-        catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Reminders could not be saved.");}
-    }
+    private void SaveReminders()=>TrySave("Reminders");
 }

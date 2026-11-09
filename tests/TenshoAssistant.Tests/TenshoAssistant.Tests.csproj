@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../src/TenshoAssistant/MyTools/*.cs" Exclude="../../src/TenshoAssistant/MyTools/*.Dalamud.cs" Link="MyTools/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Discoveries/*.cs" Exclude="../../src/TenshoAssistant/Discoveries/*.Dalamud.cs" Link="Discoveries/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Localization/*.cs" Link="Localization/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Carnivale/*.cs" Exclude="../../src/TenshoAssistant/Carnivale/*.Dalamud.cs" Link="Carnivale/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Societies/*.cs" Exclude="../../src/TenshoAssistant/Societies/*.Dalamud.cs" Link="Societies/%(Filename)%(Extension)" />
@@ -44,9 +45,13 @@
     <Compile Include="../../src/TenshoAssistant/Maps/MapCatalog.cs" Link="Maps/MapCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapBookmarks.cs" Link="Maps/MapBookmarks.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapProjection.cs" Link="Maps/MapProjection.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/VistaLogNumbers.cs" Link="Maps/VistaLogNumbers.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapPartySmoother.cs" Link="Maps/MapPartySmoother.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapZoomMemory.cs" Link="Maps/MapZoomMemory.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapLabels.cs" Link="Maps/MapLabels.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/MapDiscovery.cs" Link="Maps/MapDiscovery.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/ZoneEntries.cs" Link="Maps/ZoneEntries.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/MapHeight.cs" Link="Maps/MapHeight.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapResume.cs" Link="Maps/MapResume.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/IslandResources.cs" Link="Maps/IslandResources.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/JobProgress.cs" Link="Gear/JobProgress.cs" />
@@ -65,6 +70,7 @@
     <Compile Include="../../src/TenshoAssistant/Quests/QuestList.cs" Link="Quests/QuestList.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestStartCities.cs" Link="Quests/QuestStartCities.cs" />
     <Compile Include="../../src/TenshoAssistant/Quests/QuestAlternatives.cs" Link="Quests/QuestAlternatives.cs" />
+    <Compile Include="../../src/TenshoAssistant/Quests/ExpansionOrigin.cs" Link="Quests/ExpansionOrigin.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/ResetSchedule.cs" Link="Reminders/ResetSchedule.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/CompanyBenefits.cs" Link="Reminders/CompanyBenefits.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/HomeToday.cs" Link="Reminders/HomeToday.cs" />
@@ -98,7 +104,10 @@
     <Compile Include="../../src/TenshoAssistant/Collections/CollectionService.cs" Link="Collections/CollectionService.cs" />
     <Compile Include="../../src/TenshoAssistant/Collections/Outfits.cs" Link="Collections/Outfits.cs" />
     <Compile Include="../../src/TenshoAssistant/Collections/CollectionRecent.cs" Link="Collections/CollectionRecent.cs" />
+    <Compile Include="../../src/TenshoAssistant/Collections/AchievementProgressStore.cs" Link="Collections/AchievementProgressStore.cs" />
     <Compile Include="../../src/TenshoAssistant/Leves/LeveCatalog.cs" Link="Leves/LeveCatalog.cs" />
+    <Compile Include="../../src/TenshoAssistant/Leves/LevePrepare.cs" Link="Leves/LevePrepare.cs" />
+    <Compile Include="../../src/TenshoAssistant/SettingsIndex.cs" Link="SettingsIndex.cs" />
     <Compile Include="../../src/TenshoAssistant/Hunting/HuntingLog.cs" Link="Hunting/HuntingLog.cs" />
     <Compile Include="../../src/TenshoAssistant/Hunting/SRankConditions.cs" Link="Hunting/SRankConditions.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GatheringCatalog.cs" Link="Gathering/GatheringCatalog.cs" />
@@ -107,10 +116,12 @@
     <Compile Include="../../src/TenshoAssistant/Gathering/RegenTick.cs" Link="Gathering/RegenTick.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/OceanFishing.cs" Link="Gathering/OceanFishing.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/OceanVoyage.cs" Link="Gathering/OceanVoyage.cs" />
+    <Compile Include="../../src/TenshoAssistant/Gathering/OceanMissions.cs" Link="Gathering/OceanMissions.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/FishWindows.cs" Link="Gathering/FishWindows.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/FishNow.cs" Link="Gathering/FishNow.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/Notebooks.cs" Link="Gathering/Notebooks.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/FontSettings.cs" Link="UI/FontSettings.cs" />
+    <Compile Include="../../src/TenshoAssistant/UI/SettingSave.cs" Link="UI/SettingSave.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/WeatherForecast.cs" Link="Gathering/WeatherForecast.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/FishingForecast.cs" Link="Gathering/FishingForecast.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GatheringSchedule.cs" Link="Gathering/GatheringSchedule.cs" />
@@ -126,6 +137,11 @@
     <Compile Include="../../src/TenshoAssistant/Configuration.cs" Link="Configuration.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/ThemePalettes.cs" Link="UI/ThemePalettes.cs" />
     <Compile Include="../../src/TenshoAssistant/RegistrationScope.cs" Link="RegistrationScope.cs" />
+    <Compile Include="../../src/TenshoAssistant/AtomicFile.cs" Link="AtomicFile.cs" />
+    <Compile Include="../../src/TenshoAssistant/BackgroundWriter.cs" Link="BackgroundWriter.cs" />
+    <Compile Include="../../src/TenshoAssistant/OnceSet.cs" Link="OnceSet.cs" />
+    <Compile Include="../../src/TenshoAssistant/BackupZip.cs" Link="BackupZip.cs" />
+    <Compile Include="../../src/TenshoAssistant/CommunitySources.cs" Link="CommunitySources.cs" />
     <Compile Include="../../src/TenshoAssistant/Inventory/*.cs" Exclude="../../src/TenshoAssistant/Inventory/*.Dalamud.cs" Link="Inventory/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Items/*.cs" Exclude="../../src/TenshoAssistant/Items/*.Dalamud.cs;../../src/TenshoAssistant/Items/*.Lumina.cs" Link="Items/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Craft/RecipeCatalog.cs" Link="Craft/RecipeCatalog.cs" />

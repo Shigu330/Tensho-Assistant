@@ -79,7 +79,7 @@ internal sealed partial class MainWindow
         if(airshipChosen.Count==0)ImGui.TextDisabled(localization.Get("AirshipPlanner.ChooseHint"));
         else if(airshipChosenRoute is { } mine)
         {
-            ImGui.TextUnformatted(localization.Format("AirshipPlanner.Chosen",AirshipRouteNames(catalog,mine),mine.Distance,airshipRange,Duration(mine.Seconds),AirshipExp(mine),mine.Tanks));
+            ImGui.TextUnformatted(localization.Format("AirshipPlanner.Chosen",AirshipRouteNames(catalog,mine),mine.Distance,airshipRange,HoursMinutes(TimeSpan.FromSeconds(mine.Seconds)),AirshipExp(mine),mine.Tanks));
             if(mine.UnknownExp>0)Tip("AirshipPlanner.ExpUnknownTip");
             if(mine.Distance>airshipRange)ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("AirshipPlanner.OverRange"));
             ImGui.SameLine();
@@ -123,19 +123,20 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted($"{index}. {AirshipRouteNames(catalog,route)}");
                 ImGui.TableNextColumn();ImGui.TextUnformatted($"{route.Distance} / {airshipRange}");
-                ImGui.TableNextColumn();ImGui.TextUnformatted(Duration(route.Seconds));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(HoursMinutes(TimeSpan.FromSeconds(route.Seconds)));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(AirshipExp(route));
                 if(route.UnknownExp>0)Tip("AirshipPlanner.ExpUnknownTip");
                 ImGui.TableNextColumn();ImGui.TextUnformatted((route.UnknownExp>0 ? "≥ ":"")+route.ExpPerDay.ToString("N0"));
                 ImGui.TableNextColumn();
                 if(ImGui.SmallButton(localization.Get("AirshipPlanner.Use")+$"##AirshipUse{index}")){airshipChosen.Clear();airshipChosen.AddRange(route.Sectors);}
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("AirshipPlanner.UseTip"));
+                Tip("AirshipPlanner.UseTip");
             }
         }
         finally{ImGui.EndTable();}
-
-        static string Duration(int seconds){var time=TimeSpan.FromSeconds(seconds);return $"{(int)time.TotalHours} h {time.Minutes:00}";}
     }
+
+    // « H h mm » of a voyage or survey time, on the airship and submarine pages.
+    private static string HoursMinutes(TimeSpan time)=>$"{(int)time.TotalHours} h {time.Minutes:00}";
 
     // Experience of a route; « ≥ » when a sector's experience is not known (0 in the game data).
     private static string AirshipExp(AirshipRoute route)=>(route.UnknownExp>0 ? "≥ ":"")+route.Exp.ToString("N0");

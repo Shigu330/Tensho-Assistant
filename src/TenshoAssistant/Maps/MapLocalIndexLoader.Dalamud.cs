@@ -99,7 +99,7 @@ internal sealed class MapLocalIndexLoader : IDisposable
             }
             catch(Exception error)
             {
-                log.Error(error,"Tensho map positions could not be built.");
+                log.Warning(error,"Tensho map positions could not be built.");
                 service.Fail(error);Stop();
             }
         }
@@ -169,7 +169,8 @@ internal sealed class MapLocalIndexLoader : IDisposable
                 if(map.SizeFactor>0)
                 {
                     var scale=map.SizeFactor/100f;
-                    rows.Add(new(MapLocalKind.FishingSpot,spot.RowId,map.RowId,(spot.X-1024f)/scale-map.OffsetX,(spot.Z-1024f)/scale-map.OffsetY,0));
+                    rows.Add(new(MapLocalKind.FishingSpot,spot.RowId,map.RowId,(spot.X-1024f)/scale-map.OffsetX,(spot.Z-1024f)/scale-map.OffsetY,
+                        spot.Radius*MapLocalIndexCache.FishingSpotRadiusFactor/scale));
                 }
             }
             yield return ++count;

@@ -120,10 +120,7 @@ public sealed class ToolTemplateStore:IDisposable
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-            var temporary=path+"."+Guid.NewGuid().ToString("N")+".tmp";
-            File.WriteAllBytes(temporary,JsonSerializer.SerializeToUtf8Bytes(snapshot,Options));
-            File.Move(temporary,path,true);
+            AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(snapshot,Options));
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException){warn(error,"My tools could not be saved.");}
     }

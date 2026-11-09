@@ -1,3 +1,5 @@
+using TenshoAssistant.Collections;
+
 namespace TenshoAssistant.Monsters;
 
 /// <summary>0.795 (X-34, X-35): what a nearby monster means for the player; information only, from the game's data and the player's lists.</summary>
@@ -22,5 +24,25 @@ public static class NearbyMonsters
                 if(!names.Contains(name))names.Add(name);
             }
         return result.ToDictionary(pair=>pair.Key,pair=>(IReadOnlyList<string>)pair.Value);
+    }
+}
+
+/// <summary>X-76 (0.956): the collection entries still missing that a nearby monster's drop can unlock, built once per published collections state.</summary>
+public sealed record NearbyMissingCollections(IReadOnlySet<uint> Mounts,IReadOnlySet<uint> Minions,IReadOnlySet<uint> Rolls)
+{
+    public static NearbyMissingCollections From(IReadOnlyList<CollectionEntry> entries)
+    {
+        HashSet<uint> Missing(CollectionKind kind)=>entries.Where(entry=>entry.Kind==kind && !entry.ConfirmedUnlocked).Select(entry=>entry.Id).ToHashSet();
+        return new(Missing(CollectionKind.Mount),Missing(CollectionKind.Companion),Missing(CollectionKind.Orchestrion));
+    }
+}
+
+/// <summary>X-76 (0.956): the blue magic spells (their ids) and those not learned yet (id to name), built once per published collections state.</summary>
+public sealed record NearbyBlueSpells(IReadOnlyList<uint> Spells,IReadOnlyDictionary<uint,string> NotLearned)
+{
+    public static NearbyBlueSpells From(IReadOnlyList<CollectionEntry> entries)
+    {
+        var spells=entries.Where(entry=>entry.Kind==CollectionKind.BlueMagic).ToArray();
+        return new(spells.Select(entry=>entry.Id).ToArray(),spells.Where(entry=>!entry.ConfirmedUnlocked).ToDictionary(entry=>entry.Id,entry=>entry.Name));
     }
 }

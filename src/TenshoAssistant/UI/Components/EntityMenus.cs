@@ -19,7 +19,7 @@ internal sealed partial class MainWindow
             if(ImGui.Selectable(localization.Get("EntityMenu.OpenQuest"))){SelectQuest(questId);questShowDetails=true;page=Page.Quests;IsOpen=true;}
             // Where the quest starts (cached map position index).
             if(mapLocal?.State.Index?.Quest(questId) is { } start && maps.State.Catalog?.Find(start.MapId) is { } map)
-                PlaceEntries(map,MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(new Vector3(start.X,0,start.Z),map),map),"EntityMenu.QuestStart");
+                PlaceEntries(map,MapProjection.CoordinateFromWorld(new Vector3(start.X,0,start.Z),map),"EntityMenu.QuestStart");
         }
         finally{ImGui.EndPopup();}
     }
@@ -64,8 +64,11 @@ internal sealed partial class MainWindow
     }
 
     // 0.706 (user report): the Island Sanctuary has no aetheryte, nor have other maps: no entry that can only fail. Markers not read yet: the question says so itself.
+    // 0.853 (X-48, user report: no nearest aetheryte on a quest's target, Limsa's Upper Decks): a map without an aetheryte of its own counts too when there is
+    // a way in (X-63, ZoneEntries): an aethernet shard placed there (the Upper Decks' guilds), or a neighbouring map; the teleport question then says the way.
     private bool MapHasAetheryte(MapDefinition map)=>map.TerritoryId!=0 && map.TerritoryId!=IslandResources.Territory
-        && (mapMarkers is null || mapMarkers.For(map.MarkerRange).Any(marker=>marker.AetheryteId!=0));
+        && (mapMarkers is null || mapMarkers.For(map.MarkerRange).Any(marker=>marker.AetheryteId!=0 || marker.LinkMapId!=0)
+            || mapMarkers.Aetherytes.Any(row=>!row.Main && row.Group!=0 && row.Territory==map.TerritoryId));
 
     private void MenuHeader(string name)
     {
@@ -77,7 +80,7 @@ internal sealed partial class MainWindow
     private void PlaceEntries(MapDefinition map,Vector2 coordinate,string? titleKey,string? place=null)
     {
         // A place text already carries its coordinates (NpcPlace): they are not repeated.
-        ImGui.TextDisabled(place ?? $"{(titleKey is null ? map.Zone:localization.Get(titleKey))}  (X {coordinate.X:0.0}  Y {coordinate.Y:0.0})");
+        ImGui.TextDisabled(place ?? $"{(titleKey is null ? map.Zone:localization.Get(titleKey))}  ({MapProjection.CoordinateText(coordinate)})");
         ImGui.BeginDisabled(map.TerritoryId==0);
         try{if(ImGui.Selectable(localization.Get("MapView.Flag")+"##EntityFlag"))PlaceFlagFromMapView(map,coordinate.X,coordinate.Y);}
         finally{ImGui.EndDisabled();}

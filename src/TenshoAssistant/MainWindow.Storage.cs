@@ -2,7 +2,7 @@ using Dalamud.Bindings.ImGui;
 
 namespace TenshoAssistant;
 
-// R-06 step 3 (0.280): « Rangements », its own page — where the items are (character, retainers, saddlebags, armoury, glamour
+// R-06 step 3 (0.280): « Storage », its own page — where the items are (character, retainers, saddlebags, armoury, glamour
 // dresser, armoire: grids per container with origin tabs, category / quality filters and search), crystals, manual imports.
 internal sealed partial class MainWindow
 {

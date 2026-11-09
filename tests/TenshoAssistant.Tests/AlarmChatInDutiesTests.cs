@@ -3,8 +3,8 @@ using System.Text.RegularExpressions;
 using TenshoAssistant.Alarms;
 
 // Queue step e (audit 2026-11-02): « No sound in duties » can also keep the [Tensho] chat line out of a duty (MuteChatInDuties, off by
-// default, so the line stays as before); Discord and the alarms copied into the game are not affected, and the rebuild of the alarm
-// settings on the settings page copies every AlarmSettings field.
+// default, so the line stays as before); Discord and the alarms copied into the game are not affected, and the edit of the alarm
+// settings on the settings page keeps every AlarmSettings field (a copy since X-76 H3, 0.914).
 internal static class AlarmChatInDutiesTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -38,15 +38,18 @@ internal static class AlarmChatInDutiesTests
             Check(!service.Contains("if (settings.Chat)",StringComparison.Ordinal),"no chat line outside the rule");
             Check(!service[discord..].Contains("inDuty",StringComparison.Ordinal) && !service[discord..].Contains("BoundByDuty",StringComparison.Ordinal),"Discord is still sent in a duty");
         }),
-        ("Alarm settings page: the rebuild copies every AlarmSettings field; the new row has its tooltip and reset button",() =>
+        ("Alarm settings page: the edit keeps every AlarmSettings field; the new row has its tooltip and reset button",() =>
         {
             var page = Read("MainWindow.Alarms.cs");
-            var start = page.IndexOf("configuration.AlarmOptions=new(){",StringComparison.Ordinal);
-            var end = start < 0 ? -1 : page.IndexOf("};",start,StringComparison.Ordinal);
-            Check(start > 0 && end > start,"settings rebuild found");
-            var rebuild = page[start..end];
-            var lost = typeof(AlarmSettings).GetProperties().Where(property => property.CanWrite && !Regex.IsMatch(rebuild,@"\b" + property.Name + "=")).Select(property => property.Name).ToArray();
-            Check(lost.Length == 0,"fields lost when the alarm settings are rebuilt: " + string.Join(", ",lost));
+            // X-76 H3 (0.914): the page edits a Copy() of the saved options instead of rebuilding them field by field, so no field can be
+            // forgotten (the command delay, the duty ready alert and the automatic alarms are saved on their own and must survive).
+            Check(page.Contains("var next=configuration.AlarmOptions.Copy();",StringComparison.Ordinal) && !page.Contains("configuration.AlarmOptions=new(){",StringComparison.Ordinal),"edited on a copy");
+            var source = new AlarmSettings();
+            foreach (var property in typeof(AlarmSettings).GetProperties().Where(property => property.CanWrite))
+                property.SetValue(source,property.GetValue(source) switch { bool on => !on, int number => number + 7, var other => throw new Exception("new field type to cover: " + property.Name + " " + other) });
+            var copy = source.Copy();
+            var lost = typeof(AlarmSettings).GetProperties().Where(property => property.CanWrite && !Equals(property.GetValue(copy),property.GetValue(source))).Select(property => property.Name).ToArray();
+            Check(!ReferenceEquals(copy,source) && lost.Length == 0,"fields lost when the alarm settings are copied: " + string.Join(", ",lost));
             Check(page.Contains("Tip(" + Quoted("Advanced.MuteChatTip") + ");",StringComparison.Ordinal),"tooltip");
             Check(page.Contains("DefaultButton(" + Quoted("AlarmMuteChat") + ",muteChat!=defaults.MuteChatInDuties)",StringComparison.Ordinal),"reset button");
             Check(page.Contains("var muteChatOff=!mute || !chat;",StringComparison.Ordinal),"greyed while the sound silence or the chat line is off");

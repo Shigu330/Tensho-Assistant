@@ -3,7 +3,11 @@ namespace TenshoAssistant.Fields;
 public enum FieldEventKind { Fate,Engagement }
 /// <summary>W-14 (0.717): something that happens in a field, where the zone's layout puts it. Level null: the sheet gives none. docs/evidence/0.717-eureka-bozja.md.</summary>
 public sealed record FieldEvent(FieldEventKind Kind,uint Id,string Name,string Description,int? Level,int Participants,float X,float Z);
-public sealed record FieldZone(uint Territory,uint Map,string Name,IReadOnlyList<FieldEvent> Events);
+public sealed record FieldZone(uint Territory,uint Map,string Name,IReadOnlyList<FieldEvent> Events)
+{
+    /// <summary>0.976: the zone's TerritoryIntendedUse (48: Bozja, whose FATEs are skirmishes); 0 for the open zones.</summary>
+    public uint Use { get; init; }
+}
 public sealed record FieldRecord(uint Id,int Number,string Name,string Description,int Rarity,string Quest,uint Icon);
 public sealed record FieldAction(uint Id,int Order,string Name,string Category,int Most,string Description,uint Icon);
 public sealed record FieldCatalog(IReadOnlyList<FieldZone> Zones,IReadOnlyList<FieldRecord> Records,IReadOnlyList<FieldAction> Actions);
@@ -13,8 +17,13 @@ public sealed record FieldEventRow(FieldEventKind Kind,uint Id,uint Instance,str
 
 public static class FieldBoard
 {
-    /// <summary>The four Eureka zones, Bozjan Southern Front, Zadnor. TerritoryType, checked on 2026-11-07.</summary>
-    public static readonly IReadOnlyList<uint> Territories=[732,763,795,827,920,975];
+    /// <summary>
+    /// X-90 / X-92 (0.975): the field operation zones are the TerritoryType rows of these uses: 41 Eureka, 48 Bozja, 61 Occult Crescent
+    /// (docs/evidence/0.975-field-zones.md; the six zones fixed in 0.717 are exactly uses 41 and 48). A new zone of the same family is listed without code.
+    /// </summary>
+    public static readonly IReadOnlyList<uint> FieldZoneUses=[41,48,61];
+    /// <summary>0.976: Bozja's use: its FATEs are called skirmishes (Eureka and Occult Crescent keep « FATE »).</summary>
+    public const uint BozjaUse=48;
 
     /// <summary>The rows the layout places, once each, the FATEs first by level. A row with no entry in this layout belongs to another zone.</summary>
     public static IReadOnlyList<FieldEvent> Place(IEnumerable<FieldLayoutEntry> entries,IEnumerable<FieldEventRow> rows)

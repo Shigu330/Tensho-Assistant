@@ -42,7 +42,7 @@ internal sealed partial class MainWindow
         Tip("Gear.PlanPickTip");
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("Gear.PlanNew"))){gearPlanEdit=GearPlanEdit.New;gearPlanName="";gearPlanNameRefused=false;}
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("Gear.PlanNewTip"));
+        Tip("Gear.PlanNewTip");
         ImGui.SameLine();
         ImGui.BeginDisabled(set is null);
         if(ImGui.SmallButton(localization.Get("Gear.PlanRename"))){gearPlanEdit=GearPlanEdit.Rename;gearPlanName=set?.Active ?? "";gearPlanNameRefused=false;}
@@ -51,7 +51,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(set is not {Others.Count:>0});
         if(ImGui.SmallButton(localization.Get("Gear.PlanDelete")) && set is not null && GearPlanSets.Delete(set) is { } next){LoadGearPlan(job,next);gearPlanEdit=GearPlanEdit.None;SaveGearPlan();}
         ImGui.EndDisabled();
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Gear.PlanDeleteTip"));
+        Tip("Gear.PlanDeleteTip");
         if(gearPlanEdit==GearPlanEdit.None)return;
         ImGui.SetNextItemWidth(220);
         var confirmed=ImGui.InputText(localization.Get("Gear.PlanName")+"###GearPlanName",ref gearPlanName,GearPlanSets.MaxName,ImGuiInputTextFlags.EnterReturnsTrue);Tip("Gear.PlanNameTip");

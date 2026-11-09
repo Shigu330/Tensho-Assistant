@@ -133,3 +133,41 @@ La liste complète de ce qui reste pour la 1.0.0 : [PUBLISHING](PUBLISHING.md) �
 | N-10, atelier de l'île | Fait sans le jeu en 0.671 et 0.672, inconnues listées dans `docs/evidence/0.671-island-workshop.md` | Essais et capture devant l'agenda de l'île ; prévision de la semaine plus tard |
 | I-05, suite | Relevé des offres du jeu, vue de tous les servants | Après un essai de la 0.508 |
 | Dresseur, suite | Mis de côté par l'utilisateur | Sonde déjà en place (0.501) |
+
+## À revoir avec l'utilisateur (notées le 2026-11-08 au soir, demande « continue en notant les propositions »)
+
+**Revus le 2026-11-09 (DEC-045)** : 1 laissé ; 2 position exacte partout ; 3 plan à proposer ; 4 déjà confirmé (DEC-026), alternatives revues ; 5 sur clic ; 6 aide à la pêche ; 7 français ; 8 wiki + notes + schéma, bestiaire avec notes du wiki.
+
+| # | Sujet | Proposition (recommandée) | Autre choix |
+|---|---|---|---|
+| 1 | Coupure JcJ des travaux déjà lancés (DEC-038, audit 0.949) | Annuler dès le début de la coupure : connexion GitHub en attente, échange de découvertes, lectures Garland et wiki, prix d'une préparation ; couper l'alerte Discord « mission trouvée » en JcJ | Laisser comme aujourd'hui (non retenu le 2026-11-08) |
+| 2 | Position exacte dans les découvertes partagées (audit 0.949) | N'envoyer que la case de 50 yalms | Garder la position exacte (non retenu le 2026-11-08) |
+| 3 | Réorganisation des pages de réglages (X-76 étape 3) | Proposition concrète après la passe des groupes de réglages | — |
+| 4 | Choix provisoires depuis la 0.345 (tableau en tête de ce fichier) | Les passer en un seul lot, cases à cocher, à la fin du nettoyage (étape 9) | — |
+| 5 | Ventes des servants (I-05) | Garder la comparaison Universalis sur clic | Demander une fois à l'ouverture, sur réglage |
+| 6 | Poissons de collection « pas pris en compte » (X-97) | Question : où l'avez-vous vu ? Les prises collectionnables sont bien comptées dans les sacs et les découvertes ; proposition : afficher dans l'aide à la pêche la collectionnabilité visée et les assignats d'un poisson collectionnable | — |
+| 7 | Langue des fichiers de l'agent (X-91, 2026-11-09) | CLAUDE.md, docs/ai/RULES.md et le skill de version mis à jour contre le code, mais gardés en français (exception de l'étape 4 : fichiers hors Git, consignes de l'utilisateur en français) | Les traduire en anglais avec les documents vivants, juste avant la 1.0.0 |
+| 8 | Outils de contenus (X-90), docs/project/CONTENT-TOOLS.md | Tableaux stratégiques en notes écrites par vous, masquées en combat, sans dessin sur l'écran du jeu ; bestiaire des donjons profonds hors du donjon, sans conseil ; suivi partagé des NM d'Eurêka laissé aux plugins existants | Conseils de la communauté hors du donjon ; autre format de tableaux |
+| 9 | Alerte « souhait en vente sous un prix » (X-101) : Tensho interrogerait Universalis en arrière-plan, sans clic, pour vos souhaits avec un prix (règle Dalamud : appel réseau automatique, à déclarer) | Réglage coupé par défaut ; au plus une fois toutes les 30 min, seulement les souhaits avec un prix, 20 objets par passage, ligne de discussion à la baisse sous le prix ; Universalis déjà dans la liste des hôtes | Seulement sur un bouton « Vérifier maintenant » (aucun appel automatique) |
+| 10 | Regroupement des outils et des réglages (X-100) | Voir la section « Proposition X-100 » ci-dessous | Garder la disposition actuelle |
+
+## Proposition X-100 : regroupement des outils et des réglages (2026-11-10) — **validée (DEC-048)** ; n° 9 : automatique coupé par défaut (DEC-048)
+
+Constat (0.991) : la navigation a 8 groupes ; « Progression » compte 16 pages et « Monde » 11 ; les réglages sont dans 7 onglets et aussi sur les pages (MapView 92, Paramètres 44, Avancé 24, panneaux des listes 13…, 320 réglages au total, docs/project/SETTINGS.md).
+
+| Groupe proposé | Pages | Changement |
+|---|---|---|
+| Objets | Objets, Rangements, Tri, Marché | Lexique part dans « Références » |
+| Production | Artisanat, Récolte, Pêche en mer, Île sanctuaire, Enchaînement de macros | inchangé (sans les livraisons) |
+| Monde | Carte, Météo, ALÉA, Marchands, Butin des contenus, Butin des monstres, Découvertes | sans les minuteurs |
+| Suivi (nouveau) | Alarmes, Rappels, Jardin, Compagnie libre | les minuteurs et rappels ensemble |
+| Progression | Quêtes, Fêtes, Collections, Mandats, Carnet de chasse, Peuples alliés, Grandes compagnies, Livraisons (spéciales et sur mesure), Équipement, Chocobo | 10 pages au lieu de 16 ; les deux livraisons réunies |
+| Contenus (nouveau, X-90) | Eurêka/Bozja/Croissant, Donjons profonds, Reliques, Carnaval masqué, Dresseur, plus tard tableaux stratégiques | une famille par contenu (X-92) |
+| Gold Saucer | Revue de mode, Triple Triade, Mini Cactpot | inchangé |
+| Références (nouveau) | Lexique, Aide, Crédits | ce qu'on consulte |
+| Préférences | Paramètres, Diagnostics (développeur) | Accueil et Mes outils restent en tête, hors groupe |
+
+Réglages : chaque réglage reste aussi à côté de son outil (comme aujourd'hui), et la page Paramètres les regroupe par les mêmes groupes que la navigation :
+Général (langue, thème, polices, discussion, sons) · Panneaux à côté des fenêtres du jeu (récolte, artisanat, collectionnable, ventes des servants, recherche de mission, revue de mode, Triple Triade, plateau du dresseur…) · Carte · Suivi et notifications (alarmes, rappels, Discord, barre du serveur : monnaies, gils) · Données et sources (sources communautaires, cache, découvertes) · Avancé · Débogage.
+Plus un champ de recherche en haut des Paramètres qui trouve n'importe quel réglage par son nom (les 320) et ouvre son onglet.
+| 11 | Monstres proches, autres usages (X-40) ; aujourd'hui : vos listes, carnet de chasse, ALÉA, mage bleu, collections manquantes, dresseur, cibles de mandat | Ajouter (chacun une couche de la carte, cochée dans Paramètres › Carte et sur sa page) : a) le monstre fait tomber un ingrédient d'une de vos listes d'artisanat (butin vu en jeu, puis wiki) ; b) cible d'un livre de relique en cours (Zodiaque : « vaincre N … ») ; c) le monstre fait tomber un objet de vos souhaits | Seulement a) ; ou rien |

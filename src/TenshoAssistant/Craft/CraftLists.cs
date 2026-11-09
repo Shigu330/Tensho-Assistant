@@ -83,10 +83,7 @@ public static class CraftLists
 
     public static void Write(string path,IReadOnlyList<CraftList> lists)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        var temporary=path+"."+Guid.NewGuid().ToString("N")+".tmp";
-        File.WriteAllBytes(temporary,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,lists.Take(MaxLists).ToArray()),Json));
-        File.Move(temporary,path,true);
+        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,lists.Take(MaxLists).ToArray()),Json));
     }
 }
 

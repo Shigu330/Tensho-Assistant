@@ -9,7 +9,7 @@ public sealed record InventorySortMetadata(string Name,uint Category,bool? Marke
     int? ItemLevel=null,int? EquipLevel=null,int? Rarity=null,uint? SellPrice=null,ItemTraits? Traits=null,ulong? Jobs=null,bool? InGearset=null)
 {
     /// <summary>0.595 (I21): jobs = the piece's jobs as a mask of ClassJob rows, null when it is no gear; inGearset = in one of the game's sets, null when they were not read.</summary>
-    public static InventorySortMetadata FromItem(uint id,ItemDefinition? item,ulong? jobs=null,bool? inGearset=null)=>item is null || item.Id!=id ? new($"Objet {id}",0)
+    public static InventorySortMetadata FromItem(uint id,ItemDefinition? item,ulong? jobs=null,bool? inGearset=null)=>item is null || item.Id!=id ? new($"Item {id}",0)
         :new(item.Name,item.UiCategoryId,item.IsMarketable,item.CanBeHq,item.Equipment,(int)Math.Min(item.ItemLevel,int.MaxValue),item.EquipLevel,item.Rarity,item.SellPrice,item.Traits,jobs,inGearset);
 }
 public sealed record InventorySortCriterion(InventorySortField Field,bool Descending=false);
@@ -32,7 +32,8 @@ public static class InventorySortRules
         =>profile.CharacterId==scope.CharacterId && profile.Kind==scope.Storage?.Kind && profile.StorageId==(scope.Storage?.StorageId ?? 0);
     public static InventorySortProfile Default(InventorySortScope scope,InventorySortField sort=InventorySortField.Name,bool descending=false)
         =>new(scope.CharacterId,scope.Storage?.Kind,scope.Storage?.StorageId ?? 0,Array.AsReadOnly(new[]{new InventorySortCriterion(sort,descending)}),Array.AsReadOnly(Array.Empty<InventorySortZone>()));
-    public const int MaxZoneCategories=64,MaxZoneItems=128;
+    // X-88 (0.969, user report: « after 64 I cannot any more »): 256 categories a zone, above the game's ~110 item categories, so a zone can take all.
+    public const int MaxZoneCategories=256,MaxZoneItems=128;
     public static InventorySortProfile Copy(InventorySortProfile value)
         =>value with{Criteria=Array.AsReadOnly(value.Criteria.ToArray()),Zones=CopyZones(value.Zones)};
     internal static IReadOnlyList<InventorySortZone> CopyZones(IReadOnlyList<InventorySortZone> zones)

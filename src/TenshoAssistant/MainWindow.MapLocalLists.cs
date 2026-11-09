@@ -65,16 +65,12 @@ internal sealed partial class MainWindow
 
     private void FlagAt(MapDefinition map,Vector3 world)
     {
-        var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(world,map),map);
+        var coordinate=MapProjection.CoordinateFromWorld(world,map);
         PlaceFlagFromMapView(map,coordinate.X,coordinate.Y);
         ImGui.CloseCurrentPopup();
     }
-    private static Vector2 CoordinateOf(MapDefinition map,Vector3 world)=>MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(world,map),map);
-    private string CoordinateText(MapDefinition map,Vector3 world)
-    {
-        var coordinate=MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(world,map),map);
-        return $"X {coordinate.X:0.0}  Y {coordinate.Y:0.0}";
-    }
+    private static Vector2 CoordinateOf(MapDefinition map,Vector3 world)=>MapProjection.CoordinateFromWorld(world,map);
+    private static string CoordinateText(MapDefinition map,Vector3 world)=>MapProjection.CoordinateText(CoordinateOf(map,world));
 
     private void DrawLocalQuests(MapDefinition map)
     {
@@ -211,12 +207,15 @@ internal sealed partial class MainWindow
     }
     // 0.328: the sightseeing log number, as in the vista tooltip: the wiki's when its row is matched (numbering restarts in each
     // expansion), else the sheet row order, which is the log number only for the 80 A Realm Reborn vistas (no number beyond).
+    // X-76 P5 (0.929): the game's own numbering first (AdventureExPhase, Maps/VistaLogNumbers.cs), the wiki's only when the game data is not there.
     private string VistaNumber(MapLocalPosition vista)
     {
+        if(VistaPhases?.Invoke() is { } phases && Maps.VistaLogNumbers.Of(vista.Id,phases) is { } game)
+            return localization.Format(game.Expansion==0 ? "MapView.VistaNumberArr":"MapView.VistaNumberEx",game.Number,ExpansionName(game.Expansion));
         if(WikiVistaFor(vista) is { } wiki)return localization.Format(wiki.Section==0 ? "MapView.VistaNumberArr":"MapView.VistaNumberEx",wiki.Number,ExpansionName(wiki.Section));
-        var order=vista.Id-2162688u;
-        return order<80 ? localization.Format("MapView.VistaNumberArr",(int)order+1):"";
+        return "";
     }
+    internal Func<IReadOnlyList<(uint Begin,uint End,int Expansion)>?>? VistaPhases { get; set; }
     // Maps showing the same ground as the shown map (MapCatalog.Equivalent walks every map), kept per catalogue and map.
     private IReadOnlySet<uint> EquivalentMaps(MapDefinition map)
     {
@@ -239,7 +238,7 @@ internal sealed partial class MainWindow
             var name=vendor.Name.Length>0 ? vendor.Name:localization.Get("MapLocal.UnnamedVendor");
             // Same icon as on the map: the game's icon the vendor stands by (MAP-017), else the icon of its kind.
             DrawSmallGameIcon(VendorMarker(vendorMarkers,MapProjection.PixelFromWorld(new Vector3(spot.WorldX,0,spot.WorldZ),map),VendorIconOf(vendor))?.Icon ?? VendorIconOf(vendor));
-            if(ImGui.Selectable($"{name}  (X {spot.X:0.0}  Y {spot.Y:0.0})##Vendor{vendor.NpcId}/{spot.X}/{spot.Y}")){PlaceFlagFromMapView(map,spot.X,spot.Y);ImGui.CloseCurrentPopup();}
+            if(ImGui.Selectable($"{name}  ({MapProjection.CoordinateText(new(spot.X,spot.Y))})##Vendor{vendor.NpcId}/{spot.X}/{spot.Y}")){PlaceFlagFromMapView(map,spot.X,spot.Y);ImGui.CloseCurrentPopup();}
             NpcMenu($"VendorTool{vendor.NpcId}/{spot.X}/{spot.Y}",name,vendor.NpcId,vendor.Locations);
             if(ImGui.IsItemHovered())WrappedTooltip(VendorLabel(vendor)+"\n"+localization.Get("MapLocal.ClickFlag")+"\n"+localization.Get("MapLocal.RightClickTool"));
         }
@@ -264,7 +263,7 @@ internal sealed partial class MainWindow
             var locked=npc.Available(questsDone)==false;
             var lacking=(missing.Count>0 ? "  "+localization.Format("MapLocal.TriadMissing",missing.Count):"")+(locked ? "  "+localization.Get("TriadNpcs.QuestNeeded"):"");
             ImGui.PushStyleColor(ImGuiCol.Text,locked || (beaten==true && missing.Count==0) ? UI.FfxivTheme.TextMuted:UI.FfxivTheme.Text);
-            try{if(ImGui.Selectable($"{mark}  {npc.Name}  (X {npc.X:0.0}  Y {npc.Y:0.0}){lacking}##LocalTriad{npc.MatchId}")){PlaceFlagFromMapView(map,npc.X,npc.Y);ImGui.CloseCurrentPopup();}}
+            try{if(ImGui.Selectable($"{mark}  {npc.Name}  ({MapProjection.CoordinateText(new(npc.X,npc.Y))}){lacking}##LocalTriad{npc.MatchId}")){PlaceFlagFromMapView(map,npc.X,npc.Y);ImGui.CloseCurrentPopup();}}
             finally{ImGui.PopStyleColor();}
             NpcMenu($"TriadTool{npc.MatchId}",npc.Name,0,[new(map.TerritoryId,map.MapId,map.Zone,npc.X,npc.Y,0,0,0)],("MapLocal.OpenTriadTool",()=>OpenTriadTab("Npcs")));
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("TriadNpcs.Tooltip",npc.Fee,npc.RewardCards.Count==0 ? "—"
@@ -296,7 +295,7 @@ internal sealed partial class MainWindow
                     Tip("MapLocal.FavoriteRemoveTip");
                     ImGui.SameLine();
                     var name=(point.Group is { } group ? $"[{group}] ":"")+point.Name.Replace("##","# #");
-                    var place=here || !known ? $"{point.X:F1}, {point.Y:F1}":$"{target!.Zone} · {point.X:F1}, {point.Y:F1}";
+                    var place=here || !known ? $"{MapProjection.CoordinateNumber(point.X)}, {MapProjection.CoordinateNumber(point.Y)}":$"{target!.Zone} · {MapProjection.CoordinateNumber(point.X)}, {MapProjection.CoordinateNumber(point.Y)}";
                     if(!known)ImGui.TextDisabled(localization.Format("MapLocal.FavoriteUnknown",name));
                     else if(ImGui.Selectable($"{name} ({place})###Favorite"))
                     {
@@ -330,8 +329,8 @@ internal sealed partial class MainWindow
         {
             DrawSmallGameIcon(marker.Icon);
             if(ImGui.Selectable($"{marker.Label}##Aetheryte{marker.AetheryteId}"))
-            {mapTeleportTarget=(marker.AetheryteId,marker.Label);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;ImGui.CloseCurrentPopup();}
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MapView.TeleportHint"));
+            {mapTeleportNote=null;mapTeleportTarget=(marker.AetheryteId,marker.Label);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;ImGui.CloseCurrentPopup();}
+            Tip("MapView.TeleportHint");
         }
     }
 
@@ -354,17 +353,10 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndPopup();}
     }
-    private void ToolMenu(string id,string labelKey,Action open)
-    {
-        if(!ImGui.BeginPopupContextItem(id))return;
-        try{if(ImGui.Selectable(localization.Get(labelKey))){open();IsOpen=true;mapLocalCloseMenu=true;}}
-        finally{ImGui.EndPopup();}
-    }
     private void DrawSmallGameIcon(uint icon)
     {
         var size=new Vector2(ImGui.GetTextLineHeight());
-        if(icon!=0 && textures.TryGetFromGameIcon(new GameIconLookup(icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)ImGui.Image(image.Handle,size);
-        else ImGui.Dummy(size);
+        DrawGameIcon(icon,size);
         ImGui.SameLine();
     }
 }

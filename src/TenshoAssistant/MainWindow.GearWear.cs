@@ -17,14 +17,9 @@ internal sealed partial class MainWindow
         var settings=WearSettings;var defaults=new GearWearSettings();
         BoolSetting("GearWear.Alert","GearWear.AlertTip",()=>WearSettings.Alert,value=>WearSettings.Alert=value,c=>(c.GearWear ?? new()).Alert);
         BoolSetting("GearWear.Bar","GearWear.BarTip",()=>WearSettings.Bar,value=>WearSettings.Bar=value,c=>(c.GearWear ?? new()).Bar);
-        var repair=settings.Repair;ImGui.SetNextItemWidth(160);
-        if(ImGui.SliderInt(localization.Get("GearWear.RepairBelow")+"##RepairBelow",ref repair,1,99,"%d %%")){settings.RepairBelow=repair;SaveGearWear();}
-        Tip("GearWear.RepairBelowTip");
-        if(DefaultButton("RepairBelow",settings.Repair!=defaults.Repair)){settings.RepairBelow=defaults.RepairBelow;SaveGearWear();}
-        var bond=settings.Spiritbond;ImGui.SetNextItemWidth(160);
-        if(ImGui.SliderInt(localization.Get("GearWear.SpiritbondAt")+"##SpiritbondAt",ref bond,50,100,"%d %%")){settings.SpiritbondAt=bond;SaveGearWear();}
-        Tip("GearWear.SpiritbondAtTip");
-        if(DefaultButton("SpiritbondAt",settings.Spiritbond!=defaults.Spiritbond)){settings.SpiritbondAt=defaults.SpiritbondAt;SaveGearWear();}
+        // X-76 H4 (0.914): written once, when the slider is released (it was written on every frame of a drag).
+        SliderSetting("GearWear.RepairBelow","GearWear.RepairBelowTip",()=>WearSettings.Repair,value=>WearSettings.RepairBelow=value,1,99,defaults.Repair,"%d %%");
+        SliderSetting("GearWear.SpiritbondAt","GearWear.SpiritbondAtTip",()=>WearSettings.Spiritbond,value=>WearSettings.SpiritbondAt=value,50,100,defaults.Spiritbond,"%d %%");
         var pieces=EquippedGear?.Invoke() ?? [];
         if(pieces.Count==0){ImGui.TextDisabled(localization.Get("GearWear.Unknown"));return;}
         if(!ImGui.BeginTable("GearWearTable",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
@@ -49,12 +44,6 @@ internal sealed partial class MainWindow
         finally{ImGui.EndTable();}
     }
 
-    private void SaveGearWear()
-    {
-        try{save();saveError=null;}
-        catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Gear wear settings could not be saved.");}
-    }
-
     // The on-screen wear bar (a PanelWindow since 0.514), only when it is on and the worn gear is known.
     private GearWearState wearBarState=new(0,0,null,null);
     private PanelDefinition WearPanel=>new("WearBar","###TenshoWearBar",new Vector2(40,200),
@@ -74,13 +63,13 @@ internal sealed partial class MainWindow
         if(state.LowestCondition is { } condition)
         {
             ImGui.TextColored(state.ToRepair>0 ? UI.FfxivTheme.Error:Success,localization.Format("GearWear.BarCondition",condition));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GearWear.BarConditionTip"));
+            Tip("GearWear.BarConditionTip");
         }
         if(state.HighestSpiritbond is { } bond)
         {
             if(state.LowestCondition is not null)ImGui.SameLine();
             ImGui.TextColored(state.ToExtract>0 ? Accent:Muted,localization.Format("GearWear.BarSpiritbond",bond.ToString("0")));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GearWear.BarSpiritbondTip"));
+            Tip("GearWear.BarSpiritbondTip");
         }
     }
 }

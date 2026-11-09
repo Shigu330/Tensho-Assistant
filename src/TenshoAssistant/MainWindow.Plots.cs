@@ -19,7 +19,7 @@ internal sealed partial class MainWindow
     /// <summary>Called every frame: the watch's next read when it is due.</summary>
     internal void WatchPlots()
     {
-        if(!configuration.PlotWatch || Paissa is not { } paissa || market.State.WorldId==0)return;
+        if(!configuration.PlotWatch || !configuration.CommunityPaissa || Paissa is not { } paissa || market.State.WorldId==0)return;
         var now=DateTimeOffset.UtcNow;
         if(now<plotWatchAt)return;
         plotWatchAt=now.AddMinutes(Math.Clamp(configuration.PlotWatchMinutes,10,240));
@@ -39,19 +39,30 @@ internal sealed partial class MainWindow
         if(Paissa is not { } paissa)return;
         ImGui.TextWrapped(localization.Get("Plots.Help"));
         var world=market.State;
-        BoolSetting("Plots.Watch","Plots.WatchTip",()=>configuration.PlotWatch,value=>configuration.PlotWatch=value,c=>c.PlotWatch);
-        IntSetting("Plots.Minutes","Plots.MinutesTip",()=>configuration.PlotWatchMinutes,value=>configuration.PlotWatchMinutes=value,10,240,DefaultConfiguration.PlotWatchMinutes);
-        var size=configuration.PlotWatchSize;
-        ImGui.SetNextItemWidth(160);
-        if(ImGui.Combo(localization.Get("Plots.Size")+"###PlotSize",ref size,[localization.Get("Plots.AnySize"),PlotSize(0),PlotSize(1),PlotSize(2)],4))
-        {configuration.PlotWatchSize=size;try{save();}catch(Exception failure){log.Warning(failure,"Plot watch size could not be saved.");}}
-        Tip("Plots.SizeTip");
+        // X-76 step 3 (0.952): the watch reads nothing while the PaissaDB source is off (WatchPlots), greyed then with the source-off note;
+        // its interval is read only while it watches, indented and greyed while it is off.
+        if(!configuration.CommunityPaissa)ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
+        ImGui.BeginDisabled(!configuration.CommunityPaissa);
+        try
+        {
+            BoolSetting("Plots.Watch","Plots.WatchTip",()=>configuration.PlotWatch,value=>configuration.PlotWatch=value,c=>c.PlotWatch);
+            ImGui.Indent();
+            ImGui.BeginDisabled(!configuration.PlotWatch);
+            try{IntSetting("Plots.Minutes","Plots.MinutesTip",()=>configuration.PlotWatchMinutes,value=>configuration.PlotWatchMinutes=value,10,240,DefaultConfiguration.PlotWatchMinutes);}
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
+        }
+        finally{ImGui.EndDisabled();}
+        // X-76 H5 (0.915): shared combo row (rollback when saving fails, « ↺ »); 0 = any size, then small, medium, large.
+        ComboSetting("Plots.Size","Plots.SizeTip",()=>configuration.PlotWatchSize,value=>configuration.PlotWatchSize=value,
+            [(0,localization.Get("Plots.AnySize")),(1,PlotSize(0)),(2,PlotSize(1)),(3,PlotSize(2))],DefaultConfiguration.PlotWatchSize);
         var state=paissa.State;
-        ImGui.BeginDisabled(world.WorldId==0 || state.Loading);
+        // X-76 step 5 (0.949): nothing is asked while the PaissaDB source is off (Settings › Advanced, or « game data only »); the note is
+        // shown above the watch (X-76 step 3, 0.952).
+        ImGui.BeginDisabled(world.WorldId==0 || state.Loading || !configuration.CommunityPaissa);
         try{if(ImGui.SmallButton(localization.Format("Plots.Fetch",world.WorldName)))paissa.Request(world.WorldId);}
         finally{ImGui.EndDisabled();}
         if(state.Loading)ImGui.TextDisabled(localization.Get("Plots.Loading"));
-        if(state.Error is { } error){ImGui.TextWrapped(localization.Get("Plots.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
+        if(state.Error is { } error)DrawDataError(error,"Plots.Error");
         if(state.WorldId!=world.WorldId || state.Plots is not { } plots)return;
         if(state.ReadAt is { } at)ImGui.TextDisabled(localization.Format("Plots.ReadAt",at.ToLocalTime().ToString("t")));
         var shown=plots.Where(PlotMatches).ToArray();

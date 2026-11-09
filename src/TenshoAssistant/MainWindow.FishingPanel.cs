@@ -33,9 +33,21 @@ internal sealed partial class MainWindow
 
     // 0.568 (C9): time window and weather now, against what GatherBuddy gives for this fish. The zone's weather is computed once per period.
     private (uint Territory,long Period,uint? Current,uint? Previous) fishNowWeather;
+    /// <summary>
+    /// X-73.3 (0.859, user request: learn from the game what comes from community data): the game's own fishing log says whether a fish has a time or a weather
+    /// condition (FishingNoteInfo.TimeRestriction / WeatherRestriction, copied by FishingNotebookCopy). False there means none, whatever a community source says;
+    /// null: not known from the game. Several notebook rows for one fish: only when all agree.
+    /// </summary>
+    private (bool? Time,bool? Weather) FishRestrictions(uint fishId)
+    {
+        if(gatheringCatalog.State.Catalog?.Fishing.ForItem(fishId) is not { Count:>0 } notes)return (null,null);
+        static bool? All(IEnumerable<bool?> values){var list=values.ToArray();return list.All(value=>value==false) ? false:list.All(value=>value==true) ? true:null;}
+        return (All(notes.Select(note=>note.TimeRestricted)),All(notes.Select(note=>note.WeatherRestricted)));
+    }
     private void DrawFishNow(uint fishId,uint territory)
     {
         if(gatherBuddyFish?.State.Data?.Find(fishId) is not { } fish)return;
+        var (timeLimited,weatherLimited)=FishRestrictions(fishId);
         var moment=DateTimeOffset.UtcNow;var period=moment.ToUnixTimeSeconds()/1400;
         if(fishNowWeather.Territory!=territory || fishNowWeather.Period!=period)
         {
@@ -44,16 +56,19 @@ internal sealed partial class MainWindow
         }
         string Mark(bool? value)=>localization.Get(value switch{true=>"FishingPanel.NowYes",false=>"FishingPanel.NowNo",_=>"FishingPanel.NowUnknown"});
         var parts=new List<string>();
-        if(fish.StartMinute is not null && fish.EndMinute is not null)parts.Add(localization.Format("FishingPanel.NowWindow",Mark(FishNow.InWindow(fish.StartMinute,fish.EndMinute,EorzeaMinutes()))));
-        if(fish.Weathers.Count>0)parts.Add(localization.Format("FishingPanel.NowWeather",Mark(FishNow.WeatherFits(fish.Weathers,fishNowWeather.Current))));
-        if(fish.Transitions.Count>0)parts.Add(localization.Format("FishingPanel.NowBefore",Mark(FishNow.WeatherFits(fish.Transitions,fishNowWeather.Previous))));
+        if(timeLimited!=false && fish.StartMinute is not null && fish.EndMinute is not null)parts.Add(localization.Format("FishingPanel.NowWindow",Mark(FishNow.InWindow(fish.StartMinute,fish.EndMinute,EorzeaMinutes()))));
+        if(weatherLimited!=false && fish.Weathers.Count>0)parts.Add(localization.Format("FishingPanel.NowWeather",Mark(FishNow.WeatherFits(fish.Weathers,fishNowWeather.Current))));
+        if(weatherLimited!=false && fish.Transitions.Count>0)parts.Add(localization.Format("FishingPanel.NowBefore",Mark(FishNow.WeatherFits(fish.Transitions,fishNowWeather.Previous))));
         if(parts.Count==0)return;
         ImGui.TextDisabled(string.Join(" · ",parts));
     }
     internal void DrawFishingPanel()
     {
         if(windowDisposed || fishingNow?.Invoke() is not { } now)return;
-        var automatic=configuration.FishingPanel && now.Fishing && now.Job==18;
+        // X-85 V1 (0.917): at sea the usual help picks a wrong spot or none: off while the voyage director is read, or in an ocean fishing
+        // territory (read in the game data) when it is not; the ocean voyage panel takes over. Opening it by hand still works.
+        var atSea=OceanVoyage?.Frame is not null || OceanVoyageData?.Invoke()?.Territories.Contains(now.Territory)==true;
+        var automatic=configuration.FishingPanel && now.Fishing && now.Job==18 && !atSea;
         if(!automatic && !fishingPanelManual)return;
         var spot=fishingSpotAt?.Invoke(now.Territory,now.X,now.Z);
         var title=localization.Format("FishingPanel.Title",spot?.Name ?? localization.Get("FishingPanel.NoSpotTitle"));
@@ -70,7 +85,7 @@ internal sealed partial class MainWindow
                 ImGui.TextColored(Accent,localization.Format("FishingPanel.Elapsed",seconds));
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("FishingPanel.Restart")))fishingSince=DateTimeOffset.UtcNow;
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FishingPanel.RestartHelp"));
+                Tip("FishingPanel.RestartHelp");
             }
             // C28 (0.663): the time left of the intuition, from the character's status.
             if(FishingIntuitionLeft?.Invoke() is { } intuitionLeft)
@@ -108,6 +123,13 @@ internal sealed partial class MainWindow
                             ItemCell(fish,row.FishId,22,$"{fish?.Name ?? row.FishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
                             if(ChainNeed(row.FishId,stock) is { } need)ImGui.TextColored(Accent,need);
                             DrawFishNow(row.FishId,now.Territory);
+                            // X-97 (0.982, user report: « collectable fish not taken into account », seen in the fishing helper; DEC-045): the collectability of each
+                            // tier and its scrips, from the game's sheets (CollectablesShopRefine, CollectablesShopRewardScrip), the same rules as the gathering panel.
+                            if(Collectables?.Catalog?.For(row.FishId) is { Count:>0 } collectable && collectable.FirstOrDefault(rule=>rule.Scrips) is { } scrip)
+                            {
+                                ImGui.TextColored(Accent,localization.Format("FishingPanel.Collectable",scrip.Low,scrip.Mid,scrip.High));
+                                if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FishingPanel.CollectableTip",scrip.Low,scrip.RewardLow,scrip.Mid,scrip.RewardMid,scrip.High,scrip.RewardHigh,scrip.Group));
+                            }
                             ImGui.TableNextColumn();
                             for(var step=0;step<row.Route.Count;step++)
                             {
@@ -126,7 +148,7 @@ internal sealed partial class MainWindow
                             var bite=(row.Bite is "Weak" or "Strong" or "Legendary") ? row.Bite:null;var hook=(row.HookSet is "Precise" or "Powerful") ? row.HookSet:null;
                             if(bite is not null || hook is not null)
                             {
-                                var colour=bite switch{"Weak"=>new Vector4(0.45f,0.85f,0.45f,1),"Strong"=>new Vector4(0.95f,0.80f,0.30f,1),"Legendary"=>new Vector4(0.95f,0.35f,0.35f,1),_=>Muted};
+                                var colour=bite switch{"Weak"=>Success,"Strong"=>Warning,"Legendary"=>Error,_=>Muted};
                                 ImGui.TextColored(colour,(bite switch{"Weak"=>"!","Strong"=>"!!","Legendary"=>"!!!",_=>"?"})+(hook is not null ? " "+localization.Get("FishingPanel.HookShort"+hook):""));
                                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(bite is not null ? "FishingPanel.Bite"+bite:"FishingPanel.BiteUnknown")+(hook is not null ? " · "+localization.Get("FishingPanel.Hook"+hook):""));
                             }
@@ -136,7 +158,8 @@ internal sealed partial class MainWindow
                             {
                                 var inside=elapsed is { } spent && spent>=time.Minimum && spent<=time.Maximum;
                                 var text=localization.Format("FishingPanel.BiteShort",time.Minimum,time.Maximum,time.Usual);
-                                if(inside)ImGui.TextColored(Success,text);else ImGui.TextUnformatted(text);
+                                // X-98 (0.958, user request): green while the bite time runs, red once the stopwatch has passed it.
+                        if(inside)ImGui.TextColored(Success,text);else if(elapsed is { } passed && passed>time.Maximum)ImGui.TextColored(Error,text);else ImGui.TextUnformatted(text);
                                 if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FishingPanel.BiteTime",time.Minimum,time.Maximum,time.Usual)+"\n"+localization.Format("FishingPanel.BiteTimeHelp",time.Reports));
                             }
                             else ImGui.TextDisabled(bites is { Loading:true } ? "…":"—");
@@ -157,7 +180,7 @@ internal sealed partial class MainWindow
             }
             // Sources in a tooltip, so the window keeps the width of its table.
             ImGui.TextDisabled(localization.Get("FishingPanel.SourcesShort"));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get(gatherBuddyFish?.State.Data is not null ? "FishingPanel.FooterGatherBuddy":"FishingPanel.Footer"));
+            Tip(gatherBuddyFish?.State.Data is not null ? "FishingPanel.FooterGatherBuddy":"FishingPanel.Footer");
             if(gatherBuddyFish?.State is { Loading:true })ImGui.TextDisabled(localization.Get("FishingPanel.GatherBuddyLoading"));
         },fishingPanelManual ? ()=>fishingPanelManual=false:null);
     }
@@ -166,7 +189,7 @@ internal sealed partial class MainWindow
     private void DrawFishingPanelButton()
     {
         if(ImGui.SmallButton(localization.Get(fishingPanelManual ? "FishingPanel.Close":"FishingPanel.Open")+"##FishingPanelButton"))ToggleFishingPanel();
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FishingPanel.OpenHelp"));
+        Tip("FishingPanel.OpenHelp");
     }
 
     // One fish of the panel: bait route, bite, hookset and conditions (short text + full tooltip), GatherBuddy first, else Garland.
@@ -174,13 +197,17 @@ internal sealed partial class MainWindow
     {
         var items=itemCatalog.State.Catalog;var catalog=weather.State.Catalog;
         string Weathers(IEnumerable<uint> ids)=>string.Join(", ",ids.Select(id=>catalog?.Weather(id)?.Name ?? id.ToString()));
+        // X-73.3 (0.859): what the game's fishing log says first; a community window or weather is left out when the game says there is none.
+        var (timeLimited,weatherLimited)=FishRestrictions(fishId);
+        string? free=timeLimited==false && weatherLimited==false ? localization.Get("FishingPanel.NoCondition"):null;
         if(gatherBuddyFish?.State.Data is { } data && data.Find(fishId) is { } known)
         {
             var parts=new List<string>();var detail=new List<string>();
-            if(known.StartMinute is { } start && known.EndMinute is { } stop)
-            {var window=$"{start/60:00}:{start%60:00}–{stop/60%24:00}:{stop%60:00} ET";parts.Add(window);detail.Add(window);}
-            if(known.Transitions.Count>0){parts.Add(Weathers(known.Transitions)+" ›");detail.Add(localization.Format("FishingPanel.Previous",Weathers(known.Transitions)));}
-            if(known.Weathers.Count>0){parts.Add(Weathers(known.Weathers));detail.Add(localization.Format("FishingPanel.Weather",Weathers(known.Weathers)));}
+            if(free is not null){parts.Add(free);detail.Add(localization.Get("FishingPanel.NoConditionDetail"));}
+            if(timeLimited!=false && known.StartMinute is { } start && known.EndMinute is { } stop)
+            {var window=EtRange(start,stop%1440);parts.Add(window);detail.Add(window);}
+            if(weatherLimited!=false && known.Transitions.Count>0){parts.Add(Weathers(known.Transitions)+" ›");detail.Add(localization.Format("FishingPanel.Previous",Weathers(known.Transitions)));}
+            if(weatherLimited!=false && known.Weathers.Count>0){parts.Add(Weathers(known.Weathers));detail.Add(localization.Format("FishingPanel.Weather",Weathers(known.Weathers)));}
             if(known.Lure is { } lure){parts.Add(lure);detail.Add(localization.Format("FishingPanel.Lure",lure));}
             if(known.Snag){parts.Add(localization.Get("FishingPanel.SnagShort"));detail.Add(localization.Get("FishingPanel.Snag"));}
             if(known.Predators.Count>0)
@@ -189,15 +216,18 @@ internal sealed partial class MainWindow
                 detail.Add(localization.Format("FishingPanel.Predators",string.Join(", ",known.Predators.Select(pair=>$"{items?.Find(pair.Fish)?.Name ?? pair.Fish.ToString()} ×{pair.Count}"))));
                 if(known.Intuition is { } intuition)detail.Add(localization.Format("FishingPanel.Intuition",intuition));
             }
+            // X-75.3 (0.877): what was seen in game (yours or shared), after the community conditions, in the detail.
+            if(SeenFishLine(fishId) is { } seenLine){parts.Add(localization.Get("FishingPanel.SeenShort"));detail.Add(seenLine);}
             return (fishId,data.Route(fishId),known.Bite,known.HookSet,string.Join(" · ",parts),string.Join("\n",detail));
         }
         var here=itemSources?.Get(fishId).List?.Fishing?.Spots.FirstOrDefault(entry=>entry.SpotId==spotId);
         var route=here?.BaitChains is { Count:>0 } chains ? chains[0]:(IReadOnlyList<uint>)[];
         var conditions=new List<string>();
+        if(free is not null)conditions.Add(free);
         if(here?.Conditions is { Error:null } found)
         {
-            if(found.Timing.Kind==Gathering.GatheringScheduleKind.Limited)conditions.Add(found.Timing.Label);
-            if(found.Weather is { Count:>0 } names)conditions.Add(string.Join(", ",names));
+            if(timeLimited!=false && found.Timing.Kind==Gathering.GatheringScheduleKind.Limited)conditions.Add(found.Timing.Label);
+            if(weatherLimited!=false && found.Weather is { Count:>0 } names)conditions.Add(string.Join(", ",names));
         }
         return (fishId,route,null,null,string.Join(" · ",conditions),string.Join("\n",conditions));
     }

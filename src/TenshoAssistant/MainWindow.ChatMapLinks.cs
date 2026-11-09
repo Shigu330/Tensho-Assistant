@@ -80,7 +80,7 @@ internal sealed partial class MainWindow
                         finally{ImGui.EndDisabled();}
                         ImGui.SameLine();
                         var place=map is null ? link.Place:string.IsNullOrWhiteSpace(map.Subzone) ? map.Zone:$"{map.Zone} · {map.Subzone}";
-                        ImGui.TextUnformatted($"{link.At.ToLocalTime():t} · {place} ({link.X:0.0}, {link.Y:0.0})");
+                        ImGui.TextUnformatted($"{link.At.ToLocalTime():t} · {place} ({MapProjection.CoordinateNumber(link.X)}, {MapProjection.CoordinateNumber(link.Y)})");
                         if(map is not null && MapCatalog.CoordinatesValid(link.X,link.Y))PlaceMenu($"ChatLinkPlace{link.At.Ticks}",map,new(link.X,link.Y),place);
                         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ChatLinks.Line",ChannelName(link.Channel),
                             link.Sender.Length>0 ? link.Sender:localization.Get("ChatLinks.NoSender")));
@@ -108,6 +108,23 @@ internal sealed partial class MainWindow
     }
 
     // Called by the Tensho map canvas: once the asked map is shown and the teleport list read (or 3 s passed), opens the teleport question.
+    /// <summary>0.833 (X-63): the neighbouring maps from the target map's link markers, each with its ways back into the target and its aetherytes.</summary>
+    private ZoneEntry? ZoneEntryFor(MapDefinition map,Vector2 point,IReadOnlyDictionary<uint,uint>? costs)
+    {
+        if(mapMarkers is not { } source || maps.State.Catalog is not { } catalog)return null;
+        var links=new List<ZoneEntryLink>();
+        foreach(var neighbourId in source.For(map.MarkerRange).Where(marker=>marker.LinkMapId!=0 && marker.LinkMapId!=map.MapId).Select(marker=>marker.LinkMapId).Distinct())
+        {
+            if(catalog.Find(neighbourId) is not { TerritoryId:not 0 } neighbour)continue;
+            var on=source.For(neighbour.MarkerRange);
+            links.Add(new(neighbour,on.Where(marker=>marker.LinkMapId==map.MapId).Select(marker=>new Vector2(marker.X,marker.Y)).ToArray(),
+                on.Where(marker=>marker.AetheryteId!=0).Select(marker=>(marker.AetheryteId,new Vector2(marker.X,marker.Y))).ToArray()));
+        }
+        var entry=ZoneEntries.Plan(map,point,source.Aetherytes,links,costs,MapProjection.PixelFromWorld);
+        if(developerMode)log.Information("Zone entry for map {0}: {1} neighbours, {2}.",map.MapId,links.Count,entry is null ? "none":$"aetheryte {entry.Aetheryte} shard {entry.Shard} via map {entry.ViaMapId}{(entry.NoAethernet ? " no aethernet":"")}");
+        return entry;
+    }
+
     private void ResolveNearestAetheryte(MapDefinition map)
     {
         if(mapNearestRequest is not { } request || request.MapId!=map.MapId)return;
@@ -115,6 +132,18 @@ internal sealed partial class MainWindow
         if(costs is null && !failed && now<request.Until)return;
         mapNearestRequest=null;
         var markers=(mapMarkers?.For(map.MarkerRange) ?? []).Where(marker=>marker.AetheryteId!=0).ToList();
+        // 0.833 (X-63): a zone with no aetheryte: the aetheryte that leads there, and the aethernet step, said before the teleport.
+        if(markers.Count==0 && ZoneEntryFor(map,request.Pixel,failed ? null:costs) is { } entry)
+        {
+            var rows=mapMarkers?.Aetherytes ?? [];
+            string Name(uint id)=>rows.FirstOrDefault(row=>row.Id==id)?.Name is { Length:>0 } name ? name:id.ToString();
+            var via=maps.State.Catalog?.Find(entry.ViaMapId)?.Zone ?? "";
+            var note=entry.NoAethernet ? localization.Format("MapView.TeleportNoAethernet",Name(entry.Aetheryte),map.Zone)
+                :entry.Shard is { } shard ? localization.Format("MapView.TeleportThenAethernet",Name(shard)):localization.Format("MapView.TeleportWalk",map.Zone);
+            mapTeleportNote=(entry.Aetheryte,localization.Format("MapView.TeleportVia",map.Zone,via.Length>0 ? via:Name(entry.Aetheryte))+" "+note,entry.NoAethernet);
+            mapTeleportTarget=(entry.Aetheryte,Name(entry.Aetheryte));mapTeleportRequested=true;
+            return;
+        }
         if(ChatMapLinks.NearestAetheryte(markers.Select(marker=>(marker.AetheryteId,marker.X,marker.Y)),request.Pixel,failed ? null:costs) is not { } found)
         {
             mapOpenError=localization.Get(markers.Count==0 ? "ChatLinks.NoAetheryte":"ChatLinks.NoAttuned");mapErrorUntil=now.AddSeconds(5);

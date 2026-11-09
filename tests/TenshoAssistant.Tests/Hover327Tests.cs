@@ -29,7 +29,8 @@ internal static class Hover327Tests
             Check(page.Contains("Enum.IsDefined(configuration.MarketBoardScope) ? configuration.MarketBoardScope:MarketScope.DataCenter",StringComparison.Ordinal),"unknown saved value: data centre");
             Check(page.Contains("MarketScopeShown==scope))ChooseMarketScope(scope);",StringComparison.Ordinal),"a click on the page saves it");
             var settings = Read("MainWindow.Settings.cs");
-            Check(settings.Contains("Tip(\"Settings.MarketScopeTip\");",StringComparison.Ordinal) && settings.Contains("DefaultButton(\"MarketBoardScope\",",StringComparison.Ordinal),"Settings row with tooltip and ↺");
+            // X-76 H5 (0.915): the shared combo row brings the tooltip and the « ↺ ».
+            Check(settings.Contains("ComboSetting(\"Settings.MarketScope\",\"Settings.MarketScopeTip\",()=>MarketScopeShown,",StringComparison.Ordinal),"Settings row with tooltip and ↺");
             Check(Text("en","MarketScopeTip").EndsWith("\\nDefault: data center.\"",StringComparison.Ordinal) && Text("fr","MarketScopeTip").EndsWith("\\nPar défaut : centre de données.\"",StringComparison.Ordinal),"tips end with the default");
         }),
         ("Hover hidden in duties: off by default, reset; in a duty nothing is observed, so no panel and no price request",() =>

@@ -18,8 +18,11 @@ public sealed record MapEventMarker(uint MapId,uint Icon,Vector3 Position,float 
 
 // Nearby game objects shown on the map (coffers, gathering points); Level is the gathering level when known, else 0.
 // N-09 (0.441): HuntMark = a living hunt mark (NotoriousMonster by BNpcBase); Level holds its rank (1 B, 2 A, 3 S).
-public enum MapObjectKind { Treasure, Gathering, HuntMark }
-public sealed record MapObjectMarker(MapObjectKind Kind,string Name,Vector3 Position,int Level);
+// 0.901 (X-83): IslandAnimal: a wild animal of the Island Sanctuary that can be caught (MJIAnimals, by BNpcBase), Icon = its icon in the sheet.
+public enum MapObjectKind { Treasure, Gathering, HuntMark, IslandAnimal }
+public sealed record MapObjectMarker(MapObjectKind Kind,string Name,Vector3 Position,int Level,uint NameId=0,uint BaseId=0,uint Icon=0);
+/// <summary>0.813 (X-49): one point of an accepted quest as the game's own Map holds it (MarkerInfo.ObjectiveId, MapMarkerData map and place).</summary>
+public sealed record MapQuestPoint(uint Quest,uint MapId,float X,float Z);
 /// <summary>0.795 (X-34): a living enemy the game streams around the player: its name row, base row, name, place and level. Information only.</summary>
 public sealed record MapMonster(uint NameId,uint BaseId,string Name,Vector3 Position,int Level,uint FateId=0,uint EventId=0,float Height=0);
 
@@ -32,7 +35,11 @@ public sealed record MapLiveState(uint TerritoryId,uint MapId,Vector3 Position,f
     IReadOnlyDictionary<uint,MapFlightState>? Flights=null,IReadOnlyList<MapEventMarker>? Events=null,bool InCombat=false,bool InDuty=false,
     IReadOnlyList<MapObjectMarker>? Objects=null,IReadOnlyList<MapFateMarker>? Fates=null,IReadOnlyList<MapPartyMarker>? Party=null,
     IReadOnlySet<uint>? UnlockedCurrents=null,IReadOnlySet<uint>? Sightseen=null,int SightseeingUnlock=-1,int SightseeingUnlockEx=-1,string Area="",string SubArea="",
-    IReadOnlyList<MapMonster>? Monsters=null);
+    IReadOnlyList<MapMonster>? Monsters=null,uint DiscoveryMapId=0,IReadOnlyList<int>? Undiscovered=null,IReadOnlyList<MapQuestPoint>? QuestPoints=null)
+{
+    /// <summary>X-87 (0.968): the leve under way (Map.ActiveLevequestMarker): its objective id and the game's icon of its marker; null when none.</summary>
+    public (uint Objective,uint Icon)? ActiveLeve { get; init; }
+}
 
 // Party member in the same territory as the player (not the player): job icon = 62100 + ClassJob row.
 public sealed record MapPartyMarker(string Name,uint Job,int Level,Vector3 Position);
@@ -43,9 +50,44 @@ internal sealed class MapLiveReader : IDisposable
     private readonly Dictionary<uint,(uint Set,uint[] Currents)> currents=[];
     private readonly Dictionary<uint,bool> mounts=[];
     private MapLiveState? state;private bool disposed;private DateTimeOffset retryAt;private DateTimeOffset flightAt;
+    private bool positionFailureLogged;
     private IReadOnlyDictionary<uint,MapFlightState>? flights;private int removeFlag;
     private IReadOnlyList<MapEventMarker> events=[];private DateTimeOffset eventsAt;
-    private IReadOnlyList<MapObjectMarker> nearby=[];private IReadOnlyList<MapMonster> monsters=[];
+    private IReadOnlyList<MapObjectMarker> nearby=[];private IReadOnlyList<MapMonster> monsters=[];private IReadOnlyList<MapQuestPoint>? questPoints;
+    // P11 (0.803): the map whose discovery the window wants, and what was read for it.
+    private int discoveryWanted;private uint discoveryMap;private IReadOnlyList<int>? undiscovered;
+    private Dictionary<uint,(uint Flag,int Index,bool Small)>? discoveryRows;
+    public void WantDiscovery(uint mapId)=>Volatile.Write(ref discoveryWanted,(int)mapId);
+    /// <summary>A game texture's pixels (BGRA), read off the frame; null when missing or unreadable.</summary>
+    public (byte[] Bgra,int Width,int Height)? ReadTexture(string path)
+    {
+        try{return placeData.GetFile<Lumina.Data.Files.TexFile>(path) is { } tex ? (tex.ImageData,tex.Header.Width,tex.Header.Height):null;}
+        catch(Exception error){log.Warning(error,"Map texture {0} unreadable.",path);return null;}
+    }
+    // P11 (0.803): the game keeps each region's state in two tables (16 or 32 regions a map); the Map sheet gives the table (DiscoveryArrayByte: the
+    // 16 one, inferred from Central Shroud 13 regions / Heritage Found 30) and the row (DiscoveryIndex). Fields read, no function called.
+    private unsafe IReadOnlyList<int>? ReadUndiscovered(uint mapId)
+    {
+        discoveryRows??=placeData.GetExcelSheet<Lumina.Excel.Sheets.Map>().Where(row=>row.DiscoveryFlag!=0)
+            .ToDictionary(row=>row.RowId,row=>(row.DiscoveryFlag,(int)row.DiscoveryIndex,row.DiscoveryArrayByte));
+        if(!discoveryRows.TryGetValue(mapId,out var row))return null;
+        var manager=FFXIVClientStructs.FFXIV.Client.Game.MapDiscoveryManager.Instance();
+        if(manager==null)return null;
+        var found=new bool[32];var size=0;
+        if(row.Small)
+        {
+            var tables=manager->MapsWithUpTo16Regions;
+            if(row.Index<0 || row.Index>=tables.Length)return null;
+            var table=tables[row.Index].Discoveries;size=table.Length;for(var region=0;region<size && region<32;region++)found[region]=table[region];
+        }
+        else
+        {
+            var tables=manager->MapsWithUpTo32Regions;
+            if(row.Index<0 || row.Index>=tables.Length)return null;
+            var table=tables[row.Index].Discoveries;size=table.Length;for(var region=0;region<size && region<32;region++)found[region]=table[region];
+        }
+        return MapDiscovery.Undiscovered(row.Flag,region=>region<size ? found[region]:null);
+    }
     private readonly ICondition condition;private readonly IFateTable fateTable;private readonly IPartyList party;
     private IReadOnlyList<MapPartyMarker> partyMarkers=[];private IReadOnlySet<uint>? unlockedCurrents;private IReadOnlySet<uint>? sightseen;
     private readonly uint[] allCurrents;private readonly uint[] adventureRows;private int loggedVistas=-1,loggedNative=-1;private int logUnlock=-1,logUnlockEx=-1;
@@ -64,6 +106,11 @@ internal sealed class MapLiveReader : IDisposable
     }
     // N-09 (0.441): hunt marks by BNpcBase → rank (docs/evidence/0.441-hunt-marks.md).
     private readonly Dictionary<uint,int> huntMarks=[];
+    // 0.901 (X-83, docs/evidence/0.901-island-animals.md): the island's animals that can be caught: BNpcBase → icon (MJIAnimals).
+    private readonly Dictionary<uint,uint> islandAnimals=[];
+    /// <summary>X-76 P5 (0.932): each island animal's size (MJIAnimals.Size, 1 to 3) and its two leavings (MJIAnimals.Reward), by BNpcBase row.</summary>
+    public IReadOnlyDictionary<uint,(byte Size,uint[] Rewards)> IslandAnimalInfo=>islandAnimalInfo;
+    private readonly Dictionary<uint,(byte Size,uint[] Rewards)> islandAnimalInfo=[];
     private readonly TeleportListGate teleportGate=new();
     private long teleport;private int costsRequest;private IReadOnlyDictionary<uint,uint>? teleportCosts;
     /// <summary>Queues a teleport to an aetheryte (game action, normal gil cost); sent on the next framework tick.</summary>
@@ -129,6 +176,16 @@ internal sealed class MapLiveReader : IDisposable
                 if(mark.BNpcBase.RowId!=0 && mark.Rank is >= 1 and <= 3)huntMarks.TryAdd(mark.BNpcBase.RowId,mark.Rank);
         }
         catch(Exception error){log.Warning(error,"Hunt mark data unavailable: marks are not shown on the map.");}
+        try
+        {
+            foreach(var animal in data.GetExcelSheet<Lumina.Excel.Sheets.MJIAnimals>())
+                if(animal.BNpcBase.RowId!=0 && animal.Icon>0)
+                {
+                    islandAnimals.TryAdd(animal.BNpcBase.RowId,(uint)animal.Icon);
+                    islandAnimalInfo.TryAdd(animal.BNpcBase.RowId,(animal.Size,animal.Reward.Select(reward=>reward.RowId).Where(id=>id!=0).ToArray()));
+                }
+        }
+        catch(Exception error){log.Warning(error,"Island animal data unavailable: they are not shown on the map.");}
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
     }
     private bool teleportFailed;
@@ -157,6 +214,8 @@ internal sealed class MapLiveReader : IDisposable
             {
                 try{flights=ReadFlights();Read("flights");}catch(Exception error){Failed("flights",error);}
                 try{(unlockedCurrents,sightseen)=ReadCollected();Read("collected");}catch(Exception error){Failed("collected",error);}
+                try{var wanted=(uint)Volatile.Read(ref discoveryWanted);undiscovered=wanted==0 ? null:ReadUndiscovered(wanted);discoveryMap=wanted;Read("discovery");}
+                catch(Exception error){undiscovered=null;Failed("discovery",error);}
                 flightAt=now.AddSeconds(2);
             }
             if(now>=eventsAt)
@@ -164,6 +223,7 @@ internal sealed class MapLiveReader : IDisposable
                 try{events=ReadEvents();Read("events");}catch(Exception error){Failed("events",error);}
                 // Objects, FATEs and party carry no map id: on a failure they are emptied, never kept from another zone.
                 try{nearby=ReadObjects();Read("objects");}catch(Exception error){nearby=[];Failed("objects",error);}
+                try{questPoints=ReadQuestPoints();Read("quest points");}catch(Exception error){questPoints=null;Failed("quest points",error);}
                 try{fates=ReadFates();Read("FATEs");}catch(Exception error){fates=[];Failed("FATEs",error);}
                 eventsAt=now.AddMilliseconds(500);
             }
@@ -178,9 +238,11 @@ internal sealed class MapLiveReader : IDisposable
             try{ReadPlace();Read("place");}catch(Exception error){areaName=subAreaName="";Failed("place",error);}
             var inCombat=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             var inDuty=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty56];
-            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName,monsters));
+            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName,monsters,discoveryMap,undiscovered,questPoints){ActiveLeve=ReadActiveLeve()});
+            positionFailureLogged=false;
         }
-        catch(Exception error){Volatile.Write(ref state,null);retryAt=now.AddSeconds(5);log.Warning(error,"Map position unavailable; retry in five seconds.");}
+        // X-76 H9 (0.922): logged once until a read succeeds again (it was logged every 5 s).
+        catch(Exception error){Volatile.Write(ref state,null);retryAt=now.AddSeconds(5);if(!positionFailureLogged){positionFailureLogged=true;log.Warning(error,"Map position unavailable; retried every five seconds, logged again only after a good read.");}}
     }
     // Parts whose read failed, logged once each (the reads repeat every half second or two seconds).
     private readonly HashSet<string> failedReads=[];
@@ -235,11 +297,16 @@ internal sealed class MapLiveReader : IDisposable
                 Dalamud.Game.ClientState.Objects.Enums.ObjectKind.GatheringPoint=>MapObjectKind.Gathering,
                 Dalamud.Game.ClientState.Objects.Enums.ObjectKind.BattleNpc when huntMarks.ContainsKey(item.BaseId)
                     && item is Dalamud.Game.ClientState.Objects.Types.IBattleNpc { CurrentHp:>0 }=>MapObjectKind.HuntMark,
+                Dalamud.Game.ClientState.Objects.Enums.ObjectKind.BattleNpc when islandAnimals.ContainsKey(item.BaseId)
+                    && item is Dalamud.Game.ClientState.Objects.Types.IBattleNpc { CurrentHp:>0 }=>MapObjectKind.IslandAnimal,
                 _=>(MapObjectKind?)null,
             };
             if(kind is null || !item.IsTargetable)continue;
+            // 0.856 (X-72 C): a hunt mark keeps its name and base rows, for the discoveries base.
             result.Add(new(kind.Value,item.Name.TextValue,item.Position,kind==MapObjectKind.Gathering ? gatheringLevels.GetValueOrDefault(item.BaseId)
-                :kind==MapObjectKind.HuntMark ? huntMarks.GetValueOrDefault(item.BaseId):0));
+                :kind==MapObjectKind.HuntMark ? huntMarks.GetValueOrDefault(item.BaseId):0,
+                kind==MapObjectKind.HuntMark && item is Dalamud.Game.ClientState.Objects.Types.IBattleNpc mark ? mark.NameId:0,kind==MapObjectKind.HuntMark ? item.BaseId:0,
+                kind==MapObjectKind.IslandAnimal ? islandAnimals.GetValueOrDefault(item.BaseId):0));
         }
         return result.AsReadOnly();
     }
@@ -291,7 +358,8 @@ internal sealed class MapLiveReader : IDisposable
         foreach(var fate in fateTable)
         {
             if(result.Count>=64)break;
-            if(fate is null || !float.IsFinite(fate.Position.X) || !float.IsFinite(fate.Position.Z))continue;
+            // 0.911 (X-76): the game gives a FATE a zero position for about a second (entering the zone, reloading): skipped until it has its place.
+            if(fate is null || !float.IsFinite(fate.Position.X) || !float.IsFinite(fate.Position.Z) || fate.Position==Vector3.Zero)continue;
             result.Add(new(fate.FateId,fate.Name.TextValue,fate.Level,fate.MapIconId!=0 ? fate.MapIconId:fate.IconId,fate.Position,
                 float.IsFinite(fate.Radius) ? Math.Max(0,fate.Radius):0,fate.Progress,Math.Max(0,fate.TimeRemaining),fate.State.ToString(),fate.HasBonus));
         }
@@ -373,9 +441,93 @@ internal sealed class MapLiveReader : IDisposable
         // 0.653: the game empties this list during a journal request; what was read just before stays.
         var journalRequest=agent->CurrentOpenMapInfo.Type is FFXIVClientStructs.FFXIV.Client.UI.Agent.MapType.QuestLog or FFXIVClientStructs.FFXIV.Client.UI.Agent.MapType.GatheringLog;
         if(!MapEventHold.Holds(result.Count,journalRequest,agent->CurrentMapId,lastEventsMap)){lastEvents=result.AsReadOnly();lastEventsMap=agent->CurrentMapId;}
-        return WithLeveAreas(MapGameLeves.Merge(lastEvents,ReadGameLeves(),marker=>(marker.MapId,marker.Icon,marker.Position.X,marker.Position.Z)));
+        // 0.848 (X-70): the game's quest list, current at each step, replaces the window's markers of the same quests.
+        var current=MapQuestEvents.Merge(lastEvents,ReadGameQuests(),marker=>(marker.MarkerType==3,marker.ObjectiveId & 0xFFFF));
+        // X-99 (0.977, user report with captures: after a teleport, the quests not accepted yet were missing from the Tensho map): the map window's
+        // list holds only the map last shown in the game's own window (here the world map, 919), so the game's own list of those quests is added.
+        current=MapGameLeves.Merge(current,ReadGameUnaccepted(),marker=>(marker.MapId,marker.Icon,marker.Position.X,marker.Position.Z));
+        return WithLeveAreas(MapGameLeves.Merge(current,ReadGameLeves(),marker=>(marker.MapId,marker.Icon,marker.Position.X,marker.Position.Z)));
+    }
+    /// <summary>0.848 (X-70): the markers of the quests the game renders, from its own Map (kept current with or without its map window); bounded.</summary>
+    private static unsafe IReadOnlyList<MapEventMarker> ReadGameQuests()
+    {
+        var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
+        if(map==null)return [];
+        var result=new List<MapEventMarker>();
+        var quests=map->QuestMarkers;
+        for(var index=0;index<quests.Length && result.Count<128;index++)
+        {
+            fixed(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info=&quests[index])
+            {
+                if(info->ObjectiveId==0 || !info->ShouldRender)continue;
+                var count=info->MarkerData.LongCount;
+                if(count is <=0 or >32)continue;
+                var label=TooltipText(&info->Label);
+                foreach(var data in info->MarkerData)
+                {
+                    if(data.IconId==0 || data.MapId==0 || !float.IsFinite(data.Position.X) || !float.IsFinite(data.Position.Z) || result.Count>=128)continue;
+                    var text=label.Length>0 ? label:TooltipText(data.TooltipString);
+                    result.Add(new(data.MapId,data.IconId,data.Position,float.IsFinite(data.Radius) ? Math.Max(0,data.Radius):0,text,info->ObjectiveId,3,data.DataId,false));
+                }
+            }
+        }
+        return result;
+    }
+    /// <summary>X-99 (0.977): the markers of the quests not accepted yet, from the game's Map (UnacceptedQuestMarkers, kept with or without its map window); bounded.</summary>
+    private static unsafe IReadOnlyList<MapEventMarker> ReadGameUnaccepted()
+    {
+        var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
+        if(map==null)return [];
+        var count=map->UnacceptedQuestMarkers.LongCount;
+        if(count is <=0 or >1024)return [];
+        var result=new List<MapEventMarker>();var visited=0;
+        foreach(var entry in map->UnacceptedQuestMarkers)
+        {
+            var info=entry;
+            if(++visited>1024 || result.Count>=256)break;
+            if(info.ObjectiveId==0)continue;
+            var points=info.MarkerData.LongCount;
+            if(points is <=0 or >32)continue;
+            var label=TooltipText(&info.Label);
+            foreach(var data in info.MarkerData)
+            {
+                if(data.IconId==0 || data.MapId==0 || !float.IsFinite(data.Position.X) || !float.IsFinite(data.Position.Z) || result.Count>=256)continue;
+                result.Add(new(data.MapId,data.IconId,data.Position,float.IsFinite(data.Radius) ? Math.Max(0,data.Radius):0,label.Length>0 ? label:TooltipText(data.TooltipString),info.ObjectiveId,3,data.DataId,false));
+            }
+        }
+        return result;
+    }
+    // 0.813 (X-49): the points of the accepted quests, from the game's Map (docs/evidence/0.793-game-leve-markers.md shows its quest list); bounded.
+    private static unsafe IReadOnlyList<MapQuestPoint>? ReadQuestPoints()
+    {
+        var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
+        if(map==null)return null;
+        var result=new List<MapQuestPoint>();
+        var quests=map->QuestMarkers;
+        for(var index=0;index<quests.Length;index++)
+        {
+            fixed(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info=&quests[index])
+            {
+                if(info->ObjectiveId==0)continue;
+                var count=info->MarkerData.LongCount;
+                if(count is <=0 or >32)continue;
+                foreach(var data in info->MarkerData)
+                    if(data.MapId!=0 && float.IsFinite(data.Position.X) && float.IsFinite(data.Position.Z) && result.Count<256)
+                        result.Add(new(info->ObjectiveId,data.MapId,data.Position.X,data.Position.Z));
+            }
+        }
+        return result;
     }
     // 0.793 (X-32): the leve areas the game keeps itself, with or without its map open: each accepted leve's area, and the points of the one started.
+    private static unsafe (uint Objective,uint Icon)? ReadActiveLeve()
+    {
+        var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
+        if(map==null || !map->ActiveLevequestMarker.ShouldRender || map->ActiveLevequestMarker.ObjectiveId==0)return null;
+        var data=map->ActiveLevequestMarker.MarkerData;
+        if(data.LongCount is <=0 or >32)return null;
+        foreach(var entry in data)if(entry.IconId!=0)return (map->ActiveLevequestMarker.ObjectiveId,entry.IconId);
+        return null;
+    }
     private static unsafe IReadOnlyList<MapEventMarker> ReadGameLeves()
     {
         var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
@@ -395,9 +547,14 @@ internal sealed class MapLiveReader : IDisposable
                 result.Add(new(data.MapId,data.IconId,data.Position,float.IsFinite(data.Radius) ? Math.Max(0,data.Radius):0,text,data.ObjectiveId,data.MarkerType,data.DataId,true));
             }
         }
+        // X-87 (0.968, user report: the leve's area stays shown once it has started): a marker group the game does not draw (ShouldRender) is left out,
+        // and so is an accepted leve's marker once that same leve is under way (same objective id as the active marker).
+        var active=map->ActiveLevequestMarker.ShouldRender && map->ActiveLevequestMarker.MarkerData.LongCount>0 ? map->ActiveLevequestMarker.ObjectiveId:0u;
         var leves=map->LevequestMarkers;
-        for(var index=0;index<leves.Length;index++)fixed(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info=&leves[index])From(info);
-        From(&map->ActiveLevequestMarker);
+        for(var index=0;index<leves.Length;index++)
+            fixed(FFXIVClientStructs.FFXIV.Client.Game.UI.MarkerInfo* info=&leves[index])
+                if(info->ShouldRender && (active==0 || info->ObjectiveId!=active))From(info);
+        if(map->ActiveLevequestMarker.ShouldRender)From(&map->ActiveLevequestMarker);
         return result;
     }
     private static IReadOnlyList<MapEventMarker> lastEvents=[];private static uint lastEventsMap;

@@ -42,7 +42,7 @@ internal sealed partial class MainWindow
     {
         var vessels=configuration.Voyages ?? [];
         if(VoyageReadUnavailable?.Invoke()==true)ImGui.TextColored(Accent,localization.Get("FreeCompany.ReadUnavailable"));
-        if(vessels.Count==0){ImGui.TextWrapped(localization.Get("FreeCompany.NoData"));return;}
+        if(vessels.Count==0){EmptyState("FreeCompany.NoData");return;}
         var now=DateTimeOffset.UtcNow;
         // 0.603 (T23): one frame per workshop: several companies are not mixed, each has the date of its own reading.
         var workshops=FreeCompany.Voyages.Workshops(vessels);
@@ -58,7 +58,7 @@ internal sealed partial class MainWindow
     {
         if(count>1)ImGui.TextColored(Accent,localization.Format("FreeCompany.Workshop",number));
         ImGui.TextDisabled(localization.Format("FreeCompany.ReadAt",vessels.Max(vessel=>vessel.ReadAt).ToLocalTime().ToString("g")));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FreeCompany.ReadAtTip"));
+        Tip("FreeCompany.ReadAtTip");
         foreach(var kind in new[]{VesselKind.Submarine,VesselKind.Airship})
         {
             var list=vessels.Where(vessel=>vessel.Kind==kind).ToArray();
@@ -125,17 +125,11 @@ internal sealed partial class MainWindow
         configuration.Voyages=(vessels ?? []).Where(vessel=>vessel.HouseId!=house).ToList();
         configuration.SubmarineUnlocked=unlocked?.Where(entry=>entry.Key!=key).ToDictionary(entry=>entry.Key,entry=>entry.Value);
         configuration.VesselPlans=plans?.Where(entry=>!Voyages.IsPlanOf(entry.Key,house)).ToDictionary(entry=>entry.Key,entry=>entry.Value);
-        try
+        if(TrySave("Forgotten free company",()=>(configuration.Voyages,configuration.SubmarineUnlocked,configuration.VesselPlans)=(vessels,unlocked,plans)))
         {
-            save();saveError=null;
             // The Builds tab and the planner leave a forgotten vessel (Builds: first submarine read, else manual; planner: manual input).
             if(buildVesselKey is not null && Voyages.IsPlanOf(buildVesselKey,house)){buildVesselKey=null;buildCandidates=[];buildSearchKey=null;}
             if(plannerVesselKey is not null && Voyages.IsPlanOf(plannerVesselKey,house))plannerVesselKey=null;
-        }
-        catch(Exception error)
-        {
-            (configuration.Voyages,configuration.SubmarineUnlocked,configuration.VesselPlans)=(vessels,unlocked,plans);
-            saveError=localization.Get("Common.SaveError");log.Warning(error,"Free company could not be forgotten.");
         }
     }
 
@@ -157,15 +151,17 @@ internal sealed partial class MainWindow
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FreeCompany.Exp",vessel.Exp.ToString("N0"),vessel.NextExp.ToString("N0")));
         ImGui.TableNextColumn();
         if(vessel.Route.Count>0)ImGui.TextWrapped(string.Join(" › ",vessel.Route));
+        // T26 (0.919): an airship's last voyage, rebuilt from the game's voyage log.
+        else if(vessel.Kind==VesselKind.Airship && vessel.LastRoute.Count>0)
+        {
+            ImGui.TextWrapped(localization.Format("FreeCompany.LastRoute",string.Join(" › ",vessel.LastRoute)));
+            Tip("FreeCompany.LastRouteTip");
+        }
         else ImGui.TextDisabled(vessel.Kind==VesselKind.Airship ? localization.Get("FreeCompany.RouteUnknown"):"—");
         // Return: time left, « returned » (finds listed in the tooltip), or « at the dock ».
         ImGui.TableNextColumn();
         var state=Voyages.StateOf(vessel,now);
-        if(state==VoyageState.Voyaging && vessel.ReturnAt is { } at)
-        {
-            var left=at-now;
-            ImGui.TextUnformatted(localization.Format("Reminders.In",(int)left.TotalHours,left.Minutes,at.ToLocalTime().ToString("g")));
-        }
+        if(state==VoyageState.Voyaging && vessel.ReturnAt is { } at)ImGui.TextUnformatted(InText(at,now));
         else if(state==VoyageState.Returned)ImGui.TextColored(Accent,localization.Get("FreeCompany.Returned"));
         else ImGui.TextDisabled(localization.Get("FreeCompany.Idle"));
         if(vessel.Loot.Count>0)
@@ -174,7 +170,7 @@ internal sealed partial class MainWindow
             ImGui.PushFont(UiBuilder.IconFont);
             try{ImGui.TextDisabled(FontAwesomeIcon.BoxOpen.ToIconString());}
             finally{ImGui.PopFont();}
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FreeCompany.LootHint"));
+            Tip("FreeCompany.LootHint");
             if(ImGui.IsItemClicked())ImGui.OpenPopup("VesselLoot"+id);
             if(ImGui.BeginPopup("VesselLoot"+id))
             {

@@ -40,9 +40,11 @@ internal static class FieldContent717Tests
             var check=Read("MainWindow.SelfCheck.cs");
             Check(check.Contains("selfCheckPages!.All(page => page.Read.IsCompleted)") && check.Contains(".. SelfCheckPageProbes()"),"waited for, then reported");
         }),
-        ("Eureka and Bozja: the six zones, and the search on name or text",() =>
+        ("Eureka and Bozja: the zones of the field uses (0.975: Occult Crescent too), and the search on name or text",() =>
         {
-            Check(FieldBoard.Territories.SequenceEqual([732u,763u,795u,827u,920u,975u]),"zones");
+            Check(FieldBoard.FieldZoneUses.SequenceEqual([41u,48u,61u]),"zones");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.FieldContent.cs")).Contains("zone.Use==FieldBoard.BozjaUse ? \"FieldContent.KindSkirmish\""),"skirmishes in Bozja only");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Fields/FieldBoard.Dalamud.cs")).Contains("FieldBoard.FieldZoneUses.Contains(territory.TerritoryIntendedUse.RowId)"),"from the sheet");
             Check(FieldBoard.Matches("",["a"]) && FieldBoard.Matches("BC",["x","abcd"]) && !FieldBoard.Matches("z",["x"]),"search");
         }),
         ("Eureka and Bozja: the files are read off the frame, only once checked, and a place has its right click",() =>

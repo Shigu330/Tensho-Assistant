@@ -112,7 +112,7 @@ internal sealed partial class MainWindow
                 if(wrongJob)DrawEquipRecipeJob(context.Recipe!,"CraftLogEquip");
                 return;
             }
-            if(actions is null){if(craftActions.State.Error is { } failure)DrawDataError(failure,"ServiceErrors.Craft");else ImGui.TextWrapped(localization.Get("CraftLogUi.ActionsLoading"));return;}
+            if(actions is null){if(craftActions.State.Error is { } failure)DrawDataError(failure,"ServiceErrors.Craft");else EmptyState("CraftLogUi.ActionsLoading");return;}
             if(context.Recipe is {Simulation.Quality:>0} aimed)
             {
                 CraftLogSection(localization.Get("CraftLogUi.SectionTarget"));
@@ -191,7 +191,7 @@ internal sealed partial class MainWindow
             {
                 if(index%perRow!=0)ImGui.SameLine(0,iconGap);
                 var metadata=catalog.Find(job,steps[index].Action);
-                DrawItemIcon(metadata is null ? null:new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(iconSize));
+                DrawGameIcon(metadata?.Icon ?? 0,new Vector2(iconSize));
                 if(ImGui.IsItemHovered())WrappedTooltip($"{index+1}. {metadata?.Name ?? steps[index].Action.ToString()}");
             }
             if(steps.Count>30)ImGui.TextDisabled(localization.Format("CraftLogUi.More",steps.Count-30));
@@ -200,7 +200,7 @@ internal sealed partial class MainWindow
             {
                 var block=macro.Export.Pages[page];
                 if(page%3!=0)ImGui.SameLine();
-                if(ImGui.SmallButton(localization.Format("CraftLogUi.Copy",block.Number,macro.Export.Pages.Count)))ImGui.SetClipboardText(block.Text);
+                CopyButton(localization.Format("CraftLogUi.Copy",block.Number,macro.Export.Pages.Count),()=>block.Text);
             }
             DrawMacroToGame(macro.Export.Pages,true);
             if(ImGui.SmallButton(localization.Get("CraftLogUi.Edit")))
@@ -228,8 +228,7 @@ internal sealed partial class MainWindow
         using(TenshoAssistant.UI.UiComponents.PushSectionFont())ImGui.TextColored(Accent,title);
         if(help is not null)
         {
-            ImGui.SameLine();ImGui.TextDisabled("(?)");
-            if(ImGui.IsItemHovered())WrappedTooltip(help);
+            ImGui.SameLine();HelpMarkerText(help);
         }
         ImGui.Separator();
     }
@@ -242,7 +241,7 @@ internal sealed partial class MainWindow
         ImGui.BeginGroup();
         try
         {
-            using(TenshoAssistant.UI.UiComponents.PushSectionFont())ImGui.TextWrapped(item?.Name ?? localization.Format("CraftLogUi.Item",recipe.ResultItemId));
+            using(TenshoAssistant.UI.UiComponents.PushSectionFont())ImGui.TextWrapped(item?.Name ?? localization.Format("BankUi.Item",recipe.ResultItemId));
             ImGui.TextColored(Accent,recipe.Simulation?.Collectable==true ? $"{recipe.CraftType} · {localization.Get("CraftLogUi.Collectable")}":recipe.CraftType);
         }
         finally{ImGui.EndGroup();}
@@ -286,7 +285,7 @@ internal sealed partial class MainWindow
         // 0.469 (user request): the skill's icon instead of its name; what was detected is in its tooltip, and beside it only when the box says otherwise.
         ImGui.SameLine();
         var skill=craftActions.State.Catalog?.Find(job,CraftActionKind.Manipulation);
-        DrawItemIcon(skill is null ? null:new ItemDefinition(0,skill.Name,false,skill.Icon),new Vector2(28));
+        DrawGameIcon(skill?.Icon ?? 0,new Vector2(28));
         if(ImGui.IsItemHovered())WrappedTooltip((skill?.Name ?? CraftActionKind.Manipulation.ToString())+"\n"+localization.Format("CraftLogUi.ManipulationDetected",CraftYesNo(detected))+"\n"+localization.Get("CraftLogUi.ManipulationTip"));
         if(used!=detected){ImGui.SameLine();ImGui.TextDisabled(localization.Format("CraftLogUi.ManipulationDetected",CraftYesNo(detected)));}
     }

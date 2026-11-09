@@ -33,7 +33,7 @@ internal sealed partial class MainWindow
             Tip("CraftLists.ListTip");
             ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("CraftLists.Delete")) && ImGui.GetIO().KeyCtrl){store.Set(craftListIndex,null);craftListIndex=0;return;}
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftLists.DeleteTip"));
+            Tip("CraftLists.DeleteTip");
         }
         ImGui.SetNextItemWidth(200);
         ImGui.InputTextWithHint("###CraftListName",localization.Get("CraftLists.NewName"),ref craftListName,CraftLists.MaxName);
@@ -107,8 +107,8 @@ internal sealed partial class MainWindow
         }
         if(TeamcraftExport.Link(list.Entries.Select(entry=>(entry.ItemId,recipes?.ForResult(entry.ItemId) is { Count:>0 } own ? (uint?)PreferredRecipe(own).RecipeId:null,entry.Quantity))) is { } teamcraft)
         {
-            if(ImGui.Button(localization.Get("PlanUi.TeamcraftCopy")+"###CraftListTeamcraft"))ImGui.SetClipboardText(teamcraft);
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("PlanUi.TeamcraftTip"));
+            CopyButton(localization.Get("PlanUi.TeamcraftCopy")+"###CraftListTeamcraft",()=>teamcraft);
+            Tip("PlanUi.TeamcraftTip");
         }
     }
 
@@ -119,6 +119,21 @@ internal sealed partial class MainWindow
             .OfType<CraftPlan>().ToArray();
     }
 
+    /// <summary>
+    /// 0.826 (X-58, user request: Tensho's right-click menu adds a recipe to a list already made): one entry per crafting list, for an item that has a recipe; one more
+    /// to make, or the item added with one. Used by Tensho's own item menu and by the game's (its « Tensho » sub-menu).
+    /// </summary>
+    internal IReadOnlyList<(string Label,Action Open)> CraftListAdds(uint itemId)
+    {
+        if(CraftListStore is not { Unavailable:false } store || store.Lists is not { Count:>0 } lists || recipeCatalog.State.Catalog?.ForResult(itemId) is not { Count:>0 })return [];
+        return lists.Select((list,index)=>(localization.Format("ItemMenu.AddToList",list.Name),(Action)(()=>
+        {
+            var current=store.Lists is { } now && index<now.Count ? now[index]:null;
+            var done=current is not null && CraftLists.Add(current,itemId,1) is { } added && store.Set(index,added);
+            if(!done)log.Warning("The item {0} could not be added to the crafting list {1}.",itemId,list.Name);
+        }))).ToArray();
+    }
+
     // Preparation › « Add to the list »: the recipe's item and the quantity to produce.
     private void DrawAddToCraftList(RecipeDefinition recipe,long quantity)
     {
@@ -127,6 +142,6 @@ internal sealed partial class MainWindow
         if(ImGui.Button(localization.Format("CraftLists.Add",list.Name)))
             craftListMessage=CraftLists.Add(list,recipe.ResultItemId,quantity) is { } added && store.Set(Math.Clamp(craftListIndex,0,lists.Count-1),added)
                 ? localization.Format("CraftLists.Added",list.Name):localization.Get("CraftLists.AddFailed");
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftLists.AddTip"));
+        Tip("CraftLists.AddTip");
     }
 }

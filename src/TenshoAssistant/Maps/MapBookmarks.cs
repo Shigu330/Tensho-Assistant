@@ -109,6 +109,9 @@ public static class MapBookmarks
         return (Array.AsReadOnly(found.ToArray()), unknown);
     }
 
+    /// <summary>Name given to a bookmark saved without one: « Zone · 12.3, 4.5 » (coordinates always with a dot, as the game writes them).</summary>
+    public static string DefaultName(string zone, float x, float y) => $"{zone} · {MapProjection.CoordinateNumber(x)}, {MapProjection.CoordinateNumber(y)}";
+
     public static MapBookmark Create(MapDefinition map, string name, float x, float y)
     {
         ArgumentNullException.ThrowIfNull(map);

@@ -29,6 +29,7 @@ public sealed unsafe class FestivalReader : IDisposable
     private bool disposed,warned;
 
     public FestivalState? State=>Volatile.Read(ref state);
+    private bool emptyOnce;
     public bool Unavailable { get; private set; }
     /// <summary>Quest rows of each festival (null while built, or when it could not be built: QuestsFailed).</summary>
     public IReadOnlyDictionary<uint,IReadOnlyList<uint>>? Quests=>Volatile.Read(ref quests);
@@ -136,6 +137,10 @@ public sealed unsafe class FestivalReader : IDisposable
             if(game==null){Unavailable=true;return;}
             var slots=new List<(ushort,ushort)>();
             foreach(var festival in game->ActiveFestivals)slots.Add((festival.Id,festival.Phase));
+            // X-95 (0.950, slow frames on the map): during a zone change the game gives no festival for a moment; an empty list right after a
+            // running one is kept only when the next read (10 s later) agrees, so the map does not rebuild its vendors twice for nothing.
+            if(slots.Count==0 && Volatile.Read(ref state) is { Active.Count:>0 } && !emptyOnce){emptyOnce=true;return;}
+            emptyOnce=false;
             Volatile.Write(ref state,new FestivalState(now,Festivals.Running(slots)));
             Unavailable=false;warned=false;
         }

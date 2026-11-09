@@ -40,8 +40,7 @@ internal sealed class BankInventoryBridge : IDisposable
     private bool outfitSlotsFailed;
     private readonly Dictionary<BankKey, TimeSpan> autoCaptured = [];
     private IReadOnlyList<(ulong Id, string Name)>? knownRetainers;
-    // 0.329 (R-14): optional reads that failed once (logged once); the first failure of each posts ReadUnavailable.
-    private const string ReadUnavailable = "A storage could not be read (perhaps after a game update); the other storages are still recorded.";
+    // 0.329 (R-14): optional reads that failed once (logged once).
     private readonly HashSet<string> failedReads = [];
     private bool importingSilent;
     private bool disposed;
@@ -130,7 +129,7 @@ internal sealed class BankInventoryBridge : IDisposable
                 // 0.350 (g, I-09): the company chest, while its window is open (the game sends its pages only then).
                 var company = Optional(GetFreeCompany, character, null, "company chest");
                 // Armoury chest (0.235): always in memory once logged in; read like a storage, kept in the Bank, refreshed every 30 s.
-                var armoury = character == 0 ? null : new BankMenuContext(new BankKey(character, BankStorageKind.Armoury, 0), "Arsenal", "",
+                var armoury = character == 0 ? null : new BankMenuContext(new BankKey(character, BankStorageKind.Armoury, 0), "Armoury chest", "",
                     Vector2.Zero, Optional(static _ => IsLoaded(BankStorageKind.Armoury), character, false, "armoury"));
                 // Glamour dresser and armoire (0.236): known once opened in the game this session (PrismBoxLoaded, IsCabinetLoaded).
                 var dresser = character == 0 ? null : new BankMenuContext(new BankKey(character, BankStorageKind.GlamourDresser, 0), "Glamour dresser", "",
@@ -294,7 +293,7 @@ internal sealed class BankInventoryBridge : IDisposable
         if (character == 0) return null;
         var addon = FindVisible("InventoryBuddy", "InventoryBuddy2");
         if (addon.IsNull) return null;
-        return new(new BankKey(character, kind, 0), kind == BankStorageKind.Saddlebag ? "Sacoche chocobo" : "Premium chocobo saddlebag",
+        return new(new BankKey(character, kind, 0), kind == BankStorageKind.Saddlebag ? "Chocobo saddlebag" : "Premium chocobo saddlebag",
             addon.Name, addon.Position + new Vector2(addon.ScaledWidth + 6, 20), IsLoaded(kind), addon.Position);
     }
 

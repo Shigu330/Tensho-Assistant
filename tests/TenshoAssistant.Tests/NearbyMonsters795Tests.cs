@@ -28,7 +28,7 @@ internal static class NearbyMonsters795Tests
         {
             var reader=Read("Maps/MapLiveReader.Dalamud.cs");
             Check(reader.Contains("npc.BattleNpcKind!=Dalamud.Game.ClientState.Objects.Enums.BattleNpcSubKind.Combatant || !npc.IsTargetable") && reader.Contains("if(result.Count>=100)break;"),"enemies, bounded");
-            Check(Read("MainWindow.MapView.cs").Contains("if((settings.ShowListMonsters || settings.ShowHuntLogMonsters || settings.ShowFateMonsters || settings.ShowBlueMageMonsters || settings.ShowCollectionMonsters) && live?.Monsters is { Count:>0 } monsters"),"map setting");
+            Check(Read("MainWindow.MapView.cs").Contains("if((settings.ShowListMonsters || settings.ShowHuntLogMonsters || settings.ShowFateMonsters || settings.ShowBlueMageMonsters || settings.ShowCollectionMonsters || settings.ShowBeastMonsters || settings.ShowRelicMonsters || settings.ShowWishMonsters) && live?.Monsters is { Count:>0 } monsters"),"map setting");
             Check(Read("MainWindow.NearbyMonsters.cs").Contains("if(now-nearbyMonstersAt<1000)return;"),"once a second");
             Check(Read("MainWindow.ListPanels.cs").Contains("if(nearbyDroppedItems.TryGetValue(itemId,out var droppers))"),"list line");
         }),

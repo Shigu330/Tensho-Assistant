@@ -21,7 +21,7 @@ internal static class GameLeves793Tests
         ("Game leves: read from the game's Map, bounded, merged before the leve memory",() =>
         {
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs"));
-            Check(reader.Contains("return WithLeveAreas(MapGameLeves.Merge(lastEvents,ReadGameLeves(),"),"merged, then remembered");
+            Check(reader.Contains("return WithLeveAreas(MapGameLeves.Merge(current,ReadGameLeves(),"),"merged, then remembered (0.848: after the current quests)");
             Check(reader.Contains("if(count is <=0 or >32)return;") && reader.Contains("From(&map->ActiveLevequestMarker);"),"bounded; the started leve's points too");
         }),
     ];

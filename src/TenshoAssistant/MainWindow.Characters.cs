@@ -25,7 +25,7 @@ internal sealed partial class MainWindow
         {otherStocks=OtherCharacterStocks.Of(item,character,bank.Entries);otherStocksItem=item;otherStocksCharacter=character;otherStocksBank=bank;}
         if(otherStocks.Length==0)return;
         ImGui.TextDisabled(localization.Get("BankUi.OtherCharacters"));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("BankUi.OtherCharactersTip"));
+        Tip("BankUi.OtherCharactersTip");
         foreach(var row in otherStocks)
             ImGui.TextUnformatted(localization.Format("BankUi.OtherCharacterLine",CharacterName(bank.Entries,row.CharacterId),row.Nq.ToString("N0"),row.Hq.ToString("N0"),row.ObservedAt.ToLocalTime().ToString("d")));
     }

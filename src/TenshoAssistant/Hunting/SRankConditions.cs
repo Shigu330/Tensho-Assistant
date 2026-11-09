@@ -17,6 +17,14 @@ public sealed record SRankRow(SRankMark Mark,string Name,string Zone,string Expa
 /// </summary>
 public static class SRankConditions
 {
+    /// <summary>X-111 (0.983): the map coordinates of a community place written « x, y » (dot decimals); null for any other text.</summary>
+    public static System.Numerics.Vector2? PlaceOf(string text)
+    {
+        var parts=text.Split(',',StringSplitOptions.TrimEntries);
+        return parts.Length==2 && float.TryParse(parts[0],System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out var x)
+            && float.TryParse(parts[1],System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out var y) && x is >= 1 and <= 42 && y is >= 1 and <= 42
+            ? new System.Numerics.Vector2(x,y):null;
+    }
     public static readonly IReadOnlyList<SRankMark> Marks=
     [
         new(5,13444,1188,"MinionSpot",[new(SRankRefKind.Minion,180)],null,SRankOdds.Guaranteed,84,132,50,80),

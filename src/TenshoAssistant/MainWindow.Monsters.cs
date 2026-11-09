@@ -17,11 +17,31 @@ internal sealed partial class MainWindow
     internal void ConfigureWikiSources(WikiMonsterSources service)=>wikiMonsterSources=service;
     private void DrawWikiMonsterSources(uint id)
     {
+        // X-75.2 (0.875): the monsters seen in game dropping it (yours or shared) come first, with where they were seen; then the community lists.
+        if(Seen()?.MonstersByItem.GetValueOrDefault(id) is { Length:>0 } seenMonsters
+           && TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.SeenDrops")+"###SeenMonsters",ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            foreach(var monster in seenMonsters)
+            {
+                ImGui.BulletText(DiscoveryMonsterName(monster));
+                ImGui.Indent();
+                try{DrawSeenPlaces("SeenLoot"+monster,subject=>subject==monster,DiscoveryMonsterName(monster));}
+                finally{ImGui.Unindent();}
+            }
+            ImGui.TextDisabled(localization.Get("MonsterUi.SeenDropsHelp"));
+        }
         // LuminaSupplemental first (0.190): monsters dropping the item, from MobDrop with names from the game sheet BNpcName.
         lumina?.Request();
         if(lumina?.State.Data?.MonstersOf(id) is { Count:>0 } mobs && TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.Lumina")+"###LuminaMonsters",ImGuiTreeNodeFlags.DefaultOpen))
         {
-            foreach(var mob in mobs)ImGui.BulletText(mob);
+            foreach(var mob in mobs)
+            {
+                ImGui.BulletText(mob);
+                // X-72 A (0.854): where you saw it.
+                ImGui.Indent();
+                try{DrawSeenPlaces("Loot"+mob,subject=>string.Equals(DiscoveryMonsterName(subject),mob,StringComparison.CurrentCultureIgnoreCase),mob);}
+                finally{ImGui.Unindent();}
+            }
             ImGui.TextDisabled(localization.Get("MonsterUi.LuminaHelp"));
         }
         if(wikiMonsterSources is not { } wiki)return;
@@ -39,11 +59,11 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         if(view.Loading)ImGui.TextDisabled(localization.Get("WikiMonsters.Loading"));
         if(view.Error is { } error)
-        {ImGui.TextWrapped(localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"WikiMonsters.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
+        DrawDataError(error,"WikiMonsters.Error");
         if(view.Document is not { } document)return;
         ImGui.TextWrapped(document.Url);
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,document.FetchedAt);
-        if(document.Monsters.Count==0)ImGui.TextWrapped(localization.Get("WikiMonsters.Empty"));
+        if(document.Monsters.Count==0)EmptyState("WikiMonsters.Empty");
         var wikiRow=0;
         foreach(var row in document.Monsters)
         {
@@ -53,7 +73,7 @@ internal sealed partial class MainWindow
             var place=BlueSpellSources.Parse(row.Location);
             if(place.X is not { } x || place.Y is not { } y || MapOfEnglishPlace(place.Place) is not { } map)continue;
             PlaceMenu($"WikiMonsterPlace{wikiRow}",map,new(x,y),CommunityMonster(row.Name));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("EntityMenu.RightClickPlace"));
+            Tip("EntityMenu.RightClickPlace");
         }
     }
     private void DrawMonsterLoot()
@@ -65,7 +85,7 @@ internal sealed partial class MainWindow
         var state = monsterLoot.State;
         if (state.ItemId == 0) { ImGui.TextWrapped(localization.Get("MonsterUi.Help")); return; }
         DrawItemIcon(SelectedItem,new Vector2(40)); ImGui.SameLine();
-        ImGui.TextColored(Accent,SelectedItem?.Name ?? localization.Format("MonsterUi.Item",state.ItemId));
+        ImGui.TextColored(Accent,SelectedItem?.Name ?? localization.Format("BankUi.Item",state.ItemId));
         // LuminaSupplemental, then the wiki (DrawWikiMonsterSources); Garland stays as a folded complement for monster pages and map links.
         DrawWikiMonsterSources(state.ItemId);
         if (!TenshoAssistant.UI.UiComponents.Header(localization.Get("MonsterUi.GarlandSection")+"###GarlandMonsters")) return;
@@ -76,7 +96,7 @@ internal sealed partial class MainWindow
             if (state.Item is not null)
             { ImGui.SameLine(); if (SourceButton(localization.Get("MonsterUi.Refresh")+"##Monster",configuration.CommunityGarland,true)) _ = monsterLoot.RequestItemAsync(true); }
         }
-        if (state.Error is { } error) { ImGui.TextWrapped(localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"MonsterUi.Error")); if(developerMode)ImGui.TextWrapped(RawMessage(error)); }
+        if (state.Error is { } error) DrawDataError(error,"MonsterUi.Error");
         ImGui.TextWrapped(localization.Get("MonsterUi.Source"));
         if (state.Item is not { } itemDocument) return;
         ImGui.TextDisabled(localization.Format("MonsterSource.Retrieved",itemDocument.FetchedAt.ToLocalTime().ToString("g")));
@@ -135,7 +155,7 @@ internal sealed partial class MainWindow
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Sources,detail.FetchedAt);
         ImGui.TextUnformatted(localization.Format("MonsterUi.Description",detail.Name,detail.Level.Length == 0 ? localization.Get("MonsterUi.Missing") : detail.Level));
         ImGui.TextUnformatted(MonsterZone(detail.PlaceNameId));
-        if (detail.X is { } x && detail.Y is { } y) ImGui.TextDisabled(localization.Format("MonsterUi.Position",x.ToString("F2"),y.ToString("F2")));
+        if (detail.X is { } x && detail.Y is { } y) ImGui.TextDisabled(localization.Format("MonsterUi.Position",MapProjection.CoordinateNumber(x),MapProjection.CoordinateNumber(y)));
         else ImGui.TextDisabled(localization.Get("MonsterUi.NoPosition"));
         if (detail.HasDrops && !detail.DropItemIds.Contains(state.ItemId))
             ImGui.TextWrapped(localization.Get("MonsterUi.Mismatch"));
@@ -163,7 +183,7 @@ internal sealed partial class MainWindow
                         for (var index=clipper.DisplayStart;index<clipper.DisplayEnd;index++)
                         {
                             var id=detail.DropItemIds[index]; var item=itemCatalog.State.Catalog?.Find(id);
-                            ItemCell(item,id,24,item is null ? localization.Format("MonsterUi.Item",id):null);
+                            ItemCell(item,id,24,item is null ? localization.Format("BankUi.Item",id):null);
                         }
                     }
                     finally { clipper.End(); clipper.Destroy(); }

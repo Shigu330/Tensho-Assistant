@@ -7,6 +7,7 @@ namespace TenshoAssistant.Items;
 
 internal sealed class ItemContextMenuBridge : IDisposable
 {
+    private readonly RegistrationScope registrations=new();
     private readonly Configuration configuration;
     private readonly IContextMenu menus;
     private readonly IPlayerState player;
@@ -23,12 +24,27 @@ internal sealed class ItemContextMenuBridge : IDisposable
     {
         this.configuration=configuration;this.menus=menus;this.player=player;this.client=client;this.catalog=catalog;this.log=log;
         this.localization=localization;this.gui=gui;
-        menus.OnMenuOpened+=OnMenuOpened;
-        try{client.Logout+=OnLogout;}
-        catch{menus.OnMenuOpened-=OnMenuOpened;throw;}
+        // X-76 H10 (0.924): subscriptions owned by one RegistrationScope: a failure part-way undoes the ones already made; Dispose releases them in reverse order.
+        try
+        {
+            registrations.Register(()=>menus.OnMenuOpened+=OnMenuOpened,()=>menus.OnMenuOpened-=OnMenuOpened);
+            registrations.Register(()=>client.Logout+=OnLogout,()=>client.Logout-=OnLogout);
+        }
+        catch{registrations.Dispose();throw;}
     }
 
     private void OnLogout(int type,int code)=>session.Clear();
+    /// <summary>0.808 (X-44): windows that list items only (crafting log, its material list and tree): their menu is about the hovered item.</summary>
+    // 0.852 (X-47, dalamud.log 2026-11-07 22:11:48: « addon JournalAccept, hovered item 5707, name set », left out as a character's menu): the quest windows' rewards.
+    internal static readonly IReadOnlySet<string> ItemWindows=new HashSet<string>(StringComparer.Ordinal){"RecipeNote","RecipeMaterialList","RecipeTree","RecipeProductList",
+        "JournalAccept","JournalResult","JournalDetail"};
+    /// <summary>0.837 (X-03): the chat's link item (AgentChatLog.ContextItemId, framework thread) is the hovered item, HQ or not.</summary>
+    private static unsafe bool ChatLinkItem(ulong hovered)
+    {
+        var agent=FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentChatLog.Instance();
+        return agent!=null && ChatLinkMatches(agent->ContextItemId,hovered);
+    }
+    internal static bool ChatLinkMatches(uint linked,ulong hovered)=>linked!=0 && hovered!=0 && linked%1_000_000==hovered%1_000_000;
     private bool Current(ItemMenuToken token)=>!disposed && session.IsCurrent(token,configuration.ItemContextMenuEnabled,Owner,catalog.State.Catalog,DateTimeOffset.UtcNow);
 
     private void OnMenuOpened(IMenuOpenedArgs args)
@@ -39,7 +55,8 @@ internal sealed class ItemContextMenuBridge : IDisposable
             session.Clear();
             // 0.781 (X-03, user report: a right click on the ring's item scrolled the chat and opened nothing): developer mode, what the game opened.
             if(configuration.DeveloperMode)
-                log.Information("Context menu opened: type {0}, addon \"{1}\", target {2}, hovered item {3}.",args.MenuType,args.AddonName ?? "",args.Target?.GetType().Name ?? "none",gui.HoveredItem);
+                log.Information("Context menu opened: type {0}, addon \"{1}\", target {2}, hovered item {3}{4}.",args.MenuType,args.AddonName ?? "",args.Target?.GetType().Name ?? "none",gui.HoveredItem,
+                    args.Target is MenuTargetDefault aimed ? $"; content {(aimed.TargetContentId!=0 ? "set":"0")}, object {(aimed.TargetObject is null ? "none":"set")}, name {(string.IsNullOrEmpty(aimed.TargetName) ? "empty":"set")}":"");
             if(disposed || !configuration.ItemContextMenuEnabled || Owner==0)return;
             var owner=Owner;
             ulong raw;
@@ -53,8 +70,13 @@ internal sealed class ItemContextMenuBridge : IDisposable
             {
                 // Shops, exchanges and item lists open a default menu without an item target: the item hovered when the
                 // menu opened is used. Menus aimed at a character (player, NPC, party member) never get the Tensho entry.
+                // 0.808 (X-44, user report: no Tensho entry in the crafting log): the game's item windows aim no character, whatever their target holds.
+                var itemWindow=ItemWindows.Contains(args.AddonName ?? "");
+                // 0.837 (X-03, « /tensho linktest », dalamud.log 23:35: the chat's menu opened on the item link, hovered item 12898, « name set »): an item link
+                // in the chat is the game's link item, the same as the hovered one; a player's name in the chat still gets no entry.
+                var chatItem=args.AddonName=="ChatLog" && ChatLinkItem(gui.HoveredItem);
                 if(args.MenuType!=ContextMenuType.Default || args.Target is not MenuTargetDefault target
-                   || target.TargetContentId!=0 || target.TargetObject is not null || !string.IsNullOrEmpty(target.TargetName))return;
+                   || !itemWindow && !chatItem && (target.TargetContentId!=0 || target.TargetObject is not null || !string.IsNullOrEmpty(target.TargetName)))return;
                 raw=gui.HoveredItem;
                 if(raw==0)return;
             }
@@ -133,6 +155,6 @@ internal sealed class ItemContextMenuBridge : IDisposable
     public void Dispose()
     {
         if(disposed)return;disposed=true;
-        menus.OnMenuOpened-=OnMenuOpened;client.Logout-=OnLogout;session.Dispose();
+        registrations.Dispose();session.Dispose();
     }
 }

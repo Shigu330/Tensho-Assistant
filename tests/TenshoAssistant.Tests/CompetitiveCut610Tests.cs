@@ -42,7 +42,7 @@ internal static class CompetitiveCut610Tests
             var around=Code().Where(file=>!file.EndsWith("CompetitiveGate.Dalamud.cs") && Regex.IsMatch(File.ReadAllText(file),@"\.Update\s*[+-]=")).Select(Path.GetFileName).ToArray();
             Check(around.Length==0,"going around the gate: "+string.Join(", ",around));
             var always=Code().Where(file=>File.ReadAllText(file).Contains("CompetitiveGate.AddAlways(")).Select(file=>Path.GetFileName(file)!).Order().ToArray();
-            Check(always.SequenceEqual(["AlarmDtrEntry.Dalamud.cs","CurrencyDtrEntry.Dalamud.cs","NativeMapReplacer.Dalamud.cs","ReminderDtrEntry.Dalamud.cs"]),"only what must undo something: "+string.Join(", ",always));
+            Check(always.SequenceEqual(["AlarmDtrEntry.Dalamud.cs","CurrencyDtrEntry.Dalamud.cs","GilDtrEntry.Dalamud.cs","NativeMapReplacer.Dalamud.cs","ReminderDtrEntry.Dalamud.cs"]),"only what must undo something: "+string.Join(", ",always));
             foreach(var file in always)Check(File.ReadAllText(Code().First(path=>Path.GetFileName(path)==file)).Contains("CompetitiveGate.Cut)"),$"{file} acts on the cut");
         }),
         ("Competitive (0.615): the chat is not read during a cut either",() =>
@@ -54,7 +54,8 @@ internal static class CompetitiveCut610Tests
         ("Competitive: nothing shown, no command, no menu, no hook work, no way to turn it off",() =>
         {
             var plugin=Source("Plugin.cs");
-            Check(plugin.Contains("private void Draw()\n    {\n        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;"),"no drawing");
+            Check(plugin.Contains("private void Draw()\n    {\n        if(TenshoAssistant.Competitive.CompetitiveGate.Cut){DrawBeastBoard(TenshoAssistant.Competitive.CompetitiveGate.LabyrinthBoard);return;}"),"no drawing but the labyrinth board's panel (DEC-047)");
+            Check(plugin.Contains("boardWindow.IsOpen=allowed && !boardPanelBroken && showBoardPanel() && boardReader?.State.Board==true;"),"that panel only while the board is open");
             Check(plugin.Contains("private void OnCommand(string command, string arguments)\n    {\n        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)"),"commands");
             Check(plugin.Contains("private void Open(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;") && plugin.Contains("private void OpenConfig(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;"),"opening");
             Check(plugin.IndexOf("new TenshoAssistant.Competitive.CompetitiveWatcher(")<plugin.IndexOf("mainWindow = new MainWindow("),"decided before anything starts");

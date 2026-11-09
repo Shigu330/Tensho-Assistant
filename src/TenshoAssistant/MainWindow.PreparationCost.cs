@@ -38,12 +38,9 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(230);
         changed |= ImGui.Combo(localization.Get("CostUi.Quality")+"##Cost",ref costQualityIndex,new[] {"NQ","HQ",localization.Get("CostUi.Cheapest")},3);
         Tip("CostUi.QualityTip");
-        var dataCenter=configuration.CostDataCenter;
-        if(ImGui.Checkbox(localization.Get("CostUi.DataCenter")+"##CostDataCenter",ref dataCenter)){configuration.CostDataCenter=dataCenter;try{save();}catch(Exception error){log.Warning(error,"Could not save the cost scope.");}}
-        Tip("CostUi.DataCenterTip");
-        var vendors=configuration.CostUseVendors;
-        if(ImGui.Checkbox(localization.Get("CostUi.Vendors")+"##CostVendors",ref vendors)){configuration.CostUseVendors=vendors;try{save();}catch(Exception error){log.Warning(error,"Could not save the cost scope.");}}
-        Tip("CostUi.VendorsTip");
+        // X-76 H3 (0.914): the shared setting row (restored when saving fails, which was only logged).
+        BoolSetting("CostUi.DataCenter","CostUi.DataCenterTip",()=>configuration.CostDataCenter,value=>configuration.CostDataCenter=value,c=>c.CostDataCenter);
+        BoolSetting("CostUi.Vendors","CostUi.VendorsTip",()=>configuration.CostUseVendors,value=>configuration.CostUseVendors=value,c=>c.CostUseVendors);
         if(changed) {preparationPrices.Cancel(); preparationCostError=null;}
         PreparationCostEstimate estimate;
         try

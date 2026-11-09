@@ -15,6 +15,27 @@ internal sealed partial class MainWindow
     private uint currencyValueItem;
     private readonly PreparationPriceSession currencyPrices=new();
     private (uint Item,object? Catalog,uint World,int Done,bool Loading,IReadOnlyList<CollectionEntry> Collections,long? Balance,int Days)? currencyValueKey;
+    /// <summary>
+    /// X-76 H4 (0.914): the days of sales shared by « What can I craft? » and this page, one editor for both. The value is bounded and
+    /// used as typed, written once when the field is left (it was written on every key press), and the value from before the edit comes
+    /// back when saving fails.
+    /// </summary>
+    private void SaleDaysSetting(string id,string tipKey)
+    {
+        ImGui.SetNextItemWidth(70*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+        var before=configuration.CraftStockSaleDays;var saleDays=FromStockDays;
+        writeSaleDays??=WriteSaleDays;
+        if(ImGui.InputInt(localization.Get("CraftStock.SaleDays")+"###"+id,ref saleDays,0))writeSaleDays(saleDays);
+        SaveWhenEditEnds("CraftStockSaleDays",writeSaleDays,before);
+        Tip(tipKey);
+    }
+    private Action<int>? writeSaleDays;
+    private void WriteSaleDays(int saleDays)
+    {
+        configuration.CraftStockSaleDays=Math.Clamp(saleDays,1,30);
+        fromStockView=null;
+    }
+
     // 0.794 (X-33): the balance of the chosen currency, as the Currencies tab reads it; null: not read, which is not zero.
     private long? CurrencyValueBalance()
     {
@@ -92,20 +113,15 @@ internal sealed partial class MainWindow
             }).Where(buy=>buy.Cost>0),balance,days);
             var mounts=collected.Where(entry=>entry.Kind==CollectionKind.Mount && entry.ConfirmedUnlocked).Select(entry=>entry.Id).ToHashSet();
             var minions=collected.Where(entry=>entry.Kind==CollectionKind.Companion && entry.ConfirmedUnlocked).Select(entry=>entry.Id).ToHashSet();
-            currencyValueOwned=currencyValueRows.Select(row=>items?.Find(row.ItemId)).OfType<Items.ItemDefinition>().Where(item=>item.MountId!=0 || item.CompanionId!=0)
-                .DistinctBy(item=>item.Id).ToDictionary(item=>item.Id,item=>item.MountId!=0 ? mounts.Contains(item.MountId):minions.Contains(item.CompanionId));
+            // X-76 P4 (0.927): besides mounts and minions, every item the game says teaches something.
+            currencyValueOwned=currencyValueRows.Select(row=>items?.Find(row.ItemId)).OfType<Items.ItemDefinition>()
+                .Where(item=>item.MountId!=0 || item.CompanionId!=0 || GameItemUnlocked(item.Id) is not null)
+                .DistinctBy(item=>item.Id).ToDictionary(item=>item.Id,item=>item.MountId!=0 ? mounts.Contains(item.MountId):item.CompanionId!=0 ? minions.Contains(item.CompanionId):GameItemUnlocked(item.Id)==true);
             currencyValueKey=key;
         }
         ImGui.TextWrapped(localization.Get("CurrencyValue.Help"));
         // 0.794 (X-33, user request): the same days of sales as « What can I craft? », and the balance they are counted against.
-        ImGui.SetNextItemWidth(70*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
-        var saleDays=days;
-        if(ImGui.InputInt(localization.Get("CraftStock.SaleDays")+"###CurrencyValueDays",ref saleDays,0))
-        {
-            configuration.CraftStockSaleDays=Math.Clamp(saleDays,1,30);fromStockView=null;
-            try{save();}catch(Exception error){log.Warning(error,"Sale days could not be saved.");}
-        }
-        Tip("CurrencyValue.SaleDaysTip");
+        SaleDaysSetting("CurrencyValueDays","CurrencyValue.SaleDaysTip");
         ImGui.SameLine();
         ImGui.TextDisabled(balance is { } held ? localization.Format("CurrencyValue.Balance",held.ToString("N0")):localization.Get("CurrencyValue.BalanceUnknown"));
         BoolSetting("CurrencyValue.Market","CurrencyValue.MarketTip",()=>configuration.CurrencyValueMarket,value=>

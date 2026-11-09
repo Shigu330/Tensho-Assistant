@@ -1,6 +1,10 @@
 namespace TenshoAssistant.Gathering;
 
-public sealed record GatheringOpening(DateTimeOffset StartsAt,DateTimeOffset EndsAt,bool Current);
+public sealed record GatheringOpening(DateTimeOffset StartsAt,DateTimeOffset EndsAt,bool Current)
+{
+    /// <summary>Whether this opening is open at <paramref name="now"/>, and the time left until it closes (open) or opens (not open).</summary>
+    public (bool Open,TimeSpan Left) At(DateTimeOffset now){var open=StartsAt<=now && now<EndsAt;return (open,(open ? EndsAt:StartsAt)-now);}
+}
 public sealed record GatheringTimeline(GatheringScheduleKind Kind,int EtMinute,DateTimeOffset CalculatedAt,IReadOnlyList<GatheringOpening> Openings);
 /// <summary>0.588 (C7): the timed points open now, then those opening soon. Fish are left out: their weather is not checked here.</summary>
 public static class GatheringNow
@@ -55,6 +59,8 @@ public static class GatheringTime
         if(ticks<0)throw new ArgumentOutOfRangeException(nameof(date));
         return (int)(ticks%DayTicks*12/(35L*TimeSpan.TicksPerSecond));
     }
+    /// <summary>An Eorzea minute of the day (0 to 1439) as « HH:mm ».</summary>
+    public static string Clock(int minute)=>$"{minute/60:00}:{minute%60:00}";
     public static GatheringTimeline Next(GatheringSchedule schedule,DateTimeOffset date,int count=3)
     {
         ArgumentNullException.ThrowIfNull(schedule);

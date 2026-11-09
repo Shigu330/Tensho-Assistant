@@ -84,7 +84,7 @@ internal sealed partial class MainWindow
             && ReferenceEquals(configuration.MacroChainPlan,chain.Plan) && pages.Select(page=>page.Text).SequenceEqual(chain.Texts))
         {
             if(ImGui.SmallButton(localization.Get("CraftMacro.StartChain")+"##MacroChainStart"))macroChain.RequestStart(chain.Plan);
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftMacro.StartChainHelp"));
+            Tip("CraftMacro.StartChainHelp");
         }
         if(macroWriter?.SlotsOf(copy.Book) is { } states)
         {
@@ -188,12 +188,12 @@ internal sealed partial class MainWindow
         if(developerMode)ImGui.TextDisabled($"ID {recipe.RecipeId}");
         // 0.405 (user request): this recipe in the game's crafting log.
         if(ImGui.SmallButton(localization.Get("GameLogs.Recipe")))OpenGameRecipe(recipe);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GameLogs.RecipeTip"));
+        Tip("GameLogs.RecipeTip");
         // A-12 (0.427): level, Craftsmanship and Control against the recipe; the job's gear set on click.
         DrawCraftReadiness(recipe);
         if(preparation) { DrawCraftPlan(recipe); return; }
         if(CraftSimulation.Unsupported(recipe) is { } unsupported) { ImGui.TextWrapped(CraftMessage(unsupported)); return; }
-        if(craftActions.State.Catalog is not { } catalog) { if(craftActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Craft"); else ImGui.TextWrapped(localization.Get("SimulationHelp.Loading")); return; }
+        if(craftActions.State.Catalog is not { } catalog) { if(craftActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Craft"); else EmptyState("SimulationHelp.Loading"); return; }
         var p=recipe.Simulation!; var job=recipe.CraftTypeId+8;
         if(p.Collectable)ImGui.TextColored(Accent,localization.Get("SimulationHelp.Collectable"));
         // A-07 (0.435): expert recipes simulated in the normal condition, said so.
@@ -291,8 +291,8 @@ internal sealed partial class MainWindow
                             ImGui.BeginDisabled(forbidden || simulationActions.Count>=100 || simulationLevel<spec.Level || spec.Kind==CraftActionKind.Manipulation && !simulationManipulation);
                             try
                             {
-                                DrawItemIcon(new ItemDefinition(0,action.Name,false,action.Icon),new Vector2(26)); var click=ImGui.IsItemClicked();
-                                if(ImGui.IsItemHovered()) WrappedTooltip(action.Description);
+                                DrawGameIcon(action.Icon,new Vector2(26)); var click=ImGui.IsItemClicked();
+                                TipText(action.Description);
                                 ImGui.SameLine(); click|=ImGui.SmallButton(action.Name);
                                 if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(forbidden ? localization.Get("CraftRules.ForbiddenTip"):localization.Format("SimulationHelp.Action",action.Description,spec.Level,spec.Cp));
                                 if(click && !forbidden && simulationActions.Count<100 && simulationLevel>=spec.Level && (spec.Kind!=CraftActionKind.Manipulation || simulationManipulation))
@@ -352,7 +352,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.PushID(i);
                     try
                     {
-                        DrawItemIcon(metadata is null ? null:new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(24)); ImGui.SameLine();
+                        DrawGameIcon(metadata?.Icon ?? 0,new Vector2(24)); ImGui.SameLine();
                         ImGui.TextWrapped($"{i+1}. {metadata?.Name ?? kind.ToString()}");
                         if(ImGui.IsItemHovered() && step is not null) WrappedTooltip(localization.Format("SimulationHelp.Effects",step.After.Veneration,step.After.Innovation,step.After.GreatStrides,step.After.WasteNot,step.After.Manipulation,step.After.MuscleMemory,localization.Get(step.After.TrainedPerfection ? "SimulationHelp.Protected":step.After.UsedTrainedPerfection ? "SimulationHelp.Used":"SimulationHelp.Available")));
                         if(ImGui.SmallButton(localization.Get("CraftPresets.Remove"))) { simulationActions.RemoveAt(i); simulationResult=null; break; }
@@ -405,7 +405,7 @@ internal sealed partial class MainWindow
             {
                 if(TenshoAssistant.UI.UiComponents.Header(localization.Format("CraftMacro.Block",block.Number,export.Pages.Count,block.Lines.Count)+"###MacroBlock",ImGuiTreeNodeFlags.DefaultOpen))
                 {
-                    if(ImGui.SmallButton(localization.Get("CraftMacro.Copy"))) ImGui.SetClipboardText(block.Text);
+                    CopyButton(localization.Get("CraftMacro.Copy"),()=>block.Text);
                     foreach(var line in block.Lines) ImGui.TextUnformatted(line);
                 }
             }

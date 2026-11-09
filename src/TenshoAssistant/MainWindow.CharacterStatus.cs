@@ -21,11 +21,12 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Get("CharacterStatus.Help"));
         if(all.Count==0){ImGui.TextDisabled(localization.Get("CharacterStatus.Empty"));return;}
         var now=DateTimeOffset.UtcNow;var lastDaily=ResetSchedule.PreviousDaily(now,ResetSchedule.DailyHour);var current=source.Current;
-        if(!ImGui.BeginTable("CharacterStatuses",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.ScrollX,
+        var lastWeekly=ResetSchedule.PreviousWeekly(now,ResetSchedule.WeeklyDay,ResetSchedule.WeeklyHour);
+        if(!ImGui.BeginTable("CharacterStatuses",8,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.ScrollX,
                new Vector2(0,Math.Min(260,(all.Count+1)*ImGui.GetFrameHeightWithSpacing()+8))))return;
         try
         {
-            foreach(var key in new[]{"Name","Seen","Ventures","Treasure","Bingo","HuntBills","Roulettes"})ImGui.TableSetupColumn(localization.Get("CharacterStatus.Column"+key));
+            foreach(var key in new[]{"Name","Seen","Ventures","Treasure","Bingo","HuntBills","Roulettes","Other"})ImGui.TableSetupColumn(localization.Get("CharacterStatus.Column"+key));
             ImGui.TableSetupScrollFreeze(1,1);
             ImGui.TableHeadersRow();
             foreach(var status in all)
@@ -81,11 +82,32 @@ internal sealed partial class MainWindow
                         if(roulettes.Done>=roulettes.Total)ImGui.TextColored(Success,text);else ImGui.TextUnformatted(text);
                     }
                     else ImGui.TextDisabled(localization.Get(status.RoulettesAt is null ? "CharacterStatus.Unknown":"CharacterStatus.SinceReset"));
+                    // X-76 P9 (0.936): leves, deliveries, allied quests and squadron, as last read for this character.
+                    ImGui.TableNextColumn();
+                    DrawCharacterOther(status,now,lastDaily,lastWeekly);
                 }
                 finally{ImGui.PopID();}
             }
         }
         finally{ImGui.EndTable();}
+    }
+
+    private void DrawCharacterOther(CharacterStatus status,DateTimeOffset now,DateTimeOffset lastDaily,DateTimeOffset lastWeekly)
+    {
+        var (allied,deliveries)=CharacterStatuses.DailyWeekly(status,lastDaily,lastWeekly);
+        var parts=new List<string>();var detail=new List<string>();
+        if(status.LeveAllowances is { } leves)
+        {
+            parts.Add(localization.Format("CharacterStatus.OtherLeves",leves));
+            if(status.NextLeveAllowances is { } more)detail.Add(localization.Format("CharacterStatus.OtherLevesNext",more.ToLocalTime().ToString("g")));
+        }
+        if(deliveries is { } left)parts.Add(localization.Format("CharacterStatus.OtherDeliveries",left));
+        if(allied is { } alliedLeft)parts.Add(localization.Format("CharacterStatus.OtherAllied",alliedLeft));
+        foreach(var (done,key) in new[]{(status.SquadronMissionDone,"CharacterStatus.OtherMission"),(status.SquadronTrainingDone,"CharacterStatus.OtherTraining")})
+            if(done is { } end)detail.Add(localization.Format(key,end<=now ? localization.Get("CharacterStatus.OtherDone"):end.ToLocalTime().ToString("g")));
+        if(parts.Count==0 && detail.Count==0){ImGui.TextDisabled(localization.Get("CharacterStatus.Unknown"));return;}
+        ImGui.TextUnformatted(parts.Count>0 ? string.Join(" · ",parts):localization.Get("CharacterStatus.OtherMore"));
+        if(detail.Count>0)TipText(string.Join("\n",detail));
     }
 
     // Reminders « done » boxes: the logged-in character's (0.374, M-04), or the shared ones when no character is logged in.

@@ -42,7 +42,7 @@ internal static class Island679Tests
                 Check(popup>=0 && box>popup && box<popup+4000,kind+" in the display menu");
                 Check(view.LastIndexOf($"SettingBox(\"MapView.ShowIsland{kind}\"",StringComparison.Ordinal)==box,kind+" once");
             }
-            Check(view.Contains("settings.ShowIslandPlants=settings.ShowIslandWood=settings.ShowIslandRocks=settings.ShowIslandEarth=settings.ShowIslandFishing=shown;"),"All and None");
+            Check(view.Contains("settings.ShowIslandPlants=settings.ShowIslandWood=settings.ShowIslandRocks=settings.ShowIslandEarth=settings.ShowIslandFishing=settings.ShowIslandAnimals=shown;"),"All and None (0.901: and the animals)");
         }),
         ("Island map: a place of one kind at the same spot is drawn once, and a far one or another kind stays apart",() =>
         {

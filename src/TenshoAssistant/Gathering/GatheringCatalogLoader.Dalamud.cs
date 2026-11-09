@@ -220,7 +220,7 @@ internal sealed class GatheringCatalogLoader : IDisposable
             }
             catch (Exception error)
             {
-                log.Error(error, "Tensho gathering catalog could not be built.");
+                log.Warning(error, "Tensho gathering catalog could not be built.");
                 service.Fail(error);
                 Stop();
             }

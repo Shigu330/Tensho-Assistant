@@ -32,7 +32,7 @@ internal sealed partial class MainWindow
                 if(ImGui.GetContentRegionAvail().X<24)ImGui.NewLine();
             }
             var metadata=catalog.Find(job,actions[index]);
-            DrawItemIcon(metadata is null ? null:new ItemDefinition(0,metadata.Name,false,metadata.Icon),new System.Numerics.Vector2(24));
+            DrawGameIcon(metadata?.Icon ?? 0,new System.Numerics.Vector2(24));
             if(ImGui.IsItemHovered())WrappedTooltip($"{index+1}. {metadata?.Name ?? actions[index].ToString()}");
         }
         if(ignored>0)ImGui.TextDisabled(localization.Format("CraftRecorder.Ignored",ignored));

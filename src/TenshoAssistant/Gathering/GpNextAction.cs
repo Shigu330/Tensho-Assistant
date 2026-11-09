@@ -1,8 +1,10 @@
 namespace TenshoAssistant.Gathering;
 
 public enum GpNextKind { Action,Gather,OffPlan,Done }
-/// <summary>Used: how many of each action the plan has seen spent, by action id.</summary>
-/// <summary>Finished: every step of the plan is behind; Leftover: the action comes from the GP left at the end, not from the plan.</summary>
+/// <summary>
+/// Used: how many of each action the plan has seen spent, by action id. Finished: every step of the plan is behind; Leftover: the action comes from the GP left
+/// at the end, not from the plan.
+/// </summary>
 public sealed record GpNextStep(GpNextKind Kind,GpAction? Action,IReadOnlyDictionary<uint,int> Used,bool Finished=false,bool Leftover=false);
 /// <summary>A hotbar slot on the screen, copied on the framework thread.</summary>
 public readonly record struct ActionBarRect(float X,float Y,float Width,float Height)

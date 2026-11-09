@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace TenshoAssistant.Reminders;
 
-public enum GardenChatKind { PlantedBed, PlantedPot, Tended, Uprooted }
+public enum GardenChatKind { PlantedBed, PlantedPot, Tended, Uprooted, Harvested }
 
 /// <summary>A planting the game announced in the chat: patch and bed for a garden patch, nothing for a flowerpot.</summary>
 public sealed record GardenChatEvent(GardenChatKind Kind,int? Patch,int? Bed);
@@ -32,6 +32,11 @@ public sealed class GardenChat
     private static string Bare(string? text)=>string.Concat((text ?? "").Where(character=>!char.IsWhiteSpace(character) && character!='\u00AD'));
 
     public static bool BedComesFirst(string language)=>language is "English" or "French";
+
+    /// <summary>#36 (0.978, docs/evidence/0.978-garden-harvest.md): EObjName 2003757, « emplacement », a garden bed: the target while harvesting.</summary>
+    public const uint BedObject=2003757;
+    /// <summary>#36 (0.978): a harvest is the ordinary item gain line (chat type 62, no sender) while the target is a garden bed (the caller checks housing).</summary>
+    public static bool IsHarvest(int chatType,string sender,uint target)=>chatType==62 && sender.Length==0 && target==BedObject;
 
     private static Regex? Pattern(IReadOnlyList<string?>? parts)
     {

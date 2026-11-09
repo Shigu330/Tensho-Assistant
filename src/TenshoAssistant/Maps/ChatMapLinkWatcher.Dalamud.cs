@@ -12,6 +12,7 @@ namespace TenshoAssistant.Maps;
 /// </summary>
 public sealed class ChatMapLinkWatcher : IDisposable
 {
+    private readonly RegistrationScope registrations=new();
     private readonly IChatGui chat;
     private readonly IClientState client;
     private readonly IPluginLog log;
@@ -22,8 +23,13 @@ public sealed class ChatMapLinkWatcher : IDisposable
     public ChatMapLinkWatcher(IChatGui chat,IClientState client,IPluginLog log,Func<bool> enabled)
     {
         this.chat=chat;this.client=client;this.log=log;this.enabled=enabled;
-        chat.ChatMessageUnhandled+=OnMessage;
-        try{client.Logout+=OnLogout;}catch{chat.ChatMessageUnhandled-=OnMessage;throw;}
+        // X-76 H10 (0.924): subscriptions owned by one RegistrationScope: a failure part-way undoes the ones already made; Dispose releases them in reverse order.
+        try
+        {
+            registrations.Register(()=>chat.ChatMessageUnhandled+=OnMessage,()=>chat.ChatMessageUnhandled-=OnMessage);
+            registrations.Register(()=>client.Logout+=OnLogout,()=>client.Logout-=OnLogout);
+        }
+        catch{registrations.Dispose();throw;}
     }
 
     private void OnMessage(IChatMessage message)
@@ -69,8 +75,7 @@ public sealed class ChatMapLinkWatcher : IDisposable
     {
         if(disposed)return;
         disposed=true;
-        chat.ChatMessageUnhandled-=OnMessage;
-        client.Logout-=OnLogout;
+        registrations.Dispose();
         History.Clear();
     }
 }

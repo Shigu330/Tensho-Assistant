@@ -20,7 +20,7 @@ internal static class OceanFishing392Tests
             Check(schedule.Next(slot+TimeSpan.FromMinutes(16),1)[0].At==slot+TimeSpan.FromHours(2),"boarding closed after 15 minutes");
             var filtered = schedule.Next(slot+TimeSpan.FromMinutes(16),2,1);
             Check(filtered.All(departure=>departure.Aldenard!.Id==1) && filtered[0].At==slot+TimeSpan.FromHours(4) && filtered[1].At==slot+TimeSpan.FromHours(10),"filter by voyage");
-            Check(OceanSchedule.TimeOf(1)==OceanTime.Night && OceanSchedule.TimeOf(2)==OceanTime.Day && OceanSchedule.TimeOf(3)==OceanTime.Sunset && OceanSchedule.TimeOf(9)==OceanTime.Unknown,"moments");
+            Check(OceanSchedule.TimeOf(1)==OceanTime.Day && OceanSchedule.TimeOf(2)==OceanTime.Sunset && OceanSchedule.TimeOf(3)==OceanTime.Night && OceanSchedule.TimeOf(9)==OceanTime.Unknown,"moments");
             Check(routes[7].Label==OceanTime.Sunset,"named after the last stop");
         }),
     ];

@@ -37,7 +37,8 @@ internal static class PlaceMenus704Tests
         {
             var settings=new TenshoAssistant.Configuration();
             Check(settings.HoverVendors && !settings.HoverVendorsMetOnly && !settings.HoverVendorsByCurrency,"as before by default");
-            Check(Read("MainWindow.NpcVendors.cs").Contains("private int HoveredNpcCount(uint id)=>HoverOffers(id).Count;") && Read("MainWindow.NpcVendors.cs").Contains("HoverOffers(id) is not { Count:>0 } offers"),"vendor lines");
+            // 0.904 (X-76): the old vendor rows of the hover (HoveredNpcCount, DrawHoveredNpcs) had no caller left and were removed; the hover reads HoverOffers.
+            Check(!Read("MainWindow.NpcVendors.cs").Contains("DrawHoveredNpcs") && Read("MainWindow.ListPanels.cs").Contains("private IReadOnlyList<NpcVendorOffer> HoverOffers(uint item)"),"vendor lines");
             var hover=Read("MainWindow.MarketHover.cs");
             Check(hover.Contains("HoverOffers(item.Id) is { Count:>0 } offers") && hover.Contains("HoverOffers(id) is { Count:>0 } offers"),"sources");
         }),

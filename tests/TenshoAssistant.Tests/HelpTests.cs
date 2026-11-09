@@ -118,7 +118,7 @@ internal static class HelpTests
         ("Help: « ? » on every page, and a page in the navigation",() =>
         {
             Check(Read("src/TenshoAssistant/MainWindow.cs").Contains("DrawPageHelpButton();"),"the button beside the title");
-            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Help,\"Preferences\",PageLabel(\"Navigation.Help\"),DrawHelpPage,"),"the page");
+            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Help,\"References\",PageLabel(\"Navigation.Help\"),DrawHelpPage,"),"the page");
         }),
     ];
 }

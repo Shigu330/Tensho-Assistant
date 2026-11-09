@@ -11,16 +11,46 @@ namespace TenshoAssistant.Competitive;
 /// </summary>
 internal static class CompetitiveGate
 {
+    /// <summary>X-109 (0.979): developer mode, given once the configuration is loaded (the gate starts before it).</summary>
+    internal static Func<bool>? Developer { get; set; }
     private static readonly object Gate=new();
     private static readonly Dictionary<IFramework.OnUpdateDelegate,IFramework.OnUpdateDelegate> Wrappers=[];
     private static volatile bool cut;
     public static bool Cut=>cut;
+    // X-109 (0.981, DEC-047): in the Beastmaster labyrinth, the board window is open and the player is not in combat (docs/evidence/0.979-labyrinth-reading.md).
+    private static volatile bool labyrinthBoard;
+    public static bool LabyrinthBoard=>labyrinthBoard;
+    internal static void SetLabyrinthBoard(bool value)=>labyrinthBoard=value;
+    /// <summary>X-109 (0.981, DEC-047): a subscription that runs out of a cut, and during one only while the labyrinth's board is open (the team panel).</summary>
+    public static void AddBoard(IFramework framework,IFramework.OnUpdateDelegate handler)
+    {
+        void Guarded(IFramework running){if(!cut || labyrinthBoard)Timed(handler,running);}
+        lock(Gate)Wrappers[handler]=Guarded;
+        framework.Update+=Guarded;
+    }
     /// <summary>On the framework thread, when the cut starts (true) or ends (false).</summary>
     public static event Action<bool>? Changed;
 
+    /// <summary>
+    /// 0.992 (the log shows « Long CompetitiveGate…Guarded » hitches at each load, 90 to 144 ms, without saying which reader): in developer mode, a
+    /// subscription that takes more than 50 ms is named in the log, once per reader.
+    /// </summary>
+    internal static Action<string,double>? SlowSubscription { get; set; }
+    private static readonly HashSet<string> slowNamed=[];
+    private static void Timed(IFramework.OnUpdateDelegate handler,IFramework running)
+    {
+        if(Developer?.Invoke()!=true){handler(running);return;}
+        var started=System.Diagnostics.Stopwatch.GetTimestamp();
+        handler(running);
+        var spent=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+        if(spent<=50)return;
+        var name=$"{handler.Method.DeclaringType?.Name}.{handler.Method.Name}";
+        lock(Gate){if(!slowNamed.Add(name))return;}
+        SlowSubscription?.Invoke(name,spent);
+    }
     public static void Add(IFramework framework,IFramework.OnUpdateDelegate handler)
     {
-        void Guarded(IFramework running){if(!cut)handler(running);}
+        void Guarded(IFramework running){if(!cut)Timed(handler,running);}
         lock(Gate)Wrappers[handler]=Guarded;
         framework.Update+=Guarded;
     }
@@ -53,13 +83,25 @@ internal sealed class CompetitiveWatcher : IDisposable
     private readonly ICondition condition;
     private string arenaSeen="";
 
+    // X-109 (0.979, DEC-047): developer reading inside the labyrinth only, to prove when a fight starts (nothing else runs there).
+    private string labyrinthSeen="";
+    private DateTimeOffset labyrinthNext;
     public CompetitiveWatcher(IFramework framework,IClientState client,IDataManager data,IPluginLog log,IGameGui gui,ICondition condition)
     {
         this.framework=framework;this.client=client;this.log=log;this.gui=gui;this.condition=condition;
         try
         {
+            // X-92 (0.1001): the labyrinth's boards from the sheets (XBMContent column 0 = ContentFinderCondition); a failed read keeps the written list only.
+            var labyrinth=new List<uint>();
+            try
+            {
+                var finder=data.GetExcelSheet<ContentFinderCondition>();
+                foreach(var row in data.Excel.GetSheet<Lumina.Excel.RawRow>(null,"XBMContent"))
+                    if(row.RowId!=0 && Convert.ToUInt32(row.ReadColumn(0))is var content and not 0 && finder.GetRowOrDefault(content) is { } duty)labyrinth.Add(duty.TerritoryType.RowId);
+            }
+            catch(Exception error){log.Warning(error,"Labyrinth boards unreadable from the sheets: the written list stays.");}
             zones=CompetitiveZones.Build(data.GetExcelSheet<TerritoryType>().Select(row=>(row.RowId,row.IsPvpZone)),
-                data.GetExcelSheet<ContentFinderCondition>().Select(row=>(row.TerritoryType.RowId,row.PvP,row.ContentType.RowId)));
+                data.GetExcelSheet<ContentFinderCondition>().Select(row=>(row.TerritoryType.RowId,row.PvP,row.ContentType.RowId)),labyrinth);
         }
         // In doubt, stopped: after a game update that breaks these sheets Tensho stays cut rather than running in PvP.
         catch(Exception error){zones=null;log.Warning(error,"Competitive zones unavailable: Tensho stays stopped while logged in.");}
@@ -82,10 +124,50 @@ internal sealed class CompetitiveWatcher : IDisposable
     private bool Decide()=>CompetitiveZones.IsCut(client.IsLoggedIn,(uint)client.TerritoryType,client.IsPvP,zones,CompetitiveGate.Cut,InArenaInstance());
     private void Tick(IFramework _)
     {
+        // X-109 (0.981, DEC-047): the board is open (its window visible) and the player not in combat; anything else, or a failed read, is no board.
+        var board=false;
+        if(CompetitiveZones.IsLabyrinth((uint)client.TerritoryType))
+            try{var window=gui.GetAddonByName("XBMStageDetailList");board=!window.IsNull && window.IsVisible && !condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];}catch(Exception){board=false;}
+        if(board!=CompetitiveGate.LabyrinthBoard){CompetitiveGate.SetLabyrinthBoard(board);log.Information("Labyrinth board panel {0}: territory {1}.",board ? "on":"off",client.TerritoryType);}
+        if(CompetitiveGate.Developer?.Invoke()==true && CompetitiveZones.IsLabyrinth((uint)client.TerritoryType))
+            try{ReadLabyrinth();}catch(Exception error){if(labyrinthSeen!="failed"){labyrinthSeen="failed";log.Warning(error,"Labyrinth reading failed.");}}
         var now=Decide();
         if(now==CompetitiveGate.Cut)return;
         log.Information("Competitive cut {0}: territory {1}, PvP {2}.",now ? "on":"off",client.TerritoryType,client.IsPvP);
         CompetitiveGate.Set(now,true);
+    }
+    /// <summary>
+    /// X-109 (0.979, DEC-047): read only, twice a second, written on change: the game's « in combat » and « bound by duty » states and the names of the
+    /// visible windows, so the moment a fight starts (and the board's windows) can be told from the log. Developer mode only, labyrinth only.
+    /// </summary>
+    private unsafe void ReadLabyrinth()
+    {
+        var at=DateTimeOffset.UtcNow;
+        if(at<labyrinthNext)return;
+        labyrinthNext=at.AddMilliseconds(500);
+        var names=new List<string>();
+        var manager=FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkUnitManager.Instance();
+        if(manager!=null)
+        {
+            var layers=manager->AtkUnitManager.DepthLayers;
+            for(var layer=0;layer<layers.Length;layer++)
+            {
+                ref var list=ref layers[layer];
+                var count=Math.Min((int)list.Count,list.Entries.Length);
+                for(var index=0;index<count && names.Count<64;index++)
+                {
+                    FFXIVClientStructs.FFXIV.Component.GUI.AtkUnitBase* unit=list.Entries[index].Value;
+                    if(unit==null || !unit->IsVisible)continue;
+                    var name=unit->NameString;
+                    if(name.Length>0)names.Add(name);
+                }
+            }
+        }
+        var seen=$"territory {client.TerritoryType}, in combat {condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat]}, bound by duty {condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty]}, "
+            +$"cut {CompetitiveGate.Cut}, windows: {string.Join(", ",names.Distinct().Order(StringComparer.Ordinal))}";
+        if(seen==labyrinthSeen)return;
+        labyrinthSeen=seen;
+        log.Information("Labyrinth reading: {0}",seen);
     }
     public void Dispose()
     {

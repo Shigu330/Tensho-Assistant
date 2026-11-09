@@ -12,7 +12,7 @@ public static class ConfigurationReset
         "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenBase", "CollectableScrutinyGain", "CollectableIntuitionGain", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
-        "Voyages", "GearPlans", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
+        "Voyages", "OceanSightings", "WeatherStoryZones", "GearPlans", "DutyNotes", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
         // 0.503 (ONBOARD-001): the pages whose first-visit help was read.
@@ -22,7 +22,7 @@ public static class ConfigurationReset
         // 0.347 (g, I-08): the player's item notes and labels.
         "ItemNotes",
         // 0.360 (g, C-09): the player's wishlist.
-        "Wishlist",
+        "Wishlist", "WishlistPrices",
         // 0.368 (g, C-15): the achievements the player tracks.
         "TrackedAchievements",
         // 0.369 (g, X-03): the title chosen for each job.
@@ -51,13 +51,13 @@ public static class ConfigurationReset
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
         "HoverShowCompare",
-        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip",
+        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "ShowBeastBoardPanel", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
-        "CurrencyAlerts", "CurrencyServerBar", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
+        "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "WishlistSaleAlert", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringNextHighlight", "CacheLongerDefaults", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
-        "Discord", "ThemeMode", "ThemeModeBeforeTool", "CraftLogTryAllPresets", "GatherPlanFromList", "GatheringListHighlight", "ListPanelsByZone", "ListPanelsFinishedOnly", "ListPanelsNearbyMonsters", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
+        "Discord", "ThemeMode", "ThemeModeBeforeTool", "GameDataOnly", "CommunityBeforeGameOnly", "CommunityPaissa", "CraftLogTryAllPresets", "GatherPlanFromList", "GatheringListHighlight", "ListPanelsByZone", "ListPanelsFinishedOnly", "ListPanelsNearbyMonsters", "ListPanelsStorageHighlight", "Discovery", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
         // 0.347 (g, I-08): the two shop reminder settings (the notes themselves are saved data, kept by « restore every setting »).
         "ItemNoteShopReminder", "ItemNoteImportantSound",
@@ -143,11 +143,15 @@ public sealed class QuestListSettings
 public sealed class MapViewSettings
 {
     public bool ShowFixedIcons { get; set; } = true;
+    /// <summary>P11 (0.803): the parts of the map not discovered yet drawn as blank parchment, like the game's map.</summary>
+    public bool HideUndiscovered { get; set; } = true;
     public bool ShowPlaceNames { get; set; } = true;
     // 0.596 (P12): the names the game writes beside some icons.
     public bool ShowIconNames { get; set; } = true;
     public bool ShowQuests { get; set; } = true;
     public bool ShowQuestAreas { get; set; } = true;
+    // X-86 (0.966, user request): the quest markers the game shows locked (quests not available yet) can be hidden.
+    public bool ShowLockedQuests { get; set; } = true;
     public bool ShowFlag { get; set; } = true;
     public bool ShowPlayer { get; set; } = true;
     public float IconScale { get; set; } = 1f;
@@ -158,6 +162,12 @@ public sealed class MapViewSettings
     // 0.107: nearby objects, teleport, per-layer options and replacing the game map (requested by the user, on by default).
     public bool ShowTreasure { get; set; } = true;
     public bool ShowGathering { get; set; } = true;
+    // X-80 (0.895, user request: « gathering points should be split into miner, botanist and fisher »): under ShowGathering, one switch per gatherer.
+    public bool ShowMiningPoints { get; set; } = true;
+    public bool ShowBotanyPoints { get; set; } = true;
+    public bool ShowFishingPoints { get; set; } = true;
+    /// <summary>X-80 (0.895): a gathering job's points (16 miner, 17 botanist, 18 fisher: rod and spearfishing).</summary>
+    public bool ShowsGatherer(uint job)=>job switch{16=>ShowMiningPoints,17=>ShowBotanyPoints,_=>ShowFishingPoints};
     // N-09 (0.441): living hunt marks streamed around the player (B, A, S).
     public bool ShowHuntMarks { get; set; } = true;
     /// <summary>0.795 (X-35): nearby monsters that drop an item the tracking lists still need.</summary>
@@ -172,6 +182,17 @@ public sealed class MapViewSettings
     /// <summary>0.800 (X-41): nearby monsters that drop a mount, minion or orchestrion roll not owned.</summary>
     public bool ShowCollectionMonsters { get; set; } = true;
     public bool AboveCollection { get; set; }
+    /// <summary>0.804 (X-39): nearby monsters a beast not tamed yet is tamed from (wiki); as Beastmaster only, unless BeastMonstersAlways; the job icon above their head.</summary>
+    public bool ShowBeastMonsters { get; set; } = true;
+    public bool BeastMonstersAlways { get; set; }
+    public bool AboveBeast { get; set; } = true;
+    /// <summary>X-40 (0.1002, DEC-049): the list layer also counts every crafting list, not only the lists shown in a panel.</summary>
+    public bool ListMonstersAllLists { get; set; } = true;
+    /// <summary>X-40 (0.1002): monsters your relic book still asks for (after the Relics page read it), and monsters dropping an item of your wishlist.</summary>
+    public bool ShowRelicMonsters { get; set; } = true;
+    public bool AboveRelic { get; set; } = true;
+    public bool ShowWishMonsters { get; set; } = true;
+    public bool AboveWish { get; set; } = true;
     /// <summary>0.799 (X-38): icons above the heads of nearby monsters that matter, in the game's view; which reasons, their size, how far, and in combat.</summary>
     public bool MonsterIconsAbove { get; set; } = true;
     public bool AboveBlueSpell { get; set; } = true;
@@ -179,6 +200,9 @@ public sealed class MapViewSettings
     public bool AboveHuntLog { get; set; }
     public bool AboveFate { get; set; }
     public bool MonsterIconsHideInCombat { get; set; }
+    // 0.844 (X-67): an up or down arrow on quest, event and FATE icons above or below the player, and from which height difference (Tensho's choice).
+    public bool HeightArrows { get; set; } = true;
+    public float HeightArrowYalms { get; set; } = 10;
     public int MonsterIconSize { get; set; } = 32;
     public float MonsterIconDistance { get; set; } = 50;
     public bool GatheringLabels { get; set; } = true;
@@ -273,6 +297,8 @@ public sealed class MapViewSettings
     public bool ShowIslandRocks { get; set; } = true;
     public bool ShowIslandEarth { get; set; } = true;
     public bool ShowIslandFishing { get; set; } = true;
+    /// <summary>X-83 (0.901, user report: no icon beside an island animal): the island's wild animals that can be caught, with their icon.</summary>
+    public bool ShowIslandAnimals { get; set; } = true;
     /// <summary>An item of no known kind stays as long as one kind is shown.</summary>
     public bool ShowsIslandKind(TenshoAssistant.Maps.IslandResourceKind? kind)=>kind switch
     {
@@ -381,6 +407,8 @@ public sealed partial class Configuration
     public bool ShowCharacterPanel { get; set; } = true;
     // 0.537 (user request): Tensho's panels and bars step aside when a game window comes in front.
     public bool HidePanelsBehindGame { get; set; } = true;
+    // X-109 (0.981): the team panel beside the game's Beastmaster board.
+    public bool ShowBeastBoardPanel { get; set; } = true;
     public bool HideBarsBehindGame { get; set; } = true;
     // Duty loot panel beside the game's Duty Finder (0.185).
     public bool ShowDutyFinderLoot { get; set; } = true;
@@ -405,6 +433,8 @@ public sealed partial class Configuration
     private Dictionary<uint,int>? currencyThresholds;
     public bool CurrencyAlerts { get=>Volatile.Read(ref currencyAlerts); set=>Volatile.Write(ref currencyAlerts,value); }
     public bool CurrencyServerBar { get=>Volatile.Read(ref currencyServerBar); set=>Volatile.Write(ref currencyServerBar,value); }
+    // X-107 (0.986): the gil of the day in the server info bar (off by default).
+    public bool GilServerBar { get; set; }
     // 0.606: with the alerts, the weekly limit of the limited tomestones reached.
     public bool CurrencyWeeklyCapAlert { get; set; } = true;
     public Dictionary<uint,int>? CurrencyThresholds { get=>Volatile.Read(ref currencyThresholds); set=>Volatile.Write(ref currencyThresholds,value); }
@@ -423,6 +453,12 @@ public sealed partial class Configuration
     public bool RouteUnlockedOnly { get; set; } = true;
     // 0.310 (R-11): gear plans (job → slot → item) and the planner's filters.
     public Dictionary<uint,Dictionary<TenshoAssistant.Gear.GearSlot,uint>>? GearPlans { get; set; }
+    // X-90 (0.995): the player's notes and arena drawings, by duty (ContentFinderCondition row).
+    public Dictionary<uint,TenshoAssistant.Duties.DutyNote>? DutyNotes { get; set; }
+    // X-85 V1 (0.917): ocean fishing departures seen aboard (loop slot, route the game said); they settle the timetable of each port.
+    public List<TenshoAssistant.Gathering.OceanSighting>? OceanSightings { get; set; }
+    // X-96 (0.959): zones with a story weather where the game confirmed the standard forecast for this player (their story is done).
+    public List<uint>? WeatherStoryZones { get; set; }
     // 0.593 (T25): the other named plans of each job; the one in use stays in GearPlans and GearMateria.
     public Dictionary<uint,TenshoAssistant.Gear.GearPlanSet>? GearPlanSets { get; set; }
     // 0.602 (T28): by character, what the collections held at the last reading and what was gained since.
@@ -489,6 +525,10 @@ public sealed partial class Configuration
     public bool ListPanelsFinishedOnly { get; set; }
     /// <summary>0.795 (X-35): the list lines and the map say which nearby monster drops a needed item.</summary>
     public bool ListPanelsNearbyMonsters { get; set; } = true;
+    /// <summary>X-54 (0.820): frame, in an open retainer, saddlebag or company chest, the items of the crafting and workshop lists.</summary>
+    public bool ListPanelsStorageHighlight { get; set; } = true;
+    /// <summary>X-43 (0.807): the local base of discoveries, what it notes.</summary>
+    public TenshoAssistant.Discoveries.DiscoverySettings Discovery { get; set; } = new();
     // 0.480 (user report): Scrutiny in the collectable plan, and what the bonuses add, as measured in the game's window.
     public bool CollectableUseScrutiny { get; set; } = true;
     public bool CollectableUseRestore { get; set; } = true;
@@ -505,6 +545,12 @@ public sealed partial class Configuration
     public List<string>? GpForbiddenActions { get; set; } = [];
     // 0.477 (user report): the theme in use before a tool's was chosen, to come back to it. Null once the theme is chosen in the settings.
     public int? ThemeModeBeforeTool { get; set; }
+    // X-76 step 3 (0.945, user request): « game and observed data only » turns the seven community sources off at once; their choices are kept
+    // (one bit each: Lumina, Garland, Wiki, GatherBuddy, Teamcraft, Fashion, Universalis) and come back when it is unticked.
+    public bool GameDataOnly { get; set; }
+    // X-76 step 5 (0.949, user's go-ahead): PaissaDB (plots for sale) as a source with its switch, like the seven others.
+    public bool CommunityPaissa { get; set; }=true;
+    public int? CommunityBeforeGameOnly { get; set; }
     // 0.328 (map audit): « "MapView": null » in a hand-edited file becomes the defaults here, like Cache, so no draw path reads null.
     private MapViewSettings mapView=new();
     public MapViewSettings MapView {get=>mapView;set=>mapView=value ?? new();}
@@ -579,6 +625,9 @@ public sealed partial class Configuration
     // 0.360 (g, C-09): wishlist item ids, in the order they were added (replaced whole on every change).
     private List<uint>? wishlist;
     public List<uint>? Wishlist { get=>Volatile.Read(ref wishlist); set=>Volatile.Write(ref wishlist,value); }
+    // X-101 (0.1000, DEC-048): the player's price for each wish, and the sale alert (off by default).
+    public Dictionary<uint,long>? WishlistPrices { get; set; }
+    public bool WishlistSaleAlert { get; set; }
     // 0.368 (g, C-15): tracked achievement ids, 100 at most (replaced whole on every change).
     private List<uint>? trackedAchievements;
     public List<uint>? TrackedAchievements { get=>Volatile.Read(ref trackedAchievements); set=>Volatile.Write(ref trackedAchievements,value); }

@@ -67,22 +67,15 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();
                 foreach(var icon in new[]{set.IconHead,set.IconBody,set.IconLegs})
                 {
-                    if(icon!=0 && textures.TryGetFromGameIcon(new GameIconLookup(icon),out var shared) && shared.TryGetWrap(out var image,out _) && image is not null)
-                    {ImGui.Image(image.Handle,size);ImGui.SameLine();}
+                    if(DrawGameIcon(icon,size,false))ImGui.SameLine();
                 }
                 ImGui.TextUnformatted(set.Name);
                 ImGui.TableNextColumn();
                 ImGui.TextUnformatted(set.GrandCompany==0 ? localization.Get("ChocoboBarding.AnyCompany"):GrandCompanyName(set.GrandCompany));
                 ImGui.TableNextColumn();
-                // 0.341 (user screenshot: « ✗ » showed as « = », missing from the font): icons from the icon font, as the owned mark.
+                // 0.341 (user screenshot: « ✗ » showed as « = », missing from the font): icons from the icon font (DrawStateMark), as the owned mark.
                 if(unlocked is null)ImGui.TextDisabled(localization.Get("ChocoboBarding.Unknown"));
-                else
-                {
-                    var has=unlocked.Contains(set.Id);
-                    ImGui.PushFont(UiBuilder.IconFont);
-                    try{ImGui.TextColored(has ? Success:Muted,(has ? FontAwesomeIcon.Check:FontAwesomeIcon.Times).ToIconString());}
-                    finally{ImGui.PopFont();}
-                }
+                else DrawStateMark(unlocked.Contains(set.Id));
                 ImGui.TableNextColumn();
                 var item=set.ItemId==0 ? null:items?.Find(set.ItemId);
                 if(item is null){ImGui.TextDisabled(set.ItemId==0 ? localization.Get("ChocoboBarding.NoItem"):$"#{set.ItemId}");continue;}

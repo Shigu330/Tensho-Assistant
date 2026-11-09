@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using TenshoAssistant.UI;
 
 namespace TenshoAssistant.FreeCompany;
 
@@ -42,17 +43,10 @@ internal sealed class WorkshopDeliveryReader : IDisposable
         var addon=(AtkUnitBase*)handle.Address;
         if(addon->AtkValues==null || addon->AtkValuesCount<=Read132)return;
         var numbers=new int[Read132];
-        for(var index=0;index<numbers.Length;index++)numbers[index]=Number(addon->AtkValues[index]);
+        for(var index=0;index<numbers.Length;index++)numbers[index]=AtkValueRead.Number(addon->AtkValues[index]);
         var loaded=addon->AtkValues[10] is { Type:AtkValueType.Bool } flag && flag.Bool;
         if(WorkshopDelivery.FromWindow(numbers,loaded,DateTimeOffset.UtcNow) is { } read)seen(read.Result,read.Delivery);
     }
-
-    private static int Number(AtkValue value)=>value.Type switch
-    {
-        AtkValueType.UInt=>value.UInt>int.MaxValue ? -1:(int)value.UInt,
-        AtkValueType.Int=>value.Int,
-        _=>-1,
-    };
 
     public void Dispose()
     {

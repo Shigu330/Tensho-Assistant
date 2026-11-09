@@ -105,7 +105,7 @@ public static class VesselBuilds
 
     /// <summary>
     /// 0.334 (DEC-023, point 1): the 19 sectors where the embedded community value is below every observation of FFXIVGachaSpreadsheet
-    /// (docs/evidence/0.315-vessel-builds.md, « Seuils de butin par secteur »): a tier shown as reached there is confirmed by no record.
+    /// (docs/evidence/0.315-vessel-builds.md, the loot breakpoints per sector): a tier shown as reached there is confirmed by no record.
     /// </summary>
     public static readonly IReadOnlySet<uint> UnconfirmedSectors=new HashSet<uint>{81,86,92,98,105,109,111,112,121,125,126,130,132,133,144,145,146,147,148};
     public static bool Unconfirmed(IEnumerable<uint> sectors)=>sectors.Any(UnconfirmedSectors.Contains);

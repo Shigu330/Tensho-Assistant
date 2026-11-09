@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using TenshoAssistant.Items;
+using TenshoAssistant.UI;
 
 namespace TenshoAssistant.Craft;
 
@@ -109,8 +110,7 @@ internal sealed class CraftLiveReader : IDisposable
                 if(CurrentOwner!=current){service.BeginRead(CurrentOwner);return;}
                 if(objects.LocalPlayer?.Address!=local.Address || player.ClassJob.RowId!=raw.JobId || objects.LocalPlayer?.ClassJob.RowId!=raw.JobId)
                 {service.Missing(ticket,current,CraftLiveStatusKind.NotReady);return;}
-                var after=gui.GetAddonByName("Synthesis");
-                if(after.IsNull || after.Address!=handle.Address || !after.IsReady || !after.IsVisible || gui.GameUiHidden
+                if(!GameWindowCheck.StillShown(gui,"Synthesis",handle)
                     || eventFramework->GetCraftEventHandler()!=handler || handler->RecipeId!=recipe || handler->StepNumber!=step || handler->Condition!=condition
                     || (byte)handler->CraftFlags!=nativeFlags || Numbers(addon)!=numbers || local.CurrentCp!=raw.Cp || local.MaxCp!=raw.MaxCp || MainHand()!=toolBefore)
                 {service.Missing(ticket,current,CraftLiveStatusKind.NotReady);return;}

@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
         string? sheetTab = focusStocksTab ? "Stocks" : focusCraftTab ? "Craft" : focusUsesTab ? "Uses" : focusGatherTab ? "Gathering" : null;
         focusStocksTab = focusCraftTab = focusUsesTab = focusGatherTab = false;
         if (sheetTab is not null) itemSheetFocus = sheetTab;
-        // 0.280 (R-06 step 3): « Objets » is the search and the item sheet; storages, crystals and imports moved to « Rangements ».
+        // 0.280 (R-06 step 3): « Items » is the search and the item sheet; storages, crystals and imports moved to « Storage ».
         DrawItemSearch();
         DrawManualItemId();
         DrawItemSheet();
@@ -69,7 +69,7 @@ internal sealed partial class MainWindow
         if (!snapshot.Containers.TryGetValue(location, out var container)
             || container.Coverage == InventoryCoverage.Unknown)
         {
-            ImGui.TextWrapped(localization.Get("ItemsUi.CrystalLoading"));
+            EmptyState("ItemsUi.CrystalLoading");
             return;
         }
         if (container.Quantities.Count == 0)
@@ -94,8 +94,6 @@ internal sealed partial class MainWindow
 
     private static readonly string[] CrystalElements = CrystalClassifier.Elements;
     private static readonly string[] CrystalSizes = CrystalClassifier.Sizes;
-    private static readonly string[] CrystalElementKeys=["Fire","Ice","Wind","Earth","Lightning","Water"];
-    private static readonly string[] CrystalSizeKeys=["Shards","Crystals","Clusters"];
 
     private void DrawCrystalElementTable(IReadOnlyList<CrystalCell> crystals)
     {
@@ -109,13 +107,13 @@ internal sealed partial class MainWindow
             foreach (var element in CrystalElements)
             {
                 ImGui.TableNextColumn();
-                ImGui.TextColored(Accent, localization.Get("CrystalElements."+CrystalElementKeys[Array.IndexOf(CrystalElements,element)]));
+                ImGui.TextColored(Accent, localization.Get("CrystalElements."+element));
             }
             foreach (var size in CrystalSizes)
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
-                ImGui.TextDisabled(localization.Get("CrystalSizes."+CrystalSizeKeys[Array.IndexOf(CrystalSizes,size)]));
+                ImGui.TextDisabled(localization.Get("CrystalSizes."+size));
                 foreach (var element in CrystalElements)
                 {
                     ImGui.TableNextColumn();
@@ -240,7 +238,7 @@ internal sealed partial class MainWindow
 
     private void DrawRecipes()
     {
-        // 0.292: shown inside the sheet's « Craft lié » tab; the header that repeated the tab name is gone.
+        // 0.292: shown inside the sheet's « Related crafting » tab (ItemsUi.Craft); the header that repeated the tab name is gone.
         ImGui.PushStyleColor(ImGuiCol.ChildBg, TenshoAssistant.UI.FfxivTheme.Panel);
         ImGui.PushStyleColor(ImGuiCol.Border, TenshoAssistant.UI.FfxivTheme.Border);
         var visible = ImGui.BeginChild("RecipePanel", new Vector2(-1, 0), true);
@@ -444,7 +442,7 @@ internal sealed partial class MainWindow
                 craftBookFilter = string.Empty;
         }
         finally { ImGui.PopFont(); }
-        if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("RecipeUi.AllJobs"));
+        Tip("RecipeUi.AllJobs");
 
         foreach (var (craftType, craftTypeId) in craftTypes)
         {
@@ -453,14 +451,14 @@ internal sealed partial class MainWindow
             try
             {
                 var selected = string.Equals(craftBookFilter, craftType, StringComparison.Ordinal);
-                if (selected) ImGui.PushStyleColor(ImGuiCol.Button, Accent);
+                if (selected) ImGui.PushStyleColor(ImGuiCol.Button, Selected);
                 var clicked = ImGui.Button("##CraftBookJob", new Vector2(38, 38));
                 var buttonPosition = ImGui.GetItemRectMin();
                 var buttonHovered = ImGui.IsItemHovered();
                 ImGui.SetCursorScreenPos(buttonPosition + new Vector2(3));
                 // Native framed class icons: 62100 + ClassJob ID, crafters 8..15.
                 if (craftTypeId < 8)
-                    DrawItemIcon(new ItemDefinition(0, craftType, false, 62108 + craftTypeId), new Vector2(32));
+                    DrawGameIcon(62108 + craftTypeId,new Vector2(32));
                 // 0.207: the icon was the last item, so the next SameLine started after it (3 px lower and further right each time);
                 // an invisible item over the button restores the button's place for the next one.
                 ImGui.SetCursorScreenPos(buttonPosition);
@@ -482,9 +480,9 @@ internal sealed partial class MainWindow
         RecipeLog?.Want();
         if (RecipeLog?.State?.WasCrafted(recipe.RecipeId) is not { } crafted) return;
         ImGui.SameLine();
-        if (crafted) ImGui.TextDisabled(localization.Get("RecipeUi.Crafted"));
+        if (crafted) { DrawStateMark(true); ImGui.SameLine(); ImGui.TextDisabled(localization.Get("RecipeUi.Crafted")); }
         else ImGui.TextColored(Accent, localization.Get("RecipeUi.NeverCrafted"));
-        if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("RecipeUi.CraftedTip"));
+        Tip("RecipeUi.CraftedTip");
     }
     private void DrawCraftBook(IReadOnlyList<RecipeDefinition> recipes, string source)
     {
@@ -618,7 +616,7 @@ internal sealed partial class MainWindow
             var buttonWidth = Math.Max(90, ImGui.CalcTextSize(label).X + 20);
             if (ImGui.Selectable($"{label}##IngredientButton", false, ImGuiSelectableFlags.None, new Vector2(buttonWidth, 30)))
                 SelectItem(ingredient.ItemId);
-            if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("RecipeUi.IngredientHint"));
+            Tip("RecipeUi.IngredientHint");
             ImGui.SameLine();
             ImGui.TextDisabled($"× {ingredient.Amount}");
             ImGui.SameLine();
@@ -784,7 +782,7 @@ internal sealed partial class MainWindow
         }
         if (searchResults.Count == 0)
         {
-            ImGui.TextUnformatted(localization.Get("ItemsUi.Empty"));
+            EmptyState("ItemsUi.Empty");
             return;
         }
         // 0.292 (user request): the result list folds, leaving the room to the item sheet.

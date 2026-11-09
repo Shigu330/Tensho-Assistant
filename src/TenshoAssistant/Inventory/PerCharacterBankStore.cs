@@ -1,7 +1,7 @@
 namespace TenshoAssistant.Inventory;
 
 /// <summary>
-/// g, I-03 (0.345, user's choice « un fichier par personnage »): the bank kept as one file per character, InventoryBank/&lt;id&gt;.json,
+/// g, I-03 (0.345, user's choice: one file per character): the bank kept as one file per character, InventoryBank/&lt;id&gt;.json,
 /// each read and written by its own <see cref="FileInventoryBankStore"/> (same bounds and checks, .bak copy, a corrupt file fails
 /// closed). The id is the local character id the game gives the logged-in character (ContentId), never an Account ID.
 /// Only the characters whose entries changed are written; a character no longer in the list (erased) has its files deleted.

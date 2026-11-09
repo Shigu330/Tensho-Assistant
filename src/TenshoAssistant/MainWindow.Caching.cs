@@ -27,9 +27,7 @@ internal sealed partial class MainWindow
                     for(var index=0;index<CacheChoiceKeys.Length;index++)
                     {
                         if(!ImGui.Selectable(localization.Get("CacheDuration."+CacheChoiceKeys[index]),selected==index))continue;
-                        var previous=configuration.Cache;configuration.Cache=previous.With(area,(CacheRetention)index);
-                        try{save();saveError=null;}
-                        catch(Exception error){configuration.Cache=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not persist cache policy.");}
+                        SaveCache(configuration.Cache.With(area,(CacheRetention)index));
                     }
                 }
                 finally{ImGui.EndCombo();}
@@ -39,9 +37,7 @@ internal sealed partial class MainWindow
             var byDefault=DefaultConfiguration.Cache.Get(area);
             if(DefaultButton("Cache"+area,configuration.Cache.Get(area)!=byDefault))
             {
-                var previous=configuration.Cache;configuration.Cache=previous.With(area,byDefault);
-                try{save();saveError=null;}
-                catch(Exception error){configuration.Cache=previous;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not persist cache policy.");}
+                SaveCache(configuration.Cache.With(area,byDefault));
             }
         }
         ImGui.TextWrapped(localization.Get("CacheUi.QuestHelp"));
@@ -49,6 +45,43 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(localization.Get("CacheUi.NativeHelp"));
         ImGui.TextWrapped(localization.Get("CacheUi.LiveHelp"));
         if(dataCacheStore?.Error is { } errorText)DrawDataError(errorText,"ServiceErrors.Cache");
+        DrawCacheClear();
+    }
+
+    // X-76 step 3 (0.945, user request): empty the cache, a zip copy taken just before (Backups folder).
+    private bool cacheClearAsked;private string? cacheClearMessage;
+    private void DrawCacheClear()
+    {
+        if(dataCacheStore is not { } store)return;
+        if(!cacheClearAsked){if(ImGui.SmallButton(localization.Get("CacheUi.Clear")))cacheClearAsked=true;Tip("CacheUi.ClearTip");}
+        else
+        {
+            ImGui.TextColored(Warning,localization.Get("CacheUi.ClearSure"));
+            if(ImGui.SmallButton(localization.Get("CacheUi.ClearYes")))
+            {
+                cacheClearAsked=false;cacheClearMessage=localization.Get("CacheUi.Clearing");
+                var root=store.Root;var backups=Path.Combine(Path.GetDirectoryName(root) ?? root,"Backups");
+                _=Task.Run(async()=>
+                {
+                    try
+                    {
+                        var copy=BackupZip.Create(root,backups,"cache",DateTimeOffset.UtcNow);
+                        var removed=await store.ClearAsync().ConfigureAwait(false);
+                        cacheClearMessage=localization.Format("CacheUi.Cleared",removed,copy ?? "—");
+                    }
+                    catch(Exception error){log.Warning(error,"The cache could not be emptied.");cacheClearMessage=localization.Get("CacheUi.ClearFailed");}
+                });
+            }
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("CacheUi.ClearNo")))cacheClearAsked=false;
+        }
+        if(cacheClearMessage is { } message)ImGui.TextDisabled(message);
+    }
+    // X-76 H3 (0.914): one cache duration chosen or reset; the previous durations come back when saving fails.
+    private void SaveCache(CachePreferences next)
+    {
+        var previous=configuration.Cache;configuration.Cache=next;
+        TrySave("Cache durations",()=>configuration.Cache=previous);
     }
     private void DrawCacheStamp(CacheArea area,DateTimeOffset? date,bool restored=false)
     {

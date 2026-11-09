@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
+using TenshoAssistant.UI;
 
 namespace TenshoAssistant.MiniGames;
 
@@ -68,8 +69,7 @@ internal sealed class TriadObservationReader : IDisposable
                 var board = Copy(addon->Board);
                 var context = Context(addon, phase);
                 if (CurrentOwner != character) { service.BeginRead(CurrentOwner); return; }
-                var after = gui.GetAddonByName("TripleTriad");
-                if (after.IsNull || after.Address != handle.Address || !after.IsReady || !after.IsVisible || gui.GameUiHidden)
+                if (!GameWindowCheck.StillShown(gui, "TripleTriad", handle))
                 { service.Missing(ticket,character,TriadObservationStatus.NotReady); return; }
                 service.Publish(ticket,character,phase,blue,red,board,context);
             }
@@ -128,8 +128,8 @@ internal sealed class TriadObservationReader : IDisposable
                 AtkValueType.Int => value.Int.ToString(),
                 AtkValueType.UInt => value.UInt.ToString(),
                 AtkValueType.Bool => value.Byte != 0 ? "true" : "false",
-                AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString => Bounded(value.String),
                 AtkValueType.Undefined => null,
+                _ when AtkValueRead.IsText(value.Type) => Bounded(value.String),
                 _ => $"<{value.Type}>",
             };
             if (shown is not null) text.Append(index).Append(':').Append(shown).Append(';');
@@ -166,7 +166,7 @@ internal sealed class TriadObservationReader : IDisposable
         for (var index = 5; index <= 9 && known; index++)
         {
             var value = unit->AtkValues[index];
-            if (value.Type is not (AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString)) { known = false; break; }
+            if (!AtkValueRead.IsText(value.Type)) { known = false; break; }
             var name = Bounded(value.String).Trim('"');
             if (name.Length == 0) continue;
             if (!ruleIds!.TryGetValue(name, out var rule)) known = false;
@@ -316,9 +316,9 @@ internal sealed class TriadObservationReader : IDisposable
         lastEditDeck = line;
         log.Information("Triad {Window} capture: values={Values} images={Images}", unit->NameString, Values(unit), line);
     }
-    // R-14 (0.452): same guard as GatheringObservationReader: no node list, a count beyond its allocated size or a component not fully loaded is not walked.
+    // R-14 (0.452): the shared guard (UiNodes.Walkable, X-76): no node list, a count beyond its allocated size or a component not fully loaded is not walked.
     private static unsafe bool Walkable(AtkUldManager* manager, int depth)
-        => manager != null && depth <= 4 && manager->NodeList != null && manager->NodeListCount <= manager->NodeListSize && manager->LoadedState == AtkLoadState.Loaded;
+        => depth <= 4 && UiNodes.Walkable(manager);
     // Visible card images of the editor's list: texture ui/icon/088000/088NNN(_hr1).tex = card NNN.
     private static unsafe void ListedCards(AtkUldManager* manager, int depth, List<(uint, TriadRect)> cards)
     {

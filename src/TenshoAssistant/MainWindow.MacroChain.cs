@@ -28,7 +28,7 @@ internal sealed partial class MainWindow
         var state = macroChain.State;
         var active = state.Sequence.Status is MacroSequenceStatus.Ready or MacroSequenceStatus.AwaitingStart or MacroSequenceStatus.Running;
         ImGui.TextWrapped(localization.Get("MacroUi.Help"));
-        if (ImGui.SmallButton(localization.Get("MacroUi.Copy"))) ImGui.SetClipboardText(MacroDefinition.Marker);
+        CopyButton(localization.Get("MacroUi.Copy"),()=>MacroDefinition.Marker);
         ImGui.SameLine();
         if (ImGui.SmallButton(localization.Get("MacroUi.Refresh"))) macroChain.RequestRefresh();
         if (state.Loading) ImGui.TextDisabled(localization.Get("MacroUi.Loading"));
@@ -53,7 +53,7 @@ internal sealed partial class MainWindow
                     ImGui.PushID($"Macro{macro.Slot.Book}/{macro.Slot.Index}");
                     try
                     {
-                        DrawItemIcon(new ItemDefinition(0, macro.Slot.Name, false, macro.IconId), new Vector2(24));
+                        DrawGameIcon(macro.IconId,new Vector2(24));
                         ImGui.SameLine();
                         if (ImGui.SmallButton(localization.Get("MacroCounts.Add")+$"###AddMacro{macro.Slot.Index}") && macroPlan.Count < 32)
                         { macroPlan.Add(macro.Slot); macroPlanSaved = false; }

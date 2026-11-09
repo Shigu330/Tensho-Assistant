@@ -35,7 +35,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(ReadCarnivale is null || carnivaleRead is not null);
         try{if(ImGui.Button(localization.Get("MaskedCarnivale.Read")))carnivaleRead=ReadCarnivale!(stages);}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("MaskedCarnivale.ReadTip"));
+        Tip("MaskedCarnivale.ReadTip");
         if(carnivaleReadFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("MaskedCarnivale.Unavailable"));return;}
         if(carnivaleSnapshot is not { } current)return;
         switch(current.Status)

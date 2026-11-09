@@ -51,8 +51,7 @@ internal sealed partial class MainWindow
     // A wiki line naming an achievement in English, matched to the game's achievement (0.180).
     private CollectionEntry? AchievementNamed(Community.WikiAcquisitionLine line)=>
         line.Heading.Equals("Achievement",StringComparison.OrdinalIgnoreCase) || line.Heading.Equals("Achievements",StringComparison.OrdinalIgnoreCase)
-            ? collections.State.Entries.FirstOrDefault(entry=>entry.Kind==CollectionKind.Achievement && entry.Achievement is { EnglishName.Length:>0 } metadata
-                && metadata.EnglishName.Equals(line.Text,StringComparison.OrdinalIgnoreCase)):null;
+            ? AchievementByEnglishName(line.Text):null; // X-76 (0.955): a look-up in the collection index (UI/Components/DataIndexes.cs), not a scan per line and frame.
     // 0.331: the state filter and the category are reset to the achievement's, which they could hide (as OpenCompletion).
     private void OpenAchievement(CollectionEntry achievement)
     {
@@ -60,13 +59,13 @@ internal sealed partial class MainWindow
         collectionFilter=0;achievementCategoryFilter=achievement.Achievement?.CategoryId;IsOpen=true;
     }
 
-    private string VendorPlace(Npcs.NpcVendor vendor)=>vendor.Locations.FirstOrDefault() is { } place ? NpcPlace(place):localization.Get("NpcUi.NoLocation");
+    private string VendorPlace(Npcs.NpcVendor vendor)=>VendorLocations(vendor).FirstOrDefault() is { } place ? NpcPlace(place):localization.Get("NpcUi.NoLocation");
     // Vendor line (opens the vendor tool) and, when placed, its map flag sub-link.
     private void DrawVendorLink(uint itemId,Npcs.NpcVendor vendor,string label)
     {
         if(ImGui.Selectable(label+$"##SrcNpc{itemId}/{vendor.NpcId}")){npcVendorFocus=vendor.NpcId;page=Page.NpcVendors;IsOpen=true;}
-        NpcMenu($"SrcNpcMenu{itemId}/{vendor.NpcId}",NpcName(vendor),vendor.NpcId,vendor.Locations);
-        if(vendor.Locations.FirstOrDefault() is { } place && maps.State.Catalog?.Find(place.MapId) is { } map
+        NpcMenu($"SrcNpcMenu{itemId}/{vendor.NpcId}",NpcName(vendor),vendor.NpcId,VendorLocations(vendor));
+        if(VendorLocations(vendor).FirstOrDefault() is { } place && maps.State.Catalog?.Find(place.MapId) is { } map
            && ImGui.Selectable("    "+localization.Get("SourceLinks.Flag")+$"##SrcFlag{itemId}/{vendor.NpcId}"))PlaceFlagFromMapView(map,place.X,place.Y);
     }
 
@@ -79,11 +78,11 @@ internal sealed partial class MainWindow
         return catalog.SalesOf(itemId).Where(sale=>!sold.Contains(sale.ShopId) && (currency is null || sale.Costs.Any(cost=>cost.CurrencyItemId==currency)))
             .SelectMany(sale=>data.NpcsOfShop(sale.ShopId)).Distinct().Take(4)
             .Select(npc=>(npc,data.NpcName(npc) is { Length:>0 } name ? char.ToUpper(name[0],System.Globalization.CultureInfo.CurrentCulture)+name[1..]:npc.ToString(),
-                data.PlaceOf(npc) is { } place ? new Npcs.NpcLocation(place.TerritoryId,place.MapId,maps.State.Catalog?.Find(place.MapId)?.Zone ?? "",place.X,place.Y,0,0,0):null))
+                SeenNpcPlace(npc) ?? (data.PlaceOf(npc) is { } place ? new Npcs.NpcLocation(place.TerritoryId,place.MapId,maps.State.Catalog?.Find(place.MapId)?.Zone ?? "",place.X,place.Y,0,0,0):null)))
             .ToArray();
     }
     /// <summary>Menu entries for the sources of these items; false when none is known.</summary>
-    // 0.251 (user request): the sources are grouped by kind, each group a sub-menu that opens on hover (« Échanges (12) »…);
+    // 0.251 (user request): the sources are grouped by kind, each group a sub-menu that opens on hover (« Exchanges (12) »…);
     // lines with the same text are shown once (the same NPC listed under several ids). Craft and gathering stay one line each.
     // 0.256: the lines are computed once (SourceLines) and drawn either in Tensho (ImGui) or in the game's inventory menu.
     private enum SourceGroup { Achievements, Duties, FromItems, Trades, Vendors, Quests, Craft, Gathering }
@@ -156,12 +155,19 @@ internal sealed partial class MainWindow
                 if(AchievementNamed(line) is { } named)
                     Add(SourceGroup.Achievements,localization.Format("SourceLinks.Achievement",named.Name),()=>OpenAchievement(named));
             // Duties from LuminaSupplemental (ContentFinderCondition id = DutyId, 0.188), then those named by Garland (« instance », 0.181).
-            var dutyList=LuminaDutiesOf(item.Id).Take(4).Select(id=>duties.State.Catalog?.Find(id))
+            // X-75.2 (0.875): duties whose chests were seen in game giving it (yours or shared) come first.
+            var dutyList=(Seen()?.DutiesByItem.GetValueOrDefault(item.Id) ?? []).Concat(LuminaDutiesOf(item.Id)).Distinct().Take(4).Select(id=>duties.State.Catalog?.Find(id))
                 .Concat((Garland(item.Id)?.List?.Sources ?? []).Where(source=>source.Type=="instance").Take(4)
                     .Select(source=>duties.State.Catalog?.Entries.FirstOrDefault(duty=>duty.InstanceId==source.Id)));
             foreach(var duty in dutyList)
                 if(duty is { } lootDuty)
                     Add(SourceGroup.Duties,localization.Format("SourceLinks.Duty",lootDuty.Name),()=>{dutyLoot.Select(lootDuty);showDutyDetails=true;dutyItemQuery="";page=Page.DutyLoot;});
+            // X-75.2 (0.875): the items it was seen in game coming from (yours or shared: desynthesis, opened), before LuminaSupplemental's.
+            foreach(var source in (Seen()?.SourcesByItem.GetValueOrDefault(item.Id) ?? []).Take(4))
+            {
+                var name=itemCatalog.State.Catalog?.Find(source)?.Name ?? source.ToString();
+                Add(SourceGroup.FromItems,localization.Format("SourceLinks.SeenFromItem",name),()=>{SelectItem(source);OpenItemSheet();});
+            }
             // Items the item comes from (LuminaSupplemental ItemSupplement, 0.197): opens the source item and its own sources.
             foreach(var (kind,_,sources) in lumina?.State.Data?.SupplementsOf(item.Id) ?? [])
                 foreach(var source in sources.Take(4))

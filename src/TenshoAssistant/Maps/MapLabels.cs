@@ -2,11 +2,6 @@ using System.Numerics;
 
 namespace TenshoAssistant.Maps;
 
-/// <summary>
-/// 0.596 (P12): where the name of a map icon goes, as on the game's map. Measured from the MapMarker sheet: 1 left, 2 right, 3 below, 4 above
-/// (docs/evidence/0.596-map-label-orientation.md); the rare other values are not established and go to the right.
-/// </summary>
-/// <summary>P17 (0.652): a leve's marker on the map: the icon read in game, or a tooltip naming a row of the Leve sheet (docs/evidence/0.652-leve-markers.md).</summary>
 /// <summary>P22 (0.665): what a quest icon's variant is known to mean (docs/evidence/0.665-quest-icon-variants.md). Variant 1 is the quest on offer; a locked variant 5 marks a step of a quest under way. The others say their number.</summary>
 public static class MapQuestIcons
 {
@@ -14,6 +9,7 @@ public static class MapQuestIcons
     public static bool IsStep(bool locked,int variant)=>locked && variant==5;
 }
 
+/// <summary>P17 (0.652): a leve's marker on the map: the icon read in game, or a tooltip naming a row of the Leve sheet (docs/evidence/0.652-leve-markers.md).</summary>
 public static class MapLeves
 {
     public const uint AreaIcon=60492;
@@ -26,9 +22,35 @@ public static class MapLeves
 }
 
 /// <summary>
-/// 0.653 (user report): while the journal has the game's map on a leve, the game empties its event markers, every one of them, and fills them again once that request ends
-/// (docs/evidence/0.653-markers-during-journal-request.md). Those read just before stay until then, on the same map.
+/// 0.813 (X-49, user report: a quest target stays after the quest step is done): the game's journal request carries no quest (« quest 0 » in the log), so
+/// the target is tied to the accepted quest whose point stands at the same place when it is set; it goes once that quest has no point there any more.
 /// </summary>
+public static class MapQuestTarget
+{
+    public const float Near=6;
+    /// <summary>The quest with a point within a few yalms of the target; 0 when none.</summary>
+    public static uint QuestAt(IReadOnlyList<(uint Quest,uint Map,float X,float Z)> points,uint map,Vector2 world)
+        =>points.Where(point=>point.Map==map && Vector2.Distance(new(point.X,point.Z),world)<=Near).Select(point=>point.Quest).FirstOrDefault();
+    /// <summary>True when that quest no longer has a point there (step done, quest done or given up).</summary>
+    public static bool Gone(IReadOnlyList<(uint Quest,uint Map,float X,float Z)> points,uint quest,uint map,Vector2 world)
+        =>quest!=0 && !points.Any(point=>point.Quest==quest && point.Map==map && Vector2.Distance(new(point.X,point.Z),world)<=Near);
+}
+
+/// <summary>
+/// 0.848 (X-70, user report: a quest's new area missing until the game map is closed and opened again). The game map window's list (AgentMap.EventMarkers) is
+/// rebuilt only when that window opens; the game's own quest list (Map.QuestMarkers) follows each step at once (log 2026-11-08 00:36:56: quest 2607 on map 371,
+/// radius 35, with the window's list empty). The quests that list renders replace the window's markers of the same quests; other markers stay.
+/// </summary>
+public static class MapQuestEvents
+{
+    public static IReadOnlyList<T> Merge<T>(IReadOnlyList<T> window,IReadOnlyList<T> quests,Func<T,(bool Quest,uint Key)> key)
+    {
+        if(quests.Count==0)return window;
+        var fresh=quests.Select(marker=>key(marker).Key).ToHashSet();
+        return [..window.Where(marker=>key(marker) is not { Quest:true } known || !fresh.Contains(known.Key)),..quests];
+    }
+}
+
 /// <summary>
 /// 0.793 (X-32, user request: what opening and closing the game map unblocked): the game's own leve markers (UIState Map) hold a leve's area while the map
 /// window's list is still empty (docs/evidence/0.793-game-leve-markers.md). They are added to what the map window gives, each once: the same map, icon and
@@ -51,6 +73,10 @@ public static class MapGameLeves
     }
 }
 
+/// <summary>
+/// 0.653 (user report): while the journal has the game's map on a leve, the game empties its event markers, every one of them, and fills them again once that request ends
+/// (docs/evidence/0.653-markers-during-journal-request.md). Those read just before stay until then, on the same map.
+/// </summary>
 public static class MapEventHold
 {
     public static bool Holds(int read,bool journalRequest,uint currentMap,uint keptMap)=>read==0 && journalRequest && currentMap!=0 && currentMap==keptMap;
@@ -128,7 +154,10 @@ public static class MapLabels
         return kept.ToArray();
     }
 
-    /// <summary>The top-left corner of the text, from the icon's centre.</summary>
+    /// <summary>
+    /// The top-left corner of the text, from the icon's centre. 0.596 (P12): where the name of a map icon goes, as on the game's map. Measured from the MapMarker
+    /// sheet: 1 left, 2 right, 3 below, 4 above (docs/evidence/0.596-map-label-orientation.md); the rare other values are not established and go to the right.
+    /// </summary>
     public static Vector2 Offset(byte orientation,float iconSize,Vector2 text)
     {
         var gap=iconSize/2+1;

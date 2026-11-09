@@ -3,8 +3,6 @@ namespace TenshoAssistant.Craft;
 /// <summary>W-09 (0.699): where an item comes from, for the on-screen lists. What several sources give goes under the first of these.</summary>
 public enum ItemOrigin { Gathering,Vendor,Monster,Other,Crystal }
 
-public sealed record BaseMaterial(uint Item,long Needed,ItemOrigin Origin);
-
 public static class BaseMaterials
 {
     /// <summary>How deep recipes are followed; the recursion stops here whatever the game's data holds.</summary>
@@ -23,10 +21,6 @@ public static class BaseMaterials
 
     public static ItemOrigin OriginOf(bool gathered,bool sold,bool dropped)=>gathered ? ItemOrigin.Gathering:sold ? ItemOrigin.Vendor:dropped ? ItemOrigin.Monster:ItemOrigin.Other;
 
-    /// <summary>
-    /// What has to be fetched for a list: a crafted item not in stock is replaced by its ingredients, unless it can be gathered or bought (<paramref name="fetched"/>). Crafted items in stock
-    /// are used first, all from one stock. Base items keep their whole need, so that the list shows their stock against it. Each once, in the order it first comes.
-    /// </summary>
     /// <summary>
     /// 0.752 (X-05, user request): the gathered lines of a list, by zone, for fewer trips: the zone where the most remaining items grow comes first and takes them,
     /// then the next among what is left. An item with no zone goes last, under an empty name. Zones of equal weight keep their name order.
@@ -91,6 +85,10 @@ public static class BaseMaterials
         return runs.Select(pair=>new CraftStep(pair.Key,recipes[pair.Key],pair.Value,deepest-level[pair.Key]+1){Needed=asked[pair.Key]}).OrderBy(step=>step.Step).ToArray();
     }
 
+    /// <summary>
+    /// What has to be fetched for a list: a crafted item not in stock is replaced by its ingredients, unless it can be gathered or bought (<paramref name="fetched"/>). Crafted items in stock
+    /// are used first, all from one stock. Base items keep their whole need, so that the list shows their stock against it. Each once, in the order it first comes.
+    /// </summary>
     public static IReadOnlyList<(uint Item,long Needed)> Expand(IEnumerable<(uint Item,long Amount)> wanted,Func<uint,long> stock,Func<uint,RecipeDefinition?> recipeOf,Func<uint,bool> fetched)
     {
         var needed=new Dictionary<uint,long>();var order=new List<uint>();var used=new Dictionary<uint,long>();var open=new HashSet<uint>();
@@ -106,6 +104,10 @@ public static class BaseMaterials
             var free=Math.Max(0,stock(item)-used.GetValueOrDefault(item));
             var taken=Math.Min(free,amount);
             used[item]=used.GetValueOrDefault(item)+taken;
+            // 0.838 (X-65, user report: the birch syrup held, 157/1, was in no group, so neither seen nor marked as kept by a retainer): an ingredient that is
+            // crafted but taken from the stock stays a line, for the part taken; the list's own items are left as before.
+            // 0.841 (X-65, log « List panel CraftList »: the crafting list hands its direct ingredients, the syrup among them, at the first level): every level.
+            if(taken>0)Base(item,taken);
             amount-=taken;
             if(amount==0)return;
             var runs=(amount+recipe.ResultAmount-1)/recipe.ResultAmount;

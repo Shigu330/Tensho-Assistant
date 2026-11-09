@@ -70,7 +70,8 @@ internal static class MapAside617Tests
         ("Map request (0.637): a quest always adjusts the map and keeps the zoom",() =>
         {
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
-            Check(view.Contains("mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(mapZoom);mapCenterRequest=pixel;"),"centred on it, same zoom");
+            // 0.846 (X-68, user correction): centred, never zoomed.
+            Check(view.Contains("mapFocusRequest=null;mapZoom=MapProjection.ClampZoom(mapZoom);mapCenterRequest=pixel;") && !view.Contains("areaZoom"),"centred on it, same zoom");
             Check(view.Contains("mapFocusRequest=null;mapCenterRequest=new Vector2(MapProjection.TextureSize/2f);mapFitRequested=false;"),"not found: the map's centre, same zoom");
         }),
         ("Map request (0.633): away from a quest's zone, the map of the NPC that leads there",() =>

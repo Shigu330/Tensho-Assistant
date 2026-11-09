@@ -44,7 +44,7 @@ internal sealed partial class MainWindow
         try
         {
             // CraftType 0 to 7 are the crafters in ClassJob order, 8 to 15; their icons are 62100 + job, as the gathering panel uses.
-            if(recipe.CraftTypeId<8)DrawItemIcon(new Items.ItemDefinition(0,recipe.CraftType,false,62108+recipe.CraftTypeId),new System.Numerics.Vector2(ImGui.GetTextLineHeight()+4),false);
+            if(recipe.CraftTypeId<8)DrawGameIcon(62108+recipe.CraftTypeId,new System.Numerics.Vector2(ImGui.GetTextLineHeight()+4));
             else ImGui.TextUnformatted(recipe.CraftType);
             if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("CraftStock.JobIconTip",recipe.CraftType,FromStockRowText(row)));
             if(ImGui.IsItemClicked())OpenCraftSimulation(recipe);
@@ -106,18 +106,11 @@ internal sealed partial class MainWindow
     private void DrawFromStockPrices(CraftFromStockRow[] all,CraftFromStockRow[] page)
     {
         if(fromStockSort!=1)return;
-        ImGui.Checkbox(localization.Get("CurrencyValue.Market")+"###FromStockMarket",ref fromStockPricesOn);
+        // X-76 step 3 (0.954): its own label: this page's box, not saved, not the currency value page's setting.
+        ImGui.Checkbox(localization.Get("CraftStock.Market")+"###FromStockMarket",ref fromStockPricesOn);
         Tip("CraftStock.MarketTip");
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(70*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
-        var saleDays=FromStockDays;
-        if(ImGui.InputInt(localization.Get("CraftStock.SaleDays")+"###FromStockDays",ref saleDays,0))
-        {
-            configuration.CraftStockSaleDays=Math.Clamp(saleDays,1,30);
-            fromStockView=null;
-            try{save();}catch(Exception error){log.Warning(error,"Sale days could not be saved.");}
-        }
-        Tip("CraftStock.SaleDaysTip");
+        SaleDaysSetting("FromStockDays","CraftStock.SaleDaysTip");
         if(!fromStockPricesOn){if(fromStockPrices.State.Loading)fromStockPrices.Cancel();return;}
         var prices=fromStockPrices.State;var world=market.State.WorldId;var character=bankBridge.State.CharacterId;var now=DateTimeOffset.UtcNow;var items=itemCatalog.State.Catalog;
         var marketable=all.Where(row=>items?.Find(row.Recipe.ResultItemId) is { IsMarketable:true }).Select(row=>row.Recipe.ResultItemId).Distinct().Count();
@@ -232,13 +225,13 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(fromStockPage<=0);
         try{if(ImGui.SmallButton("<###CraftStockPrevious"))fromStockPage--;}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("CraftStock.PreviousTip"));
+        Tip("CraftStock.PreviousTip");
         ImGui.SameLine();ImGui.TextUnformatted(localization.Format("CraftStock.Page",fromStockPage+1,known.Pages));
         ImGui.SameLine();
         ImGui.BeginDisabled(fromStockPage>=known.Pages-1);
         try{if(ImGui.SmallButton(">###CraftStockNext"))fromStockPage++;}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("CraftStock.NextTip"));
+        Tip("CraftStock.NextTip");
         if(result.Undecided>0)ImGui.TextDisabled(localization.Format("CraftStock.Undecided",result.Undecided.ToString("N0")));
         if(rows.Length==0){ImGui.TextDisabled(localization.Get("CraftStock.Empty"));return;}
         DrawChainList("CraftStockList",rows.Length,index=>
@@ -253,11 +246,11 @@ internal sealed partial class MainWindow
                 foreach(var recipe in line.All){ImGui.SameLine();DrawFromStockJob(recipe);}
                 ImGui.SameLine();
                 ImGui.TextDisabled(FromStockRowText(row));
-                if(row.Chained && ImGui.IsItemHovered())WrappedTooltip(localization.Get("CraftStock.RowChainedTip"));
+                if(row.Chained)Tip("CraftStock.RowChainedTip");
                 if(fromStockValues.TryGetValue(row.Recipe.RecipeId,out var worth)){ImGui.SameLine();ImGui.TextColored(Success,worth);}
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("ChainUi.Simulate")))OpenCraftSimulation(row.Recipe);
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("ChainUi.SimulateTip"));
+                Tip("ChainUi.SimulateTip");
             }
             finally{ImGui.PopID();}
         },Math.Max(260,ImGui.GetContentRegionAvail().Y));

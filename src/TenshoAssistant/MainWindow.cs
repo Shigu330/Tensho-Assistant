@@ -1,5 +1,6 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using TenshoAssistant.Inventory;
@@ -27,11 +28,16 @@ namespace TenshoAssistant;
 // Diagnostics (0.290–0.292). Each page or tool is a partial file MainWindow.<Tool>.cs; services are created in Plugin.cs.
 internal sealed partial class MainWindow : Window, IDisposable
 {
-    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Chocobo, Events, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms, Storage, Reminders, FreeCompany, Gear, Credits, Leves, HuntingLog, OceanFishing, Garden, MyTools, GatheringCollectables, Beastmaster, Help, IslandSanctuary, CustomDeliveries, MaskedCarnivale, RelicWeapons, AlliedSocieties, GrandCompanies, SpecialDeliveries, FieldContent, DeepDungeons, Lexicon, Fates }
+    private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Chocobo, Events, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms, Storage, Reminders, FreeCompany, Gear, Credits, Leves, HuntingLog, OceanFishing, Garden, MyTools, GatheringCollectables, Beastmaster, Help, IslandSanctuary, CustomDeliveries, MaskedCarnivale, RelicWeapons, AlliedSocieties, GrandCompanies, SpecialDeliveries, FieldContent, DeepDungeons, Lexicon, Fates, Discoveries }
     // Read from the active theme each time: the game theme can change while the plugin runs.
     private static Vector4 Accent => FfxivTheme.Gold;
     private static Vector4 Success => FfxivTheme.Success;
     private static Vector4 Muted => FfxivTheme.TextMuted;
+    private static Vector4 Text => FfxivTheme.Text;
+    private static Vector4 Error => FfxivTheme.Error;
+    private static Vector4 Warning => FfxivTheme.Warning;
+    // Background of a chosen toggle button (as the map's buttons): readable with the theme's text on light themes too.
+    private static Vector4 Selected => FfxivTheme.Selected;
     private static readonly string BuildVersion = typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?";
     private readonly Configuration configuration;
     private readonly Action save;
@@ -198,6 +204,8 @@ internal sealed partial class MainWindow : Window, IDisposable
     internal void OpenReminders(){page=Page.Reminders;IsOpen=true;}
     // 0.344 (g, I-02): from the currency entry of the server bar.
     internal void OpenCurrencies(){page=Page.Storage;focusCurrencyTab=true;IsOpen=true;}
+    /// <summary>X-107 (0.986): the server bar's gil entry opens the storage page (gil journal tab).</summary>
+    internal void OpenGilJournal(){page=Page.Storage;IsOpen=true;}
 
     // 0.327 (queue step e): opening page. Off (default): Home when the plugin loads, as before (the reopened window keeps its page
     // during a session). On: the page shown is kept in memory as it changes and written to disk only when the window closes or the
@@ -293,6 +301,8 @@ internal sealed partial class MainWindow : Window, IDisposable
             finally { ImGui.EndTable(); }
         }
         ImGui.Separator();
+        // X-76 H3 (0.914): a failed save is said here, whatever the page; else the usual footer.
+        if(DrawSaveError())return;
         ImGui.TextDisabled("/tensho");
         ImGui.SameLine();
         ImGui.TextDisabled(localization.Get("UiFragments.Footer"));
@@ -346,6 +356,19 @@ internal sealed partial class MainWindow : Window, IDisposable
     private static void Heading(string title, string description)
     {
         UiComponents.SectionHeader(title, description);
+    }
+
+    // One state mark for every page: check = the game confirms it (owned, done, unlocked), cross = it says no, question mark = not read yet.
+    // Drawn from the icon font: « ✗ » is missing from the game font (0.341, it showed as « = »).
+    private static void DrawStateMark(bool? state)
+    {
+        ImGui.PushFont(UiBuilder.IconFont);
+        try
+        {
+            var icon=state switch{true=>FontAwesomeIcon.Check,false=>FontAwesomeIcon.Times,_=>FontAwesomeIcon.Question};
+            ImGui.TextColored(state switch{true=>Success,false=>Muted,_=>Accent},icon.ToIconString());
+        }
+        finally{ImGui.PopFont();}
     }
 
     private void DrawCatalogStatus()

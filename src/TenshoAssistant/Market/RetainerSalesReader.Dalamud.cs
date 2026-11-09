@@ -28,8 +28,10 @@ internal sealed class RetainerSalesReader : IDisposable
 
     public RetainerSalesState State => Volatile.Read(ref state);
 
-    public RetainerSalesReader(IFramework framework, IGameGui gui, IClientState client, IPlayerState player, IPluginLog log, Func<bool> enabled)
-    {
+    // X-76 H9 (0.922): developer captures are logged in developer mode only.
+    private readonly Func<bool>? developer;
+    public RetainerSalesReader(IFramework framework, IGameGui gui, IClientState client, IPlayerState player, IPluginLog log, Func<bool> enabled, Func<bool>? developer = null)
+    {this.developer=developer;
         this.framework = framework; this.gui = gui; this.client = client; this.player = player; this.log = log; this.enabled = enabled;
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
@@ -74,7 +76,7 @@ internal sealed class RetainerSalesReader : IDisposable
             failure = null;
             Publish(new(RetainerSalesStatus.Ready, listings.AsReadOnly(), own, home, atHome));
             var capture = string.Join(";", raw);
-            if (capture != lastRaw && rawLines < 40) { lastRaw = capture; rawLines++; log.Information("Retainer sale list: {0} rows: {1}", count, capture); }
+            if (developer?.Invoke() == true && capture != lastRaw && rawLines < 40) { lastRaw = capture; rawLines++; log.Information("Retainer sale list: {0} rows: {1}", count, capture); }
         }
         catch (Exception error) { Fail($"{error.GetType().Name}: {error.Message}"); }
     }

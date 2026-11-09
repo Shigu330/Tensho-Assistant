@@ -41,19 +41,15 @@ internal sealed partial class MainWindow
     }
     private void DrawStatHelp(DerivedStat row,LevelModifiers modifiers)
     {
-        ImGui.BeginTooltip();
-        try
+        using(TooltipScope.Begin())
         {
-            ImGui.PushTextWrapPos(ImGui.GetFontSize()*26);
             ImGui.TextColored(Accent,localization.Get("CharacterStats."+row.Key));
             ImGui.TextWrapped(localization.Get("CharacterStats."+row.Key+"Help"));
             ImGui.TextDisabled(localization.Get("CharacterStats."+row.Key+"Formula"));
             ImGui.TextDisabled(localization.Format("CharacterStats.Modifiers",modifiers.Main,modifiers.Sub,modifiers.Div,row.Raw));
             // 0.380 (g, M-09): stat tier.
             if(StatFormulas.Tier(row.Key,row.Raw,modifiers) is { } tier)ImGui.TextColored(Accent,localization.Format("CharacterStats.Tier",tier.ToNext,tier.Wasted));
-            ImGui.PopTextWrapPos();
         }
-        finally{ImGui.EndTooltip();}
     }
 
     // Beside the game's Character window: only the real values the game does not show (0.182).

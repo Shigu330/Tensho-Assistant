@@ -48,7 +48,7 @@ internal static class CharacterStatus374Tests
             finally{if(Directory.Exists(folder))Directory.Delete(folder,true);}
             var watcher = Read("Character/CharacterStatusWatcher.Dalamud.cs");
             Check(watcher.Contains("if(id==0 || id==current)return false;",StringComparison.Ordinal),"the logged-in character is never erased");
-            Check(watcher.Contains("if(WriteLocked(id) && migrated){configuration.ReminderDone=null;saveConfiguration();}",StringComparison.Ordinal),"shared boxes moved once, only after the file is written");
+            Check(watcher.Contains("if(migrated){if(WriteLocked(id)){configuration.ReminderDone=null;saveConfiguration();}}",StringComparison.Ordinal),"shared boxes moved once, only after the file is written");
             Check(Read("MainWindow.Reminders.cs").Contains("var done=ResetSchedule.DoneSince(ReminderDoneAt(key),reset);",StringComparison.Ordinal),"done boxes per character");
         }),
     ];

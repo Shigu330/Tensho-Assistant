@@ -96,7 +96,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(ReadDeliveries is null || deliveryRead is not null);
         try{if(ImGui.Button(localization.Get("CustomDeliveries.Read")))deliveryRead=ReadDeliveries!(clients);}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("CustomDeliveries.ReadTip"));
+        Tip("CustomDeliveries.ReadTip");
         if(deliveryReadFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("CustomDeliveries.Unavailable"));return;}
         if(deliverySnapshot is not { } current)return;
         switch(current.Status)

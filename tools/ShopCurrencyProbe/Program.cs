@@ -5,6 +5,66 @@ using Lumina.Excel.Sheets;
 // Read-only evidence for NPC-VENDORS-014: how scrip exchanges encode currencies and how NPCs reach their shops.
 if(args.Length is <1 or >2)throw new ArgumentException("Supply installed sqpack directory and optionally an item name.");
 using var data=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.French,CacheFileResources=false});
+// PROBE_SRANK (X-76 P5, 0.931): the notorious monsters of every territory (TerritoryType.NotoriousMonsterTerritory -> NotoriousMonster: BNpcName,
+// Rank), to check Tensho's S rank table (Hunting/SRankConditions.cs) against the game; read-only.
+if(Environment.GetEnvironmentVariable("PROBE_SRANK") is { Length:>0 })
+{
+    var names=data.Excel.GetSheet<BNpcName>(Language.English);
+    foreach(var territory in data.Excel.GetSheet<TerritoryType>().Where(row=>row.NotoriousMonsterTerritory.RowId!=0))
+        foreach(var monster in territory.NotoriousMonsterTerritory.ValueNullable?.NotoriousMonsters.Where(m=>m.RowId!=0) ?? [])
+            Console.WriteLine($"NM territory {territory.RowId} monster {monster.RowId} name {monster.ValueNullable?.BNpcName.RowId} '{names.GetRowOrDefault(monster.ValueNullable?.BNpcName.RowId ?? 0)?.Singular.ExtractText()}' rank {monster.ValueNullable?.Rank}");
+    return;
+}
+// PROBE_OCEANFISH (X-85 research): every column of the ocean fishing sheets (IKDContentBonus, IKDFishParam, IKDSpot with the fish of
+// both spots, IKDRoute's unnamed columns, IKDPlayerMissionCondition with its raw macros), the ocean fish rows of FishParameter, and the
+// game texts that name the spectral current or the scrips; read-only.
+if(Environment.GetEnvironmentVariable("PROBE_OCEANFISH") is { Length:>0 })
+{
+    var oceanItems=data.Excel.GetSheet<Item>();var oceanItemsEn=data.Excel.GetSheet<Item>(Language.English);
+    string OceanItemName(uint id)=>$"{oceanItemsEn.GetRowOrDefault(id)?.Name.ExtractText()} / {oceanItems.GetRowOrDefault(id)?.Name.ExtractText()}";
+    var bonusEn=data.Excel.GetSheet<IKDContentBonus>(Language.English);
+    foreach(var row in data.Excel.GetSheet<IKDContentBonus>())
+        Console.WriteLine($"BONUS {row.RowId} order {row.Order} x{row.BonusMultiplier} image {row.Image} '{bonusEn.GetRowOrDefault(row.RowId)?.Objective.ExtractText()}' :: '{bonusEn.GetRowOrDefault(row.RowId)?.Requirement.ExtractText()}' / FR '{row.Objective.ExtractText()}' :: '{row.Requirement.ExtractText()}'");
+    var oceanFishParams=data.Excel.GetSheet<FishParameter>();
+    var ikdByFish=new Dictionary<uint,string>();
+    foreach(var row in data.Excel.GetSheet<IKDFishParam>().Where(row=>row.Fish.RowId!=0))
+    {
+        var fp=oceanFishParams.GetRowOrDefault(row.Fish.RowId);var item=fp?.Item.RowId ?? 0;
+        var bonuses=string.Join(",",row.IKDContentBonus.Select(b=>b.RowId).Where(id=>id!=0));
+        ikdByFish[item]=$"ikd {row.RowId} bonuses [{bonuses}]";
+        Console.WriteLine($"IKDFISH {row.RowId} fishParam {row.Fish.RowId} item {item} '{OceanItemName(item)}' stars {fp?.OceanStars} hidden {fp?.IsHidden} inLog {fp?.IsInLog} spot {fp?.FishingSpot.RowId} record {fp?.FishingRecordType.RowId} bonuses [{bonuses}]");
+    }
+    var oceanSpotsSheet=data.Excel.GetSheet<FishingSpot>();
+    foreach(var spot in data.Excel.GetSheet<IKDSpot>().Where(row=>row.PlaceName.RowId!=0))
+    {
+        var main=spot.SpotMain.ValueNullable?.Item.Select(i=>i.RowId).Where(i=>i!=0).ToArray() ?? [];
+        var sub=spot.SpotSub.ValueNullable?.Item.Select(i=>i.RowId).Where(i=>i!=0).ToArray() ?? [];
+        Console.WriteLine($"SPOT {spot.RowId} '{spot.PlaceName.ValueNullable?.Name.ExtractText()}' main {spot.SpotMain.RowId} sub {spot.SpotSub.RowId} territory {spot.SpotMain.ValueNullable?.TerritoryType.RowId}/{spot.SpotSub.ValueNullable?.TerritoryType.RowId}");
+        foreach(var id in main)Console.WriteLine($"  MAIN {id} '{OceanItemName(id)}' {(sub.Contains(id) ? "also-spectral":"main-only")} {ikdByFish.GetValueOrDefault(id)}");
+        foreach(var id in sub)Console.WriteLine($"  SUB  {id} '{OceanItemName(id)}' {(main.Contains(id) ? "also-main":"spectral-only")} {ikdByFish.GetValueOrDefault(id)}");
+    }
+    foreach(var route in data.Excel.GetSheet<IKDRoute>().Where(row=>!row.Name.IsEmpty))
+        Console.WriteLine($"ROUTE {route.RowId} '{route.Name.ExtractText()}' image {route.Image} u0 {route.Unknown0} u1 {route.Unknown1} u2 {route.Unknown2} instance {route.Instance.RowId} territory {route.Instance.ValueNullable?.TerritoryType.RowId} '{route.Instance.ValueNullable?.Name.ExtractText()}' spots {string.Join(",",route.Spot.Select(s=>s.RowId))} times {string.Join(",",route.Time.Select(t=>t.RowId))}");
+    var missionEn=data.Excel.GetSheet<IKDPlayerMissionCondition>(Language.English);
+    foreach(var row in data.Excel.GetSheet<IKDPlayerMissionCondition>())
+        Console.WriteLine($"MISSION {row.RowId} n {row.Unknown1} FR '{row.Unknown0.ExtractText()}' raw '{row.Unknown0}' / EN '{missionEn.GetRowOrDefault(row.RowId)?.Unknown0.ExtractText()}'");
+    foreach(var id in new uint[]{29714,29715,29716,27590,2585,2591,2603,2619,36593,36594,36595,36596,36597})Console.WriteLine($"BAIT {id} '{OceanItemName(id)}'");
+    foreach(var row in oceanItems.Where(row=>row.Name.ExtractText().Contains("ssignat",StringComparison.OrdinalIgnoreCase)))Console.WriteLine($"SCRIPITEM {row.RowId} '{OceanItemName(row.RowId)}'");
+    foreach(var row in data.Excel.GetSheet<Addon>().Where(row=>row.Text.ExtractText() is var t && (t.Contains("spectral",StringComparison.OrdinalIgnoreCase) || (t.Contains("ssignat",StringComparison.OrdinalIgnoreCase) && t.Length<80))))
+        Console.WriteLine($"ADDON {row.RowId} '{row.Text.ExtractText().Replace("\n"," ")}'");
+    foreach(var row in data.Excel.GetSheet<LogMessage>().Where(row=>row.Text.ExtractText().Contains("spectral",StringComparison.OrdinalIgnoreCase)))
+        Console.WriteLine($"LOG {row.RowId} '{row.Text.ExtractText().Replace("\n"," ")}'");
+    // Ocean fish that are collectables: their scrip (CollectablesShopRewardScrip.Currency: 2/4/6/7 = purple/orange crafter/gatherer, Deliveries/CustomDeliveries.cs).
+    var oceanFishItems=ikdByFish.Keys.ToHashSet();
+    foreach(var row in data.Excel.GetSubrowSheet<CollectablesShopItem>().SelectMany(group=>group).Where(row=>oceanFishItems.Contains(row.Item.RowId)))
+    {
+        var reward=row.CollectablesShopRewardScrip.ValueNullable;var refine=row.CollectablesShopRefine.ValueNullable;
+        Console.WriteLine($"COLLECTABLE item {row.Item.RowId} '{OceanItemName(row.Item.RowId)}' shopItem {row.RowId}.{row.SubrowId} currency {reward?.Currency} reward {reward?.LowReward}/{reward?.MidReward}/{reward?.HighReward} refine {refine?.LowCollectability}/{refine?.MidCollectability}/{refine?.HighCollectability}");
+    }
+    foreach(var text in data.Excel.GetSheet<InstanceContentTextData>().Where(row=>row.Text.ExtractText().Contains("spectral",StringComparison.OrdinalIgnoreCase)))
+        Console.WriteLine($"ICTEXT {text.RowId} '{text.Text.ExtractText().Replace("\n"," ")}'");
+    return;
+}
 // PROBE_LEGENDS (0.526): what the game calls « légendes locales », and every folklore tome: job, division, quest bit, item, how many points or fish use it.
 if(Environment.GetEnvironmentVariable("PROBE_LEGENDS") is { Length:>0 })
 {
@@ -827,6 +887,33 @@ if(Environment.GetEnvironmentVariable("PROBE_FISHSPOT") is { Length:>0 } spotQue
         var map=spot.TerritoryType.Value.Map.Value;
         Console.WriteLine($"FISHSPOT {id} '{spot.PlaceName.Value.Name.ExtractText()}' territory {spot.TerritoryType.RowId} X {spot.X} Z {spot.Z} radius {spot.Radius} map size {map.SizeFactor} offset {map.OffsetX},{map.OffsetY}");
     }
+    return;
+}
+// PROBE_REDUCE (0.888, user asked where to get an item for the aetherial reduction test): items the game marks reducible (Item.AetherialReduce > 0) that are
+// gathered (GatheringItem in a GatheringPointBase), with the gathering type, the point level, the zone and whether the point is ephemeral (GatheringPointTransient).
+if(Environment.GetEnvironmentVariable("PROBE_REDUCE") is { Length:>0 })
+{
+    var itemsSheet=data.Excel.GetSheet<Item>();var transient=data.Excel.GetSheet<GatheringPointTransient>();
+    var reducible=itemsSheet.Where(item=>item.AetherialReduce>0).Select(item=>item.RowId).ToHashSet();
+    var gatheringToItem=data.Excel.GetSheet<GatheringItem>().Where(row=>row.Item.RowType==typeof(Item) && reducible.Contains(row.Item.RowId)).ToDictionary(row=>row.RowId,row=>row.Item.RowId);
+    var seen=new HashSet<string>();
+    foreach(var point in data.Excel.GetSheet<GatheringPoint>())
+    {
+        if(point.GatheringPointBase.RowId==0 || point.TerritoryType.RowId==0)continue;
+        var basis=point.GatheringPointBase.Value;
+        foreach(var entry in basis.Item)
+        {
+            if(!gatheringToItem.TryGetValue(entry.RowId,out var itemId))continue;
+            var timing=transient.TryGetRow(point.RowId,out var found) ? found:default;
+            var ephemeral=timing.RowId!=0 && timing.EphemeralStartTime!=65535 && timing.EphemeralStartTime!=timing.EphemeralEndTime;
+            var zone=point.TerritoryType.Value.PlaceName.Value.Name.ExtractText();
+            var rare=timing.RowId!=0 && timing.GatheringRarePopTimeTable.RowId!=0 ? timing.GatheringRarePopTimeTable.Value:default;
+            var rareText=rare.RowId==0 ? "":" rare "+string.Join(",",Enumerable.Range(0,rare.StartTime.Count).Where(index=>rare.Duration[index]!=0).Select(index=>$"{rare.StartTime[index]}+{rare.Duration[index]}min"));
+            var line=$"REDUCE {itemsSheet.GetRow(itemId).Name.ExtractText()} | {basis.GatheringType.Value.Name.ExtractText()} level {basis.GatheringLevel} | {zone} | point {point.RowId} type {point.Type} | ephemeral {ephemeral} {timing.EphemeralStartTime}-{timing.EphemeralEndTime}{rareText}";
+            if(seen.Add(line))Console.WriteLine(line);
+        }
+    }
+    Console.WriteLine($"REDUCE reducible items {reducible.Count}, gathered {gatheringToItem.Values.Distinct().Count()}");
     return;
 }
 // PROBE_GATHERLEVEL (0.224): for gathering items named like the value, GatheringItem → GatheringItemLevelConvertTable (level, stars)

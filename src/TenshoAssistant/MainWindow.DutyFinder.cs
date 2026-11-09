@@ -57,7 +57,7 @@ internal sealed partial class MainWindow
     private void DrawDutyFinderLoot(DutyLootService loot,DutyDefinition duty)
     {
         var state=loot.State;
-        DrawItemIcon(new ItemDefinition(0,duty.Name,false,duty.Icon),new Vector2(28));ImGui.SameLine();
+        DrawGameIcon(duty.Icon,new Vector2(28));ImGui.SameLine();
         ImGui.BeginGroup();
         ImGui.TextColored(Accent,duty.Name);
         ImGui.TextDisabled(localization.Format("DutyCounts.Level",duty.Category,duty.Level));
@@ -66,7 +66,7 @@ internal sealed partial class MainWindow
         // Source, freshness and refresh on one line; the long explanations go into the (i) tooltip.
         if(state.Loading)ImGui.TextDisabled(localization.Get("DutyUi.Loading"));
         else if(state.Document is { } fetched)ImGui.TextDisabled(localization.Format("DutyFinder.Fetched",fetched.FetchedAt.ToLocalTime().ToString("g")));
-        else if(state.Error is { } error)ImGui.TextColored(Accent,localization.Get(SourceOff(error) ? "Advanced.SourceOffTip":"ServiceErrors.Duty"));
+        else if(state.Error is { } error)DrawDataError(error,"ServiceErrors.Duty");
         ImGui.SameLine();
         ImGui.PushFont(UiBuilder.IconFont);
         // 0.325: the ↻ button has its own tooltip, drawn once the icon font is popped.
@@ -77,12 +77,12 @@ internal sealed partial class MainWindow
             try{if(ImGui.SmallButton(FontAwesomeIcon.SyncAlt.ToIconString()+"##DutyFinderRefresh"))_=loot.RequestAsync(true);}
             finally{ImGui.EndDisabled();}
             refreshHovered=ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled);
-            ImGui.SameLine();ImGui.TextDisabled(FontAwesomeIcon.InfoCircle.ToIconString());
         }
         finally{ImGui.PopFont();}
         if(refreshHovered)WrappedTooltip(localization.Get(configuration.CommunityGarland ? "DutyFinder.RefreshTip":"Advanced.SourceOffTip"));
-        else if(ImGui.IsItemHovered())
-            WrappedTooltip(localization.Get("DutyUi.Source")+(state.Document is { HasRewards:true, HasFights:true, HasCoffers:true } ? "":"\n"+localization.Get("DutyUi.Partial")));
+        ImGui.SameLine();
+        if(state.Document is { HasRewards:true, HasFights:true, HasCoffers:true })HelpMarker("DutyUi.Source");
+        else HelpMarkerText(localization.Get("DutyUi.Source")+"\n"+localization.Get("DutyUi.Partial"));
         if(DutyDocument(state,true) is not { } document)return;
         if(lumina?.State.Data?.ForDuty(duty.DutyId) is { Count:>0 })ImGui.TextDisabled(localization.Get("DutyFinder.Lumina"));
         var view=DutyFinderViewOf(document);
@@ -157,14 +157,20 @@ internal sealed partial class MainWindow
     {
         if(gatheringCatalog.State.Catalog?.ForItem(item) is not { Count:>0 } sources)return null;
         var here=ListPanelZoneHere();var now=DateTimeOffset.UtcNow;
-        return sources.Where(source=>!source.IsHidden).Select(source=>(Source:source,Target:GatheringPointPixel(source))).Where(pair=>pair.Target is not null)
+        // 0.834 (X-64, user report: no « Go there » for Emerald beans, Cyclops onion): both are hidden items of their point (GatheringItem.IsHidden), whose
+        // point and map are known (tools/MapMaskProbe --item, docs/evidence/0.834-hidden-gathering-items.md); a hidden source now comes after the others, no longer left out.
+        // 0.835 (X-64, user rule: « left out only when unavailable »): a point the character cannot gather yet (tome not read, level too low) is left out.
+        return sources.Where(source=>GatherAccess?.Invoke(source.BaseId)?.Blocks(source.Level)!=true)
+            .Select(source=>(Source:source,Target:GatheringPointPixel(source))).Where(pair=>pair.Target is not null)
             .Select(pair=>(pair.Source,Target:pair.Target!.Value))
-            .OrderBy(pair=>pair.Source.Timing.Kind!=Gathering.GatheringScheduleKind.Limited
-                || Gathering.GatheringTime.Next(pair.Source.Timing,now,1).Openings.FirstOrDefault() is { } next && next.StartsAt<=now && now<next.EndsAt ? 0:1)
+            .OrderBy(pair=>pair.Source.IsHidden ? 1:0)
+            .ThenBy(pair=>pair.Source.Timing.Kind!=Gathering.GatheringScheduleKind.Limited
+                || Gathering.GatheringTime.Next(pair.Source.Timing,now,1).Openings.FirstOrDefault() is { } next && next.At(now).Open ? 0:1)
             .ThenBy(pair=>pair.Source.Zone==here ? 0:1).ThenBy(pair=>ListPanelZoneCost(pair.Source.Zone) ?? uint.MaxValue).ThenBy(pair=>pair.Source.Level)
             .Cast<(Gathering.GatheringSource,(Maps.MapDefinition,Vector2))?>().FirstOrDefault();
     }
 
+    private readonly HashSet<uint> goThereLogged=[];
     private void ItemLinksMenu(string id,ItemDefinition? item)
     {
         if(item is null || !ImGui.BeginPopupContextItem(id))return;
@@ -178,12 +184,29 @@ internal sealed partial class MainWindow
                 && ImGui.Selectable(localization.Get("ItemMenu.TryOn")+$"##TryOn{item.Id}"))TryOnItem(item.Id);
             // 0.360 (g, C-09): add to or remove from the wishlist.
             DrawWishlistToggle(item);
-            // 0.762 (X-15, user request): « Go there » for an item that is gathered, as on the Gathering page: flag, Tensho map and the nearest aetheryte's teleport.
-            if(GoThereSource(item.Id) is { } go && ImGui.Selectable(localization.Get("GatheringDetails.GoThere")+$"##GoThere{item.Id}"))
+            // 0.826 (X-58): add its recipe to one of the crafting lists.
+            if(CraftListAdds(item.Id) is { Count:>0 } adds && ImGui.BeginMenu(localization.Get("ItemMenu.AddToLists")+$"##AddToLists{item.Id}"))
             {
-                if(configuration.GoThereEquip)EquipGatheringGearset(go.Source);
-                AskNearestAetheryteAt(go.Target.Map,go.Target.Pixel,string.IsNullOrWhiteSpace(go.Source.Place) ? go.Source.Zone:go.Source.Place,flag:true,direct:configuration.GoThereTeleport);
+                try{foreach(var (label,open) in adds)if(ImGui.MenuItem(label))open();}
+                finally{ImGui.EndMenu();}
             }
+            // 0.762 (X-15, user request): « Go there » for an item that is gathered, as on the Gathering page: flag, Tensho map and the nearest aetheryte's teleport.
+            var go=GoThereSource(item.Id);
+            if(go is { } there && ImGui.Selectable(localization.Get("GatheringDetails.GoThere")+$"##GoThere{item.Id}"))
+            {
+                if(configuration.GoThereEquip)EquipGatheringGearset(there.Source);
+                AskNearestAetheryteAt(there.Target.Map,there.Target.Pixel,string.IsNullOrWhiteSpace(there.Source.Place) ? there.Source.Zone:there.Source.Place,flag:true,direct:configuration.GoThereTeleport);
+            }
+            // 0.830 (X-60, user request): the flag alone on that point, without a teleport (for when one is already in the zone).
+            if(go is { } point && ImGui.Selectable(localization.Get("ItemMenu.PlaceFlag")+$"##PlaceFlag{item.Id}"))
+            {
+                var place=Maps.MapProjection.CoordinateFromPixel(point.Target.Pixel,point.Target.Map);
+                FlagFromMap(point.Target.Map,place.X,place.Y);
+            }
+            // 0.830 (X-60): developer mode, why « Go there » is missing for a gathered item, once per item.
+            if(go is null && developerMode && gatheringCatalog.State.Catalog?.ForItem(item.Id) is { Count:>0 } sources && goThereLogged.Add(item.Id))
+                log.Information("Go there missing for item {0}: {1} sources, {2} with a map, local index {3}, points: {4}.",item.Id,sources.Count,sources.Count(source=>source.MapId!=0),
+                    mapLocal?.State.Index is null ? "not loaded":"loaded",string.Join(", ",sources.Take(6).Select(source=>$"base {source.BaseId} map {source.MapId}{(source.IsHidden ? " hidden":"")}")));
             // 0.561 (I8, I9): the item's name, a link in your own chat, and its pages on the web; nothing is sent to the game's server.
             if(ImGui.Selectable(localization.Get("ItemMenu.CopyName")+$"##CopyName{item.Id}"))ImGui.SetClipboardText(item.Name);
             if(ItemLinkToChat is not null && ImGui.Selectable(localization.Get("ItemMenu.LinkChat")+$"##LinkChat{item.Id}"))ItemLinkToChat(item.Id);

@@ -1,6 +1,7 @@
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using TenshoAssistant.Community;
 
 namespace TenshoAssistant.Market;
 
@@ -124,23 +125,14 @@ public sealed class RetainerCompareService : IDisposable
         RetainerCompareState result;
         try
         {
-            using var response = await client.GetAsync(Address(world, asked), HttpCompletionOption.ResponseHeadersRead, cancellation.Token).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            await using var stream = await response.Content.ReadAsStreamAsync(cancellation.Token).ConfigureAwait(false);
-            using var memory = new MemoryStream();
-            var buffer = new byte[64 * 1024];
-            int read;
-            while ((read = await stream.ReadAsync(buffer, cancellation.Token).ConfigureAwait(false)) > 0)
-            {
-                if (memory.Length + read > MaximumBytes) throw new InvalidDataException("Universalis answer too large.");
-                memory.Write(buffer, 0, read);
-            }
+            // X-76 (step 2): the shared bounded reader (size limit, Tensho's User-Agent, strict UTF-8).
+            var json = await BoundedHttp.ReadAsync(client, new Uri(Address(world, asked)), MaximumBytes, cancellation.Token).ConfigureAwait(false);
             var now = DateTimeOffset.UtcNow;
-            result = new(false, RetainerSales.ParseMany(Encoding.UTF8.GetString(memory.GetBuffer(), 0, (int)memory.Length), world, asked, now), null, now, world);
+            result = new(false, RetainerSales.ParseMany(json, world, asked, now), null, now, world);
         }
         catch (OperationCanceledException) { result = new(false, null, "Network", null, world); }
         catch (HttpRequestException) { result = new(false, null, "Network", null, world); }
-        catch (Exception error) when (error is JsonException or InvalidDataException or KeyNotFoundException or FormatException) { result = new(false, null, "Data", null, world); }
+        catch (Exception error) when (error is JsonException or InvalidDataException or KeyNotFoundException or FormatException or DecoderFallbackException) { result = new(false, null, "Data", null, world); }
         lock (gate) if (!disposed) state = result;
     }
 

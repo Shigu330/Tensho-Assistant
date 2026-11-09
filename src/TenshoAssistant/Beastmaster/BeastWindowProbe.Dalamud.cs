@@ -1,5 +1,6 @@
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using TenshoAssistant.UI;
 
 namespace TenshoAssistant.Beastmaster;
 
@@ -33,9 +34,9 @@ internal sealed class BeastWindowProbe : IDisposable
         return line.Length <= MaximumText ? line : line[..MaximumText];
     }
 
-    private static unsafe void Texts(AtkUldManager* manager, int depth, List<string> found)
+    internal static unsafe void Texts(AtkUldManager* manager, int depth, List<string> found)
     {
-        if (depth > MaximumDepth || manager == null || manager->NodeList == null) return;
+        if (depth > MaximumDepth || !UiNodes.Walkable(manager)) return;
         var count = Math.Min((int)manager->NodeListCount, MaximumNodes);
         for (var index = 0; index < count && found.Count < MaximumTexts; index++)
         {
@@ -63,7 +64,7 @@ internal sealed class BeastWindowProbe : IDisposable
                 AtkValueType.Int => value.Int.ToString(),
                 AtkValueType.UInt => value.UInt.ToString(),
                 AtkValueType.Bool => value.Byte != 0 ? "true" : "false",
-                AtkValueType.String or AtkValueType.ManagedString or AtkValueType.ConstString => '"' + Bounded(value.String.ToString() ?? "") + '"',
+                _ when AtkValueRead.IsText(value.Type) => '"' + Bounded(value.String.ToString() ?? "") + '"',
                 _ => null,
             };
             if (text is not null) values.Add($"{index}:{text}");

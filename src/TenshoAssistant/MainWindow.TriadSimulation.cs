@@ -188,7 +188,7 @@ internal sealed partial class MainWindow
                         {
                             var definition = position.Cards[token];
                             var entry = triadCards.FirstOrDefault(entry => entry.Id == definition.Id);
-                            DrawItemIcon(new ItemDefinition(0, entry?.Name ?? localization.Format("UiFragments.Card",definition.Label), false, definition.IconId), new Vector2(62));
+                            DrawGameIcon(definition.IconId,new Vector2(62));
                             if (ImGui.IsItemHovered()) WrappedTooltip(TriadSimulationTooltip(entry?.Name, definition, token, position));
                             var blue = position.OwnerAt(square) == TriadPlayer.Blue;
                             ImGui.TextColored(blue ? TriadBlue : TriadRed, $"{(blue ? localization.Get("TriadSim.Blue") : localization.Get("TriadSim.Red"))} · {definition.Label}");
@@ -226,7 +226,7 @@ internal sealed partial class MainWindow
                     ImGui.BeginDisabled(triadPosition is not null && !playable);
                     try
                     {
-                        DrawItemIcon(new ItemDefinition(0, entry?.Name ?? $"ID {hand[index]}", false, entry?.IconId ?? 0), new Vector2(44));
+                        DrawGameIcon(entry?.IconId ?? 0,new Vector2(44));
                         if (playable && ImGui.IsItemClicked()) triadSelectedToken = token;
                         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(entry?.Card is { } card
                             ? TriadSimulationTooltip(entry.Name,card,token,triadPosition) + "\n"+localization.Get("TriadDynamic.Click")
@@ -310,7 +310,7 @@ internal sealed partial class MainWindow
             {
                 if (ImGui.SmallButton(localization.Format("UiFragments.Move",entry?.Name ?? localization.Format("UiFragments.Card",card.Label),candidate.Move.Square/3+1,candidate.Move.Square%3+1,blue,10-blue)))
                 { ApplyTriadMove(candidate.Move); break; }
-                if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("TriadSim.Apply"));
+                Tip("TriadSim.Apply");
             }
             finally { ImGui.PopID(); }
         }

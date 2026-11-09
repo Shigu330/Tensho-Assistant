@@ -100,8 +100,13 @@ internal sealed partial class MainWindow
         }
         ImGui.TextDisabled(localization.Format("DutyCounts.Duties",dutyMatches.Length));
         ImGui.SameLine();
-        if (progress is not null) ImGui.TextDisabled(localization.Format("DutyProgress.Count",dutyProgressCount.Completed,dutyProgressCount.Known));
-        else ImGui.TextDisabled(localization.Get(DutyProgressUnavailable?.Invoke() == true ? "DutyProgress.Unavailable" : "DutyProgress.Unknown"));
+        if (progress is null) ImGui.TextDisabled(localization.Get(DutyProgressUnavailable?.Invoke() == true ? "DutyProgress.Unavailable" : "DutyProgress.Unknown"));
+        else
+        {
+            ImGui.TextDisabled(localization.Format("DutyProgress.Count",dutyProgressCount.Completed,dutyProgressCount.Known));
+            // X-106 (0.990): logged out, the last character's saved state, said as such. 0.997 (review): the « unknown » line no longer pairs with this one.
+            if (progress.FromDisk) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("DutyProgress.Saved",progress.ReadAt.ToLocalTime().ToString("g"))); }
+        }
         if (!ImGui.BeginTable("DutyCatalog",4,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp)) return;
         try
         {
@@ -117,7 +122,7 @@ internal sealed partial class MainWindow
                 {
                     var duty = dutyMatches[index];
                     ImGui.TableNextRow(); ImGui.TableNextColumn();
-                    DrawItemIcon(new ItemDefinition(0,duty.Name,false,duty.Icon),new Vector2(24));
+                    DrawGameIcon(duty.Icon,new Vector2(24));
                     var clicked = ImGui.IsItemClicked(); ImGui.SameLine();
                     if (ImGui.Selectable($"{duty.Name}##Duty{duty.DutyId}",dutyLoot.State.Duty?.DutyId == duty.DutyId,ImGuiSelectableFlags.None,new Vector2(0,24)) || clicked)
                     { dutyLoot.Select(duty); showDutyDetails = true; dutyItemQuery = ""; }
@@ -140,16 +145,128 @@ internal sealed partial class MainWindow
         if(ImGui.SmallButton($"{quest.Name}##DutyUnlock{duty.DutyId}")){SelectQuest(quest.Id);page=Page.Quests;}
         ImGui.SameLine();ImGui.TextDisabled(QuestProgressLabel(quest));
     }
+    // X-90 (0.994, DEC-045 and DEC-041): the duty's mechanics and strategy from the wiki (GFDL), on a click, out of combat only (hidden in combat).
+    internal WikiDutyGuides? DutyGuides { get; set; }
+    internal Func<bool>? InCombatNow { get; set; }
+    private void DrawDutyGuide(DutyDefinition duty)
+    {
+        if(DutyGuides is not { } guides)return;
+        guides.Select(duty.DutyId);
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("DutyGuide.Title")+"###DutyGuide"))return;
+        if(InCombatNow?.Invoke()==true){EmptyState("DutyGuide.InCombat");return;}
+        var view=guides.State;
+        ImGui.BeginDisabled(view.Loading);
+        try{if(SourceButton(localization.Get(view.Document is null ? "DutyGuide.Fetch":"DutyGuide.Refresh"),configuration.CommunityWiki,true))_=guides.RequestAsync(view.Document is not null);}
+        finally{ImGui.EndDisabled();}
+        Tip("DutyGuide.FetchTip");
+        if(view.Loading)ImGui.TextDisabled(localization.Get("DutyGuide.Loading"));
+        if(view.Error is { } error)DrawDataError(error,"DutyGuide.Error");
+        if(view.Document is not { } document)return;
+        ImGui.TextDisabled(localization.Format("DutyGuide.Source",document.Title,document.FetchedAt.ToLocalTime().ToString("g")));
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get("DutyGuide.Open")))Dalamud.Utility.Util.OpenLink(document.Url);
+        if(document.Sections.Count==0){EmptyState("DutyGuide.Empty");return;}
+        foreach(var section in document.Sections)
+        {
+            if(!ImGui.TreeNode(section.Title+$"###DutyGuide{section.Title}"))continue;
+            try{ImGui.TextWrapped(section.Text);}
+            finally{ImGui.TreePop();}
+        }
+    }
+
+    // X-90 (0.995, DEC-045): the player's note and arena drawing for the duty, in Tensho's window, hidden in combat; never drawn over the game.
+    private int arenaDragged=-1;
+    private string arenaLabel="";
+    private string? arenaMessage;
+    private void DrawDutyNotes(DutyDefinition duty)
+    {
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("DutyNotes.Title")+"###DutyNotes"))return;
+        if(InCombatNow?.Invoke()==true){EmptyState("DutyGuide.InCombat");return;}
+        var notes=configuration.DutyNotes ??= [];
+        var note=notes.GetValueOrDefault(duty.DutyId) ?? new DutyNote();
+        var changed=false;
+        var text=note.Text;
+        ImGui.InputTextMultiline("##DutyNoteText",ref text,DutyArena.MaxText,new Vector2(-1,90));
+        Tip("DutyNotes.TextTip");
+        if(text!=note.Text)note.Text=text;
+        if(ImGui.IsItemDeactivatedAfterEdit())changed=true;
+        var round=note.Shape==ArenaShape.Round;
+        if(ImGui.RadioButton(localization.Get("DutyNotes.Round"),round)){note.Shape=ArenaShape.Round;changed=true;}
+        Tip("DutyNotes.ShapeTip");
+        ImGui.SameLine();
+        if(ImGui.RadioButton(localization.Get("DutyNotes.Square"),!round)){note.Shape=ArenaShape.Square;changed=true;}
+        Tip("DutyNotes.ShapeTip");
+        // The drawing: north up, marks dragged with the mouse, a right click removes one.
+        var side=Math.Min(260f,ImGui.GetContentRegionAvail().X);
+        var origin=ImGui.GetCursorScreenPos();var centre=origin+new Vector2(side/2);var radius=side/2-14;
+        ImGui.InvisibleButton("##ArenaCanvas",new Vector2(side));
+        var draw=ImGui.GetWindowDrawList();
+        var line=ImGui.GetColorU32(TenshoAssistant.UI.FfxivTheme.TextMuted);
+        if(note.Shape==ArenaShape.Round)draw.AddCircle(centre,radius,line,64,2);
+        else draw.AddRect(centre-new Vector2(radius),centre+new Vector2(radius),line,0,ImDrawFlags.None,2);
+        draw.AddText(centre-new Vector2(4,radius+13),line,localization.Get("DutyNotes.North"));
+        Vector2 At(ArenaToken token)=>centre+new Vector2(DutyArena.Clamp(token.X),DutyArena.Clamp(token.Y))*radius;
+        var mouse=ImGui.GetIO().MousePos;var hovered=ImGui.IsItemHovered();
+        if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Left))arenaDragged=note.Tokens.FindIndex(token=>Vector2.Distance(At(token),mouse)<=12);
+        if(arenaDragged>=0 && arenaDragged<note.Tokens.Count && ImGui.IsMouseDown(ImGuiMouseButton.Left))
+        {var moved=(mouse-centre)/radius;note.Tokens[arenaDragged].X=DutyArena.Clamp(moved.X);note.Tokens[arenaDragged].Y=DutyArena.Clamp(moved.Y);}
+        if(arenaDragged>=0 && ImGui.IsMouseReleased(ImGuiMouseButton.Left)){arenaDragged=-1;changed=true;}
+        if(hovered && ImGui.IsMouseClicked(ImGuiMouseButton.Right) && note.Tokens.FindIndex(token=>Vector2.Distance(At(token),mouse)<=12) is var removed and >=0){note.Tokens.RemoveAt(removed);changed=true;}
+        foreach(var token in note.Tokens)
+        {
+            var at=At(token);
+            draw.AddCircleFilled(at,11,ImGui.GetColorU32(Accent));
+            var size=ImGui.CalcTextSize(token.Label);
+            draw.AddText(at-size/2,ImGui.GetColorU32(new Vector4(0,0,0,1)),token.Label);
+        }
+        if(hovered)WrappedTooltip(localization.Get("DutyNotes.CanvasTip"));
+        // Marks in one click (waymark names and roles), or a short label typed.
+        ImGui.BeginDisabled(note.Tokens.Count>=DutyArena.MaxTokens);
+        try
+        {
+            foreach(var label in DutyArena.QuickLabels)
+            {
+                if(ImGui.SmallButton(label+$"##ArenaQuick{label}")){note.Tokens.Add(new ArenaToken{Label=label});changed=true;}
+                ImGui.SameLine();
+            }
+            ImGui.NewLine();
+            ImGui.SetNextItemWidth(60);ImGui.InputText("##ArenaLabel",ref arenaLabel,DutyArena.MaxLabel);Tip("DutyNotes.LabelTip");
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("DutyNotes.Add")) && DutyArena.CleanLabel(arenaLabel) is { Length:>0 } typed){note.Tokens.Add(new ArenaToken{Label=typed});arenaLabel="";changed=true;}
+            Tip("DutyNotes.LabelTip");
+        }
+        finally{ImGui.EndDisabled();}
+        if(CopyButton(localization.Get("DutyNotes.Copy"),()=>DutyArena.Share(duty.DutyId,note)))arenaMessage=null;
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get("DutyNotes.Paste")))
+        {
+            if(DutyArena.Parse(ImGui.GetClipboardText()) is { } pasted){note=pasted.Note;changed=true;arenaMessage=pasted.Duty==duty.DutyId ? null:localization.Get("DutyNotes.OtherDuty");}
+            else arenaMessage=localization.Get("DutyNotes.NotACode");
+        }
+        Tip("DutyNotes.PasteTip");
+        if(arenaMessage is { } said)ImGui.TextDisabled(said);
+        if(!changed)
+        {
+            if(!notes.ContainsKey(duty.DutyId) && (note.Text.Length>0 || note.Tokens.Count>0))notes[duty.DutyId]=note;
+            return;
+        }
+        if(note.Text.Length==0 && note.Tokens.Count==0)notes.Remove(duty.DutyId);
+        else if(notes.ContainsKey(duty.DutyId) || notes.Count<DutyArena.MaxNotes)notes[duty.DutyId]=note;
+        TrySave("DutyNotes.Title");
+    }
+
     private void DrawDutyLootDetails()
     {
         var state = dutyLoot.State;
         if (state.Duty is not { } duty) return;
-        DrawItemIcon(new ItemDefinition(0,duty.Name,false,duty.Icon),new Vector2(32)); ImGui.SameLine();
+        DrawGameIcon(duty.Icon,new Vector2(32)); ImGui.SameLine();
         ImGui.TextColored(Accent,duty.Name);
         ImGui.TextDisabled(localization.Format("DutyCounts.Level",duty.Category,duty.Level));
         ImGui.SameLine(); DrawDutyStatus(DutyProgressSource?.Invoke()?.Of(duty.InstanceId));
         DrawDutyUnlock(duty);
         if(developerMode)ImGui.TextDisabled(localization.Format("DevMode.DutyInstance",duty.DutyId,duty.InstanceId));
+        DrawDutyGuide(duty);
+        DrawDutyNotes(duty);
         if (state.Loading)
         { if (ImGui.Button(localization.Get("DutyUi.Cancel"))) dutyLoot.Cancel(); ImGui.SameLine(); ImGui.TextDisabled(localization.Get("DutyUi.Loading")); }
         else
@@ -205,7 +322,7 @@ internal sealed partial class MainWindow
             dutyViewLanguageRevision=localization.Revision; dutyViewCollections=collections.State;
         }
         ImGui.TextDisabled(localization.Format("DutyCounts.Items",dutyItemMatches.Length));
-        if (dutyItemMatches.Length == 0) { ImGui.TextWrapped(localization.Get("DutyUi.Empty")); return; }
+        if (dutyItemMatches.Length == 0) { EmptyState("DutyUi.Empty"); return; }
         if (!ImGui.BeginTable("DutyLootEntries",2,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp)) return;
         try
         {
@@ -226,7 +343,7 @@ internal sealed partial class MainWindow
                     else
                     {
                         DrawItemIcon(local,new Vector2(28)); ImGui.SameLine(); ImGui.TextDisabled(item.Name);
-                        if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("UiFragments.MissingItem"));
+                        Tip("UiFragments.MissingItem");
                     }
                     ImGui.TableNextColumn();
                     ImGui.TextUnformatted(item.Sources.Length == 1 ? DutySourceLabel(item.Sources[0]) : $"{item.Sources.Length} sources");
@@ -241,6 +358,7 @@ internal sealed partial class MainWindow
     private string DutySourceLabel(DutyLootEntry entry) => entry.Kind switch
     {
         DutyLootSourceKind.Reward => localization.Get("DutyUi.Reward"),
+        DutyLootSourceKind.Seen => localization.Get("DutyUi.SeenChest"),
         DutyLootSourceKind.FightCoffer => localization.Format("DutyCounts.Fight",entry.SourceIndex+1) + (string.IsNullOrWhiteSpace(entry.SourceName) ? "" : $" · {entry.SourceName}"),
         _ => localization.Format("DutyCounts.Coffer",entry.SourceIndex+1)
     };

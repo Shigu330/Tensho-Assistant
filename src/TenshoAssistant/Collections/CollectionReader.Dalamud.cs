@@ -30,6 +30,7 @@ internal sealed partial class CollectionReader : IDisposable
     private bool orchestrionUnavailable,orchestrionUnlockUnavailable;
     private string? orchestrionIssue,blueIssue,triadIssue;
     private readonly List<CollectionEntry> entries = [];
+    private readonly RegistrationScope registrations = new();
     private int position;
     private ulong character;
     private bool scanning = true;
@@ -50,9 +51,14 @@ internal sealed partial class CollectionReader : IDisposable
         this.service = service; this.data = data; this.framework = framework;
         this.player = player; this.client = client; this.unlocks = unlocks; this.log = log;
         this.cacheLifetime=cacheLifetime ?? (()=>TimeSpan.FromDays(1));this.disk=disk;this.completionLifetime=completionLifetime ?? (()=>TimeSpan.FromDays(7));
-        unlocks.Unlock+=OnCollectionUnlock;
-        try{TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);try{client.Logout+=OnLogout;}catch{TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);throw;}}
-        catch{unlocks.Unlock-=OnCollectionUnlock;throw;}
+        // X-76 H10 (0.924): subscriptions owned by one RegistrationScope: a failure part-way undoes the ones already made; Dispose releases them in reverse order.
+        try
+        {
+            registrations.Register(()=>unlocks.Unlock+=OnCollectionUnlock,()=>unlocks.Unlock-=OnCollectionUnlock);
+            registrations.Register(()=>TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate),()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate));
+            registrations.Register(()=>client.Logout+=OnLogout,()=>client.Logout-=OnLogout);
+        }
+        catch{registrations.Dispose();throw;}
     }
     private void OnCollectionUnlock(RowRef row)
     {
@@ -251,6 +257,7 @@ internal sealed partial class CollectionReader : IDisposable
                             var number = 0;
                             var description = "";
                             var location = "";
+                            var dutyLevel = 0;
                             if (blueDetails.TryGetRow(row.RowId, out var details))
                             {
                                 number = details.Number;
@@ -265,12 +272,15 @@ internal sealed partial class CollectionReader : IDisposable
                                     else if (source.RowType == typeof(TerritoryType))
                                         location = data.GetExcelSheet<TerritoryType>().TryGetRow(source.RowId, out var territory) ? territory.PlaceName.ValueNullable?.Name.ExtractText() ?? "" : "";
                                     else if (source.RowType == typeof(ContentFinderCondition))
-                                        location = data.GetExcelSheet<ContentFinderCondition>().TryGetRow(source.RowId, out var content) ? content.Name.ExtractText() : "";
+                                    {
+                                        // X-76 P5 (0.930): the duty's required level, from the same row (ContentFinderCondition.ClassJobLevelRequired).
+                                        if (data.GetExcelSheet<ContentFinderCondition>().TryGetRow(source.RowId, out var content)) { location = content.Name.ExtractText(); dutyLevel = content.ClassJobLevelRequired; }
+                                    }
                                 }
                                     catch (Exception) { location = ""; blueIssue = "Blue magic spell catalogue partly read; the other collections can still be browsed."; }
                             }
                             entries.Add(new(CollectionKind.BlueMagic, row.RowId, name, action.Icon,
-                                character != 0 && unlocks.IsAozActionUnlocked(row), number, row.Rank, description, location));
+                                character != 0 && unlocks.IsAozActionUnlocked(row), number, row.Rank, description, location, DutyLevel: dutyLevel));
                         }
                     }
                 }
@@ -317,9 +327,7 @@ internal sealed partial class CollectionReader : IDisposable
         {
         if (disposed) return;
         disposed = true;
-        TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
-        client.Logout-=OnLogout;
-        unlocks.Unlock-=OnCollectionUnlock;
+        registrations.Dispose();
         service.Clear();
         entries.Clear(); mounts = null; companions = null; emotes = null; blue = null; blueDetails = null;
         cards = null; cardDetails = null;

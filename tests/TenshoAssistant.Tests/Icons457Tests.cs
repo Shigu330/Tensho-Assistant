@@ -8,7 +8,7 @@ internal static class Icons457Tests
     [
         ("Crafting action icons: in the forbidden actions and the recorder's list, from the game's data",() =>
         {
-            const string icon="DrawItemIcon(metadata is null ? null:new ItemDefinition(0,metadata.Name,false,metadata.Icon),";
+            const string icon="DrawGameIcon(metadata?.Icon ?? 0,";
             var rules=Read("MainWindow.CraftRules.cs");
             Check(rules.Contains(icon) && rules.IndexOf(icon,StringComparison.Ordinal)<rules.IndexOf("ImGui.Checkbox(",StringComparison.Ordinal),"forbidden actions: icon before the box");
             var recorder=Read("MainWindow.CraftRecorder.cs");

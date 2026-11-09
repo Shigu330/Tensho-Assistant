@@ -126,6 +126,7 @@ internal sealed unsafe class QuestReader : IDisposable
                             Level = row.ClassJobLevel.FirstOrDefault(),
                             AdditionalLevel = row.ClassJobLevel.Skip(1).FirstOrDefault(),
                             Zone = row.PlaceName.RowId == 0 || !row.PlaceName.IsValid ? "" : row.PlaceName.Value.Name.ExtractText(),
+                            Expansion = row.Expansion.IsValid ? row.Expansion.Value.Name.ExtractText() : "",
                             IssuerId = row.IssuerStart.RowId,
                             IssuerMapId = row.IssuerLocation.RowId == 0 || !row.IssuerLocation.IsValid ? 0 : row.IssuerLocation.Value.Map.RowId,
                             IssuerTerritoryId = row.IssuerLocation.RowId == 0 || !row.IssuerLocation.IsValid ? 0 : row.IssuerLocation.Value.Territory.RowId

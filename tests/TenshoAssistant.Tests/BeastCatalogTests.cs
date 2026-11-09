@@ -89,7 +89,7 @@ internal static class BeastCatalogTests
             var windows=probe[probe.IndexOf("Windows =",StringComparison.Ordinal)..probe.IndexOf("private const int",StringComparison.Ordinal)];
             Check(windows.Contains("XBMMonsterBookDetail") && windows.Contains("XBMPetParty") && windows.Contains("XBMBattleMonsterDetail"),"the windows wanted");
             Check(!windows.Contains("XBMRanking") && !windows.Contains("XBMResult"),"other players and the character stay out");
-            Check(probe.Contains("!developerMode()") && probe.Contains("depth > MaximumDepth") && probe.Contains("found.Count < MaximumTexts") && probe.Contains("written >= MaximumLinesPerWindow"),"off by default, recursion and output bounded");
+            Check(probe.Contains("!developerMode()") && probe.Contains("if (depth > MaximumDepth || !UiNodes.Walkable(manager)) return;") && probe.Contains("found.Count < MaximumTexts") && probe.Contains("written >= MaximumLinesPerWindow"),"off by default, recursion and output bounded");
             Check(probe.Contains("failed = true;") && probe.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate)"),"stops on failure, cleaned up");
         }),
         ("Beastmaster page: raw reads guarded, read-only, in the self-check",() =>

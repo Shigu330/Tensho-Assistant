@@ -8,6 +8,12 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal AchievementProgressWatcher? AchievementProgressSource { get; set; }
+    /// <summary>X-102 (0.987): a tracked achievement seen reaching its maximum: one chat line (framework thread; the name from the collections read).</summary>
+    internal void AchievementCompleted(uint id)
+    {
+        var name=collections.State.Entries.FirstOrDefault(entry=>entry.Kind==CollectionKind.Achievement && entry.Id==id)?.Name ?? $"#{id}";
+        ChatNotice?.Invoke(localization.Format("AchievementProgress.Completed",name));
+    }
 
     private void DrawAchievementProgress(CollectionEntry entry)
     {
@@ -26,7 +32,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("AchievementProgress.Ask")+$"##Ask{id}") && AchievementProgressSource?.Request(id)==false)
             saveError=localization.Get("AchievementProgress.Wait");
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("AchievementProgress.AskTip"));
+        Tip("AchievementProgress.AskTip");
     }
 
     private void ToggleTracked(uint id)

@@ -12,7 +12,7 @@ public enum MapLocalKind { QuestIssuer, GatheringPoint, FishingSpot, Sightseeing
 /// GatheringPointBase). MapId is 0 when the row gives no map: gathering points take the map of their catalogue source.
 /// Proof of the links: docs/evidence/0.114.0-local-probe.log (Fate.Location is not a Level row, so FATEs have no static position).
 /// Fishing spots (0.126): FishingSpot.X/Z are map texture pixels (docs/evidence/0.126.0-fishing-probe.log, equal to Garland's
-/// coordinates for spots 2 and 35), converted to world X/Z; their radius unit is unproven, so Radius is 0.
+/// coordinates for spots 2 and 35), converted to world X/Z; 0.894: their radius from FishingSpot.Radius × FishingSpotRadiusFactor (texture pixels), in world units.
 /// </summary>
 // Sightseeing (0.127): Id = Adventure row, Data = its discovered picture icon, Name = vista name (Adventure → Level).
 // AetherCurrent (0.127): Id = AetherCurrent row; field currents placed by the Level whose Object is the EObj carrying it
@@ -86,7 +86,13 @@ public static class MapLocalIndexCache
     public const int MaximumRows=200_000;
     // Bump when the Lumina → MapLocalPosition copy rules change without a change of record shape.
     // 2: quest giver rows carry the quest kind's map icon in Data (0.151).
-    private const int CopyRules=2;
+    // 3: fishing spots carry their area (0.894, FishingSpotRadiusFactor).
+    private const int CopyRules=3;
+    /// <summary>
+    /// X-78 (0.894, docs/evidence/0.894-fishing-spot-area.md): FishingSpot.Radius in map texture pixels (as FishingSpot.X/Z), measured on the fishing log's own map
+    /// of La Mer de Rubis (user capture): spots of radius 1000 drew circles of about 155 texture pixels, the 2000 one about 310. Approximate (±5 %).
+    /// </summary>
+    public const float FishingSpotRadiusFactor=0.155f;
     public static readonly string Shape=CatalogCacheKeys.Shape(typeof(MapLocalPosition),typeof(MapLocalKind));
     public static string Version(string dataVersion)=>CatalogCacheKeys.Version(dataVersion,CopyRules,Shape);
     public static bool Valid(MapLocalIndexCacheData? data,string dataVersion)
@@ -98,8 +104,10 @@ public sealed record MapLocalQuest(QuestEntry Quest,MapLocalPosition Position);
 // Icon: the gathering type's map icon (GatheringType.IconMain, copied into GatheringSource.IconId).
 // Schedule (0.130): the point's Eorzea windows when limited (unspoiled, ephemeral, legendary), else null.
 public sealed record MapLocalGatheringPoint(uint BaseId,string Type,int Level,string Place,IReadOnlyList<uint> Items,bool Hidden,MapLocalPosition? Position,uint Icon=0,
-    GatheringSchedule? Schedule=null)
+    GatheringSchedule? Schedule=null,uint TypeId=0)
 {
+    /// <summary>X-80 (0.895): the job of the point: GatheringType 0–1 miner (16), 2–3 botanist (17), spearfishing (4–5) and fishing spots (100) fisher (18).</summary>
+    public uint Job=>TypeId switch{0 or 1=>16,2 or 3=>17,_=>18};
     public bool Timed=>Schedule is { Kind:GatheringScheduleKind.Limited, Windows.Count:>0 };
     /// <summary>True when an Eorzea minute of the day falls in one of the windows (windows may cross midnight).</summary>
     public bool ActiveAt(int eorzeaMinutes)=>Timed && Schedule!.Windows.Any(window=>
@@ -124,6 +132,13 @@ public static class MapLocalLists
             .ToArray();
     }
 
+    /// <summary>
+    /// X-78 (0.891, user request: the fishing spot « as on FF14 », an orange fish like the spearfishing one): the game's orange fish map icon, 60465, next to the
+    /// gathering types' icons (60461–60464, GatheringType.IconOff) and drawn like the spearfishing fish 60929 (docs/evidence/0.891-spearfishing-slots.md). No sheet
+    /// names it: chosen by its look, for the map only (the gathering lists keep their icon).
+    /// </summary>
+    public const uint FishingSpotIcon=60465;
+
     /// <summary>Gathering points of the map by gathering type, one row per point base or fishing spot (items merged).</summary>
     public static IReadOnlyList<(string Type,IReadOnlyList<MapLocalGatheringPoint> Points)> Gathering(IEnumerable<GatheringSource> sources,MapLocalIndex index,uint mapId)
     {
@@ -134,8 +149,8 @@ public static class MapLocalLists
             {
                 var first=group.First();
                 return new MapLocalGatheringPoint(first.BaseId,first.TypeName,first.Level,first.Place,group.Select(source=>source.ItemId).Distinct().Order().ToArray(),
-                    group.Any(source=>source.IsHidden),first.IsFishing ? index.Fishing(first.BaseId):index.Gathering(first.BaseId),first.IconId,
-                    group.Select(source=>source.Schedule).FirstOrDefault(schedule=>schedule is { Kind:GatheringScheduleKind.Limited }));
+                    group.Any(source=>source.IsHidden),first.IsFishing ? index.Fishing(first.BaseId):index.Gathering(first.BaseId),first.IsFishing ? FishingSpotIcon:first.IconId,
+                    group.Select(source=>source.Schedule).FirstOrDefault(schedule=>schedule is { Kind:GatheringScheduleKind.Limited }),first.TypeId);
             })
             .GroupBy(point=>point.Type.Length>0 ? point.Type:"—")
             .OrderBy(group=>group.Key,StringComparer.CurrentCultureIgnoreCase)

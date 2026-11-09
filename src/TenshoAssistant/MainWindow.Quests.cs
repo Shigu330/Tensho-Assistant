@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
         if (ImGui.Button(localization.Get("QuestsBrowser.Refresh"))) quests.RequestRefresh();
         ImGui.SameLine();
         ImGui.TextDisabled(state.Loading ? localization.Get("QuestsBrowser.Loading") : state.ObservedAt is { } date ? localization.Format("QuestsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("QuestsBrowser.Offline"));
-        if (state.Error is { } error) {ImGui.TextWrapped(localization.Get("QuestsBrowser.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error));}
+        if (state.Error is { } error) DrawDataError(error,"QuestsBrowser.Error");
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Quests,state.ObservedAt,state.FromCache);
         DrawFollowedQuests();
         if (ImGui.SmallButton(localization.Get("QuestsBrowser.Catalogue")+"###QuestCatalogue")) questShowDetails = false;
@@ -194,11 +194,13 @@ internal sealed partial class MainWindow
             {
                 var entry = matches[index];
                 ImGui.TableNextRow(); ImGui.TableNextColumn();
-                DrawItemIcon(new ItemDefinition(0, entry.Name, false, entry.Icon), new Vector2(24));
+                DrawGameIcon(entry.Icon,new Vector2(24));
                 if (ImGui.IsItemClicked()) SelectQuest(entry.Id);
                 ImGui.SameLine();
                 if (ImGui.Selectable($"{entry.Name}##quest{entry.Id}", selectedQuestId == entry.Id)) SelectQuest(entry.Id);
-                if (ImGui.IsItemHovered()) WrappedTooltip(developerMode ? $"{entry.Name}\n{entry.Section} › {entry.Category}\nID: {entry.Id}":$"{entry.Name}\n{entry.Section} › {entry.Category}");
+                // X-89 (0.970): the quest's expansion (game data) in its tooltip.
+                if (ImGui.IsItemHovered()) WrappedTooltip($"{entry.Name}\n{entry.Section} › {entry.Category}"
+                    +(entry.Expansion is { Length:>0 } questExpansion ? "\n"+localization.Format("QuestDetails.Expansion",questExpansion):"")+(developerMode ? $"\nID: {entry.Id}":""));
                 QuestMenu($"QuestMenu{entry.Id}", entry.Id, entry.Name);
                 ImGui.TableNextColumn(); if (entry.Level > 0) ImGui.TextUnformatted(entry.Level.ToString(CultureInfo.CurrentCulture)); else ImGui.TextDisabled("?");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Zone ?? "");
@@ -238,7 +240,7 @@ internal sealed partial class MainWindow
         if (ImGui.SmallButton(localization.Get("QuestDetails.Close"))) { selectedQuestId = 0; questShowDetails = false; questNavigation.Clear(); return; }
         var entry = questLinks.Find(selectedQuestId);
         if (entry is null) { ImGui.TextDisabled(localization.Format("QuestDetails.Missing",selectedQuestId)); return; }
-        DrawItemIcon(new ItemDefinition(0, entry.Name, false, entry.Icon), new Vector2(36));
+        DrawGameIcon(entry.Icon,new Vector2(36));
         ImGui.SameLine(); ImGui.TextColored(Accent, entry.Name);
         var followed = configuration.FollowedQuests?.Contains(entry.Id) == true;
         if (ImGui.SmallButton(localization.Get(followed ? "QuestDetails.Unfollow":"QuestDetails.Follow"))) SaveFollowedQuest(entry.Id, !followed);
@@ -253,6 +255,7 @@ internal sealed partial class MainWindow
             ImGui.TextUnformatted(localization.Format("QuestDetails.Level",entry.Level));
         if(entry.AdditionalLevel!=0)ImGui.TextUnformatted(localization.Format("QuestDetails.OtherLevel",entry.AdditionalLevel));
         if (!string.IsNullOrWhiteSpace(entry.Zone)) ImGui.TextUnformatted(localization.Format("QuestDetails.Zone",entry.Zone));
+        if (!string.IsNullOrWhiteSpace(entry.Expansion)) ImGui.TextUnformatted(localization.Format("QuestDetails.Expansion",entry.Expansion));
         if (developerMode && entry.IssuerId != 0) ImGui.TextDisabled(localization.Format("DevMode.IssuerId",entry.IssuerId));
         if (entry.IssuerMapId != 0 && entry.IssuerTerritoryId != 0)
         {
@@ -265,7 +268,7 @@ internal sealed partial class MainWindow
                     if (mapLocal?.State.Index?.Quest(entry.Id) is { } giver && giver.MapId == issuerMap.MapId) ShowOnTenshoMap(issuerMap, new Vector3(giver.X, 0, giver.Z));
                     else ShowMapOnTenshoMap(issuerMap.MapId);
                 }
-                if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("QuestDetails.MapHelp"));
+                Tip("QuestDetails.MapHelp");
             }
             else ImGui.TextDisabled(localization.Get("QuestDetails.NoMap"));
         }
@@ -301,7 +304,7 @@ internal sealed partial class MainWindow
         var linked = questLinks.Find(id);
         if (linked is not null)
         {
-            DrawItemIcon(new ItemDefinition(0, linked.Name, false, linked.Icon), new Vector2(24));
+            DrawGameIcon(linked.Icon,new Vector2(24));
             if (ImGui.IsItemClicked()) SelectQuest(id);
             ImGui.SameLine();
         }
@@ -386,7 +389,7 @@ internal sealed partial class MainWindow
         if (TenshoAssistant.UI.UiComponents.Header(localization.Format("QuestsBrowser.Followed",followed?.Count ?? 0)+"###FollowedQuests"))
         {
             ImGui.TextDisabled(localization.Get("QuestsBrowser.FollowHelp"));
-            if (followed is not { Count: > 0 }) ImGui.TextWrapped(localization.Get("QuestsBrowser.FollowEmpty"));
+            if (followed is not { Count: > 0 }) EmptyState("QuestsBrowser.FollowEmpty");
             else
             {
                 uint? remove = null;

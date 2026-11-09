@@ -117,7 +117,7 @@ internal sealed partial class MainWindow
         var state=cactpotSolve.State;
         ImGui.TextDisabled(localization.Format("CactpotCounts.Revealed",cactpotBoard.Count(value=>value!=0)));
         if(state.Loading)ImGui.TextDisabled(localization.Get("CactpotUi.Calculating"));
-        if(state.Error is { } errorText){ImGui.TextWrapped(localization.Get("CactpotCounts.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(errorText));}
+        if(state.Error is { } errorText)DrawDataError(errorText,"CactpotCounts.Error");
         if(state.Result is not { } result)return;
         ImGui.TextColored(Accent,result.ChooseLine ? localization.Get("CactpotUi.ChooseLine"):localization.Get("CactpotUi.ChooseCell"));
         ImGui.TextUnformatted(localization.Format("CactpotCounts.Reward",result.ExpectedReward));

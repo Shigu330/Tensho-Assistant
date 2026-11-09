@@ -66,7 +66,7 @@ internal static class RetainerSalesTests
             Check(reader.Contains("agent->RetainerSellListAddonId != unit->Id") && reader.Contains("count > RetainerSales.MaximumListings") && reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate)"),"window confirmed, rows bounded, cleaned up");
             Check(panel.Split("RetainerCompare?.Request(").Length==2 && panel.Contains("if (ImGui.SmallButton(localization.Get(\"RetainerSales.Compare\")))"),"asked on the click only");
             Check(!reader.Contains("RetainerCompare") && !reader.Contains("Request("),"never by the reader");
-            Check(panel.Contains("ImGui.SetClipboardText(paste.ToString())"),"the only write");
+            Check(panel.Contains("()=>paste.ToString());"),"the only write");
             Check(Read("Plugin.cs").Contains("(\"RetainerSales\",mainWindow.DrawRetainerSalesPanel)"),"drawn as an isolated panel");
         }),
     ];

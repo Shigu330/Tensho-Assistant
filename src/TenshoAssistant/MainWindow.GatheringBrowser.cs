@@ -98,7 +98,7 @@ internal sealed partial class MainWindow
             ImGui.PushID($"SourceType{type.TypeId}");
             try
             {
-                DrawItemIcon(new ItemDefinition(0, type.TypeName, false, type.IconId), new Vector2(28));
+                DrawGameIcon(type.IconId,new Vector2(28));
                 if (ImGui.IsItemClicked()) sourceTypeFilter = type.TypeId;
                 if (ImGui.IsItemHovered()) WrappedTooltip(type.TypeName);
             }
@@ -157,14 +157,14 @@ internal sealed partial class MainWindow
                                     ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
                                     try { ImGui.TextColored(Success, Dalamud.Interface.FontAwesomeIcon.Check.ToIconString()); }
                                     finally { ImGui.PopFont(); }
-                                    if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("Notebooks.DoneTip"));
+                                    Tip("Notebooks.DoneTip");
                                 }
                             }
                             finally { ImGui.PopID(); }
                         }
                     }
                     finally { clipper.End(); clipper.Destroy(); }
-                    if (sourceMatches.Length == 0) ImGui.TextWrapped(localization.Get("GatheringBrowser.Empty"));
+                    if (sourceMatches.Length == 0) EmptyState("GatheringBrowser.Empty");
                 }
             }
             finally { ImGui.EndChild(); }

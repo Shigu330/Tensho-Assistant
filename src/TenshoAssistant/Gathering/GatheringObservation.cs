@@ -42,6 +42,12 @@ public sealed class GatheringObservedFrame
             .Select(slot=>new GatheringObservedSlot(slot.Index,slot.ContextResolved ? slot.BaseItemId:0,slot.ItemId,slot.Flags,Number(slot.Success,0,100,true),BoonNumber(slot.Boon),Number(slot.Quantity,1,20))).ToArray());
     }
 }
+/// <summary>0.831 (X-61): another node row (both read), or more attempts left than last read, is another node.</summary>
+public static class GatheringNodes
+{
+    public static bool IsNew(uint startNode,int? lastAttempts,uint node,int? attempts)
+        =>startNode!=0 && node!=0 && startNode!=node || lastAttempts is { } last && attempts is { } now && now>last;
+}
 public sealed record GatheringObservationState(bool Enabled,ulong Owner,GatheringObservationStatus Status,DateTimeOffset? ObservedAt,GatheringObservedFrame? Frame,string? Error)
 {
     public bool Fresh(DateTimeOffset now)=>Enabled && Owner!=0 && Status==GatheringObservationStatus.Observed && Frame is not null

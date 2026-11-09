@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
     /// </summary>
     internal void GardenPlanted(GardenChatEvent found,uint? seedId,string? zone)
     {
-        if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted){GardenCared(found.Kind,zone);return;}
+        if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted or GardenChatKind.Harvested){GardenCared(found.Kind,zone);return;}
         var seeds=GardenSeedCatalog?.Invoke() ?? [];
         var known=seedId is { } id ? seeds.FirstOrDefault(row=>row.Seed.SeedId==id):default;
         if(known.Seed is null){ChatNotice?.Invoke(localization.Get("Garden.DetectedUnknown"));return;}
@@ -55,9 +55,21 @@ internal sealed partial class MainWindow
     {
         var here=GardenJournal.At(configuration.GardenBeds,zone);
         if(here.Length==0)return;
+        // #36 (0.978): a harvest is of a ripe bed: the only one ripe here is that one; none ripe (0.997, review): nothing is removed, the player is told.
+        if(kind==GardenChatKind.Harvested)
+        {
+            var ripe=here.Where(row=>GardenJournal.RipeAt(row)<=DateTimeOffset.UtcNow).ToArray();
+            if(ripe.Length==0){ChatNotice?.Invoke(localization.Get("Garden.HarvestNoneRipe"));return;}
+            here=ripe;
+        }
         if(here.Length>1){ChatNotice?.Invoke(localization.Get("Garden.CareSeveral"));return;}
         var bed=here[0];
         if(kind==GardenChatKind.Tended)GardenJournal.Tend(bed,DateTimeOffset.UtcNow);
+        else if(kind==GardenChatKind.Harvested)
+        {
+            configuration.GardenBeds=(configuration.GardenBeds ?? []).Where(row=>row.Id!=bed.Id).ToList();
+            ChatNotice?.Invoke(localization.Format("Garden.HarvestedNotice",bed.Seed,bed.Place));
+        }
         else
         {
             configuration.GardenBeds=(configuration.GardenBeds ?? []).Where(row=>row.Id!=bed.Id).ToList();
@@ -148,7 +160,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(GardenJournal.TendAt(bed) is null);
         try{if(ImGui.SmallButton(localization.Get("Garden.Tend"))){GardenJournal.Tend(bed,now);changed=true;}}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get("Garden.TendTip"));
+        Tip("Garden.TendTip");
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("Garden.Remove")))removed=bed;
         Tip("Garden.RemoveTip");
@@ -187,7 +199,7 @@ internal sealed partial class MainWindow
             }
         }
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(beds.Count>=GardenJournal.Capacity ? "Garden.Full":"Garden.PlantTip"));
+        Tip(beds.Count>=GardenJournal.Capacity ? "Garden.Full":"Garden.PlantTip");
         if(newBedError is { } error)ImGui.TextColored(UI.FfxivTheme.Error,error);
     }
 
@@ -199,7 +211,7 @@ internal sealed partial class MainWindow
         {
             ImGui.SetNextItemWidth(160);
             var open=ImGui.BeginCombo("##NewBedSeedPick",localization.Get("Garden.SeedPick"));
-            if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(seeds.Count==0 ? "Garden.SeedPickNone":"Garden.SeedPickTip"));
+            Tip(seeds.Count==0 ? "Garden.SeedPickNone":"Garden.SeedPickTip");
             if(open)
             {
                 try

@@ -26,6 +26,8 @@ public sealed class TenshoAlarm
     public int LeadMinutes { get; set; } = 5;
     public uint TerritoryId { get; set; }
     public uint ItemId { get; set; }
+    // 0.832 (X-62): the quantity a tracking list needed when the alarm was added from it; 0 for every other alarm.
+    public long Needed { get; set; }
     public List<uint> Weathers { get; set; } = [];
     public List<uint> PreviousWeathers { get; set; } = [];
     public bool Enabled { get; set; } = true;
@@ -72,6 +74,12 @@ public sealed class AlarmSettings
     // 0.371 (g, M-01): automatic alarms at the ventures' end and the vessels' return (user's choice: on by default).
     public bool AutoAlarms { get; set; } = true;
 
+    /// <summary>
+    /// X-76 H3 (0.914): a separate copy with every field (all are values). The settings page edits the copy and saves it, so the saved
+    /// object stays untouched and a failed save puts it back as it was.
+    /// </summary>
+    public AlarmSettings Copy() => (AlarmSettings)MemberwiseClone();
+
     /// <summary>Whether a ringing Tensho alarm plays its sound: not in a duty while MuteInDuties is on.</summary>
     public bool SoundAllowed(bool inDuty) => PlaySound && !(MuteInDuties && inDuty);
     /// <summary>Whether it writes its [Tensho] chat line: not in a duty when MuteInDuties and MuteChatInDuties are both on.</summary>
@@ -80,6 +88,9 @@ public sealed class AlarmSettings
 
 public static class AlarmSchedule
 {
+    /// <summary>0.832 (X-62, user report): an alarm added from a tracking list stays silent once the item is held in the quantity the list needed.</summary>
+    public static bool Gathered(TenshoAlarm alarm, long held) => alarm.ItemId != 0 && alarm.Needed > 0 && held >= alarm.Needed;
+
     public const int Maximum = 60;
     // Real seconds of one ET day (24 ET hours × 175 s) and of one ET minute (175 / 60 s).
     public const double EtDaySeconds = 4200, EtMinuteSeconds = 175.0 / 60;
@@ -155,7 +166,7 @@ public static class AlarmSchedule
         IReadOnlyList<uint>? weathers = null, IReadOnlyList<uint>? previous = null) =>
         startMinutes.Select(minute => ((minute % 1440) + 1440) % 1440).Distinct().Order().Select(minute => new TenshoAlarm
         {
-            Label = $"{label} · {minute / 60:00}:{minute % 60:00} ET", Repeat = AlarmRepeat.EorzeaDaily, EtMinute = minute,
+            Label = $"{label} · {Gathering.GatheringTime.Clock(minute)} ET", Repeat = AlarmRepeat.EorzeaDaily, EtMinute = minute,
             LeadMinutes = ClampLead(AlarmRepeat.EorzeaDaily, lead), TerritoryId = territory, ItemId = item,
             Weathers = [.. weathers ?? []], PreviousWeathers = [.. previous ?? []],
         }).ToArray();

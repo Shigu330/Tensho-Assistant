@@ -25,6 +25,12 @@ internal sealed partial class MainWindow
     // Hint id of a category name shown by the game (FashionCheckThemeCategory name, same client language).
     private uint FashionHintIdOf(string category)=>category.Length==0 ? 0
         :fashionHints.State.Catalog?.Hints.FirstOrDefault(hint=>string.Equals(hint.Name,category,StringComparison.CurrentCultureIgnoreCase))?.Id ?? 0;
+    /// <summary>X-73.4 (0.861): the slot's category: the game's own id when it is a known hint, else the name match as before.</summary>
+    private uint FashionHintOf(FashionCheckFrame frame,int slot)
+    {
+        if(frame.CategoryIds is { } ids && slot<ids.Count && ids[slot] is var id and not 0 && fashionHints.State.Catalog?.Hints.Any(hint=>hint.Id==id)==true)return id;
+        return FashionHintIdOf(slot<frame.Categories.Count ? frame.Categories[slot]:"");
+    }
 
     private IReadOnlyList<FashionCandidate> FashionSlotCandidates(uint hint,EquipmentSlots slot)
     {
@@ -43,9 +49,10 @@ internal sealed partial class MainWindow
     private void DrawFashionWeek()
     {
         var now=DateTimeOffset.UtcNow;var (_,next)=FashionWeek.Bounds(now);
-        var theme=fashionThemeName?.Invoke(FashionWeek.ThemeRow(now));
+        // X-73.4 (0.861): the theme the game gives, once its window has been read; the « week + 9 » rule only before.
+        var theme=fashionThemeName?.Invoke(fashionCheck?.Last is { WeeklyTheme:not 0 } read && read.ObservedAt>=FashionWeek.Bounds(now).Start ? read.WeeklyTheme:FashionWeek.ThemeRow(now));
         ImGui.TextColored(Accent,localization.Format("FashionWeek.Theme",theme is { Length:>0 } ? theme:localization.Get("FashionWeek.ThemeUnknown")));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("FashionWeek.ThemeHelp"));
+        Tip("FashionWeek.ThemeHelp");
         ImGui.TextDisabled(localization.Format("FashionWeek.Reset",next.ToLocalTime().ToString("g"),Math.Max(0,(int)(next-now).TotalHours)));
         DrawFashionOptions();
         if(fashionCheck?.Last is not { } frame){ImGui.TextWrapped(localization.Get("FashionWeek.OpenInGame"));return;}
@@ -82,24 +89,12 @@ internal sealed partial class MainWindow
 
     private void DrawFashionOptions()
     {
+        // X-76 H5 (0.915): one shared row per option (tooltip, « ↺ », the value restored when saving fails).
         var options=configuration.FashionOptions??=new();
-        var owned=options.OwnedFirst;var dim=options.DimUnowned;var popular=options.ByPopularity;var panel=options.ShowPanel;var changed=false;
-        // 0.324: « ↺ » after each option.
-        var defaults=DefaultConfiguration.FashionOptions;
-        changed|=ImGui.Checkbox(localization.Get("FashionWeek.OwnedFirst"),ref owned);Tip("FashionWeek.OwnedFirstTip");
-        if(DefaultButton("FashionOwnedFirst",owned!=defaults.OwnedFirst)){owned=defaults.OwnedFirst;changed=true;}
-        ImGui.SameLine();
-        changed|=ImGui.Checkbox(localization.Get("FashionWeek.Dim"),ref dim);Tip("FashionWeek.DimTip");
-        if(DefaultButton("FashionDim",dim!=defaults.DimUnowned)){dim=defaults.DimUnowned;changed=true;}
-        ImGui.SameLine();
-        changed|=ImGui.Checkbox(localization.Get("FashionWeek.Popular"),ref popular);Tip("FashionWeek.PopularTip");
-        if(DefaultButton("FashionPopular",popular!=defaults.ByPopularity)){popular=defaults.ByPopularity;changed=true;}
-        changed|=ImGui.Checkbox(localization.Get("FashionWeek.Panel"),ref panel);Tip("FashionWeek.PanelTip");
-        if(DefaultButton("FashionPanel",panel!=defaults.ShowPanel)){panel=defaults.ShowPanel;changed=true;}
-        if(!changed)return;
-        var previous=configuration.FashionOptions;
-        configuration.FashionOptions=new(){OwnedFirst=owned,DimUnowned=dim,ByPopularity=popular,ShowPanel=panel};
-        try{save();}catch(Exception error){configuration.FashionOptions=previous;log.Warning(error,"Fashion options could not be saved.");}
+        BoolSetting("FashionWeek.OwnedFirst","FashionWeek.OwnedFirstTip",()=>options.OwnedFirst,value=>options.OwnedFirst=value,c=>c.FashionOptions.OwnedFirst);
+        BoolSetting("FashionWeek.Dim","FashionWeek.DimTip",()=>options.DimUnowned,value=>options.DimUnowned=value,c=>c.FashionOptions.DimUnowned);
+        BoolSetting("FashionWeek.Popular","FashionWeek.PopularTip",()=>options.ByPopularity,value=>options.ByPopularity=value,c=>c.FashionOptions.ByPopularity);
+        BoolSetting("FashionWeek.Panel","FashionWeek.PanelTip",()=>options.ShowPanel,value=>options.ShowPanel=value,c=>c.FashionOptions.ShowPanel);
     }
 
     // The 11 slots: category of the week, pieces reported for it (owned / total), expandable list.
@@ -114,7 +109,7 @@ internal sealed partial class MainWindow
         for(var slot=0;slot<FashionWeek.SlotCount && slot<frame.Categories.Count;slot++)
         {
             var category=frame.Categories[slot];
-            var hint=FashionHintIdOf(category);
+            var hint=FashionHintOf(frame,slot);
             var candidates=FashionSlotCandidates(hint,FashionWeek.Slots[slot]);
             var ownedCount=candidates.Count(entry=>FashionOwned(entry.Match.ItemId)==true);
             var label=$"{localization.Get("FashionWeek.Slot"+slot)} · {(category.Length>0 ? category:localization.Get("FashionWeek.NoCategory"))}";
@@ -126,7 +121,10 @@ internal sealed partial class MainWindow
                 // 0.217: a slot without category still opens when it can be dyed (weapon to feet): its dyes of the week stay visible.
                 // Slots without a category open too (from the game window's buttons): they say so; weapon to feet also show their dyes.
                 var open=fashionOpenSlot==slot;
-                if(ImGui.Selectable($"{(open ? "▼":"▶")} {label}  {counts}{(ownedCount>0 ? " ✓":"")}###FashionSlot",open))fashionOpenSlot=open ? -1:slot;
+                var slotText=$"{(open ? "▼":"▶")} {label}  {counts}";var slotStart=ImGui.GetCursorPosX();
+                if(ImGui.Selectable(slotText+"###FashionSlot",open))fashionOpenSlot=open ? -1:slot;
+                // The owned mark right after the row's text, drawn over the full-width row (it does not take the click).
+                if(ownedCount>0){ImGui.SameLine(slotStart+ImGui.CalcTextSize(slotText).X+ImGui.GetStyle().ItemSpacing.X);DrawStateMark(true);}
                 if(!open)continue;
                 var childVisible=ImGui.BeginChild("FashionSlotList",new Vector2(0,compact ? 200:260),true);
                 try{if(childVisible)DrawFashionSlotBody(frame,slot,compact);}
@@ -140,7 +138,7 @@ internal sealed partial class MainWindow
     private void DrawFashionSlotBody(FashionCheckFrame frame,int slot,bool compact)
     {
         var category=slot<frame.Categories.Count ? frame.Categories[slot]:"";
-        var hint=FashionHintIdOf(category);
+        var hint=FashionHintOf(frame,slot);
         if(category.Length>0)DrawFashionSlotItems(FashionSlotCandidates(hint,FashionWeek.Slots[slot]),compact,hint,slot);
         else ImGui.TextDisabled(localization.Get("FashionWeek.NoCategoryWeek"));
         if(slot<6)DrawFashionDyes(slot);
@@ -160,7 +158,17 @@ internal sealed partial class MainWindow
             if(dim)ImGui.PushStyleVar(ImGuiStyleVar.Alpha,0.45f);
             try
             {
-                DrawItemIcon(item,new Vector2(compact ? 22:26));var clicked=ImGui.IsItemClicked();ImGui.SameLine();
+                // 0.900 (user report: the icon's right-click menu came out greyed): only the image is dimmed; its tooltip and menu are drawn without the dimming, like the
+                // name's (0.214).
+                DrawItemImage(item,new Vector2(compact ? 22:26));var clicked=ImGui.IsItemClicked();var iconHovered=ImGui.IsItemHovered();
+                if(dim)ImGui.PopStyleVar();
+                if(item is { Id:>0 })
+                {
+                    if(iconHovered)DrawItemInfoTooltip(id);
+                    ItemLinksMenu(UniqueMenuId($"FashionWeekIcon{hint}/{id}"),item);
+                }
+                if(dim)ImGui.PushStyleVar(ImGuiStyleVar.Alpha,0.45f);
+                ImGui.SameLine();
                 var stock=owned==true ? $" · ×{GetRecipeHoldings(id).Total:N0}":"";
                 clicked|=ImGui.Selectable($"{item?.Name ?? localization.Format("BankUi.Item",id)}{stock}##FashionWeekItem{hint}/{id}",itemId==id);
                 var hovered=ImGui.IsItemHovered();

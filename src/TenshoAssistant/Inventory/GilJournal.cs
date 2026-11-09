@@ -6,7 +6,8 @@ namespace TenshoAssistant.Inventory;
 public enum GilSource { Character, Retainers, Company }
 
 /// <summary>What the change most likely was, from the game window open when it happened (Other when none matched).</summary>
-public enum GilCategory { Other, NpcShop, Market, Repair, Teleport, Retainer, Company }
+// 0.903 (X-84): Mail: gil taken from a letter or attached to one (LetterViewer, LetterEditor). Added last: the saved numbers stay the same.
+public enum GilCategory { Other, NpcShop, Market, Repair, Teleport, Retainer, Company, Mail }
 
 /// <summary>One change of a gil balance: when, by how much, the balance after it, whose, and its category.</summary>
 public sealed record GilEntry(DateTimeOffset At,long Delta,long Balance,GilSource Source,GilCategory Category);
@@ -29,6 +30,8 @@ public static class GilJournal
         ("Shop",GilCategory.NpcShop),("InclusionShop",GilCategory.NpcShop),("ShopExchangeItem",GilCategory.NpcShop),
         ("Bank",GilCategory.Retainer),("RetainerList",GilCategory.Retainer),("SelectString",GilCategory.Other),
         ("FreeCompanyChest",GilCategory.Company),
+        // 0.903 (X-84, user's test, docs/evidence/0.903-letters.md): the log showed « Gil other: +1, windows seen in the last 15 s: LetterList, LetterViewer … ».
+        ("LetterViewer",GilCategory.Mail),("LetterEditor",GilCategory.Mail),
         // 0.775 (X-18): the game takes the teleport's price on arrival, after its window closed: the log showed « Gil other: -1,240, windows seen in the last
         // 15 s: NowLoading » with the chat line « Vous avez dépensé 1240 gils pour vous téléporter ». Only a spending counts (see GilWatcher).
         ("NowLoading",GilCategory.Teleport),
@@ -70,6 +73,13 @@ public static class GilJournal
     }
 
     /// <summary>Gains and spendings per category since a time, for one source.</summary>
+    /// <summary>X-107 (0.986): the character's gil gained and spent since local midnight, transfers with retainers and the company chest left out.</summary>
+    public static (long Gained,long Spent) Today(IEnumerable<GilEntry> entries,DateTimeOffset now)
+    {
+        var since=new DateTimeOffset(now.ToLocalTime().Date,now.ToLocalTime().Offset);
+        var today=entries.Where(entry=>entry.Source==GilSource.Character && entry.At>=since && !IsTransfer(entry.Category)).ToArray();
+        return (today.Where(entry=>entry.Delta>0).Sum(entry=>entry.Delta),today.Where(entry=>entry.Delta<0).Sum(entry=>-entry.Delta));
+    }
     public static IReadOnlyList<(GilCategory Category,long Gained,long Spent)> Totals(IEnumerable<GilEntry> entries,GilSource source,DateTimeOffset since)
         =>entries.Where(entry=>entry.Source==source && entry.At>=since).GroupBy(entry=>entry.Category)
             .Select(group=>(group.Key,group.Where(entry=>entry.Delta>0).Sum(entry=>entry.Delta),group.Where(entry=>entry.Delta<0).Sum(entry=>-entry.Delta)))
@@ -92,9 +102,6 @@ public static class GilJournal
     /// <summary>Writes a journal file through a temporary file (a crash never leaves half a file).</summary>
     public static void Write(string path,IReadOnlyList<GilEntry> entries)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        var temporary=path+"."+Guid.NewGuid().ToString("N")+".tmp";
-        File.WriteAllBytes(temporary,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,entries.ToArray()),Json));
-        File.Move(temporary,path,true);
+        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,entries.ToArray()),Json));
     }
 }

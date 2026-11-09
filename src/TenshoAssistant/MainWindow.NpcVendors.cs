@@ -10,7 +10,6 @@ namespace TenshoAssistant;
 // sheet opened from the Tensho map (one NPC's places and stock) and the short vendor rows of the item hover panel.
 internal sealed partial class MainWindow
 {
-    public const int HoverNpcLines=2;
     private NpcVendorService? npcVendors;
     internal void ConfigureNpcVendors(NpcVendorService service)=>npcVendors=service;
 
@@ -25,16 +24,16 @@ internal sealed partial class MainWindow
             if(developerMode && state.Error is { } error)ImGui.TextWrapped(RawMessage(error));
             return;
         }
-        if(npcVendorFocus!=0 && catalog.Vendors.FirstOrDefault(vendor=>vendor.NpcId==npcVendorFocus) is { } focused){DrawNpcVendorSheet(catalog,focused);return;}
+        if(npcVendorFocus!=0 && catalog.Vendor(npcVendorFocus) is { } focused){DrawNpcVendorSheet(catalog,focused);return;}
         if(itemId<=0){ImGui.TextWrapped(localization.Get("NpcUi.Help"));return;}
         var id=(uint)itemId;
         DrawItemIcon(SelectedItem,new Vector2(40));
         ItemCollectionMenu("SelectedItemCollection",SelectedItem);
         ImGui.SameLine();
-        ImGui.TextColored(Accent,SelectedItem?.Name ?? localization.Format("MonsterUi.Item",id));
+        ImGui.TextColored(Accent,SelectedItem?.Name ?? localization.Format("BankUi.Item",id));
         DrawItemCollection(SelectedItem);
         var offers=catalog.ForItem(id);
-        if(offers.Count==0){ImGui.TextWrapped(localization.Get("NpcUi.None"));return;}
+        if(offers.Count==0){EmptyState("NpcUi.None");return;}
         ImGui.TextDisabled(localization.Format("NpcUi.Count",offers.Count,offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));
         ImGui.TextDisabled(localization.Get("NpcUi.FlagHelp"));
         if(mapOpenError is { } flagError)ImGui.TextColored(Accent,flagError);
@@ -55,9 +54,10 @@ internal sealed partial class MainWindow
                 {
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     ImGui.Selectable(NpcName(offer.Vendor)+"##Offer",false,ImGuiSelectableFlags.SpanAllColumns);
-                    NpcMenu("NpcFlag",NpcName(offer.Vendor),offer.Vendor.NpcId,offer.Vendor.Locations);
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(offer.Vendor.Locations.Count==0 ? localization.Get("NpcUi.NoLocation")
-                        :string.Join(" · ",offer.Vendor.Locations.Take(2).Select(NpcPlace))+(offer.Vendor.Locations.Count>2 ? localization.Format("HoverUi.More",offer.Vendor.Locations.Count-2):""));
+                    var places=VendorLocations(offer.Vendor);
+                    NpcMenu("NpcFlag",NpcName(offer.Vendor),offer.Vendor.NpcId,places);
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(places.Count==0 ? localization.Get("NpcUi.NoLocation")
+                        :string.Join(" · ",places.Take(2).Select(NpcPlace))+(places.Count>2 ? localization.Format("HoverUi.More",places.Count-2):""));
                     ImGui.TableNextColumn();DrawNpcCosts(offer.Sale,18,true);
                     ImGui.TableNextColumn();ImGui.TextUnformatted(offer.Sale.ShopName.Length>0 ? offer.Sale.ShopName:localization.Get("NpcUi.Kind"+offer.Sale.Kind));
                 }
@@ -85,16 +85,18 @@ internal sealed partial class MainWindow
                 if(ImGui.SmallButton(localization.Get("MapView.ShowOnMap")+$"##VendorMap{location.MapId}/{location.X}/{location.Y}"))ShowOnTenshoMap(map,new Vector3(location.WorldX,0,location.WorldZ));
             }
         }
-        var sales=catalog.Sales.Where(sale=>vendor.ShopIds.Contains(sale.ShopId)).GroupBy(sale=>sale.ShopId).ToArray();
-        if(sales.Length==0){ImGui.TextDisabled(localization.Get("MapLocal.ShopsNone"));return;}
+        // X-76 (0.955): the shops' sales come from the catalogue's index (built once), not from a scan of every sale on each frame.
+        var sales=catalog.ShopsOf(vendor.NpcId);
+        if(sales.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.ShopsNone"));return;}
         var items=itemCatalog.State.Catalog;
         foreach(var shop in sales)
         {
-            var first=shop.First();
+            var first=shop[0];
+            var shopKey=first.ShopId;
             var title=first.ShopName.Length>0 && !(localization.CurrentCode!="ja" && first.ShopName.Any(c=>c is >= '\u3040' and <= '\u30FF' or >= '\u4E00' and <= '\u9FFF'))
                 ? first.ShopName:localization.Get("MapLocal.ShopKind"+first.Kind);
-            if(!TenshoAssistant.UI.UiComponents.Header($"{title} ({shop.Count()})##Shop{shop.Key}"))continue;
-            if(!ImGui.BeginTable($"VendorShop{shop.Key}",2,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))continue;
+            if(!TenshoAssistant.UI.UiComponents.Header($"{title} ({shop.Count})##Shop{shopKey}"))continue;
+            if(!ImGui.BeginTable($"VendorShop{shopKey}",2,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))continue;
             try
             {
                 foreach(var sale in shop)
@@ -102,9 +104,9 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     var item=items?.Find(sale.ItemId);
                     DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();
-                    if(ImGui.Selectable($"{item?.Name ?? localization.Format("MonsterUi.Item",sale.ItemId)}##Sale{shop.Key}/{sale.ItemId}/{sale.Quantity}")){itemId=(int)sale.ItemId;npcVendorFocus=0;}
+                    if(ImGui.Selectable($"{item?.Name ?? localization.Format("BankUi.Item",sale.ItemId)}##Sale{shopKey}/{sale.ItemId}/{sale.Quantity}")){itemId=(int)sale.ItemId;npcVendorFocus=0;}
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(sale.ItemId);
-                    ItemCollectionMenu($"SaleCollection{shop.Key}/{sale.ItemId}",item);
+                    ItemCollectionMenu($"SaleCollection{shopKey}/{sale.ItemId}",item);
                     ImGui.TableNextColumn();DrawNpcCosts(sale,16,true);
                 }
             }
@@ -116,7 +118,7 @@ internal sealed partial class MainWindow
     private string NpcName(NpcVendor vendor)=>vendor.Name.Length>0 ? char.ToUpper(vendor.Name[0],System.Globalization.CultureInfo.CurrentCulture)+vendor.Name[1..]
         :localization.Format("NpcUi.Unnamed",vendor.NpcId);
     private string NpcPlace(NpcLocation location)=>localization.Format("NpcUi.Place",location.Zone.Length>0 ? location.Zone:localization.Get("NpcUi.UnknownZone"),
-        location.X.ToString("0.0"),location.Y.ToString("0.0"));
+        Maps.MapProjection.CoordinateNumber(location.X),Maps.MapProjection.CoordinateNumber(location.Y));
     // Amount followed by the currency's game icon; the name is only a tooltip (when the window accepts input) or a fallback text.
     private void DrawNpcCosts(NpcShopSale sale,float iconSize,bool tooltips)
     {
@@ -141,27 +143,12 @@ internal sealed partial class MainWindow
                 continue;
             }
             var currency=cost.CurrencyItemId==0 ? null:itemCatalog.State.Catalog?.Find(cost.CurrencyItemId);
-            if(currency is null)ImGui.TextDisabled(cost.CurrencyItemId==0 ? localization.Format("NpcUi.EncodedCurrency",cost.RawCurrency):localization.Format("MonsterUi.Item",cost.CurrencyItemId));
+            if(currency is null)ImGui.TextDisabled(cost.CurrencyItemId==0 ? localization.Format("NpcUi.EncodedCurrency",cost.RawCurrency):localization.Format("BankUi.Item",cost.CurrencyItemId));
             else
             {
                 DrawItemIcon(currency,new Vector2(iconSize),tooltips);
             }
         }
         if(sale.Quantity>1 || sale.Hq){ImGui.SameLine(0,6);ImGui.TextDisabled(localization.Format("NpcUi.Receives",sale.Quantity,sale.Hq ? " HQ":""));}
-    }
-
-    // Compact hover rows: first vendors with place and cost icons, then an explicit "+N" pointing at the tool.
-    private int HoveredNpcCount(uint id)=>HoverOffers(id).Count;
-    private void DrawHoveredNpcs(uint id)
-    {
-        if(HoverOffers(id) is not { Count:>0 } offers)return;
-        // Short cost first (amount + icon), then the wrapped name and place: wrapping text never pushes the icons off the panel.
-        foreach(var offer in offers.Take(HoverNpcLines))
-        {
-            var place=offer.Vendor.Locations.Count>0 ? NpcPlace(offer.Vendor.Locations[0]):localization.Get("NpcUi.NoLocation");
-            DrawNpcCosts(offer.Sale,ImGui.GetTextLineHeight(),false);ImGui.SameLine(0,6);
-            ImGui.TextWrapped(localization.Format("HoverUi.Npc",NpcName(offer.Vendor),place));
-        }
-        if(offers.Count>HoverNpcLines)ImGui.TextDisabled(localization.Format("HoverUi.NpcMore",offers.Count-HoverNpcLines));
     }
 }

@@ -16,7 +16,7 @@ internal static class Chocobo341Tests
             Check(!character.Contains("DrawCharacterStats",StringComparison.Ordinal) && character.Contains("internal void DrawCharacterPanel()",StringComparison.Ordinal),"page removed, panel kept");
             Check(!Read("MainWindow.Gear.cs").Contains("DrawChocoboBarding",StringComparison.Ordinal),"barding no longer at the bottom of Gear");
             var page = Read("MainWindow.ChocoboBarding.cs");
-            Check(!page.Contains("\"✗\"",StringComparison.Ordinal) && page.Contains("FontAwesomeIcon.Times",StringComparison.Ordinal),"no « ✗ » glyph (missing from the font)");
+            Check(!page.Contains("\"✗\"",StringComparison.Ordinal) && page.Contains("else DrawStateMark(unlocked.Contains(set.Id));",StringComparison.Ordinal) && Read("MainWindow.cs").Contains("FontAwesomeIcon.Times",StringComparison.Ordinal),"no « ✗ » glyph (missing from the font): the shared state mark draws it from the icon font");
             Check(page.Contains("ImGui.SameLine();DrawOwnedMark(item.Id);",StringComparison.Ordinal),"owned mark on the item's line");
             Check(page.Contains("CharacterUi.Offline",StringComparison.Ordinal),"says when no character is logged in");
         }),

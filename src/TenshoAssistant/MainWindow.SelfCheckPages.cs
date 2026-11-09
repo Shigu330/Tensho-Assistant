@@ -12,6 +12,8 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     private IReadOnlyList<(string Domain,Task<SelfCheckLine> Read)>? selfCheckPages;
+    /// <summary>X-92 (0.972): the game data check of this load (null result: failed or cancelled).</summary>
+    internal Func<Task<GameDataReport?>>? GameDataCheck { get; set; }
 
     private void StartSelfCheckPages()
     {
@@ -30,6 +32,12 @@ internal sealed partial class MainWindow
                     ? Diagnostics.SelfCheck.Suspect("deep dungeons","a text kept a macro")
                     :Diagnostics.SelfCheck.Ok("deep dungeons",string.Join(", ",dungeons.Select(dungeon=>$"{dungeon.Pomanders.Count}+{dungeon.Others.Count}"))+" items"))
                 :Diagnostics.SelfCheck.Failed("deep dungeons","nothing read"))),
+            Page("game data",async ()=>
+            {
+                if(GameDataCheck is null || await GameDataCheck() is not { } report)return Diagnostics.SelfCheck.Failed("game data","check not run");
+                var (needsLook,detail)=GameDataChanges.Summary(report);
+                return needsLook ? Diagnostics.SelfCheck.Suspect("game data",detail):Diagnostics.SelfCheck.Ok("game data",detail);
+            }),
             Page("lexicon",()=>Task.FromResult(LexiconLoad?.Invoke() is { Count:>0 } words
                 ? Diagnostics.SelfCheck.Ok("lexicon",$"{words.Count} words, {words.Select(word=>word.Kind).Distinct().Count()} kinds")
                 :Diagnostics.SelfCheck.Failed("lexicon","nothing read"))),

@@ -34,7 +34,7 @@ internal static class HomeToday599Tests
             Check(view.Contains("TimeSpan.FromSeconds(1)") && !view.Contains("GameTimers.Read"),"once a second, from what is already copied");
             var home=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Home.cs"));
             Check(home.Contains("HomeTiles().Where(tile=>configuration.HomeTilesHidden?.Contains(tile.Target.ToString())!=true)"),"the tiles chosen");
-            Check(home.Contains("DrawHomeToday();"),"on Home");
+            Check(home.Contains("MeasureMap(\"home today\",DrawHomeToday);"),"on Home");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Reminders.cs")).Contains("KeepHomeTimers(timers);"),"fed by the same copy as the bar");
         }),
     ];

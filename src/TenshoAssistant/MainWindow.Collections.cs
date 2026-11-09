@@ -19,6 +19,8 @@ internal sealed partial class MainWindow
     private int collectionViewFilter = -1;
     private CollectionEntry[] collectionViewEntries = [];
     private CollectionEntry[] collectionViewMatches = [];
+    // X-76 (0.956): the summary's counts, worked out with collectionViewEntries instead of on every frame.
+    private int collectionViewAcquired, collectionViewNotAcquired, collectionViewUnknown;
     private uint? collectionViewMusicCategory;
     private uint? collectionViewAchievementCategory;
     // 0.365 (g, C-04): the kinds read by ExtraCollectionReader, in the user's order (GAPS.md C-04).
@@ -39,10 +41,7 @@ internal sealed partial class MainWindow
                 var memories=configuration.CollectionMemories??=[];
                 if(!memories.TryGetValue(state.CharacterId,out var read))memories[state.CharacterId]=read=new();
                 if(CollectionRecent.Update(read,state.Entries,DateTimeOffset.UtcNow))
-                {
-                    try{save();saveError=null;}
-                    catch(Exception error){saveError=localization.Get("Common.SaveError");log.Warning(error,"Recently obtained could not be saved.");}
-                }
+                    TrySave("Recently obtained");
             }
         }
         if(configuration.CollectionMemories?.GetValueOrDefault(state.CharacterId) is not {Recent.Count:>0} memory)return;
@@ -56,7 +55,7 @@ internal sealed partial class MainWindow
         if (ImGui.Button(localization.Get("CollectionsBrowser.Refresh"))) collections.RequestRefresh();
         ImGui.SameLine();
         ImGui.TextDisabled(state.Loading ? localization.Get("CollectionsBrowser.Loading") : state.ObservedAt is { } date ? localization.Format("CollectionsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("CollectionsBrowser.Offline"));
-        if (state.Error is { } error) { ImGui.TextWrapped(localization.Get("CollectionsBrowser.Error"));if(developerMode)ImGui.TextWrapped(RawMessage(error)); }
+        if (state.Error is { } error) DrawDataError(error,"CollectionsBrowser.Error");
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Collections,state.ObservedAt,state.FromCache);
         if(!blueMagic)DrawCollectionRecent(state);
         // 0.360 (g, C-09): the Wishlist tab, set again by its tab on every frame it is shown.
@@ -139,6 +138,9 @@ internal sealed partial class MainWindow
                 .ThenBy(entry => blueMagic || kind is CollectionKind.Ornament or CollectionKind.McGuffin or CollectionKind.Folklore ? entry.Number:kind==CollectionKind.Orchestrion ? entry.Music?.Order ?? int.MaxValue:kind==CollectionKind.Title ? entry.Title?.Order ?? int.MaxValue:kind==CollectionKind.Achievement ? entry.Achievement?.Order ?? int.MaxValue:0)
                 .ThenBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase).ToArray();
             if(blueOrder!=0)collectionViewEntries=Monsters.BlueSpellSources.SortByMonsterLevel(collectionViewEntries,entry=>BlueSpellLevel(entry.Number),blueOrder);
+            collectionViewAcquired=collectionViewEntries.Count(entry=>entry.ConfirmedUnlocked);
+            collectionViewNotAcquired=collectionViewEntries.Count(entry=>entry.Acquisition==CollectionAcquisition.NotAcquired);
+            collectionViewUnknown=collectionViewEntries.Count(entry=>entry.Acquisition==CollectionAcquisition.Unknown);
             // 0.331: « Unconfirmed » (non-completion kinds) = everything the game does not confirm as obtained, by the same rule as the
             // ✓ / ✗ badge (CollectionStateOf), so a mount or minion read as not unlocked stays listed there.
             bool StateMatches(CollectionEntry entry)=>collectionFilter switch
@@ -152,8 +154,8 @@ internal sealed partial class MainWindow
                 && (string.IsNullOrWhiteSpace(collectionQuery) || entry.Name.Contains(collectionQuery.Trim(), StringComparison.OrdinalIgnoreCase))).ToArray();
         }
         var entries = collectionViewEntries;
-        ImGui.TextColored(Accent,localization.Format(kind==CollectionKind.Achievement ? "CollectionSummary.Completed":"CollectionSummary.Acquired",entries.Count(entry=>entry.ConfirmedUnlocked),entries.Length));
-        if(completion)ImGui.TextDisabled(localization.Format(kind==CollectionKind.Achievement ? "CollectionSummary.Incomplete":"CollectionSummary.Missing",entries.Count(entry=>entry.Acquisition==CollectionAcquisition.NotAcquired),entries.Count(entry=>entry.Acquisition==CollectionAcquisition.Unknown)));
+        ImGui.TextColored(Accent,localization.Format(kind==CollectionKind.Achievement ? "CollectionSummary.Completed":"CollectionSummary.Acquired",collectionViewAcquired,entries.Length));
+        if(completion)ImGui.TextDisabled(localization.Format(kind==CollectionKind.Achievement ? "CollectionSummary.Incomplete":"CollectionSummary.Missing",collectionViewNotAcquired,collectionViewUnknown));
         ImGui.TextWrapped(localization.Get("CollectionSummary.Help"));
         if (state.CharacterId == 0) ImGui.TextDisabled(localization.Get("CollectionSummary.Login"));
         var openDetails = false;
@@ -185,7 +187,8 @@ internal sealed partial class MainWindow
                     try{if(ImGui.Button(FontAwesomeIcon.Crown.ToIconString()+$"##TitleIcon{entry.Id}",new Vector2(32))){selectedCompletionKind=kind;selectedCompletionId=entry.Id;openCompletionDetails=true;}}
                     finally{ImGui.PopFont();}
                 }
-                else DrawItemIcon(musicItem ?? new ItemDefinition(0, entry.Name, false, entry.IconId), new Vector2(32));
+                else if(musicItem is not null)DrawItemIcon(musicItem,new Vector2(32));
+                else DrawGameIcon(entry.IconId,new Vector2(32));
                 // An item icon (orchestrion roll) carries its own badge; the other entries get it here.
                 if(musicItem is null)DrawEntryMark(entry);
                 if(kind==CollectionKind.TripleTriad)TriadCardTooltip(entry.Id);
@@ -246,13 +249,13 @@ internal sealed partial class MainWindow
                 var spell = state.Entries.FirstOrDefault(entry => entry.Kind == CollectionKind.BlueMagic && entry.Id == selectedBlueSpell);
                 if (spell is not null)
                 {
-                    DrawItemIcon(new ItemDefinition(0, spell.Name, false, spell.IconId), new Vector2(40));
+                    DrawGameIcon(spell.IconId,new Vector2(40));
                     ImGui.SameLine(); ImGui.TextColored(Accent, $"{spell.Number} · {spell.Name}");
                     ImGui.TextUnformatted(localization.Format("BlueSpell.Rank",spell.Rank));
                     ImGui.TextWrapped(spell.Description);
-                    ImGui.TextWrapped(string.IsNullOrWhiteSpace(spell.Location) ? localization.Get("BlueSpell.MissingLocation") : localization.Format("BlueSpell.Location",spell.Location));
+                    ImGui.TextWrapped(string.IsNullOrWhiteSpace(spell.Location) ? localization.Get("BlueSpell.MissingLocation") : localization.Format("BlueSpell.Location",spell.Location)+(spell.DutyLevel>0 ? " "+localization.Format("BlueSpell.DutyLevel",spell.DutyLevel):""));
                     ImGui.TextColored(spell.ConfirmedUnlocked ? Success : Muted,localization.Get(spell.ConfirmedUnlocked ? "BlueSpell.Learned":"CollectionState.Unknown"));
-                    if (ImGui.Button(localization.Get("BlueSpell.Copy"))) ImGui.SetClipboardText(spell.Name);
+                    CopyButton(localization.Get("BlueSpell.Copy"),()=>spell.Name);
                     DrawBlueSpellMonsters(spell.Id);
                 }
                 if (ImGui.Button(localization.Get("BlueSpell.Close"))) ImGui.CloseCurrentPopup();

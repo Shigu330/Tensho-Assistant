@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
         var sources = catalog.ForItem((uint)itemId);
         if (sources.Count == 0)
         {
-            ImGui.TextWrapped(localization.Get("GatheringDetails.Empty"));
+            EmptyState("GatheringDetails.Empty");
             ImGui.TextDisabled(localization.Get("GatheringDetails.Coverage"));
             return;
         }
@@ -67,7 +67,7 @@ internal sealed partial class MainWindow
             ImGui.PushID((int)type.TypeId);
             try
             {
-                DrawItemIcon(new ItemDefinition(0, type.TypeName, false, type.IconId), new Vector2(30));
+                DrawGameIcon(type.IconId,new Vector2(30));
                 if (ImGui.IsItemClicked()) gatheringTypeFilter = type.TypeId;
                 if (ImGui.IsItemHovered()) WrappedTooltip(type.TypeName);
             }
@@ -124,7 +124,7 @@ internal sealed partial class MainWindow
                             }
                         }
                         finally { ImGui.EndDisabled(); }
-                        if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("GatheringDetails.MapHelp"));
+                        Tip("GatheringDetails.MapHelp");
                         // 0.397 (g, R-03): « Go there » — flag on the point, Tensho map on it, nearest aetheryte's teleport question (click only).
                         var goTo=GatheringPointPixel(source);
                         ImGui.BeginDisabled(goTo is null);
@@ -139,14 +139,14 @@ internal sealed partial class MainWindow
                         }
                         finally { ImGui.EndDisabled(); }
                         if (goTo is { } goSpot) PlaceMenu("GoTherePlace", goSpot.Map, MapProjection.CoordinateFromPixel(goSpot.Pixel, goSpot.Map), string.IsNullOrWhiteSpace(source.Place) ? source.Zone : source.Place);
-                        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(localization.Get(goTo is null ? "GatheringDetails.GoThereUnknown":configuration.GoThereTeleport ? "GatheringDetails.GoThereDirectTip":"GatheringDetails.GoThereTip"));
+                        Tip(goTo is null ? "GatheringDetails.GoThereUnknown":configuration.GoThereTeleport ? "GatheringDetails.GoThereDirectTip":"GatheringDetails.GoThereTip");
                         DrawGatheringGearset(source);
                         if(ImGui.SmallButton(localization.Get("GatheringDetails.ZoneWeather"))) OpenWeather(source.TerritoryId,source.Zone);
                         // 0.405 (user request): the game's gathering log, opened on this item (not for fishing: no game function found).
                         if(!source.IsFishing)
                         {
                             if(ImGui.SmallButton(localization.Get("GameLogs.Gathering"))) OpenGameGatherable(source.ItemId);
-                            if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("GameLogs.GatheringTip"));
+                            Tip("GameLogs.GatheringTip");
                         }
                     }
                     finally { ImGui.PopID(); }

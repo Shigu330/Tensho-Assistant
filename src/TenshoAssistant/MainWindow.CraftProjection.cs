@@ -25,7 +25,7 @@ internal sealed partial class MainWindow
     private bool suggestLoading;
     private void UpdateCraftSuggestion(CraftProjectionResult result,string forbidden)
     {
-        if(!configuration.CraftLiveSuggest || result.Suggest is not { } input || windowDisposed)
+        if(!configuration.CraftLivePanel || !configuration.CraftLiveSuggest || result.Suggest is not { } input || windowDisposed)
         {
             lock(suggestGate){suggestCancel?.Cancel();suggestCancel?.Dispose();suggestCancel=null;suggestKey="";suggestion=null;suggestLoading=false;}
             return;
@@ -153,7 +153,7 @@ internal sealed partial class MainWindow
                 var rows=sortedProjectionRows;
                 foreach(var row in rows)
                 {
-                    ImGui.TableNextRow();ImGui.TableNextColumn();DrawItemIcon(new ItemDefinition(0,row.Metadata.Name,false,row.Metadata.Icon),new Vector2(24));ImGui.SameLine();ImGui.TextWrapped(row.Metadata.Name);
+                    ImGui.TableNextRow();ImGui.TableNextColumn();DrawGameIcon(row.Metadata.Icon,new Vector2(24));ImGui.SameLine();ImGui.TextWrapped(row.Metadata.Name);
                     if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("LiveDetails.Alternatives",row.Metadata.Description,row.Alternatives));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(row.Progress.ToString());ImGui.TableNextColumn();ImGui.TextUnformatted(row.Quality?.ToString() ?? localization.Get("CraftProjectionUi.Unknown"));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(row.Durability.ToString());ImGui.TableNextColumn();ImGui.TextUnformatted(row.CpCost.ToString());

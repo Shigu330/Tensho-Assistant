@@ -43,7 +43,7 @@ internal sealed partial class MainWindow
                 if(width is null)
                 {
                     DrawItemIcon(item,new Vector2(28));ImGui.SameLine();
-                    ImGui.TextColored(Accent,item?.Name ?? localization.Format("HoverUi.Item",hovered.ItemId));
+                    ImGui.TextColored(Accent,item?.Name ?? localization.Format("BankUi.Item",hovered.ItemId));
                 }
                 if(compare.Count>0)
                 {
@@ -58,7 +58,7 @@ internal sealed partial class MainWindow
                 if(prices)
                 {
                     if(usages || compare.Count>0)ImGui.Separator();
-                    DrawHoveredPrices(priced!,item?.CanBeHq ?? true,observed.Stack);
+                    MeasureMap("hover prices",()=>DrawHoveredPrices(priced!,item?.CanBeHq ?? true,observed.Stack));
                 }
             }
             finally{ImGui.PopTextWrapPos();}
@@ -113,9 +113,17 @@ internal sealed partial class MainWindow
             :item.CompanionId!=0 ? (Collections.CollectionKind.Companion,item.CompanionId)
             :item.TripleTriadCardId!=0 ? (Collections.CollectionKind.TripleTriad,item.TripleTriadCardId)
             :item.OrchestrionId!=0 ? (Collections.CollectionKind.Orchestrion,item.OrchestrionId):null;
-        if(link is not { } target)return;
+        if(link is not { } target)
+        {
+            // X-76 P4 (0.927): any other item that teaches something, as the game says.
+            if(GameItemUnlocked(item.Id) is not { } learned)return;
+            ImGui.TextColored(learned ? UI.FfxivTheme.Success:UI.FfxivTheme.Error,localization.Format("HoverUi.Unlock",localization.Get(learned ? "HoverUi.UnlockYes":"HoverUi.UnlockNo")));
+            return;
+        }
         var entry=CollectionEntryOf(target.Kind,target.Id);
         var acquisition=CollectionStateOf(entry);
+        if(acquisition==Collections.CollectionAcquisition.Unknown && GameItemUnlocked(item.Id) is { } game)
+            acquisition=game ? Collections.CollectionAcquisition.Acquired:Collections.CollectionAcquisition.NotAcquired;
         var colour=acquisition switch{Collections.CollectionAcquisition.Acquired=>UI.FfxivTheme.Success,Collections.CollectionAcquisition.NotAcquired=>UI.FfxivTheme.Error,_=>UI.FfxivTheme.TextMuted};
         ImGui.TextColored(colour,localization.Format("HoverUi.Collection",localization.Get("HoverUi.CollectionKind"+target.Kind),localization.Get("HoverUi.Collection"+acquisition)));
     }
@@ -168,10 +176,8 @@ internal sealed partial class MainWindow
     // quests that reward them, recipes that make them.
     private void DrawCollectionTooltip(Collections.CollectionEntry entry)
     {
-        ImGui.BeginTooltip();
-        try
+        using(TooltipScope.Begin())
         {
-            ImGui.PushTextWrapPos(ImGui.GetFontSize()*26);
             ImGui.TextColored(Accent,entry.Name);
             var acquisition=CollectionStateOf(entry);
             ImGui.TextColored(acquisition switch{Collections.CollectionAcquisition.Acquired=>UI.FfxivTheme.Success,Collections.CollectionAcquisition.NotAcquired=>UI.FfxivTheme.Error,_=>UI.FfxivTheme.TextMuted},
@@ -222,9 +228,7 @@ internal sealed partial class MainWindow
             // 0.331: the right-click menu exists for these kinds only (MainWindow.Collections.cs), not for emotes.
             if(entry.Kind is Collections.CollectionKind.Mount or Collections.CollectionKind.Companion or Collections.CollectionKind.TripleTriad or Collections.CollectionKind.Orchestrion)
                 ImGui.TextDisabled(localization.Get("SourceLinks.Hint"));
-            ImGui.PopTextWrapPos();
         }
-        finally{ImGui.EndTooltip();}
     }
 
     private Community.GarlandItemSourceService? itemSources;
@@ -305,34 +309,53 @@ internal sealed partial class MainWindow
     {
         if(ItemTooltipAlreadyDrawn(id))return;
         var item=itemCatalog.State.Catalog?.Find(id);
-        ImGui.BeginTooltip();
-        try
+        using(TooltipScope.Begin())
         {
             DrawEnglishItemName(item);
-            ImGui.PushTextWrapPos(ImGui.GetFontSize()*24);
             DrawItemImage(item,new Vector2(32));ImGui.SameLine();
             ImGui.BeginGroup();
-            ImGui.TextColored(Accent,item?.Name ?? localization.Format("HoverUi.Item",id));
+            ImGui.TextColored(Accent,item?.Name ?? localization.Format("BankUi.Item",id));
             if(item is { UiCategoryName.Length:>0 })ImGui.TextDisabled(item.UiCategoryName);
             ImGui.EndGroup();
             if(item is { ItemLevel:>1 })ImGui.TextDisabled(localization.Format("HoverUi.Levels",item.ItemLevel,item.EquipLevel));
             if(ShowIds)ImGui.TextDisabled($"ID {id}");
             DrawItemInfoBody(item,id);
-            ImGui.PopTextWrapPos();
         }
-        finally{ImGui.EndTooltip();}
     }
 
     // 0.257: the body of the common item tooltip (collection, stock, usages, how to get it), also drawn under the game's tooltip so
     // both show the same; the header (icon, name) is left to the caller.
     // e) (audit 2026-11-02): hoverPanel = the panel under the game's item tooltip, whose four parts follow Settings › Interface;
     // Tensho's own item tooltips and the item sheet (hoverPanel false) always draw every part.
+    // X-89 (0.970, user request): the item's expansion, only when its sure sources agree (Quests/ExpansionOrigin.cs); computed once per item
+    // and catalogue (no sheet read each frame), nothing while the gathering catalogue or the quest rewards are not loaded.
+    internal Func<uint,string?>? TerritoryExpansion { get; set; }
+    internal Func<uint,string?>? QuestExpansion { get; set; }
+    private readonly Dictionary<uint,(string Name,int From)?> itemExpansions=[];
+    private (object? Gathering,object? Rewards) itemExpansionsFor;
+    private void DrawItemExpansion(uint id)
+    {
+        if(TerritoryExpansion is not { } zoneExpansion || QuestExpansion is not { } questExpansion)return;
+        var gathering=gatheringCatalog.State.Catalog;var rewards=quests.State.RewardIndex;
+        if(gathering is null || rewards is null)return;
+        if(!ReferenceEquals(itemExpansionsFor.Gathering,gathering) || !ReferenceEquals(itemExpansionsFor.Rewards,rewards) || itemExpansions.Count>4096)
+        {itemExpansions.Clear();itemExpansionsFor=(gathering,rewards);}
+        if(!itemExpansions.TryGetValue(id,out var origin))
+        {
+            var zones=gathering.ForItem(id).Select(source=>source.TerritoryId).Distinct().Select(territory=>territory==0 ? null:zoneExpansion(territory)).ToArray();
+            var fromQuests=rewards.ForItem(id).Select(reward=>reward.QuestId).Distinct().Select(quest=>questExpansion(quest)).ToArray();
+            itemExpansions[id]=origin=TenshoAssistant.Quests.ExpansionOrigin.Of(zones,fromQuests);
+        }
+        if(origin is { } found)ImGui.TextDisabled(localization.Format(found.From switch{1=>"HoverUi.ExpansionZones",2=>"HoverUi.ExpansionQuests",_=>"HoverUi.ExpansionBoth"},found.Name));
+    }
     private void DrawItemInfoBody(Items.ItemDefinition? item,uint id,bool hoverPanel=false)
     {
         // 0.347 (g, I-08): the player's own note first.
         DrawItemNoteLine(id);
-        if(!hoverPanel || configuration.HoverShowCollection)DrawItemCollection(item);
-        if(!hoverPanel || configuration.HoverShowStock)DrawHoveredStock(id);
+        DrawItemExpansion(id);
+        // X-95 (0.951): the parts of the item panel timed in developer mode (the panel reached 173 ms in the slow frame log).
+        if(!hoverPanel || configuration.HoverShowCollection)MeasureMap("hover collection",()=>DrawItemCollection(item));
+        if(!hoverPanel || configuration.HoverShowStock)MeasureMap("hover stock",()=>DrawHoveredStock(id));
         // 0.346 (g, I-06): NPC sale price (Item.PriceLow, game data), and the hovered stack's when the game tooltip is for one of the
         // player's slots; for NQ (the HQ price is not in the sheet); nothing when the item does not sell to NPCs (price 0).
         if(item is { SellPrice:>0 } sold)
@@ -342,22 +365,28 @@ internal sealed partial class MainWindow
                 ? localization.Format("HoverUi.NpcSaleStack",sold.SellPrice.ToString("N0"),count,(sold.SellPrice*(long)count).ToString("N0"))
                 :localization.Format("HoverUi.NpcSale",sold.SellPrice.ToString("N0")));
         }
-        if(!hoverPanel || configuration.HoverShowUsages)DrawHoveredUsages(id);
+        if(!hoverPanel || configuration.HoverShowUsages)MeasureMap("hover usages",()=>DrawHoveredUsages(id));
         // « How to get it » is the last part: hidden, its Garland / wiki fallback is not asked from the hover either.
         if(hoverPanel && !configuration.HoverShowSources)return;
         // How to obtain the item itself (0.144: the sources follow the unlocking item, not only the collection page).
         ImGui.TextColored(Accent,localization.Get("HoverUi.HowToGet"));
         var known=0;
+        // X-74 (0.865): what was seen in game first (discoveries base, yours or shared); a source seen there makes the Garland / wiki fallback needless.
+        foreach(var seen in DiscoveredSourcesOf(id)){known++;ImGui.TextWrapped(localization.Format("HoverUi.SeenSource",seen));}
         if(HoverOffers(id) is { Count:>0 } offers){known++;ImGui.TextUnformatted(localization.Format("HoverUi.VendorCount",offers.Select(offer=>offer.Vendor.NpcId).Distinct().Count()));}
         if(quests.State.RewardIndex?.ForItem(id) is { Count:>0 } rewards){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionQuests",string.Join(", ",rewards.Take(3).Select(reward=>reward.Name))));}
         foreach(var achievement in AchievementsRewarding([id]).Take(3)){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionAchievement",achievement));}
         foreach(var dutyId in LuminaDutiesOf(id).Take(3))
             if(duties.State.Catalog?.Find(dutyId) is { } lootDuty){known++;ImGui.TextUnformatted(localization.Format("HoverUi.LuminaDuty",lootDuty.Name));}
+        // X-76 P5 (0.928): targeted retainer ventures from the game's sheets (RetainerTask → RetainerTaskNormal.Item), level and jobs.
+        var ventureTasks=VentureTasksOf?.Invoke(id) ?? [];
+        if(ventureTasks.Count>0){known++;ImGui.TextWrapped(localization.Format("HoverUi.Venture",string.Join(", ",ventureTasks.Take(3).Select(task=>localization.Format("HoverUi.VentureTask",task.Level,task.Jobs)))));}
         if(lumina?.State.Data is { } supplement)
         {
             if(supplement.MonstersOf(id) is { Count:>0 } mobs){known++;ImGui.TextWrapped(localization.Format("HoverUi.LuminaMonsters",string.Join(", ",mobs.Take(4))));}
             if(supplement.FatesOf(id) is { Count:>0 } fates){known++;ImGui.TextWrapped(localization.Format("HoverUi.LuminaFates",string.Join(", ",fates.Take(3))));}
-            if(supplement.FromVenture(id)){known++;ImGui.TextUnformatted(localization.Get("HoverUi.LuminaVenture"));}
+            // Exploration ventures give no item list in the sheets: the community line stays for them only.
+            if(ventureTasks.Count==0 && supplement.FromVenture(id)){known++;ImGui.TextUnformatted(localization.Get("HoverUi.LuminaVenture"));}
             foreach(var (kind,count,sources) in supplement.SupplementsOf(id))
             {
                 known++;
@@ -375,7 +404,7 @@ internal sealed partial class MainWindow
     // e): true when a part turned on has something to draw for this item; Stock and « How to get it » always draw their heading.
     // Cheap lookups, cut short with the default settings (stock on).
     private bool HoverInfoShown(Items.ItemDefinition? item,uint id)=>configuration.HoverShowStock || configuration.HoverShowSources
-        || configuration.HoverShowCollection && item is { MountId:not 0 } or { CompanionId:not 0 } or { TripleTriadCardId:not 0 } or { OrchestrionId:not 0 }
+        || configuration.HoverShowCollection && (item is { MountId:not 0 } or { CompanionId:not 0 } or { TripleTriadCardId:not 0 } or { OrchestrionId:not 0 } || item is not null && GameItemUnlocked(item.Id) is not null)
         || configuration.HoverShowUsages && HoveredUsageLines(id).Count>0;
 
     private void DrawHoveredUsages(uint id)

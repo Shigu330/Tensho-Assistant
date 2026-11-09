@@ -28,6 +28,7 @@ internal sealed class DutyFinderReader : IDisposable
     private readonly IPluginLog log;
     private readonly Func<bool> capture;
     private long nextRead;
+    private bool failureLogged;
     private (byte, uint)? lastLogged;
 
     public DutyFinderReader(DutyFinderService service, IFramework framework, IGameGui gui, IPluginLog log, Func<bool> capture)
@@ -57,8 +58,10 @@ internal sealed class DutyFinderReader : IDisposable
                 lastLogged = (value.Kind, value.Id);
                 log.Information("Duty finder selection: kind {Kind} id {Id}", value.Kind, value.Id);
             }
+            failureLogged = false;
         }
-        catch (Exception error) { service.Publish(null); nextRead = now + Stopwatch.Frequency * 5; log.Warning(error, "Duty finder selection unavailable."); }
+        // X-76 H9 (0.922): logged once until a read succeeds again (it was logged every 5 s).
+        catch (Exception error) { service.Publish(null); nextRead = now + Stopwatch.Frequency * 5; if (!failureLogged) { failureLogged = true; log.Warning(error, "Duty finder selection unavailable; retried every five seconds, logged again only after a good read."); } }
     }
 
     public void Dispose() { TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate); service.Publish(null); }

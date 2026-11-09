@@ -23,8 +23,8 @@ internal sealed partial class MainWindow
     private bool LootKindMatches(ItemDefinition? item)
     {
         if(lootKind!=0 && LootKindOf(item)!=lootKind)return false;
-        // « Not obtained only »: collection items whose state is known and not obtained.
-        return !lootMissingOnly || CollectionStateOf(CollectionOf(item))==CollectionAcquisition.NotAcquired;
+        // « Not obtained only »: items whose state is known and not obtained (collections, then the game's unlock state, X-76 P4).
+        return !lootMissingOnly || ItemAcquisition(item)==CollectionAcquisition.NotAcquired;
     }
 
     private void DrawLootKindFilter(string id)

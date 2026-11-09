@@ -20,6 +20,32 @@ internal sealed partial class MainWindow
     private (int Stored,int Ready,int Total) outfitCount;
     private bool outfitDresserKnown;
 
+    // X-104 (0.989, user choice DEC-045, from C-05): the pieces not owned of an outfit, in one click into the wishlist (any piece) or the chosen
+    // crafting list (pieces with a recipe).
+    private void DrawOutfitMissingActions(OutfitProgress row)
+    {
+        if(row.Stored)return;
+        var missing=row.Outfit.Pieces.Where(piece=>!outfitOwned.Contains(piece) && !outfitDresser.Contains(piece)).ToArray();
+        if(missing.Length==0)return;
+        if(ImGui.SmallButton(localization.Format("Outfits.ToWishlist",missing.Length)+$"##OutfitWish{row.Outfit.SetItemId}"))
+        {
+            if(Items.Wishlist.AddAll(configuration.Wishlist,missing) is { } next)SaveSetting("Wishlist.Title",()=>configuration.Wishlist,value=>configuration.Wishlist=value,next);
+            else saveError=localization.Format("Wishlist.Full",Items.Wishlist.MaximumItems);
+        }
+        Tip("Outfits.ToWishlistTip");
+        var craftable=missing.Where(piece=>recipeCatalog.State.Catalog?.ForResult(piece) is { Count:>0 }).ToArray();
+        if(craftable.Length==0 || CraftListStore is not { Unavailable:false } store || store.Lists is not { Count:>0 } lists)return;
+        ImGui.SameLine();
+        var index=Math.Clamp(craftListIndex,0,lists.Count-1);
+        if(ImGui.SmallButton(localization.Format("Outfits.ToCraftList",craftable.Length,lists[index].Name)+$"##OutfitCraft{row.Outfit.SetItemId}"))
+        {
+            var current=lists[index];
+            foreach(var piece in craftable)if(Craft.CraftLists.Add(current,piece,1) is { } next)current=next;
+            if(!store.Set(index,current))log.Warning("The outfit's pieces could not be added to the crafting list {0}.",lists[index].Name);
+        }
+        Tip("Outfits.ToCraftListTip");
+    }
+
     private void DrawOutfits()
     {
         ImGui.TextWrapped(localization.Get("Outfits.Help"));
@@ -107,6 +133,7 @@ internal sealed partial class MainWindow
                         if(ImGui.IsItemHovered())DrawItemInfoTooltip(piece);
                         ItemLinksMenu($"OutfitPieceMenu{row.Outfit.SetItemId}/{piece}",definition);
                     }
+                    DrawOutfitMissingActions(row);
                 }
                 finally{ImGui.TreePop();}
             }

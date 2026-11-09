@@ -91,6 +91,15 @@ public sealed class WikiMonsterSources : IDisposable
     {Family=family;this.englishName=englishName;this.lifetime=lifetime;this.disk=disk;this.http=http ?? new HttpClient{Timeout=TimeSpan.FromSeconds(15)};ownsHttp=http is null;}
     public bool IsFresh(WikiMonsterDocument document)=>CacheAge.Fresh(document.FetchedAt,DateTimeOffset.UtcNow,lifetime());
 
+    /// <summary>0.819 (X-53): the copy in memory, if any; nothing else.</summary>
+    public WikiMonsterDocument? Cached(uint itemId){lock(gate)return disposed ? null:cache.GetValueOrDefault(itemId);}
+    private readonly HashSet<uint> warmed=[];
+    /// <summary>0.819 (X-53): the disk copy brought to memory, once per item; never the network.</summary>
+    public void Warm(uint itemId)
+    {
+        lock(gate){if(disposed || cache.ContainsKey(itemId) || warmed.Count>=512 || !warmed.Add(itemId))return;}
+        _=ReadCachedAsync(itemId,disposal.Token);
+    }
     /// <summary>Memory or disk copy, whatever its age; never touches the network.</summary>
     public async Task<WikiMonsterDocument?> ReadCachedAsync(uint itemId,CancellationToken token)
     {

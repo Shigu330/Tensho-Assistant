@@ -42,7 +42,7 @@ internal sealed partial class MainWindow
         DrawGatheringObservation();
         // 0.330: a catalogue failure (sheet changed by a game update) is shown translated, its detail in developer mode only (R-14).
         if(gpActions.State.Catalog is not { } catalog)
-        { if(gpActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Gp"); else ImGui.TextWrapped(localization.Get("GpUi.Loading")); return; }
+        { if(gpActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Gp"); else EmptyState("GpUi.Loading"); return; }
         ImGui.TextWrapped(localization.Get("GpUi.Help"));
         var stats=characterStats.State;
         var canCopy=stats.CharacterId!=0 && stats.JobId is 16 or 17 && stats.CurrentGp is not null
@@ -79,7 +79,7 @@ internal sealed partial class MainWindow
                     changed|=ImGui.InputInt(localization.Get("GpUi.Attempts"),ref gpAttempts,0);
                     Tip("GpUi.AttemptsTip");
                     ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110); changed|=ImGui.InputInt(localization.Get("GpUi.Yield"),ref gpBaseYield,0);
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GpUi.YieldHelp"));
+                    Tip("GpUi.YieldHelp");
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Success"),ref gpSuccess,0);
                     Tip("GpUi.SuccessTip");
@@ -87,7 +87,7 @@ internal sealed partial class MainWindow
                     Tip("GpUi.BoonTip");
                     ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.SetNextItemWidth(110);
                     changed|=ImGui.InputInt(localization.Get("GpUi.Bountiful"),ref gpBountiful,0);
-                    if(ImGui.IsItemHovered()) WrappedTooltip(localization.Get("GpUi.BountifulHelp"));
+                    Tip("GpUi.BountifulHelp");
                     ImGui.TableNextColumn();
                     if(DrawBountifulEstimate() is { } estimate && estimate!=gpBountiful){gpBountiful=estimate;changed=true;}
                 }
@@ -102,8 +102,8 @@ internal sealed partial class MainWindow
             changed|=DrawGpDeclaredEffect(catalog,GpEffect.BoonChance2,localization.Get("GpUi.Gift2"),ref gpGift2Active);
             changed|=DrawGpDeclaredEffect(catalog,GpEffect.BoonYield,localization.Get("GpUi.Tidings"),ref gpTidingsActive);
             ImGui.SetNextItemWidth(110);changed|=ImGui.InputInt(localization.Get("GpUi.FirstBonus"),ref gpFirstAttemptBonus,0);
+            // X-76 H6 (0.915): the help is the field's tooltip only (it was also written under the field).
             Tip("GpUi.FirstHelp");
-            ImGui.TextWrapped(localization.Get("GpUi.FirstHelp"));
             changed|=ImGui.Checkbox(localization.Get("GpUi.OtherEffect"),ref gpOtherEffects);
             Tip("GpUi.OtherEffectTip");
         }
@@ -128,7 +128,7 @@ internal sealed partial class MainWindow
         if(best.Actions.Count==0) ImGui.TextUnformatted(localization.Get("GpUi.Keep"));
         foreach(var use in best.Actions)
         {
-            DrawItemIcon(new ItemDefinition(0,use.Action.Name,false,use.Action.Icon),new Vector2(28)); ImGui.SameLine();
+            DrawGameIcon(use.Action.Icon,new Vector2(28)); ImGui.SameLine();
             var repeat=use.Action.Spec.Effect is GpEffect.Bountiful1 or GpEffect.Bountiful2;
             var when=use.Action.Spec.Effect switch
             {
@@ -164,7 +164,7 @@ internal sealed partial class MainWindow
     private bool DrawGpDeclaredEffect(GpActionCatalog catalog,GpEffect effect,string label,ref bool active)
     {
         var metadata=catalog.Actions.First(action=>action.Spec.JobId==gpJob && action.Spec.Effect==effect);
-        DrawItemIcon(new ItemDefinition(0,metadata.Name,false,metadata.Icon),new Vector2(24));
+        DrawGameIcon(metadata.Icon,new Vector2(24));
         if(ImGui.IsItemHovered())WrappedTooltip(metadata.Description);
         ImGui.SameLine();var toggled=ImGui.Checkbox(label,ref active);
         Tip("GpUi.ActiveEffectTip");
@@ -183,7 +183,7 @@ internal sealed partial class MainWindow
         if(baseValue is not { } valueBase || rating<=0 || BountifulEstimate.Bonus(rating,valueBase) is not { } bonus)
         {
             ImGui.TextDisabled(localization.Get("GpUi.BountifulEstimateNone"));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("GpUi.BountifulEstimateNoneHelp"));
+            Tip("GpUi.BountifulEstimateNoneHelp");
             return null;
         }
         ImGui.TextColored(Accent,localization.Format("GpUi.BountifulEstimate",bonus));

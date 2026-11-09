@@ -71,12 +71,30 @@ internal sealed partial class MainWindow
 
     private long guideChecklistNext;
     private bool guideChecklistDone;
+    // X-76 (0.956): the guide's « Windows » step works out each task's mark when one of the states it reads is published again (or the tasks,
+    // or what is saved, change), not on every frame: the collections are thousands of rows.
+    private readonly record struct GuideWindowsKey(object? Collections, object? Bank, object? CraftLog, object? Beasts, bool Voyages, HashSet<string>? Saved, int SavedCount, string Tasks);
+    private GuideWindowsKey? guideWindowsKey;
+    private bool[] guideWindowsDone = [];
     private void DrawGuideWindows(IReadOnlyList<GuideWindowTask> tasks, bool check = true)
     {
-        foreach (var task in tasks)
+        if (check)
         {
-            var done = check ? GuideWindowDone(task.Key) : configuration.GuideWindowsDone?.Contains(task.Key) == true;
-            ImGui.TextColored(done ? Success : Muted, (done ? "✓ " : "○ ") + localization.Get($"Guide.Window{task.Key}"));
+            var key = new GuideWindowsKey(collections.State, bank.State, craftLog.Observation, Beasts?.State, configuration.Voyages is { Count: > 0 },
+                configuration.GuideWindowsDone, configuration.GuideWindowsDone?.Count ?? 0, string.Join('|', tasks.Select(task => task.Key)));
+            if (guideWindowsKey != key || guideWindowsDone.Length != tasks.Count)
+            {
+                guideWindowsDone = tasks.Select(task => GuideWindowDone(task.Key)).ToArray();
+                // Read after the marks: a mark seen for the first time is saved by GuideWindowDone, and that must not ask for another pass.
+                guideWindowsKey = key with { Saved = configuration.GuideWindowsDone, SavedCount = configuration.GuideWindowsDone?.Count ?? 0 };
+            }
+        }
+        for (var index = 0; index < tasks.Count; index++)
+        {
+            var task = tasks[index];
+            var done = check ? guideWindowsDone[index] : configuration.GuideWindowsDone?.Contains(task.Key) == true;
+            DrawStateMark(done); ImGui.SameLine();
+            ImGui.TextColored(done ? Success : Muted, localization.Get($"Guide.Window{task.Key}"));
             if (!done) { ImGui.Indent(); ImGui.PushTextWrapPos(0); ImGui.TextDisabled(localization.Get($"Guide.Window{task.Key}Where")); ImGui.PopTextWrapPos(); ImGui.Unindent(); }
         }
     }
@@ -170,12 +188,13 @@ internal sealed partial class MainWindow
                 BoolSetting("Advanced.Fashion", "Advanced.FashionTip", () => configuration.CommunityFashion, value => configuration.CommunityFashion = value, c => c.CommunityFashion);
                 break;
             case GuideStep.Settings:
-                BoolSetting("MapView.ReplaceGameMap", "Guide.ReplaceMapTip", () => configuration.MapView.ReplaceGameMap, value => configuration.MapView.ReplaceGameMap = value);
-                BoolSetting("Settings.UsageHover", "InterfaceHelp.UsageHelp", () => configuration.ItemUsagesOnHover, value => configuration.ItemUsagesOnHover = value);
-                BoolSetting("Settings.ContextMenu", "InterfaceHelp.MenuHelp", () => configuration.ItemContextMenuEnabled, value => configuration.ItemContextMenuEnabled = value);
-                BoolSetting("BankUi.AutoSetting", "BankUi.AutoSettingHelp", () => configuration.AutoBankCapture, value => configuration.AutoBankCapture = value);
-                BoolSetting("Settings.OpenOnLogin", "Settings.OpenOnLoginHelp", () => configuration.OpenOnLogin, value => configuration.OpenOnLogin = value);
-                BoolSetting("Settings.HelpBanners", "SettingTips.HelpBanners", () => configuration.HelpBanners, value => configuration.HelpBanners = value);
+                // X-76 H5 (0.915): « ↺ » on these rows too, and the map row has the same tooltip as in Settings › Map.
+                BoolSetting("MapView.ReplaceGameMap", "MapView.ReplaceGameMapHelp", () => configuration.MapView.ReplaceGameMap, value => configuration.MapView.ReplaceGameMap = value, c => c.MapView.ReplaceGameMap);
+                BoolSetting("Settings.UsageHover", "InterfaceHelp.UsageHelp", () => configuration.ItemUsagesOnHover, value => configuration.ItemUsagesOnHover = value, c => c.ItemUsagesOnHover);
+                BoolSetting("Settings.ContextMenu", "InterfaceHelp.MenuHelp", () => configuration.ItemContextMenuEnabled, value => configuration.ItemContextMenuEnabled = value, c => c.ItemContextMenuEnabled);
+                BoolSetting("BankUi.AutoSetting", "BankUi.AutoSettingHelp", () => configuration.AutoBankCapture, value => configuration.AutoBankCapture = value, c => c.AutoBankCapture);
+                BoolSetting("Settings.OpenOnLogin", "Settings.OpenOnLoginHelp", () => configuration.OpenOnLogin, value => configuration.OpenOnLogin = value, c => c.OpenOnLogin);
+                BoolSetting("Settings.HelpBanners", "SettingTips.HelpBanners", () => configuration.HelpBanners, value => configuration.HelpBanners = value, c => c.HelpBanners);
                 break;
             case GuideStep.Interests:
                 foreach (var interest in Enum.GetValues<GuideInterest>())

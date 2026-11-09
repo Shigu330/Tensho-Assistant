@@ -89,10 +89,7 @@ public static class VoyageHistory
     /// <summary>Writes the history through a temporary file.</summary>
     public static void Write(string path,IReadOnlyList<VoyageRecord> records)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        var temporary=path+"."+Guid.NewGuid().ToString("N")+".tmp";
-        File.WriteAllBytes(temporary,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,records.ToArray()),Json));
-        File.Move(temporary,path,true);
+        AtomicFile.Write(path,JsonSerializer.SerializeToUtf8Bytes(new FileDto(1,records.ToArray()),Json));
     }
 }
 
@@ -105,6 +102,9 @@ public sealed class VoyageHistoryStore(string path,Action<Exception,string> warn
     private readonly object gate=new();
     private List<VoyageRecord>? records;
     private bool failed;
+    // X-76 H10 (0.925): written off the framework thread, in order.
+    private readonly BackgroundWriter writer=new(warn);
+    public bool Flush(TimeSpan wait)=>writer.Flush(wait);
     public bool Unavailable{get{lock(gate){Load();return failed;}}}
     public IReadOnlyList<VoyageRecord> Records{get{lock(gate){Load();return records!.ToArray();}}}
 
@@ -116,8 +116,8 @@ public sealed class VoyageHistoryStore(string path,Action<Exception,string> warn
             if(failed)return;
             if(!VoyageHistory.Record(records!,vessels))return;
             records=VoyageHistory.Prune(records!,DateTimeOffset.UtcNow);
-            try{VoyageHistory.Write(path,records);}
-            catch(Exception error){warn(error,"Voyage history could not be saved.");}
+            var copy=records.ToArray();
+            writer.Enqueue("Voyage history could not be saved.",()=>VoyageHistory.Write(path,copy));
         }
     }
 

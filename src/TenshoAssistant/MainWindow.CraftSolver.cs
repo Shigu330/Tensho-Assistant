@@ -117,7 +117,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Format("CraftSearchResults.Statistics",result.Expanded,result.Depth,state.CalculatedAt?.ToLocalTime().ToString("T") ?? "—"));
         if(result.BeamPruned) ImGui.TextDisabled(localization.Get("CraftSearch.Pruned"));
         if(result.NodeLimitReached || result.DepthLimitReached) ImGui.TextDisabled(localization.Get("CraftSearch.LimitReached"));
-        if(result.Simulation is not { } simulation) {ImGui.TextWrapped(localization.Get("CraftSearch.NoResult"));return;}
+        if(result.Simulation is not { } simulation) {EmptyState("CraftSearch.NoResult");return;}
         ImGui.TextColored(result.TargetReached ? Success:Accent,localization.Format("CraftSearchResults.Summary",localization.Get(result.TargetReached ? "CraftSearchResults.Reached":"CraftSearchResults.Below"),simulation.Final.Quality,result.TargetQuality,simulation.Steps.Count,simulation.Final.Cp));
         if(ImGui.Button(localization.Get(result.TargetReached ? "CraftSearch.Use":"CraftSearch.UseBelow")))
         {

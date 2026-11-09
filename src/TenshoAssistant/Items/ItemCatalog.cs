@@ -10,7 +10,9 @@ public sealed record ItemDefinition(uint Id, string Name, bool CanBeHq, uint Ico
     uint UiCategoryId = 0, string UiCategoryName = "", bool IsMarketable = false, uint TripleTriadCardId = 0, EquipmentSlots Equipment = EquipmentSlots.None,CraftToolDefinition? CraftTool=null,uint OrchestrionId=0,
     uint ItemLevel=0,int EquipLevel=0,int Rarity=0,uint SellPrice=0,ItemTraits Traits=ItemTraits.None,string EnglishName="",
     // 0.141: collection unlocked by the item (ItemAction 1322 = mount, 853 = minion; docs/evidence/0.141.0-itemaction-probe.log).
-    uint MountId=0,uint CompanionId=0);
+    uint MountId=0,uint CompanionId=0,
+    // X-105 (0.991): the jobs that can use the item (ClassJobCategory row; 0 = none or unknown).
+    uint JobCategory=0);
 public sealed record CraftToolDefinition(uint JobId,int? GoodQualityPercent);
 public sealed record ItemCategoryDefinition(uint Id,string Name);
 public static class CraftToolBonuses

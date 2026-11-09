@@ -39,7 +39,6 @@ internal sealed partial class MainWindow
     {
         var previous=configuration.ThemeMode;var previousBefore=configuration.ThemeModeBeforeTool;
         configuration.ThemeMode=mode;configuration.ThemeModeBeforeTool=before;
-        try{save();saveError=null;}
-        catch(Exception error){configuration.ThemeMode=previous;configuration.ThemeModeBeforeTool=previousBefore;saveError=localization.Get("Common.SaveError");log.Warning(error,"Could not save theme preference.");}
+        TrySave("Theme",()=>{configuration.ThemeMode=previous;configuration.ThemeModeBeforeTool=previousBefore;});
     }
 }

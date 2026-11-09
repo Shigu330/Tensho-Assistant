@@ -10,7 +10,7 @@ internal static class AlarmLinks759Tests
         {
             var plugin=Read("Plugin.cs");
             Check(!plugin.Contains("foreach(var item in (configuration.Alarms ?? []).Select(alarm=>alarm.ItemId)"),"no load-time registration");
-            Check(plugin.Contains(".AddItemLink(alarm.ItemId,false,"),"item link");
+            Check(plugin.Contains(".AddItemLink(alarm.ItemId,false)"),"item link");
         }),
     ];
 }

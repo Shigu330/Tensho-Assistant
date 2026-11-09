@@ -105,7 +105,7 @@ internal static class Craft468Tests
         }),
         ("Projection window: its setting is also under Crafting, and its cross turns it off",() =>
         {
-            Check(Read("MainWindow.Settings.cs").Contains("BoolSetting(\"CraftLiveUi.Panel\",\"CraftLiveUi.PanelTip\",()=>configuration.CraftLivePanel"),"setting");
+            Check(Read("MainWindow.Settings.cs").Contains("DrawCraftLiveSettings();") && Read("MainWindow.CraftLive.cs").Contains("BoolSetting(\"CraftLiveUi.Panel\",\"CraftLiveUi.PanelTip\",()=>configuration.CraftLivePanel"),"setting");
             var panel=Read("MainWindow.CraftProjection.cs");
             Check(panel.Contains("\"TenshoCraftLivePanel\"") && panel.Contains("()=>{configuration.CraftLivePanel=false;craftLive.SetEnabled(CraftLiveWanted(configuration));SaveReminders();}"),"cross");
         }),

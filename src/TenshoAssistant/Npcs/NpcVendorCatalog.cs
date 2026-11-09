@@ -16,7 +16,8 @@ public sealed record NpcCost(uint CurrencyItemId,uint Amount,uint RawCurrency=0)
 public sealed record NpcShopSale(uint ShopId,NpcShopKind Kind,string ShopName,uint ItemId,uint Quantity,bool Hq,IReadOnlyList<NpcCost> Costs,byte RequiredRank=0,
     uint QuestRequired=0,uint AchievementRequired=0);
 // X/Y are map coordinates as shown in game; World* are kept to place the map flag exactly.
-public sealed record NpcLocation(uint TerritoryId,uint MapId,string Zone,float X,float Y,float WorldX,float WorldY,float WorldZ);
+/// <summary>0.811 (X-45): Condition 0 = always there, 1 = only while its festival (Festival) runs, 2 = only during a quest or the opening (layer QST_, QB_, EVT_OP).</summary>
+public sealed record NpcLocation(uint TerritoryId,uint MapId,string Zone,float X,float Y,float WorldX,float WorldY,float WorldZ,int Condition=0,uint Festival=0);
 public sealed record NpcVendor(uint NpcId,string Name,IReadOnlyList<uint> ShopIds,IReadOnlyList<NpcLocation> Locations);
 public sealed record NpcVendorOffer(NpcVendor Vendor,NpcShopSale Sale);
 public sealed record NpcVendorCacheData(string DataVersion,IReadOnlyList<NpcVendor> Vendors,IReadOnlyList<NpcShopSale> Sales);
@@ -24,6 +25,22 @@ public sealed record NpcVendorCacheData(string DataVersion,IReadOnlyList<NpcVend
 /// <summary>Shop links as copied from game sheets; resolution follows direct shops, topic menus, pre-handlers and talk scripts.</summary>
 public static class NpcShopLinks
 {
+    public const int Always=0,DuringFestival=1,DuringQuest=2,Unplaced=3;
+    /// <summary>
+    /// 0.811 (X-45, user report: event vendors on the map while absent): a layout layer's condition. Limsa's planevent.lgb (tools/MapMaskProbe --lgb 128,
+    /// docs/evidence/0.811-conditional-npcs.md): 136 layers with a FestivalID, and layers « EVT_OP_ONLY_ENPC », « QST_… », « QB_… » for the opening and quests.
+    /// </summary>
+    /// 0.829 (tools/MapMaskProbe --lgb 128, planner.lgb): « QST_ENPC01 » to « QST_ENPC14 » hold the Upper Decks' permanent NPCs (up to 34 a layer): always there.
+    public static (int Condition,uint Festival) LayerCondition(string? layer,uint festival)=>festival!=0 ? (DuringFestival,festival)
+        :layer is { } name && !name.StartsWith("QST_ENPC",StringComparison.Ordinal)
+         && (name.StartsWith("QST_",StringComparison.Ordinal) || name.StartsWith("QB_",StringComparison.Ordinal) || name.StartsWith("EVT_OP",StringComparison.Ordinal)) ? (DuringQuest,0u):(Always,0u);
+    /// <summary>0.823: of two layers placing one NPC, the one that keeps it there more: always, then a festival, then a quest or the opening.</summary>
+    public static (int Condition,uint Festival) MorePresent((int Condition,uint Festival) first,(int Condition,uint Festival) second)
+        =>first.Condition==Always || second.Condition==Always ? (Always,0u):first.Condition==DuringFestival ? first:second;
+    /// <summary>0.811: a place shown on the map: always there, or its festival running; never a quest's or the opening's.</summary>
+    /// 0.829: never a vendor placed by no layer at all (only a Level row): on the Upper Decks all nine are event NPCs (docs/evidence/0.811-conditional-npcs.md).
+    public static bool Present(NpcLocation spot,IReadOnlySet<uint> running)=>spot.Condition==Always || spot.Condition==DuringFestival && running.Contains(spot.Festival);
+
     public const int MaximumDepth=4;
     public static IReadOnlyList<uint> Resolve(IEnumerable<uint> npcData,IReadOnlySet<uint> shops,IReadOnlyDictionary<uint,IReadOnlyList<uint>> indirections)
     {
@@ -38,16 +55,6 @@ public static class NpcShopLinks
         return Array.AsReadOnly(found.Distinct().Order().ToArray());
     }
     /// <summary>
-    /// Cost of a special shop entry: direct item ids are exact; encoded small ids stay raw. Probe 2026-10-30
-    /// (docs/evidence/0.92.0-shop-currency-probe.log): scrip exchanges use type 16 id 4 for both crafter and gatherer scrips,
-    /// so neither TomestonesItem nor any single table maps these ids; they are shown unresolved, never guessed.
-    /// </summary>
-    /// <summary>
-    /// Talk scripts that open shops from compiled script code, never from a sheet. Each entry is backed by an in-game
-    /// observation (2026-10-30: « Prêtresse à la robe noire », Wolves' Den, menu « Échanger des marques de loup » mêlée 1/2,
-    /// distance) and docs/evidence/0.97.0-wolf-npc-probe.log: the only three wolf-mark shops (type 4) that no sheet references.
-    /// </summary>
-    /// <summary>
     /// 0.679 (user report): NPCs of a service whose shop is opened by script code, with no sheet to give it. They are placed on the map by name and title, with no sales.
     /// On the Island Sanctuary: Marchandréa « Divers », Laracheteuse « Exportations », Rodolfermier « Champs », Béberger « Pâturage », Chamoiselle « Guide »: docs/evidence/0.679-island-map.md.
     /// </summary>
@@ -56,6 +63,11 @@ public static class NpcShopLinks
     /// <summary>0.680: where the game placed an NPC that no sheet and no layout places, read in the game (docs/evidence/0.679-island-map.md). Id, territory, map, world position.</summary>
     public static readonly IReadOnlyList<(uint Npc,uint Territory,uint Map,float X,float Y,float Z)> ObservedPlaces=[(1043464,1055,773,-266.316f,41.001f,207.874f)];
 
+    /// <summary>
+    /// Talk scripts that open shops from compiled script code, never from a sheet. Each entry is backed by an in-game
+    /// observation (2026-10-30: « Prêtresse à la robe noire », Wolves' Den, menu « Échanger des marques de loup » mêlée 1/2,
+    /// distance) and docs/evidence/0.97.0-wolf-npc-probe.log: the only three wolf-mark shops (type 4) that no sheet references.
+    /// </summary>
     public static readonly IReadOnlyDictionary<uint,IReadOnlyList<uint>> ObservedTalkShops=new Dictionary<uint,IReadOnlyList<uint>>
     {
         [721280]=[1769743,1770537,1769744],
@@ -71,6 +83,11 @@ public static class NpcShopLinks
         [721862]=[1771038],
     };
     public const byte TomestoneCost=2,ScripCost=3;
+    /// <summary>
+    /// Cost of a special shop entry: direct item ids are exact; encoded small ids stay raw. Probe 2026-10-30
+    /// (docs/evidence/0.92.0-shop-currency-probe.log): scrip exchanges use type 16 id 4 for both crafter and gatherer scrips,
+    /// so neither TomestonesItem nor any single table maps these ids; they are shown unresolved, never guessed.
+    /// </summary>
     public static NpcCost Currency(byte encoding,uint costId,uint amount,byte costType=0)
     {
         if(encoding==0 || costId>=100)return new(costId,amount);
@@ -109,7 +126,24 @@ public sealed class NpcVendorCatalog
     {
         Source=source;Vendors=vendors;Sales=sales;this.byItem=byItem;VendorCount=vendors.Count;SaleCount=sales.Count;
         salesByItem=sales.GroupBy(sale=>sale.ItemId).ToFrozenDictionary(group=>group.Key,group=>(IReadOnlyList<NpcShopSale>)group.ToArray());
+        // X-76 (0.955): the vendor sheet read every sale and every vendor on each frame; these are built once with the catalogue.
+        // Shops keep the order of their first sale in Sales, sales their order in Sales (as the page's former GroupBy did).
+        var shops=sales.GroupBy(sale=>sale.ShopId).Select((group,order)=>(group.Key,Order:order,Sales:(IReadOnlyList<NpcShopSale>)Array.AsReadOnly(group.ToArray()))).ToArray();
+        salesByShop=shops.ToFrozenDictionary(shop=>shop.Key,shop=>shop.Sales);
+        var shopOrder=shops.ToDictionary(shop=>shop.Key,shop=>shop.Order);
+        vendorByNpc=vendors.GroupBy(vendor=>vendor.NpcId).ToFrozenDictionary(group=>group.Key,group=>group.First());
+        shopsByNpc=vendorByNpc.ToFrozenDictionary(pair=>pair.Key,pair=>(IReadOnlyList<IReadOnlyList<NpcShopSale>>)Array.AsReadOnly(pair.Value.ShopIds.Distinct()
+            .Where(shopOrder.ContainsKey).OrderBy(shop=>shopOrder[shop]).Select(shop=>salesByShop[shop]).ToArray()));
     }
+    private readonly FrozenDictionary<uint,IReadOnlyList<NpcShopSale>> salesByShop;
+    private readonly FrozenDictionary<uint,NpcVendor> vendorByNpc;
+    private readonly FrozenDictionary<uint,IReadOnlyList<IReadOnlyList<NpcShopSale>>> shopsByNpc;
+    /// <summary>Every sale of one shop, in the order of Sales; empty when the shop sells nothing.</summary>
+    public IReadOnlyList<NpcShopSale> SalesOfShop(uint shopId)=>salesByShop.GetValueOrDefault(shopId) ?? [];
+    /// <summary>The vendor of this NPC id (the first one kept by Build), or null.</summary>
+    public NpcVendor? Vendor(uint npcId)=>vendorByNpc.GetValueOrDefault(npcId);
+    /// <summary>The shops of this NPC's vendor that sell something, each one's sales (never empty), shops in the order of their first sale in Sales.</summary>
+    public IReadOnlyList<IReadOnlyList<NpcShopSale>> ShopsOf(uint npcId)=>shopsByNpc.GetValueOrDefault(npcId) ?? [];
     // Every sale of an item, also in shops no NPC of the sheets opens (0.199: matched with LuminaSupplemental ENpcShop).
     private readonly FrozenDictionary<uint,IReadOnlyList<NpcShopSale>> salesByItem;
     public IReadOnlyList<NpcShopSale> SalesOf(uint itemId)=>salesByItem.GetValueOrDefault(itemId) ?? [];
@@ -176,7 +210,7 @@ public static class NpcVendorCache
     public const int MaximumRows=500_000;
     // Bump when the sheet-to-record copy rules change without a change of record shape.
     // 2: FateShop links (gemstone traders). 3: InclusionShop links (scrip exchanges), encoded currencies no longer mapped (2026-10-30).
-    private const int CopyRules=11; // 11: Kaede's archaeology talk (Auxesia). 8: observed talk links; 9: planevent.lgb; 10: planner.lgb + header check + crystal exchange. // 4: purple scrips; 5: (type, id) table; 6: currencies keyed by CostType (tomestones vs scrips).
+    private const int CopyRules=15; // 15: QST_ENPC layers permanent; Level-only vendors unplaced. // 14: Level positions take a festival's condition only. // 13: Level positions take their layer's condition. // 12: layer conditions (festival, quest, opening). 11: Kaede's archaeology talk (Auxesia). 8: observed talk links; 9: planevent.lgb; 10: planner.lgb + header check + crystal exchange. // 4: purple scrips; 5: (type, id) table; 6: currencies keyed by CostType (tomestones vs scrips).
     public static readonly string Shape=CatalogCacheKeys.Shape(typeof(NpcVendor),typeof(NpcLocation),typeof(NpcShopSale),typeof(NpcCost),typeof(NpcShopKind));
     public static string Version(string dataVersion)=>CatalogCacheKeys.Version(dataVersion,CopyRules,Shape);
     public static bool Valid(NpcVendorCacheData? data,string dataVersion)

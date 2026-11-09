@@ -16,11 +16,19 @@ internal sealed partial class MainWindow
     private void DrawListPanelOptions()
     {
         BoolSetting("ListPanels.HideInCombat","ListPanels.HideInCombatTip",()=>configuration.ListPanelsHideInCombat,value=>configuration.ListPanelsHideInCombat=value,c=>c.ListPanelsHideInCombat);
-        BoolSetting("ListPanels.HideBehindGame","ListPanels.HideBehindGameTip",()=>configuration.ListPanelsHideBehindGame,value=>configuration.ListPanelsHideBehindGame=value,c=>c.ListPanelsHideBehindGame);
+        // X-76 step 3 (0.952): a panel steps aside only through BarBehindGame, which needs Settings › Data « bars and free panels step aside »:
+        // greyed while that is off, the tip names it.
+        ImGui.BeginDisabled(!configuration.HideBarsBehindGame);
+        try{BoolSetting("ListPanels.HideBehindGame","ListPanels.HideBehindGameTip",()=>configuration.ListPanelsHideBehindGame,value=>configuration.ListPanelsHideBehindGame=value,c=>c.ListPanelsHideBehindGame);}
+        finally{ImGui.EndDisabled();}
         BoolSetting("ListPanels.FinishedOnly","ListPanels.FinishedOnlyTip",()=>configuration.ListPanelsFinishedOnly,value=>configuration.ListPanelsFinishedOnly=value,c=>c.ListPanelsFinishedOnly);
+        BoolSetting("ListPanels.StorageHighlight","ListPanels.StorageHighlightTip",()=>configuration.ListPanelsStorageHighlight,value=>configuration.ListPanelsStorageHighlight=value,c=>c.ListPanelsStorageHighlight);
         BoolSetting("ListPanels.Base","ListPanels.BaseTip",()=>configuration.ListPanelsBase,value=>configuration.ListPanelsBase=value,c=>c.ListPanelsBase);
         if(!configuration.ListPanelsBase)return;
         ImGui.Indent();
+        // X-76 step 3 (0.954): the origin groups sort materials; with « finished items only » no material is shown, so they are greyed.
+        ImGui.BeginDisabled(configuration.ListPanelsFinishedOnly);
+        try{
         BoolSetting("ListPanels.Gathering","ListPanels.OriginTip",()=>configuration.ListPanelsGathering,value=>configuration.ListPanelsGathering=value,c=>c.ListPanelsGathering);
         if(configuration.ListPanelsGathering)
         {
@@ -42,7 +50,9 @@ internal sealed partial class MainWindow
             ImGui.Unindent();
         }
         BoolSetting("ListPanels.Other","ListPanels.OriginTip",()=>configuration.ListPanelsOther,value=>configuration.ListPanelsOther=value,c=>c.ListPanelsOther);
-        BoolSetting("ListPanels.Crystal","ListPanels.OriginTip",()=>configuration.ListPanelsCrystal,value=>configuration.ListPanelsCrystal=value,c=>c.ListPanelsCrystal);
+        BoolSetting("ListPanels.Crystal","ListPanels.CrystalTip",()=>configuration.ListPanelsCrystal,value=>configuration.ListPanelsCrystal=value,c=>c.ListPanelsCrystal);
+        }
+        finally{ImGui.EndDisabled();}
         ImGui.Unindent();
     }
     private IReadOnlyList<WorkshopProject> workshopPanelShown=[];
@@ -225,7 +235,7 @@ internal sealed partial class MainWindow
                 {
                     if(craft.Recipe.CraftTypeId<8)
                     {
-                        DrawItemIcon(new Items.ItemDefinition(0,craft.Recipe.CraftType,false,62108+craft.Recipe.CraftTypeId),new Vector2(ImGui.GetTextLineHeight()),false);
+                        DrawGameIcon(62108+craft.Recipe.CraftTypeId,new Vector2(ImGui.GetTextLineHeight()));
                         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.CraftRuns",craft.Recipe.CraftType,craft.Runs.ToString("N0")));
                         ImGui.SameLine();
                     }
@@ -242,6 +252,7 @@ internal sealed partial class MainWindow
         "Preparation"=>preparationPanelShown is { } recipe ? new[]{(recipe.ResultItemId,(long)configuration.PreparationPanelTarget)}:null,
         _=>null,
     };
+    private readonly Dictionary<string,string> listPanelLogged=[];
     private (long At,(uint Item,long Needed)[] Lines) ListPanelLinesOf(string key,Func<(uint Item,long Needed)[]> entries)
     {
         var now=Environment.TickCount64;
@@ -254,6 +265,13 @@ internal sealed partial class MainWindow
             // 0.789 (X-30): the crafts left, worked out with the lines.
             listPanelCrafts[key]=BaseMaterials.Crafts(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched);
             listPanelLines[key]=known=(now,configuration.ListPanelsBase ? BaseMaterials.Expand(wanted,ListPanelStock,ListPanelRecipe,ListPanelFetched).ToArray():wanted);
+            // 0.840 (X-65, user report: still no birch syrup after 0.838): developer mode, what the panel asked and got, each line with its stock and group, on change.
+            if(developerMode)
+            {
+                var line=string.Join(", ",wanted.Select(entry=>$"{entry.Item}x{entry.Needed}"))+" -> "+string.Join(", ",known.Lines.Select(entry=>
+                    $"{entry.Item}x{entry.Needed} stock {ListPanelStock(entry.Item)} recipe {(ListPanelRecipe(entry.Item) is { } recipe ? recipe.RecipeId:0)} fetched {ListPanelFetched(entry.Item)} {ListPanelOrigin(entry.Item)}"));
+                if(listPanelLogged.GetValueOrDefault(key)!=line){listPanelLogged[key]=line;log.Information("List panel {0}: {1}.",key,line);}
+            }
             // 0.779 (X-24, user report: after a reload, monster items sat in « Others » for a while): the monster source is asked by the lists themselves; it is read
             // from its copy on disk (the network only when there is none or it is out of date, under the source's setting).
             if(configuration.ListPanelsBase)lumina?.Request();
@@ -287,7 +305,9 @@ internal sealed partial class MainWindow
             foreach(var group in layout.Zones)
             {
                 var zoneDone=group.Lines.Count(line=>GetRecipeHoldings(line.Item) is { HasObservation:true } held && held.Total>=line.Needed);
-                if(!ImGui.TreeNodeEx($"{group.Label} ({zoneDone}/{group.Lines.Length}){group.Note}###ListZone{key}{group.Id}",ImGuiTreeNodeFlags.DefaultOpen))continue;
+                var zoneOpen=ImGui.TreeNodeEx($"{group.Label} ({zoneDone}/{group.Lines.Length}){group.Note}###ListZone{key}{group.Id}",ImGuiTreeNodeFlags.DefaultOpen);
+                if(group.Cost is { } gil)DrawListZoneCost(gil);
+                if(!zoneOpen)continue;
                 try
                 {
                     foreach(var (item,needed) in group.Lines)
@@ -295,14 +315,29 @@ internal sealed partial class MainWindow
                         DrawListPanelLine(key,item,needed,GetRecipeHoldings(item));
                         if(group.Timed && ImGui.IsItemHovered())WrappedTooltip(string.Join(", ",ListPanelZones(item)));
                         // 0.761 (X-14, user request): open or closed now, and for how long.
-                        if(group.Timed && ListPanelTimedState(item) is { } state){ImGui.SameLine();ImGui.TextColored(state.Open ? Success:Muted,state.Text);}
+                        // 0.827 (X-59, user request): the timer alone, green while open, red while closed; the words on hover.
+                        if(group.Timed && ListPanelTimedState(item) is { } state)
+                        {
+                            ImGui.SameLine();ImGui.TextColored(state.Open ? Success:UI.FfxivTheme.Error,state.Text);
+                            Tip(state.Open ? "ListPanels.TimedOpenHint":"ListPanels.TimedClosedHint");
+                        }
                     }
                 }
                 finally{ImGui.TreePop();}
             }
         }
     }
-    private sealed record ListZoneGroup(string Id,string Label,string Note,bool Timed,(uint Item,long Needed)[] Lines);
+    private sealed record ListZoneGroup(string Id,string Label,string Note,bool Timed,(uint Item,long Needed)[] Lines,uint? Cost=null);
+    // 0.824 (X-56, user request: icons, no words): the Teleport action's icon (Action row 5 « Teleport », icon 111, tools/XbmProbe) and the gil's (item 1).
+    private const uint TeleportIcon=111;
+    private void DrawListZoneCost(uint gil)
+    {
+        var size=new Vector2(ImGui.GetTextLineHeight());
+        ImGui.SameLine();DrawGameIcon(TeleportIcon,size);
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.ZoneCost",gil.ToString("N0")));
+        ImGui.SameLine();DrawItemIcon(itemCatalog.State.Catalog?.Find(1) ?? new Items.ItemDefinition(1,"",false,65002),size);
+        ImGui.SameLine();ImGui.TextUnformatted(gil.ToString("N0"));
+    }
     private sealed record ListLayout(long At,string? Here,(ItemOrigin Origin,(uint Item,long Needed)[] Lines)[] Origins,ListZoneGroup[]? Zones);
     private readonly Dictionary<string,ListLayout> listPanelLayouts=[];
     private ListLayout ListLayoutOf(long at,(uint Item,long Needed)[] all,string? here)
@@ -318,8 +353,9 @@ internal sealed partial class MainWindow
         uint? Cost(string zone){if(!costs.TryGetValue(zone,out var known))costs[zone]=known=ListPanelZoneCost(zone);return known;}
         foreach(var (zone,inZone) in BaseMaterials.OrderZones(BaseMaterials.ByZone(rest,line=>ListPanelZones(line.Item)),here,Cost))
         {
-            var note=zone==here && zone.Length>0 ? " · "+localization.Get("ListPanels.ZoneHere"):Cost(zone) is { } gil ? " · "+localization.Format("ListPanels.ZoneCost",gil.ToString("N0")):"";
-            zones.Add(new(zone,zone.Length>0 ? zone:localization.Get("ListPanels.ZoneUnknown"),note,false,inZone.ToArray()));
+            var cost=zone==here && zone.Length>0 ? null:Cost(zone);
+            var note=zone==here && zone.Length>0 ? " · "+localization.Get("ListPanels.ZoneHere"):"";
+            zones.Add(new(zone,zone.Length>0 ? zone:localization.Get("ListPanels.ZoneUnknown"),note,false,inZone.ToArray(),cost));
         }
         return new(at,here,origins,zones.ToArray());
     }
@@ -333,7 +369,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(known.Alarms.Length==0);
         try{if(ImGui.SmallButton(localization.Format("ListPanels.AddAlarms",known.Alarms.Length)+$"###ListAlarms{key}")){AddAlarms(known.Alarms);listPanelAlarms.Remove(key);}}
         finally{ImGui.EndDisabled();}
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(known.Alarms.Length==0 ? "ListPanels.AddAlarmsNone":"ListPanels.AddAlarmsTip"));
+        Tip(known.Alarms.Length==0 ? "ListPanels.AddAlarmsNone":"ListPanels.AddAlarmsTip");
     }
     private TenshoAssistant.Alarms.TenshoAlarm[] ListAlarms((uint Item,long Needed)[] lines)
     {
@@ -355,7 +391,7 @@ internal sealed partial class MainWindow
                 var job=TenshoAssistant.Alarms.AlarmSchedule.JobOf(source.TypeId,source.IsFishing);
                 foreach(var alarm in TenshoAssistant.Alarms.AlarmSchedule.ForWindows($"{name} · {place}",timing.OpeningMinutes,DefaultAlarmLead,source.TerritoryId,item))
                 {
-                    alarm.JobId=job;
+                    alarm.JobId=job;alarm.Needed=needed;
                     if(existing.Any(known=>known.Label==alarm.Label && known.Repeat==alarm.Repeat && known.EtMinute==alarm.EtMinute)
                         || created.Any(known=>known.Label==alarm.Label && known.EtMinute==alarm.EtMinute))continue;
                     created.Add(alarm);
@@ -385,7 +421,7 @@ internal sealed partial class MainWindow
         foreach(var source in gatheringCatalog.State.Catalog?.ForItem(item) ?? [])
         {
             if(source.Timing.Kind!=Gathering.GatheringScheduleKind.Limited || Gathering.GatheringTime.Next(source.Timing,now,1).Openings.FirstOrDefault() is not { } next)continue;
-            var open=next.StartsAt<=now && now<next.EndsAt;var left=(open ? next.EndsAt:next.StartsAt)-now;
+            var (open,left)=next.At(now);
             if(best is null || open && !best.Value.Open || open==best.Value.Open && left<best.Value.Left)best=(open,left);
         }
         (bool,string)? state=best is { } found ? (found.Open,localization.Format(found.Open ? "ListPanels.TimedOpen":"ListPanels.TimedClosed",Math.Max(0,(int)found.Left.TotalHours),found.Left.Minutes,found.Left.Seconds)):null;
@@ -472,6 +508,14 @@ internal sealed partial class MainWindow
 
     // Stock over what is needed; a dash when the stocks have not been read: unknown is not zero.
     private readonly Diagnostics.BlinkWatch listPanelBlinks=new();
+    /// <summary>0.822 (X-55): the storages holding the item away from the character, when the bags do not cover the need; null otherwise.</summary>
+    private string? ListPanelElsewhere(Inventory.ItemHoldingsSummary stock,long required)
+    {
+        var onMe=stock.Rows.Where(row=>row.Category==Inventory.StorageCategory.PlayerBags).Sum(row=>row.Nq+row.Hq);
+        if(onMe>=required)return null;
+        var away=stock.Rows.Where(row=>row.Category!=Inventory.StorageCategory.PlayerBags && row.Nq+row.Hq>0).ToArray();
+        return away.Length==0 ? null:string.Join(", ",away.Select(row=>$"{StorageRowName(row)} {(row.Nq+row.Hq):N0}"));
+    }
     private void DrawListPanelLine(string list,uint itemId,long required,Inventory.ItemHoldingsSummary stock)
     {
         // 0.740: developer mode, to find the line that goes back and forth while gathering (docs/evidence/0.740-list-blink.md).
@@ -498,6 +542,15 @@ internal sealed partial class MainWindow
         if(!stock.HasObservation)ImGui.TextDisabled($"— / {required:N0}");
         else if(stock.Total<required)ImGui.TextColored(UI.FfxivTheme.Warning,$"{stock.Total:N0} / {required:N0}");
         else ImGui.TextColored(Success,$"{stock.Total:N0} / {required:N0}");
+        // 0.822 (X-55, user request): part of the count is not on the character (a retainer, the saddlebag, the company chest…) and the bags alone do not cover the need.
+        if(stock.HasObservation && ListPanelElsewhere(stock,required) is { } elsewhere)
+        {
+            ImGui.SameLine();
+            ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
+            try{ImGui.TextColored(UI.FfxivTheme.Warning,Dalamud.Interface.FontAwesomeIcon.Warehouse.ToIconString());}
+            finally{ImGui.PopFont();}
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.Elsewhere",elsewhere));
+        }
         // 0.795 (X-35, user request): a monster nearby drops it.
         if(nearbyDroppedItems.TryGetValue(itemId,out var droppers))
         {

@@ -19,8 +19,8 @@ internal static class OceanVoyage418Tests
         {
             var data=Data();
             var second=OceanVoyages.Current(data,Frame(1,false))!;
-            Check(second.Spot.Place=="Galadion" && second.Time==OceanTime.Day && second.Fish.SequenceEqual([10u,11u]),"stop 2: place, moment row 2 = day, main spot fish");
-            Check(second.NextSpot?.Place=="Merlthor N" && second.NextTime==OceanTime.Sunset,"next stop");
+            Check(second.Spot.Place=="Galadion" && second.Time==OceanTime.Sunset && second.Fish.SequenceEqual([10u,11u]),"stop 2: place, moment row 2 = sunset (0.946), main spot fish");
+            Check(second.NextSpot?.Place=="Merlthor N" && second.NextTime==OceanTime.Night,"next stop");
             Check(OceanVoyages.Current(data,Frame(1,true))!.Fish.SequenceEqual([20u]),"spectral current: the sub spot");
             Check(OceanVoyages.Current(data,Frame(2,false)) is { NextSpot:null, Fish.Count:0 },"last stop: no next; unknown spot fish: none");
             Check(OceanVoyages.Current(data,Frame(3,false)) is null && OceanVoyages.Current(data,Frame(0,false) with {RouteId=7}) is null,"out of range or unknown route");

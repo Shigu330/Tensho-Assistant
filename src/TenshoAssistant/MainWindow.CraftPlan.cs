@@ -20,7 +20,7 @@ internal sealed partial class MainWindow
         if(ImGui.SmallButton(localization.Get("PlanUi.Detailed"))) OpenCraftSimulation(recipe);
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("PlanUi.OpenPreparation"))) OpenCraftPreparation(recipe);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("PlanUi.OpenPreparationTip"));
+        Tip("PlanUi.OpenPreparationTip");
         if(craftLogOpenError is { } openError)ImGui.TextWrapped(openError);
         if(craftLog.Error is { } nativeError)DrawDataError(nativeError,"ServiceErrors.CraftLog");
     }
@@ -123,11 +123,11 @@ internal sealed partial class MainWindow
         // A-09 (0.423): the target as a Teamcraft list (import link built here; copied, or opened on click).
         if (TeamcraftExport.Link([(recipe.ResultItemId, recipe.RecipeId, (long)plan.Requested)]) is { } teamcraft)
         {
-            if (ImGui.Button(localization.Get("PlanUi.TeamcraftCopy"))) ImGui.SetClipboardText(teamcraft);
-            if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("PlanUi.TeamcraftTip"));
+            CopyButton(localization.Get("PlanUi.TeamcraftCopy"),()=>teamcraft);
+            Tip("PlanUi.TeamcraftTip");
             ImGui.SameLine();
             if (ImGui.Button(localization.Get("PlanUi.TeamcraftOpen"))) Dalamud.Utility.Util.OpenLink(teamcraft);
-            if (ImGui.IsItemHovered()) WrappedTooltip(localization.Get("PlanUi.TeamcraftTip"));
+            Tip("PlanUi.TeamcraftTip");
             ImGui.SameLine();
         }
         if (ImGui.Button(localization.Get("PlanUi.Copy")))

@@ -111,7 +111,7 @@ internal sealed class NpcVendorLoader : IDisposable
             }
             catch(Exception error)
             {
-                log.Error(error,"Tensho NPC vendor catalog could not be built.");
+                log.Warning(error,"Tensho NPC vendor catalog could not be built.");
                 service.Fail(error);Stop();
             }
         }
@@ -239,8 +239,10 @@ internal sealed class NpcVendorLoader : IDisposable
         // Most vendors are placed by territory layouts, not the Level sheet: read planevent.lgb, one territory per step,
         // only for vendors still without a position (probe: docs/evidence/0.98.0-lgb-probe.log).
         var missing=vendorShops.Keys.Where(id=>!locations.ContainsKey(id)).ToHashSet();
-        if(missing.Count>0)
-            foreach(var territory in data.GetExcelSheet<TerritoryType>())
+        // 0.823 (X-45, reopened: event NPCs still on the Aftcastle): every vendor's layers are read, not only the vendors without a position, so that a Level
+        // position also gets its layer's condition (an NPC on an always-there layer stays; one only on festival, quest or opening layers does not).
+        var conditions=new Dictionary<(uint Npc,uint Territory),(int Condition,uint Festival)>();
+        foreach(var territory in data.GetExcelSheet<TerritoryType>())
             foreach(var kind in LayoutKinds)
             {
                 if(territory.Map.RowId!=0 && territory.Map.IsValid && Layout(territory,kind) is { } file)
@@ -252,16 +254,36 @@ internal sealed class NpcVendorLoader : IDisposable
                     {
                         if(instance.AssetType!=Lumina.Data.Parsing.Layer.LayerEntryType.EventNPC
                            || instance.Object is not Lumina.Data.Parsing.Layer.LayerCommon.ENPCInstanceObject npc
-                           || !missing.Contains(npc.ParentData.ParentData.BaseId))continue;
+                           || !vendorShops.ContainsKey(npc.ParentData.ParentData.BaseId))continue;
+                        {
+                            var layerCondition=NpcShopLinks.LayerCondition(layer.Name,layer.FestivalID);
+                            var key=(npc.ParentData.ParentData.BaseId,territory.RowId);
+                            conditions[key]=conditions.TryGetValue(key,out var known) ? NpcShopLinks.MorePresent(known,layerCondition):layerCondition;
+                        }
+                        if(!missing.Contains(npc.ParentData.ParentData.BaseId))continue;
                         var id=npc.ParentData.ParentData.BaseId;var position=instance.Transform.Translation;
                         var x=NpcShopLinks.MapCoordinate(position.X,map.OffsetX,map.SizeFactor);var y=NpcShopLinks.MapCoordinate(position.Z,map.OffsetY,map.SizeFactor);
                         if(!locations.TryGetValue(id,out var list))locations[id]=list=[];
                         // Several territories share one layout (e.g. instanced copies): keep one entry per map and spot.
+                        // 0.811 (X-45): the layer says whether the NPC is always there, during a festival, or only during a quest or the opening.
+                        var (condition,festival)=NpcShopLinks.LayerCondition(layer.Name,layer.FestivalID);
                         if(list.Count<8 && !list.Any(known=>known.MapId==map.RowId && Math.Abs(known.X-x)<0.1f && Math.Abs(known.Y-y)<0.1f))
-                            list.Add(new(territory.RowId,map.RowId,zone,x,y,position.X,position.Y,position.Z));
+                            list.Add(new(territory.RowId,map.RowId,zone,x,y,position.X,position.Y,position.Z,condition,festival));
                     }
                 }
                 yield return ++count;
+            }
+        var placedAnywhere=conditions.Keys.Select(key=>key.Npc).ToHashSet();
+        // 0.823 (X-45): a Level position takes the condition of the NPC's layers in that territory (none: always there). 0.828: a festival's only; a quest's or
+        // the opening's layer often places a permanent NPC too (0.823 left out 13 of map 12's 14 vendors).
+        foreach(var (npcId,list) in locations)
+            for(var index=0;index<list.Count;index++)
+            {
+                if(list[index].Condition==NpcShopLinks.Always && conditions.TryGetValue((npcId,list[index].TerritoryId),out var placed) && placed.Condition==NpcShopLinks.DuringFestival)
+                    list[index]=list[index] with {Condition=placed.Condition,Festival=placed.Festival};
+                // 0.829 (X-45, user capture of the Aftcastle): a vendor no layer places anywhere exists only through its Level row: the game shows it for an event.
+                else if(list[index].Condition==NpcShopLinks.Always && !placedAnywhere.Contains(npcId))
+                    list[index]=list[index] with {Condition=NpcShopLinks.Unplaced};
             }
         foreach(var place in NpcShopLinks.ObservedPlaces)
         {

@@ -28,7 +28,11 @@ internal sealed partial class MainWindow
         Tip("ItemNotes.ToSellTip");
         ImGui.Separator();
         BoolSetting("ItemNotes.ShopReminder","ItemNotes.ShopReminderTip",()=>configuration.ItemNoteShopReminder,value=>configuration.ItemNoteShopReminder=value,c=>c.ItemNoteShopReminder);
-        BoolSetting("ItemNotes.ImportantSound","ItemNotes.ImportantSoundTip",()=>configuration.ItemNoteImportantSound,value=>configuration.ItemNoteImportantSound=value,c=>c.ItemNoteImportantSound);
+        // X-76 step 3 (0.952): the sound is played only by the shop reminder, greyed while it is off.
+        ImGui.Indent();
+        ImGui.BeginDisabled(!configuration.ItemNoteShopReminder);
+        try{BoolSetting("ItemNotes.ImportantSound","ItemNotes.ImportantSoundTip",()=>configuration.ItemNoteImportantSound,value=>configuration.ItemNoteImportantSound=value,c=>c.ItemNoteImportantSound);}
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
         ImGui.TextDisabled(localization.Format("ItemNotes.Count",notes?.Count ?? 0,ItemNotes.MaximumItems));
     }
 

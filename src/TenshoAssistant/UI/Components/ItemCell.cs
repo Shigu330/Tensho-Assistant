@@ -7,14 +7,14 @@ namespace TenshoAssistant;
 
 // R-06 step 1 (0.247): the shared item templates. Every page draws items through them, so an item looks and answers the same
 // everywhere: game icon; hover = the common item tooltip; right click = the useful tools (RelevantRoutes) and the item's sources.
-// Icons that are not items (duties, actions, jobs, weather…) are passed as ItemDefinition with Id 0 and stay plain images.
+// Icons that are not items (duties, actions, jobs, weather…) go through DrawGameIcon (X-76 H8, 0.920) and stay plain images.
 internal sealed partial class MainWindow
 {
     private int itemTooltipFrame=-1;private uint itemTooltipId;
     private int menuFrame=-1;
     private readonly Dictionary<uint,int> menuSeen=[];
 
-    // 0.269: an icon and the name next to it used the same popup id; the open menu was then drawn twice (« plusieurs fois le même »).
+    // 0.269: an icon and the name next to it used the same popup id; the open menu was then drawn twice (user report: the same menu several times).
     // 0.737 (user report: the right-click menu of a project's material closed at once, now and then): the serial counted every icon of the frame, in every
     // window, so one icon more or less anywhere before it changed the id and ImGui closed the menu. It now counts only the same item at the same place
     // (same id stack), which changes only if that very list changes.
@@ -53,14 +53,20 @@ internal sealed partial class MainWindow
         return clicked;
     }
 
-    // Borrowed for this UI frame only; ownership remains with Dalamud.
-    private void DrawItemImage(ItemDefinition? item,Vector2 size)
+    private void DrawItemImage(ItemDefinition? item,Vector2 size)=>DrawGameIcon(item?.IconId ?? 0,size);
+
+    /// <summary>
+    /// X-76 H8 (0.920): a game icon that is not an item (duty, action, job, weather, card…), a plain image. Missing icon: an empty space of the same
+    /// size, or nothing when <paramref name="keepSpace"/> is false; returns whether the image was drawn. Borrowed for this UI frame only;
+    /// ownership remains with Dalamud.
+    /// </summary>
+    private bool DrawGameIcon(uint iconId,Vector2 size,bool keepSpace=true)
     {
-        if(item is not null && item.IconId!=0
-           && textures.TryGetFromGameIcon(new GameIconLookup(item.IconId,false,true),out var shared)
+        if(iconId!=0 && textures.TryGetFromGameIcon(new GameIconLookup(iconId,false,true),out var shared)
            && shared.TryGetWrap(out var texture,out _) && texture is not null)
-            ImGui.Image(texture.Handle,size);
-        else ImGui.Dummy(size);
+        {ImGui.Image(texture.Handle,size);return true;}
+        if(keepSpace)ImGui.Dummy(size);
+        return false;
     }
 
     // One item tooltip per frame: an icon and its name next to it no longer stack two copies of the same tooltip.

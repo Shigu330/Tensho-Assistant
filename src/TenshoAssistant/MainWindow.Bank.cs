@@ -18,7 +18,7 @@ internal sealed partial class MainWindow
     private string BankEntryName(BankEntry entry)=>StorageNames.Of(localization,entry.Key.Kind,entry.Name);
     private readonly record struct BankItemRow(uint ItemId, long Nq, long Hq);
     private readonly record struct BankSourceViewKey(ulong Character,InventorySnapshot? Live,BankState Bank,ItemCatalog? Items,bool Personal,BankKey? Origin);
-    private readonly record struct BankFrameViewKey(BankSourceViewKey Source,string Category,int Quality,string Query,int LanguageRevision,TenshoAssistant.Caching.CacheRetention Retention,long Second);
+    private readonly record struct BankFrameViewKey(BankSourceViewKey Source,string Category,int Quality,string Query,int LanguageRevision,TenshoAssistant.Caching.CacheRetention Retention,DateTimeOffset? NextExpiry,DateTime Today);
     private BankState? bankEntriesSource;
     private ulong bankEntriesCharacter;
     private BankEntry[] bankEntriesView=[];
@@ -102,7 +102,7 @@ internal sealed partial class MainWindow
             ImGui.TextDisabled(localization.Get("BankUi.NoOpen"));
         if (menus.Message is { } message) DrawServiceMessage(message,"ServiceErrors.Bank");
         if (menus.ReadsUnavailable) ImGui.TextColored(Accent,localization.Get("ServiceStatus.StorageReadUnavailable"));
-        if (state.Loading) ImGui.TextWrapped(localization.Get("BankUi.Loading"));
+        if (state.Loading) EmptyState("BankUi.Loading");
         if (state.Error is { } error) DrawDataError(error,"ServiceErrors.Bank");
         if (menus.CharacterId == 0)
         {
@@ -289,8 +289,12 @@ internal sealed partial class MainWindow
         BoolSetting("BankUi.ListView","BankUi.ListViewTip",()=>configuration.BankListView,value=>configuration.BankListView=value,c=>c.BankListView);
 
         var now=DateTimeOffset.UtcNow;
+        // X-76 (0.955): no longer a per-second field: the frames are rebuilt when a selected snapshot turns expired (or fresh), and when the
+        // local day changes (time or date in the title), so the « expired » mark still comes on time.
+        var nextExpiry=TenshoAssistant.Caching.CacheAge.NextChange(selectedEntries.Select(entry=>(DateTimeOffset?)entry.Snapshot.ObservedAt),now,
+            configuration.Cache.Duration(TenshoAssistant.Caching.CacheArea.ImportedStock));
         var frameKey=new BankFrameViewKey(sourceKey,bankCategoryFilter,bankQualityFilter,bankQuery,localization.Revision,
-            configuration.Cache.Get(TenshoAssistant.Caching.CacheArea.ImportedStock),now.ToUnixTimeSeconds());
+            configuration.Cache.Get(TenshoAssistant.Caching.CacheArea.ImportedStock),nextExpiry,now.ToLocalTime().Date);
         if(bankFrameViewKey!=frameKey)
         {
             bankHasVisibleItems=bankSourceRows.Any(pair=>MatchesBankFilters(new(pair.Key,pair.Value.Nq,pair.Value.Hq)));
@@ -306,7 +310,7 @@ internal sealed partial class MainWindow
                     foreach(var entry in selectedEntries)
                     {
                         var expired=!TenshoAssistant.Caching.CacheAge.Fresh(entry.Snapshot.ObservedAt,now,configuration.Cache.Duration(TenshoAssistant.Caching.CacheArea.ImportedStock));
-                        // 0.329: the date too when the snapshot is not from today (« Stocks importés » keeps one for a day by default).
+                        // 0.329: the date too when the snapshot is not from today (« Imported stock », CacheUi.Stocks, keeps one for a day by default).
                         var observed=entry.Snapshot.ObservedAt.ToLocalTime();
                         AddDisplayFrames(localization.Format("BankUi.Frame",BankEntryName(entry),observed.ToString(observed.Date==now.ToLocalTime().Date ? "t":"g"),expired ? localization.Get("BankUi.ExpiredSuffix"):""),entry.Snapshot.Containers.Values,groups,errors);
                     }

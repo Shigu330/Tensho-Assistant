@@ -31,9 +31,6 @@ public static class BlueSpellSources
         return known.Concat(indexed.Where(entry=>entry.Level is null)).Select(entry=>entry.Row).ToArray();
     }
 
-    /// <summary>0.395: lowest level among a spell's teaching monsters (the level to learn it from), or null when none has a level.</summary>
-    public static int? LowestLevel(IReadOnlyList<WikiMonsterRow>? rows)=>rows?.Select(row=>Level(row.Level)).Where(level=>level is not null).Min();
-
     /// <summary>
     /// 0.395 (user request): spells by that level (1 = lowest first, 2 = highest first); spells with no known level (not read yet, learnt
     /// otherwise) stay last in their first order. Order 0 keeps the list as given.

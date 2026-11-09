@@ -167,7 +167,7 @@ internal sealed partial class MainWindow
                 if(task.Period==TaskPeriod.Counter)
                 {
                     if(ImGui.SmallButton("+")){PersonalTasks.Mark(task,true,now);SaveReminders();}
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("PersonalTasks.DoneTip"));
+                    Tip("PersonalTasks.DoneTip");
                     ImGui.SameLine();ImGui.TextUnformatted($"{task.Name} ({task.Count}/{PersonalTasks.ClampTarget(task.Target)})");
                 }
                 else

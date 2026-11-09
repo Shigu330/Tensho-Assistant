@@ -14,28 +14,8 @@ internal sealed partial class MainWindow
 {
     private const string RepositoryUrl = "https://github.com/Shigu330/Tensho-Assistant";
     private bool clearAlarmsArmed;private int clearAlarmsSeenFrame;
-    // 0.331 (audit): value of the slider being dragged as it was before the drag, put back when the save on release fails.
-    private int sliderBefore;
 
-    // Tooltip text wrapped to a readable width (0.207: long help texts went past the screen edge).
-    private static void WrappedTooltip(string text)
-    {
-        ImGui.BeginTooltip();
-        try
-        {
-            ImGui.PushTextWrapPos(ImGui.GetFontSize()*32);
-            try{ImGui.TextUnformatted(text);}
-            finally{ImGui.PopTextWrapPos();}
-        }
-        finally{ImGui.EndTooltip();}
-    }
-
-    // Tooltip of the last drawn item (also when disabled).
-    private void Tip(string key)
-    {
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(localization.Get(key));
-    }
-
+    // WrappedTooltip, Tip, TipText and HelpMarker: UI/Components/Tooltip.cs (X-76 H1).
 
     // Header and home options (Settings › General).
     private void DrawHeaderSettings()
@@ -47,24 +27,25 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.AlarmServerBar","Advanced.AlarmServerBarTip",()=>configuration.AlarmServerBar,value=>configuration.AlarmServerBar=value,c=>c.AlarmServerBar);
         BoolSetting("Advanced.ReminderServerBar","Advanced.ReminderServerBarTip",()=>configuration.ReminderServerBar,value=>configuration.ReminderServerBar=value,c=>c.ReminderServerBar);
         BoolSetting("Advanced.ReminderFinishedServerBar","Advanced.ReminderFinishedServerBarTip",()=>configuration.ReminderFinishedServerBar,value=>configuration.ReminderFinishedServerBar=value,c=>c.ReminderFinishedServerBar);
+        // X-76 step 3 (0.952): the server bar tooltip belongs to the three bar entries above (not to the tracking window it sat under):
+        // greyed while none of them is on; its count is read by the alarm entry only, greyed while that entry or the tooltip is off.
+        ImGui.Indent();
+        ImGui.BeginDisabled(!configuration.AlarmServerBar && !configuration.ReminderServerBar && !configuration.ReminderFinishedServerBar);
+        try
+        {
+            BoolSetting("Advanced.AlarmBarTooltip","Advanced.AlarmBarTooltipTip",()=>configuration.AlarmBarTooltip,value=>configuration.AlarmBarTooltip=value,c=>c.AlarmBarTooltip);
+            ImGui.Indent();
+            ImGui.BeginDisabled(!configuration.AlarmBarTooltip || !configuration.AlarmServerBar);
+            // 0.331 (audit): the sliders follow the drag in memory and save once, when released (no disk write per frame); X-76 H4 (0.914): SliderSetting.
+            try{SliderSetting("Advanced.AlarmBarTooltipCount","Advanced.AlarmBarTooltipCountTip",()=>configuration.AlarmBarTooltipCount,value=>configuration.AlarmBarTooltipCount=value,
+                1,10,DefaultConfiguration.AlarmBarTooltipCount,width:120);}
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
+        }
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
         // 0.426 (user request): close Tensho when it opens a game window.
         BoolSetting("Advanced.CloseOnGameWindow","Advanced.CloseOnGameWindowTip",()=>configuration.CloseOnGameWindow,value=>configuration.CloseOnGameWindow=value,c=>c.CloseOnGameWindow);
         // 0.415 (g, R-13): pinned tracking window.
         BoolSetting("Tracker.Setting","Tracker.SettingTip",()=>configuration.TrackerWindow,value=>configuration.TrackerWindow=value,c=>c.TrackerWindow);
-        ImGui.Indent();
-        BoolSetting("Advanced.AlarmBarTooltip","Advanced.AlarmBarTooltipTip",()=>configuration.AlarmBarTooltip,value=>configuration.AlarmBarTooltip=value,c=>c.AlarmBarTooltip);
-        // 0.331 (audit): the sliders follow the drag in memory and save once, when released (no disk write per frame).
-        var barBefore=configuration.AlarmBarTooltipCount;
-        var barCount=Math.Clamp(barBefore,1,10);ImGui.SetNextItemWidth(120);
-        if(ImGui.SliderInt(localization.Get("Advanced.AlarmBarTooltipCount")+"###AlarmBarCount",ref barCount,1,10))configuration.AlarmBarTooltipCount=barCount;
-        if(ImGui.IsItemActivated())sliderBefore=barBefore;
-        if(ImGui.IsItemDeactivatedAfterEdit())
-            try{save();saveError=null;}
-            catch(Exception error){configuration.AlarmBarTooltipCount=sliderBefore;saveError=localization.Get("Common.SaveError");log.Warning(error,"Setting {Setting} could not be saved.","AlarmBarTooltipCount");}
-        Tip("Advanced.AlarmBarTooltipCountTip");
-        if(DefaultButton("AlarmBarTooltipCount",configuration.AlarmBarTooltipCount!=DefaultConfiguration.AlarmBarTooltipCount))
-            SaveSetting("AlarmBarTooltipCount",()=>configuration.AlarmBarTooltipCount,value=>configuration.AlarmBarTooltipCount=value,DefaultConfiguration.AlarmBarTooltipCount);
-        ImGui.Unindent();
     }
 
     private void DrawAdvancedSettings()
@@ -79,20 +60,37 @@ internal sealed partial class MainWindow
         {
             developerMode=developer;if(!developer)localization.ShowKeys=false;
             configuration.DeveloperMode=developer;
-            try{save();saveError=null;}catch(Exception error){developerMode=configuration.DeveloperMode=!developer;saveError=localization.Get("Common.SaveError");log.Warning(error,"Developer mode could not be saved.");}
+            TrySave("Developer mode",()=>developerMode=configuration.DeveloperMode=!developer);
         }
         Tip("Advanced.DeveloperTip");
-        if(BoolDefaultButton("DeveloperMode",DefaultConfiguration.DeveloperMode,developerMode))
+        if(DefaultButton("DeveloperMode",developerMode!=DefaultConfiguration.DeveloperMode,OnOff(DefaultConfiguration.DeveloperMode)))
         {
             developerMode=configuration.DeveloperMode=false;localization.ShowKeys=false;
-            try{save();saveError=null;}catch(Exception error){developerMode=configuration.DeveloperMode=true;saveError=localization.Get("Common.SaveError");log.Warning(error,"Developer mode could not be saved.");}
+            TrySave("Developer mode",()=>developerMode=configuration.DeveloperMode=true);
         }
-        BoolSetting("Advanced.ShowIds","Advanced.ShowIdsTip",()=>configuration.ShowIds,value=>configuration.ShowIds=value,c=>c.ShowIds);
+        // X-76 step 3 (0.954): developer mode already shows the ids, so the box is greyed then.
+        ImGui.BeginDisabled(developerMode);
+        try{BoolSetting("Advanced.ShowIds","Advanced.ShowIdsTip",()=>configuration.ShowIds,value=>configuration.ShowIds=value,c=>c.ShowIds);}
+        finally{ImGui.EndDisabled();}
         if(developerMode && ImGui.SmallButton(localization.Get("Navigation.Diagnostics")))page=Page.Diagnostics;
 
         ImGui.Separator();
+        ImGui.TextColored(Accent,localization.Get("Advanced.SupportTitle"));
+        CopyButton(localization.Get("Advanced.CopyReport"),()=>BugReport());
+        Tip("Advanced.CopyReportTip");
+        ImGui.SameLine();
+        CopyButton(localization.Get("Advanced.CopyRepository"),()=>RepositoryUrl);
+        Tip("Advanced.CopyRepositoryTip");
+    }
+
+    // X-100 (0.999, DEC-048): the community sources, now in « Data and sources ».
+    private void DrawSourceSettings()
+    {
+        ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Advanced.SourcesTitle"));
         ImGui.TextDisabled(localization.Get("Advanced.SourcesHelp"));
+        DrawGameDataOnly();
+        if(configuration.GameDataOnly)ImGui.BeginDisabled();
         BoolSetting("Advanced.Lumina","Advanced.LuminaTip",()=>configuration.CommunityLumina,value=>configuration.CommunityLumina=value,c=>c.CommunityLumina);
         BoolSetting("Advanced.Garland","Advanced.GarlandTip",()=>configuration.CommunityGarland,value=>configuration.CommunityGarland=value,c=>c.CommunityGarland);
         BoolSetting("Advanced.Wiki","Advanced.WikiTip",()=>configuration.CommunityWiki,value=>configuration.CommunityWiki=value,c=>c.CommunityWiki);
@@ -100,39 +98,40 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.Teamcraft","Advanced.TeamcraftTip",()=>configuration.CommunityTeamcraftBites,value=>configuration.CommunityTeamcraftBites=value,c=>c.CommunityTeamcraftBites);
         // 0.321 (review 0.316, point 2): the Fashion Report source had no switch.
         BoolSetting("Advanced.Fashion","Advanced.FashionTip",()=>configuration.CommunityFashion,value=>configuration.CommunityFashion=value,c=>c.CommunityFashion);
+        // X-76 step 5 (0.949): PaissaDB (plots for sale), with its switch.
+        BoolSetting("Advanced.Paissa","Advanced.PaissaTip",()=>configuration.CommunityPaissa,value=>configuration.CommunityPaissa=value,c=>c.CommunityPaissa);
         // 0.324: Universalis as a whole; « prices on hover » under it, greyed while Universalis is off.
         BoolSetting("Advanced.Universalis","Advanced.UniversalisTip",()=>configuration.CommunityUniversalis,value=>{configuration.CommunityUniversalis=value;if(!value)market.CancelBackground();},c=>c.CommunityUniversalis);
+        if(configuration.GameDataOnly)ImGui.EndDisabled();
         ImGui.Indent();
         if(!configuration.CommunityUniversalis)ImGui.BeginDisabled();
         try
         {
             BoolSetting("Settings.MarketHover","Advanced.MarketTip",()=>configuration.MarketPricesOnHover,value=>{configuration.MarketPricesOnHover=value;if(!value)market.CancelBackground();},c=>c.MarketPricesOnHover);
-            // 0.343 (I-01): refresh key for the hovered price.
-            BoolSetting("Advanced.HoverRefresh","Advanced.HoverRefreshTip",()=>configuration.HoverPriceRefresh,value=>configuration.HoverPriceRefresh=value,c=>c.HoverPriceRefresh);
+            // 0.343 (I-01): refresh key for the hovered price. X-76 step 3 (0.952): under « prices on hover », greyed while it is off (the
+            // hover reader drops the refresh with the prices, ItemHoverCoordinator).
+            ImGui.Indent();
+            ImGui.BeginDisabled(!configuration.MarketPricesOnHover);
+            try{BoolSetting("Advanced.HoverRefresh","Advanced.HoverRefreshTip",()=>configuration.HoverPriceRefresh,value=>configuration.HoverPriceRefresh=value,c=>c.HoverPriceRefresh);}
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
         }
         finally{if(!configuration.CommunityUniversalis)ImGui.EndDisabled();ImGui.Unindent();}
         // 0.346 (g, I-07): not tied to Universalis: it uses the offers the game shows when you open them.
         BoolSetting("Advanced.Undercut","Advanced.UndercutTip",()=>configuration.UndercutClipboard,value=>configuration.UndercutClipboard=value,c=>c.UndercutClipboard);
         BoolSetting("Advanced.RetainerSales","Advanced.RetainerSalesTip",()=>configuration.RetainerSalesPanel,value=>configuration.RetainerSalesPanel=value,c=>c.RetainerSalesPanel);
 
+    }
+
+    // X-100 (0.999, DEC-048): the game command delay and « remove all alarms », now in « Tracking and notifications ».
+    private void DrawAlarmCommandSettings()
+    {
         ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Advanced.AlarmsTitle"));
-        var options=configuration.AlarmOptions??=new();
-        var delayBefore=options.GameCommandDelayMs;var delay=delayBefore;
-        ImGui.SetNextItemWidth(200);
-        // 0.331 (audit): saved once, when the slider is released (it saved the whole configuration on every frame of a drag).
-        if(ImGui.SliderInt(localization.Get("Advanced.CommandDelay")+"###CommandDelay",ref delay,250,5000,"%d ms"))options.GameCommandDelayMs=delay;
-        if(ImGui.IsItemActivated())sliderBefore=delayBefore;
-        if(ImGui.IsItemDeactivatedAfterEdit())
-            try{save();}catch(Exception error){options.GameCommandDelayMs=sliderBefore;log.Warning(error,"Alarm delay could not be saved.");}
-        Tip("Advanced.CommandDelayTip");
-        // 0.260: « ↺ » back to the default delay (read from a fresh AlarmSettings).
-        var defaultDelay=new TenshoAssistant.Alarms.AlarmSettings().GameCommandDelayMs;
-        if(DefaultButton("CommandDelay",options.GameCommandDelayMs!=defaultDelay))
-        {
-            var previous=options.GameCommandDelayMs;options.GameCommandDelayMs=defaultDelay;
-            try{save();}catch(Exception error){options.GameCommandDelayMs=previous;log.Warning(error,"Alarm delay could not be saved.");}
-        }
+        configuration.AlarmOptions??=new();
+        // 0.331 (audit): saved once, when the slider is released (it saved the whole configuration on every frame of a drag); 0.260: « ↺ »
+        // back to the default delay (read from a fresh Configuration). X-76 H4 (0.914): SliderSetting.
+        SliderSetting("Advanced.CommandDelay","Advanced.CommandDelayTip",()=>configuration.AlarmOptions.GameCommandDelayMs,value=>configuration.AlarmOptions.GameCommandDelayMs=value,
+            250,5000,DefaultConfiguration.AlarmOptions.GameCommandDelayMs,"%d ms",200);
         // Two clicks: the first arms the button, the second deletes. 0.331 (audit): an arming not drawn on the previous frame (page or
         // tab left) is dropped, as for the alarm groups (0.326).
         if(clearAlarmsArmed && ImGui.GetFrameCount()>clearAlarmsSeenFrame+1)clearAlarmsArmed=false;
@@ -148,13 +147,6 @@ internal sealed partial class MainWindow
         if(clearAlarmsArmed)clearAlarmsSeenFrame=ImGui.GetFrameCount();
         Tip("Advanced.ClearAlarmsTip");
 
-        ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("Advanced.SupportTitle"));
-        if(ImGui.SmallButton(localization.Get("Advanced.CopyReport")))ImGui.SetClipboardText(BugReport());
-        Tip("Advanced.CopyReportTip");
-        ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("Advanced.CopyRepository")))ImGui.SetClipboardText(RepositoryUrl);
-        Tip("Advanced.CopyRepositoryTip");
     }
 
     /// <summary>Text for an issue: version, language, data states and errors, settings that change behaviour; no character data.</summary>
@@ -185,13 +177,13 @@ internal sealed partial class MainWindow
     {
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("Contributor.Title")+"###ContributorHelp",ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextWrapped(localization.Get("Contributor.Intro"));
-        if(ImGui.SmallButton(localization.Get("Advanced.CopyRepository")+"##ContribRepo"))ImGui.SetClipboardText(RepositoryUrl);
+        CopyButton(localization.Get("Advanced.CopyRepository")+"##ContribRepo",()=>RepositoryUrl);
         Tip("Advanced.CopyRepositoryTip");
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("Advanced.CopyReport")+"##ContribReport"))ImGui.SetClipboardText(BugReport());
+        CopyButton(localization.Get("Advanced.CopyReport")+"##ContribReport",()=>BugReport());
         Tip("Advanced.CopyReportTip");
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("Contributor.CopyBuild")))ImGui.SetClipboardText(@".\scripts\Verify.ps1");
+        CopyButton(localization.Get("Contributor.CopyBuild"),()=>@".\scripts\Verify.ps1");
         Tip("Contributor.CopyBuildTip");
         ImGui.TextDisabled(localization.Get("Contributor.License"));
         if(ImGui.TreeNode(localization.Get("Contributor.DocsTitle")+"###ContribDocs"))

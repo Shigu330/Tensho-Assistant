@@ -59,7 +59,7 @@ internal static class SourceSwitch324Tests
             var plugin = File.ReadAllText(Path.Combine(Source,"Plugin.cs"));
             foreach (var wire in new[] { "garland.Enabled=()=>configuration.CommunityGarland","market.Enabled=()=>configuration.CommunityUniversalis","marketBoard.Enabled=()=>configuration.CommunityUniversalis" })
                 Check(plugin.Contains(wire,StringComparison.Ordinal),wire);
-            Check(Regex.Matches(plugin,@"\{Enabled=\(\)=>configuration\.CommunityWiki\}").Count == 5,"wiki monsters, item acquisition, vistas, blue magic spells (0.367) and island animals (0.685) get the wiki switch");
+            Check(Regex.Matches(plugin,@"\{Enabled=\(\)=>configuration\.CommunityWiki\}").Count == 6,"wiki monsters, item acquisition, vistas, blue magic spells (0.367), island animals (0.685) and duty guides (0.994) get the wiki switch");
             var hover = File.ReadAllText(Path.Combine(Source,"Items","ItemHoverReader.Dalamud.cs")) + File.ReadAllText(Path.Combine(Source,"MainWindow.MarketHover.cs"));
             Check(Regex.Matches(hover,@"configuration\.CommunityUniversalis && configuration\.MarketPricesOnHover").Count == 2,"hover prices follow Universalis");
             // 0.447 (decided 2026-11-03): the dead « monsters on hover » setting and its wiki lookup are gone.
@@ -71,10 +71,9 @@ internal static class SourceSwitch324Tests
             string Read(string file) => File.ReadAllText(Path.Combine(Source,file));
             var expected = new (string File,string[] Ids)[]
             {
-                ("MainWindow.Settings.cs",["\"MacroBook\"","\"MacroStart\"","\"MacroEnd\"","\"MacroPrefix\"","\"MacroOverwrite\"","\"MacroChain\""]),
+                ("MainWindow.Settings.cs",["\"MacroStart\"","\"MacroEnd\"","\"MacroPrefix\""]),
                 ("MainWindow.Caching.cs",["\"Cache\"+area"]),
                 ("MainWindow.Alarms.cs",["\"AlarmLead\"","\"AlarmPlaySound\"","\"AlarmSound\"","\"AlarmChat\"","\"AlarmMute\"","\"AlarmUseGame\"","\"AlarmGameWeather\""]),
-                ("MainWindow.FashionWeek.cs",["\"FashionOwnedFirst\"","\"FashionDim\"","\"FashionPopular\"","\"FashionPanel\""]),
                 ("MainWindow.MapView.cs",["\"Area\"+key"]),
             };
             foreach (var (file,ids) in expected)
@@ -82,6 +81,15 @@ internal static class SourceSwitch324Tests
                 var text = Read(file);
                 foreach (var id in ids) Check(text.Contains("DefaultButton(" + id,StringComparison.Ordinal),file + ": " + id);
             }
+            // X-76 H5 (0.915): the macro book and switches and the Fashion Report options are shared rows, whose « ↺ » comes with the row.
+            foreach (var (file,row) in new[]
+            {
+                ("MainWindow.Settings.cs","ComboSetting(\"ModuleSettings.MacroBook\","),
+                ("MainWindow.Settings.cs","BoolSetting(\"ModuleSettings.MacroOverwrite\","),("MainWindow.Settings.cs","BoolSetting(\"ModuleSettings.MacroChain\","),
+                ("MainWindow.FashionWeek.cs","BoolSetting(\"FashionWeek.OwnedFirst\","),("MainWindow.FashionWeek.cs","BoolSetting(\"FashionWeek.Dim\","),
+                ("MainWindow.FashionWeek.cs","BoolSetting(\"FashionWeek.Popular\","),("MainWindow.FashionWeek.cs","BoolSetting(\"FashionWeek.Panel\","),
+            })
+                Check(Read(file).Contains(row,StringComparison.Ordinal),file + ": " + row);
             var settings = Read("MainWindow.Settings.cs");
             foreach (var key in new[] { "Settings.OpenOnLoad","Settings.OpenOnLogin","Settings.UsageHover","Settings.ContextMenu","DutyFinder.Setting","CharacterStats.Setting","BankUi.AutoSetting" })
             {

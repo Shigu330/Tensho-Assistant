@@ -380,7 +380,7 @@ Timestamp: 2026-11-05 Europe/Brussels
 Problem: Tensho tourne partout en JcJ et en contenu classé ; seuls les conseils de Triple Triade y sont coupés (DEC-033).
 Evidence: Demande de l'utilisateur : « prevoir que en pvp le plugin se deactive et reactive apres pvp pas de reglages fais obligatoirement pareil pour match classer triad ou dresseur ou autre tous ce qui pourrais etre detecter par SE ou cree un impact sur des classements fais un plan pas de code pour ca pour le moment ». Règle Dalamud : pas d'avantage en environnement compétitif ou JcJ.
 Options: Une coupure par outil, ou une coupure de tout le plugin.
-Decision: Tout le plugin se coupe et repart seul en JcJ et en contenu classé, obligatoirement, sans réglage. Plan seulement pour le moment. Choix D1 à D5 de la liste à cocher du 2026-11-05 : voir le plan. Panneau du Dédale de DEC-032 abandonné.
+Decision: Tout le plugin se coupe et repart seul en JcJ et en contenu classé, obligatoirement, sans réglage. Complément du 2026-11-08 (accord de l'utilisateur, « y a pas de vendeur en pvp donc oui ») : la lecture des offres du marché pendant une mise en vente (UndercutWatcher), seule restée active, est coupée aussi (0.926). Plan seulement pour le moment. Choix D1 à D5 de la liste à cocher du 2026-11-05 : voir le plan. Panneau du Dédale de DEC-032 abandonné.
 Reason: Décision de l'utilisateur.
 Consequences: docs/project/COMPETITIVE-OFF-PLAN.md, docs/evidence/0.600-competitive-inventory.md. Codé en 0.610 sur le feu vert de l'utilisateur.
 References: DEC-032, DEC-033, CONTRIBUTING.md, docs/project/PUBLISHING.md
@@ -404,3 +404,93 @@ Decision: Automatique, en mode développeur seulement, avec les requêtes que le
 Reason: Décision de l'utilisateur.
 Consequences: Le résumé du passage donne le nombre de requêtes et leurs hôtes. Un test vérifie que la fenêtre ne s'ouvre qu'en mode développeur. 0.748 (X-01, lourdeur signalée par l'utilisateur) : au plus un passage toutes les deux heures, quels que soient les rechargements.
 References: DEC-038, docs/evidence/0.724-page-sweep.md
+
+DEC-ID: DEC-041
+Timestamp: 2026-11-08 Europe/Brussels
+Problem: Le document « a faire » demande des outils de contenus (Eurêka, Bozja, donjons profonds, île Lunule, raids fatals) avec des tableaux stratégiques ; DEC-009 a retiré le domaine Combat (seule exception : le dresseur, informations seulement, JcE, DEC-032).
+Evidence: Réponse de l'utilisateur au lot de décisions du 2026-11-08 : « On peut être beaucoup plus permissif, mais que pour préparer les combats, pas en combat, tant que FF14 ne peut pas nous détecter ; je suis ok, pareil pour autre contenu ».
+Options: Élargir l'exception à la préparation des combats ; garder le combat dehors.
+Decision: Exception élargie : des informations pour préparer les combats et les contenus (mécaniques, ordre, placements écrits, objectifs, progression), en JcE seulement. Rien pendant un combat (affichage masqué en combat), rien ne lit les données de combat (pas d'ACT/IINACT, pas de journal de combat), aucune action automatisée, tout coupé en JcJ et en contenu classé (DEC-038). Les règles Dalamud restent le critère (PUBLISHING.md), au-delà de ce que le jeu peut détecter.
+Reason: Décision de l'utilisateur, encadrée par les règles Dalamud gardées (DEC-039).
+Consequences: X-90 peut prévoir des tableaux de préparation ; résumé et accord de l'utilisateur avant chaque outil qui touche une règle Dalamud.
+References: DEC-009, DEC-032, DEC-033, DEC-038, DEC-039, docs/project/GLOBAL-PLAN.md (X-90)
+
+DEC-ID: DEC-042
+Timestamp: 2026-11-08 Europe/Brussels
+Problem: Le format du fichier des découvertes n'a pas de place pour le HQ, des compteurs par valeur ou des dénominateurs (taux de butin futurs) ; le changer après la 1.0.0 obligerait à migrer les fichiers de tous les joueurs.
+Evidence: Plan X-76 2c (étape E1, docs/evidence/x76-2bc-plan.md) ; réponse de l'utilisateur : « Fais-le au plus vite ».
+Options: Avant la 1.0.0 ; plus tard.
+Decision: Format fixé tout de suite : champs facultatifs ajoutés, version du format montée, lecture des anciens fichiers gardée, outil de fusion mis à jour.
+Reason: Décision de l'utilisateur.
+Consequences: Fait avant X-85.
+References: DEC-039, tools/discoveries-merge.py
+
+DEC-ID: DEC-043
+Timestamp: 2026-11-08 Europe/Brussels
+Problem: Durées des voyages de sous-marins calculées par une formule communautaire (SubmarineTracker, MIT) ; le jeu a ses propres fonctions de calcul.
+Evidence: X-75.6 ; réponse de l'utilisateur : « Oui si lecture pure ».
+Options: Fonctions du jeu si elles ne font que calculer ; garder la formule.
+Decision: Les fonctions du jeu sont appelées seulement si elles ne font que calculer (aucune action, aucun envoi au serveur, aucun état modifié), sur le fil du framework ; sinon la formule reste, contrôlée contre le jeu.
+Reason: Décision de l'utilisateur.
+Consequences: Une sonde prouve d'abord la nature de la fonction ; preuve dans docs/evidence.
+References: X-75.6, docs/evidence/0.874-probe-coverage.md
+
+DEC-ID: DEC-044
+Timestamp: 2026-11-08 Europe/Brussels
+Problem: Pêche en mer (X-85) : quel appât déclenche le courant spectral, si les données du jeu ne le disent pas.
+Evidence: Réponse de l'utilisateur : « Vos relevés, puis la commu ».
+Options: Relevés d'abord puis source communautaire marquée ; relevés seulement.
+Decision: Les relevés en jeu de l'utilisateur d'abord ; en attendant, une source communautaire indiquée comme telle, coupée par le réglage « données du jeu et observées seulement » (X-76 étape 3).
+Reason: Décision de l'utilisateur.
+Consequences: Un parseur note les courants spectraux observés et l'appât du lancer.
+References: X-85, X-76
+
+DEC-ID: DEC-045
+Timestamp: 2026-11-09 Europe/Brussels
+Problem: Revue des propositions de G-PROPOSALS « À revoir avec l'utilisateur » (points 1 à 8).
+Evidence: Réponses de l'utilisateur du 2026-11-09 (cases à cocher).
+Options: Pour chaque point, la proposition recommandée ou l'autre choix (G-PROPOSALS).
+Decision: 1 coupure JcJ : laissée comme aujourd'hui (travaux lancés non annulés, alerte Discord de mission gardée). 2 position dans les découvertes partagées : exacte partout, après explication (utile aux cartes des autres joueurs ; elle peut dire où vous pêchiez tel jour). 3 réglages : l'agent propose un plan des onglets et sections, rien ne change avant accord. 4 choix provisoires : déjà confirmés par DEC-026 ; revue des alternatives. 5 ventes des servants : comparaison Universalis sur clic. 6 poissons de collection : vus dans l'aide à la pêche ; y ajouter la collectionnabilité visée et les assignats. 7 fichiers de l'agent : en français (au choix de l'agent, réponses en français). 8 outils de contenus : mécaniques et stratégies du wiki (GFDL, sur clic, créditées, interrupteur Wiki), notes écrites et schéma d'arène dans la fenêtre Tensho, hors combat, jamais par-dessus le jeu, aucun marqueur posé dans le jeu ; liens navigateur pour les sites sans licence ; bestiaire des donjons profonds avec les notes du wiki, hors du donjon seulement.
+Reason: Décisions de l'utilisateur.
+Consequences: X-97 (aide à la pêche), X-90 (wiki, notes, schéma, bestiaire), plan des réglages à proposer.
+References: G-PROPOSALS, DEC-026, DEC-038, DEC-041, docs/project/CONTENT-TOOLS.md
+
+DEC-ID: DEC-046
+Timestamp: 2026-11-09 Europe/Brussels
+Problem: Maximiseur d'équipe du dresseur (demande du 2026-11-09) alors que DEC-032 excluait une « meilleure équipe » calculée sans nouvelle décision (le Dédale bestial a des classements).
+Evidence: Réponse de l'utilisateur après le rappel de la règle : « équipe calculée tant que ce n'est pas pendant le combat, je pense que c'est ok ».
+Options: Couverture des faiblesses seulement ; équipe calculée hors combat ; rien de plus.
+Decision: Équipe calculée permise, préparée hors combat : depuis la page Tensho, avant d'entrer, d'après les faiblesses des ennemis rencontrés (relevés) et les bêtes possédées ; résultat en cache disque. Rien pendant un combat, rien à l'intérieur du Dédale (DEC-038 coupe Tensho en contenu classé), aucune action automatisée, JcE seulement. Complète DEC-032 et DEC-041.
+Reason: Décision de l'utilisateur, règle Dalamud rappelée avant (dépôt personnalisé, DEC-039).
+Consequences: Point X-109 du plan ; le calcul reste une aide de préparation, affichée comme telle.
+References: DEC-032, DEC-038, DEC-039, DEC-041, issue #34
+
+DEC-ID: DEC-047
+Timestamp: 2026-11-09 Europe/Brussels
+Problem: Aide au choix des 3 bêtes de chaque affrontement du Dédale bestial : l'écran du plateau est dans l'instance (relevé du 2026-11-09 : « Competitive cut on: territory 1339 » à l'entrée, juste après la fenêtre de mission), où DEC-038 coupe tout Tensho.
+Evidence: Réponse de l'utilisateur après le rappel de DEC-038 et de la règle Dalamud (classements, avantage en contenu compétitif) : couper « au début de chaque combat ».
+Options: Coupure à l'entrée, tout préparé avant ; coupure au début de chaque combat (exception).
+Decision: Exception limitée à DEC-038 pour le Dédale bestial : dans ses territoires, tout Tensho reste coupé sauf le panneau d'équipe du dresseur et la lecture minimale qu'il demande, actifs seulement devant le plateau, entre les combats ; coupés dès le début de chaque combat et pendant tout combat. Aucune action automatisée, rien qui lise le combat. Le reste du contenu classé est inchangé.
+Reason: Décision de l'utilisateur, règle Dalamud rappelée avant (dépôt personnalisé, DEC-039).
+Consequences: X-109 : le moment du début de combat est à prouver en jeu (relevé de développement autorisé par cette exception) avant d'activer le panneau ; en doute, coupé.
+References: DEC-032, DEC-038, DEC-039, DEC-041, DEC-046
+
+DEC-ID: DEC-048
+Timestamp: 2026-11-10 Europe/Brussels
+Problem: Propositions 9 (X-101, alerte « souhait en vente », appel réseau automatique) et 10 (X-100, regroupement des outils et des réglages) de G-PROPOSALS.
+Evidence: Réponses de l'utilisateur du 2026-11-10 (cases à cocher), après le rappel de la règle Dalamud pour l'appel automatique.
+Options: X-101 automatique coupé par défaut, bouton seulement, rien ; X-100 regroupement proposé ou disposition actuelle ; réglages en onglets + recherche, recherche seule, rien.
+Decision: X-101 : réglage coupé par défaut ; activé : au plus une vérification toutes les 30 min, seulement les souhaits avec un prix, 20 objets par passage, ligne de discussion quand un prix passe sous le sien ; Universalis déjà déclaré. X-100 : navigation en groupes Objets, Production, Monde, Suivi, Progression, Contenus, Gold Saucer, Références, Préférences (Accueil et Mes outils en tête) ; Paramètres en onglets Général, Panneaux à côté du jeu, Carte, Suivi et notifications, Données et sources, Avancé, Débogage, avec une recherche parmi tous les réglages ; chaque réglage reste aussi à côté de son outil.
+Reason: Décisions de l'utilisateur (choix recommandés).
+Consequences: X-100 et X-101 à coder.
+References: G-PROPOSALS (9, 10, « Proposition X-100 »), DEC-039
+
+DEC-ID: DEC-049
+Timestamp: 2026-11-10 Europe/Brussels
+Problem: Proposition 11 de G-PROPOSALS (X-40) : autres usages des monstres proches.
+Evidence: Réponse de l'utilisateur : « Les trois ».
+Options: a) toutes les listes d'artisanat, b) cibles du livre de relique, c) butin des souhaits ; seulement a) ; rien.
+Decision: Les trois, chacun avec son réglage (couche de la carte, icône au-dessus de la tête), activés par défaut. a) étend la couche « vos listes » (X-35) qui ne comptait que la liste affichée dans un panneau.
+Reason: Décision de l'utilisateur.
+Consequences: X-40 codé en 0.1002.
+References: G-PROPOSALS n° 11, X-35, X-40

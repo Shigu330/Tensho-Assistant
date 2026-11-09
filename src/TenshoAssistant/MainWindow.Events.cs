@@ -40,7 +40,7 @@ internal sealed partial class MainWindow
         // Game flags (« Special Event Flag », or no quest and no NPC of their own) are not events: left out, counted in developer mode.
         var shown=state.Active.Where(festival=>!Events.Festivals.Technical(festival.Id,reader.Names,questsOf,layouts)).ToArray();
         if(developerMode && shown.Length<state.Active.Count)ImGui.TextDisabled(localization.Format("Events.Technical",state.Active.Count-shown.Length));
-        if(shown.Length==0){ImGui.TextWrapped(localization.Get("Events.None"));return;}
+        if(shown.Length==0){EmptyState("Events.None");return;}
         if(layouts is null)ImGui.TextDisabled(localization.Get(reader.LayoutsFailed ? "Events.LayoutsUnavailable":"Events.LayoutsLoading"));
         foreach(var festival in shown)
         {
@@ -56,6 +56,9 @@ internal sealed partial class MainWindow
                 ImGui.TextDisabled(french is not null ? localization.Format("Events.NameFromGuide",guide!,english ?? "—")
                     :english is not null ? localization.Get("Events.NameEnglishOnly"):localization.Get("Events.NameUnknown"));
                 if(developerMode)ImGui.TextDisabled(localization.Format("Events.Raw",festival.Id,festival.Phase));
+                // X-75.5 (0.879): the days it was seen running in game (yours or shared, this year and before), from the discoveries.
+                if(DiscoveryStore is { } seenStore && DiscoveriesLoaded && seenStore.Find(Discoveries.DiscoveryKind.FestivalSeen,festival.Id,16) is { Count:>0 } seenDays)
+                    ImGui.TextDisabled(localization.Format("Events.SeenDays",new DateTime(2013,8,27).AddDays(seenDays.Min(fact=>fact.LevelMin)).ToString("d"),new DateTime(2013,8,27).AddDays(seenDays.Max(fact=>fact.LevelMax)).ToString("d")));
                 if(questsOf is null)ImGui.TextDisabled(localization.Get(reader.QuestsFailed ? "Events.QuestsUnavailable":"Events.Loading"));
                 else if(questsOf.GetValueOrDefault(festival.Id) is { Count:>0 } ids)
                 {

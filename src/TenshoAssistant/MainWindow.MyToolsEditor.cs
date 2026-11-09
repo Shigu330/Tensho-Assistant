@@ -57,10 +57,10 @@ internal sealed partial class MainWindow
                 ImGui.TextColored(Accent,localization.Format("MyToolsEditor.BlockTitle",index+1,localization.Get("MyToolsEditor.Kind"+KindOf(draft.Blocks[index]))));
                 ImGui.SameLine();
                 if(ImGui.SmallButton("^"))draft.Move(index,-1);
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsEditor.UpTip"));
+                Tip("MyToolsEditor.UpTip");
                 ImGui.SameLine();
                 if(ImGui.SmallButton("v"))draft.Move(index,1);
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsEditor.DownTip"));
+                Tip("MyToolsEditor.DownTip");
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("MyToolsEditor.RemoveBlock"))){draft.Blocks.RemoveAt(index);return;}
                 draft.Blocks[index]=DrawMyToolBlockEditor(draft.Blocks[index]);
@@ -91,7 +91,7 @@ internal sealed partial class MainWindow
                 else myToolDraftProblem=new("Full");
             }
         }
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Get("MyToolsEditor.SaveTip"));
+        Tip("MyToolsEditor.SaveTip");
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("MyToolsEditor.Cancel"))){myToolDraft=null;myToolDraftProblem=null;}
     }

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- X-93 (0.938): load test of the discoveries base with invented facts; offline, writes only to a temporary folder. -->
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/TenshoAssistant/Discoveries/DiscoveriesModel.cs" Link="Linked/DiscoveriesModel.cs" />
+    <Compile Include="../../src/TenshoAssistant/Discoveries/ItemGains.cs" Link="Linked/ItemGains.cs" />
+    <Compile Include="../../src/TenshoAssistant/AtomicFile.cs" Link="Linked/AtomicFile.cs" />
+  </ItemGroup>
+</Project>

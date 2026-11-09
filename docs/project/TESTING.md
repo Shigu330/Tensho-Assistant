@@ -1246,6 +1246,416 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.802) Rien à essayer en jeu.
 
+- [ ] (0.803) Carte Tensho sur une zone pas entièrement découverte : les mêmes parties vierges que la carte du jeu.
+
+- [ ] (0.804) Page Dresseur : « Lire le bestiaire du wiki », puis en dresseur près d'un monstre d'une bête manquante : icône du dresseur au-dessus de lui.
+
+- [ ] (0.805) Jouez avec la carte Tensho ouverte ; je relis les « Slow frame ».
+
+- [ ] (0.806) Jouez avec la carte ouverte ; je relis les « Slow frame ».
+
+- [ ] (0.807) Promenez-vous parmi des monstres, puis Monde › Découvertes : cherchez un nom, ses lieux s'affichent ; Exporter, puis déposez le fichier dans Import et Importer.
+
+- [ ] (0.808) Carnet d'artisanat : clic droit sur une recette puis sur un matériau : entrée « Tensho ».
+
+- [ ] (0.809) Vainquez quelques monstres et ramassez leur butin (en mage bleu : un sort ; en dresseur : une capture) ; je relis « Reading messages ».
+
+- [ ] (0.810) Limsa, la Dunette : les marchands absents en jeu ne sont plus sur la carte Tensho.
+
+- [ ] (0.811) Limsa, le Tillac et la Dunette : seuls les marchands présents en jeu restent sur la carte Tensho.
+
+- [ ] (0.812) À la prochaine alarme : clic droit sur le nom de l'objet : menu de l'objet avec « Tensho ».
+
+- [ ] (0.813) Cliquez une quête dans le journal, validez l'étape : la cible quitte la carte Tensho.
+
+- [ ] (0.814) Une cible hors de la vue, en haut à gauche : son icône de bord passe au-dessus du bandeau des noms.
+
+- [ ] (0.815) Récolte d'un collectionnable avec seuils : la compétence du plan encadrée sur la barre.
+
+- [ ] (0.816) Récolte d'un collectionnable avec seuils : le bouton de l'action du plan encadré dans la fenêtre du jeu.
+
+- [ ] (0.817) Ouvrez un objet au tableau des ventes, puis regardez son prix dans Tensho (survol, Que faire avec ?) : celui que vous venez de voir.
+
+- [ ] (0.818) Approchez un yak laineux avec la liste qui demande du lait de yak ; je relis « Nearby monsters ».
+
+- [ ] (0.819) Près d'un yak laineux avec du lait de yak demandé : patte sur la carte et à côté de l'objet dans la liste.
+
+- [ ] (0.820) Ouvrez l'inventaire d'un servant qui garde un objet de votre liste : sa case est encadrée.
+
+- [ ] (0.821) Survolez un objet ouvert au tableau des ventes : votre monde, puis « Le moins cher » d'un autre monde et de la région.
+
+- [ ] (0.822) Un objet de la liste gardé chez un servant : icône d'entrepôt et son nom au survol.
+
+- [ ] (0.823) Limsa, la Dunette : seuls les marchands présents en jeu restent ; je relis « Map vendors on map ».
+
+- [ ] (0.824) Liste de suivi par zone : icône de téléportation, icône des gils et le montant.
+
+- [ ] (0.825) Avec la quête « Le pari » : carte Tensho sur le Tillac puis l'Entrepont ; je relis « Reading eventMarkers ».
+
+- [ ] (0.826) Clic droit sur un objet fabricable : « Ajouter à « Liste 1 » » ; il apparaît dans la liste.
+
+- [ ] (0.827) Liste de suivi, points à horaire : minuteurs verts et rouges, sans mots.
+
+- [ ] (0.828) Près d'une cocatrix avec la cuisse demandée : patte sur la carte et dans la liste ; Limsa : les marchands reviennent ; Monde › Découvertes se remplit.
+
+- [ ] (0.829) Limsa, la Dunette : plus de marchand fantôme ; ailleurs dans Limsa, les marchands permanents sont là.
+
+- [ ] (0.830) Clic droit sur un objet récolté de la liste : « Placer le drapeau » ; sur l'Échalion cyclope, je relis « Go there missing ».
+
+- [ ] (0.831) Enchaîner deux points du même genre en dépensant des PR au premier : le second propose un plan.
+
+- [ ] (0.832) Retirer les alarmes du sel gemme, les ajouter de nouveau depuis la liste : page Alarmes, « objet réuni : muette », et plus de sonnerie.
+
+- [ ] (0.833) Liste de suivi, « Y aller » sur un objet de l'Arrière-pays dravanien : question « Se téléporter à Idyllée ? », puis « par l'éthernet : Porte du Prologue / de l'Épilogue ».
+
+- [ ] (0.834) Clic droit sur Haricots émeraude dans la liste : « Y aller » et « Placer le drapeau ».
+
+- [ ] (0.835) Un objet d'un point à livre de folklore non lu : « Y aller » mène à un autre point, ou n'apparaît pas.
+
+- [ ] (0.836) Mode développeur : /tensho linktest, puis clic droit sur A et B, clic gauche sur C et D ; je lis le journal.
+
+- [ ] (0.837) Clic droit sur la morille d'une ligne d'alarme ou de « /tensho linktest » : l'entrée Tensho ; clic droit sur le nom d'un joueur : pas d'entrée.
+
+- [ ] (0.838) Liste 1 : le sirop de bouleau apparaît (157/1), avec l'icône d'entrepôt s'il est chez un servant ; survol : où il est.
+
+- [ ] (0.839) Servant avec les deux vins : seul le vin de qualité encadré ; changer d'onglet : l'encadré suit, ou disparaît.
+
+- [ ] (0.840) Mode développeur, panneau Liste 1 ouvert : je lis la ligne « List panel CraftList ».
+
+- [ ] (0.841) Liste 1 : sirop de bouleau 157/1 dans « Autres », icône d'entrepôt s'il est chez le servant.
+
+- [ ] (0.842) Carte du jeu ouverte devant une icône avec flèche (Mor Dhona) : je lis « Reading mapMarkers ».
+
+- [ ] (0.843) Carte du jeu ouverte devant une icône avec flèche : je lis « Reading mapMarkers » et « Reading eventMarkers ».
+
+- [ ] (0.844) Mor Dhona, quête de cuisinier : flèche vers le bas sur l'icône et la zone plus basse ; Carte › Alentours : le réglage.
+
+- [ ] (0.845) Journal, quête de cuisinier à Mor Dhona, « Carte » : la zone orange remplit la vue.
+
+- [ ] (0.846) Journal, « Carte » sur une quête : la carte centre dessus sans changer le zoom.
+
+- [ ] (0.847) Journal, « Carte » sur une quête, faire l'étape : la cible du journal disparaît dans la seconde.
+
+- [ ] (0.848) Faire une étape de quête carte du jeu fermée : la zone suivante apparaît sur la carte de Tensho dans la seconde.
+
+- [ ] (0.849) Mer de Rubis ou Mor Dhona : chevron orange du jeu sur les icônes plus hautes ou plus basses.
+
+- [ ] (0.850) Changer de zone, M : la carte s'ouvre au zoom réglé ; choisir une autre carte dans le menu : même zoom.
+
+- [ ] (0.851) Icône plus haute ou plus basse : chevron plus discret.
+
+- [ ] (0.852) Fenêtre d'une quête, clic droit sur une récompense : entrée Tensho ; survol : panneau ou ligne « Item hover without panel » au journal.
+
+- [ ] (0.853) Tillac de Limsa, clic droit sur la cible de quête : « Éthérite la plus proche », puis Limsa et l'éthernet jusqu'à la guilde.
+
+- [ ] (0.854) Carnet de chasse : une cible déjà croisée montre « Vu par vous » ; clic droit, drapeau.
+
+- [ ] (0.855) Monde › Découvertes : le nombre de relevés baisse (environ 640) ; le fichier Discoveries.json rapetisse.
+
+- [ ] (0.856) Passer près d'une ALÉA ou d'un monstre de chasse : Monde › Découvertes, chercher son nom.
+
+- [ ] (0.857) Aller sur un autre monde, ouvrir le tableau d'un objet, revenir : l'info-bulle de l'objet donne ce monde comme le moins cher s'il l'est.
+
+- [ ] (0.858) Ouvrir le tableau d'un objet deux jours de suite : l'historique vu grandit.
+
+- [ ] (0.859) Pêcher à un lieu avec un poisson commun : « ni heure ni météo (jeu) » ; un poisson à fenêtre garde sa fenêtre.
+
+- [ ] (0.860) Désynthétiser un objet, ouvrir un coffre, pêcher : Monde › Découvertes, le résumé compte ces relevés ; chercher le nom de l'objet.
+
+- [ ] (0.861) Fashion Report, fenêtre ouverte : les catégories et le thème ; après un jugement, Monde › Découvertes les compte.
+
+- [ ] (0.862) Atelier de la compagnie, relire un sous-marin rentré : Monde › Découvertes compte le butin par secteur.
+
+- [ ] (0.863) Apprendre un sort de mage bleu : Monde › Découvertes, « appris de » le monstre.
+
+- [ ] (0.864) Pendant une fête, Monde › Découvertes : « Fêtes vues » ; inscrire un panorama : il apparaît avec sa météo.
+
+- [ ] (0.865) Désynthétiser un objet, puis survoler un résultat : « Vu par vous : … ← désynthèse de … ».
+
+- [ ] (0.866) Crédits : les nouvelles références ; Aide : « Que garde Tensho sur mon PC ? » ; Découvertes : l'indication de recherche.
+
+- [ ] (0.867) Rien à essayer en jeu.
+
+- [ ] (0.868) Ouvrir le tableau du jeu pour un objet, puis Tensho › Marché › Offres sur le même objet : les offres de votre monde marquées « (vu en jeu) ».
+
+- [ ] (0.869) Mode développeur : pêcher une dizaine de fois (dont une touche !!! si possible et un mooch), faire une réduction éthérée, ouvrir une remise d'objet de quête ; le journal garde les lignes « Reading fishline / purify / npctrade ».
+
+- [ ] (0.870) Ouvrir le tableau du jeu sur un objet que vous vendez, puis la liste de ventes du servant : le verdict sans cliquer « Comparer » ; survol du prix le plus bas : « Vu au tableau du jeu à … ».
+
+- [ ] (0.871) Tensho › Marché › Offres : l'étendue « Région » est nommée tout de suite (Europe, Japon…).
+
+- [ ] (0.872) Ouvrir la boutique d'un marchand, puis Monde › Découvertes : « Marchands placés : 1 ».
+
+- [ ] (0.873) En donjon sans fond, ouvrir un coffre : Monde › Découvertes, un coffre de mission pour l'étage.
+
+- [ ] (0.874) Relevés en jeu par sonde (mode développeur, journal Dalamud « Reading <partie> » ou Monde › Découvertes) : pêche (fishing, fishline, statuts sous Pêche lente/Amorce/Prise forcée), réduction (purify), remise de quête (npctrade), île (island), aéronef revenu (airship), atelier (workshop) ; servant revenu de tâche → « Tâches des servants » ; coffre de donjon (fenêtre de butin) → « coffre de mission » ; ALÉA avec récompense → « récompense d'ALÉA » ; cible vaincue avec butin hors mission → « butin du monstre » ; Eurêka ou Bozja, même chose (en dernier) ; dresseur, bête apprivoisée → « apprivoisée de ».
+
+- [ ] (0.875) Désynthétiser un objet, puis sa fiche › Usages : « Vu donner » ; vaincre un monstre et ramasser un objet, puis Monde › Monstres sur cet objet : « Vu le laisser ».
+
+- [ ] (0.876) Après un coffre de mission ouvert : la fiche de la mission montre « Coffre (vu par vous) » ; clic droit sur l'objet : la mission proposée.
+
+- [ ] (0.877) Pêcher un poisson puis le moocher : Monde › Découvertes, la prise moochée « appât » = le premier poisson ; panneau de pêche : « Vu par vous ».
+
+- [ ] (0.878) Combattre un monstre qui lance un sort de mage bleu (barre d'incantation) : Monde › Découvertes « vu lançant » ; Collections › Magie bleue, fenêtre du sort : « Vu par vous ».
+
+- [ ] (0.879) Pendant une fête : Événements « Vue en cours par vous » ; un panorama inscrit : son info-bulle « Inscrit par vous ».
+
+- [ ] (0.880) Pêche en mer : à bord, aucune ligne « Ocean schedule check: the game says » dans le journal (sinon l'horaire est faux).
+
+- [ ] (0.881) Mode développeur, journal « Reading addons / fashion / islandobjects » : pêche au harpon, aéronef envoyé puis revenu, sous-marin revenu, sertissage forcé, extraction de matéria, lettre avec pièce jointe, revue de mode (avant et après jugement), île sanctuaire près des animaux.
+
+- [ ] (0.882) Monde › Découvertes : « Partager les miennes » → le dossier Export s'ouvre avec un zip, et le navigateur sur le ticket ; « Récupérer les découvertes communes » → « pas encore publié » tant qu'aucune release n'a le fichier.
+
+- [ ] (0.883) Monde › Découvertes : « Connecter GitHub » → code, l'approuver sur github.com/login/device → « Connecté à GitHub en tant que … » ; « Échanger maintenant » → « Vos découvertes ont été envoyées » et un ticket « Discoveries: <login> » dans le dépôt.
+
+- [ ] (0.884) Après la prochaine release : « Récupérer les découvertes communes » → « Fichier commun récupéré ».
+
+- [ ] (0.885) Monde › Découvertes : plus de « Récupérer » ni « Partager » ; « Échanger maintenant » marche toujours.
+
+- [ ] (0.886) Aucun essai en jeu (outil du mainteneur).
+
+- [ ] (0.887) Pêcher deux ou trois poissons : panneau de pêche, détail du poisson : « Vu par vous … ! 13,6–18,8 s » ; Monde › Découvertes : « Touches de poissons vues ».
+
+- [ ] (0.888) Faire une éthérolyse : Monde › Découvertes, « Éthérolyses : 1 » ; fiche d'un cristal obtenu : « ← éthérolyse de … ».
+
+- [ ] (0.889) À la prochaine quête qui demande un objet : remettre l'objet, puis la fiche de l'objet › Usages : « Demandé par des quêtes (vu par vous) ».
+
+- [ ] (0.890) Harpon (mode développeur) : quelques prises ; panneau de harpon : « vu par vous » ; Monde › Découvertes : « Ombres au harpon vues ». Carte : carnet de pêche › un trou de La Mer de Rubis › afficher sur la carte.
+
+- [ ] (0.891) Harpon : la liste du point reste affichée ; un poisson de la bonne ombre en vue passe en couleur « en vue ». Carte : les trous de pêche en poisson orange. Carnet de pêche › un trou › afficher sur la carte (pour la zone).
+
+- [ ] (0.892) Harpon : « Poissons de ce point : » avec une courte liste qui ne bouge pas ; un poisson en vue passe en couleur avec « » ».
+
+- [ ] (0.893) Harpon : icônes des poissons dans la liste et sur les lignes « Poisson n » ; un poisson en vue a un cadre en couleur.
+
+- [ ] (0.894) Harpon à Tamamizu : « Poissons de ce point : » avec 6 poissons. Carte de Tensho en Mer de Rubis : zones des trous de pêche, à comparer avec celles du carnet de pêche.
+
+- [ ] (0.895) Carte › calques : décocher Botaniste, les points de coupe et de fauche disparaissent, le reste demeure.
+
+- [ ] (0.896) Harpon : quelques prises ; chaque « vu par vous » doit garder la même ombre d'une prise à l'autre (Crabe-pagaie petit).
+
+- [ ] (0.897) Harpon : lignes « 1 M >>> » et liste « S >> Nom » ; survol : les mots.
+
+- [ ] (0.898) Harpon (mode développeur, journal des découvertes) : une prise multiple donne « Discovery: spearfishing, 2 at once: … shadows … ».
+
+- [ ] (0.899) Plus tard, avec une matéria XI ou XII : le taux affiché comparé à la fiche d'équipement de Tensho.
+
+- [ ] (0.900) Revue de mode › liste d'un emplacement : clic droit sur l'icône d'une pièce grisée : menu normal, lisible.
+
+- [ ] (0.901) Île sanctuaire : près d'un opo-opo ou d'un agneau, la carte de Tensho montre son icône ; calques › « Animaux de l'île » les cache.
+
+- [ ] (0.902) Carte › calques : « Rien » décoche aussi les six lignes de monstres, « Tout » les coche.
+
+- [ ] (0.903) Recevoir des gils par lettre : journal des gils › « Courrier (lettres) ».
+
+- [ ] (0.904) Rien de visible à tester : aucune page ne doit montrer une clé brute (texte entre crochets).
+
+- [ ] (0.905) Carte et listes : toutes les coordonnées s'écrivent « 12.3 » avec un point (curseur, joueur, PNJ, ALÉA, signets, triple triade, île).
+
+- [ ] (0.906) Rien de nouveau à voir : horaires ET, comptes à rebours des points de récolte et durées de voyage inchangés.
+
+- [ ] (0.907) En jeu : surlignage des collectionnables (fenêtre d'échange) et des inventaires (recherche), récolte sur un point : rien ne doit avoir changé.
+
+- [ ] (0.908) Harpon, pêche, fiche d'objet, monstres : les lignes « vu en jeu » remplacent « vu par vous ».
+
+- [ ] (0.909) Page Objets › cristaux : éléments et tailles affichés comme avant.
+
+- [ ] (0.910) Barre d'infos du serveur : l'entrée des monnaies s'appelle « Tensho Assistant (Currencies) » dans les réglages Dalamud ; la réactiver si besoin.
+
+- [ ] (0.911) Monde › Découvertes : les faits de pêche portent un libellé de pêche ; les ALÉA à (0,0) ont disparu.
+
+- [ ] (0.912) Thème clair : page Équipement lisible ; marques coche/croix sur le dresseur, le guide, la revue de mode.
+
+- [ ] (0.913) Survoler un bouton grisé (galerie d'outils pendant un chargement, carte d'un point sans carte) : l'info-bulle s'affiche ; les info-bulles longues ont toutes la même largeur.
+
+- [ ] (0.914) Glisser un curseur de la carte ou de l'équipement : l'effet suit en direct ; les réglages sont bien gardés après un rechargement.
+
+- [ ] (0.915) Réglages : chaque case a son bouton ↺ ; survoler un réglage : dernière ligne « Par défaut : … ».
+
+- [ ] (0.916) Rien de visible : les découvertes se chargent et s'enregistrent comme avant.
+
+- [ ] (0.917) Page Pêche en mer : une ligne d'état par port (« pas encore vérifié » tant que vous n'avez pas embarqué). À bord : l'aide à la pêche ordinaire ne s'ouvre pas, le panneau de voyage oui ; dalamud.log contient « Ocean schedule sighting ». Après un voyage de chaque port : l'état change.
+
+- [ ] (0.918) En pêche en mer : le panneau de voyage montre les icônes, l'appât en main encadré en vert, la touche en couleur, le temps de touche et le chronomètre ; « Poissons du courant spectral » en vert, à ouvrir.
+
+- [ ] (0.919) Atelier de la compagnie, après avoir consulté les résultats de l'aéronef : onglet des navires, « Dernier voyage : Mer de nuages - secteur 1 › … ».
+
+- [ ] (0.920) Pages avec une erreur de source (source coupée ou hors ligne) : ligne rouge ; pages vides : ligne grise ; un bouton Copier : « Copié » à côté pendant deux secondes.
+
+- [ ] (0.921) Parcourir quelques pages avec des icônes (contenus, actions, cartes de Triple Triade, carte du monde, vues panoramiques) : les icônes sont là et à la même taille.
+
+- [ ] (0.922) Rien de visible ; dalamud.log est plus court hors mode développeur.
+
+- [ ] (0.923) Rien de visible : vos listes, découvertes et historiques s'enregistrent comme avant.
+
+- [ ] (0.924) Rien de visible ; recharger le plugin ne laisse pas d'erreur dans dalamud.log.
+
+- [ ] (0.925) Rien de visible : journal des gils, cases « fait » et historique des voyages enregistrés comme avant (vérifier après un rechargement).
+
+- [ ] (0.926) Rien de visible hors JcJ : le prix à copier marche comme avant au marché.
+
+- [ ] (0.927) Survoler un objet qui apprend une emote ou une coiffure, déjà apprise puis non apprise : ligne « Apprend quelque chose : … » verte ou rouge.
+
+- [ ] (0.928) Survoler un minerai ou un bois courant : ligne « Tâche de servant : niveau … (…) ».
+
+- [ ] (0.929) Carte d'une zone de Stormblood ou plus récente : survol d'une vue panoramique, « Carnet Stormblood n° 0xx » ; la liste des vues de la carte a ses numéros.
+
+- [ ] (0.930) Collections, magie bleue : un sort appris en donjon affiche « (mission de niveau …) » après le lieu.
+
+- [ ] (0.931) Rien de visible.
+
+- [ ] (0.932) Île de l'utilisateur, carte : survol d'un animal sauvage, taille et « Produits au pâturage : … ».
+
+- [ ] (0.933) Pêcher jusqu'à une Intuition du pêcheur : page Découvertes, « pêché juste avant l'Intuition du pêcheur » et les prises sous intuition ; « touche avec <appât> ».
+
+- [ ] (0.934) Au retour d'un sous-marin, dans l'atelier : page Découvertes, « Voyage de sous-marin : … exploré ».
+
+- [ ] (0.935) Vaincre quelques ennemis ciblés, ouvrir un coffre en mission : page Découvertes, « vaincu » et « coffre au trésor ».
+
+- [ ] (0.936) Rappels, « Vos personnages » : colonne « Autres » avec mandats, livraisons et quêtes tribales du personnage connecté ; survol pour l'escouade.
+
+- [ ] (0.937) Rien de visible ; en mission longue (donjon profond), le butin des coffres reste noté après 256 objets.
+
+- [ ] (0.938) Rien de visible : page Découvertes, aide à la pêche (lignes « vu ») et info-bulles comme avant.
+
+- [ ] (0.939) Rien de visible avec une base normale.
+
+- [ ] (0.940) Après une minute de jeu : le dossier Discoveries contient Shared/kind-NN.json.gz ; page Découvertes, mêmes nombres qu'avant ; recharger le plugin, mêmes nombres.
+
+- [ ] (0.941) Recharger le plugin : page Découvertes, les nombres des sortes apparaissent quand une page les demande ; info-bulles « vu en jeu » comme avant.
+
+- [ ] (0.942) Ouvrir la page Découvertes : mêmes totaux qu'avant.
+
+- [ ] (0.943) Rien de visible avec une base normale.
+
+- [ ] (0.944) Paramètres : info-bulles relues ; carte › réglages : une seule case « zones de quête » (section Zones) ; craft › attente des bonus : le bouton par défaut revient à la valeur des actions.
+
+- [ ] (0.945) Paramètres › Avancé : cocher « Données du jeu et observées seulement » (les sources se grisent et se décochent), décocher (elles reviennent comme avant) ; Paramètres › Données : « Vider le cache… », puis le dossier Backups contient la copie.
+
+- [ ] (0.946) Prochain voyage : à chaque escale, le moment affiché par Tensho (jour, crépuscule, nuit) est celui du soleil / demi-soleil / lune de la fenêtre du jeu.
+
+- [ ] (0.947) Rien de visible.
+
+- [ ] (0.948) Paramètres › Artisanat (et page Artisanat en direct) : les deux cases en retrait sous la fenêtre, grisées quand elle est décochée.
+
+- [ ] (0.949) Paramètres › Avancé : « Terrains en vente (PaissaDB) » ; décoché, la page des terrains ne relève plus rien. Découvertes : l'avertissement au-dessus de « Se connecter ».
+
+- [ ] (0.950) Changer de zone avec la carte ouverte : moins d'à-coups ; en mode développeur, la ligne « Map vendors on map » n'apparaît plus qu'une fois par changement de carte.
+
+- [ ] (0.951) Mode développeur : ouvrir l'accueil et survoler des objets ; les lignes « Slow frame » nomment les parties.
+
+- [ ] (0.952) Paramètres : décocher un réglage principal (Discord, alertes de monnaies, aide à la récolte…) grise ses parties en retrait dessous.
+
+- [ ] (0.953) Paramètres › Carte : décocher « Points de récolte », « Quêtes et objectifs » ou « Icônes du jeu » grise les réglages en retrait dessous.
+
+- [ ] (0.954) Panneaux des listes : cocher « seulement les objets finis » grise les provenances ; « Que puis-je fabriquer ? », tri par marché : « Prix du marché pour cette liste ».
+
+- [ ] (0.955) Rien de visible : pages Vendeurs (fiche), Équipement, Banque, Tri comme avant, sans à-coups.
+
+- [ ] (0.956) Rien de visible : carte (menus des zones), collections, guide, monstres proches comme avant.
+
+- [ ] (0.957) Rien de visible.
+
+- [ ] (0.958) Pêche : un temps de touche dépassé passe en rouge ; en mer, objectif « 5 / 5 » ; points affichés seulement s'ils collent au jeu ; page Pêche en mer : Kugane avec un relevé de plus.
+
+- [ ] (0.959) Aller au Détroit ouest de Zorgor (ou une zone de Shadowbringers), attendre 10 s : l'aide à la pêche montre « météo : … · météo d'avant : … ».
+
+- [ ] (0.960) Carte du Détroit ouest de Zorgor : survol du trou de pêche, plus de « point légendaire » ni de tome de mineur.
+
+- [ ] (0.961) Prochain voyage : une cible à côté des poissons qui comptent pour un objectif en cours ; elle disparaît quand l'objectif est rempli.
+
+- [ ] (0.962) Prochain voyage, quand un courant spectral commence : page Découvertes « pêché avec … juste avant un courant spectral » ; au voyage suivant sur la même escale, la ligne dans le panneau.
+
+- [ ] (0.963) Panneau de voyage : un œil à côté des poissons à intuition ; survol, les poissons à pêcher d'abord.
+
+- [ ] (0.964) Prochain voyage : « … pts » apparaît à côté des poissons après leur première prise ; en fin de voyage, dalamud.log contient « Ocean voyage result: … scrip1 … scrip2 … » (à comparer avec l'écran de fin).
+
+- [ ] (0.965) Prochain voyage, mode développeur : dalamud.log contient « bite strength unknown; timeline slots … » à chaque touche inconnue.
+
+- [ ] (0.966) Carte : clic droit, décocher « Quêtes pas encore disponibles » : les marqueurs de quête verrouillés disparaissent.
+
+- [ ] (0.967) Carte, une zone de quête sur un autre étage : chevron discret sur la zone (option « flèches de hauteur » cochée).
+
+- [ ] (0.968) Accepter et commencer un mandat de combat : la zone « acceptée » disparaît, seule celle du mandat en cours reste ; ses cibles portent l'icône du mandat sur la carte.
+
+- [ ] (0.969) Tri › une zone › « Ajouter une catégorie » : lignes « + groupe entier : … » en tête ; plus de 64 catégories possibles.
+
+- [ ] (0.970) Quêtes : survoler une quête, ligne « Extension : … ». Survoler un objet récolté (ex. un minerai de Heavensward) : ligne « Extension (d'après ses lieux de récolte) : Heavensward ».
+
+- [ ] (0.971) Cartes › Conditions des rangs S, un rang S à ALÉA (ex. un ALÉA déjà vu) : ligne « ALÉA « … » vu en jeu en x, y (×n) ».
+
+- [ ] (0.972) Après la prochaine mise à jour du jeu : dalamud.log, lignes « Game data check: … » ; auto-contrôle, ligne « game data ».
+
+- [ ] (0.973) Mode développeur, en Eurêka : dalamud.log, lignes « Reading fields: eureka … » ; changer la magia : nouvelle ligne.
+
+- [ ] (0.974) Reliques › Vue « Par version de relique » › Zodiaque, Étape 1 : une arme par job ; onglet d'une famille avec armures › Armures : un ensemble par ligne.
+
+- [ ] (0.975) Page Eurêka et Bozja : onglets ou zones du Croissant occulte présents, avec des ALÉA et des affrontements placés.
+
+- [ ] (0.976) Page Eurêka et Bozja, zone du Croissant occulte : type « ALÉA », pas « escarmouche » ; Front sud de Bozja : « escarmouche ».
+
+- [ ] (0.977) Cibler un lieu d'une autre zone, se téléporter dans la zone, ouvrir la carte Tensho sans ouvrir celle du jeu : les marqueurs rouges des quêtes pas encore acceptées sont là.
+
+- [ ] (0.978) Planter (le journal note l'emplacement), à maturité récolter : ligne « Jardin : … récolté, retiré du journal ».
+
+- [ ] (0.979) Mode développeur, dans le Dédale : plateau, « Commencer le combat », fin du combat, plateau suivant ; dalamud.log, lignes « Labyrinth reading: … ».
+
+- [ ] (0.980) Dresseur › Équipe › 1er plateau : 10 bêtes listées, puis pour chaque combat les ennemis avec leur faiblesse et 3 bêtes ; onglet Plateaux : étoiles des ennemis (Chevalier du plateau : For 2 · Int 1 · Rés. phys. 2 · Rés. mag. 2 · Vit 3).
+
+- [ ] (0.981) Devant le plateau d'avant l'entrée : panneau Tensho à droite de « Formation de l'équipe », plateau choisi, 10 bêtes avec leur rang lu ; entrer : panneau devant le plateau ; « Commencer le combat » : le panneau disparaît ; journal : « Labyrinth board panel on/off ».
+
+- [ ] (0.982) Aide à la pêche dans un lieu avec un poisson collectionnable : ligne « Collectionnable : … / … / … », survol : assignats de chaque palier.
+
+- [ ] (0.983) Cartes › Conditions des rangs S : clic droit sur le texte d'une condition avec un lieu, ou sur « ALÉA … vu en jeu » : menu avec drapeau et éthérite la plus proche.
+
+- [ ] (0.984) Dresseur › Bêtes : une bête pas encore capturée dont le monstre a été vu : « (n lieux vus) », clic droit : lieux avec drapeau et éthérite la plus proche.
+
+- [ ] (0.985) En dresseur, carte Tensho d'une zone où vit le monstre d'une bête manquante (déjà vu) : icône de la bête ; survol, clic : drapeau.
+
+- [ ] (0.986) Rangements › Gils : cocher « Gils du jour dans la barre du serveur » ; barre du serveur : « +… » ; survol : gains et dépenses.
+
+- [ ] (0.987) Suivre un succès presque fini, demander sa progression, le finir : ligne dans la discussion ; relancer : la progression vue est toujours là.
+
+- [ ] (0.988) Accepter deux mandats d'artisanat ; Progression › Mandats : « Préparer » ; page Préparation : les objets manquants dans la liste.
+
+- [ ] (0.989) Collections › Tenues : déplier une tenue incomplète, « Pièces manquantes → souhaits » : elles sont dans Souhaits ; « Fabricables → … » : dans la liste d'artisanat.
+
+- [ ] (0.990) Ouvrir Butin des contenus (lecture), se déconnecter, rouvrir la page : états affichés et ligne « État enregistré de votre dernier personnage ».
+
+- [ ] (0.991) Objets › filtres › Job : choisir un job : seules ses pièces et armes restent.
+
+- [ ] (0.992) Mode développeur, recharger Tensho : dalamud.log, lignes « Slow reader: … ».
+
+- [ ] (0.993) Recharger Tensho en mode développeur : plus de « Slow reader: GilWatcher » ; le journal des gils garde son contenu.
+
+- [ ] (0.994) Butin des contenus › un donjon › « Mécaniques et stratégie (wiki) » › Lire sur le wiki : sections Objectives, boss… ; en combat : « Masqué pendant un combat ».
+
+- [ ] (0.995) Butin des contenus › un raid › « Vos notes et schéma d'arène » : écrire une note, ajouter T1 et A, les glisser, copier le code, coller dans un autre contenu.
+
+- [ ] (0.996) Donjons profonds › Palais des morts › Étages › 1-10 › « Mécaniques et stratégie (wiki) » › Lire : sections Enemies, Floor 10 Boss ; Sastasha : pas de butin des boss.
+
+- [ ] (0.997) Butin des contenus connecté : une seule ligne d'état ; jardin : récolter un emplacement mûr à côté d'un autre pas mûr : seul le mûr est retiré.
+
+- [ ] (0.998) Fenêtre Tensho : groupes SUIVI, CONTENUS et RÉFÉRENCES dans la navigation ; chaque page s'ouvre comme avant.
+
+- [ ] (0.999) Paramètres : sept onglets ; « Chercher un réglage » : taper « wiki » : la ligne Wiki · Données et sources, un clic ouvre l'onglet.
+
+- [ ] (0.1000) Collections › Souhaits : un prix sur un objet bon marché, cocher l'alerte : au plus 30 min après, ligne « Souhait en vente : … ».
+
+- [ ] (0.1001) Entrer dans le Dédale : « Competitive cut on » comme avant ; journal sans « Labyrinth boards unreadable ».
+
+- [ ] (0.1002) Avec un livre du Zodiaque en cours (lu sur la page Reliques) : bouclier au-dessus de ses cibles proches ; un souhait qui tombe d'un monstre proche : cœur ; liste d'artisanat sans panneau : ses matériaux comptent.
+
+- [ ] (0.1003) Atelier de la compagnie, au retour d'un aéronef : Découvertes, « … ← aéronef, secteur » ; mode développeur, un combat : lignes « Item gain not attributed » si un butin n'est pas noté.
+
+- [ ] (0.1004) Aucun essai en jeu : outil de vérification seulement.
+
+- [ ] (0.1005) Aucun essai demandé : la sonde tools/DiscoveryCheckProbe ne doit plus signaler QuestItemAsked après l'enregistrement suivant de la base (une minute de jeu).
+
+- [ ] (0.1006) Rien à faire : la sonde tourne seule au rechargement (mode développeur) ; l'agent lit le journal.
+
+- [ ] (0.1007) Atelier de compagnie, mode développeur : entrer, ouvrir la fenêtre des sous-marins ; l'agent lit « Submarine voyage check ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

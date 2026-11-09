@@ -1,6 +1,7 @@
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using TenshoAssistant.Community;
 
 namespace TenshoAssistant.Help;
 
@@ -91,19 +92,12 @@ public sealed class CommunityHelpIndex : IDisposable
         (IReadOnlyList<CommunityGuide>?, string?) result;
         try
         {
-            using var response = await client.GetAsync(Address, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode) result = (null, "Unavailable");
-            else
-            {
-                await using var stream = await response.Content.ReadAsStreamAsync(token).ConfigureAwait(false);
-                var buffer = new byte[MaxBytes + 1];
-                var read = 0;
-                while (read < buffer.Length && await stream.ReadAsync(buffer.AsMemory(read), token).ConfigureAwait(false) is var count and > 0) read += count;
-                result = read > MaxBytes ? (null, "Broken") : Parse(Encoding.UTF8.GetString(buffer, 0, read), pages);
-            }
+            // X-76 (step 2): the shared bounded reader (size limit, Tensho's User-Agent, strict UTF-8); a refused status is an HttpRequestException.
+            result = Parse(await BoundedHttp.ReadAsync(client, new Uri(Address), MaxBytes, token).ConfigureAwait(false), pages);
         }
         catch (OperationCanceledException) { result = (null, "Unavailable"); }
         catch (HttpRequestException) { result = (null, "Unavailable"); }
+        catch (Exception error) when (error is InvalidDataException or DecoderFallbackException) { result = (null, "Broken"); }
         lock (gate) if (!disposed) state = new(false, result.Item1, result.Item2);
     }
 

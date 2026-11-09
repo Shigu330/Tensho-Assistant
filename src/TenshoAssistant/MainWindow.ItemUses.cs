@@ -61,7 +61,7 @@ internal sealed partial class MainWindow
             ImGui.PushID((int)leve.RowId);
             try
             {
-                DrawItemIcon(new ItemDefinition(0,leve.Name,false,leve.IconId),new Vector2(24));ImGui.SameLine();
+                DrawGameIcon(leve.IconId,new Vector2(24));ImGui.SameLine();
                 var job=string.IsNullOrWhiteSpace(leve.Job) ? localization.Get("ItemUsesUi.UnknownJob"):leve.Job;
                 var level=leve.Level>0 ? localization.Format("QuestDetails.Level",leve.Level):localization.Get("ItemUsesUi.UnknownLevel");
                 if(!TenshoAssistant.UI.UiComponents.Header($"{leve.Name} · {job} · {level}"))continue;
@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
                     try
                     {
                         var quantityText=request.Quantity is { } quantity ? $"× {quantity}":localization.Get("ItemUsesUi.Quantity");
-                        if(ItemCell(item,request.ItemId,28,$"{item?.Name ?? localization.Format("CraftPresetMessages.Item",request.ItemId)}  {quantityText}"))focusUsesTab=true;
+                        if(ItemCell(item,request.ItemId,28,$"{item?.Name ?? localization.Format("BankUi.Item",request.ItemId)}  {quantityText}"))focusUsesTab=true;
                     }
                     finally{ImGui.PopID();}
                 }
@@ -114,6 +114,20 @@ internal sealed partial class MainWindow
                 finally{ImGui.PopID();}
             }
         }
+        // X-75.2 (0.875): what this item was seen in game giving (yours or shared: desynthesis, opened), before LuminaSupplemental's lists.
+        if(Seen()?.GivesBySource.GetValueOrDefault(id) is { Length:>0 } seenGives
+           && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.SeenGives",seenGives.Length)+"###UseSeenGives"))
+        {
+            ImGui.Indent();
+            foreach(var result in seenGives)
+            {
+                var got=items?.Find(result);
+                ImGui.PushID((int)result);
+                try{if(ItemCell(got,result,20,got is null ? result.ToString():null))focusUsesTab=true;}
+                finally{ImGui.PopID();}
+            }
+            ImGui.Unindent();
+        }
         if(lumina?.State.Data is { } data)
         {
             var given=data.GivesOf(id);
@@ -131,6 +145,14 @@ internal sealed partial class MainWindow
                     }
                     ImGui.Unindent();
                 }
+            // X-73.18 (0.889): the quests seen in game asking for it (yours or shared) come first. 0.911: an HQ demand (the item's HQ id) says « HQ ».
+            if(DiscoveryStore is { } seenStore && DiscoveriesLoaded
+               && seenStore.Find(Discoveries.DiscoveryKind.QuestItemAsked,subject=>Discoveries.QuestItemAsks.IsOf(subject,id),16) is { Count:>0 } seenAsks
+               && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.SeenQuests",seenAsks.Count)+"###UseSeenQuests"))
+                foreach(var fact in seenAsks)
+                    if(ImGui.Selectable(localization.Format("ItemUseRefs.Quest",DiscoveryQuestName(fact.Detail),LevelRange(fact.LevelMin,fact.LevelMax))
+                        +(Discoveries.QuestItemAsks.Hq(fact.Subject) ? " HQ":"")+$"##SeenAsk{fact.Detail}:{fact.Subject}"))
+                    {page=Page.Quests;SelectQuest(fact.Detail);}
             var asked=data.QuestsRequiring(id);
             if(asked.Count>0 && TenshoAssistant.UI.UiComponents.Header(localization.Format("ItemUseRefs.Quests",asked.Count)+"###UseQuests"))
                 foreach(var (questId,name,quantity,hq) in asked)

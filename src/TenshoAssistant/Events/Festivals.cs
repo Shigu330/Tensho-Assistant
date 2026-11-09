@@ -19,6 +19,7 @@ public sealed record FestivalLayouts(IReadOnlyDictionary<uint,IReadOnlyList<(uin
 /// </summary>
 public static class Festivals
 {
+
     /// <summary>FestivalName rows (id, English name); « None » and « Unknown » are no name.</summary>
     public static IReadOnlyDictionary<uint,string> ReadNames(TextReader reader)
     {

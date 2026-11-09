@@ -38,7 +38,7 @@ internal sealed partial class MainWindow
         if(native.Catalog is not null && TenshoAssistant.UI.UiComponents.Header(localization.Get("FashionWeek.Title")+"###FashionWeek",ImGuiTreeNodeFlags.DefaultOpen))DrawFashionWeek();
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("FashionWeek.AllTitle")+"###FashionAll",fashionShowItems ? ImGuiTreeNodeFlags.DefaultOpen:ImGuiTreeNodeFlags.None))return;
         ImGui.TextWrapped(localization.Get("FashionUi.Help"));
-        if(native.Catalog is not { } catalog) { if(native.Error is { } hintError)DrawDataError(hintError,"ServiceErrors.Fashion");else ImGui.TextWrapped(localization.Get("FashionUi.LoadingHints")); return; }
+        if(native.Catalog is not { } catalog) { if(native.Error is { } hintError)DrawDataError(hintError,"ServiceErrors.Fashion");else EmptyState("FashionUi.LoadingHints"); return; }
         var state=fashionData.State; var dataset=state.Dataset;
         if(state.Loading) { if(ImGui.Button(localization.Get("FashionUi.Cancel"))) fashionData.Cancel(); ImGui.SameLine(); ImGui.TextDisabled(localization.Get("FashionUi.Loading")); }
         else
@@ -132,7 +132,7 @@ internal sealed partial class MainWindow
             ImGui.SameLine(); if(ImGui.SmallButton(localization.Get("FashionUi.Recipes"))) OpenContextTool("Craftimizer");
             ImGui.SameLine(); if(ImGui.SmallButton(localization.Get("FashionUi.Prices"))) OpenContextTool("Price Insight");
         }
-        if(fashionCandidates.Count==0) { ImGui.TextWrapped(localization.Get("FashionUi.Empty")); return; }
+        if(fashionCandidates.Count==0) { EmptyState("FashionUi.Empty"); return; }
         RefreshRecipeHoldingsCache();
         if(!ImGui.BeginTable("FashionCandidates",3,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp)) return;
         try
@@ -159,7 +159,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();
                     var stock=GetRecipeHoldings(id);
                     ImGui.TextUnformatted(!stock.HasObservation ? localization.Get("FashionUi.Unknown") : $"{stock.Total:N0}{(stock.HasCached ? localization.Get("UiFragments.CacheSuffix"):"")}{(stock.HasUnknown ? localization.Get("UiFragments.PartialSuffix"):"")}");
-                    if(ImGui.IsItemHovered()) WrappedTooltip(localization.Get("FashionUi.StockHelp"));
+                    Tip("FashionUi.StockHelp");
                 }
             }
             finally { clipper.End(); clipper.Destroy(); }

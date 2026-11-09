@@ -117,7 +117,7 @@ public sealed class ExtraCollectionReader : IDisposable
             .Select(row=>new CollectionEntry(CollectionKind.Portrait,200000+row.RowId,row.Name.ExtractText(),(uint)Math.Max(0,row.Icon),unlocks.IsBannerDecorationUnlocked(row),Description:"Decoration")),
         ()=>data.GetExcelSheet<SecretRecipeBook>().Where(row=>row.RowId!=0 && !row.Name.IsEmpty)
             .Select(row=>new CollectionEntry(CollectionKind.MasterBook,row.RowId,row.Name.ExtractText(),row.Item.ValueNullable?.Icon ?? 0,unlocks.IsSecretRecipeBookUnlocked(row),ItemId:row.Item.RowId)),
-        // 0.526 (user report): the game's « Légendes locales »: the folklore tomes of miner, botanist and fisher, one per region (docs/evidence/0.526-folklore-tomes.md).
+        // 0.526 (user report): the game's folklore tomes (Folklore): those of miner, botanist and fisher, one per region (docs/evidence/0.526-folklore-tomes.md).
         Folklore,
         ()=>data.GetExcelSheet<McGuffin>().Where(row=>row.RowId!=0 && row.UIData.ValueNullable is { } ui && !ui.Name.IsEmpty)
             .Select(row=>new CollectionEntry(CollectionKind.McGuffin,row.RowId,row.UIData.Value.Name.ExtractText(),row.UIData.Value.Icon,unlocks.IsMcGuffinUnlocked(row),Number:row.UIData.Value.Order)),

@@ -14,10 +14,6 @@ public sealed record MapDefinition(uint MapId, uint TerritoryId, string Region, 
 public static class MapMenus
 {
     /// <summary>
-    /// 0.619 (user report: « 0 » in the menu): the name of a floor. The game gives a name, or a number for the floors of a dungeon; its main map has neither (Limsa's
-    /// upper decks: map 11, index 0, no subzone, beside its Airship Landing), so it takes the zone's name.
-    /// </summary>
-    /// <summary>
     /// 0.621 (user report, compared in game): what the game's map writes under the zone: where the player stands (TerritoryInfo), then the sub-place when there is one (user's choice: no « -- »). Only for the
     /// map the player is on. Nothing when the place is unknown.
     /// </summary>
@@ -35,11 +31,39 @@ public static class MapMenus
             if(extra is { TerritoryId:not 0,MenuCategory:0 } && extra.RegionPlaceId==region.RegionPlaceId && !result.Any(entry=>entry.Contains(extra)))result.Add([extra]);
         return result;
     }
+    /// <summary>
+    /// 0.619 (user report: « 0 » in the menu): the name of a floor. The game gives a name, or a number for the floors of a dungeon; its main map has neither (Limsa's
+    /// upper decks: map 11, index 0, no subzone, beside its Airship Landing), so it takes the zone's name.
+    /// </summary>
     public static string FloorLabel(MapDefinition map)=>map.Subzone.Length>0 ? map.Subzone:map.MapIndex>0 ? map.MapIndex.ToString():map.Zone;
     public static IReadOnlyList<IReadOnlyList<MapDefinition>> Zones(IEnumerable<MapDefinition> maps,MapDefinition? region)
         =>region is not { MenuCategory:>0 } ? []:maps.Where(map=>map.MenuCategory==region.MenuCategory && map.MenuPriority>region.MenuPriority && map.TerritoryId!=0)
             .GroupBy(map=>map.MenuPriority).OrderBy(group=>group.Key)
             .Select(group=>(IReadOnlyList<MapDefinition>)group.OrderBy(map=>map.MapIndex).ThenBy(map=>map.MapId).ToArray()).ToArray();
+}
+
+/// <summary>
+/// X-76 (0.956): the zone menu (with its extras) and the shown map's floors, kept while the catalogue, the region, the shown map and the quest's map stay
+/// the same: they change on navigation only, and the menus are drawn every frame. Draw-thread only.
+/// </summary>
+public sealed class MapZoneMenu
+{
+    private (MapCatalog? Catalog,uint Region,uint Map,uint Quest) key;
+    public IReadOnlyList<IReadOnlyList<MapDefinition>> Zones { get; private set; } = [];
+    public IReadOnlyList<MapDefinition> Floors { get; private set; } = [];
+    /// <summary>Changes each time the lists are built again: a key for what is measured from them.</summary>
+    public int Builds { get; private set; }
+    public void Update(MapCatalog catalog,MapDefinition? region,MapDefinition map,uint questMap)
+    {
+        ArgumentNullException.ThrowIfNull(catalog);
+        ArgumentNullException.ThrowIfNull(map);
+        var next=(catalog,region?.MapId ?? 0,map.MapId,questMap);
+        if(Builds>0 && key==next)return;
+        key=next;
+        Zones=MapMenus.WithExtras(MapMenus.Zones(catalog.Entries,region),region,map,catalog.Find(questMap));
+        Floors=Zones.FirstOrDefault(entry=>entry.Any(floor=>floor.MapId==map.MapId)) ?? [];
+        Builds++;
+    }
 }
 
 /// <summary>0.634: where a dungeon is entered, in map pixels (docs/evidence/0.634-dungeon-entrances.md).</summary>
@@ -197,9 +221,10 @@ public sealed class MapCatalogService
 }
 
 /// <summary>
-/// Game map icon a vendor NPC stands by (MAP-017, docs/evidence/0.155.0-vendor-markers-probe.log): shop icons (Échoppe, Échangeur,
-/// Marchand) within 16 texture pixels, as since 0.140; service icons seen beside vendors (Réparations, Officier du logement, Mage bleu,
-/// Guide, Commise aux objets de classe/job, Commandes spéciales, Dresseur) within 8 pixels and only when the marker has no place label.
+/// Game map icon a vendor NPC stands by (MAP-017, docs/evidence/0.155.0-vendor-markers-probe.log): shop icons (shop, exchange,
+/// merchant) within 16 texture pixels, as since 0.140; service icons seen beside vendors (in the probe log under the French client's names:
+/// Réparations, Officier du logement, Mage bleu, Guide, Commise aux objets de classe/job, Commandes spéciales, Dresseur) within 8 pixels and only
+/// when the marker has no place label.
 /// </summary>
 public static class MapVendorIcons
 {
@@ -209,8 +234,8 @@ public static class MapVendorIcons
 
     /// <summary>
     /// Index of the marker the vendor at <paramref name="pixel"/> belongs to, or -1: the nearest qualifying marker of the vendor's own
-    /// kind (<paramref name="preferred"/>: Échangeur for exchange-only vendors, Échoppe otherwise) when one is in reach, else the nearest
-    /// (0.171: in Auxesia the credit exchange stands 2.3 px from an Échoppe and 3.7 px from its Échangeur).
+    /// kind (<paramref name="preferred"/>: the exchange icon for exchange-only vendors, the shop icon otherwise) when one is in reach, else the nearest
+    /// (0.171: in Auxesia the credit exchange stands 2.3 px from a shop icon and 3.7 px from its exchange icon).
     /// </summary>
     public static int Nearest(IReadOnlyList<(float X, float Y, uint Icon, bool Labelled)> markers, System.Numerics.Vector2 pixel, uint preferred = 0)
     {
