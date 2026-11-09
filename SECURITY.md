@@ -25,7 +25,7 @@ What the plugin does that matters for security (checked against the code on 2026
 
 - **Network**: HTTPS requests with a timeout and a size limit (`src/TenshoAssistant/Community/BoundedHttp.cs`, or the client's own
   limit for Universalis) to:
-  - Universalis (`universalis.app`: prices, listings and history, by world and item id);
+  - Universalis (`universalis.app`: prices, listings and history, by world and item id); when the wishlist sale alert is on (off by default, 0.1000), one request every 30 minutes at most for up to 20 wishes that have a price;
   - Garland Tools (`www.garlandtools.org`: item sources, duty and monster loot);
   - the FFXIV Console Games Wiki (`ffxiv.consolegameswiki.com`: item acquisition, monster drops, sightseeing log, blue magic spells,
     Beastmaster and island pasture pages);
@@ -153,7 +153,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code le 2
 
 - **Réseau** : requêtes HTTPS avec un délai et une taille limités (`src/TenshoAssistant/Community/BoundedHttp.cs`, ou la limite propre
   du client pour Universalis) vers :
-  - Universalis (`universalis.app` : prix, annonces et historique, par monde et numéro d'objet) ;
+  - Universalis (`universalis.app` : prix, annonces et historique, par monde et numéro d'objet) ; quand l'alerte de vente des souhaits est activée (désactivée par défaut, 0.1000), une requête toutes les 30 minutes au plus pour 20 souhaits avec un prix au plus ;
   - Garland Tools (`www.garlandtools.org` : sources d'objets, butin des contenus et des monstres) ;
   - le FFXIV Console Games Wiki (`ffxiv.consolegameswiki.com` : acquisition des objets, butin des monstres, carnet d'exploration, sorts
     de mage bleu, pages du dresseur et du pâturage de l'île) ;

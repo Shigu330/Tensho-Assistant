@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1001.0
+- Plan global, Verify : Contenus à venir (X-92) : l'inventaire des listes de numéros écrites dans le code n'a trouvé qu'un cas que les feuilles du jeu donnent : les territoires du Dédale bestial (coupure JcJ et classé). Ses plateaux sont maintenant aussi tirés des feuilles : un plateau ajouté par une mise à jour sera coupé (et son panneau d'équipe permis devant le plateau) sans code. La liste écrite reste, dans le doute. Aussi : SECURITY.md déclare la vérification des souhaits. Non validé en jeu.
+- Tests : LabyrinthSheets1001Tests. Verify.ps1 (agent) : 1638/1638, 0 avertissement, 0 erreur ; DLL 0.1001.0.0. Non validé en jeu.
+### English
+- Future content (X-92): the inventory of id lists written in the code found one case the game's sheets give: the Beastmaster labyrinth's territories (PvP and ranked cut). Its boards now also come from the sheets: a board added by an update will be cut (and its team panel allowed in front of the board) without code. The written list stays, in doubt. Also: SECURITY.md declares the wishlist check. Not validated in game.
+
 ## 0.1000.0
 - Plan global, Verify : Souhaits (X-101, votre choix DEC-048) : la liste de souhaits a une colonne « Mon prix » et un réglage « Alerte quand un souhait est en vente sous mon prix », désactivé par défaut. Activé (et Universalis activé), Tensho demande à Universalis, au plus une fois toutes les 30 minutes, les souhaits qui ont un prix (20 par requête) et écrit une ligne dans la discussion quand l'un est en vente sous votre prix, avec le monde, une fois à chaque passage sous ce prix. Rien n'est demandé pendant la coupure JcJ ni quand Universalis est coupé. Non validé en jeu.
 - Tests : WishSales1000Tests. Verify.ps1 (agent) : 1637/1637, 0 avertissement, 0 erreur ; DLL 0.1000.0.0. Non validé en jeu.

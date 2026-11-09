@@ -11,7 +11,7 @@ internal static class Labyrinth979Tests
         {
             Check(CompetitiveZones.Labyrinth.All(CompetitiveZones.Listed.Contains),"still cut");
             var gate=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs"));
-            Check(gate.Contains("if(CompetitiveGate.Developer?.Invoke()==true && CompetitiveZones.Labyrinth.Contains((uint)client.TerritoryType))"),"guard");
+            Check(gate.Contains("if(CompetitiveGate.Developer?.Invoke()==true && CompetitiveZones.IsLabyrinth((uint)client.TerritoryType))"),"guard");
             Check(gate.Contains("if(seen==labyrinthSeen)return;"),"on change");
         }),
     ];

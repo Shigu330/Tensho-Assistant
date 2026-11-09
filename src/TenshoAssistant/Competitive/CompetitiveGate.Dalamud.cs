@@ -91,8 +91,17 @@ internal sealed class CompetitiveWatcher : IDisposable
         this.framework=framework;this.client=client;this.log=log;this.gui=gui;this.condition=condition;
         try
         {
+            // X-92 (0.1001): the labyrinth's boards from the sheets (XBMContent column 0 = ContentFinderCondition); a failed read keeps the written list only.
+            var labyrinth=new List<uint>();
+            try
+            {
+                var finder=data.GetExcelSheet<ContentFinderCondition>();
+                foreach(var row in data.Excel.GetSheet<Lumina.Excel.RawRow>(null,"XBMContent"))
+                    if(row.RowId!=0 && Convert.ToUInt32(row.ReadColumn(0))is var content and not 0 && finder.GetRowOrDefault(content) is { } duty)labyrinth.Add(duty.TerritoryType.RowId);
+            }
+            catch(Exception error){log.Warning(error,"Labyrinth boards unreadable from the sheets: the written list stays.");}
             zones=CompetitiveZones.Build(data.GetExcelSheet<TerritoryType>().Select(row=>(row.RowId,row.IsPvpZone)),
-                data.GetExcelSheet<ContentFinderCondition>().Select(row=>(row.TerritoryType.RowId,row.PvP,row.ContentType.RowId)));
+                data.GetExcelSheet<ContentFinderCondition>().Select(row=>(row.TerritoryType.RowId,row.PvP,row.ContentType.RowId)),labyrinth);
         }
         // In doubt, stopped: after a game update that breaks these sheets Tensho stays cut rather than running in PvP.
         catch(Exception error){zones=null;log.Warning(error,"Competitive zones unavailable: Tensho stays stopped while logged in.");}
@@ -117,10 +126,10 @@ internal sealed class CompetitiveWatcher : IDisposable
     {
         // X-109 (0.981, DEC-047): the board is open (its window visible) and the player not in combat; anything else, or a failed read, is no board.
         var board=false;
-        if(CompetitiveZones.Labyrinth.Contains((uint)client.TerritoryType))
+        if(CompetitiveZones.IsLabyrinth((uint)client.TerritoryType))
             try{var window=gui.GetAddonByName("XBMStageDetailList");board=!window.IsNull && window.IsVisible && !condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];}catch(Exception){board=false;}
         if(board!=CompetitiveGate.LabyrinthBoard){CompetitiveGate.SetLabyrinthBoard(board);log.Information("Labyrinth board panel {0}: territory {1}.",board ? "on":"off",client.TerritoryType);}
-        if(CompetitiveGate.Developer?.Invoke()==true && CompetitiveZones.Labyrinth.Contains((uint)client.TerritoryType))
+        if(CompetitiveGate.Developer?.Invoke()==true && CompetitiveZones.IsLabyrinth((uint)client.TerritoryType))
             try{ReadLabyrinth();}catch(Exception error){if(labyrinthSeen!="failed"){labyrinthSeen="failed";log.Warning(error,"Labyrinth reading failed.");}}
         var now=Decide();
         if(now==CompetitiveGate.Cut)return;
